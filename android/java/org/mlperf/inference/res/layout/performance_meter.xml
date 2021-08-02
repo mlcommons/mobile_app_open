@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/performanceDial"
+    android:layout_width="180dp"
+    android:layout_height="180dp"
+    android:clipChildren="false">
+
+    <View
+        android:id="@+id/innerPerformanceCircleBackground"
+        android:layout_width="135dp"
+        android:layout_height="135dp"
+        android:layout_gravity="center"
+        android:background="@drawable/performance_meter_circle"
+        android:elevation="16dp" />
+
+    <FrameLayout
+        android:id="@+id/performanceDialHandLayout"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:elevation="16dp"
+        android:clipChildren="false">
+
+        <View
+            android:id="@+id/performanceDialHand"
+            android:layout_width="135dp"
+            android:layout_height="135dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_performance_hand"
+            android:rotation="0" />
+
+        <ImageView
+            android:id="@+id/dialGlow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:translationY="28dp"
+            app:srcCompat="@drawable/highlight1" />
+
+    </FrameLayout>
+
+    <org.mlperf.inference.ui.PerformanceMeterProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_gravity="center"
+        android:rotation="90" />
+</FrameLayout>

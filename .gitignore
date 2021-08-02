@@ -1,0 +1,14 @@
+.DS_Store
+.aswb
+.idea
+.vscode
+bazel-*
+output
+output_logs
+*.so
+* .apk
+* .tflite
+* .dlc
+* .zip
+* .jar
+* .tgz

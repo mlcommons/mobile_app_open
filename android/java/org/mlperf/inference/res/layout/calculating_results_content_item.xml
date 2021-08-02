@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginTop="18dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ImageView
+        android:id="@+id/calculatingStatusIcon"
+        app:layout_constraintEnd_toStartOf="@id/calculatingStatusTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/result_label_margin"
+        android:layout_marginBottom="@dimen/result_label_margin"
+        android:layout_marginEnd="8dp"
+        android:layout_width="@dimen/icon_size"
+        android:src="@drawable/ic_image_classification"
+        android:layout_height="@dimen/icon_size"
+        tools:ignore="ContentDescription" />
+    <TextView
+        android:id="@+id/calculatingStatusTitle"
+        android:textColor="#135384"
+        android:textSize="@dimen/result_label_text_size"
+        android:text="Image Classification"
+        android:gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"/>
+</LinearLayout>
