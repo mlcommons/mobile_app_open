@@ -30,7 +30,7 @@ cc_library(
         "external.h",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -39,10 +39,10 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "//cpp:mlperf_driver",
-        "//cpp:utils",
-        "//cpp/datasets:allocator",
-        "//cpp/proto:mlperf_task_cc_proto",
+        "//android/cpp:mlperf_driver",
+        "//android/cpp:utils",
+        "//android/cpp/datasets:allocator",
+        "//android/cpp/proto:mlperf_task_cc_proto",
         "@org_tensorflow//tensorflow/lite:shared_library",
     ],
 )

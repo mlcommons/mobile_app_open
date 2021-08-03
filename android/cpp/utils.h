@@ -20,8 +20,8 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "cpp/c/type.h"
-#include "cpp/proto/backend_setting.pb.h"
+#include "android/cpp/c/type.h"
+#include "android/cpp/proto/backend_setting.pb.h"
 #include "loadgen/test_settings.h"
 #include "tensorflow/core/platform/logging.h"
 

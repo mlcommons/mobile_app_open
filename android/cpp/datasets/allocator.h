@@ -18,7 +18,7 @@ limitations under the License.
 #include <cstdlib>
 #include <new>
 
-#include "cpp/utils.h"
+#include "android/cpp/utils.h"
 
 namespace mlperf {
 namespace mobile {

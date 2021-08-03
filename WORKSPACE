@@ -12,7 +12,7 @@ http_archive(
 http_archive(
     name = "org_tensorflow",
     patch_args = ["-p1"],
-    patches = ["//third_party:tf_grappler_cost.diff"],
+    patches = ["//android/third_party:tf_grappler_cost.diff"],
     sha256 = "1fee58466b88d276f1eb3fb9126b1cd3b261460540b5ac415ca239160e101edb",
     strip_prefix = "tensorflow-2.4.0",
     urls = [
@@ -120,25 +120,15 @@ http_archive(
     urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/56908661f2558953d8850cace4d06d049cf4efc3.tar.gz"],
 )
 
-local_repository(
-    name = "tflitebackend",
-    path = "tflite_backend",
-)
-
-local_repository(
-    name = "qtibackend",
-    path = "qti_backend",
-)
-
 new_local_repository(
     name = "samsungbackend",
     build_file = "samsung_backend/BUILD",
-    path = "samsung_backend",
+    path = "mobile_back_samsung",
 )
 
 http_archive(
     name = "org_mlperf_inference",
-    build_file = "@//third_party:loadgen.BUILD",
+    build_file = "@//android/third_party:loadgen.BUILD",
     patch_cmds = ["python loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
     sha256 = "900053d97d4165396c45ec13dd211ea3cb3306a6c496b0172f7093e9fc5ebc47",
     strip_prefix = "inference-dd9e6bf867869fad0b9fcade0f719e1536780299",

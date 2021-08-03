@@ -19,11 +19,11 @@ limitations under the License.
 #include <streambuf>
 #include <string>
 
-#include "cpp/backend.h"
-#include "cpp/dataset.h"
-#include "cpp/mlperf_driver.h"
-#include "cpp/proto/backend_setting.pb.h"
-#include "cpp/proto/mlperf_task.pb.h"
+#include "android/cpp/backend.h"
+#include "android/cpp/dataset.h"
+#include "android/cpp/mlperf_driver.h"
+#include "android/cpp/proto/backend_setting.pb.h"
+#include "android/cpp/proto/mlperf_task.pb.h"
 #include "google/protobuf/text_format.h"
 #include "tensorflow/lite/java/src/main/native/jni_utils.h"
 

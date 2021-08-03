@@ -25,7 +25,7 @@ common_linkopts = tflite_linkopts() + select({
         "-pie",
     ],
 }) + select({
-    "//commonlibs:use_asan": [
+    "//android/commonlibs:use_asan": [
         "-fsanitize=address",
         "-g",
         "-O1",
@@ -38,7 +38,7 @@ cc_binary(
     name = "main",
     srcs = ["main.cc"],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -48,22 +48,15 @@ cc_binary(
     }),
     linkopts = common_linkopts,
     deps = [
-        "//cpp:mlperf_driver",
-        "//cpp:utils",
-        "//cpp/backends:external",
-        "//cpp/datasets:ade20k",
-        "//cpp/datasets:coco",
-        "//cpp/datasets:imagenet",
-        "//cpp/datasets:squad",
-        "//cpp/proto:mlperf_task_cc_proto",
+        "//android/cpp:mlperf_driver",
+        "//android/cpp:utils",
+        "//android/cpp/backends:external",
+        "//android/cpp/datasets:ade20k",
+        "//android/cpp/datasets:coco",
+        "//android/cpp/datasets:imagenet",
+        "//android/cpp/datasets:squad",
+        "//android/cpp/proto:mlperf_task_cc_proto",
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/lite/tools:command_line_flags",
-    ],
-)
-
-cc_library(
-    name = "tflitebackend",
-    deps = [
-        "@tflitebackend",
     ],
 )

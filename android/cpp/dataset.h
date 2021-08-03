@@ -20,8 +20,8 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "cpp/backend.h"
-#include "cpp/utils.h"
+#include "android/cpp/backend.h"
+#include "android/cpp/utils.h"
 #include "loadgen/query_sample_library.h"
 
 namespace mlperf {

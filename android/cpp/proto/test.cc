@@ -16,9 +16,9 @@ limitations under the License.
 #include <list>
 #include <string>
 
-#include "cpp/c/type.h"
-#include "cpp/proto/mlperf_task.pb.h"
-#include "cpp/utils.h"
+#include "android/cpp/c/type.h"
+#include "android/cpp/proto/mlperf_task.pb.h"
+#include "android/cpp/utils.h"
 #include "google/protobuf/text_format.h"
 
 namespace mlperf {

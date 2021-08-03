@@ -9,7 +9,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include "cpp/mlperf_driver.h"
+#include "android/cpp/mlperf_driver.h"
 
 #include <stdint.h>
 
@@ -17,9 +17,9 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "cpp/backend.h"
-#include "cpp/dataset.h"
-#include "cpp/utils.h"
+#include "android/cpp/backend.h"
+#include "android/cpp/dataset.h"
+#include "android/cpp/utils.h"
 #include "loadgen/loadgen.h"
 #include "loadgen/query_sample_library.h"
 #include "loadgen/system_under_test.h"

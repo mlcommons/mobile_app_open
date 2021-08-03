@@ -24,9 +24,9 @@ limitations under the License.
 #include <unordered_map>
 #include <vector>
 
-#include "cpp/dataset.h"
-#include "cpp/datasets/squad_utils/tfrecord_reader.h"
-#include "cpp/datasets/squad_utils/types.h"
+#include "android/cpp/dataset.h"
+#include "android/cpp/datasets/squad_utils/tfrecord_reader.h"
+#include "android/cpp/datasets/squad_utils/types.h"
 
 namespace mlperf {
 namespace mobile {

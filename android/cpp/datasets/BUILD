@@ -29,7 +29,7 @@ cc_library(
         "allocator.h",
     ],
     copts = select({
-        "//commonlibs:use_asan": [
+        "//android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -38,7 +38,7 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "//cpp:utils",
+        "//android/cpp:utils",
     ],
 )
 
@@ -51,7 +51,7 @@ cc_library(
         "imagenet.h",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -61,9 +61,9 @@ cc_library(
     }),
     deps = [
         ":allocator",
-        "//cpp:mlperf_driver",
-        "//cpp:utils",
-        "//cpp/backends:external",
+        "//android/cpp:mlperf_driver",
+        "//android/cpp:utils",
+        "//android/cpp/backends:external",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
         "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
         "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
@@ -80,7 +80,7 @@ cc_library(
         "coco.h",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -90,9 +90,9 @@ cc_library(
     }),
     deps = [
         ":allocator",
-        "//cpp:mlperf_driver",
-        "//cpp:utils",
-        "//cpp/backends:external",
+        "//android/cpp:mlperf_driver",
+        "//android/cpp:utils",
+        "//android/cpp/backends:external",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_protobuf//:protobuf",
         "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
@@ -107,7 +107,7 @@ cc_library(
     srcs = ["squad.cc"],
     hdrs = ["squad.h"],
     copts = select({
-        "//commonlibs:use_asan": [
+        "//android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -116,9 +116,9 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "//cpp:mlperf_driver",
-        "//cpp:utils",
-        "//cpp/datasets/squad_utils",
+        "//android/cpp:mlperf_driver",
+        "//android/cpp:utils",
+        "//android/cpp/datasets/squad_utils",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/core:portable_tensorflow_lib_lite",
@@ -139,9 +139,9 @@ cc_library(
     ],
     deps = [
         ":allocator",
-        "//cpp:mlperf_driver",
-        "//cpp:utils",
-        "//cpp/backends:external",
+        "//android/cpp:mlperf_driver",
+        "//android/cpp:utils",
+        "//android/cpp/backends:external",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
         "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
         "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",

@@ -101,10 +101,10 @@ cc_library(
     }),
     data = select({
         "android_arm64": [
-            "//commonlibs:asan_arm64",
+            "//android/commonlibs:asan_arm64",
         ],
         "android_x86_64": [
-            "//commonlibs:asan_x86_64",
+            "//android/commonlibs:asan_x86_64",
         ],
         "//conditions:default": [],
     }),
@@ -120,13 +120,13 @@ cc_library(
     }),
     data = select({
         "android_arm64": [
-            "//commonlibs:libcpp_shared_arm64",
+            "//android/commonlibs:libcpp_shared_arm64",
         ],
         "//conditions:default": [],
     }),
     deps = select({
         ":use_asan": [
-            "//commonlibs:asan_lib",
+            "//android/commonlibs:asan_lib",
         ],
         "//conditions:default": [],
     }),

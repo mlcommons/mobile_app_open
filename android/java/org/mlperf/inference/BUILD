@@ -14,7 +14,7 @@
 # ==============================================================================
 load("@build_bazel_rules_android//android:rules.bzl", "android_binary", "android_library")
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
-load("//cpp/proto:gen_binary_proto.bzl", "basename", "text_to_bin")
+load("//android/cpp/proto:gen_binary_proto.bzl", "basename", "text_to_bin")
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 
 package(
@@ -60,7 +60,7 @@ config_setting(
 
 java_lite_proto_library(
     name = "mlperf_task_java_proto_lite",
-    deps = ["//cpp/proto:mlperf_task_proto"],
+    deps = ["//android/cpp/proto:mlperf_task_proto"],
 )
 
 genrule(
@@ -119,16 +119,16 @@ android_library(
     deps = [
         ":evaluation_native",
         ":mlperf_task_java_proto_lite",
-        "//third_party:androidx_annotation",
-        "//third_party:androidx_appcompat",
-        "//third_party:androidx_constraint_layout",
-        "//third_party:androidx_core",
-        "//third_party:androidx_material",
-        "//third_party:androidx_preference",
-        "//third_party:androidx_recyclerview",
-        "//third_party:androidx_test_espresso_idling_resource",
+        "//android/third_party:androidx_annotation",
+        "//android/third_party:androidx_appcompat",
+        "//android/third_party:androidx_constraint_layout",
+        "//android/third_party:androidx_core",
+        "//android/third_party:androidx_material",
+        "//android/third_party:androidx_preference",
+        "//android/third_party:androidx_recyclerview",
+        "//android/third_party:androidx_test_espresso_idling_resource",
     ] + select({
-        ":use_mediatek": ["@tflitebackend//cpp/backend_tflite:tflite_neuron_aar"],
+        ":use_mediatek": ["//mobile_back_tflite/cpp/backend_tflite:tflite_neuron_aar"],
         "//conditions:default": [],
     }),
 )
@@ -150,15 +150,15 @@ android_binary(
     ],
     deps = [
         ":evaluation_app_lib",
-        "//commonlibs:commonlibs",
+        "//android/commonlibs:commonlibs",
     ] + select({
-        ":use_qti": ["@qtibackend//:qtibackend"],
+        ":use_qti": ["//mobile_back_qti:qtibackend"],
         "//conditions:default": [],
     }) + select({
         ":use_samsung": ["@samsungbackend//:samsungbackend"],
         "//conditions:default": [],
     }) + select({
-        ":use_mediatek": ["@tflitebackend//:tfliteneuronbackend"],
+        ":use_mediatek": ["//mobile_back_tflite:tfliteneuronbackend"],
         "//conditions:default": [],
     }),
 )
@@ -180,14 +180,14 @@ cc_library(
         "libmlperf_jni.so",
     ],
     deps = [
-        "@tflitebackend//:tflitebackend",
+        "//mobile_back_tflite:tflitebackend",
     ] + select({
         ":use_samsung": [
             "@samsungbackend//:samsungbackend",
         ],
         "//conditions:default": [],
     }) + select({
-        ":use_mediatek": ["@tflitebackend//:tfliteneuronbackend"],
+        ":use_mediatek": ["//mobile_back_tflite:tfliteneuronbackend"],
         "//conditions:default": [],
     }),
 )
@@ -195,6 +195,6 @@ cc_library(
 tflite_jni_binary(
     name = "libmlperf_jni.so",
     deps = [
-        "//java/org/mlperf/inference/jni:mlperf_jni",
+        "//android/java/org/mlperf/inference/jni:mlperf_jni",
     ],
 )

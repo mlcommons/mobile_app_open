@@ -18,7 +18,7 @@ limitations under the License.
 #include <vector>
 
 #include "allocator.h"
-#include "cpp/dataset.h"
+#include "android/cpp/dataset.h"
 #include "tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.h"
 
 namespace mlperf {

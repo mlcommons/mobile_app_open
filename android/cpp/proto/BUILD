@@ -54,9 +54,9 @@ cc_binary(
     ],
     linkopts = common_linkopts,
     deps = [
-        "//cpp:mlperf_driver",
-        "//cpp:utils",
-        "//cpp/proto:mlperf_task_cc_proto",
+        "//android/cpp:mlperf_driver",
+        "//android/cpp:utils",
+        "//android/cpp/proto:mlperf_task_cc_proto",
         "@com_google_protobuf//:protobuf",
         "@org_tensorflow//tensorflow/lite/tools:command_line_flags",
     ],

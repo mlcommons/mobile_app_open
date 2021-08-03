@@ -28,7 +28,7 @@ cc_library(
         "mlperf_driver_jni.cc",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -40,19 +40,19 @@ cc_library(
         "-lm",
         "-ldl",
     ] + select({
-        "//commonlibs:use_asan": [
+        "//android/commonlibs:use_asan": [
             "-fsanitize=address",
         ],
         "//conditions:default": [],
     }),
     deps = [
-        "//cpp:mlperf_driver",
-        "//cpp/backends:external",
-        "//cpp/datasets:ade20k",
-        "//cpp/datasets:coco",
-        "//cpp/datasets:imagenet",
-        "//cpp/datasets:squad",
-        "//cpp/proto:mlperf_task_cc_proto",
+        "//android/cpp:mlperf_driver",
+        "//android/cpp/backends:external",
+        "//android/cpp/datasets:ade20k",
+        "//android/cpp/datasets:coco",
+        "//android/cpp/datasets:imagenet",
+        "//android/cpp/datasets:squad",
+        "//android/cpp/proto:mlperf_task_cc_proto",
         "@com_google_protobuf//:protobuf",
         "@org_tensorflow//tensorflow/lite/java/src/main/native",
         "@org_tensorflow//tensorflow/lite/java/src/main/native:native_framework_only",

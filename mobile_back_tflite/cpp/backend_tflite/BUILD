@@ -33,7 +33,7 @@ cc_library(
         "utils.h",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -42,7 +42,7 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "//cpp/c:headers",
+        "//android/cpp/c:headers",
         "@org_tensorflow//tensorflow/lite/c:c_api",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
@@ -82,7 +82,7 @@ cc_library(
     copts = tflite_copts() + [
         "-Iexternal/neuron_delegate",
     ] + select({
-        "//commonlibs:use_asan": [
+        "//android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -91,7 +91,7 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "//cpp/c:headers",
+        "//android/cpp/c:headers",
         "@org_tensorflow//tensorflow/lite/c:c_api",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
@@ -107,8 +107,8 @@ cc_library(
 
 tflite_jni_binary(
     name = "libtflitebackend.so",
-    exported_symbols = "//cpp/c:exported_symbols.lds",
-    linkscript = "//cpp/c:version_script.lds",
+    exported_symbols = "//android/cpp/c:exported_symbols.lds",
+    linkscript = "//android/cpp/c:version_script.lds",
     deps = [
         ":tflite_c",
     ],
@@ -116,8 +116,8 @@ tflite_jni_binary(
 
 tflite_jni_binary(
     name = "libtfliteneuronbackend.so",
-    exported_symbols = "//cpp/c:exported_symbols.lds",
-    linkscript = "//cpp/c:version_script.lds",
+    exported_symbols = "//mobile_back_tflite/cpp/c:exported_symbols.lds",
+    linkscript = "//android/cpp/c:version_script.lds",
     deps = [
         ":tflite_neuron_c",
     ],

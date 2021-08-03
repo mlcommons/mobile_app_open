@@ -9,7 +9,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include "cpp/datasets/ade20k.h"
+#include "android/cpp/datasets/ade20k.h"
 
 #include <cstdint>
 #include <fstream>
@@ -21,7 +21,7 @@ limitations under the License.
 #include <string>
 #include <unordered_set>
 
-#include "cpp/utils.h"
+#include "android/cpp/utils.h"
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/tools/evaluation/proto/evaluation_stages.pb.h"
 #include "tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.h"

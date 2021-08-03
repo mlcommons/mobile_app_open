@@ -5,10 +5,10 @@ package(
 
 cc_library(
     name = "tflitebackend",
-    srcs = ["//cpp/backend_tflite:libtflitebackend.so"],
+    srcs = ["//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.so"],
 )
 
 cc_library(
     name = "tfliteneuronbackend",
-    srcs = ["//cpp/backend_tflite:libtfliteneuronbackend.so"],
+    srcs = ["//mobile_back_tflite/cpp/backend_tflite:libtfliteneuronbackend.so"],
 )

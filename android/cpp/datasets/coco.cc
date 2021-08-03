@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include "cpp/datasets/coco.h"
+#include "android/cpp/datasets/coco.h"
 
 #include <algorithm>
 #include <cstdint>
@@ -26,8 +26,8 @@ limitations under the License.
 #include <variant>
 #include <vector>
 
-#include "cpp/dataset.h"
-#include "cpp/utils.h"
+#include "android/cpp/dataset.h"
+#include "android/cpp/utils.h"
 #include "src/google/protobuf/text_format.h"
 #include "tensorflow/lite/tools/evaluation/proto/evaluation_stages.pb.h"
 #include "tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.h"
