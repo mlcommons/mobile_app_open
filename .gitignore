@@ -2,9 +2,9 @@
 .aswb
 .idea
 .vscode
-bazel-*
-output
-output_logs
+android/bazel-*
+android/output
+android/output_logs
 *.so
 * .apk
 * .tflite

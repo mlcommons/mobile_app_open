@@ -3,9 +3,6 @@
 This project contains the MLPerf mobile app, an app-based implementationn of
 [MLPerf Inference](https://github.com/mlperf/inference) tasks.
 
-*Please note that this app is not official yet and the integration with LoadGen
-isn't quite complete yet.*
-
 ## Overview
 
 The MLPerf app offers a simple mobile UI for executing MLPerf inference tasks
