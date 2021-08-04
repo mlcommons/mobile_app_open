@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="32dp"
+        android:textColor="@color/mlperfBlue"
+        android:textSize="20sp"
+        android:fontFamily="@font/source_sans_pro_regular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/config_item_title"
+        android:text="@string/sharing"/>
+
+    <TextView
+        android:layout_marginBottom="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="32dp"
+        android:paddingEnd="20dp"
+        android:textColor="@color/subtitle_gray"
+        android:textSize="14sp"
+        android:fontFamily="@font/source_sans_pro_semi_bold"
+        app:layout_constraintTop_toBottomOf="@id/config_item_title"
+        android:layout_below="@id/config_item_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/config_item_subtitle"
+        android:text="@string/share_subtitle"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="26dp"
+        android:id="@+id/sharingSettingsToggle"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/div"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <View
+        android:id="@+id/div"
+        app:layout_constraintTop_toBottomOf="@id/config_item_subtitle"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/div_gray"/>
+
+    <TextView
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/div"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_below="@id/div"
+        android:layout_marginStart="32dp"
+        android:textColor="@color/mlperfBlue"
+        android:textSize="20sp"
+        android:fontFamily="@font/source_sans_pro_regular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/submission_mode_item_title"
+        android:text="@string/submission_mode"/>
+
+    <TextView
+        android:layout_marginBottom="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="32dp"
+        android:textColor="@color/subtitle_gray"
+        android:textSize="14sp"
+        android:fontFamily="@font/source_sans_pro_semi_bold"
+        app:layout_constraintTop_toBottomOf="@id/submission_mode_item_title"
+        android:layout_below="@id/submission_mode_item_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/submission_mode_item_subtitle"
+        android:text="@string/submission_mode_subtitle"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:layout_marginEnd="26dp"
+        android:id="@+id/submissionModeToggle"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/div"
+        app:layout_constraintBottom_toTopOf="@id/div5"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <View
+        android:id="@+id/div5"
+        app:layout_constraintTop_toBottomOf="@id/submission_mode_item_subtitle"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/div_gray"/>
+
+    <TextView
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/div5"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_below="@id/div5"
+        android:layout_marginStart="32dp"
+        android:textColor="@color/mlperfBlue"
+        android:textSize="20sp"
+        android:fontFamily="@font/source_sans_pro_regular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cooldown_item_title"
+        android:text="@string/cooldown"/>
+
+    <TextView
+        android:layout_marginBottom="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="32dp"
+        android:textColor="@color/subtitle_gray"
+        android:textSize="14sp"
+        android:fontFamily="@font/source_sans_pro_semi_bold"
+        app:layout_constraintTop_toBottomOf="@id/cooldown_item_title"
+        android:layout_below="@id/cooldown_item_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cooldown_item_subtitle"
+        android:text="@string/cooldown_subtitle"/>
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+       android:id="@+id/cooldownSlider"
+       android:layout_marginLeft="32dp"
+       android:layout_marginRight="32dp"
+       app:layout_constraintTop_toBottomOf="@id/cooldown_item_subtitle"
+       app:layout_constraintBottom_toTopOf="@id/div4"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       style="@style/cooldown_bar"
+       android:min="0"
+       android:max="10"
+       android:progress="5"
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"/>
+
+    <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:orientation="horizontal"
+      android:layout_marginBottom="16dp"
+      app:layout_constraintStart_toStartOf="parent"
+      android:layout_marginLeft="40dp"
+      android:layout_marginRight="32dp"
+      app:layout_constraintTop_toBottomOf="@id/cooldownSlider"
+      android:layout_below="@id/cooldownSlider"
+      android:id="@+id/cooldown_slider_marks">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:textColor="@color/subtitle_gray"
+          android:textSize="14sp"
+          android:fontFamily="@font/source_sans_pro_semi_bold"
+          android:gravity="left"
+          android:text="0"/>
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:textColor="@color/subtitle_gray"
+          android:textSize="14sp"
+          android:fontFamily="@font/source_sans_pro_semi_bold"
+          android:gravity="center_horizontal"
+          android:text="5"/>
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:textColor="@color/subtitle_gray"
+          android:textSize="14sp"
+          android:fontFamily="@font/source_sans_pro_semi_bold"
+          android:gravity="right"
+          android:text="10"/>
+    </LinearLayout>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:layout_marginEnd="26dp"
+        android:id="@+id/cooldownSettingToggle"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/div5"
+        app:layout_constraintBottom_toTopOf="@id/div4"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <View
+        android:id="@+id/div4"
+        app:layout_constraintTop_toBottomOf="@id/cooldown_item_subtitle"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginTop="64dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/div_gray"/>
+
+    <LinearLayout
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/div4"
+        android:layout_below="@id/div4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/privacyPolicyContainer"
+        >
+
+        <Button
+            style="@style/text_button"
+            android:layout_marginTop="0dp"
+            android:layout_gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="32dp"
+            android:textColor="@color/mlperfBlue"
+            android:textSize="20sp"
+            android:fontFamily="@font/source_sans_pro_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/privacyPolicyButton"
+            android:text="@string/privacy_policy"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/div2"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/privacyPolicyContainer"
+        android:layout_below="@id/privacyPolicyContainer"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/div_gray"/>
+
+    <LinearLayout
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/div2"
+        android:layout_below="@id/div2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/eulaContainer"
+        >
+
+        <Button
+            style="@style/text_button"
+            android:layout_marginTop="0dp"
+            android:layout_gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="32dp"
+            android:textColor="@color/mlperfBlue"
+            android:textSize="20sp"
+            android:fontFamily="@font/source_sans_pro_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/eulaButton"
+            android:text="@string/eula"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/div3"
+        app:layout_constraintTop_toBottomOf="@id/eulaContainer"
+        android:layout_below="@id/eulaContainer"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/div_gray"/>
+
+    <Button
+        style="@style/text_button"
+        android:id="@+id/developerToolButton"
+        android:textColor="@color/subtitle_gray"
+        android:fontFamily="@font/source_sans_pro_regular"
+        android:layout_below="@id/div3"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/view_developer_tool"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

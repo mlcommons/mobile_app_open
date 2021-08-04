@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<org.mlperf.inference.ui.LockableScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:id="@+id/calculatingScrollView"
+    android:fillViewport="true">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="730dp"
+            tools:context=".activities.CalculatingActivity"
+            android:clipChildren="false">
+
+            <!--Will probably be a custom view?-->
+            <org.mlperf.inference.ui.DiagnosticBackgroundView
+                android:id="@+id/diagnosticBackgroundView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <org.mlperf.inference.ui.TabSwitcher
+                android:id="@+id/tabSwitcher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                android:layout_marginTop="64dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/progressContainer"
+                app:layout_constraintTop_toTopOf="@id/tabSwitcher"
+                app:layout_constraintBottom_toTopOf="@id/progressMessage"
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginBottom="8dp">
+                <TextView
+                    android:id="@+id/calculatingText"
+                    android:lineSpacingExtra="8sp"
+                    android:translationY="-3.96sp"
+                    android:gravity="top"
+                    android:textSize="20sp"
+                    android:textColor="#fff"
+                    android:textAlignment="center"
+                    android:layout_width="wrap_content"
+                    android:lineSpacingMultiplier="1.32"
+                    android:layout_height="wrap_content"
+                    android:text="@string/calculating"/>
+                <TextView
+                    android:id="@+id/dontCloseAppText"
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#f5f5f5"
+                    android:lineSpacingExtra="6sp"
+                    android:translationY="-3.2sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dontCloseApp"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/progressMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/varela_round_regular"
+                android:gravity="top|center_horizontal"
+                android:lineSpacingExtra="0sp"
+                android:text="20%"
+                android:textColor="#fff"
+                android:textSize="56sp"
+                app:layout_constraintBottom_toTopOf="@id/performanceMeter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tabSwitcher"
+                tools:ignore="HardcodedText" />
+
+            <Button
+                android:id="@+id/startButton"
+                android:layout_width="@dimen/go_button_size"
+                android:layout_height="@dimen/go_button_size"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="@dimen/go_button_margin_bottom"
+                android:background="@drawable/circle_gradient"
+                android:elevation="8dp"
+                android:fontFamily="@font/varela_round_regular"
+                android:text="@string/model_not_ready"
+                android:textSize="48sp"
+                android:textColor="@color/white"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@id/resultsDescriptionText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/loadingContent"
+                app:layout_constraintVertical_bias="0.2" />
+
+            <ImageView
+                android:id="@+id/startButtonHighlight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:translationY="-20dp"
+                app:layout_constraintEnd_toEndOf="@id/startButton"
+                app:layout_constraintTop_toTopOf="@id/startButton"
+                android:src="@drawable/highlight1" />
+
+            <org.mlperf.inference.ui.PerformanceMeter
+                android:id="@+id/performanceMeter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleX="@dimen/meter_scale"
+                android:scaleY="@dimen/meter_scale"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:clipChildren="false"/>
+
+            <ImageView
+                android:id="@+id/performanceMeterHighlight2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="105dp"
+                app:layout_constraintEnd_toEndOf="@id/performanceMeter"
+                app:layout_constraintStart_toStartOf="@id/performanceMeter"
+                app:layout_constraintTop_toTopOf="@id/performanceMeter"
+                android:src="@drawable/dial_highlight2" />
+
+            <LinearLayout
+                android:visibility="visible"
+                android:id="@+id/performanceDetailsArea"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/performanceMeter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="@dimen/performance_meter_margin_bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/performanceDetailsIcon"
+                    android:layout_gravity="center"
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_object_detection"
+                    app:tint="#fff" />
+                <TextView
+                    android:layout_marginTop="14dp"
+                    android:textColor="#fff"
+                    android:id="@+id/performanceDetailsTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Object Detection"/>
+            </LinearLayout>
+
+            <TextView
+                android:fontFamily="@font/source_sans_pro_semi_bold"
+                android:visibility="invisible"
+                android:id="@+id/cancelButton"
+                android:textColor="#fff"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/cancel"/>
+
+            <TextView
+                android:id="@+id/loadingContent"
+                android:fontFamily="@font/varela_round_regular"
+                android:textSize="18sp"
+                android:textColor="#fff"
+                android:text="@string/loading_content"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:paddingTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <!--Horizontal list-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/resultSummaryRecyclerView"
+                app:layout_constraintBottom_toBottomOf="@id/diagnosticBackgroundView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="48dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@id/detailedResultsLabel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/performanceMeter"
+                app:layout_constraintVertical_bias="0.90" />
+
+            <TextView
+                android:fontFamily="@font/varela_round_regular"
+                android:id="@+id/resultsDescriptionText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/contentItemListView"
+                android:layout_marginBottom="@dimen/measure_label_margin"
+                android:textSize="@dimen/measure_label_text_size"
+                android:textColor="#333538"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/measureCapabilityText"/>
+
+            <LinearLayout
+                android:id="@+id/contentItemListView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="40dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+
+            <TextView
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="@string/detailed_results_text"
+                android:layout_marginStart="@dimen/scroll_arrow_margin"
+                android:layout_marginBottom="@dimen/detailed_results_label_margin_bottom"
+                android:textSize="15sp"
+                android:textColor="#333538"
+                android:id="@+id/detailedResultsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="@dimen/detailed_results_label_margin_bottom"
+                android:layout_marginEnd="@dimen/scroll_arrow_margin"
+                android:id="@+id/downArrowScroll"
+                android:src="@drawable/ic_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/detailedResultsRecyclerView"
+            android:layout_marginTop="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:fontFamily="@font/source_sans_pro_semi_bold"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            style="@style/positive_button"
+            android:text="@string/testAgain"
+            android:layout_gravity="center"
+            android:id="@+id/testAgainButton"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"/>
+
+        <Button
+            android:fontFamily="@font/source_sans_pro_semi_bold"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            style="@style/positive_button"
+            android:text="@string/shareResults"
+            android:layout_gravity="center"
+            android:id="@+id/shareResultsButton"
+            android:layout_marginBottom="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"/>
+    </LinearLayout>
+</org.mlperf.inference.ui.LockableScrollView>

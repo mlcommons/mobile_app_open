@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      package="org.mlperf.inference.test"
+      android:versionName="1.0.1"
+      android:versionCode="1010">
+
+    <uses-sdk
+      android:minSdkVersion="29"
+      android:targetSdkVersion="29" />
+
+    <instrumentation android:targetPackage="org.mlperf.inference"
+                     android:name="androidx.test.runner.AndroidJUnitRunner"/>
+
+    <application tools:replace="label" android:label="MLPerfTest" />
+</manifest>

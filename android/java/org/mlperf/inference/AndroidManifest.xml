@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.mlperf.inference"
+    android:versionName="1.0.1"
+    android:versionCode="1010">
+
+  <uses-sdk
+      android:minSdkVersion="29"
+      android:targetSdkVersion="29" />
+
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+  <application
+      android:allowBackup="true"
+      android:debuggable="true"
+      android:extractNativeLibs="true"
+      android:icon="@mipmap/ic_launcher"
+      android:roundIcon="@mipmap/ic_launcher_round"
+      android:label="@string/app_name"
+      android:theme="@style/AppTheme"
+      android:usesCleartextTraffic="true"
+      android:requestLegacyExternalStorage="true">
+    <activity
+        android:name=".activities.SplashActivity"
+        android:screenOrientation="portrait"
+        android:theme="@style/AppThemeNoActionBar"
+        android:alwaysRetainTaskState="true"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+
+    <activity
+        android:name=".activities.SharingActivity"
+        android:screenOrientation="portrait"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+    <activity
+        android:name=".activities.CalculatingActivity"
+        android:screenOrientation="portrait"
+        android:exported="true"
+        android:theme="@style/MlThemeActionBar.Overlay"
+        android:label="@string/calculatingActivityLabel"/>
+
+    <activity
+        android:name=".activities.ErrorActivity"
+        android:screenOrientation="portrait"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+    <activity
+        android:name=".activities.settings.SettingsActivity"
+        android:label="@string/settings"
+        android:screenOrientation="portrait"
+        android:theme="@style/MlThemeActionBar"/>
+    <activity
+        android:name=".activities.settings.DeveloperSettingsActivity"
+        android:screenOrientation="portrait"
+        android:label="@string/developer_tool"
+        android:theme="@style/MlThemeActionBar"/>
+    <activity
+        android:name=".activities.settings.ConfigSettingsActivity"
+        android:screenOrientation="portrait"
+        android:label="@string/customize_config_title"
+        android:theme="@style/MlThemeActionBar" />
+    <activity
+        android:name=".activities.settings.ConfigurationItemSelectionActivity"
+        android:screenOrientation="portrait"
+        android:label="@string/customize_config_title"
+        android:theme="@style/MlThemeActionBar" />
+  </application>
+</manifest>

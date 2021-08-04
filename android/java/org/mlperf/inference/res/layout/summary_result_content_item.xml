@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="90dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/summary_margin"
+    android:layout_marginEnd="@dimen/summary_margin"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:textColor="#fff"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        android:fontFamily="@font/source_sans_pro_regular"
+        android:textSize="12sp"
+        android:text="Image Classification"
+        android:id="@+id/summaryResultItemTitle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"/>
+    <TextView
+        android:id="@+id/summaryResultItemScore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:lines="1"
+        android:text="4000"
+        android:textColor="#fff"
+        android:textSize="20sp"
+        android:fontFamily="@font/varela_round_regular"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/summaryResultItemTitle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
