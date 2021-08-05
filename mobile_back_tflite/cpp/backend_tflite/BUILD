@@ -78,7 +78,6 @@ cc_library(
         "thread_pool.h",
         "utils.h",
     ],
-    local_defines = ["MTK_TFLITE_NEURON_BACKEND"],
     copts = tflite_copts() + [
         "-Iexternal/neuron_delegate",
     ] + select({
@@ -90,6 +89,7 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
+    local_defines = ["MTK_TFLITE_NEURON_BACKEND"],
     deps = [
         "//android/cpp/c:headers",
         "@org_tensorflow//tensorflow/lite/c:c_api",

@@ -48,6 +48,5 @@ cc_library(
 tflite_jni_binary(
     name = "libqtibackend.so",
     linkscript = "//android/cpp/c:version_script.lds",
-    deps = [":qti_mock",],
+    deps = [":qti_mock"],
 )
-

@@ -74,10 +74,10 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
+        "//android/cpp/c:headers",
         "//android/cpp/proto:mlperf_task_cc_proto",
         "@org_mlperf_inference//:loadgen",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-        "//android/cpp/c:headers",
     ],
 )
 

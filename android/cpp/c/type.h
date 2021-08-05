@@ -54,8 +54,8 @@ typedef struct {
 } mlperf_backend_configuration_t;
 
 typedef struct {
-  const char *model;
-  const char *manufacturer;
+  const char* model;
+  const char* manufacturer;
 } mlperf_device_info_t;
 
 #ifdef __cplusplus
