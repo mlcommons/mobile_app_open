@@ -45,7 +45,6 @@ frameworks contributed by the broader MLPerf community.
 *   [Android SDK](https://developer.android.com/studio)
 *   Android 10.0+ (API 29) w/
     [USB debugging enabled](https://developer.android.com/studio/debug/dev-options)
-*   SNPE prebuilt backend repository extracted to "./qti_backend"
 
 ## Getting Started
 
@@ -84,11 +83,11 @@ make app
 ```
 or to enable the QTI backend:
 ```
-make QTI_BRANCH=master app
+make WITH_QTI=1 app
 ```
 or to enable both the MediaTek and QTI backends:
 ```
-make QTI_BRANCH=master MEDIATEK_BACKEND=--//java/org/mlperf/inference:with_mediatek="1" app
+make WITH_QTI=1 WITH_MEDIATEK=1 app
 ```
 
 # Install the app with the command:

@@ -23,7 +23,7 @@ config_setting(
     values = {"cpu": "arm64-v8a"},
 )
 
-load("//:variables.bzl", "SNPE_VERSION")
+load("//mobile_back_qti:variables.bzl", "SNPE_VERSION")
 
 cc_library(
     name = "snpe",
@@ -53,10 +53,12 @@ cc_library(
 cc_library(
     name = "qtibackend",
     srcs = select({
-        "//conditions:default": ["//cpp/backend_mock_qti:libqtibackend.so"],
-        ":android_arm64": [
-            "//cpp/backend_qti:libqtibackend.so",
-        ],
+        "//conditions:default": ["//mobile_back_qti/cpp/backend_mock_qti:libqtibackend.so"],
+# TODO: Add proper handling for QTI devices
+        ":android_arm64": [ "//mobile_back_qti/cpp/backend_mock_qti:libqtibackend.so"],
+#        ":android_arm64": [
+#            "//mobile_back_qti/cpp/backend_qti:libqtibackend.so",
+#        ],
     }),
     deps = select({
         "//conditions:default": [],

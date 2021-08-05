@@ -116,7 +116,7 @@ tflite_jni_binary(
 
 tflite_jni_binary(
     name = "libtfliteneuronbackend.so",
-    exported_symbols = "//mobile_back_tflite/cpp/c:exported_symbols.lds",
+    exported_symbols = "//android/cpp/c:exported_symbols.lds",
     linkscript = "//android/cpp/c:version_script.lds",
     deps = [
         ":tflite_neuron_c",

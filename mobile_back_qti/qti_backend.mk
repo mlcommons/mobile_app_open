@@ -13,7 +13,7 @@
 # limitations under the License.
 ##########################################################################
 
-.PHONY: qti_backend_sync
+.PHONY: snpe_version_check
 
 ifeq (${USE_PROXY_WORKAROUND},1)
   export PROXY_WORKAROUND1=\
@@ -28,38 +28,34 @@ else
 endif
 
 # Set the included backends
-#QTI_BRANCH=master
-QTI_BRANCH=
-TFLITE_BRANCH=main
+WITH_QTI=0
 
-ifneq (${QTI_BRANCH},)
+ifeq (${WITH_QTI},1)
   ifneq (${SNPE_SDK},)
-    QTI_BACKEND=--//java/org/mlperf/inference:with_qti="1"
-    QTI_STAMP=qti_backend/.stamp
-    QTI_SYNC=qti_backend_sync
+    QTI_BACKEND=--//android/java/org/mlperf/inference:with_qti="1"
+    QTI_TARGET=//mobile_back_qti:qtibackend
+    # TODO: Change to backend_qti when bqckend_qti is enabled
+    QTI_LIB_COPY=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_mock_qti/libqtibackend.so output/binary/libqtibackend.so
     SNPE_VERSION=$(shell basename ${SNPE_SDK})
-    QTI_SNPE_VERSION=$(shell grep SNPE_VERSION qti_backend/variables.bzl | cut -d\" -f2)
-    QTI_VOLUMES=-v ${SNPE_SDK}:/home/mlperf/mobile_app/qti_backend/${SNPE_VERSION}
+    QTI_SNPE_VERSION=$(shell grep SNPE_VERSION mobile_back_qti/variables.bzl | cut -d\" -f2)
+    QTI_VOLUMES=-v ${SNPE_SDK}:/home/mlperf/mobile_app/mobile_back_qti/${SNPE_VERSION}
+    QTI_DEPS=snpe_version_check
   else
     echo "ERROR: SNPE_SDK not set"
     QTI_BACKEND=--ERROR_SNPE_SDK_NOT_SET
-    QTI_STAMP=
-    QTI_SYNC=
     QTI_VOLUMES=
+    QTI_DEPS=
+    QTI_TARGET=
+    QTI_LIB_COPY=true
   endif
 else
   QTI_BACKEND=
-  QTI_STAMP=
-  QTI_SYNC=
   QTI_VOLUMES=
+  QTI_DEPS=
+  QTI_TARGET=
+  QTI_LIB_COPY=true
 endif
 
-qti_backend/.stamp:
-	git clone -b ${QTI_BRANCH} https://github.com/mlcommons/mobile_back_qualcomm qti_backend
-	touch $@
-
-qti_backend_sync: qti_backend/.stamp
-	[ ${SNPE_VERSION} = ${QTI_SNPE_VERSION} ] || (echo "SNPE_SDK is not ${QTI_SNPE_VERSION}" && fail)
-	(cd qti_backend && [ `git branch` = ${QTI_BRANCH} ]) || (echo "Checked out mobile_back_qualcomm branch is not ${QTI_BRANCH}" && fail)
-	cd qti_backend && git fetch && git pull
+snpe_version_check:
+	@[ ${SNPE_VERSION} = ${QTI_SNPE_VERSION} ] || (echo "SNPE_SDK (${SNPE_VERSION}) doesn't match required version (${QTI_SNPE_VERSION})" && false)
 
