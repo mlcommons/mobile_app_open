@@ -20,17 +20,17 @@ CPP_DIRS=('android/cpp' 'mobile_back_qti' 'mobile_back_tflite')
 for directory in "${CPP_DIRS[@]}"
 do
     find $directory -iname "*.h" | \
-        xargs docker run --rm -it -v `pwd`:/home/mlperf/mobile_app -w /home/mlperf/mobile_app mlcommons/mlperf_mobile:0.2 clang-format-10 -i -style=google
+        xrags clang-format-10 -i -style=google
 
     find $directory -iname "*.cc" | \
-        xargs docker run --rm -it -v `pwd`:/home/mlperf/mobile_app -w /home/mlperf/mobile_app mlcommons/mlperf_mobile:0.2 clang-format-10 -i -style=google
+        xargs clang-format-10 -i -style=google
 
     find $directory -iname "*.cpp" | \
-        xargs docker run --rm -it -v `pwd`:/home/mlperf/mobile_app -w /home/mlperf/mobile_app mlcommons/mlperf_mobile:0.2 clang-format-10 -i -style=google
+        xargs clang-format-10 -i -style=google
 done
 
 find java/org/mlperf/inference/jni -iname "*.cc" | \
-    xargs docker run --rm -it -v `pwd`:/home/mlperf/mobile_app -w /home/mlperf/mobile_app mlcommons/mlperf_mobile:0.2 clang-format-10 -i -style=google
+    xargs clang-format-10 -i -style=google
 
 if [ "$1" = "CI" ]; then
     git diff >cpp-codeformat-${GIT_COMMIT}.patch

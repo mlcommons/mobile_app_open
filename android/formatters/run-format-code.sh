@@ -33,7 +33,7 @@ ls_staged_files () {
 cpp_files=$(ls_staged_files "\.h|\.cc|\.cpp")
 if [ "$cpp_files" ]; then
   echo "Updated/new C++ files: $cpp_files"
-  clang-format -i  -style=google $cpp_files
+  clang-format-10 -i  -style=google $cpp_files
 else
   echo "There is no updated/new C++ files"
 fi
@@ -51,7 +51,7 @@ fi
 java_files=$(ls_staged_files "\.java")
 if [ "$java_files" ]; then
   echo "Updated/new Java files: $java_files"
-  java -jar formatters/google-java-format/google-java-format-1.9-all-deps.jar --replace  $java_files
+  java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace  $java_files
 else
   echo "There is no updated/new Java files"
 fi

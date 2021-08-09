@@ -15,7 +15,7 @@
 # limitations under the License.
 ##########################################################################
 
-FORMATTER=formatters/google-java-format/google-java-format-1.9-all-deps.jar
+FORMATTER=/opt/formatters/google-java-format-1.9-all-deps.jar
 
 find java -iname "*.java" | \
     xargs java -jar $FORMATTER --set-exit-if-changed --replace

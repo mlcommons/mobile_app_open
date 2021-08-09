@@ -16,9 +16,9 @@
 ##########################################################################
 
 buildifier WORKSPACE
-find . -name BUILD | xargs buildifier
-find . -name BUILD.bazel | xargs buildifier
-find . -iname "*.bzl" | xargs buildifier
+find android -name BUILD | xargs buildifier
+find android -name BUILD.bazel | xargs buildifier
+find android -iname "*.bzl" | xargs buildifier
 
 if [ "$1" = "CI" ]; then
     git diff >bazel-codeformat-${GIT_COMMIT}.patch

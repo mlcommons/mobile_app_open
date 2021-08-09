@@ -15,30 +15,12 @@
 # limitations under the License.
 ##########################################################################
 
-# This script formats staged C++ and build files. Files that are already committed
-# will not be checked. So please run this script before you commit your changes.
-# In case you did commit them, you can use "git reset --soft HEAD~1" to undo the
-# commit and commit again after formatting it.
-
-if [ $(git diff --name-only | wc -l) -ne 0 ]; then
-  echo "Please stage or stash unstaged changes first."
-  exit 1
-fi
-
-ls_staged_files () {
-  # Don't throw errors if egrep find no match.
-  echo $(git diff --name-only --cached --diff-filter=d | egrep $1 || true)
-}
+# This script formats all staged C++ and build files.
 
 # Formatting cpp files using clang-format.
-cpp_files=$(ls_staged_files "\.h|\.cc|\.cpp")
+cpp_files=$(find android -name "*.h" && find android -name "*.cc")
 if [ "$cpp_files" ]; then
-  docker run\
-    --rm \
-    -it \
-    -v `pwd`:/home/mlperf/mobile_app \
-    -w /home/mlperf/mobile_app \
-    mlcommons/mlperf_mobile:1.0 clang-format-10 -i -style=google $cpp_files
+  clang-format-10 -i -style=google $cpp_files
 fi
 
 
@@ -49,7 +31,7 @@ if [ ! -x "$buildifier_is_present" ] ; then
   echo "* Bazel config files can't be formated because 'buildifier' is not in \$PATH"
   echo "*\n"
 else
-  build_files=$(ls_staged_files "WORKSPACE|BUILD|BUILD.bazel|\.bzl")
+  build_files=$(echo WORKSPACE && find android -name BUILD && find android -name BUILD.bazel && find android -name "*.bzl")
   if [ "$build_files" ]; then
     buildifier -v $build_files
   fi
@@ -62,7 +44,7 @@ if [ ! -x "$java_is_present" ] ; then
   echo "* Java files can't be formated because 'java' is not in \$PATH"
   echo "*\n"
 else
-  java_files=$(ls_staged_files "\.java")
+  java_files=$(find android -name "*.java")
   if [ "$java_files" ]; then
     java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace  $java_files
   fi
