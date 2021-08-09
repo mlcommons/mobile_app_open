@@ -31,17 +31,16 @@ ls_staged_files () {
 }
 
 # Formatting cpp files using clang-format.
-clang_is_present=$(which clang-format)
-if [ ! -x "$clang_is_present" ] ; then
-  echo "*"
-  echo "* C++ files can't be formated because 'clang-format' is not in \$PATH"
-  echo "*\n"
-else
-  cpp_files=$(ls_staged_files "\.h|\.cc|\.cpp")
-  if [ "$cpp_files" ]; then
-    clang-format -i  -style=google $cpp_files
-  fi
+cpp_files=$(ls_staged_files "\.h|\.cc|\.cpp")
+if [ "$cpp_files" ]; then
+  docker run\
+    --rm \
+    -it \
+    -v `pwd`:/home/mlperf/mobile_app \
+    -w /home/mlperf/mobile_app \
+    mlcommons/mlperf_mobile:0.2 clang-format-10 -i -style=google $cpp_files
 fi
+
 
 # Formatting build files using buildifier.
 buildifier_is_present=$(which buildifier)
