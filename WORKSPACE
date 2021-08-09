@@ -129,7 +129,7 @@ new_local_repository(
 http_archive(
     name = "org_mlperf_inference",
     build_file = "@//android/third_party:loadgen.BUILD",
-    patch_cmds = ["python loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
+    patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
     sha256 = "900053d97d4165396c45ec13dd211ea3cb3306a6c496b0172f7093e9fc5ebc47",
     strip_prefix = "inference-dd9e6bf867869fad0b9fcade0f719e1536780299",
     urls = [
