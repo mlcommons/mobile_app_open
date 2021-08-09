@@ -29,7 +29,7 @@ using mlperf::mobile::Dataset;
 
 Backend* convertLongToBackend(JNIEnv* env, jlong handle) {
   if (handle == 0) {
-    tflite::jni::ThrowException(env, kIllegalArgumentException,
+    tflite::jni::ThrowException(env, tflite::jni::kIllegalArgumentException,
                                 "Internal error: Invalid handle to Backend.");
     return nullptr;
   }
