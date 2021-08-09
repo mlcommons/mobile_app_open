@@ -78,7 +78,6 @@ cc_library(
         "thread_pool.h",
         "utils.h",
     ],
-    local_defines = ["MTK_TFLITE_NEURON_BACKEND"],
     copts = tflite_copts() + [
         "-Iexternal/neuron_delegate",
     ] + select({
@@ -90,6 +89,7 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
+    local_defines = ["MTK_TFLITE_NEURON_BACKEND"],
     deps = [
         "//android/cpp/c:headers",
         "@org_tensorflow//tensorflow/lite/c:c_api",
@@ -116,7 +116,7 @@ tflite_jni_binary(
 
 tflite_jni_binary(
     name = "libtfliteneuronbackend.so",
-    exported_symbols = "//mobile_back_tflite/cpp/c:exported_symbols.lds",
+    exported_symbols = "//android/cpp/c:exported_symbols.lds",
     linkscript = "//android/cpp/c:version_script.lds",
     deps = [
         ":tflite_neuron_c",

@@ -1,0 +1,1 @@
+SNPE_VERSION = "snpe-1.48.0.2554"

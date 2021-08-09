@@ -40,14 +40,13 @@ cc_library(
     srcs = ["qti_mock_c.cc"],
     copts = tflite_copts(),
     deps = [
-        "//cpp/c:headers",
+        "//android/cpp/c:headers",
     ],
     alwayslink = 1,
 )
 
 tflite_jni_binary(
     name = "libqtibackend.so",
-    linkscript = "//cpp/c:version_script.lds",
-    deps = [":qti_mock",],
+    linkscript = "//android/cpp/c:version_script.lds",
+    deps = [":qti_mock"],
 )
-

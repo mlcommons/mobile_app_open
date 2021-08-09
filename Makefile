@@ -24,7 +24,8 @@ MEDIATEK_BACKEND=
 
 all: app
 
-include android/qti_backend.mk
+include mobile_back_tflite/tflite_backend.mk
+include mobile_back_qti/qti_backend.mk
 
 
 output/mlperf_mobile_docker_0_2.stamp:
@@ -69,15 +70,16 @@ proto_test: output/mlperf_mobile_docker_0_2.stamp
 	@cp output/`readlink bazel-bin`/android/cpp/proto/proto_test output/proto_test
 	@chmod 777 output/proto_test
 
-main: output/mlperf_mobile_docker_0_2.stamp
+main: output/mlperf_mobile_docker_0_2.stamp ${QTI_DEPS}
 	@echo "Building main"
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
 		${COMMON_DOCKER_FLAGS} \
-		--config android_arm64 //mobile_back_tflite:tflitebackend //android/cpp/binary:main
+		--config android_arm64 //mobile_back_tflite:tflitebackend ${QTI_TARGET} //android/cpp/binary:main
 	@rm -rf output/binary && mkdir -p output/binary
 	@cp output/`readlink bazel-bin`/android/cpp/binary/main output/binary/main
 	@cp output/`readlink bazel-bin`/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so output/binary/libtflitebackend.so
+	@${QTI_LIB_COPY}
 	@chmod 777 output/binary/main output/binary/libtflitebackend.so
 
 libtflite: output/mlperf_mobile_docker_0_2.stamp
@@ -91,7 +93,7 @@ libtflite: output/mlperf_mobile_docker_0_2.stamp
 	@chmod 777 output/binary/libtflitebackend.so
 	
 
-app: output/mlperf_mobile_docker_0_2.stamp ${QTI_STAMP}
+app: output/mlperf_mobile_docker_0_2.stamp ${QTI_DEPS}
 	@echo "Building mlperf_app.apk"
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
@@ -102,7 +104,7 @@ app: output/mlperf_mobile_docker_0_2.stamp ${QTI_STAMP}
 	@cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app.apk
 	@chmod 777 output/mlperf_app.apk
 
-app_x86_64: output/mlperf_mobile_docker_0_2.stamp ${QTI_STAMP}
+app_x86_64: output/mlperf_mobile_docker_0_2.stamp
 	@echo "Building mlperf_app.apk"
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \

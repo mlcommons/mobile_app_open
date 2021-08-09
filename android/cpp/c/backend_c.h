@@ -68,9 +68,8 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                           void** data);
 
 // Optional functions
-void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr,
-                                   int bytes, int width, int height,
-                                   uint8_t* data);
+void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
+                                   int width, int height, uint8_t* data);
 
 #ifdef __cplusplus
 }

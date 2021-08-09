@@ -23,7 +23,7 @@ config_setting(
     values = {"cpu": "arm64-v8a"},
 )
 
-load("//:variables.bzl", "SNPE_VERSION")
+load("//mobile_back_qti:variables.bzl", "SNPE_VERSION")
 
 cc_library(
     name = "snpe",
@@ -42,24 +42,29 @@ cc_library(
 cc_library(
     name = "snpe_deps",
     srcs = [
-            SNPE_VERSION + "/lib/aarch64-android-clang6.0/libhta.so",
-            SNPE_VERSION + "/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v2.so",
-            SNPE_VERSION + "/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v3.so",
-            SNPE_VERSION + "/lib/dsp/libsnpe_dsp_v66_domains_v2_skel.so",
-            SNPE_VERSION + "/lib/dsp/libsnpe_dsp_v68_domains_v3_skel.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang6.0/libhta.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v2.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v3.so",
+        SNPE_VERSION + "/lib/dsp/libsnpe_dsp_v66_domains_v2_skel.so",
+        SNPE_VERSION + "/lib/dsp/libsnpe_dsp_v68_domains_v3_skel.so",
     ],
 )
 
 cc_library(
     name = "qtibackend",
     srcs = select({
-        "//conditions:default": ["//cpp/backend_mock_qti:libqtibackend.so"],
-        ":android_arm64": [
-            "//cpp/backend_qti:libqtibackend.so",
-        ],
+        "//conditions:default": ["//mobile_back_qti/cpp/backend_mock_qti:libqtibackend.so"],
+        # TODO: Add proper handling for QTI devices
+        ":android_arm64": ["//mobile_back_qti/cpp/backend_mock_qti:libqtibackend.so"],
+        #        ":android_arm64": [
+        #            "//mobile_back_qti/cpp/backend_qti:libqtibackend.so",
+        #        ],
     }),
     deps = select({
         "//conditions:default": [],
-        ":android_arm64": ["snpe","snpe_deps"],
+        ":android_arm64": [
+            "snpe",
+            "snpe_deps",
+        ],
     }),
 )
