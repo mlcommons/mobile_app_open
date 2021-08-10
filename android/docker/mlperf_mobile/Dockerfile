@@ -5,7 +5,7 @@ LABEL maintainer="quic_mcharleb@quicinc.com"
 # Update the apt configuration and set timezone first or image creation waits
 # for selection of timezone
 RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y && \
-    apt-get install -y --no-install-recommends tzdata 
+    apt-get install -y --no-install-recommends tzdata
 
 RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y && \
     apt-get install -y --no-install-recommends \
@@ -50,7 +50,7 @@ RUN mkdir -p ${android_home} && \
     unzip -q /tmp/sdk_tools.zip -d ${android_home}/cmdline-tools/ && \
     mv ${android_home}/cmdline-tools/cmdline-tools ${android_home}/cmdline-tools/tools && \
     rm /tmp/sdk_tools.zip
-   
+
 # Set environment variables
 ENV ANDROID_HOME ${android_home}
 ENV ANDROID_NDK_HOME ${android_ndk_home}
@@ -87,7 +87,7 @@ ENV ANDROID_NDK_HOME ${android_ndk_home}
 ENV GOBIN /opt/formatters/bin
 RUN mkdir -p ${GOBIN} && curl --output `dirname ${GOBIN}`/google-java-format-1.9-all-deps.jar -L https://github.com/google/google-java-format/releases/download/v1.9/google-java-format-1.9-all-deps.jar
 RUN /usr/lib/go-1.13/bin/go get github.com/bazelbuild/buildtools/buildifier
-ENV PATH=${PATH}:${GOBIN} 
+ENV PATH=${PATH}:${GOBIN}
 
 RUN mkdir -p /home/mlperf && chmod 777 /home/mlperf
 ENV HOME /home/mlperf

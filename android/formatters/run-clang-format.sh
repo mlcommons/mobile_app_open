@@ -16,7 +16,7 @@
 ##########################################################################
 
 CPP_DIRS=('android/cpp' 'mobile_back_qti' 'mobile_back_tflite')
- 
+
 for directory in "${CPP_DIRS[@]}"
 do
     find $directory -iname "*.h" | \

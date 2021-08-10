@@ -53,7 +53,7 @@ else
   if [ "$build_files" ]; then
     buildifier -v $build_files
   fi
-fi 
+fi
 
 # Formatting Java files.
 java_is_present=$(which java)
