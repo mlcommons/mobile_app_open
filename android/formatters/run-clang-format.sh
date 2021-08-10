@@ -20,7 +20,7 @@ CPP_DIRS=('android/cpp' 'mobile_back_qti' 'mobile_back_tflite')
 for directory in "${CPP_DIRS[@]}"
 do
     find $directory -iname "*.h" | \
-        xrags clang-format-10 -i -style=google
+        xargs clang-format-10 -i -style=google
 
     find $directory -iname "*.cc" | \
         xargs clang-format-10 -i -style=google

@@ -33,12 +33,7 @@ ls_staged_files () {
 # Formatting cpp files using clang-format.
 cpp_files=$(ls_staged_files "\.h|\.cc|\.cpp")
 if [ "$cpp_files" ]; then
-    docker run\
-        --rm \
-        -it \
-        -v `pwd`:/home/mlperf/mobile_app \
-        -w /home/mlperf/mobile_app \
-        mlcommons/mlperf_mobile:1.0 clang-format-10 -i -style=google $cpp_files
+    clang-format-10 -i -style=google $cpp_files
 fi
 
 
