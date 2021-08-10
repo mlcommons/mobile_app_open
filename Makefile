@@ -17,9 +17,6 @@
 #SAMSUNG_BACKEND=--//android/java/org/mlperf/inference:with_samsung="1"
 SAMSUNG_BACKEND=
 
-#MEDIATEK_BACKEND=--//android/java/org/mlperf/inference:with_mediatek="1"
-MEDIATEK_BACKEND=
-
 .PHONY: docker_image app bazel-version rundocker clean
 
 all: app
@@ -28,12 +25,12 @@ include mobile_back_tflite/tflite_backend.mk
 include mobile_back_qti/qti_backend.mk
 
 
-output/mlperf_mobile_docker_0_2.stamp:
+output/mlperf_mobile_docker_1_0.stamp: android/docker/mlperf_mobile/Dockerfile
 	@mkdir -p output/docker
-	@docker image build -t mlcommons/mlperf_mobile:0.2 android/docker/mlperf_mobile
+	@docker image build -t mlcommons/mlperf_mobile:1.0 android/docker/mlperf_mobile
 	@touch $@
 
-docker_image: output/mlperf_mobile_docker_0_2.stamp
+docker_image: output/mlperf_mobile_docker_1_0.stamp
 
 COMMON_DOCKER_FLAGS1= \
                 -e USER=mlperf \
@@ -43,7 +40,7 @@ COMMON_DOCKER_FLAGS1= \
                 ${QTI_VOLUMES} \
 		-w /home/mlperf/mobile_app \
                 -u `id -u`:`id -g` \
-		mlcommons/mlperf_mobile:0.2 bazel-3.7.2
+		mlcommons/mlperf_mobile:1.0 bazel-3.7.2
 
 COMMON_DOCKER_FLAGS2= \
                 ${PROXY_WORKAROUND2} \
@@ -61,7 +58,7 @@ NATIVE_DOCKER_FLAGS= \
                 ${COMMON_DOCKER_FLAGS1} --bazelrc=/dev/null \
                 ${COMMON_DOCKER_FLAGS2}
 
-proto_test: output/mlperf_mobile_docker_0_2.stamp
+proto_test: output/mlperf_mobile_docker_1_0.stamp
 	@echo "Building proto_test"
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
@@ -70,7 +67,7 @@ proto_test: output/mlperf_mobile_docker_0_2.stamp
 	@cp output/`readlink bazel-bin`/android/cpp/proto/proto_test output/proto_test
 	@chmod 777 output/proto_test
 
-main: output/mlperf_mobile_docker_0_2.stamp ${QTI_DEPS}
+main: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
 	@echo "Building main"
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
@@ -82,7 +79,7 @@ main: output/mlperf_mobile_docker_0_2.stamp ${QTI_DEPS}
 	@${QTI_LIB_COPY}
 	@chmod 777 output/binary/main output/binary/libtflitebackend.so
 
-libtflite: output/mlperf_mobile_docker_0_2.stamp
+libtflite: output/mlperf_mobile_docker_1_0.stamp
 	@echo "Building libtflite"
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
@@ -93,7 +90,7 @@ libtflite: output/mlperf_mobile_docker_0_2.stamp
 	@chmod 777 output/binary/libtflitebackend.so
 	
 
-app: output/mlperf_mobile_docker_0_2.stamp ${QTI_DEPS}
+app: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
 	@echo "Building mlperf_app.apk"
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
@@ -104,7 +101,7 @@ app: output/mlperf_mobile_docker_0_2.stamp ${QTI_DEPS}
 	@cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app.apk
 	@chmod 777 output/mlperf_app.apk
 
-app_x86_64: output/mlperf_mobile_docker_0_2.stamp
+app_x86_64: output/mlperf_mobile_docker_1_0.stamp
 	@echo "Building mlperf_app.apk"
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
@@ -115,7 +112,7 @@ app_x86_64: output/mlperf_mobile_docker_0_2.stamp
 	@cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app_x86_64.apk
 	@chmod 777 output/mlperf_app.apk
 
-test_app: output/mlperf_mobile_docker_0_2.stamp
+test_app: output/mlperf_mobile_docker_1_0.stamp
 	@echo "Building mlperf_app.apk"
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
@@ -126,22 +123,22 @@ test_app: output/mlperf_mobile_docker_0_2.stamp
 	@cp output/`readlink bazel-bin`/android/androidTest/mlperf_test_app.apk output/mlperf_test_app.apk
 	@chmod 777 output/mlperf_test_app.apk
 
-rundocker: output/mlperf_mobile_docker_0_2.stamp
+rundocker: output/mlperf_mobile_docker_1_0.stamp
 	@docker run -it \
                 -e USER=mlperf \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
 		-w /home/mlperf/mobile_app \
                 -u `id -u`:`id -g` \
-		mlcommons/mlperf_mobile:0.2
+		mlcommons/mlperf_mobile:1.0
 
-rundocker_root: output/mlperf_mobile_docker_0_2.stamp
+rundocker_root: output/mlperf_mobile_docker_1_0.stamp
 	@docker run -it \
                 -e USER=mlperf \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
 		-w /home/mlperf/mobile_app \
-		mlcommons/mlperf_mobile:0.2
+		mlcommons/mlperf_mobile:1.0
 
 clean:
 	@([ -d output/home/mlperf/cache ] && chmod -R +w output/home/mlperf/cache) || true

@@ -16,13 +16,13 @@
 ##########################################################################
 
 if [ $(git diff --name-only | wc -l) -ne 0 ]; then
-  echo "Please stage or stash unstaged changes first."
-  exit 1
+    echo "Please stage or stash unstaged changes first."
+    exit 1
 fi
 
 ls_staged_files () {
-  # Don't throw errors if egrep find no match.
-  echo $(git diff --name-only --cached --diff-filter=d | egrep $1 || true)
+    # Don't throw errors if egrep find no match.
+    echo $(git diff --name-only --cached --diff-filter=d | egrep $1 || true)
 }
 
 # Search files with prohibited extensions

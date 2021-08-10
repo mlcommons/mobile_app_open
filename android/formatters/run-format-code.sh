@@ -20,40 +20,40 @@ set -e
 ERROR=0
 
 if [ $(git diff --name-only --diff-filter=d origin/master origin/${GIT_BRANCH}| wc -l) -eq 0 ]; then
-  echo "No new files found"
-  exit 0
+    echo "No new files found"
+    exit 0
 fi
 
 ls_staged_files () {
-  # Don't throw errors if egrep find no match.
-  echo $(git diff --name-only --diff-filter=d origin/master origin/${GIT_BRANCH} | egrep $1 || true)
+    # Don't throw errors if egrep find no match.
+    echo $(git diff --name-only --diff-filter=d origin/master origin/${GIT_BRANCH} | egrep $1 || true)
 }
 
 # Formatting cpp files using clang-format.
 cpp_files=$(ls_staged_files "\.h|\.cc|\.cpp")
 if [ "$cpp_files" ]; then
-  echo "Updated/new C++ files: $cpp_files"
-  clang-format -i  -style=google $cpp_files
+    echo "Updated/new C++ files: $cpp_files"
+    clang-format-10 -i  -style=google $cpp_files
 else
-  echo "There is no updated/new C++ files"
+    echo "There is no updated/new C++ files"
 fi
 
 # Formatting build files using buildifier.
 build_files=$(ls_staged_files "WORKSPACE|BUILD|BUILD.bazel|\.bzl")
 if [ "$build_files" ]; then
-  echo "Updated/new Bazel files: $build_files"
-  buildifier -v $build_files
+    echo "Updated/new Bazel files: $build_files"
+    buildifier -v $build_files
 else
-  echo "There is no updated/new Bazel files"
+    echo "There is no updated/new Bazel files"
 fi
 
 # Formatting Java files.
 java_files=$(ls_staged_files "\.java")
 if [ "$java_files" ]; then
-  echo "Updated/new Java files: $java_files"
-  java -jar formatters/google-java-format/google-java-format-1.9-all-deps.jar --replace  $java_files
+    echo "Updated/new Java files: $java_files"
+    java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace  $java_files
 else
-  echo "There is no updated/new Java files"
+    echo "There is no updated/new Java files"
 fi
 
 # Create path-file to fix code format
@@ -61,10 +61,10 @@ git diff >codeformat-${GIT_COMMIT}.patch
 
 # Return error if file(s) require(s) code formatting
 if [ $(git ls-files -m | wc -l) -ne 0 ]; then
-  echo "\nNeed code formatting!\n"
-  ERROR=1
+    echo "\nNeed code formatting!\n"
+    ERROR=1
 else
-  echo "\nNo need code formatting\n"
+    echo "\nNo need code formatting\n"
 fi
 
 # Search files with prohibited extensions
