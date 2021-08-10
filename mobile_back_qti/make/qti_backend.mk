@@ -34,8 +34,7 @@ ifeq (${WITH_QTI},1)
   ifneq (${SNPE_SDK},)
     QTI_BACKEND=--//android/java/org/mlperf/inference:with_qti="1"
     QTI_TARGET=//mobile_back_qti:qtibackend
-    # TODO: Change to backend_qti when bqckend_qti is enabled
-    QTI_LIB_COPY=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_mock_qti/libqtibackend.so output/binary/libqtibackend.so
+    QTI_LIB_COPY=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/binary/libqtibackend.so
     SNPE_VERSION=$(shell basename ${SNPE_SDK})
     QTI_SNPE_VERSION=$(shell grep SNPE_VERSION mobile_back_qti/variables.bzl | cut -d\" -f2)
     QTI_VOLUMES=-v ${SNPE_SDK}:/home/mlperf/mobile_app/mobile_back_qti/${SNPE_VERSION}

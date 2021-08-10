@@ -53,12 +53,12 @@ cc_library(
 cc_library(
     name = "qtibackend",
     srcs = select({
-        "//conditions:default": ["//mobile_back_qti/cpp/backend_mock_qti:libqtibackend.so"],
-        # TODO: Add proper handling for QTI devices
-        ":android_arm64": ["//mobile_back_qti/cpp/backend_mock_qti:libqtibackend.so"],
-        #        ":android_arm64": [
-        #            "//mobile_back_qti/cpp/backend_qti:libqtibackend.so",
-        #        ],
+        "//conditions:default": [
+            "//mobile_back_qti/cpp/backend_mock_qti:libqtibackend.so"
+        ],
+        ":android_arm64": [
+            "//mobile_back_qti/cpp/backend_qti:libqtibackend.so"
+        ],
     }),
     deps = select({
         "//conditions:default": [],

@@ -22,7 +22,7 @@ SAMSUNG_BACKEND=
 all: app
 
 include mobile_back_tflite/tflite_backend.mk
-include mobile_back_qti/qti_backend.mk
+include mobile_back_qti/make/qti_backend.mk
 
 
 output/mlperf_mobile_docker_1_0.stamp: android/docker/mlperf_mobile/Dockerfile
@@ -143,4 +143,9 @@ rundocker_root: output/mlperf_mobile_docker_1_0.stamp
 clean:
 	@([ -d output/home/mlperf/cache ] && chmod -R +w output/home/mlperf/cache) || true
 	@rm -rf output
+
+ifeq (${WITH_QTI},1)
+  include mobile_back_qti/make/qti_backend_targets.mk
+endif
+
 
