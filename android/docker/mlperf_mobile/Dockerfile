@@ -85,7 +85,7 @@ ENV ANDROID_NDK_HOME ${android_ndk_home}
 
 # Add Java format checker and buildifier
 ENV GOBIN /opt/formatters/bin
-RUN mkdir -p ${GOBIN} && curl --output `dirname ${GOBIN}`/google-java-format-1.9-all-deps.jar -L https://github.com/google/google-java-format/releases/download/v1.9/google-java-format-1.9-all-deps.jar
+RUN mkdir -p ${GOBIN} && curl --output `dirname ${GOBIN}`/google-java-format-1.9-all-deps.jar -L https://github.com/google/google-java-format/releases/download/google-java-format-1.9/google-java-format-1.9-all-deps.jar
 RUN /usr/lib/go-1.13/bin/go get github.com/bazelbuild/buildtools/buildifier
 ENV PATH=${PATH}:${GOBIN}
 
