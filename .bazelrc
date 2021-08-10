@@ -20,3 +20,13 @@ build --host_cxxopt='--std=c++14'
 test --fat_apk_cpu=x86_64,arm64-v8a
 test --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
 
+#common --experimental_repo_remote_exec
+build:linux --copt=-w
+
+build:asan --strip=never
+build:asan --copt -fsanitize=address
+build:asan --copt -DADDRESS_SANITIZER
+build:asan --copt -O1
+build:asan --copt -g
+build:asan --copt -fno-omit-frame-pointer
+build:asan --linkopt -fsanitize=address
