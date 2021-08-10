@@ -117,6 +117,8 @@ public class CalculatingActivity extends BaseActivity
   private static final float MAX_PERCENTAGE_NUMBER = 100.0f;
   private static final String TAG = "CalculatingActivity";
   private static final String PERCENTAGE_CHAR = "%";
+  private static final int MAX_TASKS = 10;
+  private static boolean isStatusViewsSetup = false;
   public static MiddleInterface middleInterface;
   private final ArrayList<ResultHolder> results = new ArrayList<>();
   private int state = STATE_IDLE;
@@ -137,7 +139,7 @@ public class CalculatingActivity extends BaseActivity
   private Button startCalculatingButton;
   private TextView cancelButton;
   private Handler handler = null;
-  private ItemStatus[] statuses = null;
+  private final ArrayList<ItemStatus> statuses = new ArrayList<>();
   private View progressContainer;
   private TextView progressMessage;
   private TextView dontCloseApptext;
@@ -152,7 +154,6 @@ public class CalculatingActivity extends BaseActivity
   private float previousScore = -1;
   private ArrayList<ResultHolder> previousResults = null;
   private TextView loadingContentText;
-  private float mCircularRevealDistDefault = -1;
   private float mCircularRevealDistFillScreen = -1;
   private String runMode;
   private volatile IdlingResource.ResourceCallback idleCallback;
@@ -289,9 +290,12 @@ public class CalculatingActivity extends BaseActivity
         }
         float product = 1f;
         int count = 0;
-        ResultHolder[] tmpArray = new ResultHolder[5];
+        ResultHolder[] tmpArray = new ResultHolder[MAX_TASKS];
         for (String s : previousResultsStrings) {
           ResultHolder result = deserializeResult(s);
+
+          // FIXME - Is it safe to call getOrder here? Has the tasks_v2.pbtxt been
+          // downloaded yet? If not can this be deferred until we have loaded the file?
           int order = getOrder(result.getId());
           if (order < 0) continue;
           if (tmpArray[order] == null)
@@ -320,6 +324,7 @@ public class CalculatingActivity extends BaseActivity
         }
       }
     }
+
     allowShareResults = Util.getUserShareConsent();
   }
 
@@ -454,37 +459,30 @@ public class CalculatingActivity extends BaseActivity
     testAgainButton.setOnClickListener(this::startCalculating);
     shareResultsButton.setOnClickListener(this::shareResults);
 
-    statuses = new ItemStatus[5];
-    statuses[0] =
-        new ItemStatus(
-            getString(R.string.image_classification),
-            true,
-            R.drawable.ic_image_classification,
-            "IC");
-    statuses[1] =
-        new ItemStatus(
-            getString(R.string.object_detection), false, R.drawable.ic_object_detection, "OD");
-    statuses[2] =
-        new ItemStatus(
-            getString(R.string.image_segmentation), false, R.drawable.ic_image_segmentation, "IS");
-    statuses[3] =
-        new ItemStatus(
-            getString(R.string.language_processing),
-            false,
-            R.drawable.ic_language_processing,
-            "LU");
-    statuses[4] =
-        new ItemStatus(
-            getString(R.string.image_classification_offline),
-            true,
-            R.drawable.ic_image_processing_2,
-            "IC");
+    diagnosticBackgroundView = findViewById(R.id.diagnosticBackgroundView);
+  }
+
+  private void setupItemStatusViews() {
+    if (isStatusViewsSetup == true) return;
+    MLPerfConfig mlperfTasks = MLPerfTasks.getConfig();
+    for (TaskConfig task : mlperfTasks.getTaskList()) {
+      for (ModelConfig model : task.getModelList()) {
+        String token = model.getId().substring(0, 2);
+        if (middleInterface.hasBenchmark(model.getId())) {
+          statuses.add(
+              new ItemStatus(
+                  task.getName(),
+                  token.equals("IC") ? true : false,
+                  getIcon(model.getId()),
+                  token));
+        }
+      }
+    }
     for (ItemStatus status : statuses) {
       MeasureItemUtil.addItemToParent(
           this, itemContentView, status, (view) -> onItemClicked((String) view.getTag()));
     }
-
-    diagnosticBackgroundView = findViewById(R.id.diagnosticBackgroundView);
+    isStatusViewsSetup = true;
   }
 
   private void cancelBenchmarks() {
@@ -511,15 +509,28 @@ public class CalculatingActivity extends BaseActivity
     SnackBarResultLayout.make(getWindow().getDecorView(), id).show();
   }
 
-  public static String getReadableBenchmarkTitle(Context ctx, String benchmarkId) {
-    String id = benchmarkId.toLowerCase();
-    if (id.startsWith("ic_")) {
-      if (id.contains("offline")) return ctx.getString(R.string.image_classification_offline);
-      else return ctx.getString(R.string.image_classification);
-    } else if (id.startsWith("od_")) return ctx.getString(R.string.object_detection);
-    else if (id.startsWith("lu_")) return ctx.getString(R.string.language_processing);
-    else if (id.startsWith("is_")) return ctx.getString(R.string.image_segmentation);
-    else return benchmarkId;
+  public static String getReadableBenchmarkTitle(String benchmarkId) {
+    MLPerfConfig mlperfTasks = MLPerfTasks.getConfig();
+    for (TaskConfig task : mlperfTasks.getTaskList()) {
+      for (ModelConfig model : task.getModelList()) {
+        if (model.getId().equals(benchmarkId)) {
+          return task.getName();
+        }
+      }
+    }
+    return benchmarkId;
+  }
+
+  public static int getIcon(String benchmarkId) {
+    int icon = R.drawable.ic_image_classification;
+    if (benchmarkId.startsWith("IS_")) {
+      icon = R.drawable.ic_image_segmentation;
+    } else if (benchmarkId.startsWith("OD_")) {
+      icon = R.drawable.ic_object_detection;
+    } else if (benchmarkId.startsWith("LU_")) {
+      icon = R.drawable.ic_language_processing;
+    }
+    return icon;
   }
 
   public void clearUI() {
@@ -542,6 +553,37 @@ public class CalculatingActivity extends BaseActivity
     loadingContentText.setVisibility(View.INVISIBLE);
   }
 
+  private void updateCircle(boolean fullscreen, View view) {
+    if (fullscreen) {
+      view.getViewTreeObserver()
+          .addOnPreDrawListener(
+              new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                  view.getViewTreeObserver().removeOnPreDrawListener(this);
+                  float bottom = diagnosticBackgroundView.getHeight() * 1.1f;
+                  diagnosticBackgroundView.setFill(bottom);
+                  return false;
+                }
+              });
+    } else {
+      view.getViewTreeObserver()
+          .addOnPreDrawListener(
+              new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                  view.getViewTreeObserver().removeOnPreDrawListener(this);
+                  view.measure(0, 0);
+                  view.getMeasuredHeight();
+                  float offset =
+                      view.getTop() - getResources().getDimension(R.dimen.measure_label_margin);
+                  diagnosticBackgroundView.setFill(offset);
+                  return false;
+                }
+              });
+    }
+  }
+
   private synchronized void onNewState(int state) {
     clearUI();
     switch (state) {
@@ -559,7 +601,7 @@ public class CalculatingActivity extends BaseActivity
             ContextCompat.getDrawable(this, R.drawable.circle_disabled));
         startCalculatingButton.setEnabled(false);
         itemContentView.setVisibility(View.VISIBLE);
-        resultsDescriptionText.setVisibility(View.VISIBLE);
+        resultsDescriptionText.setVisibility(View.GONE);
         calculatingScrollView.setScrollEnabled(false);
         startCalculatingButton.setText(
             ((Context) this)
@@ -570,34 +612,7 @@ public class CalculatingActivity extends BaseActivity
         cancelButton.setVisibility(View.INVISIBLE);
 
         // ensure bg fill is set up
-        if (mCircularRevealDistDefault != -1) {
-          diagnosticBackgroundView.setFill(mCircularRevealDistDefault);
-        } else {
-          resultsDescriptionText
-              .getViewTreeObserver()
-              .addOnPreDrawListener(
-                  new ViewTreeObserver.OnPreDrawListener() {
-                    @Override
-                    public boolean onPreDraw() {
-                      resultsDescriptionText.getViewTreeObserver().removeOnPreDrawListener(this);
-                      mCircularRevealDistDefault =
-                          resultsDescriptionText.getTop()
-                              - getResources().getDimension(R.dimen.measure_label_margin);
-
-                      if (mCircularRevealDistFillScreen == -1) {
-                        diagnosticBackgroundView.setFillImmediate(mCircularRevealDistDefault);
-                        // also set up running state
-                        mCircularRevealDistFillScreen = diagnosticBackgroundView.getHeight() * 1.1f;
-                      } else {
-                        // transitioning from other state
-                        diagnosticBackgroundView.setFill(mCircularRevealDistDefault);
-                      }
-                      return false;
-                    }
-                  });
-        }
-
-        resultsDescriptionText.forceLayout();
+        updateCircle(true, itemContentView);
 
         if (getSupportActionBar() != null) {
           getSupportActionBar().setTitle(R.string.calculatingActivityLabel);
@@ -630,35 +645,10 @@ public class CalculatingActivity extends BaseActivity
           loadingContentText.setVisibility(View.VISIBLE);
         }
 
-        // ensure bg fill is set up
-        if (mCircularRevealDistDefault != -1) {
-          diagnosticBackgroundView.setFill(mCircularRevealDistDefault);
-        } else {
-          resultsDescriptionText
-              .getViewTreeObserver()
-              .addOnPreDrawListener(
-                  new ViewTreeObserver.OnPreDrawListener() {
-                    @Override
-                    public boolean onPreDraw() {
-                      resultsDescriptionText.getViewTreeObserver().removeOnPreDrawListener(this);
-                      mCircularRevealDistDefault =
-                          resultsDescriptionText.getTop()
-                              - getResources().getDimension(R.dimen.measure_label_margin);
-
-                      if (mCircularRevealDistFillScreen == -1) {
-                        diagnosticBackgroundView.setFillImmediate(mCircularRevealDistDefault);
-                        // also set up running state
-                        mCircularRevealDistFillScreen = diagnosticBackgroundView.getHeight() * 1.1f;
-                      } else {
-                        // transitioning from other state
-                        diagnosticBackgroundView.setFill(mCircularRevealDistDefault);
-                      }
-                      return false;
-                    }
-                  });
-        }
-
+        // Ensure bg fill is set up
+        updateCircle(false, resultsDescriptionText);
         resultsDescriptionText.forceLayout();
+
         if (getSupportActionBar() != null && !benchmarksAreRunning) {
           getSupportActionBar().setTitle(R.string.calculatingActivityLabel);
           getSupportActionBar().show();
@@ -695,22 +685,7 @@ public class CalculatingActivity extends BaseActivity
         progressContainer.setVisibility(View.VISIBLE);
 
         // ensure bg fill is set up
-        if (mCircularRevealDistFillScreen == -1) {
-          diagnosticBackgroundView
-              .getViewTreeObserver()
-              .addOnPreDrawListener(
-                  new ViewTreeObserver.OnPreDrawListener() {
-                    @Override
-                    public boolean onPreDraw() {
-                      diagnosticBackgroundView.getViewTreeObserver().removeOnPreDrawListener(this);
-                      mCircularRevealDistFillScreen = diagnosticBackgroundView.getHeight() * 1.1f;
-                      diagnosticBackgroundView.setFillImmediate(mCircularRevealDistFillScreen);
-                      return false;
-                    }
-                  });
-        } else {
-          diagnosticBackgroundView.setFill(mCircularRevealDistFillScreen);
-        }
+        updateCircle(true, diagnosticBackgroundView);
 
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         break;
@@ -1054,6 +1029,9 @@ public class CalculatingActivity extends BaseActivity
   public void setModelIsAvailable() {
     modelIsAvailable = true;
 
+    // Now that we have the set of tasks and benchmarks, list the runnable set
+    setupItemStatusViews();
+
     if (autoStart) {
       autoStart = false;
       calculating();
@@ -1100,7 +1078,7 @@ public class CalculatingActivity extends BaseActivity
     runOnUiThread(
         () -> {
           TextView title = findViewById(R.id.performanceDetailsTitle);
-          title.setText(getReadableBenchmarkTitle(this, benchmarkId));
+          title.setText(getReadableBenchmarkTitle(benchmarkId));
 
           ImageView icon = findViewById(R.id.performanceDetailsIcon);
 
@@ -1154,21 +1132,17 @@ public class CalculatingActivity extends BaseActivity
   }
 
   private int getOrder(String benchmarkId) {
-    String id = benchmarkId == null ? "" : benchmarkId.toLowerCase();
-    int order = -1;
-
-    if (id.startsWith("ic")) {
-      if (id.endsWith("offline")) order = 4;
-      else order = 0;
-    } else if (id.startsWith("od")) {
-      order = 1;
-    } else if (id.startsWith("is")) {
-      order = 2;
-    } else if (id.startsWith("lu")) {
-      order = 3;
+    int order = 0;
+    MLPerfConfig mlperfTasks = MLPerfTasks.getConfig();
+    for (TaskConfig task : mlperfTasks.getTaskList()) {
+      for (ModelConfig model : task.getModelList()) {
+        if (benchmarkId.equals(model.getId())) {
+          return order;
+        }
+      }
+      order++;
     }
-
-    return order;
+    return -1;
   }
 
   private void showResults(float summaryScore, ArrayList<ResultHolder> results) {
@@ -1176,7 +1150,7 @@ public class CalculatingActivity extends BaseActivity
     tabSwitcher.Reset();
 
     ArrayList<ResultHolder> finalResults = generateResults(results, runMode);
-    ResultHolder[] tmpArray = new ResultHolder[5];
+    ResultHolder[] tmpArray = new ResultHolder[MAX_TASKS];
     int index = 0;
     for (ResultHolder rh : finalResults) {
       String id = rh.getId();

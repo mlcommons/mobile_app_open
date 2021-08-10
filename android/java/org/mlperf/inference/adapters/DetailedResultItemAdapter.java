@@ -58,8 +58,7 @@ public class DetailedResultItemAdapter
 
     public void setData(ResultHolder result, int type, View.OnClickListener onItemInfoClicked) {
       TextView titleTV = view.findViewById(R.id.detailedResultItemTitle);
-      titleTV.setText(
-          CalculatingActivity.getReadableBenchmarkTitle(view.getContext(), result.getId()));
+      titleTV.setText(CalculatingActivity.getReadableBenchmarkTitle(result.getId()));
 
       DecimalFormat df = new DecimalFormat("0.00");
       TextView scoreTV = view.findViewById(R.id.detailedResultItemScore);
