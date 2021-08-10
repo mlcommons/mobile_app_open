@@ -21,49 +21,49 @@
 # commit and commit again after formatting it.
 
 if [ $(git diff --name-only | wc -l) -ne 0 ]; then
-  echo "Please stage or stash unstaged changes first."
-  exit 1
+    echo "Please stage or stash unstaged changes first."
+    exit 1
 fi
 
 ls_staged_files () {
-  # Don't throw errors if egrep find no match.
-  echo $(git diff --name-only --cached --diff-filter=d | egrep $1 || true)
+    # Don't throw errors if egrep find no match.
+    echo $(git diff --name-only --cached --diff-filter=d | egrep $1 || true)
 }
 
 # Formatting cpp files using clang-format.
 cpp_files=$(ls_staged_files "\.h|\.cc|\.cpp")
 if [ "$cpp_files" ]; then
-  docker run\
-    --rm \
-    -it \
-    -v `pwd`:/home/mlperf/mobile_app \
-    -w /home/mlperf/mobile_app \
-    mlcommons/mlperf_mobile:1.0 clang-format-10 -i -style=google $cpp_files
+    docker run\
+        --rm \
+        -it \
+        -v `pwd`:/home/mlperf/mobile_app \
+        -w /home/mlperf/mobile_app \
+        mlcommons/mlperf_mobile:1.0 clang-format-10 -i -style=google $cpp_files
 fi
 
 
 # Formatting build files using buildifier.
 buildifier_is_present=$(which buildifier)
 if [ ! -x "$buildifier_is_present" ] ; then
-  echo "*"
-  echo "* Bazel config files can't be formated because 'buildifier' is not in \$PATH"
-  echo "*\n"
+    echo "*"
+    echo "* Bazel config files can't be formated because 'buildifier' is not in \$PATH"
+    echo "*\n"
 else
-  build_files=$(ls_staged_files "WORKSPACE|BUILD|BUILD.bazel|\.bzl")
-  if [ "$build_files" ]; then
-    buildifier -v $build_files
-  fi
+    build_files=$(ls_staged_files "WORKSPACE|BUILD|BUILD.bazel|\.bzl")
+    if [ "$build_files" ]; then
+        buildifier -v $build_files
+    fi
 fi
 
 # Formatting Java files.
 java_is_present=$(which java)
 if [ ! -x "$java_is_present" ] ; then
-  echo "*"
-  echo "* Java files can't be formated because 'java' is not in \$PATH"
-  echo "*\n"
+    echo "*"
+    echo "* Java files can't be formated because 'java' is not in \$PATH"
+    echo "*\n"
 else
-  java_files=$(ls_staged_files "\.java")
-  if [ "$java_files" ]; then
-    java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace  $java_files
-  fi
+    java_files=$(ls_staged_files "\.java")
+    if [ "$java_files" ]; then
+        java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace  $java_files
+    fi
 fi

@@ -20,32 +20,31 @@
 # Formatting cpp files using clang-format.
 cpp_files=$(find android -name "*.h" && find android -name "*.cc")
 if [ "$cpp_files" ]; then
-  clang-format-10 -i -style=google $cpp_files
+    clang-format-10 -i -style=google $cpp_files
 fi
-
 
 # Formatting build files using buildifier.
 buildifier_is_present=$(which buildifier)
 if [ ! -x "$buildifier_is_present" ] ; then
-  echo "*"
-  echo "* Bazel config files can't be formated because 'buildifier' is not in \$PATH"
-  echo "*\n"
+    echo "*"
+    echo "* Bazel config files can't be formated because 'buildifier' is not in \$PATH"
+    echo "*\n"
 else
-  build_files=$(echo WORKSPACE && find android -name BUILD && find android -name BUILD.bazel && find android -name "*.bzl")
-  if [ "$build_files" ]; then
-    buildifier -v $build_files
-  fi
+    build_files=$(echo WORKSPACE && find android -name BUILD && find android -name BUILD.bazel && find android -name "*.bzl")
+    if [ "$build_files" ]; then
+        buildifier -v $build_files
+    fi
 fi
 
 # Formatting Java files.
 java_is_present=$(which java)
 if [ ! -x "$java_is_present" ] ; then
-  echo "*"
-  echo "* Java files can't be formated because 'java' is not in \$PATH"
+    echo "*"
+    echo "* Java files can't be formated because 'java' is not in \$PATH"
   echo "*\n"
 else
-  java_files=$(find android -name "*.java")
-  if [ "$java_files" ]; then
-    java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace  $java_files
-  fi
+    java_files=$(find android -name "*.java")
+    if [ "$java_files" ]; then
+        java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace $java_files
+    fi
 fi
