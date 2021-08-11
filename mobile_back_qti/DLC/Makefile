@@ -48,7 +48,7 @@ ${BUILDDIR}/datasets.stamp:
 ${BUILDDIR}/mobile/.stamp:
 	@curl -H  "Authorization: token ${GITHUB_TOKEN}" -o ${BUILDDIR}/mobile.zip -L https://github.com/mlcommons/mobile/archive/mobiledet-export_inference_graph.zip
 	@cd ${BUILDDIR} && unzip mobile.zip
-	@mv mobile-mobiledet-export_inference_graph mobile
+	@mv ${BUILDDIR}/mobile-mobiledet-export_inference_graph ${BUILDDIR}/mobile
 	@touch $@
 
 ${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_float.dlc: \

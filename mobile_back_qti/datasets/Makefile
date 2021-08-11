@@ -13,7 +13,7 @@
 # limitations under the License.
 ##########################################################################
 
-include ../builddir.mk
+include ../make/builddir.mk
 
 all: ${BUILDDIR}/datasets.stamp
 
