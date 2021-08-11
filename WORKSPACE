@@ -91,7 +91,7 @@ maven_install(
         "androidx.preference:preference:aar:1.1.0",
         "androidx.fragment:fragment:aar:1.2.0-rc04",
         "com.google.android.material:material:aar:1.2.0-alpha03",
-        "androidx.recyclerview:recyclerview:aar:1.1.0",
+        "androidx.recyclerview:recyclerview:aar:1.2.1",
         "androidx.lifecycle:lifecycle-livedata:aar:2.1.0",
         "junit:junit:4.13",
         "com.google.inject:guice:4.2.2",
