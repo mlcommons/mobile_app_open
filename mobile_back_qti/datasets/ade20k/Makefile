@@ -47,7 +47,7 @@ ${DOWNLOADS}/models-2.3.0/.stamp: ${DOWNLOADS}/v2.3.0.zip
 	@(cd ${DOWNLOADS} && unzip v2.3.0.zip)
 	@touch $@
 
-${ADE20K_OUT}/quantdata.stamp:
+${ADE20K_OUT}/quantdata.stamp: \
 		${DOWNLOADS}/models-2.3.0/.stamp \
 		${ADE20K_OUT}/ADE20K_2016_07_26/.stamp \
 		${BUILDDIR}/mlperf_mobile_docker_1_0.stamp
