@@ -88,7 +88,7 @@ maven_install(
         "androidx.appcompat:appcompat:aar:1.1.0",
         "androidx.constraintlayout:constraintlayout:aar:2.0.0-beta3",
         "androidx.core:core:aar:1.1.0",
-        "androidx.preference:preference:aar:1.1.0",
+        "androidx.preference:preference:aar:1.1.1",
         "androidx.fragment:fragment:aar:1.2.0-rc04",
         "com.google.android.material:material:aar:1.2.0-alpha03",
         "androidx.recyclerview:recyclerview:aar:1.2.1",
