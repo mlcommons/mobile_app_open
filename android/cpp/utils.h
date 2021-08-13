@@ -107,7 +107,7 @@ inline mlperf_backend_configuration_t CppToCSettings(
     const SettingList& settings) {
   mlperf_backend_configuration_t c_settings;
   char* accelerator =
-      new char[settings.benchmark_setting().accelerator().length()];
+      new char[settings.benchmark_setting().accelerator().length()+1];
   strcpy(accelerator, settings.benchmark_setting().accelerator().c_str());
   c_settings.accelerator = accelerator;
   c_settings.batch_size = settings.benchmark_setting().batch_size();
