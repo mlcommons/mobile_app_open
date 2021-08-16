@@ -27,3 +27,4 @@ $ sh android/formatters/docker_run.sh android/formatters/run-google-java-format.
 ```
 
 The scripts format all files found in scan paths. Scan paths are different for the scripts
+
