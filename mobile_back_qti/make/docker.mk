@@ -1,6 +1,4 @@
-#!/bin/bash
-
-# Copyright 2020 The MLPerf Authors. All Rights Reserved.
+# Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +13,17 @@
 # limitations under the License.
 ##########################################################################
 
-buildifier WORKSPACE
-find android -name BUILD | xargs buildifier
-find android -name BUILD.bazel | xargs buildifier
-find android -iname "*.bzl" | xargs buildifier
+.PHONY: docker_image
 
-if [ "$1" = "CI" ]; then
-    git diff >bazel-codeformat-${GIT_COMMIT}.patch
+${BUILDDIR}/mlperf_mobile_docker_1_0.stamp: ${APP_DIR}/android/docker/mlperf_mobile/Dockerfile
+	@mkdir -p ${BUILDDIR}
+	@docker image build -t mlcommons/mlperf_mobile:1.0 ${APPDIR}/android/docker/mlperf_mobile
+	@touch $@
 
-    if [ $(git ls-files -m | wc -l) -ne 0 ]; then
-        echo "\nNeed code formatting!\n"
-        exit 1
-    fi
-fi
+${BUILDDIR}/mlperf_mobiledet_docker_image.stamp: ${TOPDIR}/docker/mlperf_mobiledet/Dockerfile
+	@mkdir -p ${BUILDDIR}
+	@docker image build -t mlcommons/mlperf_mobiledet:0.1 ${TOPDIR}/docker/mlperf_mobiledet
+	@touch $@
+
+docker_image: ${BUILDDIR}/mlperf_mobile_docker_1_0.stamp
+

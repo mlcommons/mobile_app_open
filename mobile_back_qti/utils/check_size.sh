@@ -1,6 +1,6 @@
 #!/bin/bash
-
-# Copyright 2020 The MLPerf Authors. All Rights Reserved.
+##########################################################################
+# Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +15,7 @@
 # limitations under the License.
 ##########################################################################
 
-buildifier WORKSPACE
-find android -name BUILD | xargs buildifier
-find android -name BUILD.bazel | xargs buildifier
-find android -iname "*.bzl" | xargs buildifier
-
-if [ "$1" = "CI" ]; then
-    git diff >bazel-codeformat-${GIT_COMMIT}.patch
-
-    if [ $(git ls-files -m | wc -l) -ne 0 ]; then
-        echo "\nNeed code formatting!\n"
-        exit 1
-    fi
-fi
+git rev-list --objects --all \
+| git cat-file --batch-check='%(objecttype) %(objectsize) %(objectname) %(rest)' \
+| grep "^blob" | sort --numeric-sort -k2 \
+| numfmt --field=2 --to=si

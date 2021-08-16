@@ -1,16 +1,17 @@
+# Docker image name: mlcommons/mlperf_mobile:1.0
 FROM ubuntu:bionic
 LABEL maintainer="quic_mcharleb@quicinc.com"
 
 # Update the apt configuration and set timezone first or image creation waits
 # for selection of timezone
 RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y && \
-    apt-get install -y --no-install-recommends tzdata 
+    apt-get install -y --no-install-recommends tzdata
 
 RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y && \
     apt-get install -y --no-install-recommends \
        python3 python3-pip libpython3.6-dev python3.6-venv libgl1-mesa-glx libglib2.0 cython3 gcc make curl unzip libc++1-8 \
        git locales openssh-client ca-certificates tar gzip parallel \
-       zip bzip2 gnupg wget python3-six python3-pip libncurses5 openjdk-8-jdk-headless
+       zip bzip2 gnupg wget python3-six python3-pip libncurses5 openjdk-11-jdk-headless clang-format-10 golang-1.13-go
 
 RUN pip3 install pip==19.3.1 setuptools==31.0.1
 RUN pip3 install tensorflow-cpu==1.15
@@ -45,15 +46,16 @@ ARG android_home=/opt/android/sdk
 
 # Install Android SDK and NDK
 RUN mkdir -p ${android_home} && \
-    curl --silent --show-error --location --fail --retry 3 --output /tmp/sdk_tools.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip && \
-    unzip -q /tmp/sdk_tools.zip -d ${android_home} && \
+    wget -O /tmp/sdk_tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip && \
+    unzip -q /tmp/sdk_tools.zip -d ${android_home}/cmdline-tools/ && \
+    mv ${android_home}/cmdline-tools/cmdline-tools ${android_home}/cmdline-tools/tools && \
     rm /tmp/sdk_tools.zip
-   
+
 # Set environment variables
 ENV ANDROID_HOME ${android_home}
 ENV ANDROID_NDK_HOME ${android_ndk_home}
 ENV ADB_INSTALL_TIMEOUT 120
-ENV PATH=${ANDROID_HOME}/emulator:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools:${PATH}
+ENV PATH=${ANDROID_HOME}/emulator:${ANDROID_HOME}/cmdline-tools/tools/bin:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/build-tools/29.0.3:${PATH}
 
 RUN mkdir ~/.android && echo '### User Sources for Android SDK Manager' > ~/.android/repositories.cfg
 
@@ -81,6 +83,13 @@ RUN cd /tmp &&  wget -nv https://dl.google.com/android/repository/${ndk_version}
 
 ENV ANDROID_NDK_HOME ${android_ndk_home}
 
+# Add Java format checker and buildifier
+ENV GOBIN /opt/formatters/bin
+RUN mkdir -p ${GOBIN} && curl --output `dirname ${GOBIN}`/google-java-format-1.9-all-deps.jar -L https://github.com/google/google-java-format/releases/download/google-java-format-1.9/google-java-format-1.9-all-deps.jar
+RUN /usr/lib/go-1.13/bin/go get github.com/bazelbuild/buildtools/buildifier
+ENV PATH=${PATH}:${GOBIN}
+
 RUN mkdir -p /home/mlperf && chmod 777 /home/mlperf
 ENV HOME /home/mlperf
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 

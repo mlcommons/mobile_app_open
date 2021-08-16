@@ -15,22 +15,22 @@
 # limitations under the License.
 ##########################################################################
 
-CPP_DIRS=('cpp' 'qti_mock_backend' 'samsung_mock_backend')
- 
+CPP_DIRS=('android/cpp' 'mobile_back_qti' 'mobile_back_tflite')
+
 for directory in "${CPP_DIRS[@]}"
 do
     find $directory -iname "*.h" | \
-        xargs clang-format -i -style=google
+        xargs clang-format-10 -i -style=google
 
     find $directory -iname "*.cc" | \
-        xargs clang-format -i -style=google
+        xargs clang-format-10 -i -style=google
 
     find $directory -iname "*.cpp" | \
-        xargs clang-format -i -style=google
+        xargs clang-format-10 -i -style=google
 done
 
 find java/org/mlperf/inference/jni -iname "*.cc" | \
-    xargs clang-format -i -style=google
+    xargs clang-format-10 -i -style=google
 
 if [ "$1" = "CI" ]; then
     git diff >cpp-codeformat-${GIT_COMMIT}.patch

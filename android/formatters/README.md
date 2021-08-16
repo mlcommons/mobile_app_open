@@ -12,16 +12,18 @@ You should use script `format_code.sh` in project root directory for usual devel
 
 Example:
 ```
-$ sh format_code.sh
+$ sh android/formatters/docker_run.sh android/format_code.sh
 ```
 
 
 ## CI
 The scripts in the current directory are intended to be used primarily in the CI process. "CI" should be used as the only parameter in that case.
 
-Example for bazel:
+To run the scripts in the docker image use:
 ```
-$ sh formatters/run-bazel-format.sh CI
+$ sh android/formatters/docker_run.sh android/formatters/run-bazel-format.sh CI
+$ sh android/formatters/docker_run.sh android/formatters/run-clang-format.sh CI
+$ sh android/formatters/docker_run.sh android/formatters/run-google-java-format.sh CI
 ```
 
 The scripts format all files found in scan paths. Scan paths are different for the scripts

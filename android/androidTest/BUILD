@@ -22,16 +22,16 @@ android_library(
     custom_package = "org.mlperf.inference.test",
     deps = [
         ":test_deps",
-        "//java/org/mlperf/inference:evaluation_app_lib",
-        "//third_party:androidx_preference",
-        "//third_party:androidx_recyclerview",
+        "//android/java/org/mlperf/inference:evaluation_app_lib",
+        "//android/third_party:androidx_preference",
+        "//android/third_party:androidx_recyclerview",
     ],
 )
 
 android_binary(
     name = "mlperf_test_app",
     custom_package = "org.mlperf.inference.test",
-    instruments = "//java/org/mlperf/inference:mlperf_app",
+    instruments = "//android/java/org/mlperf/inference:mlperf_app",
     manifest = "org/mlperf/inference/AndroidManifest.xml",
     deps = [":mlperf_test_lib"],
 )

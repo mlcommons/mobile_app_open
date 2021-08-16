@@ -1,6 +1,4 @@
-#!/bin/bash
-
-# Copyright 2020 The MLPerf Authors. All Rights Reserved.
+# Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +13,23 @@
 # limitations under the License.
 ##########################################################################
 
-buildifier WORKSPACE
-find android -name BUILD | xargs buildifier
-find android -name BUILD.bazel | xargs buildifier
-find android -iname "*.bzl" | xargs buildifier
+import os
 
-if [ "$1" = "CI" ]; then
-    git diff >bazel-codeformat-${GIT_COMMIT}.patch
+url=os.sys.argv[1]
+numbytes=int(os.sys.argv[2])
+prefix=os.sys.argv[3]
 
-    if [ $(git ls-files -m | wc -l) -ne 0 ]; then
-        echo "\nNeed code formatting!\n"
-        exit 1
-    fi
-fi
+tokenstr = ""
+if len(os.sys.argv) > 4 and os.sys.argv[4] == "usetoken":
+  tokenstr = '-H "Authorization: token ${GITHUB_TOKEN}"'
+
+chunksize = 500000000
+i=0
+for x in range(0, numbytes, chunksize):
+  if x+chunksize > numbytes:
+    end=numbytes
+  else:
+    end=x-1+chunksize
+  os.system("curl %s --range %d-%d -L %s -o %s.part%02d" % (tokenstr, x, end, url, prefix,i))
+  i=i+1
+

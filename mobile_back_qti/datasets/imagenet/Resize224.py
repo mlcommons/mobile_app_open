@@ -1,6 +1,5 @@
 #!/bin/bash
-
-# Copyright 2020 The MLPerf Authors. All Rights Reserved.
+# Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +14,19 @@
 # limitations under the License.
 ##########################################################################
 
-buildifier WORKSPACE
-find android -name BUILD | xargs buildifier
-find android -name BUILD.bazel | xargs buildifier
-find android -iname "*.bzl" | xargs buildifier
+from PIL import Image
+import os
+for f in os.listdir(os.sys.argv[1]):
+  img = Image.open(os.sys.argv[1]+"/"+f)
+  img256 = img.resize((256, 256), Image.ANTIALIAS)
 
-if [ "$1" = "CI" ]; then
-    git diff >bazel-codeformat-${GIT_COMMIT}.patch
+  # Seems like the required algo is to resize to 256x256
+  # Then center crop a 224x244 image
+  left = (256 - 224)/2
+  top = (256 - 224)/2
+  right = (256 + 224)/2
+  bottom = (256 + 224)/2
 
-    if [ $(git ls-files -m | wc -l) -ne 0 ]; then
-        echo "\nNeed code formatting!\n"
-        exit 1
-    fi
-fi
+  # Crop 224x224 image from the center
+  img224 = img256.crop((left, top, right, bottom))
+  img224.save(os.sys.argv[2]+"/"+f)

@@ -1,6 +1,4 @@
-#!/bin/bash
-
-# Copyright 2020 The MLPerf Authors. All Rights Reserved.
+# Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +13,12 @@
 # limitations under the License.
 ##########################################################################
 
-buildifier WORKSPACE
-find android -name BUILD | xargs buildifier
-find android -name BUILD.bazel | xargs buildifier
-find android -iname "*.bzl" | xargs buildifier
+this_mkfile:=$(abspath $(lastword $(MAKEFILE_LIST)))
+TOPDIR:=$(abspath $(shell dirname ${this_mkfile})/..)
+APP_DIR=$(abspath ${TOPDIR}/..)
+BUILDDIR=${APP_DIR}/output
+SNPE_VERSION=$(shell grep SNPE_VERSION ../variables.bzl | cut -d\" -f2)
 
-if [ "$1" = "CI" ]; then
-    git diff >bazel-codeformat-${GIT_COMMIT}.patch
+USERID=$(shell id -u)
+GROUPID=$(shell id -g)
 
-    if [ $(git ls-files -m | wc -l) -ne 0 ]; then
-        echo "\nNeed code formatting!\n"
-        exit 1
-    fi
-fi

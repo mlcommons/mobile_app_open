@@ -1,6 +1,5 @@
 #!/bin/bash
-
-# Copyright 2020 The MLPerf Authors. All Rights Reserved.
+# Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +14,18 @@
 # limitations under the License.
 ##########################################################################
 
-buildifier WORKSPACE
-find android -name BUILD | xargs buildifier
-find android -name BUILD.bazel | xargs buildifier
-find android -iname "*.bzl" | xargs buildifier
+set -e
 
-if [ "$1" = "CI" ]; then
-    git diff >bazel-codeformat-${GIT_COMMIT}.patch
-
-    if [ $(git ls-files -m | wc -l) -ne 0 ]; then
-        echo "\nNeed code formatting!\n"
-        exit 1
-    fi
+if [ ! $# = 1 ]; then
+  echo "Usage: $0 assetsdir"
+  exit 1
 fi
+
+ASSETS=$1
+
+mkdir -p ${ASSETS}
+
+adb pull /sdcard/Android/data/org.mlperf.inference/files/mlperf/results.json ${ASSETS}/results.json
+adb pull /sdcard/Android/data/org.mlperf.inference/files/log_performance ${ASSETS}/log_performance
+adb pull /sdcard/Android/data/org.mlperf.inference/files/log_accuracy ${ASSETS}/log_accuracy
+
