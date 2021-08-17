@@ -46,18 +46,20 @@ public final class Benchmark {
   }
 
   public int getIcon() {
-    String name = taskConfig.getName().toLowerCase();
+    String id = modelConfig.getId();
     Integer icon;
 
-    if (name.equals("image classification")) {
-      icon = R.drawable.ic_image_classification;
-    } else if (name.equals("image classification (offline)")) {
-      icon = R.drawable.ic_image_processing_2;
-    } else if (name.equals("image segmentation")) {
+    if (id.startsWith("IC")) {
+      if (id.endsWith("offline")) {
+        icon = R.drawable.ic_image_processing_2;
+      } else {
+        icon = R.drawable.ic_image_classification;
+      }
+    } else if (id.startsWith("IS")) {
       icon = R.drawable.ic_image_segmentation;
-    } else if (name.equals("object detection")) {
+    } else if (id.startsWith("OD")) {
       icon = R.drawable.ic_object_detection;
-    } else if (name.equals("language understanding")) {
+    } else if (id.startsWith("LU")) {
       icon = R.drawable.ic_language_processing;
     } else {
       // TODO create an icon for custom/unknown test
