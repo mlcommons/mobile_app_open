@@ -233,4 +233,3 @@ teams and organizations who desire this.
 Please search
 https://groups.google.com/forum/#!forum/mlperf-inference-submitters for
 additional help and related questions.
-
