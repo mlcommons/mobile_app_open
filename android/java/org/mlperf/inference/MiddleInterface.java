@@ -246,7 +246,7 @@ public final class MiddleInterface implements AutoCloseable, RunMLPerfWorker.Cal
   public BackendSetting getSettings() {
     try {
       String backendPref = sharedPref.getString(getBackendKey(), null);
-      if (backendPref != null) {
+      if (backendPref != null && !backendPref.isEmpty()) {
         return BackendSetting.parseFrom(Base64.decode(backendPref, Base64.DEFAULT));
       }
 
