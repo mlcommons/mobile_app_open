@@ -17,7 +17,7 @@
 
 ${BUILDDIR}/mlperf_mobile_docker_1_0.stamp: ${APP_DIR}/android/docker/mlperf_mobile/Dockerfile
 	@mkdir -p ${BUILDDIR}
-	@docker image build -t mlcommons/mlperf_mobile:1.0 ${APPDIR}/android/docker/mlperf_mobile
+	@docker image build -t mlcommons/mlperf_mobile:1.0 ${APP_DIR}/android/docker/mlperf_mobile
 	@touch $@
 
 ${BUILDDIR}/mlperf_mobiledet_docker_image.stamp: ${TOPDIR}/docker/mlperf_mobiledet/Dockerfile
