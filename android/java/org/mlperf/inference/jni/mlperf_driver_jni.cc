@@ -34,7 +34,7 @@ using mlperf::mobile::MlperfDriver;
 MlperfDriver* convertLongToMlperfDriver(JNIEnv* env, jlong handle) {
   if (handle == 0) {
     tflite::jni::ThrowException(
-        env, kIllegalArgumentException,
+        env, tflite::jni::kIllegalArgumentException,
         "Internal error: Invalid handle to MlperfDriver.");
     return nullptr;
   }
@@ -66,7 +66,7 @@ Java_org_mlperf_inference_MLPerfDriverWrapper_nativeInit(
     JNIEnv* env, jclass clazz, jlong dataset_handle, jlong backend_handle,
     jstring jscenario, jint batch) {
   if (dataset_handle == 0 || backend_handle == 0) {
-    tflite::jni::ThrowException(env, kIllegalArgumentException,
+    tflite::jni::ThrowException(env, tflite::jni::kIllegalArgumentException,
                                 "Internal error: Invalid handle.");
   }
   Dataset* dataset = reinterpret_cast<Dataset*>(dataset_handle);
