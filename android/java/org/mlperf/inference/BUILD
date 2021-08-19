@@ -155,7 +155,7 @@ android_binary(
         ":use_qti": ["//mobile_back_qti:qtibackend"],
         "//conditions:default": [],
     }) + select({
-        ":use_samsung": ["@samsungbackend//:samsungbackend"],
+        ":use_samsung": ["//mobile_back_samsung:samsungbackend"],
         "//conditions:default": [],
     }) + select({
         ":use_mediatek": ["//mobile_back_tflite:tfliteneuronbackend"],
@@ -183,7 +183,7 @@ cc_library(
         "//mobile_back_tflite:tflitebackend",
     ] + select({
         ":use_samsung": [
-            "@samsungbackend//:samsungbackend",
+            "//mobile_back_samsung:samsungbackend",
         ],
         "//conditions:default": [],
     }) + select({
