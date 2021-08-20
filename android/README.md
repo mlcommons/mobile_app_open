@@ -1,5 +1,5 @@
 # MLPerf™ Mobile App
-
+  
 This project contains the MLPerf mobile app, an app-based implementationn of
 [MLPerf Inference](https://github.com/mlperf/inference) tasks.
 
