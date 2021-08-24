@@ -88,7 +88,7 @@ public final class Benchmark {
 
   public boolean checkGroundtruthFile() {
     DatasetConfig cfg = taskConfig.getDataset();
-    String fileName = cfg.getGroundtruthSrc();
+    String fileName = MLPerfTasks.getLocalPath(cfg.getGroundtruthSrc());
     return new File(fileName).canRead();
   }
 }
