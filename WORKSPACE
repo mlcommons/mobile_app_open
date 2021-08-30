@@ -98,10 +98,10 @@ http_archive(
     name = "org_mlperf_inference",
     build_file = "@//android/third_party:loadgen.BUILD",
     patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
-    sha256 = "900053d97d4165396c45ec13dd211ea3cb3306a6c496b0172f7093e9fc5ebc47",
-    strip_prefix = "inference-dd9e6bf867869fad0b9fcade0f719e1536780299",
+    sha256 = "ba9419270a7837b375b3ecd1e25b3b883f79da90d94bdad658798d635bd17eb1",
+    strip_prefix = "inference-8a5b5db8df1dc8b6de6adfefe9fd96d918f53fb2",
     urls = [
-        "https://github.com/mlperf/inference/archive/dd9e6bf867869fad0b9fcade0f719e1536780299.tar.gz",
+        "https://github.com/mlcommons/inference/archive/8a5b5db8df1dc8b6de6adfefe9fd96d918f53fb2.tar.gz",
     ],
 )
 
