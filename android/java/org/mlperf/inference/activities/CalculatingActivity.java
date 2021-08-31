@@ -1095,8 +1095,9 @@ public class CalculatingActivity extends BaseActivity
   public void oncoolingStarted() {
     runOnUiThread(
         () -> {
+          int cooldownMinutes = Util.getCooldownPause((Context) CalculatingActivity.this);
           calculatingText.setText(getText(R.string.cooldown));
-          dontCloseApptext.setText(getText(R.string.cooldown_subtitle));
+          dontCloseApptext.setText(getString(R.string.cooldown_subtitle, cooldownMinutes));
         });
   }
 
