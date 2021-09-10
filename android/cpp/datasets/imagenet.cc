@@ -161,7 +161,7 @@ std::vector<uint8_t> Imagenet::ProcessOutput(
 float Imagenet::ComputeAccuracy() {
   std::ifstream gt_file(groundtruth_file_);
   if (!gt_file.good()) {
-    LOG(FATAL) << "Could not read the ground truth file";
+    LOG(ERROR) << "Could not read the ground truth file";
     return 0.0f;
   }
   int32_t label_idx;

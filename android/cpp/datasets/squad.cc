@@ -20,6 +20,7 @@ limitations under the License.
 #include <limits>
 #include <memory>
 #include <sstream>
+#include <fstream>
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
@@ -53,9 +54,15 @@ Squad::Squad(Backend* backend, const std::string& input_tfrecord,
              const std::string& gt_tfrecord)
     : Dataset(backend),
       sample_reader_(input_tfrecord),
-      gt_reader_(gt_tfrecord),
       samples_(sample_reader_.Size()),
       predictions_(sample_reader_.Size()) {
+
+    if (std::ifstream(gt_tfrecord).good()) {
+      gt_reader_ = std::make_unique<TFRecordReader>(gt_tfrecord);
+    } else {
+      LOG(ERROR) << "Could not read the ground truth file";
+    };
+
   // Check input and output formats.
   if (input_format_.size() != 3 || output_format_.size() != 2) {
     LOG(FATAL) << "MobileBert only supports 3 inputs and 2 outputs";
@@ -82,9 +89,11 @@ Squad::Squad(Backend* backend, const std::string& input_tfrecord,
   }
 
   // Map the question id to its ground truth data.
-  for (uint32_t idx = 0; idx < gt_reader_.Size(); ++idx) {
-    GroundTruthRecord record(gt_reader_.ReadRecord(idx));
-    qas_id_to_ground_truth_[record.qas_id] = idx;
+  if (gt_reader_ != nullptr) {
+    for (uint32_t idx = 0; idx < gt_reader_->Size(); ++idx) {
+      GroundTruthRecord record(gt_reader_->ReadRecord(idx));
+      qas_id_to_ground_truth_[record.qas_id] = idx;
+    }
   }
 }
 
@@ -118,6 +127,7 @@ std::vector<uint8_t> Squad::ProcessOutput(const int sample_idx,
 
 float Squad::ComputeAccuracy() {
   float final_score = 0.0f;
+  if (gt_reader_ == nullptr) return final_score;
   for (auto& it : qas_id_to_samples_) {
     const std::string& qas_id = it.first;
     // Find candidates for the best prediction.
@@ -180,7 +190,7 @@ float Squad::ComputeAccuracy() {
     int doc_end = sample.token_index_map_[best_pred.end_index -
                                           sample.query_tokens_length_];
     GroundTruthRecord gt_record(
-        gt_reader_.ReadRecord(qas_id_to_ground_truth_[qas_id]));
+        gt_reader_->ReadRecord(qas_id_to_ground_truth_[qas_id]));
     if (gt_record.tokens.size() <= doc_start ||
         gt_record.words.size() <= doc_start)
       continue;
