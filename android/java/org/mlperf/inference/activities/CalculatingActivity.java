@@ -1491,7 +1491,8 @@ public class CalculatingActivity extends BaseActivity
               error = "Dataset is unavailable: " + dataset.getPath();
             }
           }
-          if (doesFileNeedExtract(dataset.getGroundtruthSrc())) {
+          if (runMode.equals(AppConstants.SUBMISSION_MODE) &&
+              doesFileNeedExtract(dataset.getGroundtruthSrc())) {
             if (extractFileFail(dataset.getGroundtruthSrc())) {
               success = false;
             }

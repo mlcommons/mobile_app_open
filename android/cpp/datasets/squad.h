@@ -77,7 +77,7 @@ class Squad : public Dataset {
   // The random access reader to read input TFRecord file.
   TFRecordReader sample_reader_;
   // The random access reader to read ground truth TFRecord file.
-  TFRecordReader gt_reader_;
+  std::unique_ptr<TFRecordReader> gt_reader_;
   // Loaded samples in RAM.
   std::vector<std::unique_ptr<ISampleRecord>> samples_;
   // Store predictions to compute accuracy.
