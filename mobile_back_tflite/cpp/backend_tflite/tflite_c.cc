@@ -118,7 +118,10 @@ static bool neuron_tflite_backend(const char** not_allowed_message,
     char ro_system_build_version_sdk[PROP_VALUE_MAX + 1];
     if (__system_property_get("ro.system.build.version.sdk",
                               ro_system_build_version_sdk)) {
-      if (atoi(ro_system_build_version_sdk) >= 30) {
+      char ro_device_family[PROP_VALUE_MAX + 1];
+      __system_property_get("ro.build.device_family", ro_device_family);
+      if (strcmp(ro_device_family, "OPMT6885") &&
+          atoi(ro_system_build_version_sdk) >= 30) {
         neuron_capable = true;
       }
     }
@@ -208,8 +211,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
                            (strcmp(configs->accelerator, "gpu") == 0))) {
       auto options = TfLiteGpuDelegateOptionsV2Default();
       if (strcmp(configs->accelerator, "gpu_f16") == 0)
-        options.inference_priority1 =
-            TFLITE_GPU_INFERENCE_PRIORITY_MIN_LATENCY;
+        options.inference_priority1 = TFLITE_GPU_INFERENCE_PRIORITY_MIN_LATENCY;
       delegate = TfLiteGpuDelegateV2Create(&options);
 #if MTK_TFLITE_NEURON_BACKEND
       use_gpu = true;
@@ -235,13 +237,13 @@ mlperf_backend_ptr_t mlperf_backend_create(
         options.allow_fp16 = true;
         delegate = TfLiteNeuronDelegateCreate(&options);
       }
-#endif // MTK_TFLITE_NEURON_BACKEND
+#endif  // MTK_TFLITE_NEURON_BACKEND
     }
 
     if (delegate != nullptr) {
       TfLiteInterpreterOptionsAddDelegate(option_ptr, delegate);
     }
-#endif // __ANDROID__
+#endif  // __ANDROID__
   };
 
   const int dispatch_max = shard_num;
@@ -367,7 +369,7 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
 #if defined(MTK_TFLITE_NEURON_BACKEND) && defined(__ANDROID__)
   if (use_gpu)
     perf_handle =
-      acquirePerformanceLock(perf_handle, FAST_SINGLE_ANSWER_MODE, 2000);
+        acquirePerformanceLock(perf_handle, FAST_SINGLE_ANSWER_MODE, 2000);
 #endif
   const int real_batch_size =
       (backend_data->use_batches) ? (backend_data->batch_size / shard_num) : 1;
