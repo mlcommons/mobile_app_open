@@ -83,9 +83,9 @@ maven_install(
 
 http_archive(
     name = "neuron_delegate",
-    sha256 = "365fb6b82948b02072567def378fc9c3d6edfe3898d1978025172d00101b18cc",
-    strip_prefix = "tflite-neuron-delegate-56908661f2558953d8850cace4d06d049cf4efc3",
-    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/56908661f2558953d8850cace4d06d049cf4efc3.tar.gz"],
+    sha256 = "2e4600c99c9b4ea7a129108cd688419eeef9b2aeabf05df6f385258e19ca96c4",
+    strip_prefix = "tflite-neuron-delegate-2.6.0",
+    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/v2.6.0.tar.gz"],
 )
 
 new_local_repository(
