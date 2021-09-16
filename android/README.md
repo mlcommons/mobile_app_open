@@ -65,13 +65,14 @@ pip3 install numpy absl-py
 ```
 
 ## Option 1 - Building Manually
-The app can be built and installed with the following commands:
+The app can be built and installed with the following commands 
+(execute from root directory `mobile_app_open`):
 
 ```bash
-bazel build -c opt //java/org/mlperf/inference:mlperf_app
+bazel build -c opt //android/java/org/mlperf/inference:mlperf_app
 
 # Install the app with the command:
-adb install -r bazel-bin/java/org/mlperf/inference/mlperf_app.apk
+adb install -r bazel-bin/android/java/org/mlperf/inference/mlperf_app.apk
 ```
 
 
@@ -111,7 +112,7 @@ Make sure you follow the Getting Started steps listed above to set up your SDK/N
 5. File > Import Bazel Project and follow the instructions
 6. Run > Edit Configurations...
 7. Click the + button in the upper-left corner and select 'Bazel Command' from the list
-8. Click the + button in the 'Target expression' box and enter ```//java/org/mlperf/inference:mlperf_app```
+8. Click the + button in the 'Target expression' box and enter ```//android/java/org/mlperf/inference:mlperf_app```
 9. Select 'Build' from the 'Bazel command' dropdown
 10. Enter the following into the 'Bazel flags' box:
 ```
@@ -206,7 +207,7 @@ local_repository(
 )
 ```
 Modify the Makefile to change release-app to use your backend when
-building with --//java/org/mlperf/inference:with_vendor="1"
+building with --//android/java/org/mlperf/inference:with_vendor="1"
 substituting your backend name for vendor.
 
 ## FAQ
