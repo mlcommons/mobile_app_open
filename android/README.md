@@ -122,8 +122,7 @@ Make sure you follow the Getting Started steps listed above to set up your SDK/N
 ```
 11. Run > Run 'inference:mlperf_app'
 
-Please see [these instructions](prebuilt/README.md) for installing and using the
-app.
+Please see [these instructions](docs/guides/installation.md) for installing and using the app.
 
 ## Adding a new Backend
 
