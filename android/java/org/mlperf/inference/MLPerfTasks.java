@@ -139,6 +139,8 @@ public final class MLPerfTasks {
   // Update the results.json file.
   public static void resultsToFile(ArrayList<ResultHolder> results, String mode) {
     File resultsFile = new File(MLPerfTasks.getResultsJsonPath());
+    File resultsFileDir = new File(resultsFile.getParent());
+    resultsFileDir.mkdirs();
     FileWriter writer;
     try {
       JSONArray resultsArray = new JSONArray();
