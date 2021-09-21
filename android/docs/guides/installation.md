@@ -69,3 +69,4 @@ tasks, and execution of the supported models (float/quantized) for each task.
 
 If **`Submission mode`** is enabled, the task-specific accuracy will be measured, otherwise it
 will only report latency results.
+
