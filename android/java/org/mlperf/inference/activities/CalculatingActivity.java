@@ -54,8 +54,10 @@ import java.net.URL;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -63,8 +65,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.apache.commons.io.FileUtils;
 import org.mlperf.inference.AppConstants;
 import org.mlperf.inference.Benchmark;
+import org.mlperf.inference.BuildTimeConstants;
 import org.mlperf.inference.MLCtx;
 import org.mlperf.inference.MLPerfTasks;
 import org.mlperf.inference.MiddleInterface;
@@ -248,6 +252,57 @@ public class CalculatingActivity extends BaseActivity
 
     handler = new Handler(this.getMainLooper(), this);
 
+    String cacheDirName = MLPerfTasks.getCacheDirName();
+    String currentAppVersion;
+    try {
+      currentAppVersion = getApplicationContext().getPackageManager()
+              .getPackageInfo(getApplicationContext().getPackageName(), 0)
+              .versionName.concat(BuildTimeConstants.HASH);
+    } catch (Exception e) {
+      currentAppVersion = BuildTimeConstants.HASH;
+    }
+
+    Log.i(TAG, "Current application version is " + currentAppVersion);
+    File cacheDir = new File(cacheDirName);
+    String storedVersionFileName = cacheDirName + "/.version";
+    File storedVersionFile = new File(storedVersionFileName);
+    boolean arePrevResultsValid = true;
+    boolean isVersionChanged = false;
+
+    if (storedVersionFile.exists()) {
+      String storedVersion;
+      try {
+        storedVersion = new String(Files.readAllBytes(Paths.get(storedVersionFileName)));
+      } catch (Exception e) {
+        Log.i(TAG, "Unable to read version from " + storedVersionFileName);
+        storedVersion = "";
+      }
+
+      isVersionChanged = !storedVersion.equals(currentAppVersion);
+      Log.i(TAG, "Version is changed: " + isVersionChanged);
+      long diff = new Date().getTime() - cacheDir.lastModified();
+      Log.i(TAG, "Stored version is: " + storedVersion);
+
+      if (diff > AppConstants.MAX_FILE_AGE_IN_DAYS * 24 * 60  * 60 * 1000 && isVersionChanged) {
+        try {
+          FileUtils.forceDelete(cacheDir);
+        } catch (Exception e) {
+          Log.i(TAG, "Fail to remove old cache folder");
+        };
+        arePrevResultsValid = false;
+      }
+    } else {
+      isVersionChanged = true;
+    }
+    cacheDir.mkdirs();
+    if (isVersionChanged) {
+      try {
+        Files.write(Paths.get(storedVersionFileName), currentAppVersion.getBytes());
+      } catch (Exception e) {
+        Log.i(TAG, "Unable to store version to " + storedVersionFileName);
+      }
+    }
+
     String configIntentPath = getIntent().getStringExtra(CONFIG_PATH);
     File file = new File(CONFIG_SDCARD_PATH);
     String configSdcardPath = file.exists() ? CONFIG_SDCARD_PATH : "";
@@ -277,7 +332,7 @@ public class CalculatingActivity extends BaseActivity
       Set<String> previousResultsStrings =
           sharedPref.getStringSet(RESULTS_PREF, Collections.emptySet());
 
-      if (previousScore != -1 && previousResultsStrings != null) {
+      if (previousScore != -1 && arePrevResultsValid && previousResultsStrings != null) {
         displayPreviousResults = true;
         state = STATE_RESULTS;
         pendingState = STATE_RESULTS;
@@ -315,10 +370,8 @@ public class CalculatingActivity extends BaseActivity
             count++;
           }
         }
-
         float geomean = Math.round(Math.pow(product, 1.0 / (float) (count)));
         Benchmark.setSummaryMaxScore(geomean);
-
         for (ResultHolder rh : tmpArray) {
           if (rh != null) previousResults.add(rh);
         }
@@ -1294,6 +1347,7 @@ public class CalculatingActivity extends BaseActivity
           if (!unZip(tmpFile, dest)) {
             return true;
           }
+          tmpFile.delete();
           Log.d(TAG, "Unzipped " + src + " to " + dest);
         } else {
           tmpFile.renameTo(destFile);

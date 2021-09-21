@@ -16,4 +16,5 @@ public final class AppConstants {
   public static final int DEFAULT_COOLDOWN_PAUSE = 5;
   public static final int TYPE_PERFORMANCE = 0;
   public static final int TYPE_ACCURACY = 1;
+  public static final int MAX_FILE_AGE_IN_DAYS = 90;
 }

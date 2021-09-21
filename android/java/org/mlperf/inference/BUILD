@@ -126,6 +126,7 @@ android_library(
         "//android/third_party:androidx_material",
         "//android/third_party:androidx_preference",
         "//android/third_party:androidx_recyclerview",
+        "//android/third_party:commons_io",
         "//android/third_party:androidx_test_espresso_idling_resource",
     ] + select({
         ":use_mediatek": ["//mobile_back_tflite/cpp/backend_tflite:tflite_neuron_aar"],

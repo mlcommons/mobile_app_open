@@ -69,6 +69,7 @@ maven_install(
         "androidx.test:runner:1.2.0",
         "androidx.test:rules:1.2.0",
         "androidx.test.ext:junit:1.1.2-alpha03",
+        "commons-io:commons-io:2.6",q
     ],
     repositories = [
         "https://dl.google.com/dl/android/maven2",

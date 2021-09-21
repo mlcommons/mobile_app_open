@@ -19,6 +19,7 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,18 +116,33 @@ public final class MLPerfTasks {
     return path.endsWith(ZIP);
   }
 
+  public static String getCacheDirName() {
+    return MLCtx.getInstance().getContext().getExternalFilesDir("cache").getAbsolutePath()
+            + "/cache/";
+  }
+
   public static String getLocalPath(String path) {
 
     // Use the localDir's cache directory path only if its a github link or assets link.
     // For local files, use it as is.
     String filename = new File(path).getName();
-    if (path.startsWith("http://") || path.startsWith("https://") || isZipFile(filename)) {
+    boolean isURL = path.startsWith("http://") || path.startsWith("https://");
+    if (isURL || isZipFile(filename)) {
       if (isZipFile(filename)) {
         filename = filename.substring(0, filename.length() - ZIP.length());
       }
-      String localDir =
-          MLCtx.getInstance().getContext().getExternalFilesDir("cache").getAbsolutePath();
-      return localDir + "/cache/" + filename;
+
+      if (isURL) {
+        String longFileName;
+        try{
+          longFileName = new URL(path).getPath();
+        }
+        catch(Exception e) {
+          longFileName = filename;
+        }
+        return getCacheDirName().concat(longFileName);
+      }
+      return getCacheDirName().concat(filename);
     } else {
       return path;
     }
