@@ -33,6 +33,9 @@ import org.mlperf.proto.TaskConfig;
 public final class MLPerfTasks {
   private static final String TAG = "MLPerfTasks";
   private static final String ZIP = ".zip";
+  private static final String LOCAL_FOLDER = "/sdcard/mlperf_results/mlperf/";
+  private static final String LOCAL_CACHE_FOLDER = LOCAL_FOLDER + "cache/";
+  private static final String RESULTS_JSON = LOCAL_FOLDER + "results.json";
 
   private static MLPerfConfig mlperfTasks;
   private static String configPath;
@@ -117,8 +120,7 @@ public final class MLPerfTasks {
   }
 
   public static String getCacheDirName() {
-    return MLCtx.getInstance().getContext().getExternalFilesDir("cache").getAbsolutePath()
-            + "/cache/";
+    return LOCAL_CACHE_FOLDER;
   }
 
   public static String getLocalPath(String path) {
@@ -149,7 +151,7 @@ public final class MLPerfTasks {
   }
 
   public static String getResultsJsonPath() {
-    return "/sdcard/mlperf_results/mlperf/results.json";
+    return RESULTS_JSON;
   }
 
   // Update the results.json file.

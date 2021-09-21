@@ -283,7 +283,7 @@ public class CalculatingActivity extends BaseActivity
       long diff = new Date().getTime() - cacheDir.lastModified();
       Log.i(TAG, "Stored version is: " + storedVersion);
 
-      if (diff > AppConstants.MAX_FILE_AGE_IN_DAYS * 24 * 60  * 60 * 1000 && isVersionChanged) {
+      if (diff > Long.valueOf(AppConstants.MAX_FILE_AGE_IN_DAYS) * 24 * 60  * 60 * 1000 && isVersionChanged) {
         try {
           FileUtils.forceDelete(cacheDir);
         } catch (Exception e) {
