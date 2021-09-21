@@ -16,50 +16,8 @@ Note that the full datasets can be extremely large; a subset of the full dataset
 prepared to give a useful proxy for task-specific accuracy. When prepared, each task
 directory should be pushed to `/sdcard/mlperf_datasets/...`.
 
-#### Imagenet (Classification)
-
-The app evaluates Image Classification using any subset of images used in the
-[ILSVRC 2012 image classification task](http://www.image-net.org/download-images/).
-
-To download the 2012 dataset, you will need to do the following:
-
-* Open the [ImageNet downloads link](http://www.image-net.org/download-images), creating
-  an ImageNet account if you have not done so already.
-* Navigate to the 2012 downloads page under the **`Download links to ILSVRC image data`**
-  section.
-* Download the **`Validation images (all tasks)`** archive.
-* Create a staging directory for the dataset, call it `${WORKING_DIR}/imagenet`.
-* From the downloaded archive, extract the images into a `${WORKING_DIR}/imagenet/img`
-  directory.
-
-The full set of validation images is quite large, over 6GB. This can take an extremely
-long time to process. The resulting folder contents should appear like:
-
-* `imagenet/img` : `folder` \
-  Contains the set of images to evaluate over. This could be any subset of the ILSVRC 2012
-  evaluation dataset.
-
-Once the data has been prepared, push the resulting `imagenet` folder
-to `/sdcard/mlperf_datasets/imagenet`.
-
-#### Coco (Detection)
-
-The app evaluates Object Detection using any subset of images used in
-[COCO 2017 dataset](http://cocodataset.org/#download).
-
-To prepare the dataset for object detection you need to do the following:
-
-* Download the 2017 Val images from above website.
-* Extract the images to `${WORKING_DIR}/coco/img` directory.
-
-The resulting folder contents should appear like:
-
-* `coco/img` : `folder` \
-  Contains the set of images to evaluate over. This could be any subset of the COCO 2017
-  evaluation dataset.
-
-Once the data has been prepared push the resulting `coco` folder to
-`/sdcard/mlperf_datasets/coco`.
+You can follow [this guide](https://github.com/mlcommons/mobile_app_open/blob/master/android/cpp/datasets/README.md) 
+to download the datasets.
 
 ## <a name="app-execution"></a> App Execution
 
