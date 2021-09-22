@@ -112,7 +112,7 @@ inline mlperf_backend_configuration_t CppToCSettings(
   c_settings.accelerator = accelerator;
   c_settings.batch_size = settings.benchmark_setting().batch_size();
 
-  // Add common setings
+  // Add common settings
   for (Setting s : settings.setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value().value());
   }
