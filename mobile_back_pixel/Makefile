@@ -52,7 +52,7 @@ USER_ID=$(shell id -u)
 
 ${BUILDDIR}/mlperf_mobile_image.stamp: ${TOPDIR}/docker/mlperf_mobile/Dockerfile
 	@mkdir -p ${BUILDDIR}
-	@docker image build -t mlcommons/mlperf_mobile:0.1 docker/mlperf_mobile
+	@docker image build -t mlcommons/mlperf_mobile:1.0 docker/mlperf_mobile
 	@touch $@
 
 docker_image: ${BUILDDIR}/mlperf_mobile_image.stamp
@@ -68,7 +68,7 @@ ${BUILDDIR}/lib_arm64/libtflitebackend.so: ${SRCFILES} docker_image
 		-v ${BUILDDIR}/cache:/cache \
 		-w /tflite_backend \
 	        -u ${USERID}:${GROUPID} \
-		mlcommons/mlperf_mobile:0.1 bazel-3.7.2 ${PROXY_WORKAROUND2} \
+		mlcommons/mlperf_mobile:1.0 bazel-3.7.2 ${PROXY_WORKAROUND2} \
                 --output_user_root=/cache/bazel build \
 		-c opt --cxxopt='--std=c++14' \
                 --cxxopt='-Wno-deprecated-declarations' \
@@ -92,7 +92,7 @@ ${BUILDDIR}/lib_x86_64/libtflitebackend.so: ${SRCFILES} docker_image
 		-v ${BUILDDIR}/cache:/cache \
 		-w /tflite_backend \
 	        -u ${USERID}:${GROUPID} \
-		 mlcommons/mlperf_mobile:0.1 bazel-3.7.2 ${PROXY_WORKAROUND2} \
+		 mlcommons/mlperf_mobile:1.0 bazel-3.7.2 ${PROXY_WORKAROUND2} \
                 --output_user_root=/cache/bazel build \
 		-c opt --cxxopt='--std=c++14' \
                 --cxxopt='-Wno-deprecated-declarations' \
