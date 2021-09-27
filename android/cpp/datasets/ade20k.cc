@@ -61,10 +61,9 @@ ADE20K::ADE20K(Backend* backend, const std::string& image_dir,
 
   // Finds all images under image_dir.
   std::unordered_set<std::string> exts{".rgb8", ".jpg", ".jpeg"};
-  TfLiteStatus ret = tflite::evaluation::GetSortedFileNames(
-      tflite::evaluation::StripTrailingSlashes(image_dir), &image_list_, exts);
-  if (ret == kTfLiteError || image_list_.empty()) {
-    LOG(FATAL) << "Failed to list all the images file in provided path";
+  image_list_ = GetSortedFileNames(image_dir, exts);
+  if (image_list_.empty()) {
+    LOG(FATAL) << "Failed to list all the image files in provided path";
     return;
   }
   samples_ = std::vector<
@@ -72,10 +71,8 @@ ADE20K::ADE20K(Backend* backend, const std::string& image_dir,
       image_list_.size());
   // Finds all ground truth files under ground_truth_dir.
   std::unordered_set<std::string> gt_exts{".raw"};
-  ret = tflite::evaluation::GetSortedFileNames(
-      tflite::evaluation::StripTrailingSlashes(ground_truth_dir),
-      &ground_truth_list_, gt_exts);
-  if (ret == kTfLiteError || ground_truth_list_.empty()) {
+  ground_truth_list_ = GetSortedFileNames(ground_truth_dir, gt_exts);
+  if (ground_truth_list_.empty()) {
     LOG(ERROR) << "Failed to list all the ground truth files in provided path. "
                   "Only measuring performance.";
   }

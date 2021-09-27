@@ -68,9 +68,8 @@ Imagenet::Imagenet(Backend* backend, const std::string& image_dir,
 
   // Finds all images under image_dir.
   std::unordered_set<std::string> exts{".rgb8", ".jpg", ".jpeg"};
-  TfLiteStatus ret = tflite::evaluation::GetSortedFileNames(
-      tflite::evaluation::StripTrailingSlashes(image_dir), &image_list_, exts);
-  if (ret == kTfLiteError || image_list_.empty()) {
+  image_list_ = GetSortedFileNames(image_dir, exts);
+  if (image_list_.empty()) {
     LOG(FATAL) << "Failed to list all the images file in provided path";
     return;
   }
