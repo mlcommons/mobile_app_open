@@ -256,11 +256,31 @@ mlperf_backend_ptr_t mlperf_backend_create(
       }
 #endif  // MTK_TFLITE_NEURON_BACKEND
     }
-
+#endif  // __ANDROID__
+#if TARGET_OS_SIMULATOR
+#elif TARGET_OS_IPHONE
+    if (strcmp(configs->accelerator, "metal") == 0) {
+      TFLGpuDelegateOptions opts{
+          .allow_precision_loss = false,
+          .wait_type = TFLGpuDelegateWaitType::TFLGpuDelegateWaitTypePassive,
+          .enable_quantization = true,
+      };
+      delegate = TFLGpuDelegateCreate(&opts);
+      std::cout << "Enabling Metal delegate " << delegate << "\n";
+    } else if (strcmp(configs->accelerator, "coreml") == 0) {
+      TfLiteCoreMlDelegateOptions opts{
+          .enabled_devices = TfLiteCoreMlDelegateAllDevices,
+          .coreml_version = 3,
+          .max_delegated_partitions = 0,
+          .min_nodes_per_partition = 2,
+      };
+      delegate = TfLiteCoreMlDelegateCreate(&opts);
+      std::cout << "Enabling CoreML delegate " << delegate << "\n";
+    }
+#endif
     if (delegate != nullptr) {
       TfLiteInterpreterOptionsAddDelegate(option_ptr, delegate);
     }
-#endif  // __ANDROID__
   };
 
   backend_data->options.resize(backend_data->shards_num);
