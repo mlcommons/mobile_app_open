@@ -46,11 +46,11 @@ limitations under the License.
 #include "utils.h"
 
 struct TFLiteBackendData {
-  const char* name = "TFLite";
-  const char* vendor = "Google";
-  TfLiteModel* model{nullptr};
-  std::vector<TfLiteInterpreterOptions*> options{};
-  std::vector<TfLiteInterpreter*> interpreter{};
+  const char *name = "TFLite";
+  const char *vendor = "Google";
+  TfLiteModel *model{nullptr};
+  std::vector<TfLiteInterpreterOptions *> options{};
+  std::vector<TfLiteInterpreter *> interpreter{};
   int32_t shards_num = 1;
   uint32_t real_batch_size = 1;
   std::unique_ptr<Threadpool> executer;
@@ -66,25 +66,25 @@ static bool use_gpu = false;
 
 inline mlperf_data_t::Type TfType2Type(TfLiteType type) {
   switch (type) {
-    case kTfLiteFloat32:
-      return mlperf_data_t::Float32;
-    case kTfLiteUInt8:
-      return mlperf_data_t::Uint8;
-    case kTfLiteInt8:
-      return mlperf_data_t::Int8;
-    case kTfLiteFloat16:
-      return mlperf_data_t::Float16;
-    case kTfLiteInt32:
-      return mlperf_data_t::Int32;
-    case kTfLiteInt64:
-      return mlperf_data_t::Int64;
-    default:
-      printf("TfLiteType %d not supported\n", type);
-      return mlperf_data_t::Float32;
+  case kTfLiteFloat32:
+    return mlperf_data_t::Float32;
+  case kTfLiteUInt8:
+    return mlperf_data_t::Uint8;
+  case kTfLiteInt8:
+    return mlperf_data_t::Int8;
+  case kTfLiteFloat16:
+    return mlperf_data_t::Float16;
+  case kTfLiteInt32:
+    return mlperf_data_t::Int32;
+  case kTfLiteInt64:
+    return mlperf_data_t::Int64;
+  default:
+    printf("TfLiteType %d not supported\n", type);
+    return mlperf_data_t::Float32;
   }
 }
 
-size_t TFLiteNumElements(const TfLiteTensor* tensor) {
+size_t TFLiteNumElements(const TfLiteTensor *tensor) {
   size_t result = 1;
   for (int i = 0; i < TfLiteTensorNumDims(tensor); ++i) {
     result *= TfLiteTensorDim(tensor, i);
@@ -93,19 +93,20 @@ size_t TFLiteNumElements(const TfLiteTensor* tensor) {
 }
 
 #if defined(__ANDROID__) && defined(MTK_TFLITE_NEURON_BACKEND)
-static bool neuron_tflite_backend(const char** not_allowed_message,
-                                  const mlperf_device_info_t* device_info) {
+static bool neuron_tflite_backend(const char **not_allowed_message,
+                                  const mlperf_device_info_t *device_info) {
   bool neuron_capable = false;
 
   bool neuron_adapter = false;
-  void* libneuron_adapter;
+  void *libneuron_adapter;
   libneuron_adapter =
       dlopen("libneuron_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
   if (libneuron_adapter == nullptr) {
     // Try to dlopen Neuron universal SDK
     libneuron_adapter =
         dlopen("libneuronusdk_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
-    if (libneuron_adapter != nullptr) neuron_adapter = true;
+    if (libneuron_adapter != nullptr)
+      neuron_adapter = true;
   } else {
     neuron_adapter = true;
   }
@@ -134,9 +135,9 @@ static bool neuron_tflite_backend(const char** not_allowed_message,
 #endif
 
 // TFLite is the standard backend for all hardwares.
-bool mlperf_backend_matches_hardware(const char** not_allowed_message,
-                                     const char** settings,
-                                     const mlperf_device_info_t* device_info) {
+bool mlperf_backend_matches_hardware(const char **not_allowed_message,
+                                     const char **settings,
+                                     const mlperf_device_info_t *device_info) {
   *not_allowed_message = nullptr;
   *settings = tflite_settings.c_str();
 #if MTK_TFLITE_NEURON_BACKEND && defined(__ANDROID__)
@@ -152,25 +153,27 @@ bool is_emulator() {
   char ro_build_characteristics[PROP_VALUE_MAX + 1];
   if (__system_property_get("ro.build.characteristics",
                             ro_build_characteristics)) {
-    char* ptr;
+    char *ptr;
     ptr = strstr(ro_build_characteristics, "emulator");
-    if (ptr) return true;
+    if (ptr)
+      return true;
   }
   return false;
 }
 #endif
 
 // Create a new backend and return the pointer to it.
-mlperf_backend_ptr_t mlperf_backend_create(
-    const char* model_path, mlperf_backend_configuration_t* configs,
-    const char* native_lib_path) {
+mlperf_backend_ptr_t
+mlperf_backend_create(const char *model_path,
+                      mlperf_backend_configuration_t *configs,
+                      const char *native_lib_path) {
   // Verify only one instance of the backend exists at any time
   if (backendExists) {
     printf("Error: Only one backend instance should exist at a time\n");
     return nullptr;
   }
 
-  TFLiteBackendData* backend_data = new TFLiteBackendData();
+  TFLiteBackendData *backend_data = new TFLiteBackendData();
 
   backendExists = true;
 
@@ -211,9 +214,9 @@ mlperf_backend_ptr_t mlperf_backend_create(
       std::unique_ptr<Threadpool>(new Threadpool(backend_data->shards_num));
 
   // Create interpreter options function.
-  auto create_option = [&](TfLiteInterpreterOptions*& option_ptr) -> void {
+  auto create_option = [&](TfLiteInterpreterOptions *&option_ptr) -> void {
     option_ptr = TfLiteInterpreterOptionsCreate();
-    TfLiteDelegate* delegate = nullptr;
+    TfLiteDelegate *delegate = nullptr;
 
     // TODO convert this to a member var
     for (int i = 0; i < configs->count; ++i) {
@@ -254,9 +257,9 @@ mlperf_backend_ptr_t mlperf_backend_create(
         options.allow_fp16 = true;
         delegate = TfLiteNeuronDelegateCreate(&options);
       }
-#endif  // MTK_TFLITE_NEURON_BACKEND
+#endif // MTK_TFLITE_NEURON_BACKEND
     }
-#endif  // __ANDROID__
+#endif // __ANDROID__
 #if TARGET_OS_SIMULATOR
 #elif TARGET_OS_IPHONE
     if (strcmp(configs->accelerator, "metal") == 0) {
@@ -308,10 +311,10 @@ mlperf_backend_ptr_t mlperf_backend_create(
 
   for (int shard_index = 0; shard_index < backend_data->shards_num;
        shard_index++) {
-    TfLiteInterpreter*& shard = backend_data->interpreter[shard_index];
+    TfLiteInterpreter *&shard = backend_data->interpreter[shard_index];
 
     for (int input_index = 0; input_index < input_tensor_count; input_index++) {
-      TfLiteTensor* tensor =
+      TfLiteTensor *tensor =
           TfLiteInterpreterGetInputTensor(shard, input_index);
 
       backend_data->original_tensor_size = tensor->bytes;
@@ -344,20 +347,20 @@ mlperf_backend_ptr_t mlperf_backend_create(
 }
 
 // Vendor name who create this backend.
-const char* mlperf_backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
-  TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
+const char *mlperf_backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
   return backend_data->vendor;
 }
 
 // Return the name of this backend.
-const char* mlperf_backend_name(mlperf_backend_ptr_t backend_ptr) {
-  TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
+const char *mlperf_backend_name(mlperf_backend_ptr_t backend_ptr) {
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
   return backend_data->name;
 }
 
 // Destroy the backend pointer and its data.
 void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
-  TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
   TfLiteModelDelete(backend_data->model);
   for (int i = 0; i < backend_data->shards_num; i++) {
     TfLiteInterpreterOptionsDelete(backend_data->options[i]);
@@ -369,7 +372,7 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
 
 // Run the inference for a sample.
 mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
-  TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
   auto task = [&backend_data](int index) -> TfLiteStatus {
     return TfLiteInterpreterInvoke(backend_data->interpreter[index]);
   };
@@ -402,15 +405,15 @@ mlperf_status_t mlperf_backend_flush_queries(mlperf_backend_ptr_t backend_ptr) {
 
 // Return the number of inputs of the model.
 int32_t mlperf_backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
-  TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
   return TfLiteInterpreterGetInputTensorCount(backend_data->interpreter[0]);
 }
 
 // Return the type of the ith input.
 mlperf_data_t mlperf_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
                                             int32_t i) {
-  TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
-  const TfLiteTensor* tensor =
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
+  const TfLiteTensor *tensor =
       TfLiteInterpreterGetInputTensor(backend_data->interpreter[0], i);
   mlperf_data_t type;
   type.type = TfType2Type(TfLiteTensorType(tensor));
@@ -422,15 +425,15 @@ mlperf_data_t mlperf_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
 // Set the data for ith input.
 mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                          int32_t batch_index, int32_t i,
-                                         void* data) {
-  TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
+                                         void *data) {
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
 #if defined(MTK_TFLITE_NEURON_BACKEND) && defined(__ANDROID__)
   if (use_gpu)
     perf_handle =
         acquirePerformanceLock(perf_handle, FAST_SINGLE_ANSWER_MODE, 2000);
 #endif
   const int shard_index = batch_index / backend_data->real_batch_size;
-  TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(
+  TfLiteTensor *tensor = TfLiteInterpreterGetInputTensor(
       backend_data->interpreter[shard_index], i);
   const int data_offset = backend_data->original_tensor_size *
                           (batch_index % backend_data->real_batch_size);
@@ -442,15 +445,15 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
 
 // Return the number of outputs for the model.
 int32_t mlperf_backend_get_output_count(mlperf_backend_ptr_t backend_ptr) {
-  TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
   return TfLiteInterpreterGetOutputTensorCount(backend_data->interpreter[0]);
 }
 
 // Return the type of ith output.
 mlperf_data_t mlperf_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
                                              int32_t i) {
-  TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
-  const TfLiteTensor* tensor =
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
+  const TfLiteTensor *tensor =
       TfLiteInterpreterGetOutputTensor(backend_data->interpreter[0], i);
   mlperf_data_t type;
   type.type = TfType2Type(TfLiteTensorType(tensor));
@@ -462,11 +465,11 @@ mlperf_data_t mlperf_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
 // Get the data from ith output.
 mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                           uint32_t batch_index, int32_t i,
-                                          void** data) {
-  TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
+                                          void **data) {
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
   const int shard_index = batch_index / backend_data->real_batch_size;
 
-  const TfLiteTensor* output_tensor = TfLiteInterpreterGetOutputTensor(
+  const TfLiteTensor *output_tensor = TfLiteInterpreterGetOutputTensor(
       backend_data->interpreter[shard_index], i);
   batch_index %= backend_data->real_batch_size;
 
@@ -476,27 +479,27 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
   }
 
   switch (output_tensor->type) {
-    case kTfLiteFloat32:
-      *data = (output_tensor->data.f + (batch_index * non_batch_size));
-      break;
-    case kTfLiteUInt8:
-      *data = (output_tensor->data.uint8 + (batch_index * non_batch_size));
-      break;
-    case kTfLiteInt8:
-      *data = (output_tensor->data.int8 + (batch_index * non_batch_size));
-      break;
-    case kTfLiteFloat16:
-      *data = (output_tensor->data.f16 + (batch_index * non_batch_size));
-      break;
-    case kTfLiteInt32:
-      *data = (output_tensor->data.i32 + (batch_index * non_batch_size));
-      break;
-    case kTfLiteInt64:
-      *data = (output_tensor->data.i64 + (batch_index * non_batch_size));
-      break;
-    default:
-      printf("Data type not yet supported\n");
-      return MLPERF_FAILURE;
+  case kTfLiteFloat32:
+    *data = (output_tensor->data.f + (batch_index * non_batch_size));
+    break;
+  case kTfLiteUInt8:
+    *data = (output_tensor->data.uint8 + (batch_index * non_batch_size));
+    break;
+  case kTfLiteInt8:
+    *data = (output_tensor->data.int8 + (batch_index * non_batch_size));
+    break;
+  case kTfLiteFloat16:
+    *data = (output_tensor->data.f16 + (batch_index * non_batch_size));
+    break;
+  case kTfLiteInt32:
+    *data = (output_tensor->data.i32 + (batch_index * non_batch_size));
+    break;
+  case kTfLiteInt64:
+    *data = (output_tensor->data.i64 + (batch_index * non_batch_size));
+    break;
+  default:
+    printf("Data type not yet supported\n");
+    return MLPERF_FAILURE;
   }
   return MLPERF_SUCCESS;
 }

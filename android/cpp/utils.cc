@@ -1,7 +1,7 @@
 #include "android/cpp/utils.h"
 
 #if defined(_WIN64) || defined(_WIN32)
-#define  _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else
@@ -11,28 +11,31 @@ namespace fs = std::experimental::filesystem;
 namespace mlperf {
 namespace mobile {
 
-
 #if defined(_WIN64) || defined(_WIN32)
-std::vector<std::string> GetSortedFileNames(
-    const std::string& directory,
-    const std::unordered_set<std::string>& extensions) {
+std::vector<std::string>
+GetSortedFileNames(const std::string &directory,
+                   const std::unordered_set<std::string> &extensions) {
   std::vector<std::string> result;
-  for (const auto & entry : fs::directory_iterator(directory)) {
-    if (!fs::is_regular_file(entry.path())) continue;
-    if (!extensions.empty() && extensions.count(entry.path().extension().string()) == 0) continue;
-    result.emplace_back(directory +"/"+ entry.path().string());
+  for (const auto &entry : fs::directory_iterator(directory)) {
+    if (!fs::is_regular_file(entry.path()))
+      continue;
+    if (!extensions.empty() &&
+        extensions.count(entry.path().extension().string()) == 0)
+      continue;
+    result.emplace_back(directory + "/" + entry.path().string());
   }
   std::sort(result.begin(), result.end());
   return result;
 }
 #else
-std::vector<std::string> GetSortedFileNames(
-    const std::string& directory,
-    const std::unordered_set<std::string>& extensions) {
+std::vector<std::string>
+GetSortedFileNames(const std::string &directory,
+                   const std::unordered_set<std::string> &extensions) {
   std::vector<std::string> result;
   TfLiteStatus ret = tflite::evaluation::GetSortedFileNames(
       tflite::evaluation::StripTrailingSlashes(directory), &result, extensions);
-  if (ret == kTfLiteError) return {};
+  if (ret == kTfLiteError)
+    return {};
   return result;
 }
 #endif
@@ -40,22 +43,22 @@ std::vector<std::string> GetSortedFileNames(
 // Get the number of bytes required for a type.
 int GetByte(DataType type) {
   switch (type.type) {
-    case DataType::Uint8:
-      return 1;
-    case DataType::Int8:
-      return 1;
-    case DataType::Float16:
-      return 2;
-    case DataType::Int32:
-    case DataType::Float32:
-      return 4;
-    case DataType::Int64:
-      return 8;
+  case DataType::Uint8:
+    return 1;
+  case DataType::Int8:
+    return 1;
+  case DataType::Float16:
+    return 2;
+  case DataType::Int32:
+  case DataType::Float32:
+    return 4;
+  case DataType::Int64:
+    return 8;
   }
 }
 
 // Convert string to mlperf::TestMode.
-::mlperf::TestMode Str2TestMode(const std::string& mode) {
+::mlperf::TestMode Str2TestMode(const std::string &mode) {
   if (mode == "PerformanceOnly") {
     return ::mlperf::TestMode::PerformanceOnly;
   } else if (mode == "AccuracyOnly") {
@@ -68,16 +71,15 @@ int GetByte(DataType type) {
   }
 }
 
-bool AddBackendConfiguration(mlperf_backend_configuration_t* configs,
-                                    const std::string& key,
-                                    const std::string& value) {
+bool AddBackendConfiguration(mlperf_backend_configuration_t *configs,
+                             const std::string &key, const std::string &value) {
   if (configs->count >= kMaxMLPerfBackendConfigs) {
     return false;
   }
   // Copy data in case of key, value deallocated.
-  char* c_key = new char[key.length() + 1];
+  char *c_key = new char[key.length() + 1];
   strcpy(c_key, key.c_str());
-  char* c_value = new char[value.length() + 1];
+  char *c_value = new char[value.length() + 1];
   strcpy(c_value, value.c_str());
   configs->keys[configs->count] = c_key;
   configs->values[configs->count] = c_value;
@@ -85,8 +87,7 @@ bool AddBackendConfiguration(mlperf_backend_configuration_t* configs,
   return true;
 }
 
-void DeleteBackendConfiguration(
-    mlperf_backend_configuration_t* configs) {
+void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs) {
   delete configs->accelerator;
   for (int i = 0; i < configs->count; ++i) {
     delete configs->keys[i];
@@ -95,10 +96,9 @@ void DeleteBackendConfiguration(
   configs->count = 0;
 }
 
-mlperf_backend_configuration_t CppToCSettings(
-    const SettingList& settings) {
+mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   mlperf_backend_configuration_t c_settings;
-  char* accelerator =
+  char *accelerator =
       new char[settings.benchmark_setting().accelerator().length() + 1];
   strcpy(accelerator, settings.benchmark_setting().accelerator().c_str());
   c_settings.accelerator = accelerator;
@@ -114,8 +114,8 @@ mlperf_backend_configuration_t CppToCSettings(
   return c_settings;
 }
 
-SettingList createSettingList(const BackendSetting& backend_setting,
-                                     std::string benchmark_id) {
+SettingList createSettingList(const BackendSetting &backend_setting,
+                              std::string benchmark_id) {
   SettingList setting_list;
   int setting_index = 0;
 
@@ -152,5 +152,5 @@ SettingList createSettingList(const BackendSetting& backend_setting,
   return setting_list;
 }
 
-}  // namespace mobile
-}  // namespace mlperf
+} // namespace mobile
+} // namespace mlperf

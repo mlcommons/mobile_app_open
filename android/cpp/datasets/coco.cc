@@ -40,29 +40,26 @@ namespace {
 // TODO(b/145480762) Remove this code when preprocessing code is refactored.
 inline TfLiteType DataType2TfType(DataType::Type type) {
   switch (type) {
-    case DataType::Float32:
-      return kTfLiteFloat32;
-    case DataType::Uint8:
-      return kTfLiteUInt8;
-    case DataType::Int8:
-      return kTfLiteInt8;
-    case DataType::Float16:
-      return kTfLiteFloat16;
-    default:
-      break;
+  case DataType::Float32:
+    return kTfLiteFloat32;
+  case DataType::Uint8:
+    return kTfLiteUInt8;
+  case DataType::Int8:
+    return kTfLiteInt8;
+  case DataType::Float16:
+    return kTfLiteFloat16;
+  default:
+    break;
   }
   return kTfLiteNoType;
 }
-}  // namespace
+} // namespace
 
-Coco::Coco(Backend* backend, const std::string& image_dir,
-           const std::string& grouth_truth_file, int offset, int num_classes,
+Coco::Coco(Backend *backend, const std::string &image_dir,
+           const std::string &grouth_truth_file, int offset, int num_classes,
            int image_width, int image_height)
-    : Dataset(backend),
-      groundtruth_file_(grouth_truth_file),
-      offset_(offset),
-      num_classes_(num_classes),
-      image_width_(image_width),
+    : Dataset(backend), groundtruth_file_(grouth_truth_file), offset_(offset),
+      num_classes_(num_classes), image_width_(image_width),
       image_height_(image_height) {
   if (input_format_.size() != 1 || output_format_.size() != 4) {
     LOG(FATAL) << "Coco only supports 1 input and 4 outputs";
@@ -78,13 +75,13 @@ Coco::Coco(Backend* backend, const std::string& image_dir,
   }
   // Get filenames of the listed images. filenames are onverted to .jpg to match
   // filenames in the ground truth. They are used as keys to compare results.
-  for (const auto& image_name : image_list_) {
+  for (const auto &image_name : image_list_) {
     std::string filename = image_name.substr(image_name.find_last_of("/") + 1);
     filename.replace(filename.find_last_of("."), std::string::npos, ".jpg");
     name_list_.push_back(filename);
   }
   samples_ = std::vector<
-      std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>>*>>(
+      std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>> *>>(
       image_list_.size());
   // Prepares the preprocessing stage.
   tflite::evaluation::ImagePreprocessingConfigBuilder builder(
@@ -98,7 +95,7 @@ Coco::Coco(Backend* backend, const std::string& image_dir,
   }
 }
 
-void Coco::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
+void Coco::LoadSamplesToRam(const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
     // Preprocessing.
     if (sample_idx >= image_list_.size()) {
@@ -112,11 +109,11 @@ void Coco::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
 
     // Move data out of preprocessing_stage_ so it can be reused.
     int total_byte = input_format_[0].size * GetByte(input_format_[0]);
-    void* data_void = preprocessing_stage_->GetPreprocessedImageData();
-    std::vector<uint8_t, BackendAllocator<uint8_t>>* data_uint8 =
+    void *data_void = preprocessing_stage_->GetPreprocessedImageData();
+    std::vector<uint8_t, BackendAllocator<uint8_t>> *data_uint8 =
         new std::vector<uint8_t, BackendAllocator<uint8_t>>(total_byte);
-    std::copy(static_cast<uint8_t*>(data_void),
-              static_cast<uint8_t*>(data_void) + total_byte,
+    std::copy(static_cast<uint8_t *>(data_void),
+              static_cast<uint8_t *>(data_void) + total_byte,
               data_uint8->begin());
 
     // Allow backend to convert data layout if needed
@@ -127,9 +124,9 @@ void Coco::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
   }
 }
 
-void Coco::UnloadSamplesFromRam(const std::vector<QuerySampleIndex>& samples) {
+void Coco::UnloadSamplesFromRam(const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
-    for (std::vector<uint8_t, BackendAllocator<uint8_t>>* v :
+    for (std::vector<uint8_t, BackendAllocator<uint8_t>> *v :
          samples_.at(sample_idx)) {
       delete v;
     }
@@ -138,27 +135,27 @@ void Coco::UnloadSamplesFromRam(const std::vector<QuerySampleIndex>& samples) {
 }
 
 std::vector<uint8_t> Coco::ProcessOutput(const int sample_idx,
-                                         const std::vector<void*>& outputs) {
-  int num_detections = static_cast<int>(*reinterpret_cast<float*>(outputs[3]));
-  float* detected_label_boxes = reinterpret_cast<float*>(outputs[0]);
-  float* detected_label_indices = reinterpret_cast<float*>(outputs[1]);
-  float* detected_label_probabilities = reinterpret_cast<float*>(outputs[2]);
+                                         const std::vector<void *> &outputs) {
+  int num_detections = static_cast<int>(*reinterpret_cast<float *>(outputs[3]));
+  float *detected_label_boxes = reinterpret_cast<float *>(outputs[0]);
+  float *detected_label_indices = reinterpret_cast<float *>(outputs[1]);
+  float *detected_label_probabilities = reinterpret_cast<float *>(outputs[2]);
 
   std::vector<float> data;
   tflite::evaluation::ObjectDetectionResult predict_;
   for (int i = 0; i < num_detections; ++i) {
     const int bounding_box_offset = i * 4;
     // Add for reporting to mlperf log.
-    data.push_back(static_cast<float>(sample_idx));                 // Image id
-    data.push_back(detected_label_boxes[bounding_box_offset + 0]);  // ymin
-    data.push_back(detected_label_boxes[bounding_box_offset + 1]);  // xmin
-    data.push_back(detected_label_boxes[bounding_box_offset + 2]);  // ymax
-    data.push_back(detected_label_boxes[bounding_box_offset + 3]);  // xmax
-    data.push_back(detected_label_probabilities[i]);                // Score
-    data.push_back(detected_label_indices[i] + offset_);            // Class
+    data.push_back(static_cast<float>(sample_idx));                // Image id
+    data.push_back(detected_label_boxes[bounding_box_offset + 0]); // ymin
+    data.push_back(detected_label_boxes[bounding_box_offset + 1]); // xmin
+    data.push_back(detected_label_boxes[bounding_box_offset + 2]); // ymax
+    data.push_back(detected_label_boxes[bounding_box_offset + 3]); // xmax
+    data.push_back(detected_label_probabilities[i]);               // Score
+    data.push_back(detected_label_indices[i] + offset_);           // Class
     // Add for evaluation inside this class.
-    auto* object = predict_.add_objects();
-    auto* bbox = object->mutable_bounding_box();
+    auto *object = predict_.add_objects();
+    auto *bbox = object->mutable_bounding_box();
     bbox->set_normalized_top(detected_label_boxes[bounding_box_offset + 0]);
     bbox->set_normalized_left(detected_label_boxes[bounding_box_offset + 1]);
     bbox->set_normalized_bottom(detected_label_boxes[bounding_box_offset + 2]);
@@ -170,7 +167,7 @@ std::vector<uint8_t> Coco::ProcessOutput(const int sample_idx,
 
   // Mlperf interpret data as uint8_t* and log it as a HEX string.
   std::vector<uint8_t> result(data.size() * 4);
-  uint8_t* temp_data = reinterpret_cast<uint8_t*>(data.data());
+  uint8_t *temp_data = reinterpret_cast<uint8_t *>(data.data());
   std::copy(temp_data, temp_data + result.size(), result.begin());
   return result;
 }
@@ -203,7 +200,7 @@ float Coco::ComputeAccuracy() {
     return 0.0f;
   }
 
-  for (auto const& element : predicted_objects_) {
+  for (auto const &element : predicted_objects_) {
     eval_stage_.SetEvalInputs(element.second,
                               groundtruth_objects[element.first]);
     if (eval_stage_.Run() == kTfLiteError) {
@@ -229,5 +226,5 @@ std::string Coco::ComputeAccuracyString() {
   return stream.str();
 }
 
-}  // namespace mobile
-}  // namespace mlperf
+} // namespace mobile
+} // namespace mlperf

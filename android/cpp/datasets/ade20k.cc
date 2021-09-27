@@ -32,27 +32,25 @@ namespace mobile {
 namespace {
 inline TfLiteType DataType2TfType(DataType::Type type) {
   switch (type) {
-    case DataType::Float32:
-      return kTfLiteFloat32;
-    case DataType::Uint8:
-      return kTfLiteUInt8;
-    case DataType::Int8:
-      return kTfLiteInt8;
-    case DataType::Float16:
-      return kTfLiteFloat16;
-    default:
-      break;
+  case DataType::Float32:
+    return kTfLiteFloat32;
+  case DataType::Uint8:
+    return kTfLiteUInt8;
+  case DataType::Int8:
+    return kTfLiteInt8;
+  case DataType::Float16:
+    return kTfLiteFloat16;
+  default:
+    break;
   }
   return kTfLiteNoType;
 }
-}  // namespace
+} // namespace
 
-ADE20K::ADE20K(Backend* backend, const std::string& image_dir,
-               const std::string& ground_truth_dir, int num_classes,
+ADE20K::ADE20K(Backend *backend, const std::string &image_dir,
+               const std::string &ground_truth_dir, int num_classes,
                int image_width, int image_height)
-    : Dataset(backend),
-      num_classes_(num_classes),
-      image_width_(image_width),
+    : Dataset(backend), num_classes_(num_classes), image_width_(image_width),
       image_height_(image_height) {
   if (input_format_.size() != 1 || output_format_.size() != 1) {
     LOG(FATAL) << "ADE20K model only supports 1 input and 1 output";
@@ -67,7 +65,7 @@ ADE20K::ADE20K(Backend* backend, const std::string& image_dir,
     return;
   }
   samples_ = std::vector<
-      std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>>*>>(
+      std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>> *>>(
       image_list_.size());
   // Finds all ground truth files under ground_truth_dir.
   std::unordered_set<std::string> gt_exts{".raw"};
@@ -95,7 +93,7 @@ ADE20K::ADE20K(Backend* backend, const std::string& image_dir,
   fn_acc_ = std::vector<uint64_t>(num_classes_, 0);
 }
 
-void ADE20K::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
+void ADE20K::LoadSamplesToRam(const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
     // Preprocessing.
     if (sample_idx >= image_list_.size()) {
@@ -109,11 +107,11 @@ void ADE20K::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
 
     // Move data out of preprocessing_stage_ so it can be reused.
     int total_byte = input_format_[0].size * GetByte(input_format_[0]);
-    void* data_void = preprocessing_stage_->GetPreprocessedImageData();
-    std::vector<uint8_t, BackendAllocator<uint8_t>>* data_uint8 =
+    void *data_void = preprocessing_stage_->GetPreprocessedImageData();
+    std::vector<uint8_t, BackendAllocator<uint8_t>> *data_uint8 =
         new std::vector<uint8_t, BackendAllocator<uint8_t>>(total_byte);
-    std::copy(static_cast<uint8_t*>(data_void),
-              static_cast<uint8_t*>(data_void) + total_byte,
+    std::copy(static_cast<uint8_t *>(data_void),
+              static_cast<uint8_t *>(data_void) + total_byte,
               data_uint8->begin());
 
     // Allow backend to convert data layout if needed
@@ -125,9 +123,9 @@ void ADE20K::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
 }
 
 void ADE20K::UnloadSamplesFromRam(
-    const std::vector<QuerySampleIndex>& samples) {
+    const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
-    for (std::vector<uint8_t, BackendAllocator<uint8_t>>* v :
+    for (std::vector<uint8_t, BackendAllocator<uint8_t>> *v :
          samples_.at(sample_idx)) {
       delete v;
     }
@@ -136,7 +134,7 @@ void ADE20K::UnloadSamplesFromRam(
 }
 
 std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
-                                           const std::vector<void*>& outputs) {
+                                           const std::vector<void *> &outputs) {
   if (ground_truth_list_.empty()) {
     return std::vector<uint8_t>();
   }
@@ -148,9 +146,9 @@ std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
         (std::istreambuf_iterator<char>(stream)),
         std::istreambuf_iterator<char>());
 
-    float* outputFloat = reinterpret_cast<float*>(outputs[0]);
-    int32_t* outputInt = reinterpret_cast<int32_t*>(outputs[0]);
-    uint8_t* outputUint8 = reinterpret_cast<uint8_t*>(outputs[0]);
+    float *outputFloat = reinterpret_cast<float *>(outputs[0]);
+    int32_t *outputInt = reinterpret_cast<int32_t *>(outputs[0]);
+    uint8_t *outputUint8 = reinterpret_cast<uint8_t *>(outputs[0]);
     bool isOutputFloat = (output_format_.at(0).type == DataType::Float32);
     bool isOutputUint8 = (output_format_.at(0).type == DataType::Uint8);
 
@@ -176,7 +174,8 @@ std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
           if (p == g) {
             true_positive++;
           } else if (p == c) {
-            if ((g > 0) && (g <= num_classes_)) false_positive++;
+            if ((g > 0) && (g <= num_classes_))
+              false_positive++;
           } else {
             false_negative++;
           }
@@ -191,7 +190,8 @@ std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
 #if __DEBUG__
     for (int j = 0; j < num_classes_; j++) {
       LOG(INFO) << tp_acc_[j] << ", " << fp_acc_[j] << ", " << fn_acc_[j];
-      if (j < num_classes_ - 1) std::cout << ", ";
+      if (j < num_classes_ - 1)
+        std::cout << ", ";
     }
     LOG(INFO) << "\n";
     for (int j = 0; j < num_classes_; j++) {
@@ -236,5 +236,5 @@ std::string ADE20K::ComputeAccuracyString() {
   return stream.str();
 }
 
-}  // namespace mobile
-}  // namespace mlperf
+} // namespace mobile
+} // namespace mlperf

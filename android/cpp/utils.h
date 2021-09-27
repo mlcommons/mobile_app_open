@@ -32,9 +32,9 @@ namespace mobile {
 // Original function is abcent on Windows.
 // When building not for windows this function
 // is a bridge to original function
-std::vector<std::string> GetSortedFileNames(
-    const std::string& directory,
-    const std::unordered_set<std::string>& extensions);
+std::vector<std::string>
+GetSortedFileNames(const std::string &directory,
+                   const std::unordered_set<std::string> &extensions);
 
 // Requirements of the data including multiple inputs.
 using DataType = mlperf_data_t;
@@ -45,8 +45,7 @@ int GetByte(DataType type);
 
 // Return topK indexes with highest probability.
 template <typename T>
-std::vector<int32_t> GetTopK(T* values, int num_elem, int k,
-                                    int offset) {
+std::vector<int32_t> GetTopK(T *values, int num_elem, int k, int offset) {
   std::vector<int32_t> indices(num_elem - offset);
   std::iota(indices.begin(), indices.end(), 0);
   std::sort(indices.begin(), indices.end(), [&values, offset](int a, int b) {
@@ -57,22 +56,19 @@ std::vector<int32_t> GetTopK(T* values, int num_elem, int k,
 }
 
 // Convert string to mlperf::TestMode.
-::mlperf::TestMode Str2TestMode(const std::string& mode);
+::mlperf::TestMode Str2TestMode(const std::string &mode);
 
-bool AddBackendConfiguration(mlperf_backend_configuration_t* configs,
-                                     const std::string& key,
-                                    const std::string& value);
+bool AddBackendConfiguration(mlperf_backend_configuration_t *configs,
+                             const std::string &key, const std::string &value);
 
-void DeleteBackendConfiguration(
-    mlperf_backend_configuration_t* configs);
+void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs);
 
-mlperf_backend_configuration_t CppToCSettings(
-    const SettingList& settings);
+mlperf_backend_configuration_t CppToCSettings(const SettingList &settings);
 
-SettingList createSettingList(const BackendSetting& backend_setting,
-                                     std::string benchmark_id);
+SettingList createSettingList(const BackendSetting &backend_setting,
+                              std::string benchmark_id);
 
-}  // namespace mobile
-}  // namespace mlperf
+} // namespace mobile
+} // namespace mlperf
 
-#endif  // MLPERF_UTILS_H_
+#endif // MLPERF_UTILS_H_
