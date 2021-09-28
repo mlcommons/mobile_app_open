@@ -6,20 +6,16 @@ TFLite. Other backends may need to extend them.
 
 ## Imagenet
 
-The Imagenet dataset can be downloaded from
-[image-net.org](http://image-net.org/challenges/LSVRC/2012/). The ground truth
-file is
-[imagenet_val.txt](../../java/org/mlperf/inference/assets/imagenet_val.txt)
-which contains indexes of the corresponding class of each images.
-
-If you want to use a subset of images, remember to use the first N ones.
+The full ImageNet dataset is available to MLCommons members individually. 
+You can request access from the mobile chairs.
+For testing purpose, you may download a subset dataset from 
+[https://github.com/mlcommons/mobile_models/tree/main/v0_7/datasets](https://github.com/mlcommons/mobile_models/tree/main/v0_7/datasets)
 
 ## COCO
 
 Download the COCO 2017 dataset from
-[http://cocodataset.org/#download](http://cocodataset.org/#download) and the
-upscale_coco.py from
-[https://github.com/mlperf/inference/blob/master/v0.5/tools/upscale_coco](https://github.com/mlperf/inference/blob/master/v0.5/tools/upscale_coco).
+[http://cocodataset.org/#download](http://cocodataset.org/#download) and the script
+[upscale_coco.py](https://github.com/mlcommons/mobile_app_open/blob/150470388e728894ccb0268b1cef422b410a83e7/mobile_back_qti/datasets/coco/upscale_coco.py).
 Then use the script to process the images:
 
 ```bash
@@ -27,8 +23,8 @@ python upscale_coco.py --inputs /path-to-coco/ --outputs /output-path/ --size 30
 ```
 
 The ground truth file is
-[coco_val.pbtxt](../../java/org/mlperf/inference/assets/coco_val.pbtxt) If you
-want to use a subset of images, remember to use the first N images which appear
+[coco_val.pbtxt](https://github.com/mlcommons/mobile_app/blob/c8075ac367554cae98b1508c4a5ab14d14c5885c/java/org/mlperf/inference/assets/coco_val.pbtxt).
+If you want to use a subset of images, remember to use the first N images which appear
 in the file instances_val2017.json. **Note** that the order of images in this
 file and the order of images under the images directory are not the same.
 
@@ -71,7 +67,8 @@ python cpp/datasets/squad_utils/generate_tfrecords.py \
   --max_query_length=64
 ```
 
-There are default tfrecord files [here](https://github.com/mlcommons/mobile_models/v1_0/datasets)
+There are default tfrecord files at 
+[https://github.com/mlcommons/mobile_models/tree/main/v1_0/datasets](https://github.com/mlcommons/mobile_models/tree/main/v1_0/datasets)
 generated with above default parameters. By default, the app will use a
 [mini version](https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord)
 of the dataset with 160 random questions. To evaluate using the full dataset,
