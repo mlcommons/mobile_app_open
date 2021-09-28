@@ -12,18 +12,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+#include <string>
+
 #ifndef TFLITE_SETTINGS_H
 #define TFLITE_SETTINGS_H
-
-#include <string>
 
 const std::string tflite_settings = R"SETTINGS(
 common_setting {
   id: "num_threads"
   name: "Number of threads"
   value {
-    value: "4"
-    name: "4 threads"
+    value: "2"
+    name: "2 threads"
   }
   acceptable_value {
     value: "1"
@@ -103,7 +103,7 @@ benchmark_setting {
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
-  batch_size: 2
+  batch_size: 64
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
 }
 
@@ -117,10 +117,10 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "LU_float32"
-  accelerator: "gpu_f16"
-  accelerator_desc: "GPU (FP16)"
+  accelerator: "nnapi"
+  accelerator_desc: "NNAPI"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
 }
 
 benchmark_setting {
@@ -128,7 +128,7 @@ benchmark_setting {
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_uint8.tflite"
+  src: "https://github.com/mlcommons/mobile_models/raw/Google/v1_0/Google/deeplabv3.tflite"
 })SETTINGS";
 
 #endif
