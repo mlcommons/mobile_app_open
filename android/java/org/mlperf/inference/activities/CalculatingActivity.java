@@ -1345,6 +1345,7 @@ public class CalculatingActivity extends BaseActivity
         copyFile(in, out, callback);
         if (MLPerfTasks.isZipFile(src)) {
           if (!unZip(tmpFile, dest)) {
+            tmpFile.delete();
             return true;
           }
           tmpFile.delete();
