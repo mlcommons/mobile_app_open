@@ -8,7 +8,7 @@ TFLite. Other backends may need to extend them.
 
 The full ImageNet dataset is available to MLCommons members individually. 
 You can request access from the mobile chairs.
-For testing purpose, you may download a subset dataset from 
+For testing purpose, you may download a substitute dataset from 
 [https://github.com/mlcommons/mobile_models/tree/main/v0_7/datasets](https://github.com/mlcommons/mobile_models/tree/main/v0_7/datasets)
 
 ## COCO
