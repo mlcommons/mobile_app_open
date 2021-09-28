@@ -40,26 +40,29 @@ namespace {
 // TODO(b/145480762) Remove this code when preprocessing code is refactored.
 inline TfLiteType DataType2TfType(DataType::Type type) {
   switch (type) {
-  case DataType::Float32:
-    return kTfLiteFloat32;
-  case DataType::Uint8:
-    return kTfLiteUInt8;
-  case DataType::Int8:
-    return kTfLiteInt8;
-  case DataType::Float16:
-    return kTfLiteFloat16;
-  default:
-    break;
+    case DataType::Float32:
+      return kTfLiteFloat32;
+    case DataType::Uint8:
+      return kTfLiteUInt8;
+    case DataType::Int8:
+      return kTfLiteInt8;
+    case DataType::Float16:
+      return kTfLiteFloat16;
+    default:
+      break;
   }
   return kTfLiteNoType;
 }
-} // namespace
+}  // namespace
 
 Coco::Coco(Backend *backend, const std::string &image_dir,
            const std::string &grouth_truth_file, int offset, int num_classes,
            int image_width, int image_height)
-    : Dataset(backend), groundtruth_file_(grouth_truth_file), offset_(offset),
-      num_classes_(num_classes), image_width_(image_width),
+    : Dataset(backend),
+      groundtruth_file_(grouth_truth_file),
+      offset_(offset),
+      num_classes_(num_classes),
+      image_width_(image_width),
       image_height_(image_height) {
   if (input_format_.size() != 1 || output_format_.size() != 4) {
     LOG(FATAL) << "Coco only supports 1 input and 4 outputs";
@@ -146,13 +149,13 @@ std::vector<uint8_t> Coco::ProcessOutput(const int sample_idx,
   for (int i = 0; i < num_detections; ++i) {
     const int bounding_box_offset = i * 4;
     // Add for reporting to mlperf log.
-    data.push_back(static_cast<float>(sample_idx));                // Image id
-    data.push_back(detected_label_boxes[bounding_box_offset + 0]); // ymin
-    data.push_back(detected_label_boxes[bounding_box_offset + 1]); // xmin
-    data.push_back(detected_label_boxes[bounding_box_offset + 2]); // ymax
-    data.push_back(detected_label_boxes[bounding_box_offset + 3]); // xmax
-    data.push_back(detected_label_probabilities[i]);               // Score
-    data.push_back(detected_label_indices[i] + offset_);           // Class
+    data.push_back(static_cast<float>(sample_idx));                 // Image id
+    data.push_back(detected_label_boxes[bounding_box_offset + 0]);  // ymin
+    data.push_back(detected_label_boxes[bounding_box_offset + 1]);  // xmin
+    data.push_back(detected_label_boxes[bounding_box_offset + 2]);  // ymax
+    data.push_back(detected_label_boxes[bounding_box_offset + 3]);  // xmax
+    data.push_back(detected_label_probabilities[i]);                // Score
+    data.push_back(detected_label_indices[i] + offset_);            // Class
     // Add for evaluation inside this class.
     auto *object = predict_.add_objects();
     auto *bbox = object->mutable_bounding_box();
@@ -226,5 +229,5 @@ std::string Coco::ComputeAccuracyString() {
   return stream.str();
 }
 
-} // namespace mobile
-} // namespace mlperf
+}  // namespace mobile
+}  // namespace mlperf

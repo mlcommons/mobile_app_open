@@ -32,9 +32,9 @@ namespace mobile {
 // Original function is absent on Windows.
 // When building not for Windows this function
 // is a bridge to original function
-std::vector<std::string>
-GetSortedFileNames(const std::string &directory,
-                   const std::unordered_set<std::string> &extensions);
+std::vector<std::string> GetSortedFileNames(
+    const std::string &directory,
+    const std::unordered_set<std::string> &extensions);
 
 // Requirements of the data including multiple inputs.
 using DataType = mlperf_data_t;
@@ -68,7 +68,7 @@ mlperf_backend_configuration_t CppToCSettings(const SettingList &settings);
 SettingList createSettingList(const BackendSetting &backend_setting,
                               std::string benchmark_id);
 
-} // namespace mobile
-} // namespace mlperf
+}  // namespace mobile
+}  // namespace mlperf
 
-#endif // MLPERF_UTILS_H_
+#endif  // MLPERF_UTILS_H_

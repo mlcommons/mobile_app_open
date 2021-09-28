@@ -12,13 +12,12 @@ namespace mlperf {
 namespace mobile {
 
 #if defined(_WIN64) || defined(_WIN32)
-std::vector<std::string>
-GetSortedFileNames(const std::string &directory,
-                   const std::unordered_set<std::string> &extensions) {
+std::vector<std::string> GetSortedFileNames(
+    const std::string &directory,
+    const std::unordered_set<std::string> &extensions) {
   std::vector<std::string> result;
   for (const auto &entry : fs::directory_iterator(directory)) {
-    if (!fs::is_regular_file(entry.path()))
-      continue;
+    if (!fs::is_regular_file(entry.path())) continue;
     if (!extensions.empty() &&
         extensions.count(entry.path().extension().string()) == 0)
       continue;
@@ -28,14 +27,13 @@ GetSortedFileNames(const std::string &directory,
   return result;
 }
 #else
-std::vector<std::string>
-GetSortedFileNames(const std::string &directory,
-                   const std::unordered_set<std::string> &extensions) {
+std::vector<std::string> GetSortedFileNames(
+    const std::string &directory,
+    const std::unordered_set<std::string> &extensions) {
   std::vector<std::string> result;
   TfLiteStatus ret = tflite::evaluation::GetSortedFileNames(
       tflite::evaluation::StripTrailingSlashes(directory), &result, extensions);
-  if (ret == kTfLiteError)
-    return {};
+  if (ret == kTfLiteError) return {};
   return result;
 }
 #endif
@@ -43,17 +41,17 @@ GetSortedFileNames(const std::string &directory,
 // Get the number of bytes required for a type.
 int GetByte(DataType type) {
   switch (type.type) {
-  case DataType::Uint8:
-    return 1;
-  case DataType::Int8:
-    return 1;
-  case DataType::Float16:
-    return 2;
-  case DataType::Int32:
-  case DataType::Float32:
-    return 4;
-  case DataType::Int64:
-    return 8;
+    case DataType::Uint8:
+      return 1;
+    case DataType::Int8:
+      return 1;
+    case DataType::Float16:
+      return 2;
+    case DataType::Int32:
+    case DataType::Float32:
+      return 4;
+    case DataType::Int64:
+      return 8;
   }
 }
 
@@ -152,5 +150,5 @@ SettingList createSettingList(const BackendSetting &backend_setting,
   return setting_list;
 }
 
-} // namespace mobile
-} // namespace mlperf
+}  // namespace mobile
+}  // namespace mlperf

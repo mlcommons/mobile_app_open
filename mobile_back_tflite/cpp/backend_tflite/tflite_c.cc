@@ -66,21 +66,21 @@ static bool use_gpu = false;
 
 inline mlperf_data_t::Type TfType2Type(TfLiteType type) {
   switch (type) {
-  case kTfLiteFloat32:
-    return mlperf_data_t::Float32;
-  case kTfLiteUInt8:
-    return mlperf_data_t::Uint8;
-  case kTfLiteInt8:
-    return mlperf_data_t::Int8;
-  case kTfLiteFloat16:
-    return mlperf_data_t::Float16;
-  case kTfLiteInt32:
-    return mlperf_data_t::Int32;
-  case kTfLiteInt64:
-    return mlperf_data_t::Int64;
-  default:
-    printf("TfLiteType %d not supported\n", type);
-    return mlperf_data_t::Float32;
+    case kTfLiteFloat32:
+      return mlperf_data_t::Float32;
+    case kTfLiteUInt8:
+      return mlperf_data_t::Uint8;
+    case kTfLiteInt8:
+      return mlperf_data_t::Int8;
+    case kTfLiteFloat16:
+      return mlperf_data_t::Float16;
+    case kTfLiteInt32:
+      return mlperf_data_t::Int32;
+    case kTfLiteInt64:
+      return mlperf_data_t::Int64;
+    default:
+      printf("TfLiteType %d not supported\n", type);
+      return mlperf_data_t::Float32;
   }
 }
 
@@ -105,8 +105,7 @@ static bool neuron_tflite_backend(const char **not_allowed_message,
     // Try to dlopen Neuron universal SDK
     libneuron_adapter =
         dlopen("libneuronusdk_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
-    if (libneuron_adapter != nullptr)
-      neuron_adapter = true;
+    if (libneuron_adapter != nullptr) neuron_adapter = true;
   } else {
     neuron_adapter = true;
   }
@@ -155,18 +154,16 @@ bool is_emulator() {
                             ro_build_characteristics)) {
     char *ptr;
     ptr = strstr(ro_build_characteristics, "emulator");
-    if (ptr)
-      return true;
+    if (ptr) return true;
   }
   return false;
 }
 #endif
 
 // Create a new backend and return the pointer to it.
-mlperf_backend_ptr_t
-mlperf_backend_create(const char *model_path,
-                      mlperf_backend_configuration_t *configs,
-                      const char *native_lib_path) {
+mlperf_backend_ptr_t mlperf_backend_create(
+    const char *model_path, mlperf_backend_configuration_t *configs,
+    const char *native_lib_path) {
   // Verify only one instance of the backend exists at any time
   if (backendExists) {
     printf("Error: Only one backend instance should exist at a time\n");
@@ -257,9 +254,9 @@ mlperf_backend_create(const char *model_path,
         options.allow_fp16 = true;
         delegate = TfLiteNeuronDelegateCreate(&options);
       }
-#endif // MTK_TFLITE_NEURON_BACKEND
+#endif  // MTK_TFLITE_NEURON_BACKEND
     }
-#endif // __ANDROID__
+#endif  // __ANDROID__
 #if TARGET_OS_SIMULATOR
 #elif TARGET_OS_IPHONE
     if (strcmp(configs->accelerator, "metal") == 0) {
@@ -479,27 +476,27 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
   }
 
   switch (output_tensor->type) {
-  case kTfLiteFloat32:
-    *data = (output_tensor->data.f + (batch_index * non_batch_size));
-    break;
-  case kTfLiteUInt8:
-    *data = (output_tensor->data.uint8 + (batch_index * non_batch_size));
-    break;
-  case kTfLiteInt8:
-    *data = (output_tensor->data.int8 + (batch_index * non_batch_size));
-    break;
-  case kTfLiteFloat16:
-    *data = (output_tensor->data.f16 + (batch_index * non_batch_size));
-    break;
-  case kTfLiteInt32:
-    *data = (output_tensor->data.i32 + (batch_index * non_batch_size));
-    break;
-  case kTfLiteInt64:
-    *data = (output_tensor->data.i64 + (batch_index * non_batch_size));
-    break;
-  default:
-    printf("Data type not yet supported\n");
-    return MLPERF_FAILURE;
+    case kTfLiteFloat32:
+      *data = (output_tensor->data.f + (batch_index * non_batch_size));
+      break;
+    case kTfLiteUInt8:
+      *data = (output_tensor->data.uint8 + (batch_index * non_batch_size));
+      break;
+    case kTfLiteInt8:
+      *data = (output_tensor->data.int8 + (batch_index * non_batch_size));
+      break;
+    case kTfLiteFloat16:
+      *data = (output_tensor->data.f16 + (batch_index * non_batch_size));
+      break;
+    case kTfLiteInt32:
+      *data = (output_tensor->data.i32 + (batch_index * non_batch_size));
+      break;
+    case kTfLiteInt64:
+      *data = (output_tensor->data.i64 + (batch_index * non_batch_size));
+      break;
+    default:
+      printf("Data type not yet supported\n");
+      return MLPERF_FAILURE;
   }
   return MLPERF_SUCCESS;
 }

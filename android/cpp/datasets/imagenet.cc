@@ -35,29 +35,32 @@ namespace {
 // TODO(b/145480762) Remove this code when preprocessing code is refactored.
 inline TfLiteType DataType2TfType(DataType::Type type) {
   switch (type) {
-  case DataType::Float32:
-    return kTfLiteFloat32;
-  case DataType::Uint8:
-    return kTfLiteUInt8;
-  case DataType::Int8:
-    return kTfLiteInt8;
-  case DataType::Float16:
-    return kTfLiteFloat16;
-  default:
-    break;
+    case DataType::Float32:
+      return kTfLiteFloat32;
+    case DataType::Uint8:
+      return kTfLiteUInt8;
+    case DataType::Int8:
+      return kTfLiteInt8;
+    case DataType::Float16:
+      return kTfLiteFloat16;
+    default:
+      break;
   }
   return kTfLiteNoType;
 }
 
 // Default cropping fraction value.
 const float kCroppingFraction = 0.875;
-} // namespace
+}  // namespace
 
 Imagenet::Imagenet(Backend *backend, const std::string &image_dir,
                    const std::string &groundtruth_file, int offset,
                    int image_width, int image_height)
-    : Dataset(backend), groundtruth_file_(groundtruth_file),
-      image_width_(image_width), image_height_(image_height), offset_(offset) {
+    : Dataset(backend),
+      groundtruth_file_(groundtruth_file),
+      image_width_(image_width),
+      image_height_(image_height),
+      offset_(offset) {
   if (input_format_.size() != 1 || output_format_.size() != 1) {
     LOG(FATAL) << "Imagenet only supports 1 input and 1 output";
     return;
@@ -127,25 +130,26 @@ void Imagenet::UnloadSamplesFromRam(
   }
 }
 
-std::vector<uint8_t>
-Imagenet::ProcessOutput(const int sample_idx,
-                        const std::vector<void *> &outputs) {
+std::vector<uint8_t> Imagenet::ProcessOutput(
+    const int sample_idx, const std::vector<void *> &outputs) {
   std::vector<int32_t> topk;
   void *output = outputs.at(0);
   int data_size = output_format_[0].size;
   switch (output_format_[0].type) {
-  case DataType::Float32:
-    topk = GetTopK(reinterpret_cast<float *>(output), data_size, 1, offset_);
-    break;
-  case DataType::Uint8:
-    topk = GetTopK(reinterpret_cast<uint8_t *>(output), data_size, 1, offset_);
-    break;
-  case DataType::Int8:
-    topk = GetTopK(reinterpret_cast<int8_t *>(output), data_size, 1, offset_);
-    break;
-  case DataType::Float16:
-    topk = GetTopK(reinterpret_cast<uint16_t *>(output), data_size, 1, offset_);
-    break;
+    case DataType::Float32:
+      topk = GetTopK(reinterpret_cast<float *>(output), data_size, 1, offset_);
+      break;
+    case DataType::Uint8:
+      topk =
+          GetTopK(reinterpret_cast<uint8_t *>(output), data_size, 1, offset_);
+      break;
+    case DataType::Int8:
+      topk = GetTopK(reinterpret_cast<int8_t *>(output), data_size, 1, offset_);
+      break;
+    case DataType::Float16:
+      topk =
+          GetTopK(reinterpret_cast<uint16_t *>(output), data_size, 1, offset_);
+      break;
   }
   // Mlperf interpret data as uint8_t* and log it as a HEX string.
   predictions_[sample_idx] = topk.at(0);
@@ -169,8 +173,7 @@ float Imagenet::ComputeAccuracy() {
   // Read the result in mlpef log file and calculate the accuracy.
   int good = 0;
   for (auto const &element : predictions_) {
-    if (groundtruth[element.first] == element.second)
-      good++;
+    if (groundtruth[element.first] == element.second) good++;
   }
   return static_cast<float>(good) / predictions_.size();
 }
@@ -185,5 +188,5 @@ std::string Imagenet::ComputeAccuracyString() {
   return stream.str();
 }
 
-} // namespace mobile
-} // namespace mlperf
+}  // namespace mobile
+}  // namespace mlperf

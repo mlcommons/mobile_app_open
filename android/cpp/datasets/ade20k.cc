@@ -32,25 +32,27 @@ namespace mobile {
 namespace {
 inline TfLiteType DataType2TfType(DataType::Type type) {
   switch (type) {
-  case DataType::Float32:
-    return kTfLiteFloat32;
-  case DataType::Uint8:
-    return kTfLiteUInt8;
-  case DataType::Int8:
-    return kTfLiteInt8;
-  case DataType::Float16:
-    return kTfLiteFloat16;
-  default:
-    break;
+    case DataType::Float32:
+      return kTfLiteFloat32;
+    case DataType::Uint8:
+      return kTfLiteUInt8;
+    case DataType::Int8:
+      return kTfLiteInt8;
+    case DataType::Float16:
+      return kTfLiteFloat16;
+    default:
+      break;
   }
   return kTfLiteNoType;
 }
-} // namespace
+}  // namespace
 
 ADE20K::ADE20K(Backend *backend, const std::string &image_dir,
                const std::string &ground_truth_dir, int num_classes,
                int image_width, int image_height)
-    : Dataset(backend), num_classes_(num_classes), image_width_(image_width),
+    : Dataset(backend),
+      num_classes_(num_classes),
+      image_width_(image_width),
       image_height_(image_height) {
   if (input_format_.size() != 1 || output_format_.size() != 1) {
     LOG(FATAL) << "ADE20K model only supports 1 input and 1 output";
@@ -174,8 +176,7 @@ std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
           if (p == g) {
             true_positive++;
           } else if (p == c) {
-            if ((g > 0) && (g <= num_classes_))
-              false_positive++;
+            if ((g > 0) && (g <= num_classes_)) false_positive++;
           } else {
             false_negative++;
           }
@@ -190,8 +191,7 @@ std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
 #if __DEBUG__
     for (int j = 0; j < num_classes_; j++) {
       LOG(INFO) << tp_acc_[j] << ", " << fp_acc_[j] << ", " << fn_acc_[j];
-      if (j < num_classes_ - 1)
-        std::cout << ", ";
+      if (j < num_classes_ - 1) std::cout << ", ";
     }
     LOG(INFO) << "\n";
     for (int j = 0; j < num_classes_; j++) {
@@ -236,5 +236,5 @@ std::string ADE20K::ComputeAccuracyString() {
   return stream.str();
 }
 
-} // namespace mobile
-} // namespace mlperf
+}  // namespace mobile
+}  // namespace mlperf
