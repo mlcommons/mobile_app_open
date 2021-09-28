@@ -29,8 +29,8 @@ namespace mlperf {
 namespace mobile {
 
 // equivalent of tflite::evaluation::GetSortedFileNames.
-// Original function is abcent on Windows.
-// When building not for windows this function
+// Original function is absent on Windows.
+// When building not for Windows this function
 // is a bridge to original function
 std::vector<std::string>
 GetSortedFileNames(const std::string &directory,
