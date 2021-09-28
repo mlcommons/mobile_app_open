@@ -29,7 +29,7 @@ do
         xargs clang-format-10 -i -style=google
 done
 
-find java/org/mlperf/inference/jni -iname "*.cc" | \
+find android/java/org/mlperf/inference/jni -iname "*.cc" | \
     xargs clang-format-10 -i -style=google
 
 if [ "$1" = "CI" ]; then

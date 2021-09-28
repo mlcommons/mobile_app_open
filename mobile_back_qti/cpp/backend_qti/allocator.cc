@@ -16,7 +16,7 @@ limitations under the License.
 #include "allocator.h"
 
 // Map of allocation size to Chunk allocator instance
-std::map<size_t, ChunkAllocator> &getAllocator() {
+std::map<size_t, ChunkAllocator>& getAllocator() {
   static std::map<size_t, ChunkAllocator> allocator;
   return allocator;
 }
@@ -26,7 +26,8 @@ std::map<void*, ChunkAllocator::Block*> ChunkAllocator::Block::block_map_;
 void* ChunkAllocator::GetBuffer(size_t n, size_t chunks_per_block) {
   // See if allocator for this allocation size exists
   if (!getAllocator().count(n)) {
-    getAllocator().emplace(std::make_pair(n, ChunkAllocator(n, chunks_per_block)));
+    getAllocator().emplace(
+        std::make_pair(n, ChunkAllocator(n, chunks_per_block)));
   }
   return getAllocator().at(n).GetChunk();
 }
@@ -48,9 +49,7 @@ void ChunkAllocator::DumpState() {
   }
 }
 
-RpcMem &ChunkAllocator::getRpcMem()
-{
+RpcMem& ChunkAllocator::getRpcMem() {
   static RpcMem rpcmem;
   return rpcmem;
 }
-

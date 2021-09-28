@@ -17,12 +17,12 @@
 
 FORMATTER=/opt/formatters/google-java-format-1.9-all-deps.jar
 
-find java -iname "*.java" | \
+find android/java -iname "*.java" | \
     xargs java -jar $FORMATTER --set-exit-if-changed --replace
 
 CODE1=$?
 
-find androidTest -iname "*.java" | \
+find android/androidTest -iname "*.java" | \
     xargs java -jar $FORMATTER --set-exit-if-changed --replace
 
 CODE2=$?

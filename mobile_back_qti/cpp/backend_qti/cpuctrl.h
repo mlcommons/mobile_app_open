@@ -14,9 +14,9 @@ limitations under the License.
 ==============================================================================*/
 #pragma once
 
-#include <stdint.h>
 #include <EGL/egl.h>
 #include <GLES/gl.h>
+#include <stdint.h>
 
 #define SDM865 356
 #define SDM888 415
