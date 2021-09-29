@@ -11,6 +11,11 @@ http_archive(
 
 http_archive(
     name = "org_tensorflow",
+    patch_args = ["-p1"],
+    patches = [
+        # An improve from tensorflow 2.7 that Pixel 6 needs
+        "//patches:fast_nms.diff",
+    ],
     sha256 = "40d3203ab5f246d83bae328288a24209a2b85794f1b3e2cd0329458d8e7c1985",
     strip_prefix = "tensorflow-2.6.0",
     urls = [
