@@ -25,8 +25,8 @@ import android.os.HandlerThread;
 import android.util.Base64;
 import android.util.Log;
 import androidx.preference.PreferenceManager;
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.mlperf.inference.exceptions.UnsupportedDeviceException;
@@ -193,13 +193,13 @@ public final class MiddleInterface implements AutoCloseable, RunMLPerfWorker.Cal
         String logDir = "/sdcard/mlperf_results/log_performance/" + bm.getId();
         File appDir = new File(logDir);
         appDir.mkdirs();
-        Log.d(TAG,"log_performance file path: " + logDir);
+        Log.d(TAG, "log_performance file path: " + logDir);
         startingList[counter] =
             new StartData(bm.getId(), logDir, AppConstants.PERFORMANCE_LITE_MODE, batch);
         logDir = "/sdcard/mlperf_results/log_accuracy/" + bm.getId();
         appDir = new File(logDir);
         appDir.mkdirs();
-        Log.d(TAG,"log_accuracy file path: " + logDir);
+        Log.d(TAG, "log_accuracy file path: " + logDir);
 
         startingList[counter + benchmarksSize] =
             new StartData(bm.getId(), logDir, AppConstants.ACCURACY_MODE, batch);
@@ -217,7 +217,7 @@ public final class MiddleInterface implements AutoCloseable, RunMLPerfWorker.Cal
         String logDir = "/sdcard/mlperf_results/" + logDirBase + bm.getId();
         File appDir = new File(logDir);
         appDir.mkdirs();
-        Log.d(TAG,logDirBase + " file path: " + logDir);
+        Log.d(TAG, logDirBase + " file path: " + logDir);
 
         startingList[counter] = new StartData(bm.getId(), logDir, runMode, batch);
       }
