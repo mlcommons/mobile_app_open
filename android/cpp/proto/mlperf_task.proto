@@ -95,9 +95,9 @@ message ModelConfig {
   optional string description = 7;
   // Max Accuracy  of this benchmark.
   optional float accuracy_max = 8;
-  // image width of the input if its an image
+  // image width of the input if it is an image
   optional int32 image_width = 9;
-  // image height of the input if its an image
+  // image height of the input if it is an image
   optional int32 image_height = 10;
   // Number of detection classes if applicable
   optional int32 num_classes = 11;

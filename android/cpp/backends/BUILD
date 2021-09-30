@@ -15,7 +15,6 @@
 load(
     "@org_tensorflow//tensorflow/lite:build_def.bzl",
     "tflite_copts",
-    "tflite_jni_binary",
 )
 
 package(

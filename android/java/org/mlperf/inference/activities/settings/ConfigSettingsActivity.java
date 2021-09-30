@@ -45,8 +45,7 @@ public final class ConfigSettingsActivity extends BaseActivity {
         middleInterface.getCommonSetting(CONFIGURATION_SETTINGS).getValue().getName();
 
     for (Benchmark bm : middleInterface.getBenchmarks()) {
-      String label =
-          CalculatingActivity.getReadableBenchmarkTitle(bm.getId());
+      String label = CalculatingActivity.getReadableBenchmarkTitle(bm.getId());
       View v = getLayoutInflater().inflate(R.layout.config_item_panel, null);
       TextView title = v.findViewById(R.id.config_item_title);
       title.setText(label);

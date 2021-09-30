@@ -5,5 +5,5 @@ public final class Backends {
     private Backends() {
     }
 
-    public static final String[] BACKEND_LIST = {QTI SAMSUNG MEDIATEK "tflite"};
+    public static final String[] BACKEND_LIST = {QTI SAMSUNG MEDIATEK PIXEL "tflite"};
 }

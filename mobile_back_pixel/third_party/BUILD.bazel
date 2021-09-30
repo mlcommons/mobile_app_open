@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Copyright 2020 The MLPerf Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,28 +13,7 @@
 # limitations under the License.
 ##########################################################################
 
-CPP_DIRS=('android/cpp' 'mobile_back_qti' 'mobile_back_tflite')
+licenses(["notice"])  # Apache 2.0
 
-for directory in "${CPP_DIRS[@]}"
-do
-    find $directory -iname "*.h" | \
-        xargs clang-format-10 -i -style=google
+package(default_visibility = ["//visibility:public"])
 
-    find $directory -iname "*.cc" | \
-        xargs clang-format-10 -i -style=google
-
-    find $directory -iname "*.cpp" | \
-        xargs clang-format-10 -i -style=google
-done
-
-find android/java/org/mlperf/inference/jni -iname "*.cc" | \
-    xargs clang-format-10 -i -style=google
-
-if [ "$1" = "CI" ]; then
-    git diff >cpp-codeformat-${GIT_COMMIT}.patch
-
-    if [ $(git ls-files -m | wc -l) -ne 0 ]; then
-        echo "\nNeed code formatting!\n"
-        exit 1
-    fi
-fi
