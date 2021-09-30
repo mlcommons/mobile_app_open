@@ -84,19 +84,19 @@ genrule(
         "Backends.java",
     ],
     cmd = "cat $(location Backends.java.in) " +
-        select({
-            ":use_pixel": "| sed -e 's/PIXEL/\"tflitepixel\",/' ",
-            "//conditions:default": "| sed -e 's/PIXEL//' ",
-        }) + select({
-            ":use_qti": "| sed -e 's/QTI/\"qti\",/' ",
-            "//conditions:default": "| sed -e 's/QTI//' ",
-        }) + select({
-            ":use_samsung": "| sed -e 's/SAMSUNG/\"samsung\",/' ",
-            "//conditions:default": "| sed -e 's/SAMSUNG//'",
-        }) + select({
-            ":use_mediatek": "| sed -e 's/MEDIATEK/\"tfliteneuron\",/' ",
-            "//conditions:default": "| sed -e 's/MEDIATEK//' ",
-        }) + " > $(@)",
+          select({
+              ":use_pixel": "| sed -e 's/PIXEL/\"tflitepixel\",/' ",
+              "//conditions:default": "| sed -e 's/PIXEL//' ",
+          }) + select({
+        ":use_qti": "| sed -e 's/QTI/\"qti\",/' ",
+        "//conditions:default": "| sed -e 's/QTI//' ",
+    }) + select({
+        ":use_samsung": "| sed -e 's/SAMSUNG/\"samsung\",/' ",
+        "//conditions:default": "| sed -e 's/SAMSUNG//'",
+    }) + select({
+        ":use_mediatek": "| sed -e 's/MEDIATEK/\"tfliteneuron\",/' ",
+        "//conditions:default": "| sed -e 's/MEDIATEK//' ",
+    }) + " > $(@)",
 )
 
 android_library(

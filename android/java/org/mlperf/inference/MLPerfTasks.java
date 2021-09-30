@@ -136,10 +136,9 @@ public final class MLPerfTasks {
 
       if (isURL) {
         String longFileName;
-        try{
+        try {
           longFileName = new URL(path).getPath();
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
           longFileName = filename;
         }
         return getCacheDirName().concat(longFileName);

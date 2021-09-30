@@ -255,9 +255,12 @@ public class CalculatingActivity extends BaseActivity
     String cacheDirName = MLPerfTasks.getCacheDirName();
     String currentAppVersion;
     try {
-      currentAppVersion = getApplicationContext().getPackageManager()
+      currentAppVersion =
+          getApplicationContext()
+              .getPackageManager()
               .getPackageInfo(getApplicationContext().getPackageName(), 0)
-              .versionName.concat(BuildTimeConstants.HASH);
+              .versionName
+              .concat(BuildTimeConstants.HASH);
     } catch (Exception e) {
       currentAppVersion = BuildTimeConstants.HASH;
     }
@@ -283,12 +286,14 @@ public class CalculatingActivity extends BaseActivity
       long diff = new Date().getTime() - cacheDir.lastModified();
       Log.i(TAG, "Stored version is: " + storedVersion);
 
-      if (diff > Long.valueOf(AppConstants.MAX_FILE_AGE_IN_DAYS) * 24 * 60  * 60 * 1000 && isVersionChanged) {
+      if (diff > Long.valueOf(AppConstants.MAX_FILE_AGE_IN_DAYS) * 24 * 60 * 60 * 1000
+          && isVersionChanged) {
         try {
           FileUtils.forceDelete(cacheDir);
         } catch (Exception e) {
           Log.i(TAG, "Fail to remove old cache folder");
-        };
+        }
+        ;
         arePrevResultsValid = false;
       }
     } else {
