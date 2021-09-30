@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2021 Samsung Electronics Co., Ltd. All rights reserved.
+/* Copyright 2020-2021 The MLPerf Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@ limitations under the License.
 ==============================================================================*/
 #include <string>
 
-#ifndef SAMSUNG_SETTINGS_H
-#define SAMSUNG_SETTINGS_H
+#ifndef TFLITE_SETTINGS_H
+#define TFLITE_SETTINGS_H
 
-const std::string samsung_settings = R"SETTINGS(
+const std::string tflite_settings = R"SETTINGS(
 common_setting {
   id: "num_threads"
   name: "Number of threads"
   value {
-    value: "4"
-    name: "4 threads"
+    value: "2"
+    name: "2 threads"
   }
   acceptable_value {
     value: "1"
@@ -49,10 +49,10 @@ common_setting {
 
 common_setting {
   id: "configuration"
-  name: "configuration"
+  name: "Configuration"
   value {
-    value: "Samsung's Exynos Neural Network SDK running\non Exynos 990 mobile processor."
-    name: "Samsung Exynos"
+    value: "TFLite backend using NNAPI, GPU delegate or CPU delegate."
+    name: "Default"
   }
 }
 
@@ -91,45 +91,44 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
-  accelerator: "npu"
-  accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/is.nnc"
-}
-
-benchmark_setting {
   benchmark_id: "IC_tpu_uint8"
-  accelerator: "npu"
-  accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/ic.nnc"
+  accelerator: "nnapi"
+  accelerator_desc: "NNAPI"
+  configuration: "TFLite"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
 }
-
-
-benchmark_setting {
-  benchmark_id: "OD_uint8"
-  accelerator: "npu"
-  accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/od.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
-  accelerator: "gpu"
-  accelerator_desc: "gpu"
-  configuration: "Samsung Exynos"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/lu.nnc"
-}
-
 
 benchmark_setting {
   benchmark_id: "IC_tpu_uint8_offline"
-  accelerator: "npu"
-  accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
-  batch_size: 2048
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/ic_offline.nncgo"
+  accelerator: "nnapi"
+  accelerator_desc: "NNAPI"
+  configuration: "TFLite"
+  batch_size: 64
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+}
+
+benchmark_setting {
+  benchmark_id: "OD_uint8"
+  accelerator: "nnapi"
+  accelerator_desc: "NNAPI"
+  configuration: "TFLite"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+}
+
+benchmark_setting {
+  benchmark_id: "LU_float32"
+  accelerator: "nnapi"
+  accelerator_desc: "NNAPI"
+  configuration: "TFLite"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
+}
+
+benchmark_setting {
+  benchmark_id: "IS_uint8"
+  accelerator: "nnapi"
+  accelerator_desc: "NNAPI"
+  configuration: "TFLite"
+  src: "https://github.com/mlcommons/mobile_models/raw/Google/v1_0/Google/deeplabv3.tflite"
 })SETTINGS";
+
 #endif

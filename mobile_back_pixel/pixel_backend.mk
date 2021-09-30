@@ -1,6 +1,4 @@
-#!/bin/bash
-
-# Copyright 2020 The MLPerf Authors. All Rights Reserved.
+# Copyright 2021 The MLPerf Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,23 +13,9 @@
 # limitations under the License.
 ##########################################################################
 
-FORMATTER=/opt/formatters/google-java-format-1.9-all-deps.jar
+# Set the included backends
+WITH_PIXEL=0
 
-find android/java -iname "*.java" | \
-    xargs java -jar $FORMATTER --set-exit-if-changed --replace
-
-CODE1=$?
-
-find android/androidTest -iname "*.java" | \
-    xargs java -jar $FORMATTER --set-exit-if-changed --replace
-
-CODE2=$?
-
-if [ "$1" = "CI" ]; then
-    git diff >codeformat-${GIT_COMMIT}.patch
-
-    if [ $CODE1 != 0 ] || [ $CODE2 != 0 ]; then
-        echo "\nNeed code formatting!\n"
-        exit 1
-    fi
-fi
+ifeq (${WITH_PIXEL},1)
+  PIXEL_BACKEND=--//android/java/org/mlperf/inference:with_pixel="1"
+endif

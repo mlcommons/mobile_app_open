@@ -22,6 +22,7 @@ SAMSUNG_BACKEND=
 all: app
 
 include mobile_back_tflite/tflite_backend.mk
+include mobile_back_pixel/pixel_backend.mk
 include mobile_back_qti/make/qti_backend.mk
 
 
@@ -95,7 +96,7 @@ app: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
 		${COMMON_DOCKER_FLAGS} \
-                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} \
+                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
 		--fat_apk_cpu=arm64-v8a \
 		//android/java/org/mlperf/inference:mlperf_app
 	@cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app.apk
@@ -106,7 +107,7 @@ app_x86_64: output/mlperf_mobile_docker_1_0.stamp
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
 		${COMMON_DOCKER_FLAGS} \
-                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} \
+                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
 		--fat_apk_cpu=x86_64 \
 		//android/java/org/mlperf/inference:mlperf_app
 	@cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app_x86_64.apk
@@ -117,7 +118,7 @@ test_app: output/mlperf_mobile_docker_1_0.stamp
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	@docker run \
 		${COMMON_DOCKER_FLAGS} \
-                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} \
+                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
 		--fat_apk_cpu=x86_64,arm64-v8a \
 		//androidTest:mlperf_test_app
 	@cp output/`readlink bazel-bin`/android/androidTest/mlperf_test_app.apk output/mlperf_test_app.apk

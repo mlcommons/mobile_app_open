@@ -111,7 +111,7 @@ BackendFunctions::BackendFunctions(const std::string& lib_path) {
       CheckSymbol("mlperf_backend_convert_inputs"));
 
   // If both functions are defined, then update
-  if (get_buffer && get_buffer) {
+  if (get_buffer && release_buffer) {
     LOG(INFO) << "Using backend allocator";
     AllocatorMgr::UseBackendAllocator(get_buffer, release_buffer);
   } else {
