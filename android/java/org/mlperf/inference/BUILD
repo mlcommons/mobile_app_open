@@ -58,6 +58,18 @@ config_setting(
     },
 )
 
+string_flag(
+    name = "with_pixel",
+    build_setting_default = "0",
+)
+
+config_setting(
+    name = "use_pixel",
+    flag_values = {
+        ":with_pixel": "1",
+    },
+)
+
 java_lite_proto_library(
     name = "mlperf_task_java_proto_lite",
     deps = ["//android/cpp/proto:mlperf_task_proto"],
@@ -72,16 +84,19 @@ genrule(
         "Backends.java",
     ],
     cmd = "cat $(location Backends.java.in) " +
-          select({
-              ":use_qti": "| sed -e 's/QTI/\"qti\",/' ",
-              "//conditions:default": "| sed -e 's/QTI//' ",
-          }) + select({
-        ":use_samsung": "| sed -e 's/SAMSUNG/\"samsung\",/' ",
-        "//conditions:default": "| sed -e 's/SAMSUNG//'",
-    }) + select({
-        ":use_mediatek": "| sed -e 's/MEDIATEK/\"tfliteneuron\",/' ",
-        "//conditions:default": "| sed -e 's/MEDIATEK//' ",
-    }) + " > $(@)",
+        select({
+            ":use_pixel": "| sed -e 's/PIXEL/\"tflitepixel\",/' ",
+            "//conditions:default": "| sed -e 's/PIXEL//' ",
+        }) + select({
+            ":use_qti": "| sed -e 's/QTI/\"qti\",/' ",
+            "//conditions:default": "| sed -e 's/QTI//' ",
+        }) + select({
+            ":use_samsung": "| sed -e 's/SAMSUNG/\"samsung\",/' ",
+            "//conditions:default": "| sed -e 's/SAMSUNG//'",
+        }) + select({
+            ":use_mediatek": "| sed -e 's/MEDIATEK/\"tfliteneuron\",/' ",
+            "//conditions:default": "| sed -e 's/MEDIATEK//' ",
+        }) + " > $(@)",
 )
 
 android_library(
@@ -182,12 +197,13 @@ cc_library(
     deps = [
         "//mobile_back_tflite:tflitebackend",
     ] + select({
-        ":use_samsung": [
-            "//mobile_back_samsung:samsungbackend",
-        ],
+        ":use_samsung": ["//mobile_back_samsung:samsungbackend"],
         "//conditions:default": [],
     }) + select({
         ":use_mediatek": ["//mobile_back_tflite:tfliteneuronbackend"],
+        "//conditions:default": [],
+    }) + select({
+        ":use_pixel": ["//mobile_back_pixel:tflitepixelbackend"],
         "//conditions:default": [],
     }),
 )

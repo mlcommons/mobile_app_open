@@ -81,8 +81,7 @@ mlperf_backend_ptr_t tflite_backend_create(
   std::string delegateStr = configs->accelerator;
 #if __ANDROID__
   if (delegateStr == "gpu_f16") {
-    TfLiteGpuDelegateOptionsV2 options =
-        TfLiteGpuDelegateOptionsV2Default();
+    TfLiteGpuDelegateOptionsV2 options = TfLiteGpuDelegateOptionsV2Default();
     options.inference_preference =
         TFLITE_GPU_INFERENCE_PREFERENCE_SUSTAINED_SPEED;
     options.inference_priority1 = TFLITE_GPU_INFERENCE_PRIORITY_MIN_LATENCY;

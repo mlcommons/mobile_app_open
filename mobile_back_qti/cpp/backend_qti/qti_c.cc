@@ -19,8 +19,8 @@ limitations under the License.
 #include "allocator.h"
 #include "cpuctrl.h"
 #include "mlperf_helper.h"
-#include "qti_settings.h"
 #include "qti_backend_helper.h"
+#include "qti_settings.h"
 #include "tensorflow/core/platform/logging.h"
 #include "tflite_c.h"
 
