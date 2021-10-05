@@ -132,6 +132,7 @@ float Squad::ComputeAccuracy() {
     // Find candidates for the best prediction.
     PrelimPrediction best_pred(0, 0, 0, -std::numeric_limits<float>::max());
     for (uint32_t sample_index : it.second) {
+      if (predictions_[sample_index] == nullptr) continue;
       SampleRecord<int32_t> sample(sample_reader_.ReadRecord(sample_index));
       // Get top start and end indexes based on their logit.
       std::vector<int32_t> top_start_indexes =
