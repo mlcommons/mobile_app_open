@@ -47,8 +47,8 @@ inline TfLiteType DataType2TfType(DataType::Type type) {
 }
 }  // namespace
 
-ADE20K::ADE20K(Backend* backend, const std::string& image_dir,
-               const std::string& ground_truth_dir, int num_classes,
+ADE20K::ADE20K(Backend *backend, const std::string &image_dir,
+               const std::string &ground_truth_dir, int num_classes,
                int image_width, int image_height)
     : Dataset(backend),
       num_classes_(num_classes),
@@ -61,21 +61,18 @@ ADE20K::ADE20K(Backend* backend, const std::string& image_dir,
 
   // Finds all images under image_dir.
   std::unordered_set<std::string> exts{".rgb8", ".jpg", ".jpeg"};
-  TfLiteStatus ret = tflite::evaluation::GetSortedFileNames(
-      tflite::evaluation::StripTrailingSlashes(image_dir), &image_list_, exts);
-  if (ret == kTfLiteError || image_list_.empty()) {
-    LOG(FATAL) << "Failed to list all the images file in provided path";
+  image_list_ = GetSortedFileNames(image_dir, exts);
+  if (image_list_.empty()) {
+    LOG(FATAL) << "Failed to list all the image files in provided path";
     return;
   }
   samples_ = std::vector<
-      std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>>*>>(
+      std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>> *>>(
       image_list_.size());
   // Finds all ground truth files under ground_truth_dir.
   std::unordered_set<std::string> gt_exts{".raw"};
-  ret = tflite::evaluation::GetSortedFileNames(
-      tflite::evaluation::StripTrailingSlashes(ground_truth_dir),
-      &ground_truth_list_, gt_exts);
-  if (ret == kTfLiteError || ground_truth_list_.empty()) {
+  ground_truth_list_ = GetSortedFileNames(ground_truth_dir, gt_exts);
+  if (ground_truth_list_.empty()) {
     LOG(ERROR) << "Failed to list all the ground truth files in provided path. "
                   "Only measuring performance.";
   }
@@ -98,7 +95,7 @@ ADE20K::ADE20K(Backend* backend, const std::string& image_dir,
   fn_acc_ = std::vector<uint64_t>(num_classes_, 0);
 }
 
-void ADE20K::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
+void ADE20K::LoadSamplesToRam(const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
     // Preprocessing.
     if (sample_idx >= image_list_.size()) {
@@ -112,11 +109,11 @@ void ADE20K::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
 
     // Move data out of preprocessing_stage_ so it can be reused.
     int total_byte = input_format_[0].size * GetByte(input_format_[0]);
-    void* data_void = preprocessing_stage_->GetPreprocessedImageData();
-    std::vector<uint8_t, BackendAllocator<uint8_t>>* data_uint8 =
+    void *data_void = preprocessing_stage_->GetPreprocessedImageData();
+    std::vector<uint8_t, BackendAllocator<uint8_t>> *data_uint8 =
         new std::vector<uint8_t, BackendAllocator<uint8_t>>(total_byte);
-    std::copy(static_cast<uint8_t*>(data_void),
-              static_cast<uint8_t*>(data_void) + total_byte,
+    std::copy(static_cast<uint8_t *>(data_void),
+              static_cast<uint8_t *>(data_void) + total_byte,
               data_uint8->begin());
 
     // Allow backend to convert data layout if needed
@@ -128,9 +125,9 @@ void ADE20K::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
 }
 
 void ADE20K::UnloadSamplesFromRam(
-    const std::vector<QuerySampleIndex>& samples) {
+    const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
-    for (std::vector<uint8_t, BackendAllocator<uint8_t>>* v :
+    for (std::vector<uint8_t, BackendAllocator<uint8_t>> *v :
          samples_.at(sample_idx)) {
       delete v;
     }
@@ -139,7 +136,7 @@ void ADE20K::UnloadSamplesFromRam(
 }
 
 std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
-                                           const std::vector<void*>& outputs) {
+                                           const std::vector<void *> &outputs) {
   if (ground_truth_list_.empty()) {
     return std::vector<uint8_t>();
   }
@@ -151,9 +148,9 @@ std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
         (std::istreambuf_iterator<char>(stream)),
         std::istreambuf_iterator<char>());
 
-    float* outputFloat = reinterpret_cast<float*>(outputs[0]);
-    int32_t* outputInt = reinterpret_cast<int32_t*>(outputs[0]);
-    uint8_t* outputUint8 = reinterpret_cast<uint8_t*>(outputs[0]);
+    float *outputFloat = reinterpret_cast<float *>(outputs[0]);
+    int32_t *outputInt = reinterpret_cast<int32_t *>(outputs[0]);
+    uint8_t *outputUint8 = reinterpret_cast<uint8_t *>(outputs[0]);
     bool isOutputFloat = (output_format_.at(0).type == DataType::Float32);
     bool isOutputUint8 = (output_format_.at(0).type == DataType::Uint8);
 

@@ -53,8 +53,8 @@ inline TfLiteType DataType2TfType(DataType::Type type) {
 const float kCroppingFraction = 0.875;
 }  // namespace
 
-Imagenet::Imagenet(Backend* backend, const std::string& image_dir,
-                   const std::string& groundtruth_file, int offset,
+Imagenet::Imagenet(Backend *backend, const std::string &image_dir,
+                   const std::string &groundtruth_file, int offset,
                    int image_width, int image_height)
     : Dataset(backend),
       groundtruth_file_(groundtruth_file),
@@ -68,14 +68,13 @@ Imagenet::Imagenet(Backend* backend, const std::string& image_dir,
 
   // Finds all images under image_dir.
   std::unordered_set<std::string> exts{".rgb8", ".jpg", ".jpeg"};
-  TfLiteStatus ret = tflite::evaluation::GetSortedFileNames(
-      tflite::evaluation::StripTrailingSlashes(image_dir), &image_list_, exts);
-  if (ret == kTfLiteError || image_list_.empty()) {
+  image_list_ = GetSortedFileNames(image_dir, exts);
+  if (image_list_.empty()) {
     LOG(FATAL) << "Failed to list all the images file in provided path";
     return;
   }
   samples_ = std::vector<
-      std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>>*>>(
+      std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>> *>>(
       image_list_.size());
   // Prepares the preprocessing stage.
   tflite::evaluation::ImagePreprocessingConfigBuilder builder(
@@ -91,7 +90,7 @@ Imagenet::Imagenet(Backend* backend, const std::string& image_dir,
   }
 }
 
-void Imagenet::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
+void Imagenet::LoadSamplesToRam(const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
     // Preprocessing.
     if (sample_idx >= image_list_.size()) {
@@ -105,11 +104,11 @@ void Imagenet::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
 
     // Move data out of preprocessing_stage_ so it can be reused.
     int total_byte = input_format_[0].size * GetByte(input_format_[0]);
-    void* data_void = preprocessing_stage_->GetPreprocessedImageData();
-    std::vector<uint8_t, BackendAllocator<uint8_t>>* data_uint8 =
+    void *data_void = preprocessing_stage_->GetPreprocessedImageData();
+    std::vector<uint8_t, BackendAllocator<uint8_t>> *data_uint8 =
         new std::vector<uint8_t, BackendAllocator<uint8_t>>(total_byte);
-    std::copy(static_cast<uint8_t*>(data_void),
-              static_cast<uint8_t*>(data_void) + total_byte,
+    std::copy(static_cast<uint8_t *>(data_void),
+              static_cast<uint8_t *>(data_void) + total_byte,
               data_uint8->begin());
 
     // Allow backend to convert data layout if needed
@@ -121,9 +120,9 @@ void Imagenet::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
 }
 
 void Imagenet::UnloadSamplesFromRam(
-    const std::vector<QuerySampleIndex>& samples) {
+    const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
-    for (std::vector<uint8_t, BackendAllocator<uint8_t>>* v :
+    for (std::vector<uint8_t, BackendAllocator<uint8_t>> *v :
          samples_.at(sample_idx)) {
       delete v;
     }
@@ -132,29 +131,30 @@ void Imagenet::UnloadSamplesFromRam(
 }
 
 std::vector<uint8_t> Imagenet::ProcessOutput(
-    const int sample_idx, const std::vector<void*>& outputs) {
+    const int sample_idx, const std::vector<void *> &outputs) {
   std::vector<int32_t> topk;
-  void* output = outputs.at(0);
+  void *output = outputs.at(0);
   int data_size = output_format_[0].size;
   switch (output_format_[0].type) {
     case DataType::Float32:
-      topk = GetTopK(reinterpret_cast<float*>(output), data_size, 1, offset_);
+      topk = GetTopK(reinterpret_cast<float *>(output), data_size, 1, offset_);
       break;
     case DataType::Uint8:
-      topk = GetTopK(reinterpret_cast<uint8_t*>(output), data_size, 1, offset_);
+      topk =
+          GetTopK(reinterpret_cast<uint8_t *>(output), data_size, 1, offset_);
       break;
     case DataType::Int8:
-      topk = GetTopK(reinterpret_cast<int8_t*>(output), data_size, 1, offset_);
+      topk = GetTopK(reinterpret_cast<int8_t *>(output), data_size, 1, offset_);
       break;
     case DataType::Float16:
       topk =
-          GetTopK(reinterpret_cast<uint16_t*>(output), data_size, 1, offset_);
+          GetTopK(reinterpret_cast<uint16_t *>(output), data_size, 1, offset_);
       break;
   }
   // Mlperf interpret data as uint8_t* and log it as a HEX string.
   predictions_[sample_idx] = topk.at(0);
   std::vector<uint8_t> result(topk.size() * 4);
-  uint8_t* temp_data = reinterpret_cast<uint8_t*>(topk.data());
+  uint8_t *temp_data = reinterpret_cast<uint8_t *>(topk.data());
   std::copy(temp_data, temp_data + result.size(), result.begin());
   return result;
 }
@@ -172,7 +172,7 @@ float Imagenet::ComputeAccuracy() {
 
   // Read the result in mlpef log file and calculate the accuracy.
   int good = 0;
-  for (auto const& element : predictions_) {
+  for (auto const &element : predictions_) {
     if (groundtruth[element.first] == element.second) good++;
   }
   return static_cast<float>(good) / predictions_.size();
