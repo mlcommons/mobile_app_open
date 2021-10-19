@@ -25,12 +25,12 @@ limitations under the License.
 #if __ANDROID__
 #include <sys/system_properties.h>
 
+#include "tensorflow/core/platform/logging.h"
 #include "tensorflow/lite/delegates/gpu/delegate.h"
 #include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
-#include "tensorflow/core/platform/logging.h"
 #endif
-#include "tflite_settings_pixel.h"
 #include "resize_argmax_op.h"
+#include "tflite_settings_pixel.h"
 #include "thread_pool.h"
 
 #define N_OFFLINE_INTEPRETERS 8
@@ -89,8 +89,19 @@ bool mlperf_backend_matches_hardware(const char** not_allowed_message,
                                      const mlperf_device_info_t* device_info) {
   *not_allowed_message = nullptr;
   *settings = tflite_settings.c_str();
-  printf("TFLite backend matches hardware");
-  return true;
+
+  if (device_info && device_info->model && device_info->manufacturer) {
+    LOG(INFO) << "Pixel HW supported check: model: " << device_info->model
+              << ", manufacturer: " << device_info->manufacturer;
+
+    if (strcmp(device_info->manufacturer, "Google") == 0 &&
+        strstr(device_info->model, "Pixel 6") != NULL) {
+      printf("Pixel backend matches hardware");
+      return true;
+    }
+  }
+
+  return false;
 }
 
 #if __ANDROID__
@@ -135,11 +146,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
   // Create interpreter options function.
   auto create_option = [&](TfLiteInterpreterOptions*& option_ptr) -> void {
     option_ptr = TfLiteInterpreterOptionsCreate();
-    TfLiteInterpreterOptionsAddCustomOp(option_ptr,
-      "ResizeArgmax",
-      Register_ResizeArgmax(),
-      1,
-      999);
+    TfLiteInterpreterOptionsAddCustomOp(option_ptr, "ResizeArgmax",
+                                        Register_ResizeArgmax(), 1, 999);
     TfLiteDelegate* delegate = nullptr;
 
     for (int i = 0; i < configs->count; ++i) {
@@ -147,7 +155,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
         TfLiteInterpreterOptionsSetNumThreads(option_ptr,
                                               atoi(configs->values[i]));
       }
-  #if __ANDROID__
+#if __ANDROID__
       if (!is_emulator() && ((strcmp(configs->accelerator, "gpu_f16") == 0) ||
                              (strcmp(configs->accelerator, "gpu") == 0))) {
         auto options = TfLiteGpuDelegateOptionsV2Default();
@@ -166,7 +174,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
       if (delegate != nullptr) {
         TfLiteInterpreterOptionsAddDelegate(option_ptr, delegate);
       }
-  #endif
+#endif
     }
   };
 
@@ -208,42 +216,45 @@ mlperf_backend_ptr_t mlperf_backend_create(
   for (int i = 0; i < N_OFFLINE_INTEPRETERS; i++) {
     backend_data->acc_data[i] =
         (void**)malloc(sizeof(void*) * backend_data->input_tensor_count);
-    memset(backend_data->acc_data[i], 0, sizeof(void*) * backend_data->input_tensor_count);
+    memset(backend_data->acc_data[i], 0,
+           sizeof(void*) * backend_data->input_tensor_count);
   }
 
   for (int k = 0; k < N_OFFLINE_INTEPRETERS; k++) {
-    for (int i=0; i<backend_data->input_tensor_count; ++i) {
+    for (int i = 0; i < backend_data->input_tensor_count; ++i) {
       TfLiteTensor* tensor =
-        TfLiteInterpreterGetInputTensor(backend_data->interpreter[k], i);
+          TfLiteInterpreterGetInputTensor(backend_data->interpreter[k], i);
       int32_t* dims = (int32_t*)malloc(sizeof(int32_t) * tensor->dims->size);
       dims[0] = 1;
       for (int i = 1; i < tensor->dims->size; i++) {
         dims[i] = tensor->dims->data[i];
       }
-      TfLiteInterpreterResizeInputTensor(backend_data->interpreter[k], i,
-                                       dims, tensor->dims->size);
+      TfLiteInterpreterResizeInputTensor(backend_data->interpreter[k], i, dims,
+                                         tensor->dims->size);
       free(dims);
     }
-    if (kTfLiteOk != TfLiteInterpreterAllocateTensors(backend_data->interpreter[k])) {
+    if (kTfLiteOk !=
+        TfLiteInterpreterAllocateTensors(backend_data->interpreter[k])) {
       printf("Failed to allocate tensors");
       return nullptr;
     }
   }
 
   for (int k = 0; k < N_OFFLINE_INTEPRETERS; k++) {
-    for (int i=0; i<backend_data->input_tensor_count; ++i) {
+    for (int i = 0; i < backend_data->input_tensor_count; ++i) {
       TfLiteTensor* tensor =
-        TfLiteInterpreterGetInputTensor(backend_data->interpreter8[k], i);
+          TfLiteInterpreterGetInputTensor(backend_data->interpreter8[k], i);
       int32_t* dims = (int32_t*)malloc(sizeof(int32_t) * tensor->dims->size);
       dims[0] = 8;
       for (int i = 1; i < tensor->dims->size; i++) {
         dims[i] = tensor->dims->data[i];
       }
-      TfLiteInterpreterResizeInputTensor(backend_data->interpreter8[k], i,
-                                       dims, tensor->dims->size);
+      TfLiteInterpreterResizeInputTensor(backend_data->interpreter8[k], i, dims,
+                                         tensor->dims->size);
       free(dims);
     }
-    if (kTfLiteOk != TfLiteInterpreterAllocateTensors(backend_data->interpreter8[k])) {
+    if (kTfLiteOk !=
+        TfLiteInterpreterAllocateTensors(backend_data->interpreter8[k])) {
       printf("Failed to allocate tensors");
       break;
     }
@@ -348,14 +359,17 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
 
   TfLiteTensor* tensor = nullptr;
   if (backend_data->use_shard) {
-    tensor = TfLiteInterpreterGetInputTensor(backend_data->interpreter8[shard], i);
+    tensor =
+        TfLiteInterpreterGetInputTensor(backend_data->interpreter8[shard], i);
   } else {
-    tensor = TfLiteInterpreterGetInputTensor(backend_data->interpreter[shard], i);
+    tensor =
+        TfLiteInterpreterGetInputTensor(backend_data->interpreter[shard], i);
   }
   if (real_batch_index == 0 && backend_data->use_shard == false) {
     if (backend_data->original_tensor_size == 0) {
       backend_data->original_tensor_size = tensor->bytes;
-      memcpy((char*)tensor->data.raw, (char*)data, backend_data->original_tensor_size);
+      memcpy((char*)tensor->data.raw, (char*)data,
+             backend_data->original_tensor_size);
       backend_data->has_temp_data = true;
     } else {
       tensor->data.raw = (char*)data;
@@ -364,26 +378,28 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
 
   if (backend_data->use_shard) {
     if (backend_data->acc_data[shard][i] == nullptr) {
-      backend_data->acc_data[shard][i] = malloc(real_batch_size * backend_data->original_tensor_size);
+      backend_data->acc_data[shard][i] =
+          malloc(real_batch_size * backend_data->original_tensor_size);
     }
     if (backend_data->has_temp_data) {
-      TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(backend_data->interpreter[shard], i);
-      memcpy(
-          (char*)backend_data->acc_data[shard][i],
-          (char*)tensor->data.raw, backend_data->original_tensor_size);
+      TfLiteTensor* tensor =
+          TfLiteInterpreterGetInputTensor(backend_data->interpreter[shard], i);
+      memcpy((char*)backend_data->acc_data[shard][i], (char*)tensor->data.raw,
+             backend_data->original_tensor_size);
       backend_data->has_temp_data = false;
     }
-    memcpy(
-        ((char*)backend_data->acc_data[shard][i] +
-         ((batch_index % real_batch_size) * backend_data->original_tensor_size)),
-        data, backend_data->original_tensor_size);
+    memcpy(((char*)backend_data->acc_data[shard][i] +
+            ((batch_index % real_batch_size) *
+             backend_data->original_tensor_size)),
+           data, backend_data->original_tensor_size);
     if (real_batch_index == (real_batch_size - 1)) {
       tensor->data.raw = (char*)backend_data->acc_data[shard][i];
     }
   }
 
   // Allocate tensors.
-  if (((batch_index+1) % real_batch_size) == 0 && i == (backend_data->input_tensor_count - 1)) {
+  if (((batch_index + 1) % real_batch_size) == 0 &&
+      i == (backend_data->input_tensor_count - 1)) {
     auto task = [](TFLiteBackendData* backend_data, int index) -> TfLiteStatus {
       if (backend_data->use_shard) {
         return TfLiteInterpreterInvoke(backend_data->interpreter8[index]);
@@ -394,7 +410,8 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
 
     // dispatch workers
     if (backend_data->use_shard) {
-      backend_data->status[shard] = backend_data->executer->submit(task, backend_data, shard);
+      backend_data->status[shard] =
+          backend_data->executer->submit(task, backend_data, shard);
     }
   }
 
@@ -433,9 +450,10 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                           void** data) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   const int real_batch_size =
-      (backend_data->use_shard) ? backend_data->batch_size / N_OFFLINE_INTEPRETERS : 1;
+      (backend_data->use_shard)
+          ? backend_data->batch_size / N_OFFLINE_INTEPRETERS
+          : 1;
   const int shard = batch_index / (real_batch_size);
-
 
   if (backend_data->use_shard) {
     if (backend_data->status[shard].valid()) {
@@ -448,9 +466,11 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
 
   const TfLiteTensor* output_tensor;
   if (backend_data->use_shard) {
-    output_tensor = TfLiteInterpreterGetOutputTensor(backend_data->interpreter8[shard], i);
+    output_tensor =
+        TfLiteInterpreterGetOutputTensor(backend_data->interpreter8[shard], i);
   } else {
-    output_tensor = TfLiteInterpreterGetOutputTensor(backend_data->interpreter[shard], i);
+    output_tensor =
+        TfLiteInterpreterGetOutputTensor(backend_data->interpreter[shard], i);
   }
   batch_index %= (real_batch_size);
   int non_batch_size = 1;
