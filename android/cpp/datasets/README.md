@@ -23,7 +23,7 @@ python upscale_coco.py --inputs /path-to-coco/ --outputs /output-path/ --size 30
 ```
 
 The ground truth file is
-[coco_val.pbtxt](https://github.com/mlcommons/mobile_app/blob/c8075ac367554cae98b1508c4a5ab14d14c5885c/java/org/mlperf/inference/assets/coco_val.pbtxt).
+[coco_val_full.pbtxt](https://github.com/mlcommons/mobile_models/blob/b2519b57de06c347a4600851b47e45ce45d5919f/v1_0/assets/coco_val_full.pbtxt).
 If you want to use a subset of images, remember to use the first N images which appear
 in the file instances_val2017.json. **Note** that the order of images in this
 file and the order of images under the images directory are not the same.
