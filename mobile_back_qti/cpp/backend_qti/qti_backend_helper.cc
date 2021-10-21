@@ -40,6 +40,8 @@ limitations under the License.
 
 int isSignedStatus = DEFAULT;
 
+enum snpe_runtimes_t { SNPE_DSP = 0, SNPE_AIP = 1, SNPE_GPU = 2, SNPE_CPU = 3 };
+
 static long calcSizeFromDims(const size_t rank,
                              const zdl::DlSystem::Dimension *dims) {
   if (rank == 0) return 0;
@@ -94,61 +96,61 @@ static std::vector<size_t> calcStrides(zdl::DlSystem::TensorShape dims,
   return strides;
 }
 
-static zdl::DlSystem::Runtime_t Str2Delegate(const std::string &delegate) {
-  if (absl::AsciiStrToLower(delegate) == "snpe dsp") {
-    if (!zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-            zdl::DlSystem::Runtime_t::DSP,
-            zdl::DlSystem::RuntimeCheckOption_t::BASIC_CHECK)) {
-      // This platform supports DSP runtime
-      LOG(FATAL) << "DSP runtime is not available on this platform";
-    } else {
-      if (isSignedStatus == DEFAULT) {
+static zdl::DlSystem::Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
+  zdl::DlSystem::Runtime_t runtime;
+  bool isDSP = false;
+
+  switch (delegate) {
+    case SNPE_DSP:
+      runtime = zdl::DlSystem::Runtime_t::DSP;
+      isDSP = true;
+      break;
+    case SNPE_AIP:
+      runtime = zdl::DlSystem::Runtime_t::AIP_FIXED_TF;
+      isDSP = true;
+      break;
+    case SNPE_GPU:
+      runtime = zdl::DlSystem::Runtime_t::GPU;
+      break;
+    case SNPE_CPU:
+      runtime = zdl::DlSystem::Runtime_t::CPU;
+      break;
+    default:
+      LOG(ERROR) << "runtime not supported";
+      break;
+  }
+
+  if (isDSP) {
+    if (isSignedStatus == DEFAULT) {
+      if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
+              runtime, zdl::DlSystem::RuntimeCheckOption_t::NORMAL_CHECK)) {
+        isSignedStatus = SIGNED_PD;
+        LOG(INFO) << "runtime " << delegate
+                  << " is available on this platform with SignedPD";
+      } else {
         if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-                zdl::DlSystem::Runtime_t::DSP,
-                zdl::DlSystem::RuntimeCheckOption_t::NORMAL_CHECK)) {
-          isSignedStatus = SIGNED_PD;
-          LOG(INFO)
-              << "DSP runtime is available on this platform with SignedPD";
-        } else {
+                runtime,
+                zdl::DlSystem::RuntimeCheckOption_t::UNSIGNEDPD_CHECK)) {
           isSignedStatus = UNSIGNED_PD;
-          LOG(INFO)
-              << "DSP runtime is available on this platform with UnSignedPD";
+          LOG(INFO) << "runtime " << delegate
+                    << " is available on this platform with UnsignedPD";
+        } else {
+          // This platform doesn't support DSP runtime
+          LOG(FATAL) << "runtime " << delegate
+                     << " is not available on this platform";
         }
       }
-      return zdl::DlSystem::Runtime_t::DSP;
     }
-  } else if (absl::AsciiStrToLower(delegate) == "snpe aip") {
-    if (!zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-            zdl::DlSystem::Runtime_t::AIP_FIXED_TF,
-            zdl::DlSystem::RuntimeCheckOption_t::BASIC_CHECK)) {
-      // This platform supports AIP runtime
-      LOG(FATAL) << "AIP runtime is not available on this platform";
+    return runtime;
+  } else {
+    if (!zdl::SNPE::SNPEFactory::isRuntimeAvailable(runtime)) {
+      LOG(FATAL) << "runtime " << delegate
+                 << " is not available on this platform";
     } else {
-      if (isSignedStatus == DEFAULT) {
-        if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-                zdl::DlSystem::Runtime_t::AIP_FIXED_TF,
-                zdl::DlSystem::RuntimeCheckOption_t::NORMAL_CHECK)) {
-          isSignedStatus = SIGNED_PD;
-          LOG(INFO)
-              << "AIP runtime is available on this platform with SignedPD";
-        } else {
-          isSignedStatus = UNSIGNED_PD;
-          LOG(INFO)
-              << "AIP runtime is available on this platform with UnSignedPD";
-        }
-      }
-      return zdl::DlSystem::Runtime_t::AIP_FIXED_TF;
-    }
-  } else if (absl::AsciiStrToLower(delegate) == "snpe gpu") {
-    if (!zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-            zdl::DlSystem::Runtime_t::GPU)) {
-      LOG(FATAL) << "GPU runtime is not available on this platform";
-    } else {
-      LOG(INFO) << "GPU runtime is available on this platform";
-      return zdl::DlSystem::Runtime_t::GPU;
+      LOG(INFO) << "runtime " << delegate << " is available on this platform";
+      return runtime;
     }
   }
-  return zdl::DlSystem::Runtime_t::CPU;
 }
 
 void QTIBackendHelper::use_psnpe(const char *model_path) {
@@ -177,7 +179,7 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
         zdl::PSNPE::InputOutputTransmissionMode::sync;
 
     zdl::DlSystem::StringList outputLayers =
-        ResolveOutputLayerNames(snpe_output_layers_);
+        ResolveOutputLayerNames(snpeOutputLayers_);
 
     zdl::SNPE::SNPEBuilder snpeBuilder(container.get());
     snpeBuilder.setOutputLayers(outputLayers);
@@ -193,10 +195,12 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
     }
 
     // These features are not for SDM865, so turning them off.
-    if (useDspFeatures && soc_id == SDM888) {
+    if (useDspFeatures && (soc_id == SDM888 || soc_id == SDM778)) {
       // use Zero copy for input and output buffers.
       // Requires rpc registered ion buffers.
-      platformOptionStr += ";useDspZeroCopy:ON";
+      if (useIonBuffers_) {
+        platformOptionStr += ";useDspZeroCopy:ON";
+      }
       platformOptionStr += ";dspPowerSettingContext:ON";
       buildConfig.enableInitCache = true;
     }
@@ -239,10 +243,9 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
 
     zdl::SNPE::SNPEBuilder snpeBuilder(container.get());
     zdl::DlSystem::StringList outputLayers =
-        ResolveOutputLayerNames(snpe_output_layers_);
+        ResolveOutputLayerNames(snpeOutputLayers_);
 
-    snpeBuilder
-        .setPerformanceProfile(zdl::DlSystem::PerformanceProfile_t::BURST)
+    snpeBuilder.setPerformanceProfile(perfProfile_)
         .setExecutionPriorityHint(zdl::DlSystem::ExecutionPriorityHint_t::HIGH)
         .setRuntimeProcessorOrder(inputRuntimeList)
         .setUseUserSuppliedBuffers(true)
@@ -255,10 +258,12 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
     }
 
     // These features are not for SDM865, so turning them off.
-    if (useDspFeatures && soc_id == SDM888) {
+    if (useDspFeatures && (soc_id == SDM888 || soc_id == SDM778)) {
       // use Zero copy for input and output buffers.
       // Requires rpc registered ion buffers.
-      platformOptionStr += ";useDspZeroCopy:ON";
+      if (useIonBuffers_) {
+        platformOptionStr += ";useDspZeroCopy:ON";
+      }
       platformOptionStr += ";dspPowerSettingContext:ON";
       snpeBuilder.setInitCacheMode(true);
     }
@@ -288,52 +293,63 @@ inline int QTIBackendHelper::get_num_inits() {
   }
 }
 
-void QTIBackendHelper::get_accelerator_instances(int &numDSP, int &numAIP,
-                                                 int &numGPU, int &numCPU) {
+void QTIBackendHelper::get_accelerator_instances(int &num_dsp, int &num_aip,
+                                                 int &num_gpu, int &num_cpu) {
   uint32_t soc_id = CpuCtrl::getSocId();
   std::string &delegate = delegate_;
+  num_dsp = 0;
+  num_aip = 0;
+  num_gpu = 0;
+  num_cpu = 0;
   if (scenario_ == "Offline") {
     // For 865 use DSP+AIP
     if (soc_id == SDM865) {
-      if (delegate != "snpe aip" && delegate != "psnpe aip") {
+      if (delegate != "snpe_aip" && delegate != "psnpe_aip") {
         LOG(FATAL) << "Error: Unsupported delegate for offline mode";
       }
       useDspFeatures = true;
-      numDSP = 2;
-      numAIP = 6;
+      num_dsp = 1;
+      num_aip = 6;
     } else if (soc_id == SDM888) {
-      if (delegate != "snpe dsp" && delegate != "psnpe dsp") {
+      if (delegate != "snpe_dsp" && delegate != "psnpe_dsp") {
         LOG(FATAL) << "Error: Unsupported delegate for offline mode";
       }
       useDspFeatures = true;
-      numDSP = 2;
-      numAIP = 0;
+      num_dsp = 2;
+      num_gpu = 4;
+    } else if (soc_id == SDM778) {
+      if (delegate != "snpe_dsp" && delegate != "psnpe_dsp") {
+        LOG(FATAL) << "Error: Unsupported delegate for offline mode";
+      }
+      useDspFeatures = true;
+      num_dsp = 2;
+      num_gpu = 4;
     }
   } else {
-    if (delegate == "snpe dsp" || delegate == "psnpe dsp") {
-      numDSP = 1;
+    if (delegate == "snpe_dsp" || delegate == "psnpe_dsp") {
+      num_dsp = 1;
       useDspFeatures = true;
-    } else if (delegate == "snpe aip" || delegate == "psnpe aip") {
-      numAIP = 1;
+    } else if (delegate == "snpe_aip" || delegate == "psnpe_aip") {
+      num_aip = 1;
       useDspFeatures = true;
-    } else if (delegate == "snpe gpu" || delegate == "psnpe gpu") {
-      numGPU = 1;
+    } else if (delegate == "snpe_gpu" || delegate == "psnpe_gpu") {
+      num_gpu = 1;
       useDspFeatures = false;
-    } else if (delegate == "snpe cpu" || delegate == "psnpe cpu") {
-      numCPU = 1;
+    } else if (delegate == "snpe_cpu" || delegate == "psnpe_cpu") {
+      num_cpu = 1;
       useDspFeatures = false;
     } else {
       LOG(FATAL) << "Error: Unsupported delegate " << delegate << " SoC ID "
                  << soc_id;
     }
   }
-  LOG(INFO) << "Using " << numDSP << " dsp " << numAIP << " aip " << numGPU
-            << " gpu and " << numCPU << " cpu";
+  LOG(INFO) << "Using " << num_dsp << " dsp " << num_aip << " aip " << num_gpu
+            << " gpu and " << num_cpu << " cpu";
 }
 
 void QTIBackendHelper::map_inputs() {
   zdl::DlSystem::UserBufferMap inputMap;
-  for (int bi = 0; bi < batchSize_ / input_batch_; bi++) {
+  for (int bi = 0; bi < batchSize_ / inputBatch_; bi++) {
     for (const auto &name : networkInputTensorNames_) {
       zdl::DlSystem::IUserBufferFactory &ubFactory =
           zdl::SNPE::SNPEFactory::getUserBufferFactory();
@@ -343,8 +359,8 @@ void QTIBackendHelper::map_inputs() {
       std::vector<size_t> strides;
       std::unique_ptr<zdl::DlSystem::IUserBuffer> ubPtr;
 
-      if ((*ubaOpt)->getEncodingType() ==
-          zdl::DlSystem::UserBufferEncoding::ElementType_t::FLOAT) {
+      LOG(INFO) << "inputbuffer: " << inputBufferType_ << " name: " << name;
+      if (inputBufferType_ == QTIBufferType::FLOAT_32) {
         // Prepare float buffer
         bufSize *= sizeof(float);
         std::vector<uint8_t> inputBuffer(bufSize);
@@ -369,7 +385,7 @@ void QTIBackendHelper::map_inputs() {
         // Set the default QP for model which doesn't have QP.
         // HTP may not need to use the QP for the current set of DLCs
         // This may be required for AIP though.
-        LOG(INFO) << "QP parameters from model: " << ubeTfN;
+        // LOG(INFO) << "QP parameters from model: " << ubeTfN;
         if (!ubeTfN) ubeTfN = &temp;
 
         ubPtr = ubFactory.createUserBuffer(std::move(inputBuffer.data()),
@@ -379,29 +395,47 @@ void QTIBackendHelper::map_inputs() {
     }
     inputMap_.push_back(inputMap);
   }
-  bufs_.resize(batchSize_ / input_batch_);
+  bufs_.resize(batchSize_ / inputBatch_);
 }
 
 void QTIBackendHelper::map_outputs() {
   zdl::DlSystem::UserBufferMap outputMap;
   zdl::DlSystem::IUserBufferFactory &ubFactory =
       zdl::SNPE::SNPEFactory::getUserBufferFactory();
-  for (int bi = 0; bi < batchSize_ / input_batch_; bi++) {
+  for (int bi = 0; bi < batchSize_ / inputBatch_; bi++) {
     for (const auto &name : networkOutputTensorNames_) {
       auto ubaOpt = snpe_->getInputOutputBufferAttributes(name);
       long bufSize = calcSizeFromDims((*ubaOpt)->getDims().rank(),
                                       (*ubaOpt)->getDims().getDimensions());
 
-      output_batch_bufsize_ = bufSize;
-      zdl::DlSystem::UserBufferEncodingFloat userBufferEncodingFloat;
-      bufs_[bi].emplace(
-          std::string(name),
-          std::vector<uint8_t, Allocator<uint8_t>>(bufSize * sizeof(float)));
-      auto x = ubFactory.createUserBuffer(
-          bufs_[bi].at(name).data(), bufSize * sizeof(float),
-          calcStrides((*ubaOpt)->getDims(), sizeof(float)),
-          &userBufferEncodingFloat);
-      outputMap.add(name, x.release());
+      outputBatchBufsize_ = bufSize;
+      LOG(INFO) << "outputBufferType: " << outputBufferType_
+                << " name: " << name;
+      if (useIonBuffers_) {
+        Allocator<uint8_t>::useIonAllocator();
+      } else {
+        Allocator<uint8_t>::useDefaultAllocator();
+      }
+      if (outputBufferType_ == QTIBufferType::UINT_8) {
+        zdl::DlSystem::UserBufferEncodingTfN ubeTfN(0, 1.0f, 8);
+        bufs_[bi].emplace(std::string(name),
+                          std::vector<uint8_t, Allocator<uint8_t>>(
+                              bufSize * sizeof(uint8_t)));
+        auto x = ubFactory.createUserBuffer(
+            bufs_[bi].at(name).data(), bufSize * sizeof(uint8_t),
+            calcStrides((*ubaOpt)->getDims(), sizeof(uint8_t)), &ubeTfN);
+        outputMap.add(name, x.release());
+      } else {
+        zdl::DlSystem::UserBufferEncodingFloat userBufferEncodingFloat;
+        bufs_[bi].emplace(
+            std::string(name),
+            std::vector<uint8_t, Allocator<uint8_t>>(bufSize * sizeof(float)));
+        auto x = ubFactory.createUserBuffer(
+            bufs_[bi].at(name).data(), bufSize * sizeof(float),
+            calcStrides((*ubaOpt)->getDims(), sizeof(float)),
+            &userBufferEncodingFloat);
+        outputMap.add(name, x.release());
+      }
     }
     outputMap_.push_back(outputMap);
   }
@@ -416,14 +450,21 @@ void QTIBackendHelper::get_data_formats() {
 
   zdl::DlSystem::TensorShape tensorShape;
   tensorShape = snpe_->getInputDimensions();
-  input_batch_ = tensorShape.getDimensions()[0];
+  inputBatch_ = tensorShape.getDimensions()[0];
 
   for (const auto &name : networkInputTensorNames_) {
     auto ubaOpt = snpe_->getInputOutputBufferAttributes(name);
     long bufSize = calcSizeFromDims((*ubaOpt)->getDims().rank(),
                                     (*ubaOpt)->getDims().getDimensions());
-    input_format_.push_back(
-        {mlperf_data_t::Type::Uint8, bufSize / input_batch_});
+    if (inputBufferType_ == FLOAT_32) {
+      // Input buffer type FLOAT
+      inputFormat_.push_back(
+          {mlperf_data_t::Type::Float32, bufSize / inputBatch_});
+    } else {
+      // Input buffer type UINT8
+      inputFormat_.push_back(
+          {mlperf_data_t::Type::Uint8, bufSize / inputBatch_});
+    }
   }
 
   const auto &strList_output = snpe_->getOutputTensorNames();
@@ -436,8 +477,28 @@ void QTIBackendHelper::get_data_formats() {
     auto ubaOpt = snpe_->getInputOutputBufferAttributes(name);
     long bufSize = calcSizeFromDims((*ubaOpt)->getDims().rank(),
                                     (*ubaOpt)->getDims().getDimensions());
-    output_format_.push_back(
-        {mlperf_data_t::Type::Float32, bufSize / input_batch_});
+    if (outputBufferType_ == FLOAT_32) {
+      if (snpeOutputLayers_ == "transpose") {
+        // For mobileBERT, return output size as half the size of computed
+        // values,
+        // because the DLC returns only single layer as output but the app needs
+        // 2 tensors,
+        // split from the single tensor
+        bufSize = bufSize / 2;
+        outputFormat_.push_back(
+            {mlperf_data_t::Type::Float32, bufSize / inputBatch_});
+        outputFormat_.push_back(
+            {mlperf_data_t::Type::Float32, bufSize / inputBatch_});
+      } else {
+        // output buffer type FLOAT
+        outputFormat_.push_back(
+            {mlperf_data_t::Type::Float32, bufSize / inputBatch_});
+      }
+    } else {
+      // output buffer type UINT8
+      outputFormat_.push_back(
+          {mlperf_data_t::Type::Uint8, bufSize / inputBatch_});
+    }
   }
 }
 
@@ -448,44 +509,44 @@ void QTIBackendHelper::set_runtime_config() {
   zdl::DlSystem::Runtime_t runtime;
   for (int i = 0; i < numDSP; i++) {
     if (i == 0) {
-      runtime = Str2Delegate("snpe dsp");
+      runtime = Str2Delegate(SNPE_DSP);
     }
     zdl::PSNPE::RuntimeConfig runtimeConfig;
     runtimeConfig.runtime = runtime;
-    runtimeConfig.perfProfile = zdl::DlSystem::PerformanceProfile_t::BURST;
+    runtimeConfig.perfProfile = perfProfile_;
     runtimeConfigsList.push_back(runtimeConfig);
     inputRuntimeList.add(runtime);
   }
 
   for (int i = 0; i < numAIP; i++) {
     if (i == 0) {
-      runtime = Str2Delegate("snpe aip");
+      runtime = Str2Delegate(SNPE_AIP);
     }
     zdl::PSNPE::RuntimeConfig runtimeConfig;
     runtimeConfig.runtime = runtime;
-    runtimeConfig.perfProfile = zdl::DlSystem::PerformanceProfile_t::BURST;
+    runtimeConfig.perfProfile = perfProfile_;
     runtimeConfigsList.push_back(runtimeConfig);
     inputRuntimeList.add(runtime);
   }
 
   for (int i = 0; i < numGPU; i++) {
     if (i == 0) {
-      runtime = Str2Delegate("snpe gpu");
+      runtime = Str2Delegate(SNPE_GPU);
     }
     zdl::PSNPE::RuntimeConfig runtimeConfig;
     runtimeConfig.runtime = runtime;
-    runtimeConfig.perfProfile = zdl::DlSystem::PerformanceProfile_t::BURST;
+    runtimeConfig.perfProfile = perfProfile_;
     runtimeConfigsList.push_back(runtimeConfig);
     inputRuntimeList.add(runtime);
   }
 
   for (int i = 0; i < numCPU; i++) {
     if (i == 0) {
-      runtime = Str2Delegate("snpe cpu");
+      runtime = Str2Delegate(SNPE_CPU);
     }
     zdl::PSNPE::RuntimeConfig runtimeConfig;
     runtimeConfig.runtime = runtime;
-    runtimeConfig.perfProfile = zdl::DlSystem::PerformanceProfile_t::BURST;
+    runtimeConfig.perfProfile = perfProfile_;
     runtimeConfigsList.push_back(runtimeConfig);
     inputRuntimeList.add(runtime);
   }

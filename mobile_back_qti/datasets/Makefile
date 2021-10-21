@@ -22,7 +22,8 @@ dependencies:
 
 ${BUILDDIR}/datasets.stamp: dependencies ${BUILDDIR}/ade20k/ade20k_out/.stamp \
 		${BUILDDIR}/coco/coco-out/.stamp \
-		${BUILDDIR}/imagenet/imagenet-out/.stamp
+		${BUILDDIR}/imagenet/imagenet-out/.stamp \
+		${BUILDDIR}/SQUAD/SQUAD_out/.stamp
 	@touch $@
 
 # ADE20K
@@ -37,13 +38,19 @@ ${BUILDDIR}/coco/coco-out/.stamp:
 ${BUILDDIR}/imagenet/imagenet-out/.stamp:
 	@(cd imagenet && make)
 
+# SQUAD
+${BUILDDIR}/SQUAD/SQUAD_out/.stamp:
+	@(cd squad && make)
+
 clean:
 	@(cd ade20k && make clean)
 	@(cd coco && make clean)
 	@(cd imagenet && make clean)
+	@(cd squad && make clean)
 	@rm ${BUILDDIR}/datasets.stamp
 
 clean_downloads:
 	@(cd ade20k && make clean_downloads)
 	@(cd coco && make clean_downloads)
 	@(cd imagenet && make clean_downloads)
+	@(cd squad && make clean_downloads)

@@ -15,27 +15,31 @@ limitations under the License.
 
 #include "rpcmem.h"
 
+#include "cpuctrl.h"
 #include "tensorflow/core/platform/logging.h"
 
 RpcMem::RpcMem() {
-  libHandle_ = dlopen("libadsprpc.so", RTLD_NOW);
+  if (CpuCtrl::getSocId() != SDM865) {
+    libHandle_ = dlopen("libcdsprpc.so", RTLD_NOW);
+  } else {
+    libHandle_ = nullptr;
+  }
 
   if (libHandle_ == nullptr) {
     LOG(ERROR) << "Can't open rpc lib";
     isSuccess_ = false;
   } else {
-    rpcmem_alloc =
+    rpcmemAlloc_ =
         reinterpret_cast<RpcMemAllocPtr>(dlsym(libHandle_, "rpcmem_alloc"));
-    rpcmem_free =
+    rpcmemFree_ =
         reinterpret_cast<RpcMemFreePtr>(dlsym(libHandle_, "rpcmem_free"));
 
-    if (rpcmem_alloc && rpcmem_free) {
+    if (rpcmemAlloc_ && rpcmemFree_) {
       isSuccess_ = true;
     } else {
       isSuccess_ = false;
+      LOG(ERROR) << "Unable to dlsym rpcmem functions";
     }
-
-    LOG(ERROR) << "Able to open rpc lib. " << isSuccess_;
   }
 }
 
@@ -46,7 +50,7 @@ RpcMem::~RpcMem() {
 
 void *RpcMem::Alloc(int id, uint32_t flags, int size) {
   if (isSuccess_) {
-    return rpcmem_alloc(id, flags, size);
+    return rpcmemAlloc_(id, flags, size);
   } else {
     return std::malloc(size);
   }
@@ -56,7 +60,7 @@ void *RpcMem::Alloc(int size) { return Alloc(25, 1, size); }
 
 void RpcMem::Free(void *data) {
   if (isSuccess_) {
-    return rpcmem_free(data);
+    return rpcmemFree_(data);
   } else {
     return std::free(data);
   }

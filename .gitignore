@@ -5,6 +5,7 @@
 /bazel-*
 /output
 /output_logs
+/mobile_back_qti/snpe-*
 *.so
 * .apk
 * .tflite
@@ -12,3 +13,5 @@
 * .zip
 * .jar
 * .tgz
+__pycache__/
+mobile_app_open.iml
