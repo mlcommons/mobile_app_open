@@ -92,8 +92,8 @@ mlperf_backend_ptr_t tflite_backend_create(
     options.allow_fp16 = false;
     options.disallow_nnapi_cpu = true;
     std::string accelerator_name =
-        (delegateStr.find("-") != std::string::npos)
-            ? delegateStr.substr(delegateStr.find('-') + 1)
+        (delegateStr.find("_") != std::string::npos)
+            ? delegateStr.substr(delegateStr.find('_') + 1)
             : std::string();
     options.execution_preference = tflite::StatefulNnApiDelegate::Options::
         ExecutionPreference::kFastSingleAnswer;
@@ -178,7 +178,7 @@ mlperf_data_t tflite_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
 }
 // Set the data for ith input.
 mlperf_status_t tflite_backend_set_input(mlperf_backend_ptr_t backend_ptr,
-                                         int32_t batchIndex, int32_t i,
+                                         int32_t batch_index, int32_t i,
                                          void* data) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   TfLiteTensor* tensor =
@@ -206,7 +206,7 @@ mlperf_data_t tflite_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
 
 // Get the data from ith output.
 mlperf_status_t tflite_backend_get_output(mlperf_backend_ptr_t backend_ptr,
-                                          uint32_t batchIndex, int32_t i,
+                                          uint32_t batch_index, int32_t i,
                                           void** data) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   const TfLiteTensor* output_tensor =
