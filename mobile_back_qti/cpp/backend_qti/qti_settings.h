@@ -375,7 +375,7 @@ benchmark_setting {
     id: "scenario"
     value: "Offline"
   }
-  src: "/sdcard/mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
 }
 
 benchmark_setting {
