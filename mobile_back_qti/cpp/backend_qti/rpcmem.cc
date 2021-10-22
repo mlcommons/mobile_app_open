@@ -14,8 +14,8 @@ limitations under the License.
 ==============================================================================*/
 
 #include "rpcmem.h"
-#include "cpuctrl.h"
 
+#include "cpuctrl.h"
 #include "tensorflow/core/platform/logging.h"
 
 RpcMem::RpcMem() {
