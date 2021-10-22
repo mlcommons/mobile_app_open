@@ -133,13 +133,14 @@ public final class MLPerfTasks {
   }
 
   public static String getResultsJsonPath() {
-    return MLCtx.getInstance().getContext().getExternalFilesDir("mlperf").getAbsolutePath()
-        + "/results.json";
+    return "/sdcard/mlperf_results/mlperf/results.json";
   }
 
   // Update the results.json file.
   public static void resultsToFile(ArrayList<ResultHolder> results, String mode) {
     File resultsFile = new File(MLPerfTasks.getResultsJsonPath());
+    File resultsFileDir = new File(resultsFile.getParent());
+    resultsFileDir.mkdirs();
     FileWriter writer;
     try {
       JSONArray resultsArray = new JSONArray();

@@ -25,7 +25,7 @@ ASSETS=$1
 
 mkdir -p ${ASSETS}
 
-adb pull /sdcard/Android/data/org.mlperf.inference/files/mlperf/results.json ${ASSETS}/results.json
-adb pull /sdcard/Android/data/org.mlperf.inference/files/log_performance ${ASSETS}/log_performance
-adb pull /sdcard/Android/data/org.mlperf.inference/files/log_accuracy ${ASSETS}/log_accuracy
+adb pull /sdcard/mlperf_results/results.json ${ASSETS}/results.json
+adb pull /sdcard/mlperf_results/log_performance ${ASSETS}/log_performance
+adb pull /sdcard/mlperf_results/log_accuracy ${ASSETS}/log_accuracy
 

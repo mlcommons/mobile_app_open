@@ -16,11 +16,11 @@ limitations under the License.
 
 #include <cstdint>
 #include <cstring>
+#include <fstream>
 #include <iomanip>
 #include <limits>
 #include <memory>
 #include <sstream>
-#include <fstream>
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
@@ -56,12 +56,11 @@ Squad::Squad(Backend* backend, const std::string& input_tfrecord,
       sample_reader_(input_tfrecord),
       samples_(sample_reader_.Size()),
       predictions_(sample_reader_.Size()) {
-
-    if (std::ifstream(gt_tfrecord).good()) {
-      gt_reader_ = std::make_unique<TFRecordReader>(gt_tfrecord);
-    } else {
-      LOG(ERROR) << "Could not read the ground truth file";
-    };
+  if (std::ifstream(gt_tfrecord).good()) {
+    gt_reader_ = std::make_unique<TFRecordReader>(gt_tfrecord);
+  } else {
+    LOG(ERROR) << "Could not read the ground truth file";
+  };
 
   // Check input and output formats.
   if (input_format_.size() != 3 || output_format_.size() != 2) {

@@ -21,6 +21,7 @@ limitations under the License.
 #include <memory>
 
 #include "rpcmem.h"
+#include "tensorflow/core/platform/logging.h"
 
 // This allocator assumes all allocations and frees are done in order
 class ChunkAllocator {
@@ -131,29 +132,50 @@ class ChunkAllocator {
 };
 
 template <class T>
-struct Allocator {
+class Allocator {
+ public:
   typedef T value_type;
+  static bool useIonBuffer;
 
   Allocator() = default;
 
   template <class U>
   constexpr Allocator(const Allocator<U> &) noexcept {}
 
-      [[nodiscard]] T *allocate(std::size_t n) {
-    if (auto p = static_cast<T *>(
-            ChunkAllocator::getRpcMem().Alloc(n * sizeof(T)))) {
-      return p;
+  [[nodiscard]] T *allocate(std::size_t n) {
+    T *p;
+    if (useIonBuffer) {
+      p = static_cast<T *>(ChunkAllocator::getRpcMem().Alloc(n * sizeof(T)));
+    } else {
+      p = static_cast<T *>(std::malloc(n * sizeof(T)));
     }
-    return nullptr;
+    return p;
   }
 
   void deallocate(T *p, std::size_t n) noexcept {
-    ChunkAllocator::getRpcMem().Free(p);
+    if (useIonBuffer) {
+      ChunkAllocator::getRpcMem().Free(p);
+    } else {
+      std::free(p);
+    }
+  }
+
+  static void useIonAllocator() {
+    useIonBuffer = true;
+    LOG(INFO) << "Using Ion Allocator";
+  }
+
+  static void useDefaultAllocator() {
+    useIonBuffer = false;
+    LOG(INFO) << "Using Default Allocator";
   }
 };
 
+template <class T>
+bool Allocator<T>::useIonBuffer = true;
+
 static void *get_ion_buffer(size_t n) {
-  void *p = ChunkAllocator::GetBuffer(n, 3);
+  void *p = ChunkAllocator::GetBuffer(n, 4);
   // LOG(INFO) << "QTI backend SNPE allocator " << n << " bytes at " << p;
   return p;
 }

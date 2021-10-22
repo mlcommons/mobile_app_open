@@ -35,7 +35,8 @@ config_setting(
 
 snpe_copts = [
     "-Imobile_back_qti/" + SNPE_VERSION + "/include/zdl",
-    "-fexceptions", "-lc++_shared"
+    "-fexceptions",
+    "-lc++_shared",
 ]
 
 load(
@@ -47,7 +48,10 @@ load(
 cc_library(
     name = "qti_rpcmem",
     srcs = ["rpcmem.cc"],
-    hdrs = ["rpcmem.h"],
+    hdrs = [
+        "cpuctrl.h",
+        "rpcmem.h",
+    ],
     copts = tflite_copts() + snpe_copts,
     deps = ["@org_tensorflow//tensorflow/core:tflite_portable_logging"],
     alwayslink = 1,

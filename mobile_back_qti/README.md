@@ -7,19 +7,19 @@ implementationn of [MLPerf Inference](https://github.com/mlperf/inference) tasks
 
 This repository builds the libqtibackend.so backend and prepares the libraries and
 SNPE DLC files for integration with the MLPerf app. These DLC files have been 
-uploaded to https://github.com/mlcommons/mobile_models.
+uploaded with the other submission files to here: <path where needs to be uploaded>
 
 ## Requirements
 
 *   [SNPE SDK](https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk)
-    * Version 1.48.0
+    * Version 1.54.2
 *   Linux machine capable of running Ubuntu 18.04 docker images
 
 After downloading and unzipping the SNPE SDK, make sure to set SNPE_SDK to its location:
 ```
 cd /opt
-unzip snpe-1.48.0.2554.zip
-export SNPE_SDK=/opt/snpe-1.48.0.2554
+unzip snpe-1.54.2.2899.zip
+export SNPE_SDK=/opt/snpe-1.54.2.2899
 ```
 
 ### Optional
@@ -72,10 +72,8 @@ The task config settings are embedded in libqtibackend.so. These settings contai
 backend specific data for each task to be run. This backend assumes a few things about
 the settings:
 
-1. The MobileBERT task sets the configuration name to "TFLite GPU". The accelerator
-   value is gpu_f16 to use TFLite GPU delegate.
-2. All other models use "SNPE" for the configuration name and use "snpe aip", "snpe dsp",
-   "psnpe aip", or "psnpe dsp" for the accelerator value when using SNPE.
+1. All the models use "SNPE" for the configuration name and use "snpe_aip", "snpe_dsp",
+   "psnpe_aip", or "psnpe_dsp" for the accelerator value when using SNPE.
 
 ## FAQ
 
@@ -85,12 +83,11 @@ No, the information to build the DLC files is only to show how they are created.
 
 #### What devices does this backend support?
 
-This backend only supports SDM865/SDM865 Pro and SDM888 devices. Other Snapdragon based
-devices will not run the MLPerf app. Future updates of the app will provide
+This backend only supports SDM865/SDM865 Pro ,SDM888/SDM888 Pro and SDM778G devices. Other Snapdragon
+based devices will not run the MLPerf app. Future updates of the app will provide
 additional device support.
 
 #### Is SNPE used to run all the models?
 
-No, there is a TFLite wrapper invoked by this backend to run the MobileBERT model. The
-other models use SNPE.
+Yes. All the models use use SNPE for execution.
 

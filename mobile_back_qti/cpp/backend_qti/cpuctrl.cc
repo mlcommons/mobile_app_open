@@ -31,26 +31,26 @@ using namespace std::chrono;
 #define SET_AFFINITY(a, b) sched_setaffinity(gettid(), a, b)
 #define GET_AFFINITY(a, b) sched_getaffinity(gettid(), a, b)
 
-#define SLEEPMS 2
+static uint32_t soc_id_ = 0;
 
-static uint32_t soc_id_g = 0;
-
-static bool active_g = false;
+static bool active_ = false;
+static uint32_t loadOffTime_ = 2;
+static uint32_t loadOnTime_ = 100;
 static std::thread *thread_ = nullptr;
-static cpu_set_t cpusetLow_g;
-static cpu_set_t cpusetHigh_g;
-static cpu_set_t cpusetall_g;
+static cpu_set_t cpusetLow_;
+static cpu_set_t cpusetHigh_;
+static cpu_set_t cpusetall_;
 
 static void loop(void *unused) {
   (void)unused;
-  active_g = true;
-  while (active_g) {
+  active_ = true;
+  while (active_) {
     auto now =
         duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-    if (now.count() % 100 == 0 && active_g) {
-      usleep(SLEEPMS * 1000);
+    if (now.count() % loadOnTime_ == 0 && active_) {
+      usleep(loadOffTime_ * 1000);
     } else {
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < loadOnTime_; i++) {
         // Prevent compiler from optimizing away busy loop
         __asm__ __volatile__("" : "+g"(i) : :);
       }
@@ -58,15 +58,17 @@ static void loop(void *unused) {
   }
 }
 
-void CpuCtrl::startLoad() {
-  if (active_g) {
+void CpuCtrl::startLoad(uint32_t load_off_time, uint32_t load_on_time) {
+  if (active_) {
     return;
   }
+  loadOffTime_ = load_off_time;
+  loadOnTime_ = load_on_time;
   thread_ = new std::thread(loop, nullptr);
 }
 
 void CpuCtrl::stopLoad() {
-  active_g = false;
+  active_ = false;
   if (thread_) {
     thread_->join();
   }
@@ -74,11 +76,11 @@ void CpuCtrl::stopLoad() {
   thread_ = nullptr;
 }
 
-void CpuCtrl::lowLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetLow_g); }
+void CpuCtrl::lowLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetLow_); }
 
-void CpuCtrl::normalLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetall_g); }
+void CpuCtrl::normalLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetall_); }
 
-void CpuCtrl::highLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetHigh_g); }
+void CpuCtrl::highLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetHigh_); }
 
 bool CpuCtrl::isSnapDragon(const char *manufacturer) {
   bool is_qcom = false;
@@ -120,7 +122,7 @@ bool CpuCtrl::isSnapDragon(const char *manufacturer) {
 }
 
 uint32_t CpuCtrl::getSocId() {
-  if (soc_id_g == 0) {
+  if (soc_id_ == 0) {
     std::ifstream in_file;
     std::vector<char> line(5);
     in_file.open("/sys/devices/soc0/soc_id");
@@ -133,13 +135,13 @@ uint32_t CpuCtrl::getSocId() {
 
     in_file.read(line.data(), 5);
     in_file.close();
-    soc_id_g = (uint32_t)std::atoi(line.data());
+    soc_id_ = (uint32_t)std::atoi(line.data());
 
     std::vector<uint32_t> allcores;
     std::vector<uint32_t> low_latency_cores;
     std::vector<uint32_t> high_latency_cores;
     int maxcores = 0;
-    if (soc_id_g == SDM888 || soc_id_g == SDM865) {
+    if (soc_id_ == SDM888 || soc_id_ == SDM865 || soc_id_ == SDM778) {
       high_latency_cores.emplace_back(0);
       high_latency_cores.emplace_back(1);
       high_latency_cores.emplace_back(2);
@@ -147,7 +149,7 @@ uint32_t CpuCtrl::getSocId() {
       maxcores = 8;
     }
 
-    if (soc_id_g == SDM888 || soc_id_g == SDM865) {
+    if (soc_id_ == SDM888 || soc_id_ == SDM865 || soc_id_ == SDM778) {
       low_latency_cores.emplace_back(4);
       low_latency_cores.emplace_back(5);
       low_latency_cores.emplace_back(6);
@@ -159,19 +161,19 @@ uint32_t CpuCtrl::getSocId() {
       allcores.emplace_back(i);
     }
 
-    CPU_ZERO(&cpusetLow_g);
+    CPU_ZERO(&cpusetLow_);
     for (auto core : low_latency_cores) {
-      CPU_SET(core, &cpusetLow_g);
+      CPU_SET(core, &cpusetLow_);
     }
-    CPU_ZERO(&cpusetHigh_g);
+    CPU_ZERO(&cpusetHigh_);
     for (auto core : high_latency_cores) {
-      CPU_SET(core, &cpusetHigh_g);
+      CPU_SET(core, &cpusetHigh_);
     }
-    CPU_ZERO(&cpusetall_g);
+    CPU_ZERO(&cpusetall_);
     for (auto core : allcores) {
-      CPU_SET(core, &cpusetall_g);
+      CPU_SET(core, &cpusetall_);
     }
   }
-  LOG(INFO) << "SOC ID is " << soc_id_g;
-  return soc_id_g;
+  LOG(INFO) << "SOC ID is " << soc_id_;
+  return soc_id_;
 }

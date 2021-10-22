@@ -25,6 +25,7 @@ import android.os.HandlerThread;
 import android.util.Base64;
 import android.util.Log;
 import androidx.preference.PreferenceManager;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -189,19 +190,16 @@ public final class MiddleInterface implements AutoCloseable, RunMLPerfWorker.Cal
         batch = 1;
       }
       if (runMode.equals(AppConstants.SUBMISSION_MODE)) {
-        String logDir =
-            MLCtx.getInstance()
-                .getContext()
-                .getExternalFilesDir("log_performance/" + bm.getId())
-                .getAbsolutePath();
-
+        String logDir = "/sdcard/mlperf_results/log_performance/" + bm.getId();
+        File appDir = new File(logDir);
+        appDir.mkdirs();
+        Log.d(TAG, "log_performance file path: " + logDir);
         startingList[counter] =
             new StartData(bm.getId(), logDir, AppConstants.PERFORMANCE_LITE_MODE, batch);
-        logDir =
-            MLCtx.getInstance()
-                .getContext()
-                .getExternalFilesDir("log_accuracy/" + bm.getId())
-                .getAbsolutePath();
+        logDir = "/sdcard/mlperf_results/log_accuracy/" + bm.getId();
+        appDir = new File(logDir);
+        appDir.mkdirs();
+        Log.d(TAG, "log_accuracy file path: " + logDir);
 
         startingList[counter + benchmarksSize] =
             new StartData(bm.getId(), logDir, AppConstants.ACCURACY_MODE, batch);
@@ -216,11 +214,10 @@ public final class MiddleInterface implements AutoCloseable, RunMLPerfWorker.Cal
         } else {
           logDirBase = "log_undefined/";
         }
-        String logDir =
-            MLCtx.getInstance()
-                .getContext()
-                .getExternalFilesDir(logDirBase + bm.getId())
-                .getAbsolutePath();
+        String logDir = "/sdcard/mlperf_results/" + logDirBase + bm.getId();
+        File appDir = new File(logDir);
+        appDir.mkdirs();
+        Log.d(TAG, logDirBase + " file path: " + logDir);
 
         startingList[counter] = new StartData(bm.getId(), logDir, runMode, batch);
       }
