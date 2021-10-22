@@ -40,13 +40,15 @@ class QTIBackendHelper {
                                  int &numCPU);
 
  public:
+  enum QTIBufferType { FLOAT_32 = 0, UINT_8 = 1 };
   using GetBufferFn = std::add_pointer<void *(size_t)>::type;
   using ReleaseBufferFn = std::add_pointer<void(void *)>::type;
 
+  // FIXME use the name style fooBar or foo_bar but not a mix of both
   const char *name_ = "snpe";
-  std::string snpe_output_layers_;
-  std::vector<mlperf_data_t> input_format_;
-  std::vector<mlperf_data_t> output_format_;
+  std::string snpeOutputLayers_;
+  std::vector<mlperf_data_t> inputFormat_;
+  std::vector<mlperf_data_t> outputFormat_;
   std::unique_ptr<zdl::PSNPE::PSNPE> psnpe_;
   std::unique_ptr<zdl::SNPE::SNPE> snpe_;
   zdl::PSNPE::UserBufferList inputMap_, outputMap_;
@@ -56,17 +58,24 @@ class QTIBackendHelper {
   std::string scenario_;
   zdl::DlSystem::StringList networkInputTensorNames_;
   zdl::DlSystem::StringList networkOutputTensorNames_;
-  bool is_tflite_;
+  zdl::DlSystem::PerformanceProfile_t perfProfile_;
+
+  bool isTflite_;
   bool useSnpe_;
-  mlperf_backend_ptr_t tflite_backend;
+  mlperf_backend_ptr_t tfliteBackend_;
   int batchSize_;
-  int input_batch_;
-  int output_batch_bufsize_;
-  GetBufferFn get_buffer_;
-  ReleaseBufferFn release_buffer_;
+  int inputBatch_;
+  int outputBatchBufsize_;
+  GetBufferFn getBuffer_;
+  ReleaseBufferFn releaseBuffer_;
   bool bgLoad_;
   std::string delegate_;
+  QTIBufferType inputBufferType_ = UINT_8;
+  QTIBufferType outputBufferType_ = FLOAT_32;
   bool useDspFeatures = false;
+  uint32_t loadOffTime_ = 2;
+  uint32_t loadOnTime_ = 100;
+  bool useIonBuffers_ = true;
 
   /* exposed functions */
   void use_psnpe(const char *model_path);

@@ -36,8 +36,8 @@ class RpcMem {
  private:
   void *libHandle_;
   bool isSuccess_;
-  RpcMemAllocPtr rpcmem_alloc{nullptr};
-  RpcMemFreePtr rpcmem_free{nullptr};
+  RpcMemAllocPtr rpcmemAlloc_{nullptr};
+  RpcMemFreePtr rpcmemFree_{nullptr};
 };
 
 #endif  // RPCMEM_H

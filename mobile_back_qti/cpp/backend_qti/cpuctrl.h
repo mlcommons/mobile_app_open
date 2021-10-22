@@ -14,16 +14,17 @@ limitations under the License.
 ==============================================================================*/
 #pragma once
 
-#include <stdint.h>
 #include <EGL/egl.h>
 #include <GLES/gl.h>
+#include <stdint.h>
 
 #define SDM865 356
 #define SDM888 415
+#define SDM778 475
 
 class CpuCtrl {
  public:
-  static void startLoad();
+  static void startLoad(uint32_t load_off_time, uint32_t load_on_time);
   static void stopLoad();
   static void lowLatency();
   static void normalLatency();
