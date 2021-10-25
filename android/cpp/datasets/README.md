@@ -6,8 +6,7 @@ TFLite. Other backends may need to extend them.
 
 ## Imagenet
 
-The full ImageNet dataset is available to MLCommons members individually. 
-You can request access from the mobile chairs.
+If you need help obtaining the ImageNet dataset, contact the chairs for suggestions.
 For testing purpose, you may download a substitute dataset from 
 [https://github.com/mlcommons/mobile_models/tree/main/v0_7/datasets](https://github.com/mlcommons/mobile_models/tree/main/v0_7/datasets)
 
