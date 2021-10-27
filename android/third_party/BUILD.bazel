@@ -75,3 +75,10 @@ android_library(
         "@maven//:androidx_test_espresso_espresso_idling_resource",
     ],
 )
+
+android_library(
+    name = "commons_io",
+    exports = [
+        "@maven//:commons_io_commons_io",
+    ],
+)

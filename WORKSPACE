@@ -64,6 +64,7 @@ maven_install(
         "junit:junit:4.13",
         "com.google.inject:guice:4.2.2",
         "org.hamcrest:java-hamcrest:2.0.0.0",
+        "commons-io:commons-io:2.6",
         "androidx.test.espresso:espresso-core:3.2.0",
         "androidx.test.espresso:espresso-idling-resource:3.2.0",
         "androidx.test:runner:1.2.0",
