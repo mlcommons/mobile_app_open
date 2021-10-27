@@ -197,11 +197,11 @@ public class CalculatingActivity extends BaseActivity
     String version;
     try {
       version =
-              getApplicationContext()
-                      .getPackageManager()
-                      .getPackageInfo(getApplicationContext().getPackageName(), 0)
-                      .versionName
-                      .concat(BuildTimeConstants.HASH);
+          getApplicationContext()
+              .getPackageManager()
+              .getPackageInfo(getApplicationContext().getPackageName(), 0)
+              .versionName
+              .concat(BuildTimeConstants.HASH);
     } catch (Exception e) {
       version = BuildTimeConstants.HASH;
     }
@@ -237,7 +237,7 @@ public class CalculatingActivity extends BaseActivity
     File cacheDir = new File(AppConstants.CACHE_DIR);
     long cacheAge = new Date().getTime() - cacheDir.lastModified();
     Boolean isCacheTooOld =
-            cacheAge > (long) AppConstants.NUM_DAYS_TO_CACHE_FILES * 24 * 60 * 60 * 1000;
+        cacheAge > (long) AppConstants.NUM_DAYS_TO_CACHE_FILES * 24 * 60 * 60 * 1000;
 
     Boolean isVersionChanged = !getCurrentAppVersion().equals(getStoredAppVersion());
     return isCacheTooOld && isVersionChanged;

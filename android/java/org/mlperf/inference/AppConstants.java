@@ -20,6 +20,4 @@ public final class AppConstants {
   public static final int NUM_DAYS_TO_CACHE_FILES = 90;
   public static final String RESULTS_DIR = "/sdcard/mlperf_results/";
   public static final String CACHE_DIR = "/sdcard/mlperf_cache/";
-
-
 }
