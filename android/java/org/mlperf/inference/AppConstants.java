@@ -16,4 +16,10 @@ public final class AppConstants {
   public static final int DEFAULT_COOLDOWN_PAUSE = 5;
   public static final int TYPE_PERFORMANCE = 0;
   public static final int TYPE_ACCURACY = 1;
+
+  public static final int NUM_DAYS_TO_CACHE_FILES = 90;
+  public static final String RESULTS_DIR = "/sdcard/mlperf_results/";
+  public static final String CACHE_DIR = "/sdcard/mlperf_cache/";
+
+
 }

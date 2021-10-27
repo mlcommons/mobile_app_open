@@ -133,7 +133,7 @@ public final class MLPerfTasks {
   }
 
   public static String getResultsJsonPath() {
-    return "/sdcard/mlperf_results/mlperf/results.json";
+    return AppConstants.RESULTS_DIR + "results.json";
   }
 
   // Update the results.json file.

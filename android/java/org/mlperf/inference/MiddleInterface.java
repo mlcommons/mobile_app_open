@@ -190,13 +190,13 @@ public final class MiddleInterface implements AutoCloseable, RunMLPerfWorker.Cal
         batch = 1;
       }
       if (runMode.equals(AppConstants.SUBMISSION_MODE)) {
-        String logDir = "/sdcard/mlperf_results/log_performance/" + bm.getId();
+        String logDir = AppConstants.RESULTS_DIR + "log_performance/" + bm.getId();
         File appDir = new File(logDir);
         appDir.mkdirs();
         Log.d(TAG, "log_performance file path: " + logDir);
         startingList[counter] =
             new StartData(bm.getId(), logDir, AppConstants.PERFORMANCE_LITE_MODE, batch);
-        logDir = "/sdcard/mlperf_results/log_accuracy/" + bm.getId();
+        logDir = AppConstants.RESULTS_DIR + "log_accuracy/" + bm.getId();
         appDir = new File(logDir);
         appDir.mkdirs();
         Log.d(TAG, "log_accuracy file path: " + logDir);
@@ -214,7 +214,7 @@ public final class MiddleInterface implements AutoCloseable, RunMLPerfWorker.Cal
         } else {
           logDirBase = "log_undefined/";
         }
-        String logDir = "/sdcard/mlperf_results/" + logDirBase + bm.getId();
+        String logDir = AppConstants.RESULTS_DIR + logDirBase + bm.getId();
         File appDir = new File(logDir);
         appDir.mkdirs();
         Log.d(TAG, logDirBase + " file path: " + logDir);
