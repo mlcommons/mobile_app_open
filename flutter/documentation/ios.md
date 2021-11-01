@@ -86,8 +86,7 @@ Please note that iOS icons should not have any transparency. See more guidelines
 ```bash
 2 connected devices:
 
-iPhone 12 Pro Max (mobile) • XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX • ios            •
-com.apple.CoreSimulator.SimRuntime.iOS-14-4 (simulator)
+iPhone 12 Pro Max (mobile) • XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX • ios            • com.apple.CoreSimulator.SimRuntime.iOS-14-4 (simulator)
 Chrome (web)               • chrome                               • web-javascript • Google Chrome 89.0.4389.128
 ```
 * Run test:

@@ -11,8 +11,8 @@ so you will likely see a lot of performance and UX issues.
 
 ## Documentation
 
-* [Short overview of the repo structure](/documentation/repo-overview.md)
-* [Building for iOS](/documentation/ios.md)
-* [Building for Windows](/documentation/windows.md)
-* [Using custom benchmark configuration](/documentation/custom-tasks.md)
-* [Adding support for your custom backend](/documentation/adding-custom-backend.md)
+* [Short overview of the repo structure](./documentation/repo-overview.md)
+* [Building for iOS](./documentation/ios.md)
+* [Building for Windows](./documentation/windows.md)
+* [Using custom benchmark configuration](./documentation/custom-tasks.md)
+* [Adding support for your custom backend](./documentation/adding-custom-backend.md)

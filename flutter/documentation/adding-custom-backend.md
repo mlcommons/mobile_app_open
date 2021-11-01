@@ -9,7 +9,7 @@ This file describes how to add support for your backend.
 
 # Adding backend to list of backends
 
-1. Modify file [backends_list.in](/lib/backend/backends_list.in).
+1. Modify file [backends_list.in](../lib/backend/backends_list.in).
 Add a line with your backend tag.
 ```dart
 const _backendsList = [
@@ -17,7 +17,7 @@ const _backendsList = [
     TFLITE_TAG
 ];
 ```
-2. Modify [makefile](/Makefile).
+2. Modify [makefile](../Makefile).
 Make a copy of if-condition for `ENABLE_BACKEND_EXAMPLE` and change variable names and file name.
 Add line for your backend to `set-supported-backends` make target.
 3. Make your backend accessible to application.
@@ -35,6 +35,6 @@ or run `make set-supported-backends` directly.
 
 Unfortunately, right now we don't have a separate documentation on how to implement a backend.
 
-You can find declarations of C functions that you need to implement in [cpp/c](/cpp/c) directory.
+You can find declarations of C functions that you need to implement in [cpp/c](../cpp/c) directory.
 
-You can look at the [default TFLite backend implementation](/cpp/backend_tflite) for a reference.
+You can look at the [default TFLite backend implementation](../cpp/backend_tflite) for a reference.
