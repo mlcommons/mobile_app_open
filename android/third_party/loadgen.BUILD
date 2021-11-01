@@ -29,5 +29,4 @@ cc_library(
         "loadgen/system_under_test.h",
         "loadgen/test_settings.h",
     ],
-    copts = ["-Wno-c++98-c++11-compat"],
 )
