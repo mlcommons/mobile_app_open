@@ -2,8 +2,8 @@
 
 #include <cstring>
 
-#include "cpp/backends/external.h"
-#include "cpp/proto/backend_setting.pb.h"
+#include "flutter/cpp/backends/external.h"
+#include "flutter/cpp/proto/backend_setting.pb.h"
 #include "main.h"
 
 extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(

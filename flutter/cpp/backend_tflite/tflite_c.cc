@@ -23,8 +23,8 @@ limitations under the License.
 #include "neuron/APUWareUtilsApi.h"
 #endif
 
-#include "cpp/c/backend_c.h"
-#include "cpp/c/type.h"
+#include "flutter/cpp/c/backend_c.h"
+#include "flutter/cpp/c/type.h"
 #include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/c/common.h"
 #if __ANDROID__

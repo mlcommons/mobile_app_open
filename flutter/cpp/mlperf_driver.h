@@ -22,8 +22,8 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "cpp/backend.h"
-#include "cpp/dataset.h"
+#include "flutter/cpp/backend.h"
+#include "flutter/cpp/dataset.h"
 #include "loadgen/system_under_test.h"
 
 namespace mlperf {
