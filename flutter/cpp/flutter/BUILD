@@ -20,13 +20,13 @@ cc_library(
     ],
     hdrs = ["main.h"],
     deps = [
-        "//cpp:mlperf_driver",
-        "//cpp/backends:external",
-        "//cpp/datasets:ade20k",
-        "//cpp/datasets:coco",
-        "//cpp/datasets:imagenet",
-        "//cpp/datasets:squad",
-        "//cpp/proto:mlperf_task_cc_proto",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp/backends:external",
+        "//flutter/cpp/datasets:ade20k",
+        "//flutter/cpp/datasets:coco",
+        "//flutter/cpp/datasets:imagenet",
+        "//flutter/cpp/datasets:squad",
+        "//flutter/cpp/proto:mlperf_task_cc_proto",
     ],
     alwayslink = 1,
 )
@@ -40,8 +40,8 @@ ios_static_framework(
     ],
     minimum_os_version = "11.0",
     deps = [
-        "//cpp/backend_tflite:tflite_c",
-        "//cpp/flutter:bridge",
+        "//flutter/cpp/backend_tflite:tflite_c",
+        "//flutter/cpp/flutter:bridge",
     ],
 )
 
@@ -50,15 +50,15 @@ cc_binary(
     linkshared = 1,
     win_def_file = "dll_export.def",
     deps = [
-        "//cpp/flutter:bridge",
+        "//flutter/cpp/flutter:bridge",
     ],
 )
 
 tflite_jni_binary(
     name = "libbackendbridge.so",
-    exported_symbols = "//cpp/flutter:exported_symbols.lds",
-    linkscript = "//cpp/flutter:version_script.lds",
+    exported_symbols = "//flutter/cpp/flutter:exported_symbols.lds",
+    linkscript = "//flutter/cpp/flutter:version_script.lds",
     deps = [
-        "//cpp/flutter:bridge",
+        "//flutter/cpp/flutter:bridge",
     ],
 )

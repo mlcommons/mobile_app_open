@@ -16,7 +16,7 @@ cpp-ios:
 	@# NOTE: add `--copt -g` for debug info (but the resulting library would be 0.5 GiB)
 	bazel \
 		${BAZEL_CACHE_FLAG} \
-		build --config=ios_fat64 -c opt //cpp/flutter:ios_backend_fw_static
+		build --config=ios_fat64 -c opt //flutter/cpp/flutter:ios_backend_fw_static
 
 	rm -rf ${_xcode_fw}
 	cp -a ${_bazel_ios_fw} ${_xcode_fw}
@@ -119,7 +119,7 @@ windows/flutter-release:
 
 .PHONY: backend-bridge-windows
 backend-bridge-windows:
-	bazel build ${_bazel_links_arg} --config=windows -c opt //cpp/flutter:backend_bridge.dll
+	bazel build ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/flutter:backend_bridge.dll
 	chmod +w ${BAZEL_LINKS_DIR}bin/cpp/flutter/backend_bridge.dll
 	mkdir -p build/win-dlls/
 	rm -f build/win-dlls/backend_bridge.dll
@@ -127,7 +127,7 @@ backend-bridge-windows:
 
 .PHONY: backend-bridge-android
 backend-bridge-android:
-	bazel build --config=android_arm64 -c opt //cpp/flutter:libbackendbridge.so
+	bazel build --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
 	chmod +w bazel-bin/cpp/flutter/libbackendbridge.so
 	mkdir -p android/app/src/main/jniLibs/arm64-v8a
 	rm -f android/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
@@ -135,7 +135,7 @@ backend-bridge-android:
 
 .PHONY: backends/tflite-windows
 backends/tflite-windows:
-	bazel build ${_bazel_links_arg} --config=windows -c opt //cpp/backend_tflite:libtflitebackend.dll
+	bazel build ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/backend_tflite:libtflitebackend.dll
 	chmod +w ${BAZEL_LINKS_DIR}bin/cpp/backend_tflite/libtflitebackend.dll
 	mkdir -p build/win-dlls/backends
 	rm -f build/win-dlls/backends/libtflitebackend.dll
@@ -143,7 +143,7 @@ backends/tflite-windows:
 
 .PHONY: backends/tflite-android
 backends/tflite-android:
-	bazel build --config=android_arm64 -c opt //cpp/backend_tflite:libtflitebackend.so
+	bazel build --config=android_arm64 -c opt //flutter/cpp/backend_tflite:libtflitebackend.so
 	chmod +w bazel-bin/cpp/backend_tflite/libtflitebackend.so
 	mkdir -p android/app/src/main/jniLibs/arm64-v8a
 	rm -f android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so

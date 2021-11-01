@@ -39,10 +39,10 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "//cpp:mlperf_driver",
-        "//cpp:utils",
-        "//cpp/datasets:allocator",
-        "//cpp/proto:mlperf_task_cc_proto",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp:utils",
+        "//flutter/cpp/datasets:allocator",
+        "//flutter/cpp/proto:mlperf_task_cc_proto",
         "@org_tensorflow//tensorflow/lite:shared_library",
     ],
 )
