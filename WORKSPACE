@@ -11,6 +11,11 @@ http_archive(
 
 http_archive(
     name = "org_tensorflow",
+    patch_args = ["-p1"],
+    patches = [
+        # Fix tensorflow not being able to read image files on Windows
+        "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
+    ],
     sha256 = "40d3203ab5f246d83bae328288a24209a2b85794f1b3e2cd0329458d8e7c1985",
     strip_prefix = "tensorflow-2.6.0",
     urls = [
@@ -134,3 +139,30 @@ http_archive(
 load("@android_test_support//:repo.bzl", "android_test_repositories")
 
 android_test_repositories()
+
+http_archive(
+    name = "build_bazel_rules_apple",
+    sha256 = "9f9eb6cdd25d7932cb939df24807c2d70772aad7a79f1357e25ced9d0d443cfd",
+    strip_prefix = "rules_apple-0.19.0",
+    urls = [
+        "https://github.com/bazelbuild/rules_apple/archive/refs/tags/0.19.0.zip",
+    ],
+)
+
+http_archive(
+    name = "build_bazel_rules_swift",
+    sha256 = "ef728d0d99276d62b2393c350f29f176a6f38a925f2d12c37c4ed64f6906c2f5",
+    strip_prefix = "rules_swift-0.13.0",
+    urls = [
+        "https://github.com/bazelbuild/rules_swift/archive/refs/tags/0.13.0.zip",
+    ],
+)
+
+http_archive(
+    name = "build_bazel_apple_support",
+    sha256 = "249be3d90bc4211928a5260c4bc5792a236c58d1b6183c0e30f58db8710fc952",
+    strip_prefix = "apple_support-0.7.2",
+    urls = [
+        "https://github.com/bazelbuild/apple_support/archive/refs/tags/0.7.2.zip",
+    ],
+)
