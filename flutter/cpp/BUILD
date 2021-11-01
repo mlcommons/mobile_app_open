@@ -26,7 +26,7 @@ common_linkopts = tflite_linkopts() + select({
         "-pie",
     ],
 }) + select({
-    "//commonlibs:use_asan": [
+    "//flutter/commonlibs:use_asan": [
         "-fsanitize=address",
         "-g",
         "-O1",
@@ -44,7 +44,7 @@ cc_library(
         "mlperf_driver.h",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//flutter/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -66,7 +66,7 @@ cc_library(
         "utils.h",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//flutter/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",

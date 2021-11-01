@@ -29,7 +29,7 @@ cc_library(
         "allocator.h",
     ],
     copts = select({
-        "//commonlibs:use_asan": [
+        "//flutter/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -51,7 +51,7 @@ cc_library(
         "imagenet.h",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//flutter/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -80,7 +80,7 @@ cc_library(
         "coco.h",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//flutter/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -107,7 +107,7 @@ cc_library(
     srcs = ["squad.cc"],
     hdrs = ["squad.h"],
     copts = select({
-        "//commonlibs:use_asan": [
+        "//flutter/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
