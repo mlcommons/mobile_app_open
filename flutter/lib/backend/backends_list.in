@@ -1,0 +1,6 @@
+part of 'bridge.dart';
+
+const _backendsList = [
+    EXAMPLE_TAG
+    TFLITE_TAG
+];

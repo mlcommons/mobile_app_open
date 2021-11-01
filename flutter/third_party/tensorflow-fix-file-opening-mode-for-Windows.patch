@@ -1,0 +1,25 @@
+From 572106fabc561a7f6338072fdab676c5bd2731c9 Mon Sep 17 00:00:00 2001
+From: Danil Uzlov <DanilUzlov@yandex.ru>
+Date: Tue, 28 Sep 2021 10:28:53 +0700
+Subject: [PATCH] fix file opening mode for Windows
+
+---
+ .../lite/tools/evaluation/stages/image_preprocessing_stage.cc   | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
+index dd434a1c882..fe244b078ba 100644
+--- a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
++++ b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
+@@ -75,7 +75,7 @@ inline void LoadImageRaw(std::string* filename, ImageData* image_data) {
+ // Loads the jpeg image.
+ inline void LoadImageJpeg(std::string* filename, ImageData* image_data) {
+   // Reads image.
+-  std::ifstream t(*filename);
++  std::ifstream t(*filename, std::ios::binary);
+   std::string image_str((std::istreambuf_iterator<char>(t)),
+                         std::istreambuf_iterator<char>());
+   const int fsize = image_str.size();
+-- 
+2.31.1.windows.1
+

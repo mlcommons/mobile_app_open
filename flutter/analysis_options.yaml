@@ -1,0 +1,9 @@
+include: package:pedantic/analysis_options.yaml
+
+analyzer:
+  exclude: 
+    - bazel-*/**
+    - lib/localizations/**
+    - lib/protos/**
+  strong-mode:
+    implicit-casts: false

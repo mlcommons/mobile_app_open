@@ -1,0 +1,6 @@
+dart_ffi_run_benchmark
+dart_ffi_run_benchmark_free
+dart_ffi_backend_match
+dart_ffi_backend_match_free
+dart_ffi_mlperf_config
+dart_ffi_mlperf_config_free
