@@ -26,7 +26,7 @@ common_linkopts = tflite_linkopts() + select({
         "-pie",
     ],
 }) + select({
-    "//commonlibs:use_asan": [
+    "//flutter/commonlibs:use_asan": [
         "-fsanitize=address",
         "-g",
         "-O1",
@@ -44,7 +44,7 @@ cc_library(
         "mlperf_driver.h",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//flutter/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -54,7 +54,7 @@ cc_library(
     }),
     deps = [
         ":utils",
-        "//cpp/proto:mlperf_task_cc_proto",
+        "//flutter/cpp/proto:mlperf_task_cc_proto",
         "@org_mlperf_inference//:loadgen",
     ],
 )
@@ -66,7 +66,7 @@ cc_library(
         "utils.h",
     ],
     copts = tflite_copts() + select({
-        "//commonlibs:use_asan": [
+        "//flutter/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",
@@ -75,8 +75,8 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "//cpp/c:headers",
-        "//cpp/proto:mlperf_task_cc_proto",
+        "//flutter/cpp/c:headers",
+        "//flutter/cpp/proto:mlperf_task_cc_proto",
         "@org_mlperf_inference//:loadgen",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
         "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",

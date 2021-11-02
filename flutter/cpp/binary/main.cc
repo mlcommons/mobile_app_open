@@ -21,14 +21,14 @@ limitations under the License.
 #include <vector>
 
 #include "absl/strings/match.h"
-#include "cpp/backends/external.h"
-#include "cpp/datasets/ade20k.h"
-#include "cpp/datasets/coco.h"
-#include "cpp/datasets/imagenet.h"
-#include "cpp/datasets/squad.h"
-#include "cpp/mlperf_driver.h"
-#include "cpp/proto/mlperf_task.pb.h"
-#include "cpp/utils.h"
+#include "flutter/cpp/backends/external.h"
+#include "flutter/cpp/datasets/ade20k.h"
+#include "flutter/cpp/datasets/coco.h"
+#include "flutter/cpp/datasets/imagenet.h"
+#include "flutter/cpp/datasets/squad.h"
+#include "flutter/cpp/mlperf_driver.h"
+#include "flutter/cpp/proto/mlperf_task.pb.h"
+#include "flutter/cpp/utils.h"
 #include "tensorflow/lite/tools/command_line_flags.h"
 
 namespace mlperf {

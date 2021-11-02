@@ -12,15 +12,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include "cpp/backends/external.h"
+#include "flutter/cpp/backends/external.h"
 
 #include <cstdlib>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "cpp/backend.h"
-#include "cpp/utils.h"
+#include "flutter/cpp/backend.h"
+#include "flutter/cpp/utils.h"
 #include "tensorflow/lite/shared_library.h"
 
 namespace mlperf {

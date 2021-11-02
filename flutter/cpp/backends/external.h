@@ -15,11 +15,11 @@ limitations under the License.
 #ifndef MLPERF_BACKENDS_EXTERNAL_H_
 #define MLPERF_BACKENDS_EXTERNAL_H_
 
-#include "cpp/backend.h"
-#include "cpp/c/type.h"
-#include "cpp/datasets/allocator.h"
-#include "cpp/proto/backend_setting.pb.h"
-#include "cpp/utils.h"
+#include "flutter/cpp/backend.h"
+#include "flutter/cpp/c/type.h"
+#include "flutter/cpp/datasets/allocator.h"
+#include "flutter/cpp/proto/backend_setting.pb.h"
+#include "flutter/cpp/utils.h"
 #include "tensorflow/lite/shared_library.h"
 
 namespace mlperf {

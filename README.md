@@ -41,6 +41,7 @@ frameworks contributed by the broader MLPerf community.
 ## Folder Structure
 
 * android - Contains the Android version of the app
+* flutter - Contains the Flutter (cross-platform) version of the app
 * mobile_back_qti - QTI backend for Android
 * mobile_back_samsung - Samsung backend for Android
 * mobile_back_pixel - Google Pixel backend for Android

@@ -114,7 +114,7 @@ for i in range(1, 2001):
 3. Build command line tool to test performance and accuracy on x86 host
 
 ```
-build  --cxxopt='--std=c++14' --host_cxxopt='--std=c++14' --copt=-march=native //cpp/binary:main
+build  --cxxopt='--std=c++14' --host_cxxopt='--std=c++14' --copt=-march=native //flutter/cpp/binary:main
 ```
 4. test with the command line tool
 ```
