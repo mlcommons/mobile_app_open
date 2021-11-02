@@ -121,19 +121,28 @@ public final class MLPerfTasks {
     // For local files, use it as is.
     String filename = new File(path).getName();
     if (path.startsWith("http://") || path.startsWith("https://") || isZipFile(filename)) {
-      if (isZipFile(filename)) {
-        filename = filename.substring(0, filename.length() - ZIP.length());
+      // remove http:// or https:// from path
+      if (path.startsWith("http://")) {
+        path = path.substring("http://".length());
+      } else if (path.startsWith("https://")) {
+        path = path.substring("https://".length());
       }
-      String localDir =
-          MLCtx.getInstance().getContext().getExternalFilesDir("cache").getAbsolutePath();
-      return localDir + "/cache/" + filename;
+      // remove .zip from path
+      if (isZipFile(filename)) {
+        path = path.substring(0, path.length() - ZIP.length());
+      }
+      return getCacheDir() + path;
     } else {
       return path;
     }
   }
 
   public static String getResultsJsonPath() {
-    return "/sdcard/mlperf_results/mlperf/results.json";
+    return AppConstants.RESULTS_DIR + "results.json";
+  }
+
+  public static String getCacheDir() {
+    return AppConstants.CACHE_DIR;
   }
 
   // Update the results.json file.

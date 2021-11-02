@@ -54,8 +54,10 @@ import java.net.URL;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -63,8 +65,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.apache.commons.io.FileUtils;
 import org.mlperf.inference.AppConstants;
 import org.mlperf.inference.Benchmark;
+import org.mlperf.inference.BuildTimeConstants;
 import org.mlperf.inference.MLCtx;
 import org.mlperf.inference.MLPerfTasks;
 import org.mlperf.inference.MiddleInterface;
@@ -189,6 +193,56 @@ public class CalculatingActivity extends BaseActivity
     }
   }
 
+  private String getCurrentAppVersion() {
+    String version;
+    try {
+      version =
+          getApplicationContext()
+              .getPackageManager()
+              .getPackageInfo(getApplicationContext().getPackageName(), 0)
+              .versionName
+              .concat(BuildTimeConstants.HASH);
+    } catch (Exception e) {
+      version = BuildTimeConstants.HASH;
+    }
+    return version;
+  }
+
+  private String getVersionFilePath() {
+    return AppConstants.CACHE_DIR + ".version";
+  }
+
+  private String getStoredAppVersion() {
+    File versionFile = new File(getVersionFilePath());
+    String version = "Unknown";
+    if (versionFile.exists()) {
+      try {
+        version = new String(Files.readAllBytes(Paths.get(getVersionFilePath())));
+      } catch (Exception e) {
+        Log.e(TAG, "Unable to read version from " + getVersionFilePath());
+      }
+    }
+    return version;
+  }
+
+  private void setStoredAppVersion(String version) {
+    try {
+      Files.write(Paths.get(getVersionFilePath()), version.getBytes());
+    } catch (Exception e) {
+      Log.i(TAG, "Unable to store version to " + getVersionFilePath());
+    }
+  }
+
+  private Boolean shouldClearCache() {
+    File cacheDir = new File(AppConstants.CACHE_DIR);
+    long cacheAge = new Date().getTime() - cacheDir.lastModified();
+    Boolean isCacheTooOld =
+        cacheAge > (long) AppConstants.NUM_DAYS_TO_CACHE_FILES * 24 * 60 * 60 * 1000;
+
+    Boolean isVersionChanged = !getCurrentAppVersion().equals(getStoredAppVersion());
+    return isCacheTooOld && isVersionChanged;
+  }
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -248,6 +302,19 @@ public class CalculatingActivity extends BaseActivity
 
     handler = new Handler(this.getMainLooper(), this);
 
+    boolean arePreviousResultsValid = true;
+    if (shouldClearCache()) {
+      Log.i(TAG, "Wiil delete cache dir " + AppConstants.CACHE_DIR);
+      try {
+        File cacheDir = new File(AppConstants.CACHE_DIR);
+        FileUtils.forceDelete(cacheDir);
+        arePreviousResultsValid = false;
+      } catch (Exception e) {
+        Log.e(TAG, "Failed to delete cache dir");
+      }
+    }
+    setStoredAppVersion(getCurrentAppVersion());
+
     String configIntentPath = getIntent().getStringExtra(CONFIG_PATH);
     File file = new File(CONFIG_SDCARD_PATH);
     String configSdcardPath = file.exists() ? CONFIG_SDCARD_PATH : "";
@@ -277,7 +344,7 @@ public class CalculatingActivity extends BaseActivity
       Set<String> previousResultsStrings =
           sharedPref.getStringSet(RESULTS_PREF, Collections.emptySet());
 
-      if (previousScore != -1 && previousResultsStrings != null) {
+      if (previousScore != -1 && previousResultsStrings != null && arePreviousResultsValid) {
         displayPreviousResults = true;
         state = STATE_RESULTS;
         pendingState = STATE_RESULTS;
@@ -1292,8 +1359,10 @@ public class CalculatingActivity extends BaseActivity
         copyFile(in, out, callback);
         if (MLPerfTasks.isZipFile(src)) {
           if (!unZip(tmpFile, dest)) {
+            tmpFile.delete();
             return true;
           }
+          tmpFile.delete();
           Log.d(TAG, "Unzipped " + src + " to " + dest);
         } else {
           tmpFile.renameTo(destFile);
