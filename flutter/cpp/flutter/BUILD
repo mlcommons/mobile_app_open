@@ -40,7 +40,7 @@ ios_static_framework(
     ],
     minimum_os_version = "11.0",
     deps = [
-        "//flutter/cpp/backend_tflite:tflite_c",
+        "//mobile_back_tflite/cpp/backend_tflite:tflite_c",
         "//flutter/cpp/flutter:bridge",
     ],
 )
