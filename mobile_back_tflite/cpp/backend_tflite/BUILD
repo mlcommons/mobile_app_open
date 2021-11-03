@@ -29,6 +29,7 @@ cc_library(
     srcs = ["tflite_c.cc"],
     hdrs = [
         "tflite_settings.h",
+        "tflite_settings_apple.h",
         "thread_pool.h",
         "utils.h",
     ],
