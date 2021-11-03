@@ -37,11 +37,15 @@ limitations under the License.
 #include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
 #endif
 #include "tensorflow/core/platform/logging.h"
+
 #if MTK_TFLITE_NEURON_BACKEND
 #include "neuron/tflite_settings_mtk.h"
+#elif __APPLE__
+#include "tflite_settings_apple.h"
 #else
 #include "tflite_settings.h"
 #endif
+
 #include "thread_pool.h"
 #include "utils.h"
 
