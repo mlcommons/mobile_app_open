@@ -42,6 +42,9 @@ build:ios --copt=-Wno-c++11-narrowing
 build:ios_fat64 --config=ios
 build:ios_fat64 --ios_multi_cpus=arm64,x86_64
 
+# Fix an error in build_bazel_rules_apple
+build:ios --incompatible_run_shell_command_string=false
+
 # Windows configs
 
 # Make sure to include as little of windows.h as possible
