@@ -9,6 +9,11 @@ cc_library(
 )
 
 cc_library(
+    name = "tflitebackenddll",
+    srcs = ["//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.dll"],
+)
+
+cc_library(
     name = "tfliteneuronbackend",
     srcs = ["//mobile_back_tflite/cpp/backend_tflite:libtfliteneuronbackend.so"],
 )

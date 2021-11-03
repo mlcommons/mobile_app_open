@@ -50,6 +50,10 @@ cc_library(
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
         ],
+        "@org_tensorflow//tensorflow:ios": [
+            "@org_tensorflow//tensorflow/lite/delegates/coreml:coreml_delegate",
+            "@org_tensorflow//tensorflow/lite/delegates/gpu:metal_delegate",
+        ],
         "//conditions:default": [],
     }),
     alwayslink = 1,
@@ -126,4 +130,13 @@ tflite_jni_binary(
 aar_import(
     name = "tflite_neuron_aar",
     aar = "@neuron_delegate//neuron/java:tensorflow-lite-neuron",
+)
+
+cc_binary(
+    name = "libtflitebackend.dll",
+    linkshared = 1,
+    win_def_file = "//flutter/cpp/c:dll_export.def",
+    deps = [
+        ":tflite_c",
+    ],
 )
