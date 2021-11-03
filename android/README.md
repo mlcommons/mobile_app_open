@@ -69,7 +69,7 @@ The app can be built and installed with the following commands
 (execute from root directory `mobile_app_open`):
 
 ```bash
-bazel build -c opt //android/java/org/mlperf/inference:mlperf_app
+bazel build --config android_arm64 -c opt //android/java/org/mlperf/inference:mlperf_app
 
 # Install the app with the command:
 adb install -r bazel-bin/android/java/org/mlperf/inference/mlperf_app.apk
