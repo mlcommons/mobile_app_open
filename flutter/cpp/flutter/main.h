@@ -4,8 +4,6 @@
 extern "C" {
 #endif
 
-void stop_backend();
-
 // dart_backend.cpp
 
 void fake_calls();

@@ -53,17 +53,6 @@ static ::std::mutex global_driver_mutex;
   std::cout << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__ << "\n"
 #define lip(X) std::cout << #X "=" << in->X << ";\n"
 
-extern "C" void stop_backend() {
-  {
-    ::std::lock_guard<::std::mutex> guard(global_driver_mutex);
-    if (global_driver) {
-      li;
-      global_driver->AbortMLPerfTest();
-      li;
-    }
-  }
-}
-
 extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     const struct dart_ffi_run_benchmark_in* in) {
   lip(backend_model_path);

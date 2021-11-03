@@ -109,7 +109,5 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
   ::mlperf::StartTest(this, dataset_.get(), mlperf_settings, log_settings);
 }
 
-void MlperfDriver::AbortMLPerfTest() { ::mlperf::AbortTest(); }
-
 }  // namespace mobile
 }  // namespace mlperf
