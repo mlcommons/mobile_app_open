@@ -42,8 +42,13 @@ limitations under the License.
 #include "neuron/tflite_settings_mtk.h"
 #elif __APPLE__
 #include "tflite_settings_apple.h"
+#elif defined(_WIN64) || defined(_WIN32)
+// We don't have specialized settings for windows
+// but settings for Apple work on Windows orders of magnitude faster than settings for Android.
+// Apparently, uint8 operations require some special emulation that slows down the benchmark.
+#include "tflite_settings_apple.h"
 #else
-#include "tflite_settings.h"
+#include "tflite_settings_android.h"
 #endif
 
 #include "thread_pool.h"
