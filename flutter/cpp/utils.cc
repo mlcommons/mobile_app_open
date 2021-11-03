@@ -13,10 +13,10 @@ namespace mobile {
 
 #if defined(_WIN64) || defined(_WIN32)
 std::vector<std::string> GetSortedFileNames(
-    const std::string& directory,
-    const std::unordered_set<std::string>& extensions) {
+    const std::string &directory,
+    const std::unordered_set<std::string> &extensions) {
   std::vector<std::string> result;
-  for (const auto& entry : fs::directory_iterator(directory)) {
+  for (const auto &entry : fs::directory_iterator(directory)) {
     if (!fs::is_regular_file(entry.path())) continue;
     if (!extensions.empty()) {
       std::string ext = entry.path().extension().string();
@@ -32,8 +32,8 @@ std::vector<std::string> GetSortedFileNames(
 }
 #else
 std::vector<std::string> GetSortedFileNames(
-    const std::string& directory,
-    const std::unordered_set<std::string>& extensions) {
+    const std::string &directory,
+    const std::unordered_set<std::string> &extensions) {
   std::vector<std::string> result;
   TfLiteStatus ret = tflite::evaluation::GetSortedFileNames(
       tflite::evaluation::StripTrailingSlashes(directory), &result, extensions);
@@ -60,7 +60,7 @@ int GetByte(DataType type) {
 }
 
 // Convert string to mlperf::TestMode.
-::mlperf::TestMode Str2TestMode(const std::string& mode) {
+::mlperf::TestMode Str2TestMode(const std::string &mode) {
   if (mode == "PerformanceOnly") {
     return ::mlperf::TestMode::PerformanceOnly;
   } else if (mode == "AccuracyOnly") {
@@ -73,15 +73,15 @@ int GetByte(DataType type) {
   }
 }
 
-bool AddBackendConfiguration(mlperf_backend_configuration_t* configs,
-                             const std::string& key, const std::string& value) {
+bool AddBackendConfiguration(mlperf_backend_configuration_t *configs,
+                             const std::string &key, const std::string &value) {
   if (configs->count >= kMaxMLPerfBackendConfigs) {
     return false;
   }
   // Copy data in case of key, value deallocated.
-  char* c_key = new char[key.length() + 1];
+  char *c_key = new char[key.length() + 1];
   strcpy(c_key, key.c_str());
-  char* c_value = new char[value.length() + 1];
+  char *c_value = new char[value.length() + 1];
   strcpy(c_value, value.c_str());
   configs->keys[configs->count] = c_key;
   configs->values[configs->count] = c_value;
@@ -89,7 +89,7 @@ bool AddBackendConfiguration(mlperf_backend_configuration_t* configs,
   return true;
 }
 
-void DeleteBackendConfiguration(mlperf_backend_configuration_t* configs) {
+void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs) {
   delete configs->accelerator;
   for (int i = 0; i < configs->count; ++i) {
     delete configs->keys[i];
@@ -98,15 +98,15 @@ void DeleteBackendConfiguration(mlperf_backend_configuration_t* configs) {
   configs->count = 0;
 }
 
-mlperf_backend_configuration_t CppToCSettings(const SettingList& settings) {
+mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   mlperf_backend_configuration_t c_settings;
-  char* accelerator =
+  char *accelerator =
       new char[settings.benchmark_setting().accelerator().length() + 1];
   strcpy(accelerator, settings.benchmark_setting().accelerator().c_str());
   c_settings.accelerator = accelerator;
   c_settings.batch_size = settings.benchmark_setting().batch_size();
 
-  // Add common setings
+  // Add common settings
   for (Setting s : settings.setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value().value());
   }
@@ -116,7 +116,7 @@ mlperf_backend_configuration_t CppToCSettings(const SettingList& settings) {
   return c_settings;
 }
 
-SettingList createSettingList(const BackendSetting& backend_setting,
+SettingList createSettingList(const BackendSetting &backend_setting,
                               std::string benchmark_id) {
   SettingList setting_list;
   int setting_index = 0;
