@@ -12,6 +12,9 @@ common --experimental_repo_remote_exec
 build:short_logs --output_filter=DONT_MATCH_ANYTHING
 build:verbose_logs --output_filter=
 
+# Fix an error in build_bazel_rules_apple
+build:ios --incompatible_run_shell_command_string=false
+
 # Suppress C++ compiler warnings, otherwise build logs become 10s of MBs.
 build:android --copt=-w
 build:ios --copt=-w
