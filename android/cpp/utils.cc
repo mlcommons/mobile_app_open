@@ -18,10 +18,14 @@ std::vector<std::string> GetSortedFileNames(
   std::vector<std::string> result;
   for (const auto &entry : fs::directory_iterator(directory)) {
     if (!fs::is_regular_file(entry.path())) continue;
-    if (!extensions.empty() &&
-        extensions.count(entry.path().extension().string()) == 0)
-      continue;
-    result.emplace_back(directory + "/" + entry.path().string());
+    if (!extensions.empty()) {
+      std::string ext = entry.path().extension().string();
+      std::transform(ext.begin(), ext.end(), ext.begin(), tolower);
+      if (extensions.count(ext) == 0) {
+        continue;
+      }
+    }
+    result.emplace_back(entry.path().string());
   }
   std::sort(result.begin(), result.end());
   return result;
