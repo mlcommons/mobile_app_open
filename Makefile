@@ -33,15 +33,22 @@ output/mlperf_mobile_docker_1_0.stamp: android/docker/mlperf_mobile/Dockerfile
 
 docker_image: output/mlperf_mobile_docker_1_0.stamp
 
-COMMON_DOCKER_FLAGS1= \
+BASE_DOCKER_FLAGS= \
                 -e USER=mlperf \
                 ${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
+                -u `id -u`:`id -g`
+
+COMMON_DOCKER_FLAGS0= \
+		${BASE_DOCKER_FLAGS} \
                 ${QTI_VOLUMES} \
 		-w /home/mlperf/mobile_app \
-                -u `id -u`:`id -g` \
-		mlcommons/mlperf_mobile:1.0 bazel-3.7.2
+		mlcommons/mlperf_mobile:1.0
+
+COMMON_DOCKER_FLAGS1= \
+		${COMMON_DOCKER_FLAGS0} \
+		bazel-3.7.2
 
 COMMON_DOCKER_FLAGS2= \
                 ${PROXY_WORKAROUND2} \
@@ -113,6 +120,15 @@ app_x86_64: output/mlperf_mobile_docker_1_0.stamp
 	@cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app_x86_64.apk
 	@chmod 777 output/mlperf_app.apk
 
+flutter_android:
+	@echo "Building flutter app for android"
+	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
+	@docker run \
+		${BASE_DOCKER_FLAGS} \
+		-e USE_PROXY_WORKAROUND=${USE_PROXY_WORKAROUND} \
+		-w /home/mlperf/mobile_app/flutter \
+		mlcommons/mlperf_mobile:1.0 make android
+
 test_app: output/mlperf_mobile_docker_1_0.stamp
 	@echo "Building mlperf_app.apk"
 	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
@@ -127,6 +143,7 @@ test_app: output/mlperf_mobile_docker_1_0.stamp
 rundocker: output/mlperf_mobile_docker_1_0.stamp
 	@docker run -it \
                 -e USER=mlperf \
+                ${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
 		-w /home/mlperf/mobile_app \

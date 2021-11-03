@@ -93,3 +93,5 @@ RUN mkdir -p /home/mlperf && chmod 777 /home/mlperf
 ENV HOME /home/mlperf
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 
+RUN ln -s /usr/bin/bazel-3.7.2 /usr/bin/bazel
+
