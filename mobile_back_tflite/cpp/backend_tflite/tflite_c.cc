@@ -45,6 +45,14 @@ limitations under the License.
 #include "thread_pool.h"
 #include "utils.h"
 
+#if __APPLE__
+#include <TargetConditionals.h>
+#if TARGET_OS_IPHONE
+#include "tensorflow/lite/delegates/coreml/coreml_delegate.h"
+#include "tensorflow/lite/delegates/gpu/metal_delegate.h"
+#endif
+#endif
+
 struct TFLiteBackendData {
   const char *name = "TFLite";
   const char *vendor = "Google";
