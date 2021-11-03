@@ -8,7 +8,7 @@ endif
 .PHONY: ios
 ios: cpp-ios prepare-flutter update-splash-screen
 
-BAZEL_LINKS_DIR=bazel-
+BAZEL_LINKS_DIR=../bazel-
 _bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_DIR} --experimental_no_product_name_out_symlink
 
 .PHONY: cpp-ios
@@ -135,19 +135,19 @@ backend-bridge-android:
 
 .PHONY: backends/tflite-windows
 backends/tflite-windows:
-	bazel build ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/backend_tflite:libtflitebackend.dll
-	chmod +w ${BAZEL_LINKS_DIR}bin/cpp/backend_tflite/libtflitebackend.dll
+	bazel build ${_bazel_links_arg} --config=windows -c opt //mobile_back_tflite:tflitebackenddll
+	chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll
 	mkdir -p build/win-dlls/backends
 	rm -f build/win-dlls/backends/libtflitebackend.dll
-	cp ${BAZEL_LINKS_DIR}bin/cpp/backend_tflite/libtflitebackend.dll build/win-dlls/backends/libtflitebackend.dll
+	cp ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll build/win-dlls/backends/libtflitebackend.dll
 
 .PHONY: backends/tflite-android
 backends/tflite-android:
-	bazel build --config=android_arm64 -c opt //flutter/cpp/backend_tflite:libtflitebackend.so
-	chmod +w bazel-bin/cpp/backend_tflite/libtflitebackend.so
+	bazel build --config=android_arm64 -c opt //mobile_back_tflite:tflitebackend
+	chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
 	mkdir -p android/app/src/main/jniLibs/arm64-v8a
 	rm -f android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
-	cp bazel-bin/cpp/backend_tflite/libtflitebackend.so android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
+	cp ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
 
 ifeq (${ENABLE_BACKEND_EXAMPLE},1)
 backend_replace_example=\'example\',
