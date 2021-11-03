@@ -14,6 +14,7 @@ limitations under the License.
 ==============================================================================*/
 #include "android/cpp/backends/external.h"
 
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <vector>
@@ -63,11 +64,26 @@ std::string BackendFunctions::isSupported(const std::string& lib_path,
 
 BackendFunctions::BackendFunctions(const std::string& lib_path) {
   if (!lib_path.empty()) {
+    isloaded = false;
+#if defined(_WIN64) || defined(_WIN32)
+    std::wstring wide_lib_path;
+    wide_lib_path.resize(lib_path.size() + 1);
+    std::mbstate_t state{};
+    const char* src = lib_path.c_str();
+    auto conv_res =
+        std::mbsrtowcs(&wide_lib_path[0], &src, wide_lib_path.size(), &state);
+    if (conv_res == std::string::npos) {
+      LOG(ERROR) << "Unable to load: " << lib_path
+                 << ": can't convert to std::wstring";
+      return;
+    }
+    handle = tflite::SharedLibrary::LoadLibrary(wide_lib_path.c_str());
+#else
     handle = tflite::SharedLibrary::LoadLibrary(lib_path.c_str());
+#endif
     if (handle == nullptr) {
       LOG(ERROR) << "Unable to load: " << lib_path << ": "
                  << tflite::SharedLibrary::GetError();
-      isloaded = false;
       return;
     }
     isloaded = true;
