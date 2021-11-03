@@ -14,7 +14,7 @@ For example, the following command to run TFLite with the dummy dataset:
 
 ```bash
 bazel run -c opt -- \
-  //flutter/cpp/binary:main TFLITE DUMMY \
+  //cpp/binary:main TFLITE DUMMY \
   --mode=SubmissionRun \
   --model_file=<path to the model file> \
   --num_threads=4 \
@@ -27,7 +27,7 @@ Each set of (backend, dataset) has a different set of arguments, so please use
 
 ```bash
 bazel run -c opt -- \
-  //flutter/cpp/binary:main TFLITE IMAGENET --help
+  //cpp/binary:main TFLITE IMAGENET --help
 ```
 
 The supported backends and datasets for this binary is listed in the enum
@@ -37,7 +37,7 @@ BackendType and DatasetType in main.cc.
 
 Build the CLI and backend library, and push them to device:
 ```
-bazel build -c opt --config android_arm64 //flutter/cpp/binary:tflitebackend //flutter/cpp/binary:main
+bazel build -c opt --config android_arm64 //cpp/binary:tflitebackend //cpp/binary:main
 adb push bazel-bin/tflite_backend/libtflitebackend.so /data/local/tmp
 adb push bazel-bin/cpp/binary/main /data/local/tmp/mlperf_main
 ```
