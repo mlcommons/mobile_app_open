@@ -28,7 +28,8 @@ cc_library(
     name = "tflite_c",
     srcs = ["tflite_c.cc"],
     hdrs = [
-        "tflite_settings.h",
+        "tflite_settings_android.h",
+        "tflite_settings_apple.h",
         "thread_pool.h",
         "utils.h",
     ],
@@ -49,6 +50,10 @@ cc_library(
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
+        ],
+        "@org_tensorflow//tensorflow:ios": [
+            "@org_tensorflow//tensorflow/lite/delegates/coreml:coreml_delegate",
+            "@org_tensorflow//tensorflow/lite/delegates/gpu:metal_delegate",
         ],
         "//conditions:default": [],
     }),
@@ -126,4 +131,13 @@ tflite_jni_binary(
 aar_import(
     name = "tflite_neuron_aar",
     aar = "@neuron_delegate//neuron/java:tensorflow-lite-neuron",
+)
+
+cc_binary(
+    name = "libtflitebackend.dll",
+    linkshared = 1,
+    win_def_file = "//flutter/cpp/c:dll_export.def",
+    deps = [
+        ":tflite_c",
+    ],
 )

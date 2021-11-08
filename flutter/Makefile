@@ -21,7 +21,7 @@ cpp-ios:
 	rm -rf ${_xcode_fw}
 	cp -a ${_bazel_ios_fw} ${_xcode_fw}
 
-_bazel_ios_fw := bazel-bin/cpp/flutter/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework
+_bazel_ios_fw := ../bazel-bin/flutter/cpp/flutter/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework
 _xcode_fw := ios/Flutter/ios_backend_fw_static.framework
 
 .PHONY: windows
@@ -120,34 +120,34 @@ windows/flutter-release:
 .PHONY: backend-bridge-windows
 backend-bridge-windows:
 	bazel build ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/flutter:backend_bridge.dll
-	chmod +w ${BAZEL_LINKS_DIR}bin/cpp/flutter/backend_bridge.dll
+	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll
 	mkdir -p build/win-dlls/
 	rm -f build/win-dlls/backend_bridge.dll
-	cp ${BAZEL_LINKS_DIR}bin/cpp/flutter/backend_bridge.dll build/win-dlls/backend_bridge.dll
+	cd .. && cp ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll flutter/build/win-dlls/backend_bridge.dll
 
 .PHONY: backend-bridge-android
 backend-bridge-android:
-	bazel build --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
-	chmod +w bazel-bin/cpp/flutter/libbackendbridge.so
+	bazel build ${_bazel_links_arg} --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
+	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so
 	mkdir -p android/app/src/main/jniLibs/arm64-v8a
-	rm -f android/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
-	cp bazel-bin/cpp/flutter/libbackendbridge.so android/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
+	rm -f android/flutter/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
+	cd .. && cp ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so flutter/android/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
 
 .PHONY: backends/tflite-windows
 backends/tflite-windows:
-	bazel build ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/backend_tflite:libtflitebackend.dll
-	chmod +w ${BAZEL_LINKS_DIR}bin/cpp/backend_tflite/libtflitebackend.dll
+	bazel build ${_bazel_links_arg} --config=windows -c opt //mobile_back_tflite:tflitebackenddll
+	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll
 	mkdir -p build/win-dlls/backends
 	rm -f build/win-dlls/backends/libtflitebackend.dll
-	cp ${BAZEL_LINKS_DIR}bin/cpp/backend_tflite/libtflitebackend.dll build/win-dlls/backends/libtflitebackend.dll
+	cd .. && cp ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll flutter/build/win-dlls/backends/libtflitebackend.dll
 
 .PHONY: backends/tflite-android
 backends/tflite-android:
-	bazel build --config=android_arm64 -c opt //flutter/cpp/backend_tflite:libtflitebackend.so
-	chmod +w bazel-bin/cpp/backend_tflite/libtflitebackend.so
+	bazel build ${_bazel_links_arg} --config=android_arm64 -c opt //mobile_back_tflite:tflitebackend
+	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
 	mkdir -p android/app/src/main/jniLibs/arm64-v8a
 	rm -f android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
-	cp bazel-bin/cpp/backend_tflite/libtflitebackend.so android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
+	cd .. && cp ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so flutter/android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
 
 ifeq (${ENABLE_BACKEND_EXAMPLE},1)
 backend_replace_example=\'example\',

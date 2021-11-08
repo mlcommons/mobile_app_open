@@ -37,13 +37,31 @@ limitations under the License.
 #include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
 #endif
 #include "tensorflow/core/platform/logging.h"
+
 #if MTK_TFLITE_NEURON_BACKEND
 #include "neuron/tflite_settings_mtk.h"
+#elif __APPLE__
+#include "tflite_settings_apple.h"
+#elif defined(_WIN64) || defined(_WIN32)
+// We don't have specialized settings for windows
+// but settings for Apple work on Windows orders of magnitude faster than
+// settings for Android. Apparently, uint8 operations require some special
+// emulation that slows down the benchmark.
+#include "tflite_settings_apple.h"
 #else
-#include "tflite_settings.h"
+#include "tflite_settings_android.h"
 #endif
+
 #include "thread_pool.h"
 #include "utils.h"
+
+#if __APPLE__
+#include <TargetConditionals.h>
+#if TARGET_OS_IPHONE
+#include "tensorflow/lite/delegates/coreml/coreml_delegate.h"
+#include "tensorflow/lite/delegates/gpu/metal_delegate.h"
+#endif
+#endif
 
 struct TFLiteBackendData {
   const char *name = "TFLite";

@@ -1,4 +1,4 @@
-/* Copyright 2021 The MLPerf Authors. All Rights Reserved.
+/* Copyright 2020-2021 The MLPerf Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -60,8 +60,8 @@ common_setting {
   id: "share_results"
   name: "Share results"
   value {
-    value: "1"
-    name: "true"
+    value: "0"
+    name: "false"
   }
   acceptable_value {
     value: "1"
@@ -91,44 +91,44 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
-  accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  benchmark_id: "IC_tpu_float32"
+  accelerator: "coreml"
+  accelerator_desc: "CoreML"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
-  accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  benchmark_id: "IC_tpu_float32_offline"
+  accelerator: "coreml"
+  accelerator_desc: "CoreML"
   configuration: "TFLite"
-  batch_size: 128
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+  batch_size: 2
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
-  accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  benchmark_id: "OD_float32"
+  accelerator: "coreml"
+  accelerator_desc: "CoreML"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
 }
 
 benchmark_setting {
   benchmark_id: "LU_float32"
-  accelerator: "gpu_f16"
-  accelerator_desc: "GPU FP16"
+  accelerator: "metal"
+  accelerator_desc: "Metal"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
-  accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  benchmark_id: "IS_float32"
+  accelerator: "coreml"
+  accelerator_desc: "CoreML"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_uint8.tflite"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_float.tflite"
 })SETTINGS";
 
 #endif
