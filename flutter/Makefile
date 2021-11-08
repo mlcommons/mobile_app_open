@@ -21,7 +21,7 @@ cpp-ios:
 	rm -rf ${_xcode_fw}
 	cp -a ${_bazel_ios_fw} ${_xcode_fw}
 
-_bazel_ios_fw := bazel-bin/cpp/flutter/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework
+_bazel_ios_fw := ../bazel-bin/flutter/cpp/flutter/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework
 _xcode_fw := ios/Flutter/ios_backend_fw_static.framework
 
 .PHONY: windows
