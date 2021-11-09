@@ -160,7 +160,8 @@ of java/org/mlperf/inference/BUILD:
 ```
 Modify java/org/mlperf/inference/Backends.java.in to add your backend and
 modify the genrule in java/org/mlperf/inference/BUILD to enable your
-backend if it is enabled in the build.
+backend if it is enabled in the build. **The order is important! Backends will be
+probed in the order of occurence in the list and the TFLite backend must be last.**
 
 Modify the Makefile to change release-app to use your backend when
 building with --//android/java/org/mlperf/inference:with_vendor="1"

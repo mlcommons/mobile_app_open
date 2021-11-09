@@ -27,6 +27,8 @@ const _backendsList = [
     TFLITE_TAG
 ];
 ```
+
+**The order is important! The TFLITE_TAG must always be last and the probe order is first to last.**
 2. Modify [makefile](../Makefile).
 Make a copy of if-condition for `ENABLE_BACKEND_EXAMPLE` and change variable names and file name.
 Add line for your backend to `set-supported-backends` make target.
