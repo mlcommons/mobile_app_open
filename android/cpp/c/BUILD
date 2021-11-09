@@ -21,6 +21,7 @@ package(
 exports_files(
     [
         "backend_c.h",
+        "dll_export.def",
         "exported_symbols.lds",
         "type.h",
         "version_script.lds",

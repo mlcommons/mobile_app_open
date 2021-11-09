@@ -181,10 +181,10 @@ protobuf:
 	dart pub get
 	rm -rf lib/protos
 	mkdir -p lib/protos
-	protoc --proto_path cpp/proto \
+	protoc --proto_path ../android/cpp/proto \
 		--plugin protoc-gen-dart="${script_launch_prefix}protoc-gen-dart.${script_extension}" \
 		--dart_out lib/protos \
-		cpp/proto/*.proto
+		../android/cpp/proto/*.proto
 
 .PHONY: format
 format: format-clang format-bazel format-dart

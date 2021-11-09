@@ -136,7 +136,7 @@ aar_import(
 cc_binary(
     name = "libtflitebackend.dll",
     linkshared = 1,
-    win_def_file = "//flutter/cpp/c:dll_export.def",
+    win_def_file = "//android/cpp/c:dll_export.def",
     deps = [
         ":tflite_c",
     ],

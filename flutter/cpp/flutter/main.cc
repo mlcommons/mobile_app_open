@@ -6,15 +6,15 @@
 #include <iostream>
 #include <mutex>
 
-#include "flutter/cpp/backends/external.h"
-#include "flutter/cpp/c/backend_c.h"
-#include "flutter/cpp/datasets/ade20k.h"
-#include "flutter/cpp/datasets/coco.h"
-#include "flutter/cpp/datasets/imagenet.h"
-#include "flutter/cpp/datasets/squad.h"
-#include "flutter/cpp/mlperf_driver.h"
-#include "flutter/cpp/proto/backend_setting.pb.h"
-#include "flutter/cpp/proto/mlperf_task.pb.h"
+#include "android/cpp/backends/external.h"
+#include "android/cpp/c/backend_c.h"
+#include "android/cpp/datasets/ade20k.h"
+#include "android/cpp/datasets/coco.h"
+#include "android/cpp/datasets/imagenet.h"
+#include "android/cpp/datasets/squad.h"
+#include "android/cpp/mlperf_driver.h"
+#include "android/cpp/proto/backend_setting.pb.h"
+#include "android/cpp/proto/mlperf_task.pb.h"
 
 // On iOS we link backend statically and don't export any functions
 // Linker sees that we don't use some of the functions and removes them
@@ -52,17 +52,6 @@ static ::std::mutex global_driver_mutex;
 #define li \
   std::cout << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__ << "\n"
 #define lip(X) std::cout << #X "=" << in->X << ";\n"
-
-extern "C" void stop_backend() {
-  {
-    ::std::lock_guard<::std::mutex> guard(global_driver_mutex);
-    if (global_driver) {
-      li;
-      global_driver->AbortMLPerfTest();
-      li;
-    }
-  }
-}
 
 extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     const struct dart_ffi_run_benchmark_in* in) {
