@@ -1,5 +1,4 @@
-# Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
-# Copyright (c) 2021 Samsung Electronics Co. Ltd. All rights reserved.
+# Copyright (c) 2020-2021 The MLPerf Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
