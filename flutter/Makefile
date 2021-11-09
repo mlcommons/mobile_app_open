@@ -1,3 +1,18 @@
+# Copyright 2020-2021 The MLPerf Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+##########################################################################
+
 .PHONY: all
 ifeq (${OS},Windows_NT)
 all: windows
@@ -24,6 +39,7 @@ cpp-ios:
 _bazel_ios_fw := ../bazel-bin/flutter/cpp/flutter/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework
 _xcode_fw := ios/Flutter/ios_backend_fw_static.framework
 
+# To add a new backend, add backends/example-windows target (e.g. backends/intel-windows)
 .PHONY: windows
 windows: backend-bridge-windows backends/tflite-windows prepare-flutter
 
@@ -133,6 +149,15 @@ backend-bridge-android:
 	rm -f android/flutter/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
 	cd .. && cp ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so flutter/android/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
 
+# Use the following block as a template to add a new Windows backend
+#.PHONY: backends/example-windows
+#backends/example-windows:
+#	bazel build ${_bazel_links_arg} --config=windows -c opt //mobile_back_example:examplebackenddll
+#	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.dll
+#	mkdir -p build/win-dlls/backends
+#	rm -f build/win-dlls/backends/libexamplebackend.dll
+#	cd .. && cp ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.dll flutter/build/win-dlls/backends/libexamplebackend.dll
+
 .PHONY: backends/tflite-windows
 backends/tflite-windows:
 	bazel build ${_bazel_links_arg} --config=windows -c opt //mobile_back_tflite:tflitebackenddll
@@ -140,6 +165,15 @@ backends/tflite-windows:
 	mkdir -p build/win-dlls/backends
 	rm -f build/win-dlls/backends/libtflitebackend.dll
 	cd .. && cp ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll flutter/build/win-dlls/backends/libtflitebackend.dll
+
+# Use the following block as a template to add a new Android backend
+#.PHONY: backends/example-android
+#backends/example-android:
+#	bazel build ${_bazel_links_arg} --config=android_arm64 -c opt //mobile_back_example:examplebackend
+#	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.so
+#	mkdir -p android/app/src/main/jniLibs/arm64-v8a
+#	rm -f android/app/src/main/jniLibs/arm64-v8a/libexamplebackend.so
+#	cd .. && cp ${BAZEL_LINKS_DIR}bin/mobile_back_examplet/cpp/backend_example/libexamplebackend.so flutter/android/app/src/main/jniLibs/arm64-v8a/libexamplebackend.so
 
 .PHONY: backends/tflite-android
 backends/tflite-android:
@@ -149,11 +183,13 @@ backends/tflite-android:
 	rm -f android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
 	cd .. && cp ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so flutter/android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
 
-ifeq (${ENABLE_BACKEND_EXAMPLE},1)
-backend_replace_example=\'example\',
-else
-backend_replace_example=
-endif
+# To add a new vendor backend, copy and uncomment this block and replace "EXAMPLE" and "example" with the vendor name (e.g. INTEL and intel)
+# See tflite backend below as an example
+#ifeq (${ENABLE_BACKEND_EXAMPLE},0)
+#backend_replace_example=
+#else
+#backend_replace_example=\'libexamplebackend\',
+#endif
 
 ifeq (${ENABLE_BACKEND_TFLITE},0)
 backend_replace_tflite=
@@ -161,6 +197,8 @@ else
 backend_replace_tflite=\'libtflitebackend\',
 endif
 
+# To add a new backend, add a new line to the sed command for your backend replacing "example" with the vendor name. For instance, for Intel it would be:
+#               -e "s/INTEL_TAG/${backend_replace_intel}/" \
 .PHONY: set-supported-backends
 set-supported-backends:
 	cat lib/backend/backends_list.in | sed \

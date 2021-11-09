@@ -126,48 +126,14 @@ Please see [these instructions](docs/guides/installation.md) for installing and 
 
 ## Adding a new Backend
 
-### Backend changes
-In mobile_back_vendor, the following steps are required to add your backend:
+The following steps are required to add your backend:
 
-1. Create a branch in mobile_back_[vendor] that builds your backend using cpp/c/backend_c.h
-2. Generate an artifacts dir with:
-  a. BUILD
-  b. libbackendname.so shared library
-  c. dependent shared libraries (e.g. libaccelerator.so, libMySDK.so)
+1. Create a mobile_back_[vendor] top level directory that builds your backend using android/cpp/c/backend_c.h
+2. Implement all the C API backend interfaces defined in android/cpp/c/backend_c.h
+3. Add a bazel BUILD file to create lib[vendor]backend.so shared library
 
-Use the following as a template for the layout of the artifacts dir
-replacing _vendor_ with the actual vendor/backend name:
-```
-artifacts
-├── BUILD
-└─── lib_arm64/
-    ├── libaccelerator.so
-    ├── libvendorbackend.so
-    └── libMySDK.so
-```
-The generated BUILD file is:
-```
-package(
-    default_visibility = ["//visibility:public"],
-    licenses = ["notice"],  # Apache 2.0
-)
-
-config_setting(
-    name = "android_arm64",
-    values = {"cpu": "arm64-v8a"},
-)
-
-cc_library(
-    name = "vendorbackend",
-    srcs = [
-             "lib_arm64/libMySDK.so",
-             "lib_arm64/libaccelerator.so",
-             "lib_arm64/libvendorbackend.so",
-    ],
-)
-```
-The contents of the artifacts dir will have to be checked into https://github.com/mlcommons/mobile_back_build
-by MLCommons.
+You can look at the [default TFLite backend implementation](../../mobile_back_tflite) for a reference.
+The following steps are required to add your backend:
 
 ### Unified app changes
 In java/org/mlperf/inference/BUILD, add the following replacing
@@ -196,15 +162,6 @@ Modify java/org/mlperf/inference/Backends.java.in to add your backend and
 modify the genrule in java/org/mlperf/inference/BUILD to enable your
 backend if it is enabled in the build.
 
-Modify the WORKSPACE to add your backend by replacing vendor with
-your backend name as in the example below:
-```
-# other dependencies.
-local_repository(
-    name = "vendorbackend",
-    path = "vendor_backend",
-)
-```
 Modify the Makefile to change release-app to use your backend when
 building with --//android/java/org/mlperf/inference:with_vendor="1"
 substituting your backend name for vendor.
