@@ -95,3 +95,5 @@ ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 
 RUN ln -s /usr/bin/bazel-3.7.2 /usr/bin/bazel
 
+# Flutter must be installed by the user and the install dir is modified
+ENV PATH=${PATH}:/home/mlperf/mobile_app/output/flutter/bin

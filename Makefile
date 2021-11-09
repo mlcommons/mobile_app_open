@@ -24,6 +24,7 @@ all: app
 include mobile_back_tflite/tflite_backend.mk
 include mobile_back_pixel/pixel_backend.mk
 include mobile_back_qti/make/qti_backend.mk
+include flutter/make/android.mk
 
 
 output/mlperf_mobile_docker_1_0.stamp: android/docker/mlperf_mobile/Dockerfile
@@ -38,6 +39,7 @@ BASE_DOCKER_FLAGS= \
                 ${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
+		-v $(CURDIR)/output/home/mlperf/flutter_cache:/home/mlperf/flutter_cache \
                 -u `id -u`:`id -g`
 
 COMMON_DOCKER_FLAGS0= \
@@ -65,6 +67,8 @@ COMMON_DOCKER_FLAGS= \
 NATIVE_DOCKER_FLAGS= \
                 ${COMMON_DOCKER_FLAGS1} --bazelrc=/dev/null \
                 ${COMMON_DOCKER_FLAGS2}
+
+export PATH := $(CURDIR)/output/flutter/bin:$(PATH)
 
 proto_test: output/mlperf_mobile_docker_1_0.stamp
 	@echo "Building proto_test"
@@ -120,14 +124,21 @@ app_x86_64: output/mlperf_mobile_docker_1_0.stamp
 	@cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app_x86_64.apk
 	@chmod 777 output/mlperf_app.apk
 
-flutter_android:
+flutter: output/flutter/.stamp
+
+output/flutter/.stamp:
+	cd output && git clone https://github.com/flutter/flutter.git
+	touch $@
+
+flutter_backendbridge: output/mlperf_mobile_docker_1_0.stamp
 	@echo "Building flutter app for android"
-	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
+	@mkdir -p output/home/mlperf/flutter_cache && chmod 777 output/home/mlperf/flutter_cache
 	@docker run \
 		${BASE_DOCKER_FLAGS} \
 		-e USE_PROXY_WORKAROUND=${USE_PROXY_WORKAROUND} \
-		-w /home/mlperf/mobile_app/flutter \
-		mlcommons/mlperf_mobile:1.0 make android
+		-w /home/mlperf/mobile_app \
+		mlcommons/mlperf_mobile:1.0 \
+		bazel ${PROXY_WORKAROUND2} --output_user_root=/home/mlperf/flutter_cache/bazel build --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
 
 test_app: output/mlperf_mobile_docker_1_0.stamp
 	@echo "Building mlperf_app.apk"
@@ -145,6 +156,7 @@ rundocker: output/mlperf_mobile_docker_1_0.stamp
                 -e USER=mlperf \
                 ${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
+		-v $(CURDIR)/output/home/mlperf/git-certs:/home/mlperf/git-certs \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
 		-w /home/mlperf/mobile_app \
                 -u `id -u`:`id -g` \
