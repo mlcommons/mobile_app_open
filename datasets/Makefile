@@ -1,5 +1,4 @@
-# Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
-# Copyright (c) 2021 Samsung Electronics Co., Ltd. All rights reserved.
+# Copyright (c) 2020-2021 The MLPerf Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +20,7 @@ MK_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 ROOTDIR := $(abspath $(shell dirname ${MK_PATH})/..)
 BUILDDIR := ${ROOTDIR}/datasets
 
-.PHONY: clean clean-ade20k clean-coco clean-imagenet clean-squad doc
+.PHONY: clean clean-ade20k clean-coco clean-imagenet clean-squad
 
 USERID = $(shell id -u)
 GROUPID = $(shell id -g)
@@ -110,13 +109,8 @@ ${BUILDDIR}/ade20k_calibration_helper.stamp:
 ${BUILDDIR}/coco.stamp: ${BUILDDIR}/coco_helper.stamp ${BUILDDIR}/downloads/val2017.zip.stamp
 	@touch $@
 
-${BUILDDIR}/coco_helper.stamp: ${BUILDDIR}/downloads/val2014.zip.stamp \
-		${BUILDDIR}/downloads/coco_cal_images_list.txt ${BUILDDIR}/coco_calibration.stamp 
+${BUILDDIR}/coco_helper.stamp: ${BUILDDIR}/downloads/val2014.zip.stamp  ${BUILDDIR}/coco_calibration.stamp 
 	@touch $@
-
-${BUILDDIR}/downloads/coco_cal_images_list.txt:
-	@mkdir -p ${BUILDDIR}/downloads/
-	@curl -o $@ -L https://raw.githubusercontent.com/mlperf/inference/master/calibration/COCO/coco_cal_images_list.txt 
 
 ${BUILDDIR}/downloads/val2017.zip.stamp: ${BUILDDIR}/downloads/val2017.zip
 	@echo "Generating COCO test set"
