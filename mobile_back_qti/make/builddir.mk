@@ -14,9 +14,9 @@
 ##########################################################################
 
 this_mkfile:=$(abspath $(lastword $(MAKEFILE_LIST)))
-TOPDIR:=$(abspath $(shell dirname ${this_mkfile})/..)
-APP_DIR=$(abspath ${TOPDIR}/..)
-BUILDDIR=${APP_DIR}/output
+DLCDIR:=$(abspath $(shell dirname ${this_mkfile})/../DLC)
+TOPDIR=$(abspath ${DLCDIR}/../..)
+BUILDDIR=${TOPDIR}/output
 SNPE_VERSION=$(shell grep SNPE_VERSION ../variables.bzl | cut -d\" -f2)
 
 USERID=$(shell id -u)

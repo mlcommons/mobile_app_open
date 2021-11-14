@@ -17,20 +17,18 @@
 
 include ../make/builddir.mk
 
-DATASETS:=$(shell realpath ${TOPDIR}/../datasets)
+DATASETS:=${TOPDIR}/datasets
 DATASETS_OUT:=${DATASETS}/output
-CALIBRATION_DATA=${DATASETS_OUT}/calibration_set
-MLPERF_DATASETS=${DATASETS_OUT}/mlperf_datasets
+CALIBRATION_DATA:=${DATASETS_OUT}/calibration_set
+MLPERF_DATASETS:=${DATASETS_OUT}/mlperf_datasets
 
 all: ${DATASETS_OUT}/state/calibration.stamp hta-dlc htp-dlc
 
 # Download and build datasets and calibration files
 ${DATASETS_OUT}/state/calibration.stamp:
-	@(cd ${TOPDIR}/../datasets && make)
+	@(cd ${TOPDIR}/datasets && make)
 
 .PHONY: hta-dlc htp-dlc dependencies gen-hta-dlc-info gen-htp-dlc-info clean
-
-include ../make/docker.mk
 
 DLCBUILDDIR=${BUILDDIR}/DLC
 MODEL_BASE_PATH=${DLCBUILDDIR}/mobile
@@ -40,7 +38,8 @@ MOBILEBERT_MODEL_PATH=${MODEL_BASE_PATH}/language/bert/models_and_code/checkpoin
 
 ${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp:
 	@echo "Building mlperf_mobile docker"
-	@docker image build -t mlperf_mobile:1.1 $(dir $(abspath ${TOPDIR}/../android/docker/mlperf_mobile/Dockerfile))
+	@docker image build -t mlperf_mobile:1.1 $(dir $(abspath ${TOPDIR}/android/docker/mlperf_mobile/Dockerfile))
+	@mkdir -p ${DLCBUILDDIR}
 	@touch $@
 
 
@@ -71,6 +70,7 @@ mobilebert: \
 
 ${DLCBUILDDIR}/mobile/.stamp:
 	@echo "Downloading mobile"
+	@mkdir -p ${DLCBUILDDIR}
 	@(cd ${DLCBUILDDIR} && git clone --depth=1 https://github.com/mlcommons/mobile_open.git mobile)
 	@touch $@
 
@@ -93,7 +93,7 @@ ${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_float.dlc: \
 			-o /output/mobilenet_edgetpu_224_1.0_float.dlc
 
 ${DLCBUILDDIR}/imagenet/imagenet_image_list.txt: ${DLCBUILDDIR}/imagenet/state/quantdata.stamp
-	@cat ${TOPDIR}/../datasets/downloads/imagenet/cal_image_list_option_1.txt | sed "s!^!quantdata/!" | sed "s!JPEG!raw!" > $@
+	@cat ${TOPDIR}/datasets/downloads/imagenet/cal_image_list_option_1.txt | sed "s!^!quantdata/!" | sed "s!JPEG!raw!" > $@
 
 ${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_hta.stamp: \
 		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp \
@@ -201,7 +201,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat.dlc: \
 			-o /dlc/ssd_mobiledet_qat.dlc
 		
 ${DLCBUILDDIR}/coco/coco_image_list.txt: ${DLCBUILDDIR}/coco/state/quantdata.stamp
-	cat ${TOPDIR}/../datasets/util/coco/coco_calibration_files.txt | sed "s!^!quantdata/!" | sed "s!jpg!raw!" > ${DLCBUILDDIR}/coco/coco_image_list.txt
+	cat ${TOPDIR}/datasets/util/coco/coco_calibration_files.txt | sed "s!^!quantdata/!" | sed "s!jpg!raw!" > ${DLCBUILDDIR}/coco/coco_image_list.txt
 
 ${DLCBUILDDIR}/ssd_mobiledet_qat_hta.stamp: \
 		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp \
@@ -253,19 +253,19 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp.stamp: \
 
 
 ${DLCBUILDDIR}/deeplabv3_quantized.dlc: \
-		${TOPDIR}/DLC/argmax-quant.json \
+		${DLCDIR}/argmax-quant.json \
 		${DEEPLABV3QAT_MODEL_PATH}/freeze.pb \
 		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp \
 		${DLCBUILDDIR}/mobile/.stamp
 	@echo "Deeplab v3 model conversion ...."
 	@echo "Deeplabv3 QAT model"
-	@cat ${TOPDIR}/DLC/argmax-quant.json
+	@cat ${DLCDIR}/argmax-quant.json
 	@docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DEEPLABV3QAT_MODEL_PATH}:/deeplabv3 \
 		-v ${DLCBUILDDIR}:/output \
-		-v ${TOPDIR}/DLC:/dlc \
+		-v ${DLCDIR}:/dlc \
 		-u ${USERID}:${GROUPID} \
 		mlperf_mobile:1.1 \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-tensorflow-to-dlc \
@@ -279,7 +279,7 @@ ${DLCBUILDDIR}/deeplabv3_quantized.dlc: \
 
 ${DLCBUILDDIR}/ade20k/ade20k_image_list.txt: ${DLCBUILDDIR}/ade20k/state/quantdata.stamp
 	@mkdir -p ${DLCBUILDDIR}/ade20k
-	@cat ${TOPDIR}/../datasets/util/ade20k/ade20k_calibration_files.txt | sed "s!^!/ade20k/quantdata/!" | sed "s!jpg!raw!" > $@
+	@cat ${TOPDIR}/datasets/util/ade20k/ade20k_calibration_files.txt | sed "s!^!/ade20k/quantdata/!" | sed "s!jpg!raw!" > $@
 
 ${DLCBUILDDIR}/deeplabv3_hta.stamp: \
 		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp \
@@ -360,7 +360,7 @@ ${DLCBUILDDIR}/mobilebert_float.dlc: \
 		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
-		-v ${TOPDIR}/DLC:/dlc \
+		-v ${DLCDIR}:/dlc \
 		-v ${MOBILEBERT_MODEL_PATH}:/models \
 		-u ${USERID}:${GROUPID} \
 		mlperf_mobile:1.1 \
@@ -417,7 +417,7 @@ ${DLCBUILDDIR}/ade20k/state/resized.stamp: \
 	@docker run \
 		-e PYTHONPATH=/input/models-2.3.0/research/slim:/input/models-2.3.0/research/deeplab:/input/models-2.3.0/research \
 		-v $(CURDIR)/util/ade20k:/util/ \
-		-v ${TOPDIR}/../datasets/util/ade20k:/util2 \
+		-v ${TOPDIR}/datasets/util/ade20k:/util2 \
 		-v ${DATASETS_OUT}/ade20k:/input/ \
 		-v $(DLCBUILDDIR)/ade20k:/output/ \
 	  	-u ${USERID}:${GROUPID} \
@@ -433,7 +433,7 @@ ${DLCBUILDDIR}/ade20k/state/quantdata.stamp: \
 	@rm -rf ${DLCBUILDDIR}/ade20k/resized_raw
 	@mkdir -p ${DLCBUILDDIR}/ade20k/resized_raw
 	@docker run \
-		-v ${TOPDIR}/../datasets/util:/util \
+		-v ${TOPDIR}/datasets/util:/util \
 		-v ${DLCBUILDDIR}/ade20k:/ade20k \
 		-u ${USERID}:${GROUPID} \
 		mlperf_mobile:1.1 \
@@ -450,7 +450,7 @@ ${DLCBUILDDIR}/imagenet/state/resized.stamp: \
 	@rm -rf ${DLCBUILDDIR}/imagenet/resized
 	@mkdir -p ${DLCBUILDDIR}/imagenet/resized
 	@docker run \
-		-v ${TOPDIR}/../datasets/util:/util \
+		-v ${TOPDIR}/datasets/util:/util \
 		-v ${CALIBRATION_DATA}/imagenet:/imagenet \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
@@ -466,7 +466,7 @@ ${DLCBUILDDIR}/imagenet/state/quantdata.stamp: \
 	@rm -rf ${DLCBUILDDIR}/imagenet/resized_raw
 	@mkdir -p ${DLCBUILDDIR}/imagenet/resized_raw
 	@docker run \
-		-v ${TOPDIR}/../datasets/util:/util \
+		-v ${TOPDIR}/datasets/util:/util \
 		-v ${DLCBUILDDIR}/imagenet:/imagenet \
 		-u ${USERID}:${GROUPID} \
 		mlperf_mobile:1.1 \
@@ -481,11 +481,11 @@ ${DLCBUILDDIR}/coco/state/resized.stamp: \
 		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp
 	@echo "Scaling Coco images to 320x320"
 	@rm -rf ${DLCBUILDDIR}/coco/resized
-	@mkdir ${DLCBUILDDIR}/coco/resized
+	@mkdir -p ${DLCBUILDDIR}/coco/resized
 	@docker run \
 		-v ${CALIBRATION_DATA}/coco:/coco \
 		-v ${DLCBUILDDIR}/coco/resized:/resized \
-		-v ${TOPDIR}/../datasets/util:/util \
+		-v ${TOPDIR}/datasets/util:/util \
 		-u ${USERID}:${GROUPID} \
 		mlperf_mobile:1.1 \
 		python3 /util/coco/upscale_coco.py --inputs /coco/images --outputs /resized --size 320 320
@@ -500,7 +500,7 @@ ${DLCBUILDDIR}/coco/state/quantdata.stamp: \
 	@rm -rf ${DLCBUILDDIR}/coco/resized_raw
 	@mkdir -p ${DLCBUILDDIR}/coco/resized_raw
 	@docker run \
-		-v ${TOPDIR}/../datasets/util:/util \
+		-v ${TOPDIR}/datasets/util:/util \
 		-v ${DLCBUILDDIR}/coco:/coco_out \
 		-u ${USERID}:${GROUPID} \
 		mlperf_mobile:1.1 \
