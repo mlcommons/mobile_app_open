@@ -86,9 +86,9 @@ or to enable the QTI backend:
 ```
 make WITH_QTI=1 app
 ```
-or to enable both the MediaTek and QTI backends:
+or to enable multiple backends:
 ```
-make WITH_QTI=1 WITH_MEDIATEK=1 app
+make WITH_QTI=1 WITH_SAMSUNG=1 WITH_PIXEL=1 app
 ```
 
 # Install the app with the command:
