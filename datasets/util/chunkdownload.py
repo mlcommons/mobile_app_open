@@ -13,17 +13,23 @@
 # limitations under the License.
 ##########################################################################
 
-.PHONY: docker_image
+import os
 
-${BUILDDIR}/mlperf_mobile_docker_1_0.stamp: ${APP_DIR}/android/docker/mlperf_mobile/Dockerfile
-	@mkdir -p ${BUILDDIR}
-	@docker image build -t mlcommons/mlperf_mobile:1.0 ${APP_DIR}/android/docker/mlperf_mobile
-	@touch $@
+url=os.sys.argv[1]
+numbytes=int(os.sys.argv[2])
+prefix=os.sys.argv[3]
 
-${BUILDDIR}/mlperf_mobiledet_docker_image.stamp: ${TOPDIR}/docker/mlperf_mobiledet/Dockerfile
-	@mkdir -p ${BUILDDIR}
-	@docker image build -t mlcommons/mlperf_mobiledet:0.1 ${TOPDIR}/docker/mlperf_mobiledet
-	@touch $@
+tokenstr = ""
+if len(os.sys.argv) > 4 and os.sys.argv[4] == "usetoken":
+  tokenstr = '-H "Authorization: token ${GITHUB_TOKEN}"'
 
-docker_image: ${BUILDDIR}/mlperf_mobile_docker_1_0.stamp
+chunksize = 500000000
+i=0
+for x in range(0, numbytes, chunksize):
+  if x+chunksize > numbytes:
+    end=numbytes
+  else:
+    end=x-1+chunksize
+  os.system("curl %s --range %d-%d -L %s -o %s.part%02d" % (tokenstr, x, end, url, prefix,i))
+  i=i+1
 

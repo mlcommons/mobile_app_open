@@ -46,3 +46,4 @@ frameworks contributed by the broader MLPerf community.
 * mobile_back_samsung - Samsung backend for Android
 * mobile_back_pixel - Google Pixel backend for Android
 * mobile_back_tflite - Combined TFLite / MediaTek backends for Android
+* datasets - contains scripts to prepare test and calibration data used for accuracy evaluation and model quantization.

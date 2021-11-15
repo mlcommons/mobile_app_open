@@ -38,8 +38,7 @@ for image in image_list:
     npimage = npimage * 0.00784313771874
     npimage = npimage - 1.0
     img_ndarray = np.array(npimage)
-    if model_name == "ade20k":
-        f_name = dst[:-5] + '.raw'
-    else :
-        f_name = dst[:-4] + '.raw'
+    tmp = dst.split(".")
+    tmp[-1] = "raw"
+    f_name = ".".join(tmp)
     npimage.astype(np.float32).tofile(f_name)

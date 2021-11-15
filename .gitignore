@@ -5,6 +5,8 @@
 /bazel-*
 /output
 /output_logs
+/datasets/output
+/datasets/downloads
 /mobile_back_qti/snpe-*
 *.so
 * .apk

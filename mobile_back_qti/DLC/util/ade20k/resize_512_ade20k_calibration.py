@@ -28,13 +28,11 @@ FILELIST = sys.argv[3]
 
 files = open(FILELIST).read().split("\n")[:-1]
 for fname in files:
-  print(fname)
   found = False
   for dirpath, dirs, files in os.walk(ADE20K_PATH):  
     for filename in files: 
       if filename == fname:
         image_jpeg = os.path.join(dirpath,filename)
-        print(image_jpeg)
         image_jpeg_data = tf.io.read_file(image_jpeg)
         image_tensor = tf.io.decode_jpeg(image_jpeg_data)
         o_image, p_image, p_label = deeplab.input_preprocess.preprocess_image_and_label(image_tensor, None, 512, 512, 512, 512, is_training=False)
