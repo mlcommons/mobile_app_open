@@ -1,0 +1,104 @@
+steps:
+# We need this step to correctly identify dockerfile tag
+- id: fetch-repo-history
+  name: gcr.io/cloud-builders/git
+  args:
+  - fetch
+  - --unshallow
+# Download DOCKERFILE_COMMIT tag if it exists to skip docker image generation,
+#   or download the :latest tag and use it as a cache,
+#   or skip downloading if :latest doesn't exist yet.
+# This being a separate step helps readability in Cloud Build console.
+- id: cache-old-image
+  name: gcr.io/cloud-builders/docker
+  timeout: 600s # 10 minutes
+  entrypoint: bash
+  args:
+  - -xc
+  - |
+    DOCKERFILE_COMMIT=$$(git log -n 1 --pretty=format:%H -- android/docker/mlperf_mobile/Dockerfile)
+    docker pull gcr.io/$PROJECT_ID/mlperf-mobile-android:$$DOCKERFILE_COMMIT \
+    || docker pull gcr.io/$PROJECT_ID/mlperf-mobile-android:latest \
+    || true
+# This step overrides the :latest tag of the image, so that we can use it in later steps.
+- id: build-new-image
+  name: gcr.io/cloud-builders/docker
+  timeout: 1800s # 30 minutes
+  entrypoint: bash
+  args:
+  - -xc
+  - |
+    DOCKERFILE_COMMIT=$$(git log -n 1 --pretty=format:%H -- android/docker/mlperf_mobile/Dockerfile)
+    docker build \
+      -t gcr.io/$PROJECT_ID/mlperf-mobile-android:$$DOCKERFILE_COMMIT \
+      -t gcr.io/$PROJECT_ID/mlperf-mobile-android:latest \
+      --cache-from gcr.io/$PROJECT_ID/mlperf-mobile-android:$$DOCKERFILE_COMMIT \
+      --cache-from gcr.io/$PROJECT_ID/mlperf-mobile-android:latest \
+      -f android/docker/mlperf_mobile/Dockerfile \
+      .
+# If the build fails artifacts are not uploaded automatically, so we save them manually before build
+- id: push-new-image
+  name: gcr.io/cloud-builders/docker
+  timeout: 600s # 10 minutes
+  entrypoint: bash
+  args:
+  - -xc
+  - |
+    DOCKERFILE_COMMIT=$$(git log -n 1 --pretty=format:%H -- android/docker/mlperf_mobile/Dockerfile)
+    docker push gcr.io/$PROJECT_ID/mlperf-mobile-android:$$DOCKERFILE_COMMIT
+    docker push gcr.io/$PROJECT_ID/mlperf-mobile-android:latest
+- id: build-apks
+  name: gcr.io/$PROJECT_ID/mlperf-mobile-android:latest
+  timeout: 10800s # 3 hours
+  entrypoint: bash
+  args:
+  - -xc
+  - |
+    bazel-3.7.2 build \
+      --remote_cache=https://storage.googleapis.com/$_BAZEL_CACHE_BUCKET \
+      --google_default_credentials \
+      -c opt \
+      --config android_arm64 \
+      //android/java/org/mlperf/inference:mlperf_app //android/androidTest:mlperf_test_app
+    # artifacts can not be uploaded from a symlinked directory, like bazel-bin
+    mkdir -p output/artifacts
+    cp bazel-bin/android/java/org/mlperf/inference/mlperf_app.apk output/artifacts
+    cp bazel-bin/android/androidTest/mlperf_test_app.apk output/artifacts
+- id: instrument-test-on-google-pixel-5e-firebase
+  name: gcr.io/cloud-builders/gcloud
+  timeout: 3600s # 1 hour
+  entrypoint: bash
+  args:
+  - -xc
+  - |
+    gcloud firebase test android run \
+      --type instrumentation \
+      --app output/artifacts/mlperf_app.apk \
+      --test output/artifacts/mlperf_test_app.apk \
+      --timeout 45m \
+      --device model=redfin,version=30,locale=en,orientation=portrait
+- id: crawl-test-on-google-pixel-4-firebase
+  name: gcr.io/cloud-builders/gcloud
+  timeout: 3600s # 1 hour (we sometimes wait 30+ minutes until the device we need is free)
+  entrypoint: bash
+  args:
+  - -xc
+  - |
+    gcloud firebase test android run \
+      --type robo \
+      --app output/artifacts/mlperf_app.apk \
+      --device model=flame,version=29,locale=en,orientation=portrait \
+      --timeout 90s
+
+# We uploaded both tags earlier, but this option also adds them to the artifacts page of the build
+images:
+- gcr.io/$PROJECT_ID/mlperf-mobile-android
+
+artifacts:
+  objects:
+    location: gs://$_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA
+    paths:
+    - output/artifacts/mlperf_app.apk
+    - output/artifacts/mlperf_test_app.apk
+
+timeout: 18000s # 5 hours
