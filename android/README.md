@@ -88,8 +88,10 @@ make WITH_QTI=1 app
 ```
 or to enable multiple backends:
 ```
-make WITH_QTI=1 WITH_SAMSUNG=1 WITH_PIXEL=1 app
+make WITH_QTI=1 WITH_MEDIATEK=1 app
 ```
+Note: Follow the instruction of the backend vendor (in `mobile_back_*` folders at root level) to build for that backend.
+Some backends may contain proprietary code. In that case, please contact MLCommons to get help.
 
 # Install the app with the command:
 adb install -r build/mlperf_app.apk
