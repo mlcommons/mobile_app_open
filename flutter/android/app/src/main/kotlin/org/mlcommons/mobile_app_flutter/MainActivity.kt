@@ -1,4 +1,4 @@
-package org.mlcommons.mobile_app_flutter
+package org.mlcommons.android.mlperfbench
 
 import io.flutter.embedding.android.FlutterActivity
 

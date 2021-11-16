@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.mlcommons.mobile_app_flutter">
+    package="org.mlcommons.android.mlperfbench">
 
    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -8,7 +8,7 @@
    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
    <application
-        android:label="mobile_app_flutter"
+        android:label="MLPerf Mobile"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
