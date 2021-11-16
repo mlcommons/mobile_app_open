@@ -504,7 +504,7 @@
 					"$(PROJECT_DIR)/Flutter/ios_backend_fw_static.framework",
 				);
 				MARKETING_VERSION = 0.7.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xored.flutter1;
+				PRODUCT_BUNDLE_IDENTIFIER = org.mlcommons.flutter1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -739,7 +739,7 @@
 					"$(PROJECT_DIR)/Flutter/ios_backend_fw_static.framework",
 				);
 				MARKETING_VERSION = 0.7.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xored.flutter1;
+				PRODUCT_BUNDLE_IDENTIFIER = org.mlcommons.flutter1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

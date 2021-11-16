@@ -1,4 +1,4 @@
-package com.xored.mobile_app_flutter
+package org.mlcommons.mobile_app_flutter
 
 import io.flutter.embedding.android.FlutterActivity
 
