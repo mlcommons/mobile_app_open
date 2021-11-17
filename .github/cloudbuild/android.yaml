@@ -51,7 +51,7 @@ steps:
 - id: build-apks
   name: gcr.io/$PROJECT_ID/mlperf-mobile-android:latest
   waitFor:
-  - build-new-image
+  - build-new-image # we can run this step in parallel with image uploading
   timeout: 10800s # 3 hours
   entrypoint: bash
   args:
@@ -84,7 +84,7 @@ steps:
 - id: crawler-test-on-firebase
   name: gcr.io/cloud-builders/gcloud
   waitFor:
-  - build-apks
+  - build-apks # don't wait for the other test to finish, run as soon as APKs are ready
   timeout: 3600s # 1 hour (we sometimes wait 30+ minutes until the device we need is free)
   entrypoint: bash
   args:
