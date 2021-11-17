@@ -2,6 +2,7 @@ steps:
 # We need this step to correctly identify dockerfile tag
 - id: fetch-repo-history
   name: gcr.io/cloud-builders/git
+  timeout: 10s
   args:
   - fetch
   - --unshallow
