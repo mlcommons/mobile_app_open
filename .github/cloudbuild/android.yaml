@@ -50,6 +50,8 @@ steps:
     docker push gcr.io/$PROJECT_ID/mlperf-mobile-android:latest
 - id: build-apks
   name: gcr.io/$PROJECT_ID/mlperf-mobile-android:latest
+  waitFor:
+  - build-new-image
   timeout: 10800s # 3 hours
   entrypoint: bash
   args:
@@ -80,6 +82,8 @@ steps:
       --device model=redfin,version=30,locale=en,orientation=portrait
 - id: crawl-test-on-google-pixel-4-firebase
   name: gcr.io/cloud-builders/gcloud
+  waitFor:
+  - build-apks
   timeout: 3600s # 1 hour (we sometimes wait 30+ minutes until the device we need is free)
   entrypoint: bash
   args:
