@@ -67,20 +67,21 @@ steps:
     mkdir -p output/artifacts
     cp bazel-bin/android/java/org/mlperf/inference/mlperf_app.apk output/artifacts
     cp bazel-bin/android/androidTest/mlperf_test_app.apk output/artifacts
-- id: instrument-test-on-google-pixel-5e-firebase
+- id: instrument-test-on-firebase
   name: gcr.io/cloud-builders/gcloud
   timeout: 3600s # 1 hour
   entrypoint: bash
   args:
   - -xc
   - |
+    # redfin is Pixel 5e
     gcloud firebase test android run \
       --type instrumentation \
       --app output/artifacts/mlperf_app.apk \
       --test output/artifacts/mlperf_test_app.apk \
       --timeout 45m \
       --device model=redfin,version=30,locale=en,orientation=portrait
-- id: crawl-test-on-google-pixel-4-firebase
+- id: crawler-test-on-firebase
   name: gcr.io/cloud-builders/gcloud
   waitFor:
   - build-apks
@@ -89,10 +90,11 @@ steps:
   args:
   - -xc
   - |
+    # a10 is SM-A105FN
     gcloud firebase test android run \
       --type robo \
       --app output/artifacts/mlperf_app.apk \
-      --device model=flame,version=29,locale=en,orientation=portrait \
+      --device model=a10,version=29,locale=en,orientation=portrait \
       --timeout 90s
 
 # We uploaded both tags earlier, but this option also adds them to the artifacts page of the build
