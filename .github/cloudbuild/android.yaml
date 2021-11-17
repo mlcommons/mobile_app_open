@@ -109,3 +109,4 @@ artifacts:
     - output/artifacts/mlperf_test_app.apk
 
 timeout: 18000s # 5 hours
+
