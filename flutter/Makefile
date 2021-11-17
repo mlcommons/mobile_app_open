@@ -35,7 +35,7 @@ _bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_DIR} --experimental_no_product_n
 
 .PHONY: cpp-ios
 cpp-ios:
-	@# NOTE: add `--copt -g` for debug info (but the resulting library would be 0.5 GiB)
+	# NOTE: add `--copt -g` for debug info (but the resulting library would be 0.5 GiB)
 	bazel \
 		${BAZEL_CACHE_FLAG} \
 		build --config=ios_fat64 -c opt //flutter/cpp/flutter:ios_backend_fw_static
@@ -64,11 +64,11 @@ windows/docker/create-container:
 	docker rm -f mobile_app_flutter_windows_container
 	mkdir -p output
 	echo >output/container-script.bat
-	@# "-it" here is required to make the container killable by Ctrl+C signal.
-	@# A lot of memory is required by bazel.
-	@#		With default settings only 1 bazel job can run at a time, which, obviously, greatly slows down the build.
-	@#		4G typically runs 6-7 jobs. 8G is enough for bazel to run 16+ jobs.
-	@# Also a lot of memory is required by Flutter. When using 2G Flutter fails with out of memory error, so at least 4G is needed.
+	# "-it" here is required to make the container killable by Ctrl+C signal.
+	# A lot of memory is required by bazel.
+	#		With default settings only 1 bazel job can run at a time, which, obviously, greatly slows down the build.
+	#		4G typically runs 6-7 jobs. 8G is enough for bazel to run 16+ jobs.
+	# Also a lot of memory is required by Flutter. When using 2G Flutter fails with out of memory error, so at least 4G is needed.
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --name mobile_app_flutter_windows_container \
 		--detach --memory 8G --cpus $$(( `nproc` - 1 )) \
 		--volume $(CURDIR):C:/mobile_app_flutter \
@@ -78,9 +78,9 @@ windows/docker/create-container:
 
 .PHONY: windows/docker/native
 windows/docker/native:
-	@# We must create the directory here because msys2 commands inside a container
-	@# can't manipulate files directly inside a mounted directory for some reason
-	@# but can freely manupulate nested directories.
+	# We must create the directory here because msys2 commands inside a container
+	# can't manipulate files directly inside a mounted directory for some reason
+	# but can freely manupulate nested directories.
 	mkdir -p build
 	echo >output/container-script.bat "make BAZEL_LINKS_DIR=C:/bazel-links/ backend-bridge-windows backends/tflite-windows"
 	docker start -ai mobile_app_flutter_windows_container
@@ -105,9 +105,9 @@ windows/docker/flutter-release:
 # This make target expects that all DLLs are already present.
 .PHONY: windows/copy-flutter-files-for-docker
 windows/copy-flutter-files-for-docker:
-	@# for some reason, make can't delete the folder with symlinks:
-	@# 		meither rm nor rmdir (both from msys2) doesn't do anything to the .plugin_symlinks folder or its contents,
-	@#		so we call native Windows command line here.
+	# for some reason, make can't delete the folder with symlinks:
+	# 		meither rm nor rmdir (both from msys2) doesn't do anything to the .plugin_symlinks folder or its contents,
+	#		so we call native Windows command line here.
 	if [ -d "windows/flutter/ephemeral/.plugin_symlinks" ]; then MSYS2_ARG_CONV_EXCL="*" cmd /S /C "rmdir /S /Q windows\\flutter\\ephemeral\\.plugin_symlinks"; fi
 	rm -rf C:/mobile_app_flutter-local
 	mkdir -p C:/mobile_app_flutter-local

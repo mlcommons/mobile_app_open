@@ -51,17 +51,17 @@ all: ${BUILDDIR}/lib_x86_64/libtflitebackend.so ${BUILDDIR}/lib_arm64/libtfliteb
 USER_ID=$(shell id -u)
 
 ${BUILDDIR}/mlperf_mobile_image.stamp: ${TOPDIR}/docker/mlperf_mobile/Dockerfile
-	@mkdir -p ${BUILDDIR}
-	@docker image build -t mlcommons/mlperf_mobile:0.1 docker/mlperf_mobile
-	@touch $@
+	mkdir -p ${BUILDDIR}
+	docker image build -t mlcommons/mlperf_mobile:0.1 docker/mlperf_mobile
+	touch $@
 
 docker_image: ${BUILDDIR}/mlperf_mobile_image.stamp
 
 ${BUILDDIR}/lib_arm64/libtflitebackend.so: ${SRCFILES} docker_image
-	@echo "Building arm64 libtflitebackend.so"
-	@mkdir -p ${BUILDDIR}/lib_arm64
-	@mkdir -p ${BUILDDIR}/cache
-	@docker run \
+	echo "Building arm64 libtflitebackend.so"
+	mkdir -p ${BUILDDIR}/lib_arm64
+	mkdir -p ${BUILDDIR}/cache
+	docker run \
 	        -e USER=mlperf \
                 ${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/tflite_backend \
@@ -78,13 +78,13 @@ ${BUILDDIR}/lib_arm64/libtflitebackend.so: ${SRCFILES} docker_image
                 --host_cxxopt='-Wno-class-memaccess' \
 		--config=android_arm64 \
 		:tflitebackend
-	@cp build/`readlink bazel-out`/arm64-v8a-opt/bin/cpp/backend_tflite/libtflitebackend.so $@
-	@chmod 777 $@
+	cp build/`readlink bazel-out`/arm64-v8a-opt/bin/cpp/backend_tflite/libtflitebackend.so $@
+	chmod 777 $@
 
 ${BUILDDIR}/lib_x86_64/libtflitebackend.so: ${SRCFILES} docker_image
-	@echo "Building x86_64 libtflitebackend.so"
-	@mkdir -p ${BUILDDIR}/lib_x86_64
-	@mkdir -p ${BUILDDIR}/cache
+	echo "Building x86_64 libtflitebackend.so"
+	mkdir -p ${BUILDDIR}/lib_x86_64
+	mkdir -p ${BUILDDIR}/cache
 	docker run \
 	        -e USER=mlperf \
                 ${PROXY_WORKAROUND1} \
@@ -102,10 +102,10 @@ ${BUILDDIR}/lib_x86_64/libtflitebackend.so: ${SRCFILES} docker_image
                 --host_cxxopt='-Wno-class-memaccess' \
 		--config=android_x86_64 \
 		:tflitebackend
-	@cp build/`readlink bazel-out`/x86_64-opt/bin/cpp/backend_tflite/libtflitebackend.so $@
-	@chmod 777 $@
+	cp build/`readlink bazel-out`/x86_64-opt/bin/cpp/backend_tflite/libtflitebackend.so $@
+	chmod 777 $@
 
 clean:
-	@rm -rf bazel-bin bazel-testlogs bazel-out bazel-tflite_backend
-	@rm -rf ${BUILDDIR}
+	rm -rf bazel-bin bazel-testlogs bazel-out bazel-tflite_backend
+	rm -rf ${BUILDDIR}
 

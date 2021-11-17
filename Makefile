@@ -14,168 +14,24 @@
 ##########################################################################
 
 
-#SAMSUNG_BACKEND=--//android/java/org/mlperf/inference:with_samsung="1"
-SAMSUNG_BACKEND=
+.PHONY: app clean
 
-.PHONY: docker_image app bazel-version rundocker clean
+all: app flutter_app
 
-all: app
+# Common
+include make/docker.mk
 
+# Legacy App
+include android/app.mk
 include mobile_back_tflite/tflite_backend.mk
 include mobile_back_pixel/pixel_backend.mk
 include mobile_back_qti/make/qti_backend.mk
+
+# Flutter app
 include flutter/make/android.mk
-
-
-output/mlperf_mobile_docker_1_0.stamp: android/docker/mlperf_mobile/Dockerfile
-	@mkdir -p output/docker
-	@docker image build -t mlcommons/mlperf_mobile:1.0 android/docker/mlperf_mobile
-	@touch $@
-
-docker_image: output/mlperf_mobile_docker_1_0.stamp
-
-BASE_DOCKER_FLAGS= \
-                -e USER=mlperf \
-                ${PROXY_WORKAROUND1} \
-		-v $(CURDIR):/home/mlperf/mobile_app \
-		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
-		-v $(CURDIR)/output/home/mlperf/flutter_cache:/home/mlperf/flutter_cache \
-                -u `id -u`:`id -g`
-
-COMMON_DOCKER_FLAGS0= \
-		${BASE_DOCKER_FLAGS} \
-                ${QTI_VOLUMES} \
-		-w /home/mlperf/mobile_app \
-		mlcommons/mlperf_mobile:1.0
-
-COMMON_DOCKER_FLAGS1= \
-		${COMMON_DOCKER_FLAGS0} \
-		bazel-3.7.2
-
-COMMON_DOCKER_FLAGS2= \
-                ${PROXY_WORKAROUND2} \
-                --output_user_root=/home/mlperf/cache/bazel build --verbose_failures \
-		-c opt --cxxopt='--std=c++14' --host_cxxopt='--std=c++14'  \
-                --host_cxxopt='-Wno-deprecated-declarations' --host_cxxopt='-Wno-class-memaccess' \
-                --cxxopt='-Wno-deprecated-declarations' --cxxopt='-Wno-unknown-attributes'
-
-COMMON_DOCKER_FLAGS= \
-                ${COMMON_DOCKER_FLAGS1} \
-                ${COMMON_DOCKER_FLAGS2}
-
-
-NATIVE_DOCKER_FLAGS= \
-                ${COMMON_DOCKER_FLAGS1} --bazelrc=/dev/null \
-                ${COMMON_DOCKER_FLAGS2}
-
-export PATH := $(CURDIR)/output/flutter/bin:$(PATH)
-
-proto_test: output/mlperf_mobile_docker_1_0.stamp
-	@echo "Building proto_test"
-	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
-	@docker run \
-		${NATIVE_DOCKER_FLAGS} --experimental_repo_remote_exec \
-		//android/cpp/proto:proto_test
-	@cp output/`readlink bazel-bin`/android/cpp/proto/proto_test output/proto_test
-	@chmod 777 output/proto_test
-
-main: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
-	@echo "Building main"
-	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
-	@docker run \
-		${COMMON_DOCKER_FLAGS} \
-		--config android_arm64 //mobile_back_tflite:tflitebackend ${QTI_TARGET} //android/cpp/binary:main
-	@rm -rf output/binary && mkdir -p output/binary
-	@cp output/`readlink bazel-bin`/android/cpp/binary/main output/binary/main
-	@cp output/`readlink bazel-bin`/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so output/binary/libtflitebackend.so
-	@${QTI_LIB_COPY}
-	@chmod 777 output/binary/main output/binary/libtflitebackend.so
-
-libtflite: output/mlperf_mobile_docker_1_0.stamp
-	@echo "Building libtflite"
-	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
-	@docker run \
-		${COMMON_DOCKER_FLAGS} \
-		--config android_arm64 //mobile_back_tflite:tflitebackend
-	@rm -rf output/binary && mkdir -p output/binary
-	@cp output/`readlink bazel-bin`/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so output/binary/libtflitebackend.so
-	@chmod 777 output/binary/libtflitebackend.so
-	
-
-app: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
-	@echo "Building mlperf_app.apk"
-	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
-	@docker run \
-		${COMMON_DOCKER_FLAGS} \
-                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
-		--fat_apk_cpu=arm64-v8a \
-		//android/java/org/mlperf/inference:mlperf_app
-	@cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app.apk
-	@chmod 777 output/mlperf_app.apk
-
-app_x86_64: output/mlperf_mobile_docker_1_0.stamp
-	@echo "Building mlperf_app.apk"
-	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
-	@docker run \
-		${COMMON_DOCKER_FLAGS} \
-                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
-		--fat_apk_cpu=x86_64 \
-		//android/java/org/mlperf/inference:mlperf_app
-	@cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app_x86_64.apk
-	@chmod 777 output/mlperf_app.apk
-
-flutter: output/flutter/.stamp
-
-output/flutter/.stamp:
-	cd output && git clone https://github.com/flutter/flutter.git
-	touch $@
-
-flutter_backendbridge: output/mlperf_mobile_docker_1_0.stamp
-	@echo "Building flutter app for android"
-	@mkdir -p output/home/mlperf/flutter_cache && chmod 777 output/home/mlperf/flutter_cache
-	@docker run \
-		${BASE_DOCKER_FLAGS} \
-		-e USE_PROXY_WORKAROUND=${USE_PROXY_WORKAROUND} \
-		-w /home/mlperf/mobile_app \
-		mlcommons/mlperf_mobile:1.0 \
-		bazel ${PROXY_WORKAROUND2} --output_user_root=/home/mlperf/flutter_cache/bazel build --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
-
-test_app: output/mlperf_mobile_docker_1_0.stamp
-	@echo "Building mlperf_app.apk"
-	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
-	@docker run \
-		${COMMON_DOCKER_FLAGS} \
-                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
-		--fat_apk_cpu=x86_64,arm64-v8a \
-		//androidTest:mlperf_test_app
-	@cp output/`readlink bazel-bin`/android/androidTest/mlperf_test_app.apk output/mlperf_test_app.apk
-	@chmod 777 output/mlperf_test_app.apk
-
-rundocker: output/mlperf_mobile_docker_1_0.stamp
-	@docker run -it \
-                -e USER=mlperf \
-                ${PROXY_WORKAROUND1} \
-		-v $(CURDIR):/home/mlperf/mobile_app \
-		-v $(CURDIR)/output/home/mlperf/git-certs:/home/mlperf/git-certs \
-		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
-		-w /home/mlperf/mobile_app \
-                -u `id -u`:`id -g` \
-		mlcommons/mlperf_mobile:1.0
-
-rundocker_root: output/mlperf_mobile_docker_1_0.stamp
-	@docker run -it \
-                -e USER=mlperf \
-		-v $(CURDIR):/home/mlperf/mobile_app \
-		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
-		-w /home/mlperf/mobile_app \
-		mlcommons/mlperf_mobile:1.0
+include flutter/make/docker.mk
 
 clean:
-	@([ -d output/home/mlperf/cache ] && chmod -R +w output/home/mlperf/cache) || true
-	@rm -rf output
-
-ifeq (${WITH_QTI},1)
-  include mobile_back_qti/make/qti_backend_targets.mk
-endif
-
+	([ -d output/home/mlperf/cache ] && chmod -R +w output/home/mlperf/cache) || true
+	rm -rf output
 
