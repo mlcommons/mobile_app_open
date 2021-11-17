@@ -90,11 +90,11 @@ steps:
   args:
   - -xc
   - |
-    # a10 is SM-A105FN
+    # x1q is SM-G981U1
     gcloud firebase test android run \
       --type robo \
       --app output/artifacts/mlperf_app.apk \
-      --device model=a10,version=29,locale=en,orientation=portrait \
+      --device model=x1q,version=29,locale=en,orientation=portrait \
       --timeout 90s
 
 # We uploaded both tags earlier, but this option also adds them to the artifacts page of the build
