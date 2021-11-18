@@ -3,6 +3,12 @@
 This project contains the MLPerf mobile app, an app-based implementation of
 [MLPerf Inference](https://github.com/mlperf/inference) tasks.
 
+**TOC**:
+
+* [Overview](#overview)
+* [Folder Structure](#folder-structure)
+* [Related Repositories](#related-repositories)
+
 ## Overview
 
 The MLPerf app offers a simple mobile UI for executing MLPerf inference tasks
@@ -46,4 +52,16 @@ frameworks contributed by the broader MLPerf community.
 * mobile_back_samsung - Samsung backend for Android
 * mobile_back_pixel - Google Pixel backend for Android
 * mobile_back_tflite - Combined TFLite / MediaTek backends for Android
-* datasets - contains scripts to prepare test and calibration data used for accuracy evaluation and model quantization.
+* datasets - Contains scripts to prepare test and calibration data used for accuracy evaluation and model quantization.
+
+## Related Repositories:
+
+* [inference](https://github.com/mlcommons/inference): Reference implementations of MLPerf inference benchmarks.
+* [mobile_models](https://github.com/mlcommons/mobile_models): Storage for ML models and task definition file.
+* [mobile_open](https://github.com/mlcommons/mobile_open): MLPerf Mobile benchmarks.
+* [mobile_submission_1.1](https://github.com/mlcommons/mobile_submission_1.1): MLPerf Mobile inference v1.1 results.
+* [mobile_datasets](https://github.com/mlcommons/mobile_datasets): Scripts to create performance-only test sets for
+  MLPerf Mobile
+* [mobile_app_open/android/cpp/datasets](https://github.com/mlcommons/mobile_app_open/tree/master/android/cpp/datasets):
+  Instruction and scripts to create dataset for this MLPerf Mobile App.
+  
