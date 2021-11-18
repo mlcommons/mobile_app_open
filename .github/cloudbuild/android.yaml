@@ -52,8 +52,11 @@ steps:
     docker push gcr.io/$PROJECT_ID/mlperf-mobile-android:latest
 - id: build-apks
   name: gcr.io/$PROJECT_ID/mlperf-mobile-android:latest
-  waitFor:
-  - build-new-image # we can run this step in parallel with image uploading
+  # Image upload usually takes only few seconds.
+  # However, if we generated a new image and the build failed,
+  # it can fail before the build finishes, canceling the upload.
+  # Let's wait for the upload to finish before starting the actual build.
+  waitFor: []
   timeout: 10800s # 3 hours
   entrypoint: bash
   args:
