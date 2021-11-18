@@ -38,8 +38,7 @@ steps:
       -t gcr.io/$PROJECT_ID/mlperf-mobile-android:latest \
       --cache-from gcr.io/$PROJECT_ID/mlperf-mobile-android:$$DOCKERFILE_COMMIT-buildkit \
       --cache-from gcr.io/$PROJECT_ID/mlperf-mobile-android:latest \
-      -f android/docker/mlperf_mobile/Dockerfile \
-      .
+      android/docker/mlperf_mobile
 # If the build fails artifacts are not uploaded automatically, so we save them manually before build
 - id: push-new-image
   name: gcr.io/cloud-builders/docker
