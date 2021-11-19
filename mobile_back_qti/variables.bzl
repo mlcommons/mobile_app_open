@@ -1,1 +1,3 @@
-SNPE_VERSION = "snpe-1.54.2.2899"
+"""Name of the SNPE folder"""
+
+SNPE_VERSION = "snpe-1.55.0.2958"

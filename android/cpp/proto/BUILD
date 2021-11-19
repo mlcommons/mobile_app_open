@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_linkopts")
+load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_linkopts")
 
 package(
     default_visibility = ["//visibility:public"],

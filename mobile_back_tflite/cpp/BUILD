@@ -13,13 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_linkopts")
+load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_linkopts")
 
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
 )
 
+# @unused
 common_linkopts = tflite_linkopts() + select({
     "//conditions:default": [],
     "@org_tensorflow//tensorflow:android": [

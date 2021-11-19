@@ -64,7 +64,14 @@ def text_to_bin(name, src, out, proto_message, proto_deps):
     )
 
 def basename(filepath):
-    """Return base filename without directory and extension."""
+    """Return base filename without directory and extension.
+
+    Args:
+        filepath: path to take basename from
+
+    Returns:
+        Base filename without directory and extension.
+    """
     left = filepath.rfind("/") + 1
     filename = filepath[left:]
     right = filename.find(".")

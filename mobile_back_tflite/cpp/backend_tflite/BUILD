@@ -17,7 +17,6 @@ load(
     "tflite_copts",
     "tflite_jni_binary",
 )
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 
 package(
     default_visibility = ["//visibility:public"],
