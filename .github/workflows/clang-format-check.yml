@@ -1,0 +1,23 @@
+name: C++ format
+
+on:
+  push:
+    branches:
+      - main
+      - 136/ci-format-check
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check C++ format
+      uses: jidicula/clang-format-action@v4.3.1
+      with:
+        clang-format-version: '12'
+        check-path: .
+        fallback-style: Google
