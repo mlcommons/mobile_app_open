@@ -207,11 +207,9 @@ set-supported-backends:
 		> lib/backend/backends_list.gen.dart
 
 ifeq (${OS},Windows_NT)
-script_launch_prefix=.\\tool\\
-script_extension=bat
+_protoc_gen_script=.\\tool\\protoc-gen-dart.bat
 else
-script_launch_prefix=./tool/
-script_extension=sh
+_protoc_gen_script=./tool/protoc-gen-dart.sh
 endif
 
 .PHONY: protobuf
@@ -220,7 +218,7 @@ protobuf:
 	rm -rf lib/protos
 	mkdir -p lib/protos
 	protoc --proto_path ../android/cpp/proto \
-		--plugin protoc-gen-dart="${script_launch_prefix}protoc-gen-dart.${script_extension}" \
+		--plugin protoc-gen-dart="${_protoc_gen_script}" \
 		--dart_out lib/protos \
 		../android/cpp/proto/*.proto
 
@@ -229,7 +227,9 @@ format: format-clang format-bazel format-dart
 
 .PHONY: format-clang
 format-clang:
-	${script_launch_prefix}run-clang-format.${script_extension}
+	cd .. && _cpp_files=$$(git ls-files | grep "\.h$$\|\.cc$$\|\.cpp$$") \
+		&& [[ "$$_cpp_files" ]] \
+		&& clang-format -i -style=google $${_cpp_files}
 
 .PHONY: format-bazel
 format-bazel:
