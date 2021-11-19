@@ -3,7 +3,7 @@
 This project contains the MLPerf mobile app, an app-based implementation of
 [MLPerf Inference](https://github.com/mlperf/inference) tasks.
 
-**TOC**:
+**Table of Contents**:
 
 * [Overview](#overview)
 * [Folder Structure](#folder-structure)
