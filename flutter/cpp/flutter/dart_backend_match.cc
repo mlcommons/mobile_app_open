@@ -8,9 +8,10 @@
 
 extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
     const char *lib_path, const char *manufacturer, const char *model) {
+  LOG(INFO) << "checking backend '" << lib_path << "'...\n";
   ::mlperf::mobile::BackendFunctions backend(lib_path);
   if (*lib_path != '\0' && !backend.isLoaded()) {
-    std::cerr << "backend '" << lib_path << "' can't be loaded\n";
+    LOG(INFO) << "backend '" << lib_path << "' can't be loaded\n";
     return nullptr;
   }
 
@@ -21,30 +22,48 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
   const char *pbdata = nullptr;
 
   auto result = new dart_ffi_backend_match_result;
+  result->pbdata = nullptr;
   result->matches =
       backend.match(&result->error_message, &pbdata, &device_info);
+  if (!result->matches) {
+    return result;
+  }
 
-  if (pbdata == nullptr) {
-    std::cout << "Backend haven't filled settings" << std::endl;
+  if (result->error_message != nullptr) {
+    result->matches = false;
+    LOG(INFO)
+        << "Backend generally matches but can't work on this specific device: " << result->error_message << "\n";
+    return result;
+  }
+
+  LOG(INFO) << "checking pbdata\n";
+
+  if (pbdata == nullptr || strlen(pbdata) == 0) {
+    result->matches = false;
+    LOG(INFO) << "Backend hasn't filled settings\n";
     return result;
   }
 
   ::mlperf::mobile::BackendSetting setting;
   if (!google::protobuf::TextFormat::ParseFromString(pbdata, &setting)) {
-    std::cout << "Can't parse backend settings before serialization:\n"
+    result->matches = false;
+    LOG(INFO) << "Can't parse backend settings before serialization:\n"
               << pbdata << std::endl;
     return result;
   }
 
   std::string res;
   if (!setting.SerializeToString(&res)) {
-    std::cout << "Can't serialize backend settings\n";
+    result->matches = false;
+    LOG(INFO) << "Can't serialize backend settings\n";
     return result;
   }
 
   result->pbdata_size = res.length();
   result->pbdata = new char[result->pbdata_size];
   memcpy(result->pbdata, res.data(), result->pbdata_size);
+
+  LOG(INFO) << "backend '" << lib_path << "' matches\n";
 
   return result;
 }
