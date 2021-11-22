@@ -218,6 +218,15 @@ protobuf:
 .PHONY: format
 format: format-clang format-bazel format-dart
 
+.PHONY: format-check-prohibited
+format-check-prohibited:
+	cd .. && _files=$$(git ls-files | grep "\.so$$\|\.apk$$\|\.tflite$$\|\.dlc$$\|\.zip$$\|\.jar$$\|\.tgz$$"); \
+		if [ ! -z "$$_files" ]; then \
+			echo found prohibited files:; \
+			echo "$$_files"; \
+			false; \
+		fi
+
 .PHONY: format-java
 format-java:
 	cd .. && _files=$$(git ls-files | grep "\.java$$") \
