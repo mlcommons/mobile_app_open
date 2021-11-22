@@ -218,11 +218,17 @@ protobuf:
 .PHONY: format
 format: format-clang format-bazel format-dart
 
+.PHONY: format-java
+format-java:
+	cd .. && _files=$$(git ls-files | grep "\.java$$") \
+		&& [ ! -z "$$_files" ] \
+		&& java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace $${_files}
+
 .PHONY: format-clang
 format-clang:
-	cd .. && _cpp_files=$$(git ls-files | grep "\.h$$\|\.cc$$\|\.cpp$$") \
-		&& [[ "$$_cpp_files" ]] \
-		&& clang-format -i -style=google $${_cpp_files}
+	cd .. && _files=$$(git ls-files | grep "\.h$$\|\.cc$$\|\.cpp$$") \
+		&& [ ! -z "$$_files" ] \
+		&& clang-format -i -style=google $${_files}
 
 .PHONY: format-bazel
 format-bazel:
