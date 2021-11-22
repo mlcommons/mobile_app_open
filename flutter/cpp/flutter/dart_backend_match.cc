@@ -12,7 +12,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
   else LOG(INFO) << "checking backend '" << lib_path << "' ...";
   ::mlperf::mobile::BackendFunctions backend(lib_path);
   if (*lib_path != '\0' && !backend.isLoaded()) {
-    LOG(INFO) << "backend can't be loaded";
+    LOG(ERROR) << "backend can't be loaded";
     return nullptr;
   }
 
@@ -32,7 +32,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
 
   if (result->error_message != nullptr) {
     result->matches = false;
-    LOG(INFO)
+    LOG(ERROR)
         << "Backend generally matches but can't work on this specific device: "
         << result->error_message;
     return result;
@@ -42,14 +42,14 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
 
   if (pbdata == nullptr || strlen(pbdata) == 0) {
     result->matches = false;
-    LOG(INFO) << "Backend hasn't filled settings";
+    LOG(ERROR) << "Backend hasn't filled settings";
     return result;
   }
 
   ::mlperf::mobile::BackendSetting setting;
   if (!google::protobuf::TextFormat::ParseFromString(pbdata, &setting)) {
     result->matches = false;
-    LOG(INFO) << "Can't parse backend settings before serialization:\n"
+    LOG(ERROR) << "Can't parse backend settings before serialization:\n"
               << pbdata << std::endl;
     return result;
   }
@@ -57,7 +57,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
   std::string res;
   if (!setting.SerializeToString(&res)) {
     result->matches = false;
-    LOG(INFO) << "Can't serialize backend settings";
+    LOG(ERROR) << "Can't serialize backend settings";
     return result;
   }
 
