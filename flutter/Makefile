@@ -227,6 +227,20 @@ format-check-prohibited:
 			false; \
 		fi
 
+.PHONY: format-check-big-files
+format-check-big-files:
+	cd .. && \
+		big_file_list=""; \
+		for f in $$(git ls-files); do \
+			if [ "$$(stat $$f --format %s)" -gt 5242880 ]; then \
+				big_file_list="$$big_file_list$$f\n"; \
+			fi; \
+		done; \
+		if [ ! -z "$$big_file_list" ]; then \
+			echo -e "found too big files: \n$$big_file_list"; \
+			false; \
+		fi
+
 .PHONY: format-java
 format-java:
 	cd .. && _files=$$(git ls-files | grep "\.java$$") \
