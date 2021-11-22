@@ -8,8 +8,10 @@
 
 extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
     const char *lib_path, const char *manufacturer, const char *model) {
-  if (strlen(lib_path) == 0) LOG(INFO) << "checking built-in backend...";
-  else LOG(INFO) << "checking backend '" << lib_path << "' ...";
+  if (strlen(lib_path) == 0)
+    LOG(INFO) << "checking built-in backend...";
+  else
+    LOG(INFO) << "checking backend '" << lib_path << "' ...";
   ::mlperf::mobile::BackendFunctions backend(lib_path);
   if (*lib_path != '\0' && !backend.isLoaded()) {
     LOG(ERROR) << "backend can't be loaded";
@@ -50,7 +52,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
   if (!google::protobuf::TextFormat::ParseFromString(pbdata, &setting)) {
     result->matches = false;
     LOG(ERROR) << "Can't parse backend settings before serialization:\n"
-              << pbdata << std::endl;
+               << pbdata << std::endl;
     return result;
   }
 
