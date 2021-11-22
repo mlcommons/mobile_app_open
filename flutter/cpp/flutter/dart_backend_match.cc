@@ -8,10 +8,11 @@
 
 extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
     const char *lib_path, const char *manufacturer, const char *model) {
-  LOG(INFO) << "checking backend '" << lib_path << "'...";
+  if (strlen(lib_path) == 0) LOG(INFO) << "checking built-in backend...";
+  else LOG(INFO) << "checking backend '" << lib_path << "' ...";
   ::mlperf::mobile::BackendFunctions backend(lib_path);
   if (*lib_path != '\0' && !backend.isLoaded()) {
-    LOG(INFO) << "backend '" << lib_path << "' can't be loaded";
+    LOG(INFO) << "backend can't be loaded";
     return nullptr;
   }
 
@@ -64,7 +65,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
   result->pbdata = new char[result->pbdata_size];
   memcpy(result->pbdata, res.data(), result->pbdata_size);
 
-  LOG(INFO) << "backend '" << lib_path << "' matches";
+  LOG(INFO) << "backend matches";
 
   return result;
 }
