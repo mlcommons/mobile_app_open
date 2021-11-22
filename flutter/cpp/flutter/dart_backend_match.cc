@@ -8,10 +8,10 @@
 
 extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
     const char *lib_path, const char *manufacturer, const char *model) {
-  LOG(INFO) << "checking backend '" << lib_path << "'...\n";
+  LOG(INFO) << "checking backend '" << lib_path << "'...";
   ::mlperf::mobile::BackendFunctions backend(lib_path);
   if (*lib_path != '\0' && !backend.isLoaded()) {
-    LOG(INFO) << "backend '" << lib_path << "' can't be loaded\n";
+    LOG(INFO) << "backend '" << lib_path << "' can't be loaded";
     return nullptr;
   }
 
@@ -33,15 +33,15 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
     result->matches = false;
     LOG(INFO)
         << "Backend generally matches but can't work on this specific device: "
-        << result->error_message << "\n";
+        << result->error_message;
     return result;
   }
 
-  LOG(INFO) << "checking pbdata\n";
+  LOG(INFO) << "checking pbdata";
 
   if (pbdata == nullptr || strlen(pbdata) == 0) {
     result->matches = false;
-    LOG(INFO) << "Backend hasn't filled settings\n";
+    LOG(INFO) << "Backend hasn't filled settings";
     return result;
   }
 
@@ -56,7 +56,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
   std::string res;
   if (!setting.SerializeToString(&res)) {
     result->matches = false;
-    LOG(INFO) << "Can't serialize backend settings\n";
+    LOG(INFO) << "Can't serialize backend settings";
     return result;
   }
 
@@ -64,7 +64,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
   result->pbdata = new char[result->pbdata_size];
   memcpy(result->pbdata, res.data(), result->pbdata_size);
 
-  LOG(INFO) << "backend '" << lib_path << "' matches\n";
+  LOG(INFO) << "backend '" << lib_path << "' matches";
 
   return result;
 }
