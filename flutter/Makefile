@@ -206,19 +206,12 @@ set-supported-backends:
 		-e "s/TFLITE_TAG/${backend_replace_tflite}/" \
 		> lib/backend/backends_list.gen.dart
 
-ifeq (${OS},Windows_NT)
-_protoc_gen_script=.\\tool\\protoc-gen-dart.bat
-else
-_protoc_gen_script=./tool/protoc-gen-dart.sh
-endif
-
 .PHONY: protobuf
 protobuf:
 	dart pub get
 	rm -rf lib/protos
 	mkdir -p lib/protos
 	protoc --proto_path ../android/cpp/proto \
-		--plugin protoc-gen-dart="${_protoc_gen_script}" \
 		--dart_out lib/protos \
 		../android/cpp/proto/*.proto
 

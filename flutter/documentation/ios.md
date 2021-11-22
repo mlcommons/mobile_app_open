@@ -24,6 +24,10 @@ Otherwise, you can get errors about missing pods
     * `sudo gem install cocoapods`
 * Install python dependencies: `python3 -m pip install --user numpy absl-py`
 * Enable protobuf plugin: `dart pub global activate protoc_plugin`
+* Add `$HOME/.pub-cache/bin` directory to PATH (the command bellow is for ZSH, adjust your `rc` file if you use something else):
+```bash
+echo export PATH="$PATH:$HOME/.pub-cache/bin" >>~/.zshrc
+```
 * Go to `ios` directory and install pods: `pod install`
 
 The app was built and tested successfully in this environment:
