@@ -1,4 +1,4 @@
-name: Buildifier format and linter
+name: 'Format: Buildifier +linter'
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: C++ format
+name: 'Format: C++'
 
 on:
   push:
