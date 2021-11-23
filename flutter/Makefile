@@ -215,57 +215,6 @@ protobuf:
 		--dart_out lib/protos \
 		../android/cpp/proto/*.proto
 
-.PHONY: format
-format: format-clang format-bazel format-dart
-
-.PHONY: format-check-prohibited
-format-check-prohibited:
-	cd .. && _files=$$(git ls-files | grep "\.so$$\|\.apk$$\|\.tflite$$\|\.dlc$$\|\.zip$$\|\.jar$$\|\.tgz$$"); \
-		if [ ! -z "$$_files" ]; then \
-			echo found prohibited files:; \
-			echo "$$_files"; \
-			false; \
-		fi
-
-.PHONY: format-check-big-files
-format-check-big-files:
-	cd .. && \
-		big_file_list=""; \
-		for f in $$(git ls-files); do \
-			if [ "$$(stat $$f --format %s)" -gt 5242880 ]; then \
-				big_file_list="$$big_file_list$$f\n"; \
-			fi; \
-		done; \
-		if [ ! -z "$$big_file_list" ]; then \
-			echo -e "found too big files: \n$$big_file_list"; \
-			false; \
-		fi
-
-.PHONY: format-java
-format-java:
-	cd .. && _files=$$(git ls-files | grep "\.java$$") \
-		&& [ ! -z "$$_files" ] \
-		&& java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace $${_files}
-
-.PHONY: format-clang
-format-clang:
-	cd .. && _files=$$(git ls-files | grep "\.h$$\|\.cc$$\|\.cpp$$") \
-		&& [ ! -z "$$_files" ] \
-		&& clang-format -i -style=google $${_files}
-
-.PHONY: format-bazel
-format-bazel:
-	buildifier -r .
-
-.PHONY: format-dart
-format-dart:
-	dart run import_sorter:main
-	dart format lib integration_test test_driver
-
-.PHONY: lint
-lint:
-	flutter analyze
-
 .PHONY: update-splash-screen
 update-splash-screen:
 	tool/update-splash-screen
@@ -278,10 +227,6 @@ generate-localizations:
 		--template-arb-file=app_en.arb \
 		--output-localization-file=app_localizations.dart \
 		--no-synthetic-package
-
-# this make target is intended to be used by CI system, to avoid calling other targets directly
-.PHONY: prepare-lint
-prepare-lint: prepare-flutter
 
 .PHONY: prepare-flutter
 prepare-flutter: set-supported-backends protobuf generate-localizations

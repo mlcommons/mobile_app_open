@@ -18,6 +18,8 @@
 
 all: app
 
+include format.mk
+
 # TFLite is the default backend
 include mobile_back_tflite/tflite_backend.mk
 

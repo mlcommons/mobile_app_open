@@ -19,6 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Check prohibited extensions
-        run: cd flutter && make format-check-prohibited
+        run: make lint/check-prohibited
       - name: Check large files
-        run: cd flutter && make format-check-big-files
+        run: make lint/check-big-files
