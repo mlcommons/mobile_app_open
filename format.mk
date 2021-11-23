@@ -72,5 +72,5 @@ lint/line-endings:
 	@_files=$$(git ls-files -z | xargs --null ${_start_args} dos2unix --info=c --) && \
 	if [ ! -z "$$_files" ]; then \
 		echo -e "found files with CRLF line endings: \n$$_files"; false; \
-	else echo al files have unix line endings; \
+	else echo all files have unix line endings; \
 	fi
