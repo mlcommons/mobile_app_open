@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Check prohibited extensions
-        run: make lint/prohibited
+        run: make lint/prohibited-extensions
       - name: Check large files
         run: make lint/big-files
       - name: Install dos2unix

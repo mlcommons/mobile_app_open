@@ -22,7 +22,12 @@ jobs:
         with:
           version: '3.x'
       - name: Create ephemeral files
-        run: cd flutter && make prepare-flutter && dart format lib/backend/backends_list.gen.dart lib/protos lib/localizations
+        run: |
+            cd flutter &&
+            dart pub global activate protoc_plugin &&
+            export PATH="$PATH:$HOME/.pub-cache/bin" &&
+            make prepare-flutter &&
+            dart format lib/backend/backends_list.gen.dart lib/protos lib/localizations
       - name: Run dart format check
         run: dart format --output=none --set-exit-if-changed flutter
       - name: Run dart linter
