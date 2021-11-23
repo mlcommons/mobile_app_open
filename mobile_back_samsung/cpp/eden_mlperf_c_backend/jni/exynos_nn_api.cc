@@ -27,8 +27,8 @@ limitations under the License.
 #include "eden_nn_api.h"
 #include "eden_nn_types.h"
 #include "eden_types.h"
-#include "ofi_mm_memory-public.h"
 #include "ofi_api-public.h"
+#include "ofi_mm_memory-public.h"
 
 // TODO:
 #define OFI_NUM_BUFF (2)
