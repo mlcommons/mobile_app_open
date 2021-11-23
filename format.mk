@@ -1,4 +1,11 @@
 
+ifeq (${OS},Windows_NT)
+# On Windows some commands don't run correctly in the default make shell
+_start_args=powershell -Command
+else
+_start_args=
+endif
+
 .PHONY: format
 ifeq (${OS},Windows_NT)
 # format/java is not supported on Windows
@@ -23,21 +30,14 @@ format/java:
 		&& [ ! -z "$$_files" ] \
 		&& java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace $${_files}
 
-ifeq (${OS},Windows_NT)
-# On Windows dart and flutter commands are defined as .bat files.
-# When these commands are used in makefile directly, they work as expected.
-# When these commands are used after a `cd` command, make apparently uses a different shell,
-# and `dart` command fails with "some/path/flutter/bin/dart: No such file or directory".
-# Explicitly using cmd prevents this.
-_dart_start_args=cmd //C
-else
-_dart_start_args=
-endif
-
 .PHONY: format/dart
 format/dart:
-	cd flutter && ${_dart_start_args} dart run import_sorter:main
-	cd flutter && ${_dart_start_args} dart format lib integration_test test_driver
+	cd flutter && ${_start_args} dart run import_sorter:main
+	cd flutter && ${_start_args} dart format lib integration_test test_driver
+
+.PHONY: format/line-endings
+format/line-endings:
+	git ls-files -z | xargs -0 ${_start_args} dos2unix --keep-bom --
 
 .PHONY: lint
 lint: lint/bazel lint/dart lint/check-prohibited lint/check-big-files
@@ -72,3 +72,11 @@ lint/check-big-files:
 			echo -e "found too big files: \n$$big_file_list"; \
 			false; \
 		fi
+
+.PHONY: lint/check-line-endings
+lint/check-line-endings:
+	incorrect_files=$$(git ls-files -z | xargs -0 ${_start_args} dos2unix --info=c --) && \
+	if [ ! -z "$$incorrect_files" ]; then \
+		echo -e "found files with CRLF line endings: \n$$incorrect_files"; \
+		false; \
+	fi

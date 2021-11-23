@@ -22,3 +22,7 @@ jobs:
         run: make lint/check-prohibited
       - name: Check large files
         run: make lint/check-big-files
+      - name: Install dos2unix
+        run: sudo apt-get install dos2unix
+      - name: Check line endings
+        run: make lint/check-line-endings
