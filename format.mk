@@ -9,9 +9,9 @@ endif
 .PHONY: format
 ifeq (${OS},Windows_NT)
 # format/java is not supported on Windows
-format: format/bazel format/clang format/dart
+format: format/bazel format/clang format/dart format/line-endings
 else
-format: format/bazel format/clang format/java format/dart
+format: format/bazel format/clang format/java format/dart format/line-endings
 endif
 
 .PHONY: format/bazel
@@ -20,15 +20,11 @@ format/bazel:
 
 .PHONY: format/clang
 format/clang:
-	_files=$$(git ls-files | grep "\.h$$\|\.cc$$\|\.cpp$$") \
-		&& [ ! -z "$$_files" ] \
-		&& clang-format -i -style=google $${_files}
+	git ls-files -z | grep --null-data "\.h$$\|\.cc$$\|\.cpp$$" | xargs --null --no-run-if-empty clang-format -i -style=google
 
 .PHONY: format/java
 format/java:
-	_files=$$(git ls-files | grep "\.java$$") \
-		&& [ ! -z "$$_files" ] \
-		&& java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace $${_files}
+	git ls-files -z | grep --null-data "\.java$$" | xargs --null --no-run-if-empty java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace
 
 .PHONY: format/dart
 format/dart:
@@ -37,10 +33,10 @@ format/dart:
 
 .PHONY: format/line-endings
 format/line-endings:
-	git ls-files -z | xargs -0 ${_start_args} dos2unix --keep-bom --
+	git ls-files -z | xargs --null ${_start_args} dos2unix --keep-bom --
 
 .PHONY: lint
-lint: lint/bazel lint/dart lint/check-prohibited lint/check-big-files
+lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files lint/line-endings
 
 .PHONY: lint/bazel
 lint/bazel:
@@ -51,32 +47,30 @@ lint/dart:
 	cd flutter && make prepare-flutter
 	dart analyze flutter
 
-.PHONY: lint/check-prohibited
-lint/check-prohibited:
-	_files=$$(git ls-files | grep "\.so$$\|\.apk$$\|\.tflite$$\|\.dlc$$\|\.zip$$\|\.jar$$\|\.tgz$$"); \
-		if [ ! -z "$$_files" ]; then \
-			echo found prohibited files:; \
-			echo "$$_files"; \
-			false; \
-		fi
+.PHONY: lint/prohibited-extensions
+lint/prohibited-extensions:
+	@echo checking prohibited extensions...
+	@_files=$$(git ls-files -z | grep --null-data "\.so$$\|\.apk$$\|\.tflite$$\|\.dlc$$\|\.zip$$\|\.jar$$\|\.tgz$$"); \
+	if [ ! -z "$$_files" ]; then echo -e "found prohibited files:\n$$_files"; false; \
+	else echo found 0 files with prohibited extensions; \
+	fi
 
-.PHONY: lint/check-big-files
-lint/check-big-files:
-	big_file_list=""; \
-		for f in $$(git ls-files); do \
-			if [ "$$(stat $$f --format %s)" -gt 5242880 ]; then \
-				big_file_list="$$big_file_list$$f\n"; \
-			fi; \
-		done; \
-		if [ ! -z "$$big_file_list" ]; then \
-			echo -e "found too big files: \n$$big_file_list"; \
-			false; \
-		fi
+.PHONY: lint/big-files
+lint/big-files:
+	@echo checking big files...
+	@big_file_list=""; \
+	for f in $$(git ls-files); do \
+		if [ "$$(stat $$f --format %s)" -gt 5242880 ]; then big_file_list="$$big_file_list$$f\n"; fi; \
+	done; \
+	if [ ! -z "$$big_file_list" ]; then echo -e "found too big files: \n$$big_file_list"; false; \
+	else echo found 0 too big files; \
+	fi
 
-.PHONY: lint/check-line-endings
-lint/check-line-endings:
-	incorrect_files=$$(git ls-files -z | xargs -0 ${_start_args} dos2unix --info=c --) && \
-	if [ ! -z "$$incorrect_files" ]; then \
-		echo -e "found files with CRLF line endings: \n$$incorrect_files"; \
-		false; \
+.PHONY: lint/line-endings
+lint/line-endings:
+	@echo checking line endings...
+	@_files=$$(git ls-files -z | xargs --null ${_start_args} dos2unix --info=c --) && \
+	if [ ! -z "$$_files" ]; then \
+		echo -e "found files with CRLF line endings: \n$$_files"; false; \
+	else echo al files have unix line endings; \
 	fi
