@@ -19,14 +19,14 @@
 # Inputs to and outputs from the network are conveyed in binary form as single
 # precision floating point values.
 #
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+load("//mobile_back_qti:variables.bzl", "SNPE_VERSION")
+load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
 
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
 )
-
-load("//mobile_back_qti:variables.bzl", "SNPE_VERSION")
 
 config_setting(
     name = "android_arm64",
@@ -38,12 +38,6 @@ snpe_copts = [
     "-fexceptions",
     "-lc++_shared",
 ]
-
-load(
-    "@org_tensorflow//tensorflow/lite:build_def.bzl",
-    "tflite_copts",
-    "tflite_jni_binary",
-)
 
 cc_library(
     name = "qti_rpcmem",

@@ -1,0 +1,84 @@
+name: Format & lint
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  bazel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/src/github.com/${{ github.repository }}
+      - name: Setup Golang
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.16
+      - name: Set go env
+        run: echo GOPATH=$GITHUB_WORKSPACE >> $GITHUB_ENV
+      - name: Get buildifier
+        run: go get github.com/bazelbuild/buildtools/buildifier
+      - name: Run buildifier format check
+        run: $GOPATH/bin/buildifier -mode=check -r ${{ github.workspace }}/src/github.com/${{ github.repository }}
+      - name: Run buildifier linter
+        run: $GOPATH/bin/buildifier -lint=warn -r ${{ github.workspace }}/src/github.com/${{ github.repository }}
+  cpp:
+    name: C++
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check C++ format
+      uses: jidicula/clang-format-action@v4.3.1
+      with:
+        clang-format-version: 12
+        check-path: .
+        fallback-style: Google
+  dart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: '3.x'
+      - name: Create ephemeral files
+        run: |
+            cd flutter &&
+            dart pub global activate protoc_plugin &&
+            export PATH="$PATH:$HOME/.pub-cache/bin" &&
+            make prepare-flutter &&
+            dart format lib/backend/backends_list.gen.dart lib/protos lib/localizations
+      - name: Run Dart format check
+        run: dart format --output=none --set-exit-if-changed flutter
+      - name: Run Dart linter
+        run: dart analyze --fatal-infos
+  java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Java format check
+        uses: axel-op/googlejavaformat-action@v3
+        with:
+          version: 1.9
+          args: --set-exit-if-changed --replace
+  misc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check prohibited extensions
+        run: make lint/prohibited-extensions
+      - name: Check large files
+        run: make lint/big-files
+      - name: Install dos2unix
+        run: sudo apt-get install dos2unix
+      - name: Check line endings
+        run: make lint/line-endings

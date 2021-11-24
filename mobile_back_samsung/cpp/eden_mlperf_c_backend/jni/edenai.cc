@@ -244,7 +244,7 @@ int32_t edenWaitForAll(EdenCallback* callbacks, uint32_t timeout,
         if (idx < batch) {
           if (fillRequest(&requests[idx], requests[i].modelId,
                           requests[i].inputBuffers, requests[i].outputBuffers,
-                          (char *)ptr->input_conv->at(idx), oneFrameSize,
+                          (char*)ptr->input_conv->at(idx), oneFrameSize,
                           IMAGE_FORMAT_BGRC) == RET_OK &&
               ExecuteEdenModel(&requests[idx], &requestId[idx], options) ==
                   RET_OK) {
@@ -266,7 +266,7 @@ int32_t edenWaitForAll(EdenCallback* callbacks, uint32_t timeout,
           if (fillDspRequest(&requests[dsp_idx], requests[i].modelId,
                              requests[i].inputBuffers,
                              requests[i].outputBuffers,
-                             (char *)ptr->input_conv->at(dsp_idx), oneFrameSize,
+                             (char*)ptr->input_conv->at(dsp_idx), oneFrameSize,
                              IMAGE_FORMAT_BGRC) == RET_OK &&
               ExynosOFI_ExecuteEdenModel(
                   &requests[dsp_idx], &requestId[dsp_idx], options) == RET_OK) {
@@ -366,8 +366,6 @@ bool jni_OpenModelFromMemory(char* bufferMain, int lengthMain,
         return false;
       }
 
-
-
       if (bufferOther && lengthOther) {
         if (!dspOpenModelFromMemory(ModelIdDsp, bufferOther, lengthOther,
                                     inputBuffers3, outputBuffers3,
@@ -376,7 +374,6 @@ bool jni_OpenModelFromMemory(char* bufferMain, int lengthMain,
           return false;
         }
       }
-
 
       MULTI_NPU_ENABLED = true;
     }
@@ -536,14 +533,14 @@ int sample_notify_callback(int num_param, void** params) {
   if (num_param != 1) {
     MLOGE("Wrong params. num_param(%d != 1)\n", num_param);
   }
-  //MLOGD("User notify callback-ed! req=%p", params[0]);
+  // MLOGD("User notify callback-ed! req=%p", params[0]);
   return 0;
 }
 
 /* OFI Test */
 int sample_user_wait_for(exynos_nn_request_t* req) {
   while (req->result == (int32_t)0xffffffff) {
-    //MLOGD("User waiting.. result(0x%x) addr:%p", req->result, req);
+    // MLOGD("User waiting.. result(0x%x) addr:%p", req->result, req);
     usleep(1000);
   }
   if (req->result != RET_OK) {
@@ -553,8 +550,8 @@ int sample_user_wait_for(exynos_nn_request_t* req) {
   return 0;
 }
 
-bool jni_ExecuteModelBatch(char* input, char* output,
-                           bool isMobileBert, Backend* ptr) {
+bool jni_ExecuteModelBatch(char* input, char* output, bool isMobileBert,
+                           Backend* ptr) {
   int ret = RET_OK;
   vecOutputSize.clear();
 
@@ -646,7 +643,7 @@ bool jni_ExecuteModelBatch(char* input, char* output,
       if (hwPreference == DSP_ONLY) {
         fillDspRequest(&requests[executedCount], ModelId0, inputBuffers0[i],
                        outputBuffers0[i],
-                       (char *)ptr->input_conv->at(executedCount), oneFrameSize,
+                       (char*)ptr->input_conv->at(executedCount), oneFrameSize,
                        IMAGE_FORMAT_BGR);
       } else {
         if (isMobileBert) {
@@ -662,9 +659,9 @@ bool jni_ExecuteModelBatch(char* input, char* output,
           GPUBoost::apply_GPU_boost();
         } else {
           fillRequest(&requests[executedCount], ModelId0, inputBuffers0[i],
-                      outputBuffers0[i], 
-                      (char *)ptr->input_conv->at(executedCount),    
-                      oneFrameSize, IMAGE_FORMAT_BGRC);
+                      outputBuffers0[i],
+                      (char*)ptr->input_conv->at(executedCount), oneFrameSize,
+                      IMAGE_FORMAT_BGRC);
         }
       }
       if (ExecuteEdenModelFunc(&requests[executedCount],
@@ -682,8 +679,7 @@ bool jni_ExecuteModelBatch(char* input, char* output,
     if (MULTI_NPU_ENABLED) {
       if (checkBufferBoard1[i] == AVAILABLE && ModelId1 != INVALID_MODEL_ID) {
         memcpy(inputBuffers1[i]->addr,
-               (char *)ptr->input_conv->at(executedCount),
-               oneFrameSize);
+               (char*)ptr->input_conv->at(executedCount), oneFrameSize);
         requests[executedCount].modelId = ModelId1;
         requests[executedCount].inputBuffers = inputBuffers1[i];
         requests[executedCount].outputBuffers = outputBuffers1[i];
@@ -703,8 +699,7 @@ bool jni_ExecuteModelBatch(char* input, char* output,
 
       if (checkBufferBoard2[i] == AVAILABLE && ModelId2 != INVALID_MODEL_ID) {
         memcpy(inputBuffers2[i]->addr,
-               (char *)ptr->input_conv->at(executedCount),
-               oneFrameSize);
+               (char*)ptr->input_conv->at(executedCount), oneFrameSize);
         requests[executedCount].modelId = ModelId2;
         requests[executedCount].inputBuffers = inputBuffers2[i];
         requests[executedCount].outputBuffers = outputBuffers2[i];
@@ -727,7 +722,7 @@ bool jni_ExecuteModelBatch(char* input, char* output,
     for (int i = 0; i < dsp_init_batch; ++i) {
       if (fillDspRequest(&requests[batch + i], ModelIdDsp, inputBuffers3[i],
                          outputBuffers3[i],
-                         (char *)ptr->input_conv->at(batch + i), oneFrameSize,
+                         (char*)ptr->input_conv->at(batch + i), oneFrameSize,
                          IMAGE_FORMAT_BGRC) != RET_OK ||
           ExynosOFI_ExecuteEdenModel(
               &requests[batch + i], &requestId[batch + i], options) != RET_OK) {
@@ -788,7 +783,7 @@ bool jni_ExecuteModelBatch(char* input, char* output,
             if (fillDspRequest(&requests[idx], requests[i].modelId,
                                requests[i].inputBuffers,
                                requests[i].outputBuffers,
-                               (char *)ptr->input_conv->at(idx), oneFrameSize,   
+                               (char*)ptr->input_conv->at(idx), oneFrameSize,
                                IMAGE_FORMAT_BGR) == RET_OK &&
                 ExecuteEdenModelFunc(&requests[idx], &requestId[idx],
                                      options) == RET_OK) {
@@ -918,69 +913,66 @@ bool jni_GetEdenVersion(uint32_t modelId, int32_t* versions) {
 }  // namespace EdenAI
 
 // Should return true if current hardware is supported.
-bool mlperf_backend_matches_hardware(const char** not_allowed_message, const char ** settings, mlperf_device_info_t* device_info)
-{      
-    MLOGD("Check for support  manufacturer: %s  model: %s", device_info->manufacturer,  device_info->model);
-   
-    *not_allowed_message = nullptr;
-    *settings = samsung_settings.c_str();
+bool mlperf_backend_matches_hardware(const char** not_allowed_message,
+                                     const char** settings,
+                                     mlperf_device_info_t* device_info) {
+  MLOGD("Check for support  manufacturer: %s  model: %s",
+        device_info->manufacturer, device_info->model);
 
-    char *isSamsung1 = NULL;
-    isSamsung1 = strstr ((char *)device_info->manufacturer,"samsung");
-    char *isSamsung2 = NULL;
-    isSamsung2 = strstr ((char *)device_info->manufacturer,"Samsung");
-    if (isSamsung1 || isSamsung2)
-    { //Samsung device
-            MLOGD("This is Samsung device");
-	    
-	    char *isG998N = NULL;
-	    isG998N = strstr ((char *)device_info->model,"SM-G998N");
-        char *isG998B = NULL;
-	    isG998B = strstr ((char *)device_info->model,"SM-G998B");
-	    char *isG996N = NULL;
-	    isG996N = strstr ((char *)device_info->model,"SM-G996N");
-	    char *isG996B = NULL;
-	    isG996B = strstr ((char *)device_info->model,"SM-G996B");
-	    char *isG991N = NULL;
-	    isG991N = strstr ((char *)device_info->model,"SM-G991N");
-	    char *isG991B = NULL;
-	    isG991B = strstr ((char *)device_info->model,"SM-G991B");
-	    if (isG998N || isG998B || isG996N || isG996B || isG991N || isG991B)
-	    { // S21, S21 ultra or Olympus engineering device
-                    MLOGD("This is S21 device");
-		    std::array<char, 128> buffer;
-		    std::string result;
-		    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen("getprop | grep ro.hardware.chipname", "r"), pclose);
-		    if (!pipe) {
-			 throw std::runtime_error("popen() failed!");
-		    }
-		    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-			result += buffer.data();
-		    }
-		    if (result.find("exynos2100") != std::string::npos) {
-                        MLOGD("This hardware is supported");
-			return true;
-		    }
-		    else
-		    {  //S21 but not using exynos2100, unsuported, should stop search for next backend, report unsupported
-                       MLOGD("This hardware is unsupported");
-		       *not_allowed_message = "Unsupported";
-		       return true;
-		    }
-            }
-            else
-            { //Samsung but not s21
-                 MLOGD("This hardware is unsupported");
-		 *not_allowed_message = "Unsupported";
-		 return true;
-            }  
-   } 
-   else
-   { // not Samsung
-        MLOGD("Soc Not supported. Trying next backend");  
-	*not_allowed_message = "UnsupportedSoc";
-	return true;    
-   }  
+  *not_allowed_message = nullptr;
+  *settings = samsung_settings.c_str();
+
+  char* isSamsung1 = NULL;
+  isSamsung1 = strstr((char*)device_info->manufacturer, "samsung");
+  char* isSamsung2 = NULL;
+  isSamsung2 = strstr((char*)device_info->manufacturer, "Samsung");
+  if (isSamsung1 || isSamsung2) {  // Samsung device
+    MLOGD("This is Samsung device");
+
+    char* isG998N = NULL;
+    isG998N = strstr((char*)device_info->model, "SM-G998N");
+    char* isG998B = NULL;
+    isG998B = strstr((char*)device_info->model, "SM-G998B");
+    char* isG996N = NULL;
+    isG996N = strstr((char*)device_info->model, "SM-G996N");
+    char* isG996B = NULL;
+    isG996B = strstr((char*)device_info->model, "SM-G996B");
+    char* isG991N = NULL;
+    isG991N = strstr((char*)device_info->model, "SM-G991N");
+    char* isG991B = NULL;
+    isG991B = strstr((char*)device_info->model, "SM-G991B");
+    if (isG998N || isG998B || isG996N || isG996B || isG991N ||
+        isG991B) {  // S21, S21 ultra or Olympus engineering device
+      MLOGD("This is S21 device");
+      std::array<char, 128> buffer;
+      std::string result;
+      std::unique_ptr<FILE, decltype(&pclose)> pipe(
+          popen("getprop | grep ro.hardware.chipname", "r"), pclose);
+      if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+      }
+      while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+      }
+      if (result.find("exynos2100") != std::string::npos) {
+        MLOGD("This hardware is supported");
+        return true;
+      } else {  // S21 but not using exynos2100, unsuported, should stop search
+                // for next backend, report unsupported
+        MLOGD("This hardware is unsupported");
+        *not_allowed_message = "Unsupported";
+        return true;
+      }
+    } else {  // Samsung but not s21
+      MLOGD("This hardware is unsupported");
+      *not_allowed_message = "Unsupported";
+      return true;
+    }
+  } else {  // not Samsung
+    MLOGD("Soc Not supported. Trying next backend");
+    *not_allowed_message = "UnsupportedSoc";
+    return true;
+  }
 }
 void mlperf_backend_clear(mlperf_backend_ptr_t backend_ptr) {
   MLOGD("mlperf_backend_clear");
@@ -1005,14 +997,12 @@ void mlperf_backend_clear(mlperf_backend_ptr_t backend_ptr) {
     samsung_backend->model_buffer = nullptr;
   }
 
-
   if (samsung_backend->input_conv != nullptr) {
     samsung_backend->input_conv->clear();
     samsung_backend->input_conv->shrink_to_fit();
     delete samsung_backend->input_conv;
     samsung_backend->input_conv = nullptr;
   }
-
 
   if (samsung_backend->detected_label_boxes != nullptr) {
     samsung_backend->detected_label_boxes->clear();
@@ -1130,12 +1120,12 @@ mlperf_backend_ptr_t mlperf_backend_create(
   samsung_backend->batch = 1;
   EdenAI::gIsOfflineModel = false;
   if (configs->batch_size > 1) {
-      samsung_backend->batch = configs->batch_size;
-      MLOGD("mlperf_backend_create samsung_backend->batch: %d",
-            samsung_backend->batch);
-      EdenAI::requestMode = RequestMode::NONBLOCK;
-      EdenAI::modePreference = BOOST_MODE;
-      EdenAI::gIsOfflineModel = true;
+    samsung_backend->batch = configs->batch_size;
+    MLOGD("mlperf_backend_create samsung_backend->batch: %d",
+          samsung_backend->batch);
+    EdenAI::requestMode = RequestMode::NONBLOCK;
+    EdenAI::modePreference = BOOST_MODE;
+    EdenAI::gIsOfflineModel = true;
   }
 
   libeden_nn_on_direct = nullptr;
@@ -1310,7 +1300,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
     if (samsung_backend->model == "object_detection") {
       samsung_backend->outputs_buffer = new std::vector<uint8_t>(
           samsung_backend->output_size * samsung_backend->batch);
-      samsung_backend->input_conv = new std::vector<uint8_t*>(samsung_backend->batch);
+      samsung_backend->input_conv =
+          new std::vector<uint8_t*>(samsung_backend->batch);
       samsung_backend->detected_label_boxes =
           new std::vector<float>(samsung_backend->output_size / 7);
       samsung_backend->detected_label_indices =
@@ -1342,7 +1333,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
     } else {
       samsung_backend->outputs_buffer = new std::vector<uint8_t>(
           samsung_backend->output_size * samsung_backend->batch);
-      samsung_backend->input_conv = new std::vector<uint8_t*>(samsung_backend->batch);
+      samsung_backend->input_conv =
+          new std::vector<uint8_t*>(samsung_backend->batch);
 
       v.type = mlperf_data_t::Uint8;
       v.size = samsung_backend->input_size;
@@ -1417,8 +1409,8 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
     EdenAI::setInputSize(ptr->input_size);
     EdenAI::setOutputSize(ptr->output_size);
     if (EdenAI::jni_ExecuteModelBatch((char*)(ptr->m_inputs_.data()),
-                                      (char*)(ptr->m_outputs_.data()),
-                                      true, ptr)) {
+                                      (char*)(ptr->m_outputs_.data()), true,
+                                      ptr)) {
       return MLPERF_SUCCESS;
     } else {
       return MLPERF_FAILURE;
@@ -1538,29 +1530,28 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
   mlperf_backend_clear(backend_ptr);
 }
 
-void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr,
-                                   int bytes, int width, int height, uint8_t* data) {
-      //MLOGE("mlperf_backend_convert_inputs called width: %d height: %d", width, height);
-      std::vector<uint8_t>* data_uint8_conv =
-          new std::vector<uint8_t>(bytes);
-      int blueOffset = 0;
-      int greenOffset = width * height;
-      int redOffset = width * height * 2;
-      int idx = 0;
-      for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-          (*data_uint8_conv)[redOffset] = data[idx];
-          (*data_uint8_conv)[greenOffset] = data[idx + 1];
-          (*data_uint8_conv)[blueOffset] = data[idx + 2];
-          redOffset++;
-          greenOffset++;
-          blueOffset++;
-          idx = idx + 3;
-        }
-      }
-      memcpy(data, data_uint8_conv->data(),
-             sizeof(uint8_t) * bytes);
-      data_uint8_conv->clear();
-      data_uint8_conv->shrink_to_fit();
-      delete data_uint8_conv;
+void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
+                                   int width, int height, uint8_t* data) {
+  // MLOGE("mlperf_backend_convert_inputs called width: %d height: %d", width,
+  // height);
+  std::vector<uint8_t>* data_uint8_conv = new std::vector<uint8_t>(bytes);
+  int blueOffset = 0;
+  int greenOffset = width * height;
+  int redOffset = width * height * 2;
+  int idx = 0;
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      (*data_uint8_conv)[redOffset] = data[idx];
+      (*data_uint8_conv)[greenOffset] = data[idx + 1];
+      (*data_uint8_conv)[blueOffset] = data[idx + 2];
+      redOffset++;
+      greenOffset++;
+      blueOffset++;
+      idx = idx + 3;
+    }
+  }
+  memcpy(data, data_uint8_conv->data(), sizeof(uint8_t) * bytes);
+  data_uint8_conv->clear();
+  data_uint8_conv->shrink_to_fit();
+  delete data_uint8_conv;
 }

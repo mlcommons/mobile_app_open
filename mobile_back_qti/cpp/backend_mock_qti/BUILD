@@ -19,6 +19,9 @@
 # Inputs to and outputs from the network are conveyed in binary form as single
 # precision floating point values.
 #
+
+load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
+
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
@@ -27,12 +30,6 @@ package(
 config_setting(
     name = "android_arm64",
     values = {"cpu": "arm64-v8a"},
-)
-
-load(
-    "@org_tensorflow//tensorflow/lite:build_def.bzl",
-    "tflite_copts",
-    "tflite_jni_binary",
 )
 
 cc_library(

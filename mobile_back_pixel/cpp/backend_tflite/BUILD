@@ -33,10 +33,10 @@ cc_library(
     ],
     deps = [
         "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
         "@org_tensorflow//tensorflow/lite/core/api",
         "@org_tensorflow//tensorflow/lite/kernels:cpu_backend_context",
         "@org_tensorflow//tensorflow/lite/kernels:cpu_backend_threadpool",
+        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
     ],
 )
 

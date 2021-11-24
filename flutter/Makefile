@@ -206,43 +206,14 @@ set-supported-backends:
 		-e "s/TFLITE_TAG/${backend_replace_tflite}/" \
 		> lib/backend/backends_list.gen.dart
 
-ifeq (${OS},Windows_NT)
-script_launch_prefix=.\\tool\\
-script_extension=bat
-else
-script_launch_prefix=./tool/
-script_extension=sh
-endif
-
 .PHONY: protobuf
 protobuf:
 	dart pub get
 	rm -rf lib/protos
 	mkdir -p lib/protos
 	protoc --proto_path ../android/cpp/proto \
-		--plugin protoc-gen-dart="${script_launch_prefix}protoc-gen-dart.${script_extension}" \
 		--dart_out lib/protos \
 		../android/cpp/proto/*.proto
-
-.PHONY: format
-format: format-clang format-bazel format-dart
-
-.PHONY: format-clang
-format-clang:
-	${script_launch_prefix}run-clang-format.${script_extension}
-
-.PHONY: format-bazel
-format-bazel:
-	buildifier -r .
-
-.PHONY: format-dart
-format-dart:
-	dart run import_sorter:main
-	dart format lib integration_test test_driver
-
-.PHONY: lint
-lint:
-	flutter analyze
 
 .PHONY: update-splash-screen
 update-splash-screen:
@@ -256,10 +227,6 @@ generate-localizations:
 		--template-arb-file=app_en.arb \
 		--output-localization-file=app_localizations.dart \
 		--no-synthetic-package
-
-# this make target is intended to be used by CI system, to avoid calling other targets directly
-.PHONY: prepare-lint
-prepare-lint: prepare-flutter
 
 .PHONY: prepare-flutter
 prepare-flutter: set-supported-backends protobuf generate-localizations
