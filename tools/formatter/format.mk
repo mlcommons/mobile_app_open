@@ -74,3 +74,19 @@ lint/line-endings:
 		echo -e "found files with CRLF line endings: \n$$_files"; false; \
 	else echo all files have unix line endings; \
 	fi
+
+.PHONY: docker/build/format
+docker/build/format:
+	docker build --progress=plain \
+		--build-arg UID=`id -u` --build-arg GID=`id -g` \
+		-t mlperf/formatter tools/formatter
+
+.PHONY: docker/run/format
+docker/run/format:
+	docker run -it --rm \
+    	-v ~/.pub-cache:/home/mlperf/.pub-cache \
+    	-v ~/.config/flutter:/home/mlperf/.config/flutter \
+    	-v $(CURDIR):/home/mlperf/mobile_app_open \
+    	-w /home/mlperf/mobile_app_open \
+    	-u `id -u`:`id -g` \
+    	mlperf/formatter bash -c "make format"
