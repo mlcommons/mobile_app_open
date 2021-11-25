@@ -51,48 +51,9 @@ The code was originally contributed by Google so it conforms to the
 [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) and
 [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
 
-The `format_code.sh` script is the convinent way to format your staged files. It uses the
-[clang-format](https://clang.llvm.org/docs/ClangFormat.html) for checking your C/C++ files,
-[buildifier](https://github.com/bazelbuild/buildtools/tree/master/buildifier) for bazel files and
-[google-java-format](https://github.com/google/google-java-format) for Javafiles.
+From the root directory you can run the command `make format` to format all files or `format <bazel|java|clang|dart>` to format only certain files in the directory.
+See [format.mk](tools/formatter/format.mk) for more commands.
 
-The `format_all_code.sh` script is the convinent way to format all files.
-
-
-##### Using docker image
-These are installed in the docker image. To make the docker image run:
-```
-make output/mlperf_mobile_docker_1_0.stamp
-```
-
-You can format your staged files by running:
-```bash
-bash android/formatters/docker_run.sh android/format_code.sh
-```
-
-You can format all files by running:
-```bash
-bash android/formatters/docker_run.sh android/format_all_code.sh
-```
-
-##### Using native OS
-
-To install its dependencies, do:
-
-```bash
-sudo apt install clang-format-10
-go get github.com/bazelbuild/buildtools/buildifier
-mkdir /opt/formatters/
-curl --output /opt/formatters/google-java-format-1.9-all-deps.jar -L https://github.com/google/google-java-format/releases/download/google-java-format-1.9/google-java-format-1.9-all-deps.jar
-```
-
-Then you can format your staged files by running:
-```bash
-bash android/format_code.sh
-```
-
-Optionally, you can add it to pre-commit hook by running:
-```bash
-sed -i -e '$a\' -e 'bash `git rev-parse --show-toplevel`/android/format_code.sh && git add *' \
--e "#android/format_code.sh#d" .git/hooks/pre-commit
-```
+Running `make format` requires you have all the tools installed locally on your computer.
+For your convenience you can use a Docker image to format code files.
+First run `docker/build/format` to build the image. Then each time you need to format your code, run `docker/run/format`.
