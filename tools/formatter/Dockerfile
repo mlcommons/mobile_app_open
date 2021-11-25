@@ -13,6 +13,8 @@
 # limitations under the License.
 ##########################################################################
 
+# This Docker image is used to run code formatter
+
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND="noninteractive"
