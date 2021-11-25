@@ -75,14 +75,16 @@ lint/line-endings:
 	else echo all files have unix line endings; \
 	fi
 
-.PHONY: docker/build/format
-docker/build/format:
+output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	docker build --progress=plain \
 		--build-arg UID=`id -u` --build-arg GID=`id -g` \
 		-t mlperf/formatter tools/formatter
+	# need to clean flutter cache first else we will have error when running `dart run import_sorter:main` later in docker
+	cd flutter && flutter clean
+	touch $@
 
-.PHONY: docker/run/format
-docker/run/format:
+.PHONY: docker/format
+docker/format: output/docker_mlperf_formatter.stamp
 	docker run -it --rm \
     	-v ~/.pub-cache:/home/mlperf/.pub-cache \
     	-v ~/.config/flutter:/home/mlperf/.config/flutter \

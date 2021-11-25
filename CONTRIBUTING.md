@@ -55,5 +55,4 @@ From the root directory you can run the command `make format` to format all file
 See [format.mk](tools/formatter/format.mk) for more commands.
 
 Running `make format` requires you have all the tools installed locally on your computer.
-For your convenience you can use a Docker image to format code files.
-First run `make docker/build/format` to build the image. Then each time you need to format your code, run `make docker/run/format`.
+For your convenience you can use a Docker image to format code files by running `make docker/format`.
