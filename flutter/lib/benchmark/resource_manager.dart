@@ -108,9 +108,23 @@ class ResourceManager {
   }
 
   Future<void> initSystemPaths() async {
-    applicationDirectory = (await getApplicationDocumentsDirectory()).path;
-    loadedResourcesDir = '$applicationDirectory/loaded resources';
-    externalResourcesDir = '$applicationDirectory/external resources';
+    // applicationDirectory should be visible to user
+    Directory? dir;
+    if (Platform.isIOS) {
+      dir = await getApplicationDocumentsDirectory();
+    } else if (Platform.isAndroid) {
+      dir = await getExternalStorageDirectory();
+    } else if (Platform.isWindows) {
+      dir = await getDownloadsDirectory();
+    }
+    if (dir != null) {
+      applicationDirectory = dir.path;
+    } else {
+      applicationDirectory = (await getApplicationDocumentsDirectory()).path;
+    }
+
+    loadedResourcesDir = '$applicationDirectory/loaded_resources';
+    externalResourcesDir = '$applicationDirectory/external_resources';
     _tmpDirectory = (await getTemporaryDirectory()).path;
     _jsonResultPath = '$applicationDirectory/result.json';
 

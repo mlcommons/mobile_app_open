@@ -19,10 +19,10 @@ Add new paths to the file `tasks.pbtxt` in following format:
 See [Resources in the tasks.pbtxt](#resources-in-the-taskspbtxt) block
 for details on different ways you can specify resources.
 
-After adding new option into the `benchmarkCponfigurations.json` file
+After adding new option into the `benchmarksConfigurations.json` file
 run application and open setting screen.  
 Tap on `Benchmarks configuration path` option
-and choose added item. Current chosen path highlited blue.
+and choose added item. Current chosen path highlighted blue.
 
 # Resources in the tasks.pbtxt
 
@@ -41,9 +41,9 @@ Location of the external resources directory is platform dependent.
 # Using external resources on an iPhone
 
 On iOS an application resource folder can be found in `On My iPhone` -> `<app name>`.
-The `external resources` folder corresponds to the `mlperf_datasets` folder in path specified in `tasks.pbtxt`.
+The `external_resources` folder corresponds to the `mlperf_datasets` folder in path specified in `tasks.pbtxt`.
 So, if you have `/sdcard/mlperf_datasets/some/folders/test.txt` path in your config file,
-then the path on your iPhone would be: `MLPerf/external resources/some/folders/test.txt`.
+then the path on your iPhone would be: `MLPerf/external_resources/some/folders/test.txt`.
 
 Note, that iPhone's `Files` app has issues with moving folders with big number of files into application folders.
 So if you have an archive with big dataset and want to place it in the app resources folder,
@@ -55,3 +55,13 @@ Also note, that sometimes iPhone's `Files` app may prevent you from copying file
 from some external file managers and cloud storage clients.
 Instead of copying your file using `Files`, you can use Share button in your external app and choose "Save to Files".
 This method doesn't have restrictions on file extension.
+
+# Using external resources on an Android
+On Android the resource folder is located at `/Android/data/org.mlcommons.android.mlperfbench/files`.
+On Android 11, the folder `/Android/data/` is inaccessible using the default File Manager app. 
+It stills accessible through 3rd party File Manager apps, though. 
+Or using a File Manager on a desktop computer and access the files via USB also works.
+
+So, if you have `/sdcard/mlperf_datasets/some/folders/test.txt` path in your config file,
+then the path on your Android phone would be:
+`/Android/data/org.mlcommons.android.mlperfbench/files/external_resources/some/folders/test.txt`.
