@@ -69,7 +69,7 @@ RUN yes | sdkmanager \
     "extras;google;google_play_services" \
     "build-tools;29.0.3"
 
-ARG android_version=29
+ARG android_version=30
 RUN sdkmanager "platforms;android-${android_version}" "cmake;3.6.4111459"
 
 ARG ndk_version=android-ndk-r21e
