@@ -85,4 +85,5 @@ If you use bash: `echo export PATH=\$PATH:~/.pub-cache/bin >>~/.bashrc`
   but we don't have make targets to automatically inject them into the Flutter app yet
 * build and launch the app: `flutter run`
 
-If you want to get release APK go to run `flutter` directory `flutter build apk` (still note that only default backend will be included).
+If you want to get release APK go to `flutter` directory and run `flutter build apk` (still note that only default backend will be included).
+Like with `flutter run`, you need to build native libraries prior to this.
