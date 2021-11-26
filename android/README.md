@@ -93,14 +93,14 @@ make WITH_QTI=1 WITH_MEDIATEK=1 app
 Note: Follow the instruction of the backend vendor (in `mobile_back_*` folders at root level) to build for that backend.
 Some backends may contain proprietary code. In that case, please contact MLCommons to get help.
 
-# Install the app with the command:
+Install the app with the command:
+```
 adb install -r build/mlperf_app.apk
 ```
 
 If you want to build an instrumented test APK you should add target `//androidTest:mlperf_test_app`, i.e. :
 ```bash
 make test_app
-
 adb install -r build/mlperf_test_app.apk
 ```
 
@@ -134,7 +134,7 @@ The following steps are required to add your backend:
 2. Implement all the C API backend interfaces defined in android/cpp/c/backend_c.h
 3. Add a bazel BUILD file to create lib[vendor]backend.so shared library
 
-You can look at the [default TFLite backend implementation](../../mobile_back_tflite) for a reference.
+You can look at the [default TFLite backend implementation](../mobile_back_tflite) for a reference.
 The following steps are required to add your backend:
 
 ### Unified app changes

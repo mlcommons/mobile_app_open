@@ -68,3 +68,5 @@ flutter:
 
 import_sorter:
   comments: false
+  ignored_files:
+    - \/.pub-cache\/*
