@@ -109,7 +109,7 @@ images:
 
 artifacts:
   objects:
-    location: gs://$_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA
+    location: gs://$_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA-flutter
     paths:
     - output/artifacts/mlperf_app.apk
     - output/artifacts/mlperf_test_app.apk
