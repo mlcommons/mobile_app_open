@@ -38,8 +38,9 @@ RUN yes | sdkmanager \
     "platform-tools" \
     "build-tools;29.0.2" \
     "build-tools;30.0.3" \
-    "platforms;android-30" \
-    "ndk;21.4.7075529"
+    "platforms;android-30"
+# Install NDK in a separate layer to decrease max layer size.
+RUN yes | sdkmanager "ndk;21.4.7075529"
 ENV ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529
 
 WORKDIR /tools
