@@ -52,7 +52,11 @@ android: backend-bridge-android backends/tflite-android prepare-flutter
 android/apk: android
 	flutter clean
 	flutter build apk
-	# take results from build\app\outputs\flutter-apk\app-release.apk
+
+.PHONY: android/test_apk
+android/test_apk: android/apk
+    cd android && ./gradlew app:assembleAndroidTest
+    cd android && ./gradlew app:assembleDebug -Ptarget=test_driver/integration_test.dart
 
 .PHONY: docker/android/apk
 docker/android/apk: android
