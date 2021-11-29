@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip
 RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN python3 -m pip install --user numpy absl-py
+RUN python3 -m pip install numpy absl-py
 
 # Bazel is not present in the standard repositories
 RUN curl -L https://bazel.build/bazel-release.pub.gpg | gpg --dearmor | tee /etc/apt/trusted.gpg.d/bazel.gpg >/dev/null && \
