@@ -48,6 +48,16 @@ debug_flags_windows=-c dbg --copt /Od --copt /Z7 --linkopt -debug
 .PHONY: android
 android: backend-bridge-android backends/tflite-android prepare-flutter
 
+.PHONY: android/apk
+android/apk: android
+	flutter clean
+	flutter build apk
+	# take results from build\app\outputs\flutter-apk\app-release.apk
+
+.PHONY: docker/android/apk
+docker/android/apk: android
+	docker run --rm -it --user `id -u`:`id -g` -v $(CURDIR):/mnt/project test-android:4 bash -c "cd /mnt/project/flutter && make prepare-flutter && make android/apk"
+
 .PHONY: windows/docker/image
 windows/docker/image:
 	docker build -t mlperf_mobile_flutter:windows-1.0 windows/docker
