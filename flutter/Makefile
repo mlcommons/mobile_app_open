@@ -53,8 +53,8 @@ android/apk: android
 
 .PHONY: android/test_apk
 android/test_apk: android/apk
-    cd android && ./gradlew app:assembleAndroidTest
-    cd android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
+	cd android && ./gradlew app:assembleAndroidTest
+	cd android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
 
 .PHONY: docker/android/apk
 docker/android/apk: android
