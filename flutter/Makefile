@@ -29,9 +29,7 @@ _bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_DIR} --experimental_no_product_n
 .PHONY: cpp-ios
 cpp-ios:
 	@# NOTE: add `--copt -g` for debug info (but the resulting library would be 0.5 GiB)
-	bazel \
-		${BAZEL_CACHE_FLAG} \
-		build --config=ios_fat64 -c opt //flutter/cpp/flutter:ios_backend_fw_static
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} build --config=ios_fat64 -c opt //flutter/cpp/flutter:ios_backend_fw_static
 
 	rm -rf ${_xcode_fw}
 	cp -a ${_bazel_ios_fw} ${_xcode_fw}
@@ -149,7 +147,7 @@ windows/flutter-release:
 
 .PHONY: backend-bridge-windows
 backend-bridge-windows:
-	bazel build ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/flutter:backend_bridge.dll
+	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/flutter:backend_bridge.dll
 	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll
 	mkdir -p build/win-dlls/
 	rm -f build/win-dlls/backend_bridge.dll
@@ -157,7 +155,7 @@ backend-bridge-windows:
 
 .PHONY: backend-bridge-android
 backend-bridge-android:
-	bazel build ${_bazel_links_arg} --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
+	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
 	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so
 	mkdir -p android/app/src/main/jniLibs/arm64-v8a
 	rm -f android/flutter/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
@@ -174,7 +172,7 @@ backend-bridge-android:
 
 .PHONY: backends/tflite-windows
 backends/tflite-windows:
-	bazel build ${_bazel_links_arg} --config=windows -c opt //mobile_back_tflite:tflitebackenddll
+	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=windows -c opt //mobile_back_tflite:tflitebackenddll
 	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll
 	mkdir -p build/win-dlls/backends
 	rm -f build/win-dlls/backends/libtflitebackend.dll
@@ -191,7 +189,7 @@ backends/tflite-windows:
 
 .PHONY: backends/tflite-android
 backends/tflite-android:
-	bazel build ${_bazel_links_arg} --config=android_arm64 -c opt //mobile_back_tflite:tflitebackend
+	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=android_arm64 -c opt //mobile_back_tflite:tflitebackend
 	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
 	mkdir -p android/app/src/main/jniLibs/arm64-v8a
 	rm -f android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so

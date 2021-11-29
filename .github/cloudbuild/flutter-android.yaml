@@ -62,6 +62,8 @@ steps:
   waitFor: []
   timeout: 10800s # 3 hours
   entrypoint: bash
+  env:
+  - BAZEL_CACHE_ARG=--remote_cache=https://storage.googleapis.com/$_BAZEL_CACHE_BUCKET --google_default_credentials
   args:
   - -xc
   - |
