@@ -57,8 +57,8 @@ android/test_apk: android/apk
 	cd android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
 
 .PHONY: docker/android/apk
-docker/android/apk: android
-	docker run --rm -it --user `id -u`:`id -g` -v $(CURDIR):/mnt/project test-android:4 bash -c "cd /mnt/project/flutter && make prepare-flutter && make android/apk"
+docker/android/apk:
+	docker run --rm -it --user `id -u`:`id -g` -v $$(dirname $(CURDIR)):/mnt/project test-android:4 bash -c "cd /mnt/project/flutter && make prepare-flutter && make android/apk"
 
 .PHONY: windows/docker/image
 windows/docker/image:
