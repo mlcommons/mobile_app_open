@@ -107,7 +107,7 @@ class ResourceManager {
     return defaultBenchmarksConfiguration;
   }
 
-  Future<void> initSystemPaths() async {
+  static Future<String> getApplicationDirectory() async {
     // applicationDirectory should be visible to user
     Directory? dir;
     if (Platform.isIOS) {
@@ -116,12 +116,18 @@ class ResourceManager {
       dir = await getExternalStorageDirectory();
     } else if (Platform.isWindows) {
       dir = await getDownloadsDirectory();
+    } else {
+      throw 'unsupported platform';
     }
     if (dir != null) {
-      applicationDirectory = dir.path;
+      return dir.path;
     } else {
-      applicationDirectory = (await getApplicationDocumentsDirectory()).path;
+      return (await getApplicationDocumentsDirectory()).path;
     }
+  }
+
+  Future<void> initSystemPaths() async {
+    applicationDirectory = await getApplicationDirectory();
 
     loadedResourcesDir = '$applicationDirectory/loaded_resources';
     externalResourcesDir = '$applicationDirectory/external_resources';
