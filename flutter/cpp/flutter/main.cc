@@ -50,8 +50,8 @@ static ::mlperf::mobile::MlperfDriver* global_driver = nullptr;
 static ::std::mutex global_driver_mutex;
 
 #define li \
-  std::cout << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__ << "\n"
-#define lip(X) std::cout << #X "=" << in->X << ";\n"
+  LOG(INFO) << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__
+#define lip(X) LOG(INFO) << #X "=" << in->X << ";"
 
 extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     const struct dart_ffi_run_benchmark_in* in) {
@@ -75,16 +75,14 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   li;
 
-  std::cout.flush();
-
   ::mlperf::mobile::SettingList settings;
   if (settings.ParseFromArray(in->backend_settings_data,
                               in->backend_settings_len)) {
     std::string s;
     google::protobuf::TextFormat::PrintToString(settings, &s);
-    std::cout << "Using settings:\n" << s << "\n";
+    LOG(INFO) << "Using settings:\n" << s;
   } else {
-    std::cout << "ERROR parsing settings\n";
+    LOG(ERROR) << "ERROR parsing settings";
     return nullptr;
   }
   li;
