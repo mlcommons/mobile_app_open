@@ -1,11 +1,12 @@
 FROM ubuntu:20.04
 
-# Without noninteractive arg apt-get waits for user input
-ARG DEBIAN_FRONTEND=noninteractive
-# JDK package downloads hundreds of megabytes,
-# so let's install it separately to reuse cache in case we change any other dependencies
-RUN apt-get update && apt-get install -y openjdk-11-jdk-headless
-RUN apt-get update && apt-get install -y \
+# Without DEBIAN_FRONTEND=noninteractive arg apt-get waits for user input.
+#   Docker desktop shows all previously defined args for each of the commands,
+#   which makes reading layer info harder, so we set this env for for individual commands only.
+# JDK package downloads ~500 MB from slow mirrors, which cat take a lot of time,
+#   so a separate layer for it makes image rebuild faster in case we cahnge any other dependencies.
+RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-8-jdk-headless
+RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     apt-transport-https \
     curl \
     git \
@@ -18,9 +19,9 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python3 -m pip install numpy absl-py
 
 # Bazel is not present in the standard repositories
-RUN curl -L https://bazel.build/bazel-release.pub.gpg | gpg --dearmor | tee /etc/apt/trusted.gpg.d/bazel.gpg >/dev/null && \
+RUN curl -L https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
     echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list && \
-    apt-get update && apt-get install -y bazel=4.2.1
+    apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y bazel=4.2.1
 
 ENV ANDROID_HOME=/opt/android
 WORKDIR $ANDROID_HOME/cmdline-tools
@@ -43,14 +44,12 @@ RUN yes | sdkmanager \
 RUN yes | sdkmanager "ndk;21.4.7075529"
 ENV ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529
 
-WORKDIR /tools
-RUN curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.5.3-stable.tar.xz | tar Jxf - && \
-    chmod --recursive a=u flutter
-ENV PUB_CACHE=/tools/flutter/.pub-cache
-ENV PATH=$PATH:/tools/flutter/bin:$PUB_CACHE/bin
-RUN dart pub global activate protoc_plugin
+ENV HOME=/image-workdir
+WORKDIR $HOME
+ENV PUB_CACHE=$HOME/flutter/.pub-cache
+ENV PATH=$PATH:$HOME/flutter/bin:$PUB_CACHE/bin
+ENV GRADLE_USER_HOME=$HOME/.gradle
 
-WORKDIR /workdir
-ENV HOME=/workdir
-RUN chmod --recursive a=u /workdir
-ENV GRADLE_USER_HOME=/workdir/.gradle
+RUN curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.5.3-stable.tar.xz | tar Jxf -
+RUN dart pub global activate protoc_plugin
+RUN chmod --recursive a=u $HOME
