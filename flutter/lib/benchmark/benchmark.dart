@@ -17,7 +17,6 @@ import 'package:wakelock/wakelock.dart';
 
 import 'package:mlcommons_ios_app/backend/bridge.dart';
 import 'package:mlcommons_ios_app/backend/native.dart' as native_backend;
-import 'package:mlcommons_ios_app/backend/native.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
 import 'package:mlcommons_ios_app/benchmark/resource_manager.dart';
 import 'package:mlcommons_ios_app/icons.dart';
@@ -76,7 +75,7 @@ class MiddleInterface {
       } else if (Platform.isAndroid) {
         backendPath = '$backendPath.so';
       }
-      final backendSetting = await backendMatch(backendPath);
+      final backendSetting = await native_backend.backendMatch(backendPath);
       if (backendSetting != null) {
         return MapEntry(backendSetting, backendPath);
       }
@@ -85,7 +84,8 @@ class MiddleInterface {
   }
 
   static Future<MiddleInterface> create(File configFile) async {
-    final tasks = getMLPerfConfig(await configFile.readAsString());
+    final tasks =
+        native_backend.getMLPerfConfig(await configFile.readAsString());
     final backendMatchInfo = await findMatchingBackend();
     final backendSetting = backendMatchInfo.key;
     final backendPath = backendMatchInfo.value;
