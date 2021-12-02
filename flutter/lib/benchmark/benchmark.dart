@@ -15,6 +15,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
+import 'package:mlcommons_ios_app/backend/native.dart' as native_backend;
 import 'package:mlcommons_ios_app/backend/bridge.dart';
 import 'package:mlcommons_ios_app/backend/native.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
@@ -625,11 +626,16 @@ class BenchmarkJob {
       ));
     }
 
+    var backendNativeLibPath = '';
+    if (Platform.isAndroid) {
+      backendNativeLibPath = await native_backend.getNativeLibraryPath();
+    }
+
     final result = await backend.run(RunSettings(
       backend_model_path: resourceManager.get(benchmark.benchmarkSetting.src),
       backend_lib_path: backendLibPath,
       backend_settings: settings.writeToBuffer(),
-      backend_native_lib_path: '' /* TFLite backend ignores this*/,
+      backend_native_lib_path: backendNativeLibPath,
       dataset_type: benchmark.taskConfig.dataset.type.value,
       dataset_data_path: resourceManager.get(dataset.path),
       dataset_groundtruth_path: resourceManager.get(dataset.groundtruthSrc),
