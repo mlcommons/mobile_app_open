@@ -20,8 +20,7 @@ extern "C" dart_ffi_mlperf_config_result *dart_ffi_mlperf_config(
 
   ::mlperf::mobile::MLPerfConfig config;
   if (!google::protobuf::TextFormat::ParseFromString(pb_content, &config)) {
-    LOG(ERROR) << "Can't parse config before serialization:\n"
-              << pb_content;
+    LOG(ERROR) << "Can't parse config before serialization:\n" << pb_content;
     return nullptr;
   }
 

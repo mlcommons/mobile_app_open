@@ -49,8 +49,7 @@ extern "C" void fake_calls() {
 static ::mlperf::mobile::MlperfDriver* global_driver = nullptr;
 static ::std::mutex global_driver_mutex;
 
-#define li \
-  LOG(INFO) << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__
+#define li LOG(INFO) << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__
 #define lip(X) LOG(INFO) << #X "=" << in->X << ";"
 
 extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(

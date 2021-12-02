@@ -15,8 +15,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
-import 'package:mlcommons_ios_app/backend/native.dart' as native_backend;
 import 'package:mlcommons_ios_app/backend/bridge.dart';
+import 'package:mlcommons_ios_app/backend/native.dart' as native_backend;
 import 'package:mlcommons_ios_app/backend/native.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
 import 'package:mlcommons_ios_app/benchmark/resource_manager.dart';
