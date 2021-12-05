@@ -146,6 +146,14 @@ class _SettingsScreen extends State<SettingsScreen> {
               }
             },
           ),
+          ListTile(
+            title: Text(
+              stringResources.clearCache,
+              style: TextStyle(color: Colors.blue),
+            ),
+            onTap: state.clearCache,
+          ),
+          Divider(),
         ],
       ),
     );
