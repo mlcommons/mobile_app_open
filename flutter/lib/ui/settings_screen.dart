@@ -151,7 +151,10 @@ class _SettingsScreen extends State<SettingsScreen> {
               stringResources.clearCache,
               style: TextStyle(color: Colors.blue),
             ),
-            onTap: state.clearCache,
+            onTap: () async {
+              await state.clearCache();
+              Navigator.pop(context);
+            },
           ),
           Divider(),
         ],
