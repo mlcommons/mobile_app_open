@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 # Without DEBIAN_FRONTEND=noninteractive arg apt-get waits for user input.
 #   Docker desktop shows all previously defined args for each of the commands,
 #   which makes reading layer info harder, so we set this env for for individual commands only.
-# JDK package downloads ~500 MB from slow mirrors, which cat take a lot of time,
+# JDK package downloads ~500 MB from slow mirrors, which can take a lot of time,
 #   so a separate layer for it makes image rebuild faster in case we cahnge any other dependencies.
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-8-jdk-headless
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y \
