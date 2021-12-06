@@ -51,8 +51,8 @@ android/apk: android
 	flutter clean
 	flutter build apk
 
-.PHONY: android/test_apk
-android/test_apk: android/apk
+.PHONY: ci/android/test_apk
+ci/android/test_apk: android/apk
 	cd android && ./gradlew app:assembleAndroidTest
 	cd android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
 

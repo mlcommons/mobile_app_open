@@ -67,12 +67,12 @@ steps:
   args:
   - -xc
   - |
-    cd flutter
-    make android/test_apk
+    cd flutter || exit $?
+    make ci/android/test_apk || exit $?
 
-    mkdir -p /workspace/output/artifacts
-    cp build/app/outputs/flutter-apk/app-release.apk /workspace/output/artifacts/mlperf_app.apk
-    cp build/app/outputs/apk/debug/app-debug.apk /workspace/output/artifacts/mlperf_test_app.apk
+    mkdir -p /workspace/output/artifacts || exit $?
+    cp /workspace/flutter/build/app/outputs/apk/debug/app-debug.apk /workspace/output/artifacts/mlperf_app.apk || exit $?
+    cp /workspace/flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk /workspace/output/artifacts/mlperf_test_app.apk || exit $?
 - id: instrument-test-on-firebase
   name: gcr.io/cloud-builders/gcloud
   timeout: 3600s # 1 hour
