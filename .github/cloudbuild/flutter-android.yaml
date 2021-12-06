@@ -1,5 +1,9 @@
 substitutions:
   _IMAGE_NAME: mlperf-mobile-flutter-android
+# Building apks with flutter requires a lot of memory.
+# Builds on standard machines with 4GB of RAM can unexpectedly hang.
+# Also the build is mostly CPU-intensive, so using 8-core machines
+# reduces build time up to 3 times.
 options:
  machineType: 'E2_HIGHCPU_8'
 

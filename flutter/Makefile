@@ -49,11 +49,14 @@ android: backend-bridge-android backends/tflite-android prepare-flutter
 .PHONY: android/apk
 android/apk: android
 	flutter clean
+	@# take results from build/app/outputs/flutter-apk/app-release.apk
 	flutter build apk
 
 .PHONY: ci/android/test_apk
 ci/android/test_apk: android/apk
+	@# take results from build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 	cd android && ./gradlew app:assembleAndroidTest
+	@# take results from build/app/outputs/apk/debug/app-debug.apk
 	cd android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
 
 .PHONY: docker/android/apk
