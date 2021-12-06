@@ -69,8 +69,9 @@ steps:
     make ci/android/test_apk || exit $?
 
     mkdir -p /workspace/output/artifacts || exit $?
-    cp /workspace/flutter/build/app/outputs/apk/debug/app-debug.apk /workspace/output/artifacts/mlperf_app.apk || exit $?
-    cp /workspace/flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk /workspace/output/artifacts/mlperf_test_app.apk || exit $?
+    cp /workspace/flutter/build/app/outputs/flutter-apk/app-release.apk /workspace/output/artifacts/mlperf_app_release.apk || exit $?
+    cp /workspace/flutter/build/app/outputs/apk/debug/app-debug.apk /workspace/output/artifacts/mlperf_app_test_main.apk || exit $?
+    cp /workspace/flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk /workspace/output/artifacts/mlperf_app_test_helper.apk || exit $?
 - id: instrument-test-on-firebase
   name: gcr.io/cloud-builders/gcloud
   waitFor:
@@ -83,8 +84,8 @@ steps:
     # redfin is Pixel 5e
     gcloud firebase test android run \
       --type instrumentation \
-      --app output/artifacts/mlperf_app.apk \
-      --test output/artifacts/mlperf_test_app.apk \
+      --app output/artifacts/mlperf_app_test_main.apk \
+      --test output/artifacts/mlperf_app_test_helper.apk \
       --timeout 45m \
       --device model=redfin,version=30,locale=en,orientation=portrait
 - id: crawler-test-on-firebase
@@ -99,7 +100,7 @@ steps:
     # x1q is SM-G981U1 (Samsung Galaxy S20 5G)
     gcloud firebase test android run \
       --type robo \
-      --app output/artifacts/mlperf_app.apk \
+      --app output/artifacts/mlperf_app_release.apk \
       --device model=x1q,version=29,locale=en,orientation=portrait \
       --timeout 90s
 
@@ -111,7 +112,8 @@ artifacts:
   objects:
     location: gs://$_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA-flutter
     paths:
-    - output/artifacts/mlperf_app.apk
-    - output/artifacts/mlperf_test_app.apk
+    - output/artifacts/mlperf_app_release.apk
+    - output/artifacts/mlperf_app_test_main.apk
+    - output/artifacts/mlperf_app_test_helper.apk
 
 timeout: 18000s # 5 hours
