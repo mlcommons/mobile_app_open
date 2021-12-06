@@ -58,8 +58,7 @@ steps:
 - id: build-apks
   name: gcr.io/$PROJECT_ID/$_IMAGE_NAME:latest
   # Image upload usually takes only few seconds.
-  # However, if we generated a new image and the build failed,
-  # it can fail before the build finishes, canceling the upload.
+  # However, if we generated a new image and the build failed, it can cancel the upload.
   # Let's wait for the upload to finish before starting the actual build.
   waitFor: []
   timeout: 10800s # 3 hours
@@ -77,6 +76,8 @@ steps:
     cp /workspace/flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk /workspace/output/artifacts/mlperf_test_app.apk || exit $?
 - id: instrument-test-on-firebase
   name: gcr.io/cloud-builders/gcloud
+  waitFor:
+  - build-apks
   timeout: 3600s # 1 hour
   entrypoint: bash
   args:
@@ -92,8 +93,8 @@ steps:
 - id: crawler-test-on-firebase
   name: gcr.io/cloud-builders/gcloud
   waitFor:
-  - build-apks # don't wait for the other test to finish, run as soon as APKs are ready
-  timeout: 3600s # 1 hour (we sometimes wait 30+ minutes until the device we need is free)
+  - build-apks
+  timeout: 3600s # 1 hour
   entrypoint: bash
   args:
   - -xc
