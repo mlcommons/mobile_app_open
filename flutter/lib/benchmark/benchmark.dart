@@ -153,6 +153,7 @@ class BenchmarkState extends ChangeNotifier {
   late final ResourceManager resourceManager;
 
   String _chosenBenchmarksConfigurationName;
+
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
   bool _cooling = false;
@@ -229,6 +230,14 @@ class BenchmarkState extends ChangeNotifier {
     var index = 0;
     return errorDescription +
         datasetsError.map((element) => '\n${++index}) $element').join();
+  }
+
+  Future<void> clearCache() async {
+    await resourceManager.deleteLoadedResources([], 0);
+    await resourceManager.deleteDefaultBenchmarksConfiguration();
+    _store.clearBenchmarkList();
+    final configFile = await handleChosenConfiguration(store: _store);
+    await loadResources(configFile!);
   }
 
   Future<void> loadResources(File configFile) async {

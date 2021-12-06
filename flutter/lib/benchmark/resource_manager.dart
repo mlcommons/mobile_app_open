@@ -192,6 +192,14 @@ class ResourceManager {
     return deleteLoadedResources(currentResources, atLeastDaysOld);
   }
 
+  Future<void> deleteDefaultBenchmarksConfiguration() async {
+    final fileName = defaultBenchmarksConfiguration.path.split('/').last;
+    var configFile = File('$applicationDirectory/$fileName');
+    if (await configFile.exists()) {
+      await configFile.delete();
+    }
+  }
+
   Future<void> deleteResultJson() async {
     var resultsFile = File(_jsonResultPath);
     if (await resultsFile.exists()) {

@@ -75,7 +75,7 @@ class MyApp extends StatelessWidget {
     // final store = context.watch<Store>();
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'MLPerf Mobile',
       localizationsDelegates: [AppLocalizations.delegate],
       supportedLocales: [const Locale('en', '')],
       theme: ThemeData(
@@ -120,7 +120,7 @@ class ExceptionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'MLPerf Mobile',
         home: Material(
           type: MaterialType.transparency,
           child: SafeArea(
