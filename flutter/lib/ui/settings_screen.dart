@@ -146,17 +146,17 @@ class _SettingsScreen extends State<SettingsScreen> {
               }
             },
           ),
-          ListTile(
-            title: Text(
-              stringResources.clearCache,
-              style: TextStyle(color: Colors.blue),
+          Divider(),
+          TextButton(
+            style: TextButton.styleFrom(
+              textStyle: const TextStyle(fontSize: 20),
             ),
-            onTap: () async {
+            onPressed: () async {
               await state.clearCache();
               Navigator.pop(context);
             },
+            child: Text(stringResources.clearCache),
           ),
-          Divider(),
         ],
       ),
     );
