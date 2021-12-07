@@ -61,7 +61,9 @@ ci/android/test_apk: android/apk
 
 .PHONY: docker/android/apk
 docker/android/apk:
-	docker run --rm -it --user `id -u`:`id -g` -v $$(dirname $(CURDIR)):/mnt/project test-android:4 bash -c "cd /mnt/project/flutter && make prepare-flutter && make android/apk"
+	@# if the build fails with java.io.IOException: Input/output error
+	@# remove file android/gradle/wrapper/gradle-wrapper.jar
+	MSYS2_ARG_CONV_EXCL="*" docker run --rm -it --user `id -u`:`id -g` -v $(CURDIR)/..:/mnt/project test-android:4 bash -c "cd /mnt/project/flutter && make prepare-flutter && make android/apk"
 
 .PHONY: windows/docker/image
 windows/docker/image:

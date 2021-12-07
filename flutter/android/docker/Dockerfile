@@ -23,13 +23,13 @@ RUN curl -L https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
     echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list && \
     apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y bazel=4.2.1
 
-ENV ANDROID_HOME=/opt/android
-WORKDIR $ANDROID_HOME/cmdline-tools
-# sdkmanager expects to be placed into `$ANDROID_HOME/cmdline-tools/tools`
+ENV ANDROID_SDK_ROOT=/opt/android
+WORKDIR $ANDROID_SDK_ROOT/cmdline-tools
+# sdkmanager expects to be placed into `$ANDROID_SDK_ROOT/cmdline-tools/tools`
 RUN curl -L https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip | jar x && \
     mv cmdline-tools tools && \
     chmod --recursive +x tools/bin
-ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/tools/bin
+ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin
 
 RUN yes | sdkmanager --licenses >/dev/null
 # Build tools 29.0.2 are required by Flutter 2.5.3
@@ -42,14 +42,20 @@ RUN yes | sdkmanager \
     "platforms;android-30"
 # Install NDK in a separate layer to decrease max layer size.
 RUN yes | sdkmanager "ndk;21.4.7075529"
-ENV ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529
+ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/21.4.7075529
 
 ENV HOME=/image-workdir
 WORKDIR $HOME
+
 ENV PUB_CACHE=$HOME/flutter/.pub-cache
 ENV PATH=$PATH:$HOME/flutter/bin:$PUB_CACHE/bin
-ENV GRADLE_USER_HOME=$HOME/.gradle
-
 RUN curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.5.3-stable.tar.xz | tar Jxf -
 RUN dart pub global activate protoc_plugin
+
+ENV GRADLE_USER_HOME=$HOME/.gradle
+ENV ANDROID_SDK_HOME=$HOME/.android
+
+RUN mkdir $ANDROID_SDK_HOME && \
+    keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
+
 RUN chmod --recursive a=u $HOME
