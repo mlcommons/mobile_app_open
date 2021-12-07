@@ -63,7 +63,7 @@ ci/android/test_apk: android/apk
 docker/android/apk: android/docker/image
 	@# if the build fails with java.io.IOException: Input/output error
 	@# remove file android/gradle/wrapper/gradle-wrapper.jar
-	MSYS2_ARG_CONV_EXCL="*" docker run --rm -it --user `id -u`:`id -g` -v $(CURDIR)/..:/mnt/project test-android:4 bash -c "cd /mnt/project/flutter && make prepare-flutter && make android/apk"
+	MSYS2_ARG_CONV_EXCL="*" docker run --rm -it --user `id -u`:`id -g` -v $(CURDIR)/..:/mnt/project mlcommons/mlperf_mobile_flutter bash -c "cd /mnt/project/flutter && make prepare-flutter && make android/apk"
 
 .PHONY: android/docker/image
 android/docker/image: build/docker/mlperf_mobile_flutter.stamp
