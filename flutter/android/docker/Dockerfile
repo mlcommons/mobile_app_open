@@ -4,7 +4,7 @@ FROM ubuntu:20.04
 #   Docker desktop shows all previously defined args for each of the commands,
 #   which makes reading layer info harder, so we set this env for for individual commands only.
 # JDK package downloads ~500 MB from slow mirrors, which can take a lot of time,
-#   so a separate layer for it makes image rebuild faster in case we cahnge any other dependencies.
+#   so a separate layer for it makes image rebuild faster in case we change any other dependencies.
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-8-jdk-headless
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     apt-transport-https \
@@ -18,7 +18,7 @@ RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python3 -m pip install numpy absl-py
 
-# Bazel is not present in the standard repositories
+# Bazel is not present in standard repositories
 RUN curl -L https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
     echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list && \
     apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y bazel=4.2.1
