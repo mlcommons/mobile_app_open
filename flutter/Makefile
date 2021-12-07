@@ -60,10 +60,18 @@ ci/android/test_apk: android/apk
 	cd android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
 
 .PHONY: docker/android/apk
-docker/android/apk:
+docker/android/apk: android/docker/image
 	@# if the build fails with java.io.IOException: Input/output error
 	@# remove file android/gradle/wrapper/gradle-wrapper.jar
 	MSYS2_ARG_CONV_EXCL="*" docker run --rm -it --user `id -u`:`id -g` -v $(CURDIR)/..:/mnt/project test-android:4 bash -c "cd /mnt/project/flutter && make prepare-flutter && make android/apk"
+
+.PHONY: android/docker/image
+android/docker/image: build/docker/mlperf_mobile_flutter.stamp
+
+build/docker/mlperf_mobile_flutter.stamp: android/docker/Dockerfile
+	docker image build -t mlcommons/mlperf_mobile_flutter android/docker
+	mkdir -p build/docker
+	touch $@
 
 .PHONY: windows/docker/image
 windows/docker/image:
