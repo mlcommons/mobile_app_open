@@ -39,5 +39,5 @@ for i in range(1, 2001):
     target_label_raw = OUTPUT_PATH + '/annotations/ADE_val_0000%04d.raw' % i
 
     resized_image = Image.fromarray(tf.reshape(tf.cast(p_image, tf.uint8), [512, 512, 3]).numpy())
-    resized_image.save(target_image_jpeg)
+    resized_image.save(target_image_jpeg, quality=100)
     tf.reshape(tf.cast(p_label, tf.uint8), [512, 512]).numpy().tofile(target_label_raw)
