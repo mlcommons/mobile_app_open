@@ -9,7 +9,8 @@ import 'dart:convert';
 import 'package:mlcommons_ios_app/main.dart' as app;
 import 'package:mlcommons_ios_app/ui/main_screen.dart';
 import 'package:mlcommons_ios_app/ui/result_screen.dart';
-import 'package:mlcommons_ios_app/benchmark/resource_manager.dart' as resource_manager;
+import 'package:mlcommons_ios_app/benchmark/resource_manager.dart'
+    as resource_manager;
 
 void main() {
   final splashPauseSeconds = 4;
@@ -63,11 +64,14 @@ void main() {
       expect(scrollButtonIsPresented, true,
           reason: 'Test results were not found');
 
-      final applicationDirectory = await resource_manager.ResourceManager.getApplicationDirectory();
+      final applicationDirectory =
+          await resource_manager.ResourceManager.getApplicationDirectory();
       final jsonResultPath = '$applicationDirectory/result.json';
       final file = File(jsonResultPath);
 
-      expect(await file.exists(), true, reason: 'Result.json does not exist: file $applicationDirectory/result.json is not found');
+      expect(await file.exists(), true,
+          reason:
+              'Result.json does not exist: file $applicationDirectory/result.json is not found');
 
       final jsonResultContent = await file.readAsString();
       final results = jsonDecode(jsonResultContent);
