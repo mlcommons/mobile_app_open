@@ -43,6 +43,7 @@ RUN yes | sdkmanager \
 # Install NDK in a separate layer to decrease max layer size.
 RUN yes | sdkmanager "ndk;21.4.7075529"
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/21.4.7075529
+ENV ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
 
 ENV HOME=/image-workdir
 WORKDIR $HOME
