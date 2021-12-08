@@ -29,9 +29,7 @@ _bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_DIR} --experimental_no_product_n
 .PHONY: cpp-ios
 cpp-ios:
 	@# NOTE: add `--copt -g` for debug info (but the resulting library would be 0.5 GiB)
-	bazel \
-		${BAZEL_CACHE_FLAG} \
-		build --config=ios_fat64 -c opt //flutter/cpp/flutter:ios_backend_fw_static
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} build --config=ios_fat64 -c opt //flutter/cpp/flutter:ios_backend_fw_static
 
 	rm -rf ${_xcode_fw}
 	cp -a ${_bazel_ios_fw} ${_xcode_fw}
@@ -47,6 +45,33 @@ debug_flags_windows=-c dbg --copt /Od --copt /Z7 --linkopt -debug
 
 .PHONY: android
 android: backend-bridge-android backends/tflite-android prepare-flutter
+
+.PHONY: android/apk
+android/apk: android
+	flutter clean
+	@# take results from build/app/outputs/flutter-apk/app-release.apk
+	flutter build apk
+
+.PHONY: ci/android/test_apk
+ci/android/test_apk: android/apk
+	@# take results from build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+	cd android && ./gradlew app:assembleAndroidTest
+	@# take results from build/app/outputs/apk/debug/app-debug.apk
+	cd android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
+
+.PHONY: docker/android/apk
+docker/android/apk: android/docker/image
+	@# if the build fails with java.io.IOException: Input/output error
+	@# remove file android/gradle/wrapper/gradle-wrapper.jar
+	MSYS2_ARG_CONV_EXCL="*" docker run --rm -it --user `id -u`:`id -g` -v $(CURDIR)/..:/mnt/project mlcommons/mlperf_mobile_flutter bash -c "cd /mnt/project/flutter && make prepare-flutter && make android/apk"
+
+.PHONY: android/docker/image
+android/docker/image: build/docker/mlperf_mobile_flutter.stamp
+
+build/docker/mlperf_mobile_flutter.stamp: android/docker/Dockerfile
+	docker image build -t mlcommons/mlperf_mobile_flutter android/docker
+	mkdir -p build/docker
+	touch $@
 
 .PHONY: windows/docker/image
 windows/docker/image:
@@ -135,7 +160,7 @@ windows/flutter-release:
 
 .PHONY: backend-bridge-windows
 backend-bridge-windows:
-	bazel build ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/flutter:backend_bridge.dll
+	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/flutter:backend_bridge.dll
 	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll
 	mkdir -p build/win-dlls/
 	rm -f build/win-dlls/backend_bridge.dll
@@ -143,7 +168,7 @@ backend-bridge-windows:
 
 .PHONY: backend-bridge-android
 backend-bridge-android:
-	bazel build ${_bazel_links_arg} --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
+	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
 	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so
 	mkdir -p android/app/src/main/jniLibs/arm64-v8a
 	rm -f android/flutter/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
@@ -160,7 +185,7 @@ backend-bridge-android:
 
 .PHONY: backends/tflite-windows
 backends/tflite-windows:
-	bazel build ${_bazel_links_arg} --config=windows -c opt //mobile_back_tflite:tflitebackenddll
+	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=windows -c opt //mobile_back_tflite:tflitebackenddll
 	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll
 	mkdir -p build/win-dlls/backends
 	rm -f build/win-dlls/backends/libtflitebackend.dll
@@ -177,7 +202,7 @@ backends/tflite-windows:
 
 .PHONY: backends/tflite-android
 backends/tflite-android:
-	bazel build ${_bazel_links_arg} --config=android_arm64 -c opt //mobile_back_tflite:tflitebackend
+	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=android_arm64 -c opt //mobile_back_tflite:tflitebackend
 	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
 	mkdir -p android/app/src/main/jniLibs/arm64-v8a
 	rm -f android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
