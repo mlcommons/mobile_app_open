@@ -14,8 +14,6 @@
 ##########################################################################
 
 
-.PHONY: docker_image app bazel-version rundocker clean
-
 all: app
 
 include tools/formatter/format.mk
@@ -44,6 +42,7 @@ output/mlperf_mobile_docker_1_0.stamp: android/docker/mlperf_mobile/Dockerfile
 	docker image build -t mlcommons/mlperf_mobile:1.0 android/docker/mlperf_mobile
 	touch $@
 
+.PHONY: docker_image
 docker_image: output/mlperf_mobile_docker_1_0.stamp
 
 COMMON_DOCKER_FLAGS1= \
@@ -104,6 +103,7 @@ libtflite: output/mlperf_mobile_docker_1_0.stamp
 	chmod 777 output/binary/libtflitebackend.so
 
 
+.PHONY: app
 app: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
 	# Building mlperf_app.apk
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
@@ -137,6 +137,7 @@ test_app: output/mlperf_mobile_docker_1_0.stamp
 	cp output/`readlink bazel-bin`/android/androidTest/mlperf_test_app.apk output/mlperf_test_app.apk
 	chmod 777 output/mlperf_test_app.apk
 
+.PHONY: rundocker
 rundocker: output/mlperf_mobile_docker_1_0.stamp
 	docker run -it \
 		-e USER=mlperf \
@@ -154,6 +155,7 @@ rundocker_root: output/mlperf_mobile_docker_1_0.stamp
 		-w /home/mlperf/mobile_app \
 		mlcommons/mlperf_mobile:1.0
 
+.PHONY: clean
 clean:
 	([ -d output/home/mlperf/cache ] && chmod -R +w output/home/mlperf/cache) || true
 	rm -rf output
