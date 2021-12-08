@@ -13,7 +13,8 @@
 # limitations under the License.
 ##########################################################################
 
-libqtibackend: docker_image
+.PHONY: libqtibackend
+libqtibackend: android/builder-image
 	# Building libqtibackend
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	mkdir -p output/mobile_back_qti
