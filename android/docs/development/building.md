@@ -35,7 +35,7 @@ git clone https://github.com/mlcommons/mobile_app
 export SNPE_SDK=/opt/snpe-1.48.0.2554
 cd mobile_app
 cp -r <Samsung backend build artifacts from desired branch> samsung_backend
-make TFLITE_BRANCH=main QTI_BRANCH=master MEDIATEK_BACKEND=--//java/org/mlperf/inference:with_mediatek="1" SAMSUNG_BACKEND=--//java/org/mlperf/inference:with_samsung="1" app
+make TFLITE_BRANCH=main QTI_BRANCH=master MEDIATEK_BACKEND_BAZEL_FLAG=--//java/org/mlperf/inference:with_mediatek="1" SAMSUNG_BACKEND_BAZEL_FLAG=--//java/org/mlperf/inference:with_samsung="1" app
 ```
 
 **To build a specific branch for each backend (e.g. v1_0_2):**
@@ -46,7 +46,7 @@ git clone -b v1_0_2 https://github.com/mlcommons/mobile_app
 export SNPE_SDK=/opt/snpe-1.48.0.2554
 cd mobile_app
 cp -r <Samsung backend build artifacts from desired branch> samsung_backend
-make TFLITE_BRANCH=v1_0_2 QTI_BRANCH=v1_0_2 MEDIATEK_BACKEND=--//java/org/mlperf/inference:with_mediatek="1" SAMSUNG_BACKEND=--//java/org/mlperf/inference:with_samsung="1" app
+make TFLITE_BRANCH=v1_0_2 QTI_BRANCH=v1_0_2 MEDIATEK_BACKEND_BAZEL_FLAG=--//java/org/mlperf/inference:with_mediatek="1" SAMSUNG_BACKEND_BAZEL_FLAG=--//java/org/mlperf/inference:with_samsung="1" app
 ```
 
 ### Building without make and docker

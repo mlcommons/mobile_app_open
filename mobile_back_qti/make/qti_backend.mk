@@ -18,7 +18,7 @@ ifeq (${WITH_QTI},1)
   ifeq (${SNPE_SDK},)
     $(error SNPE_SDK env is undefined)
   endif
-  QTI_BACKEND=--//android/java/org/mlperf/inference:with_qti="1"
+  QTI_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_qti="1"
   QTI_TARGET=//mobile_back_qti:qtibackend
   QTI_LIB_COPY=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/binary/libqtibackend.so
   SNPE_VERSION=$(shell basename ${SNPE_SDK})

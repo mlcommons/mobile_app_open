@@ -15,5 +15,5 @@
 
 ifeq (${WITH_PIXEL},1)
   $(info WITH_PIXEL=1)
-  PIXEL_BACKEND=--//android/java/org/mlperf/inference:with_pixel="1"
+  PIXEL_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_pixel="1"
 endif

@@ -27,7 +27,7 @@ include mobile_back_qti/make/qti_backend_targets.mk
 
 ifeq (${WITH_SAMSUNG},1)
   $(info WITH_SAMSUNG=1)
-  SAMSUNG_BACKEND=--//android/java/org/mlperf/inference:with_samsung="1"
+  SAMSUNG_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_samsung="1"
 endif
 
 include mobile_back_pixel/pixel_backend.mk
