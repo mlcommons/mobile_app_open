@@ -198,7 +198,7 @@ backend_replace_tflite=\'libtflitebackend\',
 endif
 
 # To add a new backend, add a new line to the sed command for your backend replacing "example" with the vendor name. For instance, for Intel it would be:
-#               -e "s/INTEL_TAG/${backend_replace_intel}/" \
+#		-e "s/INTEL_TAG/${backend_replace_intel}/" \
 .PHONY: set-supported-backends
 set-supported-backends:
 	cat lib/backend/backends_list.in | sed \
