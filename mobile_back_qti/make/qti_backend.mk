@@ -13,8 +13,6 @@
 # limitations under the License.
 ##########################################################################
 
-.PHONY: snpe_version_check
-
 ifeq (${USE_PROXY_WORKAROUND},1)
   export PROXY_WORKAROUND1=\
 	-v /etc/ssl/certs:/etc/ssl/certs \
@@ -31,30 +29,16 @@ endif
 WITH_QTI=0
 
 ifeq (${WITH_QTI},1)
-  ifneq (${SNPE_SDK},)
-    QTI_BACKEND=--//android/java/org/mlperf/inference:with_qti="1"
-    QTI_TARGET=//mobile_back_qti:qtibackend
-    QTI_LIB_COPY=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/binary/libqtibackend.so
-    SNPE_VERSION=$(shell basename ${SNPE_SDK})
-    QTI_SNPE_VERSION=$(shell grep SNPE_VERSION mobile_back_qti/variables.bzl | cut -d\" -f2)
-    QTI_VOLUMES=-v ${SNPE_SDK}:/home/mlperf/mobile_app/mobile_back_qti/${SNPE_VERSION}
-    QTI_DEPS=snpe_version_check
-  else
-    echo "ERROR: SNPE_SDK not set"
-    QTI_BACKEND=--ERROR_SNPE_SDK_NOT_SET
-    QTI_VOLUMES=
-    QTI_DEPS=
-    QTI_TARGET=
-    QTI_LIB_COPY=true
+  ifeq (${SNPE_SDK},)
+    $(error SNPE_SDK env is undefined)
   endif
-else
-  QTI_BACKEND=
-  QTI_VOLUMES=
-  QTI_DEPS=
-  QTI_TARGET=
-  QTI_LIB_COPY=true
+  QTI_BACKEND=--//android/java/org/mlperf/inference:with_qti="1"
+  QTI_TARGET=//mobile_back_qti:qtibackend
+  QTI_LIB_COPY=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/binary/libqtibackend.so
+  SNPE_VERSION=$(shell basename ${SNPE_SDK})
+  QTI_SNPE_VERSION=$(shell grep SNPE_VERSION mobile_back_qti/variables.bzl | cut -d\" -f2)
+  QTI_VOLUMES=-v ${SNPE_SDK}:/home/mlperf/mobile_app/mobile_back_qti/${SNPE_VERSION}
+  ifneq (${SNPE_VERSION},${QTI_SNPE_VERSION})
+    $(error SNPE_SDK (${SNPE_VERSION}) doesn't match version specified in bazel config: (${QTI_SNPE_VERSION}))
+  endif
 endif
-
-snpe_version_check:
-	@[ ${SNPE_VERSION} = ${QTI_SNPE_VERSION} ] || (echo "SNPE_SDK (${SNPE_VERSION}) doesn't match required version (${QTI_SNPE_VERSION})" && false)
-

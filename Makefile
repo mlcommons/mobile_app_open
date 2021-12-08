@@ -23,9 +23,9 @@ include mobile_back_tflite/tflite_backend.mk
 
 ifeq (${WITH_QTI},1)
   $(info WITH_QTI=1)
-  include mobile_back_qti/make/qti_backend.mk
-  include mobile_back_qti/make/qti_backend_targets.mk
 endif
+include mobile_back_qti/make/qti_backend.mk
+include mobile_back_qti/make/qti_backend_targets.mk
 
 ifeq (${WITH_SAMSUNG},1)
   $(info WITH_SAMSUNG=1)
@@ -80,7 +80,7 @@ proto_test: output/mlperf_mobile_docker_1_0.stamp
 	cp output/`readlink bazel-bin`/android/cpp/proto/proto_test output/proto_test
 	chmod 777 output/proto_test
 
-main: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
+main: output/mlperf_mobile_docker_1_0.stamp
 	# Building main
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
@@ -104,7 +104,7 @@ libtflite: output/mlperf_mobile_docker_1_0.stamp
 
 
 .PHONY: app
-app: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
+app: output/mlperf_mobile_docker_1_0.stamp
 	# Building mlperf_app.apk
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
