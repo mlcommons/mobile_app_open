@@ -21,3 +21,10 @@ ifeq (${USE_PROXY_WORKAROUND},1)
 
   export PROXY_WORKAROUND2=--host_jvm_args -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
 endif
+
+ifeq (${OS},Windows_NT)
+# On Windows some commands don't run correctly in the default make shell
+_start_args=powershell -Command
+else
+_start_args=
+endif

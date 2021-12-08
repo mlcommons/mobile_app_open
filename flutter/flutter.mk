@@ -38,8 +38,8 @@ flutter/cpp-ios:
 	rm -rf ${_xcode_fw}
 	cp -a ${_bazel_ios_fw} ${_xcode_fw}
 
-_bazel_ios_fw := ../bazel-bin/flutter/cpp/flutter/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework
-_xcode_fw := ios/Flutter/ios_backend_fw_static.framework
+_bazel_ios_fw := bazel-bin/flutter/cpp/flutter/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework
+_xcode_fw := flutter/ios/Flutter/ios_backend_fw_static.framework
 
 # To add a new backend, add flutter/backends/example-windows target (e.g. flutter/backends/intel-windows)
 .PHONY: flutter/windows
@@ -52,27 +52,27 @@ flutter/android: flutter/backend-bridge-android flutter/backends/tflite-android 
 
 .PHONY: flutter/android/apk
 flutter/android/apk: flutter/android
-	flutter clean
-	@# take results from build/app/outputs/flutter-apk/app-release.apk
-	flutter build apk
+	cd flutter && flutter clean
+	@# take results from flutter/build/app/outputs/flutter-apk/app-release.apk
+	cd flutter && flutter build apk
 
 .PHONY: ci/flutter/android/test_apk
 ci/flutter/android/test_apk: flutter/android/apk
-	@# take results from build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-	cd android && ./gradlew app:assembleAndroidTest
-	@# take results from build/app/outputs/apk/debug/app-debug.apk
-	cd android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
+	@# take results from flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+	cd flutter/android && ./gradlew app:assembleAndroidTest
+	@# take results from flutter/build/app/outputs/apk/debug/app-debug.apk
+	cd flutter/android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
 
 .PHONY: flutter/docker/android/apk
 flutter/docker/android/apk: flutter/android/docker/image
 	@# if the build fails with java.io.IOException: Input/output error
-	@# remove file android/gradle/wrapper/gradle-wrapper.jar
-	MSYS2_ARG_CONV_EXCL="*" docker run --rm -it --user `id -u`:`id -g` -v $(CURDIR)/..:/mnt/project mlcommons/mlperf_mobile_flutter bash -c "cd /mnt/project/flutter && make prepare-flutter && make android/apk"
+	@# remove file flutter/android/gradle/wrapper/gradle-wrapper.jar
+	MSYS2_ARG_CONV_EXCL="*" docker run --rm -it --user `id -u`:`id -g` -v $(CURDIR):/mnt/project mlcommons/mlperf_mobile_flutter bash -c "cd /mnt/project && make flutter/android/apk"
 
 .PHONY: flutter/android/docker/image
-flutter/android/docker/image: build/docker/mlperf_mobile_flutter.stamp
+flutter/android/docker/image: flutter/build/docker/mlperf_mobile_flutter.stamp
 
-build/docker/mlperf_mobile_flutter.stamp: android/docker/Dockerfile
+flutter/build/docker/mlperf_mobile_flutter.stamp: flutter/android/docker/Dockerfile
 	docker image build -t mlcommons/mlperf_mobile_flutter android/docker
 	mkdir -p build/docker
 	touch $@
@@ -113,7 +113,7 @@ flutter/windows/docker/flutter-release:
 	echo >output/container-script.bat "\
 		make windows/copy-flutter-files-for-docker \
 		&& cd C:/mobile_app_flutter-local \
-		&& make prepare-flutter windows/flutter-release \
+		&& make prepare-flutter flutter/windows/flutter-release \
 		&& cp -r build/windows/runner/Release C:/mobile_app_flutter/output/windows-build \
 		"
 	docker start -ai mobile_app_flutter_windows_container
@@ -121,7 +121,7 @@ flutter/windows/docker/flutter-release:
 # In Docker Windows containers it's impossible to create a link
 # from a mounted volume/folder to any folder of the container itself.
 # Flutter wants to create links,
-# 		and place them here: windows/flutter/ephemeral/.plugin_symlinks
+# 		and place them here: flutter/windows/flutter/ephemeral/.plugin_symlinks
 # so the build doesn't work.
 #
 # This make target expects that all DLLs are already present.
@@ -165,52 +165,52 @@ flutter/windows/flutter-release:
 .PHONY: flutter/backend-bridge-windows
 flutter/backend-bridge-windows:
 	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/flutter:backend_bridge.dll
-	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll
-	mkdir -p build/win-dlls/
-	rm -f build/win-dlls/backend_bridge.dll
-	cd .. && cp ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll flutter/build/win-dlls/backend_bridge.dll
+	chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll
+	mkdir -p flutter/build/win-dlls/
+	rm -f flutter/build/win-dlls/backend_bridge.dll
+	cp ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll flutter/build/win-dlls/backend_bridge.dll
 
 .PHONY: flutter/backend-bridge-android
 flutter/backend-bridge-android:
 	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
-	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so
-	mkdir -p android/app/src/main/jniLibs/arm64-v8a
-	rm -f android/flutter/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
-	cd .. && cp ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so flutter/android/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
+	chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so
+	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
+	rm -f flutter/android/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
+	cp ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so flutter/android/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
 
 # Use the following block as a template to add a new Windows backend
 #.PHONY: backends/example-windows
 #backends/example-windows:
 #	bazel build ${_bazel_links_arg} --config=windows -c opt //mobile_back_example:examplebackenddll
-#	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.dll
-#	mkdir -p build/win-dlls/backends
-#	rm -f build/win-dlls/backends/libexamplebackend.dll
-#	cd .. && cp ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.dll flutter/build/win-dlls/backends/libexamplebackend.dll
+#	chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.dll
+#	mkdir -p flutter/build/win-dlls/backends
+#	rm -f flutter/build/win-dlls/backends/libexamplebackend.dll
+#	cp ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.dll flutter/build/win-dlls/backends/libexamplebackend.dll
 
 .PHONY: flutter/backends/tflite-windows
 flutter/backends/tflite-windows:
 	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=windows -c opt //mobile_back_tflite:tflitebackenddll
-	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll
-	mkdir -p build/win-dlls/backends
-	rm -f build/win-dlls/backends/libtflitebackend.dll
-	cd .. && cp ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll flutter/build/win-dlls/backends/libtflitebackend.dll
+	chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll
+	mkdir -p flutter/build/win-dlls/backends
+	rm -f flutter/build/win-dlls/backends/libtflitebackend.dll
+	cp ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll flutter/build/win-dlls/backends/libtflitebackend.dll
 
 # Use the following block as a template to add a new Android backend
 #.PHONY: backends/example-android
 #backends/example-android:
 #	bazel build ${_bazel_links_arg} --config=android_arm64 -c opt //mobile_back_example:examplebackend
-#	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.so
-#	mkdir -p android/app/src/main/jniLibs/arm64-v8a
-#	rm -f android/app/src/main/jniLibs/arm64-v8a/libexamplebackend.so
-#	cd .. && cp ${BAZEL_LINKS_DIR}bin/mobile_back_examplet/cpp/backend_example/libexamplebackend.so flutter/android/app/src/main/jniLibs/arm64-v8a/libexamplebackend.so
+#	chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.so
+#	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
+#	rm -f flutter/android/app/src/main/jniLibs/arm64-v8a/libexamplebackend.so
+#	cp ${BAZEL_LINKS_DIR}bin/mobile_back_examplet/cpp/backend_example/libexamplebackend.so flutter/android/app/src/main/jniLibs/arm64-v8a/libexamplebackend.so
 
 .PHONY: flutter/backends/tflite-android
 flutter/backends/tflite-android:
 	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=android_arm64 -c opt //mobile_back_tflite:tflitebackend
-	cd .. && chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
-	mkdir -p android/app/src/main/jniLibs/arm64-v8a
-	rm -f android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
-	cd .. && cp ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so flutter/android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
+	chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
+	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
+	rm -f flutter/android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
+	cp ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so flutter/android/app/src/main/jniLibs/arm64-v8a/libtflitebackend.so
 
 # To add a new vendor backend, copy and uncomment this block and replace "EXAMPLE" and "example" with the vendor name (e.g. INTEL and intel)
 # See tflite backend below as an example
@@ -230,29 +230,29 @@ endif
 # -e "s/INTEL_TAG/${backend_replace_intel}/"
 .PHONY: flutter/set-supported-backends
 flutter/set-supported-backends:
-	cat lib/backend/backends_list.in | sed \
+	cat flutter/lib/backend/backends_list.in | sed \
 		-e "s/EXAMPLE_TAG/${backend_replace_example}/" \
 		-e "s/TFLITE_TAG/${backend_replace_tflite}/" \
-		> lib/backend/backends_list.gen.dart
+		> flutter/lib/backend/backends_list.gen.dart
 
 .PHONY: flutter/protobuf
 flutter/protobuf:
-	dart pub get
-	rm -rf lib/protos
-	mkdir -p lib/protos
-	protoc --proto_path ../android/cpp/proto \
-		--dart_out lib/protos \
-		../android/cpp/proto/*.proto
+	cd flutter && ${_start_args} dart pub get
+	rm -rf flutter/lib/protos
+	mkdir -p flutter/lib/protos
+	protoc --proto_path android/cpp/proto \
+		--dart_out flutter/lib/protos \
+		android/cpp/proto/*.proto
 
 .PHONY: flutter/update-splash-screen
 flutter/update-splash-screen:
-	tool/update-splash-screen
+	cd flutter && tool/update-splash-screen
 
 .PHONY: flutter/generate-localizations
 flutter/generate-localizations:
 	flutter gen-l10n \
-		--arb-dir=lib/resources \
-		--output-dir=lib/localizations \
+		--arb-dir=flutter/lib/resources \
+		--output-dir=flutter/lib/localizations \
 		--template-arb-file=app_en.arb \
 		--output-localization-file=app_localizations.dart \
 		--no-synthetic-package

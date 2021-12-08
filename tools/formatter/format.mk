@@ -1,11 +1,4 @@
 
-ifeq (${OS},Windows_NT)
-# On Windows some commands don't run correctly in the default make shell
-_start_args=powershell -Command
-else
-_start_args=
-endif
-
 .PHONY: format
 ifeq (${OS},Windows_NT)
 # format/java is not supported on Windows

@@ -16,8 +16,8 @@
 
 all: app
 
-include tools/formatter/format.mk
 include tools/common.mk
+include tools/formatter/format.mk
 
 # TFLite is the default backend
 include mobile_back_tflite/tflite_backend.mk
@@ -33,6 +33,7 @@ endif
 include mobile_back_pixel/pixel_backend.mk
 
 include android/android.mk
+include flutter/flutter.mk
 
 .PHONY: clean
 clean:
