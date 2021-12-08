@@ -22,6 +22,7 @@ output/android_docker.stamp: android/docker/mlperf_mobile/Dockerfile
 	touch $@
 
 ANDROID_COMMON_DOCKER_FLAGS1= \
+		-it \
 		-e USER=mlperf \
 		${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
