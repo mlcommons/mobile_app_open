@@ -47,30 +47,30 @@ output/mlperf_mobile_docker_1_0.stamp: android/docker/mlperf_mobile/Dockerfile
 docker_image: output/mlperf_mobile_docker_1_0.stamp
 
 COMMON_DOCKER_FLAGS1= \
-                -e USER=mlperf \
-                ${PROXY_WORKAROUND1} \
+		-e USER=mlperf \
+		${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
-                ${QTI_VOLUMES} \
+		${QTI_VOLUMES} \
 		-w /home/mlperf/mobile_app \
-                -u `id -u`:`id -g` \
+		-u `id -u`:`id -g` \
 		mlcommons/mlperf_mobile:1.0 bazel-3.7.2
 
 COMMON_DOCKER_FLAGS2= \
-                ${PROXY_WORKAROUND2} \
-                --output_user_root=/home/mlperf/cache/bazel build --verbose_failures \
+		${PROXY_WORKAROUND2} \
+		--output_user_root=/home/mlperf/cache/bazel build --verbose_failures \
 		-c opt --cxxopt='--std=c++14' --host_cxxopt='--std=c++14'  \
-                --host_cxxopt='-Wno-deprecated-declarations' --host_cxxopt='-Wno-class-memaccess' \
-                --cxxopt='-Wno-deprecated-declarations' --cxxopt='-Wno-unknown-attributes'
+		--host_cxxopt='-Wno-deprecated-declarations' --host_cxxopt='-Wno-class-memaccess' \
+		--cxxopt='-Wno-deprecated-declarations' --cxxopt='-Wno-unknown-attributes'
 
 COMMON_DOCKER_FLAGS= \
-                ${COMMON_DOCKER_FLAGS1} \
-                ${COMMON_DOCKER_FLAGS2}
+		${COMMON_DOCKER_FLAGS1} \
+		${COMMON_DOCKER_FLAGS2}
 
 
 NATIVE_DOCKER_FLAGS= \
-                ${COMMON_DOCKER_FLAGS1} --bazelrc=/dev/null \
-                ${COMMON_DOCKER_FLAGS2}
+		${COMMON_DOCKER_FLAGS1} --bazelrc=/dev/null \
+		${COMMON_DOCKER_FLAGS2}
 
 proto_test: output/mlperf_mobile_docker_1_0.stamp
 	# Building proto_test
@@ -109,7 +109,7 @@ app: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
 		${COMMON_DOCKER_FLAGS} \
-                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
+		${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
 		--fat_apk_cpu=arm64-v8a \
 		//android/java/org/mlperf/inference:mlperf_app
 	cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app.apk
@@ -120,7 +120,7 @@ app_x86_64: output/mlperf_mobile_docker_1_0.stamp
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
 		${COMMON_DOCKER_FLAGS} \
-                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
+		${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
 		--fat_apk_cpu=x86_64 \
 		//android/java/org/mlperf/inference:mlperf_app
 	cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app_x86_64.apk
@@ -131,7 +131,7 @@ test_app: output/mlperf_mobile_docker_1_0.stamp
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
 		${COMMON_DOCKER_FLAGS} \
-                ${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
+		${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
 		--fat_apk_cpu=x86_64,arm64-v8a \
 		//androidTest:mlperf_test_app
 	cp output/`readlink bazel-bin`/android/androidTest/mlperf_test_app.apk output/mlperf_test_app.apk
@@ -139,16 +139,16 @@ test_app: output/mlperf_mobile_docker_1_0.stamp
 
 rundocker: output/mlperf_mobile_docker_1_0.stamp
 	docker run -it \
-                -e USER=mlperf \
+		-e USER=mlperf \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
 		-w /home/mlperf/mobile_app \
-                -u `id -u`:`id -g` \
+		-u `id -u`:`id -g` \
 		mlcommons/mlperf_mobile:1.0
 
 rundocker_root: output/mlperf_mobile_docker_1_0.stamp
 	docker run -it \
-                -e USER=mlperf \
+		-e USER=mlperf \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
 		-w /home/mlperf/mobile_app \

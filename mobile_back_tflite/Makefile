@@ -62,20 +62,20 @@ ${BUILDDIR}/lib_arm64/libtflitebackend.so: ${SRCFILES} docker_image
 	mkdir -p ${BUILDDIR}/lib_arm64
 	mkdir -p ${BUILDDIR}/cache
 	docker run \
-	        -e USER=mlperf \
-                ${PROXY_WORKAROUND1} \
+		-e USER=mlperf \
+		${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/tflite_backend \
 		-v ${BUILDDIR}/cache:/cache \
 		-w /tflite_backend \
-	        -u ${USERID}:${GROUPID} \
+		-u ${USERID}:${GROUPID} \
 		mlcommons/mlperf_mobile:0.1 bazel-3.7.2 ${PROXY_WORKAROUND2} \
-                --output_user_root=/cache/bazel build \
+		--output_user_root=/cache/bazel build \
 		-c opt --cxxopt='--std=c++14' \
-                --cxxopt='-Wno-deprecated-declarations' \
-                --cxxopt='-Wno-unknown-attributes' \
-                --host_cxxopt='--std=c++14'  \
-                --host_cxxopt='-Wno-deprecated-declarations' \
-                --host_cxxopt='-Wno-class-memaccess' \
+		--cxxopt='-Wno-deprecated-declarations' \
+		--cxxopt='-Wno-unknown-attributes' \
+		--host_cxxopt='--std=c++14'  \
+		--host_cxxopt='-Wno-deprecated-declarations' \
+		--host_cxxopt='-Wno-class-memaccess' \
 		--config=android_arm64 \
 		:tflitebackend
 	cp build/`readlink bazel-out`/arm64-v8a-opt/bin/cpp/backend_tflite/libtflitebackend.so $@
@@ -86,20 +86,20 @@ ${BUILDDIR}/lib_x86_64/libtflitebackend.so: ${SRCFILES} docker_image
 	mkdir -p ${BUILDDIR}/lib_x86_64
 	mkdir -p ${BUILDDIR}/cache
 	docker run \
-	        -e USER=mlperf \
-                ${PROXY_WORKAROUND1} \
+		-e USER=mlperf \
+		${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/tflite_backend \
 		-v ${BUILDDIR}/cache:/cache \
 		-w /tflite_backend \
-	        -u ${USERID}:${GROUPID} \
+		-u ${USERID}:${GROUPID} \
 		 mlcommons/mlperf_mobile:0.1 bazel-3.7.2 ${PROXY_WORKAROUND2} \
-                --output_user_root=/cache/bazel build \
+		--output_user_root=/cache/bazel build \
 		-c opt --cxxopt='--std=c++14' \
-                --cxxopt='-Wno-deprecated-declarations' \
-                --cxxopt='-Wno-unknown-attributes' \
-                --host_cxxopt='--std=c++14'  \
-                --host_cxxopt='-Wno-deprecated-declarations' \
-                --host_cxxopt='-Wno-class-memaccess' \
+		--cxxopt='-Wno-deprecated-declarations' \
+		--cxxopt='-Wno-unknown-attributes' \
+		--host_cxxopt='--std=c++14'  \
+		--host_cxxopt='-Wno-deprecated-declarations' \
+		--host_cxxopt='-Wno-class-memaccess' \
 		--config=android_x86_64 \
 		:tflitebackend
 	cp build/`readlink bazel-out`/x86_64-opt/bin/cpp/backend_tflite/libtflitebackend.so $@
