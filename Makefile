@@ -22,9 +22,6 @@ include tools/common.mk
 # TFLite is the default backend
 include mobile_back_tflite/tflite_backend.mk
 
-ifeq (${WITH_QTI},1)
-  $(info WITH_QTI=1)
-endif
 include mobile_back_qti/make/qti_backend.mk
 include mobile_back_qti/make/qti_backend_targets.mk
 
@@ -33,10 +30,7 @@ ifeq (${WITH_SAMSUNG},1)
   SAMSUNG_BACKEND=--//android/java/org/mlperf/inference:with_samsung="1"
 endif
 
-ifeq (${WITH_PIXEL},1)
-  $(info WITH_PIXEL=1)
-  include mobile_back_pixel/pixel_backend.mk
-endif
+include mobile_back_pixel/pixel_backend.mk
 
 include android/android.mk
 

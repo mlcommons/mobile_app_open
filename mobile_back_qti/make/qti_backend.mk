@@ -14,6 +14,7 @@
 ##########################################################################
 
 ifeq (${WITH_QTI},1)
+  $(info WITH_QTI=1)
   ifeq (${SNPE_SDK},)
     $(error SNPE_SDK env is undefined)
   endif
