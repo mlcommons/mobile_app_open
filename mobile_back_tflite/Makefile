@@ -32,17 +32,7 @@ cpp/backend_tflite/tflite_settings.h \
 cpp/backend_tflite/utils.h \
 cpp/backend_tflite/BUILD
 
-ifeq (${USE_PROXY_WORKAROUND},1)
-  export PROXY_WORKAROUND1=\
-	-v /etc/ssl/certs:/etc/ssl/certs \
-	-v /usr/share/ca-certificates:/usr/share/ca-certificates \
-	-v /usr/share/ca-certificates-java:/usr/share/ca-certificates-java
-
-  export PROXY_WORKAROUND2=--host_jvm_args -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
-else
-  export PROXY_WORKAROUND1=
-  export PROXY_WORKAROUND2=
-endif
+include tools/common.mk
 
 all: ${BUILDDIR}/lib_x86_64/libtflitebackend.so ${BUILDDIR}/lib_arm64/libtflitebackend.so
 

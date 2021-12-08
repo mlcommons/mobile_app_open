@@ -17,6 +17,7 @@
 all: app
 
 include tools/formatter/format.mk
+include tools/common.mk
 
 # TFLite is the default backend
 include mobile_back_tflite/tflite_backend.mk

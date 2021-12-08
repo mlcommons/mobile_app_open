@@ -13,21 +13,6 @@
 # limitations under the License.
 ##########################################################################
 
-ifeq (${USE_PROXY_WORKAROUND},1)
-  export PROXY_WORKAROUND1=\
-	-v /etc/ssl/certs:/etc/ssl/certs \
-	-v /usr/share/ca-certificates:/usr/share/ca-certificates \
-	-v /usr/share/ca-certificates-java:/usr/share/ca-certificates-java
-
-  export PROXY_WORKAROUND2=--host_jvm_args -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
-else
-  export PROXY_WORKAROUND1=
-  export PROXY_WORKAROUND2=
-endif
-
-# Set the included backends
-WITH_QTI=0
-
 ifeq (${WITH_QTI},1)
   ifeq (${SNPE_SDK},)
     $(error SNPE_SDK env is undefined)
