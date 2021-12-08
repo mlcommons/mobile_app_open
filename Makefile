@@ -45,7 +45,7 @@ output/mlperf_mobile_docker_1_0.stamp: android/docker/mlperf_mobile/Dockerfile
 .PHONY: docker_image
 docker_image: output/mlperf_mobile_docker_1_0.stamp
 
-COMMON_DOCKER_FLAGS1= \
+ANDROID_COMMON_DOCKER_FLAGS1= \
 		-e USER=mlperf \
 		${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
@@ -55,27 +55,27 @@ COMMON_DOCKER_FLAGS1= \
 		-u `id -u`:`id -g` \
 		mlcommons/mlperf_mobile:1.0 bazel-3.7.2
 
-COMMON_DOCKER_FLAGS2= \
+ANDROID_COMMON_DOCKER_FLAGS2= \
 		${PROXY_WORKAROUND2} \
 		--output_user_root=/home/mlperf/cache/bazel build --verbose_failures \
 		-c opt --cxxopt='--std=c++14' --host_cxxopt='--std=c++14'  \
 		--host_cxxopt='-Wno-deprecated-declarations' --host_cxxopt='-Wno-class-memaccess' \
 		--cxxopt='-Wno-deprecated-declarations' --cxxopt='-Wno-unknown-attributes'
 
-COMMON_DOCKER_FLAGS= \
-		${COMMON_DOCKER_FLAGS1} \
-		${COMMON_DOCKER_FLAGS2}
+ANDROID_COMMON_DOCKER_FLAGS= \
+		${ANDROID_COMMON_DOCKER_FLAGS1} \
+		${ANDROID_COMMON_DOCKER_FLAGS2}
 
 
-NATIVE_DOCKER_FLAGS= \
-		${COMMON_DOCKER_FLAGS1} --bazelrc=/dev/null \
-		${COMMON_DOCKER_FLAGS2}
+ANDROID_NATIVE_DOCKER_FLAGS= \
+		${ANDROID_COMMON_DOCKER_FLAGS1} --bazelrc=/dev/null \
+		${ANDROID_COMMON_DOCKER_FLAGS2}
 
 proto_test: output/mlperf_mobile_docker_1_0.stamp
 	# Building proto_test
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
-		${NATIVE_DOCKER_FLAGS} --experimental_repo_remote_exec \
+		${ANDROID_NATIVE_DOCKER_FLAGS} --experimental_repo_remote_exec \
 		//android/cpp/proto:proto_test
 	cp output/`readlink bazel-bin`/android/cpp/proto/proto_test output/proto_test
 	chmod 777 output/proto_test
@@ -84,7 +84,7 @@ main: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
 	# Building main
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
-		${COMMON_DOCKER_FLAGS} \
+		${ANDROID_COMMON_DOCKER_FLAGS} \
 		--config android_arm64 //mobile_back_tflite:tflitebackend ${QTI_TARGET} //android/cpp/binary:main
 	rm -rf output/binary && mkdir -p output/binary
 	cp output/`readlink bazel-bin`/android/cpp/binary/main output/binary/main
@@ -96,7 +96,7 @@ libtflite: output/mlperf_mobile_docker_1_0.stamp
 	# Building libtflite
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
-		${COMMON_DOCKER_FLAGS} \
+		${ANDROID_COMMON_DOCKER_FLAGS} \
 		--config android_arm64 //mobile_back_tflite:tflitebackend
 	rm -rf output/binary && mkdir -p output/binary
 	cp output/`readlink bazel-bin`/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so output/binary/libtflitebackend.so
@@ -108,7 +108,7 @@ app: output/mlperf_mobile_docker_1_0.stamp ${QTI_DEPS}
 	# Building mlperf_app.apk
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
-		${COMMON_DOCKER_FLAGS} \
+		${ANDROID_COMMON_DOCKER_FLAGS} \
 		${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
 		--fat_apk_cpu=arm64-v8a \
 		//android/java/org/mlperf/inference:mlperf_app
@@ -119,7 +119,7 @@ app_x86_64: output/mlperf_mobile_docker_1_0.stamp
 	# Building mlperf_app_x86_64.apk
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
-		${COMMON_DOCKER_FLAGS} \
+		${ANDROID_COMMON_DOCKER_FLAGS} \
 		${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
 		--fat_apk_cpu=x86_64 \
 		//android/java/org/mlperf/inference:mlperf_app
@@ -130,7 +130,7 @@ test_app: output/mlperf_mobile_docker_1_0.stamp
 	# Building mlperf_test_app.apk
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
-		${COMMON_DOCKER_FLAGS} \
+		${ANDROID_COMMON_DOCKER_FLAGS} \
 		${QTI_BACKEND} ${SAMSUNG_BACKEND} ${MEDIATEK_BACKEND} ${PIXEL_BACKEND} \
 		--fat_apk_cpu=x86_64,arm64-v8a \
 		//androidTest:mlperf_test_app
