@@ -86,9 +86,9 @@ output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 .PHONY: docker/format
 docker/format: output/docker_mlperf_formatter.stamp
 	docker run -it --rm \
-    	-v ~/.pub-cache:/home/mlperf/.pub-cache \
-    	-v ~/.config/flutter:/home/mlperf/.config/flutter \
-    	-v $(CURDIR):/home/mlperf/mobile_app_open \
-    	-w /home/mlperf/mobile_app_open \
-    	-u `id -u`:`id -g` \
-    	mlperf/formatter bash -c "make format"
+		-v ~/.pub-cache:/home/mlperf/.pub-cache \
+		-v ~/.config/flutter:/home/mlperf/.config/flutter \
+		-v $(CURDIR):/home/mlperf/mobile_app_open \
+		-w /home/mlperf/mobile_app_open \
+		-u `id -u`:`id -g` \
+		mlperf/formatter bash -c "make format"
