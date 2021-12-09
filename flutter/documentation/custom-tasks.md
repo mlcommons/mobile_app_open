@@ -57,6 +57,7 @@ Instead of copying your file using `Files`, you can use Share button in your ext
 This method doesn't have restrictions on file extension.
 
 # Using external resources on an Android
+
 On Android the resource folder is located at `/Android/data/org.mlcommons.android.mlperfbench/files`.
 On Android 11, the folder `/Android/data/` is inaccessible using the default File Manager app. 
 It stills accessible through 3rd party File Manager apps, though. 

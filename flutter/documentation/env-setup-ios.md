@@ -1,13 +1,11 @@
 
-This file describes how to build the app for iOS.
+This file describes environment setup for iOS builds on macOS.
 
 # Contents
 
 * [Setting up the environment](#setting-up-the-environment)
-* [Build and run](#build-and-run)
+* [Tested anvironment](#tested-anvironment)
 * [Changing application icon](#changing-application-icon)
-* [Running instrumented test](#running-instrumented-test)
-* [Formatting the code](#formatting-the-code)
 
 # Setting up the environment
 
@@ -29,6 +27,8 @@ Otherwise, you can get errors about missing pods
 echo export PATH="$PATH:$HOME/.pub-cache/bin" >>~/.zshrc
 ```
 * Go to `ios` directory and install pods: `pod install`
+
+# Tested anvironment
 
 The app was built and tested successfully in this environment:
 
@@ -58,22 +58,9 @@ Python 3.9.7
 Note: the current version may crash with EXC_RESOURCE if built with XCode 13.0
 (see issue [#303](https://github.com/mlcommons/mobile_app_flutter/issues/303))
 
-# Build and run
-
-[comment]: # (Don't remove spaces at the end of lines, they force line breaks)
-* build backend library: `make`
-* build and launch the app: `flutter run`
-    * If you want to run the app on a real device, you have to change settings in XCode.  
-Open `Runner` settings → `Signings & Capabilities`.  
-Make sure checkbox "Automatically manage signing" is checked.
-Set `Team` to your personal team.  
-Set `Bundle identifier` to some value, that is unique for you (for example, you can add your name to it).
-    * If you want to run the app in the simulator, make sure that the simulator is running.  
-You can launch the simulator with the following command: `open -a Simulator`  
-Or you can choose desired model of an iPhone in XCode and launch the app from XCode.
-Simulator will be opened automatically by XCode. 
-
 # Changing application icon
+
+[comment]: # (TODO move this somewhere?)
 
 After building application, if you would like to set new application icon use following actions:
 
@@ -83,40 +70,4 @@ After building application, if you would like to set new application icon use fo
 
 Please note that iOS icons should not have any transparency. See more guidelines [here](https://developer.apple.com/design/human-interface-guidelines/ios/icons-and-images/app-icon/).
 
-# Running instrumented test
-
-* Run simulator `open -a Simulator` or connect physical device
-* Define device Id `flutter devices`:
-```bash
-2 connected devices:
-
-iPhone 12 Pro Max (mobile) • XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX • ios            • com.apple.CoreSimulator.SimRuntime.iOS-14-4 (simulator)
-Chrome (web)               • chrome                               • web-javascript • Google Chrome 89.0.4389.128
-```
-* Run test:
-```bash
-flutter drive \
-  --driver=test_driver/integration_test.dart \
-  --target=integration_test/first_test.dart \
-  -d "iPhone 12 Pro Max"
-```
-or
-```bash
-flutter drive \
-  --driver=test_driver/integration_test.dart \
-  --target=integration_test/first_test.dart \
-  -d XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
-```
-
-# Formatting the code
-
-In order to automatically format your files
-you must have `clang-format` and `buildifier` in addition to build dependencies.
-
-* clang-format can be installed via `brew install clang-format`,
-* buildifier can be installed via `brew install buildifier`
-
-Run `make format` to fix the formatting.  
-This will fix C++, bazel and Dart files.  
-Alternatively you can use make targets `format-clang`, `format-bazel`, `format-dart`
-to format only certain kinds of files.
+[comment]: # (TODO add info about installing formatting tools)
