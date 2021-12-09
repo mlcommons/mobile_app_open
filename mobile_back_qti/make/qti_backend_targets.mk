@@ -22,7 +22,7 @@ libqtibackend: android/builder-image
 		${ANDROID_COMMON_DOCKER_FLAGS} \
 		--config android_arm64 //mobile_back_qti:qtibackend
 	cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/mobile_back_qti/libtqtibackend.so
-	
+
 # You need libasan5 installed to run allocator_test (sudo apt install libasan5)
 qti_allocator_test: output/mobile_back_qti/test/allocator_test
 output/mobile_back_qti/test/allocator_test: docker_image
