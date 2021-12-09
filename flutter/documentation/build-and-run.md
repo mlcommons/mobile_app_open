@@ -3,9 +3,12 @@ This file describes how to build and run the Flutter app for different platforms
 
 # Contents
 
-* [Implementing backend interface](#implementing-backend-interface)
-* [Adding backend to list of backends](#adding-backend-to-list-of-backends)
-* [Building the app with backends](#building-the-app-with-backends)
+* [Overview](#overview)
+* [Common info](#common-info)
+* [Android](#android)
+* [iOS](#ios)
+* [Windows](#windows)
+* [Running tests](#running-tests)
 
 # Overview
 
@@ -48,16 +51,16 @@ You should not evaluate performance when using this flag.
 [comment]: # (TODO add information about using Android emulators)
 
 On Linux command `make flutter` builds native libs automatically.  
-See [Android environment setup guide](./android.md#setting-up-the-environment-on-ubuntu).
+See [Android environment setup guide](./env-setup-android.md#setting-up-the-environment-on-ubuntu).
 
-On macOS `make flutter` will try to build native libs for iOS. Run `make flutter/android` to build android libs on macOS.
+On macOS `make flutter` will try to build native libs for iOS. Run `make flutter/android` to build android libs on macOS.  
 Unfortunately, there is no complete environment setup guide for now.
-See [macOS guide](./ios.md#setting-up-the-environment) for general setup and [Ubuntu guide](./android.md#setting-up-the-environment-on-ubuntu) for android-specific parts.
+See [macOS guide](./env-setup-ios.md#setting-up-the-environment) for general setup and [Ubuntu guide](./env-setup-android.md#setting-up-the-environment-on-ubuntu) for android-specific parts.
 
 On Windows building libs for Android is not available.  
 You can copy `.so` files from some Linux or macOS system, then run `make flutter/prepare-flutter`, and then run Flutter commands locally.  
 For example, it's relatively convenient to use WSL to build native libs.
-See [Windows environment setup guide](./windows.md#setting-up-the-environment) to set up your system to run Flutter.
+See [Windows environment setup guide](./env-setup-windows.md#setting-up-the-environment) to set up your system to run Flutter.
 
 Run `make flutter/android/apk` to build APK.
 
@@ -67,15 +70,15 @@ Run `make flutter/android/apk` to build APK.
 
 Building for iOS is available only on macOS.
 
-See [iOS environment setup guide](./ios.md#setting-up-the-environment).
+See [iOS environment setup guide](./env-setup-ios.md#setting-up-the-environment).
 
 If you want to run the app on a real device, you have to change settings in XCode:
-* Open `/flutter/ios/Runner.xcworkspace`
-* Open `Runner` settings → `Signings & Capabilities`.
+1. Open `/flutter/ios/Runner.xcworkspace`
+2. Open `Runner` settings → `Signings & Capabilities`.  
 You probably need the Debug mode tab, but you can also change values in other tabs if you need.
-* Make sure checkbox `Automatically manage signing` is checked.
-* Set `Team` to your personal team.
-* Set `Bundle identifier` to some globally unique value (for example, you can add your name to it).
+3. Make sure checkbox `Automatically manage signing` is checked.
+4. Set `Team` to your personal team.
+5. Set `Bundle identifier` to some globally unique value (for example, you can add your name to it).
 
 If you want to run the app in iPhone Simulator, make sure that the Simulator is running.  
 To launch Simulator for iPhone 12 Pro you can use the following command: `xcrun simctl bootstatus "iPhone 12 Pro" -b`.  
@@ -97,11 +100,11 @@ Note that you will need to sign the app using external tools, which are not desc
 
 Building for Windows is available only on Windows.
 
-See [Windows environment setup guide](./windows.md#setting-up-the-environment).
+See [Windows environment setup guide](./env-setup-windows.md#setting-up-the-environment).
 
 On Windows it's pretty easy to use Visual Studio debugger for native libs.
-1. First you need to build native libs in debug mode.
-Add `${debug_flags_windows}` to bazel build command in the corresponding make target.
+1. Build native libs with debug symbols.  
+Add `${debug_flags_windows}` to bazel build command in the corresponding make target and rerun `make flutter`.
 2. Use `flutter run -d windows` or `flutter build windows --debug`
 to update Visual Studio project after any changes in Flutter files or config.
 3. Open VS solution file `/flutter/build/windows/mobile_app_flutter2.sln`,
@@ -122,7 +125,7 @@ msvcp140_codecvt_ids.dll
 ```
 You can create `.zip` archive with the `Release` folder to redistribute the app.
 
-# Run tests
+# Running tests
 
 You can run integration test on your device.
 Use the following command to start the test:
