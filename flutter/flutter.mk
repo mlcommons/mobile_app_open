@@ -93,8 +93,8 @@ flutter/windows/docker/create-container:
 	@# Also a lot of memory is required by Flutter. When using 2G Flutter fails with out of memory error, so at least 4G is needed.
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --name mobile_app_flutter_windows_container \
 		--detach --memory 8G --cpus $$(( `nproc` - 1 )) \
-		--volume $(CURDIR):C:/mobile_app_flutter \
-		--workdir C:/mobile_app_flutter \
+		--volume $(CURDIR):C:/mnt/project \
+		--workdir C:/mnt/project \
 		mlperf_mobile_flutter:windows-1.0 \
 		".\\output\\container-script.bat <NUL"
 
@@ -104,17 +104,17 @@ flutter/windows/docker/native:
 	@# can't manipulate files directly inside a mounted directory for some reason
 	@# but can freely manupulate nested directories.
 	mkdir -p build
-	echo >output/container-script.bat "make BAZEL_LINKS_DIR=C:/bazel-links/ backend-bridge-windows backends/tflite-windows"
+	echo >output/container-script.bat "make BAZEL_LINKS_DIR=C:/bazel-links/ flutter/backend-bridge-windows flutter/backends/tflite-windows"
 	docker start -ai mobile_app_flutter_windows_container
 
 .PHONY: flutter/windows/docker/flutter-release
 flutter/windows/docker/flutter-release:
 	mkdir -p output/windows-build
 	echo >output/container-script.bat "\
-		make windows/copy-flutter-files-for-docker \
-		&& cd C:/mobile_app_flutter-local \
-		&& make prepare-flutter flutter/windows/flutter-release \
-		&& cp -r build/windows/runner/Release C:/mobile_app_flutter/output/windows-build \
+		make flutter/windows/copy-flutter-files-for-docker \
+		&& cd C:/project-local \
+		&& make flutter/prepare-flutter flutter/windows/flutter-release \
+		&& cp -r build/windows/runner/Release C:/mnt/project/output/windows-build \
 		"
 	docker start -ai mobile_app_flutter_windows_container
 
@@ -130,22 +130,22 @@ flutter/windows/copy-flutter-files-for-docker:
 	@# for some reason, make can't delete the folder with symlinks:
 	@# 		meither rm nor rmdir (both from msys2) doesn't do anything to the .plugin_symlinks folder or its contents,
 	@#		so we call native Windows command line here.
-	if [ -d "windows/flutter/ephemeral/.plugin_symlinks" ]; then MSYS2_ARG_CONV_EXCL="*" cmd /S /C "rmdir /S /Q windows\\flutter\\ephemeral\\.plugin_symlinks"; fi
-	rm -rf C:/mobile_app_flutter-local
-	mkdir -p C:/mobile_app_flutter-local
-	cp -r --target-directory C:/mobile_app_flutter-local \
-		assets \
-		cpp \
-		integration_test \
-		lib \
-		test_driver \
-		tool \
-		windows \
-		Makefile \
-		pubspec.yaml \
-		pubspec.lock
-	mkdir -p C:/mobile_app_flutter-local/build
-	cp -r --target-directory C:/mobile_app_flutter-local/build \
+	if [ -d "flutter/windows/flutter/ephemeral/.plugin_symlinks" ]; then MSYS2_ARG_CONV_EXCL="*" cmd /S /C "rmdir /S /Q flutter\\windows\\flutter\\ephemeral\\.plugin_symlinks"; fi
+	rm -rf C:/project-local
+	mkdir -p C:/project-local
+	cp -r --target-directory C:/project-local \
+		flutter/assets \
+		flutter/cpp \
+		flutter/integration_test \
+		flutter/lib \
+		flutter/test_driver \
+		flutter/tool \
+		flutter/windows \
+		flutter/Makefile \
+		flutter/pubspec.yaml \
+		flutter/pubspec.lock
+	mkdir -p C:/project-local/build
+	cp -r --target-directory C:/project-local/build \
 		build/win-dlls
 
 # _windows_container_redist_dlls_dir is specific to our docker image.
