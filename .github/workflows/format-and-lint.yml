@@ -46,6 +46,7 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
+          flutter-version: '2.5.3'
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
