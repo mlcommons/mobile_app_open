@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -9,6 +8,8 @@ import 'dart:convert';
 import 'package:mlcommons_ios_app/main.dart' as app;
 import 'package:mlcommons_ios_app/ui/main_screen.dart';
 import 'package:mlcommons_ios_app/ui/result_screen.dart';
+import 'package:mlcommons_ios_app/benchmark/resource_manager.dart'
+    as resource_manager;
 
 void main() {
   final splashPauseSeconds = 4;
@@ -63,11 +64,13 @@ void main() {
           reason: 'Test results were not found');
 
       final applicationDirectory =
-          (await getApplicationDocumentsDirectory()).path;
+          await resource_manager.ResourceManager.getApplicationDirectory();
       final jsonResultPath = '$applicationDirectory/result.json';
       final file = File(jsonResultPath);
 
-      expect(await file.exists(), true, reason: 'Result.json does not exist');
+      expect(await file.exists(), true,
+          reason:
+              'Result.json does not exist: file $applicationDirectory/result.json is not found');
 
       final jsonResultContent = await file.readAsString();
       final results = jsonDecode(jsonResultContent);

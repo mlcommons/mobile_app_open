@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Icons;
 import 'package:flutter/material.dart';
+import 'package:mlcommons_ios_app/ui/confirm_dialog.dart';
 
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -145,6 +146,26 @@ class _SettingsScreen extends State<SettingsScreen> {
                     context, stringResources);
               }
             },
+          ),
+          Divider(),
+          TextButton(
+            style: TextButton.styleFrom(
+              textStyle: const TextStyle(fontSize: 20),
+            ),
+            onPressed: () async {
+              switch (await showConfirmDialog(
+                  context, stringResources.confirmClearCache)) {
+                case ConfirmDialogAction.ok:
+                  await state.clearCache();
+                  Navigator.pop(context);
+                  break;
+                case ConfirmDialogAction.cancel:
+                  break;
+                default:
+                  break;
+              }
+            },
+            child: Text(stringResources.clearCache),
           ),
         ],
       ),

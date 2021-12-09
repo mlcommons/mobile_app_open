@@ -14,24 +14,24 @@
 ##########################################################################
 
 libqtibackend: docker_image
-	@echo "Building libqtibackend"
-	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
-	@mkdir -p output/mobile_back_qti
-	@docker run \
+	# Building libqtibackend
+	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
+	mkdir -p output/mobile_back_qti
+	docker run \
 		${COMMON_DOCKER_FLAGS} \
 		--config android_arm64 //mobile_back_qti:qtibackend
-	@cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/mobile_back_qti/libtqtibackend.so
+	cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/mobile_back_qti/libtqtibackend.so
 	
 # You need libasan5 installed to run allocator_test (sudo apt install libasan5)
 qti_allocator_test: output/mobile_back_qti/test/allocator_test
 output/mobile_back_qti/test/allocator_test: docker_image
-	@echo "Building QTI allocator_test"
-	@mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
-	@mkdir -p output/mobile_back_qti/test
-	@docker run \
+	# Building QTI allocator_test
+	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
+	mkdir -p output/mobile_back_qti/test
+	docker run \
 		${NATIVE_DOCKER_FLAGS} --experimental_repo_remote_exec \
 		--config=asan \
 		//mobile_back_qti/cpp/backend_qti:allocator_test
-	@cp output/`readlink bazel-out`/k8-opt/bin/mobile_back_qti/cpp/backend_qti/allocator_test $@
-	@chmod 777 $@
+	cp output/`readlink bazel-out`/k8-opt/bin/mobile_back_qti/cpp/backend_qti/allocator_test $@
+	chmod 777 $@
 
