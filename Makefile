@@ -14,7 +14,7 @@
 ##########################################################################
 
 
-all: app
+all: android/app
 
 include tools/common.mk
 include tools/formatter/format.mk
