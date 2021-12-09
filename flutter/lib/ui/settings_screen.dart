@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide Icons;
 import 'package:flutter/material.dart';
-import 'package:mlcommons_ios_app/ui/confirm_dialog.dart';
 
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,6 +8,7 @@ import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
 import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
 import 'package:mlcommons_ios_app/store.dart';
 import 'package:mlcommons_ios_app/ui/benchmarks_configuration_screen.dart';
+import 'package:mlcommons_ios_app/ui/confirm_dialog.dart';
 import 'package:mlcommons_ios_app/ui/snack_bar.dart';
 
 class SettingsScreen extends StatefulWidget {
