@@ -69,8 +69,7 @@ steps:
   args:
   - -xc
   - |
-    cd flutter || exit $?
-    make ci/android/test_apk || exit $?
+    make flutter/ci/android/test_apk || exit $?
 
     mkdir -p /workspace/output/artifacts || exit $?
     cp /workspace/flutter/build/app/outputs/flutter-apk/app-release.apk /workspace/output/artifacts/mlperf_app_release.apk || exit $?
