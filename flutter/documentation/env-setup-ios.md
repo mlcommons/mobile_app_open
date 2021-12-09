@@ -70,4 +70,12 @@ After building application, if you would like to set new application icon use fo
 
 Please note that iOS icons should not have any transparency. See more guidelines [here](https://developer.apple.com/design/human-interface-guidelines/ios/icons-and-images/app-icon/).
 
-[comment]: # (TODO add info about installing formatting tools)
+# Formatting
+
+[comment]: # (TODO add info about installing other tools)
+
+In order to automatically format your files
+you must have `clang-format` and `buildifier` in addition to build dependencies.
+
+* `brew install clang-format`,
+* `brew install buildifier`
