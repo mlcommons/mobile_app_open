@@ -71,7 +71,7 @@ class MiddleInterface {
       findMatchingBackend() async {
     for (var backendPath in getBackendsList()) {
       if (Platform.isWindows) {
-        backendPath = './backends/$backendPath';
+        backendPath = './libs/$backendPath';
       } else if (Platform.isAndroid) {
         backendPath = '$backendPath.so';
       }

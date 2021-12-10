@@ -94,7 +94,5 @@ install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
   CONFIGURATIONS Profile;Release
   COMPONENT Runtime)
 
-install(FILES "../build/win-dlls/backend_bridge.dll"
-    DESTINATION "${INSTALL_BUNDLE_LIB_DIR}")
-install(DIRECTORY "../build/win-dlls/backends"
+install(DIRECTORY "libs"
     DESTINATION "${INSTALL_BUNDLE_LIB_DIR}")
