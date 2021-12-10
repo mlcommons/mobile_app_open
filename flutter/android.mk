@@ -14,7 +14,7 @@
 ##########################################################################
 
 .PHONY: flutter/android
-flutter/android: flutter/android/bridge flutter/android/backends/tflite flutter/prepare-flutter
+flutter/android: flutter/android/libs flutter/prepare-flutter
 
 .PHONY: flutter/android/docker/image
 flutter/android/docker/image: output/docker/mlperf_mobile_flutter.stamp
@@ -43,21 +43,12 @@ docker/flutter/android/apk: flutter/android/docker/image
 	@# remove file flutter/android/gradle/wrapper/gradle-wrapper.jar
 	MSYS2_ARG_CONV_EXCL="*" docker run --rm -it --user `id -u`:`id -g` -v $(CURDIR):/mnt/project mlcommons/mlperf_mobile_flutter bash -c "cd /mnt/project && make flutter/android/apk"
 
-.PHONY: flutter/android/bridge
-flutter/android/bridge:
-	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=android_arm64 -c opt //flutter/cpp/flutter:libbackendbridge.so
+.PHONY: flutter/android/libs
+flutter/android/libs:
+	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} \
+		--config=android_arm64 -c opt \
+		${BACKEND_TFLITE_SO_TARGET} \
+		//flutter/cpp/flutter:backend_bridge.dll
 	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
-	cp -f ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so flutter/android/app/src/main/jniLibs/arm64-v8a/libbackendbridge.so
-
-# Use the following block as a template to add a new Android backend
-#.PHONY: flutter/android/backends/example
-#flutter/android/backends/example:
-#	bazel build ${_bazel_links_arg} --config=android_arm64 -c opt //mobile_back_example:examplebackend
-#	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
-#	cp -f ${BAZEL_LINKS_DIR}bin/mobile_back_examplet/cpp/backend_example/libexamplebackend.so flutter/android/app/src/main/jniLibs/arm64-v8a/libexamplebackend.so
-
-.PHONY: flutter/android/backends/tflite
-flutter/android/backends/tflite:
-	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=android_arm64 -c opt ${BACKEND_TFLITE_SO_TARGET}
-	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
-	cp -f ${BAZEL_LINKS_DIR}bin/${BACKEND_TFLITE_SO_FILE} flutter/android/app/src/main/jniLibs/arm64-v8a/${BACKEND_TFLITE_FILENAME}
+	cp -f ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so flutter/android/app/src/main/jniLibs/arm64-v8a
+	[[ "${BACKEND_TFLITE_SO_FILE}" ]] && cp -f ${BAZEL_LINKS_DIR}bin/${BACKEND_TFLITE_SO_FILE} flutter/android/app/src/main/jniLibs/arm64-v8a
