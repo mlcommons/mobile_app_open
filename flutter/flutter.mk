@@ -24,10 +24,10 @@ flutter: flutter/android
 endif
 endif
 
-include ios.mk
-include windows.mk
-include windows-docker.mk
-include android.mk
+include flutter/ios.mk
+include flutter/windows.mk
+include flutter/windows-docker.mk
+include flutter/android.mk
 
 BAZEL_LINKS_DIR=bazel-
 _bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_DIR} --experimental_no_product_name_out_symlink
