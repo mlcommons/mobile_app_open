@@ -15,16 +15,31 @@
 
 ifeq (${WITH_QTI},1)
   $(info WITH_QTI=1)
-  ifeq (${SNPE_SDK},)
-    $(error SNPE_SDK env is undefined)
+  local_snpe_sdk_root=$(shell find ./mobile_back_qti/ -maxdepth 1 -name "snpe-*" -print -quit)
+  ifeq (${local_snpe_sdk_root},)
+    ifeq (${SNPE_SDK},)
+      $(error SNPE SDK is not found. Define SNPE_SDK env or manually link/copy snpe-<version> folder into mobile_back_qti)
+    endif
+    ifneq ($(shell [ -e "${SNPE_SDK}" ] && echo exists),exists)
+      $(error SNPE_SDK env is invalid: path doesn't exist: ${SNPE_SDK})
+    endif
+    ifeq ($(findstring snpe-,${SNPE_SDK}),)
+      $(error SNPE_SDK env invalid: folder name must start with "snpe-": ${SNPE_SDK})
+    endif
+    snpe_version=$(shell basename ${SNPE_SDK})
+    $(shell ln -s $(SNPE_SDK) ./mobile_back_qti/${snpe_version})
+    local_snpe_sdk_root=./mobile_back_qti/${snpe_version}
+  endif
+  ifneq ($(shell [ -e "${local_snpe_sdk_root}" ] && echo exists),exists)
+    $(error SNPE SDK does not exist. Did you change SNPE_SDK env?)
+  endif
+  $(info using snpe $(shell basename ${local_snpe_sdk_root}))
+  is_snpe_symlink=$(shell [ -L "${local_snpe_sdk_root}" ] && [ -d "${local_snpe_sdk_root}" ] && echo symlink)
+  ifeq (${is_snpe_symlink},symlink)
+    snpe_target=$(shell readlink ${local_snpe_sdk_root})
+    QTI_VOLUMES=-v ${snpe_target}:${snpe_target}
   endif
   QTI_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_qti="1"
   QTI_TARGET=//mobile_back_qti:qtibackend
   QTI_LIB_COPY=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/binary/libqtibackend.so
-  SNPE_VERSION=$(shell basename ${SNPE_SDK})
-  QTI_SNPE_VERSION=$(shell grep SNPE_VERSION mobile_back_qti/variables.bzl | cut -d\" -f2)
-  QTI_VOLUMES=-v ${SNPE_SDK}:/home/mlperf/mobile_app/mobile_back_qti/${SNPE_VERSION}
-  ifneq (${SNPE_VERSION},${QTI_SNPE_VERSION})
-    $(error SNPE_SDK (${SNPE_VERSION}) doesn't match version specified in bazel config: (${QTI_SNPE_VERSION}))
-  endif
 endif

@@ -167,3 +167,11 @@ http_archive(
         "https://github.com/bazelbuild/apple_support/archive/refs/tags/0.7.2.zip",
     ],
 )
+
+# This is required to pass SNPE SDK path from external environment to sources,
+# without actually modifying files
+load("//mobile_back_qti:variables.bzl", "snpe_version_loader")
+snpe_version_loader(
+    name = "snpe_version_loader",
+    workspace_dir = __workspace_dir__,
+)

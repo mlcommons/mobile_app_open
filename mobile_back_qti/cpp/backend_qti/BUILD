@@ -20,7 +20,7 @@
 # precision floating point values.
 #
 
-load("//mobile_back_qti:variables.bzl", "SNPE_VERSION")
+load("@snpe_version_loader//:snpe_var_def.bzl", "SNPE_VERSION")
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
 
 package(
