@@ -14,13 +14,13 @@
 ##########################################################################
 
 .PHONY: flutter/ios
-flutter/ios: flutter/cpp-ios flutter/prepare-flutter flutter/update-splash-screen
+flutter/ios: flutter/ios/native flutter/prepare-flutter flutter/update-splash-screen
 
 # BAZEL_OUTPUT_ROOT_ARG is set on our Jenkins CI
 bazel_ios_fw := bazel-bin/flutter/cpp/flutter/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework
 xcode_fw := flutter/ios/Flutter/ios_backend_fw_static.framework
-.PHONY: flutter/cpp-ios
-flutter/cpp-ios:
+.PHONY: flutter/ios/native
+flutter/ios/native:
 	@# NOTE: add `--copt -g` for debug info (but the resulting library would be 0.5 GiB)
 	bazel ${BAZEL_OUTPUT_ROOT_ARG} build --config=ios_fat64 -c opt //flutter/cpp/flutter:ios_backend_fw_static
 

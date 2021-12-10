@@ -17,10 +17,10 @@ debug_flags_windows=-c dbg --copt /Od --copt /Z7 --linkopt -debug
 
 # To add a new backend, add flutter/backends/example-windows target (e.g. flutter/backends/intel-windows)
 .PHONY: flutter/windows
-flutter/windows: flutter/backend-bridge-windows flutter/backends/tflite-windows flutter/prepare-flutter
+flutter/windows: flutter/windows/bridge flutter/windows/backends/tflite flutter/prepare-flutter
 
-.PHONY: flutter/backend-bridge-windows
-flutter/backend-bridge-windows:
+.PHONY: flutter/windows/bridge
+flutter/windows/bridge:
 	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=windows -c opt //flutter/cpp/flutter:backend_bridge.dll
 	chmod +w ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll
 	mkdir -p flutter/build/win-dlls/
@@ -28,16 +28,16 @@ flutter/backend-bridge-windows:
 	cp ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll flutter/build/win-dlls/backend_bridge.dll
 
 # Use the following block as a template to add a new Windows backend
-#.PHONY: backends/example-windows
-#backends/example-windows:
+#.PHONY: flutter/windows/backends/example
+#flutter/windows/backends/example:
 #	bazel build ${_bazel_links_arg} --config=windows -c opt //mobile_back_example:examplebackenddll
 #	chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.dll
 #	mkdir -p flutter/build/win-dlls/backends
 #	rm -f flutter/build/win-dlls/backends/libexamplebackend.dll
 #	cp ${BAZEL_LINKS_DIR}bin/mobile_back_example/cpp/backend_example/libexamplebackend.dll flutter/build/win-dlls/backends/libexamplebackend.dll
 
-.PHONY: flutter/backends/tflite-windows
-flutter/backends/tflite-windows:
+.PHONY: flutter/windows/backends/tflite
+flutter/windows/backends/tflite:
 	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} --config=windows -c opt //mobile_back_tflite:tflitebackenddll
 	chmod +w ${BAZEL_LINKS_DIR}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll
 	mkdir -p flutter/build/win-dlls/backends
