@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The MLPerf Authors. All Rights Reserved.
+# Copyright 2021 The MLPerf Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,18 @@
 # limitations under the License.
 ##########################################################################
 
-# This is needed for iOS CI
-# We'll remove this makefile when we merge the PR and update iOS CI job
+ifeq (${USE_PROXY_WORKAROUND},1)
+  export PROXY_WORKAROUND1=\
+	-v /etc/ssl/certs:/etc/ssl/certs \
+	-v /usr/share/ca-certificates:/usr/share/ca-certificates \
+	-v /usr/share/ca-certificates-java:/usr/share/ca-certificates-java
 
-.PHONY: all
-all:
-	cd .. && make flutter
+  export PROXY_WORKAROUND2=--host_jvm_args -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+endif
+
+ifeq (${OS},Windows_NT)
+# On Windows some commands don't run correctly in the default make shell
+_start_args=powershell -Command
+else
+_start_args=
+endif

@@ -46,17 +46,17 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
+          flutter-version: '2.5.3'
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
           version: '3.x'
       - name: Create ephemeral files
         run: |
-            cd flutter &&
             dart pub global activate protoc_plugin &&
             export PATH="$PATH:$HOME/.pub-cache/bin" &&
-            make prepare-flutter &&
-            dart format lib/backend/backends_list.gen.dart lib/protos lib/localizations
+            make flutter/prepare-flutter &&
+            dart format flutter/lib/backend/backends_list.gen.dart flutter/lib/protos flutter/lib/localizations
       - name: Run Dart format check
         run: dart format --output=none --set-exit-if-changed flutter
       - name: Run Dart linter

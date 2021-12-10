@@ -1,4 +1,4 @@
-# Docker image name: mlcommons/mlperf_mobile:1.0
+# Docker image name: mlcommons/mlperf_mobile_android_builder
 FROM ubuntu:bionic
 LABEL maintainer="quic_mcharleb@quicinc.com"
 

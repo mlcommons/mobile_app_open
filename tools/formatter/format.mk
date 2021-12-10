@@ -1,11 +1,4 @@
 
-ifeq (${OS},Windows_NT)
-# On Windows some commands don't run correctly in the default make shell
-_start_args=powershell -Command
-else
-_start_args=
-endif
-
 .PHONY: format
 ifeq (${OS},Windows_NT)
 # format/java is not supported on Windows
@@ -29,7 +22,7 @@ format/java:
 .PHONY: format/dart
 format/dart:
 	cd flutter && ${_start_args} dart run import_sorter:main
-	cd flutter && ${_start_args} dart format lib integration_test test_driver
+	dart format flutter/lib flutter/integration_test flutter/test_driver
 
 .PHONY: format/line-endings
 format/line-endings:
@@ -44,7 +37,7 @@ lint/bazel:
 
 .PHONY: lint/dart
 lint/dart:
-	cd flutter && make prepare-flutter
+	make flutter/prepare-flutter
 	dart analyze flutter
 
 .PHONY: lint/prohibited-extensions
@@ -86,9 +79,9 @@ output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 .PHONY: docker/format
 docker/format: output/docker_mlperf_formatter.stamp
 	docker run -it --rm \
-    	-v ~/.pub-cache:/home/mlperf/.pub-cache \
-    	-v ~/.config/flutter:/home/mlperf/.config/flutter \
-    	-v $(CURDIR):/home/mlperf/mobile_app_open \
-    	-w /home/mlperf/mobile_app_open \
-    	-u `id -u`:`id -g` \
-    	mlperf/formatter bash -c "make format"
+		-v ~/.pub-cache:/home/mlperf/.pub-cache \
+		-v ~/.config/flutter:/home/mlperf/.config/flutter \
+		-v $(CURDIR):/home/mlperf/mobile_app_open \
+		-w /home/mlperf/mobile_app_open \
+		-u `id -u`:`id -g` \
+		mlperf/formatter bash -c "make format"

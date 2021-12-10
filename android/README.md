@@ -80,15 +80,15 @@ adb install -r bazel-bin/android/java/org/mlperf/inference/mlperf_app.apk
 On the other hand, you can use a docker image to build the app:
 
 ```
-make app
+make android/app
 ```
 or to enable the QTI backend:
 ```
-make WITH_QTI=1 app
+make WITH_QTI=1 android/app
 ```
 or to enable multiple backends:
 ```
-make WITH_QTI=1 WITH_MEDIATEK=1 app
+make WITH_QTI=1 WITH_MEDIATEK=1 android/app
 ```
 Note: Follow the instruction of the backend vendor (in `mobile_back_*` folders at root level) to build for that backend.
 Some backends may contain proprietary code. In that case, please contact MLCommons to get help.
@@ -100,7 +100,7 @@ adb install -r build/mlperf_app.apk
 
 If you want to build an instrumented test APK you should add target `//androidTest:mlperf_test_app`, i.e. :
 ```bash
-make test_app
+make android/test_app
 adb install -r build/mlperf_test_app.apk
 ```
 

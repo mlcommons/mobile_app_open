@@ -4,8 +4,7 @@ This file describes how to build the app for Windows.
 # Contents
 
 * [Setting up the environment](#setting-up-the-environment)
-* [Build and run](#build-and-run)
-* [Formatting the code](#formatting-the-code)
+* [Formatting](#formatting)
 
 # Setting up the environment
 
@@ -58,16 +57,9 @@ $env:TEMP=$env:USERPROFILE+'\AppData\Local\Temp'
 $env:TMP=$env:USERPROFILE+'\AppData\Local\Temp'
 ```
 
-# Build and run
+# Formatting
 
-* Build default backend: `make`  
-This can take a long time if you are building it from scratch.  
-After you have built the backend one time you will have bazel cache,
-and later builds should be pretty fast, unless you change global build configuration
-(for example, switching between debug and release mode).
-* Build and launch: `flutter run`
-
-# Formatting the code
+[comment]: # (TODO add info about installing other tools)
 
 In order to automatically format your files
 you must have `clang-format` and `buildifier` in addition to build dependencies.
@@ -76,8 +68,3 @@ you must have `clang-format` and `buildifier` in addition to build dependencies.
 or it can be manually downloaded from the very bottom
 of the [LLVM Snapshot Builds page](https://llvm.org/builds/) and manually placed somewhere in your PATH.
 * buildifier can be installed via `choco install buildifier -y`
-
-Run `make format` to fix the formatting.  
-This will fix C++, bazel and Dart files.  
-Alternatively you can use make targets `format-clang`, `format-bazel`, `format-dart`
-to format only certain kinds of files.

@@ -1,15 +1,9 @@
 
-This file describes how to build the Flutter app for Android.
-
-Android native files can be built on linux and Mac OS.
-You will get an error if you try to build android bazel targets on Windows.
-
-When you have all required native .so libraries, the Flutter app itself can be built on Windows without any issues.
+This file describes how to setup the environment for Android builds on Ubuntu.
 
 # Contents
 
 * [Setting up the environment on Ubuntu](#setting-up-the-environment-on-ubuntu)
-* [Build and run](#build-and-run)
 
 # Setting up the environment on Ubuntu
 
@@ -78,12 +72,4 @@ When you have all required native .so libraries, the Flutter app itself can be b
 * Add Dart pub bin folder to PATH: `export PATH=$PATH:~/.pub-cache/bin`  
 If you use bash: `echo export PATH=\$PATH:~/.pub-cache/bin >>~/.bashrc`
 
-# Build and run
-
-* build native libraries: go to `flutter` directory and run `make android`
-  * The app is compatible with all android backends for the old Android app
-  but we don't have make targets to automatically inject them into the Flutter app yet
-* build and launch the app: `flutter run`
-
-If you want to get release APK go to `flutter` directory and run `flutter build apk` (still note that only default backend will be included).
-Like with `flutter run`, you need to build native libraries prior to this.
+[comment]: # (TODO add info about installing formatting tools)
