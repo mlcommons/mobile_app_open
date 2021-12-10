@@ -13,6 +13,17 @@
 # limitations under the License.
 ##########################################################################
 
+ifeq (${WITH_TFLITE},1)
+  $(info WITH_TFLITE=1)
+  # Android app always includes tflite backend
+  # ANDROID_TFLITE_BACKEND_BAZEL_FLAG=
+  BACKEND_TFLITE_DLL_FILE=mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll
+  BACKEND_TFLITE_DLL_TARGET=//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.dll
+  BACKEND_TFLITE_SO_FILE=mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
+  BACKEND_TFLITE_SO_TARGET=//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.so
+  BACKEND_TFLITE_FILENAME=libtflitebackend
+endif
+
 ifeq (${WITH_MEDIATEK},1)
   $(info WITH_MEDIATEK=1)
   ANDROID_MEDIATEK_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_mediatek="1"

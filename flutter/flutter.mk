@@ -40,19 +40,13 @@ _bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_DIR} --experimental_no_product_n
 #backend_replace_example=\'libexamplebackend\',
 #endif
 
-ifeq (${ENABLE_BACKEND_TFLITE},0)
-backend_replace_tflite=
-else
-backend_replace_tflite=\'libtflitebackend\',
-endif
-
 # To add a new backend, add a new line to the sed command for your backend replacing "example" with the vendor name. For instance, for Intel it would be:
 # -e "s/INTEL_TAG/${backend_replace_intel}/"
 .PHONY: flutter/set-supported-backends
 flutter/set-supported-backends:
 	cat flutter/lib/backend/backends_list.in | sed \
 		-e "s/EXAMPLE_TAG/${backend_replace_example}/" \
-		-e "s/TFLITE_TAG/${backend_replace_tflite}/" \
+		-e "s/TFLITE_TAG/${BACKEND_TFLITE_FILENAME}/" \
 		> flutter/lib/backend/backends_list.gen.dart
 
 .PHONY: flutter/protobuf
