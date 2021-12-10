@@ -15,5 +15,5 @@
 
 ifeq (${WITH_MEDIATEK},1)
   $(info WITH_MEDIATEK=1)
-  MEDIATEK_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_mediatek="1"
+  ANDROID_MEDIATEK_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_mediatek="1"
 endif

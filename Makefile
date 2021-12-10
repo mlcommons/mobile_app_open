@@ -16,10 +16,16 @@
 
 all: android/app
 
+# avaiable backends
+WITH_TFLITE=1
+WITH_QTI=0
+WITH_SAMSUNG=0
+WITH_PIXEL=0
+WITH_MEDIATEK=0
+
 include tools/common.mk
 include tools/formatter/format.mk
 
-# TFLite is the default backend
 include mobile_back_tflite/tflite_backend.mk
 
 include mobile_back_qti/make/qti_backend.mk
@@ -27,7 +33,7 @@ include mobile_back_qti/make/qti_backend_targets.mk
 
 ifeq (${WITH_SAMSUNG},1)
   $(info WITH_SAMSUNG=1)
-  SAMSUNG_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_samsung="1"
+  ANDROID_SAMSUNG_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_samsung="1"
 endif
 
 include mobile_back_pixel/pixel_backend.mk
