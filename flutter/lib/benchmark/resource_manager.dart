@@ -376,20 +376,24 @@ class ResourceManager {
   Future<List<BenchmarksConfiguration>>
       getAvailableBenchmarksConfigurations() async {
     final file = File('$applicationDirectory/$_configurationsFileName');
-    final benchmarksConfigurations = <BenchmarksConfiguration>[
-      defaultBenchmarksConfiguration
-    ];
+    final benchmarksConfigurations = <BenchmarksConfiguration>[];
 
-    if (await file.exists()) {
-      final content =
-          jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+    if (!await file.exists()) {
+      print('Create ' + file.path);
+      var config = <String, String>{
+        defaultBenchmarksConfiguration.name: defaultBenchmarksConfiguration.path
+      };
+      await file.writeAsString(jsonEncode(config));
+    }
+    assert(await file.exists());
 
-      for (final benchmarksConfigurationContent in content.entries) {
-        final benchmarksConfiguration = BenchmarksConfiguration(
-            benchmarksConfigurationContent.key,
-            benchmarksConfigurationContent.value as String);
-        benchmarksConfigurations.add(benchmarksConfiguration);
-      }
+    final content =
+        jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+    for (final benchmarksConfigurationContent in content.entries) {
+      final benchmarksConfiguration = BenchmarksConfiguration(
+          benchmarksConfigurationContent.key,
+          benchmarksConfigurationContent.value as String);
+      benchmarksConfigurations.add(benchmarksConfiguration);
     }
     return benchmarksConfigurations;
   }
