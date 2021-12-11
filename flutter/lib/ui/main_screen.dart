@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Icons;
-import 'package:mlcommons_ios_app/store.dart';
 
 import 'package:provider/provider.dart';
 
@@ -93,19 +92,11 @@ class MyHomePage extends StatelessWidget {
   Widget _goContainer(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
-    final store = context.watch<Store>();
 
     return CustomPaint(
       painter: MyPaintBottom(),
       child: GoButtonGradient(() async {
-        var errors = <String>[];
-        errors.add(await state.validateExternalResourcesDirectory(
-            stringResources.incorrectDatasetsPath));
-        if (store.offlineMode) {
-          errors.add(await state
-              .validateOfflineMode(stringResources.errorOfflineModeEnabled));
-        }
-        errors = errors.where((e) => e.isNotEmpty).toList();
+        final errors = await state.validateBenchmark(stringResources);
         if (errors.isEmpty) {
           state.runBenchmarks();
         } else {

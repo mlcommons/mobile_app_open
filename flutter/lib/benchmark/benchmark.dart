@@ -208,6 +208,19 @@ class BenchmarkState extends ChangeNotifier {
 
   static double _getSummaryMaxScore() => MAX_SCORE['SUMMARY_MAX_SCORE']!;
 
+  Future<List<String>> validateBenchmark(
+      AppLocalizations stringResources) async {
+    var errors = <String>[];
+    errors.add(await validateExternalResourcesDirectory(
+        stringResources.incorrectDatasetsPath));
+    if (_store.offlineMode) {
+      errors.add(
+          await validateOfflineMode(stringResources.errorOfflineModeEnabled));
+    }
+    errors = errors.where((e) => e.isNotEmpty).toList();
+    return errors;
+  }
+
   Future<String> validateExternalResourcesDirectory(
       String errorDescription) async {
     final datasetsError = <String>[];
