@@ -58,6 +58,13 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get offlineMode => _getBool(_StoreConstants.offline_mode);
+
+  set offlineMode(bool offlineModeFlag) {
+    _storeFromDisk.setBool(_StoreConstants.offline_mode, offlineModeFlag);
+    notifyListeners();
+  }
+
   bool get testMode => _getBool(_StoreConstants.test_mode);
 
   set testMode(bool testModeFlag) {
@@ -112,6 +119,7 @@ class Store extends ChangeNotifier {
 class _StoreConstants {
   static const share = 'share';
   static const submission_mode = 'submission mode';
+  static const offline_mode = 'offline mode';
   static const test_mode = 'test mode';
   static const cooldown = 'cooldown';
   static const cooldown_pause = 'cooldown pause';

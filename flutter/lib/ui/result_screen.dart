@@ -322,13 +322,18 @@ class _ResultScreenState extends State<ResultScreen>
           child: TextButton(
             style: buttonStyle,
             onPressed: () async {
-              final error = await state.validateExternalResourcesDirectory(
-                  stringResources.incorrectDatasetsPath);
-
-              if (error.isEmpty) {
+              var errors = <String>[];
+              errors.add(await state.validateExternalResourcesDirectory(
+                  stringResources.incorrectDatasetsPath));
+              if (store.offlineMode) {
+                errors.add(await state.validateOfflineMode(
+                    stringResources.errorOfflineModeEnabled));
+              }
+              errors = errors.where((e) => e.isNotEmpty).toList();
+              if (errors.isEmpty) {
                 state.runBenchmarks();
               } else {
-                await showErrorDialog(context, <String>[error]);
+                await showErrorDialog(context, errors);
               }
             },
             child: Padding(

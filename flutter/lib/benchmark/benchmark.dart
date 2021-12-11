@@ -233,6 +233,30 @@ class BenchmarkState extends ChangeNotifier {
         datasetsError.map((element) => '\n${++index}) $element').join();
   }
 
+  Future<String> validateOfflineMode(String errorDescription) async {
+    final errors = <String>[];
+    for (final job in _getBenchmarkJobs()) {
+      final modelPath = job.benchmark.benchmarkSetting.src;
+      if (isInternetResource(modelPath)) {
+        errors.add(modelPath);
+      }
+      final testDataPath = job.dataset.groundtruthSrc;
+      if (isInternetResource(testDataPath)) {
+        errors.add(testDataPath);
+      }
+      final groundtruthDataPath = job.dataset.path;
+      if (isInternetResource(groundtruthDataPath)) {
+        errors.add(groundtruthDataPath);
+      }
+    }
+
+    if (errors.isEmpty) return '';
+
+    var index = 0;
+    return errorDescription +
+        errors.map((element) => '\n${++index}) $element').join();
+  }
+
   Future<void> clearCache() async {
     await resourceManager.deleteLoadedResources([], 0);
     await resourceManager.deleteDefaultBenchmarksConfiguration();

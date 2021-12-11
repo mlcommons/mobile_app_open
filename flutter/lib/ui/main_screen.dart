@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Icons;
+import 'package:mlcommons_ios_app/store.dart';
 
 import 'package:provider/provider.dart';
 
@@ -92,17 +93,23 @@ class MyHomePage extends StatelessWidget {
   Widget _goContainer(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
+    final store = context.watch<Store>();
 
     return CustomPaint(
       painter: MyPaintBottom(),
       child: GoButtonGradient(() async {
-        final error = await state.validateExternalResourcesDirectory(
-            stringResources.incorrectDatasetsPath);
-
-        if (error.isEmpty) {
+        var errors = <String>[];
+        errors.add(await state.validateExternalResourcesDirectory(
+            stringResources.incorrectDatasetsPath));
+        if (store.offlineMode) {
+          errors.add(await state
+              .validateOfflineMode(stringResources.errorOfflineModeEnabled));
+        }
+        errors = errors.where((e) => e.isNotEmpty).toList();
+        if (errors.isEmpty) {
           state.runBenchmarks();
         } else {
-          await showErrorDialog(context, <String>[error]);
+          await showErrorDialog(context, errors);
         }
       }),
     );
@@ -144,6 +151,7 @@ class MyPaintBottom extends CustomPainter {
 
 class GoButtonGradient extends StatelessWidget {
   final AsyncCallback onPressed;
+
   GoButtonGradient(this.onPressed);
 
   @override

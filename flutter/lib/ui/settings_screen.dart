@@ -70,6 +70,21 @@ class _SettingsScreen extends State<SettingsScreen> {
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: Text(
+                stringResources.offlineMode,
+              ),
+            ),
+            subtitle: Text(stringResources.offlineModeSubtitle),
+            trailing: Switch(
+              value: store.offlineMode,
+              onChanged: (flag) {
+                store.offlineMode = flag;
+              },
+            ),
+          ),
+          ListTile(
+            title: Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Text(
                 stringResources.submissionMode,
               ),
             ),
