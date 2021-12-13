@@ -51,6 +51,7 @@ flutter/android/libs:
 		${BACKEND_MEDIATEK_SO_TARGET} \
 		${BACKEND_PIXEL_SO_TARGET} \
 		${BACKEND_QTI_SO_TARGET} \
+		${BACKEND_SAMSUNG_SO_TARGET} \
 		//flutter/cpp/flutter:backend_bridge.dll
 	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
 	cp -f --target-directory flutter/android/app/src/main/jniLibs/arm64-v8a \
@@ -58,4 +59,5 @@ flutter/android/libs:
 		${BACKEND_MEDIATEK_SO_FILE} \
 		${BACKEND_PIXEL_SO_FILE} \
 		${BACKEND_QTI_SO_FILES} \
+		${BACKEND_SAMSUNG_SO_FILES} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/libbackendbridge.so

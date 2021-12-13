@@ -6,5 +6,6 @@ const _backendsList = [
     MEDIATEKE_TAG
     PIXEL_TAG
     QTI_TAG
+    SAMSUNG_TAG
     TFLITE_TAG
 ];

@@ -27,15 +27,9 @@ include tools/common.mk
 include tools/formatter/format.mk
 
 include mobile_back_tflite/tflite_backend.mk
-
+include mobile_back_tflite/samsung_backend.mk
 include mobile_back_qti/make/qti_backend.mk
 include mobile_back_qti/make/qti_backend_targets.mk
-
-ifeq (${WITH_SAMSUNG},1)
-  $(info WITH_SAMSUNG=1)
-  ANDROID_SAMSUNG_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_samsung="1"
-endif
-
 include mobile_back_pixel/pixel_backend.mk
 
 include android/android.mk
