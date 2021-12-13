@@ -40,7 +40,7 @@ flutter/windows/docker/native:
 	@# can't manipulate files directly inside a mounted directory for some reason
 	@# but can freely manupulate nested directories.
 	mkdir -p build
-	echo >output/container-script.bat "make BAZEL_LINKS_DIR=C:/bazel-links/ flutter/backend-bridge-windows flutter/backends/tflite-windows"
+	echo >output/container-script.bat "make BAZEL_LINKS_PREFIX=C:/bazel-links/ flutter/backend-bridge-windows flutter/backends/tflite-windows"
 	docker start -ai mobile_app_flutter_windows_container
 
 .PHONY: flutter/windows/docker/flutter-release

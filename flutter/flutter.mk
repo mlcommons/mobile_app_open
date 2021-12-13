@@ -29,9 +29,6 @@ include flutter/windows.mk
 include flutter/windows-docker.mk
 include flutter/android.mk
 
-BAZEL_LINKS_DIR=bazel-
-_bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_DIR} --experimental_no_product_name_out_symlink
-
 # To add a new vendor backend, copy and uncomment this block and replace "EXAMPLE" and "example" with the vendor name (e.g. INTEL and intel)
 # See tflite backend below as an example
 #ifeq (${ENABLE_BACKEND_EXAMPLE},0)

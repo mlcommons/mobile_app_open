@@ -26,5 +26,5 @@ flutter/windows/libs:
 		//flutter/cpp/flutter:backend_bridge.dll
 	mkdir -p flutter/windows/libs
 	cp -f --target-directory flutter/windows/libs \
-		${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/backend_bridge.dll
-	[ -n "${BACKEND_TFLITE_DLL_FILE}" ] && cp -f ${BAZEL_LINKS_DIR}bin/${BACKEND_TFLITE_DLL_FILE} flutter/windows/libs
+		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/backend_bridge.dll
+	[ -n "${BACKEND_TFLITE_DLL_FILE}" ] && cp -f ${BAZEL_LINKS_PREFIX}bin/${BACKEND_TFLITE_DLL_FILE} flutter/windows/libs
