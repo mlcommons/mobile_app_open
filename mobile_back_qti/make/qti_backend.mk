@@ -42,4 +42,14 @@ ifeq (${WITH_QTI},1)
   ANDROID_QTI_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_qti="1"
   QTI_TARGET=//mobile_back_qti:qtibackend
   QTI_LIB_COPY=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/binary/libqtibackend.so
+
+  BACKEND_QTI_SO_FILES=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_mock_qti/libqtibackend.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libSNPE.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libhta.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v2.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v3.so \
+    ${local_snpe_sdk_root}/lib/dsp/libsnpe_dsp_v66_domains_v2_skel.so \
+    ${local_snpe_sdk_root}/lib/dsp/libsnpe_dsp_v68_domains_v3_skel.so
+  BACKEND_QTI_SO_TARGET=//mobile_back_qti/cpp/backend_mock_qti:libqtibackend.so
+  BACKEND_QTI_FILENAME=libqtibackend
 endif
