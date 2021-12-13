@@ -45,6 +45,7 @@ flutter/set-supported-backends:
 		-e "s/EXAMPLE_TAG/${backend_replace_example}/" \
 		-e "s/TFLITE_TAG/${BACKEND_TFLITE_FILENAME}/" \
 		-e "s/MEDIATEKE_TAG/${BACKEND_MEDIATEK_FILENAME}/" \
+		-e "s/PIXEL_TAG/${BACKEND_PIXEL_FILENAME}/" \
 		> flutter/lib/backend/backends_list.gen.dart
 
 .PHONY: flutter/protobuf

@@ -4,5 +4,6 @@ part of 'bridge.dart';
 const _backendsList = [
     EXAMPLE_TAG
     MEDIATEKE_TAG
+    PIXEL_TAG
     TFLITE_TAG
 ];
