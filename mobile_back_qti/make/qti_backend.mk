@@ -49,6 +49,6 @@ ifeq (${WITH_QTI},1)
     ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v3.so \
     ${local_snpe_sdk_root}/lib/dsp/libsnpe_dsp_v66_domains_v2_skel.so \
     ${local_snpe_sdk_root}/lib/dsp/libsnpe_dsp_v68_domains_v3_skel.so
-  backend_qti_android_target=//mobile_back_qti/cpp/backend_mock_qti:libqtibackend.so
+  backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so
   backend_qti_filename=libqtibackend
 endif
