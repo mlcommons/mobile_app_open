@@ -74,3 +74,4 @@ Or using a File Manager on a desktop computer and access the files via USB also 
 So, if you have `/sdcard/mlperf_datasets/some/folders/test.txt` path in your config file,
 then the path on your Android phone would be:
 `/Android/data/org.mlcommons.android.mlperfbench/files/external_resources/some/folders/test.txt`.
+
