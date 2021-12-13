@@ -29,20 +29,9 @@ include flutter/windows.mk
 include flutter/windows-docker.mk
 include flutter/android.mk
 
-# To add a new vendor backend, copy and uncomment this block and replace "EXAMPLE" and "example" with the vendor name (e.g. INTEL and intel)
-# See tflite backend below as an example
-#ifeq (${ENABLE_BACKEND_EXAMPLE},0)
-#backend_replace_example=
-#else
-#backend_replace_example=\'libexamplebackend\',
-#endif
-
-# To add a new backend, add a new line to the sed command for your backend replacing "example" with the vendor name. For instance, for Intel it would be:
-# -e "s/INTEL_TAG/${backend_replace_intel}/"
 .PHONY: flutter/set-supported-backends
 flutter/set-supported-backends:
 	cat flutter/lib/backend/backends_list.in | sed \
-		-e "s/EXAMPLE_TAG/${backend_replace_example}/" \
 		-e "s/TFLITE_TAG/${backend_tflite_filename}/" \
 		-e "s/MEDIATEKE_TAG/${backend_mediatek_filename}/" \
 		-e "s/PIXEL_TAG/${backend_pixel_filename}/" \

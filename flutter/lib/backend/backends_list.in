@@ -1,6 +1,6 @@
 part of 'bridge.dart';
 
-// To add a new backend, add an entry for your backend here. For instance, for Intel add "INTEL_TAG"
+// Always add new tags before TFLITE_TAG, otherwise your backend will never be used
 const _backendsList = [
     EXAMPLE_TAG
     MEDIATEKE_TAG
