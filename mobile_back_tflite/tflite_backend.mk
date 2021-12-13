@@ -27,4 +27,7 @@ endif
 ifeq (${WITH_MEDIATEK},1)
   $(info WITH_MEDIATEK=1)
   ANDROID_MEDIATEK_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_mediatek="1"
+  BACKEND_MEDIATEK_SO_FILE=mobile_back_tflite/cpp/backend_tflite/libtfliteneuronbackend.so
+  BACKEND_MEDIATEK_SO_TARGET=//mobile_back_tflite/cpp/backend_tflite:libtfliteneuronbackend.so
+  BACKEND_MEDIATEK_FILENAME=libtfliteneuronbackend
 endif

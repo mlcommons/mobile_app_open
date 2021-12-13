@@ -48,7 +48,10 @@ flutter/android/libs:
 	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} \
 		--config=android_arm64 -c opt \
 		${BACKEND_TFLITE_SO_TARGET} \
+		${BACKEND_MEDIATEK_SO_TARGET} \
 		//flutter/cpp/flutter:backend_bridge.dll
 	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
-	cp -f ${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so flutter/android/app/src/main/jniLibs/arm64-v8a
-	[[ "${BACKEND_TFLITE_SO_FILE}" ]] && cp -f ${BAZEL_LINKS_DIR}bin/${BACKEND_TFLITE_SO_FILE} flutter/android/app/src/main/jniLibs/arm64-v8a
+	cp -f --target-directory flutter/android/app/src/main/jniLibs/arm64-v8a \
+		${BAZEL_LINKS_DIR}bin/flutter/cpp/flutter/libbackendbridge.so
+	[ -n "${BACKEND_TFLITE_SO_FILE}" ] && cp -f ${BAZEL_LINKS_DIR}bin/${BACKEND_TFLITE_SO_FILE} flutter/android/app/src/main/jniLibs/arm64-v8a
+	[ -n "${BACKEND_MEDIATEK_SO_FILE}" ] && cp -f ${BAZEL_LINKS_DIR}bin/${BACKEND_MEDIATEK_SO_FILE} flutter/android/app/src/main/jniLibs/arm64-v8a
