@@ -27,7 +27,7 @@ ANDROID_COMMON_DOCKER_FLAGS1= \
 		${PROXY_WORKAROUND1} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
-		${QTI_VOLUMES} \
+		${qti_volumes} \
 		-w /home/mlperf/mobile_app \
 		-u `id -u`:`id -g` \
 		mlcommons/mlperf_mobile_android_builder bazel-3.7.2
@@ -64,11 +64,11 @@ android/main: android/builder-image
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
 		${ANDROID_COMMON_DOCKER_FLAGS} \
-		--config android_arm64 //mobile_back_tflite:tflitebackend ${QTI_TARGET} //android/cpp/binary:main
+		--config android_arm64 //mobile_back_tflite:tflitebackend ${backend_qti_android_target} //android/cpp/binary:main
 	rm -rf output/binary && mkdir -p output/binary
 	cp output/`readlink bazel-bin`/android/cpp/binary/main output/binary/main
 	cp output/`readlink bazel-bin`/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so output/binary/libtflitebackend.so
-	${QTI_LIB_COPY}
+	${qti_lib_copy}
 	chmod 777 output/binary/main output/binary/libtflitebackend.so
 
 .PHONY: android/libtflite
@@ -88,10 +88,10 @@ android/app: android/builder-image
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
 		${ANDROID_COMMON_DOCKER_FLAGS} \
-		${ANDROID_QTI_BACKEND_BAZEL_FLAG} \
+		${android_qti_backend_bazel_flag} \
 		${ANDROID_SAMSUNG_BACKEND_BAZEL_FLAG} \
-		${ANDROID_MEDIATEK_BACKEND_BAZEL_FLAG} \
-		${ANDROID_PIXEL_BACKEND_BAZEL_FLAG} \
+		${android_mediatek_backend_bazel_flag} \
+		${android_pixel_backend_bazel_flag} \
 		--fat_apk_cpu=arm64-v8a \
 		//android/java/org/mlperf/inference:mlperf_app
 	cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app.apk
@@ -103,10 +103,10 @@ android/app_x86_64: android/builder-image
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
 		${ANDROID_COMMON_DOCKER_FLAGS} \
-		${ANDROID_QTI_BACKEND_BAZEL_FLAG} \
+		${android_qti_backend_bazel_flag} \
 		${ANDROID_SAMSUNG_BACKEND_BAZEL_FLAG} \
-		${ANDROID_MEDIATEK_BACKEND_BAZEL_FLAG} \
-		${ANDROID_PIXEL_BACKEND_BAZEL_FLAG} \
+		${android_mediatek_backend_bazel_flag} \
+		${android_pixel_backend_bazel_flag} \
 		--fat_apk_cpu=x86_64 \
 		//android/java/org/mlperf/inference:mlperf_app
 	cp output/`readlink bazel-bin`/android/java/org/mlperf/inference/mlperf_app.apk output/mlperf_app_x86_64.apk
@@ -118,10 +118,10 @@ android/test_app: android/builder-image
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	docker run \
 		${ANDROID_COMMON_DOCKER_FLAGS} \
-		${ANDROID_QTI_BACKEND_BAZEL_FLAG} \
+		${android_qti_backend_bazel_flag} \
 		${ANDROID_SAMSUNG_BACKEND_BAZEL_FLAG} \
-		${ANDROID_MEDIATEK_BACKEND_BAZEL_FLAG} \
-		${ANDROID_PIXEL_BACKEND_BAZEL_FLAG} \
+		${android_mediatek_backend_bazel_flag} \
+		${android_pixel_backend_bazel_flag} \
 		--fat_apk_cpu=x86_64,arm64-v8a \
 		//androidTest:mlperf_test_app
 	cp output/`readlink bazel-bin`/android/androidTest/mlperf_test_app.apk output/mlperf_test_app.apk

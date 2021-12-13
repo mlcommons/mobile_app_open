@@ -15,8 +15,8 @@
 
 ifeq (${WITH_PIXEL},1)
   $(info WITH_PIXEL=1)
-  ANDROID_PIXEL_BACKEND_BAZEL_FLAG=--//android/java/org/mlperf/inference:with_pixel="1"
-  BACKEND_PIXEL_SO_FILE=${BAZEL_LINKS_PREFIX}bin/mobile_back_pixel/cpp/backend_tflite/libtflitepixelbackend.so
-  BACKEND_PIXEL_SO_TARGET=//mobile_back_pixel/cpp/backend_tflite:libtflitepixelbackend.so
-  BACKEND_PIXEL_FILENAME=libtflitepixelbackend
+  android_pixel_backend_bazel_flag=--//android/java/org/mlperf/inference:with_pixel="1"
+  backend_pixel_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_pixel/cpp/backend_tflite/libtflitepixelbackend.so
+  backend_pixel_android_target=//mobile_back_pixel/cpp/backend_tflite:libtflitepixelbackend.so
+  backend_pixel_filename=libtflitepixelbackend
 endif

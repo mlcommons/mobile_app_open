@@ -43,11 +43,11 @@ include flutter/android.mk
 flutter/set-supported-backends:
 	cat flutter/lib/backend/backends_list.in | sed \
 		-e "s/EXAMPLE_TAG/${backend_replace_example}/" \
-		-e "s/TFLITE_TAG/${BACKEND_TFLITE_FILENAME}/" \
-		-e "s/MEDIATEKE_TAG/${BACKEND_MEDIATEK_FILENAME}/" \
-		-e "s/PIXEL_TAG/${BACKEND_PIXEL_FILENAME}/" \
-		-e "s/QTI_TAG/${BACKEND_QTI_FILENAME}/" \
-		-e "s/SAMSUNG_TAG/${BACKEND_SAMSUNG_FILENAME}/" \
+		-e "s/TFLITE_TAG/${backend_tflite_filename}/" \
+		-e "s/MEDIATEKE_TAG/${backend_mediatek_filename}/" \
+		-e "s/PIXEL_TAG/${backend_pixel_filename}/" \
+		-e "s/QTI_TAG/${backend_qti_filename}/" \
+		-e "s/SAMSUNG_TAG/${backend_samsung_filename}/" \
 		> flutter/lib/backend/backends_list.gen.dart
 
 .PHONY: flutter/protobuf

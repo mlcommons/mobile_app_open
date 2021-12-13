@@ -20,7 +20,7 @@ ifeq (${WITH_SAMSUNG},1)
   ifeq (${MOBILE_BACK_SAMSUNG_ROOT},)
     $(error MOBILE_BACK_SAMSUNG_ROOT env must be defined when building with samsung backend)
   endif
-  BACKEND_SAMSUNG_SO_FILES=${MOBILE_BACK_SAMSUNG_ROOT}/lib/libsamsungbackend.so \
+  backend_samsung_android_files=${MOBILE_BACK_SAMSUNG_ROOT}/lib/libsamsungbackend.so \
     ${MOBILE_BACK_SAMSUNG_ROOT}/lib/libeden_model.so \
     ${MOBILE_BACK_SAMSUNG_ROOT}/lib/libeden_profiler.so \
     ${MOBILE_BACK_SAMSUNG_ROOT}/lib/libeden_rt.so \
@@ -42,6 +42,6 @@ ifeq (${WITH_SAMSUNG},1)
     ${MOBILE_BACK_SAMSUNG_ROOT}/lib/libprocessgroup.so \
     ${MOBILE_BACK_SAMSUNG_ROOT}/lib/libvendor_samsung_slsi_hardware_gpu_boost.so \
   # Samsung backend is prebuilt, so we don't need any bazel target for it
-  BACKEND_SAMSUNG_SO_TARGET=
-  BACKEND_SAMSUNG_FILENAME=libsamsungbackend
+  backend_samsung_android_target=
+  backend_samsung_filename=libsamsungbackend
 endif

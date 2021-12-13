@@ -45,19 +45,19 @@ docker/flutter/android/apk: flutter/android/docker/image
 
 .PHONY: flutter/android/libs
 flutter/android/libs:
-	bazel build ${BAZEL_CACHE_ARG} ${_bazel_links_arg} \
+	bazel build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
 		--config=android_arm64 -c opt \
-		${BACKEND_TFLITE_SO_TARGET} \
-		${BACKEND_MEDIATEK_SO_TARGET} \
-		${BACKEND_PIXEL_SO_TARGET} \
-		${BACKEND_QTI_SO_TARGET} \
-		${BACKEND_SAMSUNG_SO_TARGET} \
+		${backend_tflite_android_target} \
+		${backend_mediatek_android_target} \
+		${backend_pixel_android_target} \
+		${backend_qti_android_target} \
+		${backend_samsung_android_target} \
 		//flutter/cpp/flutter:backend_bridge.dll
 	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
 	cp -f --target-directory flutter/android/app/src/main/jniLibs/arm64-v8a \
-		${BACKEND_TFLITE_SO_FILE} \
-		${BACKEND_MEDIATEK_SO_FILE} \
-		${BACKEND_PIXEL_SO_FILE} \
-		${BACKEND_QTI_SO_FILES} \
-		${BACKEND_SAMSUNG_SO_FILES} \
+		${backend_tflite_android_files} \
+		${backend_mediatek_android_files} \
+		${backend_pixel_android_files} \
+		${backend_qti_android_files} \
+		${backend_samsung_android_files} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/libbackendbridge.so
