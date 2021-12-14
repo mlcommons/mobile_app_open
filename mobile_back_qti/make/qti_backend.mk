@@ -15,28 +15,14 @@
 
 ifeq (${WITH_QTI},1)
   $(info WITH_QTI=1)
+  _=$(shell make qti/ensure-snpe-is-present)
+  ifneq ($(findstring error:,${_}),)
+    $(error $(_))
+  endif
   local_snpe_sdk_root=$(shell find ./mobile_back_qti/ -maxdepth 1 -name "snpe-*" -print -quit)
-  ifeq (${local_snpe_sdk_root},)
-    ifeq (${SNPE_SDK},)
-      $(error SNPE SDK is not found. Define SNPE_SDK env or manually link/copy snpe-<version> folder into mobile_back_qti)
-    endif
-    ifneq ($(shell [ -e "${SNPE_SDK}" ] && echo exists),exists)
-      $(error SNPE_SDK env is invalid: path doesn't exist: ${SNPE_SDK})
-    endif
-    ifeq ($(findstring snpe-,${SNPE_SDK}),)
-      $(error SNPE_SDK env invalid: folder name must start with "snpe-": ${SNPE_SDK})
-    endif
-    snpe_version=$(shell basename ${SNPE_SDK})
-    $(shell ln -s $(SNPE_SDK) ./mobile_back_qti/${snpe_version})
-    local_snpe_sdk_root=./mobile_back_qti/${snpe_version}
-  endif
-  ifneq ($(shell [ -e "${local_snpe_sdk_root}" ] && echo exists),exists)
-    $(error SNPE SDK does not exist. Did you change SNPE_SDK env?)
-  endif
   $(info using snpe $(shell basename ${local_snpe_sdk_root}))
-  is_snpe_symlink=$(shell [ -L "${local_snpe_sdk_root}" ] && [ -d "${local_snpe_sdk_root}" ] && echo symlink)
-  ifeq (${is_snpe_symlink},symlink)
-    snpe_target=$(shell readlink ${local_snpe_sdk_root})
+  snpe_target=$(shell readlink ${local_snpe_sdk_root})
+  ifneq (${snpe_target},) # for non-symlink folders readlink will return empty string
     qti_volumes=-v ${snpe_target}:${snpe_target}
   endif
   android_qti_backend_bazel_flag=--//android/java/org/mlperf/inference:with_qti="1"
@@ -52,3 +38,18 @@ ifeq (${WITH_QTI},1)
   backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so
   backend_qti_filename=libqtibackend
 endif
+
+.PHONY: qti/ensure-snpe-is-present
+qti/ensure-snpe-is-present:
+	@local_snpe_sdk_root=$$(find ./mobile_back_qti/ -maxdepth 1 -name "snpe-*" -print -quit) && \
+	if [ ! -z "$$local_snpe_sdk_root" ] && [ ! -e "$$local_snpe_sdk_root" ]; then \
+		rm -f $$local_snpe_sdk_root && \
+		local_snpe_sdk_root=$$(find ./mobile_back_qti/ -maxdepth 1 -name "snpe-*" -print -quit); \
+	fi && \
+	if [ -z "$$local_snpe_sdk_root" ]; then \
+		if [ -z "$$SNPE_SDK" ]; then echo "error: SNPE SDK is not found. Define SNPE_SDK env or manually link or copy snpe-<version> folder into mobile_back_qti"; exit 1; fi && \
+		if [ ! -e "$$SNPE_SDK" ]; then echo "error: SNPE_SDK env is invalid: path doesn't exist: $$SNPE_SDK"; exit 1; fi && \
+		if [ "$$SNPE_SDK" = "$${SNPE_SDK#snpe-}" ]; then echo "error: SNPE_SDK env invalid: folder name must start with 'snpe-': $$SNPE_SDK"; exit 1; fi && \
+		snpe_version=$$(basename $$SNPE_SDK) && \
+		ln -s $$SNPE_SDK ./mobile_back_qti/$$snpe_version; \
+	fi
