@@ -2,7 +2,6 @@ part of 'bridge.dart';
 
 // Always add new tags before TFLITE_TAG, otherwise your backend will never be used
 const _backendsList = [
-    EXAMPLE_TAG
     MEDIATEKE_TAG
     PIXEL_TAG
     QTI_TAG

@@ -23,7 +23,7 @@ ifeq (${WITH_QTI},1)
   $(info using snpe $(shell basename ${local_snpe_sdk_root}))
   snpe_target=$(shell readlink ${local_snpe_sdk_root})
   ifneq (${snpe_target},) # for non-symlink folders readlink will return empty string
-    qti_volumes=-v ${snpe_target}:${snpe_target}
+    qti_docker_args=-v ${snpe_target}:${snpe_target}
   endif
   android_qti_backend_bazel_flag=--//android/java/org/mlperf/inference:with_qti="1"
   qti_lib_copy=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/binary/libqtibackend.so

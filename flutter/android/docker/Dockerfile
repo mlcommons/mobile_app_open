@@ -60,3 +60,6 @@ RUN mkdir $ANDROID_SDK_HOME && \
     keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
 
 RUN chmod --recursive a=u $HOME
+
+RUN mkdir -p /mnt/cache
+RUN chmod 777 /mnt/cache

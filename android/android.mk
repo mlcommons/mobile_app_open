@@ -24,16 +24,16 @@ output/android_docker.stamp: android/docker/mlperf_mobile/Dockerfile
 android_common_docker_flags1= \
 		-it \
 		-e USER=mlperf \
-		${proxy_workaround1} \
+		${proxy_docker_args} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
-		${qti_volumes} \
+		${qti_docker_args} \
 		-w /home/mlperf/mobile_app \
 		-u `id -u`:`id -g` \
 		mlcommons/mlperf_mobile_android_builder bazel-3.7.2
 
 android_common_docker_flags2= \
-		${proxy_workaround2} \
+		${proxy_bazel_args} \
 		--output_user_root=/home/mlperf/cache/bazel build --verbose_failures \
 		-c opt --cxxopt='--std=c++14' --host_cxxopt='--std=c++14'  \
 		--host_cxxopt='-Wno-deprecated-declarations' --host_cxxopt='-Wno-class-memaccess' \

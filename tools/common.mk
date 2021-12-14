@@ -14,12 +14,12 @@
 ##########################################################################
 
 ifeq (${USE_PROXY_WORKAROUND},1)
-  export proxy_workaround1=\
+  proxy_docker_args=\
 	-v /etc/ssl/certs:/etc/ssl/certs \
 	-v /usr/share/ca-certificates:/usr/share/ca-certificates \
 	-v /usr/share/ca-certificates-java:/usr/share/ca-certificates-java
 
-  export proxy_workaround2=--host_jvm_args -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+  proxy_bazel_args=--host_jvm_args -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
 endif
 
 ifeq (${OS},Windows_NT)
