@@ -21,13 +21,11 @@ flutter/android/docker/image: output/docker/mlperf_mobile_flutter.stamp
 
 output/docker/mlperf_mobile_flutter.stamp: flutter/android/docker/Dockerfile
 	docker image build -t mlcommons/mlperf_mobile_flutter flutter/android/docker
-	docker volume create mlperf-mobile-flutter-bazel-cache
-	docker volume create mlperf-mobile-flutter-build
-	docker volume create mlperf-mobile-flutter-workdir
+	docker volume create mlperf-mobile-flutter-cache-bazel
+	docker volume create mlperf-mobile-flutter-cache-workdir
 	mkdir -p output/docker
 	touch $@
 
-# USER env is required by bazel
 flutter_common_docker_flags= \
 		--rm \
 		-it \
@@ -35,9 +33,9 @@ flutter_common_docker_flags= \
 		--env USER=mlperf \
 		-v $(CURDIR):/mnt/project \
 		--workdir /mnt/project \
-		-v mlperf-mobile-flutter-build:/mnt/project/flutter/build \
-		-v mlperf-mobile-flutter-workdir:/image-workdir \
-		-v mlperf-mobile-flutter-bazel-cache:/mnt/cache \
+		-v /mnt/project/flutter/build \
+		-v mlperf-mobile-flutter-cache-workdir:/image-workdir/.cache \
+		-v mlperf-mobile-flutter-cache-bazel:/mnt/cache \
 		--env BAZEL_ARGS_GLOBAL="${proxy_bazel_args} --output_user_root=/mnt/cache/bazel" \
 		${proxy_docker_args} \
 		${qti_docker_args} \

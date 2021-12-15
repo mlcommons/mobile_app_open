@@ -48,21 +48,19 @@ ENV ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
 ENV HOME=/image-workdir
 WORKDIR $HOME
 
-ENV PUB_CACHE=$HOME/flutter/.pub-cache
+ENV PUB_CACHE=$HOME/.cache/.pub-cache
 ENV PATH=$PATH:$HOME/flutter/bin:$PUB_CACHE/bin
-RUN curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.5.3-stable.tar.xz | tar Jxf -
-RUN dart pub global activate protoc_plugin
+RUN curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.5.3-stable.tar.xz | tar Jxf - && chmod --recursive a=u $HOME/flutter
+RUN flutter config --no-analytics && dart --disable-analytics && alias flutter='flutter --no-version-check'
+RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
 
-ENV GRADLE_USER_HOME=$HOME/.gradle
-ENV ANDROID_SDK_HOME=$HOME/.android
+ENV GRADLE_USER_HOME=$HOME/.cache/.gradle
+ENV ANDROID_SDK_HOME=$HOME/.cache/.android
 
 RUN mkdir $ANDROID_SDK_HOME && \
     keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
 
-RUN chmod --recursive a=u $HOME
+RUN chmod 777 $HOME
 
-RUN mkdir -p /mnt/cache
-RUN chmod 777 /mnt/cache
-
-RUN mkdir -p /mnt/project/flutter/build
-RUN chmod 777 /mnt/project/flutter/build
+RUN mkdir -p /mnt/cache && chmod 777 /mnt/cache
+RUN mkdir -p /mnt/project/flutter/build && chmod 777 /mnt/project/flutter/build
