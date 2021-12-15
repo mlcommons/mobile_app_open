@@ -17,11 +17,11 @@
 all: android/app
 
 # avaiable backends
-WITH_TFLITE=1
-WITH_QTI=0
-WITH_SAMSUNG=0
-WITH_PIXEL=0
-WITH_MEDIATEK=0
+WITH_TFLITE?=1
+WITH_QTI?=0
+WITH_SAMSUNG?=0
+WITH_PIXEL?=0
+WITH_MEDIATEK?=0
 
 include tools/common.mk
 include tools/formatter/format.mk

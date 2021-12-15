@@ -20,6 +20,8 @@ ifeq (${WITH_SAMSUNG},1)
   ifeq (${MOBILE_BACK_SAMSUNG_LIB_ROOT},)
     $(error MOBILE_BACK_SAMSUNG_LIB_ROOT env must be defined when building with samsung backend)
   endif
+  $(info MOBILE_BACK_SAMSUNG_LIB_ROOT=${MOBILE_BACK_SAMSUNG_LIB_ROOT})
+  backend_samsung_docker_args=-v "${MOBILE_BACK_SAMSUNG_LIB_ROOT}:/mnt/samsung_backend" --env MOBILE_BACK_SAMSUNG_LIB_ROOT=/mnt/samsung_backend
   backend_samsung_android_files=${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libsamsungbackend.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_model.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_profiler.so \

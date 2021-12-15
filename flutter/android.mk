@@ -45,9 +45,15 @@ flutter_common_docker_flags= \
 		-v /mnt/project/flutter/build \
 		-v ${flutter_docker_volume_workdir}:/image-workdir/.cache \
 		-v ${flutter_docker_volume_bazel}:/mnt/cache \
+		--env WITH_TFLITE=${WITH_TFLITE} \
+		--env WITH_QTI=${WITH_QTI} \
+		--env WITH_SAMSUNG=${WITH_SAMSUNG} \
+		--env WITH_PIXEL=${WITH_PIXEL} \
+		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
 		--env BAZEL_ARGS_GLOBAL="${proxy_bazel_args} --output_user_root=/mnt/cache/bazel" \
 		${proxy_docker_args} \
-		${qti_docker_args} \
+		${backend_qti_docker_args} \
+		${backend_samsung_docker_args} \
 		mlcommons/mlperf_mobile_flutter
 
 .PHONY: flutter/android/apk

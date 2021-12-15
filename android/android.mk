@@ -27,7 +27,7 @@ android_common_docker_flags1= \
 		${proxy_docker_args} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
-		${qti_docker_args} \
+		${backend_qti_docker_args} \
 		-w /home/mlperf/mobile_app \
 		-u `id -u`:`id -g` \
 		mlcommons/mlperf_mobile_android_builder bazel-3.7.2
@@ -68,7 +68,7 @@ android/main: android/builder-image
 	rm -rf output/binary && mkdir -p output/binary
 	cp output/`readlink bazel-bin`/android/cpp/binary/main output/binary/main
 	cp output/`readlink bazel-bin`/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so output/binary/libtflitebackend.so
-	${qti_lib_copy}
+	${backend_qti_lib_copy}
 	chmod 777 output/binary/main output/binary/libtflitebackend.so
 
 .PHONY: android/libtflite
