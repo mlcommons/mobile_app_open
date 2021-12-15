@@ -82,7 +82,7 @@ See [iOS environment setup guide](./env-setup-ios.md#setting-up-the-environment)
 
 If you want to run the app on a real device, you have to change settings in XCode:
 1. Open `/flutter/ios/Runner.xcworkspace`
-2. Open `Runner` settings → `Signings & Capabilities`.  
+2. Open `Runner` settings → `Signings & Capabilities`.  
 You probably need the Debug mode tab, but you can also change values in other tabs if you need.
 3. Make sure checkbox `Automatically manage signing` is checked.
 4. Set `Team` to your personal team.
