@@ -61,8 +61,8 @@ ${BUILDDIR}/output/state/ade20k.stamp: ${BUILDDIR}/output/state/ade20k_unzip.sta
 	docker run \
 		-e PYTHONPATH=/workspace/output/ade20k/models-2.3.0/research/slim:/workspace/output/ade20k/models-2.3.0/research/deeplab:/workspace/output/ade20k/models-2.3.0/research \
 		-v $(BUILDDIR):/workspace/ \
-	  	-u ${USERID}:${GROUPID} \
-	  	mlperf_mobile:1.1 \
+		-u ${USERID}:${GROUPID} \
+		mlperf_mobile:1.1 \
 		python3 /workspace/util/ade20k/resize_512_ade20k.py /workspace/output/ade20k/ADEChallengeData2016/ \
 			/workspace/output/mlperf_datasets/ade20k/
 	touch $@
@@ -102,8 +102,8 @@ ${BUILDDIR}/output/state/ade20k_calibration.stamp: ${BUILDDIR}/output/state/ade2
 	mkdir -p ${A_DEST_DIR}
 	mkdir -p ${BUILDDIR}/output/state
 	for f in $(shell cat ${BUILDDIR}/util/ade20k/ade20k_calibration_files.txt) ; do \
-                cp ${A_SRC_DIR}/$${f} ${A_DEST_DIR}; \
-        done
+		cp ${A_SRC_DIR}/$${f} ${A_DEST_DIR}; \
+	done
 	touch $@
 
 # Coco
@@ -145,8 +145,8 @@ ${BUILDDIR}/output/state/coco_calibration.stamp: ${BUILDDIR}/output/state/coco_v
 	mkdir -p ${C_DEST_DIR}
 	mkdir -p ${BUILDDIR}/output/state
 	for f in $(shell cat ${BUILDDIR}/util/coco/coco_calibration_files.txt) ; do \
-                cp ${C_SRC_DIR}/COCO_val2014_$${f} ${C_DEST_DIR}/$${f}; \
-        done
+		cp ${C_SRC_DIR}/COCO_val2014_$${f} ${C_DEST_DIR}/$${f}; \
+	done
 	touch $@
 
 # imagenet
@@ -171,8 +171,8 @@ ${BUILDDIR}/output/state/imagenet.stamp: \
 ${BUILDDIR}/output/state/imagenet_calibration.stamp: ${BUILDDIR}/output/state/imagenet.stamp
 	mkdir -p ${BUILDDIR}/output/calibration_set/imagenet/images
 	for f in `cat ${BUILDDIR}/downloads/imagenet/cal_image_list_option_1.txt` ; do \
-                cp ${BUILDDIR}/output/mlperf_datasets/imagenet/img/$${f} ${BUILDDIR}/output/calibration_set/imagenet/images; \
-        done
+		cp ${BUILDDIR}/output/mlperf_datasets/imagenet/img/$${f} ${BUILDDIR}/output/calibration_set/imagenet/images; \
+	done
 	touch $@
 
 # squad

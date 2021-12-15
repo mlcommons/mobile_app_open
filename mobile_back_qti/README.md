@@ -53,7 +53,7 @@ Clone mlperf_app_open and build with the following build commands.
 ```
 git clone https://github.com/mlcommons/mobile_app_open
 cd mobile_app_open
-make WITH_QTI=1 app
+make WITH_QTI=1 android/app
 ```
 
 This will build the QTI backend into the MLPerf app.
