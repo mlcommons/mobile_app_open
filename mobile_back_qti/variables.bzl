@@ -9,7 +9,7 @@ def _impl(repository_ctx):
         fail("snpe folder is not found in the repo")
 
     sdk_version = found.stdout[found.stdout.rfind("/") + 1:-1]
-    print("Using SNPE: " + sdk_version)
+    print("Using SNPE: " + sdk_version)  # buildifier: disable=print
 
     repository_ctx.file("BUILD", "")
     repository_ctx.file(
