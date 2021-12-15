@@ -171,6 +171,7 @@ http_archive(
 # This is required to pass SNPE SDK path from external environment to sources,
 # without actually modifying files
 load("//mobile_back_qti:variables.bzl", "snpe_version_loader")
+
 snpe_version_loader(
     name = "snpe_version_loader",
     workspace_dir = __workspace_dir__,

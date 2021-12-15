@@ -21,5 +21,5 @@ snpe_version_loader = repository_rule(
     implementation = _impl,
     environ = ["SNPE_VERSION"],
     local = True,
-    attrs = { "workspace_dir": attr.string(mandatory = True) }
+    attrs = {"workspace_dir": attr.string(mandatory = True)},
 )
