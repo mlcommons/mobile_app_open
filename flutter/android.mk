@@ -19,19 +19,10 @@ flutter/android: flutter/android/libs flutter/prepare-flutter
 .PHONY: flutter/android/docker/image
 flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android.stamp
 
-# if someone tries to run the build on WSL and then on the host Windows machine,
-# and the build uses the same volume for cache, the build will fail
-ifeq (${OS},Windows_NT)
-flutter_docker_volume_bazel=mlperf-mobile-flutter-cache-bazel-win
-flutter_docker_volume_workdir=mlperf-mobile-flutter-cache-workdir-win
-else
-flutter_docker_volume_bazel=mlperf-mobile-flutter-cache-bazel
-flutter_docker_volume_workdir=mlperf-mobile-flutter-cache-workdir
-endif
 output/docker/mlperf_mobile_flutter_android.stamp: flutter/android/docker/Dockerfile
 	docker image build -t mlcommons/mlperf_mobile_flutter flutter/android/docker
-	docker volume create ${flutter_docker_volume_bazel}
-	docker volume create ${flutter_docker_volume_workdir}
+	docker volume create mlperf-mobile-flutter-cache-bazel-`id -u`
+	docker volume create mlperf-mobile-flutter-cache-workdir-`id -u`
 	mkdir -p output/docker
 	touch $@
 
@@ -43,8 +34,8 @@ flutter_common_docker_flags= \
 		-v $(CURDIR):/mnt/project \
 		--workdir /mnt/project \
 		-v /mnt/project/flutter/build \
-		-v ${flutter_docker_volume_workdir}:/image-workdir/.cache \
-		-v ${flutter_docker_volume_bazel}:/mnt/cache \
+		-v mlperf-mobile-flutter-cache-workdir-`id -u`:/image-workdir/.cache \
+		-v mlperf-mobile-flutter-cache-bazel-`id -u`:/mnt/cache \
 		--env WITH_TFLITE=${WITH_TFLITE} \
 		--env WITH_QTI=${WITH_QTI} \
 		--env WITH_SAMSUNG=${WITH_SAMSUNG} \
