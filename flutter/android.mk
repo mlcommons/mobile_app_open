@@ -17,12 +17,21 @@
 flutter/android: flutter/android/libs flutter/prepare-flutter
 
 .PHONY: flutter/android/docker/image
-flutter/android/docker/image: output/docker/mlperf_mobile_flutter.stamp
+flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android.stamp
 
-output/docker/mlperf_mobile_flutter.stamp: flutter/android/docker/Dockerfile
+# if someone tries to run the build on WSL and then on the host Windows machine,
+# and the build uses the same volume for cache, the build will fail
+ifeq (${OS},Windows_NT)
+flutter_docker_volume_bazel=mlperf-mobile-flutter-cache-bazel-win
+flutter_docker_volume_workdir=mlperf-mobile-flutter-cache-workdir-win
+else
+flutter_docker_volume_bazel=mlperf-mobile-flutter-cache-bazel
+flutter_docker_volume_workdir=mlperf-mobile-flutter-cache-workdir
+endif
+output/docker/mlperf_mobile_flutter_android.stamp: flutter/android/docker/Dockerfile
 	docker image build -t mlcommons/mlperf_mobile_flutter flutter/android/docker
-	docker volume create mlperf-mobile-flutter-cache-bazel
-	docker volume create mlperf-mobile-flutter-cache-workdir
+	docker volume create ${flutter_docker_volume_bazel}
+	docker volume create ${flutter_docker_volume_workdir}
 	mkdir -p output/docker
 	touch $@
 
@@ -34,8 +43,8 @@ flutter_common_docker_flags= \
 		-v $(CURDIR):/mnt/project \
 		--workdir /mnt/project \
 		-v /mnt/project/flutter/build \
-		-v mlperf-mobile-flutter-cache-workdir:/image-workdir/.cache \
-		-v mlperf-mobile-flutter-cache-bazel:/mnt/cache \
+		-v ${flutter_docker_volume_workdir}:/image-workdir/.cache \
+		-v ${flutter_docker_volume_bazel}:/mnt/cache \
 		--env BAZEL_ARGS_GLOBAL="${proxy_bazel_args} --output_user_root=/mnt/cache/bazel" \
 		${proxy_docker_args} \
 		${qti_docker_args} \
@@ -50,8 +59,6 @@ flutter/android/apk: flutter/android
 
 .PHONY: docker/flutter/android/apk
 docker/flutter/android/apk: flutter/android/docker/image
-	@# if the build fails with java.io.IOException: Input/output error
-	@# remove file flutter/android/gradle/wrapper/gradle-wrapper.jar
 	MSYS2_ARG_CONV_EXCL="*" docker run \
 		${flutter_common_docker_flags} \
 		make flutter/android/apk

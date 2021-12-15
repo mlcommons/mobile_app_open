@@ -47,7 +47,6 @@ You should not evaluate performance when using this flag.
 # Android
 
 [comment]: # (Don't remove spaces at the end of lines, they force line breaks)
-[comment]: # (TODO add info about building in Docker after we add commands for it)
 [comment]: # (TODO add information about using Android emulators)
 
 On Linux command `make flutter` builds native libs automatically.  
@@ -63,6 +62,15 @@ For example, it's relatively convenient to use WSL to build native libs.
 See [Windows environment setup guide](./env-setup-windows.md#setting-up-the-environment) to set up your system to run Flutter.
 
 Run `make flutter/android/apk` to build APK.
+
+You can build the app using docker.  
+Run `make docker/flutter/android/apk` to build release APK.  
+RUn `make docker/flutter/android/libs` to build just `.so` libs. This command is helpful if you want to build Android version of the app on Windows.
+
+if the build fails with `java.io.IOException: Input/output error`, remove file gradle-wrapper.jar:
+```bash
+rm -f flutter/android/gradle/wrapper/gradle-wrapper.jar
+```
 
 # iOS
 
