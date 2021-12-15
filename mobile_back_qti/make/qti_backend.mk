@@ -15,7 +15,7 @@
 
 ifeq (${WITH_QTI},1)
   $(info WITH_QTI=1)
-  _=$(shell make qti/ensure-snpe-is-present)
+  _=$(shell make WITH_QTI=0 qti/ensure-snpe-is-present)
   ifneq ($(findstring error:,${_}),)
     $(error $(_))
   endif
