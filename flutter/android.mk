@@ -82,3 +82,9 @@ flutter/android/libs:
 		${backend_qti_android_files} \
 		${backend_samsung_android_files} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/libbackendbridge.so
+
+.PHONY: docker/flutter/android/libs
+docker/flutter/android/libs:
+	MSYS2_ARG_CONV_EXCL="*" docker run \
+		${flutter_common_docker_flags} \
+		make flutter/android/libs
