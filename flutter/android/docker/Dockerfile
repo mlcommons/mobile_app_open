@@ -63,3 +63,6 @@ RUN chmod --recursive a=u $HOME
 
 RUN mkdir -p /mnt/cache
 RUN chmod 777 /mnt/cache
+
+RUN mkdir -p /mnt/project/flutter/build
+RUN chmod 777 /mnt/project/flutter/build

@@ -22,6 +22,8 @@ flutter/android/docker/image: output/docker/mlperf_mobile_flutter.stamp
 output/docker/mlperf_mobile_flutter.stamp: flutter/android/docker/Dockerfile
 	docker image build -t mlcommons/mlperf_mobile_flutter flutter/android/docker
 	docker volume create mlperf-mobile-flutter-bazel-cache
+	docker volume create mlperf-mobile-flutter-build
+	docker volume create mlperf-mobile-flutter-workdir
 	mkdir -p output/docker
 	touch $@
 
@@ -33,6 +35,8 @@ flutter_common_docker_flags= \
 		--env USER=mlperf \
 		-v $(CURDIR):/mnt/project \
 		--workdir /mnt/project \
+		-v mlperf-mobile-flutter-build:/mnt/project/flutter/build \
+		-v mlperf-mobile-flutter-workdir:/image-workdir \
 		-v mlperf-mobile-flutter-bazel-cache:/mnt/cache \
 		--env BAZEL_ARGS_GLOBAL="${proxy_bazel_args} --output_user_root=/mnt/cache/bazel" \
 		${proxy_docker_args} \
@@ -43,7 +47,8 @@ flutter_common_docker_flags= \
 flutter/android/apk: flutter/android
 	cd flutter && flutter clean
 	cd flutter && flutter build apk
-	@# take results from flutter/build/app/outputs/flutter-apk/app-release.apk
+	mkdir -p output/flutter/android/
+	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk output/flutter/android/release.apk
 
 .PHONY: docker/flutter/android/apk
 docker/flutter/android/apk: flutter/android/docker/image
@@ -57,8 +62,9 @@ docker/flutter/android/apk: flutter/android/docker/image
 flutter/android/test_apk: flutter/android/apk
 	cd flutter/android && ./gradlew app:assembleAndroidTest
 	cd flutter/android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
-	# take result from flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-	# take result from flutter/build/app/outputs/apk/debug/app-debug.apk
+	mkdir -p output/flutter/android/
+	cp -f flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk output/flutter/android/test-helper.apk
+	cp -f flutter/build/app/outputs/apk/debug/app-debug.apk output/flutter/android/test.apk
 
 .PHONY: flutter/android/libs
 flutter/android/libs:
