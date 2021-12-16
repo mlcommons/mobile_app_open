@@ -29,7 +29,7 @@ format/line-endings:
 	git ls-files -z | xargs --null ${_start_args} dos2unix --keep-bom --
 
 .PHONY: lint
-lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files lint/line-endings
+lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files
 
 .PHONY: lint/bazel
 lint/bazel:
@@ -84,4 +84,5 @@ docker/format: output/docker_mlperf_formatter.stamp
 		-v $(CURDIR):/home/mlperf/mobile_app_open \
 		-w /home/mlperf/mobile_app_open \
 		-u `id -u`:`id -g` \
-		mlperf/formatter bash -c "make format"
+		mlperf/formatter \
+		make format
