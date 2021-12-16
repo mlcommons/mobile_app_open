@@ -9,8 +9,8 @@ This file describes how to add support for your backend into the Flutter app.
 
 # Folder structure
 
-Create a new folder for your backend, named `mobile_back_<vendor>`, where `<vendor>` is the name of your organization.
-Structure inside that your backend directory in not strictly regulated, you may keep it the way that is convenient to you.
+Create a new folder for your backend, named `mobile_back_<vendor>`, where `<vendor>` is the name of your organization or name of your backend, if you have one.
+Structure inside that your backend directory in not strictly regulated, you may keep it the way that is convenient to you. Just keep it organized.
 See existing `mobile_back_*` folders for examples on how you you can structure your files.
 
 Generally it's a good idea to keep all C++ files in a `cpp` folder.
@@ -20,7 +20,7 @@ Add a readme file explaining how to set up environment to build your backend and
 Add `<vendor>_backend.mk` file defining variables for your backend, similar to such files for other backends. This file should have the following structure:
 ```make
 ifeq (${WITH_<VENDOR>},1)
-  $(info WITH_<VENDOR>K=1)
+  $(info WITH_<VENDOR>=1)
   backend_<vendor>_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_<vendor>/path/to/lib.so
   backend_<vendor>_android_target=//mobile_back_<vendor>/path/to:lib.so
   backend_<vendor>_filename=lib

@@ -44,6 +44,13 @@ If you want to test something without spending a lot of time on the benchmark,
 you can use flag `--dart-define=fast-mode=true` to speed up the benchmark.
 You should not evaluate performance when using this flag.
 
+Add `WITH_<VENDOR>=1` to make commands to build the the app with backends.
+For example:
+```bash
+make WITH_QTI=1 WITH_SAMSUNG=1 WITH_PIXEL=1 WITH_MEDIATEK=1 docker/flutter/android/apk
+```
+Some of the backends have additional requirements. See command output for details.
+
 # Android
 
 [comment]: # (Don't remove spaces at the end of lines, they force line breaks)
@@ -65,7 +72,7 @@ Run `make flutter/android/apk` to build APK.
 
 You can build the app using docker.  
 Run `make docker/flutter/android/apk` to build release APK.  
-RUn `make docker/flutter/android/libs` to build just `.so` libs. This command is helpful if you want to build Android version of the app on Windows.
+Run `make docker/flutter/android/libs` to build just `.so` libs. This command is helpful if you want to build Android version of the app on Windows.
 
 if the build fails with `java.io.IOException: Input/output error`, remove file gradle-wrapper.jar:
 ```bash
