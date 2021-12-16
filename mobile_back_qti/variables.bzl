@@ -5,11 +5,13 @@ def _impl(repository_ctx):
         fail("building with SNPE on Windows is not supported")
 
     found = repository_ctx.execute(["find", repository_ctx.attr.workspace_dir + "/mobile_back_qti/", "-maxdepth", "1", "-name", "snpe-*", "-type", "d", "-print", "-quit"])
-    if found.return_code != 0 or found.stdout == "":
+    if found.return_code != 0 or found.stdout == "" or found.stdout == "\n":
         fail("snpe folder is not found in the repo")
+    filepath = found.stdout[:-1]
 
-    sdk_version = found.stdout[found.stdout.rfind("/") + 1:-1]
-    print("Using SNPE: " + sdk_version)  # buildifier: disable=print
+    sdk_version = filepath[found.stdout.rfind("/") + 1:]
+    print("Update SNPE version: " + sdk_version)  # buildifier: disable=print
+    repository_ctx.read(Label("@//:mobile_back_qti/" + sdk_version + "/ReleaseNotes.txt"))
 
     repository_ctx.file("BUILD", "")
     repository_ctx.file(

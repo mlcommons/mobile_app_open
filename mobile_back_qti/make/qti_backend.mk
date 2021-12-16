@@ -15,19 +15,15 @@
 
 ifeq (${WITH_QTI},1)
   $(info WITH_QTI=1)
-  _=$(shell make WITH_QTI=0 qti/ensure-snpe-is-present)
-  ifneq ($(findstring error:,${_}),)
-    $(error $(_))
-  endif
-  local_snpe_sdk_root=$(shell find ./mobile_back_qti/ -maxdepth 1 -name "snpe-*" -print -quit)
-  $(info using snpe $(shell basename ${local_snpe_sdk_root}))
-  snpe_target=$(shell readlink ${local_snpe_sdk_root})
-  ifneq (${snpe_target},) # for non-symlink folders readlink will return empty string
-    backend_qti_docker_args=-v ${snpe_target}:${snpe_target}
+  ifneq (${SNPE_SDK},)
+    backend_qti_android_docker_args=-v "${SNPE_SDK}:/home/mlperf/mobile_app/mobile_back_qti/$(shell basename ${SNPE_SDK})"
+    backend_qti_flutter_docker_args=-v "${SNPE_SDK}:/mnt/project/mobile_back_qti/$(shell basename ${SNPE_SDK})"
   endif
   android_qti_backend_bazel_flag=--//android/java/org/mlperf/inference:with_qti="1"
   backend_qti_lib_copy=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/binary/libqtibackend.so
 
+  local_snpe_sdk_root=$(shell echo mobile_back_qti/snpe-* | awk '{print $$NF}')
+  $(info detected SNPE SDK: ${local_snpe_sdk_root})
   backend_qti_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
     ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libSNPE.so \
     ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libhta.so \
@@ -38,18 +34,3 @@ ifeq (${WITH_QTI},1)
   backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so
   backend_qti_filename=libqtibackend
 endif
-
-.PHONY: qti/ensure-snpe-is-present
-qti/ensure-snpe-is-present:
-	@local_snpe_sdk_root=$$(find ./mobile_back_qti/ -maxdepth 1 -name "snpe-*" -print -quit) && \
-	if [ ! -z "$$local_snpe_sdk_root" ] && [ ! -e "$$local_snpe_sdk_root" ]; then \
-		rm -f $$local_snpe_sdk_root && \
-		local_snpe_sdk_root=$$(find ./mobile_back_qti/ -maxdepth 1 -name "snpe-*" -print -quit); \
-	fi && \
-	if [ -z "$$local_snpe_sdk_root" ]; then \
-		if [ -z "$$SNPE_SDK" ]; then echo "error: SNPE SDK is not found. Define SNPE_SDK env or manually link or copy snpe-<version> folder into mobile_back_qti"; exit 1; fi && \
-		if [ ! -e "$$SNPE_SDK" ]; then echo "error: SNPE_SDK env is invalid: path doesn't exist: $$SNPE_SDK"; exit 1; fi && \
-		if [ "$$SNPE_SDK" = "$${SNPE_SDK#snpe-}" ]; then echo "error: SNPE_SDK env invalid: folder name must start with 'snpe-': $$SNPE_SDK"; exit 1; fi && \
-		snpe_version=$$(basename $$SNPE_SDK) && \
-		ln -s $$SNPE_SDK ./mobile_back_qti/$$snpe_version; \
-	fi

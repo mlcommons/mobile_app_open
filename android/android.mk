@@ -27,7 +27,7 @@ android_common_docker_flags1= \
 		${proxy_docker_args} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
-		${backend_qti_docker_args} \
+		${backend_qti_android_docker_args} \
 		-w /home/mlperf/mobile_app \
 		-u `id -u`:`id -g` \
 		mlcommons/mlperf_mobile_android_builder bazel-3.7.2
