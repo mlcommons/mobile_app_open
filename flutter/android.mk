@@ -71,7 +71,7 @@ flutter/android/test_apk: flutter/android/apk
 .PHONY: flutter/android/libs
 flutter/android/libs:
 	bazel ${BAZEL_ARGS_GLOBAL} build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
-		--config=android_arm64 -c opt \
+		--config=android_arm64 \
 		${backend_tflite_android_target} \
 		${backend_mediatek_android_target} \
 		${backend_pixel_android_target} \

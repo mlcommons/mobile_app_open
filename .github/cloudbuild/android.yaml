@@ -64,7 +64,6 @@ steps:
     bazel-3.7.2 build \
       --remote_cache=https://storage.googleapis.com/$_BAZEL_CACHE_BUCKET \
       --google_default_credentials \
-      -c opt \
       --config android_arm64 \
       //android/java/org/mlperf/inference:mlperf_app //android/androidTest:mlperf_test_app
     # artifacts can not be uploaded from a symlinked directory, like bazel-bin
