@@ -78,14 +78,17 @@ flutter/android/libs:
 		${backend_qti_android_target} \
 		${backend_samsung_android_target} \
 		//flutter/cpp/flutter:libbackendbridge.so
+	rm -rf flutter/android/app/src/main/jniLibs/arm64-v8a
 	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
-	cp -f --target-directory flutter/android/app/src/main/jniLibs/arm64-v8a \
+	# macos doesn't support --target-directory flag
+	cp -f \
 		${backend_tflite_android_files} \
 		${backend_mediatek_android_files} \
 		${backend_pixel_android_files} \
 		${backend_qti_android_files} \
 		${backend_samsung_android_files} \
-		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/libbackendbridge.so
+		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/libbackendbridge.so \
+		flutter/android/app/src/main/jniLibs/arm64-v8a
 
 .PHONY: docker/flutter/android/libs
 docker/flutter/android/libs: flutter/android/docker/image
