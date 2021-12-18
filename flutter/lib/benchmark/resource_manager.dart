@@ -30,15 +30,18 @@ class BatchPreset {
 
 class ResourceManager {
   static const _zipPattern = '.zip';
-  static const _systemPathPattern = '/sdcard/mlperf_datasets';
+  static const _applicationDirectoryPrefix = 'app://';
   static const _configurationsFileName = 'benchmarksConfigurations.json';
+  static const _jsonResultFileName = 'result.json';
+  static const _loadedResourcesDirName = 'loaded_resources';
 
   final VoidCallback onUpdate;
   final HttpClient _httpClient = HttpClient();
   final BenchmarksConfiguration defaultBenchmarksConfiguration =
       BenchmarksConfiguration(
     'default',
-    'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v2.pbtxt',
+    // [anh] TODO: Replace this temp URL before merge PR
+    'https://www.dropbox.com/s/kx3qbe524oj95g1/171_tasks_v3.pbtxt?dl=1',
   );
 
   Map<String, String> _resourcesMap = {};
@@ -48,7 +51,6 @@ class ResourceManager {
 
   late final String applicationDirectory;
   late final String loadedResourcesDir;
-  late final String externalResourcesDir;
   late final String _tmpDirectory;
   late final String _jsonResultPath;
 
@@ -65,10 +67,9 @@ class ResourceManager {
   String get(String uri) {
     if (uri.isEmpty) return '';
 
-    if (uri.startsWith(_systemPathPattern)) {
+    if (uri.startsWith(_applicationDirectoryPrefix)) {
       final resourceSystemPath =
-          uri.replaceFirst(_systemPathPattern, externalResourcesDir);
-
+          uri.replaceFirst(_applicationDirectoryPrefix, applicationDirectory);
       return resourceSystemPath;
     }
 
@@ -129,13 +130,11 @@ class ResourceManager {
   Future<void> initSystemPaths() async {
     applicationDirectory = await getApplicationDirectory();
 
-    loadedResourcesDir = '$applicationDirectory/loaded_resources';
-    externalResourcesDir = '$applicationDirectory/external_resources';
+    loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
     _tmpDirectory = (await getTemporaryDirectory()).path;
-    _jsonResultPath = '$applicationDirectory/result.json';
+    _jsonResultPath = '$applicationDirectory/$_jsonResultFileName';
 
     await Directory(loadedResourcesDir).create();
-    await Directory(externalResourcesDir).create();
   }
 
   Future<void> writeToJsonResult(List<Map<String, dynamic>> content) async {
@@ -224,7 +223,7 @@ class ResourceManager {
     onUpdate();
 
     for (final resource in _resources) {
-      if (resource.startsWith(_systemPathPattern)) continue;
+      if (resource.startsWith(_applicationDirectoryPrefix)) continue;
       if (_resourcesMap.containsKey(resource)) continue;
       if (resourcesFromInternet.contains(resource)) continue;
 
