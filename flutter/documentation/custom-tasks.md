@@ -32,18 +32,18 @@ File will be automatically downloaded.
 2. URL of a .zip archive  
 Archive will be automatically downloaded and unzipped.
 3. External resource  
-You can specify a path starting with `/sdcard/mlperf_datasets/`.  
-For example: `/sdcard/mlperf_datasets/some/folders/test.txt`.  
-The app will expect to find a file with path `some/folders/test.txt`
-relative to the external resources directory.  
-Location of the external resources directory is platform dependent.
+You can specify a path starting with `app://`.  
+For example: `app:///mlperf_datasets/some/folders/test.txt` (note the 3 slashes).  
+The app will expect to find a file with path `mlperf_datasets/some/folders/test.txt`
+relative to the application root directory.  
+Location of the application root directory is platform dependent.
+On iOS it will be: `MLPerf/`. On Android it will be `/Android/data/org.mlcommons.android.mlperfbench/files/`
 
 # Using external resources on an iPhone
 
 On iOS an application resource folder can be found in `On My iPhone` -> `<app name>`.
-The `external_resources` folder corresponds to the `mlperf_datasets` folder in path specified in `tasks.pbtxt`.
-So, if you have `/sdcard/mlperf_datasets/some/folders/test.txt` path in your config file,
-then the path on your iPhone would be: `MLPerf/external_resources/some/folders/test.txt`.
+So, if you have `app:///mlperf_datasets/some/folders/test.txt` path in your config file,
+then the path on your iPhone would be: `MLPerf/mlperf_datasets/some/folders/test.txt`.
 
 Note, that iPhone's `Files` app has issues with moving folders with big number of files into application folders.
 So if you have an archive with big dataset and want to place it in the app resources folder,
@@ -63,6 +63,6 @@ On Android 11, the folder `/Android/data/` is inaccessible using the default Fil
 It stills accessible through 3rd party File Manager apps, though. 
 Or using a File Manager on a desktop computer and access the files via USB also works.
 
-So, if you have `/sdcard/mlperf_datasets/some/folders/test.txt` path in your config file,
+So, if you have `app:///mlperf_datasets/some/folders/test.txt` path in your config file,
 then the path on your Android phone would be:
-`/Android/data/org.mlcommons.android.mlperfbench/files/external_resources/some/folders/test.txt`.
+`/Android/data/org.mlcommons.android.mlperfbench/files/mlperf_datasets/some/folders/test.txt`.
