@@ -150,8 +150,8 @@ ${BUILDDIR}/output/state/coco_calibration.stamp: ${BUILDDIR}/output/state/coco_v
 	touch $@
 
 # imagenet
-${BUILDDIR}/downloads/imagenet/LSVRC2012_img_val.tar:
-	# Manually copy LSVRC2012_img_val.tar to $@
+${BUILDDIR}/downloads/imagenet/ILSVRC2012_img_val.tar:
+	# Manually copy ILSVRC2012_img_val.tar to $@
 	false
 
 ${BUILDDIR}/downloads/imagenet/cal_image_list_option_1.txt:
@@ -159,12 +159,12 @@ ${BUILDDIR}/downloads/imagenet/cal_image_list_option_1.txt:
 	curl -o $@ -L https://raw.githubusercontent.com/mlperf/inference/master/calibration/ImageNet/cal_image_list_option_1.txt
 
 ${BUILDDIR}/output/state/imagenet.stamp: \
-		${BUILDDIR}/downloads/imagenet/LSVRC2012_img_val.tar \
+		${BUILDDIR}/downloads/imagenet/ILSVRC2012_img_val.tar \
 		${BUILDDIR}/downloads/imagenet/cal_image_list_option_1.txt
 	# Extracting Imagenet images
 	rm -rf ${BUILDDIR}/output/mlperf_datasets/imagenet ${BUILDDIR}/output/imagenet
 	mkdir -p ${BUILDDIR}/output/mlperf_datasets/imagenet/img
-	(cd ${BUILDDIR}/output/mlperf_datasets/imagenet/img && tar xf ${BUILDDIR}/downloads/imagenet/LSVRC2012_img_val.tar)
+	(cd ${BUILDDIR}/output/mlperf_datasets/imagenet/img && tar xf ${BUILDDIR}/downloads/imagenet/ILSVRC2012_img_val.tar)
 	touch $@
 
 # No preprocessing is applied to the calibration images
@@ -182,7 +182,7 @@ ${BUILDDIR}/downloads/mobilebert.tar.gz:
 	curl -o $@ -L https://storage.googleapis.com/cloud-tpu-checkpoints/mobilebert/uncased_L-24_H-128_B-512_A-4_F-4_OPT.tar.gz
 
 ${BUILDDIR}/downloads/mobilebert/.stamp: ${BUILDDIR}/downloads/mobilebert.tar.gz
-	(cd ${BUILDDIR}/downloads/ && tar -xvf $@)
+	(cd ${BUILDDIR}/downloads/ && tar -xvf $<)
 	chmod 777 -R ${BUILDDIR}/downloads/mobilebert
 	touch $@
 

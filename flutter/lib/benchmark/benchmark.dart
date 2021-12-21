@@ -403,7 +403,7 @@ class BenchmarkState extends ChangeNotifier {
         return null;
       }
     } else {
-      configFile = File('${resourceManager.externalResourcesDir}/$path');
+      configFile = File('${resourceManager.applicationDirectory}/$path');
 
       if (!await configFile.exists()) return null;
     }
