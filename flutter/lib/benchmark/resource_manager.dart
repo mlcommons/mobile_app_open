@@ -40,8 +40,7 @@ class ResourceManager {
   final BenchmarksConfiguration defaultBenchmarksConfiguration =
       BenchmarksConfiguration(
     'default',
-    // [anh] TODO: Replace this temp URL before merge PR
-    'https://www.dropbox.com/s/kx3qbe524oj95g1/171_tasks_v3.pbtxt?dl=1',
+    'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v3.pbtxt',
   );
 
   Map<String, String> _resourcesMap = {};
