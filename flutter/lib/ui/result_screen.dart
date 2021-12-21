@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mlcommons_ios_app/ui/confirm_dialog.dart';
 
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
@@ -322,12 +323,26 @@ class _ResultScreenState extends State<ResultScreen>
           child: TextButton(
             style: buttonStyle,
             onPressed: () async {
-              final errors = await state.validateBenchmark(stringResources);
-              if (errors.isEmpty) {
-                state.runBenchmarks();
-              } else {
-                await showErrorDialog(context, errors);
+              final wrongPathError =
+                  await state.validateExternalResourcesDirectory(
+                      stringResources.incorrectDatasetsPath);
+              if (wrongPathError.isNotEmpty) {
+                await showErrorDialog(context, [wrongPathError]);
+                return;
               }
+              final offlineError = await state.validateOfflineMode(
+                  stringResources.warningOfflineModeEnabled);
+              if (offlineError.isNotEmpty) {
+                switch (await showConfirmDialog(context, offlineError)) {
+                  case ConfirmDialogAction.ok:
+                    break;
+                  case ConfirmDialogAction.cancel:
+                    return;
+                  default:
+                    break;
+                }
+              }
+              state.runBenchmarks();
             },
             child: Padding(
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),

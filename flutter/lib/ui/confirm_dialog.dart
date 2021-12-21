@@ -28,7 +28,7 @@ Future<ConfirmDialogAction?> showConfirmDialog(
       return AlertDialog(
         backgroundColor: Colors.white,
         title: Text(stringResources.confirmDialogTitle),
-        content: Text(message),
+        content: SingleChildScrollView(child: Text(message)),
         actions: [cancelButton, okButton],
       );
     },
