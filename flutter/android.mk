@@ -16,26 +16,30 @@
 .PHONY: flutter/android
 flutter/android: flutter/android/libs flutter/prepare-flutter
 
+flutter_docker_postfix=$(shell id -u)
 .PHONY: flutter/android/docker/image
-flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android.stamp
-
-output/docker/mlperf_mobile_flutter_android.stamp: flutter/android/docker/Dockerfile
+flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp
+output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp: flutter/android/docker/Dockerfile
 	docker image build -t mlcommons/mlperf_mobile_flutter flutter/android/docker
-	docker volume create mlperf-mobile-flutter-cache-bazel-`id -u`
-	docker volume create mlperf-mobile-flutter-cache-workdir-`id -u`
 	mkdir -p output/docker
 	touch $@
 
+# you can set env CONNECT_TTY_TO_DOCKER=0 to run commands in systems without tty, like jenkins
+ifneq (${CONNECT_TTY_TO_DOCKER},0)
+flutter_docker_tty_arg=-it
+endif
+
 flutter_common_docker_flags= \
 		--rm \
-		-it \
+		${flutter_docker_tty_arg} \
+		--init \
 		--user `id -u`:`id -g` \
 		--env USER=mlperf \
 		-v $(CURDIR):/mnt/project \
 		--workdir /mnt/project \
 		-v /mnt/project/flutter/build \
-		-v mlperf-mobile-flutter-cache-workdir-`id -u`:/image-workdir/.cache \
-		-v mlperf-mobile-flutter-cache-bazel-`id -u`:/mnt/cache \
+		-v mlperf-mobile-flutter-cache-workdir-${flutter_docker_postfix}:/image-workdir/.cache \
+		-v mlperf-mobile-flutter-cache-bazel-${flutter_docker_postfix}:/mnt/cache \
 		--env WITH_TFLITE=${WITH_TFLITE} \
 		--env WITH_QTI=${WITH_QTI} \
 		--env WITH_SAMSUNG=${WITH_SAMSUNG} \

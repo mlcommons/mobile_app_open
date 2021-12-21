@@ -22,8 +22,9 @@ output/android_docker.stamp: android/docker/mlperf_mobile/Dockerfile
 	touch $@
 
 android_common_docker_flags1= \
-		-it \
 		-e USER=mlperf \
+		--rm \
+		--init \
 		${proxy_docker_args} \
 		-v $(CURDIR):/home/mlperf/mobile_app \
 		-v $(CURDIR)/output/home/mlperf/cache:/home/mlperf/cache \
