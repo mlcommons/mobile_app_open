@@ -267,7 +267,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
       // to handle it.
       //
       // When batch_size > 1 and divisible by shards_num, we have
-      //   backend_data->real_batch_size = 
+      //   backend_data->real_batch_size =
       //     configs->batch_size / backend_data->shards_num;
       // which is not what we want. E.g., for shards_num = 2 and
       // batch_size = 2, then real_batch_size = 1. We still want to
