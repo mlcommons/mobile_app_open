@@ -346,6 +346,7 @@ class BenchmarkState extends ChangeNotifier {
     final result = BenchmarkState._(store, await BackendBridge.create());
 
     await result.resourceManager.initSystemPaths();
+    await result.resourceManager.createConfigurationFile();
     await result.resourceManager.loadBatchPresets();
     final configFile = await result.handleChosenConfiguration(store: store);
     await result.loadResources(configFile!);
