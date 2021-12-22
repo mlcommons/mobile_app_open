@@ -243,11 +243,11 @@ class BenchmarkState extends ChangeNotifier {
       if (isInternetResource(modelPath)) {
         errors.add(modelPath);
       }
-      final testDataPath = job.dataset.groundtruthSrc;
+      final testDataPath = job.dataset.path;
       if (isInternetResource(testDataPath)) {
         errors.add(testDataPath);
       }
-      final groundtruthDataPath = job.dataset.path;
+      final groundtruthDataPath = job.dataset.groundtruthSrc;
       if (isInternetResource(groundtruthDataPath)) {
         errors.add(groundtruthDataPath);
       }
