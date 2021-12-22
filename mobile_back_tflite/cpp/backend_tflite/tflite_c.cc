@@ -260,7 +260,19 @@ mlperf_backend_ptr_t mlperf_backend_create(
     } else if (strcmp(configs->accelerator, "neuron") == 0) {
       // The kOptimizationBatchProcessor doesn't work yet.
       // Use NNAPI instead.
-      if (configs->batch_size != 1) {
+      //
+      // Here we use the batch size of the task to check if this
+      // is for offline/batch scenario, if batch size is not
+      // larger than 1, assume it's offline and use NNAPI delegate
+      // to handle it.
+      //
+      // When batch_size > 1 and divisible by shards_num, we have
+      //   backend_data->real_batch_size =
+      //     configs->batch_size / backend_data->shards_num;
+      // which is not what we want. E.g., for shards_num = 2 and
+      // batch_size = 2, then real_batch_size = 1. We still want to
+      // use NNAPI delegate for this case.
+      if (configs->batch_size > 1) {
         auto options = tflite::StatefulNnApiDelegate::Options();
         options.allow_fp16 = true;
         options.disallow_nnapi_cpu = true;
