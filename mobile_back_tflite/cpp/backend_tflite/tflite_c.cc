@@ -260,6 +260,11 @@ mlperf_backend_ptr_t mlperf_backend_create(
     } else if (strcmp(configs->accelerator, "neuron") == 0) {
       // The kOptimizationBatchProcessor doesn't work yet.
       // Use NNAPI instead.
+      //
+      // Here we use the batch size of the task to check if this
+      // is for offline/batch scenario, if batch size is not
+      // larger than 1, assume it's offline and use NNAPI delegate
+      // to handle it.
       if (configs->batch_size > 1) {
         auto options = tflite::StatefulNnApiDelegate::Options();
         options.allow_fp16 = true;
