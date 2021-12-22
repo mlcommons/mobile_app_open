@@ -18,12 +18,14 @@ The `benchmarksConfigurations.json` looks like this:
 ```json
 {
    "default":"https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v2.pbtxt",
-   "otherName":"/sdcard/location/to/tasks.pbtxt" 
+   "otherName":"app:///path/to/custom_tasks.pbtxt" 
 }
 ```
 where the `key` is the name of the configuration and `value` is the path to the configuration file.
+**Note**: Currently the app can only read files stored within the app directory. 
+See the next sections for more details on this.
 
-`tasks.pbtxt` file is a resource.
+The `tasks.pbtxt` file is a text file in [protobuf](https://developers.google.com/protocol-buffers) format.
 See [Resources in the tasks.pbtxt](#resources-in-the-taskspbtxt) block
 for details on different ways you can specify resources.
 
