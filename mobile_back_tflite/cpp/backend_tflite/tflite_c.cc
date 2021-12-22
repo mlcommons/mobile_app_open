@@ -260,7 +260,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
     } else if (strcmp(configs->accelerator, "neuron") == 0) {
       // The kOptimizationBatchProcessor doesn't work yet.
       // Use NNAPI instead.
-      if (configs->batch_size != 1) {
+      if (configs->batch_size > 1) {
         auto options = tflite::StatefulNnApiDelegate::Options();
         options.allow_fp16 = true;
         options.disallow_nnapi_cpu = true;
