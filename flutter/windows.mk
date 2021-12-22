@@ -18,13 +18,16 @@ debug_flags_windows=-c dbg --copt /Od --copt /Z7 --linkopt -debug
 .PHONY: flutter/windows
 flutter/windows: flutter/windows/libs flutter/prepare-flutter
 
+flutter_windows_libs_folder=flutter/windows/libs
 .PHONY: flutter/windows/libs
 flutter/windows/libs:
 	bazel build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
 		--config=windows \
 		${backend_tflite_windows_target} \
 		//flutter/cpp/flutter:backend_bridge.dll
-	mkdir -p flutter/windows/libs
-	cp -f --target-directory flutter/windows/libs \
+	rm -rf ${flutter_windows_libs_folder}
+	mkdir -p ${flutter_windows_libs_folder}
+	cp -f --target-directory ${flutter_windows_libs_folder} \
 		${backend_tflite_windows_files} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/backend_bridge.dll
+	chmod 777 --recursive ${flutter_windows_libs_folder}

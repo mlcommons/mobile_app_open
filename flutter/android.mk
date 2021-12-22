@@ -72,6 +72,7 @@ flutter/android/test_apk: flutter/android/apk
 	cp -f flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk output/flutter/android/test-helper.apk
 	cp -f flutter/build/app/outputs/apk/debug/app-debug.apk output/flutter/android/test.apk
 
+flutter_android_libs_folder=flutter/android/app/src/main/jniLibs/arm64-v8a
 .PHONY: flutter/android/libs
 flutter/android/libs:
 	bazel ${BAZEL_ARGS_GLOBAL} build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
@@ -82,9 +83,9 @@ flutter/android/libs:
 		${backend_qti_android_target} \
 		${backend_samsung_android_target} \
 		//flutter/cpp/flutter:libbackendbridge.so
-	rm -rf flutter/android/app/src/main/jniLibs/arm64-v8a
-	mkdir -p flutter/android/app/src/main/jniLibs/arm64-v8a
-	# macos doesn't support --target-directory flag
+	rm -rf ${flutter_android_libs_folder}
+	mkdir -p ${flutter_android_libs_folder}
+	@# macos doesn't support --target-directory flag
 	cp -f \
 		${backend_tflite_android_files} \
 		${backend_mediatek_android_files} \
@@ -92,7 +93,8 @@ flutter/android/libs:
 		${backend_qti_android_files} \
 		${backend_samsung_android_files} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/libbackendbridge.so \
-		flutter/android/app/src/main/jniLibs/arm64-v8a
+		${flutter_android_libs_folder}
+	chmod 777 --recursive ${flutter_android_libs_folder}
 
 .PHONY: docker/flutter/android/libs
 docker/flutter/android/libs: flutter/android/docker/image
