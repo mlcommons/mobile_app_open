@@ -351,8 +351,7 @@ TfLiteStatus ResizeArgmax_Invoke(TfLiteContext* context, TfLiteNode* node) {
                          output_height, start_row, input->dims->data[2], move,
                          (tflite::Profiler*)context->profiler);
     }
-    cpu_backend_threadpool::Execute(tasks.size(), tasks.data(),
-                                    cpu_backend_context);
+
     std::vector<std::thread> task_thread(thread_count);
     for (int i = 0; i < thread_count; ++i) {
       task_thread[i] = std::thread(TaskFunc, &tasks[i]);
