@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <algorithm>
 #include <memory>
+#include <thread>
 #ifdef __ARM_NEON
 #include <arm_neon.h>
 #endif
@@ -304,6 +305,8 @@ struct ResizeArgmaxTask : cpu_backend_threadpool::Task {
   tflite::Profiler* profiler_;
 };
 
+void TaskFunc(ResizeArgmaxTask* task) { task->Run(); }
+
 TfLiteStatus ResizeArgmax_Invoke(TfLiteContext* context, TfLiteNode* node) {
   const TfLiteTensor* input;
   TF_LITE_ENSURE_OK(context, GetInputSafe(context, node, kInputTensor, &input));
@@ -350,6 +353,13 @@ TfLiteStatus ResizeArgmax_Invoke(TfLiteContext* context, TfLiteNode* node) {
     }
     cpu_backend_threadpool::Execute(tasks.size(), tasks.data(),
                                     cpu_backend_context);
+    std::vector<std::thread> task_thread(thread_count);
+    for (int i = 0; i < thread_count; ++i) {
+      task_thread[i] = std::thread(TaskFunc, &tasks[i]);
+    }
+    for (int i = 0; i < thread_count; ++i) {
+      task_thread[i].join();
+    }
   }
 
   return kTfLiteOk;
