@@ -13,29 +13,16 @@
 # limitations under the License.
 ##########################################################################
 
+.PHONY: flutter/ios
+flutter/ios: flutter/ios/native flutter/prepare-flutter flutter/update-splash-screen
 
-all: android/app
+# BAZEL_OUTPUT_ROOT_ARG is set on our Jenkins CI
+bazel_ios_fw := bazel-bin/flutter/cpp/flutter/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework
+xcode_fw := flutter/ios/Flutter/ios_backend_fw_static.framework
+.PHONY: flutter/ios/native
+flutter/ios/native:
+	@# NOTE: add `--copt -g` for debug info (but the resulting library would be 0.5 GiB)
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} build --config=ios_fat64 -c opt //flutter/cpp/flutter:ios_backend_fw_static
 
-# avaiable backends
-WITH_TFLITE?=1
-WITH_QTI?=0
-WITH_SAMSUNG?=0
-WITH_PIXEL?=0
-WITH_MEDIATEK?=0
-
-include tools/common.mk
-include tools/formatter/format.mk
-
-include mobile_back_tflite/tflite_backend.mk
-include mobile_back_samsung/samsung_backend.mk
-include mobile_back_qti/make/qti_backend.mk
-include mobile_back_qti/make/qti_backend_targets.mk
-include mobile_back_pixel/pixel_backend.mk
-
-include android/android.mk
-include flutter/flutter.mk
-
-.PHONY: clean
-clean:
-	([ -d output/home/mlperf/cache ] && chmod -R +w output/home/mlperf/cache) || true
-	rm -rf output
+	rm -rf ${xcode_fw}
+	cp -a ${bazel_ios_fw} ${xcode_fw}

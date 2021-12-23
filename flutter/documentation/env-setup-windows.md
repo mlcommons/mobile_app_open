@@ -33,7 +33,7 @@ If you installed MSYS2 via Chocolatey, the path would be `C:/tools/msys64/usr/bi
 * Enable Windows support in flutter: `flutter config --enable-windows-desktop`  
 Windows support is still in beta, so it is disabled by default.
 * Turn on the developer mode in Windows settings.
-* * This option should be located in `Update & Security` → `For developers`.
+* * This option should be located in `Update & Security` → `For developers`.
 * * Or you can open this page from command line: `start ms-settings:developers`
 
 **Note**: If you have a WSL distro installed on your PC, you may need to set `BAZEL_SH` enviromnet variable.

@@ -44,10 +44,16 @@ If you want to test something without spending a lot of time on the benchmark,
 you can use flag `--dart-define=fast-mode=true` to speed up the benchmark.
 You should not evaluate performance when using this flag.
 
+Add `WITH_<VENDOR>=1` to make commands to build the the app with backends.
+For example:
+```bash
+make WITH_QTI=1 WITH_SAMSUNG=1 WITH_PIXEL=1 WITH_MEDIATEK=1 docker/flutter/android/apk
+```
+Some of the backends have additional requirements. See command output for details.
+
 # Android
 
 [comment]: # (Don't remove spaces at the end of lines, they force line breaks)
-[comment]: # (TODO add info about building in Docker after we add commands for it)
 [comment]: # (TODO add information about using Android emulators)
 
 On Linux command `make flutter` builds native libs automatically.  
@@ -64,6 +70,15 @@ See [Windows environment setup guide](./env-setup-windows.md#setting-up-the-envi
 
 Run `make flutter/android/apk` to build APK.
 
+You can build the app using docker.  
+Run `make docker/flutter/android/apk` to build release APK.  
+Run `make docker/flutter/android/libs` to build just `.so` libs. This command is helpful if you want to build Android version of the app on Windows.
+
+if the build fails with `java.io.IOException: Input/output error`, remove file gradle-wrapper.jar:
+```bash
+rm -f flutter/android/gradle/wrapper/gradle-wrapper.jar
+```
+
 # iOS
 
 [comment]: # (Don't remove spaces at the end of lines, they force line breaks)
@@ -74,7 +89,7 @@ See [iOS environment setup guide](./env-setup-ios.md#setting-up-the-environment)
 
 If you want to run the app on a real device, you have to change settings in XCode:
 1. Open `/flutter/ios/Runner.xcworkspace`
-2. Open `Runner` settings → `Signings & Capabilities`.  
+2. Open `Runner` settings → `Signings & Capabilities`.  
 You probably need the Debug mode tab, but you can also change values in other tabs if you need.
 3. Make sure checkbox `Automatically manage signing` is checked.
 4. Set `Team` to your personal team.

@@ -70,8 +70,11 @@ class MiddleInterface {
   static Future<MapEntry<pb.BackendSetting, String>>
       findMatchingBackend() async {
     for (var backendPath in getBackendsList()) {
+      if (backendPath == '') {
+        continue;
+      }
       if (Platform.isWindows) {
-        backendPath = './backends/$backendPath';
+        backendPath = './libs/$backendPath';
       } else if (Platform.isAndroid) {
         backendPath = '$backendPath.so';
       }
@@ -79,6 +82,11 @@ class MiddleInterface {
       if (backendSetting != null) {
         return MapEntry(backendSetting, backendPath);
       }
+    }
+    // try built-in backend
+    final backendSetting = await native_backend.backendMatch('');
+    if (backendSetting != null) {
+      return MapEntry(backendSetting, '');
     }
     throw 'no matching backend found';
   }

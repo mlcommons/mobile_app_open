@@ -12,7 +12,7 @@ part 'backends_list.gen.dart';
 List<String> getBackendsList() {
   if (Platform.isIOS) {
     // on iOS backend is statically linked
-    return [''];
+    return [];
   } else if (Platform.isWindows || Platform.isAndroid) {
     return _backendsList;
   } else {

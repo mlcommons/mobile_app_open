@@ -13,7 +13,7 @@
 # limitations under the License.
 ##########################################################################
 
-load("//mobile_back_qti:variables.bzl", "SNPE_VERSION")
+load("@snpe_version_loader//:snpe_var_def.bzl", "SNPE_VERSION")
 
 package(
     default_visibility = ["//visibility:public"],

@@ -29,7 +29,7 @@ format/line-endings:
 	git ls-files -z | xargs --null ${_start_args} dos2unix --keep-bom --
 
 .PHONY: lint
-lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files lint/line-endings
+lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files
 
 .PHONY: lint/bazel
 lint/bazel:
@@ -73,15 +73,16 @@ output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 		--build-arg UID=`id -u` --build-arg GID=`id -g` \
 		-t mlperf/formatter tools/formatter
 	# need to clean flutter cache first else we will have error when running `dart run import_sorter:main` later in docker
-	cd flutter && flutter clean
+	cd flutter && ${_start_args} flutter clean
 	touch $@
 
 .PHONY: docker/format
 docker/format: output/docker_mlperf_formatter.stamp
-	docker run -it --rm \
+	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
 		-v ~/.pub-cache:/home/mlperf/.pub-cache \
 		-v ~/.config/flutter:/home/mlperf/.config/flutter \
 		-v $(CURDIR):/home/mlperf/mobile_app_open \
 		-w /home/mlperf/mobile_app_open \
 		-u `id -u`:`id -g` \
-		mlperf/formatter bash -c "make format"
+		mlperf/formatter \
+		make format

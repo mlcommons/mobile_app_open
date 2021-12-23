@@ -49,12 +49,15 @@ Include a license at the top of new files.
 
 The code was originally contributed by Google so it conforms to the
 [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) and
-[Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
+[Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).  
+For makefiles we follow the [standard makefile code-style](https://style-guides.readthedocs.io/en/latest/makefile.html).  
+We use the default code style in bazel and dart files, enforced by `buildifier` and `dart format` respectively.
 
-From the root directory you can run the command `make format` to format all files or `make format/<bazel|java|clang|dart>` to format only certain files in the directory.
+From the root directory you can run the command `make format`
+to format all files or `make format/<bazel|java|clang|dart>` to format only certain files in the directory.
 See [format.mk](tools/formatter/format.mk) for more commands.
 
-Running `make format` requires you have all the tools installed locally on your computer.
+Running `make format` requires you to have all the tools installed locally on your computer.
 For your convenience you can use a Docker image to format code files by running `make docker/format`.
 Note: if you have an error related to flutter when running `make docker/format`, 
 try to run `cd flutter && flutter clean` to clear flutter cache, then try `make docker/format` again.

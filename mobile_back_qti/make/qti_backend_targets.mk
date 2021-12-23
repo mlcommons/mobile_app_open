@@ -19,7 +19,7 @@ libqtibackend: android/builder-image
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	mkdir -p output/mobile_back_qti
 	docker run \
-		${ANDROID_COMMON_DOCKER_FLAGS} \
+		${android_common_docker_flags} \
 		--config android_arm64 //mobile_back_qti:qtibackend
 	cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/mobile_back_qti/libtqtibackend.so
 
@@ -30,7 +30,7 @@ output/mobile_back_qti/test/allocator_test: docker_image
 	mkdir -p output/home/mlperf/cache && chmod 777 output/home/mlperf/cache
 	mkdir -p output/mobile_back_qti/test
 	docker run \
-		${ANDROID_NATIVE_DOCKER_FLAGS} --experimental_repo_remote_exec \
+		${android_native_docker_flags} --experimental_repo_remote_exec \
 		--config=asan \
 		//mobile_back_qti/cpp/backend_qti:allocator_test
 	cp output/`readlink bazel-out`/k8-opt/bin/mobile_back_qti/cpp/backend_qti/allocator_test $@

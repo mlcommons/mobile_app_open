@@ -14,12 +14,12 @@
 ##########################################################################
 
 ifeq (${USE_PROXY_WORKAROUND},1)
-  export PROXY_WORKAROUND1=\
+  proxy_docker_args=\
 	-v /etc/ssl/certs:/etc/ssl/certs \
 	-v /usr/share/ca-certificates:/usr/share/ca-certificates \
 	-v /usr/share/ca-certificates-java:/usr/share/ca-certificates-java
 
-  export PROXY_WORKAROUND2=--host_jvm_args -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+  proxy_bazel_args=--host_jvm_args -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
 endif
 
 ifeq (${OS},Windows_NT)
@@ -28,3 +28,8 @@ _start_args=powershell -Command
 else
 _start_args=
 endif
+
+# We define default value here, but user can overwrite it.
+# Particularly, we have to overwrite it when building inside Windows container
+BAZEL_LINKS_PREFIX=bazel-
+bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_PREFIX} --experimental_no_product_name_out_symlink

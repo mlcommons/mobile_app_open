@@ -251,7 +251,7 @@ class _Native {
 
   static DynamicLibrary _getBackendBridgeLibraryHandle() {
     if (Platform.isWindows) {
-      return DynamicLibrary.open('./backend_bridge.dll');
+      return DynamicLibrary.open('./libs/backend_bridge.dll');
     } else if (Platform.isIOS) {
       return DynamicLibrary.process();
     } else if (Platform.isAndroid) {
