@@ -394,8 +394,8 @@ class BenchmarkState extends ChangeNotifier {
         return null;
       }
     } else {
-      configFile = File('${resourceManager.applicationDirectory}/$path');
-
+      final parsedPath = resourceManager.get(path);
+      configFile = File(parsedPath);
       if (!await configFile.exists()) return null;
     }
 
