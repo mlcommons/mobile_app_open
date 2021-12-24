@@ -7,7 +7,7 @@ import 'package:ffi/ffi.dart';
 import 'package:mlcommons_ios_app/protos/backend_setting.pb.dart' as pb;
 import 'handle.dart';
 
-class _BackendMatchResult extends Struct {
+class _RunOut extends Struct {
   @Int32()
   external int matches;
   external Pointer<Utf8> error_message;
@@ -17,59 +17,63 @@ class _BackendMatchResult extends Struct {
   external Pointer<Uint8> pbdata;
 }
 
-typedef _BackendMatch = Pointer<_BackendMatchResult> Function(
+const _runName = 'dart_ffi_backend_match';
+const _freeName = 'dart_ffi_backend_match_free';
+
+typedef _Run = Pointer<_RunOut> Function(
     Pointer<Utf8> lib_path, Pointer<Utf8> manufacturer, Pointer<Utf8> model);
+final _run = getBridgeHandle().lookupFunction<_Run, _Run>(_runName);
 
-typedef _BackendMatchFree1 = Void Function(Pointer<_BackendMatchResult>);
-typedef _BackendMatchFree2 = void Function(Pointer<_BackendMatchResult>);
+typedef _Free1 = Void Function(Pointer<_RunOut>);
+typedef _Free2 = void Function(Pointer<_RunOut>);
+final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 
-final _backend_match = getBridgeHandle()
-    .lookupFunction<_BackendMatch, _BackendMatch>('dart_ffi_backend_match');
-final _backend_match_free = getBridgeHandle()
-    .lookupFunction<_BackendMatchFree1, _BackendMatchFree2>(
-        'dart_ffi_backend_match_free');
+late final Pointer<Utf8> _manufacturerUtf8;
+late final Pointer<Utf8> _modelUtf8;
 
-Future<pb.BackendSetting?> backendMatch(String lib_path) async {
-  Pointer<Utf8> model;
-  Pointer<Utf8> manufacturer;
-
+Future<void> initDeviceInfo() async {
+  String model;
+  String manufacturer;
   if (Platform.isIOS) {
     final deviceInfo = DeviceInfoPlugin();
     final iosInfo = await deviceInfo.iosInfo;
 
-    manufacturer = 'Apple'.toNativeUtf8();
-    model = iosInfo.name.toNativeUtf8();
+    manufacturer = 'Apple';
+    model = iosInfo.name;
   } else if (Platform.isWindows) {
-    manufacturer = 'Microsoft'.toNativeUtf8();
-    model = 'Unknown PC'.toNativeUtf8();
+    manufacturer = 'Microsoft';
+    model = 'Unknown PC';
   } else if (Platform.isAndroid) {
     final deviceInfo = await DeviceInfoPlugin().androidInfo;
 
-    manufacturer = deviceInfo.manufacturer.toNativeUtf8();
-    model = deviceInfo.model.toNativeUtf8();
+    manufacturer = deviceInfo.manufacturer;
+    model = deviceInfo.model;
   } else {
     throw 'Could not define platform';
   }
+  _manufacturerUtf8 = manufacturer.toNativeUtf8();
+  _modelUtf8 = model.toNativeUtf8();
+}
 
-  final lib_path_ = lib_path.toNativeUtf8();
-  final matchResult = _backend_match(lib_path_, manufacturer, model);
-  malloc.free(lib_path_);
-  malloc.free(manufacturer);
-  malloc.free(model);
+pb.BackendSetting? backendMatch(String libPath) {
+  final libPathUtf8 = libPath.toNativeUtf8();
+  final runOut = _run(libPathUtf8, _manufacturerUtf8, _modelUtf8);
+  malloc.free(libPathUtf8);
 
-  if (matchResult.address == 0) {
+  if (runOut.address == 0) {
     return null;
+  }
+  if (runOut.ref.matches == 0) {
+    return null;
+  }
+  if (runOut.ref.pbdata.address == 0) {
+    throw '$_runName result: pbdata: nullptr';
   }
 
   try {
-    if (matchResult.ref.matches != 0 && matchResult.ref.pbdata.address != 0) {
-      final view =
-          matchResult.ref.pbdata.asTypedList(matchResult.ref.pbdata_size);
-      return pb.BackendSetting.fromBuffer(view);
-    }
+    final view = runOut.ref.pbdata.asTypedList(runOut.ref.pbdata_size);
+    return pb.BackendSetting.fromBuffer(view);
   } finally {
-    _backend_match_free(matchResult);
+    _free(runOut);
   }
-
-  return null;
 }

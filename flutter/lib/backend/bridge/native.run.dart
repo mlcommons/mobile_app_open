@@ -5,7 +5,7 @@ import 'package:ffi/ffi.dart';
 import 'package:mlcommons_ios_app/backend/run_settings.dart';
 import 'handle.dart';
 
-class _RunBackend4in extends Struct {
+class _RunIn extends Struct {
   external Pointer<Utf8> backend_model_path;
   external Pointer<Utf8> backend_lib_path;
   external Pointer<Uint8> backend_settings_data;
@@ -71,7 +71,7 @@ class _RunBackend4in extends Struct {
   }
 }
 
-class _RunBackend4out extends Struct {
+class _RunOut extends Struct {
   @Int32()
   external int ok;
   @Float()
@@ -83,50 +83,49 @@ class _RunBackend4out extends Struct {
   external double duration_ms;
 }
 
-class BackendRun4results {
+class RunBenchmarkResult {
   final int ok;
   final double latency;
   final String accuracy;
   final int num_samples;
   final double duration_ms;
 
-  BackendRun4results(
+  RunBenchmarkResult(
       this.ok, this.latency, this.accuracy, this.num_samples, this.duration_ms);
 }
 
-typedef _RunBenchmark = Pointer<_RunBackend4out> Function(
-    Pointer<_RunBackend4in>);
-typedef _RunBenchmarkFree1 = Void Function(Pointer<_RunBackend4out>);
-typedef _RunBenchmarkFree2 = void Function(Pointer<_RunBackend4out>);
+const _runName = 'dart_ffi_run_benchmark';
+const _freeName = 'dart_ffi_run_benchmark_free';
 
-final _dart_ffi_run_benchmark = getBridgeHandle()
-    .lookupFunction<_RunBenchmark, _RunBenchmark>('dart_ffi_run_benchmark');
-final _dart_ffi_run_benchmark_free = getBridgeHandle()
-    .lookupFunction<_RunBenchmarkFree1, _RunBenchmarkFree2>(
-        'dart_ffi_run_benchmark_free');
+typedef _Run = Pointer<_RunOut> Function(Pointer<_RunIn>);
+final _run = getBridgeHandle().lookupFunction<_Run, _Run>(_runName);
 
-BackendRun4results runBenchmark(RunSettings rs) {
-  var backend_in = malloc.allocate<_RunBackend4in>(sizeOf<_RunBackend4in>());
+typedef _Free1 = Void Function(Pointer<_RunOut>);
+typedef _Free2 = void Function(Pointer<_RunOut>);
+final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 
-  backend_in.ref.set(rs);
-  var backend_out = _dart_ffi_run_benchmark(backend_in);
-  backend_in.ref.free();
+RunBenchmarkResult runBenchmark(RunSettings rs) {
+  var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
+  runIn.ref.set(rs);
 
-  if (backend_out.address == 0) {
-    throw '_Native.dart_ffi_run_benchmark failed';
+  var runOut = _run(runIn);
+
+  runIn.ref.free();
+  malloc.free(runIn);
+
+  if (runOut.address == 0) {
+    throw '$_runName result: nullptr';
   }
 
-  var res = BackendRun4results(
-    backend_out.ref.ok,
-    backend_out.ref.latency,
-    backend_out.ref.accuracy.toDartString(),
-    backend_out.ref.num_samples,
-    backend_out.ref.duration_ms,
+  var res = RunBenchmarkResult(
+    runOut.ref.ok,
+    runOut.ref.latency,
+    runOut.ref.accuracy.toDartString(),
+    runOut.ref.num_samples,
+    runOut.ref.duration_ms,
   );
 
-  malloc.free(backend_in);
-
-  _dart_ffi_run_benchmark_free(backend_out);
+  _free(runOut);
 
   return res;
 }

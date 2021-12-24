@@ -5,43 +5,39 @@ import 'package:ffi/ffi.dart';
 import 'package:mlcommons_ios_app/protos/mlperf_task.pb.dart' as pb;
 import 'handle.dart';
 
-class _MLPerfConfigResult extends Struct {
+class _RunOut extends Struct {
   @Int32()
   external int size;
 
   external Pointer<Uint8> data;
 }
 
-typedef _MLPerfConfig = Pointer<_MLPerfConfigResult> Function(
-    Pointer<Utf8> pb_content);
+const _runName = 'dart_ffi_mlperf_config';
+const _freeName = 'dart_ffi_mlperf_config_free';
 
-typedef _MLPerfConfigFree1 = Void Function(Pointer<_MLPerfConfigResult>);
-typedef _MLPerfConfigFree2 = void Function(Pointer<_MLPerfConfigResult>);
+typedef _Run = Pointer<_RunOut> Function(Pointer<Utf8> pb_content);
+final _run = getBridgeHandle().lookupFunction<_Run, _Run>(_runName);
 
-final _mlperf_config = getBridgeHandle()
-    .lookupFunction<_MLPerfConfig, _MLPerfConfig>('dart_ffi_mlperf_config');
-final _mlperf_config_free = getBridgeHandle()
-    .lookupFunction<_MLPerfConfigFree1, _MLPerfConfigFree2>(
-        'dart_ffi_mlperf_config_free');
+typedef _Free1 = Void Function(Pointer<_RunOut>);
+typedef _Free2 = void Function(Pointer<_RunOut>);
+final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 
 pb.MLPerfConfig getMLPerfConfig(String pbtxtContent) {
-  final pbtxtContent_ = pbtxtContent.toNativeUtf8();
-  final pbdata = _mlperf_config(pbtxtContent_);
+  final pbtxtContentUtf8 = pbtxtContent.toNativeUtf8();
+  final runOut = _run(pbtxtContentUtf8);
+  malloc.free(pbtxtContentUtf8);
 
-  pb.MLPerfConfig? config;
+  if (runOut.address == 0) {
+    throw '$_runName result: nullprt';
+  }
+  if (runOut.ref.data.address == 0) {
+    throw '$_runName result: data: nullptr';
+  }
 
   try {
-    if (pbdata.ref.data.address != 0) {
-      final convertedContent = pbdata.ref.data.asTypedList(pbdata.ref.size);
-      config = pb.MLPerfConfig.fromBuffer(convertedContent);
-    }
+    final view = runOut.ref.data.asTypedList(runOut.ref.size);
+    return pb.MLPerfConfig.fromBuffer(view);
   } finally {
-    _mlperf_config_free(pbdata);
-    malloc.free(pbtxtContent_);
+    _free(runOut);
   }
-  if (config == null) {
-    throw 'Could not load content from pbtxt file';
-  }
-
-  return config;
 }
