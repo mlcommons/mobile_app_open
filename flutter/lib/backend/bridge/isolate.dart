@@ -1,21 +1,21 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:mlcommons_ios_app/backend/native.dart' as native_backend;
+import 'package:mlcommons_ios_app/backend/bridge/native.dart' as native_backend;
 import 'package:mlcommons_ios_app/backend/run_settings.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
 
-class BackendBridge {
+class BridgeIsolate {
   late final SendPort _runSendPort;
   Completer<RunResult> _nextResult = Completer();
 
-  BackendBridge._();
+  BridgeIsolate._();
 
-  static Future<BackendBridge> create() async {
+  static Future<BridgeIsolate> create() async {
     final receivePort = ReceivePort();
     await Isolate.spawn(_isolateRun, receivePort.sendPort);
 
-    var res = BackendBridge._();
+    var res = BridgeIsolate._();
 
     var sendPortCompleter = Completer<SendPort>();
 

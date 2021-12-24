@@ -16,9 +16,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
-import 'package:mlcommons_ios_app/backend/bridge.dart';
+import 'package:mlcommons_ios_app/backend/bridge/isolate.dart';
 import 'package:mlcommons_ios_app/backend/list.dart';
-import 'package:mlcommons_ios_app/backend/native.dart' as native_backend;
+import 'package:mlcommons_ios_app/backend/bridge/native.dart' as native_backend;
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
 import 'package:mlcommons_ios_app/benchmark/resource_manager.dart';
 import 'package:mlcommons_ios_app/icons.dart';
@@ -159,7 +159,7 @@ class BenchmarksConfiguration {
 
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
-  final BackendBridge backendBridge;
+  final BridgeIsolate backendBridge;
 
   late final ResourceManager resourceManager;
 
@@ -353,7 +353,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   static Future<BenchmarkState> create(Store store) async {
-    final result = BenchmarkState._(store, await BackendBridge.create());
+    final result = BenchmarkState._(store, await BridgeIsolate.create());
 
     await result.resourceManager.initSystemPaths();
     await result.resourceManager.createConfigurationFile();
@@ -612,7 +612,7 @@ class BenchmarkJob {
   final bool fast;
   final DatasetMode _datasetMode;
   final int threadsNumber;
-  final BackendBridge backend;
+  final BridgeIsolate backend;
   final String backendLibPath;
 
   BenchmarkJob(
