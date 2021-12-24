@@ -52,4 +52,4 @@ app.*.map.json
 /lib/protos
 /lib/localizations
 /output/
-/lib/backend/backends_list.gen.dart
+/lib/backend/list.gen.dart

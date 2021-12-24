@@ -5,10 +5,10 @@ import 'package:flutter/services.dart';
 
 import 'package:device_info/device_info.dart';
 import 'package:ffi/ffi.dart';
+import 'package:mlcommons_ios_app/backend/run_settings.dart';
 
 import 'package:mlcommons_ios_app/protos/backend_setting.pb.dart' as pb;
 import 'package:mlcommons_ios_app/protos/mlperf_task.pb.dart' as pb;
-import 'bridge.dart';
 
 const androidChannel = MethodChannel('org.mlcommons.mlperfbench/android');
 Future<String> getNativeLibraryPath() async {
