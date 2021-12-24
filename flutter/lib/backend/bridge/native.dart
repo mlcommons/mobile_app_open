@@ -30,4 +30,5 @@ DynamicLibrary _getBridgeLibraryHandle() {
     throw 'unsupported platform';
   }
 }
+
 final DynamicLibrary _bridge = _getBridgeLibraryHandle();

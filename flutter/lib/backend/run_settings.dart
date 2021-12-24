@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
