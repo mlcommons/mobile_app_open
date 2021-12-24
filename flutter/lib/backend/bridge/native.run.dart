@@ -94,11 +94,17 @@ typedef _RunBenchmark = Pointer<_RunBackend4out> Function(
 typedef _RunBenchmarkFree1 = Void Function(Pointer<_RunBackend4out>);
 typedef _RunBenchmarkFree2 = void Function(Pointer<_RunBackend4out>);
 
+final _dart_ffi_run_benchmark = _bridge
+    .lookupFunction<_RunBenchmark, _RunBenchmark>('dart_ffi_run_benchmark');
+final _dart_ffi_run_benchmark_free =
+    _bridge.lookupFunction<_RunBenchmarkFree1, _RunBenchmarkFree2>(
+        'dart_ffi_run_benchmark_free');
+
 BackendRun4results runBenchmark(RunSettings rs) {
   var backend_in = malloc.allocate<_RunBackend4in>(sizeOf<_RunBackend4in>());
 
   backend_in.ref.set(rs);
-  var backend_out = _Native.dart_ffi_run_benchmark(backend_in);
+  var backend_out = _dart_ffi_run_benchmark(backend_in);
   backend_in.ref.free();
 
   if (backend_out.address == 0) {
@@ -115,7 +121,7 @@ BackendRun4results runBenchmark(RunSettings rs) {
 
   malloc.free(backend_in);
 
-  _Native.dart_ffi_run_benchmark_free(backend_out);
+  _dart_ffi_run_benchmark_free(backend_out);
 
   return res;
 }

@@ -13,9 +13,15 @@ typedef _MLPerfConfig = Pointer<_MLPerfConfigResult> Function(
 typedef _MLPerfConfigFree1 = Void Function(Pointer<_MLPerfConfigResult>);
 typedef _MLPerfConfigFree2 = void Function(Pointer<_MLPerfConfigResult>);
 
+final _mlperf_config = _bridge
+    .lookupFunction<_MLPerfConfig, _MLPerfConfig>('dart_ffi_mlperf_config');
+final _mlperf_config_free =
+    _bridge.lookupFunction<_MLPerfConfigFree1, _MLPerfConfigFree2>(
+        'dart_ffi_mlperf_config_free');
+
 pb.MLPerfConfig getMLPerfConfig(String pbtxtContent) {
   final pbtxtContent_ = pbtxtContent.toNativeUtf8();
-  final pbdata = _Native.mlperf_config(pbtxtContent_);
+  final pbdata = _mlperf_config(pbtxtContent_);
 
   pb.MLPerfConfig? config;
 
@@ -25,7 +31,7 @@ pb.MLPerfConfig getMLPerfConfig(String pbtxtContent) {
       config = pb.MLPerfConfig.fromBuffer(convertedContent);
     }
   } finally {
-    _Native.mlperf_config_free(pbdata);
+    _mlperf_config_free(pbdata);
     malloc.free(pbtxtContent_);
   }
   if (config == null) {

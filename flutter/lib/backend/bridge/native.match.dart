@@ -16,6 +16,12 @@ typedef _BackendMatch = Pointer<_BackendMatchResult> Function(
 typedef _BackendMatchFree1 = Void Function(Pointer<_BackendMatchResult>);
 typedef _BackendMatchFree2 = void Function(Pointer<_BackendMatchResult>);
 
+final _backend_match = _bridge
+    .lookupFunction<_BackendMatch, _BackendMatch>('dart_ffi_backend_match');
+final _backend_match_free =
+    _bridge.lookupFunction<_BackendMatchFree1, _BackendMatchFree2>(
+        'dart_ffi_backend_match_free');
+
 Future<pb.BackendSetting?> backendMatch(String lib_path) async {
   Pointer<Utf8> model;
   Pointer<Utf8> manufacturer;
@@ -39,7 +45,7 @@ Future<pb.BackendSetting?> backendMatch(String lib_path) async {
   }
 
   final lib_path_ = lib_path.toNativeUtf8();
-  final matchResult = _Native.backend_match(lib_path_, manufacturer, model);
+  final matchResult = _backend_match(lib_path_, manufacturer, model);
   if (matchResult.address == 0) {
     return null;
   }
@@ -53,7 +59,7 @@ Future<pb.BackendSetting?> backendMatch(String lib_path) async {
     malloc.free(lib_path_);
     malloc.free(manufacturer);
     malloc.free(model);
-    _Native.backend_match_free(matchResult);
+    _backend_match_free(matchResult);
   }
 
   return null;
