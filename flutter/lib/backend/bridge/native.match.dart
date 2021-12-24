@@ -46,9 +46,14 @@ Future<pb.BackendSetting?> backendMatch(String lib_path) async {
 
   final lib_path_ = lib_path.toNativeUtf8();
   final matchResult = _backend_match(lib_path_, manufacturer, model);
+  malloc.free(lib_path_);
+  malloc.free(manufacturer);
+  malloc.free(model);
+
   if (matchResult.address == 0) {
     return null;
   }
+
   try {
     if (matchResult.ref.matches != 0 && matchResult.ref.pbdata.address != 0) {
       final view =
@@ -56,9 +61,6 @@ Future<pb.BackendSetting?> backendMatch(String lib_path) async {
       return pb.BackendSetting.fromBuffer(view);
     }
   } finally {
-    malloc.free(lib_path_);
-    malloc.free(manufacturer);
-    malloc.free(model);
     _backend_match_free(matchResult);
   }
 
