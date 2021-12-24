@@ -136,6 +136,17 @@ class ResourceManager {
     await Directory(loadedResourcesDir).create();
   }
 
+  Future<void> createConfigurationFile() async {
+    final file = File('$applicationDirectory/$_configurationsFileName');
+    if (!await file.exists()) {
+      print('Create ' + file.path);
+      var config = <String, String>{
+        defaultBenchmarksConfiguration.name: defaultBenchmarksConfiguration.path
+      };
+      await file.writeAsString(jsonEncode(config));
+    }
+  }
+
   Future<void> writeToJsonResult(List<Map<String, dynamic>> content) async {
     final jsonFile = File(_jsonResultPath);
 
@@ -373,21 +384,20 @@ class ResourceManager {
 
   Future<List<BenchmarksConfiguration>>
       getAvailableBenchmarksConfigurations() async {
+    final benchmarksConfigurations = <BenchmarksConfiguration>[];
     final file = File('$applicationDirectory/$_configurationsFileName');
-    final benchmarksConfigurations = <BenchmarksConfiguration>[
-      defaultBenchmarksConfiguration
-    ];
+    if (!await file.exists()) {
+      await createConfigurationFile();
+    }
+    assert(await file.exists());
 
-    if (await file.exists()) {
-      final content =
-          jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-
-      for (final benchmarksConfigurationContent in content.entries) {
-        final benchmarksConfiguration = BenchmarksConfiguration(
-            benchmarksConfigurationContent.key,
-            benchmarksConfigurationContent.value as String);
-        benchmarksConfigurations.add(benchmarksConfiguration);
-      }
+    final content =
+        jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+    for (final benchmarksConfigurationContent in content.entries) {
+      final benchmarksConfiguration = BenchmarksConfiguration(
+          benchmarksConfigurationContent.key,
+          benchmarksConfigurationContent.value as String);
+      benchmarksConfigurations.add(benchmarksConfiguration);
     }
     return benchmarksConfigurations;
   }

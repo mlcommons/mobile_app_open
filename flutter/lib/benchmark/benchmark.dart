@@ -241,6 +241,33 @@ class BenchmarkState extends ChangeNotifier {
         datasetsError.map((element) => '\n${++index}) $element').join();
   }
 
+  Future<String> validateOfflineMode(String errorDescription) async {
+    if (!_store.offlineMode) {
+      return '';
+    }
+    final errors = <String>[];
+    for (final job in _getBenchmarkJobs()) {
+      final modelPath = job.benchmark.benchmarkSetting.src;
+      if (isInternetResource(modelPath)) {
+        errors.add(modelPath);
+      }
+      final testDataPath = job.dataset.path;
+      if (isInternetResource(testDataPath)) {
+        errors.add(testDataPath);
+      }
+      final groundtruthDataPath = job.dataset.groundtruthSrc;
+      if (isInternetResource(groundtruthDataPath)) {
+        errors.add(groundtruthDataPath);
+      }
+    }
+
+    if (errors.isEmpty) return '';
+
+    var index = 0;
+    return errorDescription +
+        errors.map((element) => '\n${++index}) $element').join();
+  }
+
   Future<void> clearCache() async {
     await resourceManager.deleteLoadedResources([], 0);
     await resourceManager.deleteDefaultBenchmarksConfiguration();
@@ -327,6 +354,7 @@ class BenchmarkState extends ChangeNotifier {
     final result = BenchmarkState._(store, await BackendBridge.create());
 
     await result.resourceManager.initSystemPaths();
+    await result.resourceManager.createConfigurationFile();
     await result.resourceManager.loadBatchPresets();
     final configFile = await result.handleChosenConfiguration(store: store);
     await result.loadResources(configFile!);
@@ -374,8 +402,8 @@ class BenchmarkState extends ChangeNotifier {
         return null;
       }
     } else {
-      configFile = File('${resourceManager.applicationDirectory}/$path');
-
+      final parsedPath = resourceManager.get(path);
+      configFile = File(parsedPath);
       if (!await configFile.exists()) return null;
     }
 

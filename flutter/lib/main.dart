@@ -56,6 +56,8 @@ void autostartHandler(BenchmarkState state, Store store) async {
   if (state.state == BenchmarkStateEnum.waiting) {
     store.submissionMode =
         const bool.fromEnvironment('submission', defaultValue: false);
+    store.offlineMode =
+        const bool.fromEnvironment('offline', defaultValue: false);
     state.runBenchmarks();
     return;
   }

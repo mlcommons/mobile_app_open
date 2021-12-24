@@ -9,13 +9,23 @@ This file describes how to configure the application to use non-default benchmar
 
 # Using custom tasks.pbtxt file
 
-Create file named `benchmarksConfigurations.json`
-and put it into root application directory.
-Add new paths to the file `tasks.pbtxt` in following format:
+When the app starts for the first time, it creates a file named `benchmarksConfigurations.json` 
+in the root application directory.
+Each entry in the `benchmarksConfigurations.json` is the name and location of a configuration file.
+You can have multiple configurations stored in the `benchmarksConfigurations.json` and switch 
+between them in the app settings. 
+The `benchmarksConfigurations.json` looks like this:
+```json
+{
+   "default":"https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v2.pbtxt",
+   "otherName":"app:///path/to/custom_tasks.pbtxt" 
+}
+```
+where the `key` is the name of the configuration and `value` is the path to the configuration file.
+**Note**: Currently the app can only read files stored within the app directory. 
+See the next sections for more details on this.
 
-`${Name of option}: ${path}`
-
-`tasks.pbtxt` file is a resource.
+The `tasks.pbtxt` file is a text file in [protobuf](https://developers.google.com/protocol-buffers) format.
 See [Resources in the tasks.pbtxt](#resources-in-the-taskspbtxt) block
 for details on different ways you can specify resources.
 

@@ -12,6 +12,7 @@ import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
 import 'package:mlcommons_ios_app/store.dart';
 import 'package:mlcommons_ios_app/ui/app_bar.dart';
 import 'package:mlcommons_ios_app/ui/error_dialog.dart';
+import 'package:mlcommons_ios_app/ui/confirm_dialog.dart';
 import 'package:mlcommons_ios_app/ui/list_of_benchmark_items.dart';
 import 'package:mlcommons_ios_app/ui/page_constraints.dart';
 import 'package:mlcommons_ios_app/ui/result_circle.dart';
@@ -322,14 +323,26 @@ class _ResultScreenState extends State<ResultScreen>
           child: TextButton(
             style: buttonStyle,
             onPressed: () async {
-              final error = await state.validateExternalResourcesDirectory(
-                  stringResources.incorrectDatasetsPath);
-
-              if (error.isEmpty) {
-                state.runBenchmarks();
-              } else {
-                await showErrorDialog(context, <String>[error]);
+              final wrongPathError =
+                  await state.validateExternalResourcesDirectory(
+                      stringResources.incorrectDatasetsPath);
+              if (wrongPathError.isNotEmpty) {
+                await showErrorDialog(context, [wrongPathError]);
+                return;
               }
+              final offlineError = await state.validateOfflineMode(
+                  stringResources.warningOfflineModeEnabled);
+              if (offlineError.isNotEmpty) {
+                switch (await showConfirmDialog(context, offlineError)) {
+                  case ConfirmDialogAction.ok:
+                    break;
+                  case ConfirmDialogAction.cancel:
+                    return;
+                  default:
+                    break;
+                }
+              }
+              state.runBenchmarks();
             },
             child: Padding(
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
