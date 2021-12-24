@@ -1,4 +1,9 @@
-part of 'native.dart';
+import 'dart:ffi';
+
+import 'package:ffi/ffi.dart';
+
+import 'package:mlcommons_ios_app/protos/mlperf_task.pb.dart' as pb;
+import 'handle.dart';
 
 class _MLPerfConfigResult extends Struct {
   @Int32()
@@ -13,10 +18,10 @@ typedef _MLPerfConfig = Pointer<_MLPerfConfigResult> Function(
 typedef _MLPerfConfigFree1 = Void Function(Pointer<_MLPerfConfigResult>);
 typedef _MLPerfConfigFree2 = void Function(Pointer<_MLPerfConfigResult>);
 
-final _mlperf_config = _bridge
+final _mlperf_config = getBridgeHandle()
     .lookupFunction<_MLPerfConfig, _MLPerfConfig>('dart_ffi_mlperf_config');
-final _mlperf_config_free =
-    _bridge.lookupFunction<_MLPerfConfigFree1, _MLPerfConfigFree2>(
+final _mlperf_config_free = getBridgeHandle()
+    .lookupFunction<_MLPerfConfigFree1, _MLPerfConfigFree2>(
         'dart_ffi_mlperf_config_free');
 
 pb.MLPerfConfig getMLPerfConfig(String pbtxtContent) {

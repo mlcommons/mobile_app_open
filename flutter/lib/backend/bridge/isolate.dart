@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:mlcommons_ios_app/backend/bridge/native.dart' as native_backend;
+import 'package:mlcommons_ios_app/backend/bridge/native.run.dart';
 import 'package:mlcommons_ios_app/backend/run_settings.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
 
@@ -47,7 +47,7 @@ class BridgeIsolate {
     var port = ReceivePort();
     sendPort.send(port.sendPort);
     await for (var rs in port.cast<RunSettings>()) {
-      var r = native_backend.runBenchmark(rs);
+      var r = runBenchmark(rs);
       sendPort.send(RunResult(
           rs.benchmark_id,
           r.accuracy,

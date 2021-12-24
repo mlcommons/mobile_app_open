@@ -1,4 +1,11 @@
-part of 'native.dart';
+import 'dart:ffi';
+import 'dart:io' show Platform;
+
+import 'package:device_info/device_info.dart';
+import 'package:ffi/ffi.dart';
+
+import 'package:mlcommons_ios_app/protos/backend_setting.pb.dart' as pb;
+import 'handle.dart';
 
 class _BackendMatchResult extends Struct {
   @Int32()
@@ -16,10 +23,10 @@ typedef _BackendMatch = Pointer<_BackendMatchResult> Function(
 typedef _BackendMatchFree1 = Void Function(Pointer<_BackendMatchResult>);
 typedef _BackendMatchFree2 = void Function(Pointer<_BackendMatchResult>);
 
-final _backend_match = _bridge
+final _backend_match = getBridgeHandle()
     .lookupFunction<_BackendMatch, _BackendMatch>('dart_ffi_backend_match');
-final _backend_match_free =
-    _bridge.lookupFunction<_BackendMatchFree1, _BackendMatchFree2>(
+final _backend_match_free = getBridgeHandle()
+    .lookupFunction<_BackendMatchFree1, _BackendMatchFree2>(
         'dart_ffi_backend_match_free');
 
 Future<pb.BackendSetting?> backendMatch(String lib_path) async {

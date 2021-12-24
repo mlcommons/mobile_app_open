@@ -15,8 +15,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
+import 'package:mlcommons_ios_app/backend/bridge/handle.dart';
 import 'package:mlcommons_ios_app/backend/bridge/isolate.dart';
-import 'package:mlcommons_ios_app/backend/bridge/native.dart' as native_backend;
+import 'package:mlcommons_ios_app/backend/bridge/native.config.dart';
+import 'package:mlcommons_ios_app/backend/bridge/native.match.dart';
 import 'package:mlcommons_ios_app/backend/list.dart';
 import 'package:mlcommons_ios_app/backend/run_settings.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
@@ -80,13 +82,13 @@ class MiddleInterface {
       } else if (Platform.isAndroid) {
         backendPath = '$backendPath.so';
       }
-      final backendSetting = await native_backend.backendMatch(backendPath);
+      final backendSetting = await backendMatch(backendPath);
       if (backendSetting != null) {
         return MapEntry(backendSetting, backendPath);
       }
     }
     // try built-in backend
-    final backendSetting = await native_backend.backendMatch('');
+    final backendSetting = await backendMatch('');
     if (backendSetting != null) {
       return MapEntry(backendSetting, '');
     }
@@ -94,8 +96,7 @@ class MiddleInterface {
   }
 
   static Future<MiddleInterface> create(File configFile) async {
-    final tasks =
-        native_backend.getMLPerfConfig(await configFile.readAsString());
+    final tasks = getMLPerfConfig(await configFile.readAsString());
     final backendMatchInfo = await findMatchingBackend();
     final backendSetting = backendMatchInfo.key;
     final backendPath = backendMatchInfo.value;
@@ -675,7 +676,7 @@ class BenchmarkJob {
 
     var backendNativeLibPath = '';
     if (Platform.isAndroid) {
-      backendNativeLibPath = await native_backend.getNativeLibraryPath();
+      backendNativeLibPath = await getNativeLibraryPath();
     }
 
     final result = await backend.run(RunSettings(

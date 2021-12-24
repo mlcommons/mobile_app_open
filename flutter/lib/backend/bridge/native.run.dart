@@ -1,4 +1,9 @@
-part of 'native.dart';
+import 'dart:ffi';
+
+import 'package:ffi/ffi.dart';
+
+import 'package:mlcommons_ios_app/backend/run_settings.dart';
+import 'handle.dart';
 
 class _RunBackend4in extends Struct {
   external Pointer<Utf8> backend_model_path;
@@ -94,10 +99,10 @@ typedef _RunBenchmark = Pointer<_RunBackend4out> Function(
 typedef _RunBenchmarkFree1 = Void Function(Pointer<_RunBackend4out>);
 typedef _RunBenchmarkFree2 = void Function(Pointer<_RunBackend4out>);
 
-final _dart_ffi_run_benchmark = _bridge
+final _dart_ffi_run_benchmark = getBridgeHandle()
     .lookupFunction<_RunBenchmark, _RunBenchmark>('dart_ffi_run_benchmark');
-final _dart_ffi_run_benchmark_free =
-    _bridge.lookupFunction<_RunBenchmarkFree1, _RunBenchmarkFree2>(
+final _dart_ffi_run_benchmark_free = getBridgeHandle()
+    .lookupFunction<_RunBenchmarkFree1, _RunBenchmarkFree2>(
         'dart_ffi_run_benchmark_free');
 
 BackendRun4results runBenchmark(RunSettings rs) {
