@@ -5,13 +5,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'package:archive/archive_io.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:yaml/yaml.dart';
 
 import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
+import 'package:mlcommons_ios_app/benchmark/cache_manager.dart';
 
 bool isInternetResource(String uri) =>
     uri.startsWith('http://') || uri.startsWith('https://');
@@ -36,7 +35,6 @@ class ResourceManager {
   static const _loadedResourcesDirName = 'loaded_resources';
 
   final VoidCallback onUpdate;
-  final HttpClient _httpClient = HttpClient();
   final BenchmarksConfiguration defaultBenchmarksConfiguration =
       BenchmarksConfiguration(
     'default',
@@ -50,10 +48,11 @@ class ResourceManager {
 
   late final String applicationDirectory;
   late final String loadedResourcesDir;
-  late final String _tmpDirectory;
   late final String _jsonResultPath;
 
   late final List<BatchPreset> _batchPresets;
+
+  late final CacheManager cacheManager;
 
   ResourceManager(this.onUpdate);
 
@@ -129,8 +128,10 @@ class ResourceManager {
   Future<void> initSystemPaths() async {
     applicationDirectory = await getApplicationDirectory();
 
+    await cacheManager.init();
+
     loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
-    _tmpDirectory = (await getTemporaryDirectory()).path;
+    cacheManager = CacheManager(loadedResourcesDir);
     _jsonResultPath = '$applicationDirectory/$_jsonResultFileName';
 
     await Directory(loadedResourcesDir).create();
@@ -278,7 +279,7 @@ class ResourceManager {
       String resourcePath;
 
       if (_isResourceAnArchive(relativePath)) {
-        final unZippedDirectory = await _unZipFile(file);
+        final unZippedDirectory = await cacheManager.unzipFile(file);
 
         resourcePath = '$loadedResourcesDir/${_getArchiveFolder(relativePath)}';
         await moveDirectory(unZippedDirectory, resourcePath);
@@ -296,51 +297,8 @@ class ResourceManager {
   Stream<MapEntry<String, File>> _downloadedResourcesStream(
       Queue<String> resourcesPath) async* {
     for (var resource in resourcesPath) {
-      yield MapEntry<String, File>(resource, await getFileByUrl(resource));
-    }
-  }
-
-  Future<File> getFileByUrl(String url) async {
-    final file =
-        await File('$_tmpDirectory/${Uuid().v4()}').create(recursive: true);
-    final succesStatusCode = 200;
-
-    final response = await _httpClient
-        .getUrl(Uri.parse(url))
-        .then((request) => request.close());
-
-    if (response.statusCode == succesStatusCode) {
-      try {
-        await response.pipe(file.openWrite());
-      } catch (e) {
-        throw 'Could not write to file ${file.path}';
-      }
-      return file;
-    } else {
-      throw 'Could not download file by url $url';
-    }
-  }
-
-  Future<Directory> _unZipFile(File zippedFile) async {
-    final zipDirectory = Directory('$_tmpDirectory/${Uuid().v4()}');
-    await zipDirectory.create(recursive: true);
-
-    try {
-      final archive = ZipDecoder().decodeBytes(await zippedFile.readAsBytes());
-
-      for (final archiveFile in archive) {
-        final filePath = '${zipDirectory.path}/${archiveFile.name}';
-        final file = await File(filePath).create(recursive: true);
-
-        final data = archiveFile.content as List<int>;
-        await file.writeAsBytes(data);
-      }
-      await zippedFile.delete();
-
-      return zipDirectory;
-    } catch (e) {
-      await zipDirectory.delete(recursive: true);
-      throw 'Could not unzip file ${zippedFile.path}';
+      var file = cacheManager.downloadFile(resource);
+      yield MapEntry<String, File>(resource, await file);
     }
   }
 
