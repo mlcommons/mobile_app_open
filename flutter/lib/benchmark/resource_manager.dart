@@ -238,7 +238,7 @@ class ResourceManager {
       if (resourcesFromInternet.contains(resource)) continue;
 
       if (isInternetResource(resource)) {
-        var filename = getResourceRelativePath(resource);
+        var filename = cacheManager.getResourceRelativePath(resource);
         var loadedFilePath =
             await _getResourceFromFileSystem(filename, loadedResourcesDir);
 
@@ -273,7 +273,8 @@ class ResourceManager {
 
     for (var res in resourcesPath) {
       var file = await cacheManager.downloadFile(res);
-      var relativePath = getResourceRelativePath(res);
+      var relativePath = cacheManager.getResourceRelativePath(res);
+      var cachePath = cacheManager.getCachePath(res);
       String resourcePath;
 
       if (_isResourceAnArchive(relativePath)) {
@@ -282,7 +283,7 @@ class ResourceManager {
         resourcePath = '$loadedResourcesDir/${_getArchiveFolder(relativePath)}';
         await moveDirectory(unZippedDirectory, resourcePath);
       } else {
-        resourcePath = '$loadedResourcesDir/$relativePath';
+        resourcePath = cachePath;
         await moveFile(file, resourcePath);
       }
       _resourcesMap[res] = resourcePath;
@@ -290,17 +291,6 @@ class ResourceManager {
       _progress += 1 / downloadedResourcesCount;
       onUpdate();
     }
-  }
-
-  String getResourceRelativePath(String uri) {
-    var result = uri;
-    var protocolIndex = result.indexOf('://');
-    if (protocolIndex != -1) {
-      result = result.substring(protocolIndex + '://'.length);
-    }
-    const illegalFilenameSymbols = '\\?%*:|"<>';
-    result = result.replaceAll(RegExp('[$illegalFilenameSymbols]'), '#');
-    return result;
   }
 
   bool _isResourceAnArchive(String resourcePath) {

@@ -5,7 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class CacheManager {
-  final cacheDirectory;
+  final String cacheDirectory;
 
   final HttpClient _httpClient = HttpClient();
   late final String tmpDirectory;
@@ -14,6 +14,25 @@ class CacheManager {
 
   Future<void> init() async {
     tmpDirectory = (await getTemporaryDirectory()).path;
+  }
+
+  String sanitazePath(String path) {
+    const illegalFilenameSymbols = '\\?%*:|"<>';
+    return path.replaceAll(RegExp('[$illegalFilenameSymbols]'), '#');
+  }
+
+  String getResourceRelativePath(String url) {
+    var result = url;
+    var protocolIndex = result.indexOf('://');
+    if (protocolIndex != -1) {
+      result = result.substring(protocolIndex + '://'.length);
+    }
+    result = sanitazePath(result);
+    return result;
+  }
+
+  String getCachePath(String resourceUrl) {
+    return '$cacheDirectory/${getResourceRelativePath(resourceUrl)}';
   }
 
   Future<File> downloadFile(String url) async {
