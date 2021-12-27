@@ -272,7 +272,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> clearCache() async {
-    await resourceManager.deleteLoadedResources([], 0);
+    await resourceManager.cacheManager.deleteLoadedResources([], 0);
     await resourceManager.configurationsManager.deleteDefaultBenchmarksConfiguration();
     _store.clearBenchmarkList();
     final configFile = await handleChosenConfiguration(store: _store);
@@ -301,7 +301,6 @@ class BenchmarkState extends ChangeNotifier {
 
       _store.addBenchmarkToList(item.id, item.taskName, batchPreset);
     }
-    resourceManager.resources = _middle.data();
     await reset();
 
     final packageInfo = await PackageInfo.fromPlatform();
@@ -311,7 +310,10 @@ class BenchmarkState extends ChangeNotifier {
       _store.previousAppVersion = newAppVersion;
       needToPurgeCache = true;
     }
-    resourceManager.handleResources(needToPurgeCache);
+
+    await Wakelock.enable();
+    resourceManager.handleResources( _middle.data(), needToPurgeCache);
+    await Wakelock.disable();
   }
 
   Future<bool> _handlePreviousResult() async {
@@ -395,7 +397,7 @@ class BenchmarkState extends ChangeNotifier {
         if (newChosenConfiguration != null ||
             benchmarksConfiguration == null ||
             !await currentConfigFile.exists()) {
-          configFile = await resourceManager.fileCacheHelper.download(path);
+          configFile = await resourceManager.cacheManager.fileCacheHelper.download(path);
           configFile = await resourceManager.moveFile(
               configFile, currentConfigFile.path);
         } else {
@@ -417,7 +419,7 @@ class BenchmarkState extends ChangeNotifier {
 
       final nonRemovableResources = <String>[configFile.path];
 
-      await resourceManager.deleteLoadedResources(nonRemovableResources);
+      await resourceManager.cacheManager.deleteLoadedResources(nonRemovableResources);
     }
 
     return configFile;
