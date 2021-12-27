@@ -12,6 +12,8 @@ import 'package:yaml/yaml.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
 import 'package:mlcommons_ios_app/benchmark/cache_manager.dart';
 
+import 'archive_cache_manager.dart';
+
 bool isInternetResource(String uri) =>
     uri.startsWith('http://') || uri.startsWith('https://');
 
@@ -53,6 +55,7 @@ class ResourceManager {
   late final List<BatchPreset> _batchPresets;
 
   late final CacheManager cacheManager;
+  late final ArchiveCacheManager archiveCacheManager;
 
   ResourceManager(this.onUpdate);
 
@@ -130,7 +133,7 @@ class ResourceManager {
 
     loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
     cacheManager = CacheManager(loadedResourcesDir);
-    await cacheManager.init();
+    archiveCacheManager = ArchiveCacheManager(cacheManager);
     _jsonResultPath = '$applicationDirectory/$_jsonResultFileName';
 
     await Directory(loadedResourcesDir).create();
@@ -222,6 +225,10 @@ class ResourceManager {
     }
   }
 
+  bool isResourceAnArchive(String resource) {
+    return resource.endsWith(_zipPattern);
+  }
+
   void handleResources(bool purgeOldCache) async {
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
@@ -238,13 +245,19 @@ class ResourceManager {
       if (resourcesFromInternet.contains(resource)) continue;
 
       if (isInternetResource(resource)) {
-        var filename = cacheManager.getResourceRelativePath(resource);
-
-        if (!await cacheManager.isResourceCached(resource)) {
-          resourcesFromInternet.add(resource);
+        String path;
+        if (isResourceAnArchive(resource)) {
+          path = await archiveCacheManager.get(resource, false);
         } else {
-          _resourcesMap[resource] = await _getResourceFromFileSystem(filename, loadedResourcesDir);
+          path = await cacheManager.get(resource, false);
         }
+        
+        if (path != '') {
+          _resourcesMap[resource] = path;
+          continue;
+        }
+
+        resourcesFromInternet.add(resource);
 
         continue;
       }
@@ -271,34 +284,15 @@ class ResourceManager {
 
     for (var res in resourcesPath) {
       var cachePath = cacheManager.getCachePath(res);
-      if (cacheManager.isResourceAnArchive(cachePath)) {
-        _resourcesMap[res] = await cacheManager.getArchive(res, true);
+      if (isResourceAnArchive(cachePath)) {
+        _resourcesMap[res] = await archiveCacheManager.get(res, true);
       } else {
-        _resourcesMap[res] = await cacheManager.getFile(res, true);
+        _resourcesMap[res] = await cacheManager.get(res, true);
       }
 
       _progress += 1 / downloadedResourcesCount;
       onUpdate();
     }
-  }
-
-  Future<String> _getResourceFromFileSystem(
-      String relativeResourcePath, String baseDirectoryPath) async {
-    final filePath = '$baseDirectoryPath/$relativeResourcePath';
-
-    if (await File(filePath).exists()) {
-      return filePath;
-    }
-
-    if (cacheManager.isResourceAnArchive(relativeResourcePath)) {
-      final directory = cacheManager.getArchiveFolder(relativeResourcePath);
-      final directoryPath = '$baseDirectoryPath/$directory';
-      if (await Directory(directoryPath).exists()) {
-        return directoryPath;
-      }
-    }
-
-    return '';
   }
 
   Future<List<BenchmarksConfiguration>>

@@ -1,21 +1,11 @@
 import 'dart:io';
 
-import 'package:archive/archive_io.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:uuid/uuid.dart';
-
 class CacheManager {
-  static const _zipPattern = '.zip';
   final String cacheDirectory;
 
   final HttpClient _httpClient = HttpClient();
-  late final String tmpDirectory;
 
   CacheManager(this.cacheDirectory);
-
-  Future<void> init() async {
-    tmpDirectory = (await getTemporaryDirectory()).path;
-  }
 
   String sanitazePath(String path) {
     const illegalFilenameSymbols = '\\?%*:|"<>';
@@ -43,28 +33,12 @@ class CacheManager {
     return await file.exists();
   }
 
-  bool isResourceAnArchive(String cachedPath) {
-    return cachedPath.endsWith(_zipPattern);
-  }
-
-  String getArchiveFolder(String cachedPath) {
-    return cachedPath.substring(0, cachedPath.length - _zipPattern.length);
-  }
-
-  Future<bool> isResourceCached(String url) async {
-    var cachedPath = getCachePath(url);
-    if (isResourceAnArchive(cachedPath)) {
-      return Directory(getArchiveFolder(cachedPath)).exists();
-    }
-    return isFileCached(url);
-  }
-
   // If resource is cached, returns path to it
   // If resource doesn't exists and downloadMissing=true,
   //    downloads and returns path
   // If resource doesn't exists and downloadMissing=false,
   //    returns empty string
-  Future<String> getFile(String url, bool downloadMissing) async {
+  Future<String> get(String url, bool downloadMissing) async {
     var cachePath = getCachePath(url);
     if (await isFileCached(url)) {
       return cachePath;
@@ -74,25 +48,6 @@ class CacheManager {
     }
     await downloadFile(url);
     return cachePath;
-  }
-
-  // If resource is cached, returns path to it
-  // If resource doesn't exists and downloadMissing=true,
-  //    downloads and returns path
-  // If resource doesn't exists and downloadMissing=false,
-  //    returns empty string
-  Future<String> getArchive(String url, bool downloadMissing) async {
-    var cachePath = getArchiveFolder(getCachePath(url));
-    if (await Directory(cachePath).exists()) {
-      return cachePath;
-    }
-    if (!downloadMissing) {
-      return '';
-    }
-    var file = await downloadFile(url);
-    final unZippedDirectory = await _unzipFile(file);
-    await file.delete();
-    return unZippedDirectory.path;
   }
 
   Future<File> downloadFile(String url) async {
@@ -115,27 +70,5 @@ class CacheManager {
       throw 'Could not write to file ${result.path}: $e';
     }
     return result;
-  }
-
-  Future<Directory> _unzipFile(File zippedFile) async {
-    final result = Directory(getArchiveFolder(zippedFile.path));
-    await result.create(recursive: true);
-
-    try {
-      final archive = ZipDecoder().decodeBytes(await zippedFile.readAsBytes());
-
-      for (final archiveFile in archive) {
-        final filePath = '${result.path}/${archiveFile.name}';
-        final file = await File(filePath).create(recursive: true);
-
-        final data = archiveFile.content as List<int>;
-        await file.writeAsBytes(data);
-      }
-
-      return result;
-    } catch (e) {
-      await result.delete(recursive: true);
-      throw 'Could not unzip file ${zippedFile.path}: $e';
-    }
   }
 }
