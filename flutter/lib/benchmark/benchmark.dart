@@ -395,7 +395,7 @@ class BenchmarkState extends ChangeNotifier {
         if (newChosenConfiguration != null ||
             benchmarksConfiguration == null ||
             !await currentConfigFile.exists()) {
-          configFile = await resourceManager.fileCacheHelper.downloadFile(path);
+          configFile = await resourceManager.fileCacheHelper.download(path);
           configFile = await resourceManager.moveFile(
               configFile, currentConfigFile.path);
         } else {

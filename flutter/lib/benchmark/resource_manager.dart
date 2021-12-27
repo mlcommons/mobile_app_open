@@ -30,7 +30,6 @@ class BatchPreset {
 }
 
 class ResourceManager {
-  static const _zipPattern = '.zip';
   static const _applicationDirectoryPrefix = 'app://';
   static const _loadedResourcesDirName = 'loaded_resources';
 
@@ -153,14 +152,14 @@ class ResourceManager {
   }
 
   bool isResourceAnArchive(String resource) {
-    return resource.endsWith(_zipPattern);
+    return resource.endsWith(ArchiveCacheHelper.extension);
   }
 
   void handleResources(bool purgeOldCache) async {
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
 
-    final resourcesFromInternet = ListQueue<String>();
+    final resourcesFromInternet = <String>[];
     _resourcesMap = {};
     _progress = 0;
     _done = false;
@@ -206,18 +205,15 @@ class ResourceManager {
 
   set resources(List<String> resources) => _resources = resources;
 
-  Future<void> _handleResourcesFromInternet(Queue<String> resourcesPath) async {
-    final downloadedResourcesCount = resourcesPath.length;
-
-    for (var res in resourcesPath) {
-      var cachePath = fileCacheHelper.getCachePath(res);
-      if (isResourceAnArchive(cachePath)) {
-        _resourcesMap[res] = await archiveCacheHelper.get(res, true);
+  Future<void> _handleResourcesFromInternet(List<String> resources) async {
+    for (var url in resources) {
+      if (isResourceAnArchive(url)) {
+        _resourcesMap[url] = await archiveCacheHelper.get(url, true);
       } else {
-        _resourcesMap[res] = await fileCacheHelper.get(res, true);
+        _resourcesMap[url] = await fileCacheHelper.get(url, true);
       }
 
-      _progress += 1 / downloadedResourcesCount;
+      _progress += 1 / resources.length;
       onUpdate();
     }
   }

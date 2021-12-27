@@ -26,13 +26,6 @@ class FileCacheHelper {
     return '$cacheDirectory/${getResourceRelativePath(url)}';
   }
 
-  Future<bool> isFileCached(String url) async {
-    // TODO pass cachedPath?
-    var cachedPath = getCachePath(url);
-    var file = File(cachedPath);
-    return await file.exists();
-  }
-
   // If resource is cached, returns path to it
   // If resource doesn't exists and downloadMissing=true,
   //    downloads and returns path
@@ -40,18 +33,18 @@ class FileCacheHelper {
   //    returns empty string
   Future<String> get(String url, bool downloadMissing) async {
     var cachePath = getCachePath(url);
-    if (await isFileCached(url)) {
+    if (await File(cachePath).exists()) {
       return cachePath;
     }
     if (!downloadMissing) {
       return '';
     }
-    await downloadFile(url);
+    await download(url);
     return cachePath;
   }
 
-  Future<File> downloadFile(String url) async {
-    final succesStatusCode = 200;
+  Future<File> download(String url) async {
+    const succesStatusCode = 200;
 
     final response = await _httpClient
         .getUrl(Uri.parse(url))
@@ -61,7 +54,7 @@ class FileCacheHelper {
       throw 'Could not download file by url: status ${response.statusCode}, url: $url';
     }
 
-    final result = File('${getCachePath(url)}');
+    final result = File(getCachePath(url));
     await result.create(recursive: true);
     try {
       await response.pipe(result.openWrite());
