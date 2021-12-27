@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:archive/archive_io.dart';
 
-import 'cache_manager.dart';
+import 'file_cache_helper_.dart';
 
-class ArchiveCacheManager {
+class ArchiveCacheHelper {
   static const _zipPattern = '.zip';
 
-  final CacheManager cacheManager;
+  final FileCacheHelper cacheManager;
 
-  ArchiveCacheManager(this.cacheManager);
+  ArchiveCacheHelper(this.cacheManager);
 
 
   Future<bool> hasCached(String url) async {

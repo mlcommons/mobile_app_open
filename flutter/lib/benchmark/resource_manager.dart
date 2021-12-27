@@ -9,9 +9,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:yaml/yaml.dart';
 
-import 'package:mlcommons_ios_app/benchmark/cache_manager.dart';
+import 'package:mlcommons_ios_app/benchmark/file_cache_helper_.dart';
 
-import 'archive_cache_manager.dart';
+import 'archive_cache_helper.dart';
 import 'result_manager.dart';
 
 bool isInternetResource(String uri) =>
@@ -46,8 +46,8 @@ class ResourceManager {
 
   late final List<BatchPreset> _batchPresets;
 
-  late final CacheManager cacheManager;
-  late final ArchiveCacheManager archiveCacheManager;
+  late final FileCacheHelper fileCacheHelper;
+  late final ArchiveCacheHelper archiveCacheHelper;
   late final ConfigurationsManager configurationsManager;
   late final ResultManager resultManager;
 
@@ -104,8 +104,8 @@ class ResourceManager {
     applicationDirectory = await getApplicationDirectory();
 
     loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
-    cacheManager = CacheManager(loadedResourcesDir);
-    archiveCacheManager = ArchiveCacheManager(cacheManager);
+    fileCacheHelper = FileCacheHelper(loadedResourcesDir);
+    archiveCacheHelper = ArchiveCacheHelper(fileCacheHelper);
     configurationsManager = ConfigurationsManager(applicationDirectory);
     resultManager = ResultManager(applicationDirectory);
 
@@ -174,9 +174,9 @@ class ResourceManager {
       if (isInternetResource(resource)) {
         String path;
         if (isResourceAnArchive(resource)) {
-          path = await archiveCacheManager.get(resource, false);
+          path = await archiveCacheHelper.get(resource, false);
         } else {
-          path = await cacheManager.get(resource, false);
+          path = await fileCacheHelper.get(resource, false);
         }
         
         if (path != '') {
@@ -210,11 +210,11 @@ class ResourceManager {
     final downloadedResourcesCount = resourcesPath.length;
 
     for (var res in resourcesPath) {
-      var cachePath = cacheManager.getCachePath(res);
+      var cachePath = fileCacheHelper.getCachePath(res);
       if (isResourceAnArchive(cachePath)) {
-        _resourcesMap[res] = await archiveCacheManager.get(res, true);
+        _resourcesMap[res] = await archiveCacheHelper.get(res, true);
       } else {
-        _resourcesMap[res] = await cacheManager.get(res, true);
+        _resourcesMap[res] = await fileCacheHelper.get(res, true);
       }
 
       _progress += 1 / downloadedResourcesCount;

@@ -1,11 +1,11 @@
 import 'dart:io';
 
-class CacheManager {
+class FileCacheHelper {
   final String cacheDirectory;
 
   final HttpClient _httpClient = HttpClient();
 
-  CacheManager(this.cacheDirectory);
+  FileCacheHelper(this.cacheDirectory);
 
   String sanitazePath(String path) {
     const illegalFilenameSymbols = '\\?%*:|"<>';
