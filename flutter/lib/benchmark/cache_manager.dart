@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'archive_cache_helper.dart';
@@ -10,12 +9,13 @@ class CacheManager {
   final ArchiveCacheHelper archiveCacheHelper;
   Map<String, String> _resourcesMap = {};
 
-  CacheManager(this.loadedResourcesDir, this.fileCacheHelper, this.archiveCacheHelper);
+  CacheManager(
+      this.loadedResourcesDir, this.fileCacheHelper, this.archiveCacheHelper);
 
   String? get(String url) {
     return _resourcesMap[url];
   }
-  
+
   Future<void> deleteLoadedResources(List<String> nonRemovableResources,
       [int atLeastDaysOld = 0]) async {
     final directory = Directory(loadedResourcesDir);
@@ -25,7 +25,9 @@ class CacheManager {
     for (final file in await directory.list(recursive: true).toList()) {
       // skip files in already deleted folders
       if (!await file.exists()) continue;
-      final relativePath = file.path.substring(loadedResourcesDir.length + 1).replaceAll('\\', '/');
+      final relativePath = file.path
+          .substring(loadedResourcesDir.length + 1)
+          .replaceAll('\\', '/');
       var nonRemovable = false;
       for (var resource in nonRemovableResources) {
         // relativePath.startsWith(resource): if we want to preserve a folder resource
@@ -58,7 +60,8 @@ class CacheManager {
     return deleteLoadedResources(currentResources, atLeastDaysOld);
   }
 
-  Future<void> cache(List<String> urls, void Function(double) reportProgress, bool purgeOldCache) async {
+  Future<void> cache(List<String> urls, void Function(double) reportProgress,
+      bool purgeOldCache) async {
     final resourcesToDownload = <String>[];
     _resourcesMap = {};
 
@@ -72,7 +75,7 @@ class CacheManager {
       } else {
         path = await fileCacheHelper.get(resource, false);
       }
-      
+
       if (path != '') {
         _resourcesMap[resource] = path;
         continue;
@@ -94,7 +97,8 @@ class CacheManager {
     return resource.endsWith(ArchiveCacheHelper.extension);
   }
 
-  Future<void> _download(List<String> urls, void Function(double) reportProgress) async {
+  Future<void> _download(
+      List<String> urls, void Function(double) reportProgress) async {
     var progress = 0.0;
     for (var url in urls) {
       if (isResourceAnArchive(url)) {

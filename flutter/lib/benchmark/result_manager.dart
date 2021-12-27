@@ -8,7 +8,7 @@ class ResultManager {
   ResultManager(String applicationDirectory) {
     _jsonResultPath = '$applicationDirectory/$_jsonResultFileName';
   }
-  
+
   Future<void> write(List<Map<String, dynamic>> content) async {
     final jsonFile = File(_jsonResultPath);
 
@@ -35,5 +35,4 @@ class ResultManager {
       await resultsFile.delete();
     }
   }
-
 }

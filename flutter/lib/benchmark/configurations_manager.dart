@@ -14,7 +14,7 @@ class ConfigurationsManager {
   );
 
   ConfigurationsManager(this.applicationDirectory);
-  
+
   Future<void> createConfigurationFile() async {
     final file = File('$applicationDirectory/$_configurationsFileName');
     if (!await file.exists()) {
@@ -75,5 +75,4 @@ class ConfigurationsManager {
 
     return defaultBenchmarksConfiguration;
   }
-
 }

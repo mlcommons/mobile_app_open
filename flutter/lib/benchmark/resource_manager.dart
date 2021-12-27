@@ -3,13 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:mlcommons_ios_app/benchmark/configurations_manager.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
+import 'package:mlcommons_ios_app/benchmark/configurations_manager.dart';
 import 'package:mlcommons_ios_app/benchmark/file_cache_helper_.dart';
-
 import 'archive_cache_helper.dart';
 import 'cache_manager.dart';
 import 'result_manager.dart';
@@ -90,12 +89,12 @@ class ResourceManager {
       }
       throw 'forbidden path: $resource (only http://, https:// and app:// resources are allowed)';
     }
-    
-    await cacheManager.cache(internetResources, (double val){ 
-      _progressString = '${(val * 100).round()}%'; 
+
+    await cacheManager.cache(internetResources, (double val) {
+      _progressString = '${(val * 100).round()}%';
       onUpdate();
-      }, purgeOldCache);
-      
+    }, purgeOldCache);
+
     _done = true;
     onUpdate();
   }
@@ -124,10 +123,11 @@ class ResourceManager {
 
     loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
     await Directory(loadedResourcesDir).create();
-    
+
     final fileCacheHelper = FileCacheHelper(loadedResourcesDir);
     final archiveCacheHelper = ArchiveCacheHelper(fileCacheHelper);
-    cacheManager = CacheManager(loadedResourcesDir, fileCacheHelper, archiveCacheHelper);
+    cacheManager =
+        CacheManager(loadedResourcesDir, fileCacheHelper, archiveCacheHelper);
 
     configurationsManager = ConfigurationsManager(applicationDirectory);
     resultManager = ResultManager(applicationDirectory);
