@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -12,9 +11,7 @@ import 'package:mlcommons_ios_app/benchmark/file_cache_helper_.dart';
 import 'archive_cache_helper.dart';
 import 'cache_manager.dart';
 import 'result_manager.dart';
-
-bool isInternetResource(String uri) =>
-    uri.startsWith('http://') || uri.startsWith('https://');
+import 'utils.dart';
 
 class BatchPreset {
   final String name;

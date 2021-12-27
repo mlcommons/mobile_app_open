@@ -152,7 +152,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                   state.state == BenchmarkStateEnum.waiting) {
                 final benchmarksConfigurations = await state
                     .resourceManager.configurationsManager
-                    .getAvailableBenchmarksConfigurations();
+                    .getAvailableConfigs();
 
                 await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => BenchmarksConfigurationScreen(

@@ -25,10 +25,11 @@ import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
 import 'package:mlcommons_ios_app/benchmark/resource_manager.dart';
 import 'package:mlcommons_ios_app/icons.dart';
 import 'package:mlcommons_ios_app/info.dart';
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
 import 'package:mlcommons_ios_app/protos/backend_setting.pb.dart' as pb;
 import 'package:mlcommons_ios_app/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlcommons_ios_app/store.dart';
+import 'configurations_manager.dart';
+import 'utils.dart';
 
 class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;
@@ -147,17 +148,6 @@ enum BenchmarkStateEnum {
   done,
 }
 
-class BenchmarksConfiguration {
-  final String name;
-  final String path;
-
-  BenchmarksConfiguration(this.name, this.path);
-
-  String getType(AppLocalizations stringResources) => isInternetResource(path)
-      ? stringResources.internetResource
-      : stringResources.localResource;
-}
-
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
   final BridgeIsolate backendBridge;
@@ -173,9 +163,9 @@ class BenchmarkState extends ChangeNotifier {
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get downloadingProgress => resourceManager.progress;
 
-  Future<BenchmarksConfiguration?> get chosenBenchmarksConfiguration async =>
+  Future<BenchmarksConfig?> get chosenBenchmarksConfiguration async =>
       await resourceManager.configurationsManager
-          .getChosenConfiguration(_chosenBenchmarksConfigurationName);
+          .getChosenConfig(_chosenBenchmarksConfigurationName);
 
   // Only if [state] == [BenchmarkStateEnum.running]
   Benchmark? currentlyRunning;
@@ -273,8 +263,7 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> clearCache() async {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
-    await resourceManager.configurationsManager
-        .deleteDefaultBenchmarksConfiguration();
+    await resourceManager.configurationsManager.deleteDefaultConfig();
     _store.clearBenchmarkList();
     final configFile = await handleChosenConfiguration(store: _store);
     await loadResources(configFile!);
@@ -379,17 +368,14 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<File?> handleChosenConfiguration(
-      {BenchmarksConfiguration? newChosenConfiguration,
-      required Store store}) async {
+      {BenchmarksConfig? newChosenConfiguration, required Store store}) async {
     final benchmarksConfiguration = newChosenConfiguration ??
         await resourceManager.configurationsManager
-            .getChosenConfiguration(_chosenBenchmarksConfigurationName);
+            .getChosenConfig(_chosenBenchmarksConfigurationName);
     final path = benchmarksConfiguration?.path ??
-        resourceManager
-            .configurationsManager.defaultBenchmarksConfiguration.path;
+        resourceManager.configurationsManager.defaultConfig.path;
     final configurationName = benchmarksConfiguration?.name ??
-        resourceManager
-            .configurationsManager.defaultBenchmarksConfiguration.name;
+        resourceManager.configurationsManager.defaultConfig.name;
     File configFile;
 
     if (isInternetResource(path)) {
