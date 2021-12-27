@@ -284,7 +284,6 @@ class ResourceManager {
         await moveDirectory(unZippedDirectory, resourcePath);
       } else {
         resourcePath = cachePath;
-        await moveFile(file, resourcePath);
       }
       _resourcesMap[res] = resourcePath;
 

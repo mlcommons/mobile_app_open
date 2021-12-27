@@ -46,7 +46,7 @@ class CacheManager {
       throw 'Could not download file by url: status ${response.statusCode}, url: $url';
     }
 
-    final result = File('$tmpDirectory/${Uuid().v4()}');
+    final result = File('${getCachePath(url)}');
     await result.create(recursive: true);
     try {
       await response.pipe(result.openWrite());
