@@ -174,7 +174,7 @@ class BenchmarkState extends ChangeNotifier {
   String get downloadingProgress => resourceManager.progress;
 
   Future<BenchmarksConfiguration?> get chosenBenchmarksConfiguration async =>
-      await resourceManager
+      await resourceManager.configurationsManager
           .getChosenConfiguration(_chosenBenchmarksConfigurationName);
 
   // Only if [state] == [BenchmarkStateEnum.running]
@@ -273,7 +273,7 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> clearCache() async {
     await resourceManager.deleteLoadedResources([], 0);
-    await resourceManager.deleteDefaultBenchmarksConfiguration();
+    await resourceManager.configurationsManager.deleteDefaultBenchmarksConfiguration();
     _store.clearBenchmarkList();
     final configFile = await handleChosenConfiguration(store: _store);
     await loadResources(configFile!);
@@ -358,7 +358,7 @@ class BenchmarkState extends ChangeNotifier {
     await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
-    await result.resourceManager.createConfigurationFile();
+    await result.resourceManager.configurationsManager.createConfigurationFile();
     await result.resourceManager.loadBatchPresets();
     final configFile = await result.handleChosenConfiguration(store: store);
     await result.loadResources(configFile!);
@@ -378,12 +378,12 @@ class BenchmarkState extends ChangeNotifier {
       {BenchmarksConfiguration? newChosenConfiguration,
       required Store store}) async {
     final benchmarksConfiguration = newChosenConfiguration ??
-        await resourceManager
+        await resourceManager.configurationsManager
             .getChosenConfiguration(_chosenBenchmarksConfigurationName);
     final path = benchmarksConfiguration?.path ??
-        resourceManager.defaultBenchmarksConfiguration.path;
+        resourceManager.configurationsManager.defaultBenchmarksConfiguration.path;
     final configurationName = benchmarksConfiguration?.name ??
-        resourceManager.defaultBenchmarksConfiguration.name;
+        resourceManager.configurationsManager.defaultBenchmarksConfiguration.name;
     File configFile;
 
     if (isInternetResource(path)) {

@@ -4,12 +4,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:mlcommons_ios_app/benchmark/configurations_manager.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:yaml/yaml.dart';
 
-import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
 import 'package:mlcommons_ios_app/benchmark/cache_manager.dart';
 
 import 'archive_cache_manager.dart';
@@ -32,16 +32,10 @@ class BatchPreset {
 class ResourceManager {
   static const _zipPattern = '.zip';
   static const _applicationDirectoryPrefix = 'app://';
-  static const _configurationsFileName = 'benchmarksConfigurations.json';
   static const _jsonResultFileName = 'result.json';
   static const _loadedResourcesDirName = 'loaded_resources';
 
   final VoidCallback onUpdate;
-  final BenchmarksConfiguration defaultBenchmarksConfiguration =
-      BenchmarksConfiguration(
-    'default',
-    'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v3.pbtxt',
-  );
 
   Map<String, String> _resourcesMap = {};
   bool _done = false;
@@ -56,6 +50,7 @@ class ResourceManager {
 
   late final CacheManager cacheManager;
   late final ArchiveCacheManager archiveCacheManager;
+  late final ConfigurationsManager configurationsManager;
 
   ResourceManager(this.onUpdate);
 
@@ -87,28 +82,6 @@ class ResourceManager {
         await Directory(path).exists();
   }
 
-  Future<BenchmarksConfiguration?> getChosenConfiguration(
-      String chosenBenchmarksConfigurationName) async {
-    final file = File('$applicationDirectory/$_configurationsFileName');
-    if (await file.exists()) {
-      final content = await file.readAsString();
-      final jsonContent = jsonDecode(content) as Map<String, dynamic>;
-      final configPath =
-          jsonContent[chosenBenchmarksConfigurationName] as String?;
-
-      if (configPath != null) {
-        return BenchmarksConfiguration(
-            chosenBenchmarksConfigurationName, configPath);
-      }
-    }
-    if (chosenBenchmarksConfigurationName !=
-        defaultBenchmarksConfiguration.name) {
-      return null;
-    }
-
-    return defaultBenchmarksConfiguration;
-  }
-
   static Future<String> getApplicationDirectory() async {
     // applicationDirectory should be visible to user
     Directory? dir;
@@ -134,20 +107,10 @@ class ResourceManager {
     loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
     cacheManager = CacheManager(loadedResourcesDir);
     archiveCacheManager = ArchiveCacheManager(cacheManager);
+    configurationsManager = ConfigurationsManager(applicationDirectory);
     _jsonResultPath = '$applicationDirectory/$_jsonResultFileName';
 
     await Directory(loadedResourcesDir).create();
-  }
-
-  Future<void> createConfigurationFile() async {
-    final file = File('$applicationDirectory/$_configurationsFileName');
-    if (!await file.exists()) {
-      print('Create ' + file.path);
-      var config = <String, String>{
-        defaultBenchmarksConfiguration.name: defaultBenchmarksConfiguration.path
-      };
-      await file.writeAsString(jsonEncode(config));
-    }
   }
 
   Future<void> writeToJsonResult(List<Map<String, dynamic>> content) async {
@@ -208,14 +171,6 @@ class ResourceManager {
       currentResources.add(r.substring(loadedResourcesDir.length + 1));
     }
     return deleteLoadedResources(currentResources, atLeastDaysOld);
-  }
-
-  Future<void> deleteDefaultBenchmarksConfiguration() async {
-    final fileName = defaultBenchmarksConfiguration.path.split('/').last;
-    var configFile = File('$applicationDirectory/$fileName');
-    if (await configFile.exists()) {
-      await configFile.delete();
-    }
   }
 
   Future<void> deleteResultJson() async {
@@ -293,26 +248,6 @@ class ResourceManager {
       _progress += 1 / downloadedResourcesCount;
       onUpdate();
     }
-  }
-
-  Future<List<BenchmarksConfiguration>>
-      getAvailableBenchmarksConfigurations() async {
-    final benchmarksConfigurations = <BenchmarksConfiguration>[];
-    final file = File('$applicationDirectory/$_configurationsFileName');
-    if (!await file.exists()) {
-      await createConfigurationFile();
-    }
-    assert(await file.exists());
-
-    final content =
-        jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-    for (final benchmarksConfigurationContent in content.entries) {
-      final benchmarksConfiguration = BenchmarksConfiguration(
-          benchmarksConfigurationContent.key,
-          benchmarksConfigurationContent.value as String);
-      benchmarksConfigurations.add(benchmarksConfiguration);
-    }
-    return benchmarksConfigurations;
   }
 
   List<BatchPreset> getBatchPresets() {
