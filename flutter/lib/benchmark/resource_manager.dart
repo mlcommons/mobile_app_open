@@ -239,13 +239,11 @@ class ResourceManager {
 
       if (isInternetResource(resource)) {
         var filename = cacheManager.getResourceRelativePath(resource);
-        var loadedFilePath =
-            await _getResourceFromFileSystem(filename, loadedResourcesDir);
 
-        if (loadedFilePath == '') {
+        if (!await cacheManager.isResourceCached(resource)) {
           resourcesFromInternet.add(resource);
         } else {
-          _resourcesMap[resource] = loadedFilePath;
+          _resourcesMap[resource] = await _getResourceFromFileSystem(filename, loadedResourcesDir);
         }
 
         continue;
@@ -277,10 +275,10 @@ class ResourceManager {
       var cachePath = cacheManager.getCachePath(res);
       String resourcePath;
 
-      if (_isResourceAnArchive(relativePath)) {
+      if (cacheManager.isResourceAnArchive(relativePath)) {
         final unZippedDirectory = await cacheManager.unzipFile(file);
 
-        resourcePath = '$loadedResourcesDir/${_getArchiveFolder(relativePath)}';
+        resourcePath = '$loadedResourcesDir/${cacheManager.getArchiveFolder(relativePath)}';
         await moveDirectory(unZippedDirectory, resourcePath);
       } else {
         resourcePath = cachePath;
@@ -292,14 +290,6 @@ class ResourceManager {
     }
   }
 
-  bool _isResourceAnArchive(String resourcePath) {
-    return resourcePath.endsWith(_zipPattern);
-  }
-
-  String _getArchiveFolder(String resourcePath) {
-    return resourcePath.substring(0, resourcePath.length - _zipPattern.length);
-  }
-
   Future<String> _getResourceFromFileSystem(
       String relativeResourcePath, String baseDirectoryPath) async {
     final filePath = '$baseDirectoryPath/$relativeResourcePath';
@@ -308,8 +298,8 @@ class ResourceManager {
       return filePath;
     }
 
-    if (_isResourceAnArchive(relativeResourcePath)) {
-      final directory = _getArchiveFolder(relativeResourcePath);
+    if (cacheManager.isResourceAnArchive(relativeResourcePath)) {
+      final directory = cacheManager.getArchiveFolder(relativeResourcePath);
       final directoryPath = '$baseDirectoryPath/$directory';
       if (await Directory(directoryPath).exists()) {
         return directoryPath;

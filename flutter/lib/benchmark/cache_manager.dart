@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class CacheManager {
+  static const _zipPattern = '.zip';
   final String cacheDirectory;
 
   final HttpClient _httpClient = HttpClient();
@@ -31,8 +32,31 @@ class CacheManager {
     return result;
   }
 
-  String getCachePath(String resourceUrl) {
-    return '$cacheDirectory/${getResourceRelativePath(resourceUrl)}';
+  String getCachePath(String url) {
+    return '$cacheDirectory/${getResourceRelativePath(url)}';
+  }
+
+  Future<bool> isFileCached(String url) async {
+    // TODO pass cachedPath?
+    var cachedPath = getCachePath(url);
+    var file = File(cachedPath);
+    return await file.exists();
+  }
+
+  bool isResourceAnArchive(String cachedPath) {
+    return cachedPath.endsWith(_zipPattern);
+  }
+
+  String getArchiveFolder(String cachedPath) {
+    return cachedPath.substring(0, cachedPath.length - _zipPattern.length);
+  }
+
+  Future<bool> isResourceCached(String url) async {
+    var cachedPath = getCachePath(url);
+    if (isResourceAnArchive(cachedPath)) {
+      return await Directory(getArchiveFolder(cachedPath)).exists();
+    }
+    return isFileCached(url);
   }
 
   Future<File> downloadFile(String url) async {
