@@ -54,9 +54,45 @@ class CacheManager {
   Future<bool> isResourceCached(String url) async {
     var cachedPath = getCachePath(url);
     if (isResourceAnArchive(cachedPath)) {
-      return await Directory(getArchiveFolder(cachedPath)).exists();
+      return Directory(getArchiveFolder(cachedPath)).exists();
     }
     return isFileCached(url);
+  }
+
+  // If resource is cached, returns path to it
+  // If resource doesn't exists and downloadMissing=true,
+  //    downloads and returns path
+  // If resource doesn't exists and downloadMissing=false,
+  //    returns empty string
+  Future<String> getFile(String url, bool downloadMissing) async {
+    var cachePath = getCachePath(url);
+    if (await isFileCached(url)) {
+      return cachePath;
+    }
+    if (!downloadMissing) {
+      return '';
+    }
+    await downloadFile(url);
+    return cachePath;
+  }
+
+  // If resource is cached, returns path to it
+  // If resource doesn't exists and downloadMissing=true,
+  //    downloads and returns path
+  // If resource doesn't exists and downloadMissing=false,
+  //    returns empty string
+  Future<String> getArchive(String url, bool downloadMissing) async {
+    var cachePath = getArchiveFolder(getCachePath(url));
+    if (await Directory(cachePath).exists()) {
+      return cachePath;
+    }
+    if (!downloadMissing) {
+      return '';
+    }
+    var file = await downloadFile(url);
+    final unZippedDirectory = await _unzipFile(file);
+    await file.delete();
+    return unZippedDirectory.path;
   }
 
   Future<File> downloadFile(String url) async {
@@ -81,8 +117,8 @@ class CacheManager {
     return result;
   }
 
-  Future<Directory> unzipFile(File zippedFile) async {
-    final result = Directory('$tmpDirectory/${Uuid().v4()}');
+  Future<Directory> _unzipFile(File zippedFile) async {
+    final result = Directory(getArchiveFolder(zippedFile.path));
     await result.create(recursive: true);
 
     try {
@@ -95,12 +131,11 @@ class CacheManager {
         final data = archiveFile.content as List<int>;
         await file.writeAsBytes(data);
       }
-      await zippedFile.delete();
 
       return result;
     } catch (e) {
       await result.delete(recursive: true);
-      throw 'Could not unzip file ${zippedFile.path}';
+      throw 'Could not unzip file ${zippedFile.path}: $e';
     }
   }
 }

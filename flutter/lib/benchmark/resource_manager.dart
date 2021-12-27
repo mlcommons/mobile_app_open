@@ -270,20 +270,12 @@ class ResourceManager {
     final downloadedResourcesCount = resourcesPath.length;
 
     for (var res in resourcesPath) {
-      var file = await cacheManager.downloadFile(res);
-      var relativePath = cacheManager.getResourceRelativePath(res);
       var cachePath = cacheManager.getCachePath(res);
-      String resourcePath;
-
-      if (cacheManager.isResourceAnArchive(relativePath)) {
-        final unZippedDirectory = await cacheManager.unzipFile(file);
-
-        resourcePath = '$loadedResourcesDir/${cacheManager.getArchiveFolder(relativePath)}';
-        await moveDirectory(unZippedDirectory, resourcePath);
+      if (cacheManager.isResourceAnArchive(cachePath)) {
+        _resourcesMap[res] = await cacheManager.getArchive(res, true);
       } else {
-        resourcePath = cachePath;
+        _resourcesMap[res] = await cacheManager.getFile(res, true);
       }
-      _resourcesMap[res] = resourcePath;
 
       _progress += 1 / downloadedResourcesCount;
       onUpdate();
