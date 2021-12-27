@@ -347,7 +347,7 @@ class BenchmarkState extends ChangeNotifier {
       }
     } else {
       await _store.deletePreviousResult();
-      await resourceManager.deleteResultJson();
+      await resourceManager.resultManager.delete();
     }
 
     return false;
@@ -579,7 +579,7 @@ class BenchmarkState extends ChangeNotifier {
     }
 
     _store.previousResult = JsonEncoder().convert(briefResultContent);
-    await resourceManager.writeToJsonResult(resultContent);
+    await resourceManager.resultManager.write(resultContent);
   }
 
   Future<void> abortBenchmarks() async {

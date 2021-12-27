@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -13,6 +12,7 @@ import 'package:yaml/yaml.dart';
 import 'package:mlcommons_ios_app/benchmark/cache_manager.dart';
 
 import 'archive_cache_manager.dart';
+import 'result_manager.dart';
 
 bool isInternetResource(String uri) =>
     uri.startsWith('http://') || uri.startsWith('https://');
@@ -32,7 +32,6 @@ class BatchPreset {
 class ResourceManager {
   static const _zipPattern = '.zip';
   static const _applicationDirectoryPrefix = 'app://';
-  static const _jsonResultFileName = 'result.json';
   static const _loadedResourcesDirName = 'loaded_resources';
 
   final VoidCallback onUpdate;
@@ -44,13 +43,13 @@ class ResourceManager {
 
   late final String applicationDirectory;
   late final String loadedResourcesDir;
-  late final String _jsonResultPath;
 
   late final List<BatchPreset> _batchPresets;
 
   late final CacheManager cacheManager;
   late final ArchiveCacheManager archiveCacheManager;
   late final ConfigurationsManager configurationsManager;
+  late final ResultManager resultManager;
 
   ResourceManager(this.onUpdate);
 
@@ -108,29 +107,9 @@ class ResourceManager {
     cacheManager = CacheManager(loadedResourcesDir);
     archiveCacheManager = ArchiveCacheManager(cacheManager);
     configurationsManager = ConfigurationsManager(applicationDirectory);
-    _jsonResultPath = '$applicationDirectory/$_jsonResultFileName';
+    resultManager = ResultManager(applicationDirectory);
 
     await Directory(loadedResourcesDir).create();
-  }
-
-  Future<void> writeToJsonResult(List<Map<String, dynamic>> content) async {
-    final jsonFile = File(_jsonResultPath);
-
-    final jsonEncoder = JsonEncoder.withIndent('  ');
-    var encoded = jsonEncoder.convert(content);
-    // needed to match android behavior
-    encoded = encoded.replaceAll('/', '\\/');
-    await jsonFile.writeAsString(encoded);
-  }
-
-  Future<String> get jsonResult async {
-    final file = File(_jsonResultPath);
-
-    if (await file.exists()) {
-      return file.readAsString();
-    }
-
-    return '';
   }
 
   Future<void> deleteLoadedResources(List<String> nonRemovableResources,
@@ -171,13 +150,6 @@ class ResourceManager {
       currentResources.add(r.substring(loadedResourcesDir.length + 1));
     }
     return deleteLoadedResources(currentResources, atLeastDaysOld);
-  }
-
-  Future<void> deleteResultJson() async {
-    var resultsFile = File(_jsonResultPath);
-    if (await resultsFile.exists()) {
-      await resultsFile.delete();
-    }
   }
 
   bool isResourceAnArchive(String resource) {
