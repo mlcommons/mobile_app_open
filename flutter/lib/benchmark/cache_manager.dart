@@ -17,24 +17,25 @@ class CacheManager {
   }
 
   Future<File> downloadFile(String url) async {
-    final result = File('$tmpDirectory/${Uuid().v4()}');
-    await result.create(recursive: true);
     final succesStatusCode = 200;
 
     final response = await _httpClient
         .getUrl(Uri.parse(url))
         .then((request) => request.close());
 
-    if (response.statusCode == succesStatusCode) {
-      try {
-        await response.pipe(result.openWrite());
-      } catch (e) {
-        throw 'Could not write to file ${result.path}';
-      }
-      return result;
-    } else {
-      throw 'Could not download file by url $url';
+    if (response.statusCode != succesStatusCode) {
+      throw 'Could not download file by url: status ${response.statusCode}, url: $url';
     }
+
+    final result = File('$tmpDirectory/${Uuid().v4()}');
+    await result.create(recursive: true);
+    try {
+      await response.pipe(result.openWrite());
+    } catch (e) {
+      await result.delete();
+      throw 'Could not write to file ${result.path}: $e';
+    }
+    return result;
   }
 
   Future<Directory> unzipFile(File zippedFile) async {
