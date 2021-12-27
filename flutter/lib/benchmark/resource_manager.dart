@@ -355,44 +355,4 @@ class ResourceManager {
       return result;
     }
   }
-
-  Future<Directory> moveDirectory(Directory source, String destination) async {
-    await Directory(destination).parent.create(recursive: true);
-    try {
-      return await source.rename(destination);
-    } catch (e) {
-      await _copyDirectory(source, destination);
-      await source.delete(recursive: true);
-      return Directory(destination);
-    }
-  }
-
-  Future<void> _copyDirectory(Directory source, String destination) async {
-    var sourcePrefixLength = source.path.length;
-    if (!(source.path.endsWith('/') || source.path.endsWith('\\'))) {
-      sourcePrefixLength += 1;
-    }
-
-    await for (var e in source.list(recursive: true)) {
-      var stat = await e.stat();
-      final relativePath = e.path.substring(sourcePrefixLength);
-      final entityDestination = '$destination/$relativePath';
-      switch (stat.type) {
-        case FileSystemEntityType.file:
-          var file = File(e.path);
-          await File(entityDestination).parent.create(recursive: true);
-          await file.copy(entityDestination);
-          break;
-        case FileSystemEntityType.directory:
-          await _copyDirectory(Directory(e.path), entityDestination);
-          break;
-        case FileSystemEntityType.link:
-          throw "moving links isn't supported";
-        case FileSystemEntityType.notFound:
-          throw 'unexpected missing file';
-        default:
-          throw 'unexpected file type';
-      }
-    }
-  }
 }
