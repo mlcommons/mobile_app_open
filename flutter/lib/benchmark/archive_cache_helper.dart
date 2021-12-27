@@ -14,10 +14,10 @@ class ArchiveCacheHelper {
     return cachedPath.substring(0, cachedPath.length - extension.length);
   }
 
-  // If resource is cached, returns path to it
-  // If resource doesn't exists and downloadMissing=true,
-  //    downloads and returns path
-  // If resource doesn't exists and downloadMissing=false,
+  // If archive is cached, returns path to it
+  // If archive is not cached and downloadMissing=true,
+  //    downloads it and returns path to folder
+  // If archive is not cached and downloadMissing=false,
   //    returns empty string
   Future<String> get(String url, bool downloadMissing) async {
     var cachePath = getArchiveFolder(cacheManager.getCachePath(url));

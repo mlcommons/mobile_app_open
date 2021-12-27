@@ -26,10 +26,10 @@ class FileCacheHelper {
     return '$cacheDirectory/${getResourceRelativePath(url)}';
   }
 
-  // If resource is cached, returns path to it
-  // If resource doesn't exists and downloadMissing=true,
-  //    downloads and returns path
-  // If resource doesn't exists and downloadMissing=false,
+  // If file is cached, returns path to it
+  // If file is not cached and downloadMissing=true,
+  //    downloads it and returns path to the file
+  // If file is not cached and downloadMissing=false,
   //    returns empty string
   Future<String> get(String url, bool downloadMissing) async {
     var cachePath = getCachePath(url);
