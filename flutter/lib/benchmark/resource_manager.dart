@@ -128,10 +128,9 @@ class ResourceManager {
   Future<void> initSystemPaths() async {
     applicationDirectory = await getApplicationDirectory();
 
-    await cacheManager.init();
-
     loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
     cacheManager = CacheManager(loadedResourcesDir);
+    await cacheManager.init();
     _jsonResultPath = '$applicationDirectory/$_jsonResultFileName';
 
     await Directory(loadedResourcesDir).create();
@@ -271,11 +270,10 @@ class ResourceManager {
 
   Future<void> _handleResourcesFromInternet(Queue<String> resourcesPath) async {
     final downloadedResourcesCount = resourcesPath.length;
-    final downloadedResources = _downloadedResourcesStream(resourcesPath);
 
-    await for (var resource in downloadedResources) {
-      final file = resource.value;
-      var relativePath = getResourceRelativePath(resource.key);
+    for (var res in resourcesPath) {
+      var file = await cacheManager.downloadFile(res);
+      var relativePath = getResourceRelativePath(res);
       String resourcePath;
 
       if (_isResourceAnArchive(relativePath)) {
@@ -287,18 +285,10 @@ class ResourceManager {
         resourcePath = '$loadedResourcesDir/$relativePath';
         await moveFile(file, resourcePath);
       }
-      _resourcesMap[resource.key] = resourcePath;
+      _resourcesMap[res] = resourcePath;
 
       _progress += 1 / downloadedResourcesCount;
       onUpdate();
-    }
-  }
-
-  Stream<MapEntry<String, File>> _downloadedResourcesStream(
-      Queue<String> resourcesPath) async* {
-    for (var resource in resourcesPath) {
-      var file = cacheManager.downloadFile(resource);
-      yield MapEntry<String, File>(resource, await file);
     }
   }
 
