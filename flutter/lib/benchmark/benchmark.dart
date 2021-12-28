@@ -28,8 +28,8 @@ import 'package:mlcommons_ios_app/protos/backend_setting.pb.dart' as pb;
 import 'package:mlcommons_ios_app/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlcommons_ios_app/resources/configurations_manager.dart';
 import 'package:mlcommons_ios_app/resources/resource_manager.dart';
+import 'package:mlcommons_ios_app/resources/utils.dart';
 import 'package:mlcommons_ios_app/store.dart';
-import '../resources/utils.dart';
 
 class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;
@@ -387,8 +387,8 @@ class BenchmarkState extends ChangeNotifier {
         if (newChosenConfiguration != null ||
             benchmarksConfiguration == null ||
             !await currentConfigFile.exists()) {
-          configFile =
-              File(await resourceManager.cacheManager.fileCacheHelper.get(path, true));
+          configFile = File(await resourceManager.cacheManager.fileCacheHelper
+              .get(path, true));
           configFile = await resourceManager.moveFile(
               configFile, currentConfigFile.path);
         } else {
