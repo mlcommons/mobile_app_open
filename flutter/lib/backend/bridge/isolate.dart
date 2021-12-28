@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:mlcommons_ios_app/backend/bridge/native.run.dart';
+import 'package:mlcommons_ios_app/backend/bridge/ffi_run.dart';
 import 'package:mlcommons_ios_app/backend/run_settings.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
 
