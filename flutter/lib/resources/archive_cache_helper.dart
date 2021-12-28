@@ -52,7 +52,7 @@ class ArchiveCacheHelper {
       return result;
     } catch (e) {
       await result.delete(recursive: true);
-      throw 'Could not unzip file ${archivePath}: $e';
+      throw 'Could not unzip file $archivePath: $e';
     }
   }
 }
