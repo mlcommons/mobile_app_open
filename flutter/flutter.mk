@@ -31,13 +31,13 @@ include flutter/android.mk
 
 .PHONY: flutter/set-supported-backends
 flutter/set-supported-backends:
-	cat flutter/lib/backend/backends_list.in | sed \
+	cat flutter/lib/backend/list.in | sed \
 		-e "s/TFLITE_TAG/${backend_tflite_filename}/" \
 		-e "s/MEDIATEKE_TAG/${backend_mediatek_filename}/" \
 		-e "s/PIXEL_TAG/${backend_pixel_filename}/" \
 		-e "s/QTI_TAG/${backend_qti_filename}/" \
 		-e "s/SAMSUNG_TAG/${backend_samsung_filename}/" \
-		> flutter/lib/backend/backends_list.gen.dart
+		> flutter/lib/backend/list.gen.dart
 
 .PHONY: flutter/protobuf
 flutter/protobuf:

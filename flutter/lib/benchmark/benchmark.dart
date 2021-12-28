@@ -15,8 +15,12 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
-import 'package:mlcommons_ios_app/backend/bridge.dart';
-import 'package:mlcommons_ios_app/backend/native.dart' as native_backend;
+import 'package:mlcommons_ios_app/backend/bridge/ffi_config.dart';
+import 'package:mlcommons_ios_app/backend/bridge/ffi_match.dart';
+import 'package:mlcommons_ios_app/backend/bridge/handle.dart';
+import 'package:mlcommons_ios_app/backend/bridge/isolate.dart';
+import 'package:mlcommons_ios_app/backend/list.dart';
+import 'package:mlcommons_ios_app/backend/run_settings.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
 import 'package:mlcommons_ios_app/benchmark/resource_manager.dart';
 import 'package:mlcommons_ios_app/icons.dart';
@@ -78,13 +82,13 @@ class MiddleInterface {
       } else if (Platform.isAndroid) {
         backendPath = '$backendPath.so';
       }
-      final backendSetting = await native_backend.backendMatch(backendPath);
+      final backendSetting = backendMatch(backendPath);
       if (backendSetting != null) {
         return MapEntry(backendSetting, backendPath);
       }
     }
     // try built-in backend
-    final backendSetting = await native_backend.backendMatch('');
+    final backendSetting = backendMatch('');
     if (backendSetting != null) {
       return MapEntry(backendSetting, '');
     }
@@ -92,8 +96,7 @@ class MiddleInterface {
   }
 
   static Future<MiddleInterface> create(File configFile) async {
-    final tasks =
-        native_backend.getMLPerfConfig(await configFile.readAsString());
+    final tasks = getMLPerfConfig(await configFile.readAsString());
     final backendMatchInfo = await findMatchingBackend();
     final backendSetting = backendMatchInfo.key;
     final backendPath = backendMatchInfo.value;
@@ -157,7 +160,7 @@ class BenchmarksConfiguration {
 
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
-  final BackendBridge backendBridge;
+  final BridgeIsolate backendBridge;
 
   late final ResourceManager resourceManager;
 
@@ -351,7 +354,8 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   static Future<BenchmarkState> create(Store store) async {
-    final result = BenchmarkState._(store, await BackendBridge.create());
+    final result = BenchmarkState._(store, await BridgeIsolate.create());
+    await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
     await result.resourceManager.createConfigurationFile();
@@ -610,7 +614,7 @@ class BenchmarkJob {
   final bool fast;
   final DatasetMode _datasetMode;
   final int threadsNumber;
-  final BackendBridge backend;
+  final BridgeIsolate backend;
   final String backendLibPath;
 
   BenchmarkJob(
@@ -673,7 +677,7 @@ class BenchmarkJob {
 
     var backendNativeLibPath = '';
     if (Platform.isAndroid) {
-      backendNativeLibPath = await native_backend.getNativeLibraryPath();
+      backendNativeLibPath = await getNativeLibraryPath();
     }
 
     final result = await backend.run(RunSettings(

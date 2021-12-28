@@ -94,7 +94,8 @@ flutter/android/libs:
 		${backend_samsung_android_files} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/libbackendbridge.so \
 		${flutter_android_libs_folder}
-	chmod 777 --recursive ${flutter_android_libs_folder}
+	@# macos doesn't support --recursive flag
+	chmod -R 777 ${flutter_android_libs_folder}
 
 .PHONY: docker/flutter/android/libs
 docker/flutter/android/libs: flutter/android/docker/image
