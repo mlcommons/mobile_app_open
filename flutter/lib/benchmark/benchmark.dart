@@ -73,7 +73,6 @@ class MiddleInterface {
 
   static Future<MapEntry<pb.BackendSetting, String>>
       findMatchingBackend() async {
-    await initDeviceInfo();
     for (var backendPath in getBackendsList()) {
       if (backendPath == '') {
         continue;
@@ -356,6 +355,7 @@ class BenchmarkState extends ChangeNotifier {
 
   static Future<BenchmarkState> create(Store store) async {
     final result = BenchmarkState._(store, await BridgeIsolate.create());
+    await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
     await result.resourceManager.createConfigurationFile();
