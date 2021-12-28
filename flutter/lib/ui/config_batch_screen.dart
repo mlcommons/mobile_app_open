@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
-import 'package:mlcommons_ios_app/benchmark/resource_manager.dart';
+import 'package:mlcommons_ios_app/resources/resource_manager.dart';
 import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
 import 'package:mlcommons_ios_app/store.dart';
 

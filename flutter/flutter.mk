@@ -55,7 +55,7 @@ flutter/update-splash-screen:
 .PHONY: flutter/generate-localizations
 flutter/generate-localizations:
 	flutter gen-l10n \
-		--arb-dir=flutter/lib/resources \
+		--arb-dir=flutter/lib/l10n \
 		--output-dir=flutter/lib/localizations \
 		--template-arb-file=app_en.arb \
 		--output-localization-file=app_localizations.dart \

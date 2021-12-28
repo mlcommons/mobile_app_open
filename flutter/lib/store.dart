@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart' show ChangeNotifier;
+import 'package:mlcommons_ios_app/resources/resource_manager.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'benchmark/resource_manager.dart';
 
 class Store extends ChangeNotifier {
   final SharedPreferences _storeFromDisk;

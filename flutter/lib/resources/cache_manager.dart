@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'archive_cache_helper.dart';
-import 'file_cache_helper_.dart';
+import 'file_cache_helper.dart';
 
 class CacheManager {
   final String loadedResourcesDir;

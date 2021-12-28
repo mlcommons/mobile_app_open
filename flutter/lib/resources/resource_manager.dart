@@ -6,10 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
-import 'package:mlcommons_ios_app/benchmark/configurations_manager.dart';
-import 'package:mlcommons_ios_app/benchmark/file_cache_helper_.dart';
 import 'archive_cache_helper.dart';
 import 'cache_manager.dart';
+import 'configurations_manager.dart';
+import 'file_cache_helper.dart';
 import 'result_manager.dart';
 import 'utils.dart';
 

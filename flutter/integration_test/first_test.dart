@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'package:mlcommons_ios_app/main.dart' as app;
 import 'package:mlcommons_ios_app/ui/main_screen.dart';
 import 'package:mlcommons_ios_app/ui/result_screen.dart';
-import 'package:mlcommons_ios_app/benchmark/resource_manager.dart'
+import 'package:mlcommons_ios_app/resources/resource_manager.dart'
     as resource_manager;
 
 void main() {
