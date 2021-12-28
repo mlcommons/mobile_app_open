@@ -7,23 +7,23 @@ class FileCacheHelper {
 
   FileCacheHelper(this.cacheDirectory);
 
-  String sanitazePath(String path) {
+  String _sanitizePath(String path) {
     const illegalFilenameSymbols = '\\?%*:|"<>';
     return path.replaceAll(RegExp('[$illegalFilenameSymbols]'), '#');
   }
 
-  String getResourceRelativePath(String url) {
+  String _getResourceRelativePath(String url) {
     var result = url;
     var protocolIndex = result.indexOf('://');
     if (protocolIndex != -1) {
       result = result.substring(protocolIndex + '://'.length);
     }
-    result = sanitazePath(result);
+    result = _sanitizePath(result);
     return result;
   }
 
   String getCachePath(String url) {
-    return '$cacheDirectory/${getResourceRelativePath(url)}';
+    return '$cacheDirectory/${_getResourceRelativePath(url)}';
   }
 
   // If file is cached, returns path to it
@@ -39,11 +39,11 @@ class FileCacheHelper {
     if (!downloadMissing) {
       return '';
     }
-    await download(url);
+    await _download(url);
     return cachePath;
   }
 
-  Future<File> download(String url) async {
+  Future<File> _download(String url) async {
     const succesStatusCode = 200;
 
     final response = await _httpClient

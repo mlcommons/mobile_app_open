@@ -5,12 +5,14 @@ import 'file_cache_helper.dart';
 
 class CacheManager {
   final String loadedResourcesDir;
-  final FileCacheHelper fileCacheHelper;
-  final ArchiveCacheHelper archiveCacheHelper;
+  late final FileCacheHelper fileCacheHelper;
+  late final ArchiveCacheHelper archiveCacheHelper;
   Map<String, String> _resourcesMap = {};
 
-  CacheManager(
-      this.loadedResourcesDir, this.fileCacheHelper, this.archiveCacheHelper);
+  CacheManager(this.loadedResourcesDir) {
+    fileCacheHelper = FileCacheHelper(loadedResourcesDir);
+    archiveCacheHelper = ArchiveCacheHelper(fileCacheHelper);
+  }
 
   String? get(String url) {
     return _resourcesMap[url];

@@ -6,10 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
-import 'archive_cache_helper.dart';
 import 'cache_manager.dart';
 import 'configurations_manager.dart';
-import 'file_cache_helper.dart';
 import 'result_manager.dart';
 import 'utils.dart';
 
@@ -29,13 +27,13 @@ class ResourceManager {
   static const _applicationDirectoryPrefix = 'app://';
   static const _loadedResourcesDirName = 'loaded_resources';
 
-  final VoidCallback onUpdate;
+  final VoidCallback _onUpdate;
 
   bool _done = false;
   String _progressString = '0%';
 
   late final String applicationDirectory;
-  late final String loadedResourcesDir;
+  late final String _loadedResourcesDir;
 
   late final List<BatchPreset> _batchPresets;
 
@@ -43,7 +41,7 @@ class ResourceManager {
   late final ConfigurationsManager configurationsManager;
   late final ResultManager resultManager;
 
-  ResourceManager(this.onUpdate);
+  ResourceManager(this._onUpdate);
 
   bool get done => _done;
 
@@ -75,7 +73,7 @@ class ResourceManager {
 
   void handleResources(List<String> resources, bool purgeOldCache) async {
     _done = false;
-    onUpdate();
+    _onUpdate();
 
     var internetResources = <String>[];
     for (final resource in resources) {
@@ -89,11 +87,11 @@ class ResourceManager {
 
     await cacheManager.cache(internetResources, (double val) {
       _progressString = '${(val * 100).round()}%';
-      onUpdate();
+      _onUpdate();
     }, purgeOldCache);
 
     _done = true;
-    onUpdate();
+    _onUpdate();
   }
 
   static Future<String> getApplicationDirectory() async {
@@ -117,15 +115,10 @@ class ResourceManager {
 
   Future<void> initSystemPaths() async {
     applicationDirectory = await getApplicationDirectory();
+    _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
+    await Directory(_loadedResourcesDir).create();
 
-    loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
-    await Directory(loadedResourcesDir).create();
-
-    final fileCacheHelper = FileCacheHelper(loadedResourcesDir);
-    final archiveCacheHelper = ArchiveCacheHelper(fileCacheHelper);
-    cacheManager =
-        CacheManager(loadedResourcesDir, fileCacheHelper, archiveCacheHelper);
-
+    cacheManager = CacheManager(_loadedResourcesDir);
     configurationsManager = ConfigurationsManager(applicationDirectory);
     resultManager = ResultManager(applicationDirectory);
   }

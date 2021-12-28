@@ -22,13 +22,13 @@ import 'package:mlcommons_ios_app/backend/bridge/isolate.dart';
 import 'package:mlcommons_ios_app/backend/list.dart';
 import 'package:mlcommons_ios_app/backend/run_settings.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
-import 'package:mlcommons_ios_app/resources/resource_manager.dart';
 import 'package:mlcommons_ios_app/icons.dart';
 import 'package:mlcommons_ios_app/info.dart';
 import 'package:mlcommons_ios_app/protos/backend_setting.pb.dart' as pb;
 import 'package:mlcommons_ios_app/protos/mlperf_task.pb.dart' as pb;
-import 'package:mlcommons_ios_app/store.dart';
 import 'package:mlcommons_ios_app/resources/configurations_manager.dart';
+import 'package:mlcommons_ios_app/resources/resource_manager.dart';
+import 'package:mlcommons_ios_app/store.dart';
 import '../resources/utils.dart';
 
 class Benchmark {
@@ -388,7 +388,7 @@ class BenchmarkState extends ChangeNotifier {
             benchmarksConfiguration == null ||
             !await currentConfigFile.exists()) {
           configFile =
-              await resourceManager.cacheManager.fileCacheHelper.download(path);
+              File(await resourceManager.cacheManager.fileCacheHelper.get(path, true));
           configFile = await resourceManager.moveFile(
               configFile, currentConfigFile.path);
         } else {
