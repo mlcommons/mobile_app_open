@@ -61,7 +61,7 @@ class ConfigurationsManager {
         .deleteLoadedResources(nonRemovableResources);
   }
 
-  String getConfigFilePath() {
+  String get configPath {
     return configFilePath;
   }
 

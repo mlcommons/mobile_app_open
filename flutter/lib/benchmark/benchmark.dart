@@ -258,12 +258,12 @@ class BenchmarkState extends ChangeNotifier {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
     await configManager.deleteDefaultConfig();
     _store.clearBenchmarkList();
-    final configFile = await changeConfig();
-    await loadResources(configFile);
+    await resetConfig();
+    await loadResources();
   }
 
-  Future<void> loadResources(File configFile) async {
-    _middle = await MiddleInterface.create(configFile);
+  Future<void> loadResources() async {
+    _middle = await MiddleInterface.create(File(configManager.configPath));
     for (final item in _middle.benchmarks) {
       BatchPreset? batchPreset;
       if (item.modelConfig.scenario == 'Offline') {
@@ -319,8 +319,8 @@ class BenchmarkState extends ChangeNotifier {
     result.configManager = ConfigurationsManager(result.resourceManager.applicationDirectory, store.chosenConfigurationName, result.resourceManager);
     await result.configManager.createConfigurationsFile();
     await result.resourceManager.loadBatchPresets();
-    final configFile = await result.changeConfig();
-    await result.loadResources(configFile);
+    await result.resetConfig();
+    await result.loadResources();
 
     final loadFromStore = () {
       result._submissionMode = store.submissionMode;
@@ -333,14 +333,12 @@ class BenchmarkState extends ChangeNotifier {
     return result;
   }
 
-  Future<File> changeConfig({BenchmarksConfig? newConfig}) async {
+  Future<void> resetConfig({BenchmarksConfig? newConfig}) async {
     final config = newConfig ??
         await configManager.currentConfig ??
         configManager.defaultConfig;
     await configManager.setConfig(config);
-    var configFilePath = configManager.getConfigFilePath();
       _store.chosenConfigurationName = config.name;
-    return File(configFilePath);
   }
 
   BenchmarkStateEnum get state {
