@@ -73,6 +73,7 @@ class ResourceManager {
   }
 
   void handleResources(List<String> resources, bool purgeOldCache) async {
+    _progressString = '0%';
     _done = false;
     _onUpdate();
 
@@ -104,6 +105,7 @@ class ResourceManager {
       dir = await getExternalStorageDirectory();
     } else if (Platform.isWindows) {
       dir = await getDownloadsDirectory();
+      dir = Directory(dir!.path.replaceAll('\\', '/'));
     } else {
       throw 'unsupported platform';
     }

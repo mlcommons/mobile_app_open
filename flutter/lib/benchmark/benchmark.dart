@@ -357,7 +357,11 @@ class BenchmarkState extends ChangeNotifier {
       _chosenConfigName = config.name;
       _store.chosenConfigurationName = config.name;
 
-      final nonRemovableResources = <String>[configFilePath];
+      final nonRemovableResources = <String>[];
+      if (isInternetResource(config.path)) {
+        nonRemovableResources.add(resourceManager.cacheManager.fileCacheHelper
+            .getResourceRelativePath(config.path));
+      }
 
       await resourceManager.cacheManager
           .deleteLoadedResources(nonRemovableResources);
