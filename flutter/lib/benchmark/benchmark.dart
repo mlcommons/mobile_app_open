@@ -264,7 +264,7 @@ class BenchmarkState extends ChangeNotifier {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
     await resourceManager.configurationsManager.deleteDefaultConfig();
     _store.clearBenchmarkList();
-    final configFile = await handleChosenConfiguration(store: _store);
+    final configFile = await handleChosenConfiguration();
     await loadResources(configFile!);
   }
 
@@ -325,7 +325,7 @@ class BenchmarkState extends ChangeNotifier {
     await result.resourceManager.configurationsManager
         .createConfigurationFile();
     await result.resourceManager.loadBatchPresets();
-    final configFile = await result.handleChosenConfiguration(store: store);
+    final configFile = await result.handleChosenConfiguration();
     await result.loadResources(configFile!);
 
     final loadFromStore = () {
@@ -340,7 +340,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<File?> handleChosenConfiguration(
-      {BenchmarksConfig? newChosenConfiguration, required Store store}) async {
+      {BenchmarksConfig? newChosenConfiguration}) async {
     final benchmarksConfiguration = newChosenConfiguration ??
         await resourceManager.configurationsManager
             .getChosenConfig(_chosenBenchmarksConfigurationName);
@@ -378,7 +378,7 @@ class BenchmarkState extends ChangeNotifier {
 
     if (newChosenConfiguration != null || benchmarksConfiguration == null) {
       _chosenBenchmarksConfigurationName = configurationName;
-      store.chosenConfigurationName = configurationName;
+      _store.chosenConfigurationName = configurationName;
 
       final nonRemovableResources = <String>[configFile.path];
 

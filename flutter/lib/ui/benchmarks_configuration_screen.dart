@@ -35,7 +35,6 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
         onTap: () async {
           final configFile = await state.handleChosenConfiguration(
             newChosenConfiguration: !wasChosen ? configuration : null,
-            store: store,
           );
 
           if (configFile != null) {
