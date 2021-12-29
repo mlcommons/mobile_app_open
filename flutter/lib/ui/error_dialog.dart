@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide Icons;
 
-import 'package:mlcommons_ios_app/icons.dart';
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
+import 'package:mlperfbench/icons.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
 
 Future<void> showErrorDialog(BuildContext context, List<String> errors) async {
   final stringResources = AppLocalizations.of(context);

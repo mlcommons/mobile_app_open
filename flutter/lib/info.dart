@@ -1,5 +1,5 @@
-import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'icons.dart';
 
 class BenchmarkInfoItem {

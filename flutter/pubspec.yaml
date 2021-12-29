@@ -1,5 +1,5 @@
-name: mlcommons_ios_app
-description: A new Flutter project.
+name: mlperfbench
+description: The MLPerf app offers a simple mobile UI for executing MLPerf inference tasks and comparing results.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.

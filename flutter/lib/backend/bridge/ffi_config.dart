@@ -2,7 +2,7 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import 'package:mlcommons_ios_app/protos/mlperf_task.pb.dart' as pb;
+import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'handle.dart';
 
 class _RunOut extends Struct {

@@ -1,4 +1,4 @@
-import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
 
 class BenchmarkMode {
   static final String backendPerfomance = 'PerformanceOnly';

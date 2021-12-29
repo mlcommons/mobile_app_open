@@ -2,7 +2,7 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import 'package:mlcommons_ios_app/backend/run_settings.dart';
+import 'package:mlperfbench/backend/run_settings.dart';
 import 'handle.dart';
 
 class _RunIn extends Struct {

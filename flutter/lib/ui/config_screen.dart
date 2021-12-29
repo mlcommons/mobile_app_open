@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
-import 'package:mlcommons_ios_app/store.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/store.dart';
 import 'config_batch_screen.dart';
 
 class ConfigScreen extends StatefulWidget {

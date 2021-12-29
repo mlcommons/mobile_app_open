@@ -4,7 +4,7 @@ import 'dart:io' show Platform;
 import 'package:device_info/device_info.dart';
 import 'package:ffi/ffi.dart';
 
-import 'package:mlcommons_ios_app/protos/backend_setting.pb.dart' as pb;
+import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'handle.dart';
 
 class _RunOut extends Struct {

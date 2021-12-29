@@ -5,17 +5,17 @@ import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
-import 'package:mlcommons_ios_app/icons.dart' as app_icons;
-import 'package:mlcommons_ios_app/info.dart';
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
-import 'package:mlcommons_ios_app/store.dart';
-import 'package:mlcommons_ios_app/ui/app_bar.dart';
-import 'package:mlcommons_ios_app/ui/confirm_dialog.dart';
-import 'package:mlcommons_ios_app/ui/error_dialog.dart';
-import 'package:mlcommons_ios_app/ui/list_of_benchmark_items.dart';
-import 'package:mlcommons_ios_app/ui/page_constraints.dart';
-import 'package:mlcommons_ios_app/ui/result_circle.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/icons.dart' as app_icons;
+import 'package:mlperfbench/info.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/app_bar.dart';
+import 'package:mlperfbench/ui/confirm_dialog.dart';
+import 'package:mlperfbench/ui/error_dialog.dart';
+import 'package:mlperfbench/ui/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/page_constraints.dart';
+import 'package:mlperfbench/ui/result_circle.dart';
 import 'main_screen.dart';
 
 enum _ScreenMode { performance, accuracy }

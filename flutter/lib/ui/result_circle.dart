@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import 'package:mlcommons_ios_app/icons.dart' as app_icons;
+import 'package:mlperfbench/icons.dart' as app_icons;
 
 class ResultCircle extends StatefulWidget {
   final num _value;

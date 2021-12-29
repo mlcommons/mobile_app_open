@@ -4,10 +4,10 @@ import 'package:flutter/material.dart' hide Icons;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:mlcommons_ios_app/icons.dart' show Icons;
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
-import 'package:mlcommons_ios_app/store.dart';
-import 'package:mlcommons_ios_app/ui/page_constraints.dart';
+import 'package:mlperfbench/icons.dart' show Icons;
+import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/page_constraints.dart';
 import 'main_screen.dart';
 
 class ShareKeys {
