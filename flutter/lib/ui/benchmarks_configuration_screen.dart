@@ -52,14 +52,14 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
-    final chosenConfiguration = state.chosenConfig;
+    final currentConfiguration = state.currentConfig;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(stringResources.benchmarksConfigurationTitle),
       ),
       body: FutureBuilder<BenchmarksConfig?>(
-        future: chosenConfiguration,
+        future: currentConfiguration,
         builder: (context, snapshot) => ListView.builder(
             itemCount: _benchmarksConfigurations.length,
             itemBuilder: (context, index) {
