@@ -4,17 +4,18 @@ import 'package:provider/provider.dart';
 
 import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
 import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
+import 'package:mlcommons_ios_app/resources/configurations_manager.dart';
 import 'package:mlcommons_ios_app/store.dart';
 import 'package:mlcommons_ios_app/ui/error_dialog.dart';
 
 class BenchmarksConfigurationScreen extends StatelessWidget {
-  final List<BenchmarksConfiguration> _benchmarksConfigurations;
+  final List<BenchmarksConfig> _benchmarksConfigurations;
 
   BenchmarksConfigurationScreen(this._benchmarksConfigurations);
 
   Card getOptionPattern(
     BuildContext context,
-    BenchmarksConfiguration configuration,
+    BenchmarksConfig configuration,
     String chosenBenchmarksConfiguration,
   ) {
     final store = context.watch<Store>();
@@ -59,7 +60,7 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(stringResources.benchmarksConfigurationTitle),
       ),
-      body: FutureBuilder<BenchmarksConfiguration?>(
+      body: FutureBuilder<BenchmarksConfig?>(
         future: chosenConfiguration,
         builder: (context, snapshot) => ListView.builder(
             itemCount: _benchmarksConfigurations.length,

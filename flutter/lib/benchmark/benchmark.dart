@@ -22,12 +22,13 @@ import 'package:mlcommons_ios_app/backend/bridge/isolate.dart';
 import 'package:mlcommons_ios_app/backend/list.dart';
 import 'package:mlcommons_ios_app/backend/run_settings.dart';
 import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
-import 'package:mlcommons_ios_app/benchmark/resource_manager.dart';
 import 'package:mlcommons_ios_app/icons.dart';
 import 'package:mlcommons_ios_app/info.dart';
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
 import 'package:mlcommons_ios_app/protos/backend_setting.pb.dart' as pb;
 import 'package:mlcommons_ios_app/protos/mlperf_task.pb.dart' as pb;
+import 'package:mlcommons_ios_app/resources/configurations_manager.dart';
+import 'package:mlcommons_ios_app/resources/resource_manager.dart';
+import 'package:mlcommons_ios_app/resources/utils.dart';
 import 'package:mlcommons_ios_app/store.dart';
 
 class Benchmark {
@@ -147,17 +148,6 @@ enum BenchmarkStateEnum {
   done,
 }
 
-class BenchmarksConfiguration {
-  final String name;
-  final String path;
-
-  BenchmarksConfiguration(this.name, this.path);
-
-  String getType(AppLocalizations stringResources) => isInternetResource(path)
-      ? stringResources.internetResource
-      : stringResources.localResource;
-}
-
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
   final BridgeIsolate backendBridge;
@@ -173,9 +163,9 @@ class BenchmarkState extends ChangeNotifier {
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get downloadingProgress => resourceManager.progress;
 
-  Future<BenchmarksConfiguration?> get chosenBenchmarksConfiguration async =>
-      await resourceManager
-          .getChosenConfiguration(_chosenBenchmarksConfigurationName);
+  Future<BenchmarksConfig?> get chosenBenchmarksConfiguration async =>
+      await resourceManager.configurationsManager
+          .getChosenConfig(_chosenBenchmarksConfigurationName);
 
   // Only if [state] == [BenchmarkStateEnum.running]
   Benchmark? currentlyRunning;
@@ -272,8 +262,8 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> clearCache() async {
-    await resourceManager.deleteLoadedResources([], 0);
-    await resourceManager.deleteDefaultBenchmarksConfiguration();
+    await resourceManager.cacheManager.deleteLoadedResources([], 0);
+    await resourceManager.configurationsManager.deleteDefaultConfig();
     _store.clearBenchmarkList();
     final configFile = await handleChosenConfiguration(store: _store);
     await loadResources(configFile!);
@@ -301,7 +291,6 @@ class BenchmarkState extends ChangeNotifier {
 
       _store.addBenchmarkToList(item.id, item.taskName, batchPreset);
     }
-    resourceManager.resources = _middle.data();
     await reset();
 
     final packageInfo = await PackageInfo.fromPlatform();
@@ -311,7 +300,10 @@ class BenchmarkState extends ChangeNotifier {
       _store.previousAppVersion = newAppVersion;
       needToPurgeCache = true;
     }
-    resourceManager.handleResources(needToPurgeCache);
+
+    await Wakelock.enable();
+    resourceManager.handleResources(_middle.data(), needToPurgeCache);
+    await Wakelock.disable();
   }
 
   Future<bool> _handlePreviousResult() async {
@@ -347,7 +339,7 @@ class BenchmarkState extends ChangeNotifier {
       }
     } else {
       await _store.deletePreviousResult();
-      await resourceManager.deleteResultJson();
+      await resourceManager.resultManager.delete();
     }
 
     return false;
@@ -358,7 +350,8 @@ class BenchmarkState extends ChangeNotifier {
     await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
-    await result.resourceManager.createConfigurationFile();
+    await result.resourceManager.configurationsManager
+        .createConfigurationFile();
     await result.resourceManager.loadBatchPresets();
     final configFile = await result.handleChosenConfiguration(store: store);
     await result.loadResources(configFile!);
@@ -375,15 +368,14 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<File?> handleChosenConfiguration(
-      {BenchmarksConfiguration? newChosenConfiguration,
-      required Store store}) async {
+      {BenchmarksConfig? newChosenConfiguration, required Store store}) async {
     final benchmarksConfiguration = newChosenConfiguration ??
-        await resourceManager
-            .getChosenConfiguration(_chosenBenchmarksConfigurationName);
+        await resourceManager.configurationsManager
+            .getChosenConfig(_chosenBenchmarksConfigurationName);
     final path = benchmarksConfiguration?.path ??
-        resourceManager.defaultBenchmarksConfiguration.path;
+        resourceManager.configurationsManager.defaultConfig.path;
     final configurationName = benchmarksConfiguration?.name ??
-        resourceManager.defaultBenchmarksConfiguration.name;
+        resourceManager.configurationsManager.defaultConfig.name;
     File configFile;
 
     if (isInternetResource(path)) {
@@ -395,7 +387,8 @@ class BenchmarkState extends ChangeNotifier {
         if (newChosenConfiguration != null ||
             benchmarksConfiguration == null ||
             !await currentConfigFile.exists()) {
-          configFile = await resourceManager.getFileByUrl(path);
+          configFile = File(await resourceManager.cacheManager.fileCacheHelper
+              .get(path, true));
           configFile = await resourceManager.moveFile(
               configFile, currentConfigFile.path);
         } else {
@@ -417,7 +410,8 @@ class BenchmarkState extends ChangeNotifier {
 
       final nonRemovableResources = <String>[configFile.path];
 
-      await resourceManager.deleteLoadedResources(nonRemovableResources);
+      await resourceManager.cacheManager
+          .deleteLoadedResources(nonRemovableResources);
     }
 
     return configFile;
@@ -579,7 +573,7 @@ class BenchmarkState extends ChangeNotifier {
     }
 
     _store.previousResult = JsonEncoder().convert(briefResultContent);
-    await resourceManager.writeToJsonResult(resultContent);
+    await resourceManager.resultManager.write(resultContent);
   }
 
   Future<void> abortBenchmarks() async {
