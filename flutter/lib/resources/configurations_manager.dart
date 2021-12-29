@@ -67,9 +67,6 @@ class ConfigurationsManager {
     if (configPath != null) {
       return BenchmarksConfig(name, configPath);
     }
-    if (name == defaultConfig.name) {
-      return defaultConfig;
-    }
     return null;
   }
 }

@@ -63,7 +63,7 @@ void autostartHandler(BenchmarkState state, Store store) async {
   }
   if (state.state == BenchmarkStateEnum.done) {
     print(const String.fromEnvironment('resultsStringMark'));
-    print(await state.resourceManager.resultManager.json);
+    print(await state.resourceManager.resultManager.read());
     print(const String.fromEnvironment('terminalStringMark'));
     exit(0);
   }

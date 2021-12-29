@@ -19,7 +19,7 @@ class ResultManager {
     await jsonFile.writeAsString(encoded);
   }
 
-  Future<String> get json async {
+  Future<String> read() async {
     final file = File(_jsonResultPath);
 
     if (await file.exists()) {

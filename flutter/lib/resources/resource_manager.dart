@@ -26,6 +26,7 @@ class BatchPreset {
 class ResourceManager {
   static const _applicationDirectoryPrefix = 'app://';
   static const _loadedResourcesDirName = 'loaded_resources';
+  static const _defaultBatchSettingsPath = 'assets/default_batch_settings.yaml';
 
   final VoidCallback _onUpdate;
 
@@ -140,8 +141,7 @@ class ResourceManager {
       shardsCount: 0,
     ));
 
-    final yamlString =
-        await rootBundle.loadString('assets/default_batch_settings.yaml');
+    final yamlString = await rootBundle.loadString(_defaultBatchSettingsPath);
     for (var item in loadYaml(yamlString)['devices']) {
       result.add(BatchPreset(
         name: item['name'] as String,

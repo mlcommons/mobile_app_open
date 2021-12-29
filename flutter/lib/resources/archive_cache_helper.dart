@@ -6,9 +6,9 @@ import 'file_cache_helper.dart';
 
 class ArchiveCacheHelper {
   static const extension = '.zip';
-  final FileCacheHelper cacheManager;
+  final FileCacheHelper fileCacheHelper;
 
-  ArchiveCacheHelper(this.cacheManager);
+  ArchiveCacheHelper(this.fileCacheHelper);
 
   String _getArchiveFolder(String cachedPath) {
     return cachedPath.substring(0, cachedPath.length - extension.length);
@@ -20,14 +20,14 @@ class ArchiveCacheHelper {
   // If archive is not cached and downloadMissing=false,
   //    returns empty string
   Future<String> get(String url, bool downloadMissing) async {
-    var cachePath = _getArchiveFolder(cacheManager.getCachePath(url));
+    var cachePath = _getArchiveFolder(fileCacheHelper.getCachePath(url));
     if (await Directory(cachePath).exists()) {
       return cachePath;
     }
     if (!downloadMissing) {
       return '';
     }
-    var file = await cacheManager.get(url, true);
+    var file = await fileCacheHelper.get(url, true);
     await _unzipFile(file);
     await File(file).delete();
     return cachePath;

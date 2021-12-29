@@ -3,6 +3,8 @@ import 'dart:io';
 import 'archive_cache_helper.dart';
 import 'file_cache_helper.dart';
 
+const _oldFilesAgeInDays = 30 * 9;
+
 class CacheManager {
   final String loadedResourcesDir;
   late final FileCacheHelper fileCacheHelper;
@@ -90,8 +92,7 @@ class CacheManager {
     await _download(resourcesToDownload, reportProgress);
 
     if (purgeOldCache) {
-      const atLeastDaysOld = 30 * 9;
-      await purgeOutdatedCache(atLeastDaysOld);
+      await purgeOutdatedCache(_oldFilesAgeInDays);
     }
   }
 
