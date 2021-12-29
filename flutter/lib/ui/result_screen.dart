@@ -59,6 +59,26 @@ class _ResultScreenState extends State<ResultScreen>
     super.dispose();
   }
 
+  String _getFormattedAccuracyValue(Benchmark benchmark) {
+    final accuracy = benchmark.accuracy;
+    if (accuracy == null) return 'N/A';
+    final numeric = _getNumericAccuracy(accuracy);
+    switch (benchmark.type) {
+      // if the benchmark type is unknown, just show the original string
+      // so we know that this need to be fixed
+      case BenchmarkTypeEnum.unknown:
+        return _getAccuracyValue(benchmark.accuracy);
+      case BenchmarkTypeEnum.imageClassification:
+        return (numeric * 100).toStringAsFixed(2);
+      case BenchmarkTypeEnum.objectDetection:
+        return (numeric * 100).toStringAsFixed(2);
+      case BenchmarkTypeEnum.imageSegmentation:
+        return (numeric * 100).toStringAsFixed(2);
+      case BenchmarkTypeEnum.languageUnderstanding:
+        return numeric.toStringAsFixed(2);
+    }
+  }
+
   double _getNumericAccuracy(String accuracy) {
     final percentPattern = '%';
 
@@ -225,7 +245,7 @@ class _ResultScreenState extends State<ResultScreen>
                 Text(
                   _screenMode == _ScreenMode.performance
                       ? benchmark.score?.toStringAsFixed(2) ?? 'N/A'
-                      : _getAccuracyValue(benchmark.accuracy),
+                      : _getFormattedAccuracyValue(benchmark),
                   style: TextStyle(
                       fontSize: 32.0,
                       color: Colors.white,

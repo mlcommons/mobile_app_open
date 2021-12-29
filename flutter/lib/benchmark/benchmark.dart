@@ -56,6 +56,8 @@ class Benchmark {
   /// 'SingleStream' or 'Offline'.
   String get scenario => modelConfig.scenario;
 
+  BenchmarkTypeEnum get type => _typeFromCode();
+
   SvgPicture get icon => BENCHMARK_ICONS[scenario]?[code] ?? Icons.logo;
 
   SvgPicture get iconWhite =>
@@ -63,6 +65,21 @@ class Benchmark {
 
   @override
   String toString() => 'Benchmark:$id';
+
+  BenchmarkTypeEnum _typeFromCode() {
+    switch (code) {
+      case 'IC':
+        return BenchmarkTypeEnum.imageClassification;
+      case 'OD':
+        return BenchmarkTypeEnum.objectDetection;
+      case 'IS':
+        return BenchmarkTypeEnum.imageSegmentation;
+      case 'LU':
+        return BenchmarkTypeEnum.languageUnderstanding;
+      default:
+        return BenchmarkTypeEnum.unknown;
+    }
+  }
 }
 
 class MiddleInterface {
@@ -137,6 +154,14 @@ class MiddleInterface {
     result.sort();
     return result.where((element) => element.isNotEmpty).toList();
   }
+}
+
+enum BenchmarkTypeEnum {
+  unknown,
+  imageClassification,
+  objectDetection,
+  imageSegmentation,
+  languageUnderstanding,
 }
 
 enum BenchmarkStateEnum {
