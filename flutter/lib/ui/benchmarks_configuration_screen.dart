@@ -34,7 +34,7 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
         trailing: Text(configuration.getType(stringResources)),
         onTap: () async {
           try {
-            final configFile = await state.handleChosenConfiguration(
+            final configFile = await state.changeConfig(
               newConfig: !wasChosen ? configuration : null,
             );
             Navigator.of(context).popUntil((route) => route.isFirst);

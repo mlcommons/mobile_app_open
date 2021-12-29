@@ -152,6 +152,7 @@ class BenchmarkState extends ChangeNotifier {
   final BridgeIsolate backendBridge;
 
   late final ResourceManager resourceManager;
+  late final ConfigurationsManager configManager;
 
   String _currentConfigName;
 
@@ -163,7 +164,7 @@ class BenchmarkState extends ChangeNotifier {
   String get downloadingProgress => resourceManager.progress;
 
   Future<BenchmarksConfig?> get currentConfig async =>
-      await resourceManager.configManager.getConfig(_currentConfigName);
+      await configManager.getConfig(_currentConfigName);
 
   // Only if [state] == [BenchmarkStateEnum.running]
   Benchmark? currentlyRunning;
@@ -261,7 +262,7 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> clearCache() async {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
-    await resourceManager.configManager.deleteDefaultConfig();
+    await configManager.deleteDefaultConfig();
     _store.clearBenchmarkList();
     final configFile = await changeConfig();
     await loadResources(configFile);
@@ -321,7 +322,8 @@ class BenchmarkState extends ChangeNotifier {
     await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
-    await result.resourceManager.configManager.createConfigurationsFile();
+    result.configManager = ConfigurationsManager(result.resourceManager.applicationDirectory);
+    await result.configManager.createConfigurationsFile();
     await result.resourceManager.loadBatchPresets();
     final configFile = await result.changeConfig();
     await result.loadResources(configFile);
@@ -340,7 +342,7 @@ class BenchmarkState extends ChangeNotifier {
   Future<File> changeConfig({BenchmarksConfig? newConfig}) async {
     final config = newConfig ??
         await currentConfig ??
-        resourceManager.configManager.defaultConfig;
+        configManager.defaultConfig;
     String configFilePath;
 
     if (isInternetResource(config.path)) {
