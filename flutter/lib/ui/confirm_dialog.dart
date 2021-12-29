@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Icons;
 
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
 
 enum ConfirmDialogAction { ok, cancel }
 

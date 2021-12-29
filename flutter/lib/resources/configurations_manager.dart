@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'utils.dart';
 
 const _configurationsFileName = 'benchmarksConfigurations.json';

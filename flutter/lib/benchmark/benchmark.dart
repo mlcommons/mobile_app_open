@@ -15,21 +15,21 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
-import 'package:mlcommons_ios_app/backend/bridge/ffi_config.dart';
-import 'package:mlcommons_ios_app/backend/bridge/ffi_match.dart';
-import 'package:mlcommons_ios_app/backend/bridge/handle.dart';
-import 'package:mlcommons_ios_app/backend/bridge/isolate.dart';
-import 'package:mlcommons_ios_app/backend/list.dart';
-import 'package:mlcommons_ios_app/backend/run_settings.dart';
-import 'package:mlcommons_ios_app/benchmark/benchmark_result.dart';
-import 'package:mlcommons_ios_app/icons.dart';
-import 'package:mlcommons_ios_app/info.dart';
-import 'package:mlcommons_ios_app/protos/backend_setting.pb.dart' as pb;
-import 'package:mlcommons_ios_app/protos/mlperf_task.pb.dart' as pb;
-import 'package:mlcommons_ios_app/resources/configurations_manager.dart';
-import 'package:mlcommons_ios_app/resources/resource_manager.dart';
-import 'package:mlcommons_ios_app/resources/utils.dart';
-import 'package:mlcommons_ios_app/store.dart';
+import 'package:mlperfbench/backend/bridge/ffi_config.dart';
+import 'package:mlperfbench/backend/bridge/ffi_match.dart';
+import 'package:mlperfbench/backend/bridge/handle.dart';
+import 'package:mlperfbench/backend/bridge/isolate.dart';
+import 'package:mlperfbench/backend/list.dart';
+import 'package:mlperfbench/backend/run_settings.dart';
+import 'package:mlperfbench/benchmark/benchmark_result.dart';
+import 'package:mlperfbench/icons.dart';
+import 'package:mlperfbench/info.dart';
+import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
+import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
+import 'package:mlperfbench/resources/configurations_manager.dart';
+import 'package:mlperfbench/resources/resource_manager.dart';
+import 'package:mlperfbench/resources/utils.dart';
+import 'package:mlperfbench/store.dart';
 
 class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;

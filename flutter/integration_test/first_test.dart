@@ -5,10 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'dart:convert';
 
-import 'package:mlcommons_ios_app/main.dart' as app;
-import 'package:mlcommons_ios_app/ui/main_screen.dart';
-import 'package:mlcommons_ios_app/ui/result_screen.dart';
-import 'package:mlcommons_ios_app/resources/resource_manager.dart'
+import 'package:mlperfbench/main.dart' as app;
+import 'package:mlperfbench/ui/main_screen.dart';
+import 'package:mlperfbench/ui/result_screen.dart';
+import 'package:mlperfbench/resources/resource_manager.dart'
     as resource_manager;
 
 void main() {

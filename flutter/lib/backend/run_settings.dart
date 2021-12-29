@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
 
 class RunSettings {
   final String backend_model_path;

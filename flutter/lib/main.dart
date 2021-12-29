@@ -6,13 +6,13 @@ import 'package:flutter/services.dart';
 
 import 'package:provider/provider.dart';
 
-import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
-import 'package:mlcommons_ios_app/store.dart';
-import 'package:mlcommons_ios_app/ui/main_screen.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/main_screen.dart';
 
 // TODO sharing screen temporarily disabled
-// import 'package:mlcommons_ios_app/ui/share_screen.dart';
+// import 'package:mlperfbench/ui/share_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

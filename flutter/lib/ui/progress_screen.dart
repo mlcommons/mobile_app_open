@@ -3,9 +3,9 @@ import 'package:flutter/material.dart' hide Icons;
 
 import 'package:provider/provider.dart';
 
-import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
-import 'package:mlcommons_ios_app/ui/progress_circles.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/progress_circles.dart';
 
 class ProgressScreen extends StatefulWidget {
   @override

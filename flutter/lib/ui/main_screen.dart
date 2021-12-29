@@ -6,15 +6,15 @@ import 'package:flutter/material.dart' hide Icons;
 
 import 'package:provider/provider.dart';
 
-import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
-import 'package:mlcommons_ios_app/icons.dart';
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
-import 'package:mlcommons_ios_app/ui/app_bar.dart';
-import 'package:mlcommons_ios_app/ui/confirm_dialog.dart';
-import 'package:mlcommons_ios_app/ui/error_dialog.dart';
-import 'package:mlcommons_ios_app/ui/list_of_benchmark_items.dart';
-import 'package:mlcommons_ios_app/ui/progress_screen.dart';
-import 'package:mlcommons_ios_app/ui/result_screen.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/icons.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/app_bar.dart';
+import 'package:mlperfbench/ui/confirm_dialog.dart';
+import 'package:mlperfbench/ui/error_dialog.dart';
+import 'package:mlperfbench/ui/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/progress_screen.dart';
+import 'package:mlperfbench/ui/result_screen.dart';
 
 class MainKeys {
   // list of widget keys that need to be accessed in the test code

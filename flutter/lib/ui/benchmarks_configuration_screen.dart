@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
-import 'package:mlcommons_ios_app/benchmark/benchmark.dart';
-import 'package:mlcommons_ios_app/localizations/app_localizations.dart';
-import 'package:mlcommons_ios_app/resources/configurations_manager.dart';
-import 'package:mlcommons_ios_app/store.dart';
-import 'package:mlcommons_ios_app/ui/error_dialog.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/resources/configurations_manager.dart';
+import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/error_dialog.dart';
 
 class BenchmarksConfigurationScreen extends StatelessWidget {
   final List<BenchmarksConfig> _benchmarksConfigurations;
