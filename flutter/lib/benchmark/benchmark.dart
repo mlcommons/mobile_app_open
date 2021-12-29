@@ -154,17 +154,12 @@ class BenchmarkState extends ChangeNotifier {
   late final ResourceManager resourceManager;
   late final ConfigurationsManager configManager;
 
-  String _currentConfigName;
-
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
   bool _cooling = false;
 
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get downloadingProgress => resourceManager.progress;
-
-  Future<BenchmarksConfig?> get currentConfig async =>
-      await configManager.getConfig(_currentConfigName);
 
   // Only if [state] == [BenchmarkStateEnum.running]
   Benchmark? currentlyRunning;
@@ -201,8 +196,7 @@ class BenchmarkState extends ChangeNotifier {
 
   late MiddleInterface _middle;
 
-  BenchmarkState._(this._store, this.backendBridge)
-      : _currentConfigName = _store.chosenConfigurationName {
+  BenchmarkState._(this._store, this.backendBridge) {
     resourceManager = ResourceManager(notifyListeners);
   }
 
@@ -322,7 +316,7 @@ class BenchmarkState extends ChangeNotifier {
     await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
-    result.configManager = ConfigurationsManager(result.resourceManager.applicationDirectory);
+    result.configManager = ConfigurationsManager(result.resourceManager.applicationDirectory, store.chosenConfigurationName, result.resourceManager);
     await result.configManager.createConfigurationsFile();
     await result.resourceManager.loadBatchPresets();
     final configFile = await result.changeConfig();
@@ -341,34 +335,11 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<File> changeConfig({BenchmarksConfig? newConfig}) async {
     final config = newConfig ??
-        await currentConfig ??
+        await configManager.currentConfig ??
         configManager.defaultConfig;
-    String configFilePath;
-
-    if (isInternetResource(config.path)) {
-      configFilePath = await resourceManager.cacheManager.fileCacheHelper
-          .get(config.path, true);
-    } else {
-      configFilePath = resourceManager.get(config.path);
-      if (!await File(configFilePath).exists()) {
-        throw 'local config file is missing: $configFilePath';
-      }
-    }
-
-    if (newConfig != null) {
-      _currentConfigName = config.name;
+    await configManager.setConfig(config);
+    var configFilePath = configManager.getConfigFilePath();
       _store.chosenConfigurationName = config.name;
-
-      final nonRemovableResources = <String>[];
-      if (isInternetResource(config.path)) {
-        nonRemovableResources.add(resourceManager.cacheManager.fileCacheHelper
-            .getResourceRelativePath(config.path));
-      }
-
-      await resourceManager.cacheManager
-          .deleteLoadedResources(nonRemovableResources);
-    }
-
     return File(configFilePath);
   }
 

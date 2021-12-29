@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/resources/resource_manager.dart';
 import 'utils.dart';
 
 const _configurationsFileName = 'benchmarksConfigurations.json';
@@ -21,10 +22,49 @@ class BenchmarksConfig {
 
 class ConfigurationsManager {
   final String applicationDirectory;
+  final ResourceManager resourceManager;
   final BenchmarksConfig defaultConfig =
       BenchmarksConfig('default', _defaultConfigUrl);
+  String currentConfigName;
+    String configFilePath = '';
 
-  ConfigurationsManager(this.applicationDirectory);
+  ConfigurationsManager(this.applicationDirectory, this.currentConfigName, this.resourceManager);
+
+  Future<BenchmarksConfig?> get currentConfig async =>
+      await getConfig(currentConfigName);
+
+      
+  Future<void> setConfig(BenchmarksConfig config) async {
+    if (isInternetResource(config.path)) {
+      configFilePath = await resourceManager.cacheManager.fileCacheHelper
+          .get(config.path, true);
+    } else {
+      configFilePath = resourceManager.get(config.path);
+      if (!await File(configFilePath).exists()) {
+        throw 'local config file is missing: $configFilePath';
+      }
+    }
+
+    if (currentConfigName == config.name) {
+      return;
+    }
+
+    currentConfigName = config.name;
+
+    final nonRemovableResources = <String>[];
+    if (isInternetResource(config.path)) {
+      nonRemovableResources.add(resourceManager.cacheManager.fileCacheHelper
+          .getResourceRelativePath(config.path));
+    }
+
+    await resourceManager.cacheManager
+        .deleteLoadedResources(nonRemovableResources);
+  }
+
+  String getConfigFilePath() {
+    return configFilePath;
+  }
+
 
   Future<File> createConfigurationsFile() async {
     final file = File('$applicationDirectory/$_configurationsFileName');
