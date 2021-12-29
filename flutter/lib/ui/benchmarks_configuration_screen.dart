@@ -39,7 +39,7 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
             );
             Navigator.of(context).popUntil((route) => route.isFirst);
             await state.loadResources(configFile);
-          } catch(e) {
+          } catch (e) {
             await showErrorDialog(
                 context, <String>[stringResources.errorConfig, e.toString()]);
           }
@@ -52,7 +52,7 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
-    final chosenConfiguration = state.chosenBenchmarksConfiguration;
+    final chosenConfiguration = state.chosenConfig;
 
     return Scaffold(
       appBar: AppBar(

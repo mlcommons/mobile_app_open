@@ -26,7 +26,7 @@ class ConfigurationsManager {
 
   ConfigurationsManager(this.applicationDirectory);
 
-  Future<File> createConfigurationFile() async {
+  Future<File> createConfigurationsFile() async {
     final file = File('$applicationDirectory/$_configurationsFileName');
     if (await file.exists()) return file;
 
@@ -38,11 +38,11 @@ class ConfigurationsManager {
   }
 
   Future<Map<String, dynamic>> _readConfigs() async {
-    final file = await createConfigurationFile();
+    final file = await createConfigurationsFile();
     return jsonDecode(await file.readAsString()) as Map<String, dynamic>;
   }
 
-  Future<List<BenchmarksConfig>> getAvailableConfigs() async {
+  Future<List<BenchmarksConfig>> getList() async {
     final jsonContent = await _readConfigs();
 
     final result = <BenchmarksConfig>[];
@@ -60,7 +60,7 @@ class ConfigurationsManager {
     }
   }
 
-  Future<BenchmarksConfig?> getChosenConfig(String name) async {
+  Future<BenchmarksConfig?> getConfig(String name) async {
     final jsonContent = await _readConfigs();
     final configPath = jsonContent[name] as String?;
 

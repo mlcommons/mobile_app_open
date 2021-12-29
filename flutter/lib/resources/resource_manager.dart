@@ -39,7 +39,7 @@ class ResourceManager {
   late final List<BatchPreset> _batchPresets;
 
   late final CacheManager cacheManager;
-  late final ConfigurationsManager configurationsManager;
+  late final ConfigurationsManager configManager;
   late final ResultManager resultManager;
 
   ResourceManager(this._onUpdate);
@@ -120,7 +120,7 @@ class ResourceManager {
     await Directory(_loadedResourcesDir).create();
 
     cacheManager = CacheManager(_loadedResourcesDir);
-    configurationsManager = ConfigurationsManager(applicationDirectory);
+    configManager = ConfigurationsManager(applicationDirectory);
     resultManager = ResultManager(applicationDirectory);
   }
 

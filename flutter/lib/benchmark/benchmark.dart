@@ -153,7 +153,7 @@ class BenchmarkState extends ChangeNotifier {
 
   late final ResourceManager resourceManager;
 
-  String _chosenBenchmarksConfigurationName;
+  String _chosenConfigName;
 
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
@@ -162,9 +162,8 @@ class BenchmarkState extends ChangeNotifier {
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get downloadingProgress => resourceManager.progress;
 
-  Future<BenchmarksConfig?> get chosenBenchmarksConfiguration async =>
-      await resourceManager.configurationsManager
-          .getChosenConfig(_chosenBenchmarksConfigurationName);
+  Future<BenchmarksConfig?> get chosenConfig async =>
+      await resourceManager.configManager.getConfig(_chosenConfigName);
 
   // Only if [state] == [BenchmarkStateEnum.running]
   Benchmark? currentlyRunning;
@@ -202,7 +201,7 @@ class BenchmarkState extends ChangeNotifier {
   late MiddleInterface _middle;
 
   BenchmarkState._(this._store, this.backendBridge)
-      : _chosenBenchmarksConfigurationName = _store.chosenConfigurationName {
+      : _chosenConfigName = _store.chosenConfigurationName {
     resourceManager = ResourceManager(notifyListeners);
   }
 
@@ -262,7 +261,7 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> clearCache() async {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
-    await resourceManager.configurationsManager.deleteDefaultConfig();
+    await resourceManager.configManager.deleteDefaultConfig();
     _store.clearBenchmarkList();
     final configFile = await handleChosenConfiguration();
     await loadResources(configFile);
@@ -322,8 +321,7 @@ class BenchmarkState extends ChangeNotifier {
     await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
-    await result.resourceManager.configurationsManager
-        .createConfigurationFile();
+    await result.resourceManager.configManager.createConfigurationsFile();
     await result.resourceManager.loadBatchPresets();
     final configFile = await result.handleChosenConfiguration();
     await result.loadResources(configFile);
@@ -341,24 +339,22 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<File> handleChosenConfiguration({BenchmarksConfig? newConfig}) async {
     final config = newConfig ??
-        await resourceManager.configurationsManager
-            .getChosenConfig(_chosenBenchmarksConfigurationName) ??
-        resourceManager.configurationsManager.defaultConfig;
+        await chosenConfig ??
+        resourceManager.configManager.defaultConfig;
     String configFilePath;
 
     if (isInternetResource(config.path)) {
-      try {
-        configFilePath = await resourceManager.cacheManager.fileCacheHelper.get(config.path, true);
-      } catch (e) {
-        throw "can't download config file: $e";
-      }
+      configFilePath = await resourceManager.cacheManager.fileCacheHelper
+          .get(config.path, true);
     } else {
       configFilePath = resourceManager.get(config.path);
-      if (!await File(configFilePath).exists()) throw 'local config file is missing';
+      if (!await File(configFilePath).exists()) {
+        throw 'local config file is missing: $configFilePath';
+      }
     }
 
     if (newConfig != null) {
-      _chosenBenchmarksConfigurationName = config.name;
+      _chosenConfigName = config.name;
       _store.chosenConfigurationName = config.name;
 
       final nonRemovableResources = <String>[configFilePath];
