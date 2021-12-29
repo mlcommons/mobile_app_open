@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
 import 'cache_manager.dart';
-import 'configurations_manager.dart';
 import 'result_manager.dart';
 import 'utils.dart';
 

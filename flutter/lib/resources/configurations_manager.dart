@@ -26,14 +26,14 @@ class ConfigurationsManager {
   final BenchmarksConfig defaultConfig =
       BenchmarksConfig('default', _defaultConfigUrl);
   String currentConfigName;
-    String configFilePath = '';
+  String configFilePath = '';
 
-  ConfigurationsManager(this.applicationDirectory, this.currentConfigName, this.resourceManager);
+  ConfigurationsManager(
+      this.applicationDirectory, this.currentConfigName, this.resourceManager);
 
   Future<BenchmarksConfig?> get currentConfig async =>
       await getConfig(currentConfigName);
 
-      
   Future<void> setConfig(BenchmarksConfig config) async {
     if (isInternetResource(config.path)) {
       configFilePath = await resourceManager.cacheManager.fileCacheHelper
@@ -64,7 +64,6 @@ class ConfigurationsManager {
   String get configPath {
     return configFilePath;
   }
-
 
   Future<File> createConfigurationsFile() async {
     final file = File('$applicationDirectory/$_configurationsFileName');

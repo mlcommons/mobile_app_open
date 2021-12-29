@@ -316,7 +316,10 @@ class BenchmarkState extends ChangeNotifier {
     await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
-    result.configManager = ConfigurationsManager(result.resourceManager.applicationDirectory, store.chosenConfigurationName, result.resourceManager);
+    result.configManager = ConfigurationsManager(
+        result.resourceManager.applicationDirectory,
+        store.chosenConfigurationName,
+        result.resourceManager);
     await result.configManager.createConfigurationsFile();
     await result.resourceManager.loadBatchPresets();
     await result.resetConfig();
@@ -338,7 +341,7 @@ class BenchmarkState extends ChangeNotifier {
         await configManager.currentConfig ??
         configManager.defaultConfig;
     await configManager.setConfig(config);
-      _store.chosenConfigurationName = config.name;
+    _store.chosenConfigurationName = config.name;
   }
 
   BenchmarkStateEnum get state {
