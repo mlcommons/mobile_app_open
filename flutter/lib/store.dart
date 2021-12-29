@@ -12,8 +12,9 @@ class Store extends ChangeNotifier {
   final List<BenchmarkDescription> _benchmarkList = [];
 
   void addBenchmarkToList(
-      String id, String description, BatchPreset? batchPreset) {
-    _benchmarkList.add(BenchmarkDescription(id, description, batchPreset));
+      String id, String name, String description, BatchPreset? batchPreset) {
+    _benchmarkList
+        .add(BenchmarkDescription(id, name, description, batchPreset));
   }
 
   void clearBenchmarkList() {
@@ -130,13 +131,14 @@ class _StoreConstants {
 
 class BenchmarkDescription {
   String id;
+  String name;
   String description;
   bool active;
   BatchPreset? batchPreset;
   int batchSize = 0;
   int threadsNumber = 0;
 
-  BenchmarkDescription(this.id, this.description,
+  BenchmarkDescription(this.id, this.name, this.description,
       [this.batchPreset, this.active = true]) {
     if (batchPreset != null) {
       batchSize = batchPreset!.batchSize;

@@ -78,14 +78,7 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 28)),
-                                  Padding(
-                                      padding: EdgeInsets.only(top: 10),
-                                      child: Text(stringResources.benchmarkType,
-                                          textAlign: TextAlign.left,
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.grey))),
+                                          fontSize: 28))
                                 ])),
                         Flexible(
                             flex: 1,

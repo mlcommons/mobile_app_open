@@ -112,6 +112,8 @@ class _ResultScreenState extends State<ResultScreen>
     final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
     for (final benchmark in state.benchmarks) {
+      final backendDesc =
+          '${benchmark.benchmarkSetting.configuration} | ${benchmark.benchmarkSetting.acceleratorDesc}';
       late final String textResult;
       late final double numericResult;
       if (_screenMode == _ScreenMode.performance) {
@@ -130,7 +132,7 @@ class _ResultScreenState extends State<ResultScreen>
         children: [
           Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text(stringResources.benchmarkType)),
+              child: Text(backendDesc)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
