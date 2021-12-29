@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -308,35 +307,8 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<bool> _handlePreviousResult() async {
     if (_doneRunning == null) {
-      final content = _store.previousResult;
-
-      if (content.isNotEmpty) {
-        try {
-          for (final resultContent in jsonDecode(content)) {
-            final result = resultContent as Map<String, dynamic>;
-            final id = result['benchmark_id'] as String;
-            final accuracy = result['accuracy'] as String?;
-            final score = result['score'] as double?;
-            final threadsNumber = result['shards_num'] as int?;
-            final batchSize = result['batch_size'] as int?;
-            final benchmark =
-                benchmarks.singleWhere((benchmark) => benchmark.id == id);
-            benchmark.accuracy = accuracy;
-            benchmark.score = score;
-
-            if (benchmark.modelConfig.scenario == 'Offline') {
-              benchmark.benchmarkSetting.customSetting.add(pb.CustomSetting(
-                  id: 'batch_size', value: batchSize.toString()));
-              benchmark.benchmarkSetting.customSetting.add(pb.CustomSetting(
-                  id: 'shards_num', value: threadsNumber.toString()));
-              benchmark.benchmarkSetting.writeToBuffer();
-            }
-          }
-        } catch (_) {
-          return false;
-        }
-        return true;
-      }
+      return resourceManager.resultManager
+          .restoreResults(_store.previousResult, benchmarks);
     } else {
       await _store.deletePreviousResult();
       await resourceManager.resultManager.delete();
@@ -521,7 +493,10 @@ class BenchmarkState extends ChangeNotifier {
       }
     }
 
-    if (!_aborting) await _recordResult(results);
+    if (!_aborting) {
+      _store.previousResult =
+          await resourceManager.resultManager.record(results);
+    }
 
     currentlyRunning = null;
     _doneRunning = _aborting ? null : true;
@@ -529,51 +504,6 @@ class BenchmarkState extends ChangeNotifier {
     notifyListeners();
 
     await Wakelock.disable();
-  }
-
-  Future<void> _recordResult(List<RunResult?> results) async {
-    final resultContent = <Map<String, dynamic>>[];
-    final briefResultContent = <Map<String, dynamic>>[];
-
-    for (final result in results) {
-      if (result != null) {
-        final score =
-            result.mode == BenchmarkMode.accuracy ? null : result.score;
-
-        final benchmarkResult = {
-          'benchmark_id': result.id,
-          'configuration': {
-            'runtime': '',
-          },
-          'score': score != null ? score.toString() : 'N/A',
-          'accuracy': BenchmarkMode.performance_lite == result.mode
-              ? 'N/A'
-              : result.accuracy,
-          // strings are used here to match android app behavior
-          'min_duration': result.minDuration.toString(),
-          'duration': result.durationMs.toString(),
-          'min_samples': result.minSamples.toString(),
-          'num_samples': result.numSamples.toString(),
-          'shards_num': result.threadsNumber,
-          'batch_size': result.batchSize,
-          'mode': result.mode.toString(),
-          'datetime': DateTime.now().toIso8601String(),
-        };
-        final benchmarkBriefResult = {
-          'benchmark_id': result.id,
-          'score': score,
-          'accuracy': result.accuracy,
-          'shards_num': result.threadsNumber,
-          'batch_size': result.batchSize,
-        };
-
-        resultContent.add(benchmarkResult);
-        briefResultContent.add(benchmarkBriefResult);
-      }
-    }
-
-    _store.previousResult = JsonEncoder().convert(briefResultContent);
-    await resourceManager.resultManager.write(resultContent);
   }
 
   Future<void> abortBenchmarks() async {
