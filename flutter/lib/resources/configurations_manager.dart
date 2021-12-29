@@ -26,7 +26,7 @@ class ConfigurationsManager {
   final BenchmarksConfig defaultConfig =
       BenchmarksConfig('default', _defaultConfigUrl);
   String currentConfigName;
-  String configFilePath = '';
+  String configPath = '';
 
   ConfigurationsManager(
       this.applicationDirectory, this.currentConfigName, this.resourceManager);
@@ -36,12 +36,12 @@ class ConfigurationsManager {
 
   Future<void> setConfig(BenchmarksConfig config) async {
     if (isInternetResource(config.path)) {
-      configFilePath = await resourceManager.cacheManager.fileCacheHelper
+      configPath = await resourceManager.cacheManager.fileCacheHelper
           .get(config.path, true);
     } else {
-      configFilePath = resourceManager.get(config.path);
-      if (!await File(configFilePath).exists()) {
-        throw 'local config file is missing: $configFilePath';
+      configPath = resourceManager.get(config.path);
+      if (!await File(configPath).exists()) {
+        throw 'local config file is missing: $configPath';
       }
     }
 
@@ -59,10 +59,6 @@ class ConfigurationsManager {
 
     await resourceManager.cacheManager
         .deleteLoadedResources(nonRemovableResources);
-  }
-
-  String get configPath {
-    return configFilePath;
   }
 
   Future<File> createConfigurationsFile() async {
