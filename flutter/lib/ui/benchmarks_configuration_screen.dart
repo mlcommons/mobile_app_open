@@ -33,16 +33,15 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
         subtitle: Text(configuration.path),
         trailing: Text(configuration.getType(stringResources)),
         onTap: () async {
-          final configFile = await state.handleChosenConfiguration(
-            newChosenConfiguration: !wasChosen ? configuration : null,
-          );
-
-          if (configFile != null) {
+          try {
+            final configFile = await state.handleChosenConfiguration(
+              newConfig: !wasChosen ? configuration : null,
+            );
             Navigator.of(context).popUntil((route) => route.isFirst);
             await state.loadResources(configFile);
-          } else {
+          } catch(e) {
             await showErrorDialog(
-                context, <String>[stringResources.errorConfig]);
+                context, <String>[stringResources.errorConfig, e.toString()]);
           }
         },
       ),

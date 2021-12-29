@@ -265,7 +265,7 @@ class BenchmarkState extends ChangeNotifier {
     await resourceManager.configurationsManager.deleteDefaultConfig();
     _store.clearBenchmarkList();
     final configFile = await handleChosenConfiguration();
-    await loadResources(configFile!);
+    await loadResources(configFile);
   }
 
   Future<void> loadResources(File configFile) async {
@@ -326,7 +326,7 @@ class BenchmarkState extends ChangeNotifier {
         .createConfigurationFile();
     await result.resourceManager.loadBatchPresets();
     final configFile = await result.handleChosenConfiguration();
-    await result.loadResources(configFile!);
+    await result.loadResources(configFile);
 
     final loadFromStore = () {
       result._submissionMode = store.submissionMode;
@@ -339,54 +339,35 @@ class BenchmarkState extends ChangeNotifier {
     return result;
   }
 
-  Future<File?> handleChosenConfiguration(
-      {BenchmarksConfig? newChosenConfiguration}) async {
-    final benchmarksConfiguration = newChosenConfiguration ??
+  Future<File> handleChosenConfiguration({BenchmarksConfig? newConfig}) async {
+    final config = newConfig ??
         await resourceManager.configurationsManager
-            .getChosenConfig(_chosenBenchmarksConfigurationName);
-    final path = benchmarksConfiguration?.path ??
-        resourceManager.configurationsManager.defaultConfig.path;
-    final configurationName = benchmarksConfiguration?.name ??
-        resourceManager.configurationsManager.defaultConfig.name;
-    File configFile;
+            .getChosenConfig(_chosenBenchmarksConfigurationName) ??
+        resourceManager.configurationsManager.defaultConfig;
+    String configFilePath;
 
-    if (isInternetResource(path)) {
+    if (isInternetResource(config.path)) {
       try {
-        final baseName = path.split('/').last;
-        final currentConfigFile =
-            File('${resourceManager.applicationDirectory}/$baseName');
-
-        if (newChosenConfiguration != null ||
-            benchmarksConfiguration == null ||
-            !await currentConfigFile.exists()) {
-          configFile = File(await resourceManager.cacheManager.fileCacheHelper
-              .get(path, true));
-          configFile = await resourceManager.moveFile(
-              configFile, currentConfigFile.path);
-        } else {
-          configFile = currentConfigFile;
-        }
+        configFilePath = await resourceManager.cacheManager.fileCacheHelper.get(config.path, true);
       } catch (e) {
-        print(e);
-        return null;
+        throw "can't download config file: $e";
       }
     } else {
-      final parsedPath = resourceManager.get(path);
-      configFile = File(parsedPath);
-      if (!await configFile.exists()) return null;
+      configFilePath = resourceManager.get(config.path);
+      if (!await File(configFilePath).exists()) throw 'local config file is missing';
     }
 
-    if (newChosenConfiguration != null || benchmarksConfiguration == null) {
-      _chosenBenchmarksConfigurationName = configurationName;
-      _store.chosenConfigurationName = configurationName;
+    if (newConfig != null) {
+      _chosenBenchmarksConfigurationName = config.name;
+      _store.chosenConfigurationName = config.name;
 
-      final nonRemovableResources = <String>[configFile.path];
+      final nonRemovableResources = <String>[configFilePath];
 
       await resourceManager.cacheManager
           .deleteLoadedResources(nonRemovableResources);
     }
 
-    return configFile;
+    return File(configFilePath);
   }
 
   BenchmarkStateEnum get state {
