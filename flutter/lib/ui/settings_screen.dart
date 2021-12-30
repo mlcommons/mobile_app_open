@@ -151,7 +151,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               if (state.state == BenchmarkStateEnum.done ||
                   state.state == BenchmarkStateEnum.waiting) {
                 final benchmarksConfigurations =
-                    await state.configManager.getList();
+                    await state.configManager.getConfigs();
 
                 await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => BenchmarksConfigurationScreen(

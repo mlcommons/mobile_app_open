@@ -25,7 +25,7 @@ import 'package:mlperfbench/icons.dart';
 import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
-import 'package:mlperfbench/resources/configurations_manager.dart';
+import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
@@ -152,7 +152,7 @@ class BenchmarkState extends ChangeNotifier {
   final BridgeIsolate backendBridge;
 
   late final ResourceManager resourceManager;
-  late final ConfigurationsManager configManager;
+  late final ConfigManager configManager;
 
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
@@ -316,11 +316,11 @@ class BenchmarkState extends ChangeNotifier {
     await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
-    result.configManager = ConfigurationsManager(
+    result.configManager = ConfigManager(
         result.resourceManager.applicationDirectory,
         store.chosenConfigurationName,
         result.resourceManager);
-    await result.configManager.createConfigurationsFile();
+    await result.configManager.createConfigListFile();
     await result.resourceManager.loadBatchPresets();
     await result.resetConfig();
     await result.loadResources();

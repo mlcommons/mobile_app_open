@@ -5,7 +5,7 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'utils.dart';
 
-const _configurationsFileName = 'benchmarksConfigurations.json';
+const _configListFileName = 'benchmarksConfigurations.json';
 const _defaultConfigUrl =
     'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v3.pbtxt';
 
@@ -20,7 +20,7 @@ class BenchmarksConfig {
       : stringResources.localResource;
 }
 
-class ConfigurationsManager {
+class ConfigManager {
   final String applicationDirectory;
   final ResourceManager resourceManager;
   final BenchmarksConfig defaultConfig =
@@ -28,11 +28,11 @@ class ConfigurationsManager {
   String currentConfigName;
   String configPath = '';
 
-  ConfigurationsManager(
+  ConfigManager(
       this.applicationDirectory, this.currentConfigName, this.resourceManager);
 
   Future<BenchmarksConfig?> get currentConfig async =>
-      await getConfig(currentConfigName);
+      await _getConfig(currentConfigName);
 
   Future<void> setConfig(BenchmarksConfig config) async {
     if (isInternetResource(config.path)) {
@@ -61,8 +61,8 @@ class ConfigurationsManager {
         .deleteLoadedResources(nonRemovableResources);
   }
 
-  Future<File> createConfigurationsFile() async {
-    final file = File('$applicationDirectory/$_configurationsFileName');
+  Future<File> createConfigListFile() async {
+    final file = File('$applicationDirectory/$_configListFileName');
     if (await file.exists()) return file;
 
     print('Create ' + file.path);
@@ -73,11 +73,11 @@ class ConfigurationsManager {
   }
 
   Future<Map<String, dynamic>> _readConfigs() async {
-    final file = await createConfigurationsFile();
+    final file = await createConfigListFile();
     return jsonDecode(await file.readAsString()) as Map<String, dynamic>;
   }
 
-  Future<List<BenchmarksConfig>> getList() async {
+  Future<List<BenchmarksConfig>> getConfigs() async {
     final jsonContent = await _readConfigs();
 
     final result = <BenchmarksConfig>[];
@@ -95,7 +95,7 @@ class ConfigurationsManager {
     }
   }
 
-  Future<BenchmarksConfig?> getConfig(String name) async {
+  Future<BenchmarksConfig?> _getConfig(String name) async {
     final jsonContent = await _readConfigs();
     final configPath = jsonContent[name] as String?;
 

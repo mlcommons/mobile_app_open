@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/resources/configurations_manager.dart';
+import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 
 class BenchmarksConfigurationScreen extends StatelessWidget {
@@ -50,14 +50,14 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
-    final currentConfiguration = state.configManager.currentConfig;
+    final currentConfig = state.configManager.currentConfig;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(stringResources.benchmarksConfigurationTitle),
       ),
       body: FutureBuilder<BenchmarksConfig?>(
-        future: currentConfiguration,
+        future: currentConfig,
         builder: (context, snapshot) => ListView.builder(
             itemCount: _benchmarksConfigurations.length,
             itemBuilder: (context, index) {
