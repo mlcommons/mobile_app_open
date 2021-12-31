@@ -175,10 +175,8 @@ public final class RunMLPerfWorker implements Handler.Callback {
       result.setDuration(driverWrapper.getDurationMs());
       result.setMode(data.mode);
       callback.onBenchmarkFinished(result);
+      driverWrapper.close();
 
-      if (!backendName.contains("samsung")) {
-        driverWrapper.close();
-      }
     } catch (Exception e) {
       Log.e(TAG, "Running \"" + modelName + "\" failed with error: " + e.getMessage());
       Log.e(TAG, Log.getStackTraceString(e));
