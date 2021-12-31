@@ -1050,15 +1050,17 @@ void mlperf_backend_clear(mlperf_backend_ptr_t backend_ptr) {
   EdenAI::jni_CloseModel();
   EdenAI::jni_Shutdown();
   libeden_nn_on_direct = nullptr;
+  delete samsung_backend;
 }
 
-Backend ss_backend;
+static Backend *ss_backend;
 
 // Create a new backend and return the pointer to it.
 mlperf_backend_ptr_t mlperf_backend_create(
     const char* model_path, mlperf_backend_configuration_t* configs,
     const char* native_lib_path) {
-  Backend* samsung_backend = &ss_backend;
+  ss_backend = new Backend();
+  Backend* samsung_backend = ss_backend;
   if (samsung_backend->created) {
     mlperf_backend_clear(samsung_backend);
   }
