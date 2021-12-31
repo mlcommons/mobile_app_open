@@ -1053,7 +1053,7 @@ void mlperf_backend_clear(mlperf_backend_ptr_t backend_ptr) {
   delete samsung_backend;
 }
 
-static Backend *ss_backend;
+static Backend* ss_backend;
 
 // Create a new backend and return the pointer to it.
 mlperf_backend_ptr_t mlperf_backend_create(
