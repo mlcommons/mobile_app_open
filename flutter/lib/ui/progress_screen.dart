@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' hide Icons;
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/progress_circles.dart';
@@ -30,11 +31,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
             borderRadius: BorderRadius.circular(18.0),
             side: BorderSide(color: Colors.white))));
 
+    final colors = OFFICIAL_BUILD
+        ? [Color(0xff3189E2), Color(0xff0B4A7F)]
+        : [Colors.brown, Colors.brown];
     return Scaffold(
       body: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
-            colors: [Color(0xff3189E2), Color(0xff0B4A7F)],
+            colors: colors,
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           )),

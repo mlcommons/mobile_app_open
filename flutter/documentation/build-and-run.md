@@ -51,6 +51,11 @@ make WITH_QTI=1 WITH_SAMSUNG=1 WITH_PIXEL=1 WITH_MEDIATEK=1 docker/flutter/andro
 ```
 Some of the backends have additional requirements. See command output for details.
 
+The app is built with an unofficial UI (different color and text) by default.
+To build with an official UI, you need to set 
+* the environment variable `OFFICIAL_BUILD=true` if `make` is used (e.g. `OFFICIAL_BUILD=true make flutter/android/apk`), or 
+* the argument `--dart-define=official_build=true` if `flutter` is used (e.g. `flutter build apk --dart-define=official_build=true`).
+
 # Android
 
 [comment]: # (Don't remove spaces at the end of lines, they force line breaks)

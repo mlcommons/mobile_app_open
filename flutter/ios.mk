@@ -26,3 +26,10 @@ flutter/ios/native:
 
 	rm -rf ${xcode_fw}
 	cp -a ${bazel_ios_fw} ${xcode_fw}
+
+.PHONY: flutter/ios/ipa
+flutter/ios/ipa: flutter/ios
+	cd flutter && flutter clean
+	cd flutter && flutter build ipa ${flutter_common_dart_flags}
+	mkdir -p output/flutter/ios/
+	cp -rf flutter/build/ios/archive/Runner.xcarchive output/flutter/ios/release.xcarchive

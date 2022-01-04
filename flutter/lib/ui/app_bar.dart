@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Icons;
+import 'package:mlperfbench/app_constants.dart';
 
 import 'package:mlperfbench/icons.dart';
 import 'config_screen.dart';
@@ -33,12 +34,12 @@ class MyAppBar {
     }
 
     return AppBar(
-      title: Text(
-        title,
-        style: TextStyle(fontSize: 24, color: Colors.white),
+      title: FittedBox(
+        fit: BoxFit.fitWidth,
+        child: Text(title, style: TextStyle(fontSize: 24, color: Colors.white)),
       ),
       centerTitle: true,
-      backgroundColor: Color(0xFF31A3E2),
+      backgroundColor: OFFICIAL_BUILD ? Color(0xFF31A3E2) : Colors.brown,
       iconTheme: IconThemeData(color: Colors.white),
       actions: actions,
     );
