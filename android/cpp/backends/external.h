@@ -31,7 +31,7 @@ struct BackendFunctions {
   BackendFunctions(const std::string& lib_path);
 
   ~BackendFunctions() {
-    if (false) {
+    if (handle) {
       tflite::SharedLibrary::UnLoadLibrary(handle);
     }
   }
