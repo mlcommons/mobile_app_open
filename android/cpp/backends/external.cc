@@ -79,7 +79,7 @@ BackendFunctions::BackendFunctions(const std::string& lib_path) {
     }
     handle = tflite::SharedLibrary::LoadLibrary(wide_lib_path.c_str());
 #else
-    handle = tflite::SharedLibrary::LoadLibrary(lib_path.c_str());
+    handle = dlopen(lib_path.c_str(), RTLD_LAZY | RTLD_LOCAL | RTLD_NODELETE);
 #endif
     if (handle == nullptr) {
       LOG(ERROR) << "Unable to load: " << lib_path << ": "
