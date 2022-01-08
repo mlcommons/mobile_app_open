@@ -30,7 +30,7 @@ format/line-endings:
 
 .PHONY: format/markdown
 format/markdown:
-	markdownlint '**/*.md'
+	markdownlint -c tools/formatter/markdownlint_config.yml '**/*.md' --ignore 'LICENSE.md'
 
 .PHONY: lint
 lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files
