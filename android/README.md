@@ -15,11 +15,11 @@ top-1 accuracy for image classification).
 
 Several important mobile-specific considerations are addressed in the app:
 
-*   Limited disk space - Certain datasets are quite large (multiple gigabytes),
+* Limited disk space - Certain datasets are quite large (multiple gigabytes),
     which makes an exhaustive evaluation difficult. By default, the app does not
     include the full dataset for validation. The client can optionally push part
     or all of the task validation datasets, depending on their use-case.
-*   Device variability - The number of CPU, GPU and DSP/NPU hardware
+* Device variability - The number of CPU, GPU and DSP/NPU hardware
     permutations in the mobile ecosystem is quite large. To this end, the app
     affords the option to customize hardware execution, e.g., adjusting the
     number of threads for CPU inference, enabling GPU acceleration, or NN API
@@ -40,17 +40,17 @@ frameworks contributed by the broader MLPerf community.
 
 ## Requirements
 
-*   Linux OS
-*   [Bazel 2.x](https://docs.bazel.build/versions/master/install-ubuntu.html)
-*   [Android SDK](https://developer.android.com/studio)
-*   Android 10.0+ (API 29) w/
+* Linux OS
+* [Bazel 2.x](https://docs.bazel.build/versions/master/install-ubuntu.html)
+* [Android SDK](https://developer.android.com/studio)
+* Android 10.0+ (API 29) w/
     [USB debugging enabled](https://developer.android.com/studio/debug/dev-options)
 
 ## Getting Started
 
 There are three ways to build the app. If you want to make your own environment,
 first make sure to download the SDK and NDK using the Android studio. The build
-was tested with NDK r21e. Make sure the default system python is python3. Then, 
+was tested with NDK r21e. Make sure the default system python is python3. Then,
 set the following environment variables:
 
 ```bash
@@ -65,7 +65,8 @@ pip3 install numpy absl-py
 ```
 
 ## Option 1 - Building Manually
-The app can be built and installed with the following commands 
+
+The app can be built and installed with the following commands
 (execute from root directory `mobile_app_open`):
 
 ```bash
@@ -75,36 +76,44 @@ bazel build --config android_arm64 -c opt //android/java/org/mlperf/inference:ml
 adb install -r bazel-bin/android/java/org/mlperf/inference/mlperf_app.apk
 ```
 
-
 ## Option 2 - Building Using the Prebuilt Docker Image
+
 On the other hand, you can use a docker image to build the app:
 
-```
+```shell
 make android/app
 ```
+
 or to enable the QTI backend:
-```
+
+```shell
 make WITH_QTI=1 android/app
 ```
+
 or to enable multiple backends:
-```
+
+```shell
 make WITH_QTI=1 WITH_MEDIATEK=1 android/app
 ```
+
 Note: Follow the instruction of the backend vendor (in `mobile_back_*` folders at root level) to build for that backend.
 Some backends may contain proprietary code. In that case, please contact MLCommons to get help.
 
 Install the app with the command:
-```
+
+```shell
 adb install -r build/mlperf_app.apk
 ```
 
 If you want to build an instrumented test APK you should add target `//androidTest:mlperf_test_app`, i.e. :
+
 ```bash
 make android/test_app
 adb install -r build/mlperf_test_app.apk
 ```
 
 ## Option 3 - Building With Android Studio
+
 Make sure you follow the Getting Started steps listed above to set up your SDK/NDK paths and python dependencies. Once that's done, follow these steps:
 
 1. Install Android Studio (version >= 4.0)
@@ -117,11 +126,13 @@ Make sure you follow the Getting Started steps listed above to set up your SDK/N
 8. Click the + button in the 'Target expression' box and enter ```//android/java/org/mlperf/inference:mlperf_app```
 9. Select 'Build' from the 'Bazel command' dropdown
 10. Enter the following into the 'Bazel flags' box:
-```
---cxxopt='--std=c++14'
---host_cxxopt='--std=c++14'
---fat_apk_cpu=x86_64,arm64-v8a
-```
+
+    ```shell
+    --cxxopt='--std=c++14'
+    --host_cxxopt='--std=c++14'
+    --fat_apk_cpu=x86_64,arm64-v8a
+    ```
+
 11. Run > Run 'inference:mlperf_app'
 
 Please see [these instructions](docs/guides/installation.md) for installing and using the app.
@@ -138,10 +149,11 @@ You can look at the [default TFLite backend implementation](../mobile_back_tflit
 The following steps are required to add your backend:
 
 ### Unified app changes
+
 In java/org/mlperf/inference/BUILD, add the following replacing
 _vendor_ with the actual vendor/backend name:
 
-```
+```text
 string_flag(name = "with_vendor", build_setting_default = "1")
 config_setting(
     name = "use_vendor",
@@ -151,15 +163,18 @@ config_setting(
 )
 
 ```
+
 Replace "vendor" in the the code below with your backend name in equivalent sections
 of java/org/mlperf/inference/BUILD:
-```
+
+```text
     deps = [":evaluation_app_lib"] +
            select({
              ":use_vendor": ["@vendorbackend"],
              "//conditions:default": ["@vendormockbackend"],
     }),
 ```
+
 Modify java/org/mlperf/inference/Backends.java.in to add your backend and
 modify the genrule in java/org/mlperf/inference/BUILD to enable your
 backend if it is enabled in the build. **The order is important! Backends will be
@@ -171,25 +186,25 @@ substituting your backend name for vendor.
 
 ## FAQ
 
-#### Will this be available in the app store(s)?
+### Will this be available in the app store(s)?
 
 Yes, eventually, but not with the 0.7 release.
 
-#### When will an iOS version be avilable?
+### When will an iOS version be available?
 
 This is a priority for the community but requires some additional resourcing.
 
-#### Will the app support all MLPerf Inference tasks?
+### Will the app support all MLPerf Inference tasks?
 
 That is the eventual goal. To start, it supports only those tasks specifically
 targeting mobile and/or edge use-cases (e.g., Classification w/ MobileNet,
 Detection w/ SSD MobileNet).
 
-#### Will the app support more than just TensorFlow Lite for inference?
+### Will the app support more than just TensorFlow Lite for inference?
 
 Yes, that is the plan, though this is largely dependent on contributions from
 teams and organizations who desire this.
 
 Please search
-https://groups.google.com/forum/#!forum/mlperf-inference-submitters for
+<https://groups.google.com/forum/#!forum/mlperf-inference-submitters> for
 additional help and related questions.
