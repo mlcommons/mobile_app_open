@@ -49,6 +49,11 @@ RUN cp $(which clang-format-10) ${FORMATTER_HOME}/clang-format
 RUN apt-get update && apt-get install -y \
     dos2unix
 
+# Add Markdown formatter
+RUN apt-get update && apt-get install -y \
+    nodejs npm
+RUN npm install -g --production "markdownlint-cli@0.26.0"
+
 # Setup permission to run Flutter as non-root user
 # this is needed to share Flutter cache with host machine
 ARG UNAME=mlperf

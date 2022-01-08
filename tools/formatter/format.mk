@@ -2,9 +2,9 @@
 .PHONY: format
 ifeq (${OS},Windows_NT)
 # format/java is not supported on Windows
-format: format/bazel format/clang format/dart format/line-endings
+format: format/bazel format/clang format/dart format/line-endings format/markdown
 else
-format: format/bazel format/clang format/java format/dart format/line-endings
+format: format/bazel format/clang format/java format/dart format/line-endings format/markdown
 endif
 
 .PHONY: format/bazel
@@ -27,6 +27,10 @@ format/dart:
 .PHONY: format/line-endings
 format/line-endings:
 	git ls-files -z | xargs --null ${_start_args} dos2unix --keep-bom --
+
+.PHONY: format/markdown
+format/markdown:
+	markdownlint '**/*.md'
 
 .PHONY: lint
 lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files

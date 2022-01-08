@@ -51,7 +51,8 @@ The code was originally contributed by Google so it conforms to the
 [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) and
 [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).  
 For makefiles we follow the [standard makefile code-style](https://style-guides.readthedocs.io/en/latest/makefile.html).  
-We use the default code style in bazel and dart files, enforced by `buildifier` and `dart format` respectively.
+We use the default code style in bazel and dart files, enforced by `buildifier` and `dart format` respectively.  
+For Markdown files we use [markdownlint](https://github.com/DavidAnson/markdownlint). 
 
 From the root directory you can run the command `make format`
 to format all files or `make format/<bazel|java|clang|dart>` to format only certain files in the directory.
