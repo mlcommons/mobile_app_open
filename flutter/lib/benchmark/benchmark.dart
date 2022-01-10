@@ -296,6 +296,7 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> loadResources(File configFile) async {
     _middle = await MiddleInterface.create(configFile);
+    _store.clearBenchmarkList();
     for (final item in _middle.benchmarks) {
       BatchPreset? batchPreset;
       if (item.modelConfig.scenario == 'Offline') {
