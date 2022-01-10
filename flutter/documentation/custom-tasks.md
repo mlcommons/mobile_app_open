@@ -1,28 +1,31 @@
+# Custom tasks
 
 This file describes how to configure the application to use non-default benchmark settings.
 
-# Contents
+## Contents
 
 * [Using custom tasks.pbtxt file](#using-custom-taskspbtxt-file)
 * [Resources in the tasks.pbtxt](#resources-in-the-taskspbtxt)
 * [Using external resources on an iPhone](#using-external-resources-on-an-iphone)
 
-# Using custom tasks.pbtxt file
+## Using custom tasks.pbtxt file
 
-When the app starts for the first time, it creates a file named `benchmarksConfigurations.json` 
+When the app starts for the first time, it creates a file named `benchmarksConfigurations.json`
 in the root application directory.
 Each entry in the `benchmarksConfigurations.json` is the name and location of a configuration file.
-You can have multiple configurations stored in the `benchmarksConfigurations.json` and switch 
-between them in the app settings. 
+You can have multiple configurations stored in the `benchmarksConfigurations.json` and switch
+between them in the app settings.
 The `benchmarksConfigurations.json` looks like this:
+
 ```json
 {
    "default":"https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v2.pbtxt",
    "otherName":"app:///path/to/custom_tasks.pbtxt" 
 }
 ```
+
 where the `key` is the name of the configuration and `value` is the path to the configuration file.
-**Note**: Currently the app can only read files stored within the app directory. 
+**Note**: Currently the app can only read files stored within the app directory.
 See the next sections for more details on this.
 
 The `tasks.pbtxt` file is a text file in [protobuf](https://developers.google.com/protocol-buffers) format.
@@ -34,9 +37,10 @@ run application and open setting screen.
 Tap on `Benchmarks configuration path` option
 and choose added item. Current chosen path highlighted blue.
 
-# Resources in the tasks.pbtxt
+## Resources in the tasks.pbtxt
 
 You can specify several types of resources in a `tasks.pbtxt` file:
+
 1. URL of a file  
 File will be automatically downloaded.
 2. URL of a .zip archive  
@@ -49,7 +53,7 @@ relative to the application root directory.
 Location of the application root directory is platform dependent.
 On iOS it will be: `MLPerf/`. On Android it will be `/Android/data/org.mlcommons.android.mlperfbench/files/`
 
-# Using external resources on an iPhone
+## Using external resources on an iPhone
 
 On iOS an application resource folder can be found in `On My iPhone` -> `<app name>`.
 So, if you have `app:///mlperf_datasets/some/folders/test.txt` path in your config file,
@@ -66,11 +70,11 @@ from some external file managers and cloud storage clients.
 Instead of copying your file using `Files`, you can use Share button in your external app and choose "Save to Files".
 This method doesn't have restrictions on file extension.
 
-# Using external resources on an Android
+## Using external resources on an Android
 
 On Android the resource folder is located at `/Android/data/org.mlcommons.android.mlperfbench/files`.
-On Android 11, the folder `/Android/data/` is inaccessible using the default File Manager app. 
-It stills accessible through 3rd party File Manager apps, though. 
+On Android 11, the folder `/Android/data/` is inaccessible using the default File Manager app.
+It stills accessible through 3rd party File Manager apps, though.
 Or using a File Manager on a desktop computer and access the files via USB also works.
 
 So, if you have `app:///mlperf_datasets/some/folders/test.txt` path in your config file,

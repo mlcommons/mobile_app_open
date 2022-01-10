@@ -4,8 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/resources/configurations_manager.dart';
-import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 
 class BenchmarksConfigurationScreen extends StatelessWidget {
@@ -18,7 +17,6 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
     BenchmarksConfig configuration,
     String chosenBenchmarksConfiguration,
   ) {
-    final store = context.watch<Store>();
     final stringResources = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
     final wasChosen = chosenBenchmarksConfiguration == configuration.name;
@@ -33,17 +31,15 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
         subtitle: Text(configuration.path),
         trailing: Text(configuration.getType(stringResources)),
         onTap: () async {
-          final configFile = await state.handleChosenConfiguration(
-            newChosenConfiguration: !wasChosen ? configuration : null,
-            store: store,
-          );
-
-          if (configFile != null) {
+          try {
+            await state.resetConfig(
+              newConfig: !wasChosen ? configuration : null,
+            );
             Navigator.of(context).popUntil((route) => route.isFirst);
-            await state.loadResources(configFile);
-          } else {
+            await state.loadResources();
+          } catch (e) {
             await showErrorDialog(
-                context, <String>[stringResources.errorConfig]);
+                context, <String>[stringResources.errorConfig, e.toString()]);
           }
         },
       ),
@@ -54,14 +50,14 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
-    final chosenConfiguration = state.chosenBenchmarksConfiguration;
+    final currentConfig = state.configManager.currentConfig;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(stringResources.benchmarksConfigurationTitle),
       ),
       body: FutureBuilder<BenchmarksConfig?>(
-        future: chosenConfiguration,
+        future: currentConfig,
         builder: (context, snapshot) => ListView.builder(
             itemCount: _benchmarksConfigurations.length,
             itemBuilder: (context, index) {

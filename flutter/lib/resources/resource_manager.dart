@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
 import 'cache_manager.dart';
-import 'configurations_manager.dart';
 import 'result_manager.dart';
 import 'utils.dart';
 
@@ -39,7 +38,6 @@ class ResourceManager {
   late final List<BatchPreset> _batchPresets;
 
   late final CacheManager cacheManager;
-  late final ConfigurationsManager configurationsManager;
   late final ResultManager resultManager;
 
   ResourceManager(this._onUpdate);
@@ -73,6 +71,7 @@ class ResourceManager {
   }
 
   void handleResources(List<String> resources, bool purgeOldCache) async {
+    _progressString = '0%';
     _done = false;
     _onUpdate();
 
@@ -104,6 +103,7 @@ class ResourceManager {
       dir = await getExternalStorageDirectory();
     } else if (Platform.isWindows) {
       dir = await getDownloadsDirectory();
+      dir = Directory(dir!.path.replaceAll('\\', '/'));
     } else {
       throw 'unsupported platform';
     }
@@ -120,7 +120,6 @@ class ResourceManager {
     await Directory(_loadedResourcesDir).create();
 
     cacheManager = CacheManager(_loadedResourcesDir);
-    configurationsManager = ConfigurationsManager(applicationDirectory);
     resultManager = ResultManager(applicationDirectory);
   }
 

@@ -12,7 +12,7 @@ class FileCacheHelper {
     return path.replaceAll(RegExp('[$illegalFilenameSymbols]'), '#');
   }
 
-  String _getResourceRelativePath(String url) {
+  String getResourceRelativePath(String url) {
     var result = url;
     var protocolIndex = result.indexOf('://');
     if (protocolIndex != -1) {
@@ -23,7 +23,7 @@ class FileCacheHelper {
   }
 
   String getCachePath(String url) {
-    return '$cacheDirectory/${_getResourceRelativePath(url)}';
+    return '$cacheDirectory/${getResourceRelativePath(url)}';
   }
 
   // If file is cached, returns path to it

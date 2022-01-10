@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/resources/resource_manager.dart';
 import 'utils.dart';
 
-const _configurationsFileName = 'benchmarksConfigurations.json';
+const _configListFileName = 'benchmarksConfigurations.json';
 const _defaultConfigUrl =
     'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v3.pbtxt';
 
@@ -19,15 +20,49 @@ class BenchmarksConfig {
       : stringResources.localResource;
 }
 
-class ConfigurationsManager {
+class ConfigManager {
   final String applicationDirectory;
+  final ResourceManager resourceManager;
   final BenchmarksConfig defaultConfig =
       BenchmarksConfig('default', _defaultConfigUrl);
+  String currentConfigName;
+  String configPath = '';
 
-  ConfigurationsManager(this.applicationDirectory);
+  ConfigManager(
+      this.applicationDirectory, this.currentConfigName, this.resourceManager);
 
-  Future<File> createConfigurationFile() async {
-    final file = File('$applicationDirectory/$_configurationsFileName');
+  Future<BenchmarksConfig?> get currentConfig async =>
+      await _getConfig(currentConfigName);
+
+  Future<void> setConfig(BenchmarksConfig config) async {
+    if (isInternetResource(config.path)) {
+      configPath = await resourceManager.cacheManager.fileCacheHelper
+          .get(config.path, true);
+    } else {
+      configPath = resourceManager.get(config.path);
+      if (!await File(configPath).exists()) {
+        throw 'local config file is missing: $configPath';
+      }
+    }
+
+    if (currentConfigName == config.name) {
+      return;
+    }
+
+    currentConfigName = config.name;
+
+    final nonRemovableResources = <String>[];
+    if (isInternetResource(config.path)) {
+      nonRemovableResources.add(resourceManager.cacheManager.fileCacheHelper
+          .getResourceRelativePath(config.path));
+    }
+
+    await resourceManager.cacheManager
+        .deleteLoadedResources(nonRemovableResources);
+  }
+
+  Future<File> createConfigListFile() async {
+    final file = File('$applicationDirectory/$_configListFileName');
     if (await file.exists()) return file;
 
     print('Create ' + file.path);
@@ -38,11 +73,11 @@ class ConfigurationsManager {
   }
 
   Future<Map<String, dynamic>> _readConfigs() async {
-    final file = await createConfigurationFile();
+    final file = await createConfigListFile();
     return jsonDecode(await file.readAsString()) as Map<String, dynamic>;
   }
 
-  Future<List<BenchmarksConfig>> getAvailableConfigs() async {
+  Future<List<BenchmarksConfig>> getConfigs() async {
     final jsonContent = await _readConfigs();
 
     final result = <BenchmarksConfig>[];
@@ -60,7 +95,7 @@ class ConfigurationsManager {
     }
   }
 
-  Future<BenchmarksConfig?> getChosenConfig(String name) async {
+  Future<BenchmarksConfig?> _getConfig(String name) async {
     final jsonContent = await _readConfigs();
     final configPath = jsonContent[name] as String?;
 

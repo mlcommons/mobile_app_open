@@ -30,8 +30,8 @@ class CacheManager {
       // skip files in already deleted folders
       if (!await file.exists()) continue;
       final relativePath = file.path
-          .substring(loadedResourcesDir.length + 1)
-          .replaceAll('\\', '/');
+          .replaceAll('\\', '/')
+          .substring(loadedResourcesDir.length + 1);
       var nonRemovable = false;
       for (var resource in nonRemovableResources) {
         // relativePath.startsWith(resource): if we want to preserve a folder resource
