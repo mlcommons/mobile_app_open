@@ -19,7 +19,11 @@ class _BriefResult {
   final int batchSize;
 
   _BriefResult(
-      this.id, this.score, this.accuracy, this.shardsNum, this.batchSize);
+      {required this.id,
+      required this.score,
+      required this.accuracy,
+      required this.shardsNum,
+      required this.batchSize});
 
   Map<String, dynamic> toJsonMap() {
     return {
@@ -38,7 +42,59 @@ class _BriefResult {
     final shardsNum = jsonMap[_shardsNumTag] as int? ?? 0;
     final batchSize = jsonMap[_batchSizeTag] as int? ?? 0;
 
-    return _BriefResult(id, score, accuracy, shardsNum, batchSize);
+    return _BriefResult(
+        id: id,
+        score: score,
+        accuracy: accuracy,
+        shardsNum: shardsNum,
+        batchSize: batchSize);
+  }
+}
+
+class _FullResult {
+  final String id;
+  final String score;
+  final String accuracy;
+  // numeric values are saved as string to match old android app behavior
+  final String minDuration;
+  final String duration;
+  final String minSamples;
+  final String numSamples;
+  final int shardsNum;
+  final int batchSize;
+  final String mode;
+  final String datetime;
+
+  _FullResult(
+      {required this.id,
+      required this.score,
+      required this.accuracy,
+      required this.minDuration,
+      required this.duration,
+      required this.minSamples,
+      required this.numSamples,
+      required this.shardsNum,
+      required this.batchSize,
+      required this.mode,
+      required this.datetime});
+
+  Map<String, dynamic> toJsonMap() {
+    return {
+      'benchmark_id': id,
+      'configuration': {
+        'runtime': '',
+      },
+      'score': score,
+      'accuracy': accuracy,
+      'min_duration': minDuration,
+      'duration': duration,
+      'min_samples': minSamples,
+      'num_samples': numSamples,
+      'shards_num': shardsNum,
+      'batch_size': batchSize,
+      'mode': mode,
+      'datetime': datetime,
+    };
   }
 }
 
@@ -57,31 +113,32 @@ class ResultManager {
 
     for (final result in results) {
       if (result == null) continue;
-      final score = result.mode == BenchmarkMode.accuracy ? null : result.score;
 
-      final benchmarkResult = {
-        'benchmark_id': result.id,
-        'configuration': {
-          'runtime': '',
-        },
-        'score': score != null ? score.toString() : 'N/A',
-        'accuracy': BenchmarkMode.performance_lite == result.mode
-            ? 'N/A'
-            : result.accuracy,
-        // strings are used here to match android app behavior
-        'min_duration': result.minDuration.toString(),
-        'duration': result.durationMs.toString(),
-        'min_samples': result.minSamples.toString(),
-        'num_samples': result.numSamples.toString(),
-        'shards_num': result.threadsNumber,
-        'batch_size': result.batchSize,
-        'mode': result.mode.toString(),
-        'datetime': DateTime.now().toIso8601String(),
-      };
-      var briefResult = _BriefResult(result.id, score, result.accuracy,
-          result.threadsNumber, result.batchSize);
-      resultContent.add(benchmarkResult);
-      briefResultContent.add(briefResult.toJsonMap());
+      var full = _FullResult(
+          id: result.id,
+          score: result.mode == BenchmarkMode.accuracy
+              ? 'N/A'
+              : result.score.toString(),
+          accuracy: BenchmarkMode.performance_lite == result.mode
+              ? 'N/A'
+              : result.accuracy,
+          minDuration: result.minDuration.toString(),
+          duration: result.durationMs.toString(),
+          minSamples: result.minSamples.toString(),
+          numSamples: result.numSamples.toString(),
+          shardsNum: result.threadsNumber,
+          batchSize: result.batchSize,
+          mode: result.mode.toString(),
+          datetime: DateTime.now().toIso8601String());
+      resultContent.add(full.toJsonMap());
+
+      var brief = _BriefResult(
+          id: result.id,
+          score: result.mode == BenchmarkMode.accuracy ? null : result.score,
+          accuracy: result.accuracy,
+          shardsNum: result.threadsNumber,
+          batchSize: result.batchSize);
+      briefResultContent.add(brief.toJsonMap());
     }
     await _write(resultContent);
     return JsonEncoder().convert(briefResultContent);
