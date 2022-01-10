@@ -1,6 +1,7 @@
 # Mobile backend tflite
 
 Build so-library for selected architecture:
+
 ```bash
 bazel build -c opt \
     --cxxopt='--std=c++14' \

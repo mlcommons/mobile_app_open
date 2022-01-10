@@ -1,3 +1,5 @@
+# Installation
+
 ## Getting Started
 
 Due to restrictions in dataset redistribution, some amount of manual retrieval, processing
@@ -16,10 +18,10 @@ Note that the full datasets can be extremely large; a subset of the full dataset
 prepared to give a useful proxy for task-specific accuracy. When prepared, each task
 directory should be pushed to `/sdcard/mlperf_datasets/...`.
 
-You can follow [this guide](https://github.com/mlcommons/mobile_app_open/blob/master/android/cpp/datasets/README.md) 
+You can follow [this guide](https://github.com/mlcommons/mobile_app_open/blob/master/android/cpp/datasets/README.md)
 to download the datasets.
 
-## <a name="app-execution"></a> App Execution
+## App Execution
 
 After the app has been installed, and the optional dataset(s), simply open
 **`MLPerf Mobile`** from the Android launcher. The app UI allows selection of supported
@@ -27,4 +29,3 @@ tasks, and execution of the supported models (float/quantized) for each task.
 
 If **`Submission mode`** is enabled, the task-specific accuracy will be measured, otherwise it
 will only report latency results.
-
