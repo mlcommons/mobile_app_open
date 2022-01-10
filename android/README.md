@@ -153,7 +153,7 @@ The following steps are required to add your backend:
 In java/org/mlperf/inference/BUILD, add the following replacing
 _vendor_ with the actual vendor/backend name:
 
-```text
+```python
 string_flag(name = "with_vendor", build_setting_default = "1")
 config_setting(
     name = "use_vendor",
@@ -164,10 +164,10 @@ config_setting(
 
 ```
 
-Replace "vendor" in the the code below with your backend name in equivalent sections
+Replace "vendor" in the code below with your backend name in equivalent sections
 of java/org/mlperf/inference/BUILD:
 
-```text
+```python
     deps = [":evaluation_app_lib"] +
            select({
              ":use_vendor": ["@vendorbackend"],
