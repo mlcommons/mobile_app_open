@@ -1,13 +1,14 @@
+# Adding custom backend
 
 This file describes how to add support for your backend into the Flutter app.
 
-# Contents
+## Contents
 
 * [Folder structure](#folder-structure)
 * [Integrating your backend into the app](#integrating-your-backend-into-the-app)
 * [Implementing backend interface](#implementing-backend-interface)
 
-# Folder structure
+## Folder structure
 
 Create a new folder for your backend, named `mobile_back_<vendor>`, where `<vendor>` is the name of your organization or name of your backend, if you have one.
 Structure inside that your backend directory in not strictly regulated, you may keep it the way that is convenient to you. Just keep it organized.
@@ -18,6 +19,7 @@ Generally it's a good idea to keep all C++ files in a `cpp` folder.
 Add a readme file explaining how to set up environment to build your backend and which commands to use.
 
 Add `<vendor>_backend.mk` file defining variables for your backend, similar to such files for other backends. This file should have the following structure:
+
 ```make
 ifeq (${WITH_<VENDOR>},1)
   $(info WITH_<VENDOR>=1)
@@ -36,9 +38,10 @@ However, this is not a strict requirement.
 Our Flutter app requires only final binaries, so any build system can theoretically be used.
 Set `backend_<vendor>_android_target` to appropriate value for your build system.
 
-# Integrating your backend into the app
+## Integrating your backend into the app
 
 You will need to do few things:
+
 * Include your `<vendor>_backend.mk` into the root makefile.
 * Add new line with your `<VENDOR>_TAG` into [backends_list.in](/flutter/lib/backend/backends_list.in).  
 Note that order is important in this file. Backends are evaluated in the order they are defined, and the app never checks backends after TFLite.
@@ -50,7 +53,7 @@ Place your tag before TFLite tag.
   * If you use different build system, add a condition to only build your backend when `WITH_<VENDOR>=1` is defined.
   * Add a line `${backend_<vendor>_android_files}` into the copy command
 
-# Implementing backend interface
+## Implementing backend interface
 
 Backend C API is defined in [android/cpp/c/backend_c.h](/android/cpp/c/backend_c.h).  
 Unfortunately, we don't have any documentation on details of how to implement it yet.  

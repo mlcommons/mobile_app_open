@@ -21,11 +21,11 @@ top-1 accuracy for image classification).
 
 Several important mobile-specific considerations are addressed in the app:
 
-*   Limited disk space - Certain datasets are quite large (multiple gigabytes),
+* Limited disk space - Certain datasets are quite large (multiple gigabytes),
     which makes an exhaustive evaluation difficult. By default, the app does not
     include the full dataset for validation. The client can optionally push part
     or all of the task validation datasets, depending on their use-case.
-*   Device variability - The number of CPU, GPU and DSP/NPU hardware
+* Device variability - The number of CPU, GPU and DSP/NPU hardware
     permutations in the mobile ecosystem is quite large. To this end, the app
     affords the option to customize hardware execution, e.g., adjusting the
     number of threads for CPU inference, enabling GPU acceleration, or NN API
@@ -55,7 +55,7 @@ frameworks contributed by the broader MLPerf community.
 * datasets - Contains scripts to prepare test and calibration data used for accuracy evaluation and model quantization.
 * tools - contains miscellaneous tools (e.g., formatting commands)
 
-## Related Repositories:
+## Related Repositories
 
 * [inference](https://github.com/mlcommons/inference): Reference implementations of MLPerf inference benchmarks.
 * [mobile_models](https://github.com/mlcommons/mobile_models): Storage for ML models and task definition file.
