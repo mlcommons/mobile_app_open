@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -26,7 +25,7 @@ import 'package:mlperfbench/icons.dart';
 import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
-import 'package:mlperfbench/resources/configurations_manager.dart';
+import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
@@ -178,8 +177,7 @@ class BenchmarkState extends ChangeNotifier {
   final BridgeIsolate backendBridge;
 
   late final ResourceManager resourceManager;
-
-  String _chosenBenchmarksConfigurationName;
+  late final ConfigManager configManager;
 
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
@@ -187,10 +185,6 @@ class BenchmarkState extends ChangeNotifier {
 
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get downloadingProgress => resourceManager.progress;
-
-  Future<BenchmarksConfig?> get chosenBenchmarksConfiguration async =>
-      await resourceManager.configurationsManager
-          .getChosenConfig(_chosenBenchmarksConfigurationName);
 
   // Only if [state] == [BenchmarkStateEnum.running]
   Benchmark? currentlyRunning;
@@ -227,8 +221,7 @@ class BenchmarkState extends ChangeNotifier {
 
   late MiddleInterface _middle;
 
-  BenchmarkState._(this._store, this.backendBridge)
-      : _chosenBenchmarksConfigurationName = _store.chosenConfigurationName {
+  BenchmarkState._(this._store, this.backendBridge) {
     resourceManager = ResourceManager(notifyListeners);
   }
 
@@ -288,14 +281,15 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> clearCache() async {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
-    await resourceManager.configurationsManager.deleteDefaultConfig();
+    await configManager.deleteDefaultConfig();
     _store.clearBenchmarkList();
-    final configFile = await handleChosenConfiguration(store: _store);
-    await loadResources(configFile!);
+    await resetConfig();
+    await loadResources();
   }
 
-  Future<void> loadResources(File configFile) async {
-    _middle = await MiddleInterface.create(configFile);
+  Future<void> loadResources() async {
+    _middle = await MiddleInterface.create(File(configManager.configPath));
+    _store.clearBenchmarkList();
     for (final item in _middle.benchmarks) {
       BatchPreset? batchPreset;
       if (item.modelConfig.scenario == 'Offline') {
@@ -333,35 +327,8 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<bool> _handlePreviousResult() async {
     if (_doneRunning == null) {
-      final content = _store.previousResult;
-
-      if (content.isNotEmpty) {
-        try {
-          for (final resultContent in jsonDecode(content)) {
-            final result = resultContent as Map<String, dynamic>;
-            final id = result['benchmark_id'] as String;
-            final accuracy = result['accuracy'] as String?;
-            final score = result['score'] as double?;
-            final threadsNumber = result['shards_num'] as int?;
-            final batchSize = result['batch_size'] as int?;
-            final benchmark =
-                benchmarks.singleWhere((benchmark) => benchmark.id == id);
-            benchmark.accuracy = accuracy;
-            benchmark.score = score;
-
-            if (benchmark.modelConfig.scenario == 'Offline') {
-              benchmark.benchmarkSetting.customSetting.add(pb.CustomSetting(
-                  id: 'batch_size', value: batchSize.toString()));
-              benchmark.benchmarkSetting.customSetting.add(pb.CustomSetting(
-                  id: 'shards_num', value: threadsNumber.toString()));
-              benchmark.benchmarkSetting.writeToBuffer();
-            }
-          }
-        } catch (_) {
-          return false;
-        }
-        return true;
-      }
+      return resourceManager.resultManager
+          .restoreResults(_store.previousResult, benchmarks);
     } else {
       await _store.deletePreviousResult();
       await resourceManager.resultManager.delete();
@@ -375,11 +342,14 @@ class BenchmarkState extends ChangeNotifier {
     await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
-    await result.resourceManager.configurationsManager
-        .createConfigurationFile();
+    result.configManager = ConfigManager(
+        result.resourceManager.applicationDirectory,
+        store.chosenConfigurationName,
+        result.resourceManager);
+    await result.configManager.createConfigListFile();
     await result.resourceManager.loadBatchPresets();
-    final configFile = await result.handleChosenConfiguration(store: store);
-    await result.loadResources(configFile!);
+    await result.resetConfig();
+    await result.loadResources();
 
     final loadFromStore = () {
       result._submissionMode = store.submissionMode;
@@ -392,54 +362,12 @@ class BenchmarkState extends ChangeNotifier {
     return result;
   }
 
-  Future<File?> handleChosenConfiguration(
-      {BenchmarksConfig? newChosenConfiguration, required Store store}) async {
-    final benchmarksConfiguration = newChosenConfiguration ??
-        await resourceManager.configurationsManager
-            .getChosenConfig(_chosenBenchmarksConfigurationName);
-    final path = benchmarksConfiguration?.path ??
-        resourceManager.configurationsManager.defaultConfig.path;
-    final configurationName = benchmarksConfiguration?.name ??
-        resourceManager.configurationsManager.defaultConfig.name;
-    File configFile;
-
-    if (isInternetResource(path)) {
-      try {
-        final baseName = path.split('/').last;
-        final currentConfigFile =
-            File('${resourceManager.applicationDirectory}/$baseName');
-
-        if (newChosenConfiguration != null ||
-            benchmarksConfiguration == null ||
-            !await currentConfigFile.exists()) {
-          configFile = File(await resourceManager.cacheManager.fileCacheHelper
-              .get(path, true));
-          configFile = await resourceManager.moveFile(
-              configFile, currentConfigFile.path);
-        } else {
-          configFile = currentConfigFile;
-        }
-      } catch (e) {
-        print(e);
-        return null;
-      }
-    } else {
-      final parsedPath = resourceManager.get(path);
-      configFile = File(parsedPath);
-      if (!await configFile.exists()) return null;
-    }
-
-    if (newChosenConfiguration != null || benchmarksConfiguration == null) {
-      _chosenBenchmarksConfigurationName = configurationName;
-      store.chosenConfigurationName = configurationName;
-
-      final nonRemovableResources = <String>[configFile.path];
-
-      await resourceManager.cacheManager
-          .deleteLoadedResources(nonRemovableResources);
-    }
-
-    return configFile;
+  Future<void> resetConfig({BenchmarksConfig? newConfig}) async {
+    final config = newConfig ??
+        await configManager.currentConfig ??
+        configManager.defaultConfig;
+    await configManager.setConfig(config);
+    _store.chosenConfigurationName = config.name;
   }
 
   BenchmarkStateEnum get state {
@@ -546,7 +474,11 @@ class BenchmarkState extends ChangeNotifier {
       }
     }
 
-    if (!_aborting) await _recordResult(results);
+    if (!_aborting) {
+      await resourceManager.resultManager.writeResults(results);
+      _store.previousResult =
+          resourceManager.resultManager.serializeBriefResults(results);
+    }
 
     currentlyRunning = null;
     _doneRunning = _aborting ? null : true;
@@ -554,51 +486,6 @@ class BenchmarkState extends ChangeNotifier {
     notifyListeners();
 
     await Wakelock.disable();
-  }
-
-  Future<void> _recordResult(List<RunResult?> results) async {
-    final resultContent = <Map<String, dynamic>>[];
-    final briefResultContent = <Map<String, dynamic>>[];
-
-    for (final result in results) {
-      if (result != null) {
-        final score =
-            result.mode == BenchmarkMode.accuracy ? null : result.score;
-
-        final benchmarkResult = {
-          'benchmark_id': result.id,
-          'configuration': {
-            'runtime': '',
-          },
-          'score': score != null ? score.toString() : 'N/A',
-          'accuracy': BenchmarkMode.performance_lite == result.mode
-              ? 'N/A'
-              : result.accuracy,
-          // strings are used here to match android app behavior
-          'min_duration': result.minDuration.toString(),
-          'duration': result.durationMs.toString(),
-          'min_samples': result.minSamples.toString(),
-          'num_samples': result.numSamples.toString(),
-          'shards_num': result.threadsNumber,
-          'batch_size': result.batchSize,
-          'mode': result.mode.toString(),
-          'datetime': DateTime.now().toIso8601String(),
-        };
-        final benchmarkBriefResult = {
-          'benchmark_id': result.id,
-          'score': score,
-          'accuracy': result.accuracy,
-          'shards_num': result.threadsNumber,
-          'batch_size': result.batchSize,
-        };
-
-        resultContent.add(benchmarkResult);
-        briefResultContent.add(benchmarkBriefResult);
-      }
-    }
-
-    _store.previousResult = JsonEncoder().convert(briefResultContent);
-    await resourceManager.resultManager.write(resultContent);
   }
 
   Future<void> abortBenchmarks() async {

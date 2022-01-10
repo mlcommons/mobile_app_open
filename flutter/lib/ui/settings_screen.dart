@@ -150,9 +150,8 @@ class _SettingsScreen extends State<SettingsScreen> {
             onTap: () async {
               if (state.state == BenchmarkStateEnum.done ||
                   state.state == BenchmarkStateEnum.waiting) {
-                final benchmarksConfigurations = await state
-                    .resourceManager.configurationsManager
-                    .getAvailableConfigs();
+                final benchmarksConfigurations =
+                    await state.configManager.getConfigs();
 
                 await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => BenchmarksConfigurationScreen(

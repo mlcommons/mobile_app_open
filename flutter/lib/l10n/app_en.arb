@@ -63,7 +63,7 @@
   "luInfo": "Language Processing",
   "internetResource": "downloadable",
   "localResource": "local",
-  "errorConfig": "Path to benchmarks config is not correct",
+  "errorConfig": "Path to config is invalid:",
   "notAvailableModel": "Model is not available",
   "benchmarkType": "TFLite",
   "unableSpecifyConfiguration": "Could not specify until benchmarks is running or content is loading",

@@ -1,7 +1,8 @@
+# Build and run
 
 This file describes how to build and run the Flutter app for different platforms.
 
-# Contents
+## Contents
 
 * [Overview](#overview)
 * [Common info](#common-info)
@@ -10,7 +11,7 @@ This file describes how to build and run the Flutter app for different platforms
 * [Windows](#windows)
 * [Running tests](#running-tests)
 
-# Overview
+## Overview
 
 [comment]: # (Don't remove spaces at the end of lines, they force line breaks)
 
@@ -26,13 +27,14 @@ If you want to build the app, you first need to build native libs,
 then prepare files that Flutter needs,
 and then run the build command for Flutter.
 
-# Common info
+## Common info
 
 The root makefile defines a convenient `flutter` make target, that prepares native libs
 and all miscellaneous files for Flutter but doesn't build actual application.  
 After you run `make flutter`, you can use any Flutter tools to build the app with parameters you need (release, debug, test, etc.).
 
 The easiest way to just run the app is to run flutter via console:
+
 ```bash
 flutter run
 ```
@@ -46,9 +48,11 @@ You should not evaluate performance when using this flag.
 
 Add `WITH_<VENDOR>=1` to make commands to build the the app with backends.
 For example:
+
 ```bash
 make WITH_QTI=1 WITH_SAMSUNG=1 WITH_PIXEL=1 WITH_MEDIATEK=1 docker/flutter/android/apk
 ```
+
 Some of the backends have additional requirements. See command output for details.
 
 The app is built with an unofficial UI (different color and text) by default.
@@ -56,7 +60,7 @@ To build with an official UI, you need to set
 * the environment variable `OFFICIAL_BUILD=true` if `make` is used (e.g. `OFFICIAL_BUILD=true make flutter/android/apk`), or 
 * the argument `--dart-define=official_build=true` if `flutter` is used (e.g. `flutter build apk --dart-define=official_build=true`).
 
-# Android
+## Android
 
 [comment]: # (Don't remove spaces at the end of lines, they force line breaks)
 [comment]: # (TODO add information about using Android emulators)
@@ -80,11 +84,12 @@ Run `make docker/flutter/android/apk` to build release APK.
 Run `make docker/flutter/android/libs` to build just `.so` libs. This command is helpful if you want to build Android version of the app on Windows.
 
 if the build fails with `java.io.IOException: Input/output error`, remove file gradle-wrapper.jar:
+
 ```bash
 rm -f flutter/android/gradle/wrapper/gradle-wrapper.jar
 ```
 
-# iOS
+## iOS
 
 [comment]: # (Don't remove spaces at the end of lines, they force line breaks)
 
@@ -93,6 +98,7 @@ Building for iOS is available only on macOS.
 See [iOS environment setup guide](./env-setup-ios.md#setting-up-the-environment).
 
 If you want to run the app on a real device, you have to change settings in XCode:
+
 1. Open `/flutter/ios/Runner.xcworkspace`
 2. Open `Runner` settings → `Signings & Capabilities`.  
 You probably need the Debug mode tab, but you can also change values in other tabs if you need.
@@ -109,6 +115,7 @@ Also Flutter doesn't support running the app on a remote device, without wired c
 Remember that XCode is used for the final build of the app, but it doesn't update any Flutter-related info.
 If you change Flutter sources or configs and then press the `Run` button in XCode, you will build outdated version of the app.  
 Run any of the following commands to update Flutter files in XCode project:
+
 * `flutter run` (make sure that you select iOS device during build)
 * `flutter build ios`
 * `flutter build ipa`
@@ -116,13 +123,14 @@ Run any of the following commands to update Flutter files in XCode project:
 Run `flutter build ipa` to create redistributable archive.
 Note that you will need to sign the app using external tools, which are not described here.
 
-# Windows
+## Windows
 
 Building for Windows is available only on Windows.
 
 See [Windows environment setup guide](./env-setup-windows.md#setting-up-the-environment).
 
 On Windows it's pretty easy to use Visual Studio debugger for native libs.
+
 1. Build native libs with debug symbols.  
 Add `${debug_flags_windows}` to bazel build command in the corresponding make target and rerun `make flutter`.
 2. Use `flutter run -d windows` or `flutter build windows --debug`
@@ -137,15 +145,17 @@ but you can drag and drop files from `cpp` folders to open them in Visual Studio
 Run `flutter build windows` to build release folder with the app.
 The release folder will be located in `flutter/build/windows/runner/Release/`.
 To create redistributable copy the following files into the application directory:
-```
+
+```text
 msvcp140.dll
 vcruntime140.dll
 vcruntime140_1.dll
 msvcp140_codecvt_ids.dll
 ```
+
 You can create `.zip` archive with the `Release` folder to redistribute the app.
 
-# Running tests
+## Running tests
 
 You can run integration test on your device.
 Use the following command to start the test:
