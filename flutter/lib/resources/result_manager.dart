@@ -107,9 +107,8 @@ class ResultManager {
   }
 
   // returns brief results in json
-  Future<String> record(List<RunResult?> results) async {
-    final resultContent = <Map<String, dynamic>>[];
-    final briefResultContent = <Map<String, dynamic>>[];
+  Future<void> writeResults(List<RunResult?> results) async {
+    final jsonContent = <Map<String, dynamic>>[];
 
     for (final result in results) {
       if (result == null) continue;
@@ -130,7 +129,16 @@ class ResultManager {
           batchSize: result.batchSize,
           mode: result.mode.toString(),
           datetime: DateTime.now().toIso8601String());
-      resultContent.add(full.toJsonMap());
+      jsonContent.add(full.toJsonMap());
+    }
+    await _write(jsonContent);
+  }
+
+  String serializeBriefResults(List<RunResult?> results) {
+    final jsonContent = <Map<String, dynamic>>[];
+
+    for (final result in results) {
+      if (result == null) continue;
 
       var brief = _BriefResult(
           id: result.id,
@@ -138,10 +146,9 @@ class ResultManager {
           accuracy: result.accuracy,
           shardsNum: result.threadsNumber,
           batchSize: result.batchSize);
-      briefResultContent.add(brief.toJsonMap());
+      jsonContent.add(brief.toJsonMap());
     }
-    await _write(resultContent);
-    return JsonEncoder().convert(briefResultContent);
+    return JsonEncoder().convert(jsonContent);
   }
 
   bool restoreResults(String briefResultsJson, List<Benchmark> benchmarks) {
@@ -153,6 +160,7 @@ class ResultManager {
             _BriefResult.fromJsonMap(resultContent as Map<String, dynamic>);
         final benchmark = benchmarks
             .singleWhere((benchmark) => benchmark.id == briefResult.id);
+
         benchmark.accuracy = briefResult.accuracy;
         benchmark.score = briefResult.score;
 
@@ -165,7 +173,9 @@ class ResultManager {
         }
       }
     } catch (e) {
-      print("can't parse previous results: $e");
+      print("can't parse previous results:");
+      print(briefResultsJson);
+      print(e);
       return false;
     }
     return true;

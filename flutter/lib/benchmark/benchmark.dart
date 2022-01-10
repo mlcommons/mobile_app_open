@@ -449,8 +449,9 @@ class BenchmarkState extends ChangeNotifier {
     }
 
     if (!_aborting) {
+      await resourceManager.resultManager.writeResults(results);
       _store.previousResult =
-          await resourceManager.resultManager.record(results);
+          resourceManager.resultManager.serializeBriefResults(results);
     }
 
     currentlyRunning = null;
