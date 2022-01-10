@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 
 class RunSettings {
+  final String backend_description;
   final String backend_model_path;
   final String backend_lib_path;
   final Uint8List backend_settings;
@@ -23,6 +24,7 @@ class RunSettings {
   final DatasetMode dataset_mode;
 
   RunSettings({
+    required this.backend_description,
     required this.backend_model_path,
     required this.backend_lib_path,
     required this.backend_settings,

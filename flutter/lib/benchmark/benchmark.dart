@@ -37,8 +37,11 @@ class Benchmark {
 
   double? score;
   String? accuracy;
+  String backendDescription;
 
-  Benchmark(this.benchmarkSetting, this.taskConfig, this.modelConfig);
+  Benchmark(this.benchmarkSetting, this.taskConfig, this.modelConfig)
+      : backendDescription =
+            '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}';
 
   String get id => modelConfig.id;
 
@@ -290,9 +293,9 @@ class BenchmarkState extends ChangeNotifier {
   Future<void> loadResources() async {
     _middle = await MiddleInterface.create(File(configManager.configPath));
     _store.clearBenchmarkList();
-    for (final item in _middle.benchmarks) {
+    for (final benchmark in _middle.benchmarks) {
       BatchPreset? batchPreset;
-      if (item.modelConfig.scenario == 'Offline') {
+      if (benchmark.modelConfig.scenario == 'Offline') {
         var presetList = resourceManager.getBatchPresets();
 
         if (Platform.isIOS) {
@@ -308,9 +311,8 @@ class BenchmarkState extends ChangeNotifier {
         batchPreset ??= presetList[0];
       }
 
-      final desc =
-          '${item.benchmarkSetting.configuration} | ${item.benchmarkSetting.acceleratorDesc}';
-      _store.addBenchmarkToList(item.id, item.taskName, desc, batchPreset);
+      _store.addBenchmarkToList(benchmark.id, benchmark.taskName,
+          benchmark.backendDescription, batchPreset);
     }
     await reset();
 
@@ -587,8 +589,8 @@ class BenchmarkJob {
     if (Platform.isAndroid) {
       backendNativeLibPath = await getNativeLibraryPath();
     }
-
     final result = await backend.run(RunSettings(
+      backend_description: benchmark.backendDescription,
       backend_model_path: resourceManager.get(benchmark.benchmarkSetting.src),
       backend_lib_path: backendLibPath,
       backend_settings: settings.writeToBuffer(),

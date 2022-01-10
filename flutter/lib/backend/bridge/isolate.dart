@@ -57,6 +57,7 @@ class BridgeIsolate {
           rs.min_duration,
           rs.threads_number,
           rs.batch_size,
+          rs.backend_description,
           rs.dataset_mode,
           rs.mode,
           r.latency,
