@@ -44,7 +44,7 @@ class _ConfigBatchScreen extends State<ConfigBatchScreen> {
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Text(
-            element.description,
+            element.name,
             textAlign: TextAlign.center,
           ),
         ),

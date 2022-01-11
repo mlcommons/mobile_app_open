@@ -130,7 +130,7 @@ class _ResultScreenState extends State<ResultScreen>
         children: [
           Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text(stringResources.benchmarkType)),
+              child: Text(benchmark.backendDescription)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

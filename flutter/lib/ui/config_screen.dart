@@ -24,10 +24,10 @@ class _ConfigScreen extends State<ConfigScreen> {
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Text(
-            item.description,
+            item.name,
           ),
         ),
-        subtitle: Text(item.id),
+        subtitle: Text(item.id + ' | ' + item.description),
         leading: Checkbox(
             value: item.active,
             onChanged: (bool? value) {

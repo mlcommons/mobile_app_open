@@ -32,6 +32,7 @@ class RunResult {
   final double score;
   final int threadsNumber;
   final int batchSize;
+  final String backendDescription;
 
   RunResult(
     this.id,
@@ -42,6 +43,7 @@ class RunResult {
     this.minDuration,
     this.threadsNumber,
     this.batchSize,
+    this.backendDescription,
     this._datasetMode,
     this._backendMode,
     double latency,

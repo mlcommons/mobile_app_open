@@ -11,19 +11,22 @@ class _BriefResult {
   static const _accuracyTag = 'accuracy';
   static const _shardsNumTag = 'shards_num';
   static const _batchSizeTag = 'batch_size';
+  static const _backendDescriptionTag = 'backend_description';
 
   final String id;
   final double? score;
   final String? accuracy;
   final int shardsNum;
   final int batchSize;
+  final String backendDescription;
 
   _BriefResult(
       {required this.id,
       required this.score,
       required this.accuracy,
       required this.shardsNum,
-      required this.batchSize});
+      required this.batchSize,
+      required this.backendDescription});
 
   Map<String, dynamic> toJsonMap() {
     return {
@@ -32,6 +35,7 @@ class _BriefResult {
       _accuracyTag: accuracy,
       _shardsNumTag: shardsNum,
       _batchSizeTag: batchSize,
+      _backendDescriptionTag: backendDescription,
     };
   }
 
@@ -41,13 +45,15 @@ class _BriefResult {
     final accuracy = jsonMap[_accuracyTag] as String?;
     final shardsNum = jsonMap[_shardsNumTag] as int? ?? 0;
     final batchSize = jsonMap[_batchSizeTag] as int? ?? 0;
+    final backendDescription = jsonMap[_backendDescriptionTag] as String;
 
     return _BriefResult(
         id: id,
         score: score,
         accuracy: accuracy,
         shardsNum: shardsNum,
-        batchSize: batchSize);
+        batchSize: batchSize,
+        backendDescription: backendDescription);
   }
 }
 
@@ -64,6 +70,7 @@ class _FullResult {
   final int batchSize;
   final String mode;
   final String datetime;
+  final String backendDescription;
 
   _FullResult(
       {required this.id,
@@ -76,7 +83,8 @@ class _FullResult {
       required this.shardsNum,
       required this.batchSize,
       required this.mode,
-      required this.datetime});
+      required this.datetime,
+      required this.backendDescription});
 
   Map<String, dynamic> toJsonMap() {
     return {
@@ -94,6 +102,7 @@ class _FullResult {
       'batch_size': batchSize,
       'mode': mode,
       'datetime': datetime,
+      'backendDescription': backendDescription,
     };
   }
 }
@@ -128,7 +137,8 @@ class ResultManager {
           shardsNum: result.threadsNumber,
           batchSize: result.batchSize,
           mode: result.mode.toString(),
-          datetime: DateTime.now().toIso8601String());
+          datetime: DateTime.now().toIso8601String(),
+          backendDescription: result.backendDescription);
       jsonContent.add(full.toJsonMap());
     }
     await _write(jsonContent);
@@ -145,7 +155,8 @@ class ResultManager {
           score: result.mode == BenchmarkMode.accuracy ? null : result.score,
           accuracy: result.accuracy,
           shardsNum: result.threadsNumber,
-          batchSize: result.batchSize);
+          batchSize: result.batchSize,
+          backendDescription: result.backendDescription);
       jsonContent.add(brief.toJsonMap());
     }
     return JsonEncoder().convert(jsonContent);
@@ -163,6 +174,7 @@ class ResultManager {
 
         benchmark.accuracy = briefResult.accuracy;
         benchmark.score = briefResult.score;
+        benchmark.backendDescription = briefResult.backendDescription;
 
         if (benchmark.modelConfig.scenario == 'Offline') {
           benchmark.benchmarkSetting.customSetting.add(pb.CustomSetting(
