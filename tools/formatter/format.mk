@@ -30,7 +30,7 @@ format/line-endings:
 
 .PHONY: format/markdown
 format/markdown:
-	markdownlint -c tools/formatter/markdownlint_config.yml '**/*.md' --ignore 'LICENSE.md'
+	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty markdownlint -c tools/formatter/markdownlint_config.yml --ignore 'LICENSE.md'
 
 .PHONY: lint
 lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files
