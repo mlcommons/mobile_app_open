@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/icons.dart' as app_icons;
 import 'package:mlperfbench/info.dart';
@@ -392,13 +393,14 @@ class _ResultScreenState extends State<ResultScreen>
           : Container(),
     ]);
 
+    String title;
+    title = _screenMode == _ScreenMode.performance
+        ? stringResources.resultsPerformanceTitle
+        : stringResources.resultsAccuracyTitle;
+    title = OFFICIAL_BUILD ? title : '${stringResources.unverified} $title';
+
     return Scaffold(
-      appBar: MyAppBar.buildAppBar(
-          _screenMode == _ScreenMode.performance
-              ? stringResources.resultsPerformanceTitle
-              : stringResources.resultsAccuracyTitle,
-          context,
-          true),
+      appBar: MyAppBar.buildAppBar(title, context, true),
       body: LayoutBuilder(
         builder: (context, constraint) {
           return SingleChildScrollView(

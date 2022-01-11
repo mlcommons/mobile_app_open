@@ -54,7 +54,7 @@ flutter_common_docker_flags= \
 .PHONY: flutter/android/apk
 flutter/android/apk: flutter/android
 	cd flutter && flutter clean
-	cd flutter && flutter build apk
+	cd flutter && flutter build apk ${flutter_common_dart_flags}
 	mkdir -p output/flutter/android/
 	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk output/flutter/android/release.apk
 

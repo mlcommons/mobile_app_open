@@ -6,6 +6,7 @@ import 'package:flutter/material.dart' hide Icons;
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/icons.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -133,19 +134,31 @@ class MyHomePage extends StatelessWidget {
 class MyPaintBottom extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
+    final List<Color> colors;
+    if (OFFICIAL_BUILD) {
+      colors = [
+        Color(0xFF31A3E2),
+        Color(0xFF31A3E2),
+        Color(0xFF31A3E2),
+        Color(0xFF3189E2),
+        Color(0xFF0B4A7F),
+      ];
+    } else {
+      colors = [
+        Colors.brown.shade400,
+        Colors.brown.shade400,
+        Colors.brown.shade400,
+        Colors.brown,
+        Colors.brown,
+      ];
+    }
     final rect =
         Rect.fromCircle(center: Offset(size.width / 2, 0), radius: size.height);
     final paint = Paint()
       ..shader = LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomLeft,
-        colors: [
-          Color(0xFF31A3E2),
-          Color(0xFF31A3E2),
-          Color(0xFF31A3E2),
-          Color(0xFF3189E2),
-          Color(0xFF0B4A7F),
-        ],
+        colors: colors,
       ).createShader(rect);
     canvas.drawArc(rect, 0, pi, true, paint);
   } // paint

@@ -2,12 +2,13 @@
 
 print_usage() {
 cat << 'PRINT_HELP'
-usage: ./autostart-run.sh [-h] [-s] [-d] [-l] [-o]
+usage: ./autostart-run.sh [-h] [-u] [-s] [-d] [-l] [-o]
 This script installs MLPerf app to a device, automatically starts the test,
 and writes run logs into the specified directory.
 When benchmark have finished, results json is printed on the screen and saved near log file.
 optional arguments:
  -h Display usage
+ -u Use official app UI
  -s Enable (s)ubmission mode to report per-usecase accuracy
  -d DEVICE_ID         Choose the device if several are connected (Default: No Default)
                       Run `flutter devices` to get ID of your device.
@@ -19,6 +20,7 @@ PRINT_HELP
 resultsStringMark=resultsStringMark
 terminalStringMark=terminalStringMark
 DEVICE_ID=""
+official_build=false
 submission_mode=false
 OUTPUT_LOG_PATH="output/autostart_logs"
 OUTPUT_LOG_NAME="mlperf_$(date +%Y-%m-%d-T%H-%M-%S)"
@@ -28,6 +30,7 @@ do
     case "$flag" in
         h)  print_usage;
             exit 0;;
+        u)  official_build=true ;;
         s)  submission_mode=true ;;
         d)  DEVICE_ID=$OPTARG ;;
         l)  OUTPUT_LOG_PATH=$OPTARG ;;
@@ -39,6 +42,7 @@ do
 done
 
 echo "using parameters:"
+echo "Official build set to \"$official_build\""
 echo "Submission mode set to \"$submission_mode\""
 echo "DEVICE_ID set to \"$DEVICE_ID\""
 echo "OUTPUT_LOG_PATH set to \"$OUTPUT_LOG_PATH\""
@@ -54,6 +58,7 @@ mkdir -p "$OUTPUT_LOG_PATH"
 echo "building and running the app... (this will take a while, see log file for intermediate results)"
 flutter run \
     --dart-define=autostart=true \
+    --dart-define=official_build=$official_build \
     --dart-define=submission=$submission_mode \
     --dart-define=resultsStringMark=resultsStringMark \
     --dart-define=terminalStringMark=terminalStringMark \

@@ -91,7 +91,7 @@ flutter/windows/copy-flutter-files-for-docker:
 _windows_container_redist_dlls_dir="C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Redist/MSVC/14.29.30133/x64/Microsoft.VC142.CRT"
 .PHONY: flutter/windows/flutter-release
 flutter/windows/flutter-release:
-	flutter build windows
+	flutter build windows ${flutter_common_dart_flags}
 	cp -t build/windows/runner/Release \
 		${_windows_container_redist_dlls_dir}/msvcp140.dll \
 		${_windows_container_redist_dlls_dir}/vcruntime140.dll \

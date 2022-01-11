@@ -13,6 +13,9 @@
 # limitations under the License.
 ##########################################################################
 
+flutter_common_dart_flags= \
+        --dart-define=official_build=${OFFICIAL_BUILD}
+
 .PHONY: flutter
 ifeq (${OS},Windows_NT)
 flutter: flutter/windows
