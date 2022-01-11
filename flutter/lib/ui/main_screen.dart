@@ -145,6 +145,9 @@ class MyPaintBottom extends CustomPainter {
       ];
     } else {
       colors = [
+        Colors.brown.shade400,
+        Colors.brown.shade400,
+        Colors.brown.shade400,
         Colors.brown,
         Colors.brown,
       ];

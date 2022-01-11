@@ -33,7 +33,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
     final colors = OFFICIAL_BUILD
         ? [Color(0xff3189E2), Color(0xff0B4A7F)]
-        : [Colors.brown, Colors.brown];
+        : [Colors.brown.shade400, Colors.brown];
     return Scaffold(
       body: Container(
           decoration: BoxDecoration(

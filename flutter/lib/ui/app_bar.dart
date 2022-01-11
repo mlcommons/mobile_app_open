@@ -39,7 +39,8 @@ class MyAppBar {
         child: Text(title, style: TextStyle(fontSize: 24, color: Colors.white)),
       ),
       centerTitle: true,
-      backgroundColor: OFFICIAL_BUILD ? Color(0xFF31A3E2) : Colors.brown,
+      backgroundColor:
+          OFFICIAL_BUILD ? Color(0xFF31A3E2) : Colors.brown.shade400,
       iconTheme: IconThemeData(color: Colors.white),
       actions: actions,
     );
