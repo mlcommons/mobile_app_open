@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Icons;
-import 'package:mlperfbench/app_constants.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/icons.dart';
 import 'config_screen.dart';
 import 'settings_screen.dart';
