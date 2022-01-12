@@ -72,6 +72,10 @@ lint/line-endings:
 	else echo all files have unix line endings; \
 	fi
 
+.PHONY: lint/markdown-links
+lint/markdown-links:
+	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty -n1 markdown-link-check
+
 output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	docker build --progress=plain \
 		--build-arg UID=`id -u` --build-arg GID=`id -g` \

@@ -80,6 +80,8 @@ jobs:
           config: 'tools/formatter/markdownlint_config.yml'
           args: '**/*.md'
           ignore: './LICENSE.md'
+      - name: Check links in markdown files
+        run: make lint/markdown-links
   misc:
     runs-on: ubuntu-latest
     steps:
