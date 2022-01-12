@@ -31,8 +31,9 @@ struct BackendFunctions {
   BackendFunctions(const std::string& lib_path);
 
   ~BackendFunctions() {
-    if (handle) {
+    if (handle != nullptr && needToUnload) {
       tflite::SharedLibrary::UnLoadLibrary(handle);
+      handle = nullptr;
     }
   }
   // Types for function pointer.
@@ -97,6 +98,7 @@ struct BackendFunctions {
 
   // Handle to the loaded library.
   void* handle{nullptr};
+  bool needToUnload = true;
 
   void* GetSymbol(const std::string& name) {
     void* result;

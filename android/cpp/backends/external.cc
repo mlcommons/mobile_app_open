@@ -134,6 +134,10 @@ BackendFunctions::BackendFunctions(const std::string& lib_path) {
     AllocatorMgr::UseDefaultAllocator();
     LOG(INFO) << "Using default allocator";
   }
+
+  if (lib_path.find("samsung") != std::string::npos) {
+    needToUnload = false;
+  }
 }
 
 ExternalBackend::ExternalBackend(const std::string& model_file_path,
