@@ -60,6 +60,7 @@ Python 3.9.7
 ```
 
 Note: the current version may crash with EXC_RESOURCE if built with XCode 13.0
+<!-- markdown-link-check-disable-next-line -->
 (see issue [#303](https://github.com/mlcommons/mobile_app_flutter/issues/303))
 
 ## Changing application icon
