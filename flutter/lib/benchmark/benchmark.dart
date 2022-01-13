@@ -350,7 +350,6 @@ class BenchmarkState extends ChangeNotifier {
         result.resourceManager.applicationDirectory,
         store.chosenConfigurationName,
         result.resourceManager);
-    await result.configManager.createConfigListFile();
     await result.resourceManager.loadBatchPresets();
     await result.resetConfig();
     await result.loadResources();

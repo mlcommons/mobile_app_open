@@ -64,7 +64,7 @@ class ConfigManager {
         .deleteLoadedResources(nonRemovableResources);
   }
 
-  Future<File> createConfigListFile() async {
+  Future<File> _createOrUpdateConfigListFile() async {
     final file = File('$applicationDirectory/$_configListFileName');
     final jsonEncoder = JsonEncoder.withIndent('  ');
 
@@ -86,7 +86,7 @@ class ConfigManager {
   }
 
   Future<Map<String, dynamic>> _readConfigs() async {
-    final file = await createConfigListFile();
+    final file = await _createOrUpdateConfigListFile();
     return jsonDecode(await file.readAsString()) as Map<String, dynamic>;
   }
 
