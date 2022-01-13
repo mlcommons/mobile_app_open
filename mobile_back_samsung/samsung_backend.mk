@@ -43,7 +43,8 @@ ifeq (${WITH_SAMSUNG},1)
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libgpu_boost_vendor.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libprocessgroup.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libvendor_samsung_slsi_hardware_gpu_boost.so \
+    ${BAZEL_LINKS_PREFIX}bin/android/commonlibs/lib_arm64/libc++_shared.so
   # Samsung backend is prebuilt, so we don't need any bazel targets for it
-  backend_samsung_android_target=
+  backend_samsung_android_target=//android/commonlibs:commonlibs
   backend_samsung_filename=libsamsungbackend
 endif
