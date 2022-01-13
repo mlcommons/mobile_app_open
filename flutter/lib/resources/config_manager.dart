@@ -76,13 +76,12 @@ class ConfigManager {
 
     final configs =
         jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-    if (configs[defaultConfig.name] == defaultConfig.path) {
-      return file;
+    if (configs[defaultConfig.name] != defaultConfig.path) {
+      print('Update default config path in ' + file.path);
+      configs[defaultConfig.name] = defaultConfig.path;
+      await file.writeAsString(jsonEncoder.convert(configs));
     }
 
-    print('Update default config path in ' + file.path);
-    configs[defaultConfig.name] = defaultConfig.path;
-    await file.writeAsString(jsonEncoder.convert(configs));
     return file;
   }
 
