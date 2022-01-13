@@ -91,6 +91,8 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       in->backend_native_lib_path);
   li;
 
+  char* backend_description = strdup(backend->Name().c_str());
+
   ::std::unique_ptr<::mlperf::mobile::Dataset> dataset;
   switch (in->dataset_type) {
     case ::mlperf::mobile::DatasetConfig::IMAGENET:
@@ -143,6 +145,7 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   out->accuracy = strdup(driver.ComputeAccuracyString().c_str());
   out->num_samples = driver.GetNumSamples();
   out->duration_ms = driver.GetDurationMs();
+  out->backend_description = backend_description;
   li;
 
   return out;
@@ -150,5 +153,6 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
 void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out* out) {
   free(out->accuracy);
+  free(out->backend_description);
   delete out;
 }
