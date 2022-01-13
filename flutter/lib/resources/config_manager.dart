@@ -6,6 +6,7 @@ import 'package:mlperfbench/resources/resource_manager.dart';
 import 'utils.dart';
 
 const _configListFileName = 'benchmarksConfigurations.json';
+const _defaultConfigName = 'default';
 const _defaultConfigUrl =
     'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v3.pbtxt';
 
@@ -18,13 +19,15 @@ class BenchmarksConfig {
   String getType(AppLocalizations stringResources) => isInternetResource(path)
       ? stringResources.internetResource
       : stringResources.localResource;
+
+  Map<String, String> asMap() => {name: path};
 }
 
 class ConfigManager {
   final String applicationDirectory;
   final ResourceManager resourceManager;
   final BenchmarksConfig defaultConfig =
-      BenchmarksConfig('default', _defaultConfigUrl);
+      BenchmarksConfig(_defaultConfigName, _defaultConfigUrl);
   String currentConfigName;
   String configPath = '';
 
@@ -63,12 +66,23 @@ class ConfigManager {
 
   Future<File> createConfigListFile() async {
     final file = File('$applicationDirectory/$_configListFileName');
-    if (await file.exists()) return file;
-
-    print('Create ' + file.path);
-    var config = <String, String>{defaultConfig.name: defaultConfig.path};
     final jsonEncoder = JsonEncoder.withIndent('  ');
-    await file.writeAsString(jsonEncoder.convert(config));
+
+    if (!await file.exists()) {
+      print('Create new config file at ' + file.path);
+      await file.writeAsString(jsonEncoder.convert(defaultConfig.asMap()));
+      return file;
+    }
+
+    final configs =
+        jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+    if (configs[defaultConfig.name] == defaultConfig.path) {
+      return file;
+    }
+
+    print('Update default config path in ' + file.path);
+    configs[defaultConfig.name] = defaultConfig.path;
+    await file.writeAsString(jsonEncoder.convert(configs));
     return file;
   }
 
