@@ -80,6 +80,10 @@ jobs:
           config: 'tools/formatter/markdownlint_config.yml'
           args: '**/*.md'
           ignore: './LICENSE.md'
+      - name: Check links in markdown files
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-verbose-mode: yes
   misc:
     runs-on: ubuntu-latest
     steps:

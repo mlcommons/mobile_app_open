@@ -53,6 +53,7 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get update && apt-get install -y \
     nodejs npm
 RUN npm install -g --production "markdownlint-cli@0.26.0"
+RUN npm install -g --production markdown-link-check@3.9.0
 
 # Setup permission to run Flutter as non-root user
 # this is needed to share Flutter cache with host machine
