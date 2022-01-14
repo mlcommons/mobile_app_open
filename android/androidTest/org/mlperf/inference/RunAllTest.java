@@ -68,11 +68,11 @@ public class RunAllTest {
   private static final String[] REFERENCE_RESULTS_STR = {
     "IC_tpu_uint8 40.0 N/A",
     "OD_uint8 40.0 N/A",
-    "SM_uint8 30.0 N/A",
+    "IS_uint8_deeplabv3 20.0 N/A",
+    "IS_uint8_mosaic 30.0 N/A",
     "LU_float32 4.0 N/A",
     "LU_gpu_float32 5.0 N/A",
     "IC_tpu_uint8_offline 10.00 N/A",
-    "IS_uint8 20.0 N/A"
   };
 
   @SuppressWarnings("FieldCanBeLocal")

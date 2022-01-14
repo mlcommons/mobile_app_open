@@ -55,7 +55,7 @@ public final class Benchmark {
       } else {
         icon = R.drawable.ic_image_classification;
       }
-    } else if (id.startsWith("IS") || id.startsWith("SM")) {
+    } else if (id.startsWith("IS")) {
       icon = R.drawable.ic_image_segmentation;
     } else if (id.startsWith("OD")) {
       icon = R.drawable.ic_object_detection;

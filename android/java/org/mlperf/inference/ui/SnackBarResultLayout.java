@@ -84,11 +84,6 @@ public class SnackBarResultLayout extends BaseTransientBottomBar<SnackBarResultL
         details = res.getString(R.string.snack_title_details_IS);
         detailsTitle = res.getString(R.string.snack_title_IS);
         break;
-      case "SM":
-        // TODO add description for new image segmentation
-        details = "";
-        detailsTitle = "Image Segmentation (MOSAIC)";
-        break;
       case "OD":
         details = res.getString(R.string.snack_title_details_OD);
         detailsTitle = res.getString(R.string.snack_title_OD);
