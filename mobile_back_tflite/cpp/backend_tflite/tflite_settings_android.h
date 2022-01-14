@@ -124,7 +124,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_deeplabv3"
+  benchmark_id: "IS_uint8"
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
