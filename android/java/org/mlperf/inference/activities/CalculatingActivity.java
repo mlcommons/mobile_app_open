@@ -103,7 +103,7 @@ public class CalculatingActivity extends BaseActivity
   public static final String CONFIG_SDCARD_PATH =
       "/storage/emulated/0/mlperf_datasets/tasks_v2.pbtxt";
   public static final String CONFIG_DEFAULT_URL =
-      "https://raw.githubusercontent.com/mlcommons/mobile_models/4b9c498172b194f77802f2d6c9279174bd04a5a2/v1_0/assets/tasks_v4.pbtxt";
+      "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/tasks_v4.pbtxt";
   public static final String SETTINGS_PATH = "SETTINGS_PATH";
 
   private float summaryScore;
