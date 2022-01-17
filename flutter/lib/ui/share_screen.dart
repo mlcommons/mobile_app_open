@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' hide Icons;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/icons.dart' show Icons;
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
@@ -26,7 +27,8 @@ class ShareScreen extends StatelessWidget {
     final minimumShareButtonWidth = MediaQuery.of(context).size.width - 60;
 
     final shareButtonStyle = ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
+        backgroundColor:
+            MaterialStateProperty.all<Color>(AppColors.shareRectangle),
         shape: MaterialStateProperty.all(RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.0),
             side: BorderSide(color: Colors.white))),
@@ -61,7 +63,8 @@ class ShareScreen extends StatelessWidget {
                                   child: Text(stringResources.privacyPrompt,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                          fontSize: 15, color: Colors.black)))))
+                                          fontSize: 15,
+                                          color: AppColors.darkText)))))
                     ])),
             Expanded(
               flex: 2,
@@ -89,7 +92,8 @@ class ShareScreen extends StatelessWidget {
                                   child: Text(
                                     stringResources.share,
                                     style: TextStyle(
-                                        fontSize: 20, color: Colors.white),
+                                        fontSize: 20,
+                                        color: AppColors.lightText),
                                   ),
                                 ))),
                         Padding(
@@ -108,7 +112,7 @@ class ShareScreen extends StatelessWidget {
                               child: Text(
                                 stringResources.dontShare,
                                 style: TextStyle(
-                                  color: Colors.blue.shade900,
+                                  color: AppColors.shareTextButton,
                                   fontSize: 18,
                                 ),
                               ),
@@ -125,7 +129,8 @@ class ShareScreen extends StatelessWidget {
                             TextSpan(
                               text: stringResources.privacyPolicyButton,
                               style: TextStyle(
-                                  fontSize: 13, color: Colors.blue.shade900),
+                                  fontSize: 13,
+                                  color: AppColors.shareTextButton),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () => _launchURL(),
                             ),

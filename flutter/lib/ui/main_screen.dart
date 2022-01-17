@@ -58,7 +58,7 @@ class MyHomePage extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(30),
               child: Text(stringResources.measureCapability,
-                  style: TextStyle(fontSize: 16, color: Colors.black)),
+                  style: TextStyle(fontSize: 16, color: AppColors.darkText)),
             ),
             Expanded(
               flex: 5,
@@ -124,7 +124,7 @@ class MyHomePage extends StatelessWidget {
   Widget _downloadContainer(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
     final textLabel = Text(context.watch<BenchmarkState>().downloadingProgress,
-        style: TextStyle(color: Colors.white, fontSize: 40));
+        style: TextStyle(color: AppColors.lightText, fontSize: 40));
 
     return _circleContainerWithContent(
         context, textLabel, stringResources.loadingContent);
@@ -134,31 +134,13 @@ class MyHomePage extends StatelessWidget {
 class MyPaintBottom extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final List<Color> colors;
-    if (OFFICIAL_BUILD) {
-      colors = [
-        Color(0xFF31A3E2),
-        Color(0xFF31A3E2),
-        Color(0xFF31A3E2),
-        Color(0xFF3189E2),
-        Color(0xFF0B4A7F),
-      ];
-    } else {
-      colors = [
-        Colors.brown.shade400,
-        Colors.brown.shade400,
-        Colors.brown.shade400,
-        Colors.brown,
-        Colors.brown,
-      ];
-    }
     final rect =
         Rect.fromCircle(center: Offset(size.width / 2, 0), radius: size.height);
     final paint = Paint()
       ..shader = LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomLeft,
-        colors: colors,
+        colors: AppColors.mainScreenGradient,
       ).createShader(rect);
     canvas.drawArc(rect, 0, pi, true, paint);
   } // paint
@@ -179,10 +161,7 @@ class GoButtonGradient extends StatelessWidget {
     var decoration = BoxDecoration(
       shape: BoxShape.circle,
       gradient: LinearGradient(
-        colors: [
-          Color.lerp(Color(0xFF0DB526), Colors.white, 0.65)!,
-          Color(0xFF0DB526), // 0DB526
-        ],
+        colors: AppColors.runBenchmarkCircleGradient,
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),
@@ -207,7 +186,7 @@ class GoButtonGradient extends StatelessWidget {
         child: Text(
           stringResources.go,
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.lightText,
             fontSize: 40,
           ),
         ),
@@ -226,7 +205,7 @@ Widget _circleContainerWithContent(
           padding: EdgeInsets.all(20),
           child: Text(
             label,
-            style: TextStyle(color: Colors.white, fontSize: 15),
+            style: TextStyle(color: AppColors.lightText, fontSize: 15),
           ),
         ),
       ),
@@ -237,7 +216,7 @@ Widget _circleContainerWithContent(
             alignment: Alignment.center,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Color(0xff135384),
+              color: AppColors.progressCircle,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black12,

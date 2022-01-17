@@ -138,7 +138,7 @@ class _ResultScreenState extends State<ResultScreen>
               Text(
                 textResult,
                 style: TextStyle(
-                  color: Colors.black,
+                  color: AppColors.darkText,
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                 ),
@@ -240,7 +240,8 @@ class _ResultScreenState extends State<ResultScreen>
                         .join('\n')
                         .toUpperCase(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12.0, color: Colors.white),
+                    style:
+                        TextStyle(fontSize: 12.0, color: AppColors.lightText),
                   ),
                 ),
                 Text(
@@ -249,7 +250,7 @@ class _ResultScreenState extends State<ResultScreen>
                       : _getFormattedAccuracyValue(benchmark),
                   style: TextStyle(
                       fontSize: 32.0,
-                      color: Colors.white,
+                      color: AppColors.lightText,
                       fontWeight: FontWeight.bold),
                 ),
               ]),
@@ -330,7 +331,8 @@ class _ResultScreenState extends State<ResultScreen>
 
     final minimumShareButtonWidth = MediaQuery.of(context).size.width - 40;
     final buttonStyle = ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
+        backgroundColor:
+            MaterialStateProperty.all<Color>(AppColors.runBenchmarkRectangle),
         shape: MaterialStateProperty.all(RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.0),
             side: BorderSide(color: Colors.white))),
@@ -369,7 +371,7 @@ class _ResultScreenState extends State<ResultScreen>
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: Text(
                 stringResources.testAgain,
-                style: TextStyle(fontSize: 20.0, color: Colors.white),
+                style: TextStyle(fontSize: 20.0, color: AppColors.lightText),
               ),
             ),
           )),
@@ -385,7 +387,7 @@ class _ResultScreenState extends State<ResultScreen>
                 },
                 child: Text(stringResources.shareResults,
                     style: TextStyle(
-                      color: Colors.blue.shade900,
+                      color: AppColors.shareTextButton,
                       fontSize: 18,
                     )),
               ),
@@ -444,13 +446,7 @@ class BlueProgressLine extends Container {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5.0),
           gradient: LinearGradient(
-            colors: [
-              Color(0xFF135384),
-              Color(0xFF3183E2),
-              Color(0xFF31B8E2),
-              Color(0xFF7DD5F0),
-              Color(0xFF6AD7F9)
-            ],
+            colors: AppColors.resultBarGradient,
             begin: Alignment.topLeft,
             end: Alignment(1 / _progressValue, 0),
             stops: [0, 0.36, 0.61, 0.83, 1.0],

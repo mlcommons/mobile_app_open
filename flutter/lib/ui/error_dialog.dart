@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Icons;
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/icons.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
@@ -11,7 +12,7 @@ Future<void> showErrorDialog(BuildContext context, List<String> errors) async {
     barrierDismissible: false,
     builder: (context) {
       return AlertDialog(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.dialogBackground,
         titlePadding: EdgeInsets.all(10),
         contentPadding: EdgeInsets.fromLTRB(15, 10, 10, 10),
         title:

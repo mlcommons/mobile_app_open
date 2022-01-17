@@ -36,12 +36,12 @@ class MyAppBar {
     return AppBar(
       title: FittedBox(
         fit: BoxFit.fitWidth,
-        child: Text(title, style: TextStyle(fontSize: 24, color: Colors.white)),
+        child: Text(title,
+            style: TextStyle(fontSize: 24, color: AppColors.lightText)),
       ),
       centerTitle: true,
-      backgroundColor:
-          OFFICIAL_BUILD ? Color(0xFF31A3E2) : Colors.brown.shade400,
-      iconTheme: IconThemeData(color: Colors.white),
+      backgroundColor: AppColors.darkAppBarBackground,
+      iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
       actions: actions,
     );
   }
