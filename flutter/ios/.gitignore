@@ -30,3 +30,9 @@ Runner/GeneratedPluginRegistrant.*
 !default.mode2v3
 !default.pbxuser
 !default.perspectivev3
+
+# Project specific
+/Flutter/backend_fw.framework
+/Flutter/ios_backend_fw_static.framework
+/build
+/Runner/Base.lproj/LaunchScreen.storyboard
