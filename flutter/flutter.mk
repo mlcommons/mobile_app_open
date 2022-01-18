@@ -64,8 +64,8 @@ flutter/generate-localizations:
 		--output-localization-file=app_localizations.dart \
 		--no-synthetic-package
 
-.PHONY: flutter/prepare-flutter
-flutter/prepare-flutter: flutter/set-supported-backends flutter/protobuf flutter/generate-localizations
+.PHONY: flutter/prepare
+flutter/prepare: flutter/set-supported-backends flutter/protobuf flutter/generate-localizations
 
 .PHONY: flutter/clean
 flutter/clean:

@@ -74,7 +74,7 @@ Unfortunately, there is no complete environment setup guide for now.
 See [macOS guide](./env-setup-ios.md#setting-up-the-environment) for general setup and [Ubuntu guide](./env-setup-android.md#setting-up-the-environment-on-ubuntu) for android-specific parts.
 
 On Windows building libs for Android is not available.  
-You can copy `.so` files from some Linux or macOS system, then run `make flutter/prepare-flutter`, and then run Flutter commands locally.  
+You can copy `.so` files from some Linux or macOS system, then run `make flutter/prepare`, and then run Flutter commands locally.  
 For example, it's relatively convenient to use WSL to build native libs.
 See [Windows environment setup guide](./env-setup-windows.md#setting-up-the-environment) to set up your system to run Flutter.
 

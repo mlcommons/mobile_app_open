@@ -16,7 +16,7 @@
 debug_flags_windows=-c dbg --copt /Od --copt /Z7 --linkopt -debug
 
 .PHONY: flutter/windows
-flutter/windows: flutter/windows/libs flutter/prepare-flutter
+flutter/windows: flutter/windows/libs flutter/prepare
 
 flutter_windows_libs_folder=flutter/windows/libs
 .PHONY: flutter/windows/libs

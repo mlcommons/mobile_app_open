@@ -55,7 +55,7 @@ jobs:
         run: |
             dart pub global activate protoc_plugin &&
             export PATH="$PATH:$HOME/.pub-cache/bin" &&
-            make flutter/prepare-flutter &&
+            make flutter/prepare &&
             dart format flutter/lib/backend/backends_list.gen.dart flutter/lib/protos flutter/lib/localizations
       - name: Run Dart format check
         run: dart format --output=none --set-exit-if-changed flutter

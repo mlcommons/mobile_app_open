@@ -41,7 +41,7 @@ lint/bazel:
 
 .PHONY: lint/dart
 lint/dart:
-	make flutter/prepare-flutter
+	make flutter/prepare
 	dart analyze flutter
 
 .PHONY: lint/prohibited-extensions
