@@ -49,7 +49,7 @@ flutter/windows/docker/flutter-release:
 	echo >output/container-script.bat "\
 		make flutter/windows/copy-flutter-files-for-docker \
 		&& cd C:/project-local \
-		&& make flutter/prepare-flutter flutter/windows/flutter-release \
+		&& make flutter/prepare flutter/windows/flutter-release \
 		&& cp -r build/windows/runner/Release C:/mnt/project/output/windows-build \
 		"
 	docker start -ai mobile_app_flutter_windows_container

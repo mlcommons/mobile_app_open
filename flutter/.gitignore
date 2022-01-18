@@ -1,25 +1,3 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-.vscode/
-
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
@@ -42,14 +20,6 @@ app.*.map.json
 
 
 # Project specific
-/android/local.properties
-/bazel-*
-/data/data.bundle
-/ios/Flutter/backend_fw.framework
-/ios/Flutter/ios_backend_fw_static.framework
-/ios/build
-/ios/Runner/Base.lproj/LaunchScreen.storyboard
 /lib/protos
 /lib/localizations
-/output/
-/lib/backend/list.gen.dart
+*.gen.dart
