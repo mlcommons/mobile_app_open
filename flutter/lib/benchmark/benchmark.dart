@@ -307,6 +307,11 @@ class BenchmarkState extends ChangeNotifier {
               break;
             }
           }
+        } else if (Platform.isAndroid) {
+          batchPreset = BatchPreset(
+              name: 'backend-defined',
+              batchSize: benchmark.benchmarkSetting.batchSize,
+              shardsCount: 2);
         }
         batchPreset ??= presetList[0];
       }
