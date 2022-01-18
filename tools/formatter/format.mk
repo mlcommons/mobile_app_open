@@ -41,7 +41,7 @@ lint/bazel:
 
 .PHONY: lint/dart
 lint/dart:
-	make flutter/prepare-flutter
+	make flutter/prepare
 	dart analyze flutter
 
 .PHONY: lint/prohibited-extensions
@@ -71,6 +71,10 @@ lint/line-endings:
 		echo -e "found files with CRLF line endings: \n$$_files"; false; \
 	else echo all files have unix line endings; \
 	fi
+
+.PHONY: lint/markdown-links
+lint/markdown-links:
+	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty -n1 markdown-link-check
 
 output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	docker build --progress=plain \

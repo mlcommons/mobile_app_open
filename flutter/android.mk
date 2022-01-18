@@ -14,7 +14,7 @@
 ##########################################################################
 
 .PHONY: flutter/android
-flutter/android: flutter/android/libs flutter/prepare-flutter
+flutter/android: flutter/android/libs flutter/prepare
 
 flutter_docker_postfix=$(shell id -u)
 .PHONY: flutter/android/docker/image
@@ -46,15 +46,18 @@ flutter_common_docker_flags= \
 		--env WITH_PIXEL=${WITH_PIXEL} \
 		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
 		--env BAZEL_ARGS_GLOBAL="${proxy_bazel_args} --output_user_root=/mnt/cache/bazel" \
+		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
 		${proxy_docker_args} \
 		${backend_qti_flutter_docker_args} \
 		${backend_samsung_docker_args} \
 		mlcommons/mlperf_mobile_flutter
 
 .PHONY: flutter/android/apk
-flutter/android/apk: flutter/android
-	cd flutter && flutter clean
-	cd flutter && flutter build apk ${flutter_common_dart_flags}
+flutter/android/apk: flutter/android flutter/android/apk-only
+
+.PHONY: flutter/android/apk-only
+flutter/android/apk-only: flutter/prepare
+	cd flutter && ${_start_args} flutter --no-version-check build apk ${flutter_common_dart_flags}
 	mkdir -p output/flutter/android/
 	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk output/flutter/android/release.apk
 

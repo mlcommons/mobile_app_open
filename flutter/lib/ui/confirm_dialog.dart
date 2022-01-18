@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Icons;
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 enum ConfirmDialogAction { ok, cancel }
@@ -26,7 +27,7 @@ Future<ConfirmDialogAction?> showConfirmDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.dialogBackground,
         title: Text(stringResources.confirmDialogTitle),
         content: SingleChildScrollView(child: Text(message)),
         actions: [cancelButton, okButton],

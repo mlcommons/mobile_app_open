@@ -40,11 +40,13 @@ frameworks contributed by the broader MLPerf community.
 
 ## Requirements
 
+[comment]: # (links to developer.android.com return error when checking on CI)
+
 * Linux OS
 * [Bazel 2.x](https://docs.bazel.build/versions/master/install-ubuntu.html)
-* [Android SDK](https://developer.android.com/studio)
+* [Android SDK](https://developer.android.com/studio) <!-- markdown-link-check-disable-line -->
 * Android 10.0+ (API 29) w/
-    [USB debugging enabled](https://developer.android.com/studio/debug/dev-options)
+    [USB debugging enabled](https://developer.android.com/studio/debug/dev-options) <!-- markdown-link-check-disable-line -->
 
 ## Getting Started
 

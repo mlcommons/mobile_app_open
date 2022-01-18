@@ -350,7 +350,6 @@ class BenchmarkState extends ChangeNotifier {
         result.resourceManager.applicationDirectory,
         store.chosenConfigurationName,
         result.resourceManager);
-    await result.configManager.createConfigListFile();
     await result.resourceManager.loadBatchPresets();
     await result.resetConfig();
     await result.loadResources();
@@ -471,6 +470,7 @@ class BenchmarkState extends ChangeNotifier {
       final result = await resultFuture;
       results.add(result);
 
+      job.benchmark.backendDescription = result?.backendDescription ?? 'N/A';
       if (job.accuracy) {
         job.benchmark.accuracy = result?.accuracy;
       } else {
@@ -590,7 +590,6 @@ class BenchmarkJob {
       backendNativeLibPath = await getNativeLibraryPath();
     }
     final result = await backend.run(RunSettings(
-      backend_description: benchmark.backendDescription,
       backend_model_path: resourceManager.get(benchmark.benchmarkSetting.src),
       backend_lib_path: backendLibPath,
       backend_settings: settings.writeToBuffer(),

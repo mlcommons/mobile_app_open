@@ -17,3 +17,4 @@
 * .tgz
 __pycache__/
 mobile_app_open.iml
+*.log
