@@ -25,7 +25,7 @@ submission_mode=false
 OUTPUT_LOG_PATH="output/autostart_logs"
 OUTPUT_LOG_NAME="mlperf_$(date +%Y-%m-%d-T%H-%M-%S)"
 
-while getopts "h?asd:l:o:" flag
+while getopts "h?usd:l:o:" flag
 do
     case "$flag" in
         h)  print_usage;

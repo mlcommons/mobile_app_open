@@ -31,14 +31,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
             borderRadius: BorderRadius.circular(18.0),
             side: BorderSide(color: Colors.white))));
 
-    final colors = OFFICIAL_BUILD
-        ? [Color(0xff3189E2), Color(0xff0B4A7F)]
-        : [Colors.brown.shade400, Colors.brown];
     return Scaffold(
       body: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
-            colors: colors,
+            colors: AppColors.progressScreenGradient,
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           )),
@@ -55,10 +52,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         Text(stringResources.measuring,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: AppColors.lightText,
                                 fontSize: 30)),
                         Text(stringResources.dontCloseApp,
-                            style: TextStyle(color: Colors.white, fontSize: 17))
+                            style: TextStyle(
+                                color: AppColors.lightText, fontSize: 17))
                       ])),
               Stack(
                   alignment: AlignmentDirectional.centerStart,
@@ -70,7 +68,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: LinearGradient(
-                            colors: [Color(0xff135384), Color(0xff135384)],
+                            colors: AppColors.progressCircleGradient,
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                           ),
@@ -85,7 +83,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           child: Text(state.runningProgress,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white),
+                                  color: AppColors.lightText),
                               textScaleFactor: 3)),
                     )),
                     Center(
@@ -112,7 +110,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         : currentBenchmark.taskName,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppColors.lightText,
                     ),
                   ),
                 ),
@@ -125,8 +123,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       child: Text(
-                        'Cancel',
-                        style: TextStyle(fontSize: 15.0, color: Colors.white),
+                        stringResources.cancel,
+                        style: TextStyle(
+                            fontSize: 15.0, color: AppColors.lightText),
                       ),
                     ),
                   )),

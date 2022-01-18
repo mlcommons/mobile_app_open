@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
@@ -90,21 +91,21 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: AppColors.primary,
         // This makes the visual density adapt to the platform that you run
         // the app on. For desktop platforms, the controls will be smaller and
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
         // This sets default color for active switcher
-        toggleableActiveColor: Colors.green,
-        scaffoldBackgroundColor: Colors.white,
+        toggleableActiveColor: AppColors.secondary,
+        scaffoldBackgroundColor: AppColors.lightBackground,
 
         // This theme of application app bar
         appBarTheme: AppBarTheme(
-          titleTextStyle: TextStyle(color: Colors.black, fontSize: 20),
+          titleTextStyle: TextStyle(color: AppColors.darkText, fontSize: 20),
           elevation: 0,
-          backgroundColor: Colors.white,
-          iconTheme: IconThemeData(color: Color(0xFF135384)),
+          backgroundColor: AppColors.lightAppBarBackground,
+          iconTheme: IconThemeData(color: AppColors.darkAppBarIconTheme),
         ),
       ),
       // TODO sharing screen temporarily disabled
@@ -117,6 +118,7 @@ class MyApp extends StatelessWidget {
 class ExceptionWidget extends StatelessWidget {
   final Object error;
   final StackTrace stackTrace;
+
   ExceptionWidget(this.error, this.stackTrace);
 
   @override
@@ -131,7 +133,7 @@ class ExceptionWidget extends StatelessWidget {
             style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.normal,
-                color: Colors.white),
+                color: AppColors.lightText),
           )),
         ));
   }

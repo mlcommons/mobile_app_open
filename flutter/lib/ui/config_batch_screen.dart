@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
@@ -117,7 +118,7 @@ class _ConfigBatchScreen extends State<ConfigBatchScreen> {
         height: 40.0,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(color: Colors.blue),
+          border: Border.all(color: AppColors.primary),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 12.0),
         child: DropdownButtonHideUnderline(
