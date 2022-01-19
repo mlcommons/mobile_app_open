@@ -55,6 +55,11 @@ RUN apt-get update && apt-get install -y \
 RUN npm install -g --production "markdownlint-cli@0.26.0"
 RUN npm install -g --production markdown-link-check@3.9.0
 
+# Add YAML linter
+RUN apt-get update && apt-get install -y \
+	python3-pip
+RUN pip install yamllint==1.26.3
+
 # Setup permission to run Flutter as non-root user
 # this is needed to share Flutter cache with host machine
 ARG UNAME=mlperf

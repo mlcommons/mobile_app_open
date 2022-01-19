@@ -77,13 +77,21 @@ jobs:
       - name: Run Markdown format check
         uses: avto-dev/markdown-lint@v1.5.0
         with:
-          config: 'tools/formatter/markdownlint_config.yml'
+          config: 'tools/formatter/configs/markdownlint.yml'
           args: '**/*.md'
           ignore: './LICENSE.md'
       - name: Check links in markdown files
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           use-verbose-mode: yes
+  yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run YAML format check
+        uses: ibiqlik/action-yamllint@v3.1.0
+        with:
+          config_file: 'tools/formatter/configs/yamllint.yml'
   misc:
     runs-on: ubuntu-latest
     steps:

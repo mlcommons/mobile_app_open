@@ -1,0 +1,38 @@
+yaml-files:
+  - '*.yaml'
+  - '*.yml'
+  - '.yamllint'
+
+ignore: |
+  .github/workflows/cla.yml
+
+rules:
+  braces: enable
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  colons: enable
+  commas: enable
+  comments:
+    level: warning
+    min-spaces-from-content: 1
+  comments-indentation:
+    level: warning
+  document-start: disable
+  document-end: disable
+  empty-lines: enable
+  empty-values: disable
+  hyphens: enable
+  indentation: enable
+  key-duplicates: enable
+  key-ordering: disable
+  line-length: disable
+  new-line-at-end-of-file: enable
+  new-lines: enable
+  octal-values: disable
+  quoted-strings: disable
+  trailing-spaces: enable
+  truthy:
+    level: warning
+    allowed-values: [ 'true', 'false', 'yes', 'no' ]
+    check-keys: false
