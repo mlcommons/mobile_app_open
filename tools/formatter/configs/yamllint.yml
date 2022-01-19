@@ -14,7 +14,6 @@ rules:
   colons: enable
   commas: enable
   comments:
-    level: warning
     min-spaces-from-content: 1
   comments-indentation:
     level: warning
@@ -33,6 +32,5 @@ rules:
   quoted-strings: disable
   trailing-spaces: enable
   truthy:
-    level: warning
     allowed-values: [ 'true', 'false', 'yes', 'no' ]
     check-keys: false
