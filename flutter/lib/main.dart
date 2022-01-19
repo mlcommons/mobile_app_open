@@ -11,6 +11,7 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/main_screen.dart';
+import 'package:mlperfbench/backend/bridge/ffi_match.dart';
 
 // TODO sharing screen temporarily disabled
 // import 'package:mlperfbench/ui/share_screen.dart';
@@ -30,6 +31,7 @@ Future<void> main() async {
 }
 
 Future<void> launchUi() async {
+  await initDeviceInfo();
   final store = await Store.create();
   final benchmarkState = await BenchmarkState.create(store);
 

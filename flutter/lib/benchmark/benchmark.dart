@@ -15,7 +15,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
-import 'package:mlperfbench/backend/bridge/ffi_match.dart';
 import 'package:mlperfbench/backend/bridge/handle.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
@@ -86,14 +85,11 @@ class Benchmark {
 
 class MiddleInterface {
   final List<Benchmark> benchmarks;
-  final BackendInfo backendInfo;
 
-  MiddleInterface._(this.benchmarks, this.backendInfo);
+  MiddleInterface._(this.benchmarks);
 
-  static Future<MiddleInterface> create(File configFile) async {
+  static Future<MiddleInterface> create(File configFile, BackendInfo backendInfo) async {
     final tasks = getMLPerfConfig(await configFile.readAsString());
-
-    final backendInfo = BackendInfo.finMatching();
 
     final benchmarks = <Benchmark>[];
     for (final task in tasks.task) {
@@ -106,7 +102,7 @@ class MiddleInterface {
       }
     }
 
-    return MiddleInterface._(benchmarks, backendInfo);
+    return MiddleInterface._(benchmarks);
   }
 
   /// The list of URL or file names to download.
@@ -154,6 +150,7 @@ class BenchmarkState extends ChangeNotifier {
 
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
+  late final BackendInfo backendInfo;
 
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
@@ -199,6 +196,7 @@ class BenchmarkState extends ChangeNotifier {
 
   BenchmarkState._(this._store, this.backendBridge) {
     resourceManager = ResourceManager(notifyListeners);
+    backendInfo = BackendInfo.finMatching();
   }
 
   static double _getSummaryMaxScore() => MAX_SCORE['SUMMARY_MAX_SCORE']!;
@@ -264,7 +262,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> loadResources() async {
-    _middle = await MiddleInterface.create(File(configManager.configPath));
+    _middle = await MiddleInterface.create(File(configManager.configPath), backendInfo);
     _store.clearBenchmarkList();
     for (final benchmark in _middle.benchmarks) {
       BatchPreset? batchPreset;
@@ -328,7 +326,6 @@ class BenchmarkState extends ChangeNotifier {
 
   static Future<BenchmarkState> create(Store store) async {
     final result = BenchmarkState._(store, await BridgeIsolate.create());
-    await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
     result.configManager = ConfigManager(
@@ -396,7 +393,7 @@ class BenchmarkState extends ChangeNotifier {
         testMode ? true : _fast,
         storedConfig.threadsNumber,
         backendBridge,
-        _middle.backendInfo.libPath,
+        backendInfo.libPath,
       ));
 
       if (!submissionMode) continue;
@@ -409,7 +406,7 @@ class BenchmarkState extends ChangeNotifier {
         _fast,
         storedConfig.threadsNumber,
         backendBridge,
-        _middle.backendInfo.libPath,
+        backendInfo.libPath,
       ));
     }
     return jobs;
@@ -448,7 +445,7 @@ class BenchmarkState extends ChangeNotifier {
       wasAccuracy = job.accuracy;
 
       final resultFuture =
-          job._run(resourceManager, _middle.backendInfo.settings.commonSetting);
+          job._run(resourceManager, backendInfo.settings.commonSetting);
       currentlyRunning = job.benchmark;
       runningProgress = '${(100 * (n++ / jobs.length)).round()}%';
       notifyListeners();
