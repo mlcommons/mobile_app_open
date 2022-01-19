@@ -70,3 +70,5 @@ import_sorter:
   comments: false
   ignored_files:
     - \/.pub-cache\/*
+    - \/lib/protos\/*
+    - \/lib/localizations/*
