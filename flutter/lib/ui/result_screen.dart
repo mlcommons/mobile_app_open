@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/icons.dart' as app_icons;
 import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
