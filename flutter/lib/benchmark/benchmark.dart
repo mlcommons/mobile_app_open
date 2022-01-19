@@ -307,6 +307,18 @@ class BenchmarkState extends ChangeNotifier {
               break;
             }
           }
+        } else if (Platform.isAndroid) {
+          // shardsCount is only supported by the TFLite backend.
+          // On iPhones changing this value may significantly affect performance.
+          // On Android this value does not affect performance as much,
+          // (shards=2 is faster than shards=1, but I didn't notice any further improvements).
+          // Originally this value for hardcoded to 2 in the backend
+          // (before we made it configurable for iOS devices).
+          const defaultShardsCount = 2;
+          batchPreset = BatchPreset(
+              name: 'backend-defined',
+              batchSize: benchmark.benchmarkSetting.batchSize,
+              shardsCount: defaultShardsCount);
         }
         batchPreset ??= presetList[0];
       }

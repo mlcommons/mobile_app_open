@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart' hide Icons;
 import 'package:flutter/material.dart';
 
@@ -35,7 +37,7 @@ class _ConfigScreen extends State<ConfigScreen> {
                 item.active = value == true ? true : false;
               });
             }),
-        trailing: item.batchSize > 0
+        trailing: item.batchSize > 0 && !Platform.isAndroid
             ? IconButton(
                 icon: Icon(Icons.settings),
                 tooltip: 'Batch settings',
