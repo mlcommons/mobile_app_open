@@ -14,6 +14,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/handle.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
@@ -88,7 +89,8 @@ class MiddleInterface {
 
   MiddleInterface._(this.benchmarks);
 
-  static Future<MiddleInterface> create(File configFile, BackendInfo backendInfo) async {
+  static Future<MiddleInterface> create(
+      File configFile, BackendInfo backendInfo) async {
     final tasks = getMLPerfConfig(await configFile.readAsString());
 
     final benchmarks = <Benchmark>[];
@@ -188,8 +190,6 @@ class BenchmarkState extends ChangeNotifier {
   int _cooldownPause = 0;
   Future<void> _cooldownFuture = Future.value();
 
-  static const _fast = bool.fromEnvironment('fast-mode', defaultValue: false);
-
   bool _aborting = false;
 
   late MiddleInterface _middle;
@@ -262,7 +262,8 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> loadResources() async {
-    _middle = await MiddleInterface.create(File(configManager.configPath), backendInfo);
+    _middle = await MiddleInterface.create(
+        File(configManager.configPath), backendInfo);
     _store.clearBenchmarkList();
     for (final benchmark in _middle.benchmarks) {
       BatchPreset? batchPreset;
@@ -384,29 +385,19 @@ class BenchmarkState extends ChangeNotifier {
       if (!storedConfig.active) continue;
       benchmark.benchmarkSetting.batchSize = storedConfig.batchSize;
       jobs.add(BenchmarkJob(
-        benchmark,
-        testMode
-            ? benchmark.taskConfig.testDataset
-            : benchmark.taskConfig.liteDataset,
-        testMode ? DatasetMode.test : DatasetMode.lite,
-        false,
-        testMode ? true : _fast,
-        storedConfig.threadsNumber,
-        backendBridge,
-        backendInfo.libPath,
+        benchmark: benchmark,
+        accuracy: false,
+        threadsNumber: storedConfig.threadsNumber,
+        testMode: testMode,
       ));
 
       if (!submissionMode) continue;
 
       jobs.add(BenchmarkJob(
-        benchmark,
-        benchmark.taskConfig.dataset,
-        DatasetMode.full,
-        true,
-        _fast,
-        storedConfig.threadsNumber,
-        backendBridge,
-        backendInfo.libPath,
+        benchmark: benchmark,
+        accuracy: true,
+        threadsNumber: storedConfig.threadsNumber,
+        testMode: testMode,
       ));
     }
     return jobs;
@@ -436,16 +427,17 @@ class BenchmarkState extends ChangeNotifier {
       if (cooldown && !job.accuracy && !wasAccuracy) {
         _cooling = true;
         notifyListeners();
-        await (_cooldownFuture = Future.delayed(
-            _fast ? Duration(seconds: 1) : Duration(minutes: cooldownPause)));
+        await (_cooldownFuture = Future.delayed(FAST_MODE
+            ? Duration(seconds: 1)
+            : Duration(minutes: cooldownPause)));
         _cooling = false;
         notifyListeners();
       }
       if (_aborting) break;
       wasAccuracy = job.accuracy;
 
-      final resultFuture =
-          job._run(resourceManager, backendInfo.settings.commonSetting);
+      final resultFuture = job._run(resourceManager, backendBridge,
+          backendInfo.settings.commonSetting, backendInfo.libPath);
       currentlyRunning = job.benchmark;
       runningProgress = '${(100 * (n++ / jobs.length)).round()}%';
       notifyListeners();
@@ -502,27 +494,35 @@ enum DatasetMode { lite, full, test }
 
 class BenchmarkJob {
   final Benchmark benchmark;
-  final pb.DatasetConfig dataset;
+  late final pb.DatasetConfig dataset;
   final bool accuracy;
-  final bool fast;
-  final DatasetMode _datasetMode;
+  late final bool fast;
+  late final DatasetMode _datasetMode;
   final int threadsNumber;
-  final BridgeIsolate backend;
-  final String backendLibPath;
 
-  BenchmarkJob(
-    this.benchmark,
-    this.dataset,
-    this._datasetMode,
-    this.accuracy,
-    this.fast,
-    this.threadsNumber,
-    this.backend,
-    this.backendLibPath,
-  );
+  BenchmarkJob({
+    required this.benchmark,
+    required this.accuracy,
+    required this.threadsNumber,
+    required bool testMode,
+  }) {
+    if (testMode) {
+      _datasetMode = accuracy ? DatasetMode.full : DatasetMode.lite;
+      dataset = accuracy
+          ? benchmark.taskConfig.dataset
+          : benchmark.taskConfig.liteDataset;
+    } else {
+      _datasetMode = DatasetMode.test;
+      dataset = benchmark.taskConfig.testDataset;
+    }
+    fast = testMode || FAST_MODE;
+  }
 
   Future<RunResult?> _run(
-      ResourceManager resourceManager, List<pb.Setting> commonSettings) async {
+      ResourceManager resourceManager,
+      BridgeIsolate backend,
+      List<pb.Setting> commonSettings,
+      String backendLibPath) async {
     final tmpDir = await getTemporaryDirectory();
 
     print(
