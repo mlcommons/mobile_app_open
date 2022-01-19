@@ -86,45 +86,19 @@ class Benchmark {
 
 class MiddleInterface {
   final List<Benchmark> benchmarks;
-  final List<pb.Setting> commonSettings;
-  final String backendLibPath;
+  final BackendInfo backendInfo;
 
-  MiddleInterface._(this.benchmarks, this.commonSettings, this.backendLibPath);
-
-  static Future<MapEntry<pb.BackendSetting, String>>
-      findMatchingBackend() async {
-    for (var backendPath in getBackendsList()) {
-      if (backendPath == '') {
-        continue;
-      }
-      if (Platform.isWindows) {
-        backendPath = './libs/$backendPath';
-      } else if (Platform.isAndroid) {
-        backendPath = '$backendPath.so';
-      }
-      final backendSetting = backendMatch(backendPath);
-      if (backendSetting != null) {
-        return MapEntry(backendSetting, backendPath);
-      }
-    }
-    // try built-in backend
-    final backendSetting = backendMatch('');
-    if (backendSetting != null) {
-      return MapEntry(backendSetting, '');
-    }
-    throw 'no matching backend found';
-  }
+  MiddleInterface._(this.benchmarks, this.backendInfo);
 
   static Future<MiddleInterface> create(File configFile) async {
     final tasks = getMLPerfConfig(await configFile.readAsString());
-    final backendMatchInfo = await findMatchingBackend();
-    final backendSetting = backendMatchInfo.key;
-    final backendPath = backendMatchInfo.value;
+
+    final backendInfo = BackendInfo.finMatching();
 
     final benchmarks = <Benchmark>[];
     for (final task in tasks.task) {
       for (final model in task.model) {
-        final benchmarkSetting = backendSetting.benchmarkSetting
+        final benchmarkSetting = backendInfo.settings.benchmarkSetting
             .singleWhereOrNull((setting) => setting.benchmarkId == model.id);
         if (benchmarkSetting == null) continue;
 
@@ -132,8 +106,7 @@ class MiddleInterface {
       }
     }
 
-    return MiddleInterface._(
-        benchmarks, backendSetting.commonSetting, backendPath);
+    return MiddleInterface._(benchmarks, backendInfo);
   }
 
   /// The list of URL or file names to download.
@@ -423,7 +396,7 @@ class BenchmarkState extends ChangeNotifier {
         testMode ? true : _fast,
         storedConfig.threadsNumber,
         backendBridge,
-        _middle.backendLibPath,
+        _middle.backendInfo.libPath,
       ));
 
       if (!submissionMode) continue;
@@ -436,7 +409,7 @@ class BenchmarkState extends ChangeNotifier {
         _fast,
         storedConfig.threadsNumber,
         backendBridge,
-        _middle.backendLibPath,
+        _middle.backendInfo.libPath,
       ));
     }
     return jobs;
@@ -474,7 +447,8 @@ class BenchmarkState extends ChangeNotifier {
       if (_aborting) break;
       wasAccuracy = job.accuracy;
 
-      final resultFuture = job._run(resourceManager, _middle.commonSettings);
+      final resultFuture =
+          job._run(resourceManager, _middle.backendInfo.settings.commonSetting);
       currentlyRunning = job.benchmark;
       runningProgress = '${(100 * (n++ / jobs.length)).round()}%';
       notifyListeners();
