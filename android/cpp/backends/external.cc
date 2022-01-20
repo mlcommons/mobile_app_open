@@ -17,8 +17,8 @@ limitations under the License.
 #include <cstdlib>
 #include <memory>
 #include <string>
-#include <vector>
 #include <system_error>
+#include <vector>
 
 #include "android/cpp/backend.h"
 #include "android/cpp/utils.h"
@@ -81,7 +81,9 @@ BackendFunctions::BackendFunctions(const std::string& lib_path) {
     handle = tflite::SharedLibrary::LoadLibrary(wide_lib_path.c_str());
     if (handle == nullptr) {
       const auto errorCode = GetLastError();
-      LOG(ERROR) << "Can't load library in path '" << lib_path << "' (error  " << errorCode << "): " << std::system_category().message(errorCode);
+      LOG(ERROR) << "Can't load library in path '" << lib_path << "' (error  "
+                 << errorCode
+                 << "): " << std::system_category().message(errorCode);
       return;
     }
 #else
