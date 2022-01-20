@@ -61,6 +61,8 @@ jobs:
         run: dart format --output=none --set-exit-if-changed flutter
       - name: Run Dart linter
         run: dart analyze --fatal-infos
+      - name: Run Dart import sorter
+        run: cd flutter && dart run import_sorter:main --exit-if-changed
   java:
     runs-on: ubuntu-latest
     steps:
