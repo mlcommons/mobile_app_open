@@ -31,13 +31,13 @@ jobs:
     name: C++
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Check C++ format
-      uses: jidicula/clang-format-action@v4.3.1
-      with:
-        clang-format-version: 12
-        check-path: .
-        fallback-style: Google
+      - uses: actions/checkout@v2
+      - name: Check C++ format
+        uses: jidicula/clang-format-action@v4.3.1
+        with:
+          clang-format-version: 12
+          check-path: .
+          fallback-style: Google
   dart:
     runs-on: ubuntu-latest
     steps:
@@ -53,10 +53,10 @@ jobs:
           version: '3.x'
       - name: Create ephemeral files
         run: |
-            dart pub global activate protoc_plugin &&
-            export PATH="$PATH:$HOME/.pub-cache/bin" &&
-            make flutter/prepare &&
-            dart format flutter/lib/backend/backends_list.gen.dart flutter/lib/protos flutter/lib/localizations
+          dart pub global activate protoc_plugin &&
+          export PATH="$PATH:$HOME/.pub-cache/bin" &&
+          make flutter/prepare &&
+          dart format flutter/lib/backend/backends_list.gen.dart flutter/lib/protos flutter/lib/localizations
       - name: Run Dart format check
         run: dart format --output=none --set-exit-if-changed flutter
       - name: Run Dart linter
@@ -79,13 +79,21 @@ jobs:
       - name: Run Markdown format check
         uses: avto-dev/markdown-lint@v1.5.0
         with:
-          config: 'tools/formatter/markdownlint_config.yml'
+          config: 'tools/formatter/configs/markdownlint.yml'
           args: '**/*.md'
           ignore: './LICENSE.md'
       - name: Check links in markdown files
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           use-verbose-mode: yes
+  yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run YAML format check
+        uses: ibiqlik/action-yamllint@v3.1.0
+        with:
+          config_file: 'tools/formatter/configs/yamllint.yml'
   misc:
     runs-on: ubuntu-latest
     steps:

@@ -1,7 +1,7 @@
 include: package:pedantic/analysis_options.yaml
 
 analyzer:
-  exclude: 
+  exclude:
     - bazel-*/**
     - lib/localizations/**
     - lib/protos/**

@@ -63,7 +63,7 @@ flutter_icons:
 flutter:
   assets:
     - assets/
-  generate: true 
+  generate: true
   uses-material-design: true
 
 import_sorter:

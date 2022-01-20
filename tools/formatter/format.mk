@@ -30,7 +30,7 @@ format/line-endings:
 
 .PHONY: format/markdown
 format/markdown:
-	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty markdownlint -c tools/formatter/markdownlint_config.yml --fix --ignore 'LICENSE.md'
+	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml --fix --ignore 'LICENSE.md'
 
 .PHONY: lint
 lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files
@@ -43,6 +43,10 @@ lint/bazel:
 lint/dart:
 	make flutter/prepare
 	dart analyze flutter
+
+.PHONY: lint/yaml
+lint/yaml:
+	git ls-files -z | grep --null-data "\.yml$$\|\.yaml$$" | xargs --null --no-run-if-empty yamllint -c tools/formatter/configs/yamllint.yml
 
 .PHONY: lint/prohibited-extensions
 lint/prohibited-extensions:
