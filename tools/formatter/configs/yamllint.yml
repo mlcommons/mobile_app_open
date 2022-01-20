@@ -3,6 +3,9 @@ yaml-files:
   - '*.yml'
   - '.yamllint'
 
+# The file cla.yml is used in multiple repos organization-wide by the admin.
+# If we enforce yamllint on this file, we need to reformat it. That makes it different from other cla.yml,
+# which makes the maintenance of this file difficult for the admin.
 ignore: |
   .github/workflows/cla.yml
 
