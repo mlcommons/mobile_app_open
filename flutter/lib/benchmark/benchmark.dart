@@ -494,13 +494,13 @@ class BenchmarkJob {
     required bool testMode,
   }) {
     if (testMode) {
+      _datasetMode = DatasetMode.test;
+      dataset = benchmark.taskConfig.testDataset;
+    } else {
       _datasetMode = accuracy ? DatasetMode.full : DatasetMode.lite;
       dataset = accuracy
           ? benchmark.taskConfig.dataset
           : benchmark.taskConfig.liteDataset;
-    } else {
-      _datasetMode = DatasetMode.test;
-      dataset = benchmark.taskConfig.testDataset;
     }
     fast = testMode || FAST_MODE;
   }
