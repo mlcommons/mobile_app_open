@@ -400,12 +400,14 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.enable();
 
     final cooldown = _store.cooldown;
-    final cooldownPause = _store.cooldownPause;
+    final cooldownPause = FAST_MODE
+        ? Duration(seconds: 1)
+        : Duration(minutes: _store.cooldownPause);
     final jobs = _getBenchmarkJobs();
 
-    var n = 0;
+    var jobsDoneCounter = 0;
     var wasAccuracy = true;
-    final results = <RunResult?>[];
+    final results = <RunResult>[];
 
     for (final job in jobs) {
       if (_aborting) break;
@@ -413,9 +415,7 @@ class BenchmarkState extends ChangeNotifier {
       if (cooldown && !job.accuracy && !wasAccuracy) {
         _cooling = true;
         notifyListeners();
-        await (_cooldownFuture = Future.delayed(FAST_MODE
-            ? Duration(seconds: 1)
-            : Duration(minutes: cooldownPause)));
+        await (_cooldownFuture = Future.delayed(cooldownPause));
         _cooling = false;
         notifyListeners();
       }
@@ -425,17 +425,18 @@ class BenchmarkState extends ChangeNotifier {
       final resultFuture = job._run(resourceManager, backendBridge,
           backendInfo.settings.commonSetting, backendInfo.libPath);
       currentlyRunning = job.benchmark;
-      runningProgress = '${(100 * (n++ / jobs.length)).round()}%';
+      runningProgress = '${(100 * (jobsDoneCounter / jobs.length)).round()}%';
+      jobsDoneCounter++;
       notifyListeners();
 
       final result = await resultFuture;
       results.add(result);
 
-      job.benchmark.backendDescription = result?.backendDescription ?? 'N/A';
+      job.benchmark.backendDescription = result.backendDescription;
       if (job.accuracy) {
-        job.benchmark.accuracy = result?.accuracy;
+        job.benchmark.accuracy = result.accuracy;
       } else {
-        job.benchmark.score = result?.score;
+        job.benchmark.score = result.score;
       }
     }
 
@@ -504,11 +505,8 @@ class BenchmarkJob {
     fast = testMode || FAST_MODE;
   }
 
-  Future<RunResult?> _run(
-      ResourceManager resourceManager,
-      BridgeIsolate backend,
-      List<pb.Setting> commonSettings,
-      String backendLibPath) async {
+  Future<RunResult> _run(ResourceManager resourceManager, BridgeIsolate backend,
+      List<pb.Setting> commonSettings, String backendLibPath) async {
     final tmpDir = await getTemporaryDirectory();
 
     print(
