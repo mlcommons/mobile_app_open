@@ -183,11 +183,6 @@ class BenchmarkState extends ChangeNotifier {
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
 
-  // Settings from store
-  bool _submissionMode = false;
-  bool _testMode = false;
-  bool _cooldown = false;
-  int _cooldownPause = 0;
   Future<void> _cooldownFuture = Future.value();
 
   bool _aborting = false;
@@ -336,15 +331,6 @@ class BenchmarkState extends ChangeNotifier {
     await result.resourceManager.loadBatchPresets();
     await result.resetConfig();
     await result.loadResources();
-
-    final loadFromStore = () {
-      result._submissionMode = store.submissionMode;
-      result._testMode = store.testMode;
-      result._cooldown = store.cooldown;
-      result._cooldownPause = store.cooldownPause;
-    };
-    store.addListener(loadFromStore);
-    loadFromStore();
     return result;
   }
 
@@ -374,8 +360,8 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   List<BenchmarkJob> _getBenchmarkJobs() {
-    final submissionMode = _submissionMode;
-    final testMode = _testMode;
+    final submissionMode = _store.submissionMode;
+    final testMode = _store.testMode;
     final jobs = <BenchmarkJob>[];
 
     for (final benchmark in _middle.benchmarks) {
@@ -413,8 +399,8 @@ class BenchmarkState extends ChangeNotifier {
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
 
-    final cooldown = _cooldown;
-    final cooldownPause = _cooldownPause;
+    final cooldown = _store.cooldown;
+    final cooldownPause = _store.cooldownPause;
     final jobs = _getBenchmarkJobs();
 
     var n = 0;
