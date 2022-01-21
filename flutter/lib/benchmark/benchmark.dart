@@ -109,6 +109,7 @@ class MiddleInterface {
 
   /// The list of URL or file names to download.
   List<String> data() {
+    // TODO unify with listSelectedResources
     final result = <String>[];
 
     for (final b in benchmarks) {
@@ -196,17 +197,21 @@ class BenchmarkState extends ChangeNotifier {
 
   static double _getSummaryMaxScore() => MAX_SCORE['SUMMARY_MAX_SCORE']!;
 
-  Future<String> validateExternalResourcesDirectory(
-      String errorDescription) async {
-    final resources = <String>[];
+  List<String> listSelectedResources() {
+    final result = <String>[];
     for (final job in _getBenchmarkJobs()) {
-      resources.add(job.benchmark.benchmarkSetting.src);
-      resources.add(job.dataset.path);
-      resources.add(job.dataset.groundtruthSrc);
+      result.add(job.benchmark.benchmarkSetting.src);
+      result.add(job.dataset.path);
+      result.add(job.dataset.groundtruthSrc);
     }
     final set = <String>{};
-    resources.retainWhere((x) => x.isNotEmpty && set.add(x));
+    result.retainWhere((x) => x.isNotEmpty && set.add(x));
+    return result;
+  }
 
+  Future<String> validateExternalResourcesDirectory(
+      String errorDescription) async {
+    final resources = listSelectedResources();
     final missing = await resourceManager.validateResourcesExist(resources);
     if (missing.isEmpty) return '';
 
@@ -215,15 +220,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<String> validateOfflineMode(String errorDescription) async {
-    final resources = <String>[];
-    for (final job in _getBenchmarkJobs()) {
-      resources.add(job.benchmark.benchmarkSetting.src);
-      resources.add(job.dataset.path);
-      resources.add(job.dataset.groundtruthSrc);
-    }
-    final set = <String>{};
-    resources.retainWhere((x) => x.isNotEmpty && set.add(x));
-
+    final resources = listSelectedResources();
     final errors = filterInternetResources(resources);
     if (errors.isEmpty) return '';
 
