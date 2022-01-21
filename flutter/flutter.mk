@@ -14,7 +14,7 @@
 ##########################################################################
 
 flutter_common_dart_flags= \
-        --dart-define=official_build=${OFFICIAL_BUILD}
+        --dart-define=official-build=${OFFICIAL_BUILD}
 
 .PHONY: flutter
 ifeq (${OS},Windows_NT)

@@ -59,7 +59,7 @@ The app is built with an unofficial UI (different color and text) by default.
 To build with an official UI, you need to set
 
 * the environment variable `OFFICIAL_BUILD=true` if `make` is used (e.g. `OFFICIAL_BUILD=true make flutter/android/apk`), or
-* the argument `--dart-define=official_build=true` if `flutter` is used (e.g. `flutter build apk --dart-define=official_build=true`).
+* the argument `--dart-define=official-build=true` if `flutter` is used (e.g. `flutter build apk --dart-define=official-build=true`).
 
 ## Android
 

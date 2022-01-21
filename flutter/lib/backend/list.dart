@@ -22,7 +22,7 @@ class BackendInfo {
 
   BackendInfo._(this.settings, this.libPath);
 
-  static BackendInfo finMatching() {
+  static BackendInfo findMatching() {
     for (var path in _getBackendsList()) {
       if (path == '') {
         continue;

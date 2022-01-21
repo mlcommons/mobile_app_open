@@ -192,7 +192,7 @@ class BenchmarkState extends ChangeNotifier {
 
   BenchmarkState._(this._store, this.backendBridge) {
     resourceManager = ResourceManager(notifyListeners);
-    backendInfo = BackendInfo.finMatching();
+    backendInfo = BackendInfo.findMatching();
   }
 
   static double _getSummaryMaxScore() => MAX_SCORE['SUMMARY_MAX_SCORE']!;
@@ -221,11 +221,13 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<String> validateOfflineMode(String errorDescription) async {
     final resources = listSelectedResources();
-    final errors = filterInternetResources(resources);
-    if (errors.isEmpty) return '';
+    final internetResources = filterInternetResources(resources);
+    if (internetResources.isEmpty) return '';
 
     return errorDescription +
-        errors.mapIndexed((i, element) => '\n${i + 1}) $element').join();
+        internetResources
+            .mapIndexed((i, element) => '\n${i + 1}) $element')
+            .join();
   }
 
   Future<void> clearCache() async {
@@ -352,7 +354,7 @@ class BenchmarkState extends ChangeNotifier {
       benchmark.benchmarkSetting.batchSize = storedConfig.batchSize;
       jobs.add(BenchmarkJob(
         benchmark: benchmark,
-        accuracy: false,
+        accuracyMode: false,
         threadsNumber: storedConfig.threadsNumber,
         testMode: testMode,
       ));
@@ -361,7 +363,7 @@ class BenchmarkState extends ChangeNotifier {
 
       jobs.add(BenchmarkJob(
         benchmark: benchmark,
-        accuracy: true,
+        accuracyMode: true,
         threadsNumber: storedConfig.threadsNumber,
         testMode: testMode,
       ));
@@ -392,7 +394,7 @@ class BenchmarkState extends ChangeNotifier {
     for (final job in jobs) {
       if (_aborting) break;
 
-      if (cooldown && !job.accuracy && !wasAccuracy) {
+      if (cooldown && !job.accuracyMode && !wasAccuracy) {
         _cooling = true;
         notifyListeners();
         await (_cooldownFuture = Future.delayed(cooldownPause));
@@ -400,7 +402,7 @@ class BenchmarkState extends ChangeNotifier {
         notifyListeners();
       }
       if (_aborting) break;
-      wasAccuracy = job.accuracy;
+      wasAccuracy = job.accuracyMode;
 
       final resultFuture = job._run(resourceManager, backendBridge,
           backendInfo.settings.commonSetting, backendInfo.libPath);
@@ -413,7 +415,7 @@ class BenchmarkState extends ChangeNotifier {
       results.add(result);
 
       job.benchmark.backendDescription = result.backendDescription;
-      if (job.accuracy) {
+      if (job.accuracyMode) {
         job.benchmark.accuracy = result.accuracy;
       } else {
         job.benchmark.score = result.score;
@@ -462,14 +464,14 @@ enum DatasetMode { lite, full, test }
 class BenchmarkJob {
   final Benchmark benchmark;
   late final pb.DatasetConfig dataset;
-  final bool accuracy;
-  late final bool fast;
+  final bool accuracyMode;
+  late final bool _fastMode;
   late final DatasetMode _datasetMode;
   final int threadsNumber;
 
   BenchmarkJob({
     required this.benchmark,
-    required this.accuracy,
+    required this.accuracyMode,
     required this.threadsNumber,
     required bool testMode,
   }) {
@@ -477,12 +479,12 @@ class BenchmarkJob {
       _datasetMode = DatasetMode.test;
       dataset = benchmark.taskConfig.testDataset;
     } else {
-      _datasetMode = accuracy ? DatasetMode.full : DatasetMode.lite;
-      dataset = accuracy
+      _datasetMode = accuracyMode ? DatasetMode.full : DatasetMode.lite;
+      dataset = accuracyMode
           ? benchmark.taskConfig.dataset
           : benchmark.taskConfig.liteDataset;
     }
-    fast = testMode || FAST_MODE;
+    _fastMode = testMode || FAST_MODE;
   }
 
   Future<RunResult> _run(ResourceManager resourceManager, BridgeIsolate backend,
@@ -490,11 +492,11 @@ class BenchmarkJob {
     final tmpDir = await getTemporaryDirectory();
 
     print(
-        'Running $benchmark in ${accuracy ? 'accuracy' : 'performance'} mode...');
+        'Running $benchmark in ${accuracyMode ? 'accuracy' : 'performance'} mode...');
     final stopwatch = Stopwatch()..start();
 
-    var minQueryCount = fast ? 8 : benchmark.taskConfig.minQueryCount;
-    var minDuration = fast ? 10 : benchmark.taskConfig.minDurationMs;
+    var minQueryCount = _fastMode ? 8 : benchmark.taskConfig.minQueryCount;
+    var minDuration = _fastMode ? 10 : benchmark.taskConfig.minDurationMs;
 
     final settings = pb.SettingList(
       setting: commonSettings,
@@ -549,7 +551,7 @@ class BenchmarkJob {
       batch: benchmark.benchmarkSetting.batchSize,
       batch_size: batchSizeValue,
       threads_number: threadsNumber,
-      mode: accuracy
+      mode: accuracyMode
           ? BenchmarkMode.backendAccuracy
           : BenchmarkMode.backendPerfomance,
       min_query_count: minQueryCount,
