@@ -198,54 +198,37 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<String> validateExternalResourcesDirectory(
       String errorDescription) async {
-    final datasetsError = <String>[];
-
+    final resources = <String>[];
     for (final job in _getBenchmarkJobs()) {
-      final dataset = job.dataset;
-      final groundTruthSrc = dataset.groundtruthSrc;
-
-      if (!await resourceManager.isResourceExist(dataset.path) ||
-          (!await resourceManager.isResourceExist(groundTruthSrc)) &&
-              _store.submissionMode) {
-        final error = dataset.type.name;
-        if (!datasetsError.contains(error)) {
-          datasetsError.add('$error');
-        }
-      }
+      resources.add(job.benchmark.benchmarkSetting.src);
+      resources.add(job.dataset.path);
+      resources.add(job.dataset.groundtruthSrc);
     }
+    final set = <String>{};
+    resources.retainWhere((x) => x.isNotEmpty && set.add(x));
 
-    if (datasetsError.isEmpty) return '';
+    final missing = await resourceManager.validateResourcesExist(resources);
+    if (missing.isEmpty) return '';
 
-    var index = 0;
     return errorDescription +
-        datasetsError.map((element) => '\n${++index}) $element').join();
+        missing.mapIndexed((i, element) => '\n${i + 1}) $element').join();
   }
 
   Future<String> validateOfflineMode(String errorDescription) async {
-    if (!_store.offlineMode) {
-      return '';
-    }
-    final errors = <String>[];
+    final resources = <String>[];
     for (final job in _getBenchmarkJobs()) {
-      final modelPath = job.benchmark.benchmarkSetting.src;
-      if (isInternetResource(modelPath)) {
-        errors.add(modelPath);
-      }
-      final testDataPath = job.dataset.path;
-      if (isInternetResource(testDataPath)) {
-        errors.add(testDataPath);
-      }
-      final groundtruthDataPath = job.dataset.groundtruthSrc;
-      if (isInternetResource(groundtruthDataPath)) {
-        errors.add(groundtruthDataPath);
-      }
+      resources.add(job.benchmark.benchmarkSetting.src);
+      resources.add(job.dataset.path);
+      resources.add(job.dataset.groundtruthSrc);
     }
+    final set = <String>{};
+    resources.retainWhere((x) => x.isNotEmpty && set.add(x));
 
+    final errors = filterInternetResources(resources);
     if (errors.isEmpty) return '';
 
-    var index = 0;
     return errorDescription +
-        errors.map((element) => '\n${++index}) $element').join();
+        errors.mapIndexed((i, element) => '\n${i + 1}) $element').join();
   }
 
   Future<void> clearCache() async {
