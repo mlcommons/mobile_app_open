@@ -125,7 +125,7 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> loadResources() async {
     _middle = BenchmarkList(await File(configManager.configPath).readAsString(),
-        backendInfo.settings.benchmarkSetting);
+        backendInfo.settings.benchmarkSetting, _store.testMode);
     _store.clearBenchmarkList();
     for (final benchmark in _middle.benchmarks) {
       BatchPreset? batchPreset;
@@ -228,7 +228,6 @@ class BenchmarkState extends ChangeNotifier {
 
   List<BenchmarkJob> _getBenchmarkJobs() {
     final submissionMode = _store.submissionMode;
-    final testMode = _store.testMode;
     final jobs = <BenchmarkJob>[];
 
     for (final benchmark in _middle.benchmarks) {
@@ -237,21 +236,11 @@ class BenchmarkState extends ChangeNotifier {
           .firstWhere((element) => element.id == benchmark.id);
       if (!storedConfig.active) continue;
       benchmark.benchmarkSetting.batchSize = storedConfig.batchSize;
-      jobs.add(BenchmarkJob(
-        benchmark: benchmark,
-        accuracyMode: false,
-        threadsNumber: storedConfig.threadsNumber,
-        testMode: testMode,
-      ));
+      jobs.add(benchmark.createPerformanceJob(storedConfig.threadsNumber));
 
       if (!submissionMode) continue;
 
-      jobs.add(BenchmarkJob(
-        benchmark: benchmark,
-        accuracyMode: true,
-        threadsNumber: storedConfig.threadsNumber,
-        testMode: testMode,
-      ));
+      jobs.add(benchmark.createAccuracyJob(storedConfig.threadsNumber));
     }
     return jobs;
   }

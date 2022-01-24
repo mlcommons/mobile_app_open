@@ -72,22 +72,41 @@ class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;
   final pb.TaskConfig taskConfig;
   final pb.ModelConfig modelConfig;
+  final bool testMode;
 
   BenchmarkResult? performance;
   BenchmarkResult? accuracy;
 
   final BenchmarkInfo info;
 
-  Benchmark(this.benchmarkSetting, this.taskConfig, this.modelConfig)
+  Benchmark(
+      this.benchmarkSetting, this.taskConfig, this.modelConfig, this.testMode)
       : info = BenchmarkInfo(modelConfig, taskConfig.name);
 
   String get id => modelConfig.id;
+
+  BenchmarkJob createPerformanceJob(int threadsNumber) {
+    return BenchmarkJob._(
+        benchmark: this,
+        accuracyMode: false,
+        threadsNumber: threadsNumber,
+        testMode: testMode);
+  }
+
+  BenchmarkJob createAccuracyJob(int threadsNumber) {
+    return BenchmarkJob._(
+        benchmark: this,
+        accuracyMode: true,
+        threadsNumber: threadsNumber,
+        testMode: testMode);
+  }
 }
 
 class BenchmarkList {
   final List<Benchmark> benchmarks = <Benchmark>[];
 
-  BenchmarkList(String config, List<pb.BenchmarkSetting> benchmarkSettings) {
+  BenchmarkList(String config, List<pb.BenchmarkSetting> benchmarkSettings,
+      bool testMode) {
     final tasks = getMLPerfConfig(config);
 
     for (final task in tasks.task) {
@@ -96,7 +115,7 @@ class BenchmarkList {
             .singleWhereOrNull((setting) => setting.benchmarkId == model.id);
         if (benchmarkSetting == null) continue;
 
-        benchmarks.add(Benchmark(benchmarkSetting, task, model));
+        benchmarks.add(Benchmark(benchmarkSetting, task, model, testMode));
       }
     }
   }
@@ -142,7 +161,7 @@ class BenchmarkJob {
   late final DatasetMode _datasetMode;
   final int threadsNumber;
 
-  BenchmarkJob({
+  BenchmarkJob._({
     required this.benchmark,
     required this.accuracyMode,
     required this.threadsNumber,
