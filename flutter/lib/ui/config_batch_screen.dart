@@ -9,7 +9,6 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
-import 'package:mlperfbench/store.dart';
 
 const maxBatchThreadsValue = 64;
 const maxThreadsNumber = maxBatchThreadsValue ~/ 2;

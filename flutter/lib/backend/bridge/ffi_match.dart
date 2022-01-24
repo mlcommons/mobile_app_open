@@ -1,7 +1,5 @@
 import 'dart:ffi';
-import 'dart:io' show Platform;
 
-import 'package:device_info/device_info.dart';
 import 'package:ffi/ffi.dart';
 
 import 'package:mlperfbench/device_info.dart';
