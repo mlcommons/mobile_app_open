@@ -7,17 +7,15 @@ import 'package:flutter/material.dart' hide Icons;
 
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
-import 'package:device_info/device_info.dart';
-import 'package:ios_utsname_ext/extension.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/backend/bridge/handle.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/benchmark/benchmark_result.dart';
+import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';
@@ -134,10 +132,8 @@ class BenchmarkState extends ChangeNotifier {
         var presetList = resourceManager.getBatchPresets();
 
         if (Platform.isIOS) {
-          var iosInfo = await DeviceInfoPlugin().iosInfo;
-          final currentDevice = iosInfo.utsname.machine.iOSProductName;
           for (var p in presetList) {
-            if (currentDevice.startsWith(p.name)) {
+            if (DeviceInfo.model.startsWith(p.name)) {
               batchPreset = p;
               break;
             }
@@ -316,12 +312,8 @@ class BenchmarkState extends ChangeNotifier {
         'Running ${job.benchmark} in ${job.accuracyMode ? 'accuracy' : 'performance'} mode...');
     final stopwatch = Stopwatch()..start();
 
-    var backendNativeLibPath = '';
-    if (Platform.isAndroid) {
-      backendNativeLibPath = await getNativeLibraryPath();
-    }
-    final runSettings = job.createRunSettings(resourceManager, commonSettings,
-        backendLibPath, backendNativeLibPath, tmpDir);
+    final runSettings = job.createRunSettings(
+        resourceManager, commonSettings, backendLibPath, tmpDir);
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 

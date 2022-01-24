@@ -7,6 +7,7 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/run_settings.dart';
 import 'package:mlperfbench/benchmark/benchmark_result.dart';
+import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/icons.dart';
 import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
@@ -199,7 +200,6 @@ class BenchmarkJob {
       ResourceManager resourceManager,
       List<pb.Setting> commonSettings,
       String backendLibPath,
-      String backendNativeLibPath,
       Directory tmpDir) {
     var minQueryCount = _fastMode ? 8 : benchmark.taskConfig.minQueryCount;
     var minDuration = _fastMode ? 10 : benchmark.taskConfig.minDurationMs;
@@ -244,7 +244,7 @@ class BenchmarkJob {
       backend_model_path: resourceManager.get(benchmark.benchmarkSetting.src),
       backend_lib_path: backendLibPath,
       backend_settings: settings.writeToBuffer(),
-      backend_native_lib_path: backendNativeLibPath,
+      backend_native_lib_path: DeviceInfo.nativeLibraryPath,
       dataset_type: benchmark.taskConfig.dataset.type.value,
       dataset_data_path: resourceManager.get(dataset.path),
       dataset_groundtruth_path: resourceManager.get(dataset.groundtruthSrc),

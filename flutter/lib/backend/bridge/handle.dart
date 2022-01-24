@@ -1,13 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
-
-const _androidChannel = MethodChannel('org.mlcommons.mlperfbench/android');
-Future<String> getNativeLibraryPath() async {
-  return await _androidChannel.invokeMethod('getNativeLibraryPath') as String;
-}
-
 DynamicLibrary _getBridgeLibraryHandle() {
   if (Platform.isWindows) {
     return DynamicLibrary.open('./libs/backend_bridge.dll');
