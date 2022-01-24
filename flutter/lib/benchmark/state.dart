@@ -124,38 +124,11 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> loadResources() async {
-    _middle = BenchmarkList(await File(configManager.configPath).readAsString(),
-        backendInfo.settings.benchmarkSetting, _store.testMode);
-    for (final benchmark in _middle.benchmarks) {
-      BatchPreset? batchPreset;
-      if (benchmark.info.isOffline) {
-        var presetList = resourceManager.getBatchPresets();
-
-        if (Platform.isIOS) {
-          for (var p in presetList) {
-            if (DeviceInfo.model.startsWith(p.name)) {
-              batchPreset = p;
-              break;
-            }
-          }
-        } else if (Platform.isAndroid) {
-          // shardsCount is only supported by the TFLite backend.
-          // On iPhones changing this value may significantly affect performance.
-          // On Android this value does not affect performance as much,
-          // (shards=2 is faster than shards=1, but I didn't notice any further improvements).
-          // Originally this value for hardcoded to 2 in the backend
-          // (before we made it configurable for iOS devices).
-          const defaultShardsCount = 2;
-          batchPreset = BatchPreset(
-              name: 'backend-defined',
-              batchSize: benchmark.benchmarkSetting.batchSize,
-              shardsCount: defaultShardsCount);
-        }
-        batchPreset ??= presetList[0];
-      }
-
-      benchmark.config = BenchmarkConfig(batchPreset);
-    }
+    _middle = BenchmarkList(
+        await File(configManager.configPath).readAsString(),
+        backendInfo.settings.benchmarkSetting,
+        _store.testMode,
+        resourceManager.getDefaultBatchPreset());
     await reset();
 
     final packageInfo = await PackageInfo.fromPlatform();

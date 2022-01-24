@@ -82,6 +82,14 @@ class BenchmarkConfig {
   }
 }
 
+// shardsCount is only supported by the TFLite backend.
+// On iPhones changing this value may significantly affect performance.
+// On Android this value does not affect performance as much,
+// (shards=2 is faster than shards=1, but I didn't notice any further improvements).
+// Originally this value for hardcoded to 2 in the backend
+// (before we made it configurable for iOS devices).
+const _defaultShardsCount = 2;
+
 class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;
   final pb.TaskConfig taskConfig;
@@ -91,18 +99,27 @@ class Benchmark {
   final BenchmarkInfo info;
   final String backendDescription;
   // TODO save config in the Store?
-  late final BenchmarkConfig config;
+  final BenchmarkConfig config;
 
   BenchmarkResult? performance;
   BenchmarkResult? accuracy;
 
-  Benchmark(
-      this.benchmarkSetting, this.taskConfig, this.modelConfig, this.testMode)
+  Benchmark(this.benchmarkSetting, this.taskConfig, this.modelConfig,
+      this.testMode, BenchmarkConfig? predefinedConfig)
       : info = BenchmarkInfo(modelConfig, taskConfig.name),
         backendDescription =
-            '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}';
+            '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}',
+        config = predefinedConfig ?? _getDefaultConfig(benchmarkSetting);
 
   String get id => modelConfig.id;
+
+  static BenchmarkConfig _getDefaultConfig(
+      pb.BenchmarkSetting benchmarkSetting) {
+    return BenchmarkConfig(BatchPreset(
+        name: 'backend-defined',
+        batchSize: benchmarkSetting.batchSize,
+        shardsCount: _defaultShardsCount));
+  }
 
   BenchmarkJob createPerformanceJob(int threadsNumber) {
     return BenchmarkJob._(
@@ -125,7 +142,7 @@ class BenchmarkList {
   final List<Benchmark> benchmarks = <Benchmark>[];
 
   BenchmarkList(String config, List<pb.BenchmarkSetting> benchmarkSettings,
-      bool testMode) {
+      bool testMode, BatchPreset? defaultPreset) {
     final tasks = getMLPerfConfig(config);
 
     for (final task in tasks.task) {
@@ -134,7 +151,12 @@ class BenchmarkList {
             .singleWhereOrNull((setting) => setting.benchmarkId == model.id);
         if (benchmarkSetting == null) continue;
 
-        benchmarks.add(Benchmark(benchmarkSetting, task, model, testMode));
+        BenchmarkConfig? config;
+        if (defaultPreset != null) {
+          config = BenchmarkConfig(defaultPreset);
+        }
+        benchmarks
+            .add(Benchmark(benchmarkSetting, task, model, testMode, config));
       }
     }
   }
