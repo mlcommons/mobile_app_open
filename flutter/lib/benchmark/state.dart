@@ -10,13 +10,16 @@ import 'package:collection/collection.dart';
 import 'package:device_info/device_info.dart';
 import 'package:ios_utsname_ext/extension.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/backend/bridge/handle.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/benchmark/benchmark_result.dart';
 import 'package:mlperfbench/info.dart';
+import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
@@ -278,8 +281,8 @@ class BenchmarkState extends ChangeNotifier {
       if (_aborting) break;
       wasAccuracy = job.accuracyMode;
 
-      final resultFuture = job.run(resourceManager, backendBridge,
-          backendInfo.settings.commonSetting, backendInfo.libPath);
+      final resultFuture = runBenchmark(
+          job, backendInfo.settings.commonSetting, backendInfo.libPath);
       currentlyRunning = job.benchmark;
       runningProgress = '${(100 * (jobsDoneCounter / jobs.length)).round()}%';
       jobsDoneCounter++;
@@ -309,6 +312,27 @@ class BenchmarkState extends ChangeNotifier {
     notifyListeners();
 
     await Wakelock.disable();
+  }
+
+  Future<RunResult> runBenchmark(BenchmarkJob job,
+      List<pb.Setting> commonSettings, String backendLibPath) async {
+    final tmpDir = await getTemporaryDirectory();
+
+    print(
+        'Running ${job.benchmark} in ${job.accuracyMode ? 'accuracy' : 'performance'} mode...');
+    final stopwatch = Stopwatch()..start();
+
+    var backendNativeLibPath = '';
+    if (Platform.isAndroid) {
+      backendNativeLibPath = await getNativeLibraryPath();
+    }
+    final runSettings = job.createRunSettings(resourceManager, commonSettings,
+        backendLibPath, backendNativeLibPath, tmpDir);
+    final result = await backendBridge.run(runSettings);
+    final elapsed = stopwatch.elapsed;
+
+    print('Benchmark result: $result, elapsed: $elapsed');
+    return result;
   }
 
   Future<void> abortBenchmarks() async {

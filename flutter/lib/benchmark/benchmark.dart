@@ -2,12 +2,9 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
-import 'package:mlperfbench/backend/bridge/handle.dart';
-import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/run_settings.dart';
 import 'package:mlperfbench/benchmark/benchmark_result.dart';
 import 'package:mlperfbench/icons.dart';
@@ -179,14 +176,12 @@ class BenchmarkJob {
     _fastMode = testMode || FAST_MODE;
   }
 
-  Future<RunResult> run(ResourceManager resourceManager, BridgeIsolate backend,
-      List<pb.Setting> commonSettings, String backendLibPath) async {
-    final tmpDir = await getTemporaryDirectory();
-
-    print(
-        'Running $benchmark in ${accuracyMode ? 'accuracy' : 'performance'} mode...');
-    final stopwatch = Stopwatch()..start();
-
+  RunSettings createRunSettings(
+      ResourceManager resourceManager,
+      List<pb.Setting> commonSettings,
+      String backendLibPath,
+      String backendNativeLibPath,
+      Directory tmpDir) {
     var minQueryCount = _fastMode ? 8 : benchmark.taskConfig.minQueryCount;
     var minDuration = _fastMode ? 10 : benchmark.taskConfig.minDurationMs;
 
@@ -226,11 +221,7 @@ class BenchmarkJob {
       ));
     }
 
-    var backendNativeLibPath = '';
-    if (Platform.isAndroid) {
-      backendNativeLibPath = await getNativeLibraryPath();
-    }
-    final result = await backend.run(RunSettings(
+    return RunSettings(
       backend_model_path: resourceManager.get(benchmark.benchmarkSetting.src),
       backend_lib_path: backendLibPath,
       backend_settings: settings.writeToBuffer(),
@@ -251,10 +242,6 @@ class BenchmarkJob {
       output_dir: tmpDir.path,
       benchmark_id: benchmark.id,
       dataset_mode: _datasetMode,
-    ));
-    final elapsed = stopwatch.elapsed;
-
-    print('Benchmark result: $result, elapsed: $elapsed');
-    return result;
+    );
   }
 }
