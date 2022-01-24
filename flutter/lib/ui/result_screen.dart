@@ -120,11 +120,11 @@ class _ResultScreenState extends State<ResultScreen>
         final score = benchmark.performance?.score;
         textResult = score?.toStringAsFixed(2) ?? 'N/A';
         numericResult = (score ?? 0) / benchmark.info.maxScore;
-        backendDescription = benchmark.performance?.backendDescription ?? '';
+        backendDescription = benchmark.performance?.backendName ?? '';
       } else if (_screenMode == _ScreenMode.accuracy) {
         textResult = benchmark.accuracy?.accuracy ?? 'N/A';
         numericResult = _getNumericAccuracy(textResult);
-        backendDescription = benchmark.accuracy?.backendDescription ?? '';
+        backendDescription = benchmark.accuracy?.backendName ?? '';
       } else {
         continue;
       }

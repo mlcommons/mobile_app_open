@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class Store extends ChangeNotifier {
   final SharedPreferences _storeFromDisk;
 

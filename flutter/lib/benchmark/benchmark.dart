@@ -60,22 +60,18 @@ class BenchmarkInfo {
 class BenchmarkResult {
   final double score;
   final String accuracy;
-  final String backendDescription;
+  final String backendName;
 
-  BenchmarkResult(this.score, this.accuracy, this.backendDescription);
+  BenchmarkResult(this.score, this.accuracy, this.backendName);
 }
 
 class BenchmarkConfig {
-  String id;
-  String name;
-  String description;
-  bool active;
+  bool active = true;
   BatchPreset? batchPreset;
   int batchSize = 0;
   int threadsNumber = 0;
 
-  BenchmarkConfig(this.id, this.name, this.description,
-      [this.batchPreset, this.active = true]) {
+  BenchmarkConfig(this.batchPreset) {
     if (batchPreset != null) {
       batchSize = batchPreset!.batchSize;
       threadsNumber = batchPreset!.shardsCount;
@@ -90,6 +86,8 @@ class Benchmark {
   final bool testMode;
 
   final BenchmarkInfo info;
+  final String backendDescription;
+  // TODO save config in the Store?
   late final BenchmarkConfig config;
 
   BenchmarkResult? performance;
@@ -97,7 +95,9 @@ class Benchmark {
 
   Benchmark(
       this.benchmarkSetting, this.taskConfig, this.modelConfig, this.testMode)
-      : info = BenchmarkInfo(modelConfig, taskConfig.name);
+      : info = BenchmarkInfo(modelConfig, taskConfig.name),
+        backendDescription =
+            '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}';
 
   String get id => modelConfig.id;
 

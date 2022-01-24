@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart' hide Icons;
 import 'package:flutter/material.dart';
-import 'package:mlperfbench/benchmark/state.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'config_batch_screen.dart';
 
@@ -27,10 +27,10 @@ class _ConfigScreen extends State<ConfigScreen> {
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Text(
-            item.name,
+            benchmark.info.taskName,
           ),
         ),
-        subtitle: Text(item.id + ' | ' + item.description),
+        subtitle: Text(benchmark.id + ' | ' + benchmark.backendDescription),
         leading: Checkbox(
             value: item.active,
             onChanged: (bool? value) {
@@ -46,7 +46,7 @@ class _ConfigScreen extends State<ConfigScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ConfigBatchScreen(item.id)),
+                        builder: (context) => ConfigBatchScreen(benchmark.id)),
                   );
                 })
             : null,

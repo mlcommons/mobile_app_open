@@ -28,11 +28,10 @@ class _ConfigBatchScreen extends State<ConfigBatchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final store = context.watch<Store>();
     final state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
-    final benchmark = state.benchmarks
-        .firstWhere((benchmark) => benchmark.id == widget.id);
+    final benchmark =
+        state.benchmarks.firstWhere((benchmark) => benchmark.id == widget.id);
     final element = benchmark.config;
     _maxBatchSize = maxBatchThreadsValue ~/ element.threadsNumber;
 
@@ -45,7 +44,7 @@ class _ConfigBatchScreen extends State<ConfigBatchScreen> {
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Text(
-            element.name,
+            benchmark.info.taskName,
             textAlign: TextAlign.center,
           ),
         ),
