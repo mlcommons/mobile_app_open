@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart' hide Icons;
 import 'package:flutter/material.dart';
+import 'package:mlperfbench/benchmark/state.dart';
 
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/store.dart';
 import 'config_batch_screen.dart';
 
 class ConfigScreen extends StatefulWidget {
@@ -17,11 +17,12 @@ class ConfigScreen extends StatefulWidget {
 class _ConfigScreen extends State<ConfigScreen> {
   @override
   Widget build(BuildContext context) {
-    final store = context.watch<Store>();
+    final state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
     final childrenList = <Widget>[];
 
-    for (var item in store.getBenchmarkList()) {
+    for (var benchmark in state.benchmarks) {
+      final item = benchmark.config;
       childrenList.add(ListTile(
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),

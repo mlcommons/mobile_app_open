@@ -121,7 +121,6 @@ class BenchmarkState extends ChangeNotifier {
   Future<void> clearCache() async {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
     await configManager.deleteDefaultConfig();
-    _store.clearBenchmarkList();
     await resetConfig();
     await loadResources();
   }
@@ -129,7 +128,6 @@ class BenchmarkState extends ChangeNotifier {
   Future<void> loadResources() async {
     _middle = BenchmarkList(await File(configManager.configPath).readAsString(),
         backendInfo.settings.benchmarkSetting, _store.testMode);
-    _store.clearBenchmarkList();
     for (final benchmark in _middle.benchmarks) {
       BatchPreset? batchPreset;
       if (benchmark.modelConfig.scenario == 'Offline') {
@@ -160,8 +158,7 @@ class BenchmarkState extends ChangeNotifier {
         batchPreset ??= presetList[0];
       }
 
-      _store.addBenchmarkToList(
-          benchmark.id, benchmark.info.taskName, '', batchPreset);
+      benchmark.config = BenchmarkConfig(benchmark.id, benchmark.info.taskName, '', batchPreset);
     }
     await reset();
 
@@ -234,16 +231,13 @@ class BenchmarkState extends ChangeNotifier {
     final jobs = <BenchmarkJob>[];
 
     for (final benchmark in _middle.benchmarks) {
-      var storedConfig = _store
-          .getBenchmarkList()
-          .firstWhere((element) => element.id == benchmark.id);
-      if (!storedConfig.active) continue;
-      benchmark.benchmarkSetting.batchSize = storedConfig.batchSize;
-      jobs.add(benchmark.createPerformanceJob(storedConfig.threadsNumber));
+      if (!benchmark.config.active) continue;
+      benchmark.benchmarkSetting.batchSize = benchmark.config.batchSize;
+      jobs.add(benchmark.createPerformanceJob(benchmark.config.threadsNumber));
 
       if (!submissionMode) continue;
 
-      jobs.add(benchmark.createAccuracyJob(storedConfig.threadsNumber));
+      jobs.add(benchmark.createAccuracyJob(benchmark.config.threadsNumber));
     }
     return jobs;
   }

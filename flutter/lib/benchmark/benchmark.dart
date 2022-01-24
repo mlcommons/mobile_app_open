@@ -65,16 +65,35 @@ class BenchmarkResult {
   BenchmarkResult(this.score, this.accuracy, this.backendDescription);
 }
 
+class BenchmarkConfig {
+  String id;
+  String name;
+  String description;
+  bool active;
+  BatchPreset? batchPreset;
+  int batchSize = 0;
+  int threadsNumber = 0;
+
+  BenchmarkConfig(this.id, this.name, this.description,
+      [this.batchPreset, this.active = true]) {
+    if (batchPreset != null) {
+      batchSize = batchPreset!.batchSize;
+      threadsNumber = batchPreset!.shardsCount;
+    }
+  }
+}
+
 class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;
   final pb.TaskConfig taskConfig;
   final pb.ModelConfig modelConfig;
   final bool testMode;
 
+  final BenchmarkInfo info;
+  late final BenchmarkConfig config;
+
   BenchmarkResult? performance;
   BenchmarkResult? accuracy;
-
-  final BenchmarkInfo info;
 
   Benchmark(
       this.benchmarkSetting, this.taskConfig, this.modelConfig, this.testMode)

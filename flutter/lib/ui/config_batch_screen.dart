@@ -31,9 +31,9 @@ class _ConfigBatchScreen extends State<ConfigBatchScreen> {
     final store = context.watch<Store>();
     final state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
-    final element = store
-        .getBenchmarkList()
+    final benchmark = state.benchmarks
         .firstWhere((benchmark) => benchmark.id == widget.id);
+    final element = benchmark.config;
     _maxBatchSize = maxBatchThreadsValue ~/ element.threadsNumber;
 
     var presets = state.resourceManager.getBatchPresets();
