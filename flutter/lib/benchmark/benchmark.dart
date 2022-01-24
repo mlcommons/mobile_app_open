@@ -8,7 +8,6 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/handle.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
-import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/backend/run_settings.dart';
 import 'package:mlperfbench/benchmark/benchmark_result.dart';
 import 'package:mlperfbench/icons.dart';
@@ -71,27 +70,21 @@ class Benchmark {
   }
 }
 
-class MiddleInterface {
-  final List<Benchmark> benchmarks;
+class BenchmarkList {
+  final List<Benchmark> benchmarks = <Benchmark>[];
 
-  MiddleInterface._(this.benchmarks);
+  BenchmarkList(String config, List<pb.BenchmarkSetting> benchmarkSettings) {
+    final tasks = getMLPerfConfig(config);
 
-  static Future<MiddleInterface> create(
-      File configFile, BackendInfo backendInfo) async {
-    final tasks = getMLPerfConfig(await configFile.readAsString());
-
-    final benchmarks = <Benchmark>[];
     for (final task in tasks.task) {
       for (final model in task.model) {
-        final benchmarkSetting = backendInfo.settings.benchmarkSetting
+        final benchmarkSetting = benchmarkSettings
             .singleWhereOrNull((setting) => setting.benchmarkId == model.id);
         if (benchmarkSetting == null) continue;
 
         benchmarks.add(Benchmark(benchmarkSetting, task, model));
       }
     }
-
-    return MiddleInterface._(benchmarks);
   }
 
   /// The list of URL or file names to download.

@@ -73,7 +73,7 @@ class BenchmarkState extends ChangeNotifier {
 
   bool _aborting = false;
 
-  late MiddleInterface _middle;
+  late BenchmarkList _middle;
 
   BenchmarkState._(this._store, this.backendBridge) {
     resourceManager = ResourceManager(notifyListeners);
@@ -124,8 +124,8 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> loadResources() async {
-    _middle = await MiddleInterface.create(
-        File(configManager.configPath), backendInfo);
+    _middle = BenchmarkList(await File(configManager.configPath).readAsString(),
+        backendInfo.settings.benchmarkSetting);
     _store.clearBenchmarkList();
     for (final benchmark in _middle.benchmarks) {
       BatchPreset? batchPreset;
