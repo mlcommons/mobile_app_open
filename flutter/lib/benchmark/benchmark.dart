@@ -16,27 +16,17 @@ import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlperfbench/resources/resource_manager.dart';
 
-class Benchmark {
-  final pb.BenchmarkSetting benchmarkSetting;
-  final pb.TaskConfig taskConfig;
+class BenchmarkInfo {
   final pb.ModelConfig modelConfig;
 
-  double? score;
-  String? accuracy;
-  String backendDescription;
+  /// 'Object Detection', 'Image Classification (offline)', and so on.
+  final String taskName;
 
-  Benchmark(this.benchmarkSetting, this.taskConfig, this.modelConfig)
-      : backendDescription =
-            '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}';
-
-  String get id => modelConfig.id;
+  BenchmarkInfo(this.modelConfig, this.taskName);
 
   String get name => modelConfig.name;
 
-  double get maxScore => MAX_SCORE[id]!;
-
-  /// 'Object Detection', 'Image Classification (offline)', and so on.
-  String get taskName => taskConfig.name;
+  double get maxScore => MAX_SCORE[modelConfig.id]!;
 
   /// 'IC', 'OD', and so on.
   String get code => modelConfig.id.split('_').first;
@@ -52,7 +42,7 @@ class Benchmark {
       BENCHMARK_ICONS_WHITE[scenario]?[code] ?? Icons.logo;
 
   @override
-  String toString() => 'Benchmark:$id';
+  String toString() => 'Benchmark:${modelConfig.id}';
 
   BenchmarkTypeEnum _typeFromCode() {
     switch (code) {
@@ -68,6 +58,25 @@ class Benchmark {
         return BenchmarkTypeEnum.unknown;
     }
   }
+}
+
+class Benchmark {
+  final pb.BenchmarkSetting benchmarkSetting;
+  final pb.TaskConfig taskConfig;
+  final pb.ModelConfig modelConfig;
+
+  double? score;
+  String? accuracy;
+  String backendDescription;
+
+  final BenchmarkInfo info;
+
+  Benchmark(this.benchmarkSetting, this.taskConfig, this.modelConfig)
+      : backendDescription =
+            '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}',
+        info = BenchmarkInfo(modelConfig, taskConfig.name);
+
+  String get id => modelConfig.id;
 }
 
 class BenchmarkList {

@@ -28,7 +28,7 @@ Column createListOfBenchmarkItemsWidgets(
               child: Container(
                 width: pictureEdgeSize,
                 height: pictureEdgeSize,
-                child: benchmark.icon,
+                child: benchmark.info.icon,
               ),
             ),
             Text(getBenchmarkName(
@@ -50,9 +50,9 @@ Column createListOfBenchmarkItemsWidgets(
 void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
   final stringResources = AppLocalizations.of(context);
 
-  final info =
-      BenchmarkInfoItem.getBenchmarkInfoItem(benchmark.code, stringResources) ??
-          BenchmarkInfoItem.stub(benchmark.taskName);
+  final info = BenchmarkInfoItem.getBenchmarkInfoItem(
+          benchmark.info.code, stringResources) ??
+      BenchmarkInfoItem.stub(benchmark.info.taskName);
 
   showModalBottomSheet(
       context: context,

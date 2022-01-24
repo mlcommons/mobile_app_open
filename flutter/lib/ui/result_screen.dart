@@ -65,7 +65,7 @@ class _ResultScreenState extends State<ResultScreen>
     final accuracy = benchmark.accuracy;
     if (accuracy == null) return 'N/A';
     final numeric = _getNumericAccuracy(accuracy);
-    switch (benchmark.type) {
+    switch (benchmark.info.type) {
       // if the benchmark type is unknown, just show the original string
       // so we know that this need to be fixed
       case BenchmarkTypeEnum.unknown:
@@ -118,7 +118,7 @@ class _ResultScreenState extends State<ResultScreen>
       late final double numericResult;
       if (_screenMode == _ScreenMode.performance) {
         textResult = benchmark.score?.toStringAsFixed(2) ?? 'N/A';
-        numericResult = (benchmark.score ?? 0) / benchmark.maxScore;
+        numericResult = (benchmark.score ?? 0) / benchmark.info.maxScore;
       } else if (_screenMode == _ScreenMode.accuracy) {
         textResult = benchmark.accuracy ?? 'N/A';
         numericResult = _getNumericAccuracy(textResult);
@@ -205,7 +205,7 @@ class _ResultScreenState extends State<ResultScreen>
               leading: Container(
                   width: pictureEdgeSize,
                   height: pictureEdgeSize,
-                  child: benchmark.icon),
+                  child: benchmark.info.icon),
               title: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                 child: Text(getBenchmarkName(benchmark, stringResources)),

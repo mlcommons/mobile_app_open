@@ -157,7 +157,7 @@ class BenchmarkState extends ChangeNotifier {
         batchPreset ??= presetList[0];
       }
 
-      _store.addBenchmarkToList(benchmark.id, benchmark.taskName,
+      _store.addBenchmarkToList(benchmark.id, benchmark.info.taskName,
           benchmark.backendDescription, batchPreset);
     }
     await reset();
