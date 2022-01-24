@@ -158,7 +158,8 @@ class BenchmarkState extends ChangeNotifier {
         batchPreset ??= presetList[0];
       }
 
-      benchmark.config = BenchmarkConfig(benchmark.id, benchmark.info.taskName, '', batchPreset);
+      final configDescription = '${benchmark.benchmarkSetting.configuration} | ${benchmark.benchmarkSetting.acceleratorDesc}';
+      benchmark.config = BenchmarkConfig(benchmark.id, benchmark.info.taskName, configDescription, batchPreset);
     }
     await reset();
 
