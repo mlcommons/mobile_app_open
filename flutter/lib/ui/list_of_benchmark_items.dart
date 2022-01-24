@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 

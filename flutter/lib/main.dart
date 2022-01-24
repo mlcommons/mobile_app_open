@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/ffi_match.dart';
-import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/main_screen.dart';
