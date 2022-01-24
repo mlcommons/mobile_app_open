@@ -60,21 +60,26 @@ class BenchmarkInfo {
   }
 }
 
+class BenchmarkResult {
+  final double score;
+  final String accuracy;
+  final String backendDescription;
+
+  BenchmarkResult(this.score, this.accuracy, this.backendDescription);
+}
+
 class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;
   final pb.TaskConfig taskConfig;
   final pb.ModelConfig modelConfig;
 
-  double? score;
-  String? accuracy;
-  String backendDescription;
+  BenchmarkResult? performance;
+  BenchmarkResult? accuracy;
 
   final BenchmarkInfo info;
 
   Benchmark(this.benchmarkSetting, this.taskConfig, this.modelConfig)
-      : backendDescription =
-            '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}',
-        info = BenchmarkInfo(modelConfig, taskConfig.name);
+      : info = BenchmarkInfo(modelConfig, taskConfig.name);
 
   String get id => modelConfig.id;
 }

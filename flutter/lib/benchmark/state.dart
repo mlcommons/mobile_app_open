@@ -53,13 +53,13 @@ class BenchmarkState extends ChangeNotifier {
 
   num get result {
     final benchmarksCount =
-        benchmarks.where((benchmark) => benchmark.score != null).length;
+        benchmarks.where((benchmark) => benchmark.performance != null).length;
 
     if (benchmarksCount == 0) return 0;
 
     final summaryScore = pow(
         benchmarks.fold<double>(1, (prev, i) {
-          if (i.score != null) return prev * i.score!;
+          if (i.performance != null) return prev * i.performance!.score;
           return prev;
         }),
         1.0 / benchmarksCount);
@@ -157,8 +157,8 @@ class BenchmarkState extends ChangeNotifier {
         batchPreset ??= presetList[0];
       }
 
-      _store.addBenchmarkToList(benchmark.id, benchmark.info.taskName,
-          benchmark.backendDescription, batchPreset);
+      _store.addBenchmarkToList(
+          benchmark.id, benchmark.info.taskName, '', batchPreset);
     }
     await reset();
 
@@ -299,11 +299,12 @@ class BenchmarkState extends ChangeNotifier {
       final result = await resultFuture;
       results.add(result);
 
-      job.benchmark.backendDescription = result.backendDescription;
       if (job.accuracyMode) {
-        job.benchmark.accuracy = result.accuracy;
+        job.benchmark.accuracy =
+            BenchmarkResult(0.0, result.accuracy, result.backendDescription);
       } else {
-        job.benchmark.score = result.score;
+        job.benchmark.performance =
+            BenchmarkResult(result.score, 'N/A', result.backendDescription);
       }
     }
 
@@ -335,8 +336,8 @@ class BenchmarkState extends ChangeNotifier {
     if (isPreviousResultUsed) {
       _doneRunning = true;
     } else {
-      _middle.benchmarks
-          .forEach((benchmark) => benchmark.accuracy = benchmark.score = null);
+      _middle.benchmarks.forEach(
+          (benchmark) => benchmark.accuracy = benchmark.performance = null);
       _doneRunning = null;
     }
 

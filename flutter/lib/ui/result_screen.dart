@@ -62,14 +62,13 @@ class _ResultScreenState extends State<ResultScreen>
   }
 
   String _getFormattedAccuracyValue(Benchmark benchmark) {
-    final accuracy = benchmark.accuracy;
-    if (accuracy == null) return 'N/A';
-    final numeric = _getNumericAccuracy(accuracy);
+    if (benchmark.accuracy == null) return 'N/A';
+    final numeric = _getNumericAccuracy(benchmark.accuracy!.accuracy);
     switch (benchmark.info.type) {
       // if the benchmark type is unknown, just show the original string
       // so we know that this need to be fixed
       case BenchmarkTypeEnum.unknown:
-        return _getAccuracyValue(benchmark.accuracy);
+        return _getAccuracyValue(benchmark.accuracy!.accuracy);
       case BenchmarkTypeEnum.imageClassification:
         return (numeric * 100).toStringAsFixed(2);
       case BenchmarkTypeEnum.objectDetection:
@@ -116,12 +115,16 @@ class _ResultScreenState extends State<ResultScreen>
     for (final benchmark in state.benchmarks) {
       late final String textResult;
       late final double numericResult;
+      late final String backendDescription;
       if (_screenMode == _ScreenMode.performance) {
-        textResult = benchmark.score?.toStringAsFixed(2) ?? 'N/A';
-        numericResult = (benchmark.score ?? 0) / benchmark.info.maxScore;
+        final score = benchmark.performance?.score;
+        textResult = score?.toStringAsFixed(2) ?? 'N/A';
+        numericResult = (score ?? 0) / benchmark.info.maxScore;
+        backendDescription = benchmark.performance?.backendDescription ?? '';
       } else if (_screenMode == _ScreenMode.accuracy) {
-        textResult = benchmark.accuracy ?? 'N/A';
+        textResult = benchmark.accuracy?.accuracy ?? 'N/A';
         numericResult = _getNumericAccuracy(textResult);
+        backendDescription = benchmark.accuracy?.backendDescription ?? '';
       } else {
         continue;
       }
@@ -132,7 +135,7 @@ class _ResultScreenState extends State<ResultScreen>
         children: [
           Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text(benchmark.backendDescription)),
+              child: Text(backendDescription)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -247,7 +250,7 @@ class _ResultScreenState extends State<ResultScreen>
                 ),
                 Text(
                   _screenMode == _ScreenMode.performance
-                      ? benchmark.score?.toStringAsFixed(2) ?? 'N/A'
+                      ? benchmark.performance?.score.toStringAsFixed(2) ?? 'N/A'
                       : _getFormattedAccuracyValue(benchmark),
                   style: TextStyle(
                       fontSize: 32.0,

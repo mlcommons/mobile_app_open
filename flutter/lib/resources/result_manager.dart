@@ -168,9 +168,10 @@ class ResultManager {
         final benchmark = benchmarks
             .singleWhere((benchmark) => benchmark.id == briefResult.id);
 
-        benchmark.accuracy = briefResult.accuracy;
-        benchmark.score = briefResult.score;
-        benchmark.backendDescription = briefResult.backendDescription;
+        benchmark.performance = BenchmarkResult(
+            briefResult.score ?? 0.0, 'N/A', briefResult.backendDescription);
+        benchmark.accuracy = BenchmarkResult(
+            0.0, briefResult.accuracy ?? 'N/A', briefResult.backendDescription);
 
         if (benchmark.modelConfig.scenario == 'Offline') {
           benchmark.benchmarkSetting.customSetting.add(pb.CustomSetting(
