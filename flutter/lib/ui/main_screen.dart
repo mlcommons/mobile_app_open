@@ -10,6 +10,7 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/icons.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/app_bar.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
@@ -93,6 +94,7 @@ class MyHomePage extends StatelessWidget {
 
   Widget _goContainer(BuildContext context) {
     final state = context.watch<BenchmarkState>();
+    final store = context.watch<Store>();
     final stringResources = AppLocalizations.of(context);
 
     return CustomPaint(
@@ -104,16 +106,18 @@ class MyHomePage extends StatelessWidget {
           await showErrorDialog(context, [wrongPathError]);
           return;
         }
-        final offlineError = await state
-            .validateOfflineMode(stringResources.warningOfflineModeEnabled);
-        if (offlineError.isNotEmpty) {
-          switch (await showConfirmDialog(context, offlineError)) {
-            case ConfirmDialogAction.ok:
-              break;
-            case ConfirmDialogAction.cancel:
-              return;
-            default:
-              break;
+        if (store.offlineMode) {
+          final offlineError = await state
+              .validateOfflineMode(stringResources.warningOfflineModeEnabled);
+          if (offlineError.isNotEmpty) {
+            switch (await showConfirmDialog(context, offlineError)) {
+              case ConfirmDialogAction.ok:
+                break;
+              case ConfirmDialogAction.cancel:
+                return;
+              default:
+                break;
+            }
           }
         }
         state.runBenchmarks();

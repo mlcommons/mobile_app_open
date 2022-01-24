@@ -152,14 +152,13 @@ class ResourceManager {
     _batchPresets = result;
   }
 
-  Future<File> moveFile(File source, String destination) async {
-    await Directory(destination).parent.create(recursive: true);
-    try {
-      return await source.rename(destination);
-    } on FileSystemException {
-      var result = await source.copy(destination);
-      await source.delete();
-      return result;
+  Future<List<String>> validateResourcesExist(List<String> resources) async {
+    final missingResources = <String>[];
+    for (var r in resources) {
+      if (!await isResourceExist(r)) {
+        missingResources.add(r);
+      }
     }
+    return missingResources;
   }
 }

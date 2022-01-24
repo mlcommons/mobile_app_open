@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 const OFFICIAL_BUILD =
-    bool.fromEnvironment('official_build', defaultValue: false);
+    bool.fromEnvironment('official-build', defaultValue: false);
+
+const FAST_MODE = bool.fromEnvironment('fast-mode', defaultValue: false);
 
 class AppColors {
   static const primary = Colors.blue;

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/backend/bridge/ffi_match.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
@@ -30,6 +31,7 @@ Future<void> main() async {
 }
 
 Future<void> launchUi() async {
+  await initDeviceInfo();
   final store = await Store.create();
   final benchmarkState = await BenchmarkState.create(store);
 

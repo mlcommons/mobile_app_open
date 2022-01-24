@@ -116,12 +116,10 @@ class ResultManager {
   }
 
   // returns brief results in json
-  Future<void> writeResults(List<RunResult?> results) async {
+  Future<void> writeResults(List<RunResult> results) async {
     final jsonContent = <Map<String, dynamic>>[];
 
     for (final result in results) {
-      if (result == null) continue;
-
       var full = _FullResult(
           id: result.id,
           score: result.mode == BenchmarkMode.accuracy
@@ -144,12 +142,10 @@ class ResultManager {
     await _write(jsonContent);
   }
 
-  String serializeBriefResults(List<RunResult?> results) {
+  String serializeBriefResults(List<RunResult> results) {
     final jsonContent = <Map<String, dynamic>>[];
 
     for (final result in results) {
-      if (result == null) continue;
-
       var brief = _BriefResult(
           id: result.id,
           score: result.mode == BenchmarkMode.accuracy ? null : result.score,

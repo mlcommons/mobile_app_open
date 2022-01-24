@@ -353,16 +353,18 @@ class _ResultScreenState extends State<ResultScreen>
                 await showErrorDialog(context, [wrongPathError]);
                 return;
               }
-              final offlineError = await state.validateOfflineMode(
-                  stringResources.warningOfflineModeEnabled);
-              if (offlineError.isNotEmpty) {
-                switch (await showConfirmDialog(context, offlineError)) {
-                  case ConfirmDialogAction.ok:
-                    break;
-                  case ConfirmDialogAction.cancel:
-                    return;
-                  default:
-                    break;
+              if (store.offlineMode) {
+                final offlineError = await state.validateOfflineMode(
+                    stringResources.warningOfflineModeEnabled);
+                if (offlineError.isNotEmpty) {
+                  switch (await showConfirmDialog(context, offlineError)) {
+                    case ConfirmDialogAction.ok:
+                      break;
+                    case ConfirmDialogAction.cancel:
+                      return;
+                    default:
+                      break;
+                  }
                 }
               }
               state.runBenchmarks();

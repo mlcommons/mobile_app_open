@@ -14,8 +14,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
-import 'package:mlperfbench/backend/bridge/ffi_match.dart';
 import 'package:mlperfbench/backend/bridge/handle.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
@@ -86,45 +86,17 @@ class Benchmark {
 
 class MiddleInterface {
   final List<Benchmark> benchmarks;
-  final List<pb.Setting> commonSettings;
-  final String backendLibPath;
 
-  MiddleInterface._(this.benchmarks, this.commonSettings, this.backendLibPath);
+  MiddleInterface._(this.benchmarks);
 
-  static Future<MapEntry<pb.BackendSetting, String>>
-      findMatchingBackend() async {
-    for (var backendPath in getBackendsList()) {
-      if (backendPath == '') {
-        continue;
-      }
-      if (Platform.isWindows) {
-        backendPath = './libs/$backendPath';
-      } else if (Platform.isAndroid) {
-        backendPath = '$backendPath.so';
-      }
-      final backendSetting = backendMatch(backendPath);
-      if (backendSetting != null) {
-        return MapEntry(backendSetting, backendPath);
-      }
-    }
-    // try built-in backend
-    final backendSetting = backendMatch('');
-    if (backendSetting != null) {
-      return MapEntry(backendSetting, '');
-    }
-    throw 'no matching backend found';
-  }
-
-  static Future<MiddleInterface> create(File configFile) async {
+  static Future<MiddleInterface> create(
+      File configFile, BackendInfo backendInfo) async {
     final tasks = getMLPerfConfig(await configFile.readAsString());
-    final backendMatchInfo = await findMatchingBackend();
-    final backendSetting = backendMatchInfo.key;
-    final backendPath = backendMatchInfo.value;
 
     final benchmarks = <Benchmark>[];
     for (final task in tasks.task) {
       for (final model in task.model) {
-        final benchmarkSetting = backendSetting.benchmarkSetting
+        final benchmarkSetting = backendInfo.settings.benchmarkSetting
             .singleWhereOrNull((setting) => setting.benchmarkId == model.id);
         if (benchmarkSetting == null) continue;
 
@@ -132,12 +104,12 @@ class MiddleInterface {
       }
     }
 
-    return MiddleInterface._(
-        benchmarks, backendSetting.commonSetting, backendPath);
+    return MiddleInterface._(benchmarks);
   }
 
   /// The list of URL or file names to download.
   List<String> data() {
+    // TODO unify with listSelectedResources
     final result = <String>[];
 
     for (final b in benchmarks) {
@@ -181,6 +153,7 @@ class BenchmarkState extends ChangeNotifier {
 
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
+  late final BackendInfo backendInfo;
 
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
@@ -211,14 +184,7 @@ class BenchmarkState extends ChangeNotifier {
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
 
-  // Settings from store
-  bool _submissionMode = false;
-  bool _testMode = false;
-  bool _cooldown = false;
-  int _cooldownPause = 0;
   Future<void> _cooldownFuture = Future.value();
-
-  static const _fast = bool.fromEnvironment('fast-mode', defaultValue: false);
 
   bool _aborting = false;
 
@@ -226,60 +192,42 @@ class BenchmarkState extends ChangeNotifier {
 
   BenchmarkState._(this._store, this.backendBridge) {
     resourceManager = ResourceManager(notifyListeners);
+    backendInfo = BackendInfo.findMatching();
   }
 
   static double _getSummaryMaxScore() => MAX_SCORE['SUMMARY_MAX_SCORE']!;
 
+  List<String> listSelectedResources() {
+    final result = <String>[];
+    for (final job in _getBenchmarkJobs()) {
+      result.add(job.benchmark.benchmarkSetting.src);
+      result.add(job.dataset.path);
+      result.add(job.dataset.groundtruthSrc);
+    }
+    final set = <String>{};
+    result.retainWhere((x) => x.isNotEmpty && set.add(x));
+    return result;
+  }
+
   Future<String> validateExternalResourcesDirectory(
       String errorDescription) async {
-    final datasetsError = <String>[];
+    final resources = listSelectedResources();
+    final missing = await resourceManager.validateResourcesExist(resources);
+    if (missing.isEmpty) return '';
 
-    for (final job in _getBenchmarkJobs()) {
-      final dataset = job.dataset;
-      final groundTruthSrc = dataset.groundtruthSrc;
-
-      if (!await resourceManager.isResourceExist(dataset.path) ||
-          (!await resourceManager.isResourceExist(groundTruthSrc)) &&
-              _store.submissionMode) {
-        final error = dataset.type.name;
-        if (!datasetsError.contains(error)) {
-          datasetsError.add('$error');
-        }
-      }
-    }
-
-    if (datasetsError.isEmpty) return '';
-
-    var index = 0;
     return errorDescription +
-        datasetsError.map((element) => '\n${++index}) $element').join();
+        missing.mapIndexed((i, element) => '\n${i + 1}) $element').join();
   }
 
   Future<String> validateOfflineMode(String errorDescription) async {
-    if (!_store.offlineMode) {
-      return '';
-    }
-    final errors = <String>[];
-    for (final job in _getBenchmarkJobs()) {
-      final modelPath = job.benchmark.benchmarkSetting.src;
-      if (isInternetResource(modelPath)) {
-        errors.add(modelPath);
-      }
-      final testDataPath = job.dataset.path;
-      if (isInternetResource(testDataPath)) {
-        errors.add(testDataPath);
-      }
-      final groundtruthDataPath = job.dataset.groundtruthSrc;
-      if (isInternetResource(groundtruthDataPath)) {
-        errors.add(groundtruthDataPath);
-      }
-    }
+    final resources = listSelectedResources();
+    final internetResources = filterInternetResources(resources);
+    if (internetResources.isEmpty) return '';
 
-    if (errors.isEmpty) return '';
-
-    var index = 0;
     return errorDescription +
-        errors.map((element) => '\n${++index}) $element').join();
+        internetResources
+            .mapIndexed((i, element) => '\n${i + 1}) $element')
+            .join();
   }
 
   Future<void> clearCache() async {
@@ -291,7 +239,8 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> loadResources() async {
-    _middle = await MiddleInterface.create(File(configManager.configPath));
+    _middle = await MiddleInterface.create(
+        File(configManager.configPath), backendInfo);
     _store.clearBenchmarkList();
     for (final benchmark in _middle.benchmarks) {
       BatchPreset? batchPreset;
@@ -355,7 +304,6 @@ class BenchmarkState extends ChangeNotifier {
 
   static Future<BenchmarkState> create(Store store) async {
     final result = BenchmarkState._(store, await BridgeIsolate.create());
-    await initDeviceInfo();
 
     await result.resourceManager.initSystemPaths();
     result.configManager = ConfigManager(
@@ -365,15 +313,6 @@ class BenchmarkState extends ChangeNotifier {
     await result.resourceManager.loadBatchPresets();
     await result.resetConfig();
     await result.loadResources();
-
-    final loadFromStore = () {
-      result._submissionMode = store.submissionMode;
-      result._testMode = store.testMode;
-      result._cooldown = store.cooldown;
-      result._cooldownPause = store.cooldownPause;
-    };
-    store.addListener(loadFromStore);
-    loadFromStore();
     return result;
   }
 
@@ -403,8 +342,8 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   List<BenchmarkJob> _getBenchmarkJobs() {
-    final submissionMode = _submissionMode;
-    final testMode = _testMode;
+    final submissionMode = _store.submissionMode;
+    final testMode = _store.testMode;
     final jobs = <BenchmarkJob>[];
 
     for (final benchmark in _middle.benchmarks) {
@@ -414,29 +353,19 @@ class BenchmarkState extends ChangeNotifier {
       if (!storedConfig.active) continue;
       benchmark.benchmarkSetting.batchSize = storedConfig.batchSize;
       jobs.add(BenchmarkJob(
-        benchmark,
-        testMode
-            ? benchmark.taskConfig.testDataset
-            : benchmark.taskConfig.liteDataset,
-        testMode ? DatasetMode.test : DatasetMode.lite,
-        false,
-        testMode ? true : _fast,
-        storedConfig.threadsNumber,
-        backendBridge,
-        _middle.backendLibPath,
+        benchmark: benchmark,
+        accuracyMode: false,
+        threadsNumber: storedConfig.threadsNumber,
+        testMode: testMode,
       ));
 
       if (!submissionMode) continue;
 
       jobs.add(BenchmarkJob(
-        benchmark,
-        benchmark.taskConfig.dataset,
-        DatasetMode.full,
-        true,
-        _fast,
-        storedConfig.threadsNumber,
-        backendBridge,
-        _middle.backendLibPath,
+        benchmark: benchmark,
+        accuracyMode: true,
+        threadsNumber: storedConfig.threadsNumber,
+        testMode: testMode,
       ));
     }
     return jobs;
@@ -452,41 +381,44 @@ class BenchmarkState extends ChangeNotifier {
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
 
-    final cooldown = _cooldown;
-    final cooldownPause = _cooldownPause;
+    final cooldown = _store.cooldown;
+    final cooldownPause = FAST_MODE
+        ? Duration(seconds: 1)
+        : Duration(minutes: _store.cooldownPause);
     final jobs = _getBenchmarkJobs();
 
-    var n = 0;
+    var jobsDoneCounter = 0;
     var wasAccuracy = true;
-    final results = <RunResult?>[];
+    final results = <RunResult>[];
 
     for (final job in jobs) {
       if (_aborting) break;
 
-      if (cooldown && !job.accuracy && !wasAccuracy) {
+      if (cooldown && !job.accuracyMode && !wasAccuracy) {
         _cooling = true;
         notifyListeners();
-        await (_cooldownFuture = Future.delayed(
-            _fast ? Duration(seconds: 1) : Duration(minutes: cooldownPause)));
+        await (_cooldownFuture = Future.delayed(cooldownPause));
         _cooling = false;
         notifyListeners();
       }
       if (_aborting) break;
-      wasAccuracy = job.accuracy;
+      wasAccuracy = job.accuracyMode;
 
-      final resultFuture = job._run(resourceManager, _middle.commonSettings);
+      final resultFuture = job._run(resourceManager, backendBridge,
+          backendInfo.settings.commonSetting, backendInfo.libPath);
       currentlyRunning = job.benchmark;
-      runningProgress = '${(100 * (n++ / jobs.length)).round()}%';
+      runningProgress = '${(100 * (jobsDoneCounter / jobs.length)).round()}%';
+      jobsDoneCounter++;
       notifyListeners();
 
       final result = await resultFuture;
       results.add(result);
 
-      job.benchmark.backendDescription = result?.backendDescription ?? 'N/A';
-      if (job.accuracy) {
-        job.benchmark.accuracy = result?.accuracy;
+      job.benchmark.backendDescription = result.backendDescription;
+      if (job.accuracyMode) {
+        job.benchmark.accuracy = result.accuracy;
       } else {
-        job.benchmark.score = result?.score;
+        job.benchmark.score = result.score;
       }
     }
 
@@ -531,35 +463,40 @@ enum DatasetMode { lite, full, test }
 
 class BenchmarkJob {
   final Benchmark benchmark;
-  final pb.DatasetConfig dataset;
-  final bool accuracy;
-  final bool fast;
-  final DatasetMode _datasetMode;
+  late final pb.DatasetConfig dataset;
+  final bool accuracyMode;
+  late final bool _fastMode;
+  late final DatasetMode _datasetMode;
   final int threadsNumber;
-  final BridgeIsolate backend;
-  final String backendLibPath;
 
-  BenchmarkJob(
-    this.benchmark,
-    this.dataset,
-    this._datasetMode,
-    this.accuracy,
-    this.fast,
-    this.threadsNumber,
-    this.backend,
-    this.backendLibPath,
-  );
+  BenchmarkJob({
+    required this.benchmark,
+    required this.accuracyMode,
+    required this.threadsNumber,
+    required bool testMode,
+  }) {
+    if (testMode) {
+      _datasetMode = DatasetMode.test;
+      dataset = benchmark.taskConfig.testDataset;
+    } else {
+      _datasetMode = accuracyMode ? DatasetMode.full : DatasetMode.lite;
+      dataset = accuracyMode
+          ? benchmark.taskConfig.dataset
+          : benchmark.taskConfig.liteDataset;
+    }
+    _fastMode = testMode || FAST_MODE;
+  }
 
-  Future<RunResult?> _run(
-      ResourceManager resourceManager, List<pb.Setting> commonSettings) async {
+  Future<RunResult> _run(ResourceManager resourceManager, BridgeIsolate backend,
+      List<pb.Setting> commonSettings, String backendLibPath) async {
     final tmpDir = await getTemporaryDirectory();
 
     print(
-        'Running $benchmark in ${accuracy ? 'accuracy' : 'performance'} mode...');
+        'Running $benchmark in ${accuracyMode ? 'accuracy' : 'performance'} mode...');
     final stopwatch = Stopwatch()..start();
 
-    var minQueryCount = fast ? 8 : benchmark.taskConfig.minQueryCount;
-    var minDuration = fast ? 10 : benchmark.taskConfig.minDurationMs;
+    var minQueryCount = _fastMode ? 8 : benchmark.taskConfig.minQueryCount;
+    var minDuration = _fastMode ? 10 : benchmark.taskConfig.minDurationMs;
 
     final settings = pb.SettingList(
       setting: commonSettings,
@@ -614,7 +551,7 @@ class BenchmarkJob {
       batch: benchmark.benchmarkSetting.batchSize,
       batch_size: batchSizeValue,
       threads_number: threadsNumber,
-      mode: accuracy
+      mode: accuracyMode
           ? BenchmarkMode.backendAccuracy
           : BenchmarkMode.backendPerfomance,
       min_query_count: minQueryCount,
