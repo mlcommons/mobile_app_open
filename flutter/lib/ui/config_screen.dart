@@ -38,7 +38,7 @@ class _ConfigScreen extends State<ConfigScreen> {
                 item.active = value == true ? true : false;
               });
             }),
-        trailing: item.batchSize > 0 && !Platform.isAndroid
+        trailing: benchmark.info.isOffline && !Platform.isAndroid
             ? IconButton(
                 icon: Icon(Icons.settings),
                 tooltip: 'Batch settings',

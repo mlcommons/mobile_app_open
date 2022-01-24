@@ -41,7 +41,7 @@ class BenchmarkInfoItem {
 String getBenchmarkName(Benchmark benchmark, AppLocalizations stringResources) {
   switch (benchmark.info.code) {
     case ('IC'):
-      if (benchmark.info.scenario == 'Offline') {
+      if (benchmark.info.isOffline) {
         return stringResources.imageClassificationOffline;
       }
 

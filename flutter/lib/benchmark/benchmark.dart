@@ -24,6 +24,8 @@ class BenchmarkInfo {
 
   String get name => modelConfig.name;
 
+  bool get isOffline => modelConfig.scenario == 'Offline';
+
   double get maxScore => MAX_SCORE[modelConfig.id]!;
 
   /// 'IC', 'OD', and so on.
@@ -211,7 +213,7 @@ class BenchmarkJob {
 
     final batchSizeValue = benchmark.benchmarkSetting.batchSize;
 
-    if (benchmark.modelConfig.scenario == 'Offline') {
+    if (benchmark.info.isOffline) {
       var shardsNumSetting = benchmark.benchmarkSetting.customSetting
           .singleWhereOrNull((element) => element.id == 'shards_num');
       if (shardsNumSetting == null) {

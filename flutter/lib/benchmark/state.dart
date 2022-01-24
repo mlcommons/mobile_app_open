@@ -128,7 +128,7 @@ class BenchmarkState extends ChangeNotifier {
         backendInfo.settings.benchmarkSetting, _store.testMode);
     for (final benchmark in _middle.benchmarks) {
       BatchPreset? batchPreset;
-      if (benchmark.modelConfig.scenario == 'Offline') {
+      if (benchmark.info.isOffline) {
         var presetList = resourceManager.getBatchPresets();
 
         if (Platform.isIOS) {
