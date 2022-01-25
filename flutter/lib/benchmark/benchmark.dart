@@ -121,19 +121,19 @@ class Benchmark {
         shardsCount: _defaultShardsCount));
   }
 
-  BenchmarkJob createPerformanceJob(int threadsNumber) {
+  BenchmarkJob createPerformanceJob() {
     return BenchmarkJob._(
         benchmark: this,
         accuracyMode: false,
-        threadsNumber: threadsNumber,
+        threadsNumber: config.threadsNumber,
         testMode: testMode);
   }
 
-  BenchmarkJob createAccuracyJob(int threadsNumber) {
+  BenchmarkJob createAccuracyJob() {
     return BenchmarkJob._(
         benchmark: this,
         accuracyMode: true,
-        threadsNumber: threadsNumber,
+        threadsNumber: config.threadsNumber,
         testMode: testMode);
   }
 }
@@ -233,7 +233,7 @@ class BenchmarkJob {
       benchmarkSetting: benchmark.benchmarkSetting,
     );
 
-    final batchSizeValue = benchmark.benchmarkSetting.batchSize;
+    final batchSizeValue = benchmark.config.batchSize;
 
     if (benchmark.info.isOffline) {
       var shardsNumSetting = benchmark.benchmarkSetting.customSetting
@@ -253,7 +253,7 @@ class BenchmarkJob {
         batchSizeSetting.value = batchSizeValue.toString();
       }
 
-      benchmark.benchmarkSetting.batchSize *= threadsNumber;
+      benchmark.benchmarkSetting.batchSize = batchSizeValue * threadsNumber;
       settings.setting.add(pb.Setting(
         id: 'shards_num',
         name: 'Number of threads for inference',

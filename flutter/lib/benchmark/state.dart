@@ -200,12 +200,11 @@ class BenchmarkState extends ChangeNotifier {
 
     for (final benchmark in _middle.benchmarks) {
       if (!benchmark.config.active) continue;
-      benchmark.benchmarkSetting.batchSize = benchmark.config.batchSize;
-      jobs.add(benchmark.createPerformanceJob(benchmark.config.threadsNumber));
+      jobs.add(benchmark.createPerformanceJob());
 
       if (!submissionMode) continue;
 
-      jobs.add(benchmark.createAccuracyJob(benchmark.config.threadsNumber));
+      jobs.add(benchmark.createAccuracyJob());
     }
     return jobs;
   }
