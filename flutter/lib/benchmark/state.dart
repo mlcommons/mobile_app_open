@@ -82,21 +82,9 @@ class BenchmarkState extends ChangeNotifier {
 
   static double _getSummaryMaxScore() => MAX_SCORE['SUMMARY_MAX_SCORE']!;
 
-  List<String> listSelectedResources() {
-    final result = <String>[];
-    for (final job in _getBenchmarkJobs()) {
-      result.add(job.benchmark.benchmarkSetting.src);
-      result.add(job.dataset.path);
-      result.add(job.dataset.groundtruthSrc);
-    }
-    final set = <String>{};
-    result.retainWhere((x) => x.isNotEmpty && set.add(x));
-    return result;
-  }
-
   Future<String> validateExternalResourcesDirectory(
       String errorDescription) async {
-    final resources = listSelectedResources();
+    final resources = _middle.listResources(skipInactive: true, includeAccuracy: _store.submissionMode);
     final missing = await resourceManager.validateResourcesExist(resources);
     if (missing.isEmpty) return '';
 
@@ -105,7 +93,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<String> validateOfflineMode(String errorDescription) async {
-    final resources = listSelectedResources();
+    final resources = _middle.listResources(skipInactive: true, includeAccuracy: _store.submissionMode);
     final internetResources = filterInternetResources(resources);
     if (internetResources.isEmpty) return '';
 
@@ -139,7 +127,7 @@ class BenchmarkState extends ChangeNotifier {
     }
 
     await Wakelock.enable();
-    resourceManager.handleResources(_middle.data(), needToPurgeCache);
+    resourceManager.handleResources(_middle.listResources(), needToPurgeCache);
     await Wakelock.disable();
   }
 

@@ -140,9 +140,10 @@ class Benchmark {
 
 class BenchmarkList {
   final List<Benchmark> benchmarks = <Benchmark>[];
+  final bool testMode;
 
   BenchmarkList(String config, List<pb.BenchmarkSetting> benchmarkSettings,
-      bool testMode, BatchPreset? defaultPreset) {
+      this.testMode, BatchPreset? defaultPreset) {
     final tasks = getMLPerfConfig(config);
 
     for (final task in tasks.task) {
@@ -161,25 +162,28 @@ class BenchmarkList {
     }
   }
 
-  /// The list of URL or file names to download.
-  List<String> data() {
-    // TODO unify with listSelectedResources
+  List<String> listResources({bool skipInactive = false, bool includeAccuracy = true}) {
     final result = <String>[];
 
     for (final b in benchmarks) {
-      result.add(b.taskConfig.liteDataset.path);
-      result.add(b.taskConfig.liteDataset.groundtruthSrc);
+      if (skipInactive && !b.config.active) continue;
+      if (testMode) {
+        result.add(b.taskConfig.testDataset.path);
+        result.add(b.taskConfig.testDataset.groundtruthSrc);
+      } else {
+        result.add(b.taskConfig.liteDataset.path);
+        result.add(b.taskConfig.liteDataset.groundtruthSrc);
 
-      result.add(b.taskConfig.dataset.path);
-      result.add(b.taskConfig.dataset.groundtruthSrc);
-
-      result.add(b.taskConfig.testDataset.path);
-      result.add(b.taskConfig.testDataset.groundtruthSrc);
-
+        if (includeAccuracy) {
+          result.add(b.taskConfig.dataset.path);
+          result.add(b.taskConfig.dataset.groundtruthSrc);
+        }
+      }
       result.add(b.benchmarkSetting.src);
     }
 
-    result.sort();
+    final set = <String>{};
+    result.retainWhere((x) => x.isNotEmpty && set.add(x));
     return result.where((element) => element.isNotEmpty).toList();
   }
 }
