@@ -84,7 +84,8 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<String> validateExternalResourcesDirectory(
       String errorDescription) async {
-    final resources = _middle.listResources(skipInactive: true, includeAccuracy: _store.submissionMode);
+    final resources = _middle.listResources(
+        skipInactive: true, includeAccuracy: _store.submissionMode);
     final missing = await resourceManager.validateResourcesExist(resources);
     if (missing.isEmpty) return '';
 
@@ -93,7 +94,8 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<String> validateOfflineMode(String errorDescription) async {
-    final resources = _middle.listResources(skipInactive: true, includeAccuracy: _store.submissionMode);
+    final resources = _middle.listResources(
+        skipInactive: true, includeAccuracy: _store.submissionMode);
     final internetResources = filterInternetResources(resources);
     if (internetResources.isEmpty) return '';
 
@@ -182,21 +184,6 @@ class BenchmarkState extends ChangeNotifier {
     throw StateError('unreachable');
   }
 
-  List<BenchmarkJob> _getBenchmarkJobs() {
-    final submissionMode = _store.submissionMode;
-    final jobs = <BenchmarkJob>[];
-
-    for (final benchmark in _middle.benchmarks) {
-      if (!benchmark.config.active) continue;
-      jobs.add(benchmark.createPerformanceJob());
-
-      if (!submissionMode) continue;
-
-      jobs.add(benchmark.createAccuracyJob());
-    }
-    return jobs;
-  }
-
   void runBenchmarks() async {
     await reset();
 
@@ -211,42 +198,59 @@ class BenchmarkState extends ChangeNotifier {
     final cooldownPause = FAST_MODE
         ? Duration(seconds: 1)
         : Duration(minutes: _store.cooldownPause);
-    final jobs = _getBenchmarkJobs();
 
-    var jobsDoneCounter = 0;
-    var wasAccuracy = true;
+    final activeBenchmarks =
+        _middle.benchmarks.where((element) => element.config.active);
+
+    var doneCounter = 0.0;
+    var doneMultiplier = _store.submissionMode ? 0.5 : 1.0;
     final results = <RunResult>[];
+    var first = true;
 
-    for (final job in jobs) {
+    for (final benchmark in activeBenchmarks) {
       if (_aborting) break;
 
-      if (cooldown && !job.accuracyMode && !wasAccuracy) {
+      // we only do cooldown before performance benchmarks
+      if (cooldown && !first) {
         _cooling = true;
         notifyListeners();
         await (_cooldownFuture = Future.delayed(cooldownPause));
         _cooling = false;
         notifyListeners();
       }
+      first = false;
       if (_aborting) break;
-      wasAccuracy = job.accuracyMode;
 
-      final resultFuture = runBenchmark(
-          job, backendInfo.settings.commonSetting, backendInfo.libPath);
-      currentlyRunning = job.benchmark;
-      runningProgress = '${(100 * (jobsDoneCounter / jobs.length)).round()}%';
-      jobsDoneCounter++;
+      currentlyRunning = benchmark;
+
+      final performanceJob = benchmark.createPerformanceJob();
+      final performanceFuture = runBenchmark(performanceJob,
+          backendInfo.settings.commonSetting, backendInfo.libPath);
+      runningProgress =
+          '${(100 * (doneCounter * doneMultiplier / activeBenchmarks.length)).round()}%';
+      doneCounter++;
       notifyListeners();
 
-      final result = await resultFuture;
-      results.add(result);
+      final performanceResult = await performanceFuture;
+      results.add(performanceResult);
+      benchmark.performance = BenchmarkResult(performanceResult.score,
+          performanceResult.accuracy, performanceResult.backendDescription);
 
-      if (job.accuracyMode) {
-        job.benchmark.accuracy =
-            BenchmarkResult(0.0, result.accuracy, result.backendDescription);
-      } else {
-        job.benchmark.performance =
-            BenchmarkResult(result.score, 'N/A', result.backendDescription);
-      }
+      if (_aborting) break;
+      if (!_store.submissionMode) continue;
+
+      final accuracyJob = benchmark.createAccuracyJob();
+      final accuracyFuture = runBenchmark(
+          accuracyJob, backendInfo.settings.commonSetting, backendInfo.libPath);
+      runningProgress =
+          '${(100 * (doneCounter * doneMultiplier / activeBenchmarks.length)).round()}%';
+      doneCounter++;
+      notifyListeners();
+
+      final accuracyResult = await accuracyFuture;
+      results.add(accuracyResult);
+      benchmark.performance = BenchmarkResult(accuracyResult.score,
+          accuracyResult.accuracy, accuracyResult.backendDescription);
     }
 
     if (!_aborting) {

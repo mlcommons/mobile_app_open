@@ -162,7 +162,8 @@ class BenchmarkList {
     }
   }
 
-  List<String> listResources({bool skipInactive = false, bool includeAccuracy = true}) {
+  List<String> listResources(
+      {bool skipInactive = false, bool includeAccuracy = true}) {
     final result = <String>[];
 
     for (final b in benchmarks) {

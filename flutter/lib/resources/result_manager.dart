@@ -148,7 +148,7 @@ class ResultManager {
     for (final result in results) {
       var brief = _BriefResult(
           id: result.id,
-          score: result.mode == BenchmarkMode.accuracy ? null : result.score,
+          score: result.score,
           accuracy: result.accuracy,
           shardsNum: result.threadsNumber,
           batchSize: result.batchSize,
