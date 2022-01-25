@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/benchmark_result.dart';
-import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 
 class _BriefResult {
   static const _idTag = 'benchmark_id';
