@@ -135,20 +135,66 @@ class Benchmark {
     }
   }
 
-  BenchmarkJob createPerformanceJob() {
-    return BenchmarkJob._(
-        benchmark: this,
-        accuracyMode: false,
-        threadsNumber: config.threadsNumber,
-        testMode: testMode);
-  }
+  RunSettings createRunSettings(
+      {required bool accuracyMode,
+      required ResourceManager resourceManager,
+      required List<pb.Setting> commonSettings,
+      required String backendLibPath,
+      required Directory tmpDir}) {
+    final dataset = testMode
+        ? taskConfig.testDataset
+        : accuracyMode
+            ? taskConfig.dataset
+            : taskConfig.liteDataset;
+    final datasetMode = testMode
+        ? DatasetMode.test
+        : accuracyMode
+            ? DatasetMode.full
+            : DatasetMode.lite;
 
-  BenchmarkJob createAccuracyJob() {
-    return BenchmarkJob._(
-        benchmark: this,
-        accuracyMode: true,
-        threadsNumber: config.threadsNumber,
-        testMode: testMode);
+    final _fastMode = testMode || FAST_MODE;
+    var minQueryCount = _fastMode ? 8 : taskConfig.minQueryCount;
+    var minDuration = _fastMode ? 10 : taskConfig.minDurationMs;
+
+    final settings = pb.SettingList(
+      setting: commonSettings,
+      benchmarkSetting: benchmarkSetting,
+    );
+
+    if (info.isOffline) {
+      benchmarkSetting.batchSize = config.batchSize * config.threadsNumber;
+      settings.setting.add(pb.Setting(
+        id: 'shards_num',
+        name: 'Number of threads for inference',
+        value: pb.Setting_Value(
+          name: config.threadsNumber.toString(),
+          value: config.threadsNumber.toString(),
+        ),
+      ));
+    }
+
+    return RunSettings(
+      backend_model_path: resourceManager.get(benchmarkSetting.src),
+      backend_lib_path: backendLibPath,
+      backend_settings: settings.writeToBuffer(),
+      backend_native_lib_path: DeviceInfo.nativeLibraryPath,
+      dataset_type: taskConfig.dataset.type.value,
+      dataset_data_path: resourceManager.get(dataset.path),
+      dataset_groundtruth_path: resourceManager.get(dataset.groundtruthSrc),
+      dataset_offset: modelConfig.offset,
+      scenario: modelConfig.scenario,
+      batch: benchmarkSetting.batchSize,
+      batch_size: config.batchSize,
+      threads_number: config.threadsNumber,
+      mode: accuracyMode
+          ? BenchmarkMode.backendAccuracy
+          : BenchmarkMode.backendPerfomance,
+      min_query_count: minQueryCount,
+      min_duration: minDuration,
+      output_dir: tmpDir.path,
+      benchmark_id: id,
+      dataset_mode: datasetMode,
+    );
   }
 }
 
@@ -212,80 +258,3 @@ enum BenchmarkTypeEnum {
 }
 
 enum DatasetMode { lite, full, test }
-
-class BenchmarkJob {
-  final Benchmark benchmark;
-  late final pb.DatasetConfig dataset;
-  final bool accuracyMode;
-  late final bool _fastMode;
-  late final DatasetMode _datasetMode;
-  final int threadsNumber;
-
-  BenchmarkJob._({
-    required this.benchmark,
-    required this.accuracyMode,
-    required this.threadsNumber,
-    required bool testMode,
-  }) {
-    if (testMode) {
-      _datasetMode = DatasetMode.test;
-      dataset = benchmark.taskConfig.testDataset;
-    } else {
-      _datasetMode = accuracyMode ? DatasetMode.full : DatasetMode.lite;
-      dataset = accuracyMode
-          ? benchmark.taskConfig.dataset
-          : benchmark.taskConfig.liteDataset;
-    }
-    _fastMode = testMode || FAST_MODE;
-  }
-
-  RunSettings createRunSettings(
-      ResourceManager resourceManager,
-      List<pb.Setting> commonSettings,
-      String backendLibPath,
-      Directory tmpDir) {
-    var minQueryCount = _fastMode ? 8 : benchmark.taskConfig.minQueryCount;
-    var minDuration = _fastMode ? 10 : benchmark.taskConfig.minDurationMs;
-
-    final settings = pb.SettingList(
-      setting: commonSettings,
-      benchmarkSetting: benchmark.benchmarkSetting,
-    );
-
-    if (benchmark.info.isOffline) {
-      benchmark.benchmarkSetting.batchSize =
-          benchmark.config.batchSize * threadsNumber;
-      settings.setting.add(pb.Setting(
-        id: 'shards_num',
-        name: 'Number of threads for inference',
-        value: pb.Setting_Value(
-          name: threadsNumber.toString(),
-          value: threadsNumber.toString(),
-        ),
-      ));
-    }
-
-    return RunSettings(
-      backend_model_path: resourceManager.get(benchmark.benchmarkSetting.src),
-      backend_lib_path: backendLibPath,
-      backend_settings: settings.writeToBuffer(),
-      backend_native_lib_path: DeviceInfo.nativeLibraryPath,
-      dataset_type: benchmark.taskConfig.dataset.type.value,
-      dataset_data_path: resourceManager.get(dataset.path),
-      dataset_groundtruth_path: resourceManager.get(dataset.groundtruthSrc),
-      dataset_offset: benchmark.modelConfig.offset,
-      scenario: benchmark.modelConfig.scenario,
-      batch: benchmark.benchmarkSetting.batchSize,
-      batch_size: benchmark.config.batchSize,
-      threads_number: threadsNumber,
-      mode: accuracyMode
-          ? BenchmarkMode.backendAccuracy
-          : BenchmarkMode.backendPerfomance,
-      min_query_count: minQueryCount,
-      min_duration: minDuration,
-      output_dir: tmpDir.path,
-      benchmark_id: benchmark.id,
-      dataset_mode: _datasetMode,
-    );
-  }
-}

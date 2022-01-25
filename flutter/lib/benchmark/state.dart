@@ -184,6 +184,11 @@ class BenchmarkState extends ChangeNotifier {
     throw StateError('unreachable');
   }
 
+  void _updateProgress(double value) {
+    runningProgress = '${(100 * value).round()}%';
+    notifyListeners();
+  }
+
   void runBenchmarks() async {
     await reset();
 
@@ -208,6 +213,9 @@ class BenchmarkState extends ChangeNotifier {
     var first = true;
 
     for (final benchmark in activeBenchmarks) {
+      currentlyRunning = benchmark;
+      _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
+
       if (_aborting) break;
 
       // we only do cooldown before performance benchmarks
@@ -221,17 +229,11 @@ class BenchmarkState extends ChangeNotifier {
       first = false;
       if (_aborting) break;
 
-      currentlyRunning = benchmark;
-
-      final performanceJob = benchmark.createPerformanceJob();
-      final performanceFuture = runBenchmark(performanceJob,
+      final performanceResult = await runBenchmark(benchmark, false,
           backendInfo.settings.commonSetting, backendInfo.libPath);
-      runningProgress =
-          '${(100 * (doneCounter * doneMultiplier / activeBenchmarks.length)).round()}%';
+      _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
       doneCounter++;
-      notifyListeners();
 
-      final performanceResult = await performanceFuture;
       results.add(performanceResult);
       benchmark.performance = BenchmarkResult(
           score: performanceResult.score,
@@ -243,15 +245,11 @@ class BenchmarkState extends ChangeNotifier {
       if (_aborting) break;
       if (!_store.submissionMode) continue;
 
-      final accuracyJob = benchmark.createAccuracyJob();
-      final accuracyFuture = runBenchmark(
-          accuracyJob, backendInfo.settings.commonSetting, backendInfo.libPath);
-      runningProgress =
-          '${(100 * (doneCounter * doneMultiplier / activeBenchmarks.length)).round()}%';
+      final accuracyResult = await runBenchmark(benchmark, false,
+          backendInfo.settings.commonSetting, backendInfo.libPath);
+      _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
       doneCounter++;
-      notifyListeners();
 
-      final accuracyResult = await accuracyFuture;
       results.add(accuracyResult);
       benchmark.performance = BenchmarkResult(
           score: accuracyResult.score,
@@ -275,16 +273,20 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.disable();
   }
 
-  Future<RunResult> runBenchmark(BenchmarkJob job,
+  Future<RunResult> runBenchmark(Benchmark benchmark, bool accuracyMode,
       List<pb.Setting> commonSettings, String backendLibPath) async {
     final tmpDir = await getTemporaryDirectory();
 
     print(
-        'Running ${job.benchmark.id} in ${job.accuracyMode ? 'accuracy' : 'performance'} mode...');
+        'Running ${benchmark.id} in ${accuracyMode ? 'accuracy' : 'performance'} mode...');
     final stopwatch = Stopwatch()..start();
 
-    final runSettings = job.createRunSettings(
-        resourceManager, commonSettings, backendLibPath, tmpDir);
+    final runSettings = benchmark.createRunSettings(
+        accuracyMode: accuracyMode,
+        resourceManager: resourceManager,
+        commonSettings: commonSettings,
+        backendLibPath: backendLibPath,
+        tmpDir: tmpDir);
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
