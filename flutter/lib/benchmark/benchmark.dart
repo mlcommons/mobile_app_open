@@ -89,14 +89,6 @@ class BenchmarkConfig {
   }
 }
 
-// shardsCount is only supported by the TFLite backend.
-// On iPhones changing this value may significantly affect performance.
-// On Android this value does not affect performance as much,
-// (shards=2 is faster than shards=1, but I didn't notice any further improvements).
-// Originally this value for hardcoded to 2 in the backend
-// (before we made it configurable for iOS devices).
-const _defaultShardsCount = 2;
-
 class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;
   final pb.TaskConfig taskConfig;
@@ -122,10 +114,25 @@ class Benchmark {
 
   static BenchmarkConfig _getDefaultConfig(
       pb.BenchmarkSetting benchmarkSetting) {
-    return BenchmarkConfig(BatchPreset(
-        name: 'backend-defined',
-        batchSize: benchmarkSetting.batchSize,
-        shardsCount: _defaultShardsCount));
+    // shardsCount is only supported by the TFLite backend.
+    // On iPhones changing this value may significantly affect performance.
+    // On Android this value does not affect performance as much,
+    // (shards=2 is faster than shards=1, but I didn't notice any further improvements).
+    // Originally this value was hardcoded to 2 in the backend
+    // (before we made it configurable for iOS devices).
+    const _defaultShardsCount = 2;
+    // when creating run config we multiply batch size and shardsCount
+    if (benchmarkSetting.batchSize >= _defaultShardsCount) {
+      return BenchmarkConfig(BatchPreset(
+          name: 'backend-defined',
+          batchSize: benchmarkSetting.batchSize ~/ _defaultShardsCount,
+          shardsCount: _defaultShardsCount));
+    } else {
+      return BenchmarkConfig(BatchPreset(
+          name: 'backend-defined',
+          batchSize: benchmarkSetting.batchSize,
+          shardsCount: 1));
+    }
   }
 
   BenchmarkJob createPerformanceJob() {
@@ -245,10 +252,9 @@ class BenchmarkJob {
       benchmarkSetting: benchmark.benchmarkSetting,
     );
 
-    final batchSizeValue = benchmark.config.batchSize;
-
     if (benchmark.info.isOffline) {
-      benchmark.benchmarkSetting.batchSize = batchSizeValue * threadsNumber;
+      benchmark.benchmarkSetting.batchSize =
+          benchmark.config.batchSize * threadsNumber;
       settings.setting.add(pb.Setting(
         id: 'shards_num',
         name: 'Number of threads for inference',
@@ -270,7 +276,7 @@ class BenchmarkJob {
       dataset_offset: benchmark.modelConfig.offset,
       scenario: benchmark.modelConfig.scenario,
       batch: benchmark.benchmarkSetting.batchSize,
-      batch_size: batchSizeValue,
+      batch_size: benchmark.config.batchSize,
       threads_number: threadsNumber,
       mode: accuracyMode
           ? BenchmarkMode.backendAccuracy
