@@ -73,6 +73,30 @@ class BenchmarkResult {
       required this.backendName,
       required this.batchSize,
       required this.threadsNumber});
+
+  static const _tagScore = 'score';
+  static const _tagAccuracy = 'accuracy';
+  static const _tagBackendName = 'backend_name';
+  static const _tagbatchSize = 'batch_size';
+  static const _tagThreadsNumber = 'threads_number';
+
+  static BenchmarkResult? fromJson(Map<String, dynamic>? json) {
+    if (json == null) return null;
+    return BenchmarkResult(
+        score: json[_tagScore] as double,
+        accuracy: json[_tagAccuracy] as String,
+        backendName: json[_tagBackendName] as String,
+        batchSize: json[_tagbatchSize] as int,
+        threadsNumber: json[_tagThreadsNumber] as int);
+  }
+
+  Map<String, dynamic> toJson() => {
+        _tagScore: score,
+        _tagAccuracy: accuracy,
+        _tagBackendName: backendName,
+        _tagbatchSize: batchSize,
+        _tagThreadsNumber: threadsNumber,
+      };
 }
 
 class BenchmarkConfig {

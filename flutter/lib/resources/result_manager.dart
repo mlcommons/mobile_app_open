@@ -5,55 +5,29 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/benchmark_result.dart';
 
 class _BriefResult {
-  static const _idTag = 'benchmark_id';
-  static const _scoreTag = 'score';
-  static const _accuracyTag = 'accuracy';
-  static const _shardsNumTag = 'shards_num';
-  static const _batchSizeTag = 'batch_size';
-  static const _backendDescriptionTag = 'backend_description';
+  static const _tagId = 'benchmark_id';
+  static const _tagPerformance = 'performance';
+  static const _tagAccuracy = 'accuracy';
 
   final String id;
-  final double? score;
-  final String? accuracy;
-  final int shardsNum;
-  final int batchSize;
-  final String backendDescription;
+  final BenchmarkResult? performance;
+  final BenchmarkResult? accuracy;
 
   _BriefResult(
-      {required this.id,
-      required this.score,
-      required this.accuracy,
-      required this.shardsNum,
-      required this.batchSize,
-      required this.backendDescription});
+      {required this.id, required this.performance, required this.accuracy});
 
-  Map<String, dynamic> toJsonMap() {
-    return {
-      _idTag: id,
-      _scoreTag: score,
-      _accuracyTag: accuracy,
-      _shardsNumTag: shardsNum,
-      _batchSizeTag: batchSize,
-      _backendDescriptionTag: backendDescription,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        _tagId: id,
+        _tagPerformance: performance,
+        _tagAccuracy: accuracy,
+      };
 
-  static _BriefResult fromJsonMap(Map<String, dynamic> jsonMap) {
-    final id = jsonMap[_idTag] as String;
-    final score = jsonMap[_scoreTag] as double?;
-    final accuracy = jsonMap[_accuracyTag] as String?;
-    final shardsNum = jsonMap[_shardsNumTag] as int? ?? 0;
-    final batchSize = jsonMap[_batchSizeTag] as int? ?? 0;
-    final backendDescription = jsonMap[_backendDescriptionTag] as String;
-
-    return _BriefResult(
-        id: id,
-        score: score,
-        accuracy: accuracy,
-        shardsNum: shardsNum,
-        batchSize: batchSize,
-        backendDescription: backendDescription);
-  }
+  _BriefResult.fromJson(Map<String, dynamic> jsonMap)
+      : id = jsonMap[_tagId] as String,
+        performance = BenchmarkResult.fromJson(
+            jsonMap[_tagPerformance] as Map<String, dynamic>?),
+        accuracy = BenchmarkResult.fromJson(
+            jsonMap[_tagAccuracy] as Map<String, dynamic>?);
 }
 
 class _FullResult {
@@ -141,18 +115,15 @@ class ResultManager {
     await _write(jsonContent);
   }
 
-  String serializeBriefResults(List<RunResult> results) {
+  String serializeBriefResults(List<Benchmark> benchmarks) {
     final jsonContent = <Map<String, dynamic>>[];
 
-    for (final result in results) {
+    for (final result in benchmarks) {
       var brief = _BriefResult(
           id: result.id,
-          score: result.score,
-          accuracy: result.accuracy,
-          shardsNum: result.threadsNumber,
-          batchSize: result.batchSize,
-          backendDescription: result.backendDescription);
-      jsonContent.add(brief.toJsonMap());
+          performance: result.performance,
+          accuracy: result.accuracy);
+      jsonContent.add(brief.toJson());
     }
     return JsonEncoder().convert(jsonContent);
   }
@@ -161,29 +132,21 @@ class ResultManager {
     if (briefResultsJson == '') return false;
 
     try {
-      for (final resultContent in jsonDecode(briefResultsJson)) {
+      for (final resultContent
+          in jsonDecode(briefResultsJson) as List<dynamic>) {
         var briefResult =
-            _BriefResult.fromJsonMap(resultContent as Map<String, dynamic>);
+            _BriefResult.fromJson(resultContent as Map<String, dynamic>);
         final benchmark = benchmarks
             .singleWhere((benchmark) => benchmark.id == briefResult.id);
 
-        benchmark.performance = BenchmarkResult(
-            score: briefResult.score ?? 0.0,
-            accuracy: 'N/A',
-            backendName: briefResult.backendDescription,
-            batchSize: briefResult.batchSize,
-            threadsNumber: briefResult.shardsNum);
-        benchmark.accuracy = BenchmarkResult(
-            score: 0.0,
-            accuracy: briefResult.accuracy ?? 'N/A',
-            backendName: briefResult.backendDescription,
-            batchSize: briefResult.batchSize,
-            threadsNumber: briefResult.shardsNum);
+        benchmark.performance = briefResult.performance;
+        benchmark.accuracy = briefResult.accuracy;
       }
-    } catch (e) {
+    } catch (e, stacktrace) {
       print("can't parse previous results:");
       print(briefResultsJson);
       print(e);
+      print(stacktrace);
       return false;
     }
     return true;
