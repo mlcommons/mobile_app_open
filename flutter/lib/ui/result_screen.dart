@@ -115,19 +115,21 @@ class _ResultScreenState extends State<ResultScreen>
     for (final benchmark in state.benchmarks) {
       late final String textResult;
       late final double numericResult;
-      late final String backendDescription;
+      late final BenchmarkResult? benchmarkResult;
       if (_screenMode == _ScreenMode.performance) {
-        final score = benchmark.performance?.score;
+        benchmarkResult = benchmark.performance;
+        final score = benchmarkResult?.score;
         textResult = score?.toStringAsFixed(2) ?? 'N/A';
         numericResult = (score ?? 0) / benchmark.info.maxScore;
-        backendDescription = benchmark.performance?.backendName ?? '';
       } else if (_screenMode == _ScreenMode.accuracy) {
-        textResult = benchmark.accuracy?.accuracy ?? 'N/A';
+        benchmarkResult = benchmark.accuracy;
+        textResult = benchmarkResult?.accuracy ?? 'N/A';
         numericResult = _getNumericAccuracy(textResult);
-        backendDescription = benchmark.accuracy?.backendName ?? '';
       } else {
         continue;
       }
+      final backendDescription = benchmark.performance?.backendName ?? '';
+
       var rowChildren = <Widget>[];
       rowChildren.add(Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,24 +154,15 @@ class _ResultScreenState extends State<ResultScreen>
           ),
         ],
       ));
-      if (benchmark.benchmarkSetting.batchSize > 0) {
+      if (benchmark.info.isOffline) {
         String shardsNum;
         String batchSize;
         if (textResult == 'N/A') {
           shardsNum = 'N/A';
           batchSize = 'N/A';
         } else {
-          try {
-            shardsNum = benchmark.benchmarkSetting.customSetting
-                .firstWhere((element) => element.id == 'shards_num')
-                .value;
-            batchSize = benchmark.benchmarkSetting.customSetting
-                .firstWhere((element) => element.id == 'batch_size')
-                .value;
-          } catch (_) {
-            shardsNum = 'N/A';
-            batchSize = 'N/A';
-          }
+          shardsNum = benchmarkResult?.threadsNumber.toString() ?? '';
+          batchSize = benchmarkResult?.batchSize.toString() ?? '';
         }
 
         rowChildren.add(Row(

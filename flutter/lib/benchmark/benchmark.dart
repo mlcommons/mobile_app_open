@@ -64,8 +64,15 @@ class BenchmarkResult {
   final double score;
   final String accuracy;
   final String backendName;
+  final int batchSize;
+  final int threadsNumber;
 
-  BenchmarkResult(this.score, this.accuracy, this.backendName);
+  BenchmarkResult(
+      {required this.score,
+      required this.accuracy,
+      required this.backendName,
+      required this.batchSize,
+      required this.threadsNumber});
 }
 
 class BenchmarkConfig {
@@ -241,23 +248,6 @@ class BenchmarkJob {
     final batchSizeValue = benchmark.config.batchSize;
 
     if (benchmark.info.isOffline) {
-      var shardsNumSetting = benchmark.benchmarkSetting.customSetting
-          .singleWhereOrNull((element) => element.id == 'shards_num');
-      if (shardsNumSetting == null) {
-        benchmark.benchmarkSetting.customSetting.add(pb.CustomSetting(
-            id: 'shards_num', value: threadsNumber.toString()));
-      } else {
-        shardsNumSetting.value = threadsNumber.toString();
-      }
-      var batchSizeSetting = benchmark.benchmarkSetting.customSetting
-          .singleWhereOrNull((element) => element.id == 'batch_size');
-      if (batchSizeSetting == null) {
-        benchmark.benchmarkSetting.customSetting.add(pb.CustomSetting(
-            id: 'batch_size', value: batchSizeValue.toString()));
-      } else {
-        batchSizeSetting.value = batchSizeValue.toString();
-      }
-
       benchmark.benchmarkSetting.batchSize = batchSizeValue * threadsNumber;
       settings.setting.add(pb.Setting(
         id: 'shards_num',

@@ -233,8 +233,12 @@ class BenchmarkState extends ChangeNotifier {
 
       final performanceResult = await performanceFuture;
       results.add(performanceResult);
-      benchmark.performance = BenchmarkResult(performanceResult.score,
-          performanceResult.accuracy, performanceResult.backendDescription);
+      benchmark.performance = BenchmarkResult(
+          score: performanceResult.score,
+          accuracy: performanceResult.accuracy,
+          backendName: performanceResult.backendDescription,
+          batchSize: benchmark.config.batchSize,
+          threadsNumber: benchmark.config.threadsNumber);
 
       if (_aborting) break;
       if (!_store.submissionMode) continue;
@@ -249,8 +253,12 @@ class BenchmarkState extends ChangeNotifier {
 
       final accuracyResult = await accuracyFuture;
       results.add(accuracyResult);
-      benchmark.performance = BenchmarkResult(accuracyResult.score,
-          accuracyResult.accuracy, accuracyResult.backendDescription);
+      benchmark.performance = BenchmarkResult(
+          score: accuracyResult.score,
+          accuracy: accuracyResult.accuracy,
+          backendName: accuracyResult.backendDescription,
+          batchSize: benchmark.config.batchSize,
+          threadsNumber: benchmark.config.threadsNumber);
     }
 
     if (!_aborting) {

@@ -169,17 +169,17 @@ class ResultManager {
             .singleWhere((benchmark) => benchmark.id == briefResult.id);
 
         benchmark.performance = BenchmarkResult(
-            briefResult.score ?? 0.0, 'N/A', briefResult.backendDescription);
+            score: briefResult.score ?? 0.0,
+            accuracy: 'N/A',
+            backendName: briefResult.backendDescription,
+            batchSize: briefResult.batchSize,
+            threadsNumber: briefResult.shardsNum);
         benchmark.accuracy = BenchmarkResult(
-            0.0, briefResult.accuracy ?? 'N/A', briefResult.backendDescription);
-
-        if (benchmark.info.isOffline) {
-          benchmark.benchmarkSetting.customSetting.add(pb.CustomSetting(
-              id: 'batch_size', value: briefResult.batchSize.toString()));
-          benchmark.benchmarkSetting.customSetting.add(pb.CustomSetting(
-              id: 'shards_num', value: briefResult.shardsNum.toString()));
-          benchmark.benchmarkSetting.writeToBuffer();
-        }
+            score: 0.0,
+            accuracy: briefResult.accuracy ?? 'N/A',
+            backendName: briefResult.backendDescription,
+            batchSize: briefResult.batchSize,
+            threadsNumber: briefResult.shardsNum);
       }
     } catch (e) {
       print("can't parse previous results:");
