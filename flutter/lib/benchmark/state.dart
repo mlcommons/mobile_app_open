@@ -281,7 +281,7 @@ class BenchmarkState extends ChangeNotifier {
     final tmpDir = await getTemporaryDirectory();
 
     print(
-        'Running ${job.benchmark} in ${job.accuracyMode ? 'accuracy' : 'performance'} mode...');
+        'Running ${job.benchmark.id} in ${job.accuracyMode ? 'accuracy' : 'performance'} mode...');
     final stopwatch = Stopwatch()..start();
 
     final runSettings = job.createRunSettings(
