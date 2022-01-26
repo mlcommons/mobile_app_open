@@ -20,7 +20,6 @@ class RunSettings {
   final int min_duration;
   final String output_dir;
   final String benchmark_id;
-  final DatasetMode dataset_mode;
 
   RunSettings({
     required this.backend_model_path,
@@ -40,6 +39,5 @@ class RunSettings {
     required this.min_duration,
     required this.output_dir,
     required this.benchmark_id,
-    required this.dataset_mode,
   });
 }

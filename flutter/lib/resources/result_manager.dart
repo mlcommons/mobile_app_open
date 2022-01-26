@@ -34,8 +34,9 @@ class _BriefResult {
 class RunInfo {
   final RunResult result;
   final RunSettings settings;
+  final BenchmarkRunMode runMode;
 
-  RunInfo(this.result, this.settings);
+  RunInfo(this.result, this.settings, this.runMode);
 }
 
 class _FullResult {
@@ -103,19 +104,19 @@ class ResultManager {
     for (final info in results) {
       var full = _FullResult(
           id: info.settings.benchmark_id,
-          score: info.result.mode == BenchmarkMode.accuracy
+          score: info.runMode == BenchmarkRunMode.accuracy
               ? 'N/A'
               : info.result.score.toString(),
-          accuracy: BenchmarkMode.performance_lite == info.result.mode
-              ? 'N/A'
-              : info.result.accuracy,
+          accuracy: info.runMode == BenchmarkRunMode.accuracy
+              ? info.result.accuracy
+              : 'N/A',
           minDuration: info.settings.min_duration.toString(),
           duration: info.result.durationMs.toString(),
           minSamples: info.settings.min_query_count.toString(),
           numSamples: info.result.numSamples.toString(),
           shardsNum: info.settings.threads_number,
           batchSize: info.settings.batch_size,
-          mode: info.result.mode.toString(),
+          mode: info.runMode.getResultModeString(),
           datetime: DateTime.now().toIso8601String(),
           backendDescription: info.result.backendDescription);
       jsonContent.add(full.toJsonMap());

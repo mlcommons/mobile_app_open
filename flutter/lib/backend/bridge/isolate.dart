@@ -53,8 +53,6 @@ class BridgeIsolate {
         numSamples: r.num_samples,
         durationMs: r.duration_ms,
         backendDescription: r.backend_description,
-        datasetMode: rs.dataset_mode,
-        backendMode: rs.mode,
         score: r.score,
       ));
     }

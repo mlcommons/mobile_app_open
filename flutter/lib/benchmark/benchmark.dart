@@ -98,6 +98,66 @@ class BenchmarkConfig {
   }
 }
 
+enum BenchmarkRunModeEnum { performance, accuracy }
+
+class BenchmarkRunMode {
+  final BenchmarkRunModeEnum _mode;
+
+  // Only some of these constants are used in the app
+  // Let's keep them for now,
+  // they are used by other apps that work with mlperf benchmark
+  // they can potentially be used in the future in this app
+  static final String backendPerfomanceString = 'PerformanceOnly';
+  static final String backendAccuracyString = 'AccuracyOnly';
+  static final String backendSubmissionString = 'SubmissionRun';
+
+  static final String resultSubmissionString = 'submission_mode';
+  static final String resultAccuracyString = 'accuracy_mode';
+  static final String resultPerformanceString = 'performance_mode';
+  static final String resultPerformance_liteString = 'performance_lite_mode';
+  static final String resultTestString = 'testing';
+
+  BenchmarkRunMode._(this._mode);
+
+  static BenchmarkRunMode performance =
+      BenchmarkRunMode._(BenchmarkRunModeEnum.performance);
+  static BenchmarkRunMode accuracy =
+      BenchmarkRunMode._(BenchmarkRunModeEnum.accuracy);
+
+  String getBackendModeString() {
+    switch (_mode) {
+      case BenchmarkRunModeEnum.performance:
+        return backendPerfomanceString;
+      case BenchmarkRunModeEnum.accuracy:
+        return backendAccuracyString;
+      default:
+        throw 'unhandled BenchmarkRunModeEnum';
+    }
+  }
+
+  String getResultModeString() {
+    switch (_mode) {
+      case BenchmarkRunModeEnum.performance:
+        return resultPerformance_liteString;
+      case BenchmarkRunModeEnum.accuracy:
+        return resultAccuracyString;
+      default:
+        throw 'unhandled BenchmarkRunModeEnum';
+    }
+  }
+
+  pb.DatasetConfig chooseDatase(pb.TaskConfig taskConfig) {
+    switch (_mode) {
+      case BenchmarkRunModeEnum.performance:
+        return taskConfig.liteDataset;
+      case BenchmarkRunModeEnum.accuracy:
+        return taskConfig.dataset;
+      default:
+        throw 'unhandled BenchmarkRunModeEnum';
+    }
+  }
+}
+
 class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;
   final pb.TaskConfig taskConfig;
@@ -145,21 +205,13 @@ class Benchmark {
   }
 
   RunSettings createRunSettings(
-      {required bool accuracyMode,
+      {required BenchmarkRunMode runMode,
       required ResourceManager resourceManager,
       required List<pb.Setting> commonSettings,
       required String backendLibPath,
       required Directory tmpDir}) {
-    final dataset = testMode
-        ? taskConfig.testDataset
-        : accuracyMode
-            ? taskConfig.dataset
-            : taskConfig.liteDataset;
-    final datasetMode = testMode
-        ? DatasetMode.test
-        : accuracyMode
-            ? DatasetMode.full
-            : DatasetMode.lite;
+    final dataset =
+        testMode ? taskConfig.testDataset : runMode.chooseDatase(taskConfig);
 
     final _fastMode = testMode || FAST_MODE;
     var minQueryCount = _fastMode ? 8 : taskConfig.minQueryCount;
@@ -195,14 +247,11 @@ class Benchmark {
       batch: benchmarkSetting.batchSize,
       batch_size: config.batchSize,
       threads_number: config.threadsNumber,
-      mode: accuracyMode
-          ? BenchmarkMode.backendAccuracy
-          : BenchmarkMode.backendPerfomance,
+      mode: runMode.getBackendModeString(),
       min_query_count: minQueryCount,
       min_duration: minDuration,
       output_dir: tmpDir.path,
       benchmark_id: id,
-      dataset_mode: datasetMode,
     );
   }
 }
@@ -258,5 +307,3 @@ class BenchmarkList {
     return result.where((element) => element.isNotEmpty).toList();
   }
 }
-
-enum DatasetMode { lite, full, test }

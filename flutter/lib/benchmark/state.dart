@@ -278,12 +278,15 @@ class BenchmarkState extends ChangeNotifier {
       List<pb.Setting> commonSettings, String backendLibPath) async {
     final tmpDir = await getTemporaryDirectory();
 
+    final runMode =
+        accuracyMode ? BenchmarkRunMode.accuracy : BenchmarkRunMode.performance;
+
     print(
-        'Running ${benchmark.id} in ${accuracyMode ? 'accuracy' : 'performance'} mode...');
+        'Running ${benchmark.id} in ${runMode.getResultModeString()} mode...');
     final stopwatch = Stopwatch()..start();
 
     final runSettings = benchmark.createRunSettings(
-        accuracyMode: accuracyMode,
+        runMode: runMode,
         resourceManager: resourceManager,
         commonSettings: commonSettings,
         backendLibPath: backendLibPath,
@@ -292,7 +295,7 @@ class BenchmarkState extends ChangeNotifier {
     final elapsed = stopwatch.elapsed;
 
     print('Benchmark result: $result, elapsed: $elapsed');
-    return RunInfo(result, runSettings);
+    return RunInfo(result, runSettings, runMode);
   }
 
   Future<void> abortBenchmarks() async {
