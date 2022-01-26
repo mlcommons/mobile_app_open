@@ -12,40 +12,15 @@ enum BenchmarkTypeEnum {
   languageUnderstanding,
 }
 
-class BenchmarkInfoItem {
-  final String title;
-  final String details;
+class BenchmarkLocalizationInfo {
+  final String name;
+  final String detailsTitle;
+  final String detailsContent;
 
-  BenchmarkInfoItem({required this.title, required String details})
-      : details = _trim(details);
-
-  BenchmarkInfoItem.stub(String name)
-      : title = name,
-        details = name;
-
-  static BenchmarkInfoItem? getBenchmarkInfoItem(
-      String benchmarkCode, AppLocalizations stringResources) {
-    switch (benchmarkCode) {
-      case ('IC'):
-        return BenchmarkInfoItem(
-          title: stringResources.icInfo,
-          details: stringResources.icInfoDescription,
-        );
-      case ('OD'):
-        return BenchmarkInfoItem(
-          title: stringResources.odInfo,
-          details: stringResources.odInfoDescription,
-        );
-      case ('IS'):
-        return BenchmarkInfoItem(
-            title: stringResources.isInfo,
-            details: stringResources.isInfoDescription);
-      case ('LU'):
-        return BenchmarkInfoItem(
-            title: stringResources.luInfo,
-            details: stringResources.luInfoDescription);
-    }
-  }
+  BenchmarkLocalizationInfo(
+      {required this.name,
+      required this.detailsTitle,
+      required this.detailsContent});
 }
 
 class BenchmarkInfo {
@@ -58,22 +33,38 @@ class BenchmarkInfo {
 
   String get name => modelConfig.name;
 
-  String getBenchmarkName(AppLocalizations stringResources) {
+  BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
     switch (code) {
       case ('IC'):
         if (isOffline) {
-          return stringResources.imageClassificationOffline;
+          return BenchmarkLocalizationInfo(
+              name: stringResources.imageClassificationOffline,
+              detailsTitle: stringResources.icInfo,
+              detailsContent: stringResources.icInfoDescription);
+        } else {
+          return BenchmarkLocalizationInfo(
+              name: stringResources.imageClassification,
+              detailsTitle: stringResources.icInfo,
+              detailsContent: stringResources.icInfoDescription);
         }
-        return stringResources.imageClassification;
       case ('OD'):
-        return stringResources.objectDetection;
+        return BenchmarkLocalizationInfo(
+            name: stringResources.objectDetection,
+            detailsTitle: stringResources.odInfo,
+            detailsContent: stringResources.odInfoDescription);
       case ('IS'):
-        return stringResources.imageSegmentation;
+        return BenchmarkLocalizationInfo(
+            name: stringResources.imageSegmentation,
+            detailsTitle: stringResources.isInfo,
+            detailsContent: stringResources.isInfoDescription);
       case ('LU'):
-        return stringResources.languageProcessing;
+        return BenchmarkLocalizationInfo(
+            name: stringResources.languageProcessing,
+            detailsTitle: stringResources.luInfo,
+            detailsContent: stringResources.luInfoDescription);
+      default:
+        throw 'unhandled benchmark code: $code';
     }
-
-    return modelConfig.id;
   }
 
   bool get isOffline => modelConfig.scenario == 'Offline';
@@ -112,20 +103,6 @@ class BenchmarkInfo {
   }
 
   static double getSummaryMaxScore() => _MAX_SCORE['SUMMARY_MAX_SCORE']!;
-}
-
-String _trim(String s) {
-  return s
-      .trim()
-      .splitMapJoin(
-        RegExp('\\n *'),
-        onMatch: (_) => '\n',
-      )
-      .splitMapJoin(
-        RegExp('\n\n?'),
-        onMatch: (nl) => nl.end - nl.start == 1 ? ' ' : '\n',
-      )
-      .replaceAll('\n', '\n\n');
 }
 
 final _MAX_SCORE = {
