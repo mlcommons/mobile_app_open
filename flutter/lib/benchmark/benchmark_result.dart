@@ -1,4 +1,4 @@
-import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'benchmark.dart';
 
 class BenchmarkMode {
   static final String backendPerfomance = 'PerformanceOnly';
