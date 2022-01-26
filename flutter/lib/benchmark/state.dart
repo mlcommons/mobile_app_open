@@ -15,7 +15,7 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
-import 'package:mlperfbench/benchmark/benchmark_result.dart';
+import 'package:mlperfbench/benchmark/run_result.dart';
 import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';

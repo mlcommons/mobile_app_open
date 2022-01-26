@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
-import 'package:mlperfbench/benchmark/benchmark_result.dart';
+import 'package:mlperfbench/benchmark/run_result.dart';
 
 class _BriefResult {
   static const _tagId = 'benchmark_id';

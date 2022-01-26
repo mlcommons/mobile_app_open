@@ -20,8 +20,8 @@ class RunDebugResult {
 }
 
 class RunResult {
-  final DatasetMode _datasetMode;
-  final String _backendMode;
+  final DatasetMode datasetMode;
+  final String backendMode;
 
   final String accuracy;
   final int numSamples;
@@ -34,38 +34,38 @@ class RunResult {
   final int batchSize;
   final String backendDescription;
 
-  RunResult(
-    this.id,
-    this.accuracy,
-    this.numSamples,
-    this.minSamples,
-    this.durationMs,
-    this.minDuration,
-    this.threadsNumber,
-    this.batchSize,
-    this.backendDescription,
-    this._datasetMode,
-    this._backendMode,
-    double latency,
-    String scenario,
-  ) : score = 'Offline' == scenario ? latency : 1000 / latency;
+  RunResult({
+    required this.id,
+    required this.accuracy,
+    required this.numSamples,
+    required this.minSamples,
+    required this.durationMs,
+    required this.minDuration,
+    required this.threadsNumber,
+    required this.batchSize,
+    required this.backendDescription,
+    required this.datasetMode,
+    required this.backendMode,
+    required double latency,
+    required String scenario,
+  }) : score = 'Offline' == scenario ? latency : 1000 / latency;
 
   String get mode {
-    if (_backendMode == BenchmarkMode.backendSubmission) {
-      if (_datasetMode == DatasetMode.test) {
+    if (backendMode == BenchmarkMode.backendSubmission) {
+      if (datasetMode == DatasetMode.test) {
         return BenchmarkMode.test;
-      } else if (_datasetMode == DatasetMode.full) {
+      } else if (datasetMode == DatasetMode.full) {
         return BenchmarkMode.submission;
       }
     }
 
-    if (_backendMode == BenchmarkMode.backendAccuracy &&
-        _datasetMode == DatasetMode.full) return BenchmarkMode.accuracy;
+    if (backendMode == BenchmarkMode.backendAccuracy &&
+        datasetMode == DatasetMode.full) return BenchmarkMode.accuracy;
 
-    if (_backendMode == BenchmarkMode.backendPerfomance) {
-      if (_datasetMode == DatasetMode.full) {
+    if (backendMode == BenchmarkMode.backendPerfomance) {
+      if (datasetMode == DatasetMode.full) {
         return BenchmarkMode.performance;
-      } else if (_datasetMode == DatasetMode.lite) {
+      } else if (datasetMode == DatasetMode.lite) {
         return BenchmarkMode.performance_lite;
       }
     }

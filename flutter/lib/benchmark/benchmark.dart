@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/run_settings.dart';
-import 'package:mlperfbench/benchmark/benchmark_result.dart';
+import 'package:mlperfbench/benchmark/run_result.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
