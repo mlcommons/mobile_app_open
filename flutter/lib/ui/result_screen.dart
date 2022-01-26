@@ -61,51 +61,6 @@ class _ResultScreenState extends State<ResultScreen>
     super.dispose();
   }
 
-  String _getFormattedAccuracyValue(Benchmark benchmark) {
-    if (benchmark.accuracy == null) return 'N/A';
-    final numeric = _getNumericAccuracy(benchmark.accuracy!.accuracy);
-    switch (benchmark.info.type) {
-      // if the benchmark type is unknown, just show the original string
-      // so we know that this need to be fixed
-      case BenchmarkTypeEnum.unknown:
-        return _getAccuracyValue(benchmark.accuracy!.accuracy);
-      case BenchmarkTypeEnum.imageClassification:
-        return (numeric * 100).toStringAsFixed(2);
-      case BenchmarkTypeEnum.objectDetection:
-        return (numeric * 100).toStringAsFixed(2);
-      case BenchmarkTypeEnum.imageSegmentation:
-        return (numeric * 100).toStringAsFixed(2);
-      case BenchmarkTypeEnum.languageUnderstanding:
-        return numeric.toStringAsFixed(2);
-    }
-  }
-
-  double _getNumericAccuracy(String accuracy) {
-    final percentPattern = '%';
-
-    accuracy = _getAccuracyValue(accuracy);
-
-    if (!accuracy.endsWith(percentPattern)) {
-      return double.tryParse(accuracy) ?? 0.0;
-    }
-
-    return (double.tryParse(accuracy.replaceAll(RegExp('%'), '')) ?? 0.0) / 100;
-  }
-
-  String _getAccuracyValue(String? accuracy) {
-    final onlyNumbersWithPercentPattern = '[^.%0-9]';
-    final notAvailable = 'N/A';
-
-    if (accuracy != null) {
-      if (accuracy == notAvailable) {
-        return accuracy;
-      }
-      return accuracy.replaceAll(RegExp(onlyNumbersWithPercentPattern), '');
-    }
-
-    return notAvailable;
-  }
-
   Column _createListOfBenchmarkResultWidgets(
       BuildContext context, BenchmarkState state) {
     final list = <Widget>[];
@@ -124,7 +79,7 @@ class _ResultScreenState extends State<ResultScreen>
       } else if (_screenMode == _ScreenMode.accuracy) {
         benchmarkResult = benchmark.accuracy;
         textResult = benchmarkResult?.accuracy ?? 'N/A';
-        numericResult = _getNumericAccuracy(textResult);
+        numericResult = benchmarkResult?.numericAccuracy ?? 0.0;
       } else {
         continue;
       }
@@ -244,7 +199,9 @@ class _ResultScreenState extends State<ResultScreen>
                 Text(
                   _screenMode == _ScreenMode.performance
                       ? benchmark.performance?.score.toStringAsFixed(2) ?? 'N/A'
-                      : _getFormattedAccuracyValue(benchmark),
+                      : benchmark.accuracy?.getFormattedAccuracyValue(
+                              benchmark.info.type) ??
+                          'N/A',
                   style: TextStyle(
                       fontSize: 32.0,
                       color: AppColors.lightText,

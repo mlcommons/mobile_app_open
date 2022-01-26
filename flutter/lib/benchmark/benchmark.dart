@@ -69,10 +69,44 @@ class BenchmarkResult {
 
   BenchmarkResult(
       {required this.score,
-      required this.accuracy,
+      required String accuracy,
       required this.backendName,
       required this.batchSize,
-      required this.threadsNumber});
+      required this.threadsNumber})
+      : accuracy = _replaceAccuracy(accuracy);
+
+  static String _replaceAccuracy(String accuracy) {
+    if (accuracy != 'N/A') {
+      const onlyNumbersWithPercentPattern = '[^.%0-9]';
+      accuracy = accuracy.replaceAll(RegExp(onlyNumbersWithPercentPattern), '');
+    }
+    return accuracy;
+  }
+
+  String getFormattedAccuracyValue(BenchmarkTypeEnum type) {
+    switch (type) {
+      // if the benchmark type is unknown, just show the original string
+      // so we know that this need to be fixed
+      case BenchmarkTypeEnum.unknown:
+        return accuracy;
+      case BenchmarkTypeEnum.imageClassification:
+        return (numericAccuracy * 100).toStringAsFixed(2);
+      case BenchmarkTypeEnum.objectDetection:
+        return (numericAccuracy * 100).toStringAsFixed(2);
+      case BenchmarkTypeEnum.imageSegmentation:
+        return (numericAccuracy * 100).toStringAsFixed(2);
+      case BenchmarkTypeEnum.languageUnderstanding:
+        return numericAccuracy.toStringAsFixed(2);
+    }
+  }
+
+  double get numericAccuracy {
+    if (!accuracy.endsWith('%')) {
+      return double.tryParse(accuracy) ?? 0.0;
+    }
+
+    return (double.tryParse(accuracy.replaceAll(RegExp('%'), '')) ?? 0.0) / 100;
+  }
 
   static const _tagScore = 'score';
   static const _tagAccuracy = 'accuracy';
