@@ -15,8 +15,7 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
-import 'package:mlperfbench/benchmark/run_result.dart';
-import 'package:mlperfbench/info.dart';
+import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
@@ -66,7 +65,7 @@ class BenchmarkState extends ChangeNotifier {
         }),
         1.0 / benchmarksCount);
 
-    return summaryScore / _getSummaryMaxScore();
+    return summaryScore / BenchmarkInfo.getSummaryMaxScore();
   }
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
@@ -81,8 +80,6 @@ class BenchmarkState extends ChangeNotifier {
     resourceManager = ResourceManager(notifyListeners);
     backendInfo = BackendInfo.findMatching();
   }
-
-  static double _getSummaryMaxScore() => MAX_SCORE['SUMMARY_MAX_SCORE']!;
 
   Future<String> validateExternalResourcesDirectory(
       String errorDescription) async {

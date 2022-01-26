@@ -9,7 +9,6 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/icons.dart' as app_icons;
-import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/app_bar.dart';
@@ -159,7 +158,7 @@ class _ResultScreenState extends State<ResultScreen>
                   child: benchmark.info.icon),
               title: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child: Text(getBenchmarkName(benchmark, stringResources)),
+                child: Text(benchmark.info.getBenchmarkName(stringResources)),
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +186,8 @@ class _ResultScreenState extends State<ResultScreen>
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
-                    getBenchmarkName(benchmark, stringResources)
+                    benchmark.info
+                        .getBenchmarkName(stringResources)
                         .split(' ')
                         .join('\n')
                         .toUpperCase(),

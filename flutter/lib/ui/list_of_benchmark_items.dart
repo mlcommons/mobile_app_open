@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 Column createListOfBenchmarkItemsWidgets(
@@ -31,10 +31,7 @@ Column createListOfBenchmarkItemsWidgets(
                 child: benchmark.info.icon,
               ),
             ),
-            Text(getBenchmarkName(
-              benchmark,
-              stringResources,
-            )),
+            Text(benchmark.info.getBenchmarkName(stringResources)),
             Icon(
               Icons.chevron_right,
               color: Colors.grey,
