@@ -25,30 +25,19 @@ class RunResult {
 
   final String accuracy;
   final int numSamples;
-  final int minSamples;
   final double durationMs;
-  final int minDuration;
-  final String id;
   final double score;
-  final int threadsNumber;
-  final int batchSize;
   final String backendDescription;
 
   RunResult({
-    required this.id,
     required this.accuracy,
     required this.numSamples,
-    required this.minSamples,
     required this.durationMs,
-    required this.minDuration,
-    required this.threadsNumber,
-    required this.batchSize,
     required this.backendDescription,
     required this.datasetMode,
     required this.backendMode,
-    required double latency,
-    required String scenario,
-  }) : score = 'Offline' == scenario ? latency : 1000 / latency;
+    required this.score,
+  });
 
   String get mode {
     if (backendMode == BenchmarkMode.backendSubmission) {

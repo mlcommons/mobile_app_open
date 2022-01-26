@@ -49,19 +49,14 @@ class BridgeIsolate {
     await for (var rs in port.cast<RunSettings>()) {
       var r = runBenchmark(rs);
       sendPort.send(RunResult(
-          id: rs.benchmark_id,
-          accuracy: r.accuracy,
-          numSamples: r.num_samples,
-          minSamples: rs.min_query_count,
-          durationMs: r.duration_ms,
-          minDuration: rs.min_duration,
-          threadsNumber: rs.threads_number,
-          batchSize: rs.batch_size,
-          backendDescription: r.backend_description,
-          datasetMode: rs.dataset_mode,
-          backendMode: rs.mode,
-          latency: r.latency,
-          scenario: rs.scenario));
+        accuracy: r.accuracy,
+        numSamples: r.num_samples,
+        durationMs: r.duration_ms,
+        backendDescription: r.backend_description,
+        datasetMode: rs.dataset_mode,
+        backendMode: rs.mode,
+        score: r.score,
+      ));
     }
   }
 }

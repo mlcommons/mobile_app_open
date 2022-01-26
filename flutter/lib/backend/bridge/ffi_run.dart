@@ -75,7 +75,7 @@ class _RunOut extends Struct {
   @Int32()
   external int ok;
   @Float()
-  external double latency;
+  external double score;
   external Pointer<Utf8> accuracy;
   @Int32()
   external int num_samples;
@@ -86,14 +86,19 @@ class _RunOut extends Struct {
 
 class RunBenchmarkResult {
   final int ok;
-  final double latency;
+  final double score;
   final String accuracy;
   final int num_samples;
   final double duration_ms;
   final String backend_description;
 
-  RunBenchmarkResult(this.ok, this.latency, this.accuracy, this.num_samples,
-      this.duration_ms, this.backend_description);
+  RunBenchmarkResult(
+      {required this.ok,
+      required this.score,
+      required this.accuracy,
+      required this.num_samples,
+      required this.duration_ms,
+      required this.backend_description});
 }
 
 const _runName = 'dart_ffi_run_benchmark';
@@ -120,12 +125,12 @@ RunBenchmarkResult runBenchmark(RunSettings rs) {
   }
 
   var res = RunBenchmarkResult(
-    runOut.ref.ok,
-    runOut.ref.latency,
-    runOut.ref.accuracy.toDartString(),
-    runOut.ref.num_samples,
-    runOut.ref.duration_ms,
-    runOut.ref.backend_description.toDartString(),
+    ok: runOut.ref.ok,
+    score: runOut.ref.score,
+    accuracy: runOut.ref.accuracy.toDartString(),
+    num_samples: runOut.ref.num_samples,
+    duration_ms: runOut.ref.duration_ms,
+    backend_description: runOut.ref.backend_description.toDartString(),
   );
 
   _free(runOut);

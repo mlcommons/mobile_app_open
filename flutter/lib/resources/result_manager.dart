@@ -102,19 +102,19 @@ class ResultManager {
 
     for (final info in results) {
       var full = _FullResult(
-          id: info.result.id,
+          id: info.settings.benchmark_id,
           score: info.result.mode == BenchmarkMode.accuracy
               ? 'N/A'
               : info.result.score.toString(),
           accuracy: BenchmarkMode.performance_lite == info.result.mode
               ? 'N/A'
               : info.result.accuracy,
-          minDuration: info.result.minDuration.toString(),
+          minDuration: info.settings.min_duration.toString(),
           duration: info.result.durationMs.toString(),
-          minSamples: info.result.minSamples.toString(),
+          minSamples: info.settings.min_query_count.toString(),
           numSamples: info.result.numSamples.toString(),
-          shardsNum: info.result.threadsNumber,
-          batchSize: info.result.batchSize,
+          shardsNum: info.settings.threads_number,
+          batchSize: info.settings.batch_size,
           mode: info.result.mode.toString(),
           datetime: DateTime.now().toIso8601String(),
           backendDescription: info.result.backendDescription);

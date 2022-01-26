@@ -141,7 +141,11 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   auto out = new dart_ffi_run_benchmark_out;
   out->ok = 1;
-  out->latency = driver.ComputeLatency();
+  if (std::string{in->scenario} == "Offline") {
+    out->score = driver.ComputeLatency();
+  } else {
+    out->score = 1000.0 / driver.ComputeLatency();
+  }
   out->accuracy = strdup(driver.ComputeAccuracyString().c_str());
   out->num_samples = driver.GetNumSamples();
   out->duration_ms = driver.GetDurationMs();
