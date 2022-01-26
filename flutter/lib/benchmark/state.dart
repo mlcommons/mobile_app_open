@@ -20,6 +20,7 @@ import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
+import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
@@ -209,7 +210,7 @@ class BenchmarkState extends ChangeNotifier {
 
     var doneCounter = 0.0;
     var doneMultiplier = _store.submissionMode ? 0.5 : 1.0;
-    final results = <RunResult>[];
+    final results = <RunInfo>[];
     var first = true;
 
     for (final benchmark in activeBenchmarks) {
@@ -236,9 +237,9 @@ class BenchmarkState extends ChangeNotifier {
 
       results.add(performanceResult);
       benchmark.performance = BenchmarkResult(
-          score: performanceResult.score,
-          accuracy: performanceResult.accuracy,
-          backendName: performanceResult.backendDescription,
+          score: performanceResult.result.score,
+          accuracy: performanceResult.result.accuracy,
+          backendName: performanceResult.result.backendDescription,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
 
@@ -252,9 +253,9 @@ class BenchmarkState extends ChangeNotifier {
 
       results.add(accuracyResult);
       benchmark.performance = BenchmarkResult(
-          score: accuracyResult.score,
-          accuracy: accuracyResult.accuracy,
-          backendName: accuracyResult.backendDescription,
+          score: accuracyResult.result.score,
+          accuracy: accuracyResult.result.accuracy,
+          backendName: accuracyResult.result.backendDescription,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
     }
@@ -273,7 +274,7 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.disable();
   }
 
-  Future<RunResult> runBenchmark(Benchmark benchmark, bool accuracyMode,
+  Future<RunInfo> runBenchmark(Benchmark benchmark, bool accuracyMode,
       List<pb.Setting> commonSettings, String backendLibPath) async {
     final tmpDir = await getTemporaryDirectory();
 
@@ -291,7 +292,7 @@ class BenchmarkState extends ChangeNotifier {
     final elapsed = stopwatch.elapsed;
 
     print('Benchmark result: $result, elapsed: $elapsed');
-    return result;
+    return RunInfo(result, runSettings);
   }
 
   Future<void> abortBenchmarks() async {

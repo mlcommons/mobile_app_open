@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:mlperfbench/backend/run_settings.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/run_result.dart';
 
@@ -28,6 +29,13 @@ class _BriefResult {
             jsonMap[_tagPerformance] as Map<String, dynamic>?),
         accuracy = BenchmarkResult.fromJson(
             jsonMap[_tagAccuracy] as Map<String, dynamic>?);
+}
+
+class RunInfo {
+  final RunResult result;
+  final RunSettings settings;
+
+  RunInfo(this.result, this.settings);
 }
 
 class _FullResult {
@@ -89,27 +97,27 @@ class ResultManager {
   }
 
   // returns brief results in json
-  Future<void> writeResults(List<RunResult> results) async {
+  Future<void> writeResults(List<RunInfo> results) async {
     final jsonContent = <Map<String, dynamic>>[];
 
-    for (final result in results) {
+    for (final info in results) {
       var full = _FullResult(
-          id: result.id,
-          score: result.mode == BenchmarkMode.accuracy
+          id: info.result.id,
+          score: info.result.mode == BenchmarkMode.accuracy
               ? 'N/A'
-              : result.score.toString(),
-          accuracy: BenchmarkMode.performance_lite == result.mode
+              : info.result.score.toString(),
+          accuracy: BenchmarkMode.performance_lite == info.result.mode
               ? 'N/A'
-              : result.accuracy,
-          minDuration: result.minDuration.toString(),
-          duration: result.durationMs.toString(),
-          minSamples: result.minSamples.toString(),
-          numSamples: result.numSamples.toString(),
-          shardsNum: result.threadsNumber,
-          batchSize: result.batchSize,
-          mode: result.mode.toString(),
+              : info.result.accuracy,
+          minDuration: info.result.minDuration.toString(),
+          duration: info.result.durationMs.toString(),
+          minSamples: info.result.minSamples.toString(),
+          numSamples: info.result.numSamples.toString(),
+          shardsNum: info.result.threadsNumber,
+          batchSize: info.result.batchSize,
+          mode: info.result.mode.toString(),
           datetime: DateTime.now().toIso8601String(),
-          backendDescription: result.backendDescription);
+          backendDescription: info.result.backendDescription);
       jsonContent.add(full.toJsonMap());
     }
     await _write(jsonContent);
