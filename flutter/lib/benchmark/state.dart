@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/benchmark/benchmark_result.dart';
@@ -113,11 +114,10 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> loadResources() async {
-    _middle = BenchmarkList(
-        await File(configManager.configPath).readAsString(),
-        backendInfo.settings.benchmarkSetting,
-        _store.testMode,
-        resourceManager.getDefaultBatchPreset());
+    final mlperfConfig =
+        getMLPerfConfig(await File(configManager.configPath).readAsString());
+    _middle = BenchmarkList(mlperfConfig, backendInfo.settings.benchmarkSetting,
+        _store.testMode, resourceManager.getDefaultBatchPreset());
     await reset();
 
     final packageInfo = await PackageInfo.fromPlatform();

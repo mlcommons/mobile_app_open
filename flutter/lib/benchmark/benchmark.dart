@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/run_settings.dart';
 import 'package:mlperfbench/benchmark/benchmark_result.dart';
 import 'package:mlperfbench/device_info.dart';
@@ -260,11 +259,12 @@ class BenchmarkList {
   final List<Benchmark> benchmarks = <Benchmark>[];
   final bool testMode;
 
-  BenchmarkList(String config, List<pb.BenchmarkSetting> benchmarkSettings,
-      this.testMode, BatchPreset? defaultPreset) {
-    final tasks = getMLPerfConfig(config);
-
-    for (final task in tasks.task) {
+  BenchmarkList(
+      pb.MLPerfConfig mlperfConfig,
+      List<pb.BenchmarkSetting> benchmarkSettings,
+      this.testMode,
+      BatchPreset? defaultPreset) {
+    for (final task in mlperfConfig.task) {
       for (final model in task.model) {
         final benchmarkSetting = benchmarkSettings
             .singleWhereOrNull((setting) => setting.benchmarkId == model.id);
