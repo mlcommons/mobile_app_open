@@ -61,9 +61,7 @@ class BenchmarkState extends ChangeNotifier {
 
     final summaryScore = pow(
         benchmarks.fold<double>(1, (prev, i) {
-          if (i.performanceModeResult != null)
-            return prev * i.performanceModeResult!.score;
-          return prev;
+          return prev * (i.performanceModeResult?.score ?? 1.0);
         }),
         1.0 / benchmarksCount);
 
