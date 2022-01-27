@@ -71,18 +71,18 @@ class _ResultScreenState extends State<ResultScreen>
       late final double numericResult;
       late final BenchmarkResult? benchmarkResult;
       if (_screenMode == _ScreenMode.performance) {
-        benchmarkResult = benchmark.performance;
+        benchmarkResult = benchmark.performanceModeResult;
         final score = benchmarkResult?.score;
         textResult = score?.toStringAsFixed(2) ?? 'N/A';
         numericResult = (score ?? 0) / benchmark.info.maxScore;
       } else if (_screenMode == _ScreenMode.accuracy) {
-        benchmarkResult = benchmark.accuracy;
+        benchmarkResult = benchmark.accuracyModeResult;
         textResult = benchmarkResult?.accuracy ?? 'N/A';
         numericResult = benchmarkResult?.numericAccuracy ?? 0.0;
       } else {
         continue;
       }
-      final backendDescription = benchmark.performance?.backendName ?? '';
+      final backendName = benchmark.performanceModeResult?.backendName ?? '';
 
       var rowChildren = <Widget>[];
       rowChildren.add(Row(
@@ -91,7 +91,7 @@ class _ResultScreenState extends State<ResultScreen>
         children: [
           Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text(backendDescription)),
+              child: Text(backendName)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -200,8 +200,10 @@ class _ResultScreenState extends State<ResultScreen>
                 ),
                 Text(
                   _screenMode == _ScreenMode.performance
-                      ? benchmark.performance?.score.toStringAsFixed(2) ?? 'N/A'
-                      : benchmark.accuracy?.getFormattedAccuracyValue(
+                      ? benchmark.performanceModeResult?.score
+                              .toStringAsFixed(2) ??
+                          'N/A'
+                      : benchmark.accuracyModeResult?.getFormattedAccuracyValue(
                               benchmark.info.type) ??
                           'N/A',
                   style: TextStyle(

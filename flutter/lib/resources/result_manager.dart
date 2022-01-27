@@ -11,23 +11,25 @@ class _BriefResult {
   static const _tagAccuracy = 'accuracy';
 
   final String id;
-  final BenchmarkResult? performance;
-  final BenchmarkResult? accuracy;
+  final BenchmarkResult? performanceModeResult;
+  final BenchmarkResult? accuracyModeResult;
 
   _BriefResult(
-      {required this.id, required this.performance, required this.accuracy});
+      {required this.id,
+      required this.performanceModeResult,
+      required this.accuracyModeResult});
 
   Map<String, dynamic> toJson() => {
         _tagId: id,
-        _tagPerformance: performance,
-        _tagAccuracy: accuracy,
+        _tagPerformance: performanceModeResult,
+        _tagAccuracy: accuracyModeResult,
       };
 
   _BriefResult.fromJson(Map<String, dynamic> jsonMap)
       : id = jsonMap[_tagId] as String,
-        performance = BenchmarkResult.fromJson(
+        performanceModeResult = BenchmarkResult.fromJson(
             jsonMap[_tagPerformance] as Map<String, dynamic>?),
-        accuracy = BenchmarkResult.fromJson(
+        accuracyModeResult = BenchmarkResult.fromJson(
             jsonMap[_tagAccuracy] as Map<String, dynamic>?);
 }
 
@@ -52,7 +54,7 @@ class _FullResult {
   final int batchSize;
   final String mode;
   final String datetime;
-  final String backendDescription;
+  final String backendName;
 
   _FullResult(
       {required this.id,
@@ -66,7 +68,7 @@ class _FullResult {
       required this.batchSize,
       required this.mode,
       required this.datetime,
-      required this.backendDescription});
+      required this.backendName});
 
   Map<String, dynamic> toJsonMap() {
     return {
@@ -84,7 +86,9 @@ class _FullResult {
       'batch_size': batchSize,
       'mode': mode,
       'datetime': datetime,
-      'backendDescription': backendDescription,
+      // format of results.json should be stable,
+      // so we keep 'backendDescription' tag here
+      'backendDescription': backendName,
     };
   }
 }
@@ -118,7 +122,7 @@ class ResultManager {
           batchSize: info.settings.batch_size,
           mode: info.runMode.getResultModeString(),
           datetime: DateTime.now().toIso8601String(),
-          backendDescription: info.result.backendDescription);
+          backendName: info.result.backendName);
       jsonContent.add(full.toJsonMap());
     }
     await _write(jsonContent);
@@ -130,8 +134,8 @@ class ResultManager {
     for (final result in benchmarks) {
       var brief = _BriefResult(
           id: result.id,
-          performance: result.performance,
-          accuracy: result.accuracy);
+          performanceModeResult: result.performanceModeResult,
+          accuracyModeResult: result.accuracyModeResult);
       jsonContent.add(brief.toJson());
     }
     return JsonEncoder().convert(jsonContent);
@@ -148,8 +152,8 @@ class ResultManager {
         final benchmark = benchmarks
             .singleWhere((benchmark) => benchmark.id == briefResult.id);
 
-        benchmark.performance = briefResult.performance;
-        benchmark.accuracy = briefResult.accuracy;
+        benchmark.performanceModeResult = briefResult.performanceModeResult;
+        benchmark.accuracyModeResult = briefResult.accuracyModeResult;
       }
     } catch (e, stacktrace) {
       print("can't parse previous results:");

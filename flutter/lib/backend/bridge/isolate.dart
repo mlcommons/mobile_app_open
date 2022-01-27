@@ -50,9 +50,9 @@ class BridgeIsolate {
       var r = runBenchmark(rs);
       sendPort.send(RunResult(
         accuracy: r.accuracy,
-        numSamples: r.num_samples,
-        durationMs: r.duration_ms,
-        backendDescription: r.backend_description,
+        numSamples: r.numSamples,
+        durationMs: r.durationMs,
+        backendName: r.backendName,
         score: r.score,
       ));
     }

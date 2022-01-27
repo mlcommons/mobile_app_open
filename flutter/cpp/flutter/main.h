@@ -38,7 +38,7 @@ struct dart_ffi_run_benchmark_out {
   char *accuracy;
   int32_t num_samples;
   float duration_ms;
-  char *backend_description;
+  char *backend_name;
 };
 
 struct dart_ffi_run_benchmark_out *dart_ffi_run_benchmark(

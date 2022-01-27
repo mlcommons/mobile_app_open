@@ -164,17 +164,19 @@ class Benchmark {
   final bool testMode;
 
   final BenchmarkInfo info;
-  final String backendDescription;
+  // this variable holds description of our config file,
+  // which may not represent what backend actually used for computations
+  final String backendRequestDescription;
   // TODO save config in the Store?
   final BenchmarkConfig config;
 
-  BenchmarkResult? performance;
-  BenchmarkResult? accuracy;
+  BenchmarkResult? performanceModeResult;
+  BenchmarkResult? accuracyModeResult;
 
   Benchmark(this.benchmarkSetting, this.taskConfig, this.modelConfig,
       this.testMode, BenchmarkConfig? predefinedConfig)
       : info = BenchmarkInfo(modelConfig, taskConfig.name),
-        backendDescription =
+        backendRequestDescription =
             '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}',
         config = predefinedConfig ?? _getDefaultConfig(benchmarkSetting);
 

@@ -3,13 +3,13 @@ class RunResult {
   final int numSamples;
   final double durationMs;
   final double score;
-  final String backendDescription;
+  final String backendName;
 
   RunResult({
     required this.accuracy,
     required this.numSamples,
     required this.durationMs,
-    required this.backendDescription,
+    required this.backendName,
     required this.score,
   });
 

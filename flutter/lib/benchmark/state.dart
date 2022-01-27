@@ -53,14 +53,16 @@ class BenchmarkState extends ChangeNotifier {
   String runningProgress = '';
 
   num get result {
-    final benchmarksCount =
-        benchmarks.where((benchmark) => benchmark.performance != null).length;
+    final benchmarksCount = benchmarks
+        .where((benchmark) => benchmark.performanceModeResult != null)
+        .length;
 
     if (benchmarksCount == 0) return 0;
 
     final summaryScore = pow(
         benchmarks.fold<double>(1, (prev, i) {
-          if (i.performance != null) return prev * i.performance!.score;
+          if (i.performanceModeResult != null)
+            return prev * i.performanceModeResult!.score;
           return prev;
         }),
         1.0 / benchmarksCount);
@@ -233,10 +235,10 @@ class BenchmarkState extends ChangeNotifier {
       doneCounter++;
 
       results.add(performanceResult);
-      benchmark.performance = BenchmarkResult(
+      benchmark.performanceModeResult = BenchmarkResult(
           score: performanceResult.result.score,
           accuracy: performanceResult.result.accuracy,
-          backendName: performanceResult.result.backendDescription,
+          backendName: performanceResult.result.backendName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
 
@@ -249,10 +251,10 @@ class BenchmarkState extends ChangeNotifier {
       doneCounter++;
 
       results.add(accuracyResult);
-      benchmark.performance = BenchmarkResult(
+      benchmark.performanceModeResult = BenchmarkResult(
           score: accuracyResult.result.score,
           accuracy: accuracyResult.result.accuracy,
-          backendName: accuracyResult.result.backendDescription,
+          backendName: accuracyResult.result.backendName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
     }
@@ -309,8 +311,8 @@ class BenchmarkState extends ChangeNotifier {
     if (isPreviousResultUsed) {
       _doneRunning = true;
     } else {
-      _middle.benchmarks.forEach(
-          (benchmark) => benchmark.accuracy = benchmark.performance = null);
+      _middle.benchmarks.forEach((benchmark) => benchmark.accuracyModeResult =
+          benchmark.performanceModeResult = null);
       _doneRunning = null;
     }
 

@@ -30,7 +30,8 @@ class _ConfigScreen extends State<ConfigScreen> {
             benchmark.info.taskName,
           ),
         ),
-        subtitle: Text(benchmark.id + ' | ' + benchmark.backendDescription),
+        subtitle:
+            Text(benchmark.id + ' | ' + benchmark.backendRequestDescription),
         leading: Checkbox(
             value: item.active,
             onChanged: (bool? value) {
