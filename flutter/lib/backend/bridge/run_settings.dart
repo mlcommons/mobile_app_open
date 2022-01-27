@@ -1,7 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:mlperfbench/benchmark/benchmark.dart';
-
 class RunSettings {
   final String backend_model_path;
   final String backend_lib_path;

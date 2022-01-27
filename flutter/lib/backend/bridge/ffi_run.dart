@@ -2,8 +2,9 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import 'package:mlperfbench/backend/run_settings.dart';
+import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'handle.dart';
+import 'run_result.dart';
 
 class _RunIn extends Struct {
   external Pointer<Utf8> backend_model_path;
@@ -84,23 +85,6 @@ class _RunOut extends Struct {
   external Pointer<Utf8> backend_name;
 }
 
-class RunBenchmarkResult {
-  final int ok;
-  final double score;
-  final String accuracy;
-  final int numSamples;
-  final double durationMs;
-  final String backendName;
-
-  RunBenchmarkResult(
-      {required this.ok,
-      required this.score,
-      required this.accuracy,
-      required this.numSamples,
-      required this.durationMs,
-      required this.backendName});
-}
-
 const _runName = 'dart_ffi_run_benchmark';
 const _freeName = 'dart_ffi_run_benchmark_free';
 
@@ -111,7 +95,7 @@ typedef _Free1 = Void Function(Pointer<_RunOut>);
 typedef _Free2 = void Function(Pointer<_RunOut>);
 final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 
-RunBenchmarkResult runBenchmark(RunSettings rs) {
+RunResult runBenchmark(RunSettings rs) {
   var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
   runIn.ref.set(rs);
 
@@ -123,9 +107,11 @@ RunBenchmarkResult runBenchmark(RunSettings rs) {
   if (runOut.address == 0) {
     throw '$_runName result: nullptr';
   }
+  if (runOut.ref.ok != 1) {
+    throw '$_runName result: runOut.ref.ok != 1';
+  }
 
-  var res = RunBenchmarkResult(
-    ok: runOut.ref.ok,
+  var res = RunResult(
     score: runOut.ref.score,
     accuracy: runOut.ref.accuracy.toDartString(),
     numSamples: runOut.ref.num_samples,

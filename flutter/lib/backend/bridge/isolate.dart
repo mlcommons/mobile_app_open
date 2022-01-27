@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:mlperfbench/backend/bridge/ffi_run.dart';
-import 'package:mlperfbench/backend/run_settings.dart';
-import 'package:mlperfbench/benchmark/run_result.dart';
+import 'package:mlperfbench/backend/bridge/run_settings.dart';
+import 'package:mlperfbench/backend/bridge/run_result.dart';
 
 class BridgeIsolate {
   late final SendPort _runSendPort;

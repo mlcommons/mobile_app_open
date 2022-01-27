@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/backend/run_settings.dart';
+import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
