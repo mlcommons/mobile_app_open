@@ -34,7 +34,7 @@ struct dart_ffi_run_benchmark_in {
 struct dart_ffi_run_benchmark_out {
   int32_t ok;
 
-  float qps;
+  float latency;
   char *accuracy;
   int32_t num_samples;
   float duration_ms;

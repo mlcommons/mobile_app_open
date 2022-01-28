@@ -76,7 +76,7 @@ class _RunOut extends Struct {
   @Int32()
   external int ok;
   @Float()
-  external double qps;
+  external double latency;
   external Pointer<Utf8> accuracy;
   @Int32()
   external int num_samples;
@@ -112,7 +112,7 @@ RunResult runBenchmark(RunSettings rs) {
   }
 
   var res = RunResult(
-    score: runOut.ref.qps,
+    score: 1000.0 / runOut.ref.latency,
     accuracy: runOut.ref.accuracy.toDartString(),
     numSamples: runOut.ref.num_samples,
     durationMs: runOut.ref.duration_ms,
