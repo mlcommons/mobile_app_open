@@ -46,15 +46,9 @@ class BridgeIsolate {
   static void _isolateRun(SendPort sendPort) async {
     var port = ReceivePort();
     sendPort.send(port.sendPort);
-    await for (var rs in port.cast<RunSettings>()) {
-      var r = runBenchmark(rs);
-      sendPort.send(RunResult(
-        accuracy: r.accuracy,
-        numSamples: r.numSamples,
-        durationMs: r.durationMs,
-        backendName: r.backendName,
-        score: r.score,
-      ));
+    await for (var settings in port.cast<RunSettings>()) {
+      var result = runBenchmark(settings);
+      sendPort.send(result);
     }
   }
 }
