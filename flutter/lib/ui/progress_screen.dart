@@ -4,7 +4,7 @@ import 'package:flutter/material.dart' hide Icons;
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/progress_circles.dart';
 
@@ -99,7 +99,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   child: Container(
                     width: 100,
                     height: 100,
-                    child: coolingState ? null : currentBenchmark.iconWhite,
+                    child:
+                        coolingState ? null : currentBenchmark.info.iconWhite,
                   ),
                 ),
                 Padding(
@@ -107,7 +108,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   child: Text(
                     coolingState
                         ? stringResources.cooldownStatus
-                        : currentBenchmark.taskName,
+                        : currentBenchmark.info.taskName,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.lightText,

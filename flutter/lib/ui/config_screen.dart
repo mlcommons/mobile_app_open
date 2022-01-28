@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/store.dart';
 import 'config_batch_screen.dart';
 
 class ConfigScreen extends StatefulWidget {
@@ -17,19 +17,21 @@ class ConfigScreen extends StatefulWidget {
 class _ConfigScreen extends State<ConfigScreen> {
   @override
   Widget build(BuildContext context) {
-    final store = context.watch<Store>();
+    final state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
     final childrenList = <Widget>[];
 
-    for (var item in store.getBenchmarkList()) {
+    for (var benchmark in state.benchmarks) {
+      final item = benchmark.config;
       childrenList.add(ListTile(
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Text(
-            item.name,
+            benchmark.info.taskName,
           ),
         ),
-        subtitle: Text(item.id + ' | ' + item.description),
+        subtitle:
+            Text(benchmark.id + ' | ' + benchmark.backendRequestDescription),
         leading: Checkbox(
             value: item.active,
             onChanged: (bool? value) {
@@ -37,7 +39,7 @@ class _ConfigScreen extends State<ConfigScreen> {
                 item.active = value == true ? true : false;
               });
             }),
-        trailing: item.batchSize > 0 && !Platform.isAndroid
+        trailing: benchmark.info.isOffline && !Platform.isAndroid
             ? IconButton(
                 icon: Icon(Icons.settings),
                 tooltip: 'Batch settings',
@@ -45,7 +47,7 @@ class _ConfigScreen extends State<ConfigScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ConfigBatchScreen(item.id)),
+                        builder: (context) => ConfigBatchScreen(benchmark.id)),
                   );
                 })
             : null,

@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:mlperfbench/backend/bridge/ffi_run.dart';
-import 'package:mlperfbench/backend/run_settings.dart';
-import 'package:mlperfbench/benchmark/benchmark_result.dart';
+import 'package:mlperfbench/backend/bridge/run_result.dart';
+import 'package:mlperfbench/backend/bridge/run_settings.dart';
 
 class BridgeIsolate {
   late final SendPort _runSendPort;
@@ -46,22 +46,9 @@ class BridgeIsolate {
   static void _isolateRun(SendPort sendPort) async {
     var port = ReceivePort();
     sendPort.send(port.sendPort);
-    await for (var rs in port.cast<RunSettings>()) {
-      var r = runBenchmark(rs);
-      sendPort.send(RunResult(
-          rs.benchmark_id,
-          r.accuracy,
-          r.num_samples,
-          rs.min_query_count,
-          r.duration_ms,
-          rs.min_duration,
-          rs.threads_number,
-          rs.batch_size,
-          r.backend_description,
-          rs.dataset_mode,
-          rs.mode,
-          r.latency,
-          rs.scenario));
+    await for (var settings in port.cast<RunSettings>()) {
+      var result = runBenchmark(settings);
+      sendPort.send(result);
     }
   }
 }

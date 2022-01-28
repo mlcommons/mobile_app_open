@@ -7,8 +7,8 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/icons.dart' as app_icons;
-import 'package:mlperfbench/info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/app_bar.dart';
@@ -60,52 +60,6 @@ class _ResultScreenState extends State<ResultScreen>
     super.dispose();
   }
 
-  String _getFormattedAccuracyValue(Benchmark benchmark) {
-    final accuracy = benchmark.accuracy;
-    if (accuracy == null) return 'N/A';
-    final numeric = _getNumericAccuracy(accuracy);
-    switch (benchmark.type) {
-      // if the benchmark type is unknown, just show the original string
-      // so we know that this need to be fixed
-      case BenchmarkTypeEnum.unknown:
-        return _getAccuracyValue(benchmark.accuracy);
-      case BenchmarkTypeEnum.imageClassification:
-        return (numeric * 100).toStringAsFixed(2);
-      case BenchmarkTypeEnum.objectDetection:
-        return (numeric * 100).toStringAsFixed(2);
-      case BenchmarkTypeEnum.imageSegmentation:
-        return (numeric * 100).toStringAsFixed(2);
-      case BenchmarkTypeEnum.languageUnderstanding:
-        return numeric.toStringAsFixed(2);
-    }
-  }
-
-  double _getNumericAccuracy(String accuracy) {
-    final percentPattern = '%';
-
-    accuracy = _getAccuracyValue(accuracy);
-
-    if (!accuracy.endsWith(percentPattern)) {
-      return double.tryParse(accuracy) ?? 0.0;
-    }
-
-    return (double.tryParse(accuracy.replaceAll(RegExp('%'), '')) ?? 0.0) / 100;
-  }
-
-  String _getAccuracyValue(String? accuracy) {
-    final onlyNumbersWithPercentPattern = '[^.%0-9]';
-    final notAvailable = 'N/A';
-
-    if (accuracy != null) {
-      if (accuracy == notAvailable) {
-        return accuracy;
-      }
-      return accuracy.replaceAll(RegExp(onlyNumbersWithPercentPattern), '');
-    }
-
-    return notAvailable;
-  }
-
   Column _createListOfBenchmarkResultWidgets(
       BuildContext context, BenchmarkState state) {
     final list = <Widget>[];
@@ -115,15 +69,21 @@ class _ResultScreenState extends State<ResultScreen>
     for (final benchmark in state.benchmarks) {
       late final String textResult;
       late final double numericResult;
+      late final BenchmarkResult? benchmarkResult;
       if (_screenMode == _ScreenMode.performance) {
-        textResult = benchmark.score?.toStringAsFixed(2) ?? 'N/A';
-        numericResult = (benchmark.score ?? 0) / benchmark.maxScore;
+        benchmarkResult = benchmark.performanceModeResult;
+        final score = benchmarkResult?.score;
+        textResult = score?.toStringAsFixed(2) ?? 'N/A';
+        numericResult = (score ?? 0) / benchmark.info.maxScore;
       } else if (_screenMode == _ScreenMode.accuracy) {
-        textResult = benchmark.accuracy ?? 'N/A';
-        numericResult = _getNumericAccuracy(textResult);
+        benchmarkResult = benchmark.accuracyModeResult;
+        textResult = benchmarkResult?.accuracy ?? 'N/A';
+        numericResult = benchmarkResult?.numericAccuracy ?? 0.0;
       } else {
         continue;
       }
+      final backendName = benchmark.performanceModeResult?.backendName ?? '';
+
       var rowChildren = <Widget>[];
       rowChildren.add(Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,7 +91,7 @@ class _ResultScreenState extends State<ResultScreen>
         children: [
           Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text(benchmark.backendDescription)),
+              child: Text(backendName)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -148,24 +108,15 @@ class _ResultScreenState extends State<ResultScreen>
           ),
         ],
       ));
-      if (benchmark.benchmarkSetting.batchSize > 0) {
+      if (benchmark.info.isOffline) {
         String shardsNum;
         String batchSize;
         if (textResult == 'N/A') {
           shardsNum = 'N/A';
           batchSize = 'N/A';
         } else {
-          try {
-            shardsNum = benchmark.benchmarkSetting.customSetting
-                .firstWhere((element) => element.id == 'shards_num')
-                .value;
-            batchSize = benchmark.benchmarkSetting.customSetting
-                .firstWhere((element) => element.id == 'batch_size')
-                .value;
-          } catch (_) {
-            shardsNum = 'N/A';
-            batchSize = 'N/A';
-          }
+          shardsNum = benchmarkResult?.threadsNumber.toString() ?? '';
+          batchSize = benchmarkResult?.batchSize.toString() ?? '';
         }
 
         rowChildren.add(Row(
@@ -204,10 +155,11 @@ class _ResultScreenState extends State<ResultScreen>
               leading: Container(
                   width: pictureEdgeSize,
                   height: pictureEdgeSize,
-                  child: benchmark.icon),
+                  child: benchmark.info.icon),
               title: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child: Text(getBenchmarkName(benchmark, stringResources)),
+                child:
+                    Text(benchmark.info.getLocalizedInfo(stringResources).name),
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,7 +187,9 @@ class _ResultScreenState extends State<ResultScreen>
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
-                    getBenchmarkName(benchmark, stringResources)
+                    benchmark.info
+                        .getLocalizedInfo(stringResources)
+                        .name
                         .split(' ')
                         .join('\n')
                         .toUpperCase(),
@@ -246,8 +200,12 @@ class _ResultScreenState extends State<ResultScreen>
                 ),
                 Text(
                   _screenMode == _ScreenMode.performance
-                      ? benchmark.score?.toStringAsFixed(2) ?? 'N/A'
-                      : _getFormattedAccuracyValue(benchmark),
+                      ? benchmark.performanceModeResult?.score
+                              .toStringAsFixed(2) ??
+                          'N/A'
+                      : benchmark.accuracyModeResult?.getFormattedAccuracyValue(
+                              benchmark.info.type) ??
+                          'N/A',
                   style: TextStyle(
                       fontSize: 32.0,
                       color: AppColors.lightText,

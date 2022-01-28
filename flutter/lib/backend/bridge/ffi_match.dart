@@ -1,9 +1,8 @@
 import 'dart:ffi';
-import 'dart:io' show Platform;
 
-import 'package:device_info/device_info.dart';
 import 'package:ffi/ffi.dart';
 
+import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'handle.dart';
 
@@ -28,37 +27,14 @@ typedef _Free1 = Void Function(Pointer<_RunOut>);
 typedef _Free2 = void Function(Pointer<_RunOut>);
 final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 
-late final Pointer<Utf8> _manufacturerUtf8;
-late final Pointer<Utf8> _modelUtf8;
-
-Future<void> initDeviceInfo() async {
-  String model;
-  String manufacturer;
-  if (Platform.isIOS) {
-    final deviceInfo = DeviceInfoPlugin();
-    final iosInfo = await deviceInfo.iosInfo;
-
-    manufacturer = 'Apple';
-    model = iosInfo.name;
-  } else if (Platform.isWindows) {
-    manufacturer = 'Microsoft';
-    model = 'Unknown PC';
-  } else if (Platform.isAndroid) {
-    final deviceInfo = await DeviceInfoPlugin().androidInfo;
-
-    manufacturer = deviceInfo.manufacturer;
-    model = deviceInfo.model;
-  } else {
-    throw 'Could not define platform';
-  }
-  _manufacturerUtf8 = manufacturer.toNativeUtf8();
-  _modelUtf8 = model.toNativeUtf8();
-}
-
 pb.BackendSetting? backendMatch(String libPath) {
   final libPathUtf8 = libPath.toNativeUtf8();
-  final runOut = _run(libPathUtf8, _manufacturerUtf8, _modelUtf8);
+  final manufacturerUtf8 = DeviceInfo.manufacturer.toNativeUtf8();
+  final modelUtf8 = DeviceInfo.model.toNativeUtf8();
+  final runOut = _run(libPathUtf8, manufacturerUtf8, modelUtf8);
   malloc.free(libPathUtf8);
+  malloc.free(manufacturerUtf8);
+  malloc.free(modelUtf8);
 
   if (runOut.address == 0) {
     return null;

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
+import 'package:mlperfbench/device_info.dart';
 import 'cache_manager.dart';
 import 'result_manager.dart';
 import 'utils.dart';
@@ -121,6 +122,20 @@ class ResourceManager {
 
     cacheManager = CacheManager(_loadedResourcesDir);
     resultManager = ResultManager(applicationDirectory);
+  }
+
+  BatchPreset? getDefaultBatchPreset() {
+    if (Platform.isAndroid) {
+      // batch presets are disabled for android
+      return null;
+    }
+    final presets = getBatchPresets();
+    for (var preset in presets) {
+      if (DeviceInfo.model.startsWith(preset.name)) {
+        return preset;
+      }
+    }
+    return presets[0];
   }
 
   List<BatchPreset> getBatchPresets() {

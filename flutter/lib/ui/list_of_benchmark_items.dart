@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
-import 'package:mlperfbench/info.dart';
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 Column createListOfBenchmarkItemsWidgets(
@@ -27,13 +27,10 @@ Column createListOfBenchmarkItemsWidgets(
               child: Container(
                 width: pictureEdgeSize,
                 height: pictureEdgeSize,
-                child: benchmark.icon,
+                child: benchmark.info.icon,
               ),
             ),
-            Text(getBenchmarkName(
-              benchmark,
-              stringResources,
-            )),
+            Text(benchmark.info.getLocalizedInfo(stringResources).name),
             Icon(
               Icons.chevron_right,
               color: Colors.grey,
@@ -49,9 +46,7 @@ Column createListOfBenchmarkItemsWidgets(
 void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
   final stringResources = AppLocalizations.of(context);
 
-  final info =
-      BenchmarkInfoItem.getBenchmarkInfoItem(benchmark.code, stringResources) ??
-          BenchmarkInfoItem.stub(benchmark.taskName);
+  final info = benchmark.info.getLocalizedInfo(stringResources);
 
   showModalBottomSheet(
       context: context,
@@ -74,7 +69,7 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(info.title,
+                                  Text(info.detailsTitle,
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -92,7 +87,8 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
                       ])),
               Padding(
                   padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
-                  child: Text(info.details, style: TextStyle(fontSize: 16))),
+                  child: Text(info.detailsContent,
+                      style: TextStyle(fontSize: 16))),
             ],
           ));
 }

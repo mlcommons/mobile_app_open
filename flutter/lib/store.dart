@@ -2,28 +2,10 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:mlperfbench/resources/resource_manager.dart';
-
 class Store extends ChangeNotifier {
   final SharedPreferences _storeFromDisk;
 
   Store._(this._storeFromDisk);
-
-  final List<BenchmarkDescription> _benchmarkList = [];
-
-  void addBenchmarkToList(
-      String id, String name, String description, BatchPreset? batchPreset) {
-    _benchmarkList
-        .add(BenchmarkDescription(id, name, description, batchPreset));
-  }
-
-  void clearBenchmarkList() {
-    _benchmarkList.clear();
-  }
-
-  List<BenchmarkDescription> getBenchmarkList() {
-    return _benchmarkList;
-  }
 
   static Future<Store> create() async {
     final store = await SharedPreferences.getInstance();
@@ -127,22 +109,4 @@ class _StoreConstants {
   static const chosen_configuration_name = 'chosen configuration name';
   static const previous_result = 'previous result';
   static const previous_app_version = 'previous app version';
-}
-
-class BenchmarkDescription {
-  String id;
-  String name;
-  String description;
-  bool active;
-  BatchPreset? batchPreset;
-  int batchSize = 0;
-  int threadsNumber = 0;
-
-  BenchmarkDescription(this.id, this.name, this.description,
-      [this.batchPreset, this.active = true]) {
-    if (batchPreset != null) {
-      batchSize = batchPreset!.batchSize;
-      threadsNumber = batchPreset!.shardsCount;
-    }
-  }
 }

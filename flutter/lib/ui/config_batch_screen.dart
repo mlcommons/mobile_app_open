@@ -6,10 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
-import 'package:mlperfbench/store.dart';
 
 const maxBatchThreadsValue = 64;
 const maxThreadsNumber = maxBatchThreadsValue ~/ 2;
@@ -28,12 +27,11 @@ class _ConfigBatchScreen extends State<ConfigBatchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final store = context.watch<Store>();
     final state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
-    final element = store
-        .getBenchmarkList()
-        .firstWhere((benchmark) => benchmark.id == widget.id);
+    final benchmark =
+        state.benchmarks.firstWhere((benchmark) => benchmark.id == widget.id);
+    final element = benchmark.config;
     _maxBatchSize = maxBatchThreadsValue ~/ element.threadsNumber;
 
     var presets = state.resourceManager.getBatchPresets();
@@ -45,7 +43,7 @@ class _ConfigBatchScreen extends State<ConfigBatchScreen> {
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Text(
-            element.name,
+            benchmark.info.taskName,
             textAlign: TextAlign.center,
           ),
         ),

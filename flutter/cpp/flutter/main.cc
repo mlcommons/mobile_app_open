@@ -91,7 +91,7 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       in->backend_native_lib_path);
   li;
 
-  char* backend_description = strdup(backend->Name().c_str());
+  char* backend_name = strdup(backend->Name().c_str());
 
   ::std::unique_ptr<::mlperf::mobile::Dataset> dataset;
   switch (in->dataset_type) {
@@ -141,11 +141,15 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   auto out = new dart_ffi_run_benchmark_out;
   out->ok = 1;
-  out->latency = driver.ComputeLatency();
+  if (std::string{in->scenario} == "Offline") {
+    out->latency = 1000.0 / driver.ComputeLatency();
+  } else {
+    out->latency = driver.ComputeLatency();
+  }
   out->accuracy = strdup(driver.ComputeAccuracyString().c_str());
   out->num_samples = driver.GetNumSamples();
   out->duration_ms = driver.GetDurationMs();
-  out->backend_description = backend_description;
+  out->backend_name = backend_name;
   li;
 
   return out;
@@ -153,6 +157,6 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
 void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out* out) {
   free(out->accuracy);
-  free(out->backend_description);
+  free(out->backend_name);
   delete out;
 }
