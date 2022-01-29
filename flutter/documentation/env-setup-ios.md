@@ -5,7 +5,7 @@ This file describes environment setup for iOS builds on macOS.
 ## Contents
 
 * [Setting up the environment](#setting-up-the-environment)
-* [Tested anvironment](#tested-anvironment)
+* [Tested environment](#tested-environment)
 * [Changing application icon](#changing-application-icon)
 
 ## Setting up the environment
@@ -23,7 +23,7 @@ Otherwise, you can get errors about missing pods
   * `sudo gem install cocoapods`
 * Install python dependencies: `python3 -m pip install --user numpy absl-py`
 * Enable protobuf plugin: `dart pub global activate protoc_plugin`
-* Add `$HOME/.pub-cache/bin` directory to PATH (the command bellow is for ZSH, adjust your `rc` file if you use something else):
+* Add `$HOME/.pub-cache/bin` directory to PATH (the command below is for ZSH, adjust your `rc` file if you use something else):
 
 ```bash
 echo export PATH="$PATH:$HOME/.pub-cache/bin" >>~/.zshrc
@@ -31,7 +31,7 @@ echo export PATH="$PATH:$HOME/.pub-cache/bin" >>~/.zshrc
 
 * Go to `ios` directory and install pods: `pod install`
 
-## Tested anvironment
+## Tested environment
 
 The app was built and tested successfully in this environment:
 
@@ -67,7 +67,7 @@ Note: the current version may crash with EXC_RESOURCE if built with XCode 13.0
 
 [comment]: # (TODO move this somewhere?)
 
-After building application, if you would like to set new application icon use following actions:
+After building the application, if you would like to set a new application icon, use the following actions:
 
 * Go to `pubspec.yaml` file in root folder
 * Find `flutter_icons` configuration and change value of option `image_path` to the path of desirable application icon
@@ -79,8 +79,7 @@ Please note that iOS icons should not have any transparency. See more guidelines
 
 [comment]: # (TODO add info about installing other tools)
 
-In order to automatically format your files
-you must have `clang-format` and `buildifier` in addition to build dependencies.
+To automatically format your files you must have `clang-format` and `buildifier` in addition to build dependencies.
 
 * `brew install clang-format`,
 * `brew install buildifier`
