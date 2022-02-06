@@ -18,6 +18,7 @@ build:verbose_logs --output_filter=
 # Suppress C++ compiler warnings, otherwise build logs become 10s of MBs.
 build:android --copt=-w
 build:ios --copt=-w
+build:linux --copt=-w
 build:windows --copt=/W0
 
 # Build in C++ 14 mode.
@@ -25,6 +26,8 @@ build:android --cxxopt=-std=c++14
 build:android --host_cxxopt=-std=c++14
 build:ios --cxxopt=-std=c++14
 build:ios --host_cxxopt=-std=c++14
+build:linux --cxxopt=-std=c++14
+build:linux --host_cxxopt=-std=c++14
 build:windows --cxxopt=/std:c++14
 build:windows --host_cxxopt=/std:c++14
 
