@@ -11,14 +11,14 @@ import 'package:mlperfbench/resources/resource_manager.dart';
 import 'info.dart';
 
 class BenchmarkResult {
-  final double score;
+  final double throughput;
   final String accuracy;
   final String backendName;
   final int batchSize;
   final int threadsNumber;
 
   BenchmarkResult(
-      {required this.score,
+      {required this.throughput,
       required String accuracy,
       required this.backendName,
       required this.batchSize,
@@ -58,7 +58,7 @@ class BenchmarkResult {
     return (double.tryParse(accuracy.replaceAll(RegExp('%'), '')) ?? 0.0) / 100;
   }
 
-  static const _tagScore = 'score';
+  static const _tagThroughput = 'throughput';
   static const _tagAccuracy = 'accuracy';
   static const _tagBackendName = 'backend_name';
   static const _tagbatchSize = 'batch_size';
@@ -67,7 +67,7 @@ class BenchmarkResult {
   static BenchmarkResult? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
     return BenchmarkResult(
-        score: json[_tagScore] as double,
+        throughput: json[_tagThroughput] as double,
         accuracy: json[_tagAccuracy] as String,
         backendName: json[_tagBackendName] as String,
         batchSize: json[_tagbatchSize] as int,
@@ -75,7 +75,7 @@ class BenchmarkResult {
   }
 
   Map<String, dynamic> toJson() => {
-        _tagScore: score,
+        _tagThroughput: throughput,
         _tagAccuracy: accuracy,
         _tagBackendName: backendName,
         _tagbatchSize: batchSize,

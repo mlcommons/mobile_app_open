@@ -112,7 +112,7 @@ RunResult runBenchmark(RunSettings rs) {
   }
 
   var res = RunResult(
-    score: 1000.0 / runOut.ref.latency,
+    throughput: 1000.0 / runOut.ref.latency,
     accuracy: runOut.ref.accuracy.toDartString(),
     numSamples: runOut.ref.num_samples,
     durationMs: runOut.ref.duration_ms,

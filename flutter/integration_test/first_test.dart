@@ -83,12 +83,12 @@ void main() {
           final result = resultContent as Map<String, dynamic>;
           final id = result['benchmark_id'] as String;
           final accuracy = result['accuracy'] as String?;
-          final score = result['score'] as double?;
+          final throughput = result['throughput'] as double?;
           expect(accuracy != 'N/A', true,
               reason:
                   'accuracy should be N/A in benchmark $id, but is "$accuracy"');
-          expect(score != null, true,
-              reason: 'score should not be null in benchmark $id');
+          expect(throughput != null, true,
+              reason: 'throughput should not be null in benchmark $id');
         }
       } catch (_) {
         stderr.writeln('Error in result.json format');

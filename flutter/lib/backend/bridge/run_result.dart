@@ -2,7 +2,7 @@ class RunResult {
   final String accuracy;
   final int numSamples;
   final double durationMs;
-  final double score;
+  final double throughput;
   final String backendName;
 
   RunResult({
@@ -10,9 +10,9 @@ class RunResult {
     required this.numSamples,
     required this.durationMs,
     required this.backendName,
-    required this.score,
+    required this.throughput,
   });
 
   @override
-  String toString() => 'RunResult(score:$score, accuracy:$accuracy)';
+  String toString() => 'RunResult(throughput:$throughput, accuracy:$accuracy)';
 }
