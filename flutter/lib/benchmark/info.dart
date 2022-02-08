@@ -102,7 +102,8 @@ class BenchmarkInfo {
     }
   }
 
-  static double getSummaryMaxThroughput() => _MAX_THROUGHPUT['SUMMARY_MAX_THROUGHPUT']!;
+  static double getSummaryMaxThroughput() =>
+      _MAX_THROUGHPUT['SUMMARY_MAX_THROUGHPUT']!;
 }
 
 final _MAX_THROUGHPUT = {
