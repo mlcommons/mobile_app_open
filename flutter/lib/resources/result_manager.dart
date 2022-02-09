@@ -43,7 +43,7 @@ class RunInfo {
 
 class _FullResult {
   final String id;
-  final String score;
+  final String throughput;
   final String accuracy;
   // numeric values are saved as string to match old android app behavior
   final String minDuration;
@@ -58,7 +58,7 @@ class _FullResult {
 
   _FullResult(
       {required this.id,
-      required this.score,
+      required this.throughput,
       required this.accuracy,
       required this.minDuration,
       required this.duration,
@@ -76,7 +76,7 @@ class _FullResult {
       'configuration': {
         'runtime': '',
       },
-      'score': score,
+      'throughput': throughput,
       'accuracy': accuracy,
       'min_duration': minDuration,
       'duration': duration,
@@ -108,9 +108,9 @@ class ResultManager {
     for (final info in results) {
       var full = _FullResult(
           id: info.settings.benchmark_id,
-          score: info.runMode == BenchmarkRunMode.accuracy
+          throughput: info.runMode == BenchmarkRunMode.accuracy
               ? 'N/A'
-              : info.result.score.toString(),
+              : info.result.throughput.toString(),
           accuracy: info.runMode == BenchmarkRunMode.accuracy
               ? info.result.accuracy
               : 'N/A',

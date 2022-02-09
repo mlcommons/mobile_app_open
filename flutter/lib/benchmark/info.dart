@@ -69,7 +69,7 @@ class BenchmarkInfo {
 
   bool get isOffline => modelConfig.scenario == 'Offline';
 
-  double get maxScore => _MAX_SCORE[modelConfig.id]!;
+  double get maxThroughput => _MAX_THROUGHPUT[modelConfig.id]!;
 
   /// 'IC', 'OD', and so on.
   String get code => modelConfig.id.split('_').first;
@@ -102,10 +102,11 @@ class BenchmarkInfo {
     }
   }
 
-  static double getSummaryMaxScore() => _MAX_SCORE['SUMMARY_MAX_SCORE']!;
+  static double getSummaryMaxThroughput() =>
+      _MAX_THROUGHPUT['SUMMARY_MAX_THROUGHPUT']!;
 }
 
-final _MAX_SCORE = {
+final _MAX_THROUGHPUT = {
   'IC_tpu_uint8': 508.0,
   'IC_tpu_float32': 508.0,
   'IC_tpu_uint8_offline': 508.0,
@@ -119,7 +120,7 @@ final _MAX_SCORE = {
   'IS_int8': 50.0,
   'IS_uint8': 50.0,
   'IS_float32': 50.0,
-  'SUMMARY_MAX_SCORE': 155.0,
+  'SUMMARY_MAX_THROUGHPUT': 155.0,
 };
 
 final _BENCHMARK_ICONS = {

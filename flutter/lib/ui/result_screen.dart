@@ -72,9 +72,9 @@ class _ResultScreenState extends State<ResultScreen>
       late final BenchmarkResult? benchmarkResult;
       if (_screenMode == _ScreenMode.performance) {
         benchmarkResult = benchmark.performanceModeResult;
-        final score = benchmarkResult?.score;
-        textResult = score?.toStringAsFixed(2) ?? 'N/A';
-        numericResult = (score ?? 0) / benchmark.info.maxScore;
+        final throughput = benchmarkResult?.throughput;
+        textResult = throughput?.toStringAsFixed(2) ?? 'N/A';
+        numericResult = (throughput ?? 0) / benchmark.info.maxThroughput;
       } else if (_screenMode == _ScreenMode.accuracy) {
         benchmarkResult = benchmark.accuracyModeResult;
         textResult = benchmarkResult?.accuracy ?? 'N/A';
@@ -200,7 +200,7 @@ class _ResultScreenState extends State<ResultScreen>
                 ),
                 Text(
                   _screenMode == _ScreenMode.performance
-                      ? benchmark.performanceModeResult?.score
+                      ? benchmark.performanceModeResult?.throughput
                               .toStringAsFixed(2) ??
                           'N/A'
                       : benchmark.accuracyModeResult?.getFormattedAccuracyValue(

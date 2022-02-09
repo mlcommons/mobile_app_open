@@ -11,14 +11,14 @@ import 'package:mlperfbench/resources/resource_manager.dart';
 import 'info.dart';
 
 class BenchmarkResult {
-  final double score;
+  final double throughput;
   final String accuracy;
   final String backendName;
   final int batchSize;
   final int threadsNumber;
 
   BenchmarkResult(
-      {required this.score,
+      {required this.throughput,
       required String accuracy,
       required this.backendName,
       required this.batchSize,
@@ -58,27 +58,27 @@ class BenchmarkResult {
     return (double.tryParse(accuracy.replaceAll(RegExp('%'), '')) ?? 0.0) / 100;
   }
 
-  static const _tagScore = 'score';
+  static const _tagThroughput = 'throughput';
   static const _tagAccuracy = 'accuracy';
   static const _tagBackendName = 'backend_name';
-  static const _tagbatchSize = 'batch_size';
+  static const _tagBatchSize = 'batch_size';
   static const _tagThreadsNumber = 'threads_number';
 
   static BenchmarkResult? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
     return BenchmarkResult(
-        score: json[_tagScore] as double,
+        throughput: json[_tagThroughput] as double,
         accuracy: json[_tagAccuracy] as String,
         backendName: json[_tagBackendName] as String,
-        batchSize: json[_tagbatchSize] as int,
+        batchSize: json[_tagBatchSize] as int,
         threadsNumber: json[_tagThreadsNumber] as int);
   }
 
   Map<String, dynamic> toJson() => {
-        _tagScore: score,
+        _tagThroughput: throughput,
         _tagAccuracy: accuracy,
         _tagBackendName: backendName,
-        _tagbatchSize: batchSize,
+        _tagBatchSize: batchSize,
         _tagThreadsNumber: threadsNumber,
       };
 }
@@ -145,7 +145,7 @@ class BenchmarkRunMode {
     }
   }
 
-  pb.DatasetConfig chooseDatase(pb.TaskConfig taskConfig) {
+  pb.DatasetConfig chooseDataset(pb.TaskConfig taskConfig) {
     switch (_mode) {
       case BenchmarkRunModeEnum.performance:
         return taskConfig.liteDataset;
@@ -212,7 +212,7 @@ class Benchmark {
       required String backendLibPath,
       required Directory tmpDir}) {
     final dataset =
-        testMode ? taskConfig.testDataset : runMode.chooseDatase(taskConfig);
+        testMode ? taskConfig.testDataset : runMode.chooseDataset(taskConfig);
 
     final _fastMode = testMode || FAST_MODE;
     var minQueryCount = _fastMode ? 8 : taskConfig.minQueryCount;

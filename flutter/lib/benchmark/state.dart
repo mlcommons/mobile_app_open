@@ -59,13 +59,13 @@ class BenchmarkState extends ChangeNotifier {
 
     if (benchmarksCount == 0) return 0;
 
-    final summaryScore = pow(
+    final summaryThroughput = pow(
         benchmarks.fold<double>(1, (prev, i) {
-          return prev * (i.performanceModeResult?.score ?? 1.0);
+          return prev * (i.performanceModeResult?.throughput ?? 1.0);
         }),
         1.0 / benchmarksCount);
 
-    return summaryScore / BenchmarkInfo.getSummaryMaxScore();
+    return summaryThroughput / BenchmarkInfo.getSummaryMaxThroughput();
   }
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
@@ -234,7 +234,7 @@ class BenchmarkState extends ChangeNotifier {
 
       results.add(performanceResult);
       benchmark.performanceModeResult = BenchmarkResult(
-          score: performanceResult.result.score,
+          throughput: performanceResult.result.throughput,
           accuracy: performanceResult.result.accuracy,
           backendName: performanceResult.result.backendName,
           batchSize: benchmark.config.batchSize,
@@ -250,7 +250,7 @@ class BenchmarkState extends ChangeNotifier {
 
       results.add(accuracyResult);
       benchmark.performanceModeResult = BenchmarkResult(
-          score: accuracyResult.result.score,
+          throughput: accuracyResult.result.throughput,
           accuracy: accuracyResult.result.accuracy,
           backendName: accuracyResult.result.backendName,
           batchSize: benchmark.config.batchSize,
