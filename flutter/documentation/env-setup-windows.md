@@ -19,11 +19,13 @@ However, using Chocolatey greatly simplifies installation.
 * Install dependencies:
   * `choco install git -y`
   * `choco install make -y`
-  * `choco install bazel -y`
+  * `choco install bazel -y --version 4.2.1`
   * `choco install python3 -y`
   * `choco install msys2 -y`
   * `choco install flutter -y`
   * `choco install protoc -y`
+* choco install command installs the latest version of the package.  Add --version option to specify which version you would like to install. 
+* bazel version 5.0 causes few issues at time of this writing. Bazel 4.2.1 helps to have a successful build. 
 * You must have command `python3` in your PATH.  
 Python installed via Chocolatey provides only `python.exe` file, so you will need to create `python3` yourself.  
 At the moment of writing this instruction the default path for python is `C:/Python39/`.
