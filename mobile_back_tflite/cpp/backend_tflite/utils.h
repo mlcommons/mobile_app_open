@@ -15,7 +15,7 @@ limitations under the License.
 #ifndef MLPERF_UTILS_H_
 #define MLPERF_UTILS_H_
 
-#include "android/cpp/c/type.h"
+#include "flutter/cpp/c/type.h"
 
 namespace mlperf {
 namespace mobile {

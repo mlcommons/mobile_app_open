@@ -17,8 +17,8 @@ limitations under the License.
 #include <stdlib.h>
 #include <string.h>
 
-#include "android/cpp/c/backend_c.h"
-#include "android/cpp/c/type.h"
+#include "flutter/cpp/c/backend_c.h"
+#include "flutter/cpp/c/type.h"
 #include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/c/c_api_experimental.h"
 #include "tensorflow/lite/c/common.h"
