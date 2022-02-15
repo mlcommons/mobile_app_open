@@ -55,6 +55,6 @@ Place your tag before TFLite tag.
 
 ## Implementing backend interface
 
-Backend C API is defined in [android/cpp/c/backend_c.h](../../android/cpp/c/backend_c.h).  
+Backend C API is defined in [flutter/cpp/c/backend_c.h](../../flutter/cpp/c/backend_c.h).  
 Unfortunately, we don't have any documentation on details of how to implement it yet.  
 You can look at the [reference TFLite backend implementation](../../mobile_back_tflite) for hints or create an issue if something is not clear.

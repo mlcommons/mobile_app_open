@@ -24,7 +24,7 @@ limitations under the License.
 
 #include "absl/container/flat_hash_map.h"
 #include "allocator.h"
-#include "android/cpp/dataset.h"
+#include "flutter/cpp/dataset.h"
 #include "tensorflow/lite/tools/evaluation/proto/evaluation_stages.pb.h"
 #include "tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.h"
 

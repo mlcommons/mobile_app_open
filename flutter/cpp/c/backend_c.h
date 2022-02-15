@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <stdint.h>
 
-#include "android/cpp/c/type.h"
+#include "flutter/cpp/c/type.h"
 
 #ifdef __cplusplus
 extern "C" {

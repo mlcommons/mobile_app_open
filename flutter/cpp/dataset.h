@@ -20,8 +20,8 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "android/cpp/backend.h"
-#include "android/cpp/utils.h"
+#include "flutter/cpp/backend.h"
+#include "flutter/cpp/utils.h"
 #include "loadgen/query_sample_library.h"
 
 namespace mlperf {

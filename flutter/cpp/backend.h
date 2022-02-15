@@ -17,8 +17,8 @@ limitations under the License.
 
 #include <vector>
 
-#include "android/cpp/proto/backend_setting.pb.h"
-#include "android/cpp/utils.h"
+#include "flutter/cpp/proto/backend_setting.pb.h"
+#include "flutter/cpp/utils.h"
 #include "loadgen/system_under_test.h"
 
 namespace mlperf {

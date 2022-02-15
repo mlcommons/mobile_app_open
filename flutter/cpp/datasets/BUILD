@@ -38,7 +38,7 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "//android/cpp:utils",
+        "//flutter/cpp:utils",
     ],
 )
 
@@ -61,9 +61,9 @@ cc_library(
     }),
     deps = [
         ":allocator",
-        "//android/cpp:mlperf_driver",
-        "//android/cpp:utils",
-        "//android/cpp/backends:external",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp:utils",
+        "//flutter/cpp/backends:external",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
         "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
         "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
@@ -90,9 +90,9 @@ cc_library(
     }),
     deps = [
         ":allocator",
-        "//android/cpp:mlperf_driver",
-        "//android/cpp:utils",
-        "//android/cpp/backends:external",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp:utils",
+        "//flutter/cpp/backends:external",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_protobuf//:protobuf",
         "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
@@ -116,9 +116,9 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "//android/cpp:mlperf_driver",
-        "//android/cpp:utils",
-        "//android/cpp/datasets/squad_utils",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp:utils",
+        "//flutter/cpp/datasets/squad_utils",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/core:portable_tensorflow_lib_lite",
@@ -139,9 +139,9 @@ cc_library(
     ],
     deps = [
         ":allocator",
-        "//android/cpp:mlperf_driver",
-        "//android/cpp:utils",
-        "//android/cpp/backends:external",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp:utils",
+        "//flutter/cpp/backends:external",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
         "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
         "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",

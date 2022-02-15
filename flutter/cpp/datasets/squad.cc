@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include "android/cpp/datasets/squad.h"
+#include "flutter/cpp/datasets/squad.h"
 
 #include <cstdint>
 #include <cstring>
@@ -24,8 +24,8 @@ limitations under the License.
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
-#include "android/cpp/datasets/squad_utils/common.h"
-#include "android/cpp/utils.h"
+#include "flutter/cpp/datasets/squad_utils/common.h"
+#include "flutter/cpp/utils.h"
 #include "tensorflow/core/platform/file_system.h"
 
 namespace mlperf {
