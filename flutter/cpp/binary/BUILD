@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_linkopts")
 
 package(
@@ -35,14 +34,9 @@ common_linkopts = tflite_linkopts() + select({
     "//conditions:default": [],
 })
 
-cc_library(
-    name = "mlperf_driver",
-    srcs = ["mlperf_driver.cc"],
-    hdrs = [
-        "backend.h",
-        "dataset.h",
-        "mlperf_driver.h",
-    ],
+cc_binary(
+    name = "main",
+    srcs = ["main.cc"],
     copts = tflite_copts() + select({
         "//android/commonlibs:use_asan": [
             "-fsanitize=address",
@@ -52,44 +46,17 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
-    deps = [
-        ":utils",
-        "//android/cpp/proto:mlperf_task_cc_proto",
-        "@org_mlperf_inference//:loadgen",
-    ],
-)
-
-cc_library(
-    name = "utils",
-    srcs = ["utils.cc"],
-    hdrs = [
-        "utils.h",
-    ],
-    copts = tflite_copts() + select({
-        "//android/commonlibs:use_asan": [
-            "-fsanitize=address",
-            "-g",
-            "-O1",
-            "-fno-omit-frame-pointer",
-        ],
-        "//conditions:default": [],
-    }),
-    deps = [
-        "//android/cpp/c:headers",
-        "//android/cpp/proto:mlperf_task_cc_proto",
-        "@org_mlperf_inference//:loadgen",
-        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
-    ],
-)
-
-cc_test(
-    name = "utils_test",
-    srcs = ["utils_test.cc"],
     linkopts = common_linkopts,
-    linkstatic = 1,
     deps = [
-        ":utils",
-        "@com_google_googletest//:gtest",
+        "//android/cpp:mlperf_driver",
+        "//android/cpp:utils",
+        "//android/cpp/backends:external",
+        "//android/cpp/datasets:ade20k",
+        "//android/cpp/datasets:coco",
+        "//android/cpp/datasets:imagenet",
+        "//android/cpp/datasets:squad",
+        "//android/cpp/proto:mlperf_task_cc_proto",
+        "@com_google_absl//absl/strings",
+        "@org_tensorflow//tensorflow/lite/tools:command_line_flags",
     ],
 )

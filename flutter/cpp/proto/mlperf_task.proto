@@ -1,0 +1,104 @@
+/* Copyright 2019 The MLPerf Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
+syntax = "proto2";
+
+package mlperf.mobile;
+
+option cc_enable_arenas = true;
+option java_multiple_files = true;
+option java_package = "org.mlperf.proto";
+
+// Config of a mlperf run.
+//
+// Next ID: 2
+message MLPerfConfig {
+  // All tasks will be run.
+  repeated TaskConfig task = 1;
+}
+
+// Config of the mlperf tasks.
+// A task is basically a combination of models and a dataset.
+//
+// Next ID: 8
+message TaskConfig {
+  // Name of the task. Ex: Image classification.
+  required string name = 1;
+  // The dataset used in this task.
+  required DatasetConfig dataset = 2;
+  // Models to run in this task.
+  repeated ModelConfig model = 3;
+  // Minimum number of samples the test should run in the performance mode.
+  required int32 min_query_count = 4;
+  // Minimum duration the test should run in the performance mode.
+  required int32 min_duration_ms = 5;
+  // The lite dataset for performance mode.
+  optional DatasetConfig lite_dataset = 6;
+  // The dataset for instrument test.
+  optional DatasetConfig test_dataset = 7;
+}
+
+// Config of the dataset.
+//
+// Next ID: 5
+message DatasetConfig {
+  // Name of the dataset.
+  required string name = 1;
+  // Type of the dataset.
+  enum DatasetType {
+    NONE = 0;
+    IMAGENET = 1;
+    COCO = 2;
+    SQUAD = 3;
+    ADE20K = 4;
+  }
+  required DatasetType type = 2;
+  // Path to the dataset.
+  required string path = 3;
+  // Path to download the ground truth file.
+  // Could be: http, https, or @assets/file (for files embedded in assets) or
+  // absolute path if the file is stored on the device. This file will be cached
+  // in the app's local directory. If you replace the src file without renaming,
+  // it is recommended to uninstall the app to reflect the update.
+  optional string groundtruth_src = 4;
+}
+
+// Config of a model.
+//
+// Next ID: 9
+message ModelConfig {
+  // Name of the model.
+  required string name = 1;
+  // Offset value of the model if applicable.
+  optional int32 offset = 2 [default = 0];
+  // Tags related to the models.
+  optional string tags = 3;
+  // Custom scenario string to configure custom LoadGen parameter in
+  // mlperf_driver.cc .
+  optional string scenario = 4 [default = "SingleStream"];
+  // Unique id of the model. Format: TaskID_ModelID;
+  required string id = 5;
+  // Max score of this benchmark.
+  optional float score_max = 6;
+  // The detailed description of this model.
+  optional string description = 7;
+  // Max Accuracy  of this benchmark.
+  optional float accuracy_max = 8;
+  // image width of the input if it is an image
+  optional int32 image_width = 9;
+  // image height of the input if it is an image
+  optional int32 image_height = 10;
+  // Number of detection classes if applicable
+  optional int32 num_classes = 11;
+}
