@@ -92,9 +92,9 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
 
   mlperf_settings.min_query_count = min_query_count;
   mlperf_settings.mode = Str2TestMode(mode);
-  mlperf_settings.qsl_rng_seed = 1624344308455410291UL;
-  mlperf_settings.sample_index_rng_seed = 517984244576520566UL;
-  mlperf_settings.schedule_rng_seed = 10051496985653635065UL;
+  mlperf_settings.qsl_rng_seed = 6655344265603136530UL;
+  mlperf_settings.sample_index_rng_seed = 15863379492028895792UL;
+  mlperf_settings.schedule_rng_seed = 12662793979680847247UL;
 
   if (scenario_ == "Offline") {
     mlperf_settings.scenario = ::mlperf::TestScenario::Offline;
