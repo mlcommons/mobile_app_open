@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:textColor="#7C8289"
-            android:text="Version 1.1.1"
+            android:text="Version 2.0.0"
             app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
         <TextView
