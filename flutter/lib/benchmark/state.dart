@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -9,6 +10,7 @@ import 'package:async/async.dart';
 import 'package:collection/collection.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -16,13 +18,17 @@ import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/benchmark/info.dart';
+import 'package:mlperfbench/benchmark/run_info.dart';
+import 'package:mlperfbench/data/environment_info.dart';
+import 'package:mlperfbench/data/export_result.dart';
+import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
-import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
+import 'run_mode.dart';
 
 enum BenchmarkStateEnum {
   downloading,
@@ -51,6 +57,8 @@ class BenchmarkState extends ChangeNotifier {
   // Only if [state] == [BenchmarkStateEnum.running]
   Benchmark? currentlyRunning;
   String runningProgress = '';
+  String currentResultUuid = '';
+  ExtendedResult? lastResult;
 
   num get result {
     final benchmarksCount = benchmarks
@@ -133,6 +141,13 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<bool> _handlePreviousResult() async {
     if (_doneRunning == null) {
+      try {
+        lastResult = ExtendedResult.fromJson(
+            jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
+      } catch (e, trace) {
+        print('unable to restore previous extended result: $e');
+        print(trace);
+      }
       return resourceManager.resultManager
           .restoreResults(_store.previousResult, benchmarks);
     } else {
@@ -193,6 +208,7 @@ class BenchmarkState extends ChangeNotifier {
     assert(resourceManager.done, 'Resource manager is not done.');
     assert(_doneRunning == null, '_doneRunning is not null');
     _doneRunning = false;
+    currentResultUuid = '';
 
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
@@ -207,7 +223,7 @@ class BenchmarkState extends ChangeNotifier {
 
     var doneCounter = 0.0;
     var doneMultiplier = _store.submissionMode ? 0.5 : 1.0;
-    final results = <RunInfo>[];
+    final exportResults = <ExportResult>[];
     var first = true;
 
     for (final benchmark in activeBenchmarks) {
@@ -232,13 +248,13 @@ class BenchmarkState extends ChangeNotifier {
       _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
       doneCounter++;
 
-      results.add(performanceResult);
       benchmark.performanceModeResult = BenchmarkResult(
           throughput: performanceResult.result.throughput,
           accuracy: performanceResult.result.accuracy,
           backendName: performanceResult.result.backendName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
+      exportResults.add(ExportResult.fromRunInfo(performanceResult));
 
       if (_aborting) break;
       if (!_store.submissionMode) continue;
@@ -248,19 +264,29 @@ class BenchmarkState extends ChangeNotifier {
       _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
       doneCounter++;
 
-      results.add(accuracyResult);
-      benchmark.performanceModeResult = BenchmarkResult(
+      benchmark.accuracyModeResult = BenchmarkResult(
           throughput: accuracyResult.result.throughput,
           accuracy: accuracyResult.result.accuracy,
           backendName: accuracyResult.result.backendName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
+      exportResults.add(ExportResult.fromRunInfo(accuracyResult));
     }
 
     if (!_aborting) {
-      await resourceManager.resultManager.writeResults(results);
+      lastResult = ExtendedResult(
+        uuid: Uuid().v4(),
+        envInfo: await EnvironmentInfo.currentDevice,
+        results: ExportResultList(exportResults),
+      );
+      _store.previousExtendedResult =
+          JsonEncoder().convert(lastResult!.toJson());
+      await resourceManager.resultManager.writeResults(lastResult!.results);
+
       _store.previousResult = resourceManager.resultManager
           .serializeBriefResults(activeBenchmarks.toList());
+
+      currentResultUuid = Uuid().v4();
     }
 
     currentlyRunning = null;

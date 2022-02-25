@@ -88,6 +88,13 @@ class Store extends ChangeNotifier {
     await _storeFromDisk.remove(_StoreConstants.previous_result);
   }
 
+  String get previousExtendedResult =>
+      _getString(_StoreConstants.previous_extended_result);
+
+  set previousExtendedResult(String result) {
+    _storeFromDisk.setString(_StoreConstants.previous_extended_result, result);
+  }
+
   bool isShareOptionChosen() =>
       _storeFromDisk.containsKey(_StoreConstants.share);
 
@@ -108,5 +115,6 @@ class _StoreConstants {
   static const cooldown_pause = 'cooldown pause';
   static const chosen_configuration_name = 'chosen configuration name';
   static const previous_result = 'previous result';
+  static const previous_extended_result = 'previous extended result';
   static const previous_app_version = 'previous app version';
 }
