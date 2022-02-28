@@ -4,7 +4,7 @@ import 'environment_info.dart';
 class ExtendedResult {
   static const String _tagUuid = 'uuid';
   static const String _tagResultJson = 'results';
-  static const String _tagEnvInfo = 'appVersion';
+  static const String _tagEnvInfo = 'envInfo';
 
   final String uuid;
   final ExportResultList results;
