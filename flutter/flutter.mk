@@ -42,6 +42,19 @@ flutter/set-supported-backends:
 		-e "s/SAMSUNG_TAG/${backend_samsung_filename}/" \
 		> flutter/lib/backend/list.gen.dart
 
+FIREBASE_CONFIG_ENV_PATH?=flutter/lib/firebase/config.env
+.PHONY: flutter/generate-firebase-config
+flutter/generate-firebase-config:
+	. ${FIREBASE_CONFIG_ENV_PATH} && \
+		cat flutter/lib/firebase/config.in | sed \
+		-e "s/FIREBASE_FLUTTER_CONFIG_API_KEY/$$FIREBASE_FLUTTER_CONFIG_API_KEY/" \
+		-e "s/FIREBASE_FLUTTER_CONFIG_PROJECT_ID/$$FIREBASE_FLUTTER_CONFIG_PROJECT_ID/" \
+		-e "s/FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID/$$FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID/" \
+		-e "s/FIREBASE_FLUTTER_CONFIG_APP_ID/$$FIREBASE_FLUTTER_CONFIG_APP_ID/" \
+		-e "s/FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID/$$FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID/" \
+		-e "s/FIREBASE_FLUTTER_FUNCTIONS_URL/$$FIREBASE_FLUTTER_FUNCTIONS_URL/" \
+		> flutter/lib/firebase/config.gen.dart
+
 .PHONY: flutter/protobuf
 flutter/protobuf:
 	cd flutter && ${_start_args} dart pub get

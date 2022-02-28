@@ -4,10 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Icons;
 import 'package:flutter/services.dart';
 
+import 'package:firebase_dart_flutter/firebase_dart_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/firebase/manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/main_screen.dart';
@@ -32,8 +34,10 @@ Future<void> main() async {
 
 Future<void> launchUi() async {
   await initDeviceInfo();
+  await FirebaseDartFlutter.setup();
+  final firebaseManager = await FirebaseManager.create();
   final store = await Store.create();
-  final benchmarkState = await BenchmarkState.create(store);
+  final benchmarkState = await BenchmarkState.create(store, firebaseManager);
 
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));

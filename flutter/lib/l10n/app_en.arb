@@ -48,6 +48,7 @@
   "benchmarksConfiguration": "Benchmarks configuration path",
   "benchmarksConfigurationTitle": "Benchmarks configuration",
   "errorDialogTitle": "Errors",
+  "successDialogTitle": "Success",
   "incorrectDatasetsPath": "Selected datasets directory does not contain files for following benchmarks:",
   "ok": "Ok",
   "waitBenchmarks": "Wait for benchmark to finish",
@@ -73,6 +74,9 @@
   "luInfoDescription": "Question Answering finds the  best answer to an input question based on a body of text. The reference model, MobileBERT, is evaluated on the Stanford Question Answering Dataset (SQUAD) v1.1 Dev and achieves an F1-score of 90.0.\n\nMobileBERT is a thin, mobile-optimized version of the larger BERT (BERT_LARGE) network, equipped with bottleneck structures and a carefully designed balance between self-attensions and feed-forward networks. Like BERT, it is task-agnostic, applicable for a variety of downstream NLP tasks, but for MLPerf we use the variant fine-tuned for Q&A.",
   "clearCache": "Clear cache",
   "confirmClearCache": "All loaded resources will be deleted and downloaded again. Continue?",
-  "confirmDialogTitle": "Confirm?"
+  "confirmDialogTitle": "Confirm?",
+  "uploadButton": "Upload results",
+  "uploadSuccess": "Results uploaded successfully",
+  "uploadFail": "Error uploading results"
 }
 

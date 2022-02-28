@@ -353,6 +353,29 @@ class _ResultScreenState extends State<ResultScreen>
               ),
             )
           : Container(),
+      store.share
+          ? Padding(
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: TextButton(
+                onPressed: () async {
+                  try {
+                    await state.testUpload();
+                    await showSuccessDialog(
+                        context, [stringResources.uploadSuccess]);
+                  } catch (e) {
+                    await showErrorDialog(
+                        context, [stringResources.uploadFail, e.toString()]);
+                    return;
+                  }
+                },
+                child: Text(stringResources.uploadButton,
+                    style: TextStyle(
+                      color: AppColors.shareTextButton,
+                      fontSize: 18,
+                    )),
+              ),
+            )
+          : Container(),
     ]);
 
     String title;
