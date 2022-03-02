@@ -41,7 +41,6 @@ dependencies:
   package_info_plus: ^1.0.6
   share_plus: ^2.2.0
   firebase_dart: ^1.0.4
-  firebase_dart_flutter: ^1.0.0
 
 dev_dependencies:
   flutter_test:
