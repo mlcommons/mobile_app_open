@@ -2,9 +2,9 @@
 .PHONY: format
 ifeq (${OS},Windows_NT)
 # format/java is not supported on Windows
-format: format/bazel format/clang format/dart format/line-endings format/markdown
+format: format/bazel format/clang format/line-endings format/markdown
 else
-format: format/bazel format/clang format/java format/dart format/line-endings format/markdown
+format: format/bazel format/clang format/java format/line-endings format/markdown
 endif
 
 .PHONY: format/bazel
@@ -19,11 +19,6 @@ format/clang:
 format/java:
 	git ls-files -z | grep --null-data "\.java$$" | xargs --null --no-run-if-empty java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace
 
-.PHONY: format/dart
-format/dart:
-	cd flutter && ${_start_args} dart run import_sorter:main
-	dart format flutter/lib flutter/integration_test flutter/test_driver
-
 .PHONY: format/line-endings
 format/line-endings:
 	git ls-files -z | xargs --null ${_start_args} dos2unix --keep-bom --
@@ -33,16 +28,11 @@ format/markdown:
 	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml --fix --ignore 'LICENSE.md'
 
 .PHONY: lint
-lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files
+lint: lint/bazel lint/prohibited-extensions lint/big-files
 
 .PHONY: lint/bazel
 lint/bazel:
 	buildifier -lint=warn -r .
-
-.PHONY: lint/dart
-lint/dart:
-	make flutter/prepare
-	dart analyze flutter
 
 .PHONY: lint/yaml
 lint/yaml:
@@ -84,8 +74,6 @@ output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	docker build --progress=plain \
 		--build-arg UID=`id -u` --build-arg GID=`id -g` \
 		-t mlperf/formatter tools/formatter
-	# need to clean flutter cache first else we will have error when running `dart run import_sorter:main` later in docker
-	cd flutter && ${_start_args} flutter clean
 	touch $@
 
 .PHONY: docker/format
