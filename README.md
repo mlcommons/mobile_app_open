@@ -2,8 +2,11 @@
 
 **Important Note**:
 
-This branch `android-v2` is used to maintain the legacy version of the MLPerf™ Mobile App, which is a native Android app.
-The MLPerf™ Mobile App is now further developed as a Flutter app, which is maintained in the main branch `master`.
+This branch `android-v2` is used to maintain the legacy version of the MLPerf™ Mobile App, 
+which is a native Android app.
+
+The MLPerf™ Mobile App is now further developed as a Flutter app, 
+which is maintained in the main branch `master`.
 
 ---
 
@@ -54,7 +57,6 @@ frameworks contributed by the broader MLPerf community.
 ## Folder Structure
 
 * android - Contains the Android version of the app
-* flutter - Contains the Flutter (cross-platform) version of the app
 * mobile_back_qti - QTI backend for Android
 * mobile_back_samsung - Samsung backend for Android
 * mobile_back_pixel - Google Pixel backend for Android
