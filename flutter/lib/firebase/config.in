@@ -1,5 +1,5 @@
 class FirebaseConfig {
-  static const enabled = FIREBASE_FLUTTER_ENABLE;
+  static const enable = FIREBASE_FLUTTER_ENABLE;
   static const connectionConfig = {
     'apiKey': 'FIREBASE_FLUTTER_CONFIG_API_KEY',
     'projectId': 'FIREBASE_FLUTTER_CONFIG_PROJECT_ID',

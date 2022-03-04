@@ -43,7 +43,7 @@ enum BenchmarkStateEnum {
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
   final BridgeIsolate backendBridge;
-  final FirebaseManager firebaseManager;
+  final FirebaseManager? firebaseManager;
 
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
@@ -91,7 +91,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> testUpload() async {
-    await firebaseManager.restHelper.upload(lastResult!);
+    await firebaseManager!.restHelper.upload(lastResult!);
   }
 
   Future<String> validateExternalResourcesDirectory(
@@ -164,7 +164,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   static Future<BenchmarkState> create(
-      Store store, FirebaseManager firebaseManager) async {
+      Store store, FirebaseManager? firebaseManager) async {
     final result =
         BenchmarkState._(store, await BridgeIsolate.create(), firebaseManager);
 

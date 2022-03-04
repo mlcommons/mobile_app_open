@@ -1,4 +1,5 @@
 import 'package:firebase_dart/firebase_dart.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:mlperfbench/firebase/rest_helper.dart';
 import 'config.gen.dart';
@@ -12,7 +13,19 @@ class FirebaseManager {
   FirebaseManager._(this.app, this.auth, this.userInfo)
       : restHelper = RestHelper(userInfo);
 
-  static Future<FirebaseManager> create() async {
+  static Future<void> staticInit() async {
+    if (!FirebaseConfig.enable) {
+      return;
+    }
+    final firebaseDataDir = (await getApplicationDocumentsDirectory()).path;
+    FirebaseDart.setup(isolated: true, storagePath: firebaseDataDir);
+  }
+
+  static Future<FirebaseManager?> create() async {
+    if (!FirebaseConfig.enable) {
+      return null;
+    }
+
     final app = await Firebase.initializeApp(
         options: FirebaseOptions.fromMap(FirebaseConfig.connectionConfig));
     final auth = FirebaseAuth.instanceFor(app: app);

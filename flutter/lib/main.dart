@@ -4,8 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Icons;
 import 'package:flutter/services.dart';
 
-import 'package:firebase_dart/firebase_dart.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -35,8 +33,7 @@ Future<void> main() async {
 
 Future<void> launchUi() async {
   await initDeviceInfo();
-  final firebaseDataDir = (await getApplicationDocumentsDirectory()).path;
-  FirebaseDart.setup(isolated: true, storagePath: firebaseDataDir);
+  await FirebaseManager.staticInit();
   final firebaseManager = await FirebaseManager.create();
   final store = await Store.create();
   final benchmarkState = await BenchmarkState.create(store, firebaseManager);
