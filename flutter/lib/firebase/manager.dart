@@ -14,7 +14,7 @@ class FirebaseManager {
 
   static Future<FirebaseManager> create() async {
     final app = await Firebase.initializeApp(
-        options: FirebaseOptions.fromMap(firebaseConfig));
+        options: FirebaseOptions.fromMap(FirebaseConfig.connectionConfig));
     final auth = FirebaseAuth.instanceFor(app: app);
     var userInfo = await auth.signInAnonymously();
     // await auth.signOut();

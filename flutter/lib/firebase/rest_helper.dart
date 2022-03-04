@@ -16,7 +16,7 @@ class RestHelper {
     const path = '/v0/upload';
     final jsonResult = result.toJson();
     var response =
-        await http.post(Uri.parse('$firebaseFunctionsUrl$path'),
+        await http.post(Uri.parse('${FirebaseConfig.functionsUrl}$path'),
             headers: {
               'Authorization': '${await userInfo.user!.getIdToken()}',
             },

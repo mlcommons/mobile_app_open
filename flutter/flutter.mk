@@ -41,19 +41,30 @@ flutter/set-supported-backends:
 		-e "s/QTI_TAG/${backend_qti_filename}/" \
 		-e "s/SAMSUNG_TAG/${backend_samsung_filename}/" \
 		> flutter/lib/backend/list.gen.dart
+	dart format flutter/lib/backend/list.gen.dart
 
-FIREBASE_CONFIG_ENV_PATH?=flutter/lib/firebase/config.env
+ifeq (${FIREBASE_CONFIG_ENV_PATH},)
+FIREBASE_CONFIG_ENV_PATH=output/flutter/empty.sh
+FIREBASE_FLUTTER_ENABLE=false
+$(shell touch ${FIREBASE_CONFIG_ENV_PATH})
+$(shell chmod +x ${FIREBASE_CONFIG_ENV_PATH})
+else
+FIREBASE_FLUTTER_ENABLE=true
+endif
 .PHONY: flutter/generate-firebase-config
 flutter/generate-firebase-config:
+	echo ${FIREBASE_CONFIG_ENV_PATH}
 	. ${FIREBASE_CONFIG_ENV_PATH} && \
 		cat flutter/lib/firebase/config.in | sed \
-		-e "s/FIREBASE_FLUTTER_CONFIG_API_KEY/$$FIREBASE_FLUTTER_CONFIG_API_KEY/" \
-		-e "s/FIREBASE_FLUTTER_CONFIG_PROJECT_ID/$$FIREBASE_FLUTTER_CONFIG_PROJECT_ID/" \
-		-e "s/FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID/$$FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID/" \
-		-e "s/FIREBASE_FLUTTER_CONFIG_APP_ID/$$FIREBASE_FLUTTER_CONFIG_APP_ID/" \
-		-e "s/FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID/$$FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID/" \
-		-e "s/FIREBASE_FLUTTER_FUNCTIONS_URL/$$FIREBASE_FLUTTER_FUNCTIONS_URL/" \
+		-e "s,FIREBASE_FLUTTER_ENABLE,${FIREBASE_FLUTTER_ENABLE}," \
+		-e "s,FIREBASE_FLUTTER_CONFIG_API_KEY,$$FIREBASE_FLUTTER_CONFIG_API_KEY," \
+		-e "s,FIREBASE_FLUTTER_CONFIG_PROJECT_ID,$$FIREBASE_FLUTTER_CONFIG_PROJECT_ID," \
+		-e "s,FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID,$$FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID," \
+		-e "s,FIREBASE_FLUTTER_CONFIG_APP_ID,$$FIREBASE_FLUTTER_CONFIG_APP_ID," \
+		-e "s,FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID,$$FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID," \
+		-e "s,FIREBASE_FLUTTER_FUNCTIONS_URL,$$FIREBASE_FLUTTER_FUNCTIONS_URL," \
 		> flutter/lib/firebase/config.gen.dart
+	dart format flutter/lib/firebase/config.gen.dart
 
 .PHONY: flutter/generate-result-schema
 flutter/generate-result-schema:
