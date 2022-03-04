@@ -16,12 +16,14 @@
 
 all: android/app
 
-# avaiable backends
-WITH_TFLITE?=1
+# Available backends. App will crash if phone and backend do not match.
 WITH_QTI?=0
 WITH_SAMSUNG?=0
 WITH_PIXEL?=0
 WITH_MEDIATEK?=0
+
+# TFLite backend will work with any phones.
+WITH_TFLITE?=0
 
 include tools/common.mk
 include tools/formatter/format.mk
