@@ -17,8 +17,8 @@ class FirebaseManager {
         options: FirebaseOptions.fromMap(firebaseConfig));
     final auth = FirebaseAuth.instanceFor(app: app);
     var userInfo = await auth.signInAnonymously();
-    await auth.signOut();
-    userInfo = await auth.signInAnonymously();
+    // await auth.signOut();
+    // userInfo = await auth.signInAnonymously();
 
     print('name: ${userInfo.user!.displayName}');
     print('uid: ' + userInfo.user!.uid);

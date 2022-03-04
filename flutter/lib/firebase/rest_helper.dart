@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io' show File, HttpStatus;
+import 'dart:io' show HttpStatus;
 
 import 'package:firebase_dart/firebase_dart.dart';
 import 'package:http/http.dart' as http;
@@ -13,19 +13,17 @@ class RestHelper {
   RestHelper(this.userInfo);
 
   Future<void> upload(ExtendedResult result) async {
+    const path = '/v0/upload';
     final jsonResult = result.toJson();
     var response =
-        await http.post(Uri.parse('http://$firebaseFunctionsUrl/upload'),
+        await http.post(Uri.parse('$firebaseFunctionsUrl$path'),
             headers: {
-              'Content-Type': 'application/json',
               'Authorization': '${await userInfo.user!.getIdToken()}',
             },
             body: JsonEncoder().convert(jsonResult));
 
-    // await File('Z:/test.json').writeAsString(JsonEncoder().convert(jsonResult));
-
     if (response.statusCode != HttpStatus.ok) {
-      throw 'result uploading error: ${response.statusCode}';
+      throw 'result uploading error: ${response.statusCode}: ${response.body}';
     }
   }
 }
