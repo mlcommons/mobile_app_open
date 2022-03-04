@@ -19,9 +19,9 @@ import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
-import 'package:mlperfbench/data/environment_info.dart';
 import 'package:mlperfbench/data/export_result.dart';
 import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/firebase/manager.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';
@@ -282,7 +282,7 @@ class BenchmarkState extends ChangeNotifier {
     if (!_aborting) {
       lastResult = ExtendedResult(
         uuid: Uuid().v4(),
-        envInfo: await EnvironmentInfo.currentDevice,
+        envInfo: await DeviceInfo.environmentInfo,
         results: ExportResultList(exportResults),
       );
       _store.previousExtendedResult =

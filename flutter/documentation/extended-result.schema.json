@@ -1,0 +1,138 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$ref": "#/definitions/ExtendedResultSchema",
+    "definitions": {
+        "ExtendedResultSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "uuid": {
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Result"
+                    }
+                },
+                "envInfo": {
+                    "$ref": "#/definitions/EnvInfo"
+                }
+            },
+            "required": [
+                "envInfo",
+                "results",
+                "uuid"
+            ],
+            "title": "ExtendedResultSchema"
+        },
+        "EnvInfo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "manufacturer": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "os": {
+                    "type": "string"
+                },
+                "osVersion": {
+                    "type": "string"
+                },
+                "appVersion": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "appVersion",
+                "manufacturer",
+                "model",
+                "os",
+                "osVersion"
+            ],
+            "title": "EnvInfo"
+        },
+        "Result": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "configuration": {
+                    "$ref": "#/definitions/Configuration"
+                },
+                "throughput": {
+                    "type": "string"
+                },
+                "accuracy": {
+                    "type": "string"
+                },
+                "min_duration": {
+                    "type": "string",
+                    "format": "integer"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "min_samples": {
+                    "type": "string",
+                    "format": "integer"
+                },
+                "num_samples": {
+                    "type": "string",
+                    "format": "integer"
+                },
+                "shards_num": {
+                    "type": "integer"
+                },
+                "batch_size": {
+                    "type": "integer"
+                },
+                "mode": {
+                    "type": "string"
+                },
+                "datetime": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "backendDescription": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "accuracy",
+                "backendDescription",
+                "batch_size",
+                "configuration",
+                "datetime",
+                "duration",
+                "id",
+                "min_duration",
+                "min_samples",
+                "mode",
+                "num_samples",
+                "shards_num",
+                "throughput"
+            ],
+            "title": "Result"
+        },
+        "Configuration": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "runtime": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "runtime"
+            ],
+            "title": "Configuration"
+        }
+    }
+}

@@ -55,6 +55,12 @@ flutter/generate-firebase-config:
 		-e "s/FIREBASE_FLUTTER_FUNCTIONS_URL/$$FIREBASE_FLUTTER_FUNCTIONS_URL/" \
 		> flutter/lib/firebase/config.gen.dart
 
+.PHONY: flutter/generate-result-schema
+flutter/generate-result-schema:
+	cd flutter && ${_start_args} dart run --define=jsonFileName=../output/extended-result-example.json lib/data/json_generator_main.dart
+	quicktype output/extended-result-example.json --out flutter/documentation/extended-result.schema.json --lang schema
+	quicktype --src-lang schema flutter/documentation/extended-result.schema.json --lang ts --top-level ExtendedResult --out firebase_functions/functions/src/extended-result.gen.ts
+
 .PHONY: flutter/protobuf
 flutter/protobuf:
 	cd flutter && ${_start_args} dart pub get

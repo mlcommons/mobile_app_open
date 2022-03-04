@@ -1,5 +1,5 @@
-import 'package:mlperfbench/data/export_result.dart';
 import 'environment_info.dart';
+import 'export_result.dart';
 
 class ExtendedResult {
   static const String _tagUuid = 'uuid';
