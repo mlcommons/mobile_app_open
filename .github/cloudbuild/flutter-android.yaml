@@ -69,7 +69,7 @@ steps:
     args:
       - -xc
       - |
-        make flutter/android/test_apk || exit $?
+        make flutter/android/test_apk WITH_TFLITE=1 || exit $?
         mkdir -p /workspace/output/artifacts || exit $?
         cp /workspace/flutter/build/app/outputs/flutter-apk/app-release.apk /workspace/output/artifacts/mlperf_app_release.apk || exit $?
         cp /workspace/flutter/build/app/outputs/apk/debug/app-debug.apk /workspace/output/artifacts/mlperf_app_test_main.apk || exit $?
