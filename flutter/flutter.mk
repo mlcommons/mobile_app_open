@@ -44,16 +44,18 @@ flutter/set-supported-backends:
 	dart format flutter/lib/backend/list.gen.dart
 
 ifeq (${FIREBASE_CONFIG_ENV_PATH},)
+$(info FIREBASE_CONFIG_ENV_PATH is empty)
 FIREBASE_CONFIG_ENV_PATH=output/flutter/empty.sh
 FIREBASE_FLUTTER_ENABLE=false
+$(shell mkdir -p output/flutter)
 $(shell touch ${FIREBASE_CONFIG_ENV_PATH})
 $(shell chmod +x ${FIREBASE_CONFIG_ENV_PATH})
 else
+$(info using firebase: FIREBASE_CONFIG_ENV_PATH=${FIREBASE_CONFIG_ENV_PATH})
 FIREBASE_FLUTTER_ENABLE=true
 endif
 .PHONY: flutter/generate-firebase-config
 flutter/generate-firebase-config:
-	echo ${FIREBASE_CONFIG_ENV_PATH}
 	. ${FIREBASE_CONFIG_ENV_PATH} && \
 		cat flutter/lib/firebase/config.in | sed \
 		-e "s,FIREBASE_FLUTTER_ENABLE,${FIREBASE_FLUTTER_ENABLE}," \
