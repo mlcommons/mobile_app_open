@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 
-export function auth(firebaseAuth: admin.auth.Auth): (request: Request, response: Response, next: NextFunction) => void {
+export function auth(firebaseAuth: admin.auth.Auth): (request: Request, response: Response, next: NextFunction) => Promise<void> {
     return async (request: Request, response: Response, next: NextFunction) => {
         try {
             const token = request.headers['authorization'];

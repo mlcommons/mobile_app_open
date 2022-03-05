@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { Convert } from './extended-result.gen';
 
-export function upload(db: FirebaseFirestore.Firestore): (request: Request, response: Response, next: NextFunction) => void {
+export function upload(db: FirebaseFirestore.Firestore): (request: Request, response: Response, next: NextFunction) => Promise<void> {
   return async (request: Request, response: Response, next: NextFunction) => {
     try {
       let parsed = Convert.toExtendedResult(request.body);
