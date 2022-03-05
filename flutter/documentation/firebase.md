@@ -2,7 +2,7 @@
 
 This app supports uploading benchmark results into an online database. The database and related services are backed by Firebase.
 
-This page describes what you need to build the app with result uploading functionality and how to develop the sevrer side for result uploading.
+This page describes what you need to build the app with result uploading functionality and how to develop the server side for result uploading.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ You need to have access to a Firebase project with Authentication, Firestore and
     Here is an example with fake values:
 
     ```bash
-    FIREBASE_FLUTTER_CONFIG_API_KEY=y40nbPVMXCovcDVJlmqUnBKYAzOSLWZSnu4rPby
+    FIREBASE_FLUTTER_CONFIG_API_KEY=y40nbPVMXCovcDV-lmqUnBKYAzOSLWZSnu4rPby
     FIREBASE_FLUTTER_CONFIG_PROJECT_ID=my-project-123456
     FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID=123456789012
     FIREBASE_FLUTTER_CONFIG_APP_ID=1:123456789012:web:jvfplnzhknjirxgzxoxvqu
@@ -36,12 +36,14 @@ You need to have access to a Firebase project with Authentication, Firestore and
 
     If you want to use the Firebase emulator, set `FIREBASE_FLUTTER_FUNCTIONS_URL` to the following value instead:
     `localhost:5001/<appId>/us-central1`.
-    5001 is the default port for Firebase Functions at the moment os writing this, adjust the port if you use a custom port of the default has changed.
+    5001 is the default port for Firebase Functions at the moment of writing this, adjust the port if you use a custom port or the default has changed.
+
 4. Run `make flutter/generate-firebase-config` or `make flutter/prepare` in the repository root.
-You must set `FIREBASE_CONFIG_ENV_PATH` when running this command.
-You can set it permanently as an environment variable, or you can set it for current `make` command only.
-For example: `make flutter/generate-firebase-config FIREBASE_CONFIG_ENV_PATH=flutter/google.env`
-5. Build the app, it should be able to connect to your Firebase project
+    You must set `FIREBASE_CONFIG_ENV_PATH` when running this command.
+    You can set it permanently as an environment variable, or you can set it for current `make` command only.
+    For example: `make flutter/generate-firebase-config FIREBASE_CONFIG_ENV_PATH=flutter/google.env`
+
+5. Build the app, it should be able to connect to your Firebase project.
 
 Right now Firebase Auth emulator is not supported in this app. Authentication is always done via the real Google servers.
 
@@ -50,13 +52,13 @@ Right now Firebase Auth emulator is not supported in this app. Authentication is
 Flutter app is used as a source for structure of JSON data in requests to Firebase Functions.
 Whenever you change any of the data classes, you should re-generate JSON schema and JSON parser for Functions.
 
-For this you need Quicktype instaled: `npm install -g quicktype`
+For this you need Quicktype installed: `npm install -g quicktype`
 
 To generate schema and parser run the following command: `make flutter/generate-result-schema`
 
 ## Developing Firebase Functions
 
-All `firebase` and `npm` commands should be run unside `firebase_functions/functions` directory.
+All `firebase` and `npm` commands should be run inside `firebase_functions/functions` directory.
 
 One time setup:
 
