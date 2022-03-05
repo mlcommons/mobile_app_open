@@ -7,7 +7,6 @@ export function upload(db: FirebaseFirestore.Firestore): (request: Request, resp
   return async (request: Request, response: Response, next: NextFunction) => {
     try {
       let parsed = Convert.toExtendedResult(request.body);
-      console.log(parsed);
       let docRef = db.doc(`v0/${ parsed.uuid }`);
       await docRef.set(parsed);
       response.status(StatusCodes.OK).send(ReasonPhrases.OK);
