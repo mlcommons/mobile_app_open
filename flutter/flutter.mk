@@ -95,7 +95,7 @@ flutter/generate-localizations:
 		--no-synthetic-package
 
 .PHONY: flutter/prepare
-flutter/prepare: flutter/set-supported-backends flutter/protobuf flutter/generate-localizations
+flutter/prepare: flutter/set-supported-backends flutter/protobuf flutter/generate-localizations flutter/generate-firebase-config
 
 .PHONY: flutter/clean
 flutter/clean:
