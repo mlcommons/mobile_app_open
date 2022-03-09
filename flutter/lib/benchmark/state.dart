@@ -90,7 +90,7 @@ class BenchmarkState extends ChangeNotifier {
     backendInfo = BackendInfo.findMatching();
   }
 
-  Future<void> testUpload() async {
+  Future<void> uploadLastResult() async {
     await firebaseManager!.restHelper.upload(lastResult!);
   }
 

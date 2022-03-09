@@ -15,6 +15,9 @@ class RestHelper {
   Future<void> upload(ExtendedResult result) async {
     const path = '/v0/upload';
     final jsonResult = result.toJson();
+    if (userInfo.user == null) {
+      throw 'Firebase Authentication issue';
+    }
     var response =
         await http.post(Uri.parse('${FirebaseConfig.functionsUrl}$path'),
             headers: {

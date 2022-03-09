@@ -360,7 +360,7 @@ class _ResultScreenState extends State<ResultScreen>
               child: TextButton(
                 onPressed: () async {
                   try {
-                    await state.testUpload();
+                    await state.uploadLastResult();
                     await showSuccessDialog(
                         context, [stringResources.uploadSuccess]);
                   } catch (e) {

@@ -5,6 +5,8 @@ import 'package:mlperfbench/firebase/rest_helper.dart';
 import 'config.gen.dart';
 
 class FirebaseManager {
+  static late final FirebaseManager _defaultInstance;
+
   final FirebaseApp app;
   final FirebaseAuth auth;
   final UserCredential userInfo;
@@ -19,24 +21,26 @@ class FirebaseManager {
     }
     final firebaseDataDir = (await getApplicationDocumentsDirectory()).path;
     FirebaseDart.setup(isolated: true, storagePath: firebaseDataDir);
+    _defaultInstance = await _create();
   }
 
-  static Future<FirebaseManager?> create() async {
-    if (!FirebaseConfig.enable) {
-      return null;
-    }
-
+  static Future<FirebaseManager> _create({String? name}) async {
     final app = await Firebase.initializeApp(
+        name: name,
         options: FirebaseOptions.fromMap(FirebaseConfig.connectionConfig));
     final auth = FirebaseAuth.instanceFor(app: app);
     var userInfo = await auth.signInAnonymously();
-    // await auth.signOut();
-    // userInfo = await auth.signInAnonymously();
 
-    print('name: ${userInfo.user!.displayName}');
-    print('uid: ' + userInfo.user!.uid);
-    print('uid: ' + await userInfo.user!.getIdToken());
+    print(
+        'logged into firebase: name=${userInfo.user!.displayName}, uid=${userInfo.user!.uid}');
 
     return FirebaseManager._(app, auth, userInfo);
+  }
+
+  static FirebaseManager? get instance {
+    if (!FirebaseConfig.enable) {
+      return null;
+    }
+    return _defaultInstance;
   }
 }
