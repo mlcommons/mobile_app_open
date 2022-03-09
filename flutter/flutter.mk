@@ -41,6 +41,37 @@ flutter/set-supported-backends:
 		-e "s/QTI_TAG/${backend_qti_filename}/" \
 		-e "s/SAMSUNG_TAG/${backend_samsung_filename}/" \
 		> flutter/lib/backend/list.gen.dart
+	dart format flutter/lib/backend/list.gen.dart
+
+ifeq (${FIREBASE_CONFIG_ENV_PATH},)
+FIREBASE_CONFIG_ENV_PATH=output/flutter/empty.sh
+FIREBASE_FLUTTER_ENABLE=false
+$(shell mkdir -p output/flutter)
+$(shell touch ${FIREBASE_CONFIG_ENV_PATH})
+$(shell chmod +x ${FIREBASE_CONFIG_ENV_PATH})
+else
+FIREBASE_FLUTTER_ENABLE=true
+endif
+.PHONY: flutter/generate-firebase-config
+flutter/generate-firebase-config:
+	@echo using firebase config: FIREBASE_CONFIG_ENV_PATH=${FIREBASE_CONFIG_ENV_PATH}
+	. ${FIREBASE_CONFIG_ENV_PATH} && \
+		cat flutter/lib/firebase/config.in | sed \
+		-e "s,FIREBASE_FLUTTER_ENABLE,${FIREBASE_FLUTTER_ENABLE}," \
+		-e "s,FIREBASE_FLUTTER_CONFIG_API_KEY,$$FIREBASE_FLUTTER_CONFIG_API_KEY," \
+		-e "s,FIREBASE_FLUTTER_CONFIG_PROJECT_ID,$$FIREBASE_FLUTTER_CONFIG_PROJECT_ID," \
+		-e "s,FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID,$$FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID," \
+		-e "s,FIREBASE_FLUTTER_CONFIG_APP_ID,$$FIREBASE_FLUTTER_CONFIG_APP_ID," \
+		-e "s,FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID,$$FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID," \
+		-e "s,FIREBASE_FLUTTER_FUNCTIONS_URL,$$FIREBASE_FLUTTER_FUNCTIONS_URL," \
+		> flutter/lib/firebase/config.gen.dart
+	dart format flutter/lib/firebase/config.gen.dart
+
+.PHONY: flutter/generate-result-schema
+flutter/generate-result-schema:
+	cd flutter && ${_start_args} dart run --define=jsonFileName=../output/extended-result-example.json lib/data/json_generator_main.dart
+	quicktype output/extended-result-example.json --out flutter/documentation/extended-result.schema.json --lang schema
+	quicktype --src-lang schema flutter/documentation/extended-result.schema.json --lang ts --top-level ExtendedResult --out firebase_functions/functions/src/extended-result.gen.ts
 
 .PHONY: flutter/protobuf
 flutter/protobuf:
@@ -65,7 +96,7 @@ flutter/generate-localizations:
 		--no-synthetic-package
 
 .PHONY: flutter/prepare
-flutter/prepare: flutter/set-supported-backends flutter/protobuf flutter/generate-localizations
+flutter/prepare: flutter/set-supported-backends flutter/protobuf flutter/generate-localizations flutter/generate-firebase-config
 
 .PHONY: flutter/clean
 flutter/clean:

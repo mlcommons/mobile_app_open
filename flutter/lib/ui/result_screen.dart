@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/firebase/config.gen.dart';
 import 'package:mlperfbench/icons.dart' as app_icons;
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
@@ -346,6 +347,29 @@ class _ResultScreenState extends State<ResultScreen>
                   );
                 },
                 child: Text(stringResources.shareResults,
+                    style: TextStyle(
+                      color: AppColors.shareTextButton,
+                      fontSize: 18,
+                    )),
+              ),
+            )
+          : Container(),
+      store.share && FirebaseConfig.enable
+          ? Padding(
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: TextButton(
+                onPressed: () async {
+                  try {
+                    await state.uploadLastResult();
+                    await showSuccessDialog(
+                        context, [stringResources.uploadSuccess]);
+                  } catch (e) {
+                    await showErrorDialog(
+                        context, [stringResources.uploadFail, e.toString()]);
+                    return;
+                  }
+                },
+                child: Text(stringResources.uploadButton,
                     style: TextStyle(
                       color: AppColors.shareTextButton,
                       fontSize: 18,

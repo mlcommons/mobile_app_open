@@ -4,11 +4,24 @@ import 'package:flutter/services.dart';
 
 import 'package:device_info/device_info.dart';
 import 'package:ios_utsname_ext/extension.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
+import 'package:mlperfbench/data/environment_info.dart';
 
 class DeviceInfo {
   static late final String nativeLibraryPath;
   static late final String model;
   static late final String manufacturer;
+
+  static Future<EnvironmentInfo> get environmentInfo async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    return EnvironmentInfo(
+        appVersion: packageInfo.version + '+' + packageInfo.buildNumber,
+        manufacturer: DeviceInfo.manufacturer,
+        model: DeviceInfo.model,
+        os: Platform.operatingSystem,
+        osVersion: Platform.operatingSystemVersion);
+  }
 }
 
 Future<void> initDeviceInfo() async {

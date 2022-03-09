@@ -1,9 +1,3 @@
-import 'dart:io';
-
-import 'package:package_info_plus/package_info_plus.dart';
-
-import 'package:mlperfbench/device_info.dart';
-
 class EnvironmentInfo {
   static const String _tagManufacturer = 'manufacturer';
   static const String _tagModel = 'model';
@@ -23,16 +17,6 @@ class EnvironmentInfo {
       required this.os,
       required this.osVersion,
       required this.appVersion});
-
-  static Future<EnvironmentInfo> get currentDevice async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    return EnvironmentInfo(
-        appVersion: packageInfo.version + '+' + packageInfo.buildNumber,
-        manufacturer: DeviceInfo.manufacturer,
-        model: DeviceInfo.model,
-        os: Platform.operatingSystem,
-        osVersion: Platform.operatingSystemVersion);
-  }
 
   EnvironmentInfo.fromJson(Map<String, dynamic> json)
       : this(

@@ -19,9 +19,10 @@ import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
-import 'package:mlperfbench/data/environment_info.dart';
 import 'package:mlperfbench/data/export_result.dart';
 import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/device_info.dart';
+import 'package:mlperfbench/firebase/manager.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
@@ -42,6 +43,7 @@ enum BenchmarkStateEnum {
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
   final BridgeIsolate backendBridge;
+  final FirebaseManager? firebaseManager;
 
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
@@ -57,7 +59,6 @@ class BenchmarkState extends ChangeNotifier {
   // Only if [state] == [BenchmarkStateEnum.running]
   Benchmark? currentlyRunning;
   String runningProgress = '';
-  String currentResultUuid = '';
   ExtendedResult? lastResult;
 
   num get result {
@@ -84,9 +85,13 @@ class BenchmarkState extends ChangeNotifier {
 
   late BenchmarkList _middle;
 
-  BenchmarkState._(this._store, this.backendBridge) {
+  BenchmarkState._(this._store, this.backendBridge, this.firebaseManager) {
     resourceManager = ResourceManager(notifyListeners);
     backendInfo = BackendInfo.findMatching();
+  }
+
+  Future<void> uploadLastResult() async {
+    await firebaseManager!.restHelper.upload(lastResult!);
   }
 
   Future<String> validateExternalResourcesDirectory(
@@ -158,8 +163,10 @@ class BenchmarkState extends ChangeNotifier {
     return false;
   }
 
-  static Future<BenchmarkState> create(Store store) async {
-    final result = BenchmarkState._(store, await BridgeIsolate.create());
+  static Future<BenchmarkState> create(
+      Store store, FirebaseManager? firebaseManager) async {
+    final result =
+        BenchmarkState._(store, await BridgeIsolate.create(), firebaseManager);
 
     await result.resourceManager.initSystemPaths();
     result.configManager = ConfigManager(
@@ -208,7 +215,6 @@ class BenchmarkState extends ChangeNotifier {
     assert(resourceManager.done, 'Resource manager is not done.');
     assert(_doneRunning == null, '_doneRunning is not null');
     _doneRunning = false;
-    currentResultUuid = '';
 
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
@@ -276,7 +282,7 @@ class BenchmarkState extends ChangeNotifier {
     if (!_aborting) {
       lastResult = ExtendedResult(
         uuid: Uuid().v4(),
-        envInfo: await EnvironmentInfo.currentDevice,
+        envInfo: await DeviceInfo.environmentInfo,
         results: ExportResultList(exportResults),
       );
       _store.previousExtendedResult =
@@ -285,8 +291,6 @@ class BenchmarkState extends ChangeNotifier {
 
       _store.previousResult = resourceManager.resultManager
           .serializeBriefResults(activeBenchmarks.toList());
-
-      currentResultUuid = Uuid().v4();
     }
 
     currentlyRunning = null;
