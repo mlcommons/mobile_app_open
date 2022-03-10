@@ -78,9 +78,9 @@ flutter/protobuf:
 	cd flutter && ${_start_args} dart pub get
 	rm -rf flutter/lib/protos
 	mkdir -p flutter/lib/protos
-	protoc --proto_path android/cpp/proto \
+	protoc --proto_path flutter/cpp/proto \
 		--dart_out flutter/lib/protos \
-		android/cpp/proto/*.proto
+		flutter/cpp/proto/*.proto
 
 .PHONY: flutter/update-splash-screen
 flutter/update-splash-screen:

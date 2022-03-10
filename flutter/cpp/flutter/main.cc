@@ -6,15 +6,15 @@
 #include <iostream>
 #include <mutex>
 
-#include "android/cpp/backends/external.h"
-#include "android/cpp/c/backend_c.h"
-#include "android/cpp/datasets/ade20k.h"
-#include "android/cpp/datasets/coco.h"
-#include "android/cpp/datasets/imagenet.h"
-#include "android/cpp/datasets/squad.h"
-#include "android/cpp/mlperf_driver.h"
-#include "android/cpp/proto/backend_setting.pb.h"
-#include "android/cpp/proto/mlperf_task.pb.h"
+#include "flutter/cpp/backends/external.h"
+#include "flutter/cpp/c/backend_c.h"
+#include "flutter/cpp/datasets/ade20k.h"
+#include "flutter/cpp/datasets/coco.h"
+#include "flutter/cpp/datasets/imagenet.h"
+#include "flutter/cpp/datasets/squad.h"
+#include "flutter/cpp/mlperf_driver.h"
+#include "flutter/cpp/proto/backend_setting.pb.h"
+#include "flutter/cpp/proto/mlperf_task.pb.h"
 
 // On iOS we link backend statically and don't export any functions
 // Linker sees that we don't use some of the functions and removes them

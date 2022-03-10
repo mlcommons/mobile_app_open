@@ -2,8 +2,8 @@
 
 #include <cstring>
 
-#include "android/cpp/backends/external.h"
-#include "android/cpp/proto/mlperf_task.pb.h"
+#include "flutter/cpp/backends/external.h"
+#include "flutter/cpp/proto/mlperf_task.pb.h"
 #include "main.h"
 
 // The main purpose of this function

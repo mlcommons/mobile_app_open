@@ -18,3 +18,4 @@
 __pycache__/
 mobile_app_open.iml
 *.log
+*.iml

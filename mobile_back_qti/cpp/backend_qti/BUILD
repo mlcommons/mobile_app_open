@@ -95,7 +95,7 @@ cc_library(
     }),
     copts = tflite_copts() + snpe_copts,
     deps = [
-        "//android/cpp/c:headers",
+        "//flutter/cpp/c:headers",
         ":qti_allocator",
     ] + select({
         "android_arm64": [
@@ -111,7 +111,7 @@ cc_library(
 
 tflite_jni_binary(
     name = "libqtibackend.so",
-    linkscript = "//android/cpp/c:version_script.lds",
+    linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [
         ":qti_c",
     ],
@@ -129,7 +129,7 @@ cc_binary(
     deps = [] + select({
         "android_arm64": [
             ":libqtibackend.so",
-            "//android/cpp/c:headers",
+            "//flutter/cpp/c:headers",
             "@org_tensorflow//tensorflow/lite:shared_library",
         ],
     }),

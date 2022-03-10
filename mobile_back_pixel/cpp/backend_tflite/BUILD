@@ -60,7 +60,7 @@ cc_library(
     }),
     deps = [
         ":resize_bilinear_op",
-        "//android/cpp/c:headers",
+        "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/lite/c:c_api",
         "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
         "@org_tensorflow//tensorflow/lite/c:common",
@@ -76,8 +76,8 @@ cc_library(
 
 tflite_jni_binary(
     name = "libtflitepixelbackend.so",
-    exported_symbols = "//android/cpp/c:exported_symbols.lds",
-    linkscript = "//android/cpp/c:version_script.lds",
+    exported_symbols = "//flutter/cpp/c:exported_symbols.lds",
+    linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [
         ":tflite_pixel",
     ],
