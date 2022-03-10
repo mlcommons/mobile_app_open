@@ -34,9 +34,8 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
 
   if (result->error_message != nullptr) {
     result->matches = false;
-    LOG(ERROR)
-        << "Backend generally matches but can't work on this specific device: "
-        << result->error_message;
+    LOG(ERROR) << "Device is recognized but not supported: "
+               << result->error_message;
     return result;
   }
 
