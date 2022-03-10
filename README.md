@@ -67,7 +67,7 @@ frameworks contributed by the broader MLPerf community.
 * [mobile_app_open/flutter/cpp/datasets](https://github.com/mlcommons/mobile_app_open/tree/master/flutter/cpp/datasets):
   Instruction and scripts to create dataset for this MLPerf Mobile App.
 
-## Notes:
+## Notes
 
 The MLPerf™ Mobile App is now further developed as a Flutter app,
 which is maintained in the main branch `master`.
