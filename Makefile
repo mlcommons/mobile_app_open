@@ -14,7 +14,7 @@
 ##########################################################################
 
 
-all: android/app
+all: flutter
 
 # avaiable backends
 WITH_TFLITE?=1
@@ -32,7 +32,6 @@ include mobile_back_qti/make/qti_backend.mk
 include mobile_back_qti/make/qti_backend_targets.mk
 include mobile_back_pixel/pixel_backend.mk
 
-include android/android.mk
 include flutter/flutter.mk
 
 .PHONY: clean

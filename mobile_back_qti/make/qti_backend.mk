@@ -26,7 +26,7 @@ ifeq (${WITH_QTI},1)
   $(info detected SNPE SDK: ${local_snpe_sdk_root})
   backend_qti_android_files= \
     ${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
-    ${BAZEL_LINKS_PREFIX}bin/android/commonlibs/lib_arm64/libc++_shared.so \
+    ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so \
     ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libSNPE.so \
     ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libhta.so \
     ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v2.so \
@@ -35,6 +35,6 @@ ifeq (${WITH_QTI},1)
     ${local_snpe_sdk_root}/lib/dsp/libsnpe_dsp_v68_domains_v3_skel.so
   backend_qti_android_target= \
     //mobile_back_qti/cpp/backend_qti:libqtibackend.so \
-    //android/commonlibs:commonlibs
+    //flutter/android/commonlibs:commonlibs
   backend_qti_filename=libqtibackend
 endif

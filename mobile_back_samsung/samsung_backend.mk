@@ -23,7 +23,7 @@ ifeq (${WITH_SAMSUNG},1)
   $(info MOBILE_BACK_SAMSUNG_LIB_ROOT=${MOBILE_BACK_SAMSUNG_LIB_ROOT})
   backend_samsung_docker_args=-v "${MOBILE_BACK_SAMSUNG_LIB_ROOT}:/mnt/samsung_backend" --env MOBILE_BACK_SAMSUNG_LIB_ROOT=/mnt/samsung_backend
   backend_samsung_android_files= \
-    ${BAZEL_LINKS_PREFIX}bin/android/commonlibs/lib_arm64/libc++_shared.so \
+    ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libsamsungbackend.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_model.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_profiler.so \
@@ -46,6 +46,6 @@ ifeq (${WITH_SAMSUNG},1)
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libprocessgroup.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libvendor_samsung_slsi_hardware_gpu_boost.so
   # main binaries for Samsung backend are prebuilt
-  backend_samsung_android_target=//android/commonlibs:commonlibs
+  backend_samsung_android_target=//flutter/android/commonlibs:commonlibs
   backend_samsung_filename=libsamsungbackend
 endif

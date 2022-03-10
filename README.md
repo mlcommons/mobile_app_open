@@ -8,6 +8,7 @@ This project contains the MLPerf mobile app, an app-based implementation of
 * [Overview](#overview)
 * [Folder Structure](#folder-structure)
 * [Related Repositories](#related-repositories)
+* [Notes](#notes)
 
 ## Overview
 
@@ -46,7 +47,6 @@ frameworks contributed by the broader MLPerf community.
 
 ## Folder Structure
 
-* android - Contains the Android version of the app (now deprecated)
 * flutter - Contains the Flutter (cross-platform) version of the app
 * mobile_back_qti - QTI backend for Android
 * mobile_back_samsung - Samsung backend for Android
@@ -64,6 +64,13 @@ frameworks contributed by the broader MLPerf community.
 * [mobile_submission_1.1](https://github.com/mlcommons/mobile_submission_1.1): MLPerf Mobile inference v1.1 results.
 * [mobile_datasets](https://github.com/mlcommons/mobile_datasets): Scripts to create performance-only test sets for
   MLPerf Mobile
-* [mobile_app_open/android/cpp/datasets](https://github.com/mlcommons/mobile_app_open/tree/master/android/cpp/datasets):
+* [mobile_app_open/flutter/cpp/datasets](https://github.com/mlcommons/mobile_app_open/tree/master/flutter/cpp/datasets):
   Instruction and scripts to create dataset for this MLPerf Mobile App.
-  
+
+## Notes:
+
+The MLPerf™ Mobile App is now further developed as a Flutter app,
+which is maintained in the main branch `master`.
+
+The branch `android-v2` is used to maintain the legacy version of the MLPerf™ Mobile App,
+which is a native Android app.
