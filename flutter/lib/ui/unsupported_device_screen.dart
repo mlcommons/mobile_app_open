@@ -16,16 +16,6 @@ class UnsupportedDeviceScreen extends StatelessWidget {
     final stringResources = AppLocalizations.of(context);
 
     final iconEdgeSize = MediaQuery.of(context).size.width * 0.66;
-    final minimumShareButtonWidth = MediaQuery.of(context).size.width - 60;
-
-    // final shareButtonStyle = ButtonStyle(
-    //     backgroundColor:
-    //         MaterialStateProperty.all<Color>(AppColors.shareRectangle),
-    //     shape: MaterialStateProperty.all(RoundedRectangleBorder(
-    //         borderRadius: BorderRadius.circular(14.0),
-    //         side: BorderSide(color: Colors.white))),
-    //     minimumSize:
-    //         MaterialStateProperty.all<Size>(Size(minimumShareButtonWidth, 0)));
 
     return Scaffold(
       body: getSinglePageView(
