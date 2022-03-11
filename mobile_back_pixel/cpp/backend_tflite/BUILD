@@ -50,7 +50,7 @@ cc_library(
         "thread_pool.h",
     ],
     copts = tflite_copts() + select({
-        "//android/commonlibs:use_asan": [
+        "//flutter/android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",

@@ -25,7 +25,7 @@ common_linkopts = tflite_linkopts() + select({
         "-pie",
     ],
 }) + select({
-    "//android/commonlibs:use_asan": [
+    "//flutter/android/commonlibs:use_asan": [
         "-fsanitize=address",
         "-g",
         "-O1",
@@ -38,7 +38,7 @@ cc_binary(
     name = "main",
     srcs = ["main.cc"],
     copts = tflite_copts() + select({
-        "//android/commonlibs:use_asan": [
+        "//flutter/android/commonlibs:use_asan": [
             "-fsanitize=address",
             "-g",
             "-O1",

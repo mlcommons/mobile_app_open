@@ -102,7 +102,7 @@ new_local_repository(
 
 http_archive(
     name = "org_mlperf_inference",
-    build_file = "@//android/third_party:loadgen.BUILD",
+    build_file = "@//flutter/android/third_party:loadgen.BUILD",
     patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
     sha256 = "f4c57a3f3cd71f2dac166a79ad760b824aafda7b91400889acff4a9c7dbdaf8e",
     strip_prefix = "inference-a77ac37d07145d9f3123465a8fd18f9ebbde5d6a",
