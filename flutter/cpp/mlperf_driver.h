@@ -68,7 +68,6 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
       return 0.0f;
     }
     if (scenario_ == "Offline") {
-      //      return 1000.0 / (1000.0 * GetNumSamples() / GetDurationMs());
       return GetDurationMs() / GetNumSamples();
     }
     std::sort(latencies_ns_.begin(), latencies_ns_.end());
