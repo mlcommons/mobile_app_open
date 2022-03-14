@@ -68,7 +68,8 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
       return 0.0f;
     }
     if (scenario_ == "Offline") {
-      return 1000.0f * GetNumSamples() / GetDurationMs();
+      //      return 1000.0 / (1000.0 * GetNumSamples() / GetDurationMs());
+      return GetDurationMs() / GetNumSamples();
     }
     std::sort(latencies_ns_.begin(), latencies_ns_.end());
     return static_cast<float>(latencies_ns_[latencies_ns_.size() * 0.9]) / 1e6;
@@ -81,11 +82,7 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
     }
     std::stringstream stream;
     stream << std::fixed << std::setprecision(2) << ComputeLatency();
-    if (scenario_ == "Offline") {
-      stream << " qps";
-    } else {
-      stream << " ms";
-    }
+    stream << " ms";
     return stream.str();
   }
 
