@@ -26,6 +26,11 @@ const char* mlperf_backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
   return "snpe";
 }
 
+// TODO: Return the name of the accelerator.
+const char* mlperf_backend_accelerator_name(mlperf_backend_ptr_t backend_ptr) {
+  return "ACCELERATOR_NAME";
+}
+
 // Should return true if current hardware is supported.
 bool mlperf_backend_matches_hardware(const char** not_allowed_message,
                                      const char** settings,

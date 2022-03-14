@@ -84,6 +84,8 @@ class _ResultScreenState extends State<ResultScreen>
         continue;
       }
       final backendName = benchmark.performanceModeResult?.backendName ?? '';
+      final acceleratorName =
+          benchmark.performanceModeResult?.acceleratorName ?? '';
 
       var rowChildren = <Widget>[];
       rowChildren.add(Row(
@@ -92,7 +94,7 @@ class _ResultScreenState extends State<ResultScreen>
         children: [
           Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text(backendName)),
+              child: Text(backendName + ' | ' + acceleratorName)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

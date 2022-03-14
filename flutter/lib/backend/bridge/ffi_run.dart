@@ -83,6 +83,7 @@ class _RunOut extends Struct {
   @Float()
   external double duration_ms;
   external Pointer<Utf8> backend_name;
+  external Pointer<Utf8> accelerator_name;
 }
 
 const _runName = 'dart_ffi_run_benchmark';
@@ -117,6 +118,7 @@ RunResult runBenchmark(RunSettings rs) {
     numSamples: runOut.ref.num_samples,
     durationMs: runOut.ref.duration_ms,
     backendName: runOut.ref.backend_name.toDartString(),
+    acceleratorName: runOut.ref.accelerator_name.toDartString(),
   );
 
   _free(runOut);

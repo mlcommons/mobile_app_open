@@ -92,6 +92,7 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   li;
 
   char* backend_name = strdup(backend->Name().c_str());
+  char* accelerator_name = strdup(backend->AcceleratorName().c_str());
 
   ::std::unique_ptr<::mlperf::mobile::Dataset> dataset;
   switch (in->dataset_type) {
@@ -155,6 +156,7 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   out->num_samples = driver.GetNumSamples();
   out->duration_ms = driver.GetDurationMs();
   out->backend_name = backend_name;
+  out->accelerator_name = accelerator_name;
   li;
 
   return out;
@@ -163,5 +165,6 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out* out) {
   free(out->accuracy);
   free(out->backend_name);
+  free(out->accelerator_name);
   delete out;
 }

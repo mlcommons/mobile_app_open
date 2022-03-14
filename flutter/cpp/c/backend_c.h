@@ -36,6 +36,9 @@ mlperf_backend_ptr_t mlperf_backend_create(
 // Vendor name who create this backend.
 const char* mlperf_backend_vendor_name(mlperf_backend_ptr_t backend_ptr);
 
+// Return the name of the accelerator.
+const char* mlperf_backend_accelerator_name(mlperf_backend_ptr_t backend_ptr);
+
 // Return the name of this backend.
 const char* mlperf_backend_name(mlperf_backend_ptr_t backend_ptr);
 

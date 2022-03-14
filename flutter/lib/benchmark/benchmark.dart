@@ -15,6 +15,7 @@ class BenchmarkResult {
   final double throughput;
   final String accuracy;
   final String backendName;
+  final String acceleratorName;
   final int batchSize;
   final int threadsNumber;
 
@@ -22,6 +23,7 @@ class BenchmarkResult {
       {required this.throughput,
       required String accuracy,
       required this.backendName,
+      required this.acceleratorName,
       required this.batchSize,
       required this.threadsNumber})
       : accuracy = _replaceAccuracy(accuracy);
@@ -62,6 +64,7 @@ class BenchmarkResult {
   static const _tagThroughput = 'throughput';
   static const _tagAccuracy = 'accuracy';
   static const _tagBackendName = 'backend_name';
+  static const _tagAcceleratorName = 'accelerator_name';
   static const _tagBatchSize = 'batch_size';
   static const _tagThreadsNumber = 'threads_number';
 
@@ -71,6 +74,7 @@ class BenchmarkResult {
         throughput: json[_tagThroughput] as double,
         accuracy: json[_tagAccuracy] as String,
         backendName: json[_tagBackendName] as String,
+        acceleratorName: json[_tagAcceleratorName] as String,
         batchSize: json[_tagBatchSize] as int,
         threadsNumber: json[_tagThreadsNumber] as int);
   }
@@ -79,6 +83,7 @@ class BenchmarkResult {
         _tagThroughput: throughput,
         _tagAccuracy: accuracy,
         _tagBackendName: backendName,
+        _tagAcceleratorName: acceleratorName,
         _tagBatchSize: batchSize,
         _tagThreadsNumber: threadsNumber,
       };

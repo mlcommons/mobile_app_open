@@ -1360,6 +1360,11 @@ const char* mlperf_backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
   return name;
 }
 
+// TODO: Return the name of the accelerator.
+const char* mlperf_backend_accelerator_name(mlperf_backend_ptr_t backend_ptr) {
+  return "ACCELERATOR_NAME";
+}
+
 const char* mlperf_backend_name(mlperf_backend_ptr_t backend_ptr) {
   static const char name[] = "samsung";
   return name;
