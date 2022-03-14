@@ -7,11 +7,13 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/firebase/manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/main_screen.dart';
+import 'package:mlperfbench/ui/unsupported_device_screen.dart';
 import 'device_info.dart';
 
 // TODO sharing screen temporarily disabled
@@ -24,6 +26,10 @@ Future<void> main() async {
 
   try {
     await launchUi();
+  } on UnsupportedDeviceException catch (e) {
+    runApp(MyApp(UnsupportedDeviceScreen(
+      backendError: e.backendError,
+    )));
   } catch (e, s) {
     print('Exception: $e');
     print('Exception stack: $s');
@@ -53,7 +59,7 @@ Future<void> launchUi() async {
         ChangeNotifierProvider.value(value: benchmarkState),
         ChangeNotifierProvider.value(value: store)
       ],
-      child: MyApp(),
+      child: MyApp(MyHomePage()),
     ),
   );
 }
@@ -76,6 +82,10 @@ void autostartHandler(BenchmarkState state, Store store) async {
 }
 
 class MyApp extends StatelessWidget {
+  final Widget home;
+
+  MyApp(this.home);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -115,7 +125,7 @@ class MyApp extends StatelessWidget {
       ),
       // TODO sharing screen temporarily disabled
       // home: store.isShareOptionChosen() ? MyHomePage() : ShareScreen(),
-      home: MyHomePage(),
+      home: home,
     );
   }
 }

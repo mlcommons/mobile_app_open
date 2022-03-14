@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
+import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'handle.dart';
@@ -37,16 +38,20 @@ pb.BackendSetting? backendMatch(String libPath) {
   malloc.free(modelUtf8);
 
   if (runOut.address == 0) {
-    return null;
-  }
-  if (runOut.ref.matches == 0) {
-    return null;
-  }
-  if (runOut.ref.pbdata.address == 0) {
-    throw '$_runName result: pbdata: nullptr';
+    throw '$_runName result: nullptr';
   }
 
   try {
+    if (runOut.ref.error_message.address != 0) {
+      throw UnsupportedDeviceException(runOut.ref.error_message.toDartString());
+    }
+    if (runOut.ref.matches == 0) {
+      return null;
+    }
+    if (runOut.ref.pbdata.address == 0) {
+      throw '$_runName result: pbdata: nullptr';
+    }
+
     final view = runOut.ref.pbdata.asTypedList(runOut.ref.pbdata_size);
     return pb.BackendSetting.fromBuffer(view);
   } finally {
