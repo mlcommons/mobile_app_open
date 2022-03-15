@@ -16,10 +16,10 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
     ],
-    sha256 = "40d3203ab5f246d83bae328288a24209a2b85794f1b3e2cd0329458d8e7c1985",
-    strip_prefix = "tensorflow-2.6.0",
+    sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
+    strip_prefix = "tensorflow-2.8.0",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.6.0.zip",
+        "https://github.com/tensorflow/tensorflow/archive/v2.8.0.zip",
     ],
 )
 
