@@ -31,5 +31,5 @@ endif
 
 # We define default value here, but user can overwrite it.
 # Particularly, we have to overwrite it when building inside Windows container
-BAZEL_LINKS_PREFIX?=bazel-
-bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_PREFIX} --experimental_no_product_name_out_symlink
+BAZEL_LINKS_PREFIX=bazel-
+bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_PREFIX}
