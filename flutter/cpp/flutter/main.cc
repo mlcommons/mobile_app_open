@@ -141,16 +141,7 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   auto out = new dart_ffi_run_benchmark_out;
   out->ok = 1;
-
-  // TODO (anhappdev): Refactor the C++ code so that ComputeLatency() only
-  // report duration in ms and not QPS (but after moving `android/cpp` out of
-  // `android` folder). See
-  // https://github.com/mlcommons/mobile_app_open/issues/237
-  if (std::string{in->scenario} == "Offline") {
-    out->latency = 1000.0 / driver.ComputeLatency();
-  } else {
-    out->latency = driver.ComputeLatency();
-  }
+  out->latency = driver.ComputeLatency();
   out->accuracy = strdup(driver.ComputeAccuracyString().c_str());
   out->num_samples = driver.GetNumSamples();
   out->duration_ms = driver.GetDurationMs();
