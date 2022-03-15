@@ -21,6 +21,7 @@ Future<void> main() async {
     accuracy: 'N/A',
     throughput: '123.45',
     backendName: 'backend',
+    acceleratorName: 'accelerator',
     minDuration: '10',
     duration: '123.456',
     minSamples: '8',

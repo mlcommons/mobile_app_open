@@ -38,6 +38,9 @@ class Backend {
   // A human-readable string for logging purposes.
   virtual const std::string& Name() const = 0;
 
+  // Accelerator name.
+  virtual const std::string& AcceleratorName() const = 0;
+
   // Run inference for a sample. Inputs is already set by SetInputs.
   virtual void IssueQuery() = 0;
 

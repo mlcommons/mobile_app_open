@@ -2,6 +2,7 @@ EXPORTS
     mlperf_backend_matches_hardware
     mlperf_backend_create
     mlperf_backend_vendor_name
+    mlperf_backend_accelerator_name
     mlperf_backend_name
     mlperf_backend_delete
     mlperf_backend_issue_query

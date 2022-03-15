@@ -42,6 +42,8 @@ struct BackendFunctions {
       const char*, mlperf_backend_configuration_t*, const char*)>::type;
   using BackendNamePtr =
       std::add_pointer<const char*(mlperf_backend_ptr_t)>::type;
+  using AcceleratorNamePtr =
+      std::add_pointer<const char*(mlperf_backend_ptr_t)>::type;
   using BackendDeletePtr = std::add_pointer<void(mlperf_backend_ptr_t)>::type;
   using IssueQueryPtr =
       std::add_pointer<mlperf_status_t(mlperf_backend_ptr_t)>::type;
@@ -68,6 +70,7 @@ struct BackendFunctions {
   BackendMatchesPtr match{nullptr};
   BackendCreatePtr create{nullptr};
   BackendNamePtr name{nullptr};
+  AcceleratorNamePtr accelerator_name{nullptr};
   BackendDeletePtr destroy{nullptr};
 
   IssueQueryPtr issue_query{nullptr};
@@ -139,6 +142,11 @@ class ExternalBackend : public Backend {
   // A human-readable string for logging purposes.
   const std::string& Name() const override { return name_; }
 
+  // Accelerator name
+  const std::string& AcceleratorName() const override {
+    return accelerator_name_;
+  }
+
   // Run inference for a sample.
   void IssueQuery() override {
     if (backend_functions_.issue_query(backend_ptr_) != MLPERF_SUCCESS) {
@@ -198,6 +206,7 @@ class ExternalBackend : public Backend {
 
  private:
   std::string name_ = "External";
+  std::string accelerator_name_ = "Accelerator";
   std::string settings_;
   DataFormat input_format_;
   DataFormat output_format_;

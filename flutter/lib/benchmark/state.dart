@@ -258,6 +258,7 @@ class BenchmarkState extends ChangeNotifier {
           throughput: performanceResult.result.throughput,
           accuracy: performanceResult.result.accuracy,
           backendName: performanceResult.result.backendName,
+          acceleratorName: performanceResult.result.acceleratorName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
       exportResults.add(ExportResult.fromRunInfo(performanceResult));
@@ -274,6 +275,7 @@ class BenchmarkState extends ChangeNotifier {
           throughput: accuracyResult.result.throughput,
           accuracy: accuracyResult.result.accuracy,
           backendName: accuracyResult.result.backendName,
+          acceleratorName: accuracyResult.result.acceleratorName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
       exportResults.add(ExportResult.fromRunInfo(accuracyResult));

@@ -379,6 +379,11 @@ const char *mlperf_backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
   return backend_data->vendor;
 }
 
+// TODO: Return the name of the accelerator.
+const char *mlperf_backend_accelerator_name(mlperf_backend_ptr_t backend_ptr) {
+  return "ACCELERATOR_NAME";
+}
+
 // Return the name of this backend.
 const char *mlperf_backend_name(mlperf_backend_ptr_t backend_ptr) {
   TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;

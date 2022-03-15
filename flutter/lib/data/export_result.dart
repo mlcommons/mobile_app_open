@@ -15,9 +15,8 @@ class ExportResult {
   static const String _tagBatchSize = 'batch_size';
   static const String _tagMode = 'mode';
   static const String _tagDatetime = 'datetime';
-  // format of results.json should be stable,
-  // so we keep 'backendDescription' tag here
-  static const String _tagBackendName = 'backendDescription';
+  static const String _tagBackendName = 'backendName';
+  static const String _tagAcceleratorName = 'acceleratorName';
 
   final String id;
   final String throughput;
@@ -32,6 +31,7 @@ class ExportResult {
   final String mode;
   final String datetime;
   final String backendName;
+  final String acceleratorName;
 
   ExportResult(
       {required this.id,
@@ -45,7 +45,8 @@ class ExportResult {
       required this.batchSize,
       required this.mode,
       required this.datetime,
-      required this.backendName});
+      required this.backendName,
+      required this.acceleratorName});
 
   ExportResult.fromRunInfo(RunInfo info)
       : this(
@@ -64,7 +65,8 @@ class ExportResult {
             batchSize: info.settings.batch_size,
             mode: info.runMode.getResultModeString(),
             datetime: DateTime.now().toIso8601String(),
-            backendName: info.result.backendName);
+            backendName: info.result.backendName,
+            acceleratorName: info.result.acceleratorName);
 
   ExportResult.fromJson(Map<String, dynamic> json)
       : this(
@@ -79,7 +81,8 @@ class ExportResult {
             batchSize: json[_tagBatchSize] as int,
             mode: json[_tagMode] as String,
             datetime: json[_tagDatetime] as String,
-            backendName: json[_tagBackendName] as String);
+            backendName: json[_tagBackendName] as String,
+            acceleratorName: json[_tagAcceleratorName] as String);
 
   Map<String, dynamic> toJson() => {
         _tagId: id,
@@ -97,6 +100,7 @@ class ExportResult {
         _tagMode: mode,
         _tagDatetime: datetime,
         _tagBackendName: backendName,
+        _tagAcceleratorName: acceleratorName,
       };
 }
 
