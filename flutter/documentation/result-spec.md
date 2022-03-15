@@ -51,6 +51,16 @@ because each benchmark will generate a performance and an accuracy mode result.
   * `accelerator_desc`: string
   * `configuration`: string
   * `model_path`: string
+* `backend_extra_settings`: list of maps  
+  Extra settings that can vary between different benchmarks and backends.  
+  Here must be stored values set by backend in `common_setting`.  
+  `batch_size` value for offline benchmarks should be located here.  
+  `shards_num` value for TFLite backend should be located here.  
+  Map structure:
+  * `id`: string. Value from `setting.id` that is passed to backend
+  * `name`: string. Value from `setting.name` that is passed to backend
+  * `value`: string. Value from `setting.value.value` that is passed to backend
+  * `value_name`: string. Value from `setting.value.name` that is passed to backend
 * `throughput`: floating point number. Present for all results
 * `accuracy`: floating point number. Present for all results, including `loadgen_mode=PerformanceOnly` runs  
   When actual accuracy is not available value `-1` must be used
