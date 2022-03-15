@@ -30,10 +30,15 @@ because each benchmark will generate a performance and an accuracy mode result.
 * `benchmark_name`: string  
   Value from `task.model.name` for this benchmark from selected tasks.pbtxt file.
 * `loadgen_mode`: string enum  
-  See [`::mlperf::TestSettings::mode`](https://github.com/mlcommons/inference/blob/08f5e36b74f4ec78ad738a287ae50462bb130330/loadgen/test_settings.h#L84).  
+  See [`::mlperf::TestSettings`](https://github.com/mlcommons/inference/blob/08f5e36b74f4ec78ad738a287ae50462bb130330/loadgen/test_settings.h#L84).  
   Allowed values:
-  * `AccuracyOnly`
-  * `PerformanceOnly`
+  * `accuracy_only`
+  * `performance_only`
+* `loadgen_scenario`: string enum  
+  See [`::mlperf::TestScenario`](https://github.com/mlcommons/inference/blob/a67f9f34bcc4439af4740095958c23380f9b284b/loadgen/test_settings.h#L38).  
+  Allowed values:
+  * `single_stream`
+  * `offline`
 * `dataset`: map  
   Dataset info for this benchmark from selected tasks.pbtxt file.
   * `name`: string
@@ -88,7 +93,7 @@ Info about environment the app is running in. May change when you update your OS
   * `android`
   * `ios`
   * `windows`
-* `osVersion`: string  
+* `os_version`: string  
   Must be obtained from environment
 * `manufacturer`: string. Manufacturer of the device  
   On Windows systems value must be `Unknown`.  
@@ -111,7 +116,7 @@ Info about environment the app is running in. May change when you update your OS
 Constant info for this build of the app. The only way to change it is to use a different version of the app.
 
 * `version`: string
-* `buildNumber`: string
+* `build_number`: string
 * `official_release_flag`: bool  
   Indicates if the official release flag was set for this build
 * `dev_test_flag`: bool  
