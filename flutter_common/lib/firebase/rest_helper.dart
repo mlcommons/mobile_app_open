@@ -4,7 +4,7 @@ import 'dart:io' show HttpStatus;
 import 'package:firebase_dart/firebase_dart.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench_common/data/extended_result.dart';
 import 'config.gen.dart';
 
 class RestHelper {

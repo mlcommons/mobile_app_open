@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench_common/firebase/config.gen.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:share_plus/share_plus.dart';
@@ -8,7 +9,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/firebase/config.gen.dart';
 import 'package:mlperfbench/icons.dart' as app_icons;
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';

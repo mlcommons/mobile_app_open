@@ -4,12 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Icons;
 import 'package:flutter/services.dart';
 
+import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/firebase/manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/main_screen.dart';

@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:mlperfbench_common/data/export_result.dart';
+
 import 'package:mlperfbench/benchmark/benchmark.dart';
-import 'package:mlperfbench/data/export_result.dart';
 
 class _BriefResult {
   static const _tagId = 'benchmark_id';

@@ -56,7 +56,7 @@ endif
 flutter/generate-firebase-config:
 	@echo using firebase config: FIREBASE_CONFIG_ENV_PATH=${FIREBASE_CONFIG_ENV_PATH}
 	. ${FIREBASE_CONFIG_ENV_PATH} && \
-		cat flutter/lib/firebase/config.in | sed \
+		cat flutter_common/lib/firebase/config.in | sed \
 		-e "s,FIREBASE_FLUTTER_ENABLE,${FIREBASE_FLUTTER_ENABLE}," \
 		-e "s,FIREBASE_FLUTTER_CONFIG_API_KEY,$$FIREBASE_FLUTTER_CONFIG_API_KEY," \
 		-e "s,FIREBASE_FLUTTER_CONFIG_PROJECT_ID,$$FIREBASE_FLUTTER_CONFIG_PROJECT_ID," \
@@ -64,12 +64,12 @@ flutter/generate-firebase-config:
 		-e "s,FIREBASE_FLUTTER_CONFIG_APP_ID,$$FIREBASE_FLUTTER_CONFIG_APP_ID," \
 		-e "s,FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID,$$FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID," \
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_URL,$$FIREBASE_FLUTTER_FUNCTIONS_URL," \
-		> flutter/lib/firebase/config.gen.dart
-	dart format flutter/lib/firebase/config.gen.dart
+		> flutter_common/lib/firebase/config.gen.dart
+	dart format flutter_common/lib/firebase/config.gen.dart
 
 .PHONY: flutter/generate-result-schema
 flutter/generate-result-schema:
-	cd flutter && ${_start_args} dart run --define=jsonFileName=../output/extended-result-example.json lib/data/json_generator_main.dart
+	cd flutter_common && ${_start_args} dart run --define=jsonFileName=../output/extended-result-example.json lib/data/json_generator_main.dart
 	quicktype output/extended-result-example.json --out flutter/documentation/extended-result.schema.json --lang schema
 	quicktype --src-lang schema flutter/documentation/extended-result.schema.json --lang ts --top-level ExtendedResult --out firebase_functions/functions/src/extended-result.gen.ts
 
@@ -81,6 +81,7 @@ flutter/protobuf:
 	protoc --proto_path flutter/cpp/proto \
 		--dart_out flutter/lib/protos \
 		flutter/cpp/proto/*.proto
+	dart format flutter/lib/proto
 
 .PHONY: flutter/update-splash-screen
 flutter/update-splash-screen:
@@ -94,6 +95,7 @@ flutter/generate-localizations:
 		--template-arb-file=app_en.arb \
 		--output-localization-file=app_localizations.dart \
 		--no-synthetic-package
+	dart format flutter/lib/localizations
 
 .PHONY: flutter/prepare
 flutter/prepare: flutter/set-supported-backends flutter/protobuf flutter/generate-localizations flutter/generate-firebase-config
