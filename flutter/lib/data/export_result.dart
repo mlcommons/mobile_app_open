@@ -1,6 +1,3 @@
-import 'package:mlperfbench/benchmark/run_info.dart';
-import 'package:mlperfbench/benchmark/run_mode.dart';
-
 class ExportResult {
   static const String _tagId = 'id';
   static const String _tagConfiguration = 'configuration';
@@ -11,7 +8,7 @@ class ExportResult {
   static const String _tagDuration = 'duration';
   static const String _tagMinSamples = 'min_samples';
   static const String _tagNumSamples = 'num_samples';
-  static const String _tagSharsNum = 'shards_num';
+  static const String _tagShardsNum = 'shards_num';
   static const String _tagBatchSize = 'batch_size';
   static const String _tagMode = 'mode';
   static const String _tagDatetime = 'datetime';
@@ -48,26 +45,6 @@ class ExportResult {
       required this.backendName,
       required this.acceleratorName});
 
-  ExportResult.fromRunInfo(RunInfo info)
-      : this(
-            id: info.settings.benchmark_id,
-            throughput: info.runMode == BenchmarkRunMode.accuracy
-                ? 'N/A'
-                : info.result.throughput.toString(),
-            accuracy: info.runMode == BenchmarkRunMode.accuracy
-                ? info.result.accuracy
-                : 'N/A',
-            minDuration: info.settings.min_duration.toString(),
-            duration: info.result.durationMs.toString(),
-            minSamples: info.settings.min_query_count.toString(),
-            numSamples: info.result.numSamples.toString(),
-            shardsNum: info.settings.threads_number,
-            batchSize: info.settings.batch_size,
-            mode: info.runMode.getResultModeString(),
-            datetime: DateTime.now().toIso8601String(),
-            backendName: info.result.backendName,
-            acceleratorName: info.result.acceleratorName);
-
   ExportResult.fromJson(Map<String, dynamic> json)
       : this(
             id: json[_tagId] as String,
@@ -77,7 +54,7 @@ class ExportResult {
             duration: json[_tagDuration] as String,
             minSamples: json[_tagMinSamples] as String,
             numSamples: json[_tagNumSamples] as String,
-            shardsNum: json[_tagSharsNum] as int,
+            shardsNum: json[_tagShardsNum] as int,
             batchSize: json[_tagBatchSize] as int,
             mode: json[_tagMode] as String,
             datetime: json[_tagDatetime] as String,
@@ -95,7 +72,7 @@ class ExportResult {
         _tagDuration: duration,
         _tagMinSamples: minSamples,
         _tagNumSamples: numSamples,
-        _tagSharsNum: shardsNum,
+        _tagShardsNum: shardsNum,
         _tagBatchSize: batchSize,
         _tagMode: mode,
         _tagDatetime: datetime,

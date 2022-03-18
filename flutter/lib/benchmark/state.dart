@@ -261,7 +261,7 @@ class BenchmarkState extends ChangeNotifier {
           acceleratorName: performanceResult.result.acceleratorName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
-      exportResults.add(ExportResult.fromRunInfo(performanceResult));
+      exportResults.add(exportResultFromRunInfo(performanceResult));
 
       if (_aborting) break;
       if (!_store.submissionMode) continue;
@@ -278,7 +278,7 @@ class BenchmarkState extends ChangeNotifier {
           acceleratorName: accuracyResult.result.acceleratorName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
-      exportResults.add(ExportResult.fromRunInfo(accuracyResult));
+      exportResults.add(exportResultFromRunInfo(accuracyResult));
     }
 
     if (!_aborting) {
@@ -302,6 +302,25 @@ class BenchmarkState extends ChangeNotifier {
 
     await Wakelock.disable();
   }
+
+  static ExportResult exportResultFromRunInfo(RunInfo info) => ExportResult(
+      id: info.settings.benchmark_id,
+      throughput: info.runMode == BenchmarkRunMode.accuracy
+          ? 'N/A'
+          : info.result.throughput.toString(),
+      accuracy: info.runMode == BenchmarkRunMode.accuracy
+          ? info.result.accuracy
+          : 'N/A',
+      minDuration: info.settings.min_duration.toString(),
+      duration: info.result.durationMs.toString(),
+      minSamples: info.settings.min_query_count.toString(),
+      numSamples: info.result.numSamples.toString(),
+      shardsNum: info.settings.threads_number,
+      batchSize: info.settings.batch_size,
+      mode: info.runMode.getResultModeString(),
+      datetime: DateTime.now().toIso8601String(),
+      backendName: info.result.backendName,
+      acceleratorName: info.result.acceleratorName);
 
   Future<RunInfo> runBenchmark(Benchmark benchmark, bool accuracyMode,
       List<pb.Setting> commonSettings, String backendLibPath) async {
