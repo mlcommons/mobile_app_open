@@ -177,10 +177,11 @@ public final class RunMLPerfWorker implements Handler.Callback {
       result.setMode(data.mode);
       callback.onBenchmarkFinished(result);
 
-      //if (!backendName.contains("samsung")) {
       Log.i(TAG, "Build.HARDWARE " + Build.HARDWARE);
       if (!"exynos2100".equals(Build.HARDWARE)){
         driverWrapper.close();
+      } else {
+        Log.w(TAG, "WARNING exynos2100 is detected");
       }
     } catch (Exception e) {
       Log.e(TAG, "Running \"" + modelName + "\" failed with error: " + e.getMessage());
