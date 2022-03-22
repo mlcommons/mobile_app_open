@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 package org.mlperf.inference;
+import android.os.Build;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -176,7 +177,9 @@ public final class RunMLPerfWorker implements Handler.Callback {
       result.setMode(data.mode);
       callback.onBenchmarkFinished(result);
 
-      if (!backendName.contains("samsung")) {
+      //if (!backendName.contains("samsung")) {
+      Log.i(TAG, "Build.HARDWARE " + Build.HARDWARE);
+      if (!"exynos2100".equals(Build.HARDWARE)){
         driverWrapper.close();
       }
     } catch (Exception e) {
