@@ -284,6 +284,7 @@ class BenchmarkState extends ChangeNotifier {
     if (!_aborting) {
       lastResult = ExtendedResult(
         uuid: Uuid().v4(),
+        uploadDate: '',
         envInfo: await DeviceInfo.environmentInfo,
         results: ExportResultList(exportResults),
       );

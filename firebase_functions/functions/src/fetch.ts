@@ -1,0 +1,119 @@
+import { Request, Response, NextFunction } from 'express';
+import * as functions from 'firebase-functions';
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { Convert } from './extended-result.gen';
+
+function _makeBatchQuery(db: FirebaseFirestore.Firestore, pageSize: number): FirebaseFirestore.Query<FirebaseFirestore.DocumentData> {
+  return db.collection(`/v0/`).orderBy('uploadDate', 'desc').limit(pageSize);
+}
+
+export function fetchFirst(db: FirebaseFirestore.Firestore): (request: Request, response: Response, next: NextFunction) => Promise<void> {
+  return async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const pageSizeString = request.headers['page-size'];
+      if (typeof pageSizeString != 'string') {
+        throw 'page-size header is missing';
+      }
+      const pageSize = parseInt(pageSizeString);
+      console.log(`pageSize is ${pageSize}`);
+      
+      let snapshot = await _makeBatchQuery(db, pageSize).get();
+      let result = [];
+      for (const document of snapshot.docs) {
+        result.push(document.data());
+      }
+      console.log(result);
+      response.status(StatusCodes.OK).send(JSON.stringify(result));
+    } catch(e) {
+      functions.logger.info(e, {structuredData: true});
+      response.status(StatusCodes.BAD_REQUEST).send('invalid request: ' + e);
+      return;
+    }
+  }
+}
+
+export function fetchNext(db: FirebaseFirestore.Firestore): (request: Request, response: Response, next: NextFunction) => Promise<void> {
+  return async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const pageSizeString = request.headers['page-size'];
+      if (typeof pageSizeString != 'string') {
+        throw 'page-size header is missing';
+      }
+      const pageSize = parseInt(pageSizeString);
+      console.log(`pageSize is ${pageSize}`);
+      
+      const uuid = request.headers['uuid-cursor'];
+      if (typeof uuid != 'string') {
+        throw 'uuid-cursor header is missing';
+      }
+      
+      let cursorRef = db.doc(`v0/${ uuid }`);
+      const cursorSnapshot = await cursorRef.get();
+
+      let snapshot = await _makeBatchQuery(db, pageSize).startAfter(cursorSnapshot).get();
+      let result = [];
+      for (const document of snapshot.docs) {
+        result.push(document.data());
+      }
+      console.log(result);
+      response.status(StatusCodes.OK).send(JSON.stringify(result));
+    } catch(e) {
+      functions.logger.info(e, {structuredData: true});
+      response.status(StatusCodes.BAD_REQUEST).send('invalid request: ' + e);
+      return;
+    }
+  }
+}
+
+export function fetchPrev(db: FirebaseFirestore.Firestore): (request: Request, response: Response, next: NextFunction) => Promise<void> {
+  return async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const pageSizeString = request.headers['page-size'];
+      if (typeof pageSizeString != 'string') {
+        throw 'page-size header is missing';
+      }
+      const pageSize = parseInt(pageSizeString);
+      console.log(`pageSize is ${pageSize}`);
+      
+      const uuid = request.headers['uuid-cursor'];
+      if (typeof uuid != 'string') {
+        throw 'uuid-cursor header is missing';
+      }
+      
+      let cursorRef = db.doc(`v0/${ uuid }`);
+      const cursorSnapshot = await cursorRef.get();
+
+      let snapshot = await _makeBatchQuery(db, pageSize).startAfter(cursorSnapshot).get();
+      let result = [];
+      for (const document of snapshot.docs) {
+        result.push(document.data());
+      }
+      console.log(result);
+      response.status(StatusCodes.OK).send(JSON.stringify(result));
+    } catch(e) {
+      functions.logger.info(e, {structuredData: true});
+      response.status(StatusCodes.BAD_REQUEST).send('invalid request: ' + e);
+      return;
+    }
+  }
+}
+
+export function fetchId(db: FirebaseFirestore.Firestore): (request: Request, response: Response, next: NextFunction) => Promise<void> {
+  return async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const uuid = request.headers['uuid'];
+      if (typeof uuid != 'string') {
+        throw 'uuid header is missing';
+      }
+      
+      let docRef = db.doc(`v0/${ uuid }`);
+      const snapshot = await docRef.get();
+
+      response.status(StatusCodes.OK).send(JSON.stringify(snapshot.data()));
+    } catch(e) {
+      functions.logger.info(e, {structuredData: true});
+      response.status(StatusCodes.BAD_REQUEST).send('invalid request: ' + e);
+      return;
+    }
+  }
+}

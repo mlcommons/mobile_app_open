@@ -365,7 +365,9 @@ class _ResultScreenState extends State<ResultScreen>
                     await state.uploadLastResult();
                     await showSuccessDialog(
                         context, [stringResources.uploadSuccess]);
-                  } catch (e) {
+                  } catch (e, s) {
+                    print(e);
+                    print(s);
                     await showErrorDialog(
                         context, [stringResources.uploadFail, e.toString()]);
                     return;
