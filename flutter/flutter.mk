@@ -64,8 +64,13 @@ flutter/generate-firebase-config:
 		-e "s,FIREBASE_FLUTTER_CONFIG_APP_ID,$$FIREBASE_FLUTTER_CONFIG_APP_ID," \
 		-e "s,FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID,$$FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID," \
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_URL,$$FIREBASE_FLUTTER_FUNCTIONS_URL," \
+		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
 		> flutter_common/lib/firebase/config.gen.dart
 	dart format flutter_common/lib/firebase/config.gen.dart
+	. ${FIREBASE_CONFIG_ENV_PATH} && \
+		cat firebase_functions/functions/src/prefix.in | sed \
+		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
+		> firebase_functions/functions/src/prefix.gen.ts
 
 .PHONY: flutter/generate-result-schema
 flutter/generate-result-schema:

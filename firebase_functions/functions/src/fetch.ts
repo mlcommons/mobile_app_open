@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import * as functions from 'firebase-functions';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import { Convert } from './extended-result.gen';
+import { StatusCodes } from 'http-status-codes';
+import {currentPrefix} from './prefix.gen';
 
 function _makeBatchQuery(db: FirebaseFirestore.Firestore, pageSize: number): FirebaseFirestore.Query<FirebaseFirestore.DocumentData> {
-  return db.collection(`/v0/`).orderBy('uploadDate', 'desc').limit(pageSize);
+  return db.collection(`/${currentPrefix}/`).orderBy('uploadDate', 'desc').limit(pageSize);
 }
 
 export function fetchFirst(db: FirebaseFirestore.Firestore): (request: Request, response: Response, next: NextFunction) => Promise<void> {

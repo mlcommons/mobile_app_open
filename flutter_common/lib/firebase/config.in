@@ -8,4 +8,5 @@ class FirebaseConfig {
     'measurementId': 'FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID',
   };
   static const functionsUrl = 'FIREBASE_FLUTTER_FUNCTIONS_URL';
+  static const functionsPrefix = 'FIREBASE_FLUTTER_FUNCTIONS_PREFIX';
 }

@@ -4,9 +4,11 @@ admin.initializeApp();
 const db = admin.firestore();
 import * as cors from 'cors';
 
+import {currentPrefix} from './prefix.gen';
+
 import * as express from 'express';
 const app = express()
-export const v0 = functions.https.onRequest(app);
+exports[currentPrefix] = functions.https.onRequest(app);
 
 import {auth} from './auth';
 import {upload} from './upload';

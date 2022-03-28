@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as functions from 'firebase-functions';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { Convert } from './extended-result.gen';
+import {currentPrefix} from './prefix.gen';
 
 export function upload(db: FirebaseFirestore.Firestore): (request: Request, response: Response, next: NextFunction) => Promise<void> {
   return async (request: Request, response: Response, next: NextFunction) => {
@@ -11,7 +12,7 @@ export function upload(db: FirebaseFirestore.Firestore): (request: Request, resp
         throw 'uploadDate must be empty';
       }
       parsed.uploadDate = new Date().toISOString();
-      let docRef = db.doc(`v0/${ parsed.uuid }`);
+      let docRef = db.doc(`${currentPrefix}/${ parsed.uuid }`);
       const alreadyExists = (await docRef.get()).exists;
       if (alreadyExists) {
         response.status(StatusCodes.CONFLICT).send('result already exists in database');
