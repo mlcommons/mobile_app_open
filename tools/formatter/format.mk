@@ -23,7 +23,8 @@ format/java:
 format/dart:
 	cd flutter && ${_start_args} dart run import_sorter:main
 	cd flutter_common && ${_start_args} dart run import_sorter:main
-	dart format flutter flutter_common
+	cd website && ${_start_args} dart run import_sorter:main
+	dart format flutter flutter_common website
 
 .PHONY: format/line-endings
 format/line-endings:
@@ -42,7 +43,7 @@ lint/bazel:
 
 .PHONY: lint/dart
 lint/dart:
-	dart analyze flutter flutter_common
+	dart analyze flutter flutter_common website
 
 .PHONY: lint/yaml
 lint/yaml:

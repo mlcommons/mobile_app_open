@@ -101,4 +101,12 @@ class ExportResultList {
     }
     return result;
   }
+
+  double calculateAverageThroughput() {
+    var throughput = 0.0;
+    for (var item in list) {
+      throughput += double.parse(item.throughput);
+    }
+    return throughput / list.length;
+  }
 }

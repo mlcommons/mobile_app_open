@@ -20,7 +20,7 @@ You need to have access to a Firebase project with Authentication, Firestore and
     FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID=<messagingSenderId from config>
     FIREBASE_FLUTTER_CONFIG_APP_ID=<appId from config>
     FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID=<measurementId>
-    FIREBASE_FLUTTER_FUNCTIONS_URL=us-central1-<projectId>.cloudfunctions.net
+    FIREBASE_FLUTTER_FUNCTIONS_URL=https://us-central1-<projectId>.cloudfunctions.net
     ```
 
     Here is an example with fake values:
@@ -31,11 +31,11 @@ You need to have access to a Firebase project with Authentication, Firestore and
     FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID=123456789012
     FIREBASE_FLUTTER_CONFIG_APP_ID=1:123456789012:web:jvfplnzhknjirxgzxoxvqu
     FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID=G-47RV91VIUJ
-    FIREBASE_FLUTTER_FUNCTIONS_URL=us-central1-my-project-123456.cloudfunctions.net
+    FIREBASE_FLUTTER_FUNCTIONS_URL=https://us-central1-my-project-123456.cloudfunctions.net
     ```
 
-    If you want to use the Firebase emulator, set `FIREBASE_FLUTTER_FUNCTIONS_URL` to the following value instead:
-    `localhost:5001/<appId>/us-central1`.
+    If you want to use Firebase emulator, set `FIREBASE_FLUTTER_FUNCTIONS_URL` to the following value instead:
+    `http://localhost:5001/<appId>/us-central1`.
     5001 is the default port for Firebase Functions at the moment of writing this, adjust the port if you use a custom port or the default has changed.
 
 4. Run `make flutter/generate-firebase-config` or `make flutter/prepare` in the repository root.
