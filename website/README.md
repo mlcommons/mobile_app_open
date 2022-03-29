@@ -1,16 +1,6 @@
-# website
+# Website
 
-A new Flutter project.
+This folder contains files for the Flutter Web Single Page Application
+that provides access to the online database of results from the MLPerfBench benchmark.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+See [documentation](../flutter/documentation/firebase.md#developing-website) for details about developing and deploying the website.
