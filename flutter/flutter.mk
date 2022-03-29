@@ -86,7 +86,7 @@ flutter/protobuf:
 	protoc --proto_path flutter/cpp/proto \
 		--dart_out flutter/lib/protos \
 		flutter/cpp/proto/*.proto
-	dart format flutter/lib/proto
+	dart format flutter/lib/protos
 
 .PHONY: flutter/update-splash-screen
 flutter/update-splash-screen:
