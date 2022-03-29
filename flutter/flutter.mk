@@ -80,7 +80,6 @@ flutter/generate-result-schema:
 
 .PHONY: flutter/protobuf
 flutter/protobuf:
-	cd flutter && ${_start_args} dart pub get
 	rm -rf flutter/lib/protos
 	mkdir -p flutter/lib/protos
 	protoc --proto_path flutter/cpp/proto \
@@ -102,8 +101,14 @@ flutter/generate-localizations:
 		--no-synthetic-package
 	dart format flutter/lib/localizations
 
+.PHONY: flutter/pub
+flutter/pub:
+	cd flutter && ${_start_args} dart pub get
+	cd flutter_common && ${_start_args} dart pub get
+	cd website && ${_start_args} dart pub get
+
 .PHONY: flutter/prepare
-flutter/prepare: flutter/set-supported-backends flutter/protobuf flutter/generate-localizations flutter/generate-firebase-config
+flutter/prepare: flutter/pub flutter/set-supported-backends flutter/protobuf flutter/generate-localizations flutter/generate-firebase-config
 
 .PHONY: flutter/clean
 flutter/clean:
