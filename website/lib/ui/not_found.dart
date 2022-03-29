@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:website/route_generator.dart';
-
 class NotFoundPage extends StatelessWidget {
   const NotFoundPage({Key? key}) : super(key: key);
 

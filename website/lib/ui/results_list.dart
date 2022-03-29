@@ -17,7 +17,7 @@ class ResultsListPageState extends State<ResultsListPage> {
   Future<void> fetchData() async {
     try {
       await AppState.instance.fetchBatch(from: widget.fromUuid);
-    } catch (e, s) {
+    } catch (e) {
       print(e);
       return;
     }

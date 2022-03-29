@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/environment_info.dart';
 import 'package:mlperfbench_common/data/export_result.dart';
-import 'package:mlperfbench_common/data/extended_result.dart';
 
 import 'package:website/app_state.dart';
 
@@ -21,7 +20,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
   Future<void> fetchData() async {
     try {
       await AppState.instance.fetchByUuid(widget.id);
-    } catch (e, s) {
+    } catch (e) {
       print(e);
       return;
     }
