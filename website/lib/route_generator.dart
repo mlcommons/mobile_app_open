@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'ui/home.dart';
 import 'ui/not_found.dart';
 import 'ui/result_details.dart';
-import 'ui/home.dart';
 import 'ui/results_list.dart';
 
 class AppRoutes {

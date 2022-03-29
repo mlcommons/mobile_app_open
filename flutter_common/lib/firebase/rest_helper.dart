@@ -22,7 +22,8 @@ class RestHelper {
   }
 
   static Uri getUrl(String path) {
-    return Uri.parse('${FirebaseConfig.functionsUrl}/${FirebaseConfig.functionsPrefix}/$path');
+    return Uri.parse(
+        '${FirebaseConfig.functionsUrl}/${FirebaseConfig.functionsPrefix}/$path');
   }
 
   Future<void> upload(ExtendedResult result) async {
