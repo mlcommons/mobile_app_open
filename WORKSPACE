@@ -34,18 +34,21 @@ load("@org_tensorflow//tensorflow:workspace2.bzl", "tf_workspace2")
 tf_workspace2()
 
 # Android.
-#build_file = "@//flutter/android/third_party:loadgen.BUILD",
 load("@//flutter/third_party/android:android_configure.bzl", "android_configure")
 
 android_configure(name = "local_config_android")
+
 load("@local_config_android//:android_configure.bzl", "android_workspace")
+
 android_workspace()
 
+# avoid using android_{sdk,ndk}_repo because of bazel 5.0
+#
 #android_sdk_repository(
 #    name = "androidsdk",
 #    api_level = 30,
 #)
-
+#
 #android_ndk_repository(
 #    name = "androidndk",
 #)
