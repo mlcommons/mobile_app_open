@@ -272,7 +272,7 @@ class BenchmarkState extends ChangeNotifier {
       doneCounter++;
 
       benchmark.accuracyModeResult = BenchmarkResult(
-          // loadgen doesn't calculate ltency for accuracy mode benchmarks
+          // loadgen doesn't calculate latency for accuracy mode benchmarks
           // so throughput is infinity which is not a valid JSON numeric value
           throughput: accuracyResult.result.throughput.isFinite
               ? accuracyResult.result.throughput
