@@ -266,13 +266,17 @@ class BenchmarkState extends ChangeNotifier {
       if (_aborting) break;
       if (!_store.submissionMode) continue;
 
-      final accuracyResult = await runBenchmark(benchmark, false,
+      final accuracyResult = await runBenchmark(benchmark, true,
           backendInfo.settings.commonSetting, backendInfo.libPath);
       _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
       doneCounter++;
 
       benchmark.accuracyModeResult = BenchmarkResult(
-          throughput: accuracyResult.result.throughput,
+          // loadgen doesn't calculate latency for accuracy mode benchmarks
+          // so throughput is infinity which is not a valid JSON numeric value
+          throughput: accuracyResult.result.throughput.isFinite
+              ? accuracyResult.result.throughput
+              : 0.0,
           accuracy: accuracyResult.result.accuracy,
           backendName: accuracyResult.result.backendName,
           acceleratorName: accuracyResult.result.acceleratorName,
