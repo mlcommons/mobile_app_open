@@ -27,12 +27,13 @@ Future<void> main() async {
     minSamples: '8',
     numSamples: '8',
     mode: 'performance_lite_mode',
-    datetime: '2022-02-28T16:24:10.914130',
+    datetime: 'date will be here',
     batchSize: 0,
     shardsNum: 0,
   );
   var extendedResult = ExtendedResult(
     uuid: Uuid().v4(),
+    uploadDate: 'upload date will be here',
     envInfo: EnvironmentInfo(
       appVersion: '1.0',
       manufacturer: 'unknown',

@@ -19,3 +19,5 @@ __pycache__/
 mobile_app_open.iml
 *.log
 *.iml
+*.gen.dart
+*.env

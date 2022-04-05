@@ -4,9 +4,8 @@ import 'package:flutter/services.dart';
 
 import 'package:device_info/device_info.dart';
 import 'package:ios_utsname_ext/extension.dart';
+import 'package:mlperfbench_common/data/environment_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-
-import 'package:mlperfbench/data/environment_info.dart';
 
 class DeviceInfo {
   static late final String nativeLibraryPath;

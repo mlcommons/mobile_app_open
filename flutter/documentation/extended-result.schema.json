@@ -10,6 +10,9 @@
                     "type": "string",
                     "format": "uuid"
                 },
+                "uploadDate": {
+                    "type": "string"
+                },
                 "results": {
                     "type": "array",
                     "items": {
@@ -23,6 +26,7 @@
             "required": [
                 "envInfo",
                 "results",
+                "uploadDate",
                 "uuid"
             ],
             "title": "ExtendedResultSchema"
@@ -97,16 +101,19 @@
                     "type": "string"
                 },
                 "datetime": {
-                    "type": "string",
-                    "format": "date-time"
+                    "type": "string"
                 },
-                "backendDescription": {
+                "backendName": {
+                    "type": "string"
+                },
+                "acceleratorName": {
                     "type": "string"
                 }
             },
             "required": [
+                "acceleratorName",
                 "accuracy",
-                "backendDescription",
+                "backendName",
                 "batch_size",
                 "configuration",
                 "datetime",

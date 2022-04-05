@@ -22,5 +22,3 @@ app.*.map.json
 # Project specific
 /lib/protos
 /lib/localizations
-*.gen.dart
-*.env

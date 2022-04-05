@@ -22,7 +22,9 @@ format/java:
 .PHONY: format/dart
 format/dart:
 	cd flutter && ${_start_args} dart run import_sorter:main
-	dart format flutter/lib flutter/integration_test flutter/test_driver
+	cd flutter_common && ${_start_args} dart run import_sorter:main
+	cd website && ${_start_args} dart run import_sorter:main
+	dart format flutter flutter_common website
 
 .PHONY: format/line-endings
 format/line-endings:
@@ -41,8 +43,7 @@ lint/bazel:
 
 .PHONY: lint/dart
 lint/dart:
-	make flutter/prepare
-	dart analyze flutter
+	dart analyze flutter flutter_common website
 
 .PHONY: lint/yaml
 lint/yaml:

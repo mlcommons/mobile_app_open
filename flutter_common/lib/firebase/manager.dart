@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 import 'package:firebase_dart/firebase_dart.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:mlperfbench/firebase/rest_helper.dart';
 import 'config.gen.dart';
+import 'rest_helper.dart';
 
 class FirebaseManager {
   static late final FirebaseManager _defaultInstance;
@@ -19,7 +21,8 @@ class FirebaseManager {
     if (!FirebaseConfig.enable) {
       return;
     }
-    final firebaseDataDir = (await getApplicationDocumentsDirectory()).path;
+    final firebaseDataDir =
+        kIsWeb ? '' : (await getApplicationDocumentsDirectory()).path;
     FirebaseDart.setup(isolated: true, storagePath: firebaseDataDir);
     _defaultInstance = await _create();
   }

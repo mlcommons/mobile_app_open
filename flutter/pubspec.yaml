@@ -41,6 +41,8 @@ dependencies:
   package_info_plus: ^1.0.6
   share_plus: ^2.2.0
   firebase_dart: ^1.0.4
+  mlperfbench_common:
+    path: ../flutter_common
 
 dev_dependencies:
   flutter_test:
