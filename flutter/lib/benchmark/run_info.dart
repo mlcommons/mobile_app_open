@@ -1,11 +1,14 @@
-import 'package:mlperfbench/backend/bridge/run_result.dart';
-import 'package:mlperfbench/backend/bridge/run_settings.dart';
-import 'package:mlperfbench/benchmark/run_mode.dart';
+// import 'package:mlperfbench/backend/bridge/run_result.dart';
+// import 'package:mlperfbench/backend/bridge/run_settings.dart';
 
-class RunInfo {
-  final RunResult result;
-  final RunSettings settings;
-  final BenchmarkRunMode runMode;
+// import 'benchmark.dart';
 
-  RunInfo(this.result, this.settings, this.runMode);
-}
+// class RunInfo {
+//   final BackendSettings backendSettings;
+//   final RunResult result;
+  
+//   RunInfo({
+//     required this.settings,
+//     required this.result,
+//   });
+// }

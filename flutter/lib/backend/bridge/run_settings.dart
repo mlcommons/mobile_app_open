@@ -11,8 +11,6 @@ class RunSettings {
   final int dataset_offset;
   final String scenario;
   final int batch;
-  final int batch_size;
-  final int threads_number;
   final String mode; // Submission/Accuracy/Performance
   final int min_query_count;
   final int min_duration;
@@ -30,8 +28,6 @@ class RunSettings {
     required this.dataset_offset,
     required this.scenario,
     required this.batch,
-    required this.batch_size,
-    required this.threads_number,
     required this.mode, // Submission/Accuracy/Performance
     required this.min_query_count,
     required this.min_duration,

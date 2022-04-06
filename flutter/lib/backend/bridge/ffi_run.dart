@@ -83,6 +83,7 @@ class _RunOut extends Struct {
   @Float()
   external double duration_ms;
   external Pointer<Utf8> backend_name;
+  external Pointer<Utf8> backend_vendor;
   external Pointer<Utf8> accelerator_name;
 }
 
@@ -99,6 +100,8 @@ final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 RunResult runBenchmark(RunSettings rs) {
   var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
   runIn.ref.set(rs);
+
+  final startTime = DateTime.now();
 
   var runOut = _run(runIn);
 
@@ -118,7 +121,9 @@ RunResult runBenchmark(RunSettings rs) {
     numSamples: runOut.ref.num_samples,
     durationMs: runOut.ref.duration_ms,
     backendName: runOut.ref.backend_name.toDartString(),
+    backendVendor: runOut.ref.backend_vendor.toDartString(),
     acceleratorName: runOut.ref.accelerator_name.toDartString(),
+    startTime: startTime,
   );
 
   _free(runOut);

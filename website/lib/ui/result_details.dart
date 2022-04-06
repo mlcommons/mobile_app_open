@@ -104,7 +104,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
   Widget _makeEnvTable(EnvironmentInfo info) {
     return _makeTable(
       <TableRow>[
-        _makeTableRow(const Text('Operation system'), Text(info.os)),
+        _makeTableRow(const Text('Operation system'), Text(info.osName)),
         _makeTableRow(const Text('OS version'), Text(info.osVersion)),
         _makeTableRow(const Text('Application version'), Text(info.appVersion)),
         _makeTableRow(
@@ -121,9 +121,10 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
             Text(info.id)), // TODO replace with proper name
         _makeTableRow(const Text('Throughput'), Text(info.throughput)),
         _makeTableRow(const Text('Accuracy'), Text(info.accuracy)),
-        _makeTableRow(const Text('Duration'), Text(info.duration)),
-        _makeTableRow(const Text('Backend'), Text(info.backendName)),
-        _makeTableRow(const Text('Accelerator'), Text(info.acceleratorName)),
+        _makeTableRow(const Text('Duration'), Text(info.measuredDurationMs)),
+        _makeTableRow(const Text('Backend'), Text(info.name)),
+        _makeTableRow(
+            const Text('Accelerator'), Text(info.backendAcceleratorName)),
       ],
     );
   }

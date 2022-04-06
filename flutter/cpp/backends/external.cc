@@ -102,6 +102,7 @@ BackendFunctions::BackendFunctions(const std::string& lib_path) {
   create =
       reinterpret_cast<decltype(create)>(GetSymbol("mlperf_backend_create"));
   name = reinterpret_cast<decltype(name)>(GetSymbol("mlperf_backend_name"));
+  vendor = reinterpret_cast<decltype(vendor)>(GetSymbol("mlperf_backend_vendor_name"));
   accelerator_name = reinterpret_cast<decltype(accelerator_name)>(
       GetSymbol("mlperf_backend_accelerator_name"));
   destroy =
@@ -170,10 +171,8 @@ ExternalBackend::ExternalBackend(const std::string& model_file_path,
         backend_functions_.get_output_type(backend_ptr_, i));
   }
 
-  // Get the backend name.
   name_ = backend_functions_.name(backend_ptr_);
-
-  // Get the accelerator name.
+  vendor_ = backend_functions_.vendor(backend_ptr_);
   accelerator_name_ = backend_functions_.accelerator_name(backend_ptr_);
 }
 

@@ -3,9 +3,19 @@ import 'dart:io';
 
 import 'package:uuid/uuid.dart';
 
-import 'environment_info.dart';
-import 'export_result.dart';
+import 'package:mlperfbench_common/data/build_info/backend_list.dart';
+import 'package:mlperfbench_common/data/build_info/build_info.dart';
+import 'package:mlperfbench_common/data/environment/os_enum.dart';
+import 'package:mlperfbench_common/data/environment/selected_backend_info.dart';
+import 'package:mlperfbench_common/data/meta_info.dart';
+import 'package:mlperfbench_common/data/results/dataset_info.dart';
+import 'package:mlperfbench_common/data/results/dataset_type.dart';
+import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
+import 'environment/environment_info.dart';
 import 'extended_result.dart';
+import 'results/backend_settings.dart';
+import 'results/backend_settings_extra.dart';
+import 'results/benchmark_result.dart';
 
 //
 // This file is intended to be used
@@ -16,32 +26,73 @@ import 'extended_result.dart';
 const fileNameEnv = 'jsonFileName';
 
 Future<void> main() async {
-  var exportResult = ExportResult(
-    id: 'id',
-    accuracy: 'N/A',
-    throughput: '123.45',
-    backendName: 'backend',
-    acceleratorName: 'accelerator',
-    minDuration: '10',
-    duration: '123.456',
-    minSamples: '8',
-    numSamples: '8',
-    mode: 'performance_lite_mode',
-    datetime: 'date will be here',
-    batchSize: 0,
-    shardsNum: 0,
+  final runResult = BenchmarkRunResult(
+    score: 123.45,
+    datasetInfo: DatasetInfo(
+      name: 'Imagenet classification validation set',
+      type: DatasetType.fromJson('IMAGENET'),
+      dataPath: 'app:///mlperf_datasets/imagenet/img',
+      groundtruthPath: 'app:///mlperf_datasets/imagenet/imagenet_val_full.txt',
+    ),
+    measuredDurationMs: 123.456,
+    measuredSamples: 8,
+    startDatetime: 'date will be here',
+  );
+  var exportResult = BenchmarkExportResult(
+    benchmarkId: 'id',
+    benchmarkName: 'name',
+    performance: runResult,
+    accuracy: runResult,
+    backendAcceleratorName: 'accelerator',
+    minDurationMs: 10.5,
+    minSamples: 8,
+    backendSettingsInfo: BackendSettingsInfo(
+      acceleratorCode: '',
+      acceleratorDesc: '',
+      configuration: '',
+      modelPath: '',
+      extraSettings: BackendExtraSettingList(
+        <BackendExtraSetting>[
+          BackendExtraSetting(
+            id: 'batch_size',
+            name: 'Batch size',
+            value: '4',
+            valueName: '4',
+          ),
+        ],
+      ),
+    ),
+    loadgenScenario: LoadgenScenario.fromJson('single_stream'),
   );
   var extendedResult = ExtendedResult(
-    uuid: Uuid().v4(),
-    uploadDate: 'upload date will be here',
+    meta: ResultMetaInfo(
+      uploadDate: 'upload date will be here',
+      uuid: Uuid().v4(),
+    ),
+    buildInfo: BuildInfo(
+      version: '1.0',
+      buildNumber: '10qwe',
+      gitBranch: 'feature',
+      gitCommit: 'as91230jr90qwe',
+      gitDirtyFlag: false,
+      devTestFlag: true,
+      backends: BackendList(<String>[
+        'libtflitebackend',
+      ]),
+      officialReleaseFlag: false,
+    ),
     envInfo: EnvironmentInfo(
-      appVersion: '1.0',
       manufacturer: 'unknown',
       model: 'unknown',
-      os: 'os',
+      osName: OsName.fromJson('windows'),
       osVersion: '10.0',
+      selectedBackend: SelectedBackendInfo(
+        filename: 'tflite',
+        vendor: 'tflite',
+        name: 'libtflitebackend',
+      ),
     ),
-    results: ExportResultList([exportResult, exportResult]),
+    results: BenchmarkExportResultList([exportResult, exportResult]),
   );
   if (!const bool.hasEnvironment(fileNameEnv)) {
     print('pass --define=$fileNameEnv=<value> to specify file to write');

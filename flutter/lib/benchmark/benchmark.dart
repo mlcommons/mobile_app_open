@@ -192,8 +192,6 @@ class Benchmark {
       dataset_offset: modelConfig.offset,
       scenario: modelConfig.scenario,
       batch: benchmarkSetting.batchSize,
-      batch_size: config.batchSize,
-      threads_number: config.threadsNumber,
       mode: runMode.getBackendModeString(),
       min_query_count: minQueryCount,
       min_duration: minDuration,

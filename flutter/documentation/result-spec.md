@@ -29,57 +29,59 @@ because each benchmark will generate a performance and an accuracy mode result.
 * `benchmark_id`: string
 * `benchmark_name`: string  
   Value from `task.model.name` for this benchmark from selected tasks.pbtxt file.
-* `loadgen_mode`: string enum  
-  See [`::mlperf::TestSettings`](https://github.com/mlcommons/inference/blob/08f5e36b74f4ec78ad738a287ae50462bb130330/loadgen/test_settings.h#L84).  
-  Allowed values:
-  * `accuracy_only`
-  * `performance_only`
 * `loadgen_scenario`: string enum  
   See [`::mlperf::TestScenario`](https://github.com/mlcommons/inference/blob/a67f9f34bcc4439af4740095958c23380f9b284b/loadgen/test_settings.h#L38).  
   Allowed values:
-  * `single_stream`
-  * `offline`
-* `dataset`: map  
-  Dataset info for this benchmark from selected tasks.pbtxt file.
-  * `name`: string
-  * `type`: string enum  
-    Allowed values:
-    * `IMAGENET`
-    * `COCO`
-    * `ADE20K`
-    * `SQUAD`
-  * `data_path`: string
-  * `groundtruth_path`: string
+  * `SingleStream`
+  * `Offline`
 * `backend_settings`: map  
   Settings defined by selected backend for this benchmark.
   * `accelerator_code`: string
   * `accelerator_desc`: string
   * `configuration`: string
   * `model_path`: string
-* `backend_extra_settings`: list of maps  
-  Extra settings that can vary between different benchmarks and backends.  
-  Here must be stored values set by backend in `common_setting`.  
-  `batch_size` value for offline benchmarks should be located here.  
-  `shards_num` value for TFLite backend should be located here.  
-  Map structure:
-  * `id`: string. Value from `setting.id` that is passed to backend
-  * `name`: string. Value from `setting.name` that is passed to backend
-  * `value`: string. Value from `setting.value.value` that is passed to backend
-  * `value_name`: string. Value from `setting.value.name` that is passed to backend
-* `throughput`: floating point number. Present for all results
-* `accuracy`: floating point number. Present for all results, including `loadgen_mode=PerformanceOnly` runs  
-  When actual accuracy is not available value `-1` must be used
+  * `extra_settings`: list of maps  
+    Extra settings that can vary between different benchmarks and backends.  
+    Here must be stored values set by backend in `common_setting`.  
+    `batch_size` value for offline benchmarks should be located here.  
+    `shards_num` value for TFLite backend should be located here.  
+    Map structure:
+    * `id`: string. Value from `setting.id` that is passed to backend
+    * `name`: string. Value from `setting.name` that is passed to backend
+    * `value`: string. Value from `setting.value.value` that is passed to backend
+    * `value_name`: string. Value from `setting.value.name` that is passed to backend
+* `performance_run`: map  
+  May be null if performance was not tested in this benchmark.
+  * `score`: floating point number  
+    Throughput value for performance run of the benchmark.
+  * `measured_duration_ms`: floating point number  
+    Actual duration of the benchmark in milliseconds for start to finish.
+  * `measured_samples`: integer number  
+    Actual number of samples evaluated during the benchmark
+  * `start_datetime`: string  
+    Contains datetime of the moment when benchmark started  
+    Format is: `yyyy-MM-ddTHH:mm:ss.sTZD`
+  * `dataset`: map  
+    Dataset info for this benchmark from selected `tasks.pbtxt` file.
+    * `name`: string
+    * `type`: string enum  
+      Allowed values (this list may be extended when we add support for more datasets):
+      * `IMAGENET`
+      * `COCO`
+      * `ADE20K`
+      * `SQUAD`
+    * `data_path`: string
+    * `groundtruth_path`: string
+* `accuracy_run`: map  
+  Same as `performance_run` except for the `score` value.
+  May be null if performance was not tested in this benchmark.
+  * `score`: floating point number  
+    Accuracy value for performance run of the benchmark.
+    Value must be normalized between `0` and `100`.
 * `min_duration_ms`: floating point number  
   Value from `task.min_duration_ms` for this benchmark from selected tasks.pbtxt file.
-* `measured_duration_ms`: floating point number  
-  Actual duration of the benchmark in milliseconds for start to finish.
 * `min_samples`: integer number  
   Value from `task.min_query_count` for this benchmark from selected tasks.pbtxt file.
-* `measured_samples`: integer number  
-  Actual number of samples evaluated during the benchmark
-* `datetime`: string  
-  Contains datetime of the moment when benchmark **started**  
-  Format is: `yyyy-MM-ddTHH:mm:ss.sTZD`
 * `backend_accelerator_name`: string  
   Backend-defined string describing actual accelerator used during this benchmark.  
   Should typically match `accelerator_desc` from the `backend_settings` map but may be different in case of accelerator fallback.
@@ -108,7 +110,7 @@ Info about environment the app is running in. May change when you update your OS
     Actual filename of the backend
   * `vendor_name`: string  
     Vendor name reported by backend
-  * `name`: string  
+  * `backend_name`: string  
     Backend name reported by backend
 
 ## Application build info

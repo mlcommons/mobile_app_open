@@ -6,12 +6,8 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "uuid": {
-                    "type": "string",
-                    "format": "uuid"
-                },
-                "uploadDate": {
-                    "type": "string"
+                "meta": {
+                    "$ref": "#/definitions/Meta"
                 },
                 "results": {
                     "type": "array",
@@ -19,19 +15,66 @@
                         "$ref": "#/definitions/Result"
                     }
                 },
-                "envInfo": {
-                    "$ref": "#/definitions/EnvInfo"
+                "environment_info": {
+                    "$ref": "#/definitions/EnvironmentInfo"
+                },
+                "build_info": {
+                    "$ref": "#/definitions/BuildInfo"
                 }
             },
             "required": [
-                "envInfo",
-                "results",
-                "uploadDate",
-                "uuid"
+                "build_info",
+                "environment_info",
+                "meta",
+                "results"
             ],
             "title": "ExtendedResultSchema"
         },
-        "EnvInfo": {
+        "BuildInfo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "version": {
+                    "type": "string"
+                },
+                "build_number": {
+                    "type": "string"
+                },
+                "official_release_flag": {
+                    "type": "boolean"
+                },
+                "dev_test_flag": {
+                    "type": "boolean"
+                },
+                "backend_list": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "git_branch": {
+                    "type": "string"
+                },
+                "git_commit": {
+                    "type": "string"
+                },
+                "git_dirty_flag": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "backend_list",
+                "build_number",
+                "dev_test_flag",
+                "git_branch",
+                "git_commit",
+                "git_dirty_flag",
+                "official_release_flag",
+                "version"
+            ],
+            "title": "BuildInfo"
+        },
+        "EnvironmentInfo": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -41,105 +84,212 @@
                 "model": {
                     "type": "string"
                 },
-                "os": {
+                "os_name": {
                     "type": "string"
                 },
-                "osVersion": {
+                "os_version": {
                     "type": "string"
                 },
-                "appVersion": {
+                "selected_backend": {
+                    "$ref": "#/definitions/SelectedBackend"
+                }
+            },
+            "required": [
+                "manufacturer",
+                "model",
+                "os_name",
+                "os_version",
+                "selected_backend"
+            ],
+            "title": "EnvironmentInfo"
+        },
+        "SelectedBackend": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "filename": {
+                    "type": "string"
+                },
+                "vendor_name": {
+                    "type": "string"
+                },
+                "backend_name": {
                     "type": "string"
                 }
             },
             "required": [
-                "appVersion",
-                "manufacturer",
-                "model",
-                "os",
-                "osVersion"
+                "backend_name",
+                "filename",
+                "vendor_name"
             ],
-            "title": "EnvInfo"
+            "title": "SelectedBackend"
+        },
+        "Meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "uuid": {
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "upload_date": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "upload_date",
+                "uuid"
+            ],
+            "title": "Meta"
         },
         "Result": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "benchmark_id": {
+                    "type": "string"
+                },
+                "benchmark_name": {
+                    "type": "string"
+                },
+                "loadgen_mode": {
+                    "type": "string"
+                },
+                "loadgen_scenario": {
+                    "type": "string"
+                },
+                "dataset_info": {
+                    "$ref": "#/definitions/DatasetInfo"
+                },
+                "backend_settings": {
+                    "$ref": "#/definitions/BackendSettings"
+                },
+                "throughput": {
+                    "type": "number"
+                },
+                "accuracy": {
+                    "type": "number"
+                },
+                "min_duration_ms": {
+                    "type": "number"
+                },
+                "measured_duration_ms": {
+                    "type": "number"
+                },
+                "min_samples": {
+                    "type": "integer"
+                },
+                "measured_samples": {
+                    "type": "integer"
+                },
+                "datetime": {
+                    "type": "string"
+                },
+                "backend_accelerator_name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "accuracy",
+                "backend_accelerator_name",
+                "backend_settings",
+                "benchmark_id",
+                "benchmark_name",
+                "dataset_info",
+                "datetime",
+                "loadgen_mode",
+                "loadgen_scenario",
+                "measured_duration_ms",
+                "measured_samples",
+                "min_duration_ms",
+                "min_samples",
+                "throughput"
+            ],
+            "title": "Result"
+        },
+        "BackendSettings": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "accelerator_code": {
+                    "type": "string"
+                },
+                "accelerator_desc": {
+                    "type": "string"
+                },
+                "configuration": {
+                    "type": "string"
+                },
+                "model_path": {
+                    "type": "string"
+                },
+                "extra_settings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ExtraSetting"
+                    }
+                }
+            },
+            "required": [
+                "accelerator_code",
+                "accelerator_desc",
+                "configuration",
+                "extra_settings",
+                "model_path"
+            ],
+            "title": "BackendSettings"
+        },
+        "ExtraSetting": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "id": {
                     "type": "string"
                 },
-                "configuration": {
-                    "$ref": "#/definitions/Configuration"
-                },
-                "throughput": {
+                "name": {
                     "type": "string"
                 },
-                "accuracy": {
-                    "type": "string"
-                },
-                "min_duration": {
+                "value": {
                     "type": "string",
                     "format": "integer"
                 },
-                "duration": {
-                    "type": "string"
-                },
-                "min_samples": {
+                "value_name": {
                     "type": "string",
                     "format": "integer"
-                },
-                "num_samples": {
-                    "type": "string",
-                    "format": "integer"
-                },
-                "shards_num": {
-                    "type": "integer"
-                },
-                "batch_size": {
-                    "type": "integer"
-                },
-                "mode": {
-                    "type": "string"
-                },
-                "datetime": {
-                    "type": "string"
-                },
-                "backendName": {
-                    "type": "string"
-                },
-                "acceleratorName": {
-                    "type": "string"
                 }
             },
             "required": [
-                "acceleratorName",
-                "accuracy",
-                "backendName",
-                "batch_size",
-                "configuration",
-                "datetime",
-                "duration",
                 "id",
-                "min_duration",
-                "min_samples",
-                "mode",
-                "num_samples",
-                "shards_num",
-                "throughput"
+                "name",
+                "value",
+                "value_name"
             ],
-            "title": "Result"
+            "title": "ExtraSetting"
         },
-        "Configuration": {
+        "DatasetInfo": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "runtime": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "data_path": {
+                    "type": "string"
+                },
+                "groundtruth_path": {
                     "type": "string"
                 }
             },
             "required": [
-                "runtime"
+                "data_path",
+                "groundtruth_path",
+                "name",
+                "type"
             ],
-            "title": "Configuration"
+            "title": "DatasetInfo"
         }
     }
 }

@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/main_screen.dart';
@@ -38,7 +39,8 @@ Future<void> main() async {
 }
 
 Future<void> launchUi() async {
-  await initDeviceInfo();
+  await DeviceInfo.staticInit();
+  await BuildInfoHelper.staticInit();
   await FirebaseManager.staticInit();
   final store = await Store.create();
   final benchmarkState =

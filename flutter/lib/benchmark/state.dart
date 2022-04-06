@@ -8,8 +8,16 @@ import 'package:flutter/material.dart' hide Icons;
 
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
-import 'package:mlperfbench_common/data/export_result.dart';
+import 'package:mlperfbench/backend/bridge/run_result.dart';
+import 'package:mlperfbench/build_info.dart';
+import 'package:mlperfbench_common/data/environment/selected_backend_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
+import 'package:mlperfbench_common/data/results/backend_settings.dart';
+import 'package:mlperfbench_common/data/results/backend_settings_extra.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
+import 'package:mlperfbench_common/data/results/dataset_info.dart';
+import 'package:mlperfbench_common/data/results/dataset_type.dart';
+import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -229,7 +237,7 @@ class BenchmarkState extends ChangeNotifier {
 
     var doneCounter = 0.0;
     var doneMultiplier = _store.submissionMode ? 0.5 : 1.0;
-    final exportResults = <ExportResult>[];
+    final exportResults = <BenchmarkExportResult>[];
     var first = true;
 
     for (final benchmark in activeBenchmarks) {
@@ -255,42 +263,52 @@ class BenchmarkState extends ChangeNotifier {
       doneCounter++;
 
       benchmark.performanceModeResult = BenchmarkResult(
-          throughput: performanceResult.result.throughput,
-          accuracy: performanceResult.result.accuracy,
-          backendName: performanceResult.result.backendName,
-          acceleratorName: performanceResult.result.acceleratorName,
+          throughput: performanceResult.throughput,
+          accuracy: performanceResult.accuracy,
+          backendName: performanceResult.backendName,
+          acceleratorName: performanceResult.acceleratorName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
-      exportResults.add(exportResultFromRunInfo(performanceResult));
+      
+      DeviceInfo.setBackendInfo(SelectedBackendInfo(
+        filename: backendInfo.libPath,
+        vendor: performanceResult.backendVendor,
+        name: performanceResult.backendName));
 
       if (_aborting) break;
-      if (!_store.submissionMode) continue;
 
-      final accuracyResult = await runBenchmark(benchmark, true,
-          backendInfo.settings.commonSetting, backendInfo.libPath);
-      _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
-      doneCounter++;
+      RunResult? accuracyResult;
 
-      benchmark.accuracyModeResult = BenchmarkResult(
-          // loadgen doesn't calculate latency for accuracy mode benchmarks
-          // so throughput is infinity which is not a valid JSON numeric value
-          throughput: accuracyResult.result.throughput.isFinite
-              ? accuracyResult.result.throughput
-              : 0.0,
-          accuracy: accuracyResult.result.accuracy,
-          backendName: accuracyResult.result.backendName,
-          acceleratorName: accuracyResult.result.acceleratorName,
-          batchSize: benchmark.config.batchSize,
-          threadsNumber: benchmark.config.threadsNumber);
-      exportResults.add(exportResultFromRunInfo(accuracyResult));
+      if (_store.submissionMode) {
+        accuracyResult = await runBenchmark(benchmark, true,
+            backendInfo.settings.commonSetting, backendInfo.libPath);
+        _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
+        doneCounter++;
+
+        benchmark.accuracyModeResult = BenchmarkResult(
+            // loadgen doesn't calculate latency for accuracy mode benchmarks
+            // so throughput is infinity which is not a valid JSON numeric value
+            throughput: accuracyResult.throughput.isFinite
+                ? accuracyResult.throughput
+                : 0.0,
+            accuracy: accuracyResult.accuracy,
+            backendName: accuracyResult.backendName,
+            acceleratorName: accuracyResult.acceleratorName,
+            batchSize: benchmark.config.batchSize,
+            threadsNumber: benchmark.config.threadsNumber);
+      }
+
+      exportResults.add(exportResultFromRunInfo(benchmark, performanceResult, accuracyResult));
     }
+
 
     if (!_aborting) {
       lastResult = ExtendedResult(
-        uuid: Uuid().v4(),
-        uploadDate: '',
-        envInfo: await DeviceInfo.environmentInfo,
-        results: ExportResultList(exportResults),
+        meta: null,
+        // uuid: Uuid().v4(),
+        envInfo: DeviceInfo.environmentInfo,
+        results: BenchmarkExportResultList(exportResults), 
+        buildInfo: BuildInfoHelper.info,
       );
       _store.previousExtendedResult =
           JsonEncoder().convert(lastResult!.toJson());
@@ -308,26 +326,55 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.disable();
   }
 
-  static ExportResult exportResultFromRunInfo(RunInfo info) => ExportResult(
-      id: info.settings.benchmark_id,
-      throughput: info.runMode == BenchmarkRunMode.accuracy
-          ? 'N/A'
-          : info.result.throughput.toString(),
-      accuracy: info.runMode == BenchmarkRunMode.accuracy
-          ? info.result.accuracy
-          : 'N/A',
-      minDuration: info.settings.min_duration.toString(),
-      duration: info.result.durationMs.toString(),
-      minSamples: info.settings.min_query_count.toString(),
-      numSamples: info.result.numSamples.toString(),
-      shardsNum: info.settings.threads_number,
-      batchSize: info.settings.batch_size,
-      mode: info.runMode.getResultModeString(),
-      datetime: DateTime.now().toIso8601String(),
-      backendName: info.result.backendName,
-      acceleratorName: info.result.acceleratorName);
+  static BenchmarkExportResult exportResultFromRunInfo(Benchmark benchmark, RunResult? performance, RunResult? accuracy) {
+      return BenchmarkExportResult(
+          benchmarkId: benchmark.id,
+          benchmarkName: benchmark.taskConfig.name,
+          performance: performance == null ? null : BenchmarkRunResult(
+            score: performance.throughput,
+            datasetInfo: DatasetInfo(
+              name: benchmark.taskConfig.liteDataset.name, 
+              type: DatasetType.fromJson(benchmark.taskConfig.liteDataset.type.toString()),
+              dataPath: benchmark.taskConfig.liteDataset.path,
+              groundtruthPath: benchmark.taskConfig.liteDataset.groundtruthSrc,
+            ),
+            measuredDurationMs: performance.durationMs,
+            measuredSamples: performance.numSamples,
+            startDatetime: performance.startTime.toIso8601String(),
+            ), 
+          accuracy: accuracy == null ? null : BenchmarkRunResult(
+            score: 0.0, // TODO
+            datasetInfo: DatasetInfo(
+              name: benchmark.taskConfig.liteDataset.name, 
+              type: DatasetType.fromJson(benchmark.taskConfig.liteDataset.type.toString()),
+              dataPath: benchmark.taskConfig.liteDataset.path,
+              groundtruthPath: benchmark.taskConfig.liteDataset.groundtruthSrc,
+            ),
+            measuredDurationMs: accuracy.durationMs,
+            measuredSamples: accuracy.numSamples,
+            startDatetime: accuracy.startTime.toIso8601String(),
+            ), 
+          minDurationMs: benchmark.taskConfig.minDurationMs.toDouble(),
+          minSamples: benchmark.taskConfig.minQueryCount,
+          // shardsNum: info.settings.threads_number,
+          // batchSize: info.settings.batch_size,
+          // mode: info.runMode.getResultModeString(),
+          backendAcceleratorName: '', // TODO
+          backendSettingsInfo: BackendSettingsInfo(
+            acceleratorCode: benchmark.benchmarkSetting.accelerator,
+             acceleratorDesc: benchmark.benchmarkSetting.acceleratorDesc,
+              configuration: benchmark.benchmarkSetting.configuration,
+               modelPath: benchmark.benchmarkSetting.src,
+                extraSettings: BackendExtraSettingList([]) // TODO
+                ),
+          loadgenScenario: LoadgenScenario.fromJson(benchmark.modelConfig.scenario));
+  }
 
-  Future<RunInfo> runBenchmark(Benchmark benchmark, bool accuracyMode,
+  // BackendExtraSettingList transformExtraSettings() {
+    
+  // }
+
+  Future<RunResult> runBenchmark(Benchmark benchmark, bool accuracyMode,
       List<pb.Setting> commonSettings, String backendLibPath) async {
     final tmpDir = await getTemporaryDirectory();
 
@@ -348,7 +395,7 @@ class BenchmarkState extends ChangeNotifier {
     final elapsed = stopwatch.elapsed;
 
     print('Benchmark result: $result, elapsed: $elapsed');
-    return RunInfo(result, runSettings, runMode);
+    return result;
   }
 
   Future<void> abortBenchmarks() async {
