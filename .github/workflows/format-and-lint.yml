@@ -93,6 +93,32 @@ jobs:
         uses: ibiqlik/action-yamllint@v3.1.0
         with:
           config_file: 'tools/formatter/configs/yamllint.yml'
+  ts:
+    name: TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        name: Setup Node
+        with:
+          node-version: '16'
+      - name: Install Prettier
+        working-directory: firebase_functions/functions
+        run: npm install prettier
+      - name: Run "Prettier"
+        working-directory: firebase_functions/functions
+        run: npx prettier --check .
+      - name: Install ESLint
+        run: |
+          npm install \
+            eslint \
+            eslint-plugin-import \
+            eslint-config-google \
+            @typescript-eslint/parser \
+            @typescript-eslint/eslint-plugin
+      - name: Run ESLint
+        working-directory: firebase_functions/functions
+        run: npm run lint
   misc:
     runs-on: ubuntu-latest
     steps:

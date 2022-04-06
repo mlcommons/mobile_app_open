@@ -25,9 +25,16 @@ module.exports = {
   plugins: [
     "@typescript-eslint",
     "import",
+    "only-warn",
   ],
   rules: {
-    "quotes": ["error", "double"],
-    "import/no-unresolved": 0,
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      },
+    ],
   },
 };

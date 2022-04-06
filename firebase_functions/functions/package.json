@@ -1,7 +1,9 @@
 {
   "name": "functions",
   "scripts": {
-    "lint": "eslint --ext .js,.ts .",
+    "lint": "eslint --max-warnings 0 --ext .js,.ts .",
+    "lint-fix": "eslint --fix --ext .js,.ts .",
+    "format": "prettier --write .",
     "build": "tsc",
     "serve": "npm run build && firebase emulators:start --only functions,firestore,ui",
     "shell": "npm run build && firebase functions:shell",
@@ -28,6 +30,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-only-warn": "^1.0.3",
     "firebase-functions-test": "^0.2.0",
     "prettier": "2.6.2",
     "typescript": "^3.8.0"

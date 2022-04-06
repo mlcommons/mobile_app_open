@@ -2,9 +2,9 @@
 .PHONY: format
 ifeq (${OS},Windows_NT)
 # format/java is not supported on Windows
-format: format/bazel format/clang format/dart format/line-endings format/markdown
+format: format/bazel format/clang format/dart format/ts format/line-endings format/markdown
 else
-format: format/bazel format/clang format/java format/dart format/line-endings format/markdown
+format: format/bazel format/clang format/java format/dart format/ts format/line-endings format/markdown
 endif
 
 .PHONY: format/bazel
@@ -26,6 +26,11 @@ format/dart:
 	cd website && ${_start_args} dart run import_sorter:main
 	dart format flutter flutter_common website
 
+.PHONY: format/ts
+format/ts:
+	cd firebase_functions/functions && ${_start_args} npm run format
+	cd firebase_functions/functions && ${_start_args} npm run lint-fix
+
 .PHONY: format/line-endings
 format/line-endings:
 	git ls-files -z | xargs --null ${_start_args} dos2unix --keep-bom --
@@ -35,7 +40,7 @@ format/markdown:
 	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml --fix --ignore 'LICENSE.md'
 
 .PHONY: lint
-lint: lint/bazel lint/dart lint/prohibited-extensions lint/big-files
+lint: lint/bazel lint/dart lint/ts lint/prohibited-extensions lint/big-files
 
 .PHONY: lint/bazel
 lint/bazel:
@@ -48,6 +53,10 @@ lint/dart:
 .PHONY: lint/yaml
 lint/yaml:
 	git ls-files -z | grep --null-data "\.yml$$\|\.yaml$$" | xargs --null --no-run-if-empty yamllint -c tools/formatter/configs/yamllint.yml
+
+.PHONY: lint/ts
+lint/ts:
+	cd firebase_functions/functions && ${_start_args} npm run lint
 
 .PHONY: lint/prohibited-extensions
 lint/prohibited-extensions:
