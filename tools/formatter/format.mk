@@ -33,7 +33,7 @@ format/ts:
 
 .PHONY: format/line-endings
 format/line-endings:
-	git ls-files -z | xargs --null ${_start_args} dos2unix --keep-bom --
+	git ls-files -z | xargs --null ${_start_args} dos2unix --keep-bom --quiet --
 
 .PHONY: format/markdown
 format/markdown:
@@ -98,13 +98,22 @@ output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	cd flutter && ${_start_args} flutter clean
 	touch $@
 
+FORMAT_DOCKER_ARGS= \
+	-v ~/.pub-cache:/home/mlperf/.pub-cache \
+	-v ~/.config/flutter:/home/mlperf/.config/flutter \
+	-v $(CURDIR):/home/mlperf/mobile_app_open \
+	-w /home/mlperf/mobile_app_open \
+	-u `id -u`:`id -g` \
+	mlperf/formatter \
+
 .PHONY: docker/format
 docker/format: output/docker_mlperf_formatter.stamp
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
-		-v ~/.pub-cache:/home/mlperf/.pub-cache \
-		-v ~/.config/flutter:/home/mlperf/.config/flutter \
-		-v $(CURDIR):/home/mlperf/mobile_app_open \
-		-w /home/mlperf/mobile_app_open \
-		-u `id -u`:`id -g` \
-		mlperf/formatter \
+		${FORMAT_DOCKER_ARGS} \
 		make format
+
+.PHONY: docker/format/--
+docker/format/--: output/docker_mlperf_formatter.stamp
+	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
+		${FORMAT_DOCKER_ARGS} \
+		bash
