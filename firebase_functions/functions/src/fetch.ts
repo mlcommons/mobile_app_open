@@ -16,11 +16,11 @@ function _makeBatchQuery(
 export function fetchFirst(
   db: FirebaseFirestore.Firestore,
 ): (request: Request, response: Response, next: NextFunction) => Promise<void> {
-  return async (request: Request, response: Response, next: NextFunction) => {
+  return async (request: Request, response: Response, _: NextFunction) => {
     try {
       const pageSizeString = request.headers['page-size'];
       if (typeof pageSizeString != 'string') {
-        throw 'page-size header is missing';
+        throw Error('page-size header is missing');
       }
       const pageSize = parseInt(pageSizeString);
       console.log(`pageSize is ${pageSize}`);
@@ -43,18 +43,18 @@ export function fetchFirst(
 export function fetchNext(
   db: FirebaseFirestore.Firestore,
 ): (request: Request, response: Response, next: NextFunction) => Promise<void> {
-  return async (request: Request, response: Response, next: NextFunction) => {
+  return async (request: Request, response: Response, _: NextFunction) => {
     try {
       const pageSizeString = request.headers['page-size'];
       if (typeof pageSizeString != 'string') {
-        throw 'page-size header is missing';
+        throw Error('page-size header is missing');
       }
       const pageSize = parseInt(pageSizeString);
       console.log(`pageSize is ${pageSize}`);
 
       const uuid = request.headers['uuid-cursor'];
       if (typeof uuid != 'string') {
-        throw 'uuid-cursor header is missing';
+        throw Error('uuid-cursor header is missing');
       }
 
       const cursorRef = db.doc(`v0/${uuid}`);
@@ -80,18 +80,18 @@ export function fetchNext(
 export function fetchPrev(
   db: FirebaseFirestore.Firestore,
 ): (request: Request, response: Response, next: NextFunction) => Promise<void> {
-  return async (request: Request, response: Response, next: NextFunction) => {
+  return async (request: Request, response: Response, _: NextFunction) => {
     try {
       const pageSizeString = request.headers['page-size'];
       if (typeof pageSizeString != 'string') {
-        throw 'page-size header is missing';
+        throw Error('page-size header is missing');
       }
       const pageSize = parseInt(pageSizeString);
       console.log(`pageSize is ${pageSize}`);
 
       const uuid = request.headers['uuid-cursor'];
       if (typeof uuid != 'string') {
-        throw 'uuid-cursor header is missing';
+        throw Error('uuid-cursor header is missing');
       }
 
       const cursorRef = db.doc(`v0/${uuid}`);
@@ -117,7 +117,7 @@ export function fetchPrev(
 export function fetchId(
   db: FirebaseFirestore.Firestore,
 ): (request: Request, response: Response, next: NextFunction) => Promise<void> {
-  return async (request: Request, response: Response, next: NextFunction) => {
+  return async (request: Request, response: Response, _: NextFunction) => {
     try {
       const uuid = request.headers['uuid'];
       if (typeof uuid != 'string') {

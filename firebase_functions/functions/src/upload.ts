@@ -7,11 +7,11 @@ import { currentPrefix } from './prefix.gen';
 export function upload(
   db: FirebaseFirestore.Firestore,
 ): (request: Request, response: Response, next: NextFunction) => Promise<void> {
-  return async (request: Request, response: Response, next: NextFunction) => {
+  return async (request: Request, response: Response, _: NextFunction) => {
     try {
       const parsed = Convert.toExtendedResult(request.body);
       if (parsed.uploadDate != '') {
-        throw 'uploadDate must be empty';
+        throw Error('uploadDate must be empty');
       }
       parsed.uploadDate = new Date().toISOString();
       const docRef = db.doc(`${currentPrefix}/${parsed.uuid}`);

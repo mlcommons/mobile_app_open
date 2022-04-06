@@ -10,7 +10,7 @@ export function auth(
     try {
       const token = request.headers['authorization'];
       if (token == undefined) {
-        throw 'Authorization missing';
+        throw Error('Authorization missing');
       }
       await firebaseAuth.verifyIdToken(token);
       next();

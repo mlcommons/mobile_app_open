@@ -1,2 +1,2 @@
-const currentPrefix = 'FIREBASE_FLUTTER_FUNCTIONS_PREFIX';;
-export {currentPrefix};
+const currentPrefix = 'FIREBASE_FLUTTER_FUNCTIONS_PREFIX';
+export { currentPrefix };
