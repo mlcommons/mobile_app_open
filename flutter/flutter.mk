@@ -18,12 +18,12 @@ flutter_common_dart_flags= \
 
 .PHONY: flutter
 ifeq (${OS},Windows_NT)
-flutter: flutter/windows
+flutter: flutter/windows flutter/prepare
 else
 ifeq ($(shell uname -s),Darwin)
-flutter: flutter/ios
+flutter: flutter/ios flutter/prepare
 else
-flutter: flutter/android
+flutter: flutter/android flutter/prepare
 endif
 endif
 
@@ -32,8 +32,8 @@ include flutter/windows.mk
 include flutter/windows-docker.mk
 include flutter/android.mk
 
-.PHONY: flutter/set-supported-backends
-flutter/set-supported-backends:
+.PHONY: flutter/backend-list
+flutter/backend-list:
 	cat flutter/lib/backend/list.in | sed \
 		-e "s/TFLITE_TAG/${backend_tflite_filename}/" \
 		-e "s/MEDIATEKE_TAG/${backend_mediatek_filename}/" \
@@ -52,8 +52,11 @@ $(shell chmod +x ${FIREBASE_CONFIG_ENV_PATH})
 else
 FIREBASE_FLUTTER_ENABLE=true
 endif
-.PHONY: flutter/generate-firebase-config
-flutter/generate-firebase-config:
+
+flutter/firebase: flutter/firebase/config flutter/firebase/prefix
+
+.PHONY: flutter/firebase/config
+flutter/firebase/config:
 	@echo using firebase config: FIREBASE_CONFIG_ENV_PATH=${FIREBASE_CONFIG_ENV_PATH}
 	. ${FIREBASE_CONFIG_ENV_PATH} && \
 		cat flutter_common/lib/firebase/config.in | sed \
@@ -65,18 +68,35 @@ flutter/generate-firebase-config:
 		-e "s,FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID,$$FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID," \
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_URL,$$FIREBASE_FLUTTER_FUNCTIONS_URL," \
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
-		> flutter_common/lib/firebase/config.gen.dart
+		| tee flutter_common/lib/firebase/config.gen.dart
 	dart format flutter_common/lib/firebase/config.gen.dart
+
+.PHONY: flutter/firebase/prefix
+flutter/firebase/prefix:
 	. ${FIREBASE_CONFIG_ENV_PATH} && \
 		cat firebase_functions/functions/src/prefix.in | sed \
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
-		> firebase_functions/functions/src/prefix.gen.ts
+		| tee firebase_functions/functions/src/prefix.gen.ts
 
-.PHONY: flutter/generate-result-schema
-flutter/generate-result-schema:
-	cd flutter_common && ${_start_args} dart run --define=jsonFileName=../output/extended-result-example.json lib/data/json_generator_main.dart
-	quicktype output/extended-result-example.json --out flutter/documentation/extended-result.schema.json --lang schema
-	quicktype --src-lang schema flutter/documentation/extended-result.schema.json --lang ts --top-level ExtendedResult --out firebase_functions/functions/src/extended-result.gen.ts
+flutter/result: flutter/result/schema flutter/result/ts
+
+.PHONY: flutter/result/schema
+flutter/result/schema:
+	cd flutter_common && \
+		${_start_args} dart run \
+		--define=jsonFileName=../output/extended-result-example.json \
+		lib/data/json_generator_main.dart
+	quicktype output/extended-result-example.json \
+		--lang schema \
+		--out flutter/documentation/extended-result.schema.json
+
+.PHONY: flutter/result/ts
+flutter/result/ts:
+	quicktype flutter/documentation/extended-result.schema.json \
+		--src-lang schema \
+		--lang ts \
+		--top-level ExtendedResult \
+		--out firebase_functions/functions/src/extended-result.gen.ts
 
 .PHONY: flutter/protobuf
 flutter/protobuf:
@@ -91,8 +111,8 @@ flutter/protobuf:
 flutter/update-splash-screen:
 	cd flutter && tool/update-splash-screen
 
-.PHONY: flutter/generate-localizations
-flutter/generate-localizations:
+.PHONY: flutter/l10n
+flutter/l10n:
 	flutter --no-version-check gen-l10n \
 		--arb-dir=flutter/lib/l10n \
 		--output-dir=flutter/lib/localizations \
@@ -108,7 +128,7 @@ flutter/pub:
 	cd website && ${_start_args} dart pub get
 
 .PHONY: flutter/prepare
-flutter/prepare: flutter/pub flutter/set-supported-backends flutter/protobuf flutter/generate-localizations flutter/generate-firebase-config
+flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase
 
 .PHONY: flutter/clean
 flutter/clean:

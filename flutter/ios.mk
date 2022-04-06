@@ -14,7 +14,7 @@
 ##########################################################################
 
 .PHONY: flutter/ios
-flutter/ios: flutter/ios/native flutter/prepare flutter/update-splash-screen
+flutter/ios: flutter/ios/native flutter/update-splash-screen
 
 # BAZEL_OUTPUT_ROOT_ARG is set on our Jenkins CI
 bazel_ios_fw := bazel-bin/flutter/cpp/flutter/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework

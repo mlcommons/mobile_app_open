@@ -53,6 +53,7 @@ jobs:
           version: '3.x'
       - name: Create ephemeral files
         run: |
+          flutter config --no-analytics &&
           dart pub global activate protoc_plugin &&
           export PATH="$PATH:$HOME/.pub-cache/bin" &&
           make flutter/prepare
@@ -102,6 +103,12 @@ jobs:
         name: Setup Node
         with:
           node-version: '16'
+      - name: Install quicktype
+        run: |
+          npm install -g quicktype
+      - name: Create ephemeral files
+        run: |
+          make flutter/result/ts flutter/firebase/prefix
       - name: Install Prettier
         working-directory: firebase_functions/functions
         run: npm install prettier
@@ -118,7 +125,7 @@ jobs:
             @typescript-eslint/eslint-plugin
       - name: Run ESLint
         working-directory: firebase_functions/functions
-        run: npm run lint
+        run: make lint/ts
   misc:
     runs-on: ubuntu-latest
     steps:
