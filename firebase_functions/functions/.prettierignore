@@ -1,0 +1,4 @@
+/lib/
+/lib/
+/node_modules/
+*.gen.ts
