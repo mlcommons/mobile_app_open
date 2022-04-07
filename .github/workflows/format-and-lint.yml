@@ -124,7 +124,6 @@ jobs:
             @typescript-eslint/parser \
             @typescript-eslint/eslint-plugin
       - name: Run ESLint
-        working-directory: firebase_functions/functions
         run: make lint/ts
   misc:
     runs-on: ubuntu-latest
