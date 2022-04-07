@@ -40,10 +40,10 @@ You need to have access to a Firebase project with Authentication, Firestore and
     `http://localhost:5001/<appId>/us-central1`.
     5001 is the default port for Firebase Functions at the moment of writing this, adjust the port if you use a custom port or the default has changed.
 
-4. Run `make flutter/generate-firebase-config` or `make flutter/prepare` in the repository root.
+4. Run `make flutter/firebase-config` or `make flutter/prepare` in the repository root.
     You must set `FIREBASE_CONFIG_ENV_PATH` when running this command.
     You can set it permanently as an environment variable, or you can set it for current `make` command only.
-    For example: `make flutter/generate-firebase-config FIREBASE_CONFIG_ENV_PATH=flutter/google.env`
+    For example: `make flutter/firebase-config FIREBASE_CONFIG_ENV_PATH=flutter/google.env`
 
 5. Build the app, it should be able to connect to your Firebase project.
 
@@ -56,14 +56,14 @@ Whenever you change any of the data classes, you should re-generate JSON schema 
 
 For this you need Quicktype installed: `npm install -g quicktype`
 
-To generate schema and parser run the following command: `make flutter/generate-result-schema`
+To generate schema and parser run the following command: `make flutter/result`
 
 ## Developing Firebase Functions
 
 There is no default root function name that will be uploaded to Firebase Functions service.
 You must set it in Firebase config for Flutter and generate sources from it.
 
-Run `make flutter/generate-firebase-config` to do it. See [Linking Flutter to Firebase](#Linking-Flutter-to-Firebase) section for details.
+Run `make flutter/firebase-config` to do it. See [Linking Flutter to Firebase](#Linking-Flutter-to-Firebase) section for details.
 
 All `firebase` and `npm` commands for Firebase Functions should be run inside `firebase_functions/functions` directory.
 
