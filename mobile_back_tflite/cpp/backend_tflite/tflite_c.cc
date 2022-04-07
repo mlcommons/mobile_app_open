@@ -66,6 +66,7 @@ limitations under the License.
 struct TFLiteBackendData {
   const char *name = "TFLite";
   const char *vendor = "Google";
+  const char *accelerator = "CPU";
   TfLiteModel *model{nullptr};
   std::vector<TfLiteInterpreterOptions *> options{};
   std::vector<TfLiteInterpreter *> interpreter{};
@@ -245,19 +246,25 @@ mlperf_backend_ptr_t mlperf_backend_create(
     if (!is_emulator() && ((strcmp(configs->accelerator, "gpu_f16") == 0) ||
                            (strcmp(configs->accelerator, "gpu") == 0))) {
       auto options = TfLiteGpuDelegateOptionsV2Default();
-      if (strcmp(configs->accelerator, "gpu_f16") == 0)
+      if (strcmp(configs->accelerator, "gpu_f16") == 0) {
+        backend_data->accelerator = "GPU (FP16)";
         options.inference_priority1 = TFLITE_GPU_INFERENCE_PRIORITY_MIN_LATENCY;
+      } else {
+        backend_data->accelerator = "GPU";
+      }
       delegate = TfLiteGpuDelegateV2Create(&options);
 #if MTK_TFLITE_NEURON_BACKEND
       use_gpu = true;
 #endif
     } else if (strcmp(configs->accelerator, "nnapi") == 0) {
+      backend_data->accelerator = "NNAPI";
       auto options = tflite::StatefulNnApiDelegate::Options();
       options.allow_fp16 = true;
       options.disallow_nnapi_cpu = true;
       delegate = new tflite::StatefulNnApiDelegate(options);
 #if MTK_TFLITE_NEURON_BACKEND
     } else if (strcmp(configs->accelerator, "neuron") == 0) {
+      backend_data->accelerator = "Neuron";
       // The kOptimizationBatchProcessor doesn't work yet.
       // Use NNAPI instead.
       //
@@ -290,6 +297,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
 #if TARGET_OS_SIMULATOR
 #elif TARGET_OS_IPHONE
     if (strcmp(configs->accelerator, "metal") == 0) {
+      backend_data->accelerator = "Metal";
       TFLGpuDelegateOptions opts{
           .allow_precision_loss = false,
           .wait_type = TFLGpuDelegateWaitType::TFLGpuDelegateWaitTypePassive,
@@ -298,6 +306,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
       delegate = TFLGpuDelegateCreate(&opts);
       std::cout << "Enabling Metal delegate " << delegate << "\n";
     } else if (strcmp(configs->accelerator, "coreml") == 0) {
+      backend_data->accelerator = "CoreML";
       TfLiteCoreMlDelegateOptions opts{
           .enabled_devices = TfLiteCoreMlDelegateAllDevices,
           .coreml_version = 3,
@@ -381,7 +390,8 @@ const char *mlperf_backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
 
 // TODO: Return the name of the accelerator.
 const char *mlperf_backend_accelerator_name(mlperf_backend_ptr_t backend_ptr) {
-  return "ACCELERATOR_NAME";
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
+  return backend_data->accelerator;
 }
 
 // Return the name of this backend.
