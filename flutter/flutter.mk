@@ -18,12 +18,12 @@ flutter_common_dart_flags= \
 
 .PHONY: flutter
 ifeq (${OS},Windows_NT)
-flutter: flutter/windows flutter/prepare
+flutter: flutter/windows
 else
 ifeq ($(shell uname -s),Darwin)
-flutter: flutter/ios flutter/prepare
+flutter: flutter/ios
 else
-flutter: flutter/android flutter/prepare
+flutter: flutter/android
 endif
 endif
 
@@ -98,6 +98,15 @@ flutter/result/ts:
 		--top-level ExtendedResult \
 		--out firebase_functions/functions/src/extended-result.gen.ts
 
+.PHONY: flutter/build-info
+flutter/build-info:
+	cat flutter/lib/build_info.in | sed \
+		-e "s,FLUTTER_BUILD_GIT_COMMIT,$(shell git rev-parse HEAD)," \
+		-e "s,FLUTTER_BUILD_GIT_BRANCH,$(shell git rev-parse --abbrev-ref HEAD)," \
+		-e "s,FLUTTER_BUILD_GIT_DIRTY,$(shell git status --porcelain | head -c1 | wc -c)," \
+		| tee flutter/lib/build_info.gen.dart
+	dart format flutter/lib/build_info.gen.dart
+
 .PHONY: flutter/protobuf
 flutter/protobuf:
 	rm -rf flutter/lib/protos
@@ -128,7 +137,7 @@ flutter/pub:
 	cd website && ${_start_args} dart pub get
 
 .PHONY: flutter/prepare
-flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase
+flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info
 
 .PHONY: flutter/clean
 flutter/clean:
