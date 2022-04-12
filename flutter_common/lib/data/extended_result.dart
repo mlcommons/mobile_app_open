@@ -9,7 +9,7 @@ class ExtendedResult {
   static const String _tagEnvInfo = 'environment_info';
   static const String _tagBuildInfo = 'build_info';
 
-  final ResultMetaInfo? meta;
+  final ResultMetaInfo meta;
   final BenchmarkExportResultList results;
   final EnvironmentInfo envInfo;
   final BuildInfo buildInfo;
@@ -22,16 +22,14 @@ class ExtendedResult {
 
   ExtendedResult.fromJson(Map<String, dynamic> json)
       : this(
-            meta: json[_tagMeta] == null
-                ? null
-                : ResultMetaInfo.fromJson(
+            meta: ResultMetaInfo.fromJson(
                     json[_tagMeta] as Map<String, dynamic>),
             results: BenchmarkExportResultList.fromJson(
                 json[_tagResultJson] as List<dynamic>),
             envInfo: EnvironmentInfo.fromJson(
                 json[_tagEnvInfo] as Map<String, dynamic>),
             buildInfo:
-                BuildInfo.fromJson(json[_tagEnvInfo] as Map<String, dynamic>));
+                BuildInfo.fromJson(json[_tagBuildInfo] as Map<String, dynamic>));
 
   Map<String, dynamic> toJson() => {
         _tagMeta: meta,

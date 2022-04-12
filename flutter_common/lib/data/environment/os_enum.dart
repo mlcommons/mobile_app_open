@@ -27,9 +27,9 @@ class OsName {
       case OsEnum.android:
         return _serializedAndroid;
       case OsEnum.windows:
-        return _serializedIos;
-      case OsEnum.ios:
         return _serializedWindows;
+      case OsEnum.ios:
+        return _serializedIos;
       default:
         throw 'invalid Os value: $value';
     }

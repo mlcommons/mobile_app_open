@@ -40,10 +40,10 @@ because each benchmark will generate a performance and an accuracy mode result.
   * `accelerator_desc`: string
   * `configuration`: string
   * `model_path`: string
+  * `batch_size`: integer number
   * `extra_settings`: list of maps  
     Extra settings that can vary between different benchmarks and backends.  
     Here must be stored values set by backend in `common_setting`.  
-    `batch_size` value for offline benchmarks should be located here.  
     `shards_num` value for TFLite backend should be located here.  
     Map structure:
     * `id`: string. Value from `setting.id` that is passed to backend
@@ -52,8 +52,13 @@ because each benchmark will generate a performance and an accuracy mode result.
     * `value_name`: string. Value from `setting.value.name` that is passed to backend
 * `performance_run`: map  
   May be null if performance was not tested in this benchmark.
-  * `score`: floating point number  
-    Throughput value for performance run of the benchmark.
+  * `throughput`: floating point number  
+    Throughput value for this run of the benchmark.
+    May be null for an accuracy run.
+  * `accuracy`: floating point number  
+    Accuracy value for this run of the benchmark.
+    Value must be normalized between `0` and `100`.
+    May be null for a performance run if groundtruth file is not provided.
   * `measured_duration_ms`: floating point number  
     Actual duration of the benchmark in milliseconds for start to finish.
   * `measured_samples`: integer number  
@@ -73,11 +78,8 @@ because each benchmark will generate a performance and an accuracy mode result.
     * `data_path`: string
     * `groundtruth_path`: string
 * `accuracy_run`: map  
-  Same as `performance_run` except for the `score` value.
-  May be null if performance was not tested in this benchmark.
-  * `score`: floating point number  
-    Accuracy value for performance run of the benchmark.
-    Value must be normalized between `0` and `100`.
+  Same as `performance_run`.
+  May be null if accuracy was not tested in this benchmark.
 * `min_duration_ms`: floating point number  
   Value from `task.min_duration_ms` for this benchmark from selected tasks.pbtxt file.
 * `min_samples`: integer number  

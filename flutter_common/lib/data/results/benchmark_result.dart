@@ -3,20 +3,23 @@ import 'dataset_info.dart';
 import 'loadgen_scenario.dart';
 
 class BenchmarkRunResult {
-  static const String _tagScore = 'score';
+  static const String _tagThroughput = 'throughput';
+  static const String _tagAccuracy = 'accuracy';
   static const String _tagDatasetInfo = 'dataset';
   static const String _tagMeasuredDuration = 'measured_duration_ms';
   static const String _tagMeasuredSamples = 'measured_samples';
   static const String _tagStartDatetime = 'start_datetime';
 
-  final double score;
+  final double? throughput;
+  final double? accuracy;
   final DatasetInfo datasetInfo;
   final double measuredDurationMs;
   final int measuredSamples;
   final String startDatetime;
 
   BenchmarkRunResult({
-    required this.score, 
+    required this.throughput, 
+    required this.accuracy, 
     required this.datasetInfo,
       required this.measuredDurationMs,
       required this.measuredSamples,
@@ -25,7 +28,8 @@ class BenchmarkRunResult {
 
   BenchmarkRunResult.fromJson(Map<String, dynamic> json)
   : this(
-     score: json[_tagScore] as double,
+     throughput: json[_tagThroughput] as double?,
+     accuracy: json[_tagAccuracy] as double?,
      datasetInfo: DatasetInfo.fromJson(
                 json[_tagDatasetInfo] as Map<String, dynamic>),
             measuredDurationMs: json[_tagMeasuredDuration] as double,
@@ -34,7 +38,8 @@ class BenchmarkRunResult {
   );
 
   Map<String, dynamic> toJson() => {
-    _tagScore: score,
+    _tagThroughput: throughput,
+    _tagAccuracy: accuracy,
     _tagDatasetInfo: datasetInfo,
         _tagMeasuredDuration: measuredDurationMs,
         _tagMeasuredSamples: measuredSamples,
@@ -83,7 +88,7 @@ class BenchmarkExportResult {
             backendSettingsInfo: BackendSettingsInfo.fromJson(
                 json[_tagBackendSettings] as Map<String, dynamic>),
             performance: BenchmarkRunResult.fromJson(json[_tagPerformanceRun]),
-            accuracy: BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
+            accuracy: json[_tagAccuracyRun] == null ? null : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
             minDurationMs: json[_tagMinDuration] as double,
             minSamples: json[_tagMinSamples] as int,
             backendAcceleratorName: json[_tagBackendAcceleratorName] as String);
@@ -129,7 +134,7 @@ class BenchmarkExportResultList {
       if (item.performance == null) {
         continue;
       }
-      throughput += item.performance!.score;
+      throughput += item.performance!.throughput!;
       count++;;
     }
     return throughput / count;

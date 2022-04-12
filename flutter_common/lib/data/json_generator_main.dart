@@ -27,7 +27,8 @@ const fileNameEnv = 'jsonFileName';
 
 Future<void> main() async {
   final runResult = BenchmarkRunResult(
-    score: 123.45,
+    throughput: 123.45,
+    accuracy: null,
     datasetInfo: DatasetInfo(
       name: 'Imagenet classification validation set',
       type: DatasetType.fromJson('IMAGENET'),
@@ -51,13 +52,14 @@ Future<void> main() async {
       acceleratorDesc: '',
       configuration: '',
       modelPath: '',
+      batchSize: 0,
       extraSettings: BackendExtraSettingList(
         <BackendExtraSetting>[
           BackendExtraSetting(
-            id: 'batch_size',
-            name: 'Batch size',
-            value: '4',
-            valueName: '4',
+            id: 'shards_num',
+            name: 'Shards number',
+            value: '2',
+            valueName: '2',
           ),
         ],
       ),
@@ -102,5 +104,8 @@ Future<void> main() async {
   print('writing results to $filename');
   final file = File(filename);
   await file.create();
-  await file.writeAsString(JsonEncoder().convert(extendedResult));
+  final converted = JsonEncoder().convert(extendedResult);
+  // at least check that parsing doesn't throw exceptions
+  final _ = ExtendedResult.fromJson(jsonDecode(converted));
+  await file.writeAsString(converted);
 }

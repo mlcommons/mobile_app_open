@@ -23,7 +23,6 @@ struct dart_ffi_run_benchmark_in {
   int32_t dataset_offset;
 
   const char *scenario;  // SingleStream/Offline
-  int32_t batch;
 
   const char *mode;  // Submission/Accuracy/Performance
   int32_t min_query_count;

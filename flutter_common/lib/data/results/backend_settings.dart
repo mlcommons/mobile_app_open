@@ -5,12 +5,14 @@ class BackendSettingsInfo {
   static const String _tagAcceleratorDesc = 'accelerator_desc';
   static const String _tagConfiguration = 'configuration';
   static const String _tagModelPath = 'model_path';
+  static const String _tagBatchSize = 'batch_size';
   static const String _tagExtraSettings = 'extra_settings';
 
   final String acceleratorCode;
   final String acceleratorDesc;
   final String configuration;
   final String modelPath;
+  final int batchSize;
   final BackendExtraSettingList extraSettings;
 
   BackendSettingsInfo(
@@ -18,6 +20,7 @@ class BackendSettingsInfo {
       required this.acceleratorDesc,
       required this.configuration,
       required this.modelPath,
+      required this.batchSize,
       required this.extraSettings});
 
   BackendSettingsInfo.fromJson(Map<String, dynamic> json)
@@ -26,6 +29,7 @@ class BackendSettingsInfo {
             acceleratorDesc: json[_tagAcceleratorDesc] as String,
             configuration: json[_tagConfiguration] as String,
             modelPath: json[_tagModelPath] as String,
+            batchSize: json[_tagBatchSize] as int,
             extraSettings: BackendExtraSettingList.fromJson(
                 json[_tagExtraSettings] as List<dynamic>));
 
@@ -34,6 +38,7 @@ class BackendSettingsInfo {
         _tagAcceleratorDesc: acceleratorDesc,
         _tagConfiguration: configuration,
         _tagModelPath: modelPath,
+        _tagBatchSize: batchSize,
         _tagExtraSettings: extraSettings,
       };
 }

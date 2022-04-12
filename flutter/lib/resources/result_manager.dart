@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 class _BriefResult {
@@ -41,7 +42,7 @@ class ResultManager {
   }
 
   // returns brief results in json
-  Future<void> writeResults(BenchmarkExportResultList results) async {
+  Future<void> writeResults(ExtendedResult results) async {
     await _write(results.toJson());
   }
 
@@ -82,7 +83,7 @@ class ResultManager {
     return true;
   }
 
-  Future<void> _write(List<dynamic> content) async {
+  Future<void> _write(dynamic content) async {
     final jsonFile = File(_jsonResultPath);
 
     final jsonEncoder = JsonEncoder.withIndent('  ');

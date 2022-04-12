@@ -65,7 +65,6 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   lip(dataset_offset);
 
   lip(scenario);
-  lip(batch);
 
   lip(mode);
   lip(min_query_count);
@@ -124,7 +123,7 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   li;
 
   ::mlperf::mobile::MlperfDriver driver(std::move(dataset), std::move(backend),
-                                        in->scenario, in->batch);
+                                        in->scenario, settings.benchmark_setting().batch_size());
   li;
 
   {
