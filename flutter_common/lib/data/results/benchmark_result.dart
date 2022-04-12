@@ -1,6 +1,7 @@
 import 'backend_settings.dart';
 import 'dataset_info.dart';
 import 'loadgen_scenario.dart';
+import 'backend_info.dart';
 
 class BenchmarkRunResult {
   static const String _tagThroughput = 'throughput';
@@ -56,7 +57,7 @@ class BenchmarkExportResult {
   static const String _tagAccuracyRun = 'accuracy_run';
   static const String _tagMinDuration = 'min_duration_ms';
   static const String _tagMinSamples = 'min_samples';
-  static const String _tagBackendAcceleratorName = 'backend_accelerator_name';
+  static const String _tagBackendInfo = 'backend_info';
 
   final String benchmarkId;
   final String benchmarkName;
@@ -66,7 +67,7 @@ class BenchmarkExportResult {
   final BenchmarkRunResult? accuracy;
   final double minDurationMs;
   final int minSamples;
-  final String backendAcceleratorName;
+  final BackendReportedInfo backendInfo;
 
   BenchmarkExportResult(
       {required this.benchmarkId,
@@ -77,7 +78,7 @@ class BenchmarkExportResult {
       required this.accuracy,
       required this.minDurationMs,
       required this.minSamples,
-      required this.backendAcceleratorName});
+      required this.backendInfo});
 
   BenchmarkExportResult.fromJson(Map<String, dynamic> json)
       : this(
@@ -91,7 +92,7 @@ class BenchmarkExportResult {
             accuracy: json[_tagAccuracyRun] == null ? null : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
             minDurationMs: json[_tagMinDuration] as double,
             minSamples: json[_tagMinSamples] as int,
-            backendAcceleratorName: json[_tagBackendAcceleratorName] as String);
+            backendInfo: BackendReportedInfo.fromJson(json[_tagBackendInfo]));
 
   Map<String, dynamic> toJson() => {
         _tagBenchmarkId: benchmarkId,
@@ -102,7 +103,7 @@ class BenchmarkExportResult {
         _tagAccuracyRun: accuracy,
         _tagMinDuration: minDurationMs,
         _tagMinSamples: minSamples,
-        _tagBackendAcceleratorName: backendAcceleratorName
+        _tagBackendInfo: backendInfo
       };
 }
 

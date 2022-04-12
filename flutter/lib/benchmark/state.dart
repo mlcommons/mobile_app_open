@@ -10,8 +10,8 @@ import 'package:async/async.dart';
 import 'package:collection/collection.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/build_info.dart';
-import 'package:mlperfbench_common/data/environment/selected_backend_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
+import 'package:mlperfbench_common/data/results/backend_info.dart';
 import 'package:mlperfbench_common/data/results/backend_settings.dart';
 import 'package:mlperfbench_common/data/results/backend_settings_extra.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
@@ -272,11 +272,6 @@ class BenchmarkState extends ChangeNotifier {
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber);
 
-      DeviceInfo.setBackendInfo(SelectedBackendInfo(
-          filename: backendInfo.libPath,
-          vendor: performanceResult.backendVendor,
-          name: performanceResult.backendName));
-
       if (_aborting) break;
 
       RunResult? accuracyResult;
@@ -333,7 +328,7 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.disable();
   }
 
-  static BenchmarkExportResult exportResultFromRunInfo(
+  BenchmarkExportResult exportResultFromRunInfo(
       Benchmark benchmark,
       RunResult performance,
       RunResult? accuracy,
@@ -374,7 +369,12 @@ class BenchmarkState extends ChangeNotifier {
               ),
         minDurationMs: benchmark.taskConfig.minDurationMs.toDouble(),
         minSamples: benchmark.taskConfig.minQueryCount,
-        backendAcceleratorName: performance.acceleratorName,
+        backendInfo: BackendReportedInfo(
+          filename: backendInfo.libPath,
+          name: performance.backendName,
+          vendor: performance.backendVendor,
+          accelerator: performance.acceleratorName,
+        ),
         backendSettingsInfo: BackendSettingsInfo(
           acceleratorCode: actualSettings.benchmarkSetting.accelerator,
           acceleratorDesc: actualSettings.benchmarkSetting.acceleratorDesc,

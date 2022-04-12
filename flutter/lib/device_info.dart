@@ -6,13 +6,11 @@ import 'package:device_info/device_info.dart';
 import 'package:ios_utsname_ext/extension.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/environment/os_enum.dart';
-import 'package:mlperfbench_common/data/environment/selected_backend_info.dart';
 
 class DeviceInfo {
   static late final String nativeLibraryPath;
   static late final String model;
   static late final String manufacturer;
-  static SelectedBackendInfo? backendInfo;
 
   static EnvironmentInfo get environmentInfo {
     return EnvironmentInfo(
@@ -20,12 +18,7 @@ class DeviceInfo {
       osVersion: Platform.operatingSystemVersion,
       manufacturer: DeviceInfo.manufacturer,
       model: DeviceInfo.model,
-      selectedBackend: DeviceInfo.backendInfo!,
     );
-  }
-
-  static void setBackendInfo(SelectedBackendInfo info) {
-    DeviceInfo.backendInfo = info;
   }
 
   static Future<void> staticInit() async {

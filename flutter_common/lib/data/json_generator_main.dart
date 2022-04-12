@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 import 'package:mlperfbench_common/data/build_info/backend_list.dart';
 import 'package:mlperfbench_common/data/build_info/build_info.dart';
 import 'package:mlperfbench_common/data/environment/os_enum.dart';
-import 'package:mlperfbench_common/data/environment/selected_backend_info.dart';
+import 'package:mlperfbench_common/data/results/backend_info.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/data/results/dataset_info.dart';
 import 'package:mlperfbench_common/data/results/dataset_type.dart';
@@ -44,7 +44,12 @@ Future<void> main() async {
     benchmarkName: 'name',
     performance: runResult,
     accuracy: runResult,
-    backendAcceleratorName: 'accelerator',
+    backendInfo: BackendReportedInfo(
+        filename: 'tflite',
+        vendor: 'tflite',
+        name: 'libtflitebackend',
+      accelerator: 'accelerator',
+    ),
     minDurationMs: 10.5,
     minSamples: 8,
     backendSettingsInfo: BackendSettingsInfo(
@@ -88,11 +93,6 @@ Future<void> main() async {
       model: 'unknown',
       osName: OsName.fromJson('windows'),
       osVersion: '10.0',
-      selectedBackend: SelectedBackendInfo(
-        filename: 'tflite',
-        vendor: 'tflite',
-        name: 'libtflitebackend',
-      ),
     ),
     results: BenchmarkExportResultList([exportResult, exportResult]),
   );

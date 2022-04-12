@@ -84,9 +84,16 @@ because each benchmark will generate a performance and an accuracy mode result.
   Value from `task.min_duration_ms` for this benchmark from selected tasks.pbtxt file.
 * `min_samples`: integer number  
   Value from `task.min_query_count` for this benchmark from selected tasks.pbtxt file.
-* `backend_accelerator_name`: string  
-  Backend-defined string describing actual accelerator used during this benchmark.  
-  Should typically match `accelerator_desc` from the `backend_settings` map but may be different in case of accelerator fallback.
+* `backend_info`: map
+  * `filename`: string  
+    Actual filename of the backend
+  * `backend_name`: string  
+    Backend name reported by backend
+  * `vendor_name`: string  
+    Vendor name reported by backend
+  * `accelerator_name`: string  
+    Backend-defined string describing actual accelerator used during this benchmark.  
+    Should typically match `accelerator_desc` from the `backend_settings` map but may be different in case of accelerator fallback.
 
 ## Environment info
 
@@ -107,13 +114,6 @@ Info about environment the app is running in. May change when you update your OS
   On Windows systems value must be `Unknown PC`.  
   On iOS systems value must be human-readable iPhone name. For example: `iPhone SE 2nd Gen`.  
   On Android systems value must represent actual model name obtained from system environment.
-* `selected_backend`: map
-  * `filename`: string  
-    Actual filename of the backend
-  * `vendor_name`: string  
-    Vendor name reported by backend
-  * `backend_name`: string  
-    Backend name reported by backend
 
 ## Application build info
 
