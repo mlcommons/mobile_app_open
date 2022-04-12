@@ -3,19 +3,19 @@ import 'dart:io';
 
 import 'package:uuid/uuid.dart';
 
-import 'package:mlperfbench_common/data/build_info/backend_list.dart';
-import 'package:mlperfbench_common/data/build_info/build_info.dart';
-import 'package:mlperfbench_common/data/environment/os_enum.dart';
-import 'package:mlperfbench_common/data/results/backend_info.dart';
-import 'package:mlperfbench_common/data/meta_info.dart';
-import 'package:mlperfbench_common/data/results/dataset_info.dart';
-import 'package:mlperfbench_common/data/results/dataset_type.dart';
-import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
-import 'environment/environment_info.dart';
-import 'extended_result.dart';
-import 'results/backend_settings.dart';
-import 'results/backend_settings_extra.dart';
-import 'results/benchmark_result.dart';
+import '../build_info/backend_list.dart';
+import '../build_info/build_info.dart';
+import '../environment/os_enum.dart';
+import '../results/backend_info.dart';
+import '../meta_info.dart';
+import '../results/dataset_info.dart';
+import '../results/dataset_type.dart';
+import '../results/loadgen_scenario.dart';
+import '../environment/environment_info.dart';
+import '../extended_result.dart';
+import '../results/backend_settings.dart';
+import '../results/backend_settings_extra.dart';
+import '../results/benchmark_result.dart';
 
 //
 // This file is intended to be used
@@ -28,7 +28,7 @@ const fileNameEnv = 'jsonFileName';
 Future<void> main() async {
   final runResult = BenchmarkRunResult(
     throughput: 123.45,
-    accuracy: null,
+    accuracy: 123.45,
     datasetInfo: DatasetInfo(
       name: 'Imagenet classification validation set',
       type: DatasetType.fromJson('IMAGENET'),
@@ -69,7 +69,7 @@ Future<void> main() async {
         ],
       ),
     ),
-    loadgenScenario: LoadgenScenario.fromJson('single_stream'),
+    loadgenScenario: LoadgenScenario.fromJson('SingleStream'),
   );
   var extendedResult = ExtendedResult(
     meta: ResultMetaInfo(

@@ -89,40 +89,15 @@
                 },
                 "os_version": {
                     "type": "string"
-                },
-                "selected_backend": {
-                    "$ref": "#/definitions/SelectedBackend"
                 }
             },
             "required": [
                 "manufacturer",
                 "model",
                 "os_name",
-                "os_version",
-                "selected_backend"
+                "os_version"
             ],
             "title": "EnvironmentInfo"
-        },
-        "SelectedBackend": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "filename": {
-                    "type": "string"
-                },
-                "vendor_name": {
-                    "type": "string"
-                },
-                "backend_name": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "backend_name",
-                "filename",
-                "vendor_name"
-            ],
-            "title": "SelectedBackend"
         },
         "Meta": {
             "type": "object",
@@ -133,7 +108,14 @@
                     "format": "uuid"
                 },
                 "upload_date": {
-                    "type": "string"
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 }
             },
             "required": [
@@ -152,60 +134,144 @@
                 "benchmark_name": {
                     "type": "string"
                 },
-                "loadgen_mode": {
-                    "type": "string"
-                },
                 "loadgen_scenario": {
                     "type": "string"
-                },
-                "dataset_info": {
-                    "$ref": "#/definitions/DatasetInfo"
                 },
                 "backend_settings": {
                     "$ref": "#/definitions/BackendSettings"
                 },
-                "throughput": {
-                    "type": "number"
+                "performance_run": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/Run"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
-                "accuracy": {
-                    "type": "number"
+                "accuracy_run": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/Run"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "min_duration_ms": {
-                    "type": "number"
-                },
-                "measured_duration_ms": {
                     "type": "number"
                 },
                 "min_samples": {
                     "type": "integer"
                 },
+                "backend_info": {
+                    "$ref": "#/definitions/BackendInfo"
+                }
+            },
+            "required": [
+                "accuracy_run",
+                "backend_info",
+                "backend_settings",
+                "benchmark_id",
+                "benchmark_name",
+                "loadgen_scenario",
+                "min_duration_ms",
+                "min_samples",
+                "performance_run"
+            ],
+            "title": "Result"
+        },
+        "Run": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "throughput": {
+                    "type": "number"
+                },
+                "accuracy": {
+                    "oneOf": [
+                        {
+                            "type": "number"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "dataset": {
+                    "$ref": "#/definitions/Dataset"
+                },
+                "measured_duration_ms": {
+                    "type": "number"
+                },
                 "measured_samples": {
                     "type": "integer"
                 },
-                "datetime": {
-                    "type": "string"
-                },
-                "backend_accelerator_name": {
+                "start_datetime": {
                     "type": "string"
                 }
             },
             "required": [
                 "accuracy",
-                "backend_accelerator_name",
-                "backend_settings",
-                "benchmark_id",
-                "benchmark_name",
-                "dataset_info",
-                "datetime",
-                "loadgen_mode",
-                "loadgen_scenario",
+                "dataset",
                 "measured_duration_ms",
                 "measured_samples",
-                "min_duration_ms",
-                "min_samples",
+                "start_datetime",
                 "throughput"
             ],
-            "title": "Result"
+            "title": "Run"
+        },
+        "Dataset": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "data_path": {
+                    "type": "string"
+                },
+                "groundtruth_path": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "data_path",
+                "groundtruth_path",
+                "name",
+                "type"
+            ],
+            "title": "Dataset"
+        },
+        "BackendInfo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "filename": {
+                    "type": "string"
+                },
+                "vendor_name": {
+                    "type": "string"
+                },
+                "backend_name": {
+                    "type": "string"
+                },
+                "accelerator_name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "accelerator_name",
+                "backend_name",
+                "filename",
+                "vendor_name"
+            ],
+            "title": "BackendInfo"
         },
         "BackendSettings": {
             "type": "object",
@@ -223,6 +289,9 @@
                 "model_path": {
                     "type": "string"
                 },
+                "batch_size": {
+                    "type": "integer"
+                },
                 "extra_settings": {
                     "type": "array",
                     "items": {
@@ -233,6 +302,7 @@
             "required": [
                 "accelerator_code",
                 "accelerator_desc",
+                "batch_size",
                 "configuration",
                 "extra_settings",
                 "model_path"
@@ -265,31 +335,6 @@
                 "value_name"
             ],
             "title": "ExtraSetting"
-        },
-        "DatasetInfo": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "data_path": {
-                    "type": "string"
-                },
-                "groundtruth_path": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "data_path",
-                "groundtruth_path",
-                "name",
-                "type"
-            ],
-            "title": "DatasetInfo"
         }
     }
 }

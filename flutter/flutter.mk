@@ -80,19 +80,25 @@ flutter/firebase/prefix:
 
 flutter/result: flutter/result/schema flutter/result/ts
 
+result_json_example_path=output/extended-result-example.json
+result_json_schema_path=flutter/documentation/extended-result.schema.json
 .PHONY: flutter/result/schema
 flutter/result/schema:
 	cd flutter_common && \
 		${_start_args} dart run \
-		--define=jsonFileName=../output/extended-result-example.json \
-		lib/data/json_generator_main.dart
-	quicktype output/extended-result-example.json \
+		--define=jsonFileName=../${result_json_example_path} \
+		lib/data/generation_helpers/write_json_example.main.dart
+	quicktype ${result_json_example_path} \
 		--lang schema \
-		--out flutter/documentation/extended-result.schema.json
+		--out ${result_json_schema_path}
+	cd flutter_common && \
+		${_start_args} dart run \
+		--define=schemaPath=../${result_json_schema_path} \
+		lib/data/generation_helpers/edit_json_schema.main.dart
 
 .PHONY: flutter/result/ts
 flutter/result/ts:
-	quicktype flutter/documentation/extended-result.schema.json \
+	quicktype ${result_json_schema_path} \
 		--src-lang schema \
 		--lang ts \
 		--top-level ExtendedResult \
