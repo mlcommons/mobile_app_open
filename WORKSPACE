@@ -11,10 +11,6 @@ http_archive(
 
 http_archive(
     name = "org_tensorflow",
-<<<<<<< HEAD
-    sha256 = "40d3203ab5f246d83bae328288a24209a2b85794f1b3e2cd0329458d8e7c1985",
-    strip_prefix = "tensorflow-2.6.0",
-=======
     patch_args = ["-p1"],
     patches = [
         # Fix tensorflow not being able to read image files on Windows
@@ -22,7 +18,6 @@ http_archive(
     ],
     sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
     strip_prefix = "tensorflow-2.8.0",
->>>>>>> submission-v2.0-unified
     urls = [
         "https://github.com/tensorflow/tensorflow/archive/v2.8.0.zip",
     ],
