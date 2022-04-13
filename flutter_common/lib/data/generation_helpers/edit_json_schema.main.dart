@@ -40,6 +40,7 @@ Future<void> main() async {
   makeNullable(definitions['Meta']['properties']['upload_date']);
   makeNullable(definitions['Result']['properties']['performance_run']);
   makeNullable(definitions['Result']['properties']['accuracy_run']);
+  makeNullable(definitions['Run']['properties']['throughput']);
   makeNullable(definitions['Run']['properties']['accuracy']);
 
   final editedSchema = JsonEncoder.withIndent('    ').convert(schema);

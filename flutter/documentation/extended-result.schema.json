@@ -188,7 +188,14 @@
             "additionalProperties": false,
             "properties": {
                 "throughput": {
-                    "type": "number"
+                    "oneOf": [
+                        {
+                            "type": "number"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "accuracy": {
                     "oneOf": [
