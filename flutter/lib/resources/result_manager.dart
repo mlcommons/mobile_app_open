@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
 

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 
 class RunSettings {

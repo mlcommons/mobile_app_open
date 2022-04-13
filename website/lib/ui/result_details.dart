@@ -69,6 +69,8 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
                   SizedBox(height: 20),
                   _makeEnvTable(result.envInfo),
                   SizedBox(height: 20),
+                  _makeBuildInfoTable(result.buildInfo),
+                  SizedBox(height: 20),
                   ..._makeResults(result.results),
                 ],
               ),
@@ -124,7 +126,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
     return _makeTable(
       <TableRow>[
         _makeTableRow(const Text('App version'), Text(info.version)),
-        _makeTableRow(const Text('App version'), Text(info.buildNumber)),
+        _makeTableRow(const Text('Build number'), Text(info.buildNumber)),
         _makeTableRow(const Text('Modified version'),
             Text((!originalVersion).toString())),
       ],

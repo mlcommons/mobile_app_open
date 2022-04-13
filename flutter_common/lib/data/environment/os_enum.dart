@@ -34,4 +34,9 @@ class OsName {
         throw 'invalid Os value: $value';
     }
   }
+
+  @override
+  String toString() {
+    return toJson();
+  }
 }

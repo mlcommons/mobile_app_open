@@ -1,4 +1,3 @@
-import '../results/backend_info.dart';
 import 'os_enum.dart';
 
 class EnvironmentInfo {
