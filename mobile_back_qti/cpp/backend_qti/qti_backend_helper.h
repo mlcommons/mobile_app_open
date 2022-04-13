@@ -21,9 +21,16 @@ limitations under the License.
 #include "DlSystem/IUserBufferFactory.hpp"
 #include "SNPE/PSNPE.hpp"
 #include "SNPE/SNPE.hpp"
+<<<<<<< HEAD
 #include "allocator.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
+=======
+#include "android/cpp/c/backend_c.h"
+#include "android/cpp/c/type.h"
+>>>>>>> submission-v2.0-unified
+
+#include "allocator.h"
 
 #define SIGNED_PD 0
 #define UNSIGNED_PD 1
@@ -32,6 +39,7 @@ limitations under the License.
 class QTIBackendHelper {
  private:
   zdl::DlSystem::RuntimeList inputRuntimeList;
+  zdl::DlSystem::RuntimeList dummyInputRuntimeList;
   zdl::PSNPE::RuntimeConfigList runtimeConfigsList;
 
   inline int get_num_inits();
@@ -82,6 +90,7 @@ class QTIBackendHelper {
   void map_outputs();
   void get_data_formats();
   void set_runtime_config();
+  std::string get_snpe_version();
 };
 
 #endif

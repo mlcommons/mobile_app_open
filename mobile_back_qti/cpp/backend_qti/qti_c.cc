@@ -24,6 +24,13 @@ limitations under the License.
 #include "tensorflow/core/platform/logging.h"
 #include "tflite_c.h"
 
+#define xverstr(a) verstr(a)
+#define verstr(a) #a
+
+#ifndef SNPE_VERSION_STRING
+#define SNPE_VERSION_STRING "default"
+#endif
+
 static QTIBackendHelper *backend_data_ = nullptr;
 
 #ifdef __cplusplus
@@ -67,6 +74,9 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
       case SDM778:
         *settings = qti_settings_sdm778.c_str();
         break;
+	  case SD8G1:
+        *settings = qti_settings_sd8g1.c_str();
+	  	break;
       default:
         // it's a QTI SOC, but the chipset is not yet supported
         *not_allowed_message = "Unsupported QTI SoC";
@@ -80,6 +90,7 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
   *settings = nullptr;
   return false;
 }
+
 // Create a new backend and return the pointer to it.
 mlperf_backend_ptr_t mlperf_backend_create(
     const char *model_path, mlperf_backend_configuration_t *configs,
@@ -126,6 +137,16 @@ mlperf_backend_ptr_t mlperf_backend_create(
   adsp_lib_path << "/system/lib/rfsa/adsp;/system/vendor/lib/rfsa/adsp;/dsp";
   LOG(INFO) << "lib_path: " << adsp_lib_path.str();
   setenv("ADSP_LIBRARY_PATH", adsp_lib_path.str().c_str(), 1 /*override*/);
+  std::string snpe_version = xverstr(SNPE_VERSION_STRING);
+  if (snpe_version.compare("default") != 0){
+    int dotPosition = snpe_version.find_last_of(".");
+    snpe_version = snpe_version.substr(dotPosition+1);
+  }
+
+  if (snpe_version.compare(backend_data->get_snpe_version()) != 0) {
+    LOG(FATAL) << "Snpe libs modified. expected: " << snpe_version << " found: " << backend_data->get_snpe_version();
+  }
+  LOG(INFO) << "snpe_version: " <<  snpe_version;
 
   // set runtime config
   backend_data->set_runtime_config();
@@ -154,6 +175,11 @@ const char *mlperf_backend_accelerator_name(mlperf_backend_ptr_t backend_ptr) {
 const char *mlperf_backend_name(mlperf_backend_ptr_t backend_ptr) {
   QTIBackendHelper *backend_data = (QTIBackendHelper *)backend_ptr;
   return backend_data->name_;
+}
+
+// Return the vendor name of this backend
+const char *mlperf_backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
+  return "QTI";
 }
 
 // Destroy the backend pointer and its data.

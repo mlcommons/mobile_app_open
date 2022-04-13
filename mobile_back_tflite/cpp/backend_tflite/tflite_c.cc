@@ -206,7 +206,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
     //   if it is not specified in settings.
     // If we don't use batching, we will use shards_num=1,
     //   which is the default value.
-    backend_data->shards_num = 2;
+    backend_data->shards_num = 4;
 
     // TODO convert this to a member var
     for (int i = 0; i < configs->count; ++i) {
@@ -267,27 +267,21 @@ mlperf_backend_ptr_t mlperf_backend_create(
       backend_data->accelerator = "Neuron";
       // The kOptimizationBatchProcessor doesn't work yet.
       // Use NNAPI instead.
-      //
-      // Here we use the batch size of the task to check if this
-      // is for offline/batch scenario, if batch size is not
-      // larger than 1, assume it's offline and use NNAPI delegate
-      // to handle it.
-      //
-      // When batch_size > 1 and divisible by shards_num, we have
-      //   backend_data->real_batch_size =
-      //     configs->batch_size / backend_data->shards_num;
-      // which is not what we want. E.g., for shards_num = 2 and
-      // batch_size = 2, then real_batch_size = 1. We still want to
-      // use NNAPI delegate for this case.
       if (configs->batch_size > 1) {
         auto options = tflite::StatefulNnApiDelegate::Options();
         options.allow_fp16 = true;
         options.disallow_nnapi_cpu = true;
         delegate = new tflite::StatefulNnApiDelegate(options);
+#if 0
+        auto options = TfLiteNeuronDelegateOptionsDefault();
+        options.execution_preference = kTurboBoost;
+        options.allow_fp16 = true;
+        delegate = TfLiteNeuronDelegateCreate(&options);
+#endif
       } else {
         auto options = TfLiteNeuronDelegateOptionsDefault();
-        options.optimization_hint =
-            kOptimizationLowLatency | kOptimizationDeepFusion;
+        options.optimization_hint = kOptimizationLowLatency;
+        options.execution_preference = kTurboBoost;
         options.allow_fp16 = true;
         delegate = TfLiteNeuronDelegateCreate(&options);
       }
@@ -470,9 +464,20 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                          void *data) {
   TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
 #if defined(MTK_TFLITE_NEURON_BACKEND) && defined(__ANDROID__)
-  if (use_gpu)
-    perf_handle =
-        acquirePerformanceLock(perf_handle, FAST_SINGLE_ANSWER_MODE, 2000);
+  if (use_gpu) {
+    static std::vector<int32_t> kParams = {
+        0x00414000,  // PERF_RES_CPUFREQ_PERF_MODE
+        1,
+        0x0143c000,  // PERF_RES_SCHED_ISOLATION_CPU,
+        128,
+        0x01000000,  // PERF_RES_DRAM_OPP_MIN,
+        0};
+
+    // perf_handle =
+    //    acquirePerformanceLock(perf_handle, FAST_SINGLE_ANSWER_MODE, 2000);
+    perf_handle = acquirePerfParamsLock(perf_handle, 2000, kParams.data(),
+                                        kParams.size());
+  }
 #endif
   const int shard_index = batch_index / backend_data->real_batch_size;
   TfLiteTensor *tensor = TfLiteInterpreterGetInputTensor(

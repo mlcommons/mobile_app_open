@@ -35,6 +35,7 @@ MODEL_BASE_PATH=${DLCBUILDDIR}/mobile
 MOBILENETEDGETPU_MODEL_PATH=${MODEL_BASE_PATH}/vision/mobilenet/models_and_code/checkpoints/float
 DEEPLABV3QAT_MODEL_PATH=${MODEL_BASE_PATH}/vision/deeplab/models_and_code/checkpoints/quantize_aware_training
 MOBILEBERT_MODEL_PATH=${MODEL_BASE_PATH}/language/bert/models_and_code/checkpoints/quant/
+MOBILEMOSAIC_MODEL_PATH=${MODEL_BASE_PATH}/vision/mosaic/models_and_checkpoints/R4/
 
 ${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp:
 	# Building mlperf_mobile docker
@@ -42,16 +43,28 @@ ${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp:
 	mkdir -p ${DLCBUILDDIR}
 	touch $@
 
+${DLCBUILDDIR}/mlperf_mosaic_docker.stamp:
+	# Building mlperf_mosaic docker
+	docker image build -t mlperf_mosaic:1.0 $(dir $(abspath ${TOPDIR}/mobile_back_qti/docker/mlperf_mosaic/Dockerfile))
+	mkdir -p ${DLCBUILDDIR}
+	touch $@
 
 hta-dlc: ${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_hta.stamp \
 	${DLCBUILDDIR}/ssd_mobiledet_qat_hta.stamp \
+	${DLCBUILDDIR}/mobile_mosaic_hta.stamp \
 	${DLCBUILDDIR}/deeplabv3_hta.stamp
 
 htp-dlc: ${DLCBUILDDIR}/mobilebert_htp.stamp \
 	${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_htp.stamp \
 	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.stamp \
 	${DLCBUILDDIR}/deeplabv3_htp.stamp \
-	${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_htp_batched.stamp
+	${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_htp_batched.stamp \
+	${DLCBUILDDIR}/mobile_mosaic_htp.stamp \
+	${DLCBUILDDIR}/deeplabv3_float.dlc
+
+mosaic: \
+	${DLCBUILDDIR}/mobile_mosaic_htp.stamp \
+	${DLCBUILDDIR}/mobile_mosaic_hta.stamp
 
 mobilenet_edgetpu: \
 	${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_htp.stamp \
@@ -67,6 +80,12 @@ deeplabv3: \
 
 mobilebert: \
 	${DLCBUILDDIR}/mobilebert_htp.stamp
+
+deeplab_float: ${DLCBUILDDIR}/deeplabv3_float.dlc
+
+${BUILDDIR}/datasets.stamp:
+	(cd ../datasets && make)
+	touch $@
 
 ${DLCBUILDDIR}/mobile/.stamp:
 	# Downloading mobile
@@ -136,7 +155,7 @@ ${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_htp.stamp: \
 			--input_list=imagenet_image_list.txt \
 			--output_dlc=/output/mobilenet_edgetpu_224_1.0_htp.dlc \
 			--enable_htp \
-			--htp_socs sm8350,sm7325
+			--htp_socs sm8350,sm7325,sm8450
 	# Mobilenetedge TPU model conversion completed
 	touch $@
 
@@ -155,7 +174,7 @@ ${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_float_batched.dlc: \
 		mlperf_mobile:1.1 \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-tensorflow-to-dlc \
 			-i /models/frozen_graph_tf1x_transform.pb \
-			-d input "4,224,224,3" --out_node "MobilenetEdgeTPU/Predictions/Softmax" \
+			-d input "3,224,224,3" --out_node "MobilenetEdgeTPU/Predictions/Softmax" \
 			-o /output/mobilenet_edgetpu_224_1.0_float_batched.dlc
 
 ${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_htp_batched.stamp: \
@@ -177,7 +196,7 @@ ${DLCBUILDDIR}/mobilenet_edgetpu_224_1.0_htp_batched.stamp: \
 			--input_list=imagenet_image_list.txt \
 			--output_dlc=/output/mobilenet_edgetpu_224_1.0_htp_batched.dlc \
 			--enable_htp \
-			--htp_socs sm8350,sm7325
+			--htp_socs sm8350,sm7325,sm8450
 	# Mobilenetedge TPU model conversion completed
 	touch $@
 	
@@ -247,35 +266,30 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp.stamp: \
 			--input_list=coco_image_list.txt \
 			--output_dlc=/output/ssd_mobiledet_qat_htp.dlc \
 			--enable_htp \
-			--htp_socs sm8350,sm7325
+			--htp_socs sm8350,sm7325,sm8450
 	# SSD MobileDET model conversion for HTP completed
 	touch $@
 
-
-${DLCBUILDDIR}/deeplabv3_quantized.dlc: \
-		${DLCDIR}/argmax-quant.json \
-		${DEEPLABV3QAT_MODEL_PATH}/freeze.pb \
-		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp \
-		${DLCBUILDDIR}/mobile/.stamp
-	# Deeplab v3 model conversion ....
-	# Deeplabv3 QAT model
-	cat ${DLCDIR}/argmax-quant.json
-	docker run \
+${DLCBUILDDIR}/deeplabv3_float.dlc: \
+		${DLCBUILDDIR}/mobile/.stamp ${DEEPLABV3QAT_MODEL_PATH}/freeze.pb \
+		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp
+	@echo "Deeplab v3 model conversion ...."
+	@echo "Deeplabv3 model"
+	@mkdir -p ${DLCBUILDDIR}
+	@docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DEEPLABV3QAT_MODEL_PATH}:/deeplabv3 \
 		-v ${DLCBUILDDIR}:/output \
-		-v ${DLCDIR}:/dlc \
+		-v ${TOPDIR}/DLC:/dlc \
 		-u ${USERID}:${GROUPID} \
 		mlperf_mobile:1.1 \
-		/snpe_sdk/bin/x86_64-linux-clang/snpe-tensorflow-to-dlc \
-			-i /deeplabv3/freeze.pb \
-			-d ImageTensor "1,512,512,3" \
-			--out_node ArgMax \
-			--quantization_overrides /dlc/argmax-quant.json \
-			-o /output/deeplabv3_quantized.dlc
-	# Generated DLC from Deeplabv3 QAT model
-
+		/bin/bash -c '/snpe_sdk/bin/x86_64-linux-clang/snpe-tensorflow-to-dlc \
+		-i /deeplabv3/freeze.pb \
+		-d ImageTensor "1,512,512,3" \
+		--out_node ArgMax \
+		-o /output/deeplabv3_float.dlc'
+	@echo "Generated DLC from Deeplabv3 model"
 
 ${DLCBUILDDIR}/ade20k/ade20k_image_list.txt: ${DLCBUILDDIR}/ade20k/state/quantdata.stamp
 	mkdir -p ${DLCBUILDDIR}/ade20k
@@ -284,7 +298,7 @@ ${DLCBUILDDIR}/ade20k/ade20k_image_list.txt: ${DLCBUILDDIR}/ade20k/state/quantda
 ${DLCBUILDDIR}/deeplabv3_hta.stamp: \
 		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp \
 		${DLCBUILDDIR}/ade20k/ade20k_image_list.txt \
-		${DLCBUILDDIR}/deeplabv3_quantized.dlc
+		${DLCBUILDDIR}/deeplabv3_float.dlc
 	# Quantization of Deeplabv3 DLC
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -296,8 +310,9 @@ ${DLCBUILDDIR}/deeplabv3_hta.stamp: \
 		-u ${USERID}:${GROUPID} \
 		mlperf_mobile:1.1 \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-quantize \
-			--input_dlc=/output/deeplabv3_quantized.dlc \
+			--input_dlc=/output/deeplabv3_float.dlc \
 			--input_list=ade20k_image_list.txt \
+			--use_encoding_optimizations \
 			--output_dlc=/output/deeplabv3_hta.dlc \
 			--enable_hta
 	# Deeplab v3 model conversion completed
@@ -307,7 +322,7 @@ ${DLCBUILDDIR}/deeplabv3_hta.stamp: \
 ${DLCBUILDDIR}/deeplabv3_htp.stamp: \
 		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp \
 		${DLCBUILDDIR}/ade20k/ade20k_image_list.txt \
-		${DLCBUILDDIR}/deeplabv3_quantized.dlc
+		${DLCBUILDDIR}/deeplabv3_float.dlc
 	# Quantization of Deeplabv3 DLC
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -319,13 +334,13 @@ ${DLCBUILDDIR}/deeplabv3_htp.stamp: \
 		-u ${USERID}:${GROUPID} \
 		mlperf_mobile:1.1 \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-quantize \
-			--input_dlc=/output/deeplabv3_quantized.dlc \
+			--input_dlc=/output/deeplabv3_float.dlc \
 			--input_list=ade20k_image_list.txt \
 			--output_dlc=/output/deeplabv3_htp.dlc \
-			--override_params --enable_htp \
-			--htp_socs sm8350,sm7325
+			--use_encoding_optimizations \
+			--enable_htp \
+			--htp_socs sm8350,sm7325,sm8450
 	# Deeplab v3 model conversion completed
-	@# Can't use deeplabv3_htp.dlc as make target since this file is present on failure
 	touch $@
 
 ${DLCBUILDDIR}/mobilebert_quant.pb: \
@@ -398,10 +413,82 @@ ${DLCBUILDDIR}/mobilebert_htp.stamp: \
 			--weights_bitwidth 8 \
 			--act_bitwidth 8 \
 			--enable_htp \
-			--htp_socs sm7325,sm8350 \
+			--htp_socs sm7325,sm8350,sm8450 \
 			--use_encoding_optimizations \
 			--output_dlc=/output/mobilebert_quantized_htp.dlc
 	touch $@
+
+${DLCBUILDDIR}/mobile_mosaic_float.dlc: \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/mlperf_mosaic_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp
+	# Mobile Mosaic model conversion ....
+	# Mobile Mosaic QAT model
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${MOBILEMOSAIC_MODEL_PATH}:/mobile_mosaic \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${TOPDIR}/DLC:/dlc \
+		-u ${USERID}:${GROUPID} \
+		mlperf_mosaic:1.0 \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-tensorflow-to-dlc \
+			-i /mobile_mosaic/mobile_segmenter_r4_frozen_graph.pb \
+			-d sub_2 "1,512,512,3" \
+			--out_node ArgMax \
+			-o /output/mobile_mosaic_float.dlc
+	# Generated DLC from mobile Mosaic QAT model
+
+${DLCBUILDDIR}/mobile_mosaic_htp.stamp: \
+		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp \
+		${DLCBUILDDIR}/ade20k/ade20k_image_list.txt \
+		${DLCBUILDDIR}/mobile_mosaic_float.dlc
+	# Quantization of Mobile Mosaic DLC
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/ade20k:/ade20k \
+		-w /ade20k \
+		-u ${USERID}:${GROUPID} \
+		mlperf_mobile:1.1 \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-quantize \
+			--input_dlc=/output/mobile_mosaic_float.dlc \
+			--input_list=ade20k_image_list.txt \
+			--output_dlc=/output/mobile_mosaic_htp.dlc \
+			--enable_htp \
+			--optimizations cle \
+			--optimizations bc \
+			--use_encoding_optimizations \
+			--htp_socs sm8450,sm8350,sm7325
+	#Mobile Mosaic HTP model conversion completed
+	touch $@
+
+${DLCBUILDDIR}/mobile_mosaic_hta.stamp: \
+		${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp \
+		${DLCBUILDDIR}/ade20k/ade20k_image_list.txt \
+		${DLCBUILDDIR}/mobile_mosaic_float.dlc
+	# Quantization of Mobile Mosaic DLC
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/ade20k:/ade20k \
+		-w /ade20k \
+		-u ${USERID}:${GROUPID} \
+		mlperf_mobile:1.1 \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-quantize \
+			--input_dlc=/output/mobile_mosaic_float.dlc \
+			--input_list=ade20k_image_list.txt \
+			--output_dlc=/output/mobile_mosaic_hta.dlc \
+			--enable_hta \
+			--optimizations cle \
+			--optimizations bc
+	#Mobile Mosaic HTA model conversion completed
+	touch $@
+
 
 ####################################################################################
 # CALIBRATION / QUANTIZATION
@@ -528,6 +615,7 @@ gen-hta-dlc-info: \
 		/bin/bash -c '\
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilenet_edgetpu_224_1.0_hta.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/ssd_mobiledet_qat_htp.dlc && \
+			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobile_mosaic_hta.dlc' && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/deeplabv3_hta.dlc'
 
 gen-htp-dlc-info: \
@@ -545,6 +633,7 @@ gen-htp-dlc-info: \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/ssd_mobiledet_qat_htp.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/deeplabv3_htp.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilenet_edgetpu_224_1.0_htp_batched.dlc && \
+			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobile_mosaic_htp.dlc' && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilebert_quantized_htp.dlc'
 
 ####################################################################################

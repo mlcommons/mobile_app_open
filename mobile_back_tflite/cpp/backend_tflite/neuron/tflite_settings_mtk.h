@@ -95,6 +95,7 @@ benchmark_setting {
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
+  batch_size: 1
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
 }
 
@@ -103,7 +104,7 @@ benchmark_setting {
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
-  batch_size: 128
+  batch_size: 256
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
 }
 
@@ -112,15 +113,17 @@ benchmark_setting {
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
+  batch_size: 1
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
 }
 
 benchmark_setting {
   benchmark_id: "LU_float32"
-  accelerator: "gpu_f16"
-  accelerator_desc: "GPU FP16"
+  accelerator: "neuron"
+  accelerator_desc: "neuron"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+  batch_size: 1
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
 }
 
 benchmark_setting {
@@ -128,17 +131,16 @@ benchmark_setting {
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
+  batch_size: 1
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_uint8.tflite"
 }
 
 benchmark_setting {
   benchmark_id: "IS_uint8_mosaic"
-  accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  accelerator: "nnapi"
+  accelerator_desc: "NNAPI"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
-}
-
-)SETTINGS";
+})SETTINGS";
 
 #endif

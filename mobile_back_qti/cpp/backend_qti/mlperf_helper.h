@@ -20,6 +20,8 @@ limitations under the License.
 #include "qti_backend_helper.h"
 #include "tensorflow/core/platform/logging.h"
 
+extern bool useIonBuffer_g;
+
 static void process_config(const mlperf_backend_configuration_t *configs,
                            QTIBackendHelper *backend_data) {
   backend_data->isTflite_ = false;
