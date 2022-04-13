@@ -8,9 +8,8 @@ import 'package:flutter/material.dart' hide Icons;
 
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
-import 'package:mlperfbench/backend/bridge/run_result.dart';
-import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
+import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/data/results/backend_info.dart';
 import 'package:mlperfbench_common/data/results/backend_settings.dart';
 import 'package:mlperfbench_common/data/results/backend_settings_extra.dart';
@@ -18,7 +17,6 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench_common/data/results/dataset_info.dart';
 import 'package:mlperfbench_common/data/results/dataset_type.dart';
 import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
-import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,9 +26,11 @@ import 'package:wakelock/wakelock.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
+import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
+import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';
@@ -296,18 +296,13 @@ class BenchmarkState extends ChangeNotifier {
             threadsNumber: benchmark.config.threadsNumber);
       }
 
-      exportResults.add(exportResultFromRunInfo(
-          benchmark,
-          performanceResult,
-          accuracyResult,
-          performanceRunInfo.settings.backend_settings));
+      exportResults.add(exportResultFromRunInfo(benchmark, performanceResult,
+          accuracyResult, performanceRunInfo.settings.backend_settings));
     }
 
     if (!_aborting) {
       lastResult = ExtendedResult(
-        meta: ResultMetaInfo(
-          uuid: Uuid().v4()
-        ),
+        meta: ResultMetaInfo(uuid: Uuid().v4()),
         envInfo: DeviceInfo.environmentInfo,
         results: BenchmarkExportResultList(exportResults),
         buildInfo: BuildInfoHelper.info,

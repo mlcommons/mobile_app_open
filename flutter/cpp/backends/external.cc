@@ -102,7 +102,8 @@ BackendFunctions::BackendFunctions(const std::string& lib_path) {
   create =
       reinterpret_cast<decltype(create)>(GetSymbol("mlperf_backend_create"));
   name = reinterpret_cast<decltype(name)>(GetSymbol("mlperf_backend_name"));
-  vendor = reinterpret_cast<decltype(vendor)>(GetSymbol("mlperf_backend_vendor_name"));
+  vendor = reinterpret_cast<decltype(vendor)>(
+      GetSymbol("mlperf_backend_vendor_name"));
   accelerator_name = reinterpret_cast<decltype(accelerator_name)>(
       GetSymbol("mlperf_backend_accelerator_name"));
   destroy =

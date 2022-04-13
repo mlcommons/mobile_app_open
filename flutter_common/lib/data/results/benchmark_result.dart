@@ -1,7 +1,7 @@
+import 'backend_info.dart';
 import 'backend_settings.dart';
 import 'dataset_info.dart';
 import 'loadgen_scenario.dart';
-import 'backend_info.dart';
 
 class BenchmarkRunResult {
   static const String _tagThroughput = 'throughput';
@@ -19,33 +19,33 @@ class BenchmarkRunResult {
   final String startDatetime;
 
   BenchmarkRunResult({
-    required this.throughput, 
-    required this.accuracy, 
+    required this.throughput,
+    required this.accuracy,
     required this.datasetInfo,
-      required this.measuredDurationMs,
-      required this.measuredSamples,
-      required this.startDatetime,
+    required this.measuredDurationMs,
+    required this.measuredSamples,
+    required this.startDatetime,
   });
 
   BenchmarkRunResult.fromJson(Map<String, dynamic> json)
-  : this(
-     throughput: json[_tagThroughput] as double?,
-     accuracy: json[_tagAccuracy] as double?,
-     datasetInfo: DatasetInfo.fromJson(
-                json[_tagDatasetInfo] as Map<String, dynamic>),
-            measuredDurationMs: json[_tagMeasuredDuration] as double,
-            measuredSamples: json[_tagMeasuredSamples] as int,
-            startDatetime: json[_tagStartDatetime] as String,
-  );
+      : this(
+          throughput: json[_tagThroughput] as double?,
+          accuracy: json[_tagAccuracy] as double?,
+          datasetInfo: DatasetInfo.fromJson(
+              json[_tagDatasetInfo] as Map<String, dynamic>),
+          measuredDurationMs: json[_tagMeasuredDuration] as double,
+          measuredSamples: json[_tagMeasuredSamples] as int,
+          startDatetime: json[_tagStartDatetime] as String,
+        );
 
   Map<String, dynamic> toJson() => {
-    _tagThroughput: throughput,
-    _tagAccuracy: accuracy,
-    _tagDatasetInfo: datasetInfo,
+        _tagThroughput: throughput,
+        _tagAccuracy: accuracy,
+        _tagDatasetInfo: datasetInfo,
         _tagMeasuredDuration: measuredDurationMs,
         _tagMeasuredSamples: measuredSamples,
         _tagStartDatetime: startDatetime,
-  };
+      };
 }
 
 class BenchmarkExportResult {
@@ -89,7 +89,9 @@ class BenchmarkExportResult {
             backendSettingsInfo: BackendSettingsInfo.fromJson(
                 json[_tagBackendSettings] as Map<String, dynamic>),
             performance: BenchmarkRunResult.fromJson(json[_tagPerformanceRun]),
-            accuracy: json[_tagAccuracyRun] == null ? null : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
+            accuracy: json[_tagAccuracyRun] == null
+                ? null
+                : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
             minDurationMs: json[_tagMinDuration] as double,
             minSamples: json[_tagMinSamples] as int,
             backendInfo: BackendReportedInfo.fromJson(json[_tagBackendInfo]));
@@ -136,7 +138,8 @@ class BenchmarkExportResultList {
         continue;
       }
       throughput += item.performance!.throughput!;
-      count++;;
+      count++;
+      ;
     }
     return throughput / count;
   }

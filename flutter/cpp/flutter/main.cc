@@ -122,8 +122,9 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   }
   li;
 
-  ::mlperf::mobile::MlperfDriver driver(std::move(dataset), std::move(backend),
-                                        in->scenario, settings.benchmark_setting().batch_size());
+  ::mlperf::mobile::MlperfDriver driver(
+      std::move(dataset), std::move(backend), in->scenario,
+      settings.benchmark_setting().batch_size());
   li;
 
   {

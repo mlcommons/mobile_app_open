@@ -61,7 +61,7 @@ To build with an official UI, you need to set
 * the environment variable `OFFICIAL_BUILD=true` if `make` is used (e.g. `OFFICIAL_BUILD=true make flutter/android/apk`), or
 * the argument `--dart-define=official-build=true` if `flutter` is used (e.g. `flutter build apk --dart-define=official-build=true`).
 
-# Build info
+## Build info
 
 Make sure that build info is updated before running the app.
 Nothing will explicitly break if you forget to do it but meta information in saved result will be misleading.
@@ -69,7 +69,9 @@ Nothing will explicitly break if you forget to do it but meta information in sav
 If you run the app using console, run `make flutter/build-info` command manually.
 
 If you run the app using VS Code Flutter extension, you can set up a hook to update build info automatically.
+
 1. Add new [task](https://code.visualstudio.com/docs/editor/tasks#_custom-tasks) into `.vscode/tasks.json`:
+
     ```json
     {
         "label": "generate-flutter-build-info",
@@ -81,6 +83,7 @@ If you run the app using VS Code Flutter extension, you can set up a hook to upd
         }
     }
     ```
+
 2. Edit Flutter launch command in `.vscode/launch.json`:  
   Add `"preLaunchTask": "generate-flutter-build-info"` line into each flutter launch config.
 

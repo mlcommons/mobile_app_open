@@ -9,20 +9,20 @@ class BackendReportedInfo {
   final String name;
   final String accelerator;
 
-  BackendReportedInfo(
-      {required this.filename,
-      required this.vendor,
-      required this.name,
-      required this.accelerator,
-      });
+  BackendReportedInfo({
+    required this.filename,
+    required this.vendor,
+    required this.name,
+    required this.accelerator,
+  });
 
   BackendReportedInfo.fromJson(Map<String, dynamic> json)
       : this(
-            filename: json[_tagFilename] as String,
-            vendor: json[_tagVendorName] as String,
-            name: json[_tagBackendName] as String,
-            accelerator: json[_tagAcceleratorName] as String,
-            );
+          filename: json[_tagFilename] as String,
+          vendor: json[_tagVendorName] as String,
+          name: json[_tagBackendName] as String,
+          accelerator: json[_tagAcceleratorName] as String,
+        );
 
   Map<String, dynamic> toJson() => {
         _tagFilename: filename,

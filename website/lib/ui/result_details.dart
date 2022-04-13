@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:mlperfbench_common/data/build_info/build_info.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
@@ -58,11 +59,12 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   _makeTable(<TableRow>[
-                    _makeTableRow(const Text('Result UUID'), Text(result.meta.uuid)),
+                    _makeTableRow(
+                        const Text('Result UUID'), Text(result.meta.uuid)),
                     _makeTableRow(const Text('Average throughput'),
                         Text('${result.results.calculateAverageThroughput()}')),
-                    _makeTableRow(
-                        const Text('Upload date'), Text(result.meta.uploadDate!)),
+                    _makeTableRow(const Text('Upload date'),
+                        Text(result.meta.uploadDate!)),
                   ]),
                   SizedBox(height: 20),
                   _makeEnvTable(result.envInfo),
@@ -104,7 +106,8 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
   Widget _makeEnvTable(EnvironmentInfo info) {
     return _makeTable(
       <TableRow>[
-        _makeTableRow(const Text('Operation system'), Text(info.osName.toString())), // TODO
+        _makeTableRow(const Text('Operation system'),
+            Text(info.osName.toString())), // TODO
         _makeTableRow(const Text('OS version'), Text(info.osVersion)),
         _makeTableRow(
             const Text('Device manufacturer'), Text(info.manufacturer)),
@@ -114,12 +117,16 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
   }
 
   Widget _makeBuildInfoTable(BuildInfo info) {
-    final originalVersion = info.officialReleaseFlag && !info.devTestFlag && !info.gitDirtyFlag && info.gitBranch == 'master';
+    final originalVersion = info.officialReleaseFlag &&
+        !info.devTestFlag &&
+        !info.gitDirtyFlag &&
+        info.gitBranch == 'master';
     return _makeTable(
       <TableRow>[
         _makeTableRow(const Text('App version'), Text(info.version)),
         _makeTableRow(const Text('App version'), Text(info.buildNumber)),
-        _makeTableRow(const Text('Modified version'), Text((!originalVersion).toString())),
+        _makeTableRow(const Text('Modified version'),
+            Text((!originalVersion).toString())),
       ],
     );
   }
@@ -129,8 +136,10 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
       <TableRow>[
         _makeTableRow(const Text('Benchmark'),
             Text(info.benchmarkName)), // TODO replace with proper name
-        _makeTableRow(const Text('Throughput'), Text(info.performance?.throughput.toString() ?? 'N/A')),
-        _makeTableRow(const Text('Accuracy'), Text(info.accuracy?.accuracy.toString() ?? 'N/A')),
+        _makeTableRow(const Text('Throughput'),
+            Text(info.performance?.throughput.toString() ?? 'N/A')),
+        _makeTableRow(const Text('Accuracy'),
+            Text(info.accuracy?.accuracy.toString() ?? 'N/A')),
         _makeTableRow(const Text('Backend name'), Text(info.backendInfo.name)),
         _makeTableRow(
             const Text('Accelerator'), Text(info.backendInfo.accelerator)),

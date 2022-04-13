@@ -5,17 +5,17 @@ import 'package:uuid/uuid.dart';
 
 import '../build_info/backend_list.dart';
 import '../build_info/build_info.dart';
-import '../environment/os_enum.dart';
-import '../results/backend_info.dart';
-import '../meta_info.dart';
-import '../results/dataset_info.dart';
-import '../results/dataset_type.dart';
-import '../results/loadgen_scenario.dart';
 import '../environment/environment_info.dart';
+import '../environment/os_enum.dart';
 import '../extended_result.dart';
+import '../meta_info.dart';
+import '../results/backend_info.dart';
 import '../results/backend_settings.dart';
 import '../results/backend_settings_extra.dart';
 import '../results/benchmark_result.dart';
+import '../results/dataset_info.dart';
+import '../results/dataset_type.dart';
+import '../results/loadgen_scenario.dart';
 
 //
 // This file is intended to be used
@@ -45,9 +45,9 @@ Future<void> main() async {
     performance: runResult,
     accuracy: runResult,
     backendInfo: BackendReportedInfo(
-        filename: 'tflite',
-        vendor: 'tflite',
-        name: 'libtflitebackend',
+      filename: 'tflite',
+      vendor: 'tflite',
+      name: 'libtflitebackend',
       accelerator: 'accelerator',
     ),
     minDurationMs: 10.5,

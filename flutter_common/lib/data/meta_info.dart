@@ -10,7 +10,9 @@ class ResultMetaInfo {
   ResultMetaInfo.fromJson(Map<String, dynamic> json)
       : this(
             uuid: json[_tagUuid] as String,
-            uploadDate: json[_tagUploadDate] == null ? null : json[_tagUploadDate] as String);
+            uploadDate: json[_tagUploadDate] == null
+                ? null
+                : json[_tagUploadDate] as String);
 
   Map<String, dynamic> toJson() => {
         _tagUuid: uuid,

@@ -1,5 +1,5 @@
-import 'os_enum.dart';
 import '../results/backend_info.dart';
+import 'os_enum.dart';
 
 class EnvironmentInfo {
   static const String _tagOsEnum = 'os_name';
@@ -20,10 +20,11 @@ class EnvironmentInfo {
 
   EnvironmentInfo.fromJson(Map<String, dynamic> json)
       : this(
-            osName: OsName.fromJson(json[_tagOsEnum] as String),
-            osVersion: json[_tagOsVersion] as String,
-            manufacturer: json[_tagManufacturer] as String,
-            model: json[_tagModel] as String,);
+          osName: OsName.fromJson(json[_tagOsEnum] as String),
+          osVersion: json[_tagOsVersion] as String,
+          manufacturer: json[_tagManufacturer] as String,
+          model: json[_tagModel] as String,
+        );
 
   Map<String, dynamic> toJson() => {
         _tagManufacturer: manufacturer,

@@ -1,8 +1,9 @@
-import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench_common/data/build_info/backend_list.dart';
 import 'package:mlperfbench_common/data/build_info/build_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+
+import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/backend/list.dart';
 
 part 'build_info.gen.dart';
 

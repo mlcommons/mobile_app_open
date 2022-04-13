@@ -122,8 +122,8 @@ class ResultsListPageState extends State<ResultsListPage> {
             isThreeLine: true,
             subtitle: Text('$averageScoreText\n$uploadDateText'),
             onTap: () {
-              Navigator.of(context)
-                  .pushNamed('/${AppRoutes.resultDetails}/${details.meta.uuid}');
+              Navigator.of(context).pushNamed(
+                  '/${AppRoutes.resultDetails}/${details.meta.uuid}');
             },
           ));
         });

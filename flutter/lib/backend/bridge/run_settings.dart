@@ -1,6 +1,6 @@
+import 'dart:typed_data';
 
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
-import 'dart:typed_data';
 
 class RunSettings {
   final String backend_model_path;
