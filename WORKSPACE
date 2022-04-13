@@ -11,10 +11,20 @@ http_archive(
 
 http_archive(
     name = "org_tensorflow",
+<<<<<<< HEAD
     sha256 = "40d3203ab5f246d83bae328288a24209a2b85794f1b3e2cd0329458d8e7c1985",
     strip_prefix = "tensorflow-2.6.0",
+=======
+    patch_args = ["-p1"],
+    patches = [
+        # Fix tensorflow not being able to read image files on Windows
+        "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
+    ],
+    sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
+    strip_prefix = "tensorflow-2.8.0",
+>>>>>>> submission-v2.0-unified
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.6.0.zip",
+        "https://github.com/tensorflow/tensorflow/archive/v2.8.0.zip",
     ],
 )
 
@@ -80,14 +90,14 @@ maven_install(
 # Other dependencies.
 # Make this a repository so it can be substituted with the real backend
 
+# use prebuilt neuron delegate for this submission, we'll update source code github later
 # Neuron Delegate
-
-http_archive(
-    name = "neuron_delegate",
-    sha256 = "2e4600c99c9b4ea7a129108cd688419eeef9b2aeabf05df6f385258e19ca96c4",
-    strip_prefix = "tflite-neuron-delegate-2.6.0",
-    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/v2.6.0.tar.gz"],
-)
+#http_archive(
+#    name = "neuron_delegate",
+#    sha256 = "e80490919c87338fea402285142a629ca5795fbe08d8b4b1e071eb454c7a537d",
+#    strip_prefix = "tflite-neuron-delegate-86fc333bafe8e556c050fe8cc32acf1c49e65847",
+#    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/86fc333bafe8e556c050fe8cc32acf1c49e65847.tar.gz"],
+#)
 
 new_local_repository(
     name = "samsungbackend",

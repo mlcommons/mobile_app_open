@@ -129,6 +129,16 @@ benchmark_setting {
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/Google/v1_0/Google/deeplabv3.tflite"
-})SETTINGS";
+}
+
+benchmark_setting {
+  benchmark_id: "IS_uint8_mosaic"
+  accelerator: "nnapi"
+  accelerator_desc: "NNAPI"
+  configuration: "TFLite"
+  src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+}
+
+)SETTINGS";
 
 #endif

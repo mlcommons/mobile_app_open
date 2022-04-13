@@ -153,7 +153,6 @@ class Allocator {
   }
 
   void deallocate(T *p, std::size_t n) noexcept {
-    ChunkAllocator::getRpcMem().Free(p);
     if (useIonBuffer) {
       ChunkAllocator::getRpcMem().Free(p);
     } else {
@@ -176,7 +175,7 @@ template <class T>
 bool Allocator<T>::useIonBuffer = true;
 
 static void *get_ion_buffer(size_t n) {
-  void *p = ChunkAllocator::GetBuffer(n, 4);
+  void *p = ChunkAllocator::GetBuffer(n, 3);
   // LOG(INFO) << "QTI backend SNPE allocator " << n << " bytes at " << p;
   return p;
 }

@@ -119,6 +119,14 @@ benchmark_setting {
   accelerator_desc: "AIP"
   configuration: "SNPE"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/SNPE/deeplabv3_hta.dlc"
+}
+
+benchmark_setting {
+  benchmark_id: "IS_uint8_mosaic"
+  accelerator: "snpe_aip"
+  accelerator_desc: "AIP"
+  configuration: "SNPE"
+  src: "/sdcard/mlperf_models/mobile_mosaic_hta.dlc"
 })SETTINGS";
 
 const std::string qti_settings_sdm888 = R"SETTINGS(
@@ -217,7 +225,7 @@ benchmark_setting {
     id: "scenario"
     value: "Offline"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
+  src: "/sdcard/mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
 }
 
 benchmark_setting {
@@ -278,6 +286,26 @@ benchmark_setting {
     value: "uint_8"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/deeplabv3_htp.dlc"
+}
+
+benchmark_setting {
+  benchmark_id: "IS_uint8_mosaic"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "input_buffer_type"
+    value: "uint_8"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "uint_8"
+  }
+  src: "/sdcard/mlperf_models/mobile_mosaic_htp.dlc"
 })SETTINGS";
 
 const std::string qti_settings_sdm778 = R"SETTINGS(
@@ -375,7 +403,7 @@ benchmark_setting {
     id: "scenario"
     value: "Offline"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
+  src: "/sdcard/mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
 }
 
 benchmark_setting {
@@ -432,5 +460,210 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/deeplabv3_htp.dlc"
+}
+
+benchmark_setting {
+  benchmark_id: "IS_uint8_mosaic"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "input_buffer_type"
+    value: "uint_8"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "uint_8"
+  }
+  src: "/sdcard/mlperf_models/mobile_mosaic_htp.dlc"
 })SETTINGS";
+
+
+const std::string qti_settings_sd8g1 = R"SETTINGS(
+common_setting {
+  id: "num_threads"
+  name: "Number of threads"
+  value {
+    value: "4"
+    name: "4 threads"
+  }
+  acceptable_value {
+    value: "1"
+    name: "Single thread"
+  }
+  acceptable_value {
+    value: "2"
+    name: "2 threads"
+  }
+  acceptable_value {
+    value: "4"
+    name: "4 threads"
+  }
+  acceptable_value {
+    value: "8"
+    name: "8 threads"
+  }
+  acceptable_value {
+    value: "16"
+    name: "16 threads"
+  }
+}
+
+common_setting {
+  id: "configuration"
+  name: "configuration"
+  value {
+    value: "QTI backend using SNPE, NNAPI and TFLite GPU Delegate"
+    name: "QTI"
+  }
+}
+
+common_setting {
+  id: "share_results"
+  name: "Share results"
+  value {
+    value: "0"
+    name: "false"
+  }
+  acceptable_value {
+    value: "1"
+    name: "true"
+  }
+  acceptable_value {
+    value: "0"
+    name: "false"
+  }
+}
+
+
+common_setting {
+  id: "cooldown"
+  name: "Cooldown"
+  value {
+    value: "1"
+    name: "true"
+  }
+  acceptable_value {
+    value: "1"
+    name: "true"
+  }
+  acceptable_value {
+    value: "0"
+    name: "false"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "IC_tpu_uint8"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  src: "/sdcard/mlperf_models/mobilenet_edgetpu_224_1.0_htp.dlc"
+}
+
+benchmark_setting {
+  benchmark_id: "IC_tpu_uint8_offline"
+  accelerator: "psnpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  batch_size: 12288
+  custom_setting {
+    id: "scenario"
+    value: "Offline"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  src: "/sdcard/mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
+}
+
+benchmark_setting {
+  benchmark_id: "OD_uint8"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "snpe_output_layers"
+    value: "Postprocessor/BatchMultiClassNonMaxSuppression"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  src: "/sdcard/mlperf_models/ssd_mobiledet_qat_htp.dlc"
+}
+
+benchmark_setting {
+  benchmark_id: "LU_int8"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "snpe_output_layers"
+    value: "transpose"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  custom_setting {
+    id: "input_buffer_type"
+    value: "float_32"
+  }
+  custom_setting {
+    id: "use_ion_buffer"
+    value: "false"
+  }
+  src: "/sdcard/mlperf_models/mobilebert_quantized_htp.dlc"
+}
+
+benchmark_setting {
+  benchmark_id: "IS_uint8"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "input_buffer_type"
+    value: "uint_8"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "uint_8"
+  }
+  src: "/sdcard/mlperf_models/deeplabv3_htp.dlc"
+}
+
+benchmark_setting {
+  benchmark_id: "IS_uint8_mosaic"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "input_buffer_type"
+    value: "uint_8"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "uint_8"
+  }
+  src: "/sdcard/mlperf_models/mobile_mosaic_htp.dlc"
+})SETTINGS";
+
 #endif
