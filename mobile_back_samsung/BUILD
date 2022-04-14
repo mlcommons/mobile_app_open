@@ -11,7 +11,7 @@ config_setting(
 cc_library(
     name = "samsungbackend",
     srcs = [
-             "samsung_backend/lib/libsamsungbackend.so",
+        "samsung_backend/lib/libsamsungbackend.so",
     ] + select({
         "android_arm64": [
             "samsung_backend/lib/libenn_public_api_cpp.so",
@@ -20,8 +20,7 @@ cc_library(
             "samsung_backend/lib/libc++.so",
             "samsung_backend/lib/libeden_nn_on_system.so",
             #"samsung_backend/lib/libsbe2100_core.so",
-    ],
+        ],
         "//conditions:default": [],
     }),
 )
-

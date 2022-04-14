@@ -1,4 +1,5 @@
 """Find SNPE folder and pass it to bazel build config"""
+
 def _impl(repository_ctx):
     if "windows" in repository_ctx.os.name:
         fail("building with SNPE on Windows is not supported")

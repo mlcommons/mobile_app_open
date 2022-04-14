@@ -482,7 +482,6 @@ benchmark_setting {
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobile_mosaic_htp.dlc"
 })SETTINGS";
 
-
 const std::string qti_settings_sd8g1 = R"SETTINGS(
 common_setting {
   id: "num_threads"
