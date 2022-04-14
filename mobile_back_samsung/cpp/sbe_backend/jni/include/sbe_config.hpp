@@ -462,5 +462,5 @@ benchmark_setting {
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
 })SETTINGS";
 
-}	// namespace sbe
+}  // namespace sbe
 #endif

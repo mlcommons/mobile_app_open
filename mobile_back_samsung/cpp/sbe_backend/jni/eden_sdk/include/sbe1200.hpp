@@ -19,12 +19,14 @@ limitations under the License.
  * @author soobong Huh (soobong.huh@samsung.com)
  */
 
+#include <unistd.h>
+
+#include <fstream>
 #include <iostream>
 #include <queue>
-#include <unordered_map>
 #include <thread>
-#include <unistd.h>
-#include <fstream>
+#include <unordered_map>
+
 #include "client/eden_nn_api.h"
 #include "client/eden_types.h"
 #include "sbe_model_container.hpp"
@@ -32,14 +34,14 @@ limitations under the License.
 #include "type.h"
 namespace sbe {
 class sbe1200 {
-  public:
+ public:
   const std::string name_ = "sbe1200";
-	int m_batch_size;
+  int m_batch_size;
 
   /* common buf */
-	void* m_mdl_buf;
-	size_t m_mdl_buf_len;
-	HwPreference pref_hw = NPU_ONLY;
+  void *m_mdl_buf;
+  size_t m_mdl_buf_len;
+  HwPreference pref_hw = NPU_ONLY;
 
   std::vector<float> det_lbl_boxes;
   std::vector<float> det_lbl_indices;
@@ -50,7 +52,7 @@ class sbe1200 {
   std::vector<EdenBuffer *> m_mdl_inbuf;
   std::vector<EdenBuffer *> m_mdl_outbuf;
 
-  void * m_batch_buf;
+  void *m_batch_buf;
 
   /* create request */
   EdenRequest *requests;
@@ -63,8 +65,8 @@ class sbe1200 {
 
   model_container *mdl_container;
 
-  std::queue<std::pair<void*, void*>> task_pool;
-  std::unordered_map<void*, void*> heap_mem;
+  std::queue<std::pair<void *, void *>> task_pool;
+  std::unordered_map<void *, void *> heap_mem;
 
   std::condition_variable inferece_start_cond[MAX_INSTANCE];
   std::condition_variable inferece_done_cond;
@@ -84,7 +86,7 @@ class sbe1200 {
   void *allocate_buf(size_t);
   void release_buf(void *);
 
-  void set_inbuf(void*, int, int);
+  void set_inbuf(void *, int, int);
   void config_request();
   void impl_config_batch();
   bool initialize(mlperf_backend_configuration_t *);
@@ -96,36 +98,37 @@ class sbe1200 {
 
   /*  batch execution */
   void impl_inference_thread(int);
-  bool task_deque(int mdl_idx, std::pair<void*, void*>&node);
+  bool task_deque(int mdl_idx, std::pair<void *, void *> &node);
 
   /* target specific */
-  bool open_model(const char*, const char*);
+  bool open_model(const char *, const char *);
   void impl_load_model(const char *);
   bool set_model_buf();
 
-	sbe1200() : m_batch_size(0), m_mdl_buf(nullptr), m_created(false) {}
-};	// sbe1200
+  sbe1200() : m_batch_size(0), m_mdl_buf(nullptr), m_created(false) {}
+};  // sbe1200
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-  bool backend_create(const char *, mlperf_backend_configuration_t *, const char *);
-  mlperf_status_t backend_get_output(uint32_t, int32_t, void **);
-  int32_t backend_get_input_count();
-  mlperf_data_t backend_get_input_type(int32_t);
-  mlperf_status_t backend_set_input(int32_t, int32_t, void*);
-  int32_t backend_get_output_count();
-  mlperf_data_t backend_get_output_type(int32_t);
-  mlperf_status_t backend_issue_query();
-  void backend_convert_inputs(int, int, int, uint8_t*);
-  void backend_delete();
-  void *backend_get_buffer(size_t);
-  void backend_release_buffer(void*);
+bool backend_create(const char *, mlperf_backend_configuration_t *,
+                    const char *);
+mlperf_status_t backend_get_output(uint32_t, int32_t, void **);
+int32_t backend_get_input_count();
+mlperf_data_t backend_get_input_type(int32_t);
+mlperf_status_t backend_set_input(int32_t, int32_t, void *);
+int32_t backend_get_output_count();
+mlperf_data_t backend_get_output_type(int32_t);
+mlperf_status_t backend_issue_query();
+void backend_convert_inputs(int, int, int, uint8_t *);
+void backend_delete();
+void *backend_get_buffer(size_t);
+void backend_release_buffer(void *);
 
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
 
-} // namespace sbe;
+}  // namespace sbe
 #endif
