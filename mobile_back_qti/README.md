@@ -11,6 +11,7 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 
 ## Requirements
 
+<!-- markdown-link-check-disable-next-line -->
 * [SNPE SDK](https://createpoint.qti.qualcomm.com/tools/#suite/9186/64383)
   * Version 1.59.1 (Needs special access to the above link. POC: wchou@qti.qualcomm.com)
 * Linux machine capable of running Ubuntu 18.04 docker images
