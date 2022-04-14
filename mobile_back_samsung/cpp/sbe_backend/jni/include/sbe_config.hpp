@@ -136,7 +136,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "true"
   }
-  src: "/sdcard/MLPerf_sideload/ic_single_fence.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single_fence.nnc"
 }
 
 benchmark_setting {
@@ -172,7 +172,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/is.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
 }
 
 benchmark_setting {
@@ -208,7 +208,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/sm_uint8.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8.nnc"
 }
 
 benchmark_setting {
@@ -244,7 +244,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "true"
   }
-  src: "/sdcard/MLPerf_sideload/od_fence.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od_fence.nnc"
 }
 
 benchmark_setting {
@@ -280,7 +280,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/mobile_bert_gpu.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
 }
 
 benchmark_setting {
@@ -321,7 +321,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/ic_offline.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
 })SETTINGS";
 
 const std::string sbe1200_config = R"SETTINGS(
@@ -410,7 +410,7 @@ benchmark_setting {
     id: "o_type"
     value: "Uint8"
   }
-  src: "/sdcard/MLPerf_sideload/is.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
 }
 
 benchmark_setting {
@@ -426,7 +426,7 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "/sdcard/MLPerf_sideload/ic_single.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
 }
 
 benchmark_setting {
@@ -442,7 +442,7 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "/sdcard/MLPerf_sideload/od.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
 }
 
 benchmark_setting {
@@ -459,7 +459,7 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "/sdcard/MLPerf_sideload/ic_offline.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
 })SETTINGS";
 
 }	// namespace sbe
