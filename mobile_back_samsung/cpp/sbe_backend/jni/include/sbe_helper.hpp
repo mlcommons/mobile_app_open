@@ -22,20 +22,22 @@ limitations under the License.
  * @author soobong Huh (soobong.huh@samsung.com)
  */
 
-#include <stdint.h>
-#include <string>
-#include <unistd.h>
 #include <dlfcn.h>
-#include "sbe_utils.hpp"
+#include <stdint.h>
+#include <unistd.h>
+
+#include <string>
+
 #include "sbe_config.hpp"
+#include "sbe_utils.hpp"
 
 namespace sbe {
-    class core_ctrl {
-        public:
-            static int support_sbe(const char *, const char *);
-            static const char* get_benchmark_config(int core_id);
-            static int get_core_id();
-    };
-}
+class core_ctrl {
+ public:
+  static int support_sbe(const char *, const char *);
+  static const char *get_benchmark_config(int core_id);
+  static int get_core_id();
+};
+}  // namespace sbe
 
 #endif
