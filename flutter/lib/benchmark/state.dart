@@ -343,7 +343,7 @@ class BenchmarkState extends ChangeNotifier {
           ),
           measuredDurationMs: performance.durationMs,
           measuredSamples: performance.numSamples,
-          startDatetime: performance.startTime.toIso8601String(),
+          startDatetime: performance.startTime,
         ),
         accuracy: accuracy == null
             ? null
@@ -362,7 +362,7 @@ class BenchmarkState extends ChangeNotifier {
                 ),
                 measuredDurationMs: accuracy.durationMs,
                 measuredSamples: accuracy.numSamples,
-                startDatetime: accuracy.startTime.toIso8601String(),
+                startDatetime: accuracy.startTime,
               ),
         minDurationMs: benchmark.taskConfig.minDurationMs.toDouble(),
         minSamples: benchmark.taskConfig.minQueryCount,

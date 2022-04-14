@@ -108,6 +108,7 @@
                     "format": "uuid"
                 },
                 "upload_date": {
+                    "format": "date-time",
                     "oneOf": [
                         {
                             "type": "string"

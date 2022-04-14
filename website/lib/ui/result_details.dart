@@ -64,7 +64,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
                     _makeTableRow(const Text('Average throughput'),
                         Text('${result.results.calculateAverageThroughput()}')),
                     _makeTableRow(const Text('Upload date'),
-                        Text(result.meta.uploadDate!)),
+                        Text(result.meta.uploadDate!.toLocal().toIso8601String())),
                   ]),
                   SizedBox(height: 20),
                   _makeEnvTable(result.envInfo),

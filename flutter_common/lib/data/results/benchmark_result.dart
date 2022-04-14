@@ -16,7 +16,7 @@ class BenchmarkRunResult {
   final DatasetInfo datasetInfo;
   final double measuredDurationMs;
   final int measuredSamples;
-  final String startDatetime;
+  final DateTime startDatetime;
 
   BenchmarkRunResult({
     required this.throughput,
@@ -35,7 +35,7 @@ class BenchmarkRunResult {
               json[_tagDatasetInfo] as Map<String, dynamic>),
           measuredDurationMs: json[_tagMeasuredDuration] as double,
           measuredSamples: json[_tagMeasuredSamples] as int,
-          startDatetime: json[_tagStartDatetime] as String,
+          startDatetime: DateTime.parse(json[_tagStartDatetime] as String),
         );
 
   Map<String, dynamic> toJson() => {
@@ -44,7 +44,7 @@ class BenchmarkRunResult {
         _tagDatasetInfo: datasetInfo,
         _tagMeasuredDuration: measuredDurationMs,
         _tagMeasuredSamples: measuredSamples,
-        _tagStartDatetime: startDatetime,
+        _tagStartDatetime: startDatetime.toUtc().toIso8601String(),
       };
 }
 

@@ -37,7 +37,7 @@ Future<void> main() async {
     ),
     measuredDurationMs: 123.456,
     measuredSamples: 8,
-    startDatetime: 'date will be here',
+    startDatetime: DateTime.now(),
   );
   var exportResult = BenchmarkExportResult(
     benchmarkId: 'id',
@@ -73,7 +73,7 @@ Future<void> main() async {
   );
   var extendedResult = ExtendedResult(
     meta: ResultMetaInfo(
-      uploadDate: 'upload date will be here',
+      uploadDate: DateTime.now(),
       uuid: Uuid().v4(),
     ),
     buildInfo: BuildInfo(
