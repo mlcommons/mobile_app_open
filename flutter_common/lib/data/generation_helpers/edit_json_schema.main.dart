@@ -42,7 +42,8 @@ Future<void> main() async {
   makeNullable(definitions['Result']['properties']['accuracy_run']);
   makeNullable(definitions['Run']['properties']['throughput']);
   makeNullable(definitions['Run']['properties']['accuracy']);
-  (definitions['Run']['properties']['start_datetime'] as Map<String, dynamic>).remove('format');
+  (definitions['Run']['properties']['start_datetime'] as Map<String, dynamic>)
+      .remove('format');
 
   final editedSchema = JsonEncoder.withIndent('    ').convert(schema);
   await File(filename).writeAsString(editedSchema);

@@ -348,9 +348,8 @@ class BenchmarkState extends ChangeNotifier {
         accuracy: accuracy == null
             ? null
             : BenchmarkRunResult(
-                throughput: accuracy.throughput.isFinite
-                ? accuracy.throughput
-                : null,
+                throughput:
+                    accuracy.throughput.isFinite ? accuracy.throughput : null,
                 accuracy: double.tryParse(accuracy.accuracy),
                 datasetInfo: DatasetInfo(
                   name: benchmark.taskConfig.liteDataset.name,

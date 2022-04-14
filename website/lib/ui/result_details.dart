@@ -63,8 +63,11 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
                         const Text('Result UUID'), Text(result.meta.uuid)),
                     _makeTableRow(const Text('Average throughput'),
                         Text('${result.results.calculateAverageThroughput()}')),
-                    _makeTableRow(const Text('Upload date'),
-                        Text(result.meta.uploadDate!.toLocal().toIso8601String())),
+                    _makeTableRow(
+                        const Text('Upload date'),
+                        Text(result.meta.uploadDate!
+                            .toLocal()
+                            .toIso8601String())),
                   ]),
                   SizedBox(height: 20),
                   _makeEnvTable(result.envInfo),
