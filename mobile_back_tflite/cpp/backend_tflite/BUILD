@@ -136,6 +136,6 @@ cc_binary(
 )
 
 cc_library(
-   name = "libneuronusdk_adapter.mtk.so",
-   srcs = ["libneuronusdk_adapter.mtk.so.5"],
+    name = "libneuronusdk_adapter.mtk.so",
+    srcs = ["libneuronusdk_adapter.mtk.so.5"],
 )

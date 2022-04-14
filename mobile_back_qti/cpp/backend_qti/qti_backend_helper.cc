@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
+#include "qti_backend_helper.h"
+
 #include <string>
 #include <vector>
 
@@ -33,11 +35,8 @@ limitations under the License.
 #include "SNPE/UserBufferList.hpp"
 #include "absl/strings/ascii.h"
 #include "cpuctrl.h"
-
 #include "tensorflow/core/platform/logging.h"
 #include "tflite_c.h"
-
-#include "qti_backend_helper.h"
 
 int isSignedStatus = DEFAULT;
 
@@ -124,14 +123,13 @@ static zdl::DlSystem::Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
   if (isDSP) {
     if (isSignedStatus == DEFAULT) {
       if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-            runtime, zdl::DlSystem::RuntimeCheckOption_t::UNSIGNEDPD_CHECK)) {
+              runtime, zdl::DlSystem::RuntimeCheckOption_t::UNSIGNEDPD_CHECK)) {
         isSignedStatus = UNSIGNED_PD;
         LOG(INFO) << "runtime " << delegate
                   << " is available on this platform with UnsignedPD";
       } else {
         if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-                runtime,
-                zdl::DlSystem::RuntimeCheckOption_t::NORMAL_CHECK)) {
+                runtime, zdl::DlSystem::RuntimeCheckOption_t::NORMAL_CHECK)) {
           isSignedStatus = SIGNED_PD;
           LOG(INFO) << "runtime " << delegate
                     << " is available on this platform with SignedPD";
@@ -201,7 +199,8 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
     }
 
     // These features are not for SDM865, so turning them off.
-    if (useDspFeatures && (soc_id == SDM888 || soc_id == SDM778 || soc_id == SD8G1)) {
+    if (useDspFeatures &&
+        (soc_id == SDM888 || soc_id == SDM778 || soc_id == SD8G1)) {
       // use Zero copy for input and output buffers.
       // Requires rpc registered ion buffers.
       if (useIonBuffers_) {
@@ -235,7 +234,6 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
   }
 }
 
-
 void QTIBackendHelper::use_snpe(const char *model_path) {
   uint32_t soc_id = CpuCtrl::getSocId();
   uint32_t numInits = get_num_inits();
@@ -268,7 +266,8 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
     }
 
     // These features are not for SDM865, so turning them off.
-    if (useDspFeatures && (soc_id == SDM888 || soc_id == SDM778 || soc_id == SD8G1)) {
+    if (useDspFeatures &&
+        (soc_id == SDM888 || soc_id == SDM778 || soc_id == SD8G1)) {
       // use Zero copy for input and output buffers.
       // Requires rpc registered ion buffers.
       if (useIonBuffers_) {
@@ -571,7 +570,7 @@ void QTIBackendHelper::set_runtime_config() {
 }
 
 std::string QTIBackendHelper::get_snpe_version() {
-  zdl::DlSystem::Version_t version = zdl::SNPE::SNPEFactory::getLibraryVersion();
+  zdl::DlSystem::Version_t version =
+      zdl::SNPE::SNPEFactory::getLibraryVersion();
   return version.Build;
 }
-

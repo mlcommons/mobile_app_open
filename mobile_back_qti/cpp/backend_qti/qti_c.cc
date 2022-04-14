@@ -74,9 +74,9 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
       case SDM778:
         *settings = qti_settings_sdm778.c_str();
         break;
-	  case SD8G1:
+      case SD8G1:
         *settings = qti_settings_sd8g1.c_str();
-	  	break;
+        break;
       default:
         // it's a QTI SOC, but the chipset is not yet supported
         *not_allowed_message = "Unsupported QTI SoC";
@@ -138,15 +138,16 @@ mlperf_backend_ptr_t mlperf_backend_create(
   LOG(INFO) << "lib_path: " << adsp_lib_path.str();
   setenv("ADSP_LIBRARY_PATH", adsp_lib_path.str().c_str(), 1 /*override*/);
   std::string snpe_version = xverstr(SNPE_VERSION_STRING);
-  if (snpe_version.compare("default") != 0){
+  if (snpe_version.compare("default") != 0) {
     int dotPosition = snpe_version.find_last_of(".");
-    snpe_version = snpe_version.substr(dotPosition+1);
+    snpe_version = snpe_version.substr(dotPosition + 1);
   }
 
   if (snpe_version.compare(backend_data->get_snpe_version()) != 0) {
-    LOG(FATAL) << "Snpe libs modified. expected: " << snpe_version << " found: " << backend_data->get_snpe_version();
+    LOG(FATAL) << "Snpe libs modified. expected: " << snpe_version
+               << " found: " << backend_data->get_snpe_version();
   }
-  LOG(INFO) << "snpe_version: " <<  snpe_version;
+  LOG(INFO) << "snpe_version: " << snpe_version;
 
   // set runtime config
   backend_data->set_runtime_config();

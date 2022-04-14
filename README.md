@@ -2,10 +2,10 @@
 
 **Important Note**:
 
-This branch `android-v2` is used to maintain the legacy version of the MLPerf™ Mobile App, 
+This branch `android-v2` is used to maintain the legacy version of the MLPerf™ Mobile App,
 which is a native Android app.
 
-The MLPerf™ Mobile App is now further developed as a Flutter app, 
+The MLPerf™ Mobile App is now further developed as a Flutter app,
 which is maintained in the main branch `master`.
 
 ---

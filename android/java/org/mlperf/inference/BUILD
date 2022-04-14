@@ -202,7 +202,7 @@ cc_library(
     }) + select({
         ":use_mediatek": [
             "//mobile_back_tflite:tfliteneuronbackend",
-            "//mobile_back_tflite/cpp/backend_tflite:libneuronusdk_adapter.mtk.so"
+            "//mobile_back_tflite/cpp/backend_tflite:libneuronusdk_adapter.mtk.so",
         ],
         "//conditions:default": [],
     }) + select({
