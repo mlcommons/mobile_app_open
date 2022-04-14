@@ -21,16 +21,9 @@ limitations under the License.
 #include "DlSystem/IUserBufferFactory.hpp"
 #include "SNPE/PSNPE.hpp"
 #include "SNPE/SNPE.hpp"
-<<<<<<< HEAD
 #include "allocator.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
-=======
-#include "android/cpp/c/backend_c.h"
-#include "android/cpp/c/type.h"
->>>>>>> submission-v2.0-unified
-
-    #include "allocator.h"
 
 #define SIGNED_PD 0
 #define UNSIGNED_PD 1
