@@ -5,6 +5,8 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2019
 SHELL ["cmd", "/S", "/C"]
 
 RUN net user /add user && net localgroup Administrators user /add
+RUN wmic useraccount where "Name='user'" set PasswordExpires=false
+
 USER user
 
 RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
@@ -28,7 +30,7 @@ RUN flutter doctor
 # because it can't delete a file, which name contains special symbols, from recycle bin.
 # See this issue: https://github.com/docker/for-win/issues/5193
 #    This issue is already closed, but the bug is still present.
-RUN choco install -y msys2 --version 20210604.0.0 --params "/NoUpdate"
+RUN choco install -y msys2 --version 20220319.0.0 --params "/NoUpdate"
 RUN setx path "%path%;C:/tools/msys64/usr/bin"
 
 RUN choco install -y git --version 2.33.0.2
@@ -44,5 +46,9 @@ RUN mkdir "C:/tools/clang-format/" && `
     setx path "%path%;C:/tools/clang-format/" && `
     curl --output "C:/tools/clang-format/clang-format.exe" `
         https://prereleases.llvm.org/win-snapshots/clang-format-6923b0a7.exe
+
+RUN dart --disable-analytics && `
+    dart pub global activate protoc_plugin && `
+    setx path "%path%;%LOCALAPPDATA%/Pub/Cache/bin"
 
 ENTRYPOINT ["cmd", "/S", "/C"]

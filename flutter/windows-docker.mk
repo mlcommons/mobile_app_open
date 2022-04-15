@@ -15,7 +15,7 @@
 
 .PHONY: flutter/windows/docker/image
 flutter/windows/docker/image:
-	docker build -t mlperf_mobile_flutter:windows-1.0 windows/docker
+	docker build -t mlperf_mobile_flutter:windows-1.0 flutter/windows/docker
 
 .PHONY: flutter/windows/docker/create-container
 flutter/windows/docker/create-container:
@@ -34,13 +34,21 @@ flutter/windows/docker/create-container:
 		mlperf_mobile_flutter:windows-1.0 \
 		".\\output\\container-script.bat <NUL"
 
+.PHONY: flutter/windows/docker/cmd
+flutter/windows/docker/cmd:
+	echo >output/container-script.bat \
+		"cmd"
+	docker start -ai mobile_app_flutter_windows_container
+
 .PHONY: flutter/windows/docker/native
 flutter/windows/docker/native:
 	@# We must create the directory here because msys2 commands inside a container
 	@# can't manipulate files directly inside a mounted directory for some reason
 	@# but can freely manupulate nested directories.
 	mkdir -p build
-	echo >output/container-script.bat "make BAZEL_LINKS_PREFIX=C:/bazel-links/ flutter/backend-bridge-windows flutter/backends/tflite-windows"
+	echo >output/container-script.bat \
+		"make BAZEL_LINKS_PREFIX=C:/bazel-links/ \
+		flutter/windows/libs"
 	docker start -ai mobile_app_flutter_windows_container
 
 .PHONY: flutter/windows/docker/flutter-release
@@ -80,9 +88,6 @@ flutter/windows/copy-flutter-files-for-docker:
 		flutter/Makefile \
 		flutter/pubspec.yaml \
 		flutter/pubspec.lock
-	mkdir -p C:/project-local/build
-	cp -r --target-directory C:/project-local/build \
-		build/win-dlls
 
 # _windows_container_redist_dlls_dir is specific to our docker image.
 # 		When building locally, path to MSVC DLLs may be different.
