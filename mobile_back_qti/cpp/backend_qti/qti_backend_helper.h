@@ -29,7 +29,7 @@ limitations under the License.
 #define UNSIGNED_PD 1
 #define DEFAULT -1
 
-    class QTIBackendHelper {
+class QTIBackendHelper {
  private:
   zdl::DlSystem::RuntimeList inputRuntimeList;
   zdl::DlSystem::RuntimeList dummyInputRuntimeList;
