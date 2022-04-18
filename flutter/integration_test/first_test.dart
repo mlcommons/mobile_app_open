@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -73,25 +74,19 @@ void main() {
               'Result.json does not exist: file $applicationDirectory/result.json is not found');
 
       final jsonResultContent = await file.readAsString();
-      final results = jsonDecode(jsonResultContent);
-      final length = results.length;
+      final extendedResults = ExtendedResult.fromJson(
+          jsonDecode(jsonResultContent) as Map<String, dynamic>);
+      final length = extendedResults.results.list.length;
 
-      expect(length, 5, reason: 'results count should be 5, but it is $length');
+      const expectedResultCount = 5;
+      expect(length, expectedResultCount,
+          reason:
+              'results count should be $expectedResultCount, but it is $length');
 
-      try {
-        for (final resultContent in results) {
-          final result = resultContent as Map<String, dynamic>;
-          final id = result['benchmark_id'] as String;
-          final accuracy = result['accuracy'] as String?;
-          final throughput = result['throughput'] as double?;
-          expect(accuracy != 'N/A', true,
-              reason:
-                  'accuracy should be N/A in benchmark $id, but is "$accuracy"');
-          expect(throughput != null, true,
-              reason: 'throughput should not be null in benchmark $id');
-        }
-      } catch (_) {
-        stderr.writeln('Error in result.json format');
+      for (final benchmarkResult in extendedResults.results.list) {
+        expect(benchmarkResult.performance, isNotNull);
+        expect(benchmarkResult.performance!.throughput, isNotNull);
+        expect(benchmarkResult.accuracy, isNull);
       }
     });
   });

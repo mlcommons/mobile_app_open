@@ -28,8 +28,8 @@ class AppState extends ChangeNotifier {
     }
     final orderedResults = <String>[];
     for (var item in list) {
-      orderedResults.add(item.uuid);
-      _resultCache[item.uuid] = item;
+      orderedResults.add(item.meta.uuid);
+      _resultCache[item.meta.uuid] = item;
     }
     _batches[from] = orderedResults;
   }

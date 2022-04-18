@@ -1,0 +1,7 @@
+part of 'build_info.dart';
+
+class GeneratedBuildInfo {
+  static const String gitCommit = 'FLUTTER_BUILD_GIT_COMMIT';
+  static const String gitBranch = 'FLUTTER_BUILD_GIT_BRANCH';
+  static const int gitDirty = FLUTTER_BUILD_GIT_DIRTY;
+}

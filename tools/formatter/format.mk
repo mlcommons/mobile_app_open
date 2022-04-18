@@ -48,7 +48,7 @@ lint/bazel:
 
 .PHONY: lint/dart
 lint/dart:
-	dart analyze flutter flutter_common website
+	dart analyze --fatal-infos flutter flutter_common website
 
 .PHONY: lint/yaml
 lint/yaml:

@@ -22,8 +22,6 @@ class _RunIn extends Struct {
   external int dataset_offset;
 
   external Pointer<Utf8> scenario;
-  @Int32()
-  external int batch;
 
   external Pointer<Utf8> mode;
   @Int32()
@@ -36,11 +34,12 @@ class _RunIn extends Struct {
     backend_model_path = rs.backend_model_path.toNativeUtf8();
     backend_lib_path = rs.backend_lib_path.toNativeUtf8();
 
-    backend_settings_len = rs.backend_settings.length;
-    backend_settings_data = malloc.allocate<Uint8>(rs.backend_settings.length);
+    final backend_settings = rs.backend_settings.writeToBuffer();
+    backend_settings_len = backend_settings.length;
+    backend_settings_data = malloc.allocate<Uint8>(backend_settings.length);
     backend_settings_data
-        .asTypedList(rs.backend_settings.length)
-        .setAll(0, rs.backend_settings);
+        .asTypedList(backend_settings.length)
+        .setAll(0, backend_settings);
 
     backend_native_lib_path = rs.backend_native_lib_path.toNativeUtf8();
 
@@ -50,7 +49,6 @@ class _RunIn extends Struct {
     dataset_offset = rs.dataset_offset;
     scenario = rs.scenario.toNativeUtf8();
 
-    batch = rs.batch;
     mode = rs.mode.toNativeUtf8();
     min_query_count = rs.min_query_count;
 
@@ -83,6 +81,7 @@ class _RunOut extends Struct {
   @Float()
   external double duration_ms;
   external Pointer<Utf8> backend_name;
+  external Pointer<Utf8> backend_vendor;
   external Pointer<Utf8> accelerator_name;
 }
 
@@ -99,6 +98,8 @@ final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 RunResult runBenchmark(RunSettings rs) {
   var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
   runIn.ref.set(rs);
+
+  final startTime = DateTime.now();
 
   var runOut = _run(runIn);
 
@@ -118,7 +119,9 @@ RunResult runBenchmark(RunSettings rs) {
     numSamples: runOut.ref.num_samples,
     durationMs: runOut.ref.duration_ms,
     backendName: runOut.ref.backend_name.toDartString(),
+    backendVendor: runOut.ref.backend_vendor.toDartString(),
     acceleratorName: runOut.ref.accelerator_name.toDartString(),
+    startTime: startTime,
   );
 
   _free(runOut);

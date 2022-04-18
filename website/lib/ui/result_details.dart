@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/data/environment_info.dart';
-import 'package:mlperfbench_common/data/export_result.dart';
+import 'package:mlperfbench_common/data/build_info/build_info.dart';
+import 'package:mlperfbench_common/data/environment/environment_info.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:website/app_state.dart';
 
@@ -58,14 +59,20 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   _makeTable(<TableRow>[
-                    _makeTableRow(const Text('Result UUID'), Text(result.uuid)),
+                    _makeTableRow(
+                        const Text('Result UUID'), Text(result.meta.uuid)),
                     _makeTableRow(const Text('Average throughput'),
                         Text('${result.results.calculateAverageThroughput()}')),
                     _makeTableRow(
-                        const Text('Upload date'), Text(result.uploadDate)),
+                        const Text('Upload date'),
+                        Text(result.meta.uploadDate!
+                            .toLocal()
+                            .toIso8601String())),
                   ]),
                   SizedBox(height: 20),
                   _makeEnvTable(result.envInfo),
+                  SizedBox(height: 20),
+                  _makeBuildInfoTable(result.buildInfo),
                   SizedBox(height: 20),
                   ..._makeResults(result.results),
                 ],
@@ -77,7 +84,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
     );
   }
 
-  List<Widget> _makeResults(ExportResultList list) {
+  List<Widget> _makeResults(BenchmarkExportResultList list) {
     final result = <Widget>[];
     for (var item in list.list) {
       result.add(_makeBenchTable(item));
@@ -104,9 +111,9 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
   Widget _makeEnvTable(EnvironmentInfo info) {
     return _makeTable(
       <TableRow>[
-        _makeTableRow(const Text('Operation system'), Text(info.os)),
+        _makeTableRow(const Text('Operation system'),
+            Text(info.osName.toString())), // TODO
         _makeTableRow(const Text('OS version'), Text(info.osVersion)),
-        _makeTableRow(const Text('Application version'), Text(info.appVersion)),
         _makeTableRow(
             const Text('Device manufacturer'), Text(info.manufacturer)),
         _makeTableRow(const Text('Device model'), Text(info.model)),
@@ -114,16 +121,33 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
     );
   }
 
-  Widget _makeBenchTable(ExportResult info) {
+  Widget _makeBuildInfoTable(BuildInfo info) {
+    final originalVersion = info.officialReleaseFlag &&
+        !info.devTestFlag &&
+        !info.gitDirtyFlag &&
+        info.gitBranch == 'master';
     return _makeTable(
       <TableRow>[
-        _makeTableRow(const Text('Benchmark ID'),
-            Text(info.id)), // TODO replace with proper name
-        _makeTableRow(const Text('Throughput'), Text(info.throughput)),
-        _makeTableRow(const Text('Accuracy'), Text(info.accuracy)),
-        _makeTableRow(const Text('Duration'), Text(info.duration)),
-        _makeTableRow(const Text('Backend'), Text(info.backendName)),
-        _makeTableRow(const Text('Accelerator'), Text(info.acceleratorName)),
+        _makeTableRow(const Text('App version'), Text(info.version)),
+        _makeTableRow(const Text('Build number'), Text(info.buildNumber)),
+        _makeTableRow(const Text('Modified version'),
+            Text((!originalVersion).toString())),
+      ],
+    );
+  }
+
+  Widget _makeBenchTable(BenchmarkExportResult info) {
+    return _makeTable(
+      <TableRow>[
+        _makeTableRow(const Text('Benchmark'),
+            Text(info.benchmarkName)), // TODO replace with proper name
+        _makeTableRow(const Text('Throughput'),
+            Text(info.performance?.throughput.toString() ?? 'N/A')),
+        _makeTableRow(const Text('Accuracy'),
+            Text(info.accuracy?.accuracy.toString() ?? 'N/A')),
+        _makeTableRow(const Text('Backend name'), Text(info.backendInfo.name)),
+        _makeTableRow(
+            const Text('Accelerator'), Text(info.backendInfo.accelerator)),
       ],
     );
   }
