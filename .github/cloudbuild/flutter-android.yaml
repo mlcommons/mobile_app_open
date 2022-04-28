@@ -69,7 +69,7 @@ steps:
     args:
       - -xc
       - |
-        # next line is fix for this issue https://github.com/actions/checkout/issues/766
+        # next line is a fix for this issue https://github.com/actions/checkout/issues/766
         git config --global --add safe.directory '/image-workdir/flutter'
         make flutter/android/test_apk || exit $?
         mkdir -p /workspace/output/artifacts || exit $?

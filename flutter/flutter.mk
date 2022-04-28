@@ -138,9 +138,9 @@ flutter/l10n:
 
 .PHONY: flutter/pub
 flutter/pub:
-	cd flutter && ${_start_args} flutter pub get
-	cd flutter_common && ${_start_args} flutter pub get
-	cd website && ${_start_args} flutter pub get
+	cd flutter && ${_start_args} dart pub get
+	cd flutter_common && ${_start_args} dart pub get
+	cd website && ${_start_args} dart pub get
 
 .PHONY: flutter/prepare
 flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info
