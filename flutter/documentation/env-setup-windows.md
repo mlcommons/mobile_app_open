@@ -32,9 +32,9 @@ Python installed via Chocolatey provides only `python.exe` file, so you will nee
 At the moment of writing this instruction the default path for python is `C:/Python39/`.
 You can make a copy of `python.exe` file in the same directory and name it `python3.exe`.
 * Install python dependencies: `python3 -m pip install --user numpy absl-py`
-* Add MSYS2 bin folder to PATH.  
-If you installed MSYS2 via Chocolatey, the path would be `C:/tools/msys64/usr/bin`.
-* Add dart pub cache bin folder to PATH: `%LOCALAPPDATA%/Pub/Cache/bin`
+* Add MSYS2 bin folder to PATH: `setx path "%path%;C:/tools/msys64/usr/bin"`
+* Enable protobuf plugin: `dart pub global activate protoc_plugin`
+* Add dart pub cache bin folder to PATH: `setx path "%path%;%LOCALAPPDATA%/Pub/Cache/bin"`
 * Enable Windows support in flutter: `flutter config --enable-windows-desktop`  
 Windows support is still in beta, so it is disabled by default.
 * Turn on the developer mode in Windows settings.

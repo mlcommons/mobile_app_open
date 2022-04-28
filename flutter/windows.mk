@@ -31,3 +31,17 @@ flutter/windows/libs:
 		${backend_tflite_windows_files} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/backend_bridge.dll
 	chmod 777 --recursive ${flutter_windows_libs_folder}
+
+# set FLUTTER_MSVC_DLLS before running `make flutter/windows/release`
+FLUTTER_MSVC_DLLS?=
+.PHONY: flutter/windows/release
+flutter/windows/release:
+	@echo FLUTTER_MSVC_DLLS env must be set
+	[ -n "${FLUTTER_MSVC_DLLS}" ]
+	@echo using "FLUTTER_MSVC_DLLS=${FLUTTER_MSVC_DLLS}"
+	cd flutter && ${_start_args} flutter --no-version-check build windows ${flutter_common_dart_flags}
+	cp --target-directory flutter/build/windows/runner/Release \
+		"${FLUTTER_MSVC_DLLS}/msvcp140.dll" \
+		"${FLUTTER_MSVC_DLLS}/vcruntime140.dll" \
+		"${FLUTTER_MSVC_DLLS}/vcruntime140_1.dll" \
+		"${FLUTTER_MSVC_DLLS}/msvcp140_codecvt_ids.dll"
