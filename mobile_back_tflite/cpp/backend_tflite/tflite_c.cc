@@ -206,7 +206,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
     //   if it is not specified in settings.
     // If we don't use batching, we will use shards_num=1,
     //   which is the default value.
-    backend_data->shards_num = 4;
+    backend_data->shards_num = 2;
 
     // TODO convert this to a member var
     for (int i = 0; i < configs->count; ++i) {
