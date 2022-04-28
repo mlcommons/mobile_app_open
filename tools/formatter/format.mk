@@ -88,7 +88,7 @@ lint/line-endings:
 
 .PHONY: lint/markdown-links
 lint/markdown-links:
-	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty -n1 markdown-link-check
+	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty -n1 markdown-link-check -c tools/formatter/configs/markdownlinkscheck.json
 
 output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	docker build --progress=plain \
