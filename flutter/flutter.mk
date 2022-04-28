@@ -138,7 +138,7 @@ flutter/l10n:
 
 .PHONY: flutter/pub
 flutter/pub:
-	git config --global --add safe.directory "$GITHUB_WORKSPACE"
+	git config --global --add safe.directory "${GITHUB_WORKSPACE}"
 	cd flutter && ${_start_args} dart pub get
 	cd flutter_common && ${_start_args} dart pub get
 	cd website && ${_start_args} dart pub get
