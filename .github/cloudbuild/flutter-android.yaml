@@ -69,7 +69,6 @@ steps:
     args:
       - -xc
       - |
-        git config --global --add safe.directory "$GITHUB_WORKSPACE"
         make flutter/android/test_apk || exit $?
         mkdir -p /workspace/output/artifacts || exit $?
         cp /workspace/flutter/build/app/outputs/flutter-apk/app-release.apk /workspace/output/artifacts/mlperf_app_release.apk || exit $?
