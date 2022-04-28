@@ -115,15 +115,15 @@ class ResultsListPageState extends State<ResultsListPage> {
           final details = state.getByUuid(ids[index])!;
           final averageScoreText =
               'Average score: ${details.results.calculateAverageThroughput()}}';
-          final uploadDateText = 'Upload date: ${details.uploadDate}';
+          final uploadDateText = 'Upload date: ${details.meta.uploadDate}';
           return Card(
               child: ListTile(
-            title: Text(details.uuid),
+            title: Text(details.meta.uuid),
             isThreeLine: true,
             subtitle: Text('$averageScoreText\n$uploadDateText'),
             onTap: () {
-              Navigator.of(context)
-                  .pushNamed('/${AppRoutes.resultDetails}/${details.uuid}');
+              Navigator.of(context).pushNamed(
+                  '/${AppRoutes.resultDetails}/${details.meta.uuid}');
             },
           ));
         });

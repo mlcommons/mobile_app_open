@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:mlperfbench_common/data/export_result.dart';
+import 'package:mlperfbench_common/data/extended_result.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
 
@@ -42,7 +42,7 @@ class ResultManager {
   }
 
   // returns brief results in json
-  Future<void> writeResults(ExportResultList results) async {
+  Future<void> writeResults(ExtendedResult results) async {
     await _write(results.toJson());
   }
 
@@ -83,13 +83,11 @@ class ResultManager {
     return true;
   }
 
-  Future<void> _write(List<dynamic> content) async {
+  Future<void> _write(dynamic content) async {
     final jsonFile = File(_jsonResultPath);
 
     final jsonEncoder = JsonEncoder.withIndent('  ');
     var encoded = jsonEncoder.convert(content);
-    // needed to match android behavior
-    encoded = encoded.replaceAll('/', '\\/');
     await jsonFile.writeAsString(encoded);
   }
 

@@ -10,11 +10,11 @@ export function upload(
   return async (request: Request, response: Response, _: NextFunction) => {
     try {
       const parsed = Convert.toExtendedResult(request.body);
-      if (parsed.uploadDate != '') {
+      if (parsed.meta.upload_date != null) {
         throw Error('uploadDate must be empty');
       }
-      parsed.uploadDate = new Date().toISOString();
-      const docRef = db.doc(`${currentPrefix}/${parsed.uuid}`);
+      parsed.meta.upload_date = new Date().toISOString();
+      const docRef = db.doc(`${currentPrefix}/${parsed.meta.uuid}`);
       const alreadyExists = (await docRef.get()).exists;
       if (alreadyExists) {
         response

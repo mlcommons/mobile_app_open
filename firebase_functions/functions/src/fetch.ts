@@ -9,7 +9,7 @@ function _makeBatchQuery(
 ): FirebaseFirestore.Query<FirebaseFirestore.DocumentData> {
   return db
     .collection(`/${currentPrefix}/`)
-    .orderBy('uploadDate', 'desc')
+    .orderBy('meta.upload_date', 'desc')
     .limit(pageSize);
 }
 

@@ -18,12 +18,12 @@ flutter_common_dart_flags= \
 
 .PHONY: flutter
 ifeq (${OS},Windows_NT)
-flutter: flutter/windows flutter/prepare
+flutter: flutter/windows
 else
 ifeq ($(shell uname -s),Darwin)
-flutter: flutter/ios flutter/prepare
+flutter: flutter/ios
 else
-flutter: flutter/android flutter/prepare
+flutter: flutter/android
 endif
 endif
 
@@ -80,23 +80,38 @@ flutter/firebase/prefix:
 
 flutter/result: flutter/result/schema flutter/result/ts
 
+result_json_example_path=output/extended-result-example.json
+result_json_schema_path=flutter/documentation/extended-result.schema.json
 .PHONY: flutter/result/schema
 flutter/result/schema:
 	cd flutter_common && \
 		${_start_args} dart run \
-		--define=jsonFileName=../output/extended-result-example.json \
-		lib/data/json_generator_main.dart
-	quicktype output/extended-result-example.json \
+		--define=jsonFileName=../${result_json_example_path} \
+		lib/data/generation_helpers/write_json_example.main.dart
+	quicktype ${result_json_example_path} \
 		--lang schema \
-		--out flutter/documentation/extended-result.schema.json
+		--out ${result_json_schema_path}
+	cd flutter_common && \
+		${_start_args} dart run \
+		--define=schemaPath=../${result_json_schema_path} \
+		lib/data/generation_helpers/edit_json_schema.main.dart
 
 .PHONY: flutter/result/ts
 flutter/result/ts:
-	quicktype flutter/documentation/extended-result.schema.json \
+	quicktype ${result_json_schema_path} \
 		--src-lang schema \
 		--lang ts \
 		--top-level ExtendedResult \
 		--out firebase_functions/functions/src/extended-result.gen.ts
+
+.PHONY: flutter/build-info
+flutter/build-info:
+	cat flutter/lib/build_info.in | sed \
+		-e "s,FLUTTER_BUILD_GIT_COMMIT,$(shell git rev-parse HEAD)," \
+		-e "s,FLUTTER_BUILD_GIT_BRANCH,$(shell git rev-parse --abbrev-ref HEAD)," \
+		-e "s,FLUTTER_BUILD_GIT_DIRTY,$(shell git status --porcelain | head -c1 | wc -c)," \
+		| tee flutter/lib/build_info.gen.dart
+	dart format flutter/lib/build_info.gen.dart
 
 .PHONY: flutter/protobuf
 flutter/protobuf:
@@ -123,12 +138,12 @@ flutter/l10n:
 
 .PHONY: flutter/pub
 flutter/pub:
-	cd flutter && ${_start_args} dart pub get
-	cd flutter_common && ${_start_args} dart pub get
-	cd website && ${_start_args} dart pub get
+	cd flutter && ${_start_args} flutter pub get
+	cd flutter_common && ${_start_args} flutter pub get
+	cd website && ${_start_args} flutter pub get
 
 .PHONY: flutter/prepare
-flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase
+flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info
 
 .PHONY: flutter/clean
 flutter/clean:

@@ -5,17 +5,6 @@ import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 
 part 'list.gen.dart';
 
-List<String> _getBackendsList() {
-  if (Platform.isIOS) {
-    // on iOS backend is statically linked
-    return [];
-  } else if (Platform.isWindows || Platform.isAndroid) {
-    return _backendsList;
-  } else {
-    throw 'current platform is unsupported';
-  }
-}
-
 class BackendInfo {
   final pb.BackendSetting settings;
   final String libPath;
@@ -28,7 +17,7 @@ class BackendInfo {
         continue;
       }
       if (Platform.isWindows) {
-        path = './libs/$path';
+        path = '$path.dll';
       } else if (Platform.isAndroid) {
         path = '$path.so';
       }
@@ -43,5 +32,29 @@ class BackendInfo {
       return BackendInfo._(backendSetting, '');
     }
     throw 'no matching backend found';
+  }
+
+  static List<String> _getBackendsList() {
+    if (Platform.isIOS) {
+      // on iOS backend is statically linked
+      return [];
+    } else if (Platform.isWindows || Platform.isAndroid) {
+      return _backendsList;
+    } else {
+      throw 'current platform is unsupported';
+    }
+  }
+
+  static List<String> getExportBackendsList() {
+    if (Platform.isIOS) {
+      // on iOS backend is statically linked
+      return ['built-in tflite'];
+    } else if (Platform.isWindows || Platform.isAndroid) {
+      final result = List<String>.from(_backendsList);
+      result.removeWhere((element) => element == '');
+      return result;
+    } else {
+      throw 'current platform is unsupported';
+    }
   }
 }
