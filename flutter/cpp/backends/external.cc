@@ -63,37 +63,84 @@ std::string BackendFunctions::isSupported(const std::string& lib_path,
   return std::string(msg);
 }
 
+#if defined(_WIN64) || defined(_WIN32)
+static std::wstring getExecutableDirectory() {
+  uint64_t bufferSize = 300;
+  std::wstring curDir;
+  while (true) {
+    curDir.resize(bufferSize);
+    uint64_t pathLength =
+        GetModuleFileNameW(nullptr, &curDir[0], curDir.size());
+    const auto errorCode = GetLastError();
+    if (errorCode == ERROR_SUCCESS) {
+      break;
+    }
+    if (errorCode == ERROR_INSUFFICIENT_BUFFER) {
+      bufferSize *= 2;
+      continue;
+    }
+    LOG(ERROR) << "Unable to get .exe file path (error  " << errorCode
+               << "): " << std::system_category().message(errorCode);
+    return {};
+  }
+  curDir = curDir.substr(0, curDir.find_last_of(L"\\/") + 1);
+  return curDir;
+}
+
+static void* loadBackendDll(const std::string& lib_path) {
+  std::wstring wide_lib_path;
+  wide_lib_path.resize(lib_path.size() + 1);
+  std::mbstate_t state{};
+  const char* src = lib_path.c_str();
+  auto conv_res =
+      std::mbsrtowcs(&wide_lib_path[0], &src, wide_lib_path.size(), &state);
+  if (conv_res == std::string::npos) {
+    LOG(ERROR) << "Unable to load: " << lib_path
+               << ": can't convert to std::wstring";
+    return nullptr;
+  }
+
+  std::wstring curDir = getExecutableDirectory();
+  if (curDir.empty()) {
+    return nullptr;
+  }
+  const wchar_t* libsFolderPath = L"libs";
+  const std::wstring libFolder = std::wstring{curDir} + libsFolderPath;
+  const auto setDllResult = SetDllDirectoryW(libFolder.c_str());
+  if (setDllResult == 0) {
+    const auto errorCode = GetLastError();
+    LOG(ERROR) << "Unable to add './libs' as a library path (error  "
+               << errorCode
+               << "): " << std::system_category().message(errorCode);
+    return nullptr;
+  }
+
+  auto handle = tflite::SharedLibrary::LoadLibrary(wide_lib_path.c_str());
+  if (handle == nullptr) {
+    const auto errorCode = GetLastError();
+    LOG(ERROR) << "Can't load library in path '" << lib_path << "' (error  "
+               << errorCode
+               << "): " << std::system_category().message(errorCode);
+  }
+  return handle;
+}
+#endif
+
 BackendFunctions::BackendFunctions(const std::string& lib_path) {
   if (!lib_path.empty()) {
     isloaded = false;
 #if defined(_WIN64) || defined(_WIN32)
-    std::wstring wide_lib_path;
-    wide_lib_path.resize(lib_path.size() + 1);
-    std::mbstate_t state{};
-    const char* src = lib_path.c_str();
-    auto conv_res =
-        std::mbsrtowcs(&wide_lib_path[0], &src, wide_lib_path.size(), &state);
-    if (conv_res == std::string::npos) {
-      LOG(ERROR) << "Unable to load: " << lib_path
-                 << ": can't convert to std::wstring";
-      return;
-    }
-    handle = tflite::SharedLibrary::LoadLibrary(wide_lib_path.c_str());
-    if (handle == nullptr) {
-      const auto errorCode = GetLastError();
-      LOG(ERROR) << "Can't load library in path '" << lib_path << "' (error  "
-                 << errorCode
-                 << "): " << std::system_category().message(errorCode);
-      return;
-    }
+    handle = loadBackendDll(lib_path);
 #else
     handle = tflite::SharedLibrary::LoadLibrary(lib_path.c_str());
     if (handle == nullptr) {
       LOG(ERROR) << "Unable to load: " << lib_path << ": "
                  << tflite::SharedLibrary::GetError();
-      return;
     }
 #endif
+    if (handle == nullptr) {
+      return;
+    }
     isloaded = true;
   }
 

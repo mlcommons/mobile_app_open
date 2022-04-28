@@ -17,7 +17,7 @@ class BackendInfo {
         continue;
       }
       if (Platform.isWindows) {
-        path = './libs/$path';
+        path = '$path.dll';
       } else if (Platform.isAndroid) {
         path = '$path.so';
       }
