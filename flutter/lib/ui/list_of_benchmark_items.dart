@@ -5,7 +5,7 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
-Column createListOfBenchmarkItemsWidgets(
+ListView createListOfBenchmarkItemsWidgets(
     BuildContext context, BenchmarkState state) {
   final stringResources = AppLocalizations.of(context);
   final list = <Widget>[];
@@ -40,7 +40,7 @@ Column createListOfBenchmarkItemsWidgets(
       ),
     );
   }
-  return Column(crossAxisAlignment: CrossAxisAlignment.start, children: list);
+  return ListView(padding: const EdgeInsets.only(left: 20), children: list);
 }
 
 void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
