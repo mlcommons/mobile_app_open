@@ -8,7 +8,7 @@ import 'utils.dart';
 const _configListFileName = 'benchmarksConfigurations.json';
 const _defaultConfigName = 'default';
 const _defaultConfigUrl =
-    'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v3.pbtxt';
+    'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v2_0/assets/tasks_flutterapp.pbtxt';
 
 class BenchmarksConfig {
   final String name;
