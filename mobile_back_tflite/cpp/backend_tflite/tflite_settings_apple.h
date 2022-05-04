@@ -129,6 +129,16 @@ benchmark_setting {
   accelerator_desc: "CoreML"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_float.tflite"
-})SETTINGS";
+}
+
+benchmark_setting {
+  benchmark_id: "IS_float32_mosaic"
+  accelerator: "coreml"
+  accelerator_desc: "CoreML"
+  configuration: "TFLite"
+  src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
+}
+
+)SETTINGS";
 
 #endif

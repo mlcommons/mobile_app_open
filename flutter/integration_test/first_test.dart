@@ -17,6 +17,7 @@ void main() {
   final runTimeLimitMinutes = 20;
   final downloadTimeLimitMinutes = 10;
   final secondsInMinute = 60;
+  final expectedResultCount = 6;
 
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -78,7 +79,6 @@ void main() {
           jsonDecode(jsonResultContent) as Map<String, dynamic>);
       final length = extendedResults.results.list.length;
 
-      const expectedResultCount = 5;
       expect(length, expectedResultCount,
           reason:
               'results count should be $expectedResultCount, but it is $length');

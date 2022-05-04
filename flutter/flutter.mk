@@ -142,6 +142,10 @@ flutter/pub:
 	cd flutter_common && ${_start_args} flutter pub get
 	cd website && ${_start_args} flutter pub get
 
+.PHONY: flutter/test
+flutter/test:
+	cd flutter && ${_start_args} flutter test integration_test
+
 .PHONY: flutter/prepare
 flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info
 
