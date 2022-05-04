@@ -11,6 +11,7 @@ MLCommons project work is tracked with issue trackers and pull requests. Modify 
 ## Contributing guidelines
 
 If you have improvements to MLPerf, send us your pull requests! For those
+<!-- markdown-link-check-disable-next-line -->
 just getting started, Github has a [howto](https://help.github.com/articles/using-pull-requests/).
 
 ### Pull Request Checklist
