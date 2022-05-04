@@ -120,6 +120,8 @@ final _MAX_THROUGHPUT = {
   'IS_int8': 50.0,
   'IS_uint8': 50.0,
   'IS_float32': 50.0,
+  'IS_uint8_mosaic': 50.0,
+  'IS_float32_mosaic': 50.0,
   'SUMMARY_MAX_THROUGHPUT': 155.0,
 };
 
