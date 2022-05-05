@@ -30,7 +30,7 @@ ListView createListOfBenchmarkItemsWidgets(
                 child: benchmark.info.icon,
               ),
             ),
-            Text(benchmark.info.getLocalizedInfo(stringResources).name),
+            Text(benchmark.taskConfig.name),
             Icon(
               Icons.chevron_right,
               color: Colors.grey,

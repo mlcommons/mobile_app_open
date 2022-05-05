@@ -161,8 +161,7 @@ class _ResultScreenState extends State<ResultScreen>
                   child: benchmark.info.icon),
               title: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child:
-                    Text(benchmark.info.getLocalizedInfo(stringResources).name),
+                child: Text(benchmark.taskConfig.name),
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +179,6 @@ class _ResultScreenState extends State<ResultScreen>
 
   List<Widget> _createListOfBenchmarkResultTopWidgets(
       BenchmarkState state, BuildContext context) {
-    final stringResources = AppLocalizations.of(context);
 
     final widgets = state.benchmarks.map((benchmark) => Padding(
           padding: const EdgeInsets.only(bottom: 10),
@@ -190,9 +188,7 @@ class _ResultScreenState extends State<ResultScreen>
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
-                    benchmark.info
-                        .getLocalizedInfo(stringResources)
-                        .name
+                    benchmark.taskConfig.name
                         .split(' ')
                         .join('\n')
                         .toUpperCase(),
