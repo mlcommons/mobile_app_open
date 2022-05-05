@@ -7,7 +7,6 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 
 ListView createListOfBenchmarkItemsWidgets(
     BuildContext context, BenchmarkState state) {
-  final stringResources = AppLocalizations.of(context);
   final list = <Widget>[];
   final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
