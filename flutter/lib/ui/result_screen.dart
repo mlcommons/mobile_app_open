@@ -179,7 +179,6 @@ class _ResultScreenState extends State<ResultScreen>
 
   List<Widget> _createListOfBenchmarkResultTopWidgets(
       BenchmarkState state, BuildContext context) {
-
     final widgets = state.benchmarks.map((benchmark) => Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Column(
