@@ -17,10 +17,9 @@
 flutter/windows/docker/image:
 	docker build -t mlperf_mobile_flutter:windows-1.0 flutter/windows/docker
 
-autocopy_folder=output/auto-copy
 
 ifneq (${GOOGLE_APPLICATION_CREDENTIALS},)
-google_credentials_local_folder=${autocopy_folder}/google-credentials
+google_credentials_local_folder=output/google-credentials
 google_credentials_container_path=${google_credentials_local_folder}/credentials.json
 else
 google_credentials_local_folder=
@@ -73,17 +72,21 @@ flutter/windows/docker/cmd:
 # but it wouldn't make much difference
 container_local_project=C:/project-local
 container_msvc_dlls=C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Redist/MSVC/14.29.30133/x64/Microsoft.VC142.CRT
-release_dir_path=${autocopy_folder}/flutter-windows-release
 .PHONY: flutter/windows/ci
 flutter/windows/ci:
 	# Only run `make flutter/windows/ci/*` inside the docker windows container
 	make flutter/windows/ci/copy-mount-to-local
 	cd ${container_local_project} && make \
-		"FLUTTER_MSVC_DLLS=${container_msvc_dlls}" \
 		flutter/prepare \
-		flutter/windows/libs \
+		# flutter/windows/libs
+	cd ${container_local_project} && make \
+		"FLUTTER_MSVC_DLLS=${container_msvc_dlls}" \
+		FLUTTER_RELEASE_NAME=release-test \
 		flutter/windows/release
-	make flutter/windows/ci/copy-release-from-local
+	make \
+		FLUTTER_RELEASE_NAME=release-test \
+		flutter/windows/ci/copy-release-from-local \
+		flutter/windows/archive-release
 
 .PHONY: flutter/windows/ci/copy-mount-to-local
 flutter/windows/ci/copy-mount-to-local:
@@ -95,7 +98,10 @@ flutter/windows/ci/copy-mount-to-local:
 
 .PHONY: flutter/windows/ci/copy-release-from-local
 flutter/windows/ci/copy-release-from-local:
-	rm -rf ${release_dir_path}
-	mkdir -p ${release_dir_path}
-	cp --target-directory ${release_dir_path} --recursive \
-		${container_local_project}/flutter/build/windows/runner/Release
+	@[ -n "${FLUTTER_RELEASE_NAME}" ] || (echo FLUTTER_RELEASE_NAME env must be set; exit 1)
+	@echo using "FLUTTER_RELEASE_NAME=${FLUTTER_RELEASE_NAME}"
+
+	rm -rf ${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}
+	mkdir -p ${flutter_windows_releases}
+	cp --target-directory ${flutter_windows_releases} --recursive \
+		${container_local_project}/${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}

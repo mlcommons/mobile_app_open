@@ -32,16 +32,51 @@ flutter/windows/libs:
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/backend_bridge.dll
 	chmod 777 --recursive ${flutter_windows_libs_folder}
 
-# set FLUTTER_MSVC_DLLS before running `make flutter/windows/release`
+# set parameters before running `make flutter/windows/release`
 FLUTTER_MSVC_DLLS?=
+FLUTTER_RELEASE_NAME?=
+flutter_windows_releases=output/flutter-windows-releases
 .PHONY: flutter/windows/release
-flutter/windows/release:
-	@echo FLUTTER_MSVC_DLLS env must be set
-	[ -n "${FLUTTER_MSVC_DLLS}" ]
-	@echo using "FLUTTER_MSVC_DLLS=${FLUTTER_MSVC_DLLS}"
+flutter/windows/release: \
+	flutter/windows/release/prepare-dlls \
+	flutter/windows/release/build \
+	flutter/windows/release/copy-dlls \
+	flutter/windows/release/name
+
+flutter_windows_dlls_path=output/win-redist-dlls
+flutter_windows_dlls_list=msvcp140.dll vcruntime140.dll vcruntime140_1.dll msvcp140_codecvt_ids.dll
+.PHONY: flutter/windows/release/prepare-dlls
+flutter/windows/release/prepare-dlls:
+	@[ -n "${FLUTTER_MSVC_DLLS}" ] || (echo FLUTTER_MSVC_DLLS env must be set; exit 1)
+
+	rm -rf ${flutter_windows_dlls_path}
+	mkdir -p ${flutter_windows_dlls_path}
+	currentDir=$$(pwd) && cd "${FLUTTER_MSVC_DLLS}" && \
+		cp  --target-directory $$currentDir/${flutter_windows_dlls_path} ${flutter_windows_dlls_list}
+
+.PHONY: flutter/windows/release/copy-dlls
+flutter/windows/release/copy-dlls:
+	currentDir=$$(pwd) && cd "${flutter_windows_dlls_path}" && \
+		cp  --target-directory $$currentDir/flutter/build/windows/runner/Release ${flutter_windows_dlls_list}
+
+.PHONY: flutter/windows/release/build
+flutter/windows/release/build:
+
+	rm -rf flutter/build/windows/runner/Release
 	cd flutter && ${_start_args} flutter --no-version-check build windows ${flutter_common_dart_flags}
-	cp --target-directory flutter/build/windows/runner/Release \
-		"${FLUTTER_MSVC_DLLS}/msvcp140.dll" \
-		"${FLUTTER_MSVC_DLLS}/vcruntime140.dll" \
-		"${FLUTTER_MSVC_DLLS}/vcruntime140_1.dll" \
-		"${FLUTTER_MSVC_DLLS}/msvcp140_codecvt_ids.dll"
+
+.PHONY: flutter/windows/release/name
+flutter/windows/release/name:
+	@[ -n "${FLUTTER_RELEASE_NAME}" ] || (echo FLUTTER_RELEASE_NAME env must be set; exit 1)
+
+	rm -rf ${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}
+	mkdir -p ${flutter_windows_releases}
+	mv flutter/build/windows/runner/Release ${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}
+
+.PHONY: flutter/windows/release/archive
+flutter/windows/release/archive:
+	@[ -n "${FLUTTER_RELEASE_NAME}" ] || (echo FLUTTER_RELEASE_NAME env must be set; exit 1)
+
+	powershell Compress-Archive \
+		${flutter_windows_releases}/${FLUTTER_RELEASE_NAME} \
+		${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}.zip
