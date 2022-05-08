@@ -53,7 +53,7 @@
   "errorDialogTitle": "Errors",
   "successDialogTitle": "Success",
   "incorrectDatasetsPath": "Selected datasets directory does not contain files for following benchmarks:",
-  "wrongChecksum": "The checksum of following files are not matched:",
+  "wrongChecksum": "The checksum of the following files are not matched with one defined in benchmark_setting:",
   "ok": "Ok",
   "waitBenchmarks": "Wait for benchmark to finish",
   "cooldownStatus": "Cooldown pause",

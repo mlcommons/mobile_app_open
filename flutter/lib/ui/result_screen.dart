@@ -307,6 +307,8 @@ class _ResultScreenState extends State<ResultScreen>
           child: TextButton(
             style: buttonStyle,
             onPressed: () async {
+              // TODO (anhappdev) Refactor the code here to avoid duplicated code.
+              // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
               final wrongPathError =
                   await state.validateExternalResourcesDirectory(
                       stringResources.incorrectDatasetsPath);
