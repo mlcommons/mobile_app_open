@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'package:md5_file_checksum/md5_file_checksum.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
@@ -86,8 +87,14 @@ class ResourceManager {
   }
 
   Future<bool> isChecksumMatched(Resource resource) async {
-    // TODO (anhappdev) compare file with checksum
-    return false;
+    try {
+      final md5ChecksumBase64 =
+          await Md5FileChecksum.getFileChecksum(filePath: resource.path);
+      final md5ChecksumHex = base64ToHex(md5ChecksumBase64);
+      return md5ChecksumHex == resource.md5Checksum;
+    } catch (exception) {
+      throw 'Unable to generate file checksum: $exception';
+    }
   }
 
   void handleResources(List<String> resources, bool purgeOldCache) async {
@@ -196,9 +203,14 @@ class ResourceManager {
     return missingResources;
   }
 
-  Future<List<Resource>> validateResourcesChecksum(List<Resource> resources) async {
+  Future<List<Resource>> validateResourcesChecksum(
+      List<Resource> resources) async {
     final mismatchedResources = <Resource>[];
-    for (var r in resources) {
+    final cachedResources = resources
+        .map((e) => Resource(
+            path: get(e.path), type: e.type, md5Checksum: e.md5Checksum))
+        .toList();
+    for (var r in cachedResources) {
       if (!await isChecksumMatched(r)) {
         mismatchedResources.add(r);
       }

@@ -133,13 +133,15 @@ class BenchmarkState extends ChangeNotifier {
   Future<String> validateModelChecksum(String errorDescription) async {
     final resources = _middle.listResources(
         skipInactive: true, includeAccuracy: _store.submissionMode);
-    final mismatched =
-        await resourceManager.validateResourcesChecksum(resources);
+    final models =
+        resources.where((e) => e.type == ResourceTypeEnum.model).toList();
+    final mismatched = await resourceManager.validateResourcesChecksum(models);
     if (mismatched.isEmpty) return '';
 
     return errorDescription +
         mismatched
-            .mapIndexed((i, element) => '\n${i + 1}) ${element.path}')
+            .mapIndexed((i, element) =>
+                '\n${i + 1}) ${element.path.replaceFirst(resourceManager.applicationDirectory, '.')}')
             .join();
   }
 
