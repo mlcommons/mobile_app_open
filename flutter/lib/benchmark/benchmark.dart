@@ -260,9 +260,9 @@ class BenchmarkList {
           result.addAll([datasetData, datasetGroundtruth]);
         }
       }
-      final model =
-          Resource(path: b.benchmarkSetting.src,
-              type: ResourceTypeEnum.model,
+      final model = Resource(
+          path: b.benchmarkSetting.src,
+          type: ResourceTypeEnum.model,
           md5Checksum: b.benchmarkSetting.md5Checksum);
       result.add(model);
     }
