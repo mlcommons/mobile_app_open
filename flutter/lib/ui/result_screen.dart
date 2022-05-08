@@ -314,6 +314,12 @@ class _ResultScreenState extends State<ResultScreen>
                 await showErrorDialog(context, [wrongPathError]);
                 return;
               }
+              final wrongChecksumError = await state
+                  .validateModelChecksum(stringResources.wrongChecksum);
+              if (wrongChecksumError.isNotEmpty) {
+                await showErrorDialog(context, [wrongChecksumError]);
+                return;
+              }
               if (store.offlineMode) {
                 final offlineError = await state.validateOfflineMode(
                     stringResources.warningOfflineModeEnabled);

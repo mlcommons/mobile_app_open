@@ -43,6 +43,7 @@ dependencies:
   firebase_dart: ^1.0.4
   mlperfbench_common:
     path: ../flutter_common
+  md5_file_checksum: ^1.0.3
 
 dev_dependencies:
   flutter_test:

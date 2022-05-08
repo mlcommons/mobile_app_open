@@ -107,7 +107,9 @@ class BenchmarkState extends ChangeNotifier {
       String errorDescription) async {
     final resources = _middle.listResources(
         skipInactive: true, includeAccuracy: _store.submissionMode);
-    final missing = await resourceManager.validateResourcesExist(resources);
+    final paths = resources.map((e) => e.path).toList();
+    // TODO (anhappdev): refactor validateResourcesExist() to receive List<Resource>
+    final missing = await resourceManager.validateResourcesExist(paths);
     if (missing.isEmpty) return '';
 
     return errorDescription +
@@ -117,12 +119,27 @@ class BenchmarkState extends ChangeNotifier {
   Future<String> validateOfflineMode(String errorDescription) async {
     final resources = _middle.listResources(
         skipInactive: true, includeAccuracy: _store.submissionMode);
-    final internetResources = filterInternetResources(resources);
+    final paths = resources.map((e) => e.path).toList();
+    // TODO (anhappdev): refactor filterInternetResources() to receive List<Resource>
+    final internetResources = filterInternetResources(paths);
     if (internetResources.isEmpty) return '';
 
     return errorDescription +
         internetResources
             .mapIndexed((i, element) => '\n${i + 1}) $element')
+            .join();
+  }
+
+  Future<String> validateModelChecksum(String errorDescription) async {
+    final resources = _middle.listResources(
+        skipInactive: true, includeAccuracy: _store.submissionMode);
+    final mismatched =
+        await resourceManager.validateResourcesChecksum(resources);
+    if (mismatched.isEmpty) return '';
+
+    return errorDescription +
+        mismatched
+            .mapIndexed((i, element) => '\n${i + 1}) ${element.path}')
             .join();
   }
 
@@ -149,7 +166,8 @@ class BenchmarkState extends ChangeNotifier {
     }
 
     await Wakelock.enable();
-    resourceManager.handleResources(_middle.listResources(), needToPurgeCache);
+    final paths = _middle.listResources().map((e) => e.path).toList();
+    resourceManager.handleResources(paths, needToPurgeCache);
     await Wakelock.disable();
   }
 

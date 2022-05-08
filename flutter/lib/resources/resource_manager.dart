@@ -23,6 +23,20 @@ class BatchPreset {
   });
 }
 
+enum ResourceTypeEnum { model, lib, datasetData, datasetGroundtruth }
+
+class Resource {
+  final String path;
+  final ResourceTypeEnum type;
+  final String? md5Checksum;
+
+  Resource({
+    required this.path,
+    required this.type,
+    this.md5Checksum,
+  });
+}
+
 class ResourceManager {
   static const _applicationDirectoryPrefix = 'app://';
   static const _loadedResourcesDirName = 'loaded_resources';
@@ -69,6 +83,11 @@ class ResourceManager {
     return path == '' ||
         await File(path).exists() ||
         await Directory(path).exists();
+  }
+
+  Future<bool> isChecksumMatched(Resource resource) async {
+    // TODO (anhappdev) compare file with checksum
+    return false;
   }
 
   void handleResources(List<String> resources, bool purgeOldCache) async {
@@ -175,5 +194,15 @@ class ResourceManager {
       }
     }
     return missingResources;
+  }
+
+  Future<List<Resource>> validateResourcesChecksum(List<Resource> resources) async {
+    final mismatchedResources = <Resource>[];
+    for (var r in resources) {
+      if (!await isChecksumMatched(r)) {
+        mismatchedResources.add(r);
+      }
+    }
+    return mismatchedResources;
   }
 }

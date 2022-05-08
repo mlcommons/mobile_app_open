@@ -110,9 +110,11 @@ class Benchmark {
   final bool testMode;
 
   final BenchmarkInfo info;
+
   // this variable holds description of our config file,
   // which may not represent what backend actually used for computations
   final String backendRequestDescription;
+
   // TODO save config in the Store?
   final BenchmarkConfig config;
 
@@ -225,29 +227,48 @@ class BenchmarkList {
     }
   }
 
-  List<String> listResources(
+  List<Resource> listResources(
       {bool skipInactive = false, bool includeAccuracy = true}) {
-    final result = <String>[];
+    final result = <Resource>[];
 
     for (final b in benchmarks) {
       if (skipInactive && !b.config.active) continue;
       if (testMode) {
-        result.add(b.taskConfig.testDataset.path);
-        result.add(b.taskConfig.testDataset.groundtruthSrc);
+        final datasetData = Resource(
+            path: b.taskConfig.testDataset.path,
+            type: ResourceTypeEnum.datasetData);
+        final datasetGroundtruth = Resource(
+            path: b.taskConfig.testDataset.groundtruthSrc,
+            type: ResourceTypeEnum.datasetGroundtruth);
+        result.addAll([datasetData, datasetGroundtruth]);
       } else {
-        result.add(b.taskConfig.liteDataset.path);
-        result.add(b.taskConfig.liteDataset.groundtruthSrc);
+        final datasetData = Resource(
+            path: b.taskConfig.liteDataset.path,
+            type: ResourceTypeEnum.datasetData);
+        final datasetGroundtruth = Resource(
+            path: b.taskConfig.liteDataset.groundtruthSrc,
+            type: ResourceTypeEnum.datasetGroundtruth);
+        result.addAll([datasetData, datasetGroundtruth]);
 
         if (includeAccuracy) {
-          result.add(b.taskConfig.dataset.path);
-          result.add(b.taskConfig.dataset.groundtruthSrc);
+          final datasetData = Resource(
+              path: b.taskConfig.dataset.path,
+              type: ResourceTypeEnum.datasetData);
+          final datasetGroundtruth = Resource(
+              path: b.taskConfig.dataset.groundtruthSrc,
+              type: ResourceTypeEnum.datasetGroundtruth);
+          result.addAll([datasetData, datasetGroundtruth]);
         }
       }
-      result.add(b.benchmarkSetting.src);
+      final model =
+          Resource(path: b.benchmarkSetting.src,
+              type: ResourceTypeEnum.model,
+          md5Checksum: b.benchmarkSetting.md5Checksum);
+      result.add(model);
     }
 
-    final set = <String>{};
-    result.retainWhere((x) => x.isNotEmpty && set.add(x));
-    return result.where((element) => element.isNotEmpty).toList();
+    final set = <Resource>{};
+    result.retainWhere((x) => x.path.isNotEmpty && set.add(x));
+    return result.where((element) => element.path.isNotEmpty).toList();
   }
 }
