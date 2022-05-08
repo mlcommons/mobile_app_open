@@ -96,6 +96,7 @@ benchmark_setting {
   accelerator_desc: "Neuron"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -105,6 +106,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 128
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -113,6 +115,7 @@ benchmark_setting {
   accelerator_desc: "Neuron"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -121,6 +124,7 @@ benchmark_setting {
   accelerator_desc: "GPU FP16"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -129,6 +133,7 @@ benchmark_setting {
   accelerator_desc: "Neuron"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_uint8.tflite"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -137,6 +142,7 @@ benchmark_setting {
   accelerator_desc: "Neuron"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+  md5Checksum: ""
 }
 
 )SETTINGS";

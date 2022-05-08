@@ -96,6 +96,7 @@ benchmark_setting {
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -105,6 +106,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 64
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -113,6 +115,7 @@ benchmark_setting {
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -121,6 +124,7 @@ benchmark_setting {
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -129,6 +133,7 @@ benchmark_setting {
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/Google/v1_0/Google/deeplabv3.tflite"
+  md5Checksum: ""
 })SETTINGS";
 
 #endif

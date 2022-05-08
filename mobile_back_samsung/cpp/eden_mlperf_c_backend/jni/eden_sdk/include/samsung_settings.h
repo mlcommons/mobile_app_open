@@ -96,6 +96,7 @@ benchmark_setting {
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/is.nnc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -104,6 +105,7 @@ benchmark_setting {
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/ic.nnc"
+  md5Checksum: ""
 }
 
 
@@ -113,6 +115,7 @@ benchmark_setting {
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/od.nnc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -121,6 +124,7 @@ benchmark_setting {
   accelerator_desc: "gpu"
   configuration: "Samsung Exynos"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/lu.nnc"
+  md5Checksum: ""
 }
 
 
@@ -131,5 +135,6 @@ benchmark_setting {
   configuration: "Samsung Exynos"
   batch_size: 2048
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/ic_offline.nncgo"
+  md5Checksum: ""
 })SETTINGS";
 #endif

@@ -78,6 +78,7 @@ benchmark_setting {
   accelerator_desc: "AIP"
   configuration: "SNPE"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/SNPE/mobilenet_edgetpu_224_1.0_hta.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -91,6 +92,7 @@ benchmark_setting {
     value: "Offline"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/SNPE/mobilenet_edgetpu_224_1.0_hta.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -103,6 +105,7 @@ benchmark_setting {
     value: "Postprocessor/BatchMultiClassNonMaxSuppression"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/SNPE/ssd_mobiledet_qat_hta.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -111,6 +114,7 @@ benchmark_setting {
   accelerator_desc: "GPU (FP16)"
   configuration: "TFLite GPU"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -119,6 +123,7 @@ benchmark_setting {
   accelerator_desc: "AIP"
   configuration: "SNPE"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/SNPE/deeplabv3_hta.dlc"
+  md5Checksum: ""
 })SETTINGS";
 
 const std::string qti_settings_sdm888 = R"SETTINGS(
@@ -205,6 +210,7 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/mobilenet_edgetpu_224_1.0_htp.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -218,6 +224,7 @@ benchmark_setting {
     value: "Offline"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -234,6 +241,7 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/ssd_mobiledet_qat_htp.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -258,6 +266,7 @@ benchmark_setting {
     value: "false"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/mobilebert_quantized_htp.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -278,6 +287,7 @@ benchmark_setting {
     value: "uint_8"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/deeplabv3_htp.dlc"
+  md5Checksum: ""
 })SETTINGS";
 
 const std::string qti_settings_sdm778 = R"SETTINGS(
@@ -363,6 +373,7 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/mobilenet_edgetpu_224_1.0_htp.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -376,6 +387,7 @@ benchmark_setting {
     value: "Offline"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -392,6 +404,7 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/ssd_mobiledet_qat_htp.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -412,6 +425,7 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/mobilebert_quantized_htp.dlc"
+  md5Checksum: ""
 }
 
 benchmark_setting {
@@ -432,5 +446,6 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/deeplabv3_htp.dlc"
+  md5Checksum: ""
 })SETTINGS";
 #endif
