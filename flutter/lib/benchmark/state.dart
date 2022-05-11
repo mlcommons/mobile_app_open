@@ -131,6 +131,10 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<String> validateModelChecksum(String errorDescription) async {
+
+    // TODO (anhappdev): add support for Windows
+    if (!(Platform.isIOS || Platform.isAndroid)) return '';
+
     final resources = _middle.listResources(
         skipInactive: true, includeAccuracy: _store.submissionMode);
     final models =
