@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'package:md5_file_checksum/md5_file_checksum.dart';
+import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
@@ -87,14 +87,9 @@ class ResourceManager {
   }
 
   Future<bool> isChecksumMatched(Resource resource) async {
-    try {
-      final md5ChecksumBase64 =
-          await Md5FileChecksum.getFileChecksum(filePath: resource.path);
-      final md5ChecksumHex = base64ToHex(md5ChecksumBase64);
-      return md5ChecksumHex == resource.md5Checksum;
-    } catch (exception) {
-      throw 'Unable to generate file checksum: $exception';
-    }
+    var fileStream = File(resource.path).openRead();
+    final checksum = (await md5.bind(fileStream).first).toString();
+    return checksum == resource.md5Checksum;
   }
 
   void handleResources(List<String> resources, bool purgeOldCache) async {

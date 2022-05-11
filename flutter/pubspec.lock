@@ -100,7 +100,7 @@ packages:
     source: hosted
     version: "3.0.1"
   crypto:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: crypto
       url: "https://pub.dartlang.org"
@@ -330,13 +330,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.10"
-  md5_file_checksum:
-    dependency: "direct main"
-    description:
-      name: md5_file_checksum
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.3"
   meta:
     dependency: transitive
     description:
