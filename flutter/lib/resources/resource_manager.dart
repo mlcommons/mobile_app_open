@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
 import 'package:mlperfbench/device_info.dart';
+import 'archive_cache_helper.dart';
 import 'cache_manager.dart';
 import 'result_manager.dart';
 import 'utils.dart';
@@ -86,31 +87,51 @@ class ResourceManager {
         await Directory(path).exists();
   }
 
-  Future<bool> isChecksumMatched(Resource resource) async {
-    var fileStream = File(resource.path).openRead();
+  Future<bool> isChecksumMatched(String filePath, String md5Checksum) async {
+    var fileStream = File(filePath).openRead();
     final checksum = (await md5.bind(fileStream).first).toString();
-    return checksum == resource.md5Checksum;
+    return checksum == md5Checksum;
   }
 
-  void handleResources(List<String> resources, bool purgeOldCache) async {
+  void handleResources(List<Resource> resources, bool purgeOldCache) async {
     _progressString = '0%';
     _done = false;
     _onUpdate();
 
-    var internetResources = <String>[];
+    var internetResources = <Resource>[];
     for (final resource in resources) {
-      if (resource.startsWith(_applicationDirectoryPrefix)) continue;
-      if (isInternetResource(resource)) {
+      if (resource.path.startsWith(_applicationDirectoryPrefix)) continue;
+      if (isInternetResource(resource.path)) {
         internetResources.add(resource);
         continue;
       }
-      throw 'forbidden path: $resource (only http://, https:// and app:// resources are allowed)';
+      throw 'forbidden path: ${resource.path} (only http://, https:// and app:// resources are allowed)';
     }
 
-    await cacheManager.cache(internetResources, (double val) {
+    final paths = internetResources.map((e) => e.path).toList();
+    await cacheManager.cache(paths, (double val) {
       _progressString = '${(val * 100).round()}%';
       _onUpdate();
     }, purgeOldCache);
+
+    // validate checksum of model files
+    final models =
+        resources.where((e) => e.type == ResourceTypeEnum.model).toList();
+    final mismatchedResources = await validateResourcesChecksum(models);
+    if (mismatchedResources.isNotEmpty) {
+      final mismatchedPaths =
+          mismatchedResources.map((e) => '\n${e.path}').join();
+      throw 'Checksum validation failed for: $mismatchedPaths';
+    }
+
+    // delete downloaded archives to free up disk space
+    for (final resource in internetResources) {
+      if (!cacheManager.isResourceAnArchive(resource.path)) return;
+      final cachedPath = cacheManager.get(resource.path);
+      if (cachedPath != null) {
+        await File(cachedPath).delete();
+      }
+    }
 
     _done = true;
     _onUpdate();
@@ -201,13 +222,15 @@ class ResourceManager {
   Future<List<Resource>> validateResourcesChecksum(
       List<Resource> resources) async {
     final mismatchedResources = <Resource>[];
-    final cachedResources = resources
-        .map((e) => Resource(
-            path: get(e.path), type: e.type, md5Checksum: e.md5Checksum))
-        .toList();
-    for (var r in cachedResources) {
-      if (!await isChecksumMatched(r)) {
-        mismatchedResources.add(r);
+    for (final resource in resources) {
+      final md5Checksum = resource.md5Checksum;
+      var localPath = cacheManager.get(resource.path);
+      if (localPath == null || md5Checksum == null) continue;
+      if (cacheManager.isResourceAnArchive(resource.path)) {
+        localPath += ArchiveCacheHelper.extension;
+      }
+      if (!await isChecksumMatched(localPath, md5Checksum)) {
+        mismatchedResources.add(resource);
       }
     }
     return mismatchedResources;

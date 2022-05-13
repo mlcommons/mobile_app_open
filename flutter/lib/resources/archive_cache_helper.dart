@@ -29,7 +29,6 @@ class ArchiveCacheHelper {
     }
     var file = await fileCacheHelper.get(url, true);
     await _unzipFile(file);
-    await File(file).delete();
     return cachePath;
   }
 

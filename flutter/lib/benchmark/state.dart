@@ -130,21 +130,6 @@ class BenchmarkState extends ChangeNotifier {
             .join();
   }
 
-  Future<String> validateModelChecksum(String errorDescription) async {
-    final resources = _middle.listResources(
-        skipInactive: true, includeAccuracy: _store.submissionMode);
-    final models =
-        resources.where((e) => e.type == ResourceTypeEnum.model).toList();
-    final mismatched = await resourceManager.validateResourcesChecksum(models);
-    if (mismatched.isEmpty) return '';
-
-    return errorDescription +
-        mismatched
-            .mapIndexed((i, element) =>
-                '\n${i + 1}) ${element.path.replaceFirst(resourceManager.applicationDirectory, '.')}')
-            .join();
-  }
-
   Future<void> clearCache() async {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
     await configManager.deleteDefaultConfig();
@@ -168,8 +153,7 @@ class BenchmarkState extends ChangeNotifier {
     }
 
     await Wakelock.enable();
-    final paths = _middle.listResources().map((e) => e.path).toList();
-    resourceManager.handleResources(paths, needToPurgeCache);
+    resourceManager.handleResources(_middle.listResources(), needToPurgeCache);
     await Wakelock.disable();
   }
 
