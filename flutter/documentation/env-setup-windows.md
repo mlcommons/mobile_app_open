@@ -40,6 +40,10 @@ Windows support is still in beta, so it is disabled by default.
 * Turn on the developer mode in Windows settings.
   * This option should be located in `Update & Security` → `For developers`.
   * Or you can open this page from command line: `start ms-settings:developers`
+* Disable python dummy files provided by Windows
+  * Go to `Settings` → `Apps` → `Apps & features` → `App execution aliases`
+  * Disable `App Installer python.exe` amd `App Installer python3.exe`
+* Set python path env, paths must use forward slashes
 
 **Note**: If you have a WSL distro installed on your PC, you may need to set `BAZEL_SH` environment variable.
 Without it bazel could call `bash` provided by WSL instead of MSYS2's one.

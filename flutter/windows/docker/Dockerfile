@@ -1,5 +1,5 @@
 # escape=`
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
+FROM mcr.microsoft.com/windows:1809
 
 # SHELL [ "powershell", "-command" ]
 SHELL ["cmd", "/S", "/C"]
