@@ -107,9 +107,7 @@ class BenchmarkState extends ChangeNotifier {
       String errorDescription) async {
     final resources = _middle.listResources(
         skipInactive: true, includeAccuracy: _store.submissionMode);
-    final paths = resources.map((e) => e.path).toList();
-    // TODO (anhappdev): refactor validateResourcesExist() to receive List<Resource>
-    final missing = await resourceManager.validateResourcesExist(paths);
+    final missing = await resourceManager.validateResourcesExist(resources);
     if (missing.isEmpty) return '';
 
     return errorDescription +
@@ -119,9 +117,7 @@ class BenchmarkState extends ChangeNotifier {
   Future<String> validateOfflineMode(String errorDescription) async {
     final resources = _middle.listResources(
         skipInactive: true, includeAccuracy: _store.submissionMode);
-    final paths = resources.map((e) => e.path).toList();
-    // TODO (anhappdev): refactor filterInternetResources() to receive List<Resource>
-    final internetResources = filterInternetResources(paths);
+    final internetResources = filterInternetResources(resources);
     if (internetResources.isEmpty) return '';
 
     return errorDescription +

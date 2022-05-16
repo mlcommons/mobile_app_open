@@ -198,11 +198,11 @@ class ResourceManager {
     _batchPresets = result;
   }
 
-  Future<List<String>> validateResourcesExist(List<String> resources) async {
+  Future<List<String>> validateResourcesExist(List<Resource> resources) async {
     final missingResources = <String>[];
     for (var r in resources) {
-      if (!await isResourceExist(r)) {
-        missingResources.add(r);
+      if (!await isResourceExist(r.path)) {
+        missingResources.add(r.path);
       }
     }
     return missingResources;
