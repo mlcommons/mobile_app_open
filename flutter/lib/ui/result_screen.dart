@@ -155,12 +155,13 @@ class _ResultScreenState extends State<ResultScreen>
         Column(
           children: [
             ListTile(
+              minVerticalPadding: 0,
               leading: Container(
                   width: pictureEdgeSize,
                   height: pictureEdgeSize,
                   child: benchmark.info.icon),
               title: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                padding: const EdgeInsets.fromLTRB(0, 9, 0, 5),
                 child:
                     Text(benchmark.info.getLocalizedInfo(stringResources).name),
               ),
