@@ -1,8 +1,24 @@
+param (
+    [string]$cacheBucket,
+    [string]$credentialsBucketPath,
+    [string]$artifactUploadPath,
+    [string]$dockerImageName,
+    [string]$dockerfileCommitFile
+)
+
+echo "using bazel cache bucket: $cacheBucket"
+echo "using credentials from: $credentialsBucketPath"
+echo "using artifact upload path: $artifactUploadPath"
+echo "using docker image name: $dockerImageName"
+echo "using dockerfile commit file: $dockerfileCommitFile"
+
+$startTime = $(get-date)
 
 echo "disabling windows defender realtime protection..."
 Set-MpPreference -DisableRealtimeMonitoring $true
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "windows defender realtime protection disabled successfully"
+echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
 
 echo "installing ops agent..."
 (New-Object Net.WebClient).DownloadFile("https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.ps1", "${env:UserProfile}\add-google-cloud-ops-agent-repo.ps1")
@@ -10,36 +26,13 @@ if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($Last
 Invoke-Expression "${env:UserProfile}\add-google-cloud-ops-agent-repo.ps1 -AlsoInstall"
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "ops agent installed successfully"
-
-echo "installing chocolatey..."
-Set-ExecutionPolicy Bypass -Scope Process -Force
-if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
-iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
-echo "chocolatey installed successfully"
-
-choco install -y git --version 2.33.0.2
-if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
-
-# we need to update PATH to access git command
-# this method is from https://stackoverflow.com/a/56033268
-function resetEnv {
-    Set-Item `
-        -Path (('Env:', $args[0]) -join '') `
-        -Value ((
-            [System.Environment]::GetEnvironmentVariable($args[0], "Machine"),
-            [System.Environment]::GetEnvironmentVariable($args[0], "User")
-        ) -match '.' -join ';')
-}
-resetEnv Path
-if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
+echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
 
 echo "configuring docker for GCR access..."
 cmd /S /C "gcloud auth configure-docker <NUL"
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "docker configured successfully"
+echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
 
 echo "obtaining environment info..."
 
@@ -50,6 +43,7 @@ echo "curDir is $curDir"
 $projectID = gcloud config get-value project;
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "projectID is $projectID"
+echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
 
 # Usually google authentication in cloudbuild containers or in compute engine VMs works by accessing LAN.
 # Container inside VM doesn't have access to VM's LAN.
@@ -57,14 +51,16 @@ echo "projectID is $projectID"
 # but it's not supported on Windows so we have to manually provide credentials.
 echo "obtaining google credentials..."
 $localCredentials = "output/auto-copy/google-credentials/credentials.json"
-gsutil cp gs://mobile-app-build-290400-helper-files/compute-engine/container-credentials.json $localCredentials
+gsutil cp $credentialsBucketPath $localCredentials
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "successfully obtained google credentials"
+echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
 
-$dockerfileCommit = git log -n 1 --pretty=format:%H -- flutter/windows/docker/Dockerfile
+$dockerfileCommit = [IO.File]::ReadAllText($dockerfileCommitFile)
 $imageTag = "gcr.io/$projectID/flutter-windows-ci:$dockerfileCommit"
 echo "using image: $imageTag"
 
+$env:DOCKER_CLI_EXPERIMENTAL = "enabled"
 docker manifest inspect $imageTag
 if ($?) {
     echo "image management: prebuilt image found"
@@ -72,19 +68,19 @@ if ($?) {
     docker pull $imageTag
     if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
     echo "image management: pulled successfully"
+    echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
 } else {
     echo "image management: image was not found in registry"
     echo "image management: building"
     docker build -t $imageTag flutter/windows/docker
     if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
+    echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
     echo "image management: pushing"
     docker push $imageTag
     if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
     echo "image management: pushed successfully"
+    echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
 }
-
-$cacheBucket = "mobile-app-build-290400-bazel-cache-windows"
-echo "using bazel cache bucket: $cacheBucket"
 
 echo "launching docker..."
 docker run -i `
@@ -98,3 +94,9 @@ docker run -i `
     $imageTag `
     make flutter/windows/ci
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
+echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+
+echo "uploading release archive..."
+gsutil cp output/flutter-windows-releases/ci-build.zip $artifactUploadPath
+echo "release archive uploaded successfully"
+echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"

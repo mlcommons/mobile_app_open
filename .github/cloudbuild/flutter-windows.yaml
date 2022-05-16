@@ -1,18 +1,52 @@
 substitutions:
-  _IMAGE_NAME: mlperf-mobile-flutter-android
-# Building apks with flutter requires a lot of memory.
-# Builds on standard machines with 4GB of RAM can unexpectedly hang.
-# Also the build is mostly CPU-intensive, so using 8-core machines
-# reduces build time up to 3 times.
-options:
-  # machineType: 'E2_HIGHCPU_8'
+  __ARTIFACT_UPLOAD_PATH: $_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA-windows
+  __DOCKER_IMAGE_NAME: flutter-windows-ci
 
 steps:
-  - name: 'gcr.io/$PROJECT_ID/windows-builder'
+  # We need this step to correctly identify dockerfile tag
+  - id: fetch-repo-history
+    name: gcr.io/cloud-builders/git
+    timeout: 10s
+    entrypoint: bash
     args:
-    - --machineType=c2-standard-4
+      - -xc
+      - |
+        git fetch --unshallow || exit 1
+        mkdir output
+        git log -n 1 --pretty=format:%H -- flutter/windows/docker/Dockerfile >output/dockerfile-commit
+  # cloudbuild does not provide an official method to run CI on Windows
+  # but there is a community-provided builder.
+  # The sources are here: https://github.com/GoogleCloudPlatform/cloud-builders-community/tree/master/windows-builder
+  # The windows-builder image was created and uploaded manually
+  - name: gcr.io/$PROJECT_ID/windows-builder
+    id: build-and-test
+    args:
+    - --machineType=n2-highcpu-8
     - --image=windows-cloud/global/images/windows-server-2019-dc-for-containers-v20220414
-    - --command=powershell.exe -file ./.github/cloudbuild/build.ps1
     - --diskType=pd-ssd
+    - --workspace-bucket=$_WORKSPACE_TMP_BUCKET
+    - --diskSizeGb=70
+    - --command=powershell.exe
+        -file ./.github/cloudbuild/build.ps1
+        -cacheBucket $_BAZEL_CACHE_BUCKET
+        -credentialsBucketPath $_CREDENTIALS_BUCKET_PATH
+        -artifactUploadPath gs://$__ARTIFACT_UPLOAD_PATH
+        -dockerImageName $__DOCKER_IMAGE_NAME
+        -dockerfileCommitFile output/dockerfile-commit
+  - id: print-artifact-links
+    name: gcr.io/cloud-builders/gcloud
+    timeout: 10s
+    entrypoint: bash
+    args:
+      - -xc
+      - |
+        echo executable archive:
+        echo gs://$__ARTIFACT_UPLOAD_PATH/ci-build.zip
+        echo https://storage.cloud.google.com/$__ARTIFACT_UPLOAD_PATH/ci-build.zip
+        echo
+        DOCKERFILE_COMMIT=$$(cat output/dockerfile-commit)
+        echo docker image:
+        echo https://gcr.io/mobile-app-build-290400/$__DOCKER_IMAGE_NAME:$$DOCKERFILE_COMMIT
+        echo
 
 timeout: 18000s # 5 hours

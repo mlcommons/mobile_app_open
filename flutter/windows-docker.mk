@@ -72,21 +72,24 @@ flutter/windows/docker/cmd:
 # but it wouldn't make much difference
 container_local_project=C:/project-local
 container_msvc_dlls=C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Redist/MSVC/14.29.30133/x64/Microsoft.VC142.CRT
+container_release_name=ci-build
 .PHONY: flutter/windows/ci
 flutter/windows/ci:
 	# Only run `make flutter/windows/ci/*` inside the docker windows container
 	make flutter/windows/ci/copy-mount-to-local
 	cd ${container_local_project} && make \
 		flutter/prepare \
-		# flutter/windows/libs
+		flutter/windows/libs
+	cd ${container_local_project} && make \
+		flutter/test
 	cd ${container_local_project} && make \
 		"FLUTTER_MSVC_DLLS=${container_msvc_dlls}" \
-		FLUTTER_RELEASE_NAME=release-test \
+		FLUTTER_RELEASE_NAME=${container_release_name} \
 		flutter/windows/release
 	make \
-		FLUTTER_RELEASE_NAME=release-test \
+		FLUTTER_RELEASE_NAME=${container_release_name} \
 		flutter/windows/ci/copy-release-from-local \
-		flutter/windows/archive-release
+		flutter/windows/release/archive
 
 .PHONY: flutter/windows/ci/copy-mount-to-local
 flutter/windows/ci/copy-mount-to-local:

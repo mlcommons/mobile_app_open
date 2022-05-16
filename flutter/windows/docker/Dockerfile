@@ -4,16 +4,14 @@ FROM mcr.microsoft.com/windows:1809
 # SHELL [ "powershell", "-command" ]
 SHELL ["cmd", "/S", "/C"]
 
-RUN net user /add user && net localgroup Administrators user /add
-RUN wmic useraccount where "Name='user'" set PasswordExpires=false
-
-USER user
-
 RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
     iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-RUN choco install -y flutter --version 2.5.2
+# --no-progress is required on all `choco install` commands
+# because on CI where the output is not a terminal but a file
+# choco generates literally megabytes of progress update lines
+RUN choco install -y --no-progress flutter --version 2.5.2
 RUN flutter config --enable-windows-desktop
 
 RUN curl -fSLo vs_BuildTools.exe https://aka.ms/vs/16/release/vs_buildtools.exe `
@@ -30,15 +28,15 @@ RUN flutter doctor
 # because it can't delete a file, which name contains special symbols, from recycle bin.
 # See this issue: https://github.com/docker/for-win/issues/5193
 #    This issue is already closed, but the bug is still present.
-RUN choco install -y msys2 --version 20220319.0.0 --params "/NoUpdate"
+RUN choco install -y --no-progress msys2 --version 20220319.0.0 --params "/NoUpdate"
 RUN setx path "%path%;C:/tools/msys64/usr/bin"
 
-RUN choco install -y git --version 2.33.0.2
-RUN choco install -y make --version 4.3
-RUN choco install -y bazel --version 4.2.1
-RUN choco install -y python3 --version 3.9.0 && copy "C:\Python39\python.exe" "C:\Python39\python3.exe"
-RUN choco install -y protoc --version 3.18.1
-RUN choco install -y buildifier --version 4.2.2
+RUN choco install -y --no-progress git --version 2.33.0.2
+RUN choco install -y --no-progress make --version 4.3
+RUN choco install -y --no-progress bazel --version 4.2.1
+RUN choco install -y --no-progress python3 --version 3.9.0 && copy "C:\Python39\python.exe" "C:\Python39\python3.exe"
+RUN choco install -y --no-progress protoc --version 3.18.1
+RUN choco install -y --no-progress buildifier --version 4.2.2
 
 RUN python3 -m pip install --user numpy absl-py
 
