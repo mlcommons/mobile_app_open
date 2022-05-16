@@ -8,7 +8,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
 import 'package:mlperfbench/device_info.dart';
-import 'archive_cache_helper.dart';
 import 'cache_manager.dart';
 import 'result_manager.dart';
 import 'utils.dart';
@@ -108,30 +107,20 @@ class ResourceManager {
       throw 'forbidden path: ${resource.path} (only http://, https:// and app:// resources are allowed)';
     }
 
-    final paths = internetResources.map((e) => e.path).toList();
-    await cacheManager.cache(paths, (double val) {
+    final internetPaths = internetResources.map((e) => e.path).toList();
+    await cacheManager.cache(internetPaths, (double val) {
       _progressString = '${(val * 100).round()}%';
       _onUpdate();
     }, purgeOldCache);
 
-    // validate checksum of model files
-    final models =
-        resources.where((e) => e.type == ResourceTypeEnum.model).toList();
-    final mismatchedResources = await validateResourcesChecksum(models);
-    if (mismatchedResources.isNotEmpty) {
-      final mismatchedPaths =
-          mismatchedResources.map((e) => '\n${e.path}').join();
+    final checksumFailed = await validateResourcesChecksum(resources);
+    if (checksumFailed.isNotEmpty) {
+      final mismatchedPaths = checksumFailed.map((e) => '\n${e.path}').join();
       throw 'Checksum validation failed for: $mismatchedPaths';
     }
 
     // delete downloaded archives to free up disk space
-    for (final resource in internetResources) {
-      if (!cacheManager.isResourceAnArchive(resource.path)) return;
-      final cachedPath = cacheManager.get(resource.path);
-      if (cachedPath != null) {
-        await File(cachedPath).delete();
-      }
-    }
+    await cacheManager.deleteArchives(internetPaths);
 
     _done = true;
     _onUpdate();
@@ -221,18 +210,21 @@ class ResourceManager {
 
   Future<List<Resource>> validateResourcesChecksum(
       List<Resource> resources) async {
-    final mismatchedResources = <Resource>[];
+    final checksumFailedResources = <Resource>[];
     for (final resource in resources) {
       final md5Checksum = resource.md5Checksum;
-      var localPath = cacheManager.get(resource.path);
-      if (localPath == null || md5Checksum == null) continue;
+      if (md5Checksum == null || md5Checksum.isEmpty) continue;
+      String? localPath;
       if (cacheManager.isResourceAnArchive(resource.path)) {
-        localPath += ArchiveCacheHelper.extension;
+        localPath = cacheManager.getArchive(resource.path);
+      } else {
+        localPath = cacheManager.get(resource.path);
       }
+      if (localPath == null || !File(localPath).existsSync()) continue;
       if (!await isChecksumMatched(localPath, md5Checksum)) {
-        mismatchedResources.add(resource);
+        checksumFailedResources.add(resource);
       }
     }
-    return mismatchedResources;
+    return checksumFailedResources;
   }
 }

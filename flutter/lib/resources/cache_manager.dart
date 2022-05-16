@@ -20,6 +20,14 @@ class CacheManager {
     return _resourcesMap[url];
   }
 
+  String? getArchive(String url) {
+    if (!isResourceAnArchive(url)) return null;
+    final archiveDirPath = get(url);
+    if (archiveDirPath == null) return null;
+    final archiveFilePath = archiveDirPath + ArchiveCacheHelper.extension;
+    return archiveFilePath;
+  }
+
   Future<void> deleteLoadedResources(List<String> nonRemovableResources,
       [int atLeastDaysOld = 0]) async {
     final directory = Directory(loadedResourcesDir);
@@ -53,6 +61,15 @@ class CacheManager {
         }
       }
       await file.delete(recursive: true);
+    }
+  }
+
+  Future<void> deleteArchives(List<String> resources) async {
+    for (final resource in resources) {
+      final archivePath = getArchive(resource);
+      if (archivePath == null) continue;
+      final archiveFile = File(archivePath);
+      if (archiveFile.existsSync()) await archiveFile.delete();
     }
   }
 

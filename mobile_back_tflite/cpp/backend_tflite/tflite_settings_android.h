@@ -95,7 +95,7 @@ benchmark_setting {
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
-  src: "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-zip-file.zip"
+  src: "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-large-zip-file.zip"
   md5Checksum: "abc"
 }
 
