@@ -180,7 +180,6 @@ class Benchmark {
         ),
       ));
     }
-    print('benchmarkSetting.expectedLatencyNs = ${benchmarkSetting.singleStreamExpectedLatencyNs}');
 
     return RunSettings(
       backend_model_path: resourceManager.get(benchmarkSetting.src),
