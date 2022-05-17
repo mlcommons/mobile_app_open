@@ -21,8 +21,8 @@ ifeq (${WITH_TFLITE},1)
   backend_tflite_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
   backend_tflite_android_target=//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.so
   backend_tflite_filename=libtflitebackend
+  $(info WITH_TFLITE=1)
 else
-  # tflite is enabled by default, so print log message only if someone disabled it
   $(info WITH_TFLITE=0)
 endif
 

@@ -102,7 +102,7 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
   } else {
     // Run MLPerf in SingleStream mode by default.
     mlperf_settings.scenario = ::mlperf::TestScenario::SingleStream;
-    mlperf_settings.single_stream_expected_latency_ns = 800000;
+    mlperf_settings.single_stream_expected_latency_ns = 900000;
     mlperf_settings.min_duration_ms = min_duration;
   }
 
