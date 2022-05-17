@@ -20,6 +20,7 @@ steps:
   # The windows-builder image was created and uploaded manually
   - name: gcr.io/$PROJECT_ID/windows-builder
     id: build-and-test
+    timeout: 5400s # 1.5 hours
     args:
     - --machineType=n2-highcpu-8
     - --image=windows-cloud/global/images/windows-server-2019-dc-for-containers-v20220414
@@ -49,4 +50,4 @@ steps:
         echo https://gcr.io/mobile-app-build-290400/$__DOCKER_IMAGE_NAME:$$DOCKERFILE_COMMIT
         echo
 
-timeout: 18000s # 5 hours
+timeout: 7200s # 2 hours

@@ -88,7 +88,6 @@ docker run -i `
     --memory 6G `
     --volume $curDir':C:/mnt/project' `
     --workdir C:/mnt/project `
-    --env MSYS=nonativeinnerlinks `
     --env "BAZEL_CACHE_ARG=--remote_cache=https://storage.googleapis.com/$cacheBucket --google_default_credentials" `
     --env GOOGLE_APPLICATION_CREDENTIALS=$localCredentials `
     $imageTag `

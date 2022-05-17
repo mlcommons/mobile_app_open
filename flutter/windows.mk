@@ -21,7 +21,7 @@ flutter/windows: flutter/windows/libs flutter/prepare
 flutter_windows_libs_folder=flutter/windows/libs
 .PHONY: flutter/windows/libs
 flutter/windows/libs:
-	bazel build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
 		--config=windows \
 		${backend_tflite_windows_target} \
 		//flutter/cpp/flutter:backend_bridge.dll

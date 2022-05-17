@@ -13,98 +13,62 @@
 # limitations under the License.
 ##########################################################################
 
+fwc_image_name=mlperf_mobile_flutter_windows
 .PHONY: flutter/windows/docker/image
 flutter/windows/docker/image:
-	docker build -t mlperf_mobile_flutter:windows-1.0 flutter/windows/docker
+	docker build -t ${fwc_image_name} flutter/windows/docker
 
-
-ifneq (${GOOGLE_APPLICATION_CREDENTIALS},)
-google_credentials_local_folder=output/google-credentials
-google_credentials_container_path=${google_credentials_local_folder}/credentials.json
-else
-google_credentials_local_folder=
-google_credentials_container_path=
-endif
-.PHONY: flutter/windows/docker/create-container
-flutter/windows/docker/create-container:
-	# docker rm -f mobile_app_flutter_windows_container
-	mkdir -p output
-	echo >output/container-script.bat
-	if [ -n "${GOOGLE_APPLICATION_CREDENTIALS}" ]; then \
-		rm -rf ${google_credentials_local_folder}; \
-		mkdir -p ${google_credentials_local_folder}; \
-		cp "${GOOGLE_APPLICATION_CREDENTIALS}" ${google_credentials_container_path}; \
-	fi
-	@# "-it" here is required to make the container killable by Ctrl+C signal.
-	@# A lot of memory is required by bazel.
-	@#		With default settings only 1 bazel job can run at a time, which, obviously, greatly slows down the build.
-	@#		4G typically runs 6-7 jobs. 8G is enough for bazel to run 16+ jobs.
-	@# Also a lot of memory is required by Flutter. When using 2G Flutter fails with out of memory error, so at least 4G is needed.
-		# --name mobile_app_flutter_windows_container \
-		# --detach \
-		# ".\\output\\container-script.bat <NUL"
-		# --env BAZEL_LINKS_PREFIX=C:/bazel-links/ \
+.PHONY: flutter/windows/docker/--
+flutter/windows/docker/--: flutter/windows/docker/image
 	MSYS2_ARG_CONV_EXCL="*" docker run \
 		-it \
 		--rm \
-		--memory 8G --cpus $$(( `nproc` - 1 )) \
-		--volume "$(CURDIR):C:/mnt/project-parent" \
-		--workdir "C:/mnt/project-parent/" \
+		--memory 8G \
+		--volume "$(CURDIR):C:/workdir" \
+		--workdir "C:/workdir" \
 		--env "BAZEL_CACHE_ARG=${BAZEL_CACHE_ARG}" \
-		--env GOOGLE_APPLICATION_CREDENTIALS=${google_credentials_container_path} \
-		--env BAZEL_LINKS_PREFIX=C:/bazel-links/ \
-		mlperf_mobile_flutter:windows-1.0 \
+		--env GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS} \
+		${fwc_image_name} \
 		cmd
-		# make flutter/prepare
 
-.PHONY: flutter/windows/docker/cmd
-flutter/windows/docker/cmd:
-	echo >output/container-script.bat \
-		"cmd"
-	docker start -ai mobile_app_flutter_windows_container
-
-# In Docker Windows containers it's impossible to create a link inside a mounted volume.
-# Flutter wants to create links in `flutter/windows/flutter/ephemeral/.plugin_symlinks`
-# so `flutter build windows` doesn't work in a folder mounted from host.
-# We have to create a copy of the project outside of the mounted volume.
-#
-# We could run bazel in the original mounted folder and only copy the flutter folder
-# but it wouldn't make much difference
-container_local_project=C:/project-local
-container_msvc_dlls=C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Redist/MSVC/14.29.30133/x64/Microsoft.VC142.CRT
-container_release_name=ci-build
+fwc_local_project=C:/project-local
+fwc_msvc_dlls=C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Redist/MSVC/14.29.30133/x64/Microsoft.VC142.CRT
+fwc_release_name=ci-build
 .PHONY: flutter/windows/ci
 flutter/windows/ci:
 	# Only run `make flutter/windows/ci/*` inside the docker windows container
 	make flutter/windows/ci/copy-mount-to-local
-	cd ${container_local_project} && make \
+	cd ${fwc_local_project} && make \
+		BAZEL_OUTPUT_ROOT_ARG=--output_user_root=C:/bazel-root/ \
+		BAZEL_LINKS_PREFIX=C:/bazel-links/ \
 		flutter/prepare \
 		flutter/windows/libs
-	cd ${container_local_project} && make \
+	cd ${fwc_local_project} && make \
 		flutter/test
-	cd ${container_local_project} && make \
-		"FLUTTER_MSVC_DLLS=${container_msvc_dlls}" \
-		FLUTTER_RELEASE_NAME=${container_release_name} \
+	cd ${fwc_local_project} && make \
+		"FLUTTER_MSVC_DLLS=${fwc_msvc_dlls}" \
+		FLUTTER_RELEASE_NAME=${fwc_release_name} \
 		flutter/windows/release
 	make \
-		FLUTTER_RELEASE_NAME=${container_release_name} \
+		FLUTTER_RELEASE_NAME=${fwc_release_name} \
 		flutter/windows/ci/copy-release-from-local \
 		flutter/windows/release/archive
 
+# Flutter wants to create links in `flutter/windows/flutter/ephemeral/.plugin_symlinks`
+# In Docker Windows containers it's impossible to create a link inside a mounted volume.
 .PHONY: flutter/windows/ci/copy-mount-to-local
 flutter/windows/ci/copy-mount-to-local:
-	rm -rf ${container_local_project}
-	mkdir -p ${container_local_project}
-	cp --target-directory ${container_local_project} --parents --recursive \
+	rm -rf ${fwc_local_project}
+	mkdir -p ${fwc_local_project}
+	cp --target-directory ${fwc_local_project} --parents --recursive \
 		${GOOGLE_APPLICATION_CREDENTIALS} \
 		`git ls-files`
 
 .PHONY: flutter/windows/ci/copy-release-from-local
 flutter/windows/ci/copy-release-from-local:
 	@[ -n "${FLUTTER_RELEASE_NAME}" ] || (echo FLUTTER_RELEASE_NAME env must be set; exit 1)
-	@echo using "FLUTTER_RELEASE_NAME=${FLUTTER_RELEASE_NAME}"
 
 	rm -rf ${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}
 	mkdir -p ${flutter_windows_releases}
 	cp --target-directory ${flutter_windows_releases} --recursive \
-		${container_local_project}/${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}
+		${fwc_local_project}/${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}
