@@ -47,6 +47,8 @@ message BenchmarkSetting {
   required string configuration = 6;
   // batch_size is passed to the backend
   optional int32 batch_size = 7;
+  // single_stream_expected_latency_ns is passed to the backend, default to 1M
+  optional int32 single_stream_expected_latency_ns = 8 [default = 1000000];
 }
 
 // Common setting of each benchmark

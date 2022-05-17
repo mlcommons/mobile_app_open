@@ -180,6 +180,7 @@ class Benchmark {
         ),
       ));
     }
+    print('benchmarkSetting.expectedLatencyNs = ${benchmarkSetting.singleStreamExpectedLatencyNs}');
 
     return RunSettings(
       backend_model_path: resourceManager.get(benchmarkSetting.src),
@@ -194,6 +195,7 @@ class Benchmark {
       mode: runMode.getBackendModeString(),
       min_query_count: minQueryCount,
       min_duration: minDuration,
+      single_stream_expected_latency_ns: benchmarkSetting.singleStreamExpectedLatencyNs,
       output_dir: tmpDir.path,
       benchmark_id: id,
     );
