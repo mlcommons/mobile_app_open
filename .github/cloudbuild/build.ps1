@@ -13,12 +13,15 @@ echo "using docker image name: $dockerImageName"
 echo "using dockerfile commit file: $dockerfileCommitFile"
 
 $startTime = $(get-date)
+$stepTime = $startTime
 
 echo "disabling windows defender realtime protection..."
 Set-MpPreference -DisableRealtimeMonitoring $true
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "windows defender realtime protection disabled successfully"
 echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
+$stepTime = $(get-date)
 
 echo "installing ops agent..."
 (New-Object Net.WebClient).DownloadFile("https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.ps1", "${env:UserProfile}\add-google-cloud-ops-agent-repo.ps1")
@@ -27,12 +30,16 @@ Invoke-Expression "${env:UserProfile}\add-google-cloud-ops-agent-repo.ps1 -AlsoI
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "ops agent installed successfully"
 echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
+$stepTime = $(get-date)
 
 echo "configuring docker for GCR access..."
 cmd /S /C "gcloud auth configure-docker <NUL"
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "docker configured successfully"
 echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
+$stepTime = $(get-date)
 
 echo "obtaining environment info..."
 
@@ -44,6 +51,8 @@ $projectID = gcloud config get-value project;
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "projectID is $projectID"
 echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
+$stepTime = $(get-date)
 
 # Usually google authentication in cloudbuild containers or in compute engine VMs works by accessing LAN.
 # Container inside VM doesn't have access to VM's LAN.
@@ -55,6 +64,8 @@ gsutil cp $credentialsBucketPath $localCredentials
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "successfully obtained google credentials"
 echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
+$stepTime = $(get-date)
 
 $dockerfileCommit = [IO.File]::ReadAllText($dockerfileCommitFile)
 $imageTag = "gcr.io/$projectID/flutter-windows-ci:$dockerfileCommit"
@@ -69,17 +80,23 @@ if ($?) {
     if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
     echo "image management: pulled successfully"
     echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+    echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
+    $stepTime = $(get-date)
 } else {
     echo "image management: image was not found in registry"
     echo "image management: building"
     docker build -t $imageTag flutter/windows/docker
     if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
     echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+    echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
+    $stepTime = $(get-date)
     echo "image management: pushing"
     docker push $imageTag
     if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
     echo "image management: pushed successfully"
     echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+    echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
+    $stepTime = $(get-date)
 }
 
 echo "launching docker..."
@@ -94,8 +111,12 @@ docker run -i `
     make flutter/windows/ci
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
+$stepTime = $(get-date)
 
 echo "uploading release archive..."
 gsutil cp output/flutter-windows-releases/ci-build.zip $artifactUploadPath
 echo "release archive uploaded successfully"
 echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
+echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
+$stepTime = $(get-date)
