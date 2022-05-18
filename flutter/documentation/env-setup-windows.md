@@ -101,6 +101,7 @@ Python 3.9.7
 You can use `make format` and `make lint` to format and check files.
 
 You need to install dependencies for these commands to work:
+
 * `choco install -y buildifier`
 * clang-format:
   * You can install the whole LLVM package `choco install llvm -y`,
