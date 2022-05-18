@@ -112,6 +112,7 @@ final _MAX_THROUGHPUT = {
   'IC_tpu_uint8_offline': 508.0,
   'IC_tpu_float32_offline': 508.0,
   'OD_uint8': 288.0,
+  'OD_uint8_offline': 288.0,
   'OD_float32': 288.0,
   'LU_int8': 12.0,
   'LU_float32': 12.0,

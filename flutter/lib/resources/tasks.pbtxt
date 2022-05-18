@@ -1,0 +1,305 @@
+task {
+  name: "Image classification"
+  dataset {
+    name: "Imagenet classification validation set"
+    type: IMAGENET
+    path: "app:///mlperf_datasets/imagenet/img"
+    groundtruth_src: "app:///mlperf_datasets/imagenet/imagenet_val_full.txt"
+  }
+  lite_dataset {
+    name: "Open images subset for classification"
+    type: IMAGENET
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
+    groundtruth_src: ""
+  }
+  test_dataset {
+    name: "Imagenet dataset for instrument test"
+    type: IMAGENET
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
+    groundtruth_src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
+  }
+  model {
+    id: "IC_tpu_uint8"
+    name: "MobileNetEdgeTPU 224 1.0 Uint8"
+    offset: 1
+    tags: "uint8"
+    score_max: 1000
+    image_width: 224
+    image_height: 224
+  }
+  model {
+    id: "IC_tpu_float32"
+    name: "MobileNetEdgeTPU 224 1.0 F32"
+    offset: 1
+    tags: "float32"
+    score_max: 1500
+    image_width: 224
+    image_height: 224
+  }
+  min_query_count: 1024
+  min_duration_ms: 60000
+}
+
+task {
+  name: "Object detection"
+  dataset {
+    name: "COCO 2017 validation set"
+    type: COCO
+    path: "app:///mlperf_datasets/coco/img"
+    groundtruth_src: "app:///mlperf_datasets/coco/coco_val_full.pbtxt"
+  }
+  lite_dataset {
+    name: "Open images subset for detection"
+    type: COCO
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco.zip"
+    groundtruth_src: ""
+  }
+  test_dataset {
+    name: "Coco dataset for instrument test"
+    type: COCO
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco_tiny.zip"
+    groundtruth_src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/coco_val_tiny.pbtxt"
+  }
+  model {
+    id: "OD_uint8"
+    name: "SSD-MobileDET UInt8"
+    offset: 1
+    tags: "uint8"
+    score_max: 2000
+    num_classes: 91
+    image_width: 320
+    image_height: 320
+  }
+  model {
+    id: "OD_float32"
+    name: "SSD-MobileDET F32"
+    offset: 1
+    tags: "float32"
+    score_max: 5000
+    num_classes: 91
+    image_width: 320
+    image_height: 320
+  }
+  min_query_count: 1024
+  min_duration_ms: 60000
+}
+
+
+task {
+  name: "Object detection (offline)"
+  dataset {
+    name: "COCO 2017 validation set"
+    type: COCO
+    path: "app:///mlperf_datasets/coco/img"
+    groundtruth_src: "app:///mlperf_datasets/coco/coco_val_full.pbtxt"
+  }
+  lite_dataset {
+    name: "Open images subset for detection"
+    type: COCO
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco.zip"
+    groundtruth_src: ""
+  }
+  test_dataset {
+    name: "Coco dataset for instrument test"
+    type: COCO
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco_tiny.zip"
+    groundtruth_src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/coco_val_tiny.pbtxt"
+  }
+  model {
+    id: "OD_uint8_offline"
+    name: "SSD-MobileDET UInt8"
+    offset: 1
+    tags: "uint8"
+    score_max: 2000
+    num_classes: 91
+    image_width: 320
+    image_height: 320
+  }
+  min_query_count: 1024
+  min_duration_ms: 60000
+}
+
+task {
+  name: "v2.0 Image Segmentation"
+  dataset {
+    name: "ADE20K validation set"
+    type: ADE20K
+    path: "app:///mlperf_datasets/ade20k/images"
+    groundtruth_src: "app:////mlperf_datasets/ade20k/annotations"
+  }
+  lite_dataset {
+    name: "Open images subset for segmentation"
+    type: ADE20K
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k.zip"
+    groundtruth_src: ""
+  }
+  test_dataset {
+    name: "Open images subset for segmentation"
+    type: ADE20K
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k_tiny.zip"
+    groundtruth_src: ""
+  }
+  model {
+    id: "IS_float32_mosaic"
+    name: "MOSAIC F32"
+    tags: "float32"
+    score_max: 2000
+    num_classes: 31
+    image_width: 512
+    image_height: 512
+  }
+  model {
+    id: "IS_uint8_mosaic"
+    name: "MOSAIC Uint8"
+    tags: "uint8"
+    score_max: 2000
+    num_classes: 31
+    image_width: 512
+    image_height: 512
+  }
+  min_query_count: 1024
+  min_duration_ms: 60000
+}
+
+task {
+  name: "Language Understanding"
+  dataset {
+    name: "Squad V1.1 validation set"
+    type: SQUAD
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord"
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/squad_groundtruth.tfrecord"
+  }
+  lite_dataset {
+    name: "Squad V1.1 mini set"
+    type: SQUAD
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord"
+    groundtruth_src: ""
+  }
+  test_dataset {
+    name: "Squad V1.1 mini set"
+    type: SQUAD
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_tiny.tfrecord"
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/squad_groundtruth.tfrecord"
+  }
+  model {
+    id: "LU_float32"
+    name: "MobileBert F32"
+    tags: "float32"
+    score_max: 12000
+  }
+  model {
+    id: "LU_gpu_float32"
+    name: "MobileBert F32 for GPU"
+    tags: "float32-gpu"
+    score_max: 10000
+  }
+  model {
+    id: "LU_int8"
+    name: "MobileBert Int8"
+    tags: "int8"
+    score_max: 8000
+  }
+  model {
+    id: "LU_nnapi_int8"
+    name: "MobileBert Int8 for NNAPI"
+    tags: "int8-nnapi"
+    score_max: 8000
+  }
+  min_query_count: 1024
+  min_duration_ms: 60000
+}
+
+task {
+  name: "Image classification (offline)"
+  dataset {
+    name: "Imagenet classification validation set"
+    type: IMAGENET
+    path: "app:///mlperf_datasets/imagenet/img"
+    groundtruth_src: "app:///mlperf_datasets/imagenet/imagenet_val_full.txt"
+  }
+  lite_dataset {
+    name: "Open images subset for classification"
+    type: IMAGENET
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
+    groundtruth_src: ""
+  }
+  test_dataset {
+    name: "Imagenet dataset for instrument test"
+    type: IMAGENET
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
+    groundtruth_src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
+  }
+  model {
+    id: "IC_tpu_uint8_offline"
+    name: "MobileNetEdgeTPU 224 1.0 Uint8 (offline)"
+    offset: 1
+    tags: "uint8-offline"
+    score_max: 1000
+    scenario: "Offline"
+    image_width: 224
+    image_height: 224
+  }
+  model {
+    id: "IC_tpu_float32_offline"
+    name: "MobileNetEdgeTPU 224 1.0 F32 (offline)"
+    offset: 1
+    tags: "float32-offline"
+    score_max: 1500
+    scenario: "Offline"
+    image_width: 224
+    image_height: 224
+  }
+  min_query_count: 24576
+  min_duration_ms: 0
+}
+
+task {
+  name: "v0.7 Image Segmentation"
+  dataset {
+    name: "ADE20K validation set"
+    type: ADE20K
+    path: "app:///mlperf_datasets/ade20k/images"
+    groundtruth_src: "app:///mlperf_datasets/ade20k/annotations"
+  }
+  lite_dataset {
+    name: "Open images subset for segmentation"
+    type: ADE20K
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k.zip"
+    groundtruth_src: ""
+  }
+  test_dataset {
+    name: "Open images subset for segmentation"
+    type: ADE20K
+    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k_tiny.zip"
+    groundtruth_src: ""
+  }
+  model {
+    id: "IS_float32"
+    name: "Deeplab-v3 Mobilenet-v2 F32"
+    tags: "float32"
+    score_max: 1800
+    num_classes: 31
+    image_width: 512
+    image_height: 512
+  }
+  model {
+    id: "IS_uint8"
+    name: "Deeplab-v3 Mobilenet-v2 UINT8"
+    tags: "uint8"
+    score_max: 2000
+    num_classes: 31
+    image_width: 512
+    image_height: 512
+  }
+  model {
+    id: "IS_int8"
+    name: "Deeplab-v3 Mobilenet-v2 INT8"
+    tags: "int8"
+    score_max: 3000
+    num_classes: 31
+    image_width: 512
+    image_height: 512
+  }
+  min_query_count: 1024
+  min_duration_ms: 60000
+}

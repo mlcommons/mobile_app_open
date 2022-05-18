@@ -119,6 +119,16 @@ benchmark_setting {
 }
 
 benchmark_setting {
+  benchmark_id: "OD_uint8_offline"
+  accelerator: "nnapi"
+  accelerator_desc: "NNAPI"
+  configuration: "TFLite"
+  batch_size: 64
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+  md5Checksum: "6c7af49d97a2b2488222d94936d2dc18"
+}
+
+benchmark_setting {
   benchmark_id: "LU_float32"
   accelerator: "gpu_f16"
   accelerator_desc: "GPU (FP16)"
