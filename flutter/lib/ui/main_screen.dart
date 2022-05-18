@@ -100,6 +100,8 @@ class MyHomePage extends StatelessWidget {
     return CustomPaint(
       painter: MyPaintBottom(),
       child: GoButtonGradient(() async {
+        // TODO (anhappdev) Refactor the code here to avoid duplicated code.
+        // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
         final wrongPathError = await state.validateExternalResourcesDirectory(
             stringResources.incorrectDatasetsPath);
         if (wrongPathError.isNotEmpty) {
