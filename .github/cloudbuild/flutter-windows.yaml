@@ -39,6 +39,7 @@ steps:
     timeout: 10s
     entrypoint: bash
     args:
+      - -c
       - |
         echo executable archive:
         echo gs://$$__ARTIFACT_UPLOAD_PATH/ci-build.zip
