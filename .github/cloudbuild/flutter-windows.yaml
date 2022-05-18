@@ -1,6 +1,5 @@
-options:
-  env:
-    - __ARTIFACT_UPLOAD_PATH=$_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA-windows
+substitutions:
+  _ARTIFACT_UPLOAD_PATH: ${_ARTIFACT_BUCKET}/${_ARTIFACT_FOLDER}/${COMMIT_SHA}-windows
 
 steps:
   # We need this step to correctly identify dockerfile tag
@@ -31,9 +30,10 @@ steps:
           -file ./.github/cloudbuild/build.ps1
           -cacheBucket $_BAZEL_CACHE_BUCKET
           -credentialsPath $_CREDENTIALS_PATH
-          -artifactUploadPath gs://$$__ARTIFACT_UPLOAD_PATH
+          -artifactUploadPath gs://$_ARTIFACT_UPLOAD_PATH/
           -dockerImageName $_DOCKER_IMAGE_NAME
           -dockerTagFile output/docker-tag
+          -releaseArchiveName ${COMMIT_SHA}
   - id: print-artifact-links
     name: gcr.io/cloud-builders/gcloud
     timeout: 10s
@@ -41,14 +41,15 @@ steps:
     args:
       - -c
       - |
+        echo
         echo executable archive:
-        echo gs://$$__ARTIFACT_UPLOAD_PATH/ci-build.zip
-        echo https://storage.cloud.google.com/$$__ARTIFACT_UPLOAD_PATH/ci-build.zip
-        echo https://console.cloud.google.com/storage/browser/_details/$$__ARTIFACT_UPLOAD_PATH/ci-build.zip
+        echo gs://$_ARTIFACT_UPLOAD_PATH/${COMMIT_SHA}.zip
+        echo https://storage.cloud.google.com/$_ARTIFACT_UPLOAD_PATH/${COMMIT_SHA}.zip
+        echo https://console.cloud.google.com/storage/browser/_details/$_ARTIFACT_UPLOAD_PATH/${COMMIT_SHA}.zip
         echo
         DOCKER_TAG=$$(cat output/docker-tag)
         echo docker image:
-        echo https://gcr.io/mobile-app-build-290400/$__DOCKER_IMAGE_NAME:$$DOCKER_TAG
+        echo https://gcr.io/mobile-app-build-290400/$_DOCKER_IMAGE_NAME:$$DOCKER_TAG
         echo
 
 timeout: 7200s # 2 hours

@@ -3,7 +3,8 @@ param (
     [string]$credentialsPath,
     [string]$artifactUploadPath,
     [string]$dockerImageName,
-    [string]$dockerTagFile
+    [string]$dockerTagFile,
+    [string]$releaseArchiveName
 )
 
 echo "using bazel cache bucket: $cacheBucket"
@@ -11,6 +12,7 @@ echo "using credentials path: $credentialsPath"
 echo "using artifact upload path: $artifactUploadPath"
 echo "using docker image name: $dockerImageName"
 echo "using docker tag file: $dockerTagFile"
+echo "using release archive name: $releaseArchiveName"
 
 $startTime = $(get-date)
 $stepTime = $startTime
@@ -107,6 +109,7 @@ docker run -i `
     --workdir C:/mnt/project `
     --env "BAZEL_CACHE_ARG=--remote_cache=https://storage.googleapis.com/$cacheBucket --google_default_credentials" `
     --env GOOGLE_APPLICATION_CREDENTIALS=$localCredentials `
+    --env FLUTTER_RELEASE_NAME=$releaseArchiveName `
     $imageTag `
     make flutter/windows/ci
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
@@ -115,7 +118,7 @@ echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTi
 $stepTime = $(get-date)
 
 echo "uploading release archive..."
-gsutil cp output/flutter-windows-releases/ci-build.zip $artifactUploadPath
+gsutil cp output/flutter-windows-releases/$releaseArchiveName`.zip $artifactUploadPath
 echo "release archive uploaded successfully"
 echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
 echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
