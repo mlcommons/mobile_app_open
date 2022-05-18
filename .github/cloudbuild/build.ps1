@@ -1,16 +1,16 @@
 param (
     [string]$cacheBucket,
-    [string]$credentialsBucketPath,
+    [string]$credentialsPath,
     [string]$artifactUploadPath,
     [string]$dockerImageName,
-    [string]$dockerfileCommitFile
+    [string]$dockerTagFile
 )
 
 echo "using bazel cache bucket: $cacheBucket"
-echo "using credentials from: $credentialsBucketPath"
+echo "using credentials path: $credentialsPath"
 echo "using artifact upload path: $artifactUploadPath"
 echo "using docker image name: $dockerImageName"
-echo "using dockerfile commit file: $dockerfileCommitFile"
+echo "using docker tag file: $dockerTagFile"
 
 $startTime = $(get-date)
 $stepTime = $startTime
@@ -60,14 +60,14 @@ $stepTime = $(get-date)
 # but it's not supported on Windows so we have to manually provide credentials.
 echo "obtaining google credentials..."
 $localCredentials = "output/auto-copy/google-credentials/credentials.json"
-gsutil cp $credentialsBucketPath $localCredentials
+gsutil cp $credentialsPath $localCredentials
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
 echo "successfully obtained google credentials"
 echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime).Ticks))"
 echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
 $stepTime = $(get-date)
 
-$dockerfileCommit = [IO.File]::ReadAllText($dockerfileCommitFile)
+$dockerfileCommit = [IO.File]::ReadAllText($dockerTagFile)
 $imageTag = "gcr.io/$projectID/flutter-windows-ci:$dockerfileCommit"
 echo "using image: $imageTag"
 

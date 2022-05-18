@@ -1,6 +1,6 @@
-substitutions:
-  __ARTIFACT_UPLOAD_PATH: $_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA-windows
-  __DOCKER_IMAGE_NAME: flutter-windows-ci
+options:
+  env:
+  - __ARTIFACT_UPLOAD_PATH=$_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA-windows
 
 steps:
   # We need this step to correctly identify dockerfile tag
@@ -13,7 +13,7 @@ steps:
       - |
         git fetch --unshallow || exit 1
         mkdir output
-        git log -n 1 --pretty=format:%H -- flutter/windows/docker/Dockerfile >output/dockerfile-commit
+        git log -n 1 --pretty=format:%H -- flutter/windows/docker >output/docker-tag
   # cloudbuild does not provide an official method to run CI on Windows
   # but there is a community-provided builder.
   # The sources are here: https://github.com/GoogleCloudPlatform/cloud-builders-community/tree/master/windows-builder
@@ -30,24 +30,23 @@ steps:
     - --command=powershell.exe
         -file ./.github/cloudbuild/build.ps1
         -cacheBucket $_BAZEL_CACHE_BUCKET
-        -credentialsBucketPath $_CREDENTIALS_BUCKET_PATH
+        -credentialsPath $_CREDENTIALS_PATH
         -artifactUploadPath gs://$__ARTIFACT_UPLOAD_PATH
         -dockerImageName $__DOCKER_IMAGE_NAME
-        -dockerfileCommitFile output/dockerfile-commit
+        -dockerTagFile output/docker-tag
   - id: print-artifact-links
     name: gcr.io/cloud-builders/gcloud
     timeout: 10s
     entrypoint: bash
     args:
-      - -xc
       - |
         echo executable archive:
         echo gs://$__ARTIFACT_UPLOAD_PATH/ci-build.zip
         echo https://storage.cloud.google.com/$__ARTIFACT_UPLOAD_PATH/ci-build.zip
+        echo https://console.cloud.google.com/storage/browser/_details/$__ARTIFACT_UPLOAD_PATH/ci-build.zip
         echo
-        DOCKERFILE_COMMIT=$$(cat output/dockerfile-commit)
         echo docker image:
-        echo https://gcr.io/mobile-app-build-290400/$__DOCKER_IMAGE_NAME:$$DOCKERFILE_COMMIT
+        echo https://gcr.io/mobile-app-build-290400/$__DOCKER_IMAGE_NAME:$$(cat output/docker-tag)
         echo
 
 timeout: 7200s # 2 hours
