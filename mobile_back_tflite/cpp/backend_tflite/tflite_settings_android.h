@@ -96,7 +96,6 @@ benchmark_setting {
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  single_stream_expected_latency_ns: 900000
 }
 
 benchmark_setting {
