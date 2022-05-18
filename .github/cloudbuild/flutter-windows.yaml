@@ -45,8 +45,9 @@ steps:
         echo https://storage.cloud.google.com/$__ARTIFACT_UPLOAD_PATH/ci-build.zip
         echo https://console.cloud.google.com/storage/browser/_details/$__ARTIFACT_UPLOAD_PATH/ci-build.zip
         echo
+        DOCKER_TAG=$$(cat output/docker-tag)
         echo docker image:
-        echo https://gcr.io/mobile-app-build-290400/$__DOCKER_IMAGE_NAME:$$(cat output/docker-tag)
+        echo https://gcr.io/mobile-app-build-290400/$__DOCKER_IMAGE_NAME:$$DOCKER_TAG
         echo
 
 timeout: 7200s # 2 hours
