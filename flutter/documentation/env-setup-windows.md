@@ -17,33 +17,37 @@ Visual Studio Community will suffice. At least Visual Studio 2019 is required.
 This is an optional step. You can download and install all of the dependencies from other sources.  
 However, using Chocolatey greatly simplifies installation.
 * Install dependencies:
-  * `choco install git -y`
-  * `choco install make -y`
-  * `choco install bazel -y --version 4.2.2`
-  * `choco install python3 -y`
-  * `choco install msys2 -y`
-  * `choco install flutter -y`
-  * `choco install protoc -y`
+  * `choco install -y git`
+  * `choco install -y make`
+  * `choco install -y bazel --version 4.2.2`
+  * `choco install -y python3`
+  * `choco install -y msys2`
+  * `choco install -y flutter`
+  * `choco install -y protoc`
   * **Note**: it's generally better to use the latest version of each tool, but bazel 5.x is incompatible with this project.
   You may need to also manually specify versions for other tools if they introduce breaking changes.
   You can refer to the [Tested environment](#tested-environment) for versions.
-* You must have command `python3` in your PATH.  
-Python installed via Chocolatey provides only `python.exe` file, so you will need to create `python3` yourself.  
-At the moment of writing this instruction the default path for python is `C:/Python39/`.
-You can make a copy of `python.exe` file in the same directory and name it `python3.exe`.
+* Configure python
+  * You must have command `python3` in your PATH.  
+  Python installed via Chocolatey provides only `python.exe` file, so you will need to create `python3` yourself.  
+  At the moment of writing this instruction the default path for python is `C:/Python39/`.
+  You can make a copy of `python.exe` file in the same directory and name it `python3.exe`.
+  * Disable python dummy files provided by Windows
+    * Go to `Settings` → `Apps` → `Apps & features` → `App execution aliases`
+    * Disable `App Installer python.exe` amd `App Installer python3.exe`
+  * Set `PYTHON_BIN_PATH` env pointing to your actual python executable
+  Bazel is able to locate python but it resolves it with backslashes in path which causes errors.
+  Use forward slashes to mitigate this: `PYTHON_BIN_PATH=C:/Python39/python.exe`
+* Set python path env, paths must use forward slashes
 * Install python dependencies: `python3 -m pip install --user numpy absl-py`
-* Add MSYS2 bin folder to PATH: `setx path "%path%;C:/tools/msys64/usr/bin"`
+* Add MSYS2 bin folder to PATH: `C:/tools/msys64/usr/bin`
 * Enable protobuf plugin: `dart pub global activate protoc_plugin`
-* Add dart pub cache bin folder to PATH: `setx path "%path%;%LOCALAPPDATA%/Pub/Cache/bin"`
+* Add dart pub cache bin folder to PATH: `%LOCALAPPDATA%/Pub/Cache/bin`
 * Enable Windows support in flutter: `flutter config --enable-windows-desktop`  
 Windows support is still in beta, so it is disabled by default.
 * Turn on the developer mode in Windows settings.
   * This option should be located in `Update & Security` → `For developers`.
   * Or you can open this page from command line: `start ms-settings:developers`
-* Disable python dummy files provided by Windows
-  * Go to `Settings` → `Apps` → `Apps & features` → `App execution aliases`
-  * Disable `App Installer python.exe` amd `App Installer python3.exe`
-* Set python path env, paths must use forward slashes
 
 **Note**: If you have a WSL distro installed on your PC, you may need to set `BAZEL_SH` environment variable.
 Without it bazel could call `bash` provided by WSL instead of MSYS2's one.
@@ -94,12 +98,16 @@ Python 3.9.7
 
 ## Formatting
 
-[comment]: # (TODO add info about installing other tools)
+You can use `make format` and `make lint` to format and check files.
 
-In order to automatically format your files
-you must have `clang-format` and `buildifier` in addition to build dependencies.
-
-* clang-format can be installed as part of LLVM via `choco install llvm -y`,
-or it can be manually downloaded from the very bottom
-of the [LLVM Snapshot Builds page](https://llvm.org/builds/) and manually placed somewhere in your PATH.
-* buildifier can be installed via `choco install buildifier -y`
+You need to install dependencies for these commands to work:
+* `choco install -y buildifier`
+* clang-format:
+  * You can install the whole LLVM package `choco install llvm -y`,
+  * Or you can download it separately
+  The link can be found at the very bottom of the [LLVM Snapshot Builds page](https://llvm.org/builds/).
+  Currently available version is [clang-format-6923b0a7.exe](https://prereleases.llvm.org/win-snapshots/clang-format-6923b0a7.exe).
+  Rename downloaded file to clang-format.exe and place it somewhere in your `PATH`.
+* `choco install -y nodejs`
+* `choco install -y dos2unix`
+* `choco install -y markdownlint-cli`
