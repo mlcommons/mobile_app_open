@@ -68,7 +68,7 @@ echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTi
 $stepTime = $(get-date)
 
 $dockerfileCommit = [IO.File]::ReadAllText($dockerTagFile)
-$imageTag = "gcr.io/$projectID/$dockerImageName:$dockerfileCommit"
+$imageTag = "gcr.io/$projectID/$dockerImageName`:$dockerfileCommit"
 echo "using image: $imageTag"
 
 $env:DOCKER_CLI_EXPERIMENTAL = "enabled"
