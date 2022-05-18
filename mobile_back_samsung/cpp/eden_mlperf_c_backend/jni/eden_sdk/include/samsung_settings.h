@@ -96,6 +96,7 @@ benchmark_setting {
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/is.nnc"
+  md5Checksum: "b501ed669da753b08a151639798af37e"
   single_stream_expected_latency_ns: 900000
 }
 
@@ -105,6 +106,7 @@ benchmark_setting {
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/ic.nnc"
+  md5Checksum: "955ef2ac3c134820eab901f3dac9f732"
 }
 
 
@@ -114,6 +116,7 @@ benchmark_setting {
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/od.nnc"
+  md5Checksum: "a3c7b5e8d6b978c05807e8926584758c"
 }
 
 benchmark_setting {
@@ -122,6 +125,7 @@ benchmark_setting {
   accelerator_desc: "gpu"
   configuration: "Samsung Exynos"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/lu.nnc"
+  md5Checksum: "215ee3b9224d15dc50b30d56fa7b7396"
 }
 
 
@@ -132,6 +136,7 @@ benchmark_setting {
   configuration: "Samsung Exynos"
   batch_size: 2048
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/ic_offline.nncgo"
+  md5Checksum: "c38acf6c66ca32c525c14ce25ead823a"
   single_stream_expected_latency_ns: 900000
 }
 
