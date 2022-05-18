@@ -1,6 +1,6 @@
 options:
   env:
-  - __ARTIFACT_UPLOAD_PATH=$_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA-windows
+    - __ARTIFACT_UPLOAD_PATH=$_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA-windows
 
 steps:
   # We need this step to correctly identify dockerfile tag
@@ -22,18 +22,18 @@ steps:
     id: build-and-test
     timeout: 5400s # 1.5 hours
     args:
-    - --machineType=n2-highcpu-8
-    - --image=windows-cloud/global/images/windows-server-2019-dc-for-containers-v20220414
-    - --diskType=pd-ssd
-    - --workspace-bucket=$_WORKSPACE_TMP_BUCKET
-    - --diskSizeGb=70
-    - --command=powershell.exe
-        -file ./.github/cloudbuild/build.ps1
-        -cacheBucket $_BAZEL_CACHE_BUCKET
-        -credentialsPath $_CREDENTIALS_PATH
-        -artifactUploadPath gs://$__ARTIFACT_UPLOAD_PATH
-        -dockerImageName $__DOCKER_IMAGE_NAME
-        -dockerTagFile output/docker-tag
+      - --machineType=n2-highcpu-8
+      - --image=windows-cloud/global/images/windows-server-2019-dc-for-containers-v20220414
+      - --diskType=pd-ssd
+      - --workspace-bucket=$_WORKSPACE_TMP_BUCKET
+      - --diskSizeGb=70
+      - --command=powershell.exe
+          -file ./.github/cloudbuild/build.ps1
+          -cacheBucket $_BAZEL_CACHE_BUCKET
+          -credentialsPath $_CREDENTIALS_PATH
+          -artifactUploadPath gs://$__ARTIFACT_UPLOAD_PATH
+          -dockerImageName $__DOCKER_IMAGE_NAME
+          -dockerTagFile output/docker-tag
   - id: print-artifact-links
     name: gcr.io/cloud-builders/gcloud
     timeout: 10s

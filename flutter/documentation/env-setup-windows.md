@@ -26,7 +26,7 @@ However, using Chocolatey greatly simplifies installation.
   * `choco install -y protoc`
   * **Note**: it's generally better to use the latest version of each tool, but bazel 5.x is incompatible with this project.
   You may need to also manually specify versions for other tools if they introduce breaking changes.
-  You can refer to the [Tested environment](#tested-environment) for versions.
+  You can refer to the [Tested environment](#tested-environment) section for versions.
 * Configure python
   * You must have command `python3` in your PATH.  
   Python installed via Chocolatey provides only `python.exe` file, so you will need to create `python3` yourself.  
@@ -35,7 +35,7 @@ However, using Chocolatey greatly simplifies installation.
   * Disable python dummy files provided by Windows
     * Go to `Settings` → `Apps` → `Apps & features` → `App execution aliases`
     * Disable `App Installer python.exe` amd `App Installer python3.exe`
-  * Set `PYTHON_BIN_PATH` env pointing to your actual python executable
+  * Set `PYTHON_BIN_PATH` env pointing to your actual python executable  
   Bazel is able to locate python but it resolves it with backslashes in path which causes errors.
   Use forward slashes to mitigate this: `PYTHON_BIN_PATH=C:/Python39/python.exe`
 * Set python path env, paths must use forward slashes
@@ -104,10 +104,11 @@ You need to install dependencies for these commands to work:
 * `choco install -y buildifier`
 * clang-format:
   * You can install the whole LLVM package `choco install llvm -y`,
-  * Or you can download it separately
+  * Or you can download it separately  
   The link can be found at the very bottom of the [LLVM Snapshot Builds page](https://llvm.org/builds/).
   Currently available version is [clang-format-6923b0a7.exe](https://prereleases.llvm.org/win-snapshots/clang-format-6923b0a7.exe).
   Rename downloaded file to clang-format.exe and place it somewhere in your `PATH`.
 * `choco install -y nodejs`
 * `choco install -y dos2unix`
 * `choco install -y markdownlint-cli`
+* `pip install --user yamllint`
