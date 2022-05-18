@@ -69,7 +69,7 @@ class CacheManager {
       final archivePath = getArchive(resource);
       if (archivePath == null) continue;
       final archiveFile = File(archivePath);
-      if (archiveFile.existsSync()) await archiveFile.delete();
+      if (await archiveFile.exists()) await archiveFile.delete();
     }
   }
 

@@ -1,4 +1,4 @@
-import 'package:mlperfbench/resources/resource_manager.dart';
+import 'package:mlperfbench/resources/resource.dart';
 
 bool isInternetResource(String uri) =>
     uri.startsWith('http://') || uri.startsWith('https://');

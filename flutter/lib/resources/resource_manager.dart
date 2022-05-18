@@ -9,6 +9,7 @@ import 'package:yaml/yaml.dart';
 
 import 'package:mlperfbench/device_info.dart';
 import 'cache_manager.dart';
+import 'resource.dart';
 import 'result_manager.dart';
 import 'utils.dart';
 
@@ -21,20 +22,6 @@ class BatchPreset {
     required this.name,
     required this.batchSize,
     required this.shardsCount,
-  });
-}
-
-enum ResourceTypeEnum { model, lib, datasetData, datasetGroundtruth }
-
-class Resource {
-  final String path;
-  final ResourceTypeEnum type;
-  final String? md5Checksum;
-
-  Resource({
-    required this.path,
-    required this.type,
-    this.md5Checksum,
   });
 }
 
@@ -220,7 +207,7 @@ class ResourceManager {
       } else {
         localPath = cacheManager.get(resource.path);
       }
-      if (localPath == null || !File(localPath).existsSync()) continue;
+      if (localPath == null || !(await File(localPath).exists())) continue;
       if (!await isChecksumMatched(localPath, md5Checksum)) {
         checksumFailedResources.add(resource);
       }
