@@ -31,7 +31,7 @@ steps:
           -file ./.github/cloudbuild/build.ps1
           -cacheBucket $_BAZEL_CACHE_BUCKET
           -credentialsPath $_CREDENTIALS_PATH
-          -artifactUploadPath gs://$__ARTIFACT_UPLOAD_PATH
+          -artifactUploadPath gs://$$__ARTIFACT_UPLOAD_PATH
           -dockerImageName $_DOCKER_IMAGE_NAME
           -dockerTagFile output/docker-tag
   - id: print-artifact-links
@@ -41,9 +41,9 @@ steps:
     args:
       - |
         echo executable archive:
-        echo gs://$__ARTIFACT_UPLOAD_PATH/ci-build.zip
-        echo https://storage.cloud.google.com/$__ARTIFACT_UPLOAD_PATH/ci-build.zip
-        echo https://console.cloud.google.com/storage/browser/_details/$__ARTIFACT_UPLOAD_PATH/ci-build.zip
+        echo gs://$$__ARTIFACT_UPLOAD_PATH/ci-build.zip
+        echo https://storage.cloud.google.com/$$__ARTIFACT_UPLOAD_PATH/ci-build.zip
+        echo https://console.cloud.google.com/storage/browser/_details/$$__ARTIFACT_UPLOAD_PATH/ci-build.zip
         echo
         DOCKER_TAG=$$(cat output/docker-tag)
         echo docker image:
