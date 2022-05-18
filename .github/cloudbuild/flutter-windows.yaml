@@ -32,7 +32,7 @@ steps:
           -cacheBucket $_BAZEL_CACHE_BUCKET
           -credentialsPath $_CREDENTIALS_PATH
           -artifactUploadPath gs://$__ARTIFACT_UPLOAD_PATH
-          -dockerImageName $__DOCKER_IMAGE_NAME
+          -dockerImageName $_DOCKER_IMAGE_NAME
           -dockerTagFile output/docker-tag
   - id: print-artifact-links
     name: gcr.io/cloud-builders/gcloud
