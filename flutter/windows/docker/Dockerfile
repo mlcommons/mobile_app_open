@@ -11,7 +11,7 @@ RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
 # --no-progress is required on all `choco install` commands
 # because on CI where the output is not a terminal but a file
 # choco generates literally megabytes of progress update lines
-RUN choco install -y --no-progress flutter --version 2.5.2
+RUN choco install -y --no-progress flutter --version 2.10.5
 RUN flutter config --enable-windows-desktop
 
 RUN curl -fSLo vs_BuildTools.exe https://aka.ms/vs/16/release/vs_buildtools.exe `
