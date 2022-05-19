@@ -43,8 +43,6 @@ However, using Chocolatey greatly simplifies installation.
 * Add MSYS2 bin folder to PATH: `C:/tools/msys64/usr/bin`
 * Enable protobuf plugin: `dart pub global activate protoc_plugin`
 * Add dart pub cache bin folder to PATH: `%LOCALAPPDATA%/Pub/Cache/bin`
-* Enable Windows support in flutter: `flutter config --enable-windows-desktop`  
-Windows support is still in beta, so it is disabled by default.
 * Turn on the developer mode in Windows settings.
   * This option should be located in `Update & Security` → `For developers`.
   * Or you can open this page from command line: `start ms-settings:developers`
