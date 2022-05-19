@@ -132,7 +132,8 @@ class ShareScreen extends StatelessWidget {
                                   fontSize: 13,
                                   color: AppColors.shareTextButton),
                               recognizer: TapGestureRecognizer()
-                                ..onTap = () => _launchURL(),
+                                ..onTap = () => launchUrl(Uri.parse(
+                                    'https://mlcommons.org/mobile_privacy')),
                             ),
                           ],
                         ),
@@ -146,14 +147,5 @@ class ShareScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-Future<void> _launchURL() async {
-  const url = 'https://mlcommons.org/mobile_privacy';
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    throw 'Could not launch $url';
   }
 }
