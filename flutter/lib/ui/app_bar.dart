@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' hide Icons;
+import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/icons.dart';
@@ -12,7 +12,7 @@ class MyAppBar {
     var actions = <Widget>[];
     if (addSettingsButton) {
       actions.add(IconButton(
-        icon: Icons.parameters,
+        icon: AppIcons.parameters,
         tooltip: 'Configuration',
         onPressed: () {
           Navigator.push(
@@ -22,7 +22,7 @@ class MyAppBar {
         },
       ));
       actions.add(IconButton(
-        icon: Icons.settings,
+        icon: AppIcons.settings,
         tooltip: 'Settings',
         onPressed: () {
           Navigator.push(
