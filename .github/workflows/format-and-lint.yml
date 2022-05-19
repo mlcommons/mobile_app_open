@@ -137,3 +137,5 @@ jobs:
         run: sudo apt-get install dos2unix
       - name: Check line endings
         run: make lint/line-endings
+      - name: Check export result schema
+        run: lint/result-schema
