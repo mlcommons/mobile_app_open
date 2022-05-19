@@ -14,7 +14,7 @@
 ##########################################################################
 
 .PHONY: flutter/android
-flutter/android: flutter/android/libs flutter/prepare
+flutter/android: flutter/android/libs
 
 flutter_docker_postfix=$(shell id -u)
 .PHONY: flutter/android/docker/image

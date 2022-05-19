@@ -40,7 +40,7 @@ format/markdown:
 	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml --fix --ignore 'LICENSE.md'
 
 .PHONY: lint
-lint: lint/bazel lint/dart lint/ts lint/prohibited-extensions lint/big-files
+lint: lint/bazel lint/dart lint/ts lint/yaml lint/prohibited-extensions lint/big-files
 
 .PHONY: lint/bazel
 lint/bazel:

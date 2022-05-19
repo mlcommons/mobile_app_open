@@ -48,7 +48,7 @@ Note that order is important in this file. Backends are evaluated in the order t
 Place your tag before TFLite tag.
 * Add line to substitute this tag with the actual name of your backend lib into [flutter.mk](../flutter.mk) in the `flutter/backend-list` make target
 * Add commands to build your backend when `WITH_<VENDOR>=1` make variable is supplied.
-  Modify `flutter/android/libs` ([android.mk](../android.mk)) or `flutter/windows/libs` ([android.mk](../windows.mk)), depending on your paltform:
+  Modify `flutter/android/libs` ([android.mk](../android/android.mk)) or `flutter/windows/libs` ([windows.mk](../windows/windows.mk)), depending on your platform:
   * If you use bazel as your build system, just add a line `${backend_<vendor>_android_target}` into appropriate position
   * If you use different build system, add a condition to only build your backend when `WITH_<VENDOR>=1` is defined.
   * Add a line `${backend_<vendor>_android_files}` into the copy command
