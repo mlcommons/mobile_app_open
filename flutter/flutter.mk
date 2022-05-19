@@ -18,19 +18,19 @@ flutter_common_dart_flags= \
 
 .PHONY: flutter
 ifeq (${OS},Windows_NT)
-flutter: flutter/windows
+flutter: flutter/prepare flutter/windows
 else
 ifeq ($(shell uname -s),Darwin)
-flutter: flutter/ios
+flutter: flutter/prepare flutter/ios
 else
-flutter: flutter/android
+flutter: flutter/prepare flutter/android
 endif
 endif
 
-include flutter/ios.mk
-include flutter/windows.mk
-include flutter/windows-docker.mk
-include flutter/android.mk
+include flutter/ios/ios.mk
+include flutter/windows/windows.mk
+include flutter/windows/windows-docker.mk
+include flutter/android/android.mk
 
 .PHONY: flutter/backend-list
 flutter/backend-list:
