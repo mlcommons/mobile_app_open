@@ -1,11 +1,11 @@
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart' hide Icons;
+import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/icons.dart' show Icons;
+import 'package:mlperfbench/icons.dart' show AppIcons;
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/page_constraints.dart';
@@ -54,7 +54,7 @@ class ShareScreen extends StatelessWidget {
                               child: Container(
                                   height: iconEdgeSize,
                                   width: iconEdgeSize,
-                                  child: Icons.logo))),
+                                  child: AppIcons.logo))),
                       Expanded(
                           child: Padding(
                               padding: EdgeInsets.fromLTRB(35, 0, 35, 0),

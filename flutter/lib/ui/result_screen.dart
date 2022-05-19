@@ -278,7 +278,7 @@ class _ResultScreenState extends State<ResultScreen>
               ),
               IconButton(
                   key: Key(ResultKeys.scrollResultsButton),
-                  icon: app_icons.Icons.arrow,
+                  icon: app_icons.AppIcons.arrow,
                   onPressed: () {
                     scrollController.animateTo(
                         scrollController.position.maxScrollExtent,
