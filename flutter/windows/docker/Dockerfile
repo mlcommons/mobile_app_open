@@ -12,7 +12,6 @@ RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
 # because on CI where the output is not a terminal but a file
 # choco generates literally megabytes of progress update lines
 RUN choco install -y --no-progress flutter --version 2.10.5
-RUN flutter config --enable-windows-desktop
 
 RUN curl -fSLo vs_BuildTools.exe https://aka.ms/vs/16/release/vs_buildtools.exe `
     && start /w vs_BuildTools --quiet --norestart --nocache --wait`
@@ -36,14 +35,8 @@ RUN choco install -y --no-progress make --version 4.3
 RUN choco install -y --no-progress bazel --version 4.2.1
 RUN choco install -y --no-progress python3 --version 3.9.0 && copy "C:\Python39\python.exe" "C:\Python39\python3.exe"
 RUN choco install -y --no-progress protoc --version 3.18.1
-RUN choco install -y --no-progress buildifier --version 4.2.2
 
 RUN python3 -m pip install --user numpy absl-py
-
-RUN mkdir "C:/tools/clang-format/" && `
-    setx path "%path%;C:/tools/clang-format/" && `
-    curl --output "C:/tools/clang-format/clang-format.exe" `
-        https://prereleases.llvm.org/win-snapshots/clang-format-6923b0a7.exe
 
 RUN dart --disable-analytics && `
     dart pub global activate protoc_plugin && `

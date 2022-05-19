@@ -79,10 +79,10 @@ Windows 20H2 (build 19042.928)
 Microsoft Visual Studio 2019, version 16.11.2
 
 λ flutter --version
-Flutter 2.5.0 • channel unknown • unknown source
-Framework • revision 4cc385b4b8 (6 months ago) • 2021-09-07 23:01:49 -0700
-Engine • revision f0826da7ef
-Tools • Dart 2.14.0
+Flutter 2.10.5 • channel unknown • unknown source
+Framework • revision 5464c5bac7 (4 weeks ago) • 2022-04-18 09:55:37 -0700
+Engine • revision 57d3bac3dd
+Tools • Dart 2.16.2 • DevTools 2.9.2
 
 λ bazel --version
 bazel 4.2.2
@@ -92,6 +92,14 @@ libprotoc 3.17.3
 
 λ python3 --version
 Python 3.9.7
+
+λ git --version
+git version 2.34.1.windows.1
+
+λ make --version
+GNU Make 4.3
+
+msys2 version: 20220319.0.0
 ```
 
 ## Formatting
