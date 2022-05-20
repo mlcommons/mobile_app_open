@@ -5,6 +5,7 @@ This file describes how to build the app for Windows.
 ## Contents
 
 * [Setting up the environment](#setting-up-the-environment)
+* [Tested environment](#tested-environment)
 * [Formatting](#formatting)
 
 ## Setting up the environment
