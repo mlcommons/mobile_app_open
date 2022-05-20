@@ -32,13 +32,9 @@ RUN curl -L https://dl.google.com/android/repository/commandlinetools-linux-7583
 ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin
 
 RUN yes | sdkmanager --licenses >/dev/null
-# Build tools 29.0.2 are required by Flutter 2.5.3
-# Build tools 30 are required by bazel 4.2.1
 RUN yes | sdkmanager \
-    "tools" \
     "platform-tools" \
     "build-tools;29.0.2" \
-    "build-tools;30.0.3" \
     "platforms;android-30"
 # Install NDK in a separate layer to decrease max layer size.
 RUN yes | sdkmanager "ndk;21.4.7075529"
