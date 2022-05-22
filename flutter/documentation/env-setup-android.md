@@ -104,7 +104,7 @@ Flutter requires native libs so you must complete [Setting up Bazel on Ubuntu](#
 
   * `platform-tools` is required for `adb`
   * `build-tools;29.0.2` is required by flutter 2.x.  
-  * `android-31` is required by flutter 2.10.5 
+  * `android-31` is required by flutter 2.10.5
 
 * Accept Android licenses: `sudo $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager --licenses`
   * Even after this command `flutter doctor` will tell you that licenses status is unknown.  
