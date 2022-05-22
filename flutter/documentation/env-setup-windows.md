@@ -20,14 +20,11 @@ However, using Chocolatey greatly simplifies installation.
 * Install dependencies:
   * `choco install -y git`
   * `choco install -y make`
-  * `choco install -y bazel --version 4.2.2`
+  * `choco install -y bazelisk`
   * `choco install -y python3`
   * `choco install -y msys2`
   * `choco install -y flutter`
   * `choco install -y protoc`
-  * **Note**: it's generally better to use the latest version of each tool, but bazel 5.x is incompatible with this project.
-  You may need to also manually specify versions for other tools if they introduce breaking changes.
-  You can refer to the [Tested environment](#tested-environment) section for versions.
 * Configure python
   * You must have command `python3` in your PATH.  
   Python installed via Chocolatey provides only `python.exe` file, so you will need to create `python3` yourself.  
