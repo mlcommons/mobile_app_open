@@ -19,7 +19,6 @@ ifeq (${WITH_QTI},1)
     backend_qti_android_docker_args=-v "${SNPE_SDK}:/home/mlperf/mobile_app/mobile_back_qti/$(shell basename ${SNPE_SDK})"
     backend_qti_flutter_docker_args=-v "${SNPE_SDK}:/mnt/project/mobile_back_qti/$(shell basename ${SNPE_SDK})"
   endif
-  android_qti_backend_bazel_flag=--//android/java/org/mlperf/inference:with_qti="1"
   backend_qti_lib_copy=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/binary/libqtibackend.so
 
   local_snpe_sdk_root=$(shell echo mobile_back_qti/snpe-* | awk '{print $$NF}')
