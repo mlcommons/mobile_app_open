@@ -1,4 +1,4 @@
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/icons.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -79,10 +79,10 @@ class BenchmarkInfo {
 
   BenchmarkTypeEnum get type => _typeFromCode();
 
-  SvgPicture get icon => _BENCHMARK_ICONS[scenario]?[code] ?? Icons.logo;
+  Widget get icon => _BENCHMARK_ICONS[scenario]?[code] ?? AppIcons.logo;
 
-  SvgPicture get iconWhite =>
-      _BENCHMARK_ICONS_WHITE[scenario]?[code] ?? Icons.logo;
+  Widget get iconWhite =>
+      _BENCHMARK_ICONS_WHITE[scenario]?[code] ?? AppIcons.logo;
 
   @override
   String toString() => 'Benchmark:${modelConfig.id}';
@@ -129,24 +129,24 @@ final _MAX_THROUGHPUT = {
 
 final _BENCHMARK_ICONS = {
   'SingleStream': {
-    'IC': Icons.image_classification,
-    'OD': Icons.object_detection,
-    'IS': Icons.image_segmentation,
-    'LU': Icons.language_processing,
+    'IC': AppIcons.image_classification,
+    'OD': AppIcons.object_detection,
+    'IS': AppIcons.image_segmentation,
+    'LU': AppIcons.language_processing,
   },
   'Offline': {
-    'IC': Icons.image_classification_offline,
+    'IC': AppIcons.image_classification_offline,
   },
 };
 
 final _BENCHMARK_ICONS_WHITE = {
   'SingleStream': {
-    'IC': Icons.image_classification_white,
-    'OD': Icons.object_detection_white,
-    'IS': Icons.image_segmentation_white,
-    'LU': Icons.language_processing_white,
+    'IC': AppIcons.image_classification_white,
+    'OD': AppIcons.object_detection_white,
+    'IS': AppIcons.image_segmentation_white,
+    'LU': AppIcons.language_processing_white,
   },
   'Offline': {
-    'IC': Icons.image_classification_offline_white,
+    'IC': AppIcons.image_classification_offline_white,
   },
 };

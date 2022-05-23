@@ -4,7 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
-import 'package:flutter/material.dart' hide Icons;
+import 'package:flutter/material.dart';
 
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';

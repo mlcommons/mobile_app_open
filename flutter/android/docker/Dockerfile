@@ -50,7 +50,7 @@ WORKDIR $HOME
 
 ENV PUB_CACHE=$HOME/.cache/.pub-cache
 ENV PATH=$PATH:$HOME/flutter/bin:$PUB_CACHE/bin
-RUN curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.5.3-stable.tar.xz | tar Jxf - && chmod --recursive a=u $HOME/flutter
+RUN curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.10.5-stable.tar.xz | tar Jxf - && chmod --recursive a=u $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
 

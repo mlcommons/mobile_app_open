@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart' hide Icons;
+import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/icons.dart' show Icons;
+import 'package:mlperfbench/icons.dart' show AppIcons;
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/page_constraints.dart';
 
@@ -30,7 +30,7 @@ class UnsupportedDeviceScreen extends StatelessWidget {
                     child: Container(
                         height: iconEdgeSize,
                         width: iconEdgeSize,
-                        child: Icons.error))),
+                        child: AppIcons.error))),
             Expanded(
                 child: Padding(
                     padding: EdgeInsets.fromLTRB(35, 0, 35, 0),
