@@ -107,9 +107,9 @@ task {
   }
   model {
     id: "OD_uint8_offline"
-    name: "SSD-MobileDET UInt8"
+    name: "SSD-MobileDET UInt8 (offline)"
     offset: 1
-    tags: "uint8"
+    tags: "uint8-offline"
     score_max: 2000
     num_classes: 91
     scenario: "Offline"
@@ -118,9 +118,9 @@ task {
   }
   model {
     id: "OD_float32_offline"
-    name: "SSD-MobileDET F32"
+    name: "SSD-MobileDET F32 (offline)"
     offset: 1
-    tags: "float32"
+    tags: "float32-offline"
     score_max: 5000
     num_classes: 91
     scenario: "Offline"
