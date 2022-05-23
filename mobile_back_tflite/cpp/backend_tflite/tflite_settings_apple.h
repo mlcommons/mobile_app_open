@@ -123,6 +123,7 @@ benchmark_setting {
   accelerator: "coreml"
   accelerator_desc: "CoreML"
   configuration: "TFLite"
+  batch_size: 2
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
   md5Checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
 }
