@@ -33,7 +33,7 @@ RUN yes | sdkmanager --licenses >/dev/null
 RUN yes | sdkmanager \
     "platform-tools" \
     "build-tools;29.0.2" \
-    "platforms;android-30"
+    "platforms;android-31"
 # Install NDK in a separate layer to decrease max layer size.
 RUN yes | sdkmanager "ndk;21.4.7075529"
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/21.4.7075529
