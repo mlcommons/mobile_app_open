@@ -18,10 +18,8 @@ RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python3 -m pip install numpy absl-py
 
-# Bazel is not present in standard repositories
-RUN curl -L https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
-    echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list && \
-    apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y bazel=4.2.1
+RUN curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64 -o /usr/local/bin/bazel && \
+    chmod +x /usr/local/bin/bazel
 
 ENV ANDROID_SDK_ROOT=/opt/android
 WORKDIR $ANDROID_SDK_ROOT/cmdline-tools
@@ -32,14 +30,10 @@ RUN curl -L https://dl.google.com/android/repository/commandlinetools-linux-7583
 ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin
 
 RUN yes | sdkmanager --licenses >/dev/null
-# Build tools 29.0.2 are required by Flutter 2.5.3
-# Build tools 30 are required by bazel 4.2.1
 RUN yes | sdkmanager \
-    "tools" \
     "platform-tools" \
     "build-tools;29.0.2" \
-    "build-tools;30.0.3" \
-    "platforms;android-30"
+    "platforms;android-31"
 # Install NDK in a separate layer to decrease max layer size.
 RUN yes | sdkmanager "ndk;21.4.7075529"
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/21.4.7075529

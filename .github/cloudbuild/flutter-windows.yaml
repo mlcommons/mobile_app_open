@@ -1,5 +1,13 @@
 substitutions:
   _ARTIFACT_UPLOAD_PATH: ${_ARTIFACT_BUCKET}/${_ARTIFACT_FOLDER}/${COMMIT_SHA}-windows
+  # Compute Engine has different quotas.
+  #   When using Cloudbuild it doesn't seem to be affected by quotas.
+  #   When creating a Compute Engine VM manually, like what windows-builder does, quotas are applied.
+  #   It makes sense to use different options for different Cloudbuild triggers.
+  #   This allows to use more resources simultaneously as different machine types in different regions don't share quotas.
+  _CE_REGION: us-central1
+  _CE_ZONE: us-central1-f
+  _CE_MACHINE_TYPE: n2-standard-4
 
 steps:
   # We need this step to correctly identify dockerfile tag
@@ -21,8 +29,11 @@ steps:
     id: build-and-test
     timeout: 5400s # 1.5 hours
     args:
-      - --machineType=n2-highcpu-8
+      - --region=$_CE_REGION
+      - --zone=$_CE_ZONE
+      - --machineType=$_CE_MACHINE_TYPE
       - --image=windows-cloud/global/images/windows-server-2019-dc-for-containers-v20220414
+      # When using other disk types image pulling and image building could take up to 3 hours
       - --diskType=pd-ssd
       - --workspace-bucket=$_WORKSPACE_TMP_BUCKET
       - --diskSizeGb=70

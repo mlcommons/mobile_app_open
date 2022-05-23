@@ -14,8 +14,6 @@
 ##########################################################################
 
 ifeq (${WITH_TFLITE},1)
-  # Android app always includes tflite backend
-  # android_tflite_backend_bazel_flag=
   backend_tflite_windows_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll
   backend_tflite_windows_target=//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.dll
   backend_tflite_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
@@ -28,7 +26,6 @@ endif
 
 ifeq (${WITH_MEDIATEK},1)
   $(info WITH_MEDIATEK=1)
-  android_mediatek_backend_bazel_flag=--//android/java/org/mlperf/inference:with_mediatek="1"
   backend_mediatek_android_files= \
     ${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtfliteneuronbackend.so \
     ${BAZEL_LINKS_PREFIX}bin/external/neuron_delegate/neuron/java/libtensorflowlite_neuron_jni.so
