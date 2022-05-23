@@ -60,11 +60,6 @@ http_archive(
     ],
 )
 
-# Specify the minimum required bazel version.
-load("@org_tensorflow//tensorflow:version_check.bzl", "check_bazel_version_at_least")
-
-check_bazel_version_at_least("3.7.2")
-
 http_archive(
     name = "build_bazel_rules_apple",
     sha256 = "9f9eb6cdd25d7932cb939df24807c2d70772aad7a79f1357e25ced9d0d443cfd",
