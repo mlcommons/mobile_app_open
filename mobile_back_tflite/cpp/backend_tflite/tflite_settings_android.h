@@ -123,7 +123,7 @@ benchmark_setting {
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
-  batch_size: 64
+  batch_size: 1
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
   md5Checksum: "6c7af49d97a2b2488222d94936d2dc18"
 }
