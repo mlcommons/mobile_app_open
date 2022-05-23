@@ -74,3 +74,5 @@ which is maintained in the main branch `master`.
 
 The branch `android-v2` is used to maintain the legacy version of the MLPerf™ Mobile App,
 which is a native Android app.
+
+test
