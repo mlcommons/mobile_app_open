@@ -119,6 +119,15 @@ benchmark_setting {
 }
 
 benchmark_setting {
+  benchmark_id: "OD_float32_offline"
+  accelerator: "coreml"
+  accelerator_desc: "CoreML"
+  configuration: "TFLite"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
+  md5Checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+}
+
+benchmark_setting {
   benchmark_id: "LU_float32"
   accelerator: "metal"
   accelerator_desc: "Metal"

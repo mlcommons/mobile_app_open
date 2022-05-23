@@ -112,6 +112,18 @@ task {
     tags: "uint8"
     score_max: 2000
     num_classes: 91
+    scenario: "Offline"
+    image_width: 320
+    image_height: 320
+  }
+  model {
+    id: "OD_float32_offline"
+    name: "SSD-MobileDET F32"
+    offset: 1
+    tags: "float32"
+    score_max: 5000
+    num_classes: 91
+    scenario: "Offline"
     image_width: 320
     image_height: 320
   }

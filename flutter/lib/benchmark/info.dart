@@ -114,6 +114,7 @@ final _MAX_THROUGHPUT = {
   'OD_uint8': 288.0,
   'OD_uint8_offline': 288.0,
   'OD_float32': 288.0,
+  'OD_float32_offline': 288.0,
   'LU_int8': 12.0,
   'LU_float32': 12.0,
   'LU_gpu_float32': 12.0,
