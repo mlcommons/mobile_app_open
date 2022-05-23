@@ -84,7 +84,7 @@ class _ResultCircleState extends State<ResultCircle>
                 height: edgeSize,
                 child: RotationTransition(
                     turns: AlwaysStoppedAnimation(value),
-                    child: app_icons.Icons.perfomance_hand)),
+                    child: app_icons.AppIcons.perfomance_hand)),
             CustomPaint(
                 size: Size(edgeSize, edgeSize), painter: ArcPaint(value))
           ],

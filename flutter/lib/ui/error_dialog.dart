@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Icons;
+import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/svg.dart';
 
@@ -46,7 +46,7 @@ Future<void> showPopupDialog(BuildContext context, String header,
 Future<void> showErrorDialog(BuildContext context, List<String> errors) async {
   final stringResources = AppLocalizations.of(context);
   await showPopupDialog(
-      context, stringResources.errorDialogTitle, Icons.error, errors);
+      context, stringResources.errorDialogTitle, AppIcons.error, errors);
 }
 
 Future<void> showSuccessDialog(
