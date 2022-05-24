@@ -69,6 +69,8 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
     Actual duration of the benchmark in milliseconds for start to finish.
   * `measured_samples`: integer number  
     Actual number of samples evaluated during the benchmark
+  * `loadgen_validity`: bool  
+    Value extracted from loadgen logs. Indicated whether all constraints were satisfied or not.
   * `start_datetime`: string  
     Datetime of the moment when benchmark started  
     Format is Iso 8601 in UTC timezone: `2022-04-14T03:54:54.687Z`

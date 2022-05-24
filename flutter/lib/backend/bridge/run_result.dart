@@ -7,6 +7,7 @@ class RunResult {
   final String backendVendor;
   final String acceleratorName;
   final DateTime startTime;
+  late final bool validity;
 
   RunResult({
     required this.accuracy,

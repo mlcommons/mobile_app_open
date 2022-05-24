@@ -265,12 +265,14 @@ class BenchmarkState extends ChangeNotifier {
 
       final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
-          throughput: performanceResult.throughput,
-          accuracy: performanceResult.accuracy,
-          backendName: performanceResult.backendName,
-          acceleratorName: performanceResult.acceleratorName,
-          batchSize: benchmark.config.batchSize,
-          threadsNumber: benchmark.config.threadsNumber);
+        throughput: performanceResult.throughput,
+        accuracy: performanceResult.accuracy,
+        backendName: performanceResult.backendName,
+        acceleratorName: performanceResult.acceleratorName,
+        batchSize: benchmark.config.batchSize,
+        threadsNumber: benchmark.config.threadsNumber,
+        validity: performanceResult.validity,
+      );
 
       if (_aborting) break;
 
@@ -284,16 +286,18 @@ class BenchmarkState extends ChangeNotifier {
 
         accuracyResult = accuracyRunInfo.result;
         benchmark.accuracyModeResult = BenchmarkResult(
-            // loadgen doesn't calculate latency for accuracy mode benchmarks
-            // so throughput is infinity which is not a valid JSON numeric value
-            throughput: accuracyResult.throughput.isFinite
-                ? accuracyResult.throughput
-                : 0.0,
-            accuracy: accuracyResult.accuracy,
-            backendName: accuracyResult.backendName,
-            acceleratorName: accuracyResult.acceleratorName,
-            batchSize: benchmark.config.batchSize,
-            threadsNumber: benchmark.config.threadsNumber);
+          // loadgen doesn't calculate latency for accuracy mode benchmarks
+          // so throughput is infinity which is not a valid JSON numeric value
+          throughput: accuracyResult.throughput.isFinite
+              ? accuracyResult.throughput
+              : 0.0,
+          accuracy: accuracyResult.accuracy,
+          backendName: accuracyResult.backendName,
+          acceleratorName: accuracyResult.acceleratorName,
+          batchSize: benchmark.config.batchSize,
+          threadsNumber: benchmark.config.threadsNumber,
+          validity: accuracyResult.validity,
+        );
       }
 
       exportResults.add(exportResultFromRunInfo(benchmark, performanceResult,
@@ -344,6 +348,7 @@ class BenchmarkState extends ChangeNotifier {
           measuredDurationMs: performance.durationMs,
           measuredSamples: performance.numSamples,
           startDatetime: performance.startTime,
+          loadgenValidity: performance.validity,
         ),
         accuracy: accuracy == null
             ? null
@@ -362,6 +367,7 @@ class BenchmarkState extends ChangeNotifier {
                 measuredDurationMs: accuracy.durationMs,
                 measuredSamples: accuracy.numSamples,
                 startDatetime: accuracy.startTime,
+                loadgenValidity: accuracy.validity,
               ),
         minDurationMs: benchmark.taskConfig.minDurationMs.toDouble(),
         minSamples: benchmark.taskConfig.minQueryCount,
@@ -412,11 +418,12 @@ class BenchmarkState extends ChangeNotifier {
         resourceManager: resourceManager,
         commonSettings: commonSettings,
         backendLibPath: backendLibPath,
-        tmpDir: tmpDir);
+        logDir: tmpDir);
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
     print('Benchmark result: $result, elapsed: $elapsed');
+
     return RunInfo(settings: runSettings, result: result);
   }
 

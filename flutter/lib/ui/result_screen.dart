@@ -82,6 +82,7 @@ class _ResultScreenState extends State<ResultScreen>
       } else {
         continue;
       }
+      final resultIsValid = benchmarkResult?.validity ?? false;
       final backendName = benchmark.performanceModeResult?.backendName ?? '';
       final acceleratorName =
           benchmark.performanceModeResult?.acceleratorName ?? '';
@@ -100,7 +101,9 @@ class _ResultScreenState extends State<ResultScreen>
               Text(
                 textResult,
                 style: TextStyle(
-                  color: AppColors.darkText,
+                  color: resultIsValid
+                      ? AppColors.darkText
+                      : AppColors.darkRedText,
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                 ),
@@ -182,40 +185,43 @@ class _ResultScreenState extends State<ResultScreen>
       BenchmarkState state, BuildContext context) {
     final stringResources = AppLocalizations.of(context);
 
-    final widgets = state.benchmarks.map((benchmark) => Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    benchmark.info
-                        .getLocalizedInfo(stringResources)
-                        .name
-                        .split(' ')
-                        .join('\n')
-                        .toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontSize: 12.0, color: AppColors.lightText),
-                  ),
-                ),
-                Text(
-                  _screenMode == _ScreenMode.performance
-                      ? benchmark.performanceModeResult?.throughput
-                              .toStringAsFixed(2) ??
-                          'N/A'
-                      : benchmark.accuracyModeResult?.getFormattedAccuracyValue(
-                              benchmark.info.type) ??
-                          'N/A',
-                  style: TextStyle(
-                      fontSize: 32.0,
-                      color: AppColors.lightText,
-                      fontWeight: FontWeight.bold),
-                ),
-              ]),
-        ));
+    final widgets = state.benchmarks.map((benchmark) {
+      final result = _screenMode == _ScreenMode.performance
+          ? benchmark.performanceModeResult
+          : benchmark.accuracyModeResult;
+      final text = _screenMode == _ScreenMode.performance
+          ? result?.throughput.toStringAsFixed(2)
+          : result?.getFormattedAccuracyValue(benchmark.info.type);
+      final resultIsValid = result?.validity ?? false;
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child:
+            Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              benchmark.info
+                  .getLocalizedInfo(stringResources)
+                  .name
+                  .split(' ')
+                  .join('\n')
+                  .toUpperCase(),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12.0, color: AppColors.lightText),
+            ),
+          ),
+          Text(
+            text ?? 'N/A',
+            style: TextStyle(
+                fontSize: 32.0,
+                color: resultIsValid
+                    ? AppColors.lightText
+                    : Color.fromARGB(255, 255, 120, 100),
+                fontWeight: FontWeight.bold),
+          ),
+        ]),
+      );
+    });
 
     return partition(widgets, 3)
         .map((row) => Row(

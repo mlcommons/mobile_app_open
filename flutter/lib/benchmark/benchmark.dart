@@ -19,6 +19,7 @@ class BenchmarkResult {
   final String acceleratorName;
   final int batchSize;
   final int threadsNumber;
+  final bool validity;
 
   BenchmarkResult(
       {required this.throughput,
@@ -26,7 +27,8 @@ class BenchmarkResult {
       required this.backendName,
       required this.acceleratorName,
       required this.batchSize,
-      required this.threadsNumber})
+      required this.threadsNumber,
+      required this.validity})
       : accuracy = _replaceAccuracy(accuracy);
 
   static String _replaceAccuracy(String accuracy) {
@@ -68,16 +70,19 @@ class BenchmarkResult {
   static const _tagAcceleratorName = 'accelerator_name';
   static const _tagBatchSize = 'batch_size';
   static const _tagThreadsNumber = 'threads_number';
+  static const _tagValidity = 'validity';
 
   static BenchmarkResult? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
     return BenchmarkResult(
-        throughput: json[_tagThroughput] as double,
-        accuracy: json[_tagAccuracy] as String,
-        backendName: json[_tagBackendName] as String,
-        acceleratorName: json[_tagAcceleratorName] as String,
-        batchSize: json[_tagBatchSize] as int,
-        threadsNumber: json[_tagThreadsNumber] as int);
+      throughput: json[_tagThroughput] as double,
+      accuracy: json[_tagAccuracy] as String,
+      backendName: json[_tagBackendName] as String,
+      acceleratorName: json[_tagAcceleratorName] as String,
+      batchSize: json[_tagBatchSize] as int,
+      threadsNumber: json[_tagThreadsNumber] as int,
+      validity: json[_tagValidity] as bool,
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -87,6 +92,7 @@ class BenchmarkResult {
         _tagAcceleratorName: acceleratorName,
         _tagBatchSize: batchSize,
         _tagThreadsNumber: threadsNumber,
+        _tagValidity: validity,
       };
 }
 
@@ -159,7 +165,7 @@ class Benchmark {
       required ResourceManager resourceManager,
       required List<pb.Setting> commonSettings,
       required String backendLibPath,
-      required Directory tmpDir}) {
+      required Directory logDir}) {
     final dataset =
         testMode ? taskConfig.testDataset : runMode.chooseDataset(taskConfig);
 
@@ -197,7 +203,7 @@ class Benchmark {
       mode: runMode.getBackendModeString(),
       min_query_count: minQueryCount,
       min_duration: minDuration,
-      output_dir: tmpDir.path,
+      output_dir: logDir.path,
       benchmark_id: id,
     );
   }

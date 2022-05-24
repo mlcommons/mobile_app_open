@@ -10,6 +10,7 @@ class BenchmarkRunResult {
   static const String _tagMeasuredDuration = 'measured_duration_ms';
   static const String _tagMeasuredSamples = 'measured_samples';
   static const String _tagStartDatetime = 'start_datetime';
+  static const String _tagValidity = 'loadgen_validity';
 
   final double? throughput;
   final double? accuracy;
@@ -17,6 +18,7 @@ class BenchmarkRunResult {
   final double measuredDurationMs;
   final int measuredSamples;
   final DateTime startDatetime;
+  final bool loadgenValidity;
 
   BenchmarkRunResult({
     required this.throughput,
@@ -25,6 +27,7 @@ class BenchmarkRunResult {
     required this.measuredDurationMs,
     required this.measuredSamples,
     required this.startDatetime,
+    required this.loadgenValidity,
   });
 
   BenchmarkRunResult.fromJson(Map<String, dynamic> json)
@@ -36,6 +39,7 @@ class BenchmarkRunResult {
           measuredDurationMs: json[_tagMeasuredDuration] as double,
           measuredSamples: json[_tagMeasuredSamples] as int,
           startDatetime: DateTime.parse(json[_tagStartDatetime] as String),
+          loadgenValidity: json[_tagValidity] as bool,
         );
 
   Map<String, dynamic> toJson() => {
@@ -45,6 +49,7 @@ class BenchmarkRunResult {
         _tagMeasuredDuration: measuredDurationMs,
         _tagMeasuredSamples: measuredSamples,
         _tagStartDatetime: startDatetime.toUtc().toIso8601String(),
+        _tagValidity: loadgenValidity,
       };
 }
 
