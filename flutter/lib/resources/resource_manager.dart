@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
 import 'package:mlperfbench/device_info.dart';
 import 'cache_manager.dart';
+import 'resource.dart';
 import 'result_manager.dart';
 import 'utils.dart';
 
@@ -71,25 +73,41 @@ class ResourceManager {
         await Directory(path).exists();
   }
 
-  void handleResources(List<String> resources, bool purgeOldCache) async {
+  Future<bool> isChecksumMatched(String filePath, String md5Checksum) async {
+    var fileStream = File(filePath).openRead();
+    final checksum = (await md5.bind(fileStream).first).toString();
+    return checksum == md5Checksum;
+  }
+
+  void handleResources(List<Resource> resources, bool purgeOldCache) async {
     _progressString = '0%';
     _done = false;
     _onUpdate();
 
-    var internetResources = <String>[];
+    var internetResources = <Resource>[];
     for (final resource in resources) {
-      if (resource.startsWith(_applicationDirectoryPrefix)) continue;
-      if (isInternetResource(resource)) {
+      if (resource.path.startsWith(_applicationDirectoryPrefix)) continue;
+      if (isInternetResource(resource.path)) {
         internetResources.add(resource);
         continue;
       }
-      throw 'forbidden path: $resource (only http://, https:// and app:// resources are allowed)';
+      throw 'forbidden path: ${resource.path} (only http://, https:// and app:// resources are allowed)';
     }
 
-    await cacheManager.cache(internetResources, (double val) {
+    final internetPaths = internetResources.map((e) => e.path).toList();
+    await cacheManager.cache(internetPaths, (double val) {
       _progressString = '${(val * 100).round()}%';
       _onUpdate();
     }, purgeOldCache);
+
+    final checksumFailed = await validateResourcesChecksum(resources);
+    if (checksumFailed.isNotEmpty) {
+      final mismatchedPaths = checksumFailed.map((e) => '\n${e.path}').join();
+      throw 'Checksum validation failed for: $mismatchedPaths';
+    }
+
+    // delete downloaded archives to free up disk space
+    await cacheManager.deleteArchives(internetPaths);
 
     _done = true;
     _onUpdate();
@@ -167,13 +185,33 @@ class ResourceManager {
     _batchPresets = result;
   }
 
-  Future<List<String>> validateResourcesExist(List<String> resources) async {
+  Future<List<String>> validateResourcesExist(List<Resource> resources) async {
     final missingResources = <String>[];
     for (var r in resources) {
-      if (!await isResourceExist(r)) {
-        missingResources.add(r);
+      if (!await isResourceExist(r.path)) {
+        missingResources.add(r.path);
       }
     }
     return missingResources;
+  }
+
+  Future<List<Resource>> validateResourcesChecksum(
+      List<Resource> resources) async {
+    final checksumFailedResources = <Resource>[];
+    for (final resource in resources) {
+      final md5Checksum = resource.md5Checksum;
+      if (md5Checksum == null || md5Checksum.isEmpty) continue;
+      String? localPath;
+      if (cacheManager.isResourceAnArchive(resource.path)) {
+        localPath = cacheManager.getArchive(resource.path);
+      } else {
+        localPath = cacheManager.get(resource.path);
+      }
+      if (localPath == null || !(await File(localPath).exists())) continue;
+      if (!await isChecksumMatched(localPath, md5Checksum)) {
+        checksumFailedResources.add(resource);
+      }
+    }
+    return checksumFailedResources;
   }
 }

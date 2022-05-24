@@ -219,11 +219,15 @@
                 },
                 "start_datetime": {
                     "type": "string"
+                },
+                "loadgen_validity": {
+                    "type": "boolean"
                 }
             },
             "required": [
                 "accuracy",
                 "dataset",
+                "loadgen_validity",
                 "measured_duration_ms",
                 "measured_samples",
                 "start_datetime",

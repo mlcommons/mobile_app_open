@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart' hide Icons;
+import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/avd.dart';
 import 'package:flutter_svg/svg.dart';
 
-class Icons {
+class AppIcons {
   static AvdPicture _pAvd(String name) {
     return AvdPicture.asset('assets/' + name);
   }

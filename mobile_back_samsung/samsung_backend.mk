@@ -15,6 +15,10 @@
 
 ifeq (${WITH_SAMSUNG},1)
   $(info WITH_SAMSUNG=1)
+
+  ifeq (${MOBILE_BACK_SAMSUNG_LIB_ROOT},)
+    $(error MOBILE_BACK_SAMSUNG_LIB_ROOT env must be defined when building with samsung backend)
+  endif
 #  android_samsung_backend_bazel_flag=--//android/java/org/mlperf/inference:with_samsung="1"
 #
   MOBILE_BACK_SAMSUNG_LIB_ROOT=$(shell echo mobile_back_samsung/samsung/lib* | awk '{print $$NF}')

@@ -7,6 +7,7 @@ import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
+import 'package:mlperfbench/resources/resource.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'info.dart';
 import 'run_mode.dart';
@@ -18,6 +19,7 @@ class BenchmarkResult {
   final String acceleratorName;
   final int batchSize;
   final int threadsNumber;
+  final bool validity;
 
   BenchmarkResult(
       {required this.throughput,
@@ -25,7 +27,8 @@ class BenchmarkResult {
       required this.backendName,
       required this.acceleratorName,
       required this.batchSize,
-      required this.threadsNumber})
+      required this.threadsNumber,
+      required this.validity})
       : accuracy = _replaceAccuracy(accuracy);
 
   static String _replaceAccuracy(String accuracy) {
@@ -67,16 +70,19 @@ class BenchmarkResult {
   static const _tagAcceleratorName = 'accelerator_name';
   static const _tagBatchSize = 'batch_size';
   static const _tagThreadsNumber = 'threads_number';
+  static const _tagValidity = 'validity';
 
   static BenchmarkResult? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
     return BenchmarkResult(
-        throughput: json[_tagThroughput] as double,
-        accuracy: json[_tagAccuracy] as String,
-        backendName: json[_tagBackendName] as String,
-        acceleratorName: json[_tagAcceleratorName] as String,
-        batchSize: json[_tagBatchSize] as int,
-        threadsNumber: json[_tagThreadsNumber] as int);
+      throughput: json[_tagThroughput] as double,
+      accuracy: json[_tagAccuracy] as String,
+      backendName: json[_tagBackendName] as String,
+      acceleratorName: json[_tagAcceleratorName] as String,
+      batchSize: json[_tagBatchSize] as int,
+      threadsNumber: json[_tagThreadsNumber] as int,
+      validity: json[_tagValidity] as bool,
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -86,6 +92,7 @@ class BenchmarkResult {
         _tagAcceleratorName: acceleratorName,
         _tagBatchSize: batchSize,
         _tagThreadsNumber: threadsNumber,
+        _tagValidity: validity,
       };
 }
 
@@ -110,9 +117,11 @@ class Benchmark {
   final bool testMode;
 
   final BenchmarkInfo info;
+
   // this variable holds description of our config file,
   // which may not represent what backend actually used for computations
   final String backendRequestDescription;
+
   // TODO save config in the Store?
   final BenchmarkConfig config;
 
@@ -156,7 +165,7 @@ class Benchmark {
       required ResourceManager resourceManager,
       required List<pb.Setting> commonSettings,
       required String backendLibPath,
-      required Directory tmpDir}) {
+      required Directory logDir}) {
     final dataset =
         testMode ? taskConfig.testDataset : runMode.chooseDataset(taskConfig);
 
@@ -194,7 +203,7 @@ class Benchmark {
       mode: runMode.getBackendModeString(),
       min_query_count: minQueryCount,
       min_duration: minDuration,
-      output_dir: tmpDir.path,
+      output_dir: logDir.path,
       benchmark_id: id,
     );
   }
@@ -225,29 +234,48 @@ class BenchmarkList {
     }
   }
 
-  List<String> listResources(
+  List<Resource> listResources(
       {bool skipInactive = false, bool includeAccuracy = true}) {
-    final result = <String>[];
+    final result = <Resource>[];
 
     for (final b in benchmarks) {
       if (skipInactive && !b.config.active) continue;
       if (testMode) {
-        result.add(b.taskConfig.testDataset.path);
-        result.add(b.taskConfig.testDataset.groundtruthSrc);
+        final datasetData = Resource(
+            path: b.taskConfig.testDataset.path,
+            type: ResourceTypeEnum.datasetData);
+        final datasetGroundtruth = Resource(
+            path: b.taskConfig.testDataset.groundtruthSrc,
+            type: ResourceTypeEnum.datasetGroundtruth);
+        result.addAll([datasetData, datasetGroundtruth]);
       } else {
-        result.add(b.taskConfig.liteDataset.path);
-        result.add(b.taskConfig.liteDataset.groundtruthSrc);
+        final datasetData = Resource(
+            path: b.taskConfig.liteDataset.path,
+            type: ResourceTypeEnum.datasetData);
+        final datasetGroundtruth = Resource(
+            path: b.taskConfig.liteDataset.groundtruthSrc,
+            type: ResourceTypeEnum.datasetGroundtruth);
+        result.addAll([datasetData, datasetGroundtruth]);
 
         if (includeAccuracy) {
-          result.add(b.taskConfig.dataset.path);
-          result.add(b.taskConfig.dataset.groundtruthSrc);
+          final datasetData = Resource(
+              path: b.taskConfig.dataset.path,
+              type: ResourceTypeEnum.datasetData);
+          final datasetGroundtruth = Resource(
+              path: b.taskConfig.dataset.groundtruthSrc,
+              type: ResourceTypeEnum.datasetGroundtruth);
+          result.addAll([datasetData, datasetGroundtruth]);
         }
       }
-      result.add(b.benchmarkSetting.src);
+      final model = Resource(
+          path: b.benchmarkSetting.src,
+          type: ResourceTypeEnum.model,
+          md5Checksum: b.benchmarkSetting.md5Checksum);
+      result.add(model);
     }
 
-    final set = <String>{};
-    result.retainWhere((x) => x.isNotEmpty && set.add(x));
-    return result.where((element) => element.isNotEmpty).toList();
+    final set = <Resource>{};
+    result.retainWhere((x) => x.path.isNotEmpty && set.add(x));
+    return result.where((element) => element.path.isNotEmpty).toList();
   }
 }

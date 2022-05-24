@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart' hide Icons;
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -131,12 +130,14 @@ class _SettingsScreen extends State<SettingsScreen> {
               stringResources.privacyPolicy,
             ),
             trailing: Icon(Icons.chevron_right),
-            onTap: () => _launchURL('https://mlcommons.org/mobile_privacy'),
+            onTap: () =>
+                launchUrl(Uri.parse('https://mlcommons.org/mobile_privacy')),
           ),
           ListTile(
             title: Text(stringResources.eula),
             trailing: Icon(Icons.chevron_right),
-            onTap: () => _launchURL('https://mlcommons.org/mobile_eula'),
+            onTap: () =>
+                launchUrl(Uri.parse('https://mlcommons.org/mobile_eula')),
           ),
           Divider(),
           ListTile(
@@ -185,13 +186,5 @@ class _SettingsScreen extends State<SettingsScreen> {
         ],
       ),
     );
-  }
-}
-
-void _launchURL(String url) async {
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    throw 'Could not launch $url';
   }
 }

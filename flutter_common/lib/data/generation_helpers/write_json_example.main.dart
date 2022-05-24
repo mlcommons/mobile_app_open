@@ -38,6 +38,7 @@ Future<void> main() async {
     measuredDurationMs: 123.456,
     measuredSamples: 8,
     startDatetime: DateTime.now(),
+    loadgenValidity: true,
   );
   var exportResult = BenchmarkExportResult(
     benchmarkId: 'id',
