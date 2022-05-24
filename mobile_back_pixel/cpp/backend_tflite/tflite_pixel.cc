@@ -16,6 +16,7 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
@@ -95,8 +96,8 @@ bool mlperf_backend_matches_hardware(const char** not_allowed_message,
               << ", manufacturer: " << device_info->manufacturer;
 
     if (strcmp(device_info->manufacturer, "Google") == 0 &&
-        strstr(device_info->model, "Pixel 6") != NULL) {
-      printf("Pixel backend matches hardware");
+        access("/dev/edgetpu", F_OK) == 0) {
+      LOG(INFO) << "Pixel backend matches hardware";
       return true;
     }
   }
