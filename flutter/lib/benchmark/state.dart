@@ -167,7 +167,7 @@ class BenchmarkState extends ChangeNotifier {
       }
     } else {
       await _store.deletePreviousExtendedResult();
-      await resourceManager.resultManager.delete();
+      await resourceManager.resultManager.deleteLastResult();
     }
 
     return false;
@@ -314,7 +314,7 @@ class BenchmarkState extends ChangeNotifier {
       );
       _store.previousExtendedResult =
           JsonEncoder().convert(lastResult!.toJson());
-      await resourceManager.resultManager.writeResults(lastResult!);
+      await resourceManager.resultManager.writeLastResult(lastResult!);
     }
 
     currentlyRunning = null;

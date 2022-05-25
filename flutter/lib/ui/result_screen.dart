@@ -352,7 +352,7 @@ class _ResultScreenState extends State<ResultScreen>
               child: TextButton(
                 onPressed: () async {
                   await Share.share(
-                    await state.resourceManager.resultManager.read(),
+                    await state.resourceManager.resultManager.readLastResult(),
                     subject: stringResources.experimentResultsSubj,
                   );
                 },

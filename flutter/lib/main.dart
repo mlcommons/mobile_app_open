@@ -49,7 +49,7 @@ Future<void> launchUi() async {
     assert(const bool.hasEnvironment('resultsStringMark'));
     assert(const bool.hasEnvironment('terminalStringMark'));
     await store.deletePreviousExtendedResult();
-    await benchmarkState.resourceManager.resultManager.delete();
+    await benchmarkState.resourceManager.resultManager.deleteLastResult();
     await benchmarkState.reset();
     benchmarkState.addListener(() => autostartHandler(benchmarkState, store));
   }
@@ -76,7 +76,7 @@ void autostartHandler(BenchmarkState state, Store store) async {
   }
   if (state.state == BenchmarkStateEnum.done) {
     print(const String.fromEnvironment('resultsStringMark'));
-    print(await state.resourceManager.resultManager.read());
+    print(await state.resourceManager.resultManager.readLastResult());
     print(const String.fromEnvironment('terminalStringMark'));
     exit(0);
   }

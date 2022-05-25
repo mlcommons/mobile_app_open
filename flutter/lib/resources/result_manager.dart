@@ -7,15 +7,36 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 
 class ResultManager {
-  static const _jsonResultFileName = 'result.json';
-  late final String _jsonResultPath;
+  static const _lastResultFileName = 'result.json';
+  late final String _lastResultPath;
 
   ResultManager(String applicationDirectory) {
-    _jsonResultPath = '$applicationDirectory/$_jsonResultFileName';
+    _lastResultPath = '$applicationDirectory/$_lastResultFileName';
   }
 
-  Future<void> writeResults(ExtendedResult results) async {
-    await _write(results.toJson());
+  Future<void> writeLastResult(ExtendedResult results) async {
+    final jsonFile = File(_lastResultPath);
+
+    final jsonEncoder = JsonEncoder.withIndent('  ');
+    var encoded = jsonEncoder.convert(results);
+    await jsonFile.writeAsString(encoded);
+  }
+
+  Future<String> readLastResult() async {
+    final file = File(_lastResultPath);
+
+    if (await file.exists()) {
+      return file.readAsString();
+    }
+
+    return '';
+  }
+
+  Future<void> deleteLastResult() async {
+    var resultsFile = File(_lastResultPath);
+    if (await resultsFile.exists()) {
+      await resultsFile.delete();
+    }
   }
 
   void restoreResults(
@@ -53,30 +74,5 @@ class ResultManager {
         batchSize: export.backendSettingsInfo.batchSize,
         threadsNumber: threadsNumber,
         validity: runResult.loadgenValidity);
-  }
-
-  Future<void> _write(dynamic content) async {
-    final jsonFile = File(_jsonResultPath);
-
-    final jsonEncoder = JsonEncoder.withIndent('  ');
-    var encoded = jsonEncoder.convert(content);
-    await jsonFile.writeAsString(encoded);
-  }
-
-  Future<String> read() async {
-    final file = File(_jsonResultPath);
-
-    if (await file.exists()) {
-      return file.readAsString();
-    }
-
-    return '';
-  }
-
-  Future<void> delete() async {
-    var resultsFile = File(_jsonResultPath);
-    if (await resultsFile.exists()) {
-      await resultsFile.delete();
-    }
   }
 }
