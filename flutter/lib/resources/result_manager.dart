@@ -2,36 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
-
-class _BriefResult {
-  static const _tagId = 'benchmark_id';
-  static const _tagPerformance = 'performance';
-  static const _tagAccuracy = 'accuracy';
-
-  final String id;
-  final BenchmarkResult? performanceModeResult;
-  final BenchmarkResult? accuracyModeResult;
-
-  _BriefResult(
-      {required this.id,
-      required this.performanceModeResult,
-      required this.accuracyModeResult});
-
-  Map<String, dynamic> toJson() => {
-        _tagId: id,
-        _tagPerformance: performanceModeResult,
-        _tagAccuracy: accuracyModeResult,
-      };
-
-  _BriefResult.fromJson(Map<String, dynamic> jsonMap)
-      : id = jsonMap[_tagId] as String,
-        performanceModeResult = BenchmarkResult.fromJson(
-            jsonMap[_tagPerformance] as Map<String, dynamic>?),
-        accuracyModeResult = BenchmarkResult.fromJson(
-            jsonMap[_tagAccuracy] as Map<String, dynamic>?);
-}
 
 class ResultManager {
   static const _jsonResultFileName = 'result.json';
@@ -41,46 +14,45 @@ class ResultManager {
     _jsonResultPath = '$applicationDirectory/$_jsonResultFileName';
   }
 
-  // returns brief results in json
   Future<void> writeResults(ExtendedResult results) async {
     await _write(results.toJson());
   }
 
-  String serializeBriefResults(List<Benchmark> benchmarks) {
-    final jsonContent = <Map<String, dynamic>>[];
+  void restoreResults(
+      List<BenchmarkExportResult> results, List<Benchmark> benchmarks) {
+    for (final exportResult in results) {
+      final benchmark = benchmarks
+          .singleWhere((benchmark) => benchmark.id == exportResult.benchmarkId);
 
-    for (final result in benchmarks) {
-      var brief = _BriefResult(
-          id: result.id,
-          performanceModeResult: result.performanceModeResult,
-          accuracyModeResult: result.accuracyModeResult);
-      jsonContent.add(brief.toJson());
+      benchmark.performanceModeResult =
+          _parseExportResult(exportResult, exportResult.performance);
+      benchmark.accuracyModeResult =
+          _parseExportResult(exportResult, exportResult.accuracy);
     }
-    return JsonEncoder().convert(jsonContent);
   }
 
-  bool restoreResults(String briefResultsJson, List<Benchmark> benchmarks) {
-    if (briefResultsJson == '') return false;
-
-    try {
-      for (final resultContent
-          in jsonDecode(briefResultsJson) as List<dynamic>) {
-        var briefResult =
-            _BriefResult.fromJson(resultContent as Map<String, dynamic>);
-        final benchmark = benchmarks
-            .singleWhere((benchmark) => benchmark.id == briefResult.id);
-
-        benchmark.performanceModeResult = briefResult.performanceModeResult;
-        benchmark.accuracyModeResult = briefResult.accuracyModeResult;
-      }
-    } catch (e, stacktrace) {
-      print("can't parse previous results:");
-      print(briefResultsJson);
-      print(e);
-      print(stacktrace);
-      return false;
+  BenchmarkResult? _parseExportResult(
+      BenchmarkExportResult export, BenchmarkRunResult? runResult) {
+    if (runResult == null) {
+      return null;
     }
-    return true;
+
+    var threadsNumber = 0;
+    for (var item in export.backendSettingsInfo.extraSettings.list) {
+      if (item.id == 'shards_num') {
+        threadsNumber = int.parse(item.value);
+        break;
+      }
+    }
+
+    return BenchmarkResult(
+        throughput: runResult.throughput ?? 0.0,
+        accuracy: runResult.accuracy?.toString() ?? '',
+        backendName: export.backendInfo.name,
+        acceleratorName: export.backendInfo.accelerator,
+        batchSize: export.backendSettingsInfo.batchSize,
+        threadsNumber: threadsNumber,
+        validity: runResult.loadgenValidity);
   }
 
   Future<void> _write(dynamic content) async {

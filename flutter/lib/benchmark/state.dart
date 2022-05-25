@@ -154,18 +154,19 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<bool> _handlePreviousResult() async {
-    if (_doneRunning == null) {
+    if (_doneRunning == null && _store.previousExtendedResult != '') {
       try {
         lastResult = ExtendedResult.fromJson(
             jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
+        resourceManager.resultManager
+            .restoreResults(lastResult!.results.list, benchmarks);
+        return true;
       } catch (e, trace) {
         print('unable to restore previous extended result: $e');
         print(trace);
       }
-      return resourceManager.resultManager
-          .restoreResults(_store.previousResult, benchmarks);
     } else {
-      await _store.deletePreviousResult();
+      await _store.deletePreviousExtendedResult();
       await resourceManager.resultManager.delete();
     }
 
@@ -314,9 +315,6 @@ class BenchmarkState extends ChangeNotifier {
       _store.previousExtendedResult =
           JsonEncoder().convert(lastResult!.toJson());
       await resourceManager.resultManager.writeResults(lastResult!);
-
-      _store.previousResult = resourceManager.resultManager
-          .serializeBriefResults(activeBenchmarks.toList());
     }
 
     currentlyRunning = null;
