@@ -134,8 +134,3 @@ cc_binary(
         ":tflite_c",
     ],
 )
-
-cc_library(
-    name = "libneuronusdk_adapter.mtk.so",
-    srcs = ["libneuronusdk_adapter.mtk.so.5"],
-)
