@@ -158,6 +158,7 @@ class BenchmarkState extends ChangeNotifier {
       try {
         lastResult = ExtendedResult.fromJson(
             jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
+        // TODO: restore from resultManager.getLastResult ?
         resourceManager.resultManager
             .restoreResults(lastResult!.results.list, benchmarks);
         return true;
@@ -167,7 +168,7 @@ class BenchmarkState extends ChangeNotifier {
       }
     } else {
       await _store.deletePreviousExtendedResult();
-      await resourceManager.resultManager.deleteLastResult();
+      await resourceManager.resultManager.deleteResults();
     }
 
     return false;
@@ -314,7 +315,7 @@ class BenchmarkState extends ChangeNotifier {
       );
       _store.previousExtendedResult =
           JsonEncoder().convert(lastResult!.toJson());
-      await resourceManager.resultManager.writeLastResult(lastResult!);
+      await resourceManager.resultManager.saveResult(lastResult!);
     }
 
     currentlyRunning = null;

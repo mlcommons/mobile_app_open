@@ -5,38 +5,68 @@ import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'utils.dart';
+
+class _ExtendedResultList {
+  final List<ExtendedResult> list;
+
+  _ExtendedResultList(this.list);
+
+  static _ExtendedResultList fromJson(List<dynamic> json) {
+    final list = <ExtendedResult>[];
+    for (var item in json) {
+      list.add(ExtendedResult.fromJson(item as Map<String, dynamic>));
+    }
+    return _ExtendedResultList(list);
+  }
+
+  List<dynamic> toJson() {
+    var result = <dynamic>[];
+    for (var item in list) {
+      result.add(item);
+    }
+    return result;
+  }
+}
 
 class ResultManager {
-  static const _lastResultFileName = 'result.json';
-  late final String _lastResultPath;
+  static const _resultsFileName = 'results.json';
+  final File jsonFile;
+  _ExtendedResultList _results = _ExtendedResultList([]);
 
-  ResultManager(String applicationDirectory) {
-    _lastResultPath = '$applicationDirectory/$_lastResultFileName';
+  ResultManager(String applicationDirectory)
+      : jsonFile = File('$applicationDirectory/$_resultsFileName');
+
+  Future<void> init() async {
+    _results = await _restoreResults();
   }
 
-  Future<void> writeLastResult(ExtendedResult results) async {
-    final jsonFile = File(_lastResultPath);
-
-    final jsonEncoder = JsonEncoder.withIndent('  ');
-    var encoded = jsonEncoder.convert(results);
-    await jsonFile.writeAsString(encoded);
+  Future<void> _saveResults() async {
+    await jsonFile.writeAsString(jsonToStringIndented(_results));
   }
 
-  Future<String> readLastResult() async {
-    final file = File(_lastResultPath);
-
-    if (await file.exists()) {
-      return file.readAsString();
+  Future<_ExtendedResultList> _restoreResults() async {
+    if (!await jsonFile.exists()) {
+      return _ExtendedResultList([]);
     }
 
-    return '';
+    return _ExtendedResultList.fromJson(
+        jsonDecode(await jsonFile.readAsString()) as List<dynamic>);
   }
 
-  Future<void> deleteLastResult() async {
-    var resultsFile = File(_lastResultPath);
-    if (await resultsFile.exists()) {
-      await resultsFile.delete();
+  Future<void> deleteResults() async {
+    if (await jsonFile.exists()) {
+      await jsonFile.delete();
     }
+  }
+
+  Future<void> saveResult(ExtendedResult value) async {
+    _results.list.add(value);
+    await _saveResults();
+  }
+
+  ExtendedResult getLastResult() {
+    return _results.list.last;
   }
 
   void restoreResults(
