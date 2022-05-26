@@ -182,7 +182,6 @@ class _ResultScreenState extends State<ResultScreen>
 
   List<Widget> _createListOfBenchmarkResultTopWidgets(
       BenchmarkState state, BuildContext context) {
-
     final widgets = state.benchmarks.map((benchmark) {
       final result = _screenMode == _ScreenMode.performance
           ? benchmark.performanceModeResult
@@ -198,10 +197,7 @@ class _ResultScreenState extends State<ResultScreen>
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
-              benchmark.taskConfig.name
-                  .split(' ')
-                  .join('\n')
-                  .toUpperCase(),
+              benchmark.taskConfig.name.split(' ').join('\n').toUpperCase(),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 12.0, color: AppColors.lightText),
             ),

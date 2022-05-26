@@ -67,7 +67,7 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(info.detailsTitle,
+                                  Text(benchmark.taskConfig.name,
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
