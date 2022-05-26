@@ -9,7 +9,9 @@ class AppColors {
   static const primary = Colors.blue;
   static const secondary = Colors.green;
   static const lightText = Colors.white;
+  static final lightRedText = Color.fromARGB(255, 255, 100, 100);
   static const darkText = Colors.black;
+  static const darkRedText = Colors.red;
   static const lightBackground = Colors.white;
   static const dartBackground = Colors.black45;
   static const dialogBackground = Colors.white;

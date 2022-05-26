@@ -1,8 +1,7 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' hide Icons;
+import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
@@ -89,7 +88,7 @@ class MyHomePage extends StatelessWidget {
     final stringResources = AppLocalizations.of(context);
 
     return _circleContainerWithContent(
-        context, Icons.waiting, stringResources.waitBenchmarks);
+        context, AppIcons.waiting, stringResources.waitBenchmarks);
   }
 
   Widget _goContainer(BuildContext context) {
