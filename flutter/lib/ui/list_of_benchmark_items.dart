@@ -6,7 +6,6 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 
 ListView createListOfBenchmarkItemsWidgets(
     BuildContext context, BenchmarkState state) {
-  final stringResources = AppLocalizations.of(context);
   final list = <Widget>[];
   final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
@@ -29,7 +28,7 @@ ListView createListOfBenchmarkItemsWidgets(
                 child: benchmark.info.icon,
               ),
             ),
-            Text(benchmark.info.getLocalizedInfo(stringResources).name),
+            Text(benchmark.taskConfig.name),
             Icon(
               Icons.chevron_right,
               color: Colors.grey,
@@ -68,7 +67,7 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(info.detailsTitle,
+                                  Text(benchmark.taskConfig.name,
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
