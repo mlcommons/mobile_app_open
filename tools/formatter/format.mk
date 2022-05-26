@@ -21,9 +21,9 @@ format/java:
 
 .PHONY: format/dart
 format/dart:
-	cd flutter && ${_start_args} dart run import_sorter:main
-	cd flutter_common && ${_start_args} dart run import_sorter:main
-	cd website && ${_start_args} dart run import_sorter:main
+	cd flutter && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
+	cd flutter_common && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
+	cd website && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
 	dart format flutter flutter_common website
 
 .PHONY: format/ts
