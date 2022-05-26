@@ -49,9 +49,8 @@ Future<void> launchUi() async {
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));
     assert(const bool.hasEnvironment('terminalStringMark'));
-    await store.deletePreviousExtendedResult();
-    await benchmarkState.resourceManager.resultManager.deleteResults();
-    await benchmarkState.reset();
+    store.previousExtendedResult = '';
+    benchmarkState.restoreLastResult();
     benchmarkState.addListener(() => autostartHandler(benchmarkState, store));
   }
 

@@ -85,10 +85,6 @@ class Store extends ChangeNotifier {
     _storeFromDisk.setString(_StoreConstants.previous_extended_result, result);
   }
 
-  Future<void> deletePreviousExtendedResult() async {
-    await _storeFromDisk.remove(_StoreConstants.previous_extended_result);
-  }
-
   bool isShareOptionChosen() =>
       _storeFromDisk.containsKey(_StoreConstants.share);
 
