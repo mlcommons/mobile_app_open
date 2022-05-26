@@ -147,6 +147,10 @@ flutter/pub:
 flutter/test:
 	cd flutter && ${_start_args} flutter test integration_test
 
+.PHONY: flutter/run
+flutter/run:
+	cd flutter && ${_start_args} flutter --no-version-check run
+
 .PHONY: flutter/prepare
 flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info
 
