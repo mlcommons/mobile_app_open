@@ -26,6 +26,7 @@ cc_library(
         "//flutter/cpp/datasets:coco",
         "//flutter/cpp/datasets:imagenet",
         "//flutter/cpp/datasets:squad",
+        "//flutter/cpp/datasets:imagepairs",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
     ],
     alwayslink = 1,

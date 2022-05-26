@@ -1,10 +1,11 @@
-enum DatasetTypeEnum { imagenet, coco, ade20k, squad }
+enum DatasetTypeEnum { imagenet, coco, ade20k, squad, imagepairs }
 
 class DatasetType {
   static const String _serializedImagenet = 'IMAGENET';
   static const String _serializedCoco = 'COCO';
   static const String _serializedAde20k = 'ADE20K';
   static const String _serializedSquad = 'SQUAD';
+  static const String _serializedImagepairs = 'IMAGEPAIRS';
 
   final DatasetTypeEnum value;
 
@@ -20,6 +21,8 @@ class DatasetType {
         return DatasetType(DatasetTypeEnum.ade20k);
       case _serializedSquad:
         return DatasetType(DatasetTypeEnum.squad);
+      case _serializedImagepairs:
+        return DatasetType(DatasetTypeEnum.imagepairs);
       default:
         throw 'invalid DatasetType value: $serialized';
     }
@@ -35,6 +38,8 @@ class DatasetType {
         return _serializedAde20k;
       case DatasetTypeEnum.squad:
         return _serializedSquad;
+      case DatasetTypeEnum.imagepairs:
+        return _serializedImagepairs;
       default:
         throw 'invalid DatasetType value: $value';
     }

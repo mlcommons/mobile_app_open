@@ -17,7 +17,7 @@ struct dart_ffi_run_benchmark_in {
   int32_t backend_settings_len;
   const char *backend_native_lib_path;
 
-  int dataset_type;  // 0: Imagenet, 1: Coco, 2: Squad, 3: Ade20k
+  int dataset_type;  // 0: Imagenet, 1: Coco, 2: Squad, 3: Ade20k, 4: ImagePairs
   const char *dataset_data_path;
   const char *dataset_groundtruth_path;
   int32_t dataset_offset;

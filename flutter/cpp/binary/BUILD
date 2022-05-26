@@ -55,6 +55,7 @@ cc_binary(
         "//flutter/cpp/datasets:coco",
         "//flutter/cpp/datasets:imagenet",
         "//flutter/cpp/datasets:squad",
+        "//flutter/cpp/datasets:imagepairs",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/lite/tools:command_line_flags",

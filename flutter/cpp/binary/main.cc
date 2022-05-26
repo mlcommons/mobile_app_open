@@ -26,6 +26,7 @@ limitations under the License.
 #include "flutter/cpp/datasets/coco.h"
 #include "flutter/cpp/datasets/imagenet.h"
 #include "flutter/cpp/datasets/squad.h"
+#include "flutter/cpp/datasets/imagepairs.h"
 #include "flutter/cpp/mlperf_driver.h"
 #include "flutter/cpp/proto/mlperf_task.pb.h"
 #include "flutter/cpp/utils.h"
@@ -60,6 +61,8 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
     return DatasetConfig::SQUAD;
   } else if (absl::EqualsIgnoreCase(name, "ADE20K")) {
     return DatasetConfig::ADE20K;
+  } else if (absl::EqualsIgnoreCase(name, "IMAGEPAIRS")) {
+    return DatasetConfig::IMAGEPAIRS;
   } else if (absl::EqualsIgnoreCase(name, "DUMMY")) {
     return DatasetConfig::NONE;
   } else {
@@ -83,7 +86,7 @@ int Main(int argc, char* argv[]) {
                        "Backend. Only TFLite is supported at the moment.",
                        Flag::kPositional),
       Flag::CreateFlag("dataset", &dataset_name,
-                       "Dataset. One of ade20k, imagenet, coco, or squad.",
+                       "Dataset. One of ade20k, imagenet, coco, squad, or imagepairs",
                        Flag::kPositional)};
   Flags::Parse(&argc, const_cast<const char**>(argv), flag_list);
   backend_type = Str2BackendType(backend_name);
@@ -161,6 +164,10 @@ int Main(int argc, char* argv[]) {
             benchmark_id = "LU_float32";
             break;
           case DatasetConfig::ADE20K:
+            benchmark_id = "IS_uint8";
+            break;
+          // Need to check this
+          case DatasetConfig::IMAGEPAIRS:
             benchmark_id = "IS_uint8";
             break;
           case DatasetConfig::NONE:
@@ -294,6 +301,38 @@ int Main(int argc, char* argv[]) {
           backend) {
         dataset.reset(new ADE20K(backend.get(), images_directory,
                                  ground_truth_directory, num_classes,
+                                 image_width, image_height));
+      }
+      // Adds to flag_list for showing help.
+      flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                       dataset_flags.end());
+    } break;
+    case DatasetConfig::IMAGEPAIRS: {
+      LOG(INFO) << "Using ImagePairs dataset";
+      std::string images_directory, ground_truth_directory;
+      // Number of channels
+      int scale = 2;
+      int num_channels = 3;
+      int image_width = 128;
+      int image_height = 128;
+      std::vector<Flag> dataset_flags{
+          Flag::CreateFlag("images_directory", &images_directory,
+                           "Path to ground truth images.", Flag::kRequired),
+          Flag::CreateFlag("ground_truth_directory", &ground_truth_directory,
+                           "Path to the imagenet ground truth file.",
+                           Flag::kRequired),
+          Flag::CreateFlag("image_width", &image_width,
+                           "The width of the processed image."),
+          Flag::CreateFlag("image_height", &image_height,
+                           "The height of the processed image."),
+          Flag::CreateFlag("n_channels", &num_channels,
+                           "The number of color channels."),
+          Flag::CreateFlag("scale", &scale,
+                           "Super-resolution scale factor")};
+      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
+          backend) {
+        dataset.reset(new IMAGEPAIRS(backend.get(), images_directory,
+                                 ground_truth_directory, num_channels, scale,
                                  image_width, image_height));
       }
       // Adds to flag_list for showing help.

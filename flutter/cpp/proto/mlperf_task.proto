@@ -62,6 +62,7 @@ message DatasetConfig {
     COCO = 2;
     SQUAD = 3;
     ADE20K = 4;
+    IMAGEPAIRS = 5;
   }
   required DatasetType type = 2;
   // Path to the dataset.
