@@ -7,7 +7,7 @@ import Flutter
 		_ application: UIApplication,
 		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
 	) -> Bool {
-        fake_calls();
+        ios_linker_workaround();
 		
 		GeneratedPluginRegistrant.register(with: self)
 		return super.application(application, didFinishLaunchingWithOptions: launchOptions)

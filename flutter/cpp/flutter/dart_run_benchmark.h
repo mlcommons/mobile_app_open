@@ -4,11 +4,7 @@
 extern "C" {
 #endif
 
-// dart_backend.cpp
-
 void fake_calls();
-
-// main.cpp
 
 struct dart_ffi_run_benchmark_in {
   const char *backend_model_path;
@@ -17,14 +13,14 @@ struct dart_ffi_run_benchmark_in {
   int32_t backend_settings_len;
   const char *backend_native_lib_path;
 
-  int dataset_type;  // 0: Imagenet, 1: Coco, 2: Squad, 3: Ade20k
+  int dataset_type;
   const char *dataset_data_path;
   const char *dataset_groundtruth_path;
   int32_t dataset_offset;
 
-  const char *scenario;  // SingleStream/Offline
+  const char *scenario;
 
-  const char *mode;  // Submission/Accuracy/Performance
+  const char *mode;
   int32_t min_query_count;
   int32_t min_duration;
   const char *output_dir;
@@ -45,33 +41,6 @@ struct dart_ffi_run_benchmark_out {
 struct dart_ffi_run_benchmark_out *dart_ffi_run_benchmark(
     const struct dart_ffi_run_benchmark_in *in);
 void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out *out);
-
-// dart_ffi_mlperf_config.cc
-
-struct dart_ffi_mlperf_config_result {
-  int size;
-  char *data;
-};
-
-struct dart_ffi_mlperf_config_result *dart_ffi_mlperf_config(
-    const char *pb_content);
-
-void dart_ffi_mlperf_config_free(struct dart_ffi_mlperf_config_result *result);
-
-// dart_ffi_backend_match.cc
-
-struct dart_ffi_backend_match_result {
-  int matches;  // 0 or 1
-  const char *error_message;
-
-  int pbdata_size;
-  char *pbdata;
-};
-
-struct dart_ffi_backend_match_result *dart_ffi_backend_match(
-    const char *lib_path, const char *manufacturer, const char *model);
-
-void dart_ffi_backend_match_free(struct dart_ffi_backend_match_result *result);
 
 #ifdef __cplusplus
 }

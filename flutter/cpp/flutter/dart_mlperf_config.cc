@@ -1,10 +1,11 @@
+#include "./dart_mlperf_config.h"
+
 #include <google/protobuf/text_format.h>
 
 #include <cstring>
 
 #include "flutter/cpp/backends/external.h"
 #include "flutter/cpp/proto/mlperf_task.pb.h"
-#include "main.h"
 
 // The main purpose of this function
 // is to allow Dart to read config from tasks.pbtxt file.
