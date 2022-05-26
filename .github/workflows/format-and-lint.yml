@@ -46,7 +46,7 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
-          flutter-version: '2.5.3'
+          flutter-version: '2.10.5'
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
@@ -63,6 +63,15 @@ jobs:
         run: dart analyze --fatal-infos
       - name: Run Dart import sorter
         run: cd flutter && dart run import_sorter:main --exit-if-changed
+      - uses: actions/setup-node@v3
+        name: Setup Node
+        with:
+          node-version: '16'
+      - name: Install quicktype
+        run: |
+          npm install -g quicktype
+      - name: Check export result schema
+        run: make lint/result-schema
   java:
     runs-on: ubuntu-latest
     steps:

@@ -33,11 +33,6 @@ cc_proto_library(
     deps = [":mlperf_task_proto"],
 )
 
-java_proto_library(
-    name = "mlperf_task_java_proto",
-    deps = [":mlperf_task_proto"],
-)
-
 common_linkopts = tflite_linkopts() + select({
     "//conditions:default": [],
     "@org_tensorflow//tensorflow:android": [

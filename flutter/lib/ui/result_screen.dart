@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/firebase/config.gen.dart';
@@ -83,6 +82,7 @@ class _ResultScreenState extends State<ResultScreen>
       } else {
         continue;
       }
+      final resultIsValid = benchmarkResult?.validity ?? false;
       final backendName = benchmark.performanceModeResult?.backendName ?? '';
       final acceleratorName =
           benchmark.performanceModeResult?.acceleratorName ?? '';
@@ -101,7 +101,9 @@ class _ResultScreenState extends State<ResultScreen>
               Text(
                 textResult,
                 style: TextStyle(
-                  color: AppColors.darkText,
+                  color: resultIsValid
+                      ? AppColors.darkText
+                      : AppColors.darkRedText,
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                 ),
@@ -155,6 +157,7 @@ class _ResultScreenState extends State<ResultScreen>
         Column(
           children: [
             ListTile(
+              minVerticalPadding: 0,
               leading: Container(
                   width: pictureEdgeSize,
                   height: pictureEdgeSize,
@@ -179,38 +182,42 @@ class _ResultScreenState extends State<ResultScreen>
 
   List<Widget> _createListOfBenchmarkResultTopWidgets(
       BenchmarkState state, BuildContext context) {
-    final widgets = state.benchmarks.map((benchmark) => Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    benchmark.taskConfig.name
-                        .split(' ')
-                        .join('\n')
-                        .toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontSize: 12.0, color: AppColors.lightText),
-                  ),
-                ),
-                Text(
-                  _screenMode == _ScreenMode.performance
-                      ? benchmark.performanceModeResult?.throughput
-                              .toStringAsFixed(2) ??
-                          'N/A'
-                      : benchmark.accuracyModeResult?.getFormattedAccuracyValue(
-                              benchmark.info.type) ??
-                          'N/A',
-                  style: TextStyle(
-                      fontSize: 32.0,
-                      color: AppColors.lightText,
-                      fontWeight: FontWeight.bold),
-                ),
-              ]),
-        ));
+
+    final widgets = state.benchmarks.map((benchmark) {
+      final result = _screenMode == _ScreenMode.performance
+          ? benchmark.performanceModeResult
+          : benchmark.accuracyModeResult;
+      final text = _screenMode == _ScreenMode.performance
+          ? result?.throughput.toStringAsFixed(2)
+          : result?.getFormattedAccuracyValue(benchmark.info.type);
+      final resultIsValid = result?.validity ?? false;
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child:
+            Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              benchmark.taskConfig.name
+                  .split(' ')
+                  .join('\n')
+                  .toUpperCase(),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12.0, color: AppColors.lightText),
+            ),
+          ),
+          Text(
+            text ?? 'N/A',
+            style: TextStyle(
+                fontSize: 32.0,
+                color: resultIsValid
+                    ? AppColors.lightText
+                    : Color.fromARGB(255, 255, 120, 100),
+                fontWeight: FontWeight.bold),
+          ),
+        ]),
+      );
+    });
 
     return partition(widgets, 3)
         .map((row) => Row(
@@ -272,7 +279,7 @@ class _ResultScreenState extends State<ResultScreen>
               ),
               IconButton(
                   key: Key(ResultKeys.scrollResultsButton),
-                  icon: app_icons.Icons.arrow,
+                  icon: app_icons.AppIcons.arrow,
                   onPressed: () {
                     scrollController.animateTo(
                         scrollController.position.maxScrollExtent,
@@ -302,6 +309,8 @@ class _ResultScreenState extends State<ResultScreen>
           child: TextButton(
             style: buttonStyle,
             onPressed: () async {
+              // TODO (anhappdev) Refactor the code here to avoid duplicated code.
+              // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
               final wrongPathError =
                   await state.validateExternalResourcesDirectory(
                       stringResources.incorrectDatasetsPath);

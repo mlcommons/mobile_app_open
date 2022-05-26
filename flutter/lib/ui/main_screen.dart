@@ -1,8 +1,7 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' hide Icons;
+import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
@@ -89,7 +88,7 @@ class MyHomePage extends StatelessWidget {
     final stringResources = AppLocalizations.of(context);
 
     return _circleContainerWithContent(
-        context, Icons.waiting, stringResources.waitBenchmarks);
+        context, AppIcons.waiting, stringResources.waitBenchmarks);
   }
 
   Widget _goContainer(BuildContext context) {
@@ -100,6 +99,8 @@ class MyHomePage extends StatelessWidget {
     return CustomPaint(
       painter: MyPaintBottom(),
       child: GoButtonGradient(() async {
+        // TODO (anhappdev) Refactor the code here to avoid duplicated code.
+        // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
         final wrongPathError = await state.validateExternalResourcesDirectory(
             stringResources.incorrectDatasetsPath);
         if (wrongPathError.isNotEmpty) {

@@ -1,0 +1,66 @@
+substitutions:
+  _ARTIFACT_UPLOAD_PATH: ${_ARTIFACT_BUCKET}/${_ARTIFACT_FOLDER}/${COMMIT_SHA}-windows
+  # Compute Engine has different quotas.
+  #   When using Cloudbuild it doesn't seem to be affected by quotas.
+  #   When creating a Compute Engine VM manually, like what windows-builder does, quotas are applied.
+  #   It makes sense to use different options for different Cloudbuild triggers.
+  #   This allows to use more resources simultaneously as different machine types in different regions don't share quotas.
+  _CE_REGION: us-central1
+  _CE_ZONE: us-central1-f
+  _CE_MACHINE_TYPE: n2-standard-4
+
+steps:
+  # We need this step to correctly identify dockerfile tag
+  - id: fetch-repo-history
+    name: gcr.io/cloud-builders/git
+    timeout: 10s
+    entrypoint: bash
+    args:
+      - -xc
+      - |
+        git fetch --unshallow || exit 1
+        mkdir output
+        git log -n 1 --pretty=format:%H -- flutter/windows/docker >output/docker-tag
+  # cloudbuild does not provide an official method to run CI on Windows
+  # but there is a community-provided builder.
+  # The sources are here: https://github.com/GoogleCloudPlatform/cloud-builders-community/tree/master/windows-builder
+  # The windows-builder image was created and uploaded manually
+  - name: gcr.io/$PROJECT_ID/windows-builder
+    id: build-and-test
+    timeout: 5400s # 1.5 hours
+    args:
+      - --region=$_CE_REGION
+      - --zone=$_CE_ZONE
+      - --machineType=$_CE_MACHINE_TYPE
+      - --image=windows-cloud/global/images/windows-server-2019-dc-for-containers-v20220414
+      # When using other disk types image pulling and image building could take up to 3 hours
+      - --diskType=pd-ssd
+      - --workspace-bucket=$_WORKSPACE_TMP_BUCKET
+      - --diskSizeGb=70
+      - --command=powershell.exe
+          -file ./.github/cloudbuild/build.ps1
+          -cacheBucket $_BAZEL_CACHE_BUCKET
+          -credentialsPath $_CREDENTIALS_PATH
+          -artifactUploadPath gs://$_ARTIFACT_UPLOAD_PATH/
+          -dockerImageName $_DOCKER_IMAGE_NAME
+          -dockerTagFile output/docker-tag
+          -releaseArchiveName ${COMMIT_SHA}
+  - id: print-artifact-links
+    name: gcr.io/cloud-builders/gcloud
+    timeout: 10s
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo
+        echo executable archive:
+        echo gs://$_ARTIFACT_UPLOAD_PATH/${COMMIT_SHA}.zip
+        echo https://storage.cloud.google.com/$_ARTIFACT_UPLOAD_PATH/${COMMIT_SHA}.zip
+        echo https://console.cloud.google.com/storage/browser/_details/$_ARTIFACT_UPLOAD_PATH/${COMMIT_SHA}.zip
+        echo
+        DOCKER_TAG=$$(cat output/docker-tag)
+        echo docker image:
+        echo https://gcr.io/mobile-app-build-290400/$_DOCKER_IMAGE_NAME:$$DOCKER_TAG
+        echo
+
+timeout: 7200s # 2 hours
