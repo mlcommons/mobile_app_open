@@ -17,7 +17,7 @@ ifeq (${WITH_SAMSUNG},1)
   $(info WITH_SAMSUNG=1)
   android_samsung_backend_bazel_flag=--//android/java/org/mlperf/inference:with_samsung="1"
 
-  MOBILE_BACK_SAMSUNG_LIB_ROOT=$(shell echo mobile_back_samsung/samsung/lib* | awk '{print $$NF}')
+  MOBILE_BACK_SAMSUNG_LIB_ROOT=$(shell echo mobile_back_samsung/samsung_backend/lib* | awk '{print $$NF}')
   $(info MOBILE_BACK_SAMSUNG_LIB_ROOT=${MOBILE_BACK_SAMSUNG_LIB_ROOT})
 
   ifeq (${MOBILE_BACK_SAMSUNG_LIB_ROOT},)
