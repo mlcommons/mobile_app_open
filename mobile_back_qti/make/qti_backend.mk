@@ -21,20 +21,5 @@ ifeq (${WITH_QTI},1)
   endif
   android_qti_backend_bazel_flag=--//android/java/org/mlperf/inference:with_qti="1"
   backend_qti_lib_copy=cp output/`readlink bazel-bin`/mobile_back_qti/cpp/backend_qti/libqtibackend.so output/binary/libqtibackend.so
-
-  local_snpe_sdk_root=$(shell echo mobile_back_qti/snpe-* | awk '{print $$NF}')
-  $(info detected SNPE SDK: ${local_snpe_sdk_root})
-  backend_qti_android_files= \
-    ${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
-    ${BAZEL_LINKS_PREFIX}bin/android/commonlibs/lib_arm64/libc++_shared.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libSNPE.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libhta.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v2.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v3.so \
-    ${local_snpe_sdk_root}/lib/dsp/libsnpe_dsp_v66_domains_v2_skel.so \
-    ${local_snpe_sdk_root}/lib/dsp/libsnpe_dsp_v68_domains_v3_skel.so
-  backend_qti_android_target= \
-    //mobile_back_qti/cpp/backend_qti:libqtibackend.so \
-    //android/commonlibs:commonlibs
-  backend_qti_filename=libqtibackend
+  backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so
 endif
