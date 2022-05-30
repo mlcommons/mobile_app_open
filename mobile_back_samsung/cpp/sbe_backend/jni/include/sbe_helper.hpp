@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright 2020-2022 Samsung Electronics Co. LTD  All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,29 +12,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#pragma once
+#ifndef SBE_HELPER_H_
+#define SBE_HELPER_H_
 
-#include <EGL/egl.h>
-#include <GLES/gl.h>
+/**
+ * @file sbe_helper.hpp
+ * @brief helper class of samsung backend core for samsung exynos
+ * @date 2022-01-04
+ * @author soobong Huh (soobong.huh@samsung.com)
+ */
+
+#include <dlfcn.h>
 #include <stdint.h>
+#include <unistd.h>
 
-#define SDM865 356
-#define SDM888 415
-#define SDM778 475
-#define SD8G1 457
+#include <string>
 
-class CpuCtrl {
+#include "sbe_config.hpp"
+#include "sbe_utils.hpp"
+
+namespace sbe {
+class core_ctrl {
  public:
-  static void startLoad();
-  static void startLoad(uint32_t load_off_time, uint32_t load_on_time);
-  static void stopLoad();
-  static void lowLatency();
-  static void normalLatency();
-  static void highLatency();
-  static uint32_t getSocId();
-  static bool isSnapDragon(const char *manufacturer);
-
- private:
-  CpuCtrl() = delete;
-  ~CpuCtrl() = delete;
+  static int support_sbe(const char *, const char *);
+  static const char *get_benchmark_config(int core_id);
+  static int get_core_id();
 };
+}  // namespace sbe
+
+#endif

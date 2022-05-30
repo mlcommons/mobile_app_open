@@ -32,6 +32,7 @@ limitations under the License.
 class QTIBackendHelper {
  private:
   zdl::DlSystem::RuntimeList inputRuntimeList;
+  zdl::DlSystem::RuntimeList dummyInputRuntimeList;
   zdl::PSNPE::RuntimeConfigList runtimeConfigsList;
 
   inline int get_num_inits();
@@ -82,6 +83,7 @@ class QTIBackendHelper {
   void map_outputs();
   void get_data_formats();
   void set_runtime_config();
+  std::string get_snpe_version();
 };
 
 #endif

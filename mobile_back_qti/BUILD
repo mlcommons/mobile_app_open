@@ -28,8 +28,8 @@ config_setting(
 cc_library(
     name = "snpe",
     srcs = [
-        SNPE_VERSION + "/lib/aarch64-android-clang6.0/libSNPE.so",
-        SNPE_VERSION + "/lib/aarch64-android-clang6.0/libhta.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSNPE.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libhta.so",
     ],
     hdrs = glob([
         SNPE_VERSION + "/include/zdl/**/*.hpp",
@@ -42,11 +42,17 @@ cc_library(
 cc_library(
     name = "snpe_deps",
     srcs = [
-        SNPE_VERSION + "/lib/aarch64-android-clang6.0/libhta.so",
-        SNPE_VERSION + "/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v2.so",
-        SNPE_VERSION + "/lib/aarch64-android-clang6.0/libsnpe_dsp_domains_v3.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libhta.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libsnpe_dsp_domains_v2.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libsnpe_dsp_domains_v3.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSnpeHtpV69Stub.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSnpeHtpV68Stub.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSNPE.so",
+        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSnpeHtpPrepare.so",
         SNPE_VERSION + "/lib/dsp/libsnpe_dsp_v66_domains_v2_skel.so",
         SNPE_VERSION + "/lib/dsp/libsnpe_dsp_v68_domains_v3_skel.so",
+        SNPE_VERSION + "/lib/dsp/libSnpeHtpV69Skel.so",
+        SNPE_VERSION + "/lib/dsp/libSnpeHtpV68Skel.so",
     ],
 )
 

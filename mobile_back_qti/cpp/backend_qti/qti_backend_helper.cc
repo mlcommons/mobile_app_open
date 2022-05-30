@@ -123,17 +123,16 @@ static zdl::DlSystem::Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
   if (isDSP) {
     if (isSignedStatus == DEFAULT) {
       if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-              runtime, zdl::DlSystem::RuntimeCheckOption_t::NORMAL_CHECK)) {
-        isSignedStatus = SIGNED_PD;
+              runtime, zdl::DlSystem::RuntimeCheckOption_t::UNSIGNEDPD_CHECK)) {
+        isSignedStatus = UNSIGNED_PD;
         LOG(INFO) << "runtime " << delegate
-                  << " is available on this platform with SignedPD";
+                  << " is available on this platform with UnsignedPD";
       } else {
         if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-                runtime,
-                zdl::DlSystem::RuntimeCheckOption_t::UNSIGNEDPD_CHECK)) {
-          isSignedStatus = UNSIGNED_PD;
+                runtime, zdl::DlSystem::RuntimeCheckOption_t::NORMAL_CHECK)) {
+          isSignedStatus = SIGNED_PD;
           LOG(INFO) << "runtime " << delegate
-                    << " is available on this platform with UnsignedPD";
+                    << " is available on this platform with SignedPD";
         } else {
           // This platform doesn't support DSP runtime
           LOG(FATAL) << "runtime " << delegate
@@ -141,6 +140,7 @@ static zdl::DlSystem::Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
         }
       }
     }
+
     return runtime;
   } else {
     if (!zdl::SNPE::SNPEFactory::isRuntimeAvailable(runtime)) {
@@ -182,7 +182,11 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
         ResolveOutputLayerNames(snpeOutputLayers_);
 
     zdl::SNPE::SNPEBuilder snpeBuilder(container.get());
-    snpeBuilder.setOutputLayers(outputLayers);
+    dummyInputRuntimeList.add(zdl::DlSystem::Runtime_t::CPU);
+    snpeBuilder.setPerformanceProfile(perfProfile_)
+        .setExecutionPriorityHint(zdl::DlSystem::ExecutionPriorityHint_t::HIGH)
+        .setRuntimeProcessorOrder(dummyInputRuntimeList)
+        .setOutputLayers(outputLayers);
 
     if (outputLayers.size() > 0) {
       buildConfig.outputBufferNames = outputLayers;
@@ -195,7 +199,8 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
     }
 
     // These features are not for SDM865, so turning them off.
-    if (useDspFeatures && (soc_id == SDM888 || soc_id == SDM778)) {
+    if (useDspFeatures &&
+        (soc_id == SDM888 || soc_id == SDM778 || soc_id == SD8G1)) {
       // use Zero copy for input and output buffers.
       // Requires rpc registered ion buffers.
       if (useIonBuffers_) {
@@ -222,7 +227,10 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
   }
 
   if (!psnpe_buildStatus) {
-    LOG(FATAL) << "Error in init of the model ";
+    LOG(FATAL) << "Error in init of psnpe_ ";
+  }
+  if (!snpe_) {
+    LOG(FATAL) << "Error in init of snpe_ " << snpe_;
   }
 }
 
@@ -258,7 +266,8 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
     }
 
     // These features are not for SDM865, so turning them off.
-    if (useDspFeatures && (soc_id == SDM888 || soc_id == SDM778)) {
+    if (useDspFeatures &&
+        (soc_id == SDM888 || soc_id == SDM778 || soc_id == SD8G1)) {
       // use Zero copy for input and output buffers.
       // Requires rpc registered ion buffers.
       if (useIonBuffers_) {
@@ -323,7 +332,15 @@ void QTIBackendHelper::get_accelerator_instances(int &num_dsp, int &num_aip,
       }
       useDspFeatures = true;
       num_dsp = 2;
-      num_gpu = 4;
+      num_gpu = 0;
+    } else if (soc_id == SD8G1) {
+      if (delegate != "snpe_dsp" && delegate != "psnpe_dsp") {
+        LOG(FATAL) << "Error: Unsupported delegate for offline mode";
+      }
+      useDspFeatures = true;
+      num_dsp = 2;
+      num_aip = 0;
+      num_gpu = 0;
     }
   } else {
     if (delegate == "snpe_dsp" || delegate == "psnpe_dsp") {
@@ -550,4 +567,10 @@ void QTIBackendHelper::set_runtime_config() {
     runtimeConfigsList.push_back(runtimeConfig);
     inputRuntimeList.add(runtime);
   }
+}
+
+std::string QTIBackendHelper::get_snpe_version() {
+  zdl::DlSystem::Version_t version =
+      zdl::SNPE::SNPEFactory::getLibraryVersion();
+  return version.Build;
 }

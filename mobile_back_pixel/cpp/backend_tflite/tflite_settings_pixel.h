@@ -136,6 +136,15 @@ benchmark_setting {
   md5Checksum: "7da3ac5017f6527eed5c85295f7695f4"
 }
 
+benchmark_setting {
+  benchmark_id: "IS_uint8_mosaic"
+  accelerator: "nnapi"
+  accelerator_desc: "NNAPI"
+  configuration: "TFLite"
+  src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+  md5Checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+}
+
 )SETTINGS";
 
 #endif
