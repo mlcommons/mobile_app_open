@@ -26,7 +26,7 @@ namespace mobile {
 
 // Implements the IMAGEPAIRS dataset for image segmentation.
 class IMAGEPAIRS : public Dataset {
-public:
+ public:
   // IMAGEPAIRS assumes that there is a single input resevered for the image
   // data and single output which contains the probabilities of every classes.
   // The order of images under image_dir should be the same as the original
@@ -45,8 +45,8 @@ public:
   void LoadSamplesToRam(const std::vector<QuerySampleIndex> &samples) override;
 
   // Unloads the requested query samples from memory.
-  void
-  UnloadSamplesFromRam(const std::vector<QuerySampleIndex> &samples) override;
+  void UnloadSamplesFromRam(
+      const std::vector<QuerySampleIndex> &samples) override;
 
   // GetData returns the data of a specific input.
   std::vector<void *> GetData(int sample_idx) override {
@@ -59,9 +59,8 @@ public:
   }
 
   // ProcessOutput processes the output data before sending to mlperf.
-  std::vector<uint8_t>
-  ProcessOutput(const int sample_idx,
-                const std::vector<void *> &outputs) override;
+  std::vector<uint8_t> ProcessOutput(
+      const int sample_idx, const std::vector<void *> &outputs) override;
 
   // ComputeAccuracy Calculate the accuracy if the processed outputs.
   float ComputeAccuracy() override;
@@ -69,7 +68,7 @@ public:
   // ComputeAccuracyString returns a string representing the accuracy.
   std::string ComputeAccuracyString() override;
 
-private:
+ private:
   const std::string name_ = "IMAGEPAIRS";
   // List of the fullpath of images.
   std::vector<std::string> image_list_;
@@ -99,6 +98,6 @@ private:
   float psnr_;
 };
 
-} // namespace mobile
-} // namespace mlperf
-#endif // MLPERF_DATASETS_IMAGEPAIRS_H_
+}  // namespace mobile
+}  // namespace mlperf
+#endif  // MLPERF_DATASETS_IMAGEPAIRS_H_

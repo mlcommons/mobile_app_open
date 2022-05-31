@@ -32,26 +32,29 @@ namespace mobile {
 namespace {
 inline TfLiteType DataType2TfType(DataType::Type type) {
   switch (type) {
-  case DataType::Float32:
-    return kTfLiteFloat32;
-  case DataType::Uint8:
-    return kTfLiteUInt8;
-  case DataType::Int8:
-    return kTfLiteInt8;
-  case DataType::Float16:
-    return kTfLiteFloat16;
-  default:
-    break;
+    case DataType::Float32:
+      return kTfLiteFloat32;
+    case DataType::Uint8:
+      return kTfLiteUInt8;
+    case DataType::Int8:
+      return kTfLiteInt8;
+    case DataType::Float16:
+      return kTfLiteFloat16;
+    default:
+      break;
   }
   return kTfLiteNoType;
 }
-} // namespace
+}  // namespace
 
 IMAGEPAIRS::IMAGEPAIRS(Backend *backend, const std::string &image_dir,
                        const std::string &ground_truth_dir, int num_channels,
                        int scale, int image_width, int image_height)
-    : Dataset(backend), num_channels_(num_channels), scale_(scale),
-      image_width_(image_width), image_height_(image_height) {
+    : Dataset(backend),
+      num_channels_(num_channels),
+      scale_(scale),
+      image_width_(image_width),
+      image_height_(image_height) {
   if (input_format_.size() != 1 || output_format_.size() != 1) {
     LOG(FATAL) << "IMAGEPAIRS model only supports 1 input and 1 output";
     return;
@@ -133,9 +136,8 @@ void IMAGEPAIRS::UnloadSamplesFromRam(
   }
 }
 
-std::vector<uint8_t>
-IMAGEPAIRS::ProcessOutput(const int sample_idx,
-                          const std::vector<void *> &outputs) {
+std::vector<uint8_t> IMAGEPAIRS::ProcessOutput(
+    const int sample_idx, const std::vector<void *> &outputs) {
   if (ground_truth_list_.empty()) {
     return std::vector<uint8_t>();
   }
@@ -164,7 +166,7 @@ IMAGEPAIRS::ProcessOutput(const int sample_idx,
                             data_uint8->data());
 
     // LOG(INFO) << "GT size : " << data_uint8->size();
-    auto ground_truth_vector = data_uint8->data(); // auto is GOD
+    auto ground_truth_vector = data_uint8->data();  // auto is GOD
 
     // old image reading
     // std::ifstream stream(filename, std::ios::in | std::ios::binary);
@@ -235,5 +237,5 @@ std::string IMAGEPAIRS::ComputeAccuracyString() {
   return stream.str();
 }
 
-} // namespace mobile
-} // namespace mlperf
+}  // namespace mobile
+}  // namespace mlperf
