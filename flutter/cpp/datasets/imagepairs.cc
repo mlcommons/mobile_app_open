@@ -136,7 +136,6 @@ void IMAGEPAIRS::UnloadSamplesFromRam(
 std::vector<uint8_t>
 IMAGEPAIRS::ProcessOutput(const int sample_idx,
                           const std::vector<void *> &outputs) {
-
   if (ground_truth_list_.empty()) {
     return std::vector<uint8_t>();
   }
