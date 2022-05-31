@@ -94,6 +94,7 @@ cc_library(
         ],
     }),
     copts = tflite_copts() + snpe_copts,
+    local_defines = ["SNPE_VERSION_STRING=" + SNPE_VERSION],
     deps = [
         "//flutter/cpp/c:headers",
         ":qti_allocator",

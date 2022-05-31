@@ -13,7 +13,7 @@ format/bazel:
 
 .PHONY: format/clang
 format/clang:
-	git ls-files -z | grep --null-data "\.h$$\|\.cc$$\|\.cpp$$" | xargs --null --no-run-if-empty clang-format -i -style=google
+	git ls-files -z | grep --null-data "\.h$$\|\.hpp$$\|\.cc$$\|\.cpp$$" | xargs --null --no-run-if-empty clang-format -i -style=google
 
 .PHONY: format/java
 format/java:
@@ -21,9 +21,9 @@ format/java:
 
 .PHONY: format/dart
 format/dart:
-	cd flutter && ${_start_args} dart run import_sorter:main
-	cd flutter_common && ${_start_args} dart run import_sorter:main
-	cd website && ${_start_args} dart run import_sorter:main
+	cd flutter && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
+	cd flutter_common && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
+	cd website && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
 	dart format flutter flutter_common website
 
 .PHONY: format/ts

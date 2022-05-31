@@ -62,15 +62,7 @@ cc_library(
 cc_library(
     name = "neuron_delegate",
     srcs = select({
-        "@org_tensorflow//tensorflow:android": [
-            "@neuron_delegate//neuron/java:libtensorflowlite_neuron_jni.so",
-        ],
-    }),
-    hdrs = select({
-        "@org_tensorflow//tensorflow:android": [
-            "@neuron_delegate//neuron:APUWareUtilsApi.h",
-            "@neuron_delegate//neuron:neuron_delegate.h",
-        ],
+        "@org_tensorflow//tensorflow:android_arm64": ["neuron/libs/arm64-v8a/libtensorflowlite_neuron_jni.so"],
     }),
 )
 
@@ -78,6 +70,8 @@ cc_library(
     name = "tflite_neuron_c",
     srcs = ["tflite_c.cc"],
     hdrs = [
+        "neuron/APUWareUtilsApi.h",
+        "neuron/neuron_delegate.h",
         "neuron/tflite_settings_mtk.h",
         "thread_pool.h",
         "utils.h",
@@ -129,7 +123,7 @@ tflite_jni_binary(
 
 aar_import(
     name = "tflite_neuron_aar",
-    aar = "@neuron_delegate//neuron/java:tensorflow-lite-neuron",
+    aar = "neuron/tensorflow-lite-neuron.aar",
 )
 
 cc_binary(

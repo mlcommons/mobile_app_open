@@ -53,10 +53,17 @@ class BenchmarkInfo {
             detailsTitle: stringResources.odInfo,
             detailsContent: stringResources.odInfoDescription);
       case ('IS'):
-        return BenchmarkLocalizationInfo(
-            name: stringResources.imageSegmentation,
-            detailsTitle: stringResources.isInfo,
-            detailsContent: stringResources.isInfoDescription);
+        if (modelConfig.id.contains('mosaic')) {
+          return BenchmarkLocalizationInfo(
+              name: stringResources.imageSegmentation,
+              detailsTitle: stringResources.isInfo,
+              detailsContent: stringResources.isMosaicInfoDescription);
+        } else {
+          return BenchmarkLocalizationInfo(
+              name: stringResources.imageSegmentation,
+              detailsTitle: stringResources.isInfo,
+              detailsContent: stringResources.isDeepLabInfoDescription);
+        }
       case ('LU'):
         return BenchmarkLocalizationInfo(
             name: stringResources.languageProcessing,

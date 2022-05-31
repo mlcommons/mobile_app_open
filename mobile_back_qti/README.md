@@ -11,16 +11,17 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 
 ## Requirements
 
-* [SNPE SDK](https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk)
-  * Version 1.54.2
+<!-- markdown-link-check-disable-next-line -->
+* [SNPE SDK](https://createpoint.qti.qualcomm.com/tools/#suite/9186/64383)
+  * Version 1.59.1 (Needs special access to the above link. POC: wchou@qti.qualcomm.com)
 * Linux machine capable of running Ubuntu 18.04 docker images
 
 After downloading and unzipping the SNPE SDK, make sure to set SNPE_SDK to its location:
 
 ```shell
 cd /opt
-unzip snpe-1.54.2.2899.zip
-export SNPE_SDK=/opt/snpe-1.54.2.2899
+unzip snpe-1.59.1.3230.zip
+export SNPE_SDK=/opt/snpe-1.59.1.3230
 ```
 
 ### Optional
@@ -39,7 +40,7 @@ export GITHUB_TOKEN=<your-personal-access-token>
 cd DLC/ && make
 ```
 
-It will take a couple hours on an 8-core Xeon workstation to generate the DLC files.
+It will take 5-6 hours on an 8-core Xeon workstation to generate the DLC files.
 
 ## Building the MLPerf app with the QTI backend
 
@@ -80,17 +81,17 @@ backend specific data for each task to be run. This backend assumes a few things
 the settings:
 
 1. All the models use "SNPE" for the configuration name and use "snpe_aip", "snpe_dsp",
-   "psnpe_aip", or "psnpe_dsp" for the accelerator value when using SNPE.
+   "psnpe_aip", or "psnpe_dsp" for the accelerator value when using SNPE / PSNPE.
 
 ## FAQ
 
 ### Do I need to build the DLC files?
 
-No, the information to build the DLC files is only to show how they are created.
+No, the information to build the DLC files is only to show how they are created. But if you want, you may.
 
 ### What devices does this backend support?
 
-This backend only supports SDM865/SDM865 Pro ,SDM888/SDM888 Pro and SDM778G devices. Other Snapdragon
+This backend only supports SDM865/SDM865 Pro ,SDM888/SDM888 Pro, SDM778G, SD8G1 devices. Other Snapdragon
 based devices will not run the MLPerf app. Future updates of the app will provide
 additional device support.
 

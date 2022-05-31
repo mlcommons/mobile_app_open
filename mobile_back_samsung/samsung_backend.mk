@@ -24,27 +24,14 @@ ifeq (${WITH_SAMSUNG},1)
   backend_samsung_android_files= \
     ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libsamsungbackend.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_model.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_profiler.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_rt.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_ud_gpu.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_ud_cpu.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_ud_npu.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_nn.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_osal.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_xtool.so \
+    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libenn_public_api_cpp.so \
+    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libsbe2200_core.so \
+    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libsbe1200_core.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libc++.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_nn_on_system.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libutils.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libcutils.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libvndksupport.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libbase.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libcgrouprc.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libhidlbase.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libgpu_boost_vendor.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libprocessgroup.so \
-    ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libvendor_samsung_slsi_hardware_gpu_boost.so
   # main binaries for Samsung backend are prebuilt
-  backend_samsung_android_target=//flutter/android/commonlibs:commonlibs
+  backend_samsung_android_target= \
+    //mobile_back_samsung/samsung/lib:libsamsungbackend.so \
+    //flutter/android/commonlibs:commonlibs
   backend_samsung_filename=libsamsungbackend
 endif
