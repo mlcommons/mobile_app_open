@@ -5,7 +5,8 @@ class RunSettings {
   final String backend_lib_path;
   final pb.SettingList backend_settings;
   final String backend_native_lib_path;
-  final int dataset_type; // 0: Imagenet; 1: Coco; 2: Squad; 3: Ade20k, 4: ImagePairs
+  final int
+      dataset_type; // 0: Imagenet; 1: Coco; 2: Squad; 3: Ade20k, 4: ImagePairs
   final String dataset_data_path;
   final String dataset_groundtruth_path;
   final int dataset_offset;
