@@ -32,29 +32,26 @@ namespace mobile {
 namespace {
 inline TfLiteType DataType2TfType(DataType::Type type) {
   switch (type) {
-    case DataType::Float32:
-      return kTfLiteFloat32;
-    case DataType::Uint8:
-      return kTfLiteUInt8;
-    case DataType::Int8:
-      return kTfLiteInt8;
-    case DataType::Float16:
-      return kTfLiteFloat16;
-    default:
-      break;
+  case DataType::Float32:
+    return kTfLiteFloat32;
+  case DataType::Uint8:
+    return kTfLiteUInt8;
+  case DataType::Int8:
+    return kTfLiteInt8;
+  case DataType::Float16:
+    return kTfLiteFloat16;
+  default:
+    break;
   }
   return kTfLiteNoType;
 }
-}  // namespace
+} // namespace
 
 IMAGEPAIRS::IMAGEPAIRS(Backend *backend, const std::string &image_dir,
-               const std::string &ground_truth_dir, int num_channels, int scale,
-               int image_width, int image_height)
-    : Dataset(backend),
-      num_channels_(num_channels),
-      scale_(scale),
-      image_width_(image_width),
-      image_height_(image_height) {
+                       const std::string &ground_truth_dir, int num_channels,
+                       int scale, int image_width, int image_height)
+    : Dataset(backend), num_channels_(num_channels), scale_(scale),
+      image_width_(image_width), image_height_(image_height) {
   if (input_format_.size() != 1 || output_format_.size() != 1) {
     LOG(FATAL) << "IMAGEPAIRS model only supports 1 input and 1 output";
     return;
@@ -91,10 +88,11 @@ IMAGEPAIRS::IMAGEPAIRS(Backend *backend, const std::string &image_dir,
   }
 
   counted_ = std::vector<bool>(image_list_.size(), false);
-  psnr_ =0;
+  psnr_ = 0;
 }
 
-void IMAGEPAIRS::LoadSamplesToRam(const std::vector<QuerySampleIndex> &samples) {
+void IMAGEPAIRS::LoadSamplesToRam(
+    const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
     // Preprocessing.
     if (sample_idx >= image_list_.size()) {
@@ -121,7 +119,6 @@ void IMAGEPAIRS::LoadSamplesToRam(const std::vector<QuerySampleIndex> &samples) 
                             data_uint8->data());
 
     samples_.at(sample_idx).push_back(data_uint8);
-
   }
 }
 
@@ -136,8 +133,9 @@ void IMAGEPAIRS::UnloadSamplesFromRam(
   }
 }
 
-std::vector<uint8_t> IMAGEPAIRS::ProcessOutput(const int sample_idx,
-                                           const std::vector<void *> &outputs) {
+std::vector<uint8_t>
+IMAGEPAIRS::ProcessOutput(const int sample_idx,
+                          const std::vector<void *> &outputs) {
 
   if (ground_truth_list_.empty()) {
     return std::vector<uint8_t>();
@@ -152,7 +150,7 @@ std::vector<uint8_t> IMAGEPAIRS::ProcessOutput(const int sample_idx,
     }
 
     // Move data out of preprocessing_stage_ so it can be reused.
-    int total_byte = output_format_[0].size * GetByte(output_format_[0]); 
+    int total_byte = output_format_[0].size * GetByte(output_format_[0]);
 
     void *data_void = preprocessing_stage_->GetPreprocessedImageData();
     std::vector<uint8_t, BackendAllocator<uint8_t>> *data_uint8 =
@@ -166,17 +164,16 @@ std::vector<uint8_t> IMAGEPAIRS::ProcessOutput(const int sample_idx,
     backend_->ConvertInputs(total_byte, image_width_, image_height_,
                             data_uint8->data());
 
-    // LOG(INFO) << "GT size : " << data_uint8->size(); 
+    // LOG(INFO) << "GT size : " << data_uint8->size();
     auto ground_truth_vector = data_uint8->data(); // auto is GOD
 
-        
     // old image reading
     // std::ifstream stream(filename, std::ios::in | std::ios::binary);
     // // LOG(INFO) << "stream : " << stream;
     // std::vector<uint8_t> ground_truth_vector(
     //     (std::istreambuf_iterator<char>(stream)),
     //     std::istreambuf_iterator<char>());
-    
+
     float *outputFloat = reinterpret_cast<float *>(outputs[0]);
     int32_t *outputInt32 = reinterpret_cast<int32_t *>(outputs[0]);
     int8_t *outputInt8 = reinterpret_cast<int8_t *>(outputs[0]);
@@ -193,9 +190,10 @@ std::vector<uint8_t> IMAGEPAIRS::ProcessOutput(const int sample_idx,
     // LOG(INFO) << "Output is .. Uint8? : " << isOutputUint8;
 
     // psnr calculating code
-    int n_pixels = image_width_ * image_height_ * num_channels_ * scale_ * scale_;
+    int n_pixels =
+        image_width_ * image_height_ * num_channels_ * scale_ * scale_;
     float mse = 0;
-    for (int i=0; i< n_pixels; i++){
+    for (int i = 0; i < n_pixels; i++) {
       uint8_t p;
       if (isOutputFloat) {
         p = (uint8_t)(0x000000ff & (int32_t)outputFloat[i]);
@@ -204,7 +202,8 @@ std::vector<uint8_t> IMAGEPAIRS::ProcessOutput(const int sample_idx,
       } else {
         p = (uint8_t)(0x000000ff & outputInt8[i]);
       }
-      mse += (float(ground_truth_vector[i]) - float(p)) * (float(ground_truth_vector[i]) - float(p));
+      mse += (float(ground_truth_vector[i]) - float(p)) *
+             (float(ground_truth_vector[i]) - float(p));
     }
     mse = mse / n_pixels;
     float sample_psnr_ = -10 * log10(mse / (255.0 * 255.0));
@@ -223,7 +222,7 @@ float IMAGEPAIRS::ComputeAccuracy() {
     return 0.0;
   }
 
-  return psnr_ / (float) ground_truth_list_.size();
+  return psnr_ / (float)ground_truth_list_.size();
 }
 
 std::string IMAGEPAIRS::ComputeAccuracyString() {
@@ -237,5 +236,5 @@ std::string IMAGEPAIRS::ComputeAccuracyString() {
   return stream.str();
 }
 
-}  // namespace mobile
-}  // namespace mlperf
+} // namespace mobile
+} // namespace mlperf

@@ -25,8 +25,8 @@ limitations under the License.
 #include "flutter/cpp/datasets/ade20k.h"
 #include "flutter/cpp/datasets/coco.h"
 #include "flutter/cpp/datasets/imagenet.h"
-#include "flutter/cpp/datasets/squad.h"
 #include "flutter/cpp/datasets/imagepairs.h"
+#include "flutter/cpp/datasets/squad.h"
 #include "flutter/cpp/mlperf_driver.h"
 #include "flutter/cpp/proto/mlperf_task.pb.h"
 #include "flutter/cpp/utils.h"
@@ -71,9 +71,9 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
   }
 }
 
-}  // namespace
+} // namespace
 
-int Main(int argc, char* argv[]) {
+int Main(int argc, char *argv[]) {
   using tflite::Flag;
   using tflite::Flags;
   std::string command_line = argv[0];
@@ -85,10 +85,11 @@ int Main(int argc, char* argv[]) {
       Flag::CreateFlag("backend", &backend_name,
                        "Backend. Only TFLite is supported at the moment.",
                        Flag::kPositional),
-      Flag::CreateFlag("dataset", &dataset_name,
-                       "Dataset. One of ade20k, imagenet, coco, squad, or imagepairs",
-                       Flag::kPositional)};
-  Flags::Parse(&argc, const_cast<const char**>(argv), flag_list);
+      Flag::CreateFlag(
+          "dataset", &dataset_name,
+          "Dataset. One of ade20k, imagenet, coco, squad, or imagepairs",
+          Flag::kPositional)};
+  Flags::Parse(&argc, const_cast<const char **>(argv), flag_list);
   backend_type = Str2BackendType(backend_name);
   dataset_type = Str2DatasetType(dataset_name);
   if (backend_type == BackendType::NONE) {
@@ -124,224 +125,222 @@ int Main(int argc, char* argv[]) {
 
   int batch_size = 1;
   switch (backend_type) {
-    case BackendType::EXTERNAL: {
-      LOG(INFO) << "Using External backend";
-      std::string model_file_path;
-      std::string lib_path;
-      std::string native_lib_path;
-      flag_list.insert(
-          flag_list.end(),
-          {Flag::CreateFlag("model_file", &model_file_path,
-                            "Path to model file.", Flag::kRequired),
-           Flag::CreateFlag("lib_path", &lib_path,
-                            "Path to the backend library .so file."),
-           Flag::CreateFlag("native_lib_path", &native_lib_path,
-                            "Path to the additioal .so files for the backend."),
-           Flag::CreateFlag("scenario", &scenario,
-                            "Scenario to run the benchmark.")});
+  case BackendType::EXTERNAL: {
+    LOG(INFO) << "Using External backend";
+    std::string model_file_path;
+    std::string lib_path;
+    std::string native_lib_path;
+    flag_list.insert(
+        flag_list.end(),
+        {Flag::CreateFlag("model_file", &model_file_path, "Path to model file.",
+                          Flag::kRequired),
+         Flag::CreateFlag("lib_path", &lib_path,
+                          "Path to the backend library .so file."),
+         Flag::CreateFlag("native_lib_path", &native_lib_path,
+                          "Path to the additioal .so files for the backend."),
+         Flag::CreateFlag("scenario", &scenario,
+                          "Scenario to run the benchmark.")});
 
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), flag_list)) {
-        const char* pbdata;
-        std::string msg = mlperf::mobile::BackendFunctions::isSupported(
-            lib_path, "", model_file_path, &pbdata);
-        std::string backend_setting_string(pbdata, strlen(pbdata));
-        std::string benchmark_id;
-        BackendSetting backend_setting;
+    if (Flags::Parse(&argc, const_cast<const char **>(argv), flag_list)) {
+      const char *pbdata;
+      std::string msg = mlperf::mobile::BackendFunctions::isSupported(
+          lib_path, "", model_file_path, &pbdata);
+      std::string backend_setting_string(pbdata, strlen(pbdata));
+      std::string benchmark_id;
+      BackendSetting backend_setting;
 
-        google::protobuf::TextFormat::ParseFromString(pbdata, &backend_setting);
+      google::protobuf::TextFormat::ParseFromString(pbdata, &backend_setting);
 
-        switch (dataset_type) {
-          case DatasetConfig::IMAGENET: {
-            if (scenario == "Offline")
-              benchmark_id = "IC_tpu_uint8_offline";
-            else
-              benchmark_id = "IC_tpu_uint8";
-          }; break;
-          case DatasetConfig::COCO:
-            benchmark_id = "OD_uint8";
-            break;
-          case DatasetConfig::SQUAD:
-            benchmark_id = "LU_float32";
-            break;
-          case DatasetConfig::ADE20K:
-            benchmark_id = "IS_uint8";
-            break;
-          // Need to check this
-          case DatasetConfig::IMAGEPAIRS:
-            benchmark_id = "IS_uint8";
-            break;
-          case DatasetConfig::NONE:
-          default:
-            LOG(INFO) << "how come";
-            break;
-        }
-
-        SettingList setting_list =
-            createSettingList(backend_setting, benchmark_id);
-
-        // If batch size is not specified the default is 0, so set to 1
-        batch_size = setting_list.benchmark_setting().batch_size() == 0
-                         ? 1
-                         : setting_list.benchmark_setting().batch_size();
-
-        ExternalBackend* external_backend = new ExternalBackend(
-            model_file_path, lib_path, setting_list, native_lib_path);
-        backend.reset(external_backend);
+      switch (dataset_type) {
+      case DatasetConfig::IMAGENET: {
+        if (scenario == "Offline")
+          benchmark_id = "IC_tpu_uint8_offline";
+        else
+          benchmark_id = "IC_tpu_uint8";
+      }; break;
+      case DatasetConfig::COCO:
+        benchmark_id = "OD_uint8";
+        break;
+      case DatasetConfig::SQUAD:
+        benchmark_id = "LU_float32";
+        break;
+      case DatasetConfig::ADE20K:
+        benchmark_id = "IS_uint8";
+        break;
+      // Need to check this
+      case DatasetConfig::IMAGEPAIRS:
+        benchmark_id = "IS_uint8";
+        break;
+      case DatasetConfig::NONE:
+      default:
+        LOG(INFO) << "how come";
+        break;
       }
-    } break;
-    default:
-      break;
+
+      SettingList setting_list =
+          createSettingList(backend_setting, benchmark_id);
+
+      // If batch size is not specified the default is 0, so set to 1
+      batch_size = setting_list.benchmark_setting().batch_size() == 0
+                       ? 1
+                       : setting_list.benchmark_setting().batch_size();
+
+      ExternalBackend *external_backend = new ExternalBackend(
+          model_file_path, lib_path, setting_list, native_lib_path);
+      backend.reset(external_backend);
+    }
+  } break;
+  default:
+    break;
   }
 
   // Command Line Flags for dataset.
   switch (dataset_type) {
-    case DatasetConfig::IMAGENET: {
-      LOG(INFO) << "Using Imagenet dataset";
-      std::string images_directory, groundtruth_file;
-      int offset = 1, image_width = 224, image_height = 224;
-      std::vector<Flag> dataset_flags{
-          Flag::CreateFlag("images_directory", &images_directory,
-                           "Path to ground truth images.", Flag::kRequired),
-          Flag::CreateFlag("offset", &offset,
-                           "The offset of the first meaningful class in the "
-                           "classification model.",
-                           Flag::kRequired),
-          Flag::CreateFlag("groundtruth_file", &groundtruth_file,
-                           "Path to the imagenet ground truth file.",
-                           Flag::kRequired),
-          Flag::CreateFlag("image_width", &image_width,
-                           "The width of the processed image."),
-          Flag::CreateFlag("image_height", &image_height,
-                           "The height of the processed image."),
-          Flag::CreateFlag("scenario", &scenario,
-                           "Scenario to run the benchmark."),
-          Flag::CreateFlag("batch_size", &batch_size, "Batch size."),
+  case DatasetConfig::IMAGENET: {
+    LOG(INFO) << "Using Imagenet dataset";
+    std::string images_directory, groundtruth_file;
+    int offset = 1, image_width = 224, image_height = 224;
+    std::vector<Flag> dataset_flags{
+        Flag::CreateFlag("images_directory", &images_directory,
+                         "Path to ground truth images.", Flag::kRequired),
+        Flag::CreateFlag("offset", &offset,
+                         "The offset of the first meaningful class in the "
+                         "classification model.",
+                         Flag::kRequired),
+        Flag::CreateFlag("groundtruth_file", &groundtruth_file,
+                         "Path to the imagenet ground truth file.",
+                         Flag::kRequired),
+        Flag::CreateFlag("image_width", &image_width,
+                         "The width of the processed image."),
+        Flag::CreateFlag("image_height", &image_height,
+                         "The height of the processed image."),
+        Flag::CreateFlag("scenario", &scenario,
+                         "Scenario to run the benchmark."),
+        Flag::CreateFlag("batch_size", &batch_size, "Batch size."),
 
-      };
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
-          backend) {
-        dataset.reset(new Imagenet(backend.get(), images_directory,
-                                   groundtruth_file, offset, image_width,
-                                   image_height));
-      }
-      // Adds to flag_list for showing help.
-      flag_list.insert(flag_list.end(), dataset_flags.begin(),
-                       dataset_flags.end());
-    } break;
-    case DatasetConfig::COCO: {
-      LOG(INFO) << "Using Coco dataset";
-      std::string images_directory, groundtruth_file;
-      int offset = 1, num_classes = 91, image_width = 320, image_height = 320;
-      std::vector<Flag> dataset_flags{
-          Flag::CreateFlag("images_directory", &images_directory,
-                           "Path to ground truth images.", Flag::kRequired),
-          Flag::CreateFlag("offset", &offset,
-                           "The offset of the first meaningful class in the "
-                           "classification model.",
-                           Flag::kRequired),
-          Flag::CreateFlag("num_classes", &num_classes,
-                           "The number of classes in the model outputs.",
-                           Flag::kRequired),
-          Flag::CreateFlag("groundtruth_file", &groundtruth_file,
-                           "Path to the imagenet ground truth file.",
-                           Flag::kRequired),
-          Flag::CreateFlag("image_width", &image_width,
-                           "The width of the processed image."),
-          Flag::CreateFlag("image_height", &image_height,
-                           "The height of the processed image.")};
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
-          backend) {
-        dataset.reset(new Coco(backend.get(), images_directory,
-                               groundtruth_file, offset, num_classes,
-                               image_width, image_height));
-      }
-      // Adds to flag_list for showing help.
-      flag_list.insert(flag_list.end(), dataset_flags.begin(),
-                       dataset_flags.end());
-    } break;
-    case DatasetConfig::SQUAD: {
-      LOG(INFO) << "Using SQuAD 1.1 dataset for MobileBert.";
-      std::string input_tfrecord, gt_tfrecord;
-      std::vector<Flag> dataset_flags{
-          Flag::CreateFlag(
-              "input_file", &input_tfrecord,
-              "Path to the tfrecord file containing inputs for the model.",
-              Flag::kRequired),
-          Flag::CreateFlag(
-              "groundtruth_file", &gt_tfrecord,
-              "Path to the tfrecord file containing ground truth data.",
-              Flag::kRequired),
-      };
+    };
+    if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+        backend) {
+      dataset.reset(new Imagenet(backend.get(), images_directory,
+                                 groundtruth_file, offset, image_width,
+                                 image_height));
+    }
+    // Adds to flag_list for showing help.
+    flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                     dataset_flags.end());
+  } break;
+  case DatasetConfig::COCO: {
+    LOG(INFO) << "Using Coco dataset";
+    std::string images_directory, groundtruth_file;
+    int offset = 1, num_classes = 91, image_width = 320, image_height = 320;
+    std::vector<Flag> dataset_flags{
+        Flag::CreateFlag("images_directory", &images_directory,
+                         "Path to ground truth images.", Flag::kRequired),
+        Flag::CreateFlag("offset", &offset,
+                         "The offset of the first meaningful class in the "
+                         "classification model.",
+                         Flag::kRequired),
+        Flag::CreateFlag("num_classes", &num_classes,
+                         "The number of classes in the model outputs.",
+                         Flag::kRequired),
+        Flag::CreateFlag("groundtruth_file", &groundtruth_file,
+                         "Path to the imagenet ground truth file.",
+                         Flag::kRequired),
+        Flag::CreateFlag("image_width", &image_width,
+                         "The width of the processed image."),
+        Flag::CreateFlag("image_height", &image_height,
+                         "The height of the processed image.")};
+    if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+        backend) {
+      dataset.reset(new Coco(backend.get(), images_directory, groundtruth_file,
+                             offset, num_classes, image_width, image_height));
+    }
+    // Adds to flag_list for showing help.
+    flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                     dataset_flags.end());
+  } break;
+  case DatasetConfig::SQUAD: {
+    LOG(INFO) << "Using SQuAD 1.1 dataset for MobileBert.";
+    std::string input_tfrecord, gt_tfrecord;
+    std::vector<Flag> dataset_flags{
+        Flag::CreateFlag(
+            "input_file", &input_tfrecord,
+            "Path to the tfrecord file containing inputs for the model.",
+            Flag::kRequired),
+        Flag::CreateFlag(
+            "groundtruth_file", &gt_tfrecord,
+            "Path to the tfrecord file containing ground truth data.",
+            Flag::kRequired),
+    };
 
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
-          backend) {
-        dataset.reset(new Squad(backend.get(), input_tfrecord, gt_tfrecord));
-      }
-      // Adds to flag_list for showing help.
-      flag_list.insert(flag_list.end(), dataset_flags.begin(),
-                       dataset_flags.end());
-    } break;
-    case DatasetConfig::ADE20K: {
-      LOG(INFO) << "Using ADE20K dataset";
-      std::string images_directory, ground_truth_directory;
-      int num_classes = 31;
-      int image_width = 512, image_height = 512;
-      std::vector<Flag> dataset_flags{
-          Flag::CreateFlag("images_directory", &images_directory,
-                           "Path to ground truth images.", Flag::kRequired),
-          Flag::CreateFlag("ground_truth_directory", &ground_truth_directory,
-                           "Path to the imagenet ground truth file.",
-                           Flag::kRequired),
-          Flag::CreateFlag("num_class", &num_classes, "number of classes"),
-          Flag::CreateFlag("image_width", &image_width,
-                           "The width of the processed image."),
-          Flag::CreateFlag("image_height", &image_height,
-                           "The height of the processed image.")};
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
-          backend) {
-        dataset.reset(new ADE20K(backend.get(), images_directory,
-                                 ground_truth_directory, num_classes,
-                                 image_width, image_height));
-      }
-      // Adds to flag_list for showing help.
-      flag_list.insert(flag_list.end(), dataset_flags.begin(),
-                       dataset_flags.end());
-    } break;
-    case DatasetConfig::IMAGEPAIRS: {
-      LOG(INFO) << "Using ImagePairs dataset";
-      std::string images_directory, ground_truth_directory;
-      // Number of channels
-      int scale = 2;
-      int num_channels = 3;
-      int image_width = 128;
-      int image_height = 128;
-      std::vector<Flag> dataset_flags{
-          Flag::CreateFlag("images_directory", &images_directory,
-                           "Path to ground truth images.", Flag::kRequired),
-          Flag::CreateFlag("ground_truth_directory", &ground_truth_directory,
-                           "Path to the imagenet ground truth file.",
-                           Flag::kRequired),
-          Flag::CreateFlag("image_width", &image_width,
-                           "The width of the processed image."),
-          Flag::CreateFlag("image_height", &image_height,
-                           "The height of the processed image."),
-          Flag::CreateFlag("n_channels", &num_channels,
-                           "The number of color channels."),
-          Flag::CreateFlag("scale", &scale,
-                           "Super-resolution scale factor")};
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
-          backend) {
-        dataset.reset(new IMAGEPAIRS(backend.get(), images_directory,
-                                 ground_truth_directory, num_channels, scale,
-                                 image_width, image_height));
-      }
-      // Adds to flag_list for showing help.
-      flag_list.insert(flag_list.end(), dataset_flags.begin(),
-                       dataset_flags.end());
-    } break;
-    case DatasetConfig::NONE:
-    default:
-      break;
+    if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+        backend) {
+      dataset.reset(new Squad(backend.get(), input_tfrecord, gt_tfrecord));
+    }
+    // Adds to flag_list for showing help.
+    flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                     dataset_flags.end());
+  } break;
+  case DatasetConfig::ADE20K: {
+    LOG(INFO) << "Using ADE20K dataset";
+    std::string images_directory, ground_truth_directory;
+    int num_classes = 31;
+    int image_width = 512, image_height = 512;
+    std::vector<Flag> dataset_flags{
+        Flag::CreateFlag("images_directory", &images_directory,
+                         "Path to ground truth images.", Flag::kRequired),
+        Flag::CreateFlag("ground_truth_directory", &ground_truth_directory,
+                         "Path to the imagenet ground truth file.",
+                         Flag::kRequired),
+        Flag::CreateFlag("num_class", &num_classes, "number of classes"),
+        Flag::CreateFlag("image_width", &image_width,
+                         "The width of the processed image."),
+        Flag::CreateFlag("image_height", &image_height,
+                         "The height of the processed image.")};
+    if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+        backend) {
+      dataset.reset(new ADE20K(backend.get(), images_directory,
+                               ground_truth_directory, num_classes, image_width,
+                               image_height));
+    }
+    // Adds to flag_list for showing help.
+    flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                     dataset_flags.end());
+  } break;
+  case DatasetConfig::IMAGEPAIRS: {
+    LOG(INFO) << "Using ImagePairs dataset";
+    std::string images_directory, ground_truth_directory;
+    // Number of channels
+    int scale = 2;
+    int num_channels = 3;
+    int image_width = 128;
+    int image_height = 128;
+    std::vector<Flag> dataset_flags{
+        Flag::CreateFlag("images_directory", &images_directory,
+                         "Path to ground truth images.", Flag::kRequired),
+        Flag::CreateFlag("ground_truth_directory", &ground_truth_directory,
+                         "Path to the imagenet ground truth file.",
+                         Flag::kRequired),
+        Flag::CreateFlag("image_width", &image_width,
+                         "The width of the processed image."),
+        Flag::CreateFlag("image_height", &image_height,
+                         "The height of the processed image."),
+        Flag::CreateFlag("n_channels", &num_channels,
+                         "The number of color channels."),
+        Flag::CreateFlag("scale", &scale, "Super-resolution scale factor")};
+    if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+        backend) {
+      dataset.reset(new IMAGEPAIRS(backend.get(), images_directory,
+                                   ground_truth_directory, num_channels, scale,
+                                   image_width, image_height));
+    }
+    // Adds to flag_list for showing help.
+    flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                     dataset_flags.end());
+  } break;
+  case DatasetConfig::NONE:
+  default:
+    break;
   }
 
   // Show usage if needed.
@@ -370,7 +369,7 @@ int Main(int argc, char* argv[]) {
   return 0;
 }
 
-}  // namespace mobile
-}  // namespace mlperf
+} // namespace mobile
+} // namespace mlperf
 
-int main(int argc, char* argv[]) { return mlperf::mobile::Main(argc, argv); }
+int main(int argc, char *argv[]) { return mlperf::mobile::Main(argc, argv); }

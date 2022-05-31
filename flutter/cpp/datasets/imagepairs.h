@@ -26,32 +26,32 @@ namespace mobile {
 
 // Implements the IMAGEPAIRS dataset for image segmentation.
 class IMAGEPAIRS : public Dataset {
- public:
-  // IMAGEPAIRS assumes that there is a single input resevered for the image data
-  // and single output which contains the probabilities of every classes. The
-  // order of images under image_dir should be the same as the original
+public:
+  // IMAGEPAIRS assumes that there is a single input resevered for the image
+  // data and single output which contains the probabilities of every classes.
+  // The order of images under image_dir should be the same as the original
   // IMAGEPAIRS dataset.
-  IMAGEPAIRS(Backend* backend, const std::string& image_dir,
-         const std::string& ground_truth_dir, int num_channels, int scale, int image_width,
-         int image_height);
+  IMAGEPAIRS(Backend *backend, const std::string &image_dir,
+             const std::string &ground_truth_dir, int num_channels, int scale,
+             int image_width, int image_height);
 
   // Returns the name of the dataset.
-  const std::string& Name() const override { return name_; }
+  const std::string &Name() const override { return name_; }
 
   // Total number of samples in library.
   size_t TotalSampleCount() override { return samples_.size(); }
 
   // Loads the requested query samples into memory.
-  void LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) override;
+  void LoadSamplesToRam(const std::vector<QuerySampleIndex> &samples) override;
 
   // Unloads the requested query samples from memory.
-  void UnloadSamplesFromRam(
-      const std::vector<QuerySampleIndex>& samples) override;
+  void
+  UnloadSamplesFromRam(const std::vector<QuerySampleIndex> &samples) override;
 
   // GetData returns the data of a specific input.
-  std::vector<void*> GetData(int sample_idx) override {
-    std::vector<void*> data;
-    for (std::vector<uint8_t, BackendAllocator<uint8_t>>* v :
+  std::vector<void *> GetData(int sample_idx) override {
+    std::vector<void *> data;
+    for (std::vector<uint8_t, BackendAllocator<uint8_t>> *v :
          samples_.at(sample_idx)) {
       data.push_back(v->data());
     }
@@ -59,8 +59,9 @@ class IMAGEPAIRS : public Dataset {
   }
 
   // ProcessOutput processes the output data before sending to mlperf.
-  std::vector<uint8_t> ProcessOutput(
-      const int sample_idx, const std::vector<void*>& outputs) override;
+  std::vector<uint8_t>
+  ProcessOutput(const int sample_idx,
+                const std::vector<void *> &outputs) override;
 
   // ComputeAccuracy Calculate the accuracy if the processed outputs.
   float ComputeAccuracy() override;
@@ -68,14 +69,14 @@ class IMAGEPAIRS : public Dataset {
   // ComputeAccuracyString returns a string representing the accuracy.
   std::string ComputeAccuracyString() override;
 
- private:
+private:
   const std::string name_ = "IMAGEPAIRS";
   // List of the fullpath of images.
   std::vector<std::string> image_list_;
   // List of the fullpath of groun dtruth file.
   std::vector<std::string> ground_truth_list_;
   // Loaded samples in RAM.
-  std::vector<std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>>*>>
+  std::vector<std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>> *>>
       samples_;
 
   // preprocessing_stage_ conducts preprocessing of images.
@@ -95,9 +96,9 @@ class IMAGEPAIRS : public Dataset {
   std::vector<bool> counted_;
 
   // results psnr
-  float psnr_ ;
+  float psnr_;
 };
 
-}  // namespace mobile
-}  // namespace mlperf
-#endif  // MLPERF_DATASETS_IMAGEPAIRS_H_
+} // namespace mobile
+} // namespace mlperf
+#endif // MLPERF_DATASETS_IMAGEPAIRS_H_
