@@ -16,8 +16,6 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
-        # fix memory leak in coreml delegate
-        "//:flutter/third_party/tflite_coreml_delegate_memory_leak.patch",
     ],
     sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
     strip_prefix = "tensorflow-2.8.0",
