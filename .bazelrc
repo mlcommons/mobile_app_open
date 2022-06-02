@@ -23,8 +23,8 @@ build:windows --copt=/W0
 # Build in C++ 14 mode.
 build:android --cxxopt=-std=c++14
 build:android --host_cxxopt=-std=c++14
-build:ios --cxxopt=-std=c++14
-build:ios --host_cxxopt=-std=c++14
+build:ios --cxxopt=-std=c++17
+build:ios --host_cxxopt=-std=c++17
 build:ios --cxxopt=-xobjective-c++
 build:windows --cxxopt=/std:c++14
 build:windows --host_cxxopt=/std:c++14
