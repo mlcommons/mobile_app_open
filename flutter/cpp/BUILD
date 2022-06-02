@@ -79,6 +79,7 @@ cc_library(
         "//flutter/cpp/proto:mlperf_task_cc_proto",
         "@org_mlperf_inference//:loadgen",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
+        "@org_tensorflow//tensorflow/lite/tools/delegates:delegate_provider_lib",
         "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
     ],
 )
