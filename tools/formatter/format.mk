@@ -13,7 +13,7 @@ format/bazel:
 
 .PHONY: format/clang
 format/clang:
-	git ls-files -z | grep --null-data "\.h$$\|\.cc$$\|\.cpp$$" | xargs --null --no-run-if-empty clang-format -i -style=google
+	git ls-files -z | grep --null-data "\.h$$\|\.hpp$$\|\.cc$$\|\.cpp$$" | xargs --null --no-run-if-empty clang-format -i -style=google
 
 .PHONY: format/java
 format/java:

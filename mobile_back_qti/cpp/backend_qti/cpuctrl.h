@@ -21,6 +21,7 @@ limitations under the License.
 #define SDM865 356
 #define SDM888 415
 #define SDM778 475
+#define SD8G1 457
 
 class CpuCtrl {
  public:

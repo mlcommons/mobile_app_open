@@ -200,7 +200,10 @@ cc_library(
         ":use_samsung": ["//mobile_back_samsung:samsungbackend"],
         "//conditions:default": [],
     }) + select({
-        ":use_mediatek": ["//mobile_back_tflite:tfliteneuronbackend"],
+        ":use_mediatek": [
+            "//mobile_back_tflite:tfliteneuronbackend",
+            "//mobile_back_tflite/cpp/backend_tflite:libneuronusdk_adapter.mtk.so",
+        ],
         "//conditions:default": [],
     }) + select({
         ":use_pixel": ["//mobile_back_pixel:tflitepixelbackend"],

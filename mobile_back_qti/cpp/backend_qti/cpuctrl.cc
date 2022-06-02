@@ -141,7 +141,8 @@ uint32_t CpuCtrl::getSocId() {
     std::vector<uint32_t> low_latency_cores;
     std::vector<uint32_t> high_latency_cores;
     int maxcores = 0;
-    if (soc_id_ == SDM888 || soc_id_ == SDM865 || soc_id_ == SDM778) {
+    if (soc_id_ == SDM888 || soc_id_ == SDM865 || soc_id_ == SDM778 ||
+        soc_id_ == SD8G1) {
       high_latency_cores.emplace_back(0);
       high_latency_cores.emplace_back(1);
       high_latency_cores.emplace_back(2);
@@ -149,7 +150,8 @@ uint32_t CpuCtrl::getSocId() {
       maxcores = 8;
     }
 
-    if (soc_id_ == SDM888 || soc_id_ == SDM865 || soc_id_ == SDM778) {
+    if (soc_id_ == SDM888 || soc_id_ == SDM865 || soc_id_ == SDM778 ||
+        soc_id_ == SD8G1) {
       low_latency_cores.emplace_back(4);
       low_latency_cores.emplace_back(5);
       low_latency_cores.emplace_back(6);
