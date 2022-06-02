@@ -16,6 +16,8 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
+        # Need newer language version to make metal delegate work on iPhone13
+        "//:flutter/third_party/metal_lang_version.patch",
     ],
     sha256 = "6eaf86ead73e23988fe192da1db68f4d3828bcdd0f3a9dc195935e339c95dbdc",
     strip_prefix = "tensorflow-2.9.1",
