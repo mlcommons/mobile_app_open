@@ -17,10 +17,10 @@ http_archive(
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
     ],
-    sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
-    strip_prefix = "tensorflow-2.8.0",
+    sha256 = "6eaf86ead73e23988fe192da1db68f4d3828bcdd0f3a9dc195935e339c95dbdc",
+    strip_prefix = "tensorflow-2.9.1",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.8.0.zip",
+        "https://github.com/tensorflow/tensorflow/archive/v2.9.1.tar.gz",
     ],
 )
 
