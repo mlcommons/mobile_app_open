@@ -67,7 +67,7 @@ RUN yes | sdkmanager \
     "extras;android;m2repository" \
     "extras;google;m2repository" \
     "extras;google;google_play_services" \
-    "build-tools;29.0.3"
+    "build-tools;30.0.3"
 
 ARG android_version=30
 RUN sdkmanager "platforms;android-${android_version}" "cmake;3.6.4111459"
