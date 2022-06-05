@@ -31,7 +31,6 @@ ifeq (${WITH_SAMSUNG},1)
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_nn_on_system.so \
   # main binaries for Samsung backend are prebuilt
   backend_samsung_android_target= \
-    //mobile_back_samsung/samsung/lib:libsamsungbackend.so \
-    //flutter/android/commonlibs:commonlibs
+    //mobile_back_samsung/samsung/lib:libsamsungbackend.so
   backend_samsung_filename=libsamsungbackend
 endif

@@ -22,7 +22,7 @@ ifeq (${WITH_QTI},1)
   local_snpe_sdk_root=$(shell echo mobile_back_qti/snpe-* | awk '{print $$NF}')
   $(info detected SNPE SDK: ${local_snpe_sdk_root})
   backend_qti_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libc++_shared.so \
+    ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so \
     ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSNPE.so \
     ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libhta.so \
     ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libsnpe_dsp_domains_v2.so \
