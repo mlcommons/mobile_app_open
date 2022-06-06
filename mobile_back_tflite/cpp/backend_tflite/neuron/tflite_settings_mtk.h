@@ -137,9 +137,10 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "IS_uint8_mosaic"
-  accelerator: "nnapi"
-  accelerator_desc: "NNAPI"
+  accelerator: "neuron"
+  accelerator_desc: "Neuron"
   configuration: "TFLite"
+  batch_size: 1
   src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
 })SETTINGS";
 

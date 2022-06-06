@@ -205,7 +205,11 @@ mlperf_backend_ptr_t mlperf_backend_create(
     //   if it is not specified in settings.
     // If we don't use batching, we will use shards_num=1,
     //   which is the default value.
+#if MTK_TFLITE_NEURON_BACKEND
+    backend_data->shards_num = 4;
+#else
     backend_data->shards_num = 2;
+#endif
 
     // TODO convert this to a member var
     for (int i = 0; i < configs->count; ++i) {
