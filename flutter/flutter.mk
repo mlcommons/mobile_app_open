@@ -139,13 +139,18 @@ flutter/l10n:
 
 .PHONY: flutter/pub
 flutter/pub:
-	cd flutter && ${_start_args} flutter pub get
-	cd flutter_common && ${_start_args} flutter pub get
-	cd website && ${_start_args} flutter pub get
+	cd flutter && ${_start_args} flutter --no-version-check pub get
+	cd flutter_common && ${_start_args} flutter --no-version-check pub get
+	cd website && ${_start_args} flutter --no-version-check pub get
 
+ifneq (${FLUTTER_TEST_DEVICE},)
+flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"
+else
+flutter_test_device_arg=
+endif
 .PHONY: flutter/test
 flutter/test:
-	cd flutter && ${_start_args} flutter test integration_test
+	cd flutter && ${_start_args} flutter --no-version-check test integration_test ${flutter_test_device_arg}
 
 .PHONY: flutter/prepare
 flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info

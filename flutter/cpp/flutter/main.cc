@@ -33,6 +33,8 @@ extern "C" void fake_calls() {
 #ifdef __APPLE__
   a = (intptr_t)mlperf_backend_matches_hardware;
   a = (intptr_t)mlperf_backend_create;
+  a = (intptr_t)mlperf_backend_vendor_name;
+  a = (intptr_t)mlperf_backend_accelerator_name;
   a = (intptr_t)mlperf_backend_name;
   a = (intptr_t)mlperf_backend_delete;
   a = (intptr_t)mlperf_backend_issue_query;
