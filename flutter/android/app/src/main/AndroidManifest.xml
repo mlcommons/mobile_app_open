@@ -7,9 +7,14 @@
    <uses-permission android:name="android.permission.INTERNET" />
    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+  
    <application
         android:label="MLPerf Mobile"
         android:icon="@mipmap/ic_launcher">
+        <uses-native-library
+              android:name="libcdsprpc.so"
+              android:required="false" 
+              />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -25,7 +30,7 @@
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
-              />
+              />           
             <!-- Displays an Android View that continues showing the launch screen
                  Drawable until Flutter paints its first frame, then this splash
                  screen fades out. A splash screen is useful to avoid any visual
