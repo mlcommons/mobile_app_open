@@ -38,6 +38,7 @@ ios_static_framework(
         "iphone",
         "ipad",
     ],
+    ipa_post_processor = "cp_framework_to_tmp.sh",
     minimum_os_version = "11.0",
     deps = [
         "//flutter/cpp/flutter:bridge",
