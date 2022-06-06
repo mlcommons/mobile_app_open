@@ -73,8 +73,9 @@ ADE20K::ADE20K(Backend *backend, const std::string &image_dir,
   std::unordered_set<std::string> gt_exts{".raw"};
   ground_truth_list_ = GetSortedFileNames(ground_truth_dir, gt_exts);
   if (ground_truth_list_.empty()) {
-    LOG(ERROR) << "Failed to list all the ground truth files in provided path. "
-                  "Only measuring performance.";
+    LOG(WARNING)
+        << "Failed to list all the ground truth files in provided path. "
+           "Only measuring performance.";
   }
 
   // Prepares the preprocessing stage.

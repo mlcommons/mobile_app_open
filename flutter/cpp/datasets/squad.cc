@@ -59,7 +59,7 @@ Squad::Squad(Backend* backend, const std::string& input_tfrecord,
   if (std::ifstream(gt_tfrecord).good()) {
     gt_reader_ = std::make_unique<TFRecordReader>(gt_tfrecord);
   } else {
-    LOG(ERROR) << "Could not read the ground truth file";
+    LOG(WARNING) << "Could not read the ground truth file";
   };
 
   // Check input and output formats.
