@@ -10,6 +10,7 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/icons.dart' as app_icons;
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/app_bar.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
@@ -343,8 +344,10 @@ class _ResultScreenState extends State<ResultScreen>
               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
                 onPressed: () async {
+                  final result =
+                      state.resourceManager.resultManager.getLastResult();
                   await Share.share(
-                    await state.resourceManager.resultManager.read(),
+                    jsonToStringIndented(result),
                     subject: stringResources.experimentResultsSubj,
                   );
                 },

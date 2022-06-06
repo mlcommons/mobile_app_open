@@ -140,6 +140,7 @@ class ResourceManager {
 
     cacheManager = CacheManager(_loadedResourcesDir);
     resultManager = ResultManager(applicationDirectory);
+    await resultManager.init();
   }
 
   BatchPreset? getDefaultBatchPreset() {

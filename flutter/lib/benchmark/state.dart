@@ -138,7 +138,7 @@ class BenchmarkState extends ChangeNotifier {
         getMLPerfConfig(await File(configManager.configPath).readAsString());
     _middle = BenchmarkList(mlperfConfig, backendInfo.settings.benchmarkSetting,
         _store.testMode, resourceManager.getDefaultBatchPreset());
-    await reset();
+    restoreLastResult();
 
     final packageInfo = await PackageInfo.fromPlatform();
     final newAppVersion = packageInfo.version + '+' + packageInfo.buildNumber;
@@ -151,25 +151,6 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.enable();
     resourceManager.handleResources(_middle.listResources(), needToPurgeCache);
     await Wakelock.disable();
-  }
-
-  Future<bool> _handlePreviousResult() async {
-    if (_doneRunning == null) {
-      try {
-        lastResult = ExtendedResult.fromJson(
-            jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
-      } catch (e, trace) {
-        print('unable to restore previous extended result: $e');
-        print(trace);
-      }
-      return resourceManager.resultManager
-          .restoreResults(_store.previousResult, benchmarks);
-    } else {
-      await _store.deletePreviousResult();
-      await resourceManager.resultManager.delete();
-    }
-
-    return false;
   }
 
   static Future<BenchmarkState> create(
@@ -219,10 +200,9 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   void runBenchmarks() async {
-    await reset();
-
     assert(resourceManager.done, 'Resource manager is not done.');
-    assert(_doneRunning == null, '_doneRunning is not null');
+    assert(_doneRunning != false, '_doneRunning is false');
+    _store.previousExtendedResult = '';
     _doneRunning = false;
 
     // disable screen sleep when benchmarks is running
@@ -313,10 +293,7 @@ class BenchmarkState extends ChangeNotifier {
       );
       _store.previousExtendedResult =
           JsonEncoder().convert(lastResult!.toJson());
-      await resourceManager.resultManager.writeResults(lastResult!);
-
-      _store.previousResult = resourceManager.resultManager
-          .serializeBriefResults(activeBenchmarks.toList());
+      await resourceManager.resultManager.saveResult(lastResult!);
     }
 
     currentlyRunning = null;
@@ -435,17 +412,25 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> reset() async {
-    final isPreviousResultUsed = await _handlePreviousResult();
+  void restoreLastResult() {
+    if (_store.previousExtendedResult == '') {
+      return;
+    }
 
-    if (isPreviousResultUsed) {
+    try {
+      lastResult = ExtendedResult.fromJson(
+          jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
+      resourceManager.resultManager
+          .restoreResults(lastResult!.results.list, benchmarks);
       _doneRunning = true;
-    } else {
+      return;
+    } catch (e, trace) {
+      print('unable to restore previous extended result: $e');
+      print(trace);
+      _store.previousExtendedResult = '';
       _middle.benchmarks.forEach((benchmark) => benchmark.accuracyModeResult =
           benchmark.performanceModeResult = null);
       _doneRunning = null;
     }
-
-    _aborting = false;
   }
 }

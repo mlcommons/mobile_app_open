@@ -11,6 +11,7 @@ import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/main_screen.dart';
 import 'package:mlperfbench/ui/unsupported_device_screen.dart';
@@ -48,9 +49,8 @@ Future<void> launchUi() async {
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));
     assert(const bool.hasEnvironment('terminalStringMark'));
-    await store.deletePreviousResult();
-    await benchmarkState.resourceManager.resultManager.delete();
-    await benchmarkState.reset();
+    store.previousExtendedResult = '';
+    benchmarkState.restoreLastResult();
     benchmarkState.addListener(() => autostartHandler(benchmarkState, store));
   }
 
@@ -76,7 +76,8 @@ void autostartHandler(BenchmarkState state, Store store) async {
   }
   if (state.state == BenchmarkStateEnum.done) {
     print(const String.fromEnvironment('resultsStringMark'));
-    print(await state.resourceManager.resultManager.read());
+    final result = state.resourceManager.resultManager.getLastResult();
+    print(jsonToStringIndented(result));
     print(const String.fromEnvironment('terminalStringMark'));
     exit(0);
   }
