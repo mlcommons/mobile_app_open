@@ -28,7 +28,10 @@ const fileNameEnv = 'jsonFileName';
 Future<void> main() async {
   final runResult = BenchmarkRunResult(
     throughput: 123.45,
-    accuracy: 123.45,
+    accuracy: AccuracyData(
+      value: 123.45,
+      string: '123.45%',
+    ),
     datasetInfo: DatasetInfo(
       name: 'Imagenet classification validation set',
       type: DatasetType.fromJson('IMAGENET'),

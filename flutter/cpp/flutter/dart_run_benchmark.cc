@@ -113,7 +113,8 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   auto out = new dart_ffi_run_benchmark_out;
   out->ok = 1;
   out->latency = driver.ComputeLatency();
-  out->accuracy = strdup(driver.ComputeAccuracyString().c_str());
+  out->accuracyNum = driver.ComputeAccuracy();
+  out->accuracyString = strdup(driver.ComputeAccuracyString().c_str());
   out->num_samples = driver.GetNumSamples();
   out->duration_ms = driver.GetDurationMs();
   out->backend_name = backend_name;
@@ -125,7 +126,7 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 }
 
 void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out* out) {
-  free(out->accuracy);
+  free(out->accuracyString);
   free(out->backend_name);
   free(out->backend_vendor);
   free(out->accelerator_name);

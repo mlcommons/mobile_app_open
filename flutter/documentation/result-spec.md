@@ -61,10 +61,13 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
   * `throughput`: floating point number  
     Throughput value for this run of the benchmark.
     May be null for an accuracy run.
-  * `accuracy`: floating point number  
-    Accuracy value for this run of the benchmark.
-    Value must be normalized between `0` and `100`.
+  * `accuracy`: map
     May be null for a performance run if groundtruth file is not provided.
+    * `value`: floating point number  
+      Accuracy value for this run of the benchmark.
+      Value must be normalized between `0` and `100`.
+    * `string`: string  
+      Formatted accuracy string, often with measuring unit suffix
   * `measured_duration_ms`: floating point number  
     Actual duration of the benchmark in milliseconds for start to finish.
   * `measured_samples`: integer number  

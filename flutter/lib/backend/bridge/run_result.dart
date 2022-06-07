@@ -1,5 +1,6 @@
 class RunResult {
-  final String accuracy;
+  final double accuracyNum;
+  final String accuracyString;
   final int numSamples;
   final double durationMs;
   final double throughput;
@@ -10,7 +11,8 @@ class RunResult {
   late final bool validity;
 
   RunResult({
-    required this.accuracy,
+    required this.accuracyNum,
+    required this.accuracyString,
     required this.numSamples,
     required this.durationMs,
     required this.backendName,
@@ -21,5 +23,6 @@ class RunResult {
   });
 
   @override
-  String toString() => 'RunResult(throughput:$throughput, accuracy:$accuracy)';
+  String toString() =>
+      'RunResult(throughput:$throughput, accuracy:$accuracyString)';
 }

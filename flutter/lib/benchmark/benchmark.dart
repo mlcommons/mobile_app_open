@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
@@ -14,7 +15,7 @@ import 'run_mode.dart';
 
 class BenchmarkResult {
   final double throughput;
-  final String accuracy;
+  final AccuracyData? accuracy;
   final String backendName;
   final String acceleratorName;
   final int batchSize;
@@ -23,46 +24,12 @@ class BenchmarkResult {
 
   BenchmarkResult(
       {required this.throughput,
-      required String accuracy,
+      required this.accuracy,
       required this.backendName,
       required this.acceleratorName,
       required this.batchSize,
       required this.threadsNumber,
-      required this.validity})
-      : accuracy = _replaceAccuracy(accuracy);
-
-  static String _replaceAccuracy(String accuracy) {
-    if (accuracy != 'N/A') {
-      const onlyNumbersWithPercentPattern = '[^.%0-9]';
-      accuracy = accuracy.replaceAll(RegExp(onlyNumbersWithPercentPattern), '');
-    }
-    return accuracy;
-  }
-
-  String getFormattedAccuracyValue(BenchmarkTypeEnum type) {
-    switch (type) {
-      // if the benchmark type is unknown, just show the original string
-      // so we know that this need to be fixed
-      case BenchmarkTypeEnum.unknown:
-        return accuracy;
-      case BenchmarkTypeEnum.imageClassification:
-        return (numericAccuracy * 100).toStringAsFixed(2);
-      case BenchmarkTypeEnum.objectDetection:
-        return (numericAccuracy * 100).toStringAsFixed(2);
-      case BenchmarkTypeEnum.imageSegmentation:
-        return (numericAccuracy * 100).toStringAsFixed(2);
-      case BenchmarkTypeEnum.languageUnderstanding:
-        return numericAccuracy.toStringAsFixed(2);
-    }
-  }
-
-  double get numericAccuracy {
-    if (!accuracy.endsWith('%')) {
-      return double.tryParse(accuracy) ?? 0.0;
-    }
-
-    return (double.tryParse(accuracy.replaceAll(RegExp('%'), '')) ?? 0.0) / 100;
-  }
+      required this.validity});
 
   static const _tagThroughput = 'throughput';
   static const _tagAccuracy = 'accuracy';
@@ -76,7 +43,8 @@ class BenchmarkResult {
     if (json == null) return null;
     return BenchmarkResult(
       throughput: json[_tagThroughput] as double,
-      accuracy: json[_tagAccuracy] as String,
+      accuracy:
+          AccuracyData.fromJson(json[_tagAccuracy] as Map<String, dynamic>),
       backendName: json[_tagBackendName] as String,
       acceleratorName: json[_tagAcceleratorName] as String,
       batchSize: json[_tagBatchSize] as int,

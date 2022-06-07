@@ -201,7 +201,7 @@
                 "accuracy": {
                     "oneOf": [
                         {
-                            "type": "number"
+                            "$ref": "#/definitions/Accuracy"
                         },
                         {
                             "type": "null"
@@ -234,6 +234,23 @@
                 "throughput"
             ],
             "title": "Run"
+        },
+        "Accuracy": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "type": "number"
+                },
+                "string": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "string",
+                "value"
+            ],
+            "title": "Accuracy"
         },
         "Dataset": {
             "type": "object",
