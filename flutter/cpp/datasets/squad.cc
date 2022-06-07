@@ -125,8 +125,10 @@ std::vector<uint8_t> Squad::ProcessOutput(const int sample_idx,
 }
 
 float Squad::ComputeAccuracy() {
+  if (gt_reader_ == nullptr) {
+    return -1.0f;
+  }
   float final_score = 0.0f;
-  if (gt_reader_ == nullptr) return final_score;
   for (auto& it : qas_id_to_samples_) {
     const std::string& qas_id = it.first;
     // Find candidates for the best prediction.
@@ -212,7 +214,7 @@ float Squad::ComputeAccuracy() {
 
 std::string Squad::ComputeAccuracyString() {
   float result = ComputeAccuracy();
-  if (result == 0.0f) {
+  if (result < 0.0f) {
     return std::string("N/A");
   }
   std::stringstream stream;

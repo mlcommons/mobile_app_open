@@ -209,7 +209,7 @@ std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
 
 float ADE20K::ComputeAccuracy() {
   if (ground_truth_list_.empty()) {
-    return 0.0;
+    return -1.0f;
   }
   float iou_sum = 0.0;
   for (int j = 0; j < num_classes_; j++) {
@@ -228,7 +228,7 @@ float ADE20K::ComputeAccuracy() {
 
 std::string ADE20K::ComputeAccuracyString() {
   float result = ComputeAccuracy();
-  if (result == 0.0f) {
+  if (result < 0.0f) {
     return std::string("N/A");
   }
   std::stringstream stream;

@@ -200,7 +200,7 @@ float Coco::ComputeAccuracy() {
   // Init and run.
   if (eval_stage_.Init() == kTfLiteError) {
     LOG(ERROR) << "Init evaluation stage failed";
-    return 0.0f;
+    return -1.0f;
   }
 
   for (auto const &element : predicted_objects_) {
@@ -208,7 +208,7 @@ float Coco::ComputeAccuracy() {
                               groundtruth_objects[element.first]);
     if (eval_stage_.Run() == kTfLiteError) {
       LOG(ERROR) << "Run evaluation stage failed";
-      return 0.0f;
+      return -1.0f;
     }
   }
 
@@ -221,7 +221,7 @@ float Coco::ComputeAccuracy() {
 
 std::string Coco::ComputeAccuracyString() {
   float result = ComputeAccuracy();
-  if (result == 0.0f) {
+  if (result < 0.0f) {
     return std::string("N/A");
   }
   std::stringstream stream;
