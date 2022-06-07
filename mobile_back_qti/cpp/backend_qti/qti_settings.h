@@ -566,6 +566,7 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobilenet_edgetpu_224_1.0_htp.dlc"
+  single_stream_expected_latency_ns: 800000
 }
 
 benchmark_setting {
