@@ -28,7 +28,6 @@ import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/list.dart';
-import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/device_info.dart';
@@ -83,7 +82,13 @@ class BenchmarkState extends ChangeNotifier {
         }),
         1.0 / benchmarksCount);
 
-    return summaryThroughput / BenchmarkInfo.getSummaryMaxThroughput();
+    final maxSummaryThroughput = pow(
+        benchmarks.fold<double>(1, (prev, i) {
+          return prev * (i.info.maxThroughput);
+        }),
+        1.0 / benchmarksCount);
+
+    return summaryThroughput / maxSummaryThroughput;
   }
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
