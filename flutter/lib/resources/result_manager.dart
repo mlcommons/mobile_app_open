@@ -17,8 +17,9 @@ class _ExtendedResultList {
     for (var item in json) {
       try {
         list.add(ExtendedResult.fromJson(item as Map<String, dynamic>));
-      } catch (e) {
-        // for now just skip result that fail to decode
+      } catch (e, trace) {
+        print('unable to parse result from history: $e');
+        print(trace);
       }
     }
     return _ExtendedResultList(list);
@@ -44,7 +45,10 @@ class ResultManager {
   Future<void> init() async {
     try {
       _results = await _restoreResults();
-    } catch (e) {}
+    } catch (e, trace) {
+      print('unable to read saved results: $e');
+      print(trace);
+    }
   }
 
   Future<void> _saveResults() async {
