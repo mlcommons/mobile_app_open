@@ -46,6 +46,9 @@ def _android_autoconf_impl(repository_ctx):
     if ndk_rule == "" and sdk_rule == "":
         sdk_rule = "pass"
 
+    # currently Android SDK is not required
+    sdk_rule = "pass"
+
     repository_ctx.file("BUILD.bazel", "")
     repository_ctx.file("android_configure.bzl", """
 def android_workspace():

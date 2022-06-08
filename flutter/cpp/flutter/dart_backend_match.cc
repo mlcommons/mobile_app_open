@@ -1,10 +1,11 @@
+#include "./dart_backend_match.h"
+
 #include <google/protobuf/text_format.h>
 
 #include <cstring>
 
 #include "flutter/cpp/backends/external.h"
 #include "flutter/cpp/proto/backend_setting.pb.h"
-#include "main.h"
 
 extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
     const char *lib_path, const char *manufacturer, const char *model) {
