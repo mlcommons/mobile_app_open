@@ -31,7 +31,7 @@ android_common_docker_flags1= \
 		${backend_qti_android_docker_args} \
 		-w /home/mlperf/mobile_app \
 		-u `id -u`:`id -g` \
-		mlcommons/mlperf_mobile_android_builder bazel-3.7.2
+		mlcommons/mlperf_mobile_android_builder bazel-5.0.0
 
 android_common_docker_flags2= \
 		${proxy_bazel_args} \

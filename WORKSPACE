@@ -11,10 +11,14 @@ http_archive(
 
 http_archive(
     name = "org_tensorflow",
-    sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
-    strip_prefix = "tensorflow-2.8.0",
+    sha256 = "9f2dac244e5af6c6a13a7dad6481e390174ac989931942098e7a4373f1bccfc2",
+    strip_prefix = "tensorflow-2.9.1",
+    patch_args = ["-p1"],
+    patches = [
+      "//patches:feature_level.diff"
+    ],
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.8.0.zip",
+        "https://github.com/tensorflow/tensorflow/archive/v2.9.1.zip",
     ],
 )
 
@@ -118,7 +122,7 @@ http_archive(
 # Specify the minimum required bazel version.
 load("@org_tensorflow//tensorflow:version_check.bzl", "check_bazel_version_at_least")
 
-check_bazel_version_at_least("3.7.2")
+check_bazel_version_at_least("5.0.0")
 
 # Dependencies for android instrument test.
 ATS_TAG = "1edfdab3134a7f01b37afabd3eebfd2c5bb05151"

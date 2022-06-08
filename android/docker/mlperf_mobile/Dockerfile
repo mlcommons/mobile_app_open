@@ -30,9 +30,9 @@ RUN curl -OL https://github.com/google/protobuf/releases/download/v3.6.1/protoc-
 
 # Install bazel
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
-RUN curl https://bazel.build/bazel-release.pub.gpg | apt-key add -
-RUN apt-get update && \
-    apt-get install -y --allow-unauthenticated bazel-3.7.2
+RUN curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
+    apt-get update && \
+    apt-get install -y --allow-unauthenticated bazel-5.0.0
 RUN apt-get clean
 
 # Set timezone to UTC by default
@@ -67,7 +67,7 @@ RUN yes | sdkmanager \
     "extras;android;m2repository" \
     "extras;google;m2repository" \
     "extras;google;google_play_services" \
-    "build-tools;29.0.3"
+    "build-tools;30.0.0"
 
 ARG android_version=30
 RUN sdkmanager "platforms;android-${android_version}" "cmake;3.6.4111459"
