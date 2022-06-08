@@ -30,12 +30,17 @@ flutter/ios/libs:
 .PHONY: flutter/ios/release
 flutter/ios/release:
 	@[ "${OFFICIAL_BUILD}" == "true" ] || [ "${OFFICIAL_BUILD}" == "false" ] \
-		|| (echo FLUTTER_RELEASE_NAME env must be set to \"true\" or \"false\"; exit 1)
+		|| (echo OFFICIAL_BUILD env must be set to \"true\" or \"false\"; exit 1)
+	@[ -n "${FLUTTER_BUILD_NUMBER}" ] || (echo FLUTTER_BUILD_NUMBER env must be set; exit 1)
 	make flutter/ios flutter/prepare flutter/ios/ipa
 
 .PHONY: flutter/ios/ipa
 flutter/ios/ipa:
+	@[ -n "${FLUTTER_BUILD_NUMBER}" ] || (echo FLUTTER_BUILD_NUMBER env must be set; exit 1)
 	cd flutter && flutter --no-version-check clean
-	cd flutter && flutter --no-version-check build ipa ${flutter_common_dart_flags}
+	cd flutter && flutter --no-version-check build \
+		ipa \
+		${flutter_common_dart_flags} \
+		--build-number ${FLUTTER_BUILD_NUMBER}
 	mkdir -p output/flutter/ios/
 	cp -rf flutter/build/ios/archive/Runner.xcarchive output/flutter/ios/release.xcarchive
