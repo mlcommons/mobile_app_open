@@ -232,7 +232,7 @@
 		97C146E61CF9000F007C117D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					2C25ABBA270595F000518142 = {
@@ -503,8 +503,8 @@
 					"$(PROJECT_DIR)/Flutter",
 					"$(PROJECT_DIR)/Flutter/ios_backend_fw_static.framework",
 				);
-				MARKETING_VERSION = 0.7.1;
-				PRODUCT_BUNDLE_IDENTIFIER = org.mlcommons.ios.mlperfbench-1;
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.mlcommons.ios.mlperfbench-1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -738,8 +738,8 @@
 					"$(PROJECT_DIR)/Flutter",
 					"$(PROJECT_DIR)/Flutter/ios_backend_fw_static.framework",
 				);
-				MARKETING_VERSION = 0.7.1;
-				PRODUCT_BUNDLE_IDENTIFIER = org.mlcommons.ios.mlperfbench-1;
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.mlcommons.ios.mlperfbench-1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -777,7 +777,7 @@
 					"$(PROJECT_DIR)/Flutter",
 					"$(PROJECT_DIR)/Flutter/ios_backend_fw_static.framework",
 				);
-				MARKETING_VERSION = 0.7.1;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mlcommons.inferencetest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "MLPerf App Store";

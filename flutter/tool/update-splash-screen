@@ -8,6 +8,6 @@ COMMIT_HASH=$(git rev-parse @)
 sed "s/${COMMIT_SEARCH_TEMPLATE}/${COMMIT_HASH}/g" ios/Runner/Base.lproj/LaunchScreen.template.storyboard > ios/Runner/Base.lproj/LaunchScreen.storyboard
 
 # update version
-VERSION=0.7.1
+VERSION=2.0.0
 VERSION_SEARCH_TEMPLATE="text=\"Version\""
 sed -i '' "s/${VERSION_SEARCH_TEMPLATE}/text=\"Version ${VERSION}\"/g" ios/Runner/Base.lproj/LaunchScreen.storyboard
