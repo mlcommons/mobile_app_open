@@ -83,7 +83,7 @@ class BenchmarkState extends ChangeNotifier {
         }),
         1.0 / benchmarksCount);
 
-    return summaryThroughput / BenchmarkInfo.getSummaryMaxThroughput();
+    return summaryThroughput / SUMMARY_MAX_THROUGHPUT;
   }
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
