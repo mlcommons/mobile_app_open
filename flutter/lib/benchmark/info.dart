@@ -110,8 +110,6 @@ class BenchmarkInfo {
   }
 }
 
-final SUMMARY_MAX_THROUGHPUT = 155.0;
-
 final _BENCHMARK_ICONS = {
   'SingleStream': {
     'IC': AppIcons.image_classification,
