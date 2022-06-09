@@ -135,7 +135,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/ic_single.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
   single_stream_expected_latency_ns: 900000
 }
 
@@ -172,7 +172,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/is.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -209,7 +209,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/sm_uint8.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -246,7 +246,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/od.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -283,7 +283,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/mobile_bert_gpu.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -325,7 +325,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/ic_offline.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
@@ -439,7 +439,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "true"
   }
-  src: "/sdcard/MLPerf_sideload/ic_single_fence.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single_fence.nnc"
   single_stream_expected_latency_ns: 900000
 }
 
@@ -476,7 +476,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "true"
   }
-  src: "/sdcard/MLPerf_sideload/is_fence.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is_fence.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -513,7 +513,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "true"
   }
-  src: "/sdcard/MLPerf_sideload/sm_uint8_fence.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8_fence.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -550,7 +550,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "true"
   }
-  src: "/sdcard/MLPerf_sideload/od_fence.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od_fence.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -587,7 +587,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/mobile_bert_gpu.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -629,7 +629,7 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "/sdcard/MLPerf_sideload/ic_offline.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
@@ -719,7 +719,7 @@ benchmark_setting {
     id: "o_type"
     value: "Uint8"
   }
-  src: "/sdcard/MLPerf_sideload/is.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -736,7 +736,7 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "/sdcard/MLPerf_sideload/ic_single.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -753,7 +753,7 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "/sdcard/MLPerf_sideload/od.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -771,7 +771,7 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "/sdcard/MLPerf_sideload/ic_offline.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
