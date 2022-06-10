@@ -177,7 +177,6 @@ mlperf_backend_ptr_t mlperf_backend_create(
       options.allow_fp16 = true;
       options.disallow_nnapi_cpu = true;
       options.accelerator_name = "google-edgetpu";
-      options.use_burst_computation = true;
       delegate = new tflite::StatefulNnApiDelegate(options);
     }
     if (delegate != nullptr) {
