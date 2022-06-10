@@ -79,7 +79,7 @@ class _ResultScreenState extends State<ResultScreen>
       } else if (_screenMode == _ScreenMode.accuracy) {
         benchmarkResult = benchmark.accuracyModeResult;
         textResult = benchmarkResult?.accuracy?.string ?? 'N/A';
-        numericResult = (benchmarkResult?.accuracy?.value ?? 0.0) / 100.0;
+        numericResult = benchmarkResult?.accuracy?.value ?? 0.0;
       } else {
         continue;
       }
@@ -189,7 +189,9 @@ class _ResultScreenState extends State<ResultScreen>
           : benchmark.accuracyModeResult;
       final text = _screenMode == _ScreenMode.performance
           ? result?.throughput.toStringAsFixed(2)
-          : result?.accuracy?.value.toStringAsFixed(2);
+          : (result?.accuracy?.value == null
+              ? null
+              : (result!.accuracy!.value * 100).toStringAsFixed(2));
       final resultIsValid = result?.validity ?? false;
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),

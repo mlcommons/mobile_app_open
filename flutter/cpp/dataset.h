@@ -66,8 +66,6 @@ class Dataset : public ::mlperf::QuerySampleLibrary {
   // other scripts for accuracy calculation.
   virtual float ComputeAccuracy() { return -1.0f; }
 
-  virtual float ComputeNormalizedAccuracy() { return ComputeAccuracy() * 100; }
-
   // ComputeAccuracyString is same as ComputeAccuracy but returns a string so
   // different metrics may have different formats.
   virtual std::string ComputeAccuracyString() { return std::string("N/A"); }

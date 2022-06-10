@@ -86,7 +86,7 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
   }
 
   // Asks the dataset to calculate the accuracy.
-  float ComputeAccuracy() { return dataset_->ComputeNormalizedAccuracy(); }
+  float ComputeAccuracy() { return dataset_->ComputeAccuracy(); }
 
   // Forms a string to report the accuracy.
   std::string ComputeAccuracyString() {
