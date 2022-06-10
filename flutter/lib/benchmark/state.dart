@@ -291,7 +291,8 @@ class BenchmarkState extends ChangeNotifier {
           acceleratorName: accuracyResult.acceleratorName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber,
-          validity: accuracyResult.accuracyNum >= 0.0,
+          validity: accuracyResult.accuracyNum >= 0.0 &&
+              accuracyResult.accuracyNum <= 1.0,
         );
       }
 
