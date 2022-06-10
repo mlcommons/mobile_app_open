@@ -3,19 +3,19 @@ import 'backend_settings.dart';
 import 'dataset_info.dart';
 import 'loadgen_scenario.dart';
 
-class AccuracyData {
+class Accuracy {
   static const String _tagValue = 'value';
   static const String _tagString = 'string';
 
   final double value;
   final String string;
 
-  AccuracyData({
+  Accuracy({
     required this.value,
     required this.string,
   });
 
-  AccuracyData.fromJson(Map<String, dynamic> json)
+  Accuracy.fromJson(Map<String, dynamic> json)
       : this(
           value: json[_tagValue] as double,
           string: json[_tagString] as String,
@@ -37,7 +37,7 @@ class BenchmarkRunResult {
   static const String _tagValidity = 'loadgen_validity';
 
   final double? throughput;
-  final AccuracyData? accuracy;
+  final Accuracy? accuracy;
   final DatasetInfo datasetInfo;
   final double measuredDurationMs;
   final int measuredSamples;
@@ -59,7 +59,7 @@ class BenchmarkRunResult {
           throughput: json[_tagThroughput] as double?,
           accuracy: json[_tagAccuracy] == null
               ? null
-              : AccuracyData.fromJson(json[_tagAccuracy]),
+              : Accuracy.fromJson(json[_tagAccuracy]),
           datasetInfo: DatasetInfo.fromJson(json[_tagDatasetInfo]),
           measuredDurationMs: json[_tagMeasuredDuration] as double,
           measuredSamples: json[_tagMeasuredSamples] as int,

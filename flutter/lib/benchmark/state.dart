@@ -253,7 +253,7 @@ class BenchmarkState extends ChangeNotifier {
         throughput: performanceResult.throughput,
         accuracy: performanceResult.accuracyNum < 0.0
             ? null
-            : AccuracyData(
+            : Accuracy(
                 value: performanceResult.accuracyNum,
                 string: performanceResult.accuracyString,
               ),
@@ -283,7 +283,7 @@ class BenchmarkState extends ChangeNotifier {
               : 0.0,
           accuracy: accuracyResult.accuracyNum < 0.0
               ? null
-              : AccuracyData(
+              : Accuracy(
                   value: accuracyResult.accuracyNum,
                   string: accuracyResult.accuracyString,
                 ),
@@ -332,7 +332,7 @@ class BenchmarkState extends ChangeNotifier {
           throughput: performance.throughput,
           accuracy: performance.accuracyNum < 0.0
               ? null
-              : AccuracyData(
+              : Accuracy(
                   value: performance.accuracyNum,
                   string: performance.accuracyString,
                 ),
@@ -355,7 +355,7 @@ class BenchmarkState extends ChangeNotifier {
                     accuracy.throughput.isFinite ? accuracy.throughput : null,
                 accuracy: accuracy.accuracyNum < 0.0
                     ? null
-                    : AccuracyData(
+                    : Accuracy(
                         value: accuracy.accuracyNum,
                         string: accuracy.accuracyString,
                       ),

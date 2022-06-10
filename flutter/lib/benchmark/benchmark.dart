@@ -15,7 +15,7 @@ import 'run_mode.dart';
 
 class BenchmarkResult {
   final double throughput;
-  final AccuracyData? accuracy;
+  final Accuracy? accuracy;
   final String backendName;
   final String acceleratorName;
   final int batchSize;
@@ -43,8 +43,7 @@ class BenchmarkResult {
     if (json == null) return null;
     return BenchmarkResult(
       throughput: json[_tagThroughput] as double,
-      accuracy:
-          AccuracyData.fromJson(json[_tagAccuracy] as Map<String, dynamic>),
+      accuracy: Accuracy.fromJson(json[_tagAccuracy] as Map<String, dynamic>),
       backendName: json[_tagBackendName] as String,
       acceleratorName: json[_tagAcceleratorName] as String,
       batchSize: json[_tagBatchSize] as int,
