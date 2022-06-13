@@ -251,11 +251,11 @@ class BenchmarkState extends ChangeNotifier {
       final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
         throughput: performanceResult.throughput,
-        accuracy: performanceResult.accuracyNum < 0.0
+        accuracy: performanceResult.accuracyNormalized < 0.0
             ? null
             : Accuracy(
-                normalized: performanceResult.accuracyNum,
-                formatted: performanceResult.accuracyString,
+                normalized: performanceResult.accuracyNormalized,
+                formatted: performanceResult.accuracyFormatted,
               ),
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
@@ -281,18 +281,18 @@ class BenchmarkState extends ChangeNotifier {
           throughput: accuracyResult.throughput.isFinite
               ? accuracyResult.throughput
               : 0.0,
-          accuracy: accuracyResult.accuracyNum < 0.0
+          accuracy: accuracyResult.accuracyNormalized < 0.0
               ? null
               : Accuracy(
-                  normalized: accuracyResult.accuracyNum,
-                  formatted: accuracyResult.accuracyString,
+                  normalized: accuracyResult.accuracyNormalized,
+                  formatted: accuracyResult.accuracyFormatted,
                 ),
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber,
-          validity: accuracyResult.accuracyNum >= 0.0 &&
-              accuracyResult.accuracyNum <= 1.0,
+          validity: accuracyResult.accuracyNormalized >= 0.0 &&
+              accuracyResult.accuracyNormalized <= 1.0,
         );
       }
 
@@ -330,11 +330,11 @@ class BenchmarkState extends ChangeNotifier {
         benchmarkName: benchmark.taskConfig.name,
         performance: BenchmarkRunResult(
           throughput: performance.throughput,
-          accuracy: performance.accuracyNum < 0.0
+          accuracy: performance.accuracyNormalized < 0.0
               ? null
               : Accuracy(
-                  normalized: performance.accuracyNum,
-                  formatted: performance.accuracyString,
+                  normalized: performance.accuracyNormalized,
+                  formatted: performance.accuracyFormatted,
                 ),
           datasetInfo: DatasetInfo(
             name: benchmark.taskConfig.liteDataset.name,
@@ -353,11 +353,11 @@ class BenchmarkState extends ChangeNotifier {
             : BenchmarkRunResult(
                 throughput:
                     accuracy.throughput.isFinite ? accuracy.throughput : null,
-                accuracy: accuracy.accuracyNum < 0.0
+                accuracy: accuracy.accuracyNormalized < 0.0
                     ? null
                     : Accuracy(
-                        normalized: accuracy.accuracyNum,
-                        formatted: accuracy.accuracyString,
+                        normalized: accuracy.accuracyNormalized,
+                        formatted: accuracy.accuracyFormatted,
                       ),
                 datasetInfo: DatasetInfo(
                   name: benchmark.taskConfig.liteDataset.name,
