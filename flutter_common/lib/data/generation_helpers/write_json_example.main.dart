@@ -29,8 +29,8 @@ Future<void> main() async {
   final runResult = BenchmarkRunResult(
     throughput: 123.45,
     accuracy: Accuracy(
-      value: 123.45,
-      string: '123.45%',
+      normalized: 0.123,
+      formatted: '123.45%',
     ),
     datasetInfo: DatasetInfo(
       name: 'Imagenet classification validation set',

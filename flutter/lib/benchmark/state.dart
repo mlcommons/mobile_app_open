@@ -254,8 +254,8 @@ class BenchmarkState extends ChangeNotifier {
         accuracy: performanceResult.accuracyNum < 0.0
             ? null
             : Accuracy(
-                value: performanceResult.accuracyNum,
-                string: performanceResult.accuracyString,
+                normalized: performanceResult.accuracyNum,
+                formatted: performanceResult.accuracyString,
               ),
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
@@ -284,8 +284,8 @@ class BenchmarkState extends ChangeNotifier {
           accuracy: accuracyResult.accuracyNum < 0.0
               ? null
               : Accuracy(
-                  value: accuracyResult.accuracyNum,
-                  string: accuracyResult.accuracyString,
+                  normalized: accuracyResult.accuracyNum,
+                  formatted: accuracyResult.accuracyString,
                 ),
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
@@ -333,8 +333,8 @@ class BenchmarkState extends ChangeNotifier {
           accuracy: performance.accuracyNum < 0.0
               ? null
               : Accuracy(
-                  value: performance.accuracyNum,
-                  string: performance.accuracyString,
+                  normalized: performance.accuracyNum,
+                  formatted: performance.accuracyString,
                 ),
           datasetInfo: DatasetInfo(
             name: benchmark.taskConfig.liteDataset.name,
@@ -356,8 +356,8 @@ class BenchmarkState extends ChangeNotifier {
                 accuracy: accuracy.accuracyNum < 0.0
                     ? null
                     : Accuracy(
-                        value: accuracy.accuracyNum,
-                        string: accuracy.accuracyString,
+                        normalized: accuracy.accuracyNum,
+                        formatted: accuracy.accuracyString,
                       ),
                 datasetInfo: DatasetInfo(
                   name: benchmark.taskConfig.liteDataset.name,

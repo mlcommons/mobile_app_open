@@ -7,23 +7,23 @@ class Accuracy {
   static const String _tagValue = 'value';
   static const String _tagString = 'string';
 
-  final double value;
-  final String string;
+  final double normalized;
+  final String formatted;
 
   Accuracy({
-    required this.value,
-    required this.string,
+    required this.normalized,
+    required this.formatted,
   });
 
   Accuracy.fromJson(Map<String, dynamic> json)
       : this(
-          value: json[_tagValue] as double,
-          string: json[_tagString] as String,
+          normalized: json[_tagValue] as double,
+          formatted: json[_tagString] as String,
         );
 
   Map<String, dynamic> toJson() => {
-        _tagValue: value,
-        _tagString: string,
+        _tagValue: normalized,
+        _tagString: formatted,
       };
 }
 
