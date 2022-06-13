@@ -42,6 +42,7 @@ Future<void> main() async {
   makeNullable(definitions['Result']['properties']['accuracy_run']);
   makeNullable(definitions['Run']['properties']['throughput']);
   makeNullable(definitions['Run']['properties']['accuracy']);
+  makeNullable(definitions['Run']['properties']['accuracy2']);
   (definitions['Run']['properties']['start_datetime'] as Map<String, dynamic>)
       .remove('format');
 

@@ -257,6 +257,12 @@ class BenchmarkState extends ChangeNotifier {
                 normalized: performanceResult.accuracyNormalized,
                 formatted: performanceResult.accuracyFormatted,
               ),
+        accuracy2: performanceResult.accuracyNormalized2 < 0.0
+            ? null
+            : Accuracy(
+                normalized: performanceResult.accuracyNormalized2,
+                formatted: performanceResult.accuracyFormatted2,
+              ),
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
         batchSize: benchmark.config.batchSize,
@@ -287,12 +293,17 @@ class BenchmarkState extends ChangeNotifier {
                   normalized: accuracyResult.accuracyNormalized,
                   formatted: accuracyResult.accuracyFormatted,
                 ),
+          accuracy2: accuracyResult.accuracyNormalized2 < 0.0
+              ? null
+              : Accuracy(
+                  normalized: accuracyResult.accuracyNormalized2,
+                  formatted: accuracyResult.accuracyFormatted2,
+                ),
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber,
-          validity: accuracyResult.accuracyNormalized >= 0.0 &&
-              accuracyResult.accuracyNormalized <= 1.0,
+          validity: accuracyResult.validity,
         );
       }
 
@@ -336,6 +347,12 @@ class BenchmarkState extends ChangeNotifier {
                   normalized: performance.accuracyNormalized,
                   formatted: performance.accuracyFormatted,
                 ),
+          accuracy2: performance.accuracyNormalized2 < 0.0
+              ? null
+              : Accuracy(
+                  normalized: performance.accuracyNormalized2,
+                  formatted: performance.accuracyFormatted2,
+                ),
           datasetInfo: DatasetInfo(
             name: benchmark.taskConfig.liteDataset.name,
             type: DatasetType.fromJson(
@@ -358,6 +375,12 @@ class BenchmarkState extends ChangeNotifier {
                     : Accuracy(
                         normalized: accuracy.accuracyNormalized,
                         formatted: accuracy.accuracyFormatted,
+                      ),
+                accuracy2: accuracy.accuracyNormalized2 < 0.0
+                    ? null
+                    : Accuracy(
+                        normalized: accuracy.accuracyNormalized2,
+                        formatted: accuracy.accuracyFormatted2,
                       ),
                 datasetInfo: DatasetInfo(
                   name: benchmark.taskConfig.liteDataset.name,
