@@ -13,24 +13,27 @@
 # limitations under the License.
 ##########################################################################
 
-flutter_common_dart_flags= \
-        --dart-define=official-build=${OFFICIAL_BUILD}
-
-.PHONY: flutter
-ifeq (${OS},Windows_NT)
-flutter: flutter/prepare flutter/windows
-else
-ifeq ($(shell uname -s),Darwin)
-flutter: flutter/prepare flutter/ios
-else
-flutter: flutter/prepare flutter/android
-endif
-endif
-
 include flutter/ios/ios.mk
 include flutter/windows/windows.mk
 include flutter/windows/windows-docker.mk
 include flutter/android/android.mk
+
+ifeq (${OS},Windows_NT)
+flutter/platform: flutter/windows
+else
+ifeq ($(shell uname -s),Darwin)
+flutter/platform: flutter/ios
+else
+flutter/platform: flutter/android
+endif
+endif
+
+flutter: flutter/prepare flutter/platform
+flutter/firebase: flutter/firebase/config flutter/firebase/prefix
+flutter/result: flutter/result/schema flutter/result/ts
+flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info
+
+flutter_official_build_flag=--dart-define=official-build=${OFFICIAL_BUILD}
 
 .PHONY: flutter/backend-list
 flutter/backend-list:
@@ -52,8 +55,6 @@ $(shell chmod +x ${FIREBASE_CONFIG_ENV_PATH})
 else
 FIREBASE_FLUTTER_ENABLE=true
 endif
-
-flutter/firebase: flutter/firebase/config flutter/firebase/prefix
 
 .PHONY: flutter/firebase/config
 flutter/firebase/config:
@@ -77,8 +78,6 @@ flutter/firebase/prefix:
 		cat firebase_functions/functions/src/prefix.in | sed \
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
 		| tee firebase_functions/functions/src/prefix.gen.ts
-
-flutter/result: flutter/result/schema flutter/result/ts
 
 result_json_example_path=output/extended-result-example.json
 default_result_json_schema_path=flutter/documentation/extended-result.schema.json
@@ -151,9 +150,6 @@ endif
 .PHONY: flutter/test
 flutter/test:
 	cd flutter && ${_start_args} flutter --no-version-check test integration_test ${flutter_test_device_arg}
-
-.PHONY: flutter/prepare
-flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info
 
 .PHONY: flutter/clean
 flutter/clean:
