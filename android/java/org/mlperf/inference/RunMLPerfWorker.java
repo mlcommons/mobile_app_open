@@ -38,6 +38,7 @@ public final class RunMLPerfWorker implements Handler.Callback {
   public static final int PAUSE_1_MINUTE = 60 * 1000; // milliseconds
   public static final float MILLISECONDS_IN_SECOND = 1000f;
   public static final String TAG = "RunMLPerfWorker";
+  public static final int MAX_LATENCY_NS = 1000000;
 
   private final Handler handler;
   private final Callback callback;
@@ -113,6 +114,15 @@ public final class RunMLPerfWorker implements Handler.Callback {
 
       BenchmarkSetting bm = middleInterface.getBenchmark(modelConfig.getId());
 
+      int singleStreamExpectedLatencyNs = bm.getSingleStreamExpectedLatencyNs();
+      if (singleStreamExpectedLatencyNs > MAX_LATENCY_NS) {
+        throw new Exception(
+            "single_stream_expected_latency_ns must be less than "
+                + MAX_LATENCY_NS
+                + " but is "
+                + singleStreamExpectedLatencyNs);
+      }
+
       // Set the dataset.
       switch (dataset.getType()) {
         case IMAGENET:
@@ -159,7 +169,8 @@ public final class RunMLPerfWorker implements Handler.Callback {
       }
 
       MLPerfDriverWrapper driverWrapper = builder.build(modelConfig.getScenario(), batch);
-      driverWrapper.runMLPerf(mode, minQueryCount, minDurationMs, data.outputFolder);
+      driverWrapper.runMLPerf(
+          mode, minQueryCount, minDurationMs, singleStreamExpectedLatencyNs, data.outputFolder);
       Log.i(TAG, "Finished running \"" + modelName + "\".");
       ResultHolder result = new ResultHolder(taskConfig.getName(), data.benchmarkId);
       result.setRuntime(runtime);

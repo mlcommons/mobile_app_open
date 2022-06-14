@@ -173,6 +173,7 @@ benchmark_setting {
     value: "false"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
+  single_stream_expected_latency_ns: 900000
 }
 
 benchmark_setting {
@@ -322,6 +323,7 @@ benchmark_setting {
     value: "false"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+  single_stream_expected_latency_ns: 900000
 })SETTINGS";
 
 const std::string sbe1200_config = R"SETTINGS(
@@ -411,6 +413,7 @@ benchmark_setting {
     value: "Uint8"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
+  single_stream_expected_latency_ns: 900000
 }
 
 benchmark_setting {
@@ -460,6 +463,7 @@ benchmark_setting {
     value: "Float32"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+  single_stream_expected_latency_ns: 900000
 })SETTINGS";
 
 }  // namespace sbe

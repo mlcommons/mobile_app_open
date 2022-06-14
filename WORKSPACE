@@ -31,6 +31,8 @@ tf_workspace2()
 android_sdk_repository(
     name = "androidsdk",
     api_level = 30,
+    # 30.0.3 required, see https://stackoverflow.com/a/68036845
+    build_tools_version = "30.0.3",
 )
 
 android_ndk_repository(

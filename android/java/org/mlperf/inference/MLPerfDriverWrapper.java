@@ -35,11 +35,18 @@ public final class MLPerfDriverWrapper implements AutoCloseable {
    * @param minQueryCount is the minimum number of samples should be run.
    * @param minDurationMs is the minimum duration in ms. After both conditions are met, the test
    *     ends.
+   * @param singleStreamExpectedLatencyNs is the expected latency in ns for single stream scenario.
    * @param outputDir is the directory to store the log files.
    */
   @SuppressWarnings("JavadocReference")
-  public void runMLPerf(String mode, int minQueryCount, int minDurationMs, String outputDir) {
-    nativeRun(driverHandle, mode, minQueryCount, minDurationMs, outputDir);
+  public void runMLPerf(
+      String mode,
+      int minQueryCount,
+      int minDurationMs,
+      int singleStreamExpectedLatencyNs,
+      String outputDir) {
+    nativeRun(
+        driverHandle, mode, minQueryCount, minDurationMs, singleStreamExpectedLatencyNs, outputDir);
   }
 
   // The latency in ms is formatted with two decimal places.
@@ -83,7 +90,12 @@ public final class MLPerfDriverWrapper implements AutoCloseable {
       long datasetHandle, long backendHandle, String scenario, int batch);
 
   private native void nativeRun(
-      long driverHandle, String jmode, int minQueryCount, int minDuration, String outputDir);
+      long driverHandle,
+      String jmode,
+      int minQueryCount,
+      int minDuration,
+      int singleStreamExpectedLatencyNs,
+      String outputDir);
 
   private native float nativeGetLatency(long handle);
 

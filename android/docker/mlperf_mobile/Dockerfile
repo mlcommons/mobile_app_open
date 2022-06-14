@@ -55,7 +55,7 @@ RUN mkdir -p ${android_home} && \
 ENV ANDROID_HOME ${android_home}
 ENV ANDROID_NDK_HOME ${android_ndk_home}
 ENV ADB_INSTALL_TIMEOUT 120
-ENV PATH=${ANDROID_HOME}/emulator:${ANDROID_HOME}/cmdline-tools/tools/bin:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/build-tools/29.0.3:${PATH}
+ENV PATH=${ANDROID_HOME}/emulator:${ANDROID_HOME}/cmdline-tools/tools/bin:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/build-tools/30.0.3:${PATH}
 
 RUN mkdir ~/.android && echo '### User Sources for Android SDK Manager' > ~/.android/repositories.cfg
 
@@ -67,7 +67,7 @@ RUN yes | sdkmanager \
     "extras;android;m2repository" \
     "extras;google;m2repository" \
     "extras;google;google_play_services" \
-    "build-tools;29.0.3"
+    "build-tools;30.0.3"
 
 ARG android_version=30
 RUN sdkmanager "platforms;android-${android_version}" "cmake;3.6.4111459"
