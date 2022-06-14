@@ -30,7 +30,7 @@ Future<void> main() async {
     throughput: 123.45,
     accuracy: Accuracy(
       normalized: 0.123,
-      formatted: '123.45%',
+      formatted: '12.3%',
     ),
     datasetInfo: DatasetInfo(
       name: 'Imagenet classification validation set',
