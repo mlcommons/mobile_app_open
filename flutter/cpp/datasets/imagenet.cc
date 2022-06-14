@@ -162,7 +162,7 @@ float Imagenet::ComputeAccuracy() {
   std::ifstream gt_file(groundtruth_file_);
   if (!gt_file.good()) {
     LOG(WARNING) << "Could not read the ground truth file";
-    return 0.0f;
+    return -1.0f;
   }
   int32_t label_idx;
   std::vector<int32_t> groundtruth;
@@ -180,7 +180,7 @@ float Imagenet::ComputeAccuracy() {
 
 std::string Imagenet::ComputeAccuracyString() {
   float result = ComputeAccuracy();
-  if (result == 0.0f) {
+  if (result < 0.0f) {
     return std::string("N/A");
   }
   std::stringstream stream;

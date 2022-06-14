@@ -11,7 +11,8 @@
 // Linker sees that we don't use some of the functions and removes them
 // (when building for release of profile modes)
 // But we still want to access these functions dynamically,
-// so we need fake_calls() function to prevent linker from removing them.
+// so we call this function in iOS native code
+// to prevent linker from removing them.
 extern "C" void ios_linker_workaround() {
   volatile intptr_t a = 1;
   if (a) return;

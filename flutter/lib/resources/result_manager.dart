@@ -15,7 +15,12 @@ class _ExtendedResultList {
   static _ExtendedResultList fromJson(List<dynamic> json) {
     final list = <ExtendedResult>[];
     for (var item in json) {
-      list.add(ExtendedResult.fromJson(item as Map<String, dynamic>));
+      try {
+        list.add(ExtendedResult.fromJson(item as Map<String, dynamic>));
+      } catch (e, trace) {
+        print('unable to parse result from history: $e');
+        print(trace);
+      }
     }
     return _ExtendedResultList(list);
   }
@@ -38,7 +43,12 @@ class ResultManager {
       : jsonFile = File('$applicationDirectory/$_resultsFileName');
 
   Future<void> init() async {
-    _results = await _restoreResults();
+    try {
+      _results = await _restoreResults();
+    } catch (e, trace) {
+      print('unable to read saved results: $e');
+      print(trace);
+    }
   }
 
   Future<void> _saveResults() async {
@@ -98,7 +108,7 @@ class ResultManager {
 
     return BenchmarkResult(
         throughput: runResult.throughput ?? 0.0,
-        accuracy: runResult.accuracy?.toString() ?? '',
+        accuracy: runResult.accuracy,
         backendName: export.backendInfo.name,
         acceleratorName: export.backendInfo.accelerator,
         batchSize: export.backendSettingsInfo.batchSize,

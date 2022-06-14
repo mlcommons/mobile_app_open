@@ -3,6 +3,30 @@ import 'backend_settings.dart';
 import 'dataset_info.dart';
 import 'loadgen_scenario.dart';
 
+class Accuracy {
+  static const String _tagValue = 'value';
+  static const String _tagString = 'string';
+
+  final double normalized;
+  final String formatted;
+
+  Accuracy({
+    required this.normalized,
+    required this.formatted,
+  });
+
+  Accuracy.fromJson(Map<String, dynamic> json)
+      : this(
+          normalized: json[_tagValue] as double,
+          formatted: json[_tagString] as String,
+        );
+
+  Map<String, dynamic> toJson() => {
+        _tagValue: normalized,
+        _tagString: formatted,
+      };
+}
+
 class BenchmarkRunResult {
   static const String _tagThroughput = 'throughput';
   static const String _tagAccuracy = 'accuracy';
@@ -13,7 +37,7 @@ class BenchmarkRunResult {
   static const String _tagValidity = 'loadgen_validity';
 
   final double? throughput;
-  final double? accuracy;
+  final Accuracy? accuracy;
   final DatasetInfo datasetInfo;
   final double measuredDurationMs;
   final int measuredSamples;
@@ -33,9 +57,10 @@ class BenchmarkRunResult {
   BenchmarkRunResult.fromJson(Map<String, dynamic> json)
       : this(
           throughput: json[_tagThroughput] as double?,
-          accuracy: json[_tagAccuracy] as double?,
-          datasetInfo: DatasetInfo.fromJson(
-              json[_tagDatasetInfo] as Map<String, dynamic>),
+          accuracy: json[_tagAccuracy] == null
+              ? null
+              : Accuracy.fromJson(json[_tagAccuracy]),
+          datasetInfo: DatasetInfo.fromJson(json[_tagDatasetInfo]),
           measuredDurationMs: json[_tagMeasuredDuration] as double,
           measuredSamples: json[_tagMeasuredSamples] as int,
           startDatetime: DateTime.parse(json[_tagStartDatetime] as String),
@@ -90,9 +115,9 @@ class BenchmarkExportResult {
             benchmarkId: json[_tagBenchmarkId] as String,
             benchmarkName: json[_tagBenchmarkName] as String,
             loadgenScenario:
-                LoadgenScenario.fromJson(json[_tagLoadgenScenario] as String),
-            backendSettingsInfo: BackendSettingsInfo.fromJson(
-                json[_tagBackendSettings] as Map<String, dynamic>),
+                LoadgenScenario.fromJson(json[_tagLoadgenScenario]),
+            backendSettingsInfo:
+                BackendSettingsInfo.fromJson(json[_tagBackendSettings]),
             performance: BenchmarkRunResult.fromJson(json[_tagPerformanceRun]),
             accuracy: json[_tagAccuracyRun] == null
                 ? null
