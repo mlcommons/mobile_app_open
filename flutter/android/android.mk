@@ -52,12 +52,12 @@ flutter_common_docker_flags= \
 		${backend_samsung_docker_args} \
 		mlcommons/mlperf_mobile_flutter
 
-.PHONY: flutter/android/apk
+flutter/android/release: flutter/android/apk
 flutter/android/apk: flutter/android flutter/android/apk-only
 
 .PHONY: flutter/android/apk-only
 flutter/android/apk-only: flutter/prepare
-	cd flutter && ${_start_args} flutter --no-version-check build apk ${flutter_common_dart_flags}
+	cd flutter && ${_start_args} flutter --no-version-check build apk ${flutter_official_build_flag}
 	mkdir -p output/flutter/android/
 	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk output/flutter/android/release.apk
 
