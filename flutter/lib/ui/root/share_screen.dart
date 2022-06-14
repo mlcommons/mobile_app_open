@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/icons.dart' show AppIcons;
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/icons.dart' show AppIcons;
 import 'package:mlperfbench/ui/page_constraints.dart';
 import 'main_screen.dart';
 

@@ -7,15 +7,15 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/icons.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
-import 'package:mlperfbench/ui/app_bar.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
-import 'package:mlperfbench/ui/list_of_benchmark_items.dart';
-import 'package:mlperfbench/ui/progress_screen.dart';
-import 'package:mlperfbench/ui/result_screen.dart';
+import 'package:mlperfbench/ui/icons.dart';
+import 'package:mlperfbench/ui/run/app_bar.dart';
+import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/run/progress_screen.dart';
+import 'package:mlperfbench/ui/run/result_screen.dart';
 
 class MainKeys {
   // list of widget keys that need to be accessed in the test code
