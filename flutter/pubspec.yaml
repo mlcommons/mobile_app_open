@@ -44,6 +44,7 @@ dependencies:
   mlperfbench_common:
     path: ../flutter_common
   crypto: ^3.0.1
+  tuple: ^2.0.0
 
 dev_dependencies:
   flutter_test:
