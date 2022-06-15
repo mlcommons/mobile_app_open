@@ -23,7 +23,8 @@ protoc --version
 brew install cocoapods
 pod --version
 
-python3 -m pip install \
+pip3 install --upgrade pip
+pip3 install \
   numpy==1.21.5 \
   absl-py==1.0.0
 
