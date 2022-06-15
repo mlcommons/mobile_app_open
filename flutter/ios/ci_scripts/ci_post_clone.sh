@@ -10,24 +10,20 @@ echo "$LOG_PREFIX Current working directory is $PWD"
 test -f WORKSPACE
 export ROOT_DIR=$PWD
 
-echo "$LOG_PREFIX Install dependencies"
-
 brew --version
+python3 --version
 
+echo "$LOG_PREFIX Install dependencies"
 export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
-
-brew extract --version=1.11.0 bazelisk homebrew/cask && brew install bazelisk@1.11.0
+brew install bazelisk
 bazel --version
-
-brew extract --version=3.19.4 protobuf homebrew/cask && brew install protobuf@3.19.4
+brew install protobuf
 protoc --version
-
-brew extract --version=1.11.3 cocoapods homebrew/cask && brew install cocoapods@1.11.3
+brew install cocoapods
 pod --version
 
-python3.9 --version
-python3.9 -m pip install \
+python3 -m pip install \
   numpy==1.21.5 \
   absl-py==1.0.0
 
