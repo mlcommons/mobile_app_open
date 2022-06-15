@@ -11,10 +11,20 @@ test -f WORKSPACE
 export ROOT_DIR=$PWD
 
 echo "$LOG_PREFIX Install dependencies"
+
+brew --version
+
 export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_INSTALL_CLEANUP=1
+
 brew extract --version=1.11.0 bazelisk homebrew/cask && brew install bazelisk@1.11.0
+bazel --version
+
 brew extract --version=3.19.4 protobuf homebrew/cask && brew install protobuf@3.19.4
+protoc --version
+
 brew extract --version=1.11.3 cocoapods homebrew/cask && brew install cocoapods@1.11.3
+pod --version
 
 python3.9 --version
 python3.9 -m pip install \
