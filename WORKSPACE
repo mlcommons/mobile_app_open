@@ -55,12 +55,13 @@ android_workspace()
 #    name = "androidndk",
 #)
 
-http_archive(
-    name = "neuron_delegate",
-    sha256 = "2e4600c99c9b4ea7a129108cd688419eeef9b2aeabf05df6f385258e19ca96c4",
-    strip_prefix = "tflite-neuron-delegate-2.6.0",
-    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/v2.6.0.tar.gz"],
-)
+# use Neuron Delegate aar before we have updated source code
+#http_archive(
+#    name = "neuron_delegate",
+#    sha256 = "2e4600c99c9b4ea7a129108cd688419eeef9b2aeabf05df6f385258e19ca96c4",
+#    strip_prefix = "tflite-neuron-delegate-2.6.0",
+#    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/v2.6.0.tar.gz"],
+#)
 
 new_local_repository(
     name = "samsungbackend",
