@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/ui/history/result_details_screen.dart';
+import 'result_details_screen.dart';
 
 // import 'package:mlperfbench/localizations/app_localizations.dart';
 
@@ -61,9 +61,7 @@ class _HistoryScreen extends State<HistoryScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DetailsScreen(
-                    result: result,
-                  ),
+                  builder: (context) => DetailsScreen(result: result),
                 ),
               );
             },

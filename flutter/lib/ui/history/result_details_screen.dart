@@ -7,6 +7,7 @@ import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:tuple/tuple.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'run_details_screen.dart';
 
 // import 'package:mlperfbench/localizations/app_localizations.dart';
 
@@ -63,6 +64,8 @@ class _DetailsScreen extends State<DetailsScreen> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 0.0),
       child: ListTile(
+        // visualDensity: VisualDensity(vertical: VisualDensity.minimumDensity),
+        minVerticalPadding: 0,
         title: Text(name),
         subtitle: GestureDetector(
           child: Text(
@@ -101,7 +104,14 @@ class _DetailsScreen extends State<DetailsScreen> {
               runInfo.benchmarkName,
               runInfo.performance?.throughput?.toStringAsFixed(2) ?? 'N/A',
               runInfo.accuracy?.accuracy?.formatted ?? 'N/A',
-            ], () {});
+            ], () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RunDetailsScreen(result: runInfo),
+                ),
+              );
+            });
           }).toList(),
     );
   }
