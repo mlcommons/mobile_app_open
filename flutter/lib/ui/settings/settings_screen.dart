@@ -6,9 +6,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
-import 'package:mlperfbench/ui/benchmarks_configuration_screen.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
-import 'package:mlperfbench/ui/snack_bar.dart';
+import 'package:mlperfbench/ui/settings/benchmarks_configuration_screen.dart';
+import 'package:mlperfbench/ui/settings/snack_bar.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override

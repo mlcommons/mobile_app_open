@@ -4,8 +4,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mlperfbench/main.dart' as app;
-import 'package:mlperfbench/ui/main_screen.dart';
-import 'package:mlperfbench/ui/result_screen.dart';
+import 'package:mlperfbench/ui/root/main_screen.dart';
+import 'package:mlperfbench/ui/run/result_screen.dart';
 import 'package:mlperfbench/resources/resource_manager.dart'
     as resource_manager;
 import 'package:mlperfbench/resources/result_manager.dart' as result_manager;

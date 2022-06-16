@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench/icons.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
+import 'package:mlperfbench/ui/icons.dart';
 
 enum BenchmarkTypeEnum {
   unknown,
