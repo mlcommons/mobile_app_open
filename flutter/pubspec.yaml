@@ -45,6 +45,7 @@ dependencies:
     path: ../flutter_common
   crypto: ^3.0.1
   tuple: ^2.0.0
+  bot_toast: ^4.0.2
 
 dev_dependencies:
   flutter_test:

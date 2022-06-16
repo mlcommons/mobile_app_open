@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/ui/history/result_details_screen.dart';
 
-import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
-
-import 'package:mlperfbench/benchmark/state.dart';
 // import 'package:mlperfbench/localizations/app_localizations.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -24,8 +26,12 @@ class _HistoryScreen extends State<HistoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Result history', // TODO move to resources
+          'Past results', // TODO move to resources
+          style: TextStyle(fontSize: 24, color: AppColors.lightText),
         ),
+        centerTitle: true,
+        backgroundColor: AppColors.darkAppBarBackground,
+        iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.only(top: 20),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:bot_toast/bot_toast.dart';
+
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
@@ -45,6 +47,8 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: AppColors.darkAppBarIconTheme),
         ),
       ),
+      builder: BotToastInit(),
+      navigatorObservers: [BotToastNavigatorObserver()],
       // TODO sharing screen temporarily disabled
       // home: store.isShareOptionChosen() ? MyHomePage() : ShareScreen(),
       home: home,
