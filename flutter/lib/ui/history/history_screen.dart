@@ -53,7 +53,7 @@ class _HistoryScreen extends State<HistoryScreen> {
               ),
             ),
             subtitle: Text(
-              'Average: ${result.results.calculateAverageThroughput().toStringAsFixed(2)}',
+              'Average: ${result.results.calculateAverageThroughput().toStringAsFixed(2)} over ${result.results.list.length} benchmark${result.results.list.length > 1 ? 's' : ''}',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             trailing: Icon(Icons.arrow_forward_ios),

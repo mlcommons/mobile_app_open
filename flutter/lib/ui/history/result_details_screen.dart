@@ -27,16 +27,18 @@ class _DetailsScreen extends State<DetailsScreen> {
 
     var dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
-    final releaseVersion = widget.result.buildInfo.officialReleaseFlag &&
-        !widget.result.buildInfo.gitDirtyFlag &&
-        !widget.result.buildInfo.devTestFlag;
+    final appVersionType = (widget.result.buildInfo.gitDirtyFlag ||
+            widget.result.buildInfo.devTestFlag)
+        ? 'debug build'
+        : widget.result.buildInfo.officialReleaseFlag
+            ? 'official'
+            : 'unofficial';
     final date = dateFormat
         .format(widget.result.results.list.first.performance!.startDatetime);
     final averageThroughput =
         widget.result.results.calculateAverageThroughput().toStringAsFixed(2);
     final appVersion =
-        '${widget.result.buildInfo.version} (build ${widget.result.buildInfo.buildNumber})' +
-            (releaseVersion ? '' : ' (unofficial)');
+        '${widget.result.buildInfo.version} (build ${widget.result.buildInfo.buildNumber}) ($appVersionType)';
     final backendName = widget.result.results.list.first.backendInfo.name;
 
     return Scaffold(
@@ -54,7 +56,7 @@ class _DetailsScreen extends State<DetailsScreen> {
         _makeInfo('UUID', widget.result.meta.uuid),
         _makeInfo('Average throughput', averageThroughput),
         _makeInfo('App version', appVersion),
-        _makeInfo('Backend', backendName),
+        _makeInfo('Backend name', backendName),
         _makeResultTable(),
       ]),
     );
@@ -73,12 +75,13 @@ class _DetailsScreen extends State<DetailsScreen> {
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
+              fontSize: 18.0,
             ),
           ),
           onTap: () async {
             await Clipboard.setData(ClipboardData(text: value));
             BotToast.showText(
-              text: 'Value copied to clipboard',
+              text: '$name value copied to clipboard',
               animationDuration: Duration(milliseconds: 60),
               animationReverseDuration: Duration(milliseconds: 60),
               duration: Duration(seconds: 1),
@@ -122,10 +125,29 @@ class _DetailsScreen extends State<DetailsScreen> {
         final rowValues = rowData.item1;
         final onTap = rowData.item2;
         final table = Table(
-          border: TableBorder.all(
-            width: 1,
-            color: Colors.blue,
-          ),
+          border: onTap == null
+              ? TableBorder.all(
+                  width: 1,
+                  color: Colors.blue,
+                )
+              : TableBorder(
+                  left: BorderSide(
+                    width: 1,
+                    color: Colors.blue,
+                  ),
+                  right: BorderSide(
+                    width: 1,
+                    color: Colors.blue,
+                  ),
+                  bottom: BorderSide(
+                    width: 1,
+                    color: Colors.blue,
+                  ),
+                  verticalInside: BorderSide(
+                    width: 1,
+                    color: Colors.blue,
+                  ),
+                ),
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           columnWidths: const {
             0: FlexColumnWidth(10),
