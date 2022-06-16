@@ -117,11 +117,7 @@ flutter/build-info:
 flutter/protobuf:
 	rm -rf flutter/lib/protos
 	mkdir -p flutter/lib/protos
-	# since we are gonna build protobuf, build the protoc
-	bazel build -c opt --spawn_strategy=standalone \
-		@com_google_protobuf//:protoc
-	bazel-bin/external/com_google_protobuf/protoc \
-		--proto_path flutter/cpp/proto \
+	protoc --proto_path flutter/cpp/proto \
 		--dart_out flutter/lib/protos \
 		flutter/cpp/proto/*.proto
 	dart format flutter/lib/protos
