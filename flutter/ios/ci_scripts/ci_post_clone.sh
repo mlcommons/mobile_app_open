@@ -40,6 +40,6 @@ echo "$LOG_PREFIX Build app"
 cd "$ROOT_DIR" && make
 cd "$ROOT_DIR"/flutter && flutter precache --ios
 cd "$ROOT_DIR"/flutter/ios && pod install
-cd "$ROOT_DIR"/flutter && flutter build ios integration_test/first_test.dart --release
+cd "$ROOT_DIR"/flutter && flutter build ios --config-only integration_test/first_test.dart
 
 exit 0
