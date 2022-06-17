@@ -30,6 +30,7 @@ fi
 LOG_TXT=$MC_BUILD_HOME/cache/cached.txt
 mkdir -p $MC_BUILD_HOME/cache
 touch $LOG_TXT
+echo "LOG_TXT=$LOG_TXT"
 echo "[$(date +"%Y-%m-%dT%H:%M:%S%z")] CI_BUILD_NUMBER=$CI_BUILD_NUMBER | CI_XCODEBUILD_ACTION=$CI_XCODEBUILD_ACTION | a" >> $LOG_TXT
 cat $LOG_TXT
 exit 1
