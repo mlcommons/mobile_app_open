@@ -82,6 +82,43 @@
   "confirmDialogTitle": "Confirm?",
   "uploadButton": "Upload results",
   "uploadSuccess": "Results uploaded successfully",
-  "uploadFail": "Error uploading results"
+  "uploadFail": "Error uploading results",
+
+  "notAvailable": "N/A",
+
+  "historyListTitle": "Past results",
+  "historyListElementSubtitle": "Average QPS <throughput> over <benchmarks#> benchmark(s)",
+
+  "historyDetailsTitle": "Result details",
+  "historyDetailsBuildTypeDebug": "debug build",
+  "historyDetailsBuildTypeOfficial": "official",
+  "historyDetailsBuildTypeUnofficial": "unofficial",
+  "historyDetailsDate": "Date",
+  "historyDetailsUUID": "UUID",
+  "historyDetailsAvgQps": "Average throughput (QPS)",
+  "historyDetailsAppVersion": "App version",
+  "historyDetailsAppVersionTemplate": "<version> (build <build>) (<buildType>)",
+  "historyDetailsBackendName": "Backend name",
+  "historyDetailsTableColName": "Benchmark name",
+  "historyDetailsTableColPerf": "Throughput",
+  "historyDetailsTableColAccuracy": "Accuracy",
+
+  "historyRunDetailsTitle": "Run details",
+  "historyRunDetailsBenchName": "Benchmark name",
+  "historyRunDetailsScenario": "Scenario",
+  "historyRunDetailsBackendName": "Backend name",
+  "historyRunDetailsVendorName": "Vendor name",
+  "historyRunDetailsAccelerator": "Accelerator",
+  "historyRunDetailsPerfTitle": "Performance run",
+  "historyRunDetailsPerfQps": "Throughput",
+  "historyRunDetailsValid": "Run is valid",
+  "historyRunDetailsDuration": "Duration",
+  "historyRunDetailsSamples": "Samples count",
+  "historyRunDetailsDatasetType": "Dataset type",
+  "historyRunDetailsDatasetName": "Dataset name",
+  "historyRunDetailsAccuracyTitle": "Accuracy run",
+  "historyRunDetailsAccuracy": "Accuracy",
+
+  "historyValueCopiedToast": "<name> value copied to clipboard"
 }
 

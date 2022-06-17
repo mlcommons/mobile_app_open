@@ -7,9 +7,8 @@ import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:tuple/tuple.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'run_details_screen.dart';
-
-// import 'package:mlperfbench/localizations/app_localizations.dart';
 
 class DetailsScreen extends StatefulWidget {
   final ExtendedResult result;
@@ -21,30 +20,34 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreen extends State<DetailsScreen> {
+  late AppLocalizations l10n;
+
   @override
   Widget build(BuildContext context) {
-    // final stringResources = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context);
 
     var dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
     final appVersionType = (widget.result.buildInfo.gitDirtyFlag ||
             widget.result.buildInfo.devTestFlag)
-        ? 'debug build'
+        ? l10n.historyDetailsBuildTypeDebug
         : widget.result.buildInfo.officialReleaseFlag
-            ? 'official'
-            : 'unofficial';
+            ? l10n.historyDetailsBuildTypeOfficial
+            : l10n.historyDetailsBuildTypeUnofficial;
     final date = dateFormat
         .format(widget.result.results.list.first.performance!.startDatetime);
     final averageThroughput =
         widget.result.results.calculateAverageThroughput().toStringAsFixed(2);
-    final appVersion =
-        '${widget.result.buildInfo.version} (build ${widget.result.buildInfo.buildNumber}) ($appVersionType)';
+    final appVersion = l10n.historyDetailsAppVersionTemplate
+        .replaceFirst('<version>', widget.result.buildInfo.version)
+        .replaceFirst('<build>', widget.result.buildInfo.buildNumber)
+        .replaceFirst('<buildType>', appVersionType);
     final backendName = widget.result.results.list.first.backendInfo.name;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Result details', // TODO move to resources
+          l10n.historyDetailsTitle,
           style: TextStyle(fontSize: 24, color: AppColors.lightText),
         ),
         centerTitle: true,
@@ -52,11 +55,11 @@ class _DetailsScreen extends State<DetailsScreen> {
         iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
       ),
       body: ListView(padding: const EdgeInsets.only(top: 0), children: [
-        _makeInfo('Date', date),
-        _makeInfo('UUID', widget.result.meta.uuid),
-        _makeInfo('Average throughput', averageThroughput),
-        _makeInfo('App version', appVersion),
-        _makeInfo('Backend name', backendName),
+        _makeInfo(l10n.historyDetailsDate, date),
+        _makeInfo(l10n.historyDetailsUUID, widget.result.meta.uuid),
+        _makeInfo(l10n.historyDetailsAvgQps, averageThroughput),
+        _makeInfo(l10n.historyDetailsAppVersion, appVersion),
+        _makeInfo(l10n.historyDetailsBackendName, backendName),
         _makeResultTable(),
       ]),
     );
@@ -81,7 +84,7 @@ class _DetailsScreen extends State<DetailsScreen> {
           onTap: () async {
             await Clipboard.setData(ClipboardData(text: value));
             BotToast.showText(
-              text: '$name value copied to clipboard',
+              text: l10n.historyValueCopiedToast.replaceFirst('<name>', name),
               animationDuration: Duration(milliseconds: 60),
               animationReverseDuration: Duration(milliseconds: 60),
               duration: Duration(seconds: 1),
@@ -96,17 +99,17 @@ class _DetailsScreen extends State<DetailsScreen> {
     return _makeTable(
       [
             Tuple2([
-              'Benchmark name',
-              'Throughput',
-              'Accuracy',
+              l10n.historyDetailsTableColName,
+              l10n.historyDetailsTableColPerf,
+              l10n.historyDetailsTableColAccuracy,
               // ignore: unnecessary_cast
             ], null as void Function()?)
           ] +
           widget.result.results.list.map((runInfo) {
             return Tuple2([
               runInfo.benchmarkName,
-              runInfo.performance?.throughput?.toStringAsFixed(2) ?? 'N/A',
-              runInfo.accuracy?.accuracy?.formatted ?? 'N/A',
+              runInfo.performance?.throughput?.toStringAsFixed(2) ?? l10n.notAvailable,
+              runInfo.accuracy?.accuracy?.formatted ?? l10n.notAvailable,
             ], () {
               Navigator.push(
                 context,

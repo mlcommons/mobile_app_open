@@ -5,9 +5,8 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'result_details_screen.dart';
-
-// import 'package:mlperfbench/localizations/app_localizations.dart';
 
 class HistoryScreen extends StatefulWidget {
   @override
@@ -18,7 +17,7 @@ class _HistoryScreen extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
-    // final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     final results = state.resourceManager.resultManager.results;
     var dateFormat = DateFormat('yyyy-MM-dd HH:mm');
@@ -26,7 +25,7 @@ class _HistoryScreen extends State<HistoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Past results', // TODO move to resources
+          l10n.historyListTitle,
           style: TextStyle(fontSize: 24, color: AppColors.lightText),
         ),
         centerTitle: true,
@@ -53,7 +52,14 @@ class _HistoryScreen extends State<HistoryScreen> {
               ),
             ),
             subtitle: Text(
-              'Average: ${result.results.calculateAverageThroughput().toStringAsFixed(2)} over ${result.results.list.length} benchmark${result.results.list.length > 1 ? 's' : ''}',
+              l10n.historyListElementSubtitle
+                  .replaceFirst(
+                      '<throughput>',
+                      result.results
+                          .calculateAverageThroughput()
+                          .toStringAsFixed(2))
+                  .replaceFirst(
+                      '<benchmarks#>', result.results.list.length.toString()),
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             trailing: Icon(Icons.arrow_forward_ios),

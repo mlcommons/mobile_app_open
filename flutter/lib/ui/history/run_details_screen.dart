@@ -4,11 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
-import 'package:tuple/tuple.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-
-// import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
 
 class RunDetailsScreen extends StatefulWidget {
   final BenchmarkExportResult result;
@@ -20,16 +18,18 @@ class RunDetailsScreen extends StatefulWidget {
 }
 
 class _RunDetailsScreen extends State<RunDetailsScreen> {
+  late AppLocalizations l10n;
+
   @override
   Widget build(BuildContext context) {
-    // final stringResources = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context);
 
     var dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Result details', // TODO move to resources
+          l10n.historyRunDetailsTitle,
           style: TextStyle(fontSize: 24, color: AppColors.lightText),
         ),
         centerTitle: true,
@@ -37,15 +37,19 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
         iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
       ),
       body: ListView(padding: const EdgeInsets.only(top: 0), children: [
-        _makeInfo('Benchmark name', widget.result.benchmarkName),
-        _makeInfo('Scenario', widget.result.loadgenScenario.toJson()),
-        _makeInfo('Backend name', widget.result.backendInfo.name),
-        _makeInfo('Vendor name', widget.result.backendInfo.vendor),
-        _makeInfo('Accelerator', widget.result.backendInfo.accelerator),
+        _makeInfo(l10n.historyRunDetailsBenchName, widget.result.benchmarkName),
+        _makeInfo(l10n.historyRunDetailsScenario,
+            widget.result.loadgenScenario.toJson()),
+        _makeInfo(
+            l10n.historyRunDetailsBackendName, widget.result.backendInfo.name),
+        _makeInfo(
+            l10n.historyRunDetailsVendorName, widget.result.backendInfo.vendor),
+        _makeInfo(l10n.historyRunDetailsAccelerator,
+            widget.result.backendInfo.accelerator),
         Divider(),
         Center(
           child: Text(
-            'Performance run',
+            l10n.historyRunDetailsPerfTitle,
             style: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.bold,
@@ -54,26 +58,26 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
         ),
         if (widget.result.performance != null) ...[
           _makeInfo(
-              'Throughput',
+              l10n.historyRunDetailsPerfQps,
               widget.result.performance!.throughput?.toStringAsFixed(2) ??
-                  'N/A'),
-          _makeInfo('Run is valid',
+                  l10n.notAvailable),
+          _makeInfo(l10n.historyRunDetailsValid,
               widget.result.performance!.loadgenValidity.toString()),
           _makeInfo(
-              'Duration',
+              l10n.historyRunDetailsDuration,
               formatDuration(Duration(
                   milliseconds:
                       widget.result.performance!.measuredDurationMs.round()))),
-          _makeInfo('Samples count',
+          _makeInfo(l10n.historyRunDetailsSamples,
               widget.result.performance!.measuredSamples.toString()),
-          _makeInfo('Dataset type',
+          _makeInfo(l10n.historyRunDetailsDatasetType,
               widget.result.performance!.datasetInfo.type.toJson()),
-          _makeInfo(
-              'Dataset name', widget.result.performance!.datasetInfo.name),
+          _makeInfo(l10n.historyRunDetailsDatasetName,
+              widget.result.performance!.datasetInfo.name),
         ] else ...[
           Center(
             child: Text(
-              'N/A',
+              l10n.notAvailable,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -84,7 +88,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
         Divider(),
         Center(
           child: Text(
-            'Accuracy run',
+            l10n.historyRunDetailsAccuracyTitle,
             style: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.bold,
@@ -92,24 +96,25 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
           ),
         ),
         if (widget.result.accuracy != null) ...[
+          _makeInfo(l10n.historyRunDetailsAccuracy,
+              widget.result.accuracy!.accuracy?.formatted ?? l10n.notAvailable),
           _makeInfo(
-              'Accuracy', widget.result.accuracy!.accuracy?.formatted ?? 'N/A'),
-          _makeInfo(
-              'Duration',
+              l10n.historyRunDetailsDuration,
               formatDuration(Duration(
                   milliseconds:
                       widget.result.accuracy!.measuredDurationMs.round()))),
-          _makeInfo('Samples count',
+          _makeInfo(l10n.historyRunDetailsSamples,
               widget.result.accuracy!.measuredSamples.toString()),
-          _makeInfo('Dataset type',
+          _makeInfo(l10n.historyRunDetailsDatasetType,
               widget.result.accuracy!.datasetInfo.type.toJson()),
-          _makeInfo('Dataset name', widget.result.accuracy!.datasetInfo.name),
+          _makeInfo(l10n.historyRunDetailsDatasetName,
+              widget.result.accuracy!.datasetInfo.name),
         ] else ...[
           Center(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 15.0),
               child: Text(
-                'N/A',
+                l10n.notAvailable,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -156,7 +161,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
           onTap: () async {
             await Clipboard.setData(ClipboardData(text: value));
             BotToast.showText(
-              text: 'Value copied to clipboard',
+              text: l10n.historyValueCopiedToast.replaceFirst('<name>', name),
               animationDuration: Duration(milliseconds: 60),
               animationReverseDuration: Duration(milliseconds: 60),
               duration: Duration(seconds: 1),
