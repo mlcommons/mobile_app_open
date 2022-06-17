@@ -19,21 +19,12 @@ export MC_REPO_HOME=$PWD
 
 if [ "$CI" = "TRUE" ]; then
   echo "$MC_LOG_PREFIX Running on CI machine"
-  # Data in CI_DERIVED_DATA_PATH is persistent between builds.
-  export MC_BUILD_HOME=$CI_DERIVED_DATA_PATH
+  export MC_BUILD_HOME=$CI_DERIVED_DATA_PATH/mobile_app_open_build
   export OFFICIAL_BUILD=true
 else
   echo "$MC_LOG_PREFIX Running on local machine"
-  export MC_BUILD_HOME="$HOME"/mobile_app_open_build
+  export MC_BUILD_HOME=$HOME/mobile_app_open_build
 fi
-
-# test if data is cached
-LOG_TXT=$MC_BUILD_HOME/cache/cached.txt
-mkdir -p "$MC_BUILD_HOME"/cache
-touch "$LOG_TXT"
-echo "LOG_TXT=$LOG_TXT"
-echo "[$(date +"%Y-%m-%dT%H:%M:%S%z")] CI_BUILD_NUMBER=$CI_BUILD_NUMBER | CI_XCODEBUILD_ACTION=$CI_XCODEBUILD_ACTION" >> "$LOG_TXT"
-cat "$LOG_TXT"
 
 brew --version
 python3 --version
@@ -51,7 +42,7 @@ pip3 install \
   absl-py==1.0.0
 
 echo "$MC_LOG_PREFIX Install Flutter"
-export MC_FLUTTER_HOME="$MC_BUILD_HOME"/flutter
+export MC_FLUTTER_HOME=$MC_BUILD_HOME/flutter
 export PUB_CACHE=$MC_BUILD_HOME/.pub-cache
 
 mkdir -p "$MC_BUILD_HOME"
