@@ -20,7 +20,6 @@ export MC_REPO_HOME=$PWD
 if [ "$CI" = "TRUE" ]; then
   echo "$MC_LOG_PREFIX Running on CI machine"
   export MC_BUILD_HOME=$CI_DERIVED_DATA_PATH/mobile_app_open_build
-  export OFFICIAL_BUILD=true
 else
   echo "$MC_LOG_PREFIX Running on local machine"
   export MC_BUILD_HOME=$HOME/mobile_app_open_build
