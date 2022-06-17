@@ -37,9 +37,13 @@ export PATH="$PATH:$FLUTTER_HOME/bin:$HOME/.pub-cache/bin"
 dart pub global activate protoc_plugin
 
 echo "$LOG_PREFIX Build app"
-cd "$ROOT_DIR" && make
+export BAZEL_OUTPUT_ROOT_ARG=--output_user_root=$CI_DERIVED_DATA_PATH/bazel
+cd "$ROOT_DIR" && time make
 cd "$ROOT_DIR"/flutter && flutter precache --ios
 cd "$ROOT_DIR"/flutter/ios && pod install
-cd "$ROOT_DIR"/flutter && flutter build ios --config-only integration_test/first_test.dart
+
+if [ "$CI_XCODEBUILD_ACTION" = "build-for-testing" ]; then
+  cd "$ROOT_DIR"/flutter && flutter build ios --config-only integration_test/first_test.dart
+fi
 
 exit 0
