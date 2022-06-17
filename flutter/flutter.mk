@@ -151,6 +151,10 @@ endif
 flutter/test:
 	cd flutter && ${_start_args} flutter --no-version-check test integration_test ${flutter_test_device_arg}
 
+.PHONY: flutter/run
+flutter/run:
+	cd flutter && ${_start_args} flutter --no-version-check run ${flutter_test_device_arg}
+
 .PHONY: flutter/clean
 flutter/clean:
 	cd flutter && ${_start_args} flutter --no-version-check clean
