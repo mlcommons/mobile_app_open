@@ -46,6 +46,9 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
             l10n.historyRunDetailsVendorName, widget.result.backendInfo.vendor),
         _makeInfo(l10n.historyRunDetailsAccelerator,
             widget.result.backendInfo.accelerator),
+        if (widget.result.backendSettingsInfo.batchSize > 0)
+          _makeInfo(l10n.historyRunDetailsBatchSize,
+              widget.result.backendSettingsInfo.batchSize.toString()),
         Divider(),
         Center(
           child: Text(
@@ -128,11 +131,12 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
   }
 
   static String formatDuration(Duration d) {
-    var seconds = d.inSeconds;
-    final hours = seconds ~/ Duration.secondsPerHour;
-    seconds -= hours * Duration.secondsPerHour;
-    final minutes = seconds ~/ Duration.secondsPerMinute;
-    seconds -= minutes * Duration.secondsPerMinute;
+    var milliseconds = d.inMilliseconds;
+    final hours = milliseconds ~/ Duration.millisecondsPerHour;
+    milliseconds -= hours * Duration.millisecondsPerHour;
+    final minutes = milliseconds ~/ Duration.millisecondsPerMinute;
+    milliseconds -= minutes * Duration.millisecondsPerMinute;
+    final seconds = (milliseconds / Duration.millisecondsPerSecond).ceil();
 
     final tokens = <String>[];
     if (hours != 0) {
@@ -154,7 +158,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
           child: Text(
             value,
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.darkText,
               fontWeight: FontWeight.bold,
             ),
           ),

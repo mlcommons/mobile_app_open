@@ -60,6 +60,19 @@ class _DetailsScreen extends State<DetailsScreen> {
         _makeInfo(l10n.historyDetailsAvgQps, averageThroughput),
         _makeInfo(l10n.historyDetailsAppVersion, appVersion),
         _makeInfo(l10n.historyDetailsBackendName, backendName),
+        Divider(),
+        Center(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 15.0),
+            child: Text(
+              l10n.historyDetailsTableTitle,
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
         _makeResultTable(),
       ]),
     );
@@ -76,7 +89,7 @@ class _DetailsScreen extends State<DetailsScreen> {
           child: Text(
             value,
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.darkText,
               fontWeight: FontWeight.bold,
               fontSize: 18.0,
             ),
@@ -108,7 +121,8 @@ class _DetailsScreen extends State<DetailsScreen> {
           widget.result.results.list.map((runInfo) {
             return Tuple2([
               runInfo.benchmarkName,
-              runInfo.performance?.throughput?.toStringAsFixed(2) ?? l10n.notAvailable,
+              runInfo.performance?.throughput?.toStringAsFixed(2) ??
+                  l10n.notAvailable,
               runInfo.accuracy?.accuracy?.formatted ?? l10n.notAvailable,
             ], () {
               Navigator.push(
