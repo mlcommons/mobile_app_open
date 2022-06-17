@@ -8,17 +8,17 @@ import 'package:share_plus/share_plus.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/icons.dart' as app_icons;
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
-import 'package:mlperfbench/ui/app_bar.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
-import 'package:mlperfbench/ui/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/icons.dart' as app_icons;
 import 'package:mlperfbench/ui/page_constraints.dart';
-import 'package:mlperfbench/ui/result_circle.dart';
-import 'main_screen.dart';
+import 'package:mlperfbench/ui/run/app_bar.dart';
+import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/run/result_circle.dart';
+import '../root/main_screen.dart';
 
 enum _ScreenMode { performance, accuracy }
 
