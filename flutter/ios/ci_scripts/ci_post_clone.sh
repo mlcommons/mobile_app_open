@@ -28,6 +28,7 @@ else
 fi
 
 LOG_TXT=$MC_BUILD_HOME/cached.txt
+touch $LOG_TXT
 echo "[$(date +"%Y-%m-%dT%H:%M:%S%z")] CI_BUILD_NUMBER=$CI_BUILD_NUMBER | CI_XCODEBUILD_ACTION=$CI_XCODEBUILD_ACTION" >> $LOG_TXT
 cat $LOG_TXT
 exit 1
