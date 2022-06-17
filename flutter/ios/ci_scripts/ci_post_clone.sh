@@ -27,13 +27,13 @@ else
   export MC_BUILD_HOME="$HOME"/mobile_app_open_build
 fi
 
+# test if data is cached
 LOG_TXT=$MC_BUILD_HOME/cache/cached.txt
-mkdir -p $MC_BUILD_HOME/cache
-touch $LOG_TXT
+mkdir -p "$MC_BUILD_HOME"/cache
+touch "$LOG_TXT"
 echo "LOG_TXT=$LOG_TXT"
-echo "[$(date +"%Y-%m-%dT%H:%M:%S%z")] CI_BUILD_NUMBER=$CI_BUILD_NUMBER | CI_XCODEBUILD_ACTION=$CI_XCODEBUILD_ACTION | a" >> $LOG_TXT
-cat $LOG_TXT
-exit 1
+echo "[$(date +"%Y-%m-%dT%H:%M:%S%z")] CI_BUILD_NUMBER=$CI_BUILD_NUMBER | CI_XCODEBUILD_ACTION=$CI_XCODEBUILD_ACTION" >> "$LOG_TXT"
+cat "$LOG_TXT"
 
 brew --version
 python3 --version
