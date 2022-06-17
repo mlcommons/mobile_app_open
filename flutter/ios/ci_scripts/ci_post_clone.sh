@@ -15,16 +15,22 @@ cd ../../../
 echo "$MC_LOG_PREFIX Current working directory is $PWD"
 # check if we are in the root directory of the repo, where the WORKSPACE file exists
 test -f WORKSPACE
-export MC_ROOT_DIR=$PWD
+export MC_REPO_HOME=$PWD
 
 if [ "$CI" = "TRUE" ]; then
   echo "$MC_LOG_PREFIX Running on CI machine"
   # Data in CI_DERIVED_DATA_PATH is persistent between builds.
   export MC_BUILD_HOME=$CI_DERIVED_DATA_PATH
+  export OFFICIAL_BUILD=true
 else
   echo "$MC_LOG_PREFIX Running on local machine"
   export MC_BUILD_HOME="$HOME"/mobile_app_open_build
 fi
+
+LOG_TXT=$MC_BUILD_HOME/cached.txt
+echo "[$(date +"%Y-%m-%dT%H:%M:%S%z")] CI_BUILD_NUMBER=$CI_BUILD_NUMBER | CI_XCODEBUILD_ACTION=$CI_XCODEBUILD_ACTION" >> $LOG_TXT
+cat $LOG_TXT
+exit 1
 
 brew --version
 python3 --version
@@ -53,12 +59,12 @@ dart pub global activate protoc_plugin
 
 echo "$MC_LOG_PREFIX Build app"
 export BAZEL_OUTPUT_ROOT_ARG=--output_user_root=$MC_BUILD_HOME/bazel
-cd "$MC_ROOT_DIR" && time make
-cd "$MC_ROOT_DIR"/flutter && flutter precache --ios
-cd "$MC_ROOT_DIR"/flutter/ios && pod install
+cd "$MC_REPO_HOME" && time make
+cd "$MC_REPO_HOME"/flutter && flutter precache --ios
+cd "$MC_REPO_HOME"/flutter/ios && pod install
 
 if [ "$CI_XCODEBUILD_ACTION" = "build-for-testing" ]; then
-  cd "$MC_ROOT_DIR"/flutter && flutter build ios --config-only integration_test/first_test.dart
+  cd "$MC_REPO_HOME"/flutter && flutter build ios --config-only integration_test/first_test.dart
 fi
 
 exit 0
