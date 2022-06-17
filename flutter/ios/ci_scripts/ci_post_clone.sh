@@ -27,7 +27,8 @@ else
   export MC_BUILD_HOME="$HOME"/mobile_app_open_build
 fi
 
-LOG_TXT=$MC_BUILD_HOME/cached.txt
+LOG_TXT=$MC_BUILD_HOME/cache/cached.txt
+mkdir -p $MC_BUILD_HOME/cache
 touch $LOG_TXT
 echo "[$(date +"%Y-%m-%dT%H:%M:%S%z")] CI_BUILD_NUMBER=$CI_BUILD_NUMBER | CI_XCODEBUILD_ACTION=$CI_XCODEBUILD_ACTION" >> $LOG_TXT
 cat $LOG_TXT
