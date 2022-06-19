@@ -24,7 +24,6 @@ import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/list.dart';
@@ -133,16 +132,17 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> clearCache() async {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
-    await configManager.deleteDefaultConfig();
-    await resetConfig();
+    await setTaskConfig(name: _store.chosenConfigurationName);
     await loadResources();
   }
 
   Future<void> loadResources() async {
-    final mlperfConfig =
-        getMLPerfConfig(await File(configManager.configPath).readAsString());
-    _middle = BenchmarkList(mlperfConfig, backendInfo.settings.benchmarkSetting,
-        _store.testMode, resourceManager.getDefaultBatchPreset());
+    _middle = BenchmarkList(
+      configManager.decodedConfig,
+      backendInfo.settings.benchmarkSetting,
+      _store.testMode,
+      resourceManager.getDefaultBatchPreset(),
+    );
     restoreLastResult();
 
     final packageInfo = await PackageInfo.fromPlatform();
@@ -166,20 +166,23 @@ class BenchmarkState extends ChangeNotifier {
     await result.resourceManager.initSystemPaths();
     result.configManager = ConfigManager(
         result.resourceManager.applicationDirectory,
-        store.chosenConfigurationName,
         result.resourceManager);
     await result.resourceManager.loadBatchPresets();
-    await result.resetConfig();
+    await result.setTaskConfig(name: store.chosenConfigurationName);
     await result.loadResources();
     return result;
   }
 
-  Future<void> resetConfig({BenchmarksConfig? newConfig}) async {
-    final config = newConfig ??
-        await configManager.currentConfig ??
-        configManager.defaultConfig;
-    await configManager.setConfig(config);
-    _store.chosenConfigurationName = config.name;
+  /// Reads config but doesn't update resources that depend on config.
+  /// Call loadResources() to update dependent resources.
+  /// 
+  /// Can throw an exception.
+  Future<void> setTaskConfig({required String name}) async {
+    if (name == '') {
+      name = configManager.defaultConfig.name;
+    }
+    await configManager.loadConfig(name);
+    _store.chosenConfigurationName = name;
   }
 
   BenchmarkStateEnum get state {

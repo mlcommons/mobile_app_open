@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mlperfbench/store.dart';
 
 import 'package:provider/provider.dart';
 
@@ -8,13 +9,13 @@ import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 
 class BenchmarksConfigurationScreen extends StatelessWidget {
-  final List<BenchmarksConfig> _benchmarksConfigurations;
+  final List<TaskConfigDescription> _benchmarksConfigurations;
 
   BenchmarksConfigurationScreen(this._benchmarksConfigurations);
 
   Card getOptionPattern(
     BuildContext context,
-    BenchmarksConfig configuration,
+    TaskConfigDescription configuration,
     String chosenBenchmarksConfiguration,
   ) {
     final stringResources = AppLocalizations.of(context);
@@ -32,9 +33,7 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
         trailing: Text(configuration.getType(stringResources)),
         onTap: () async {
           try {
-            await state.resetConfig(
-              newConfig: !wasChosen ? configuration : null,
-            );
+            await state.setTaskConfig(name: configuration.name);
             Navigator.of(context).popUntil((route) => route.isFirst);
             await state.loadResources();
           } catch (e) {
@@ -49,25 +48,22 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
-    final state = context.watch<BenchmarkState>();
-    final currentConfig = state.configManager.currentConfig;
+    final store = context.watch<Store>();
 
     return Scaffold(
       appBar: AppBar(
         title: Text(stringResources.benchmarksConfigurationTitle),
       ),
-      body: FutureBuilder<BenchmarksConfig?>(
-        future: currentConfig,
-        builder: (context, snapshot) => ListView.builder(
-            itemCount: _benchmarksConfigurations.length,
-            itemBuilder: (context, index) {
-              final configuration = _benchmarksConfigurations[index];
-              return getOptionPattern(
-                context,
-                configuration,
-                snapshot.data?.name ?? '',
-              );
-            }),
+      body: ListView.builder(
+        itemCount: _benchmarksConfigurations.length,
+        itemBuilder: (context, index) {
+          final configuration = _benchmarksConfigurations[index];
+          return getOptionPattern(
+            context,
+            configuration,
+            store.chosenConfigurationName,
+          );
+        },
       ),
     );
   }
