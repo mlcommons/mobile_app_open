@@ -56,6 +56,7 @@ class BenchmarkState extends ChangeNotifier {
   late final ConfigManager configManager;
   late final BackendInfo backendInfo;
 
+  bool taskConfigFailedToLoad = false;
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
   bool _cooling = false;
@@ -132,8 +133,16 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> clearCache() async {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
-    await setTaskConfig(name: _store.chosenConfigurationName);
-    await loadResources();
+    notifyListeners();
+    try {
+      await setTaskConfig(name: _store.chosenConfigurationName);
+      await loadResources();
+    } catch (e, trace) {
+      print("can't load resources: $e");
+      print(trace);
+      taskConfigFailedToLoad = true;
+      notifyListeners();
+    }
   }
 
   Future<void> loadResources() async {
@@ -155,6 +164,8 @@ class BenchmarkState extends ChangeNotifier {
 
     await Wakelock.enable();
     resourceManager.handleResources(_middle.listResources(), needToPurgeCache);
+
+    taskConfigFailedToLoad = false;
     await Wakelock.disable();
   }
 
@@ -165,17 +176,22 @@ class BenchmarkState extends ChangeNotifier {
 
     await result.resourceManager.initSystemPaths();
     result.configManager = ConfigManager(
-        result.resourceManager.applicationDirectory,
-        result.resourceManager);
+        result.resourceManager.applicationDirectory, result.resourceManager);
     await result.resourceManager.loadBatchPresets();
-    await result.setTaskConfig(name: store.chosenConfigurationName);
-    await result.loadResources();
+    try {
+      await result.setTaskConfig(name: store.chosenConfigurationName);
+      await result.loadResources();
+    } catch (e, trace) {
+      print("can't load resources: $e");
+      print(trace);
+      result.taskConfigFailedToLoad = true;
+    }
     return result;
   }
 
   /// Reads config but doesn't update resources that depend on config.
   /// Call loadResources() to update dependent resources.
-  /// 
+  ///
   /// Can throw an exception.
   Future<void> setTaskConfig({required String name}) async {
     if (name == '') {
@@ -183,6 +199,7 @@ class BenchmarkState extends ChangeNotifier {
     }
     await configManager.loadConfig(name);
     _store.chosenConfigurationName = name;
+    taskConfigFailedToLoad = false;
   }
 
   BenchmarkStateEnum get state {

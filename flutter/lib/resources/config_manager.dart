@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
+import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'utils.dart';
-import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 
 const _configListFileName = 'benchmarksConfigurations.json';
 const _defaultConfigName = 'default';
@@ -31,10 +31,13 @@ class ConfigManager {
   final TaskConfigDescription defaultConfig =
       TaskConfigDescription(_defaultConfigName, _defaultConfigUrl);
 
+  String configPath = '';
   late pb.MLPerfConfig decodedConfig;
 
   ConfigManager(this.applicationDirectory, this.resourceManager);
 
+  /// Can throw.
+  /// decodedConfig must not be read until this function has finished successfully
   Future<void> loadConfig(String name) async {
     TaskConfigDescription? config;
     for (var c in await getConfigs()) {
@@ -46,7 +49,6 @@ class ConfigManager {
     if (config == null) {
       throw 'config with name $name not found';
     }
-    late final String configPath;
     if (isInternetResource(config.path)) {
       configPath = await resourceManager.cacheManager.fileCacheHelper
           .get(config.path, true);
