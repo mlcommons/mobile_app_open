@@ -18,11 +18,11 @@ class HistoryHelperUtils {
   }
 
   String formatDuration(int milliseconds) {
-    final hours = milliseconds ~/ Duration.millisecondsPerHour;
-    milliseconds -= hours * Duration.millisecondsPerHour;
-    final minutes = milliseconds ~/ Duration.millisecondsPerMinute;
-    milliseconds -= minutes * Duration.millisecondsPerMinute;
-    final seconds = (milliseconds / Duration.millisecondsPerSecond).ceil();
+    var seconds = (milliseconds / Duration.millisecondsPerSecond).ceil();
+    var minutes = seconds ~/ Duration.secondsPerMinute;
+    seconds -= minutes * Duration.secondsPerMinute;
+    final hours = minutes ~/ Duration.minutesPerHour;
+    minutes -= hours * Duration.minutesPerHour;
 
     final tokens = <String>[];
     if (hours != 0) {
@@ -130,7 +130,7 @@ class HistoryHelperUtils {
           columnWidths: const {
             0: FlexColumnWidth(8),
             1: FlexColumnWidth(6),
-            2: FlexColumnWidth(4),
+            2: FlexColumnWidth(4.5),
           },
           children: [
             _makeTableRow([

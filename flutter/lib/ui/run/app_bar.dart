@@ -12,7 +12,7 @@ class MyAppBar {
     var actions = <Widget>[];
     if (addSettingsButton) {
       actions.add(IconButton(
-        icon: Icon(Icons.list),
+        icon: Icon(Icons.access_time),
         tooltip: 'History',
         onPressed: () {
           Navigator.push(
