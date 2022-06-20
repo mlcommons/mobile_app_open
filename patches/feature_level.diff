@@ -1,0 +1,31 @@
+From c2dddb8c961fb4b6688bffc737bed90c6e9339af Mon Sep 17 00:00:00 2001
+From: "A. Unique TensorFlower" <gardener@tensorflow.org>
+Date: Tue, 31 May 2022 16:29:07 -0700
+Subject: [PATCH] Prefer reusable execution for NNAPI feature level 8.
+
+PiperOrigin-RevId: 452167092
+---
+ tensorflow/lite/delegates/nnapi/nnapi_delegate.cc | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tensorflow/lite/delegates/nnapi/nnapi_delegate.cc b/tensorflow/lite/delegates/nnapi/nnapi_delegate.cc
+index 5279ca5fa19..ac350e1a05a 100644
+--- a/tensorflow/lite/delegates/nnapi/nnapi_delegate.cc
++++ b/tensorflow/lite/delegates/nnapi/nnapi_delegate.cc
+@@ -4652,9 +4652,11 @@ TfLiteStatus NNAPIDelegateKernel::Prepare(TfLiteContext* context,
+ 
+   bool should_use_burst_mode = delegate_options.use_burst_computation;
+   // Override should_use_burst_mode to true if the selected NNAPI devices are of
+-  // NNAPI feature level 5 or higher.
++  // NNAPI feature level 5 to 7. Starting from NNAPI feature level 8, reusable
++  // execution is preferred.
+   if (!nnapi_devices_.empty() &&
+-      target_feature_level_ >= kNNAPIRuntimeFeatureLevel5) {
++      target_feature_level_ >= kNNAPIRuntimeFeatureLevel5 &&
++      target_feature_level_ <= kNNAPIRuntimeFeatureLevel7) {
+     should_use_burst_mode = true;
+   }
+   // Create burst object to be reused across a sequence of executions
+-- 
+2.36.1.255.ge46751e96f-goog
+

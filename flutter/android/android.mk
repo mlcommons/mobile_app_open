@@ -38,7 +38,6 @@ flutter_common_docker_flags= \
 		-v $(CURDIR):/mnt/project \
 		--workdir /mnt/project \
 		-v /mnt/project/flutter/build \
-		-v mlperf-mobile-flutter-cache-workdir-${flutter_docker_postfix}:/image-workdir/.cache \
 		-v mlperf-mobile-flutter-cache-bazel-${flutter_docker_postfix}:/mnt/cache \
 		--env WITH_TFLITE=${WITH_TFLITE} \
 		--env WITH_QTI=${WITH_QTI} \

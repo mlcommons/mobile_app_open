@@ -49,13 +49,16 @@ RUN git config --global --add safe.directory $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
 
+RUN mkdir -p $HOME/.cache/ && chmod 777 $HOME/.cache/
+RUN mkdir -p $HOME/.cache/.gradle && chmod 777 $HOME/.cache/.gradle
 ENV GRADLE_USER_HOME=$HOME/.cache/.gradle
 ENV ANDROID_SDK_HOME=$HOME/.cache/.android
 
-RUN mkdir $ANDROID_SDK_HOME && \
+RUN mkdir $ANDROID_SDK_HOME && chmod 777 $HOME/.cache/.android && \
     keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
 
 RUN chmod 777 $HOME
 
 RUN mkdir -p /mnt/cache && chmod 777 /mnt/cache
 RUN mkdir -p /mnt/project/flutter/build && chmod 777 /mnt/project/flutter/build
+RUN mkdir -p $HOME/.cache/bazelisk && chmod 777 $HOME/.cache/bazelisk

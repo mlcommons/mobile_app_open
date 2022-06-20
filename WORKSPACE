@@ -18,6 +18,7 @@ http_archive(
         "//:flutter/third_party/tf-eigen.patch",
         # fix memory leak in coreml delegate
         "//:flutter/third_party/tflite_coreml_delegate_memory_leak.patch",
+        "//patches:feature_level.diff",
     ],
     sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
     strip_prefix = "tensorflow-2.8.0",
