@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-import 'package:bot_toast/bot_toast.dart';
-import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:tuple/tuple.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'run_details_screen.dart';
+import 'package:mlperfbench/ui/history/run_details_screen.dart';
+import 'utils.dart';
 
 class DetailsScreen extends StatefulWidget {
   final ExtendedResult result;
@@ -21,185 +18,89 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreen extends State<DetailsScreen> {
   late AppLocalizations l10n;
+  late HistoryHelperUtils helper;
 
   @override
   Widget build(BuildContext context) {
     l10n = AppLocalizations.of(context);
-
-    var dateFormat = DateFormat('yyyy-MM-dd HH:mm');
-
-    final appVersionType = (widget.result.buildInfo.gitDirtyFlag ||
-            widget.result.buildInfo.devTestFlag)
-        ? l10n.historyDetailsBuildTypeDebug
-        : widget.result.buildInfo.officialReleaseFlag
-            ? l10n.historyDetailsBuildTypeOfficial
-            : l10n.historyDetailsBuildTypeUnofficial;
-    final date = dateFormat
-        .format(widget.result.results.list.first.performance!.startDatetime);
-    final averageThroughput =
-        widget.result.results.calculateAverageThroughput().toStringAsFixed(2);
-    final appVersion = l10n.historyDetailsAppVersionTemplate
-        .replaceFirst('<version>', widget.result.buildInfo.version)
-        .replaceFirst('<build>', widget.result.buildInfo.buildNumber)
-        .replaceFirst('<buildType>', appVersionType);
-    final backendName = widget.result.results.list.first.backendInfo.name;
+    helper = HistoryHelperUtils(l10n);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l10n.historyDetailsTitle,
-          style: TextStyle(fontSize: 24, color: AppColors.lightText),
-        ),
-        centerTitle: true,
-        backgroundColor: AppColors.darkAppBarBackground,
-        iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
-      ),
-      body: ListView(padding: const EdgeInsets.only(top: 0), children: [
-        _makeInfo(l10n.historyDetailsDate, date),
-        _makeInfo(l10n.historyDetailsUUID, widget.result.meta.uuid),
-        _makeInfo(l10n.historyDetailsAvgQps, averageThroughput),
-        _makeInfo(l10n.historyDetailsAppVersion, appVersion),
-        _makeInfo(l10n.historyDetailsBackendName, backendName),
-        Divider(),
-        Center(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 15.0),
-            child: Text(
-              l10n.historyDetailsTableTitle,
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        _makeResultTable(),
-      ]),
+      appBar: helper.makeAppBar(l10n.historyDetailsTitle),
+      body: ListView(children: _makeBody()),
     );
   }
 
-  Widget _makeInfo(String name, String value) {
+  List<Widget> _makeBody() {
+    final res = widget.result;
+
+    final firstResult = res.results.list.first;
+    final date = helper.formatDate(firstResult.performance!.startDatetime);
+    final backendName = firstResult.backendInfo.name;
+
+    final averageThroughput =
+        res.results.calculateAverageThroughput().toStringAsFixed(2);
+
+    final appVersionType =
+        (res.buildInfo.gitDirtyFlag || res.buildInfo.devTestFlag)
+            ? l10n.historyDetailsBuildTypeDebug
+            : res.buildInfo.officialReleaseFlag
+                ? l10n.historyDetailsBuildTypeOfficial
+                : l10n.historyDetailsBuildTypeUnofficial;
+    final appVersion = l10n.historyDetailsAppVersionTemplate
+        .replaceFirst('<version>', res.buildInfo.version)
+        .replaceFirst('<build>', res.buildInfo.buildNumber)
+        .replaceFirst('<buildType>', appVersionType);
+
+    return [
+      helper.makeInfo(l10n.historyDetailsDate, date),
+      helper.makeInfo(l10n.historyDetailsUUID, res.meta.uuid),
+      helper.makeInfo(l10n.historyDetailsAvgQps, averageThroughput),
+      helper.makeInfo(l10n.historyDetailsAppVersion, appVersion),
+      helper.makeInfo(l10n.historyDetailsBackendName, backendName),
+      Divider(),
+      helper.makeHeader(l10n.historyDetailsTableTitle),
+      makeBenchmarkTable(context, res.results.list),
+    ];
+  }
+
+  Widget makeBenchmarkTable(
+    BuildContext context,
+    List<BenchmarkExportResult> list,
+  ) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 0.0),
-      child: ListTile(
-        // visualDensity: VisualDensity(vertical: VisualDensity.minimumDensity),
-        minVerticalPadding: 0,
-        title: Text(name),
-        subtitle: GestureDetector(
-          child: Text(
-            value,
-            style: TextStyle(
-              color: AppColors.darkText,
-              fontWeight: FontWeight.bold,
-              fontSize: 18.0,
-            ),
-          ),
-          onTap: () async {
-            await Clipboard.setData(ClipboardData(text: value));
-            BotToast.showText(
-              text: l10n.historyValueCopiedToast.replaceFirst('<name>', name),
-              animationDuration: Duration(milliseconds: 60),
-              animationReverseDuration: Duration(milliseconds: 60),
-              duration: Duration(seconds: 1),
-            );
-          },
-        ),
+      padding: EdgeInsets.symmetric(vertical: 15),
+      child: helper.makeTable(
+        [
+          RowData(
+              isHeader: true,
+              name: l10n.historyDetailsTableColName,
+              throughput: l10n.historyDetailsTableColPerf,
+              throughputValid: true,
+              accuracy: l10n.historyDetailsTableColAccuracy,
+              onTap: null),
+          ...list.map(_makeRowData).toList(),
+        ],
       ),
     );
   }
 
-  Widget _makeResultTable() {
-    return _makeTable(
-      [
-            Tuple2([
-              l10n.historyDetailsTableColName,
-              l10n.historyDetailsTableColPerf,
-              l10n.historyDetailsTableColAccuracy,
-              // ignore: unnecessary_cast
-            ], null as void Function()?)
-          ] +
-          widget.result.results.list.map((runInfo) {
-            return Tuple2([
-              runInfo.benchmarkName,
-              runInfo.performance?.throughput?.toStringAsFixed(2) ??
-                  l10n.notAvailable,
-              runInfo.accuracy?.accuracy?.formatted ?? l10n.notAvailable,
-            ], () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RunDetailsScreen(result: runInfo),
-                ),
-              );
-            });
-          }).toList(),
-    );
-  }
-
-  Widget _makeTable(List<Tuple2<List<String>, void Function()?>> rows) {
-    return (Column(
-      children: rows.map<Widget>((rowData) {
-        final rowValues = rowData.item1;
-        final onTap = rowData.item2;
-        final table = Table(
-          border: onTap == null
-              ? TableBorder.all(
-                  width: 1,
-                  color: Colors.blue,
-                )
-              : TableBorder(
-                  left: BorderSide(
-                    width: 1,
-                    color: Colors.blue,
-                  ),
-                  right: BorderSide(
-                    width: 1,
-                    color: Colors.blue,
-                  ),
-                  bottom: BorderSide(
-                    width: 1,
-                    color: Colors.blue,
-                  ),
-                  verticalInside: BorderSide(
-                    width: 1,
-                    color: Colors.blue,
-                  ),
-                ),
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          columnWidths: const {
-            0: FlexColumnWidth(10),
-            1: FlexColumnWidth(5),
-            2: FlexColumnWidth(5),
-          },
-          children: [
-            _makeTableRow(rowValues.map((value) {
-              return Text(
-                value,
-                style: onTap == null
-                    ? TextStyle(fontWeight: FontWeight.bold)
-                    : null,
-              );
-            }).toList())
-          ],
+  RowData _makeRowData(BenchmarkExportResult runInfo) {
+    return RowData(
+      isHeader: false,
+      name: runInfo.benchmarkName,
+      throughput: runInfo.performance?.throughput?.toStringAsFixed(2) ??
+          l10n.notAvailable,
+      throughputValid: runInfo.performance?.loadgenValidity ?? false,
+      accuracy: runInfo.accuracy?.accuracy?.formatted ?? l10n.notAvailable,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RunDetailsScreen(result: runInfo),
+          ),
         );
-        return InkWell(
-          onTap: onTap,
-          child: table,
-        );
-      }).toList(),
-    ));
-  }
-
-  TableRow _makeTableRow(List<Widget> cells) {
-    return TableRow(
-      children: cells.map(
-        (cell) {
-          return Padding(
-            padding: EdgeInsets.all(8.0),
-            child: cell,
-          );
-        },
-      ).toList(),
+      },
     );
   }
 }
