@@ -29,49 +29,6 @@ common_setting {
   }
 }
 
-common_setting {
-  id: "configuration"
-  name: "Configuration"
-  value {
-    value: "QTI backend using SNPE, NNAPI and TFLite GPU Delegate"
-    name: "QTI"
-  }
-}
-
-common_setting {
-  id: "share_results"
-  name: "Share results"
-  value {
-    value: "0"
-    name: "false"
-  }
-  acceptable_value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "0"
-    name: "false"
-  }
-}
-
-common_setting {
-  id: "cooldown"
-  name: "Cooldown"
-  value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "0"
-    name: "false"
-  }
-}
-
 benchmark_setting {
   benchmark_id: "IC_tpu_uint8"
   accelerator: "snpe_aip"
@@ -142,70 +99,6 @@ common_setting {
   value {
     value: "4"
     name: "4 threads"
-  }
-  acceptable_value {
-    value: "1"
-    name: "Single thread"
-  }
-  acceptable_value {
-    value: "2"
-    name: "2 threads"
-  }
-  acceptable_value {
-    value: "4"
-    name: "4 threads"
-  }
-  acceptable_value {
-    value: "8"
-    name: "8 threads"
-  }
-  acceptable_value {
-    value: "16"
-    name: "16 threads"
-  }
-}
-
-common_setting {
-  id: "configuration"
-  name: "configuration"
-  value {
-    value: "QTI backend using SNPE, NNAPI and TFLite GPU Delegate"
-    name: "QTI"
-  }
-}
-
-common_setting {
-  id: "share_results"
-  name: "Share results"
-  value {
-    value: "0"
-    name: "false"
-  }
-  acceptable_value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "0"
-    name: "false"
-  }
-}
-
-
-common_setting {
-  id: "cooldown"
-  name: "Cooldown"
-  value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "0"
-    name: "false"
   }
 }
 
@@ -328,69 +221,6 @@ common_setting {
     value: "4"
     name: "4 threads"
   }
-  acceptable_value {
-    value: "1"
-    name: "Single thread"
-  }
-  acceptable_value {
-    value: "2"
-    name: "2 threads"
-  }
-  acceptable_value {
-    value: "4"
-    name: "4 threads"
-  }
-  acceptable_value {
-    value: "8"
-    name: "8 threads"
-  }
-  acceptable_value {
-    value: "16"
-    name: "16 threads"
-  }
-}
-
-common_setting {
-  id: "configuration"
-  name: "configuration"
-  value {
-    value: "QTI backend using SNPE, NNAPI and TFLite GPU Delegate"
-    name: "QTI"
-  }
-}
-
-common_setting {
-  id: "share_results"
-  name: "Share results"
-  value {
-    value: "0"
-    name: "false"
-  }
-  acceptable_value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "0"
-    name: "false"
-  }
-}
-
-common_setting {
-  id: "cooldown"
-  name: "Cooldown"
-  value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "0"
-    name: "false"
-  }
 }
 
 benchmark_setting {
@@ -508,70 +338,6 @@ common_setting {
     value: "4"
     name: "4 threads"
   }
-  acceptable_value {
-    value: "1"
-    name: "Single thread"
-  }
-  acceptable_value {
-    value: "2"
-    name: "2 threads"
-  }
-  acceptable_value {
-    value: "4"
-    name: "4 threads"
-  }
-  acceptable_value {
-    value: "8"
-    name: "8 threads"
-  }
-  acceptable_value {
-    value: "16"
-    name: "16 threads"
-  }
-}
-
-common_setting {
-  id: "configuration"
-  name: "configuration"
-  value {
-    value: "QTI backend using SNPE, NNAPI and TFLite GPU Delegate"
-    name: "QTI"
-  }
-}
-
-common_setting {
-  id: "share_results"
-  name: "Share results"
-  value {
-    value: "0"
-    name: "false"
-  }
-  acceptable_value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "0"
-    name: "false"
-  }
-}
-
-
-common_setting {
-  id: "cooldown"
-  name: "Cooldown"
-  value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "0"
-    name: "false"
-  }
 }
 
 benchmark_setting {
@@ -584,6 +350,7 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobilenet_edgetpu_224_1.0_htp.dlc"
+  md5Checksum: "4e8c9ec583557f8dc341cdcc45dba241"
 }
 
 benchmark_setting {
@@ -601,6 +368,7 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
+  md5Checksum: "862ea4d7623c62d49153bad1a774217c"
 }
 
 benchmark_setting {
@@ -617,6 +385,7 @@ benchmark_setting {
     value: "true"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/ssd_mobiledet_qat_htp.dlc"
+  md5Checksum: "e55ab007c00629f8616a50d0d9becc26"
 }
 
 benchmark_setting {
@@ -641,6 +410,7 @@ benchmark_setting {
     value: "false"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobilebert_quantized_htp.dlc"
+  md5Checksum: "ad724f945b3745e88158cc5d5de1c2a5"
 }
 
 benchmark_setting {
@@ -661,6 +431,7 @@ benchmark_setting {
     value: "uint_8"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/deeplabv3_htp.dlc"
+  md5Checksum: "4f530fef7ae8c7adc0949d371e22f485"
 }
 
 benchmark_setting {

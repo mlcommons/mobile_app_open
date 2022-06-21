@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:mlperfbench/resources/resource.dart';
 
 bool isInternetResource(String uri) =>
@@ -11,4 +13,9 @@ List<String> filterInternetResources(List<Resource> resources) {
     }
   }
   return result;
+}
+
+String jsonToStringIndented(dynamic json) {
+  final jsonEncoder = const JsonEncoder.withIndent('  ');
+  return jsonEncoder.convert(json);
 }

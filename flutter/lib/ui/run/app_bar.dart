@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/icons.dart';
-import 'config_screen.dart';
-import 'settings_screen.dart';
+import 'package:mlperfbench/ui/icons.dart';
+import '../config/config_screen.dart';
+import '../settings/settings_screen.dart';
 
 class MyAppBar {
   static PreferredSizeWidget buildAppBar(

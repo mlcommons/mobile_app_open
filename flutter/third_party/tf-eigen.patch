@@ -1,0 +1,45 @@
+From b570eb875d9730065dcb364ef37a5ec3c885acab Mon Sep 17 00:00:00 2001
+From: "freedom\" Koan-Sin Tan" <koansin.tan@gmail.com>
+Date: Thu, 17 Mar 2022 14:51:19 +0800
+Subject: [PATCH] hacks
+
+---
+ third_party/eigen3/eigen_ios.patch | 13 +++++++++++++
+ third_party/eigen3/workspace.bzl   |  1 +
+ 2 files changed, 14 insertions(+)
+ create mode 100644 third_party/eigen3/eigen_ios.patch
+
+diff --git a/third_party/eigen3/eigen_ios.patch b/third_party/eigen3/eigen_ios.patch
+new file mode 100644
+index 00000000000..6c94319de42
+--- /dev/null
++++ b/third_party/eigen3/eigen_ios.patch
+@@ -0,0 +1,13 @@
++diff --git a/Eigen/src/Core/util/Macros.h b/Eigen/src/Core/util/Macros.h
++index e76ddd3d2..6b4fc84ec 100644
++--- a/Eigen/src/Core/util/Macros.h
+++++ b/Eigen/src/Core/util/Macros.h
++@@ -1281,7 +1281,7 @@ namespace Eigen {
++   EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(METHOD,OPNAME)
++ 
++ 
++-#if (defined(_CPPUNWIND) || defined(__EXCEPTIONS)) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE)
+++#if (defined(_CPPUNWIND) || (defined(__EXCEPTIONS) && defined(__exceptions__))) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE)
++   #define EIGEN_EXCEPTIONS
++ #endif
++ 
+diff --git a/third_party/eigen3/workspace.bzl b/third_party/eigen3/workspace.bzl
+index 9782907cf5e..ad302dbabc5 100644
+--- a/third_party/eigen3/workspace.bzl
++++ b/third_party/eigen3/workspace.bzl
+@@ -13,6 +13,7 @@ def repo():
+ 
+     tf_http_archive(
+         name = "eigen_archive",
++        patch_file = ["//third_party/eigen3:eigen_ios.patch"],
+         build_file = "//third_party/eigen3:eigen_archive.BUILD",
+         sha256 = EIGEN_SHA256,
+         strip_prefix = "eigen-{commit}".format(commit = EIGEN_COMMIT),
+-- 
+2.35.1
+

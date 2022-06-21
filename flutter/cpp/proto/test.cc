@@ -32,69 +32,6 @@ common_setting {
     value: "4"
     name: "4 threads"
   }
-  acceptable_value {
-    value: "1"
-    name: "Single thread"
-  }
-  acceptable_value {
-    value: "2"
-    name: "2 threads"
-  }
-  acceptable_value {
-    value: "4"
-    name: "4 threads"
-  }
-  acceptable_value {
-    value: "8"
-    name: "8 threads"
-  }
-  acceptable_value {
-    value: "16"
-    name: "16 threads"
-  }
-}
-
-common_setting {
-  id: "configuration"
-  name: "Configuration"
-  value {
-    value: "Test Configuration"
-    name: "Default"
-  }
-}
-
-common_setting {
-  id: "share_results"
-  name: "Share results"
-  value {
-    value: "0"
-    name: "false"
-  }
-  acceptable_value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "0"
-    name: "false"
-  }
-}
-
-common_setting {
-  id: "cooldown"
-  name: "Cooldown"
-  value {
-    value: "0"
-    name: "false"
-  }
-  acceptable_value {
-    value: "1"
-    name: "true"
-  }
-  acceptable_value {
-    value: "0"
-    name: "false"
-  }
 }
 
 benchmark_setting {

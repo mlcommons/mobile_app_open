@@ -34,6 +34,7 @@ ifeq (${WITH_QTI},1)
     ${local_snpe_sdk_root}/lib/dsp/libsnpe_dsp_v68_domains_v3_skel.so \
     ${local_snpe_sdk_root}/lib/dsp/libSnpeHtpV69Skel.so \
     ${local_snpe_sdk_root}/lib/dsp/libSnpeHtpV68Skel.so
-  backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so
+  backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so \
+                             //flutter/android/commonlibs:commonlibs
   backend_qti_filename=libqtibackend
 endif

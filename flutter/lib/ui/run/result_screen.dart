@@ -8,16 +8,17 @@ import 'package:share_plus/share_plus.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/icons.dart' as app_icons;
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
-import 'package:mlperfbench/ui/app_bar.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
-import 'package:mlperfbench/ui/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/icons.dart' as app_icons;
 import 'package:mlperfbench/ui/page_constraints.dart';
-import 'package:mlperfbench/ui/result_circle.dart';
-import 'main_screen.dart';
+import 'package:mlperfbench/ui/run/app_bar.dart';
+import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/run/result_circle.dart';
+import '../root/main_screen.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -74,11 +75,11 @@ class _ResultScreenState extends State<ResultScreen>
         benchmarkResult = benchmark.performanceModeResult;
         final throughput = benchmarkResult?.throughput;
         textResult = throughput?.toStringAsFixed(2) ?? 'N/A';
-        numericResult = (throughput ?? 0) / benchmark.info.maxThroughput;
+        numericResult = (throughput ?? 0.0) / benchmark.info.maxThroughput;
       } else if (_screenMode == _ScreenMode.accuracy) {
         benchmarkResult = benchmark.accuracyModeResult;
-        textResult = benchmarkResult?.accuracy ?? 'N/A';
-        numericResult = benchmarkResult?.numericAccuracy ?? 0.0;
+        textResult = benchmarkResult?.accuracy?.formatted ?? 'N/A';
+        numericResult = benchmarkResult?.accuracy?.normalized ?? 0.0;
       } else {
         continue;
       }
@@ -188,7 +189,9 @@ class _ResultScreenState extends State<ResultScreen>
           : benchmark.accuracyModeResult;
       final text = _screenMode == _ScreenMode.performance
           ? result?.throughput.toStringAsFixed(2)
-          : result?.getFormattedAccuracyValue(benchmark.info.type);
+          : (result?.accuracy?.normalized == null
+              ? null
+              : (result!.accuracy!.normalized * 100).toStringAsFixed(2));
       final resultIsValid = result?.validity ?? false;
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),
@@ -343,8 +346,10 @@ class _ResultScreenState extends State<ResultScreen>
               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
                 onPressed: () async {
+                  final result =
+                      state.resourceManager.resultManager.getLastResult();
                   await Share.share(
-                    await state.resourceManager.resultManager.read(),
+                    jsonToStringIndented(result),
                     subject: stringResources.experimentResultsSubj,
                   );
                 },

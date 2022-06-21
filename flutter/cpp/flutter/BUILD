@@ -16,9 +16,13 @@ cc_library(
     srcs = [
         "dart_backend_match.cc",
         "dart_mlperf_config.cc",
-        "main.cc",
+        "dart_run_benchmark.cc",
     ],
-    hdrs = ["main.h"],
+    hdrs = [
+        "dart_backend_match.h",
+        "dart_mlperf_config.h",
+        "dart_run_benchmark.h",
+    ],
     deps = [
         "//flutter/cpp:mlperf_driver",
         "//flutter/cpp/backends:external",
@@ -31,17 +35,26 @@ cc_library(
     alwayslink = 1,
 )
 
+cc_library(
+    name = "ios_backend",
+    srcs = ["ios_linker_workaround.cc"],
+    hdrs = ["ios_linker_workaround.h"],
+    deps = [
+        "//flutter/cpp/flutter:bridge",
+        "//mobile_back_tflite/cpp/backend_tflite:tflite_c",
+    ],
+)
+
 ios_static_framework(
     name = "ios_backend_fw_static",
-    hdrs = ["main.h"],
     families = [
         "iphone",
         "ipad",
     ],
+    ipa_post_processor = "cp_framework_to_tmp.sh",
     minimum_os_version = "11.0",
     deps = [
-        "//flutter/cpp/flutter:bridge",
-        "//mobile_back_tflite/cpp/backend_tflite:tflite_c",
+        "//flutter/cpp/flutter:ios_backend",
     ],
 )
 

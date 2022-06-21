@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench/icons.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
+import 'package:mlperfbench/ui/icons.dart';
 
 enum BenchmarkTypeEnum {
   unknown,
@@ -76,7 +76,7 @@ class BenchmarkInfo {
 
   bool get isOffline => modelConfig.scenario == 'Offline';
 
-  double get maxThroughput => _MAX_THROUGHPUT[modelConfig.id]!;
+  double get maxThroughput => modelConfig.maxThroughput;
 
   /// 'IC', 'OD', and so on.
   String get code => modelConfig.id.split('_').first;
@@ -108,29 +108,7 @@ class BenchmarkInfo {
         return BenchmarkTypeEnum.unknown;
     }
   }
-
-  static double getSummaryMaxThroughput() =>
-      _MAX_THROUGHPUT['SUMMARY_MAX_THROUGHPUT']!;
 }
-
-final _MAX_THROUGHPUT = {
-  'IC_tpu_uint8': 508.0,
-  'IC_tpu_float32': 508.0,
-  'IC_tpu_uint8_offline': 508.0,
-  'IC_tpu_float32_offline': 508.0,
-  'OD_uint8': 288.0,
-  'OD_float32': 288.0,
-  'LU_int8': 12.0,
-  'LU_float32': 12.0,
-  'LU_gpu_float32': 12.0,
-  'LU_nnapi_int8': 12.0,
-  'IS_int8': 50.0,
-  'IS_uint8': 50.0,
-  'IS_float32': 50.0,
-  'IS_uint8_mosaic': 50.0,
-  'IS_float32_mosaic': 50.0,
-  'SUMMARY_MAX_THROUGHPUT': 155.0,
-};
 
 final _BENCHMARK_ICONS = {
   'SingleStream': {

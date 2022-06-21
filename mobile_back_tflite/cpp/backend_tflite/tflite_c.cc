@@ -98,7 +98,7 @@ inline mlperf_data_t::Type TfType2Type(TfLiteType type) {
     case kTfLiteInt64:
       return mlperf_data_t::Int64;
     default:
-      printf("TfLiteType %d not supported\n", type);
+      LOG(ERROR) << "TfLiteType " << type << " is not supported";
       return mlperf_data_t::Float32;
   }
 }
@@ -185,7 +185,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
     const char *native_lib_path) {
   // Verify only one instance of the backend exists at any time
   if (backendExists) {
-    printf("Error: Only one backend instance should exist at a time\n");
+    LOG(ERROR) << "Only one backend instance should exist at a time";
     return nullptr;
   }
 
@@ -196,7 +196,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
   // Load the model.
   backend_data->model = TfLiteModelCreateFromFile(model_path);
   if (!backend_data->model) {
-    printf("Failed to load model: %s", model_path);
+    LOG(ERROR) << "Failed to load model: " << model_path;
     mlperf_backend_delete(backend_data);
     return nullptr;
   }
@@ -206,7 +206,11 @@ mlperf_backend_ptr_t mlperf_backend_create(
     //   if it is not specified in settings.
     // If we don't use batching, we will use shards_num=1,
     //   which is the default value.
+#if defined(__ANDROID__) && defined(MTK_TFLITE_NEURON_BACKEND)
+    backend_data->shards_num = 4;
+#else
     backend_data->shards_num = 2;
+#endif
 
     // TODO convert this to a member var
     for (int i = 0; i < configs->count; ++i) {
@@ -216,8 +220,9 @@ mlperf_backend_ptr_t mlperf_backend_create(
     }
 
     if ((configs->batch_size % backend_data->shards_num) != 0) {
-      printf("Batch size is not dividable by shards_num: %d %% %d != 0\n",
-             configs->batch_size, backend_data->shards_num);
+      LOG(ERROR) << "Batch size is not dividable by shards_num: "
+                 << configs->batch_size << " % " << backend_data->shards_num
+                 << " != 0";
       mlperf_backend_delete(backend_data);
       return nullptr;
     }
@@ -325,11 +330,11 @@ mlperf_backend_ptr_t mlperf_backend_create(
     backend_data->interpreter[k] =
         TfLiteInterpreterCreate(backend_data->model, backend_data->options[k]);
     if (!backend_data->interpreter[k]) {
-      printf("Fallback to a vanilla interpreter\n");
+      LOG(WARNING) << "Fallback to a vanilla interpreter";
       backend_data->interpreter[k] = TfLiteInterpreterCreate(
           backend_data->model, TfLiteInterpreterOptionsCreate());
       if (!backend_data->interpreter[k]) {
-        printf("Failed to create the interpreter\n");
+        LOG(ERROR) << "Failed to create the interpreter";
         mlperf_backend_delete(backend_data);
         return nullptr;
       }
@@ -359,7 +364,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
         if (TfLiteInterpreterResizeInputTensor(shard, input_index, dims.data(),
                                                tensor->dims->size) !=
             kTfLiteOk) {
-          printf("Failed to resize input\n");
+          LOG(ERROR) << "Failed to resize input";
           mlperf_backend_delete(backend_data);
           return nullptr;
         }
@@ -367,7 +372,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
     }
 
     if (TfLiteInterpreterAllocateTensors(shard) != kTfLiteOk) {
-      printf("Failed to allocate tensors\n");
+      LOG(ERROR) << "Failed to allocate tensors";
       mlperf_backend_delete(backend_data);
       return nullptr;
     }
@@ -421,13 +426,13 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
   }
   // main thread for the first shard
   if (task(0) != kTfLiteOk) {
-    printf("Failed to run the inference\n");
+    LOG(ERROR) << "Failed to run the inference";
     return MLPERF_FAILURE;
   }
   // sync and get result of workers
   for (int k = 1; k < backend_data->shards_num; k++) {
     if (f[k].get() != kTfLiteOk) {
-      printf("Failed to run the inference\n");
+      LOG(ERROR) << "Failed to run the inference";
       return MLPERF_FAILURE;
     }
   }
@@ -545,7 +550,7 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
       *data = (output_tensor->data.i64 + (batch_index * non_batch_size));
       break;
     default:
-      printf("Data type not yet supported\n");
+      LOG(ERROR) << "Data type not yet supported: " << output_tensor->type;
       return MLPERF_FAILURE;
   }
   return MLPERF_SUCCESS;

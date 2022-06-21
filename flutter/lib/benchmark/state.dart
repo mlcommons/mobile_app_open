@@ -28,7 +28,6 @@ import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/list.dart';
-import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/device_info.dart';
@@ -83,7 +82,13 @@ class BenchmarkState extends ChangeNotifier {
         }),
         1.0 / benchmarksCount);
 
-    return summaryThroughput / BenchmarkInfo.getSummaryMaxThroughput();
+    final maxSummaryThroughput = pow(
+        benchmarks.fold<double>(1, (prev, i) {
+          return prev * (i.info.maxThroughput);
+        }),
+        1.0 / benchmarksCount);
+
+    return summaryThroughput / maxSummaryThroughput;
   }
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
@@ -138,7 +143,7 @@ class BenchmarkState extends ChangeNotifier {
         getMLPerfConfig(await File(configManager.configPath).readAsString());
     _middle = BenchmarkList(mlperfConfig, backendInfo.settings.benchmarkSetting,
         _store.testMode, resourceManager.getDefaultBatchPreset());
-    await reset();
+    restoreLastResult();
 
     final packageInfo = await PackageInfo.fromPlatform();
     final newAppVersion = packageInfo.version + '+' + packageInfo.buildNumber;
@@ -151,25 +156,6 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.enable();
     resourceManager.handleResources(_middle.listResources(), needToPurgeCache);
     await Wakelock.disable();
-  }
-
-  Future<bool> _handlePreviousResult() async {
-    if (_doneRunning == null) {
-      try {
-        lastResult = ExtendedResult.fromJson(
-            jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
-      } catch (e, trace) {
-        print('unable to restore previous extended result: $e');
-        print(trace);
-      }
-      return resourceManager.resultManager
-          .restoreResults(_store.previousResult, benchmarks);
-    } else {
-      await _store.deletePreviousResult();
-      await resourceManager.resultManager.delete();
-    }
-
-    return false;
   }
 
   static Future<BenchmarkState> create(
@@ -219,10 +205,9 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   void runBenchmarks() async {
-    await reset();
-
     assert(resourceManager.done, 'Resource manager is not done.');
-    assert(_doneRunning == null, '_doneRunning is not null');
+    assert(_doneRunning != false, '_doneRunning is false');
+    _store.previousExtendedResult = '';
     _doneRunning = false;
 
     // disable screen sleep when benchmarks is running
@@ -266,7 +251,12 @@ class BenchmarkState extends ChangeNotifier {
       final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
         throughput: performanceResult.throughput,
-        accuracy: performanceResult.accuracy,
+        accuracy: performanceResult.accuracyNormalized < 0.0
+            ? null
+            : Accuracy(
+                normalized: performanceResult.accuracyNormalized,
+                formatted: performanceResult.accuracyFormatted,
+              ),
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
         batchSize: benchmark.config.batchSize,
@@ -291,12 +281,18 @@ class BenchmarkState extends ChangeNotifier {
           throughput: accuracyResult.throughput.isFinite
               ? accuracyResult.throughput
               : 0.0,
-          accuracy: accuracyResult.accuracy,
+          accuracy: accuracyResult.accuracyNormalized < 0.0
+              ? null
+              : Accuracy(
+                  normalized: accuracyResult.accuracyNormalized,
+                  formatted: accuracyResult.accuracyFormatted,
+                ),
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber,
-          validity: accuracyResult.validity,
+          validity: accuracyResult.accuracyNormalized >= 0.0 &&
+              accuracyResult.accuracyNormalized <= 1.0,
         );
       }
 
@@ -313,10 +309,7 @@ class BenchmarkState extends ChangeNotifier {
       );
       _store.previousExtendedResult =
           JsonEncoder().convert(lastResult!.toJson());
-      await resourceManager.resultManager.writeResults(lastResult!);
-
-      _store.previousResult = resourceManager.resultManager
-          .serializeBriefResults(activeBenchmarks.toList());
+      await resourceManager.resultManager.saveResult(lastResult!);
     }
 
     currentlyRunning = null;
@@ -337,7 +330,12 @@ class BenchmarkState extends ChangeNotifier {
         benchmarkName: benchmark.taskConfig.name,
         performance: BenchmarkRunResult(
           throughput: performance.throughput,
-          accuracy: double.tryParse(performance.accuracy),
+          accuracy: performance.accuracyNormalized < 0.0
+              ? null
+              : Accuracy(
+                  normalized: performance.accuracyNormalized,
+                  formatted: performance.accuracyFormatted,
+                ),
           datasetInfo: DatasetInfo(
             name: benchmark.taskConfig.liteDataset.name,
             type: DatasetType.fromJson(
@@ -355,7 +353,12 @@ class BenchmarkState extends ChangeNotifier {
             : BenchmarkRunResult(
                 throughput:
                     accuracy.throughput.isFinite ? accuracy.throughput : null,
-                accuracy: double.tryParse(accuracy.accuracy),
+                accuracy: accuracy.accuracyNormalized < 0.0
+                    ? null
+                    : Accuracy(
+                        normalized: accuracy.accuracyNormalized,
+                        formatted: accuracy.accuracyFormatted,
+                      ),
                 datasetInfo: DatasetInfo(
                   name: benchmark.taskConfig.liteDataset.name,
                   type: DatasetType.fromJson(
@@ -422,7 +425,7 @@ class BenchmarkState extends ChangeNotifier {
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
-    print('Benchmark result: $result, elapsed: $elapsed');
+    print('Benchmark result: id: ${benchmark.id}, $result, elapsed: $elapsed');
 
     return RunInfo(settings: runSettings, result: result);
   }
@@ -435,17 +438,25 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> reset() async {
-    final isPreviousResultUsed = await _handlePreviousResult();
+  void restoreLastResult() {
+    if (_store.previousExtendedResult == '') {
+      return;
+    }
 
-    if (isPreviousResultUsed) {
+    try {
+      lastResult = ExtendedResult.fromJson(
+          jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
+      resourceManager.resultManager
+          .restoreResults(lastResult!.results.list, benchmarks);
       _doneRunning = true;
-    } else {
+      return;
+    } catch (e, trace) {
+      print('unable to restore previous extended result: $e');
+      print(trace);
+      _store.previousExtendedResult = '';
       _middle.benchmarks.forEach((benchmark) => benchmark.accuracyModeResult =
           benchmark.performanceModeResult = null);
       _doneRunning = null;
     }
-
-    _aborting = false;
   }
 }

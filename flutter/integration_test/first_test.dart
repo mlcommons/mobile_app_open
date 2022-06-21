@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io';
-import 'dart:convert';
 
 import 'package:mlperfbench/main.dart' as app;
-import 'package:mlperfbench/ui/main_screen.dart';
-import 'package:mlperfbench/ui/result_screen.dart';
+import 'package:mlperfbench/ui/root/main_screen.dart';
+import 'package:mlperfbench/ui/run/result_screen.dart';
 import 'package:mlperfbench/resources/resource_manager.dart'
     as resource_manager;
+import 'package:mlperfbench/resources/result_manager.dart' as result_manager;
 
 void main() {
   final splashPauseSeconds = 4;
@@ -67,16 +65,12 @@ void main() {
 
       final applicationDirectory =
           await resource_manager.ResourceManager.getApplicationDirectory();
-      final jsonResultPath = '$applicationDirectory/result.json';
-      final file = File(jsonResultPath);
 
-      expect(await file.exists(), true,
-          reason:
-              'Result.json does not exist: file $applicationDirectory/result.json is not found');
+      final rm = result_manager.ResultManager(applicationDirectory);
+      await rm.init();
 
-      final jsonResultContent = await file.readAsString();
-      final extendedResults = ExtendedResult.fromJson(
-          jsonDecode(jsonResultContent) as Map<String, dynamic>);
+      final extendedResults = rm.getLastResult();
+      ;
       final length = extendedResults.results.list.length;
 
       expect(length, expectedResultCount,

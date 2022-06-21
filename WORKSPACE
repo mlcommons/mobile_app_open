@@ -15,11 +15,15 @@ http_archive(
     patches = [
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
+        "//:flutter/third_party/tf-eigen.patch",
+        # fix memory leak in coreml delegate
+        "//:flutter/third_party/tflite_coreml_delegate_memory_leak.patch",
+        "//patches:feature_level.diff",
     ],
-    sha256 = "40d3203ab5f246d83bae328288a24209a2b85794f1b3e2cd0329458d8e7c1985",
-    strip_prefix = "tensorflow-2.6.0",
+    sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
+    strip_prefix = "tensorflow-2.8.0",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.6.0.zip",
+        "https://github.com/tensorflow/tensorflow/archive/v2.8.0.zip",
     ],
 )
 
@@ -32,16 +36,33 @@ load("@org_tensorflow//tensorflow:workspace2.bzl", "tf_workspace2")
 
 tf_workspace2()
 
-android_ndk_repository(
-    name = "androidndk",
-)
+# Android.
+load("@//flutter/third_party/android:android_configure.bzl", "android_configure")
 
-http_archive(
-    name = "neuron_delegate",
-    sha256 = "2e4600c99c9b4ea7a129108cd688419eeef9b2aeabf05df6f385258e19ca96c4",
-    strip_prefix = "tflite-neuron-delegate-2.6.0",
-    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/v2.6.0.tar.gz"],
-)
+android_configure(name = "local_config_android")
+
+load("@local_config_android//:android_configure.bzl", "android_workspace")
+
+android_workspace()
+
+# avoid using android_{sdk,ndk}_repo because of bazel 5.0
+#
+#android_sdk_repository(
+#    name = "androidsdk",
+#    api_level = 30,
+#)
+#
+#android_ndk_repository(
+#    name = "androidndk",
+#)
+
+# use Neuron Delegate aar before we have updated source code
+#http_archive(
+#    name = "neuron_delegate",
+#    sha256 = "2e4600c99c9b4ea7a129108cd688419eeef9b2aeabf05df6f385258e19ca96c4",
+#    strip_prefix = "tflite-neuron-delegate-2.6.0",
+#    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/v2.6.0.tar.gz"],
+#)
 
 new_local_repository(
     name = "samsungbackend",

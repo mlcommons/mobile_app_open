@@ -5,7 +5,7 @@ FROM ubuntu:20.04
 #   which makes reading layer info harder, so we set this env for for individual commands only.
 # JDK package downloads ~500 MB from slow mirrors, which can take a lot of time,
 #   so a separate layer for it makes image rebuild faster in case we change any other dependencies.
-RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-8-jdk-headless
+RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-11-jdk-headless
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     apt-transport-https \
     curl \
@@ -45,16 +45,20 @@ WORKDIR $HOME
 ENV PUB_CACHE=$HOME/.cache/.pub-cache
 ENV PATH=$PATH:$HOME/flutter/bin:$PUB_CACHE/bin
 RUN curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.10.5-stable.tar.xz | tar Jxf - && chmod --recursive a=u $HOME/flutter
+RUN git config --global --add safe.directory $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
 
+RUN mkdir -p $HOME/.cache/ && chmod 777 $HOME/.cache/
+RUN mkdir -p $HOME/.cache/.gradle && chmod 777 $HOME/.cache/.gradle
 ENV GRADLE_USER_HOME=$HOME/.cache/.gradle
 ENV ANDROID_SDK_HOME=$HOME/.cache/.android
 
-RUN mkdir $ANDROID_SDK_HOME && \
+RUN mkdir $ANDROID_SDK_HOME && chmod 777 $HOME/.cache/.android && \
     keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
 
 RUN chmod 777 $HOME
 
 RUN mkdir -p /mnt/cache && chmod 777 /mnt/cache
 RUN mkdir -p /mnt/project/flutter/build && chmod 777 /mnt/project/flutter/build
+RUN mkdir -p $HOME/.cache/bazelisk && chmod 777 $HOME/.cache/bazelisk

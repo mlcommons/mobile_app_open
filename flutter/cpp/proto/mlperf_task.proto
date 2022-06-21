@@ -89,12 +89,12 @@ message ModelConfig {
   optional string scenario = 4 [default = "SingleStream"];
   // Unique id of the model. Format: TaskID_ModelID;
   required string id = 5;
-  // Max score of this benchmark.
-  optional float score_max = 6;
+  // Max throughput of this benchmark.
+  optional float max_throughput = 6;
   // The detailed description of this model.
   optional string description = 7;
-  // Max Accuracy  of this benchmark.
-  optional float accuracy_max = 8;
+  // Max accuracy of this benchmark.
+  optional float max_accuracy = 8;
   // image width of the input if it is an image
   optional int32 image_width = 9;
   // image height of the input if it is an image
