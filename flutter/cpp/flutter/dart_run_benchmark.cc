@@ -42,6 +42,8 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   li;
 
+  auto out = new dart_ffi_run_benchmark_out;
+
   ::mlperf::mobile::SettingList settings;
   if (settings.ParseFromArray(in->backend_settings_data,
                               in->backend_settings_len)) {
@@ -59,9 +61,9 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       in->backend_native_lib_path);
   li;
 
-  char* backend_name = strdup(backend->Name().c_str());
-  char* backend_vendor = strdup(backend->Vendor().c_str());
-  char* accelerator_name = strdup(backend->AcceleratorName().c_str());
+  out->backend_name = strdup(backend->Name().c_str());
+  out->backend_vendor = strdup(backend->Vendor().c_str());
+  out->accelerator_name = strdup(backend->AcceleratorName().c_str());
 
   ::std::unique_ptr<::mlperf::mobile::Dataset> dataset;
   switch (in->dataset_type) {
@@ -110,16 +112,18 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     global_driver = nullptr;
   }
 
-  auto out = new dart_ffi_run_benchmark_out;
   out->ok = 1;
   out->latency = driver.ComputeLatency();
-  out->accuracy_normalized = driver.ComputeAccuracy();
-  out->accuracy_formatted = strdup(driver.ComputeAccuracyString().c_str());
   out->num_samples = driver.GetNumSamples();
   out->duration_ms = driver.GetDurationMs();
-  out->backend_name = backend_name;
-  out->backend_vendor = backend_vendor;
-  out->accelerator_name = accelerator_name;
+
+  out->accuracy_normalized = driver.ComputeAccuracy();
+  out->accuracy_formatted = strdup(driver.ComputeAccuracyString().c_str());
+
+  // Second accuracy is not yet implemented in datasets
+  out->accuracy_normalized2 = -1.0f;
+  out->accuracy_formatted2 = strdup("");
+
   li;
 
   return out;
@@ -127,6 +131,7 @@ extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
 void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out* out) {
   free(out->accuracy_formatted);
+  free(out->accuracy_formatted2);
   free(out->backend_name);
   free(out->backend_vendor);
   free(out->accelerator_name);

@@ -208,6 +208,16 @@
                         }
                     ]
                 },
+                "accuracy2": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/Accuracy"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
                 "dataset": {
                     "$ref": "#/definitions/Dataset"
                 },
@@ -226,6 +236,7 @@
             },
             "required": [
                 "accuracy",
+                "accuracy2",
                 "dataset",
                 "loadgen_validity",
                 "measured_duration_ms",
