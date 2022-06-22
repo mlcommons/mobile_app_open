@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -13,14 +15,14 @@ class ProgressScreen extends StatefulWidget {
 }
 
 class _ProgressScreenState extends State<ProgressScreen> {
-  final double progressCircleEdgeSize = 150;
+  static const double progressCircleEdgeSize = 150;
+  late final Timer _timer;
 
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
-    final currentBenchmark = state.currentlyRunning!;
     final l10n = AppLocalizations.of(context);
-    final coolingState = state.state == BenchmarkStateEnum.cooldown;
+    final progress = state.progressInfo;
 
     final backgroundGradient = BoxDecoration(
       gradient: LinearGradient(
@@ -77,7 +79,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             ),
             child: Center(
               child: Text(
-                state.runningProgress,
+                '${progress.currentStage.toString()}/${progress.totalStages.toString()}',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppColors.lightText,
@@ -100,17 +102,25 @@ class _ProgressScreenState extends State<ProgressScreen> {
         child: Container(
           width: 100,
           height: 100,
-          child: coolingState ? null : currentBenchmark.info.iconWhite,
+          child: progress.cooldown ? null : progress.info!.iconWhite,
         ),
       ),
       Padding(
-        padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+        padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: Text(
-          coolingState ? l10n.cooldownStatus : currentBenchmark.info.taskName,
+          progress.cooldown ? l10n.cooldownStatus : progress.info!.taskName,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: AppColors.lightText,
           ),
+        ),
+      ),
+      Text(
+        l10n.progressScreenStage.replaceFirst('<percent>',
+            (progress.stageProgress * 100).round().clamp(0, 100).toString()),
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: AppColors.lightText,
         ),
       ),
     ]);
@@ -156,5 +166,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    _timer = Timer.periodic(Duration(seconds: 1), (_) => setState(() {}));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 }

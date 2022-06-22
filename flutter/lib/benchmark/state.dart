@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
+import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/data/results/backend_info.dart';
@@ -41,11 +43,20 @@ import 'run_mode.dart';
 
 enum BenchmarkStateEnum {
   downloading,
-  cooldown,
   waiting,
   running,
   aborting,
   done,
+}
+
+class ProgressInfo {
+  bool cooldown = false;
+  BenchmarkInfo? info;
+  int totalStages = 0;
+  int currentStage = 0;
+  double get stageProgress => calculateStageProgress?.call() ?? 0.0;
+
+  double Function()? calculateStageProgress;
 }
 
 class BenchmarkState extends ChangeNotifier {
@@ -59,14 +70,15 @@ class BenchmarkState extends ChangeNotifier {
 
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
-  bool _cooling = false;
 
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get downloadingProgress => resourceManager.progress;
 
   // Only if [state] == [BenchmarkStateEnum.running]
-  Benchmark? currentlyRunning;
-  String runningProgress = '';
+  ProgressInfo progressInfo = ProgressInfo();
+  // Benchmark? currentlyRunning;
+  // String runningProgress = '';
+
   ExtendedResult? lastResult;
 
   num get result {
@@ -190,18 +202,11 @@ class BenchmarkState extends ChangeNotifier {
       case false:
         return _aborting
             ? BenchmarkStateEnum.aborting
-            : _cooling
-                ? BenchmarkStateEnum.cooldown
-                : BenchmarkStateEnum.running;
+            : BenchmarkStateEnum.running;
       case true:
         return BenchmarkStateEnum.done;
     }
     throw StateError('unreachable');
-  }
-
-  void _updateProgress(double value) {
-    runningProgress = '${(100 * value).round()}%';
-    notifyListeners();
   }
 
   void runBenchmarks() async {
@@ -221,32 +226,53 @@ class BenchmarkState extends ChangeNotifier {
     final activeBenchmarks =
         _middle.benchmarks.where((element) => element.config.active);
 
-    var doneCounter = 0.0;
     var doneMultiplier = _store.submissionMode ? 0.5 : 1.0;
     final exportResults = <BenchmarkExportResult>[];
     var first = true;
 
+    progressInfo.totalStages = activeBenchmarks.length;
+    if (_store.submissionMode) {
+      progressInfo.totalStages += activeBenchmarks.length;
+    }
+    if (_store.cooldown) {
+      progressInfo.totalStages += activeBenchmarks.length - 1;
+    }
+    progressInfo.currentStage = 0;
+
     for (final benchmark in activeBenchmarks) {
-      currentlyRunning = benchmark;
-      _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
+      progressInfo.info = benchmark.info;
 
       if (_aborting) break;
 
       // we only do cooldown before performance benchmarks
       if (cooldown && !first) {
-        _cooling = true;
+        progressInfo.cooldown = true;
+        progressInfo.currentStage++;
+        final timer = Stopwatch()..start();
+        progressInfo.calculateStageProgress = () {
+          return timer.elapsedMilliseconds / cooldownPause.inMilliseconds;
+        };
         notifyListeners();
         await (_cooldownFuture = Future.delayed(cooldownPause));
-        _cooling = false;
-        notifyListeners();
+        progressInfo.cooldown = false;
+        timer.stop();
       }
       first = false;
       if (_aborting) break;
 
+      final perfTimer = Stopwatch()..start();
+      progressInfo.currentStage++;
+      progressInfo.calculateStageProgress = () {
+        final timeProgress =
+            perfTimer.elapsedMilliseconds / benchmark.taskConfig.minDurationMs;
+        final queryProgress = backendBridge.getQueryCounter() /
+            benchmark.taskConfig.minQueryCount;
+        return min(timeProgress, queryProgress);
+      };
+      notifyListeners();
       final performanceRunInfo = await runBenchmark(benchmark, false,
           backendInfo.settings.commonSetting, backendInfo.libPath);
-      _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
-      doneCounter++;
+      perfTimer.stop();
 
       final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
@@ -275,10 +301,19 @@ class BenchmarkState extends ChangeNotifier {
       RunResult? accuracyResult;
 
       if (_store.submissionMode) {
+        final accuracyTimer = Stopwatch()..start();
+        progressInfo.currentStage++;
+        progressInfo.calculateStageProgress = () {
+          final timeProgress = accuracyTimer.elapsedMilliseconds /
+              benchmark.taskConfig.minDurationMs;
+          final queryProgress = backendBridge.getQueryCounter() /
+              benchmark.taskConfig.minQueryCount;
+          return min(timeProgress, queryProgress);
+        };
+        notifyListeners();
         final accuracyRunInfo = await runBenchmark(benchmark, true,
             backendInfo.settings.commonSetting, backendInfo.libPath);
-        _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
-        doneCounter++;
+        accuracyTimer.stop();
 
         accuracyResult = accuracyRunInfo.result;
         benchmark.accuracyModeResult = BenchmarkResult(
@@ -323,7 +358,6 @@ class BenchmarkState extends ChangeNotifier {
       await resourceManager.resultManager.saveResult(lastResult!);
     }
 
-    currentlyRunning = null;
     _doneRunning = _aborting ? null : true;
     _aborting = false;
     notifyListeners();
