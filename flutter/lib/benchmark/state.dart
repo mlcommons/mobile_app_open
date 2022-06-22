@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
-import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/data/results/backend_info.dart';
@@ -30,6 +29,7 @@ import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/list.dart';
+import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/device_info.dart';
@@ -226,7 +226,6 @@ class BenchmarkState extends ChangeNotifier {
     final activeBenchmarks =
         _middle.benchmarks.where((element) => element.config.active);
 
-    var doneMultiplier = _store.submissionMode ? 0.5 : 1.0;
     final exportResults = <BenchmarkExportResult>[];
     var first = true;
 

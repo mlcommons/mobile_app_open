@@ -110,9 +110,7 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
     return result;
   }
 
-  int32_t GetCounter() {
-    return query_counter_.load();
-  }
+  int32_t GetCounter() { return query_counter_.load(); }
 
  private:
   std::unique_ptr<Dataset> dataset_;

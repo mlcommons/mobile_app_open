@@ -103,7 +103,8 @@ final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 
 typedef _GetQuery1 = Int32 Function();
 typedef _GetQuery2 = int Function();
-final _getQuery = getBridgeHandle().lookupFunction<_GetQuery1, _GetQuery2>(_getQueryName);
+final _getQuery =
+    getBridgeHandle().lookupFunction<_GetQuery1, _GetQuery2>(_getQueryName);
 
 RunResult runBenchmark(RunSettings rs) {
   var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
