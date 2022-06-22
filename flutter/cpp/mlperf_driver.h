@@ -110,6 +110,10 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
     return result;
   }
 
+  int32_t GetCounter() {
+    return query_counter_.load();
+  }
+
  private:
   std::unique_ptr<Dataset> dataset_;
   std::unique_ptr<Backend> backend_;
@@ -118,6 +122,7 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
   // Offline or SingleStream scenario.
   std::string scenario_;
   int batch_;
+  std::atomic<int32_t> query_counter_;
 };
 
 }  // namespace mobile

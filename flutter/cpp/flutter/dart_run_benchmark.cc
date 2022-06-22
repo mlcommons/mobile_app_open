@@ -21,7 +21,7 @@ static ::std::mutex global_driver_mutex;
 #define li LOG(INFO) << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__
 #define lip(X) LOG(INFO) << #X "=" << in->X << ";"
 
-extern "C" struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
+struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     const struct dart_ffi_run_benchmark_in* in) {
   lip(backend_model_path);
   lip(backend_lib_path);
@@ -136,4 +136,12 @@ void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out* out) {
   free(out->backend_vendor);
   free(out->accelerator_name);
   delete out;
+}
+
+int32_t dart_ffi_get_query_counter() {
+  ::std::lock_guard<::std::mutex> guard(global_driver_mutex);
+  if (global_driver == nullptr) {
+    return -1;
+  }
+  return global_driver->GetCounter();
 }
