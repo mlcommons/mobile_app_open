@@ -18,6 +18,8 @@
 static ::mlperf::mobile::MlperfDriver* global_driver = nullptr;
 static ::std::mutex global_driver_mutex;
 
+static std::atomic<int32_t> datasetTotalSamples = 0;
+
 #define li LOG(INFO) << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__
 #define lip(X) LOG(INFO) << #X "=" << in->X << ";"
 
@@ -93,6 +95,8 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   }
   li;
 
+  datasetTotalSamples = dataset->TotalSampleCount();
+
   ::mlperf::mobile::MlperfDriver driver(
       std::move(dataset), std::move(backend), in->scenario,
       settings.benchmark_setting().batch_size());
@@ -137,6 +141,8 @@ void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out* out) {
   free(out->accelerator_name);
   delete out;
 }
+
+int32_t dart_ffi_get_dataset_size() { return datasetTotalSamples.load(); }
 
 int32_t dart_ffi_get_query_counter() {
   ::std::lock_guard<::std::mutex> guard(global_driver_mutex);

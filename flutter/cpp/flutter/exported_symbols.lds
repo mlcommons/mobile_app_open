@@ -1,5 +1,6 @@
 dart_ffi_run_benchmark
 dart_ffi_run_benchmark_free
+dart_ffi_get_dataset_size
 dart_ffi_get_query_counter
 dart_ffi_backend_match
 dart_ffi_backend_match_free

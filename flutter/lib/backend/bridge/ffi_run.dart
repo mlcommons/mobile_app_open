@@ -93,6 +93,7 @@ class _RunOut extends Struct {
 const _runName = 'dart_ffi_run_benchmark';
 const _freeName = 'dart_ffi_run_benchmark_free';
 const _getQueryName = 'dart_ffi_get_query_counter';
+const _getDatasetSizeName = 'dart_ffi_get_dataset_size';
 
 typedef _Run = Pointer<_RunOut> Function(Pointer<_RunIn>);
 final _run = getBridgeHandle().lookupFunction<_Run, _Run>(_runName);
@@ -105,6 +106,8 @@ typedef _GetQuery1 = Int32 Function();
 typedef _GetQuery2 = int Function();
 final _getQuery =
     getBridgeHandle().lookupFunction<_GetQuery1, _GetQuery2>(_getQueryName);
+final _getDatasetSize = getBridgeHandle()
+    .lookupFunction<_GetQuery1, _GetQuery2>(_getDatasetSizeName);
 
 RunResult runBenchmark(RunSettings rs) {
   var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
@@ -145,4 +148,8 @@ RunResult runBenchmark(RunSettings rs) {
 
 int getQueryCounter() {
   return _getQuery();
+}
+
+int getDatasetSize() {
+  return _getDatasetSize();
 }

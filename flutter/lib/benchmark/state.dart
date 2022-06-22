@@ -302,20 +302,16 @@ class BenchmarkState extends ChangeNotifier {
       RunResult? accuracyResult;
 
       if (_store.submissionMode) {
-        final accuracyTimer = Stopwatch()..start();
         progressInfo.currentStage++;
         progressInfo.accuracy = true;
         progressInfo.calculateStageProgress = () {
-          final timeProgress = accuracyTimer.elapsedMilliseconds /
-              benchmark.taskConfig.minDurationMs;
-          final queryProgress = backendBridge.getQueryCounter() /
-              benchmark.taskConfig.minQueryCount;
-          return min(timeProgress, queryProgress);
+          final queryProgress =
+              backendBridge.getQueryCounter() / backendBridge.getDatasetSize();
+          return queryProgress;
         };
         notifyListeners();
         final accuracyRunInfo = await runBenchmark(benchmark, true,
             backendInfo.settings.commonSetting, backendInfo.libPath);
-        accuracyTimer.stop();
 
         accuracyResult = accuracyRunInfo.result;
         benchmark.accuracyModeResult = BenchmarkResult(
