@@ -18,7 +18,7 @@
 static ::mlperf::mobile::MlperfDriver* global_driver = nullptr;
 static ::std::mutex global_driver_mutex;
 
-static std::atomic<int32_t> datasetTotalSamples = 0;
+static std::atomic<int32_t> datasetTotalSamples;
 
 #define li LOG(INFO) << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__
 #define lip(X) LOG(INFO) << #X "=" << in->X << ";"
