@@ -8,19 +8,19 @@ import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 
-class BenchmarksConfigurationScreen extends StatelessWidget {
-  final List<TaskConfigDescription> _benchmarksConfigurations;
+class TaskConfigScreen extends StatelessWidget {
+  final List<TaskConfigDescription> _configs;
 
-  BenchmarksConfigurationScreen(this._benchmarksConfigurations);
+  TaskConfigScreen(this._configs);
 
   Card getOptionPattern(
     BuildContext context,
     TaskConfigDescription configuration,
-    String chosenBenchmarksConfiguration,
+    String chosenConfigName,
   ) {
     final stringResources = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
-    final wasChosen = chosenBenchmarksConfiguration == configuration.name;
+    final wasChosen = chosenConfigName == configuration.name;
 
     return Card(
       child: ListTile(
@@ -52,12 +52,12 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(stringResources.benchmarksConfigurationTitle),
+        title: Text(stringResources.taskConfigSettingsEntry),
       ),
       body: ListView.builder(
-        itemCount: _benchmarksConfigurations.length,
+        itemCount: _configs.length,
         itemBuilder: (context, index) {
-          final configuration = _benchmarksConfigurations[index];
+          final configuration = _configs[index];
           return getOptionPattern(
             context,
             configuration,
