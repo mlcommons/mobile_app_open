@@ -108,7 +108,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
       Padding(
         padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: Text(
-          progress.cooldown ? l10n.cooldownStatus : progress.info!.taskName,
+          progress.cooldown
+              ? l10n.cooldownStatus
+              : (progress.accuracy
+                      ? l10n.progressScreenNameAccuracy
+                      : l10n.progressScreenNamePerformance)
+                  .replaceFirst('<taskName>', progress.info!.taskName),
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: AppColors.lightText,

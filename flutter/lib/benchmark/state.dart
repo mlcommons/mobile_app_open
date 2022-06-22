@@ -51,6 +51,7 @@ enum BenchmarkStateEnum {
 
 class ProgressInfo {
   bool cooldown = false;
+  bool accuracy = false;
   BenchmarkInfo? info;
   int totalStages = 0;
   int currentStage = 0;
@@ -261,6 +262,7 @@ class BenchmarkState extends ChangeNotifier {
 
       final perfTimer = Stopwatch()..start();
       progressInfo.currentStage++;
+      progressInfo.accuracy = false;
       progressInfo.calculateStageProgress = () {
         final timeProgress =
             perfTimer.elapsedMilliseconds / benchmark.taskConfig.minDurationMs;
@@ -302,6 +304,7 @@ class BenchmarkState extends ChangeNotifier {
       if (_store.submissionMode) {
         final accuracyTimer = Stopwatch()..start();
         progressInfo.currentStage++;
+        progressInfo.accuracy = true;
         progressInfo.calculateStageProgress = () {
           final timeProgress = accuracyTimer.elapsedMilliseconds /
               benchmark.taskConfig.minDurationMs;
