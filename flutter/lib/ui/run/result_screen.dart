@@ -246,7 +246,7 @@ class _ResultScreenState extends State<ResultScreen>
                 fontSize: 32.0,
                 color: resultIsValid
                     ? AppColors.lightText
-                    : Color.fromARGB(255, 255, 120, 100),
+                    : AppColors.lightRedText,
                 fontWeight: FontWeight.bold),
           ),
           if (text2 != null)
@@ -256,7 +256,7 @@ class _ResultScreenState extends State<ResultScreen>
                   fontSize: 32.0,
                   color: resultIsValid
                       ? AppColors.lightText
-                      : Color.fromARGB(255, 255, 120, 100),
+                      : AppColors.lightRedText,
                   fontWeight: FontWeight.bold),
             ),
         ]),

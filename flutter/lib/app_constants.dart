@@ -9,7 +9,7 @@ class AppColors {
   static const primary = Colors.blue;
   static const secondary = Colors.green;
   static const lightText = Colors.white;
-  static final lightRedText = Color.fromARGB(255, 255, 100, 100);
+  static final lightRedText = Color.fromARGB(255, 255, 120, 100);
   static const darkText = Colors.black;
   static const darkRedText = Colors.red;
   static const lightBackground = Colors.white;
@@ -53,6 +53,8 @@ class AppColors {
       : [Colors.brown.shade400, Colors.brown];
 
   static const progressCircle = Color(0xff135384);
+
+  static const progressCancelButton = Color(0x000B4A7F);
 
   static List<Color> get progressCircleGradient =>
       [Color(0xff135384), Color(0xff135384)];
