@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:collection/collection.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 

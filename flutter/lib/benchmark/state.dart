@@ -19,7 +19,6 @@ import 'package:mlperfbench_common/data/results/dataset_type.dart';
 import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
 
