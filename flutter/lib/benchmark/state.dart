@@ -349,6 +349,10 @@ class BenchmarkState extends ChangeNotifier {
       await resourceManager.resultManager.saveResult(lastResult!);
     }
 
+    if (!_store.keepLogs) {
+      await Directory(logDir).delete(recursive: true);
+    }
+
     currentlyRunning = null;
     _doneRunning = _aborting ? null : true;
     _aborting = false;

@@ -99,6 +99,21 @@ class _SettingsScreen extends State<SettingsScreen> {
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: Text(
+                stringResources.settingsKeepLogs,
+              ),
+            ),
+            subtitle: Text(stringResources.settingsKeepLogsSubtitle),
+            trailing: Switch(
+              value: store.keepLogs,
+              onChanged: (flag) {
+                store.keepLogs = flag;
+              },
+            ),
+          ),
+          ListTile(
+            title: Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Text(
                 stringResources.cooldown,
               ),
             ),
