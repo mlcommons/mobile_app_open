@@ -475,7 +475,8 @@ class BenchmarkState extends ChangeNotifier {
         'Running ${benchmark.id} in ${runMode.getResultModeString()} mode...');
     final stopwatch = Stopwatch()..start();
 
-    logDir = '$logDir/${benchmark.id}';
+    final logSuffix = accuracyMode ? 'accuracy' : 'performance';
+    logDir = '$logDir/${benchmark.id}-$logSuffix';
     await Directory(logDir).create(recursive: true);
 
     final runSettings = benchmark.createRunSettings(
