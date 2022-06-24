@@ -21,16 +21,21 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
 
   mlperf_device_info_t device_info{model, manufacturer};
 
-  // backends should set pbdata to a statically allocated string, so we don't
-  // need to free it
-  const char *pbdata = nullptr;
+  // backends should allocate string values in static memory,
+  // so we don't need to free it
+  const char *pb_settings = nullptr;
+  const char *error_message = nullptr;
 
   auto result = new dart_ffi_backend_match_result;
   result->pbdata = nullptr;
-  result->matches =
-      backend.match(&result->error_message, &pbdata, &device_info);
+  result->error_message = nullptr;
+  result->matches = backend.match(&error_message, &pb_settings, &device_info);
   if (!result->matches) {
     return result;
+  }
+
+  if (error_message != nullptr) {
+    result->error_message = strdup(error_message);
   }
 
   if (result->error_message != nullptr) {
@@ -42,17 +47,17 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
 
   LOG(INFO) << "checking pbdata";
 
-  if (pbdata == nullptr || strlen(pbdata) == 0) {
+  if (pb_settings == nullptr || strlen(pb_settings) == 0) {
     result->matches = false;
     LOG(ERROR) << "Backend hasn't filled settings";
     return result;
   }
 
   ::mlperf::mobile::BackendSetting setting;
-  if (!google::protobuf::TextFormat::ParseFromString(pbdata, &setting)) {
+  if (!google::protobuf::TextFormat::ParseFromString(pb_settings, &setting)) {
     result->matches = false;
     LOG(ERROR) << "Can't parse backend settings before serialization:\n"
-               << pbdata << std::endl;
+               << pb_settings << std::endl;
     return result;
   }
 
@@ -74,7 +79,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
 
 extern "C" void dart_ffi_backend_match_free(
     dart_ffi_backend_match_result *result) {
-  (void)result->error_message;  // should be statically allocated
-  delete result->pbdata;        // pbdata is allocated in dart_ffi_backend_match
+  free(result->error_message);
+  delete result->pbdata;
   delete result;
 }

@@ -43,7 +43,8 @@ pb.BackendSetting? backendMatch(String libPath) {
 
   try {
     if (runOut.ref.error_message.address != 0) {
-      throw UnsupportedDeviceException(runOut.ref.error_message.toDartString());
+      final errorMessage = runOut.ref.error_message.toDartString();
+      throw UnsupportedDeviceException(errorMessage);
     }
     if (runOut.ref.matches == 0) {
       return null;
