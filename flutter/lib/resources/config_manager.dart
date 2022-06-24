@@ -10,8 +10,7 @@ import 'utils.dart';
 
 const _configListFileName = 'benchmarksConfigurations.json';
 const _defaultConfigName = 'default';
-const _defaultConfigUrl =
-    'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v2_0/assets/tasks_flutterapp_v2.pbtxt';
+const _defaultConfigUrl = 'asset://assets/tasks.pbtxt';
 
 class TaskConfigDescription {
   final String name;
