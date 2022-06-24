@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
+
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
@@ -9,8 +11,7 @@ import 'utils.dart';
 
 const _configListFileName = 'benchmarksConfigurations.json';
 const _defaultConfigName = 'default';
-const _defaultConfigUrl =
-    'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v2_0/assets/tasks_flutterapp_v2.pbtxt';
+const _defaultConfigUrl = 'asset://assets/tasks.pbtxt';
 
 class TaskConfigDescription {
   final String name;
@@ -31,7 +32,7 @@ class ConfigManager {
   final TaskConfigDescription defaultConfig =
       TaskConfigDescription(_defaultConfigName, _defaultConfigUrl);
 
-  String configPath = '';
+  String configLocation = '';
   late pb.MLPerfConfig decodedConfig;
 
   ConfigManager(this.applicationDirectory, this.resourceManager);
@@ -49,14 +50,21 @@ class ConfigManager {
     if (config == null) {
       throw 'config with name $name not found';
     }
+    String configContent;
     if (isInternetResource(config.path)) {
-      configPath = await resourceManager.cacheManager.fileCacheHelper
+      configLocation = await resourceManager.cacheManager.fileCacheHelper
           .get(config.path, true);
+      configContent = await File(configLocation).readAsString();
+    } else if (isAsset(config.path)) {
+      configLocation = config.path;
+      final assetPath = stripAssetPrefix(config.path);
+      configContent = await rootBundle.loadString(assetPath);
     } else {
-      configPath = resourceManager.get(config.path);
-      if (!await File(configPath).exists()) {
-        throw 'local config file is missing: $configPath';
+      configLocation = resourceManager.get(config.path);
+      if (!await File(configLocation).exists()) {
+        throw 'local config file is missing: $configLocation';
       }
+      configContent = await File(configLocation).readAsString();
     }
 
     final nonRemovableResources = <String>[];
@@ -65,7 +73,7 @@ class ConfigManager {
           .getResourceRelativePath(config.path));
     }
 
-    decodedConfig = getMLPerfConfig(await File(configPath).readAsString());
+    decodedConfig = getMLPerfConfig(configContent);
   }
 
   Future<File> _createOrUpdateConfigListFile() async {
