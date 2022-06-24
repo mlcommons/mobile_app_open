@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+
 import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
