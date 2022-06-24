@@ -52,7 +52,8 @@ dart pub global activate protoc_plugin
 
 echo "$MC_LOG_PREFIX Build app"
 export BAZEL_OUTPUT_ROOT_ARG=--output_user_root=$MC_BUILD_HOME/bazel
-cd "$MC_REPO_HOME" && time make
+cd "$MC_REPO_HOME" && time make flutter/ios
+cd "$MC_REPO_HOME" && time FLUTTER_BUILD_NUMBER=$CI_BUILD_NUMBER make flutter/ios/ipa
 cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 cd "$MC_REPO_HOME"/flutter/ios && pod install
 
