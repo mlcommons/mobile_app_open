@@ -31,7 +31,7 @@ endif
 flutter: flutter/prepare flutter/platform
 flutter/firebase: flutter/firebase/config flutter/firebase/prefix
 flutter/result: flutter/result/schema flutter/result/ts
-flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info
+flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
 
 flutter_official_build_flag=--dart-define=official-build=${OFFICIAL_BUILD}
 
@@ -135,6 +135,14 @@ flutter/l10n:
 		--output-localization-file=app_localizations.dart \
 		--no-synthetic-package
 	dart format flutter/lib/localizations
+
+FLUTTER_APP_VERSION?=$(shell grep 'version:' flutter/pubspec.yaml | head -n1 | awk '{ print $$2}')
+.PHONY: flutter/set-windows-build-number
+flutter/set-windows-build-number:
+	cat flutter/windows/runner/version.in | sed \
+		-e "s,APP_VERSION_VALUE,${FLUTTER_APP_VERSION}," \
+		-e "s,APP_BUILD_NUMBER_VALUE,$${FLUTTER_APP_BUILD_NUMBER:=0}," \
+		| tee flutter/windows/runner/version.gen.h
 
 .PHONY: flutter/pub
 flutter/pub:
