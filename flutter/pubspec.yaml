@@ -67,6 +67,7 @@ flutter_icons:
 flutter:
   assets:
     - assets/
+    - assets/icons/
   generate: true
   uses-material-design: true
 
