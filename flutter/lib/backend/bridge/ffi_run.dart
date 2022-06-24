@@ -28,6 +28,8 @@ class _RunIn extends Struct {
   external int min_query_count;
   @Int32()
   external int min_duration;
+  @Int32()
+  external int single_stream_expected_latency_ns;
   external Pointer<Utf8> output_dir;
 
   void set(RunSettings rs) {
@@ -51,8 +53,8 @@ class _RunIn extends Struct {
 
     mode = rs.mode.toNativeUtf8();
     min_query_count = rs.min_query_count;
-
     min_duration = rs.min_duration;
+    single_stream_expected_latency_ns = rs.single_stream_expected_latency_ns;
 
     output_dir = rs.output_dir.toNativeUtf8();
   }

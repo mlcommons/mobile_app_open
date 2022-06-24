@@ -175,6 +175,8 @@ class Benchmark {
       mode: runMode.getBackendModeString(),
       min_query_count: minQueryCount,
       min_duration: minDuration,
+      single_stream_expected_latency_ns:
+          benchmarkSetting.singleStreamExpectedLatencyNs,
       output_dir: logDir.path,
       benchmark_id: id,
     );
