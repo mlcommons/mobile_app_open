@@ -245,6 +245,8 @@ class BenchmarkState extends ChangeNotifier {
     final exportResults = <BenchmarkExportResult>[];
     var first = true;
 
+    resetCurrentResults();
+
     for (final benchmark in activeBenchmarks) {
       currentlyRunning = benchmark;
       _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
@@ -348,6 +350,13 @@ class BenchmarkState extends ChangeNotifier {
     notifyListeners();
 
     await Wakelock.disable();
+  }
+
+  void resetCurrentResults() {
+    for (var b in _middle.benchmarks) {
+      b.accuracyModeResult = null;
+      b.performanceModeResult = null;
+    }
   }
 
   BenchmarkExportResult exportResultFromRunInfo(
