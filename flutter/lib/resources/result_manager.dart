@@ -109,6 +109,7 @@ class ResultManager {
     return BenchmarkResult(
         throughput: runResult.throughput ?? 0.0,
         accuracy: runResult.accuracy,
+        accuracy2: runResult.accuracy2,
         backendName: export.backendInfo.name,
         acceleratorName: export.backendInfo.accelerator,
         batchSize: export.backendSettingsInfo.batchSize,

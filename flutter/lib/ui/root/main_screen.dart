@@ -16,6 +16,7 @@ import 'package:mlperfbench/ui/run/app_bar.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/run/progress_screen.dart';
 import 'package:mlperfbench/ui/run/result_screen.dart';
+import 'resource_error_screen.dart';
 
 class MainKeys {
   // list of widget keys that need to be accessed in the test code
@@ -29,6 +30,10 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
+
+    if (state.taskConfigFailedToLoad) {
+      return ResourceErrorScreen();
+    }
 
     PreferredSizeWidget? appBar;
 

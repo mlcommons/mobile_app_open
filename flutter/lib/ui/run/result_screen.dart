@@ -68,22 +68,33 @@ class _ResultScreenState extends State<ResultScreen>
     final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
     for (final benchmark in state.benchmarks) {
-      late final String textResult;
-      late final double numericResult;
+      late final String? textResult;
+      late final double? numericResult;
+      late final String? textResult2;
+      late final double? numericResult2;
       late final BenchmarkResult? benchmarkResult;
+      late final bool resultIsValid;
       if (_screenMode == _ScreenMode.performance) {
         benchmarkResult = benchmark.performanceModeResult;
         final throughput = benchmarkResult?.throughput;
-        textResult = throughput?.toStringAsFixed(2) ?? 'N/A';
+        textResult = throughput?.toStringAsFixed(2);
         numericResult = (throughput ?? 0.0) / benchmark.info.maxThroughput;
+        textResult2 = null;
+        numericResult2 = null;
+        resultIsValid = benchmarkResult?.validity ?? false;
       } else if (_screenMode == _ScreenMode.accuracy) {
         benchmarkResult = benchmark.accuracyModeResult;
-        textResult = benchmarkResult?.accuracy?.formatted ?? 'N/A';
-        numericResult = benchmarkResult?.accuracy?.normalized ?? 0.0;
+        textResult = benchmarkResult?.accuracy?.formatted;
+        numericResult = benchmarkResult?.accuracy?.normalized;
+        textResult2 = benchmarkResult?.accuracy2?.formatted;
+        numericResult2 = benchmarkResult?.accuracy2?.normalized;
+        resultIsValid =
+            (benchmarkResult?.accuracy?.normalized ?? -1.0) >= 0.0 &&
+                (benchmarkResult?.accuracy?.normalized ?? -1.0) <= 1.0 &&
+                (benchmarkResult?.accuracy2?.normalized ?? -1.0) <= 1.0;
       } else {
         continue;
       }
-      final resultIsValid = benchmarkResult?.validity ?? false;
       final backendName = benchmark.performanceModeResult?.backendName ?? '';
       final acceleratorName =
           benchmark.performanceModeResult?.acceleratorName ?? '';
@@ -99,15 +110,30 @@ class _ResultScreenState extends State<ResultScreen>
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                textResult,
-                style: TextStyle(
-                  color: resultIsValid
-                      ? AppColors.darkText
-                      : AppColors.darkRedText,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
+              Column(
+                children: [
+                  Text(
+                    textResult ?? 'N/A',
+                    style: TextStyle(
+                      color: resultIsValid
+                          ? AppColors.darkText
+                          : AppColors.darkRedText,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (textResult2 != null)
+                    Text(
+                      textResult2,
+                      style: TextStyle(
+                        color: resultIsValid
+                            ? AppColors.darkText
+                            : AppColors.darkRedText,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                ],
               ),
               Icon(Icons.chevron_right, color: Colors.grey),
             ],
@@ -117,7 +143,7 @@ class _ResultScreenState extends State<ResultScreen>
       if (benchmark.info.isOffline) {
         String shardsNum;
         String batchSize;
-        if (textResult == 'N/A') {
+        if (textResult == null) {
           shardsNum = 'N/A';
           batchSize = 'N/A';
         } else {
@@ -153,7 +179,11 @@ class _ResultScreenState extends State<ResultScreen>
         ));
       }
       rowChildren.add(FractionallySizedBox(
-          widthFactor: 0.9, child: BlueProgressLine(numericResult)));
+          widthFactor: 0.9, child: BlueProgressLine(numericResult ?? 0.0)));
+      if (numericResult2 != null) {
+        rowChildren.add(FractionallySizedBox(
+            widthFactor: 0.9, child: BlueProgressLine(numericResult2)));
+      }
       list.add(
         Column(
           children: [
@@ -189,10 +219,15 @@ class _ResultScreenState extends State<ResultScreen>
           : benchmark.accuracyModeResult;
       final text = _screenMode == _ScreenMode.performance
           ? result?.throughput.toStringAsFixed(2)
-          : (result?.accuracy?.normalized == null
-              ? null
-              : (result!.accuracy!.normalized * 100).toStringAsFixed(2));
-      final resultIsValid = result?.validity ?? false;
+          : result?.accuracy?.normalized.toStringAsFixed(2);
+      final text2 = _screenMode == _ScreenMode.performance
+          ? null
+          : result?.accuracy2?.normalized.toStringAsFixed(2);
+      final resultIsValid = _screenMode == _ScreenMode.performance
+          ? (result?.validity ?? false)
+          : ((result?.accuracy?.normalized ?? -1.0) >= 0.0 &&
+              (result?.accuracy?.normalized ?? -1.0) <= 1.0 &&
+              (result?.accuracy2?.normalized ?? -1.0) <= 1.0);
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child:
@@ -214,6 +249,16 @@ class _ResultScreenState extends State<ResultScreen>
                     : Color.fromARGB(255, 255, 120, 100),
                 fontWeight: FontWeight.bold),
           ),
+          if (text2 != null)
+            Text(
+              text2,
+              style: TextStyle(
+                  fontSize: 32.0,
+                  color: resultIsValid
+                      ? AppColors.lightText
+                      : Color.fromARGB(255, 255, 120, 100),
+                  fontWeight: FontWeight.bold),
+            ),
         ]),
       );
     });

@@ -7,8 +7,8 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
-import 'package:mlperfbench/ui/settings/benchmarks_configuration_screen.dart';
 import 'package:mlperfbench/ui/settings/snack_bar.dart';
+import 'package:mlperfbench/ui/settings/task_config_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -144,19 +144,17 @@ class _SettingsScreen extends State<SettingsScreen> {
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: Text(
-                stringResources.benchmarksConfiguration,
+                stringResources.taskConfigSettingsEntry,
               ),
             ),
             trailing: Icon(Icons.chevron_right),
             onTap: () async {
               if (state.state == BenchmarkStateEnum.done ||
                   state.state == BenchmarkStateEnum.waiting) {
-                final benchmarksConfigurations =
-                    await state.configManager.getConfigs();
+                final taskConfigs = await state.configManager.getConfigs();
 
                 await Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => BenchmarksConfigurationScreen(
-                        benchmarksConfigurations)));
+                    builder: (context) => TaskConfigScreen(taskConfigs)));
               } else {
                 _showUnableSpecifyConfigurationMessage(
                     context, stringResources);
