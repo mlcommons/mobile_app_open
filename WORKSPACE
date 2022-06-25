@@ -82,14 +82,13 @@ maven_install(
 # Other dependencies.
 # Make this a repository so it can be substituted with the real backend
 
-# use prebuilt neuron delegate for this submission, we'll update source code github later
 # Neuron Delegate
-#http_archive(
-#    name = "neuron_delegate",
-#    sha256 = "e80490919c87338fea402285142a629ca5795fbe08d8b4b1e071eb454c7a537d",
-#    strip_prefix = "tflite-neuron-delegate-86fc333bafe8e556c050fe8cc32acf1c49e65847",
-#    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/86fc333bafe8e556c050fe8cc32acf1c49e65847.tar.gz"],
-#)
+http_archive(
+    name = "neuron_delegate",
+    sha256 = "2bef00cc7ba6f649a437e979fe1b36bdd94f575b5c00e0d08cb4e92e586f49a7",
+    strip_prefix = "tflite-neuron-delegate-2.8.0",
+    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/tags/v2.8.0.tar.gz"],
+)
 
 new_local_repository(
     name = "samsungbackend",

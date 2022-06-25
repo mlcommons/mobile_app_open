@@ -120,7 +120,7 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "LU_float32"
   accelerator: "neuron"
-  accelerator_desc: "neuron"
+  accelerator_desc: "Neuron"
   configuration: "TFLite"
   batch_size: 1
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
@@ -137,8 +137,8 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "IS_uint8_mosaic"
-  accelerator: "nnapi"
-  accelerator_desc: "NNAPI"
+  accelerator: "neuron"
+  accelerator_desc: "Neuron"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
 })SETTINGS";
