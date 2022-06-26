@@ -15,7 +15,7 @@ void main() {
   final runTimeLimitMinutes = 20;
   final downloadTimeLimitMinutes = 10;
   final secondsInMinute = 60;
-  final expectedResultCount = 6;
+  final expectedResultCount = 5;  // number of tasks to be run
 
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
