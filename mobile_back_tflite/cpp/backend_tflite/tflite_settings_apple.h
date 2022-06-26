@@ -65,15 +65,6 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_float32"
-  accelerator: "coreml"
-  accelerator_desc: "CoreML"
-  configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_float.tflite"
-  md5Checksum: "e3f7a05b9e0f398c0c0502bab1fc202a"
-}
-
-benchmark_setting {
   benchmark_id: "IS_float32_mosaic"
   accelerator: "coreml"
   accelerator_desc: "CoreML"
