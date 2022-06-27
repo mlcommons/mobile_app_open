@@ -94,6 +94,13 @@ class Store extends ChangeNotifier {
   set previousAppVersion(String value) {
     _storeFromDisk.setString(_StoreConstants.previous_app_version, value);
   }
+
+  bool get keepLogs => _getBool(_StoreConstants.keep_logs);
+
+  set keepLogs(bool value) {
+    _storeFromDisk.setBool(_StoreConstants.keep_logs, value);
+    notifyListeners();
+  }
 }
 
 class _StoreConstants {
@@ -106,4 +113,5 @@ class _StoreConstants {
   static const chosen_configuration_name = 'chosen configuration name';
   static const previous_extended_result = 'previous extended result';
   static const previous_app_version = 'previous app version';
+  static const keep_logs = 'keep_logs';
 }
