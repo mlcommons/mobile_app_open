@@ -39,6 +39,8 @@ class ResultManager {
   final File jsonFile;
   _ExtendedResultList _results = _ExtendedResultList([]);
 
+  List<ExtendedResult> get results => _results.list;
+
   ResultManager(String applicationDirectory)
       : jsonFile = File('$applicationDirectory/$_resultsFileName');
 

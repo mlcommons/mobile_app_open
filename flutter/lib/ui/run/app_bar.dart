@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/ui/history/history_screen.dart';
 import 'package:mlperfbench/ui/icons.dart';
 import '../config/config_screen.dart';
 import '../settings/settings_screen.dart';
@@ -10,6 +11,16 @@ class MyAppBar {
       String title, BuildContext context, bool addSettingsButton) {
     var actions = <Widget>[];
     if (addSettingsButton) {
+      actions.add(IconButton(
+        icon: Icon(Icons.access_time),
+        tooltip: 'History',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HistoryScreen()),
+          );
+        },
+      ));
       actions.add(IconButton(
         icon: AppIcons.parameters,
         tooltip: 'Configuration',
