@@ -32,7 +32,8 @@ ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin
 RUN yes | sdkmanager --licenses >/dev/null
 RUN yes | sdkmanager \
     "platform-tools" \
-    "build-tools;29.0.2" \
+    "build-tools;30.0.3" \
+    "platforms;android-29" \
     "platforms;android-31"
 # Install NDK in a separate layer to decrease max layer size.
 RUN yes | sdkmanager "ndk;21.4.7075529"
