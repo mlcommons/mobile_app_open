@@ -30,6 +30,7 @@ class Accuracy {
 class BenchmarkRunResult {
   static const String _tagThroughput = 'throughput';
   static const String _tagAccuracy = 'accuracy';
+  static const String _tagAccuracy2 = 'accuracy2';
   static const String _tagDatasetInfo = 'dataset';
   static const String _tagMeasuredDuration = 'measured_duration_ms';
   static const String _tagMeasuredSamples = 'measured_samples';
@@ -38,6 +39,7 @@ class BenchmarkRunResult {
 
   final double? throughput;
   final Accuracy? accuracy;
+  final Accuracy? accuracy2;
   final DatasetInfo datasetInfo;
   final double measuredDurationMs;
   final int measuredSamples;
@@ -47,6 +49,7 @@ class BenchmarkRunResult {
   BenchmarkRunResult({
     required this.throughput,
     required this.accuracy,
+    required this.accuracy2,
     required this.datasetInfo,
     required this.measuredDurationMs,
     required this.measuredSamples,
@@ -60,6 +63,9 @@ class BenchmarkRunResult {
           accuracy: json[_tagAccuracy] == null
               ? null
               : Accuracy.fromJson(json[_tagAccuracy]),
+          accuracy2: json[_tagAccuracy2] == null
+              ? null
+              : Accuracy.fromJson(json[_tagAccuracy2]),
           datasetInfo: DatasetInfo.fromJson(json[_tagDatasetInfo]),
           measuredDurationMs: json[_tagMeasuredDuration] as double,
           measuredSamples: json[_tagMeasuredSamples] as int,
@@ -70,6 +76,7 @@ class BenchmarkRunResult {
   Map<String, dynamic> toJson() => {
         _tagThroughput: throughput,
         _tagAccuracy: accuracy,
+        _tagAccuracy2: accuracy2,
         _tagDatasetInfo: datasetInfo,
         _tagMeasuredDuration: measuredDurationMs,
         _tagMeasuredSamples: measuredSamples,

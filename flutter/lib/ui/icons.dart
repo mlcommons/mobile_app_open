@@ -5,19 +5,19 @@ import 'package:flutter_svg/svg.dart';
 
 class AppIcons {
   static AvdPicture _pAvd(String name) {
-    return AvdPicture.asset('assets/' + name);
+    return AvdPicture.asset('assets/icons/' + name);
   }
 
   static AvdPicture _iconWhiteAvd(String name) {
-    return AvdPicture.asset('assets/' + name, color: Colors.white);
+    return AvdPicture.asset('assets/icons/' + name, color: Colors.white);
   }
 
   static SvgPicture _pSvg(String name) {
-    return SvgPicture.asset('assets/' + name);
+    return SvgPicture.asset('assets/icons/' + name);
   }
 
   static SvgPicture _iconColorSvg(String name, Color color) {
-    return SvgPicture.asset('assets/' + name, color: color);
+    return SvgPicture.asset('assets/icons/' + name, color: color);
   }
 
   static final AvdPicture image_classification =

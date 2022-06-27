@@ -32,6 +32,10 @@ Future<void> main() async {
       normalized: 0.123,
       formatted: '12.3%',
     ),
+    accuracy2: Accuracy(
+      normalized: 0.123,
+      formatted: '12.3%',
+    ),
     datasetInfo: DatasetInfo(
       name: 'Imagenet classification validation set',
       type: DatasetType.fromJson('IMAGENET'),

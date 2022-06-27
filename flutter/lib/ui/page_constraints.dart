@@ -10,6 +10,8 @@ Widget getPageWidget(BoxConstraints constraint, Widget childWidget) {
 
 Widget getSinglePageView(Widget child) {
   return LayoutBuilder(builder: (context, constraint) {
-    return getPageWidget(constraint, child);
+    return SingleChildScrollView(
+      child: getPageWidget(constraint, child),
+    );
   });
 }

@@ -28,6 +28,8 @@ class _RunIn extends Struct {
   external int min_query_count;
   @Int32()
   external int min_duration;
+  @Int32()
+  external int single_stream_expected_latency_ns;
   external Pointer<Utf8> output_dir;
 
   void set(RunSettings rs) {
@@ -51,8 +53,8 @@ class _RunIn extends Struct {
 
     mode = rs.mode.toNativeUtf8();
     min_query_count = rs.min_query_count;
-
     min_duration = rs.min_duration;
+    single_stream_expected_latency_ns = rs.single_stream_expected_latency_ns;
 
     output_dir = rs.output_dir.toNativeUtf8();
   }
@@ -78,6 +80,9 @@ class _RunOut extends Struct {
   @Float()
   external double accuracyNormalized;
   external Pointer<Utf8> accuracyFormatted;
+  @Float()
+  external double accuracyNormalized2;
+  external Pointer<Utf8> accuracyFormatted2;
   @Int32()
   external int num_samples;
   @Float()
@@ -119,6 +124,8 @@ RunResult runBenchmark(RunSettings rs) {
     throughput: 1000.0 / runOut.ref.latency,
     accuracyNormalized: runOut.ref.accuracyNormalized,
     accuracyFormatted: runOut.ref.accuracyFormatted.toDartString(),
+    accuracyNormalized2: runOut.ref.accuracyNormalized2,
+    accuracyFormatted2: runOut.ref.accuracyFormatted2.toDartString(),
     numSamples: runOut.ref.num_samples,
     durationMs: runOut.ref.duration_ms,
     backendName: runOut.ref.backend_name.toDartString(),

@@ -121,8 +121,9 @@ class ResourceManager {
     } else if (Platform.isAndroid) {
       dir = await getExternalStorageDirectory();
     } else if (Platform.isWindows) {
-      dir = await getDownloadsDirectory();
-      dir = Directory(dir!.path.replaceAll('\\', '/'));
+      dir = await getApplicationDocumentsDirectory();
+      dir = Directory(dir.path.replaceAll('\\', '/'));
+      dir = Directory('${dir.path}/MLCommons/MLPerfBench');
     } else {
       throw 'unsupported platform';
     }
@@ -135,6 +136,7 @@ class ResourceManager {
 
   Future<void> initSystemPaths() async {
     applicationDirectory = await getApplicationDirectory();
+    await Directory(applicationDirectory).create(recursive: true);
     _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
     await Directory(_loadedResourcesDir).create();
 

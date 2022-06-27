@@ -1,20 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
+
+import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'utils.dart';
 
 const _configListFileName = 'benchmarksConfigurations.json';
 const _defaultConfigName = 'default';
-const _defaultConfigUrl =
-    'https://raw.githubusercontent.com/mlcommons/mobile_models/main/v2_0/assets/tasks_flutterapp_v2.pbtxt';
+const _defaultConfigUrl = 'asset://assets/tasks.pbtxt';
 
-class BenchmarksConfig {
+class TaskConfigDescription {
   final String name;
   final String path;
 
-  BenchmarksConfig(this.name, this.path);
+  TaskConfigDescription(this.name, this.path);
 
   String getType(AppLocalizations stringResources) => isInternetResource(path)
       ? stringResources.internetResource
@@ -26,33 +29,43 @@ class BenchmarksConfig {
 class ConfigManager {
   final String applicationDirectory;
   final ResourceManager resourceManager;
-  final BenchmarksConfig defaultConfig =
-      BenchmarksConfig(_defaultConfigName, _defaultConfigUrl);
-  String currentConfigName;
-  String configPath = '';
+  final TaskConfigDescription defaultConfig =
+      TaskConfigDescription(_defaultConfigName, _defaultConfigUrl);
 
-  ConfigManager(
-      this.applicationDirectory, this.currentConfigName, this.resourceManager);
+  String configLocation = '';
+  late pb.MLPerfConfig decodedConfig;
 
-  Future<BenchmarksConfig?> get currentConfig async =>
-      await _getConfig(currentConfigName);
+  ConfigManager(this.applicationDirectory, this.resourceManager);
 
-  Future<void> setConfig(BenchmarksConfig config) async {
-    if (isInternetResource(config.path)) {
-      configPath = await resourceManager.cacheManager.fileCacheHelper
-          .get(config.path, true);
-    } else {
-      configPath = resourceManager.get(config.path);
-      if (!await File(configPath).exists()) {
-        throw 'local config file is missing: $configPath';
+  /// Can throw.
+  /// decodedConfig must not be read until this function has finished successfully
+  Future<void> loadConfig(String name) async {
+    TaskConfigDescription? config;
+    for (var c in await getConfigs()) {
+      if (c.name == name) {
+        config = c;
+        break;
       }
     }
-
-    if (currentConfigName == config.name) {
-      return;
+    if (config == null) {
+      throw 'config with name $name not found';
     }
-
-    currentConfigName = config.name;
+    String configContent;
+    if (isInternetResource(config.path)) {
+      configLocation = await resourceManager.cacheManager.fileCacheHelper
+          .get(config.path, true);
+      configContent = await File(configLocation).readAsString();
+    } else if (isAsset(config.path)) {
+      configLocation = config.path;
+      final assetPath = stripAssetPrefix(config.path);
+      configContent = await rootBundle.loadString(assetPath);
+    } else {
+      configLocation = resourceManager.get(config.path);
+      if (!await File(configLocation).exists()) {
+        throw 'local config file is missing: $configLocation';
+      }
+      configContent = await File(configLocation).readAsString();
+    }
 
     final nonRemovableResources = <String>[];
     if (isInternetResource(config.path)) {
@@ -60,8 +73,7 @@ class ConfigManager {
           .getResourceRelativePath(config.path));
     }
 
-    await resourceManager.cacheManager
-        .deleteLoadedResources(nonRemovableResources);
+    decodedConfig = getMLPerfConfig(configContent);
   }
 
   Future<File> _createOrUpdateConfigListFile() async {
@@ -85,36 +97,15 @@ class ConfigManager {
     return file;
   }
 
-  Future<Map<String, dynamic>> _readConfigs() async {
+  Future<List<TaskConfigDescription>> getConfigs() async {
     final file = await _createOrUpdateConfigListFile();
-    return jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-  }
+    final jsonContent =
+        jsonDecode(await file.readAsString()) as Map<String, dynamic>;
 
-  Future<List<BenchmarksConfig>> getConfigs() async {
-    final jsonContent = await _readConfigs();
-
-    final result = <BenchmarksConfig>[];
+    final result = <TaskConfigDescription>[];
     for (final e in jsonContent.entries) {
-      result.add(BenchmarksConfig(e.key, e.value as String));
+      result.add(TaskConfigDescription(e.key, e.value as String));
     }
     return result;
-  }
-
-  Future<void> deleteDefaultConfig() async {
-    final fileName = defaultConfig.path.split('/').last;
-    var configFile = File('$applicationDirectory/$fileName');
-    if (await configFile.exists()) {
-      await configFile.delete();
-    }
-  }
-
-  Future<BenchmarksConfig?> _getConfig(String name) async {
-    final jsonContent = await _readConfigs();
-    final configPath = jsonContent[name] as String?;
-
-    if (configPath != null) {
-      return BenchmarksConfig(name, configPath);
-    }
-    return null;
   }
 }

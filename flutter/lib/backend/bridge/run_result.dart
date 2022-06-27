@@ -1,9 +1,11 @@
 class RunResult {
+  final double throughput;
   final double accuracyNormalized;
   final String accuracyFormatted;
+  final double accuracyNormalized2;
+  final String accuracyFormatted2;
   final int numSamples;
   final double durationMs;
-  final double throughput;
   final String backendName;
   final String backendVendor;
   final String acceleratorName;
@@ -13,6 +15,8 @@ class RunResult {
   RunResult({
     required this.accuracyNormalized,
     required this.accuracyFormatted,
+    required this.accuracyNormalized2,
+    required this.accuracyFormatted2,
     required this.numSamples,
     required this.durationMs,
     required this.backendName,

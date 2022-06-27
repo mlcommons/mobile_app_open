@@ -34,7 +34,7 @@ for details on different ways you can specify resources.
 
 After adding new option into the `benchmarksConfigurations.json` file
 run application and open setting screen.  
-Tap on `Benchmarks configuration path` option
+Tap on `Task configuration` option
 and choose added item. Current chosen path highlighted blue.
 
 ## Resources in the tasks.pbtxt

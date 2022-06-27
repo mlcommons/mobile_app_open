@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:collection/collection.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
@@ -16,6 +14,7 @@ import 'run_mode.dart';
 class BenchmarkResult {
   final double throughput;
   final Accuracy? accuracy;
+  final Accuracy? accuracy2;
   final String backendName;
   final String acceleratorName;
   final int batchSize;
@@ -25,6 +24,7 @@ class BenchmarkResult {
   BenchmarkResult(
       {required this.throughput,
       required this.accuracy,
+      required this.accuracy2,
       required this.backendName,
       required this.acceleratorName,
       required this.batchSize,
@@ -33,6 +33,7 @@ class BenchmarkResult {
 
   static const _tagThroughput = 'throughput';
   static const _tagAccuracy = 'accuracy';
+  static const _tagAccuracy2 = 'accuracy2';
   static const _tagBackendName = 'backend_name';
   static const _tagAcceleratorName = 'accelerator_name';
   static const _tagBatchSize = 'batch_size';
@@ -44,6 +45,7 @@ class BenchmarkResult {
     return BenchmarkResult(
       throughput: json[_tagThroughput] as double,
       accuracy: Accuracy.fromJson(json[_tagAccuracy] as Map<String, dynamic>),
+      accuracy2: Accuracy.fromJson(json[_tagAccuracy2] as Map<String, dynamic>),
       backendName: json[_tagBackendName] as String,
       acceleratorName: json[_tagAcceleratorName] as String,
       batchSize: json[_tagBatchSize] as int,
@@ -55,6 +57,7 @@ class BenchmarkResult {
   Map<String, dynamic> toJson() => {
         _tagThroughput: throughput,
         _tagAccuracy: accuracy,
+        _tagAccuracy2: accuracy2,
         _tagBackendName: backendName,
         _tagAcceleratorName: acceleratorName,
         _tagBatchSize: batchSize,
@@ -132,7 +135,7 @@ class Benchmark {
       required ResourceManager resourceManager,
       required List<pb.Setting> commonSettings,
       required String backendLibPath,
-      required Directory logDir}) {
+      required String logDir}) {
     final dataset =
         testMode ? taskConfig.testDataset : runMode.chooseDataset(taskConfig);
 
@@ -170,7 +173,9 @@ class Benchmark {
       mode: runMode.getBackendModeString(),
       min_query_count: minQueryCount,
       min_duration: minDuration,
-      output_dir: logDir.path,
+      single_stream_expected_latency_ns:
+          benchmarkSetting.singleStreamExpectedLatencyNs,
+      output_dir: logDir,
       benchmark_id: id,
     );
   }

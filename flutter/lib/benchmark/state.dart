@@ -19,12 +19,10 @@ import 'package:mlperfbench_common/data/results/dataset_type.dart';
 import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/list.dart';
@@ -57,6 +55,7 @@ class BenchmarkState extends ChangeNotifier {
   late final ConfigManager configManager;
   late final BackendInfo backendInfo;
 
+  bool taskConfigFailedToLoad = false;
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
   bool _cooling = false;
@@ -133,16 +132,25 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> clearCache() async {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
-    await configManager.deleteDefaultConfig();
-    await resetConfig();
-    await loadResources();
+    notifyListeners();
+    try {
+      await setTaskConfig(name: _store.chosenConfigurationName);
+      await loadResources();
+    } catch (e, trace) {
+      print("can't load resources: $e");
+      print(trace);
+      taskConfigFailedToLoad = true;
+      notifyListeners();
+    }
   }
 
   Future<void> loadResources() async {
-    final mlperfConfig =
-        getMLPerfConfig(await File(configManager.configPath).readAsString());
-    _middle = BenchmarkList(mlperfConfig, backendInfo.settings.benchmarkSetting,
-        _store.testMode, resourceManager.getDefaultBatchPreset());
+    _middle = BenchmarkList(
+      configManager.decodedConfig,
+      backendInfo.settings.benchmarkSetting,
+      _store.testMode,
+      resourceManager.getDefaultBatchPreset(),
+    );
     restoreLastResult();
 
     final packageInfo = await PackageInfo.fromPlatform();
@@ -155,6 +163,8 @@ class BenchmarkState extends ChangeNotifier {
 
     await Wakelock.enable();
     resourceManager.handleResources(_middle.listResources(), needToPurgeCache);
+
+    taskConfigFailedToLoad = false;
     await Wakelock.disable();
   }
 
@@ -165,21 +175,30 @@ class BenchmarkState extends ChangeNotifier {
 
     await result.resourceManager.initSystemPaths();
     result.configManager = ConfigManager(
-        result.resourceManager.applicationDirectory,
-        store.chosenConfigurationName,
-        result.resourceManager);
+        result.resourceManager.applicationDirectory, result.resourceManager);
     await result.resourceManager.loadBatchPresets();
-    await result.resetConfig();
-    await result.loadResources();
+    try {
+      await result.setTaskConfig(name: store.chosenConfigurationName);
+      await result.loadResources();
+    } catch (e, trace) {
+      print("can't load resources: $e");
+      print(trace);
+      result.taskConfigFailedToLoad = true;
+    }
     return result;
   }
 
-  Future<void> resetConfig({BenchmarksConfig? newConfig}) async {
-    final config = newConfig ??
-        await configManager.currentConfig ??
-        configManager.defaultConfig;
-    await configManager.setConfig(config);
-    _store.chosenConfigurationName = config.name;
+  /// Reads config but doesn't update resources that depend on config.
+  /// Call loadResources() to update dependent resources.
+  ///
+  /// Can throw an exception.
+  Future<void> setTaskConfig({required String name}) async {
+    if (name == '') {
+      name = configManager.defaultConfig.name;
+    }
+    await configManager.loadConfig(name);
+    _store.chosenConfigurationName = name;
+    taskConfigFailedToLoad = false;
   }
 
   BenchmarkStateEnum get state {
@@ -226,6 +245,12 @@ class BenchmarkState extends ChangeNotifier {
     final exportResults = <BenchmarkExportResult>[];
     var first = true;
 
+    resetCurrentResults();
+
+    final startTime = DateTime.now();
+    final logDirName = startTime.toIso8601String().replaceAll(':', '-');
+    final logDir = '${resourceManager.applicationDirectory}/logs/$logDirName';
+
     for (final benchmark in activeBenchmarks) {
       currentlyRunning = benchmark;
       _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
@@ -244,7 +269,7 @@ class BenchmarkState extends ChangeNotifier {
       if (_aborting) break;
 
       final performanceRunInfo = await runBenchmark(benchmark, false,
-          backendInfo.settings.commonSetting, backendInfo.libPath);
+          backendInfo.settings.commonSetting, backendInfo.libPath, logDir);
       _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
       doneCounter++;
 
@@ -256,6 +281,12 @@ class BenchmarkState extends ChangeNotifier {
             : Accuracy(
                 normalized: performanceResult.accuracyNormalized,
                 formatted: performanceResult.accuracyFormatted,
+              ),
+        accuracy2: performanceResult.accuracyNormalized2 < 0.0
+            ? null
+            : Accuracy(
+                normalized: performanceResult.accuracyNormalized2,
+                formatted: performanceResult.accuracyFormatted2,
               ),
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
@@ -270,7 +301,7 @@ class BenchmarkState extends ChangeNotifier {
 
       if (_store.submissionMode) {
         final accuracyRunInfo = await runBenchmark(benchmark, true,
-            backendInfo.settings.commonSetting, backendInfo.libPath);
+            backendInfo.settings.commonSetting, backendInfo.libPath, logDir);
         _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
         doneCounter++;
 
@@ -287,12 +318,17 @@ class BenchmarkState extends ChangeNotifier {
                   normalized: accuracyResult.accuracyNormalized,
                   formatted: accuracyResult.accuracyFormatted,
                 ),
+          accuracy2: accuracyResult.accuracyNormalized2 < 0.0
+              ? null
+              : Accuracy(
+                  normalized: accuracyResult.accuracyNormalized2,
+                  formatted: accuracyResult.accuracyFormatted2,
+                ),
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
           batchSize: benchmark.config.batchSize,
           threadsNumber: benchmark.config.threadsNumber,
-          validity: accuracyResult.accuracyNormalized >= 0.0 &&
-              accuracyResult.accuracyNormalized <= 1.0,
+          validity: accuracyResult.validity,
         );
       }
 
@@ -312,12 +348,23 @@ class BenchmarkState extends ChangeNotifier {
       await resourceManager.resultManager.saveResult(lastResult!);
     }
 
+    if (!_store.keepLogs) {
+      await Directory(logDir).delete(recursive: true);
+    }
+
     currentlyRunning = null;
     _doneRunning = _aborting ? null : true;
     _aborting = false;
     notifyListeners();
 
     await Wakelock.disable();
+  }
+
+  void resetCurrentResults() {
+    for (var b in _middle.benchmarks) {
+      b.accuracyModeResult = null;
+      b.performanceModeResult = null;
+    }
   }
 
   BenchmarkExportResult exportResultFromRunInfo(
@@ -335,6 +382,12 @@ class BenchmarkState extends ChangeNotifier {
               : Accuracy(
                   normalized: performance.accuracyNormalized,
                   formatted: performance.accuracyFormatted,
+                ),
+          accuracy2: performance.accuracyNormalized2 < 0.0
+              ? null
+              : Accuracy(
+                  normalized: performance.accuracyNormalized2,
+                  formatted: performance.accuracyFormatted2,
                 ),
           datasetInfo: DatasetInfo(
             name: benchmark.taskConfig.liteDataset.name,
@@ -358,6 +411,12 @@ class BenchmarkState extends ChangeNotifier {
                     : Accuracy(
                         normalized: accuracy.accuracyNormalized,
                         formatted: accuracy.accuracyFormatted,
+                      ),
+                accuracy2: accuracy.accuracyNormalized2 < 0.0
+                    ? null
+                    : Accuracy(
+                        normalized: accuracy.accuracyNormalized2,
+                        formatted: accuracy.accuracyFormatted2,
                       ),
                 datasetInfo: DatasetInfo(
                   name: benchmark.taskConfig.liteDataset.name,
@@ -405,10 +464,13 @@ class BenchmarkState extends ChangeNotifier {
     return BackendExtraSettingList(list);
   }
 
-  Future<RunInfo> runBenchmark(Benchmark benchmark, bool accuracyMode,
-      List<pb.Setting> commonSettings, String backendLibPath) async {
-    final tmpDir = await getTemporaryDirectory();
-
+  Future<RunInfo> runBenchmark(
+    Benchmark benchmark,
+    bool accuracyMode,
+    List<pb.Setting> commonSettings,
+    String backendLibPath,
+    String logDir,
+  ) async {
     final runMode =
         accuracyMode ? BenchmarkRunMode.accuracy : BenchmarkRunMode.performance;
 
@@ -416,12 +478,16 @@ class BenchmarkState extends ChangeNotifier {
         'Running ${benchmark.id} in ${runMode.getResultModeString()} mode...');
     final stopwatch = Stopwatch()..start();
 
+    final logSuffix = accuracyMode ? 'accuracy' : 'performance';
+    logDir = '$logDir/${benchmark.id}-$logSuffix';
+    await Directory(logDir).create(recursive: true);
+
     final runSettings = benchmark.createRunSettings(
         runMode: runMode,
         resourceManager: resourceManager,
         commonSettings: commonSettings,
         backendLibPath: backendLibPath,
-        logDir: tmpDir);
+        logDir: logDir);
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 

@@ -23,6 +23,7 @@ struct dart_ffi_run_benchmark_in {
   const char *mode;
   int32_t min_query_count;
   int32_t min_duration;
+  int32_t single_stream_expected_latency_ns;
   const char *output_dir;
 };
 
@@ -32,6 +33,8 @@ struct dart_ffi_run_benchmark_out {
   float latency;
   float accuracy_normalized;
   char *accuracy_formatted;
+  float accuracy_normalized2;
+  char *accuracy_formatted2;
   int32_t num_samples;
   float duration_ms;
   char *backend_name;

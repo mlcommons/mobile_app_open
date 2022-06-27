@@ -5,21 +5,22 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
+import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 
-class BenchmarksConfigurationScreen extends StatelessWidget {
-  final List<BenchmarksConfig> _benchmarksConfigurations;
+class TaskConfigScreen extends StatelessWidget {
+  final List<TaskConfigDescription> _configs;
 
-  BenchmarksConfigurationScreen(this._benchmarksConfigurations);
+  TaskConfigScreen(this._configs);
 
   Card getOptionPattern(
     BuildContext context,
-    BenchmarksConfig configuration,
-    String chosenBenchmarksConfiguration,
+    TaskConfigDescription configuration,
+    String chosenConfigName,
   ) {
     final stringResources = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
-    final wasChosen = chosenBenchmarksConfiguration == configuration.name;
+    final wasChosen = chosenConfigName == configuration.name;
 
     return Card(
       child: ListTile(
@@ -32,9 +33,7 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
         trailing: Text(configuration.getType(stringResources)),
         onTap: () async {
           try {
-            await state.resetConfig(
-              newConfig: !wasChosen ? configuration : null,
-            );
+            await state.setTaskConfig(name: configuration.name);
             Navigator.of(context).popUntil((route) => route.isFirst);
             await state.loadResources();
           } catch (e) {
@@ -49,25 +48,22 @@ class BenchmarksConfigurationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
-    final state = context.watch<BenchmarkState>();
-    final currentConfig = state.configManager.currentConfig;
+    final store = context.watch<Store>();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(stringResources.benchmarksConfigurationTitle),
+        title: Text(stringResources.taskConfigSettingsEntry),
       ),
-      body: FutureBuilder<BenchmarksConfig?>(
-        future: currentConfig,
-        builder: (context, snapshot) => ListView.builder(
-            itemCount: _benchmarksConfigurations.length,
-            itemBuilder: (context, index) {
-              final configuration = _benchmarksConfigurations[index];
-              return getOptionPattern(
-                context,
-                configuration,
-                snapshot.data?.name ?? '',
-              );
-            }),
+      body: ListView.builder(
+        itemCount: _configs.length,
+        itemBuilder: (context, index) {
+          final configuration = _configs[index];
+          return getOptionPattern(
+            context,
+            configuration,
+            store.chosenConfigurationName,
+          );
+        },
       ),
     );
   }
