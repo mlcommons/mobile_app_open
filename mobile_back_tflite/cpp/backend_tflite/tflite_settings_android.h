@@ -65,15 +65,6 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
-  accelerator: "nnapi"
-  accelerator_desc: "NNAPI"
-  configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_uint8.tflite"
-  md5Checksum: "1b0a50e380612884f82c157e69c66d22"
-}
-
-benchmark_setting {
   benchmark_id: "IS_uint8_mosaic"
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"

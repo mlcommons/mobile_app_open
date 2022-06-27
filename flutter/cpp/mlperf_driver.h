@@ -44,7 +44,8 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
 
   // Runs MLPerf tests.
   void RunMLPerfTest(const std::string& mode, int min_query_count,
-                     int min_duration, const std::string& output_dir);
+                     int min_duration, int single_stream_expected_latency_ns,
+                     const std::string& output_dir);
 
   // A human-readable string for loggin purposes.
   const std::string& Name() const override { return backend_->Name(); }

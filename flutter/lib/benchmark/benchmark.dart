@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:collection/collection.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
@@ -137,7 +135,7 @@ class Benchmark {
       required ResourceManager resourceManager,
       required List<pb.Setting> commonSettings,
       required String backendLibPath,
-      required Directory logDir}) {
+      required String logDir}) {
     final dataset =
         testMode ? taskConfig.testDataset : runMode.chooseDataset(taskConfig);
 
@@ -175,7 +173,9 @@ class Benchmark {
       mode: runMode.getBackendModeString(),
       min_query_count: minQueryCount,
       min_duration: minDuration,
-      output_dir: logDir.path,
+      single_stream_expected_latency_ns:
+          benchmarkSetting.singleStreamExpectedLatencyNs,
+      output_dir: logDir,
       benchmark_id: id,
     );
   }

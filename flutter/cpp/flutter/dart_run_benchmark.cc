@@ -40,6 +40,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   lip(mode);
   lip(min_query_count);
   lip(min_duration);
+  lip(single_stream_expected_latency_ns);
   lip(output_dir);
 
   li;
@@ -108,7 +109,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   }
 
   driver.RunMLPerfTest(in->mode, in->min_query_count, in->min_duration,
-                       in->output_dir);
+                       in->single_stream_expected_latency_ns, in->output_dir);
   li;
 
   {

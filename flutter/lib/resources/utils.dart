@@ -5,6 +5,10 @@ import 'package:mlperfbench/resources/resource.dart';
 bool isInternetResource(String uri) =>
     uri.startsWith('http://') || uri.startsWith('https://');
 
+const String _assetPrefix = 'asset://';
+bool isAsset(String uri) => uri.startsWith(_assetPrefix);
+String stripAssetPrefix(String uri) => uri.substring(_assetPrefix.length);
+
 List<String> filterInternetResources(List<Resource> resources) {
   final result = <String>[];
   for (var r in resources) {
