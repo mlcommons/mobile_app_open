@@ -19,11 +19,17 @@ format/clang:
 format/java:
 	git ls-files -z | grep --null-data "\.java$$" | xargs --null --no-run-if-empty java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace
 
+.PHONY: format/dart/pub
+format/dart/pub:
+	cd flutter && ${_start_args} dart pub get
+	cd flutter_common && ${_start_args} dart pub get
+	cd website && ${_start_args} dart pub get
+
 .PHONY: format/dart
 format/dart:
-	cd flutter && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
-	cd flutter_common && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
-	cd website && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
+	cd flutter && ${_start_args} dart run import_sorter:main
+	cd flutter_common && ${_start_args} dart run import_sorter:main
+	cd website && ${_start_args} dart run import_sorter:main
 	dart format flutter flutter_common website
 
 .PHONY: format/ts
@@ -116,9 +122,11 @@ FORMAT_DOCKER_ARGS= \
 
 .PHONY: docker/format
 docker/format: output/docker_mlperf_formatter.stamp
+	mkdir -p ~/.pub-cache
+	mkdir -p ~/.config/flutter
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
 		${FORMAT_DOCKER_ARGS} \
-		make format
+		make format/dart/pub format
 
 .PHONY: docker/format/--
 docker/format/--: output/docker_mlperf_formatter.stamp
