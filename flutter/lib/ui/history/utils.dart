@@ -118,23 +118,32 @@ class HistoryHelperUtils {
       verticalInside: borderStyle,
     );
     final headerStyle = TextStyle(fontWeight: FontWeight.bold);
+    final rowStyle = TextStyle();
     final table = Column(
       children: rows.map<Widget>((rowData) {
-        final style = rowData.isHeader ? headerStyle : null;
+        final style = rowData.isHeader ? headerStyle : rowStyle;
         final perfStyle = rowData.throughputValid
             ? style
             : TextStyle(color: AppColors.darkRedText);
+        final firstColumnText = Text(rowData.name, style: style);
+        final firstColumn = rowData.isHeader
+            ? firstColumnText
+            : Row(
+                children: [
+                  Expanded(child: firstColumnText),
+                  Icon(Icons.chevron_right, color: Colors.grey),
+                ],
+              );
         final table = Table(
           border: rowData.onTap == null ? headerBorder : rowBorder,
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           columnWidths: const {
-            0: FlexColumnWidth(8),
-            1: FlexColumnWidth(6),
-            2: FlexColumnWidth(4.5),
+            1: FixedColumnWidth(100),
+            2: FixedColumnWidth(80),
           },
           children: [
             _makeTableRow([
-              Text(rowData.name, style: style),
+              firstColumn,
               Text(rowData.throughput, style: perfStyle),
               Text(rowData.accuracy, style: style),
             ])

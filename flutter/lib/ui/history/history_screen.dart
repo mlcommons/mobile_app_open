@@ -62,7 +62,7 @@ class _HistoryScreen extends State<HistoryScreen> {
             .replaceFirst('<benchmarks#>', benchmarksNum),
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
-      trailing: Icon(Icons.arrow_forward_ios),
+      trailing: Icon(Icons.chevron_right),
       onTap: () {
         Navigator.push(
           context,
