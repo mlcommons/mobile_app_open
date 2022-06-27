@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -247,6 +248,10 @@ class BenchmarkState extends ChangeNotifier {
 
     resetCurrentResults();
 
+    final startTime = DateTime.now();
+    final logDirName = startTime.toIso8601String().replaceAll(':', '-');
+    final logDir = '${resourceManager.applicationDirectory}/logs/$logDirName';
+
     for (final benchmark in activeBenchmarks) {
       currentlyRunning = benchmark;
       _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
@@ -265,7 +270,7 @@ class BenchmarkState extends ChangeNotifier {
       if (_aborting) break;
 
       final performanceRunInfo = await runBenchmark(benchmark, false,
-          backendInfo.settings.commonSetting, backendInfo.libPath);
+          backendInfo.settings.commonSetting, backendInfo.libPath, logDir);
       _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
       doneCounter++;
 
@@ -297,7 +302,7 @@ class BenchmarkState extends ChangeNotifier {
 
       if (_store.submissionMode) {
         final accuracyRunInfo = await runBenchmark(benchmark, true,
-            backendInfo.settings.commonSetting, backendInfo.libPath);
+            backendInfo.settings.commonSetting, backendInfo.libPath, logDir);
         _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
         doneCounter++;
 
@@ -456,10 +461,13 @@ class BenchmarkState extends ChangeNotifier {
     return BackendExtraSettingList(list);
   }
 
-  Future<RunInfo> runBenchmark(Benchmark benchmark, bool accuracyMode,
-      List<pb.Setting> commonSettings, String backendLibPath) async {
-    final tmpDir = await getTemporaryDirectory();
-
+  Future<RunInfo> runBenchmark(
+    Benchmark benchmark,
+    bool accuracyMode,
+    List<pb.Setting> commonSettings,
+    String backendLibPath,
+    String logDir,
+  ) async {
     final runMode =
         accuracyMode ? BenchmarkRunMode.accuracy : BenchmarkRunMode.performance;
 
@@ -467,12 +475,15 @@ class BenchmarkState extends ChangeNotifier {
         'Running ${benchmark.id} in ${runMode.getResultModeString()} mode...');
     final stopwatch = Stopwatch()..start();
 
+    logDir = '$logDir/${benchmark.id}';
+    await Directory(logDir).create(recursive: true);
+
     final runSettings = benchmark.createRunSettings(
         runMode: runMode,
         resourceManager: resourceManager,
         commonSettings: commonSettings,
         backendLibPath: backendLibPath,
-        logDir: tmpDir);
+        logDir: logDir);
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
