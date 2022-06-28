@@ -76,7 +76,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 32
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  md5Checksum: "66bb4eba50987221608f8487ed405794"
+  md5_checksum: "66bb4eba50987221608f8487ed405794"
 }
 
 common_setting {
@@ -99,7 +99,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 64
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  md5Checksum: "66bb4eba50987221608f8487ed405794"
+  md5_checksum: "66bb4eba50987221608f8487ed405794"
 }
 
 common_setting {
@@ -122,7 +122,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 8
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  md5Checksum: "66bb4eba50987221608f8487ed405794"
+  md5_checksum: "66bb4eba50987221608f8487ed405794"
 }
 
 common_setting {
