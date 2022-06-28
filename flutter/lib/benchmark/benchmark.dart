@@ -80,8 +80,8 @@ class Benchmark {
   BenchmarkResult? performanceModeResult;
   BenchmarkResult? accuracyModeResult;
 
-  Benchmark(this.benchmarkSetting, this.taskConfig, this.modelConfig,
-      this.testMode)
+  Benchmark(
+      this.benchmarkSetting, this.taskConfig, this.modelConfig, this.testMode)
       : info = BenchmarkInfo(modelConfig, taskConfig.name),
         backendRequestDescription =
             '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}';
@@ -131,18 +131,15 @@ class BenchmarkList {
   final List<Benchmark> benchmarks = <Benchmark>[];
   final bool testMode;
 
-  BenchmarkList(
-      pb.MLPerfConfig mlperfConfig,
-      List<pb.BenchmarkSetting> benchmarkSettings,
-      this.testMode) {
+  BenchmarkList(pb.MLPerfConfig mlperfConfig,
+      List<pb.BenchmarkSetting> benchmarkSettings, this.testMode) {
     for (final task in mlperfConfig.task) {
       for (final model in task.model) {
         final benchmarkSetting = benchmarkSettings
             .singleWhereOrNull((setting) => setting.benchmarkId == model.id);
         if (benchmarkSetting == null) continue;
 
-        benchmarks
-            .add(Benchmark(benchmarkSetting, task, model, testMode));
+        benchmarks.add(Benchmark(benchmarkSetting, task, model, testMode));
       }
     }
   }

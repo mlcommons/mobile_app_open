@@ -12,12 +12,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TFLITE_SETTINGS_H
-#define TFLITE_SETTINGS_H
+#ifndef TFLITE_SETTINGS_APPLE_H
+#define TFLITE_SETTINGS_APPLE_H
 
 #include <string>
 
-const std::string tflite_settings = R"SETTINGS(
+static std::string tflite_settings_apple;
+
+const std::string tflite_settings_apple_main = R"SETTINGS(
 common_setting {
   id: "num_threads"
   name: "Number of threads"
@@ -32,16 +34,6 @@ benchmark_setting {
   accelerator: "coreml"
   accelerator_desc: "CoreML"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  md5_checksum: "66bb4eba50987221608f8487ed405794"
-}
-
-benchmark_setting {
-  benchmark_id: "IC_tpu_float32_offline"
-  accelerator: "coreml"
-  accelerator_desc: "CoreML"
-  configuration: "TFLite"
-  batch_size: 2
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
   md5_checksum: "66bb4eba50987221608f8487ed405794"
 }
@@ -71,6 +63,75 @@ benchmark_setting {
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
   md5_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+}
+
+)SETTINGS";
+
+const std::string tflite_settings_apple_iphoneX = R"SETTINGS(
+
+benchmark_setting {
+  benchmark_id: "IC_tpu_float32_offline"
+  accelerator: "coreml"
+  accelerator_desc: "CoreML"
+  configuration: "TFLite"
+  batch_size: 32
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+  md5Checksum: "66bb4eba50987221608f8487ed405794"
+}
+
+common_setting {
+  id: "shards_num"
+  name: "Number of threads for inference"
+  value {
+    value: "8"
+    name: "8"
+  }
+}
+
+)SETTINGS";
+
+const std::string tflite_settings_apple_iphone11 = R"SETTINGS(
+
+benchmark_setting {
+  benchmark_id: "IC_tpu_float32_offline"
+  accelerator: "coreml"
+  accelerator_desc: "CoreML"
+  configuration: "TFLite"
+  batch_size: 64
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+  md5Checksum: "66bb4eba50987221608f8487ed405794"
+}
+
+common_setting {
+  id: "shards_num"
+  name: "Number of threads for inference"
+  value {
+    value: "8"
+    name: "8"
+  }
+}
+
+)SETTINGS";
+
+const std::string tflite_settings_apple_iphone12 = R"SETTINGS(
+
+benchmark_setting {
+  benchmark_id: "IC_tpu_float32_offline"
+  accelerator: "coreml"
+  accelerator_desc: "CoreML"
+  configuration: "TFLite"
+  batch_size: 8
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+  md5Checksum: "66bb4eba50987221608f8487ed405794"
+}
+
+common_setting {
+  id: "shards_num"
+  name: "Number of threads for inference"
+  value {
+    value: "4"
+    name: "4"
+  }
 }
 
 )SETTINGS";

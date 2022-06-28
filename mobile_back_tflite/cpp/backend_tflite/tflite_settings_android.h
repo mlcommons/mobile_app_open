@@ -12,12 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TFLITE_SETTINGS_H
-#define TFLITE_SETTINGS_H
+#ifndef TFLITE_SETTINGS_ANDROID_H
+#define TFLITE_SETTINGS_ANDROID_H
 
 #include <string>
 
-const std::string tflite_settings = R"SETTINGS(
+const std::string tflite_settings_android = R"SETTINGS(
 common_setting {
   id: "num_threads"
   name: "Number of threads"
