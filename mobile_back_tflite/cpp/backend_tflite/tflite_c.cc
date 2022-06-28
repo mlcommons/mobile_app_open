@@ -175,7 +175,7 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
       break;
     default:
       // use iPhone 12 settings for unknown devices
-      tflite_settings_apple += tflite_settings_apple_iphone13;
+      tflite_settings_apple += tflite_settings_apple_iphone12;
       break;
   }
   *settings = tflite_settings_apple.c_str();
