@@ -118,7 +118,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               ),
             ),
             subtitle: Text(stringResources.cooldownSubtitle
-                .replaceAll('<cooldownPause>', store.cooldownPause.toString())),
+                .replaceAll('<cooldownPause>', store.cooldownDuration.toString())),
             trailing: Switch(
                 value: store.cooldown,
                 onChanged: (flag) {
@@ -126,15 +126,15 @@ class _SettingsScreen extends State<SettingsScreen> {
                 }),
           ),
           Slider(
-            value: store.cooldownPause.toDouble(),
+            value: store.cooldownDuration.toDouble(),
             min: 0,
             max: 10,
             divisions: 10,
-            label: store.cooldownPause.toString(),
+            label: store.cooldownDuration.toString(),
             onChanged: store.cooldown
                 ? (double value) {
                     setState(() {
-                      store.cooldownPause = value.toInt();
+                      store.cooldownDuration = value.toInt();
                     });
                   }
                 : null,

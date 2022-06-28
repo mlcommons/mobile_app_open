@@ -241,7 +241,7 @@ class BenchmarkState extends ChangeNotifier {
     final cooldown = _store.cooldown;
     final cooldownPause = FAST_MODE
         ? Duration(seconds: 1)
-        : Duration(minutes: _store.cooldownPause);
+        : Duration(minutes: _store.cooldownDuration);
 
     final activeBenchmarks =
         _middle.benchmarks.where((element) => element.config.active);

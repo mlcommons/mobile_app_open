@@ -12,14 +12,14 @@ class Store extends ChangeNotifier {
     return Store._(store);
   }
 
-  bool _getBool(String key) {
+  bool _getBool(String key, [bool defaultValue = false]) {
     final value = _storeFromDisk.getBool(key);
-    return value ?? false;
+    return value ?? defaultValue;
   }
 
-  int _getInt(String key) {
+  int _getInt(String key, [int defaultValue = 0]) {
     final value = _storeFromDisk.getInt(key);
-    return value ?? 0;
+    return value ?? defaultValue;
   }
 
   String _getString(String key) {
@@ -55,17 +55,17 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get cooldown => _getBool(_StoreConstants.cooldown);
+  bool get cooldown => _getBool(_StoreConstants.cooldown, true);
 
   set cooldown(bool submissionModeFlag) {
     _storeFromDisk.setBool(_StoreConstants.cooldown, submissionModeFlag);
     notifyListeners();
   }
 
-  int get cooldownPause => _getInt(_StoreConstants.cooldown_pause);
+  int get cooldownDuration => _getInt(_StoreConstants.cooldown_duration, 5);
 
-  set cooldownPause(int value) {
-    _storeFromDisk.setInt(_StoreConstants.cooldown_pause, value);
+  set cooldownDuration(int value) {
+    _storeFromDisk.setInt(_StoreConstants.cooldown_duration, value);
     notifyListeners();
   }
 
@@ -109,7 +109,7 @@ class _StoreConstants {
   static const offline_mode = 'offline mode';
   static const test_mode = 'test mode';
   static const cooldown = 'cooldown';
-  static const cooldown_pause = 'cooldown pause';
+  static const cooldown_duration = 'cooldown pause';
   static const chosen_configuration_name = 'chosen configuration name';
   static const previous_extended_result = 'previous extended result';
   static const previous_app_version = 'previous app version';
