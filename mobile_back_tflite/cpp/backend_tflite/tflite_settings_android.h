@@ -33,7 +33,7 @@ benchmark_setting {
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  md5Checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  md5_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
 }
 
 benchmark_setting {
@@ -43,7 +43,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 2
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  md5Checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  md5_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
 }
 
 benchmark_setting {
@@ -52,7 +52,7 @@ benchmark_setting {
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
-  md5Checksum: "6c7af49d97a2b2488222d94936d2dc18"
+  md5_checksum: "6c7af49d97a2b2488222d94936d2dc18"
 }
 
 benchmark_setting {
@@ -61,7 +61,7 @@ benchmark_setting {
   accelerator_desc: "GPU (FP16)"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
-  md5Checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+  md5_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
 }
 
 benchmark_setting {
@@ -70,7 +70,7 @@ benchmark_setting {
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
-  md5Checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+  md5_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
 }
 
 )SETTINGS";
