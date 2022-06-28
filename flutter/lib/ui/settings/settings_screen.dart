@@ -117,8 +117,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                 stringResources.cooldown,
               ),
             ),
-            subtitle: Text(stringResources.cooldownSubtitle
-                .replaceAll('<cooldownPause>', store.cooldownDuration.toString())),
+            subtitle: Text(stringResources.cooldownSubtitle.replaceAll(
+                '<cooldownPause>', store.cooldownDuration.toString())),
             trailing: Switch(
                 value: store.cooldown,
                 onChanged: (flag) {
