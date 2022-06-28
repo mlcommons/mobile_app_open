@@ -40,7 +40,7 @@ message BenchmarkSetting {
   repeated CustomSetting custom_setting = 2;
   required string src = 3;
   // MD5 checksum to validate the model file specified in src
-  required string md5Checksum = 4;
+  required string md5_checksum = 4;
   // accelerator is passed to the backend
   required string accelerator = 5;
   // accelerator_desc is only used by the UI
@@ -49,7 +49,7 @@ message BenchmarkSetting {
   required string configuration = 7;
   // batch_size is passed to the backend
   optional int32 batch_size = 8;
-  // single_stream_expected_latency_ns is passed to the MlperfDriver, default to 1M, max 1M
+  // single_stream_expected_latency_ns is passed to the MLPerfDriver, default to 1M, max 1M
   optional int32 single_stream_expected_latency_ns = 9 [default = 1000000];
 }
 
