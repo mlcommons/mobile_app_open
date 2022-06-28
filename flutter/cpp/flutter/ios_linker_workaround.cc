@@ -18,6 +18,8 @@ extern "C" void ios_linker_workaround() {
   if (a) return;
   a = (intptr_t)dart_ffi_run_benchmark;
   a = (intptr_t)dart_ffi_run_benchmark_free;
+  a = (intptr_t)dart_ffi_get_dataset_size;
+  a = (intptr_t)dart_ffi_get_query_counter;
   a = (intptr_t)dart_ffi_mlperf_config;
   a = (intptr_t)dart_ffi_mlperf_config_free;
   a = (intptr_t)dart_ffi_backend_match;

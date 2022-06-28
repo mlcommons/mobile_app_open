@@ -46,7 +46,6 @@ class MyHomePage extends StatelessWidget {
         appBar =
             MyAppBar.buildAppBar(stringResources.mainTitle, context, false);
         break;
-      case BenchmarkStateEnum.cooldown:
       case BenchmarkStateEnum.running:
         return ProgressScreen();
       case BenchmarkStateEnum.done:

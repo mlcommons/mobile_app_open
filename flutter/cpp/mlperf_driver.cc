@@ -60,6 +60,7 @@ void MlperfDriver::IssueQuery(
              response_data[idx + b].size()});
       }
       backend_->FlushQueries();
+      query_counter_ += batch_;
     }
   } else {
     for (int idx = 0; idx < samples.size(); ++idx) {
@@ -76,6 +77,7 @@ void MlperfDriver::IssueQuery(
            reinterpret_cast<std::uintptr_t>(response_data[idx].data()),
            response_data[idx].size()});
       backend_->FlushQueries();
+      query_counter_ += 1;
     }
   }
   ::mlperf::QuerySamplesComplete(responses.data(), responses.size());
