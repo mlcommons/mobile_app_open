@@ -80,6 +80,9 @@ cc_library(
     srcs = ["tflite_c.cc"],
     hdrs = [
         "neuron/tflite_settings_mtk.h",
+        "tflite_settings_android.h",
+        "tflite_settings_apple.h",
+        "tflite_settings_windows.h",
         "thread_pool.h",
         "utils.h",
     ],
