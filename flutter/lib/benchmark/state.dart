@@ -351,6 +351,7 @@ class BenchmarkState extends ChangeNotifier {
     if (!_store.keepLogs) {
       await Directory(logDir).delete(recursive: true);
     }
+    print('Benchmarks finished');
 
     currentlyRunning = null;
     _doneRunning = _aborting ? null : true;
