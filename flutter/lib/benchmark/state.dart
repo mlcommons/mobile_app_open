@@ -237,9 +237,9 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.enable();
 
     final cooldown = _store.cooldown;
-    final cooldownPause = FAST_MODE
+    final cooldownPause = _store.testMode || FAST_MODE
         ? Duration(seconds: 1)
-        : Duration(minutes: _store.cooldownPause);
+        : Duration(minutes: _store.cooldownDuration);
 
     final activeBenchmarks =
         _middle.benchmarks.where((element) => element.isActive);
