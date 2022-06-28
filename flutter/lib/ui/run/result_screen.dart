@@ -141,29 +141,13 @@ class _ResultScreenState extends State<ResultScreen>
         ],
       ));
       if (benchmark.info.isOffline) {
-        String shardsNum;
         String batchSize;
         if (textResult == null) {
-          shardsNum = 'N/A';
           batchSize = 'N/A';
         } else {
-          shardsNum = benchmarkResult?.threadsNumber.toString() ?? '';
           batchSize = benchmarkResult?.batchSize.toString() ?? '';
         }
 
-        rowChildren.add(Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              stringResources.resultsThreadsNumber
-                  .replaceAll('<threadsNumber>', shardsNum),
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 14.0,
-              ),
-            ),
-          ],
-        ));
         rowChildren.add(Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

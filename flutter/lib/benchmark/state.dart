@@ -162,7 +162,6 @@ class BenchmarkState extends ChangeNotifier {
       configManager.decodedConfig,
       backendInfo.settings.benchmarkSetting,
       _store.testMode,
-      resourceManager.getDefaultBatchPreset(),
     );
     restoreLastResult();
 
@@ -189,7 +188,6 @@ class BenchmarkState extends ChangeNotifier {
     await result.resourceManager.initSystemPaths();
     result.configManager = ConfigManager(
         result.resourceManager.applicationDirectory, result.resourceManager);
-    await result.resourceManager.loadBatchPresets();
     try {
       await result.setTaskConfig(name: store.chosenConfigurationName);
       await result.loadResources();
@@ -244,7 +242,7 @@ class BenchmarkState extends ChangeNotifier {
         : Duration(minutes: _store.cooldownPause);
 
     final activeBenchmarks =
-        _middle.benchmarks.where((element) => element.config.active);
+        _middle.benchmarks.where((element) => element.isActive);
 
     final exportResults = <BenchmarkExportResult>[];
     var first = true;
@@ -317,8 +315,7 @@ class BenchmarkState extends ChangeNotifier {
               ),
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
-        batchSize: benchmark.config.batchSize,
-        threadsNumber: benchmark.config.threadsNumber,
+        batchSize: benchmark.benchmarkSetting.batchSize,
         validity: performanceResult.validity,
       );
 
@@ -359,8 +356,7 @@ class BenchmarkState extends ChangeNotifier {
                 ),
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
-          batchSize: benchmark.config.batchSize,
-          threadsNumber: benchmark.config.threadsNumber,
+          batchSize: benchmark.benchmarkSetting.batchSize,
           validity: accuracyResult.validity,
         );
       }

@@ -12,12 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TFLITE_SETTINGS_ANDROID_H
-#define TFLITE_SETTINGS_ANDROID_H
+#ifndef TFLITE_SETTINGS_WINDOWS_H
+#define TFLITE_SETTINGS_WINDOWS_H
 
 #include <string>
 
-const std::string tflite_settings_android = R"SETTINGS(
+const std::string tflite_settings_windows = R"SETTINGS(
 common_setting {
   id: "num_threads"
   name: "Number of threads"
@@ -28,49 +28,49 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
-  accelerator: "nnapi"
-  accelerator_desc: "NNAPI"
+  benchmark_id: "IC_tpu_float32"
+  accelerator: "cpu"
+  accelerator_desc: "CPU"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  md5_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+  md5_checksum: "66bb4eba50987221608f8487ed405794"
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
-  accelerator: "nnapi"
-  accelerator_desc: "NNAPI"
+  benchmark_id: "IC_tpu_float32_offline"
+  accelerator: "cpu"
+  accelerator_desc: "CPU"
   configuration: "TFLite"
   batch_size: 2
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  md5_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+  md5_checksum: "66bb4eba50987221608f8487ed405794"
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
-  accelerator: "nnapi"
-  accelerator_desc: "NNAPI"
+  benchmark_id: "OD_float32"
+  accelerator: "cpu"
+  accelerator_desc: "CPU"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
-  md5_checksum: "6c7af49d97a2b2488222d94936d2dc18"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
+  md5_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
 }
 
 benchmark_setting {
   benchmark_id: "LU_float32"
-  accelerator: "gpu_f16"
-  accelerator_desc: "GPU (FP16)"
+  accelerator: "cpu"
+  accelerator_desc: "CPU"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
   md5_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
-  accelerator: "nnapi"
-  accelerator_desc: "NNAPI"
+  benchmark_id: "IS_float32_mosaic"
+  accelerator: "cpu"
+  accelerator_desc: "CPU"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
-  md5_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+  src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
+  md5_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
 }
 
 )SETTINGS";

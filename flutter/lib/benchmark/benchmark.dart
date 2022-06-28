@@ -18,7 +18,6 @@ class BenchmarkResult {
   final String backendName;
   final String acceleratorName;
   final int batchSize;
-  final int threadsNumber;
   final bool validity;
 
   BenchmarkResult(
@@ -28,7 +27,6 @@ class BenchmarkResult {
       required this.backendName,
       required this.acceleratorName,
       required this.batchSize,
-      required this.threadsNumber,
       required this.validity});
 
   static const _tagThroughput = 'throughput';
@@ -37,7 +35,6 @@ class BenchmarkResult {
   static const _tagBackendName = 'backend_name';
   static const _tagAcceleratorName = 'accelerator_name';
   static const _tagBatchSize = 'batch_size';
-  static const _tagThreadsNumber = 'threads_number';
   static const _tagValidity = 'validity';
 
   static BenchmarkResult? fromJson(Map<String, dynamic>? json) {
@@ -49,7 +46,6 @@ class BenchmarkResult {
       backendName: json[_tagBackendName] as String,
       acceleratorName: json[_tagAcceleratorName] as String,
       batchSize: json[_tagBatchSize] as int,
-      threadsNumber: json[_tagThreadsNumber] as int,
       validity: json[_tagValidity] as bool,
     );
   }
@@ -61,23 +57,8 @@ class BenchmarkResult {
         _tagBackendName: backendName,
         _tagAcceleratorName: acceleratorName,
         _tagBatchSize: batchSize,
-        _tagThreadsNumber: threadsNumber,
         _tagValidity: validity,
       };
-}
-
-class BenchmarkConfig {
-  bool active = true;
-  BatchPreset? batchPreset;
-  int batchSize = 0;
-  int threadsNumber = 0;
-
-  BenchmarkConfig(this.batchPreset) {
-    if (batchPreset != null) {
-      batchSize = batchPreset!.batchSize;
-      threadsNumber = batchPreset!.shardsCount;
-    }
-  }
 }
 
 class Benchmark {
@@ -86,49 +67,24 @@ class Benchmark {
   final pb.ModelConfig modelConfig;
   final bool testMode;
 
+  bool isActive = true;
+
   final BenchmarkInfo info;
 
   // this variable holds description of our config file,
   // which may not represent what backend actually used for computations
   final String backendRequestDescription;
 
-  // TODO save config in the Store?
-  final BenchmarkConfig config;
-
   BenchmarkResult? performanceModeResult;
   BenchmarkResult? accuracyModeResult;
 
-  Benchmark(this.benchmarkSetting, this.taskConfig, this.modelConfig,
-      this.testMode, BenchmarkConfig? predefinedConfig)
+  Benchmark(
+      this.benchmarkSetting, this.taskConfig, this.modelConfig, this.testMode)
       : info = BenchmarkInfo(modelConfig, taskConfig.name),
         backendRequestDescription =
-            '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}',
-        config = predefinedConfig ?? _getDefaultConfig(benchmarkSetting);
+            '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}';
 
   String get id => modelConfig.id;
-
-  static BenchmarkConfig _getDefaultConfig(
-      pb.BenchmarkSetting benchmarkSetting) {
-    // shardsCount is only supported by the TFLite backend.
-    // On iPhones changing this value may significantly affect performance.
-    // On Android this value does not affect performance as much,
-    // (shards=2 is faster than shards=1, but I didn't notice any further improvements).
-    // Originally this value was hardcoded to 2 in the backend
-    // (before we made it configurable for iOS devices).
-    const _defaultShardsCount = 2;
-    // when creating run config we multiply batch size and shardsCount
-    if (benchmarkSetting.batchSize >= _defaultShardsCount) {
-      return BenchmarkConfig(BatchPreset(
-          name: 'backend-defined',
-          batchSize: benchmarkSetting.batchSize ~/ _defaultShardsCount,
-          shardsCount: _defaultShardsCount));
-    } else {
-      return BenchmarkConfig(BatchPreset(
-          name: 'backend-defined',
-          batchSize: benchmarkSetting.batchSize,
-          shardsCount: 1));
-    }
-  }
 
   RunSettings createRunSettings(
       {required BenchmarkRunMode runMode,
@@ -147,18 +103,6 @@ class Benchmark {
       setting: commonSettings,
       benchmarkSetting: benchmarkSetting,
     );
-
-    if (info.isOffline) {
-      benchmarkSetting.batchSize = config.batchSize * config.threadsNumber;
-      settings.setting.add(pb.Setting(
-        id: 'shards_num',
-        name: 'Number of threads for inference',
-        value: pb.Setting_Value(
-          name: config.threadsNumber.toString(),
-          value: config.threadsNumber.toString(),
-        ),
-      ));
-    }
 
     return RunSettings(
       backend_model_path: resourceManager.get(benchmarkSetting.src),
@@ -185,23 +129,15 @@ class BenchmarkList {
   final List<Benchmark> benchmarks = <Benchmark>[];
   final bool testMode;
 
-  BenchmarkList(
-      pb.MLPerfConfig mlperfConfig,
-      List<pb.BenchmarkSetting> benchmarkSettings,
-      this.testMode,
-      BatchPreset? defaultPreset) {
+  BenchmarkList(pb.MLPerfConfig mlperfConfig,
+      List<pb.BenchmarkSetting> benchmarkSettings, this.testMode) {
     for (final task in mlperfConfig.task) {
       for (final model in task.model) {
         final benchmarkSetting = benchmarkSettings
             .singleWhereOrNull((setting) => setting.benchmarkId == model.id);
         if (benchmarkSetting == null) continue;
 
-        BenchmarkConfig? config;
-        if (defaultPreset != null) {
-          config = BenchmarkConfig(defaultPreset);
-        }
-        benchmarks
-            .add(Benchmark(benchmarkSetting, task, model, testMode, config));
+        benchmarks.add(Benchmark(benchmarkSetting, task, model, testMode));
       }
     }
   }
@@ -211,7 +147,7 @@ class BenchmarkList {
     final result = <Resource>[];
 
     for (final b in benchmarks) {
-      if (skipInactive && !b.config.active) continue;
+      if (skipInactive && !b.isActive) continue;
       if (testMode) {
         final datasetData = Resource(
             path: b.taskConfig.testDataset.path,

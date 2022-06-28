@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 
 import 'package:device_info/device_info.dart';
-import 'package:ios_utsname_ext/extension.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/environment/os_enum.dart';
 
@@ -33,7 +32,7 @@ class DeviceInfo {
       final iosInfo = await deviceInfo.iosInfo;
 
       DeviceInfo.manufacturer = 'Apple';
-      DeviceInfo.model = iosInfo.utsname.machine.iOSProductName;
+      DeviceInfo.model = iosInfo.utsname.machine;
     } else if (Platform.isWindows) {
       DeviceInfo.manufacturer = 'Microsoft';
       DeviceInfo.model = 'Unknown PC';

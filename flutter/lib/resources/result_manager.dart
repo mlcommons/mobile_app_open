@@ -100,14 +100,6 @@ class ResultManager {
       return null;
     }
 
-    var threadsNumber = 0;
-    for (var item in export.backendSettingsInfo.extraSettings.list) {
-      if (item.id == 'shards_num') {
-        threadsNumber = int.parse(item.value);
-        break;
-      }
-    }
-
     return BenchmarkResult(
         throughput: runResult.throughput ?? 0.0,
         accuracy: runResult.accuracy,
@@ -115,7 +107,6 @@ class ResultManager {
         backendName: export.backendInfo.name,
         acceleratorName: export.backendInfo.accelerator,
         batchSize: export.backendSettingsInfo.batchSize,
-        threadsNumber: threadsNumber,
         validity: runResult.loadgenValidity);
   }
 }
