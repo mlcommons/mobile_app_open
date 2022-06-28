@@ -13,6 +13,7 @@
 # limitations under the License.
 ##########################################################################
 
+
 ifeq (${WITH_SAMSUNG},1)
   $(info WITH_SAMSUNG=1)
   android_samsung_backend_bazel_flag=--//android/java/org/mlperf/inference:with_samsung="1"
