@@ -1026,7 +1026,7 @@ benchmark_setting {
   }
   custom_setting {
     id: "preset"
-    value: "1007"
+    value: "1001"
   }
   custom_setting {
     id: "i_type"
@@ -1042,11 +1042,11 @@ benchmark_setting {
   }
   custom_setting {
     id: "freezing"
-    value: "200"
+    value: "300"
   }
   custom_setting {
     id: "lazy_mode"
-    value: "true"
+    value: "false"
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single_fence.nnc"
   single_stream_expected_latency_ns: 900000
