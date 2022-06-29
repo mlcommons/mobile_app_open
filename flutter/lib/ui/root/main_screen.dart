@@ -125,7 +125,13 @@ class MyHomePage extends StatelessWidget {
             }
           }
         }
-        state.runBenchmarks();
+        try {
+          await state.runBenchmarks();
+        } catch (e) {
+          await showErrorDialog(
+              context, [stringResources.runFail + ':', e.toString()]);
+          return;
+        }
       }),
     );
   }

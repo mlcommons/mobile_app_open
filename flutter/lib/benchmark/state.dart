@@ -68,6 +68,7 @@ class BenchmarkState extends ChangeNotifier {
   late final BackendInfo backendInfo;
 
   bool taskConfigFailedToLoad = false;
+  String currentLogDir = '';
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
 
@@ -228,7 +229,7 @@ class BenchmarkState extends ChangeNotifier {
     throw StateError('unreachable');
   }
 
-  void runBenchmarks() async {
+  Future<void> runBenchmarks() async {
     assert(resourceManager.done, 'Resource manager is not done.');
     assert(_doneRunning != false, '_doneRunning is false');
     _store.previousExtendedResult = '';
@@ -237,6 +238,27 @@ class BenchmarkState extends ChangeNotifier {
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
 
+    try {
+      await _runBenchmarks();
+      print('Benchmarks finished');
+      _doneRunning = _aborting ? null : true;
+    } catch(e) {
+      _doneRunning = null;
+      rethrow;
+    } finally {
+      if (currentLogDir.isNotEmpty && !_store.keepLogs) {
+        await Directory(currentLogDir).delete(recursive: true);
+      }
+
+      _aborting = false;
+
+      notifyListeners();
+
+      await Wakelock.disable();
+    }
+  }
+
+  Future<void> _runBenchmarks() async {
     final cooldown = _store.cooldown;
     final cooldownPause = _store.testMode || FAST_MODE
         ? Duration(seconds: 1)
@@ -261,7 +283,7 @@ class BenchmarkState extends ChangeNotifier {
 
     final startTime = DateTime.now();
     final logDirName = startTime.toIso8601String().replaceAll(':', '-');
-    final logDir = '${resourceManager.applicationDirectory}/logs/$logDirName';
+    currentLogDir = '${resourceManager.applicationDirectory}/logs/$logDirName';
 
     for (final benchmark in activeBenchmarks) {
       progressInfo.info = benchmark.info;
@@ -295,8 +317,13 @@ class BenchmarkState extends ChangeNotifier {
         return min(timeProgress, queryProgress);
       };
       notifyListeners();
-      final performanceRunInfo = await runBenchmark(benchmark, false,
-          backendInfo.settings.commonSetting, backendInfo.libPath, logDir);
+      final performanceRunInfo = await runBenchmark(
+        benchmark,
+        false,
+        backendInfo.settings.commonSetting,
+        backendInfo.libPath,
+        currentLogDir,
+      );
       perfTimer.stop();
 
       final performanceResult = performanceRunInfo.result;
@@ -333,8 +360,13 @@ class BenchmarkState extends ChangeNotifier {
           return queryProgress;
         };
         notifyListeners();
-        final accuracyRunInfo = await runBenchmark(benchmark, true,
-            backendInfo.settings.commonSetting, backendInfo.libPath, logDir);
+        final accuracyRunInfo = await runBenchmark(
+          benchmark,
+          true,
+          backendInfo.settings.commonSetting,
+          backendInfo.libPath,
+          currentLogDir,
+        );
 
         accuracyResult = accuracyRunInfo.result;
         benchmark.accuracyModeResult = BenchmarkResult(
@@ -377,17 +409,6 @@ class BenchmarkState extends ChangeNotifier {
           JsonEncoder().convert(lastResult!.toJson());
       await resourceManager.resultManager.saveResult(lastResult!);
     }
-
-    if (!_store.keepLogs) {
-      await Directory(logDir).delete(recursive: true);
-    }
-    print('Benchmarks finished');
-
-    _doneRunning = _aborting ? null : true;
-    _aborting = false;
-    notifyListeners();
-
-    await Wakelock.disable();
   }
 
   void resetCurrentResults() {
