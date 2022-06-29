@@ -174,7 +174,8 @@ class BenchmarkState extends ChangeNotifier {
     }
 
     await Wakelock.enable();
-    resourceManager.handleResources(_middle.listResources(), needToPurgeCache);
+    await resourceManager.handleResources(
+        _middle.listResources(), needToPurgeCache);
 
     taskConfigFailedToLoad = false;
     await Wakelock.disable();

@@ -61,7 +61,7 @@ class ResourceManager {
     return checksum == md5Checksum;
   }
 
-  void handleResources(List<Resource> resources, bool purgeOldCache) async {
+  Future<void> handleResources(List<Resource> resources, bool purgeOldCache) async {
     _progressString = '0%';
     _done = false;
     _onUpdate();
