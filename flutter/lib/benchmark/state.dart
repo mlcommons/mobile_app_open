@@ -242,7 +242,7 @@ class BenchmarkState extends ChangeNotifier {
       await _runBenchmarks();
       print('Benchmarks finished');
       _doneRunning = _aborting ? null : true;
-    } catch(e) {
+    } catch (e) {
       _doneRunning = null;
       rethrow;
     } finally {

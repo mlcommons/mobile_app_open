@@ -10,7 +10,8 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/run/progress_circles.dart';
 
 class ProgressScreen extends StatefulWidget {
-  static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  static final GlobalKey<ScaffoldState> scaffoldKey =
+      GlobalKey<ScaffoldState>();
 
   @override
   _ProgressScreenState createState() => _ProgressScreenState();
