@@ -37,7 +37,7 @@ limitations under the License.
 #define N_OFFLINE_INTERPRETERS 8
 
 struct TFLiteBackendData {
-  const char* name = "TFLite";
+  const char* name = "TFLite-pixel";
   const char* vendor = "Google";
   TfLiteModel* model{nullptr};
   std::vector<TfLiteInterpreterOptions*> options{};
