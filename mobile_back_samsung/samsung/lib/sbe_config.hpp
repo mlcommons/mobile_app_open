@@ -1101,5 +1101,5 @@ benchmark_setting {
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
-}	// namespace sbe
+}  // namespace sbe
 #endif
