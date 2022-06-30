@@ -955,8 +955,6 @@ benchmark_setting {
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
-
-
 const std::string sbe1200_config = R"SETTINGS(
 common_setting {
   id: "num_threads"
@@ -1102,5 +1100,6 @@ benchmark_setting {
   md5_checksum: "8832370c770fa820dfde83e039e3243c"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
-} // namespace sbe
+
+}	// namespace sbe
 #endif
