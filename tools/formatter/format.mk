@@ -28,6 +28,7 @@ format/dart:
 
 .PHONY: format/ts
 format/ts:
+	cd firebase_functions/functions && ${_start_args} npm install --production=false
 	cd firebase_functions/functions && ${_start_args} npm run format
 	cd firebase_functions/functions && ${_start_args} npm run lint-fix
 

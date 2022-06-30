@@ -49,11 +49,16 @@ RUN cp $(which clang-format-10) ${FORMATTER_HOME}/clang-format
 RUN apt-get update && apt-get install -y \
     dos2unix
 
+# Install Node.js and NPM
+ENV NODE_ENV="production"
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+RUN apt-get update && apt-get install -y nodejs && node -v
+RUN npm install --location=global npm@8.13.2 && npm --version
+RUN apt-get update && apt-get install -y build-essential
+
 # Add Markdown formatter
-RUN apt-get update && apt-get install -y \
-    nodejs npm
-RUN npm install -g --production "markdownlint-cli@0.26.0"
-RUN npm install -g --production markdown-link-check@3.9.0
+RUN npm install -g markdownlint-cli@0.26.0
+RUN npm install -g markdown-link-check@3.9.0
 
 # Add YAML linter
 RUN apt-get update && apt-get install -y \
