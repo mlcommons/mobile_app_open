@@ -1102,6 +1102,5 @@ benchmark_setting {
   md5_checksum: "8832370c770fa820dfde83e039e3243c"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
-
-}	// namespace sbe
+} // namespace sbe
 #endif
