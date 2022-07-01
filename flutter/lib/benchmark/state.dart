@@ -19,7 +19,6 @@ import 'package:mlperfbench_common/data/results/dataset_info.dart';
 import 'package:mlperfbench_common/data/results/dataset_type.dart';
 import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
 
@@ -158,25 +157,30 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> loadResources() async {
-    _middle = BenchmarkList(
-      configManager.decodedConfig,
-      backendInfo.settings.benchmarkSetting,
-      _store.testMode,
-    );
-    restoreLastResult();
-
-    final packageInfo = await PackageInfo.fromPlatform();
-    final newAppVersion = packageInfo.version + '+' + packageInfo.buildNumber;
-    var needToPurgeCache = false;
-    if (_store.previousAppVersion != newAppVersion) {
-      _store.previousAppVersion = newAppVersion;
-      needToPurgeCache = true;
+  // Start loading resources in background.
+  // Return type 'void' is intended, this function must not be awaited.
+  void deferredLoadResources() async {
+    try {
+      await loadResources();
+    } catch (e, trace) {
+      print("can't load resources: $e");
+      print(trace);
+      taskConfigFailedToLoad = true;
+      notifyListeners();
     }
+  }
+
+  Future<void> loadResources() async {
+    final newAppVersion =
+        BuildInfoHelper.info.version + '+' + BuildInfoHelper.info.buildNumber;
+    var needToPurgeCache = _store.previousAppVersion != newAppVersion;
+    _store.previousAppVersion = newAppVersion;
 
     await Wakelock.enable();
+    print('start loading resources');
     await resourceManager.handleResources(
         _middle.listResources(), needToPurgeCache);
+    print('finished loading resources');
 
     taskConfigFailedToLoad = false;
     await Wakelock.disable();
@@ -192,7 +196,7 @@ class BenchmarkState extends ChangeNotifier {
         result.resourceManager.applicationDirectory, result.resourceManager);
     try {
       await result.setTaskConfig(name: store.chosenConfigurationName);
-      await result.loadResources();
+      result.deferredLoadResources();
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
@@ -212,6 +216,13 @@ class BenchmarkState extends ChangeNotifier {
     await configManager.loadConfig(name);
     _store.chosenConfigurationName = name;
     taskConfigFailedToLoad = false;
+
+    _middle = BenchmarkList(
+      configManager.decodedConfig,
+      backendInfo.settings.benchmarkSetting,
+      _store.testMode,
+    );
+    restoreLastResult();
   }
 
   BenchmarkStateEnum get state {
@@ -571,8 +582,7 @@ class BenchmarkState extends ChangeNotifier {
       print('unable to restore previous extended result: $e');
       print(trace);
       _store.previousExtendedResult = '';
-      _middle.benchmarks.forEach((benchmark) => benchmark.accuracyModeResult =
-          benchmark.performanceModeResult = null);
+      resetCurrentResults();
       _doneRunning = null;
     }
   }
