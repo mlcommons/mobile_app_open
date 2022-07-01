@@ -44,13 +44,14 @@ class FileCacheHelper {
   }
 
   Future<File> _download(String url) async {
-    const succesStatusCode = 200;
+    print('downloading $url');
+    const successStatusCode = 200;
 
     final response = await _httpClient
         .getUrl(Uri.parse(url))
         .then((request) => request.close());
 
-    if (response.statusCode != succesStatusCode) {
+    if (response.statusCode != successStatusCode) {
       throw 'Could not download file by url: status ${response.statusCode}, url: $url';
     }
 
