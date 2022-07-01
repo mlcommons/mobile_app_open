@@ -108,13 +108,10 @@ output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	docker build --progress=plain \
 		--build-arg UID=`id -u` --build-arg GID=`id -g` \
 		-t mlperf/formatter tools/formatter
-	# need to clean flutter cache first else we will have error when running `dart run import_sorter:main` later in docker
-	cd flutter && ${_start_args} flutter clean
 	touch $@
 
 FORMAT_DOCKER_ARGS= \
-	-v ~/.pub-cache:/home/mlperf/.pub-cache \
-	-v ~/.config/flutter:/home/mlperf/.config/flutter \
+	--mount source=mlperf-pubcache,target=/home/mlperf/.pub-cache \
 	-v $(CURDIR):/home/mlperf/mobile_app_open \
 	-w /home/mlperf/mobile_app_open \
 	-u `id -u`:`id -g` \
