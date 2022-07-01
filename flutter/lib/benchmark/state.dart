@@ -148,7 +148,7 @@ class BenchmarkState extends ChangeNotifier {
     notifyListeners();
     try {
       await setTaskConfig(name: _store.chosenConfigurationName);
-      await loadResources();
+      deferredLoadResources();
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
