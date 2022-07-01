@@ -146,9 +146,16 @@ flutter/set-windows-build-number:
 
 .PHONY: flutter/pub
 flutter/pub:
-	cd flutter && ${_start_args} flutter --no-version-check pub get
-	cd flutter_common && ${_start_args} flutter --no-version-check pub get
-	cd website && ${_start_args} flutter --no-version-check pub get
+	[ -z "${FLUTTER_FORCE_PUB_GET}" ] || rm -rf output/flutter/pub
+	make \
+		output/flutter/pub/flutter.stamp \
+		output/flutter/pub/flutter_common.stamp \
+		output/flutter/pub/website.stamp
+	[ -z "${FLUTTER_FORCE_PUB_GET}" ] || rm -rf output/flutter/pub
+output/flutter/pub/%.stamp: %/pubspec.yaml
+	cd $(shell basename $@ .stamp) && ${_start_args} flutter --no-version-check pub get
+	mkdir -p $(shell dirname $@)
+	touch $@
 
 ifneq (${FLUTTER_TEST_DEVICE},)
 flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"
@@ -166,3 +173,4 @@ flutter/run:
 .PHONY: flutter/clean
 flutter/clean:
 	cd flutter && ${_start_args} flutter --no-version-check clean
+	rm -rf output/flutter/pub

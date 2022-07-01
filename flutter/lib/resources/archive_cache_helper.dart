@@ -33,6 +33,7 @@ class ArchiveCacheHelper {
   }
 
   Future<Directory> _unzipFile(String archivePath) async {
+    print('unpacking $archivePath');
     final result = Directory(_getArchiveFolder(archivePath));
     await result.create(recursive: true);
 

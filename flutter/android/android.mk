@@ -46,6 +46,7 @@ flutter_common_docker_flags= \
 		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
 		--env BAZEL_ARGS_GLOBAL="${proxy_bazel_args} --output_user_root=/mnt/cache/bazel" \
 		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
+		--env FLUTTER_FORCE_PUB_GET=1 \
 		${proxy_docker_args} \
 		${backend_qti_flutter_docker_args} \
 		${backend_samsung_docker_args} \

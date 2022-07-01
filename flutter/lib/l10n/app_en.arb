@@ -84,6 +84,7 @@
   "uploadButton": "Upload results",
   "uploadSuccess": "Results uploaded successfully",
   "uploadFail": "Error uploading results",
+  "runFail": "Error while running benchmarks",
 
   "notAvailable": "N/A",
 

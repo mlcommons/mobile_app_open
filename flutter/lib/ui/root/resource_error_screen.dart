@@ -70,7 +70,7 @@ class ResourceErrorScreen extends StatelessWidget {
                         onPressed: () async {
                           try {
                             await state.setTaskConfig(name: '');
-                            await state.loadResources();
+                            state.deferredLoadResources();
                           } catch (e, trace) {
                             print("can't change task config: $e");
                             print(trace);
@@ -84,7 +84,7 @@ class ResourceErrorScreen extends StatelessWidget {
                           try {
                             await state.setTaskConfig(
                                 name: store.chosenConfigurationName);
-                            await state.loadResources();
+                            state.deferredLoadResources();
                           } catch (e, trace) {
                             print("can't change task config: $e");
                             print(trace);
