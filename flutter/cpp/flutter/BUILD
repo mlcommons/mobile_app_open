@@ -41,7 +41,9 @@ cc_library(
     hdrs = ["ios_linker_workaround.h"],
     deps = [
         "//flutter/cpp/flutter:bridge",
-        "//mobile_back_tflite/cpp/backend_tflite:tflite_c",
+        # TODO(anhappdev) Add option to choose between TFLite and CoreML
+        # "//mobile_back_tflite/cpp/backend_tflite:tflite_c",
+        "//mobile_back_apple:applelib",
     ],
 )
 
