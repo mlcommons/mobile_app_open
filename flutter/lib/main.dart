@@ -28,7 +28,7 @@ Future<void> main() async {
   try {
     await launchUi();
   } on UnsupportedDeviceException catch (e) {
-    runApp(MyApp(UnsupportedDeviceScreen(
+    runApp(MyApp(home: UnsupportedDeviceScreen(
       backendError: e.backendError,
     )));
   } catch (e, s) {
@@ -60,7 +60,7 @@ Future<void> launchUi() async {
         ChangeNotifierProvider.value(value: benchmarkState),
         ChangeNotifierProvider.value(value: store)
       ],
-      child: const MyApp(MyHomePage()),
+      child: const MyApp(home: MyHomePage()),
     ),
   );
 }

@@ -111,7 +111,7 @@ class HistoryHelperUtils {
       width: 1,
       color: Colors.grey,
     );
-    const rowBorder = const TableBorder(
+    const rowBorder = TableBorder(
       left: borderStyle,
       right: borderStyle,
       bottom: borderStyle,

@@ -11,7 +11,7 @@ import 'package:mlperfbench/ui/error_dialog.dart';
 class TaskConfigScreen extends StatelessWidget {
   final List<TaskConfigDescription> _configs;
 
-  const TaskConfigScreen(this._configs);
+  const TaskConfigScreen(this._configs, {Key? key}) : super(key: key);
 
   Card getOptionPattern(
     BuildContext context,

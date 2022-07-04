@@ -47,9 +47,9 @@ class MyHomePage extends StatelessWidget {
             MyAppBar.buildAppBar(stringResources.mainTitle, context, false);
         break;
       case BenchmarkStateEnum.running:
-        return ProgressScreen();
+        return const ProgressScreen();
       case BenchmarkStateEnum.done:
-        return ResultScreen();
+        return const ResultScreen();
     }
 
     return Scaffold(
@@ -167,7 +167,7 @@ class MyPaintBottom extends CustomPainter {
 class GoButtonGradient extends StatelessWidget {
   final AsyncCallback onPressed;
 
-  const GoButtonGradient(this.onPressed);
+  const GoButtonGradient(this.onPressed, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -215,13 +215,11 @@ Widget _circleContainerWithContent(
   return CustomPaint(
     painter: MyPaintBottom(),
     child: Stack(alignment: Alignment.topCenter, children: [
-      Container(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text(
-            label,
-            style: const TextStyle(color: AppColors.lightText, fontSize: 15),
-          ),
+      Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(
+          label,
+          style: const TextStyle(color: AppColors.lightText, fontSize: 15),
         ),
       ),
       Stack(

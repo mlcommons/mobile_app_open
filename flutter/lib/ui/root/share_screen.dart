@@ -18,6 +18,8 @@ class ShareKeys {
 }
 
 class ShareScreen extends StatelessWidget {
+  const ShareScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final store = context.watch<Store>();

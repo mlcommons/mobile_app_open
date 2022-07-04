@@ -24,6 +24,8 @@ import 'progress_screen.dart';
 enum _ScreenMode { performance, accuracy }
 
 class ResultScreen extends StatefulWidget {
+  const ResultScreen({Key? key}) : super(key: key);
+
   @override
   _ResultScreenState createState() => _ResultScreenState();
 }
@@ -456,7 +458,7 @@ class _ResultScreenState extends State<ResultScreen>
 class BlueProgressLine extends Container {
   final double _progress;
 
-  BlueProgressLine(this._progress);
+  BlueProgressLine(this._progress, {Key? key}) : super(key: key);
 
   double get _progressValue {
     final _rangedProgress = _progress.clamp(0, 1);

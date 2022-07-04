@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class ProgressCircles extends StatefulWidget {
   final Size _size;
 
-  const ProgressCircles(this._size);
+  const ProgressCircles(this._size, {Key? key}) : super(key: key);
 
   @override
   _ProgressCirclesState createState() => _ProgressCirclesState();

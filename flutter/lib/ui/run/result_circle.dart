@@ -8,7 +8,7 @@ import 'package:mlperfbench/ui/icons.dart' as app_icons;
 class ResultCircle extends StatefulWidget {
   final num _value;
 
-  ResultCircle(num value) : _value = value.clamp(0, 1);
+  ResultCircle(num value, {Key? key}) : _value = value.clamp(0, 1), super(key: key);
 
   @override
   _ResultCircleState createState() => _ResultCircleState();

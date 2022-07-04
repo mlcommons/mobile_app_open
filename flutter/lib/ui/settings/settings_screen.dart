@@ -11,6 +11,8 @@ import 'package:mlperfbench/ui/settings/snack_bar.dart';
 import 'package:mlperfbench/ui/settings/task_config_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({Key? key}) : super(key: key);
+
   @override
   _SettingsScreen createState() => _SettingsScreen();
 }

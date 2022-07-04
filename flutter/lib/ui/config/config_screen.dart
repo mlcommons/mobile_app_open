@@ -6,6 +6,8 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 class ConfigScreen extends StatefulWidget {
+  const ConfigScreen({Key? key}) : super(key: key);
+
   @override
   _ConfigScreen createState() => _ConfigScreen();
 }

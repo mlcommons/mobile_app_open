@@ -13,6 +13,8 @@ class ProgressScreen extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey =
       GlobalKey<ScaffoldState>();
 
+  const ProgressScreen({Key? key}) : super(key: key);
+
   @override
   _ProgressScreenState createState() => _ProgressScreenState();
 }

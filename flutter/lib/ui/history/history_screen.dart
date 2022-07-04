@@ -9,6 +9,8 @@ import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({Key? key}) : super(key: key);
+
   @override
   _HistoryScreen createState() => _HistoryScreen();
 }
