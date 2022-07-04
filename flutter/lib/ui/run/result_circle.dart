@@ -56,9 +56,9 @@ class _ResultCircleState extends State<ResultCircle>
     final value = widget._value * _controller.value;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(0, 30, 0, 30),
+      padding: const EdgeInsets.fromLTRB(0, 30, 0, 30),
       child: Container(
-        margin: EdgeInsets.only(bottom: 20.0),
+        margin: const EdgeInsets.only(bottom: 20.0),
         width: edgeSize,
         height: edgeSize,
         decoration: BoxDecoration(
@@ -68,7 +68,7 @@ class _ResultCircleState extends State<ResultCircle>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black12,
               offset: Offset(15, 15),
@@ -79,7 +79,7 @@ class _ResultCircleState extends State<ResultCircle>
         child: Stack(
           alignment: AlignmentDirectional.center,
           children: <Widget>[
-            Container(
+            SizedBox(
                 width: edgeSize,
                 height: edgeSize,
                 child: RotationTransition(
@@ -101,20 +101,20 @@ class ArcPaint extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final angleEpsilon = pi / 25;
-    final strokeWidth = 8.0;
-    final startAngle = pi / 2;
+    const angleEpsilon = pi / 25;
+    const strokeWidth = 8.0;
+    const startAngle = pi / 2;
     final sweepAngle = 2 * pi * _value;
-    final useCenter = false;
+    const useCenter = false;
 
     final rect = Rect.fromLTRB(-size.width / 8, -size.width / 8,
         9 / 8 * size.width, 9 / 8 * size.width);
     final paint = Paint()
       ..shader = SweepGradient(
-          transform: GradientRotation(pi / 2 - angleEpsilon),
+          transform: const GradientRotation(pi / 2 - angleEpsilon),
           endAngle: sweepAngle + angleEpsilon,
-          colors: [Colors.white54, Colors.white]).createShader(rect)
-      ..maskFilter = MaskFilter.blur(BlurStyle.solid, 10)
+          colors: const [Colors.white54, Colors.white]).createShader(rect)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 10)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;

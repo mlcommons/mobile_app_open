@@ -21,7 +21,7 @@ const _runName = 'dart_ffi_backend_match';
 const _freeName = 'dart_ffi_backend_match_free';
 
 typedef _Run = Pointer<_RunOut> Function(
-    Pointer<Utf8> lib_path, Pointer<Utf8> manufacturer, Pointer<Utf8> model);
+    Pointer<Utf8> libPath, Pointer<Utf8> manufacturer, Pointer<Utf8> model);
 final _run = getBridgeHandle().lookupFunction<_Run, _Run>(_runName);
 
 typedef _Free1 = Void Function(Pointer<_RunOut>);

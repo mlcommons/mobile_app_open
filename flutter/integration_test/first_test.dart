@@ -11,11 +11,11 @@ import 'package:mlperfbench/resources/resource_manager.dart'
 import 'package:mlperfbench/resources/result_manager.dart' as result_manager;
 
 void main() {
-  final splashPauseSeconds = 4;
-  final runTimeLimitMinutes = 20;
-  final downloadTimeLimitMinutes = 10;
-  final secondsInMinute = 60;
-  final expectedResultCount = 5; // number of tasks to be run
+  const splashPauseSeconds = 4;
+  const runTimeLimitMinutes = 20;
+  const downloadTimeLimitMinutes = 10;
+  const secondsInMinute = 60;
+  const expectedResultCount = 5; // number of tasks to be run
 
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -34,7 +34,7 @@ void main() {
         for (var counter = 0;
             counter < timeLimitMinutes * secondsInMinute;
             counter++) {
-          await tester.pumpAndSettle(Duration(seconds: 1));
+          await tester.pumpAndSettle(const Duration(seconds: 1));
           final searchResult = find.byKey(key);
 
           if (tester.any(searchResult)) {
@@ -47,18 +47,18 @@ void main() {
       }
 
       await app.main();
-      await tester.pumpAndSettle(Duration(seconds: splashPauseSeconds));
+      await tester.pumpAndSettle(const Duration(seconds: splashPauseSeconds));
 
       var goButtonIsPresented =
-          await waitFor(downloadTimeLimitMinutes, Key(MainKeys.goButton));
+          await waitFor(downloadTimeLimitMinutes, const Key(MainKeys.goButton));
 
       expect(goButtonIsPresented, true,
           reason: 'Problems with downloading of datasets or models');
-      final goButton = find.byKey(Key(MainKeys.goButton));
+      final goButton = find.byKey(const Key(MainKeys.goButton));
       await tester.tap(goButton);
 
       var scrollButtonIsPresented = await waitFor(
-          runTimeLimitMinutes, Key(ResultKeys.scrollResultsButton));
+          runTimeLimitMinutes, const Key(ResultKeys.scrollResultsButton));
 
       expect(scrollButtonIsPresented, true,
           reason: 'Test results were not found');
@@ -70,7 +70,6 @@ void main() {
       await rm.init();
 
       final extendedResults = rm.getLastResult();
-      ;
       final length = extendedResults.results.list.length;
 
       expect(length, expectedResultCount,

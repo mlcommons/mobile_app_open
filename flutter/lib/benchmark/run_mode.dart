@@ -9,15 +9,15 @@ class BenchmarkRunMode {
   // Let's keep them for now,
   // they are used by other apps that work with mlperf benchmark
   // they can potentially be used in the future in this app
-  static final String backendPerfomanceString = 'PerformanceOnly';
-  static final String backendAccuracyString = 'AccuracyOnly';
-  static final String backendSubmissionString = 'SubmissionRun';
+  static const String backendPerfomanceString = 'PerformanceOnly';
+  static const String backendAccuracyString = 'AccuracyOnly';
+  static const String backendSubmissionString = 'SubmissionRun';
 
-  static final String resultSubmissionString = 'submission_mode';
-  static final String resultAccuracyString = 'accuracy_mode';
-  static final String resultPerformanceString = 'performance_mode';
-  static final String resultPerformance_liteString = 'performance_lite_mode';
-  static final String resultTestString = 'testing';
+  static const String resultSubmissionString = 'submission_mode';
+  static const String resultAccuracyString = 'accuracy_mode';
+  static const String resultPerformanceString = 'performance_mode';
+  static const String resultPerformance_liteString = 'performance_lite_mode';
+  static const String resultTestString = 'testing';
 
   BenchmarkRunMode._(this._mode);
 

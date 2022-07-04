@@ -21,15 +21,15 @@ ListView createListOfBenchmarkItemsWidgets(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(40, 10, 20, 10),
-              child: Container(
+              padding: const EdgeInsets.fromLTRB(40, 10, 20, 10),
+              child: SizedBox(
                 width: pictureEdgeSize,
                 height: pictureEdgeSize,
                 child: benchmark.info.icon,
               ),
             ),
             Text(benchmark.taskConfig.name),
-            Icon(
+            const Icon(
               Icons.chevron_right,
               color: Colors.grey,
             ),
@@ -56,7 +56,7 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
       builder: (context) => Wrap(
             children: [
               Padding(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +69,7 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
                                 children: [
                                   Text(benchmark.taskConfig.name,
                                       textAlign: TextAlign.left,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 28))
                                 ])),
@@ -81,12 +81,12 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
                                     splashRadius: 24,
                                     onPressed: () => Navigator.pop(context),
                                     icon:
-                                        Icon(Icons.close, color: Colors.grey))))
+                                        const Icon(Icons.close, color: Colors.grey))))
                       ])),
               Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                   child: Text(info.detailsContent,
-                      style: TextStyle(fontSize: 16))),
+                      style: const TextStyle(fontSize: 16))),
             ],
           ));
 }

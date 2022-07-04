@@ -60,7 +60,7 @@ Future<void> launchUi() async {
         ChangeNotifierProvider.value(value: benchmarkState),
         ChangeNotifierProvider.value(value: store)
       ],
-      child: MyApp(MyHomePage()),
+      child: const MyApp(MyHomePage()),
     ),
   );
 }

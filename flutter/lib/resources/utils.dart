@@ -20,6 +20,6 @@ List<String> filterInternetResources(List<Resource> resources) {
 }
 
 String jsonToStringIndented(dynamic json) {
-  final jsonEncoder = const JsonEncoder.withIndent('  ');
+  const jsonEncoder = JsonEncoder.withIndent('  ');
   return jsonEncoder.convert(json);
 }

@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 class ProgressCircles extends StatefulWidget {
   final Size _size;
 
-  ProgressCircles(this._size);
+  const ProgressCircles(this._size);
 
   @override
   _ProgressCirclesState createState() => _ProgressCirclesState();
 }
 
 class _ProgressCirclesState extends State<ProgressCircles> {
-  static final circles_count = 10;
+  static const circles_count = 10;
 
   late final Timer _timer;
 
@@ -45,7 +45,7 @@ class _ProgressCirclesState extends State<ProgressCircles> {
   @override
   void initState() {
     _timer =
-        Timer.periodic(Duration(seconds: 1), (_) => setState(_updateState));
+        Timer.periodic(const Duration(seconds: 1), (_) => setState(_updateState));
     super.initState();
   }
 

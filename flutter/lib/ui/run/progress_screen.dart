@@ -35,14 +35,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
       ),
     );
     final title = Padding(
-      padding: EdgeInsets.fromLTRB(40, 80, 20, 40),
+      padding: const EdgeInsets.fromLTRB(40, 80, 20, 40),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.measuring,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.lightText,
               fontSize: 30,
@@ -50,7 +50,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           ),
           Text(
             l10n.dontCloseApp,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.lightText,
               fontSize: 17,
             ),
@@ -72,7 +72,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black12,
                   offset: Offset(15, 15),
@@ -83,7 +83,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             child: Center(
               child: Text(
                 '${progress.currentStage.toString()}/${progress.totalStages.toString()}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppColors.lightText,
                 ),
@@ -92,7 +92,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             ),
           ),
         ),
-        Center(
+        const Center(
           child: ProgressCircles(
             Size(progressCircleEdgeSize + 40, progressCircleEdgeSize + 40),
           ),
@@ -101,15 +101,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
     final namedIcon = Column(children: [
       Padding(
-        padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
-        child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+        child: SizedBox(
           width: 100,
           height: 100,
           child: progress.cooldown ? null : progress.info!.iconWhite,
         ),
       ),
       Padding(
-        padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: Text(
           progress.cooldown
               ? l10n.cooldownStatus
@@ -117,7 +117,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ? l10n.progressScreenNameAccuracy
                       : l10n.progressScreenNamePerformance)
                   .replaceFirst('<taskName>', progress.info!.taskName),
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: AppColors.lightText,
           ),
@@ -126,14 +126,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
       Text(
         l10n.progressScreenStage.replaceFirst('<percent>',
             (progress.stageProgress * 100).round().clamp(0, 100).toString()),
-        style: TextStyle(
+        style: const TextStyle(
           fontWeight: FontWeight.bold,
           color: AppColors.lightText,
         ),
       ),
     ]);
     final cancelButton = Padding(
-      padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
       child: TextButton(
         style: ButtonStyle(
           backgroundColor:
@@ -141,7 +141,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           shape: MaterialStateProperty.all(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
-              side: BorderSide(color: Colors.white),
+              side: const BorderSide(color: Colors.white),
             ),
           ),
         ),
@@ -150,7 +150,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: Text(
             l10n.cancel,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 15.0,
               color: AppColors.lightText,
             ),
@@ -179,7 +179,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   @override
   void initState() {
-    _timer = Timer.periodic(Duration(seconds: 1), (_) => setState(() {}));
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
     super.initState();
   }
 

@@ -136,7 +136,7 @@ class _ResultScreenState extends State<ResultScreen>
                     ),
                 ],
               ),
-              Icon(Icons.chevron_right, color: Colors.grey),
+              const Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
         ],
@@ -155,7 +155,7 @@ class _ResultScreenState extends State<ResultScreen>
             Text(
               stringResources.resultsBatchSize
                   .replaceAll('<batchSize>', batchSize),
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 14.0,
               ),
@@ -174,7 +174,7 @@ class _ResultScreenState extends State<ResultScreen>
           children: [
             ListTile(
               minVerticalPadding: 0,
-              leading: Container(
+              leading: SizedBox(
                   width: pictureEdgeSize,
                   height: pictureEdgeSize,
                   child: benchmark.info.icon),
@@ -188,7 +188,7 @@ class _ResultScreenState extends State<ResultScreen>
               ),
               onTap: () => showBenchmarkInfoBottomSheet(context, benchmark),
             ),
-            Divider()
+            const Divider()
           ],
         ),
       );
@@ -222,7 +222,7 @@ class _ResultScreenState extends State<ResultScreen>
             child: Text(
               benchmark.taskConfig.name.split(' ').join('\n').toUpperCase(),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12.0, color: AppColors.lightText),
+              style: const TextStyle(fontSize: 12.0, color: AppColors.lightText),
             ),
           ),
           Text(
@@ -270,11 +270,11 @@ class _ResultScreenState extends State<ResultScreen>
             painter: MyPaintBottom(),
             child: Column(
               children: <Widget>[
-                Container(
+                SizedBox(
                   width: MediaQuery.of(context).size.width * 0.75,
                   child: TabBar(
                     controller: _tabController,
-                    indicator: UnderlineTabIndicator(),
+                    indicator: const UnderlineTabIndicator(),
                     indicatorSize: TabBarIndicatorSize.label,
                     tabs: [
                       Tab(text: stringResources.performance),
@@ -304,15 +304,15 @@ class _ResultScreenState extends State<ResultScreen>
               Text(
                 stringResources.detailedResults,
                 textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
               ),
               IconButton(
-                  key: Key(ResultKeys.scrollResultsButton),
+                  key: const Key(ResultKeys.scrollResultsButton),
                   icon: app_icons.AppIcons.arrow,
                   onPressed: () {
                     scrollController.animateTo(
                         scrollController.position.maxScrollExtent,
-                        duration: Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 200),
                         curve: Curves.ease);
                   })
             ],
@@ -327,14 +327,14 @@ class _ResultScreenState extends State<ResultScreen>
             MaterialStateProperty.all<Color>(AppColors.runBenchmarkRectangle),
         shape: MaterialStateProperty.all(RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.0),
-            side: BorderSide(color: Colors.white))),
+            side: const BorderSide(color: Colors.white))),
         minimumSize:
             MaterialStateProperty.all<Size>(Size(minimumShareButtonWidth, 0)));
 
     final detailedResultsPage = Column(children: [
       _createListOfBenchmarkResultWidgets(context, state),
       Padding(
-          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           child: TextButton(
             style: buttonStyle,
             onPressed: () async {
@@ -372,16 +372,16 @@ class _ResultScreenState extends State<ResultScreen>
               }
             },
             child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: Text(
                 stringResources.testAgain,
-                style: TextStyle(fontSize: 20.0, color: AppColors.lightText),
+                style: const TextStyle(fontSize: 20.0, color: AppColors.lightText),
               ),
             ),
           )),
       store.share
           ? Padding(
-              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
                 onPressed: () async {
                   final result =
@@ -401,7 +401,7 @@ class _ResultScreenState extends State<ResultScreen>
           : Container(),
       store.share && FirebaseConfig.enable
           ? Padding(
-              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
                 onPressed: () async {
                   try {
@@ -437,7 +437,7 @@ class _ResultScreenState extends State<ResultScreen>
       body: LayoutBuilder(
         builder: (context, constraint) {
           return SingleChildScrollView(
-            physics: ClampingScrollPhysics(),
+            physics: const ClampingScrollPhysics(),
             controller: scrollController,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -460,7 +460,7 @@ class BlueProgressLine extends Container {
 
   double get _progressValue {
     final _rangedProgress = _progress.clamp(0, 1);
-    final _startOffset = 0.01;
+    const _startOffset = 0.01;
 
     return _startOffset + (1 - _startOffset) * _rangedProgress;
   }
@@ -472,7 +472,7 @@ class BlueProgressLine extends Container {
       widthFactor: _progressValue,
       child: Container(
         alignment: Alignment.topLeft,
-        margin: EdgeInsets.only(bottom: 10.0),
+        margin: const EdgeInsets.only(bottom: 10.0),
         height: 10,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5.0),
@@ -480,7 +480,7 @@ class BlueProgressLine extends Container {
             colors: AppColors.resultBarGradient,
             begin: Alignment.topLeft,
             end: Alignment(1 / _progressValue, 0),
-            stops: [0, 0.36, 0.61, 0.83, 1.0],
+            stops: const [0, 0.36, 0.61, 0.83, 1.0],
           ),
         ),
       ),

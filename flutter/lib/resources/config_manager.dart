@@ -78,7 +78,7 @@ class ConfigManager {
 
   Future<File> _createOrUpdateConfigListFile() async {
     final file = File('$applicationDirectory/$_configListFileName');
-    final jsonEncoder = JsonEncoder.withIndent('  ');
+    const jsonEncoder = JsonEncoder.withIndent('  ');
 
     if (!await file.exists()) {
       print('Create new config file at ' + file.path);

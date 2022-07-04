@@ -24,7 +24,7 @@ class MainKeys {
 }
 
 class MyHomePage extends StatelessWidget {
-  MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class MyHomePage extends StatelessWidget {
     final stringResources = AppLocalizations.of(context);
 
     if (state.taskConfigFailedToLoad) {
-      return ResourceErrorScreen();
+      return const ResourceErrorScreen();
     }
 
     PreferredSizeWidget? appBar;
@@ -60,9 +60,9 @@ class MyHomePage extends StatelessWidget {
           children: <Widget>[
             Expanded(flex: 6, child: _getContainer(context, state.state)),
             Padding(
-              padding: EdgeInsets.all(30),
+              padding: const EdgeInsets.all(30),
               child: Text(stringResources.measureCapability,
-                  style: TextStyle(fontSize: 16, color: AppColors.darkText)),
+                  style: const TextStyle(fontSize: 16, color: AppColors.darkText)),
             ),
             Expanded(
               flex: 5,
@@ -139,7 +139,7 @@ class MyHomePage extends StatelessWidget {
   Widget _downloadContainer(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
     final textLabel = Text(context.watch<BenchmarkState>().downloadingProgress,
-        style: TextStyle(color: AppColors.lightText, fontSize: 40));
+        style: const TextStyle(color: AppColors.lightText, fontSize: 40));
 
     return _circleContainerWithContent(
         context, textLabel, stringResources.loadingContent);
@@ -167,7 +167,7 @@ class MyPaintBottom extends CustomPainter {
 class GoButtonGradient extends StatelessWidget {
   final AsyncCallback onPressed;
 
-  GoButtonGradient(this.onPressed);
+  const GoButtonGradient(this.onPressed);
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +180,7 @@ class GoButtonGradient extends StatelessWidget {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),
-      boxShadow: [
+      boxShadow: const [
         BoxShadow(
           color: Colors.black12,
           offset: Offset(15, 15),
@@ -193,14 +193,14 @@ class GoButtonGradient extends StatelessWidget {
       decoration: decoration,
       width: MediaQuery.of(context).size.width * 0.35,
       child: MaterialButton(
-        key: Key(MainKeys.goButton),
+        key: const Key(MainKeys.goButton),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         splashColor: Colors.black,
-        shape: CircleBorder(),
+        shape: const CircleBorder(),
         onPressed: onPressed,
         child: Text(
           stringResources.go,
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.lightText,
             fontSize: 40,
           ),
@@ -217,10 +217,10 @@ Widget _circleContainerWithContent(
     child: Stack(alignment: Alignment.topCenter, children: [
       Container(
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Text(
             label,
-            style: TextStyle(color: AppColors.lightText, fontSize: 15),
+            style: const TextStyle(color: AppColors.lightText, fontSize: 15),
           ),
         ),
       ),
@@ -229,7 +229,7 @@ Widget _circleContainerWithContent(
           Container(
             width: MediaQuery.of(context).size.width * 0.35,
             alignment: Alignment.center,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.progressCircle,
               boxShadow: [

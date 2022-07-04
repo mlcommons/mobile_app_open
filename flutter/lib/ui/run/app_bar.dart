@@ -12,7 +12,7 @@ class MyAppBar {
     var actions = <Widget>[];
     if (addSettingsButton) {
       actions.add(IconButton(
-        icon: Icon(Icons.access_time),
+        icon: const Icon(Icons.access_time),
         tooltip: 'History',
         onPressed: () {
           Navigator.push(
@@ -47,11 +47,11 @@ class MyAppBar {
       title: FittedBox(
         fit: BoxFit.fitWidth,
         child: Text(title,
-            style: TextStyle(fontSize: 24, color: AppColors.lightText)),
+            style: const TextStyle(fontSize: 24, color: AppColors.lightText)),
       ),
       centerTitle: true,
       backgroundColor: AppColors.darkAppBarBackground,
-      iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
+      iconTheme: const IconThemeData(color: AppColors.lightAppBarIconTheme),
       actions: actions,
     );
   }

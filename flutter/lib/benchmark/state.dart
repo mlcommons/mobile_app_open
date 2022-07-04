@@ -272,7 +272,7 @@ class BenchmarkState extends ChangeNotifier {
   Future<void> _runBenchmarks() async {
     final cooldown = _store.cooldown;
     final cooldownPause = _store.testMode || FAST_MODE
-        ? Duration(seconds: 1)
+        ? const Duration(seconds: 1)
         : Duration(minutes: _store.cooldownDuration);
 
     final activeBenchmarks =
@@ -411,13 +411,13 @@ class BenchmarkState extends ChangeNotifier {
 
     if (!_aborting) {
       lastResult = ExtendedResult(
-        meta: ResultMetaInfo(uuid: Uuid().v4()),
+        meta: ResultMetaInfo(uuid: const Uuid().v4()),
         envInfo: DeviceInfo.environmentInfo,
         results: BenchmarkExportResultList(exportResults),
         buildInfo: BuildInfoHelper.info,
       );
       _store.previousExtendedResult =
-          JsonEncoder().convert(lastResult!.toJson());
+          const JsonEncoder().convert(lastResult!.toJson());
       await resourceManager.resultManager.saveResult(lastResult!);
     }
   }

@@ -54,12 +54,12 @@ class AppIcons {
   static final SvgPicture waiting = _pSvg('waiting_picture.svg');
 
   static DecorationImage splash_background2(String name) {
-    return DecorationImage(
+    return const DecorationImage(
         image: AssetImage('assets/splash.png'), fit: BoxFit.fill);
   }
 
   static DecorationImage splash_background() {
-    return DecorationImage(
+    return const DecorationImage(
         image: AssetImage('assets/splash.png'), fit: BoxFit.fill);
   }
 }

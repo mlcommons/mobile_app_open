@@ -139,22 +139,22 @@ class _SettingsScreen extends State<SettingsScreen> {
                   }
                 : null,
           ),
-          Divider(),
+          const Divider(),
           ListTile(
             title: Text(
               stringResources.privacyPolicy,
             ),
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () =>
                 launchUrl(Uri.parse('https://mlcommons.org/mobile_privacy')),
           ),
           ListTile(
             title: Text(stringResources.eula),
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () =>
                 launchUrl(Uri.parse('https://mlcommons.org/mobile_eula')),
           ),
-          Divider(),
+          const Divider(),
           ListTile(
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
@@ -162,7 +162,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 stringResources.taskConfigSettingsEntry,
               ),
             ),
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () async {
               if (state.state == BenchmarkStateEnum.done ||
                   state.state == BenchmarkStateEnum.waiting) {
@@ -176,7 +176,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               }
             },
           ),
-          Divider(),
+          const Divider(),
           TextButton(
             style: TextButton.styleFrom(
               textStyle: const TextStyle(fontSize: 20),
