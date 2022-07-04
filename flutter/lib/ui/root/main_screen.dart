@@ -61,8 +61,13 @@ class MyHomePage extends StatelessWidget {
             Expanded(flex: 6, child: _getContainer(context, state.state)),
             Padding(
               padding: const EdgeInsets.all(30),
-              child: Text(stringResources.measureCapability,
-                  style: const TextStyle(fontSize: 16, color: AppColors.darkText)),
+              child: Text(
+                stringResources.measureCapability,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: AppColors.darkText,
+                ),
+              ),
             ),
             Expanded(
               flex: 5,

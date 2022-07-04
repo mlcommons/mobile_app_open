@@ -86,11 +86,13 @@ class ShareScreen extends StatelessWidget {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const MyHomePage()),
+                                        builder: (context) =>
+                                            const MyHomePage()),
                                   );
                                 },
                                 child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 10, 0, 10),
                                   child: Text(
                                     stringResources.share,
                                     style: const TextStyle(
@@ -126,7 +128,8 @@ class ShareScreen extends StatelessWidget {
                       child: RichText(
                         text: TextSpan(
                           text: stringResources.promptSubText,
-                          style: const TextStyle(fontSize: 13, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 13, color: Colors.grey),
                           children: [
                             TextSpan(
                               text: stringResources.privacyPolicyButton,

@@ -224,7 +224,8 @@ class _ResultScreenState extends State<ResultScreen>
             child: Text(
               benchmark.taskConfig.name.split(' ').join('\n').toUpperCase(),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12.0, color: AppColors.lightText),
+              style:
+                  const TextStyle(fontSize: 12.0, color: AppColors.lightText),
             ),
           ),
           Text(
@@ -306,7 +307,8 @@ class _ResultScreenState extends State<ResultScreen>
               Text(
                 stringResources.detailedResults,
                 textAlign: TextAlign.left,
-                style: const TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    fontSize: 17.0, fontWeight: FontWeight.bold),
               ),
               IconButton(
                   key: const Key(ResultKeys.scrollResultsButton),
@@ -377,7 +379,10 @@ class _ResultScreenState extends State<ResultScreen>
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: Text(
                 stringResources.testAgain,
-                style: const TextStyle(fontSize: 20.0, color: AppColors.lightText),
+                style: const TextStyle(
+                  fontSize: 20.0,
+                  color: AppColors.lightText,
+                ),
               ),
             ),
           )),

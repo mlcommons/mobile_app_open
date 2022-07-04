@@ -44,8 +44,10 @@ class _ProgressCirclesState extends State<ProgressCircles> {
 
   @override
   void initState() {
-    _timer =
-        Timer.periodic(const Duration(seconds: 1), (_) => setState(_updateState));
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => setState(_updateState),
+    );
     super.initState();
   }
 
