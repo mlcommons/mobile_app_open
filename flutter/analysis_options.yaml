@@ -1,4 +1,4 @@
-include: package:pedantic/analysis_options.yaml
+include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
@@ -7,3 +7,7 @@ analyzer:
     - lib/protos/**
   strong-mode:
     implicit-casts: false
+
+linter:
+  rules:
+    avoid_print: false
