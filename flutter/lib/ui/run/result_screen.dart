@@ -430,7 +430,7 @@ class _ResultScreenState extends State<ResultScreen>
     title = _screenMode == _ScreenMode.performance
         ? stringResources.resultsPerformanceTitle
         : stringResources.resultsAccuracyTitle;
-    title = OFFICIAL_BUILD ? title : '${stringResources.unverified} $title';
+    title = isOfficialBuild ? title : '${stringResources.unverified} $title';
 
     return Scaffold(
       appBar: MyAppBar.buildAppBar(title, context, true),

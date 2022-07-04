@@ -34,24 +34,24 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get submissionMode => _getBool(_StoreConstants.submission_mode);
+  bool get submissionMode => _getBool(_StoreConstants.submissionMode);
 
   set submissionMode(bool submissionModeFlag) {
-    _storeFromDisk.setBool(_StoreConstants.submission_mode, submissionModeFlag);
+    _storeFromDisk.setBool(_StoreConstants.submissionMode, submissionModeFlag);
     notifyListeners();
   }
 
-  bool get offlineMode => _getBool(_StoreConstants.offline_mode);
+  bool get offlineMode => _getBool(_StoreConstants.offlineMode);
 
   set offlineMode(bool offlineModeFlag) {
-    _storeFromDisk.setBool(_StoreConstants.offline_mode, offlineModeFlag);
+    _storeFromDisk.setBool(_StoreConstants.offlineMode, offlineModeFlag);
     notifyListeners();
   }
 
-  bool get testMode => _getBool(_StoreConstants.test_mode);
+  bool get testMode => _getBool(_StoreConstants.testMode);
 
   set testMode(bool testModeFlag) {
-    _storeFromDisk.setBool(_StoreConstants.test_mode, testModeFlag);
+    _storeFromDisk.setBool(_StoreConstants.testMode, testModeFlag);
     notifyListeners();
   }
 
@@ -62,56 +62,56 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  int get cooldownDuration => _getInt(_StoreConstants.cooldown_duration, 5);
+  int get cooldownDuration => _getInt(_StoreConstants.cooldownDuration, 5);
 
   set cooldownDuration(int value) {
-    _storeFromDisk.setInt(_StoreConstants.cooldown_duration, value);
+    _storeFromDisk.setInt(_StoreConstants.cooldownDuration, value);
     notifyListeners();
   }
 
   String get chosenConfigurationName =>
-      _getString(_StoreConstants.chosen_configuration_name);
+      _getString(_StoreConstants.chosenConfigurationName);
 
   set chosenConfigurationName(String configurationName) {
     _storeFromDisk.setString(
-        _StoreConstants.chosen_configuration_name, configurationName);
+        _StoreConstants.chosenConfigurationName, configurationName);
     notifyListeners();
   }
 
   String get previousExtendedResult =>
-      _getString(_StoreConstants.previous_extended_result);
+      _getString(_StoreConstants.previousExtendedResult);
 
   set previousExtendedResult(String result) {
-    _storeFromDisk.setString(_StoreConstants.previous_extended_result, result);
+    _storeFromDisk.setString(_StoreConstants.previousExtendedResult, result);
   }
 
   bool isShareOptionChosen() =>
       _storeFromDisk.containsKey(_StoreConstants.share);
 
   String get previousAppVersion =>
-      _getString(_StoreConstants.previous_app_version);
+      _getString(_StoreConstants.previousAppVersion);
 
   set previousAppVersion(String value) {
-    _storeFromDisk.setString(_StoreConstants.previous_app_version, value);
+    _storeFromDisk.setString(_StoreConstants.previousAppVersion, value);
   }
 
-  bool get keepLogs => _getBool(_StoreConstants.keep_logs);
+  bool get keepLogs => _getBool(_StoreConstants.keepLogs);
 
   set keepLogs(bool value) {
-    _storeFromDisk.setBool(_StoreConstants.keep_logs, value);
+    _storeFromDisk.setBool(_StoreConstants.keepLogs, value);
     notifyListeners();
   }
 }
 
 class _StoreConstants {
   static const share = 'share';
-  static const submission_mode = 'submission mode';
-  static const offline_mode = 'offline mode';
-  static const test_mode = 'test mode';
+  static const submissionMode = 'submission mode';
+  static const offlineMode = 'offline mode';
+  static const testMode = 'test mode';
   static const cooldown = 'cooldown';
-  static const cooldown_duration = 'cooldown pause';
-  static const chosen_configuration_name = 'chosen configuration name';
-  static const previous_extended_result = 'previous extended result';
-  static const previous_app_version = 'previous app version';
-  static const keep_logs = 'keep_logs';
+  static const cooldownDuration = 'cooldown pause';
+  static const chosenConfigurationName = 'chosen configuration name';
+  static const previousExtendedResult = 'previous extended result';
+  static const previousAppVersion = 'previous app version';
+  static const keepLogs = 'keep_logs';
 }

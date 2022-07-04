@@ -9,14 +9,14 @@ class BenchmarkRunMode {
   // Let's keep them for now,
   // they are used by other apps that work with mlperf benchmark
   // they can potentially be used in the future in this app
-  static const String backendPerfomanceString = 'PerformanceOnly';
+  static const String backendPerformanceString = 'PerformanceOnly';
   static const String backendAccuracyString = 'AccuracyOnly';
   static const String backendSubmissionString = 'SubmissionRun';
 
   static const String resultSubmissionString = 'submission_mode';
   static const String resultAccuracyString = 'accuracy_mode';
   static const String resultPerformanceString = 'performance_mode';
-  static const String resultPerformance_liteString = 'performance_lite_mode';
+  static const String resultPerformanceLiteString = 'performance_lite_mode';
   static const String resultTestString = 'testing';
 
   BenchmarkRunMode._(this._mode);
@@ -29,7 +29,7 @@ class BenchmarkRunMode {
   String getBackendModeString() {
     switch (_mode) {
       case BenchmarkRunModeEnum.performance:
-        return backendPerfomanceString;
+        return backendPerformanceString;
       case BenchmarkRunModeEnum.accuracy:
         return backendAccuracyString;
       default:
@@ -40,7 +40,7 @@ class BenchmarkRunMode {
   String getResultModeString() {
     switch (_mode) {
       case BenchmarkRunModeEnum.performance:
-        return resultPerformance_liteString;
+        return resultPerformanceLiteString;
       case BenchmarkRunModeEnum.accuracy:
         return resultAccuracyString;
       default:

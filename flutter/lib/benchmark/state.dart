@@ -271,7 +271,7 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> _runBenchmarks() async {
     final cooldown = _store.cooldown;
-    final cooldownPause = _store.testMode || FAST_MODE
+    final cooldownPause = _store.testMode || isFastMode
         ? const Duration(seconds: 1)
         : Duration(minutes: _store.cooldownDuration);
 

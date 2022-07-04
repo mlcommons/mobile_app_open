@@ -21,8 +21,8 @@ class BuildInfoHelper {
     info = BuildInfo(
         version: packageInfo.version,
         buildNumber: packageInfo.buildNumber,
-        officialReleaseFlag: OFFICIAL_BUILD,
-        devTestFlag: FAST_MODE,
+        officialReleaseFlag: isOfficialBuild,
+        devTestFlag: isFastMode,
         backends: BackendList(BackendInfo.getExportBackendsList()),
         gitBranch: GeneratedBuildInfo.gitBranch,
         gitCommit: GeneratedBuildInfo.gitCommit,

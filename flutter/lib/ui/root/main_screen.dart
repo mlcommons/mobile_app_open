@@ -161,7 +161,7 @@ class MyPaintBottom extends CustomPainter {
   } // paint
 
   @override
-  bool shouldRepaint(MyPaintBottom old) => false;
+  bool shouldRepaint(MyPaintBottom oldDelegate) => false;
 }
 
 class GoButtonGradient extends StatelessWidget {

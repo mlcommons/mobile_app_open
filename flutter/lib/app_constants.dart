@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-const OFFICIAL_BUILD =
+const isOfficialBuild =
     bool.fromEnvironment('official-build', defaultValue: false);
 
-const FAST_MODE = bool.fromEnvironment('fast-mode', defaultValue: false);
+const isFastMode = bool.fromEnvironment('fast-mode', defaultValue: false);
 
 class AppColors {
   static const primary = Colors.blue;
@@ -20,12 +20,12 @@ class AppColors {
   static const lightAppBarBackground = Colors.white;
 
   static Color get darkAppBarBackground =>
-      OFFICIAL_BUILD ? const Color(0xFF31A3E2) : Colors.brown.shade400;
+      isOfficialBuild ? const Color(0xFF31A3E2) : Colors.brown.shade400;
 
   static const lightAppBarIconTheme = Colors.white;
   static const darkAppBarIconTheme = Color(0xFF135384);
 
-  static List<Color> get mainScreenGradient => OFFICIAL_BUILD
+  static List<Color> get mainScreenGradient => isOfficialBuild
       ? [
           const Color(0xFF31A3E2),
           const Color(0xFF31A3E2),
@@ -48,7 +48,7 @@ class AppColors {
         const Color(0xFF0DB526), // 0DB526
       ];
 
-  static List<Color> get progressScreenGradient => OFFICIAL_BUILD
+  static List<Color> get progressScreenGradient => isOfficialBuild
       ? [const Color(0xff3189E2), const Color(0xff0B4A7F)]
       : [Colors.brown.shade400, Colors.brown];
 

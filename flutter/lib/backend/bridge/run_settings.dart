@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 
 class RunSettings {
