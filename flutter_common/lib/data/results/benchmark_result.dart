@@ -176,7 +176,6 @@ class BenchmarkExportResultList {
       }
       throughput += item.performance!.throughput!;
       count++;
-      ;
     }
     return throughput / count;
   }
