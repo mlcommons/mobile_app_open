@@ -16,8 +16,8 @@ Future<void> showPopupDialog(BuildContext context, String header,
     builder: (context) {
       return AlertDialog(
         backgroundColor: AppColors.dialogBackground,
-        titlePadding: EdgeInsets.all(10),
-        contentPadding: EdgeInsets.fromLTRB(15, 10, 10, 10),
+        titlePadding: const EdgeInsets.all(10),
+        contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
         title:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text(header),
@@ -28,7 +28,7 @@ Future<void> showPopupDialog(BuildContext context, String header,
             children: [
               ...errors.map((e) => Text(
                     e,
-                    style: TextStyle(fontSize: 14),
+                    style: const TextStyle(fontSize: 14),
                   ))
             ],
           ),

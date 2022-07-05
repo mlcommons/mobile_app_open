@@ -79,10 +79,10 @@ class BenchmarkInfo {
 
   BenchmarkTypeEnum get type => _typeFromCode();
 
-  Widget get icon => _BENCHMARK_ICONS[scenario]?[code] ?? AppIcons.logo;
+  Widget get icon => _benchmarkIcons[scenario]?[code] ?? AppIcons.logo;
 
   Widget get iconWhite =>
-      _BENCHMARK_ICONS_WHITE[scenario]?[code] ?? AppIcons.logo;
+      _benchmarkIconsWhite[scenario]?[code] ?? AppIcons.logo;
 
   @override
   String toString() => 'Benchmark:${modelConfig.id}';
@@ -103,26 +103,26 @@ class BenchmarkInfo {
   }
 }
 
-final _BENCHMARK_ICONS = {
+final _benchmarkIcons = {
   'SingleStream': {
-    'IC': AppIcons.image_classification,
-    'OD': AppIcons.object_detection,
-    'IS': AppIcons.image_segmentation,
-    'LU': AppIcons.language_processing,
+    'IC': AppIcons.imageClassification,
+    'OD': AppIcons.objectDetection,
+    'IS': AppIcons.imageSegmentation,
+    'LU': AppIcons.languageProcessing,
   },
   'Offline': {
-    'IC': AppIcons.image_classification_offline,
+    'IC': AppIcons.imageClassificationOffline,
   },
 };
 
-final _BENCHMARK_ICONS_WHITE = {
+final _benchmarkIconsWhite = {
   'SingleStream': {
-    'IC': AppIcons.image_classification_white,
-    'OD': AppIcons.object_detection_white,
-    'IS': AppIcons.image_segmentation_white,
-    'LU': AppIcons.language_processing_white,
+    'IC': AppIcons.imageClassificationWhite,
+    'OD': AppIcons.objectDetectionWhite,
+    'IS': AppIcons.imageSegmentationWhite,
+    'LU': AppIcons.languageProcessingWhite,
   },
   'Offline': {
-    'IC': AppIcons.image_classification_offline_white,
+    'IC': AppIcons.imageClassificationOfflineWhite,
   },
 };

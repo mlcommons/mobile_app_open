@@ -12,12 +12,12 @@ class MyAppBar {
     var actions = <Widget>[];
     if (addSettingsButton) {
       actions.add(IconButton(
-        icon: Icon(Icons.access_time),
+        icon: const Icon(Icons.access_time),
         tooltip: 'History',
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => HistoryScreen()),
+            MaterialPageRoute(builder: (context) => const HistoryScreen()),
           );
         },
       ));
@@ -27,7 +27,7 @@ class MyAppBar {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ConfigScreen()),
+            MaterialPageRoute(builder: (context) => const ConfigScreen()),
           );
         },
       ));
@@ -37,7 +37,7 @@ class MyAppBar {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SettingsScreen()),
+            MaterialPageRoute(builder: (context) => const SettingsScreen()),
           );
         },
       ));
@@ -47,11 +47,11 @@ class MyAppBar {
       title: FittedBox(
         fit: BoxFit.fitWidth,
         child: Text(title,
-            style: TextStyle(fontSize: 24, color: AppColors.lightText)),
+            style: const TextStyle(fontSize: 24, color: AppColors.lightText)),
       ),
       centerTitle: true,
       backgroundColor: AppColors.darkAppBarBackground,
-      iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
+      iconTheme: const IconThemeData(color: AppColors.lightAppBarIconTheme),
       actions: actions,
     );
   }

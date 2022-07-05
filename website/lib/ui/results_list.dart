@@ -48,7 +48,7 @@ class ResultsListPageState extends State<ResultsListPage> {
       body: SingleChildScrollView(
         child: Center(
           child: Container(
-            constraints: BoxConstraints(minWidth: 100, maxWidth: 800),
+            constraints: const BoxConstraints(minWidth: 100, maxWidth: 800),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -86,18 +86,18 @@ class ResultsListPageState extends State<ResultsListPage> {
 
   Widget _createButton(String text, bool disabled, void Function() onPressed) {
     return Padding(
-        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
         child: TextButton(
           style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all<Color>(
                   disabled ? Colors.white : Colors.green),
               shape: MaterialStateProperty.all(RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14.0),
-                  side: BorderSide(color: Colors.green))),
-              minimumSize: MaterialStateProperty.all<Size>(Size(100, 0))),
+                  side: const BorderSide(color: Colors.green))),
+              minimumSize: MaterialStateProperty.all<Size>(const Size(100, 0))),
           onPressed: disabled ? null : onPressed,
           child: Padding(
-            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
             child: Text(
               text,
               style: TextStyle(

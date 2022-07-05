@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
@@ -36,12 +38,12 @@ class _RunIn extends Struct {
     backend_model_path = rs.backend_model_path.toNativeUtf8();
     backend_lib_path = rs.backend_lib_path.toNativeUtf8();
 
-    final backend_settings = rs.backend_settings.writeToBuffer();
-    backend_settings_len = backend_settings.length;
-    backend_settings_data = malloc.allocate<Uint8>(backend_settings.length);
+    final backendSettings = rs.backend_settings.writeToBuffer();
+    backend_settings_len = backendSettings.length;
+    backend_settings_data = malloc.allocate<Uint8>(backendSettings.length);
     backend_settings_data
-        .asTypedList(backend_settings.length)
-        .setAll(0, backend_settings);
+        .asTypedList(backendSettings.length)
+        .setAll(0, backendSettings);
 
     backend_native_lib_path = rs.backend_native_lib_path.toNativeUtf8();
 

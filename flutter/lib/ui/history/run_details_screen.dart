@@ -33,13 +33,13 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
   List<Widget> _makeBody() {
     return [
       ..._makeMainInfo(widget.result),
-      Divider(),
+      const Divider(),
       helper.makeHeader(l10n.historyRunDetailsPerfTitle),
       if (widget.result.performance != null)
         ..._makePerformanceInfo(widget.result.performance!)
       else
         helper.makeSubHeader(l10n.notAvailable),
-      Divider(),
+      const Divider(),
       helper.makeHeader(l10n.historyRunDetailsAccuracyTitle),
       if (widget.result.accuracy != null)
         ..._makeAccuracyInfo(widget.result.accuracy!)

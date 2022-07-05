@@ -30,7 +30,7 @@ class ResourceErrorScreen extends StatelessWidget {
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
+                child: SizedBox(
                   height: iconEdgeSize,
                   width: iconEdgeSize,
                   child: AppIcons.error,
@@ -39,7 +39,7 @@ class ResourceErrorScreen extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(35, 0, 35, 0),
+                padding: const EdgeInsets.fromLTRB(35, 0, 35, 0),
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: Column(
@@ -47,7 +47,7 @@ class ResourceErrorScreen extends StatelessWidget {
                       Text(
                         stringResources.resourceErrorMessage,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 15,
                           color: AppColors.darkText,
                         ),
@@ -55,7 +55,7 @@ class ResourceErrorScreen extends StatelessWidget {
                       Text(
                         '${stringResources.resourceErrorCurrentConfig} ${state.configManager.configLocation}',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 15,
                           color: AppColors.darkText,
                         ),

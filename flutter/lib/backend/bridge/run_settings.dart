@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 
 class RunSettings {
@@ -40,6 +42,5 @@ class RunSettings {
         single_stream_expected_latency_ns_max) {
       throw 'single_stream_expected_latency_ns must be less than $single_stream_expected_latency_ns_max but is $single_stream_expected_latency_ns';
     }
-    ;
   }
 }

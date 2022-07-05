@@ -38,11 +38,11 @@ class HistoryHelperUtils {
     return AppBar(
       title: Text(
         title,
-        style: TextStyle(fontSize: 24, color: AppColors.lightText),
+        style: const TextStyle(fontSize: 24, color: AppColors.lightText),
       ),
       centerTitle: true,
       backgroundColor: AppColors.darkAppBarBackground,
-      iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
+      iconTheme: const IconThemeData(color: AppColors.lightAppBarIconTheme),
     );
   }
 
@@ -50,7 +50,7 @@ class HistoryHelperUtils {
     return Center(
       child: Text(
         value,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 30,
           fontWeight: FontWeight.bold,
         ),
@@ -61,10 +61,10 @@ class HistoryHelperUtils {
   Widget makeSubHeader(String value) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 15.0),
+        padding: const EdgeInsets.symmetric(vertical: 15.0),
         child: Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -75,14 +75,14 @@ class HistoryHelperUtils {
 
   Widget makeInfo(String name, String value) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 0.0),
+      padding: const EdgeInsets.symmetric(vertical: 0.0),
       child: ListTile(
         minVerticalPadding: 0,
         title: Text(name),
         subtitle: GestureDetector(
           child: Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.darkText,
               fontWeight: FontWeight.bold,
               fontSize: 18.0,
@@ -92,9 +92,9 @@ class HistoryHelperUtils {
             await Clipboard.setData(ClipboardData(text: value));
             BotToast.showText(
               text: l10n.historyValueCopiedToast.replaceFirst('<name>', name),
-              animationDuration: Duration(milliseconds: 60),
-              animationReverseDuration: Duration(milliseconds: 60),
-              duration: Duration(seconds: 1),
+              animationDuration: const Duration(milliseconds: 60),
+              animationReverseDuration: const Duration(milliseconds: 60),
+              duration: const Duration(seconds: 1),
             );
           },
         ),
@@ -103,7 +103,7 @@ class HistoryHelperUtils {
   }
 
   Widget makeTable(List<RowData> rows) {
-    final borderStyle = BorderSide(
+    const borderStyle = BorderSide(
       width: 1,
       color: Colors.grey,
     );
@@ -111,27 +111,27 @@ class HistoryHelperUtils {
       width: 1,
       color: Colors.grey,
     );
-    final rowBorder = TableBorder(
+    const rowBorder = TableBorder(
       left: borderStyle,
       right: borderStyle,
       bottom: borderStyle,
       verticalInside: borderStyle,
     );
-    final headerStyle = TextStyle(fontWeight: FontWeight.bold);
-    final rowStyle = TextStyle();
+    const headerStyle = TextStyle(fontWeight: FontWeight.bold);
+    const rowStyle = TextStyle();
     final table = Column(
       children: rows.map<Widget>((rowData) {
         final style = rowData.isHeader ? headerStyle : rowStyle;
         final perfStyle = rowData.throughputValid
             ? style
-            : TextStyle(color: AppColors.darkRedText);
+            : const TextStyle(color: AppColors.darkRedText);
         final firstColumnText = Text(rowData.name, style: style);
         final firstColumn = rowData.isHeader
             ? firstColumnText
             : Row(
                 children: [
                   Expanded(child: firstColumnText),
-                  Icon(Icons.chevron_right, color: Colors.grey),
+                  const Icon(Icons.chevron_right, color: Colors.grey),
                 ],
               );
         final table = Table(
@@ -156,7 +156,7 @@ class HistoryHelperUtils {
       }).toList(),
     );
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: table,
     );
   }
@@ -185,7 +185,7 @@ TableRow _makeTableRow(List<Widget> cells) {
     children: cells.map(
       (cell) {
         return Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: cell,
         );
       },

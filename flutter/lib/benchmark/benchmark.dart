@@ -95,7 +95,7 @@ class Benchmark {
     final dataset =
         testMode ? taskConfig.testDataset : runMode.chooseDataset(taskConfig);
 
-    final _fastMode = testMode || FAST_MODE;
+    final _fastMode = testMode || isFastMode;
     var minQueryCount = _fastMode ? 8 : taskConfig.minQueryCount;
     var minDuration = _fastMode ? 10 : taskConfig.minDurationMs;
 
