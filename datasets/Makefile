@@ -92,7 +92,7 @@ ${BUILDDIR}/downloads/v2.3.0.zip:
 ${BUILDDIR}/output/state/mlperf_docker_1.1.stamp:
 	# Building mlperf_mobile docker
 	mkdir -p ${BUILDDIR}/output/state
-	docker image build -t mlperf_mobile:1.1 $(dir $(abspath ${ROOTDIR}/android/docker/mlperf_mobile/Dockerfile))
+	docker image build -t mlperf_mobile:1.1 $(dir $(abspath ${ROOTDIR}/flutter/android/docker/dataset_models/Dockerfile))
 	touch $@
 
 # No preprocessing is applied to the files
