@@ -8,387 +8,397 @@
  * @author soobong Huh (soobong.huh@samsung.com)
  */
 
-#include "type.h"
 #include "sbe_utils.hpp"
+#include "type.h"
 
 namespace sbe {
-	enum MODEL_IDX {
-		OBJECT_DETECTION = 0,
-		IMAGE_CLASSIFICATION,
-		IMAGE_SEGMENTATION,
-		MOBILE_BERT,
-		MAX_MODEL_IDX
-	};
-	
-	class model_container {
-		public:
-			int m_model_id;
-			int m_width;
-			int m_height;
-			int m_channel;
+enum MODEL_IDX {
+  OBJECT_DETECTION = 0,
+  IMAGE_CLASSIFICATION,
+  IMAGE_SEGMENTATION,
+  MOBILE_BERT,
+  MAX_MODEL_IDX
+};
 
-			/* mdl config */
-			int m_in_cnt;
-			int m_out_cnt;
-			int m_inbuf_size;
-			int m_outbuf_size;
+class model_container {
+ public:
+  int m_model_id;
+  int m_width;
+  int m_height;
+  int m_channel;
 
-			/* perf config */
-			int m_freeze;
-			bool b_enable_lazy;
-			bool b_enable_fpc;
+  /* mdl config */
+  int m_in_cnt;
+  int m_out_cnt;
+  int m_inbuf_size;
+  int m_outbuf_size;
 
-			mlperf_data_t::Type  m_inbuf_type;
-			mlperf_data_t::Type  m_outbuf_type;
+  /* perf config */
+  int m_freeze;
+  bool b_enable_lazy;
+  bool b_enable_fpc;
 
-		private:
-			std::vector<mlperf_data_t> m_input_data;
-			std::vector<mlperf_data_t> m_output_data;
+  mlperf_data_t::Type m_inbuf_type;
+  mlperf_data_t::Type m_outbuf_type;
 
-		public:
-			void set_input_data(mlperf_data_t v)
-			{
-				m_input_data.push_back(v);
-			}
+ private:
+  std::vector<mlperf_data_t> m_input_data;
+  std::vector<mlperf_data_t> m_output_data;
 
-			void set_output_data(mlperf_data_t v)
-			{
-				m_output_data.push_back(v);
-			}
+ public:
+  void set_input_data(mlperf_data_t v) { m_input_data.push_back(v); }
 
-			int get_buf_size()
-			{
-				return m_width * m_height * m_channel;
-			}
+  void set_output_data(mlperf_data_t v) { m_output_data.push_back(v); }
 
-			int get_input_size() { return m_input_data.size(); }
-			int get_output_size() { return m_output_data.size(); }
+  int get_buf_size() { return m_width * m_height * m_channel; }
 
-			mlperf_data_t get_input_type(int idx) { return m_input_data.at(idx); }
-			mlperf_data_t get_output_type(int idx) { return m_output_data.at(idx); }
+  int get_input_size() { return m_input_data.size(); }
+  int get_output_size() { return m_output_data.size(); }
 
-			void unset_lazy() { b_enable_lazy = false; }
-			virtual void init()=0;
+  mlperf_data_t get_input_type(int idx) { return m_input_data.at(idx); }
+  mlperf_data_t get_output_type(int idx) { return m_output_data.at(idx); }
 
-			void deinit() {
-				m_input_data.clear();
-				m_input_data.shrink_to_fit();
+  void unset_lazy() { b_enable_lazy = false; }
+  virtual void init() = 0;
 
-				m_output_data.clear();
-				m_output_data.shrink_to_fit();
-			}
+  void deinit() {
+    m_input_data.clear();
+    m_input_data.shrink_to_fit();
 
-			model_container(int w, int h, int c, int in, int out, int mdl_id) {
-				m_model_id = mdl_id;
-				m_width = w;
-				m_height = h;
-				m_channel = c;
-				m_in_cnt = in;
-				m_out_cnt = out;
-				m_freeze = 0;
-				b_enable_lazy = false;
-				b_enable_fpc = false;
-			}
+    m_output_data.clear();
+    m_output_data.shrink_to_fit();
+  }
 
-			~model_container() {
-				deinit();
-			}
-	};
+  model_container(int w, int h, int c, int in, int out, int mdl_id) {
+    m_model_id = mdl_id;
+    m_width = w;
+    m_height = h;
+    m_channel = c;
+    m_in_cnt = in;
+    m_out_cnt = out;
+    m_freeze = 0;
+    b_enable_lazy = false;
+    b_enable_fpc = false;
+  }
 
-	class mdl_attribute_template {
-		public:
-			/* model attribute */
-			int m_width;
-			int m_height;
-			int m_channel;
+  ~model_container() { deinit(); }
+};
 
-			int m_in_cnt;
-			int m_out_cnt;
-			int m_inbuf_size;
-			int m_outbuf_size;
+class mdl_attribute_template {
+ public:
+  /* model attribute */
+  int m_width;
+  int m_height;
+  int m_channel;
 
-			mlperf_data_t::Type m_inbuf_type;
-			mlperf_data_t::Type m_outbuf_type;
+  int m_in_cnt;
+  int m_out_cnt;
+  int m_inbuf_size;
+  int m_outbuf_size;
 
-			/* others */
-			int m_preset_id;
-			bool b_enable_fpc;
-			int m_freeze;
-			bool b_enable_lazy;
+  mlperf_data_t::Type m_inbuf_type;
+  mlperf_data_t::Type m_outbuf_type;
 
-		public:
-			int get_byte(mlperf_data_t::Type type) {
-				switch (type) {
-					case mlperf_data_t::Uint8:
-						return 1;
-					case mlperf_data_t::Int8:
-						return 1;
-					case mlperf_data_t::Float16:
-						return 2;
-					case mlperf_data_t::Int32:
-					case mlperf_data_t::Float32:
-						return 4;
-					case mlperf_data_t::Int64:
-						return 8;
-				}
-			}
+  /* others */
+  int m_preset_id;
+  bool b_enable_fpc;
+  int m_freeze;
+  bool b_enable_lazy;
 
-			void update(model_container* ptr)
-			{
-				ptr->m_in_cnt = m_in_cnt;
-				ptr->m_out_cnt = m_out_cnt;
+ public:
+  int get_byte(mlperf_data_t::Type type) {
+    switch (type) {
+      case mlperf_data_t::Uint8:
+        return 1;
+      case mlperf_data_t::Int8:
+        return 1;
+      case mlperf_data_t::Float16:
+        return 2;
+      case mlperf_data_t::Int32:
+      case mlperf_data_t::Float32:
+        return 4;
+      case mlperf_data_t::Int64:
+        return 8;
+    }
+  }
 
-				ptr->m_inbuf_size = m_inbuf_size;
-				ptr->m_outbuf_size = m_outbuf_size;
-				ptr->m_inbuf_type = m_inbuf_type;
-				ptr->m_outbuf_type = m_outbuf_type;
-				ptr->b_enable_fpc = b_enable_fpc;
-				ptr->m_freeze = m_freeze;
-				ptr->b_enable_lazy = b_enable_lazy;
-			}
+  void update(model_container* ptr) {
+    ptr->m_in_cnt = m_in_cnt;
+    ptr->m_out_cnt = m_out_cnt;
 
-			void show() {
-				MLOGV("mdl_attribute_template : ");
-				MLOGV("m_preset_id : %d", m_preset_id);
-				MLOGV("m_width : %d", m_width);
-				MLOGV("m_height : %d", m_height);
-				MLOGV("m_channel : %d", m_channel);
-				MLOGV("m_in_cnt : %d", m_in_cnt);
-				MLOGV("m_out_cnt : %d", m_out_cnt);
-				MLOGV("m_inbuf_size : %d", m_inbuf_size);
-				MLOGV("m_outbuf_size : %d", m_outbuf_size);
-				MLOGV("m_inbuf_type : %d", m_inbuf_type);
-				MLOGV("m_outbuf_type : %d", m_outbuf_type);
-				MLOGV("b_enable_fpc : %d", b_enable_fpc);
-				MLOGV("m_freeze : %d", m_freeze);
-				MLOGV("b_lazy : %d", b_enable_lazy);
-			}
+    ptr->m_inbuf_size = m_inbuf_size;
+    ptr->m_outbuf_size = m_outbuf_size;
+    ptr->m_inbuf_type = m_inbuf_type;
+    ptr->m_outbuf_type = m_outbuf_type;
+    ptr->b_enable_fpc = b_enable_fpc;
+    ptr->m_freeze = m_freeze;
+    ptr->b_enable_lazy = b_enable_lazy;
+  }
 
-		public:
-			mdl_attribute_template() {
-				m_width=0;
-				m_height=0;
-				m_channel=0;
-				m_in_cnt=1;
-				m_out_cnt=1;
-				m_inbuf_size=0;
-				m_outbuf_size=0;
-				m_inbuf_type=mlperf_data_t::Uint8;
-				m_outbuf_type=mlperf_data_t::Uint8;
-				m_preset_id=1001;
-				b_enable_fpc=false;
-				m_freeze=0;
-				b_enable_lazy = false;
-			}
-	};
-	mdl_attribute_template mdl_attr;
+  void show() {
+    MLOGV("mdl_attribute_template : ");
+    MLOGV("m_preset_id : %d", m_preset_id);
+    MLOGV("m_width : %d", m_width);
+    MLOGV("m_height : %d", m_height);
+    MLOGV("m_channel : %d", m_channel);
+    MLOGV("m_in_cnt : %d", m_in_cnt);
+    MLOGV("m_out_cnt : %d", m_out_cnt);
+    MLOGV("m_inbuf_size : %d", m_inbuf_size);
+    MLOGV("m_outbuf_size : %d", m_outbuf_size);
+    MLOGV("m_inbuf_type : %d", m_inbuf_type);
+    MLOGV("m_outbuf_type : %d", m_outbuf_type);
+    MLOGV("b_enable_fpc : %d", b_enable_fpc);
+    MLOGV("m_freeze : %d", m_freeze);
+    MLOGV("b_lazy : %d", b_enable_lazy);
+  }
 
-	namespace sbeID2200 {
-		class classification : public model_container {
-			public :
-				void init() override {
-					MLOGV("on target model : classification");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({(m_inbuf_type), m_inbuf_size});
+ public:
+  mdl_attribute_template() {
+    m_width = 0;
+    m_height = 0;
+    m_channel = 0;
+    m_in_cnt = 1;
+    m_out_cnt = 1;
+    m_inbuf_size = 0;
+    m_outbuf_size = 0;
+    m_inbuf_type = mlperf_data_t::Uint8;
+    m_outbuf_type = mlperf_data_t::Uint8;
+    m_preset_id = 1001;
+    b_enable_fpc = false;
+    m_freeze = 0;
+    b_enable_lazy = false;
+  }
+};
+mdl_attribute_template mdl_attr;
 
-					for(int i=0;i<m_out_cnt;i++)
-						set_output_data({m_outbuf_type, (int64_t)(m_outbuf_size / sizeof(float))});
-				}
-			public :
-				classification():model_container(224, 224, 3, 1, 1, IMAGE_CLASSIFICATION) {}
-		};
+namespace sbeID2200 {
+class classification : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model : classification");
+    for (int i = 0; i < m_in_cnt; i++)
+      set_input_data({(m_inbuf_type), m_inbuf_size});
 
-		class classification_offline : public model_container {
-			public :
-				void init() override {
-					MLOGV("on target model : classification offline");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({m_inbuf_type, m_inbuf_size});
+    for (int i = 0; i < m_out_cnt; i++)
+      set_output_data(
+          {m_outbuf_type, (int64_t)(m_outbuf_size / sizeof(float))});
+  }
 
-					for(int i=0;i<m_out_cnt;i++)
-						set_output_data({m_outbuf_type, (int64_t)(m_outbuf_size / sizeof(float))});
-				}				
-			public :
-				classification_offline():model_container(224, 224, 3, 1, 1, IMAGE_CLASSIFICATION) {}
-		};
+ public:
+  classification() : model_container(224, 224, 3, 1, 1, IMAGE_CLASSIFICATION) {}
+};
 
-		class mobilebert : public model_container {
-			public :				
-				void init() override {
-					MLOGV("on target model [mobile_bert]");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({m_inbuf_type, 384});
+class classification_offline : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model : classification offline");
+    for (int i = 0; i < m_in_cnt; i++)
+      set_input_data({m_inbuf_type, m_inbuf_size});
 
-					for(int i=0;i<m_out_cnt;i++)
-						set_output_data({m_outbuf_type, 384});
-				}
-			public :
-				mobilebert():model_container(384, 384, 3, 3, 2, MOBILE_BERT) {}
-		};
+    for (int i = 0; i < m_out_cnt; i++)
+      set_output_data(
+          {m_outbuf_type, (int64_t)(m_outbuf_size / sizeof(float))});
+  }
 
-		class segmentation : public model_container {
-			public :				
-				void init() override {
-					MLOGV("on target model : segemenatation");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({m_inbuf_type, m_inbuf_size});
+ public:
+  classification_offline()
+      : model_container(224, 224, 3, 1, 1, IMAGE_CLASSIFICATION) {}
+};
 
-					for(int i=0;i<m_out_cnt;i++)
-						set_output_data({m_outbuf_type, m_outbuf_size});
-				}
-			public :
-				segmentation():model_container(512, 512, 3, 1, 1, IMAGE_SEGMENTATION) {}
-		};
+class mobilebert : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model [mobile_bert]");
+    for (int i = 0; i < m_in_cnt; i++) set_input_data({m_inbuf_type, 384});
 
-		class detection : public model_container {
-			public :				
-				void init() override {
-					MLOGV("on target model : detection");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({m_inbuf_type, m_inbuf_size});
-					
-					set_output_data({m_outbuf_type, m_outbuf_size/7});
-					set_output_data({m_outbuf_type, m_outbuf_size/28});
-					set_output_data({m_outbuf_type, m_outbuf_size/28});
-					set_output_data({m_outbuf_type, 1});
-				}
-			public :
-				int det_block_cnt;
-				int det_block_size;
-			public :
-				detection():model_container(320, 320, 3, 1, 1, OBJECT_DETECTION),
-										det_block_cnt(11), det_block_size(7) {}
-		};
+    for (int i = 0; i < m_out_cnt; i++) set_output_data({m_outbuf_type, 384});
+  }
 
-		detection obj_od;
-		classification obj_ic;
-		classification_offline obj_ic_offline;
-		segmentation obj_is;
-		mobilebert obj_bert;
-	}
+ public:
+  mobilebert() : model_container(384, 384, 3, 3, 2, MOBILE_BERT) {}
+};
 
-	namespace sbeID1200 {
-		class detection : public model_container {
-			public :
-				void init() override {
-					MLOGV("on target model : detection");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({m_inbuf_type, m_inbuf_size});
-					
-					set_output_data({m_outbuf_type, m_outbuf_size/7});
-					set_output_data({m_outbuf_type, m_outbuf_size/28});
-					set_output_data({m_outbuf_type, m_outbuf_size/28});
-					set_output_data({m_outbuf_type, 1});
-				}
-			public :
-				int det_block_cnt;
-				int det_block_size;
-			public :
-				detection():model_container(320, 320, 3, 1, 1, OBJECT_DETECTION),
-										det_block_cnt(11), det_block_size(7) {}
-		};
+class segmentation : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model : segemenatation");
+    for (int i = 0; i < m_in_cnt; i++)
+      set_input_data({m_inbuf_type, m_inbuf_size});
 
-		class classification : public model_container {
-			public :
-				void init() override {
-					MLOGV("on target model : classification");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({(m_inbuf_type), m_inbuf_size});
+    for (int i = 0; i < m_out_cnt; i++)
+      set_output_data({m_outbuf_type, m_outbuf_size});
+  }
 
-					for(int i=0;i<m_out_cnt;i++)
-						set_output_data({m_outbuf_type, (int64_t)(m_outbuf_size / sizeof(float))});
-				}
-			public :
-				classification():model_container(224, 224, 3, 1, 1, IMAGE_CLASSIFICATION) {}
-		};
+ public:
+  segmentation() : model_container(512, 512, 3, 1, 1, IMAGE_SEGMENTATION) {}
+};
 
-		class segmentation : public model_container {
-			public :
-				void init() override {
-					MLOGV("on target model : segemenatation");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({m_inbuf_type, m_inbuf_size});
+class detection : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model : detection");
+    for (int i = 0; i < m_in_cnt; i++)
+      set_input_data({m_inbuf_type, m_inbuf_size});
 
-					for(int i=0;i<m_out_cnt;i++)
-						set_output_data({m_outbuf_type, m_outbuf_size});
-				}
-			public :
-				segmentation():model_container(512, 512, 3, 1, 1, IMAGE_SEGMENTATION) {}
-		};
+    set_output_data({m_outbuf_type, m_outbuf_size / 7});
+    set_output_data({m_outbuf_type, m_outbuf_size / 28});
+    set_output_data({m_outbuf_type, m_outbuf_size / 28});
+    set_output_data({m_outbuf_type, 1});
+  }
 
-		detection obj_od;
-		classification obj_ic;
-		segmentation obj_is;
-	}
+ public:
+  int det_block_cnt;
+  int det_block_size;
 
-	namespace sbeID2100 {
-		class detection : public model_container {
-			public :
-				void init() override {
-					MLOGV("on target model : detection");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({m_inbuf_type, m_inbuf_size});
-					
-					set_output_data({m_outbuf_type, m_outbuf_size/7});
-					set_output_data({m_outbuf_type, m_outbuf_size/28});
-					set_output_data({m_outbuf_type, m_outbuf_size/28});
-					set_output_data({m_outbuf_type, 1});
-				}
-			public :
-				int det_block_cnt;
-				int det_block_size;
-			public :
-				detection():model_container(320, 320, 3, 1, 4, OBJECT_DETECTION),
-										det_block_cnt(11), det_block_size(7) {}
-		};
+ public:
+  detection()
+      : model_container(320, 320, 3, 1, 1, OBJECT_DETECTION),
+        det_block_cnt(11),
+        det_block_size(7) {}
+};
 
-		class classification : public model_container {
-			public :
-				void init() override {
-					MLOGV("on target model : classification");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({(m_inbuf_type), m_inbuf_size});
+detection obj_od;
+classification obj_ic;
+classification_offline obj_ic_offline;
+segmentation obj_is;
+mobilebert obj_bert;
+}  // namespace sbeID2200
 
-					for(int i=0;i<m_out_cnt;i++)
-						set_output_data({m_outbuf_type, (int64_t)(m_outbuf_size / sizeof(float))});
-				}
-			public :
-				classification():model_container(224, 224, 3, 1, 1, IMAGE_CLASSIFICATION) {}
-		};
+namespace sbeID1200 {
+class detection : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model : detection");
+    for (int i = 0; i < m_in_cnt; i++)
+      set_input_data({m_inbuf_type, m_inbuf_size});
 
-		class segmentation : public model_container {
-			public :
-				void init() override {
-					MLOGV("on target model : segemenatation");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({m_inbuf_type, m_inbuf_size});
+    set_output_data({m_outbuf_type, m_outbuf_size / 7});
+    set_output_data({m_outbuf_type, m_outbuf_size / 28});
+    set_output_data({m_outbuf_type, m_outbuf_size / 28});
+    set_output_data({m_outbuf_type, 1});
+  }
 
-					for(int i=0;i<m_out_cnt;i++)
-						set_output_data({m_outbuf_type, m_outbuf_size});
-				}
-			public :
-				segmentation():model_container(512, 512, 3, 1, 1, IMAGE_SEGMENTATION) {}
-		};
+ public:
+  int det_block_cnt;
+  int det_block_size;
 
-		class mobilebert : public model_container {
-			public :
-				void init() override {
-					MLOGV("on target model [mobile_bert]");
-					for(int i=0;i<m_in_cnt;i++)
-						set_input_data({m_inbuf_type, 384});
+ public:
+  detection()
+      : model_container(320, 320, 3, 1, 1, OBJECT_DETECTION),
+        det_block_cnt(11),
+        det_block_size(7) {}
+};
 
-					for(int i=0;i<m_out_cnt;i++)
-						set_output_data({m_outbuf_type, 384});
-				}
-			public :
-				mobilebert():model_container(384, 384, 3, 3, 2, MOBILE_BERT) {}
-		};
+class classification : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model : classification");
+    for (int i = 0; i < m_in_cnt; i++)
+      set_input_data({(m_inbuf_type), m_inbuf_size});
 
-		detection obj_od;
-		classification obj_ic;
-		segmentation obj_is;
-		mobilebert obj_bert;
-	}
-}
+    for (int i = 0; i < m_out_cnt; i++)
+      set_output_data(
+          {m_outbuf_type, (int64_t)(m_outbuf_size / sizeof(float))});
+  }
+
+ public:
+  classification() : model_container(224, 224, 3, 1, 1, IMAGE_CLASSIFICATION) {}
+};
+
+class segmentation : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model : segemenatation");
+    for (int i = 0; i < m_in_cnt; i++)
+      set_input_data({m_inbuf_type, m_inbuf_size});
+
+    for (int i = 0; i < m_out_cnt; i++)
+      set_output_data({m_outbuf_type, m_outbuf_size});
+  }
+
+ public:
+  segmentation() : model_container(512, 512, 3, 1, 1, IMAGE_SEGMENTATION) {}
+};
+
+detection obj_od;
+classification obj_ic;
+segmentation obj_is;
+}  // namespace sbeID1200
+
+namespace sbeID2100 {
+class detection : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model : detection");
+    for (int i = 0; i < m_in_cnt; i++)
+      set_input_data({m_inbuf_type, m_inbuf_size});
+
+    set_output_data({m_outbuf_type, m_outbuf_size / 7});
+    set_output_data({m_outbuf_type, m_outbuf_size / 28});
+    set_output_data({m_outbuf_type, m_outbuf_size / 28});
+    set_output_data({m_outbuf_type, 1});
+  }
+
+ public:
+  int det_block_cnt;
+  int det_block_size;
+
+ public:
+  detection()
+      : model_container(320, 320, 3, 1, 4, OBJECT_DETECTION),
+        det_block_cnt(11),
+        det_block_size(7) {}
+};
+
+class classification : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model : classification");
+    for (int i = 0; i < m_in_cnt; i++)
+      set_input_data({(m_inbuf_type), m_inbuf_size});
+
+    for (int i = 0; i < m_out_cnt; i++)
+      set_output_data(
+          {m_outbuf_type, (int64_t)(m_outbuf_size / sizeof(float))});
+  }
+
+ public:
+  classification() : model_container(224, 224, 3, 1, 1, IMAGE_CLASSIFICATION) {}
+};
+
+class segmentation : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model : segemenatation");
+    for (int i = 0; i < m_in_cnt; i++)
+      set_input_data({m_inbuf_type, m_inbuf_size});
+
+    for (int i = 0; i < m_out_cnt; i++)
+      set_output_data({m_outbuf_type, m_outbuf_size});
+  }
+
+ public:
+  segmentation() : model_container(512, 512, 3, 1, 1, IMAGE_SEGMENTATION) {}
+};
+
+class mobilebert : public model_container {
+ public:
+  void init() override {
+    MLOGV("on target model [mobile_bert]");
+    for (int i = 0; i < m_in_cnt; i++) set_input_data({m_inbuf_type, 384});
+
+    for (int i = 0; i < m_out_cnt; i++) set_output_data({m_outbuf_type, 384});
+  }
+
+ public:
+  mobilebert() : model_container(384, 384, 3, 3, 2, MOBILE_BERT) {}
+};
+
+detection obj_od;
+classification obj_ic;
+segmentation obj_is;
+mobilebert obj_bert;
+}  // namespace sbeID2100
+}  // namespace sbe
 
 #endif
