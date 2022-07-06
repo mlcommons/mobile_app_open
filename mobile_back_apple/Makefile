@@ -2,7 +2,8 @@
 # It will be removed after finishing integrating Core ML backend.
 
 
-REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
+#REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
+REPO_ROOT_DIR="/Users/freedom/work/mobile_app_open"
 
 tflite: tflite-build tflite-run
 coreml: coreml-build coreml-run
@@ -26,7 +27,8 @@ tflite-run:
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \
-	bazel build -c opt --cxxopt=-std=c++14 --host_cxxopt=-std=c++14 //flutter/cpp/binary:main //mobile_back_apple:coremlbackend
+	bazel build -c opt --cxxopt=-std=c++14 --host_cxxopt=-std=c++14 //flutter/cpp/binary:main //mobile_back_apple:coremlbackend \
+        --cxxopt=-xobjective-c++
 
 coreml-run:
 	cd ${REPO_ROOT_DIR} && \

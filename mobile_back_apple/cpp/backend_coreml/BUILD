@@ -24,11 +24,18 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+objc_library(
+    name = "foo",
+    srcs = ["util.m"],
+    sdk_frameworks = ["CoreML"],
+)
+
 cc_library(
     name = "coreml_c",
-    srcs = ["main.cc"],
+    srcs = ["main.cc", "coreml_settings.h"],
     deps = [
         "//flutter/cpp/c:headers",
+        ":foo",
     ],
     alwayslink = 1,
 )
