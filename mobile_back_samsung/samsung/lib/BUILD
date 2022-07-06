@@ -17,12 +17,12 @@ cc_library(
         ],
     }),
     hdrs = [
-        "backend_c.h",
-        "sbe_config.hpp",
-        "sbe_core.hpp",
         "sbe_helper.hpp",
-        "sbe_loader.hpp",
         "sbe_utils.hpp",
+        "sbe_core.hpp",
+        "sbe_config.hpp",
+        "sbe_loader.hpp",
+        "backend_c.h",
         "type.h",
     ],
 )
