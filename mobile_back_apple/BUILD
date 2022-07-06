@@ -3,16 +3,7 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-load("@rules_cc//cc:defs.bzl", "objc_library")
-
-objc_library(
-    name = "applelib",
-    srcs = [
-        "cpp/backend_apple/main.mm",
-    ],
-    hdrs = glob(["cpp/backend_apple/*.h"]),
-    deps = [
-        "//flutter/cpp/c:headers",
-    ],
-    alwayslink = 1,
+cc_library(
+    name = "coremlbackend",
+    srcs = ["//mobile_back_apple/cpp/backend_coreml:libcoremlbackend.so"],
 )

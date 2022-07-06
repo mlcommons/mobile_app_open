@@ -43,7 +43,7 @@ cc_library(
         "//flutter/cpp/flutter:bridge",
         # TODO(anhappdev) Add option to choose between TFLite and CoreML
         # "//mobile_back_tflite/cpp/backend_tflite:tflite_c",
-        "//mobile_back_apple:applelib",
+        "//mobile_back_apple:coremlbackend",
     ],
 )
 
