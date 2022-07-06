@@ -23,27 +23,27 @@ limitations under the License.
  */
 
 #include <dlfcn.h>
-
-#include "sbe_utils.hpp"
 #include "type.h"
+#include "sbe_utils.hpp"
 
 namespace sbe {
 std::string sbe_core_libs[CORE_MAX] = {
-    "libsbe1200_core.so", /* TODO it must be replaced to libsbe2100_core */
-    "libsbe1200_core.so",
-    "libsbe2200_core.so",
+  "libsbe1200_core.so",
+  "libsbe2100_core.so",
+  "libsbe2200_core.so",
 };
 
 void* load_symbol(void* dl_handle, const char* name) {
   auto func_pt = dlsym(dl_handle, name);
-  if (func_pt == nullptr) {
+  if(func_pt==nullptr) {
     MLOGD("dlopen fail. symbol[%s]", name);
   }
   return func_pt;
 }
 
 #define link_symbol(dl_handle, symbol_name) \
-  reinterpret_cast<symbol_name##_t>(load_symbol(dl_handle, #symbol_name))
-}  // namespace sbe
+  reinterpret_cast<symbol_name##_t>(    \
+  load_symbol(dl_handle, #symbol_name))
+}
 
 #endif
