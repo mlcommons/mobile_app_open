@@ -9,6 +9,7 @@ import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/icons.dart' show AppIcons;
 import 'package:mlperfbench/ui/page_constraints.dart';
+import 'package:mlperfbench/ui/settings/task_config_screen.dart';
 
 class ResourceErrorScreen extends StatelessWidget {
   const ResourceErrorScreen({Key? key}) : super(key: key);
@@ -68,13 +69,10 @@ class ResourceErrorScreen extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () async {
-                          try {
-                            await state.setTaskConfig(name: '');
-                            state.deferredLoadResources();
-                          } catch (e, trace) {
-                            print("can't change task config: $e");
-                            print(trace);
-                          }
+                          final taskConfigs = await state.configManager.getConfigs();
+
+                          await Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => TaskConfigScreen(taskConfigs)));
                         },
                         child:
                             Text(stringResources.resourceErrorSwitchToDefault),

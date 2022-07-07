@@ -12,6 +12,8 @@ import 'utils.dart';
 const _configListFileName = 'benchmarksConfigurations.json';
 const _defaultConfigName = 'default';
 const _defaultConfigUrl = 'asset://assets/tasks.pbtxt';
+const _offlineConfigName = 'offline';
+const _offlineConfigUrl = 'asset://assets/tasks_offline.pbtxt';
 
 class TaskConfigDescription {
   final String name;
@@ -31,6 +33,8 @@ class ConfigManager {
   final ResourceManager resourceManager;
   final TaskConfigDescription defaultConfig =
       TaskConfigDescription(_defaultConfigName, _defaultConfigUrl);
+  final TaskConfigDescription offlineConfig =
+      TaskConfigDescription(_offlineConfigName, _offlineConfigUrl);
 
   String configLocation = '';
   late pb.MLPerfConfig decodedConfig;
@@ -83,6 +87,7 @@ class ConfigManager {
     if (!await file.exists()) {
       print('Create new config file at ' + file.path);
       await file.writeAsString(jsonEncoder.convert(defaultConfig.asMap()));
+      await file.writeAsString(jsonEncoder.convert(offlineConfig.asMap()));
       return file;
     }
 

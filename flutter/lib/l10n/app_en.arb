@@ -75,7 +75,7 @@
   "luInfoDescription": "Question Answering finds the  best answer to an input question based on a body of text. The reference model, MobileBERT, is evaluated on the Stanford Question Answering Dataset (SQUAD) v1.1 Dev and achieves an F1-score of 90.0.\n\nMobileBERT is a thin, mobile-optimized version of the larger BERT (BERT_LARGE) network, equipped with bottleneck structures and a carefully designed balance between self-attention and feed-forward networks. Like BERT, it is task-agnostic, applicable for a variety of downstream NLP tasks, but for MLPerf we use the variant fine-tuned for Q&A.",
   "clearCache": "Clear cache",
   "resourceErrorMessage": "Some resources failed to load.\nIf you didn't change config from default you can try clearing the cache.\nIf you use a custom configuration file ensure that it has correct structure or switch back to default config.",
-  "resourceErrorSwitchToDefault": "Switch to default config",
+  "resourceErrorSwitchToDefault": "Select Task config",
   "resourceErrorCurrentConfig": "Current config file: ",
   "resourceErrorRereadConfig": "I have fixed current config, try again",
   "resourceErrorFail": "Config failed to load",
