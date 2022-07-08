@@ -25,17 +25,21 @@ package(
 )
 
 objc_library(
-    name = "foo",
-    srcs = ["util.m"],
+    name = "coreml_util",
+    srcs = ["coreml_util.mm"],
+    hdrs = ["coreml_util.h"],
     sdk_frameworks = ["CoreML"],
 )
 
 cc_library(
     name = "coreml_c",
-    srcs = ["main.cc", "coreml_settings.h"],
+    srcs = [
+        "coreml_settings.h",
+        "main.cc",
+    ],
     deps = [
+        ":coreml_util",
         "//flutter/cpp/c:headers",
-        ":foo",
     ],
     alwayslink = 1,
 )

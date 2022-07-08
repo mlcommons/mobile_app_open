@@ -1,12 +1,11 @@
+#import <CoreML/CoreML.h>
+
 #include <cstring>
 
 #include "coreml_settings.h"
-#include "coreml_settings.h"
-
+#include "coreml_util.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
-
-#import <CoreML/CoreML.h>
 
 struct CoreMLBackendData {
   const char *name = "Core ML";
@@ -48,6 +47,10 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 mlperf_backend_ptr_t mlperf_backend_create(
     const char *model_path, mlperf_backend_configuration_t *configs,
     const char *native_lib_path) {
+
+  // Test calling Objective-C method
+  CoreMLDelegate *coremlDelegate = [[CoreMLDelegate alloc] init];
+  [coremlDelegate hello];
 
   // Verify only one instance of the backend exists at any time
   if (backendExists) {

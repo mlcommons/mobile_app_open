@@ -2,8 +2,8 @@
 # It will be removed after finishing integrating Core ML backend.
 
 
-#REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
-REPO_ROOT_DIR="/Users/freedom/work/mobile_app_open"
+REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
+#REPO_ROOT_DIR="/Users/freedom/work/mobile_app_open"
 
 tflite: tflite-build tflite-run
 coreml: coreml-build coreml-run
