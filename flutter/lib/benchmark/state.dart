@@ -66,6 +66,9 @@ class BenchmarkState extends ChangeNotifier {
   late final ConfigManager configManager;
   late final BackendInfo backendInfo;
 
+  Object? error;
+  StackTrace? stackTrace;
+
   bool taskConfigFailedToLoad = false;
   String currentLogDir = '';
   // null - downloading/waiting; false - running; true - done
@@ -152,6 +155,8 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
+      error = e;
+      stackTrace = trace;
       taskConfigFailedToLoad = true;
       notifyListeners();
     }
@@ -165,6 +170,8 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
+      error = e;
+      stackTrace = trace;
       taskConfigFailedToLoad = true;
       notifyListeners();
     }
@@ -181,7 +188,8 @@ class BenchmarkState extends ChangeNotifier {
     await resourceManager.handleResources(
         _middle.listResources(), needToPurgeCache);
     print('finished loading resources');
-
+    error = null;
+    stackTrace = null;
     taskConfigFailedToLoad = false;
     await Wakelock.disable();
   }
@@ -200,6 +208,8 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
+      result.error = e;
+      result.stackTrace = trace;
       result.taskConfigFailedToLoad = true;
     }
     return result;
@@ -215,6 +225,8 @@ class BenchmarkState extends ChangeNotifier {
     }
     await configManager.loadConfig(name);
     _store.chosenConfigurationName = name;
+    error = null;
+    stackTrace = null;
     taskConfigFailedToLoad = false;
 
     _middle = BenchmarkList(
@@ -581,6 +593,8 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print('unable to restore previous extended result: $e');
       print(trace);
+      error = e;
+      stackTrace = trace;
       _store.previousExtendedResult = '';
       resetCurrentResults();
       _doneRunning = null;
