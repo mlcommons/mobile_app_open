@@ -18,6 +18,8 @@ ifeq (${WITH_TFLITE},1)
   backend_tflite_windows_target=//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.dll
   backend_tflite_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
   backend_tflite_android_target=//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.so
+  backend_tflite_ios_target=//mobile_back_tflite/cpp/backend_tflite/ios:libtflitebackend
+  backend_tflite_ios_zip=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/ios/libtflitebackend.xcframework.zip
   backend_tflite_filename=libtflitebackend
 else
   # tflite is enabled by default, so print log message only if someone disabled it

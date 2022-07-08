@@ -124,7 +124,6 @@ tflite_jni_binary(
 
 tflite_jni_binary(
     name = "libtfliteneuronbackend.so",
-    exported_symbols = "//flutter/cpp/c:exported_symbols.lds",
     linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [
         ":tflite_neuron_c",
