@@ -30,11 +30,6 @@ class BackendInfo {
         return BackendInfo._(backendSettings, path);
       }
     }
-    // try built-in backend
-    // final backendSetting = backendMatch('');
-    // if (backendSetting != null) {
-    //   return BackendInfo._(backendSetting, '');
-    // }
     throw 'no matching backend found';
   }
 
@@ -47,10 +42,7 @@ class BackendInfo {
   }
 
   static List<String> getExportBackendsList() {
-    if (Platform.isIOS) {
-      // on iOS backend is statically linked
-      return ['built-in tflite'];
-    } else if (Platform.isWindows || Platform.isAndroid) {
+    if (Platform.isWindows || Platform.isAndroid || Platform.isIOS) {
       final result = List<String>.from(_backendsList);
       result.removeWhere((element) => element == '');
       return result;
