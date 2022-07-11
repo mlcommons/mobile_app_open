@@ -8,6 +8,7 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/run/progress_circles.dart';
+import 'package:mlperfbench/ui/time_utils.dart';
 
 class ProgressScreen extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey =
@@ -126,8 +127,18 @@ class _ProgressScreenState extends State<ProgressScreen> {
         ),
       ),
       Text(
-        l10n.progressScreenStage.replaceFirst('<percent>',
-            (progress.stageProgress * 100).round().clamp(0, 100).toString()),
+        progress.cooldown
+            ? l10n.progressScreenCooldown.replaceAll(
+                '<remaining>',
+                formatDuration((progress.cooldownDurationMs *
+                        (1.0 - progress.stageProgress))
+                    .round()))
+            : l10n.progressScreenStage.replaceFirst(
+                '<percent>',
+                (progress.stageProgress * 100)
+                    .round()
+                    .clamp(0, 100)
+                    .toString()),
         style: const TextStyle(
           fontWeight: FontWeight.bold,
           color: AppColors.lightText,

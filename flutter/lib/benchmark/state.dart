@@ -52,6 +52,7 @@ class ProgressInfo {
   BenchmarkInfo? info;
   int totalStages = 0;
   int currentStage = 0;
+  int cooldownDurationMs = 0;
   double get stageProgress => calculateStageProgress?.call() ?? 0.0;
 
   double Function()? calculateStageProgress;
@@ -297,10 +298,8 @@ class BenchmarkState extends ChangeNotifier {
     if (_store.submissionMode) {
       progressInfo.totalStages += activeBenchmarks.length;
     }
-    if (_store.cooldown) {
-      progressInfo.totalStages += activeBenchmarks.length - 1;
-    }
     progressInfo.currentStage = 0;
+    progressInfo.cooldownDurationMs = cooldownPause.inMilliseconds;
 
     resetCurrentResults();
 
@@ -311,15 +310,17 @@ class BenchmarkState extends ChangeNotifier {
     for (final benchmark in activeBenchmarks) {
       progressInfo.info = benchmark.info;
 
+      // increment counter for performance benchmark before cooldown
+      progressInfo.currentStage++;
+
       if (_aborting) break;
 
       // we only do cooldown before performance benchmarks
       if (cooldown && !first) {
         progressInfo.cooldown = true;
-        progressInfo.currentStage++;
         final timer = Stopwatch()..start();
         progressInfo.calculateStageProgress = () {
-          return timer.elapsedMilliseconds / cooldownPause.inMilliseconds;
+          return timer.elapsedMilliseconds / progressInfo.cooldownDurationMs;
         };
         notifyListeners();
         await (_cooldownFuture = Future.delayed(cooldownPause));
@@ -330,7 +331,6 @@ class BenchmarkState extends ChangeNotifier {
       if (_aborting) break;
 
       final perfTimer = Stopwatch()..start();
-      progressInfo.currentStage++;
       progressInfo.accuracy = false;
       progressInfo.calculateStageProgress = () {
         final timeProgress =
