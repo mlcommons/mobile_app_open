@@ -12,8 +12,8 @@
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		19C134532876922700263A48 /* backend_bridge_fw.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */; };
 		19C134542876922700263A48 /* backend_bridge_fw.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		19C1345728769D8300263A48 /* tflite_backend_fw.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1345628769D8300263A48 /* tflite_backend_fw.xcframework */; };
-		19C1345828769D8300263A48 /* tflite_backend_fw.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1345628769D8300263A48 /* tflite_backend_fw.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		19C1345E2878151A00263A48 /* libtflitebackend.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1345D2878151A00263A48 /* libtflitebackend.xcframework */; };
+		19C1345F2878151A00263A48 /* libtflitebackend.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1345D2878151A00263A48 /* libtflitebackend.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C25ABBE270595F000518142 /* RunnerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C25ABBD270595F000518142 /* RunnerTests.m */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
@@ -41,8 +41,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				19C1345F2878151A00263A48 /* libtflitebackend.xcframework in Embed Frameworks */,
 				19C134542876922700263A48 /* backend_bridge_fw.xcframework in Embed Frameworks */,
-				19C1345828769D8300263A48 /* tflite_backend_fw.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -58,8 +58,8 @@
 		1991586926BD025E00BB6FE2 /* Info-Debug.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-Debug.plist"; sourceTree = "<group>"; };
 		19C1344E2876918E00263A48 /* frameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = frameworks; sourceTree = "<group>"; };
 		19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = backend_bridge_fw.xcframework; path = frameworks/backend_bridge_fw.xcframework; sourceTree = "<group>"; };
-		19C1345628769D8300263A48 /* tflite_backend_fw.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = tflite_backend_fw.xcframework; path = frameworks/tflite_backend_fw.xcframework; sourceTree = "<group>"; };
 		19C134592876A70900263A48 /* ios.mk */ = {isa = PBXFileReference; lastKnownFileType = text; path = ios.mk; sourceTree = "<group>"; };
+		19C1345D2878151A00263A48 /* libtflitebackend.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libtflitebackend.xcframework; path = frameworks/libtflitebackend.xcframework; sourceTree = "<group>"; };
 		2C25ABBB270595F000518142 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C25ABBD270595F000518142 /* RunnerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunnerTests.m; sourceTree = "<group>"; };
 		2C25ABBF270595F000518142 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -98,10 +98,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				19C134532876922700263A48 /* backend_bridge_fw.xcframework in Frameworks */,
-				19C1345728769D8300263A48 /* tflite_backend_fw.xcframework in Frameworks */,
 				00168AD625E36DF700BC9D7D /* libc++.tbd in Frameworks */,
 				00168AD425E36DDA00BC9D7D /* CoreML.framework in Frameworks */,
 				DD2FD2B718B01E010F0F88BB /* Pods_Runner.framework in Frameworks */,
+				19C1345E2878151A00263A48 /* libtflitebackend.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,8 +111,8 @@
 		00168AD225E36DDA00BC9D7D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				19C1345D2878151A00263A48 /* libtflitebackend.xcframework */,
 				19C134592876A70900263A48 /* ios.mk */,
-				19C1345628769D8300263A48 /* tflite_backend_fw.xcframework */,
 				19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */,
 				19C1344E2876918E00263A48 /* frameworks */,
 				00168AD525E36DEC00BC9D7D /* libc++.tbd */,
