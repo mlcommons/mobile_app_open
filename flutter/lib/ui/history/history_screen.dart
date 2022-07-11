@@ -52,7 +52,7 @@ class _HistoryScreen extends State<HistoryScreen> {
       },
     );
     final enableSelection = IconButton(
-      icon: const Icon(Icons.done),
+      icon: const Icon(Icons.check_box_outlined),
       tooltip: l10n.historyListSelectionEnable,
       onPressed: () {
         setState(() {
@@ -100,9 +100,9 @@ class _HistoryScreen extends State<HistoryScreen> {
           l10n.historyListTitle,
           leading: isSelectionMode ? cancelSelection : null,
           actions: <Widget>[
+            if (isSelectionMode) delete,
             if (!isSelectionMode) enableSelection,
             if (isSelectionMode) selectAll,
-            if (isSelectionMode) delete,
           ],
         ),
         body: ListView.separated(
