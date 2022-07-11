@@ -94,25 +94,34 @@ class _HistoryScreen extends State<HistoryScreen> {
         }
       },
     );
-    return Scaffold(
-      appBar: helper.makeAppBar(
-        l10n.historyListTitle,
-        leading: isSelectionMode ? cancelSelection : null,
-        actions: <Widget>[
-          if (!isSelectionMode) enableSelection,
-          if (isSelectionMode) selectAll,
-          if (isSelectionMode) delete,
-        ],
+    return WillPopScope(
+      child: Scaffold(
+        appBar: helper.makeAppBar(
+          l10n.historyListTitle,
+          leading: isSelectionMode ? cancelSelection : null,
+          actions: <Widget>[
+            if (!isSelectionMode) enableSelection,
+            if (isSelectionMode) selectAll,
+            if (isSelectionMode) delete,
+          ],
+        ),
+        body: ListView.separated(
+          padding: const EdgeInsets.only(top: 20),
+          itemCount: itemList.length,
+          separatorBuilder: (context, index) => const Divider(),
+          itemBuilder: (context, index) {
+            final uiIndex = itemList.length - index - 1;
+            return _makeItem(context, uiIndex);
+          },
+        ),
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.only(top: 20),
-        itemCount: itemList.length,
-        separatorBuilder: (context, index) => const Divider(),
-        itemBuilder: (context, index) {
-          final uiIndex = itemList.length - index - 1;
-          return _makeItem(context, uiIndex);
-        },
-      ),
+      onWillPop: () async {
+        final willPop = !isSelectionMode;
+        setState(() {
+          disableSelectionMode();
+        });
+        return willPop;
+      },
     );
   }
 
