@@ -17,7 +17,7 @@ class HistoryHelperUtils {
     return dateFormat.format(value);
   }
 
-  AppBar makeAppBar(String title) {
+  AppBar makeAppBar(String title, {Widget? leading, List<Widget>? actions}) {
     return AppBar(
       title: Text(
         title,
@@ -26,6 +26,8 @@ class HistoryHelperUtils {
       centerTitle: true,
       backgroundColor: AppColors.darkAppBarBackground,
       iconTheme: const IconThemeData(color: AppColors.lightAppBarIconTheme),
+      leading: leading,
+      actions: actions,
     );
   }
 
