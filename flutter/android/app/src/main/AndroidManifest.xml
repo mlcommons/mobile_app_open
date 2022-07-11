@@ -12,6 +12,10 @@
         android:label="MLPerf Mobile"
         android:icon="@mipmap/ic_launcher">
         <uses-native-library
+              android:name="libenn_user.samsung_slsi.so"
+              android:required="false"
+              />
+        <uses-native-library
               android:name="libcdsprpc.so"
               android:required="false"
               />
