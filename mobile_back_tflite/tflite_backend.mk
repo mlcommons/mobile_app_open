@@ -29,8 +29,8 @@ endif
 ifeq (${WITH_MEDIATEK},1)
   $(info WITH_MEDIATEK=1)
   backend_mediatek_android_files= \
-    ${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtfliteneuronbackend.so \
+    ${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/neuron/libtfliteneuronbackend.so \
     bazel-bin/external/neuron_delegate/neuron/java/libtensorflowlite_neuron_jni.so
-  backend_mediatek_android_target=//mobile_back_tflite/cpp/backend_tflite:libtfliteneuronbackend.so
+  backend_mediatek_android_target=//mobile_back_tflite/cpp/backend_tflite/neuron:libtfliteneuronbackend.so
   backend_mediatek_filename=libtfliteneuronbackend
 endif

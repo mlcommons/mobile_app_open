@@ -15,5 +15,5 @@ cc_library(
 
 cc_library(
     name = "tfliteneuronbackend",
-    srcs = ["//mobile_back_tflite/cpp/backend_tflite:libtfliteneuronbackend.so"],
+    srcs = ["//mobile_back_tflite/cpp/backend_tflite/neuron:libtfliteneuronbackend.so"],
 )
