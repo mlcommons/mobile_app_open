@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
-import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
 
@@ -21,12 +20,14 @@ class _HistoryScreen extends State<HistoryScreen> {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
 
+  late List<ExtendedResult> itemList;
+
   bool isSelectionMode = false;
   List<bool>? selected;
   bool isSelectAll = false;
 
-  void resetSelection(int listLength, bool value) {
-    selected = List<bool>.generate(listLength, (_) => value);
+  void resetSelection(bool value) {
+    selected = List<bool>.generate(itemList.length, (_) => value);
   }
 
   @override
@@ -36,10 +37,9 @@ class _HistoryScreen extends State<HistoryScreen> {
 
     final state = context.watch<BenchmarkState>();
 
-    final results = state.resourceManager.resultManager.results;
-    final length = results.length;
+    itemList = state.resourceManager.resultManager.results;
     if (selected == null) {
-      resetSelection(length, false);
+      resetSelection(false);
     }
 
     final cancelSelection = IconButton(
@@ -68,7 +68,7 @@ class _HistoryScreen extends State<HistoryScreen> {
       onPressed: () {
         isSelectAll = !isSelectAll;
         setState(() {
-          resetSelection(length, isSelectAll);
+          resetSelection(isSelectAll);
         });
       },
     );
@@ -106,11 +106,11 @@ class _HistoryScreen extends State<HistoryScreen> {
       ),
       body: ListView.separated(
         padding: const EdgeInsets.only(top: 20),
-        itemCount: results.length,
+        itemCount: itemList.length,
         separatorBuilder: (context, index) => const Divider(),
         itemBuilder: (context, index) {
-          final uiIndex = results.length - index - 1;
-          return _makeItem(context, results, uiIndex);
+          final uiIndex = itemList.length - index - 1;
+          return _makeItem(context, uiIndex);
         },
       ),
     );
@@ -132,10 +132,10 @@ class _HistoryScreen extends State<HistoryScreen> {
 
   Widget _makeItem(
     BuildContext context,
-    List<ExtendedResult> allItems,
     int index,
   ) {
-    final results = allItems[index].results;
+    final item = itemList[index];
+    final results = item.results;
     final firstRunInfo = results.list.first;
     final startDatetime = firstRunInfo.performance?.startDatetime ??
         firstRunInfo.accuracy!.startDatetime;
@@ -170,7 +170,7 @@ class _HistoryScreen extends State<HistoryScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DetailsScreen(result: allItems[index]),
+                  builder: (context) => DetailsScreen(result: item),
                 ),
               );
             },
