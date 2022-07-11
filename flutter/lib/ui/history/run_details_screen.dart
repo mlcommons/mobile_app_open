@@ -4,6 +4,7 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/time_utils.dart';
 import 'utils.dart';
 
 class RunDetailsScreen extends StatefulWidget {
@@ -70,7 +71,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
       helper.makeInfo(
           l10n.historyRunDetailsValid, perf.loadgenValidity.toString()),
       helper.makeInfo(l10n.historyRunDetailsDuration,
-          helper.formatDuration(perf.measuredDurationMs.ceil())),
+          formatDuration(perf.measuredDurationMs.ceil())),
       helper.makeInfo(
           l10n.historyRunDetailsSamples, perf.measuredSamples.toString()),
       helper.makeInfo(
@@ -85,7 +86,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
           accuracy.accuracy?.formatted ?? l10n.notAvailable),
       helper.makeInfo(
         l10n.historyRunDetailsDuration,
-        helper.formatDuration(accuracy.measuredDurationMs.ceil()),
+        formatDuration(accuracy.measuredDurationMs.ceil()),
       ),
       helper.makeInfo(
           l10n.historyRunDetailsSamples, accuracy.measuredSamples.toString()),
