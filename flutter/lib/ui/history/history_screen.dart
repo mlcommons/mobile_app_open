@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/confirm_dialog.dart';
+import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
 
@@ -34,8 +36,7 @@ class _HistoryScreen extends State<HistoryScreen> {
 
     final state = context.watch<BenchmarkState>();
 
-    final results =
-        state.resourceManager.resultManager.results.reversed.toList();
+    final results = state.resourceManager.resultManager.results;
     final length = results.length;
     if (selected == null) {
       resetSelection(length, false);
@@ -46,10 +47,8 @@ class _HistoryScreen extends State<HistoryScreen> {
       tooltip: l10n.historyListSelectionCancel,
       onPressed: () {
         setState(() {
-          isSelectionMode = false;
-          isSelectAll = false;
+          disableSelectionMode();
         });
-        resetSelection(length, false);
       },
     );
     final enableSelection = IconButton(
@@ -73,6 +72,28 @@ class _HistoryScreen extends State<HistoryScreen> {
         });
       },
     );
+    final delete = IconButton(
+      icon: const Icon(Icons.delete),
+      tooltip: l10n.historyListSelectionDelete,
+      onPressed: () async {
+        final dialogResult = await showConfirmDialog(
+          context,
+          l10n.historyListSelectionDeleteConfirm,
+          title: l10n.historyListSelectionDelete,
+        );
+        switch (dialogResult) {
+          case ConfirmDialogAction.ok:
+            setState(() {
+              state.resourceManager.resultManager.removeSelected(selected!);
+              disableSelectionMode();
+            });
+            break;
+          case null:
+          case ConfirmDialogAction.cancel:
+            break;
+        }
+      },
+    );
     return Scaffold(
       appBar: helper.makeAppBar(
         l10n.historyListTitle,
@@ -80,6 +101,7 @@ class _HistoryScreen extends State<HistoryScreen> {
         actions: <Widget>[
           if (!isSelectionMode) enableSelection,
           if (isSelectionMode) selectAll,
+          if (isSelectionMode) delete,
         ],
       ),
       body: ListView.separated(
@@ -87,10 +109,17 @@ class _HistoryScreen extends State<HistoryScreen> {
         itemCount: results.length,
         separatorBuilder: (context, index) => const Divider(),
         itemBuilder: (context, index) {
-          return _makeItem(context, results[index], index, selected![index]);
+          final uiIndex = results.length - index - 1;
+          return _makeItem(context, results, uiIndex);
         },
       ),
     );
+  }
+
+  void disableSelectionMode() {
+    isSelectionMode = false;
+    isSelectAll = false;
+    selected = null;
   }
 
   void _toggleSelection(int index) {
@@ -103,14 +132,14 @@ class _HistoryScreen extends State<HistoryScreen> {
 
   Widget _makeItem(
     BuildContext context,
-    ExtendedResult extendedResult,
+    List<ExtendedResult> allItems,
     int index,
-    bool isSelected,
   ) {
-    final results = extendedResult.results;
+    final results = allItems[index].results;
     final firstRunInfo = results.list.first;
     final startDatetime = firstRunInfo.performance?.startDatetime ??
         firstRunInfo.accuracy!.startDatetime;
+    bool isSelected = selected![index];
 
     final qps = results.calculateAverageThroughput().toStringAsFixed(2);
     final benchmarksNum = results.list.length.toString();
@@ -141,7 +170,7 @@ class _HistoryScreen extends State<HistoryScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DetailsScreen(result: extendedResult),
+                  builder: (context) => DetailsScreen(result: allItems[index]),
                 ),
               );
             },

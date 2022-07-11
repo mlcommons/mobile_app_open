@@ -6,7 +6,10 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 enum ConfirmDialogAction { ok, cancel }
 
 Future<ConfirmDialogAction?> showConfirmDialog(
-    BuildContext context, String message) async {
+  BuildContext context,
+  String message, {
+  String? title,
+}) async {
   final stringResources = AppLocalizations.of(context);
 
   Widget cancelButton = TextButton(
@@ -28,7 +31,7 @@ Future<ConfirmDialogAction?> showConfirmDialog(
     builder: (context) {
       return AlertDialog(
         backgroundColor: AppColors.dialogBackground,
-        title: Text(stringResources.confirmDialogTitle),
+        title: Text(title ?? stringResources.confirmDialogTitle),
         content: SingleChildScrollView(child: Text(message)),
         actions: [cancelButton, okButton],
       );

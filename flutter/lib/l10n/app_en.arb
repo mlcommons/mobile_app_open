@@ -95,6 +95,8 @@
   "historyListSelectionEnable": "Enable selection",
   "historyListSelectionSelectAll": "Select all",
   "historyListSelectionDeselect": "Deselect",
+  "historyListSelectionDelete": "Delete",
+  "historyListSelectionDeleteConfirm": "Delete selected items?",
 
   "historyDetailsTitle": "Result details",
   "historyDetailsBuildTypeDebug": "debug build",
