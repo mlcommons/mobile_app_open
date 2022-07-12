@@ -5,7 +5,8 @@ DynamicLibrary _getBridgeLibraryHandle() {
   if (Platform.isWindows) {
     return DynamicLibrary.open('./libs/backend_bridge.dll');
   } else if (Platform.isIOS) {
-    return DynamicLibrary.process();
+    // return DynamicLibrary.process();
+    return DynamicLibrary.open('backend_bridge_fw.framework/backend_bridge_fw');
   } else if (Platform.isAndroid) {
     return DynamicLibrary.open('libbackendbridge.so');
   } else {

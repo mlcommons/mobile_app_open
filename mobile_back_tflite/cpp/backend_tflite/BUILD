@@ -60,80 +60,12 @@ cc_library(
     alwayslink = 1,
 )
 
-cc_library(
-    name = "neuron_delegate",
-    srcs = select({
-        "@org_tensorflow//tensorflow:android": [
-            "@neuron_delegate//neuron/java:libtensorflowlite_neuron_jni.so",
-        ],
-    }),
-    hdrs = select({
-        "@org_tensorflow//tensorflow:android": [
-            "@neuron_delegate//neuron:APUWareUtilsApi.h",
-            "@neuron_delegate//neuron:neuron_delegate.h",
-        ],
-    }),
-)
-
-cc_library(
-    name = "tflite_neuron_c",
-    srcs = ["tflite_c.cc"],
-    hdrs = [
-        "neuron/tflite_settings_mtk.h",
-        "tflite_settings_android.h",
-        "tflite_settings_apple.h",
-        "tflite_settings_windows.h",
-        "thread_pool.h",
-        "utils.h",
-    ],
-    copts = tflite_copts() + [
-        "-Iexternal/neuron_delegate",
-    ] + select({
-        "//flutter/android/commonlibs:use_asan": [
-            "-fsanitize=address",
-            "-g",
-            "-O1",
-            "-fno-omit-frame-pointer",
-        ],
-        "//conditions:default": [],
-    }),
-    local_defines = ["MTK_TFLITE_NEURON_BACKEND"],
-    deps = [
-        "//flutter/cpp/c:headers",
-        "@org_tensorflow//tensorflow/lite/c:c_api",
-        "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-    ] + select({
-        "@org_tensorflow//tensorflow:android": [
-            ":neuron_delegate",
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
-        ],
-        "//conditions:default": [],
-    }),
-    alwayslink = 1,
-)
-
 tflite_jni_binary(
     name = "libtflitebackend.so",
-    exported_symbols = "//flutter/cpp/c:exported_symbols.lds",
     linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [
         ":tflite_c",
     ],
-)
-
-tflite_jni_binary(
-    name = "libtfliteneuronbackend.so",
-    exported_symbols = "//flutter/cpp/c:exported_symbols.lds",
-    linkscript = "//flutter/cpp/c:version_script.lds",
-    deps = [
-        ":tflite_neuron_c",
-    ],
-)
-
-aar_import(
-    name = "tflite_neuron_aar",
-    aar = "neuron/tensorflow-lite-neuron.aar",
 )
 
 cc_binary(
