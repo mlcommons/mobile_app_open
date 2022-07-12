@@ -15,13 +15,54 @@ limitations under the License.
 
 #import "coreml_util.h"
 
-#import "Foundation/Foundation.h"
+#include <string>
+#include <vector>
+
+#import <CoreML/CoreML.h>
+#import <Foundation/Foundation.h>
 
 
-@implementation CoreMLDelegate
+@implementation CoreMLExecutor {
+@protected
+  NSURL *modelURL;
+  MLModel *mlmodel;
+}
+
+- (id)initWithModelPath:(const char *)modelPath {
+  self = [super init];
+  if (self) {
+    try {
+      modelURL = [NSURL URLWithString: [NSString stringWithCString: modelPath encoding: NSUTF8StringEncoding]];
+      NSURL *compiledModelURL = [MLModel compileModelAtURL: modelURL error: nil];
+      NSError *e;
+      mlmodel = [MLModel modelWithContentsOfURL: compiledModelURL error: &e];
+      if (mlmodel == nil) {
+        NSLog(@"hmmm, %@", e);
+      }
+    } catch (const std::exception& exception) {
+      NSLog(@"%s", exception.what());
+      return nil;
+    }
+  }
+  return self;
+}
+
+- (int)getInputCount {
+  NSInteger inputCount = [[[mlmodel modelDescription] inputDescriptionsByName] count];
+  NSLog(@"inputCount %ld", inputCount);
+  return (int) inputCount;
+}
+
+- (int)getOutputCount {
+  NSInteger outputCount = [[[mlmodel modelDescription] outputDescriptionsByName] count];
+  NSLog(@"outputCount %ld", outputCount);
+  return (int) outputCount;
+}
 
 - (void)hello {
+  
   NSLog(@"Hello from CoreMLDelegate");
 }
 
 @end
+

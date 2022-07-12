@@ -11,7 +11,7 @@ struct CoreMLBackendData {
   const char *name = "Core ML";
   const char *vendor = "Apple";
   const char *accelerator = "Neural Engine";
-  MLModel *model{nullptr};
+  CoreMLExecutor *coreMLExecutor{nullptr};
   uint32_t real_batch_size = 1;
   int32_t original_tensor_size = 0;
 };
@@ -47,11 +47,6 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 mlperf_backend_ptr_t mlperf_backend_create(
     const char *model_path, mlperf_backend_configuration_t *configs,
     const char *native_lib_path) {
-
-  // Test calling Objective-C method
-  CoreMLDelegate *coremlDelegate = [[CoreMLDelegate alloc] init];
-  [coremlDelegate hello];
-
   // Verify only one instance of the backend exists at any time
   if (backendExists) {
     NSLog(@"Only one backend instance should exist at a time");
@@ -63,10 +58,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
   backendExists = true;
 
   // Load the model.
-  NSURL *modelURL = [NSURL URLWithString: [NSString stringWithCString: model_path encoding: NSUTF8StringEncoding]];
-  NSURL *compiledModelURL = [MLModel compileModelAtURL: modelURL error: nil];
-  MLModel *mlmodel = [MLModel modelWithContentsOfURL: compiledModelURL error: nil];
-  backend_data->model = mlmodel;
+  CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:model_path];
+  backend_data->coreMLExecutor = coreMLExecutor;
 
   return backend_data;
 }
@@ -88,8 +81,7 @@ mlperf_status_t mlperf_backend_flush_queries(mlperf_backend_ptr_t backend_ptr) {
 
 // Return the number of inputs of the model.
 int32_t mlperf_backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
-  NSLog(@"input %d", [[[((CoreMLBackendData *) backend_ptr)->model modelDescription] inputDescriptionsByName] count]);
-  return [[[((CoreMLBackendData *) backend_ptr)->model modelDescription] inputDescriptionsByName] count];
+  return [((CoreMLBackendData *) backend_ptr)->coreMLExecutor getInputCount];
 }
 
 // Return the type of the ith input.
@@ -109,8 +101,7 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
 
 // Return the number of outputs for the model.
 int32_t mlperf_backend_get_output_count(mlperf_backend_ptr_t backend_ptr) {
-  NSLog(@"output count %d", [[[((CoreMLBackendData *) backend_ptr)->model modelDescription] outputDescriptionsByName] count]);
-  return [[[((CoreMLBackendData *) backend_ptr)->model modelDescription] outputDescriptionsByName] count];
+  return [((CoreMLBackendData *) backend_ptr)->coreMLExecutor getOutputCount];
 }
 
 // Return the type of ith output.
