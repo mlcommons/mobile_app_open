@@ -21,7 +21,7 @@ limitations under the License.
 @implementation CoreMLDelegate
 
 - (void)hello {
-  NSLog(@"Hello");
+  NSLog(@"Hello from CoreMLDelegate");
 }
 
 @end

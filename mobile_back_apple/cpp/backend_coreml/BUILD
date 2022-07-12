@@ -25,10 +25,19 @@ package(
 )
 
 objc_library(
-    name = "coreml_util",
-    srcs = ["coreml_util.mm"],
-    hdrs = ["coreml_util.h"],
+    name = "apple_frameworks",
     sdk_frameworks = ["CoreML"],
+)
+
+cc_library(
+    name = "coreml_util",
+    srcs = [
+        "coreml_util.cc",
+        "coreml_util.h",
+    ],
+    deps = [
+        ":apple_frameworks",
+    ],
 )
 
 cc_library(
@@ -38,6 +47,7 @@ cc_library(
         "main.cc",
     ],
     deps = [
+        ":apple_frameworks",
         ":coreml_util",
         "//flutter/cpp/c:headers",
     ],
