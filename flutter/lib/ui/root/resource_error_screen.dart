@@ -69,10 +69,12 @@ class ResourceErrorScreen extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () async {
-                          final taskConfigs = await state.configManager.getConfigs();
+                          final taskConfigs =
+                              await state.configManager.getConfigs();
 
                           await Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => TaskConfigScreen(taskConfigs)));
+                              builder: (context) =>
+                                  TaskConfigScreen(taskConfigs)));
                         },
                         child:
                             Text(stringResources.resourceErrorSwitchToDefault),
