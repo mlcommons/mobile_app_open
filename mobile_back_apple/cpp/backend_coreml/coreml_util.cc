@@ -23,12 +23,12 @@ limitations under the License.
 
 
 @implementation CoreMLExecutor {
-@protected
+  @protected
   NSURL *modelURL;
   MLModel *mlmodel;
 }
 
-- (id)initWithModelPath:(const char *)modelPath {
+- (nullable instancetype)initWithModelPath:(const char *)modelPath {
   self = [super init];
   if (self) {
     try {
@@ -37,7 +37,8 @@ limitations under the License.
       NSError *e;
       mlmodel = [MLModel modelWithContentsOfURL: compiledModelURL error: &e];
       if (mlmodel == nil) {
-        NSLog(@"hmmm, %@", e);
+        NSLog(@"Failed to init MLModel. %@", e);
+        return nil;
       }
     } catch (const std::exception& exception) {
       NSLog(@"%s", exception.what());

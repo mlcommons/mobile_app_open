@@ -59,6 +59,10 @@ mlperf_backend_ptr_t mlperf_backend_create(
 
   // Load the model.
   CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:model_path];
+  if (!coreMLExecutor) {
+    NSLog(@"Cannot create CoreMLExecutor");
+    return nullptr;
+  }
   backend_data->coreMLExecutor = coreMLExecutor;
 
   return backend_data;
