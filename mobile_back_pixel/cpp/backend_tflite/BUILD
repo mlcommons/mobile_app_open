@@ -76,7 +76,6 @@ cc_library(
 
 tflite_jni_binary(
     name = "libtflitepixelbackend.so",
-    exported_symbols = "//flutter/cpp/c:exported_symbols.lds",
     linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [
         ":tflite_pixel",

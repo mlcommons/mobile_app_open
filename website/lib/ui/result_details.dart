@@ -54,7 +54,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
           padding: const EdgeInsets.all(25),
           child: Center(
             child: Container(
-              constraints: BoxConstraints(minWidth: 100, maxWidth: 800),
+              constraints: const BoxConstraints(minWidth: 100, maxWidth: 800),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -69,11 +69,11 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
                             .toLocal()
                             .toIso8601String())),
                   ]),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   _makeEnvTable(result.envInfo),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   _makeBuildInfoTable(result.buildInfo),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ..._makeResults(result.results),
                 ],
               ),
@@ -88,7 +88,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
     final result = <Widget>[];
     for (var item in list.list) {
       result.add(_makeBenchTable(item));
-      result.add(SizedBox(height: 20));
+      result.add(const SizedBox(height: 20));
     }
     return result;
   }
@@ -102,7 +102,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: table,
       ),
     );
@@ -155,7 +155,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
   Widget _makeTable(List<TableRow> rows) {
     return _wrapTable(Table(
       border: TableBorder.symmetric(
-          inside: BorderSide(width: 1, color: Colors.blue)),
+          inside: const BorderSide(width: 1, color: Colors.blue)),
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       columnWidths: const {0: FlexColumnWidth(10), 1: FlexColumnWidth(5)},
       children: rows,
@@ -166,11 +166,11 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
     return TableRow(
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: name,
         ),
         Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: value,
         ),
       ],

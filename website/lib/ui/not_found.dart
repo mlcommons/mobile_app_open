@@ -13,11 +13,11 @@ class NotFoundPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
+            const Text(
               "The page you requested doesn't exist",
               style: TextStyle(fontSize: 30),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
                 child: const Text(
                   'Go to home page',

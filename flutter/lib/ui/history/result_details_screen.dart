@@ -58,7 +58,7 @@ class _DetailsScreen extends State<DetailsScreen> {
       helper.makeInfo(l10n.historyDetailsAvgQps, averageThroughput),
       helper.makeInfo(l10n.historyDetailsAppVersion, appVersion),
       helper.makeInfo(l10n.historyDetailsBackendName, backendName),
-      Divider(),
+      const Divider(),
       helper.makeHeader(l10n.historyDetailsTableTitle),
       makeBenchmarkTable(context, res.results.list),
     ];
@@ -69,7 +69,7 @@ class _DetailsScreen extends State<DetailsScreen> {
     List<BenchmarkExportResult> list,
   ) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 15),
+      padding: const EdgeInsets.symmetric(vertical: 15),
       child: helper.makeTable(
         [
           RowData(

@@ -27,29 +27,29 @@ class UnsupportedDeviceScreen extends StatelessWidget {
                 flex: 3,
                 child: Align(
                     alignment: Alignment.bottomCenter,
-                    child: Container(
+                    child: SizedBox(
                         height: iconEdgeSize,
                         width: iconEdgeSize,
                         child: AppIcons.error))),
             Expanded(
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(35, 0, 35, 0),
+                    padding: const EdgeInsets.fromLTRB(35, 0, 35, 0),
                     child: Align(
                         alignment: Alignment.topCenter,
                         child: Column(
                           children: [
                             Text(stringResources.unsupportedMainMessage,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 15, color: AppColors.darkText)),
                             Text(
                                 '${stringResources.unsupportedBackendError}: $backendError',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 15, color: AppColors.darkText)),
                             Text(stringResources.unsupportedTryAnotherDevice,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 15, color: AppColors.darkText)),
                           ],
                         )))),

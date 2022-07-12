@@ -16,16 +16,23 @@
 .PHONY: flutter/ios
 flutter/ios: flutter/ios/libs flutter/update-splash-screen
 
+backend_bridge_ios_target=//flutter/cpp/flutter:backend_bridge_fw
+backend_bridge_ios_zip=${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/backend_bridge_fw.xcframework.zip
+
+flutter_ios_fw_dir=flutter/ios/frameworks
+
 # BAZEL_OUTPUT_ROOT_ARG is set on our Jenkins CI
-bazel_ios_fw := /tmp/ios_backend_fw_static_archive-root/ios_backend_fw_static.framework
-xcode_fw := flutter/ios/Flutter/ios_backend_fw_static.framework
 .PHONY: flutter/ios/libs
 flutter/ios/libs:
-	@# NOTE: add `--copt -g` for debug info (but the resulting library would be 0.5 GiB)
-	bazel ${BAZEL_OUTPUT_ROOT_ARG} build --config=ios_fat64 -c opt //flutter/cpp/flutter:ios_backend_fw_static
+	# --use_top_level_targets_for_symlinks
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} build \
+		--config=ios \
+		${backend_bridge_ios_target} \
+		${backend_tflite_ios_target}
 
-	rm -rf ${xcode_fw}
-	cp -a ${bazel_ios_fw} ${xcode_fw}
+	rm -rf ${flutter_ios_fw_dir}
+	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_bridge_ios_zip}
+	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_tflite_ios_zip}
 
 .PHONY: flutter/ios/release
 flutter/ios/release:

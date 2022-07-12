@@ -9,6 +9,8 @@ import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({Key? key}) : super(key: key);
+
   @override
   _HistoryScreen createState() => _HistoryScreen();
 }
@@ -31,7 +33,7 @@ class _HistoryScreen extends State<HistoryScreen> {
       body: ListView.separated(
         padding: const EdgeInsets.only(top: 20),
         itemCount: results.length,
-        separatorBuilder: (context, index) => Divider(),
+        separatorBuilder: (context, index) => const Divider(),
         itemBuilder: (context, index) {
           return _makeItem(context, results[results.length - index - 1]);
         },
@@ -53,16 +55,16 @@ class _HistoryScreen extends State<HistoryScreen> {
         padding: const EdgeInsets.only(bottom: 5),
         child: Text(
           helper.formatDate(startDatetime.toLocal()),
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       subtitle: Text(
         l10n.historyListElementSubtitle
             .replaceFirst('<throughput>', qps)
             .replaceFirst('<benchmarks#>', benchmarksNum),
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-      trailing: Icon(Icons.chevron_right),
+      trailing: const Icon(Icons.chevron_right),
       onTap: () {
         Navigator.push(
           context,

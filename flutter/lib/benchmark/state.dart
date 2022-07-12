@@ -52,6 +52,7 @@ class ProgressInfo {
   BenchmarkInfo? info;
   int totalStages = 0;
   int currentStage = 0;
+  int cooldownDurationMs = 0;
   double get stageProgress => calculateStageProgress?.call() ?? 0.0;
 
   double Function()? calculateStageProgress;
@@ -65,6 +66,9 @@ class BenchmarkState extends ChangeNotifier {
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
   late final BackendInfo backendInfo;
+
+  Object? error;
+  StackTrace? stackTrace;
 
   bool taskConfigFailedToLoad = false;
   String currentLogDir = '';
@@ -152,6 +156,8 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
+      error = e;
+      stackTrace = trace;
       taskConfigFailedToLoad = true;
       notifyListeners();
     }
@@ -165,6 +171,8 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
+      error = e;
+      stackTrace = trace;
       taskConfigFailedToLoad = true;
       notifyListeners();
     }
@@ -181,7 +189,8 @@ class BenchmarkState extends ChangeNotifier {
     await resourceManager.handleResources(
         _middle.listResources(), needToPurgeCache);
     print('finished loading resources');
-
+    error = null;
+    stackTrace = null;
     taskConfigFailedToLoad = false;
     await Wakelock.disable();
   }
@@ -200,6 +209,8 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
+      result.error = e;
+      result.stackTrace = trace;
       result.taskConfigFailedToLoad = true;
     }
     return result;
@@ -215,6 +226,8 @@ class BenchmarkState extends ChangeNotifier {
     }
     await configManager.loadConfig(name);
     _store.chosenConfigurationName = name;
+    error = null;
+    stackTrace = null;
     taskConfigFailedToLoad = false;
 
     _middle = BenchmarkList(
@@ -271,8 +284,8 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> _runBenchmarks() async {
     final cooldown = _store.cooldown;
-    final cooldownPause = _store.testMode || FAST_MODE
-        ? Duration(seconds: 1)
+    final cooldownPause = _store.testMode || isFastMode
+        ? const Duration(seconds: 1)
         : Duration(minutes: _store.cooldownDuration);
 
     final activeBenchmarks =
@@ -285,10 +298,8 @@ class BenchmarkState extends ChangeNotifier {
     if (_store.submissionMode) {
       progressInfo.totalStages += activeBenchmarks.length;
     }
-    if (_store.cooldown) {
-      progressInfo.totalStages += activeBenchmarks.length - 1;
-    }
     progressInfo.currentStage = 0;
+    progressInfo.cooldownDurationMs = cooldownPause.inMilliseconds;
 
     resetCurrentResults();
 
@@ -299,15 +310,17 @@ class BenchmarkState extends ChangeNotifier {
     for (final benchmark in activeBenchmarks) {
       progressInfo.info = benchmark.info;
 
+      // increment counter for performance benchmark before cooldown
+      progressInfo.currentStage++;
+
       if (_aborting) break;
 
       // we only do cooldown before performance benchmarks
       if (cooldown && !first) {
         progressInfo.cooldown = true;
-        progressInfo.currentStage++;
         final timer = Stopwatch()..start();
         progressInfo.calculateStageProgress = () {
-          return timer.elapsedMilliseconds / cooldownPause.inMilliseconds;
+          return timer.elapsedMilliseconds / progressInfo.cooldownDurationMs;
         };
         notifyListeners();
         await (_cooldownFuture = Future.delayed(cooldownPause));
@@ -318,7 +331,6 @@ class BenchmarkState extends ChangeNotifier {
       if (_aborting) break;
 
       final perfTimer = Stopwatch()..start();
-      progressInfo.currentStage++;
       progressInfo.accuracy = false;
       progressInfo.calculateStageProgress = () {
         final timeProgress =
@@ -411,13 +423,13 @@ class BenchmarkState extends ChangeNotifier {
 
     if (!_aborting) {
       lastResult = ExtendedResult(
-        meta: ResultMetaInfo(uuid: Uuid().v4()),
+        meta: ResultMetaInfo(uuid: const Uuid().v4()),
         envInfo: DeviceInfo.environmentInfo,
         results: BenchmarkExportResultList(exportResults),
         buildInfo: BuildInfoHelper.info,
       );
       _store.previousExtendedResult =
-          JsonEncoder().convert(lastResult!.toJson());
+          const JsonEncoder().convert(lastResult!.toJson());
       await resourceManager.resultManager.saveResult(lastResult!);
     }
   }
@@ -581,6 +593,8 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print('unable to restore previous extended result: $e');
       print(trace);
+      error = e;
+      stackTrace = trace;
       _store.previousExtendedResult = '';
       resetCurrentResults();
       _doneRunning = null;

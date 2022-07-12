@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
               'Hi, this is the home page of MLPerfBench website',
               style: TextStyle(fontSize: 30),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
                 child: const Text(
                   'Take me to results',

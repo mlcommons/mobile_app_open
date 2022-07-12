@@ -82,7 +82,7 @@ Future<void> main() async {
   var extendedResult = ExtendedResult(
     meta: ResultMetaInfo(
       uploadDate: DateTime.now(),
-      uuid: Uuid().v4(),
+      uuid: const Uuid().v4(),
     ),
     buildInfo: BuildInfo(
       version: '1.0',
@@ -112,7 +112,7 @@ Future<void> main() async {
   print('writing results to $filename');
   final file = File(filename);
   await file.create();
-  final converted = JsonEncoder().convert(extendedResult);
+  final converted = const JsonEncoder().convert(extendedResult);
   // at least check that parsing doesn't throw exceptions
   final _ = ExtendedResult.fromJson(jsonDecode(converted));
   await file.writeAsString(converted);

@@ -15,7 +15,7 @@ class _RunOut extends Struct {
 const _runName = 'dart_ffi_mlperf_config';
 const _freeName = 'dart_ffi_mlperf_config_free';
 
-typedef _Run = Pointer<_RunOut> Function(Pointer<Utf8> pb_content);
+typedef _Run = Pointer<_RunOut> Function(Pointer<Utf8> pbContent);
 final _run = getBridgeHandle().lookupFunction<_Run, _Run>(_runName);
 
 typedef _Free1 = Void Function(Pointer<_RunOut>);

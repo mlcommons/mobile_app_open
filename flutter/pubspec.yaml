@@ -36,6 +36,7 @@ dependencies:
   crypto: ^3.0.1
   tuple: ^2.0.0
   bot_toast: ^4.0.2
+  flutter_lints: ^1.0.4
 
 dev_dependencies:
   flutter_test:
