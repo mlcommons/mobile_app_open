@@ -6,6 +6,7 @@
 #include "coreml_util.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
+#include "flutter/cpp/utils.h"
 
 struct CoreMLBackendData {
   const char *name = "Core ML";
@@ -49,7 +50,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
     const char *native_lib_path) {
   // Verify only one instance of the backend exists at any time
   if (backendExists) {
-    NSLog(@"Only one backend instance should exist at a time");
+    LOG(INFO) << "Only one backend instance should exist at a time";
     return nullptr;
   }
 
@@ -60,11 +61,11 @@ mlperf_backend_ptr_t mlperf_backend_create(
   // Load the model.
   CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:model_path];
   if (!coreMLExecutor) {
-    NSLog(@"Cannot create CoreMLExecutor");
+    LOG(INFO) << "Cannot create CoreMLExecutor";
     return nullptr;
   }
+  LOG(INFO) << "CoreMLExecutor created";
   backend_data->coreMLExecutor = coreMLExecutor;
-
   return backend_data;
 }
 
@@ -75,11 +76,13 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
 
 // Run the inference for a sample.
 mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+  LOG(INFO) << "mlperf_backend_issue_query()";
   return MLPERF_FAILURE;
 }
 
 // Flush the staged queries immediately.
 mlperf_status_t mlperf_backend_flush_queries(mlperf_backend_ptr_t backend_ptr) {
+  LOG(INFO) << "mlperf_backend_flush_queries()";
   return MLPERF_FAILURE;
 }
 
@@ -100,6 +103,9 @@ mlperf_data_t mlperf_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
 mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                          int32_t batchIndex, int32_t i,
                                          void *data) {
+  LOG(INFO) << "mlperf_backend_set_input()";
+  CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
+  [backend_data->coreMLExecutor setInput: data];
   return MLPERF_FAILURE;
 }
 
@@ -120,5 +126,6 @@ mlperf_data_t mlperf_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
 mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                           uint32_t batchIndex, int32_t i,
                                           void **data) {
+  LOG(INFO) << "mlperf_backend_get_output()";
   return MLPERF_FAILURE;
 }

@@ -49,6 +49,7 @@ cc_library(
     deps = [
         ":apple_frameworks",
         ":coreml_util",
+        "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
     ],
     alwayslink = 1,
