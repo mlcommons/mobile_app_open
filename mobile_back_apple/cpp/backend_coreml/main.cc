@@ -95,7 +95,7 @@ int32_t mlperf_backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
 mlperf_data_t mlperf_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
                                             int32_t i) {
   enum mlperf_data_t::Type datatype = mlperf_data_t::Type::Float32;
-  mlperf_data_t data = {.type = datatype, .size = 0};
+  mlperf_data_t data = {.type = datatype, .size = 4};
   return data;
 }
 
@@ -118,7 +118,7 @@ int32_t mlperf_backend_get_output_count(mlperf_backend_ptr_t backend_ptr) {
 mlperf_data_t mlperf_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
                                              int32_t i) {
   enum mlperf_data_t::Type datatype = mlperf_data_t::Type::Float32;
-  mlperf_data_t data = {.type = datatype, .size = 0};
+  mlperf_data_t data = {.type = datatype, .size = 4};
   return data;
 }
 
