@@ -110,12 +110,20 @@ struct TensorData {
   self = [super init];
   if (self) {
     try {
+      NSError* error = nil;
       modelURL = [NSURL URLWithString: [NSString stringWithCString: modelPath encoding: NSUTF8StringEncoding]];
-      NSURL *compiledModelURL = [MLModel compileModelAtURL: modelURL error: nil];
-      NSError *e;
-      mlmodel = [MLModel modelWithContentsOfURL: compiledModelURL error: &e];
-      if (mlmodel == nil) {
-        NSLog(@"Failed to init MLModel. %@", e);
+      NSURL *compiledModelURL = [MLModel compileModelAtURL: modelURL error: &error];
+      if (error != nil) {
+        NSLog(@"compileModelAtURL failed: %@", [error localizedDescription]);
+        return nil;
+      }
+      MLModelConfiguration* config = [MLModelConfiguration alloc];
+      config.computeUnits = MLComputeUnitsAll;
+      mlmodel = [MLModel modelWithContentsOfURL: compiledModelURL
+                                  configuration: config
+                                          error: &error];
+      if (error != NULL) {
+        NSLog(@"modelWithContentsOfURL failed: %@", [error localizedDescription]);
         return nil;
       }
       NSLog(@"modelDescription: %@", [mlmodel modelDescription]);
@@ -163,7 +171,6 @@ struct TensorData {
   for (int i = 0; i < [inputShape count]; i++) {
     shape.push_back([inputShape[i] intValue]);
   }
-  
   // TODO(anhappdev): currently mlperf_backend_get_input_type and mlperf_backend_get_output_type always returns Float32
   // convert float32 array to an input feature
   TensorData inputTensorData = {
