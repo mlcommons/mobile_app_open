@@ -59,7 +59,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
   backendExists = true;
 
   // Load the model.
-  CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:model_path];
+  CoreMLExecutor *coreMLExecutor =
+      [[CoreMLExecutor alloc] initWithModelPath:model_path];
   if (!coreMLExecutor) {
     LOG(INFO) << "Cannot create CoreMLExecutor";
     return nullptr;
@@ -77,18 +78,22 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
 // Run the inference for a sample.
 mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
   LOG(INFO) << "mlperf_backend_issue_query()";
+  if ([((CoreMLBackendData *)backend_ptr)->coreMLExecutor issueQueries])
+    return MLPERF_SUCCESS;
   return MLPERF_FAILURE;
 }
 
 // Flush the staged queries immediately.
 mlperf_status_t mlperf_backend_flush_queries(mlperf_backend_ptr_t backend_ptr) {
   LOG(INFO) << "mlperf_backend_flush_queries()";
+  if ([((CoreMLBackendData *)backend_ptr)->coreMLExecutor flushQueries])
+    return MLPERF_SUCCESS;
   return MLPERF_FAILURE;
 }
 
 // Return the number of inputs of the model.
 int32_t mlperf_backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
-  return [((CoreMLBackendData *) backend_ptr)->coreMLExecutor getInputCount];
+  return [((CoreMLBackendData *)backend_ptr)->coreMLExecutor getInputCount];
 }
 
 // Return the type of the ith input.
@@ -105,13 +110,13 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                          void *data) {
   LOG(INFO) << "mlperf_backend_set_input()";
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
-  [backend_data->coreMLExecutor setInput: data];
+  if ([backend_data->coreMLExecutor setInput:data]) return MLPERF_SUCCESS;
   return MLPERF_FAILURE;
 }
 
 // Return the number of outputs for the model.
 int32_t mlperf_backend_get_output_count(mlperf_backend_ptr_t backend_ptr) {
-  return [((CoreMLBackendData *) backend_ptr)->coreMLExecutor getOutputCount];
+  return [((CoreMLBackendData *)backend_ptr)->coreMLExecutor getOutputCount];
 }
 
 // Return the type of ith output.
@@ -127,5 +132,7 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                           uint32_t batchIndex, int32_t i,
                                           void **data) {
   LOG(INFO) << "mlperf_backend_get_output()";
+  if ([((CoreMLBackendData *)backend_ptr)->coreMLExecutor getOutput:data])
+    return MLPERF_SUCCESS;
   return MLPERF_FAILURE;
 }

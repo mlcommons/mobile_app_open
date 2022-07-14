@@ -15,12 +15,11 @@ limitations under the License.
 
 #import "coreml_util.h"
 
-#include <string>
-#include <vector>
-
 #import <CoreML/CoreML.h>
 #import <Foundation/Foundation.h>
 
+#include <string>
+#include <vector>
 
 struct TensorData {
   float *data;
@@ -52,7 +51,7 @@ struct TensorData {
     NSMutableArray *names = [[NSMutableArray alloc] init];
     for (auto &input : *_inputs) {
       [names addObject:[NSString stringWithCString:input.name.c_str()
-                                          encoding:[NSString defaultCStringEncoding]]];
+                                          encoding:NSUTF8StringEncoding]];
     }
     _featureNames = [NSSet setWithArray:names];
   }
@@ -68,40 +67,43 @@ struct TensorData {
         @(input.shape[2]),
         @(input.shape[3]),
       ];
-      
+
       NSArray *strides = @[
         @(input.shape[1] * input.shape[2] * input.shape[3]),
         @(input.shape[2] * input.shape[3]),
         @(input.shape[3]),
         @1,
       ];
-      
+
       NSError *error = nil;
-      MLMultiArray *mlArray = [[MLMultiArray alloc] initWithDataPointer:input.data
-                                                                  shape:shape
-                                                               dataType:MLMultiArrayDataTypeFloat32
-                                                                strides:strides
-                                                            deallocator:(^(void *bytes){})error:&error];
+      MLMultiArray *mlArray =
+          [[MLMultiArray alloc] initWithDataPointer:input.data
+                                              shape:shape
+                                           dataType:MLMultiArrayDataTypeFloat32
+                                            strides:strides
+                                        deallocator:(^(void *bytes){
+                                                    })error:&error];
       if (error != nil) {
-        NSLog(@"Failed to create MLMultiArray for feature %@ error: %@", featureName,
-              [error localizedDescription]);
+        NSLog(@"Failed to create MLMultiArray for feature %@ error: %@",
+              featureName, [error localizedDescription]);
         return nil;
       }
-      auto *mlFeatureValue = [MLFeatureValue featureValueWithMultiArray:mlArray];
+      auto *mlFeatureValue =
+          [MLFeatureValue featureValueWithMultiArray:mlArray];
       return mlFeatureValue;
     }
   }
-  
+
   NSLog(@"Feature %@ not found", featureName);
   return nil;
 }
 @end
 
-
 @implementation CoreMLExecutor {
-  @protected
+ @protected
   NSURL *modelURL;
   MLModel *mlmodel;
+  std::vector<TensorData> inputVector;
   MultiArrayFeatureProvider *inputFeatures;
   MultiArrayFeatureProvider *outputFeatures;
 }
@@ -110,24 +112,28 @@ struct TensorData {
   self = [super init];
   if (self) {
     try {
-      NSError* error = nil;
-      modelURL = [NSURL URLWithString: [NSString stringWithCString: modelPath encoding: NSUTF8StringEncoding]];
-      NSURL *compiledModelURL = [MLModel compileModelAtURL: modelURL error: &error];
+      NSError *error = nil;
+      modelURL = [NSURL
+          URLWithString:[NSString stringWithCString:modelPath
+                                           encoding:NSUTF8StringEncoding]];
+      NSURL *compiledModelURL =
+          [MLModel compileModelAtURL:modelURL error:&error];
       if (error != nil) {
         NSLog(@"compileModelAtURL failed: %@", [error localizedDescription]);
         return nil;
       }
-      MLModelConfiguration* config = [MLModelConfiguration alloc];
+      MLModelConfiguration *config = [MLModelConfiguration alloc];
       config.computeUnits = MLComputeUnitsAll;
-      mlmodel = [MLModel modelWithContentsOfURL: compiledModelURL
-                                  configuration: config
-                                          error: &error];
+      mlmodel = [MLModel modelWithContentsOfURL:compiledModelURL
+                                  configuration:config
+                                          error:&error];
       if (error != NULL) {
-        NSLog(@"modelWithContentsOfURL failed: %@", [error localizedDescription]);
+        NSLog(@"modelWithContentsOfURL failed: %@",
+              [error localizedDescription]);
         return nil;
       }
       NSLog(@"modelDescription: %@", [mlmodel modelDescription]);
-    } catch (const std::exception& exception) {
+    } catch (const std::exception &exception) {
       NSLog(@"%s", exception.what());
       return nil;
     }
@@ -136,101 +142,126 @@ struct TensorData {
 }
 
 - (int)getInputCount {
-  NSInteger inputCount = [[[mlmodel modelDescription] inputDescriptionsByName] count];
+  NSInteger inputCount =
+      [[[mlmodel modelDescription] inputDescriptionsByName] count];
   NSLog(@"inputCount %ld", inputCount);
-  return (int) inputCount;
+  return (int)inputCount;
 }
 
 - (int)getOutputCount {
-  NSInteger outputCount = [[[mlmodel modelDescription] outputDescriptionsByName] count];
+  NSInteger outputCount =
+      [[[mlmodel modelDescription] outputDescriptionsByName] count];
   NSLog(@"outputCount %ld", outputCount);
-  return (int) outputCount;
+  return (int)outputCount;
 }
 
-- (bool)setInput:(void*) data {
-  
+- (bool)setInput:(void *)data {
   NSArray<NSNumber *> *inputShape;
   MLMultiArrayDataType inputDataType;
   MLMultiArrayShapeConstraint *inputShapeConstraint;
   NSString *inputName;
-  
-  NSDictionary *inputDict = [[mlmodel modelDescription] inputDescriptionsByName];
+
+  NSDictionary *inputDict =
+      [[mlmodel modelDescription] inputDescriptionsByName];
   for (NSString *key in [inputDict allKeys]) {
     NSLog(@"key: %@", key);
     inputName = [inputDict[key] name];
     NSLog(@"value name: %@", [inputDict[key] name]);
     NSLog(@"value type: %ld", ((MLFeatureDescription *)inputDict[key]).type);
-    if (((MLFeatureDescription *)inputDict[key]).type == MLFeatureTypeMultiArray) {
-      NSLog(@"constraint: %@", [((MLFeatureDescription *)inputDict[key]) multiArrayConstraint]);
-      inputShape = [[((MLFeatureDescription *)inputDict[key]) multiArrayConstraint] shape];
-      inputDataType = [[((MLFeatureDescription *)inputDict[key]) multiArrayConstraint] dataType];
-      inputShapeConstraint = [[((MLFeatureDescription *)inputDict[key]) multiArrayConstraint] shapeConstraint];
+    if (((MLFeatureDescription *)inputDict[key]).type ==
+        MLFeatureTypeMultiArray) {
+      NSLog(@"constraint: %@",
+            [((MLFeatureDescription *)inputDict[key]) multiArrayConstraint]);
+      inputShape =
+          [[((MLFeatureDescription *)inputDict[key]) multiArrayConstraint]
+              shape];
+      inputDataType =
+          [[((MLFeatureDescription *)inputDict[key]) multiArrayConstraint]
+              dataType];
+      inputShapeConstraint =
+          [[((MLFeatureDescription *)inputDict[key]) multiArrayConstraint]
+              shapeConstraint];
     }
   }
   std::vector<int> shape;
   for (int i = 0; i < [inputShape count]; i++) {
     shape.push_back([inputShape[i] intValue]);
   }
-  // TODO(anhappdev): currently mlperf_backend_get_input_type and mlperf_backend_get_output_type always returns Float32
-  // convert float32 array to an input feature
+  // TODO(anhappdev): currently mlperf_backend_get_input_type and
+  // mlperf_backend_get_output_type always returns Float32 convert float32 array
+  // to an input feature
   TensorData inputTensorData = {
-    (float *) data,
-    [inputName cStringUsingEncoding:[NSString defaultCStringEncoding]],
-    shape
-  };
-  std::vector<TensorData> inputVector;
+      (float *)data, [inputName cStringUsingEncoding:NSUTF8StringEncoding],
+      shape};
   inputVector.push_back(inputTensorData);
-  
+
   inputFeatures = [[MultiArrayFeatureProvider alloc]
-                   initWithInputs:(const std::vector<TensorData> *)&inputVector];
-  
+      initWithInputs:(const std::vector<TensorData> *)&inputVector];
+
+#if 0  // this should not be part of setInput
   NSError *error;
-  outputFeatures = (MultiArrayFeatureProvider *)[mlmodel predictionFromFeatures:inputFeatures
-                                                                          error:&error];
+  outputFeatures =
+      (MultiArrayFeatureProvider *)[mlmodel predictionFromFeatures:inputFeatures
+                                                             error:&error];
   if (error) {
-    NSLog(@"Failed to predict with %@, error: %@", inputFeatures, [error localizedDescription]);
+    NSLog(@"Failed to predict with %@, error: %@", inputFeatures,
+          [error localizedDescription]);
     return false;
   }
   NSLog(@"output names %@", [outputFeatures featureNames]);
   // TODO(anhappdev): input name is hard-coded for image classification
   NSLog(@"output Softmax: %@", [outputFeatures featureValueForName:@"Softmax"]);
-  
-  MLMultiArray *outputArray = [[outputFeatures featureValueForName:@"Softmax"] multiArrayValue];
+
+  MLMultiArray *outputArray =
+      [[outputFeatures featureValueForName:@"Softmax"] multiArrayValue];
 
   // get float array from output feature
   __block float *foo;
-  // TODO(anhappdev): Error: No visible @interface for 'MLMultiArray' declares the selector 'getBytesWithHandler:'
-//  [outputArray getBytesWithHandler:(^(const void *bytes, NSInteger size) {
-//    NSLog(@"buffer size = %ld", size);
-//    foo = (float *)bytes;
-//  })];
-//
-//  // check if the output meet our expectation
-//  float max = 0;
-//  int index = 0;
-//  for (int i = 0; i < 1001; i++) {
-//    if (foo[i] > max) {
-//      max = foo[i];
-//      index = i;
-//    }
-//  }
-//  NSLog(@"%d\n", index);
-  
+  // TODO(anhappdev): Error: No visible @interface for 'MLMultiArray' declares
+  // the selector 'getBytesWithHandler:'
+  //  [outputArray getBytesWithHandler:(^(const void *bytes, NSInteger size) {
+  //    NSLog(@"buffer size = %ld", size);
+  //    foo = (float *)bytes;
+  //  })];
+  //
+  //  // check if the output meet our expectation
+  //  float max = 0;
+  //  int index = 0;
+  //  for (int i = 0; i < 1001; i++) {
+  //    if (foo[i] > max) {
+  //      max = foo[i];
+  //      index = i;
+  //    }
+  //  }
+  //  NSLog(@"%d\n", index);
+#endif
+
   return true;
 }
 
 - (bool)issueQueries {
-  return false;
+  NSError *error;
+  outputFeatures =
+      (MultiArrayFeatureProvider *)[mlmodel predictionFromFeatures:inputFeatures
+                                                             error:&error];
+  if (!outputFeatures) {
+    NSLog(@"Failed to predict with %@, error: %@", inputFeatures,
+          [error localizedDescription]);
+    return false;
+  }
+  NSLog(@"output names %@", [outputFeatures featureNames]);
+  return true;
 }
 
 - (bool)flushQueries {
-  return false;
+  inputVector.clear();
+  return true;
 }
 
-- (bool)getOutput:(void *_Nonnull*_Nonnull) data {
-  return false;
+- (bool)getOutput:(void *_Nonnull *_Nonnull)data {
+  *data = [[[outputFeatures featureValueForName:@"Softmax"] multiArrayValue]
+      dataPointer];
+  return true;
 }
-
 
 @end
-
