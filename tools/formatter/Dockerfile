@@ -27,11 +27,9 @@ ENV FORMATTER_HOME /opt/formatters/bin
 ENV PATH=${PATH}:${FORMATTER_HOME}
 RUN mkdir -p ${FORMATTER_HOME}
 
-# Add Java formatter
+# Install Java
 RUN apt-get update && apt-get install -y \
     openjdk-11-jdk-headless
-RUN curl --output `dirname ${FORMATTER_HOME}`/google-java-format-1.9-all-deps.jar \
-         -L https://github.com/google/google-java-format/releases/download/google-java-format-1.9/google-java-format-1.9-all-deps.jar
 
 # Add buildifier
 RUN apt-get update && apt-get install -y \

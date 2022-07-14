@@ -77,15 +77,15 @@ ARG android_ndk_home=/opt/android/${ndk_version}
 
 # Install the NDK
 # Use wget instead of curl to avoid "Error in the HTTP2 framing layer"
-RUN cd /tmp &&  wget -nv https://dl.google.com/android/repository/${ndk_version}-linux-x86_64.zip && \
+RUN cd /tmp && wget -nv https://dl.google.com/android/repository/${ndk_version}-linux-x86_64.zip && \
     unzip -q /tmp/${ndk_version}-linux-x86_64.zip -d /opt/android && \
     rm /tmp/${ndk_version}-linux-x86_64.zip
 
 ENV ANDROID_NDK_HOME ${android_ndk_home}
 
-# Add Java format checker and buildifier
+# Add buildifier
 ENV GOBIN /opt/formatters/bin
-RUN mkdir -p ${GOBIN} && curl --output `dirname ${GOBIN}`/google-java-format-1.9-all-deps.jar -L https://github.com/google/google-java-format/releases/download/google-java-format-1.9/google-java-format-1.9-all-deps.jar
+RUN mkdir -p ${GOBIN}
 RUN /usr/lib/go-1.13/bin/go get github.com/bazelbuild/buildtools/buildifier
 ENV PATH=${PATH}:${GOBIN}
 
