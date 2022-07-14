@@ -56,6 +56,13 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
   // Flush the staged queries immediately.
   void FlushQueries() override { backend_->FlushQueries(); }
 
+  // Called by loadgen to show us the recorded latencies.
+  void ReportLatencyResults(
+      const std::vector<::mlperf::QuerySampleLatency>& latencies_ns) final {
+    latencies_ns_.insert(latencies_ns_.end(), latencies_ns.begin(),
+                         latencies_ns.end());
+  }
+
   // Calculates the 90 percentile latency from reported latencies.
   float ComputeLatency() {
     if (latencies_ns_.empty()) {
