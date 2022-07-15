@@ -1,11 +1,6 @@
 
 .PHONY: format
-ifeq (${OS},Windows_NT)
-# format/java is not supported on Windows
 format: format/bazel format/clang format/dart format/ts format/line-endings format/markdown
-else
-format: format/bazel format/clang format/java format/dart format/ts format/line-endings format/markdown
-endif
 
 .PHONY: format/bazel
 format/bazel:
@@ -14,10 +9,6 @@ format/bazel:
 .PHONY: format/clang
 format/clang:
 	git ls-files -z | grep --null-data "\.h$$\|\.hpp$$\|\.cc$$\|\.cpp$$" | xargs --null --no-run-if-empty clang-format -i -style=google
-
-.PHONY: format/java
-format/java:
-	git ls-files -z | grep --null-data "\.java$$" | xargs --null --no-run-if-empty java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace
 
 .PHONY: format/dart/pub
 format/dart/pub:
