@@ -105,3 +105,9 @@ snpe_version_loader(
     name = "snpe_version_loader",
     workspace_dir = __workspace_dir__,
 )
+
+new_local_repository(
+    name = "openvino",
+    build_file = "@//flutter/cpp/intel:openvino.BUILD",
+    path = "a:/work/intel/openvino-master/",
+)
