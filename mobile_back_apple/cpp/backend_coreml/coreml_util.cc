@@ -187,9 +187,7 @@ struct TensorData {
   for (int i = 0; i < [inputShape count]; i++) {
     shape.push_back([inputShape[i] intValue]);
   }
-  // TODO(anhappdev): currently mlperf_backend_get_input_type and
-  // mlperf_backend_get_output_type always returns Float32 convert float32 array
-  // to an input feature
+  // convert float32 array to an input feature
   TensorData inputTensorData = {
       (float *)data, [inputName cStringUsingEncoding:NSUTF8StringEncoding],
       shape};
@@ -198,53 +196,15 @@ struct TensorData {
   inputFeatures = [[MultiArrayFeatureProvider alloc]
       initWithInputs:(const std::vector<TensorData> *)&inputVector];
 
-#if 0  // this should not be part of setInput
-  NSError *error;
-  outputFeatures =
-      (MultiArrayFeatureProvider *)[mlmodel predictionFromFeatures:inputFeatures
-                                                             error:&error];
-  if (error) {
-    NSLog(@"Failed to predict with %@, error: %@", inputFeatures,
-          [error localizedDescription]);
-    return false;
-  }
-  NSLog(@"output names %@", [outputFeatures featureNames]);
-  // TODO(anhappdev): input name is hard-coded for image classification
-  NSLog(@"output Softmax: %@", [outputFeatures featureValueForName:@"Softmax"]);
-
-  MLMultiArray *outputArray =
-      [[outputFeatures featureValueForName:@"Softmax"] multiArrayValue];
-
-  // get float array from output feature
-  __block float *foo;
-  // TODO(anhappdev): Error: No visible @interface for 'MLMultiArray' declares
-  // the selector 'getBytesWithHandler:'
-  //  [outputArray getBytesWithHandler:(^(const void *bytes, NSInteger size) {
-  //    NSLog(@"buffer size = %ld", size);
-  //    foo = (float *)bytes;
-  //  })];
-  //
-  //  // check if the output meet our expectation
-  //  float max = 0;
-  //  int index = 0;
-  //  for (int i = 0; i < 1001; i++) {
-  //    if (foo[i] > max) {
-  //      max = foo[i];
-  //      index = i;
-  //    }
-  //  }
-  //  NSLog(@"%d\n", index);
-#endif
-
   return true;
 }
 
 - (bool)issueQueries {
-  NSError *error;
+  NSError *error = nil;
   outputFeatures =
       (MultiArrayFeatureProvider *)[mlmodel predictionFromFeatures:inputFeatures
                                                              error:&error];
-  if (!outputFeatures) {
+  if (error != nil) {
     NSLog(@"Failed to predict with %@, error: %@", inputFeatures,
           [error localizedDescription]);
     return false;
@@ -258,7 +218,8 @@ struct TensorData {
   return true;
 }
 
-- (bool)getOutput:(void *_Nonnull *_Nonnull)data {
+- (bool)getOutput:(void **)data {
+  // TODO(anhappdev): output name Softmax is for image classification only
   *data = [[[outputFeatures featureValueForName:@"Softmax"] multiArrayValue]
       dataPointer];
   return true;
