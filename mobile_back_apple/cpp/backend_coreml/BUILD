@@ -26,7 +26,7 @@ apple_xcframework(
     name = "libcoremlbackend",
     bundle_id = "com.mlcommons.inference.backend-coreml",
     exported_symbols_lists = ["//flutter/cpp/c:exported_symbols.lds"],
-    infoplists = ["//flutter/cpp/flutter:empty.plist"],
+    infoplists = ["//flutter/cpp/flutter:BackendBridgeInfo.plist"],
     ios = {
         "simulator": [
             "x86_64",

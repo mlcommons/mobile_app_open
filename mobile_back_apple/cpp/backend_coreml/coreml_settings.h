@@ -36,42 +36,42 @@ benchmark_setting {
   md5_checksum: "7921496525e1cd5464745f04e43cc7fd"
 }
 
-benchmark_setting {
-  benchmark_id: "IC_tpu_float32_offline"
-  accelerator: "coreml"
-  accelerator_desc: "Neural Engine"
-  configuration: "Core ML"
-  batch_size: 32
-  src: "https://github.com/mlcommons/mobile_app_open/raw/54c01d96f948a588c1bd38d1bc6e27cfe4c8b5bc/mobile_back_apple/dev-resources/MobilenetEdgeTPU_multi_array.mlmodel"
-  md5_checksum: "7921496525e1cd5464745f04e43cc7fd"
-}
-
-benchmark_setting {
-  benchmark_id: "OD_float32"
-  accelerator: "coreml"
-  accelerator_desc: "Neural Engine"
-  configuration: "Core ML"
-  src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
-  md5_checksum: ""
-}
-
-benchmark_setting {
-  benchmark_id: "LU_float32"
-  accelerator: "coreml"
-  accelerator_desc: "Neural Engine"
-  configuration: "Core ML"
-  src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
-  md5_checksum: ""
-}
-
-benchmark_setting {
-  benchmark_id: "IS_float32_mosaic"
-  accelerator: "coreml"
-  accelerator_desc: "Neural Engine"
-  configuration: "Core ML"
-  src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
-  md5_checksum: ""
-}
+//benchmark_setting {
+//  benchmark_id: "IC_tpu_float32_offline"
+//  accelerator: "coreml"
+//  accelerator_desc: "Neural Engine"
+//  configuration: "Core ML"
+//  batch_size: 32
+//  src: "https://github.com/mlcommons/mobile_app_open/raw/54c01d96f948a588c1bd38d1bc6e27cfe4c8b5bc/mobile_back_apple/dev-resources/MobilenetEdgeTPU_multi_array.mlmodel"
+//  md5_checksum: "7921496525e1cd5464745f04e43cc7fd"
+//}
+//
+//benchmark_setting {
+//  benchmark_id: "OD_float32"
+//  accelerator: "coreml"
+//  accelerator_desc: "Neural Engine"
+//  configuration: "Core ML"
+//  src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
+//  md5_checksum: ""
+//}
+//
+//benchmark_setting {
+//  benchmark_id: "LU_float32"
+//  accelerator: "coreml"
+//  accelerator_desc: "Neural Engine"
+//  configuration: "Core ML"
+//  src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
+//  md5_checksum: ""
+//}
+//
+//benchmark_setting {
+//  benchmark_id: "IS_float32_mosaic"
+//  accelerator: "coreml"
+//  accelerator_desc: "Neural Engine"
+//  configuration: "Core ML"
+//  src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
+//  md5_checksum: ""
+//}
 
 )SETTINGS";
 

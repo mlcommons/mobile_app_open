@@ -35,7 +35,7 @@ coreml-build:
 coreml-run:
 	cd ${REPO_ROOT_DIR} && \
 	bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET \
-		--mode=PerformanceOnly \
+		--mode=SubmissionRun \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/MobilenetEdgeTPU_multi_array.mlmodel" \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
