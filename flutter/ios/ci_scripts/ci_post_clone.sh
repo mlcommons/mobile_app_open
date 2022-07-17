@@ -65,7 +65,7 @@ export BAZEL_OUTPUT_ROOT_ARG=--output_user_root=$MC_BUILD_HOME/bazel
 
 echo "$MC_LOG_PREFIX Build backend and Flutter packages"
 # Remember to update the next line if make commands are changed.
-cd "$MC_REPO_HOME" && time make flutter/prepare && make flutter/ios
+cd "$MC_REPO_HOME" && time make flutter/prepare && time make flutter/ios
 
 if [ "$CI_XCODEBUILD_ACTION" = "build-for-testing" ]; then
   cd "$MC_REPO_HOME"/flutter && flutter build ios --config-only integration_test/first_test.dart

@@ -37,9 +37,9 @@ cc_library(
 
 apple_xcframework(
     name = "backend_bridge_fw",
-    bundle_id = "com.mlcommons.inference.backend_bridge",
+    bundle_id = "com.mlcommons.inference.backend-bridge",
     exported_symbols_lists = ["//flutter/cpp/flutter:exported_symbols.lds"],
-    infoplists = ["//flutter/cpp/flutter:empty.plist"],
+    infoplists = ["//flutter/cpp/flutter:BackendBridgeInfo.plist"],
     ios = {
         "simulator": [
             "x86_64",
