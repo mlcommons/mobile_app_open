@@ -39,7 +39,7 @@ MOBILEMOSAIC_MODEL_PATH=${MODEL_BASE_PATH}/vision/mosaic/models_and_checkpoints/
 
 ${DLCBUILDDIR}/mlperf_mobile_docker_1_1.stamp:
 	# Building mlperf_mobile docker
-	docker image build -t mlperf_mobile:1.1 $(dir $(abspath ${TOPDIR}/android/docker/mlperf_mobile/Dockerfile))
+	docker image build -t mlperf_mobile:1.1 $(dir $(abspath ${TOPDIR}/datasets/docker/Dockerfile))
 	mkdir -p ${DLCBUILDDIR}
 	touch $@
 

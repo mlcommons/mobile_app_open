@@ -72,15 +72,6 @@ jobs:
           npm install -g quicktype
       - name: Check export result schema
         run: make lint/result-schema
-  java:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run Java format check
-        uses: axel-op/googlejavaformat-action@v3
-        with:
-          version: 1.9
-          args: --set-exit-if-changed --replace
   markdown:
     runs-on: ubuntu-latest
     steps:
