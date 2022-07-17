@@ -3,22 +3,25 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		00168AD425E36DDA00BC9D7D /* CoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00168AD325E36DDA00BC9D7D /* CoreML.framework */; };
 		00168AD625E36DF700BC9D7D /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 00168AD525E36DEC00BC9D7D /* libc++.tbd */; };
-		00168AD825E3752300BC9D7D /* ios_backend_fw_static in Frameworks */ = {isa = PBXBuildFile; fileRef = 00168AD725E374ED00BC9D7D /* ios_backend_fw_static */; };
-		035547E55D1857EA2B3C8779 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10CDB3E2A91DF927CD274CD3 /* Pods_RunnerTests.framework */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		19C134532876922700263A48 /* backend_bridge_fw.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */; };
+		19C134542876922700263A48 /* backend_bridge_fw.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		19C1345E2878151A00263A48 /* libtflitebackend.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1345D2878151A00263A48 /* libtflitebackend.xcframework */; };
+		19C1345F2878151A00263A48 /* libtflitebackend.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1345D2878151A00263A48 /* libtflitebackend.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C25ABBE270595F000518142 /* RunnerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C25ABBD270595F000518142 /* RunnerTests.m */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
-		3C7409F2362C675A42089FB3 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC8264ABD8DFD67ACEACCDC0 /* Pods_Runner.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		CEA786FDB12CF80A3697FDAF /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8EF4D7B34CC3D1FBA66853A /* Pods_RunnerTests.framework */; };
+		DD2FD2B718B01E010F0F88BB /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91CBF18371DBD12EEEC9EA37 /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,12 +35,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		9705A1C41CF9048500538489 /* Embed Frameworks */ = {
+		19C134552876922700263A48 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				19C1345F2878151A00263A48 /* libtflitebackend.xcframework in Embed Frameworks */,
+				19C134542876922700263A48 /* backend_bridge_fw.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -47,12 +52,14 @@
 /* Begin PBXFileReference section */
 		00168AD325E36DDA00BC9D7D /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
 		00168AD525E36DEC00BC9D7D /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
-		00168AD725E374ED00BC9D7D /* ios_backend_fw_static */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = ios_backend_fw_static; path = Flutter/ios_backend_fw_static.framework/ios_backend_fw_static; sourceTree = "<group>"; };
-		10CDB3E2A91DF927CD274CD3 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		1991586826BD025E00BB6FE2 /* Info-Release.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-Release.plist"; sourceTree = "<group>"; };
 		1991586926BD025E00BB6FE2 /* Info-Debug.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-Debug.plist"; sourceTree = "<group>"; };
+		19C1344E2876918E00263A48 /* frameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = frameworks; sourceTree = "<group>"; };
+		19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = backend_bridge_fw.xcframework; path = frameworks/backend_bridge_fw.xcframework; sourceTree = "<group>"; };
+		19C134592876A70900263A48 /* ios.mk */ = {isa = PBXFileReference; lastKnownFileType = text; path = ios.mk; sourceTree = "<group>"; };
+		19C1345D2878151A00263A48 /* libtflitebackend.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libtflitebackend.xcframework; path = frameworks/libtflitebackend.xcframework; sourceTree = "<group>"; };
 		2C25ABBB270595F000518142 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C25ABBD270595F000518142 /* RunnerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunnerTests.m; sourceTree = "<group>"; };
 		2C25ABBF270595F000518142 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -64,6 +71,7 @@
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		77CED303FE90273EC82BBAD0 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		91CBF18371DBD12EEEC9EA37 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		96DD4CB72638A75D006643CA /* Runner.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
@@ -73,7 +81,7 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B2F3E7D2361B9115B41D6B52 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		C225CCAFF2C9DB0836BBE358 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
-		EC8264ABD8DFD67ACEACCDC0 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8EF4D7B34CC3D1FBA66853A /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				035547E55D1857EA2B3C8779 /* Pods_RunnerTests.framework in Frameworks */,
+				CEA786FDB12CF80A3697FDAF /* Pods_RunnerTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,10 +97,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00168AD825E3752300BC9D7D /* ios_backend_fw_static in Frameworks */,
+				19C134532876922700263A48 /* backend_bridge_fw.xcframework in Frameworks */,
 				00168AD625E36DF700BC9D7D /* libc++.tbd in Frameworks */,
 				00168AD425E36DDA00BC9D7D /* CoreML.framework in Frameworks */,
-				3C7409F2362C675A42089FB3 /* Pods_Runner.framework in Frameworks */,
+				DD2FD2B718B01E010F0F88BB /* Pods_Runner.framework in Frameworks */,
+				19C1345E2878151A00263A48 /* libtflitebackend.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,11 +111,14 @@
 		00168AD225E36DDA00BC9D7D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				00168AD725E374ED00BC9D7D /* ios_backend_fw_static */,
+				19C1345D2878151A00263A48 /* libtflitebackend.xcframework */,
+				19C134592876A70900263A48 /* ios.mk */,
+				19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */,
+				19C1344E2876918E00263A48 /* frameworks */,
 				00168AD525E36DEC00BC9D7D /* libc++.tbd */,
 				00168AD325E36DDA00BC9D7D /* CoreML.framework */,
-				EC8264ABD8DFD67ACEACCDC0 /* Pods_Runner.framework */,
-				10CDB3E2A91DF927CD274CD3 /* Pods_RunnerTests.framework */,
+				91CBF18371DBD12EEEC9EA37 /* Pods_Runner.framework */,
+				E8EF4D7B34CC3D1FBA66853A /* Pods_RunnerTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -213,9 +225,9 @@
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
-				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				D5A11810053EEA7778D10F3D /* [CP] Embed Pods Frameworks */,
+				19C134552876922700263A48 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -501,7 +513,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
-					"$(PROJECT_DIR)/Flutter/ios_backend_fw_static.framework",
 				);
 				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mlcommons.inference;
@@ -739,7 +750,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
-					"$(PROJECT_DIR)/Flutter/ios_backend_fw_static.framework",
 				);
 				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mlcommons.inference;
@@ -778,7 +788,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
-					"$(PROJECT_DIR)/Flutter/ios_backend_fw_static.framework",
 				);
 				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mlcommons.inference;

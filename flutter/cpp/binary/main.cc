@@ -98,7 +98,8 @@ int Main(int argc, char* argv[]) {
 
   // Command Line Flags for mlperf.
   std::string mode, scenario = "SingleStream", output_dir;
-  int min_query_count = 100, min_duration = 100;
+  int min_query_count = 100, min_duration = 100,
+      single_stream_expected_latency_ns = 1000000;
   flag_list.clear();
   flag_list.insert(
       flag_list.end(),
@@ -112,6 +113,9 @@ int Main(int argc, char* argv[]) {
        Flag::CreateFlag("min_duration", &min_duration,
                         "The test will guarantee to run at least this "
                         "duration in performance mode. The duration is in ms."),
+       Flag::CreateFlag("single_stream_expected_latency_ns",
+                        &single_stream_expected_latency_ns,
+                        "single_stream_expected_latency_ns"),
        Flag::CreateFlag("output_dir", &output_dir,
                         "The output directory of mlperf.", Flag::kRequired)});
 
@@ -325,7 +329,8 @@ int Main(int argc, char* argv[]) {
   // Running mlperf.
   MlperfDriver driver(std::move(dataset), std::move(backend), scenario,
                       batch_size);
-  driver.RunMLPerfTest(mode, min_query_count, min_duration, output_dir);
+  driver.RunMLPerfTest(mode, min_query_count, min_duration,
+                       single_stream_expected_latency_ns, output_dir);
   LOG(INFO) << "90 percentile latency: " << driver.ComputeLatencyString();
   LOG(INFO) << "Accuracy: " << driver.ComputeAccuracyString();
   return 0;

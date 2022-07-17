@@ -21,15 +21,15 @@ ListView createListOfBenchmarkItemsWidgets(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(40, 10, 20, 10),
-              child: Container(
+              padding: const EdgeInsets.fromLTRB(40, 10, 20, 10),
+              child: SizedBox(
                 width: pictureEdgeSize,
                 height: pictureEdgeSize,
                 child: benchmark.info.icon,
               ),
             ),
             Text(benchmark.taskConfig.name),
-            Icon(
+            const Icon(
               Icons.chevron_right,
               color: Colors.grey,
             ),
@@ -47,46 +47,59 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
   final info = benchmark.info.getLocalizedInfo(stringResources);
 
   showModalBottomSheet(
-      context: context,
-      isDismissible: false,
-      enableDrag: false,
-      isScrollControlled: true,
-      backgroundColor: Colors.white.withOpacity(0.8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      builder: (context) => Wrap(
+    context: context,
+    isDismissible: false,
+    enableDrag: false,
+    isScrollControlled: true,
+    backgroundColor: Colors.white.withOpacity(0.8),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+    builder: (context) => Wrap(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Flexible(
-                            flex: 5,
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(benchmark.taskConfig.name,
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 28))
-                                ])),
-                        Flexible(
-                            flex: 1,
-                            child: Container(
-                                alignment: Alignment.topRight,
-                                child: IconButton(
-                                    splashRadius: 24,
-                                    onPressed: () => Navigator.pop(context),
-                                    icon:
-                                        Icon(Icons.close, color: Colors.grey))))
-                      ])),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
-                  child: Text(info.detailsContent,
-                      style: TextStyle(fontSize: 16))),
+              Flexible(
+                flex: 5,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      benchmark.taskConfig.name,
+                      textAlign: TextAlign.left,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: Container(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                    splashRadius: 24,
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close, color: Colors.grey),
+                  ),
+                ),
+              ),
             ],
-          ));
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          child: Text(
+            info.detailsContent,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ],
+    ),
+  );
 }

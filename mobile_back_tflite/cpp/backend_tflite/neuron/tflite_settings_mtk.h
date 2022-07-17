@@ -12,12 +12,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TFLITE_SETTINGS_H
-#define TFLITE_SETTINGS_H
+#ifndef TFLITE_SETTINGS_MTK_H
+#define TFLITE_SETTINGS_MTK_H
 
 #include <string>
 
-const std::string tflite_settings = R"SETTINGS(
+const std::string tflite_settings_mtk = R"SETTINGS(
 common_setting {
   id: "num_threads"
   name: "Number of threads"
@@ -34,7 +34,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 1
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  md5Checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  md5_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
 }
 
 benchmark_setting {
@@ -44,7 +44,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 256
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  md5Checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  md5_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
 }
 
 benchmark_setting {
@@ -54,7 +54,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 1
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
-  md5Checksum: "6c7af49d97a2b2488222d94936d2dc18"
+  md5_checksum: "6c7af49d97a2b2488222d94936d2dc18"
 }
 
 benchmark_setting {
@@ -64,7 +64,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 1
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_20200602.tflite"
-  md5Checksum: "3a636c066ca2916e1858266857e96c72"
+  md5_checksum: "3a636c066ca2916e1858266857e96c72"
 }
 
 benchmark_setting {
@@ -74,7 +74,7 @@ benchmark_setting {
   configuration: "TFLite"
   batch_size: 1
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_uint8.tflite"
-  md5Checksum: "1b0a50e380612884f82c157e69c66d22"
+  md5_checksum: "1b0a50e380612884f82c157e69c66d22"
 }
 
 benchmark_setting {
@@ -83,7 +83,7 @@ benchmark_setting {
   accelerator_desc: "Neuron"
   configuration: "TFLite"
   src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
-  md5Checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+  md5_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
 }
 
 )SETTINGS";

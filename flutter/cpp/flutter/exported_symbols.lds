@@ -1,6 +1,8 @@
-dart_ffi_run_benchmark
-dart_ffi_run_benchmark_free
-dart_ffi_backend_match
-dart_ffi_backend_match_free
-dart_ffi_mlperf_config
-dart_ffi_mlperf_config_free
+_dart_ffi_run_benchmark
+_dart_ffi_run_benchmark_free
+_dart_ffi_get_dataset_size
+_dart_ffi_get_query_counter
+_dart_ffi_backend_match
+_dart_ffi_backend_match_free
+_dart_ffi_mlperf_config
+_dart_ffi_mlperf_config_free

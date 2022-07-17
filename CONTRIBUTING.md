@@ -61,5 +61,3 @@ See [format.mk](tools/formatter/format.mk) for more commands.
 
 Running `make format` requires you to have all the tools installed locally on your computer.
 For your convenience you can use a Docker image to format code files by running `make docker/format`.
-Note: if you have an error related to flutter when running `make docker/format`,
-try to run `cd flutter && flutter clean` to clear flutter cache, then try `make docker/format` again.

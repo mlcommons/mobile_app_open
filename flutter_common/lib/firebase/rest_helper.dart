@@ -35,7 +35,7 @@ class RestHelper {
         headers: {
           'Authorization': await getAuthToken(),
         },
-        body: JsonEncoder().convert(jsonResult));
+        body: const JsonEncoder().convert(jsonResult));
 
     if (response.statusCode != HttpStatus.created) {
       throw 'error ${response.statusCode}: ${response.body}';

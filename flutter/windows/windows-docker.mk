@@ -28,6 +28,7 @@ flutter/windows/docker/--: flutter/windows/docker/image
 		--workdir "C:/workdir" \
 		--env "BAZEL_CACHE_ARG=${BAZEL_CACHE_ARG}" \
 		--env GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS} \
+		--env FLUTTER_FORCE_PUB_GET=1 \
 		${fwc_image_name} \
 		cmd
 

@@ -10,6 +10,20 @@ http_archive(
 )
 
 http_archive(
+    name = "build_bazel_rules_apple",
+    sha256 = "36072d4f3614d309d6a703da0dfe48684ec4c65a89611aeb9590b45af7a3e592",
+    url = "https://github.com/bazelbuild/rules_apple/releases/download/1.0.1/rules_apple.1.0.1.tar.gz",
+)
+
+load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
+
+apple_rules_dependencies()
+
+load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
+
+apple_support_dependencies()
+
+http_archive(
     name = "org_tensorflow",
     patch_args = ["-p1"],
     patches = [
@@ -29,6 +43,8 @@ http_archive(
 )
 
 # Initialize tensorflow workspace.
+# Must be after apple dependencies
+# because it loads older version of build_bazel_rules_apple
 load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
 
 tf_workspace3()
@@ -57,13 +73,12 @@ android_workspace()
 #    name = "androidndk",
 #)
 
-# use Neuron Delegate aar before we have updated source code
-#http_archive(
-#    name = "neuron_delegate",
-#    sha256 = "2e4600c99c9b4ea7a129108cd688419eeef9b2aeabf05df6f385258e19ca96c4",
-#    strip_prefix = "tflite-neuron-delegate-2.6.0",
-#    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/v2.6.0.tar.gz"],
-#)
+http_archive(
+    name = "neuron_delegate",
+    sha256 = "2bef00cc7ba6f649a437e979fe1b36bdd94f575b5c00e0d08cb4e92e586f49a7",
+    strip_prefix = "tflite-neuron-delegate-2.8.0",
+    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/tags/v2.8.0.tar.gz"],
+)
 
 new_local_repository(
     name = "samsungbackend",
@@ -79,33 +94,6 @@ http_archive(
     strip_prefix = "inference-a77ac37d07145d9f3123465a8fd18f9ebbde5d6a",
     urls = [
         "https://github.com/mlcommons/inference/archive/a77ac37d07145d9f3123465a8fd18f9ebbde5d6a.tar.gz",
-    ],
-)
-
-http_archive(
-    name = "build_bazel_rules_apple",
-    sha256 = "9f9eb6cdd25d7932cb939df24807c2d70772aad7a79f1357e25ced9d0d443cfd",
-    strip_prefix = "rules_apple-0.19.0",
-    urls = [
-        "https://github.com/bazelbuild/rules_apple/archive/refs/tags/0.19.0.zip",
-    ],
-)
-
-http_archive(
-    name = "build_bazel_rules_swift",
-    sha256 = "ef728d0d99276d62b2393c350f29f176a6f38a925f2d12c37c4ed64f6906c2f5",
-    strip_prefix = "rules_swift-0.13.0",
-    urls = [
-        "https://github.com/bazelbuild/rules_swift/archive/refs/tags/0.13.0.zip",
-    ],
-)
-
-http_archive(
-    name = "build_bazel_apple_support",
-    sha256 = "249be3d90bc4211928a5260c4bc5792a236c58d1b6183c0e30f58db8710fc952",
-    strip_prefix = "apple_support-0.7.2",
-    urls = [
-        "https://github.com/bazelbuild/apple_support/archive/refs/tags/0.7.2.zip",
     ],
 )
 

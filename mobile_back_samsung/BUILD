@@ -1,3 +1,5 @@
+# Link to .so libs
+# https://github.com/mlcommons/mobile_back_samsung/tree/merge-submission-v2.0-into-master_samsung-backend/mobile_back_samsung/samsung/lib
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
@@ -19,7 +21,6 @@ cc_library(
             "samsung_backend/lib/libsbe1200_core.so",
             "samsung_backend/lib/libc++.so",
             "samsung_backend/lib/libeden_nn_on_system.so",
-            #"samsung_backend/lib/libsbe2100_core.so",
         ],
         "//conditions:default": [],
     }),

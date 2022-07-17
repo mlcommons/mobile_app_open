@@ -11,6 +11,8 @@ import 'package:mlperfbench/ui/settings/snack_bar.dart';
 import 'package:mlperfbench/ui/settings/task_config_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({Key? key}) : super(key: key);
+
   @override
   _SettingsScreen createState() => _SettingsScreen();
 }
@@ -99,11 +101,26 @@ class _SettingsScreen extends State<SettingsScreen> {
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: Text(
+                stringResources.settingsKeepLogs,
+              ),
+            ),
+            subtitle: Text(stringResources.settingsKeepLogsSubtitle),
+            trailing: Switch(
+              value: store.keepLogs,
+              onChanged: (flag) {
+                store.keepLogs = flag;
+              },
+            ),
+          ),
+          ListTile(
+            title: Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Text(
                 stringResources.cooldown,
               ),
             ),
-            subtitle: Text(stringResources.cooldownSubtitle
-                .replaceAll('<cooldownPause>', store.cooldownPause.toString())),
+            subtitle: Text(stringResources.cooldownSubtitle.replaceAll(
+                '<cooldownPause>', store.cooldownDuration.toString())),
             trailing: Switch(
                 value: store.cooldown,
                 onChanged: (flag) {
@@ -111,35 +128,35 @@ class _SettingsScreen extends State<SettingsScreen> {
                 }),
           ),
           Slider(
-            value: store.cooldownPause.toDouble(),
-            min: 0,
+            value: store.cooldownDuration.toDouble(),
+            min: 1,
             max: 10,
-            divisions: 10,
-            label: store.cooldownPause.toString(),
+            divisions: 9,
+            label: store.cooldownDuration.toString(),
             onChanged: store.cooldown
                 ? (double value) {
                     setState(() {
-                      store.cooldownPause = value.toInt();
+                      store.cooldownDuration = value.toInt();
                     });
                   }
                 : null,
           ),
-          Divider(),
+          const Divider(),
           ListTile(
             title: Text(
               stringResources.privacyPolicy,
             ),
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () =>
                 launchUrl(Uri.parse('https://mlcommons.org/mobile_privacy')),
           ),
           ListTile(
             title: Text(stringResources.eula),
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () =>
                 launchUrl(Uri.parse('https://mlcommons.org/mobile_eula')),
           ),
-          Divider(),
+          const Divider(),
           ListTile(
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
@@ -147,7 +164,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 stringResources.taskConfigSettingsEntry,
               ),
             ),
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () async {
               if (state.state == BenchmarkStateEnum.done ||
                   state.state == BenchmarkStateEnum.waiting) {
@@ -161,7 +178,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               }
             },
           ),
-          Divider(),
+          const Divider(),
           TextButton(
             style: TextButton.styleFrom(
               textStyle: const TextStyle(fontSize: 20),

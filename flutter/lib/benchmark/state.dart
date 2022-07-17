@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -17,8 +19,6 @@ import 'package:mlperfbench_common/data/results/dataset_info.dart';
 import 'package:mlperfbench_common/data/results/dataset_type.dart';
 import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
 
@@ -26,6 +26,7 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/list.dart';
+import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/device_info.dart';
@@ -39,11 +40,22 @@ import 'run_mode.dart';
 
 enum BenchmarkStateEnum {
   downloading,
-  cooldown,
   waiting,
   running,
   aborting,
   done,
+}
+
+class ProgressInfo {
+  bool cooldown = false;
+  bool accuracy = false;
+  BenchmarkInfo? info;
+  int totalStages = 0;
+  int currentStage = 0;
+  int cooldownDurationMs = 0;
+  double get stageProgress => calculateStageProgress?.call() ?? 0.0;
+
+  double Function()? calculateStageProgress;
 }
 
 class BenchmarkState extends ChangeNotifier {
@@ -55,17 +67,22 @@ class BenchmarkState extends ChangeNotifier {
   late final ConfigManager configManager;
   late final BackendInfo backendInfo;
 
+  Object? error;
+  StackTrace? stackTrace;
+
   bool taskConfigFailedToLoad = false;
+  String currentLogDir = '';
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
-  bool _cooling = false;
 
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get downloadingProgress => resourceManager.progress;
 
   // Only if [state] == [BenchmarkStateEnum.running]
-  Benchmark? currentlyRunning;
-  String runningProgress = '';
+  ProgressInfo progressInfo = ProgressInfo();
+  // Benchmark? currentlyRunning;
+  // String runningProgress = '';
+
   ExtendedResult? lastResult;
 
   num get result {
@@ -135,35 +152,45 @@ class BenchmarkState extends ChangeNotifier {
     notifyListeners();
     try {
       await setTaskConfig(name: _store.chosenConfigurationName);
+      deferredLoadResources();
+    } catch (e, trace) {
+      print("can't load resources: $e");
+      print(trace);
+      error = e;
+      stackTrace = trace;
+      taskConfigFailedToLoad = true;
+      notifyListeners();
+    }
+  }
+
+  // Start loading resources in background.
+  // Return type 'void' is intended, this function must not be awaited.
+  void deferredLoadResources() async {
+    try {
       await loadResources();
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
+      error = e;
+      stackTrace = trace;
       taskConfigFailedToLoad = true;
       notifyListeners();
     }
   }
 
   Future<void> loadResources() async {
-    _middle = BenchmarkList(
-      configManager.decodedConfig,
-      backendInfo.settings.benchmarkSetting,
-      _store.testMode,
-      resourceManager.getDefaultBatchPreset(),
-    );
-    restoreLastResult();
-
-    final packageInfo = await PackageInfo.fromPlatform();
-    final newAppVersion = packageInfo.version + '+' + packageInfo.buildNumber;
-    var needToPurgeCache = false;
-    if (_store.previousAppVersion != newAppVersion) {
-      _store.previousAppVersion = newAppVersion;
-      needToPurgeCache = true;
-    }
+    final newAppVersion =
+        BuildInfoHelper.info.version + '+' + BuildInfoHelper.info.buildNumber;
+    var needToPurgeCache = _store.previousAppVersion != newAppVersion;
+    _store.previousAppVersion = newAppVersion;
 
     await Wakelock.enable();
-    resourceManager.handleResources(_middle.listResources(), needToPurgeCache);
-
+    print('start loading resources');
+    await resourceManager.handleResources(
+        _middle.listResources(), needToPurgeCache);
+    print('finished loading resources');
+    error = null;
+    stackTrace = null;
     taskConfigFailedToLoad = false;
     await Wakelock.disable();
   }
@@ -176,13 +203,14 @@ class BenchmarkState extends ChangeNotifier {
     await result.resourceManager.initSystemPaths();
     result.configManager = ConfigManager(
         result.resourceManager.applicationDirectory, result.resourceManager);
-    await result.resourceManager.loadBatchPresets();
     try {
       await result.setTaskConfig(name: store.chosenConfigurationName);
-      await result.loadResources();
+      result.deferredLoadResources();
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
+      result.error = e;
+      result.stackTrace = trace;
       result.taskConfigFailedToLoad = true;
     }
     return result;
@@ -198,7 +226,16 @@ class BenchmarkState extends ChangeNotifier {
     }
     await configManager.loadConfig(name);
     _store.chosenConfigurationName = name;
+    error = null;
+    stackTrace = null;
     taskConfigFailedToLoad = false;
+
+    _middle = BenchmarkList(
+      configManager.decodedConfig,
+      backendInfo.settings.benchmarkSetting,
+      _store.testMode,
+    );
+    restoreLastResult();
   }
 
   BenchmarkStateEnum get state {
@@ -209,21 +246,14 @@ class BenchmarkState extends ChangeNotifier {
       case false:
         return _aborting
             ? BenchmarkStateEnum.aborting
-            : _cooling
-                ? BenchmarkStateEnum.cooldown
-                : BenchmarkStateEnum.running;
+            : BenchmarkStateEnum.running;
       case true:
         return BenchmarkStateEnum.done;
     }
     throw StateError('unreachable');
   }
 
-  void _updateProgress(double value) {
-    runningProgress = '${(100 * value).round()}%';
-    notifyListeners();
-  }
-
-  void runBenchmarks() async {
+  Future<void> runBenchmarks() async {
     assert(resourceManager.done, 'Resource manager is not done.');
     assert(_doneRunning != false, '_doneRunning is false');
     _store.previousExtendedResult = '';
@@ -232,40 +262,92 @@ class BenchmarkState extends ChangeNotifier {
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
 
+    try {
+      await _runBenchmarks();
+      print('Benchmarks finished');
+      _doneRunning = _aborting ? null : true;
+    } catch (e) {
+      _doneRunning = null;
+      rethrow;
+    } finally {
+      if (currentLogDir.isNotEmpty && !_store.keepLogs) {
+        await Directory(currentLogDir).delete(recursive: true);
+      }
+
+      _aborting = false;
+
+      notifyListeners();
+
+      await Wakelock.disable();
+    }
+  }
+
+  Future<void> _runBenchmarks() async {
     final cooldown = _store.cooldown;
-    final cooldownPause = FAST_MODE
-        ? Duration(seconds: 1)
-        : Duration(minutes: _store.cooldownPause);
+    final cooldownPause = _store.testMode || isFastMode
+        ? const Duration(seconds: 1)
+        : Duration(minutes: _store.cooldownDuration);
 
     final activeBenchmarks =
-        _middle.benchmarks.where((element) => element.config.active);
+        _middle.benchmarks.where((element) => element.isActive);
 
-    var doneCounter = 0.0;
-    var doneMultiplier = _store.submissionMode ? 0.5 : 1.0;
     final exportResults = <BenchmarkExportResult>[];
     var first = true;
 
+    progressInfo.totalStages = activeBenchmarks.length;
+    if (_store.submissionMode) {
+      progressInfo.totalStages += activeBenchmarks.length;
+    }
+    progressInfo.currentStage = 0;
+    progressInfo.cooldownDurationMs = cooldownPause.inMilliseconds;
+
+    resetCurrentResults();
+
+    final startTime = DateTime.now();
+    final logDirName = startTime.toIso8601String().replaceAll(':', '-');
+    currentLogDir = '${resourceManager.applicationDirectory}/logs/$logDirName';
+
     for (final benchmark in activeBenchmarks) {
-      currentlyRunning = benchmark;
-      _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
+      progressInfo.info = benchmark.info;
+
+      // increment counter for performance benchmark before cooldown
+      progressInfo.currentStage++;
 
       if (_aborting) break;
 
       // we only do cooldown before performance benchmarks
       if (cooldown && !first) {
-        _cooling = true;
+        progressInfo.cooldown = true;
+        final timer = Stopwatch()..start();
+        progressInfo.calculateStageProgress = () {
+          return timer.elapsedMilliseconds / progressInfo.cooldownDurationMs;
+        };
         notifyListeners();
         await (_cooldownFuture = Future.delayed(cooldownPause));
-        _cooling = false;
-        notifyListeners();
+        progressInfo.cooldown = false;
+        timer.stop();
       }
       first = false;
       if (_aborting) break;
 
-      final performanceRunInfo = await runBenchmark(benchmark, false,
-          backendInfo.settings.commonSetting, backendInfo.libPath);
-      _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
-      doneCounter++;
+      final perfTimer = Stopwatch()..start();
+      progressInfo.accuracy = false;
+      progressInfo.calculateStageProgress = () {
+        final timeProgress =
+            perfTimer.elapsedMilliseconds / benchmark.taskConfig.minDurationMs;
+        final queryProgress = backendBridge.getQueryCounter() /
+            benchmark.taskConfig.minQueryCount;
+        return min(timeProgress, queryProgress);
+      };
+      notifyListeners();
+      final performanceRunInfo = await runBenchmark(
+        benchmark,
+        false,
+        backendInfo.settings.commonSetting,
+        backendInfo.libPath,
+        currentLogDir,
+      );
+      perfTimer.stop();
 
       final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
@@ -284,8 +366,7 @@ class BenchmarkState extends ChangeNotifier {
               ),
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
-        batchSize: benchmark.config.batchSize,
-        threadsNumber: benchmark.config.threadsNumber,
+        batchSize: benchmark.benchmarkSetting.batchSize,
         validity: performanceResult.validity,
       );
 
@@ -294,10 +375,21 @@ class BenchmarkState extends ChangeNotifier {
       RunResult? accuracyResult;
 
       if (_store.submissionMode) {
-        final accuracyRunInfo = await runBenchmark(benchmark, true,
-            backendInfo.settings.commonSetting, backendInfo.libPath);
-        _updateProgress(doneCounter * doneMultiplier / activeBenchmarks.length);
-        doneCounter++;
+        progressInfo.currentStage++;
+        progressInfo.accuracy = true;
+        progressInfo.calculateStageProgress = () {
+          final queryProgress =
+              backendBridge.getQueryCounter() / backendBridge.getDatasetSize();
+          return queryProgress;
+        };
+        notifyListeners();
+        final accuracyRunInfo = await runBenchmark(
+          benchmark,
+          true,
+          backendInfo.settings.commonSetting,
+          backendInfo.libPath,
+          currentLogDir,
+        );
 
         accuracyResult = accuracyRunInfo.result;
         benchmark.accuracyModeResult = BenchmarkResult(
@@ -320,8 +412,7 @@ class BenchmarkState extends ChangeNotifier {
                 ),
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
-          batchSize: benchmark.config.batchSize,
-          threadsNumber: benchmark.config.threadsNumber,
+          batchSize: benchmark.benchmarkSetting.batchSize,
           validity: accuracyResult.validity,
         );
       }
@@ -332,22 +423,22 @@ class BenchmarkState extends ChangeNotifier {
 
     if (!_aborting) {
       lastResult = ExtendedResult(
-        meta: ResultMetaInfo(uuid: Uuid().v4()),
+        meta: ResultMetaInfo(uuid: const Uuid().v4()),
         envInfo: DeviceInfo.environmentInfo,
         results: BenchmarkExportResultList(exportResults),
         buildInfo: BuildInfoHelper.info,
       );
       _store.previousExtendedResult =
-          JsonEncoder().convert(lastResult!.toJson());
+          const JsonEncoder().convert(lastResult!.toJson());
       await resourceManager.resultManager.saveResult(lastResult!);
     }
+  }
 
-    currentlyRunning = null;
-    _doneRunning = _aborting ? null : true;
-    _aborting = false;
-    notifyListeners();
-
-    await Wakelock.disable();
+  void resetCurrentResults() {
+    for (var b in _middle.benchmarks) {
+      b.accuracyModeResult = null;
+      b.performanceModeResult = null;
+    }
   }
 
   BenchmarkExportResult exportResultFromRunInfo(
@@ -447,10 +538,13 @@ class BenchmarkState extends ChangeNotifier {
     return BackendExtraSettingList(list);
   }
 
-  Future<RunInfo> runBenchmark(Benchmark benchmark, bool accuracyMode,
-      List<pb.Setting> commonSettings, String backendLibPath) async {
-    final tmpDir = await getTemporaryDirectory();
-
+  Future<RunInfo> runBenchmark(
+    Benchmark benchmark,
+    bool accuracyMode,
+    List<pb.Setting> commonSettings,
+    String backendLibPath,
+    String logDir,
+  ) async {
     final runMode =
         accuracyMode ? BenchmarkRunMode.accuracy : BenchmarkRunMode.performance;
 
@@ -458,12 +552,16 @@ class BenchmarkState extends ChangeNotifier {
         'Running ${benchmark.id} in ${runMode.getResultModeString()} mode...');
     final stopwatch = Stopwatch()..start();
 
+    final logSuffix = accuracyMode ? 'accuracy' : 'performance';
+    logDir = '$logDir/${benchmark.id}-$logSuffix';
+    await Directory(logDir).create(recursive: true);
+
     final runSettings = benchmark.createRunSettings(
         runMode: runMode,
         resourceManager: resourceManager,
         commonSettings: commonSettings,
         backendLibPath: backendLibPath,
-        logDir: tmpDir);
+        logDir: logDir);
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
@@ -495,9 +593,10 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print('unable to restore previous extended result: $e');
       print(trace);
+      error = e;
+      stackTrace = trace;
       _store.previousExtendedResult = '';
-      _middle.benchmarks.forEach((benchmark) => benchmark.accuracyModeResult =
-          benchmark.performanceModeResult = null);
+      resetCurrentResults();
       _doneRunning = null;
     }
   }

@@ -25,478 +25,8 @@ limitations under the License.
  */
 
 namespace sbe {
-const std::string sbe2200_config_fence_off = R"SETTINGS(
-common_setting {
-  id: "num_threads"
-  name: "Number of threads"
-  value {
-    value: "4"
-    name: "4 threads"
-  }
-}
-
-benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
-  accelerator: "samsung npu"
-  accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1001"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "true"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "300"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "false"
-  }
-  src: "/sdcard/MLPerf_sideload/ic_single.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "IS_uint8"
-  accelerator: "samsung npu"
-  accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1004"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "false"
-  }
-  src: "/sdcard/MLPerf_sideload/is.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "SM_uint8"
-  accelerator: "samsung npu"
-  accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1004"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "false"
-  }
-  src: "/sdcard/MLPerf_sideload/sm_uint8.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "OD_uint8"
-  accelerator: "samsung npu"
-  accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1003"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "true"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "200"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "false"
-  }
-  src: "/sdcard/MLPerf_sideload/od.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
-  accelerator: "gpu"
-  accelerator_desc: "gpu"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1000"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Int32"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "false"
-  }
-  src: "/sdcard/MLPerf_sideload/mobile_bert_gpu.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
-  accelerator: "samsung npu"
-  accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
-  batch_size: 8192
-  custom_setting {
-    id: "scenario"
-    value: "offline"
-  }
-  custom_setting {
-    id: "mode"
-    value: "1"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1002"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "false"
-  }
-  src: "/sdcard/MLPerf_sideload/ic_offline.nnc"
-})SETTINGS";
-
-const std::string sbe2200_config = R"SETTINGS(
-common_setting {
-  id: "num_threads"
-  name: "Number of threads"
-  value {
-    value: "4"
-    name: "4 threads"
-  }
-}
-
-benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
-  accelerator: "samsung npu"
-  accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1007"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "true"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "300"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "true"
-  }
-  src: "/sdcard/MLPerf_sideload/ic_single_fence.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "IS_uint8"
-  accelerator: "samsung npu"
-  accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1009"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "true"
-  }
-  src: "/sdcard/MLPerf_sideload/is_fence.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "SM_uint8"
-  accelerator: "samsung npu"
-  accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1009"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "true"
-  }
-  src: "/sdcard/MLPerf_sideload/sm_uint8_fence.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "OD_uint8"
-  accelerator: "samsung npu"
-  accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1008"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "true"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "200"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "true"
-  }
-  src: "/sdcard/MLPerf_sideload/od_fence.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
-  accelerator: "gpu"
-  accelerator_desc: "gpu"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1000"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Int32"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "false"
-  }
-  src: "/sdcard/MLPerf_sideload/mobile_bert_gpu.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
-  accelerator: "samsung npu"
-  accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
-  batch_size: 8192
-  custom_setting {
-    id: "scenario"
-    value: "offline"
-  }
-  custom_setting {
-    id: "mode"
-    value: "1"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1002"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "false"
-  }
-  src: "/sdcard/MLPerf_sideload/ic_offline.nnc"
-})SETTINGS";
 
 const std::string sbe2200_flutter_config = R"SETTINGS(
-common_setting {
-  id: "num_threads"
-  name: "Number of threads"
-  value {
-    value: "4"
-    name: "4 threads"
-  }
-}
-
 benchmark_setting {
   benchmark_id: "IC_tpu_uint8"
   accelerator: "samsung npu"
@@ -530,11 +60,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/blob/main/v2_0/Samsung/ic_single.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
+  md5_checksum: "a49175f3f4f37f59780995cec540dbf2"
+  single_stream_expected_latency_ns: 900000
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "IS_uint8_mosaic"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -566,43 +98,9 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/blob/main/v2_0/Samsung/is.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "SM_uint8"
-  accelerator: "samsung npu"
-  accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
-  custom_setting {
-    id: "preset"
-    value: "1004"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "fpc_mode"
-    value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "false"
-  }
-  src: "https://github.com/mlcommons/mobile_models/blob/main/v2_0/Samsung/sm_uint8.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8.nnc"
+  md5_checksum: "f715f55818863f371336ad29ecba1183"
+  single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
@@ -638,7 +136,9 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/blob/main/v2_0/Samsung/od.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
+  md5_checksum: "6b34201b6696fa75311d0d43820e03d2"
+  single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
@@ -674,7 +174,9 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/blob/main/v2_0/Samsung/mobile_bert_gpu.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
+  md5_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
+  single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
@@ -715,51 +217,12 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/blob/main/v2_0/Samsung/ic_offline.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+  md5_checksum: "8832370c770fa820dfde83e039e3243c"
+  single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
 const std::string sbe1200_config = R"SETTINGS(
-common_setting {
-  id: "num_threads"
-  name: "Number of threads"
-  value {
-    value: "4"
-    name: "4 threads"
-  }
-}
-
-benchmark_setting {
-  benchmark_id: "IS_uint8"
-  accelerator: "npu"
-  accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Int32"
-  }
-  src: "/sdcard/MLPerf_sideload/is.nnc"
-}
-
-benchmark_setting {
-  benchmark_id: "Mosaic"
-  accelerator: "npu"
-  accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Int32"
-  }
-  src: "/sdcard/MLPerf_sideload/mosaic.nnc"
-}
-
 benchmark_setting {
   benchmark_id: "IC_tpu_uint8"
   accelerator: "npu"
@@ -773,7 +236,9 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "/sdcard/MLPerf_sideload/ic_single.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
+  md5_checksum: "a49175f3f4f37f59780995cec540dbf2"
+  single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
@@ -789,7 +254,9 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "/sdcard/MLPerf_sideload/od.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
+  md5_checksum: "6b34201b6696fa75311d0d43820e03d2"
+  single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
@@ -806,7 +273,9 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "/sdcard/MLPerf_sideload/ic_offline.nnc"
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+  md5_checksum: "8832370c770fa820dfde83e039e3243c"
+  single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
 }  // namespace sbe

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import 'package:bot_toast/bot_toast.dart';
+
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 class MyApp extends StatelessWidget {
   final Widget home;
 
-  MyApp(this.home);
+  const MyApp({Key? key, required this.home}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -16,8 +18,8 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'MLPerf Mobile',
-      localizationsDelegates: [AppLocalizations.delegate],
-      supportedLocales: [const Locale('en', '')],
+      localizationsDelegates: const [AppLocalizations.delegate],
+      supportedLocales: const [Locale('en', '')],
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -38,13 +40,15 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.lightBackground,
 
         // This theme of application app bar
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           titleTextStyle: TextStyle(color: AppColors.darkText, fontSize: 20),
           elevation: 0,
           backgroundColor: AppColors.lightAppBarBackground,
           iconTheme: IconThemeData(color: AppColors.darkAppBarIconTheme),
         ),
       ),
+      builder: BotToastInit(),
+      navigatorObservers: [BotToastNavigatorObserver()],
       // TODO sharing screen temporarily disabled
       // home: store.isShareOptionChosen() ? MyHomePage() : ShareScreen(),
       home: home,

@@ -9,6 +9,7 @@ import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/icons.dart' show AppIcons;
 import 'package:mlperfbench/ui/page_constraints.dart';
+import 'package:mlperfbench/ui/settings/task_config_screen.dart';
 
 class ResourceErrorScreen extends StatelessWidget {
   const ResourceErrorScreen({Key? key}) : super(key: key);
@@ -30,7 +31,7 @@ class ResourceErrorScreen extends StatelessWidget {
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
+                child: SizedBox(
                   height: iconEdgeSize,
                   width: iconEdgeSize,
                   child: AppIcons.error,
@@ -39,23 +40,31 @@ class ResourceErrorScreen extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(35, 0, 35, 0),
+                padding: const EdgeInsets.fromLTRB(35, 0, 35, 0),
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: Column(
                     children: [
                       Text(
+                        'Error: ${state.error}\n',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: AppColors.darkRedText,
+                        ),
+                      ),
+                      Text(
                         stringResources.resourceErrorMessage,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 15,
                           color: AppColors.darkText,
                         ),
                       ),
                       Text(
-                        '${stringResources.resourceErrorCurrentConfig} ${state.configManager.configPath}',
+                        '${stringResources.resourceErrorCurrentConfig} ${state.configManager.configLocation}',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 15,
                           color: AppColors.darkText,
                         ),
@@ -68,13 +77,12 @@ class ResourceErrorScreen extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () async {
-                          try {
-                            await state.setTaskConfig(name: '');
-                            await state.loadResources();
-                          } catch (e, trace) {
-                            print("can't change task config: $e");
-                            print(trace);
-                          }
+                          final taskConfigs =
+                              await state.configManager.getConfigs();
+
+                          await Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  TaskConfigScreen(taskConfigs)));
                         },
                         child:
                             Text(stringResources.resourceErrorSwitchToDefault),
@@ -84,7 +92,7 @@ class ResourceErrorScreen extends StatelessWidget {
                           try {
                             await state.setTaskConfig(
                                 name: store.chosenConfigurationName);
-                            await state.loadResources();
+                            state.deferredLoadResources();
                           } catch (e, trace) {
                             print("can't change task config: $e");
                             print(trace);

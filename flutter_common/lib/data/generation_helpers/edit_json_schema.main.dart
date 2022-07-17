@@ -5,7 +5,7 @@ const fileNameEnv = 'schemaPath';
 
 void makeNullable(Map<String, dynamic> fieldDescription) {
   // print(jsonEncode(fieldDescription));
-  var originalType;
+  dynamic originalType;
   var originalKey = '';
   const possibleDescriptions = <String>['type', '\$ref'];
   for (var item in possibleDescriptions) {
@@ -46,6 +46,6 @@ Future<void> main() async {
   (definitions['Run']['properties']['start_datetime'] as Map<String, dynamic>)
       .remove('format');
 
-  final editedSchema = JsonEncoder.withIndent('    ').convert(schema);
+  final editedSchema = const JsonEncoder.withIndent('    ').convert(schema);
   await File(filename).writeAsString(editedSchema);
 }

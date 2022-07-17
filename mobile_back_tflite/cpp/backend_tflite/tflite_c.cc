@@ -32,26 +32,15 @@ limitations under the License.
 
 #if MTK_TFLITE_NEURON_BACKEND
 #include "neuron/neuron_delegate.h"
+#include "neuron/tflite_settings_mtk.h"
 #endif
 #include "tensorflow/lite/delegates/gpu/delegate.h"
 #include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
 #endif
 #include "tensorflow/core/platform/logging.h"
-
-#if MTK_TFLITE_NEURON_BACKEND
-#include "neuron/tflite_settings_mtk.h"
-#elif __APPLE__
-#include "tflite_settings_apple.h"
-#elif defined(_WIN64) || defined(_WIN32)
-// We don't have specialized settings for windows
-// but settings for Apple work on Windows orders of magnitude faster than
-// settings for Android. Apparently, uint8 operations require some special
-// emulation that slows down the benchmark.
-#include "tflite_settings_apple.h"
-#else
 #include "tflite_settings_android.h"
-#endif
-
+#include "tflite_settings_apple.h"
+#include "tflite_settings_windows.h"
 #include "thread_pool.h"
 #include "utils.h"
 
@@ -157,13 +146,46 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const char **settings,
                                      const mlperf_device_info_t *device_info) {
   *not_allowed_message = nullptr;
-  *settings = tflite_settings.c_str();
 #if MTK_TFLITE_NEURON_BACKEND && defined(__ANDROID__)
+  *settings = tflite_settings_mtk.c_str();
   return neuron_tflite_backend(not_allowed_message, device_info);
+#elif __APPLE__
+  tflite_settings_apple = tflite_settings_apple_main;
+  std::string model = device_info->model;
+  int modelNumber = 0;
+
+  // iphone model is written as "iPhone14,4" or similar
+  // check that model value has 'iPhone' prefix
+  std::string prefix = "iPhone";
+  if (!model.compare(0, prefix.size(), prefix)) {
+    modelNumber = std::stoi(model.substr(prefix.size()));
+  }
+  switch (modelNumber) {
+    case 11:
+      // iPhone X series
+      tflite_settings_apple += tflite_settings_apple_iphoneX;
+      break;
+    case 12:
+      // iPhone 11 series
+      tflite_settings_apple += tflite_settings_apple_iphone11;
+      break;
+    case 13:
+      // iPhone 12 series
+      tflite_settings_apple += tflite_settings_apple_iphone12;
+      break;
+    default:
+      // use iPhone 12 settings for unknown devices
+      tflite_settings_apple += tflite_settings_apple_iphone12;
+      break;
+  }
+  *settings = tflite_settings_apple.c_str();
+#elif defined(_WIN64) || defined(_WIN32)
+  *settings = tflite_settings_windows.c_str();
 #else
+  *settings = tflite_settings_android.c_str();
+#endif
   LOG(INFO) << "TFLite backend matches hardware";
   return true;
-#endif
 }
 
 #if __ANDROID__

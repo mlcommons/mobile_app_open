@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-const OFFICIAL_BUILD =
+const isOfficialBuild =
     bool.fromEnvironment('official-build', defaultValue: false);
 
-const FAST_MODE = bool.fromEnvironment('fast-mode', defaultValue: false);
+const isFastMode = bool.fromEnvironment('fast-mode', defaultValue: false);
 
 class AppColors {
   static const primary = Colors.blue;
   static const secondary = Colors.green;
   static const lightText = Colors.white;
-  static final lightRedText = Color.fromARGB(255, 255, 100, 100);
+  static const lightRedText = Color.fromARGB(255, 255, 120, 100);
   static const darkText = Colors.black;
   static const darkRedText = Colors.red;
   static const lightBackground = Colors.white;
@@ -20,18 +20,18 @@ class AppColors {
   static const lightAppBarBackground = Colors.white;
 
   static Color get darkAppBarBackground =>
-      OFFICIAL_BUILD ? Color(0xFF31A3E2) : Colors.brown.shade400;
+      isOfficialBuild ? const Color(0xFF31A3E2) : Colors.brown.shade400;
 
   static const lightAppBarIconTheme = Colors.white;
   static const darkAppBarIconTheme = Color(0xFF135384);
 
-  static List<Color> get mainScreenGradient => OFFICIAL_BUILD
+  static List<Color> get mainScreenGradient => isOfficialBuild
       ? [
-          Color(0xFF31A3E2),
-          Color(0xFF31A3E2),
-          Color(0xFF31A3E2),
-          Color(0xFF3189E2),
-          Color(0xFF0B4A7F),
+          const Color(0xFF31A3E2),
+          const Color(0xFF31A3E2),
+          const Color(0xFF31A3E2),
+          const Color(0xFF3189E2),
+          const Color(0xFF0B4A7F),
         ]
       : [
           Colors.brown.shade400,
@@ -44,30 +44,32 @@ class AppColors {
   static const runBenchmarkRectangle = Color(0xFF0DB526);
 
   static List<Color> get runBenchmarkCircleGradient => [
-        Color.lerp(Color(0xFF0DB526), Colors.white, 0.65)!,
-        Color(0xFF0DB526), // 0DB526
+        Color.lerp(const Color(0xFF0DB526), Colors.white, 0.65)!,
+        const Color(0xFF0DB526), // 0DB526
       ];
 
-  static List<Color> get progressScreenGradient => OFFICIAL_BUILD
-      ? [Color(0xff3189E2), Color(0xff0B4A7F)]
+  static List<Color> get progressScreenGradient => isOfficialBuild
+      ? [const Color(0xff3189E2), const Color(0xff0B4A7F)]
       : [Colors.brown.shade400, Colors.brown];
 
   static const progressCircle = Color(0xff135384);
 
+  static const progressCancelButton = Color(0x000B4A7F);
+
   static List<Color> get progressCircleGradient =>
-      [Color(0xff135384), Color(0xff135384)];
+      [const Color(0xff135384), const Color(0xff135384)];
 
   static List<Color> get resultCircleGradient => [
-        Color.lerp(Color(0xFF328BE2), Colors.white, 1 - 0.65)!,
-        Color(0xFF328BE2), // 328BE2
+        Color.lerp(const Color(0xFF328BE2), Colors.white, 1 - 0.65)!,
+        const Color(0xFF328BE2), // 328BE2
       ];
 
   static List<Color> get resultBarGradient => [
-        Color(0xFF135384),
-        Color(0xFF3183E2),
-        Color(0xFF31B8E2),
-        Color(0xFF7DD5F0),
-        Color(0xFF6AD7F9)
+        const Color(0xFF135384),
+        const Color(0xFF3183E2),
+        const Color(0xFF31B8E2),
+        const Color(0xFF7DD5F0),
+        const Color(0xFF6AD7F9)
       ];
 
   static const shareRectangle = Colors.green;

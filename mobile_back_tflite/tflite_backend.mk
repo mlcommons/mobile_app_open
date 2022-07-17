@@ -18,6 +18,8 @@ ifeq (${WITH_TFLITE},1)
   backend_tflite_windows_target=//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.dll
   backend_tflite_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
   backend_tflite_android_target=//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.so
+  backend_tflite_ios_target=//mobile_back_tflite/cpp/backend_tflite/ios:libtflitebackend
+  backend_tflite_ios_zip=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/ios/libtflitebackend.xcframework.zip
   backend_tflite_filename=libtflitebackend
 else
   # tflite is enabled by default, so print log message only if someone disabled it
@@ -27,8 +29,8 @@ endif
 ifeq (${WITH_MEDIATEK},1)
   $(info WITH_MEDIATEK=1)
   backend_mediatek_android_files= \
-    ${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtfliteneuronbackend.so \
-	mobile_back_tflite/cpp/backend_tflite/neuron/jni/arm64-v8a/libtensorflowlite_neuron_jni.so
-  backend_mediatek_android_target=//mobile_back_tflite/cpp/backend_tflite:libtfliteneuronbackend.so
+    ${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/neuron/libtfliteneuronbackend.so \
+    bazel-bin/external/neuron_delegate/neuron/java/libtensorflowlite_neuron_jni.so
+  backend_mediatek_android_target=//mobile_back_tflite/cpp/backend_tflite/neuron:libtfliteneuronbackend.so
   backend_mediatek_filename=libtfliteneuronbackend
 endif

@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 class ProgressCircles extends StatefulWidget {
   final Size _size;
 
-  ProgressCircles(this._size);
+  const ProgressCircles(this._size, {Key? key}) : super(key: key);
 
   @override
   _ProgressCirclesState createState() => _ProgressCirclesState();
 }
 
 class _ProgressCirclesState extends State<ProgressCircles> {
-  static final circles_count = 10;
+  static const circlesCount = 10;
 
   late final Timer _timer;
 
@@ -23,20 +23,20 @@ class _ProgressCirclesState extends State<ProgressCircles> {
 
   void _updateState() {
     if (_increase) {
-      if (_startCircleNumber == circles_count) {
+      if (_startCircleNumber == circlesCount) {
         _startCircleNumber = 0;
         _endCircleNumber = 1;
       } else {
         _endCircleNumber++;
       }
 
-      if (_endCircleNumber == circles_count) {
+      if (_endCircleNumber == circlesCount) {
         _increase = false;
       }
     } else {
       _startCircleNumber++;
 
-      if (_startCircleNumber == circles_count) {
+      if (_startCircleNumber == circlesCount) {
         _increase = true;
       }
     }
@@ -44,8 +44,10 @@ class _ProgressCirclesState extends State<ProgressCircles> {
 
   @override
   void initState() {
-    _timer =
-        Timer.periodic(Duration(seconds: 1), (_) => setState(_updateState));
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => setState(_updateState),
+    );
     super.initState();
   }
 
@@ -79,7 +81,7 @@ class _ProgressCirclesPaint extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     for (var i = _startCircleNumber; i < _endCircleNumber; i++) {
       final currentDegree =
-          2 * pi * ((i) / _ProgressCirclesState.circles_count) + pi / 2;
+          2 * pi * ((i) / _ProgressCirclesState.circlesCount) + pi / 2;
       final x = (size.width + size.height * cos(currentDegree)) / 2;
       final y = (size.height + size.width * sin(currentDegree)) / 2;
       canvas.drawCircle(Offset(x, y), circleRadius, _paintLine);

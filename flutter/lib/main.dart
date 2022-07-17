@@ -28,9 +28,11 @@ Future<void> main() async {
   try {
     await launchUi();
   } on UnsupportedDeviceException catch (e) {
-    runApp(MyApp(UnsupportedDeviceScreen(
-      backendError: e.backendError,
-    )));
+    runApp(MyApp(
+      home: UnsupportedDeviceScreen(
+        backendError: e.backendError,
+      ),
+    ));
   } catch (e, s) {
     print('Exception: $e');
     print('Exception stack: $s');
@@ -60,7 +62,7 @@ Future<void> launchUi() async {
         ChangeNotifierProvider.value(value: benchmarkState),
         ChangeNotifierProvider.value(value: store)
       ],
-      child: MyApp(MyHomePage()),
+      child: const MyApp(home: MyHomePage()),
     ),
   );
 }
@@ -71,7 +73,7 @@ void autostartHandler(BenchmarkState state, Store store) async {
         const bool.fromEnvironment('submission', defaultValue: false);
     store.offlineMode =
         const bool.fromEnvironment('offline', defaultValue: false);
-    state.runBenchmarks();
+    await state.runBenchmarks();
     return;
   }
   if (state.state == BenchmarkStateEnum.done) {

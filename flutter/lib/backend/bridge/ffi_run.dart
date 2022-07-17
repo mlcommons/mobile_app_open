@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
@@ -28,18 +30,20 @@ class _RunIn extends Struct {
   external int min_query_count;
   @Int32()
   external int min_duration;
+  @Int32()
+  external int single_stream_expected_latency_ns;
   external Pointer<Utf8> output_dir;
 
   void set(RunSettings rs) {
     backend_model_path = rs.backend_model_path.toNativeUtf8();
     backend_lib_path = rs.backend_lib_path.toNativeUtf8();
 
-    final backend_settings = rs.backend_settings.writeToBuffer();
-    backend_settings_len = backend_settings.length;
-    backend_settings_data = malloc.allocate<Uint8>(backend_settings.length);
+    final backendSettings = rs.backend_settings.writeToBuffer();
+    backend_settings_len = backendSettings.length;
+    backend_settings_data = malloc.allocate<Uint8>(backendSettings.length);
     backend_settings_data
-        .asTypedList(backend_settings.length)
-        .setAll(0, backend_settings);
+        .asTypedList(backendSettings.length)
+        .setAll(0, backendSettings);
 
     backend_native_lib_path = rs.backend_native_lib_path.toNativeUtf8();
 
@@ -51,8 +55,8 @@ class _RunIn extends Struct {
 
     mode = rs.mode.toNativeUtf8();
     min_query_count = rs.min_query_count;
-
     min_duration = rs.min_duration;
+    single_stream_expected_latency_ns = rs.single_stream_expected_latency_ns;
 
     output_dir = rs.output_dir.toNativeUtf8();
   }
@@ -92,6 +96,8 @@ class _RunOut extends Struct {
 
 const _runName = 'dart_ffi_run_benchmark';
 const _freeName = 'dart_ffi_run_benchmark_free';
+const _getQueryName = 'dart_ffi_get_query_counter';
+const _getDatasetSizeName = 'dart_ffi_get_dataset_size';
 
 typedef _Run = Pointer<_RunOut> Function(Pointer<_RunIn>);
 final _run = getBridgeHandle().lookupFunction<_Run, _Run>(_runName);
@@ -99,6 +105,13 @@ final _run = getBridgeHandle().lookupFunction<_Run, _Run>(_runName);
 typedef _Free1 = Void Function(Pointer<_RunOut>);
 typedef _Free2 = void Function(Pointer<_RunOut>);
 final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
+
+typedef _GetQuery1 = Int32 Function();
+typedef _GetQuery2 = int Function();
+final _getQuery =
+    getBridgeHandle().lookupFunction<_GetQuery1, _GetQuery2>(_getQueryName);
+final _getDatasetSize = getBridgeHandle()
+    .lookupFunction<_GetQuery1, _GetQuery2>(_getDatasetSizeName);
 
 RunResult runBenchmark(RunSettings rs) {
   var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
@@ -135,4 +148,12 @@ RunResult runBenchmark(RunSettings rs) {
   _free(runOut);
 
   return res;
+}
+
+int getQueryCounter() {
+  return _getQuery();
+}
+
+int getDatasetSize() {
+  return _getDatasetSize();
 }

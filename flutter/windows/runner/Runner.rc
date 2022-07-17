@@ -60,17 +60,13 @@ IDI_APP_ICON            ICON                    "resources\\app_icon.ico"
 // Version
 //
 
-#ifdef FLUTTER_BUILD_NUMBER
-#define VERSION_AS_NUMBER FLUTTER_BUILD_NUMBER
-#else
-#define VERSION_AS_NUMBER 1,0,0
-#endif
+#include "./version.gen.h"
 
-#ifdef FLUTTER_BUILD_NAME
-#define VERSION_AS_STRING #FLUTTER_BUILD_NAME
-#else
-#define VERSION_AS_STRING "1.0.0"
-#endif
+#define _MAKE_STRING(value) #value
+#define MAKE_STRING(value) _MAKE_STRING(value)
+
+#define VERSION_AS_NUMBER APP_VERSION
+#define VERSION_AS_STRING MAKE_STRING(APP_VERSION) "+" MAKE_STRING(APP_BUILD_NUMBER)
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION VERSION_AS_NUMBER

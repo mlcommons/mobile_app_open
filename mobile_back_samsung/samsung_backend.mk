@@ -16,11 +16,9 @@
 ifeq (${WITH_SAMSUNG},1)
   $(info WITH_SAMSUNG=1)
 
-  ifeq (${MOBILE_BACK_SAMSUNG_LIB_ROOT},)
-    $(error MOBILE_BACK_SAMSUNG_LIB_ROOT env must be defined when building with samsung backend)
-  endif
+  MOBILE_BACK_SAMSUNG_LIB_ROOT=$(shell echo mobile_back_samsung/samsung/lib* | awk '{print $$NF}')
   $(info MOBILE_BACK_SAMSUNG_LIB_ROOT=${MOBILE_BACK_SAMSUNG_LIB_ROOT})
-  backend_samsung_docker_args=-v "${MOBILE_BACK_SAMSUNG_LIB_ROOT}:/mnt/samsung_backend" --env MOBILE_BACK_SAMSUNG_LIB_ROOT=/mnt/samsung_backend
+
   backend_samsung_android_files= \
     ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so \
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libsamsungbackend.so \

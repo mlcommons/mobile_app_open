@@ -1,11 +1,6 @@
 
 .PHONY: format
-ifeq (${OS},Windows_NT)
-# format/java is not supported on Windows
 format: format/bazel format/clang format/dart format/ts format/line-endings format/markdown
-else
-format: format/bazel format/clang format/java format/dart format/ts format/line-endings format/markdown
-endif
 
 .PHONY: format/bazel
 format/bazel:
@@ -15,19 +10,22 @@ format/bazel:
 format/clang:
 	git ls-files -z | grep --null-data "\.h$$\|\.hpp$$\|\.cc$$\|\.cpp$$" | xargs --null --no-run-if-empty clang-format -i -style=google
 
-.PHONY: format/java
-format/java:
-	git ls-files -z | grep --null-data "\.java$$" | xargs --null --no-run-if-empty java -jar /opt/formatters/google-java-format-1.9-all-deps.jar --replace
+.PHONY: format/dart/pub
+format/dart/pub:
+	cd flutter && ${_start_args} dart pub get
+	cd flutter_common && ${_start_args} dart pub get
+	cd website && ${_start_args} dart pub get
 
 .PHONY: format/dart
 format/dart:
-	cd flutter && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
-	cd flutter_common && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
-	cd website && ${_start_args} dart pub get && ${_start_args} dart run import_sorter:main
+	cd flutter && ${_start_args} dart run import_sorter:main
+	cd flutter_common && ${_start_args} dart run import_sorter:main
+	cd website && ${_start_args} dart run import_sorter:main
 	dart format flutter flutter_common website
 
 .PHONY: format/ts
 format/ts:
+	cd firebase_functions/functions && ${_start_args} npm install --production=false
 	cd firebase_functions/functions && ${_start_args} npm run format
 	cd firebase_functions/functions && ${_start_args} npm run lint-fix
 
@@ -102,13 +100,10 @@ output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	docker build --progress=plain \
 		--build-arg UID=`id -u` --build-arg GID=`id -g` \
 		-t mlperf/formatter tools/formatter
-	# need to clean flutter cache first else we will have error when running `dart run import_sorter:main` later in docker
-	cd flutter && ${_start_args} flutter clean
 	touch $@
 
 FORMAT_DOCKER_ARGS= \
-	-v ~/.pub-cache:/home/mlperf/.pub-cache \
-	-v ~/.config/flutter:/home/mlperf/.config/flutter \
+	--mount source=mlperf-pubcache,target=/home/mlperf/.pub-cache \
 	-v $(CURDIR):/home/mlperf/mobile_app_open \
 	-w /home/mlperf/mobile_app_open \
 	-u `id -u`:`id -g` \
@@ -116,9 +111,11 @@ FORMAT_DOCKER_ARGS= \
 
 .PHONY: docker/format
 docker/format: output/docker_mlperf_formatter.stamp
+	mkdir -p ~/.pub-cache
+	mkdir -p ~/.config/flutter
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
 		${FORMAT_DOCKER_ARGS} \
-		make format
+		make format/dart/pub format
 
 .PHONY: docker/format/--
 docker/format/--: output/docker_mlperf_formatter.stamp

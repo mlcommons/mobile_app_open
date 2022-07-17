@@ -5,40 +5,40 @@ import 'package:flutter_svg/svg.dart';
 
 class AppIcons {
   static AvdPicture _pAvd(String name) {
-    return AvdPicture.asset('assets/' + name);
+    return AvdPicture.asset('assets/icons/' + name);
   }
 
   static AvdPicture _iconWhiteAvd(String name) {
-    return AvdPicture.asset('assets/' + name, color: Colors.white);
+    return AvdPicture.asset('assets/icons/' + name, color: Colors.white);
   }
 
   static SvgPicture _pSvg(String name) {
-    return SvgPicture.asset('assets/' + name);
+    return SvgPicture.asset('assets/icons/' + name);
   }
 
   static SvgPicture _iconColorSvg(String name, Color color) {
-    return SvgPicture.asset('assets/' + name, color: color);
+    return SvgPicture.asset('assets/icons/' + name, color: color);
   }
 
-  static final AvdPicture image_classification =
+  static final AvdPicture imageClassification =
       _pAvd('ic_image_classification.xml');
-  static final SvgPicture image_segmentation =
+  static final SvgPicture imageSegmentation =
       _pSvg('ic_image_segmentation.svg');
-  static final AvdPicture object_detection = _pAvd('ic_object_detection.xml');
-  static final AvdPicture language_processing =
+  static final AvdPicture objectDetection = _pAvd('ic_object_detection.xml');
+  static final AvdPicture languageProcessing =
       _pAvd('ic_language_processing.xml');
-  static final SvgPicture image_classification_offline =
+  static final SvgPicture imageClassificationOffline =
       _pSvg('ic_image_classification_offline.svg');
 
-  static final AvdPicture image_classification_white =
+  static final AvdPicture imageClassificationWhite =
       _iconWhiteAvd('ic_image_classification.xml');
-  static final SvgPicture image_segmentation_white =
+  static final SvgPicture imageSegmentationWhite =
       _iconColorSvg('ic_image_segmentation.svg', Colors.white);
-  static final AvdPicture object_detection_white =
+  static final AvdPicture objectDetectionWhite =
       _iconWhiteAvd('ic_object_detection.xml');
-  static final AvdPicture language_processing_white =
+  static final AvdPicture languageProcessingWhite =
       _iconWhiteAvd('ic_language_processing.xml');
-  static final SvgPicture image_classification_offline_white =
+  static final SvgPicture imageClassificationOfflineWhite =
       _pSvg('ic_image_classification_offline_white.svg');
 
   static final AvdPicture arrow = _pAvd('ic_arrow.xml');
@@ -49,17 +49,12 @@ class AppIcons {
 
   static final SvgPicture error = _iconColorSvg('ic_error.svg', Colors.black);
 
-  static final SvgPicture perfomance_hand = _pSvg('ic_perfomance_hand.svg');
+  static final SvgPicture performanceHand = _pSvg('ic_performance_hand.svg');
 
   static final SvgPicture waiting = _pSvg('waiting_picture.svg');
 
-  static DecorationImage splash_background2(String name) {
-    return DecorationImage(
-        image: AssetImage('assets/splash.png'), fit: BoxFit.fill);
-  }
-
-  static DecorationImage splash_background() {
-    return DecorationImage(
+  static DecorationImage splashBackground() {
+    return const DecorationImage(
         image: AssetImage('assets/splash.png'), fit: BoxFit.fill);
   }
 }

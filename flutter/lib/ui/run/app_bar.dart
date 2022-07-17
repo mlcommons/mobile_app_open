@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/ui/history/history_screen.dart';
 import 'package:mlperfbench/ui/icons.dart';
 import '../config/config_screen.dart';
 import '../settings/settings_screen.dart';
@@ -11,12 +12,22 @@ class MyAppBar {
     var actions = <Widget>[];
     if (addSettingsButton) {
       actions.add(IconButton(
+        icon: const Icon(Icons.access_time),
+        tooltip: 'History',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HistoryScreen()),
+          );
+        },
+      ));
+      actions.add(IconButton(
         icon: AppIcons.parameters,
         tooltip: 'Configuration',
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ConfigScreen()),
+            MaterialPageRoute(builder: (context) => const ConfigScreen()),
           );
         },
       ));
@@ -26,7 +37,7 @@ class MyAppBar {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SettingsScreen()),
+            MaterialPageRoute(builder: (context) => const SettingsScreen()),
           );
         },
       ));
@@ -36,11 +47,11 @@ class MyAppBar {
       title: FittedBox(
         fit: BoxFit.fitWidth,
         child: Text(title,
-            style: TextStyle(fontSize: 24, color: AppColors.lightText)),
+            style: const TextStyle(fontSize: 24, color: AppColors.lightText)),
       ),
       centerTitle: true,
       backgroundColor: AppColors.darkAppBarBackground,
-      iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
+      iconTheme: const IconThemeData(color: AppColors.lightAppBarIconTheme),
       actions: actions,
     );
   }

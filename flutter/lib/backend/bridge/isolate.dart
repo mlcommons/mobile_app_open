@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:mlperfbench/backend/bridge/ffi_run.dart';
+import 'package:mlperfbench/backend/bridge/ffi_run.dart' as ffi_run;
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
 
@@ -44,11 +44,19 @@ class BridgeIsolate {
     return res;
   }
 
+  int getQueryCounter() {
+    return ffi_run.getQueryCounter();
+  }
+
+  int getDatasetSize() {
+    return ffi_run.getDatasetSize();
+  }
+
   static void _isolateRun(SendPort sendPort) async {
     var port = ReceivePort();
     sendPort.send(port.sendPort);
     await for (var settings in port.cast<RunSettings>()) {
-      var result = runBenchmark(settings);
+      var result = ffi_run.runBenchmark(settings);
       result.validity = await isResultValid(settings);
       sendPort.send(result);
     }

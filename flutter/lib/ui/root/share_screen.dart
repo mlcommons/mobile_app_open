@@ -18,6 +18,8 @@ class ShareKeys {
 }
 
 class ShareScreen extends StatelessWidget {
+  const ShareScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final store = context.watch<Store>();
@@ -31,7 +33,7 @@ class ShareScreen extends StatelessWidget {
             MaterialStateProperty.all<Color>(AppColors.shareRectangle),
         shape: MaterialStateProperty.all(RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.0),
-            side: BorderSide(color: Colors.white))),
+            side: const BorderSide(color: Colors.white))),
         minimumSize:
             MaterialStateProperty.all<Size>(Size(minimumShareButtonWidth, 0)));
 
@@ -51,18 +53,18 @@ class ShareScreen extends StatelessWidget {
                           flex: 3,
                           child: Align(
                               alignment: Alignment.bottomCenter,
-                              child: Container(
+                              child: SizedBox(
                                   height: iconEdgeSize,
                                   width: iconEdgeSize,
                                   child: AppIcons.logo))),
                       Expanded(
                           child: Padding(
-                              padding: EdgeInsets.fromLTRB(35, 0, 35, 0),
+                              padding: const EdgeInsets.fromLTRB(35, 0, 35, 0),
                               child: Align(
                                   alignment: Alignment.topCenter,
                                   child: Text(stringResources.privacyPrompt,
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 15,
                                           color: AppColors.darkText)))))
                     ])),
@@ -74,9 +76,9 @@ class ShareScreen extends StatelessWidget {
                       flex: 2,
                       child: Column(children: [
                         Padding(
-                            padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                             child: TextButton(
-                                key: Key(ShareKeys.shareButton),
+                                key: const Key(ShareKeys.shareButton),
                                 style: shareButtonStyle,
                                 onPressed: () {
                                   store.share = true;
@@ -84,29 +86,31 @@ class ShareScreen extends StatelessWidget {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => MyHomePage()),
+                                        builder: (context) =>
+                                            const MyHomePage()),
                                   );
                                 },
                                 child: Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 10, 0, 10),
                                   child: Text(
                                     stringResources.share,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 20,
                                         color: AppColors.lightText),
                                   ),
                                 ))),
                         Padding(
-                            padding: EdgeInsets.only(top: 15),
+                            padding: const EdgeInsets.only(top: 15),
                             child: TextButton(
-                              key: Key(ShareKeys.doNotShareButton),
+                              key: const Key(ShareKeys.doNotShareButton),
                               onPressed: () {
                                 store.share = false;
 
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => MyHomePage()),
+                                      builder: (context) => const MyHomePage()),
                                 );
                               },
                               child: Text(
@@ -120,11 +124,12 @@ class ShareScreen extends StatelessWidget {
                       ])),
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(35, 20, 35, 20),
+                      padding: const EdgeInsets.fromLTRB(35, 20, 35, 20),
                       child: RichText(
                         text: TextSpan(
                           text: stringResources.promptSubText,
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 13, color: Colors.grey),
                           children: [
                             TextSpan(
                               text: stringResources.privacyPolicyButton,

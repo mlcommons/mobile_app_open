@@ -23,6 +23,7 @@ struct dart_ffi_run_benchmark_in {
   const char *mode;
   int32_t min_query_count;
   int32_t min_duration;
+  int32_t single_stream_expected_latency_ns;
   const char *output_dir;
 };
 
@@ -44,6 +45,9 @@ struct dart_ffi_run_benchmark_out {
 struct dart_ffi_run_benchmark_out *dart_ffi_run_benchmark(
     const struct dart_ffi_run_benchmark_in *in);
 void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out *out);
+
+int32_t dart_ffi_get_dataset_size();
+int32_t dart_ffi_get_query_counter();
 
 #ifdef __cplusplus
 }

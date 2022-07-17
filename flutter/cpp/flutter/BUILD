@@ -1,4 +1,4 @@
-load("@build_bazel_rules_apple//apple:ios.bzl", "ios_static_framework")
+load("@build_bazel_rules_apple//apple:apple.bzl", "apple_xcframework")
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
 
 package(
@@ -35,26 +35,24 @@ cc_library(
     alwayslink = 1,
 )
 
-cc_library(
-    name = "ios_backend",
-    srcs = ["ios_linker_workaround.cc"],
-    hdrs = ["ios_linker_workaround.h"],
+apple_xcframework(
+    name = "backend_bridge_fw",
+    bundle_id = "com.mlcommons.inference.backend_bridge",
+    exported_symbols_lists = ["//flutter/cpp/flutter:exported_symbols.lds"],
+    infoplists = ["//flutter/cpp/flutter:empty.plist"],
+    ios = {
+        "simulator": [
+            "x86_64",
+            # cpuinfo doesn't support simulator on ARM-based macs
+            # "ios_sim_arm64",
+        ],
+        "device": ["arm64"],
+    },
+    minimum_os_versions = {
+        "ios": "12.0",
+    },
     deps = [
         "//flutter/cpp/flutter:bridge",
-        "//mobile_back_tflite/cpp/backend_tflite:tflite_c",
-    ],
-)
-
-ios_static_framework(
-    name = "ios_backend_fw_static",
-    families = [
-        "iphone",
-        "ipad",
-    ],
-    ipa_post_processor = "cp_framework_to_tmp.sh",
-    minimum_os_version = "11.0",
-    deps = [
-        "//flutter/cpp/flutter:ios_backend",
     ],
 )
 
@@ -69,7 +67,6 @@ cc_binary(
 
 tflite_jni_binary(
     name = "libbackendbridge.so",
-    exported_symbols = "//flutter/cpp/flutter:exported_symbols.lds",
     linkscript = "//flutter/cpp/flutter:version_script.lds",
     deps = [
         "//flutter/cpp/flutter:bridge",

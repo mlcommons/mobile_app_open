@@ -123,7 +123,7 @@ Info about environment the app is running in. May change when you update your OS
   On Android systems value must represent actual manufacturer name obtained from system environment.
 * `model`: string. Manufacturer-defined model name  
   On Windows systems value must be `Unknown PC`.  
-  On iOS systems value must be human-readable iPhone name. For example: `iPhone SE 2nd Gen`.  
+  On iOS systems value must be Apple Machine name. For example: `iPhone7,1`.  
   On Android systems value must represent actual model name obtained from system environment.
 
 ## Application build info

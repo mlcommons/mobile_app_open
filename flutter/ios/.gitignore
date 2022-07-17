@@ -36,3 +36,4 @@ Runner/GeneratedPluginRegistrant.*
 /Flutter/ios_backend_fw_static.framework
 /build
 /Runner/Base.lproj/LaunchScreen.storyboard
+/frameworks
