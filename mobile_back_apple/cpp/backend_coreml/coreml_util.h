@@ -18,15 +18,15 @@ limitations under the License.
 
 #import "Foundation/Foundation.h"
 
-@interface CoreMLExecutor: NSObject
+@interface CoreMLExecutor : NSObject
 
 - (nullable instancetype)initWithModelPath:(const char *_Nonnull)modelPath;
 - (int)getInputCount;
 - (int)getOutputCount;
-- (bool)setInput:(void *_Nonnull) data;
+- (bool)setInput:(void *_Nonnull)data;
 - (bool)issueQueries;
 - (bool)flushQueries;
-- (bool)getOutput:(void *_Nonnull*_Nonnull) data;
+- (bool)getOutput:(void *_Nonnull *_Nonnull)data;
 
 @end
 
