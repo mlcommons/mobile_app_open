@@ -44,6 +44,7 @@ flutter_common_docker_flags= \
 		--env WITH_SAMSUNG=${WITH_SAMSUNG} \
 		--env WITH_PIXEL=${WITH_PIXEL} \
 		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
+		--env WITH_APPLE=${WITH_APPLE} \
 		--env BAZEL_ARGS_GLOBAL="${proxy_bazel_args} --output_user_root=/mnt/cache/bazel" \
 		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
 		--env FLUTTER_FORCE_PUB_GET=1 \

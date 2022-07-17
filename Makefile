@@ -16,7 +16,7 @@
 
 all: flutter
 
-# avaiable backends
+# available backends
 WITH_TFLITE?=1
 WITH_QTI?=0
 WITH_SAMSUNG?=0

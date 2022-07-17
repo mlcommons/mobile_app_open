@@ -39,8 +39,8 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const char **settings,
                                      const mlperf_device_info_t *device_info) {
   (void)device_info;
+  *not_allowed_message = nullptr;
   *settings = coreml_settings.c_str();
-  *not_allowed_message = "This is a stub backend for Core ML";
   return true;
 }
 

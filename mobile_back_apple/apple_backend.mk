@@ -14,6 +14,8 @@
 ##########################################################################
 
 ifeq (${WITH_APPLE},1)
-  $(info WITH_APPLE=1)
-
+$(info WITH_APPLE=1)
+	backend_coreml_ios_target=//mobile_back_apple/cpp/backend_coreml:libcoremlbackend
+	backend_coreml_ios_zip=${BAZEL_LINKS_PREFIX}bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.xcframework.zip
+	backend_coreml_filename=libcoremlbackend
 endif

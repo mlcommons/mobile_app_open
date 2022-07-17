@@ -14,14 +14,33 @@
 # ==============================================================================
 
 # we borrow tflite_jni_binary even for non-tflite one
-load(
-    "@org_tensorflow//tensorflow/lite:build_def.bzl",
-    "tflite_jni_binary",
-)
+load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
+load("@build_bazel_rules_apple//apple:apple.bzl", "apple_xcframework")
 
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
+)
+
+apple_xcframework(
+    name = "libcoremlbackend",
+    bundle_id = "com.mlcommons.inference.backend-coreml",
+    exported_symbols_lists = ["//flutter/cpp/c:exported_symbols.lds"],
+    infoplists = ["//flutter/cpp/flutter:empty.plist"],
+    ios = {
+        "simulator": [
+            "x86_64",
+            # cpuinfo doesn't support simulator on ARM-based macs
+            # "ios_sim_arm64",
+        ],
+        "device": ["arm64"],
+    },
+    minimum_os_versions = {
+        "ios": "12.0",
+    },
+    deps = [
+        "//mobile_back_apple/cpp/backend_coreml:coreml_c",
+    ],
 )
 
 objc_library(
