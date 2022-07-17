@@ -32,14 +32,14 @@ echo "$MC_LOG_PREFIX ========== Install dependencies =========="
 brew update
 echo "$MC_LOG_PREFIX brew version:" && brew config
 
-brew install bazelisk
+# `brew install` failed often due to connection issue so we try several times
+brew install bazelisk || brew install bazelisk || brew install bazelisk
 echo "$MC_LOG_PREFIX bazel version:" && bazel --version
 
-# `brew install protobuf` failed often due to connection issue so we try several times
 brew install protobuf || brew install protobuf || brew install protobuf
 echo "$MC_LOG_PREFIX protobuf version:" && protoc --version
 
-brew install cocoapods
+brew install cocoapods || brew install cocoapods || brew install cocoapods
 echo "$MC_LOG_PREFIX cocoapods version:" && pod --version
 
 echo "$MC_LOG_PREFIX python version:" && python3 --version
