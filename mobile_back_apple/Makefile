@@ -1,5 +1,7 @@
 # This Makefile is used for development purpose.
 # It will be removed after finishing integrating Core ML backend.
+# ImageNet validation set can be downloaded from here:
+# https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip
 
 
 REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
