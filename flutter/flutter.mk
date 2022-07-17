@@ -164,11 +164,11 @@ flutter_test_device_arg=
 endif
 .PHONY: flutter/test
 flutter/test:
-	cd flutter && ${_start_args} flutter --no-version-check test integration_test ${flutter_test_device_arg}
+	cd flutter && ${_start_args} flutter --no-version-check test integration_test ${flutter_test_device_arg} ${flutter_official_build_flag}
 
 .PHONY: flutter/run
 flutter/run:
-	cd flutter && ${_start_args} flutter --no-version-check run ${flutter_test_device_arg}
+	cd flutter && ${_start_args} flutter --no-version-check run ${flutter_test_device_arg} ${flutter_official_build_flag}
 
 .PHONY: flutter/clean
 flutter/clean:

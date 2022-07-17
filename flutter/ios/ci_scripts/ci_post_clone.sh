@@ -12,6 +12,7 @@ set -e
 export MC_LOG_PREFIX="[mobile_app_open]"
 cd ../../../
 
+echo "$MC_LOG_PREFIX START ci_post_clone"
 echo "$MC_LOG_PREFIX Current working directory is $PWD"
 # check if we are in the root directory of the repo, where the WORKSPACE file exists
 test -f WORKSPACE
@@ -24,40 +25,55 @@ else
   echo "$MC_LOG_PREFIX Running on local machine"
   export MC_BUILD_HOME=$HOME/mobile_app_open_build
 fi
+echo "$MC_LOG_PREFIX MC_BUILD_HOME is ${MC_BUILD_HOME}"
 
-brew --version
-python3 --version
+echo "$MC_LOG_PREFIX ========== Install dependencies =========="
 
-echo "$MC_LOG_PREFIX Install dependencies"
-export HOMEBREW_NO_AUTO_UPDATE=1
-export HOMEBREW_NO_INSTALL_CLEANUP=1
-brew install bazelisk && bazel --version
-brew install protobuf && protoc --version
-brew install cocoapods && pod --version
+brew update
+echo "$MC_LOG_PREFIX brew version:" && brew config
 
+# `brew install` failed often due to connection issue so we try several times
+brew install bazelisk || brew install bazelisk || brew install bazelisk
+echo "$MC_LOG_PREFIX bazel version:" && bazel --version
+
+brew install protobuf || brew install protobuf || brew install protobuf
+echo "$MC_LOG_PREFIX protobuf version:" && protoc --version
+
+brew install cocoapods || brew install cocoapods || brew install cocoapods
+echo "$MC_LOG_PREFIX cocoapods version:" && pod --version
+
+echo "$MC_LOG_PREFIX python version:" && python3 --version
 pip3 install --upgrade pip
 pip3 install \
   numpy==1.21.5 \
   absl-py==1.0.0
 
-echo "$MC_LOG_PREFIX Install Flutter"
+echo "$MC_LOG_PREFIX ========== Install Flutter =========="
 export MC_FLUTTER_HOME=$MC_BUILD_HOME/flutter
 export PUB_CACHE=$MC_BUILD_HOME/.pub-cache
 
 mkdir -p "$MC_BUILD_HOME"
 test ! -d "$MC_FLUTTER_HOME" && git clone --branch 2.10.5 --depth 1 https://github.com/flutter/flutter.git "$MC_FLUTTER_HOME"
 export PATH="$PATH:$MC_FLUTTER_HOME/bin:$PUB_CACHE/bin"
+echo "$MC_LOG_PREFIX flutter version:" && flutter --version
 flutter config --no-analytics && dart --disable-analytics
 dart pub global activate protoc_plugin
-
-echo "$MC_LOG_PREFIX Build app"
-export BAZEL_OUTPUT_ROOT_ARG=--output_user_root=$MC_BUILD_HOME/bazel
-cd "$MC_REPO_HOME" && time make
 cd "$MC_REPO_HOME"/flutter && flutter precache --ios
-cd "$MC_REPO_HOME"/flutter/ios && pod install
+
+echo "$MC_LOG_PREFIX ========== Build app =========="
+export BAZEL_OUTPUT_ROOT_ARG=--output_user_root=$MC_BUILD_HOME/bazel
+
+echo "$MC_LOG_PREFIX Build backend and Flutter packages"
+# Remember to update the next line if make commands are changed.
+cd "$MC_REPO_HOME" && time make flutter/prepare && time make flutter/ios
 
 if [ "$CI_XCODEBUILD_ACTION" = "build-for-testing" ]; then
   cd "$MC_REPO_HOME"/flutter && flutter build ios --config-only integration_test/first_test.dart
+else
+  cd "$MC_REPO_HOME"/flutter && flutter build ios --config-only --dart-define=official-build="$OFFICIAL_BUILD"
 fi
 
+cd "$MC_REPO_HOME"/flutter/ios && pod install
+
+echo "$MC_LOG_PREFIX END ci_post_clone"
 exit 0
