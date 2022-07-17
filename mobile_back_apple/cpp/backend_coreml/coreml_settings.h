@@ -36,6 +36,10 @@ benchmark_setting {
   md5_checksum: "7921496525e1cd5464745f04e43cc7fd"
 }
 
+)SETTINGS";
+
+#endif
+
 //benchmark_setting {
 //  benchmark_id: "IC_tpu_float32_offline"
 //  accelerator: "coreml"
@@ -72,7 +76,3 @@ benchmark_setting {
 //  src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
 //  md5_checksum: ""
 //}
-
-)SETTINGS";
-
-#endif
