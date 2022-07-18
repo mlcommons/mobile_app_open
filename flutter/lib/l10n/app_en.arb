@@ -91,6 +91,12 @@
 
   "historyListTitle": "Past results",
   "historyListElementSubtitle": "Average QPS <throughput> over <benchmarks#> benchmark(s)",
+  "historyListSelectionCancel": "Cancel",
+  "historyListSelectionEnable": "Enable selection",
+  "historyListSelectionSelectAll": "Select all",
+  "historyListSelectionDeselect": "Deselect",
+  "historyListSelectionDelete": "Delete",
+  "historyListSelectionDeleteConfirm": "Delete selected items?",
 
   "historyDetailsTitle": "Result details",
   "historyDetailsBuildTypeDebug": "debug build",

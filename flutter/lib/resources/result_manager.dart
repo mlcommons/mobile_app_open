@@ -72,6 +72,20 @@ class ResultManager {
     }
   }
 
+  Future<void> removeSelected(List<bool> selected) async {
+    if (selected.length != _results.list.length) {
+      throw 'selected.length != results.length';
+    }
+    var newResults = <ExtendedResult>[];
+    for (int i = 0; i < _results.list.length; i++) {
+      if (!selected[i]) {
+        newResults.add(_results.list[i]);
+      }
+    }
+    _results = _ExtendedResultList(newResults);
+    await _saveResults();
+  }
+
   Future<void> saveResult(ExtendedResult value) async {
     _results.list.add(value);
     await _saveResults();
