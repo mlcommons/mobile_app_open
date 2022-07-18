@@ -10,6 +10,10 @@ REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
 tflite: tflite-build tflite-run
 coreml: coreml-build coreml-run
 
+app:
+	cd ${REPO_ROOT_DIR} && \
+	make flutter/prepare && make flutter/ios && make flutter/run
+
 
 tflite-build:
 	cd ${REPO_ROOT_DIR} && \
