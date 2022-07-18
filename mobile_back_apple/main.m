@@ -52,8 +52,9 @@ int main(int argc, const char * argv[]) {
     NSLog(@"predictedIndex: %d", predictedIndex);
     NSLog(@"predictedScore: %f", predictedScore);
     assert(predictedIndex == expectedPredictedIndex);
-
+    
     [coreMLExecutor flushQueries];
+    coreMLExecutor = nil;
     NSLog(@"END");
   }
   return 0;

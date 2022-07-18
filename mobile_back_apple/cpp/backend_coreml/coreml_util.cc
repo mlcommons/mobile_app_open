@@ -141,6 +141,11 @@ struct TensorData {
   return self;
 }
 
+- (void)dealloc {
+  [self flushQueries];
+  NSLog(@"[CoreMLExecutor dealloc]");
+}
+
 - (int)getInputCount {
   NSInteger inputCount =
       [[[mlmodel modelDescription] inputDescriptionsByName] count];

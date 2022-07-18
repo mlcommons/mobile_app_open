@@ -11,8 +11,9 @@ tflite: tflite-build tflite-run
 coreml: coreml-build coreml-run
 
 app:
-	cd ${REPO_ROOT_DIR} && \
-	make flutter/prepare && make flutter/ios && make flutter/run
+	cd ${REPO_ROOT_DIR} && make flutter/prepare && make flutter/ios
+	cd ${REPO_ROOT_DIR}/flutter && flutter build ios
+	open ${REPO_ROOT_DIR}/flutter/ios/Runner.xcworkspace
 
 
 tflite-build:

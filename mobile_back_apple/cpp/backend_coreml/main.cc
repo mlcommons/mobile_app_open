@@ -50,19 +50,18 @@ mlperf_backend_ptr_t mlperf_backend_create(
     const char *native_lib_path) {
   // Verify only one instance of the backend exists at any time
   if (backendExists) {
-    LOG(INFO) << "Only one backend instance should exist at a time";
+    LOG(ERROR) << "Only one backend instance should exist at a time";
     return nullptr;
   }
 
   CoreMLBackendData *backend_data = new CoreMLBackendData();
-
   backendExists = true;
 
   // Load the model.
   CoreMLExecutor *coreMLExecutor =
       [[CoreMLExecutor alloc] initWithModelPath:model_path];
   if (!coreMLExecutor) {
-    LOG(INFO) << "Cannot create CoreMLExecutor";
+    LOG(ERROR) << "Cannot create CoreMLExecutor";
     return nullptr;
   }
   LOG(INFO) << "CoreMLExecutor created";
@@ -72,22 +71,25 @@ mlperf_backend_ptr_t mlperf_backend_create(
 
 // Destroy the backend pointer and its data.
 void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
-  (void)backend_ptr;
+  CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
+  [backend_data->coreMLExecutor release];
+  delete backend_data;
+  backendExists = false;
 }
 
 // Run the inference for a sample.
 mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
   LOG(INFO) << "mlperf_backend_issue_query()";
-  if ([((CoreMLBackendData *)backend_ptr)->coreMLExecutor issueQueries])
-    return MLPERF_SUCCESS;
+  CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
+  if ([backend_data->coreMLExecutor issueQueries]) return MLPERF_SUCCESS;
   return MLPERF_FAILURE;
 }
 
 // Flush the staged queries immediately.
 mlperf_status_t mlperf_backend_flush_queries(mlperf_backend_ptr_t backend_ptr) {
   LOG(INFO) << "mlperf_backend_flush_queries()";
-  if ([((CoreMLBackendData *)backend_ptr)->coreMLExecutor flushQueries])
-    return MLPERF_SUCCESS;
+  CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
+  if ([backend_data->coreMLExecutor flushQueries]) return MLPERF_SUCCESS;
   return MLPERF_FAILURE;
 }
 
