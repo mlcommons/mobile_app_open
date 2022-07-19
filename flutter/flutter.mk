@@ -33,6 +33,7 @@ flutter/firebase: flutter/firebase/config flutter/firebase/prefix
 flutter/result: flutter/result/schema flutter/result/ts
 flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
 
+OFFICIAL_BUILD?=false
 flutter_official_build_flag=--dart-define=official-build=${OFFICIAL_BUILD}
 
 .PHONY: flutter/backend-list
