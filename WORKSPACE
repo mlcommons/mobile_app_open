@@ -89,11 +89,15 @@ new_local_repository(
 http_archive(
     name = "org_mlperf_inference",
     build_file = "@//flutter/android/third_party:loadgen.BUILD",
+    patch_args = ["-p1"],
     patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
-    sha256 = "f4c57a3f3cd71f2dac166a79ad760b824aafda7b91400889acff4a9c7dbdaf8e",
-    strip_prefix = "inference-a77ac37d07145d9f3123465a8fd18f9ebbde5d6a",
+    patches = [
+        "//patches:revert_ReportLatencyResults.patch",
+    ],
+    sha256 = "6773b97450d3cfe153affd8e0c69ad2c85393b1867712e812ea0d32336fa7041",
+    strip_prefix = "inference-5dd9ed739cc8dfeae2c5d30ec06f4cb524a4dd74",
     urls = [
-        "https://github.com/mlcommons/inference/archive/a77ac37d07145d9f3123465a8fd18f9ebbde5d6a.tar.gz",
+        "https://github.com/mlcommons/inference/archive/5dd9ed739cc8dfeae2c5d30ec06f4cb524a4dd74.tar.gz",
     ],
 )
 
