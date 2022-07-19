@@ -40,7 +40,7 @@ flutter_official_build_flag=--dart-define=official-build=${OFFICIAL_BUILD}
 flutter/backend-list:
 	cat flutter/lib/backend/list.in | sed \
 		-e "s/TFLITE_TAG/${backend_tflite_filename}/" \
-		-e "s/MEDIATEKE_TAG/${backend_mediatek_filename}/" \
+		-e "s/MEDIATEK_TAG/${backend_mediatek_filename}/" \
 		-e "s/PIXEL_TAG/${backend_pixel_filename}/" \
 		-e "s/QTI_TAG/${backend_qti_filename}/" \
 		-e "s/SAMSUNG_TAG/${backend_samsung_filename}/" \
