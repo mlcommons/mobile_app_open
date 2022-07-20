@@ -33,13 +33,14 @@ flutter/firebase: flutter/firebase/config flutter/firebase/prefix
 flutter/result: flutter/result/schema flutter/result/ts
 flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
 
+OFFICIAL_BUILD?=false
 flutter_official_build_flag=--dart-define=official-build=${OFFICIAL_BUILD}
 
 .PHONY: flutter/backend-list
 flutter/backend-list:
 	cat flutter/lib/backend/list.in | sed \
 		-e "s/TFLITE_TAG/${backend_tflite_filename}/" \
-		-e "s/MEDIATEKE_TAG/${backend_mediatek_filename}/" \
+		-e "s/MEDIATEK_TAG/${backend_mediatek_filename}/" \
 		-e "s/PIXEL_TAG/${backend_pixel_filename}/" \
 		-e "s/QTI_TAG/${backend_qti_filename}/" \
 		-e "s/SAMSUNG_TAG/${backend_samsung_filename}/" \
