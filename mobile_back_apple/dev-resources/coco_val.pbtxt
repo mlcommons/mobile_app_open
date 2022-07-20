@@ -1,0 +1,7662 @@
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.3212121
+      normalized_bottom: 0.8363636
+      normalized_left: 0.14
+      normalized_right: 0.58
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.13333334
+      normalized_bottom: 0.3121212
+      normalized_left: 0.67
+      normalized_right: 0.864
+    }
+  }
+  image_name: "000000000001.jpg"
+  image_id: 1
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.25625
+      normalized_bottom: 0.76666665
+      normalized_left: 0.153125
+      normalized_right: 0.6234375
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.30833334
+      normalized_bottom: 0.875
+      normalized_left: 0.3890625
+      normalized_right: 0.8921875
+    }
+  }
+  image_name: "000000000002.jpg"
+  image_id: 2
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.10062893
+      normalized_bottom: 0.17610063
+      normalized_left: 0.21928461
+      normalized_right: 0.29393467
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.2914046
+      normalized_bottom: 0.5471698
+      normalized_left: 0.24261275
+      normalized_right: 0.5381026
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.7253669
+      normalized_bottom: 0.8155136
+      normalized_left: 0.64385694
+      normalized_right: 0.7293935
+    }
+  }
+  image_name: "000000000003.jpg"
+  image_id: 3
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.65981734
+      normalized_bottom: 0.7762557
+      normalized_left: 0.1911555
+      normalized_right: 0.3751783
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.3219178
+      normalized_bottom: 0.7671233
+      normalized_left: 0.27817404
+      normalized_right: 0.90870184
+    }
+  }
+  image_name: "000000000004.jpg"
+  image_id: 4
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.08483291
+      normalized_bottom: 0.7917738
+      normalized_left: 0.2753807
+      normalized_right: 0.4390863
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.24164525
+      normalized_bottom: 0.7609255
+      normalized_left: 0.39086294
+      normalized_right: 0.84517765
+    }
+  }
+  image_name: "000000000005.jpg"
+  image_id: 5
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.13747229
+      normalized_bottom: 0.75166297
+      normalized_left: 0.3367647
+      normalized_right: 0.45147058
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.36585367
+      normalized_bottom: 0.8669623
+      normalized_left: 0.5661765
+      normalized_right: 0.8779412
+    }
+  }
+  image_name: "000000000006.jpg"
+  image_id: 6
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.06480118
+      normalized_bottom: 0.9234168
+      normalized_left: 0.61283183
+      normalized_right: 0.99336284
+    }
+  }
+  objects {
+    class_id: 46
+    bounding_box {
+      normalized_top: 0.44624448
+      normalized_bottom: 0.9513991
+      normalized_left: 0.34070796
+      normalized_right: 0.63495576
+    }
+  }
+  image_name: "000000000007.jpg"
+  image_id: 7
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.28333333
+      normalized_bottom: 0.76458335
+      normalized_left: 0.25
+      normalized_right: 0.8171875
+    }
+  }
+  image_name: "000000000008.jpg"
+  image_id: 8
+}
+detection_results {
+  objects {
+    class_id: 70
+    bounding_box {
+      normalized_top: 0.18125
+      normalized_bottom: 0.84791666
+      normalized_left: 0.1609375
+      normalized_right: 0.475
+    }
+  }
+  objects {
+    class_id: 70
+    bounding_box {
+      normalized_top: 0.18333334
+      normalized_bottom: 0.8125
+      normalized_left: 0.6203125
+      normalized_right: 0.93125
+    }
+  }
+  image_name: "000000000009.jpg"
+  image_id: 9
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.43248177
+      normalized_bottom: 0.850365
+      normalized_left: 0.12701252
+      normalized_right: 0.4078712
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.107664235
+      normalized_bottom: 0.8868613
+      normalized_left: 0.4847943
+      normalized_right: 0.8962433
+    }
+  }
+  image_name: "000000000010.jpg"
+  image_id: 10
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6479167
+      normalized_bottom: 0.82916665
+      normalized_left: 0.2375
+      normalized_right: 0.28125
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7104167
+      normalized_bottom: 0.7875
+      normalized_left: 0.296875
+      normalized_right: 0.3765625
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.55
+      normalized_bottom: 0.6479167
+      normalized_left: 0.5765625
+      normalized_right: 0.6296875
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5625
+      normalized_bottom: 0.70416665
+      normalized_left: 0.596875
+      normalized_right: 0.628125
+    }
+  }
+  image_name: "000000000011.jpg"
+  image_id: 11
+}
+detection_results {
+  objects {
+    class_id: 85
+    bounding_box {
+      normalized_top: 0.26431718
+      normalized_bottom: 0.6035242
+      normalized_left: 0.11086474
+      normalized_right: 0.6385809
+    }
+  }
+  objects {
+    class_id: 85
+    bounding_box {
+      normalized_top: 0.35976505
+      normalized_bottom: 0.6182085
+      normalized_left: 0.6496674
+      normalized_right: 0.98447895
+    }
+  }
+  image_name: "000000000012.jpg"
+  image_id: 12
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.57300884
+      normalized_bottom: 0.8938053
+      normalized_left: 0.07079646
+      normalized_right: 0.6283186
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.16371681
+      normalized_bottom: 0.6415929
+      normalized_left: 0.47492626
+      normalized_right: 0.7536873
+    }
+  }
+  image_name: "000000000013.jpg"
+  image_id: 13
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.45360824
+      normalized_bottom: 0.68247426
+      normalized_left: 0.18354431
+      normalized_right: 0.46044305
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.19587629
+      normalized_bottom: 0.40412372
+      normalized_left: 0.5
+      normalized_right: 0.8813291
+    }
+  }
+  image_name: "000000000014.jpg"
+  image_id: 14
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.10619469
+      normalized_bottom: 0.3960177
+      normalized_left: 0.0
+      normalized_right: 0.34955752
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.6880531
+      normalized_bottom: 0.90929204
+      normalized_left: 0.5383481
+      normalized_right: 0.8746313
+    }
+  }
+  image_name: "000000000015.jpg"
+  image_id: 15
+}
+detection_results {
+  objects {
+    class_id: 50
+    bounding_box {
+      normalized_top: 0.1609375
+      normalized_bottom: 0.43125
+      normalized_left: 0.2
+      normalized_right: 0.64166665
+    }
+  }
+  objects {
+    class_id: 50
+    bounding_box {
+      normalized_top: 0.484375
+      normalized_bottom: 0.90625
+      normalized_left: 0.225
+      normalized_right: 0.8
+    }
+  }
+  image_name: "000000000016.jpg"
+  image_id: 16
+}
+detection_results {
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.03125
+      normalized_bottom: 0.7395833
+      normalized_left: 0.0984375
+      normalized_right: 0.4953125
+    }
+  }
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.039583333
+      normalized_bottom: 0.72083336
+      normalized_left: 0.484375
+      normalized_right: 0.9328125
+    }
+  }
+  image_name: "000000000017.jpg"
+  image_id: 17
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.17035398
+      normalized_bottom: 0.82522124
+      normalized_left: 0.111929305
+      normalized_right: 0.52724594
+    }
+  }
+  image_name: "000000000018.jpg"
+  image_id: 18
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.25791857
+      normalized_bottom: 0.75113124
+      normalized_left: 0.17867436
+      normalized_right: 0.7737752
+    }
+  }
+  image_name: "000000000019.jpg"
+  image_id: 19
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.15265487
+      normalized_bottom: 0.8738938
+      normalized_left: 0.00736377
+      normalized_right: 0.47717232
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.32743362
+      normalized_bottom: 0.40929204
+      normalized_left: 0.8055965
+      normalized_right: 0.820324
+    }
+  }
+  image_name: "000000000020.jpg"
+  image_id: 20
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.015521064
+      normalized_bottom: 0.75831485
+      normalized_left: 0.18998528
+      normalized_right: 0.6921944
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.46563193
+      normalized_bottom: 0.55432373
+      normalized_left: 0.736377
+      normalized_right: 0.8939617
+    }
+  }
+  image_name: "000000000021.jpg"
+  image_id: 21
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.12592593
+      normalized_bottom: 0.84444445
+      normalized_left: 0.32570422
+      normalized_right: 0.71478873
+    }
+  }
+  image_name: "000000000022.jpg"
+  image_id: 22
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.12093863
+      normalized_bottom: 0.37545127
+      normalized_left: 0.30866426
+      normalized_right: 0.41155234
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.17148015
+      normalized_bottom: 0.47292417
+      normalized_left: 0.79422385
+      normalized_right: 0.94404334
+    }
+  }
+  image_name: "000000000023.jpg"
+  image_id: 23
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7671875
+      normalized_bottom: 0.9046875
+      normalized_left: 0.39791667
+      normalized_right: 0.51458335
+    }
+  }
+  objects {
+    class_id: 42
+    bounding_box {
+      normalized_top: 0.5328125
+      normalized_bottom: 0.909375
+      normalized_left: 0.23541667
+      normalized_right: 0.45625
+    }
+  }
+  image_name: "000000000024.jpg"
+  image_id: 24
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.42699116
+      normalized_bottom: 0.6924779
+      normalized_left: 0.054572273
+      normalized_right: 0.41887906
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.44469026
+      normalized_bottom: 0.71902657
+      normalized_left: 0.5457227
+      normalized_right: 0.9321534
+    }
+  }
+  image_name: "000000000025.jpg"
+  image_id: 25
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.25270757
+      normalized_bottom: 0.74187726
+      normalized_left: 0.3772563
+      normalized_right: 0.95126355
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.06498195
+      normalized_bottom: 0.18772563
+      normalized_left: 0.6949459
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000026.jpg"
+  image_id: 26
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.11247803
+      normalized_bottom: 0.3831283
+      normalized_left: 0.19480519
+      normalized_right: 0.729128
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.59050965
+      normalized_bottom: 0.86467487
+      normalized_left: 0.22634508
+      normalized_right: 0.7643785
+    }
+  }
+  image_name: "000000000027.jpg"
+  image_id: 27
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.2742616
+      normalized_bottom: 0.7742616
+      normalized_left: 0.02163833
+      normalized_right: 0.9721793
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.29113925
+      normalized_bottom: 0.38607594
+      normalized_left: 0.13292117
+      normalized_right: 0.27202472
+    }
+  }
+  image_name: "000000000028.jpg"
+  image_id: 28
+}
+detection_results {
+  objects {
+    class_id: 8
+    bounding_box {
+      normalized_top: 0.11529934
+      normalized_bottom: 0.864745
+      normalized_left: 0.101620026
+      normalized_right: 0.9263623
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.45011085
+      normalized_bottom: 0.62749445
+      normalized_left: 0.0
+      normalized_right: 0.089838
+    }
+  }
+  image_name: "000000000029.jpg"
+  image_id: 29
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.40625
+      normalized_bottom: 0.5416667
+      normalized_left: 0.25
+      normalized_right: 0.3
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.34791666
+      normalized_bottom: 0.59583336
+      normalized_left: 0.8296875
+      normalized_right: 0.90625
+    }
+  }
+  image_name: "000000000030.jpg"
+  image_id: 30
+}
+detection_results {
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.059734512
+      normalized_bottom: 0.32964602
+      normalized_left: 0.116519175
+      normalized_right: 0.7094395
+    }
+  }
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.30088496
+      normalized_bottom: 0.6482301
+      normalized_left: 0.116519175
+      normalized_right: 0.7581121
+    }
+  }
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.6283186
+      normalized_bottom: 0.96902657
+      normalized_left: 0.14306785
+      normalized_right: 0.83480823
+    }
+  }
+  image_name: "000000000031.jpg"
+  image_id: 31
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.84415585
+      normalized_bottom: 0.9220779
+      normalized_left: 0.15201005
+      normalized_right: 0.2512563
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.07272727
+      normalized_bottom: 0.74545455
+      normalized_left: 0.18718593
+      normalized_right: 0.81155777
+    }
+  }
+  image_name: "000000000032.jpg"
+  image_id: 32
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.47083333
+      normalized_bottom: 0.59375
+      normalized_left: 0.0578125
+      normalized_right: 0.2234375
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.18958333
+      normalized_bottom: 0.82708335
+      normalized_left: 0.140625
+      normalized_right: 0.8640625
+    }
+  }
+  image_name: "000000000033.jpg"
+  image_id: 33
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.27
+      normalized_bottom: 0.775
+      normalized_left: 0.016949153
+      normalized_right: 0.9308996
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.75
+      normalized_bottom: 0.8825
+      normalized_left: 0.42764017
+      normalized_right: 0.64276403
+    }
+  }
+  image_name: "000000000034.jpg"
+  image_id: 34
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.46460176
+      normalized_bottom: 0.8097345
+      normalized_left: 0.21238938
+      normalized_right: 0.52064896
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.43362832
+      normalized_bottom: 0.7876106
+      normalized_left: 0.6017699
+      normalized_right: 0.9321534
+    }
+  }
+  image_name: "000000000035.jpg"
+  image_id: 35
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.24070022
+      normalized_bottom: 0.99343544
+      normalized_left: 0.09538003
+      normalized_right: 0.92548436
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.27789935
+      normalized_bottom: 0.35886213
+      normalized_left: 0.7675112
+      normalized_right: 0.9910581
+    }
+  }
+  image_name: "000000000036.jpg"
+  image_id: 36
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.059196617
+      normalized_bottom: 0.8498943
+      normalized_left: 0.33744222
+      normalized_right: 0.70261943
+    }
+  }
+  image_name: "000000000037.jpg"
+  image_id: 37
+}
+detection_results {
+  objects {
+    class_id: 17
+    bounding_box {
+      normalized_top: 0.07692308
+      normalized_bottom: 0.86538464
+      normalized_left: 0.067175575
+      normalized_right: 0.49007633
+    }
+  }
+  objects {
+    class_id: 17
+    bounding_box {
+      normalized_top: 0.26068377
+      normalized_bottom: 0.982906
+      normalized_left: 0.4778626
+      normalized_right: 0.9648855
+    }
+  }
+  image_name: "000000000038.jpg"
+  image_id: 38
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.08425721
+      normalized_bottom: 0.15299335
+      normalized_left: 0.0
+      normalized_right: 0.12941177
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.24611974
+      normalized_bottom: 0.85365856
+      normalized_left: 0.0
+      normalized_right: 0.89705884
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.05764967
+      normalized_bottom: 0.082039915
+      normalized_left: 0.052941177
+      normalized_right: 0.07794118
+    }
+  }
+  image_name: "000000000039.jpg"
+  image_id: 39
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.284689
+      normalized_bottom: 0.91626793
+      normalized_left: 0.012261581
+      normalized_right: 0.98773843
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.26555023
+      normalized_bottom: 0.31578946
+      normalized_left: 0.6144414
+      normalized_right: 0.71253407
+    }
+  }
+  image_name: "000000000040.jpg"
+  image_id: 40
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.43636364
+      normalized_bottom: 0.830303
+      normalized_left: 0.03409091
+      normalized_right: 0.4909091
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.42424244
+      normalized_bottom: 0.8454546
+      normalized_left: 0.48181817
+      normalized_right: 0.9818182
+    }
+  }
+  image_name: "000000000041.jpg"
+  image_id: 41
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.44292238
+      normalized_bottom: 0.79908675
+      normalized_left: 0.008559201
+      normalized_right: 0.91440797
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.12328767
+      normalized_bottom: 0.4178082
+      normalized_left: 0.2596291
+      normalized_right: 0.64194006
+    }
+  }
+  image_name: "000000000042.jpg"
+  image_id: 42
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.75208336
+      normalized_bottom: 0.8854167
+      normalized_left: 0.2234375
+      normalized_right: 0.328125
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.17916666
+      normalized_bottom: 0.39583334
+      normalized_left: 0.4328125
+      normalized_right: 0.5734375
+    }
+  }
+  image_name: "000000000043.jpg"
+  image_id: 43
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.30818966
+      normalized_bottom: 0.5991379
+      normalized_left: 0.018154312
+      normalized_right: 0.43267778
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.6034483
+      normalized_bottom: 0.9008621
+      normalized_left: 0.14977308
+      normalized_right: 0.5385779
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.056034483
+      normalized_bottom: 0.3599138
+      normalized_left: 0.27685326
+      normalized_right: 0.6686838
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.4547414
+      normalized_bottom: 0.75
+      normalized_left: 0.4160363
+      normalized_right: 0.8139183
+    }
+  }
+  image_name: "000000000044.jpg"
+  image_id: 44
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.3539823
+      normalized_bottom: 0.7942478
+      normalized_left: 0.31563422
+      normalized_right: 0.48967552
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.34070796
+      normalized_bottom: 0.82300884
+      normalized_left: 0.49705014
+      normalized_right: 0.67551625
+    }
+  }
+  image_name: "000000000045.jpg"
+  image_id: 45
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.43209878
+      normalized_bottom: 0.6345679
+      normalized_left: 0.26781002
+      normalized_right: 0.30474934
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.42222223
+      normalized_bottom: 0.5753086
+      normalized_left: 0.30738786
+      normalized_right: 0.33245382
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.4074074
+      normalized_bottom: 0.50864196
+      normalized_left: 0.35092348
+      normalized_right: 0.37335092
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.38765433
+      normalized_bottom: 0.45679012
+      normalized_left: 0.39050132
+      normalized_right: 0.4116095
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.44444445
+      normalized_bottom: 0.6123457
+      normalized_left: 0.43931398
+      normalized_right: 0.47229552
+    }
+  }
+  image_name: "000000000046.jpg"
+  image_id: 46
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.79602885
+      normalized_bottom: 0.84476537
+      normalized_left: 0.633574
+      normalized_right: 0.65523463
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.79602885
+      normalized_bottom: 0.8519856
+      normalized_left: 0.6570397
+      normalized_right: 0.6732852
+    }
+  }
+  image_name: "000000000047.jpg"
+  image_id: 47
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.032490976
+      normalized_bottom: 0.8880866
+      normalized_left: 0.18772563
+      normalized_right: 0.6841155
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.07039711
+      normalized_bottom: 0.35920578
+      normalized_left: 0.8808664
+      normalized_right: 0.96570396
+    }
+  }
+  image_name: "000000000048.jpg"
+  image_id: 48
+}
+detection_results {
+  objects {
+    class_id: 17
+    bounding_box {
+      normalized_top: 0.17590362
+      normalized_bottom: 0.6698795
+      normalized_left: 0.07036536
+      normalized_right: 0.7428958
+    }
+  }
+  objects {
+    class_id: 17
+    bounding_box {
+      normalized_top: 0.118072286
+      normalized_bottom: 0.713253
+      normalized_left: 0.6725305
+      normalized_right: 0.8809202
+    }
+  }
+  image_name: "000000000049.jpg"
+  image_id: 49
+}
+detection_results {
+  objects {
+    class_id: 46
+    bounding_box {
+      normalized_top: 0.2828125
+      normalized_bottom: 0.98125
+      normalized_left: 0.34375
+      normalized_right: 0.74791664
+    }
+  }
+  image_name: "000000000050.jpg"
+  image_id: 50
+}
+detection_results {
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.44247788
+      normalized_bottom: 0.5818584
+      normalized_left: 0.20943953
+      normalized_right: 0.780236
+    }
+  }
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.6216814
+      normalized_bottom: 0.79867256
+      normalized_left: 0.22713864
+      normalized_right: 0.859882
+    }
+  }
+  image_name: "000000000051.jpg"
+  image_id: 51
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.47032967
+      normalized_bottom: 0.9164835
+      normalized_left: 0.0742942
+      normalized_right: 0.42793462
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.052747253
+      normalized_bottom: 0.8747253
+      normalized_left: 0.5497771
+      normalized_right: 0.936107
+    }
+  }
+  image_name: "000000000052.jpg"
+  image_id: 52
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.19782609
+      normalized_bottom: 0.2347826
+      normalized_left: 0.1724138
+      normalized_right: 0.20989506
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.2652174
+      normalized_bottom: 0.29347825
+      normalized_left: 0.2383808
+      normalized_right: 0.27136433
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.2826087
+      normalized_bottom: 0.31086957
+      normalized_left: 0.5982009
+      normalized_right: 0.63568217
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.104347825
+      normalized_bottom: 0.14565217
+      normalized_left: 0.76311845
+      normalized_right: 0.8125937
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.002173913
+      normalized_bottom: 0.052173913
+      normalized_left: 0.87406296
+      normalized_right: 0.91454273
+    }
+  }
+  image_name: "000000000053.jpg"
+  image_id: 53
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.538695
+      normalized_bottom: 0.8983308
+      normalized_left: 0.11612903
+      normalized_right: 0.9182796
+    }
+  }
+  image_name: "000000000054.jpg"
+  image_id: 54
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.80240965
+      normalized_bottom: 0.8168675
+      normalized_left: 0.2503383
+      normalized_right: 0.26792964
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.40963855
+      normalized_bottom: 0.58554214
+      normalized_left: 0.3328823
+      normalized_right: 0.729364
+    }
+  }
+  image_name: "000000000055.jpg"
+  image_id: 55
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.57109004
+      normalized_bottom: 0.7796208
+      normalized_left: 0.03374778
+      normalized_right: 0.106571935
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.42180094
+      normalized_bottom: 0.48815167
+      normalized_left: 0.060390763
+      normalized_right: 0.09946714
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.43838862
+      normalized_bottom: 0.6066351
+      normalized_left: 0.11722913
+      normalized_right: 0.18650089
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.42890996
+      normalized_bottom: 0.60900474
+      normalized_left: 0.22024867
+      normalized_right: 0.27531084
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.41943127
+      normalized_bottom: 0.6066351
+      normalized_left: 0.59680283
+      normalized_right: 0.6447602
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.41232228
+      normalized_bottom: 0.48815167
+      normalized_left: 0.67140317
+      normalized_right: 0.7246892
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.38388625
+      normalized_bottom: 0.44549763
+      normalized_left: 0.77442276
+      normalized_right: 0.8294849
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.38151658
+      normalized_bottom: 0.44549763
+      normalized_left: 0.8667851
+      normalized_right: 0.91474247
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.46445498
+      normalized_bottom: 0.6800948
+      normalized_left: 0.9609236
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000056.jpg"
+  image_id: 56
+}
+detection_results {
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.289823
+      normalized_bottom: 0.48230088
+      normalized_left: 0.07522124
+      normalized_right: 0.90707964
+    }
+  }
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.7787611
+      normalized_bottom: 0.9845133
+      normalized_left: 0.19321534
+      normalized_right: 0.81268436
+    }
+  }
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.03761062
+      normalized_bottom: 0.21017699
+      normalized_left: 0.20648968
+      normalized_right: 0.719764
+    }
+  }
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.57743365
+      normalized_bottom: 0.6836283
+      normalized_left: 0.2300885
+      normalized_right: 0.7079646
+    }
+  }
+  image_name: "000000000057.jpg"
+  image_id: 57
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.289823
+      normalized_bottom: 0.78539824
+      normalized_left: 0.2758112
+      normalized_right: 0.5339233
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.19247788
+      normalized_bottom: 0.6880531
+      normalized_left: 0.6135693
+      normalized_right: 0.8185841
+    }
+  }
+  image_name: "000000000058.jpg"
+  image_id: 58
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.4722838
+      normalized_bottom: 0.6696231
+      normalized_left: 0.025
+      normalized_right: 0.61470586
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.49889135
+      normalized_bottom: 0.7694013
+      normalized_left: 0.36764705
+      normalized_right: 0.9882353
+    }
+  }
+  image_name: "000000000059.jpg"
+  image_id: 59
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.5562914
+      normalized_bottom: 0.7924945
+      normalized_left: 0.2097489
+      normalized_right: 0.65435743
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.28476822
+      normalized_bottom: 0.59381896
+      normalized_left: 0.23485968
+      normalized_right: 0.77252585
+    }
+  }
+  image_name: "000000000060.jpg"
+  image_id: 60
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.24778761
+      normalized_bottom: 0.32522124
+      normalized_left: 0.017699115
+      normalized_right: 0.1740413
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.32300884
+      normalized_bottom: 0.86283183
+      normalized_left: 0.10324484
+      normalized_right: 0.97640115
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.19690265
+      normalized_bottom: 0.27876106
+      normalized_left: 0.55899704
+      normalized_right: 0.7300885
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.18362832
+      normalized_bottom: 0.26548672
+      normalized_left: 0.8259587
+      normalized_right: 0.99262536
+    }
+  }
+  image_name: "000000000061.jpg"
+  image_id: 61
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.07083333
+      normalized_bottom: 0.76875
+      normalized_left: 0.0953125
+      normalized_right: 0.653125
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.47916666
+      normalized_bottom: 0.55833334
+      normalized_left: 0.740625
+      normalized_right: 0.790625
+    }
+  }
+  image_name: "000000000062.jpg"
+  image_id: 62
+}
+detection_results {
+  objects {
+    class_id: 17
+    bounding_box {
+      normalized_top: 0.2875
+      normalized_bottom: 0.87916666
+      normalized_left: 0.290625
+      normalized_right: 0.7609375
+    }
+  }
+  image_name: "000000000063.jpg"
+  image_id: 63
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.43125
+      normalized_bottom: 0.76458335
+      normalized_left: 0.0671875
+      normalized_right: 0.9453125
+    }
+  }
+  image_name: "000000000064.jpg"
+  image_id: 64
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.12978724
+      normalized_bottom: 0.45531914
+      normalized_left: 0.049004596
+      normalized_right: 0.81776416
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.45957446
+      normalized_bottom: 0.7829787
+      normalized_left: 0.11026034
+      normalized_right: 0.88361406
+    }
+  }
+  image_name: "000000000065.jpg"
+  image_id: 65
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.13157895
+      normalized_bottom: 0.6951754
+      normalized_left: 0.31994048
+      normalized_right: 0.83630955
+    }
+  }
+  image_name: "000000000066.jpg"
+  image_id: 66
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.3375
+      normalized_bottom: 0.8225
+      normalized_left: 0.1640625
+      normalized_right: 0.7671875
+    }
+  }
+  image_name: "000000000067.jpg"
+  image_id: 67
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.5783866
+      normalized_bottom: 0.98325723
+      normalized_left: 0.23554604
+      normalized_right: 0.8051392
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.11263318
+      normalized_bottom: 0.39726028
+      normalized_left: 0.4732334
+      normalized_right: 0.84368306
+    }
+  }
+  image_name: "000000000068.jpg"
+  image_id: 68
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.30309734
+      normalized_bottom: 0.7676991
+      normalized_left: 0.25221238
+      normalized_right: 0.8362832
+    }
+  }
+  image_name: "000000000069.jpg"
+  image_id: 69
+}
+detection_results {
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.34583333
+      normalized_bottom: 0.7083333
+      normalized_left: 0.1484375
+      normalized_right: 0.8828125
+    }
+  }
+  image_name: "000000000070.jpg"
+  image_id: 70
+}
+detection_results {
+  objects {
+    class_id: 86
+    bounding_box {
+      normalized_top: 0.06859206
+      normalized_bottom: 0.72743684
+      normalized_left: 0.10830325
+      normalized_right: 0.38086644
+    }
+  }
+  objects {
+    class_id: 86
+    bounding_box {
+      normalized_top: 0.07400722
+      normalized_bottom: 0.95848376
+      normalized_left: 0.44584838
+      normalized_right: 0.866426
+    }
+  }
+  image_name: "000000000071.jpg"
+  image_id: 71
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.34429824
+      normalized_bottom: 0.92105263
+      normalized_left: 0.1279762
+      normalized_right: 0.63988096
+    }
+  }
+  image_name: "000000000072.jpg"
+  image_id: 72
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.67083335
+      normalized_bottom: 0.84791666
+      normalized_left: 0.4421875
+      normalized_right: 0.5796875
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.0
+      normalized_bottom: 0.95
+      normalized_left: 0.1515625
+      normalized_right: 0.8046875
+    }
+  }
+  image_name: "000000000073.jpg"
+  image_id: 73
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.42572063
+      normalized_bottom: 0.5587583
+      normalized_left: 0.20618556
+      normalized_right: 0.3681885
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.52993345
+      normalized_bottom: 0.556541
+      normalized_left: 0.40942562
+      normalized_right: 0.51840943
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.20842572
+      normalized_bottom: 0.6407982
+      normalized_left: 0.6053019
+      normalized_right: 0.83357877
+    }
+  }
+  image_name: "000000000074.jpg"
+  image_id: 74
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.18703704
+      normalized_bottom: 0.64074075
+      normalized_left: 0.10387324
+      normalized_right: 0.47359154
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.12407407
+      normalized_bottom: 0.9166667
+      normalized_left: 0.49295774
+      normalized_right: 0.9278169
+    }
+  }
+  image_name: "000000000075.jpg"
+  image_id: 75
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.0
+      normalized_bottom: 0.68070954
+      normalized_left: 0.19587629
+      normalized_right: 0.62886596
+    }
+  }
+  image_name: "000000000076.jpg"
+  image_id: 76
+}
+detection_results {
+  objects {
+    class_id: 88
+    bounding_box {
+      normalized_top: 0.07083333
+      normalized_bottom: 0.46666667
+      normalized_left: 0.2609375
+      normalized_right: 0.5984375
+    }
+  }
+  objects {
+    class_id: 88
+    bounding_box {
+      normalized_top: 0.13958333
+      normalized_bottom: 0.53541666
+      normalized_left: 0.6171875
+      normalized_right: 0.9125
+    }
+  }
+  image_name: "000000000077.jpg"
+  image_id: 77
+}
+detection_results {
+  objects {
+    class_id: 51
+    bounding_box {
+      normalized_top: 0.2901879
+      normalized_bottom: 0.8141962
+      normalized_left: 0.06552262
+      normalized_right: 0.55226207
+    }
+  }
+  objects {
+    class_id: 51
+    bounding_box {
+      normalized_top: 0.15240084
+      normalized_bottom: 0.6179541
+      normalized_left: 0.4851794
+      normalized_right: 0.92823714
+    }
+  }
+  image_name: "000000000078.jpg"
+  image_id: 78
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.6157407
+      normalized_bottom: 0.9259259
+      normalized_left: 0.050704226
+      normalized_right: 0.6084507
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.24074075
+      normalized_bottom: 0.5740741
+      normalized_left: 0.3859155
+      normalized_right: 0.9704225
+    }
+  }
+  image_name: "000000000079.jpg"
+  image_id: 79
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.57942235
+      normalized_bottom: 0.93862814
+      normalized_left: 0.019855596
+      normalized_right: 0.98736465
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.039711192
+      normalized_bottom: 0.45306858
+      normalized_left: 0.037906136
+      normalized_right: 0.9693141
+    }
+  }
+  image_name: "000000000080.jpg"
+  image_id: 80
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.24528302
+      normalized_bottom: 0.5849057
+      normalized_left: 0.18875
+      normalized_right: 0.53375
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.3018868
+      normalized_bottom: 0.94878703
+      normalized_left: 0.465
+      normalized_right: 0.8025
+    }
+  }
+  image_name: "000000000081.jpg"
+  image_id: 81
+}
+detection_results {
+  objects {
+    class_id: 19
+    bounding_box {
+      normalized_top: 0.30905077
+      normalized_bottom: 0.7615894
+      normalized_left: 0.3323486
+      normalized_right: 0.8005908
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.37306842
+      normalized_bottom: 0.57836646
+      normalized_left: 0.19940916
+      normalized_right: 0.37075332
+    }
+  }
+  image_name: "000000000082.jpg"
+  image_id: 82
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5625
+      normalized_bottom: 0.88958335
+      normalized_left: 0.3203125
+      normalized_right: 0.3875
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5416667
+      normalized_bottom: 0.7291667
+      normalized_left: 0.4484375
+      normalized_right: 0.490625
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.56041664
+      normalized_bottom: 0.70416665
+      normalized_left: 0.5078125
+      normalized_right: 0.5453125
+    }
+  }
+  image_name: "000000000083.jpg"
+  image_id: 83
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.34166667
+      normalized_bottom: 0.55833334
+      normalized_left: 0.14375
+      normalized_right: 0.8265625
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.375
+      normalized_bottom: 0.47083333
+      normalized_left: 0.21875
+      normalized_right: 0.275
+    }
+  }
+  image_name: "000000000084.jpg"
+  image_id: 84
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.6656977
+      normalized_bottom: 0.9040698
+      normalized_left: 0.047191013
+      normalized_right: 0.24719101
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.06686047
+      normalized_bottom: 0.9040698
+      normalized_left: 0.2764045
+      normalized_right: 0.91235954
+    }
+  }
+  image_name: "000000000085.jpg"
+  image_id: 85
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.12635379
+      normalized_bottom: 0.92960286
+      normalized_left: 0.09386282
+      normalized_right: 0.33393502
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.13898917
+      normalized_bottom: 0.93501806
+      normalized_left: 0.39169675
+      normalized_right: 0.6299639
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.13357401
+      normalized_bottom: 0.92960286
+      normalized_left: 0.6859206
+      normalized_right: 0.92960286
+    }
+  }
+  image_name: "000000000086.jpg"
+  image_id: 86
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.12050078
+      normalized_bottom: 0.7276995
+      normalized_left: 0.13125
+      normalized_right: 0.5520833
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.27856025
+      normalized_bottom: 0.7934272
+      normalized_left: 0.47083333
+      normalized_right: 0.86875
+    }
+  }
+  image_name: "000000000087.jpg"
+  image_id: 87
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.08078603
+      normalized_bottom: 0.768559
+      normalized_left: 0.22571002
+      normalized_right: 0.49476832
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.2576419
+      normalized_bottom: 0.5152838
+      normalized_left: 0.07324365
+      normalized_right: 0.38116592
+    }
+  }
+  image_name: "000000000088.jpg"
+  image_id: 88
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.44242424
+      normalized_bottom: 0.81010103
+      normalized_left: 0.022617124
+      normalized_right: 0.97415185
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.18181819
+      normalized_bottom: 0.4848485
+      normalized_left: 0.037156705
+      normalized_right: 0.9822294
+    }
+  }
+  image_name: "000000000089.jpg"
+  image_id: 89
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.34955752
+      normalized_bottom: 0.7323009
+      normalized_left: 0.0
+      normalized_right: 0.7758112
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.2721239
+      normalized_bottom: 0.539823
+      normalized_left: 0.40560472
+      normalized_right: 0.960177
+    }
+  }
+  image_name: "000000000090.jpg"
+  image_id: 90
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.18164063
+      normalized_bottom: 0.9550781
+      normalized_left: 0.04682274
+      normalized_right: 0.5250836
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.044921875
+      normalized_bottom: 0.5800781
+      normalized_left: 0.53511703
+      normalized_right: 0.9799331
+    }
+  }
+  image_name: "000000000091.jpg"
+  image_id: 91
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.075
+      normalized_bottom: 0.175
+      normalized_left: 0.571875
+      normalized_right: 0.6125
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.039583333
+      normalized_bottom: 0.25625
+      normalized_left: 0.796875
+      normalized_right: 0.834375
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.175
+      normalized_bottom: 0.26666668
+      normalized_left: 0.825
+      normalized_right: 0.8890625
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.10208333
+      normalized_bottom: 0.20625
+      normalized_left: 0.8359375
+      normalized_right: 0.9015625
+    }
+  }
+  image_name: "000000000092.jpg"
+  image_id: 92
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.04873646
+      normalized_bottom: 0.9693141
+      normalized_left: 0.45306858
+      normalized_right: 0.7743682
+    }
+  }
+  image_name: "000000000093.jpg"
+  image_id: 93
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.09166667
+      normalized_bottom: 0.3375
+      normalized_left: 0.0
+      normalized_right: 0.41875
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.32916668
+      normalized_bottom: 0.71875
+      normalized_left: 0.0265625
+      normalized_right: 0.96875
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.14583333
+      normalized_bottom: 0.375
+      normalized_left: 0.5890625
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000094.jpg"
+  image_id: 94
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.046875
+      normalized_bottom: 0.9859375
+      normalized_left: 0.54791665
+      normalized_right: 0.8625
+    }
+  }
+  image_name: "000000000095.jpg"
+  image_id: 95
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.2839196
+      normalized_bottom: 0.68844223
+      normalized_left: 0.10519481
+      normalized_right: 0.83896106
+    }
+  }
+  image_name: "000000000096.jpg"
+  image_id: 96
+}
+detection_results {
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.17291667
+      normalized_bottom: 0.6458333
+      normalized_left: 0.2078125
+      normalized_right: 0.825
+    }
+  }
+  image_name: "000000000097.jpg"
+  image_id: 97
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.34292036
+      normalized_bottom: 0.6792035
+      normalized_left: 0.022123894
+      normalized_right: 0.82890856
+    }
+  }
+  image_name: "000000000098.jpg"
+  image_id: 98
+}
+detection_results {
+  objects {
+    class_id: 53
+    bounding_box {
+      normalized_top: 0.41516244
+      normalized_bottom: 0.71480143
+      normalized_left: 0.08844765
+      normalized_right: 0.3537906
+    }
+  }
+  objects {
+    class_id: 53
+    bounding_box {
+      normalized_top: 0.45306858
+      normalized_bottom: 0.7256318
+      normalized_left: 0.6534296
+      normalized_right: 0.90794224
+    }
+  }
+  image_name: "000000000099.jpg"
+  image_id: 99
+}
+detection_results {
+  objects {
+    class_id: 43
+    bounding_box {
+      normalized_top: 0.41346154
+      normalized_bottom: 0.8605769
+      normalized_left: 0.22357723
+      normalized_right: 0.9268293
+    }
+  }
+  objects {
+    class_id: 43
+    bounding_box {
+      normalized_top: 0.043269232
+      normalized_bottom: 0.60336536
+      normalized_left: 0.35772356
+      normalized_right: 0.9268293
+    }
+  }
+  image_name: "000000000100.jpg"
+  image_id: 100
+}
+detection_results {
+  objects {
+    class_id: 51
+    bounding_box {
+      normalized_top: 0.09090909
+      normalized_bottom: 0.95989305
+      normalized_left: 0.035409037
+      normalized_right: 0.47496948
+    }
+  }
+  objects {
+    class_id: 51
+    bounding_box {
+      normalized_top: 0.069518715
+      normalized_bottom: 0.9224599
+      normalized_left: 0.53113556
+      normalized_right: 0.95726496
+    }
+  }
+  image_name: "000000000101.jpg"
+  image_id: 101
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.3318584
+      normalized_bottom: 0.7743363
+      normalized_left: 0.15634218
+      normalized_right: 0.7861357
+    }
+  }
+  image_name: "000000000102.jpg"
+  image_id: 102
+}
+detection_results {
+  objects {
+    class_id: 19
+    bounding_box {
+      normalized_top: 0.30947775
+      normalized_bottom: 0.9303675
+      normalized_left: 0.18043844
+      normalized_right: 0.767285
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.079303674
+      normalized_bottom: 0.61508703
+      normalized_left: 0.4030354
+      normalized_right: 0.58853287
+    }
+  }
+  image_name: "000000000103.jpg"
+  image_id: 103
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.7303371
+      normalized_bottom: 0.87265915
+      normalized_left: 0.045296166
+      normalized_right: 0.20905924
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.07677902
+      normalized_bottom: 0.2247191
+      normalized_left: 0.13414635
+      normalized_right: 0.2944251
+    }
+  }
+  image_name: "000000000104.jpg"
+  image_id: 104
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.12984496
+      normalized_bottom: 0.41860464
+      normalized_left: 0.008417509
+      normalized_right: 0.36363637
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.36627907
+      normalized_bottom: 1.0
+      normalized_left: 0.057239056
+      normalized_right: 0.9124579
+    }
+  }
+  image_name: "000000000105.jpg"
+  image_id: 105
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.23855421
+      normalized_bottom: 0.45783132
+      normalized_left: 0.29364005
+      normalized_right: 0.56562924
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.33734939
+      normalized_bottom: 0.8385542
+      normalized_left: 0.40324762
+      normalized_right: 0.78213805
+    }
+  }
+  image_name: "000000000106.jpg"
+  image_id: 106
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.51655626
+      normalized_bottom: 0.92715234
+      normalized_left: 0.21861152
+      normalized_right: 0.91137373
+    }
+  }
+  image_name: "000000000107.jpg"
+  image_id: 107
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.058333334
+      normalized_bottom: 0.19375
+      normalized_left: 0.0
+      normalized_right: 0.090625
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.175
+      normalized_bottom: 0.90208334
+      normalized_left: 0.103125
+      normalized_right: 0.9328125
+    }
+  }
+  image_name: "000000000108.jpg"
+  image_id: 108
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.29238328
+      normalized_bottom: 0.83538085
+      normalized_left: 0.037184596
+      normalized_right: 0.4116866
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.24815725
+      normalized_bottom: 0.8157248
+      normalized_left: 0.45683932
+      normalized_right: 0.937583
+    }
+  }
+  image_name: "000000000109.jpg"
+  image_id: 109
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.17699115
+      normalized_bottom: 0.44469026
+      normalized_left: 0.0
+      normalized_right: 0.73893803
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.29646018
+      normalized_bottom: 0.59292036
+      normalized_left: 0.36135694
+      normalized_right: 0.820059
+    }
+  }
+  image_name: "000000000110.jpg"
+  image_id: 110
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.46861926
+      normalized_bottom: 0.9874477
+      normalized_left: 0.34633386
+      normalized_right: 0.73322934
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.23640168
+      normalized_bottom: 0.3451883
+      normalized_left: 0.4102964
+      normalized_right: 0.51326054
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.30962342
+      normalized_bottom: 0.38493723
+      normalized_left: 0.55226207
+      normalized_right: 0.5959438
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.016736401
+      normalized_bottom: 0.35355648
+      normalized_left: 0.66614664
+      normalized_right: 0.73322934
+    }
+  }
+  image_name: "000000000111.jpg"
+  image_id: 111
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.3761062
+      normalized_bottom: 0.6902655
+      normalized_left: 0.03982301
+      normalized_right: 0.33628318
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.13716814
+      normalized_bottom: 0.41445428
+      normalized_left: 0.28761062
+      normalized_right: 0.59070796
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.539823
+      normalized_bottom: 0.8495575
+      normalized_left: 0.40044248
+      normalized_right: 0.69690263
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.3259587
+      normalized_bottom: 0.61651915
+      normalized_left: 0.67256635
+      normalized_right: 0.9623894
+    }
+  }
+  image_name: "000000000112.jpg"
+  image_id: 112
+}
+detection_results {
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.22516556
+      normalized_bottom: 0.70198673
+      normalized_left: 0.10846954
+      normalized_right: 0.70430905
+    }
+  }
+  image_name: "000000000113.jpg"
+  image_id: 113
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.39325842
+      normalized_bottom: 0.8247191
+      normalized_left: 0.2776163
+      normalized_right: 0.61627907
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.11460674
+      normalized_bottom: 0.33932585
+      normalized_left: 0.5363372
+      normalized_right: 0.7601744
+    }
+  }
+  image_name: "000000000114.jpg"
+  image_id: 114
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.32964602
+      normalized_bottom: 0.539823
+      normalized_left: 0.45427728
+      normalized_right: 0.53687316
+    }
+  }
+  objects {
+    class_id: 42
+    bounding_box {
+      normalized_top: 0.5287611
+      normalized_bottom: 0.54646015
+      normalized_left: 0.35693216
+      normalized_right: 0.63716817
+    }
+  }
+  image_name: "000000000115.jpg"
+  image_id: 115
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.01179941
+      normalized_bottom: 0.24483776
+      normalized_left: 0.13053097
+      normalized_right: 0.44026548
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.8303835
+      normalized_bottom: 0.9587021
+      normalized_left: 0.289823
+      normalized_right: 0.5176991
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.34955752
+      normalized_bottom: 0.5383481
+      normalized_left: 0.32522124
+      normalized_right: 0.5420354
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.50294983
+      normalized_bottom: 0.65486723
+      normalized_left: 0.4358407
+      normalized_right: 0.61283183
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.18436578
+      normalized_bottom: 0.38053098
+      normalized_left: 0.4800885
+      normalized_right: 0.65929204
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.82743365
+      normalized_bottom: 0.9616519
+      normalized_left: 0.48451328
+      normalized_right: 0.7345133
+    }
+  }
+  image_name: "000000000116.jpg"
+  image_id: 116
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.2217484
+      normalized_bottom: 0.7782516
+      normalized_left: 0.22970903
+      normalized_right: 0.5053599
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.26439232
+      normalized_bottom: 0.7228145
+      normalized_left: 0.5283308
+      normalized_right: 0.7672282
+    }
+  }
+  image_name: "000000000117.jpg"
+  image_id: 117
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.20117474
+      normalized_bottom: 0.35682818
+      normalized_left: 0.09756097
+      normalized_right: 0.383592
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.2393539
+      normalized_bottom: 0.37885463
+      normalized_left: 0.17738359
+      normalized_right: 0.46563193
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.2143906
+      normalized_bottom: 0.33773863
+      normalized_left: 0.46341464
+      normalized_right: 0.6851441
+    }
+  }
+  image_name: "000000000118.jpg"
+  image_id: 118
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.1875
+      normalized_bottom: 0.74375
+      normalized_left: 0.2453125
+      normalized_right: 0.7796875
+    }
+  }
+  image_name: "000000000119.jpg"
+  image_id: 119
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.21458334
+      normalized_bottom: 0.87916666
+      normalized_left: 0.228125
+      normalized_right: 0.4953125
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.2375
+      normalized_bottom: 0.89166665
+      normalized_left: 0.503125
+      normalized_right: 0.790625
+    }
+  }
+  image_name: "000000000120.jpg"
+  image_id: 120
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5125
+      normalized_bottom: 0.6354167
+      normalized_left: 0.134375
+      normalized_right: 0.2015625
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.40833333
+      normalized_bottom: 0.6791667
+      normalized_left: 0.55
+      normalized_right: 0.6796875
+    }
+  }
+  image_name: "000000000121.jpg"
+  image_id: 121
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.08958333
+      normalized_bottom: 0.9166667
+      normalized_left: 0.296875
+      normalized_right: 0.496875
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.0875
+      normalized_bottom: 0.91875
+      normalized_left: 0.59375
+      normalized_right: 0.790625
+    }
+  }
+  image_name: "000000000122.jpg"
+  image_id: 122
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.35176992
+      normalized_bottom: 1.0
+      normalized_left: 0.08259587
+      normalized_right: 0.40265486
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.13053097
+      normalized_bottom: 1.0
+      normalized_left: 0.64306784
+      normalized_right: 0.93952805
+    }
+  }
+  image_name: "000000000123.jpg"
+  image_id: 123
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.35920176
+      normalized_bottom: 0.5365854
+      normalized_left: 0.23788546
+      normalized_right: 0.59030837
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.49667406
+      normalized_bottom: 0.6385809
+      normalized_left: 0.36563876
+      normalized_right: 0.6696035
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.34146342
+      normalized_bottom: 0.5388027
+      normalized_left: 0.5359765
+      normalized_right: 0.87958884
+    }
+  }
+  image_name: "000000000124.jpg"
+  image_id: 124
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.2609375
+      normalized_bottom: 0.7203125
+      normalized_left: 0.17916666
+      normalized_right: 0.79791665
+    }
+  }
+  image_name: "000000000125.jpg"
+  image_id: 125
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.07743363
+      normalized_bottom: 1.0
+      normalized_left: 0.008836525
+      normalized_right: 0.35198823
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.11283186
+      normalized_bottom: 0.9137168
+      normalized_left: 0.31222385
+      normalized_right: 0.736377
+    }
+  }
+  image_name: "000000000126.jpg"
+  image_id: 126
+}
+detection_results {
+  objects {
+    class_id: 58
+    bounding_box {
+      normalized_top: 0.2203125
+      normalized_bottom: 0.8234375
+      normalized_left: 0.17708333
+      normalized_right: 0.4375
+    }
+  }
+  objects {
+    class_id: 58
+    bounding_box {
+      normalized_top: 0.221875
+      normalized_bottom: 0.7796875
+      normalized_left: 0.51666665
+      normalized_right: 0.7875
+    }
+  }
+  image_name: "000000000127.jpg"
+  image_id: 127
+}
+detection_results {
+  objects {
+    class_id: 48
+    bounding_box {
+      normalized_top: 0.14375
+      normalized_bottom: 0.8265625
+      normalized_left: 0.21875
+      normalized_right: 0.35208333
+    }
+  }
+  objects {
+    class_id: 48
+    bounding_box {
+      normalized_top: 0.4125
+      normalized_bottom: 0.81875
+      normalized_left: 0.76875
+      normalized_right: 0.84166664
+    }
+  }
+  image_name: "000000000128.jpg"
+  image_id: 128
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.13157895
+      normalized_bottom: 0.9797571
+      normalized_left: 0.136876
+      normalized_right: 0.5056361
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.10728745
+      normalized_bottom: 0.98785424
+      normalized_left: 0.5056361
+      normalized_right: 0.6988728
+    }
+  }
+  image_name: "000000000129.jpg"
+  image_id: 129
+}
+detection_results {
+  objects {
+    class_id: 8
+    bounding_box {
+      normalized_top: 0.23125
+      normalized_bottom: 0.6770833
+      normalized_left: 0.05625
+      normalized_right: 0.971875
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.4375
+      normalized_bottom: 0.54791665
+      normalized_left: 0.9390625
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000130.jpg"
+  image_id: 130
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.50110865
+      normalized_bottom: 0.6607539
+      normalized_left: 0.053019147
+      normalized_right: 0.11929308
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.59423506
+      normalized_bottom: 0.7649667
+      normalized_left: 0.120765835
+      normalized_right: 0.16936672
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5166297
+      normalized_bottom: 0.67405766
+      normalized_left: 0.18409425
+      normalized_right: 0.24447717
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.32372504
+      normalized_bottom: 0.50110865
+      normalized_left: 0.32547864
+      normalized_right: 0.37997055
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.28381374
+      normalized_bottom: 0.4368071
+      normalized_left: 0.37260678
+      normalized_right: 0.40942562
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.55210644
+      normalized_bottom: 0.7206209
+      normalized_left: 0.4197349
+      normalized_right: 0.5095729
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.50332594
+      normalized_bottom: 0.67405766
+      normalized_left: 0.5198822
+      normalized_right: 0.5714286
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.49667406
+      normalized_bottom: 0.6651885
+      normalized_left: 0.60382915
+      normalized_right: 0.6833579
+    }
+  }
+  image_name: "000000000131.jpg"
+  image_id: 131
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.27916667
+      normalized_bottom: 1.0
+      normalized_left: 0.0609375
+      normalized_right: 0.9703125
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.29791668
+      normalized_bottom: 0.56875
+      normalized_left: 0.909375
+      normalized_right: 0.9765625
+    }
+  }
+  image_name: "000000000132.jpg"
+  image_id: 132
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.098173514
+      normalized_bottom: 0.47488585
+      normalized_left: 0.12410842
+      normalized_right: 0.34379458
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.029680366
+      normalized_bottom: 0.94063926
+      normalized_left: 0.38801712
+      normalized_right: 0.93009984
+    }
+  }
+  image_name: "000000000133.jpg"
+  image_id: 133
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.36725664
+      normalized_bottom: 0.96902657
+      normalized_left: 0.42920354
+      normalized_right: 0.88495576
+    }
+  }
+  image_name: "000000000134.jpg"
+  image_id: 134
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.12606473
+      normalized_bottom: 0.8415673
+      normalized_left: 0.1724138
+      normalized_right: 0.48084292
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.14139694
+      normalized_bottom: 0.8568995
+      normalized_left: 0.4789272
+      normalized_right: 0.79693484
+    }
+  }
+  image_name: "000000000135.jpg"
+  image_id: 135
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.84444445
+      normalized_bottom: 0.9022222
+      normalized_left: 0.042584434
+      normalized_right: 0.04992658
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.86
+      normalized_bottom: 0.93777776
+      normalized_left: 0.052863438
+      normalized_right: 0.07048458
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.47333333
+      normalized_bottom: 0.52444446
+      normalized_left: 0.18061674
+      normalized_right: 0.19676946
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.47333333
+      normalized_bottom: 0.52444446
+      normalized_left: 0.20558003
+      normalized_right: 0.2143906
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.48
+      normalized_bottom: 0.52444446
+      normalized_left: 0.21292217
+      normalized_right: 0.23348017
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.48
+      normalized_bottom: 0.52444446
+      normalized_left: 0.22760646
+      normalized_right: 0.2452276
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.19333333
+      normalized_bottom: 0.26222223
+      normalized_left: 0.7914831
+      normalized_right: 0.83847284
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6511111
+      normalized_bottom: 0.7088889
+      normalized_left: 0.8986784
+      normalized_right: 0.93245226
+    }
+  }
+  image_name: "000000000136.jpg"
+  image_id: 136
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.27644232
+      normalized_bottom: 0.88221157
+      normalized_left: 0.30758807
+      normalized_right: 0.43766937
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.26442307
+      normalized_bottom: 0.7956731
+      normalized_left: 0.48509485
+      normalized_right: 0.66260165
+    }
+  }
+  image_name: "000000000137.jpg"
+  image_id: 137
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.48434237
+      normalized_bottom: 0.8830898
+      normalized_left: 0.034428794
+      normalized_right: 0.9374022
+    }
+  }
+  objects {
+    class_id: 13
+    bounding_box {
+      normalized_top: 0.1440501
+      normalized_bottom: 0.29227558
+      normalized_left: 0.043818466
+      normalized_right: 0.15023474
+    }
+  }
+  image_name: "000000000138.jpg"
+  image_id: 138
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.4440433
+      normalized_bottom: 0.75090253
+      normalized_left: 0.045126352
+      normalized_right: 0.9638989
+    }
+  }
+  image_name: "000000000139.jpg"
+  image_id: 139
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.19555555
+      normalized_bottom: 0.5377778
+      normalized_left: 0.09677419
+      normalized_right: 0.6583578
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.4422222
+      normalized_bottom: 0.8155556
+      normalized_left: 0.30058652
+      normalized_right: 0.9237537
+    }
+  }
+  image_name: "000000000140.jpg"
+  image_id: 140
+}
+detection_results {
+  objects {
+    class_id: 86
+    bounding_box {
+      normalized_top: 0.43855423
+      normalized_bottom: 0.773494
+      normalized_left: 0.013531799
+      normalized_right: 0.20027064
+    }
+  }
+  objects {
+    class_id: 86
+    bounding_box {
+      normalized_top: 0.24096386
+      normalized_bottom: 0.79518074
+      normalized_left: 0.3396482
+      normalized_right: 0.65223277
+    }
+  }
+  objects {
+    class_id: 86
+    bounding_box {
+      normalized_top: 0.48915663
+      normalized_bottom: 0.7855422
+      normalized_left: 0.7577808
+      normalized_right: 0.9594046
+    }
+  }
+  objects {
+    class_id: 51
+    bounding_box {
+      normalized_top: 0.486747
+      normalized_bottom: 0.77590364
+      normalized_left: 0.759134
+      normalized_right: 0.95805144
+    }
+  }
+  image_name: "000000000141.jpg"
+  image_id: 141
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.32522124
+      normalized_bottom: 0.69911504
+      normalized_left: 0.19911504
+      normalized_right: 0.94690263
+    }
+  }
+  image_name: "000000000142.jpg"
+  image_id: 142
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.2759434
+      normalized_bottom: 0.8561321
+      normalized_left: 0.15373962
+      normalized_right: 0.5512465
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.2476415
+      normalized_bottom: 0.7995283
+      normalized_left: 0.50831026
+      normalized_right: 0.7077562
+    }
+  }
+  image_name: "000000000143.jpg"
+  image_id: 143
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.30416667
+      normalized_bottom: 0.7
+      normalized_left: 0.2078125
+      normalized_right: 0.4453125
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.18333334
+      normalized_bottom: 0.78541666
+      normalized_left: 0.325
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000144.jpg"
+  image_id: 144
+}
+detection_results {
+  objects {
+    class_id: 46
+    bounding_box {
+      normalized_top: 0.092920355
+      normalized_bottom: 0.86873156
+      normalized_left: 0.20353982
+      normalized_right: 0.5176991
+    }
+  }
+  objects {
+    class_id: 46
+    bounding_box {
+      normalized_top: 0.038348082
+      normalized_bottom: 0.9454277
+      normalized_left: 0.43141592
+      normalized_right: 0.78539824
+    }
+  }
+  image_name: "000000000145.jpg"
+  image_id: 145
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.27107063
+      normalized_bottom: 0.6378132
+      normalized_left: 0.11874106
+      normalized_right: 0.8469242
+    }
+  }
+  image_name: "000000000146.jpg"
+  image_id: 146
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.40625
+      normalized_bottom: 0.65
+      normalized_left: 0.1625
+      normalized_right: 0.478125
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.31458333
+      normalized_bottom: 0.54583335
+      normalized_left: 0.6328125
+      normalized_right: 0.9046875
+    }
+  }
+  image_name: "000000000147.jpg"
+  image_id: 147
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.0
+      normalized_bottom: 0.72771084
+      normalized_left: 0.16779432
+      normalized_right: 0.4533153
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.18554217
+      normalized_bottom: 1.0
+      normalized_left: 0.48443842
+      normalized_right: 0.78078485
+    }
+  }
+  image_name: "000000000148.jpg"
+  image_id: 148
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.25174826
+      normalized_bottom: 0.5314685
+      normalized_left: 0.24055944
+      normalized_right: 0.4125874
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.16550116
+      normalized_bottom: 0.51981354
+      normalized_left: 0.38321677
+      normalized_right: 0.46573427
+    }
+  }
+  image_name: "000000000149.jpg"
+  image_id: 149
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.32919255
+      normalized_bottom: 0.6625259
+      normalized_left: 0.03937008
+      normalized_right: 0.8551181
+    }
+  }
+  image_name: "000000000150.jpg"
+  image_id: 150
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.21017699
+      normalized_bottom: 0.6482301
+      normalized_left: 0.1519174
+      normalized_right: 0.7861357
+    }
+  }
+  image_name: "000000000151.jpg"
+  image_id: 151
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.0
+      normalized_bottom: 0.954023
+      normalized_left: 0.05106383
+      normalized_right: 0.4141844
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.0
+      normalized_bottom: 0.95632184
+      normalized_left: 0.6099291
+      normalized_right: 0.93475175
+    }
+  }
+  image_name: "000000000152.jpg"
+  image_id: 152
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.0953125
+      normalized_bottom: 0.9046875
+      normalized_left: 0.1875
+      normalized_right: 0.53541666
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.29375
+      normalized_bottom: 0.9078125
+      normalized_left: 0.5541667
+      normalized_right: 0.89375
+    }
+  }
+  image_name: "000000000153.jpg"
+  image_id: 153
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.0
+      normalized_bottom: 0.7716186
+      normalized_left: 0.21029411
+      normalized_right: 0.5764706
+    }
+  }
+  image_name: "000000000154.jpg"
+  image_id: 154
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.23451327
+      normalized_bottom: 0.95132744
+      normalized_left: 0.32300884
+      normalized_right: 0.70501477
+    }
+  }
+  image_name: "000000000155.jpg"
+  image_id: 155
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.15172414
+      normalized_bottom: 0.85172415
+      normalized_left: 0.003787879
+      normalized_right: 0.7140151
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.41724136
+      normalized_bottom: 0.8413793
+      normalized_left: 0.5871212
+      normalized_right: 0.9649621
+    }
+  }
+  image_name: "000000000156.jpg"
+  image_id: 156
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.41666666
+      normalized_bottom: 0.54583335
+      normalized_left: 0.015625
+      normalized_right: 0.0453125
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.425
+      normalized_bottom: 0.56041664
+      normalized_left: 0.125
+      normalized_right: 0.1640625
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.44166666
+      normalized_bottom: 0.79583335
+      normalized_left: 0.3296875
+      normalized_right: 0.40625
+    }
+  }
+  image_name: "000000000157.jpg"
+  image_id: 157
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.43982494
+      normalized_bottom: 0.88840264
+      normalized_left: 0.25782415
+      normalized_right: 0.9076006
+    }
+  }
+  image_name: "000000000158.jpg"
+  image_id: 158
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.6106195
+      normalized_bottom: 0.82743365
+      normalized_left: 0.29351032
+      normalized_right: 0.40707964
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.3960177
+      normalized_bottom: 0.61504424
+      normalized_left: 0.6622419
+      normalized_right: 0.8643068
+    }
+  }
+  image_name: "000000000159.jpg"
+  image_id: 159
+}
+detection_results {
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.40707964
+      normalized_bottom: 0.9292035
+      normalized_left: 0.084070794
+      normalized_right: 0.719764
+    }
+  }
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.1039823
+      normalized_bottom: 0.48230088
+      normalized_left: 0.45132744
+      normalized_right: 0.93657815
+    }
+  }
+  image_name: "000000000160.jpg"
+  image_id: 160
+}
+detection_results {
+  objects {
+    class_id: 17
+    bounding_box {
+      normalized_top: 0.11585366
+      normalized_bottom: 0.800813
+      normalized_left: 0.032051284
+      normalized_right: 0.55288464
+    }
+  }
+  objects {
+    class_id: 17
+    bounding_box {
+      normalized_top: 0.22560975
+      normalized_bottom: 0.902439
+      normalized_left: 0.55608976
+      normalized_right: 0.9102564
+    }
+  }
+  image_name: "000000000161.jpg"
+  image_id: 161
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.104377106
+      normalized_bottom: 0.9175084
+      normalized_left: 0.38372093
+      normalized_right: 0.7131783
+    }
+  }
+  image_name: "000000000162.jpg"
+  image_id: 162
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.5379061
+      normalized_bottom: 0.933213
+      normalized_left: 0.2797834
+      normalized_right: 0.96570396
+    }
+  }
+  image_name: "000000000163.jpg"
+  image_id: 163
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.670082
+      normalized_bottom: 1.0
+      normalized_left: 0.581876
+      normalized_right: 0.72019076
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.72540987
+      normalized_bottom: 0.8032787
+      normalized_left: 0.8219396
+      normalized_right: 0.87758344
+    }
+  }
+  image_name: "000000000164.jpg"
+  image_id: 164
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.50625
+      normalized_bottom: 0.7125
+      normalized_left: 0.16458334
+      normalized_right: 0.29583332
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.571875
+      normalized_bottom: 0.7578125
+      normalized_left: 0.5
+      normalized_right: 0.59375
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.4734375
+      normalized_bottom: 0.9875
+      normalized_left: 0.625
+      normalized_right: 0.81458336
+    }
+  }
+  image_name: "000000000165.jpg"
+  image_id: 165
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.27433628
+      normalized_bottom: 0.7477876
+      normalized_left: 0.24742268
+      normalized_right: 0.8129602
+    }
+  }
+  image_name: "000000000166.jpg"
+  image_id: 166
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.3858093
+      normalized_bottom: 0.7960089
+      normalized_left: 0.21585903
+      normalized_right: 0.4375918
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.31929046
+      normalized_bottom: 1.0
+      normalized_left: 0.26284876
+      normalized_right: 0.8428781
+    }
+  }
+  image_name: "000000000167.jpg"
+  image_id: 167
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.118072286
+      normalized_bottom: 0.36626506
+      normalized_left: 0.21409214
+      normalized_right: 0.4322493
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.3686747
+      normalized_bottom: 0.89638555
+      normalized_left: 0.2506775
+      normalized_right: 0.4715447
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.38554215
+      normalized_bottom: 0.67228913
+      normalized_left: 0.6585366
+      normalized_right: 0.77506775
+    }
+  }
+  image_name: "000000000168.jpg"
+  image_id: 168
+}
+detection_results {
+  objects {
+    class_id: 42
+    bounding_box {
+      normalized_top: 0.33333334
+      normalized_bottom: 0.53333336
+      normalized_left: 0.0
+      normalized_right: 0.91875
+    }
+  }
+  objects {
+    class_id: 42
+    bounding_box {
+      normalized_top: 0.5229167
+      normalized_bottom: 0.875
+      normalized_left: 0.0
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000169.jpg"
+  image_id: 169
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.29646018
+      normalized_bottom: 0.5199115
+      normalized_left: 0.12536873
+      normalized_right: 0.22271386
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.38938054
+      normalized_bottom: 0.74336284
+      normalized_left: 0.64306784
+      normalized_right: 0.8023599
+    }
+  }
+  image_name: "000000000170.jpg"
+  image_id: 170
+}
+detection_results {
+  objects {
+    class_id: 62
+    bounding_box {
+      normalized_top: 0.21666667
+      normalized_bottom: 0.9166667
+      normalized_left: 0.4203125
+      normalized_right: 0.803125
+    }
+  }
+  objects {
+    class_id: 63
+    bounding_box {
+      normalized_top: 0.21666667
+      normalized_bottom: 0.8854167
+      normalized_left: 0.41875
+      normalized_right: 0.803125
+    }
+  }
+  image_name: "000000000171.jpg"
+  image_id: 171
+}
+detection_results {
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.14823009
+      normalized_bottom: 0.8163717
+      normalized_left: 0.076696165
+      normalized_right: 0.95132744
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.006637168
+      normalized_bottom: 0.38495576
+      normalized_left: 0.41887906
+      normalized_right: 0.5722714
+    }
+  }
+  image_name: "000000000172.jpg"
+  image_id: 172
+}
+detection_results {
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.20501475
+      normalized_bottom: 0.92330384
+      normalized_left: 0.26327434
+      normalized_right: 0.67699116
+    }
+  }
+  image_name: "000000000173.jpg"
+  image_id: 173
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.5121413
+      normalized_bottom: 0.777042
+      normalized_left: 0.07828656
+      normalized_right: 0.40620384
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.29801324
+      normalized_bottom: 0.6048565
+      normalized_left: 0.44017726
+      normalized_right: 0.74741507
+    }
+  }
+  image_name: "000000000174.jpg"
+  image_id: 174
+}
+detection_results {
+  objects {
+    class_id: 23
+    bounding_box {
+      normalized_top: 0.20971303
+      normalized_bottom: 0.8874172
+      normalized_left: 0.26292467
+      normalized_right: 0.6706056
+    }
+  }
+  image_name: "000000000175.jpg"
+  image_id: 175
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.42291668
+      normalized_bottom: 0.78541666
+      normalized_left: 0.25
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000176.jpg"
+  image_id: 176
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.60458016
+      normalized_bottom: 0.8152672
+      normalized_left: 0.021367522
+      normalized_right: 0.51282054
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.27480915
+      normalized_bottom: 0.42900762
+      normalized_left: 0.55128205
+      normalized_right: 0.97649574
+    }
+  }
+  image_name: "000000000177.jpg"
+  image_id: 177
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.76507276
+      normalized_bottom: 0.997921
+      normalized_left: 0.21473354
+      normalized_right: 0.39028212
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.23076923
+      normalized_bottom: 1.0
+      normalized_left: 0.2492163
+      normalized_right: 0.9341693
+    }
+  }
+  image_name: "000000000178.jpg"
+  image_id: 178
+}
+detection_results {
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.27083334
+      normalized_bottom: 0.6
+      normalized_left: 0.053125
+      normalized_right: 0.890625
+    }
+  }
+  image_name: "000000000179.jpg"
+  image_id: 179
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.325
+      normalized_bottom: 0.6979167
+      normalized_left: 0.1421875
+      normalized_right: 0.9078125
+    }
+  }
+  image_name: "000000000180.jpg"
+  image_id: 180
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.29867256
+      normalized_bottom: 0.8517699
+      normalized_left: 0.116347566
+      normalized_right: 0.8365243
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.21681416
+      normalized_bottom: 0.31637168
+      normalized_left: 0.57584685
+      normalized_right: 0.7010309
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.29867256
+      normalized_bottom: 0.31858408
+      normalized_left: 0.8630339
+      normalized_right: 0.8777614
+    }
+  }
+  image_name: "000000000181.jpg"
+  image_id: 181
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.22238587
+      normalized_bottom: 0.8453608
+      normalized_left: 0.55210644
+      normalized_right: 0.83370286
+    }
+  }
+  objects {
+    class_id: 46
+    bounding_box {
+      normalized_top: 0.34462446
+      normalized_bottom: 0.84830636
+      normalized_left: 0.14634146
+      normalized_right: 0.35920176
+    }
+  }
+  objects {
+    class_id: 46
+    bounding_box {
+      normalized_top: 0.34167895
+      normalized_bottom: 0.8026509
+      normalized_left: 0.345898
+      normalized_right: 0.54102
+    }
+  }
+  image_name: "000000000182.jpg"
+  image_id: 182
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.45011085
+      normalized_bottom: 0.52993345
+      normalized_left: 0.07205883
+      normalized_right: 0.113235295
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.38137472
+      normalized_bottom: 0.5321508
+      normalized_left: 0.11617647
+      normalized_right: 0.14705883
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.21286032
+      normalized_bottom: 0.68292683
+      normalized_left: 0.22352941
+      normalized_right: 0.3985294
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.40798226
+      normalized_bottom: 0.52993345
+      normalized_left: 0.23382352
+      normalized_right: 0.25735295
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.3946785
+      normalized_bottom: 0.5321508
+      normalized_left: 0.45735294
+      normalized_right: 0.4867647
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.4368071
+      normalized_bottom: 0.5698448
+      normalized_left: 0.5176471
+      normalized_right: 0.5602941
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.44567627
+      normalized_bottom: 0.5343681
+      normalized_left: 0.5882353
+      normalized_right: 0.6191176
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.20177384
+      normalized_bottom: 0.67849225
+      normalized_left: 0.6382353
+      normalized_right: 0.7588235
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.35698447
+      normalized_bottom: 0.5587583
+      normalized_left: 0.90882355
+      normalized_right: 0.9529412
+    }
+  }
+  image_name: "000000000183.jpg"
+  image_id: 183
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.28097346
+      normalized_bottom: 0.8318584
+      normalized_left: 0.2359882
+      normalized_right: 0.77138644
+    }
+  }
+  image_name: "000000000184.jpg"
+  image_id: 184
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.81931466
+      normalized_bottom: 0.89252335
+      normalized_left: 0.12761506
+      normalized_right: 0.19874477
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.28504673
+      normalized_bottom: 0.35514018
+      normalized_left: 0.15062761
+      normalized_right: 0.21338913
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.27725857
+      normalized_bottom: 0.36915886
+      normalized_left: 0.3912134
+      normalized_right: 0.48117155
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7803738
+      normalized_bottom: 0.89252335
+      normalized_left: 0.55648535
+      normalized_right: 0.62343097
+    }
+  }
+  image_name: "000000000185.jpg"
+  image_id: 185
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.21681416
+      normalized_bottom: 0.8539823
+      normalized_left: 0.27433628
+      normalized_right: 0.70058995
+    }
+  }
+  image_name: "000000000186.jpg"
+  image_id: 186
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.22616407
+      normalized_bottom: 0.8292683
+      normalized_left: 0.17231223
+      normalized_right: 0.39469808
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.042128604
+      normalized_bottom: 0.96230596
+      normalized_left: 0.3843888
+      normalized_right: 0.89985275
+    }
+  }
+  image_name: "000000000187.jpg"
+  image_id: 187
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.2275574
+      normalized_bottom: 0.8705637
+      normalized_left: 0.2125
+      normalized_right: 0.45
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.2526096
+      normalized_bottom: 0.8538622
+      normalized_left: 0.584375
+      normalized_right: 0.78125
+    }
+  }
+  image_name: "000000000188.jpg"
+  image_id: 188
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.27433628
+      normalized_bottom: 0.7123894
+      normalized_left: 0.13274336
+      normalized_right: 0.81120944
+    }
+  }
+  image_name: "000000000189.jpg"
+  image_id: 189
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.77734375
+      normalized_bottom: 0.8046875
+      normalized_left: 0.8222656
+      normalized_right: 0.83203125
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6894531
+      normalized_bottom: 0.76953125
+      normalized_left: 0.90625
+      normalized_right: 0.94140625
+    }
+  }
+  image_name: "000000000190.jpg"
+  image_id: 190
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.20657277
+      normalized_bottom: 0.5477308
+      normalized_left: 0.15416667
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000191.jpg"
+  image_id: 191
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.16928446
+      normalized_bottom: 0.92670155
+      normalized_left: 0.052336447
+      normalized_right: 0.9364486
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.19546248
+      normalized_bottom: 0.37696335
+      normalized_left: 0.72149533
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000192.jpg"
+  image_id: 192
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.33958334
+      normalized_bottom: 0.8625
+      normalized_left: 0.0
+      normalized_right: 0.4859375
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.27291667
+      normalized_bottom: 0.78541666
+      normalized_left: 0.3828125
+      normalized_right: 0.8640625
+    }
+  }
+  image_name: "000000000193.jpg"
+  image_id: 193
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.38333333
+      normalized_bottom: 0.6166667
+      normalized_left: 0.1367989
+      normalized_right: 0.44049248
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.3857143
+      normalized_bottom: 0.6166667
+      normalized_left: 0.40492475
+      normalized_right: 0.8112175
+    }
+  }
+  image_name: "000000000194.jpg"
+  image_id: 194
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.24031007
+      normalized_bottom: 0.9043928
+      normalized_left: 0.026515152
+      normalized_right: 0.6098485
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.24806201
+      normalized_bottom: 0.8578811
+      normalized_left: 0.66161615
+      normalized_right: 0.9621212
+    }
+  }
+  image_name: "000000000195.jpg"
+  image_id: 195
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.575
+      normalized_bottom: 0.69166666
+      normalized_left: 0.3890625
+      normalized_right: 0.4234375
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.58958334
+      normalized_bottom: 0.69375
+      normalized_left: 0.4125
+      normalized_right: 0.4453125
+    }
+  }
+  image_name: "000000000196.jpg"
+  image_id: 196
+}
+detection_results {
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.19166666
+      normalized_bottom: 0.47291666
+      normalized_left: 0.021875
+      normalized_right: 0.796875
+    }
+  }
+  objects {
+    class_id: 49
+    bounding_box {
+      normalized_top: 0.45208332
+      normalized_bottom: 0.7
+      normalized_left: 0.034375
+      normalized_right: 0.896875
+    }
+  }
+  image_name: "000000000197.jpg"
+  image_id: 197
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.29936305
+      normalized_bottom: 1.0
+      normalized_left: 0.08755761
+      normalized_right: 0.41474655
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.19957536
+      normalized_bottom: 0.86624205
+      normalized_left: 0.6282642
+      normalized_right: 0.8986175
+    }
+  }
+  image_name: "000000000198.jpg"
+  image_id: 198
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.46370023
+      normalized_bottom: 0.51288056
+      normalized_left: 0.026462395
+      normalized_right: 0.07103064
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.8266979
+      normalized_bottom: 0.84543324
+      normalized_left: 0.13788301
+      normalized_right: 0.16295265
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.88056207
+      normalized_bottom: 0.9297424
+      normalized_left: 0.26462397
+      normalized_right: 0.30083567
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.31381732
+      normalized_bottom: 0.3793911
+      normalized_left: 0.2994429
+      normalized_right: 0.34261838
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.18501171
+      normalized_bottom: 0.25526932
+      normalized_left: 0.35654595
+      normalized_right: 0.4011142
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.33489463
+      normalized_bottom: 0.40046838
+      normalized_left: 0.37325907
+      normalized_right: 0.40807799
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.5714286
+      normalized_bottom: 0.618267
+      normalized_left: 0.46239555
+      normalized_right: 0.505571
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.103044495
+      normalized_bottom: 0.17096019
+      normalized_left: 0.4902507
+      normalized_right: 0.53064066
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.6814988
+      normalized_bottom: 0.7283372
+      normalized_left: 0.5083566
+      normalized_right: 0.545961
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.39578456
+      normalized_bottom: 0.43559718
+      normalized_left: 0.862117
+      normalized_right: 0.9011142
+    }
+  }
+  image_name: "000000000199.jpg"
+  image_id: 199
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.3857143
+      normalized_bottom: 0.7346939
+      normalized_left: 0.5830671
+      normalized_right: 0.7172524
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6183674
+      normalized_bottom: 0.9979592
+      normalized_left: 0.7348243
+      normalized_right: 0.9376997
+    }
+  }
+  image_name: "000000000200.jpg"
+  image_id: 200
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.06832298
+      normalized_bottom: 0.98136646
+      normalized_left: 0.05511811
+      normalized_right: 0.45826772
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.12008282
+      normalized_bottom: 0.99378884
+      normalized_left: 0.40944883
+      normalized_right: 0.89606297
+    }
+  }
+  image_name: "000000000201.jpg"
+  image_id: 201
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.40625
+      normalized_bottom: 0.75416666
+      normalized_left: 0.265625
+      normalized_right: 0.4
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.32083333
+      normalized_bottom: 0.7083333
+      normalized_left: 0.7453125
+      normalized_right: 0.85625
+    }
+  }
+  image_name: "000000000202.jpg"
+  image_id: 202
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.4488889
+      normalized_bottom: 0.72
+      normalized_left: 0.06754772
+      normalized_right: 1.0
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.74666667
+      normalized_bottom: 0.8155556
+      normalized_left: 0.23054332
+      normalized_right: 0.24669604
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.74222225
+      normalized_bottom: 0.8155556
+      normalized_left: 0.25844347
+      normalized_right: 0.27312776
+    }
+  }
+  image_name: "000000000203.jpg"
+  image_id: 203
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.13125
+      normalized_bottom: 0.16041666
+      normalized_left: 0.009375
+      normalized_right: 0.0234375
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.12916666
+      normalized_bottom: 0.15625
+      normalized_left: 0.05
+      normalized_right: 0.0625
+    }
+  }
+  image_name: "000000000204.jpg"
+  image_id: 204
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.37831858
+      normalized_bottom: 0.710177
+      normalized_left: 0.069321536
+      normalized_right: 0.9483776
+    }
+  }
+  image_name: "000000000205.jpg"
+  image_id: 205
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.27522936
+      normalized_bottom: 0.73165137
+      normalized_left: 0.06970128
+      normalized_right: 0.14793742
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.27522936
+      normalized_bottom: 0.73394495
+      normalized_left: 0.20056899
+      normalized_right: 0.28449503
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.27293578
+      normalized_bottom: 0.73394495
+      normalized_left: 0.33854908
+      normalized_right: 0.4167852
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.27522936
+      normalized_bottom: 0.73623854
+      normalized_left: 0.46372688
+      normalized_right: 0.53485066
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.27293578
+      normalized_bottom: 0.73165137
+      normalized_left: 0.56899005
+      normalized_right: 0.68136555
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.26376146
+      normalized_bottom: 0.73623854
+      normalized_left: 0.7226173
+      normalized_right: 0.8051209
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.27522936
+      normalized_bottom: 0.73165137
+      normalized_left: 0.84637266
+      normalized_right: 0.9246088
+    }
+  }
+  image_name: "000000000206.jpg"
+  image_id: 206
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.09973046
+      normalized_bottom: 0.49595687
+      normalized_left: 0.056831922
+      normalized_right: 0.24788392
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.2264151
+      normalized_bottom: 0.55525607
+      normalized_left: 0.51753324
+      normalized_right: 0.63724303
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.3342318
+      normalized_bottom: 0.6684636
+      normalized_left: 0.8331318
+      normalized_right: 0.9842805
+    }
+  }
+  image_name: "000000000207.jpg"
+  image_id: 207
+}
+detection_results {
+  objects {
+    class_id: 24
+    bounding_box {
+      normalized_top: 0.6125
+      normalized_bottom: 0.7291667
+      normalized_left: 0.1953125
+      normalized_right: 0.3671875
+    }
+  }
+  objects {
+    class_id: 24
+    bounding_box {
+      normalized_top: 0.42708334
+      normalized_bottom: 0.7270833
+      normalized_left: 0.271875
+      normalized_right: 0.565625
+    }
+  }
+  objects {
+    class_id: 24
+    bounding_box {
+      normalized_top: 0.5208333
+      normalized_bottom: 0.74375
+      normalized_left: 0.478125
+      normalized_right: 0.5921875
+    }
+  }
+  objects {
+    class_id: 24
+    bounding_box {
+      normalized_top: 0.42291668
+      normalized_bottom: 0.71666664
+      normalized_left: 0.734375
+      normalized_right: 0.853125
+    }
+  }
+  image_name: "000000000208.jpg"
+  image_id: 208
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.16371681
+      normalized_bottom: 0.9623894
+      normalized_left: 0.0
+      normalized_right: 1.0
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.63716817
+      normalized_bottom: 0.9977876
+      normalized_left: 0.27138644
+      normalized_right: 0.34955752
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6084071
+      normalized_bottom: 0.98893803
+      normalized_left: 0.40265486
+      normalized_right: 0.48230088
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.27433628
+      normalized_bottom: 0.61504424
+      normalized_left: 0.47640118
+      normalized_right: 0.5781711
+    }
+  }
+  image_name: "000000000209.jpg"
+  image_id: 209
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.40833333
+      normalized_bottom: 0.74791664
+      normalized_left: 0.0625
+      normalized_right: 0.9203125
+    }
+  }
+  image_name: "000000000210.jpg"
+  image_id: 210
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.22708334
+      normalized_bottom: 0.925
+      normalized_left: 0.38125
+      normalized_right: 0.6875
+    }
+  }
+  objects {
+    class_id: 42
+    bounding_box {
+      normalized_top: 0.89375
+      normalized_bottom: 0.98541665
+      normalized_left: 0.115625
+      normalized_right: 0.7578125
+    }
+  }
+  image_name: "000000000211.jpg"
+  image_id: 211
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.36460555
+      normalized_bottom: 0.7121535
+      normalized_left: 0.01529052
+      normalized_right: 1.0
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.64605546
+      normalized_bottom: 0.6673774
+      normalized_left: 0.93272173
+      normalized_right: 0.9938838
+    }
+  }
+  image_name: "000000000212.jpg"
+  image_id: 212
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.57220215
+      normalized_bottom: 0.8646209
+      normalized_left: 0.23465703
+      normalized_right: 0.33032492
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.68231046
+      normalized_bottom: 0.87184113
+      normalized_left: 0.31768954
+      normalized_right: 0.4133574
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5361011
+      normalized_bottom: 0.72202164
+      normalized_left: 0.43501806
+      normalized_right: 0.49458483
+    }
+  }
+  image_name: "000000000213.jpg"
+  image_id: 213
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.28541666
+      normalized_bottom: 0.6166667
+      normalized_left: 0.0734375
+      normalized_right: 0.9171875
+    }
+  }
+  image_name: "000000000214.jpg"
+  image_id: 214
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.25884956
+      normalized_bottom: 0.8960177
+      normalized_left: 0.3820059
+      normalized_right: 0.56342185
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.37831858
+      normalized_bottom: 0.7123894
+      normalized_left: 0.64896756
+      normalized_right: 0.86725664
+    }
+  }
+  image_name: "000000000215.jpg"
+  image_id: 215
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.59423506
+      normalized_bottom: 0.9423503
+      normalized_left: 0.0
+      normalized_right: 0.14852941
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.52549887
+      normalized_bottom: 0.6385809
+      normalized_left: 0.019117648
+      normalized_right: 0.175
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.42793792
+      normalized_bottom: 0.6651885
+      normalized_left: 0.32647058
+      normalized_right: 0.6220588
+    }
+  }
+  image_name: "000000000216.jpg"
+  image_id: 216
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.24634655
+      normalized_bottom: 0.5532359
+      normalized_left: 0.034375
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000217.jpg"
+  image_id: 217
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.08277405
+      normalized_bottom: 0.7427293
+      normalized_left: 0.39504373
+      normalized_right: 0.56559765
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.147651
+      normalized_bottom: 0.74049217
+      normalized_left: 0.5991254
+      normalized_right: 0.75072885
+    }
+  }
+  objects {
+    class_id: 48
+    bounding_box {
+      normalized_top: 0.81431764
+      normalized_bottom: 0.9082774
+      normalized_left: 0.5714286
+      normalized_right: 0.9198251
+    }
+  }
+  image_name: "000000000218.jpg"
+  image_id: 218
+}
+detection_results {
+  objects {
+    class_id: 38
+    bounding_box {
+      normalized_top: 0.7022222
+      normalized_bottom: 0.8666667
+      normalized_left: 0.36563876
+      normalized_right: 0.6945668
+    }
+  }
+  objects {
+    class_id: 38
+    bounding_box {
+      normalized_top: 0.37333333
+      normalized_bottom: 0.5422222
+      normalized_left: 0.46108663
+      normalized_right: 0.79441994
+    }
+  }
+  objects {
+    class_id: 38
+    bounding_box {
+      normalized_top: 0.033333335
+      normalized_bottom: 0.20444444
+      normalized_left: 0.55947137
+      normalized_right: 0.9089574
+    }
+  }
+  image_name: "000000000219.jpg"
+  image_id: 219
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.16371681
+      normalized_bottom: 0.6039823
+      normalized_left: 0.20353982
+      normalized_right: 0.8702065
+    }
+  }
+  image_name: "000000000220.jpg"
+  image_id: 220
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.6315789
+      normalized_bottom: 0.90460527
+      normalized_left: 0.12698413
+      normalized_right: 0.36309522
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.2450658
+      normalized_bottom: 0.50328946
+      normalized_left: 0.21428572
+      normalized_right: 0.46626985
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.63486844
+      normalized_bottom: 0.8322368
+      normalized_left: 0.52380955
+      normalized_right: 0.7936508
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.24342105
+      normalized_bottom: 0.53453946
+      normalized_left: 0.6984127
+      normalized_right: 0.8730159
+    }
+  }
+  image_name: "000000000221.jpg"
+  image_id: 221
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.2920354
+      normalized_bottom: 0.6946903
+      normalized_left: 0.13864307
+      normalized_right: 0.9026549
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.61504424
+      normalized_bottom: 0.6792035
+      normalized_left: 0.42477876
+      normalized_right: 0.44247788
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6238938
+      normalized_bottom: 0.670354
+      normalized_left: 0.79498523
+      normalized_right: 0.8097345
+    }
+  }
+  image_name: "000000000222.jpg"
+  image_id: 222
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.3561947
+      normalized_bottom: 0.69690263
+      normalized_left: 0.060471978
+      normalized_right: 0.88495576
+    }
+  }
+  image_name: "000000000223.jpg"
+  image_id: 223
+}
+detection_results {
+  objects {
+    class_id: 17
+    bounding_box {
+      normalized_top: 0.50625
+      normalized_bottom: 0.9625
+      normalized_left: 0.16875
+      normalized_right: 0.7796875
+    }
+  }
+  objects {
+    class_id: 17
+    bounding_box {
+      normalized_top: 0.029166667
+      normalized_bottom: 0.31666666
+      normalized_left: 0.2390625
+      normalized_right: 0.8046875
+    }
+  }
+  image_name: "000000000224.jpg"
+  image_id: 224
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.0
+      normalized_bottom: 0.6770833
+      normalized_left: 0.0046875
+      normalized_right: 0.321875
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.29583332
+      normalized_bottom: 1.0
+      normalized_left: 0.5171875
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000225.jpg"
+  image_id: 225
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.11061947
+      normalized_bottom: 0.3761062
+      normalized_left: 0.2020649
+      normalized_right: 0.45427728
+    }
+  }
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.55088496
+      normalized_bottom: 0.8075221
+      normalized_left: 0.6386431
+      normalized_right: 0.86873156
+    }
+  }
+  image_name: "000000000226.jpg"
+  image_id: 226
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.14440434
+      normalized_bottom: 0.7527076
+      normalized_left: 0.0
+      normalized_right: 0.9801444
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.84476537
+      normalized_bottom: 0.98916966
+      normalized_left: 0.02166065
+      normalized_right: 0.2761733
+    }
+  }
+  image_name: "000000000227.jpg"
+  image_id: 227
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.28097346
+      normalized_bottom: 0.6902655
+      normalized_left: 0.18879056
+      normalized_right: 0.8864307
+    }
+  }
+  image_name: "000000000228.jpg"
+  image_id: 228
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.6020833
+      normalized_bottom: 0.63958335
+      normalized_left: 0.0203125
+      normalized_right: 0.0828125
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.08125
+      normalized_bottom: 0.11666667
+      normalized_left: 0.034375
+      normalized_right: 0.1
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.65
+      normalized_bottom: 0.70625
+      normalized_left: 0.0421875
+      normalized_right: 0.0875
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.26041666
+      normalized_bottom: 0.30208334
+      normalized_left: 0.109375
+      normalized_right: 0.1421875
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.575
+      normalized_bottom: 0.6333333
+      normalized_left: 0.2046875
+      normalized_right: 0.2484375
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.0
+      normalized_bottom: 0.052083332
+      normalized_left: 0.4578125
+      normalized_right: 0.5140625
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.17083333
+      normalized_bottom: 0.19791667
+      normalized_left: 0.509375
+      normalized_right: 0.553125
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.88958335
+      normalized_bottom: 0.90625
+      normalized_left: 0.5140625
+      normalized_right: 0.54375
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.11666667
+      normalized_bottom: 0.14375
+      normalized_left: 0.66875
+      normalized_right: 0.75
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.33541667
+      normalized_bottom: 0.38958332
+      normalized_left: 0.721875
+      normalized_right: 0.7625
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.35833332
+      normalized_bottom: 0.38541666
+      normalized_left: 0.9859375
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000229.jpg"
+  image_id: 229
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.33493975
+      normalized_bottom: 0.7325301
+      normalized_left: 0.10960758
+      normalized_right: 0.78619754
+    }
+  }
+  image_name: "000000000230.jpg"
+  image_id: 230
+}
+detection_results {
+  objects {
+    class_id: 53
+    bounding_box {
+      normalized_top: 0.24778761
+      normalized_bottom: 0.7721239
+      normalized_left: 0.14159292
+      normalized_right: 0.48082596
+    }
+  }
+  objects {
+    class_id: 53
+    bounding_box {
+      normalized_top: 0.48893806
+      normalized_bottom: 0.5243363
+      normalized_left: 0.7241888
+      normalized_right: 0.74336284
+    }
+  }
+  image_name: "000000000231.jpg"
+  image_id: 231
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.08421053
+      normalized_bottom: 0.8842105
+      normalized_left: 0.0743034
+      normalized_right: 0.37461302
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.25263157
+      normalized_bottom: 0.92
+      normalized_left: 0.2879257
+      normalized_right: 0.58049536
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.22105263
+      normalized_bottom: 0.9536842
+      normalized_left: 0.47368422
+      normalized_right: 0.9721362
+    }
+  }
+  image_name: "000000000232.jpg"
+  image_id: 232
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.23956044
+      normalized_bottom: 0.64175826
+      normalized_left: 0.043026708
+      normalized_right: 1.0
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.45274726
+      normalized_bottom: 0.6637363
+      normalized_left: 0.007418398
+      normalized_right: 0.0578635
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.4967033
+      normalized_bottom: 0.6549451
+      normalized_left: 0.10682493
+      normalized_right: 0.13204747
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.50989014
+      normalized_bottom: 0.64395607
+      normalized_left: 0.12759644
+      normalized_right: 0.1661721
+    }
+  }
+  image_name: "000000000233.jpg"
+  image_id: 233
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6791667
+      normalized_bottom: 0.73541665
+      normalized_left: 0.153125
+      normalized_right: 0.1765625
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.38333333
+      normalized_bottom: 0.42708334
+      normalized_left: 0.159375
+      normalized_right: 0.184375
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.8229167
+      normalized_bottom: 0.8833333
+      normalized_left: 0.203125
+      normalized_right: 0.2328125
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5416667
+      normalized_bottom: 0.5854167
+      normalized_left: 0.6078125
+      normalized_right: 0.640625
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.47083333
+      normalized_bottom: 0.5208333
+      normalized_left: 0.609375
+      normalized_right: 0.6421875
+    }
+  }
+  image_name: "000000000234.jpg"
+  image_id: 234
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.119205296
+      normalized_bottom: 0.98234
+      normalized_left: 0.3480826
+      normalized_right: 0.65929204
+    }
+  }
+  image_name: "000000000235.jpg"
+  image_id: 235
+}
+detection_results {
+  objects {
+    class_id: 20
+    bounding_box {
+      normalized_top: 0.024291499
+      normalized_bottom: 0.79554653
+      normalized_left: 0.07258064
+      normalized_right: 0.5064516
+    }
+  }
+  objects {
+    class_id: 20
+    bounding_box {
+      normalized_top: 0.21052632
+      normalized_bottom: 1.0
+      normalized_left: 0.48225805
+      normalized_right: 0.91774195
+    }
+  }
+  image_name: "000000000236.jpg"
+  image_id: 236
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.3180873
+      normalized_bottom: 0.6340956
+      normalized_left: 0.07535322
+      normalized_right: 0.91051805
+    }
+  }
+  image_name: "000000000237.jpg"
+  image_id: 237
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.24168514
+      normalized_bottom: 0.7006652
+      normalized_left: 0.60235643
+      normalized_right: 0.83210605
+    }
+  }
+  objects {
+    class_id: 42
+    bounding_box {
+      normalized_top: 0.5898004
+      normalized_bottom: 0.7760532
+      normalized_left: 0.49779087
+      normalized_right: 0.7628866
+    }
+  }
+  image_name: "000000000238.jpg"
+  image_id: 238
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.30752212
+      normalized_bottom: 0.78097343
+      normalized_left: 0.39675516
+      normalized_right: 0.96460176
+    }
+  }
+  image_name: "000000000239.jpg"
+  image_id: 239
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.02529762
+      normalized_bottom: 0.57738096
+      normalized_left: 0.00877193
+      normalized_right: 0.25219297
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.02529762
+      normalized_bottom: 0.57886904
+      normalized_left: 0.2609649
+      normalized_right: 0.502193
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.023809524
+      normalized_bottom: 0.57738096
+      normalized_left: 0.5
+      normalized_right: 0.75
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.02529762
+      normalized_bottom: 0.57738096
+      normalized_left: 0.752193
+      normalized_right: 0.99561405
+    }
+  }
+  image_name: "000000000240.jpg"
+  image_id: 240
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.13254787
+      normalized_bottom: 0.9896907
+      normalized_left: 0.34146342
+      normalized_right: 0.67184037
+    }
+  }
+  image_name: "000000000241.jpg"
+  image_id: 241
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.16025642
+      normalized_bottom: 0.71581197
+      normalized_left: 0.14351144
+      normalized_right: 0.38015267
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.1431624
+      normalized_bottom: 0.40811965
+      normalized_left: 0.7206107
+      normalized_right: 0.8549618
+    }
+  }
+  image_name: "000000000242.jpg"
+  image_id: 242
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.1375
+      normalized_bottom: 0.784375
+      normalized_left: 0.41458333
+      normalized_right: 0.8625
+    }
+  }
+  image_name: "000000000243.jpg"
+  image_id: 243
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.5208333
+      normalized_bottom: 0.60625
+      normalized_left: 0.253125
+      normalized_right: 0.421875
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.47291666
+      normalized_bottom: 0.58958334
+      normalized_left: 0.4515625
+      normalized_right: 0.603125
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.5416667
+      normalized_bottom: 0.57916665
+      normalized_left: 0.6515625
+      normalized_right: 0.725
+    }
+  }
+  image_name: "000000000244.jpg"
+  image_id: 244
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.18987341
+      normalized_bottom: 0.7721519
+      normalized_left: 0.074742265
+      normalized_right: 0.34407216
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.29620254
+      normalized_bottom: 0.76455694
+      normalized_left: 0.37371135
+      normalized_right: 0.617268
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.16455697
+      normalized_bottom: 0.8329114
+      normalized_left: 0.71262884
+      normalized_right: 0.9871134
+    }
+  }
+  image_name: "000000000245.jpg"
+  image_id: 245
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.28674698
+      normalized_bottom: 0.88433737
+      normalized_left: 0.08401084
+      normalized_right: 0.5067751
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.4313253
+      normalized_bottom: 1.0
+      normalized_left: 0.54607046
+      normalized_right: 0.9688347
+    }
+  }
+  image_name: "000000000246.jpg"
+  image_id: 246
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.29424778
+      normalized_bottom: 0.5376106
+      normalized_left: 0.060471978
+      normalized_right: 0.2758112
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.46902654
+      normalized_bottom: 0.6061947
+      normalized_left: 0.359882
+      normalized_right: 0.5427729
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.55309737
+      normalized_bottom: 0.70132744
+      normalized_left: 0.7625369
+      normalized_right: 0.94100296
+    }
+  }
+  image_name: "000000000247.jpg"
+  image_id: 247
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.4390625
+      normalized_bottom: 0.8875
+      normalized_left: 0.275
+      normalized_right: 0.40625
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.45625
+      normalized_bottom: 0.9703125
+      normalized_left: 0.35416666
+      normalized_right: 0.58958334
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.0234375
+      normalized_bottom: 0.5328125
+      normalized_left: 0.36875
+      normalized_right: 0.57916665
+    }
+  }
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.4390625
+      normalized_bottom: 0.88125
+      normalized_left: 0.54791665
+      normalized_right: 0.675
+    }
+  }
+  image_name: "000000000248.jpg"
+  image_id: 248
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.40486726
+      normalized_bottom: 0.8053097
+      normalized_left: 0.044247787
+      normalized_right: 0.96902657
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6526549
+      normalized_bottom: 0.91150445
+      normalized_left: 0.097345136
+      normalized_right: 0.15634218
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6946903
+      normalized_bottom: 0.7721239
+      normalized_left: 0.097345136
+      normalized_right: 0.11356932
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6438053
+      normalized_bottom: 0.95132744
+      normalized_left: 0.1740413
+      normalized_right: 0.25221238
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7278761
+      normalized_bottom: 0.7699115
+      normalized_left: 0.40855458
+      normalized_right: 0.42330384
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7234513
+      normalized_bottom: 0.7654867
+      normalized_left: 0.42920354
+      normalized_right: 0.44690266
+    }
+  }
+  image_name: "000000000249.jpg"
+  image_id: 249
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.30155212
+      normalized_bottom: 0.6895787
+      normalized_left: 0.55947137
+      normalized_right: 0.74302495
+    }
+  }
+  objects {
+    class_id: 42
+    bounding_box {
+      normalized_top: 0.23281597
+      normalized_bottom: 0.7405765
+      normalized_left: 0.5051395
+      normalized_right: 0.67547727
+    }
+  }
+  image_name: "000000000250.jpg"
+  image_id: 250
+}
+detection_results {
+  objects {
+    class_id: 7
+    bounding_box {
+      normalized_top: 0.32592592
+      normalized_bottom: 0.9111111
+      normalized_left: 0.15833333
+      normalized_right: 0.64166665
+    }
+  }
+  image_name: "000000000251.jpg"
+  image_id: 251
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.119205296
+      normalized_bottom: 0.8366446
+      normalized_left: 0.05465288
+      normalized_right: 0.6322009
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.0
+      normalized_bottom: 1.0
+      normalized_left: 0.49926144
+      normalized_right: 0.86262923
+    }
+  }
+  image_name: "000000000252.jpg"
+  image_id: 252
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.08912387
+      normalized_bottom: 0.9229607
+      normalized_left: 0.10799136
+      normalized_right: 0.88552916
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.8549849
+      normalized_bottom: 0.92749244
+      normalized_left: 0.53563714
+      normalized_right: 0.600432
+    }
+  }
+  image_name: "000000000253.jpg"
+  image_id: 253
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.0546875
+      normalized_bottom: 0.4421875
+      normalized_left: 0.125
+      normalized_right: 0.84166664
+    }
+  }
+  image_name: "000000000254.jpg"
+  image_id: 254
+}
+detection_results {
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.044247787
+      normalized_bottom: 0.21238938
+      normalized_left: 0.23451327
+      normalized_right: 0.46755162
+    }
+  }
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.14159292
+      normalized_bottom: 0.42477876
+      normalized_left: 0.32300884
+      normalized_right: 0.57669616
+    }
+  }
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.30530974
+      normalized_bottom: 0.65929204
+      normalized_left: 0.43067846
+      normalized_right: 0.73156345
+    }
+  }
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.5707965
+      normalized_bottom: 1.0
+      normalized_left: 0.5412979
+      normalized_right: 0.89528024
+    }
+  }
+  image_name: "000000000255.jpg"
+  image_id: 255
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.079166666
+      normalized_bottom: 0.93541664
+      normalized_left: 0.3484375
+      normalized_right: 0.675
+    }
+  }
+  image_name: "000000000256.jpg"
+  image_id: 256
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.26941746
+      normalized_bottom: 0.6626214
+      normalized_left: 0.24865592
+      normalized_right: 0.93010753
+    }
+  }
+  image_name: "000000000257.jpg"
+  image_id: 257
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.102725364
+      normalized_bottom: 0.9790356
+      normalized_left: 0.04354588
+      normalized_right: 0.65163296
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.46331236
+      normalized_bottom: 0.9119497
+      normalized_left: 0.592535
+      normalized_right: 0.9517885
+    }
+  }
+  image_name: "000000000258.jpg"
+  image_id: 258
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.12790698
+      normalized_bottom: 0.88081396
+      normalized_left: 0.022692889
+      normalized_right: 0.25718608
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.0872093
+      normalized_bottom: 0.88372093
+      normalized_left: 0.25869894
+      normalized_right: 0.47352496
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.09011628
+      normalized_bottom: 0.89534885
+      normalized_left: 0.50680786
+      normalized_right: 0.7019667
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.06104651
+      normalized_bottom: 0.86918604
+      normalized_left: 0.7034796
+      normalized_right: 0.8910741
+    }
+  }
+  image_name: "000000000259.jpg"
+  image_id: 259
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.24439462
+      normalized_bottom: 0.6143498
+      normalized_left: 0.1426492
+      normalized_right: 0.88500726
+    }
+  }
+  image_name: "000000000260.jpg"
+  image_id: 260
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.4359606
+      normalized_bottom: 0.58866996
+      normalized_left: 0.22089948
+      normalized_right: 0.3042328
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.40147784
+      normalized_bottom: 0.43842363
+      normalized_left: 0.02910053
+      normalized_right: 0.06613757
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.48768473
+      normalized_bottom: 0.6625616
+      normalized_left: 0.12830688
+      normalized_right: 0.3915344
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.10344828
+      normalized_bottom: 0.37438422
+      normalized_left: 0.57275134
+      normalized_right: 0.99206346
+    }
+  }
+  image_name: "000000000261.jpg"
+  image_id: 261
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.13003664
+      normalized_bottom: 0.37362638
+      normalized_left: 0.110320285
+      normalized_right: 0.40035588
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.47619048
+      normalized_bottom: 0.7692308
+      normalized_left: 0.6530249
+      normalized_right: 0.9145908
+    }
+  }
+  image_name: "000000000262.jpg"
+  image_id: 262
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.03982301
+      normalized_bottom: 0.9181416
+      normalized_left: 0.5198822
+      normalized_right: 0.83210605
+    }
+  }
+  image_name: "000000000263.jpg"
+  image_id: 263
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.33744857
+      normalized_bottom: 0.9074074
+      normalized_left: 0.026941363
+      normalized_right: 0.49920762
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.18518518
+      normalized_bottom: 0.73251027
+      normalized_left: 0.37083992
+      normalized_right: 0.88272583
+    }
+  }
+  image_name: "000000000264.jpg"
+  image_id: 264
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.13968958
+      normalized_bottom: 0.62527716
+      normalized_left: 0.10309278
+      normalized_right: 0.4329897
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.24611974
+      normalized_bottom: 0.93126386
+      normalized_left: 0.46391752
+      normalized_right: 0.9072165
+    }
+  }
+  image_name: "000000000265.jpg"
+  image_id: 265
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.5912863
+      normalized_bottom: 1.0
+      normalized_left: 0.06446541
+      normalized_right: 0.21069182
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.016597511
+      normalized_bottom: 0.89419085
+      normalized_left: 0.1855346
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000266.jpg"
+  image_id: 266
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.16041666
+      normalized_bottom: 0.78541666
+      normalized_left: 0.4078125
+      normalized_right: 0.8609375
+    }
+  }
+  image_name: "000000000267.jpg"
+  image_id: 267
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.4
+      normalized_bottom: 0.5518072
+      normalized_left: 0.19485791
+      normalized_right: 0.27334234
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.3686747
+      normalized_bottom: 0.5710843
+      normalized_left: 0.29499322
+      normalized_right: 0.38836265
+    }
+  }
+  image_name: "000000000268.jpg"
+  image_id: 268
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.46210995
+      normalized_bottom: 0.5884101
+      normalized_left: 0.44298247
+      normalized_right: 0.53289473
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7771174
+      normalized_bottom: 0.9153046
+      normalized_left: 0.8464912
+      normalized_right: 0.91885966
+    }
+  }
+  image_name: "000000000269.jpg"
+  image_id: 269
+}
+detection_results {
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.55925155
+      normalized_bottom: 0.7837838
+      normalized_left: 0.0989011
+      normalized_right: 0.9733124
+    }
+  }
+  objects {
+    class_id: 9
+    bounding_box {
+      normalized_top: 0.4989605
+      normalized_bottom: 0.50727654
+      normalized_left: 0.8288854
+      normalized_right: 0.855573
+    }
+  }
+  image_name: "000000000270.jpg"
+  image_id: 270
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.55088496
+      normalized_bottom: 0.59070796
+      normalized_left: 0.092920355
+      normalized_right: 0.14011799
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.55088496
+      normalized_bottom: 0.6106195
+      normalized_left: 0.42920354
+      normalized_right: 0.4778761
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.5973451
+      normalized_bottom: 0.6393805
+      normalized_left: 0.5545723
+      normalized_right: 0.60471976
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.6238938
+      normalized_bottom: 0.67256635
+      normalized_left: 0.7020649
+      normalized_right: 0.75516224
+    }
+  }
+  image_name: "000000000271.jpg"
+  image_id: 271
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.5854167
+      normalized_bottom: 0.62083334
+      normalized_left: 0.05625
+      normalized_right: 0.1
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.66041666
+      normalized_bottom: 0.70625
+      normalized_left: 0.08125
+      normalized_right: 0.1359375
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.41041666
+      normalized_bottom: 0.44166666
+      normalized_left: 0.1515625
+      normalized_right: 0.2
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.54583335
+      normalized_bottom: 0.56458336
+      normalized_left: 0.15625
+      normalized_right: 0.2109375
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.68958336
+      normalized_bottom: 0.74375
+      normalized_left: 0.178125
+      normalized_right: 0.215625
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.37916666
+      normalized_bottom: 0.40208334
+      normalized_left: 0.2015625
+      normalized_right: 0.265625
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.37083334
+      normalized_bottom: 0.43541667
+      normalized_left: 0.3015625
+      normalized_right: 0.3515625
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.29583332
+      normalized_bottom: 0.31666666
+      normalized_left: 0.3625
+      normalized_right: 0.41875
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.1
+      normalized_bottom: 0.125
+      normalized_left: 0.440625
+      normalized_right: 0.5140625
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.43541667
+      normalized_bottom: 0.45208332
+      normalized_left: 0.446875
+      normalized_right: 0.484375
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.78541666
+      normalized_bottom: 0.8333333
+      normalized_left: 0.4734375
+      normalized_right: 0.509375
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.6020833
+      normalized_bottom: 0.6645833
+      normalized_left: 0.496875
+      normalized_right: 0.546875
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.38958332
+      normalized_bottom: 0.41875
+      normalized_left: 0.55
+      normalized_right: 0.5953125
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.6020833
+      normalized_bottom: 0.6375
+      normalized_left: 0.55
+      normalized_right: 0.6
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.5833333
+      normalized_bottom: 0.61875
+      normalized_left: 0.6171875
+      normalized_right: 0.6640625
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.28333333
+      normalized_bottom: 0.33125
+      normalized_left: 0.6296875
+      normalized_right: 0.6703125
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.1625
+      normalized_bottom: 0.20208333
+      normalized_left: 0.64375
+      normalized_right: 0.6828125
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.43541667
+      normalized_bottom: 0.46666667
+      normalized_left: 0.809375
+      normalized_right: 0.8703125
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.0875
+      normalized_bottom: 0.1125
+      normalized_left: 0.85
+      normalized_right: 0.928125
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.2625
+      normalized_bottom: 0.3125
+      normalized_left: 0.8890625
+      normalized_right: 0.959375
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.49166667
+      normalized_bottom: 0.5104167
+      normalized_left: 0.9203125
+      normalized_right: 1.0
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.18958333
+      normalized_bottom: 0.24791667
+      normalized_left: 0.9328125
+      normalized_right: 1.0
+    }
+  }
+  image_name: "000000000272.jpg"
+  image_id: 272
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.5663717
+      normalized_bottom: 0.9380531
+      normalized_left: 0.112094395
+      normalized_right: 0.8893805
+    }
+  }
+  image_name: "000000000273.jpg"
+  image_id: 273
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.10154525
+      normalized_bottom: 0.6843267
+      normalized_left: 0.38404727
+      normalized_right: 0.8803545
+    }
+  }
+  image_name: "000000000274.jpg"
+  image_id: 274
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.3325792
+      normalized_bottom: 0.6606335
+      normalized_left: 0.053391054
+      normalized_right: 0.92496395
+    }
+  }
+  image_name: "000000000275.jpg"
+  image_id: 275
+}
+detection_results {
+  objects {
+    class_id: 44
+    bounding_box {
+      normalized_top: 0.599278
+      normalized_bottom: 0.9368231
+      normalized_left: 0.43140793
+      normalized_right: 0.5595668
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7924188
+      normalized_bottom: 0.9404332
+      normalized_left: 0.04873646
+      normalized_right: 0.11913358
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7978339
+      normalized_bottom: 0.9314079
+      normalized_left: 0.14440434
+      normalized_right: 0.22202165
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7906137
+      normalized_bottom: 0.9368231
+      normalized_left: 0.25090253
+      normalized_right: 0.3267148
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.78700364
+      normalized_bottom: 0.93501806
+      normalized_left: 0.35198557
+      normalized_right: 0.42418772
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6570397
+      normalized_bottom: 0.93862814
+      normalized_left: 0.43140793
+      normalized_right: 0.55415165
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7924188
+      normalized_bottom: 0.93501806
+      normalized_left: 0.58844763
+      normalized_right: 0.6498195
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.79422385
+      normalized_bottom: 0.93501806
+      normalized_left: 0.67509025
+      normalized_right: 0.74187726
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.79422385
+      normalized_bottom: 0.9368231
+      normalized_left: 0.7689531
+      normalized_right: 0.83935016
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.80144405
+      normalized_bottom: 0.9368231
+      normalized_left: 0.866426
+      normalized_right: 0.933213
+    }
+  }
+  image_name: "000000000276.jpg"
+  image_id: 276
+}
+detection_results {
+  objects {
+    class_id: 62
+    bounding_box {
+      normalized_top: 0.31041667
+      normalized_bottom: 0.55625
+      normalized_left: 0.2046875
+      normalized_right: 0.328125
+    }
+  }
+  objects {
+    class_id: 62
+    bounding_box {
+      normalized_top: 0.34375
+      normalized_bottom: 0.62291664
+      normalized_left: 0.309375
+      normalized_right: 0.4609375
+    }
+  }
+  objects {
+    class_id: 62
+    bounding_box {
+      normalized_top: 0.38541666
+      normalized_bottom: 0.73333335
+      normalized_left: 0.446875
+      normalized_right: 0.6359375
+    }
+  }
+  objects {
+    class_id: 62
+    bounding_box {
+      normalized_top: 0.45625
+      normalized_bottom: 0.87291664
+      normalized_left: 0.6484375
+      normalized_right: 0.88125
+    }
+  }
+  image_name: "000000000277.jpg"
+  image_id: 277
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.13377926
+      normalized_bottom: 0.68729097
+      normalized_left: 0.16179337
+      normalized_right: 0.76608187
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.26755852
+      normalized_bottom: 0.8762542
+      normalized_left: 0.36062378
+      normalized_right: 0.9610137
+    }
+  }
+  image_name: "000000000278.jpg"
+  image_id: 278
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.07079646
+      normalized_bottom: 0.32079646
+      normalized_left: 0.09144543
+      normalized_right: 0.17846608
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.40486726
+      normalized_bottom: 0.7743363
+      normalized_left: 0.30973452
+      normalized_right: 0.5899705
+    }
+  }
+  image_name: "000000000279.jpg"
+  image_id: 279
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.57746476
+      normalized_bottom: 0.96087635
+      normalized_left: 0.57708335
+      normalized_right: 0.78541666
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.031298906
+      normalized_bottom: 0.2112676
+      normalized_left: 0.63125
+      normalized_right: 0.725
+    }
+  }
+  image_name: "000000000280.jpg"
+  image_id: 280
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.4927798
+      normalized_bottom: 0.7527076
+      normalized_left: 0.40072203
+      normalized_right: 0.49819493
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.47292417
+      normalized_bottom: 0.7454874
+      normalized_left: 0.6732852
+      normalized_right: 0.7545126
+    }
+  }
+  image_name: "000000000281.jpg"
+  image_id: 281
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.46532437
+      normalized_bottom: 0.5950783
+      normalized_left: 0.4352256
+      normalized_right: 0.4657933
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.40939596
+      normalized_bottom: 0.58836687
+      normalized_left: 0.4992722
+      normalized_right: 0.5400291
+    }
+  }
+  image_name: "000000000282.jpg"
+  image_id: 282
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.33924612
+      normalized_bottom: 0.8935698
+      normalized_left: 0.23529412
+      normalized_right: 0.7411765
+    }
+  }
+  image_name: "000000000283.jpg"
+  image_id: 283
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.25052193
+      normalized_bottom: 0.8058455
+      normalized_left: 0.24804991
+      normalized_right: 0.7644306
+    }
+  }
+  image_name: "000000000284.jpg"
+  image_id: 284
+}
+detection_results {
+  objects {
+    class_id: 55
+    bounding_box {
+      normalized_top: 0.6595174
+      normalized_bottom: 1.0
+      normalized_left: 0.204
+      normalized_right: 0.5
+    }
+  }
+  objects {
+    class_id: 55
+    bounding_box {
+      normalized_top: 0.16353887
+      normalized_bottom: 0.80160856
+      normalized_left: 0.514
+      normalized_right: 0.988
+    }
+  }
+  image_name: "000000000285.jpg"
+  image_id: 285
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.25055432
+      normalized_bottom: 0.9046563
+      normalized_left: 0.20176731
+      normalized_right: 0.57879233
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.21507761
+      normalized_bottom: 0.6518847
+      normalized_left: 0.53313696
+      normalized_right: 0.7349043
+    }
+  }
+  image_name: "000000000286.jpg"
+  image_id: 286
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.1816092
+      normalized_bottom: 0.82988507
+      normalized_left: 0.12340426
+      normalized_right: 0.4992908
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.35172415
+      normalized_bottom: 0.8781609
+      normalized_left: 0.5134752
+      normalized_right: 0.87375885
+    }
+  }
+  image_name: "000000000287.jpg"
+  image_id: 287
+}
+detection_results {
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.21445782
+      normalized_bottom: 0.8987952
+      normalized_left: 0.18132612
+      normalized_right: 0.59810555
+    }
+  }
+  image_name: "000000000288.jpg"
+  image_id: 288
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.2400722
+      normalized_bottom: 0.63718414
+      normalized_left: 0.027075812
+      normalized_right: 0.933213
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.3068592
+      normalized_bottom: 0.36823106
+      normalized_left: 0.5505415
+      normalized_right: 0.7454874
+    }
+  }
+  image_name: "000000000289.jpg"
+  image_id: 289
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.35193798
+      normalized_bottom: 0.4372093
+      normalized_left: 0.06105263
+      normalized_right: 0.14736842
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5767442
+      normalized_bottom: 0.66511625
+      normalized_left: 0.08631579
+      normalized_right: 0.16421053
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7875969
+      normalized_bottom: 0.8666667
+      normalized_left: 0.08631579
+      normalized_right: 0.17894737
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.23100775
+      normalized_bottom: 0.31472868
+      normalized_left: 0.17894737
+      normalized_right: 0.28421053
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.45581394
+      normalized_bottom: 0.54108524
+      normalized_left: 0.20421052
+      normalized_right: 0.29263157
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5565891
+      normalized_bottom: 0.65581393
+      normalized_left: 0.2168421
+      normalized_right: 0.3031579
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6744186
+      normalized_bottom: 0.7612403
+      normalized_left: 0.21894737
+      normalized_right: 0.29473683
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7705426
+      normalized_bottom: 0.8511628
+      normalized_left: 0.22736841
+      normalized_right: 0.3031579
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.10232558
+      normalized_bottom: 0.18604651
+      normalized_left: 0.32421052
+      normalized_right: 0.4168421
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.2248062
+      normalized_bottom: 0.3131783
+      normalized_left: 0.33473685
+      normalized_right: 0.41473684
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.45891473
+      normalized_bottom: 0.53488374
+      normalized_left: 0.3431579
+      normalized_right: 0.4231579
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6713178
+      normalized_bottom: 0.75813955
+      normalized_left: 0.35368422
+      normalized_right: 0.43789473
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.56899226
+      normalized_bottom: 0.6527132
+      normalized_left: 0.35578948
+      normalized_right: 0.44
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.78914726
+      normalized_bottom: 0.8697674
+      normalized_left: 0.36842105
+      normalized_right: 0.4526316
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.45736435
+      normalized_bottom: 0.5317829
+      normalized_left: 0.49052632
+      normalized_right: 0.5936842
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.10232558
+      normalized_bottom: 0.18294574
+      normalized_left: 0.49473685
+      normalized_right: 0.5768421
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.2248062
+      normalized_bottom: 0.30852714
+      normalized_left: 0.49684212
+      normalized_right: 0.5831579
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.33333334
+      normalized_bottom: 0.4232558
+      normalized_left: 0.5031579
+      normalized_right: 0.5978947
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.66511625
+      normalized_bottom: 0.74883723
+      normalized_left: 0.5031579
+      normalized_right: 0.59157896
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.55968994
+      normalized_bottom: 0.64341086
+      normalized_left: 0.50736845
+      normalized_right: 0.5873684
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.10697675
+      normalized_bottom: 0.18139535
+      normalized_left: 0.62736845
+      normalized_right: 0.7263158
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.34573644
+      normalized_bottom: 0.42635658
+      normalized_left: 0.62736845
+      normalized_right: 0.7157895
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.2248062
+      normalized_bottom: 0.30852714
+      normalized_left: 0.6336842
+      normalized_right: 0.73473686
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.572093
+      normalized_bottom: 0.65736437
+      normalized_left: 0.6442105
+      normalized_right: 0.7242105
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.4635659
+      normalized_bottom: 0.54418606
+      normalized_left: 0.6463158
+      normalized_right: 0.7305263
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.6775194
+      normalized_bottom: 0.7612403
+      normalized_left: 0.6463158
+      normalized_right: 0.72210526
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.34108528
+      normalized_bottom: 0.42945737
+      normalized_left: 0.76842105
+      normalized_right: 0.8821053
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.58449614
+      normalized_bottom: 0.675969
+      normalized_left: 0.7705263
+      normalized_right: 0.86526316
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.10232558
+      normalized_bottom: 0.1875969
+      normalized_left: 0.7726316
+      normalized_right: 0.87578946
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.4604651
+      normalized_bottom: 0.5472868
+      normalized_left: 0.77894735
+      normalized_right: 0.86105263
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.21550387
+      normalized_bottom: 0.30852714
+      normalized_left: 0.78105265
+      normalized_right: 0.87578946
+    }
+  }
+  image_name: "000000000290.jpg"
+  image_id: 290
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.22516556
+      normalized_bottom: 0.73289186
+      normalized_left: 0.23485968
+      normalized_right: 0.5450517
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.22737306
+      normalized_bottom: 0.73730683
+      normalized_left: 0.65140325
+      normalized_right: 0.8183161
+    }
+  }
+  image_name: "000000000291.jpg"
+  image_id: 291
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.7109375
+      normalized_bottom: 0.7484375
+      normalized_left: 0.4
+      normalized_right: 0.42291668
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.715625
+      normalized_bottom: 0.740625
+      normalized_left: 0.43958333
+      normalized_right: 0.46041667
+    }
+  }
+  image_name: "000000000292.jpg"
+  image_id: 292
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.072916664
+      normalized_bottom: 0.6770833
+      normalized_left: 0.303125
+      normalized_right: 0.771875
+    }
+  }
+  image_name: "000000000293.jpg"
+  image_id: 293
+}
+detection_results {
+  objects {
+    class_id: 61
+    bounding_box {
+      normalized_top: 0.17771085
+      normalized_bottom: 0.8614458
+      normalized_left: 0.288
+      normalized_right: 0.71
+    }
+  }
+  image_name: "000000000294.jpg"
+  image_id: 294
+}
+detection_results {
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.42227378
+      normalized_bottom: 0.52436197
+      normalized_left: 0.3347398
+      normalized_right: 0.38396624
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.42459396
+      normalized_bottom: 0.46635732
+      normalized_left: 0.3895921
+      normalized_right: 0.43459916
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.50348026
+      normalized_bottom: 0.5684455
+      normalized_left: 0.42475387
+      normalized_right: 0.47679326
+    }
+  }
+  objects {
+    class_id: 16
+    bounding_box {
+      normalized_top: 0.44547564
+      normalized_bottom: 0.5150812
+      normalized_left: 0.4739803
+      normalized_right: 0.51336145
+    }
+  }
+  image_name: "000000000295.jpg"
+  image_id: 295
+}
+detection_results {
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.37671232
+      normalized_bottom: 0.53652966
+      normalized_left: 0.15549216
+      normalized_right: 0.2339515
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5913242
+      normalized_bottom: 0.75114155
+      normalized_left: 0.46077034
+      normalized_right: 0.49928674
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.58219177
+      normalized_bottom: 0.66210043
+      normalized_left: 0.49643368
+      normalized_right: 0.51640517
+    }
+  }
+  objects {
+    class_id: 1
+    bounding_box {
+      normalized_top: 0.5890411
+      normalized_bottom: 0.74885845
+      normalized_left: 0.50499284
+      normalized_right: 0.5520685
+    }
+  }
+  image_name: "000000000296.jpg"
+  image_id: 296
+}
+detection_results {
+  objects {
+    class_id: 5
+    bounding_box {
+      normalized_top: 0.1903409
+      normalized_bottom: 0.5823864
+      normalized_left: 0.15022936
+      normalized_right: 0.8795872
+    }
+  }
+  image_name: "000000000297.jpg"
+  image_id: 297
+}
+detection_results {
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.61875
+      normalized_bottom: 0.9078125
+      normalized_left: 0.020876827
+      normalized_right: 0.47599164
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.121875
+      normalized_bottom: 0.4171875
+      normalized_left: 0.043841336
+      normalized_right: 0.98329854
+    }
+  }
+  objects {
+    class_id: 3
+    bounding_box {
+      normalized_top: 0.6125
+      normalized_bottom: 0.8796875
+      normalized_left: 0.5219207
+      normalized_right: 0.9665971
+    }
+  }
+  image_name: "000000000298.jpg"
+  image_id: 298
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.38125
+      normalized_bottom: 0.8041667
+      normalized_left: 0.25821596
+      normalized_right: 0.45696402
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.0
+      normalized_bottom: 0.9604167
+      normalized_left: 0.3114241
+      normalized_right: 0.86071986
+    }
+  }
+  image_name: "000000000299.jpg"
+  image_id: 299
+}
+detection_results {
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.24708171
+      normalized_bottom: 0.8754864
+      normalized_left: 0.03685092
+      normalized_right: 0.36515912
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.24902724
+      normalized_bottom: 0.8754864
+      normalized_left: 0.36348408
+      normalized_right: 0.70184255
+    }
+  }
+  objects {
+    class_id: 18
+    bounding_box {
+      normalized_top: 0.36381322
+      normalized_bottom: 0.93968874
+      normalized_left: 0.66164154
+      normalized_right: 0.9748744
+    }
+  }
+  image_name: "000000000300.jpg"
+  image_id: 300
+}
