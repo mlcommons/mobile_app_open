@@ -25,7 +25,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		BD823FF0287D8F36003A6A2B /* coreml_util.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = coreml_util.cc; sourceTree = "<group>"; };
+		BD823FF0287D8F36003A6A2B /* coreml_util.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = coreml_util.cc; sourceTree = "<group>"; };
 		BD823FF1287D8F36003A6A2B /* coreml_settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = coreml_settings.h; sourceTree = "<group>"; };
 		BD823FF2287D8F36003A6A2B /* coreml_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = coreml_util.h; sourceTree = "<group>"; };
 		BD823FF3287D8F36003A6A2B /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };

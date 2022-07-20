@@ -102,8 +102,8 @@ int32_t mlperf_backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
 mlperf_data_t mlperf_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
                                             int32_t i) {
   enum mlperf_data_t::Type datatype = mlperf_data_t::Type::Float32;
-  // TODO (anhappdev) size is hard-coded for ImageNet IC
-  mlperf_data_t data = {.type = datatype, .size = 224 * 224 * 3};
+  auto size = [((CoreMLBackendData *)backend_ptr)->coreMLExecutor getInputSize];
+  mlperf_data_t data = {.type = datatype, .size = size};
   return data;
 }
 
@@ -113,7 +113,7 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                          void *data) {
   LOG(INFO) << "mlperf_backend_set_input()";
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
-  if ([backend_data->coreMLExecutor setInput:data]) return MLPERF_SUCCESS;
+  if ([backend_data->coreMLExecutor setInput:data at:i]) return MLPERF_SUCCESS;
   return MLPERF_FAILURE;
 }
 
@@ -126,8 +126,9 @@ int32_t mlperf_backend_get_output_count(mlperf_backend_ptr_t backend_ptr) {
 mlperf_data_t mlperf_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
                                              int32_t i) {
   enum mlperf_data_t::Type datatype = mlperf_data_t::Type::Float32;
-  // TODO (anhappdev) size is hard-coded for ImageNet IC
-  mlperf_data_t data = {.type = datatype, .size = 1001};
+  auto size =
+      [((CoreMLBackendData *)backend_ptr)->coreMLExecutor getOutputSize];
+  mlperf_data_t data = {.type = datatype, .size = size};
   return data;
 }
 
@@ -136,7 +137,7 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                           uint32_t batchIndex, int32_t i,
                                           void **data) {
   LOG(INFO) << "mlperf_backend_get_output()";
-  if ([((CoreMLBackendData *)backend_ptr)->coreMLExecutor getOutput:data])
+  if ([((CoreMLBackendData *)backend_ptr)->coreMLExecutor getOutput:data at:i])
     return MLPERF_SUCCESS;
   return MLPERF_FAILURE;
 }

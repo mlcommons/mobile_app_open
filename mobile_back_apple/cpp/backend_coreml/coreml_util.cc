@@ -59,6 +59,7 @@ struct TensorData {
 }
 
 - (MLFeatureValue *)featureValueForName:(NSString *)featureName {
+  NSLog(@"featureValueForName: %@", featureName);
   for (auto &input : *_inputs) {
     if ([featureName cStringUsingEncoding:NSUTF8StringEncoding] == input.name) {
       NSArray *shape = @[
@@ -103,9 +104,11 @@ struct TensorData {
  @protected
   NSURL *modelURL;
   MLModel *mlmodel;
-  std::vector<TensorData> inputVector;
-  MultiArrayFeatureProvider *inputFeatures;
-  MultiArrayFeatureProvider *outputFeatures;
+  std::vector<TensorData> inputData;
+  NSArray<NSString *> *inputNames;
+  MultiArrayFeatureProvider *inputFeature;
+  NSArray<NSString *> *outputNames;
+  id<MLFeatureProvider> outputFeature;
 }
 
 - (nullable instancetype)initWithModelPath:(const char *)modelPath {
@@ -133,6 +136,10 @@ struct TensorData {
         return nil;
       }
       NSLog(@"modelDescription: %@", [mlmodel modelDescription]);
+      inputNames =
+          [[[mlmodel modelDescription] inputDescriptionsByName] allKeys];
+      outputNames =
+          [[[mlmodel modelDescription] outputDescriptionsByName] allKeys];
     } catch (const std::exception &exception) {
       NSLog(@"%s", exception.what());
       return nil;
@@ -149,84 +156,95 @@ struct TensorData {
 - (int)getInputCount {
   NSInteger inputCount =
       [[[mlmodel modelDescription] inputDescriptionsByName] count];
-  NSLog(@"inputCount %ld", inputCount);
+  NSLog(@"inputCount: %ld", inputCount);
   return (int)inputCount;
+}
+
+- (int)getInputSize {
+  __block int inputSize = 1;
+  auto inputs = [[mlmodel modelDescription] inputDescriptionsByName];
+  [inputs enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+    NSLog(@"key:%@ -> obj:%@", key, obj);
+    for (NSNumber *n in [[obj multiArrayConstraint] shape]) {
+      inputSize *= n.intValue;
+    }
+  }];
+  NSLog(@"inputSize: %d", inputSize);
+  assert(inputSize > 1);
+  return int(inputSize);
 }
 
 - (int)getOutputCount {
   NSInteger outputCount =
       [[[mlmodel modelDescription] outputDescriptionsByName] count];
-  NSLog(@"outputCount %ld", outputCount);
+  NSLog(@"outputCount: %ld", outputCount);
   return (int)outputCount;
 }
 
-- (bool)setInput:(void *)data {
-  NSArray<NSNumber *> *inputShape;
-  MLMultiArrayDataType inputDataType;
-  MLMultiArrayShapeConstraint *inputShapeConstraint;
-  NSString *inputName;
-
-  NSDictionary *inputDict =
-      [[mlmodel modelDescription] inputDescriptionsByName];
-  for (NSString *key in [inputDict allKeys]) {
-    NSLog(@"key: %@", key);
-    inputName = [inputDict[key] name];
-    NSLog(@"value name: %@", [inputDict[key] name]);
-    NSLog(@"value type: %ld", ((MLFeatureDescription *)inputDict[key]).type);
-    if (((MLFeatureDescription *)inputDict[key]).type ==
-        MLFeatureTypeMultiArray) {
-      NSLog(@"constraint: %@",
-            [((MLFeatureDescription *)inputDict[key]) multiArrayConstraint]);
-      inputShape =
-          [[((MLFeatureDescription *)inputDict[key]) multiArrayConstraint]
-              shape];
-      inputDataType =
-          [[((MLFeatureDescription *)inputDict[key]) multiArrayConstraint]
-              dataType];
-      inputShapeConstraint =
-          [[((MLFeatureDescription *)inputDict[key]) multiArrayConstraint]
-              shapeConstraint];
+- (int)getOutputSize {
+  __block int outputSize = 1;
+  auto outputs = [[mlmodel modelDescription] outputDescriptionsByName];
+  [outputs enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+    NSLog(@"key:%@ -> obj:%@", key, obj);
+    for (NSNumber *n in [[obj multiArrayConstraint] shape]) {
+      outputSize *= n.intValue;
     }
-  }
-  std::vector<int> shape;
-  for (int i = 0; i < [inputShape count]; i++) {
-    shape.push_back([inputShape[i] intValue]);
-  }
-  // convert float32 array to an input feature
-  TensorData inputTensorData = {
-      (float *)data, [inputName cStringUsingEncoding:NSUTF8StringEncoding],
-      shape};
-  inputVector.push_back(inputTensorData);
+  }];
+  NSLog(@"outputSize: %d", outputSize);
+  // TODO (anhappdev): MobilenetEdgeTPU_multi_array.mlmodel has no output shape
+  // defined. To add output shape to *.mlmodel when converting.
+  outputSize = 1001;
+  assert(outputSize > 1);
+  return int(outputSize);
+}
 
-  inputFeatures = [[MultiArrayFeatureProvider alloc]
-      initWithInputs:(const std::vector<TensorData> *)&inputVector];
+- (bool)setInput:(void *)data at:(int)i {
+  NSString *name = inputNames[i];
+  MLFeatureDescription *description =
+      [[[mlmodel modelDescription] inputDescriptionsByName] valueForKey:name];
+  NSArray<NSNumber *> *shape = [[description multiArrayConstraint] shape];
+
+  // convert float32 array to an input feature
+  std::vector<int> tensorShape;
+  for (int i = 0; i < [shape count]; i++) {
+    tensorShape.push_back([shape[i] intValue]);
+  }
+  TensorData inputTensorData = {
+      (float *)data, [name cStringUsingEncoding:NSUTF8StringEncoding],
+      tensorShape};
+  inputData.push_back(inputTensorData);
+
+  inputFeature = [[MultiArrayFeatureProvider alloc]
+      initWithInputs:(const std::vector<TensorData> *)&inputData];
 
   return true;
 }
 
 - (bool)issueQueries {
   NSError *error = nil;
-  outputFeatures =
-      (MultiArrayFeatureProvider *)[mlmodel predictionFromFeatures:inputFeatures
-                                                             error:&error];
+  outputFeature = [mlmodel predictionFromFeatures:inputFeature error:&error];
   if (error != nil) {
-    NSLog(@"Failed to predict with %@, error: %@", inputFeatures,
+    NSLog(@"Failed to predict with %@, error: %@", inputFeature,
           [error localizedDescription]);
     return false;
   }
-  NSLog(@"output names %@", [outputFeatures featureNames]);
   return true;
 }
 
 - (bool)flushQueries {
-  inputVector.clear();
+  inputData.clear();
   return true;
 }
 
-- (bool)getOutput:(void **)data {
-  // TODO(anhappdev): output name Softmax is for image classification only
-  *data = [[[outputFeatures featureValueForName:@"Softmax"] multiArrayValue]
-      dataPointer];
+- (bool)getOutput:(void **)data at:(int)i {
+  NSString *name = outputNames[i];
+  MLFeatureValue *outputValue = [outputFeature featureValueForName:name];
+  MLMultiArray *outputArray = [outputValue multiArrayValue];
+  float *outputData = (float *)outputArray.dataPointer;
+  if (outputData == nullptr) {
+    return false;
+  }
+  *data = outputData;
   return true;
 }
 

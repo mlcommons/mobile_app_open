@@ -21,12 +21,18 @@ limitations under the License.
 @interface CoreMLExecutor : NSObject
 
 - (nullable instancetype)initWithModelPath:(const char *_Nonnull)modelPath;
+
 - (int)getInputCount;
+- (int)getInputSize;
+
 - (int)getOutputCount;
-- (bool)setInput:(void *_Nonnull)data;
+- (int)getOutputSize;
+
 - (bool)issueQueries;
 - (bool)flushQueries;
-- (bool)getOutput:(void *_Nonnull *_Nonnull)data;
+
+- (bool)setInput:(void *_Nonnull)data at:(int)i;
+- (bool)getOutput:(void *_Nonnull *_Nonnull)data at:(int)i;
 
 @end
 
