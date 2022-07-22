@@ -160,17 +160,16 @@ struct TensorData {
   return (int)inputCount;
 }
 
-- (int)getInputSize {
-  __block int inputSize = 1;
+- (int)getInputSizeAt:(int)i {
+  NSString *name = inputNames[i];
   auto inputs = [[mlmodel modelDescription] inputDescriptionsByName];
-  [inputs enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-    NSLog(@"key:%@ -> obj:%@", key, obj);
-    for (NSNumber *n in [[obj multiArrayConstraint] shape]) {
-      inputSize *= n.intValue;
-    }
-  }];
+  auto input = [inputs objectForKey:name];
+  int inputSize = 1;
+  for (NSNumber *n in [[input multiArrayConstraint] shape]) {
+    inputSize *= n.intValue;
+  }
   NSLog(@"inputSize: %d", inputSize);
-  assert(inputSize > 1);
+  assert(inputSize > 0);
   return int(inputSize);
 }
 
@@ -181,20 +180,16 @@ struct TensorData {
   return (int)outputCount;
 }
 
-- (int)getOutputSize {
-  __block int outputSize = 1;
+- (int)getOutputSizeAt:(int)i {
+  NSString *name = outputNames[i];
   auto outputs = [[mlmodel modelDescription] outputDescriptionsByName];
-  [outputs enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-    NSLog(@"key:%@ -> obj:%@", key, obj);
-    for (NSNumber *n in [[obj multiArrayConstraint] shape]) {
-      outputSize *= n.intValue;
-    }
-  }];
+  auto output = [outputs objectForKey:name];
+  int outputSize = 1;
+  for (NSNumber *n in [[output multiArrayConstraint] shape]) {
+    outputSize *= n.intValue;
+  }
   NSLog(@"outputSize: %d", outputSize);
-  // TODO (anhappdev): MobilenetEdgeTPU_multi_array.mlmodel has no output shape
-  // defined. To add output shape to *.mlmodel when converting.
-  outputSize = 1001;
-  assert(outputSize > 1);
+  assert(outputSize > 0);
   return int(outputSize);
 }
 

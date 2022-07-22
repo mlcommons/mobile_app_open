@@ -32,7 +32,7 @@ benchmark_setting {
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
-  src: "https://github.com/mlcommons/mobile_app_open/raw/54c01d96f948a588c1bd38d1bc6e27cfe4c8b5bc/mobile_back_apple/dev-resources/MobilenetEdgeTPU_multi_array.mlmodel"
+  src: "https://github.com/mlcommons/mobile_app_open/raw/360-add-coreml-backend/mobile_back_apple/dev-resources/MobilenetEdgeTPU_multi_array_with_shape.mlmodel"
   md5_checksum: "7921496525e1cd5464745f04e43cc7fd"
 }
 

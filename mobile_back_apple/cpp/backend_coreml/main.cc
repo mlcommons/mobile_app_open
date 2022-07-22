@@ -102,7 +102,7 @@ int32_t mlperf_backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
 mlperf_data_t mlperf_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
                                             int32_t i) {
   enum mlperf_data_t::Type datatype = mlperf_data_t::Type::Float32;
-  auto size = [((CoreMLBackendData *)backend_ptr)->coreMLExecutor getInputSize];
+  auto size = [((CoreMLBackendData *)backend_ptr)->coreMLExecutor getInputSizeAt:i];
   mlperf_data_t data = {.type = datatype, .size = size};
   return data;
 }
@@ -127,7 +127,7 @@ mlperf_data_t mlperf_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
                                              int32_t i) {
   enum mlperf_data_t::Type datatype = mlperf_data_t::Type::Float32;
   auto size =
-      [((CoreMLBackendData *)backend_ptr)->coreMLExecutor getOutputSize];
+      [((CoreMLBackendData *)backend_ptr)->coreMLExecutor getOutputSizeAt:i];
   mlperf_data_t data = {.type = datatype, .size = size};
   return data;
 }

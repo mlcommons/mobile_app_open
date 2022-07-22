@@ -55,7 +55,7 @@ coreml-run-ic:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET \
 		--mode=SubmissionRun \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/MobilenetEdgeTPU_multi_array.mlmodel" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/MobilenetEdgeTPU_multi_array_with_shape.mlmodel" \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet_val.txt" \

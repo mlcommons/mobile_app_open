@@ -23,10 +23,10 @@ limitations under the License.
 - (nullable instancetype)initWithModelPath:(const char *_Nonnull)modelPath;
 
 - (int)getInputCount;
-- (int)getInputSize;
+- (int)getInputSizeAt:(int)i;
 
 - (int)getOutputCount;
-- (int)getOutputSize;
+- (int)getOutputSizeAt:(int)i;
 
 - (bool)issueQueries;
 - (bool)flushQueries;
