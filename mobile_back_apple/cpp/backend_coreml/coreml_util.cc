@@ -136,10 +136,16 @@ struct TensorData {
         return nil;
       }
       NSLog(@"modelDescription: %@", [mlmodel modelDescription]);
-      inputNames =
+      auto _inputNames =
           [[[mlmodel modelDescription] inputDescriptionsByName] allKeys];
-      outputNames =
+      auto _outputNames =
           [[[mlmodel modelDescription] outputDescriptionsByName] allKeys];
+      inputNames = [_inputNames
+          sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+      outputNames = [_outputNames
+          sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+      NSLog(@"inputNames: %@", inputNames);
+      NSLog(@"outputNames: %@", outputNames);
     } catch (const std::exception &exception) {
       NSLog(@"%s", exception.what());
       return nil;

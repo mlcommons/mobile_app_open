@@ -10,7 +10,7 @@ REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
 #REPO_ROOT_DIR="/Users/freedom/work/mobile_app_open"
 
 tflite: tflite-build tflite-run-od
-coreml: coreml-build coreml-run-ic
+coreml: coreml-build coreml-run-od
 
 app:
 	cd ${REPO_ROOT_DIR} && make flutter/prepare && make flutter/ios
@@ -43,7 +43,7 @@ tflite-run-od:
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/coco" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/coco_val.pbtxt" \
 		--offset=1 \
-		--num_classes=91 \
+		--num_classes=91
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \
@@ -60,3 +60,15 @@ coreml-run-ic:
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet_val.txt" \
 		--offset=1
+
+coreml-run-od:
+	cd ${REPO_ROOT_DIR} && \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL COCO \
+		--mode=PerformanceOnly \
+		--output_dir="${REPO_ROOT_DIR}/output" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/dummy_od.mlmodel" \
+		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
+		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/coco" \
+		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/coco_val.pbtxt" \
+		--offset=1 \
+		--num_classes=91
