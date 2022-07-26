@@ -11,10 +11,15 @@ steps:
   # We need this step to correctly identify dockerfile tag
   - id: fetch-repo-history
     name: gcr.io/cloud-builders/git
-    timeout: 10s
+    timeout: 100s
+    entrypoint: bash
     args:
-      - fetch
-      - --unshallow
+      - -xc
+      - |
+        cat ./.git/config
+        git show-ref
+        # git fetch --unshallow
+        # git show-ref
 #   # Download DOCKERFILE_COMMIT tag if it exists to skip docker image generation,
 #   #   or download the :latest tag and use it as a cache,
 #   #   or skip downloading if :latest doesn't exist yet.
