@@ -156,7 +156,7 @@ ${BUILDDIR}/downloads/imagenet/ILSVRC2012_img_val.tar:
 
 ${BUILDDIR}/downloads/imagenet/cal_image_list_option_1.txt:
 	mkdir -p ${BUILDDIR}/downloads/imagenet
-	curl -o $@ -L https://raw.githubusercontent.com/mlperf/inference/master/calibration/ImageNet/cal_image_list_option_1.txt
+	curl -o $@ -L https://github.com/mlcommons/inference/raw/master/calibration/ImageNet/cal_image_list_option_1.txt
 
 ${BUILDDIR}/output/state/imagenet.stamp: \
 		${BUILDDIR}/downloads/imagenet/ILSVRC2012_img_val.tar \

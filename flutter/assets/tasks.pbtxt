@@ -16,7 +16,7 @@ task {
     name: "Imagenet dataset for instrument test"
     type: IMAGENET
     path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
-    groundtruth_src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/imagenet_val_tiny.txt"
   }
   model {
     id: "IC_tpu_uint8"
@@ -58,7 +58,7 @@ task {
     name: "Coco dataset for instrument test"
     type: COCO
     path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco_tiny.zip"
-    groundtruth_src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/coco_val_tiny.pbtxt"
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/coco_val_tiny.pbtxt"
   }
   model {
     id: "OD_uint8"
@@ -192,7 +192,7 @@ task {
     name: "Imagenet dataset for instrument test"
     type: IMAGENET
     path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
-    groundtruth_src: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/imagenet_val_tiny.txt"
   }
   model {
     id: "IC_tpu_uint8_offline"

@@ -19,7 +19,7 @@ The `benchmarksConfigurations.json` looks like this:
 
 ```json
 {
-   "default":"https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/tasks_v2.pbtxt",
+   "default":"https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/tasks_v2.pbtxt",
    "otherName":"app:///path/to/custom_tasks.pbtxt" 
 }
 ```
