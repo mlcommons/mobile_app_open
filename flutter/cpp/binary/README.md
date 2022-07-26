@@ -3,33 +3,59 @@
 This directory provides a main binary file which can be used to evaluate the
 mlperf benchmark with a specific set of (backend, dataset).
 
-## Clone the desired branch of the TFLite backend
+## Build the TFLite backend
 
 ```bash
-cd mlperf_app
-git clone https://github.com/mlcommons/mobile_back_tflite -b v1_0 tflite_backend
+bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
+  //mobile_back_tflite:tflitebackend \
+  --spawn_strategy=standalone
 ```
 
 ## Run the TFLite backend
 
-For example, the following command to run TFLite with the dummy dataset:
+For example, use the following command to run TFLite with the ImageNet dataset:
 
+1. build the command programm `//flutter/cpp/binary:main`
 ```bash
-bazel run -c opt -- \
-  //cpp/binary:main TFLITE DUMMY \
+bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
+  --spawn_strategy=standalone //flutter/cpp/binary:main
+``` 
+2. run it
+```bash
+bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET
   --mode=SubmissionRun \
   --model_file=<path to the model file> \
-  --num_threads=4 \
-  --delegate=None \
   --output_dir=<mlperf output directory>
+  ....
 ```
 
 Each set of (backend, dataset) has a different set of arguments, so please use
-`--help` argument to check which flags are available. Ex:
+`--help` argument to check which flags are available. E.g., with
 
 ```bash
-bazel run -c opt -- \
-  //cpp/binary:main TFLITE IMAGENET --help
+bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET --help
+```
+we get
+```
+usage: bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET <flags>
+Flags:
+	--mode=                                    	string	required	Mode is one among PerformanceOnly, AccuracyOnly, SubmissionRun.
+	--output_dir=                              	string	required	The output directory of mlperf.
+	--model_file=                              	string	required	Path to model file.
+	--images_directory=                        	string	required	Path to ground truth images.
+	--offset=1                                 	int32	required	The offset of the first meaningful class in the classification model.
+	--groundtruth_file=                        	string	required	Path to the imagenet ground truth file.
+	--min_query_count=100                      	int32	optional	The test will guarantee to run at least this number of samples in performance mode.
+	--min_duration=100                         	int32	optional	The test will guarantee to run at least this duration in performance mode. The duration is in ms.
+	--single_stream_expected_latency_ns=1000000	int32	optional	single_stream_expected_latency_ns
+	--lib_path=                                	string	optional	Path to the backend library .so file.
+	--native_lib_path=                         	string	optional	Path to the additioal .so files for the backend.
+	--scenario=SingleStream                    	string	optional	Scenario to run the benchmark.
+	--image_width=224                          	int32	optional	The width of the processed image.
+	--image_height=224                         	int32	optional	The height of the processed image.
+	--scenario=SingleStream                    	string	optional	Scenario to run the benchmark.
+	--batch_size=1                             	int32	optional	Batch size.
+
 ```
 
 The supported backends and datasets for this binary is listed in the enum
@@ -40,8 +66,8 @@ BackendType and DatasetType in main.cc.
 Build the CLI and backend library, and push them to device:
 
 ```shell
-bazel build -c opt --config android_arm64 //cpp/binary:tflitebackend //cpp/binary:main
-adb push bazel-bin/tflite_backend/libtflitebackend.so /data/local/tmp
+bazel build -c opt --config android_arm64 //mobile_back_tflite:tflitebackend //flutter/cpp/binary:main --spawn_strategy=standalone
+adb push bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so /data/local/tmp
 adb push bazel-bin/cpp/binary/main /data/local/tmp/mlperf_main
 ```
 
@@ -95,7 +121,7 @@ adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL A
 Evaluating accuracy of floating point MobileBERT tflite with SQuAD V1.1 mini evaluation set.
 
 ```shell
-adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main_neuron EXTERNAL SQUAD \
+adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL SQUAD \
   --mode=AccuracyOnly \
   --output_dir=/data/local/tmp/mobilebert_output \
   --model_file=/sdcard/Android/data/org.mlperf.inference/files/cache/cache/mobilebert_float_384_gpu.tflite \
