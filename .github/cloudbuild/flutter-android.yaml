@@ -12,9 +12,13 @@ steps:
   - id: fetch-repo-history
     name: gcr.io/cloud-builders/git
     timeout: 10s
+    entrypoint: bash
     args:
-      - fetch
-      - --unshallow
+      - -xc
+      - |
+        # if we fetch branches other than master this step may take a long time
+        git config remote.origin.fetch "+refs/heads/master:refs/remotes/origin/master" || exit 1
+        git fetch --unshallow || exit 1
   # Download DOCKERFILE_COMMIT tag if it exists to skip docker image generation,
   #   or download the :latest tag and use it as a cache,
   #   or skip downloading if :latest doesn't exist yet.
