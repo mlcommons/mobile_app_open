@@ -114,7 +114,7 @@ class Benchmark {
       dataset_groundtruth_path: resourceManager.get(dataset.groundtruthSrc),
       dataset_offset: modelConfig.offset,
       scenario: modelConfig.scenario,
-      mode: runMode.getBackendModeString(),
+      mode: runMode.mode,
       min_query_count: minQueryCount,
       min_duration: minDuration,
       single_stream_expected_latency_ns:

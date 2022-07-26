@@ -548,8 +548,7 @@ class BenchmarkState extends ChangeNotifier {
     final runMode =
         accuracyMode ? BenchmarkRunMode.accuracy : BenchmarkRunMode.performance;
 
-    print(
-        'Running ${benchmark.id} in ${runMode.getResultModeString()} mode...');
+    print('Running ${benchmark.id} in ${runMode.mode} mode...');
     final stopwatch = Stopwatch()..start();
 
     final logSuffix = accuracyMode ? 'accuracy' : 'performance';
