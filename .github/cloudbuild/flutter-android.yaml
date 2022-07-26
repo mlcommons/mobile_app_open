@@ -19,10 +19,11 @@ steps:
         # git config remote.origin.fetch "+refs/heads/test-cloudbuild-android:refs/remotes/origin/test-cloudbuild-android"
         cat ./.git/config
         git show-ref
+        git fetch --unshallow
+        git show-ref
+        git branch
         tar -czvf /tmp/workspace.tar.gz .
         gsutil cp /tmp/workspace.tar.gz gs://$_ARTIFACT_BUCKET/$_ARTIFACT_FOLDER/$COMMIT_SHA-flutter
-        # git fetch --unshallow
-        # git show-ref
 #   # Download DOCKERFILE_COMMIT tag if it exists to skip docker image generation,
 #   #   or download the :latest tag and use it as a cache,
 #   #   or skip downloading if :latest doesn't exist yet.
