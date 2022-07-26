@@ -40,7 +40,7 @@ pb.BackendSetting? backendMatch(String libPath) {
   malloc.free(modelUtf8);
 
   if (runOut.address == 0) {
-    throw '$_runName result: nullptr';
+    return null;
   }
 
   try {
