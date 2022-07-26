@@ -124,10 +124,27 @@ class BenchmarkState extends ChangeNotifier {
     await firebaseManager!.restHelper.upload(lastResult!);
   }
 
+  BenchmarkRunMode get perfMode => _store.testMode
+      ? BenchmarkRunMode.performanceTest
+      : BenchmarkRunMode.performance;
+
+  BenchmarkRunMode get accuracyMode => _store.testMode
+      ? BenchmarkRunMode.accuracyTest
+      : BenchmarkRunMode.accuracy;
+
+  List<BenchmarkRunMode> get selectedRunModes {
+    final result = <BenchmarkRunMode>[];
+    result.add(perfMode);
+    if (_store.submissionMode) {
+      result.add(accuracyMode);
+    }
+    return result;
+  }
+
   Future<String> validateExternalResourcesDirectory(
       String errorDescription) async {
-    final resources = _middle.listResources(
-        skipInactive: true, includeAccuracy: _store.submissionMode);
+    final resources =
+        _middle.listResources(modes: selectedRunModes, skipInactive: true);
     final missing = await resourceManager.validateResourcesExist(resources);
     if (missing.isEmpty) return '';
 
@@ -136,8 +153,8 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<String> validateOfflineMode(String errorDescription) async {
-    final resources = _middle.listResources(
-        skipInactive: true, includeAccuracy: _store.submissionMode);
+    final resources =
+        _middle.listResources(modes: selectedRunModes, skipInactive: true);
     final internetResources = filterInternetResources(resources);
     if (internetResources.isEmpty) return '';
 
@@ -187,7 +204,9 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.enable();
     print('start loading resources');
     await resourceManager.handleResources(
-        _middle.listResources(), needToPurgeCache);
+      _middle.listResources(modes: selectedRunModes, skipInactive: false),
+      needToPurgeCache,
+    );
     print('finished loading resources');
     error = null;
     stackTrace = null;
@@ -233,7 +252,6 @@ class BenchmarkState extends ChangeNotifier {
     _middle = BenchmarkList(
       configManager.decodedConfig,
       backendInfo.settings.benchmarkSetting,
-      _store.testMode,
     );
     restoreLastResult();
   }
@@ -342,7 +360,7 @@ class BenchmarkState extends ChangeNotifier {
       notifyListeners();
       final performanceRunInfo = await runBenchmark(
         benchmark,
-        false,
+        perfMode,
         backendInfo.settings.commonSetting,
         backendInfo.libPath,
         currentLogDir,
@@ -385,7 +403,7 @@ class BenchmarkState extends ChangeNotifier {
         notifyListeners();
         final accuracyRunInfo = await runBenchmark(
           benchmark,
-          true,
+          accuracyMode,
           backendInfo.settings.commonSetting,
           backendInfo.libPath,
           currentLogDir,
@@ -446,6 +464,8 @@ class BenchmarkState extends ChangeNotifier {
       RunResult performance,
       RunResult? accuracy,
       pb.SettingList actualSettings) {
+    final performanceDataset = perfMode.chooseDataset(benchmark.taskConfig);
+    final accuracyDataset = accuracyMode.chooseDataset(benchmark.taskConfig);
     return BenchmarkExportResult(
         benchmarkId: benchmark.id,
         benchmarkName: benchmark.taskConfig.name,
@@ -464,11 +484,10 @@ class BenchmarkState extends ChangeNotifier {
                   formatted: performance.accuracyFormatted2,
                 ),
           datasetInfo: DatasetInfo(
-            name: benchmark.taskConfig.liteDataset.name,
-            type: DatasetType.fromJson(
-                benchmark.taskConfig.liteDataset.type.toString()),
-            dataPath: benchmark.taskConfig.liteDataset.path,
-            groundtruthPath: benchmark.taskConfig.liteDataset.groundtruthSrc,
+            name: accuracyDataset.name,
+            type: DatasetType.fromJson(performanceDataset.type.toString()),
+            dataPath: performanceDataset.path,
+            groundtruthPath: performanceDataset.groundtruthSrc,
           ),
           measuredDurationMs: performance.durationMs,
           measuredSamples: performance.numSamples,
@@ -493,12 +512,10 @@ class BenchmarkState extends ChangeNotifier {
                         formatted: accuracy.accuracyFormatted2,
                       ),
                 datasetInfo: DatasetInfo(
-                  name: benchmark.taskConfig.liteDataset.name,
-                  type: DatasetType.fromJson(
-                      benchmark.taskConfig.liteDataset.type.toString()),
-                  dataPath: benchmark.taskConfig.liteDataset.path,
-                  groundtruthPath:
-                      benchmark.taskConfig.liteDataset.groundtruthSrc,
+                  name: accuracyDataset.name,
+                  type: DatasetType.fromJson(accuracyDataset.type.toString()),
+                  dataPath: accuracyDataset.path,
+                  groundtruthPath: accuracyDataset.groundtruthSrc,
                 ),
                 measuredDurationMs: accuracy.durationMs,
                 measuredSamples: accuracy.numSamples,
@@ -540,31 +557,29 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<RunInfo> runBenchmark(
     Benchmark benchmark,
-    bool accuracyMode,
+    BenchmarkRunMode runMode,
     List<pb.Setting> commonSettings,
     String backendLibPath,
     String logDir,
   ) async {
-    final runMode =
-        accuracyMode ? BenchmarkRunMode.accuracy : BenchmarkRunMode.performance;
-
     print('Running ${benchmark.id} in ${runMode.mode} mode...');
     final stopwatch = Stopwatch()..start();
 
-    final logSuffix = accuracyMode ? 'accuracy' : 'performance';
-    logDir = '$logDir/${benchmark.id}-$logSuffix';
+    logDir = '$logDir/${benchmark.id}-${runMode.logSuffix}';
     await Directory(logDir).create(recursive: true);
 
     final runSettings = benchmark.createRunSettings(
-        runMode: runMode,
-        resourceManager: resourceManager,
-        commonSettings: commonSettings,
-        backendLibPath: backendLibPath,
-        logDir: logDir);
+      runMode: runMode,
+      resourceManager: resourceManager,
+      commonSettings: commonSettings,
+      backendLibPath: backendLibPath,
+      logDir: logDir,
+      isTestMode: _store.testMode,
+    );
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
-    print('Benchmark result: id: ${benchmark.id}, $result, elapsed: $elapsed');
+    print('Run result: id: ${benchmark.id}, $result, elapsed: $elapsed');
 
     return RunInfo(settings: runSettings, result: result);
   }
