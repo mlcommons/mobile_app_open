@@ -16,7 +16,7 @@ steps:
     args:
       - -xc
       - |
-        # git config remote.origin.fetch "+refs/heads/test-cloudbuild-android:refs/remotes/origin/test-cloudbuild-android"
+        git config remote.origin.fetch "+refs/heads/master:refs/remotes/origin/master"
         cat ./.git/config
         git show-ref
         git fetch --unshallow
