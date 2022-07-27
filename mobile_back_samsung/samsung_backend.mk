@@ -16,7 +16,7 @@
 ifeq (${WITH_SAMSUNG},1)
   $(info WITH_SAMSUNG=1)
 
-  MOBILE_BACK_SAMSUNG_LIB_ROOT=$(shell echo mobile_back_samsung/samsung/lib* | awk '{print $$NF}')
+  MOBILE_BACK_SAMSUNG_LIB_ROOT=$(shell echo mobile_back_samsung/samsung_backend/lib* | awk '{print $$NF}')
   $(info MOBILE_BACK_SAMSUNG_LIB_ROOT=${MOBILE_BACK_SAMSUNG_LIB_ROOT})
 
   backend_samsung_android_files= \
@@ -29,7 +29,7 @@ ifeq (${WITH_SAMSUNG},1)
     ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_nn_on_system.so \
   # main binaries for Samsung backend are prebuilt
   backend_samsung_android_target= \
-    //mobile_back_samsung/samsung/lib:libsamsungbackend.so \
+    //mobile_back_samsung/samsung_backend/lib:libsamsungbackend.so \
     //flutter/android/commonlibs:commonlibs
   backend_samsung_filename=libsamsungbackend
 endif
