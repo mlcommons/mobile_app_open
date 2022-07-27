@@ -18,9 +18,11 @@ steps:
     args:
       - -xc
       - |
+        # if we fetch branches other than master this step may take a long time
+        git config remote.origin.fetch "+refs/heads/master:refs/remotes/origin/master" || exit 1
         git fetch --unshallow || exit 1
-        mkdir output
-        git log -n 1 --pretty=format:%H -- flutter/windows/docker >output/docker-tag
+        mkdir output || exit 1
+        git log -n 1 --pretty=format:%H -- flutter/windows/docker >output/docker-tag || exit 1
   # cloudbuild does not provide an official method to run CI on Windows
   # but there is a community-provided builder.
   # The sources are here: https://github.com/GoogleCloudPlatform/cloud-builders-community/tree/master/windows-builder
