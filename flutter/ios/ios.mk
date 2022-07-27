@@ -13,7 +13,6 @@
 # limitations under the License.
 ##########################################################################
 
-.PHONY: flutter/ios
 flutter/ios: flutter/ios/libs flutter/update-splash-screen
 
 backend_bridge_ios_target=//flutter/cpp/flutter:backend_bridge_fw
@@ -34,12 +33,7 @@ flutter/ios/libs:
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_bridge_ios_zip}
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_tflite_ios_zip}
 
-.PHONY: flutter/ios/release
-flutter/ios/release:
-	@[ "${OFFICIAL_BUILD}" == "true" ] || [ "${OFFICIAL_BUILD}" == "false" ] \
-		|| (echo OFFICIAL_BUILD env must be set to \"true\" or \"false\"; exit 1)
-	@[ -n "${FLUTTER_BUILD_NUMBER}" ] || (echo FLUTTER_BUILD_NUMBER env must be set; exit 1)
-	make flutter/ios flutter/prepare flutter/ios/ipa
+flutter/ios/release: flutter/check-release-env flutter/ios flutter/prepare flutter/ios/ipa
 
 .PHONY: flutter/ios/ipa
 flutter/ios/ipa:
@@ -47,7 +41,7 @@ flutter/ios/ipa:
 	cd flutter && flutter --no-version-check clean
 	cd flutter && flutter --no-version-check build \
 		ipa \
-		${flutter_official_build_flag} \
+		${flutter_official_build_arg} \
 		--build-number ${FLUTTER_BUILD_NUMBER}
 	mkdir -p output/flutter/ios/
 	cp -rf flutter/build/ios/archive/Runner.xcarchive output/flutter/ios/release.xcarchive

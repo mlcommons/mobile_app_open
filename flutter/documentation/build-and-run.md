@@ -107,10 +107,10 @@ You can copy `.so` files from some Linux or macOS system, then run `make flutter
 For example, it's relatively convenient to use WSL to build native libs.
 See [Windows environment setup guide](./env-setup-windows.md#setting-up-the-environment) to set up your system to run Flutter.
 
-Run `make flutter/android/apk` to build APK.
+Run `make flutter/android/release` to build APK.
 
 You can build the app using docker.  
-Run `make docker/flutter/android/apk` to build release APK.  
+Run `make docker/flutter/android/release` to build release APK.  
 Run `make docker/flutter/android/libs` to build just `.so` libs. This command is helpful if you want to build Android version of the app on Windows.
 
 if the build fails with `java.io.IOException: Input/output error`, remove file gradle-wrapper.jar:
