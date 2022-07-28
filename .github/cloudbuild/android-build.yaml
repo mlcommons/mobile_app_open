@@ -3,6 +3,7 @@ substitutions:
   _APK_DIR: /workspace/output/artifacts
   # allow to override trigger names
   _TFLITE_TEST_TRIGGER: android-test-tflite
+  _PIXEL_TEST_TRIGGER: android-test-pixel
 
 # Building apks with flutter requires a lot of memory.
 # Builds on standard machines with 4GB of RAM can unexpectedly hang.
@@ -74,6 +75,7 @@ steps:
     env:
       - BAZEL_CACHE_ARG=--remote_cache=https://storage.googleapis.com/$_BAZEL_CACHE_BUCKET --google_default_credentials
       - WITH_TFLITE=1
+      - WITH_PIXEL=1
     args:
       - -xc
       - |
@@ -107,7 +109,38 @@ steps:
           "commitSha": "$COMMIT_SHA"
         }
         EOL
-    # we need to upload apk artifacts manually to ensure that trigger-test step always has apk available
+  - id: build-pixel-apks
+    name: gcr.io/$PROJECT_ID/$_BUILDER_IMAGE_NAME:latest
+    timeout: 600s # 10 minutes
+    entrypoint: bash
+    env:
+      - OFFICIAL_BUILD=true
+      - FLUTTER_BUILD_NUMBER=0
+      - FLUTTER_FORCE_PUB_GET=1
+      - FLUTTER_ANDROID_APK_FOLDER=$_APK_DIR/pixel
+      - FLUTTER_ANDROID_APK_RELEASE=mlperfbench-p-$SHORT_SHA.apk
+      - FLUTTER_ANDROID_APK_TEST_MAIN=test-main-p-$SHORT_SHA.apk
+      - FLUTTER_ANDROID_APK_TEST_HELPER=test-helper-p-$SHORT_SHA.apk
+      - WITH_TFLITE=0
+      - WITH_PIXEL=1
+    args:
+      - -xc
+      - |
+        make flutter/android/libs/copy flutter/prepare || exit $?
+        make flutter/android/apk flutter/android/test-apk || exit $?
+        cat >request-pixel.json <<EOL
+        {
+          "substitutions": {
+            "_APK_LOCATION": "$_ARTIFACT_UPLOAD_PATH",
+            "_APK_SUBFOLDER": "pixel",
+            "_APK_RELEASE_NAME": "$$FLUTTER_ANDROID_APK_RELEASE",
+            "_APK_TEST_MAIN_NAME": "$$FLUTTER_ANDROID_APK_TEST_MAIN",
+            "_APK_TEST_HELPER_NAME": "$$FLUTTER_ANDROID_APK_TEST_HELPER"
+          },
+          "commitSha": "$COMMIT_SHA"
+        }
+        EOL
+    # we need to upload apk artifacts manually to ensure that trigger-tests step always has apk available
   - id: upload-apks
     name: gcr.io/cloud-builders/gsutil
     timeout: 60s # 1 minute
@@ -116,7 +149,7 @@ steps:
       - -xc
       - |
         gsutil cp -r $_APK_DIR gs://$_ARTIFACT_UPLOAD_PATH
-  - id: trigger-test-tflite
+  - id: trigger-tests
     name: gcr.io/cloud-builders/gcloud
     timeout: 60s # 1 minute
     entrypoint: bash
@@ -129,6 +162,11 @@ steps:
           -T request-tflite.json \
           -H "Authorization: Bearer $$AUTH_TOKEN" \
           "https://cloudbuild.googleapis.com/v1/projects/$PROJECT_ID/triggers/$_TFLITE_TEST_TRIGGER:run"
+        curl \
+          -X POST \
+          -T request-pixel.json \
+          -H "Authorization: Bearer $$AUTH_TOKEN" \
+          "https://cloudbuild.googleapis.com/v1/projects/$PROJECT_ID/triggers/$_PIXEL_TEST_TRIGGER:run"
   - id: print-artifact-links
     name: gcr.io/cloud-builders/gcloud
     timeout: 10s
