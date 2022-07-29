@@ -52,7 +52,7 @@ flutter/android/libs/copy:
 FLUTTER_ANDROID_APK_FOLDER?=output/android-apks
 
 FLUTTER_ANDROID_APK_RELEASE?=release.apk
-flutter_android_apk_release_path=${FLUTTER_ANDROID_APK_RELEASE}/${FLUTTER_ANDROID_APK_RELEASE}
+flutter_android_apk_release_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_RELEASE}
 .PHONY: flutter/android/apk
 flutter/android/apk:
 	mkdir -p $$(dirname ${flutter_android_apk_release_path})
@@ -60,7 +60,7 @@ flutter/android/apk:
 	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk ${flutter_android_apk_release_path}
 
 FLUTTER_ANDROID_APK_TEST_MAIN?=test-main.apk
-flutter_android_apk_test_main_path=${FLUTTER_ANDROID_APK_TEST_MAIN}/${FLUTTER_ANDROID_APK_RELEASE}
+flutter_android_apk_test_main_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_MAIN}
 .PHONY: flutter/android/test-apk/main
 flutter/android/test-apk/main:
 	mkdir -p $$(dirname ${flutter_android_apk_test_main_path})
@@ -68,7 +68,7 @@ flutter/android/test-apk/main:
 	cp -f flutter/build/app/outputs/apk/debug/app-debug.apk ${flutter_android_apk_test_main_path}
 
 FLUTTER_ANDROID_APK_TEST_HELPER?=test-helper.apk
-flutter_android_apk_test_helper_path=${FLUTTER_ANDROID_APK_TEST_HELPER}/${FLUTTER_ANDROID_APK_RELEASE}
+flutter_android_apk_test_helper_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_HELPER}
 # run `make flutter/android/apk` before this target
 .PHONY: flutter/android/test-apk/helper
 flutter/android/test-apk/helper:
