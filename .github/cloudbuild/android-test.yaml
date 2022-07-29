@@ -12,8 +12,8 @@ steps:
       - -xc
       - |
         mkdir -p output
-        gsutil cp -r gs://$_APK_LOCATION output
-        mv output/$$(basename $_APK_LOCATION) output/apks
+        gsutil cp -r gs://$_APK_LOCATION/$_APK_SUBFOLDER output
+        mv output/$_APK_SUBFOLDER output/apks
   - id: firebase-instrumentation-test
     name: gcr.io/cloud-builders/gcloud
     waitFor:
