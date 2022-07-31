@@ -43,6 +43,7 @@ flutter_common_docker_flags= \
 		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
 		--env BAZEL_ARGS_GLOBAL="${proxy_bazel_args} --output_user_root=/mnt/cache/bazel" \
 		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
+		--env FLUTTER_BUILD_NUMBER=${FLUTTER_BUILD_NUMBER} \
 		--env FLUTTER_FORCE_PUB_GET=1 \
 		${proxy_docker_args} \
 		${backend_qti_flutter_docker_args} \
@@ -56,7 +57,7 @@ docker/flutter/android/libs: flutter/android/docker/image
 		make flutter/android/libs
 
 .PHONY: docker/flutter/android/release
-docker/flutter/android/release: flutter/android/docker/image
+docker/flutter/android/release: flutter/check-release-env flutter/android/docker/image
 	MSYS2_ARG_CONV_EXCL="*" docker run \
 		${flutter_common_docker_flags} \
 		make flutter/android/release
