@@ -213,7 +213,14 @@ float ADE20K::ComputeAccuracy() {
   }
   float iou_sum = 0.0;
   for (int j = 0; j < num_classes_; j++) {
-    auto iou = tp_acc_[j] * 1.0 / (tp_acc_[j] + fp_acc_[j] + fn_acc_[j]);
+    auto sum = tp_acc_[j] + fp_acc_[j] + fn_acc_[j];
+    if (sum == 0) {
+      // in our integration test we use very small dataset
+      // which doesn't have some of the classes
+      iou_sum += 1.0;
+      continue;
+    }
+    auto iou = tp_acc_[j] * 1.0 / sum;
 #if __DEBUG__
     LOG(INFO) << "IOU class " << j + 1 << ": " << tp_acc_[j] << ", "
               << fp_acc_[j] << ", " << fn_acc_[j] << ", " << iou << "\n";
