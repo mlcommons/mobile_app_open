@@ -34,10 +34,11 @@ message BackendSetting {
 //
 // Next ID: 3
 message BenchmarkSetting {
-  // Id of the benchmark. Must match the id in ModelConfig::id.
+  // Id of the benchmark. Must match the value in TaskConfig::id.
   required string benchmark_id = 1;
   // Backend custom model settings
   repeated CustomSetting custom_setting = 2;
+  // URL or local path of the model file
   required string src = 3;
   // MD5 checksum to validate the model file specified in src
   required string md5_checksum = 4;
