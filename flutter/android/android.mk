@@ -13,71 +13,16 @@
 # limitations under the License.
 ##########################################################################
 
-.PHONY: flutter/android
+include flutter/android/android-docker.mk
+
 flutter/android: flutter/android/libs
+flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk
+flutter/android/libs: flutter/android/libs/build flutter/android/libs/copy
+# run `make flutter/android/apk` before `flutter/android/test-apk`
+flutter/android/test-apk: flutter/android/test-apk/main flutter/android/test-apk/helper
 
-flutter_docker_postfix=$(shell id -u)
-.PHONY: flutter/android/docker/image
-flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp
-output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp: flutter/android/docker/Dockerfile
-	docker image build -t mlcommons/mlperf_mobile_flutter flutter/android/docker
-	mkdir -p output/docker
-	touch $@
-
-# you can set env CONNECT_TTY_TO_DOCKER=0 to run commands in systems without tty, like jenkins
-ifneq (${CONNECT_TTY_TO_DOCKER},0)
-flutter_docker_tty_arg=-it
-endif
-
-flutter_common_docker_flags= \
-		--rm \
-		${flutter_docker_tty_arg} \
-		--init \
-		--user `id -u`:`id -g` \
-		--env USER=mlperf \
-		-v $(CURDIR):/mnt/project \
-		--workdir /mnt/project \
-		-v /mnt/project/flutter/build \
-		-v mlperf-mobile-flutter-cache-bazel-${flutter_docker_postfix}:/mnt/cache \
-		--env WITH_TFLITE=${WITH_TFLITE} \
-		--env WITH_QTI=${WITH_QTI} \
-		--env WITH_SAMSUNG=${WITH_SAMSUNG} \
-		--env WITH_PIXEL=${WITH_PIXEL} \
-		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
-		--env BAZEL_ARGS_GLOBAL="${proxy_bazel_args} --output_user_root=/mnt/cache/bazel" \
-		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
-		--env FLUTTER_FORCE_PUB_GET=1 \
-		${proxy_docker_args} \
-		${backend_qti_flutter_docker_args} \
-		${backend_samsung_docker_args} \
-		mlcommons/mlperf_mobile_flutter
-
-flutter/android/release: flutter/android/apk
-flutter/android/apk: flutter/android flutter/android/apk-only
-
-.PHONY: flutter/android/apk-only
-flutter/android/apk-only: flutter/prepare
-	cd flutter && ${_start_args} flutter --no-version-check build apk ${flutter_official_build_flag}
-	mkdir -p output/flutter/android/
-	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk output/flutter/android/release.apk
-
-.PHONY: docker/flutter/android/apk
-docker/flutter/android/apk: flutter/android/docker/image
-	MSYS2_ARG_CONV_EXCL="*" docker run \
-		${flutter_common_docker_flags} \
-		make flutter/android/apk
-
-.PHONY: flutter/android/test_apk
-flutter/android/test_apk: flutter/android/apk
-	cd flutter/android && ./gradlew app:assembleAndroidTest
-	cd flutter/android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
-	mkdir -p output/flutter/android/
-	cp -f flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk output/flutter/android/test-helper.apk
-	cp -f flutter/build/app/outputs/apk/debug/app-debug.apk output/flutter/android/test.apk
-
-flutter_android_libs_folder=flutter/android/app/src/main/jniLibs/arm64-v8a
-.PHONY: flutter/android/libs
-flutter/android/libs:
+.PHONY: flutter/android/libs/build
+flutter/android/libs/build:
 	bazel ${BAZEL_ARGS_GLOBAL} build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
 		--config=android_arm64 \
 		${backend_tflite_android_target} \
@@ -86,6 +31,10 @@ flutter/android/libs:
 		${backend_qti_android_target} \
 		${backend_samsung_android_target} \
 		//flutter/cpp/flutter:libbackendbridge.so
+
+flutter_android_libs_folder=flutter/android/app/src/main/jniLibs/arm64-v8a
+.PHONY: flutter/android/libs/copy
+flutter/android/libs/copy:
 	rm -rf ${flutter_android_libs_folder}
 	mkdir -p ${flutter_android_libs_folder}
 	@# macos doesn't support --target-directory flag
@@ -100,8 +49,29 @@ flutter/android/libs:
 	@# macos doesn't support --recursive flag
 	chmod -R 777 ${flutter_android_libs_folder}
 
-.PHONY: docker/flutter/android/libs
-docker/flutter/android/libs: flutter/android/docker/image
-	MSYS2_ARG_CONV_EXCL="*" docker run \
-		${flutter_common_docker_flags} \
-		make flutter/android/libs
+FLUTTER_ANDROID_APK_FOLDER?=output/android-apks
+
+FLUTTER_ANDROID_APK_RELEASE?=release.apk
+flutter_android_apk_release_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_RELEASE}
+.PHONY: flutter/android/apk
+flutter/android/apk:
+	mkdir -p $$(dirname ${flutter_android_apk_release_path})
+	cd flutter && ${_start_args} flutter --no-version-check build apk ${flutter_official_build_arg}
+	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk ${flutter_android_apk_release_path}
+
+FLUTTER_ANDROID_APK_TEST_MAIN?=test-main.apk
+flutter_android_apk_test_main_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_MAIN}
+.PHONY: flutter/android/test-apk/main
+flutter/android/test-apk/main:
+	mkdir -p $$(dirname ${flutter_android_apk_test_main_path})
+	cd flutter/android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
+	cp -f flutter/build/app/outputs/apk/debug/app-debug.apk ${flutter_android_apk_test_main_path}
+
+FLUTTER_ANDROID_APK_TEST_HELPER?=test-helper.apk
+flutter_android_apk_test_helper_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_HELPER}
+# run `make flutter/android/apk` before this target
+.PHONY: flutter/android/test-apk/helper
+flutter/android/test-apk/helper:
+	mkdir -p $$(dirname ${flutter_android_apk_test_helper_path})
+	cd flutter/android && ./gradlew app:assembleAndroidTest
+	cp -f flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk ${flutter_android_apk_test_helper_path}

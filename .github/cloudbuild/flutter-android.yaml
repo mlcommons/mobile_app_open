@@ -70,12 +70,14 @@ steps:
     entrypoint: bash
     env:
       - BAZEL_CACHE_ARG=--remote_cache=https://storage.googleapis.com/$_BAZEL_CACHE_BUCKET --google_default_credentials
+      - OFFICIAL_BUILD=true
+      - FLUTTER_BUILD_NUMBER=0
     args:
       - -xc
       - |
         # next line is a fix for this issue https://github.com/actions/checkout/issues/766
         git config --global --add safe.directory '/image-workdir/flutter'
-        make flutter/android/test_apk || exit $?
+        make flutter/android/release flutter/android/test-apk || exit $?
         mkdir -p /workspace/output/artifacts || exit $?
         cp /workspace/flutter/build/app/outputs/flutter-apk/app-release.apk /workspace/output/artifacts/mlperf_app_release.apk || exit $?
         cp /workspace/flutter/build/app/outputs/apk/debug/app-debug.apk /workspace/output/artifacts/mlperf_app_test_main.apk || exit $?
