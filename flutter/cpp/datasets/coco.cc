@@ -79,7 +79,8 @@ Coco::Coco(Backend *backend, const std::string &image_dir,
   // Get filenames of the listed images. filenames are onverted to .jpg to match
   // filenames in the ground truth. They are used as keys to compare results.
   for (const auto &image_name : image_list_) {
-    std::string filename = image_name.substr(image_name.find_last_of("/") + 1);
+    std::string filename =
+        image_name.substr(image_name.find_last_of("/\\") + 1);
     filename.replace(filename.find_last_of("."), std::string::npos, ".jpg");
     name_list_.push_back(filename);
   }
