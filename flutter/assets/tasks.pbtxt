@@ -10,13 +10,13 @@ task {
     name: "Open images subset for classification"
     type: IMAGENET
     path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
-    groundtruth_src: ""
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/imagenet_val_tiny.txt"
   }
   test_dataset {
     name: "Imagenet dataset for instrument test"
     type: IMAGENET
     path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
-    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/imagenet_val_tiny.txt"
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/mao/456/accuracy-on-ci/v3_0/assets/imagenet_tiny-groundtruth.txt"
   }
   model {
     id: "IC_tpu_uint8"
@@ -52,12 +52,12 @@ task {
     name: "Open images subset for detection"
     type: COCO
     path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco.zip"
-    groundtruth_src: ""
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/coco_val_tiny.pbtxt"
   }
   test_dataset {
     name: "Coco dataset for instrument test"
     type: COCO
-    path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco_tiny.zip"
+    path: "https://github.com/mlcommons/mobile_models/raw/mao/456/accuracy-on-ci/v3_0/datasets/coco-test.zip"
     groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/coco_val_tiny.pbtxt"
   }
   model {
@@ -102,7 +102,7 @@ task {
     name: "Open images subset for segmentation"
     type: ADE20K
     path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k_tiny.zip"
-    groundtruth_src: ""
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/mao/456/accuracy-on-ci/v3_0/assets/ade20k-tiny-saved-output.zip"
   }
   model {
     id: "IS_uint8_mosaic"
@@ -138,7 +138,7 @@ task {
     name: "Squad V1.1 mini set"
     type: SQUAD
     path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord"
-    groundtruth_src: ""
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/squad_groundtruth.tfrecord"
   }
   test_dataset {
     name: "Squad V1.1 mini set"
@@ -186,13 +186,13 @@ task {
     name: "Open images subset for classification"
     type: IMAGENET
     path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
-    groundtruth_src: ""
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/imagenet_val_tiny.txt"
   }
   test_dataset {
     name: "Imagenet dataset for instrument test"
     type: IMAGENET
     path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
-    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/imagenet_val_tiny.txt"
+    groundtruth_src: "https://github.com/mlcommons/mobile_models/raw/mao/456/accuracy-on-ci/v3_0/assets/imagenet_tiny-groundtruth.txt"
   }
   model {
     id: "IC_tpu_uint8_offline"
