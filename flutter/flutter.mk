@@ -55,6 +55,7 @@ flutter/backend-list:
 		-e "s/PIXEL_TAG/${backend_pixel_filename}/" \
 		-e "s/QTI_TAG/${backend_qti_filename}/" \
 		-e "s/SAMSUNG_TAG/${backend_samsung_filename}/" \
+		-e "s/APPLE_TAG/${backend_coreml_filename}/" \
 		> flutter/lib/backend/list.gen.dart
 	dart format flutter/lib/backend/list.gen.dart
 

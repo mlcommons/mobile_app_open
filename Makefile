@@ -16,12 +16,13 @@
 
 all: flutter
 
-# avaiable backends
+# available backends
 WITH_TFLITE?=1
 WITH_QTI?=0
 WITH_SAMSUNG?=0
 WITH_PIXEL?=0
 WITH_MEDIATEK?=0
+WITH_APPLE?=0
 
 include tools/common.mk
 include tools/formatter/format.mk
@@ -31,6 +32,7 @@ include mobile_back_samsung/samsung_backend.mk
 include mobile_back_qti/make/qti_backend.mk
 include mobile_back_qti/make/qti_backend_targets.mk
 include mobile_back_pixel/pixel_backend.mk
+include mobile_back_apple/apple_backend.mk
 
 include flutter/flutter.mk
 
