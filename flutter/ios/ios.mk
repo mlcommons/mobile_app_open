@@ -27,11 +27,13 @@ flutter/ios/libs:
 	bazel ${BAZEL_OUTPUT_ROOT_ARG} build \
 		--config=ios \
 		${backend_bridge_ios_target} \
-		${backend_tflite_ios_target}
+		${backend_tflite_ios_target} \
+		${backend_coreml_ios_target}
 
 	rm -rf ${flutter_ios_fw_dir}
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_bridge_ios_zip}
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_tflite_ios_zip}
+	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_coreml_ios_zip}
 
 flutter/ios/release: flutter/check-release-env flutter/ios flutter/prepare flutter/ios/ipa
 
