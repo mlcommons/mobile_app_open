@@ -62,6 +62,8 @@ cc_library(
 
 tflite_jni_binary(
     name = "libtflitebackend.so",
+    # macOS uses exported_symbols, while Windows uses linkscript
+    exported_symbols = "//flutter/cpp/c:exported_symbols.lds",
     linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [
         ":tflite_c",

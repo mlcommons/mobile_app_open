@@ -20,6 +20,8 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		BD6EDD1F2884143500106593 /* libcoremlbackend.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD6EDD1E2884143500106593 /* libcoremlbackend.xcframework */; };
+		BD6EDD202884143500106593 /* libcoremlbackend.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BD6EDD1E2884143500106593 /* libcoremlbackend.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEA786FDB12CF80A3697FDAF /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8EF4D7B34CC3D1FBA66853A /* Pods_RunnerTests.framework */; };
 		DD2FD2B718B01E010F0F88BB /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91CBF18371DBD12EEEC9EA37 /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
@@ -41,6 +43,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				BD6EDD202884143500106593 /* libcoremlbackend.xcframework in Embed Frameworks */,
 				19C1345F2878151A00263A48 /* libtflitebackend.xcframework in Embed Frameworks */,
 				19C134542876922700263A48 /* backend_bridge_fw.xcframework in Embed Frameworks */,
 			);
@@ -80,6 +83,7 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B2F3E7D2361B9115B41D6B52 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		BD6EDD1E2884143500106593 /* libcoremlbackend.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libcoremlbackend.xcframework; path = frameworks/libcoremlbackend.xcframework; sourceTree = "<group>"; };
 		C225CCAFF2C9DB0836BBE358 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		E8EF4D7B34CC3D1FBA66853A /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -97,6 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BD6EDD1F2884143500106593 /* libcoremlbackend.xcframework in Frameworks */,
 				19C134532876922700263A48 /* backend_bridge_fw.xcframework in Frameworks */,
 				00168AD625E36DF700BC9D7D /* libc++.tbd in Frameworks */,
 				00168AD425E36DDA00BC9D7D /* CoreML.framework in Frameworks */,
@@ -111,6 +116,7 @@
 		00168AD225E36DDA00BC9D7D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BD6EDD1E2884143500106593 /* libcoremlbackend.xcframework */,
 				19C1345D2878151A00263A48 /* libtflitebackend.xcframework */,
 				19C134592876A70900263A48 /* ios.mk */,
 				19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */,

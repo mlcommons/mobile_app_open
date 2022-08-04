@@ -1,0 +1,2 @@
+tensorflow-macos==2.9.2
+coremltools==6.0b1
