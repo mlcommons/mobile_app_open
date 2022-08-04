@@ -95,7 +95,7 @@ class Store extends ChangeNotifier {
     _storeFromDisk.setString(_StoreConstants.previousAppVersion, value);
   }
 
-  bool get keepLogs => _getBool(_StoreConstants.keepLogs);
+  bool get keepLogs => _getBool(_StoreConstants.keepLogs, true);
 
   set keepLogs(bool value) {
     _storeFromDisk.setBool(_StoreConstants.keepLogs, value);

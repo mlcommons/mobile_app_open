@@ -15,7 +15,6 @@
 
 include flutter/ios/ios.mk
 include flutter/windows/windows.mk
-include flutter/windows/windows-docker.mk
 include flutter/android/android.mk
 
 ifeq (${OS},Windows_NT)
@@ -32,9 +31,21 @@ flutter: flutter/prepare flutter/platform
 flutter/firebase: flutter/firebase/config flutter/firebase/prefix
 flutter/result: flutter/result/schema flutter/result/ts
 flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
+flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 
 OFFICIAL_BUILD?=false
-flutter_official_build_flag=--dart-define=official-build=${OFFICIAL_BUILD}
+flutter_official_build_arg=--dart-define=official-build=${OFFICIAL_BUILD}
+.PHONY: flutter/check/official-build
+flutter/check/official-build:
+	@[ "$$OFFICIAL_BUILD" = "true" ] || [ "$$OFFICIAL_BUILD" = "false" ] \
+		|| (echo OFFICIAL_BUILD env must be explicitly set to \"true\" or \"false\"; exit 1)
+
+FLUTTER_BUILD_NUMBER?=0
+flutter_build_number_arg=--build-number ${FLUTTER_BUILD_NUMBER}
+.PHONY: flutter/check/build-number
+flutter/check/build-number:
+	@[ -n "$$FLUTTER_BUILD_NUMBER" ] \
+		|| (echo FLUTTER_BUILD_NUMBER env must be explicitly set; exit 1)
 
 .PHONY: flutter/backend-list
 flutter/backend-list:
@@ -44,6 +55,7 @@ flutter/backend-list:
 		-e "s/PIXEL_TAG/${backend_pixel_filename}/" \
 		-e "s/QTI_TAG/${backend_qti_filename}/" \
 		-e "s/SAMSUNG_TAG/${backend_samsung_filename}/" \
+		-e "s/APPLE_TAG/${backend_coreml_filename}/" \
 		> flutter/lib/backend/list.gen.dart
 	dart format flutter/lib/backend/list.gen.dart
 
@@ -165,11 +177,11 @@ flutter_test_device_arg=
 endif
 .PHONY: flutter/test
 flutter/test:
-	cd flutter && ${_start_args} flutter --no-version-check test integration_test ${flutter_test_device_arg} ${flutter_official_build_flag}
+	cd flutter && ${_start_args} flutter --no-version-check test integration_test ${flutter_test_device_arg} ${flutter_official_build_arg}
 
 .PHONY: flutter/run
 flutter/run:
-	cd flutter && ${_start_args} flutter --no-version-check run ${flutter_test_device_arg} ${flutter_official_build_flag}
+	cd flutter && ${_start_args} flutter --no-version-check run ${flutter_test_device_arg} ${flutter_official_build_arg}
 
 .PHONY: flutter/clean
 flutter/clean:

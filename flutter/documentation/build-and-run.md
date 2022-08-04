@@ -50,7 +50,7 @@ Add `WITH_<VENDOR>=1` to make commands to build the the app with backends.
 For example:
 
 ```bash
-make WITH_QTI=1 WITH_SAMSUNG=1 WITH_PIXEL=1 WITH_MEDIATEK=1 docker/flutter/android/apk
+make WITH_QTI=1 WITH_SAMSUNG=1 WITH_PIXEL=1 WITH_MEDIATEK=1 flutter
 ```
 
 Some of the backends have additional requirements. See command output for details.
@@ -60,6 +60,9 @@ To build with an official UI, you need to set
 
 * the environment variable `OFFICIAL_BUILD=true` if `make` is used (e.g. `OFFICIAL_BUILD=true make flutter/android/apk`), or
 * the argument `--dart-define=official-build=true` if `flutter` is used (e.g. `flutter build apk --dart-define=official-build=true`).
+
+When making a release build you must specify `OFFICIAL_BUILD` and `FLUTTER_BUILD_NUMBER` environment variables, otherwise the build will fail.
+This is a requirement for `flutter/android/release`, `docker/flutter/android/release`, `flutter/ios/release` make targets.
 
 ## Build info
 
@@ -107,10 +110,11 @@ You can copy `.so` files from some Linux or macOS system, then run `make flutter
 For example, it's relatively convenient to use WSL to build native libs.
 See [Windows environment setup guide](./env-setup-windows.md#setting-up-the-environment) to set up your system to run Flutter.
 
-Run `make flutter/android/apk` to build APK.
+Run `make OFFICIAL_BUILD=false FLUTTER_BUILD_NUMBER=0 flutter/android/release` to build APK from scratch,
+or run `make flutter/android/apk` after `make flutter/prepare` and you already have native libs.
 
 You can build the app using docker.  
-Run `make docker/flutter/android/apk` to build release APK.  
+Run `make OFFICIAL_BUILD=false FLUTTER_BUILD_NUMBER=0 docker/flutter/android/release` to build release APK.  
 Run `make docker/flutter/android/libs` to build just `.so` libs. This command is helpful if you want to build Android version of the app on Windows.
 
 if the build fails with `java.io.IOException: Input/output error`, remove file gradle-wrapper.jar:
@@ -150,8 +154,7 @@ Run any of the following commands to update Flutter files in XCode project:
 * `flutter build ios`
 * `flutter build ipa`
 
-Run `flutter build ipa` to create redistributable archive.
-Note that you will need to sign the app using external tools, which are not described here.
+Run `make OFFICIAL_BUILD=false FLUTTER_BUILD_NUMBER=0 flutter/ios/release` to create redistributable archive.
 
 ## Windows
 

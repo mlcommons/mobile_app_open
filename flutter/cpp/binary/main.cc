@@ -154,7 +154,7 @@ int Main(int argc, char* argv[]) {
         switch (dataset_type) {
           case DatasetConfig::IMAGENET: {
             if (scenario == "Offline")
-              benchmark_id = "IC_tpu_uint8_offline";
+              benchmark_id = "IC_tpu_float32_offline";
             else
               benchmark_id = "IC_tpu_uint8";
           }; break;

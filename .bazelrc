@@ -43,6 +43,7 @@ build:android_x86_64 --fat_apk_cpu=x86_64
 build:ios --apple_platform_type=ios
 build:ios --apple_bitcode=embedded --copt=-fembed-bitcode
 build:ios --copt=-Wno-c++11-narrowing
+build:ios --cxxopt=-fobjc-arc
 
 # Windows configs
 

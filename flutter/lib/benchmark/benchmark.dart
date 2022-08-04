@@ -65,7 +65,6 @@ class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;
   final pb.TaskConfig taskConfig;
   final pb.ModelConfig modelConfig;
-  final bool testMode;
 
   bool isActive = true;
 
@@ -79,23 +78,26 @@ class Benchmark {
   BenchmarkResult? accuracyModeResult;
 
   Benchmark(
-      this.benchmarkSetting, this.taskConfig, this.modelConfig, this.testMode)
-      : info = BenchmarkInfo(modelConfig, taskConfig.name),
+    this.benchmarkSetting,
+    this.taskConfig,
+    this.modelConfig,
+  )   : info = BenchmarkInfo(modelConfig, taskConfig.name),
         backendRequestDescription =
             '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}';
 
   String get id => modelConfig.id;
 
-  RunSettings createRunSettings(
-      {required BenchmarkRunMode runMode,
-      required ResourceManager resourceManager,
-      required List<pb.Setting> commonSettings,
-      required String backendLibPath,
-      required String logDir}) {
-    final dataset =
-        testMode ? taskConfig.testDataset : runMode.chooseDataset(taskConfig);
+  RunSettings createRunSettings({
+    required BenchmarkRunMode runMode,
+    required ResourceManager resourceManager,
+    required List<pb.Setting> commonSettings,
+    required String backendLibPath,
+    required String logDir,
+    required bool isTestMode,
+  }) {
+    final dataset = runMode.chooseDataset(taskConfig);
 
-    final _fastMode = testMode || isFastMode;
+    final _fastMode = isTestMode || isFastMode;
     var minQueryCount = _fastMode ? 8 : taskConfig.minQueryCount;
     var minDuration = _fastMode ? 10 : taskConfig.minDurationMs;
 
@@ -114,7 +116,7 @@ class Benchmark {
       dataset_groundtruth_path: resourceManager.get(dataset.groundtruthSrc),
       dataset_offset: modelConfig.offset,
       scenario: modelConfig.scenario,
-      mode: runMode.getBackendModeString(),
+      mode: runMode.mode,
       min_query_count: minQueryCount,
       min_duration: minDuration,
       single_stream_expected_latency_ns:
@@ -127,58 +129,49 @@ class Benchmark {
 
 class BenchmarkList {
   final List<Benchmark> benchmarks = <Benchmark>[];
-  final bool testMode;
 
-  BenchmarkList(pb.MLPerfConfig mlperfConfig,
-      List<pb.BenchmarkSetting> benchmarkSettings, this.testMode) {
+  BenchmarkList(
+    pb.MLPerfConfig mlperfConfig,
+    List<pb.BenchmarkSetting> benchmarkSettings,
+  ) {
     for (final task in mlperfConfig.task) {
       for (final model in task.model) {
         final benchmarkSetting = benchmarkSettings
             .singleWhereOrNull((setting) => setting.benchmarkId == model.id);
         if (benchmarkSetting == null) continue;
 
-        benchmarks.add(Benchmark(benchmarkSetting, task, model, testMode));
+        benchmarks.add(Benchmark(benchmarkSetting, task, model));
       }
     }
   }
 
-  List<Resource> listResources(
-      {bool skipInactive = false, bool includeAccuracy = true}) {
+  List<Resource> listResources({
+    required List<BenchmarkRunMode> modes,
+    bool skipInactive = false,
+  }) {
     final result = <Resource>[];
 
     for (final b in benchmarks) {
       if (skipInactive && !b.isActive) continue;
-      if (testMode) {
-        final datasetData = Resource(
-            path: b.taskConfig.testDataset.path,
-            type: ResourceTypeEnum.datasetData);
-        final datasetGroundtruth = Resource(
-            path: b.taskConfig.testDataset.groundtruthSrc,
-            type: ResourceTypeEnum.datasetGroundtruth);
-        result.addAll([datasetData, datasetGroundtruth]);
-      } else {
-        final datasetData = Resource(
-            path: b.taskConfig.liteDataset.path,
-            type: ResourceTypeEnum.datasetData);
-        final datasetGroundtruth = Resource(
-            path: b.taskConfig.liteDataset.groundtruthSrc,
-            type: ResourceTypeEnum.datasetGroundtruth);
-        result.addAll([datasetData, datasetGroundtruth]);
 
-        if (includeAccuracy) {
-          final datasetData = Resource(
-              path: b.taskConfig.dataset.path,
-              type: ResourceTypeEnum.datasetData);
-          final datasetGroundtruth = Resource(
-              path: b.taskConfig.dataset.groundtruthSrc,
-              type: ResourceTypeEnum.datasetGroundtruth);
-          result.addAll([datasetData, datasetGroundtruth]);
-        }
+      for (var mode in modes) {
+        final dataset = mode.chooseDataset(b.taskConfig);
+        final data = Resource(
+          path: dataset.path,
+          type: ResourceTypeEnum.datasetData,
+        );
+        final groundtruth = Resource(
+          path: dataset.groundtruthSrc,
+          type: ResourceTypeEnum.datasetGroundtruth,
+        );
+        result.addAll([data, groundtruth]);
       }
+
       final model = Resource(
-          path: b.benchmarkSetting.src,
-          type: ResourceTypeEnum.model,
-          md5Checksum: b.benchmarkSetting.md5Checksum);
+        path: b.benchmarkSetting.src,
+        type: ResourceTypeEnum.model,
+        md5Checksum: b.benchmarkSetting.md5Checksum,
+      );
       result.add(model);
     }
 

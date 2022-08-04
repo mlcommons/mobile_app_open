@@ -13,9 +13,10 @@
 # limitations under the License.
 ##########################################################################
 
+include flutter/windows/windows-docker.mk
+
 debug_flags_windows=-c dbg --copt /Od --copt /Z7 --linkopt -debug
 
-.PHONY: flutter/windows
 flutter/windows: flutter/windows/libs
 
 flutter_windows_libs_folder=flutter/windows/libs
@@ -62,7 +63,7 @@ flutter/windows/release/copy-dlls:
 .PHONY: flutter/windows/release/build
 flutter/windows/release/build:
 	rm -rf flutter/build/windows/runner/Release
-	cd flutter && ${_start_args} flutter --no-version-check build windows ${flutter_official_build_flag}
+	cd flutter && ${_start_args} flutter --no-version-check build windows ${flutter_official_build_arg}
 
 .PHONY: flutter/windows/release/name
 flutter/windows/release/name:
