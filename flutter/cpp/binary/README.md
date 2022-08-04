@@ -1,7 +1,7 @@
 # MLPerf backends
 
 This directory provides a main binary file which can be used to evaluate the
-mlperf benchmark with a specific set of (backend, dataset).
+MLPerf benchmark with a specific set of (backend, dataset).
 
 ## Build the TFLite backend
 
@@ -15,19 +15,22 @@ bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
 
 For example, use the following command to run TFLite with the ImageNet dataset:
 
-1. build the command programm `//flutter/cpp/binary:main`
-```bash
-bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
-  --spawn_strategy=standalone //flutter/cpp/binary:main
-``` 
+1. build the command program `//flutter/cpp/binary:main`
+
+   ```bash
+   bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
+     --spawn_strategy=standalone //flutter/cpp/binary:main
+   ```
+
 2. run it
-```bash
-bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET
-  --mode=SubmissionRun \
-  --model_file=<path to the model file> \
-  --output_dir=<mlperf output directory>
-  ....
-```
+
+   ```bash
+   bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET
+     --mode=SubmissionRun \
+     --model_file=<path to the model file> \
+     --output_dir=<mlperf output directory>
+     ....
+   ```
 
 Each set of (backend, dataset) has a different set of arguments, so please use
 `--help` argument to check which flags are available. E.g., with
@@ -35,26 +38,28 @@ Each set of (backend, dataset) has a different set of arguments, so please use
 ```bash
 bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET --help
 ```
+
 we get
-```
+
+```shell
 usage: bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET <flags>
 Flags:
-	--mode=                                    	string	required	Mode is one among PerformanceOnly, AccuracyOnly, SubmissionRun.
-	--output_dir=                              	string	required	The output directory of mlperf.
-	--model_file=                              	string	required	Path to model file.
-	--images_directory=                        	string	required	Path to ground truth images.
-	--offset=1                                 	int32	required	The offset of the first meaningful class in the classification model.
-	--groundtruth_file=                        	string	required	Path to the imagenet ground truth file.
-	--min_query_count=100                      	int32	optional	The test will guarantee to run at least this number of samples in performance mode.
-	--min_duration=100                         	int32	optional	The test will guarantee to run at least this duration in performance mode. The duration is in ms.
-	--single_stream_expected_latency_ns=1000000	int32	optional	single_stream_expected_latency_ns
-	--lib_path=                                	string	optional	Path to the backend library .so file.
-	--native_lib_path=                         	string	optional	Path to the additioal .so files for the backend.
-	--scenario=SingleStream                    	string	optional	Scenario to run the benchmark.
-	--image_width=224                          	int32	optional	The width of the processed image.
-	--image_height=224                         	int32	optional	The height of the processed image.
-	--scenario=SingleStream                    	string	optional	Scenario to run the benchmark.
-	--batch_size=1                             	int32	optional	Batch size.
+  --mode=                                     string  required Mode is one among PerformanceOnly, AccuracyOnly, SubmissionRun.
+  --output_dir=                               string  required The output directory of mlperf.
+  --model_file=                               string  required Path to model file.
+  --images_directory=                         string  required Path to ground truth images.
+  --offset=1                                  int32   required The offset of the first meaningful class in the classification model.
+  --groundtruth_file=                         string  required Path to the imagenet ground truth file.
+  --min_query_count=100                       int32   optional The test will guarantee to run at least this number of samples in performance mode.
+  --min_duration=100                          int32   optional The test will guarantee to run at least this duration in performance mode. The duration is in ms.
+  --single_stream_expected_latency_ns=1000000 int32   optional single_stream_expected_latency_ns
+  --lib_path=                                 string  optional Path to the backend library .so file.
+  --native_lib_path=                          string  optional Path to the additioal .so files for the backend.
+  --scenario=SingleStream                     string  optional Scenario to run the benchmark.
+  --image_width=224                           int32   optional The width of the processed image.
+  --image_height=224                          int32   optional The height of the processed image.
+  --scenario=SingleStream                     string  optional Scenario to run the benchmark.
+  --batch_size=1                              int32   optional Batch size.
 
 ```
 
@@ -79,7 +84,8 @@ Assuming
    file settings accordingly), and
 2. ImageNet, COCO 2017, and ADE20K are in `/sdcard/mlperf_datasets/`
 
-Evaluating top-1 accuracy of quantized MobileNet EdgeTPU tflite with ImageNet validation set.
+Evaluating top-1 accuracy of quantized MobileNet EdgeTPU tflite with ImageNet
+validation set.
 
 ```shell
 adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL IMAGENET \
@@ -92,7 +98,7 @@ adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL I
   --lib_path=/data/local/tmp/libtflitebackend.so
 ```
 
-Evaluating accuracy of quaintized MobileDet tflite with COCO 2017 validation set.
+Evaluating accuracy of quantized MobileDet tflite with COCO 2017 validation set.
 
 ```shell
 adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL COCO \
@@ -106,7 +112,7 @@ adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL C
   --lib_path=/data/local/tmp/libtflitebackend.so
 ```
 
-Evaluating accuracy of quaintized DeepLabv3 tflite with ADE20K validation set.
+Evaluating accuracy of quantized DeepLabV3 tflite with ADE20K validation set.
 
 ```shell
 adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL ADE20K \
@@ -118,7 +124,8 @@ adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL A
   --lib_path=/data/local/tmp/libtflitebackend.so
 ```
 
-Evaluating accuracy of floating point MobileBERT tflite with SQuAD V1.1 mini evaluation set.
+Evaluating accuracy of floating point MobileBERT tflite with SQuAD V1.1 mini
+evaluation set.
 
 ```shell
 adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL SQUAD \
