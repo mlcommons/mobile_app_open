@@ -10,6 +10,8 @@ import 'package:mlperfbench/resources/resource_manager.dart'
     as resource_manager;
 import 'package:mlperfbench/resources/result_manager.dart' as result_manager;
 
+import 'expected_accuracy.dart';
+
 void main() {
   const splashPauseSeconds = 4;
   const runTimeLimitMinutes = 20;
@@ -19,15 +21,18 @@ void main() {
 
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  SharedPreferences.setMockInitialValues({'test mode': true});
+  SharedPreferences.setMockInitialValues({
+    'test mode': true,
+    'submission mode': true,
+  });
 
-  group('Testing App Performance Tests', () {
+  group('integration tests', () {
     final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized()
         as IntegrationTestWidgetsFlutterBinding;
 
     binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
-    testWidgets('Favorites operations test', (WidgetTester tester) async {
+    testWidgets('run all and check test', (WidgetTester tester) async {
       Future<bool> waitFor(int timeLimitMinutes, Key key) async {
         var element = false;
 
@@ -70,16 +75,40 @@ void main() {
       await rm.init();
 
       final extendedResults = rm.getLastResult();
+
       final length = extendedResults.results.list.length;
 
       expect(length, expectedResultCount,
           reason:
               'results count should be $expectedResultCount, but it is $length');
 
+      final backendFilename =
+          extendedResults.results.list.first.backendInfo.filename;
+      expect(
+        expectedAccuracy[backendFilename],
+        isNotNull,
+        reason: 'missing accuracy expected values for $backendFilename',
+      );
+
       for (final benchmarkResult in extendedResults.results.list) {
         expect(benchmarkResult.performance, isNotNull);
         expect(benchmarkResult.performance!.throughput, isNotNull);
-        expect(benchmarkResult.accuracy, isNull);
+        expect(benchmarkResult.accuracy, isNotNull);
+        expect(benchmarkResult.accuracy!.accuracy, isNotNull);
+
+        final expectedAccuracyValue =
+            expectedAccuracy[backendFilename]![benchmarkResult.benchmarkId];
+        expect(
+          expectedAccuracyValue,
+          isNotNull,
+          reason:
+              'missing accuracy expected value for $backendFilename[${benchmarkResult.benchmarkId}]',
+        );
+        expect(
+          benchmarkResult.accuracy!.accuracy!.normalized,
+          greaterThanOrEqualTo(expectedAccuracyValue!),
+          reason: 'accuracy for ${benchmarkResult.benchmarkId} is too low',
+        );
       }
     });
   });
