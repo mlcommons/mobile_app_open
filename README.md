@@ -51,7 +51,8 @@ frameworks contributed by the broader MLPerf community.
 * mobile_back_qti - QTI backend for Android
 * mobile_back_samsung - Samsung backend for Android
 * mobile_back_pixel - Google Pixel backend for Android
-* mobile_back_tflite - Combined TFLite / MediaTek backends for Android
+* mobile_back_tflite - Combined TFLite / MediaTek backends for Android and TFLite backend for iOS
+* mobile_back_apple - Apple backend (Core ML) for iOS
 * datasets - Contains scripts to prepare test and calibration data used for accuracy evaluation and model quantization
 * docs - contains documentation
 * tools - contains miscellaneous tools (e.g., formatting commands)
