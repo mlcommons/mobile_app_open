@@ -11,7 +11,7 @@ const Map<String, Interval> _windowsTflite = {
   'IS_float32_mosaic':
       Interval(min: 0.8387096524238586, max: 0.8387096524238586),
   'LU_float32': Interval(min: 1.0, max: 1.0),
-  'IC_tpu_float32_offline': Interval(min: 0.8387096524238586, max: 1.0),
+  'IC_tpu_float32_offline': Interval(min: 1.0, max: 1.0),
 };
 
 const Map<String, Interval> _androidTflite = {
@@ -37,7 +37,7 @@ const Map<String, Interval> _iosTflite = {
   'IC_tpu_float32': Interval(min: 1.0, max: 1.0),
   'OD_float32': Interval(min: 0.4558801054954529, max: 0.4558801054954529),
   'IS_float32_mosaic':
-      Interval(min: 0.9890317320823669, max: 0.9890317320823669),
+      Interval(min: 0.8387064337730408, max: 0.9890317320823669),
   'LU_float32': Interval(min: 0.800000011920929, max: 0.800000011920929),
   'IC_tpu_float32_offline': Interval(min: 1.0, max: 1.0),
 };
