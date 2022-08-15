@@ -26,7 +26,7 @@ const Map<String, Interval> _imageSegmentation = {
   'NNAPI': Interval(min: 0.48363617062568665, max: 0.4871025085449219),
   'CoreML': Interval(min: 0.9887274503707886, max: 0.9887274503707886),
   // accuracy in emulator is 0.83, on real device 0.98
-  'Neural Engine': Interval(min: 0.8387096524238586, max: 0.9890317320823669),
+  'Neural Engine': Interval(min: 0.8387064337730408, max: 0.9890317320823669),
 };
 
 const Map<String, Interval> _languageUnderstanding = {
