@@ -15,7 +15,7 @@ const Map<String, Interval> _imageClassification = {
 const Map<String, Interval> _objectDetection = {
   'CPU': Interval(min: 0.3162025809288025, max: 0.3162025809288025),
   'NNAPI': Interval(min: 0.28167346119880676, max: 0.3033106029033661),
-  'NNAPI+pixel': Interval(min: 0.3609350919723511, max: 0.3657975494861603),
+  'NNAPI+TFLite-pixel': Interval(min: 0.3609350919723511, max: 0.3657975494861603),
   'CoreML': Interval(min: 0.3162025809288025, max: 0.3162025809288025),
   'Neural Engine': Interval(min: 0.4558801054954529, max: 0.4558801054954529),
 };

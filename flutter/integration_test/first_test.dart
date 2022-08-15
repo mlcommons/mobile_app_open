@@ -96,16 +96,28 @@ void main() {
           reason:
               'missing expected accuracy for ${benchmarkResult.benchmarkId}',
         );
+        expectedAccuracyMap!;
+
         // backends are not forced to follow backendSettingsInfo values
-        // we must use backendInfo.accelerator, it always represents real accelerator value
-        final accelerator = benchmarkResult.backendInfo.accelerator;
-        final expectedAccuracy = expectedAccuracyMap![accelerator];
+        // we should use backendInfo.accelerator, it always represents real accelerator value
+        var accelerator = benchmarkResult.backendInfo.accelerator;
+        if (accelerator == 'ACCELERATOR_NAME') {
+          // some backends are yet to implement accelerator reporting
+          print('warning: accelerator missing, using acceleratorDesc');
+          accelerator = benchmarkResult.backendSettingsInfo.acceleratorDesc;
+        }
+        final expectedAccuracy = expectedAccuracyMap[
+                '$accelerator+${benchmarkResult.backendInfo.name}'] ??
+            expectedAccuracyMap[accelerator];
         final accuracyTag = '${benchmarkResult.benchmarkId}[$accelerator]';
         expect(
           expectedAccuracy,
           isNotNull,
-          reason: 'missing expected accuracy for $accuracyTag',
+          reason:
+              'missing expected accuracy for $accuracyTag (+${benchmarkResult.backendInfo.name})',
         );
+        expectedAccuracy!;
+
         expect(
           benchmarkResult.accuracy!.accuracy!.normalized,
           greaterThanOrEqualTo(expectedAccuracy!.min),
