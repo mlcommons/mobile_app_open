@@ -217,7 +217,6 @@ float ADE20K::ComputeAccuracy() {
     if (sum == 0) {
       // in our integration test we use very small dataset
       // which doesn't have some of the classes
-      iou_sum += 1.0;
       continue;
     }
     auto iou = tp_acc_[j] * 1.0 / sum;
