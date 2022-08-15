@@ -30,6 +30,7 @@ const Map<String, Interval> _imageSegmentation = {
 const Map<String, Interval> _languageUnderstanding = {
   'CPU': Interval(min: 1.0, max: 1.0),
   'GPU (FP16)': Interval(min: 1.0, max: 1.0),
+  'NNAPI': Interval(min: 1.0, max: 1.0),
   'Metal': Interval(min: 1.0, max: 1.0),
   'Neural Engine': Interval(min: 0.800000011920929, max: 0.800000011920929),
 };
