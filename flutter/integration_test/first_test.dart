@@ -120,7 +120,7 @@ void main() {
 
         expect(
           benchmarkResult.accuracy!.accuracy!.normalized,
-          greaterThanOrEqualTo(expectedAccuracy!.min),
+          greaterThanOrEqualTo(expectedAccuracy.min),
           reason: 'accuracy for $accuracyTag is too low',
         );
         expect(
