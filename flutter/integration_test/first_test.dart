@@ -82,32 +82,36 @@ void main() {
           reason:
               'results count should be $expectedResultCount, but it is $length');
 
-      final backendFilename =
-          extendedResults.results.list.first.backendInfo.filename;
-      expect(
-        expectedAccuracy[backendFilename],
-        isNotNull,
-        reason: 'missing accuracy expected values for $backendFilename',
-      );
-
       for (final benchmarkResult in extendedResults.results.list) {
         expect(benchmarkResult.performance, isNotNull);
         expect(benchmarkResult.performance!.throughput, isNotNull);
         expect(benchmarkResult.accuracy, isNotNull);
         expect(benchmarkResult.accuracy!.accuracy, isNotNull);
 
-        final expectedAccuracyValue =
-            expectedAccuracy[backendFilename]![benchmarkResult.benchmarkId];
+        final backendFilename = benchmarkResult.backendInfo.filename;
+        final expectedAccuracyMap = backendExpectedAccuracy[backendFilename];
         expect(
-          expectedAccuracyValue,
+          expectedAccuracyMap,
+          isNotNull,
+          reason: 'missing expected accuracy for $backendFilename',
+        );
+        final expectedAccuracy =
+            expectedAccuracyMap![benchmarkResult.benchmarkId];
+        expect(
+          expectedAccuracy,
           isNotNull,
           reason:
-              'missing accuracy expected value for $backendFilename[${benchmarkResult.benchmarkId}]',
+              'missing expected accuracy for $backendFilename[${benchmarkResult.benchmarkId}]',
         );
         expect(
           benchmarkResult.accuracy!.accuracy!.normalized,
-          greaterThanOrEqualTo(expectedAccuracyValue!),
+          greaterThanOrEqualTo(expectedAccuracy!.min),
           reason: 'accuracy for ${benchmarkResult.benchmarkId} is too low',
+        );
+        expect(
+          benchmarkResult.accuracy!.accuracy!.normalized,
+          lessThanOrEqualTo(expectedAccuracy.max),
+          reason: 'accuracy for ${benchmarkResult.benchmarkId} is too high',
         );
       }
     });
