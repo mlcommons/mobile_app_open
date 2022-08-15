@@ -88,30 +88,33 @@ void main() {
         expect(benchmarkResult.accuracy, isNotNull);
         expect(benchmarkResult.accuracy!.accuracy, isNotNull);
 
-        final backendFilename = benchmarkResult.backendInfo.filename;
-        final expectedAccuracyMap = backendExpectedAccuracy[backendFilename];
+        final expectedAccuracyMap =
+            benchmarkExpectedAccuracy[benchmarkResult.benchmarkId];
         expect(
           expectedAccuracyMap,
           isNotNull,
-          reason: 'missing expected accuracy for $backendFilename',
+          reason:
+              'missing expected accuracy for ${benchmarkResult.benchmarkId}',
         );
-        final expectedAccuracy =
-            expectedAccuracyMap![benchmarkResult.benchmarkId];
+        // backends are not forced to follow backendSettingsInfo values
+        // we must use backendInfo.accelerator, it always represents real accelerator value
+        final accelerator = benchmarkResult.backendInfo.accelerator;
+        final expectedAccuracy = expectedAccuracyMap![accelerator];
+        final accuracyTag = '${benchmarkResult.benchmarkId}[$accelerator]';
         expect(
           expectedAccuracy,
           isNotNull,
-          reason:
-              'missing expected accuracy for $backendFilename[${benchmarkResult.benchmarkId}]',
+          reason: 'missing expected accuracy for $accuracyTag',
         );
         expect(
           benchmarkResult.accuracy!.accuracy!.normalized,
           greaterThanOrEqualTo(expectedAccuracy!.min),
-          reason: 'accuracy for ${benchmarkResult.benchmarkId} is too low',
+          reason: 'accuracy for $accuracyTag is too low',
         );
         expect(
           benchmarkResult.accuracy!.accuracy!.normalized,
           lessThanOrEqualTo(expectedAccuracy.max),
-          reason: 'accuracy for ${benchmarkResult.benchmarkId} is too high',
+          reason: 'accuracy for $accuracyTag is too high',
         );
       }
     });
