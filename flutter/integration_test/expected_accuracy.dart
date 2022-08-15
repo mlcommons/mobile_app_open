@@ -25,7 +25,8 @@ const Map<String, Interval> _imageSegmentation = {
   'CPU': Interval(min: 0.8387096524238586, max: 0.8387096524238586),
   'NNAPI': Interval(min: 0.48363617062568665, max: 0.4871025085449219),
   'CoreML': Interval(min: 0.9887274503707886, max: 0.9887274503707886),
-  'Neural Engine': Interval(min: 0.9890317320823669, max: 0.9890317320823669),
+  // accuracy in emulator is 0.83, on real device 0.98
+  'Neural Engine': Interval(min: 0.8387096524238586, max: 0.9890317320823669),
 };
 
 const Map<String, Interval> _languageUnderstanding = {
@@ -33,7 +34,7 @@ const Map<String, Interval> _languageUnderstanding = {
   'GPU (FP16)': Interval(min: 1.0, max: 1.0),
   'NNAPI': Interval(min: 1.0, max: 1.0),
   'Metal': Interval(min: 1.0, max: 1.0),
-  'Neural Engine': Interval(min: 0.800000011920929, max: 0.800000011920929),
+  'Neural Engine': Interval(min: 1.0, max: 1.0),
 };
 
 const benchmarkExpectedAccuracy = {
