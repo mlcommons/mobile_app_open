@@ -35,7 +35,7 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
@@ -47,7 +47,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
@@ -122,8 +122,8 @@ int test_proto() {
 
   // Simulate the code flow
   std::list<std::string> benchmarks;
-  benchmarks.push_back("IC_tpu_uint8");
-  benchmarks.push_back("IC_tpu_uint8_offline");
+  benchmarks.push_back("image_classification");
+  benchmarks.push_back("image_classification_offline");
   for (auto benchmark_id : benchmarks) {
     // Convert to SettingList
     SettingList setting_list = createSettingList(backend_setting, benchmark_id);
