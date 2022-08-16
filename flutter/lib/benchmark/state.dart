@@ -354,10 +354,12 @@ class BenchmarkState extends ChangeNotifier {
       final perfTimer = Stopwatch()..start();
       progressInfo.accuracy = false;
       progressInfo.calculateStageProgress = () {
-        final timeProgress =
-            perfTimer.elapsedMilliseconds / benchmark.taskConfig.minDurationMs;
-        final queryProgress = backendBridge.getQueryCounter() /
-            benchmark.taskConfig.minQueryCount;
+        final minDuration = max(benchmark.taskConfig.minDurationMs, 1);
+        final timeProgress = perfTimer.elapsedMilliseconds / minDuration;
+        final minQueries = max(benchmark.taskConfig.minQueryCount, 1);
+        final queryCounter = backendBridge.getQueryCounter();
+        final queryProgress =
+            queryCounter < 0 ? 1.0 : queryCounter / minQueries;
         return min(timeProgress, queryProgress);
       };
       notifyListeners();
@@ -399,8 +401,10 @@ class BenchmarkState extends ChangeNotifier {
         progressInfo.currentStage++;
         progressInfo.accuracy = true;
         progressInfo.calculateStageProgress = () {
-          final queryProgress =
-              backendBridge.getQueryCounter() / backendBridge.getDatasetSize();
+          final queryCounter = backendBridge.getQueryCounter();
+          final queryProgress = queryCounter < 0
+              ? 1.0
+              : queryCounter / backendBridge.getDatasetSize();
           return queryProgress;
         };
         notifyListeners();
