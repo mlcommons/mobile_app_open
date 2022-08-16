@@ -4,13 +4,13 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlperfbench/ui/icons.dart';
 
-enum BenchmarkTypeEnum {
-  unknown,
-  imageClassification,
-  objectDetection,
-  imageSegmentation,
-  languageUnderstanding,
-}
+// enum BenchmarkTypeEnum {
+//   unknown,
+//   imageClassification,
+//   objectDetection,
+//   imageSegmentation,
+//   languageUnderstanding,
+// }
 
 class BenchmarkLocalizationInfo {
   final String name;
@@ -24,105 +24,80 @@ class BenchmarkLocalizationInfo {
 }
 
 class BenchmarkInfo {
-  final pb.ModelConfig modelConfig;
+  final pb.TaskConfig task;
 
   /// 'Object Detection', 'Image Classification (offline)', and so on.
-  final String taskName;
+  String get taskName => task.name;
 
-  BenchmarkInfo(this.modelConfig, this.taskName);
+  BenchmarkInfo(this.task);
 
-  String get name => modelConfig.name;
+  // TODO remove
+  String get name => task.model.name;
 
   BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
-    switch (code) {
-      case ('IC'):
-        if (isOffline) {
-          return BenchmarkLocalizationInfo(
-              name: stringResources.imageClassificationOffline,
-              detailsTitle: stringResources.icInfo,
-              detailsContent: stringResources.icInfoDescription);
-        } else {
-          return BenchmarkLocalizationInfo(
-              name: stringResources.imageClassification,
-              detailsTitle: stringResources.icInfo,
-              detailsContent: stringResources.icInfoDescription);
-        }
-      case ('OD'):
+    switch (task.id) {
+      case ('image_classification'):
         return BenchmarkLocalizationInfo(
-            name: stringResources.objectDetection,
-            detailsTitle: stringResources.odInfo,
-            detailsContent: stringResources.odInfoDescription);
-      case ('IS'):
+          name: stringResources.imageClassification,
+          detailsTitle: stringResources.icInfo,
+          detailsContent: stringResources.icInfoDescription,
+        );
+      case ('image_classification_offline'):
         return BenchmarkLocalizationInfo(
-            name: stringResources.imageSegmentation,
-            detailsTitle: stringResources.isInfo,
-            detailsContent: stringResources.isMosaicInfoDescription);
-      case ('LU'):
+          name: stringResources.imageClassificationOffline,
+          detailsTitle: stringResources.icInfo,
+          detailsContent: stringResources.icInfoDescription,
+        );
+      case ('object_detection'):
         return BenchmarkLocalizationInfo(
-            name: stringResources.languageProcessing,
-            detailsTitle: stringResources.luInfo,
-            detailsContent: stringResources.luInfoDescription);
+          name: stringResources.objectDetection,
+          detailsTitle: stringResources.odInfo,
+          detailsContent: stringResources.odInfoDescription,
+        );
+      case ('image_segmentation_v2'):
+        return BenchmarkLocalizationInfo(
+          name: stringResources.imageSegmentation,
+          detailsTitle: stringResources.isInfo,
+          detailsContent: stringResources.isMosaicInfoDescription,
+        );
+      case ('natural_language_processing'):
+        return BenchmarkLocalizationInfo(
+          name: stringResources.languageProcessing,
+          detailsTitle: stringResources.luInfo,
+          detailsContent: stringResources.luInfoDescription,
+        );
       default:
-        throw 'unhandled benchmark code: $code';
+        throw 'unhandled task id: ${task.id}';
     }
   }
 
-  bool get isOffline => modelConfig.scenario == 'Offline';
+  bool get isOffline => task.scenario == 'Offline';
 
-  double get maxThroughput => modelConfig.maxThroughput;
-
-  /// 'IC', 'OD', and so on.
-  String get code => modelConfig.id.split('_').first;
+  double get maxThroughput => task.maxThroughput;
 
   /// 'SingleStream' or 'Offline'.
-  String get scenario => modelConfig.scenario;
+  String get scenario => task.scenario;
 
-  BenchmarkTypeEnum get type => _typeFromCode();
+  Widget get icon => _benchmarkIcons[task.id] ?? AppIcons.logo;
 
-  Widget get icon => _benchmarkIcons[scenario]?[code] ?? AppIcons.logo;
-
-  Widget get iconWhite =>
-      _benchmarkIconsWhite[scenario]?[code] ?? AppIcons.logo;
+  Widget get iconWhite => _benchmarkIconsWhite[task.id] ?? AppIcons.logo;
 
   @override
-  String toString() => 'Benchmark:${modelConfig.id}';
-
-  BenchmarkTypeEnum _typeFromCode() {
-    switch (code) {
-      case 'IC':
-        return BenchmarkTypeEnum.imageClassification;
-      case 'OD':
-        return BenchmarkTypeEnum.objectDetection;
-      case 'IS':
-        return BenchmarkTypeEnum.imageSegmentation;
-      case 'LU':
-        return BenchmarkTypeEnum.languageUnderstanding;
-      default:
-        return BenchmarkTypeEnum.unknown;
-    }
-  }
+  String toString() => 'Benchmark:${task.id}';
 }
 
 final _benchmarkIcons = {
-  'SingleStream': {
-    'IC': AppIcons.imageClassification,
-    'OD': AppIcons.objectDetection,
-    'IS': AppIcons.imageSegmentation,
-    'LU': AppIcons.languageProcessing,
-  },
-  'Offline': {
-    'IC': AppIcons.imageClassificationOffline,
-  },
+  'image_classification': AppIcons.imageClassification,
+  'object_detection': AppIcons.objectDetection,
+  'image_segmentation_v2': AppIcons.imageSegmentation,
+  'natural_language_processing': AppIcons.languageProcessing,
+  'image_classification_offline': AppIcons.imageClassificationOffline,
 };
 
 final _benchmarkIconsWhite = {
-  'SingleStream': {
-    'IC': AppIcons.imageClassificationWhite,
-    'OD': AppIcons.objectDetectionWhite,
-    'IS': AppIcons.imageSegmentationWhite,
-    'LU': AppIcons.languageProcessingWhite,
-  },
-  'Offline': {
-    'IC': AppIcons.imageClassificationOfflineWhite,
-  },
+  'image_classification': AppIcons.imageClassificationWhite,
+  'object_detection': AppIcons.objectDetectionWhite,
+  'image_segmentation_v2': AppIcons.imageSegmentationWhite,
+  'natural_language_processing': AppIcons.languageProcessingWhite,
+  'image_classification_offline': AppIcons.imageClassificationOfflineWhite,
 };

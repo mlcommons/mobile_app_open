@@ -9,7 +9,7 @@ class BenchmarkRunMode {
 
   final String mode;
   final String logSuffix;
-  final pb.DatasetConfig Function(pb.TaskConfig taskConfig) chooseDataset;
+  final pb.OneDatasetConfig Function(pb.TaskConfig taskConfig) chooseDataset;
 
   BenchmarkRunMode._({
     required this.mode,
@@ -20,22 +20,22 @@ class BenchmarkRunMode {
   static BenchmarkRunMode performance = BenchmarkRunMode._(
     mode: _performanceModeString,
     logSuffix: _perfLogSuffix,
-    chooseDataset: (task) => task.liteDataset,
+    chooseDataset: (task) => task.datasets.lite,
   );
   static BenchmarkRunMode accuracy = BenchmarkRunMode._(
     mode: _accuracyModeString,
     logSuffix: _accuracyLogSuffix,
-    chooseDataset: (task) => task.dataset,
+    chooseDataset: (task) => task.datasets.full,
   );
 
   static BenchmarkRunMode performanceTest = BenchmarkRunMode._(
     mode: _performanceModeString,
     logSuffix: _perfLogSuffix,
-    chooseDataset: (task) => task.testDataset,
+    chooseDataset: (task) => task.datasets.test,
   );
   static BenchmarkRunMode accuracyTest = BenchmarkRunMode._(
     mode: _accuracyModeString,
     logSuffix: _accuracyLogSuffix,
-    chooseDataset: (task) => task.testDataset,
+    chooseDataset: (task) => task.datasets.test,
   );
 }
