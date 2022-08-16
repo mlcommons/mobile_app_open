@@ -7,26 +7,25 @@ class Interval {
 
 const Map<String, Interval> _imageClassification = {
   'CPU': Interval(min: 1.0, max: 1.0),
-  'NNAPI': Interval(min: 0.8999999761581421, max: 0.8999999761581421),
+  'NNAPI': Interval(min: 0.8999, max: 0.9),
   'CoreML': Interval(min: 1.0, max: 1.0),
   'Neural Engine': Interval(min: 1.0, max: 1.0),
 };
 
 const Map<String, Interval> _objectDetection = {
-  'CPU': Interval(min: 0.3162025809288025, max: 0.3162025809288025),
-  'NNAPI': Interval(min: 0.28167346119880676, max: 0.3033106029033661),
-  'NNAPI+TFLite-pixel':
-      Interval(min: 0.3609350919723511, max: 0.3657975494861603),
-  'CoreML': Interval(min: 0.3162025809288025, max: 0.3162025809288025),
-  'Neural Engine': Interval(min: 0.4558801054954529, max: 0.4558801054954529),
+  'CPU': Interval(min: 0.3162, max: 0.3163),
+  'NNAPI': Interval(min: 0.2816, max: 0.3034),
+  'NNAPI+TFLite-pixel': Interval(min: 0.3609, max: 0.3658),
+  'CoreML': Interval(min: 0.3162, max: 0.3163),
+  'Neural Engine': Interval(min: 0.4558, max: 0.4559),
 };
 
 const Map<String, Interval> _imageSegmentation = {
-  'CPU': Interval(min: 0.8387096524238586, max: 0.8387096524238586),
-  'NNAPI': Interval(min: 0.48363617062568665, max: 0.4871025085449219),
-  'CoreML': Interval(min: 0.9887274503707886, max: 0.9887274503707886),
+  'CPU': Interval(min: 0.8387, max: 0.8388),
+  'NNAPI': Interval(min: 0.4836, max: 0.4872),
+  'CoreML': Interval(min: 0.9887, max: 0.9888),
   // accuracy in emulator is 0.83, on real device 0.98
-  'Neural Engine': Interval(min: 0.8387064337730408, max: 0.9890317320823669),
+  'Neural Engine': Interval(min: 0.8387, max: 0.9891),
 };
 
 const Map<String, Interval> _languageUnderstanding = {
