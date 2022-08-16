@@ -154,18 +154,18 @@ int Main(int argc, char* argv[]) {
         switch (dataset_type) {
           case DatasetConfig::IMAGENET: {
             if (scenario == "Offline")
-              benchmark_id = "IC_tpu_float32_offline";
+              benchmark_id = "image_classification_offline";
             else
-              benchmark_id = "IC_tpu_uint8";
+              benchmark_id = "image_classification";
           }; break;
           case DatasetConfig::COCO:
-            benchmark_id = "OD_uint8";
+            benchmark_id = "object_detection";
             break;
           case DatasetConfig::SQUAD:
-            benchmark_id = "LU_float32";
+            benchmark_id = "natural_language_processing";
             break;
           case DatasetConfig::ADE20K:
-            benchmark_id = "IS_uint8";
+            benchmark_id = "image_segmentation_v1";
             break;
           case DatasetConfig::NONE:
           default:

@@ -30,7 +30,7 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "snpe_aip"
   accelerator_desc: "AIP"
   configuration: "SNPE"
@@ -39,7 +39,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "psnpe_aip"
   accelerator_desc: "AIP"
   configuration: "SNPE"
@@ -53,7 +53,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "snpe_aip"
   accelerator_desc: "AIP"
   configuration: "SNPE"
@@ -66,7 +66,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
+  benchmark_id: "natural_language_processing"
   accelerator: "gpu_f16"
   accelerator_desc: "GPU (FP16)"
   configuration: "TFLite GPU"
@@ -75,7 +75,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "snpe_aip"
   accelerator_desc: "AIP"
   configuration: "SNPE"
@@ -84,7 +84,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "snpe_aip"
   accelerator_desc: "AIP"
   configuration: "SNPE"
@@ -103,7 +103,7 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -116,7 +116,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -130,7 +130,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -147,7 +147,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_int8"
+  benchmark_id: "natural_language_processing"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -172,7 +172,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -193,7 +193,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -224,7 +224,7 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -237,7 +237,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -251,7 +251,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -268,7 +268,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_int8"
+  benchmark_id: "natural_language_processing"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -289,7 +289,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -310,7 +310,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -341,7 +341,7 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -355,7 +355,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -373,7 +373,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -390,7 +390,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_int8"
+  benchmark_id: "natural_language_processing"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -415,7 +415,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
@@ -436,7 +436,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"

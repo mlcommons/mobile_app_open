@@ -28,7 +28,7 @@ namespace sbe {
 
 const std::string sbe2200_flutter_config = R"SETTINGS(
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -66,7 +66,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -104,7 +104,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -142,7 +142,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -180,7 +180,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
+  benchmark_id: "natural_language_processing"
   accelerator: "gpu"
   accelerator_desc: "gpu"
   configuration: "Samsung Exynos"
@@ -218,7 +218,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "samsung npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -262,7 +262,7 @@ benchmark_setting {
 
 const std::string sbe2200_config_fence_off = R"SETTINGS(
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -300,7 +300,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -338,7 +338,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -376,7 +376,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -414,7 +414,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
+  benchmark_id: "natural_language_processing"
   accelerator: "gpu"
   accelerator_desc: "gpu"
   configuration: "Samsung Exynos"
@@ -452,7 +452,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "samsung npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -496,7 +496,7 @@ benchmark_setting {
 
 const std::string sbe2200_config = R"SETTINGS(
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -534,7 +534,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -572,7 +572,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -610,7 +610,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -648,7 +648,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
+  benchmark_id: "natural_language_processing"
   accelerator: "gpu"
   accelerator_desc: "gpu"
   configuration: "Samsung Exynos"
@@ -686,7 +686,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "samsung npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -730,7 +730,7 @@ benchmark_setting {
 
 const std::string sbe1200_config = R"SETTINGS(
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -748,7 +748,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -766,7 +766,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -784,7 +784,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"

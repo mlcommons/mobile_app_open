@@ -28,7 +28,7 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
@@ -38,7 +38,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
@@ -48,7 +48,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
@@ -58,7 +58,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_float32"
+  benchmark_id: "natural_language_processing"
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
@@ -68,7 +68,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
@@ -78,7 +78,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
