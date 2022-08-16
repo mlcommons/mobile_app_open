@@ -28,7 +28,7 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
@@ -37,7 +37,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
@@ -47,7 +47,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
@@ -56,7 +56,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_float32"
+  benchmark_id: "natural_language_processing"
   accelerator: "gpu_f16"
   accelerator_desc: "GPU (FP16)"
   configuration: "TFLite"
@@ -65,7 +65,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"

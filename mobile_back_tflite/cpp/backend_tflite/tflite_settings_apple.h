@@ -30,7 +30,7 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_float32"
+  benchmark_id: "image_classification"
   accelerator: "coreml"
   accelerator_desc: "CoreML"
   configuration: "TFLite"
@@ -39,7 +39,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_float32"
+  benchmark_id: "object_detection"
   accelerator: "coreml"
   accelerator_desc: "CoreML"
   configuration: "TFLite"
@@ -48,7 +48,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_float32"
+  benchmark_id: "natural_language_processing"
   accelerator: "metal"
   accelerator_desc: "Metal"
   configuration: "TFLite"
@@ -57,7 +57,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_float32_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "coreml"
   accelerator_desc: "CoreML"
   configuration: "TFLite"
@@ -70,7 +70,7 @@ benchmark_setting {
 const std::string tflite_settings_apple_iphoneX = R"SETTINGS(
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_float32_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "coreml"
   accelerator_desc: "CoreML"
   configuration: "TFLite"
@@ -93,7 +93,7 @@ common_setting {
 const std::string tflite_settings_apple_iphone11 = R"SETTINGS(
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_float32_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "coreml"
   accelerator_desc: "CoreML"
   configuration: "TFLite"
@@ -116,7 +116,7 @@ common_setting {
 const std::string tflite_settings_apple_iphone12 = R"SETTINGS(
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_float32_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "coreml"
   accelerator_desc: "CoreML"
   configuration: "TFLite"
