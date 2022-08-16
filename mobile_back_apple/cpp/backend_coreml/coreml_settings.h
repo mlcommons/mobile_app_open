@@ -21,7 +21,7 @@ limitations under the License.
 const std::string coreml_settings = R"SETTINGS(
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_float32"
+  benchmark_id: "image_classification"
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
@@ -29,8 +29,8 @@ benchmark_setting {
   md5_checksum: "39483b20b878d46144ab4cfe9a3e5600"
 }
 
- benchmark_setting {
-  benchmark_id: "IC_tpu_float32_offline"
+benchmark_setting {
+  benchmark_id: "image_classification_offline"
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
@@ -39,8 +39,8 @@ benchmark_setting {
   md5_checksum: "39483b20b878d46144ab4cfe9a3e5600"
 }
 
- benchmark_setting {
-  benchmark_id: "OD_float32"
+benchmark_setting {
+  benchmark_id: "object_detection"
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
@@ -48,8 +48,8 @@ benchmark_setting {
   md5_checksum: "ef849fbf2132e205158f05ca42db25f4"
 }
 
- benchmark_setting {
-  benchmark_id: "LU_float32"
+benchmark_setting {
+  benchmark_id: "natural_language_processing"
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
@@ -57,8 +57,8 @@ benchmark_setting {
   md5_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
 }
 
- benchmark_setting {
-  benchmark_id: "IS_float32_mosaic"
+benchmark_setting {
+  benchmark_id: "image_segmentation_v2"
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
