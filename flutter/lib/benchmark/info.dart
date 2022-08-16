@@ -4,23 +4,16 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlperfbench/ui/icons.dart';
 
-// enum BenchmarkTypeEnum {
-//   unknown,
-//   imageClassification,
-//   objectDetection,
-//   imageSegmentation,
-//   languageUnderstanding,
-// }
-
 class BenchmarkLocalizationInfo {
   final String name;
   final String detailsTitle;
   final String detailsContent;
 
-  BenchmarkLocalizationInfo(
-      {required this.name,
-      required this.detailsTitle,
-      required this.detailsContent});
+  BenchmarkLocalizationInfo({
+    required this.name,
+    required this.detailsTitle,
+    required this.detailsContent,
+  });
 }
 
 class BenchmarkInfo {
@@ -30,9 +23,6 @@ class BenchmarkInfo {
   String get taskName => task.name;
 
   BenchmarkInfo(this.task);
-
-  // TODO remove
-  String get name => task.model.name;
 
   BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
     switch (task.id) {
@@ -74,9 +64,6 @@ class BenchmarkInfo {
   bool get isOffline => task.scenario == 'Offline';
 
   double get maxThroughput => task.maxThroughput;
-
-  /// 'SingleStream' or 'Offline'.
-  String get scenario => task.scenario;
 
   Widget get icon => _benchmarkIcons[task.id] ?? AppIcons.logo;
 
