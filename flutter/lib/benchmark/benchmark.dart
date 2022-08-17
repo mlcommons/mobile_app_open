@@ -105,7 +105,7 @@ class Benchmark {
     );
 
     return RunSettings(
-      backend_model_path: resourceManager.get(benchmarkSetting.src),
+      backend_model_path: resourceManager.get(benchmarkSetting.modelPath),
       backend_lib_path: backendLibPath,
       backend_settings: settings,
       backend_native_lib_path: DeviceInfo.nativeLibraryPath,
@@ -167,9 +167,9 @@ class BenchmarkList {
       }
 
       final model = Resource(
-        path: b.benchmarkSetting.src,
+        path: b.benchmarkSetting.modelPath,
         type: ResourceTypeEnum.model,
-        md5Checksum: b.benchmarkSetting.md5Checksum,
+        md5Checksum: b.benchmarkSetting.modelChecksum,
       );
       result.add(model);
     }
