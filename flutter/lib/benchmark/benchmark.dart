@@ -135,7 +135,10 @@ class BenchmarkList {
     for (final task in mlperfConfig.task) {
       final benchmarkSetting = benchmarkSettings
           .singleWhereOrNull((setting) => setting.benchmarkId == task.id);
-      if (benchmarkSetting == null) continue;
+      if (benchmarkSetting == null) {
+        print('No matching benchmark setting for task ${task.id}');
+        continue;
+      }
 
       benchmarks.add(Benchmark(benchmarkSetting, task));
     }
