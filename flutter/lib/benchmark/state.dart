@@ -492,9 +492,10 @@ class BenchmarkState extends ChangeNotifier {
                 ),
           datasetInfo: DatasetInfo(
             name: accuracyDataset.name,
-            type: DatasetType.fromJson(performanceDataset.type.toString()),
-            dataPath: performanceDataset.path,
-            groundtruthPath: performanceDataset.groundtruthSrc,
+            type: DatasetType.fromJson(
+                benchmark.taskConfig.datasets.type.toString()),
+            dataPath: performanceDataset.inputPath,
+            groundtruthPath: performanceDataset.groundtruthPath,
           ),
           measuredDurationMs: performance.durationMs,
           measuredSamples: performance.numSamples,
@@ -520,9 +521,10 @@ class BenchmarkState extends ChangeNotifier {
                       ),
                 datasetInfo: DatasetInfo(
                   name: accuracyDataset.name,
-                  type: DatasetType.fromJson(accuracyDataset.type.toString()),
-                  dataPath: accuracyDataset.path,
-                  groundtruthPath: accuracyDataset.groundtruthSrc,
+                  type: DatasetType.fromJson(
+                      benchmark.taskConfig.datasets.type.toString()),
+                  dataPath: accuracyDataset.inputPath,
+                  groundtruthPath: accuracyDataset.groundtruthPath,
                 ),
                 measuredDurationMs: accuracy.durationMs,
                 measuredSamples: accuracy.numSamples,
@@ -541,12 +543,12 @@ class BenchmarkState extends ChangeNotifier {
           acceleratorCode: actualSettings.benchmarkSetting.accelerator,
           acceleratorDesc: actualSettings.benchmarkSetting.acceleratorDesc,
           configuration: actualSettings.benchmarkSetting.configuration,
-          modelPath: actualSettings.benchmarkSetting.src,
+          modelPath: actualSettings.benchmarkSetting.modelPath,
           batchSize: actualSettings.benchmarkSetting.batchSize,
           extraSettings: extraSettingsFromCommon(actualSettings.setting),
         ),
         loadgenScenario:
-            LoadgenScenario.fromJson(benchmark.modelConfig.scenario));
+            LoadgenScenario.fromJson(benchmark.taskConfig.scenario));
   }
 
   static BackendExtraSettingList extraSettingsFromCommon(

@@ -20,7 +20,7 @@ option cc_enable_arenas = true;
 option java_multiple_files = true;
 option java_package = "org.mlperf.proto";
 
-// Config of a mlperf run.
+// App config
 //
 // Next ID: 2
 message MLPerfConfig {
@@ -31,30 +31,31 @@ message MLPerfConfig {
 // Config of the mlperf tasks.
 // A task is basically a combination of models and a dataset.
 //
-// Next ID: 8
+// Next ID: 10
 message TaskConfig {
-  // Name of the task. Ex: Image classification.
-  required string name = 1;
-  // The dataset used in this task.
-  required DatasetConfig dataset = 2;
-  // Models to run in this task.
-  repeated ModelConfig model = 3;
+  // Must be unique in one task file. Ex: image_classification
+  // used to match backend settings
+  required string id = 1;
+  // Human-readable name. Ex: Image classification.
+  required string name = 2;
   // Minimum number of samples the test should run in the performance mode.
-  required int32 min_query_count = 4;
+  required int32 min_query_count = 3;
   // Minimum duration the test should run in the performance mode.
-  required int32 min_duration_ms = 5;
-  // The lite dataset for performance mode.
-  optional DatasetConfig lite_dataset = 6;
-  // The dataset for instrument test.
-  optional DatasetConfig test_dataset = 7;
+  required int32 min_duration_ms = 4;
+  // Max expected throughput score
+  required float max_throughput = 5;
+  // Max expected accuracy
+  required float max_accuracy = 6;
+  // LoadGen parameter. Allowed values: SingleStream, Offline
+  required string scenario = 7;
+  required DatasetConfig datasets = 8;
+  required ModelConfig model = 9;
 }
 
-// Config of the dataset.
+// Datasets for a task
 //
 // Next ID: 5
 message DatasetConfig {
-  // Name of the dataset.
-  required string name = 1;
   // Type of the dataset.
   enum DatasetType {
     NONE = 0;
@@ -63,42 +64,39 @@ message DatasetConfig {
     SQUAD = 3;
     ADE20K = 4;
   }
-  required DatasetType type = 2;
+  required DatasetType type = 1;
   // Path to the dataset.
-  required string path = 3;
-  // Path to download the ground truth file.
-  // Could be: http, https, or @assets/file (for files embedded in assets) or
-  // absolute path if the file is stored on the device. This file will be cached
-  // in the app's local directory. If you replace the src file without renaming,
-  // it is recommended to uninstall the app to reflect the update.
-  optional string groundtruth_src = 4;
+  required OneDatasetConfig full = 2;
+  required OneDatasetConfig lite = 3;
+  required OneDatasetConfig tiny = 4;
+}
+
+// Config of one dataset
+//
+// Next ID: 4
+message OneDatasetConfig {
+  // Human-readable name of the dataset
+  required string name = 1;
+  // URL or local path to dataset input files
+  required string input_path = 2;
+  // URL or local path to dataset groundtruth files
+  required string groundtruth_path = 3;
 }
 
 // Config of a model.
 //
-// Next ID: 9
+// Next ID: 7
 message ModelConfig {
-  // Name of the model.
-  required string name = 1;
+  // unique ID used by UI to find matching description
+  required string id = 1;
+  // Human-readable name of the model.
+  required string name = 2;
   // Offset value of the model if applicable.
-  optional int32 offset = 2 [default = 0];
-  // Tags related to the models.
-  optional string tags = 3;
-  // Custom scenario string to configure custom LoadGen parameter in
-  // mlperf_driver.cc .
-  optional string scenario = 4 [default = "SingleStream"];
-  // Unique id of the model. Format: TaskID_ModelID;
-  required string id = 5;
-  // Max throughput of this benchmark.
-  optional float max_throughput = 6;
-  // The detailed description of this model.
-  optional string description = 7;
-  // Max accuracy of this benchmark.
-  optional float max_accuracy = 8;
-  // image width of the input if it is an image
-  optional int32 image_width = 9;
-  // image height of the input if it is an image
-  optional int32 image_height = 10;
+  optional int32 offset = 3 [ default = 0 ];
+  // image width of the input (if model takes images)
+  optional int32 image_width = 4;
+  // image height of the input (if model takes images)
+  optional int32 image_height = 5;
   // Number of detection classes if applicable
-  optional int32 num_classes = 11;
+  optional int32 num_classes = 6;
 }

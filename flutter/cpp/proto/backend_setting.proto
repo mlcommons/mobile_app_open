@@ -32,15 +32,16 @@ message BackendSetting {
 
 // Config of a benchmark.
 //
-// Next ID: 3
+// Next ID: 10
 message BenchmarkSetting {
-  // Id of the benchmark. Must match the id in ModelConfig::id.
+  // Id of the benchmark. Must match the value in TaskConfig::id.
   required string benchmark_id = 1;
   // Backend custom model settings
   repeated CustomSetting custom_setting = 2;
-  required string src = 3;
-  // MD5 checksum to validate the model file specified in src
-  required string md5_checksum = 4;
+  // URL or local path of the model file
+  required string model_path = 3;
+  // MD5 checksum to validate the model file
+  required string model_checksum = 4;
   // accelerator is passed to the backend
   required string accelerator = 5;
   // accelerator_desc is only used by the UI

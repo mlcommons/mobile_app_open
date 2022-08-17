@@ -64,7 +64,6 @@ class BenchmarkResult {
 class Benchmark {
   final pb.BenchmarkSetting benchmarkSetting;
   final pb.TaskConfig taskConfig;
-  final pb.ModelConfig modelConfig;
 
   bool isActive = true;
 
@@ -80,12 +79,11 @@ class Benchmark {
   Benchmark(
     this.benchmarkSetting,
     this.taskConfig,
-    this.modelConfig,
-  )   : info = BenchmarkInfo(modelConfig, taskConfig.name),
+  )   : info = BenchmarkInfo(taskConfig),
         backendRequestDescription =
             '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}';
 
-  String get id => modelConfig.id;
+  String get id => taskConfig.id;
 
   RunSettings createRunSettings({
     required BenchmarkRunMode runMode,
@@ -107,15 +105,15 @@ class Benchmark {
     );
 
     return RunSettings(
-      backend_model_path: resourceManager.get(benchmarkSetting.src),
+      backend_model_path: resourceManager.get(benchmarkSetting.modelPath),
       backend_lib_path: backendLibPath,
       backend_settings: settings,
       backend_native_lib_path: DeviceInfo.nativeLibraryPath,
-      dataset_type: taskConfig.dataset.type.value,
-      dataset_data_path: resourceManager.get(dataset.path),
-      dataset_groundtruth_path: resourceManager.get(dataset.groundtruthSrc),
-      dataset_offset: modelConfig.offset,
-      scenario: modelConfig.scenario,
+      dataset_type: taskConfig.datasets.type.value,
+      dataset_data_path: resourceManager.get(dataset.inputPath),
+      dataset_groundtruth_path: resourceManager.get(dataset.groundtruthPath),
+      dataset_offset: taskConfig.model.offset,
+      scenario: taskConfig.scenario,
       mode: runMode.mode,
       min_query_count: minQueryCount,
       min_duration: minDuration,
@@ -135,13 +133,14 @@ class BenchmarkList {
     List<pb.BenchmarkSetting> benchmarkSettings,
   ) {
     for (final task in mlperfConfig.task) {
-      for (final model in task.model) {
-        final benchmarkSetting = benchmarkSettings
-            .singleWhereOrNull((setting) => setting.benchmarkId == model.id);
-        if (benchmarkSetting == null) continue;
-
-        benchmarks.add(Benchmark(benchmarkSetting, task, model));
+      final benchmarkSetting = benchmarkSettings
+          .singleWhereOrNull((setting) => setting.benchmarkId == task.id);
+      if (benchmarkSetting == null) {
+        print('No matching benchmark setting for task ${task.id}');
+        continue;
       }
+
+      benchmarks.add(Benchmark(benchmarkSetting, task));
     }
   }
 
@@ -157,20 +156,20 @@ class BenchmarkList {
       for (var mode in modes) {
         final dataset = mode.chooseDataset(b.taskConfig);
         final data = Resource(
-          path: dataset.path,
+          path: dataset.inputPath,
           type: ResourceTypeEnum.datasetData,
         );
         final groundtruth = Resource(
-          path: dataset.groundtruthSrc,
+          path: dataset.groundtruthPath,
           type: ResourceTypeEnum.datasetGroundtruth,
         );
         result.addAll([data, groundtruth]);
       }
 
       final model = Resource(
-        path: b.benchmarkSetting.src,
+        path: b.benchmarkSetting.modelPath,
         type: ResourceTypeEnum.model,
-        md5Checksum: b.benchmarkSetting.md5Checksum,
+        md5Checksum: b.benchmarkSetting.modelChecksum,
       );
       result.add(model);
     }
