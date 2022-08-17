@@ -32,8 +32,8 @@ benchmark_setting {
   accelerator: "cpu"
   accelerator_desc: "CPU"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  md5_checksum: "66bb4eba50987221608f8487ed405794"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+  model_checksum: "66bb4eba50987221608f8487ed405794"
 }
 
 benchmark_setting {
@@ -42,8 +42,8 @@ benchmark_setting {
   accelerator_desc: "CPU"
   configuration: "TFLite"
   batch_size: 2
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  md5_checksum: "66bb4eba50987221608f8487ed405794"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+  model_checksum: "66bb4eba50987221608f8487ed405794"
 }
 
 benchmark_setting {
@@ -51,8 +51,8 @@ benchmark_setting {
   accelerator: "cpu"
   accelerator_desc: "CPU"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
-  md5_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
+  model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
 }
 
 benchmark_setting {
@@ -60,8 +60,8 @@ benchmark_setting {
   accelerator: "cpu"
   accelerator_desc: "CPU"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
-  md5_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+  model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
 }
 
 benchmark_setting {
@@ -69,8 +69,8 @@ benchmark_setting {
   accelerator: "cpu"
   accelerator_desc: "CPU"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
-  md5_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+  model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
+  model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
 }
 
 )SETTINGS";
