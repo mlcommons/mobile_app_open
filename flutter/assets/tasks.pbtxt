@@ -3,7 +3,7 @@ task {
   name: "Image Classification"
   min_query_count: 1024
   min_duration_ms: 60000
-  max_throughput: 1000
+  max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
   datasets {
