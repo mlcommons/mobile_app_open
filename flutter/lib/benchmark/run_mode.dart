@@ -31,11 +31,11 @@ class BenchmarkRunMode {
   static BenchmarkRunMode performanceTest = BenchmarkRunMode._(
     mode: _performanceModeString,
     logSuffix: _perfLogSuffix,
-    chooseDataset: (task) => task.datasets.test,
+    chooseDataset: (task) => task.datasets.tiny,
   );
   static BenchmarkRunMode accuracyTest = BenchmarkRunMode._(
     mode: _accuracyModeString,
     logSuffix: _accuracyLogSuffix,
-    chooseDataset: (task) => task.datasets.test,
+    chooseDataset: (task) => task.datasets.tiny,
   );
 }

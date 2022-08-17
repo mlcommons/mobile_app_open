@@ -68,7 +68,7 @@ message DatasetConfig {
   // Path to the dataset.
   required OneDatasetConfig full = 2;
   required OneDatasetConfig lite = 3;
-  required OneDatasetConfig test = 4;
+  required OneDatasetConfig tiny = 4;
 }
 
 // Config of one dataset
