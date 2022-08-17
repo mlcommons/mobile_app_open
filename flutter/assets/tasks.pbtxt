@@ -25,7 +25,7 @@ task {
     }
   }
   model {
-    id: "MobileNetEdgeTPU_224_v1_0"
+    id: "mobilenetedgetpu_224_v1_0"
     name: "MobileNetEdgeTPU 224 1.0"
     offset: 1
     image_width: 224
@@ -61,7 +61,7 @@ task {
     }
   }
   model {
-    id: "ssd_MobileDET"
+    id: "ssd_mobiledet"
     name: "SSD-MobileDET"
     offset: 1
     num_classes: 91
@@ -132,7 +132,7 @@ task {
     }
   }
   model {
-    id: "MobileBert"
+    id: "mobilebert"
     name: "MobileBert"
   }
 }
@@ -164,7 +164,7 @@ task {
     }
   }
   model {
-    id: "MobileNetEdgeTPU_224_v1_0"
+    id: "mobilenetedgetpu_224_v1_0"
     name: "MobileNetEdgeTPU 224 1.0"
     offset: 1
     image_width: 224
