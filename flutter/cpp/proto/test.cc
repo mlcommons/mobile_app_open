@@ -94,7 +94,8 @@ void dumpBenchmarkSetting(const BenchmarkSetting &benchmark_setting) {
             << std::endl;
   std::cout << "    batch_size: " << benchmark_setting.batch_size()
             << std::endl;
-  std::cout << "    model_path: " << benchmark_setting.model_path() << std::endl;
+  std::cout << "    model_path: " << benchmark_setting.model_path()
+            << std::endl;
   std::cout << "    Custom Settings: " << std::endl;
   for (auto s : benchmark_setting.custom_setting()) {
     dumpCustomSetting(s);
