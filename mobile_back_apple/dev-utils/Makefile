@@ -9,7 +9,7 @@ REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
 #REPO_ROOT_DIR="/Users/freedom/work/mobile_app_open"
 
 tflite: tflite-build tflite-run-ic-offline
-coreml: coreml-build coreml-run-od
+coreml: coreml-build coreml-run-ic
 coreml-all: coreml-build coreml-run-ic coreml-run-ic-offline coreml-run-od coreml-run-is coreml-run-lu
 
 app:
@@ -88,7 +88,7 @@ coreml-run-ic:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlpackage" \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/images" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/imagenet_val.txt" \
@@ -102,7 +102,7 @@ coreml-run-ic-offline:
 		--scenario=Offline \
 		--batch_size=32 \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlpackage" \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/images" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/imagenet_val.txt" \
@@ -125,7 +125,7 @@ coreml-run-is:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL ADE20K \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mosaic/Mosaic.mlmodel" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mosaic/Mosaic.mlpackage" \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/ade20k/images" \
 		--ground_truth_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/ade20k/annotations"
@@ -135,7 +135,7 @@ coreml-run-lu:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL SQUAD \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilebert/MobileBERT.mlmodel" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilebert/MobileBERT.mlpackage" \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
 		--input_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/squad/squad_eval_mini.tfrecord" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/squad/squad_groundtruth.tfrecord"
