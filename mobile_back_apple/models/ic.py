@@ -18,7 +18,7 @@
 import shutil
 import coremltools as ct
 from utils import load_frozen_graph, optimize_graph
-
+import numpy as np
 
 def main():
   # Download frozen_graph.pb from
@@ -29,7 +29,7 @@ def main():
   output_name = 'Softmax'
   output_shape = (1, 1001)
   saved_model_export_dir = '../dev-resources/mobilenet_edgetpu/optimized_saved_model'
-  coreml_export_filepath = '../dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel'
+  coreml_export_filepath = '../dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlpackage'
 
   graph_def = load_frozen_graph(frozen_graph_filepath)
   shutil.rmtree(saved_model_export_dir, ignore_errors=True)
@@ -42,6 +42,7 @@ def main():
   model = ct.convert(
     saved_model_export_dir,
     source='tensorflow',
+    convert_to="mlprogram",
     inputs=[ct.TensorType(shape=input_shape)],
   )
 
@@ -50,7 +51,7 @@ def main():
     spec.description.output[0].type.multiArrayType.shape.append(n)
 
   print(spec.description)
-  ct.models.MLModel(spec).save(coreml_export_filepath)
+  ct.models.MLModel(spec, weights_dir=model.weights_dir).save(coreml_export_filepath)
 
 
 if __name__ == "__main__":

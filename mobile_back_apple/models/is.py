@@ -19,7 +19,7 @@ import shutil
 import tensorflow as tf
 import coremltools as ct
 from utils import load_frozen_graph, optimize_graph
-
+import numpy as np
 
 def main():
   # Download mobile_segmenter_r4_frozen_graph.pb from
@@ -30,7 +30,7 @@ def main():
   output_name = 'SemanticPredictions'
   output_shape = (1, 512, 512)
   saved_model_export_dir = '../dev-resources/mosaic/optimized_saved_model'
-  coreml_export_filepath = '../dev-resources/mosaic/Mosaic.mlmodel'
+  coreml_export_filepath = '../dev-resources/mosaic/Mosaic.mlpackage'
 
   graph_def = load_frozen_graph(frozen_graph_filepath)
   shutil.rmtree(saved_model_export_dir, ignore_errors=True)
@@ -47,6 +47,7 @@ def main():
   model = ct.convert(
     [pruned],
     source='tensorflow',
+    convert_to="mlprogram",
     inputs=[ct.TensorType(shape=input_shape)],
   )
 
@@ -55,7 +56,7 @@ def main():
     spec.description.output[0].type.multiArrayType.shape.append(n)
 
   print(spec.description)
-  ct.models.MLModel(spec).save(coreml_export_filepath)
+  ct.models.MLModel(spec, weights_dir=model.weights_dir).save(coreml_export_filepath)
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@
 import tensorflow as tf
 import coremltools as ct
 from coremltools.models.neural_network import quantization_utils
-
+import numpy as np
 
 def main():
   # Download saved_model from
@@ -27,7 +27,7 @@ def main():
   input_names = ['input_ids', 'input_mask', 'segment_ids']
   output_names = ['start_logits', 'end_logits']
   output_shapes = [(1, 384), (1, 384)]
-  coreml_export_filepath = '../dev-resources/mobilebert/MobileBERT.mlmodel'
+  coreml_export_filepath = '../dev-resources/mobilebert/MobileBERT.mlpackage'
 
   tfmodel = tf.saved_model.load(saved_model_source_dir, tags={'serve'})
   pruned = tfmodel.prune([e + ':0' for e in input_names],
@@ -35,10 +35,10 @@ def main():
   model = ct.convert(
     [pruned],
     source='tensorflow',
+    convert_to="mlprogram",
   )
-  model_quantized = quantization_utils.quantize_weights(model, nbits=16)
 
-  spec = model_quantized.get_spec()
+  spec = model.get_spec()
   for i, shape in enumerate(output_shapes):
     for n in shape:
       spec.description.output[i].type.multiArrayType.shape.append(n)
@@ -49,8 +49,7 @@ def main():
 
   print(spec.description)
 
-  model_quantized = ct.models.MLModel(spec)
-  model_quantized.save(coreml_export_filepath)
+  ct.models.MLModel(spec, weights_dir=model.weights_dir).save(coreml_export_filepath)
 
 
 if __name__ == "__main__":
