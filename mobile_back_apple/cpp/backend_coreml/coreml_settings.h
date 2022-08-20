@@ -22,18 +22,18 @@ const std::string coreml_settings = R"SETTINGS(
 
 benchmark_setting {
   benchmark_id: "image_classification"
-  accelerator: "coreml"
-  accelerator_desc: "Neural Engine"
-  configuration: "Core ML"
+  accelerator: "ANE"
+  accelerator_desc: "Apple Neural Engine"
+  configuration: "Default"
   model_path: "app:///mlperf_models/MobilenetEdgeTPU.mlpackage"
   model_checksum: ""
 }
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "coreml"
-  accelerator_desc: "Neural Engine"
-  configuration: "Core ML"
+  accelerator: "ANE"
+  accelerator_desc: "Apple Neural Engine"
+  configuration: "Default"
   batch_size: 32
   model_path: "app:///mlperf_models/MobilenetEdgeTPU.mlpackage"
   model_checksum: ""
@@ -41,27 +41,27 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "object_detection"
-  accelerator: "coreml"
-  accelerator_desc: "Neural Engine"
-  configuration: "Core ML"
+  accelerator: "ANE"
+  accelerator_desc: "Apple Neural Engine"
+  configuration: "Default"
   model_path: "app:///mlperf_models/MobileDet.mlmodel"
   model_checksum: ""
 }
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
-  accelerator: "coreml"
-  accelerator_desc: "Neural Engine"
-  configuration: "Core ML"
+  accelerator: "ANE"
+  accelerator_desc: "Apple Neural Engine"
+  configuration: "Default"
   model_path: "app:///mlperf_models/MobileBERT.mlpackage"
   model_checksum: ""
 }
 
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
-  accelerator: "coreml"
-  accelerator_desc: "Neural Engine"
-  configuration: "Core ML"
+  accelerator: "ANE"
+  accelerator_desc: "Apple Neural Engine"
+  configuration: "Default"
   model_path: "app:///mlperf_models/Mosaic.mlpackage"
   model_checksum: ""
 }
