@@ -87,6 +87,33 @@ class HistoryHelperUtils {
     );
   }
 
+  Widget makeListItem({
+    required String title,
+    String subtitle = '',
+    Widget? trailing,
+    void Function()? onTap,
+    void Function()? onLongPress,
+  }) {
+    return ListTile(
+      title: Padding(
+        padding: const EdgeInsets.only(bottom: 5),
+        child: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      subtitle: subtitle.isEmpty
+          ? null
+          : Text(
+              subtitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+      trailing: trailing ?? const Icon(Icons.chevron_right),
+      onTap: onTap,
+      onLongPress: onLongPress,
+    );
+  }
+
   Widget makeTable(List<RowData> rows) {
     const borderStyle = BorderSide(
       width: 1,

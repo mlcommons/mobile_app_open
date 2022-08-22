@@ -150,29 +150,14 @@ class _HistoryScreen extends State<HistoryScreen> {
         firstRunInfo.accuracy!.startDatetime;
     bool isSelected = selected![index];
 
-    final qps = results.calculateAverageThroughput().toStringAsFixed(2);
-    final benchmarksNum = results.list.length.toString();
-
-    return ListTile(
-      title: Padding(
-        padding: const EdgeInsets.only(bottom: 5),
-        child: Text(
-          helper.formatDate(startDatetime.toLocal()),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-      subtitle: Text(
-        l10n.historyListElementSubtitle
-            .replaceFirst('<throughput>', qps)
-            .replaceFirst('<benchmarks#>', benchmarksNum),
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
+    return helper.makeListItem(
+      title: helper.formatDate(startDatetime.toLocal()),
       trailing: isSelectionMode
           ? Checkbox(
               value: isSelected,
               onChanged: (bool? x) => _toggleSelection(index),
             )
-          : const Icon(Icons.chevron_right),
+          : null,
       onTap: isSelectionMode
           ? () => _toggleSelection(index)
           : () {
@@ -183,14 +168,14 @@ class _HistoryScreen extends State<HistoryScreen> {
                 ),
               );
             },
-      onLongPress: () {
-        if (!isSelectionMode) {
-          setState(() {
-            isSelectionMode = true;
-            _toggleSelection(index);
-          });
-        }
-      },
+      onLongPress: isSelectionMode
+          ? null
+          : () {
+              setState(() {
+                isSelectionMode = true;
+                _toggleSelection(index);
+              });
+            },
     );
   }
 }
