@@ -10,6 +10,8 @@ import 'package:mlperfbench/resources/resource_manager.dart'
     as resource_manager;
 import 'package:mlperfbench/resources/result_manager.dart' as result_manager;
 
+import 'expected_accuracy.dart';
+
 void main() {
   const splashPauseSeconds = 4;
   const runTimeLimitMinutes = 20;
@@ -19,15 +21,18 @@ void main() {
 
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  SharedPreferences.setMockInitialValues({'test mode': true});
+  SharedPreferences.setMockInitialValues({
+    'test mode': true,
+    'submission mode': true,
+  });
 
-  group('Testing App Performance Tests', () {
+  group('integration tests', () {
     final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized()
         as IntegrationTestWidgetsFlutterBinding;
 
     binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
-    testWidgets('Favorites operations test', (WidgetTester tester) async {
+    testWidgets('run all and check test', (WidgetTester tester) async {
       Future<bool> waitFor(int timeLimitMinutes, Key key) async {
         var element = false;
 
@@ -70,6 +75,7 @@ void main() {
       await rm.init();
 
       final extendedResults = rm.getLastResult();
+
       final length = extendedResults.results.list.length;
 
       expect(length, expectedResultCount,
@@ -79,7 +85,49 @@ void main() {
       for (final benchmarkResult in extendedResults.results.list) {
         expect(benchmarkResult.performance, isNotNull);
         expect(benchmarkResult.performance!.throughput, isNotNull);
-        expect(benchmarkResult.accuracy, isNull);
+        expect(benchmarkResult.accuracy, isNotNull);
+        expect(benchmarkResult.accuracy!.accuracy, isNotNull);
+
+        final expectedAccuracyMap =
+            benchmarkExpectedAccuracy[benchmarkResult.benchmarkId];
+        expect(
+          expectedAccuracyMap,
+          isNotNull,
+          reason:
+              'missing expected accuracy for ${benchmarkResult.benchmarkId}',
+        );
+        expectedAccuracyMap!;
+
+        // backends are not forced to follow backendSettingsInfo values
+        // we should use backendInfo.accelerator, it always represents real accelerator value
+        var accelerator = benchmarkResult.backendInfo.accelerator;
+        if (accelerator == 'ACCELERATOR_NAME') {
+          // some backends are yet to implement accelerator reporting
+          print('warning: accelerator missing, using acceleratorDesc');
+          accelerator = benchmarkResult.backendSettingsInfo.acceleratorDesc;
+        }
+        final expectedAccuracy = expectedAccuracyMap[
+                '$accelerator+${benchmarkResult.backendInfo.name}'] ??
+            expectedAccuracyMap[accelerator];
+        final accuracyTag = '${benchmarkResult.benchmarkId}[$accelerator]';
+        expect(
+          expectedAccuracy,
+          isNotNull,
+          reason:
+              'missing expected accuracy for $accuracyTag (+${benchmarkResult.backendInfo.name})',
+        );
+        expectedAccuracy!;
+
+        expect(
+          benchmarkResult.accuracy!.accuracy!.normalized,
+          greaterThanOrEqualTo(expectedAccuracy.min),
+          reason: 'accuracy for $accuracyTag is too low',
+        );
+        expect(
+          benchmarkResult.accuracy!.accuracy!.normalized,
+          lessThanOrEqualTo(expectedAccuracy.max),
+          reason: 'accuracy for $accuracyTag is too high',
+        );
       }
     });
   });

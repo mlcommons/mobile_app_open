@@ -367,7 +367,8 @@ class _ResultScreenState extends State<ResultScreen>
               }
               try {
                 await state.runBenchmarks();
-              } catch (e) {
+              } catch (e, t) {
+                print(t);
                 // current context may no longer be valid if runBenchmarks requested progress screen
                 await showErrorDialog(
                     ProgressScreen.scaffoldKey.currentContext ?? context,
