@@ -20,6 +20,7 @@ import coremltools as ct
 from coremltools.models.neural_network import quantization_utils
 import numpy as np
 
+
 def main():
   # Download saved_model from
   # https://storage.googleapis.com/cloud-tpu-checkpoints/mobilebert/mobilebert_squad_savedmodels.tar.gz
@@ -36,6 +37,7 @@ def main():
     [pruned],
     source='tensorflow',
     convert_to="mlprogram",
+    compute_precision=ct.precision.FLOAT32
   )
 
   spec = model.get_spec()
@@ -47,6 +49,13 @@ def main():
   for i, _ in enumerate(input_names):
     spec.description.input[i].type.multiArrayType.dataType = dtype_int32
 
+  # CoreMLExecutor sorts input and output names alphabetically then access it by index,
+  # so we prefix the name with number to make sure they are sorted as we want.
+  ct.utils.rename_feature(spec, 'input_ids', 'i1_input_ids')
+  ct.utils.rename_feature(spec, 'input_mask', 'i2_input_mask')
+  ct.utils.rename_feature(spec, 'segment_ids', 'i3_segment_ids')
+  ct.utils.rename_feature(spec, 'end_logits', 'o1_end_logits')
+  ct.utils.rename_feature(spec, 'start_logits', 'o2_start_logits')
   print(spec.description)
 
   ct.models.MLModel(spec, weights_dir=model.weights_dir).save(coreml_export_filepath)
