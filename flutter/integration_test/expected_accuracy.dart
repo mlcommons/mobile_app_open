@@ -37,13 +37,9 @@ const Map<String, Interval> _languageUnderstanding = {
 };
 
 const benchmarkExpectedAccuracy = {
-  'IC_tpu_float32': _imageClassification,
-  'IC_tpu_uint8': _imageClassification,
-  'OD_float32': _objectDetection,
-  'OD_uint8': _objectDetection,
-  'IS_float32_mosaic': _imageSegmentation,
-  'IS_uint8_mosaic': _imageSegmentation,
-  'LU_float32': _languageUnderstanding,
-  'IC_tpu_float32_offline': _imageClassification,
-  'IC_tpu_uint8_offline': _imageClassification,
+  'image_classification': _imageClassification,
+  'object_detection': _objectDetection,
+  'image_segmentation_v2': _imageSegmentation,
+  'natural_language_processing': _languageUnderstanding,
+  'image_classification_offline': _imageClassification,
 };
