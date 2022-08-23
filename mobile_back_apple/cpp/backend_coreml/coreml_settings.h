@@ -21,49 +21,49 @@ limitations under the License.
 const std::string coreml_settings = R"SETTINGS(
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_float32"
+  benchmark_id: "image_classification"
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
-  src: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobilenetEdgeTPU.mlmodel"
-  md5_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobilenetEdgeTPU.mlmodel"
+  model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
 }
 
- benchmark_setting {
-  benchmark_id: "IC_tpu_float32_offline"
+benchmark_setting {
+  benchmark_id: "image_classification_offline"
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
   batch_size: 32
-  src: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobilenetEdgeTPU.mlmodel"
-  md5_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobilenetEdgeTPU.mlmodel"
+  model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
 }
 
- benchmark_setting {
-  benchmark_id: "OD_float32"
+benchmark_setting {
+  benchmark_id: "object_detection"
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
-  src: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobileDet.mlmodel"
-  md5_checksum: "ef849fbf2132e205158f05ca42db25f4"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobileDet.mlmodel"
+  model_checksum: "ef849fbf2132e205158f05ca42db25f4"
 }
 
- benchmark_setting {
-  benchmark_id: "LU_float32"
+benchmark_setting {
+  benchmark_id: "natural_language_processing"
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
-  src: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobileBERT.mlmodel"
-  md5_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobileBERT.mlmodel"
+  model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
 }
 
- benchmark_setting {
-  benchmark_id: "IS_float32_mosaic"
+benchmark_setting {
+  benchmark_id: "image_segmentation_v2"
   accelerator: "coreml"
   accelerator_desc: "Neural Engine"
   configuration: "Core ML"
-  src: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/Mosaic.mlmodel"
-  md5_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/Mosaic.mlmodel"
+  model_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
 }
 
 )SETTINGS";
