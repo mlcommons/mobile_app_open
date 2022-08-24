@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/history_tab.dart';
 import 'package:mlperfbench/ui/history/list_tab.dart';
+import 'package:mlperfbench/ui/history/online_tab.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 
 class ListScreen extends StatefulWidget {
@@ -23,7 +24,7 @@ class _ListScreenState extends State<ListScreen> {
       setState(() {});
     },
   );
-  late HistoryTab online = HistoryTab(
+  late OnlineTab online = OnlineTab(
     pushAppBar: (AppBarContent? appBar) {
       pushedAppBar = appBar;
       setState(() {});

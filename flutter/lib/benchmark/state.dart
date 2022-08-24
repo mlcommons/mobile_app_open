@@ -531,7 +531,7 @@ class BenchmarkState extends ChangeNotifier {
                 startDatetime: accuracy.startTime,
                 loadgenValidity: accuracy.validity,
               ),
-        minDurationMs: benchmark.taskConfig.minDurationMs.toDouble(),
+        minDurationMs: benchmark.taskConfig.minDurationMs,
         minSamples: benchmark.taskConfig.minQueryCount,
         backendInfo: BackendReportedInfo(
           filename: backendInfo.libPath,
