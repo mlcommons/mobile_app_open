@@ -16,12 +16,12 @@ task {
     lite {
       name: "Open images subset for classification"
       input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
-      groundtruth_path: ""
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/imagenet_val_tiny.txt"
     }
     tiny {
       name: "Imagenet dataset for instrument test"
       input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
-      groundtruth_path: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt"
     }
   }
   model {
@@ -52,11 +52,11 @@ task {
     lite {
       name: "Open images subset for detection"
       input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco.zip"
-      groundtruth_path: ""
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/coco_val_tiny.pbtxt"
     }
     tiny {
       name: "Coco dataset for instrument test"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco_tiny.zip"
+      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/datasets/coco-test.zip"
       groundtruth_path: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/coco_val_tiny.pbtxt"
     }
   }
@@ -93,7 +93,7 @@ task {
     tiny {
       name: "Open images subset for segmentation"
       input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k_tiny.zip"
-      groundtruth_path: ""
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/ade20k-tiny-saved-output.zip"
     }
   }
   model {
@@ -123,7 +123,7 @@ task {
     lite {
       name: "Squad V1.1 mini set"
       input_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord"
-      groundtruth_path: ""
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/squad_groundtruth.tfrecord"
     }
     tiny {
       name: "Squad V1.1 mini set"
@@ -155,12 +155,12 @@ task {
     lite {
       name: "Open images subset for classification"
       input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
-      groundtruth_path: ""
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/imagenet_val_tiny.txt"
     }
     tiny {
       name: "Imagenet dataset for instrument test"
       input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
-      groundtruth_path: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/imagenet_val_tiny.txt"
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt"
     }
   }
   model {

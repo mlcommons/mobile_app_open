@@ -132,7 +132,8 @@ class MyHomePage extends StatelessWidget {
         }
         try {
           await state.runBenchmarks();
-        } catch (e) {
+        } catch (e, t) {
+          print(t);
           await showErrorDialog(
               context, [stringResources.runFail + ':', e.toString()]);
           return;
