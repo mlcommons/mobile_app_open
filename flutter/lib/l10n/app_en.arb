@@ -34,9 +34,6 @@
   "configTitle": "Configuration",
   "resultsBatchSize": "Batches: <batchSize>",
 
-  "configPreset": "Preset",
-  "configPresetSubtitle": "Use preset for batch size and number of threads.",
-
   "sharing": "Sharing",
   "sharingSubtitle": "Share your anonymous results and basic system information.",
   "submissionMode": "Submission mode",
@@ -73,8 +70,6 @@
   "internetResource": "downloadable",
   "localResource": "local",
   "errorConfig": "Path to config is invalid:",
-
-  "notAvailableModel": "Model is not available",
 
   "settingsKeepLogs": "Keep logs",
   "settingsKeepLogsSubtitle": "Keep loadgen logs of future runs.\nThis option doesn't affect past logs.",
