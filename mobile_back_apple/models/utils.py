@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import tensorflow as tf
+import coremltools as ct
 
 
 def print_versions():
@@ -69,3 +70,9 @@ def optimize_graph(graph_def: tf.compat.v1.GraphDef(),
                                          signature_def_map=sigs)
     builder.save()
     print('Optimized graph saved at:', export_dir)
+
+
+def rename_feature(spec, old_name, new_name):
+  old_name_formatted = old_name.replace('/', '_')
+  ct.utils.rename_feature(spec, old_name_formatted, new_name)
+

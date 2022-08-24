@@ -18,16 +18,16 @@
 import shutil
 import tensorflow as tf
 import coremltools as ct
-from utils import load_frozen_graph, optimize_graph
-import numpy as np
+from utils import load_frozen_graph, optimize_graph, rename_feature
+
 
 def main():
   # Download mobile_segmenter_r4_frozen_graph.pb from
   # https://github.com/mlcommons/mobile_open/tree/main/vision/mosaic/models_and_checkpoints/R4
   frozen_graph_filepath = '../dev-resources/mosaic/mobile_segmenter_r4_frozen_graph.pb'
-  input_name = 'ImageTensor'
+  input_name = 'sub_2'
   input_shape = (1, 512, 512, 3)
-  output_name = 'SemanticPredictions'
+  output_name = 'ArgMax'
   output_shape = (1, 512, 512)
   saved_model_export_dir = '../dev-resources/mosaic/optimized_saved_model'
   coreml_export_filepath = '../dev-resources/mosaic/Mosaic.mlpackage'
@@ -38,11 +38,11 @@ def main():
                  input_name,
                  output_name,
                  saved_model_export_dir,
-                 dtype='uint8')
+                 dtype='float32')
 
   # Based on https://github.com/freedomtan/coreml_models_for_mlperf/tree/main/mosaic
   tfmodel = tf.saved_model.load(saved_model_export_dir)
-  pruned = tfmodel.prune("sub_2:0", "ArgMax:0")
+  pruned = tfmodel.prune(f"{input_name}:0", f"{output_name}:0")
 
   model = ct.convert(
     [pruned],
@@ -54,6 +54,11 @@ def main():
   spec = model.get_spec()
   for n in output_shape:
     spec.description.output[0].type.multiArrayType.shape.append(n)
+
+  # CoreMLExecutor sorts input and output names alphabetically then access it by index,
+  # so we prefix the name with number to make sure they are sorted as we want.
+  rename_feature(spec, input_name, 'i1_normalized_image')
+  rename_feature(spec, output_name, 'o1_semantic_prediction')
 
   print(spec.description)
   ct.models.MLModel(spec, weights_dir=model.weights_dir).save(coreml_export_filepath)

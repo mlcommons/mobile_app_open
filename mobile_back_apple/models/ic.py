@@ -16,9 +16,10 @@
 # limitations under the License.
 
 import shutil
+import tensorflow as tf
 import coremltools as ct
-from utils import load_frozen_graph, optimize_graph
-import numpy as np
+from utils import load_frozen_graph, optimize_graph, rename_feature
+
 
 def main():
   # Download frozen_graph.pb from
@@ -26,7 +27,7 @@ def main():
   frozen_graph_filepath = '../dev-resources/mobilenet_edgetpu/frozen_graph.pb'
   input_name = 'images'
   input_shape = (1, 224, 224, 3)
-  output_name = 'Softmax'
+  output_name = 'MobilenetEdgeTPU/Logits/output'
   output_shape = (1, 1001)
   saved_model_export_dir = '../dev-resources/mobilenet_edgetpu/optimized_saved_model'
   coreml_export_filepath = '../dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlpackage'
@@ -38,9 +39,10 @@ def main():
                  output_name,
                  saved_model_export_dir,
                  dtype='float32')
-
+  tfmodel = tf.saved_model.load(saved_model_export_dir)
+  pruned = tfmodel.prune(f"{input_name}:0", f"{output_name}:0")
   model = ct.convert(
-    saved_model_export_dir,
+    [pruned],
     source='tensorflow',
     convert_to="mlprogram",
     inputs=[ct.TensorType(shape=input_shape)],
@@ -49,6 +51,11 @@ def main():
   spec = model.get_spec()
   for n in output_shape:
     spec.description.output[0].type.multiArrayType.shape.append(n)
+
+  # CoreMLExecutor sorts input and output names alphabetically then access it by index,
+  # so we prefix the name with number to make sure they are sorted as we want.
+  rename_feature(spec, input_name, 'i1_normalized_image')
+  rename_feature(spec, output_name, 'o1_class_probability')
 
   print(spec.description)
   ct.models.MLModel(spec, weights_dir=model.weights_dir).save(coreml_export_filepath)
