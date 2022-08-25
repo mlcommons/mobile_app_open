@@ -47,6 +47,10 @@ class LoadgenLogParser {
         },
       );
 
+      if (result.isEmpty) {
+        return null;
+      }
+
       final validity = result[validityKey] as String == 'VALID';
 
       const nanosecondsPerSecond = 1000 * Duration.microsecondsPerSecond;

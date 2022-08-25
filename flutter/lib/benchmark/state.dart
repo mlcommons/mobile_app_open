@@ -508,7 +508,11 @@ class BenchmarkState extends ChangeNotifier {
           measuredDurationMs: performance.durationMs,
           measuredSamples: performance.numSamples,
           startDatetime: performance.startTime,
-          loadgenValidity: performanceInfo.loadgenInfo!.validity,
+          loadgenInfo: BenchmarkLoadgenInfo(
+            validity: performanceInfo.loadgenInfo!.validity,
+            durationMs: performanceInfo.loadgenInfo!.meanLatency *
+                performanceInfo.loadgenInfo!.queryCount,
+          ),
         ),
         accuracy: accuracy == null
             ? null
@@ -536,7 +540,7 @@ class BenchmarkState extends ChangeNotifier {
                 measuredDurationMs: accuracy.durationMs,
                 measuredSamples: accuracy.numSamples,
                 startDatetime: accuracy.startTime,
-                loadgenValidity: false,
+                loadgenInfo: null,
               ),
         minDurationMs: benchmark.taskConfig.minDurationMs.toDouble(),
         minSamples: benchmark.taskConfig.minQueryCount,
