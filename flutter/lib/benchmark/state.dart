@@ -599,8 +599,8 @@ class BenchmarkState extends ChangeNotifier {
     final elapsed = stopwatch.elapsed;
 
     const logFileName = 'mlperf_log_detail.txt';
-    final loadgenInfo = await LoadgenInfo.extractLoadgenInfo(
-      logFile: '$logDir/$logFileName',
+    final loadgenInfo = await LoadgenInfo.fromFile(
+      filepath: '$logDir/$logFileName',
     );
 
     double throughput;

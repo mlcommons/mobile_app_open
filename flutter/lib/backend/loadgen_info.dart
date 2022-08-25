@@ -16,19 +16,24 @@ class LoadgenInfo {
     required this.validity,
   });
 
-  static Future<Map<String, dynamic>> parseData({
-    required String filepath,
+  static Future<LoadgenInfo?> fromFile({required String filepath}) {
+    final lines = File(filepath)
+        .openRead()
+        .map(utf8.decode)
+        .transform(const LineSplitter());
+    return extractLoadgenInfo(logLines: lines);
+  }
+
+  static Future<Map<String, dynamic>> extractKeys({
+    required Stream<String> logLines,
     required Set<String> requiredKeys,
   }) async {
     Map<String, dynamic> result = {};
-    await File(filepath)
-        .openRead()
-        .map(utf8.decode)
-        .transform(const LineSplitter())
-        .forEach((line) {
+
+    await for (var line in logLines) {
       const prefix = ':::MLLOG ';
       if (!line.startsWith(prefix)) {
-        return;
+        throw 'missing $prefix prefix';
       }
       line = line.substring(prefix.length);
       final json = jsonDecode(line);
@@ -36,49 +41,42 @@ class LoadgenInfo {
       if (requiredKeys.contains(lineKey)) {
         result[lineKey] = json['value'];
       }
-    });
+    }
 
     return result;
   }
 
   static Future<LoadgenInfo?> extractLoadgenInfo({
-    required String logFile,
+    required Stream<String> logLines,
   }) async {
-    print('reading logs from $logFile');
-    try {
-      const latencyKey = 'result_mean_latency_ns';
-      const queryCountKey = 'result_query_count';
-      const latency90Key = 'result_90.00_percentile_latency_ns';
-      const validityKey = 'result_validity';
+    const latencyKey = 'result_mean_latency_ns';
+    const queryCountKey = 'result_query_count';
+    const latency90Key = 'result_90.00_percentile_latency_ns';
+    const validityKey = 'result_validity';
 
-      final result = await parseData(
-        filepath: logFile,
-        requiredKeys: {
-          latencyKey,
-          queryCountKey,
-          latency90Key,
-          validityKey,
-        },
-      );
+    final result = await extractKeys(
+      logLines: logLines,
+      requiredKeys: {
+        latencyKey,
+        queryCountKey,
+        latency90Key,
+        validityKey,
+      },
+    );
 
-      if (result.isEmpty) {
-        return null;
-      }
-
-      final validity = result[validityKey] as String == 'VALID';
-
-      const nanosecondsPerSecond = 1000 * Duration.microsecondsPerSecond;
-
-      return LoadgenInfo(
-        meanLatency: (result[latencyKey] as int) / nanosecondsPerSecond,
-        queryCount: result[queryCountKey] as int,
-        latency90: (result[latency90Key] as int) / nanosecondsPerSecond,
-        validity: validity,
-      );
-    } catch (e, t) {
-      print(e);
-      print(t);
+    if (result.isEmpty) {
       return null;
     }
+
+    final validity = result[validityKey] as String == 'VALID';
+
+    const nanosecondsPerSecond = 1000 * Duration.microsecondsPerSecond;
+
+    return LoadgenInfo(
+      meanLatency: (result[latencyKey] as int) / nanosecondsPerSecond,
+      queryCount: result[queryCountKey] as int,
+      latency90: (result[latency90Key] as int) / nanosecondsPerSecond,
+      validity: validity,
+    );
   }
 }
