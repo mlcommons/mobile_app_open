@@ -1,3 +1,6 @@
+# proto-file: flutter/cpp/proto/mlperf_task.proto
+# proto-message: MLPerfConfig
+
 task {
   id: "image_classification"
   name: "Image Classification"
