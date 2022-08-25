@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+
 import 'package:mlperfbench/backend/loadgen_info.dart';
 
 // this data was extracted from one of real log files
