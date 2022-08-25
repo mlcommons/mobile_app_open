@@ -57,31 +57,7 @@ class BridgeIsolate {
     sendPort.send(port.sendPort);
     await for (var settings in port.cast<RunSettings>()) {
       var result = ffi_run.runBenchmark(settings);
-      result.validity = await isResultValid(settings);
       sendPort.send(result);
     }
-  }
-
-  static Future<bool> isResultValid(RunSettings settings) async {
-    // Loadgen doesn't provide any way to retrieve statistics,
-    // class where is it calculated is an internal class in .cc file:
-    //  https://github.com/mlcommons/inference/blob/e0223ffed3b4da5ab6222e6fdd10cbd9664d510a/loadgen/loadgen.cc#L553
-    // The only way to get run validation info is to parse loadgen log file.
-    final loadgenSummaryFile =
-        File('${settings.output_dir}/mlperf_log_summary.txt');
-    if (!await loadgenSummaryFile.exists()) {
-      return false;
-    }
-
-    final regexp = RegExp('Result is : (.*)');
-
-    final summary = await loadgenSummaryFile.readAsString();
-    final match = regexp.firstMatch(summary);
-    if (match == null || match.groupCount != 1) {
-      return false;
-    }
-
-    final validityString = match.group(1);
-    return validityString == 'VALID';
   }
 }

@@ -91,9 +91,7 @@ http_archive(
     build_file = "@//flutter/android/third_party:loadgen.BUILD",
     patch_args = ["-p1"],
     patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
-    patches = [
-        "//patches:revert_ReportLatencyResults.patch",
-    ],
+    patches = [ ],
     sha256 = "6773b97450d3cfe153affd8e0c69ad2c85393b1867712e812ea0d32336fa7041",
     strip_prefix = "inference-5dd9ed739cc8dfeae2c5d30ec06f4cb524a4dd74",
     urls = [

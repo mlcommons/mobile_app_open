@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
+import 'package:mlperfbench/backend/loadgen_log_parser.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/data/results/backend_info.dart';
@@ -371,10 +372,11 @@ class BenchmarkState extends ChangeNotifier {
         currentLogDir,
       );
       perfTimer.stop();
+      performanceRunInfo.loadgenInfo!;
 
       final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
-        throughput: performanceResult.throughput,
+        throughput: performanceRunInfo.throughput,
         accuracy: performanceResult.accuracyNormalized < 0.0
             ? null
             : Accuracy(
@@ -390,12 +392,12 @@ class BenchmarkState extends ChangeNotifier {
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
         batchSize: benchmark.benchmarkSetting.batchSize,
-        validity: performanceResult.validity,
+        validity: performanceRunInfo.loadgenInfo!.validity,
       );
 
       if (_aborting) break;
 
-      RunResult? accuracyResult;
+      RunInfo? accuracyRunInfo;
 
       if (_store.submissionMode) {
         progressInfo.currentStage++;
@@ -408,7 +410,7 @@ class BenchmarkState extends ChangeNotifier {
           return queryProgress;
         };
         notifyListeners();
-        final accuracyRunInfo = await runBenchmark(
+        accuracyRunInfo = await runBenchmark(
           benchmark,
           accuracyMode,
           backendInfo.settings.commonSetting,
@@ -416,13 +418,11 @@ class BenchmarkState extends ChangeNotifier {
           currentLogDir,
         );
 
-        accuracyResult = accuracyRunInfo.result;
+        final accuracyResult = accuracyRunInfo.result;
         benchmark.accuracyModeResult = BenchmarkResult(
           // loadgen doesn't calculate latency for accuracy mode benchmarks
           // so throughput is infinity which is not a valid JSON numeric value
-          throughput: accuracyResult.throughput.isFinite
-              ? accuracyResult.throughput
-              : 0.0,
+          throughput: 0.0,
           accuracy: accuracyResult.accuracyNormalized < 0.0
               ? null
               : Accuracy(
@@ -438,12 +438,15 @@ class BenchmarkState extends ChangeNotifier {
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
           batchSize: benchmark.benchmarkSetting.batchSize,
-          validity: accuracyResult.validity,
+          validity: false,
         );
       }
 
-      exportResults.add(exportResultFromRunInfo(benchmark, performanceResult,
-          accuracyResult, performanceRunInfo.settings.backend_settings));
+      exportResults.add(exportResultFromRunInfo(
+        benchmark,
+        performanceRunInfo,
+        accuracyRunInfo,
+      ));
     }
 
     if (!_aborting) {
@@ -467,17 +470,22 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   BenchmarkExportResult exportResultFromRunInfo(
-      Benchmark benchmark,
-      RunResult performance,
-      RunResult? accuracy,
-      pb.SettingList actualSettings) {
+    Benchmark benchmark,
+    RunInfo performanceInfo,
+    RunInfo? accuracyInfo,
+  ) {
+    final performance = performanceInfo.result;
+    final accuracy = accuracyInfo?.result;
+    final actualSettings = performanceInfo.settings.backend_settings;
+
     final performanceDataset = perfMode.chooseDataset(benchmark.taskConfig);
     final accuracyDataset = accuracyMode.chooseDataset(benchmark.taskConfig);
+
     return BenchmarkExportResult(
         benchmarkId: benchmark.id,
         benchmarkName: benchmark.taskConfig.name,
         performance: BenchmarkRunResult(
-          throughput: performance.throughput,
+          throughput: performanceInfo.throughput,
           accuracy: performance.accuracyNormalized < 0.0
               ? null
               : Accuracy(
@@ -500,13 +508,12 @@ class BenchmarkState extends ChangeNotifier {
           measuredDurationMs: performance.durationMs,
           measuredSamples: performance.numSamples,
           startDatetime: performance.startTime,
-          loadgenValidity: performance.validity,
+          loadgenValidity: performanceInfo.loadgenInfo!.validity,
         ),
         accuracy: accuracy == null
             ? null
             : BenchmarkRunResult(
-                throughput:
-                    accuracy.throughput.isFinite ? accuracy.throughput : null,
+                throughput: null,
                 accuracy: accuracy.accuracyNormalized < 0.0
                     ? null
                     : Accuracy(
@@ -529,7 +536,7 @@ class BenchmarkState extends ChangeNotifier {
                 measuredDurationMs: accuracy.durationMs,
                 measuredSamples: accuracy.numSamples,
                 startDatetime: accuracy.startTime,
-                loadgenValidity: accuracy.validity,
+                loadgenValidity: false,
               ),
         minDurationMs: benchmark.taskConfig.minDurationMs.toDouble(),
         minSamples: benchmark.taskConfig.minQueryCount,
@@ -588,9 +595,29 @@ class BenchmarkState extends ChangeNotifier {
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
-    print('Run result: id: ${benchmark.id}, $result, elapsed: $elapsed');
+    const logFileName = 'mlperf_log_detail.txt';
+    final loadgenInfo = await LoadgenLogParser.extractLoadgenInfo(
+      logFile: '$logDir/$logFileName',
+    );
 
-    return RunInfo(settings: runSettings, result: result);
+    double throughput;
+    if (loadgenInfo == null) {
+      throughput = 0.0;
+    } else if (benchmark.info.isOffline) {
+      throughput = result.numSamples / loadgenInfo.latency90;
+    } else {
+      throughput = 1.0 / loadgenInfo.latency90;
+    }
+
+    print(
+        'Run result: id: ${benchmark.id}, $result, throughput: $throughput, elapsed: $elapsed');
+
+    return RunInfo(
+      settings: runSettings,
+      result: result,
+      loadgenInfo: loadgenInfo,
+      throughput: throughput,
+    );
   }
 
   Future<void> abortBenchmarks() async {

@@ -1,5 +1,4 @@
 class RunResult {
-  final double throughput;
   final double accuracyNormalized;
   final String accuracyFormatted;
   final double accuracyNormalized2;
@@ -10,7 +9,6 @@ class RunResult {
   final String backendVendor;
   final String acceleratorName;
   final DateTime startTime;
-  late final bool validity;
 
   RunResult({
     required this.accuracyNormalized,
@@ -22,11 +20,10 @@ class RunResult {
     required this.backendName,
     required this.backendVendor,
     required this.acceleratorName,
-    required this.throughput,
     required this.startTime,
   });
 
   @override
   String toString() =>
-      'RunResult(throughput:$throughput, accuracy:$accuracyFormatted)';
+      'RunResult(accuracy:$accuracyFormatted)';
 }

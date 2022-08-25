@@ -121,7 +121,6 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   }
 
   out->ok = 1;
-  out->latency = driver.ComputeLatency();
   out->num_samples = driver.GetCounter();
   out->duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
