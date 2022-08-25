@@ -231,7 +231,14 @@
                     "type": "string"
                 },
                 "loadgen_info": {
-                    "$ref": "#/definitions/LoadgenInfo"
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/LoadgenInfo"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 }
             },
             "required": [
