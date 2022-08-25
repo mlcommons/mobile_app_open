@@ -69,7 +69,8 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
       return 0.0f;
     }
     if (scenario_ == "Offline") {
-      return GetDurationMs() / latencies_ns_.size();
+      // In offline mode, all reported latencies are the total latency.
+      return static_cast<float>(latencies_ns_[0]) / 1e6 / latencies_ns_.size();
     }
     std::sort(latencies_ns_.begin(), latencies_ns_.end());
     return static_cast<float>(latencies_ns_[latencies_ns_.size() * 0.9]) / 1e6;
@@ -92,20 +93,6 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
   // Forms a string to report the accuracy.
   std::string ComputeAccuracyString() {
     return dataset_->ComputeAccuracyString();
-  }
-
-  // Return the duration reported in ms.
-  float GetDurationMs() {
-    if (scenario_ == "Offline" && !latencies_ns_.empty()) {
-      // In offline mode, all reported latencies are the total latency.
-      return static_cast<float>(latencies_ns_[0]) / 1e6;
-    }
-
-    float result = 0.0f;
-    for (int64_t latency : latencies_ns_) {
-      result += static_cast<float>(latency) / 1e6;
-    }
-    return result;
   }
 
   int32_t GetCounter() { return query_counter_.load(); }
