@@ -24,7 +24,6 @@ import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
-import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/backend/loadgen_log_parser.dart';
 import 'package:mlperfbench/benchmark/info.dart';

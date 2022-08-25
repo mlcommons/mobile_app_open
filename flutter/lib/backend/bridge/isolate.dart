@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:isolate';
 
 import 'package:mlperfbench/backend/bridge/ffi_run.dart' as ffi_run;
