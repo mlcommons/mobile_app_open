@@ -25,7 +25,7 @@ import 'package:wakelock/wakelock.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
-import 'package:mlperfbench/backend/loadgen_log_parser.dart';
+import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
 import 'package:mlperfbench/build_info.dart';
@@ -599,7 +599,7 @@ class BenchmarkState extends ChangeNotifier {
     final elapsed = stopwatch.elapsed;
 
     const logFileName = 'mlperf_log_detail.txt';
-    final loadgenInfo = await LoadgenLogParser.extractLoadgenInfo(
+    final loadgenInfo = await LoadgenInfo.extractLoadgenInfo(
       logFile: '$logDir/$logFileName',
     );
 

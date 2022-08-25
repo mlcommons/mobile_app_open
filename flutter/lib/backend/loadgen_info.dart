@@ -1,7 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 
-class LoadgenLogParser {
+class LoadgenInfo {
+  // Mean latency in seconds
+  final double meanLatency;
+  final int queryCount;
+  // 90th percentile in seconds
+  final double latency90;
+  final bool validity;
+
+  LoadgenInfo({
+    required this.meanLatency,
+    required this.queryCount,
+    required this.latency90,
+    required this.validity,
+  });
+
   static Future<Map<String, dynamic>> parseData({
     required String filepath,
     required Set<String> requiredKeys,
@@ -37,7 +51,7 @@ class LoadgenLogParser {
       const latency90Key = 'result_90.00_percentile_latency_ns';
       const validityKey = 'result_validity';
 
-      final result = await LoadgenLogParser.parseData(
+      final result = await parseData(
         filepath: logFile,
         requiredKeys: {
           latencyKey,
@@ -67,18 +81,4 @@ class LoadgenLogParser {
       return null;
     }
   }
-}
-
-class LoadgenInfo {
-  final double meanLatency;
-  final int queryCount;
-  final double latency90;
-  final bool validity;
-
-  LoadgenInfo({
-    required this.meanLatency,
-    required this.queryCount,
-    required this.latency90,
-    required this.validity,
-  });
 }
