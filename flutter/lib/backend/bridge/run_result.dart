@@ -24,6 +24,5 @@ class RunResult {
   });
 
   @override
-  String toString() =>
-      'RunResult(accuracy:$accuracyFormatted)';
+  String toString() => 'RunResult(accuracy:$accuracyFormatted)';
 }

@@ -2,10 +2,10 @@
 
 #include <google/protobuf/text_format.h>
 
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <mutex>
-#include <chrono>
 
 #include "flutter/cpp/backends/external.h"
 #include "flutter/cpp/datasets/ade20k.h"
@@ -122,7 +122,9 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   out->ok = 1;
   out->num_samples = driver.GetCounter();
-  out->duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+  out->duration_ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+          .count();
 
   out->accuracy_normalized = driver.ComputeAccuracy();
   out->accuracy_formatted = strdup(driver.ComputeAccuracyString().c_str());
