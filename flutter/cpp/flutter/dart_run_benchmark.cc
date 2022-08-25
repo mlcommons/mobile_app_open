@@ -119,7 +119,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   out->ok = 1;
   out->latency = driver.ComputeLatency();
-  out->num_samples = driver.GetNumSamples();
+  out->num_samples = driver.GetCounter();
   out->duration_ms = driver.GetDurationMs();
 
   out->accuracy_normalized = driver.ComputeAccuracy();
