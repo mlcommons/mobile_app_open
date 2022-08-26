@@ -40,11 +40,12 @@ class MyHomePage extends StatelessWidget {
     switch (state.state) {
       case BenchmarkStateEnum.downloading:
       case BenchmarkStateEnum.waiting:
-        appBar = MyAppBar.buildAppBar(stringResources.mainTitle, context, true);
+        appBar = MyAppBar.buildAppBar(
+            stringResources.mainScreenTitle, context, true);
         break;
       case BenchmarkStateEnum.aborting:
-        appBar =
-            MyAppBar.buildAppBar(stringResources.mainTitle, context, false);
+        appBar = MyAppBar.buildAppBar(
+            stringResources.mainScreenTitle, context, false);
         break;
       case BenchmarkStateEnum.running:
         return const ProgressScreen();
@@ -62,7 +63,7 @@ class MyHomePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(30),
               child: Text(
-                stringResources.measureCapability,
+                stringResources.mainScreenMeasureTitle,
                 style: const TextStyle(
                   fontSize: 16,
                   color: AppColors.darkText,
@@ -97,7 +98,7 @@ class MyHomePage extends StatelessWidget {
     final stringResources = AppLocalizations.of(context);
 
     return _circleContainerWithContent(
-        context, AppIcons.waiting, stringResources.waitBenchmarks);
+        context, AppIcons.waiting, stringResources.mainScreenWaitFinish);
   }
 
   Widget _goContainer(BuildContext context) {
@@ -111,14 +112,14 @@ class MyHomePage extends StatelessWidget {
         // TODO (anhappdev) Refactor the code here to avoid duplicated code.
         // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
         final wrongPathError = await state.validateExternalResourcesDirectory(
-            stringResources.incorrectDatasetsPath);
+            stringResources.dialogContentMissingFiles);
         if (wrongPathError.isNotEmpty) {
           await showErrorDialog(context, [wrongPathError]);
           return;
         }
         if (store.offlineMode) {
           final offlineError = await state
-              .validateOfflineMode(stringResources.warningOfflineModeEnabled);
+              .validateOfflineMode(stringResources.dialogContentOfflineWarning);
           if (offlineError.isNotEmpty) {
             switch (await showConfirmDialog(context, offlineError)) {
               case ConfirmDialogAction.ok:
@@ -148,7 +149,7 @@ class MyHomePage extends StatelessWidget {
         style: const TextStyle(color: AppColors.lightText, fontSize: 40));
 
     return _circleContainerWithContent(
-        context, textLabel, stringResources.loadingContent);
+        context, textLabel, stringResources.mainScreenLoading);
   }
 }
 
@@ -205,7 +206,7 @@ class GoButtonGradient extends StatelessWidget {
         shape: const CircleBorder(),
         onPressed: onPressed,
         child: Text(
-          stringResources.go,
+          stringResources.mainScreenGo,
           style: const TextStyle(
             color: AppColors.lightText,
             fontSize: 40,

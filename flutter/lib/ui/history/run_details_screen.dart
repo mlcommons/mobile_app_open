@@ -39,13 +39,13 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
       if (widget.result.performance != null)
         ..._makePerformanceInfo(widget.result.performance!)
       else
-        helper.makeSubHeader(l10n.notAvailable),
+        helper.makeSubHeader(l10n.resultsNotAvailable),
       const Divider(),
       helper.makeHeader(l10n.historyRunDetailsAccuracyTitle),
       if (widget.result.accuracy != null)
         ..._makeAccuracyInfo(widget.result.accuracy!)
       else
-        helper.makeSubHeader(l10n.notAvailable),
+        helper.makeSubHeader(l10n.resultsNotAvailable),
     ];
   }
 
@@ -67,7 +67,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
   List<Widget> _makePerformanceInfo(BenchmarkRunResult perf) {
     return [
       helper.makeInfo(l10n.historyRunDetailsPerfQps,
-          perf.throughput?.toStringAsFixed(2) ?? l10n.notAvailable),
+          perf.throughput?.toStringAsFixed(2) ?? l10n.resultsNotAvailable),
       helper.makeInfo(
           l10n.historyRunDetailsValid, perf.loadgenValidity.toString()),
       helper.makeInfo(l10n.historyRunDetailsDuration,
@@ -83,7 +83,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
   List<Widget> _makeAccuracyInfo(BenchmarkRunResult accuracy) {
     return [
       helper.makeInfo(l10n.historyRunDetailsAccuracy,
-          accuracy.accuracy?.formatted ?? l10n.notAvailable),
+          accuracy.accuracy?.formatted ?? l10n.resultsNotAvailable),
       helper.makeInfo(
         l10n.historyRunDetailsDuration,
         formatDuration(accuracy.measuredDurationMs.ceil()),

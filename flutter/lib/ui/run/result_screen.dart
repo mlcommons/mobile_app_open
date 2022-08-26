@@ -280,8 +280,8 @@ class _ResultScreenState extends State<ResultScreen>
                     indicator: const UnderlineTabIndicator(),
                     indicatorSize: TabBarIndicatorSize.label,
                     tabs: [
-                      Tab(text: stringResources.performance),
-                      Tab(text: stringResources.accuracy),
+                      Tab(text: stringResources.resultsTabTitlePerformance),
+                      Tab(text: stringResources.resultsTabTitleAccuracy),
                     ],
                   ),
                 ),
@@ -305,7 +305,7 @@ class _ResultScreenState extends State<ResultScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                stringResources.detailedResults,
+                stringResources.resultsTitleDetails,
                 textAlign: TextAlign.left,
                 style: const TextStyle(
                     fontSize: 17.0, fontWeight: FontWeight.bold),
@@ -346,14 +346,14 @@ class _ResultScreenState extends State<ResultScreen>
               // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
               final wrongPathError =
                   await state.validateExternalResourcesDirectory(
-                      stringResources.incorrectDatasetsPath);
+                      stringResources.dialogContentMissingFiles);
               if (wrongPathError.isNotEmpty) {
                 await showErrorDialog(context, [wrongPathError]);
                 return;
               }
               if (store.offlineMode) {
                 final offlineError = await state.validateOfflineMode(
-                    stringResources.warningOfflineModeEnabled);
+                    stringResources.dialogContentOfflineWarning);
                 if (offlineError.isNotEmpty) {
                   switch (await showConfirmDialog(context, offlineError)) {
                     case ConfirmDialogAction.ok:
@@ -379,7 +379,7 @@ class _ResultScreenState extends State<ResultScreen>
             child: Padding(
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: Text(
-                stringResources.testAgain,
+                stringResources.resultsButtonTestAgain,
                 style: const TextStyle(
                   fontSize: 20.0,
                   color: AppColors.lightText,
@@ -396,10 +396,10 @@ class _ResultScreenState extends State<ResultScreen>
                       state.resourceManager.resultManager.getLastResult();
                   await Share.share(
                     jsonToStringIndented(result),
-                    subject: stringResources.experimentResultsSubj,
+                    subject: stringResources.resultsShareSubject,
                   );
                 },
-                child: Text(stringResources.shareResults,
+                child: Text(stringResources.resultsButtonShare,
                     style: TextStyle(
                       color: AppColors.shareTextButton,
                       fontSize: 18,
@@ -424,7 +424,7 @@ class _ResultScreenState extends State<ResultScreen>
                     return;
                   }
                 },
-                child: Text(stringResources.uploadButton,
+                child: Text(stringResources.resultsButtonUpload,
                     style: TextStyle(
                       color: AppColors.shareTextButton,
                       fontSize: 18,
@@ -436,9 +436,11 @@ class _ResultScreenState extends State<ResultScreen>
 
     String title;
     title = _screenMode == _ScreenMode.performance
-        ? stringResources.resultsPerformanceTitle
-        : stringResources.resultsAccuracyTitle;
-    title = isOfficialBuild ? title : '${stringResources.unverified} $title';
+        ? stringResources.resultsTitlePerformance
+        : stringResources.resultsTitleAccuracy;
+    title = isOfficialBuild
+        ? title
+        : '${stringResources.resultsTitleUnverified} $title';
 
     return Scaffold(
       appBar: MyAppBar.buildAppBar(title, context, true),

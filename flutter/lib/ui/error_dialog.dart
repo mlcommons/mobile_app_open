@@ -36,7 +36,7 @@ Future<void> showPopupDialog(BuildContext context, String header,
         actions: [
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(stringResources.ok))
+              child: Text(stringResources.dialogOk))
         ],
       );
     },
@@ -46,12 +46,12 @@ Future<void> showPopupDialog(BuildContext context, String header,
 Future<void> showErrorDialog(BuildContext context, List<String> errors) async {
   final stringResources = AppLocalizations.of(context);
   await showPopupDialog(
-      context, stringResources.errorDialogTitle, AppIcons.error, errors);
+      context, stringResources.dialogTitleError, AppIcons.error, errors);
 }
 
 Future<void> showSuccessDialog(
     BuildContext context, List<String> errors) async {
   final stringResources = AppLocalizations.of(context);
   await showPopupDialog(
-      context, stringResources.successDialogTitle, null, errors);
+      context, stringResources.dialogTitleSuccess, null, errors);
 }

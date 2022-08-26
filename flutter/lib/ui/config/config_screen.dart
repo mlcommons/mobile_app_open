@@ -47,7 +47,7 @@ class _ConfigScreen extends State<ConfigScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          stringResources.configTitle,
+          stringResources.benchConfigTitle,
         ),
       ),
       body: ListView(
