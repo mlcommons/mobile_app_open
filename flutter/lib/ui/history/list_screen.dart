@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/history/app_bar_content.dart';
 import 'package:mlperfbench/ui/history/history_tab.dart';
-import 'package:mlperfbench/ui/history/list_tab.dart';
 import 'package:mlperfbench/ui/history/online_tab.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 
@@ -24,12 +24,7 @@ class _ListScreenState extends State<ListScreen> {
       setState(() {});
     },
   );
-  late OnlineTab online = OnlineTab(
-    pushAppBar: (AppBarContent? appBar) {
-      pushedAppBar = appBar;
-      setState(() {});
-    },
-  );
+  late OnlineTab online = const OnlineTab();
 
   @override
   Widget build(BuildContext context) {

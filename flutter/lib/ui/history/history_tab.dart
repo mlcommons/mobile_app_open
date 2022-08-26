@@ -6,19 +6,17 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
-import 'package:mlperfbench/ui/history/list_tab.dart';
+import 'package:mlperfbench/ui/history/app_bar_content.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
 
 class HistoryTab extends StatefulWidget {
   final void Function(AppBarContent? appBar) pushAppBar;
 
-  HistoryTab({
+  const HistoryTab({
     Key? key,
     required this.pushAppBar,
-  }) : super(key: key) {
-    print('HistoryTab ctor');
-  }
+  }) : super(key: key);
 
   @override
   _HistoryTab createState() => _HistoryTab();
@@ -40,10 +38,6 @@ class _HistoryTab extends State<HistoryTab>
   bool isSelectionMode = false;
   List<bool>? selected;
   bool isSelectAll = false;
-
-  _HistoryTab() {
-    print('HistoryTab state ctor');
-  }
 
   void resetSelection(bool value) {
     selected = List<bool>.generate(itemList.length, (_) => value);
@@ -178,12 +172,10 @@ class _HistoryTab extends State<HistoryTab>
             },
       onLongPress: isSelectionMode
           ? null
-          : () {
-              setState(() {
+          : () => setState(() {
                 enableSelection();
                 _toggleSelection(index);
-              });
-            },
+              }),
     );
   }
 

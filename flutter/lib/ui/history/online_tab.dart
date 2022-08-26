@@ -6,19 +6,13 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/ui/history/list_tab.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
 
 class OnlineTab extends StatefulWidget {
-  final void Function(AppBarContent? appBar) pushAppBar;
-
-  OnlineTab({
+  const OnlineTab({
     Key? key,
-    required this.pushAppBar,
-  }) : super(key: key) {
-    print('OnlineTab ctor');
-  }
+  }) : super(key: key);
 
   @override
   _OnlineTab createState() {
@@ -43,10 +37,6 @@ class _OnlineTab extends State<OnlineTab>
   String currentStartUuid = '';
   bool isFetching = false;
   String error = '';
-
-  _OnlineTab() {
-    print('OnlineTab state ctor');
-  }
 
   @override
   void initState() {
