@@ -23,7 +23,8 @@ class _SettingsScreen extends State<SettingsScreen> {
   void _showUnableSpecifyConfigurationMessage(
       BuildContext context, AppLocalizations stringResources) {
     if (!_isSnackBarShowing) {
-      final snackBar = getSnackBar(stringResources.unableSpecifyConfiguration);
+      final snackBar =
+          getSnackBar(stringResources.settingsUnableSpecifyConfiguration);
 
       ScaffoldMessenger.of(context)
           .showSnackBar(snackBar)
@@ -57,10 +58,10 @@ class _SettingsScreen extends State<SettingsScreen> {
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: Text(
-                stringResources.sharing,
+                stringResources.settingsShare,
               ),
             ),
-            subtitle: Text(stringResources.sharingSubtitle),
+            subtitle: Text(stringResources.settingsShareSubtitle),
             trailing: Switch(
                 value: store.share,
                 onChanged: (flag) {
@@ -71,10 +72,10 @@ class _SettingsScreen extends State<SettingsScreen> {
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: Text(
-                stringResources.offlineMode,
+                stringResources.settingsOffline,
               ),
             ),
-            subtitle: Text(stringResources.offlineModeSubtitle),
+            subtitle: Text(stringResources.settingsOfflineSubtitle),
             trailing: Switch(
               value: store.offlineMode,
               onChanged: (flag) {
@@ -86,10 +87,10 @@ class _SettingsScreen extends State<SettingsScreen> {
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: Text(
-                stringResources.submissionMode,
+                stringResources.settingsSubmission,
               ),
             ),
-            subtitle: Text(stringResources.submissionModeSubtitle),
+            subtitle: Text(stringResources.settingsSubmissionSubtitle),
             trailing: Switch(
               value: store.submissionMode,
               onChanged: (flag) {
@@ -116,10 +117,10 @@ class _SettingsScreen extends State<SettingsScreen> {
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: Text(
-                stringResources.cooldown,
+                stringResources.settingsCooldown,
               ),
             ),
-            subtitle: Text(stringResources.cooldownSubtitle.replaceAll(
+            subtitle: Text(stringResources.settingsCooldownSubtitle.replaceAll(
                 '<cooldownPause>', store.cooldownDuration.toString())),
             trailing: Switch(
                 value: store.cooldown,
@@ -144,14 +145,14 @@ class _SettingsScreen extends State<SettingsScreen> {
           const Divider(),
           ListTile(
             title: Text(
-              stringResources.privacyPolicy,
+              stringResources.settingsPrivacyPolicy,
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () =>
                 launchUrl(Uri.parse('https://mlcommons.org/mobile_privacy')),
           ),
           ListTile(
-            title: Text(stringResources.eula),
+            title: Text(stringResources.settingsEula),
             trailing: const Icon(Icons.chevron_right),
             onTap: () =>
                 launchUrl(Uri.parse('https://mlcommons.org/mobile_eula')),
@@ -161,7 +162,7 @@ class _SettingsScreen extends State<SettingsScreen> {
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: Text(
-                stringResources.taskConfigSettingsEntry,
+                stringResources.settingsTaskConfigTitle,
               ),
             ),
             trailing: const Icon(Icons.chevron_right),
@@ -185,7 +186,7 @@ class _SettingsScreen extends State<SettingsScreen> {
             ),
             onPressed: () async {
               switch (await showConfirmDialog(
-                  context, stringResources.confirmClearCache)) {
+                  context, stringResources.settingsClearCacheConfirm)) {
                 case ConfirmDialogAction.ok:
                   await state.clearCache();
                   Navigator.pop(context);
@@ -196,7 +197,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                   break;
               }
             },
-            child: Text(stringResources.clearCache),
+            child: Text(stringResources.settingsClearCache),
           ),
         ],
       ),

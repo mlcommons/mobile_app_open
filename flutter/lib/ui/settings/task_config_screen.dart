@@ -37,8 +37,10 @@ class TaskConfigScreen extends StatelessWidget {
             Navigator.of(context).popUntil((route) => route.isFirst);
             await state.loadResources();
           } catch (e) {
-            await showErrorDialog(
-                context, <String>[stringResources.errorConfig, e.toString()]);
+            await showErrorDialog(context, <String>[
+              stringResources.settingsTaskConfigError,
+              e.toString()
+            ]);
           }
         },
       ),
@@ -52,7 +54,7 @@ class TaskConfigScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(stringResources.taskConfigSettingsEntry),
+        title: Text(stringResources.settingsTaskConfigTitle),
       ),
       body: ListView.builder(
         itemCount: _configs.length,

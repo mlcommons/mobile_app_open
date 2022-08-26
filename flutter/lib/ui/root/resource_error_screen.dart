@@ -73,7 +73,7 @@ class ResourceErrorScreen extends StatelessWidget {
                         onPressed: () {
                           state.clearCache();
                         },
-                        child: Text(stringResources.clearCache),
+                        child: Text(stringResources.settingsClearCache),
                       ),
                       TextButton(
                         onPressed: () async {

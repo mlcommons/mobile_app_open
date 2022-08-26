@@ -20,8 +20,8 @@ class TaskConfigDescription {
   TaskConfigDescription(this.name, this.path);
 
   String getType(AppLocalizations stringResources) => isInternetResource(path)
-      ? stringResources.internetResource
-      : stringResources.localResource;
+      ? stringResources.settingsTaskConfigInternetResource
+      : stringResources.settingsTaskConfigLocalResource;
 
   Map<String, String> asMap() => {name: path};
 }
