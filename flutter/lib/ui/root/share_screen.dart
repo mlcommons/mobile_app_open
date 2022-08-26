@@ -62,7 +62,8 @@ class ShareScreen extends StatelessWidget {
                               padding: const EdgeInsets.fromLTRB(35, 0, 35, 0),
                               child: Align(
                                   alignment: Alignment.topCenter,
-                                  child: Text(stringResources.privacyPrompt,
+                                  child: Text(
+                                      stringResources.shareScreenPrivacyPrompt,
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                           fontSize: 15,
@@ -94,7 +95,7 @@ class ShareScreen extends StatelessWidget {
                                   padding:
                                       const EdgeInsets.fromLTRB(0, 10, 0, 10),
                                   child: Text(
-                                    stringResources.share,
+                                    stringResources.shareScreenShare,
                                     style: const TextStyle(
                                         fontSize: 20,
                                         color: AppColors.lightText),
@@ -114,7 +115,7 @@ class ShareScreen extends StatelessWidget {
                                 );
                               },
                               child: Text(
-                                stringResources.dontShare,
+                                stringResources.shareScreenDontShare,
                                 style: TextStyle(
                                   color: AppColors.shareTextButton,
                                   fontSize: 18,
@@ -127,12 +128,13 @@ class ShareScreen extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(35, 20, 35, 20),
                       child: RichText(
                         text: TextSpan(
-                          text: stringResources.promptSubText,
+                          text: stringResources.shareScreenPromptSubText,
                           style:
                               const TextStyle(fontSize: 13, color: Colors.grey),
                           children: [
                             TextSpan(
-                              text: stringResources.privacyPolicyButton,
+                              text: stringResources
+                                  .shareScreenPrivacyPolicyButton,
                               style: TextStyle(
                                   fontSize: 13,
                                   color: AppColors.shareTextButton),
