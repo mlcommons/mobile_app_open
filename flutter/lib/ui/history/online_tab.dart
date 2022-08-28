@@ -18,6 +18,10 @@ class OnlineTab extends StatefulWidget {
   _OnlineTab createState() {
     return _OnlineTab();
   }
+
+  List<Widget>? getBarButtons(AppLocalizations l10n) {
+    return [];
+  }
 }
 
 class _OnlineTab extends State<OnlineTab>

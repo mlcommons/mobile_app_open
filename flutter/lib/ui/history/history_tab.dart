@@ -13,13 +13,24 @@ import 'result_details_screen.dart';
 class HistoryTab extends StatefulWidget {
   final void Function(AppBarContent? appBar) pushAppBar;
 
-  const HistoryTab({
+  HistoryTab({
     Key? key,
     required this.pushAppBar,
   }) : super(key: key);
 
   @override
   _HistoryTab createState() => _HistoryTab();
+
+  void Function() enableSelection = () {};
+
+  List<Widget>? getBarButtons(AppLocalizations l10n) {
+    final enableSelectionButton = IconButton(
+      icon: const Icon(Icons.check_box_outlined),
+      tooltip: l10n.historyListSelectionEnable,
+      onPressed: () => enableSelection(),
+    );
+    return [enableSelectionButton];
+  }
 }
 
 class _HistoryTab extends State<HistoryTab>
@@ -34,6 +45,13 @@ class _HistoryTab extends State<HistoryTab>
   bool isSelectionMode = false;
   List<bool>? selected;
   bool isSelectAll = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.enableSelection = enableSelection;
+  }
 
   void resetSelection(bool value) {
     selected = List<bool>.generate(itemList.length, (_) => value);
@@ -79,7 +97,6 @@ class _HistoryTab extends State<HistoryTab>
     },
   );
 
-  // TODO disable linter for functions in variables?
   void enableSelection() {
     isSelectionMode = true;
     widget.pushAppBar(AppBarContent(
@@ -88,12 +105,6 @@ class _HistoryTab extends State<HistoryTab>
       reset: () => setState(() => disableSelectionMode()),
     ));
   }
-
-  late final enableSelectionButton = IconButton(
-    icon: const Icon(Icons.check_box_outlined),
-    tooltip: l10n.historyListSelectionEnable,
-    onPressed: enableSelection,
-  );
 
   @override
   Widget build(BuildContext context) {

@@ -18,9 +18,13 @@ class ListScreen extends StatefulWidget {
   }
 }
 
-class _ListScreenState extends State<ListScreen> {
+class _ListScreenState extends State<ListScreen>
+    with SingleTickerProviderStateMixin {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
+
+  late final TabController _tabController;
+  int _selectedIndex = 0;
 
   AppBarContent? pushedAppBar;
 
@@ -31,6 +35,14 @@ class _ListScreenState extends State<ListScreen> {
     },
   );
   late OnlineTab online = const OnlineTab();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() => setState(() {}));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,34 +68,35 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   Widget _makeTabbedPage() {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: helper.makeAppBar(
-          l10n.listScreenTitleMain,
-          leading: pushedAppBar?.leading,
-          actions: pushedAppBar?.trailing,
-          bottom: pushedAppBar != null
-              ? const TabBar(
-                  tabs: [SizedBox.shrink(), SizedBox.shrink()],
-                  indicatorColor: Colors.transparent,
-                )
-              : TabBar(
-                  tabs: [
-                    Tab(text: l10n.listScreenTitleLocal),
-                    Tab(text: l10n.listScreenTitleOnline),
-                  ],
-                ),
-        ),
-        body: TabBarView(
-          children: [
-            history,
-            online,
-          ],
-          physics: pushedAppBar == null
-              ? null
-              : const NeverScrollableScrollPhysics(),
-        ),
+    final buttons = _tabController.index == 0
+        ? history.getBarButtons(l10n)
+        : online.getBarButtons(l10n);
+    return Scaffold(
+      appBar: helper.makeAppBar(
+        l10n.listScreenTitleMain,
+        leading: pushedAppBar?.leading,
+        actions: pushedAppBar?.trailing ?? buttons,
+        bottom: pushedAppBar != null
+            ? const TabBar(
+                tabs: [SizedBox.shrink(), SizedBox.shrink()],
+                indicatorColor: Colors.transparent,
+              )
+            : TabBar(
+                tabs: [
+                  Tab(text: l10n.listScreenTitleLocal),
+                  Tab(text: l10n.listScreenTitleOnline),
+                ],
+                controller: _tabController,
+              ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          history,
+          online,
+        ],
+        physics:
+            pushedAppBar == null ? null : const NeverScrollableScrollPhysics(),
       ),
     );
   }
