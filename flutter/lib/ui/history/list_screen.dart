@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mlperfbench/benchmark/state.dart';
 
+import 'package:provider/provider.dart';
+
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/app_bar_content.dart';
 import 'package:mlperfbench/ui/history/history_tab.dart';
 import 'package:mlperfbench/ui/history/online_tab.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
-import 'package:provider/provider.dart';
 
 class ListScreen extends StatefulWidget {
   const ListScreen({Key? key}) : super(key: key);
