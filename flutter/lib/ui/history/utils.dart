@@ -99,13 +99,17 @@ class HistoryHelperUtils {
     Widget? trailing,
     void Function()? onTap,
     void Function()? onLongPress,
+    bool specialTitleColor = false,
   }) {
     return ListTile(
       title: Padding(
         padding: const EdgeInsets.only(bottom: 5),
         child: Text(
           title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: specialTitleColor ? AppColors.darkRedText : null,
+          ),
         ),
       ),
       subtitle: subtitle.isEmpty

@@ -149,6 +149,8 @@ class _HistoryTab extends State<HistoryTab>
 
     return helper.makeListItem(
       title: helper.formatDate(startDatetime.toLocal()),
+      specialTitleColor: results.list
+          .any((runRes) => !(runRes.performance?.loadgenValidity ?? false)),
       trailing: isSelectionMode
           ? Checkbox(
               value: isSelected,
