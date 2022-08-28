@@ -20,10 +20,6 @@ class HistoryTab extends StatefulWidget {
 
   @override
   _HistoryTab createState() => _HistoryTab();
-
-  String getTabName() {
-    return 'local';
-  }
 }
 
 class _HistoryTab extends State<HistoryTab>
@@ -87,7 +83,6 @@ class _HistoryTab extends State<HistoryTab>
   void enableSelection() {
     isSelectionMode = true;
     widget.pushAppBar(AppBarContent(
-      title: 'local',
       leading: cancelSelection,
       trailing: [delete, selectAll],
       reset: () => setState(() => disableSelectionMode()),

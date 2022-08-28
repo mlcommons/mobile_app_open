@@ -18,10 +18,6 @@ class OnlineTab extends StatefulWidget {
   _OnlineTab createState() {
     return _OnlineTab();
   }
-
-  String getTabName() {
-    return 'online';
-  }
 }
 
 class _OnlineTab extends State<OnlineTab>
@@ -70,8 +66,8 @@ class _OnlineTab extends State<OnlineTab>
     if (fm == null) {
       // this widget shold never be displayed access to online results
       // but let's handle the lack of firebase access gracefully
-      return const Center(
-        child: Text('Online results are unavailable'),
+      return Center(
+        child: Text(l10n.listScreenOnlineDisabled),
       );
     }
 
@@ -95,7 +91,7 @@ class _OnlineTab extends State<OnlineTab>
 
     if (itemList.isEmpty) {
       return Center(
-        child: Text('Online results are empty'),
+        child: Text(l10n.listScreenNoResultsFound),
       );
     }
 

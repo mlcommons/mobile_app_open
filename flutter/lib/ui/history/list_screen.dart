@@ -59,7 +59,7 @@ class _ListScreenState extends State<ListScreen> {
       length: 2,
       child: Scaffold(
         appBar: helper.makeAppBar(
-          'Results',
+          l10n.listScreenTitleMain,
           leading: pushedAppBar?.leading,
           actions: pushedAppBar?.trailing,
           bottom: pushedAppBar != null
@@ -69,8 +69,8 @@ class _ListScreenState extends State<ListScreen> {
                 )
               : TabBar(
                   tabs: [
-                    Tab(text: history.getTabName()),
-                    Tab(text: online.getTabName()),
+                    Tab(text: l10n.listScreenTitleLocal),
+                    Tab(text: l10n.listScreenTitleOnline),
                   ],
                 ),
         ),
@@ -90,7 +90,7 @@ class _ListScreenState extends State<ListScreen> {
   Widget _makeOfflinePage() {
     return Scaffold(
       appBar: helper.makeAppBar(
-        'Past results',
+        l10n.historyListTitle,
         leading: pushedAppBar?.leading,
         actions: pushedAppBar?.trailing,
       ),
