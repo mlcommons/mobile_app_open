@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mlperfbench/benchmark/state.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/app_bar_content.dart';
 import 'package:mlperfbench/ui/history/history_tab.dart';
 import 'package:mlperfbench/ui/history/online_tab.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
+import 'package:provider/provider.dart';
 
 class ListScreen extends StatefulWidget {
   const ListScreen({Key? key}) : super(key: key);
@@ -16,6 +18,9 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
+  late AppLocalizations l10n;
+  late HistoryHelperUtils helper;
+
   AppBarContent? pushedAppBar;
 
   late HistoryTab history = HistoryTab(
@@ -28,44 +33,14 @@ class _ListScreenState extends State<ListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    HistoryHelperUtils helper;
-    final l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context);
     helper = HistoryHelperUtils(l10n);
 
+    final state = context.watch<BenchmarkState>();
+    final isOnlineEnabled = state.firebaseManager != null;
+
     return WillPopScope(
-      child: DefaultTabController(
-        length: 2,
-        child: Builder(builder: (BuildContext context) {
-          // final index = DefaultTabController.of(context)!.index;
-          return Scaffold(
-            appBar: helper.makeAppBar(
-              'Results',
-              leading: pushedAppBar?.leading,
-              actions: pushedAppBar?.trailing,
-              bottom: pushedAppBar != null
-                  ? const TabBar(
-                      tabs: [SizedBox.shrink(), SizedBox.shrink()],
-                      indicatorColor: Colors.transparent,
-                    )
-                  : TabBar(
-                      tabs: [
-                        Tab(text: history.getTabName()),
-                        Tab(text: online.getTabName()),
-                      ],
-                    ),
-            ),
-            body: TabBarView(
-              children: [
-                history,
-                online,
-              ],
-              physics: pushedAppBar == null
-                  ? null
-                  : const NeverScrollableScrollPhysics(),
-            ),
-          );
-        }),
-      ),
+      child: isOnlineEnabled ? _makeTabbedPage() : _makeOfflinePage(),
       onWillPop: () async {
         if (pushedAppBar == null) {
           return true;
@@ -76,6 +51,50 @@ class _ListScreenState extends State<ListScreen> {
         });
         return false;
       },
+    );
+  }
+
+  Widget _makeTabbedPage() {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: helper.makeAppBar(
+          'Results',
+          leading: pushedAppBar?.leading,
+          actions: pushedAppBar?.trailing,
+          bottom: pushedAppBar != null
+              ? const TabBar(
+                  tabs: [SizedBox.shrink(), SizedBox.shrink()],
+                  indicatorColor: Colors.transparent,
+                )
+              : TabBar(
+                  tabs: [
+                    Tab(text: history.getTabName()),
+                    Tab(text: online.getTabName()),
+                  ],
+                ),
+        ),
+        body: TabBarView(
+          children: [
+            history,
+            online,
+          ],
+          physics: pushedAppBar == null
+              ? null
+              : const NeverScrollableScrollPhysics(),
+        ),
+      ),
+    );
+  }
+
+  Widget _makeOfflinePage() {
+    return Scaffold(
+      appBar: helper.makeAppBar(
+        'Past results',
+        leading: pushedAppBar?.leading,
+        actions: pushedAppBar?.trailing,
+      ),
+      body: history,
     );
   }
 }

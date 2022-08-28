@@ -68,8 +68,9 @@ class _OnlineTab extends State<OnlineTab>
 
     final fm = state.firebaseManager;
     if (fm == null) {
-      // TODO remove online tab when online is disabled
-      return Center(
+      // this widget shold never be displayed access to online results
+      // but let's handle the lack of firebase access gracefully
+      return const Center(
         child: Text('Online results are unavailable'),
       );
     }
