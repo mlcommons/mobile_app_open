@@ -119,6 +119,7 @@ class _OnlineTab extends State<OnlineTab>
 
     return helper.makeListItem(
       title: helper.formatDate(startDatetime.toLocal()),
+      subtitle: item.envInfo.model,
       onTap: () {
         Navigator.push(
           context,
