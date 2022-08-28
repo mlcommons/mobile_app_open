@@ -103,7 +103,6 @@
   "listScreenNoResultsFound": "No results found",
 
   "historyListTitle": "Past results",
-  "historyListElementSubtitle": "Average QPS <throughput> over <benchmarks#> benchmark(s)",
   "historyListSelectionCancel": "Cancel",
   "historyListSelectionEnable": "Enable selection",
   "historyListSelectionSelectAll": "Select all",
