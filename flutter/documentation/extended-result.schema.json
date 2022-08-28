@@ -162,7 +162,7 @@
                     ]
                 },
                 "min_duration_ms": {
-                    "type": "number"
+                    "type": "integer"
                 },
                 "min_samples": {
                     "type": "integer"
