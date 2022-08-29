@@ -48,46 +48,48 @@ class _ListScreenState extends State<ListScreen>
     l10n = AppLocalizations.of(context);
     helper = HistoryHelperUtils(l10n);
 
-    final state = context.watch<BenchmarkState>();
-    final isOnlineEnabled = state.firebaseManager != null;
-
-    if (tabs.isEmpty) {
-      tabs.add(HistoryTab(
-        pushAppBar: (AppBarContent? appBar) {
-          pushedAppBar = appBar;
-          triggerRebuild(null);
-        },
-        state: state,
-        triggerRebuild: triggerRebuild,
-      ));
-      if (isOnlineEnabled) {
-        tabs.add(OnlineTab(
-          state: state,
-          triggerRebuild: triggerRebuild,
-        ));
-      }
-    }
+    initTabs(context);
 
     return WillPopScope(
-      child: isOnlineEnabled ? _makeTabbedPage(context) : _makeOfflinePage(),
+      child: tabs.length > 1 ? _makeTabbedPage(context) : _makeSingleTabPage(),
       onWillPop: () async {
         if (pushedAppBar == null) {
           return true;
         }
-        setState(() {
-          pushedAppBar!.reset();
-          pushedAppBar = null;
-        });
+        cancelAction();
         return false;
       },
     );
+  }
+
+  void initTabs(BuildContext context) {
+    if (tabs.isNotEmpty) return;
+
+    final state = context.watch<BenchmarkState>();
+
+    tabs.add(HistoryTab(
+      pushAppBar: (AppBarContent? appBar) {
+        pushedAppBar = appBar;
+        triggerRebuild(null);
+      },
+      state: state,
+      triggerRebuild: triggerRebuild,
+    ));
+
+    final isOnlineEnabled = state.firebaseManager != null;
+    if (isOnlineEnabled) {
+      tabs.add(OnlineTab(
+        state: state,
+        triggerRebuild: triggerRebuild,
+      ));
+    }
   }
 
   Widget _makeTabbedPage(BuildContext context) {
     return Scaffold(
       appBar: helper.makeAppBar(
         l10n.listScreenTitleMain,
-        leading: pushedAppBar?.leading,
+        leading: _makeCancelButton(),
         actions: pushedAppBar?.trailing ??
             tabs[_tabController.index].getBarButtons(l10n),
         bottom: pushedAppBar != null
@@ -110,14 +112,30 @@ class _ListScreenState extends State<ListScreen>
     );
   }
 
-  Widget _makeOfflinePage() {
+  Widget _makeSingleTabPage() {
     return Scaffold(
       appBar: helper.makeAppBar(
         l10n.historyListTitle,
-        leading: pushedAppBar?.leading,
+        leading: _makeCancelButton(),
         actions: pushedAppBar?.trailing,
       ),
       body: tabs.first.build(context),
     );
+  }
+
+  Widget? _makeCancelButton() {
+    if (pushedAppBar == null) return null;
+    return IconButton(
+      icon: const Icon(Icons.close),
+      tooltip: l10n.historyListSelectionCancel,
+      onPressed: cancelAction,
+    );
+  }
+
+  void cancelAction() {
+    triggerRebuild(() {
+      pushedAppBar!.reset();
+      pushedAppBar = null;
+    });
   }
 }

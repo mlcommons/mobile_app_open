@@ -72,12 +72,6 @@ class HistoryTab implements TabInterface {
     selected = List<bool>.generate(itemList.length, (_) => value);
   }
 
-  late final cancelSelection = IconButton(
-    icon: const Icon(Icons.close),
-    tooltip: l10n.historyListSelectionCancel,
-    onPressed: () => triggerRebuild(() => disableSelectionMode()),
-  );
-
   late final selectAll = IconButton(
     icon: Icon(isSelectAll ? Icons.deselect : Icons.select_all),
     tooltip: isSelectAll
@@ -116,7 +110,6 @@ class HistoryTab implements TabInterface {
   void enableSelection() {
     isSelectionMode = true;
     pushAppBar(AppBarContent(
-      leading: cancelSelection,
       trailing: [delete, selectAll],
       reset: () => triggerRebuild(() => disableSelectionMode()),
     ));
@@ -129,7 +122,7 @@ class HistoryTab implements TabInterface {
     pushAppBar(null);
   }
 
-  void _toggleSelection(int index) {
+  void toggleSelectionForItem(int index) {
     if (isSelectionMode) {
       triggerRebuild(() {
         selected![index] = !selected![index];
@@ -155,11 +148,11 @@ class HistoryTab implements TabInterface {
       trailing: isSelectionMode
           ? Checkbox(
               value: isSelected,
-              onChanged: (bool? x) => _toggleSelection(index),
+              onChanged: (bool? x) => toggleSelectionForItem(index),
             )
           : null,
       onTap: isSelectionMode
-          ? () => _toggleSelection(index)
+          ? () => toggleSelectionForItem(index)
           : () {
               Navigator.push(
                 context,
@@ -172,7 +165,7 @@ class HistoryTab implements TabInterface {
           ? null
           : () => triggerRebuild(() {
                 enableSelection();
-                _toggleSelection(index);
+                toggleSelectionForItem(index);
               }),
     );
   }
