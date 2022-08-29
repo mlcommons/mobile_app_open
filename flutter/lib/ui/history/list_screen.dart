@@ -95,9 +95,10 @@ class _ListScreenState extends State<ListScreen>
         leading: pushedAppBar?.leading,
         actions: pushedAppBar?.trailing ?? buttons,
         bottom: pushedAppBar != null
-            ? const TabBar(
-                tabs: [SizedBox.shrink(), SizedBox.shrink()],
+            ? TabBar(
+                tabs: const [SizedBox.shrink(), SizedBox.shrink()],
                 indicatorColor: Colors.transparent,
+                controller: _tabController,
               )
             : TabBar(
                 tabs: [
