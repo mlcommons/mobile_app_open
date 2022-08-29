@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/firebase/cache_helper.dart';
-import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -16,7 +15,7 @@ class OnlineTab {
   final List<ExtendedResult> itemList = [];
 
   final BenchmarkState state;
-  final void Function() triggerRebuild;
+  final void Function(void Function()? action) triggerRebuild;
 
   FirebaseCacheHelper? cacheHelper;
   String currentStartUuid = '';
@@ -27,22 +26,6 @@ class OnlineTab {
     required this.state,
     required this.triggerRebuild,
   });
-
-  List<Widget>? getBarButtons(AppLocalizations l10n) {
-    return [];
-  }
-
-  Future<void> fetchData() async {
-    isFetching = true;
-    try {
-      await cacheHelper!.fetchBatch(from: currentStartUuid);
-    } catch (e, t) {
-      print(e);
-      print(t);
-    }
-    isFetching = false;
-    triggerRebuild();
-  }
 
   Widget build(BuildContext context) {
     l10n = AppLocalizations.of(context);
@@ -93,6 +76,22 @@ class OnlineTab {
     );
   }
 
+  List<Widget>? getBarButtons(AppLocalizations l10n) {
+    return null;
+  }
+
+  Future<void> fetchData() async {
+    isFetching = true;
+    try {
+      await cacheHelper!.fetchBatch(from: currentStartUuid);
+    } catch (e, t) {
+      print(e);
+      print(t);
+    }
+    isFetching = false;
+    triggerRebuild(null);
+  }
+
   Widget _makeItem(
     BuildContext context,
     int index,
@@ -118,7 +117,4 @@ class OnlineTab {
       },
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

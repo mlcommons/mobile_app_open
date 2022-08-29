@@ -24,16 +24,15 @@ class _ListScreenState extends State<ListScreen>
   late HistoryHelperUtils helper;
 
   late final TabController _tabController;
-  int _selectedIndex = 0;
 
   AppBarContent? pushedAppBar;
 
   HistoryTab? history;
   OnlineTab? online;
 
-  void triggerRebuild(void Function() action) {
+  void triggerRebuild(void Function()? action) {
     if (!mounted) return;
-    action.call();
+    action?.call();
     setState(() {});
   }
 
@@ -56,9 +55,7 @@ class _ListScreenState extends State<ListScreen>
     if (isOnlineEnabled) {
       online ??= OnlineTab(
         state: state,
-        triggerRebuild: () {
-          if (mounted) setState(() {});
-        },
+        triggerRebuild: triggerRebuild,
       );
     }
     history ??= HistoryTab(

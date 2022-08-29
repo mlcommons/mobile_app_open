@@ -18,12 +18,38 @@ class HistoryTab {
   late HistoryHelperUtils helper;
 
   late List<ExtendedResult> itemList;
+  bool isSelectionMode = false;
+  List<bool>? selected;
+  bool isSelectAll = false;
 
   HistoryTab({
     required this.pushAppBar,
     required this.triggerRebuild,
     required this.state,
   });
+
+  Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
+    helper = HistoryHelperUtils(l10n);
+
+    itemList = state.resourceManager.resultManager.results;
+    if (selected == null) {
+      resetSelection(false);
+    }
+
+    delete = _makeDeleteButton(context);
+
+    return ListView.separated(
+      controller: ScrollController(),
+      padding: const EdgeInsets.only(top: 20),
+      itemCount: itemList.length,
+      separatorBuilder: (context, index) => const Divider(),
+      itemBuilder: (context, index) {
+        final uiIndex = itemList.length - index - 1;
+        return _makeListItem(context, uiIndex);
+      },
+    );
+  }
 
   List<Widget>? getBarButtons(AppLocalizations l10n) {
     final enableSelectionButton = IconButton(
@@ -33,10 +59,6 @@ class HistoryTab {
     );
     return [enableSelectionButton];
   }
-
-  bool isSelectionMode = false;
-  List<bool>? selected;
-  bool isSelectAll = false;
 
   void resetSelection(bool value) {
     selected = List<bool>.generate(itemList.length, (_) => value);
@@ -92,30 +114,6 @@ class HistoryTab {
     ));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
-    helper = HistoryHelperUtils(l10n);
-
-    itemList = state.resourceManager.resultManager.results;
-    if (selected == null) {
-      resetSelection(false);
-    }
-
-    delete = _makeDeleteButton(context);
-
-    return ListView.separated(
-      controller: ScrollController(),
-      padding: const EdgeInsets.only(top: 20),
-      itemCount: itemList.length,
-      separatorBuilder: (context, index) => const Divider(),
-      itemBuilder: (context, index) {
-        final uiIndex = itemList.length - index - 1;
-        return _makeItem(context, uiIndex);
-      },
-    );
-  }
-
   void disableSelectionMode() {
     isSelectionMode = false;
     isSelectAll = false;
@@ -131,7 +129,7 @@ class HistoryTab {
     }
   }
 
-  Widget _makeItem(
+  Widget _makeListItem(
     BuildContext context,
     int index,
   ) {
@@ -170,7 +168,4 @@ class HistoryTab {
               }),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
