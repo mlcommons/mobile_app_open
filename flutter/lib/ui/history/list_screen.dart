@@ -28,13 +28,14 @@ class _ListScreenState extends State<ListScreen>
 
   AppBarContent? pushedAppBar;
 
-  late HistoryTab history = HistoryTab(
-    pushAppBar: (AppBarContent? appBar) {
-      pushedAppBar = appBar;
-      setState(() {});
-    },
-  );
+  HistoryTab? history;
   OnlineTab? online;
+
+  void triggerRebuild(void Function() action) {
+    if (!mounted) return;
+    action.call();
+    setState(() {});
+  }
 
   @override
   void initState() {
@@ -60,6 +61,14 @@ class _ListScreenState extends State<ListScreen>
         },
       );
     }
+    history ??= HistoryTab(
+      pushAppBar: (AppBarContent? appBar) {
+        pushedAppBar = appBar;
+        setState(() {});
+      },
+      state: state,
+      triggerRebuild: triggerRebuild,
+    );
 
     return WillPopScope(
       child: isOnlineEnabled ? _makeTabbedPage(context) : _makeOfflinePage(),
@@ -78,7 +87,7 @@ class _ListScreenState extends State<ListScreen>
 
   Widget _makeTabbedPage(BuildContext context) {
     final buttons = _tabController.index == 0
-        ? history.getBarButtons(l10n)
+        ? history!.getBarButtons(l10n)
         : online!.getBarButtons(l10n);
     return Scaffold(
       appBar: helper.makeAppBar(
@@ -101,7 +110,7 @@ class _ListScreenState extends State<ListScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          history,
+          history!.build(context),
           online!.build(context),
         ],
         physics:
@@ -117,7 +126,7 @@ class _ListScreenState extends State<ListScreen>
         leading: pushedAppBar?.leading,
         actions: pushedAppBar?.trailing,
       ),
-      body: history,
+      body: history!.build(context),
     );
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -10,48 +9,34 @@ import 'package:mlperfbench/ui/history/app_bar_content.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
 
-class HistoryTab extends StatefulWidget {
+class HistoryTab {
   final void Function(AppBarContent? appBar) pushAppBar;
+  final void Function(void Function() action) triggerRebuild;
+  final BenchmarkState state;
 
-  HistoryTab({
-    Key? key,
-    required this.pushAppBar,
-  }) : super(key: key);
-
-  @override
-  _HistoryTab createState() => _HistoryTab();
-
-  void Function() enableSelection = () {};
-
-  List<Widget>? getBarButtons(AppLocalizations l10n) {
-    final enableSelectionButton = IconButton(
-      icon: const Icon(Icons.check_box_outlined),
-      tooltip: l10n.historyListSelectionEnable,
-      onPressed: () => enableSelection(),
-    );
-    return [enableSelectionButton];
-  }
-}
-
-class _HistoryTab extends State<HistoryTab>
-    with AutomaticKeepAliveClientMixin<HistoryTab> {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
 
   late List<ExtendedResult> itemList;
 
-  late BenchmarkState state;
+  HistoryTab({
+    required this.pushAppBar,
+    required this.triggerRebuild,
+    required this.state,
+  });
+
+  List<Widget>? getBarButtons(AppLocalizations l10n) {
+    final enableSelectionButton = IconButton(
+      icon: const Icon(Icons.check_box_outlined),
+      tooltip: l10n.historyListSelectionEnable,
+      onPressed: enableSelection,
+    );
+    return [enableSelectionButton];
+  }
 
   bool isSelectionMode = false;
   List<bool>? selected;
   bool isSelectAll = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    widget.enableSelection = enableSelection;
-  }
 
   void resetSelection(bool value) {
     selected = List<bool>.generate(itemList.length, (_) => value);
@@ -60,7 +45,7 @@ class _HistoryTab extends State<HistoryTab>
   late final cancelSelection = IconButton(
     icon: const Icon(Icons.close),
     tooltip: l10n.historyListSelectionCancel,
-    onPressed: () => setState(() => disableSelectionMode()),
+    onPressed: () => triggerRebuild(() => disableSelectionMode()),
   );
 
   late final selectAll = IconButton(
@@ -70,55 +55,54 @@ class _HistoryTab extends State<HistoryTab>
         : l10n.historyListSelectionSelectAll,
     onPressed: () {
       isSelectAll = !isSelectAll;
-      setState(() => resetSelection(isSelectAll));
+      triggerRebuild(() => resetSelection(isSelectAll));
     },
   );
 
-  late final delete = IconButton(
-    icon: const Icon(Icons.delete),
-    tooltip: l10n.historyListSelectionDelete,
-    onPressed: () async {
-      final dialogResult = await showConfirmDialog(
-        context,
-        l10n.historyListSelectionDeleteConfirm,
-        title: l10n.historyListSelectionDelete,
+  late Widget delete;
+  Widget _makeDeleteButton(BuildContext context) => IconButton(
+        icon: const Icon(Icons.delete),
+        tooltip: l10n.historyListSelectionDelete,
+        onPressed: () async {
+          final dialogResult = await showConfirmDialog(
+            context,
+            l10n.historyListSelectionDeleteConfirm,
+            title: l10n.historyListSelectionDelete,
+          );
+          switch (dialogResult) {
+            case ConfirmDialogAction.ok:
+              triggerRebuild(() {
+                state.resourceManager.resultManager.removeSelected(selected!);
+                disableSelectionMode();
+              });
+              break;
+            case null:
+            case ConfirmDialogAction.cancel:
+              break;
+          }
+        },
       );
-      switch (dialogResult) {
-        case ConfirmDialogAction.ok:
-          setState(() {
-            state.resourceManager.resultManager.removeSelected(selected!);
-            disableSelectionMode();
-          });
-          break;
-        case null:
-        case ConfirmDialogAction.cancel:
-          break;
-      }
-    },
-  );
 
   void enableSelection() {
     isSelectionMode = true;
-    widget.pushAppBar(AppBarContent(
+    pushAppBar(AppBarContent(
       leading: cancelSelection,
       trailing: [delete, selectAll],
-      reset: () => setState(() => disableSelectionMode()),
+      reset: () => triggerRebuild(() => disableSelectionMode()),
     ));
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     l10n = AppLocalizations.of(context);
     helper = HistoryHelperUtils(l10n);
-
-    state = context.watch<BenchmarkState>();
 
     itemList = state.resourceManager.resultManager.results;
     if (selected == null) {
       resetSelection(false);
     }
+
+    delete = _makeDeleteButton(context);
 
     return ListView.separated(
       controller: ScrollController(),
@@ -136,12 +120,12 @@ class _HistoryTab extends State<HistoryTab>
     isSelectionMode = false;
     isSelectAll = false;
     selected = null;
-    widget.pushAppBar(null);
+    pushAppBar(null);
   }
 
   void _toggleSelection(int index) {
     if (isSelectionMode) {
-      setState(() {
+      triggerRebuild(() {
         selected![index] = !selected![index];
       });
     }
@@ -180,7 +164,7 @@ class _HistoryTab extends State<HistoryTab>
             },
       onLongPress: isSelectionMode
           ? null
-          : () => setState(() {
+          : () => triggerRebuild(() {
                 enableSelection();
                 _toggleSelection(index);
               }),
