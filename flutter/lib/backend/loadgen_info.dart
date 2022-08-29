@@ -49,9 +49,13 @@ class LoadgenInfo {
   static Future<LoadgenInfo?> extractLoadgenInfo({
     required Stream<String> logLines,
   }) async {
+    // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1119
     const latencyKey = 'result_mean_latency_ns';
+    // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1055
     const queryCountKey = 'result_query_count';
+    // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1121-L1124
     const latency90Key = 'result_90.00_percentile_latency_ns';
+    // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1028-L1029
     const validityKey = 'result_validity';
 
     final result = await extractKeys(
