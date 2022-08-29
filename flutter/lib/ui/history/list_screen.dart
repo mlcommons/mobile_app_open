@@ -34,7 +34,7 @@ class _ListScreenState extends State<ListScreen>
       setState(() {});
     },
   );
-  late OnlineTab online = const OnlineTab();
+  OnlineTab? online;
 
   @override
   void initState() {
@@ -52,8 +52,17 @@ class _ListScreenState extends State<ListScreen>
     final state = context.watch<BenchmarkState>();
     final isOnlineEnabled = state.firebaseManager != null;
 
+    if (isOnlineEnabled) {
+      online ??= OnlineTab(
+        state: state,
+        triggerRebuild: () {
+          if (mounted) setState(() {});
+        },
+      );
+    }
+
     return WillPopScope(
-      child: isOnlineEnabled ? _makeTabbedPage() : _makeOfflinePage(),
+      child: isOnlineEnabled ? _makeTabbedPage(context) : _makeOfflinePage(),
       onWillPop: () async {
         if (pushedAppBar == null) {
           return true;
@@ -67,10 +76,10 @@ class _ListScreenState extends State<ListScreen>
     );
   }
 
-  Widget _makeTabbedPage() {
+  Widget _makeTabbedPage(BuildContext context) {
     final buttons = _tabController.index == 0
         ? history.getBarButtons(l10n)
-        : online.getBarButtons(l10n);
+        : online!.getBarButtons(l10n);
     return Scaffold(
       appBar: helper.makeAppBar(
         l10n.listScreenTitleMain,
@@ -93,7 +102,7 @@ class _ListScreenState extends State<ListScreen>
         controller: _tabController,
         children: [
           history,
-          online,
+          online!.build(context),
         ],
         physics:
             pushedAppBar == null ? null : const NeverScrollableScrollPhysics(),

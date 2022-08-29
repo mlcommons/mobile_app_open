@@ -9,38 +9,27 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
 
-class OnlineTab extends StatefulWidget {
-  const OnlineTab({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  _OnlineTab createState() {
-    return _OnlineTab();
-  }
-
-  List<Widget>? getBarButtons(AppLocalizations l10n) {
-    return [];
-  }
-}
-
-class _OnlineTab extends State<OnlineTab>
-    with AutomaticKeepAliveClientMixin<OnlineTab> {
+class OnlineTab {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
 
   final List<ExtendedResult> itemList = [];
 
-  late BenchmarkState state;
+  final BenchmarkState state;
+  final void Function() triggerRebuild;
 
   FirebaseCacheHelper? cacheHelper;
   String currentStartUuid = '';
   bool isFetching = false;
   String error = '';
 
-  @override
-  void initState() {
-    super.initState();
+  OnlineTab({
+    required this.state,
+    required this.triggerRebuild,
+  });
+
+  List<Widget>? getBarButtons(AppLocalizations l10n) {
+    return [];
   }
 
   Future<void> fetchData() async {
@@ -52,19 +41,12 @@ class _OnlineTab extends State<OnlineTab>
       print(t);
     }
     isFetching = false;
-    if (mounted) {
-      setState(() {});
-    }
+    triggerRebuild();
   }
 
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     l10n = AppLocalizations.of(context);
     helper = HistoryHelperUtils(l10n);
-
-    state = context.watch<BenchmarkState>();
 
     final fm = state.firebaseManager;
     if (fm == null) {
