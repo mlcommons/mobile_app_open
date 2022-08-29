@@ -13,10 +13,10 @@ class OnlineTab implements TabInterface {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
 
-  final List<ExtendedResult> itemList = [];
-
   final BenchmarkState state;
-  final void Function(void Function()? action) triggerRebuild;
+  final void Function([void Function()? action]) triggerRebuild;
+
+  final List<ExtendedResult> itemList = [];
 
   FirebaseCacheHelper? cacheHelper;
   String currentStartUuid = '';
@@ -40,8 +40,8 @@ class OnlineTab implements TabInterface {
 
     final fm = state.firebaseManager;
     if (fm == null) {
-      // this widget shold never be displayed access to online results
-      // but let's handle the lack of firebase access gracefully
+      // this widget should never be displayed without access to firebase
+      // but let's handle this case gracefully
       return Center(
         child: Text(l10n.listScreenOnlineDisabled),
       );
@@ -97,7 +97,7 @@ class OnlineTab implements TabInterface {
       print(t);
     }
     isFetching = false;
-    triggerRebuild(null);
+    triggerRebuild();
   }
 
   Widget _makeItem(

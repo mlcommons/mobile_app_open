@@ -11,8 +11,8 @@ import 'result_details_screen.dart';
 import 'tab_interface.dart';
 
 class HistoryTab implements TabInterface {
-  final void Function(AppBarContent? appBar) pushAppBar;
-  final void Function(void Function() action) triggerRebuild;
+  final void Function(AppBarContent? appBar) pushAction;
+  final void Function([void Function() action]) triggerRebuild;
   final BenchmarkState state;
 
   late AppLocalizations l10n;
@@ -24,7 +24,7 @@ class HistoryTab implements TabInterface {
   bool isSelectAll = false;
 
   HistoryTab({
-    required this.pushAppBar,
+    required this.pushAction,
     required this.triggerRebuild,
     required this.state,
   });
@@ -109,7 +109,7 @@ class HistoryTab implements TabInterface {
 
   void enableSelection() {
     isSelectionMode = true;
-    pushAppBar(AppBarContent(
+    pushAction(AppBarContent(
       trailing: [delete, selectAll],
       reset: () => triggerRebuild(() => disableSelectionMode()),
     ));
@@ -119,14 +119,13 @@ class HistoryTab implements TabInterface {
     isSelectionMode = false;
     isSelectAll = false;
     selected = null;
-    pushAppBar(null);
+    pushAction(null);
   }
 
   void toggleSelectionForItem(int index) {
     if (isSelectionMode) {
-      triggerRebuild(() {
-        selected![index] = !selected![index];
-      });
+      selected![index] = !selected![index];
+      triggerRebuild();
     }
   }
 

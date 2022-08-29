@@ -29,18 +29,10 @@ class _ListScreenState extends State<ListScreen>
 
   AppBarContent? pushedAppBar;
 
-  void triggerRebuild(void Function()? action) {
+  void triggerRebuild([void Function()? action]) {
     if (!mounted) return;
     action?.call();
     setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() => setState(() {}));
   }
 
   @override
@@ -52,13 +44,7 @@ class _ListScreenState extends State<ListScreen>
 
     return WillPopScope(
       child: tabs.length > 1 ? _makeTabbedPage(context) : _makeSingleTabPage(),
-      onWillPop: () async {
-        if (pushedAppBar == null) {
-          return true;
-        }
-        cancelAction();
-        return false;
-      },
+      onWillPop: () async => !cancelAction(),
     );
   }
 
@@ -68,10 +54,7 @@ class _ListScreenState extends State<ListScreen>
     final state = context.watch<BenchmarkState>();
 
     tabs.add(HistoryTab(
-      pushAppBar: (AppBarContent? appBar) {
-        pushedAppBar = appBar;
-        triggerRebuild(null);
-      },
+      pushAction: pushAction,
       state: state,
       triggerRebuild: triggerRebuild,
     ));
@@ -83,6 +66,9 @@ class _ListScreenState extends State<ListScreen>
         triggerRebuild: triggerRebuild,
       ));
     }
+
+    _tabController = TabController(length: tabs.length, vsync: this);
+    _tabController.addListener(() => setState(() {}));
   }
 
   Widget _makeTabbedPage(BuildContext context) {
@@ -132,10 +118,19 @@ class _ListScreenState extends State<ListScreen>
     );
   }
 
-  void cancelAction() {
-    triggerRebuild(() {
-      pushedAppBar!.reset();
-      pushedAppBar = null;
-    });
+  void pushAction(AppBarContent? appBarContent) {
+    pushedAppBar = appBarContent;
+    triggerRebuild();
+  }
+
+  /// returns true if action was cancelled, false if there was no action
+  bool cancelAction() {
+    if (pushedAppBar == null) return false;
+
+    pushedAppBar!.reset();
+    pushedAppBar = null;
+    triggerRebuild();
+
+    return true;
   }
 }
