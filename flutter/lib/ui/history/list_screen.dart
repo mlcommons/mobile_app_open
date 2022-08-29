@@ -8,6 +8,7 @@ import 'package:mlperfbench/ui/history/app_bar_content.dart';
 import 'package:mlperfbench/ui/history/history_tab.dart';
 import 'package:mlperfbench/ui/history/online_tab.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
+import 'tab_interface.dart';
 
 class ListScreen extends StatefulWidget {
   const ListScreen({Key? key}) : super(key: key);
@@ -24,11 +25,9 @@ class _ListScreenState extends State<ListScreen>
   late HistoryHelperUtils helper;
 
   late final TabController _tabController;
+  final List<TabInterface> tabs = [];
 
   AppBarContent? pushedAppBar;
-
-  HistoryTab? history;
-  OnlineTab? online;
 
   void triggerRebuild(void Function()? action) {
     if (!mounted) return;
@@ -52,20 +51,22 @@ class _ListScreenState extends State<ListScreen>
     final state = context.watch<BenchmarkState>();
     final isOnlineEnabled = state.firebaseManager != null;
 
-    if (isOnlineEnabled) {
-      online ??= OnlineTab(
+    if (tabs.isEmpty) {
+      tabs.add(HistoryTab(
+        pushAppBar: (AppBarContent? appBar) {
+          pushedAppBar = appBar;
+          triggerRebuild(null);
+        },
         state: state,
         triggerRebuild: triggerRebuild,
-      );
+      ));
+      if (isOnlineEnabled) {
+        tabs.add(OnlineTab(
+          state: state,
+          triggerRebuild: triggerRebuild,
+        ));
+      }
     }
-    history ??= HistoryTab(
-      pushAppBar: (AppBarContent? appBar) {
-        pushedAppBar = appBar;
-        setState(() {});
-      },
-      state: state,
-      triggerRebuild: triggerRebuild,
-    );
 
     return WillPopScope(
       child: isOnlineEnabled ? _makeTabbedPage(context) : _makeOfflinePage(),
@@ -83,14 +84,12 @@ class _ListScreenState extends State<ListScreen>
   }
 
   Widget _makeTabbedPage(BuildContext context) {
-    final buttons = _tabController.index == 0
-        ? history!.getBarButtons(l10n)
-        : online!.getBarButtons(l10n);
     return Scaffold(
       appBar: helper.makeAppBar(
         l10n.listScreenTitleMain,
         leading: pushedAppBar?.leading,
-        actions: pushedAppBar?.trailing ?? buttons,
+        actions: pushedAppBar?.trailing ??
+            tabs[_tabController.index].getBarButtons(l10n),
         bottom: pushedAppBar != null
             ? TabBar(
                 tabs: const [SizedBox.shrink(), SizedBox.shrink()],
@@ -98,19 +97,13 @@ class _ListScreenState extends State<ListScreen>
                 controller: _tabController,
               )
             : TabBar(
-                tabs: [
-                  Tab(text: l10n.listScreenTitleLocal),
-                  Tab(text: l10n.listScreenTitleOnline),
-                ],
+                tabs: tabs.map((e) => Tab(text: e.getTabName(l10n))).toList(),
                 controller: _tabController,
               ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          history!.build(context),
-          online!.build(context),
-        ],
+        children: tabs.map((e) => e.build(context)).toList(),
         physics:
             pushedAppBar == null ? null : const NeverScrollableScrollPhysics(),
       ),
@@ -124,7 +117,7 @@ class _ListScreenState extends State<ListScreen>
         leading: pushedAppBar?.leading,
         actions: pushedAppBar?.trailing,
       ),
-      body: history!.build(context),
+      body: tabs.first.build(context),
     );
   }
 }

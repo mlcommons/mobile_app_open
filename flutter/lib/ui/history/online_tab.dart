@@ -7,8 +7,9 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
+import 'tab_interface.dart';
 
-class OnlineTab {
+class OnlineTab implements TabInterface {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
 
@@ -27,6 +28,12 @@ class OnlineTab {
     required this.triggerRebuild,
   });
 
+  @override
+  String getTabName(AppLocalizations l10n) {
+    return l10n.listScreenTitleOnline;
+  }
+
+  @override
   Widget build(BuildContext context) {
     l10n = AppLocalizations.of(context);
     helper = HistoryHelperUtils(l10n);
@@ -76,6 +83,7 @@ class OnlineTab {
     );
   }
 
+  @override
   List<Widget>? getBarButtons(AppLocalizations l10n) {
     return null;
   }

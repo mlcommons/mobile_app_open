@@ -8,8 +8,9 @@ import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/history/app_bar_content.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
+import 'tab_interface.dart';
 
-class HistoryTab {
+class HistoryTab implements TabInterface {
   final void Function(AppBarContent? appBar) pushAppBar;
   final void Function(void Function() action) triggerRebuild;
   final BenchmarkState state;
@@ -28,6 +29,12 @@ class HistoryTab {
     required this.state,
   });
 
+  @override
+  String getTabName(AppLocalizations l10n) {
+    return l10n.listScreenTitleLocal;
+  }
+
+  @override
   Widget build(BuildContext context) {
     l10n = AppLocalizations.of(context);
     helper = HistoryHelperUtils(l10n);
@@ -51,6 +58,7 @@ class HistoryTab {
     );
   }
 
+  @override
   List<Widget>? getBarButtons(AppLocalizations l10n) {
     final enableSelectionButton = IconButton(
       icon: const Icon(Icons.check_box_outlined),
