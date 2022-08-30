@@ -389,7 +389,7 @@ class BenchmarkState extends ChangeNotifier {
               ),
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
-        batchSize: benchmark.benchmarkSetting.batchSize,
+        batchSize: benchmark.benchmarkSettings.batchSize,
         validity: performanceResult.validity,
       );
 
@@ -437,7 +437,7 @@ class BenchmarkState extends ChangeNotifier {
                 ),
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
-          batchSize: benchmark.benchmarkSetting.batchSize,
+          batchSize: benchmark.benchmarkSettings.batchSize,
           validity: accuracyResult.validity,
         );
       }
