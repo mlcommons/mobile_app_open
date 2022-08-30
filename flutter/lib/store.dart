@@ -101,6 +101,13 @@ class Store extends ChangeNotifier {
     _storeFromDisk.setBool(_StoreConstants.keepLogs, value);
     notifyListeners();
   }
+
+  String get taskSelection =>
+      _getString(_StoreConstants.taskSelection);
+
+  set taskSelection(String value) {
+    _storeFromDisk.setString(_StoreConstants.taskSelection, value);
+  }
 }
 
 class _StoreConstants {
@@ -114,4 +121,5 @@ class _StoreConstants {
   static const previousExtendedResult = 'previous extended result';
   static const previousAppVersion = 'previous app version';
   static const keepLogs = 'keep_logs';
+  static const taskSelection = 'disabled_tasks';
 }

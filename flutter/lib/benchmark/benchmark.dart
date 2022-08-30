@@ -131,6 +131,7 @@ class BenchmarkList {
   BenchmarkList({
     required pb.MLPerfConfig appConfig,
     required List<pb.BenchmarkSetting> backendConfig,
+    required  Map<String, bool> taskSelection,
   }) {
     for (final task in appConfig.task) {
       final backendSettings = backendConfig
@@ -140,10 +141,11 @@ class BenchmarkList {
         continue;
       }
 
+      final enabled = taskSelection[task.id] ?? true;
       benchmarks.add(Benchmark(
         taskConfig: task,
         benchmarkSettings: backendSettings,
-        isActive: true,
+        isActive: enabled,
       ));
     }
   }
@@ -181,5 +183,13 @@ class BenchmarkList {
     final set = <Resource>{};
     result.retainWhere((x) => x.path.isNotEmpty && set.add(x));
     return result.where((element) => element.path.isNotEmpty).toList();
+  }
+
+  Map<String, bool> get selection {
+    Map<String, bool> result = {};
+    for (var item in benchmarks) {
+      result[item.id] = item.isActive;
+    }
+    return result;
   }
 }
