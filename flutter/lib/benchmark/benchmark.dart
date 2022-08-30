@@ -128,21 +128,21 @@ class Benchmark {
 class BenchmarkList {
   final List<Benchmark> benchmarks = <Benchmark>[];
 
-  BenchmarkList(
-    pb.MLPerfConfig appConfig,
-    List<pb.BenchmarkSetting> backendConfig,
-  ) {
+  BenchmarkList({
+    required pb.MLPerfConfig appConfig,
+    required List<pb.BenchmarkSetting> backendConfig,
+  }) {
     for (final task in appConfig.task) {
-      final benchmarkSettings = backendConfig
+      final backendSettings = backendConfig
           .singleWhereOrNull((setting) => setting.benchmarkId == task.id);
-      if (benchmarkSettings == null) {
+      if (backendSettings == null) {
         print('No matching benchmark settings for task ${task.id}');
         continue;
       }
 
       benchmarks.add(Benchmark(
         taskConfig: task,
-        benchmarkSettings: benchmarkSettings,
+        benchmarkSettings: backendSettings,
         isActive: true,
       ));
     }

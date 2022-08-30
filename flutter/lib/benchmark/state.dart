@@ -253,8 +253,8 @@ class BenchmarkState extends ChangeNotifier {
     taskConfigFailedToLoad = false;
 
     _middle = BenchmarkList(
-      configManager.decodedConfig,
-      backendInfo.settings.benchmarkSetting,
+      appConfig: configManager.decodedConfig,
+      backendConfig: backendInfo.settings.benchmarkSetting,
     );
     restoreLastResult();
   }
