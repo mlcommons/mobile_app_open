@@ -252,11 +252,29 @@ class BenchmarkState extends ChangeNotifier {
     stackTrace = null;
     taskConfigFailedToLoad = false;
 
+    Map<String, bool>? taskSelection = {};
+    if (_store.taskSelection.isNotEmpty) {
+      try {
+        final map = jsonDecode(_store.taskSelection) as Map<String, dynamic>;
+        for (var kv in map.entries) {
+          taskSelection[kv.key] = kv.value as bool;
+        }
+      } catch (e, t) {
+        print('task selection parse fail: $e');
+        print(t);
+      }
+    }
+
     _middle = BenchmarkList(
-      configManager.decodedConfig,
-      backendInfo.settings.benchmarkSetting,
+      appConfig: configManager.decodedConfig,
+      backendConfig: backendInfo.settings.benchmarkSetting,
+      taskSelection: taskSelection,
     );
     restoreLastResult();
+  }
+
+  Future<void> saveTaskSelection() async {
+    _store.taskSelection = jsonEncode(_middle.selection);
   }
 
   BenchmarkStateEnum get state {
@@ -390,7 +408,7 @@ class BenchmarkState extends ChangeNotifier {
               ),
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
-        batchSize: benchmark.benchmarkSetting.batchSize,
+        batchSize: benchmark.benchmarkSettings.batchSize,
         validity: performanceRunInfo.loadgenInfo!.validity,
       );
 
@@ -436,7 +454,7 @@ class BenchmarkState extends ChangeNotifier {
                 ),
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
-          batchSize: benchmark.benchmarkSetting.batchSize,
+          batchSize: benchmark.benchmarkSettings.batchSize,
           validity: false,
         );
       }

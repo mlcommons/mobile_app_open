@@ -62,10 +62,9 @@ class BenchmarkResult {
 }
 
 class Benchmark {
-  final pb.BenchmarkSetting benchmarkSetting;
+  final pb.BenchmarkSetting benchmarkSettings;
   final pb.TaskConfig taskConfig;
-
-  bool isActive = true;
+  bool isActive;
 
   final BenchmarkInfo info;
 
@@ -76,12 +75,13 @@ class Benchmark {
   BenchmarkResult? performanceModeResult;
   BenchmarkResult? accuracyModeResult;
 
-  Benchmark(
-    this.benchmarkSetting,
-    this.taskConfig,
-  )   : info = BenchmarkInfo(taskConfig),
+  Benchmark({
+    required this.benchmarkSettings,
+    required this.taskConfig,
+    required this.isActive,
+  })  : info = BenchmarkInfo(taskConfig),
         backendRequestDescription =
-            '${benchmarkSetting.configuration} | ${benchmarkSetting.acceleratorDesc}';
+            '${benchmarkSettings.configuration} | ${benchmarkSettings.acceleratorDesc}';
 
   String get id => taskConfig.id;
 
@@ -101,11 +101,11 @@ class Benchmark {
 
     final settings = pb.SettingList(
       setting: commonSettings,
-      benchmarkSetting: benchmarkSetting,
+      benchmarkSetting: benchmarkSettings,
     );
 
     return RunSettings(
-      backend_model_path: resourceManager.get(benchmarkSetting.modelPath),
+      backend_model_path: resourceManager.get(benchmarkSettings.modelPath),
       backend_lib_path: backendLibPath,
       backend_settings: settings,
       backend_native_lib_path: DeviceInfo.nativeLibraryPath,
@@ -118,7 +118,7 @@ class Benchmark {
       min_query_count: minQueryCount,
       min_duration: minDuration,
       single_stream_expected_latency_ns:
-          benchmarkSetting.singleStreamExpectedLatencyNs,
+          benchmarkSettings.singleStreamExpectedLatencyNs,
       output_dir: logDir,
       benchmark_id: id,
     );
@@ -128,19 +128,25 @@ class Benchmark {
 class BenchmarkList {
   final List<Benchmark> benchmarks = <Benchmark>[];
 
-  BenchmarkList(
-    pb.MLPerfConfig mlperfConfig,
-    List<pb.BenchmarkSetting> benchmarkSettings,
-  ) {
-    for (final task in mlperfConfig.task) {
-      final benchmarkSetting = benchmarkSettings
+  BenchmarkList({
+    required pb.MLPerfConfig appConfig,
+    required List<pb.BenchmarkSetting> backendConfig,
+    required Map<String, bool> taskSelection,
+  }) {
+    for (final task in appConfig.task) {
+      final backendSettings = backendConfig
           .singleWhereOrNull((setting) => setting.benchmarkId == task.id);
-      if (benchmarkSetting == null) {
-        print('No matching benchmark setting for task ${task.id}');
+      if (backendSettings == null) {
+        print('No matching benchmark settings for task ${task.id}');
         continue;
       }
 
-      benchmarks.add(Benchmark(benchmarkSetting, task));
+      final enabled = taskSelection[task.id] ?? true;
+      benchmarks.add(Benchmark(
+        taskConfig: task,
+        benchmarkSettings: backendSettings,
+        isActive: enabled,
+      ));
     }
   }
 
@@ -167,9 +173,9 @@ class BenchmarkList {
       }
 
       final model = Resource(
-        path: b.benchmarkSetting.modelPath,
+        path: b.benchmarkSettings.modelPath,
         type: ResourceTypeEnum.model,
-        md5Checksum: b.benchmarkSetting.modelChecksum,
+        md5Checksum: b.benchmarkSettings.modelChecksum,
       );
       result.add(model);
     }
@@ -177,5 +183,13 @@ class BenchmarkList {
     final set = <Resource>{};
     result.retainWhere((x) => x.path.isNotEmpty && set.add(x));
     return result.where((element) => element.path.isNotEmpty).toList();
+  }
+
+  Map<String, bool> get selection {
+    Map<String, bool> result = {};
+    for (var item in benchmarks) {
+      result[item.id] = item.isActive;
+    }
+    return result;
   }
 }
