@@ -43,30 +43,20 @@ class RestHelper {
   }
 
   Future<List<ExtendedResult>> fetchFirst({int pageSize = 20}) async {
-    final token = await getAuthToken();
-    var response = await http.get(fetchFirstUri, headers: {
-      'Authorization': token,
-      'page-size': pageSize.toString(),
-    });
-    if (response.statusCode != HttpStatus.ok) {
-      throw 'error ${response.statusCode}: ${response.body}';
-    }
-    print(response.body);
-    final result = <ExtendedResult>[];
-    for (var item in jsonDecode(response.body) as List<dynamic>) {
-      final decoded = ExtendedResult.fromJson(item);
-      result.add(decoded);
-    }
-    return result;
+    return fetchNext(pageSize: pageSize, uuidCursor: '');
   }
 
-  Future<List<ExtendedResult>> fetchNext(
-      {int pageSize = 20, required String uuidCursor}) async {
+  Future<List<ExtendedResult>> fetchNext({
+    int pageSize = 20,
+    required String uuidCursor,
+    String osSelector = '',
+  }) async {
     final token = await getAuthToken();
     var response = await http.get(fetchNextUri, headers: {
       'Authorization': token,
       'page-size': pageSize.toString(),
       'uuid-cursor': uuidCursor,
+      'where-os': osSelector,
     });
     if (response.statusCode != HttpStatus.ok) {
       throw 'error ${response.statusCode}: ${response.body}';

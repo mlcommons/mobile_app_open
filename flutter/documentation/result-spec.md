@@ -110,7 +110,7 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
 
 Info about environment the app is running in. May change when you update your OS, change device hardware, or use another device.
 
-* `os`: string enum  
+* `os_name`: string enum  
   Allowed values:
   * `android`
   * `ios`

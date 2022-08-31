@@ -12,12 +12,11 @@ exports[currentPrefix] = functions.https.onRequest(app);
 
 import { auth } from './auth';
 import { upload } from './upload';
-import { fetchFirst, fetchNext, fetchPrev, fetchId } from './fetch';
+import { fetchNext, fetchPrev, fetchId } from './fetch';
 
 app.use(cors({ origin: true }));
 
 app.post('/upload', auth(admin.auth()), upload(db));
-app.get('/fetch/first', fetchFirst(db));
 app.get('/fetch/next', fetchNext(db));
 app.get('/fetch/prev', fetchPrev(db));
 app.get('/fetch/id', fetchId(db));
