@@ -131,7 +131,7 @@ class BenchmarkList {
   BenchmarkList({
     required pb.MLPerfConfig appConfig,
     required List<pb.BenchmarkSetting> backendConfig,
-    required  Map<String, bool> taskSelection,
+    required Map<String, bool> taskSelection,
   }) {
     for (final task in appConfig.task) {
       final backendSettings = backendConfig

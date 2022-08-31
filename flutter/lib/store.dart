@@ -102,8 +102,7 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  String get taskSelection =>
-      _getString(_StoreConstants.taskSelection);
+  String get taskSelection => _getString(_StoreConstants.taskSelection);
 
   set taskSelection(String value) {
     _storeFromDisk.setString(_StoreConstants.taskSelection, value);
