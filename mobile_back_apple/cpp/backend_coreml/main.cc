@@ -26,7 +26,7 @@ limitations under the License.
 struct CoreMLBackendData {
   const char *name = "Core ML";
   const char *vendor = "Apple";
-  const char *accelerator = "Neural Engine";
+  const char *accelerator{nullptr};
   CoreMLExecutor *coreMLExecutor{nullptr};
 };
 
@@ -92,6 +92,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
     return nullptr;
   }
   backend_data->coreMLExecutor = coreMLExecutor;
+  backend_data->accelerator = configs->accelerator;
+
   return backend_data;
 }
 
@@ -99,6 +101,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
 void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
   backend_data->coreMLExecutor = nil;
+  backend_data->accelerator = nil;
   delete backend_data;
   backendExists = false;
 }
