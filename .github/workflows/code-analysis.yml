@@ -1,0 +1,32 @@
+name: Code Analysis
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonar:
+    name: SonarScanner
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build scanner image
+        run: |
+          make scanner/image
+      - name: Build app and scan code
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_OUT_DIR: sonar_build_wrapper_output
+          PR_NUMBER: ${{ github.event.number }}
+          PR_BRANCH: ${{ github.HEAD_REF }}
+          PR_BASE: ${{ github.BASE_REF }}
+          CONNECT_TTY_TO_DOCKER: 0
+          WITH_TFLITE: 1
+          WITH_PIXEL: 1
+        run: |
+          make docker/scan

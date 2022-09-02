@@ -23,7 +23,8 @@ flutter/android/test-apk: flutter/android/test-apk/main flutter/android/test-apk
 
 .PHONY: flutter/android/libs/build
 flutter/android/libs/build:
-	bazel ${BAZEL_ARGS_GLOBAL} build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
+	bazel ${BAZEL_ARGS_GLOBAL} ${sonar_bazel_startup_options} \
+		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
 		--config=android_arm64 \
 		${backend_tflite_android_target} \
 		${backend_mediatek_android_target} \
