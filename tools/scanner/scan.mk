@@ -46,15 +46,15 @@ scanner/build:
 .PHONY: scanner/scan
 scanner/scan:
 	sonar-scanner \
-	-Dsonar.organization=anhappdev \
-	-Dsonar.projectKey=mobile_app_open \
-	-Dsonar.sources=. \
-	-Dsonar.cfamily.build-wrapper-output="${SONAR_OUT_DIR}" \
-	-Dsonar.host.url=https://sonarcloud.io \
-	-Dsonar.scm.provider=git \
-	-Dsonar.pullrequest.key=${PR_NUMBER} \
-	-Dsonar.pullrequest.branch=${PR_BRANCH} \
-	-Dsonar.pullrequest.base=${PR_BASE}
+		-Dsonar.organization=anhappdev \
+		-Dsonar.projectKey=mobile_app_open \
+		-Dsonar.sources=. \
+		-Dsonar.cfamily.build-wrapper-output="${SONAR_OUT_DIR}" \
+		-Dsonar.host.url=https://sonarcloud.io \
+		-Dsonar.scm.provider=git \
+		-Dsonar.pullrequest.key=${PR_NUMBER} \
+		-Dsonar.pullrequest.branch=${PR_BRANCH} \
+		-Dsonar.pullrequest.base=${PR_BASE}
 
 .PHONY: scanner/run
 scanner/run: scanner/build scanner/scan
