@@ -2,14 +2,16 @@ name: Code Analysis
 
 on:
   push:
-    branches: [ "master", android-v2 ]
+    branches: [ master, android-v2 ]
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   sonar:
     name: SonarScanner
     runs-on: ubuntu-20.04
+    permissions:
+      pull-requests: read
     steps:
       - uses: actions/checkout@v2
         with:
@@ -19,6 +21,7 @@ jobs:
           make scanner/image
       - name: Build app and scan code
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_OUT_DIR: sonar_build_wrapper_output
           PR_NUMBER: ${{ github.event.number }}
@@ -32,7 +35,7 @@ jobs:
 
   codeql:
     name: CodeQL
-    runs-on: ubuntu-latest
+    runs-on: macos-12
     permissions:
       actions: read
       contents: read
@@ -40,11 +43,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
-        language: [ 'cpp', 'java', 'javascript', 'python', 'ruby' ]
+        language: [ 'cpp', 'java', 'javascript', 'python' ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Setup environment
+        run: |
+          bash -x flutter/ios/ci_scripts/ci_post_clone.sh
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
