@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/firebase/cache_helper.dart';
+import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/history/filter_screen.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
 import 'tab_interface.dart';
@@ -22,6 +24,7 @@ class OnlineTab implements TabInterface {
   String currentStartUuid = '';
   bool isFetching = false;
   String error = '';
+  final filterTerms = FilterTerms();
 
   OnlineTab({
     required this.state,
@@ -84,19 +87,50 @@ class OnlineTab implements TabInterface {
   }
 
   @override
-  List<Widget>? getBarButtons(AppLocalizations l10n) {
-    return null;
+  List<Widget>? getBarButtons(BuildContext context, AppLocalizations l10n) {
+    final filterButton = IconButton(
+      icon: const Icon(Icons.filter_alt),
+      tooltip: 'Filter results',
+      onPressed: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (BuildContext context) => Provider.value(
+              value: filterTerms,
+              child: const FilterScreen(),
+            ),
+          ),
+        );
+        cacheHelper!.reset();
+        fetchData();
+        triggerRebuild();
+      },
+    );
+    return [filterButton];
   }
 
   Future<void> fetchData() async {
     isFetching = true;
     try {
-      await cacheHelper!.fetchBatch(from: currentStartUuid);
+      var osSelector = '';
+      final filterOs = filterTerms.osSelector;
+      if (filterOs.android || filterOs.ios || filterOs.windows) {
+        final excluded = <String>[];
+        if (!filterOs.android) excluded.add('android');
+        if (!filterOs.ios) excluded.add('ios');
+        if (!filterOs.windows) excluded.add('windows');
+        osSelector = excluded.join(',');
+      }
+      await cacheHelper!.fetchBatch(
+        from: currentStartUuid,
+        osSelector: osSelector,
+      );
     } catch (e, t) {
       print(e);
       print(t);
+    } finally {
+      isFetching = false;
     }
-    isFetching = false;
     triggerRebuild();
   }
 

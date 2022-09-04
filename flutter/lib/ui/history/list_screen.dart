@@ -77,7 +77,7 @@ class _ListScreenState extends State<ListScreen>
         l10n.listScreenTitleMain,
         leading: _makeCancelButton(),
         actions: pushedAppBar?.trailing ??
-            tabs[_tabController.index].getBarButtons(l10n),
+            tabs[_tabController.index].getBarButtons(context, l10n),
         bottom: pushedAppBar != null
             ? TabBar(
                 tabs: const [SizedBox.shrink(), SizedBox.shrink()],

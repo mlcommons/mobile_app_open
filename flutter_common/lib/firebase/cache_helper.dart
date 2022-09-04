@@ -14,19 +14,25 @@ class FirebaseCacheHelper {
   final Map<String, List<String>> _batches = {};
   static const int pageSize = 20;
 
-  Future<void> fetchBatch({required String from}) async {
+  void reset() {
+    _batches.clear();
+  }
+
+  Future<void> fetchBatch({
+    required String from,
+    String osSelector = '',
+  }) async {
     final orderedResults = <String>[];
     try {
       List<ExtendedResult> list;
-      if (from == '') {
-        _batches.clear();
-        list = await restHelper.fetchFirst(pageSize: pageSize);
-      } else {
-        if (_batches[from] != null) {
-          return;
-        }
-        list = await restHelper.fetchNext(pageSize: pageSize, uuidCursor: from);
+      if (_batches[from] != null) {
+        return;
       }
+      list = await restHelper.fetchNext(
+        pageSize: pageSize,
+        uuidCursor: from,
+        osSelector: osSelector,
+      );
       for (var item in list) {
         orderedResults.add(item.meta.uuid);
         _resultCache[item.meta.uuid] = item;

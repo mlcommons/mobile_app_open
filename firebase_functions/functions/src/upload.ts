@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as functions from 'firebase-functions';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { Convert } from './extended-result.gen';
+import { generateIndices } from './indices';
 import { currentPrefix } from './prefix.gen';
 
 export function upload(
@@ -14,6 +15,7 @@ export function upload(
         throw Error('uploadDate must be empty');
       }
       parsed.meta.upload_date = new Date().toISOString();
+
       const docRef = db.doc(`${currentPrefix}/${parsed.meta.uuid}`);
       const alreadyExists = (await docRef.get()).exists;
       if (alreadyExists) {
@@ -22,7 +24,12 @@ export function upload(
           .send('result already exists in database');
         return;
       }
-      await docRef.set(parsed);
+
+      let entry: any = {};
+      entry.data = parsed;
+      entry.indices = generateIndices(parsed);
+
+      await docRef.set(entry);
       response.status(StatusCodes.CREATED).send(ReasonPhrases.OK);
     } catch (e) {
       functions.logger.info(e, { structuredData: true });

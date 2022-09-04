@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as functions from 'firebase-functions';
 import { StatusCodes } from 'http-status-codes';
+import { osListReverse } from './indices';
 import { currentPrefix } from './prefix.gen';
 
 function _makeBatchQuery(
@@ -9,7 +10,7 @@ function _makeBatchQuery(
 ): FirebaseFirestore.Query<FirebaseFirestore.DocumentData> {
   return db
     .collection(`/${currentPrefix}/`)
-    .orderBy('meta.upload_date', 'desc')
+    .orderBy('data.meta.upload_date', 'desc')
     .limit(pageSize);
 }
 
@@ -42,17 +43,24 @@ export function fetchNext(
         query = query.startAfter(cursorSnapshot);
       }
 
-      const selectedOs = request.headers['where-os'];
-      if (typeof selectedOs == 'string' && selectedOs != '') {
-        query = query.where('environment_info.os_name', '==', selectedOs);
+      const excludedOs = request.headers['where-os-is-not'];
+      if (typeof excludedOs == 'string' && excludedOs != '') {
+        var excludedOsArray = excludedOs.split(',');
+        for (const index in excludedOsArray) {
+          const os = excludedOsArray[index];
+          const osIndex = osListReverse[os];
+          if (osIndex == undefined) {
+            throw Error(`unknown os: ${os}`);
+          }
+          query = query.where(`indices.osIs.${osIndex}`, '==', false);
+        }
       }
 
       const snapshot = await query.get();
       const result = [];
       for (const document of snapshot.docs) {
-        result.push(document.data());
+        result.push(document.data().data);
       }
-      console.log(result);
       response.status(StatusCodes.OK).send(JSON.stringify(result));
     } catch (e) {
       functions.logger.info(e, { structuredData: true });

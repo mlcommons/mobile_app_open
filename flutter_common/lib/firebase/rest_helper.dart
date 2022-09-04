@@ -31,11 +31,13 @@ class RestHelper {
     if (userInfo.user == null) {
       throw 'Firebase Authentication issue';
     }
-    var response = await http.post(uploadUri,
-        headers: {
-          'Authorization': await getAuthToken(),
-        },
-        body: const JsonEncoder().convert(jsonResult));
+    var response = await http.post(
+      uploadUri,
+      headers: {
+        'Authorization': await getAuthToken(),
+      },
+      body: const JsonEncoder().convert(jsonResult),
+    );
 
     if (response.statusCode != HttpStatus.created) {
       throw 'error ${response.statusCode}: ${response.body}';
@@ -56,12 +58,11 @@ class RestHelper {
       'Authorization': token,
       'page-size': pageSize.toString(),
       'uuid-cursor': uuidCursor,
-      'where-os': osSelector,
+      'where-os-is-not': osSelector,
     });
     if (response.statusCode != HttpStatus.ok) {
       throw 'error ${response.statusCode}: ${response.body}';
     }
-    print(response.body);
     final result = <ExtendedResult>[];
     for (var item in jsonDecode(response.body) as List<dynamic>) {
       final decoded = ExtendedResult.fromJson(item);

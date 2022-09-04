@@ -59,7 +59,7 @@ class HistoryTab implements TabInterface {
   }
 
   @override
-  List<Widget>? getBarButtons(AppLocalizations l10n) {
+  List<Widget>? getBarButtons(BuildContext context, AppLocalizations l10n) {
     final enableSelectionButton = IconButton(
       icon: const Icon(Icons.check_box_outlined),
       tooltip: l10n.historyListSelectionEnable,
