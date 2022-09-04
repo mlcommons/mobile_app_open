@@ -25,7 +25,8 @@ export function upload(
         return;
       }
 
-      let entry: any = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const entry: any = {};
       entry.data = parsed;
       entry.indices = generateIndices(parsed);
 

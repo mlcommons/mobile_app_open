@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 import { StatusCodes } from 'http-status-codes';
 import { osListReverse } from './indices';
 import { currentPrefix } from './prefix.gen';
+import { IncomingHttpHeaders } from 'http';
 
 function _makeBatchQuery(
   db: FirebaseFirestore.Firestore,
@@ -14,7 +15,7 @@ function _makeBatchQuery(
     .limit(pageSize);
 }
 
-function _getPageSize(headers: any): number {
+function _getPageSize(headers: IncomingHttpHeaders): number {
   const pageSizeString = headers['page-size'];
   if (typeof pageSizeString != 'string') {
     throw Error('page-size header is missing');
@@ -45,7 +46,7 @@ export function fetchNext(
 
       const excludedOs = request.headers['where-os-is-not'];
       if (typeof excludedOs == 'string' && excludedOs != '') {
-        var excludedOsArray = excludedOs.split(',');
+        const excludedOsArray = excludedOs.split(',');
         for (const index in excludedOsArray) {
           const os = excludedOsArray[index];
           const osIndex = osListReverse[os];
