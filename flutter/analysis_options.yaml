@@ -10,4 +10,5 @@ analyzer:
 linter:
   rules:
     avoid_print: false
+    unawaited_futures: true
     prefer_single_quotes: true
