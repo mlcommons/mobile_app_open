@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'utils.dart';
+import '../utils.dart';
+import 'filter_terms.dart';
 
 class FilterScreen extends StatefulWidget {
   const FilterScreen({Key? key}) : super(key: key);
@@ -12,16 +13,6 @@ class FilterScreen extends StatefulWidget {
   State<StatefulWidget> createState() {
     return _FilterScreen();
   }
-}
-
-class FilterTerms {
-  OsSelector osSelector = OsSelector();
-}
-
-class OsSelector {
-  bool windows = false;
-  bool android = false;
-  bool ios = false;
 }
 
 class _FilterScreen extends State<FilterScreen> {
@@ -72,25 +63,16 @@ class _FilterScreen extends State<FilterScreen> {
   }
 
   Widget _makeOsSelector() {
-    final selector = filterTerms.osSelector;
     return Column(
       children: [
         helper.makeHeader(l10n.filterOsTitle),
-        _makeSelectionItem(
-          text: l10n.filterOsWindows,
-          get: () => selector.windows,
-          set: (value) => selector.windows = value,
-        ),
-        _makeSelectionItem(
-          text: l10n.filterOsAndroid,
-          get: () => selector.android,
-          set: (value) => selector.android = value,
-        ),
-        _makeSelectionItem(
-          text: l10n.filterOsIos,
-          get: () => selector.ios,
-          set: (value) => selector.ios = value,
-        ),
+        ...filterTerms.osOptions
+            .map((e) => _makeSelectionItem(
+                  text: e.name,
+                  get: () => e.value,
+                  set: (value) => e.value = value,
+                ))
+            .toList(),
       ],
     );
   }

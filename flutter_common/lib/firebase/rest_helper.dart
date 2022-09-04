@@ -51,14 +51,14 @@ class RestHelper {
   Future<List<ExtendedResult>> fetchNext({
     int pageSize = 20,
     required String uuidCursor,
-    String osSelector = '',
+    List<String> excludedOsList = const [],
   }) async {
     final token = await getAuthToken();
     var response = await http.get(fetchNextUri, headers: {
       'Authorization': token,
       'page-size': pageSize.toString(),
       'uuid-cursor': uuidCursor,
-      'where-os-is-not': osSelector,
+      'where-os-is-not': excludedOsList.join(','),
     });
     if (response.statusCode != HttpStatus.ok) {
       throw 'error ${response.statusCode}: ${response.body}';

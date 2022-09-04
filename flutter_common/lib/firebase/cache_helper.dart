@@ -20,7 +20,7 @@ class FirebaseCacheHelper {
 
   Future<void> fetchBatch({
     required String from,
-    String osSelector = '',
+    List<String> excludedOsList = const [],
   }) async {
     final orderedResults = <String>[];
     try {
@@ -31,7 +31,7 @@ class FirebaseCacheHelper {
       list = await restHelper.fetchNext(
         pageSize: pageSize,
         uuidCursor: from,
-        osSelector: osSelector,
+        excludedOsList: excludedOsList,
       );
       for (var item in list) {
         orderedResults.add(item.meta.uuid);

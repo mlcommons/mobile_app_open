@@ -6,8 +6,9 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/ui/history/filter_screen.dart';
+import 'package:mlperfbench/ui/history/filter/filter_screen.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
+import 'filter/filter_terms.dart';
 import 'result_details_screen.dart';
 import 'tab_interface.dart';
 
@@ -24,7 +25,7 @@ class OnlineTab implements TabInterface {
   String currentStartUuid = '';
   bool isFetching = false;
   String error = '';
-  final filterTerms = FilterTerms();
+  FilterTerms? filterTerms;
 
   OnlineTab({
     required this.state,
@@ -92,6 +93,7 @@ class OnlineTab implements TabInterface {
       icon: const Icon(Icons.filter_alt),
       tooltip: l10n.filterTitle,
       onPressed: () async {
+        filterTerms ??= FilterTerms.create(l10n);
         await Navigator.push(
           context,
           MaterialPageRoute<void>(
@@ -112,18 +114,19 @@ class OnlineTab implements TabInterface {
   Future<void> fetchData() async {
     isFetching = true;
     try {
-      var osSelector = '';
-      final filterOs = filterTerms.osSelector;
-      if (filterOs.android || filterOs.ios || filterOs.windows) {
-        final excluded = <String>[];
-        if (!filterOs.android) excluded.add('android');
-        if (!filterOs.ios) excluded.add('ios');
-        if (!filterOs.windows) excluded.add('windows');
-        osSelector = excluded.join(',');
+      var excludedOsList = <String>[];
+      final filterTerms = this.filterTerms;
+      if (filterTerms != null) {
+        if (filterTerms.osOptions.any((e) => e.value)) {
+          excludedOsList = filterTerms.osOptions
+              .where((e) => !e.value)
+              .map((e) => e.key)
+              .toList();
+        }
       }
       await cacheHelper!.fetchBatch(
         from: currentStartUuid,
-        osSelector: osSelector,
+        excludedOsList: excludedOsList,
       );
     } catch (e, t) {
       print(e);
