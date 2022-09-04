@@ -41,7 +41,7 @@ class _FilterScreen extends State<FilterScreen> {
     filterTerms = context.watch<FilterTerms>();
 
     return Scaffold(
-      appBar: helper.makeAppBar('Filter results'),
+      appBar: helper.makeAppBar(l10n.filterTitle),
       body: ListView(
         padding: const EdgeInsets.only(top: 20),
         children: [
@@ -75,19 +75,19 @@ class _FilterScreen extends State<FilterScreen> {
     final selector = filterTerms.osSelector;
     return Column(
       children: [
-        helper.makeHeader('Operating system'),
+        helper.makeHeader(l10n.filterOsTitle),
         _makeSelectionItem(
-          text: 'Windows',
+          text: l10n.filterOsWindows,
           get: () => selector.windows,
           set: (value) => selector.windows = value,
         ),
         _makeSelectionItem(
-          text: 'Android',
+          text: l10n.filterOsAndroid,
           get: () => selector.android,
           set: (value) => selector.android = value,
         ),
         _makeSelectionItem(
-          text: 'iOS',
+          text: l10n.filterOsIos,
           get: () => selector.ios,
           set: (value) => selector.ios = value,
         ),

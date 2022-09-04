@@ -90,7 +90,7 @@ class OnlineTab implements TabInterface {
   List<Widget>? getBarButtons(BuildContext context, AppLocalizations l10n) {
     final filterButton = IconButton(
       icon: const Icon(Icons.filter_alt),
-      tooltip: 'Filter results',
+      tooltip: l10n.filterTitle,
       onPressed: () async {
         await Navigator.push(
           context,
