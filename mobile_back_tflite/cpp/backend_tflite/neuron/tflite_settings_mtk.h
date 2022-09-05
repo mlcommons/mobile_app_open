@@ -33,8 +33,8 @@ benchmark_setting {
   accelerator_desc: "Neuron"
   configuration: "TFLite"
   batch_size: 1
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  md5_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+  model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
 }
 
 benchmark_setting {
@@ -43,8 +43,8 @@ benchmark_setting {
   accelerator_desc: "Neuron"
   configuration: "TFLite"
   batch_size: 256
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  md5_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+  model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
 }
 
 benchmark_setting {
@@ -53,8 +53,8 @@ benchmark_setting {
   accelerator_desc: "Neuron"
   configuration: "TFLite"
   batch_size: 1
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
-  md5_checksum: "6c7af49d97a2b2488222d94936d2dc18"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+  model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
 }
 
 benchmark_setting {
@@ -63,8 +63,8 @@ benchmark_setting {
   accelerator_desc: "Neuron"
   configuration: "TFLite"
   batch_size: 1
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_20200602.tflite"
-  md5_checksum: "3a636c066ca2916e1858266857e96c72"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_20200602.tflite"
+  model_checksum: "3a636c066ca2916e1858266857e96c72"
 }
 
 benchmark_setting {
@@ -73,8 +73,8 @@ benchmark_setting {
   accelerator_desc: "Neuron"
   configuration: "TFLite"
   batch_size: 1
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_uint8.tflite"
-  md5_checksum: "1b0a50e380612884f82c157e69c66d22"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_uint8.tflite"
+  model_checksum: "1b0a50e380612884f82c157e69c66d22"
 }
 
 benchmark_setting {
@@ -82,8 +82,8 @@ benchmark_setting {
   accelerator: "neuron"
   accelerator_desc: "Neuron"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
-  md5_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+  model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+  model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
 }
 
 )SETTINGS";
