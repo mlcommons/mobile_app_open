@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
@@ -104,7 +106,8 @@ class OnlineTab implements TabInterface {
           ),
         );
         cacheHelper!.reset();
-        fetchData();
+        // we want to call triggerRebuild immidiately after starting fetching
+        unawaited(fetchData());
         triggerRebuild();
       },
     );
