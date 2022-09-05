@@ -58,7 +58,7 @@ Future<void> main() async {
       name: 'libtflitebackend',
       accelerator: 'accelerator',
     ),
-    minDurationMs: 10.5,
+    minDurationMs: 10,
     minSamples: 8,
     backendSettingsInfo: BackendSettingsInfo(
       acceleratorCode: '',

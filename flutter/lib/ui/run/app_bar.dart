@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/ui/history/history_screen.dart';
+import 'package:mlperfbench/ui/history/list_screen.dart';
 import 'package:mlperfbench/ui/icons.dart';
 import '../config/config_screen.dart';
 import '../settings/settings_screen.dart';
@@ -17,7 +17,7 @@ class MyAppBar {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const HistoryScreen()),
+            MaterialPageRoute(builder: (context) => const ListScreen()),
           );
         },
       ));

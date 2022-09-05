@@ -102,36 +102,37 @@ class BenchmarkExportResult {
   final BackendSettingsInfo backendSettingsInfo;
   final BenchmarkRunResult? performance;
   final BenchmarkRunResult? accuracy;
-  final double minDurationMs;
+  final int minDurationMs;
   final int minSamples;
   final BackendReportedInfo backendInfo;
 
-  BenchmarkExportResult(
-      {required this.benchmarkId,
-      required this.benchmarkName,
-      required this.loadgenScenario,
-      required this.backendSettingsInfo,
-      required this.performance,
-      required this.accuracy,
-      required this.minDurationMs,
-      required this.minSamples,
-      required this.backendInfo});
+  BenchmarkExportResult({
+    required this.benchmarkId,
+    required this.benchmarkName,
+    required this.loadgenScenario,
+    required this.backendSettingsInfo,
+    required this.performance,
+    required this.accuracy,
+    required this.minDurationMs,
+    required this.minSamples,
+    required this.backendInfo,
+  });
 
   BenchmarkExportResult.fromJson(Map<String, dynamic> json)
       : this(
-            benchmarkId: json[_tagBenchmarkId] as String,
-            benchmarkName: json[_tagBenchmarkName] as String,
-            loadgenScenario:
-                LoadgenScenario.fromJson(json[_tagLoadgenScenario]),
-            backendSettingsInfo:
-                BackendSettingsInfo.fromJson(json[_tagBackendSettings]),
-            performance: BenchmarkRunResult.fromJson(json[_tagPerformanceRun]),
-            accuracy: json[_tagAccuracyRun] == null
-                ? null
-                : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
-            minDurationMs: json[_tagMinDuration] as double,
-            minSamples: json[_tagMinSamples] as int,
-            backendInfo: BackendReportedInfo.fromJson(json[_tagBackendInfo]));
+          benchmarkId: json[_tagBenchmarkId] as String,
+          benchmarkName: json[_tagBenchmarkName] as String,
+          loadgenScenario: LoadgenScenario.fromJson(json[_tagLoadgenScenario]),
+          backendSettingsInfo:
+              BackendSettingsInfo.fromJson(json[_tagBackendSettings]),
+          performance: BenchmarkRunResult.fromJson(json[_tagPerformanceRun]),
+          accuracy: json[_tagAccuracyRun] == null
+              ? null
+              : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
+          minDurationMs: json[_tagMinDuration] as int,
+          minSamples: json[_tagMinSamples] as int,
+          backendInfo: BackendReportedInfo.fromJson(json[_tagBackendInfo]),
+        );
 
   Map<String, dynamic> toJson() => {
         _tagBenchmarkId: benchmarkId,
@@ -142,7 +143,7 @@ class BenchmarkExportResult {
         _tagAccuracyRun: accuracy,
         _tagMinDuration: minDurationMs,
         _tagMinSamples: minSamples,
-        _tagBackendInfo: backendInfo
+        _tagBackendInfo: backendInfo,
       };
 }
 

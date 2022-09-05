@@ -17,7 +17,7 @@ import { fetchFirst, fetchNext, fetchPrev, fetchId } from './fetch';
 app.use(cors({ origin: true }));
 
 app.post('/upload', auth(admin.auth()), upload(db));
-app.get('/fetch/first', auth(admin.auth()), fetchFirst(db));
-app.get('/fetch/next', auth(admin.auth()), fetchNext(db));
-app.get('/fetch/prev', auth(admin.auth()), fetchPrev(db));
-app.get('/fetch/id', auth(admin.auth()), fetchId(db));
+app.get('/fetch/first', fetchFirst(db));
+app.get('/fetch/next', fetchNext(db));
+app.get('/fetch/prev', fetchPrev(db));
+app.get('/fetch/id', fetchId(db));

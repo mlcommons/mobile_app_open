@@ -96,8 +96,13 @@
   "resourceErrorRereadConfig": "I have fixed current config, try again",
   "resourceErrorFail": "Config failed to load",
 
+  "listScreenTitleMain": "Results",
+  "listScreenTitleLocal": "Local",
+  "listScreenTitleOnline": "Online",
+  "listScreenOnlineDisabled": "Online results are unavailable",
+  "listScreenNoResultsFound": "No results found",
+
   "historyListTitle": "Past results",
-  "historyListElementSubtitle": "Average QPS <throughput> over <benchmarks#> benchmark(s)",
   "historyListSelectionCancel": "Cancel",
   "historyListSelectionEnable": "Enable selection",
   "historyListSelectionSelectAll": "Select all",
