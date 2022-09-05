@@ -190,9 +190,13 @@ You can create `.zip` archive with the `Release` folder to redistribute the app.
 
 ## Running tests
 
-You can run integration test on your device.
-Use the following command to start the test:
-`flutter drive --driver=test_driver/integration_test.dart --target=integration_test/first_test.dart`
+`make flutter/test` will run all available tests.
+
+You can run only unit tests via `make flutter/test/unit`.
+
+You can run only integration test on your device via `make flutter/test/integration`.
+Set `FLUTTER_TEST_DEVICE` environment variable to specify a device if you have more than one.
+For example: `make flutter/test/integration FLUTTER_TEST_DEVICE=windows`
 
 Remember that running integration test changes Flutter configuration.
 If you run this command and then try to launch the app from XCode or Visual Studio,
