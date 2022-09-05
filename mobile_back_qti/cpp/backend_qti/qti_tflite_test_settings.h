@@ -47,7 +47,7 @@ benchmark_setting {
       name: "TFLite"
     }
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
 })SETTINGS";
 
 const std::string qti_settings_415 = R"SETTINGS(
@@ -86,7 +86,7 @@ benchmark_setting {
         name: "snpeOutputLayerName"
     }
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/ssd_mobilenet_v2_300_uint8.tflite"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/ssd_mobilenet_v2_300_uint8.tflite"
 }
 
 benchmark_setting {
@@ -107,7 +107,7 @@ benchmark_setting {
       name: "TFLite"
     }
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
 })SETTINGS";
 
 #endif
