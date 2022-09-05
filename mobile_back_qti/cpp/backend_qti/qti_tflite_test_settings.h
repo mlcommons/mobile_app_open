@@ -30,7 +30,7 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
+  benchmark_id: "natural_language_processing"
   setting {
     id: "accelerator"
     name: "accelerator"
@@ -61,7 +61,7 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   setting {
     id: "accelerator"
     name: "accelerator"
@@ -90,7 +90,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
+  benchmark_id: "natural_language_processing"
   setting {
     id: "accelerator"
     name: "accelerator"
