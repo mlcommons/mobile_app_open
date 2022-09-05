@@ -60,8 +60,8 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
-  md5_checksum: "a49175f3f4f37f59780995cec540dbf2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
+  model_checksum: "a49175f3f4f37f59780995cec540dbf2"
   single_stream_expected_latency_ns: 900000
 }
 
@@ -98,8 +98,8 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8.nnc"
-  md5_checksum: "f715f55818863f371336ad29ecba1183"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8.nnc"
+  model_checksum: "f715f55818863f371336ad29ecba1183"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -136,8 +136,8 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
-  md5_checksum: "6b34201b6696fa75311d0d43820e03d2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
+  model_checksum: "6b34201b6696fa75311d0d43820e03d2"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -174,8 +174,8 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
-  md5_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
+  model_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -217,8 +217,8 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
-  md5_checksum: "8832370c770fa820dfde83e039e3243c"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+  model_checksum: "8832370c770fa820dfde83e039e3243c"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
@@ -236,8 +236,8 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
-  md5_checksum: "a49175f3f4f37f59780995cec540dbf2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
+  model_checksum: "a49175f3f4f37f59780995cec540dbf2"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -254,8 +254,8 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
-  md5_checksum: "6b34201b6696fa75311d0d43820e03d2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
+  model_checksum: "6b34201b6696fa75311d0d43820e03d2"
   single_stream_expected_latency_ns: 1000000
 }
 
@@ -273,8 +273,8 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
-  md5_checksum: "8832370c770fa820dfde83e039e3243c"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+  model_checksum: "8832370c770fa820dfde83e039e3243c"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
