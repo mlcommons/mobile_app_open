@@ -12,9 +12,16 @@ jobs:
     runs-on: ubuntu-20.04
     permissions:
       pull-requests: read
-      actions: read
-      contents: read
-      security-events: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_OUT_DIR: sonar_build_wrapper_output
+      PR_NUMBER: ${{ github.event.number }}
+      PR_BRANCH: ${{ github.HEAD_REF }}
+      PR_BASE: ${{ github.BASE_REF }}
+      CONNECT_TTY_TO_DOCKER: 0
+      WITH_TFLITE: 1
+      WITH_PIXEL: 1
     steps:
       - uses: actions/checkout@v2
         with:
@@ -22,16 +29,9 @@ jobs:
       - name: Build scanner image
         run: |
           make scanner/image
-      - name: Build app and scan code
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_OUT_DIR: sonar_build_wrapper_output
-          PR_NUMBER: ${{ github.event.number }}
-          PR_BRANCH: ${{ github.HEAD_REF }}
-          PR_BASE: ${{ github.BASE_REF }}
-          CONNECT_TTY_TO_DOCKER: 0
-          WITH_TFLITE: 1
-          WITH_PIXEL: 1
+      - name: Build app
         run: |
-          make docker/scan
+          make docker/scanner/build
+      - name: Scan code
+        run: |
+          make docker/scanner/scan
