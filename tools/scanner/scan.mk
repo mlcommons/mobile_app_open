@@ -15,6 +15,7 @@
 
 # Note:
 # SonarScanner requires a clean build for every run. Do not cache build files.
+# https://docs.sonarcloud.io/advanced-setup/languages/c-c-objective-c/#analysis-steps-using-build-wrapper
 
 ifdef SONAR_OUT_DIR
 	scanner_docker_args=\
