@@ -44,9 +44,9 @@ message BenchmarkSetting {
   required string model_checksum = 4;
   // accelerator is passed to the backend
   required string accelerator = 5;
-  // accelerator_desc is only used by the UI
+  // Human-readable name of the accelerator
   required string accelerator_desc = 6;
-  // configuration is only used by the UI
+  // Human-readable name of the underlying ML framework
   required string configuration = 7;
   // batch_size is passed to the backend
   optional int32 batch_size = 8;

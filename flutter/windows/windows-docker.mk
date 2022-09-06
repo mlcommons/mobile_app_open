@@ -46,7 +46,7 @@ flutter/windows/ci:
 		flutter/prepare \
 		flutter/windows/libs
 	cd ${fwc_local_project} && make \
-		flutter/test
+		flutter/test/integration
 	cd ${fwc_local_project} && make \
 		"FLUTTER_MSVC_DLLS=${fwc_msvc_dlls}" \
 		flutter/windows/release

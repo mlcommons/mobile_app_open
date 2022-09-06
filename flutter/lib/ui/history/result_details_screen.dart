@@ -91,7 +91,7 @@ class _DetailsScreen extends State<DetailsScreen> {
       name: runInfo.benchmarkName,
       throughput: runInfo.performance?.throughput?.toStringAsFixed(2) ??
           l10n.resultsNotAvailable,
-      throughputValid: runInfo.performance?.loadgenValidity ?? false,
+      throughputValid: runInfo.performance?.loadgenInfo?.validity ?? false,
       accuracy:
           runInfo.accuracy?.accuracy?.formatted ?? l10n.resultsNotAvailable,
       onTap: () {

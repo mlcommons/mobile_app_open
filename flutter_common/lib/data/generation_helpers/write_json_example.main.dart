@@ -45,7 +45,10 @@ Future<void> main() async {
     measuredDurationMs: 123.456,
     measuredSamples: 8,
     startDatetime: DateTime.now(),
-    loadgenValidity: true,
+    loadgenInfo: BenchmarkLoadgenInfo(
+      durationMs: 10.6,
+      validity: true,
+    ),
   );
   var exportResult = BenchmarkExportResult(
     benchmarkId: 'id',
@@ -58,7 +61,7 @@ Future<void> main() async {
       name: 'libtflitebackend',
       accelerator: 'accelerator',
     ),
-    minDurationMs: 10.5,
+    minDurationMs: 10,
     minSamples: 8,
     backendSettingsInfo: BackendSettingsInfo(
       acceleratorCode: '',

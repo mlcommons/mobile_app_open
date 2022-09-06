@@ -56,36 +56,6 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
   // Flush the staged queries immediately.
   void FlushQueries() override { backend_->FlushQueries(); }
 
-  // Called by loadgen to show us the recorded latencies.
-  void ReportLatencyResults(
-      const std::vector<::mlperf::QuerySampleLatency>& latencies_ns) final {
-    latencies_ns_.insert(latencies_ns_.end(), latencies_ns.begin(),
-                         latencies_ns.end());
-  }
-
-  // Calculates the 90 percentile latency from reported latencies.
-  float ComputeLatency() {
-    if (latencies_ns_.empty()) {
-      return 0.0f;
-    }
-    if (scenario_ == "Offline") {
-      return GetDurationMs() / GetNumSamples();
-    }
-    std::sort(latencies_ns_.begin(), latencies_ns_.end());
-    return static_cast<float>(latencies_ns_[latencies_ns_.size() * 0.9]) / 1e6;
-  }
-
-  // Forms a string to report 90 percentile latency in ms.
-  std::string ComputeLatencyString() {
-    if (latencies_ns_.empty()) {
-      return std::string("N/A");
-    }
-    std::stringstream stream;
-    stream << std::fixed << std::setprecision(2) << ComputeLatency();
-    stream << " ms";
-    return stream.str();
-  }
-
   // Asks the dataset to calculate the accuracy.
   float ComputeAccuracy() { return dataset_->ComputeAccuracy(); }
 
@@ -94,30 +64,11 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
     return dataset_->ComputeAccuracyString();
   }
 
-  // Return the number of samples reported.
-  size_t GetNumSamples() { return latencies_ns_.size(); }
-
-  // Return the duration reported in ms.
-  float GetDurationMs() {
-    if (scenario_ == "Offline" && !latencies_ns_.empty()) {
-      // In offline mode, all reported latencies are the total latency.
-      return static_cast<float>(latencies_ns_[0]) / 1e6;
-    }
-
-    float result = 0.0f;
-    for (int64_t latency : latencies_ns_) {
-      result += static_cast<float>(latency) / 1e6;
-    }
-    return result;
-  }
-
   int32_t GetCounter() { return query_counter_.load(); }
 
  private:
   std::unique_ptr<Dataset> dataset_;
   std::unique_ptr<Backend> backend_;
-  // Reported latency from MLPerf.
-  std::vector<int64_t> latencies_ns_;
   // Offline or SingleStream scenario.
   std::string scenario_;
   int batch_;

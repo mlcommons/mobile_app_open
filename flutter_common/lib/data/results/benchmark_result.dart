@@ -27,6 +27,30 @@ class Accuracy {
       };
 }
 
+class BenchmarkLoadgenInfo {
+  static const String _tagValidity = 'validity';
+  static const String _tagDuration = 'duration_ms';
+
+  final bool validity;
+  final double durationMs;
+
+  BenchmarkLoadgenInfo({
+    required this.validity,
+    required this.durationMs,
+  });
+
+  BenchmarkLoadgenInfo.fromJson(Map<String, dynamic> json)
+      : this(
+          validity: json[_tagValidity] as bool,
+          durationMs: json[_tagDuration] as double,
+        );
+
+  Map<String, dynamic> toJson() => {
+        _tagValidity: validity,
+        _tagDuration: durationMs,
+      };
+}
+
 class BenchmarkRunResult {
   static const String _tagThroughput = 'throughput';
   static const String _tagAccuracy = 'accuracy';
@@ -35,7 +59,7 @@ class BenchmarkRunResult {
   static const String _tagMeasuredDuration = 'measured_duration_ms';
   static const String _tagMeasuredSamples = 'measured_samples';
   static const String _tagStartDatetime = 'start_datetime';
-  static const String _tagValidity = 'loadgen_validity';
+  static const String _tagLoadgenInfo = 'loadgen_info';
 
   final double? throughput;
   final Accuracy? accuracy;
@@ -44,7 +68,7 @@ class BenchmarkRunResult {
   final double measuredDurationMs;
   final int measuredSamples;
   final DateTime startDatetime;
-  final bool loadgenValidity;
+  final BenchmarkLoadgenInfo? loadgenInfo;
 
   BenchmarkRunResult({
     required this.throughput,
@@ -54,7 +78,7 @@ class BenchmarkRunResult {
     required this.measuredDurationMs,
     required this.measuredSamples,
     required this.startDatetime,
-    required this.loadgenValidity,
+    required this.loadgenInfo,
   });
 
   BenchmarkRunResult.fromJson(Map<String, dynamic> json)
@@ -70,7 +94,9 @@ class BenchmarkRunResult {
           measuredDurationMs: json[_tagMeasuredDuration] as double,
           measuredSamples: json[_tagMeasuredSamples] as int,
           startDatetime: DateTime.parse(json[_tagStartDatetime] as String),
-          loadgenValidity: json[_tagValidity] as bool,
+          loadgenInfo: json[_tagLoadgenInfo] == null
+              ? null
+              : BenchmarkLoadgenInfo.fromJson(json[_tagLoadgenInfo]),
         );
 
   Map<String, dynamic> toJson() => {
@@ -81,7 +107,7 @@ class BenchmarkRunResult {
         _tagMeasuredDuration: measuredDurationMs,
         _tagMeasuredSamples: measuredSamples,
         _tagStartDatetime: startDatetime.toUtc().toIso8601String(),
-        _tagValidity: loadgenValidity,
+        _tagLoadgenInfo: loadgenInfo,
       };
 }
 
@@ -102,36 +128,37 @@ class BenchmarkExportResult {
   final BackendSettingsInfo backendSettingsInfo;
   final BenchmarkRunResult? performance;
   final BenchmarkRunResult? accuracy;
-  final double minDurationMs;
+  final int minDurationMs;
   final int minSamples;
   final BackendReportedInfo backendInfo;
 
-  BenchmarkExportResult(
-      {required this.benchmarkId,
-      required this.benchmarkName,
-      required this.loadgenScenario,
-      required this.backendSettingsInfo,
-      required this.performance,
-      required this.accuracy,
-      required this.minDurationMs,
-      required this.minSamples,
-      required this.backendInfo});
+  BenchmarkExportResult({
+    required this.benchmarkId,
+    required this.benchmarkName,
+    required this.loadgenScenario,
+    required this.backendSettingsInfo,
+    required this.performance,
+    required this.accuracy,
+    required this.minDurationMs,
+    required this.minSamples,
+    required this.backendInfo,
+  });
 
   BenchmarkExportResult.fromJson(Map<String, dynamic> json)
       : this(
-            benchmarkId: json[_tagBenchmarkId] as String,
-            benchmarkName: json[_tagBenchmarkName] as String,
-            loadgenScenario:
-                LoadgenScenario.fromJson(json[_tagLoadgenScenario]),
-            backendSettingsInfo:
-                BackendSettingsInfo.fromJson(json[_tagBackendSettings]),
-            performance: BenchmarkRunResult.fromJson(json[_tagPerformanceRun]),
-            accuracy: json[_tagAccuracyRun] == null
-                ? null
-                : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
-            minDurationMs: json[_tagMinDuration] as double,
-            minSamples: json[_tagMinSamples] as int,
-            backendInfo: BackendReportedInfo.fromJson(json[_tagBackendInfo]));
+          benchmarkId: json[_tagBenchmarkId] as String,
+          benchmarkName: json[_tagBenchmarkName] as String,
+          loadgenScenario: LoadgenScenario.fromJson(json[_tagLoadgenScenario]),
+          backendSettingsInfo:
+              BackendSettingsInfo.fromJson(json[_tagBackendSettings]),
+          performance: BenchmarkRunResult.fromJson(json[_tagPerformanceRun]),
+          accuracy: json[_tagAccuracyRun] == null
+              ? null
+              : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
+          minDurationMs: json[_tagMinDuration] as int,
+          minSamples: json[_tagMinSamples] as int,
+          backendInfo: BackendReportedInfo.fromJson(json[_tagBackendInfo]),
+        );
 
   Map<String, dynamic> toJson() => {
         _tagBenchmarkId: benchmarkId,
@@ -142,7 +169,7 @@ class BenchmarkExportResult {
         _tagAccuracyRun: accuracy,
         _tagMinDuration: minDurationMs,
         _tagMinSamples: minSamples,
-        _tagBackendInfo: backendInfo
+        _tagBackendInfo: backendInfo,
       };
 }
 

@@ -32,6 +32,7 @@ flutter/firebase: flutter/firebase/config flutter/firebase/prefix
 flutter/result: flutter/result/schema flutter/result/ts
 flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
+flutter/test: flutter/test/unit flutter/test/integration
 
 OFFICIAL_BUILD?=false
 flutter_official_build_arg=--dart-define=official-build=${OFFICIAL_BUILD}
@@ -170,13 +171,17 @@ output/flutter/pub/%.stamp: %/pubspec.yaml
 	mkdir -p $(shell dirname $@)
 	touch $@
 
+.PHONY: flutter/test/unit
+flutter/test/unit:
+	cd flutter && ${_start_args} flutter --no-version-check test test
+
 ifneq (${FLUTTER_TEST_DEVICE},)
 flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"
 else
 flutter_test_device_arg=
 endif
-.PHONY: flutter/test
-flutter/test:
+.PHONY: flutter/test/integration
+flutter/test/integration:
 	cd flutter && ${_start_args} flutter --no-version-check test integration_test ${flutter_test_device_arg} ${flutter_official_build_arg}
 
 .PHONY: flutter/run
