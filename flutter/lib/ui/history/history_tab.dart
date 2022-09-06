@@ -142,8 +142,8 @@ class HistoryTab implements TabInterface {
 
     return helper.makeListItem(
       title: helper.formatDate(startDatetime.toLocal()),
-      specialTitleColor: results.list
-          .any((runRes) => !(runRes.performance?.loadgenValidity ?? false)),
+      specialTitleColor: results.list.any(
+          (runRes) => !(runRes.performance?.loadgenInfo?.validity ?? false)),
       trailing: isSelectionMode
           ? Checkbox(
               value: isSelected,
