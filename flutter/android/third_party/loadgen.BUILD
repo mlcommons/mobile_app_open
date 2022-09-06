@@ -9,6 +9,7 @@ exports_files(["LICENSE"])
 cc_library(
     name = "loadgen",
     srcs = [
+        "loadgen/early_stopping.cc",
         "loadgen/issue_query_controller.cc",
         "loadgen/loadgen.cc",
         "loadgen/logging.cc",
@@ -22,6 +23,7 @@ cc_library(
         "loadgen/version_generated.cc",
     ],
     hdrs = [
+        "loadgen/early_stopping.h",
         "loadgen/issue_query_controller.h",
         "loadgen/loadgen.h",
         "loadgen/query_sample.h",

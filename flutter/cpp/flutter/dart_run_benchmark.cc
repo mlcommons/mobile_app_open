@@ -2,6 +2,7 @@
 
 #include <google/protobuf/text_format.h>
 
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <mutex>
@@ -108,8 +109,10 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     global_driver = &driver;
   }
 
+  auto start = std::chrono::steady_clock::now();
   driver.RunMLPerfTest(in->mode, in->min_query_count, in->min_duration,
                        in->single_stream_expected_latency_ns, in->output_dir);
+  auto end = std::chrono::steady_clock::now();
   li;
 
   {
@@ -118,9 +121,10 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   }
 
   out->ok = 1;
-  out->latency = driver.ComputeLatency();
-  out->num_samples = driver.GetNumSamples();
-  out->duration_ms = driver.GetDurationMs();
+  out->num_samples = driver.GetCounter();
+  out->duration_ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+          .count();
 
   out->accuracy_normalized = driver.ComputeAccuracy();
   out->accuracy_formatted = strdup(driver.ComputeAccuracyString().c_str());

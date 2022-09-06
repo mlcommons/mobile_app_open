@@ -68,8 +68,8 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
     return [
       helper.makeInfo(l10n.historyRunDetailsPerfQps,
           perf.throughput?.toStringAsFixed(2) ?? l10n.resultsNotAvailable),
-      helper.makeInfo(
-          l10n.historyRunDetailsValid, perf.loadgenValidity.toString()),
+      helper.makeInfo(l10n.historyRunDetailsValid,
+          (perf.loadgenInfo?.validity ?? false).toString()),
       helper.makeInfo(l10n.historyRunDetailsDuration,
           formatDuration(perf.measuredDurationMs.ceil())),
       helper.makeInfo(

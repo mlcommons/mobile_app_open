@@ -331,7 +331,6 @@ int Main(int argc, char* argv[]) {
                       batch_size);
   driver.RunMLPerfTest(mode, min_query_count, min_duration,
                        single_stream_expected_latency_ns, output_dir);
-  LOG(INFO) << "90 percentile latency: " << driver.ComputeLatencyString();
   LOG(INFO) << "Accuracy: " << driver.ComputeAccuracyString();
   return 0;
 }

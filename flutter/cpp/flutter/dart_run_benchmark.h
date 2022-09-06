@@ -30,7 +30,6 @@ struct dart_ffi_run_benchmark_in {
 struct dart_ffi_run_benchmark_out {
   int32_t ok;
 
-  float latency;
   float accuracy_normalized;
   char *accuracy_formatted;
   float accuracy_normalized2;
