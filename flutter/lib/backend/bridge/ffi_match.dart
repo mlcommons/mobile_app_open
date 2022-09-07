@@ -32,8 +32,8 @@ final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 
 pb.BackendSetting? backendMatch(String libPath) {
   final libPathUtf8 = libPath.toNativeUtf8();
-  final manufacturerUtf8 = DeviceInfo.manufacturer.toNativeUtf8();
-  final modelUtf8 = DeviceInfo.model.toNativeUtf8();
+  final manufacturerUtf8 = DeviceInfo.instance.manufacturer.toNativeUtf8();
+  final modelUtf8 = DeviceInfo.instance.modelCode.toNativeUtf8();
   final runOut = _run(libPathUtf8, manufacturerUtf8, modelUtf8);
   malloc.free(libPathUtf8);
   malloc.free(manufacturerUtf8);
