@@ -28,7 +28,7 @@ namespace sbe {
 
 const std::string sbe2200_flutter_config = R"SETTINGS(
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -60,13 +60,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
-  md5_checksum: "a49175f3f4f37f59780995cec540dbf2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
+  model_checksum: "a49175f3f4f37f59780995cec540dbf2"
   single_stream_expected_latency_ns: 900000
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -98,13 +98,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
-  md5_checksum: "d7cbd596179beb3c0fe51b745769fc69"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
+  model_checksum: "d7cbd596179beb3c0fe51b745769fc69"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -136,13 +136,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8.nnc"
-  md5_checksum: "f715f55818863f371336ad29ecba1183"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8.nnc"
+  model_checksum: "f715f55818863f371336ad29ecba1183"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -174,13 +174,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
-  md5_checksum: "6b34201b6696fa75311d0d43820e03d2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
+  model_checksum: "6b34201b6696fa75311d0d43820e03d2"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
+  benchmark_id: "natural_language_processing"
   accelerator: "gpu"
   accelerator_desc: "gpu"
   configuration: "Samsung Exynos"
@@ -212,13 +212,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
-  md5_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
+  model_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "samsung npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -255,14 +255,14 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
-  md5_checksum: "8832370c770fa820dfde83e039e3243c"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+  model_checksum: "8832370c770fa820dfde83e039e3243c"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
 const std::string sbe2200_config_fence_off = R"SETTINGS(
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -294,13 +294,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
-  md5_checksum: "a49175f3f4f37f59780995cec540dbf2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
+  model_checksum: "a49175f3f4f37f59780995cec540dbf2"
   single_stream_expected_latency_ns: 900000
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -332,13 +332,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
-  md5_checksum: "d7cbd596179beb3c0fe51b745769fc69"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
+  model_checksum: "d7cbd596179beb3c0fe51b745769fc69"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -370,13 +370,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8.nnc"
-  md5_checksum: "f715f55818863f371336ad29ecba1183"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8.nnc"
+  model_checksum: "f715f55818863f371336ad29ecba1183"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -408,13 +408,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
-  md5_checksum: "6b34201b6696fa75311d0d43820e03d2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
+  model_checksum: "6b34201b6696fa75311d0d43820e03d2"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
+  benchmark_id: "natural_language_processing"
   accelerator: "gpu"
   accelerator_desc: "gpu"
   configuration: "Samsung Exynos"
@@ -446,13 +446,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
-  md5_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
+  model_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "samsung npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -489,14 +489,14 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
-  md5_checksum: "8832370c770fa820dfde83e039e3243c"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+  model_checksum: "8832370c770fa820dfde83e039e3243c"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
 const std::string sbe2200_config = R"SETTINGS(
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -528,13 +528,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "true"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single_fence.nnc"
-  md5_checksum: "81af8ea507065da2c04a89229a0e4c45"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single_fence.nnc"
+  model_checksum: "81af8ea507065da2c04a89229a0e4c45"
   single_stream_expected_latency_ns: 900000
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -566,13 +566,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is_fence.nnc"
-  md5_checksum: "a727276c80d7a93073266113fba9beec"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is_fence.nnc"
+  model_checksum: "a727276c80d7a93073266113fba9beec"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8_mosaic"
+  benchmark_id: "image_segmentation_v2"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -604,13 +604,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8_fence.nnc"
-  md5_checksum: "190169754dc4557725fbe456e31a238e"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8_fence.nnc"
+  model_checksum: "190169754dc4557725fbe456e31a238e"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "object_detection"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
   configuration: "Samsung Exynos"
@@ -642,13 +642,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "true"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od_fence.nnc"
-  md5_checksum: "e3760bd134eb93438345d7ddbf34ee48"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od_fence.nnc"
+  model_checksum: "e3760bd134eb93438345d7ddbf34ee48"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "LU_gpu_float32"
+  benchmark_id: "natural_language_processing"
   accelerator: "gpu"
   accelerator_desc: "gpu"
   configuration: "Samsung Exynos"
@@ -680,13 +680,13 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
-  md5_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
+  model_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "samsung npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -723,14 +723,14 @@ benchmark_setting {
     id: "lazy_mode"
     value: "false"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
-  md5_checksum: "8832370c770fa820dfde83e039e3243c"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+  model_checksum: "8832370c770fa820dfde83e039e3243c"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
 const std::string sbe1200_config = R"SETTINGS(
 benchmark_setting {
-  benchmark_id: "IS_uint8"
+  benchmark_id: "image_segmentation_v1"
   accelerator: "npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -742,31 +742,13 @@ benchmark_setting {
     id: "o_type"
     value: "Uint8"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
-  md5_checksum: "d7cbd596179beb3c0fe51b745769fc69"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/is.nnc"
+  model_checksum: "d7cbd596179beb3c0fe51b745769fc69"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
-  accelerator: "npu"
-  accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
-  md5_checksum: "a49175f3f4f37f59780995cec540dbf2"
-  single_stream_expected_latency_ns: 1000000
-}
-
-benchmark_setting {
-  benchmark_id: "OD_uint8"
+  benchmark_id: "image_classification"
   accelerator: "npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -778,13 +760,31 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
-  md5_checksum: "6b34201b6696fa75311d0d43820e03d2"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
+  model_checksum: "a49175f3f4f37f59780995cec540dbf2"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "object_detection"
+  accelerator: "npu"
+  accelerator_desc: "npu"
+  configuration: "Samsung Exynos"
+  custom_setting {
+    id: "i_type"
+    value: "Uint8"
+  }
+  custom_setting {
+    id: "o_type"
+    value: "Float32"
+  }
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
+  model_checksum: "6b34201b6696fa75311d0d43820e03d2"
+  single_stream_expected_latency_ns: 1000000
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline"
   accelerator: "npu"
   accelerator_desc: "npu"
   configuration: "Samsung Exynos"
@@ -797,8 +797,8 @@ benchmark_setting {
     id: "o_type"
     value: "Float32"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
-  md5_checksum: "8832370c770fa820dfde83e039e3243c"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+  model_checksum: "8832370c770fa820dfde83e039e3243c"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
 
