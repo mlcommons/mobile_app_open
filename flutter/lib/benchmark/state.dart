@@ -392,6 +392,12 @@ class BenchmarkState extends ChangeNotifier {
       performanceRunInfo.loadgenInfo!;
 
       final performanceResult = performanceRunInfo.result;
+      if (!performanceResult.accuracyNormalized.isFinite ||
+          performanceResult.accuracyNormalized > 1.0 ||
+          !performanceResult.accuracyNormalized2.isFinite ||
+          performanceResult.accuracyNormalized2 > 1.0) {
+        throw '${benchmark.info.taskName}: performance run: accuracy is invalid (backend may be corrupted)';
+      }
       benchmark.performanceModeResult = BenchmarkResult(
         throughput: performanceRunInfo.throughput,
         accuracy: performanceResult.accuracyNormalized < 0.0
@@ -436,6 +442,12 @@ class BenchmarkState extends ChangeNotifier {
         );
 
         final accuracyResult = accuracyRunInfo.result;
+        if (!accuracyResult.accuracyNormalized.isFinite ||
+            accuracyResult.accuracyNormalized > 1.0 ||
+            !accuracyResult.accuracyNormalized2.isFinite ||
+            accuracyResult.accuracyNormalized2 > 1.0) {
+          throw '${benchmark.info.taskName}: accuracy run: accuracy is invalid (backend may be corrupted)';
+        }
         benchmark.accuracyModeResult = BenchmarkResult(
           // loadgen doesn't calculate latency for accuracy mode benchmarks
           // so throughput is infinity which is not a valid JSON numeric value
