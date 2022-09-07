@@ -5,7 +5,6 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 import 'package:mlperfbench/backend/unsupported_device_exception.dart';
-import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'handle.dart';
 
@@ -30,10 +29,14 @@ typedef _Free1 = Void Function(Pointer<_RunOut>);
 typedef _Free2 = void Function(Pointer<_RunOut>);
 final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 
-pb.BackendSetting? backendMatch(String libPath) {
+pb.BackendSetting? backendMatch({
+  required String libPath,
+  required String manufacturer,
+  required String model,
+}) {
   final libPathUtf8 = libPath.toNativeUtf8();
-  final manufacturerUtf8 = DeviceInfo.instance.manufacturer.toNativeUtf8();
-  final modelUtf8 = DeviceInfo.instance.modelCode.toNativeUtf8();
+  final manufacturerUtf8 = manufacturer.toNativeUtf8();
+  final modelUtf8 = model.toNativeUtf8();
   final runOut = _run(libPathUtf8, manufacturerUtf8, modelUtf8);
   malloc.free(libPathUtf8);
   malloc.free(manufacturerUtf8);
