@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 
 import 'package:device_info/device_info.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
-import 'package:ios_utsname_ext/extension.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/environment/os_enum.dart';
 
@@ -50,21 +49,25 @@ class DeviceInfo {
   static Future<DeviceInfo> _makeIosInfo() async {
     final deviceInfo = DeviceInfoPlugin();
     final iosInfo = await deviceInfo.iosInfo;
+    final deviceNames = DeviceMarketingNames();
 
     return DeviceInfo(
       manufacturer: 'Apple',
       modelCode: iosInfo.utsname.machine,
-      modelName: iosInfo.utsname.machine.iOSProductName,
+      modelName: deviceNames.getSingleNameFromModel(
+          DeviceType.ios, iosInfo.utsname.machine),
     );
   }
 
   static Future<DeviceInfo> _makeAndroidInfo() async {
     final deviceInfo = await DeviceInfoPlugin().androidInfo;
     final deviceNames = DeviceMarketingNames();
+
     return DeviceInfo(
       manufacturer: deviceInfo.manufacturer,
       modelCode: deviceInfo.model,
-      modelName: await deviceNames.getSingleName(),
+      modelName: deviceNames.getSingleNameFromModel(
+          DeviceType.android, deviceInfo.model),
     );
   }
 
