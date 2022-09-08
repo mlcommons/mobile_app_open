@@ -37,8 +37,7 @@ You need to have access to a Firebase project with Authentication, Firestore and
     ```
 
     If you want to use Firebase emulator, set `FIREBASE_FLUTTER_FUNCTIONS_URL` to the following value instead:
-    `http://localhost:5001/<appId>/us-central1`.
-    5001 is the default port for Firebase Functions at the moment of writing this, adjust the port if you use a custom port or the default has changed.
+    `http://<host-ip-in-lan>:5001/<appId>/us-central1`.
 
 4. Run `make flutter/firebase-config` or `make flutter/prepare` in the repository root.
     You must set `FIREBASE_CONFIG_ENV_PATH` when running this command.
