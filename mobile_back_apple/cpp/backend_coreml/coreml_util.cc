@@ -127,6 +127,7 @@ struct MLFeature {
 
 - (nullable instancetype)initWithModelPath:(const char *)modelPath
                                  batchSize:(int)batchSize {
+  pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED,0);
   self = [super init];
   if (self) {
     try {
