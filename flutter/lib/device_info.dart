@@ -47,15 +47,14 @@ class DeviceInfo {
   }
 
   static Future<DeviceInfo> _makeIosInfo() async {
-    final deviceInfo = DeviceInfoPlugin();
-    final iosInfo = await deviceInfo.iosInfo;
+    final deviceInfo = await DeviceInfoPlugin().iosInfo;
     final deviceNames = DeviceMarketingNames();
 
     return DeviceInfo(
       manufacturer: 'Apple',
-      modelCode: iosInfo.utsname.machine,
+      modelCode: deviceInfo.utsname.machine,
       modelName: deviceNames.getSingleNameFromModel(
-          DeviceType.ios, iosInfo.utsname.machine),
+          DeviceType.ios, deviceInfo.utsname.machine),
     );
   }
 
