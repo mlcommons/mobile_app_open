@@ -37,6 +37,7 @@ dependencies:
   bot_toast: ^4.0.2
   flutter_lints: ^1.0.4
   device_marketing_names: ^0.4.2
+  process_run: ^0.12.3+2
 
 dev_dependencies:
   flutter_test:

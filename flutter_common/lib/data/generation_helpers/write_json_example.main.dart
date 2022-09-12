@@ -107,6 +107,12 @@ Future<void> main() async {
       osVersion: '10.0',
       socInfo: EnvSocInfo(
         cpuinfo: EnvCpuinfo(socName: 'soc name'),
+        androidInfo: EnvAndroidInfo(
+          propSocModel: 'soc model',
+          propSocManufacturer: 'soc manufacturer',
+          buildBoard: 'board',
+          buildHardware: 'hardware',
+        ),
       ),
     ),
     results: BenchmarkExportResultList([exportResult, exportResult]),

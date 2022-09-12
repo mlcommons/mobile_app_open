@@ -113,12 +113,41 @@
             "properties": {
                 "cpuinfo": {
                     "$ref": "#/definitions/Cpuinfo"
+                },
+                "android_info": {
+                    "$ref": "#/definitions/AndroidInfo"
                 }
             },
             "required": [
+                "android_info",
                 "cpuinfo"
             ],
             "title": "SocInfo"
+        },
+        "AndroidInfo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "prop_soc_model": {
+                    "type": "string"
+                },
+                "prop_soc_manufacturer": {
+                    "type": "string"
+                },
+                "build_board": {
+                    "type": "string"
+                },
+                "build_hardware": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "build_board",
+                "build_hardware",
+                "prop_soc_manufacturer",
+                "prop_soc_model"
+            ],
+            "title": "AndroidInfo"
         },
         "Cpuinfo": {
             "type": "object",

@@ -136,6 +136,17 @@ Info about environment the app is running in. May change when you update your OS
   * `cpuinfo`: map
     * `soc_name`: string
       CPU/SOC name obtained from `cpuinfo` library
+  * `android_info`: map
+    * `prop_soc_model`: string  
+      Value obtained via `getprop ro.soc.model`
+    * `prop_soc_manufacturer`: string  
+      Value obtained via `getprop ro.soc.manufacturer`
+    * `build_board`: string  
+      <!-- markdown-link-check-disable-next-line -->
+      Value of `board` from [Android build constants](https://developer.android.com/reference/android/os/Build#BOARD)
+    * `build_hardware`: string  
+      <!-- markdown-link-check-disable-next-line -->
+      Value of `hardware` from [Android build constants](https://developer.android.com/reference/android/os/Build#HARDWARE)
 
 ## Application build info
 

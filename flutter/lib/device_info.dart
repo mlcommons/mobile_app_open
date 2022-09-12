@@ -6,6 +6,7 @@ import 'package:device_info/device_info.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/environment/os_enum.dart';
+import 'package:process_run/shell.dart';
 
 import 'package:mlperfbench/backend/bridge/ffi_cpuinfo.dart';
 
@@ -13,6 +14,7 @@ class DeviceInfo {
   final String modelCode;
   final String modelName;
   final String manufacturer;
+  final EnvAndroidInfo? androidInfo;
 
   static late final String nativeLibraryPath;
   static late final DeviceInfo instance;
@@ -22,6 +24,7 @@ class DeviceInfo {
     required this.manufacturer,
     required this.modelCode,
     required this.modelName,
+    required this.androidInfo,
   });
 
   static Future<void> staticInit() async {
@@ -59,6 +62,7 @@ class DeviceInfo {
       modelCode: deviceInfo.utsname.machine,
       modelName: deviceNames.getSingleNameFromModel(
           DeviceType.ios, deviceInfo.utsname.machine),
+      androidInfo: null,
     );
   }
 
@@ -66,11 +70,25 @@ class DeviceInfo {
     final deviceInfo = await DeviceInfoPlugin().androidInfo;
     final deviceNames = DeviceMarketingNames();
 
+    var shell = Shell();
+    final socModel = await shell.run('getprop ro.soc.model');
+    final socManufacturer = await shell.run('getprop ro.soc.manufacturer');
+
+    final androidInfo = EnvAndroidInfo(
+      propSocModel: socModel.outText,
+      propSocManufacturer: socManufacturer.outText,
+      buildBoard: deviceInfo.board,
+      buildHardware: deviceInfo.hardware,
+    );
+
     return DeviceInfo(
+      // deviceInfo.manufacturer is usually a human-readable string with proper capitalisation
+      // deviceInfo.brand seems to be machine-readable string because it tends to be all lower-case letters
       manufacturer: deviceInfo.manufacturer,
       modelCode: deviceInfo.model,
       modelName: deviceNames.getSingleNameFromModel(
           DeviceType.android, deviceInfo.model),
+      androidInfo: androidInfo,
     );
   }
 
@@ -79,6 +97,7 @@ class DeviceInfo {
       manufacturer: '',
       modelCode: 'Unknown PC',
       modelName: 'Unknown PC',
+      androidInfo: null,
     );
   }
 
@@ -91,6 +110,7 @@ class DeviceInfo {
       modelName: DeviceInfo.instance.modelName,
       socInfo: EnvSocInfo(
         cpuinfo: EnvCpuinfo(socName: DeviceInfo.cpuinfoSocName),
+        androidInfo: DeviceInfo.instance.androidInfo,
       ),
     );
   }
