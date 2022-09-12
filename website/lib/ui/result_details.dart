@@ -116,7 +116,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
         _makeTableRow(const Text('OS version'), Text(info.osVersion)),
         _makeTableRow(
             const Text('Device manufacturer'), Text(info.manufacturer)),
-        _makeTableRow(const Text('Device model'), Text(info.model)),
+        _makeTableRow(const Text('Device model'), Text(info.modelCode)),
       ],
     );
   }

@@ -81,7 +81,8 @@ class DeviceInfo {
       osName: OsName.fromJson(Platform.operatingSystem),
       osVersion: Platform.operatingSystemVersion,
       manufacturer: DeviceInfo.instance.manufacturer,
-      model: DeviceInfo.instance.modelCode,
+      modelCode: DeviceInfo.instance.modelCode,
+      modelName: DeviceInfo.instance.modelName,
     );
   }
 }
