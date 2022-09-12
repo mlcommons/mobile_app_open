@@ -24,6 +24,13 @@ load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependen
 apple_support_dependencies()
 
 http_archive(
+    name = "org_pytorch_cpuinfo",
+    sha256 = "3389494589a97122779cd8d57fbffb1ac1e1ca3e795981c1d8d71b92281ae8c4",
+    strip_prefix = "cpuinfo-8ec7bd91ad0470e61cf38f618cc1f270dede599c",
+    url = "https://github.com/pytorch/cpuinfo/archive/8ec7bd91ad0470e61cf38f618cc1f270dede599c.tar.gz",
+)
+
+http_archive(
     name = "org_tensorflow",
     patch_args = ["-p1"],
     patches = [

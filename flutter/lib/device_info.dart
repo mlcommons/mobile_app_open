@@ -7,6 +7,8 @@ import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/environment/os_enum.dart';
 
+import 'package:mlperfbench/backend/bridge/ffi_cpuinfo.dart';
+
 class DeviceInfo {
   final String modelCode;
   final String modelName;
@@ -14,6 +16,7 @@ class DeviceInfo {
 
   static late final String nativeLibraryPath;
   static late final DeviceInfo instance;
+  static late final String cpuinfoSocName;
 
   DeviceInfo({
     required this.manufacturer,
@@ -24,6 +27,7 @@ class DeviceInfo {
   static Future<void> staticInit() async {
     DeviceInfo.nativeLibraryPath = await _makeNativeLibraryPath();
     DeviceInfo.instance = await createFromEnvironment();
+    DeviceInfo.cpuinfoSocName = getSocName();
   }
 
   static Future<DeviceInfo> createFromEnvironment() async {

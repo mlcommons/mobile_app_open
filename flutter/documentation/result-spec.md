@@ -132,6 +132,10 @@ Info about environment the app is running in. May change when you update your OS
 * `model_name`: string. Human-readable model name  
   On Windows systems value must be `Unknown PC`.  
   On iOS and Android systems value must be the marketing name that corresponds to `model_code`. For example: `iPhone 13`, `Galaxy S20 5G`.
+* `soc_info`: map
+  * `cpuinfo`: map
+    * `soc_name`: string
+      CPU/SOC name obtained from `cpuinfo` library
 
 ## Application build info
 
