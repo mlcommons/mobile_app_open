@@ -92,6 +92,9 @@
                 },
                 "os_version": {
                     "type": "string"
+                },
+                "soc_info": {
+                    "$ref": "#/definitions/SocInfo"
                 }
             },
             "required": [
@@ -99,9 +102,36 @@
                 "model_code",
                 "model_name",
                 "os_name",
-                "os_version"
+                "os_version",
+                "soc_info"
             ],
             "title": "EnvironmentInfo"
+        },
+        "SocInfo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "cpuinfo": {
+                    "$ref": "#/definitions/Cpuinfo"
+                }
+            },
+            "required": [
+                "cpuinfo"
+            ],
+            "title": "SocInfo"
+        },
+        "Cpuinfo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "soc_name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "soc_name"
+            ],
+            "title": "Cpuinfo"
         },
         "Meta": {
             "type": "object",

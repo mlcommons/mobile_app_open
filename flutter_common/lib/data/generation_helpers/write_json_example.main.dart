@@ -105,6 +105,9 @@ Future<void> main() async {
       modelName: 'Unknown PC',
       osName: OsName.fromJson('windows'),
       osVersion: '10.0',
+      socInfo: EnvSocInfo(
+        cpuinfo: EnvCpuinfo(socName: 'soc name'),
+      ),
     ),
     results: BenchmarkExportResultList([exportResult, exportResult]),
   );

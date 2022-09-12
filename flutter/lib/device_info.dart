@@ -89,6 +89,9 @@ class DeviceInfo {
       manufacturer: DeviceInfo.instance.manufacturer,
       modelCode: DeviceInfo.instance.modelCode,
       modelName: DeviceInfo.instance.modelName,
+      socInfo: EnvSocInfo(
+        cpuinfo: EnvCpuinfo(socName: DeviceInfo.cpuinfoSocName),
+      ),
     );
   }
 }
