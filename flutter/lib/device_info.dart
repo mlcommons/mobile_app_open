@@ -67,7 +67,7 @@ class DeviceInfo {
 
   static Future<DeviceInfo> _makeWindowsInfo() async {
     return DeviceInfo(
-      manufacturer: 'Microsoft',
+      manufacturer: '',
       modelCode: 'Unknown PC',
       modelName: '',
     );
