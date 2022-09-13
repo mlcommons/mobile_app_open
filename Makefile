@@ -26,6 +26,7 @@ WITH_APPLE?=0
 
 include tools/common.mk
 include tools/formatter/format.mk
+include tools/scanner/scan.mk
 
 include mobile_back_tflite/tflite_backend.mk
 include mobile_back_samsung/samsung_backend.mk
