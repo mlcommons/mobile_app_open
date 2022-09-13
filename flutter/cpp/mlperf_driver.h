@@ -72,7 +72,7 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
   // Offline or SingleStream scenario.
   std::string scenario_;
   int batch_;
-  std::atomic<int32_t> query_counter_;
+  std::atomic<int32_t> query_counter_{0};
 };
 
 }  // namespace mobile
