@@ -119,6 +119,8 @@
   "historyDetailsAvgQps": "Average throughput (QPS)",
   "historyDetailsAppVersion": "App version",
   "historyDetailsAppVersionTemplate": "<version> (build <build>) (<buildType>)",
+  "historyDetailsModelName": "Device model name",
+  "historyDetailsSocName": "Device SoC/CPU name",
   "historyDetailsBackendName": "Backend name",
   "historyDetailsTableTitle": "Benchmarks",
   "historyDetailsTableColName": "Benchmark name",
