@@ -41,10 +41,12 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get appleHackEnabled => _getBool(_StoreConstants.appleHackEnabled);
+  bool get artificialCPULoadEnabled =>
+      _getBool(_StoreConstants.artificialCPULoadEnabled);
 
-  set appleHackEnabled(bool appleHackEnabledFlag) {
-    _storeFromDisk.setBool(_StoreConstants.appleHackEnabled, appleHackEnabledFlag);
+  set artificialCPULoadEnabled(bool artificialCPULoadEnabled) {
+    _storeFromDisk.setBool(
+        _StoreConstants.artificialCPULoadEnabled, artificialCPULoadEnabled);
     notifyListeners();
   }
 
@@ -119,7 +121,7 @@ class Store extends ChangeNotifier {
 class _StoreConstants {
   static const share = 'share';
   static const submissionMode = 'submission mode';
-  static const appleHackEnabled = 'apple hack enabled';
+  static const artificialCPULoadEnabled = 'apple hack enabled';
   static const offlineMode = 'offline mode';
   static const testMode = 'test mode';
   static const cooldown = 'cooldown';

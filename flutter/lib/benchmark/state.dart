@@ -624,13 +624,9 @@ class BenchmarkState extends ChangeNotifier {
     );
 
     // TODO (anhappdev): remove this hack
-    final shouldDoAppleHack = [
-      'image_classification',
-      'object_detection',
-      'image_classification_offline'
-    ].any((e) => e.contains(benchmark.taskConfig.id));
-    if (_store.appleHackEnabled && shouldDoAppleHack) {
-      print('Will apply the CPU hack for ${benchmark.taskConfig.id} task');
+    if (_store.artificialCPULoadEnabled) {
+      print(
+          'Will apply the artificial CPU load for ${benchmark.taskConfig.id} task');
       const value = 999999999999999.0;
       final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
     }
@@ -638,7 +634,7 @@ class BenchmarkState extends ChangeNotifier {
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
-    if (_store.appleHackEnabled && shouldDoAppleHack) {
+    if (_store.artificialCPULoadEnabled) {
       await Executor().dispose();
     }
 
