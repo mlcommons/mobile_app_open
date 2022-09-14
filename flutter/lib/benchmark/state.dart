@@ -21,6 +21,7 @@ import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
@@ -37,6 +38,13 @@ import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
 import 'run_mode.dart';
+
+void _doSomethingCPUIntensive(double value) {
+  var newValue = value;
+  while (true) {
+    newValue = newValue * 0.999999999999999;
+  }
+}
 
 enum BenchmarkStateEnum {
   downloading,
@@ -614,8 +622,25 @@ class BenchmarkState extends ChangeNotifier {
       logDir: logDir,
       isTestMode: _store.testMode,
     );
+
+    // TODO (anhappdev): remove this hack
+    final shouldDoAppleHack = [
+      'image_classification',
+      'object_detection',
+      'image_classification_offline'
+    ].any((e) => e.contains(benchmark.taskConfig.id));
+    if (_store.appleHackEnabled && shouldDoAppleHack) {
+      print('Will apply the CPU hack for ${benchmark.taskConfig.id} task');
+      const value = 999999999999999.0;
+      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
+    }
+
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
+
+    if (_store.appleHackEnabled && shouldDoAppleHack) {
+      await Executor().dispose();
+    }
 
     const logFileName = 'mlperf_log_detail.txt';
     final loadgenInfo = await LoadgenInfo.fromFile(

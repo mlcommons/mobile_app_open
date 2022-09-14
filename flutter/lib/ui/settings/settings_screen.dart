@@ -98,6 +98,22 @@ class _SettingsScreen extends State<SettingsScreen> {
               },
             ),
           ),
+          // TODO (anhappdev): remove this hack after testing
+          ListTile(
+            title: Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Text(
+                stringResources.settingsAppleHackTitle,
+              ),
+            ),
+            subtitle: Text(stringResources.settingsAppleHackSubtitle),
+            trailing: Switch(
+              value: store.appleHackEnabled,
+              onChanged: (flag) {
+                store.appleHackEnabled = flag;
+              },
+            ),
+          ),
           ListTile(
             title: Padding(
               padding: const EdgeInsets.only(bottom: 5),

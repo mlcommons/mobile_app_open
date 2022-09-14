@@ -41,6 +41,13 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get appleHackEnabled => _getBool(_StoreConstants.appleHackEnabled);
+
+  set appleHackEnabled(bool appleHackEnabledFlag) {
+    _storeFromDisk.setBool(_StoreConstants.appleHackEnabled, appleHackEnabledFlag);
+    notifyListeners();
+  }
+
   bool get offlineMode => _getBool(_StoreConstants.offlineMode);
 
   set offlineMode(bool offlineModeFlag) {
@@ -112,6 +119,7 @@ class Store extends ChangeNotifier {
 class _StoreConstants {
   static const share = 'share';
   static const submissionMode = 'submission mode';
+  static const appleHackEnabled = 'apple hack enabled';
   static const offlineMode = 'offline mode';
   static const testMode = 'test mode';
   static const cooldown = 'cooldown';
