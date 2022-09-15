@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Store extends ChangeNotifier {
   final SharedPreferences _storeFromDisk;
@@ -36,6 +34,27 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get submissionMode => _getBool(_StoreConstants.submissionMode);
+
+  set submissionMode(bool submissionModeFlag) {
+    _storeFromDisk.setBool(_StoreConstants.submissionMode, submissionModeFlag);
+    notifyListeners();
+  }
+
+  bool get offlineMode => _getBool(_StoreConstants.offlineMode);
+
+  set offlineMode(bool offlineModeFlag) {
+    _storeFromDisk.setBool(_StoreConstants.offlineMode, offlineModeFlag);
+    notifyListeners();
+  }
+
+  bool get testMode => _getBool(_StoreConstants.testMode);
+
+  set testMode(bool testModeFlag) {
+    _storeFromDisk.setBool(_StoreConstants.testMode, testModeFlag);
+    notifyListeners();
+  }
+
   bool get cooldown => _getBool(_StoreConstants.cooldown, true);
 
   set cooldown(bool submissionModeFlag) {
@@ -58,30 +77,6 @@ class Store extends ChangeNotifier {
         _StoreConstants.chosenConfigurationName, configurationName);
     notifyListeners();
   }
-
-
-  bool get submissionMode => _getBool(_StoreConstants.submissionMode);
-
-  set submissionMode(bool submissionModeFlag) {
-    _storeFromDisk.setBool(_StoreConstants.submissionMode, submissionModeFlag);
-    notifyListeners();
-  }
-
-  bool get offlineMode => _getBool(_StoreConstants.offlineMode);
-
-  set offlineMode(bool offlineModeFlag) {
-    _storeFromDisk.setBool(_StoreConstants.offlineMode, offlineModeFlag);
-    notifyListeners();
-  }
-
-  bool get testMode => _getBool(_StoreConstants.testMode);
-
-  set testMode(bool testModeFlag) {
-    _storeFromDisk.setBool(_StoreConstants.testMode, testModeFlag);
-    notifyListeners();
-  }
-
-
 
   String get previousExtendedResult =>
       _getString(_StoreConstants.previousExtendedResult);
