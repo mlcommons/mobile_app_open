@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 
 import 'package:device_info/device_info.dart';
+import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/environment/os_enum.dart';
 
@@ -46,22 +47,26 @@ class DeviceInfo {
   }
 
   static Future<DeviceInfo> _makeIosInfo() async {
-    final deviceInfo = DeviceInfoPlugin();
-    final iosInfo = await deviceInfo.iosInfo;
+    final deviceInfo = await DeviceInfoPlugin().iosInfo;
+    final deviceNames = DeviceMarketingNames();
 
     return DeviceInfo(
       manufacturer: 'Apple',
-      modelCode: iosInfo.utsname.machine,
-      modelName: '',
+      modelCode: deviceInfo.utsname.machine,
+      modelName: deviceNames.getSingleNameFromModel(
+          DeviceType.ios, deviceInfo.utsname.machine),
     );
   }
 
   static Future<DeviceInfo> _makeAndroidInfo() async {
     final deviceInfo = await DeviceInfoPlugin().androidInfo;
+    final deviceNames = DeviceMarketingNames();
+
     return DeviceInfo(
       manufacturer: deviceInfo.manufacturer,
       modelCode: deviceInfo.model,
-      modelName: '',
+      modelName: deviceNames.getSingleNameFromModel(
+          DeviceType.android, deviceInfo.model),
     );
   }
 
@@ -69,7 +74,7 @@ class DeviceInfo {
     return DeviceInfo(
       manufacturer: '',
       modelCode: 'Unknown PC',
-      modelName: '',
+      modelName: 'Unknown PC',
     );
   }
 
@@ -78,7 +83,8 @@ class DeviceInfo {
       osName: OsName.fromJson(Platform.operatingSystem),
       osVersion: Platform.operatingSystemVersion,
       manufacturer: DeviceInfo.instance.manufacturer,
-      model: DeviceInfo.instance.modelCode,
+      modelCode: DeviceInfo.instance.modelCode,
+      modelName: DeviceInfo.instance.modelName,
     );
   }
 }

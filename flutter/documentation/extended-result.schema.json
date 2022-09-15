@@ -81,7 +81,10 @@
                 "manufacturer": {
                     "type": "string"
                 },
-                "model": {
+                "model_code": {
+                    "type": "string"
+                },
+                "model_name": {
                     "type": "string"
                 },
                 "os_name": {
@@ -93,7 +96,8 @@
             },
             "required": [
                 "manufacturer",
-                "model",
+                "model_code",
+                "model_name",
                 "os_name",
                 "os_version"
             ],

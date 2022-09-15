@@ -17,7 +17,7 @@ class Accuracy {
 
   Accuracy.fromJson(Map<String, dynamic> json)
       : this(
-          normalized: json[_tagValue] as double,
+          normalized: (json[_tagValue] as num).toDouble(),
           formatted: json[_tagString] as String,
         );
 
@@ -91,7 +91,7 @@ class BenchmarkRunResult {
               ? null
               : Accuracy.fromJson(json[_tagAccuracy2]),
           datasetInfo: DatasetInfo.fromJson(json[_tagDatasetInfo]),
-          measuredDurationMs: json[_tagMeasuredDuration] as double,
+          measuredDurationMs: (json[_tagMeasuredDuration] as num).toDouble(),
           measuredSamples: json[_tagMeasuredSamples] as int,
           startDatetime: DateTime.parse(json[_tagStartDatetime] as String),
           loadgenInfo: json[_tagLoadgenInfo] == null
