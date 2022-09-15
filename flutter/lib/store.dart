@@ -42,7 +42,7 @@ class Store extends ChangeNotifier {
   }
 
   bool get artificialCPULoadEnabled =>
-      _getBool(_StoreConstants.artificialCPULoadEnabled);
+      _getBool(_StoreConstants.artificialCPULoadEnabled, true);
 
   set artificialCPULoadEnabled(bool artificialCPULoadEnabled) {
     _storeFromDisk.setBool(
