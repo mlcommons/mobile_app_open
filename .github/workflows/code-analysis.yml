@@ -33,7 +33,7 @@ jobs:
       - name: Cache bazel
         uses: actions/cache@v3
         with:
-          path: ~/.cache/bazel
+          path: /mnt/cache/bazel
           key: ${{ runner.os }}-bazel
       - name: Build scanner image
         run: |

@@ -23,7 +23,8 @@ ifdef SONAR_OUT_DIR
 		--env SONAR_TOKEN=${SONAR_TOKEN} \
 		--env PR_NUMBER=${PR_NUMBER} \
 		--env PR_BRANCH=${PR_BRANCH} \
-		--env PR_BASE=${PR_BASE}
+		--env PR_BASE=${PR_BASE} \
+		-v /mnt/cache/bazel:/mnt/cache/bazel
 
 	# https://docs.sonarcloud.io/advanced-setup/languages/c-c-objective-c/#building-with-bazel
 	sonar_bazel_startup_options=--batch
@@ -50,7 +51,7 @@ scanner/scan:
 		-Dsonar.organization=anhappdev \
 		-Dsonar.projectKey=mobile_app_open \
 		-Dsonar.sources=. \
-		-Dsonar.python.version="3.7, 3.8, 3.9" \
+		-Dsonar.python.version="3.8, 3.9, 3.10" \
 		-Dsonar.flutter.analyzer.mode=flutter \
 		-Dsonar.cfamily.build-wrapper-output="${SONAR_OUT_DIR}" \
 		-Dsonar.host.url=https://sonarcloud.io \
