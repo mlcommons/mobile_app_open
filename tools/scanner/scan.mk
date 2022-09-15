@@ -41,8 +41,7 @@ scanner/image: output/docker_mlperf_scanner.stamp
 .PHONY: scanner/build
 scanner/build:
 	bazel clean
-	build-wrapper-linux-x86-64 --out-dir "${SONAR_OUT_DIR}" \
-		make flutter/android
+	build-wrapper-linux-x86-64 --out-dir "${SONAR_OUT_DIR}" make
 
 # TODO (anhappdev): Use MLCommons organization
 .PHONY: scanner/scan
