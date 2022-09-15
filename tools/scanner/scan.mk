@@ -31,7 +31,7 @@ ifdef SONAR_OUT_DIR
 endif
 
 output/docker_mlperf_scanner.stamp: flutter/android/docker/image tools/scanner/Dockerfile
-	docker image build -t mlcommons/mlperf_mobile_flutter tools/scanner
+	docker image build -t mlperf/scanner tools/scanner
 	touch $@
 
 .PHONY: scanner/image

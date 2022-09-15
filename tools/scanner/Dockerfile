@@ -13,7 +13,7 @@ ENV SONAR_SCANNER_OPTS="-server"
 RUN sonar-scanner --version
 
 # Add Flutter plugin
-RUN curl --create-dirs -sSLo $SONAR_SCANNER_DIR/extensions/plugins/sonar-flutter-plugin-0.4.0.jar https://github.com/insideapp-oss/sonar-flutter/releases/download/0.4.0/sonar-flutter-plugin-0.4.0.jar
+RUN curl --create-dirs -sSLo $SONAR_SCANNER_DIR/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/extensions/plugins/sonar-flutter-plugin-0.4.0.jar https://github.com/insideapp-oss/sonar-flutter/releases/download/0.4.0/sonar-flutter-plugin-0.4.0.jar
 
 # Install build-wrapper-linux-x86
 RUN curl --create-dirs -sSLo $SONAR_SCANNER_DIR/build-wrapper-linux-x86.zip https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
