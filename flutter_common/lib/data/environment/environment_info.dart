@@ -92,18 +92,15 @@ class EnvAndroidInfo {
   static const String _tagPropSocModel = 'prop_soc_model';
   static const String _tagPropSocManufacturer = 'prop_soc_manufacturer';
   static const String _tagBuildBoard = 'build_board';
-  static const String _tagBuildHardware = 'build_hardware';
 
   final String propSocModel;
   final String propSocManufacturer;
   final String buildBoard;
-  final String buildHardware;
 
   EnvAndroidInfo({
     required this.propSocModel,
     required this.propSocManufacturer,
     required this.buildBoard,
-    required this.buildHardware,
   });
 
   EnvAndroidInfo.fromJson(Map<String, dynamic> json)
@@ -111,13 +108,11 @@ class EnvAndroidInfo {
           propSocModel: json[_tagPropSocModel],
           propSocManufacturer: json[_tagPropSocManufacturer],
           buildBoard: json[_tagBuildBoard],
-          buildHardware: json[_tagBuildHardware],
         );
 
   Map<String, dynamic> toJson() => {
         _tagPropSocModel: propSocModel,
         _tagPropSocManufacturer: propSocManufacturer,
         _tagBuildBoard: buildBoard,
-        _tagBuildHardware: buildHardware,
       };
 }

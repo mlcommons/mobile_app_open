@@ -136,14 +136,10 @@
                 },
                 "build_board": {
                     "type": "string"
-                },
-                "build_hardware": {
-                    "type": "string"
                 }
             },
             "required": [
                 "build_board",
-                "build_hardware",
                 "prop_soc_manufacturer",
                 "prop_soc_model"
             ],

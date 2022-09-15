@@ -111,7 +111,6 @@ Future<void> main() async {
           propSocModel: 'soc model',
           propSocManufacturer: 'soc manufacturer',
           buildBoard: 'board',
-          buildHardware: 'hardware',
         ),
       ),
     ),

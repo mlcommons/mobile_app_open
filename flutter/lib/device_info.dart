@@ -78,7 +78,6 @@ class DeviceInfo {
       propSocModel: socModel.outText,
       propSocManufacturer: socManufacturer.outText,
       buildBoard: deviceInfo.board,
-      buildHardware: deviceInfo.hardware,
     );
 
     return DeviceInfo(

@@ -144,9 +144,6 @@ Info about environment the app is running in. May change when you update your OS
     * `build_board`: string  
       <!-- markdown-link-check-disable-next-line -->
       Value of `board` from [Android build constants](https://developer.android.com/reference/android/os/Build#BOARD)
-    * `build_hardware`: string  
-      <!-- markdown-link-check-disable-next-line -->
-      Value of `hardware` from [Android build constants](https://developer.android.com/reference/android/os/Build#HARDWARE)
 
 ## Application build info
 
