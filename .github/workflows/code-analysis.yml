@@ -23,6 +23,7 @@ jobs:
       PR_NUMBER: ${{ github.event.number }}
       PR_BRANCH: ${{ github.HEAD_REF }}
       PR_BASE: ${{ github.BASE_REF }}
+      CACHE_PATH: ${{ github.workspace }}/cache/bazel
       CONNECT_TTY_TO_DOCKER: 0
       WITH_TFLITE: 1
       WITH_PIXEL: 1
@@ -33,8 +34,8 @@ jobs:
       - name: Cache bazel
         uses: actions/cache@v3
         with:
-          path: ./cache/bazel
-          key: ${{ runner.os }}-bazel
+          path: ${CACHE_PATH}
+          key: ${{ runner.os }}-bazel-cache
       - name: Build scanner image
         run: |
           make scanner/image
