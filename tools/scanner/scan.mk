@@ -30,8 +30,9 @@ ifdef SONAR_OUT_DIR
 	sonar_bazel_build_args=--spawn_strategy=local --strategy=Genrule=local
 endif
 
+# Use the same image tag used in `flutter_common_docker_flags`
 output/docker_mlperf_scanner.stamp: flutter/android/docker/image tools/scanner/Dockerfile
-	docker image build -t mlperf/scanner tools/scanner
+	docker image build -t mlcommons/mlperf_mobile_flutter tools/scanner
 	touch $@
 
 .PHONY: scanner/image
@@ -59,7 +60,7 @@ scanner/scan:
 		-Dsonar.pullrequest.base=${PR_BASE}
 
 .PHONY: docker/scanner/build
-docker/scanner/build: scanner/image
+docker/scanner/build: output/docker_mlperf_scanner.stamp
 	MSYS2_ARG_CONV_EXCL="*" docker run ${flutter_common_docker_flags} \
 		make scanner/build
 
