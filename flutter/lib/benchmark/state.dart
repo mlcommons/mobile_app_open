@@ -614,12 +614,7 @@ class BenchmarkState extends ChangeNotifier {
       logDir: logDir,
       isTestMode: _store.testMode,
     );
-
-    var result = await backendBridge.run(runSettings);
-    result = await backendBridge.run(runSettings);
-    result = await backendBridge.run(runSettings);
-    result = await backendBridge.run(runSettings);
-    result = await backendBridge.run(runSettings);
+    final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
     const logFileName = 'mlperf_log_detail.txt';
