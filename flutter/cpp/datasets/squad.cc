@@ -124,6 +124,8 @@ std::vector<uint8_t> Squad::ProcessOutput(const int sample_idx,
   return predictions_.at(sample_idx)->GetData();
 }
 
+bool Squad::HasAccuracy() { return gt_reader_ != nullptr; }
+
 float Squad::ComputeAccuracy() {
   if (gt_reader_ == nullptr) {
     return -1.0f;

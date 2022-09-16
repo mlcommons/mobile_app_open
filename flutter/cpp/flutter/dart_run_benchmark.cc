@@ -126,9 +126,13 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
           .count();
 
-  out->accuracy1 = new dart_ffi_run_benchmark_out_accuracy;
-  out->accuracy1->normalized = driver.ComputeAccuracy();
-  out->accuracy1->formatted = strdup(driver.ComputeAccuracyString().c_str());
+  if (driver.HasAccuracy()) {
+    out->accuracy1 = new dart_ffi_run_benchmark_out_accuracy;
+    out->accuracy1->normalized = driver.ComputeAccuracy();
+    out->accuracy1->formatted = strdup(driver.ComputeAccuracyString().c_str());
+  } else {
+    out->accuracy1 = nullptr;
+  }
 
   // Second accuracy is not yet implemented in datasets
   out->accuracy2 = nullptr;

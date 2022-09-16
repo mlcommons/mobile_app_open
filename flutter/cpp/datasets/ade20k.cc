@@ -207,6 +207,8 @@ std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
   return std::vector<uint8_t>();
 }
 
+bool ADE20K::HasAccuracy() { return !ground_truth_list_.empty(); }
+
 float ADE20K::ComputeAccuracy() {
   if (ground_truth_list_.empty()) {
     return -1.0f;

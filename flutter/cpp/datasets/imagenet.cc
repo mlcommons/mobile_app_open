@@ -158,6 +158,12 @@ std::vector<uint8_t> Imagenet::ProcessOutput(
   std::copy(temp_data, temp_data + result.size(), result.begin());
   return result;
 }
+
+bool Imagenet::HasAccuracy() {
+  std::ifstream gt_file(groundtruth_file_);
+  return gt_file.good();
+}
+
 float Imagenet::ComputeAccuracy() {
   std::ifstream gt_file(groundtruth_file_);
   if (!gt_file.good()) {
