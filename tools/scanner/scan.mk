@@ -51,7 +51,6 @@ scanner/scan:
 		-Dsonar.projectKey=mobile_app_open \
 		-Dsonar.sources=. \
 		-Dsonar.python.version="3.8, 3.9, 3.10" \
-		-Dsonar.flutter.analyzer.mode=flutter \
 		-Dsonar.cfamily.build-wrapper-output="${SONAR_OUT_DIR}" \
 		-Dsonar.host.url=https://sonarcloud.io \
 		-Dsonar.scm.provider=git \
