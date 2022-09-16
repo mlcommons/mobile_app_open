@@ -329,7 +329,7 @@ int Main(int argc, char* argv[]) {
   // Running mlperf.
   MlperfDriver driver(std::move(dataset), std::move(backend), scenario,
                       batch_size);
-  driver.RunMLPerfTest(mode, min_query_count, min_duration,
+  driver.RunMLPerfTest(mode, min_query_count, min_duration / 1000.0,
                        single_stream_expected_latency_ns, output_dir);
   LOG(INFO) << "Accuracy: " << driver.ComputeAccuracyString();
   return 0;
