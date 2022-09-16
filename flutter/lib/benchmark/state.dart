@@ -392,26 +392,14 @@ class BenchmarkState extends ChangeNotifier {
       performanceRunInfo.loadgenInfo!;
 
       final performanceResult = performanceRunInfo.result;
-      if (!performanceResult.accuracyNormalized.isFinite ||
-          performanceResult.accuracyNormalized > 1.0 ||
-          !performanceResult.accuracyNormalized2.isFinite ||
-          performanceResult.accuracyNormalized2 > 1.0) {
+      if (!(performanceResult.accuracy1?.isInBounds() ?? true) ||
+          !(performanceResult.accuracy2?.isInBounds() ?? true)) {
         throw '${benchmark.info.taskName}: performance run: accuracy is invalid (backend may be corrupted)';
       }
       benchmark.performanceModeResult = BenchmarkResult(
         throughput: performanceRunInfo.throughput,
-        accuracy: performanceResult.accuracyNormalized < 0.0
-            ? null
-            : Accuracy(
-                normalized: performanceResult.accuracyNormalized,
-                formatted: performanceResult.accuracyFormatted,
-              ),
-        accuracy2: performanceResult.accuracyNormalized2 < 0.0
-            ? null
-            : Accuracy(
-                normalized: performanceResult.accuracyNormalized2,
-                formatted: performanceResult.accuracyFormatted2,
-              ),
+        accuracy: performanceResult.accuracy1,
+        accuracy2: performanceResult.accuracy2,
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
         batchSize: benchmark.benchmarkSettings.batchSize,
@@ -442,28 +430,16 @@ class BenchmarkState extends ChangeNotifier {
         );
 
         final accuracyResult = accuracyRunInfo.result;
-        if (!accuracyResult.accuracyNormalized.isFinite ||
-            accuracyResult.accuracyNormalized > 1.0 ||
-            !accuracyResult.accuracyNormalized2.isFinite ||
-            accuracyResult.accuracyNormalized2 > 1.0) {
+        if (!(accuracyResult.accuracy1?.isInBounds() ?? true) ||
+            !(accuracyResult.accuracy2?.isInBounds() ?? true)) {
           throw '${benchmark.info.taskName}: accuracy run: accuracy is invalid (backend may be corrupted)';
         }
         benchmark.accuracyModeResult = BenchmarkResult(
           // loadgen doesn't calculate latency for accuracy mode benchmarks
           // so throughput is infinity which is not a valid JSON numeric value
           throughput: 0.0,
-          accuracy: accuracyResult.accuracyNormalized < 0.0
-              ? null
-              : Accuracy(
-                  normalized: accuracyResult.accuracyNormalized,
-                  formatted: accuracyResult.accuracyFormatted,
-                ),
-          accuracy2: accuracyResult.accuracyNormalized2 < 0.0
-              ? null
-              : Accuracy(
-                  normalized: accuracyResult.accuracyNormalized2,
-                  formatted: accuracyResult.accuracyFormatted2,
-                ),
+          accuracy: accuracyResult.accuracy1,
+          accuracy2: accuracyResult.accuracy2,
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
           batchSize: benchmark.benchmarkSettings.batchSize,
@@ -515,18 +491,8 @@ class BenchmarkState extends ChangeNotifier {
         benchmarkName: benchmark.taskConfig.name,
         performance: BenchmarkRunResult(
           throughput: performanceInfo.throughput,
-          accuracy: performance.accuracyNormalized < 0.0
-              ? null
-              : Accuracy(
-                  normalized: performance.accuracyNormalized,
-                  formatted: performance.accuracyFormatted,
-                ),
-          accuracy2: performance.accuracyNormalized2 < 0.0
-              ? null
-              : Accuracy(
-                  normalized: performance.accuracyNormalized2,
-                  formatted: performance.accuracyFormatted2,
-                ),
+          accuracy: performance.accuracy1,
+          accuracy2: performance.accuracy2,
           datasetInfo: DatasetInfo(
             name: accuracyDataset.name,
             type: DatasetType.fromJson(
@@ -548,18 +514,8 @@ class BenchmarkState extends ChangeNotifier {
             ? null
             : BenchmarkRunResult(
                 throughput: null,
-                accuracy: accuracy.accuracyNormalized < 0.0
-                    ? null
-                    : Accuracy(
-                        normalized: accuracy.accuracyNormalized,
-                        formatted: accuracy.accuracyFormatted,
-                      ),
-                accuracy2: accuracy.accuracyNormalized2 < 0.0
-                    ? null
-                    : Accuracy(
-                        normalized: accuracy.accuracyNormalized2,
-                        formatted: accuracy.accuracyFormatted2,
-                      ),
+                accuracy: accuracy.accuracy1,
+                accuracy2: accuracy.accuracy2,
                 datasetInfo: DatasetInfo(
                   name: accuracyDataset.name,
                   type: DatasetType.fromJson(

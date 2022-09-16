@@ -3,6 +3,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'handle.dart';
@@ -74,15 +75,24 @@ class _RunIn extends Struct {
   }
 }
 
+class _RunOutAccuracy extends Struct {
+  @Float()
+  external double normalized;
+  external Pointer<Utf8> formatted;
+
+  Accuracy toAccuracy() {
+    return Accuracy(
+      normalized: normalized,
+      formatted: formatted.toDartString(),
+    );
+  }
+}
+
 class _RunOut extends Struct {
-  @Int32()
-  external int ok;
-  @Float()
-  external double accuracyNormalized;
-  external Pointer<Utf8> accuracyFormatted;
-  @Float()
-  external double accuracyNormalized2;
-  external Pointer<Utf8> accuracyFormatted2;
+  @Bool()
+  external bool runOk;
+  external Pointer<_RunOutAccuracy> accuracy1;
+  external Pointer<_RunOutAccuracy> accuracy2;
   @Int32()
   external int num_samples;
   @Float()
@@ -93,10 +103,8 @@ class _RunOut extends Struct {
 
   RunResult toTunResult(DateTime startTime) {
     return RunResult(
-      accuracyNormalized: accuracyNormalized,
-      accuracyFormatted: accuracyFormatted.toDartString(),
-      accuracyNormalized2: accuracyNormalized2,
-      accuracyFormatted2: accuracyFormatted2.toDartString(),
+      accuracy1: accuracy1.address == 0 ? null : accuracy1.ref.toAccuracy(),
+      accuracy2: accuracy2.address == 0 ? null : accuracy2.ref.toAccuracy(),
       numSamples: num_samples,
       durationMs: duration_ms,
       backendName: backend_name.toDartString(),
@@ -145,7 +153,7 @@ RunResult runBenchmark(RunSettings rs) {
   }
 
   try {
-    if (runOut.ref.ok != 1) {
+    if (!runOut.ref.runOk) {
       throw '$_runName result: runOut.ref.ok != 1';
     }
 

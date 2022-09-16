@@ -120,18 +120,18 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     global_driver = nullptr;
   }
 
-  out->ok = 1;
+  out->run_ok = true;
   out->num_samples = driver.GetCounter();
   out->duration_ms =
       std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
           .count();
 
-  out->accuracy_normalized = driver.ComputeAccuracy();
-  out->accuracy_formatted = strdup(driver.ComputeAccuracyString().c_str());
+  out->accuracy1 = new dart_ffi_run_benchmark_out_accuracy;
+  out->accuracy1->normalized = driver.ComputeAccuracy();
+  out->accuracy1->formatted = strdup(driver.ComputeAccuracyString().c_str());
 
   // Second accuracy is not yet implemented in datasets
-  out->accuracy_normalized2 = -1.0f;
-  out->accuracy_formatted2 = strdup("");
+  out->accuracy2 = nullptr;
 
   li;
 
@@ -139,8 +139,14 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 }
 
 void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out* out) {
-  free(out->accuracy_formatted);
-  free(out->accuracy_formatted2);
+  if (out->accuracy1 != nullptr) {
+    free(out->accuracy1->formatted);
+    delete out->accuracy1;
+  }
+  if (out->accuracy2 != nullptr) {
+    free(out->accuracy2->formatted);
+    delete out->accuracy2;
+  }
   free(out->backend_name);
   free(out->backend_vendor);
   free(out->accelerator_name);
