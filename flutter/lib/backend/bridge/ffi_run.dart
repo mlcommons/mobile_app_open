@@ -90,6 +90,21 @@ class _RunOut extends Struct {
   external Pointer<Utf8> backend_name;
   external Pointer<Utf8> backend_vendor;
   external Pointer<Utf8> accelerator_name;
+
+  RunResult toTunResult(DateTime startTime) {
+    return RunResult(
+      accuracyNormalized: accuracyNormalized,
+      accuracyFormatted: accuracyFormatted.toDartString(),
+      accuracyNormalized2: accuracyNormalized2,
+      accuracyFormatted2: accuracyFormatted2.toDartString(),
+      numSamples: num_samples,
+      durationMs: duration_ms,
+      backendName: backend_name.toDartString(),
+      backendVendor: backend_vendor.toDartString(),
+      acceleratorName: accelerator_name.toDartString(),
+      startTime: startTime,
+    );
+  }
 }
 
 const _runName = 'dart_ffi_run_benchmark';
@@ -112,39 +127,32 @@ final _getDatasetSize = getBridgeHandle()
     .lookupFunction<_GetQuery1, _GetQuery2>(_getDatasetSizeName);
 
 RunResult runBenchmark(RunSettings rs) {
-  var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
-  runIn.ref.set(rs);
-
   final startTime = DateTime.now();
 
-  var runOut = _run(runIn);
+  var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
+  Pointer<_RunOut> runOut;
+  try {
+    runIn.ref.set(rs);
 
-  runIn.ref.free();
-  malloc.free(runIn);
+    runOut = _run(runIn);
 
-  if (runOut.address == 0) {
-    throw '$_runName result: nullptr';
+    if (runOut.address == 0) {
+      throw '$_runName result: nullptr';
+    }
+  } finally {
+    runIn.ref.free();
+    malloc.free(runIn);
   }
-  if (runOut.ref.ok != 1) {
-    throw '$_runName result: runOut.ref.ok != 1';
+
+  try {
+    if (runOut.ref.ok != 1) {
+      throw '$_runName result: runOut.ref.ok != 1';
+    }
+
+    return runOut.ref.toTunResult(startTime);
+  } finally {
+    _free(runOut);
   }
-
-  var res = RunResult(
-    accuracyNormalized: runOut.ref.accuracyNormalized,
-    accuracyFormatted: runOut.ref.accuracyFormatted.toDartString(),
-    accuracyNormalized2: runOut.ref.accuracyNormalized2,
-    accuracyFormatted2: runOut.ref.accuracyFormatted2.toDartString(),
-    numSamples: runOut.ref.num_samples,
-    durationMs: runOut.ref.duration_ms,
-    backendName: runOut.ref.backend_name.toDartString(),
-    backendVendor: runOut.ref.backend_vendor.toDartString(),
-    acceleratorName: runOut.ref.accelerator_name.toDartString(),
-    startTime: startTime,
-  );
-
-  _free(runOut);
-
-  return res;
 }
 
 int getQueryCounter() {
