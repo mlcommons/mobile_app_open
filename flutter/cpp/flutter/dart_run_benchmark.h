@@ -4,8 +4,6 @@
 extern "C" {
 #endif
 
-void fake_calls();
-
 struct dart_ffi_run_benchmark_in {
   const char *backend_model_path;
   const char *backend_lib_path;
@@ -22,7 +20,7 @@ struct dart_ffi_run_benchmark_in {
 
   const char *mode;
   int32_t min_query_count;
-  int32_t min_duration;
+  double min_duration;
   int32_t single_stream_expected_latency_ns;
   const char *output_dir;
 };
