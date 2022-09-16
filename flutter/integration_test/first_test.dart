@@ -92,6 +92,7 @@ void main() {
               'results count should be $expectedResultCount, but it is $length');
 
       for (final benchmarkResult in extendedResults.results.list) {
+        print('checking ${benchmarkResult.benchmarkId}');
         expect(benchmarkResult.performance, isNotNull);
         expect(benchmarkResult.performance!.throughput, isNotNull);
         expect(benchmarkResult.accuracy, isNotNull);

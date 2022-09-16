@@ -154,7 +154,7 @@ RunResult runBenchmark(RunSettings rs) {
 
   try {
     if (!runOut.ref.runOk) {
-      throw '$_runName result: runOut.ref.ok != 1';
+      throw '$_runName result: !runOut.ref.runOk';
     }
 
     return runOut.ref.toTunResult(startTime);
