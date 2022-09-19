@@ -52,7 +52,7 @@ class ProgressInfo {
   BenchmarkInfo? info;
   int totalStages = 0;
   int currentStage = 0;
-  int cooldownDurationMs = 0;
+  double cooldownDuration = 0;
   double get stageProgress => calculateStageProgress?.call() ?? 0.0;
 
   double Function()? calculateStageProgress;
@@ -338,7 +338,7 @@ class BenchmarkState extends ChangeNotifier {
       progressInfo.totalStages += activeBenchmarks.length;
     }
     progressInfo.currentStage = 0;
-    progressInfo.cooldownDurationMs = cooldownPause.inMilliseconds;
+    progressInfo.cooldownDuration = cooldownPause.inSeconds.toDouble();
 
     resetCurrentResults();
 
@@ -359,7 +359,7 @@ class BenchmarkState extends ChangeNotifier {
         progressInfo.cooldown = true;
         final timer = Stopwatch()..start();
         progressInfo.calculateStageProgress = () {
-          return timer.elapsedMilliseconds / progressInfo.cooldownDurationMs;
+          return timer.elapsed.inSeconds / progressInfo.cooldownDuration;
         };
         notifyListeners();
         await (_cooldownFuture = Future.delayed(cooldownPause));
@@ -372,8 +372,12 @@ class BenchmarkState extends ChangeNotifier {
       final perfTimer = Stopwatch()..start();
       progressInfo.accuracy = false;
       progressInfo.calculateStageProgress = () {
-        final minDuration = max(benchmark.taskConfig.minDurationMs, 1);
-        final timeProgress = perfTimer.elapsedMilliseconds / minDuration;
+        // UI updates once per second so using 1 second as lower bound should not affect it.
+        final minDuration = max(benchmark.taskConfig.minDuration, 1);
+        final timeProgress = perfTimer.elapsedMilliseconds /
+            Duration.millisecondsPerSecond /
+            minDuration;
+
         final minQueries = max(benchmark.taskConfig.minQueryCount, 1);
         final queryCounter = backendBridge.getQueryCounter();
         final queryProgress =
@@ -492,13 +496,12 @@ class BenchmarkState extends ChangeNotifier {
             dataPath: performanceDataset.inputPath,
             groundtruthPath: performanceDataset.groundtruthPath,
           ),
-          measuredDurationMs: performance.durationMs,
+          measuredDuration: performance.duration,
           measuredSamples: performance.numSamples,
           startDatetime: performance.startTime,
           loadgenInfo: BenchmarkLoadgenInfo(
             validity: performanceInfo.loadgenInfo!.validity,
-            durationMs: Duration.millisecondsPerSecond *
-                performanceInfo.loadgenInfo!.meanLatency *
+            duration: performanceInfo.loadgenInfo!.meanLatency *
                 performanceInfo.loadgenInfo!.queryCount,
           ),
         ),
@@ -515,12 +518,12 @@ class BenchmarkState extends ChangeNotifier {
                   dataPath: accuracyDataset.inputPath,
                   groundtruthPath: accuracyDataset.groundtruthPath,
                 ),
-                measuredDurationMs: accuracy.durationMs,
+                measuredDuration: accuracy.duration,
                 measuredSamples: accuracy.numSamples,
                 startDatetime: accuracy.startTime,
                 loadgenInfo: null,
               ),
-        minDurationMs: benchmark.taskConfig.minDurationMs,
+        minDuration: benchmark.taskConfig.minDuration,
         minSamples: benchmark.taskConfig.minQueryCount,
         backendInfo: BackendReportedInfo(
           filename: backendInfo.libPath,

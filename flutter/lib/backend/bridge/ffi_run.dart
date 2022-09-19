@@ -29,8 +29,8 @@ class _RunIn extends Struct {
   external Pointer<Utf8> mode;
   @Int32()
   external int min_query_count;
-  @Int32()
-  external int min_duration;
+  @Double()
+  external double min_duration;
   @Int32()
   external int single_stream_expected_latency_ns;
   external Pointer<Utf8> output_dir;
@@ -96,7 +96,7 @@ class _RunOut extends Struct {
   @Int32()
   external int num_samples;
   @Float()
-  external double duration_ms;
+  external double duration;
   external Pointer<Utf8> backend_name;
   external Pointer<Utf8> backend_vendor;
   external Pointer<Utf8> accelerator_name;
@@ -106,7 +106,7 @@ class _RunOut extends Struct {
       accuracy1: accuracy1.address == 0 ? null : accuracy1.ref.toAccuracy(),
       accuracy2: accuracy2.address == 0 ? null : accuracy2.ref.toAccuracy(),
       numSamples: num_samples,
-      durationMs: duration_ms,
+      duration: duration,
       backendName: backend_name.toDartString(),
       backendVendor: backend_vendor.toDartString(),
       acceleratorName: accelerator_name.toDartString(),

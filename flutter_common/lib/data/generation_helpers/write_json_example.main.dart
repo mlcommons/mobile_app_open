@@ -42,11 +42,11 @@ Future<void> main() async {
       dataPath: 'app:///mlperf_datasets/imagenet/img',
       groundtruthPath: 'app:///mlperf_datasets/imagenet/imagenet_val_full.txt',
     ),
-    measuredDurationMs: 123.456,
+    measuredDuration: 123.456,
     measuredSamples: 8,
     startDatetime: DateTime.now(),
     loadgenInfo: BenchmarkLoadgenInfo(
-      durationMs: 10.6,
+      duration: 10.6,
       validity: true,
     ),
   );
@@ -61,7 +61,7 @@ Future<void> main() async {
       name: 'libtflitebackend',
       accelerator: 'accelerator',
     ),
-    minDurationMs: 10,
+    minDuration: 10.5,
     minSamples: 8,
     backendSettingsInfo: BackendSettingsInfo(
       acceleratorCode: '',

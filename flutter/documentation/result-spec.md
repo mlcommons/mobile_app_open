@@ -68,16 +68,16 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
       Value must be normalized between `0.0` and `1.0`.
     * `formatted`: string  
       Formatted accuracy string, often with measuring unit suffix
-  * `measured_duration_ms`: floating point number  
-    Actual duration of the benchmark in milliseconds from start to finish.
+  * `measured_duration`: floating point number  
+    Actual duration of the benchmark in seconds from start to finish.
   * `measured_samples`: integer number  
     Actual number of samples evaluated during the benchmark
   * `loadgen_info`: map  
     Info provided by loadgen. May be null for accuracy runs.
     * `validity`: bool  
       Indicates whether all constraints were satisfied or not.
-    * `duration_ms`: floating point number  
-      Duration of the benchmark without loadgen overhead in milliseconds.
+    * `duration`: floating point number  
+      Duration of the benchmark without loadgen overhead in seconds.
   * `start_datetime`: string  
     Datetime of the moment when benchmark started  
     Format is Iso 8601 in UTC timezone: `2022-04-14T03:54:54.687Z`
@@ -95,8 +95,8 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
 * `accuracy_run`: map  
   Same as `performance_run`.
   May be null if accuracy was not tested in this benchmark.
-* `min_duration_ms`: floating point number  
-  Value from `task.min_duration_ms` for this benchmark from selected tasks.pbtxt file.
+* `min_duration`: floating point number  
+  Value from `task.min_duration` for this benchmark from selected tasks.pbtxt file.
 * `min_samples`: integer number  
   Value from `task.min_query_count` for this benchmark from selected tasks.pbtxt file.
 * `backend_info`: map

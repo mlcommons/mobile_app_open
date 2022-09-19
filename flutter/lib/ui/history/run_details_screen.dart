@@ -71,7 +71,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
       helper.makeInfo(l10n.historyRunDetailsValid,
           (perf.loadgenInfo?.validity ?? false).toString()),
       helper.makeInfo(l10n.historyRunDetailsDuration,
-          formatDuration(perf.measuredDurationMs.ceil())),
+          formatDuration(perf.measuredDuration)),
       helper.makeInfo(
           l10n.historyRunDetailsSamples, perf.measuredSamples.toString()),
       helper.makeInfo(
@@ -86,7 +86,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
           accuracy.accuracy?.formatted ?? l10n.resultsNotAvailable),
       helper.makeInfo(
         l10n.historyRunDetailsDuration,
-        formatDuration(accuracy.measuredDurationMs.ceil()),
+        formatDuration(accuracy.measuredDuration),
       ),
       helper.makeInfo(
           l10n.historyRunDetailsSamples, accuracy.measuredSamples.toString()),

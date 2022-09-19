@@ -165,8 +165,8 @@
                         }
                     ]
                 },
-                "min_duration_ms": {
-                    "type": "integer"
+                "min_duration": {
+                    "type": "number"
                 },
                 "min_samples": {
                     "type": "integer"
@@ -182,7 +182,7 @@
                 "benchmark_id",
                 "benchmark_name",
                 "loadgen_scenario",
-                "min_duration_ms",
+                "min_duration",
                 "min_samples",
                 "performance_run"
             ],
@@ -225,7 +225,7 @@
                 "dataset": {
                     "$ref": "#/definitions/Dataset"
                 },
-                "measured_duration_ms": {
+                "measured_duration": {
                     "type": "number"
                 },
                 "measured_samples": {
@@ -250,7 +250,7 @@
                 "accuracy2",
                 "dataset",
                 "loadgen_info",
-                "measured_duration_ms",
+                "measured_duration",
                 "measured_samples",
                 "start_datetime",
                 "throughput"
@@ -306,12 +306,12 @@
                 "validity": {
                     "type": "boolean"
                 },
-                "duration_ms": {
+                "duration": {
                     "type": "number"
                 }
             },
             "required": [
-                "duration_ms",
+                "duration",
                 "validity"
             ],
             "title": "LoadgenInfo"
