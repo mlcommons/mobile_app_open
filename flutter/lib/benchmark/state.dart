@@ -533,8 +533,7 @@ class BenchmarkState extends ChangeNotifier {
           startDatetime: performance.startTime,
           loadgenInfo: BenchmarkLoadgenInfo(
             validity: performanceInfo.loadgenInfo!.validity,
-            durationMs: Duration.millisecondsPerSecond *
-                performanceInfo.loadgenInfo!.meanLatency *
+            duration: performanceInfo.loadgenInfo!.meanLatency *
                 performanceInfo.loadgenInfo!.queryCount,
           ),
         ),

@@ -76,8 +76,8 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
     Info provided by loadgen. May be null for accuracy runs.
     * `validity`: bool  
       Indicates whether all constraints were satisfied or not.
-    * `duration_ms`: floating point number  
-      Duration of the benchmark without loadgen overhead in milliseconds.
+    * `duration`: floating point number  
+      Duration of the benchmark without loadgen overhead in seconds.
   * `start_datetime`: string  
     Datetime of the moment when benchmark started  
     Format is Iso 8601 in UTC timezone: `2022-04-14T03:54:54.687Z`

@@ -29,25 +29,25 @@ class Accuracy {
 
 class BenchmarkLoadgenInfo {
   static const String _tagValidity = 'validity';
-  static const String _tagDuration = 'duration_ms';
+  static const String _tagDuration = 'duration';
 
   final bool validity;
-  final double durationMs;
+  final double duration;
 
   BenchmarkLoadgenInfo({
     required this.validity,
-    required this.durationMs,
+    required this.duration,
   });
 
   BenchmarkLoadgenInfo.fromJson(Map<String, dynamic> json)
       : this(
           validity: json[_tagValidity] as bool,
-          durationMs: json[_tagDuration] as double,
+          duration: json[_tagDuration] as double,
         );
 
   Map<String, dynamic> toJson() => {
         _tagValidity: validity,
-        _tagDuration: durationMs,
+        _tagDuration: duration,
       };
 }
 

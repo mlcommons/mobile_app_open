@@ -306,12 +306,12 @@
                 "validity": {
                     "type": "boolean"
                 },
-                "duration_ms": {
+                "duration": {
                     "type": "number"
                 }
             },
             "required": [
-                "duration_ms",
+                "duration",
                 "validity"
             ],
             "title": "LoadgenInfo"

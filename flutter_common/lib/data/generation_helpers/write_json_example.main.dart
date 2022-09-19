@@ -46,7 +46,7 @@ Future<void> main() async {
     measuredSamples: 8,
     startDatetime: DateTime.now(),
     loadgenInfo: BenchmarkLoadgenInfo(
-      durationMs: 10.6,
+      duration: 10.6,
       validity: true,
     ),
   );
