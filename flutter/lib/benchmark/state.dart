@@ -359,8 +359,7 @@ class BenchmarkState extends ChangeNotifier {
         progressInfo.cooldown = true;
         final timer = Stopwatch()..start();
         progressInfo.calculateStageProgress = () {
-          return timer.elapsedMilliseconds /
-              Duration.millisecondsPerSecond /
+          return timer.elapsed.inSeconds /
               progressInfo.cooldownDuration;
         };
         notifyListeners();
