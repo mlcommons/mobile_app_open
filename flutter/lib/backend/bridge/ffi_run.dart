@@ -101,7 +101,7 @@ class _RunOut extends Struct {
   external Pointer<Utf8> backend_vendor;
   external Pointer<Utf8> accelerator_name;
 
-  RunResult toTunResult(DateTime startTime) {
+  RunResult toRunResult(DateTime startTime) {
     return RunResult(
       accuracy1: accuracy1.address == 0 ? null : accuracy1.ref.toAccuracy(),
       accuracy2: accuracy2.address == 0 ? null : accuracy2.ref.toAccuracy(),
@@ -157,7 +157,7 @@ RunResult runBenchmark(RunSettings rs) {
       throw '$_runName result: !runOut.ref.runOk';
     }
 
-    return runOut.ref.toTunResult(startTime);
+    return runOut.ref.toRunResult(startTime);
   } finally {
     _free(runOut);
   }
