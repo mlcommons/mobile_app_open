@@ -25,6 +25,11 @@ class Accuracy {
         _tagValue: normalized,
         _tagString: formatted,
       };
+
+  bool isInBounds({double min = 0.0, double max = 1.0}) {
+    if (!normalized.isFinite) return false;
+    return normalized >= min && normalized <= max;
+  }
 }
 
 class BenchmarkLoadgenInfo {

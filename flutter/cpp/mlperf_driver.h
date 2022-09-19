@@ -56,6 +56,8 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
   // Flush the staged queries immediately.
   void FlushQueries() override { backend_->FlushQueries(); }
 
+  bool HasAccuracy() { return dataset_->HasAccuracy(); }
+
   // Asks the dataset to calculate the accuracy.
   float ComputeAccuracy() { return dataset_->ComputeAccuracy(); }
 
