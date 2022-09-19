@@ -33,7 +33,7 @@ struct dart_ffi_run_benchmark_out {
   float accuracy_normalized2;
   char *accuracy_formatted2;
   int32_t num_samples;
-  float duration_ms;
+  float duration;
   char *backend_name;
   char *backend_vendor;
   char *accelerator_name;

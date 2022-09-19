@@ -122,9 +122,8 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   out->ok = 1;
   out->num_samples = driver.GetCounter();
-  out->duration_ms =
-      std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
-          .count();
+
+  out->duration = std::chrono::duration<float>{end - start}.count();
 
   out->accuracy_normalized = driver.ComputeAccuracy();
   out->accuracy_formatted = strdup(driver.ComputeAccuracyString().c_str());

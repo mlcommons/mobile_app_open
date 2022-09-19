@@ -68,8 +68,8 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
       Value must be normalized between `0.0` and `1.0`.
     * `formatted`: string  
       Formatted accuracy string, often with measuring unit suffix
-  * `measured_duration_ms`: floating point number  
-    Actual duration of the benchmark in milliseconds from start to finish.
+  * `measured_duration`: floating point number  
+    Actual duration of the benchmark in seconds from start to finish.
   * `measured_samples`: integer number  
     Actual number of samples evaluated during the benchmark
   * `loadgen_info`: map  

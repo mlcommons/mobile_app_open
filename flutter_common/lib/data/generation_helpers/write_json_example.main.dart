@@ -42,7 +42,7 @@ Future<void> main() async {
       dataPath: 'app:///mlperf_datasets/imagenet/img',
       groundtruthPath: 'app:///mlperf_datasets/imagenet/imagenet_val_full.txt',
     ),
-    measuredDurationMs: 123.456,
+    measuredDuration: 123.456,
     measuredSamples: 8,
     startDatetime: DateTime.now(),
     loadgenInfo: BenchmarkLoadgenInfo(

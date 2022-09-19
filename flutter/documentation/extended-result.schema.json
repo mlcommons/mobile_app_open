@@ -225,7 +225,7 @@
                 "dataset": {
                     "$ref": "#/definitions/Dataset"
                 },
-                "measured_duration_ms": {
+                "measured_duration": {
                     "type": "number"
                 },
                 "measured_samples": {
@@ -250,7 +250,7 @@
                 "accuracy2",
                 "dataset",
                 "loadgen_info",
-                "measured_duration_ms",
+                "measured_duration",
                 "measured_samples",
                 "start_datetime",
                 "throughput"

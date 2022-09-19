@@ -86,7 +86,7 @@ class _RunOut extends Struct {
   @Int32()
   external int num_samples;
   @Float()
-  external double duration_ms;
+  external double duration;
   external Pointer<Utf8> backend_name;
   external Pointer<Utf8> backend_vendor;
   external Pointer<Utf8> accelerator_name;
@@ -135,7 +135,7 @@ RunResult runBenchmark(RunSettings rs) {
     accuracyNormalized2: runOut.ref.accuracyNormalized2,
     accuracyFormatted2: runOut.ref.accuracyFormatted2.toDartString(),
     numSamples: runOut.ref.num_samples,
-    durationMs: runOut.ref.duration_ms,
+    duration: runOut.ref.duration,
     backendName: runOut.ref.backend_name.toDartString(),
     backendVendor: runOut.ref.backend_vendor.toDartString(),
     acceleratorName: runOut.ref.accelerator_name.toDartString(),

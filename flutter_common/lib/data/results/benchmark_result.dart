@@ -56,7 +56,7 @@ class BenchmarkRunResult {
   static const String _tagAccuracy = 'accuracy';
   static const String _tagAccuracy2 = 'accuracy2';
   static const String _tagDatasetInfo = 'dataset';
-  static const String _tagMeasuredDuration = 'measured_duration_ms';
+  static const String _tagMeasuredDuration = 'measured_duration';
   static const String _tagMeasuredSamples = 'measured_samples';
   static const String _tagStartDatetime = 'start_datetime';
   static const String _tagLoadgenInfo = 'loadgen_info';
@@ -65,7 +65,7 @@ class BenchmarkRunResult {
   final Accuracy? accuracy;
   final Accuracy? accuracy2;
   final DatasetInfo datasetInfo;
-  final double measuredDurationMs;
+  final double measuredDuration;
   final int measuredSamples;
   final DateTime startDatetime;
   final BenchmarkLoadgenInfo? loadgenInfo;
@@ -75,7 +75,7 @@ class BenchmarkRunResult {
     required this.accuracy,
     required this.accuracy2,
     required this.datasetInfo,
-    required this.measuredDurationMs,
+    required this.measuredDuration,
     required this.measuredSamples,
     required this.startDatetime,
     required this.loadgenInfo,
@@ -91,7 +91,7 @@ class BenchmarkRunResult {
               ? null
               : Accuracy.fromJson(json[_tagAccuracy2]),
           datasetInfo: DatasetInfo.fromJson(json[_tagDatasetInfo]),
-          measuredDurationMs: (json[_tagMeasuredDuration] as num).toDouble(),
+          measuredDuration: (json[_tagMeasuredDuration] as num).toDouble(),
           measuredSamples: json[_tagMeasuredSamples] as int,
           startDatetime: DateTime.parse(json[_tagStartDatetime] as String),
           loadgenInfo: json[_tagLoadgenInfo] == null
@@ -104,7 +104,7 @@ class BenchmarkRunResult {
         _tagAccuracy: accuracy,
         _tagAccuracy2: accuracy2,
         _tagDatasetInfo: datasetInfo,
-        _tagMeasuredDuration: measuredDurationMs,
+        _tagMeasuredDuration: measuredDuration,
         _tagMeasuredSamples: measuredSamples,
         _tagStartDatetime: startDatetime.toUtc().toIso8601String(),
         _tagLoadgenInfo: loadgenInfo,

@@ -52,7 +52,7 @@ class ProgressInfo {
   BenchmarkInfo? info;
   int totalStages = 0;
   int currentStage = 0;
-  int cooldownDurationMs = 0;
+  double cooldownDuration = 0;
   double get stageProgress => calculateStageProgress?.call() ?? 0.0;
 
   double Function()? calculateStageProgress;
@@ -338,7 +338,7 @@ class BenchmarkState extends ChangeNotifier {
       progressInfo.totalStages += activeBenchmarks.length;
     }
     progressInfo.currentStage = 0;
-    progressInfo.cooldownDurationMs = cooldownPause.inMilliseconds;
+    progressInfo.cooldownDuration = cooldownPause.inSeconds.toDouble();
 
     resetCurrentResults();
 
@@ -359,7 +359,9 @@ class BenchmarkState extends ChangeNotifier {
         progressInfo.cooldown = true;
         final timer = Stopwatch()..start();
         progressInfo.calculateStageProgress = () {
-          return timer.elapsedMilliseconds / progressInfo.cooldownDurationMs;
+          return timer.elapsedMilliseconds /
+              Duration.millisecondsPerSecond /
+              progressInfo.cooldownDuration;
         };
         notifyListeners();
         await (_cooldownFuture = Future.delayed(cooldownPause));
@@ -526,7 +528,7 @@ class BenchmarkState extends ChangeNotifier {
             dataPath: performanceDataset.inputPath,
             groundtruthPath: performanceDataset.groundtruthPath,
           ),
-          measuredDurationMs: performance.durationMs,
+          measuredDuration: performance.duration,
           measuredSamples: performance.numSamples,
           startDatetime: performance.startTime,
           loadgenInfo: BenchmarkLoadgenInfo(
@@ -559,7 +561,7 @@ class BenchmarkState extends ChangeNotifier {
                   dataPath: accuracyDataset.inputPath,
                   groundtruthPath: accuracyDataset.groundtruthPath,
                 ),
-                measuredDurationMs: accuracy.durationMs,
+                measuredDuration: accuracy.duration,
                 measuredSamples: accuracy.numSamples,
                 startDatetime: accuracy.startTime,
                 loadgenInfo: null,

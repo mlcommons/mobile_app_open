@@ -4,7 +4,7 @@ class RunResult {
   final double accuracyNormalized2;
   final String accuracyFormatted2;
   final int numSamples;
-  final double durationMs;
+  final double duration;
   final String backendName;
   final String backendVendor;
   final String acceleratorName;
@@ -16,7 +16,7 @@ class RunResult {
     required this.accuracyNormalized2,
     required this.accuracyFormatted2,
     required this.numSamples,
-    required this.durationMs,
+    required this.duration,
     required this.backendName,
     required this.backendVendor,
     required this.acceleratorName,
