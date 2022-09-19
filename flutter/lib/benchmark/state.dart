@@ -577,6 +577,11 @@ class BenchmarkState extends ChangeNotifier {
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
+    if (!(result.accuracy1?.isInBounds() ?? true) ||
+        !(result.accuracy2?.isInBounds() ?? true)) {
+      throw '${benchmark.info.taskName}: ${runMode.logSuffix} run: accuracy is invalid (backend may be corrupted)';
+    }
+
     const logFileName = 'mlperf_log_detail.txt';
     final loadgenInfo = await LoadgenInfo.fromFile(
       filepath: '$logDir/$logFileName',
@@ -593,11 +598,6 @@ class BenchmarkState extends ChangeNotifier {
 
     print(
         'Run result: id: ${benchmark.id}, $result, throughput: $throughput, elapsed: $elapsed');
-
-    if (!(result.accuracy1?.isInBounds() ?? true) ||
-        !(result.accuracy2?.isInBounds() ?? true)) {
-      throw '${benchmark.info.taskName}: ${runMode.logSuffix} run: accuracy is invalid (backend may be corrupted)';
-    }
 
     return RunInfo(
       settings: runSettings,
