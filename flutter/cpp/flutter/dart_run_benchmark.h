@@ -27,13 +27,17 @@ struct dart_ffi_run_benchmark_in {
   const char *output_dir;
 };
 
-struct dart_ffi_run_benchmark_out {
-  int32_t ok;
+struct dart_ffi_run_benchmark_out_accuracy {
+  float normalized;
+  char *formatted;
+};
 
-  float accuracy_normalized;
-  char *accuracy_formatted;
-  float accuracy_normalized2;
-  char *accuracy_formatted2;
+struct dart_ffi_run_benchmark_out {
+  bool run_ok;
+
+  struct dart_ffi_run_benchmark_out_accuracy *accuracy1;
+  struct dart_ffi_run_benchmark_out_accuracy *accuracy2;
+
   int32_t num_samples;
   float duration_ms;
   char *backend_name;

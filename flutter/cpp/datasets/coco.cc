@@ -176,6 +176,11 @@ std::vector<uint8_t> Coco::ProcessOutput(const int sample_idx,
   return result;
 }
 
+bool Coco::HasAccuracy() {
+  std::ifstream t(groundtruth_file_);
+  return t.good();
+}
+
 float Coco::ComputeAccuracy() {
   // Reads the ground truth file.
   std::ifstream t(groundtruth_file_);
