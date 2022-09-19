@@ -392,10 +392,6 @@ class BenchmarkState extends ChangeNotifier {
       performanceRunInfo.loadgenInfo!;
 
       final performanceResult = performanceRunInfo.result;
-      if (!(performanceResult.accuracy1?.isInBounds() ?? true) ||
-          !(performanceResult.accuracy2?.isInBounds() ?? true)) {
-        throw '${benchmark.info.taskName}: performance run: accuracy is invalid (backend may be corrupted)';
-      }
       benchmark.performanceModeResult = BenchmarkResult(
         throughput: performanceRunInfo.throughput,
         accuracy: performanceResult.accuracy1,
@@ -430,10 +426,6 @@ class BenchmarkState extends ChangeNotifier {
         );
 
         final accuracyResult = accuracyRunInfo.result;
-        if (!(accuracyResult.accuracy1?.isInBounds() ?? true) ||
-            !(accuracyResult.accuracy2?.isInBounds() ?? true)) {
-          throw '${benchmark.info.taskName}: accuracy run: accuracy is invalid (backend may be corrupted)';
-        }
         benchmark.accuracyModeResult = BenchmarkResult(
           // loadgen doesn't calculate latency for accuracy mode benchmarks
           // so throughput is infinity which is not a valid JSON numeric value
@@ -601,6 +593,11 @@ class BenchmarkState extends ChangeNotifier {
 
     print(
         'Run result: id: ${benchmark.id}, $result, throughput: $throughput, elapsed: $elapsed');
+
+    if (!(result.accuracy1?.isInBounds() ?? true) ||
+        !(result.accuracy2?.isInBounds() ?? true)) {
+      throw '${benchmark.info.taskName}: ${runMode.logSuffix} run: accuracy is invalid (backend may be corrupted)';
+    }
 
     return RunInfo(
       settings: runSettings,
