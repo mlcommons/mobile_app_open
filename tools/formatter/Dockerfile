@@ -76,6 +76,7 @@ USER $UNAME
 RUN git clone --branch "2.10.5" --single-branch --depth 1 \
     https://github.com/flutter/flutter.git /home/$UNAME/flutter
 ENV PATH=$PATH:/home/$UNAME/flutter/bin:/home/$UNAME/flutter/bin/cache/dart-sdk/bin
+RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
 RUN flutter doctor -v
 
 
