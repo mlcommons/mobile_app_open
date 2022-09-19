@@ -16,7 +16,7 @@ class RunSettings {
   final String scenario;
   final String mode; // Submission/Accuracy/Performance
   final int min_query_count;
-  final int min_duration;
+  final double min_duration;
   final int single_stream_expected_latency_ns;
   final String output_dir;
   final String benchmark_id;

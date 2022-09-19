@@ -55,7 +55,7 @@ class _RunIn extends Struct {
 
     mode = rs.mode.toNativeUtf8();
     min_query_count = rs.min_query_count;
-    min_duration = rs.min_duration / 1000.0;
+    min_duration = rs.min_duration;
     single_stream_expected_latency_ns = rs.single_stream_expected_latency_ns;
 
     output_dir = rs.output_dir.toNativeUtf8();

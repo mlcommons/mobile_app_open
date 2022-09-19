@@ -372,8 +372,12 @@ class BenchmarkState extends ChangeNotifier {
       final perfTimer = Stopwatch()..start();
       progressInfo.accuracy = false;
       progressInfo.calculateStageProgress = () {
-        final minDuration = max(benchmark.taskConfig.minDurationMs, 1);
-        final timeProgress = perfTimer.elapsedMilliseconds / minDuration;
+        // UI updates once per second so using 1 second as lower bound should not affect it.
+        final minDuration = max(benchmark.taskConfig.minDuration, 1);
+        final timeProgress = perfTimer.elapsedMilliseconds /
+            Duration.millisecondsPerSecond /
+            minDuration;
+
         final minQueries = max(benchmark.taskConfig.minQueryCount, 1);
         final queryCounter = backendBridge.getQueryCounter();
         final queryProgress =
@@ -560,7 +564,7 @@ class BenchmarkState extends ChangeNotifier {
                 startDatetime: accuracy.startTime,
                 loadgenInfo: null,
               ),
-        minDurationMs: benchmark.taskConfig.minDurationMs,
+        minDurationMs: (benchmark.taskConfig.minDuration * 1000).toInt(),
         minSamples: benchmark.taskConfig.minQueryCount,
         backendInfo: BackendReportedInfo(
           filename: backendInfo.libPath,
