@@ -118,7 +118,7 @@ class BenchmarkExportResult {
   static const String _tagBackendSettings = 'backend_settings';
   static const String _tagPerformanceRun = 'performance_run';
   static const String _tagAccuracyRun = 'accuracy_run';
-  static const String _tagMinDuration = 'min_duration_ms';
+  static const String _tagMinDuration = 'min_duration';
   static const String _tagMinSamples = 'min_samples';
   static const String _tagBackendInfo = 'backend_info';
 
@@ -128,7 +128,7 @@ class BenchmarkExportResult {
   final BackendSettingsInfo backendSettingsInfo;
   final BenchmarkRunResult? performance;
   final BenchmarkRunResult? accuracy;
-  final int minDurationMs;
+  final double minDuration;
   final int minSamples;
   final BackendReportedInfo backendInfo;
 
@@ -139,7 +139,7 @@ class BenchmarkExportResult {
     required this.backendSettingsInfo,
     required this.performance,
     required this.accuracy,
-    required this.minDurationMs,
+    required this.minDuration,
     required this.minSamples,
     required this.backendInfo,
   });
@@ -155,7 +155,7 @@ class BenchmarkExportResult {
           accuracy: json[_tagAccuracyRun] == null
               ? null
               : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
-          minDurationMs: json[_tagMinDuration] as int,
+          minDuration: json[_tagMinDuration] as double,
           minSamples: json[_tagMinSamples] as int,
           backendInfo: BackendReportedInfo.fromJson(json[_tagBackendInfo]),
         );
@@ -167,7 +167,7 @@ class BenchmarkExportResult {
         _tagBackendSettings: backendSettingsInfo,
         _tagPerformanceRun: performance,
         _tagAccuracyRun: accuracy,
-        _tagMinDuration: minDurationMs,
+        _tagMinDuration: minDuration,
         _tagMinSamples: minSamples,
         _tagBackendInfo: backendInfo,
       };

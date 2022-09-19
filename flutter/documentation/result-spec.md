@@ -95,8 +95,8 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
 * `accuracy_run`: map  
   Same as `performance_run`.
   May be null if accuracy was not tested in this benchmark.
-* `min_duration_ms`: floating point number  
-  Value from `task.min_duration_ms` for this benchmark from selected tasks.pbtxt file.
+* `min_duration`: floating point number  
+  Value from `task.min_duration` for this benchmark from selected tasks.pbtxt file.
 * `min_samples`: integer number  
   Value from `task.min_query_count` for this benchmark from selected tasks.pbtxt file.
 * `backend_info`: map

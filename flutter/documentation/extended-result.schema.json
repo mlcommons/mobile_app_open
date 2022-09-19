@@ -165,8 +165,8 @@
                         }
                     ]
                 },
-                "min_duration_ms": {
-                    "type": "integer"
+                "min_duration": {
+                    "type": "number"
                 },
                 "min_samples": {
                     "type": "integer"
@@ -182,7 +182,7 @@
                 "benchmark_id",
                 "benchmark_name",
                 "loadgen_scenario",
-                "min_duration_ms",
+                "min_duration",
                 "min_samples",
                 "performance_run"
             ],
