@@ -41,7 +41,8 @@ scanner/image: output/docker_mlperf_scanner.stamp
 .PHONY: scanner/build
 scanner/build:
 	bazel clean
-	build-wrapper-linux-x86-64 --out-dir "${SONAR_OUT_DIR}" make
+	build-wrapper-linux-x86-64 --out-dir "${SONAR_OUT_DIR}" \
+		make flutter/android
 
 # TODO (anhappdev): Use MLCommons organization
 .PHONY: scanner/scan
@@ -59,7 +60,7 @@ scanner/scan:
 		-Dsonar.pullrequest.base=${PR_BASE}
 
 .PHONY: docker/scanner/build
-docker/scanner/build: output/docker_mlperf_scanner.stamp
+docker/scanner/build:
 	MSYS2_ARG_CONV_EXCL="*" docker run ${flutter_common_docker_flags} \
 		make scanner/build
 
