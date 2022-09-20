@@ -84,3 +84,9 @@ To automatically format your files you must have `clang-format` and `buildifier`
 
 * `brew install clang-format`,
 * `brew install buildifier`
+
+Install GNU utils:
+
+* `brew install findutils`
+  * Add GNU utils to path: `PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH"`  
+    If you use zsh: `echo export PATH="/usr/local/opt/findutils/libexec/gnubin:\$PATH" >>~/.zshrc`

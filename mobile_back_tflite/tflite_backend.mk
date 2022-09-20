@@ -24,6 +24,9 @@ ifeq (${WITH_TFLITE},1)
 else
   # tflite is enabled by default, so print log message only if someone disabled it
   $(info WITH_TFLITE=0)
+  # xcode will give you an error if a backend is specified in xcode config but the file is missing
+  backend_tflite_ios_target=//mobile_back_tflite/cpp/backend_dummy/ios:libtflitebackend
+  backend_tflite_ios_zip=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_dummy/ios/libtflitebackend.xcframework.zip
 endif
 
 ifeq (${WITH_MEDIATEK},1)
