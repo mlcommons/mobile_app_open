@@ -19,8 +19,8 @@ package(
 )
 
 cc_library(
-    name = "fake_backend",
-    srcs = ["fake_backend.cc"],
+    name = "dummy_backend",
+    srcs = ["dummy_backend.cc"],
     deps = [
         "//flutter/cpp/c:headers",
     ],

@@ -20,6 +20,6 @@ $(info WITH_APPLE=1)
   backend_coreml_filename=libcoremlbackend
 else 
   # xcode will give you an error if a backend is specified in xcode config but the file is missing
-  backend_coreml_ios_target=//mobile_back_tflite/cpp/backend_fake/ios:libcoremlbackend
-  backend_coreml_ios_zip=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_fake/ios/libcoremlbackend.xcframework.zip
+  backend_coreml_ios_target=//mobile_back_tflite/cpp/backend_dummy/ios:libcoremlbackend
+  backend_coreml_ios_zip=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_dummy/ios/libcoremlbackend.xcframework.zip
 endif

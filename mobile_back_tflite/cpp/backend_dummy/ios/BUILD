@@ -20,20 +20,18 @@ load("@build_bazel_rules_apple//apple:apple.bzl", "apple_xcframework")
 # Otherwise xcode will fail to build the app.
 apple_xcframework(
     name = "libtflitebackend",
-    bundle_id = "com.mlcommons.inference.backend-tflite-fake",
+    bundle_id = "com.mlcommons.inference.backend-tflite-dummy",
     exported_symbols_lists = ["//flutter/cpp/c:exported_symbols.lds"],
     infoplists = ["//flutter/cpp/flutter:BackendBridgeInfo.plist"],
     ios = {
-        "simulator": [
-            "x86_64",
-        ],
+        "simulator": ["x86_64"],
         "device": ["arm64"],
     },
     minimum_os_versions = {
         "ios": "12.0",
     },
     deps = [
-        "//mobile_back_tflite/cpp/backend_fake:fake_backend",
+        "//mobile_back_tflite/cpp/backend_dummy:dummy_backend",
     ],
 )
 
@@ -42,19 +40,17 @@ apple_xcframework(
 # Otherwise xcode will fail to build the app.
 apple_xcframework(
     name = "libcoremlbackend",
-    bundle_id = "com.mlcommons.inference.backend-coreml-fake",
+    bundle_id = "com.mlcommons.inference.backend-coreml-dummy",
     exported_symbols_lists = ["//flutter/cpp/c:exported_symbols.lds"],
     infoplists = ["//flutter/cpp/flutter:BackendBridgeInfo.plist"],
     ios = {
-        "simulator": [
-            "x86_64",
-        ],
+        "simulator": ["x86_64"],
         "device": ["arm64"],
     },
     minimum_os_versions = {
         "ios": "12.0",
     },
     deps = [
-        "//mobile_back_tflite/cpp/backend_fake:fake_backend",
+        "//mobile_back_tflite/cpp/backend_dummy:dummy_backend",
     ],
 )
