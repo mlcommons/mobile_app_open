@@ -5,7 +5,7 @@ import 'package:ffi/ffi.dart';
 import 'handle.dart';
 
 class _RunOut extends Struct {
-  external Pointer<Utf8> soc_name;
+  external Pointer<Utf8> socName;
 }
 
 const _runName = 'dart_ffi_cpuinfo';
@@ -26,10 +26,10 @@ String getSocName() {
   }
 
   try {
-    if (runOut.ref.soc_name.address == 0) {
+    if (runOut.ref.socName.address == 0) {
       throw '$_runName result: data: nullptr';
     }
-    return runOut.ref.soc_name.toDartString();
+    return runOut.ref.socName.toDartString();
   } finally {
     _free(runOut);
   }
