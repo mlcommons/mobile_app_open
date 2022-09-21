@@ -94,7 +94,7 @@ void main() {
           expectedAccuracyMap,
           isNotNull,
           reason:
-              'missing expected accuracy for ${benchmarkResult.benchmarkId}',
+              'missing expected expected accuracy map for ${benchmarkResult.benchmarkId}',
         );
         expectedAccuracyMap!;
 

@@ -17,7 +17,12 @@ class HistoryHelperUtils {
     return dateFormat.format(value);
   }
 
-  AppBar makeAppBar(String title, {Widget? leading, List<Widget>? actions}) {
+  AppBar makeAppBar(
+    String title, {
+    Widget? leading,
+    List<Widget>? actions,
+    PreferredSizeWidget? bottom,
+  }) {
     return AppBar(
       title: Text(
         title,
@@ -28,6 +33,7 @@ class HistoryHelperUtils {
       iconTheme: const IconThemeData(color: AppColors.lightAppBarIconTheme),
       leading: leading,
       actions: actions,
+      bottom: bottom,
     );
   }
 
@@ -84,6 +90,37 @@ class HistoryHelperUtils {
           },
         ),
       ),
+    );
+  }
+
+  Widget makeListItem({
+    required String title,
+    String subtitle = '',
+    Widget? trailing,
+    void Function()? onTap,
+    void Function()? onLongPress,
+    bool specialTitleColor = false,
+  }) {
+    return ListTile(
+      title: Padding(
+        padding: const EdgeInsets.only(bottom: 5),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: specialTitleColor ? AppColors.darkRedText : null,
+          ),
+        ),
+      ),
+      subtitle: subtitle.isEmpty
+          ? null
+          : Text(
+              subtitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+      trailing: trailing ?? const Icon(Icons.chevron_right),
+      onTap: onTap,
+      onLongPress: onLongPress,
     );
   }
 

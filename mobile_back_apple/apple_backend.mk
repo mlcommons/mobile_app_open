@@ -16,10 +16,10 @@
 # Currently both Apple and TFLite backend is hard-coded in XCode project,
 # therefore building iOS app will require both of them.
 # To build for only one framework, modify XCode project and the next lines accordingly.
-ifeq ($(shell uname -s),Darwin)
-WITH_TFLITE=1
-WITH_APPLE=1
-endif
+#ifeq ($(shell uname -s),Darwin)
+#WITH_TFLITE=1
+#WITH_APPLE=1
+#endif
 
 ifeq (${WITH_APPLE},1)
 $(info WITH_APPLE=1)

@@ -10,4 +10,6 @@ analyzer:
 linter:
   rules:
     avoid_print: false
+    unawaited_futures: true
     prefer_single_quotes: true
+    prefer_function_declarations_over_variables: false

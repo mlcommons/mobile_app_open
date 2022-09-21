@@ -12,7 +12,7 @@
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		19C134532876922700263A48 /* backend_bridge_fw.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */; };
 		19C134542876922700263A48 /* backend_bridge_fw.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1344F2876919E00263A48 /* backend_bridge_fw.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		19C1345E2878151A00263A48 /* libtflitebackend.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1345D2878151A00263A48 /* libtflitebackend.xcframework */; };
+		19C1345E2878151A00263A48 /* libtflitebackend.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1345D2878151A00263A48 /* libtflitebackend.xcframework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		19C1345F2878151A00263A48 /* libtflitebackend.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 19C1345D2878151A00263A48 /* libtflitebackend.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C25ABBE270595F000518142 /* RunnerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C25ABBD270595F000518142 /* RunnerTests.m */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -20,7 +20,7 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-		BD6EDD1F2884143500106593 /* libcoremlbackend.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD6EDD1E2884143500106593 /* libcoremlbackend.xcframework */; };
+		BD6EDD1F2884143500106593 /* libcoremlbackend.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD6EDD1E2884143500106593 /* libcoremlbackend.xcframework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		BD6EDD202884143500106593 /* libcoremlbackend.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BD6EDD1E2884143500106593 /* libcoremlbackend.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEA786FDB12CF80A3697FDAF /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8EF4D7B34CC3D1FBA66853A /* Pods_RunnerTests.framework */; };
 		DD2FD2B718B01E010F0F88BB /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91CBF18371DBD12EEEC9EA37 /* Pods_Runner.framework */; };
@@ -39,7 +39,7 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		19C134552876922700263A48 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
@@ -48,7 +48,7 @@
 				19C134542876922700263A48 /* backend_bridge_fw.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 

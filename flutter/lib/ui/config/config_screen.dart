@@ -13,9 +13,17 @@ class ConfigScreen extends StatefulWidget {
 }
 
 class _ConfigScreen extends State<ConfigScreen> {
+  late BenchmarkState state;
+
+  @override
+  void dispose() {
+    state.saveTaskSelection();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<BenchmarkState>();
+    state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
     final childrenList = <Widget>[];
 
@@ -47,7 +55,7 @@ class _ConfigScreen extends State<ConfigScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          stringResources.configTitle,
+          stringResources.benchConfigTitle,
         ),
       ),
       body: ListView(

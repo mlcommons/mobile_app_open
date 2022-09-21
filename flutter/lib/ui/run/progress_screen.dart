@@ -44,7 +44,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.measuring,
+            l10n.progressMeasuring,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.lightText,
@@ -52,7 +52,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             ),
           ),
           Text(
-            l10n.dontCloseApp,
+            l10n.progressDontClose,
             style: const TextStyle(
               color: AppColors.lightText,
               fontSize: 17,
@@ -115,7 +115,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: Text(
           progress.cooldown
-              ? l10n.cooldownStatus
+              ? l10n.progressCooldown
               : (progress.accuracy
                       ? l10n.progressScreenNameAccuracy
                       : l10n.progressScreenNamePerformance)
@@ -162,7 +162,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: Text(
-            l10n.cancel,
+            l10n.progressCancel,
             style: const TextStyle(
               fontSize: 15.0,
               color: AppColors.lightText,

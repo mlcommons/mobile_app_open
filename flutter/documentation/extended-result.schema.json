@@ -162,7 +162,7 @@
                     ]
                 },
                 "min_duration_ms": {
-                    "type": "number"
+                    "type": "integer"
                 },
                 "min_samples": {
                     "type": "integer"
@@ -230,15 +230,22 @@
                 "start_datetime": {
                     "type": "string"
                 },
-                "loadgen_validity": {
-                    "type": "boolean"
+                "loadgen_info": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/LoadgenInfo"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 }
             },
             "required": [
                 "accuracy",
                 "accuracy2",
                 "dataset",
-                "loadgen_validity",
+                "loadgen_info",
                 "measured_duration_ms",
                 "measured_samples",
                 "start_datetime",
@@ -287,6 +294,23 @@
                 "type"
             ],
             "title": "Dataset"
+        },
+        "LoadgenInfo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "validity": {
+                    "type": "boolean"
+                },
+                "duration_ms": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "duration_ms",
+                "validity"
+            ],
+            "title": "LoadgenInfo"
         },
         "BackendInfo": {
             "type": "object",

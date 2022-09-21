@@ -35,11 +35,11 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8"
+  benchmark_id: "image_classification"
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
   custom_setting {
     id: "bgLoad2"
     value: "true"
@@ -47,12 +47,12 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IC_tpu_uint8_offline"
+  benchmark_id: "image_classification_offline"
   accelerator: "nnapi"
   accelerator_desc: "NNAPI"
   configuration: "TFLite"
   batch_size: 2
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
   custom_setting {
     id: "bgLoad2"
     value: "true"
@@ -94,7 +94,8 @@ void dumpBenchmarkSetting(const BenchmarkSetting &benchmark_setting) {
             << std::endl;
   std::cout << "    batch_size: " << benchmark_setting.batch_size()
             << std::endl;
-  std::cout << "    src: " << benchmark_setting.src() << std::endl;
+  std::cout << "    model_path: " << benchmark_setting.model_path()
+            << std::endl;
   std::cout << "    Custom Settings: " << std::endl;
   for (auto s : benchmark_setting.custom_setting()) {
     dumpCustomSetting(s);
@@ -122,8 +123,8 @@ int test_proto() {
 
   // Simulate the code flow
   std::list<std::string> benchmarks;
-  benchmarks.push_back("IC_tpu_uint8");
-  benchmarks.push_back("IC_tpu_uint8_offline");
+  benchmarks.push_back("image_classification");
+  benchmarks.push_back("image_classification_offline");
   for (auto benchmark_id : benchmarks) {
     // Convert to SettingList
     SettingList setting_list = createSettingList(backend_setting, benchmark_id);

@@ -28,33 +28,33 @@ class BenchmarkInfo {
     switch (task.id) {
       case ('image_classification'):
         return BenchmarkLocalizationInfo(
-          name: stringResources.imageClassification,
-          detailsTitle: stringResources.icInfo,
-          detailsContent: stringResources.icInfoDescription,
+          name: stringResources.benchNameImageClassification,
+          detailsTitle: stringResources.benchInfoImageClassification,
+          detailsContent: stringResources.benchInfoImageClassificationDesc,
         );
       case ('image_classification_offline'):
         return BenchmarkLocalizationInfo(
-          name: stringResources.imageClassificationOffline,
-          detailsTitle: stringResources.icInfo,
-          detailsContent: stringResources.icInfoDescription,
+          name: stringResources.benchNameImageClassificationOffline,
+          detailsTitle: stringResources.benchInfoImageClassification,
+          detailsContent: stringResources.benchInfoImageClassificationDesc,
         );
       case ('object_detection'):
         return BenchmarkLocalizationInfo(
-          name: stringResources.objectDetection,
-          detailsTitle: stringResources.odInfo,
-          detailsContent: stringResources.odInfoDescription,
+          name: stringResources.benchNameObjectDetection,
+          detailsTitle: stringResources.benchInfoObjectDetection,
+          detailsContent: stringResources.benchInfoObjectDetectionDesc,
         );
       case ('image_segmentation_v2'):
         return BenchmarkLocalizationInfo(
-          name: stringResources.imageSegmentation,
-          detailsTitle: stringResources.isInfo,
-          detailsContent: stringResources.isMosaicInfoDescription,
+          name: stringResources.benchNameImageSegmentation,
+          detailsTitle: stringResources.benchInfoImageSegmentation,
+          detailsContent: stringResources.benchInfoImageSegmentationDesc,
         );
       case ('natural_language_processing'):
         return BenchmarkLocalizationInfo(
-          name: stringResources.languageProcessing,
-          detailsTitle: stringResources.luInfo,
-          detailsContent: stringResources.luInfoDescription,
+          name: stringResources.benchNameLanguageProcessing,
+          detailsTitle: stringResources.benchInfoLanguageProcessing,
+          detailsContent: stringResources.benchInfoLanguageProcessingDesc,
         );
       default:
         throw 'unhandled task id: ${task.id}';

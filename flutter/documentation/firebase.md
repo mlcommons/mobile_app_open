@@ -65,6 +65,10 @@ You must set it in Firebase config for Flutter and generate sources from it.
 
 Run `make flutter/firebase-config` to do it. See [Linking Flutter to Firebase](#Linking-Flutter-to-Firebase) section for details.
 
+You can have several different functions in one Firebase project if you set different `FIREBASE_FLUTTER_FUNCTIONS_PREFIX` for them.
+You can use it for testing or for supporting several versions of the API.
+Just remember to keep older functions when deploying when firebase tool asks you if they should be deleted.
+
 All `firebase` and `npm` commands for Firebase Functions should be run inside `firebase_functions/functions` directory.
 
 One time setup:
