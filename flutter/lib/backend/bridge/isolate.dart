@@ -5,6 +5,13 @@ import 'package:mlperfbench/backend/bridge/ffi_run.dart' as ffi_run;
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
 
+class _ErrorHolder {
+  final Object exception;
+  final StackTrace trace;
+
+  _ErrorHolder(this.exception, this.trace);
+}
+
 class BridgeIsolate {
   late final SendPort _runSendPort;
   Completer<RunResult> _nextResult = Completer();
@@ -22,12 +29,18 @@ class BridgeIsolate {
     receivePort.listen((message) {
       if (message is SendPort) {
         sendPortCompleter.complete(message);
+        return;
       }
       if (message is RunResult) {
         if (res._nextResult.isCompleted) {
           throw 'unexpected completed run result';
         }
         res._nextResult.complete(message);
+        return;
+      }
+      if (message is _ErrorHolder) {
+        res._nextResult.completeError(message.exception, message.trace);
+        return;
       }
     });
 
@@ -38,9 +51,12 @@ class BridgeIsolate {
 
   Future<RunResult> run(RunSettings rs) async {
     _runSendPort.send(rs);
-    var res = await _nextResult.future;
-    _nextResult = Completer();
-    return res;
+    try {
+      var res = await _nextResult.future;
+      return res;
+    } finally {
+      _nextResult = Completer();
+    }
   }
 
   int getQueryCounter() {
@@ -55,8 +71,12 @@ class BridgeIsolate {
     var port = ReceivePort();
     sendPort.send(port.sendPort);
     await for (var settings in port.cast<RunSettings>()) {
-      var result = ffi_run.runBenchmark(settings);
-      sendPort.send(result);
+      try {
+        var result = ffi_run.runBenchmark(settings);
+        sendPort.send(result);
+      } catch (e, t) {
+        sendPort.send(_ErrorHolder(e, t));
+      }
     }
   }
 }

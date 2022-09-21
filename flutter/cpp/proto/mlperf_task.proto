@@ -40,8 +40,8 @@ message TaskConfig {
   required string name = 2;
   // Minimum number of samples the test should run in the performance mode.
   required int32 min_query_count = 3;
-  // Minimum duration the test should run in the performance mode.
-  required int32 min_duration_ms = 4;
+  // Minimum duration the test should run in the performance mode, in seconds.
+  required double min_duration = 4;
   // Max expected throughput score
   required float max_throughput = 5;
   // Max expected accuracy

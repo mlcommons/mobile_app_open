@@ -84,7 +84,7 @@ void MlperfDriver::IssueQuery(
 }
 
 void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
-                                 int min_duration,
+                                 double min_duration,
                                  int single_stream_expected_latency_ns,
                                  const std::string& output_dir) {
   // Setting the mlperf configs.
@@ -107,7 +107,8 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
     mlperf_settings.scenario = ::mlperf::TestScenario::SingleStream;
     mlperf_settings.single_stream_expected_latency_ns =
         single_stream_expected_latency_ns;
-    mlperf_settings.min_duration_ms = min_duration;
+    mlperf_settings.min_duration_ms =
+        static_cast<uint64_t>(std::ceil(min_duration * 1000.0));
   }
 
   ::mlperf::StartTest(this, dataset_.get(), mlperf_settings, log_settings);

@@ -130,9 +130,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
         progress.cooldown
             ? l10n.progressScreenCooldown.replaceAll(
                 '<remaining>',
-                formatDuration((progress.cooldownDurationMs *
-                        (1.0 - progress.stageProgress))
-                    .round()))
+                formatDuration(
+                    progress.cooldownDuration * (1.0 - progress.stageProgress)))
             : l10n.progressScreenStage.replaceFirst(
                 '<percent>',
                 (progress.stageProgress * 100)

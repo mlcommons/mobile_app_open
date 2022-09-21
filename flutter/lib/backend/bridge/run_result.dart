@@ -1,22 +1,20 @@
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
+
 class RunResult {
-  final double accuracyNormalized;
-  final String accuracyFormatted;
-  final double accuracyNormalized2;
-  final String accuracyFormatted2;
+  final Accuracy? accuracy1;
+  final Accuracy? accuracy2;
   final int numSamples;
-  final double durationMs;
+  final double duration;
   final String backendName;
   final String backendVendor;
   final String acceleratorName;
   final DateTime startTime;
 
   RunResult({
-    required this.accuracyNormalized,
-    required this.accuracyFormatted,
-    required this.accuracyNormalized2,
-    required this.accuracyFormatted2,
+    required this.accuracy1,
+    required this.accuracy2,
     required this.numSamples,
-    required this.durationMs,
+    required this.duration,
     required this.backendName,
     required this.backendVendor,
     required this.acceleratorName,
@@ -24,5 +22,5 @@ class RunResult {
   });
 
   @override
-  String toString() => 'RunResult(accuracy:$accuracyFormatted)';
+  String toString() => 'RunResult(accuracy:${accuracy1?.normalized ?? 0.0})';
 }

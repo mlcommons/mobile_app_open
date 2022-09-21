@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -76,6 +78,13 @@ void main() {
 
       final extendedResults = rm.getLastResult();
 
+      print('benchmark result json:');
+      for (final line in const JsonEncoder.withIndent('  ')
+          .convert(extendedResults)
+          .split('\n')) {
+        print(line);
+      }
+
       final length = extendedResults.results.list.length;
 
       expect(length, expectedResultCount,
@@ -83,6 +92,7 @@ void main() {
               'results count should be $expectedResultCount, but it is $length');
 
       for (final benchmarkResult in extendedResults.results.list) {
+        print('checking ${benchmarkResult.benchmarkId}');
         expect(benchmarkResult.performance, isNotNull);
         expect(benchmarkResult.performance!.throughput, isNotNull);
         expect(benchmarkResult.accuracy, isNotNull);

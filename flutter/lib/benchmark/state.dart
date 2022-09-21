@@ -52,7 +52,7 @@ class ProgressInfo {
   BenchmarkInfo? info;
   int totalStages = 0;
   int currentStage = 0;
-  int cooldownDurationMs = 0;
+  double cooldownDuration = 0;
   double get stageProgress => calculateStageProgress?.call() ?? 0.0;
 
   double Function()? calculateStageProgress;
@@ -338,7 +338,7 @@ class BenchmarkState extends ChangeNotifier {
       progressInfo.totalStages += activeBenchmarks.length;
     }
     progressInfo.currentStage = 0;
-    progressInfo.cooldownDurationMs = cooldownPause.inMilliseconds;
+    progressInfo.cooldownDuration = cooldownPause.inSeconds.toDouble();
 
     resetCurrentResults();
 
@@ -359,7 +359,7 @@ class BenchmarkState extends ChangeNotifier {
         progressInfo.cooldown = true;
         final timer = Stopwatch()..start();
         progressInfo.calculateStageProgress = () {
-          return timer.elapsedMilliseconds / progressInfo.cooldownDurationMs;
+          return timer.elapsed.inSeconds / progressInfo.cooldownDuration;
         };
         notifyListeners();
         await (_cooldownFuture = Future.delayed(cooldownPause));
@@ -372,8 +372,12 @@ class BenchmarkState extends ChangeNotifier {
       final perfTimer = Stopwatch()..start();
       progressInfo.accuracy = false;
       progressInfo.calculateStageProgress = () {
-        final minDuration = max(benchmark.taskConfig.minDurationMs, 1);
-        final timeProgress = perfTimer.elapsedMilliseconds / minDuration;
+        // UI updates once per second so using 1 second as lower bound should not affect it.
+        final minDuration = max(benchmark.taskConfig.minDuration, 1);
+        final timeProgress = perfTimer.elapsedMilliseconds /
+            Duration.millisecondsPerSecond /
+            minDuration;
+
         final minQueries = max(benchmark.taskConfig.minQueryCount, 1);
         final queryCounter = backendBridge.getQueryCounter();
         final queryProgress =
@@ -394,18 +398,8 @@ class BenchmarkState extends ChangeNotifier {
       final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
         throughput: performanceRunInfo.throughput,
-        accuracy: performanceResult.accuracyNormalized < 0.0
-            ? null
-            : Accuracy(
-                normalized: performanceResult.accuracyNormalized,
-                formatted: performanceResult.accuracyFormatted,
-              ),
-        accuracy2: performanceResult.accuracyNormalized2 < 0.0
-            ? null
-            : Accuracy(
-                normalized: performanceResult.accuracyNormalized2,
-                formatted: performanceResult.accuracyFormatted2,
-              ),
+        accuracy: performanceResult.accuracy1,
+        accuracy2: performanceResult.accuracy2,
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
         batchSize: benchmark.benchmarkSettings.batchSize,
@@ -440,18 +434,8 @@ class BenchmarkState extends ChangeNotifier {
           // loadgen doesn't calculate latency for accuracy mode benchmarks
           // so throughput is infinity which is not a valid JSON numeric value
           throughput: 0.0,
-          accuracy: accuracyResult.accuracyNormalized < 0.0
-              ? null
-              : Accuracy(
-                  normalized: accuracyResult.accuracyNormalized,
-                  formatted: accuracyResult.accuracyFormatted,
-                ),
-          accuracy2: accuracyResult.accuracyNormalized2 < 0.0
-              ? null
-              : Accuracy(
-                  normalized: accuracyResult.accuracyNormalized2,
-                  formatted: accuracyResult.accuracyFormatted2,
-                ),
+          accuracy: accuracyResult.accuracy1,
+          accuracy2: accuracyResult.accuracy2,
           backendName: accuracyResult.backendName,
           acceleratorName: accuracyResult.acceleratorName,
           batchSize: benchmark.benchmarkSettings.batchSize,
@@ -503,18 +487,8 @@ class BenchmarkState extends ChangeNotifier {
         benchmarkName: benchmark.taskConfig.name,
         performance: BenchmarkRunResult(
           throughput: performanceInfo.throughput,
-          accuracy: performance.accuracyNormalized < 0.0
-              ? null
-              : Accuracy(
-                  normalized: performance.accuracyNormalized,
-                  formatted: performance.accuracyFormatted,
-                ),
-          accuracy2: performance.accuracyNormalized2 < 0.0
-              ? null
-              : Accuracy(
-                  normalized: performance.accuracyNormalized2,
-                  formatted: performance.accuracyFormatted2,
-                ),
+          accuracy: performance.accuracy1,
+          accuracy2: performance.accuracy2,
           datasetInfo: DatasetInfo(
             name: accuracyDataset.name,
             type: DatasetType.fromJson(
@@ -522,13 +496,12 @@ class BenchmarkState extends ChangeNotifier {
             dataPath: performanceDataset.inputPath,
             groundtruthPath: performanceDataset.groundtruthPath,
           ),
-          measuredDurationMs: performance.durationMs,
+          measuredDuration: performance.duration,
           measuredSamples: performance.numSamples,
           startDatetime: performance.startTime,
           loadgenInfo: BenchmarkLoadgenInfo(
             validity: performanceInfo.loadgenInfo!.validity,
-            durationMs: Duration.millisecondsPerSecond *
-                performanceInfo.loadgenInfo!.meanLatency *
+            duration: performanceInfo.loadgenInfo!.meanLatency *
                 performanceInfo.loadgenInfo!.queryCount,
           ),
         ),
@@ -536,18 +509,8 @@ class BenchmarkState extends ChangeNotifier {
             ? null
             : BenchmarkRunResult(
                 throughput: null,
-                accuracy: accuracy.accuracyNormalized < 0.0
-                    ? null
-                    : Accuracy(
-                        normalized: accuracy.accuracyNormalized,
-                        formatted: accuracy.accuracyFormatted,
-                      ),
-                accuracy2: accuracy.accuracyNormalized2 < 0.0
-                    ? null
-                    : Accuracy(
-                        normalized: accuracy.accuracyNormalized2,
-                        formatted: accuracy.accuracyFormatted2,
-                      ),
+                accuracy: accuracy.accuracy1,
+                accuracy2: accuracy.accuracy2,
                 datasetInfo: DatasetInfo(
                   name: accuracyDataset.name,
                   type: DatasetType.fromJson(
@@ -555,12 +518,12 @@ class BenchmarkState extends ChangeNotifier {
                   dataPath: accuracyDataset.inputPath,
                   groundtruthPath: accuracyDataset.groundtruthPath,
                 ),
-                measuredDurationMs: accuracy.durationMs,
+                measuredDuration: accuracy.duration,
                 measuredSamples: accuracy.numSamples,
                 startDatetime: accuracy.startTime,
                 loadgenInfo: null,
               ),
-        minDurationMs: benchmark.taskConfig.minDurationMs,
+        minDuration: benchmark.taskConfig.minDuration,
         minSamples: benchmark.taskConfig.minQueryCount,
         backendInfo: BackendReportedInfo(
           filename: backendInfo.libPath,
@@ -616,6 +579,11 @@ class BenchmarkState extends ChangeNotifier {
     );
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
+
+    if (!(result.accuracy1?.isInBounds() ?? true) ||
+        !(result.accuracy2?.isInBounds() ?? true)) {
+      throw '${benchmark.info.taskName}: ${runMode.logSuffix} run: accuracy is invalid (backend may be corrupted)';
+    }
 
     const logFileName = 'mlperf_log_detail.txt';
     final loadgenInfo = await LoadgenInfo.fromFile(

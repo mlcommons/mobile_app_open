@@ -4,8 +4,6 @@
 extern "C" {
 #endif
 
-void fake_calls();
-
 struct dart_ffi_run_benchmark_in {
   const char *backend_model_path;
   const char *backend_lib_path;
@@ -22,20 +20,24 @@ struct dart_ffi_run_benchmark_in {
 
   const char *mode;
   int32_t min_query_count;
-  int32_t min_duration;
+  double min_duration;
   int32_t single_stream_expected_latency_ns;
   const char *output_dir;
 };
 
-struct dart_ffi_run_benchmark_out {
-  int32_t ok;
+struct dart_ffi_run_benchmark_out_accuracy {
+  float normalized;
+  char *formatted;
+};
 
-  float accuracy_normalized;
-  char *accuracy_formatted;
-  float accuracy_normalized2;
-  char *accuracy_formatted2;
+struct dart_ffi_run_benchmark_out {
+  bool run_ok;
+
+  struct dart_ffi_run_benchmark_out_accuracy *accuracy1;
+  struct dart_ffi_run_benchmark_out_accuracy *accuracy2;
+
   int32_t num_samples;
-  float duration_ms;
+  float duration;
   char *backend_name;
   char *backend_vendor;
   char *accelerator_name;
