@@ -54,7 +54,7 @@ class DeviceInfo {
       manufacturer: 'Apple',
       modelCode: deviceInfo.utsname.machine ?? 'Unknown',
       modelName: deviceNames.getSingleNameFromModel(
-          DeviceType.ios, deviceInfo.utsname.machine  ?? 'Unknown'),
+          DeviceType.ios, deviceInfo.utsname.machine ?? 'Unknown'),
     );
   }
 
