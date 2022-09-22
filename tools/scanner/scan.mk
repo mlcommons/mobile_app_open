@@ -26,8 +26,8 @@ ifdef SONAR_OUT_DIR
 		--env PR_BASE=${PR_BASE}
 
 	# https://docs.sonarcloud.io/advanced-setup/languages/c-c-objective-c/#building-with-bazel
-	sonar_bazel_startup_options=--batch
-#	sonar_bazel_build_args=--spawn_strategy=local --strategy=Genrule=local
+#	sonar_bazel_startup_options=--batch
+	sonar_bazel_build_args=--spawn_strategy=local --strategy=Genrule=local
 endif
 
 # Use the same image tag used in `flutter_common_docker_flags`
