@@ -93,14 +93,14 @@ Future<void> main() async {
       ],
       officialReleaseFlag: false,
     ),
-    envInfo: EnvironmentInfo(
+    environmentInfo: EnvironmentInfo(
       manufacturer: 'Unknown',
       modelCode: 'Unknown PC',
       modelName: 'Unknown PC',
       osName: OsEnum.windows,
       osVersion: '10.0',
     ),
-    results: BenchmarkExportResultList([exportResult, exportResult]),
+    results: [exportResult, exportResult],
   );
   if (!const bool.hasEnvironment(fileNameEnv)) {
     print('pass --define=$fileNameEnv=<value> to specify file to write');

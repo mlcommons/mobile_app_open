@@ -85,13 +85,13 @@ void main() {
         print(line);
       }
 
-      final length = extendedResults.results.list.length;
+      final length = extendedResults.results.length;
 
       expect(length, expectedResultCount,
           reason:
               'results count should be $expectedResultCount, but it is $length');
 
-      for (final benchmarkResult in extendedResults.results.list) {
+      for (final benchmarkResult in extendedResults.results) {
         print('checking ${benchmarkResult.benchmarkId}');
         expect(benchmarkResult.performanceRun, isNotNull);
         expect(benchmarkResult.performanceRun!.throughput, isNotNull);

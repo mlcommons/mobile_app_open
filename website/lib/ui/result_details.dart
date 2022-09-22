@@ -61,8 +61,8 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
                   _makeTable(<TableRow>[
                     _makeTableRow(
                         const Text('Result UUID'), Text(result.meta.uuid)),
-                    _makeTableRow(const Text('Average throughput'),
-                        Text('${result.results.calculateAverageThroughput()}')),
+                    // _makeTableRow(const Text('Average throughput'),
+                    //     Text('${result.results.calculateAverageThroughput()}')),
                     _makeTableRow(
                         const Text('Upload date'),
                         Text(result.meta.uploadDate!
@@ -70,7 +70,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
                             .toIso8601String())),
                   ]),
                   const SizedBox(height: 20),
-                  _makeEnvTable(result.envInfo),
+                  _makeEnvTable(result.environmentInfo),
                   const SizedBox(height: 20),
                   _makeBuildInfoTable(result.buildInfo),
                   const SizedBox(height: 20),
@@ -84,9 +84,9 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
     );
   }
 
-  List<Widget> _makeResults(BenchmarkExportResultList list) {
+  List<Widget> _makeResults(List<BenchmarkExportResult> list) {
     final result = <Widget>[];
-    for (var item in list.list) {
+    for (var item in list) {
       result.add(_makeBenchTable(item));
       result.add(const SizedBox(height: 20));
     }

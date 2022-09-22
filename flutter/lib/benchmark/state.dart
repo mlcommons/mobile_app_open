@@ -451,8 +451,8 @@ class BenchmarkState extends ChangeNotifier {
     if (!_aborting) {
       lastResult = ExtendedResult(
         meta: ResultMetaInfo(uuid: const Uuid().v4()),
-        envInfo: DeviceInfo.environmentInfo,
-        results: BenchmarkExportResultList(exportResults),
+        environmentInfo: DeviceInfo.environmentInfo,
+        results: exportResults,
         buildInfo: BuildInfoHelper.info,
       );
       _store.previousExtendedResult =
@@ -625,7 +625,7 @@ class BenchmarkState extends ChangeNotifier {
       lastResult = ExtendedResult.fromJson(
           jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
       resourceManager.resultManager
-          .restoreResults(lastResult!.results.list, benchmarks);
+          .restoreResults(lastResult!.results, benchmarks);
       _doneRunning = true;
       return;
     } catch (e, trace) {

@@ -31,15 +31,28 @@ class _DetailsScreen extends State<DetailsScreen> {
     );
   }
 
+  double calculateAverageThroughput(List<BenchmarkExportResult> results) {
+    var throughput = 0.0;
+    var count = 0;
+    for (var item in results) {
+      if (item.performanceRun == null) {
+        continue;
+      }
+      throughput += item.performanceRun!.throughput!;
+      count++;
+    }
+    return throughput / count;
+  }
+
   List<Widget> _makeBody() {
     final res = widget.result;
 
-    final firstResult = res.results.list.first;
+    final firstResult = res.results.first;
     final date = helper.formatDate(firstResult.performanceRun!.startDatetime);
     final backendName = firstResult.backendInfo.backendName;
 
     final averageThroughput =
-        res.results.calculateAverageThroughput().toStringAsFixed(2);
+        calculateAverageThroughput(res.results).toStringAsFixed(2);
 
     final appVersionType =
         (res.buildInfo.gitDirtyFlag || res.buildInfo.devTestFlag)
@@ -60,7 +73,7 @@ class _DetailsScreen extends State<DetailsScreen> {
       helper.makeInfo(l10n.historyDetailsBackendName, backendName),
       const Divider(),
       helper.makeHeader(l10n.historyDetailsTableTitle),
-      makeBenchmarkTable(context, res.results.list),
+      makeBenchmarkTable(context, res.results),
     ];
   }
 

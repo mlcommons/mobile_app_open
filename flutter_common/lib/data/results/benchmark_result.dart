@@ -119,38 +119,3 @@ class BenchmarkExportResult {
         .key;
   }
 }
-
-class BenchmarkExportResultList {
-  final List<BenchmarkExportResult> list;
-
-  BenchmarkExportResultList(this.list);
-
-  static BenchmarkExportResultList fromJson(List<dynamic> json) {
-    final list = <BenchmarkExportResult>[];
-    for (var item in json) {
-      list.add(BenchmarkExportResult.fromJson(item as Map<String, dynamic>));
-    }
-    return BenchmarkExportResultList(list);
-  }
-
-  List<dynamic> toJson() {
-    var result = <dynamic>[];
-    for (var item in list) {
-      result.add(item);
-    }
-    return result;
-  }
-
-  double calculateAverageThroughput() {
-    var throughput = 0.0;
-    var count = 0;
-    for (var item in list) {
-      if (item.performanceRun == null) {
-        continue;
-      }
-      throughput += item.performanceRun!.throughput!;
-      count++;
-    }
-    return throughput / count;
-  }
-}

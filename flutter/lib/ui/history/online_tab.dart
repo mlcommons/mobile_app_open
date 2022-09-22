@@ -106,17 +106,17 @@ class OnlineTab implements TabInterface {
   ) {
     final item = itemList[index];
     final results = item.results;
-    final firstRunInfo = results.list.first;
+    final firstRunInfo = results.first;
     final startDatetime = firstRunInfo.performanceRun?.startDatetime ??
         firstRunInfo.accuracyRun!.startDatetime;
 
-    final modelDescription = item.envInfo.manufacturer.isEmpty
-        ? item.envInfo.modelName
-        : '${item.envInfo.manufacturer} ${item.envInfo.modelName}';
+    final modelDescription = item.environmentInfo.manufacturer.isEmpty
+        ? item.environmentInfo.modelName
+        : '${item.environmentInfo.manufacturer} ${item.environmentInfo.modelName}';
 
     return helper.makeListItem(
       title: helper.formatDate(startDatetime.toLocal()),
-      specialTitleColor: results.list.any(
+      specialTitleColor: results.any(
           (runRes) => !(runRes.performanceRun?.loadgenInfo?.validity ?? false)),
       subtitle: modelDescription,
       onTap: () {
