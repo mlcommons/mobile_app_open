@@ -543,7 +543,7 @@ class BenchmarkState extends ChangeNotifier {
             LoadgenScenario.fromJson(benchmark.taskConfig.scenario));
   }
 
-  static BackendExtraSettingList extraSettingsFromCommon(
+  static List<BackendExtraSetting> extraSettingsFromCommon(
       List<pb.Setting> commonSettings) {
     final list = <BackendExtraSetting>[];
     for (var item in commonSettings) {
@@ -553,7 +553,7 @@ class BenchmarkState extends ChangeNotifier {
           value: item.value.value,
           valueName: item.value.name));
     }
-    return BackendExtraSettingList(list);
+    return list;
   }
 
   Future<RunInfo> runBenchmark(

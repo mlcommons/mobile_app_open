@@ -67,16 +67,14 @@ Future<void> main() async {
       configuration: '',
       modelPath: '',
       batchSize: 0,
-      extraSettings: BackendExtraSettingList(
-        <BackendExtraSetting>[
-          BackendExtraSetting(
-            id: 'shards_num',
-            name: 'Shards number',
-            value: '2',
-            valueName: '2',
-          ),
-        ],
-      ),
+      extraSettings: <BackendExtraSetting>[
+        BackendExtraSetting(
+          id: 'shards_num',
+          name: 'Shards number',
+          value: '2',
+          valueName: '2',
+        ),
+      ],
     ),
     loadgenScenario: LoadgenScenario.fromJson('SingleStream'),
   );

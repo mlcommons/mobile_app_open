@@ -21,25 +21,3 @@ class BackendExtraSetting {
 
   Map<String, dynamic> toJson() => _$BackendExtraSettingToJson(this);
 }
-
-class BackendExtraSettingList {
-  final List<BackendExtraSetting> list;
-
-  BackendExtraSettingList(this.list);
-
-  static BackendExtraSettingList fromJson(List<dynamic> json) {
-    final list = <BackendExtraSetting>[];
-    for (var item in json) {
-      list.add(BackendExtraSetting.fromJson(item as Map<String, dynamic>));
-    }
-    return BackendExtraSettingList(list);
-  }
-
-  List<dynamic> toJson() {
-    var result = <dynamic>[];
-    for (var item in list) {
-      result.add(item);
-    }
-    return result;
-  }
-}
