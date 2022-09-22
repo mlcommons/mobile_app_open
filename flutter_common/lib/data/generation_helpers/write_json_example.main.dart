@@ -5,7 +5,6 @@ import 'package:uuid/uuid.dart';
 
 import '../build_info/build_info.dart';
 import '../environment/environment_info.dart';
-import '../environment/os_enum.dart';
 import '../extended_result.dart';
 import '../meta_info.dart';
 import '../results/backend_info.dart';
@@ -102,7 +101,7 @@ Future<void> main() async {
       manufacturer: 'Unknown',
       modelCode: 'Unknown PC',
       modelName: 'Unknown PC',
-      osName: OsName.fromJson('windows'),
+      osName: OsEnum.windows,
       osVersion: '10.0',
     ),
     results: BenchmarkExportResultList([exportResult, exportResult]),
