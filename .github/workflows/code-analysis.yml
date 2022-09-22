@@ -23,6 +23,8 @@ jobs:
       PR_NUMBER: ${{ github.event.number }}
       PR_BRANCH: ${{ github.HEAD_REF }}
       PR_BASE: ${{ github.BASE_REF }}
+      BAZEL_CACHE_PATH: ${{ github.workspace }}/bazel_cache
+      BAZEL_CACHE_ARG: --disk_cache=${BAZEL_CACHE_PATH}
       CONNECT_TTY_TO_DOCKER: 0
       WITH_TFLITE: 1
       WITH_PIXEL: 1
@@ -42,6 +44,11 @@ jobs:
               repo: context.repo.repo,
               body: `https://sonarcloud.io/dashboard?id=mobile_app_open&pullRequest=${context.issue.number}`
             })
+      - name: Cache bazel
+        uses: actions/cache@v3
+        with:
+          path: ${BAZEL_CACHE_PATH}
+          key: ${{ runner.os }}-bazel_cache
       - name: Build scanner image
         run: |
           make scanner/image

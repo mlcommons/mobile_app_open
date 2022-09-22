@@ -23,7 +23,8 @@ ifdef SONAR_OUT_DIR
 		--env SONAR_TOKEN=${SONAR_TOKEN} \
 		--env PR_NUMBER=${PR_NUMBER} \
 		--env PR_BRANCH=${PR_BRANCH} \
-		--env PR_BASE=${PR_BASE}
+		--env PR_BASE=${PR_BASE} \
+		-v ${BAZEL_CACHE_PATH}:${BAZEL_CACHE_PATH}
 
 	# https://docs.sonarcloud.io/advanced-setup/languages/c-c-objective-c/#building-with-bazel
 	sonar_bazel_startup_options=--batch
