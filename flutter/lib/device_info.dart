@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/environment/os_enum.dart';
@@ -52,9 +52,9 @@ class DeviceInfo {
 
     return DeviceInfo(
       manufacturer: 'Apple',
-      modelCode: deviceInfo.utsname.machine,
+      modelCode: deviceInfo.utsname.machine ?? 'Unknown',
       modelName: deviceNames.getSingleNameFromModel(
-          DeviceType.ios, deviceInfo.utsname.machine),
+          DeviceType.ios, deviceInfo.utsname.machine  ?? 'Unknown'),
     );
   }
 
@@ -63,10 +63,10 @@ class DeviceInfo {
     final deviceNames = DeviceMarketingNames();
 
     return DeviceInfo(
-      manufacturer: deviceInfo.manufacturer,
-      modelCode: deviceInfo.model,
+      manufacturer: deviceInfo.manufacturer ?? 'Unknown',
+      modelCode: deviceInfo.model ?? 'Unknown',
       modelName: deviceNames.getSingleNameFromModel(
-          DeviceType.android, deviceInfo.model),
+          DeviceType.android, deviceInfo.model ?? 'Unknown'),
     );
   }
 
