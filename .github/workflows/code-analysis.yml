@@ -15,7 +15,7 @@ jobs:
     name: SonarScanner
     runs-on: ubuntu-20.04
     permissions:
-      pull-requests: read
+      pull-requests: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -41,7 +41,7 @@ jobs:
           make docker/scanner/scan
       - name: Comment dashboard URL
         uses: actions/github-script@v5
-        if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' }}
+        # if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' }}
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
