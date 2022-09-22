@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
-import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
@@ -36,14 +35,14 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
       ..._makeMainInfo(widget.result),
       const Divider(),
       helper.makeHeader(l10n.historyRunDetailsPerfTitle),
-      if (widget.result.performance != null)
-        ..._makePerformanceInfo(widget.result.performance!)
+      if (widget.result.performanceRun != null)
+        ..._makePerformanceInfo(widget.result.performanceRun!)
       else
         helper.makeSubHeader(l10n.resultsNotAvailable),
       const Divider(),
       helper.makeHeader(l10n.historyRunDetailsAccuracyTitle),
-      if (widget.result.accuracy != null)
-        ..._makeAccuracyInfo(widget.result.accuracy!)
+      if (widget.result.accuracyRun != null)
+        ..._makeAccuracyInfo(widget.result.accuracyRun!)
       else
         helper.makeSubHeader(l10n.resultsNotAvailable),
     ];
@@ -53,16 +52,16 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
     return [
       helper.makeInfo(l10n.historyRunDetailsBenchName, res.benchmarkName),
       helper.makeInfo(
-          l10n.historyRunDetailsScenario, res.loadgenScenario.toJson()),
+          l10n.historyRunDetailsScenario, res.loadgenScenario.humanName),
       helper.makeInfo(
           l10n.historyRunDetailsBackendName, res.backendInfo.backendName),
       helper.makeInfo(
           l10n.historyRunDetailsVendorName, res.backendInfo.vendorName),
       helper.makeInfo(
           l10n.historyRunDetailsAccelerator, res.backendInfo.acceleratorName),
-      if (res.loadgenScenario.value == LoadgenScenarioEnum.offline)
+      if (res.loadgenScenario == LoadgenScenarioEnum.offline)
         helper.makeInfo(l10n.historyRunDetailsBatchSize,
-            res.backendSettingsInfo.batchSize.toString()),
+            res.backendSettings.batchSize.toString()),
     ];
   }
 
@@ -77,8 +76,8 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
       helper.makeInfo(
           l10n.historyRunDetailsSamples, perf.measuredSamples.toString()),
       helper.makeInfo(
-          l10n.historyRunDetailsDatasetType, perf.datasetInfo.type.toJson()),
-      helper.makeInfo(l10n.historyRunDetailsDatasetName, perf.datasetInfo.name),
+          l10n.historyRunDetailsDatasetType, perf.dataset.type.toJson()),
+      helper.makeInfo(l10n.historyRunDetailsDatasetName, perf.dataset.name),
     ];
   }
 
@@ -92,10 +91,9 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
       ),
       helper.makeInfo(
           l10n.historyRunDetailsSamples, accuracy.measuredSamples.toString()),
-      helper.makeInfo(l10n.historyRunDetailsDatasetType,
-          accuracy.datasetInfo.type.toJson()),
       helper.makeInfo(
-          l10n.historyRunDetailsDatasetName, accuracy.datasetInfo.name),
+          l10n.historyRunDetailsDatasetType, accuracy.dataset.type.toJson()),
+      helper.makeInfo(l10n.historyRunDetailsDatasetName, accuracy.dataset.name),
     ];
   }
 }

@@ -17,7 +17,6 @@ import 'package:mlperfbench_common/data/results/backend_settings_extra.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench_common/data/results/dataset_info.dart';
 import 'package:mlperfbench_common/data/results/dataset_type.dart';
-import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
@@ -485,11 +484,11 @@ class BenchmarkState extends ChangeNotifier {
     return BenchmarkExportResult(
         benchmarkId: benchmark.id,
         benchmarkName: benchmark.taskConfig.name,
-        performance: BenchmarkRunResult(
+        performanceRun: BenchmarkRunResult(
           throughput: performanceInfo.throughput,
           accuracy: performance.accuracy1,
           accuracy2: performance.accuracy2,
-          datasetInfo: DatasetInfo(
+          dataset: DatasetInfo(
             name: accuracyDataset.name,
             type: DatasetType.fromJson(
                 benchmark.taskConfig.datasets.type.toString()),
@@ -505,13 +504,13 @@ class BenchmarkState extends ChangeNotifier {
                 performanceInfo.loadgenInfo!.queryCount,
           ),
         ),
-        accuracy: accuracy == null
+        accuracyRun: accuracy == null
             ? null
             : BenchmarkRunResult(
                 throughput: null,
                 accuracy: accuracy.accuracy1,
                 accuracy2: accuracy.accuracy2,
-                datasetInfo: DatasetInfo(
+                dataset: DatasetInfo(
                   name: accuracyDataset.name,
                   type: DatasetType.fromJson(
                       benchmark.taskConfig.datasets.type.toString()),
@@ -531,7 +530,7 @@ class BenchmarkState extends ChangeNotifier {
           vendorName: performance.backendVendor,
           acceleratorName: performance.acceleratorName,
         ),
-        backendSettingsInfo: BackendSettingsInfo(
+        backendSettings: BackendSettingsInfo(
           acceleratorCode: actualSettings.benchmarkSetting.accelerator,
           acceleratorDesc: actualSettings.benchmarkSetting.acceleratorDesc,
           configuration: actualSettings.benchmarkSetting.configuration,
@@ -539,8 +538,8 @@ class BenchmarkState extends ChangeNotifier {
           batchSize: actualSettings.benchmarkSetting.batchSize,
           extraSettings: extraSettingsFromCommon(actualSettings.setting),
         ),
-        loadgenScenario:
-            LoadgenScenario.fromJson(benchmark.taskConfig.scenario));
+        loadgenScenario: BenchmarkExportResult.parseLoadgenScenario(
+            benchmark.taskConfig.scenario));
   }
 
   static List<BackendExtraSetting> extraSettingsFromCommon(

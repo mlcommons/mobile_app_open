@@ -93,10 +93,10 @@ void main() {
 
       for (final benchmarkResult in extendedResults.results.list) {
         print('checking ${benchmarkResult.benchmarkId}');
-        expect(benchmarkResult.performance, isNotNull);
-        expect(benchmarkResult.performance!.throughput, isNotNull);
-        expect(benchmarkResult.accuracy, isNotNull);
-        expect(benchmarkResult.accuracy!.accuracy, isNotNull);
+        expect(benchmarkResult.performanceRun, isNotNull);
+        expect(benchmarkResult.performanceRun!.throughput, isNotNull);
+        expect(benchmarkResult.accuracyRun, isNotNull);
+        expect(benchmarkResult.accuracyRun!.accuracy, isNotNull);
 
         final expectedAccuracyMap =
             benchmarkExpectedAccuracy[benchmarkResult.benchmarkId];
@@ -114,7 +114,7 @@ void main() {
         if (accelerator == 'ACCELERATOR_NAME') {
           // some backends are yet to implement accelerator reporting
           print('warning: accelerator missing, using acceleratorDesc');
-          accelerator = benchmarkResult.backendSettingsInfo.acceleratorDesc;
+          accelerator = benchmarkResult.backendSettings.acceleratorDesc;
         }
         final expectedAccuracy = expectedAccuracyMap[
                 '$accelerator+${benchmarkResult.backendInfo.backendName}'] ??
@@ -129,12 +129,12 @@ void main() {
         expectedAccuracy!;
 
         expect(
-          benchmarkResult.accuracy!.accuracy!.normalized,
+          benchmarkResult.accuracyRun!.accuracy!.normalized,
           greaterThanOrEqualTo(expectedAccuracy.min),
           reason: 'accuracy for $accuracyTag is too low',
         );
         expect(
-          benchmarkResult.accuracy!.accuracy!.normalized,
+          benchmarkResult.accuracyRun!.accuracy!.normalized,
           lessThanOrEqualTo(expectedAccuracy.max),
           reason: 'accuracy for $accuracyTag is too high',
         );

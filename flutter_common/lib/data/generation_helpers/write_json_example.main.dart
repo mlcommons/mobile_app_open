@@ -13,7 +13,6 @@ import '../results/backend_settings_extra.dart';
 import '../results/benchmark_result.dart';
 import '../results/dataset_info.dart';
 import '../results/dataset_type.dart';
-import '../results/loadgen_scenario.dart';
 
 //
 // This file is intended to be used
@@ -34,7 +33,7 @@ Future<void> main() async {
       normalized: 0.123,
       formatted: '12.3%',
     ),
-    datasetInfo: DatasetInfo(
+    dataset: DatasetInfo(
       name: 'Imagenet classification validation set',
       type: DatasetType.fromJson('IMAGENET'),
       dataPath: 'app:///mlperf_datasets/imagenet/img',
@@ -51,8 +50,8 @@ Future<void> main() async {
   var exportResult = BenchmarkExportResult(
     benchmarkId: 'id',
     benchmarkName: 'name',
-    performance: runResult,
-    accuracy: runResult,
+    performanceRun: runResult,
+    accuracyRun: runResult,
     backendInfo: BackendReportedInfo(
       filename: 'tflite',
       vendorName: 'tflite',
@@ -61,7 +60,7 @@ Future<void> main() async {
     ),
     minDuration: 10.5,
     minSamples: 8,
-    backendSettingsInfo: BackendSettingsInfo(
+    backendSettings: BackendSettingsInfo(
       acceleratorCode: '',
       acceleratorDesc: '',
       configuration: '',
@@ -76,7 +75,7 @@ Future<void> main() async {
         ),
       ],
     ),
-    loadgenScenario: LoadgenScenario.fromJson('SingleStream'),
+    loadgenScenario: BenchmarkExportResult.parseLoadgenScenario('SingleStream'),
   );
   var extendedResult = ExtendedResult(
     meta: ResultMetaInfo(

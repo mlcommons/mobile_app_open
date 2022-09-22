@@ -1,12 +1,13 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'backend_info.dart';
 import 'backend_settings.dart';
 import 'dataset_info.dart';
-import 'loadgen_scenario.dart';
 
+part 'benchmark_result.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Accuracy {
-  static const String _tagValue = 'value';
-  static const String _tagString = 'string';
-
   final double normalized;
   final String formatted;
 
@@ -15,16 +16,10 @@ class Accuracy {
     required this.formatted,
   });
 
-  Accuracy.fromJson(Map<String, dynamic> json)
-      : this(
-          normalized: (json[_tagValue] as num).toDouble(),
-          formatted: json[_tagString] as String,
-        );
+  factory Accuracy.fromJson(Map<String, dynamic> json) =>
+      _$AccuracyFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagValue: normalized,
-        _tagString: formatted,
-      };
+  Map<String, dynamic> toJson() => _$AccuracyToJson(this);
 
   bool isInBounds({double min = 0.0, double max = 1.0}) {
     if (!normalized.isFinite) return false;
@@ -32,10 +27,8 @@ class Accuracy {
   }
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class BenchmarkLoadgenInfo {
-  static const String _tagValidity = 'validity';
-  static const String _tagDuration = 'duration';
-
   final bool validity;
   final double duration;
 
@@ -44,32 +37,18 @@ class BenchmarkLoadgenInfo {
     required this.duration,
   });
 
-  BenchmarkLoadgenInfo.fromJson(Map<String, dynamic> json)
-      : this(
-          validity: json[_tagValidity] as bool,
-          duration: json[_tagDuration] as double,
-        );
+  factory BenchmarkLoadgenInfo.fromJson(Map<String, dynamic> json) =>
+      _$BenchmarkLoadgenInfoFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagValidity: validity,
-        _tagDuration: duration,
-      };
+  Map<String, dynamic> toJson() => _$BenchmarkLoadgenInfoToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class BenchmarkRunResult {
-  static const String _tagThroughput = 'throughput';
-  static const String _tagAccuracy = 'accuracy';
-  static const String _tagAccuracy2 = 'accuracy2';
-  static const String _tagDatasetInfo = 'dataset';
-  static const String _tagMeasuredDuration = 'measured_duration';
-  static const String _tagMeasuredSamples = 'measured_samples';
-  static const String _tagStartDatetime = 'start_datetime';
-  static const String _tagLoadgenInfo = 'loadgen_info';
-
   final double? throughput;
   final Accuracy? accuracy;
   final Accuracy? accuracy2;
-  final DatasetInfo datasetInfo;
+  final DatasetInfo dataset;
   final double measuredDuration;
   final int measuredSamples;
   final DateTime startDatetime;
@@ -79,60 +58,40 @@ class BenchmarkRunResult {
     required this.throughput,
     required this.accuracy,
     required this.accuracy2,
-    required this.datasetInfo,
+    required this.dataset,
     required this.measuredDuration,
     required this.measuredSamples,
     required this.startDatetime,
     required this.loadgenInfo,
   });
 
-  BenchmarkRunResult.fromJson(Map<String, dynamic> json)
-      : this(
-          throughput: json[_tagThroughput] as double?,
-          accuracy: json[_tagAccuracy] == null
-              ? null
-              : Accuracy.fromJson(json[_tagAccuracy]),
-          accuracy2: json[_tagAccuracy2] == null
-              ? null
-              : Accuracy.fromJson(json[_tagAccuracy2]),
-          datasetInfo: DatasetInfo.fromJson(json[_tagDatasetInfo]),
-          measuredDuration: (json[_tagMeasuredDuration] as num).toDouble(),
-          measuredSamples: json[_tagMeasuredSamples] as int,
-          startDatetime: DateTime.parse(json[_tagStartDatetime] as String),
-          loadgenInfo: json[_tagLoadgenInfo] == null
-              ? null
-              : BenchmarkLoadgenInfo.fromJson(json[_tagLoadgenInfo]),
-        );
+  factory BenchmarkRunResult.fromJson(Map<String, dynamic> json) =>
+      _$BenchmarkRunResultFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagThroughput: throughput,
-        _tagAccuracy: accuracy,
-        _tagAccuracy2: accuracy2,
-        _tagDatasetInfo: datasetInfo,
-        _tagMeasuredDuration: measuredDuration,
-        _tagMeasuredSamples: measuredSamples,
-        _tagStartDatetime: startDatetime.toUtc().toIso8601String(),
-        _tagLoadgenInfo: loadgenInfo,
-      };
+  Map<String, dynamic> toJson() => _$BenchmarkRunResultToJson(this);
 }
 
-class BenchmarkExportResult {
-  static const String _tagBenchmarkId = 'benchmark_id';
-  static const String _tagBenchmarkName = 'benchmark_name';
-  static const String _tagLoadgenScenario = 'loadgen_scenario';
-  static const String _tagBackendSettings = 'backend_settings';
-  static const String _tagPerformanceRun = 'performance_run';
-  static const String _tagAccuracyRun = 'accuracy_run';
-  static const String _tagMinDuration = 'min_duration';
-  static const String _tagMinSamples = 'min_samples';
-  static const String _tagBackendInfo = 'backend_info';
+enum LoadgenScenarioEnum {
+  @JsonValue('SingleStream')
+  singleStream,
+  @JsonValue('Offline')
+  offline,
+}
 
+extension LoadgenScenarioExtension on LoadgenScenarioEnum {
+  String get humanName {
+    return _$LoadgenScenarioEnumEnumMap[this]!;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class BenchmarkExportResult {
   final String benchmarkId;
   final String benchmarkName;
-  final LoadgenScenario loadgenScenario;
-  final BackendSettingsInfo backendSettingsInfo;
-  final BenchmarkRunResult? performance;
-  final BenchmarkRunResult? accuracy;
+  final LoadgenScenarioEnum loadgenScenario;
+  final BackendSettingsInfo backendSettings;
+  final BenchmarkRunResult? performanceRun;
+  final BenchmarkRunResult? accuracyRun;
   final double minDuration;
   final int minSamples;
   final BackendReportedInfo backendInfo;
@@ -141,41 +100,24 @@ class BenchmarkExportResult {
     required this.benchmarkId,
     required this.benchmarkName,
     required this.loadgenScenario,
-    required this.backendSettingsInfo,
-    required this.performance,
-    required this.accuracy,
+    required this.backendSettings,
+    required this.performanceRun,
+    required this.accuracyRun,
     required this.minDuration,
     required this.minSamples,
     required this.backendInfo,
   });
 
-  BenchmarkExportResult.fromJson(Map<String, dynamic> json)
-      : this(
-          benchmarkId: json[_tagBenchmarkId] as String,
-          benchmarkName: json[_tagBenchmarkName] as String,
-          loadgenScenario: LoadgenScenario.fromJson(json[_tagLoadgenScenario]),
-          backendSettingsInfo:
-              BackendSettingsInfo.fromJson(json[_tagBackendSettings]),
-          performance: BenchmarkRunResult.fromJson(json[_tagPerformanceRun]),
-          accuracy: json[_tagAccuracyRun] == null
-              ? null
-              : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
-          minDuration: json[_tagMinDuration] as double,
-          minSamples: json[_tagMinSamples] as int,
-          backendInfo: BackendReportedInfo.fromJson(json[_tagBackendInfo]),
-        );
+  factory BenchmarkExportResult.fromJson(Map<String, dynamic> json) =>
+      _$BenchmarkExportResultFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagBenchmarkId: benchmarkId,
-        _tagBenchmarkName: benchmarkName,
-        _tagLoadgenScenario: loadgenScenario,
-        _tagBackendSettings: backendSettingsInfo,
-        _tagPerformanceRun: performance,
-        _tagAccuracyRun: accuracy,
-        _tagMinDuration: minDuration,
-        _tagMinSamples: minSamples,
-        _tagBackendInfo: backendInfo,
-      };
+  Map<String, dynamic> toJson() => _$BenchmarkExportResultToJson(this);
+
+  static LoadgenScenarioEnum parseLoadgenScenario(String value) {
+    return _$LoadgenScenarioEnumEnumMap.entries
+        .firstWhere((element) => element.value == value)
+        .key;
+  }
 }
 
 class BenchmarkExportResultList {
@@ -203,10 +145,10 @@ class BenchmarkExportResultList {
     var throughput = 0.0;
     var count = 0;
     for (var item in list) {
-      if (item.performance == null) {
+      if (item.performanceRun == null) {
         continue;
       }
-      throughput += item.performance!.throughput!;
+      throughput += item.performanceRun!.throughput!;
       count++;
     }
     return throughput / count;

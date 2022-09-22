@@ -261,16 +261,16 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "value": {
+                "normalized": {
                     "type": "number"
                 },
-                "string": {
+                "formatted": {
                     "type": "string"
                 }
             },
             "required": [
-                "string",
-                "value"
+                "formatted",
+                "normalized"
             ],
             "title": "Accuracy"
         },

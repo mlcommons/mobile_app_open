@@ -143,9 +143,9 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
         _makeTableRow(const Text('Benchmark'),
             Text(info.benchmarkName)), // TODO replace with proper name
         _makeTableRow(const Text('Throughput'),
-            Text(info.performance?.throughput.toString() ?? 'N/A')),
+            Text(info.performanceRun?.throughput.toString() ?? 'N/A')),
         _makeTableRow(const Text('Accuracy'),
-            Text(info.accuracy?.accuracy.toString() ?? 'N/A')),
+            Text(info.accuracyRun?.accuracy.toString() ?? 'N/A')),
         _makeTableRow(
             const Text('Backend name'), Text(info.backendInfo.backendName)),
         _makeTableRow(

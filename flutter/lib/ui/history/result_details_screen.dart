@@ -35,7 +35,7 @@ class _DetailsScreen extends State<DetailsScreen> {
     final res = widget.result;
 
     final firstResult = res.results.list.first;
-    final date = helper.formatDate(firstResult.performance!.startDatetime);
+    final date = helper.formatDate(firstResult.performanceRun!.startDatetime);
     final backendName = firstResult.backendInfo.backendName;
 
     final averageThroughput =
@@ -89,11 +89,11 @@ class _DetailsScreen extends State<DetailsScreen> {
     return RowData(
       isHeader: false,
       name: runInfo.benchmarkName,
-      throughput: runInfo.performance?.throughput?.toStringAsFixed(2) ??
+      throughput: runInfo.performanceRun?.throughput?.toStringAsFixed(2) ??
           l10n.resultsNotAvailable,
-      throughputValid: runInfo.performance?.loadgenInfo?.validity ?? false,
+      throughputValid: runInfo.performanceRun?.loadgenInfo?.validity ?? false,
       accuracy:
-          runInfo.accuracy?.accuracy?.formatted ?? l10n.resultsNotAvailable,
+          runInfo.accuracyRun?.accuracy?.formatted ?? l10n.resultsNotAvailable,
       onTap: () {
         Navigator.push(
           context,
