@@ -61,10 +61,12 @@ scanner/scan:
 
 .PHONY: docker/scanner/build
 docker/scanner/build:
-	MSYS2_ARG_CONV_EXCL="*" docker run ${flutter_common_docker_flags} \
+	MSYS2_ARG_CONV_EXCL="*" docker run \
+		${scanner_docker_args} ${flutter_common_docker_flags} \
 		make scanner/build
 
 .PHONY: docker/scanner/scan
 docker/scanner/scan:
-	MSYS2_ARG_CONV_EXCL="*" docker run ${flutter_common_docker_flags} \
+	MSYS2_ARG_CONV_EXCL="*" docker run \
+		${scanner_docker_args} ${flutter_common_docker_flags} \
 		make scanner/scan
