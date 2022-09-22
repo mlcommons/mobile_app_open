@@ -8,9 +8,9 @@ import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/environment/os_enum.dart';
 
 class DeviceInfo {
-  final String modelCode;
-  final String modelName;
-  final String manufacturer;
+  final String? modelCode;
+  final String? modelName;
+  final String? manufacturer;
 
   static late final String nativeLibraryPath;
   static late final DeviceInfo instance;
@@ -49,24 +49,31 @@ class DeviceInfo {
   static Future<DeviceInfo> _makeIosInfo() async {
     final deviceInfo = await DeviceInfoPlugin().iosInfo;
     final deviceNames = DeviceMarketingNames();
-
+    final modelCode = deviceInfo.utsname.machine;
+    String? modelName;
+    var machine = deviceInfo.utsname.machine;
+    if (machine != null) {
+      modelName = deviceNames.getSingleNameFromModel(DeviceType.ios, machine);
+    }
     return DeviceInfo(
       manufacturer: 'Apple',
-      modelCode: deviceInfo.utsname.machine ?? 'Unknown',
-      modelName: deviceNames.getSingleNameFromModel(
-          DeviceType.ios, deviceInfo.utsname.machine ?? 'Unknown'),
+      modelCode: modelCode,
+      modelName: modelName,
     );
   }
 
   static Future<DeviceInfo> _makeAndroidInfo() async {
     final deviceInfo = await DeviceInfoPlugin().androidInfo;
     final deviceNames = DeviceMarketingNames();
-
+    final modelCode = deviceInfo.model;
+    String? modelName;
+    if (modelCode != null) {
+      deviceNames.getSingleNameFromModel(DeviceType.android, modelCode);
+    }
     return DeviceInfo(
-      manufacturer: deviceInfo.manufacturer ?? 'Unknown',
-      modelCode: deviceInfo.model ?? 'Unknown',
-      modelName: deviceNames.getSingleNameFromModel(
-          DeviceType.android, deviceInfo.model ?? 'Unknown'),
+      manufacturer: deviceInfo.manufacturer,
+      modelCode: modelCode,
+      modelName: modelName,
     );
   }
 

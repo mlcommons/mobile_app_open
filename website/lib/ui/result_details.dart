@@ -115,9 +115,9 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
             Text(info.osName.toString())), // TODO
         _makeTableRow(const Text('OS version'), Text(info.osVersion)),
         _makeTableRow(
-            const Text('Device manufacturer'), Text(info.manufacturer)),
-        _makeTableRow(const Text('Device model code'), Text(info.modelCode)),
-        _makeTableRow(const Text('Device model name'), Text(info.modelName)),
+            const Text('Device manufacturer'), Text(info.manufacturer ?? 'unknown')),
+        _makeTableRow(const Text('Device model code'), Text(info.modelCode ?? 'unknown')),
+        _makeTableRow(const Text('Device model name'), Text(info.modelName ?? 'unknown')),
       ],
     );
   }

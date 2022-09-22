@@ -9,9 +9,9 @@ class EnvironmentInfo {
 
   final OsName osName;
   final String osVersion;
-  final String manufacturer;
-  final String modelCode;
-  final String modelName;
+  final String? manufacturer;
+  final String? modelCode;
+  final String? modelName;
 
   EnvironmentInfo({
     required this.osName,
