@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:uuid/uuid.dart';
 
-import '../build_info/backend_list.dart';
 import '../build_info/build_info.dart';
 import '../environment/environment_info.dart';
 import '../environment/os_enum.dart';
@@ -94,9 +93,9 @@ Future<void> main() async {
       gitCommit: 'as91230jr90qwe',
       gitDirtyFlag: false,
       devTestFlag: true,
-      backends: BackendList(<String>[
+      backendList: <String>[
         'libtflitebackend',
-      ]),
+      ],
       officialReleaseFlag: false,
     ),
     envInfo: EnvironmentInfo(

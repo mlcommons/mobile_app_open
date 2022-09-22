@@ -29,8 +29,8 @@ endif
 
 flutter: flutter/prepare flutter/platform
 flutter/firebase: flutter/firebase/config flutter/firebase/prefix
-flutter/result: flutter/result/schema flutter/result/ts
-flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
+flutter/result: flutter/result/json flutter/result/schema flutter/result/ts
+flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 flutter/test: flutter/test/unit flutter/test/integration
 
@@ -117,6 +117,10 @@ flutter/result/ts:
 		--lang ts \
 		--top-level ExtendedResult \
 		--out firebase_functions/functions/src/extended-result.gen.ts
+
+.PHONY: flutter/result/json
+flutter/result/json:
+	cd flutter_common && ${_start_args} flutter --no-version-check pub run build_runner build
 
 .PHONY: flutter/build-info
 flutter/build-info:
