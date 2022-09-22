@@ -39,3 +39,15 @@ jobs:
       - name: Scan code
         run: |
           make docker/scanner/scan
+      - name: Comment URL to SonarCloud dashboard
+        uses: actions/github-script@v5
+        if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' }}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `👋 https://sonarcloud.io/dashboard?id=mobile_app_open&pullRequest=${context.issue.number}`
+            })
