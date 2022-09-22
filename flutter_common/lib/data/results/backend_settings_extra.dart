@@ -1,33 +1,25 @@
-class BackendExtraSetting {
-  static const String _tagId = 'id';
-  static const String _tagName = 'name';
-  static const String _tagValue = 'value';
-  static const String _tagValueName = 'value_name';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'backend_settings_extra.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class BackendExtraSetting {
   final String id;
   final String name;
   final String value;
   final String valueName;
 
-  BackendExtraSetting(
-      {required this.id,
-      required this.name,
-      required this.value,
-      required this.valueName});
+  BackendExtraSetting({
+    required this.id,
+    required this.name,
+    required this.value,
+    required this.valueName,
+  });
 
-  BackendExtraSetting.fromJson(Map<String, dynamic> json)
-      : this(
-            id: json[_tagId] as String,
-            name: json[_tagName] as String,
-            value: json[_tagValue] as String,
-            valueName: json[_tagValueName] as String);
+  factory BackendExtraSetting.fromJson(Map<String, dynamic> json) =>
+      _$BackendExtraSettingFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagId: id,
-        _tagName: name,
-        _tagValue: value,
-        _tagValueName: valueName,
-      };
+  Map<String, dynamic> toJson() => _$BackendExtraSettingToJson(this);
 }
 
 class BackendExtraSettingList {
