@@ -32,7 +32,10 @@ endif
 
 # Use the same image tag used in `flutter_common_docker_flags`
 output/docker_mlperf_scanner.stamp: flutter/android/docker/image tools/scanner/Dockerfile
-	docker image build -t mlcommons/mlperf_mobile_flutter tools/scanner
+	docker image build \
+		-t ${docker_image_tag} \
+		--build-arg DOCKER_IMAGE_TAG=${docker_image_tag} \
+		tools/scanner
 	touch $@
 
 .PHONY: scanner/image
