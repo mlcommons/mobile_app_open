@@ -36,7 +36,7 @@ class _DetailsScreen extends State<DetailsScreen> {
 
     final firstResult = res.results.list.first;
     final date = helper.formatDate(firstResult.performance!.startDatetime);
-    final backendName = firstResult.backendInfo.name;
+    final backendName = firstResult.backendInfo.backendName;
 
     final averageThroughput =
         res.results.calculateAverageThroughput().toStringAsFixed(2);

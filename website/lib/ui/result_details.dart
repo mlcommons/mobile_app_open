@@ -146,9 +146,10 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
             Text(info.performance?.throughput.toString() ?? 'N/A')),
         _makeTableRow(const Text('Accuracy'),
             Text(info.accuracy?.accuracy.toString() ?? 'N/A')),
-        _makeTableRow(const Text('Backend name'), Text(info.backendInfo.name)),
         _makeTableRow(
-            const Text('Accelerator'), Text(info.backendInfo.accelerator)),
+            const Text('Backend name'), Text(info.backendInfo.backendName)),
+        _makeTableRow(
+            const Text('Accelerator'), Text(info.backendInfo.acceleratorName)),
       ],
     );
   }

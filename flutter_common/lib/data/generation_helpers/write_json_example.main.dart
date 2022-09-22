@@ -55,9 +55,9 @@ Future<void> main() async {
     accuracy: runResult,
     backendInfo: BackendReportedInfo(
       filename: 'tflite',
-      vendor: 'tflite',
-      name: 'libtflitebackend',
-      accelerator: 'accelerator',
+      vendorName: 'tflite',
+      backendName: 'libtflitebackend',
+      acceleratorName: 'accelerator',
     ),
     minDuration: 10.5,
     minSamples: 8,

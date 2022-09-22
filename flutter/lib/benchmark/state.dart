@@ -527,9 +527,9 @@ class BenchmarkState extends ChangeNotifier {
         minSamples: benchmark.taskConfig.minQueryCount,
         backendInfo: BackendReportedInfo(
           filename: backendInfo.libPath,
-          name: performance.backendName,
-          vendor: performance.backendVendor,
-          accelerator: performance.acceleratorName,
+          backendName: performance.backendName,
+          vendorName: performance.backendVendor,
+          acceleratorName: performance.acceleratorName,
         ),
         backendSettingsInfo: BackendSettingsInfo(
           acceleratorCode: actualSettings.benchmarkSetting.accelerator,

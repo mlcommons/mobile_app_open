@@ -118,8 +118,8 @@ class ResultManager {
       throughput: runResult.throughput ?? 0.0,
       accuracy: runResult.accuracy,
       accuracy2: runResult.accuracy2,
-      backendName: export.backendInfo.name,
-      acceleratorName: export.backendInfo.accelerator,
+      backendName: export.backendInfo.backendName,
+      acceleratorName: export.backendInfo.acceleratorName,
       batchSize: export.backendSettingsInfo.batchSize,
       validity: runResult.loadgenInfo?.validity ?? false,
     );
