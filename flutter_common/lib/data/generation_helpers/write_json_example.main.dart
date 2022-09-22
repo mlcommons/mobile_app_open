@@ -12,7 +12,6 @@ import '../results/backend_settings.dart';
 import '../results/backend_settings_extra.dart';
 import '../results/benchmark_result.dart';
 import '../results/dataset_info.dart';
-import '../results/dataset_type.dart';
 
 //
 // This file is intended to be used
@@ -35,7 +34,7 @@ Future<void> main() async {
     ),
     dataset: DatasetInfo(
       name: 'Imagenet classification validation set',
-      type: DatasetType.fromJson('IMAGENET'),
+      type: DatasetTypeEnum.imagenet,
       dataPath: 'app:///mlperf_datasets/imagenet/img',
       groundtruthPath: 'app:///mlperf_datasets/imagenet/imagenet_val_full.txt',
     ),

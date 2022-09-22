@@ -16,7 +16,6 @@ import 'package:mlperfbench_common/data/results/backend_settings.dart';
 import 'package:mlperfbench_common/data/results/backend_settings_extra.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench_common/data/results/dataset_info.dart';
-import 'package:mlperfbench_common/data/results/dataset_type.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
@@ -490,7 +489,7 @@ class BenchmarkState extends ChangeNotifier {
           accuracy2: performance.accuracy2,
           dataset: DatasetInfo(
             name: accuracyDataset.name,
-            type: DatasetType.fromJson(
+            type: DatasetInfo.parseDatasetType(
                 benchmark.taskConfig.datasets.type.toString()),
             dataPath: performanceDataset.inputPath,
             groundtruthPath: performanceDataset.groundtruthPath,
@@ -512,7 +511,7 @@ class BenchmarkState extends ChangeNotifier {
                 accuracy2: accuracy.accuracy2,
                 dataset: DatasetInfo(
                   name: accuracyDataset.name,
-                  type: DatasetType.fromJson(
+                  type: DatasetInfo.parseDatasetType(
                       benchmark.taskConfig.datasets.type.toString()),
                   dataPath: accuracyDataset.inputPath,
                   groundtruthPath: accuracyDataset.groundtruthPath,

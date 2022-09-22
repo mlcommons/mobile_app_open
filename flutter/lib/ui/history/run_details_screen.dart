@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
+import 'package:mlperfbench_common/data/results/dataset_info.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
@@ -76,7 +77,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
       helper.makeInfo(
           l10n.historyRunDetailsSamples, perf.measuredSamples.toString()),
       helper.makeInfo(
-          l10n.historyRunDetailsDatasetType, perf.dataset.type.toJson()),
+          l10n.historyRunDetailsDatasetType, perf.dataset.type.humanName),
       helper.makeInfo(l10n.historyRunDetailsDatasetName, perf.dataset.name),
     ];
   }
@@ -92,7 +93,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
       helper.makeInfo(
           l10n.historyRunDetailsSamples, accuracy.measuredSamples.toString()),
       helper.makeInfo(
-          l10n.historyRunDetailsDatasetType, accuracy.dataset.type.toJson()),
+          l10n.historyRunDetailsDatasetType, accuracy.dataset.type.humanName),
       helper.makeInfo(l10n.historyRunDetailsDatasetName, accuracy.dataset.name),
     ];
   }
