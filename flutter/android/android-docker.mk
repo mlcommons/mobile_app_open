@@ -32,6 +32,8 @@ flutter_common_docker_flags= \
 		--rm \
 		${flutter_docker_tty_arg} \
 		--init \
+		--user `id -u`:`id -g` \
+		--env USER=mlperf \
 		-v $(CURDIR):/mnt/project \
 		--workdir /mnt/project \
 		-v /mnt/project/flutter/build \
