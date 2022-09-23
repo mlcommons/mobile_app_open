@@ -47,7 +47,7 @@ jobs:
       - name: Cache bazel
         uses: actions/cache@v3
         with:
-          path: ${BAZEL_CACHE_PATH}
+          path: ${{ github.workspace }}/bazel_cache
           key: ${{ runner.os }}-bazel_cache
       - name: Build scanner image
         run: |
