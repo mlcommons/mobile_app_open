@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,8 +12,8 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   SharedPreferences.setMockInitialValues({
-    'test mode': true,
-    'submission mode': true,
+    StoreConstants.testMode: true,
+    StoreConstants.submissionMode: true,
   });
 
   group('integration tests', () {
