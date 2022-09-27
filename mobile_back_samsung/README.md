@@ -1,10 +1,12 @@
 # Building MLPerf Open app with Samsung backend
 
-## Samsung backend directory [mobile_app_open/mobile_back_samsung/samsung](https://github.com/mlcommons/mobile_app_open/tree/master/mobile_back_samsung/samsung) with latest libs can be found here.
-[samsung](https://github.com/mlcommons/mobile_back_samsung/tree/samsung_backend_flutter_libs/samsung_libs/mobile_back_samsung/samsung)
+1. Update the "lib" folder at 'mobile_app_open/mobile_back_samsung/samsung/lib' by copying it from 
+[here](https://github.com/mlcommons/mobile_back_samsung/tree/samsung_backend_flutter_libs/samsung_libs/mobile_back_samsung/samsung)
 
+2. Change directory to the main path (mobile_app_open)
 
-## To build the app, use the following command
+3. Run the build command
 ```bash
-make WITH_SAMSUNG=1 WITH_PIXEL=1 WITH_TFLITE=1 docker/flutter/android/apk
+make WITH_SAMSUNG=1 docker/flutter/android/apk
 ```
+
