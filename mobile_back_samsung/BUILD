@@ -17,8 +17,9 @@ cc_library(
     ] + select({
         "android_arm64": [
             "samsung_backend/lib/libenn_public_api_cpp.so",
-            "samsung_backend/lib/libsbe2200_core.so",
             "samsung_backend/lib/libsbe1200_core.so",
+            "samsung_backend/lib/libsbe2200_core.so",
+            "samsung_backend/lib/libsbe2300_core.so",
             "samsung_backend/lib/libc++.so",
             "samsung_backend/lib/libeden_nn_on_system.so",
         ],
