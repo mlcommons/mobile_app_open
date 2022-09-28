@@ -22,5 +22,5 @@ class RunResult {
   });
 
   @override
-  String toString() => 'RunResult(accuracy:${accuracy1?.normalized ?? 0.0})';
+  String toString() => 'RunResult(accuracy:$accuracy1)';
 }

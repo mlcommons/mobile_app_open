@@ -582,6 +582,8 @@ class BenchmarkState extends ChangeNotifier {
 
     if (!(result.accuracy1?.isInBounds() ?? true) ||
         !(result.accuracy2?.isInBounds() ?? true)) {
+      print(
+          '${benchmark.id} accuracies: ${result.accuracy1}, ${result.accuracy2}');
       throw '${benchmark.info.taskName}: ${runMode.logSuffix} run: accuracy is invalid (backend may be corrupted)';
     }
 
