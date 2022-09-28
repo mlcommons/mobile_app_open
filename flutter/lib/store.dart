@@ -109,6 +109,7 @@ class Store extends ChangeNotifier {
   }
 
   int get testMinDuration => _getInt(StoreConstants.testMinDuration);
+  int get testCooldown => _getInt(StoreConstants.testCooldown);
 }
 
 class StoreConstants {
@@ -124,4 +125,5 @@ class StoreConstants {
   static const keepLogs = 'keep_logs';
   static const taskSelection = 'disabled_tasks';
   static const testMinDuration = 'test min duration';
+  static const testCooldown = 'test cooldown';
 }

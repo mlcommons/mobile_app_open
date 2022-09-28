@@ -322,10 +322,16 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> _runBenchmarks() async {
+    // TODO refactor this method
     final cooldown = _store.cooldown;
-    final cooldownPause = _store.testMode || isFastMode
-        ? const Duration(seconds: 1)
-        : Duration(minutes: _store.cooldownDuration);
+    late final Duration cooldownDuration;
+    if (_store.testMode) {
+      cooldownDuration = Duration(seconds: _store.testCooldown);
+    } else if (isFastMode) {
+      cooldownDuration = const Duration(seconds: 1);
+    } else {
+      cooldownDuration = Duration(minutes: _store.cooldownDuration);
+    }
 
     final activeBenchmarks =
         _middle.benchmarks.where((element) => element.isActive);
@@ -338,7 +344,7 @@ class BenchmarkState extends ChangeNotifier {
       progressInfo.totalStages += activeBenchmarks.length;
     }
     progressInfo.currentStage = 0;
-    progressInfo.cooldownDuration = cooldownPause.inSeconds.toDouble();
+    progressInfo.cooldownDuration = cooldownDuration.inSeconds.toDouble();
 
     resetCurrentResults();
 
@@ -362,7 +368,7 @@ class BenchmarkState extends ChangeNotifier {
           return timer.elapsed.inSeconds / progressInfo.cooldownDuration;
         };
         notifyListeners();
-        await (_cooldownFuture = Future.delayed(cooldownPause));
+        await (_cooldownFuture = Future.delayed(cooldownDuration));
         progressInfo.cooldown = false;
         timer.stop();
       }
