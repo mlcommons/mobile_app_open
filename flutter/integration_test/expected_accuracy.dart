@@ -28,7 +28,7 @@ const Map<String, Interval> _imageSegmentation = {
   'ANE': Interval(min: 0.8387, max: 0.9891),
 };
 
-const Map<String, Interval> _languageUnderstanding = {
+const Map<String, Interval> _naturalLanguageProcessing = {
   'CPU': Interval(min: 1.0, max: 1.0),
   'GPU (FP16)': Interval(min: 1.0, max: 1.0),
   'NNAPI': Interval(min: 1.0, max: 1.0),
@@ -40,6 +40,6 @@ const benchmarkExpectedAccuracy = {
   'image_classification': _imageClassification,
   'object_detection': _objectDetection,
   'image_segmentation_v2': _imageSegmentation,
-  'natural_language_processing': _languageUnderstanding,
+  'natural_language_processing': _naturalLanguageProcessing,
   'image_classification_offline': _imageClassification,
 };
