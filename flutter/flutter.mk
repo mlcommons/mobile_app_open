@@ -180,9 +180,15 @@ flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"
 else
 flutter_test_device_arg=
 endif
+flutter_perf_test_arg=--dart-define=enable-perf-test=${PERF_TEST}
 .PHONY: flutter/test/integration
 flutter/test/integration:
-	cd flutter && ${_start_args} flutter --no-version-check test integration_test ${flutter_test_device_arg} ${flutter_official_build_arg}
+	cd flutter && ${_start_args} \
+		flutter --no-version-check test \
+		integration_test \
+		${flutter_test_device_arg} \
+		${flutter_official_build_arg} \
+		${flutter_perf_test_arg}
 
 .PHONY: flutter/run
 flutter/run:

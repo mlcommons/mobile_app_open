@@ -70,9 +70,10 @@ flutter/android/test-apk/main:
 
 FLUTTER_ANDROID_APK_TEST_HELPER?=test-helper.apk
 flutter_android_apk_test_helper_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_HELPER}
-# run `make flutter/android/apk` before this target
 .PHONY: flutter/android/test-apk/helper
 flutter/android/test-apk/helper:
 	mkdir -p $$(dirname ${flutter_android_apk_test_helper_path})
-	cd flutter/android && ./gradlew app:assembleAndroidTest
+	flutter_android_apk_test_perf_arg=$$(echo enable-perf-test=${PERF_TEST} | base64) && \
+		cd flutter/android && ./gradlew app:assembleAndroidTest \
+		-Pdart-defines=$${flutter_android_apk_test_perf_arg}
 	cp -f flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk ${flutter_android_apk_test_helper_path}

@@ -10,15 +10,26 @@ import 'expected_accuracy.dart';
 import 'expected_performance.dart';
 import 'utils.dart';
 
+const enablePerfTest = bool.fromEnvironment(
+  'enable-perf-test',
+  defaultValue: false,
+);
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  SharedPreferences.setMockInitialValues({
+  final prefs = <String, Object>{
     StoreConstants.testMode: true,
     StoreConstants.submissionMode: true,
-    StoreConstants.testMinDuration: 15,
-    StoreConstants.testCooldown: 10,
-  });
+    StoreConstants.testMinDuration: 1,
+    StoreConstants.testMinQueryCount: 4,
+  };
+  if (enablePerfTest) {
+    prefs[StoreConstants.testMinDuration] = 15;
+    prefs[StoreConstants.testMinQueryCount] = 64;
+    prefs[StoreConstants.testCooldown] = 10;
+  }
+  SharedPreferences.setMockInitialValues(prefs);
 
   group('integration tests', () {
     final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized()
@@ -47,7 +58,9 @@ void checkTasks(ExtendedResult extendedResults) {
     expect(benchmarkResult.performance!.throughput, isNotNull);
 
     checkAccuracy(benchmarkResult);
-    checkPerformance(benchmarkResult, extendedResults.envInfo);
+    if (enablePerfTest) {
+      checkPerformance(benchmarkResult, extendedResults.envInfo);
+    }
   }
 }
 
