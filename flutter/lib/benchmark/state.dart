@@ -582,6 +582,7 @@ class BenchmarkState extends ChangeNotifier {
       backendLibPath: backendLibPath,
       logDir: logDir,
       testMinDuration: _store.testMinDuration,
+      testMinQueryCount: _store.testMinQueryCount,
     );
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;

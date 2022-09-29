@@ -92,13 +92,14 @@ class Benchmark {
     required String backendLibPath,
     required String logDir,
     required int testMinDuration,
+    required int testMinQueryCount,
   }) {
     final dataset = runMode.chooseDataset(taskConfig);
 
     int minQueryCount;
     double minDuration;
     if (testMinDuration != 0) {
-      minQueryCount = 64;
+      minQueryCount = testMinQueryCount;
       minDuration = testMinDuration.toDouble();
     } else if (isFastMode) {
       minQueryCount = 8;
