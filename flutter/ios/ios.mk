@@ -13,12 +13,16 @@
 # limitations under the License.
 ##########################################################################
 
-flutter/ios: flutter/ios/libs flutter/update-splash-screen
+flutter/ios: flutter/ios/libs flutter/ios/clean flutter/update-splash-screen
 
 backend_bridge_ios_target=//flutter/cpp/flutter:backend_bridge_fw
 backend_bridge_ios_zip=${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/backend_bridge_fw.xcframework.zip
 
 flutter_ios_fw_dir=flutter/ios/frameworks
+
+.PHONY: flutter/ios/clean
+flutter/ios/clean:
+	rm -rf flutter/build/ios
 
 # BAZEL_OUTPUT_ROOT_ARG is set on our Jenkins CI
 .PHONY: flutter/ios/libs
