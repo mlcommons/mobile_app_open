@@ -44,7 +44,7 @@ const Map<String, double> _imageClassification = {
 
 const Map<String, double> _objectDetection = {
   _tagWindowsRyzen5600: 18,
-  _tagWindowsCI: 4.8,
+  _tagWindowsCI: 4.5,
   _tagPixel5: 48,
   _tagPixel6: 440,
   _tagSamsungS0UltraExynosTflite: 33,
@@ -85,7 +85,7 @@ const Map<String, double> _imageClassificationOffline = {
   _tagWindowsRyzen5600: 52,
   _tagWindowsCI: 12,
   _tagPixel5: 152,
-  _tagPixel6: 1500,
+  _tagPixel6: 1550,
   _tagSamsungS0UltraExynosTflite: 89,
   _tagSamsungS21PlusExynosTflite: 110,
   _tagIosSimMacincloudTflite: 8,
