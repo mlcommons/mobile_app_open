@@ -6,5 +6,5 @@
 3. Run the build command
 
 ```bash
-make WITH_SAMSUNG=1 docker/flutter/android/apk
+make WITH_SAMSUNG=1 OFFICIAL_BUILD=false FLUTTER_BUILD_NUMBER=0 docker/flutter/android/release
 ```
