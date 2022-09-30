@@ -361,7 +361,7 @@ class BenchmarkState extends ChangeNotifier {
       if (_aborting) break;
 
       // we only do cooldown before performance benchmarks
-      if (cooldown && !first) {
+      if (cooldown && !first && cooldownDuration.inMilliseconds != 0) {
         progressInfo.cooldown = true;
         final timer = Stopwatch()..start();
         progressInfo.calculateStageProgress = () {
