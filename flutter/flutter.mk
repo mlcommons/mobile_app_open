@@ -93,16 +93,16 @@ flutter/firebase/prefix:
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
 		| tee firebase_functions/functions/src/prefix.gen.ts
 
-result_json_example_path=output/extended-result-example.json
+result_json_sample_path=output/extended-result-example.json
 default_result_json_schema_path=flutter/documentation/extended-result.schema.json
 RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
 .PHONY: flutter/result/schema
 flutter/result/schema:
 	cd flutter_common && \
 		${_start_args} dart run \
-		--define=jsonFileName=../${result_json_example_path} \
-		lib/data/generation_helpers/write_json_example.main.dart
-	quicktype ${result_json_example_path} \
+		--define=jsonFileName=../${result_json_sample_path} \
+		lib/data/generation_helpers/write_json_sample.main.dart
+	quicktype ${result_json_sample_path} \
 		--lang schema \
 		--out ${RESULT_JSON_SCHEMA_PATH}
 	cd flutter_common && \
