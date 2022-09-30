@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
@@ -44,6 +45,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     final store = context.watch<Store>();
     final state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
+    final buildInfo = BuildInfoHelper.info;
 
     return Scaffold(
       appBar: AppBar(
@@ -199,6 +201,11 @@ class _SettingsScreen extends State<SettingsScreen> {
             },
             child: Text(stringResources.settingsClearCache),
           ),
+          const Divider(),
+          Text(
+            'Version: ${buildInfo.version} | Build: ${buildInfo.buildNumber}',
+            textAlign: TextAlign.center,
+          )
         ],
       ),
     );
