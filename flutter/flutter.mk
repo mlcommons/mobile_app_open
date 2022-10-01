@@ -41,6 +41,7 @@ flutter/check/official-build:
 	@[ "$$OFFICIAL_BUILD" = "true" ] || [ "$$OFFICIAL_BUILD" = "false" ] \
 		|| (echo OFFICIAL_BUILD env must be explicitly set to \"true\" or \"false\"; exit 1)
 
+FLUTTER_APP_VERSION?=$(shell grep 'version:' flutter/pubspec.yaml | head -n1 | awk '{ print $$2}' | awk -F+ '{ print $$1}')
 FLUTTER_BUILD_NUMBER?=0
 flutter_build_number_arg=--build-number ${FLUTTER_BUILD_NUMBER}
 .PHONY: flutter/check/build-number
@@ -150,7 +151,6 @@ flutter/l10n:
 		--no-synthetic-package
 	dart format flutter/lib/localizations
 
-FLUTTER_APP_VERSION?=$(shell grep 'version:' flutter/pubspec.yaml | head -n1 | awk '{ print $$2}')
 .PHONY: flutter/set-windows-build-number
 flutter/set-windows-build-number:
 	cat flutter/windows/runner/version.in | sed \
