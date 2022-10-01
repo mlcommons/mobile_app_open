@@ -1,5 +1,3 @@
-# Link to .so libs
-# https://github.com/mlcommons/mobile_back_samsung/tree/merge-submission-v2.0-into-master_samsung-backend/mobile_back_samsung/samsung/lib
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
