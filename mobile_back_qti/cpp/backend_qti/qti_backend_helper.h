@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,10 +41,11 @@ class QTIBackendHelper {
 
  public:
   enum QTIBufferType { FLOAT_32 = 0, UINT_8 = 1 };
-  using GetBufferFn = std::add_pointer<void *(size_t)>::type;
+  using GetBufferFn = std::add_pointer<void *(size_t,int)>::type;
   using ReleaseBufferFn = std::add_pointer<void(void *)>::type;
 
   const char *name_ = "snpe";
+  const char *acceleratorName_;
   std::string snpeOutputLayers_;
   std::vector<mlperf_data_t> inputFormat_;
   std::vector<mlperf_data_t> outputFormat_;
@@ -63,6 +64,7 @@ class QTIBackendHelper {
   bool useSnpe_;
   mlperf_backend_ptr_t tfliteBackend_;
   int batchSize_;
+  int queryCount_;
   int inputBatch_;
   int outputBatchBufsize_;
   GetBufferFn getBuffer_;
@@ -71,7 +73,6 @@ class QTIBackendHelper {
   std::string delegate_;
   QTIBufferType inputBufferType_ = UINT_8;
   QTIBufferType outputBufferType_ = FLOAT_32;
-  bool useDspFeatures = false;
   uint32_t loadOffTime_ = 2;
   uint32_t loadOnTime_ = 100;
   bool useIonBuffers_ = true;
