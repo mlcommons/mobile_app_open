@@ -9,6 +9,7 @@ For private files, private repo should be used.
 
 ## Versioning
 
+* The app version is configured in the file `flutter/pubspec.yaml`
 * Every build must have a unique build number. Increment the last part of the
   version number as needed, but don’t have a v1.0.1 with and without a specific
   backend.
