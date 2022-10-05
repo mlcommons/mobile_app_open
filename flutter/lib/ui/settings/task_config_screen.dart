@@ -2,11 +2,112 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
+import 'package:mlperfbench/ui/settings/data_folder_type.dart';
+
+class _DataFolderSelectorHelper {
+  final AppLocalizations l10n;
+  final Store store;
+  final DataFolderType selectedOption;
+
+  _DataFolderSelectorHelper(BuildContext context)
+      : l10n = AppLocalizations.of(context),
+        store = context.watch<Store>(),
+        selectedOption =
+            parseDataFolderTypeSelection(context.read<Store>().dataFolderType);
+
+  Widget build() {
+    final options = <Widget>[];
+    options.add(_makeDefaultOption());
+    if (defaultDataFolder.isNotEmpty) {
+      options.add(_makeAppFolderOption());
+    }
+    options.add(_makeCustomOption());
+
+    return Column(
+      children: options,
+    );
+  }
+
+  void setValue(DataFolderType? value) {
+    if (value == null) return;
+    if (value == selectedOption) return;
+    store.dataFolderType = value.name;
+  }
+
+  Widget _makeDefaultOption() {
+    late final String defaultOptionSubtitle;
+    if (defaultDataFolder.isEmpty) {
+      defaultOptionSubtitle = l10n.settingsTaskDataFolderApp;
+    } else {
+      defaultOptionSubtitle = defaultDataFolder;
+    }
+    return ListTile(
+      title: Text(l10n.settingsTaskDataFolderDefault),
+      subtitle: Text(defaultOptionSubtitle),
+      leading: Radio<DataFolderType>(
+        value: DataFolderType.default_,
+        groupValue: selectedOption,
+        onChanged: setValue,
+      ),
+      onTap: () => setValue(DataFolderType.default_),
+    );
+  }
+
+  Widget _makeAppFolderOption() {
+    return ListTile(
+      title: Text(l10n.settingsTaskDataFolderApp),
+      leading: Radio<DataFolderType>(
+        value: DataFolderType.appFolder,
+        groupValue: selectedOption,
+        onChanged: setValue,
+      ),
+      onTap: () => setValue(DataFolderType.appFolder),
+    );
+  }
+
+  Widget _makeCustomOption() {
+    final textController = TextEditingController(text: store.customDataFolder);
+    return ListTile(
+      title: Text(l10n.settingsTaskDataFolderCustom),
+      subtitle: Focus(
+        onFocusChange: (focused) {
+          if (focused) {
+            if (selectedOption != DataFolderType.custom) {
+              setValue(DataFolderType.custom);
+            }
+          } else {
+            store.customDataFolder = textController.text;
+          }
+        },
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: textController,
+              ),
+            ),
+            ElevatedButton(
+              child: Icon(Icons.folder),
+              onPressed: null,
+            )
+          ],
+        ),
+      ),
+      leading: Radio<DataFolderType>(
+        value: DataFolderType.custom,
+        groupValue: selectedOption,
+        onChanged: setValue,
+      ),
+      onTap: () => setValue(DataFolderType.custom),
+    );
+  }
+}
 
 class TaskConfigScreen extends StatelessWidget {
   final List<TaskConfigDescription> _configs;
@@ -49,23 +150,40 @@ class TaskConfigScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
     final store = context.watch<Store>();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(stringResources.settingsTaskConfigTitle),
+        title: Text(l10n.settingsTaskConfigTitle),
       ),
-      body: ListView.builder(
-        itemCount: _configs.length,
-        itemBuilder: (context, index) {
-          final configuration = _configs[index];
-          return getOptionPattern(
-            context,
-            configuration,
-            store.chosenConfigurationName,
-          );
-        },
+      body: Column(
+        children: [
+          ListTile(
+            title: Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Text(
+                l10n.settingsTaskDataFolderTitle,
+              ),
+            ),
+            subtitle: Text(l10n.settingsTaskDataFolderDesc),
+          ),
+          _DataFolderSelectorHelper(context).build(),
+          const Divider(),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _configs.length,
+              itemBuilder: (context, index) {
+                final configuration = _configs[index];
+                return getOptionPattern(
+                  context,
+                  configuration,
+                  store.chosenConfigurationName,
+                );
+              },
+            ),
+          )
+        ],
       ),
     );
   }
