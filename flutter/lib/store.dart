@@ -49,11 +49,11 @@ class Store extends ChangeNotifier {
   }
 
   bool get artificialCPULoadEnabled =>
-      _getBool(_StoreConstants.artificialCPULoadEnabled, false);
+      _getBool(StoreConstants.artificialCPULoadEnabled, false);
 
   set artificialCPULoadEnabled(bool artificialCPULoadEnabled) {
     _storeFromDisk.setBool(
-        _StoreConstants.artificialCPULoadEnabled, artificialCPULoadEnabled);
+        StoreConstants.artificialCPULoadEnabled, artificialCPULoadEnabled);
     notifyListeners();
   }
 
