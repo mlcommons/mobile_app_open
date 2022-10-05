@@ -44,7 +44,7 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
 
   // Runs MLPerf tests.
   void RunMLPerfTest(const std::string& mode, int min_query_count,
-                     int min_duration, int single_stream_expected_latency_ns,
+                     double min_duration, int single_stream_expected_latency_ns,
                      const std::string& output_dir);
 
   // A human-readable string for loggin purposes.
@@ -55,6 +55,8 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
 
   // Flush the staged queries immediately.
   void FlushQueries() override { backend_->FlushQueries(); }
+
+  bool HasAccuracy() { return dataset_->HasAccuracy(); }
 
   // Asks the dataset to calculate the accuracy.
   float ComputeAccuracy() { return dataset_->ComputeAccuracy(); }

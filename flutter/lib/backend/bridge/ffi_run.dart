@@ -3,6 +3,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'handle.dart';
@@ -28,8 +29,8 @@ class _RunIn extends Struct {
   external Pointer<Utf8> mode;
   @Int32()
   external int min_query_count;
-  @Int32()
-  external int min_duration;
+  @Double()
+  external double min_duration;
   @Int32()
   external int single_stream_expected_latency_ns;
   external Pointer<Utf8> output_dir;
@@ -74,22 +75,44 @@ class _RunIn extends Struct {
   }
 }
 
+class _RunOutAccuracy extends Struct {
+  @Float()
+  external double normalized;
+  external Pointer<Utf8> formatted;
+
+  Accuracy toAccuracy() {
+    return Accuracy(
+      normalized: normalized,
+      formatted: formatted.toDartString(),
+    );
+  }
+}
+
 class _RunOut extends Struct {
-  @Int32()
-  external int ok;
-  @Float()
-  external double accuracyNormalized;
-  external Pointer<Utf8> accuracyFormatted;
-  @Float()
-  external double accuracyNormalized2;
-  external Pointer<Utf8> accuracyFormatted2;
+  @Bool()
+  external bool runOk;
+  external Pointer<_RunOutAccuracy> accuracy1;
+  external Pointer<_RunOutAccuracy> accuracy2;
   @Int32()
   external int num_samples;
   @Float()
-  external double duration_ms;
+  external double duration;
   external Pointer<Utf8> backend_name;
   external Pointer<Utf8> backend_vendor;
   external Pointer<Utf8> accelerator_name;
+
+  RunResult toRunResult(DateTime startTime) {
+    return RunResult(
+      accuracy1: accuracy1.address == 0 ? null : accuracy1.ref.toAccuracy(),
+      accuracy2: accuracy2.address == 0 ? null : accuracy2.ref.toAccuracy(),
+      numSamples: num_samples,
+      duration: duration,
+      backendName: backend_name.toDartString(),
+      backendVendor: backend_vendor.toDartString(),
+      acceleratorName: accelerator_name.toDartString(),
+      startTime: startTime,
+    );
+  }
 }
 
 const _runName = 'dart_ffi_run_benchmark';
@@ -112,39 +135,32 @@ final _getDatasetSize = getBridgeHandle()
     .lookupFunction<_GetQuery1, _GetQuery2>(_getDatasetSizeName);
 
 RunResult runBenchmark(RunSettings rs) {
-  var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
-  runIn.ref.set(rs);
-
   final startTime = DateTime.now();
 
-  var runOut = _run(runIn);
+  var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
+  Pointer<_RunOut> runOut;
+  try {
+    runIn.ref.set(rs);
 
-  runIn.ref.free();
-  malloc.free(runIn);
+    runOut = _run(runIn);
 
-  if (runOut.address == 0) {
-    throw '$_runName result: nullptr';
+    if (runOut.address == 0) {
+      throw '$_runName result: nullptr';
+    }
+  } finally {
+    runIn.ref.free();
+    malloc.free(runIn);
   }
-  if (runOut.ref.ok != 1) {
-    throw '$_runName result: runOut.ref.ok != 1';
+
+  try {
+    if (!runOut.ref.runOk) {
+      throw '$_runName result: !runOut.ref.runOk';
+    }
+
+    return runOut.ref.toRunResult(startTime);
+  } finally {
+    _free(runOut);
   }
-
-  var res = RunResult(
-    accuracyNormalized: runOut.ref.accuracyNormalized,
-    accuracyFormatted: runOut.ref.accuracyFormatted.toDartString(),
-    accuracyNormalized2: runOut.ref.accuracyNormalized2,
-    accuracyFormatted2: runOut.ref.accuracyFormatted2.toDartString(),
-    numSamples: runOut.ref.num_samples,
-    durationMs: runOut.ref.duration_ms,
-    backendName: runOut.ref.backend_name.toDartString(),
-    backendVendor: runOut.ref.backend_vendor.toDartString(),
-    acceleratorName: runOut.ref.accelerator_name.toDartString(),
-    startTime: startTime,
-  );
-
-  _free(runOut);
-
-  return res;
 }
 
 int getQueryCounter() {

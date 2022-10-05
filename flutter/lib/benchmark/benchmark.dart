@@ -97,7 +97,7 @@ class Benchmark {
 
     final _fastMode = isTestMode || isFastMode;
     var minQueryCount = _fastMode ? 8 : taskConfig.minQueryCount;
-    var minDuration = _fastMode ? 10 : taskConfig.minDurationMs;
+    var minDuration = _fastMode ? 1.0 : taskConfig.minDuration;
 
     final settings = pb.SettingList(
       setting: commonSettings,

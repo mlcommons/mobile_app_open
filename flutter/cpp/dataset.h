@@ -61,6 +61,8 @@ class Dataset : public ::mlperf::QuerySampleLibrary {
   virtual std::vector<uint8_t> ProcessOutput(
       const int sample_idx, const std::vector<void*>& outputs) = 0;
 
+  virtual bool HasAccuracy() { return false; }
+
   // ComputeAccuracy Calculate the accuracy if the processed outputs. This
   // function is optional, you don't need to implement it if you want to use
   // other scripts for accuracy calculation.

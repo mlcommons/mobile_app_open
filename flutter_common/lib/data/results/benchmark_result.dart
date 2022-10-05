@@ -17,7 +17,7 @@ class Accuracy {
 
   Accuracy.fromJson(Map<String, dynamic> json)
       : this(
-          normalized: json[_tagValue] as double,
+          normalized: (json[_tagValue] as num).toDouble(),
           formatted: json[_tagString] as String,
         );
 
@@ -25,29 +25,37 @@ class Accuracy {
         _tagValue: normalized,
         _tagString: formatted,
       };
+
+  bool isInBounds({double min = 0.0, double max = 1.0}) {
+    if (!normalized.isFinite) return false;
+    return normalized >= min && normalized <= max;
+  }
+
+  @override
+  String toString() => normalized.toString();
 }
 
 class BenchmarkLoadgenInfo {
   static const String _tagValidity = 'validity';
-  static const String _tagDuration = 'duration_ms';
+  static const String _tagDuration = 'duration';
 
   final bool validity;
-  final double durationMs;
+  final double duration;
 
   BenchmarkLoadgenInfo({
     required this.validity,
-    required this.durationMs,
+    required this.duration,
   });
 
   BenchmarkLoadgenInfo.fromJson(Map<String, dynamic> json)
       : this(
           validity: json[_tagValidity] as bool,
-          durationMs: json[_tagDuration] as double,
+          duration: json[_tagDuration] as double,
         );
 
   Map<String, dynamic> toJson() => {
         _tagValidity: validity,
-        _tagDuration: durationMs,
+        _tagDuration: duration,
       };
 }
 
@@ -56,7 +64,7 @@ class BenchmarkRunResult {
   static const String _tagAccuracy = 'accuracy';
   static const String _tagAccuracy2 = 'accuracy2';
   static const String _tagDatasetInfo = 'dataset';
-  static const String _tagMeasuredDuration = 'measured_duration_ms';
+  static const String _tagMeasuredDuration = 'measured_duration';
   static const String _tagMeasuredSamples = 'measured_samples';
   static const String _tagStartDatetime = 'start_datetime';
   static const String _tagLoadgenInfo = 'loadgen_info';
@@ -65,7 +73,7 @@ class BenchmarkRunResult {
   final Accuracy? accuracy;
   final Accuracy? accuracy2;
   final DatasetInfo datasetInfo;
-  final double measuredDurationMs;
+  final double measuredDuration;
   final int measuredSamples;
   final DateTime startDatetime;
   final BenchmarkLoadgenInfo? loadgenInfo;
@@ -75,7 +83,7 @@ class BenchmarkRunResult {
     required this.accuracy,
     required this.accuracy2,
     required this.datasetInfo,
-    required this.measuredDurationMs,
+    required this.measuredDuration,
     required this.measuredSamples,
     required this.startDatetime,
     required this.loadgenInfo,
@@ -91,7 +99,7 @@ class BenchmarkRunResult {
               ? null
               : Accuracy.fromJson(json[_tagAccuracy2]),
           datasetInfo: DatasetInfo.fromJson(json[_tagDatasetInfo]),
-          measuredDurationMs: json[_tagMeasuredDuration] as double,
+          measuredDuration: (json[_tagMeasuredDuration] as num).toDouble(),
           measuredSamples: json[_tagMeasuredSamples] as int,
           startDatetime: DateTime.parse(json[_tagStartDatetime] as String),
           loadgenInfo: json[_tagLoadgenInfo] == null
@@ -104,7 +112,7 @@ class BenchmarkRunResult {
         _tagAccuracy: accuracy,
         _tagAccuracy2: accuracy2,
         _tagDatasetInfo: datasetInfo,
-        _tagMeasuredDuration: measuredDurationMs,
+        _tagMeasuredDuration: measuredDuration,
         _tagMeasuredSamples: measuredSamples,
         _tagStartDatetime: startDatetime.toUtc().toIso8601String(),
         _tagLoadgenInfo: loadgenInfo,
@@ -118,7 +126,7 @@ class BenchmarkExportResult {
   static const String _tagBackendSettings = 'backend_settings';
   static const String _tagPerformanceRun = 'performance_run';
   static const String _tagAccuracyRun = 'accuracy_run';
-  static const String _tagMinDuration = 'min_duration_ms';
+  static const String _tagMinDuration = 'min_duration';
   static const String _tagMinSamples = 'min_samples';
   static const String _tagBackendInfo = 'backend_info';
 
@@ -128,7 +136,7 @@ class BenchmarkExportResult {
   final BackendSettingsInfo backendSettingsInfo;
   final BenchmarkRunResult? performance;
   final BenchmarkRunResult? accuracy;
-  final int minDurationMs;
+  final double minDuration;
   final int minSamples;
   final BackendReportedInfo backendInfo;
 
@@ -139,7 +147,7 @@ class BenchmarkExportResult {
     required this.backendSettingsInfo,
     required this.performance,
     required this.accuracy,
-    required this.minDurationMs,
+    required this.minDuration,
     required this.minSamples,
     required this.backendInfo,
   });
@@ -155,7 +163,7 @@ class BenchmarkExportResult {
           accuracy: json[_tagAccuracyRun] == null
               ? null
               : BenchmarkRunResult.fromJson(json[_tagAccuracyRun]),
-          minDurationMs: json[_tagMinDuration] as int,
+          minDuration: json[_tagMinDuration] as double,
           minSamples: json[_tagMinSamples] as int,
           backendInfo: BackendReportedInfo.fromJson(json[_tagBackendInfo]),
         );
@@ -167,7 +175,7 @@ class BenchmarkExportResult {
         _tagBackendSettings: backendSettingsInfo,
         _tagPerformanceRun: performance,
         _tagAccuracyRun: accuracy,
-        _tagMinDuration: minDurationMs,
+        _tagMinDuration: minDuration,
         _tagMinSamples: minSamples,
         _tagBackendInfo: backendInfo,
       };
