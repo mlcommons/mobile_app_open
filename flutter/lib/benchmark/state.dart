@@ -586,7 +586,6 @@ class BenchmarkState extends ChangeNotifier {
       isTestMode: _store.testMode,
     );
 
-    // TODO (anhappdev): remove this hack
     if (_store.artificialCPULoadEnabled) {
       print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
       const value = 999999999999999.0;

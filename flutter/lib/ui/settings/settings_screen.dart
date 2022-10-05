@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -46,6 +48,27 @@ class _SettingsScreen extends State<SettingsScreen> {
     final state = context.watch<BenchmarkState>();
     final stringResources = AppLocalizations.of(context);
     final buildInfo = BuildInfoHelper.info;
+
+    Widget artificialLoadSwitch;
+    if (Platform.isIOS) {
+      artificialLoadSwitch = ListTile(
+        title: Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: Text(
+            stringResources.settingsArtificialCPULoadTitle,
+          ),
+        ),
+        subtitle: Text(stringResources.settingsArtificialCPULoadSubtitle),
+        trailing: Switch(
+          value: store.artificialCPULoadEnabled,
+          onChanged: (flag) {
+            store.artificialCPULoadEnabled = flag;
+          },
+        ),
+      );
+    } else {
+      artificialLoadSwitch = const SizedBox(width: 0, height: 0);
+    }
 
     return Scaffold(
         appBar: AppBar(
@@ -116,21 +139,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 },
               ),
             ),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: Text(
-                  stringResources.settingsArtificialCPULoadTitle,
-                ),
-              ),
-              subtitle: Text(stringResources.settingsArtificialCPULoadSubtitle),
-              trailing: Switch(
-                value: store.artificialCPULoadEnabled,
-                onChanged: (flag) {
-                  store.artificialCPULoadEnabled = flag;
-                },
-              ),
-            ),
+            artificialLoadSwitch,
             ListTile(
               title: Padding(
                 padding: const EdgeInsets.only(bottom: 5),
