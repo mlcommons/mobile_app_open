@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 import 'package:crypto/crypto.dart';
+import 'package:mlperfbench/app_constants.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'cache_manager.dart';
@@ -120,7 +121,11 @@ class ResourceManager {
   Future<void> initSystemPaths() async {
     applicationDirectory = await getApplicationDirectory();
     await Directory(applicationDirectory).create(recursive: true);
-    _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
+    if (defaultCacheFolder.isNotEmpty) {
+      _loadedResourcesDir = defaultCacheFolder;
+    } else {
+      _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
+    }
     await Directory(_loadedResourcesDir).create();
 
     cacheManager = CacheManager(_loadedResourcesDir);
