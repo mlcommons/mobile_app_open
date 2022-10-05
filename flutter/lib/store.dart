@@ -123,7 +123,7 @@ class Store extends ChangeNotifier {
 class StoreConstants {
   static const share = 'share';
   static const submissionMode = 'submission mode';
-  static const artificialCPULoadEnabled = 'apple hack enabled';
+  static const artificialCPULoadEnabled = 'artificial cpu load enabled';
   static const offlineMode = 'offline mode';
   static const testMode = 'test mode';
   static const cooldown = 'cooldown';
