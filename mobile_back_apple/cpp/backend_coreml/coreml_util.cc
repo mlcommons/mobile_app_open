@@ -128,6 +128,8 @@ struct MLFeature {
 - (nullable instancetype)initWithModelPath:(const char *)modelPath
                                  batchSize:(int)batchSize {
   self = [super init];
+  // change the current thread priority because dart worker have a lower default priority
+  pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
   if (self) {
     try {
       NSError *error = nil;
