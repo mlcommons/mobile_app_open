@@ -85,11 +85,10 @@ class _DataFolderSelectorHelper {
           ),
         ),
         ElevatedButton(
-          child: Icon(Icons.folder),
+          child: const Icon(Icons.folder),
           onPressed: () async {
             final dir = await FilePicker.platform.getDirectoryPath(
               lockParentWindow: true,
-              initialDirectory: 'z:/',
             );
             if (dir != null) {
               store.customDataFolder = dir;
@@ -111,7 +110,7 @@ class _DataFolderSelectorHelper {
           if (!dirExists) {
             return Text(
               'Folder ${store.customDataFolder} does not exist or is not accessible',
-              style: TextStyle(color: AppColors.darkRedText),
+              style: const TextStyle(color: AppColors.darkRedText),
             );
           }
           return const SizedBox.shrink();
