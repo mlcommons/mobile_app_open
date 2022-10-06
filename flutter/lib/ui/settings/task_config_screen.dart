@@ -118,7 +118,8 @@ class _DataFolderSelectorHelper {
           final dirExists = snapshot.data!;
           if (!dirExists) {
             return Text(
-              'Folder ${store.customDataFolder} does not exist or is not accessible',
+              l10n.settingsTaskDataFolderWarning
+                  .replaceFirst('<path>', store.customDataFolder),
               style: const TextStyle(color: AppColors.darkRedText),
             );
           }
