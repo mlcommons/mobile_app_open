@@ -236,9 +236,11 @@ class TaskConfigScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          _makeCacheFolderNotice(l10n),
-          _DataFolderSelectorHelper(context).build(),
-          const Divider(),
+          if (!Platform.isIOS) ...[
+            _makeCacheFolderNotice(l10n),
+            _DataFolderSelectorHelper(context).build(),
+            const Divider(),
+          ],
           ..._configs.map((c) => getOptionPattern(
                 context,
                 c,
