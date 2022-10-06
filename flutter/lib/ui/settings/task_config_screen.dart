@@ -87,26 +87,23 @@ class _DataFolderSelectorHelper {
   }
 
   Widget _makeCustomOption() {
-    final textController = TextEditingController(text: store.customDataFolder);
-
+    final pickFolder = () async {
+      final dir = await FilePicker.platform.getDirectoryPath(
+        lockParentWindow: true,
+      );
+      if (dir != null) {
+        store.customDataFolder = dir;
+        setValue(DataFolderType.custom);
+      }
+    };
     final pathField = Row(
       children: [
         Expanded(
-          child: TextField(
-            controller: textController,
-          ),
+          child: Text(store.customDataFolder),
         ),
         ElevatedButton(
           child: const Icon(Icons.folder),
-          onPressed: () async {
-            final dir = await FilePicker.platform.getDirectoryPath(
-              lockParentWindow: true,
-            );
-            if (dir != null) {
-              store.customDataFolder = dir;
-              setValue(DataFolderType.custom);
-            }
-          },
+          onPressed: pickFolder,
         )
       ],
     );
@@ -129,22 +126,16 @@ class _DataFolderSelectorHelper {
         },
       );
     }
-    final focusHandler = (bool focused) async {
-      if (focused) {
-        if (selectedOption != DataFolderType.custom) {
-          setValue(DataFolderType.custom);
-        }
-      } else {
-        store.customDataFolder = textController.text;
-        if (textController.text.isEmpty) {
-          setValue(DataFolderType.default_);
-        }
-      }
-    };
     return ListTile(
       title: Text(l10n.settingsTaskDataFolderCustom),
-      subtitle: Focus(
-        onFocusChange: focusHandler,
+      subtitle: WillPopScope(
+        onWillPop: () async {
+          if (store.customDataFolder.isEmpty ||
+              !await Directory(store.customDataFolder).exists()) {
+            setValue(DataFolderType.default_);
+          }
+          return true;
+        },
         child: Column(
           children: [pathField, dirWarning],
         ),
@@ -154,7 +145,13 @@ class _DataFolderSelectorHelper {
         groupValue: selectedOption,
         onChanged: setValue,
       ),
-      onTap: () => setValue(DataFolderType.custom),
+      onTap: () async {
+        if (store.customDataFolder.isEmpty) {
+          await pickFolder();
+        } else {
+          setValue(DataFolderType.custom);
+        }
+      },
     );
   }
 }
