@@ -39,8 +39,8 @@ Future<void> main() async {
     datasetInfo: DatasetInfo(
       name: 'Imagenet classification validation set',
       type: DatasetType.fromJson('IMAGENET'),
-      dataPath: 'app:///mlperf_datasets/imagenet/img',
-      groundtruthPath: 'app:///mlperf_datasets/imagenet/imagenet_val_full.txt',
+      dataPath: 'mlperf_datasets/imagenet/img',
+      groundtruthPath: 'mlperf_datasets/imagenet/imagenet_val_full.txt',
     ),
     measuredDuration: 123.456,
     measuredSamples: 8,

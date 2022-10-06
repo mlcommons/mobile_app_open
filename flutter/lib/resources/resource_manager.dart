@@ -12,7 +12,7 @@ import 'result_manager.dart';
 import 'utils.dart';
 
 class ResourceManager {
-  static const _applicationDirectoryPrefix = 'app://';
+  static const _applicationDirectoryPrefix = 'data://';
   static const _loadedResourcesDirName = 'loaded_resources';
 
   final VoidCallback _onUpdate;
@@ -75,7 +75,7 @@ class ResourceManager {
         internetResources.add(resource);
         continue;
       }
-      throw 'forbidden path: ${resource.path} (only http://, https:// and app:// resources are allowed)';
+      throw 'forbidden path: ${resource.path} (only http://, https:// and data:// resources are allowed)';
     }
 
     final internetPaths = internetResources.map((e) => e.path).toList();
