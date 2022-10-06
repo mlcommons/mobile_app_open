@@ -1,11 +1,11 @@
-# Custom tasks
+# Custom task config
 
-This file describes how to configure the application to use non-default benchmark settings.
+This file describes how to configure the application to use non-default task settings.
 
 ## Contents
 
 * [Using custom tasks.pbtxt file](#using-custom-taskspbtxt-file)
-* [Resources in the tasks.pbtxt](#resources-in-the-taskspbtxt)
+* [How to specify a resource](#how-to-specify-a-resource)
 * [Using external resources on an iPhone](#using-external-resources-on-an-iphone)
 
 ## Using custom tasks.pbtxt file
@@ -19,39 +19,38 @@ The `benchmarksConfigurations.json` looks like this:
 
 ```json
 {
-   "default":"https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/tasks_v2.pbtxt",
-   "otherName":"app:///path/to/custom_tasks.pbtxt" 
+   "default": "asset://assets/tasks.pbtxt",
+   "Custom config name": "path/to/custom/tasks.pbtxt"
 }
 ```
 
-where the `key` is the name of the configuration and `value` is the path to the configuration file.
-**Note**: Currently the app can only read files stored within the app directory.
-See the next sections for more details on this.
+See [How to specify a resource](#how-to-specify-a-resource) for details on how to specify a path to the config.
 
 The `tasks.pbtxt` file is a text file in [protobuf](https://developers.google.com/protocol-buffers) format.
-See [Resources in the tasks.pbtxt](#resources-in-the-taskspbtxt) block
-for details on different ways you can specify resources.
+The format specification for this app is [here](../cpp/proto/mlperf_task.proto).
+The easiest way to create a custom config is to copy and modify [the default config](../assets/tasks.pbtxt).
 
 After adding new option into the `benchmarksConfigurations.json` file
 run application and open setting screen.  
 Tap on `Task configuration` option
-and choose added item. Current chosen path highlighted blue.
+and choose added item. Current chosen path is highlighted with blue color.
 
-## Resources in the tasks.pbtxt
+## How to specify a resource
 
-You can specify several types of resources in a `tasks.pbtxt` file:
+You can use several types of resources:
 
 1. URL of a file  
-File will be automatically downloaded.
+File will be automatically downloaded.  
+Allowed schemes: `http`, `https`.
 2. URL of a .zip archive  
 Archive will be automatically downloaded and unzipped.
-3. External resource  
-You can specify a path starting with `app://`.  
-For example: `app:///mlperf_datasets/some/folders/test.txt` (note the 3 slashes).  
-The app will expect to find a file with path `mlperf_datasets/some/folders/test.txt`
-relative to the application root directory.  
-Location of the application root directory is platform dependent.
-On iOS it will be: `MLPerf/`. On Android it will be `/Android/data/org.mlcommons.android.mlperfbench/files/`
+3. Local resource in a data folder  
+You can specify a path starting with `data://`. For example: `data:///mlperf_datasets/some/folders/test.txt` (note the 3 slashes).  
+The app will expect to find a file with path `mlperf_datasets/some/folders/test.txt` relative to the data directory.  
+Data directory can be changed in settings, and its possible locations depend on the platform.
+4. Local resource with an absolute path  
+You can specify the full path, which will not depend on the data folder.  
+Absolute path is only available for the task config path. All local resources in the task config must point to the data folder.
 
 ## Using external resources on an iPhone
 
