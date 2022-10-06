@@ -118,18 +118,22 @@ class _DataFolderSelectorHelper {
         },
       );
     }
+    final focusHandler = (bool focused) async {
+      if (focused) {
+        if (selectedOption != DataFolderType.custom) {
+          setValue(DataFolderType.custom);
+        }
+      } else {
+        store.customDataFolder = textController.text;
+        if (textController.text.isEmpty) {
+          setValue(DataFolderType.default_);
+        }
+      }
+    };
     return ListTile(
       title: Text(l10n.settingsTaskDataFolderCustom),
       subtitle: Focus(
-        onFocusChange: (focused) async {
-          if (focused) {
-            if (selectedOption != DataFolderType.custom) {
-              setValue(DataFolderType.custom);
-            }
-          } else {
-            store.customDataFolder = textController.text;
-          }
-        },
+        onFocusChange: focusHandler,
         child: Column(
           children: [pathField, dirWarning],
         ),
