@@ -25,15 +25,27 @@ class _DataFolderSelectorHelper {
             parseDataFolderType(context.read<Store>().dataFolderType);
 
   Widget build() {
-    final options = <Widget>[];
-    options.add(_makeDefaultOption());
+    final items = <Widget>[];
+
+    final dataFolderTitle = ListTile(
+      title: Padding(
+        padding: const EdgeInsets.only(bottom: 5),
+        child: Text(
+          l10n.settingsTaskDataFolderTitle,
+        ),
+      ),
+      subtitle: Text(l10n.settingsTaskDataFolderDesc),
+    );
+    items.add(dataFolderTitle);
+
+    items.add(_makeDefaultOption());
     if (defaultDataFolder.isNotEmpty) {
-      options.add(_makeAppFolderOption());
+      items.add(_makeAppFolderOption());
     }
-    options.add(_makeCustomOption());
+    items.add(_makeCustomOption());
 
     return Column(
-      children: options,
+      children: items,
     );
   }
 
@@ -220,38 +232,20 @@ class TaskConfigScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final store = context.watch<Store>();
 
-    final dataFolderTitle = ListTile(
-      title: Padding(
-        padding: const EdgeInsets.only(bottom: 5),
-        child: Text(
-          l10n.settingsTaskDataFolderTitle,
-        ),
-      ),
-      subtitle: Text(l10n.settingsTaskDataFolderDesc),
-    );
-    final optionsList = ListView.builder(
-      itemCount: _configs.length,
-      itemBuilder: (context, index) {
-        final configuration = _configs[index];
-        return getOptionPattern(
-          context,
-          configuration,
-          store.chosenConfigurationName,
-        );
-      },
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.settingsTaskConfigTitle),
       ),
-      body: Column(
+      body: ListView(
         children: [
           _makeCacheFolderNotice(l10n),
-          dataFolderTitle,
           _DataFolderSelectorHelper(context).build(),
           const Divider(),
-          Expanded(child: optionsList)
+          ..._configs.map((c) => getOptionPattern(
+                context,
+                c,
+                store.chosenConfigurationName,
+              )),
         ],
       ),
     );
