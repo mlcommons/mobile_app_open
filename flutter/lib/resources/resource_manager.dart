@@ -44,8 +44,14 @@ class ResourceManager {
       final resourceSystemPath = uri.replaceFirst(_dataPrefix, getDataFolder());
       return resourceSystemPath;
     }
+    if (isInternetResource(uri)) {
+      return cacheManager.get(uri)!;
+    }
+    if (File(uri).isAbsolute) {
+      return uri;
+    }
 
-    return cacheManager.get(uri)!;
+    throw 'invalid resource path: $uri';
   }
 
   String getDataFolder() {
