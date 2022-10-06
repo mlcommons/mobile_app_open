@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:file_picker/file_picker.dart';
@@ -74,10 +76,52 @@ class _DataFolderSelectorHelper {
 
   Widget _makeCustomOption() {
     final textController = TextEditingController(text: store.customDataFolder);
+
+    final pathField = Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: textController,
+          ),
+        ),
+        ElevatedButton(
+          child: Icon(Icons.folder),
+          onPressed: () async {
+            final dir = await FilePicker.platform.getDirectoryPath(
+              lockParentWindow: true,
+              initialDirectory: 'z:/',
+            );
+            if (dir != null) {
+              store.customDataFolder = dir;
+              setValue(DataFolderType.custom);
+            }
+          },
+        )
+      ],
+    );
+    Widget dirWarning = const SizedBox.shrink();
+    if (store.customDataFolder.isNotEmpty) {
+      dirWarning = FutureBuilder(
+        future: Directory(store.customDataFolder).exists(),
+        builder: (context, AsyncSnapshot<bool> snapshot) {
+          if (!snapshot.hasData) {
+            return const SizedBox.shrink();
+          }
+          final dirExists = snapshot.data!;
+          if (!dirExists) {
+            return Text(
+              'Folder ${store.customDataFolder} does not exist or is not accessible',
+              style: TextStyle(color: AppColors.darkRedText),
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      );
+    }
     return ListTile(
       title: Text(l10n.settingsTaskDataFolderCustom),
       subtitle: Focus(
-        onFocusChange: (focused) {
+        onFocusChange: (focused) async {
           if (focused) {
             if (selectedOption != DataFolderType.custom) {
               setValue(DataFolderType.custom);
@@ -86,27 +130,8 @@ class _DataFolderSelectorHelper {
             store.customDataFolder = textController.text;
           }
         },
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: textController,
-              ),
-            ),
-            ElevatedButton(
-              child: Icon(Icons.folder),
-              onPressed: () async {
-                final dir = await FilePicker.platform.getDirectoryPath(
-                  lockParentWindow: true,
-                  initialDirectory: 'z:/',
-                );
-                if (dir != null) {
-                  store.customDataFolder = dir;
-                  setValue(DataFolderType.custom);
-                }
-              },
-            )
-          ],
+        child: Column(
+          children: [pathField, dirWarning],
         ),
       ),
       leading: Radio<DataFolderType>(

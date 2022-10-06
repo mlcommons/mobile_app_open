@@ -143,6 +143,13 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<String> validateExternalResourcesDirectory(
       String errorDescription) async {
+    final dataFolderPath = resourceManager.getDataFolder();
+    if (dataFolderPath.isEmpty) {
+      return 'Data folder must not be empty';
+    }
+    if (!await Directory(dataFolderPath).exists()) {
+      return 'Data folder does not exist';
+    }
     final resources =
         _middle.listResources(modes: selectedRunModes, skipInactive: true);
     final missing = await resourceManager.validateResourcesExist(resources);
