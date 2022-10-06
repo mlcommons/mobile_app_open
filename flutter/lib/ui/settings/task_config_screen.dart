@@ -186,10 +186,60 @@ class TaskConfigScreen extends StatelessWidget {
     );
   }
 
+  Widget _makeCacheFolderNotice(AppLocalizations l10n) {
+    if (defaultCacheFolder.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      children: [
+        ListTile(
+          title: Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: Text(
+              l10n.settingsTaskCacheFolderTitle,
+            ),
+          ),
+          subtitle: Text(l10n.settingsTaskCacheFolderDesc),
+        ),
+        ListTile(
+          enabled: false,
+          title: Text(l10n.settingsTaskCacheFolderDefault),
+          subtitle: const Text(defaultCacheFolder),
+          leading: const Radio<bool>(
+            value: true,
+            groupValue: true,
+            onChanged: null,
+          ),
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final store = context.watch<Store>();
+
+    final dataFolderTitle = ListTile(
+      title: Padding(
+        padding: const EdgeInsets.only(bottom: 5),
+        child: Text(
+          l10n.settingsTaskDataFolderTitle,
+        ),
+      ),
+      subtitle: Text(l10n.settingsTaskDataFolderDesc),
+    );
+    final optionsList = ListView.builder(
+      itemCount: _configs.length,
+      itemBuilder: (context, index) {
+        final configuration = _configs[index];
+        return getOptionPattern(
+          context,
+          configuration,
+          store.chosenConfigurationName,
+        );
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -197,30 +247,11 @@ class TaskConfigScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          ListTile(
-            title: Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Text(
-                l10n.settingsTaskDataFolderTitle,
-              ),
-            ),
-            subtitle: Text(l10n.settingsTaskDataFolderDesc),
-          ),
+          _makeCacheFolderNotice(l10n),
+          dataFolderTitle,
           _DataFolderSelectorHelper(context).build(),
           const Divider(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _configs.length,
-              itemBuilder: (context, index) {
-                final configuration = _configs[index];
-                return getOptionPattern(
-                  context,
-                  configuration,
-                  store.chosenConfigurationName,
-                );
-              },
-            ),
-          )
+          Expanded(child: optionsList)
         ],
       ),
     );
