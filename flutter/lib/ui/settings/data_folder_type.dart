@@ -2,7 +2,7 @@ import 'package:mlperfbench/app_constants.dart';
 
 enum DataFolderType { default_, appFolder, custom }
 
-DataFolderType parseDataFolderTypeSelection(String value) {
+DataFolderType parseDataFolderType(String value) {
   if (value == DataFolderType.appFolder.name && defaultDataFolder.isNotEmpty) {
     // if defaultDataFolder is empty then default_ and appFolder value means the same,
     // so it doesn't make sense to have them as separate values

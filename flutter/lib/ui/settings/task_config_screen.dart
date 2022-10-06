@@ -19,7 +19,7 @@ class _DataFolderSelectorHelper {
       : l10n = AppLocalizations.of(context),
         store = context.watch<Store>(),
         selectedOption =
-            parseDataFolderTypeSelection(context.read<Store>().dataFolderType);
+            parseDataFolderType(context.read<Store>().dataFolderType);
 
   Widget build() {
     final options = <Widget>[];

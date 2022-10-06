@@ -116,7 +116,7 @@ class BenchmarkState extends ChangeNotifier {
   late BenchmarkList _middle;
 
   BenchmarkState._(this._store, this.backendBridge, this.firebaseManager) {
-    resourceManager = ResourceManager(notifyListeners);
+    resourceManager = ResourceManager(notifyListeners, _store);
     backendInfo = BackendInfo.findMatching();
   }
 
