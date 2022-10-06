@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -94,7 +95,16 @@ class _DataFolderSelectorHelper {
             ),
             ElevatedButton(
               child: Icon(Icons.folder),
-              onPressed: null,
+              onPressed: () async {
+                final dir = await FilePicker.platform.getDirectoryPath(
+                  lockParentWindow: true,
+                  initialDirectory: 'z:/',
+                );
+                if (dir != null) {
+                  store.customDataFolder = dir;
+                  setValue(DataFolderType.custom);
+                }
+              },
             )
           ],
         ),
