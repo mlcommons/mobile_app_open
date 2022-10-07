@@ -69,6 +69,8 @@ cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 
 echo "$MC_LOG_PREFIX ========== Build app =========="
 export BAZEL_OUTPUT_ROOT_ARG=--output_user_root=$MC_BUILD_HOME/bazel
+export WITH_TFLITE=0
+export WITH_APPLE=1
 
 echo "$MC_LOG_PREFIX Build backend and Flutter packages"
 # Remember to update the next line if make commands are changed.
