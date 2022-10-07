@@ -7,8 +7,8 @@
 # This script can also be run on the local Mac machine for testing and debugging.
 # We use [ "$CI" = "TRUE" ] to test if the script is run on local machine or Xcode Cloud.
 
-# abort if an error occurred
-set -e
+# abort if an error occurred, show cmd executed
+set -ex
 
 export MC_LOG_PREFIX="[mobile_app_open]"
 cd ../../../
