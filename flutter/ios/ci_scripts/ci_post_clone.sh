@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # This script runs after the repo is cloned and before any action execution.
-# Environment variables with `CI_` prefix are set by Xcode Cloud (see https://developer.apple.com/documentation/xcode/environment-variable-reference)
+# Environment variables with `CI_` prefix are set by Xcode Cloud
+# (see https://developer.apple.com/documentation/xcode/environment-variable-reference)
 # To avoid collision with other environment variables, we use `MC_` (MLCommons) prefix for our own variables.
 # This script can also be run on the local Mac machine for testing and debugging.
 # We use [ "$CI" = "TRUE" ] to test if the script is run on local machine or Xcode Cloud.
