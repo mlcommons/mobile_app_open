@@ -22,6 +22,10 @@ export MC_REPO_HOME=$PWD
 if [ "$CI" = "TRUE" ]; then
   echo "$MC_LOG_PREFIX Running on CI machine"
   export MC_BUILD_HOME=$CI_DERIVED_DATA_PATH/mobile_app_open_build
+  CACHE_BUCKET=xcodecloud-bazel-ios---mobile-app-build-290400
+  GC_CREDS_FILE=$CI_WORKSPACE/mobile-app-build-290400-1b26aafa8afd.json
+  echo "$GC_CREDS" | base64 --decode > "$GC_CREDS_FILE"
+  export BAZEL_CACHE_ARG="--remote_cache=https://storage.googleapis.com/$CACHE_BUCKET --google_credentials=$GC_CREDS_FILE"
 else
   echo "$MC_LOG_PREFIX Running on local machine"
   export MC_BUILD_HOME=$HOME/mobile_app_open_build
@@ -63,7 +67,6 @@ cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 
 echo "$MC_LOG_PREFIX ========== Build app =========="
 export BAZEL_OUTPUT_ROOT_ARG=--output_user_root=$MC_BUILD_HOME/bazel
-export BAZEL_CACHE_ARG=--disk_cache=$MC_BUILD_HOME/bazel
 
 echo "$MC_LOG_PREFIX Build backend and Flutter packages"
 # Remember to update the next line if make commands are changed.
