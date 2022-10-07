@@ -92,7 +92,7 @@ message ModelConfig {
   // Human-readable name of the model.
   required string name = 2;
   // Offset value of the model if applicable.
-  optional int32 offset = 3 [ default = 0 ];
+  optional int32 offset = 3 [default = 0];
   // image width of the input (if model takes images)
   optional int32 image_width = 4;
   // image height of the input (if model takes images)
