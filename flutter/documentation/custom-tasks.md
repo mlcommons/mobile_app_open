@@ -9,6 +9,7 @@ This file describes how to configure the application to use non-default task set
 * [Overriding default folders](#overriding-default-folders)
 * [Using external resources on an iPhone](#using-external-resources-on-an-iphone)
 * [Using external resources on an Android](#using-external-resources-on-an-android)
+* [Using external resources on an Windows](#using-external-resources-on-an-windows)
 
 ## Using custom tasks.pbtxt file
 
@@ -75,7 +76,7 @@ These options are not available on iOS.
 ## Using external resources on an iPhone
 
 On iOS an application resource folder can be found in `On My iPhone` -> `<app name>`.
-So, if you have `app:///mlperf_datasets/some/folders/test.txt` path in your config file,
+So, if you have `data:///mlperf_datasets/some/folders/test.txt` path in your config file,
 then the path on your iPhone would be: `MLPerf/mlperf_datasets/some/folders/test.txt`.
 
 Note, that iPhone's `Files` app has issues with moving folders with big number of files into application folders.
@@ -91,11 +92,28 @@ This method doesn't have restrictions on file extension.
 
 ## Using external resources on an Android
 
-On Android the resource folder is located at `/Android/data/org.mlcommons.android.mlperfbench/files`.
-On Android 11, the folder `/Android/data/` is inaccessible using the default File Manager app.
-It stills accessible through 3rd party File Manager apps, though.
-Or using a File Manager on a desktop computer and access the files via USB also works.
+In the Android version of the app the data folder points to the app folder by default.
 
-So, if you have `app:///mlperf_datasets/some/folders/test.txt` path in your config file,
-then the path on your Android phone would be:
-`/Android/data/org.mlcommons.android.mlperfbench/files/mlperf_datasets/some/folders/test.txt`.
+On Android the application folder is located at
+`/storage/emulated/0/Android/data/org.mlcommons.android.mlperfbench/files`.  
+If you have `data:///mlperf_datasets/some/folders/test.txt` path in your config file,
+then the path on your Android phone would be
+`/storage/emulated/0/Android/data/org.mlcommons.android.mlperfbench/files/mlperf_datasets/some/folders/test.txt`.
+
+You may want to change the data folder to a custom one for several reasons:
+issues accessing the `/Android/data/` folder,
+data persistence between app reinstalls.
+
+Adjust the file paths according to the folder you choose.  
+For example, if you selected the `Documents` standard folder
+the resulting path for the resource mentioned above would instead be
+`/storage/emulated/0/Documents/mlperf_datasets/some/folders/test.txt`.
+
+## Using external resources on an Windows
+
+On Windows the application folder is located at `%USERPROFILE%/Documents/MLCommons/MLPerfBench/`.
+If you have `data:///mlperf_datasets/some/folders/test.txt` path in your config file,
+then the path on your Windows device would be
+`%USERPROFILE%/Documents/MLCommons/MLPerfBench/mlperf_datasets/some/folders/test.txt`.
+
+You can choose a custom data folder. Adjust paths accordingly.
