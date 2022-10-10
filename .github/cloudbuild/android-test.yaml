@@ -6,7 +6,7 @@ substitutions:
 steps:
   - id: pull-apks
     name: gcr.io/cloud-builders/gsutil
-    timeout: 10s
+    timeout: 60s
     entrypoint: bash
     args:
       - -xc
