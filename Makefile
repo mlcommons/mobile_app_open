@@ -31,7 +31,6 @@ include tools/scanner/scan.mk
 include mobile_back_tflite/tflite_backend.mk
 include mobile_back_samsung/samsung_backend.mk
 include mobile_back_qti/make/qti_backend.mk
-include mobile_back_qti/make/qti_backend_targets.mk
 include mobile_back_pixel/pixel_backend.mk
 include mobile_back_apple/apple_backend.mk
 
