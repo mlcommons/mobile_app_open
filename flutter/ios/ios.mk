@@ -28,7 +28,7 @@ flutter/ios/clean:
 .PHONY: flutter/ios/libs
 flutter/ios/libs:
 	# --use_top_level_targets_for_symlinks
-	bazel ${BAZEL_OUTPUT_ROOT_ARG} build \
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} build ${BAZEL_CACHE_ARG} \
 		--config=ios \
 		${backend_bridge_ios_target} \
 		${backend_tflite_ios_target} \
