@@ -13,8 +13,8 @@ task {
     type: IMAGENET
     full {
       name: "Imagenet classification validation set"
-      input_path: "data:///mlperf_datasets/imagenet/img"
-      groundtruth_path: "data:///mlperf_datasets/imagenet/imagenet_val_full.txt"
+      input_path: "local:///mlperf_datasets/imagenet/img"
+      groundtruth_path: "local:///mlperf_datasets/imagenet/imagenet_val_full.txt"
     }
     lite {
       name: "Open images subset for classification"
@@ -49,8 +49,8 @@ task {
     type: COCO
     full {
       name: "COCO 2017 validation set"
-      input_path: "data:///mlperf_datasets/coco/img"
-      groundtruth_path: "data:///mlperf_datasets/coco/coco_val_full.pbtxt"
+      input_path: "local:///mlperf_datasets/coco/img"
+      groundtruth_path: "local:///mlperf_datasets/coco/coco_val_full.pbtxt"
     }
     lite {
       name: "Open images subset for detection"
@@ -85,8 +85,8 @@ task {
     type: ADE20K
     full {
       name: "ADE20K validation set"
-      input_path: "data:///mlperf_datasets/ade20k/images"
-      groundtruth_path: "data:////mlperf_datasets/ade20k/annotations"
+      input_path: "local:///mlperf_datasets/ade20k/images"
+      groundtruth_path: "local:////mlperf_datasets/ade20k/annotations"
     }
     lite {
       name: "Open images subset for segmentation"
@@ -152,8 +152,8 @@ task {
     type: IMAGENET
     full {
       name: "Imagenet classification validation set"
-      input_path: "data:///mlperf_datasets/imagenet/img"
-      groundtruth_path: "data:///mlperf_datasets/imagenet/imagenet_val_full.txt"
+      input_path: "local:///mlperf_datasets/imagenet/img"
+      groundtruth_path: "local:///mlperf_datasets/imagenet/imagenet_val_full.txt"
     }
     lite {
       name: "Open images subset for classification"

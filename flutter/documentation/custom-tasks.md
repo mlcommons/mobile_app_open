@@ -48,7 +48,7 @@ Allowed schemes: `http`, `https`.
 2. URL of a .zip archive  
 Archive will be automatically downloaded and unzipped.
 3. Local resource in a data folder  
-You can specify a path starting with `data://`. For example: `data:///mlperf_datasets/some/folders/test.txt` (note the 3 slashes).  
+You can specify a path starting with `local://`. For example: `local:///mlperf_datasets/some/folders/test.txt` (note the 3 slashes).  
 The app will expect to find a file with path `mlperf_datasets/some/folders/test.txt` relative to the data directory.  
 Data directory can be changed in settings, except for iOS, and its possible locations depend on the platform.
 4. Local resource with an absolute path  
@@ -76,7 +76,7 @@ These options are not available on iOS.
 ## Using external resources on an iPhone
 
 On iOS an application resource folder can be found in `On My iPhone` -> `<app name>`.
-So, if you have `data:///mlperf_datasets/some/folders/test.txt` path in your config file,
+So, if you have `local:///mlperf_datasets/some/folders/test.txt` path in your config file,
 then the path on your iPhone would be: `MLPerf/mlperf_datasets/some/folders/test.txt`.
 
 Note, that iPhone's `Files` app has issues with moving folders with big number of files into application folders.
@@ -96,7 +96,7 @@ In the Android version of the app the data folder points to the app folder by de
 
 On Android the application folder is located at
 `/storage/emulated/0/Android/data/org.mlcommons.android.mlperfbench/files`.  
-If you have `data:///mlperf_datasets/some/folders/test.txt` path in your config file,
+If you have `local:///mlperf_datasets/some/folders/test.txt` path in your config file,
 then the path on your Android phone would be
 `/storage/emulated/0/Android/data/org.mlcommons.android.mlperfbench/files/mlperf_datasets/some/folders/test.txt`.
 
@@ -112,7 +112,7 @@ the resulting path for the resource mentioned above would instead be
 ## Using external resources on an Windows
 
 On Windows the application folder is located at `%USERPROFILE%/Documents/MLCommons/MLPerfBench/`.
-If you have `data:///mlperf_datasets/some/folders/test.txt` path in your config file,
+If you have `local:///mlperf_datasets/some/folders/test.txt` path in your config file,
 then the path on your Windows device would be
 `%USERPROFILE%/Documents/MLCommons/MLPerfBench/mlperf_datasets/some/folders/test.txt`.
 
