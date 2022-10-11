@@ -15,12 +15,13 @@ limitations under the License.
 
 #include <EGL/egl.h>
 #include <GLES/gl.h>
-#include "qti_settings.h"
-
 #include <stdint.h>
+
 #include <map>
 #include <string>
 #include <vector>
+
+#include "qti_settings.h"
 
 #define DEFAULT_SOC_STR "Default"
 #define UNSUPPORTED_SOC_STR "Unsupported"

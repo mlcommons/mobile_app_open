@@ -54,7 +54,7 @@ struct BackendAllocator {
   template <class U>
   constexpr BackendAllocator(const BackendAllocator<U> &) noexcept {}
 
-      [[nodiscard]] T *allocate(std::size_t n) {
+  [[nodiscard]] T *allocate(std::size_t n) {
     if (auto p = static_cast<T *>(AllocatorMgr::GetBuffer(n * sizeof(T)))) {
       return p;
     }

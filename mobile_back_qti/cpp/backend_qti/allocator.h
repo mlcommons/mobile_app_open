@@ -144,7 +144,7 @@ class Allocator {
   template <class U>
   constexpr Allocator(const Allocator<U> &) noexcept {}
 
-      [[nodiscard]] T *allocate(std::size_t n) {
+  [[nodiscard]] T *allocate(std::size_t n) {
     T *p;
     if (useIonBuffer) {
       p = static_cast<T *>(ChunkAllocator::getRpcMem().Alloc(n * sizeof(T)));

@@ -14,7 +14,6 @@ limitations under the License.
 ==============================================================================*/
 
 #include "cpuctrl.h"
-#include "soc_utility.h"
 
 #include <sched.h>
 #include <sys/types.h>
@@ -25,6 +24,7 @@ limitations under the License.
 #include <thread>
 #include <vector>
 
+#include "soc_utility.h"
 #include "tensorflow/core/platform/logging.h"
 
 using namespace std::chrono;

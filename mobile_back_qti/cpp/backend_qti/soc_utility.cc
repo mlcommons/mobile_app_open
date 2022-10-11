@@ -11,7 +11,9 @@ limitations under the License.
 ==============================================================================*/
 
 #include "soc_utility.h"
+
 #include <stdint.h>
+
 #include <fstream>
 #include <thread>
 

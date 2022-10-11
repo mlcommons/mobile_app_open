@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
+#include "qti_backend_helper.h"
+
 #include <string>
 #include <vector>
 
@@ -34,11 +36,8 @@ limitations under the License.
 #include "absl/strings/ascii.h"
 #include "cpuctrl.h"
 #include "soc_utility.h"
-
 #include "tensorflow/core/platform/logging.h"
 #include "tflite_c.h"
-
-#include "qti_backend_helper.h"
 
 int isSignedStatus = DEFAULT;
 
