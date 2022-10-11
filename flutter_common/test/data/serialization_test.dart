@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/backend_info.dart';
 
 void main() {
@@ -36,6 +40,14 @@ void main() {
       expect(() {
         BackendReportedInfo.fromJson(exampleJson);
       }, throwsA(isA<TypeError>()));
+    });
+    test('full result parsing', () async {
+      final file = File('test/data/result_sample.json');
+      final data = await file.readAsString();
+
+      final json = jsonDecode(data);
+
+      ExtendedResult.fromJson(json);
     });
   });
 }
