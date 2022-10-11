@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -72,15 +72,6 @@ benchmark_setting {
   configuration: "TFLite GPU"
   src: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
   md5_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
-}
-
-benchmark_setting {
-  benchmark_id: "IS_uint8"
-  accelerator: "snpe_aip"
-  accelerator_desc: "AIP"
-  configuration: "SNPE"
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/SNPE/deeplabv3_hta.dlc"
-  md5_checksum: "b1237cfdef02887a2205154eb44d0515"
 }
 
 benchmark_setting {
@@ -169,27 +160,6 @@ benchmark_setting {
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/mobilebert_quantized_htp.dlc"
   md5_checksum: "ab97172963ec8a92905c6a2c024557ab"
-}
-
-benchmark_setting {
-  benchmark_id: "IS_uint8"
-  accelerator: "psnpe_dsp"
-  accelerator_desc: "HTP"
-  configuration: "SNPE"
-  custom_setting {
-    id: "input_buffer_type"
-    value: "uint_8"
-  }
-  custom_setting {
-    id: "bg_load"
-    value: "true"
-  }
-  custom_setting {
-    id: "output_buffer_type"
-    value: "uint_8"
-  }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/deeplabv3_htp.dlc"
-  md5_checksum: "364d536264d0e3263184f4dac88a75d9"
 }
 
 benchmark_setting {
@@ -289,8 +259,8 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "IS_uint8"
-  accelerator: "psnpe_dsp"
+  benchmark_id: "IS_uint8_mosaic"
+  accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
   configuration: "SNPE"
   custom_setting {
@@ -298,15 +268,90 @@ benchmark_setting {
     value: "uint_8"
   }
   custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  custom_setting {
     id: "output_buffer_type"
     value: "uint_8"
+  }
+  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobile_mosaic_htp.dlc"
+  md5_checksum: "ebae961e6f0b53bd839f485b125f5e46"
+})SETTINGS";
+
+const std::string qti_settings_sd7g1 = R"SETTINGS(
+common_setting {
+  id: "num_threads"
+  name: "Number of threads"
+  value {
+    value: "4"
+    name: "4 threads"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "IC_tpu_uint8"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  src: "app:///mlperf_models/mobilenet_edgetpu_224_1.0_htp.dlc"
+  md5_checksum: ""
+}
+
+benchmark_setting {
+  benchmark_id: "IC_tpu_uint8_offline"
+  accelerator: "psnpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  batch_size: 12288
+  custom_setting {
+    id: "scenario"
+    value: "Offline"
+  }
+  src: "app:///mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched_sd7g1.dlc"
+  md5_checksum: ""
+}
+
+benchmark_setting {
+  benchmark_id: "OD_uint8"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "snpe_output_layers"
+    value: "Postprocessor/BatchMultiClassNonMaxSuppression"
   }
   custom_setting {
     id: "bg_load"
     value: "true"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/SNPE/deeplabv3_htp.dlc"
-  md5_checksum: "364d536264d0e3263184f4dac88a75d9"
+  src: "app:///mlperf_models/ssd_mobiledet_qat_htp.dlc"
+  md5_checksum: ""
+}
+
+benchmark_setting {
+  benchmark_id: "LU_int8"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "snpe_output_layers"
+    value: "transpose"
+  }
+  custom_setting {
+    id: "input_buffer_type"
+    value: "float_32"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  src: "app:///mlperf_models/mobilebert_quantized_htp.dlc"
+  md5_checksum: ""
 }
 
 benchmark_setting {
@@ -326,8 +371,8 @@ benchmark_setting {
     id: "output_buffer_type"
     value: "uint_8"
   }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobile_mosaic_htp.dlc"
-  md5_checksum: "ebae961e6f0b53bd839f485b125f5e46"
+  src: "app:///mlperf_models/mobile_mosaic_htp.dlc"
+  md5_checksum: ""
 })SETTINGS";
 
 const std::string qti_settings_sd8g1 = R"SETTINGS(
@@ -351,7 +396,7 @@ benchmark_setting {
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobilenet_edgetpu_224_1.0_htp.dlc"
   md5_checksum: "4e8c9ec583557f8dc341cdcc45dba241"
-  single_stream_expected_latency_ns: 800000
+  single_stream_expected_latency_ns: 600000
 }
 
 benchmark_setting {
@@ -410,29 +455,12 @@ benchmark_setting {
     id: "use_ion_buffer"
     value: "false"
   }
+  custom_setting {
+    id: "perf_profile"
+    value: "high_performance"
+  }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobilebert_quantized_htp.dlc"
   md5_checksum: "ad724f945b3745e88158cc5d5de1c2a5"
-}
-
-benchmark_setting {
-  benchmark_id: "IS_uint8"
-  accelerator: "snpe_dsp"
-  accelerator_desc: "HTP"
-  configuration: "SNPE"
-  custom_setting {
-    id: "input_buffer_type"
-    value: "uint_8"
-  }
-  custom_setting {
-    id: "bg_load"
-    value: "true"
-  }
-  custom_setting {
-    id: "output_buffer_type"
-    value: "uint_8"
-  }
-  src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/deeplabv3_htp.dlc"
-  md5_checksum: "4f530fef7ae8c7adc0949d371e22f485"
 }
 
 benchmark_setting {
@@ -454,6 +482,115 @@ benchmark_setting {
   }
   src: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobile_mosaic_htp.dlc"
   md5_checksum: "ebae961e6f0b53bd839f485b125f5e46"
+})SETTINGS";
+
+const std::string qti_settings_sd8pg1 = R"SETTINGS(
+common_setting {
+  id: "num_threads"
+  name: "Number of threads"
+  value {
+    value: "4"
+    name: "4 threads"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "IC_tpu_uint8"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  src: "app:///mlperf_models/mobilenet_edgetpu_224_1.0_htp.dlc"
+  md5_checksum: ""
+  single_stream_expected_latency_ns: 600000
+}
+
+benchmark_setting {
+  benchmark_id: "IC_tpu_uint8_offline"
+  accelerator: "psnpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  batch_size: 12288
+  custom_setting {
+    id: "scenario"
+    value: "Offline"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  src: "app:///mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched_sd8pg1.dlc"
+  md5_checksum: ""
+}
+
+benchmark_setting {
+  benchmark_id: "OD_uint8"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "snpe_output_layers"
+    value: "Postprocessor/BatchMultiClassNonMaxSuppression"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  src: "app:///mlperf_models/ssd_mobiledet_qat_htp.dlc"
+  md5_checksum: ""
+}
+
+benchmark_setting {
+  benchmark_id: "LU_int8"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "snpe_output_layers"
+    value: "transpose"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  custom_setting {
+    id: "input_buffer_type"
+    value: "float_32"
+  }
+  custom_setting {
+    id: "use_ion_buffer"
+    value: "false"
+  }
+  custom_setting {
+    id: "perf_profile"
+    value: "high_performance"
+  }
+  src: "app:///mlperf_models/mobilebert_quantized_htp.dlc"
+  md5_checksum: ""
+}
+
+benchmark_setting {
+  benchmark_id: "IS_uint8_mosaic"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
+  configuration: "SNPE"
+  custom_setting {
+    id: "input_buffer_type"
+    value: "uint_8"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "true"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "uint_8"
+  }
+  src: "app:///mlperf_models/mobile_mosaic_htp.dlc"
+  md5_checksum: ""
 })SETTINGS";
 
 #endif
