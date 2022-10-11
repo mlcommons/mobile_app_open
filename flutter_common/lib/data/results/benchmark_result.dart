@@ -30,6 +30,9 @@ class Accuracy {
     if (!normalized.isFinite) return false;
     return normalized >= min && normalized <= max;
   }
+
+  @override
+  String toString() => normalized.toString();
 }
 
 class BenchmarkLoadgenInfo {

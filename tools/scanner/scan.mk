@@ -18,6 +18,7 @@
 # https://docs.sonarcloud.io/advanced-setup/languages/c-c-objective-c/#analysis-steps-using-build-wrapper
 
 ifdef SONAR_OUT_DIR
+	# env which needs to be passed into the docker container
 	scanner_docker_args=\
 		--env SONAR_OUT_DIR=${SONAR_OUT_DIR} \
 		--env SONAR_TOKEN=${SONAR_TOKEN} \
@@ -32,7 +33,10 @@ endif
 
 # Use the same image tag used in `flutter_common_docker_flags`
 output/docker_mlperf_scanner.stamp: flutter/android/docker/image tools/scanner/Dockerfile
-	docker image build -t mlcommons/mlperf_mobile_flutter tools/scanner
+	docker image build \
+		-t ${docker_image_tag} \
+		--build-arg DOCKER_IMAGE_TAG=${docker_image_tag} \
+		tools/scanner
 	touch $@
 
 .PHONY: scanner/image
@@ -61,10 +65,12 @@ scanner/scan:
 
 .PHONY: docker/scanner/build
 docker/scanner/build:
-	MSYS2_ARG_CONV_EXCL="*" docker run ${flutter_common_docker_flags} \
+	MSYS2_ARG_CONV_EXCL="*" docker run \
+		${scanner_docker_args} ${flutter_common_docker_flags} \
 		make scanner/build
 
 .PHONY: docker/scanner/scan
 docker/scanner/scan:
-	MSYS2_ARG_CONV_EXCL="*" docker run ${flutter_common_docker_flags} \
+	MSYS2_ARG_CONV_EXCL="*" docker run \
+		${scanner_docker_args} ${flutter_common_docker_flags} \
 		make scanner/scan
