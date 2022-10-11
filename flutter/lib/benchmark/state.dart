@@ -21,6 +21,7 @@ import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
@@ -37,6 +38,13 @@ import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
 import 'run_mode.dart';
+
+void _doSomethingCPUIntensive(double value) {
+  var newValue = value;
+  while (true) {
+    newValue = newValue * 0.999999999999999;
+  }
+}
 
 enum BenchmarkStateEnum {
   downloading,
@@ -577,8 +585,19 @@ class BenchmarkState extends ChangeNotifier {
       logDir: logDir,
       isTestMode: _store.testMode,
     );
+
+    if (_store.artificialCPULoadEnabled) {
+      print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
+      const value = 999999999999999.0;
+      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
+    }
+
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
+
+    if (_store.artificialCPULoadEnabled) {
+      await Executor().dispose();
+    }
 
     if (!(result.accuracy1?.isInBounds() ?? true) ||
         !(result.accuracy2?.isInBounds() ?? true)) {
