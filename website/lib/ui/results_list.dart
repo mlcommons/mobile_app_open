@@ -113,14 +113,14 @@ class ResultsListPageState extends State<ResultsListPage> {
         itemCount: ids.length, // TODO properly handle case size == 0
         itemBuilder: (context, index) {
           final details = state.getByUuid(ids[index])!;
-          final averageScoreText =
-              'Average score: ${details.results.calculateAverageThroughput()}}';
+          // final averageScoreText =
+          //     'Average score: ${details.results.calculateAverageThroughput()}}';
           final uploadDateText = 'Upload date: ${details.meta.uploadDate}';
           return Card(
               child: ListTile(
             title: Text(details.meta.uuid),
             isThreeLine: true,
-            subtitle: Text('$averageScoreText\n$uploadDateText'),
+            subtitle: Text(uploadDateText),
             onTap: () {
               Navigator.of(context).pushNamed(
                   '/${AppRoutes.resultDetails}/${details.meta.uuid}');

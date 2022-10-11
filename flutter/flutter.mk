@@ -29,8 +29,8 @@ endif
 
 flutter: flutter/prepare flutter/platform
 flutter/firebase: flutter/firebase/config flutter/firebase/prefix
-flutter/result: flutter/result/schema flutter/result/ts
-flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
+flutter/result: flutter/result/json flutter/result/schema flutter/result/ts
+flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 flutter/test: flutter/test/unit flutter/test/integration
 
@@ -94,16 +94,24 @@ flutter/firebase/prefix:
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
 		| tee firebase_functions/functions/src/prefix.gen.ts
 
-result_json_example_path=output/extended-result-example.json
+RESULT_JSON_SAMPLE_PATH?=output/extended-result-example.json
+.PHONY: flutter/result/sample
+flutter/result/sample:
+	cd flutter_common && \
+		${_start_args} dart run \
+		--define=jsonFileName=../${RESULT_JSON_SAMPLE_PATH} \
+		lib/data/generation_helpers/write_json_sample.main.dart
+
+.PHONY: flutter/result/test-sample
+flutter/result/test-sample:
+	make flutter/result/sample \
+		RESULT_JSON_SAMPLE_PATH=flutter_common/test/data/result_sample.json
+
 default_result_json_schema_path=flutter/documentation/extended-result.schema.json
 RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
 .PHONY: flutter/result/schema
-flutter/result/schema:
-	cd flutter_common && \
-		${_start_args} dart run \
-		--define=jsonFileName=../${result_json_example_path} \
-		lib/data/generation_helpers/write_json_example.main.dart
-	quicktype ${result_json_example_path} \
+flutter/result/schema: flutter/result/sample
+	quicktype ${RESULT_JSON_SAMPLE_PATH} \
 		--lang schema \
 		--out ${RESULT_JSON_SCHEMA_PATH}
 	cd flutter_common && \
@@ -118,6 +126,10 @@ flutter/result/ts:
 		--lang ts \
 		--top-level ExtendedResult \
 		--out firebase_functions/functions/src/extended-result.gen.ts
+
+.PHONY: flutter/result/json
+flutter/result/json:
+	cd flutter_common && ${_start_args} flutter --no-version-check pub run build_runner build
 
 .PHONY: flutter/build-info
 flutter/build-info:
@@ -174,6 +186,7 @@ output/flutter/pub/%.stamp: %/pubspec.yaml
 .PHONY: flutter/test/unit
 flutter/test/unit:
 	cd flutter && ${_start_args} flutter --no-version-check test test
+	cd flutter_common && ${_start_args} flutter --no-version-check test test
 
 ifneq (${FLUTTER_TEST_DEVICE},)
 flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"

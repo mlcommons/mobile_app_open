@@ -1,21 +1,19 @@
-class ResultMetaInfo {
-  static const String _tagUuid = 'uuid';
-  static const String _tagUploadDate = 'upload_date';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'meta_info.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class ResultMetaInfo {
   final String uuid;
   final DateTime? uploadDate;
 
-  ResultMetaInfo({required this.uuid, this.uploadDate});
+  ResultMetaInfo({
+    required this.uuid,
+    DateTime? uploadDate,
+  }) : uploadDate = uploadDate?.toUtc();
 
-  ResultMetaInfo.fromJson(Map<String, dynamic> json)
-      : this(
-            uuid: json[_tagUuid] as String,
-            uploadDate: json[_tagUploadDate] == null
-                ? null
-                : DateTime.parse(json[_tagUploadDate] as String));
+  factory ResultMetaInfo.fromJson(Map<String, dynamic> json) =>
+      _$ResultMetaInfoFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagUuid: uuid,
-        _tagUploadDate: uploadDate?.toUtc().toIso8601String(),
-      };
+  Map<String, dynamic> toJson() => _$ResultMetaInfoToJson(this);
 }
