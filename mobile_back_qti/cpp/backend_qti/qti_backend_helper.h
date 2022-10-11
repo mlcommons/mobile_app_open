@@ -41,7 +41,7 @@ class QTIBackendHelper {
 
  public:
   enum QTIBufferType { FLOAT_32 = 0, UINT_8 = 1 };
-  using GetBufferFn = std::add_pointer<void *(size_t,int)>::type;
+  using GetBufferFn = std::add_pointer<void *(size_t, int)>::type;
   using ReleaseBufferFn = std::add_pointer<void(void *)>::type;
 
   const char *name_ = "snpe";

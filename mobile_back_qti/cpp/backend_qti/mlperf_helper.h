@@ -31,7 +31,7 @@ static void process_config(const mlperf_backend_configuration_t *configs,
   backend_data->loadOffTime_ = 2;
   backend_data->loadOnTime_ = 100;
   backend_data->useIonBuffers_ = true;
-  backend_data->acceleratorName_=configs->accelerator_desc;
+  backend_data->acceleratorName_ = configs->accelerator_desc;
 
   std::string &delegate = backend_data->delegate_;
   delegate = configs->accelerator;

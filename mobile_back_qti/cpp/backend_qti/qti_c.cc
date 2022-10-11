@@ -18,10 +18,10 @@ limitations under the License.
 
 #include "allocator.h"
 #include "cpuctrl.h"
-#include "soc_utility.h"
 #include "mlperf_helper.h"
 #include "qti_backend_helper.h"
 #include "qti_settings.h"
+#include "soc_utility.h"
 #include "tensorflow/core/platform/logging.h"
 #include "tflite_c.h"
 #ifdef DEBUG_FLAG
@@ -56,7 +56,7 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
   *not_allowed_message = nullptr;
   bool isQSoC = Socs::isSnapDragon(device_info->manufacturer);
   LOG(INFO) << "Is QTI SOC: " << isQSoC;
-  if(isQSoC) {
+  if (isQSoC) {
     return Socs::soc_settings(settings, not_allowed_message);
   }
 
@@ -145,8 +145,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
 
 // Return the name of the accelerator.
 const char *mlperf_backend_accelerator_name(mlperf_backend_ptr_t backend_ptr) {
-    QTIBackendHelper *backend_data = (QTIBackendHelper *)backend_ptr;
-    return backend_data->acceleratorName_;
+  QTIBackendHelper *backend_data = (QTIBackendHelper *)backend_ptr;
+  return backend_data->acceleratorName_;
 }
 
 // Return the name of this backend.
@@ -331,7 +331,7 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
 }
 
 void *mlperf_backend_get_buffer(size_t n) {
-  return backend_data_->getBuffer_(n,backend_data_->inputBatch_);
+  return backend_data_->getBuffer_(n, backend_data_->inputBatch_);
 }
 
 void mlperf_backend_release_buffer(void *p) {

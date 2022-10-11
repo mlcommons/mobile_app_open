@@ -36,8 +36,11 @@ config_setting(
 
 string_flag(
     name = "with_qti",
-    values = ["1","2"],
     build_setting_default = "1",
+    values = [
+        "1",
+        "2",
+    ],
 )
 
 config_setting(
@@ -56,9 +59,9 @@ cc_library(
     srcs = ["rpcmem.cc"],
     hdrs = [
         "cpuctrl.h",
-        "soc_utility.h",
+        "qti_settings.h",
         "rpcmem.h",
-        "qti_settings.h"
+        "soc_utility.h",
     ],
     copts = tflite_copts() + snpe_copts,
     deps = ["@org_tensorflow//tensorflow/core:tflite_portable_logging"],
@@ -106,15 +109,14 @@ cc_library(
             "tflite_c.h",
             "qti_backend_helper.h",
             "mlperf_helper.h",
-            "soc_utility.h"
+            "soc_utility.h",
         ],
     }),
     copts = tflite_copts() + snpe_copts,
-    local_defines = ["SNPE_VERSION_STRING=" + SNPE_VERSION,] +
+    local_defines = ["SNPE_VERSION_STRING=" + SNPE_VERSION] +
                     select({
-                       "debug_option":
-                          ["DEBUG_FLAG",],
-                       "//conditions:default": [],
+                        "debug_option": ["DEBUG_FLAG"],
+                        "//conditions:default": [],
                     }),
     deps = [
         "//flutter/cpp/c:headers",

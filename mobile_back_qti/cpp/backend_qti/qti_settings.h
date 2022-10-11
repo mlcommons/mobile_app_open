@@ -330,7 +330,6 @@ benchmark_setting {
   model_checksum: "ebae961e6f0b53bd839f485b125f5e46"
 })SETTINGS";
 
-
 const std::string qti_settings_sd7g1 = R"SETTINGS(
 common_setting {
   id: "num_threads"
@@ -552,7 +551,6 @@ benchmark_setting {
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobile_mosaic_htp.dlc"
   model_checksum: "ebae961e6f0b53bd839f485b125f5e46"
 })SETTINGS";
-
 
 const std::string qti_settings_sd8pg1 = R"SETTINGS(
 common_setting {

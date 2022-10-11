@@ -115,9 +115,7 @@ class ChunkAllocator {
     }
   }
 
-  bool IsChunkEmpty() {
-    return (block_list_.empty());
-  }
+  bool IsChunkEmpty() { return (block_list_.empty()); }
 
   void DumpAllocatorState() {
     printf("  ChunkSize %lu\n", chunk_size_);
@@ -146,7 +144,7 @@ class Allocator {
   template <class U>
   constexpr Allocator(const Allocator<U> &) noexcept {}
 
-  [[nodiscard]] T *allocate(std::size_t n) {
+      [[nodiscard]] T *allocate(std::size_t n) {
     T *p;
     if (useIonBuffer) {
       p = static_cast<T *>(ChunkAllocator::getRpcMem().Alloc(n * sizeof(T)));
@@ -178,14 +176,16 @@ class Allocator {
 template <class T>
 bool Allocator<T>::useIonBuffer = true;
 
-static void *get_ion_buffer(size_t n,int chunkSize=3) {
+static void *get_ion_buffer(size_t n, int chunkSize = 3) {
   void *p = ChunkAllocator::GetBuffer(n, chunkSize);
-  // LOG(INFO) << "QTI backend SNPE allocator " << n << " bytes at " << p << " with chunk size: " << chunkSize;
+  // LOG(INFO) << "QTI backend SNPE allocator " << n << " bytes at " << p << "
+  // with chunk size: " << chunkSize;
   return p;
 }
 
-static void *std_get_buffer(size_t n, int chunkSize=1) {
-  // chunkSize is always ignored. definition needs to be consistent with get_ion_buffer above
+static void *std_get_buffer(size_t n, int chunkSize = 1) {
+  // chunkSize is always ignored. definition needs to be consistent with
+  // get_ion_buffer above
   void *p = std::malloc(n);
   // LOG(INFO) << "QTI backend STD allocator " << n << " bytes at " << p;
   return p;

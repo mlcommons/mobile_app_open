@@ -54,10 +54,9 @@ void MlperfDriver::IssueQuery(
         std::vector<void*> outputs = backend_->GetPredictedOutputs(b);
         response_data.push_back(
             dataset_->ProcessOutput(sample[b].index, outputs));
-        responses.push_back(
-            {sample[b].id,
-             reinterpret_cast<std::uintptr_t>(response_data[idx + b].data()),
-             response_data[idx + b].size()});
+        responses.push_back({sample[b].id, reinterpret_cast<std::uintptr_t>(
+                                               response_data[idx + b].data()),
+                             response_data[idx + b].size()});
       }
       backend_->FlushQueries();
       query_counter_ += batch_;
@@ -72,10 +71,9 @@ void MlperfDriver::IssueQuery(
       // Report to mlperf.
       std::vector<void*> outputs = backend_->GetPredictedOutputs();
       response_data.push_back(dataset_->ProcessOutput(sample.index, outputs));
-      responses.push_back(
-          {sample.id,
-           reinterpret_cast<std::uintptr_t>(response_data[idx].data()),
-           response_data[idx].size()});
+      responses.push_back({sample.id, reinterpret_cast<std::uintptr_t>(
+                                          response_data[idx].data()),
+                           response_data[idx].size()});
       backend_->FlushQueries();
       query_counter_ += 1;
     }

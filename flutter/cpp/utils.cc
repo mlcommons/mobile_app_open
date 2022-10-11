@@ -108,7 +108,8 @@ mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   c_settings.batch_size = settings.benchmark_setting().batch_size();
   char *accelerator_desc =
       new char[settings.benchmark_setting().accelerator_desc().length() + 1];
-  strcpy(accelerator_desc, settings.benchmark_setting().accelerator_desc().c_str());
+  strcpy(accelerator_desc,
+         settings.benchmark_setting().accelerator_desc().c_str());
   c_settings.accelerator_desc = accelerator_desc;
 
   // Add common settings

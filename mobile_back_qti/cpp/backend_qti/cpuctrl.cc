@@ -82,26 +82,26 @@ void CpuCtrl::normalLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetall_); }
 void CpuCtrl::highLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetHigh_); }
 
 void CpuCtrl::init() {
-    std::vector <uint32_t> allcores;
-    std::vector <uint32_t> low_latency_cores;
-    std::vector <uint32_t> high_latency_cores;
-    int maxcores = 0;
-    Socs::define_soc(allcores, low_latency_cores, high_latency_cores, maxcores);
+  std::vector<uint32_t> allcores;
+  std::vector<uint32_t> low_latency_cores;
+  std::vector<uint32_t> high_latency_cores;
+  int maxcores = 0;
+  Socs::define_soc(allcores, low_latency_cores, high_latency_cores, maxcores);
 
-    for (auto i = 0; i < maxcores; i++) {
-        allcores.emplace_back(i);
-    }
+  for (auto i = 0; i < maxcores; i++) {
+    allcores.emplace_back(i);
+  }
 
-    CPU_ZERO(&cpusetLow_);
-    for (auto core: low_latency_cores) {
-        CPU_SET(core, &cpusetLow_);
-    }
-    CPU_ZERO(&cpusetHigh_);
-    for (auto core: high_latency_cores) {
-        CPU_SET(core, &cpusetHigh_);
-    }
-    CPU_ZERO(&cpusetall_);
-    for (auto core: allcores) {
-        CPU_SET(core, &cpusetall_);
-    }
+  CPU_ZERO(&cpusetLow_);
+  for (auto core : low_latency_cores) {
+    CPU_SET(core, &cpusetLow_);
+  }
+  CPU_ZERO(&cpusetHigh_);
+  for (auto core : high_latency_cores) {
+    CPU_SET(core, &cpusetHigh_);
+  }
+  CPU_ZERO(&cpusetall_);
+  for (auto core : allcores) {
+    CPU_SET(core, &cpusetall_);
+  }
 }

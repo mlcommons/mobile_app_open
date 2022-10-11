@@ -125,14 +125,13 @@ static zdl::DlSystem::Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
   if (isDSP) {
     if (isSignedStatus == DEFAULT) {
       if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-            runtime, zdl::DlSystem::RuntimeCheckOption_t::UNSIGNEDPD_CHECK)) {
+              runtime, zdl::DlSystem::RuntimeCheckOption_t::UNSIGNEDPD_CHECK)) {
         isSignedStatus = UNSIGNED_PD;
         LOG(INFO) << "runtime " << delegate
                   << " is available on this platform with UnsignedPD";
       } else {
         if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-                runtime,
-                zdl::DlSystem::RuntimeCheckOption_t::NORMAL_CHECK)) {
+                runtime, zdl::DlSystem::RuntimeCheckOption_t::NORMAL_CHECK)) {
           isSignedStatus = SIGNED_PD;
           LOG(INFO) << "runtime " << delegate
                     << " is available on this platform with SignedPD";
@@ -160,11 +159,12 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
   uint32_t numInits = get_num_inits();
   LOG(INFO) << "numInits: " << numInits;
 
-  //Enable debug logs
+// Enable debug logs
 #ifdef DEBUG_FLAG
-    if (zdl::SNPE::SNPEFactory::initializeLogging(zdl::DlSystem::LogLevel_t::LOG_VERBOSE)){
-      LOG(INFO) << "Debug logs successful";
-  }else {
+  if (zdl::SNPE::SNPEFactory::initializeLogging(
+          zdl::DlSystem::LogLevel_t::LOG_VERBOSE)) {
+    LOG(INFO) << "Debug logs successful";
+  } else {
     LOG(INFO) << "Debug logs can not be intialized";
   }
 #endif
@@ -209,7 +209,7 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
       platformOptionStr += "unsignedPD:ON";
     }
 
-    if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)){
+    if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)) {
       buildConfig.enableInitCache = true;
     }
     buildConfig.platformOptions = platformOptionStr;
@@ -241,11 +241,12 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
   uint32_t numInits = get_num_inits();
   LOG(INFO) << "numInits: " << numInits;
 
-  //Enable debug logs
+// Enable debug logs
 #ifdef DEBUG_FLAG
-  if (zdl::SNPE::SNPEFactory::initializeLogging(zdl::DlSystem::LogLevel_t::LOG_VERBOSE)){
-      LOG(INFO) << "Debug logs successful";
-  }else {
+  if (zdl::SNPE::SNPEFactory::initializeLogging(
+          zdl::DlSystem::LogLevel_t::LOG_VERBOSE)) {
+    LOG(INFO) << "Debug logs successful";
+  } else {
     LOG(INFO) << "Debug logs can not be intialized";
   }
 #endif
@@ -276,7 +277,7 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
       platformOptionStr += "unsignedPD:ON";
     }
 
-    if(Socs::soc_check_feature(useIonBuffers_, platformOptionStr)){
+    if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)) {
       snpeBuilder.setInitCacheMode(true);
     }
     zdl::DlSystem::PlatformConfig platformConfig;
@@ -296,9 +297,7 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
   }
 }
 
-inline int QTIBackendHelper::get_num_inits() {
-  return Socs::soc_num_inits();
-}
+inline int QTIBackendHelper::get_num_inits() { return Socs::soc_num_inits(); }
 
 void QTIBackendHelper::get_accelerator_instances(int &num_dsp, int &num_aip,
                                                  int &num_gpu, int &num_cpu) {
@@ -309,9 +308,9 @@ void QTIBackendHelper::get_accelerator_instances(int &num_dsp, int &num_aip,
   num_cpu = 0;
   if (scenario_ == "Offline") {
     // For 865 use DSP+AIP
-      Socs::soc_offline_core_instance(num_dsp, num_aip, num_gpu, num_cpu, delegate);
-    }
-  else {
+    Socs::soc_offline_core_instance(num_dsp, num_aip, num_gpu, num_cpu,
+                                    delegate);
+  } else {
     if (delegate == "snpe_dsp" || delegate == "psnpe_dsp") {
       num_dsp = 1;
       Socs::set_use_dsp_features(true);
@@ -539,6 +538,7 @@ void QTIBackendHelper::set_runtime_config() {
 }
 
 std::string QTIBackendHelper::get_snpe_version() {
-  zdl::DlSystem::Version_t version = zdl::SNPE::SNPEFactory::getLibraryVersion();
+  zdl::DlSystem::Version_t version =
+      zdl::SNPE::SNPEFactory::getLibraryVersion();
   return version.Build;
 }
