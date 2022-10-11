@@ -23,23 +23,23 @@ const Map<String, Interval> _objectDetection = {
 const Map<String, Interval> _imageSegmentation = {
   'CPU': Interval(min: 0.8387, max: 0.8388),
   'NNAPI': Interval(min: 0.4836, max: 0.4872),
-  'CoreML': Interval(min: 0.9887, max: 0.9888),
-  // accuracy in emulator is 0.83, on real device 0.98
-  'ANE': Interval(min: 0.8387, max: 0.9891),
+  'CoreML': Interval(min: 0.80, max: 0.8275),
+  'ANE': Interval(min: 0.8277, max: 0.8388),
 };
 
-const Map<String, Interval> _languageUnderstanding = {
+const Map<String, Interval> _naturalLanguageProcessing = {
   'CPU': Interval(min: 1.0, max: 1.0),
   'GPU (FP16)': Interval(min: 1.0, max: 1.0),
   'NNAPI': Interval(min: 1.0, max: 1.0),
   'Metal': Interval(min: 1.0, max: 1.0),
-  'ANE': Interval(min: 1.0, max: 1.0),
+  // 1.0 in simulator, 0.8 on iphone 12 mini
+  'ANE': Interval(min: 0.8, max: 1.0),
 };
 
 const benchmarkExpectedAccuracy = {
   'image_classification': _imageClassification,
   'object_detection': _objectDetection,
   'image_segmentation_v2': _imageSegmentation,
-  'natural_language_processing': _languageUnderstanding,
+  'natural_language_processing': _naturalLanguageProcessing,
   'image_classification_offline': _imageClassification,
 };
