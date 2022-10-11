@@ -33,7 +33,7 @@ cc_library(
         "//flutter/cpp/datasets:imagenet",
         "//flutter/cpp/datasets:squad",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
-        "@org_pytorch_cpuinfo//:cpuinfo",
+        "@cpuinfo",
     ],
     alwayslink = 1,
 )

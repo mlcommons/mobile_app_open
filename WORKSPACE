@@ -23,8 +23,30 @@ load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependen
 
 apple_support_dependencies()
 
+# This lib must be named exactly "cpuinfo".
+# This name is used by org_tensorflow lib.
+# When we use any different name, compilation may fail
+# because there will be files from several different versions of cpuinfo.
 http_archive(
-    name = "org_pytorch_cpuinfo",
+    name = "cpuinfo",
+    patch_args = ["-p1"],
+    patches = [
+        "//patches:cpuinfo-bazel-patch.diff",
+    ],
+    sha256 = "3389494589a97122779cd8d57fbffb1ac1e1ca3e795981c1d8d71b92281ae8c4",
+    strip_prefix = "cpuinfo-8ec7bd91ad0470e61cf38f618cc1f270dede599c",
+    url = "https://github.com/pytorch/cpuinfo/archive/8ec7bd91ad0470e61cf38f618cc1f270dede599c.tar.gz",
+)
+
+# Same as cpuinfo.
+# We must override "clog" name to avoid possible version conflicts
+# with "clog" dependency from org_tensorflow lib.
+http_archive(
+    name = "clog",
+    patch_args = ["-p1"],
+    patches = [
+        "//patches:cpuinfo-bazel-patch.diff",
+    ],
     sha256 = "3389494589a97122779cd8d57fbffb1ac1e1ca3e795981c1d8d71b92281ae8c4",
     strip_prefix = "cpuinfo-8ec7bd91ad0470e61cf38f618cc1f270dede599c",
     url = "https://github.com/pytorch/cpuinfo/archive/8ec7bd91ad0470e61cf38f618cc1f270dede599c.tar.gz",
