@@ -5,6 +5,9 @@ const isOfficialBuild =
 
 const isFastMode = bool.fromEnvironment('fast-mode', defaultValue: false);
 
+const defaultCacheFolder = String.fromEnvironment('default-cache-folder');
+const defaultDataFolder = String.fromEnvironment('default-data-folder');
+
 class AppColors {
   static const primary = Colors.blue;
   static const secondary = Colors.green;
