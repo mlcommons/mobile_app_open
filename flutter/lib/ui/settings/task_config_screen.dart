@@ -236,6 +236,10 @@ class TaskConfigScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
+          // On ios you need to properly request access to a folder outside of the app folder
+          // but file_picker plugin doesn't do it.
+          // see the following link for details:
+          //    https://github.com/mlcommons/mobile_app_open/pull/562#discussion_r992167655
           if (!Platform.isIOS) ...[
             _makeCacheFolderNotice(l10n),
             _DataFolderSelectorHelper(context).build(),
