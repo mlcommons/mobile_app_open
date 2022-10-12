@@ -29,8 +29,8 @@ endif
 
 flutter: flutter/prepare flutter/platform
 flutter/firebase: flutter/firebase/config flutter/firebase/prefix
-flutter/result: flutter/result/schema flutter/result/ts
-flutter/prepare: flutter/pub flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
+flutter/result: flutter/result/json flutter/result/schema flutter/result/ts
+flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 flutter/test: flutter/test/unit flutter/test/integration
 
@@ -41,12 +41,25 @@ flutter/check/official-build:
 	@[ "$$OFFICIAL_BUILD" = "true" ] || [ "$$OFFICIAL_BUILD" = "false" ] \
 		|| (echo OFFICIAL_BUILD env must be explicitly set to \"true\" or \"false\"; exit 1)
 
+FLUTTER_APP_VERSION?=$(shell grep 'version:' flutter/pubspec.yaml | head -n1 | awk '{ print $$2}' | awk -F+ '{ print $$1}')
 FLUTTER_BUILD_NUMBER?=0
 flutter_build_number_arg=--build-number ${FLUTTER_BUILD_NUMBER}
 .PHONY: flutter/check/build-number
 flutter/check/build-number:
 	@[ -n "$$FLUTTER_BUILD_NUMBER" ] \
 		|| (echo FLUTTER_BUILD_NUMBER env must be explicitly set; exit 1)
+
+ifneq (${FLUTTER_DATA_FOLDER},)
+flutter_data_folder_arg="--dart-define=default-data-folder=${FLUTTER_DATA_FOLDER}"
+else
+flutter_data_folder_arg=
+endif
+ifneq (${FLUTTER_CACHE_FOLDER},)
+flutter_cache_folder_arg="--dart-define=default-cache-folder=${FLUTTER_CACHE_FOLDER}"
+else
+flutter_cache_folder_arg=
+endif
+flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
 
 .PHONY: flutter/backend-list
 flutter/backend-list:
@@ -93,16 +106,24 @@ flutter/firebase/prefix:
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
 		| tee firebase_functions/functions/src/prefix.gen.ts
 
-result_json_example_path=output/extended-result-example.json
+RESULT_JSON_SAMPLE_PATH?=output/extended-result-example.json
+.PHONY: flutter/result/sample
+flutter/result/sample:
+	cd flutter_common && \
+		${_start_args} dart run \
+		--define=jsonFileName=../${RESULT_JSON_SAMPLE_PATH} \
+		lib/data/generation_helpers/write_json_sample.main.dart
+
+.PHONY: flutter/result/test-sample
+flutter/result/test-sample:
+	make flutter/result/sample \
+		RESULT_JSON_SAMPLE_PATH=flutter_common/test/data/result_sample.json
+
 default_result_json_schema_path=flutter/documentation/extended-result.schema.json
 RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
 .PHONY: flutter/result/schema
-flutter/result/schema:
-	cd flutter_common && \
-		${_start_args} dart run \
-		--define=jsonFileName=../${result_json_example_path} \
-		lib/data/generation_helpers/write_json_example.main.dart
-	quicktype ${result_json_example_path} \
+flutter/result/schema: flutter/result/sample
+	quicktype ${RESULT_JSON_SAMPLE_PATH} \
 		--lang schema \
 		--out ${RESULT_JSON_SCHEMA_PATH}
 	cd flutter_common && \
@@ -117,6 +138,10 @@ flutter/result/ts:
 		--lang ts \
 		--top-level ExtendedResult \
 		--out firebase_functions/functions/src/extended-result.gen.ts
+
+.PHONY: flutter/result/json
+flutter/result/json:
+	cd flutter_common && ${_start_args} flutter --no-version-check pub run build_runner build
 
 .PHONY: flutter/build-info
 flutter/build-info:
@@ -138,7 +163,7 @@ flutter/protobuf:
 
 .PHONY: flutter/update-splash-screen
 flutter/update-splash-screen:
-	cd flutter && tool/update-splash-screen
+	cd flutter && FLUTTER_APP_VERSION='$(FLUTTER_APP_VERSION)' tool/update-splash-screen
 
 .PHONY: flutter/l10n
 flutter/l10n:
@@ -150,7 +175,6 @@ flutter/l10n:
 		--no-synthetic-package
 	dart format flutter/lib/localizations
 
-FLUTTER_APP_VERSION?=$(shell grep 'version:' flutter/pubspec.yaml | head -n1 | awk '{ print $$2}')
 .PHONY: flutter/set-windows-build-number
 flutter/set-windows-build-number:
 	cat flutter/windows/runner/version.in | sed \
@@ -174,6 +198,7 @@ output/flutter/pub/%.stamp: %/pubspec.yaml
 .PHONY: flutter/test/unit
 flutter/test/unit:
 	cd flutter && ${_start_args} flutter --no-version-check test test
+	cd flutter_common && ${_start_args} flutter --no-version-check test test
 
 ifneq (${FLUTTER_TEST_DEVICE},)
 flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"
@@ -188,11 +213,17 @@ flutter/test/integration:
 		integration_test \
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
-		${flutter_perf_test_arg}
+		${flutter_perf_test_arg} \
+		${flutter_folder_args}
 
 .PHONY: flutter/run
 flutter/run:
-	cd flutter && ${_start_args} flutter --no-version-check run ${flutter_test_device_arg} ${flutter_official_build_arg}
+	cd flutter && ${_start_args} \
+		flutter --no-version-check \
+		run \
+		${flutter_folder_args} \
+		${flutter_test_device_arg} \
+		${flutter_official_build_arg}
 
 .PHONY: flutter/clean
 flutter/clean:

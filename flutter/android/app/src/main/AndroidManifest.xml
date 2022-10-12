@@ -16,6 +16,14 @@
               android:required="false"
               />
         <uses-native-library
+              android:name="libofi_rt_framework_user_vendor.so"
+              android:required="false"
+              />
+        <uses-native-library
+              android:name="libeden_rt_stub.edensdk.samsung.so"
+              android:required="false"
+              />
+        <uses-native-library
               android:name="libcdsprpc.so"
               android:required="false"
               />

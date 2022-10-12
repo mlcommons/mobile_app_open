@@ -5,16 +5,20 @@ import 'package:flutter/foundation.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/settings/data_folder_type.dart';
 import 'cache_manager.dart';
 import 'resource.dart';
 import 'result_manager.dart';
 import 'utils.dart';
 
 class ResourceManager {
-  static const _applicationDirectoryPrefix = 'app://';
+  static const _dataPrefix = 'local://';
   static const _loadedResourcesDirName = 'loaded_resources';
 
   final VoidCallback _onUpdate;
+  final Store store;
 
   bool _done = false;
   String _progressString = '0%';
@@ -25,7 +29,7 @@ class ResourceManager {
   late final CacheManager cacheManager;
   late final ResultManager resultManager;
 
-  ResourceManager(this._onUpdate);
+  ResourceManager(this._onUpdate, this.store);
 
   bool get done => _done;
 
@@ -36,13 +40,33 @@ class ResourceManager {
   String get(String uri) {
     if (uri.isEmpty) return '';
 
-    if (uri.startsWith(_applicationDirectoryPrefix)) {
-      final resourceSystemPath =
-          uri.replaceFirst(_applicationDirectoryPrefix, applicationDirectory);
+    if (uri.startsWith(_dataPrefix)) {
+      final resourceSystemPath = uri.replaceFirst(_dataPrefix, getDataFolder());
       return resourceSystemPath;
     }
+    if (isInternetResource(uri)) {
+      return cacheManager.get(uri)!;
+    }
+    if (File(uri).isAbsolute) {
+      return uri;
+    }
 
-    return cacheManager.get(uri)!;
+    throw 'invalid resource path: $uri';
+  }
+
+  String getDataFolder() {
+    switch (parseDataFolderType(store.dataFolderType)) {
+      case DataFolderType.default_:
+        if (defaultDataFolder.isNotEmpty) {
+          return defaultDataFolder;
+        } else {
+          return applicationDirectory;
+        }
+      case DataFolderType.appFolder:
+        return applicationDirectory;
+      case DataFolderType.custom:
+        return store.customDataFolder;
+    }
   }
 
   Future<bool> isResourceExist(String? uri) async {
@@ -69,12 +93,12 @@ class ResourceManager {
 
     var internetResources = <Resource>[];
     for (final resource in resources) {
-      if (resource.path.startsWith(_applicationDirectoryPrefix)) continue;
+      if (resource.path.startsWith(_dataPrefix)) continue;
       if (isInternetResource(resource.path)) {
         internetResources.add(resource);
         continue;
       }
-      throw 'forbidden path: ${resource.path} (only http://, https:// and app:// resources are allowed)';
+      throw 'forbidden path: ${resource.path} (only http://, https:// and local:// resources are allowed)';
     }
 
     final internetPaths = internetResources.map((e) => e.path).toList();
@@ -120,7 +144,11 @@ class ResourceManager {
   Future<void> initSystemPaths() async {
     applicationDirectory = await getApplicationDirectory();
     await Directory(applicationDirectory).create(recursive: true);
-    _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
+    if (defaultCacheFolder.isNotEmpty) {
+      _loadedResourcesDir = defaultCacheFolder;
+    } else {
+      _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
+    }
     await Directory(_loadedResourcesDir).create();
 
     cacheManager = CacheManager(_loadedResourcesDir);

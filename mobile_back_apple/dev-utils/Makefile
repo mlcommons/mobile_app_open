@@ -12,8 +12,9 @@ tflite: tflite-build tflite-run-ic-offline
 coreml: coreml-build coreml-run-od
 coreml-all: coreml-build coreml-run-ic coreml-run-ic-offline coreml-run-od coreml-run-is coreml-run-lu
 
+backend=WITH_APPLE=1 WITH_TFLITE=0
 app:
-	cd ${REPO_ROOT_DIR} && make flutter/prepare && make flutter/ios
+	cd ${REPO_ROOT_DIR} && make flutter/prepare ${backend} && make flutter/ios ${backend}
 	cd ${REPO_ROOT_DIR}/flutter && flutter build ios
 	open ${REPO_ROOT_DIR}/flutter/ios/Runner.xcworkspace
 

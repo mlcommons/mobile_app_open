@@ -48,6 +48,15 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get artificialCPULoadEnabled =>
+      _getBool(StoreConstants.artificialCPULoadEnabled, false);
+
+  set artificialCPULoadEnabled(bool artificialCPULoadEnabled) {
+    _storeFromDisk.setBool(
+        StoreConstants.artificialCPULoadEnabled, artificialCPULoadEnabled);
+    notifyListeners();
+  }
+
   bool get testMode => _getBool(StoreConstants.testMode);
 
   set testMode(bool testModeFlag) {
@@ -102,6 +111,20 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
+  String get dataFolderType => _getString(StoreConstants.dataFolderType);
+
+  set dataFolderType(String value) {
+    _storeFromDisk.setString(StoreConstants.dataFolderType, value);
+    notifyListeners();
+  }
+
+  String get customDataFolder => _getString(StoreConstants.customDataFolder);
+
+  set customDataFolder(String value) {
+    _storeFromDisk.setString(StoreConstants.customDataFolder, value);
+    notifyListeners();
+  }
+
   String get taskSelection => _getString(StoreConstants.taskSelection);
 
   set taskSelection(String value) {
@@ -116,6 +139,7 @@ class Store extends ChangeNotifier {
 class StoreConstants {
   static const share = 'share';
   static const submissionMode = 'submission mode';
+  static const artificialCPULoadEnabled = 'artificial cpu load enabled';
   static const offlineMode = 'offline mode';
   static const testMode = 'test mode';
   static const cooldown = 'cooldown';
@@ -124,6 +148,8 @@ class StoreConstants {
   static const previousExtendedResult = 'previous extended result';
   static const previousAppVersion = 'previous app version';
   static const keepLogs = 'keep_logs';
+  static const dataFolderType = 'data folder type';
+  static const customDataFolder = 'custom data folder';
   static const taskSelection = 'disabled_tasks';
   static const testMinDuration = 'test min duration';
   static const testCooldown = 'test cooldown';
