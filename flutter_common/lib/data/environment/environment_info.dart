@@ -36,9 +36,6 @@ class EnvironmentInfo {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class EnvSocInfo {
-  static const String _tagCpuinfo = 'cpuinfo';
-  static const String _tagAndroidInfo = 'android_info';
-
   final EnvCpuinfo cpuinfo;
   final EnvAndroidInfo? androidInfo;
 
@@ -55,7 +52,6 @@ class EnvSocInfo {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class EnvCpuinfo {
-  static const String _tagSocName = 'soc_name';
   final String socName;
 
   EnvCpuinfo({
@@ -70,10 +66,6 @@ class EnvCpuinfo {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class EnvAndroidInfo {
-  static const String _tagPropSocModel = 'prop_soc_model';
-  static const String _tagPropSocManufacturer = 'prop_soc_manufacturer';
-  static const String _tagBuildBoard = 'build_board';
-
   final String propSocModel;
   final String propSocManufacturer;
   final String? buildBoard;
