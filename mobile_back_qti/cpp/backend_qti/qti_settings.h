@@ -349,8 +349,8 @@ benchmark_setting {
     id: "bg_load"
     value: "true"
   }
-  model_path: "app:///mlperf_models/mobilenet_edgetpu_224_1.0_htp.dlc"
-  model_checksum: ""
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/SNPE/mobilenet_edgetpu_224_1.0_htp.dlc"
+  model_checksum: "b0fe84f5d21392198b17b906a97f452d"
 }
 
 benchmark_setting {
@@ -363,8 +363,8 @@ benchmark_setting {
     id: "scenario"
     value: "Offline"
   }
-  model_path: "app:///mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched_sd7g1.dlc"
-  model_checksum: ""
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/SNPE/mobilenet_edgetpu_224_1.0_htp_batched_sd7g1.dlc"
+  model_checksum: "9380ed6edcbb9cd05dc41b7188720b88"
 }
 
 benchmark_setting {
@@ -380,8 +380,8 @@ benchmark_setting {
     id: "bg_load"
     value: "true"
   }
-  model_path: "app:///mlperf_models/ssd_mobiledet_qat_htp.dlc"
-  model_checksum: ""
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/SNPE/ssd_mobiledet_qat_htp.dlc"
+  model_checksum: "6ac3c718f1b6d39f6e9a7700709aa3ff"
 }
 
 benchmark_setting {
@@ -401,8 +401,8 @@ benchmark_setting {
     id: "bg_load"
     value: "true"
   }
-  model_path: "app:///mlperf_models/mobilebert_quantized_htp.dlc"
-  model_checksum: ""
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/SNPE/mobilebert_quantized_htp.dlc"
+  model_checksum: "896609223af86aefa7f218e515bb977e"
 }
 
 benchmark_setting {
@@ -422,8 +422,8 @@ benchmark_setting {
     id: "output_buffer_type"
     value: "uint_8"
   }
-  model_path: "app:///mlperf_models/mobile_mosaic_htp.dlc"
-  model_checksum: ""
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/SNPE/mobile_mosaic_htp.dlc"
+  model_checksum: "7a3f44d5583fae7b2c18fab3e6bcee33"
 })SETTINGS";
 
 const std::string qti_settings_sd8g1 = R"SETTINGS(
@@ -571,8 +571,8 @@ benchmark_setting {
     id: "bg_load"
     value: "true"
   }
-  model_path: "app:///mlperf_models/mobilenet_edgetpu_224_1.0_htp.dlc"
-  model_checksum: ""
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/SNPE/mobilenet_edgetpu_224_1.0_htp.dlc"
+  model_checksum: "b0fe84f5d21392198b17b906a97f452d"
   single_stream_expected_latency_ns: 600000
 }
 
@@ -590,8 +590,8 @@ benchmark_setting {
     id: "bg_load"
     value: "true"
   }
-  model_path: "app:///mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched_sd8pg1.dlc"
-  model_checksum: ""
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/SNPE/mobilenet_edgetpu_224_1.0_htp_batched_sd8pg1.dlc"
+  model_checksum: "e2fec06f8d3f1bfeb036a7f6ed012aef"
 }
 
 benchmark_setting {
@@ -607,8 +607,8 @@ benchmark_setting {
     id: "bg_load"
     value: "true"
   }
-  model_path: "app:///mlperf_models/ssd_mobiledet_qat_htp.dlc"
-  model_checksum: ""
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/SNPE/ssd_mobiledet_qat_htp.dlc"
+  model_checksum: "6ac3c718f1b6d39f6e9a7700709aa3ff"
 }
 
 benchmark_setting {
@@ -636,8 +636,8 @@ benchmark_setting {
     id: "perf_profile"
     value: "high_performance"
   }
-  model_path: "app:///mlperf_models/mobilebert_quantized_htp.dlc"
-  model_checksum: ""
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/SNPE/mobilebert_quantized_htp.dlc"
+  model_checksum: "896609223af86aefa7f218e515bb977e"
 }
 
 benchmark_setting {
@@ -657,8 +657,8 @@ benchmark_setting {
     id: "output_buffer_type"
     value: "uint_8"
   }
-  model_path: "app:///mlperf_models/mobile_mosaic_htp.dlc"
-  model_checksum: ""
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/SNPE/mobile_mosaic_htp.dlc"
+  model_checksum: "7a3f44d5583fae7b2c18fab3e6bcee33"
 })SETTINGS";
 
 #endif
