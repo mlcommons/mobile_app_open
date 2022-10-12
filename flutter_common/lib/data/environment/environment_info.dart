@@ -8,9 +8,9 @@ enum OsEnum { android, ios, windows }
 class EnvironmentInfo {
   final OsEnum osName;
   final String osVersion;
-  final String manufacturer;
-  final String modelCode;
-  final String modelName;
+  final String? manufacturer;
+  final String? modelCode;
+  final String? modelName;
 
   EnvironmentInfo({
     required this.osName,

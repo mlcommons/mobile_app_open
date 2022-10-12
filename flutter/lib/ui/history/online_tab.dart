@@ -110,9 +110,8 @@ class OnlineTab implements TabInterface {
     final startDatetime = firstRunInfo.performanceRun?.startDatetime ??
         firstRunInfo.accuracyRun!.startDatetime;
 
-    final modelDescription = item.environmentInfo.manufacturer.isEmpty
-        ? item.environmentInfo.modelName
-        : '${item.environmentInfo.manufacturer} ${item.environmentInfo.modelName}';
+    final modelDescription =
+        '${item.environmentInfo.manufacturer} ${item.environmentInfo.modelName}';
 
     return helper.makeListItem(
       title: helper.formatDate(startDatetime.toLocal()),

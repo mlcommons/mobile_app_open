@@ -1,5 +1,7 @@
-# Uncomment this line to define a global platform for your project
-platform :ios, '12.0'
+# We comment out "platform" to inherit deployment target of the app
+# platform :ios, '12.0'
+
+install! 'cocoapods', :warn_for_unused_master_specs_repo => false
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -40,6 +42,11 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    # By removing the deployment target info from each pods
+    # all pods will inherit deployment target of the app
+    target.build_configurations.each do |config|
+      config.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET'
+    end
   end
   installer.pods_project.build_configurations.each do |config|
     config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
