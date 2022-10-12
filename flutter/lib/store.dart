@@ -48,6 +48,15 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get artificialCPULoadEnabled =>
+      _getBool(StoreConstants.artificialCPULoadEnabled, false);
+
+  set artificialCPULoadEnabled(bool artificialCPULoadEnabled) {
+    _storeFromDisk.setBool(
+        StoreConstants.artificialCPULoadEnabled, artificialCPULoadEnabled);
+    notifyListeners();
+  }
+
   bool get testMode => _getBool(StoreConstants.testMode);
 
   set testMode(bool testModeFlag) {
@@ -128,6 +137,7 @@ class Store extends ChangeNotifier {
 class StoreConstants {
   static const share = 'share';
   static const submissionMode = 'submission mode';
+  static const artificialCPULoadEnabled = 'artificial cpu load enabled';
   static const offlineMode = 'offline mode';
   static const testMode = 'test mode';
   static const cooldown = 'cooldown';

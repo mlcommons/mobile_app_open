@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:device_info/device_info.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
-import 'package:mlperfbench_common/data/environment/os_enum.dart';
 
 class DeviceInfo {
   final String modelCode;
@@ -80,7 +79,7 @@ class DeviceInfo {
 
   static EnvironmentInfo get environmentInfo {
     return EnvironmentInfo(
-      osName: OsName.fromJson(Platform.operatingSystem),
+      osName: EnvironmentInfo.parseOs(Platform.operatingSystem),
       osVersion: Platform.operatingSystemVersion,
       manufacturer: DeviceInfo.instance.manufacturer,
       modelCode: DeviceInfo.instance.modelCode,

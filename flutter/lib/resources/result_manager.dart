@@ -102,9 +102,9 @@ class ResultManager {
           .singleWhere((benchmark) => benchmark.id == exportResult.benchmarkId);
 
       benchmark.performanceModeResult =
-          _parseExportResult(exportResult, exportResult.performance);
+          _parseExportResult(exportResult, exportResult.performanceRun);
       benchmark.accuracyModeResult =
-          _parseExportResult(exportResult, exportResult.accuracy);
+          _parseExportResult(exportResult, exportResult.accuracyRun);
     }
   }
 
@@ -118,9 +118,9 @@ class ResultManager {
       throughput: runResult.throughput ?? 0.0,
       accuracy: runResult.accuracy,
       accuracy2: runResult.accuracy2,
-      backendName: export.backendInfo.name,
-      acceleratorName: export.backendInfo.accelerator,
-      batchSize: export.backendSettingsInfo.batchSize,
+      backendName: export.backendInfo.backendName,
+      acceleratorName: export.backendInfo.acceleratorName,
+      batchSize: export.backendSettings.batchSize,
       validity: runResult.loadgenInfo?.validity ?? false,
     );
   }

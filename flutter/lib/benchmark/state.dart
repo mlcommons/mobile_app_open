@@ -16,11 +16,10 @@ import 'package:mlperfbench_common/data/results/backend_settings.dart';
 import 'package:mlperfbench_common/data/results/backend_settings_extra.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench_common/data/results/dataset_info.dart';
-import 'package:mlperfbench_common/data/results/dataset_type.dart';
-import 'package:mlperfbench_common/data/results/loadgen_scenario.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
@@ -37,6 +36,13 @@ import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
 import 'run_mode.dart';
+
+void _doSomethingCPUIntensive(double value) {
+  var newValue = value;
+  while (true) {
+    newValue = newValue * 0.999999999999999;
+  }
+}
 
 enum BenchmarkStateEnum {
   downloading,
@@ -460,8 +466,8 @@ class BenchmarkState extends ChangeNotifier {
     if (!_aborting) {
       lastResult = ExtendedResult(
         meta: ResultMetaInfo(uuid: const Uuid().v4()),
-        envInfo: DeviceInfo.environmentInfo,
-        results: BenchmarkExportResultList(exportResults),
+        environmentInfo: DeviceInfo.environmentInfo,
+        results: exportResults,
         buildInfo: BuildInfoHelper.info,
       );
       _store.previousExtendedResult =
@@ -492,13 +498,13 @@ class BenchmarkState extends ChangeNotifier {
     return BenchmarkExportResult(
         benchmarkId: benchmark.id,
         benchmarkName: benchmark.taskConfig.name,
-        performance: BenchmarkRunResult(
+        performanceRun: BenchmarkRunResult(
           throughput: performanceInfo.throughput,
           accuracy: performance.accuracy1,
           accuracy2: performance.accuracy2,
-          datasetInfo: DatasetInfo(
+          dataset: DatasetInfo(
             name: accuracyDataset.name,
-            type: DatasetType.fromJson(
+            type: DatasetInfo.parseDatasetType(
                 benchmark.taskConfig.datasets.type.toString()),
             dataPath: performanceDataset.inputPath,
             groundtruthPath: performanceDataset.groundtruthPath,
@@ -512,15 +518,15 @@ class BenchmarkState extends ChangeNotifier {
                 performanceInfo.loadgenInfo!.queryCount,
           ),
         ),
-        accuracy: accuracy == null
+        accuracyRun: accuracy == null
             ? null
             : BenchmarkRunResult(
                 throughput: null,
                 accuracy: accuracy.accuracy1,
                 accuracy2: accuracy.accuracy2,
-                datasetInfo: DatasetInfo(
+                dataset: DatasetInfo(
                   name: accuracyDataset.name,
-                  type: DatasetType.fromJson(
+                  type: DatasetInfo.parseDatasetType(
                       benchmark.taskConfig.datasets.type.toString()),
                   dataPath: accuracyDataset.inputPath,
                   groundtruthPath: accuracyDataset.groundtruthPath,
@@ -534,11 +540,11 @@ class BenchmarkState extends ChangeNotifier {
         minSamples: benchmark.taskConfig.minQueryCount,
         backendInfo: BackendReportedInfo(
           filename: backendInfo.libPath,
-          name: performance.backendName,
-          vendor: performance.backendVendor,
-          accelerator: performance.acceleratorName,
+          backendName: performance.backendName,
+          vendorName: performance.backendVendor,
+          acceleratorName: performance.acceleratorName,
         ),
-        backendSettingsInfo: BackendSettingsInfo(
+        backendSettings: BackendSettingsInfo(
           acceleratorCode: actualSettings.benchmarkSetting.accelerator,
           acceleratorDesc: actualSettings.benchmarkSetting.acceleratorDesc,
           configuration: actualSettings.benchmarkSetting.configuration,
@@ -546,11 +552,11 @@ class BenchmarkState extends ChangeNotifier {
           batchSize: actualSettings.benchmarkSetting.batchSize,
           extraSettings: extraSettingsFromCommon(actualSettings.setting),
         ),
-        loadgenScenario:
-            LoadgenScenario.fromJson(benchmark.taskConfig.scenario));
+        loadgenScenario: BenchmarkExportResult.parseLoadgenScenario(
+            benchmark.taskConfig.scenario));
   }
 
-  static BackendExtraSettingList extraSettingsFromCommon(
+  static List<BackendExtraSetting> extraSettingsFromCommon(
       List<pb.Setting> commonSettings) {
     final list = <BackendExtraSetting>[];
     for (var item in commonSettings) {
@@ -560,7 +566,7 @@ class BenchmarkState extends ChangeNotifier {
           value: item.value.value,
           valueName: item.value.name));
     }
-    return BackendExtraSettingList(list);
+    return list;
   }
 
   Future<RunInfo> runBenchmark(
@@ -584,8 +590,19 @@ class BenchmarkState extends ChangeNotifier {
       logDir: logDir,
       isTestMode: _store.testMode,
     );
+
+    if (_store.artificialCPULoadEnabled) {
+      print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
+      const value = 999999999999999.0;
+      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
+    }
+
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
+
+    if (_store.artificialCPULoadEnabled) {
+      await Executor().dispose();
+    }
 
     if (!(result.accuracy1?.isInBounds() ?? true) ||
         !(result.accuracy2?.isInBounds() ?? true)) {
@@ -636,7 +653,7 @@ class BenchmarkState extends ChangeNotifier {
       lastResult = ExtendedResult.fromJson(
           jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
       resourceManager.resultManager
-          .restoreResults(lastResult!.results.list, benchmarks);
+          .restoreResults(lastResult!.results, benchmarks);
       _doneRunning = true;
       return;
     } catch (e, trace) {

@@ -1,33 +1,46 @@
-import 'dataset_type.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'dataset_info.g.dart';
+
+enum DatasetTypeEnum {
+  @JsonValue('IMAGENET')
+  imagenet,
+  @JsonValue('COCO')
+  coco,
+  @JsonValue('ADE20K')
+  ade20k,
+  @JsonValue('SQUAD')
+  squad,
+}
+
+extension DatasetTypeExtension on DatasetTypeEnum {
+  String get humanName {
+    return _$DatasetTypeEnumEnumMap[this]!;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class DatasetInfo {
-  static const String _tagName = 'name';
-  static const String _tagType = 'type';
-  static const String _tagDataPath = 'data_path';
-  static const String _tagGroundtruthPath = 'groundtruth_path';
-
   final String name;
-  final DatasetType type;
+  final DatasetTypeEnum type;
   final String dataPath;
   final String groundtruthPath;
 
-  DatasetInfo(
-      {required this.name,
-      required this.type,
-      required this.dataPath,
-      required this.groundtruthPath});
+  DatasetInfo({
+    required this.name,
+    required this.type,
+    required this.dataPath,
+    required this.groundtruthPath,
+  });
 
-  DatasetInfo.fromJson(Map<String, dynamic> json)
-      : this(
-            name: json[_tagName] as String,
-            type: DatasetType.fromJson(json[_tagType] as String),
-            dataPath: json[_tagDataPath] as String,
-            groundtruthPath: json[_tagGroundtruthPath] as String);
+  factory DatasetInfo.fromJson(Map<String, dynamic> json) =>
+      _$DatasetInfoFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagName: name,
-        _tagType: type,
-        _tagDataPath: dataPath,
-        _tagGroundtruthPath: groundtruthPath,
-      };
+  Map<String, dynamic> toJson() => _$DatasetInfoToJson(this);
+
+  static DatasetTypeEnum parseDatasetType(String value) {
+    return _$DatasetTypeEnumEnumMap.entries
+        .firstWhere((element) => element.value == value)
+        .key;
+  }
 }

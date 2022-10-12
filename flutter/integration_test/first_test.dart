@@ -32,15 +32,15 @@ void main() {
 }
 
 void checkTasks(ExtendedResult extendedResults) {
-  final length = extendedResults.results.list.length;
+  final length = extendedResults.results.length;
   const expectedTasksCount = 5;
 
   expect(length, expectedTasksCount, reason: 'tasks count does not match');
 
-  for (final benchmarkResult in extendedResults.results.list) {
+  for (final benchmarkResult in extendedResults.results) {
     print('checking ${benchmarkResult.benchmarkId}');
-    expect(benchmarkResult.performance, isNotNull);
-    expect(benchmarkResult.performance!.throughput, isNotNull);
+    expect(benchmarkResult.performanceRun, isNotNull);
+    expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
     checkAccuracy(benchmarkResult);
   }
@@ -57,17 +57,17 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
 
   // backends are not forced to follow backendSettingsInfo values
   // we should use backendInfo.accelerator, it always represents real accelerator value
-  var accelerator = benchmarkResult.backendInfo.accelerator;
+  var accelerator = benchmarkResult.backendInfo.acceleratorName;
   if (accelerator == 'ACCELERATOR_NAME') {
     // some backends are yet to implement accelerator reporting
     print('warning: accelerator missing, using acceleratorDesc');
-    accelerator = benchmarkResult.backendSettingsInfo.acceleratorDesc;
+    accelerator = benchmarkResult.backendSettings.acceleratorDesc;
   }
   final expectedValue =
-      expectedMap['$accelerator+${benchmarkResult.backendInfo.name}'] ??
+      expectedMap['$accelerator+${benchmarkResult.backendInfo.backendName}'] ??
           expectedMap[accelerator];
   final tag =
-      '${benchmarkResult.benchmarkId}[$accelerator] (+${benchmarkResult.backendInfo.name})';
+      '${benchmarkResult.benchmarkId}[$accelerator] (+${benchmarkResult.backendInfo.backendName})';
   expect(
     expectedValue,
     isNotNull,
@@ -75,7 +75,7 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   );
   expectedValue!;
 
-  final accuracyRun = benchmarkResult.accuracy;
+  final accuracyRun = benchmarkResult.accuracyRun;
   accuracyRun!;
 
   final accuracyValue = accuracyRun.accuracy;

@@ -1,4 +1,3 @@
-import 'package:mlperfbench_common/data/build_info/backend_list.dart';
 import 'package:mlperfbench_common/data/build_info/build_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -23,7 +22,7 @@ class BuildInfoHelper {
         buildNumber: packageInfo.buildNumber,
         officialReleaseFlag: isOfficialBuild,
         devTestFlag: isFastMode,
-        backends: BackendList(BackendInfo.getBackendsList()),
+        backendList: BackendInfo.getBackendsList(),
         gitBranch: GeneratedBuildInfo.gitBranch,
         gitCommit: GeneratedBuildInfo.gitCommit,
         gitDirtyFlag: GeneratedBuildInfo.gitDirty != 0);
