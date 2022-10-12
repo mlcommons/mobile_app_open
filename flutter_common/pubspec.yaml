@@ -13,12 +13,15 @@ dependencies:
     sdk: flutter
   http: ^0.13.4
   import_sorter: ^4.6.0
+  json_annotation: ^4.6.0
   path_provider: ^2.0.9
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^1.0.0
+  json_serializable: ^6.3.1
+  build_runner: ^2.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

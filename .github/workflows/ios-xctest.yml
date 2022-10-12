@@ -1,0 +1,44 @@
+name: Run iOS XCTest
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test iOS app
+    # https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md
+    runs-on: macos-12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cache Xcode DerivedData
+        uses: actions/cache@v3
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-derived_data-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: ${{ runner.os }}-derived_data-
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/flutter/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+      - name: Cache bazel
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/bazel_cache
+          key: ${{ runner.os }}-bazel_cache
+      - name: Run test
+        env:
+          BAZEL_CACHE_PATH: ${{ github.workspace }}/bazel_cache
+        run: >-
+          cd flutter/ios/ci_scripts/ && bash ci_post_clone.sh

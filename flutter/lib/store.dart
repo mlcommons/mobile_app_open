@@ -27,91 +27,103 @@ class Store extends ChangeNotifier {
     return value ?? '';
   }
 
-  bool get share => _getBool(_StoreConstants.share);
+  bool get share => _getBool(StoreConstants.share);
 
   set share(bool shareFlag) {
-    _storeFromDisk.setBool(_StoreConstants.share, shareFlag);
+    _storeFromDisk.setBool(StoreConstants.share, shareFlag);
     notifyListeners();
   }
 
-  bool get submissionMode => _getBool(_StoreConstants.submissionMode);
+  bool get submissionMode => _getBool(StoreConstants.submissionMode);
 
   set submissionMode(bool submissionModeFlag) {
-    _storeFromDisk.setBool(_StoreConstants.submissionMode, submissionModeFlag);
+    _storeFromDisk.setBool(StoreConstants.submissionMode, submissionModeFlag);
     notifyListeners();
   }
 
-  bool get offlineMode => _getBool(_StoreConstants.offlineMode);
+  bool get offlineMode => _getBool(StoreConstants.offlineMode);
 
   set offlineMode(bool offlineModeFlag) {
-    _storeFromDisk.setBool(_StoreConstants.offlineMode, offlineModeFlag);
+    _storeFromDisk.setBool(StoreConstants.offlineMode, offlineModeFlag);
     notifyListeners();
   }
 
-  bool get testMode => _getBool(_StoreConstants.testMode);
+  bool get artificialCPULoadEnabled =>
+      _getBool(StoreConstants.artificialCPULoadEnabled, false);
+
+  set artificialCPULoadEnabled(bool artificialCPULoadEnabled) {
+    _storeFromDisk.setBool(
+        StoreConstants.artificialCPULoadEnabled, artificialCPULoadEnabled);
+    notifyListeners();
+  }
+
+  bool get testMode => _getBool(StoreConstants.testMode);
 
   set testMode(bool testModeFlag) {
-    _storeFromDisk.setBool(_StoreConstants.testMode, testModeFlag);
+    _storeFromDisk.setBool(StoreConstants.testMode, testModeFlag);
     notifyListeners();
   }
 
-  bool get cooldown => _getBool(_StoreConstants.cooldown, true);
+  bool get cooldown => _getBool(StoreConstants.cooldown, true);
 
   set cooldown(bool submissionModeFlag) {
-    _storeFromDisk.setBool(_StoreConstants.cooldown, submissionModeFlag);
+    _storeFromDisk.setBool(StoreConstants.cooldown, submissionModeFlag);
     notifyListeners();
   }
 
-  int get cooldownDuration => _getInt(_StoreConstants.cooldownDuration, 5);
+  int get cooldownDuration => _getInt(StoreConstants.cooldownDuration, 5);
 
   set cooldownDuration(int value) {
-    _storeFromDisk.setInt(_StoreConstants.cooldownDuration, value);
+    _storeFromDisk.setInt(StoreConstants.cooldownDuration, value);
     notifyListeners();
   }
 
   String get chosenConfigurationName =>
-      _getString(_StoreConstants.chosenConfigurationName);
+      _getString(StoreConstants.chosenConfigurationName);
 
   set chosenConfigurationName(String configurationName) {
     _storeFromDisk.setString(
-        _StoreConstants.chosenConfigurationName, configurationName);
+        StoreConstants.chosenConfigurationName, configurationName);
     notifyListeners();
   }
 
   String get previousExtendedResult =>
-      _getString(_StoreConstants.previousExtendedResult);
+      _getString(StoreConstants.previousExtendedResult);
 
   set previousExtendedResult(String result) {
-    _storeFromDisk.setString(_StoreConstants.previousExtendedResult, result);
+    _storeFromDisk.setString(StoreConstants.previousExtendedResult, result);
   }
 
   bool isShareOptionChosen() =>
-      _storeFromDisk.containsKey(_StoreConstants.share);
+      _storeFromDisk.containsKey(StoreConstants.share);
 
   String get previousAppVersion =>
-      _getString(_StoreConstants.previousAppVersion);
+      _getString(StoreConstants.previousAppVersion);
 
   set previousAppVersion(String value) {
-    _storeFromDisk.setString(_StoreConstants.previousAppVersion, value);
+    _storeFromDisk.setString(StoreConstants.previousAppVersion, value);
   }
 
-  bool get keepLogs => _getBool(_StoreConstants.keepLogs, true);
+  bool get keepLogs => _getBool(StoreConstants.keepLogs, true);
 
   set keepLogs(bool value) {
-    _storeFromDisk.setBool(_StoreConstants.keepLogs, value);
+    _storeFromDisk.setBool(StoreConstants.keepLogs, value);
     notifyListeners();
   }
 
-  String get taskSelection => _getString(_StoreConstants.taskSelection);
+  String get taskSelection => _getString(StoreConstants.taskSelection);
 
   set taskSelection(String value) {
-    _storeFromDisk.setString(_StoreConstants.taskSelection, value);
+    _storeFromDisk.setString(StoreConstants.taskSelection, value);
   }
+
+  int get testMinDuration => _getInt(StoreConstants.testMinDuration);
 }
 
-class _StoreConstants {
+class StoreConstants {
   static const share = 'share';
   static const submissionMode = 'submission mode';
+  static const artificialCPULoadEnabled = 'artificial cpu load enabled';
   static const offlineMode = 'offline mode';
   static const testMode = 'test mode';
   static const cooldown = 'cooldown';
@@ -121,4 +133,5 @@ class _StoreConstants {
   static const previousAppVersion = 'previous app version';
   static const keepLogs = 'keep_logs';
   static const taskSelection = 'disabled_tasks';
+  static const testMinDuration = 'test min duration';
 }
