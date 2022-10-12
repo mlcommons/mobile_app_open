@@ -67,7 +67,7 @@ class DeviceInfo {
     final modelCode = deviceInfo.model;
     String? modelName;
     if (modelCode != null) {
-      deviceNames.getSingleNameFromModel(DeviceType.android, modelCode);
+      modelName = deviceNames.getSingleNameFromModel(DeviceType.android, modelCode);
     }
     return DeviceInfo(
       manufacturer: deviceInfo.manufacturer,
