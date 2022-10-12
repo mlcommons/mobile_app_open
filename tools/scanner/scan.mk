@@ -22,6 +22,7 @@ ifdef SONAR_OUT_DIR
 	scanner_docker_args=\
 		--env SONAR_OUT_DIR=${SONAR_OUT_DIR} \
 		--env SONAR_TOKEN=${SONAR_TOKEN} \
+		--env GITHUB_TOKEN=${GITHUB_TOKEN} \
 		--env PR_NUMBER=${PR_NUMBER} \
 		--env PR_BRANCH=${PR_BRANCH} \
 		--env PR_BASE=${PR_BASE}
@@ -63,6 +64,7 @@ scanner/scan:
 		-Dsonar.pullrequest.provider=github \
 		-Dsonar.pullrequest.github.endpoint=https://api.github.com/ \
 		-Dsonar.pullrequest.github.repository=mlcommons/mobile_app_open \
+		-Dsonar.pullrequest.github.token.secured=${GITHUB_TOKEN} \
 		-Dsonar.pullrequest.key=${PR_NUMBER} \
 		-Dsonar.pullrequest.branch=${PR_BRANCH} \
 		-Dsonar.pullrequest.base=${PR_BASE}
