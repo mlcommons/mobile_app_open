@@ -47,6 +47,8 @@ flutter_common_docker_flags= \
 		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
 		--env FLUTTER_BUILD_NUMBER=${FLUTTER_BUILD_NUMBER} \
 		--env FLUTTER_FORCE_PUB_GET=1 \
+		--env FLUTTER_DATA_FOLDER=${FLUTTER_DATA_FOLDER} \
+		--env FLUTTER_CACHE_FOLDER=${FLUTTER_CACHE_FOLDER} \
 		${proxy_docker_args} \
 		${backend_qti_flutter_docker_args} \
 		${backend_samsung_docker_args} \

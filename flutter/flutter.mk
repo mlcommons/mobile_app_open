@@ -49,6 +49,18 @@ flutter/check/build-number:
 	@[ -n "$$FLUTTER_BUILD_NUMBER" ] \
 		|| (echo FLUTTER_BUILD_NUMBER env must be explicitly set; exit 1)
 
+ifneq (${FLUTTER_DATA_FOLDER},)
+flutter_data_folder_arg="--dart-define=default-data-folder=${FLUTTER_DATA_FOLDER}"
+else
+flutter_data_folder_arg=
+endif
+ifneq (${FLUTTER_CACHE_FOLDER},)
+flutter_cache_folder_arg="--dart-define=default-cache-folder=${FLUTTER_CACHE_FOLDER}"
+else
+flutter_cache_folder_arg=
+endif
+flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
+
 .PHONY: flutter/backend-list
 flutter/backend-list:
 	cat flutter/lib/backend/list.in | sed \
@@ -195,13 +207,25 @@ flutter_test_device_arg=
 endif
 .PHONY: flutter/test/integration
 flutter/test/integration:
-	cd flutter && ${_start_args} flutter --no-version-check test integration_test ${flutter_test_device_arg} ${flutter_official_build_arg}
+	cd flutter && ${_start_args} \
+		flutter --no-version-check \
+		test \
+		integration_test \
+		${flutter_folder_args} \
+		${flutter_test_device_arg} \
+		${flutter_official_build_arg}
 
 .PHONY: flutter/run
 flutter/run:
-	cd flutter && ${_start_args} flutter --no-version-check run ${flutter_test_device_arg} ${flutter_official_build_arg}
+	cd flutter && ${_start_args} \
+		flutter --no-version-check \
+		run \
+		${flutter_folder_args} \
+		${flutter_test_device_arg} \
+		${flutter_official_build_arg}
 
 .PHONY: flutter/clean
 flutter/clean:
 	cd flutter && ${_start_args} flutter --no-version-check clean
 	rm -rf output/flutter/pub
+

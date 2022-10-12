@@ -63,7 +63,7 @@ flutter/windows/release/copy-dlls:
 .PHONY: flutter/windows/release/build
 flutter/windows/release/build:
 	rm -rf flutter/build/windows/runner/Release
-	cd flutter && ${_start_args} flutter --no-version-check build windows ${flutter_official_build_arg}
+	cd flutter && ${_start_args} flutter --no-version-check build windows ${flutter_official_build_arg} ${flutter_folder_args}
 
 .PHONY: flutter/windows/release/name
 flutter/windows/release/name:
