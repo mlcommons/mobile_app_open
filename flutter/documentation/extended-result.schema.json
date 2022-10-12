@@ -78,6 +78,12 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "os_name": {
+                    "type": "string"
+                },
+                "os_version": {
+                    "type": "string"
+                },
                 "manufacturer": {
                     "type": "string"
                 },
@@ -85,12 +91,6 @@
                     "type": "string"
                 },
                 "model_name": {
-                    "type": "string"
-                },
-                "os_name": {
-                    "type": "string"
-                },
-                "os_version": {
                     "type": "string"
                 },
                 "soc_info": {
@@ -323,16 +323,16 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "value": {
+                "normalized": {
                     "type": "number"
                 },
-                "string": {
+                "formatted": {
                     "type": "string"
                 }
             },
             "required": [
-                "string",
-                "value"
+                "formatted",
+                "normalized"
             ],
             "title": "Accuracy"
         },

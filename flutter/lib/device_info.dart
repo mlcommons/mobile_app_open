@@ -2,18 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
-import 'package:mlperfbench_common/data/environment/os_enum.dart';
 import 'package:process_run/shell.dart';
 
 import 'package:mlperfbench/backend/bridge/ffi_cpuinfo.dart';
 
 class DeviceInfo {
-  final String modelCode;
-  final String modelName;
-  final String manufacturer;
+  final String? modelCode;
+  final String? modelName;
+  final String? manufacturer;
   final EnvAndroidInfo? androidInfo;
 
   static late final String nativeLibraryPath;
@@ -56,13 +55,17 @@ class DeviceInfo {
   static Future<DeviceInfo> _makeIosInfo() async {
     final deviceInfo = await DeviceInfoPlugin().iosInfo;
     final deviceNames = DeviceMarketingNames();
-
+    final modelCode = deviceInfo.utsname.machine;
+    String? modelName;
+    var machine = deviceInfo.utsname.machine;
+    if (machine != null) {
+      modelName = deviceNames.getSingleNameFromModel(DeviceType.ios, machine);
+    }
     return DeviceInfo(
       manufacturer: 'Apple',
-      modelCode: deviceInfo.utsname.machine,
-      modelName: deviceNames.getSingleNameFromModel(
-          DeviceType.ios, deviceInfo.utsname.machine),
       androidInfo: null,
+      modelCode: modelCode,
+      modelName: modelName,
     );
   }
 
@@ -80,14 +83,19 @@ class DeviceInfo {
       buildBoard: deviceInfo.board,
     );
 
+    final modelCode = deviceInfo.model;
+    String? modelName;
+    if (modelCode != null) {
+      modelName =
+          deviceNames.getSingleNameFromModel(DeviceType.android, modelCode);
+    }
     return DeviceInfo(
       // deviceInfo.manufacturer is usually a human-readable string with proper capitalisation
       // deviceInfo.brand seems to be machine-readable string because it tends to be all lower-case letters
       manufacturer: deviceInfo.manufacturer,
-      modelCode: deviceInfo.model,
-      modelName: deviceNames.getSingleNameFromModel(
-          DeviceType.android, deviceInfo.model),
       androidInfo: androidInfo,
+      modelCode: modelCode,
+      modelName: modelName,
     );
   }
 
@@ -102,7 +110,7 @@ class DeviceInfo {
 
   static EnvironmentInfo get environmentInfo {
     return EnvironmentInfo(
-      osName: OsName.fromJson(Platform.operatingSystem),
+      osName: EnvironmentInfo.parseOs(Platform.operatingSystem),
       osVersion: Platform.operatingSystemVersion,
       manufacturer: DeviceInfo.instance.manufacturer,
       modelCode: DeviceInfo.instance.modelCode,

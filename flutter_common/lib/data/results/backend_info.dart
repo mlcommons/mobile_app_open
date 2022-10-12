@@ -1,33 +1,23 @@
-class BackendReportedInfo {
-  static const String _tagFilename = 'filename';
-  static const String _tagVendorName = 'vendor_name';
-  static const String _tagBackendName = 'backend_name';
-  static const String _tagAcceleratorName = 'accelerator_name';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'backend_info.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class BackendReportedInfo {
   final String filename;
-  final String vendor;
-  final String name;
-  final String accelerator;
+  final String vendorName;
+  final String backendName;
+  final String acceleratorName;
 
   BackendReportedInfo({
     required this.filename,
-    required this.vendor,
-    required this.name,
-    required this.accelerator,
+    required this.vendorName,
+    required this.backendName,
+    required this.acceleratorName,
   });
 
-  BackendReportedInfo.fromJson(Map<String, dynamic> json)
-      : this(
-          filename: json[_tagFilename] as String,
-          vendor: json[_tagVendorName] as String,
-          name: json[_tagBackendName] as String,
-          accelerator: json[_tagAcceleratorName] as String,
-        );
+  factory BackendReportedInfo.fromJson(Map<String, dynamic> json) =>
+      _$BackendReportedInfoFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagFilename: filename,
-        _tagVendorName: vendor,
-        _tagBackendName: name,
-        _tagAcceleratorName: accelerator,
-      };
+  Map<String, dynamic> toJson() => _$BackendReportedInfoToJson(this);
 }

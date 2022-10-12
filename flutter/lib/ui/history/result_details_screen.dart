@@ -31,15 +31,28 @@ class _DetailsScreen extends State<DetailsScreen> {
     );
   }
 
+  double calculateAverageThroughput(List<BenchmarkExportResult> results) {
+    var throughput = 0.0;
+    var count = 0;
+    for (var item in results) {
+      if (item.performanceRun == null) {
+        continue;
+      }
+      throughput += item.performanceRun!.throughput!;
+      count++;
+    }
+    return throughput / count;
+  }
+
   List<Widget> _makeBody() {
     final res = widget.result;
 
-    final firstResult = res.results.list.first;
-    final date = helper.formatDate(firstResult.performance!.startDatetime);
-    final backendName = firstResult.backendInfo.name;
+    final firstResult = res.results.first;
+    final date = helper.formatDate(firstResult.performanceRun!.startDatetime);
+    final backendName = firstResult.backendInfo.backendName;
 
     final averageThroughput =
-        res.results.calculateAverageThroughput().toStringAsFixed(2);
+        calculateAverageThroughput(res.results).toStringAsFixed(2);
 
     final appVersionType =
         (res.buildInfo.gitDirtyFlag || res.buildInfo.devTestFlag)
@@ -52,10 +65,10 @@ class _DetailsScreen extends State<DetailsScreen> {
         .replaceFirst('<build>', res.buildInfo.buildNumber)
         .replaceFirst('<buildType>', appVersionType);
 
-    final modelDescription = res.envInfo.manufacturer.isEmpty
-        ? res.envInfo.modelName
-        : '${res.envInfo.manufacturer} ${res.envInfo.modelName}';
-    final socDescription = res.envInfo.socInfo.cpuinfo.socName;
+    final modelDescription = res.environmentInfo.manufacturer?.isEmpty ?? true
+        ? res.environmentInfo.modelName ?? 'Unknown'
+        : '${res.environmentInfo.manufacturer} ${res.environmentInfo.modelName}';
+    final socDescription = res.environmentInfo.socInfo.cpuinfo.socName;
 
     return [
       helper.makeInfo(l10n.historyDetailsDate, date),
@@ -67,7 +80,7 @@ class _DetailsScreen extends State<DetailsScreen> {
       helper.makeInfo(l10n.historyDetailsSocName, socDescription),
       const Divider(),
       helper.makeHeader(l10n.historyDetailsTableTitle),
-      makeBenchmarkTable(context, res.results.list),
+      makeBenchmarkTable(context, res.results),
     ];
   }
 
@@ -96,11 +109,11 @@ class _DetailsScreen extends State<DetailsScreen> {
     return RowData(
       isHeader: false,
       name: runInfo.benchmarkName,
-      throughput: runInfo.performance?.throughput?.toStringAsFixed(2) ??
+      throughput: runInfo.performanceRun?.throughput?.toStringAsFixed(2) ??
           l10n.resultsNotAvailable,
-      throughputValid: runInfo.performance?.loadgenInfo?.validity ?? false,
+      throughputValid: runInfo.performanceRun?.loadgenInfo?.validity ?? false,
       accuracy:
-          runInfo.accuracy?.accuracy?.formatted ?? l10n.resultsNotAvailable,
+          runInfo.accuracyRun?.accuracy?.formatted ?? l10n.resultsNotAvailable,
       onTap: () {
         Navigator.push(
           context,

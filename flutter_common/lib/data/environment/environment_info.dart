@@ -1,18 +1,16 @@
-import 'os_enum.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'environment_info.g.dart';
+
+enum OsEnum { android, ios, windows }
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class EnvironmentInfo {
-  static const String _tagOsEnum = 'os_name';
-  static const String _tagOsVersion = 'os_version';
-  static const String _tagManufacturer = 'manufacturer';
-  static const String _tagModelCode = 'model_code';
-  static const String _tagModelName = 'model_name';
-  static const String _tagSocInfo = 'soc_info';
-
-  final OsName osName;
+  final OsEnum osName;
   final String osVersion;
-  final String manufacturer;
-  final String modelCode;
-  final String modelName;
+  final String? manufacturer;
+  final String? modelCode;
+  final String? modelName;
   final EnvSocInfo socInfo;
 
   EnvironmentInfo({
@@ -24,26 +22,19 @@ class EnvironmentInfo {
     required this.socInfo,
   });
 
-  EnvironmentInfo.fromJson(Map<String, dynamic> json)
-      : this(
-          osName: OsName.fromJson(json[_tagOsEnum] as String),
-          osVersion: json[_tagOsVersion] as String,
-          manufacturer: json[_tagManufacturer] as String,
-          modelCode: json[_tagModelCode] as String,
-          modelName: json[_tagModelName] as String,
-          socInfo: EnvSocInfo.fromJson(json[_tagSocInfo]),
-        );
+  factory EnvironmentInfo.fromJson(Map<String, dynamic> json) =>
+      _$EnvironmentInfoFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagManufacturer: manufacturer,
-        _tagModelCode: modelCode,
-        _tagModelName: modelName,
-        _tagOsEnum: osName,
-        _tagOsVersion: osVersion,
-        _tagSocInfo: socInfo,
-      };
+  Map<String, dynamic> toJson() => _$EnvironmentInfoToJson(this);
+
+  static OsEnum parseOs(String name) {
+    return _$OsEnumEnumMap.entries
+        .firstWhere((element) => element.value == name)
+        .key;
+  }
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class EnvSocInfo {
   static const String _tagCpuinfo = 'cpuinfo';
   static const String _tagAndroidInfo = 'android_info';
@@ -56,20 +47,13 @@ class EnvSocInfo {
     required this.androidInfo,
   });
 
-  EnvSocInfo.fromJson(Map<String, dynamic> json)
-      : this(
-          cpuinfo: EnvCpuinfo.fromJson(json[_tagCpuinfo]),
-          androidInfo: json[_tagAndroidInfo] == null
-              ? null
-              : EnvAndroidInfo.fromJson(json[_tagAndroidInfo]),
-        );
+  factory EnvSocInfo.fromJson(Map<String, dynamic> json) =>
+      _$EnvSocInfoFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagCpuinfo: cpuinfo,
-        _tagAndroidInfo: androidInfo,
-      };
+  Map<String, dynamic> toJson() => _$EnvSocInfoToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class EnvCpuinfo {
   static const String _tagSocName = 'soc_name';
   final String socName;
@@ -78,16 +62,13 @@ class EnvCpuinfo {
     required this.socName,
   });
 
-  EnvCpuinfo.fromJson(Map<String, dynamic> json)
-      : this(
-          socName: json[_tagSocName],
-        );
+  factory EnvCpuinfo.fromJson(Map<String, dynamic> json) =>
+      _$EnvCpuinfoFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagSocName: socName,
-      };
+  Map<String, dynamic> toJson() => _$EnvCpuinfoToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class EnvAndroidInfo {
   static const String _tagPropSocModel = 'prop_soc_model';
   static const String _tagPropSocManufacturer = 'prop_soc_manufacturer';
@@ -95,7 +76,7 @@ class EnvAndroidInfo {
 
   final String propSocModel;
   final String propSocManufacturer;
-  final String buildBoard;
+  final String? buildBoard;
 
   EnvAndroidInfo({
     required this.propSocModel,
@@ -103,16 +84,8 @@ class EnvAndroidInfo {
     required this.buildBoard,
   });
 
-  EnvAndroidInfo.fromJson(Map<String, dynamic> json)
-      : this(
-          propSocModel: json[_tagPropSocModel],
-          propSocManufacturer: json[_tagPropSocManufacturer],
-          buildBoard: json[_tagBuildBoard],
-        );
+  factory EnvAndroidInfo.fromJson(Map<String, dynamic> json) =>
+      _$EnvAndroidInfoFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        _tagPropSocModel: propSocModel,
-        _tagPropSocManufacturer: propSocManufacturer,
-        _tagBuildBoard: buildBoard,
-      };
+  Map<String, dynamic> toJson() => _$EnvAndroidInfoToJson(this);
 }

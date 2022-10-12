@@ -20,5 +20,6 @@ __pycache__/
 *.iml
 *.env
 
+*.g.dart
 *.gen.dart
 *.gen.h

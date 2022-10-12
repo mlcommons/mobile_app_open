@@ -61,8 +61,8 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
                   _makeTable(<TableRow>[
                     _makeTableRow(
                         const Text('Result UUID'), Text(result.meta.uuid)),
-                    _makeTableRow(const Text('Average throughput'),
-                        Text('${result.results.calculateAverageThroughput()}')),
+                    // _makeTableRow(const Text('Average throughput'),
+                    //     Text('${result.results.calculateAverageThroughput()}')),
                     _makeTableRow(
                         const Text('Upload date'),
                         Text(result.meta.uploadDate!
@@ -70,7 +70,7 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
                             .toIso8601String())),
                   ]),
                   const SizedBox(height: 20),
-                  _makeEnvTable(result.envInfo),
+                  _makeEnvTable(result.environmentInfo),
                   const SizedBox(height: 20),
                   _makeBuildInfoTable(result.buildInfo),
                   const SizedBox(height: 20),
@@ -84,9 +84,9 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
     );
   }
 
-  List<Widget> _makeResults(BenchmarkExportResultList list) {
+  List<Widget> _makeResults(List<BenchmarkExportResult> list) {
     final result = <Widget>[];
-    for (var item in list.list) {
+    for (var item in list) {
       result.add(_makeBenchTable(item));
       result.add(const SizedBox(height: 20));
     }
@@ -114,10 +114,12 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
         _makeTableRow(const Text('Operation system'),
             Text(info.osName.toString())), // TODO
         _makeTableRow(const Text('OS version'), Text(info.osVersion)),
+        _makeTableRow(const Text('Device manufacturer'),
+            Text(info.manufacturer ?? 'unknown')),
         _makeTableRow(
-            const Text('Device manufacturer'), Text(info.manufacturer)),
-        _makeTableRow(const Text('Device model code'), Text(info.modelCode)),
-        _makeTableRow(const Text('Device model name'), Text(info.modelName)),
+            const Text('Device model code'), Text(info.modelCode ?? 'unknown')),
+        _makeTableRow(
+            const Text('Device model name'), Text(info.modelName ?? 'unknown')),
       ],
     );
   }
@@ -143,12 +145,13 @@ class ResultDetailsPageState extends State<ResultDetailsPage> {
         _makeTableRow(const Text('Benchmark'),
             Text(info.benchmarkName)), // TODO replace with proper name
         _makeTableRow(const Text('Throughput'),
-            Text(info.performance?.throughput.toString() ?? 'N/A')),
+            Text(info.performanceRun?.throughput.toString() ?? 'N/A')),
         _makeTableRow(const Text('Accuracy'),
-            Text(info.accuracy?.accuracy.toString() ?? 'N/A')),
-        _makeTableRow(const Text('Backend name'), Text(info.backendInfo.name)),
+            Text(info.accuracyRun?.accuracy.toString() ?? 'N/A')),
         _makeTableRow(
-            const Text('Accelerator'), Text(info.backendInfo.accelerator)),
+            const Text('Backend name'), Text(info.backendInfo.backendName)),
+        _makeTableRow(
+            const Text('Accelerator'), Text(info.backendInfo.acceleratorName)),
       ],
     );
   }

@@ -25,8 +25,8 @@ class BackendInfo {
       }
       final backendSettings = backendMatch(
         libPath: path,
-        manufacturer: DeviceInfo.instance.manufacturer,
-        model: DeviceInfo.instance.modelCode,
+        manufacturer: DeviceInfo.instance.manufacturer ?? '',
+        model: DeviceInfo.instance.modelCode ?? '',
       );
       if (backendSettings != null) {
         return BackendInfo._(backendSettings, path);
