@@ -52,7 +52,7 @@ scanner/build:
 # TODO (anhappdev): Use MLCommons organization
 .PHONY: scanner/scan
 scanner/scan:
-	sonar-scanner \
+	sonar-scanner -X \
 		-Dsonar.organization=anhappdev \
 		-Dsonar.projectKey=mobile_app_open \
 		-Dsonar.sources=. \
