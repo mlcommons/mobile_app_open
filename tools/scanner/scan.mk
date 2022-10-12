@@ -59,6 +59,8 @@ scanner/scan:
 		-Dsonar.cfamily.build-wrapper-output="${SONAR_OUT_DIR}" \
 		-Dsonar.host.url=https://sonarcloud.io \
 		-Dsonar.scm.provider=git \
+		-Dsonar.pullrequest.provider=github \
+		-Dsonar.pullrequest.github.repository=mlcommons/mobile_app_open \
 		-Dsonar.pullrequest.key=${PR_NUMBER} \
 		-Dsonar.pullrequest.branch=${PR_BRANCH} \
 		-Dsonar.pullrequest.base=${PR_BASE}
