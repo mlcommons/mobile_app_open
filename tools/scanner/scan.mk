@@ -49,12 +49,11 @@ scanner/build:
 	build-wrapper-linux-x86-64 --out-dir "${SONAR_OUT_DIR}" \
 		make flutter/android
 
-# TODO (anhappdev): Use MLCommons organization
 .PHONY: scanner/scan
 scanner/scan:
 	sonar-scanner -X \
-		-Dsonar.organization=anhappdev \
-		-Dsonar.projectKey=mobile_app_open \
+		-Dsonar.organization=mlcommons \
+		-Dsonar.projectKey=mlcommons_mobile_app_open \
 		-Dsonar.sources=. \
 		-Dsonar.python.version="3.8, 3.9, 3.10" \
 		-Dsonar.cfamily.build-wrapper-output="${SONAR_OUT_DIR}" \
