@@ -5,6 +5,7 @@ build --announce_rc
 
 build --config=short_logs
 build --verbose_failures
+build --spawn_strategy=standalone
 
 # This flag is required by tensorflow
 common --experimental_repo_remote_exec

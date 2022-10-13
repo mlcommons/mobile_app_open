@@ -25,6 +25,7 @@ limitations under the License.
 #include "flutter/cpp/datasets/ade20k.h"
 #include "flutter/cpp/datasets/coco.h"
 #include "flutter/cpp/datasets/imagenet.h"
+#include "flutter/cpp/datasets/snu_sr.h"
 #include "flutter/cpp/datasets/squad.h"
 #include "flutter/cpp/mlperf_driver.h"
 #include "flutter/cpp/proto/mlperf_task.pb.h"
@@ -60,6 +61,8 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
     return DatasetConfig::SQUAD;
   } else if (absl::EqualsIgnoreCase(name, "ADE20K")) {
     return DatasetConfig::ADE20K;
+  } else if (absl::EqualsIgnoreCase(name, "SNUSR")) {
+    return DatasetConfig::SNUSR;
   } else if (absl::EqualsIgnoreCase(name, "DUMMY")) {
     return DatasetConfig::NONE;
   } else {
@@ -70,7 +73,7 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
 
 }  // namespace
 
-int Main(int argc, char* argv[]) {
+int Main(int argc, char *argv[]) {
   using tflite::Flag;
   using tflite::Flags;
   std::string command_line = argv[0];
@@ -82,10 +85,11 @@ int Main(int argc, char* argv[]) {
       Flag::CreateFlag("backend", &backend_name,
                        "Backend. Only TFLite is supported at the moment.",
                        Flag::kPositional),
-      Flag::CreateFlag("dataset", &dataset_name,
-                       "Dataset. One of ade20k, imagenet, coco, or squad.",
-                       Flag::kPositional)};
-  Flags::Parse(&argc, const_cast<const char**>(argv), flag_list);
+      Flag::CreateFlag(
+          "dataset", &dataset_name,
+          "Dataset. One of ade20k, imagenet, coco, squad, or snusr",
+          Flag::kPositional)};
+  Flags::Parse(&argc, const_cast<const char **>(argv), flag_list);
   backend_type = Str2BackendType(backend_name);
   dataset_type = Str2DatasetType(dataset_name);
   if (backend_type == BackendType::NONE) {
@@ -141,8 +145,8 @@ int Main(int argc, char* argv[]) {
            Flag::CreateFlag("scenario", &scenario,
                             "Scenario to run the benchmark.")});
 
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), flag_list)) {
-        const char* pbdata;
+      if (Flags::Parse(&argc, const_cast<const char **>(argv), flag_list)) {
+        const char *pbdata;
         std::string msg = mlperf::mobile::BackendFunctions::isSupported(
             lib_path, "", model_file_path, &pbdata);
         std::string backend_setting_string(pbdata, strlen(pbdata));
@@ -167,6 +171,10 @@ int Main(int argc, char* argv[]) {
           case DatasetConfig::ADE20K:
             benchmark_id = "image_segmentation_v1";
             break;
+          // Need to check this
+          case DatasetConfig::SNUSR:
+            benchmark_id = "IS_uint8";
+            break;
           case DatasetConfig::NONE:
           default:
             LOG(INFO) << "how come";
@@ -181,7 +189,7 @@ int Main(int argc, char* argv[]) {
                          ? 1
                          : setting_list.benchmark_setting().batch_size();
 
-        ExternalBackend* external_backend = new ExternalBackend(
+        ExternalBackend *external_backend = new ExternalBackend(
             model_file_path, lib_path, setting_list, native_lib_path);
         backend.reset(external_backend);
       }
@@ -215,7 +223,7 @@ int Main(int argc, char* argv[]) {
           Flag::CreateFlag("batch_size", &batch_size, "Batch size."),
 
       };
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new Imagenet(backend.get(), images_directory,
                                    groundtruth_file, offset, image_width,
@@ -246,7 +254,7 @@ int Main(int argc, char* argv[]) {
                            "The width of the processed image."),
           Flag::CreateFlag("image_height", &image_height,
                            "The height of the processed image.")};
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new Coco(backend.get(), images_directory,
                                groundtruth_file, offset, num_classes,
@@ -270,7 +278,7 @@ int Main(int argc, char* argv[]) {
               Flag::kRequired),
       };
 
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new Squad(backend.get(), input_tfrecord, gt_tfrecord));
       }
@@ -294,11 +302,42 @@ int Main(int argc, char* argv[]) {
                            "The width of the processed image."),
           Flag::CreateFlag("image_height", &image_height,
                            "The height of the processed image.")};
-      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new ADE20K(backend.get(), images_directory,
                                  ground_truth_directory, num_classes,
                                  image_width, image_height));
+      }
+      // Adds to flag_list for showing help.
+      flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                       dataset_flags.end());
+    } break;
+    case DatasetConfig::SNUSR: {
+      LOG(INFO) << "Using SNU SR dataset";
+      std::string images_directory, ground_truth_directory;
+      // Number of channels
+      int scale = 2;
+      int num_channels = 3;
+      int image_width = 960;
+      int image_height = 540;
+      std::vector<Flag> dataset_flags{
+          Flag::CreateFlag("images_directory", &images_directory,
+                           "Path to ground truth images.", Flag::kRequired),
+          Flag::CreateFlag("ground_truth_directory", &ground_truth_directory,
+                           "Path to the imagenet ground truth file.",
+                           Flag::kRequired),
+          Flag::CreateFlag("image_width", &image_width,
+                           "The width of the processed image."),
+          Flag::CreateFlag("image_height", &image_height,
+                           "The height of the processed image."),
+          Flag::CreateFlag("n_channels", &num_channels,
+                           "The number of color channels."),
+          Flag::CreateFlag("scale", &scale, "Super-resolution scale factor")};
+      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+          backend) {
+        dataset.reset(new SNUSR(backend.get(), images_directory,
+                                     ground_truth_directory, num_channels,
+                                     scale, image_width, image_height));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),
@@ -338,4 +377,4 @@ int Main(int argc, char* argv[]) {
 }  // namespace mobile
 }  // namespace mlperf
 
-int main(int argc, char* argv[]) { return mlperf::mobile::Main(argc, argv); }
+int main(int argc, char *argv[]) { return mlperf::mobile::Main(argc, argv); }

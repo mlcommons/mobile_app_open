@@ -54,6 +54,7 @@ cc_binary(
         "//flutter/cpp/datasets:ade20k",
         "//flutter/cpp/datasets:coco",
         "//flutter/cpp/datasets:imagenet",
+        "//flutter/cpp/datasets:snu_sr",
         "//flutter/cpp/datasets:squad",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
         "@com_google_absl//absl/strings",

@@ -148,3 +148,21 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:image_preprocessing_stage",
     ],
 )
+
+cc_library(
+    name = "snu_sr",
+    srcs = ["snu_sr.cc"],
+    hdrs = [
+        "snu_sr.h",
+    ],
+    deps = [
+        ":allocator",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp:utils",
+        "//flutter/cpp/backends:external",
+        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:image_preprocessing_stage",
+    ],
+)
