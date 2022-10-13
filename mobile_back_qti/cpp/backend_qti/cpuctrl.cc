@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,14 +24,13 @@ limitations under the License.
 #include <thread>
 #include <vector>
 
+#include "soc_utility.h"
 #include "tensorflow/core/platform/logging.h"
 
 using namespace std::chrono;
 
 #define SET_AFFINITY(a, b) sched_setaffinity(gettid(), a, b)
 #define GET_AFFINITY(a, b) sched_getaffinity(gettid(), a, b)
-
-static uint32_t soc_id_ = 0;
 
 static bool active_ = false;
 static uint32_t loadOffTime_ = 2;
@@ -82,100 +81,27 @@ void CpuCtrl::normalLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetall_); }
 
 void CpuCtrl::highLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetHigh_); }
 
-bool CpuCtrl::isSnapDragon(const char *manufacturer) {
-  bool is_qcom = false;
+void CpuCtrl::init() {
+  std::vector<uint32_t> allcores;
+  std::vector<uint32_t> low_latency_cores;
+  std::vector<uint32_t> high_latency_cores;
+  int maxcores = 0;
+  Socs::define_soc(allcores, low_latency_cores, high_latency_cores, maxcores);
 
-  if (strncmp("QUALCOMM", manufacturer, 7) == 0) {
-    // This is a test device
-    LOG(INFO) << "QTI test device detected";
-    is_qcom = true;
-  } else {
-    static EGLint const attribute_list[] = {EGL_RED_SIZE,  1, EGL_GREEN_SIZE, 1,
-                                            EGL_BLUE_SIZE, 1, EGL_NONE};
-
-    EGLDisplay display;
-    EGLConfig config;
-    EGLContext context;
-    EGLSurface surface;
-    EGLint num_config;
-
-    /* get an EGL display connection */
-    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    /* initialize the EGL display connection */
-    eglInitialize(display, NULL, NULL);
-    /* get an appropriate EGL frame buffer configuration */
-    eglChooseConfig(display, attribute_list, &config, 1, &num_config);
-    /* create an EGL rendering context */
-    context = eglCreateContext(display, config, EGL_NO_CONTEXT, NULL);
-    /* connect the context to the surface */
-    eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, context);
-
-    const unsigned char *vendor = glGetString(GL_VENDOR);
-
-    if (strcmp("Qualcomm", (const char *)vendor) == 0) {
-      is_qcom = true;
-    }
-
-    LOG(INFO) << "vendor: " << vendor;
+  for (auto i = 0; i < maxcores; i++) {
+    allcores.emplace_back(i);
   }
-  return is_qcom;
-}
 
-uint32_t CpuCtrl::getSocId() {
-  if (soc_id_ == 0) {
-    std::ifstream in_file;
-    std::vector<char> line(5);
-    in_file.open("/sys/devices/soc0/soc_id");
-    if (in_file.fail()) {
-      in_file.open("/sys/devices/system/soc/soc0/id");
-    }
-    if (in_file.fail()) {
-      return 0;
-    }
-
-    in_file.read(line.data(), 5);
-    in_file.close();
-    soc_id_ = (uint32_t)std::atoi(line.data());
-
-    std::vector<uint32_t> allcores;
-    std::vector<uint32_t> low_latency_cores;
-    std::vector<uint32_t> high_latency_cores;
-    int maxcores = 0;
-    if (soc_id_ == SDM888 || soc_id_ == SDM865 || soc_id_ == SDM778 ||
-        soc_id_ == SD8G1) {
-      high_latency_cores.emplace_back(0);
-      high_latency_cores.emplace_back(1);
-      high_latency_cores.emplace_back(2);
-      high_latency_cores.emplace_back(3);
-      maxcores = 8;
-    }
-
-    if (soc_id_ == SDM888 || soc_id_ == SDM865 || soc_id_ == SDM778 ||
-        soc_id_ == SD8G1) {
-      low_latency_cores.emplace_back(4);
-      low_latency_cores.emplace_back(5);
-      low_latency_cores.emplace_back(6);
-      low_latency_cores.emplace_back(7);
-      maxcores = 8;
-    }
-
-    for (auto i = 0; i < maxcores; i++) {
-      allcores.emplace_back(i);
-    }
-
-    CPU_ZERO(&cpusetLow_);
-    for (auto core : low_latency_cores) {
-      CPU_SET(core, &cpusetLow_);
-    }
-    CPU_ZERO(&cpusetHigh_);
-    for (auto core : high_latency_cores) {
-      CPU_SET(core, &cpusetHigh_);
-    }
-    CPU_ZERO(&cpusetall_);
-    for (auto core : allcores) {
-      CPU_SET(core, &cpusetall_);
-    }
+  CPU_ZERO(&cpusetLow_);
+  for (auto core : low_latency_cores) {
+    CPU_SET(core, &cpusetLow_);
   }
-  LOG(INFO) << "SOC ID is " << soc_id_;
-  return soc_id_;
+  CPU_ZERO(&cpusetHigh_);
+  for (auto core : high_latency_cores) {
+    CPU_SET(core, &cpusetHigh_);
+  }
+  CPU_ZERO(&cpusetall_);
+  for (auto core : allcores) {
+    CPU_SET(core, &cpusetall_);
+  }
 }

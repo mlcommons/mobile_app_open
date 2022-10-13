@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -115,6 +115,8 @@ class ChunkAllocator {
     }
   }
 
+  bool IsChunkEmpty() { return (block_list_.empty()); }
+
   void DumpAllocatorState() {
     printf("  ChunkSize %lu\n", chunk_size_);
     printf("  ChunksPerBlock %lu\n", chunks_per_block_);
@@ -162,27 +164,30 @@ class Allocator {
 
   static void useIonAllocator() {
     useIonBuffer = true;
-    LOG(INFO) << "Using Ion Allocator";
+    // LOG(INFO) << "Using Ion Allocator";
   }
 
   static void useDefaultAllocator() {
     useIonBuffer = false;
-    LOG(INFO) << "Using Default Allocator";
+    // LOG(INFO) << "Using Default Allocator";
   }
 };
 
 template <class T>
 bool Allocator<T>::useIonBuffer = true;
 
-static void *get_ion_buffer(size_t n) {
-  void *p = ChunkAllocator::GetBuffer(n, 3);
-  // LOG(INFO) << "QTI backend SNPE allocator " << n << " bytes at " << p;
+static void *get_ion_buffer(size_t n, int chunkSize = 3) {
+  void *p = ChunkAllocator::GetBuffer(n, chunkSize);
+  // LOG(INFO) << "QTI backend SNPE allocator " << n << " bytes at " << p << "
+  // with chunk size: " << chunkSize;
   return p;
 }
 
-static void *std_get_buffer(size_t n) {
+static void *std_get_buffer(size_t n, int chunkSize = 1) {
+  // chunkSize is always ignored. definition needs to be consistent with
+  // get_ion_buffer above
   void *p = std::malloc(n);
-  // LOG(INFO) << "QTI backend SDT allocator " << n << " bytes at " << p;
+  // LOG(INFO) << "QTI backend STD allocator " << n << " bytes at " << p;
   return p;
 }
 

@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ static void process_config(const mlperf_backend_configuration_t *configs,
   backend_data->loadOffTime_ = 2;
   backend_data->loadOnTime_ = 100;
   backend_data->useIonBuffers_ = true;
+  backend_data->acceleratorName_ = configs->accelerator_desc;
 
   std::string &delegate = backend_data->delegate_;
   delegate = configs->accelerator;
@@ -134,7 +135,8 @@ static void process_config(const mlperf_backend_configuration_t *configs,
             << " | inputBufferType: " << backend_data->inputBufferType_
             << " | outputBufferType: " << backend_data->outputBufferType_
             << " | perfProfile: " << perfProfile
-            << " | useIonBuffer: " << backend_data->useIonBuffers_;
+            << " | useIonBuffer: " << backend_data->useIonBuffers_
+            << " | acceleratorName: " << backend_data->acceleratorName_;
 }
 
 #endif
