@@ -80,9 +80,9 @@ bool AddBackendConfiguration(mlperf_backend_configuration_t *configs,
   }
   // Copy data in case of key, value deallocated.
   char *c_key = new char[key.length() + 1];
-  strcpy(c_key, key.c_str());
+  strlcpy(c_key, key.c_str(), sizeof(c_key));
   char *c_value = new char[value.length() + 1];
-  strcpy(c_value, value.c_str());
+  strlcpy(c_value, value.c_str(), sizeof(c_value));
   configs->keys[configs->count] = c_key;
   configs->values[configs->count] = c_value;
   configs->count++;
@@ -103,13 +103,15 @@ mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   mlperf_backend_configuration_t c_settings;
   char *accelerator =
       new char[settings.benchmark_setting().accelerator().length() + 1];
-  strcpy(accelerator, settings.benchmark_setting().accelerator().c_str());
+  strlcpy(accelerator, settings.benchmark_setting().accelerator().c_str(),
+          sizeof(accelerator));
   c_settings.accelerator = accelerator;
   c_settings.batch_size = settings.benchmark_setting().batch_size();
   char *accelerator_desc =
       new char[settings.benchmark_setting().accelerator_desc().length() + 1];
-  strcpy(accelerator_desc,
-         settings.benchmark_setting().accelerator_desc().c_str());
+  strlcpy(accelerator_desc,
+          settings.benchmark_setting().accelerator_desc().c_str(),
+          sizeof(accelerator_desc));
   c_settings.accelerator_desc = accelerator_desc;
 
   // Add common settings
