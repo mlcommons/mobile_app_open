@@ -48,8 +48,8 @@ inline TfLiteType DataType2TfType(DataType::Type type) {
 }  // namespace
 
 SNUSR::SNUSR(Backend *backend, const std::string &image_dir,
-                       const std::string &ground_truth_dir, int num_channels,
-                       int scale, int image_width, int image_height)
+             const std::string &ground_truth_dir, int num_channels, int scale,
+             int image_width, int image_height)
     : Dataset(backend),
       num_channels_(num_channels),
       scale_(scale),
@@ -94,8 +94,7 @@ SNUSR::SNUSR(Backend *backend, const std::string &image_dir,
   psnr_ = 0;
 }
 
-void SNUSR::LoadSamplesToRam(
-    const std::vector<QuerySampleIndex> &samples) {
+void SNUSR::LoadSamplesToRam(const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
     // Preprocessing.
     if (sample_idx >= image_list_.size()) {
@@ -125,8 +124,7 @@ void SNUSR::LoadSamplesToRam(
   }
 }
 
-void SNUSR::UnloadSamplesFromRam(
-    const std::vector<QuerySampleIndex> &samples) {
+void SNUSR::UnloadSamplesFromRam(const std::vector<QuerySampleIndex> &samples) {
   for (QuerySampleIndex sample_idx : samples) {
     for (std::vector<uint8_t, BackendAllocator<uint8_t>> *v :
          samples_.at(sample_idx)) {
@@ -136,8 +134,8 @@ void SNUSR::UnloadSamplesFromRam(
   }
 }
 
-std::vector<uint8_t> SNUSR::ProcessOutput(
-    const int sample_idx, const std::vector<void *> &outputs) {
+std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
+                                          const std::vector<void *> &outputs) {
   if (ground_truth_list_.empty()) {
     return std::vector<uint8_t>();
   }

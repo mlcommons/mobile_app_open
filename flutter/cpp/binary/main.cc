@@ -336,8 +336,8 @@ int Main(int argc, char *argv[]) {
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new SNUSR(backend.get(), images_directory,
-                                     ground_truth_directory, num_channels,
-                                     scale, image_width, image_height));
+                                ground_truth_directory, num_channels, scale,
+                                image_width, image_height));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),

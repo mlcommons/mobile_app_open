@@ -32,8 +32,8 @@ class SNUSR : public Dataset {
   // The order of images under image_dir should be the same as the original
   // IMAGEPAIRS dataset.
   SNUSR(Backend *backend, const std::string &image_dir,
-             const std::string &ground_truth_dir, int num_channels, int scale,
-             int image_width, int image_height);
+        const std::string &ground_truth_dir, int num_channels, int scale,
+        int image_width, int image_height);
 
   // Returns the name of the dataset.
   const std::string &Name() const override { return name_; }
