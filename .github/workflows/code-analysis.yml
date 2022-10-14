@@ -14,8 +14,6 @@ jobs:
   sonar:
     name: SonarScanner
     runs-on: ubuntu-20.04
-    permissions:
-      pull-requests: read
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
