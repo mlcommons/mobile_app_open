@@ -51,7 +51,7 @@ scanner/build:
 
 .PHONY: scanner/scan
 scanner/scan:
-	sonar-scanner -X \
+	sonar-scanner \
 		-Dsonar.organization=mlcommons \
 		-Dsonar.projectKey=mlcommons_mobile_app_open \
 		-Dsonar.sources=. \
