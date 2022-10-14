@@ -55,7 +55,7 @@ frameworks contributed by the broader MLPerf community.
 * mobile_back_apple - Apple backend (Core ML) for iOS
 * datasets - Contains scripts to prepare test and calibration data used for accuracy evaluation and model quantization
 * docs - contains documentation
-* tools - contains miscellaneous tools (e.g., formatting commands)
+* tools - contains miscellaneous tools (e.g. formatting commands, code scanner)
 
 ## Related Repositories
 
