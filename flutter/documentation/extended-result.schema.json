@@ -371,8 +371,8 @@
                 "accelerator_code",
                 "accelerator_desc",
                 "batch_size",
-                "framework",
                 "extra_settings",
+                "framework",
                 "model_path"
             ],
             "title": "BackendSettings"
