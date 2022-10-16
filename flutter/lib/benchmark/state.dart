@@ -547,7 +547,7 @@ class BenchmarkState extends ChangeNotifier {
         backendSettings: BackendSettingsInfo(
           acceleratorCode: actualSettings.benchmarkSetting.accelerator,
           acceleratorDesc: actualSettings.benchmarkSetting.acceleratorDesc,
-          configuration: actualSettings.benchmarkSetting.configuration,
+          framework: actualSettings.benchmarkSetting.framework,
           modelPath: actualSettings.benchmarkSetting.modelPath,
           batchSize: actualSettings.benchmarkSetting.batchSize,
           extraSettings: extraSettingsFromCommon(actualSettings.setting),

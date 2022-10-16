@@ -55,7 +55,7 @@ class SampleGenerator {
         backendSettings: BackendSettingsInfo(
           acceleratorCode: '',
           acceleratorDesc: '',
-          configuration: '',
+          framework: '',
           modelPath: '',
           batchSize: 0,
           extraSettings: <BackendExtraSetting>[
