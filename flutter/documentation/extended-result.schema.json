@@ -351,7 +351,7 @@
                 "accelerator_desc": {
                     "type": "string"
                 },
-                "configuration": {
+                "framework": {
                     "type": "string"
                 },
                 "model_path": {
@@ -371,7 +371,7 @@
                 "accelerator_code",
                 "accelerator_desc",
                 "batch_size",
-                "configuration",
+                "framework",
                 "extra_settings",
                 "model_path"
             ],
