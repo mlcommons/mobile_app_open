@@ -31,36 +31,36 @@ common_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification"
-  accelerator: "coreml"
-  accelerator_desc: "CoreML"
-  framework: "TFLite"
+  accelerator: "ane"
+  accelerator_desc: "ANE"
+  framework: "TFLite CoreML"
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
   model_checksum: "66bb4eba50987221608f8487ed405794"
 }
 
 benchmark_setting {
   benchmark_id: "object_detection"
-  accelerator: "coreml"
-  accelerator_desc: "CoreML"
-  framework: "TFLite"
+  accelerator: "ane"
+  accelerator_desc: "ANE"
+  framework: "TFLite CoreML"
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
   model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
 }
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
-  accelerator: "metal"
-  accelerator_desc: "Metal"
-  framework: "TFLite"
+  accelerator: "gpu"
+  accelerator_desc: "GPU"
+  framework: "TFLite Metal"
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
   model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
 }
 
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
-  accelerator: "coreml"
-  accelerator_desc: "CoreML"
-  framework: "TFLite"
+  accelerator: "ane"
+  accelerator_desc: "ANE"
+  framework: "TFLite CoreML"
   model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
   model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
 }
@@ -71,9 +71,9 @@ const std::string tflite_settings_apple_iphoneX = R"SETTINGS(
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "coreml"
-  accelerator_desc: "CoreML"
-  framework: "TFLite"
+  accelerator: "ane"
+  accelerator_desc: "ANE"
+  framework: "TFLite CoreML"
   batch_size: 32
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
   model_checksum: "66bb4eba50987221608f8487ed405794"
@@ -94,9 +94,9 @@ const std::string tflite_settings_apple_iphone11 = R"SETTINGS(
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "coreml"
-  accelerator_desc: "CoreML"
-  framework: "TFLite"
+  accelerator: "ane"
+  accelerator_desc: "ANE"
+  framework: "TFLite CoreML"
   batch_size: 64
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
   model_checksum: "66bb4eba50987221608f8487ed405794"
@@ -117,9 +117,9 @@ const std::string tflite_settings_apple_iphone12 = R"SETTINGS(
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "coreml"
-  accelerator_desc: "CoreML"
-  framework: "TFLite"
+  accelerator: "ane"
+  accelerator_desc: "ANE"
+  framework: "TFLite CoreML"
   batch_size: 8
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
   model_checksum: "66bb4eba50987221608f8487ed405794"
