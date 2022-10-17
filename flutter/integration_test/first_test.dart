@@ -55,19 +55,12 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   );
   expectedMap!;
 
-  // backends are not forced to follow backendSettingsInfo values
-  // we should use backendInfo.accelerator, it always represents real accelerator value
-  var accelerator = benchmarkResult.backendInfo.acceleratorName;
-  if (accelerator == 'ACCELERATOR_NAME') {
-    // some backends are yet to implement accelerator reporting
-    print('warning: accelerator missing, using acceleratorDesc');
-    accelerator = benchmarkResult.backendSettings.acceleratorDesc;
-  }
+  final accelerator = benchmarkResult.backendSettings.acceleratorCode;
+  final backendName = benchmarkResult.backendInfo.backendName;
   final expectedValue =
-      expectedMap['$accelerator+${benchmarkResult.backendInfo.backendName}'] ??
-          expectedMap[accelerator];
+      expectedMap['$accelerator|$backendName'] ?? expectedMap[accelerator];
   final tag =
-      '${benchmarkResult.benchmarkId}[$accelerator] (+${benchmarkResult.backendInfo.backendName})';
+      '${benchmarkResult.benchmarkId} [accelerator: $accelerator | backendName: $backendName]';
   expect(
     expectedValue,
     isNotNull,
