@@ -30,7 +30,7 @@ common_setting {
 benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
   configuration: "TFLite"
   batch_size: 1
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
@@ -40,7 +40,7 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
   framework: "TFLite"
   batch_size: 256
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
@@ -50,7 +50,7 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  accelerator_desc: "MediaTek NN accelerator + CPU via the Neuron Delegate"
   framework: "TFLite"
   batch_size: 1
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
@@ -60,7 +60,7 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  accelerator_desc: "MediaTek NN accelerator + VPU via the Neuron Delegate"
   framework: "TFLite"
   batch_size: 1
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_20200602.tflite"
@@ -70,7 +70,7 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "image_segmentation_v1"
   accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
   framework: "TFLite"
   batch_size: 1
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/deeplabv3_mnv2_ade20k_uint8.tflite"
