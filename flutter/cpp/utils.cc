@@ -91,6 +91,7 @@ bool AddBackendConfiguration(mlperf_backend_configuration_t *configs,
 
 void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs) {
   delete configs->accelerator;
+  delete configs->accelerator_desc;
   for (int i = 0; i < configs->count; ++i) {
     delete configs->keys[i];
     delete configs->values[i];
@@ -105,6 +106,11 @@ mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   strcpy(accelerator, settings.benchmark_setting().accelerator().c_str());
   c_settings.accelerator = accelerator;
   c_settings.batch_size = settings.benchmark_setting().batch_size();
+  char *accelerator_desc =
+      new char[settings.benchmark_setting().accelerator_desc().length() + 1];
+  strcpy(accelerator_desc,
+         settings.benchmark_setting().accelerator_desc().c_str());
+  c_settings.accelerator_desc = accelerator_desc;
 
   // Add common settings
   for (Setting s : settings.setting()) {

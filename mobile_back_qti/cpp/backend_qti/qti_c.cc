@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,8 +21,13 @@ limitations under the License.
 #include "mlperf_helper.h"
 #include "qti_backend_helper.h"
 #include "qti_settings.h"
+#include "soc_utility.h"
 #include "tensorflow/core/platform/logging.h"
 #include "tflite_c.h"
+#ifdef DEBUG_FLAG
+#include <chrono>
+using namespace std::chrono;
+#endif
 
 #define xverstr(a) verstr(a)
 #define verstr(a) #a
@@ -49,41 +54,10 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
   std::ifstream in_file;
 
   *not_allowed_message = nullptr;
-  bool isQSoC = CpuCtrl::isSnapDragon(device_info->manufacturer);
+  bool isQSoC = Socs::isSnapDragon(device_info->manufacturer);
   LOG(INFO) << "Is QTI SOC: " << isQSoC;
-
-  uint32_t soc_id = CpuCtrl::getSocId();
-  if (isQSoC && soc_id == 0) {
-    // it's a QTI SOC, but can't access soc_id
-    *not_allowed_message = "Unsupported app";
-    *settings = empty_settings.c_str();
-    return true;
-  }
-
-  // Check if this SoC is supported
   if (isQSoC) {
-    switch (soc_id) {
-      // it's a QTI SOC, and the chipset is supported
-      *not_allowed_message = nullptr;
-      case SDM865:
-        *settings = qti_settings_sdm865.c_str();
-        break;
-      case SDM888:
-        *settings = qti_settings_sdm888.c_str();
-        break;
-      case SDM778:
-        *settings = qti_settings_sdm778.c_str();
-        break;
-      case SD8G1:
-        *settings = qti_settings_sd8g1.c_str();
-        break;
-      default:
-        // it's a QTI SOC, but the chipset is not yet supported
-        *not_allowed_message = "Unsupported QTI SoC";
-        *settings = empty_settings.c_str();
-        break;
-    }
-    return true;
+    return Socs::soc_settings(settings, not_allowed_message);
   }
 
   // It's not a QTI SOC, so set pbData to NULL
@@ -158,6 +132,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
     backend_data->use_psnpe(model_path);
   }
 
+  backend_data->queryCount_ = 0;
+
   backend_data->get_data_formats();
   backend_data->map_inputs();
   backend_data->map_outputs();
@@ -167,9 +143,10 @@ mlperf_backend_ptr_t mlperf_backend_create(
   return backend_data;
 }
 
-// TODO: Return the name of the accelerator.
+// Return the name of the accelerator.
 const char *mlperf_backend_accelerator_name(mlperf_backend_ptr_t backend_ptr) {
-  return "ACCELERATOR_NAME";
+  QTIBackendHelper *backend_data = (QTIBackendHelper *)backend_ptr;
+  return backend_data->acceleratorName_;
 }
 
 // Return the name of this backend.
@@ -200,6 +177,9 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
 
 // Run the inference for a sample.
 mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+#ifdef DEBUG_FLAG
+  auto start = high_resolution_clock::now();
+#endif
   QTIBackendHelper *backend_data = (QTIBackendHelper *)backend_ptr;
   if (backend_data->isTflite_) {
     return tflite_backend_issue_query(backend_data->tfliteBackend_);
@@ -215,6 +195,13 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
       return MLPERF_FAILURE;
     }
   }
+#ifdef DEBUG_FLAG
+  auto end = high_resolution_clock::now();
+  auto duration = duration_cast<microseconds>(end - start);
+  LOG(INFO) << "Query cnt: " << backend_data->queryCount_
+            << "Inference Time(ms): " << duration.count();
+#endif
+  backend_data->queryCount_++;
   return MLPERF_SUCCESS;
 }
 
@@ -344,7 +331,7 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
 }
 
 void *mlperf_backend_get_buffer(size_t n) {
-  return backend_data_->getBuffer_(n);
+  return backend_data_->getBuffer_(n, backend_data_->inputBatch_);
 }
 
 void mlperf_backend_release_buffer(void *p) {
