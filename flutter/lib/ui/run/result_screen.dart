@@ -27,7 +27,7 @@ class ResultScreen extends StatefulWidget {
   const ResultScreen({Key? key}) : super(key: key);
 
   @override
-  _ResultScreenState createState() => _ResultScreenState();
+  State<ResultScreen> createState() => _ResultScreenState();
 }
 
 class ResultKeys {
