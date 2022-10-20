@@ -199,6 +199,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                     state.state == BenchmarkStateEnum.waiting) {
                   final taskConfigs = await state.configManager.getConfigs();
 
+                  if (!mounted) return;
                   await Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => TaskConfigScreen(taskConfigs)));
                 } else {
@@ -217,6 +218,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                     context, stringResources.settingsClearCacheConfirm)) {
                   case ConfirmDialogAction.ok:
                     await state.clearCache();
+                    if (!mounted) return;
                     Navigator.pop(context);
                     break;
                   case ConfirmDialogAction.cancel:

@@ -183,6 +183,7 @@ class TaskConfigScreen extends StatelessWidget {
         onTap: () async {
           try {
             await state.setTaskConfig(name: configuration.name);
+            if (!context.mounted) return;
             Navigator.of(context).popUntil((route) => route.isFirst);
             await state.loadResources();
           } catch (e) {

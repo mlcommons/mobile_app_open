@@ -114,6 +114,7 @@ class MyHomePage extends StatelessWidget {
         final wrongPathError = await state.validateExternalResourcesDirectory(
             stringResources.dialogContentMissingFiles);
         if (wrongPathError.isNotEmpty) {
+          if (!context.mounted) return;
           await showErrorDialog(context, [wrongPathError]);
           return;
         }
@@ -121,6 +122,7 @@ class MyHomePage extends StatelessWidget {
           final offlineError = await state
               .validateOfflineMode(stringResources.dialogContentOfflineWarning);
           if (offlineError.isNotEmpty) {
+            if (!context.mounted) return;
             switch (await showConfirmDialog(context, offlineError)) {
               case ConfirmDialogAction.ok:
                 break;
@@ -135,6 +137,7 @@ class MyHomePage extends StatelessWidget {
           await state.runBenchmarks();
         } catch (e, t) {
           print(t);
+          if (!context.mounted) return;
           await showErrorDialog(
               context, ['${stringResources.runFail}:', e.toString()]);
           return;

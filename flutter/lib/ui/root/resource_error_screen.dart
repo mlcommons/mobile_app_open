@@ -79,7 +79,7 @@ class ResourceErrorScreen extends StatelessWidget {
                         onPressed: () async {
                           final taskConfigs =
                               await state.configManager.getConfigs();
-
+                          if (!context.mounted) return;
                           await Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) =>
                                   TaskConfigScreen(taskConfigs)));

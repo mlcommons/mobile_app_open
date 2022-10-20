@@ -348,6 +348,7 @@ class _ResultScreenState extends State<ResultScreen>
                   await state.validateExternalResourcesDirectory(
                       stringResources.dialogContentMissingFiles);
               if (wrongPathError.isNotEmpty) {
+                if (!mounted) return;
                 await showErrorDialog(context, [wrongPathError]);
                 return;
               }
@@ -355,6 +356,7 @@ class _ResultScreenState extends State<ResultScreen>
                 final offlineError = await state.validateOfflineMode(
                     stringResources.dialogContentOfflineWarning);
                 if (offlineError.isNotEmpty) {
+                  if (!mounted) return;
                   switch (await showConfirmDialog(context, offlineError)) {
                     case ConfirmDialogAction.ok:
                       break;
@@ -414,6 +416,7 @@ class _ResultScreenState extends State<ResultScreen>
                 onPressed: () async {
                   try {
                     await state.uploadLastResult();
+                    if (!mounted) return;
                     await showSuccessDialog(
                         context, [stringResources.uploadSuccess]);
                   } catch (e, s) {
