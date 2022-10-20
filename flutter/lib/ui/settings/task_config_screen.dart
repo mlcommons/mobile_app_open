@@ -102,8 +102,8 @@ class _DataFolderSelectorHelper {
           child: Text(store.customDataFolder),
         ),
         ElevatedButton(
-          child: const Icon(Icons.folder),
           onPressed: pickFolder,
+          child: const Icon(Icons.folder),
         )
       ],
     );
