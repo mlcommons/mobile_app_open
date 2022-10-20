@@ -116,26 +116,32 @@ void checkPerformance(
 ) {
   const allowedDeviation = 0.1;
 
-  final expectedMap = taskExpectedPerformance[benchmarkResult.benchmarkId];
+  final taskId = benchmarkResult.benchmarkId;
+  final expectedMap = taskExpectedPerformance[taskId];
   expect(
     expectedMap,
     isNotNull,
-    reason:
-        'missing expected performance map for ${benchmarkResult.benchmarkId}',
+    reason: 'missing expected performance map for $taskId',
   );
   expectedMap!;
 
-  final os = environmentInfo.osName.toString();
   final model = environmentInfo.modelCode;
-  final backend = benchmarkResult.backendInfo.filename;
-  String tag = '$os+$model+$backend';
-  final expectedValue = expectedMap[tag] ?? expectedMap[os];
+  final deviceExpectedMap = expectedMap[model];
   expect(
-    expectedValue,
+    deviceExpectedMap,
     isNotNull,
-    reason: 'missing expected performance for $tag',
+    reason: 'missing expected performance for $taskId+$model',
   );
-  expectedValue!;
+  deviceExpectedMap!;
+
+  final backend = benchmarkResult.backendInfo.filename;
+  final expectedPerf = deviceExpectedMap[backend];
+  expect(
+    expectedPerf,
+    isNotNull,
+    reason: 'missing expected performance for $taskId+$model+$backend',
+  );
+  expectedPerf!;
 
   final run = benchmarkResult.performanceRun;
   run!;
@@ -144,12 +150,12 @@ void checkPerformance(
   value!;
   expect(
     value,
-    greaterThanOrEqualTo(expectedValue * (1 - allowedDeviation)),
-    reason: 'performance for $tag is too low',
+    greaterThanOrEqualTo(expectedPerf * (1 - allowedDeviation)),
+    reason: 'performance for $taskId+$model+$backend is too low',
   );
   expect(
     value,
-    lessThanOrEqualTo(expectedValue * (1 + allowedDeviation)),
-    reason: 'performance for $tag is too high',
+    lessThanOrEqualTo(expectedPerf * (1 + allowedDeviation)),
+    reason: 'performance for $taskId+$model+$backend is too high',
   );
 }
