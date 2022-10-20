@@ -22,7 +22,7 @@ class BuildInfoHelper {
         buildNumber: packageInfo.buildNumber,
         officialReleaseFlag: isOfficialBuild,
         devTestFlag: isFastMode,
-        backendList: BackendInfo.getBackendsList(),
+        backendList: BackendInfoHelper().getBackendsList(),
         gitBranch: GeneratedBuildInfo.gitBranch,
         gitCommit: GeneratedBuildInfo.gitCommit,
         gitDirtyFlag: GeneratedBuildInfo.gitDirty != 0);

@@ -65,10 +65,9 @@ class _DetailsScreen extends State<DetailsScreen> {
         .replaceFirst('<build>', res.buildInfo.buildNumber)
         .replaceFirst('<buildType>', appVersionType);
 
-    final modelDescription = res.environmentInfo.manufacturer?.isEmpty ?? true
-        ? res.environmentInfo.modelName ?? 'Unknown'
-        : '${res.environmentInfo.manufacturer} ${res.environmentInfo.modelName}';
-    final socDescription = res.environmentInfo.socInfo.cpuinfo.socName;
+    final utils = HistoryHelperUtils(l10n);
+    final modelDescription = utils.makeModelDescription(res.environmentInfo);
+    final socDescription = utils.makeSocName(res.environmentInfo);
 
     return [
       helper.makeInfo(l10n.historyDetailsDate, date),

@@ -123,7 +123,7 @@ class BenchmarkState extends ChangeNotifier {
 
   BenchmarkState._(this._store, this.backendBridge, this.firebaseManager) {
     resourceManager = ResourceManager(notifyListeners, _store);
-    backendInfo = BackendInfo.findMatching();
+    backendInfo = BackendInfoHelper().findMatching();
   }
 
   Future<void> uploadLastResult() async {
@@ -466,7 +466,7 @@ class BenchmarkState extends ChangeNotifier {
     if (!_aborting) {
       lastResult = ExtendedResult(
         meta: ResultMetaInfo(uuid: const Uuid().v4()),
-        environmentInfo: DeviceInfo.environmentInfo,
+        environmentInfo: DeviceInfo.instance.envInfo,
         results: exportResults,
         buildInfo: BuildInfoHelper.info,
       );

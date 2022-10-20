@@ -5,10 +5,10 @@ part 'env_android.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake)
 class EnvAndroid {
   final String osVersion;
-  final String manufacturer;
-  final String modelCode;
-  final String modelName;
-  final String boardCode;
+  final String? manufacturer;
+  final String? modelCode;
+  final String? modelName;
+  final String? boardCode;
   final String procCpuinfoSocName;
   final List<EnvAndroidProp> props;
 

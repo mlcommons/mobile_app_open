@@ -5,8 +5,8 @@ part 'env_ios.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake)
 class EnvIos {
   final String osVersion;
-  final String modelCode;
-  final String modelName;
+  final String? modelCode;
+  final String? modelName;
   final String socName;
 
   EnvIos({

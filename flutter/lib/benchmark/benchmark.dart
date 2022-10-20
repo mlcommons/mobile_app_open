@@ -108,7 +108,7 @@ class Benchmark {
       backend_model_path: resourceManager.get(benchmarkSettings.modelPath),
       backend_lib_path: backendLibPath,
       backend_settings: settings,
-      backend_native_lib_path: DeviceInfo.nativeLibraryPath,
+      backend_native_lib_path: DeviceInfo.instance.nativeLibraryPath,
       dataset_type: taskConfig.datasets.type.value,
       dataset_data_path: resourceManager.get(dataset.inputPath),
       dataset_groundtruth_path: resourceManager.get(dataset.groundtruthPath),
