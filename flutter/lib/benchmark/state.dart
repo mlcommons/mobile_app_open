@@ -37,7 +37,7 @@ import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
 import 'run_mode.dart';
 
-void _doSomethingCPUIntensive(double value) {
+void _doSomethingCPUIntensive(double value, TypeSendPort port) {
   var newValue = value;
   while (true) {
     newValue = newValue * 0.999999999999999;
