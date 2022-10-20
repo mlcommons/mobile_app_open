@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/firebase/cache_helper.dart';
 
