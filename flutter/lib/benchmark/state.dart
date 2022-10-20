@@ -210,7 +210,7 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> loadResources() async {
     final newAppVersion =
-        BuildInfoHelper.info.version + '+' + BuildInfoHelper.info.buildNumber;
+        '${BuildInfoHelper.info.version}+${BuildInfoHelper.info.buildNumber}';
     var needToPurgeCache = _store.previousAppVersion != newAppVersion;
     _store.previousAppVersion = newAppVersion;
 

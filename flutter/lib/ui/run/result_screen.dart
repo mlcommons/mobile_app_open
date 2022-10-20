@@ -109,7 +109,7 @@ class _ResultScreenState extends State<ResultScreen>
         children: [
           Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text(backendName + ' | ' + acceleratorName)),
+              child: Text('$backendName | $acceleratorName')),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -372,7 +372,7 @@ class _ResultScreenState extends State<ResultScreen>
                 // current context may no longer be valid if runBenchmarks requested progress screen
                 await showErrorDialog(
                     ProgressScreen.scaffoldKey.currentContext ?? context,
-                    [stringResources.runFail + ':', e.toString()]);
+                    ['${stringResources.runFail}:', e.toString()]);
                 return;
               }
             },

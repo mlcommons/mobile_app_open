@@ -36,7 +36,7 @@ class _ConfigScreen extends State<ConfigScreen> {
           ),
         ),
         subtitle:
-            Text(benchmark.id + ' | ' + benchmark.backendRequestDescription),
+            Text('${benchmark.id} | ${benchmark.backendRequestDescription}'),
         leading: Checkbox(
             value: benchmark.isActive,
             onChanged: (bool? value) {

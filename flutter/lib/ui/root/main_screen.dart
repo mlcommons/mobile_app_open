@@ -136,7 +136,7 @@ class MyHomePage extends StatelessWidget {
         } catch (e, t) {
           print(t);
           await showErrorDialog(
-              context, [stringResources.runFail + ':', e.toString()]);
+              context, ['${stringResources.runFail}:', e.toString()]);
           return;
         }
       }),
