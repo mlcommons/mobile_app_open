@@ -114,36 +114,65 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
 
 Info about environment the app is running in. May change when you update your OS, change device hardware, or use another device.
 
-* `os`: string enum  
+* `device_type`: string
+  Device type used to determine which `info` entry should be used.  
+  Currently device type simply maps to supported OS list but this may change in the future.
   Allowed values:
   * `android`
   * `ios`
   * `windows`
-* `os_version`: string  
-  Must be obtained from environment
-* `manufacturer`: string. Manufacturer of the device  
-  On Windows systems value must be `Unknown`.  
-  On iOS systems value must be `Apple`.  
-  On Android systems value must represent actual manufacturer name obtained from system environment.
-* `model_code`: string. Manufacturer-defined model code  
-  On Windows systems value must be `Unknown PC`.  
-  On iOS systems value must be Apple Machine name. For example: `iPhone14,5`.  
-  On Android systems value must represent actual model name obtained from system environment. For example: `SM-G981U1`.
-* `model_name`: string. Human-readable model name  
-  On Windows systems value must be `Unknown PC`.  
-  On iOS and Android systems value must be the marketing name that corresponds to `model_code`. For example: `iPhone 13`, `Galaxy S20 5G`.
-* `soc_info`: map
-  * `cpuinfo`: map
-    * `soc_name`: string
-      CPU/SOC name obtained from `cpuinfo` library
-  * `android_info`: map
-    * `prop_soc_model`: string  
-      Value obtained via `getprop ro.soc.model`
-    * `prop_soc_manufacturer`: string  
-      Value obtained via `getprop ro.soc.manufacturer`
-    * `build_board`: string  
+* `value`: map  
+  Info about device software and underlying hardware.
+  Should contain exactly one valid field, according to device type.
+  * `android`: map  
+    Must be null if device type is not Android.
+    * `os_version`: string  
+      Must be obtained from environment.
+    * `manufacturer`: string. Manufacturer of the device  
+      <!-- markdown-link-check-disable-next-line -->
+      Value of `manufacturer` from [Android build constants](https://developer.android.com/reference/android/os/Build#MANUFACTURER)
+    * `model_code`: string. Manufacturer-defined model code  
+      <!-- markdown-link-check-disable-next-line -->
+      Value of `model` from [Android build constants](https://developer.android.com/reference/android/os/Build#MODEL)  
+      For example: `SM-G981U1`.
+    * `model_name`: string. Human-readable model name  
+      Marketing name that corresponds to `model_code`.  
+      For example: `Galaxy S20 5G`.
+    * `board_code`: string  
       <!-- markdown-link-check-disable-next-line -->
       Value of `board` from [Android build constants](https://developer.android.com/reference/android/os/Build#BOARD)
+    * `proc_cpuinfo_soc_name`: string  
+      SoC name obtained from `/proc/cpuinfo` file.  
+      This field may serve as a backup option if SoC name can't be determined via other methods.  
+      May be null.
+    * `props`: array of maps  
+      Contains data obtained via `getprop` Android util.
+      May be extended by adding vendor-specific properties.
+      * `type`: string  
+        Type of data entry. Possible values: `soc_manufacturer`, `soc_model`. The list may be extended in the future.
+      * `name`: string  
+        Name of the property. Main purpose is to gather statistics which values can actually be seen on a phone.
+        Currently known values:
+        * `ro.soc.model`
+        * `ro.soc.manufacturer`
+      * `value`: string  
+        Result of `getprop <name>`
+  * `ios`: map  
+    Must be null is device type is not iOS.
+    * `os_version`: string  
+      Must be obtained from environment.
+    * `model_code`: string. Manufacturer-defined model code  
+      Apple Machine name. For example: `iPhone14,5`.  
+    * `model_name`: string. Human-readable model name  
+      Marketing name that corresponds to `model_code`. For example: `iPhone 13`.
+    * `soc_name`: string  
+      Full SoC name.
+  * `windows`: map  
+    Must be null is device type is not Windows.
+    * `os_version`: string  
+      Must be obtained from environment.
+    * `cpu_full_name`: string  
+      Should contain CPU name as reported by CPU.
 
 ## Application build info
 
