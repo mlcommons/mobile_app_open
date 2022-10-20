@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 load("@snpe_version_loader//:snpe_var_def.bzl", "SNPE_VERSION")
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -31,6 +32,20 @@ package(
 config_setting(
     name = "android_arm64",
     values = {"cpu": "arm64-v8a"},
+)
+
+string_flag(
+    name = "with_qti",
+    build_setting_default = "1",
+    values = [
+        "1",
+        "2",
+    ],
+)
+
+config_setting(
+    name = "debug_option",
+    flag_values = {":with_qti": "2"},
 )
 
 snpe_copts = [
@@ -44,7 +59,9 @@ cc_library(
     srcs = ["rpcmem.cc"],
     hdrs = [
         "cpuctrl.h",
+        "qti_settings.h",
         "rpcmem.h",
+        "soc_utility.h",
     ],
     copts = tflite_copts() + snpe_copts,
     deps = ["@org_tensorflow//tensorflow/core:tflite_portable_logging"],
@@ -82,6 +99,7 @@ cc_library(
             "cpuctrl.cc",
             "tflite_c.cc",
             "qti_backend_helper.cc",
+            "soc_utility.cc",
         ],
     }),
     hdrs = [] + select({
@@ -91,10 +109,15 @@ cc_library(
             "tflite_c.h",
             "qti_backend_helper.h",
             "mlperf_helper.h",
+            "soc_utility.h",
         ],
     }),
     copts = tflite_copts() + snpe_copts,
-    local_defines = ["SNPE_VERSION_STRING=" + SNPE_VERSION],
+    local_defines = ["SNPE_VERSION_STRING=" + SNPE_VERSION] +
+                    select({
+                        "debug_option": ["DEBUG_FLAG"],
+                        "//conditions:default": [],
+                    }),
     deps = [
         "//flutter/cpp/c:headers",
         ":qti_allocator",

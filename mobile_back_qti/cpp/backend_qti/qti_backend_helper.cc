@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ limitations under the License.
 #include "SNPE/UserBufferList.hpp"
 #include "absl/strings/ascii.h"
 #include "cpuctrl.h"
+#include "soc_utility.h"
 #include "tensorflow/core/platform/logging.h"
 #include "tflite_c.h"
 
@@ -154,9 +155,18 @@ static zdl::DlSystem::Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
 }
 
 void QTIBackendHelper::use_psnpe(const char *model_path) {
-  uint32_t soc_id = CpuCtrl::getSocId();
   uint32_t numInits = get_num_inits();
   LOG(INFO) << "numInits: " << numInits;
+
+// Enable debug logs
+#ifdef DEBUG_FLAG
+  if (zdl::SNPE::SNPEFactory::initializeLogging(
+          zdl::DlSystem::LogLevel_t::LOG_VERBOSE)) {
+    LOG(INFO) << "Debug logs successful";
+  } else {
+    LOG(INFO) << "Debug logs can not be intialized";
+  }
+#endif
 
   bool psnpe_buildStatus = false;
   // Init cache generated on device giving better performance.
@@ -193,20 +203,12 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
     }
 
     std::string platformOptionStr = "";
-    if (useDspFeatures && isSignedStatus == UNSIGNED_PD) {
+    if (Socs::get_use_dsp_features() && isSignedStatus == UNSIGNED_PD) {
       // use unsignedPD feature for untrusted app.
       platformOptionStr += "unsignedPD:ON";
     }
 
-    // These features are not for SDM865, so turning them off.
-    if (useDspFeatures &&
-        (soc_id == SDM888 || soc_id == SDM778 || soc_id == SD8G1)) {
-      // use Zero copy for input and output buffers.
-      // Requires rpc registered ion buffers.
-      if (useIonBuffers_) {
-        platformOptionStr += ";useDspZeroCopy:ON";
-      }
-      platformOptionStr += ";dspPowerSettingContext:ON";
+    if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)) {
       buildConfig.enableInitCache = true;
     }
     buildConfig.platformOptions = platformOptionStr;
@@ -235,9 +237,18 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
 }
 
 void QTIBackendHelper::use_snpe(const char *model_path) {
-  uint32_t soc_id = CpuCtrl::getSocId();
   uint32_t numInits = get_num_inits();
   LOG(INFO) << "numInits: " << numInits;
+
+// Enable debug logs
+#ifdef DEBUG_FLAG
+  if (zdl::SNPE::SNPEFactory::initializeLogging(
+          zdl::DlSystem::LogLevel_t::LOG_VERBOSE)) {
+    LOG(INFO) << "Debug logs successful";
+  } else {
+    LOG(INFO) << "Debug logs can not be intialized";
+  }
+#endif
 
   // Use SNPE
   for (int i = 0; i < numInits; i++) {
@@ -260,20 +271,12 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
         .setOutputLayers(outputLayers);
 
     std::string platformOptionStr = "";
-    if (useDspFeatures && isSignedStatus == UNSIGNED_PD) {
+    if (Socs::get_use_dsp_features() && isSignedStatus == UNSIGNED_PD) {
       // use unsignedPD feature for untrusted app.
       platformOptionStr += "unsignedPD:ON";
     }
 
-    // These features are not for SDM865, so turning them off.
-    if (useDspFeatures &&
-        (soc_id == SDM888 || soc_id == SDM778 || soc_id == SD8G1)) {
-      // use Zero copy for input and output buffers.
-      // Requires rpc registered ion buffers.
-      if (useIonBuffers_) {
-        platformOptionStr += ";useDspZeroCopy:ON";
-      }
-      platformOptionStr += ";dspPowerSettingContext:ON";
+    if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)) {
       snpeBuilder.setInitCacheMode(true);
     }
     zdl::DlSystem::PlatformConfig platformConfig;
@@ -293,18 +296,10 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
   }
 }
 
-inline int QTIBackendHelper::get_num_inits() {
-  uint32_t soc_id = CpuCtrl::getSocId();
-  if (!useDspFeatures || soc_id == SDM865) {
-    return 1;
-  } else {
-    return 2;
-  }
-}
+inline int QTIBackendHelper::get_num_inits() { return Socs::soc_num_inits(); }
 
 void QTIBackendHelper::get_accelerator_instances(int &num_dsp, int &num_aip,
                                                  int &num_gpu, int &num_cpu) {
-  uint32_t soc_id = CpuCtrl::getSocId();
   std::string &delegate = delegate_;
   num_dsp = 0;
   num_aip = 0;
@@ -312,52 +307,24 @@ void QTIBackendHelper::get_accelerator_instances(int &num_dsp, int &num_aip,
   num_cpu = 0;
   if (scenario_ == "Offline") {
     // For 865 use DSP+AIP
-    if (soc_id == SDM865) {
-      if (delegate != "snpe_aip" && delegate != "psnpe_aip") {
-        LOG(FATAL) << "Error: Unsupported delegate for offline mode";
-      }
-      useDspFeatures = true;
-      num_dsp = 1;
-      num_aip = 6;
-    } else if (soc_id == SDM888) {
-      if (delegate != "snpe_dsp" && delegate != "psnpe_dsp") {
-        LOG(FATAL) << "Error: Unsupported delegate for offline mode";
-      }
-      useDspFeatures = true;
-      num_dsp = 2;
-      num_gpu = 4;
-    } else if (soc_id == SDM778) {
-      if (delegate != "snpe_dsp" && delegate != "psnpe_dsp") {
-        LOG(FATAL) << "Error: Unsupported delegate for offline mode";
-      }
-      useDspFeatures = true;
-      num_dsp = 2;
-      num_gpu = 0;
-    } else if (soc_id == SD8G1) {
-      if (delegate != "snpe_dsp" && delegate != "psnpe_dsp") {
-        LOG(FATAL) << "Error: Unsupported delegate for offline mode";
-      }
-      useDspFeatures = true;
-      num_dsp = 2;
-      num_aip = 0;
-      num_gpu = 0;
-    }
+    Socs::soc_offline_core_instance(num_dsp, num_aip, num_gpu, num_cpu,
+                                    delegate);
   } else {
     if (delegate == "snpe_dsp" || delegate == "psnpe_dsp") {
       num_dsp = 1;
-      useDspFeatures = true;
+      Socs::set_use_dsp_features(true);
     } else if (delegate == "snpe_aip" || delegate == "psnpe_aip") {
       num_aip = 1;
-      useDspFeatures = true;
+      Socs::set_use_dsp_features(true);
     } else if (delegate == "snpe_gpu" || delegate == "psnpe_gpu") {
       num_gpu = 1;
-      useDspFeatures = false;
+      Socs::set_use_dsp_features(false);
     } else if (delegate == "snpe_cpu" || delegate == "psnpe_cpu") {
       num_cpu = 1;
-      useDspFeatures = false;
+      Socs::set_use_dsp_features(false);
     } else {
       LOG(FATAL) << "Error: Unsupported delegate " << delegate << " SoC ID "
-                 << soc_id;
+                 << Socs::get_soc_name();
     }
   }
   LOG(INFO) << "Using " << num_dsp << " dsp " << num_aip << " aip " << num_gpu
@@ -426,8 +393,8 @@ void QTIBackendHelper::map_outputs() {
                                       (*ubaOpt)->getDims().getDimensions());
 
       outputBatchBufsize_ = bufSize;
-      LOG(INFO) << "outputBufferType: " << outputBufferType_
-                << " name: " << name;
+      // LOG(INFO) << "outputBufferType: " << outputBufferType_
+      //          << " name: " << name;
       if (useIonBuffers_) {
         Allocator<uint8_t>::useIonAllocator();
       } else {

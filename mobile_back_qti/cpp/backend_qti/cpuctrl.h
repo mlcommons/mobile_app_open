@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2021 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,11 +18,6 @@ limitations under the License.
 #include <GLES/gl.h>
 #include <stdint.h>
 
-#define SDM865 356
-#define SDM888 415
-#define SDM778 475
-#define SD8G1 457
-
 class CpuCtrl {
  public:
   static void startLoad();
@@ -31,8 +26,7 @@ class CpuCtrl {
   static void lowLatency();
   static void normalLatency();
   static void highLatency();
-  static uint32_t getSocId();
-  static bool isSnapDragon(const char *manufacturer);
+  static void init();
 
  private:
   CpuCtrl() = delete;

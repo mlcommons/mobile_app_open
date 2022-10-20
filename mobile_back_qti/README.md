@@ -12,16 +12,16 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 ## Requirements
 
 <!-- markdown-link-check-disable-next-line -->
-* [SNPE SDK](https://createpoint.qti.qualcomm.com/tools/#suite/9186/64383)
-  * Version 1.59.1 (Needs special access to the above link. POC: wchou@qti.qualcomm.com)
+* [SNPE SDK](https://developer.qualcomm.com/downloads/qualcomm-neural-processing-sdk-ai-v1650)
+  * Version 1.65.0
 * Linux machine capable of running Ubuntu 18.04 docker images
 
 After downloading and unzipping the SNPE SDK, make sure to set SNPE_SDK to its location:
 
 ```shell
 cd /opt
-unzip snpe-1.59.1.3230.zip
-export SNPE_SDK=/opt/snpe-1.59.1.3230
+unzip snpe-1.65.0_rc2_3676.zip
+export SNPE_SDK=/opt/snpe-1.65.0.3676
 ```
 
 ### Optional
@@ -60,19 +60,10 @@ Clone mlperf_app_open and build with the following build commands.
 ```shell
 git clone https://github.com/mlcommons/mobile_app_open
 cd mobile_app_open
-make WITH_QTI=1 android/app
+make WITH_QTI=1 docker/flutter/android/apk
 ```
 
 This will build the QTI backend into the MLPerf app.
-
-## Building the QTI backend lib
-
-To build only the QTI backend:
-
-```shell
-git clone https://github.com/mlcommons/mobile_app_open
-make WITH_QTI=1 libqtibackend
-```
 
 ## Backend Specific Task Config file
 
@@ -91,10 +82,10 @@ No, the information to build the DLC files is only to show how they are created.
 
 ### What devices does this backend support?
 
-This backend only supports SDM865/SDM865 Pro ,SDM888/SDM888 Pro, SDM778G, SD8G1 devices. Other Snapdragon
-based devices will not run the MLPerf app. Future updates of the app will provide
+This backend only supports SDM865/SDM865 Pro ,SDM888/SDM888 Pro, SDM778G, SD7G1, SD8G1, SD8Pro G1 devices.
+Other Snapdragon based devices will not run the MLPerf app. Future updates of the app will provide
 additional device support.
 
 ### Is SNPE used to run all the models?
 
-Yes. All the models use SNPE for execution.
+Yes. All the models use SNPE for execution for current version.
