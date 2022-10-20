@@ -469,10 +469,10 @@ class BlueProgressLine extends Container {
   BlueProgressLine(this._progress, {Key? key}) : super(key: key);
 
   double get _progressValue {
-    final _rangedProgress = _progress.clamp(0, 1);
-    const _startOffset = 0.01;
+    final rangedProgress = _progress.clamp(0, 1);
+    const startOffset = 0.01;
 
-    return _startOffset + (1 - _startOffset) * _rangedProgress;
+    return startOffset + (1 - startOffset) * rangedProgress;
   }
 
   @override
