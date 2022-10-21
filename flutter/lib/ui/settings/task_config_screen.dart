@@ -183,7 +183,10 @@ class TaskConfigScreen extends StatelessWidget {
         onTap: () async {
           try {
             await state.setTaskConfig(name: configuration.name);
-            if (!context.mounted) return;
+            // TODO (anhappdev): Uncomment the if line and remove the ignore line, when updated to Flutter v3.4.
+            // See https://github.com/flutter/flutter/issues/111488
+            // if (!context.mounted) return;
+            // ignore: use_build_context_synchronously
             Navigator.of(context).popUntil((route) => route.isFirst);
             await state.loadResources();
           } catch (e) {

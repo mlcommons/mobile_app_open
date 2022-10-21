@@ -79,7 +79,10 @@ class ResourceErrorScreen extends StatelessWidget {
                         onPressed: () async {
                           final taskConfigs =
                               await state.configManager.getConfigs();
-                          if (!context.mounted) return;
+                          // TODO (anhappdev): Uncomment the if line and remove the ignore line, when updated to Flutter v3.4.
+                          // See https://github.com/flutter/flutter/issues/111488
+                          // if (!context.mounted) return;
+                          // ignore: use_build_context_synchronously
                           await Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) =>
                                   TaskConfigScreen(taskConfigs)));
