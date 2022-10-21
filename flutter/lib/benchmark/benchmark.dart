@@ -95,9 +95,9 @@ class Benchmark {
   }) {
     final dataset = runMode.chooseDataset(taskConfig);
 
-    final _fastMode = isTestMode || isFastMode;
-    var minQueryCount = _fastMode ? 8 : taskConfig.minQueryCount;
-    var minDuration = _fastMode ? 1.0 : taskConfig.minDuration;
+    final fastMode = isTestMode || isFastMode;
+    var minQueryCount = fastMode ? 8 : taskConfig.minQueryCount;
+    var minDuration = fastMode ? 1.0 : taskConfig.minDuration;
 
     final settings = pb.SettingList(
       setting: commonSettings,

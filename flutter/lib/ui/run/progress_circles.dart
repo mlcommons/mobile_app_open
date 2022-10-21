@@ -9,7 +9,7 @@ class ProgressCircles extends StatefulWidget {
   const ProgressCircles(this._size, {Key? key}) : super(key: key);
 
   @override
-  _ProgressCirclesState createState() => _ProgressCirclesState();
+  State<ProgressCircles> createState() => _ProgressCirclesState();
 }
 
 class _ProgressCirclesState extends State<ProgressCircles> {

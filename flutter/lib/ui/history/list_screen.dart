@@ -91,9 +91,9 @@ class _ListScreenState extends State<ListScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: tabs.map((e) => e.build(context)).toList(),
         physics:
             pushedAppBar == null ? null : const NeverScrollableScrollPhysics(),
+        children: tabs.map((e) => e.build(context)).toList(),
       ),
     );
   }

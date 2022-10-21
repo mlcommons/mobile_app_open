@@ -37,7 +37,7 @@ import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
 import 'run_mode.dart';
 
-void _doSomethingCPUIntensive(double value) {
+void _doSomethingCPUIntensive(double value, TypeSendPort port) {
   var newValue = value;
   while (true) {
     newValue = newValue * 0.999999999999999;
@@ -210,7 +210,7 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> loadResources() async {
     final newAppVersion =
-        BuildInfoHelper.info.version + '+' + BuildInfoHelper.info.buildNumber;
+        '${BuildInfoHelper.info.version}+${BuildInfoHelper.info.buildNumber}';
     var needToPurgeCache = _store.previousAppVersion != newAppVersion;
     _store.previousAppVersion = newAppVersion;
 

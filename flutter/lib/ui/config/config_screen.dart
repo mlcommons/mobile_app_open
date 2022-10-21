@@ -9,7 +9,7 @@ class ConfigScreen extends StatefulWidget {
   const ConfigScreen({Key? key}) : super(key: key);
 
   @override
-  _ConfigScreen createState() => _ConfigScreen();
+  State<ConfigScreen> createState() => _ConfigScreen();
 }
 
 class _ConfigScreen extends State<ConfigScreen> {
@@ -36,7 +36,7 @@ class _ConfigScreen extends State<ConfigScreen> {
           ),
         ),
         subtitle:
-            Text(benchmark.id + ' | ' + benchmark.backendRequestDescription),
+            Text('${benchmark.id} | ${benchmark.backendRequestDescription}'),
         leading: Checkbox(
             value: benchmark.isActive,
             onChanged: (bool? value) {

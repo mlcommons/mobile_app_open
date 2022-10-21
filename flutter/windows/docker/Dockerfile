@@ -27,7 +27,9 @@ RUN curl -fSLo vs_BuildTools.exe https://aka.ms/vs/16/release/vs_buildtools.exe 
 RUN choco install -y --no-progress msys2 --version 20220319.0.0 --params "/NoUpdate"
 RUN setx path "%path%;C:/tools/msys64/usr/bin"
 
-RUN choco install -y --no-progress flutter --version 2.10.5
+# Flutter 3.3.5 is just released today (2022-10-20) and still not available via choco install
+# TODO (anhappdev): update to flutter --version 3.3.5 when it's available
+RUN choco install -y --no-progress flutter --version 3.3.4
 RUN choco install -y --no-progress git --version 2.33.0.2
 RUN choco install -y --no-progress make --version 4.3
 RUN choco install -y --no-progress bazelisk --version 1.11.0.20220331
