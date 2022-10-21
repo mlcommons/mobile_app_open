@@ -92,6 +92,6 @@ const expectedInstabilityMap = {
     _tagTfliteSo: 1.15,
   },
   _tagPixel6: {
-    _tagPixelSo: 1.05,
+    _tagPixelSo: 1.1,
   },
 };
