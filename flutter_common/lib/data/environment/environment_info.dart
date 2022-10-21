@@ -19,7 +19,7 @@ class EnvironmentInfo {
   });
 
   EnvironmentInfo.makeAndroid({required EnvAndroid info})
-      : deviceType = EnvDeviceType.ios,
+      : deviceType = EnvDeviceType.android,
         value = EnvInfoValue(
           android: info,
           ios: null,
@@ -35,7 +35,7 @@ class EnvironmentInfo {
         );
 
   EnvironmentInfo.makeWIndows({required EnvWindows info})
-      : deviceType = EnvDeviceType.ios,
+      : deviceType = EnvDeviceType.windows,
         value = EnvInfoValue(
           android: null,
           ios: null,
