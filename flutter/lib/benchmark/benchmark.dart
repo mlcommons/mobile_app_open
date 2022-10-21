@@ -89,7 +89,7 @@ class Benchmark {
     required BenchmarkRunMode runMode,
     required ResourceManager resourceManager,
     required List<pb.Setting> commonSettings,
-    required String backendLibPath,
+    required String backendLibName,
     required String logDir,
     required bool isTestMode,
   }) {
@@ -106,7 +106,7 @@ class Benchmark {
 
     return RunSettings(
       backend_model_path: resourceManager.get(benchmarkSettings.modelPath),
-      backend_lib_path: backendLibPath,
+      backend_lib_name: backendLibName,
       backend_settings: settings,
       backend_native_lib_path: DeviceInfo.instance.nativeLibraryPath,
       dataset_type: taskConfig.datasets.type.value,

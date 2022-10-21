@@ -35,7 +35,7 @@ class BackendInfoHelper {
   pb.BackendSetting? matchAndroid(String libName) {
     final info = DeviceInfo.instance.envInfo.value.android!;
     return backendMatch(
-      libPath: '$libName.so',
+      libName: libName,
       manufacturer: info.manufacturer ?? '',
       model: info.modelCode ?? '',
     );
@@ -44,7 +44,7 @@ class BackendInfoHelper {
   pb.BackendSetting? matchIos(String libName) {
     final info = DeviceInfo.instance.envInfo.value.ios!;
     return backendMatch(
-      libPath: '$libName.framework/$libName',
+      libName: libName,
       manufacturer: 'Apple',
       model: info.modelCode ?? '',
     );
@@ -52,7 +52,7 @@ class BackendInfoHelper {
 
   pb.BackendSetting? matchWindows(String libName) {
     return backendMatch(
-      libPath: '$libName.dll',
+      libName: libName,
       manufacturer: '',
       model: '',
     );
@@ -69,7 +69,7 @@ class BackendInfoHelper {
 
 class BackendInfo {
   final pb.BackendSetting settings;
-  final String libPath;
+  final String libName;
 
-  BackendInfo._(this.settings, this.libPath);
+  BackendInfo._(this.settings, this.libName);
 }

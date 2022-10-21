@@ -6,7 +6,7 @@ class RunSettings {
   static int single_stream_expected_latency_ns_max = 1000000;
 
   final String backend_model_path;
-  final String backend_lib_path;
+  final String backend_lib_name;
   final pb.SettingList backend_settings;
   final String backend_native_lib_path;
   final int dataset_type; // 0: Imagenet; 1: Coco; 2: Squad; 3: Ade20k
@@ -23,7 +23,7 @@ class RunSettings {
 
   RunSettings({
     required this.backend_model_path,
-    required this.backend_lib_path,
+    required this.backend_lib_name,
     required this.backend_settings,
     required this.backend_native_lib_path,
     required this.dataset_type, // 0: Imagenet, 1: Coco, 2: Squad, 3: Ade20k
