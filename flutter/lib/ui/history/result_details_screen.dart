@@ -13,7 +13,7 @@ class DetailsScreen extends StatefulWidget {
   const DetailsScreen({Key? key, required this.result}) : super(key: key);
 
   @override
-  _DetailsScreen createState() => _DetailsScreen();
+  State<DetailsScreen> createState() => _DetailsScreen();
 }
 
 class _DetailsScreen extends State<DetailsScreen> {

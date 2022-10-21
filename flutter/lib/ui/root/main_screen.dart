@@ -114,6 +114,10 @@ class MyHomePage extends StatelessWidget {
         final wrongPathError = await state.validateExternalResourcesDirectory(
             stringResources.dialogContentMissingFiles);
         if (wrongPathError.isNotEmpty) {
+          // TODO (anhappdev): Uncomment the if line and remove the ignore line, when updated to Flutter v3.4.
+          // See https://github.com/flutter/flutter/issues/111488
+          // if (!context.mounted) return;
+          // ignore: use_build_context_synchronously
           await showErrorDialog(context, [wrongPathError]);
           return;
         }
@@ -121,6 +125,10 @@ class MyHomePage extends StatelessWidget {
           final offlineError = await state
               .validateOfflineMode(stringResources.dialogContentOfflineWarning);
           if (offlineError.isNotEmpty) {
+            // TODO (anhappdev): Uncomment the if line and remove the ignore line, when updated to Flutter v3.4.
+            // See https://github.com/flutter/flutter/issues/111488
+            // if (!context.mounted) return;
+            // ignore: use_build_context_synchronously
             switch (await showConfirmDialog(context, offlineError)) {
               case ConfirmDialogAction.ok:
                 break;
@@ -135,8 +143,12 @@ class MyHomePage extends StatelessWidget {
           await state.runBenchmarks();
         } catch (e, t) {
           print(t);
+          // TODO (anhappdev): Uncomment the if line and remove the ignore line, when updated to Flutter v3.4.
+          // See https://github.com/flutter/flutter/issues/111488
+          // if (!context.mounted) return;
+          // ignore: use_build_context_synchronously
           await showErrorDialog(
-              context, [stringResources.runFail + ':', e.toString()]);
+              context, ['${stringResources.runFail}:', e.toString()]);
           return;
         }
       }),
