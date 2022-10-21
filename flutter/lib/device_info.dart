@@ -28,8 +28,6 @@ class DeviceInfo {
   }
 
   static Future<DeviceInfo> createFromEnvironment() async {
-    DeviceInfo.instance = await createFromEnvironment();
-
     return DeviceInfo(
       envInfo: await makeEnvInfo(),
       nativeLibraryPath: await _makeNativeLibraryPath(),
