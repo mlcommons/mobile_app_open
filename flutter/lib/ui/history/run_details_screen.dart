@@ -13,7 +13,7 @@ class RunDetailsScreen extends StatefulWidget {
   const RunDetailsScreen({Key? key, required this.result}) : super(key: key);
 
   @override
-  _RunDetailsScreen createState() => _RunDetailsScreen();
+  State<RunDetailsScreen> createState() => _RunDetailsScreen();
 }
 
 class _RunDetailsScreen extends State<RunDetailsScreen> {

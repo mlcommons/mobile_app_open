@@ -27,7 +27,7 @@ class ResultScreen extends StatefulWidget {
   const ResultScreen({Key? key}) : super(key: key);
 
   @override
-  _ResultScreenState createState() => _ResultScreenState();
+  State<ResultScreen> createState() => _ResultScreenState();
 }
 
 class ResultKeys {
@@ -109,7 +109,7 @@ class _ResultScreenState extends State<ResultScreen>
         children: [
           Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text(backendName + ' | ' + acceleratorName)),
+              child: Text('$backendName | $acceleratorName')),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -348,6 +348,7 @@ class _ResultScreenState extends State<ResultScreen>
                   await state.validateExternalResourcesDirectory(
                       stringResources.dialogContentMissingFiles);
               if (wrongPathError.isNotEmpty) {
+                if (!mounted) return;
                 await showErrorDialog(context, [wrongPathError]);
                 return;
               }
@@ -355,6 +356,7 @@ class _ResultScreenState extends State<ResultScreen>
                 final offlineError = await state.validateOfflineMode(
                     stringResources.dialogContentOfflineWarning);
                 if (offlineError.isNotEmpty) {
+                  if (!mounted) return;
                   switch (await showConfirmDialog(context, offlineError)) {
                     case ConfirmDialogAction.ok:
                       break;
@@ -372,7 +374,7 @@ class _ResultScreenState extends State<ResultScreen>
                 // current context may no longer be valid if runBenchmarks requested progress screen
                 await showErrorDialog(
                     ProgressScreen.scaffoldKey.currentContext ?? context,
-                    [stringResources.runFail + ':', e.toString()]);
+                    ['${stringResources.runFail}:', e.toString()]);
                 return;
               }
             },
@@ -414,6 +416,7 @@ class _ResultScreenState extends State<ResultScreen>
                 onPressed: () async {
                   try {
                     await state.uploadLastResult();
+                    if (!mounted) return;
                     await showSuccessDialog(
                         context, [stringResources.uploadSuccess]);
                   } catch (e, s) {
@@ -469,10 +472,10 @@ class BlueProgressLine extends Container {
   BlueProgressLine(this._progress, {Key? key}) : super(key: key);
 
   double get _progressValue {
-    final _rangedProgress = _progress.clamp(0, 1);
-    const _startOffset = 0.01;
+    final rangedProgress = _progress.clamp(0, 1);
+    const startOffset = 0.01;
 
-    return _startOffset + (1 - _startOffset) * _rangedProgress;
+    return startOffset + (1 - startOffset) * rangedProgress;
   }
 
   @override

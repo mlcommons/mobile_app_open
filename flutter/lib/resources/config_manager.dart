@@ -81,7 +81,7 @@ class ConfigManager {
     const jsonEncoder = JsonEncoder.withIndent('  ');
 
     if (!await file.exists()) {
-      print('Create new config file at ' + file.path);
+      print('Create new config file at ${file.path}');
       await file.writeAsString(jsonEncoder.convert(defaultConfig.asMap()));
       return file;
     }
@@ -89,7 +89,7 @@ class ConfigManager {
     final configs =
         jsonDecode(await file.readAsString()) as Map<String, dynamic>;
     if (configs[defaultConfig.name] != defaultConfig.path) {
-      print('Update default config path in ' + file.path);
+      print('Update default config path in ${file.path}');
       configs[defaultConfig.name] = defaultConfig.path;
       await file.writeAsString(jsonEncoder.convert(configs));
     }

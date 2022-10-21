@@ -17,7 +17,7 @@ class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
   @override
-  _SettingsScreen createState() => _SettingsScreen();
+  State<SettingsScreen> createState() => _SettingsScreen();
 }
 
 class _SettingsScreen extends State<SettingsScreen> {
@@ -199,6 +199,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                     state.state == BenchmarkStateEnum.waiting) {
                   final taskConfigs = await state.configManager.getConfigs();
 
+                  if (!mounted) return;
                   await Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => TaskConfigScreen(taskConfigs)));
                 } else {
@@ -217,6 +218,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                     context, stringResources.settingsClearCacheConfirm)) {
                   case ConfirmDialogAction.ok:
                     await state.clearCache();
+                    if (!mounted) return;
                     Navigator.pop(context);
                     break;
                   case ConfirmDialogAction.cancel:

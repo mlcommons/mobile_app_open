@@ -13,7 +13,7 @@ class ResultCircle extends StatefulWidget {
         super(key: key);
 
   @override
-  _ResultCircleState createState() => _ResultCircleState();
+  State<ResultCircle> createState() => _ResultCircleState();
 }
 
 class _ResultCircleState extends State<ResultCircle>
