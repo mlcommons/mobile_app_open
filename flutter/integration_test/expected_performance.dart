@@ -97,3 +97,15 @@ const taskExpectedPerformance = {
   'natural_language_processing': _naturalLanguageProcessing,
   'image_classification_offline': _imageClassificationOffline,
 };
+
+const expectedInstabilityMap = {
+  _tagCloudBuildN2S4: {
+    _tagTfliteDll: 1.15,
+  },
+  _tagPixel5: {
+    _tagTfliteSo: 1.15,
+  },
+  _tagPixel6: {
+    _tagPixelSo: 1.05,
+  },
+};

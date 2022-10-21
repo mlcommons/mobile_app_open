@@ -114,8 +114,6 @@ void checkPerformance(
   BenchmarkExportResult benchmarkResult,
   EnvironmentInfo environmentInfo,
 ) {
-  const allowedDeviation = 0.1;
-
   final taskId = benchmarkResult.benchmarkId;
   final expectedMap = taskExpectedPerformance[taskId];
   expect(
@@ -134,28 +132,43 @@ void checkPerformance(
   );
   deviceExpectedMap!;
 
-  final backend = benchmarkResult.backendInfo.filename;
-  final expectedPerf = deviceExpectedMap[backend];
+  final backendTag = benchmarkResult.backendInfo.filename;
+  final expectedPerf = deviceExpectedMap[backendTag];
   expect(
     expectedPerf,
     isNotNull,
-    reason: 'missing expected performance for $taskId+$model+$backend',
+    reason: 'missing expected performance for $taskId+$model+$backendTag',
   );
   expectedPerf!;
 
   final run = benchmarkResult.performanceRun;
   run!;
 
+  final deviceExpectedInstability = expectedInstabilityMap[model];
+  expect(
+    deviceExpectedInstability,
+    isNotNull,
+    reason: 'missing expected instability for $model',
+  );
+  deviceExpectedInstability!;
+  final expectedInstability = deviceExpectedInstability[backendTag];
+  expect(
+    expectedInstability,
+    isNotNull,
+    reason: 'missing expected instability for $model+$backendTag',
+  );
+  expectedInstability!;
+
   final value = run.throughput;
   value!;
   expect(
     value,
-    greaterThanOrEqualTo(expectedPerf * (1 - allowedDeviation)),
-    reason: 'performance for $taskId+$model+$backend is too low',
+    greaterThanOrEqualTo(expectedPerf / expectedInstability),
+    reason: 'performance for $taskId+$model+$backendTag is too low',
   );
   expect(
     value,
-    lessThanOrEqualTo(expectedPerf * (1 + allowedDeviation)),
-    reason: 'performance for $taskId+$model+$backend is too high',
+    lessThanOrEqualTo(expectedPerf * expectedInstability),
+    reason: 'performance for $taskId+$model+$backendTag is too high',
   );
 }
