@@ -34,7 +34,7 @@ class EnvironmentInfo {
           windows: null,
         );
 
-  EnvironmentInfo.makeWIndows({required EnvWindows info})
+  EnvironmentInfo.makeWindows({required EnvWindows info})
       : platform = EnvPlatform.windows,
         value = EnvInfoValue(
           android: null,

@@ -40,7 +40,7 @@ class DeviceInfo {
     } else if (Platform.isIOS) {
       return EnvironmentInfo.makeIos(info: await _makeIosInfo());
     } else if (Platform.isWindows) {
-      return EnvironmentInfo.makeWIndows(info: await _makeWindowsInfo());
+      return EnvironmentInfo.makeWindows(info: await _makeWindowsInfo());
     } else {
       throw 'Could not define platform';
     }
