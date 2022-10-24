@@ -37,7 +37,8 @@ class _RunIn extends Struct {
 
   void set(RunSettings rs) {
     backend_model_path = rs.backend_model_path.toNativeUtf8();
-    backend_lib_path = rs.backend_lib_path.toNativeUtf8();
+    final libPath = libPathFromName(rs.backend_lib_name);
+    backend_lib_path = libPath.toNativeUtf8();
 
     final backendSettings = rs.backend_settings.writeToBuffer();
     backend_settings_len = backendSettings.length;

@@ -1,6 +1,9 @@
 import 'package:uuid/uuid.dart';
 
 import 'package:mlperfbench_common/data/build_info/build_info.dart';
+import 'package:mlperfbench_common/data/environment/env_android.dart';
+import 'package:mlperfbench_common/data/environment/env_ios.dart';
+import 'package:mlperfbench_common/data/environment/env_windows.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
@@ -70,30 +73,55 @@ class SampleGenerator {
         loadgenScenario:
             BenchmarkExportResult.parseLoadgenScenario('SingleStream'),
       );
+  EnvironmentInfo get envInfo => EnvironmentInfo(
+        platform: EnvPlatform.android,
+        value: EnvInfoValue(
+          android: EnvAndroid(
+            osVersion: '',
+            modelCode: '',
+            modelName: '',
+            boardCode: '',
+            manufacturer: '',
+            procCpuinfoSocName: '',
+            props: [
+              EnvAndroidProp(
+                type: AndroidPropType.socName,
+                name: '',
+                value: '',
+              )
+            ],
+          ),
+          ios: EnvIos(
+            osVersion: '',
+            modelCode: '',
+            modelName: '',
+            socName: '',
+          ),
+          windows: EnvWindows(
+            osVersion: '',
+            cpuFullName: '',
+          ),
+        ),
+      );
+  BuildInfo get buildInfo => BuildInfo(
+        version: '1.0',
+        buildNumber: '10qwe',
+        gitBranch: 'feature',
+        gitCommit: 'as91230jr90qwe',
+        gitDirtyFlag: false,
+        devTestFlag: true,
+        backendList: <String>[
+          'libtflitebackend',
+        ],
+        officialReleaseFlag: false,
+      );
   ExtendedResult get extendedResult => ExtendedResult(
         meta: ResultMetaInfo(
           uploadDate: DateTime.now(),
           uuid: const Uuid().v4(),
         ),
-        buildInfo: BuildInfo(
-          version: '1.0',
-          buildNumber: '10qwe',
-          gitBranch: 'feature',
-          gitCommit: 'as91230jr90qwe',
-          gitDirtyFlag: false,
-          devTestFlag: true,
-          backendList: <String>[
-            'libtflitebackend',
-          ],
-          officialReleaseFlag: false,
-        ),
-        environmentInfo: EnvironmentInfo(
-          manufacturer: 'Unknown',
-          modelCode: 'Unknown PC',
-          modelName: 'Unknown PC',
-          osName: OsEnum.windows,
-          osVersion: '10.0',
-        ),
+        buildInfo: buildInfo,
+        environmentInfo: envInfo,
         results: [exportResult, exportResult],
       );
 }

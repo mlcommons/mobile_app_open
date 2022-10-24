@@ -123,7 +123,7 @@ class BenchmarkState extends ChangeNotifier {
 
   BenchmarkState._(this._store, this.backendBridge, this.firebaseManager) {
     resourceManager = ResourceManager(notifyListeners, _store);
-    backendInfo = BackendInfo.findMatching();
+    backendInfo = BackendInfoHelper().findMatching();
   }
 
   Future<void> uploadLastResult() async {
@@ -408,7 +408,7 @@ class BenchmarkState extends ChangeNotifier {
         benchmark,
         perfMode,
         backendInfo.settings.commonSetting,
-        backendInfo.libPath,
+        backendInfo.libName,
         currentLogDir,
       );
       perfTimer.stop();
@@ -444,7 +444,7 @@ class BenchmarkState extends ChangeNotifier {
           benchmark,
           accuracyMode,
           backendInfo.settings.commonSetting,
-          backendInfo.libPath,
+          backendInfo.libName,
           currentLogDir,
         );
 
@@ -472,7 +472,7 @@ class BenchmarkState extends ChangeNotifier {
     if (!_aborting) {
       lastResult = ExtendedResult(
         meta: ResultMetaInfo(uuid: const Uuid().v4()),
-        environmentInfo: DeviceInfo.environmentInfo,
+        environmentInfo: DeviceInfo.instance.envInfo,
         results: exportResults,
         buildInfo: BuildInfoHelper.info,
       );
@@ -545,7 +545,7 @@ class BenchmarkState extends ChangeNotifier {
         minDuration: benchmark.taskConfig.minDuration,
         minSamples: benchmark.taskConfig.minQueryCount,
         backendInfo: BackendReportedInfo(
-          filename: backendInfo.libPath,
+          filename: backendInfo.libName,
           backendName: performance.backendName,
           vendorName: performance.backendVendor,
           acceleratorName: performance.acceleratorName,
@@ -579,7 +579,7 @@ class BenchmarkState extends ChangeNotifier {
     Benchmark benchmark,
     BenchmarkRunMode runMode,
     List<pb.Setting> commonSettings,
-    String backendLibPath,
+    String backendLibName,
     String logDir,
   ) async {
     print('Running ${benchmark.id} in ${runMode.mode} mode...');
@@ -592,7 +592,7 @@ class BenchmarkState extends ChangeNotifier {
       runMode: runMode,
       resourceManager: resourceManager,
       commonSettings: commonSettings,
-      backendLibPath: backendLibPath,
+      backendLibName: backendLibName,
       logDir: logDir,
       testMinDuration: _store.testMinDuration,
       testMinQueryCount: _store.testMinQueryCount,

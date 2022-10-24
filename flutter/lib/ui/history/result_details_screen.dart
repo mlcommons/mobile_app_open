@@ -65,12 +65,18 @@ class _DetailsScreen extends State<DetailsScreen> {
         .replaceFirst('<build>', res.buildInfo.buildNumber)
         .replaceFirst('<buildType>', appVersionType);
 
+    final utils = HistoryHelperUtils(l10n);
+    final modelDescription = utils.makeModelDescription(res.environmentInfo);
+    final socDescription = utils.makeSocName(res.environmentInfo);
+
     return [
       helper.makeInfo(l10n.historyDetailsDate, date),
       helper.makeInfo(l10n.historyDetailsUUID, res.meta.uuid),
       helper.makeInfo(l10n.historyDetailsAvgQps, averageThroughput),
       helper.makeInfo(l10n.historyDetailsAppVersion, appVersion),
       helper.makeInfo(l10n.historyDetailsBackendName, backendName),
+      helper.makeInfo(l10n.historyDetailsModelName, modelDescription),
+      helper.makeInfo(l10n.historyDetailsSocName, socDescription),
       const Divider(),
       helper.makeHeader(l10n.historyDetailsTableTitle),
       makeBenchmarkTable(context, res.results),
