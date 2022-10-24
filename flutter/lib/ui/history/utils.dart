@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:intl/intl.dart';
+import 'package:mlperfbench_common/data/environment/environment_info.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -181,6 +182,52 @@ class HistoryHelperUtils {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: table,
     );
+  }
+
+  String makeModelDescription(EnvironmentInfo info) {
+    switch (info.platform) {
+      case EnvPlatform.android:
+        final android = info.value.android;
+        if (android == null) {
+          return 'Unknown Android device';
+        }
+        return '${android.manufacturer} ${android.modelName}';
+      case EnvPlatform.ios:
+        final ios = info.value.ios;
+        if (ios == null) {
+          return 'Unknown iOS device';
+        }
+        return 'Apple ${ios.modelName}';
+      case EnvPlatform.windows:
+        return 'PC';
+      default:
+        return '';
+    }
+  }
+
+  String makeSocName(EnvironmentInfo info) {
+    switch (info.platform) {
+      case EnvPlatform.android:
+        final android = info.value.android;
+        if (android == null) {
+          return 'Unknown';
+        }
+        return android.procCpuinfoSocName;
+      case EnvPlatform.ios:
+        final ios = info.value.ios;
+        if (ios == null) {
+          return 'Unknown';
+        }
+        return ios.socName;
+      case EnvPlatform.windows:
+        final windows = info.value.windows;
+        if (windows == null) {
+          return 'Unknown';
+        }
+        return windows.cpuFullName;
+      default:
+        return 'Unknown';
+    }
   }
 }
 

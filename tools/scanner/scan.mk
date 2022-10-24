@@ -54,6 +54,7 @@ scanner/scan:
 	sonar-scanner \
 		-Dsonar.organization=mlcommons \
 		-Dsonar.projectKey=mlcommons_mobile_app_open \
+		-Dsonar.projectVersion=${FLUTTER_APP_VERSION} \
 		-Dsonar.sources=. \
 		-Dsonar.python.version="3.8, 3.9, 3.10" \
 		-Dsonar.cfamily.build-wrapper-output="${SONAR_OUT_DIR}" \

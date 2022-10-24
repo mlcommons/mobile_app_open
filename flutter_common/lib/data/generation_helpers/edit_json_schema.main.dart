@@ -44,6 +44,9 @@ Future<void> main() async {
   makeNullable(definitions['Run']['properties']['accuracy']);
   makeNullable(definitions['Run']['properties']['accuracy2']);
   makeNullable(definitions['Run']['properties']['loadgen_info']);
+  makeNullable(definitions['Value']['properties']['android']);
+  makeNullable(definitions['Value']['properties']['ios']);
+  makeNullable(definitions['Value']['properties']['windows']);
   (definitions['Run']['properties']['start_datetime'] as Map<String, dynamic>)
       .remove('format');
 

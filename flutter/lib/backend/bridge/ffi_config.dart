@@ -30,11 +30,11 @@ pb.MLPerfConfig getMLPerfConfig(String pbtxtContent) {
   if (runOut.address == 0) {
     throw '$_runName result: nullprt';
   }
-  if (runOut.ref.data.address == 0) {
-    throw '$_runName result: data: nullptr';
-  }
 
   try {
+    if (runOut.ref.data.address == 0) {
+      throw '$_runName result: data: nullptr';
+    }
     final view = runOut.ref.data.asTypedList(runOut.ref.size);
     return pb.MLPerfConfig.fromBuffer(view);
   } finally {

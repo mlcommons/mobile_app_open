@@ -30,10 +30,11 @@ typedef _Free2 = void Function(Pointer<_RunOut>);
 final _free = getBridgeHandle().lookupFunction<_Free1, _Free2>(_freeName);
 
 pb.BackendSetting? backendMatch({
-  required String libPath,
+  required String libName,
   required String manufacturer,
   required String model,
 }) {
+  final libPath = libPathFromName(libName);
   final libPathUtf8 = libPath.toNativeUtf8();
   final manufacturerUtf8 = manufacturer.toNativeUtf8();
   final modelUtf8 = model.toNativeUtf8();

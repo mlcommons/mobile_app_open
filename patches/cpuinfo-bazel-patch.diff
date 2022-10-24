@@ -1,0 +1,24 @@
+From 30a4dc8b0c26f87cdd01a0a36a5cdae381d53afe Mon Sep 17 00:00:00 2001
+From: Danil Uzlov <DanilUzlov@yandex.ru>
+Date: Tue, 11 Oct 2022 17:13:34 +0700
+Subject: fix bazel build config
+
+---
+ BUILD.bazel | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 90bef8d..70b037e 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -168,7 +168,7 @@ cc_library(
+         "src/arm/midr.h",
+     ],
+     deps = [
+-        "@org_pytorch_cpuinfo//deps/clog",
++        "//deps/clog",
+     ],
+ )
+ 
+-- 
+2.34.1.windows.1
