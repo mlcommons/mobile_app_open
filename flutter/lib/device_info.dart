@@ -96,12 +96,12 @@ class DeviceInfo {
       procCpuinfoSocName: getSocName(),
       props: [
         EnvAndroidProp(
-          type: 'soc_model',
+          type: AndroidPropType.socName,
           name: 'ro.soc.model',
           value: propSocModel.outText,
         ),
         EnvAndroidProp(
-          type: 'soc_manufacturer',
+          type: AndroidPropType.socManufacturer,
           name: 'ro.soc.manufacturer',
           value: propSocManufacturer.outText,
         ),

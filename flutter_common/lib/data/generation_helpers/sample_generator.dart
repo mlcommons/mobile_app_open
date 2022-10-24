@@ -83,7 +83,10 @@ class SampleGenerator {
             boardCode: '4',
             manufacturer: '5',
             procCpuinfoSocName: '6',
-            props: [EnvAndroidProp(type: '7', name: '8', value: '9')],
+            props: [
+              EnvAndroidProp(
+                  type: AndroidPropType.socName, name: '8', value: '9')
+            ],
           ),
           ios: EnvIos(
             osVersion: '10',

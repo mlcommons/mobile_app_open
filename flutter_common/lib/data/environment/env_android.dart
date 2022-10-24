@@ -28,9 +28,11 @@ class EnvAndroid {
   Map<String, dynamic> toJson() => _$EnvAndroidToJson(this);
 }
 
+enum AndroidPropType { socName, socManufacturer }
+
 @JsonSerializable(fieldRename: FieldRename.snake)
 class EnvAndroidProp {
-  final String type;
+  final AndroidPropType type;
   final String name;
   final String value;
 
