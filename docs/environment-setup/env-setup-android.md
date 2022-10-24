@@ -1,6 +1,6 @@
 # Android environment setup guide
 
-This file describes how to setup the environment for Android builds on Ubuntu.
+This file describes how to setup the environment for Android builds.
 
 Android native libs can not be built on Windows.
 If you use Windows as your primary build system you will have to use a helper linux or macos system to build libs.

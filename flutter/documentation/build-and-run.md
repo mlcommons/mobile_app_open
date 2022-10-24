@@ -99,16 +99,17 @@ You can run `make flutter/build-info` manually before you do hot reload to updat
 [comment]: # (TODO add information about using Android emulators)
 
 On Linux command `make flutter` builds native libs automatically.  
-See [Android environment setup guide](./env-setup-android.md#setting-up-the-environment-on-ubuntu).
+See [Android environment setup guide](../../docs/environment-setup/env-setup-android.md#setting-up-the-environment-on-ubuntu).
 
 On macOS `make flutter` will try to build native libs for iOS. Run `make flutter/android` to build android libs on macOS.  
 Unfortunately, there is no complete environment setup guide for now.
-See [macOS guide](./env-setup-ios.md#setting-up-the-environment) for general setup and [Ubuntu guide](./env-setup-android.md#setting-up-the-environment-on-ubuntu) for android-specific parts.
+See [macOS guide](../../docs/environment-setup/env-setup-ios.md#setting-up-the-environment) for general setup
+and [Ubuntu guide](../../docs/environment-setup/env-setup-android.md#setting-up-the-environment-on-ubuntu) for android-specific parts.
 
 On Windows building libs for Android is not available.  
 You can copy `.so` files from some Linux or macOS system, then run `make flutter/prepare`, and then run Flutter commands locally.  
 For example, it's relatively convenient to use WSL to build native libs.
-See [Windows environment setup guide](./env-setup-windows.md#setting-up-the-environment) to set up your system to run Flutter.
+See [Windows environment setup guide](../../docs/environment-setup/env-setup-windows.md#setting-up-the-environment) to set up your system to run Flutter.
 
 Run `make OFFICIAL_BUILD=false FLUTTER_BUILD_NUMBER=0 flutter/android/release` to build APK from scratch,
 or run `make flutter/android/apk` after `make flutter/prepare` and you already have native libs.
@@ -129,7 +130,7 @@ rm -f flutter/android/gradle/wrapper/gradle-wrapper.jar
 
 Building for iOS is available only on macOS.
 
-See [iOS environment setup guide](./env-setup-ios.md#setting-up-the-environment).
+See [iOS environment setup guide](../../docs/environment-setup/env-setup-ios.md#setting-up-the-environment).
 
 If you want to run the app on a real device, you have to change settings in XCode:
 
@@ -160,7 +161,7 @@ Run `make OFFICIAL_BUILD=false FLUTTER_BUILD_NUMBER=0 flutter/ios/release` to cr
 
 Building for Windows is available only on Windows.
 
-See [Windows environment setup guide](./env-setup-windows.md#setting-up-the-environment).
+See [Windows environment setup guide](../../docs/environment-setup/env-setup-windows.md#setting-up-the-environment).
 
 On Windows it's pretty easy to use Visual Studio debugger for native libs.
 
