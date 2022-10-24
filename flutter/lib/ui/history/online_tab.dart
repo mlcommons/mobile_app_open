@@ -110,14 +110,13 @@ class OnlineTab implements TabInterface {
     final startDatetime = firstRunInfo.performanceRun?.startDatetime ??
         firstRunInfo.accuracyRun!.startDatetime;
 
-    final modelDescription =
-        '${item.environmentInfo.manufacturer} ${item.environmentInfo.modelName}';
+    final utils = HistoryHelperUtils(l10n);
 
     return helper.makeListItem(
       title: helper.formatDate(startDatetime.toLocal()),
       specialTitleColor: results.any(
           (runRes) => !(runRes.performanceRun?.loadgenInfo?.validity ?? false)),
-      subtitle: modelDescription,
+      subtitle: utils.makeModelDescription(item.environmentInfo),
       onTap: () {
         Navigator.push(
           context,

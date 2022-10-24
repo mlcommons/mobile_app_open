@@ -9,6 +9,8 @@ VERS_1.0 {
     dart_ffi_backend_match_free;
     dart_ffi_mlperf_config;
     dart_ffi_mlperf_config_free;
+    dart_ffi_cpuinfo;
+    dart_ffi_cpuinfo_free;
 
   # Hide everything else.
   local:
