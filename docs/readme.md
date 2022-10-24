@@ -16,3 +16,4 @@ Refer to the [root README file](../README.md) for general overview of the repo.
 * [Adding support for a new custom backend](./adding-custom-backend.md)
 * [Using custom benchmark configuration](./custom-tasks.md)
 * [Working with Firebase](./firebase.md)
+* [Formal result specification](./result-spec.md)
