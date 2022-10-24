@@ -1,4 +1,4 @@
-name: Run iOS XCTest
+name: iOS Tests
 
 on:
   push:

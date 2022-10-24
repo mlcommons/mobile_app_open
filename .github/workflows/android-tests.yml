@@ -1,4 +1,4 @@
-name: Unit tests
+name: Android Tests
 
 on:
   push:
@@ -10,6 +10,7 @@ on:
 
 jobs:
   flutter:
+    name: Run Flutter Android unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
