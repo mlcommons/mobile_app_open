@@ -13,3 +13,4 @@ Refer to the [root README file](../README.md) for general overview of the repo.
 * [Environment setup for iOS builds](./environment-setup/env-setup-ios.md)
 * [Environment setup for Windows builds](./environment-setup/env-setup-windows.md)
 * [Build and Run the app](./build-and-run.md)
+* [Adding support for a new custom backend](./adding-custom-backend.md)

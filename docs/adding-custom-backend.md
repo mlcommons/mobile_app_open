@@ -43,18 +43,19 @@ Set `backend_<vendor>_android_target` to appropriate value for your build system
 You will need to do few things:
 
 * Include your `<vendor>_backend.mk` into the root makefile.
-* Add new line with your `<VENDOR>_TAG` into [list.in](../lib/backend/list.in).  
+* Add new line with your `<VENDOR>_TAG` into [list.in](../flutter/lib/backend/list.in).  
 Note that order is important in this file. Backends are evaluated in the order they are defined, and the app never checks backends after TFLite.
 Place your tag before TFLite tag.
-* Add line to substitute this tag with the actual name of your backend lib into [flutter.mk](../flutter.mk) in the `flutter/backend-list` make target
+* Add line to substitute this tag with the actual name of your backend lib into [flutter.mk](../flutter/flutter.mk) in the `flutter/backend-list` make target
 * Add commands to build your backend when `WITH_<VENDOR>=1` make variable is supplied.
-  Modify `flutter/android/libs` ([android.mk](../android/android.mk)) or `flutter/windows/libs` ([windows.mk](../windows/windows.mk)), depending on your platform:
+  Modify `flutter/android/libs` ([android.mk](../flutter/android/android.mk))
+  or `flutter/windows/libs` ([windows.mk](../flutter/windows/windows.mk)), depending on your platform:
   * If you use bazel as your build system, just add a line `${backend_<vendor>_android_target}` into appropriate position
   * If you use different build system, add a condition to only build your backend when `WITH_<VENDOR>=1` is defined.
-  * Add a line `${backend_<vendor>_android_files}` into the copy command
+  * Add a line `${backend_<vendor>_android_files}` into the `copy` command
 
 ## Implementing backend interface
 
-Backend C API is defined in [flutter/cpp/c/backend_c.h](../../flutter/cpp/c/backend_c.h).  
+Backend C API is defined in [flutter/cpp/c/backend_c.h](../flutter/cpp/c/backend_c.h).  
 Unfortunately, we don't have any documentation on details of how to implement it yet.  
-You can look at the [reference TFLite backend implementation](../../mobile_back_tflite) for hints or create an issue if something is not clear.
+You can look at the [reference TFLite backend implementation](../mobile_back_tflite) for hints or create an issue if something is not clear.
