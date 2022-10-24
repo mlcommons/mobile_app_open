@@ -77,26 +77,29 @@ class SampleGenerator {
         platform: EnvPlatform.android,
         value: EnvInfoValue(
           android: EnvAndroid(
-            osVersion: '1',
-            modelCode: '2',
-            modelName: '3',
-            boardCode: '4',
-            manufacturer: '5',
-            procCpuinfoSocName: '6',
+            osVersion: '',
+            modelCode: '',
+            modelName: '',
+            boardCode: '',
+            manufacturer: '',
+            procCpuinfoSocName: '',
             props: [
               EnvAndroidProp(
-                  type: AndroidPropType.socName, name: '8', value: '9')
+                type: AndroidPropType.socName,
+                name: '',
+                value: '',
+              )
             ],
           ),
           ios: EnvIos(
-            osVersion: '10',
-            modelCode: '11',
-            modelName: '12',
-            socName: '13',
+            osVersion: '',
+            modelCode: '',
+            modelName: '',
+            socName: '',
           ),
           windows: EnvWindows(
-            osVersion: '14',
-            cpuFullName: '15',
+            osVersion: '',
+            cpuFullName: '',
           ),
         ),
       );

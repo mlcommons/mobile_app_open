@@ -78,7 +78,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "device_type": {
+                "platform": {
                     "type": "string"
                 },
                 "value": {
@@ -86,7 +86,7 @@
                 }
             },
             "required": [
-                "device_type",
+                "platform",
                 "value"
             ],
             "title": "EnvironmentInfo"
@@ -138,28 +138,22 @@
             "additionalProperties": false,
             "properties": {
                 "os_version": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "manufacturer": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "model_code": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "model_name": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "board_code": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "proc_cpuinfo_soc_name": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "props": {
                     "type": "array",
@@ -184,16 +178,13 @@
             "additionalProperties": false,
             "properties": {
                 "type": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "name": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "value": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 }
             },
             "required": [
@@ -208,20 +199,16 @@
             "additionalProperties": false,
             "properties": {
                 "os_version": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "model_code": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "model_name": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "soc_name": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 }
             },
             "required": [
@@ -237,12 +224,10 @@
             "additionalProperties": false,
             "properties": {
                 "os_version": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 },
                 "cpu_full_name": {
-                    "type": "string",
-                    "format": "integer"
+                    "type": "string"
                 }
             },
             "required": [
