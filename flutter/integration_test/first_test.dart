@@ -109,6 +109,21 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   );
 }
 
+String getModel(EnvironmentInfo info) {
+  switch(info.platform) {
+    case EnvPlatform.android:
+      final value = info.value.android!;
+      return value.modelCode!;
+    case EnvPlatform.ios:
+      final value = info.value.ios!;
+      return value.modelCode!;
+    case EnvPlatform.windows:
+      final value = info.value.windows!;
+      return value.cpuFullName;
+    default: throw 'unsupported platform ${info.platform}';
+  }
+}
+
 void checkPerformance(
   BenchmarkExportResult benchmarkResult,
   EnvironmentInfo environmentInfo,
@@ -122,7 +137,7 @@ void checkPerformance(
   );
   expectedMap!;
 
-  final model = environmentInfo.modelCode;
+  final model = getModel(environmentInfo);
   final deviceExpectedMap = expectedMap[model];
   expect(
     deviceExpectedMap,

@@ -1,14 +1,12 @@
-const _tagTfliteDll = 'libtflitebackend.dll';
-const _tagTfliteSo = 'libtflitebackend.so';
-const _tagPixelSo = 'libtflitepixelbackend.so';
-const _tagTfliteFramework = 'libtflitebackend.framework/libtflitebackend';
-const _tagCoremlFramework = 'libcoremlbackend.framework/libcoremlbackend';
+const _tagTflite = 'libtflitebackend';
+const _tagPixelSo = 'libtflitepixelbackend';
+const _tagCoreml = 'libcoremlbackend';
 
 /// Windows
 // cloudbuild n2-standard-4 machine
-const _tagCloudBuildN2S4 = 'Unknown PC';
+const _tagCloudBuildN2S4 = 'Intel Xeon 2.80GHz';
 // not a valid device name, it's only here as a reference
-const _tagRyzen5600 = 'Unknown PC+ryzen5600x';
+const _tagRyzen5600 = 'AMD Ryzen 5 5600X 6-Core';
 
 const _tagPixel5 = 'Pixel 5';
 const _tagPixel6 = 'Pixel 6';
@@ -17,63 +15,63 @@ const _tagIphone12mini = 'iPhone13,1';
 const _tagIosSimMBP2019 = 'x86_64';
 
 const Map<String, Map<String, double>> _imageClassification = {
-  _tagCloudBuildN2S4: {_tagTfliteDll: 10},
-  _tagRyzen5600: {_tagTfliteDll: 34},
-  _tagPixel5: {_tagTfliteSo: 104},
+  _tagCloudBuildN2S4: {_tagTflite: 10},
+  _tagRyzen5600: {_tagTflite: 34},
+  _tagPixel5: {_tagTflite: 104},
   _tagPixel6: {_tagPixelSo: 1015},
   _tagIphone12mini: {
-    _tagTfliteFramework: 654,
-    _tagCoremlFramework: 545,
+    _tagTflite: 654,
+    _tagCoreml: 545,
   },
-  _tagIosSimMBP2019: {_tagTfliteSo: 23},
+  _tagIosSimMBP2019: {_tagTflite: 23},
 };
 
 const Map<String, Map<String, double>> _objectDetection = {
-  _tagCloudBuildN2S4: {_tagTfliteDll: 5.1},
-  _tagRyzen5600: {_tagTfliteDll: 18},
-  _tagPixel5: {_tagTfliteSo: 48},
+  _tagCloudBuildN2S4: {_tagTflite: 5.1},
+  _tagRyzen5600: {_tagTflite: 18},
+  _tagPixel5: {_tagTflite: 48},
   _tagPixel6: {_tagPixelSo: 440},
   _tagIphone12mini: {
-    _tagTfliteFramework: 259,
-    _tagCoremlFramework: 305,
+    _tagTflite: 259,
+    _tagCoreml: 305,
   },
-  _tagIosSimMBP2019: {_tagTfliteSo: 12.5},
+  _tagIosSimMBP2019: {_tagTflite: 12.5},
 };
 
 const Map<String, Map<String, double>> _imageSegmentation = {
-  _tagCloudBuildN2S4: {_tagTfliteDll: 1.9},
-  _tagRyzen5600: {_tagTfliteDll: 6},
-  _tagPixel5: {_tagTfliteSo: 30},
+  _tagCloudBuildN2S4: {_tagTflite: 1.9},
+  _tagRyzen5600: {_tagTflite: 6},
+  _tagPixel5: {_tagTflite: 30},
   _tagPixel6: {_tagPixelSo: 160},
   _tagIphone12mini: {
-    _tagTfliteFramework: 22,
-    _tagCoremlFramework: 75,
+    _tagTflite: 22,
+    _tagCoreml: 75,
   },
-  _tagIosSimMBP2019: {_tagTfliteSo: 4},
+  _tagIosSimMBP2019: {_tagTflite: 4},
 };
 
 const Map<String, Map<String, double>> _naturalLanguageProcessing = {
-  _tagCloudBuildN2S4: {_tagTfliteDll: 1},
-  _tagRyzen5600: {_tagTfliteDll: 3},
-  _tagPixel5: {_tagTfliteSo: 2.4},
+  _tagCloudBuildN2S4: {_tagTflite: 1},
+  _tagRyzen5600: {_tagTflite: 3},
+  _tagPixel5: {_tagTflite: 2.4},
   _tagPixel6: {_tagPixelSo: 67},
   _tagIphone12mini: {
-    _tagTfliteFramework: 12,
-    _tagCoremlFramework: 81,
+    _tagTflite: 12,
+    _tagCoreml: 81,
   },
-  _tagIosSimMBP2019: {_tagTfliteSo: 2.3},
+  _tagIosSimMBP2019: {_tagTflite: 2.3},
 };
 
 const Map<String, Map<String, double>> _imageClassificationOffline = {
-  _tagCloudBuildN2S4: {_tagTfliteDll: 12},
-  _tagRyzen5600: {_tagTfliteDll: 52},
-  _tagPixel5: {_tagTfliteSo: 152},
+  _tagCloudBuildN2S4: {_tagTflite: 12},
+  _tagRyzen5600: {_tagTflite: 52},
+  _tagPixel5: {_tagTflite: 152},
   _tagPixel6: {_tagPixelSo: 1550},
   _tagIphone12mini: {
-    _tagTfliteFramework: 1600,
-    _tagCoremlFramework: 1250,
+    _tagTflite: 1600,
+    _tagCoreml: 1250,
   },
-  _tagIosSimMBP2019: {_tagTfliteSo: 35},
+  _tagIosSimMBP2019: {_tagTflite: 35},
 };
 
 const taskExpectedPerformance = {
@@ -86,10 +84,13 @@ const taskExpectedPerformance = {
 
 const expectedInstabilityMap = {
   _tagCloudBuildN2S4: {
-    _tagTfliteDll: 1.15,
+    _tagTflite: 1.15,
+  },
+  _tagRyzen5600: {
+    _tagTflite: 1.05,
   },
   _tagPixel5: {
-    _tagTfliteSo: 1.15,
+    _tagTflite: 1.15,
   },
   _tagPixel6: {
     _tagPixelSo: 1.1,
