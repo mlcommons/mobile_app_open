@@ -74,7 +74,7 @@ class SampleGenerator {
             BenchmarkExportResult.parseLoadgenScenario('SingleStream'),
       );
   EnvironmentInfo get envInfo => EnvironmentInfo(
-        deviceType: EnvDeviceType.android,
+        platform: EnvPlatform.android,
         value: EnvInfoValue(
           android: EnvAndroid(
             osVersion: '1',

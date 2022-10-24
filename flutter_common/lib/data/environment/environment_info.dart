@@ -6,20 +6,20 @@ import 'package:mlperfbench_common/data/environment/env_windows.dart';
 
 part 'environment_info.g.dart';
 
-enum EnvDeviceType { android, ios, windows }
+enum EnvPlatform { android, ios, windows }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class EnvironmentInfo {
-  final EnvDeviceType deviceType;
+  final EnvPlatform platform;
   final EnvInfoValue value;
 
   EnvironmentInfo({
-    required this.deviceType,
+    required this.platform,
     required this.value,
   });
 
   EnvironmentInfo.makeAndroid({required EnvAndroid info})
-      : deviceType = EnvDeviceType.android,
+      : platform = EnvPlatform.android,
         value = EnvInfoValue(
           android: info,
           ios: null,
@@ -27,7 +27,7 @@ class EnvironmentInfo {
         );
 
   EnvironmentInfo.makeIos({required EnvIos info})
-      : deviceType = EnvDeviceType.ios,
+      : platform = EnvPlatform.ios,
         value = EnvInfoValue(
           android: null,
           ios: info,
@@ -35,7 +35,7 @@ class EnvironmentInfo {
         );
 
   EnvironmentInfo.makeWIndows({required EnvWindows info})
-      : deviceType = EnvDeviceType.windows,
+      : platform = EnvPlatform.windows,
         value = EnvInfoValue(
           android: null,
           ios: null,

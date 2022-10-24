@@ -185,20 +185,20 @@ class HistoryHelperUtils {
   }
 
   String makeModelDescription(EnvironmentInfo info) {
-    switch (info.deviceType) {
-      case EnvDeviceType.android:
+    switch (info.platform) {
+      case EnvPlatform.android:
         final android = info.value.android;
         if (android == null) {
           return 'Unknown Android device';
         }
         return '${android.manufacturer} ${android.modelName}';
-      case EnvDeviceType.ios:
+      case EnvPlatform.ios:
         final ios = info.value.ios;
         if (ios == null) {
           return 'Unknown iOS device';
         }
         return 'Apple ${ios.modelName}';
-      case EnvDeviceType.windows:
+      case EnvPlatform.windows:
         return 'PC';
       default:
         return '';
@@ -206,20 +206,20 @@ class HistoryHelperUtils {
   }
 
   String makeSocName(EnvironmentInfo info) {
-    switch (info.deviceType) {
-      case EnvDeviceType.android:
+    switch (info.platform) {
+      case EnvPlatform.android:
         final android = info.value.android;
         if (android == null) {
           return 'Unknown';
         }
         return android.procCpuinfoSocName;
-      case EnvDeviceType.ios:
+      case EnvPlatform.ios:
         final ios = info.value.ios;
         if (ios == null) {
           return 'Unknown';
         }
         return ios.socName;
-      case EnvDeviceType.windows:
+      case EnvPlatform.windows:
         final windows = info.value.windows;
         if (windows == null) {
           return 'Unknown';

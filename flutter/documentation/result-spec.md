@@ -114,10 +114,10 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
 
 Info about environment the app is running in. May change when you update your OS, change device hardware, or use another device.
 
-* `device_type`: string
-  Device type used to determine which `info` entry should be used.  
-  Currently device type simply maps to supported OS list but this may change in the future.
-  Allowed values:
+* `platform`: string  
+  Used to determine which `info` entry should be used.  
+  Currently device type simply maps to supported OS list but this may change in the future.  
+  Allowed values:  
   * `android`
   * `ios`
   * `windows`

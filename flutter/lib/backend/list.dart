@@ -20,12 +20,12 @@ class BackendInfoHelper {
   }
 
   pb.BackendSetting? match(String libName) {
-    switch (DeviceInfo.instance.envInfo.deviceType) {
-      case EnvDeviceType.android:
+    switch (DeviceInfo.instance.envInfo.platform) {
+      case EnvPlatform.android:
         return matchAndroid(libName);
-      case EnvDeviceType.ios:
+      case EnvPlatform.ios:
         return matchIos(libName);
-      case EnvDeviceType.windows:
+      case EnvPlatform.windows:
         return matchWindows(libName);
       default:
         throw 'unsupported platform';
