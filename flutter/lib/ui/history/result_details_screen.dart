@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench_common/data/environment/os_enum.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
+import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/run_details_screen.dart';
 import 'utils.dart';
@@ -19,11 +23,13 @@ class DetailsScreen extends StatefulWidget {
 class _DetailsScreen extends State<DetailsScreen> {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
+  late BenchmarkState state;
 
   @override
   Widget build(BuildContext context) {
     l10n = AppLocalizations.of(context);
     helper = HistoryHelperUtils(l10n);
+    state = context.watch<BenchmarkState>();
 
     return Scaffold(
       appBar: helper.makeAppBar(l10n.historyDetailsTitle),
