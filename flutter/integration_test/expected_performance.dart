@@ -29,7 +29,7 @@ const Map<String, Map<String, double>> _imageClassification = {
 };
 
 const Map<String, Map<String, double>> _objectDetection = {
-  _tagCloudBuildN2S4: {_tagTfliteDll: 5.0},
+  _tagCloudBuildN2S4: {_tagTfliteDll: 5.1},
   _tagRyzen5600: {_tagTfliteDll: 18},
   _tagPixel5: {_tagTfliteSo: 48},
   _tagPixel6: {_tagPixelSo: 440},
