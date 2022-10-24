@@ -110,7 +110,7 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
 }
 
 String getModel(EnvironmentInfo info) {
-  switch(info.platform) {
+  switch (info.platform) {
     case EnvPlatform.android:
       final value = info.value.android!;
       return value.modelCode!;
@@ -120,7 +120,8 @@ String getModel(EnvironmentInfo info) {
     case EnvPlatform.windows:
       final value = info.value.windows!;
       return value.cpuFullName;
-    default: throw 'unsupported platform ${info.platform}';
+    default:
+      throw 'unsupported platform ${info.platform}';
   }
 }
 
