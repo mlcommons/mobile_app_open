@@ -31,7 +31,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"

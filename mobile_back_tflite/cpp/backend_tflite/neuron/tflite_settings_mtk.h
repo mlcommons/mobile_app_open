@@ -31,7 +31,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "neuron"
   accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
-  configuration: "TFLite"
+  framework: "TFLite"
   batch_size: 1
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
   model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
