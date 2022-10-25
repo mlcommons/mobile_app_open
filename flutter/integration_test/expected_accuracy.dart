@@ -5,37 +5,44 @@ class Interval {
   const Interval({required this.min, required this.max});
 }
 
-// key: <accelerator> OR <accelerator>|<backendName>
+/*
+value: Interval of expected accuracy
+key: <accelerator> OR <accelerator>|<backendName>
+- cpu -> Windows
+- gpu+dsp+npu -> Android TFLite
+- tpu -> Android Pixel
+- ane -> iOS TFLite or Core ML
+*/
+
 const Map<String, Interval> _imageClassification = {
-  'cpu': Interval(min: 1.0, max: 1.0),
-  'gpu+dsp+npu': Interval(min: 0.8999, max: 0.9),
-  'tpu': Interval(min: 0.8999, max: 0.9),
-  'ane': Interval(min: 1.0, max: 1.0),
+  'cpu': Interval(min: 1.00, max: 1.00),
+  'gpu+dsp+npu': Interval(min: 0.89, max: 0.91),
+  'tpu': Interval(min: 0.89, max: 0.91),
+  'ane': Interval(min: 1.00, max: 1.00),
 };
 
 const Map<String, Interval> _objectDetection = {
-  'cpu': Interval(min: 0.3162, max: 0.3163),
-  'gpu+dsp+npu|TFLite': Interval(min: 0.2816, max: 0.3034),
-  'tpu': Interval(min: 0.3609, max: 0.3658),
-  'ane|TFLite': Interval(min: 0.3162, max: 0.3163),
-  'ane|Core ML': Interval(min: 0.4558, max: 0.4559),
+  'cpu': Interval(min: 0.31, max: 0.32),
+  'gpu+dsp+npu': Interval(min: 0.28, max: 0.31),
+  'tpu': Interval(min: 0.36, max: 0.38),
+  'ane|TFLite': Interval(min: 0.31, max: 0.32),
+  'ane|Core ML': Interval(min: 0.45, max: 0.46),
 };
 
 const Map<String, Interval> _imageSegmentation = {
-  'cpu': Interval(min: 0.8387, max: 0.8388),
-  'gpu+dsp+npu': Interval(min: 0.4836, max: 0.4872),
-  'tpu': Interval(min: 0.4836, max: 0.4872),
-  'ane|TFLite': Interval(min: 0.80, max: 0.8275),
-  'ane|Core ML': Interval(min: 0.8277, max: 0.8388),
+  'cpu': Interval(min: 0.83, max: 0.84),
+  'gpu+dsp+npu': Interval(min: 0.48, max: 0.49),
+  'tpu': Interval(min: 0.48, max: 0.49),
+  'ane|TFLite': Interval(min: 0.80, max: 0.83),
+  'ane|Core ML': Interval(min: 0.82, max: 0.84),
 };
 
 const Map<String, Interval> _naturalLanguageProcessing = {
-  'cpu': Interval(min: 1.0, max: 1.0),
-  'gpu+dsp+npu': Interval(min: 1.0, max: 1.0),
-  'tpu': Interval(min: 1.0, max: 1.0),
-  'gpu|TFLite': Interval(min: 1.0, max: 1.0),
-  // 1.0 in simulator, 0.8 on iphone 12 mini
-  'gpu|Core ML': Interval(min: 0.8, max: 1.0),
+  'cpu': Interval(min: 1.00, max: 1.00),
+  'tpu': Interval(min: 1.00, max: 1.00),
+  'gpu|TFLite': Interval(min: 1.00, max: 1.00),
+  // 1.00 in simulator, 0.80 on iphone 12 mini
+  'gpu|Core ML': Interval(min: 0.80, max: 1.00),
 };
 
 const benchmarkExpectedAccuracy = {
