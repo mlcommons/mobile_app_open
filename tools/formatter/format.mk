@@ -92,7 +92,7 @@ lint/markdown-links:
 	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty -n1 markdown-link-check
 
 .PHONY: lint/markdown
-format/markdown:
+lint/markdown:
 	git ls-files -z | \
 		grep --null-data -v "LICENSE.md" | \
 		grep --null-data "\.md$$" --exclude="*LICENSE.md" | \

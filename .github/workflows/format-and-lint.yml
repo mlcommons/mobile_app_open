@@ -76,8 +76,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: npm install -g markdownlint-cli@0.26.0
       - name: Run Markdown format check
-        uses: avto-dev/markdown-lint@v1.5.0
         run: make lint/markdown
       - name: Check links in markdown files
         uses: gaurav-nelson/github-action-markdown-link-check@v1
