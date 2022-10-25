@@ -5,7 +5,6 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/run_details_screen.dart';
 import 'utils.dart';
