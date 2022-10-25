@@ -49,8 +49,8 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
-  accelerator: "gpu"
-  accelerator_desc: "GPU"
+  accelerator: "gpu_f16"
+  accelerator_desc: "GPU (FP16)"
   framework: "TFLite Metal"
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
   model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"

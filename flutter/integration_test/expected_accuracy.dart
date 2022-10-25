@@ -33,7 +33,7 @@ const Map<String, Interval> _imageSegmentation = {
   'cpu': Interval(min: 0.83, max: 0.84),
   'npu': Interval(min: 0.48, max: 0.49),
   'tpu': Interval(min: 0.48, max: 0.49),
-  'ane|TFLite': Interval(min: 0.80, max: 0.83),
+  'ane|TFLite': Interval(min: 0.80, max: 0.84),
   'ane|Core ML': Interval(min: 0.82, max: 0.84),
 };
 
