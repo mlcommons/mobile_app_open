@@ -317,8 +317,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
 #endif  // __ANDROID__
 #if TARGET_OS_SIMULATOR
 #elif TARGET_OS_IPHONE
-    if (strcmp(configs->accelerator, "metal") == 0) {
-      backend_data->accelerator = "Metal";
+    if (strcmp(configs->accelerator, "gpu") == 0) {
+      backend_data->accelerator = "GPU";
       TFLGpuDelegateOptions opts{
           .allow_precision_loss = false,
           .wait_type = TFLGpuDelegateWaitType::TFLGpuDelegateWaitTypePassive,
@@ -326,8 +326,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
       };
       delegate = TFLGpuDelegateCreate(&opts);
       std::cout << "Enabling Metal delegate " << delegate << "\n";
-    } else if (strcmp(configs->accelerator, "coreml") == 0) {
-      backend_data->accelerator = "CoreML";
+    } else if (strcmp(configs->accelerator, "ane") == 0) {
+      backend_data->accelerator = "ANE";
       TfLiteCoreMlDelegateOptions opts{
           .enabled_devices = TfLiteCoreMlDelegateAllDevices,
           .coreml_version = 3,
