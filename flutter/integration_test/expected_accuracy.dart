@@ -40,7 +40,7 @@ const Map<String, Interval> _imageSegmentation = {
 const Map<String, Interval> _naturalLanguageProcessing = {
   'cpu': Interval(min: 1.00, max: 1.00),
   'tpu': Interval(min: 1.00, max: 1.00),
-  'gpu|TFLite': Interval(min: 1.00, max: 1.00),
+  'gpu_f16|TFLite': Interval(min: 1.00, max: 1.00),
   // 1.00 in simulator, 0.80 on iphone 12 mini
   'gpu|Core ML': Interval(min: 0.80, max: 1.00),
 };
