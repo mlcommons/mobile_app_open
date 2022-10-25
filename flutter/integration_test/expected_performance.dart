@@ -15,7 +15,7 @@ const _tagIphone12mini = 'iPhone13,1';
 const _tagIosSimMBP2019 = 'x86_64';
 
 const Map<String, Map<String, double>> _imageClassification = {
-  _tagCloudBuildX23: {_tagTflite: 9.0},
+  _tagCloudBuildX23: {_tagTflite: 9.5},
   _tagCloudBuildX28: {_tagTflite: 10},
   _tagRyzen5600: {_tagTflite: 34},
   _tagPixel5: {_tagTflite: 104},
@@ -54,7 +54,7 @@ const Map<String, Map<String, double>> _imageSegmentation = {
 };
 
 const Map<String, Map<String, double>> _naturalLanguageProcessing = {
-  _tagCloudBuildX23: {_tagTflite: 0.85},
+  _tagCloudBuildX23: {_tagTflite: 0.9},
   _tagCloudBuildX28: {_tagTflite: 1},
   _tagRyzen5600: {_tagTflite: 3},
   _tagPixel5: {_tagTflite: 2.5},
@@ -67,7 +67,7 @@ const Map<String, Map<String, double>> _naturalLanguageProcessing = {
 };
 
 const Map<String, Map<String, double>> _imageClassificationOffline = {
-  _tagCloudBuildX23: {_tagTflite: 11.4},
+  _tagCloudBuildX23: {_tagTflite: 12},
   _tagCloudBuildX28: {_tagTflite: 12},
   _tagRyzen5600: {_tagTflite: 52},
   _tagPixel5: {_tagTflite: 152},
@@ -88,8 +88,8 @@ const taskExpectedPerformance = {
 };
 
 const expectedInstabilityMap = {
-  _tagCloudBuildX23: {_tagTflite: 1.1},
-  _tagCloudBuildX28: {_tagTflite: 1.1},
+  _tagCloudBuildX23: {_tagTflite: 1.15},
+  _tagCloudBuildX28: {_tagTflite: 1.15},
   _tagRyzen5600: {_tagTflite: 1.05},
   _tagPixel5: {_tagTflite: 1.15},
   _tagPixel6: {_tagPixelSo: 1.1},
