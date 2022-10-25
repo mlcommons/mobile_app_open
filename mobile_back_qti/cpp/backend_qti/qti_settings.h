@@ -33,7 +33,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "snpe_aip"
   accelerator_desc: "AIP"
-  configuration: "SNPE"
+  framework: "SNPE"
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/SNPE/mobilenet_edgetpu_224_1.0_hta.dlc"
   model_checksum: "73def045aac5a44a152a093d58e04c96"
 }
@@ -42,7 +42,7 @@ benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "psnpe_aip"
   accelerator_desc: "AIP"
-  configuration: "SNPE"
+  framework: "SNPE"
   batch_size: 3072
   custom_setting {
     id: "scenario"
@@ -56,7 +56,7 @@ benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "snpe_aip"
   accelerator_desc: "AIP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "Postprocessor/BatchMultiClassNonMaxSuppression"
@@ -69,7 +69,7 @@ benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "gpu_f16"
   accelerator_desc: "GPU (FP16)"
-  configuration: "TFLite GPU"
+  framework: "TFLite GPU"
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
   model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
 }
@@ -78,7 +78,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v1"
   accelerator: "snpe_aip"
   accelerator_desc: "AIP"
-  configuration: "SNPE"
+  framework: "SNPE"
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/SNPE/deeplabv3_hta.dlc"
   model_checksum: "b1237cfdef02887a2205154eb44d0515"
 }
@@ -87,7 +87,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   accelerator: "snpe_aip"
   accelerator_desc: "AIP"
-  configuration: "SNPE"
+  framework: "SNPE"
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobile_mosaic_hta.dlc"
   model_checksum: "d6d74288f81e8d121568e6dff6b771e6"
 })SETTINGS";
@@ -106,7 +106,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "bg_load"
     value: "true"
@@ -119,7 +119,7 @@ benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   batch_size: 12288
   custom_setting {
     id: "scenario"
@@ -133,7 +133,7 @@ benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "Postprocessor/BatchMultiClassNonMaxSuppression"
@@ -150,7 +150,7 @@ benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "transpose"
@@ -175,7 +175,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v1"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "input_buffer_type"
     value: "uint_8"
@@ -196,7 +196,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "input_buffer_type"
     value: "uint_8"
@@ -227,7 +227,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "bg_load"
     value: "true"
@@ -240,7 +240,7 @@ benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   batch_size: 12288
   custom_setting {
     id: "scenario"
@@ -254,7 +254,7 @@ benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "Postprocessor/BatchMultiClassNonMaxSuppression"
@@ -271,7 +271,7 @@ benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "transpose"
@@ -292,7 +292,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v1"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "input_buffer_type"
     value: "uint_8"
@@ -313,7 +313,7 @@ benchmark_setting {
   benchmark_id: "IS_uint8_mosaic"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "input_buffer_type"
     value: "uint_8"
@@ -344,7 +344,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "bg_load"
     value: "true"
@@ -357,7 +357,7 @@ benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   batch_size: 12288
   custom_setting {
     id: "scenario"
@@ -371,7 +371,7 @@ benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "Postprocessor/BatchMultiClassNonMaxSuppression"
@@ -388,7 +388,7 @@ benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "transpose"
@@ -409,7 +409,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "input_buffer_type"
     value: "uint_8"
@@ -440,7 +440,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "bg_load"
     value: "true"
@@ -454,7 +454,7 @@ benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   batch_size: 12288
   custom_setting {
     id: "scenario"
@@ -472,7 +472,7 @@ benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "Postprocessor/BatchMultiClassNonMaxSuppression"
@@ -489,7 +489,7 @@ benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "transpose"
@@ -514,7 +514,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v1"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "input_buffer_type"
     value: "uint_8"
@@ -535,7 +535,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "input_buffer_type"
     value: "uint_8"
@@ -566,7 +566,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "bg_load"
     value: "true"
@@ -580,7 +580,7 @@ benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "psnpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   batch_size: 12288
   custom_setting {
     id: "scenario"
@@ -598,7 +598,7 @@ benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "Postprocessor/BatchMultiClassNonMaxSuppression"
@@ -615,7 +615,7 @@ benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "transpose"
@@ -644,7 +644,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   accelerator: "snpe_dsp"
   accelerator_desc: "HTP"
-  configuration: "SNPE"
+  framework: "SNPE"
   custom_setting {
     id: "input_buffer_type"
     value: "uint_8"
