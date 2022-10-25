@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/data/environment/os_enum.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:provider/provider.dart';
@@ -73,7 +72,7 @@ class _DetailsScreen extends State<DetailsScreen> {
 
     final utils = HistoryHelperUtils(l10n);
     final modelDescription = utils.makeModelDescription(res.environmentInfo);
-    final socDescription = utils.makeSocName(res.environmentInfo);
+    final socDescription = utils.makeSocName(state, res.environmentInfo);
 
     return [
       helper.makeInfo(l10n.historyDetailsDate, date),
