@@ -1,6 +1,6 @@
 # Android environment setup guide
 
-This file describes how to setup the environment for Android builds on Ubuntu.
+This file describes how to setup the environment for Android builds.
 
 Android native libs can not be built on Windows.
 If you use Windows as your primary build system you will have to use a helper linux or macos system to build libs.
@@ -75,7 +75,7 @@ Flutter requires native libs so you must complete [Setting up Bazel on Ubuntu](#
   * Install Flutter:
 
     ```bash
-    mkdir -p ~/tools && cd ~/tools && curl https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.10.5-stable.tar.xz | tar Jxf -
+    mkdir -p ~/tools && cd ~/tools && curl https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.3.5-stable.tar.xz | tar Jxf -
     ```
 
   * Add flutter binary folders to path: `export PATH=$PATH:~/tools/flutter/bin:~/.pub-cache/bin`  

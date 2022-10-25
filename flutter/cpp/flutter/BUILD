@@ -15,11 +15,13 @@ cc_library(
     name = "bridge",
     srcs = [
         "dart_backend_match.cc",
+        "dart_cpuinfo.cc",
         "dart_mlperf_config.cc",
         "dart_run_benchmark.cc",
     ],
     hdrs = [
         "dart_backend_match.h",
+        "dart_cpuinfo.h",
         "dart_mlperf_config.h",
         "dart_run_benchmark.h",
     ],
@@ -31,6 +33,7 @@ cc_library(
         "//flutter/cpp/datasets:imagenet",
         "//flutter/cpp/datasets:squad",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
+        "@cpuinfo",
     ],
     alwayslink = 1,
 )
@@ -43,7 +46,7 @@ apple_xcframework(
     ios = {
         "simulator": [
             "x86_64",
-            # cpuinfo doesn't support simulator on ARM-based macs
+            # cpuinfo does not support simulator on ARM-based macs
             # "ios_sim_arm64",
         ],
         "device": ["arm64"],

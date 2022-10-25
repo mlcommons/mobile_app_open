@@ -89,15 +89,15 @@ class Benchmark {
     required BenchmarkRunMode runMode,
     required ResourceManager resourceManager,
     required List<pb.Setting> commonSettings,
-    required String backendLibPath,
+    required String backendLibName,
     required String logDir,
     required bool isTestMode,
   }) {
     final dataset = runMode.chooseDataset(taskConfig);
 
-    final _fastMode = isTestMode || isFastMode;
-    var minQueryCount = _fastMode ? 8 : taskConfig.minQueryCount;
-    var minDuration = _fastMode ? 1.0 : taskConfig.minDuration;
+    final fastMode = isTestMode || isFastMode;
+    var minQueryCount = fastMode ? 8 : taskConfig.minQueryCount;
+    var minDuration = fastMode ? 1.0 : taskConfig.minDuration;
 
     final settings = pb.SettingList(
       setting: commonSettings,
@@ -106,9 +106,9 @@ class Benchmark {
 
     return RunSettings(
       backend_model_path: resourceManager.get(benchmarkSettings.modelPath),
-      backend_lib_path: backendLibPath,
+      backend_lib_name: backendLibName,
       backend_settings: settings,
-      backend_native_lib_path: DeviceInfo.nativeLibraryPath,
+      backend_native_lib_path: DeviceInfo.instance.nativeLibraryPath,
       dataset_type: taskConfig.datasets.type.value,
       dataset_data_path: resourceManager.get(dataset.inputPath),
       dataset_groundtruth_path: resourceManager.get(dataset.groundtruthPath),

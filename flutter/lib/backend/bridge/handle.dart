@@ -19,3 +19,15 @@ final DynamicLibrary _bridge = _getBridgeLibraryHandle();
 DynamicLibrary getBridgeHandle() {
   return _bridge;
 }
+
+String libPathFromName(String libName) {
+  if (Platform.isAndroid) {
+    return '$libName.so';
+  } else if (Platform.isIOS) {
+    return '$libName.framework/$libName';
+  } else if (Platform.isWindows) {
+    return '$libName.dll';
+  } else {
+    throw 'unsupported platform';
+  }
+}

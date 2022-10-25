@@ -17,8 +17,7 @@ void main() {
   });
 
   group('integration tests', () {
-    final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized()
-        as IntegrationTestWidgetsFlutterBinding;
+    final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
     binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 

@@ -17,7 +17,7 @@ class ProgressScreen extends StatefulWidget {
   const ProgressScreen({Key? key}) : super(key: key);
 
   @override
-  _ProgressScreenState createState() => _ProgressScreenState();
+  State<ProgressScreen> createState() => _ProgressScreenState();
 }
 
 class _ProgressScreenState extends State<ProgressScreen> {

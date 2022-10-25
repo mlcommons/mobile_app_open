@@ -78,9 +78,65 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "os_name": {
+                "platform": {
                     "type": "string"
                 },
+                "value": {
+                    "$ref": "#/definitions/Value"
+                }
+            },
+            "required": [
+                "platform",
+                "value"
+            ],
+            "title": "EnvironmentInfo"
+        },
+        "Value": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "android": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/Android"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "ios": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/Ios"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "windows": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/Windows"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "android",
+                "ios",
+                "windows"
+            ],
+            "title": "Value"
+        },
+        "Android": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
                 "os_version": {
                     "type": "string"
                 },
@@ -92,16 +148,93 @@
                 },
                 "model_name": {
                     "type": "string"
+                },
+                "board_code": {
+                    "type": "string"
+                },
+                "proc_cpuinfo_soc_name": {
+                    "type": "string"
+                },
+                "props": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Prop"
+                    }
                 }
             },
             "required": [
+                "board_code",
                 "manufacturer",
                 "model_code",
                 "model_name",
-                "os_name",
+                "os_version",
+                "proc_cpuinfo_soc_name",
+                "props"
+            ],
+            "title": "Android"
+        },
+        "Prop": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "type",
+                "value"
+            ],
+            "title": "Prop"
+        },
+        "Ios": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "os_version": {
+                    "type": "string"
+                },
+                "model_code": {
+                    "type": "string"
+                },
+                "model_name": {
+                    "type": "string"
+                },
+                "soc_name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "model_code",
+                "model_name",
+                "os_version",
+                "soc_name"
+            ],
+            "title": "Ios"
+        },
+        "Windows": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "os_version": {
+                    "type": "string"
+                },
+                "cpu_full_name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "cpu_full_name",
                 "os_version"
             ],
-            "title": "EnvironmentInfo"
+            "title": "Windows"
         },
         "Meta": {
             "type": "object",

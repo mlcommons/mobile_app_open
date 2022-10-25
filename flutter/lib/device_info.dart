@@ -4,34 +4,43 @@ import 'package:flutter/services.dart';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
+import 'package:mlperfbench_common/data/environment/env_android.dart';
+import 'package:mlperfbench_common/data/environment/env_ios.dart';
+import 'package:mlperfbench_common/data/environment/env_windows.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
+import 'package:process_run/shell.dart';
+
+import 'package:mlperfbench/backend/bridge/ffi_cpuinfo.dart';
 
 class DeviceInfo {
-  final String? modelCode;
-  final String? modelName;
-  final String? manufacturer;
+  final EnvironmentInfo envInfo;
+  final String nativeLibraryPath;
 
-  static late final String nativeLibraryPath;
   static late final DeviceInfo instance;
 
   DeviceInfo({
-    required this.manufacturer,
-    required this.modelCode,
-    required this.modelName,
+    required this.envInfo,
+    required this.nativeLibraryPath,
   });
 
   static Future<void> staticInit() async {
-    DeviceInfo.nativeLibraryPath = await _makeNativeLibraryPath();
-    DeviceInfo.instance = await createFromEnvironment();
+    instance = await createFromEnvironment();
   }
 
   static Future<DeviceInfo> createFromEnvironment() async {
-    if (Platform.isIOS) {
-      return _makeIosInfo();
+    return DeviceInfo(
+      envInfo: await makeEnvInfo(),
+      nativeLibraryPath: await _makeNativeLibraryPath(),
+    );
+  }
+
+  static Future<EnvironmentInfo> makeEnvInfo() async {
+    if (Platform.isAndroid) {
+      return EnvironmentInfo.makeAndroid(info: await _makeAndroidInfo());
+    } else if (Platform.isIOS) {
+      return EnvironmentInfo.makeIos(info: await _makeIosInfo());
     } else if (Platform.isWindows) {
-      return _makeWindowsInfo();
-    } else if (Platform.isAndroid) {
-      return _makeAndroidInfo();
+      return EnvironmentInfo.makeWindows(info: await _makeWindowsInfo());
     } else {
       throw 'Could not define platform';
     }
@@ -45,7 +54,7 @@ class DeviceInfo {
     }
   }
 
-  static Future<DeviceInfo> _makeIosInfo() async {
+  static Future<EnvIos> _makeIosInfo() async {
     final deviceInfo = await DeviceInfoPlugin().iosInfo;
     final deviceNames = DeviceMarketingNames();
     final modelCode = deviceInfo.utsname.machine;
@@ -54,44 +63,56 @@ class DeviceInfo {
     if (machine != null) {
       modelName = deviceNames.getSingleNameFromModel(DeviceType.ios, machine);
     }
-    return DeviceInfo(
-      manufacturer: 'Apple',
+    return EnvIos(
+      osVersion: Platform.operatingSystemVersion,
       modelCode: modelCode,
       modelName: modelName,
+      socName: getSocName(),
     );
   }
 
-  static Future<DeviceInfo> _makeAndroidInfo() async {
+  static Future<EnvAndroid> _makeAndroidInfo() async {
     final deviceInfo = await DeviceInfoPlugin().androidInfo;
     final deviceNames = DeviceMarketingNames();
+
+    var shell = Shell();
+    final propSocModel = await shell.run('getprop ro.soc.model');
+    final propSocManufacturer = await shell.run('getprop ro.soc.manufacturer');
+
     final modelCode = deviceInfo.model;
     String? modelName;
     if (modelCode != null) {
       modelName =
           deviceNames.getSingleNameFromModel(DeviceType.android, modelCode);
     }
-    return DeviceInfo(
+    return EnvAndroid(
+      osVersion: Platform.operatingSystemVersion,
+      // deviceInfo.manufacturer is usually a human-readable string with proper capitalisation
+      // deviceInfo.brand seems to be machine-readable string because it tends to be all lower-case letters
       manufacturer: deviceInfo.manufacturer,
       modelCode: modelCode,
       modelName: modelName,
+      boardCode: deviceInfo.board,
+      procCpuinfoSocName: getSocName(),
+      props: [
+        EnvAndroidProp(
+          type: AndroidPropType.socName,
+          name: 'ro.soc.model',
+          value: propSocModel.outText,
+        ),
+        EnvAndroidProp(
+          type: AndroidPropType.socManufacturer,
+          name: 'ro.soc.manufacturer',
+          value: propSocManufacturer.outText,
+        ),
+      ],
     );
   }
 
-  static Future<DeviceInfo> _makeWindowsInfo() async {
-    return DeviceInfo(
-      manufacturer: '',
-      modelCode: 'Unknown PC',
-      modelName: 'Unknown PC',
-    );
-  }
-
-  static EnvironmentInfo get environmentInfo {
-    return EnvironmentInfo(
-      osName: EnvironmentInfo.parseOs(Platform.operatingSystem),
+  static Future<EnvWindows> _makeWindowsInfo() async {
+    return EnvWindows(
       osVersion: Platform.operatingSystemVersion,
-      manufacturer: DeviceInfo.instance.manufacturer,
-      modelCode: DeviceInfo.instance.modelCode,
-      modelName: DeviceInfo.instance.modelName,
+      cpuFullName: getSocName(),
     );
   }
 }

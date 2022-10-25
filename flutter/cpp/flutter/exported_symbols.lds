@@ -6,3 +6,5 @@ _dart_ffi_backend_match
 _dart_ffi_backend_match_free
 _dart_ffi_mlperf_config
 _dart_ffi_mlperf_config_free
+_dart_ffi_cpuinfo
+_dart_ffi_cpuinfo_free
