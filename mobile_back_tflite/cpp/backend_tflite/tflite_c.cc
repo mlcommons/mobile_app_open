@@ -283,8 +283,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
 #if MTK_TFLITE_NEURON_BACKEND
       use_gpu = true;
 #endif
-    } else if (strcmp(configs->accelerator, "nnapi") == 0) {
-      backend_data->accelerator = "NNAPI";
+    } else if (strcmp(configs->accelerator, "npu") == 0) {
+      backend_data->accelerator = "NPU";
       auto options = tflite::StatefulNnApiDelegate::Options();
       options.allow_fp16 = true;
       options.disallow_nnapi_cpu = true;
