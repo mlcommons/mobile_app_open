@@ -9,21 +9,21 @@ class Interval {
 value: Interval of expected accuracy
 key: <accelerator> OR <accelerator>|<backendName>
 - cpu -> Windows
-- gpu+dsp+npu -> Android TFLite
+- npu -> Android TFLite
 - tpu -> Android Pixel
 - ane -> iOS TFLite or Core ML
 */
 
 const Map<String, Interval> _imageClassification = {
   'cpu': Interval(min: 1.00, max: 1.00),
-  'gpu+dsp+npu': Interval(min: 0.89, max: 0.91),
+  'npu': Interval(min: 0.89, max: 0.91),
   'tpu': Interval(min: 0.89, max: 0.91),
   'ane': Interval(min: 1.00, max: 1.00),
 };
 
 const Map<String, Interval> _objectDetection = {
   'cpu': Interval(min: 0.31, max: 0.32),
-  'gpu+dsp+npu': Interval(min: 0.28, max: 0.31),
+  'npu': Interval(min: 0.28, max: 0.31),
   'tpu': Interval(min: 0.36, max: 0.38),
   'ane|TFLite': Interval(min: 0.31, max: 0.32),
   'ane|Core ML': Interval(min: 0.45, max: 0.46),
@@ -31,7 +31,7 @@ const Map<String, Interval> _objectDetection = {
 
 const Map<String, Interval> _imageSegmentation = {
   'cpu': Interval(min: 0.83, max: 0.84),
-  'gpu+dsp+npu': Interval(min: 0.48, max: 0.49),
+  'npu': Interval(min: 0.48, max: 0.49),
   'tpu': Interval(min: 0.48, max: 0.49),
   'ane|TFLite': Interval(min: 0.80, max: 0.83),
   'ane|Core ML': Interval(min: 0.82, max: 0.84),

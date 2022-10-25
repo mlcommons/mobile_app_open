@@ -36,9 +36,9 @@ common_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification"
-  accelerator: "nnapi"
-  accelerator_desc: "NNAPI"
-  framework: "TFLite"
+  accelerator: "npu"
+  accelerator_desc: "NPU"
+  framework: "TFLite NNAPI"
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
   custom_setting {
     id: "bgLoad2"
@@ -48,9 +48,9 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "nnapi"
-  accelerator_desc: "NNAPI"
-  framework: "TFLite"
+  accelerator: "npu"
+  accelerator_desc: "NPU"
+  framework: "TFLite NNAPI"
   batch_size: 2
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
   custom_setting {
