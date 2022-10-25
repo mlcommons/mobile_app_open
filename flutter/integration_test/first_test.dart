@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,13 +37,15 @@ void checkTasks(ExtendedResult extendedResults) {
 
   expect(length, expectedTasksCount, reason: 'tasks count does not match');
 
+  final environmentInfo = extendedResults.environmentInfo;
+
   for (final benchmarkResult in extendedResults.results) {
     print('checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
+    checkAccelerator(environmentInfo, benchmarkResult);
     checkAccuracy(benchmarkResult);
-    checkAccelerator(benchmarkResult);
   }
 }
 
@@ -85,7 +88,10 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   );
 }
 
-void checkAccelerator(BenchmarkExportResult benchmarkResult) {
+void checkAccelerator(
+    EnvironmentInfo environmentInfo, BenchmarkExportResult benchmarkResult) {
+  final modelCode = environmentInfo.value.android?.modelCode ??
+      environmentInfo.value.ios?.modelCode;
   final backendName = benchmarkResult.backendInfo.backendName;
   final tag =
       '[benchmarkId: ${benchmarkResult.benchmarkId} | backendName: $backendName]';
@@ -93,8 +99,8 @@ void checkAccelerator(BenchmarkExportResult benchmarkResult) {
   // with real accelerator in our CI.
   // iOS run in simulator.
   // Pixel 6 with TFLite-Pixel backend still does not implement the accelerator reporting.
-  if (backendName != 'TFLite') {
-    print('skip test checkAccelerator() for $tag');
+  final supportedModelCodes = ['Pixel 5'];
+  if (!supportedModelCodes.contains(modelCode)) {
     return;
   }
   final actual = benchmarkResult.backendInfo.acceleratorName;
