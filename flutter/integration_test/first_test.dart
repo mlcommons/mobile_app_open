@@ -96,7 +96,7 @@ void checkAccelerator(
   final tag =
       '[benchmarkId: ${benchmarkResult.benchmarkId} | backendName: $backendName]';
   // Currently we only have Pixel 5 with TFLite backend as a physical test device
-  // with real accelerator in our CI.
+  // with physical accelerator in our CI.
   // iOS run in simulator.
   // Pixel 6 with TFLite-Pixel backend still does not implement the accelerator reporting.
   final supportedModelCodes = ['Pixel 5'];
@@ -104,7 +104,9 @@ void checkAccelerator(
     return;
   }
   final actual = benchmarkResult.backendInfo.acceleratorName;
-  final target = benchmarkResult.backendSettings.acceleratorCode;
-  expect(actual, equalsIgnoringCase(target),
-      reason: 'accelerator does not match for $tag');
+  // target is acceleratorDesc because the backend currently reported the
+  // same value in accelerator_desc instead of accelerator.
+  // We may need to have accelerator as an enum instead of string to have reliable match.
+  final target = benchmarkResult.backendSettings.acceleratorDesc;
+  expect(actual, equals(target), reason: 'accelerator does not match for $tag');
 }
