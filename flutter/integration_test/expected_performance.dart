@@ -57,7 +57,7 @@ const Map<String, Map<String, double>> _naturalLanguageProcessing = {
   _tagCloudBuildX23: {_tagTflite: 0.85},
   _tagCloudBuildX28: {_tagTflite: 1},
   _tagRyzen5600: {_tagTflite: 3},
-  _tagPixel5: {_tagTflite: 2.4},
+  _tagPixel5: {_tagTflite: 2.5},
   _tagPixel6: {_tagPixelSo: 67},
   _tagIphone12mini: {
     _tagTflite: 12,
