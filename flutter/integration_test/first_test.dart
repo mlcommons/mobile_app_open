@@ -42,6 +42,7 @@ void checkTasks(ExtendedResult extendedResults) {
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
     checkAccuracy(benchmarkResult);
+    checkAccelerator(benchmarkResult);
   }
 }
 
@@ -82,4 +83,11 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
     lessThanOrEqualTo(expectedValue.max),
     reason: 'accuracy for $tag is too high',
   );
+}
+
+void checkAccelerator(BenchmarkExportResult benchmarkResult) {
+  final actual = benchmarkResult.backendInfo.acceleratorName;
+  final target = benchmarkResult.backendSettings.acceleratorCode;
+  expect(actual, equals(target),
+      reason: 'reported accelerator does not match with backend settings');
 }
