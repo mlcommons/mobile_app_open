@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:flutter/material.dart';
 
-import 'package:collection/collection.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:wakelock/wakelock.dart';
@@ -17,7 +16,7 @@ import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
-import 'package:mlperfbench/resources/utils.dart';
+import 'package:mlperfbench/resources/validation_helper.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
@@ -50,10 +49,6 @@ class BenchmarkState extends ChangeNotifier {
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get downloadingProgress => resourceManager.progress;
 
-  // Only if [state] == [BenchmarkStateEnum.running]
-  // Benchmark? currentlyRunning;
-  // String runningProgress = '';
-
   ExtendedResult? lastResult;
 
   num get result {
@@ -84,6 +79,14 @@ class BenchmarkState extends ChangeNotifier {
 
   late BenchmarkList _middle;
 
+  ValidationHelper get validator {
+    return ValidationHelper(
+      resourceManager: resourceManager,
+      middle: _middle,
+      selectedRunModes: taskRunner.selectedRunModes,
+    );
+  }
+
   BenchmarkState._(this._store, this.backendBridge, this.firebaseManager) {
     resourceManager = ResourceManager(notifyListeners, _store);
     backendInfo = BackendInfoHelper().findMatching();
@@ -98,36 +101,6 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> uploadLastResult() async {
     await firebaseManager!.restHelper.upload(lastResult!);
-  }
-
-  Future<String> validateExternalResourcesDirectory(
-      String errorDescription) async {
-    final dataFolderPath = resourceManager.getDataFolder();
-    if (dataFolderPath.isEmpty) {
-      return 'Data folder must not be empty';
-    }
-    if (!await Directory(dataFolderPath).exists()) {
-      return 'Data folder does not exist';
-    }
-    final resources = _middle.listResources(
-        modes: taskRunner.selectedRunModes, skipInactive: true);
-    final missing = await resourceManager.validateResourcesExist(resources);
-    if (missing.isEmpty) return '';
-
-    return errorDescription +
-        missing.mapIndexed((i, element) => '\n${i + 1}) $element').join();
-  }
-
-  Future<String> validateOfflineMode(String errorDescription) async {
-    final resources = _middle.listResources(
-        modes: taskRunner.selectedRunModes, skipInactive: true);
-    final internetResources = filterInternetResources(resources);
-    if (internetResources.isEmpty) return '';
-
-    return errorDescription +
-        internetResources
-            .mapIndexed((i, element) => '\n${i + 1}) $element')
-            .join();
   }
 
   Future<void> clearCache() async {
