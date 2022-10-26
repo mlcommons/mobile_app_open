@@ -49,13 +49,8 @@ class ResultHelper {
     final result = info.result;
     final dataset = runMode.chooseDataset(benchmark.taskConfig);
 
-    double? throughput = info.throughput;
-    if (!throughput.isFinite) {
-      throughput = null;
-    }
-
     return BenchmarkRunResult(
-      throughput: throughput,
+      throughput: info.throughput,
       accuracy: result.accuracy1,
       accuracy2: result.accuracy2,
       dataset: DatasetInfo(

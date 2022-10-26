@@ -13,5 +13,9 @@ class RunInfo {
     required this.result,
     required this.loadgenInfo,
     required this.throughput,
-  });
+  }) {
+    if (!(throughput?.isFinite ?? true)) {
+      throw 'throughput must be a finite number: $throughput';
+    }
+  }
 }
