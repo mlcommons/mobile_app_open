@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mlperfbench/ui/root/main_screen/main_screen.dart';
+import 'package:mlperfbench/ui/root/main_screen/ready.dart';
 import 'package:mlperfbench/ui/run/result_screen.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench/resources/result_manager.dart' as result_manager;
@@ -18,12 +18,12 @@ Future<void> runBenchmark(WidgetTester tester) async {
   await app.main();
   await tester.pumpAndSettle(const Duration(seconds: splashPauseSeconds));
 
-  var goButtonIsPresented = await waitFor(
-      tester, downloadTimeLimitMinutes, const Key(MainKeys.goButton));
+  var goButtonIsPresented = await waitFor(tester, downloadTimeLimitMinutes,
+      const Key(MainScreenReadyKeys.goButton));
 
   expect(goButtonIsPresented, true,
       reason: 'Problems with downloading of datasets or models');
-  final goButton = find.byKey(const Key(MainKeys.goButton));
+  final goButton = find.byKey(const Key(MainScreenReadyKeys.goButton));
   await tester.tap(goButton);
 
   var scrollButtonIsPresented = await waitFor(
