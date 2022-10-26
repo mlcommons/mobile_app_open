@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mlperfbench/ui/root/main_screen.dart';
+import 'package:mlperfbench/ui/root/main_screen/main_screen.dart';
 import 'package:mlperfbench/ui/run/result_screen.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench/resources/result_manager.dart' as result_manager;

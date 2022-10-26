@@ -11,7 +11,7 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
-import 'package:mlperfbench/ui/root/main_screen.dart';
+import 'package:mlperfbench/ui/root/main_screen/main_screen.dart';
 import 'package:mlperfbench/ui/root/unsupported_device_screen.dart';
 import 'device_info.dart';
 import 'ui/root/app.dart';

@@ -9,7 +9,7 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/icons.dart' show AppIcons;
 import 'package:mlperfbench/ui/page_constraints.dart';
-import 'main_screen.dart';
+import 'main_screen/main_screen.dart';
 
 class ShareKeys {
   // list of widget keys that need to be accessed in the test code
