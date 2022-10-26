@@ -77,8 +77,6 @@ class BenchmarkState extends ChangeNotifier {
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
 
-  bool _aborting = false;
-
   late BenchmarkList _middle;
 
   ValidationHelper get validator {
@@ -228,7 +226,7 @@ class BenchmarkState extends ChangeNotifier {
       case null:
         return BenchmarkStateEnum.waiting;
       case false:
-        return _aborting
+        return taskRunner.aborting
             ? BenchmarkStateEnum.aborting
             : BenchmarkStateEnum.running;
       case true:
@@ -255,13 +253,17 @@ class BenchmarkState extends ChangeNotifier {
       resetCurrentResults();
       lastResult = await taskRunner.runBenchmarks(_middle, currentLogDir);
 
-      print('Benchmarks finished');
+      if (lastResult == null) {
+        print('benchmark aborted');
+      } else {
+        print('Benchmarks finished');
 
-      _store.previousExtendedResult =
-          const JsonEncoder().convert(lastResult!.toJson());
-      await resourceManager.resultManager.saveResult(lastResult!);
+        _store.previousExtendedResult =
+            const JsonEncoder().convert(lastResult!.toJson());
+        await resourceManager.resultManager.saveResult(lastResult!);
+      }
 
-      _doneRunning = _aborting ? null : true;
+      _doneRunning = taskRunner.aborting ? null : true;
     } catch (e) {
       _doneRunning = null;
       rethrow;
@@ -270,7 +272,7 @@ class BenchmarkState extends ChangeNotifier {
         await Directory(currentLogDir).delete(recursive: true);
       }
 
-      _aborting = false;
+      taskRunner.aborting = false;
 
       notifyListeners();
 

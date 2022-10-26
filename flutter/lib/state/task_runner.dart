@@ -45,7 +45,7 @@ class TaskRunner {
   final BackendInfo backendInfo;
 
   ProgressInfo progressInfo = ProgressInfo();
-  bool _aborting = false;
+  bool aborting = false;
   Future<void> _cooldownFuture = Future.value();
 
   TaskRunner({
@@ -74,7 +74,7 @@ class TaskRunner {
   }
 
   Future<void> abortBenchmarks() async {
-    _aborting = true;
+    aborting = true;
     await CancelableOperation.fromFuture(_cooldownFuture).cancel();
     notifyListeners();
   }
@@ -105,7 +105,7 @@ class TaskRunner {
       // increment counter for performance benchmark before cooldown
       progressInfo.currentStage++;
 
-      if (_aborting) break;
+      if (aborting) break;
 
       // we only do cooldown before performance benchmarks
       if (cooldown && !first) {
@@ -120,7 +120,7 @@ class TaskRunner {
         timer.stop();
       }
       first = false;
-      if (_aborting) break;
+      if (aborting) break;
 
       final perfTimer = Stopwatch()..start();
       progressInfo.accuracy = false;
@@ -164,7 +164,7 @@ class TaskRunner {
         validity: performanceRunInfo.loadgenInfo!.validity,
       );
 
-      if (_aborting) break;
+      if (aborting) break;
 
       RunInfo? accuracyRunInfo;
 
@@ -218,8 +218,8 @@ class TaskRunner {
       ));
     }
 
-    if (_aborting) {
-      _aborting = false;
+    if (aborting) {
+      aborting = false;
       return null;
     }
     return ExtendedResult(
