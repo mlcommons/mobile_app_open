@@ -268,7 +268,8 @@ class _NativeRunHelper {
     if (enableArtificialLoad) {
       print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
       const value = 999999999999999.0;
-      artificialLoadHandle = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
+      artificialLoadHandle =
+          Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
     }
 
     try {
@@ -288,13 +289,15 @@ class _NativeRunHelper {
     final nativeResult = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
     print('$logPrefix: elapsed: $elapsed');
+    print('$logPrefix: result: $nativeResult');
 
     if (!_checkAccuracy(nativeResult)) {
       throw '$logPrefix: accuracy is invalid (backend may be corrupted)';
     }
 
     final runInfo = await _makeRunInfo(nativeResult);
-    print('$logPrefix: $nativeResult, throughput: ${runInfo.throughput}');
+    print('$logPrefix: throughput: ${runInfo.throughput}');
+
     return runInfo;
   }
 
