@@ -14,7 +14,7 @@ class _ErrorHolder {
 
 class BridgeIsolate {
   late final SendPort _runSendPort;
-  Completer<RunResult> _nextResult = Completer();
+  Completer<NativeRunResult> _nextResult = Completer();
 
   BridgeIsolate._();
 
@@ -31,7 +31,7 @@ class BridgeIsolate {
         sendPortCompleter.complete(message);
         return;
       }
-      if (message is RunResult) {
+      if (message is NativeRunResult) {
         if (res._nextResult.isCompleted) {
           throw 'unexpected completed run result';
         }
@@ -49,7 +49,7 @@ class BridgeIsolate {
     return res;
   }
 
-  Future<RunResult> run(RunSettings rs) async {
+  Future<NativeRunResult> run(RunSettings rs) async {
     _runSendPort.send(rs);
     try {
       var res = await _nextResult.future;

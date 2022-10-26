@@ -82,7 +82,7 @@ class ResultHelper {
     );
   }
 
-  BackendReportedInfo _makeBackendInfo(RunResult result) {
+  BackendReportedInfo _makeBackendInfo(NativeRunResult result) {
     return BackendReportedInfo(
       filename: backendInfo.libName,
       backendName: result.backendName,

@@ -140,7 +140,8 @@ class TaskRunner {
       notifyListeners();
 
       final performanceRunInfo = await _NativeRunHelper(
-        store: store,
+        enableArtificialLoad: store.artificialCPULoadEnabled,
+        isTestMode: store.testMode,
         resourceManager: resourceManager,
         backendBridge: backendBridge,
         benchmark: benchmark,
@@ -154,7 +155,7 @@ class TaskRunner {
 
       final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
-        throughput: performanceRunInfo.throughput,
+        throughput: performanceRunInfo.throughput ?? 0.0,
         accuracy: performanceResult.accuracy1,
         accuracy2: performanceResult.accuracy2,
         backendName: performanceResult.backendName,
@@ -179,7 +180,8 @@ class TaskRunner {
         };
         notifyListeners();
         accuracyRunInfo = await _NativeRunHelper(
-          store: store,
+          enableArtificialLoad: store.artificialCPULoadEnabled,
+          isTestMode: store.testMode,
           resourceManager: resourceManager,
           backendBridge: backendBridge,
           benchmark: benchmark,
@@ -230,7 +232,8 @@ class TaskRunner {
 }
 
 class _NativeRunHelper {
-  final Store store;
+  final bool enableArtificialLoad;
+  final bool isTestMode;
   final ResourceManager resourceManager;
   final BridgeIsolate backendBridge;
 
@@ -241,7 +244,8 @@ class _NativeRunHelper {
   final String logParentDir;
 
   _NativeRunHelper({
-    required this.store,
+    required this.enableArtificialLoad,
+    required this.isTestMode,
     required this.resourceManager,
     required this.backendBridge,
     required this.benchmark,
@@ -258,7 +262,7 @@ class _NativeRunHelper {
     final logDir = '$logParentDir/${benchmark.id}-${runMode.logSuffix}';
     await Directory(logDir).create(recursive: true);
 
-    if (store.artificialCPULoadEnabled) {
+    if (enableArtificialLoad) {
       print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
       const value = 999999999999999.0;
       final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
@@ -270,21 +274,14 @@ class _NativeRunHelper {
       commonSettings: commonSettings,
       backendLibName: backendLibName,
       logDir: logDir,
-      isTestMode: store.testMode,
+      isTestMode: isTestMode,
     );
 
-    final result = await _invokeNativeRun(runSettings);
+    final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
 
-    if (store.artificialCPULoadEnabled) {
+    if (enableArtificialLoad) {
       await Executor().dispose();
-    }
-
-    if (!(result.accuracy1?.isInBounds() ?? true) ||
-        !(result.accuracy2?.isInBounds() ?? true)) {
-      print(
-          '${benchmark.id} accuracies: ${result.accuracy1}, ${result.accuracy2}');
-      throw '${benchmark.info.taskName}: ${runMode.logSuffix} run: accuracy is invalid (backend may be corrupted)';
     }
 
     const logFileName = 'mlperf_log_detail.txt';
@@ -292,17 +289,14 @@ class _NativeRunHelper {
       filepath: '$logDir/$logFileName',
     );
 
-    double throughput;
-    if (loadgenInfo == null) {
-      throughput = 0.0;
-    } else if (benchmark.info.isOffline) {
-      throughput = result.numSamples / loadgenInfo.latency90;
-    } else {
-      throughput = 1.0 / loadgenInfo.latency90;
-    }
+    final throughput = _calculateThroughput(result, loadgenInfo);
 
     print(
         'Run result: id: ${benchmark.id}, $result, throughput: $throughput, elapsed: $elapsed');
+
+    if (!_checkAccuracy(result)) {
+      throw '${benchmark.info.taskName}: ${runMode.logSuffix} run: accuracy is invalid (backend may be corrupted)';
+    }
 
     return RunInfo(
       settings: runSettings,
@@ -312,8 +306,21 @@ class _NativeRunHelper {
     );
   }
 
-  Future<RunResult> _invokeNativeRun(RunSettings settings) async {
-    return await backendBridge.run(settings);
+  bool _checkAccuracy(NativeRunResult result) {
+    return (result.accuracy1?.isInBounds() ?? true) &&
+        (result.accuracy2?.isInBounds() ?? true);
+  }
+
+  double? _calculateThroughput(
+      NativeRunResult result, LoadgenInfo? loadgenInfo) {
+    if (loadgenInfo == null) {
+      return null;
+    }
+    if (benchmark.info.isOffline) {
+      return result.numSamples / loadgenInfo.latency90;
+    } else {
+      return 1.0 / loadgenInfo.latency90;
+    }
   }
 
   void _doSomethingCPUIntensive(double value, TypeSendPort port) {
