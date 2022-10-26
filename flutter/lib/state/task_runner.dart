@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:async/async.dart';
+import 'package:mlperfbench/backend/bridge/run_result.dart';
+import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
@@ -136,13 +138,17 @@ class TaskRunner {
         return min(timeProgress, queryProgress);
       };
       notifyListeners();
-      final performanceRunInfo = await runBenchmark(
-        benchmark,
-        perfMode,
-        backendInfo.settings.commonSetting,
-        backendInfo.libName,
-        currentLogDir,
-      );
+
+      final performanceRunInfo = await _NativeRunHelper(
+        store: store,
+        resourceManager: resourceManager,
+        backendBridge: backendBridge,
+        benchmark: benchmark,
+        runMode: perfMode,
+        commonSettings: backendInfo.settings.commonSetting,
+        backendLibName: backendInfo.libName,
+        logParentDir: currentLogDir,
+      ).run();
       perfTimer.stop();
       performanceRunInfo.loadgenInfo!;
 
@@ -172,13 +178,16 @@ class TaskRunner {
           return queryProgress;
         };
         notifyListeners();
-        accuracyRunInfo = await runBenchmark(
-          benchmark,
-          accuracyMode,
-          backendInfo.settings.commonSetting,
-          backendInfo.libName,
-          currentLogDir,
-        );
+        accuracyRunInfo = await _NativeRunHelper(
+          store: store,
+          resourceManager: resourceManager,
+          backendBridge: backendBridge,
+          benchmark: benchmark,
+          runMode: accuracyMode,
+          commonSettings: backendInfo.settings.commonSetting,
+          backendLibName: backendInfo.libName,
+          logParentDir: currentLogDir,
+        ).run();
 
         final accuracyResult = accuracyRunInfo.result;
         benchmark.accuracyModeResult = BenchmarkResult(
@@ -218,26 +227,42 @@ class TaskRunner {
       buildInfo: BuildInfoHelper.info,
     );
   }
+}
 
-  void _doSomethingCPUIntensive(double value, TypeSendPort port) {
-    var newValue = value;
-    while (true) {
-      newValue = newValue * 0.999999999999999;
-    }
-  }
+class _NativeRunHelper {
+  final Store store;
+  final ResourceManager resourceManager;
+  final BridgeIsolate backendBridge;
 
-  Future<RunInfo> runBenchmark(
-    Benchmark benchmark,
-    BenchmarkRunMode runMode,
-    List<pb.Setting> commonSettings,
-    String backendLibName,
-    String logDir,
-  ) async {
+  final Benchmark benchmark;
+  final BenchmarkRunMode runMode;
+  final List<pb.Setting> commonSettings;
+  final String backendLibName;
+  final String logParentDir;
+
+  _NativeRunHelper({
+    required this.store,
+    required this.resourceManager,
+    required this.backendBridge,
+    required this.benchmark,
+    required this.runMode,
+    required this.commonSettings,
+    required this.backendLibName,
+    required this.logParentDir,
+  });
+
+  Future<RunInfo> run() async {
     print('Running ${benchmark.id} in ${runMode.mode} mode...');
     final stopwatch = Stopwatch()..start();
 
-    logDir = '$logDir/${benchmark.id}-${runMode.logSuffix}';
+    final logDir = '$logParentDir/${benchmark.id}-${runMode.logSuffix}';
     await Directory(logDir).create(recursive: true);
+
+    if (store.artificialCPULoadEnabled) {
+      print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
+      const value = 999999999999999.0;
+      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
+    }
 
     final runSettings = benchmark.createRunSettings(
       runMode: runMode,
@@ -248,13 +273,7 @@ class TaskRunner {
       isTestMode: store.testMode,
     );
 
-    if (store.artificialCPULoadEnabled) {
-      print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
-      const value = 999999999999999.0;
-      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
-    }
-
-    final result = await backendBridge.run(runSettings);
+    final result = await _invokeNativeRun(runSettings);
     final elapsed = stopwatch.elapsed;
 
     if (store.artificialCPULoadEnabled) {
@@ -291,5 +310,16 @@ class TaskRunner {
       loadgenInfo: loadgenInfo,
       throughput: throughput,
     );
+  }
+
+  Future<RunResult> _invokeNativeRun(RunSettings settings) async {
+    return await backendBridge.run(settings);
+  }
+
+  void _doSomethingCPUIntensive(double value, TypeSendPort port) {
+    var newValue = value;
+    while (true) {
+      newValue = newValue * 0.999999999999999;
+    }
   }
 }
