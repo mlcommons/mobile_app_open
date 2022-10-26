@@ -233,42 +233,25 @@ class TaskRunner {
 
 class _NativeRunHelper {
   final bool enableArtificialLoad;
-  final bool isTestMode;
-  final ResourceManager resourceManager;
   final BridgeIsolate backendBridge;
 
   final Benchmark benchmark;
   final BenchmarkRunMode runMode;
-  final List<pb.Setting> commonSettings;
-  final String backendLibName;
-  final String logParentDir;
+  final String logDir;
+  late final RunSettings runSettings;
 
   _NativeRunHelper({
     required this.enableArtificialLoad,
-    required this.isTestMode,
-    required this.resourceManager,
     required this.backendBridge,
     required this.benchmark,
     required this.runMode,
-    required this.commonSettings,
-    required this.backendLibName,
-    required this.logParentDir,
-  });
-
-  Future<RunInfo> run() async {
-    print('Running ${benchmark.id} in ${runMode.mode} mode...');
-    final stopwatch = Stopwatch()..start();
-
-    final logDir = '$logParentDir/${benchmark.id}-${runMode.logSuffix}';
-    await Directory(logDir).create(recursive: true);
-
-    if (enableArtificialLoad) {
-      print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
-      const value = 999999999999999.0;
-      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
-    }
-
-    final runSettings = benchmark.createRunSettings(
+    required bool isTestMode,
+    required ResourceManager resourceManager,
+    required List<pb.Setting> commonSettings,
+    required String backendLibName,
+    required String logParentDir,
+  }) : logDir = '$logParentDir/${benchmark.id}-${runMode.logSuffix}' {
+    runSettings = benchmark.createRunSettings(
       runMode: runMode,
       resourceManager: resourceManager,
       commonSettings: commonSettings,
@@ -276,6 +259,20 @@ class _NativeRunHelper {
       logDir: logDir,
       isTestMode: isTestMode,
     );
+  }
+
+  Future<RunInfo> run() async {
+    print('Running ${benchmark.id} in ${runMode.mode} mode...');
+    final stopwatch = Stopwatch()..start();
+
+    final logDir = runSettings.output_dir;
+    await Directory(logDir).create(recursive: true);
+
+    if (enableArtificialLoad) {
+      print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
+      const value = 999999999999999.0;
+      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
+    }
 
     final result = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
