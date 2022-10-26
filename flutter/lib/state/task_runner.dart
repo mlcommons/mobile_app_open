@@ -250,7 +250,7 @@ class _NativeRunHelper {
     required List<pb.Setting> commonSettings,
     required String backendLibName,
     required String logParentDir,
-  }) : logDir = '$logParentDir/${benchmark.id}-${runMode.logSuffix}' {
+  }) : logDir = '$logParentDir/${benchmark.id}-${runMode.readable}' {
     runSettings = benchmark.createRunSettings(
       runMode: runMode,
       resourceManager: resourceManager,
@@ -262,10 +262,9 @@ class _NativeRunHelper {
   }
 
   Future<RunInfo> run() async {
-    print('Running ${benchmark.id} in ${runMode.mode} mode...');
+    print('${benchmark.id}: $runMode mode: starting...');
     final stopwatch = Stopwatch()..start();
 
-    final logDir = runSettings.output_dir;
     await Directory(logDir).create(recursive: true);
 
     if (enableArtificialLoad) {
@@ -281,18 +280,14 @@ class _NativeRunHelper {
       await Executor().dispose();
     }
 
-    const logFileName = 'mlperf_log_detail.txt';
-    final loadgenInfo = await LoadgenInfo.fromFile(
-      filepath: '$logDir/$logFileName',
-    );
-
+    final loadgenInfo = await extractLoadgenInfo();
     final throughput = _calculateThroughput(result, loadgenInfo);
 
     print(
-        'Run result: id: ${benchmark.id}, $result, throughput: $throughput, elapsed: $elapsed');
+        '${benchmark.id}: $runMode mode: finished: $result, throughput: $throughput, elapsed: $elapsed');
 
     if (!_checkAccuracy(result)) {
-      throw '${benchmark.info.taskName}: ${runMode.logSuffix} run: accuracy is invalid (backend may be corrupted)';
+      throw '${benchmark.id}: $runMode mode: accuracy is invalid (backend may be corrupted)';
     }
 
     return RunInfo(
@@ -309,7 +304,9 @@ class _NativeRunHelper {
   }
 
   double? _calculateThroughput(
-      NativeRunResult result, LoadgenInfo? loadgenInfo) {
+    NativeRunResult result,
+    LoadgenInfo? loadgenInfo,
+  ) {
     if (loadgenInfo == null) {
       return null;
     }
@@ -318,6 +315,13 @@ class _NativeRunHelper {
     } else {
       return 1.0 / loadgenInfo.latency90;
     }
+  }
+
+  Future<LoadgenInfo?> extractLoadgenInfo() async {
+    const logFileName = 'mlperf_log_detail.txt';
+    return await LoadgenInfo.fromFile(
+      filepath: '$logDir/$logFileName',
+    );
   }
 
   void _doSomethingCPUIntensive(double value, TypeSendPort port) {
