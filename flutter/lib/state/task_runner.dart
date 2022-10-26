@@ -2,8 +2,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:async/async.dart';
-import 'package:mlperfbench/backend/bridge/run_result.dart';
-import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
@@ -12,6 +10,8 @@ import 'package:worker_manager/worker_manager.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
+import 'package:mlperfbench/backend/bridge/run_result.dart';
+import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
