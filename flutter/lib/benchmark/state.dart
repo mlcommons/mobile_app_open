@@ -13,6 +13,10 @@ import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
+import 'package:mlperfbench/backend/loadgen_info.dart';
+import 'package:mlperfbench/benchmark/info.dart';
+import 'package:mlperfbench/benchmark/run_info.dart';
+import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
@@ -38,6 +42,7 @@ class BenchmarkState extends ChangeNotifier {
   late final ConfigManager configManager;
   late final BackendInfo backendInfo;
   late final TaskRunner taskRunner;
+  late final BoardDecoder boardDecoder;
 
   Object? error;
   StackTrace? stackTrace;
@@ -174,6 +179,10 @@ class BenchmarkState extends ChangeNotifier {
       result.stackTrace = trace;
       result.taskConfigFailedToLoad = true;
     }
+
+    result.boardDecoder = BoardDecoder();
+    await result.boardDecoder.init();
+
     return result;
   }
 

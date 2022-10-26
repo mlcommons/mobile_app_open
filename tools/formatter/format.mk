@@ -35,7 +35,10 @@ format/line-endings:
 
 .PHONY: format/markdown
 format/markdown:
-	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml --fix --ignore 'LICENSE.md'
+	git ls-files -z | \
+		grep --null-data -v "LICENSE.md" | \
+		grep --null-data "\.md$$" --exclude="*LICENSE.md" | \
+		xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml --fix
 
 .PHONY: lint
 lint: lint/bazel lint/dart lint/ts lint/yaml lint/prohibited-extensions lint/big-files lint/result-schema
@@ -87,6 +90,13 @@ lint/line-endings:
 .PHONY: lint/markdown-links
 lint/markdown-links:
 	git ls-files -z | grep --null-data "\.md$$" | xargs --null --no-run-if-empty -n1 markdown-link-check
+
+.PHONY: lint/markdown
+lint/markdown:
+	git ls-files -z | \
+		grep --null-data -v "LICENSE.md" | \
+		grep --null-data "\.md$$" --exclude="*LICENSE.md" | \
+		xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml
 
 lint_result_json_schema_path=output/extended-result.schema.json
 .PHONY: lint/result-schema
