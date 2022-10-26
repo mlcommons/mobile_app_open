@@ -81,7 +81,7 @@ class Benchmark {
     required this.isActive,
   })  : info = BenchmarkInfo(taskConfig),
         backendRequestDescription =
-            '${benchmarkSettings.configuration} | ${benchmarkSettings.acceleratorDesc}';
+            '${benchmarkSettings.framework} | ${benchmarkSettings.acceleratorDesc}';
 
   String get id => taskConfig.id;
 

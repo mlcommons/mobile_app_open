@@ -172,7 +172,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
       if (strcmp(configs->accelerator, "gpu_f16") == 0)
         options.inference_priority1 = TFLITE_GPU_INFERENCE_PRIORITY_MIN_LATENCY;
       delegate = TfLiteGpuDelegateV2Create(&options);
-    } else if (strcmp(configs->accelerator, "nnapi") == 0) {
+    } else if (strcmp(configs->accelerator, "tpu") == 0) {
       auto options = tflite::StatefulNnApiDelegate::Options();
       options.allow_fp16 = true;
       options.disallow_nnapi_cpu = true;

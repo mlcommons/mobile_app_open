@@ -31,7 +31,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -69,7 +69,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v1"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -107,7 +107,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -145,7 +145,7 @@ benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -183,7 +183,7 @@ benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "gpu"
   accelerator_desc: "gpu"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -221,7 +221,7 @@ benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "samsung npu"
   accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   batch_size: 8192
   custom_setting {
     id: "scenario"
@@ -265,7 +265,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -303,7 +303,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v1"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -341,7 +341,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -379,7 +379,7 @@ benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -417,7 +417,7 @@ benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "gpu"
   accelerator_desc: "gpu"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -455,7 +455,7 @@ benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "samsung npu"
   accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   batch_size: 8192
   custom_setting {
     id: "scenario"
@@ -499,7 +499,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -537,7 +537,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v1"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -575,7 +575,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -613,7 +613,7 @@ benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "samsung npu"
   accelerator_desc: "NPU"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -651,7 +651,7 @@ benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "gpu"
   accelerator_desc: "gpu"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "mode"
     value: "3"
@@ -689,7 +689,7 @@ benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "samsung npu"
   accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   batch_size: 8192
   custom_setting {
     id: "scenario"
@@ -733,7 +733,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v1"
   accelerator: "npu"
   accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "i_type"
     value: "Uint8"
@@ -751,7 +751,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "npu"
   accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "i_type"
     value: "Uint8"
@@ -769,7 +769,7 @@ benchmark_setting {
   benchmark_id: "object_detection"
   accelerator: "npu"
   accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   custom_setting {
     id: "i_type"
     value: "Uint8"
@@ -787,7 +787,7 @@ benchmark_setting {
   benchmark_id: "image_classification_offline"
   accelerator: "npu"
   accelerator_desc: "npu"
-  configuration: "Samsung Exynos"
+  framework: "Samsung Exynos"
   batch_size: 48
   custom_setting {
     id: "i_type"

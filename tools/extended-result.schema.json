@@ -484,7 +484,7 @@
                 "accelerator_desc": {
                     "type": "string"
                 },
-                "configuration": {
+                "framework": {
                     "type": "string"
                 },
                 "model_path": {
@@ -504,8 +504,8 @@
                 "accelerator_code",
                 "accelerator_desc",
                 "batch_size",
-                "configuration",
                 "extra_settings",
+                "framework",
                 "model_path"
             ],
             "title": "BackendSettings"

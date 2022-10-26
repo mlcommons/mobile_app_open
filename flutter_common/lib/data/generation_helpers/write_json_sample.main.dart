@@ -24,7 +24,8 @@ Future<void> main() async {
   await file.create();
   final generator = SampleGenerator();
   final sample = generator.extendedResult;
-  final converted = const JsonEncoder().convert(sample);
+  final indent = ' ' * 2;
+  final converted = JsonEncoder.withIndent(indent).convert(sample);
   // at least check that parsing doesn't throw exceptions
   final _ = ExtendedResult.fromJson(jsonDecode(converted));
   await file.writeAsString(converted);

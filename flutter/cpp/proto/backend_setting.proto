@@ -42,12 +42,12 @@ message BenchmarkSetting {
   required string model_path = 3;
   // MD5 checksum to validate the model file
   required string model_checksum = 4;
-  // accelerator is passed to the backend
+  // Name of the accelerator (hardware), which is passed to the backend.
   required string accelerator = 5;
-  // Human-readable name of the accelerator
+  // Human-readable name of the accelerator (hardware)
   required string accelerator_desc = 6;
-  // Human-readable name of the underlying ML framework
-  required string configuration = 7;
+  // Human-readable name of the underlying ML framework (software)
+  required string framework = 7;
   // batch_size is passed to the backend
   optional int32 batch_size = 8;
   // single_stream_expected_latency_ns is passed to the MLPerfDriver,
