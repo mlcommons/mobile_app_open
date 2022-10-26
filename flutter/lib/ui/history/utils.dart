@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:intl/intl.dart';
+import 'package:mlperfbench_common/data/environment/env_android.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 class HistoryHelperUtils {
@@ -205,13 +207,26 @@ class HistoryHelperUtils {
     }
   }
 
-  String makeSocName(EnvironmentInfo info) {
+  String makeSocName(BenchmarkState state, EnvironmentInfo info) {
     switch (info.platform) {
       case EnvPlatform.android:
         final android = info.value.android;
         if (android == null) {
           return 'Unknown';
         }
+
+        if (android.boardCode != null) {
+          final boardName = state.boardDecoder.boards[android.boardCode];
+          if (boardName != null) {
+            return boardName;
+          }
+        }
+        final socProp =
+            android.props.where((e) => e.type == AndroidPropType.socName);
+        if (socProp.isNotEmpty) {
+          return socProp.first.value;
+        }
+
         return android.procCpuinfoSocName;
       case EnvPlatform.ios:
         final ios = info.value.ios;

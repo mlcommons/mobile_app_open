@@ -27,6 +27,7 @@ import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
+import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
@@ -72,6 +73,7 @@ class BenchmarkState extends ChangeNotifier {
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
   late final BackendInfo backendInfo;
+  late final BoardDecoder boardDecoder;
 
   Object? error;
   StackTrace? stackTrace;
@@ -248,6 +250,10 @@ class BenchmarkState extends ChangeNotifier {
       result.stackTrace = trace;
       result.taskConfigFailedToLoad = true;
     }
+
+    result.boardDecoder = BoardDecoder();
+    await result.boardDecoder.init();
+
     return result;
   }
 
