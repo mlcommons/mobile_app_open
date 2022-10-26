@@ -11,11 +11,7 @@ import 'package:async/async.dart';
 import 'package:collection/collection.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
-import 'package:mlperfbench_common/data/results/backend_info.dart';
-import 'package:mlperfbench_common/data/results/backend_settings.dart';
-import 'package:mlperfbench_common/data/results/backend_settings_extra.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
-import 'package:mlperfbench_common/data/results/dataset_info.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
@@ -31,6 +27,7 @@ import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';
+import 'package:mlperfbench/resources/export_result_helper.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
@@ -456,10 +453,16 @@ class BenchmarkState extends ChangeNotifier {
         );
       }
 
-      exportResults.add(exportResultFromRunInfo(
-        benchmark,
-        performanceRunInfo,
-        accuracyRunInfo,
+      final resultHelper = ResultHelper(
+        benchmark: benchmark,
+        backendInfo: backendInfo,
+      );
+
+      exportResults.add(resultHelper.exportResultFromRunInfo(
+        performanceInfo: performanceRunInfo,
+        accuracyInfo: accuracyRunInfo,
+        perfMode: perfMode,
+        accuracyMode: accuracyMode,
       ));
     }
 
@@ -481,92 +484,6 @@ class BenchmarkState extends ChangeNotifier {
       b.accuracyModeResult = null;
       b.performanceModeResult = null;
     }
-  }
-
-  BenchmarkExportResult exportResultFromRunInfo(
-    Benchmark benchmark,
-    RunInfo performanceInfo,
-    RunInfo? accuracyInfo,
-  ) {
-    final performance = performanceInfo.result;
-    final accuracy = accuracyInfo?.result;
-    final actualSettings = performanceInfo.settings.backend_settings;
-
-    final performanceDataset = perfMode.chooseDataset(benchmark.taskConfig);
-    final accuracyDataset = accuracyMode.chooseDataset(benchmark.taskConfig);
-
-    return BenchmarkExportResult(
-        benchmarkId: benchmark.id,
-        benchmarkName: benchmark.taskConfig.name,
-        performanceRun: BenchmarkRunResult(
-          throughput: performanceInfo.throughput,
-          accuracy: performance.accuracy1,
-          accuracy2: performance.accuracy2,
-          dataset: DatasetInfo(
-            name: accuracyDataset.name,
-            type: DatasetInfo.parseDatasetType(
-                benchmark.taskConfig.datasets.type.toString()),
-            dataPath: performanceDataset.inputPath,
-            groundtruthPath: performanceDataset.groundtruthPath,
-          ),
-          measuredDuration: performance.duration,
-          measuredSamples: performance.numSamples,
-          startDatetime: performance.startTime,
-          loadgenInfo: BenchmarkLoadgenInfo(
-            validity: performanceInfo.loadgenInfo!.validity,
-            duration: performanceInfo.loadgenInfo!.meanLatency *
-                performanceInfo.loadgenInfo!.queryCount,
-          ),
-        ),
-        accuracyRun: accuracy == null
-            ? null
-            : BenchmarkRunResult(
-                throughput: null,
-                accuracy: accuracy.accuracy1,
-                accuracy2: accuracy.accuracy2,
-                dataset: DatasetInfo(
-                  name: accuracyDataset.name,
-                  type: DatasetInfo.parseDatasetType(
-                      benchmark.taskConfig.datasets.type.toString()),
-                  dataPath: accuracyDataset.inputPath,
-                  groundtruthPath: accuracyDataset.groundtruthPath,
-                ),
-                measuredDuration: accuracy.duration,
-                measuredSamples: accuracy.numSamples,
-                startDatetime: accuracy.startTime,
-                loadgenInfo: null,
-              ),
-        minDuration: benchmark.taskConfig.minDuration,
-        minSamples: benchmark.taskConfig.minQueryCount,
-        backendInfo: BackendReportedInfo(
-          filename: backendInfo.libName,
-          backendName: performance.backendName,
-          vendorName: performance.backendVendor,
-          acceleratorName: performance.acceleratorName,
-        ),
-        backendSettings: BackendSettingsInfo(
-          acceleratorCode: actualSettings.benchmarkSetting.accelerator,
-          acceleratorDesc: actualSettings.benchmarkSetting.acceleratorDesc,
-          framework: actualSettings.benchmarkSetting.framework,
-          modelPath: actualSettings.benchmarkSetting.modelPath,
-          batchSize: actualSettings.benchmarkSetting.batchSize,
-          extraSettings: extraSettingsFromCommon(actualSettings.setting),
-        ),
-        loadgenScenario: BenchmarkExportResult.parseLoadgenScenario(
-            benchmark.taskConfig.scenario));
-  }
-
-  static List<BackendExtraSetting> extraSettingsFromCommon(
-      List<pb.Setting> commonSettings) {
-    final list = <BackendExtraSetting>[];
-    for (var item in commonSettings) {
-      list.add(BackendExtraSetting(
-          id: item.id,
-          name: item.name,
-          value: item.value.value,
-          valueName: item.value.name));
-    }
-    return list;
   }
 
   Future<RunInfo> runBenchmark(
