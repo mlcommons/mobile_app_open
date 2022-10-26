@@ -262,37 +262,49 @@ class _NativeRunHelper {
   }
 
   Future<RunInfo> run() async {
-    print('${benchmark.id}: $runMode mode: starting...');
-    final stopwatch = Stopwatch()..start();
-
     await Directory(logDir).create(recursive: true);
 
+    Cancelable<void>? artificialLoadHandle;
     if (enableArtificialLoad) {
       print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
       const value = 999999999999999.0;
-      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
+      artificialLoadHandle = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
     }
 
-    final result = await backendBridge.run(runSettings);
+    try {
+      return await _invokeNativeRun();
+    } finally {
+      if (artificialLoadHandle != null) {
+        artificialLoadHandle.cancel();
+      }
+    }
+  }
+
+  Future<RunInfo> _invokeNativeRun() async {
+    final logPrefix = '${benchmark.id}: $runMode mode';
+
+    print('$logPrefix: starting...');
+    final stopwatch = Stopwatch()..start();
+    final nativeResult = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
+    print('$logPrefix: elapsed: $elapsed');
 
-    if (enableArtificialLoad) {
-      await Executor().dispose();
+    if (!_checkAccuracy(nativeResult)) {
+      throw '$logPrefix: accuracy is invalid (backend may be corrupted)';
     }
 
+    final runInfo = await _makeRunInfo(nativeResult);
+    print('$logPrefix: $nativeResult, throughput: ${runInfo.throughput}');
+    return runInfo;
+  }
+
+  Future<RunInfo> _makeRunInfo(NativeRunResult nativeResult) async {
     final loadgenInfo = await extractLoadgenInfo();
-    final throughput = _calculateThroughput(result, loadgenInfo);
-
-    print(
-        '${benchmark.id}: $runMode mode: finished: $result, throughput: $throughput, elapsed: $elapsed');
-
-    if (!_checkAccuracy(result)) {
-      throw '${benchmark.id}: $runMode mode: accuracy is invalid (backend may be corrupted)';
-    }
+    final throughput = _calculateThroughput(nativeResult, loadgenInfo);
 
     return RunInfo(
       settings: runSettings,
-      result: result,
+      result: nativeResult,
       loadgenInfo: loadgenInfo,
       throughput: throughput,
     );
