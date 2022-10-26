@@ -15,10 +15,10 @@ import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/icons.dart' as app_icons;
 import 'package:mlperfbench/ui/page_constraints.dart';
+import 'package:mlperfbench/ui/root/main_screen/utils.dart';
 import 'package:mlperfbench/ui/run/app_bar.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/run/result_circle.dart';
-import '../root/main_screen/main_screen.dart';
 import 'progress_screen.dart';
 
 enum _ScreenMode { performance, accuracy }

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +10,8 @@ import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/icons.dart';
+import 'package:mlperfbench/ui/root/main_screen/downloading.dart';
+import 'package:mlperfbench/ui/root/main_screen/utils.dart';
 import 'package:mlperfbench/ui/run/app_bar.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/run/progress_screen.dart';
@@ -39,6 +39,7 @@ class MyHomePage extends StatelessWidget {
 
     switch (state.state) {
       case BenchmarkStateEnum.downloading:
+        return const MainScreenDownloading();
       case BenchmarkStateEnum.waiting:
         appBar = MyAppBar.buildAppBar(
             stringResources.mainScreenTitle, context, true);
@@ -91,13 +92,13 @@ class MyHomePage extends StatelessWidget {
       return _goContainer(context);
     }
 
-    return _downloadContainer(context);
+    throw 'unexpected state';
   }
 
   Widget _waitContainer(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
 
-    return _circleContainerWithContent(
+    return MainScreenUtils().circleContainerWithContent(
         context, AppIcons.waiting, stringResources.mainScreenWaitFinish);
   }
 
@@ -155,33 +156,6 @@ class MyHomePage extends StatelessWidget {
       }),
     );
   }
-
-  Widget _downloadContainer(BuildContext context) {
-    final stringResources = AppLocalizations.of(context);
-    final textLabel = Text(context.watch<BenchmarkState>().downloadingProgress,
-        style: const TextStyle(color: AppColors.lightText, fontSize: 40));
-
-    return _circleContainerWithContent(
-        context, textLabel, stringResources.mainScreenLoading);
-  }
-}
-
-class MyPaintBottom extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect =
-        Rect.fromCircle(center: Offset(size.width / 2, 0), radius: size.height);
-    final paint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomLeft,
-        colors: AppColors.mainScreenGradient,
-      ).createShader(rect);
-    canvas.drawArc(rect, 0, pi, true, paint);
-  } // paint
-
-  @override
-  bool shouldRepaint(MyPaintBottom oldDelegate) => false;
 }
 
 class GoButtonGradient extends StatelessWidget {
@@ -228,44 +202,4 @@ class GoButtonGradient extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget _circleContainerWithContent(
-    BuildContext context, Widget contentInCircle, String label) {
-  return CustomPaint(
-    painter: MyPaintBottom(),
-    child: Stack(alignment: Alignment.topCenter, children: [
-      Padding(
-        padding: const EdgeInsets.all(20),
-        child: Text(
-          label,
-          style: const TextStyle(color: AppColors.lightText, fontSize: 15),
-        ),
-      ),
-      Stack(
-        children: [
-          Container(
-            width: MediaQuery.of(context).size.width * 0.35,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.progressCircle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(15, 15),
-                  blurRadius: 10,
-                )
-              ],
-            ),
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width * 0.35,
-            alignment: Alignment.center,
-            child: contentInCircle,
-          )
-        ],
-      )
-    ]),
-  );
 }
