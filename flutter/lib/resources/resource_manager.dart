@@ -79,10 +79,9 @@ class ResourceManager {
         await Directory(path).exists();
   }
 
-  Future<bool> isChecksumMatched(String filePath, String md5Checksum) async {
+  Future<String> calculateFileChecksum(String filePath) async {
     var fileStream = File(filePath).openRead();
-    final checksum = (await md5.bind(fileStream).first).toString();
-    return checksum == md5Checksum;
+    return (await md5.bind(fileStream).first).toString();
   }
 
   Future<void> handleResources(
@@ -179,7 +178,12 @@ class ResourceManager {
         localPath = cacheManager.get(resource.path);
       }
       if (localPath == null || !(await File(localPath).exists())) continue;
-      if (!await isChecksumMatched(localPath, md5Checksum)) {
+
+      final fileChecksum = await calculateFileChecksum(localPath);
+      if (fileChecksum != md5Checksum) {
+        print('checksum validation fail: file: $localPath');
+        print('checksum validation fail: expected: $md5Checksum');
+        print('checksum validation fail: real: $fileChecksum');
         checksumFailedResources.add(resource);
       }
     }
