@@ -126,28 +126,39 @@ you need to replace `squad_eval_mini.tfrecord` by `squad_eval.tfrecord` in the
       --ground_truth_directory=/tmp/ade20k_512/annotations/raw  \
       --num_threads=4
     ```
+
 ## SNU SR set
 
 preparing datasets and models
+
 1. dataset:
-1.1. rotate 1080x1920 ones to 1920x1080 so that all the images are 1920x1080
-1.2. convert all 1920x1080 jpg images to .png files
-1.3. also generate scaled down 960x540 images
+
+    1. rotate 1080x1920 ones to 1920x1080 so that all the images are 1920x1080
+
+    2. convert all 1920x1080 jpg images to .png files
+
+    3. also generate scaled down 960x540 images
+
 2. model:
-2.1. generate a modelswith 960x540 input and 1920x1080 output
+
+   1. generate a modelswith 960x540 input and 1920x1080 output
 
 3. test with command line on Android device
 
 build the main command line program and tflite backend
+
 ```shell
 bazel build --config android_arm64 -c opt \
 flutter/cpp/binary:main mobile_back_tflite:tflitebackend
 ```
+
 push them to the target Android device
+
 ```shell
 adb -t 1 push bazel-bin/flutter/cpp/binary/main /usr/local/tmp/sr/main_sr
 adb -t 1 push bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so /usr/local/tmp/sr/
 ```
+
 assuming we have the dataset and the model on the devices at
 `/data/local/tmp/sr/dataset/` and `/data/local/tmp/edsr/tflite/pl_f32b5.tflite`
 
