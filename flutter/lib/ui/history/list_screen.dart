@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
@@ -52,6 +53,7 @@ class _ListScreenState extends State<ListScreen>
     if (tabs.isNotEmpty) return;
 
     final state = context.watch<BenchmarkState>();
+    final fm = context.watch<FirebaseManager?>();
 
     tabs.add(HistoryTab(
       pushAction: pushAction,
@@ -59,7 +61,7 @@ class _ListScreenState extends State<ListScreen>
       triggerRebuild: triggerRebuild,
     ));
 
-    final isOnlineEnabled = state.firebaseManager != null;
+    final isOnlineEnabled = fm != null;
     if (isOnlineEnabled) {
       tabs.add(OnlineTab(
         state: state,

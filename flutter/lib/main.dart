@@ -45,8 +45,7 @@ Future<void> launchUi() async {
   await BuildInfoHelper.staticInit();
   await FirebaseManager.staticInit();
   final store = await Store.create();
-  final benchmarkState =
-      await BenchmarkState.create(store, FirebaseManager.instance);
+  final benchmarkState = await BenchmarkState.create(store);
 
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));
@@ -60,7 +59,8 @@ Future<void> launchUi() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: benchmarkState),
-        ChangeNotifierProvider.value(value: store)
+        ChangeNotifierProvider.value(value: store),
+        Provider.value(value: FirebaseManager.instance),
       ],
       child: const MyApp(home: MyHomePage()),
     ),

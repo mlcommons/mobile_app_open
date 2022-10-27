@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/firebase/cache_helper.dart';
+import 'package:mlperfbench_common/firebase/manager.dart';
+import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -38,7 +40,7 @@ class OnlineTab implements TabInterface {
     l10n = AppLocalizations.of(context);
     helper = HistoryHelperUtils(l10n);
 
-    final fm = state.firebaseManager;
+    final fm = context.watch<FirebaseManager?>();
     if (fm == null) {
       // this widget should never be displayed without access to firebase
       // but let's handle this case gracefully

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/firebase/config.gen.dart';
+import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:share_plus/share_plus.dart';
@@ -335,6 +335,8 @@ class _ResultScreenState extends State<ResultScreen>
         minimumSize:
             MaterialStateProperty.all<Size>(Size(minimumShareButtonWidth, 0)));
 
+    final fm = context.watch<FirebaseManager?>();
+
     final detailedResultsPage = Column(children: [
       _createListOfBenchmarkResultWidgets(context, state),
       Padding(
@@ -409,13 +411,17 @@ class _ResultScreenState extends State<ResultScreen>
               ),
             )
           : Container(),
-      store.share && FirebaseConfig.enable
+      store.share && fm != null
           ? Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
                 onPressed: () async {
                   try {
-                    await state.uploadLastResult();
+                    final lastResult = state.lastResult;
+                    if (lastResult == null) {
+                      return;
+                    }
+                    await fm.restHelper.upload(lastResult);
                     if (!mounted) return;
                     await showSuccessDialog(
                         context, [stringResources.uploadSuccess]);
