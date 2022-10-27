@@ -102,8 +102,8 @@ class _RunOut extends Struct {
   external Pointer<Utf8> backend_vendor;
   external Pointer<Utf8> accelerator_name;
 
-  RunResult toRunResult(DateTime startTime) {
-    return RunResult(
+  NativeRunResult toRunResult(DateTime startTime) {
+    return NativeRunResult(
       accuracy1: accuracy1.address == 0 ? null : accuracy1.ref.toAccuracy(),
       accuracy2: accuracy2.address == 0 ? null : accuracy2.ref.toAccuracy(),
       numSamples: num_samples,
@@ -135,7 +135,7 @@ final _getQuery =
 final _getDatasetSize = getBridgeHandle()
     .lookupFunction<_GetQuery1, _GetQuery2>(_getDatasetSizeName);
 
-RunResult runBenchmark(RunSettings rs) {
+NativeRunResult runBenchmark(RunSettings rs) {
   final startTime = DateTime.now();
 
   var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());

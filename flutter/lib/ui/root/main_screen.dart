@@ -111,8 +111,9 @@ class MyHomePage extends StatelessWidget {
       child: GoButtonGradient(() async {
         // TODO (anhappdev) Refactor the code here to avoid duplicated code.
         // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
-        final wrongPathError = await state.validateExternalResourcesDirectory(
-            stringResources.dialogContentMissingFiles);
+        final wrongPathError = await state.validator
+            .validateExternalResourcesDirectory(
+                stringResources.dialogContentMissingFiles);
         if (wrongPathError.isNotEmpty) {
           // TODO (anhappdev): Uncomment the if line and remove the ignore line, when updated to Flutter v3.4.
           // See https://github.com/flutter/flutter/issues/111488
@@ -122,7 +123,7 @@ class MyHomePage extends StatelessWidget {
           return;
         }
         if (store.offlineMode) {
-          final offlineError = await state
+          final offlineError = await state.validator
               .validateOfflineMode(stringResources.dialogContentOfflineWarning);
           if (offlineError.isNotEmpty) {
             // TODO (anhappdev): Uncomment the if line and remove the ignore line, when updated to Flutter v3.4.
