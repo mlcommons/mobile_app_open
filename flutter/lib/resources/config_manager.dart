@@ -34,7 +34,7 @@ class ConfigManager {
 
   Map<String, TaskConfigDescription> configList = {};
 
-  String configLocation = '';
+  String configFileLocation = '';
   late pb.MLPerfConfig decodedConfig;
 
   ConfigManager._(this.applicationDirectory, this.resourceManager);
@@ -97,29 +97,32 @@ class ConfigManager {
     if (config == null) {
       throw 'config with name $name not found';
     }
-    String configContent;
-    if (isInternetResource(config.path)) {
-      configLocation = await resourceManager.cacheManager.fileCacheHelper
-          .get(config.path, true);
-      configContent = await File(configLocation).readAsString();
-    } else if (isAsset(config.path)) {
-      configLocation = config.path;
-      final assetPath = stripAssetPrefix(config.path);
-      configContent = await rootBundle.loadString(assetPath);
-    } else {
-      configLocation = resourceManager.get(config.path);
-      if (!await File(configLocation).exists()) {
-        throw 'local config file is missing: $configLocation';
-      }
-      configContent = await File(configLocation).readAsString();
+    decodedConfig = await readConfig(config);
+  }
+
+  Future<pb.MLPerfConfig> readConfig(TaskConfigDescription config) async {
+    String configContent = await getFileContent(config.path);
+    return getMLPerfConfig(configContent);
+  }
+
+  // TODO this should be responsibility of resource manager
+  Future<String> getFileContent(String uri) async {
+    if (isInternetResource(uri)) {
+      configFileLocation =
+          await resourceManager.cacheManager.fileCacheHelper.get(uri, true);
+      return await File(configFileLocation).readAsString();
     }
 
-    final nonRemovableResources = <String>[];
-    if (isInternetResource(config.path)) {
-      nonRemovableResources.add(resourceManager.cacheManager.fileCacheHelper
-          .getResourceRelativePath(config.path));
+    if (isAsset(uri)) {
+      configFileLocation = uri;
+      final assetPath = stripAssetPrefix(uri);
+      return await rootBundle.loadString(assetPath);
     }
 
-    decodedConfig = getMLPerfConfig(configContent);
+    configFileLocation = resourceManager.get(uri);
+    if (!await File(configFileLocation).exists()) {
+      throw 'local config file is missing: $configFileLocation';
+    }
+    return await File(configFileLocation).readAsString();
   }
 }

@@ -62,7 +62,7 @@ class ResourceErrorScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${stringResources.resourceErrorCurrentConfig} ${state.configManager.configLocation}',
+                        '${stringResources.resourceErrorCurrentConfig} ${state.configManager.configFileLocation}',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 15,

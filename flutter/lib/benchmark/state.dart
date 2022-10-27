@@ -159,25 +159,30 @@ class BenchmarkState extends ChangeNotifier {
     stackTrace = null;
     taskConfigFailedToLoad = false;
 
-    Map<String, bool>? taskSelection = {};
-    if (_store.taskSelection.isNotEmpty) {
-      try {
-        final map = jsonDecode(_store.taskSelection) as Map<String, dynamic>;
-        for (var kv in map.entries) {
-          taskSelection[kv.key] = kv.value as bool;
-        }
-      } catch (e, t) {
-        print('task selection parse fail: $e');
-        print(t);
-      }
-    }
-
     _middle = BenchmarkList(
       appConfig: configManager.decodedConfig,
       backendConfig: backendInfo.settings.benchmarkSetting,
-      taskSelection: taskSelection,
+      taskSelection: parseTaskSelection(_store.taskSelection),
     );
     restoreLastResult();
+  }
+
+  static Map<String, bool> parseTaskSelection(String json) {
+    Map<String, bool> result = {};
+    if (json.isEmpty) {
+      return result;
+    }
+
+    try {
+      final map = jsonDecode(json) as Map<String, dynamic>;
+      for (var kv in map.entries) {
+        result[kv.key] = kv.value as bool;
+      }
+    } catch (e, t) {
+      print('task selection parse fail: $e');
+      print(t);
+    }
+    return result;
   }
 
   Future<void> saveTaskSelection() async {
