@@ -1,4 +1,4 @@
-# Build and Release
+# Build and Release Rules
 
 ## Build artifacts
 

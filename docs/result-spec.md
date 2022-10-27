@@ -44,7 +44,7 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
   Settings defined by selected backend for this benchmark.
   * `accelerator_code`: string
   * `accelerator_desc`: string
-  * `configuration`: string
+  * `framework`: string
   * `model_path`: string
   * `batch_size`: integer number
   * `extra_settings`: list of maps  

@@ -8,7 +8,7 @@ part 'backend_settings.g.dart';
 class BackendSettingsInfo {
   final String acceleratorCode;
   final String acceleratorDesc;
-  final String configuration;
+  final String framework;
   final String modelPath;
   final int batchSize;
   final List<BackendExtraSetting> extraSettings;
@@ -16,7 +16,7 @@ class BackendSettingsInfo {
   BackendSettingsInfo({
     required this.acceleratorCode,
     required this.acceleratorDesc,
-    required this.configuration,
+    required this.framework,
     required this.modelPath,
     required this.batchSize,
     required this.extraSettings,

@@ -119,7 +119,7 @@ flutter/result/test-sample:
 	make flutter/result/sample \
 		RESULT_JSON_SAMPLE_PATH=flutter_common/test/data/result_sample.json
 
-default_result_json_schema_path=flutter/documentation/extended-result.schema.json
+default_result_json_schema_path=tools/extended-result.schema.json
 RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
 .PHONY: flutter/result/schema
 flutter/result/schema: flutter/result/sample

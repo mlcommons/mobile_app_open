@@ -30,8 +30,8 @@ The `benchmarksConfigurations.json` looks like this:
 See [How to specify a resource](#how-to-specify-a-resource) for details on how to specify a path to the config.
 
 The `tasks.pbtxt` file is a text file in [protobuf](https://developers.google.com/protocol-buffers) format.
-The format specification for this app is [here](../cpp/proto/mlperf_task.proto).
-The easiest way to create a custom config is to copy and modify [the default config](../assets/tasks.pbtxt).
+The format specification for this app is [here](../flutter/cpp/proto/mlperf_task.proto).
+The easiest way to create a custom config is to copy and modify [the default config](../flutter/assets/tasks.pbtxt).
 
 After adding new option into the `benchmarksConfigurations.json` file
 run application and open setting screen.  

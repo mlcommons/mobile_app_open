@@ -1,6 +1,6 @@
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
-class RunResult {
+class NativeRunResult {
   final Accuracy? accuracy1;
   final Accuracy? accuracy2;
   final int numSamples;
@@ -10,7 +10,7 @@ class RunResult {
   final String acceleratorName;
   final DateTime startTime;
 
-  RunResult({
+  NativeRunResult({
     required this.accuracy1,
     required this.accuracy2,
     required this.numSamples,
@@ -22,5 +22,5 @@ class RunResult {
   });
 
   @override
-  String toString() => 'RunResult(accuracy:$accuracy1)';
+  String toString() => 'RunResult(accuracy:$accuracy1, accuracy2:$accuracy2)';
 }

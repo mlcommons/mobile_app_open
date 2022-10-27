@@ -7,42 +7,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:flutter/material.dart';
 
-import 'package:async/async.dart';
-import 'package:collection/collection.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/meta_info.dart';
-import 'package:mlperfbench_common/data/results/backend_info.dart';
-import 'package:mlperfbench_common/data/results/backend_settings.dart';
-import 'package:mlperfbench_common/data/results/backend_settings_extra.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
-import 'package:mlperfbench_common/data/results/dataset_info.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
-import 'package:uuid/uuid.dart';
 import 'package:wakelock/wakelock.dart';
-import 'package:worker_manager/worker_manager.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
-import 'package:mlperfbench/backend/loadgen_info.dart';
-import 'package:mlperfbench/benchmark/info.dart';
-import 'package:mlperfbench/benchmark/run_info.dart';
+import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/build_info.dart';
-import 'package:mlperfbench/device_info.dart';
-import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
-import 'package:mlperfbench/resources/utils.dart';
+import 'package:mlperfbench/resources/validation_helper.dart';
+import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
-import 'run_mode.dart';
-
-void _doSomethingCPUIntensive(double value, TypeSendPort port) {
-  var newValue = value;
-  while (true) {
-    newValue = newValue * 0.999999999999999;
-  }
-}
 
 enum BenchmarkStateEnum {
   downloading,
@@ -50,18 +28,6 @@ enum BenchmarkStateEnum {
   running,
   aborting,
   done,
-}
-
-class ProgressInfo {
-  bool cooldown = false;
-  bool accuracy = false;
-  BenchmarkInfo? info;
-  int totalStages = 0;
-  int currentStage = 0;
-  double cooldownDuration = 0;
-  double get stageProgress => calculateStageProgress?.call() ?? 0.0;
-
-  double Function()? calculateStageProgress;
 }
 
 class BenchmarkState extends ChangeNotifier {
@@ -72,22 +38,18 @@ class BenchmarkState extends ChangeNotifier {
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
   late final BackendInfo backendInfo;
+  late final TaskRunner taskRunner;
+  late final BoardDecoder boardDecoder;
 
   Object? error;
   StackTrace? stackTrace;
 
   bool taskConfigFailedToLoad = false;
-  String currentLogDir = '';
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
 
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get downloadingProgress => resourceManager.progress;
-
-  // Only if [state] == [BenchmarkStateEnum.running]
-  ProgressInfo progressInfo = ProgressInfo();
-  // Benchmark? currentlyRunning;
-  // String runningProgress = '';
 
   ExtendedResult? lastResult;
 
@@ -115,66 +77,30 @@ class BenchmarkState extends ChangeNotifier {
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
 
-  Future<void> _cooldownFuture = Future.value();
-
-  bool _aborting = false;
-
   late BenchmarkList _middle;
+
+  ValidationHelper get validator {
+    return ValidationHelper(
+      resourceManager: resourceManager,
+      middle: _middle,
+      selectedRunModes: taskRunner.selectedRunModes,
+    );
+  }
 
   BenchmarkState._(this._store, this.backendBridge, this.firebaseManager) {
     resourceManager = ResourceManager(notifyListeners, _store);
     backendInfo = BackendInfoHelper().findMatching();
+    taskRunner = TaskRunner(
+      store: _store,
+      notifyListeners: notifyListeners,
+      resourceManager: resourceManager,
+      backendBridge: backendBridge,
+      backendInfo: backendInfo,
+    );
   }
 
   Future<void> uploadLastResult() async {
     await firebaseManager!.restHelper.upload(lastResult!);
-  }
-
-  BenchmarkRunMode get perfMode => _store.testMode
-      ? BenchmarkRunMode.performanceTest
-      : BenchmarkRunMode.performance;
-
-  BenchmarkRunMode get accuracyMode => _store.testMode
-      ? BenchmarkRunMode.accuracyTest
-      : BenchmarkRunMode.accuracy;
-
-  List<BenchmarkRunMode> get selectedRunModes {
-    final result = <BenchmarkRunMode>[];
-    result.add(perfMode);
-    if (_store.submissionMode) {
-      result.add(accuracyMode);
-    }
-    return result;
-  }
-
-  Future<String> validateExternalResourcesDirectory(
-      String errorDescription) async {
-    final dataFolderPath = resourceManager.getDataFolder();
-    if (dataFolderPath.isEmpty) {
-      return 'Data folder must not be empty';
-    }
-    if (!await Directory(dataFolderPath).exists()) {
-      return 'Data folder does not exist';
-    }
-    final resources =
-        _middle.listResources(modes: selectedRunModes, skipInactive: true);
-    final missing = await resourceManager.validateResourcesExist(resources);
-    if (missing.isEmpty) return '';
-
-    return errorDescription +
-        missing.mapIndexed((i, element) => '\n${i + 1}) $element').join();
-  }
-
-  Future<String> validateOfflineMode(String errorDescription) async {
-    final resources =
-        _middle.listResources(modes: selectedRunModes, skipInactive: true);
-    final internetResources = filterInternetResources(resources);
-    if (internetResources.isEmpty) return '';
-
-    return errorDescription +
-        internetResources
-            .mapIndexed((i, element) => '\n${i + 1}) $element')
-            .join();
   }
 
   Future<void> clearCache() async {
@@ -218,7 +144,7 @@ class BenchmarkState extends ChangeNotifier {
     print('start loading resources');
     await resourceManager.handleResources(
       _middle.listResources(
-        modes: [perfMode, accuracyMode],
+        modes: [taskRunner.perfMode, taskRunner.accuracyMode],
         skipInactive: false,
       ),
       needToPurgeCache,
@@ -248,6 +174,10 @@ class BenchmarkState extends ChangeNotifier {
       result.stackTrace = trace;
       result.taskConfigFailedToLoad = true;
     }
+
+    result.boardDecoder = BoardDecoder();
+    await result.boardDecoder.init();
+
     return result;
   }
 
@@ -296,7 +226,7 @@ class BenchmarkState extends ChangeNotifier {
       case null:
         return BenchmarkStateEnum.waiting;
       case false:
-        return _aborting
+        return taskRunner.aborting
             ? BenchmarkStateEnum.aborting
             : BenchmarkStateEnum.running;
       case true:
@@ -314,10 +244,26 @@ class BenchmarkState extends ChangeNotifier {
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
 
+    final startTime = DateTime.now();
+    final logDirName = startTime.toIso8601String().replaceAll(':', '-');
+    final currentLogDir =
+        '${resourceManager.applicationDirectory}/logs/$logDirName';
+
     try {
-      await _runBenchmarks();
-      print('Benchmarks finished');
-      _doneRunning = _aborting ? null : true;
+      resetCurrentResults();
+      lastResult = await taskRunner.runBenchmarks(_middle, currentLogDir);
+
+      if (lastResult == null) {
+        print('benchmark aborted');
+      } else {
+        print('Benchmarks finished');
+
+        _store.previousExtendedResult =
+            const JsonEncoder().convert(lastResult!.toJson());
+        await resourceManager.resultManager.saveResult(lastResult!);
+      }
+
+      _doneRunning = taskRunner.aborting ? null : true;
     } catch (e) {
       _doneRunning = null;
       rethrow;
@@ -326,7 +272,7 @@ class BenchmarkState extends ChangeNotifier {
         await Directory(currentLogDir).delete(recursive: true);
       }
 
-      _aborting = false;
+      taskRunner.aborting = false;
 
       notifyListeners();
 
@@ -334,320 +280,10 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> _runBenchmarks() async {
-    // TODO refactor this method
-    final cooldown = _store.cooldown;
-    late final Duration cooldownDuration;
-    if (_store.testMode) {
-      cooldownDuration = Duration(seconds: _store.testCooldown);
-    } else if (isFastMode) {
-      cooldownDuration = const Duration(seconds: 1);
-    } else {
-      cooldownDuration = Duration(minutes: _store.cooldownDuration);
-    }
-
-    final activeBenchmarks =
-        _middle.benchmarks.where((element) => element.isActive);
-
-    final exportResults = <BenchmarkExportResult>[];
-    var first = true;
-
-    progressInfo.totalStages = activeBenchmarks.length;
-    if (_store.submissionMode) {
-      progressInfo.totalStages += activeBenchmarks.length;
-    }
-    progressInfo.currentStage = 0;
-    progressInfo.cooldownDuration = cooldownDuration.inSeconds.toDouble();
-
-    resetCurrentResults();
-
-    final startTime = DateTime.now();
-    final logDirName = startTime.toIso8601String().replaceAll(':', '-');
-    currentLogDir = '${resourceManager.applicationDirectory}/logs/$logDirName';
-
-    for (final benchmark in activeBenchmarks) {
-      progressInfo.info = benchmark.info;
-
-      // increment counter for performance benchmark before cooldown
-      progressInfo.currentStage++;
-
-      if (_aborting) break;
-
-      // we only do cooldown before performance benchmarks
-      if (cooldown && !first && cooldownDuration.inMilliseconds != 0) {
-        progressInfo.cooldown = true;
-        final timer = Stopwatch()..start();
-        progressInfo.calculateStageProgress = () {
-          return timer.elapsed.inSeconds / progressInfo.cooldownDuration;
-        };
-        notifyListeners();
-        await (_cooldownFuture = Future.delayed(cooldownDuration));
-        progressInfo.cooldown = false;
-        timer.stop();
-      }
-      first = false;
-      if (_aborting) break;
-
-      final perfTimer = Stopwatch()..start();
-      progressInfo.accuracy = false;
-      progressInfo.calculateStageProgress = () {
-        // UI updates once per second so using 1 second as lower bound should not affect it.
-        final minDuration = max(benchmark.taskConfig.minDuration, 1);
-        final timeProgress = perfTimer.elapsedMilliseconds /
-            Duration.millisecondsPerSecond /
-            minDuration;
-
-        final minQueries = max(benchmark.taskConfig.minQueryCount, 1);
-        final queryCounter = backendBridge.getQueryCounter();
-        final queryProgress =
-            queryCounter < 0 ? 1.0 : queryCounter / minQueries;
-        return min(timeProgress, queryProgress);
-      };
-      notifyListeners();
-      final performanceRunInfo = await runBenchmark(
-        benchmark,
-        perfMode,
-        backendInfo.settings.commonSetting,
-        backendInfo.libName,
-        currentLogDir,
-      );
-      perfTimer.stop();
-      performanceRunInfo.loadgenInfo!;
-
-      final performanceResult = performanceRunInfo.result;
-      benchmark.performanceModeResult = BenchmarkResult(
-        throughput: performanceRunInfo.throughput,
-        accuracy: performanceResult.accuracy1,
-        accuracy2: performanceResult.accuracy2,
-        backendName: performanceResult.backendName,
-        acceleratorName: performanceResult.acceleratorName,
-        batchSize: benchmark.benchmarkSettings.batchSize,
-        validity: performanceRunInfo.loadgenInfo!.validity,
-      );
-
-      if (_aborting) break;
-
-      RunInfo? accuracyRunInfo;
-
-      if (_store.submissionMode) {
-        progressInfo.currentStage++;
-        progressInfo.accuracy = true;
-        progressInfo.calculateStageProgress = () {
-          final queryCounter = backendBridge.getQueryCounter();
-          final queryProgress = queryCounter < 0
-              ? 1.0
-              : queryCounter / backendBridge.getDatasetSize();
-          return queryProgress;
-        };
-        notifyListeners();
-        accuracyRunInfo = await runBenchmark(
-          benchmark,
-          accuracyMode,
-          backendInfo.settings.commonSetting,
-          backendInfo.libName,
-          currentLogDir,
-        );
-
-        final accuracyResult = accuracyRunInfo.result;
-        benchmark.accuracyModeResult = BenchmarkResult(
-          // loadgen doesn't calculate latency for accuracy mode benchmarks
-          // so throughput is infinity which is not a valid JSON numeric value
-          throughput: 0.0,
-          accuracy: accuracyResult.accuracy1,
-          accuracy2: accuracyResult.accuracy2,
-          backendName: accuracyResult.backendName,
-          acceleratorName: accuracyResult.acceleratorName,
-          batchSize: benchmark.benchmarkSettings.batchSize,
-          validity: false,
-        );
-      }
-
-      exportResults.add(exportResultFromRunInfo(
-        benchmark,
-        performanceRunInfo,
-        accuracyRunInfo,
-      ));
-    }
-
-    if (!_aborting) {
-      lastResult = ExtendedResult(
-        meta: ResultMetaInfo(uuid: const Uuid().v4()),
-        environmentInfo: DeviceInfo.instance.envInfo,
-        results: exportResults,
-        buildInfo: BuildInfoHelper.info,
-      );
-      _store.previousExtendedResult =
-          const JsonEncoder().convert(lastResult!.toJson());
-      await resourceManager.resultManager.saveResult(lastResult!);
-    }
-  }
-
   void resetCurrentResults() {
     for (var b in _middle.benchmarks) {
       b.accuracyModeResult = null;
       b.performanceModeResult = null;
-    }
-  }
-
-  BenchmarkExportResult exportResultFromRunInfo(
-    Benchmark benchmark,
-    RunInfo performanceInfo,
-    RunInfo? accuracyInfo,
-  ) {
-    final performance = performanceInfo.result;
-    final accuracy = accuracyInfo?.result;
-    final actualSettings = performanceInfo.settings.backend_settings;
-
-    final performanceDataset = perfMode.chooseDataset(benchmark.taskConfig);
-    final accuracyDataset = accuracyMode.chooseDataset(benchmark.taskConfig);
-
-    return BenchmarkExportResult(
-        benchmarkId: benchmark.id,
-        benchmarkName: benchmark.taskConfig.name,
-        performanceRun: BenchmarkRunResult(
-          throughput: performanceInfo.throughput,
-          accuracy: performance.accuracy1,
-          accuracy2: performance.accuracy2,
-          dataset: DatasetInfo(
-            name: accuracyDataset.name,
-            type: DatasetInfo.parseDatasetType(
-                benchmark.taskConfig.datasets.type.toString()),
-            dataPath: performanceDataset.inputPath,
-            groundtruthPath: performanceDataset.groundtruthPath,
-          ),
-          measuredDuration: performance.duration,
-          measuredSamples: performance.numSamples,
-          startDatetime: performance.startTime,
-          loadgenInfo: BenchmarkLoadgenInfo(
-            validity: performanceInfo.loadgenInfo!.validity,
-            duration: performanceInfo.loadgenInfo!.meanLatency *
-                performanceInfo.loadgenInfo!.queryCount,
-          ),
-        ),
-        accuracyRun: accuracy == null
-            ? null
-            : BenchmarkRunResult(
-                throughput: null,
-                accuracy: accuracy.accuracy1,
-                accuracy2: accuracy.accuracy2,
-                dataset: DatasetInfo(
-                  name: accuracyDataset.name,
-                  type: DatasetInfo.parseDatasetType(
-                      benchmark.taskConfig.datasets.type.toString()),
-                  dataPath: accuracyDataset.inputPath,
-                  groundtruthPath: accuracyDataset.groundtruthPath,
-                ),
-                measuredDuration: accuracy.duration,
-                measuredSamples: accuracy.numSamples,
-                startDatetime: accuracy.startTime,
-                loadgenInfo: null,
-              ),
-        minDuration: benchmark.taskConfig.minDuration,
-        minSamples: benchmark.taskConfig.minQueryCount,
-        backendInfo: BackendReportedInfo(
-          filename: backendInfo.libName,
-          backendName: performance.backendName,
-          vendorName: performance.backendVendor,
-          acceleratorName: performance.acceleratorName,
-        ),
-        backendSettings: BackendSettingsInfo(
-          acceleratorCode: actualSettings.benchmarkSetting.accelerator,
-          acceleratorDesc: actualSettings.benchmarkSetting.acceleratorDesc,
-          configuration: actualSettings.benchmarkSetting.configuration,
-          modelPath: actualSettings.benchmarkSetting.modelPath,
-          batchSize: actualSettings.benchmarkSetting.batchSize,
-          extraSettings: extraSettingsFromCommon(actualSettings.setting),
-        ),
-        loadgenScenario: BenchmarkExportResult.parseLoadgenScenario(
-            benchmark.taskConfig.scenario));
-  }
-
-  static List<BackendExtraSetting> extraSettingsFromCommon(
-      List<pb.Setting> commonSettings) {
-    final list = <BackendExtraSetting>[];
-    for (var item in commonSettings) {
-      list.add(BackendExtraSetting(
-          id: item.id,
-          name: item.name,
-          value: item.value.value,
-          valueName: item.value.name));
-    }
-    return list;
-  }
-
-  Future<RunInfo> runBenchmark(
-    Benchmark benchmark,
-    BenchmarkRunMode runMode,
-    List<pb.Setting> commonSettings,
-    String backendLibName,
-    String logDir,
-  ) async {
-    print('Running ${benchmark.id} in ${runMode.mode} mode...');
-    final stopwatch = Stopwatch()..start();
-
-    logDir = '$logDir/${benchmark.id}-${runMode.logSuffix}';
-    await Directory(logDir).create(recursive: true);
-
-    final runSettings = benchmark.createRunSettings(
-      runMode: runMode,
-      resourceManager: resourceManager,
-      commonSettings: commonSettings,
-      backendLibName: backendLibName,
-      logDir: logDir,
-      testMinDuration: _store.testMinDuration,
-      testMinQueryCount: _store.testMinQueryCount,
-    );
-
-    if (_store.artificialCPULoadEnabled) {
-      print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
-      const value = 999999999999999.0;
-      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
-    }
-
-    final result = await backendBridge.run(runSettings);
-    final elapsed = stopwatch.elapsed;
-
-    if (_store.artificialCPULoadEnabled) {
-      await Executor().dispose();
-    }
-
-    if (!(result.accuracy1?.isInBounds() ?? true) ||
-        !(result.accuracy2?.isInBounds() ?? true)) {
-      print(
-          '${benchmark.id} accuracies: ${result.accuracy1}, ${result.accuracy2}');
-      throw '${benchmark.info.taskName}: ${runMode.logSuffix} run: accuracy is invalid (backend may be corrupted)';
-    }
-
-    const logFileName = 'mlperf_log_detail.txt';
-    final loadgenInfo = await LoadgenInfo.fromFile(
-      filepath: '$logDir/$logFileName',
-    );
-
-    double throughput;
-    if (loadgenInfo == null) {
-      throughput = 0.0;
-    } else if (benchmark.info.isOffline) {
-      throughput = result.numSamples / loadgenInfo.latency90;
-    } else {
-      throughput = 1.0 / loadgenInfo.latency90;
-    }
-
-    print(
-        'Run result: id: ${benchmark.id}, $result, throughput: $throughput, elapsed: $elapsed');
-
-    return RunInfo(
-      settings: runSettings,
-      result: result,
-      loadgenInfo: loadgenInfo,
-      throughput: throughput,
-    );
-  }
-
-  Future<void> abortBenchmarks() async {
-    if (_doneRunning == false) {
-      _aborting = true;
-      await CancelableOperation.fromFuture(_cooldownFuture).cancel();
-      notifyListeners();
     }
   }
 

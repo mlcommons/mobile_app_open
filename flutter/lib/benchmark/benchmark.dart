@@ -81,7 +81,7 @@ class Benchmark {
     required this.isActive,
   })  : info = BenchmarkInfo(taskConfig),
         backendRequestDescription =
-            '${benchmarkSettings.configuration} | ${benchmarkSettings.acceleratorDesc}';
+            '${benchmarkSettings.framework} | ${benchmarkSettings.acceleratorDesc}';
 
   String get id => taskConfig.id;
 
@@ -124,7 +124,7 @@ class Benchmark {
       dataset_groundtruth_path: resourceManager.get(dataset.groundtruthPath),
       dataset_offset: taskConfig.model.offset,
       scenario: taskConfig.scenario,
-      mode: runMode.mode,
+      mode: runMode.loadgenMode,
       min_query_count: minQueryCount,
       min_duration: minDuration,
       single_stream_expected_latency_ns:

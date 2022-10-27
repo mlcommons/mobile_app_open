@@ -344,8 +344,8 @@ class _ResultScreenState extends State<ResultScreen>
             onPressed: () async {
               // TODO (anhappdev) Refactor the code here to avoid duplicated code.
               // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
-              final wrongPathError =
-                  await state.validateExternalResourcesDirectory(
+              final wrongPathError = await state.validator
+                  .validateExternalResourcesDirectory(
                       stringResources.dialogContentMissingFiles);
               if (wrongPathError.isNotEmpty) {
                 if (!mounted) return;
@@ -353,7 +353,7 @@ class _ResultScreenState extends State<ResultScreen>
                 return;
               }
               if (store.offlineMode) {
-                final offlineError = await state.validateOfflineMode(
+                final offlineError = await state.validator.validateOfflineMode(
                     stringResources.dialogContentOfflineWarning);
                 if (offlineError.isNotEmpty) {
                   if (!mounted) return;
