@@ -276,7 +276,7 @@ class _NativeRunHelper {
       return await _invokeNativeRun();
     } finally {
       if (artificialLoadHandle != null) {
-        artificialLoadHandle.cancel();
+        await Executor().dispose();
       }
     }
   }
