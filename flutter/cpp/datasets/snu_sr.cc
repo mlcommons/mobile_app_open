@@ -1,4 +1,4 @@
-/* Copyright 2020-2021 The MLPerf Authors. All Rights Reserved.
+/* Copyright 2022 The MLPerf Authors. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -9,13 +9,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+
 #include "flutter/cpp/datasets/snu_sr.h"
 
 #include <cstdint>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <numeric>
 #include <sstream>
 #include <streambuf>
 #include <string>
@@ -163,15 +162,7 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
     backend_->ConvertInputs(total_byte, image_width_, image_height_,
                             data_uint8->data());
 
-    // LOG(INFO) << "GT size : " << data_uint8->size();
     auto ground_truth_vector = data_uint8->data();  // auto is GOD
-
-    // old image reading
-    // std::ifstream stream(filename, std::ios::in | std::ios::binary);
-    // // LOG(INFO) << "stream : " << stream;
-    // std::vector<uint8_t> ground_truth_vector(
-    //     (std::istreambuf_iterator<char>(stream)),
-    //     std::istreambuf_iterator<char>());
 
     float *outputFloat = reinterpret_cast<float *>(outputs[0]);
     int32_t *outputInt32 = reinterpret_cast<int32_t *>(outputs[0]);
@@ -182,11 +173,6 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
     bool isOutputInt32 = (output_format_.at(0).type == DataType::Int32);
     bool isOutputInt8 = (output_format_.at(0).type == DataType::Int8);
     bool isOutputUint8 = (output_format_.at(0).type == DataType::Uint8);
-
-    // LOG(INFO) << "Output is .. Float? : " << isOutputFloat;
-    // LOG(INFO) << "Output is .. Int32? : " << isOutputInt32;
-    // LOG(INFO) << "Output is .. Int8? : " << isOutputInt8;
-    // LOG(INFO) << "Output is .. Uint8? : " << isOutputUint8;
 
     // psnr calculating code
     int n_pixels =
