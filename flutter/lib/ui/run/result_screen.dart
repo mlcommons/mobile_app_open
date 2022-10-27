@@ -66,136 +66,148 @@ class _ResultScreenState extends State<ResultScreen>
     super.dispose();
   }
 
-  Column _createListOfBenchmarkResultWidgets(
+  Widget _makeBottomTaskResultView({
+    required double pictureSize,
+    required AppLocalizations l10n,
+    required Benchmark benchmark,
+    required _ResultViewHelper taskHelper,
+  }) {
+    final icon = SizedBox(
+      width: pictureSize,
+      height: pictureSize,
+      child: benchmark.info.icon,
+    );
+    final title = Padding(
+      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+      child: Text(benchmark.taskConfig.name),
+    );
+
+    final backendInfo = Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Text(taskHelper.backendInfoSubtitle),
+    );
+
+    final scoreText1 = Text(
+      taskHelper.textResult ?? 'N/A',
+      style: TextStyle(
+        color: taskHelper.resultIsValid
+            ? AppColors.darkText
+            : AppColors.darkRedText,
+        fontSize: 16.0,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+    final scoreText2 = taskHelper.textResult2 == null
+        ? null
+        : Text(
+            taskHelper.textResult2!,
+            style: TextStyle(
+              color: taskHelper.resultIsValid
+                  ? AppColors.darkText
+                  : AppColors.darkRedText,
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+            ),
+          );
+
+    final scoreText = Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Column(
+          children: [
+            scoreText1,
+            if (scoreText2 != null) scoreText2,
+          ],
+        ),
+        const Icon(Icons.chevron_right, color: Colors.grey),
+      ],
+    );
+
+    final firstLine = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        backendInfo,
+        scoreText,
+      ],
+    );
+    Widget? batchInfo;
+    if (benchmark.info.isOffline) {
+      final batchSize = taskHelper.batchSize;
+
+      batchInfo = Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.resultsBatchSize.replaceAll('<batchSize>', batchSize),
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 14.0,
+            ),
+          ),
+        ],
+      );
+    }
+    final scoreLine1 = FractionallySizedBox(
+      widthFactor: 0.9,
+      child: BlueProgressLine(taskHelper.numericResult ?? 0.0),
+    );
+    Widget? scoreLine2;
+    if (taskHelper.numericResult2 != null) {
+      scoreLine2 = FractionallySizedBox(
+          widthFactor: 0.9,
+          child: BlueProgressLine(taskHelper.numericResult2!));
+    }
+
+    final scoreView = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        firstLine,
+        if (batchInfo != null) batchInfo,
+        scoreLine1,
+        if (scoreLine2 != null) scoreLine2,
+      ],
+    );
+
+    return Column(
+      children: [
+        ListTile(
+          minVerticalPadding: 0,
+          leading: icon,
+          title: title,
+          subtitle: scoreView,
+          onTap: () => showBenchmarkInfoBottomSheet(context, benchmark),
+        ),
+        const Divider()
+      ],
+    );
+  }
+
+  Column _makeBottomResultsView(
       BuildContext context, List<Benchmark> tasks) {
     final list = <Widget>[];
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
     final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
     for (final benchmark in tasks) {
-      late final String? textResult;
-      late final double? numericResult;
-      late final String? textResult2;
-      late final double? numericResult2;
-      late final BenchmarkResult? benchmarkResult;
-      late final bool resultIsValid;
-      if (_screenMode == _ScreenMode.performance) {
-        benchmarkResult = benchmark.performanceModeResult;
-        final throughput = benchmarkResult?.throughput;
-        textResult = throughput?.toStringAsFixed(2);
-        numericResult = (throughput ?? 0.0) / benchmark.info.maxThroughput;
-        textResult2 = null;
-        numericResult2 = null;
-        resultIsValid = benchmarkResult?.validity ?? false;
-      } else if (_screenMode == _ScreenMode.accuracy) {
-        benchmarkResult = benchmark.accuracyModeResult;
-        textResult = benchmarkResult?.accuracy?.formatted;
-        numericResult = benchmarkResult?.accuracy?.normalized;
-        textResult2 = benchmarkResult?.accuracy2?.formatted;
-        numericResult2 = benchmarkResult?.accuracy2?.normalized;
-        resultIsValid =
-            (benchmarkResult?.accuracy?.normalized ?? -1.0) >= 0.0 &&
-                (benchmarkResult?.accuracy?.normalized ?? -1.0) <= 1.0 &&
-                (benchmarkResult?.accuracy2?.normalized ?? -1.0) <= 1.0;
-      } else {
-        continue;
+      late final _ResultViewHelper taskHelper;
+      switch (_screenMode) {
+        case _ScreenMode.performance:
+          taskHelper = _ResultViewHelper.performance(benchmark);
+          break;
+        case _ScreenMode.accuracy:
+          taskHelper = _ResultViewHelper.accuracy(benchmark);
+          break;
+        default:
+          throw 'unsupported _ScreenMode enum value';
       }
-      final backendName = benchmark.performanceModeResult?.backendName ?? '';
-      final acceleratorName =
-          benchmark.performanceModeResult?.acceleratorName ?? '';
 
-      var rowChildren = <Widget>[];
-      rowChildren.add(Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Text('$backendName | $acceleratorName')),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    textResult ?? 'N/A',
-                    style: TextStyle(
-                      color: resultIsValid
-                          ? AppColors.darkText
-                          : AppColors.darkRedText,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (textResult2 != null)
-                    Text(
-                      textResult2,
-                      style: TextStyle(
-                        color: resultIsValid
-                            ? AppColors.darkText
-                            : AppColors.darkRedText,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                ],
-              ),
-              const Icon(Icons.chevron_right, color: Colors.grey),
-            ],
-          ),
-        ],
+      list.add(_makeBottomTaskResultView(
+        pictureSize: pictureEdgeSize,
+        l10n: l10n,
+        benchmark: benchmark,
+        taskHelper: taskHelper,
       ));
-      if (benchmark.info.isOffline) {
-        String batchSize;
-        if (textResult == null) {
-          batchSize = 'N/A';
-        } else {
-          batchSize = benchmarkResult?.batchSize.toString() ?? '';
-        }
-
-        rowChildren.add(Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              stringResources.resultsBatchSize
-                  .replaceAll('<batchSize>', batchSize),
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 14.0,
-              ),
-            ),
-          ],
-        ));
-      }
-      rowChildren.add(FractionallySizedBox(
-          widthFactor: 0.9, child: BlueProgressLine(numericResult ?? 0.0)));
-      if (numericResult2 != null) {
-        rowChildren.add(FractionallySizedBox(
-            widthFactor: 0.9, child: BlueProgressLine(numericResult2)));
-      }
-      list.add(
-        Column(
-          children: [
-            ListTile(
-              minVerticalPadding: 0,
-              leading: SizedBox(
-                  width: pictureEdgeSize,
-                  height: pictureEdgeSize,
-                  child: benchmark.info.icon),
-              title: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child: Text(benchmark.taskConfig.name),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: rowChildren,
-              ),
-              onTap: () => showBenchmarkInfoBottomSheet(context, benchmark),
-            ),
-            const Divider()
-          ],
-        ),
-      );
     }
     return Column(children: list);
   }
@@ -363,7 +375,7 @@ class _ResultScreenState extends State<ResultScreen>
     final fm = context.watch<FirebaseManager?>();
 
     final detailedResultsPage = Column(children: [
-      _createListOfBenchmarkResultWidgets(context, state.benchmarks),
+      _makeBottomResultsView(context, state.benchmarks),
       Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           child: TextButton(
@@ -531,5 +543,67 @@ class BlueProgressLine extends Container {
         ),
       ),
     );
+  }
+}
+
+class _ResultViewHelper {
+  final String? textResult;
+  final double? numericResult;
+  final String? textResult2;
+  final double? numericResult2;
+  final bool resultIsValid;
+  final String backendInfoSubtitle;
+  final String batchSize;
+
+  _ResultViewHelper({
+    required this.textResult,
+    required this.numericResult,
+    required this.textResult2,
+    required this.numericResult2,
+    required this.resultIsValid,
+    required this.backendInfoSubtitle,
+    required this.batchSize,
+  });
+
+  factory _ResultViewHelper.performance(Benchmark benchmark) {
+    final benchmarkResult = benchmark.performanceModeResult;
+    final throughput = benchmarkResult?.throughput;
+    return _ResultViewHelper(
+      textResult: throughput?.toStringAsFixed(2),
+      numericResult: (throughput ?? 0.0) / benchmark.info.maxThroughput,
+      textResult2: null,
+      numericResult2: null,
+      resultIsValid: benchmarkResult?.validity ?? false,
+      backendInfoSubtitle: _makeBackendSubtitle(benchmark),
+      batchSize: _makeBatchSize(benchmarkResult),
+    );
+  }
+  factory _ResultViewHelper.accuracy(Benchmark benchmark) {
+    final benchmarkResult = benchmark.accuracyModeResult;
+    return _ResultViewHelper(
+      textResult: benchmarkResult?.accuracy?.formatted,
+      numericResult: benchmarkResult?.accuracy?.normalized,
+      textResult2: benchmarkResult?.accuracy2?.formatted,
+      numericResult2: benchmarkResult?.accuracy2?.normalized,
+      resultIsValid: (benchmarkResult?.accuracy?.normalized ?? -1.0) >= 0.0 &&
+          (benchmarkResult?.accuracy?.normalized ?? -1.0) <= 1.0 &&
+          (benchmarkResult?.accuracy2?.normalized ?? -1.0) <= 1.0,
+      backendInfoSubtitle: _makeBackendSubtitle(benchmark),
+      batchSize: _makeBatchSize(benchmarkResult),
+    );
+  }
+
+  static String _makeBackendSubtitle(Benchmark benchmark) {
+    final backendName = benchmark.performanceModeResult?.backendName ?? '';
+    final acceleratorName =
+        benchmark.performanceModeResult?.acceleratorName ?? '';
+    return '$backendName | $acceleratorName';
+  }
+
+  static String _makeBatchSize(BenchmarkResult? benchmarkResult) {
+    if (benchmarkResult == null) {
+      return 'N/A';
+    }
+    return benchmarkResult.batchSize.toString();
   }
 }
