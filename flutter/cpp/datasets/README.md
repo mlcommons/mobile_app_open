@@ -155,8 +155,9 @@ flutter/cpp/binary:main mobile_back_tflite:tflitebackend
 push them to the target Android device
 
 ```shell
-adb -t 1 push bazel-bin/flutter/cpp/binary/main /usr/local/tmp/sr/main_sr
-adb -t 1 push bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so /usr/local/tmp/sr/
+adb push bazel-bin/flutter/cpp/binary/main /data/local/tmp/sr/main_sr
+adb push bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so \
+  /data/local/tmp/sr/
 ```
 
 assuming we have the dataset and the model on the devices at
