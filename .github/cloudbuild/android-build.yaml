@@ -4,6 +4,9 @@ substitutions:
   # allow to override trigger names
   _TFLITE_TEST_TRIGGER: android-test-tflite
   _PIXEL_TEST_TRIGGER: android-test-pixel
+  # only a reference, overridden in GCP trigger settings
+  _SNPE_PATH: gs://snpe-bucket/path/to/snpe
+  _SNPE_FILENAME: snpe-1.65.0_rc2_3676.zip
 
 # Building apks with flutter requires a lot of memory.
 # Builds on standard machines with 4GB of RAM can unexpectedly hang.
@@ -66,6 +69,16 @@ steps:
         DOCKERFILE_COMMIT=$$(git log -n 1 --pretty=format:%H -- flutter/android/docker/Dockerfile)
         docker push gcr.io/$PROJECT_ID/$_BUILDER_IMAGE_NAME:$$DOCKERFILE_COMMIT
         docker push gcr.io/$PROJECT_ID/$_BUILDER_IMAGE_NAME:latest
+  - id: fetch-snpe
+    name: gcr.io/cloud-builders/gsutil
+    timeout: 60s
+    entrypoint: bash
+    args:
+      - -xc
+      - |
+        mkdir -p output
+        gsutil cp -r $_SNPE_PATH/$_SNPE_FILENAME output
+        unzip ./output/$_SNPE_FILENAME -d ./mobile_back_qti
   - id: build-native-libs
     name: gcr.io/$PROJECT_ID/$_BUILDER_IMAGE_NAME:latest
     # if build fails while image is still uploading, uploading will be cancelled
@@ -76,6 +89,7 @@ steps:
       - BAZEL_CACHE_ARG=--remote_cache=https://storage.googleapis.com/$_BAZEL_CACHE_BUCKET --google_default_credentials
       - WITH_TFLITE=1
       - WITH_PIXEL=1
+      - WITH_QTI=1
     args:
       - -xc
       - |
@@ -133,6 +147,37 @@ steps:
           "substitutions": {
             "_APK_LOCATION": "$_ARTIFACT_UPLOAD_PATH",
             "_APK_SUBFOLDER": "pixel",
+            "_APK_RELEASE_NAME": "$$FLUTTER_ANDROID_APK_RELEASE",
+            "_APK_TEST_MAIN_NAME": "$$FLUTTER_ANDROID_APK_TEST_MAIN",
+            "_APK_TEST_HELPER_NAME": "$$FLUTTER_ANDROID_APK_TEST_HELPER"
+          },
+          "commitSha": "$COMMIT_SHA"
+        }
+        EOL
+  - id: build-qti-apks
+    name: gcr.io/$PROJECT_ID/$_BUILDER_IMAGE_NAME:latest
+    timeout: 600s # 10 minutes
+    entrypoint: bash
+    env:
+      - OFFICIAL_BUILD=true
+      - FLUTTER_BUILD_NUMBER=0
+      - FLUTTER_FORCE_PUB_GET=1
+      - FLUTTER_ANDROID_APK_FOLDER=$_APK_DIR/qti
+      - FLUTTER_ANDROID_APK_RELEASE=mlperfbench-q-$SHORT_SHA.apk
+      - FLUTTER_ANDROID_APK_TEST_MAIN=test-main-q-$SHORT_SHA.apk
+      - FLUTTER_ANDROID_APK_TEST_HELPER=test-helper-q-$SHORT_SHA.apk
+      - WITH_TFLITE=0
+      - WITH_QTI=1
+    args:
+      - -xc
+      - |
+        make flutter/android/libs/copy flutter/prepare || exit $?
+        make flutter/android/apk flutter/android/test-apk || exit $?
+        cat >request-qti.json <<EOL
+        {
+          "substitutions": {
+            "_APK_LOCATION": "$_ARTIFACT_UPLOAD_PATH",
+            "_APK_SUBFOLDER": "qti",
             "_APK_RELEASE_NAME": "$$FLUTTER_ANDROID_APK_RELEASE",
             "_APK_TEST_MAIN_NAME": "$$FLUTTER_ANDROID_APK_TEST_MAIN",
             "_APK_TEST_HELPER_NAME": "$$FLUTTER_ANDROID_APK_TEST_HELPER"
