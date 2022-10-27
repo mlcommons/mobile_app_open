@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/firebase/manager.dart';
@@ -259,6 +261,28 @@ class _ResultScreenState extends State<ResultScreen>
         .toList();
   }
 
+  double calculateOverallPercentage(List<Benchmark> benchmarks) {
+    final benchmarksCount = benchmarks
+        .where((benchmark) => benchmark.performanceModeResult != null)
+        .length;
+
+    if (benchmarksCount == 0) return 0;
+
+    final summaryThroughput = pow(
+        benchmarks.fold<double>(1, (prev, i) {
+          return prev * (i.performanceModeResult?.throughput ?? 1.0);
+        }),
+        1.0 / benchmarksCount);
+
+    final maxSummaryThroughput = pow(
+        benchmarks.fold<double>(1, (prev, i) {
+          return prev * (i.info.maxThroughput);
+        }),
+        1.0 / benchmarksCount);
+
+    return summaryThroughput / maxSummaryThroughput;
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
@@ -286,7 +310,8 @@ class _ResultScreenState extends State<ResultScreen>
                   ),
                 ),
                 Expanded(
-                  child: ResultCircle(state.result),
+                  child: ResultCircle(
+                      calculateOverallPercentage(state.benchmarks)),
                 ),
                 Expanded(
                   child: Column(
