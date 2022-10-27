@@ -32,21 +32,68 @@ class ConfigManager {
   final TaskConfigDescription defaultConfig =
       TaskConfigDescription(_defaultConfigName, _defaultConfigUrl);
 
+  Map<String, TaskConfigDescription> configList = {};
+
   String configLocation = '';
   late pb.MLPerfConfig decodedConfig;
 
-  ConfigManager(this.applicationDirectory, this.resourceManager);
+  ConfigManager._(this.applicationDirectory, this.resourceManager);
+
+  String get _defaultConfigFile => '$applicationDirectory/$_configListFileName';
+
+  static Future<ConfigManager> create(
+    String applicationDirectory,
+    ResourceManager resourceManager,
+  ) async {
+    final result = ConfigManager._(applicationDirectory, resourceManager);
+    await result.initConfigList();
+    return result;
+  }
+
+  Future<void> initConfigList() async {
+    configList = await readConfigList(_defaultConfigFile);
+
+    if (configList[defaultConfig.name] == null ||
+        configList[defaultConfig.name]!.path != defaultConfig.path) {
+      configList[defaultConfig.name] = defaultConfig;
+      await updateConfigOnDisk();
+    }
+  }
+
+  Future<void> updateConfigOnDisk() async {
+    await writeConfigList(configList, _defaultConfigFile);
+  }
+
+  static Future<Map<String, TaskConfigDescription>> readConfigList(
+      String configFile) async {
+    final file = File(configFile);
+    final jsonContent =
+        jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+
+    final result = <String, TaskConfigDescription>{};
+    for (final e in jsonContent.entries) {
+      result[e.key] = TaskConfigDescription(e.key, e.value as String);
+    }
+    return result;
+  }
+
+  static Future<void> writeConfigList(
+      Map<String, TaskConfigDescription> list, String configFile) async {
+    final Map<String, dynamic> json = {};
+    for (var e in list.entries) {
+      json[e.key] = e.value.path;
+    }
+
+    const jsonEncoder = JsonEncoder.withIndent('  ');
+
+    final file = File(configFile);
+    await file.writeAsString(jsonEncoder.convert(json));
+  }
 
   /// Can throw.
   /// decodedConfig must not be read until this function has finished successfully
   Future<void> loadConfig(String name) async {
-    TaskConfigDescription? config;
-    for (var c in await getConfigs()) {
-      if (c.name == name) {
-        config = c;
-        break;
-      }
-    }
+    final TaskConfigDescription? config = configList[name];
     if (config == null) {
       throw 'config with name $name not found';
     }
@@ -74,38 +121,5 @@ class ConfigManager {
     }
 
     decodedConfig = getMLPerfConfig(configContent);
-  }
-
-  Future<File> _createOrUpdateConfigListFile() async {
-    final file = File('$applicationDirectory/$_configListFileName');
-    const jsonEncoder = JsonEncoder.withIndent('  ');
-
-    if (!await file.exists()) {
-      print('Create new config file at ${file.path}');
-      await file.writeAsString(jsonEncoder.convert(defaultConfig.asMap()));
-      return file;
-    }
-
-    final configs =
-        jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-    if (configs[defaultConfig.name] != defaultConfig.path) {
-      print('Update default config path in ${file.path}');
-      configs[defaultConfig.name] = defaultConfig.path;
-      await file.writeAsString(jsonEncoder.convert(configs));
-    }
-
-    return file;
-  }
-
-  Future<List<TaskConfigDescription>> getConfigs() async {
-    final file = await _createOrUpdateConfigListFile();
-    final jsonContent =
-        jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-
-    final result = <TaskConfigDescription>[];
-    for (final e in jsonContent.entries) {
-      result.add(TaskConfigDescription(e.key, e.value as String));
-    }
-    return result;
   }
 }

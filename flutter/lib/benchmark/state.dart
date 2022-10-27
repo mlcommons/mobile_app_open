@@ -129,7 +129,7 @@ class BenchmarkState extends ChangeNotifier {
     final result = BenchmarkState._(store, await BridgeIsolate.create());
 
     await result.resourceManager.initSystemPaths();
-    result.configManager = ConfigManager(
+    result.configManager = await ConfigManager.create(
         result.resourceManager.applicationDirectory, result.resourceManager);
     try {
       await result.setTaskConfig(name: store.chosenConfigurationName);

@@ -158,11 +158,9 @@ class _DataFolderSelectorHelper {
 }
 
 class TaskConfigScreen extends StatelessWidget {
-  final List<TaskConfigDescription> _configs;
+  const TaskConfigScreen({Key? key}) : super(key: key);
 
-  const TaskConfigScreen(this._configs, {Key? key}) : super(key: key);
-
-  Card getOptionPattern(
+  Widget _makeConfigListItem(
     BuildContext context,
     TaskConfigDescription configuration,
     String chosenConfigName,
@@ -233,6 +231,9 @@ class TaskConfigScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final store = context.watch<Store>();
+    final state = context.watch<BenchmarkState>();
+
+    final configs = state.configManager.configList.values;
 
     return Scaffold(
       appBar: AppBar(
@@ -249,7 +250,7 @@ class TaskConfigScreen extends StatelessWidget {
             _DataFolderSelectorHelper(context).build(),
             const Divider(),
           ],
-          ..._configs.map((c) => getOptionPattern(
+          ...configs.map((c) => _makeConfigListItem(
                 context,
                 c,
                 store.chosenConfigurationName,

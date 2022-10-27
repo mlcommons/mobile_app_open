@@ -197,11 +197,9 @@ class _SettingsScreen extends State<SettingsScreen> {
               onTap: () async {
                 if (state.state == BenchmarkStateEnum.done ||
                     state.state == BenchmarkStateEnum.waiting) {
-                  final taskConfigs = await state.configManager.getConfigs();
-
                   if (!mounted) return;
                   await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => TaskConfigScreen(taskConfigs)));
+                      builder: (context) => const TaskConfigScreen()));
                 } else {
                   _showUnableSpecifyConfigurationMessage(
                       context, stringResources);
