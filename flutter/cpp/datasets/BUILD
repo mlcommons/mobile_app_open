@@ -48,7 +48,7 @@ cc_library(
         "imagenet.cc",
     ],
     hdrs = [
-        "imagenet.h",
+        "imagenet.h", "utils.h"
     ],
     copts = tflite_copts() + select({
         "//flutter/android/commonlibs:use_asan": [
@@ -77,7 +77,7 @@ cc_library(
         "coco.cc",
     ],
     hdrs = [
-        "coco.h",
+        "coco.h", "utils.h"
     ],
     copts = tflite_copts() + select({
         "//flutter/android/commonlibs:use_asan": [
@@ -135,7 +135,7 @@ cc_library(
     name = "ade20k",
     srcs = ["ade20k.cc"],
     hdrs = [
-        "ade20k.h",
+        "ade20k.h", "utils.h"
     ],
     deps = [
         ":allocator",
@@ -153,7 +153,7 @@ cc_library(
     name = "snu_sr",
     srcs = ["snu_sr.cc"],
     hdrs = [
-        "snu_sr.h",
+        "snu_sr.h", "utils.h"
     ],
     deps = [
         ":allocator",

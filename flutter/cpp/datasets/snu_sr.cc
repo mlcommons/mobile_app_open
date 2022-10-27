@@ -28,23 +28,6 @@ limitations under the License.
 
 namespace mlperf {
 namespace mobile {
-namespace {
-inline TfLiteType DataType2TfType(DataType::Type type) {
-  switch (type) {
-    case DataType::Float32:
-      return kTfLiteFloat32;
-    case DataType::Uint8:
-      return kTfLiteUInt8;
-    case DataType::Int8:
-      return kTfLiteInt8;
-    case DataType::Float16:
-      return kTfLiteFloat16;
-    default:
-      break;
-  }
-  return kTfLiteNoType;
-}
-}  // namespace
 
 SNUSR::SNUSR(Backend *backend, const std::string &image_dir,
              const std::string &ground_truth_dir, int num_channels, int scale,
