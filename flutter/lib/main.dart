@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
@@ -55,12 +56,16 @@ Future<void> launchUi() async {
     benchmarkState.addListener(() => autostartHandler(benchmarkState, store));
   }
 
+  final BoardDecoder boardDecoder = BoardDecoder();
+  await boardDecoder.init();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: benchmarkState),
         ChangeNotifierProvider.value(value: store),
         Provider.value(value: FirebaseManager.instance),
+        Provider.value(value: boardDecoder),
       ],
       child: const MyApp(home: MyHomePage()),
     ),

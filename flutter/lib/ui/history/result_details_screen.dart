@@ -5,6 +5,7 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/run_details_screen.dart';
 import 'utils.dart';
@@ -31,7 +32,7 @@ class _DetailsScreen extends State<DetailsScreen> {
 
     return Scaffold(
       appBar: helper.makeAppBar(l10n.historyDetailsTitle),
-      body: ListView(children: _makeBody()),
+      body: ListView(children: _makeBody(context)),
     );
   }
 
@@ -48,7 +49,7 @@ class _DetailsScreen extends State<DetailsScreen> {
     return throughput / count;
   }
 
-  List<Widget> _makeBody() {
+  List<Widget> _makeBody(BuildContext context) {
     final res = widget.result;
 
     final firstResult = res.results.first;
@@ -69,9 +70,11 @@ class _DetailsScreen extends State<DetailsScreen> {
         .replaceFirst('<build>', res.buildInfo.buildNumber)
         .replaceFirst('<buildType>', appVersionType);
 
+    final boardDecoder = context.watch<BoardDecoder>();
     final utils = HistoryHelperUtils(l10n);
     final modelDescription = utils.makeModelDescription(res.environmentInfo);
-    final socDescription = utils.makeSocName(state, res.environmentInfo);
+    final socDescription =
+        utils.makeSocName(state, res.environmentInfo, boardDecoder);
 
     return [
       helper.makeInfo(l10n.historyDetailsDate, date),

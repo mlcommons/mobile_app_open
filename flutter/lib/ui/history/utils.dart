@@ -8,6 +8,7 @@ import 'package:mlperfbench_common/data/environment/environment_info.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 class HistoryHelperUtils {
@@ -207,7 +208,8 @@ class HistoryHelperUtils {
     }
   }
 
-  String makeSocName(BenchmarkState state, EnvironmentInfo info) {
+  String makeSocName(
+      BenchmarkState state, EnvironmentInfo info, BoardDecoder boardDecoder) {
     switch (info.platform) {
       case EnvPlatform.android:
         final android = info.value.android;
@@ -216,7 +218,7 @@ class HistoryHelperUtils {
         }
 
         if (android.boardCode != null) {
-          final boardName = state.boardDecoder.boards[android.boardCode];
+          final boardName = boardDecoder.boards[android.boardCode];
           if (boardName != null) {
             return boardName;
           }
