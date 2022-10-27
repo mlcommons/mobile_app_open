@@ -3,13 +3,13 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
 
 class MainScreenUtils {
   Widget wrapCircle(AppLocalizations l10n, PreferredSizeWidget appBar,
-      Widget content, BuildContext context, BenchmarkState state) {
+      Widget content, BuildContext context, List<Benchmark> tasks) {
     return Scaffold(
       appBar: appBar,
       body: SafeArea(
@@ -31,7 +31,7 @@ class MainScreenUtils {
               flex: 5,
               child: Align(
                   alignment: Alignment.topCenter,
-                  child: createListOfBenchmarkItemsWidgets(context, state)),
+                  child: createListOfBenchmarkItemsWidgets(context, tasks)),
             ),
           ],
         ),

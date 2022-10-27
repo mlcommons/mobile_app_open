@@ -57,14 +57,13 @@ class _ListScreenState extends State<ListScreen>
 
     tabs.add(HistoryTab(
       pushAction: pushAction,
-      state: state,
+      resultManager: state.resourceManager.resultManager,
       triggerRebuild: triggerRebuild,
     ));
 
     final isOnlineEnabled = fm != null;
     if (isOnlineEnabled) {
       tabs.add(OnlineTab(
-        state: state,
         triggerRebuild: triggerRebuild,
       ));
     }

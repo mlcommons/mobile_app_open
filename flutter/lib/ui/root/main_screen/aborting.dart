@@ -22,6 +22,6 @@ class MainScreenAborting extends StatelessWidget {
     final circle = utils.circleContainerWithContent(
         context, AppIcons.waiting, l10n.mainScreenWaitFinish);
 
-    return utils.wrapCircle(l10n, appBar, circle, context, state);
+    return utils.wrapCircle(l10n, appBar, circle, context, state.benchmarks);
   }
 }

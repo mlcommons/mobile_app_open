@@ -26,6 +26,6 @@ class MainScreenDownloading extends StatelessWidget {
     final circle = utils.circleContainerWithContent(
         context, textLabel, l10n.mainScreenLoading);
 
-    return utils.wrapCircle(l10n, appBar, circle, context, state);
+    return utils.wrapCircle(l10n, appBar, circle, context, state.benchmarks);
   }
 }

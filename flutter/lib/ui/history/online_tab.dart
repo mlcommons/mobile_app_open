@@ -5,7 +5,6 @@ import 'package:mlperfbench_common/firebase/cache_helper.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
 
-import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'result_details_screen.dart';
@@ -15,7 +14,6 @@ class OnlineTab implements TabInterface {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
 
-  final BenchmarkState state;
   final void Function([void Function()? action]) triggerRebuild;
 
   final List<ExtendedResult> itemList = [];
@@ -26,7 +24,6 @@ class OnlineTab implements TabInterface {
   String error = '';
 
   OnlineTab({
-    required this.state,
     required this.triggerRebuild,
   });
 

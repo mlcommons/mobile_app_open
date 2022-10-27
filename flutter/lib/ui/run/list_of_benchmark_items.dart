@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
-import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 ListView createListOfBenchmarkItemsWidgets(
-    BuildContext context, BenchmarkState state) {
-  final list = <Widget>[];
+    BuildContext context, List<Benchmark> tasks) {
+  final result = <Widget>[];
   final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
-  for (final benchmark in state.benchmarks) {
-    list.add(
+  for (final benchmark in tasks) {
+    result.add(
       InkWell(
         onTap: () => showBenchmarkInfoBottomSheet(
           context,
@@ -38,7 +37,7 @@ ListView createListOfBenchmarkItemsWidgets(
       ),
     );
   }
-  return ListView(padding: const EdgeInsets.only(left: 20), children: list);
+  return ListView(padding: const EdgeInsets.only(left: 20), children: result);
 }
 
 void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {

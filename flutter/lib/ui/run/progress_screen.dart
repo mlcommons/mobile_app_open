@@ -27,8 +27,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
+    final taskRunner = state.taskRunner;
     final l10n = AppLocalizations.of(context);
-    final progress = state.taskRunner.progressInfo;
+    final progress = taskRunner.progressInfo;
 
     final backgroundGradient = BoxDecoration(
       gradient: LinearGradient(
@@ -157,7 +158,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             ),
           ),
         ),
-        onPressed: () async => await state.taskRunner.abortBenchmarks(),
+        onPressed: () async => await taskRunner.abortBenchmarks(),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: Text(

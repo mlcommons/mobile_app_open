@@ -67,12 +67,12 @@ class _ResultScreenState extends State<ResultScreen>
   }
 
   Column _createListOfBenchmarkResultWidgets(
-      BuildContext context, BenchmarkState state) {
+      BuildContext context, List<Benchmark> tasks) {
     final list = <Widget>[];
     final stringResources = AppLocalizations.of(context);
     final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
-    for (final benchmark in state.benchmarks) {
+    for (final benchmark in tasks) {
       late final String? textResult;
       late final double? numericResult;
       late final String? textResult2;
@@ -201,8 +201,8 @@ class _ResultScreenState extends State<ResultScreen>
   }
 
   List<Widget> _createListOfBenchmarkResultTopWidgets(
-      BenchmarkState state, BuildContext context) {
-    final widgets = state.benchmarks.map((benchmark) {
+      List<Benchmark> tasks, BuildContext context) {
+    final widgets = tasks.map((benchmark) {
       final result = _screenMode == _ScreenMode.performance
           ? benchmark.performanceModeResult
           : benchmark.accuracyModeResult;
@@ -316,8 +316,8 @@ class _ResultScreenState extends State<ResultScreen>
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children:
-                        _createListOfBenchmarkResultTopWidgets(state, context),
+                    children: _createListOfBenchmarkResultTopWidgets(
+                        state.benchmarks, context),
                   ),
                 ),
               ],
@@ -363,7 +363,7 @@ class _ResultScreenState extends State<ResultScreen>
     final fm = context.watch<FirebaseManager?>();
 
     final detailedResultsPage = Column(children: [
-      _createListOfBenchmarkResultWidgets(context, state),
+      _createListOfBenchmarkResultWidgets(context, state.benchmarks),
       Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           child: TextButton(
@@ -421,10 +421,12 @@ class _ResultScreenState extends State<ResultScreen>
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
                 onPressed: () async {
-                  final result =
-                      state.resourceManager.resultManager.getLastResult();
+                  final lastResult = state.lastResult;
+                  if (lastResult == null) {
+                    return;
+                  }
                   await Share.share(
-                    jsonToStringIndented(result),
+                    jsonToStringIndented(lastResult),
                     subject: stringResources.resultsShareSubject,
                   );
                 },

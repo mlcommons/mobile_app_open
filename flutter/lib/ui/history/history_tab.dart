@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
 
-import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/history/app_bar_content.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
@@ -13,7 +13,7 @@ import 'tab_interface.dart';
 class HistoryTab implements TabInterface {
   final void Function(AppBarContent? appBar) pushAction;
   final void Function([void Function() action]) triggerRebuild;
-  final BenchmarkState state;
+  final ResultManager resultManager;
 
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
@@ -26,7 +26,7 @@ class HistoryTab implements TabInterface {
   HistoryTab({
     required this.pushAction,
     required this.triggerRebuild,
-    required this.state,
+    required this.resultManager,
   });
 
   @override
@@ -39,7 +39,7 @@ class HistoryTab implements TabInterface {
     l10n = AppLocalizations.of(context);
     helper = HistoryHelperUtils(l10n);
 
-    itemList = state.resourceManager.resultManager.results;
+    itemList = resultManager.results;
     if (selected == null) {
       resetSelection(false);
     }
@@ -96,7 +96,7 @@ class HistoryTab implements TabInterface {
           switch (dialogResult) {
             case ConfirmDialogAction.ok:
               triggerRebuild(() {
-                state.resourceManager.resultManager.removeSelected(selected!);
+                resultManager.removeSelected(selected!);
                 disableSelectionMode();
               });
               break;

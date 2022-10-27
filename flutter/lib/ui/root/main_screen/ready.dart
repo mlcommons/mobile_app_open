@@ -30,7 +30,7 @@ class MainScreenReady extends StatelessWidget {
     final appBar = MyAppBar.buildAppBar(l10n.mainScreenTitle, context, true);
     final circle = _goContainer(context);
 
-    return utils.wrapCircle(l10n, appBar, circle, context, state);
+    return utils.wrapCircle(l10n, appBar, circle, context, state.benchmarks);
   }
 
   Widget _goContainer(BuildContext context) {
