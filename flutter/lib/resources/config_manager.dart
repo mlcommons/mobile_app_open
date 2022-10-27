@@ -32,20 +32,32 @@ class ConfigManager {
   final TaskConfigDescription defaultConfig =
       TaskConfigDescription(_defaultConfigName, _defaultConfigUrl);
 
+  final void Function() onConfigChange;
+
   Map<String, TaskConfigDescription> configList = {};
 
-  String configFileLocation = '';
-  late pb.MLPerfConfig decodedConfig;
+  String currentConfigName = '';
+  String currentConfigFilePath = '';
+  late pb.MLPerfConfig currentConfig;
 
-  ConfigManager._(this.applicationDirectory, this.resourceManager);
+  ConfigManager._({
+    required this.applicationDirectory,
+    required this.resourceManager,
+    required this.onConfigChange,
+  });
 
   String get _defaultConfigFile => '$applicationDirectory/$_configListFileName';
 
-  static Future<ConfigManager> create(
-    String applicationDirectory,
-    ResourceManager resourceManager,
-  ) async {
-    final result = ConfigManager._(applicationDirectory, resourceManager);
+  static Future<ConfigManager> create({
+    required String applicationDirectory,
+    required ResourceManager resourceManager,
+    required void Function() onConfigChange,
+  }) async {
+    final result = ConfigManager._(
+      applicationDirectory: applicationDirectory,
+      resourceManager: resourceManager,
+      onConfigChange: onConfigChange,
+    );
     await result.initConfigList();
     return result;
   }
@@ -91,13 +103,18 @@ class ConfigManager {
   }
 
   /// Can throw.
-  /// decodedConfig must not be read until this function has finished successfully
-  Future<void> loadConfig(String name) async {
+  /// currentConfig must not be read until this function has finished successfully
+  Future<void> setConfig({required String name}) async {
+    if (name == '') {
+      name = defaultConfig.name;
+    }
     final TaskConfigDescription? config = configList[name];
     if (config == null) {
       throw 'config with name $name not found';
     }
-    decodedConfig = await readConfig(config);
+    currentConfigName = name;
+    currentConfig = await readConfig(config);
+    onConfigChange();
   }
 
   Future<pb.MLPerfConfig> readConfig(TaskConfigDescription config) async {
@@ -108,21 +125,21 @@ class ConfigManager {
   // TODO this should be responsibility of resource manager
   Future<String> getFileContent(String uri) async {
     if (isInternetResource(uri)) {
-      configFileLocation =
+      currentConfigFilePath =
           await resourceManager.cacheManager.fileCacheHelper.get(uri, true);
-      return await File(configFileLocation).readAsString();
+      return await File(currentConfigFilePath).readAsString();
     }
 
     if (isAsset(uri)) {
-      configFileLocation = uri;
+      currentConfigFilePath = uri;
       final assetPath = stripAssetPrefix(uri);
       return await rootBundle.loadString(assetPath);
     }
 
-    configFileLocation = resourceManager.get(uri);
-    if (!await File(configFileLocation).exists()) {
-      throw 'local config file is missing: $configFileLocation';
+    currentConfigFilePath = resourceManager.get(uri);
+    if (!await File(currentConfigFilePath).exists()) {
+      throw 'local config file is missing: $currentConfigFilePath';
     }
-    return await File(configFileLocation).readAsString();
+    return await File(currentConfigFilePath).readAsString();
   }
 }

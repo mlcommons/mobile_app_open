@@ -62,7 +62,7 @@ class ResourceErrorScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${stringResources.resourceErrorCurrentConfig} ${state.configManager.configFileLocation}',
+                        '${stringResources.resourceErrorCurrentConfig} ${state.configManager.currentConfigFilePath}',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 15,
@@ -90,8 +90,8 @@ class ResourceErrorScreen extends StatelessWidget {
                       TextButton(
                         onPressed: () async {
                           try {
-                            await state.setTaskConfig(
-                                name: store.chosenConfigurationName);
+                            await state.configManager
+                                .setConfig(name: store.chosenConfigurationName);
                             state.deferredLoadResources();
                           } catch (e, trace) {
                             print("can't change task config: $e");

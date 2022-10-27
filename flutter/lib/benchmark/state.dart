@@ -76,8 +76,7 @@ class BenchmarkState extends ChangeNotifier {
     await resourceManager.cacheManager.deleteLoadedResources([], 0);
     notifyListeners();
     try {
-      await setTaskConfig(name: _store.chosenConfigurationName);
-      deferredLoadResources();
+      await configManager.setConfig(name: _store.chosenConfigurationName);
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
@@ -130,10 +129,12 @@ class BenchmarkState extends ChangeNotifier {
 
     await result.resourceManager.initSystemPaths();
     result.configManager = await ConfigManager.create(
-        result.resourceManager.applicationDirectory, result.resourceManager);
+      applicationDirectory: result.resourceManager.applicationDirectory,
+      resourceManager: result.resourceManager,
+      onConfigChange: result.onConfigChange,
+    );
     try {
-      await result.setTaskConfig(name: store.chosenConfigurationName);
-      result.deferredLoadResources();
+      await result.configManager.setConfig(name: store.chosenConfigurationName);
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
@@ -145,26 +146,19 @@ class BenchmarkState extends ChangeNotifier {
     return result;
   }
 
-  /// Reads config but doesn't update resources that depend on config.
-  /// Call loadResources() to update dependent resources.
-  ///
-  /// Can throw an exception.
-  Future<void> setTaskConfig({required String name}) async {
-    if (name == '') {
-      name = configManager.defaultConfig.name;
-    }
-    await configManager.loadConfig(name);
-    _store.chosenConfigurationName = name;
+  void onConfigChange() {
+    _store.chosenConfigurationName = configManager.currentConfigName;
     error = null;
     stackTrace = null;
     taskConfigFailedToLoad = false;
 
     _middle = BenchmarkList(
-      appConfig: configManager.decodedConfig,
+      appConfig: configManager.currentConfig,
       backendConfig: backendInfo.settings.benchmarkSetting,
       taskSelection: parseTaskSelection(_store.taskSelection),
     );
     restoreLastResult();
+    deferredLoadResources();
   }
 
   static Map<String, bool> parseTaskSelection(String json) {
