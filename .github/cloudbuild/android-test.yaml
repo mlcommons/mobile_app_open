@@ -28,8 +28,8 @@ steps:
       - |
         gcloud firebase test android run \
           --type instrumentation \
-          --app output/apks/test-main-$_APK_SUFFIX \
-          --test output/apks/test-helper-$_APK_SUFFIX \
+          --app output/apks/test-main-$_APK_SUFFIX.apk \
+          --test output/apks/test-helper-$_APK_SUFFIX.apk \
           --timeout 20m \
           --device $_DEVICE_SELECTOR
 
