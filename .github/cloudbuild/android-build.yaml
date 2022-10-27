@@ -114,11 +114,8 @@ steps:
         cat >request-tflite.json <<EOL
         {
           "substitutions": {
-            "_APK_LOCATION": "$_ARTIFACT_UPLOAD_PATH",
-            "_APK_SUBFOLDER": "tflite",
-            "_APK_RELEASE_NAME": "$$FLUTTER_ANDROID_APK_RELEASE",
-            "_APK_TEST_MAIN_NAME": "$$FLUTTER_ANDROID_APK_TEST_MAIN",
-            "_APK_TEST_HELPER_NAME": "$$FLUTTER_ANDROID_APK_TEST_HELPER"
+            "_APK_LOCATION": "$_ARTIFACT_UPLOAD_PATH/tflite",
+            "_APK_SUFFIX": "t-$SHORT_SHA",
           },
           "commitSha": "$COMMIT_SHA"
         }
@@ -145,11 +142,8 @@ steps:
         cat >request-pixel.json <<EOL
         {
           "substitutions": {
-            "_APK_LOCATION": "$_ARTIFACT_UPLOAD_PATH",
-            "_APK_SUBFOLDER": "pixel",
-            "_APK_RELEASE_NAME": "$$FLUTTER_ANDROID_APK_RELEASE",
-            "_APK_TEST_MAIN_NAME": "$$FLUTTER_ANDROID_APK_TEST_MAIN",
-            "_APK_TEST_HELPER_NAME": "$$FLUTTER_ANDROID_APK_TEST_HELPER"
+            "_APK_LOCATION": "$_ARTIFACT_UPLOAD_PATH/pixel",
+            "_APK_SUFFIX": "p-$SHORT_SHA",
           },
           "commitSha": "$COMMIT_SHA"
         }
@@ -176,11 +170,8 @@ steps:
         cat >request-qti.json <<EOL
         {
           "substitutions": {
-            "_APK_LOCATION": "$_ARTIFACT_UPLOAD_PATH",
-            "_APK_SUBFOLDER": "qti",
-            "_APK_RELEASE_NAME": "$$FLUTTER_ANDROID_APK_RELEASE",
-            "_APK_TEST_MAIN_NAME": "$$FLUTTER_ANDROID_APK_TEST_MAIN",
-            "_APK_TEST_HELPER_NAME": "$$FLUTTER_ANDROID_APK_TEST_HELPER"
+            "_APK_LOCATION": "$_ARTIFACT_UPLOAD_PATH/qti",
+            "_APK_SUFFIX": "q-$SHORT_SHA",
           },
           "commitSha": "$COMMIT_SHA"
         }

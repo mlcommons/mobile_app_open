@@ -1,5 +1,8 @@
 substitutions:
-  # allow to override device selection in trigger description
+  # only a reference, overridden in GCP trigger settings
+  _APK_LOCATION: gs://path/to/apks
+  _APK_SUFFIX: t-123456
+  # allow to optionally override device selection in trigger description
   _DEVICE_SELECTOR: model=redfin,version=30,locale=en,orientation=portrait
   _DEVICE_SELECTOR_DESCRIPTION: redfin is Pixel 5e
 
@@ -12,8 +15,8 @@ steps:
       - -xc
       - |
         mkdir -p output
-        gsutil cp -r gs://$_APK_LOCATION/$_APK_SUBFOLDER output
-        mv output/$_APK_SUBFOLDER output/apks
+        gsutil cp -r gs://$_APK_LOCATION output
+        mv output/$$(basename $_APK_LOCATION) output/apks
   - id: firebase-instrumentation-test
     name: gcr.io/cloud-builders/gcloud
     waitFor:
@@ -25,8 +28,8 @@ steps:
       - |
         gcloud firebase test android run \
           --type instrumentation \
-          --app output/apks/$_APK_TEST_MAIN_NAME \
-          --test output/apks/$_APK_TEST_HELPER_NAME \
+          --app output/apks/test-main-$_APK_SUFFIX \
+          --test output/apks/test-helper-$_APK_SUFFIX \
           --timeout 20m \
           --device $_DEVICE_SELECTOR
 
