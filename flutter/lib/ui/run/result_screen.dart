@@ -79,7 +79,7 @@ class _ResultScreenState extends State<ResultScreen>
     );
     final title = Padding(
       padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-      child: Text(benchmark.taskConfig.name),
+      child: Text(taskHelper.taskName),
     );
 
     final backendInfo = Padding(
@@ -183,8 +183,7 @@ class _ResultScreenState extends State<ResultScreen>
     );
   }
 
-  Column _makeBottomResultsView(
-      BuildContext context, List<Benchmark> tasks) {
+  Column _makeBottomResultsView(BuildContext context, List<Benchmark> tasks) {
     final list = <Widget>[];
     final l10n = AppLocalizations.of(context);
     final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
@@ -212,57 +211,69 @@ class _ResultScreenState extends State<ResultScreen>
     return Column(children: list);
   }
 
-  List<Widget> _createListOfBenchmarkResultTopWidgets(
-      List<Benchmark> tasks, BuildContext context) {
-    final widgets = tasks.map((benchmark) {
-      final result = _screenMode == _ScreenMode.performance
-          ? benchmark.performanceModeResult
-          : benchmark.accuracyModeResult;
-      final text = _screenMode == _ScreenMode.performance
-          ? result?.throughput.toStringAsFixed(2)
-          : result?.accuracy?.normalized.toStringAsFixed(2);
-      final text2 = _screenMode == _ScreenMode.performance
-          ? null
-          : result?.accuracy2?.normalized.toStringAsFixed(2);
-      final resultIsValid = _screenMode == _ScreenMode.performance
-          ? (result?.validity ?? false)
-          : ((result?.accuracy?.normalized ?? -1.0) >= 0.0 &&
-              (result?.accuracy?.normalized ?? -1.0) <= 1.0 &&
-              (result?.accuracy2?.normalized ?? -1.0) <= 1.0);
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child:
-            Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              benchmark.taskConfig.name.split(' ').join('\n').toUpperCase(),
-              textAlign: TextAlign.center,
-              style:
-                  const TextStyle(fontSize: 12.0, color: AppColors.lightText),
-            ),
-          ),
-          Text(
-            text ?? 'N/A',
+  Widget _makeTopTaskResultView(_ResultViewHelper taskHelper) {
+    final upperCaseName =
+        taskHelper.taskName.split(' ').join('\n').toUpperCase();
+    final title = Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        upperCaseName,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 12.0, color: AppColors.lightText),
+      ),
+    );
+    final scoreText1 = Text(
+      taskHelper.textResult ?? 'N/A',
+      style: TextStyle(
+        fontSize: 32.0,
+        color: taskHelper.resultIsValid
+            ? AppColors.lightText
+            : AppColors.lightRedText,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+    final scoreText2 = taskHelper.textResult2 == null
+        ? null
+        : Text(
+            taskHelper.textResult!,
             style: TextStyle(
-                fontSize: 32.0,
-                color: resultIsValid
-                    ? AppColors.lightText
-                    : AppColors.lightRedText,
-                fontWeight: FontWeight.bold),
-          ),
-          if (text2 != null)
-            Text(
-              text2,
-              style: TextStyle(
-                  fontSize: 32.0,
-                  color: resultIsValid
-                      ? AppColors.lightText
-                      : AppColors.lightRedText,
-                  fontWeight: FontWeight.bold),
+              fontSize: 32.0,
+              color: taskHelper.resultIsValid
+                  ? AppColors.lightText
+                  : AppColors.lightRedText,
+              fontWeight: FontWeight.bold,
             ),
-        ]),
-      );
+          );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          title,
+          scoreText1,
+          if (scoreText2 != null) scoreText2,
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _makeTopResultsView(
+    BuildContext context,
+    List<Benchmark> tasks,
+  ) {
+    final widgets = tasks.map((benchmark) {
+      late final _ResultViewHelper taskHelper;
+      switch (_screenMode) {
+        case _ScreenMode.performance:
+          taskHelper = _ResultViewHelper.performance(benchmark);
+          break;
+        case _ScreenMode.accuracy:
+          taskHelper = _ResultViewHelper.accuracy(benchmark);
+          break;
+        default:
+          throw 'unsupported _ScreenMode enum value';
+      }
+      return _makeTopTaskResultView(taskHelper);
     });
 
     return partition(widgets, 3)
@@ -328,8 +339,7 @@ class _ResultScreenState extends State<ResultScreen>
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: _createListOfBenchmarkResultTopWidgets(
-                        state.benchmarks, context),
+                    children: _makeTopResultsView(context, state.benchmarks),
                   ),
                 ),
               ],
@@ -547,6 +557,7 @@ class BlueProgressLine extends Container {
 }
 
 class _ResultViewHelper {
+  final String taskName;
   final String? textResult;
   final double? numericResult;
   final String? textResult2;
@@ -556,6 +567,7 @@ class _ResultViewHelper {
   final String batchSize;
 
   _ResultViewHelper({
+    required this.taskName,
     required this.textResult,
     required this.numericResult,
     required this.textResult2,
@@ -569,6 +581,7 @@ class _ResultViewHelper {
     final benchmarkResult = benchmark.performanceModeResult;
     final throughput = benchmarkResult?.throughput;
     return _ResultViewHelper(
+      taskName: benchmark.taskConfig.name,
       textResult: throughput?.toStringAsFixed(2),
       numericResult: (throughput ?? 0.0) / benchmark.info.maxThroughput,
       textResult2: null,
@@ -581,6 +594,7 @@ class _ResultViewHelper {
   factory _ResultViewHelper.accuracy(Benchmark benchmark) {
     final benchmarkResult = benchmark.accuracyModeResult;
     return _ResultViewHelper(
+      taskName: benchmark.taskConfig.name,
       textResult: benchmarkResult?.accuracy?.formatted,
       numericResult: benchmarkResult?.accuracy?.normalized,
       textResult2: benchmarkResult?.accuracy2?.formatted,
