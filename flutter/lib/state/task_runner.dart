@@ -264,20 +264,19 @@ class _NativeRunHelper {
   Future<RunInfo> run() async {
     await Directory(logDir).create(recursive: true);
 
-    Cancelable<void>? artificialLoadHandle;
     if (enableArtificialLoad) {
       print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
       const value = 999999999999999.0;
-      artificialLoadHandle =
-          Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
+
+      // execute() returns Cancelable, which should in theory allow you to stop the isolate
+      // unfortunately, it doesn't work, artificial load doesn't stop
+      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
     }
 
     try {
       return await _invokeNativeRun();
     } finally {
-      if (artificialLoadHandle != null) {
-        await Executor().dispose();
-      }
+      await Executor().dispose();
     }
   }
 
@@ -339,7 +338,8 @@ class _NativeRunHelper {
     );
   }
 
-  void _doSomethingCPUIntensive(double value, TypeSendPort port) {
+  // This function needs to be either a static function or a top level function to be accessible as a Flutter entry point.
+  static void _doSomethingCPUIntensive(double value, TypeSendPort port) {
     var newValue = value;
     while (true) {
       newValue = newValue * 0.999999999999999;
