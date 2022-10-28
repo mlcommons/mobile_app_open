@@ -126,7 +126,7 @@ benchmark_setting {
     value: "Offline"
   }
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
-  model_checksum: "d239e3a244da27137ca6dae27facff5a"
+  model_checksum: "862ea4d7623c62d49153bad1a774217c"
 }
 
 benchmark_setting {
@@ -247,7 +247,7 @@ benchmark_setting {
     value: "Offline"
   }
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/SNPE/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
-  model_checksum: "d239e3a244da27137ca6dae27facff5a"
+  model_checksum: "862ea4d7623c62d49153bad1a774217c"
 }
 
 benchmark_setting {
