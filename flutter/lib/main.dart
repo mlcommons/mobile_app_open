@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/backend/bridge/isolate.dart';
+import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/board_decoder.dart';
@@ -46,7 +48,13 @@ Future<void> launchUi() async {
   await BuildInfoHelper.staticInit();
   await FirebaseManager.staticInit();
   final store = await Store.create();
-  final benchmarkState = await BenchmarkState.create(store);
+  final bridgeIsolate = await BridgeIsolate.create();
+  final backendInfo = BackendInfoHelper().findMatching();
+  final benchmarkState = await BenchmarkState.create(
+    store: store,
+    bridgeIsolate: bridgeIsolate,
+    backendInfo: backendInfo,
+  );
 
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));

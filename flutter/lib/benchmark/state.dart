@@ -14,6 +14,7 @@ import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
+import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/resources/validation_helper.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
@@ -30,10 +31,10 @@ enum BenchmarkStateEnum {
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
   final BridgeIsolate backendBridge;
+  final BackendInfo backendInfo;
 
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
-  late final BackendInfo backendInfo;
   late final TaskRunner taskRunner;
 
   Object? error;
@@ -60,9 +61,13 @@ class BenchmarkState extends ChangeNotifier {
     );
   }
 
-  BenchmarkState._(this._store, this.backendBridge) {
-    resourceManager = ResourceManager(notifyListeners, _store);
-    backendInfo = BackendInfoHelper().findMatching();
+  BenchmarkState._(
+    this._store,
+    this.backendBridge,
+    this.backendInfo,
+    this.resourceManager,
+  ) {
+    resourceManager.setUpdateNotifier(notifyListeners);
     taskRunner = TaskRunner(
       store: _store,
       notifyListeners: notifyListeners,
@@ -124,12 +129,24 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.disable();
   }
 
-  static Future<BenchmarkState> create(Store store) async {
-    final result = BenchmarkState._(store, await BridgeIsolate.create());
+  static Future<BenchmarkState> create({
+    required Store store,
+    required BridgeIsolate bridgeIsolate,
+    required BackendInfo backendInfo,
+  }) async {
+    final resourceDir = await ResourceManager.getApplicationDirectory();
+    final resultManager = ResultManager(resourceDir);
+    await resultManager.init();
+    final resourceManager = await ResourceManager.create(
+      store: store,
+      resourceDir: resourceDir,
+      resultManager: resultManager,
+    );
+    final result =
+        BenchmarkState._(store, bridgeIsolate, backendInfo, resourceManager);
 
-    await result.resourceManager.initSystemPaths();
     result.configManager = await ConfigManager.create(
-      applicationDirectory: result.resourceManager.applicationDirectory,
+      applicationDirectory: result.resourceManager.resourceDir,
       resourceManager: result.resourceManager,
       onConfigChange: result.onConfigChange,
     );
@@ -209,8 +226,7 @@ class BenchmarkState extends ChangeNotifier {
 
     final startTime = DateTime.now();
     final logDirName = startTime.toIso8601String().replaceAll(':', '-');
-    final currentLogDir =
-        '${resourceManager.applicationDirectory}/logs/$logDirName';
+    final currentLogDir = '${resourceManager.resourceDir}/logs/$logDirName';
 
     try {
       resetCurrentResults();

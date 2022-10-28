@@ -17,19 +17,51 @@ class ResourceManager {
   static const _dataPrefix = 'local://';
   static const _loadedResourcesDirName = 'loaded_resources';
 
-  final VoidCallback _onUpdate;
   final Store store;
+  final String resourceDir;
+  final CacheManager cacheManager;
+  final ResultManager resultManager;
 
+  VoidCallback? _onUpdate;
   bool _done = false;
   String _progressString = '0%';
 
-  late final String applicationDirectory;
-  late final String _loadedResourcesDir;
+  ResourceManager({
+    required this.store,
+    required this.resourceDir,
+    required this.cacheManager,
+    required this.resultManager,
+  });
 
-  late final CacheManager cacheManager;
-  late final ResultManager resultManager;
+  static Future<ResourceManager> create({
+    required Store store,
+    required String resourceDir,
+    required ResultManager resultManager,
+  }) async {
+    final loadedResourcesDir = getLoadedResourcesDir(resourceDir);
 
-  ResourceManager(this._onUpdate, this.store);
+    await Directory(resourceDir).create(recursive: true);
+    await Directory(loadedResourcesDir).create();
+
+    return ResourceManager(
+      store: store,
+      resourceDir: resourceDir,
+      cacheManager: CacheManager(loadedResourcesDir),
+      resultManager: resultManager,
+    );
+  }
+
+  static String getLoadedResourcesDir(String appDir) {
+    if (defaultCacheFolder.isNotEmpty) {
+      return defaultCacheFolder;
+    } else {
+      return '$appDir/$_loadedResourcesDirName';
+    }
+  }
+
+  void setUpdateNotifier(void Function() callback) {
+    _onUpdate = callback;
+  }
 
   bool get done => _done;
 
@@ -60,10 +92,10 @@ class ResourceManager {
         if (defaultDataFolder.isNotEmpty) {
           return defaultDataFolder;
         } else {
-          return applicationDirectory;
+          return resourceDir;
         }
       case DataFolderType.appFolder:
-        return applicationDirectory;
+        return resourceDir;
       case DataFolderType.custom:
         return store.customDataFolder;
     }
@@ -89,7 +121,7 @@ class ResourceManager {
       List<Resource> resources, bool purgeOldCache) async {
     _progressString = '0%';
     _done = false;
-    _onUpdate();
+    _onUpdate?.call();
 
     var internetResources = <Resource>[];
     for (final resource in resources) {
@@ -104,7 +136,7 @@ class ResourceManager {
     final internetPaths = internetResources.map((e) => e.path).toList();
     await cacheManager.cache(internetPaths, (double val) {
       _progressString = '${(val * 100).round()}%';
-      _onUpdate();
+      _onUpdate?.call();
     }, purgeOldCache);
 
     final checksumFailed = await validateResourcesChecksum(resources);
@@ -117,7 +149,7 @@ class ResourceManager {
     await cacheManager.deleteArchives(internetPaths);
 
     _done = true;
-    _onUpdate();
+    _onUpdate?.call();
   }
 
   static Future<String> getApplicationDirectory() async {
@@ -139,21 +171,6 @@ class ResourceManager {
     } else {
       return (await getApplicationDocumentsDirectory()).path;
     }
-  }
-
-  Future<void> initSystemPaths() async {
-    applicationDirectory = await getApplicationDirectory();
-    await Directory(applicationDirectory).create(recursive: true);
-    if (defaultCacheFolder.isNotEmpty) {
-      _loadedResourcesDir = defaultCacheFolder;
-    } else {
-      _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
-    }
-    await Directory(_loadedResourcesDir).create();
-
-    cacheManager = CacheManager(_loadedResourcesDir);
-    resultManager = ResultManager(applicationDirectory);
-    await resultManager.init();
   }
 
   Future<List<String>> validateResourcesExist(List<Resource> resources) async {
