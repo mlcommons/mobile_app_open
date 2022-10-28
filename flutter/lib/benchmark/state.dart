@@ -26,11 +26,11 @@ enum BenchmarkStateEnum {
 
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
-  final TaskListManager taskListManager;
+  final TaskListManager _taskListManager;
   final ResourceManager _resourceManager;
   final ConfigManager _configManager;
   final TaskRunner taskRunner;
-  final LastResultManager lastResultManager;
+  final LastResultManager _lastResultManager;
 
   Object? error;
   StackTrace? stackTrace;
@@ -57,18 +57,18 @@ class BenchmarkState extends ChangeNotifier {
   ValidationHelper get validator {
     return ValidationHelper(
       resourceManager: _resourceManager,
-      middle: taskListManager.taskList,
+      middle: _taskListManager.taskList,
       selectedRunModes: taskRunner.selectedRunModes,
     );
   }
 
   BenchmarkState(
     this._store,
-    this.taskListManager,
+    this._taskListManager,
     this._resourceManager,
     this._configManager,
     this.taskRunner,
-    this.lastResultManager,
+    this._lastResultManager,
   ) {
     _resourceManager.setUpdateNotifier(notifyListeners);
     _configManager.setUpdateNotifier(onConfigChange);
@@ -114,7 +114,7 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.enable();
     print('start loading resources');
     await _resourceManager.handleResources(
-      taskListManager.taskList.listResources(
+      _taskListManager.taskList.listResources(
         modes: [taskRunner.perfMode, taskRunner.accuracyMode],
         skipInactive: false,
       ),
@@ -164,8 +164,8 @@ class BenchmarkState extends ChangeNotifier {
     stackTrace = null;
     taskConfigFailedToLoad = false;
 
-    taskListManager.setAppConfig(_configManager.currentConfig);
-    taskListManager.taskList.restoreSelection(
+    _taskListManager.setAppConfig(_configManager.currentConfig);
+    _taskListManager.taskList.restoreSelection(
         BenchmarkList.deserializeTaskSelection(_store.taskSelection));
     restoreLastResult();
     deferredLoadResources();
@@ -173,7 +173,7 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> saveTaskSelection() async {
     _store.taskSelection = BenchmarkList.serializeTaskSelection(
-        taskListManager.taskList.getTaskSelection());
+        _taskListManager.taskList.getTaskSelection());
   }
 
   Future<void> runBenchmarks() async {
@@ -191,9 +191,9 @@ class BenchmarkState extends ChangeNotifier {
 
     try {
       // we want last result to be null in case an exception is thrown
-      lastResultManager.value = null;
-      lastResultManager.value = await taskRunner.runBenchmarks(
-          taskListManager.taskList, currentLogDir);
+      _lastResultManager.value = null;
+      _lastResultManager.value = await taskRunner.runBenchmarks(
+          _taskListManager.taskList, currentLogDir);
       print('Benchmarks finished');
 
       _doneRunning = taskRunner.aborting ? null : true;
@@ -219,7 +219,7 @@ class BenchmarkState extends ChangeNotifier {
     }
 
     try {
-      lastResultManager.restore();
+      _lastResultManager.restore();
       _doneRunning = true;
       return;
     } catch (e, trace) {
@@ -228,7 +228,7 @@ class BenchmarkState extends ChangeNotifier {
       error = e;
       stackTrace = trace;
       _store.previousExtendedResult = '';
-      lastResultManager.value = null;
+      _lastResultManager.value = null;
       _doneRunning = null;
     }
   }

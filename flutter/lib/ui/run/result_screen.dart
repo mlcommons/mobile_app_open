@@ -459,7 +459,7 @@ class _ResultScreenState extends State<ResultScreen>
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
                 onPressed: () async {
-                  final lastResult = state.lastResultManager.value;
+                  final lastResult = lastResultManager.value;
                   if (lastResult == null) {
                     return;
                   }
@@ -482,7 +482,7 @@ class _ResultScreenState extends State<ResultScreen>
               child: TextButton(
                 onPressed: () async {
                   try {
-                    final lastResult = state.lastResultManager.value;
+                    final lastResult = lastResultManager.value;
                     if (lastResult == null) {
                       return;
                     }
