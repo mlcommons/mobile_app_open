@@ -66,6 +66,7 @@ Future<void> launchUi() async {
         ChangeNotifierProvider.value(value: store),
         Provider.value(value: FirebaseManager.instance),
         Provider.value(value: boardDecoder),
+        Provider.value(value: benchmarkState.configManager),
       ],
       child: const MyApp(home: MyHomePage()),
     ),

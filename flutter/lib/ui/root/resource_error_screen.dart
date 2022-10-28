@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/icons.dart' show AppIcons;
 import 'package:mlperfbench/ui/page_constraints.dart';
@@ -18,7 +18,10 @@ class ResourceErrorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
-    final store = context.watch<Store>();
+    final configManager = context.watch<ConfigManager>();
+
+    final error =
+        context.select<BenchmarkState, Object?>((value) => value.error);
 
     final iconEdgeSize = MediaQuery.of(context).size.width * 0.66;
 
@@ -46,7 +49,7 @@ class ResourceErrorScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'Error: ${state.error}\n',
+                        'Error: $error\n',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 15,
@@ -62,7 +65,7 @@ class ResourceErrorScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${stringResources.resourceErrorCurrentConfig} ${state.configManager.currentConfigFilePath}',
+                        '${stringResources.resourceErrorCurrentConfig} ${configManager.currentConfigFilePath}',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 15,
@@ -90,9 +93,8 @@ class ResourceErrorScreen extends StatelessWidget {
                       TextButton(
                         onPressed: () async {
                           try {
-                            await state.configManager
-                                .setConfig(name: store.chosenConfigurationName);
-                            state.deferredLoadResources();
+                            await configManager.setConfig(
+                                name: configManager.currentConfigName);
                           } catch (e, trace) {
                             print("can't change task config: $e");
                             print(trace);

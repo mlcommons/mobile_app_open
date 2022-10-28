@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/store.dart';
@@ -166,7 +165,7 @@ class TaskConfigScreen extends StatelessWidget {
     String chosenConfigName,
   ) {
     final stringResources = AppLocalizations.of(context);
-    final state = context.watch<BenchmarkState>();
+    final configManager = context.watch<ConfigManager>();
     final wasChosen = chosenConfigName == configuration.name;
 
     return Card(
@@ -180,7 +179,7 @@ class TaskConfigScreen extends StatelessWidget {
         trailing: Text(configuration.getType(stringResources)),
         onTap: () async {
           try {
-            await state.configManager.setConfig(name: configuration.name);
+            await configManager.setConfig(name: configuration.name);
             // TODO (anhappdev): Uncomment the if line and remove the ignore line, when updated to Flutter v3.4.
             // See https://github.com/flutter/flutter/issues/111488
             // if (!context.mounted) return;
@@ -229,10 +228,9 @@ class TaskConfigScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final store = context.watch<Store>();
-    final state = context.watch<BenchmarkState>();
+    final configManager = context.watch<ConfigManager>();
 
-    final configs = state.configManager.configList.values;
+    final configs = configManager.configList.values;
 
     return Scaffold(
       appBar: AppBar(
@@ -252,7 +250,7 @@ class TaskConfigScreen extends StatelessWidget {
           ...configs.map((c) => _makeConfigListItem(
                 context,
                 c,
-                store.chosenConfigurationName,
+                configManager.currentConfigName,
               )),
         ],
       ),

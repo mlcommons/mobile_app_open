@@ -309,7 +309,9 @@ class _ResultScreenState extends State<ResultScreen>
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
-    final store = context.watch<Store>();
+    final shareEnabled = context.select<Store, bool>((value) => value.share);
+    final offlineMode =
+        context.select<Store, bool>((value) => value.offlineMode);
     final stringResources = AppLocalizations.of(context);
     final scrollController = ScrollController();
 
@@ -401,7 +403,7 @@ class _ResultScreenState extends State<ResultScreen>
                 await showErrorDialog(context, [wrongPathError]);
                 return;
               }
-              if (store.offlineMode) {
+              if (offlineMode) {
                 final offlineError = await state.validator.validateOfflineMode(
                     stringResources.dialogContentOfflineWarning);
                 if (offlineError.isNotEmpty) {
@@ -438,7 +440,7 @@ class _ResultScreenState extends State<ResultScreen>
               ),
             ),
           )),
-      store.share
+      shareEnabled
           ? Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
@@ -460,7 +462,7 @@ class _ResultScreenState extends State<ResultScreen>
               ),
             )
           : Container(),
-      store.share && fm != null
+      shareEnabled && fm != null
           ? Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
