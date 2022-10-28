@@ -72,7 +72,8 @@ class BenchmarkState extends ChangeNotifier {
     this._resourceManager,
     this._configManager,
     this.taskRunner,
-  ) : lastResultManager = LastResultManager(_store) {
+    this.lastResultManager,
+  ) {
     _resourceManager.setUpdateNotifier(notifyListeners);
     _configManager.setUpdateNotifier(onConfigChange);
     taskRunner.setUpdateNotifier(notifyListeners);
@@ -137,6 +138,7 @@ class BenchmarkState extends ChangeNotifier {
     required ResourceManager resourceManager,
     required ConfigManager configManager,
     required TaskRunner taskRunner,
+    required LastResultManager lastResultManager,
   }) async {
     final result = BenchmarkState(
       store,
@@ -144,6 +146,7 @@ class BenchmarkState extends ChangeNotifier {
       resourceManager,
       configManager,
       taskRunner,
+      lastResultManager,
     );
     try {
       await result._configManager
@@ -218,10 +221,6 @@ class BenchmarkState extends ChangeNotifier {
 
   void resetCurrentResults() {
     lastResultManager.value = null;
-    // for (var b in _middle.benchmarks) {
-    //   b.accuracyModeResult = null;
-    //   b.performanceModeResult = null;
-    // }
   }
 
   void restoreLastResult() {
@@ -231,8 +230,6 @@ class BenchmarkState extends ChangeNotifier {
 
     try {
       lastResultManager.restore();
-      // ResultManager.restoreResults(
-      //     lastResultManager.value!.results, benchmarks);
       _doneRunning = true;
       return;
     } catch (e, trace) {
