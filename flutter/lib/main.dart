@@ -17,6 +17,7 @@ import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/state/last_result_manager.dart';
+import 'package:mlperfbench/state/task_list_manager.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/root/main_screen/main_screen.dart';
@@ -74,10 +75,12 @@ Future<void> launchUi() async {
     backendInfo: backendInfo,
   );
   final lastResultManager = LastResultManager(store);
+  final taskListManager =
+      TaskListManager(backendSettings: backendInfo.settings);
   final benchmarkState = await BenchmarkState.create(
     store: store,
     bridgeIsolate: bridgeIsolate,
-    backendInfo: backendInfo,
+    taskListManager: taskListManager,
     resourceManager: resourceManager,
     configManager: configManager,
     taskRunner: taskRunner,

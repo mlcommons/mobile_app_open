@@ -6,12 +6,12 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/backend/bridge/isolate.dart';
-import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/resources/validation_helper.dart';
 import 'package:mlperfbench/state/last_result_manager.dart';
+import 'package:mlperfbench/state/task_list_manager.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
@@ -26,7 +26,7 @@ enum BenchmarkStateEnum {
 
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
-  final BackendInfo backendInfo;
+  final TaskListManager taskListManager;
   final ResourceManager _resourceManager;
   final ConfigManager _configManager;
   final TaskRunner taskRunner;
@@ -39,9 +39,7 @@ class BenchmarkState extends ChangeNotifier {
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
 
-  List<Benchmark> get benchmarks => _middle.benchmarks;
-
-  late BenchmarkList _middle;
+  List<Benchmark> get benchmarks => taskListManager.taskList.benchmarks;
 
   BenchmarkStateEnum get state {
     if (!_resourceManager.done) return BenchmarkStateEnum.downloading;
@@ -61,14 +59,14 @@ class BenchmarkState extends ChangeNotifier {
   ValidationHelper get validator {
     return ValidationHelper(
       resourceManager: _resourceManager,
-      middle: _middle,
+      middle: taskListManager.taskList,
       selectedRunModes: taskRunner.selectedRunModes,
     );
   }
 
   BenchmarkState(
     this._store,
-    this.backendInfo,
+    this.taskListManager,
     this._resourceManager,
     this._configManager,
     this.taskRunner,
@@ -118,7 +116,7 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.enable();
     print('start loading resources');
     await _resourceManager.handleResources(
-      _middle.listResources(
+      taskListManager.taskList.listResources(
         modes: [taskRunner.perfMode, taskRunner.accuracyMode],
         skipInactive: false,
       ),
@@ -134,7 +132,7 @@ class BenchmarkState extends ChangeNotifier {
   static Future<BenchmarkState> create({
     required Store store,
     required BridgeIsolate bridgeIsolate,
-    required BackendInfo backendInfo,
+    required TaskListManager taskListManager,
     required ResourceManager resourceManager,
     required ConfigManager configManager,
     required TaskRunner taskRunner,
@@ -142,7 +140,7 @@ class BenchmarkState extends ChangeNotifier {
   }) async {
     final result = BenchmarkState(
       store,
-      backendInfo,
+      taskListManager,
       resourceManager,
       configManager,
       taskRunner,
@@ -168,19 +166,16 @@ class BenchmarkState extends ChangeNotifier {
     stackTrace = null;
     taskConfigFailedToLoad = false;
 
-    _middle = BenchmarkList(
-      appConfig: _configManager.currentConfig,
-      backendConfig: backendInfo.settings.benchmarkSetting,
-    );
-    _middle.restoreSelection(
+    taskListManager.setAppConfig(_configManager.currentConfig);
+    taskListManager.taskList.restoreSelection(
         BenchmarkList.deserializeTaskSelection(_store.taskSelection));
     restoreLastResult();
     deferredLoadResources();
   }
 
   Future<void> saveTaskSelection() async {
-    _store.taskSelection =
-        BenchmarkList.serializeTaskSelection(_middle.getTaskSelection());
+    _store.taskSelection = BenchmarkList.serializeTaskSelection(
+        taskListManager.taskList.getTaskSelection());
   }
 
   Future<void> runBenchmarks() async {
@@ -199,8 +194,8 @@ class BenchmarkState extends ChangeNotifier {
     try {
       // we want last result to be null in case an exception is thrown
       lastResultManager.value = null;
-      lastResultManager.value =
-          await taskRunner.runBenchmarks(_middle, currentLogDir);
+      lastResultManager.value = await taskRunner.runBenchmarks(
+          taskListManager.taskList, currentLogDir);
       print('Benchmarks finished');
 
       _doneRunning = taskRunner.aborting ? null : true;
