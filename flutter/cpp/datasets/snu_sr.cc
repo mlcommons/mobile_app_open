@@ -66,11 +66,19 @@ SNUSR::SNUSR(Backend *backend, const std::string &image_dir,
   // Prepares the preprocessing stage.
   tflite::evaluation::ImagePreprocessingConfigBuilder builder(
       "image_preprocessing", DataType2TfType(input_format_.at(0).type));
-
   preprocessing_stage_.reset(
       new tflite::evaluation::ImagePreprocessingStage(builder.build()));
   if (preprocessing_stage_->Init() != kTfLiteOk) {
     LOG(FATAL) << "Failed to init preprocessing stage";
+  }
+
+  // Always use uint8_t for ground truth image
+  tflite::evaluation::ImagePreprocessingConfigBuilder gt_builder("ground_truth",
+                                                                 kTfLiteUInt8);
+  gt_preprocessing_stage_.reset(
+      new tflite::evaluation::ImagePreprocessingStage(gt_builder.build()));
+  if (gt_preprocessing_stage_->Init() != kTfLiteOk) {
+    LOG(FATAL) << "Failed to init gt preprocessing stage";
   }
 
   counted_ = std::vector<bool>(image_list_.size(), false);
@@ -126,27 +134,13 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
   if (!counted_[sample_idx]) {
     std::string filename = ground_truth_list_.at(sample_idx);
 
-    preprocessing_stage_->SetImagePath(&filename);
-    if (preprocessing_stage_->Run() != kTfLiteOk) {
-      LOG(FATAL) << "Failed to run preprocessing stage";
+    gt_preprocessing_stage_->SetImagePath(&filename);
+    if (gt_preprocessing_stage_->Run() != kTfLiteOk) {
+      LOG(FATAL) << "Failed to load ground truth image " << filename;
     }
 
-    // Move data out of preprocessing_stage_ so it can be reused.
-    int total_byte = output_format_[0].size * GetByte(output_format_[0]);
-
-    void *data_void = preprocessing_stage_->GetPreprocessedImageData();
-    std::vector<uint8_t, BackendAllocator<uint8_t>> *data_uint8 =
-        new std::vector<uint8_t, BackendAllocator<uint8_t>>(total_byte);
-
-    std::copy(static_cast<uint8_t *>(data_void),
-              static_cast<uint8_t *>(data_void) + total_byte,
-              data_uint8->begin());
-
-    // Allow backend to convert data layout if needed
-    backend_->ConvertInputs(total_byte, image_width_, image_height_,
-                            data_uint8->data());
-
-    auto ground_truth_vector = data_uint8->data();  // auto is GOD
+    uint8_t *ground_truth_vector =
+        (uint8_t *)gt_preprocessing_stage_->GetPreprocessedImageData();
 
     float *outputFloat = reinterpret_cast<float *>(outputs[0]);
     int32_t *outputInt32 = reinterpret_cast<int32_t *>(outputs[0]);
@@ -171,12 +165,11 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
       } else {
         p = (uint8_t)(0x000000ff & outputInt8[i]);
       }
-      mse += (float(ground_truth_vector[i]) - float(p)) *
-             (float(ground_truth_vector[i]) - float(p));
+      mse += (ground_truth_vector[i] - p) * (ground_truth_vector[i] - p) * 1.0;
     }
     mse = mse / n_pixels;
     float sample_psnr_ = -10 * log10(mse / (255.0 * 255.0));
-    LOG(INFO) << "[" << filename << "] psnr : " << sample_psnr_;
+    // LOG(INFO) << "[" << filename << "] psnr : " << sample_psnr_;
 
     psnr_ += sample_psnr_;
 
@@ -191,7 +184,7 @@ float SNUSR::ComputeAccuracy() {
     return 0.0;
   }
 
-  return psnr_ / (float)ground_truth_list_.size();
+  return psnr_ / ground_truth_list_.size();
 }
 
 std::string SNUSR::ComputeAccuracyString() {

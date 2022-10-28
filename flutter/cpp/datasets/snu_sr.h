@@ -25,13 +25,13 @@ limitations under the License.
 namespace mlperf {
 namespace mobile {
 
-// Implements the IMAGEPAIRS dataset for image segmentation.
+// Implements the SNU SR dataset for image super resulotion.
 class SNUSR : public Dataset {
  public:
-  // IMAGEPAIRS assumes that there is a single input resevered for the image
-  // data and single output which contains the probabilities of every classes.
+  // SNU-SR assumes that there is a single input resevered for the image
+  // data and single output which contains scaled-up super-resultion image.
   // The order of images under image_dir should be the same as the original
-  // IMAGEPAIRS dataset.
+  // SNU-SR dataset.
   SNUSR(Backend *backend, const std::string &image_dir,
         const std::string &ground_truth_dir, int num_channels, int scale,
         int image_width, int image_height);
@@ -82,6 +82,9 @@ class SNUSR : public Dataset {
   // preprocessing_stage_ conducts preprocessing of images.
   std::unique_ptr<tflite::evaluation::ImagePreprocessingStage>
       preprocessing_stage_;
+  // gt_preprocessing_stage_ for load ground truth images.
+  std::unique_ptr<tflite::evaluation::ImagePreprocessingStage>
+      gt_preprocessing_stage_;
 
   // Number of classes in the output of the model.
   int num_channels_;
@@ -90,7 +93,8 @@ class SNUSR : public Dataset {
   int scale_;
 
   // The width and height of the input images.
-  int image_width_, image_height_;
+  int image_width_;
+  int image_height_;
 
   // sample counted or not
   std::vector<bool> counted_;
