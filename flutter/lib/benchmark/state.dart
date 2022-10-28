@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 
-import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/backend/bridge/isolate.dart';
@@ -14,6 +13,7 @@ import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/resources/validation_helper.dart';
+import 'package:mlperfbench/state/last_result_manager.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
@@ -30,8 +30,9 @@ class BenchmarkState extends ChangeNotifier {
   final Store _store;
   final BackendInfo backendInfo;
   final ResourceManager _resourceManager;
-  final ConfigManager configManager;
+  final ConfigManager _configManager;
   final TaskRunner taskRunner;
+  final LastResultManager lastResultManager;
 
   Object? error;
   StackTrace? stackTrace;
@@ -39,8 +40,6 @@ class BenchmarkState extends ChangeNotifier {
   bool taskConfigFailedToLoad = false;
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
-
-  ExtendedResult? lastResult;
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
 
@@ -73,11 +72,11 @@ class BenchmarkState extends ChangeNotifier {
     this._store,
     this.backendInfo,
     this._resourceManager,
-    this.configManager,
+    this._configManager,
     this.taskRunner,
-  ) {
+  ) : lastResultManager = LastResultManager(_store) {
     _resourceManager.setUpdateNotifier(notifyListeners);
-    configManager.setUpdateNotifier(onConfigChange);
+    _configManager.setUpdateNotifier(onConfigChange);
     taskRunner.setUpdateNotifier(notifyListeners);
   }
 
@@ -85,7 +84,7 @@ class BenchmarkState extends ChangeNotifier {
     await _resourceManager.cacheManager.deleteLoadedResources([], 0);
     notifyListeners();
     try {
-      await configManager.setConfig(name: _store.chosenConfigurationName);
+      await _configManager.setConfig(name: _store.chosenConfigurationName);
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
@@ -149,7 +148,8 @@ class BenchmarkState extends ChangeNotifier {
       taskRunner,
     );
     try {
-      await result.configManager.setConfig(name: store.chosenConfigurationName);
+      await result._configManager
+          .setConfig(name: store.chosenConfigurationName);
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
@@ -162,13 +162,13 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   void onConfigChange() {
-    _store.chosenConfigurationName = configManager.currentConfigName;
+    _store.chosenConfigurationName = _configManager.currentConfigName;
     error = null;
     stackTrace = null;
     taskConfigFailedToLoad = false;
 
     _middle = BenchmarkList(
-      appConfig: configManager.currentConfig,
+      appConfig: _configManager.currentConfig,
       backendConfig: backendInfo.settings.benchmarkSetting,
       taskSelection: parseTaskSelection(_store.taskSelection),
     );
@@ -213,17 +213,9 @@ class BenchmarkState extends ChangeNotifier {
 
     try {
       resetCurrentResults();
-      lastResult = await taskRunner.runBenchmarks(_middle, currentLogDir);
-
-      if (lastResult == null) {
-        print('benchmark aborted');
-      } else {
-        print('Benchmarks finished');
-
-        _store.previousExtendedResult =
-            const JsonEncoder().convert(lastResult!.toJson());
-        await _resourceManager.resultManager.addResult(lastResult!);
-      }
+      lastResultManager.value =
+          await taskRunner.runBenchmarks(_middle, currentLogDir);
+      print('Benchmarks finished');
 
       _doneRunning = taskRunner.aborting ? null : true;
     } catch (e) {
@@ -255,9 +247,9 @@ class BenchmarkState extends ChangeNotifier {
     }
 
     try {
-      lastResult = ExtendedResult.fromJson(
-          jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
-      ResultManager.restoreResults(lastResult!.results, benchmarks);
+      lastResultManager.restore();
+      ResultManager.restoreResults(
+          lastResultManager.value!.results, benchmarks);
       _doneRunning = true;
       return;
     } catch (e, trace) {
