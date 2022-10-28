@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart' show ChangeNotifier;
@@ -169,32 +168,16 @@ class BenchmarkState extends ChangeNotifier {
     _middle = BenchmarkList(
       appConfig: _configManager.currentConfig,
       backendConfig: backendInfo.settings.benchmarkSetting,
-      taskSelection: parseTaskSelection(_store.taskSelection),
     );
+    _middle.restoreSelection(
+        BenchmarkList.deserializeTaskSelection(_store.taskSelection));
     restoreLastResult();
     deferredLoadResources();
   }
 
-  static Map<String, bool> parseTaskSelection(String json) {
-    Map<String, bool> result = {};
-    if (json.isEmpty) {
-      return result;
-    }
-
-    try {
-      final map = jsonDecode(json) as Map<String, dynamic>;
-      for (var kv in map.entries) {
-        result[kv.key] = kv.value as bool;
-      }
-    } catch (e, t) {
-      print('task selection parse fail: $e');
-      print(t);
-    }
-    return result;
-  }
-
   Future<void> saveTaskSelection() async {
-    _store.taskSelection = jsonEncode(_middle.selection);
+    _store.taskSelection =
+        BenchmarkList.serializeTaskSelection(_middle.getTaskSelection());
   }
 
   Future<void> runBenchmarks() async {

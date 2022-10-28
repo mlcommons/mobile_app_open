@@ -31,7 +31,6 @@ void main() {
       final list = BenchmarkList(
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backendConfig: [backendSettings1],
-        taskSelection: {},
       );
 
       expect(list.benchmarks.length, 1);
@@ -49,7 +48,6 @@ void main() {
       final list = BenchmarkList(
         appConfig: pb.MLPerfConfig(task: [task2, task1]),
         backendConfig: [backendSettings1, backendSettings2],
-        taskSelection: {},
       );
 
       expect(list.benchmarks.length, 2);
@@ -61,24 +59,46 @@ void main() {
       expect(list.benchmarks.last.benchmarkSettings, backendSettings1);
     });
 
-    test('selection', () async {
+    test('selection: get', () async {
       final list = BenchmarkList(
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backendConfig: [backendSettings1, backendSettings2],
-        taskSelection: {task1.id: true, task2.id: false},
       );
+      list.benchmarks[0].isActive = false;
+      list.benchmarks[1].isActive = true;
+      final selection = list.getTaskSelection();
+
+      expect(selection.length, 2);
+      expect(selection[task1.id], false);
+      expect(selection[task2.id], true);
+    });
+
+    test('selection: restore', () async {
+      final list = BenchmarkList(
+        appConfig: pb.MLPerfConfig(task: [task1, task2]),
+        backendConfig: [backendSettings1, backendSettings2],
+      );
+      list.restoreSelection({task1.id: true, task2.id: false});
 
       expect(list.benchmarks.length, 2);
       expect(list.benchmarks.first.isActive, true);
       expect(list.benchmarks.last.isActive, false);
     });
 
+    test('selection serialize-deserialize', () async {
+      final selection = {task1.id: true, task2.id: false};
+      final serialized = BenchmarkList.serializeTaskSelection(selection);
+      final deserialized = BenchmarkList.deserializeTaskSelection(serialized);
+
+      expect(deserialized, selection);
+    });
+
     test('resource list: skip', () async {
       final list = BenchmarkList(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
-        taskSelection: {task1.id: false},
       );
+      list.restoreSelection({task1.id: false});
 
       final modes = [BenchmarkRunMode.accuracy];
       final resources = list.listResources(modes: modes, skipInactive: true);
@@ -89,7 +109,6 @@ void main() {
       final list = BenchmarkList(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
-        taskSelection: {},
       );
 
       final modes = [BenchmarkRunMode.accuracy];
@@ -120,7 +139,6 @@ void main() {
       final list = BenchmarkList(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
-        taskSelection: {},
       );
 
       final modes = [BenchmarkRunMode.performance];
@@ -145,7 +163,6 @@ void main() {
       final list = BenchmarkList(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
-        taskSelection: {},
       );
 
       final modes = [

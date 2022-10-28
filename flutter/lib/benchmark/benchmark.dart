@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -77,7 +79,6 @@ class BenchmarkList {
   BenchmarkList({
     required pb.MLPerfConfig appConfig,
     required List<pb.BenchmarkSetting> backendConfig,
-    required Map<String, bool> taskSelection,
   }) {
     for (final task in appConfig.task) {
       final backendSettings = backendConfig
@@ -87,11 +88,10 @@ class BenchmarkList {
         continue;
       }
 
-      final enabled = taskSelection[task.id] ?? true;
       benchmarks.add(Benchmark(
         taskConfig: task,
         benchmarkSettings: backendSettings,
-        isActive: enabled,
+        isActive: true,
       ));
     }
   }
@@ -131,11 +131,43 @@ class BenchmarkList {
     return result.where((element) => element.path.isNotEmpty).toList();
   }
 
-  Map<String, bool> get selection {
-    Map<String, bool> result = {};
-    for (var item in benchmarks) {
-      result[item.id] = item.isActive;
+  static String serializeTaskSelection(Map<String, bool> selection) {
+    return jsonEncode(selection);
+  }
+
+  static Map<String, bool> deserializeTaskSelection(String serialized) {
+    try {
+      final json = jsonDecode(serialized) as Map<String, dynamic>;
+      Map<String, bool> result = {};
+      for (final e in json.entries) {
+        result[e.key] = e.value as bool;
+      }
+      return result;
+    } catch (e, t) {
+      print('task selection parse fail: $e');
+      print(t);
+      return {};
     }
-    return result;
+  }
+
+  Map<String, bool> getTaskSelection() {
+    Map<String, bool> selection = {};
+    for (var item in benchmarks) {
+      selection[item.id] = item.isActive;
+    }
+    return selection;
+  }
+
+  void restoreSelection(Map<String, bool> selection) {
+    const stateForUnknown = true;
+
+    try {
+      for (var task in benchmarks) {
+        task.isActive = selection[task.id] ?? stateForUnknown;
+      }
+    } catch (e, t) {
+      print('task selection parse fail: $e');
+      print(t);
+    }
   }
 }
