@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/state/task_list_manager.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
@@ -23,14 +24,15 @@ class MainScreenReady extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final state = context.watch<BenchmarkState>();
 
     final utils = MainScreenUtils();
 
     final appBar = MyAppBar.buildAppBar(l10n.mainScreenTitle, context, true);
     final circle = _goContainer(context);
 
-    return utils.wrapCircle(l10n, appBar, circle, context, state.benchmarks);
+    final taskList = context.watch<TaskListManager>().taskList;
+
+    return utils.wrapCircle(l10n, appBar, circle, context, taskList.benchmarks);
   }
 
   Widget _goContainer(BuildContext context) {

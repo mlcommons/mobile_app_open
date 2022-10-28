@@ -39,8 +39,6 @@ class BenchmarkState extends ChangeNotifier {
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
 
-  List<Benchmark> get benchmarks => taskListManager.taskList.benchmarks;
-
   BenchmarkStateEnum get state {
     if (!_resourceManager.done) return BenchmarkStateEnum.downloading;
     switch (_doneRunning) {

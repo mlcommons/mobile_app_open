@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/state/task_list_manager.dart';
 
 class ConfigScreen extends StatefulWidget {
   const ConfigScreen({Key? key}) : super(key: key);
@@ -13,21 +14,19 @@ class ConfigScreen extends StatefulWidget {
 }
 
 class _ConfigScreen extends State<ConfigScreen> {
-  late BenchmarkState state;
-
   @override
   void dispose() {
-    state.saveTaskSelection();
+    context.read<BenchmarkState>().saveTaskSelection();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    state = context.watch<BenchmarkState>();
+    final taskList = context.watch<TaskListManager>().taskList;
     final stringResources = AppLocalizations.of(context);
     final childrenList = <Widget>[];
 
-    for (var benchmark in state.benchmarks) {
+    for (var benchmark in taskList.benchmarks) {
       childrenList.add(ListTile(
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),

@@ -15,6 +15,7 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/state/last_result_manager.dart';
+import 'package:mlperfbench/state/task_list_manager.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
@@ -325,6 +326,7 @@ class _ResultScreenState extends State<ResultScreen>
 
     final lastResultManager = context.watch<LastResultManager>();
     final results = lastResultManager.value!.results;
+    final taskList = context.watch<TaskListManager>().taskList;
 
     final resultsPage = Column(
       children: [
@@ -347,13 +349,13 @@ class _ResultScreenState extends State<ResultScreen>
                 ),
                 Expanded(
                   child: ResultCircle(
-                      calculateOverallPercentage(state.benchmarks, results)),
+                      calculateOverallPercentage(taskList.benchmarks, results)),
                 ),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children:
-                        _makeTopResultsView(context, state.benchmarks, results),
+                    children: _makeTopResultsView(
+                        context, taskList.benchmarks, results),
                   ),
                 ),
               ],
@@ -399,7 +401,7 @@ class _ResultScreenState extends State<ResultScreen>
     final fm = context.watch<FirebaseManager?>();
 
     final detailedResultsPage = Column(children: [
-      _makeBottomResultsView(context, state.benchmarks, results),
+      _makeBottomResultsView(context, taskList.benchmarks, results),
       Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           child: TextButton(

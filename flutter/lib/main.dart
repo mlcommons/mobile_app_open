@@ -75,8 +75,9 @@ Future<void> launchUi() async {
     backendInfo: backendInfo,
   );
   final lastResultManager = LastResultManager(store);
-  final taskListManager =
-      TaskListManager(backendSettings: backendInfo.settings);
+  final taskListManager = TaskListManager(
+    backendSettings: backendInfo.settings,
+  );
   final benchmarkState = await BenchmarkState.create(
     store: store,
     bridgeIsolate: bridgeIsolate,
@@ -109,6 +110,7 @@ Future<void> launchUi() async {
         Provider.value(value: resourceManager),
         Provider.value(value: resultManager),
         Provider.value(value: lastResultManager),
+        Provider.value(value: taskListManager),
       ],
       child: const MyApp(home: MyHomePage()),
     ),
