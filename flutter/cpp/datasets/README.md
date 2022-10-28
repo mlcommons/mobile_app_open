@@ -143,16 +143,16 @@ preparing datasets and models
 
    1. generate a modelswith 960x540 input and 1920x1080 output
 
-3. test with command line on Android device
+3. test with command line on Android device:
 
-build the main command line program and tflite backend
+   Build the main command line program and tflite backend
 
 ```shell
 bazel build --config android_arm64 -c opt \
-flutter/cpp/binary:main mobile_back_tflite:tflitebackend
+  flutter/cpp/binary:main mobile_back_tflite:tflitebackend
 ```
 
-push them to the target Android device
+  push them to the target Android device
 
 ```shell
 adb push bazel-bin/flutter/cpp/binary/main /data/local/tmp/sr/main_sr
@@ -160,8 +160,8 @@ adb push bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so \
   /data/local/tmp/sr/
 ```
 
-assuming we have the dataset and the model on the devices at
-`/data/local/tmp/sr/dataset/` and `/data/local/tmp/edsr/tflite/pl_f32b5.tflite`
+  Assuming we have the dataset and the model on the devices at
+  `/data/local/tmp/sr/dataset/` and `/data/local/tmp/edsr/tflite/pl_f32b5.tflite`
 
 ```shell
 adb shell /data/local/tmp/sr/main_sr external snusr --mode=PerformanceOnly \
@@ -170,4 +170,24 @@ adb shell /data/local/tmp/sr/main_sr external snusr --mode=PerformanceOnly \
   --images_directory=/data/local/tmp/sr/dataset/LR_jpg \
   --ground_truth_directory=/data/local/tmp/sr/dataset/HR_jpg \
   --lib_path=/data/local/tmp/sr/libtflitebackend.so
+```
+
+Or we can test on a host machine
+
+On a x86 machine running Ubuntu 22.04,
+
+```shell
+bazel build -c opt flutter/cpp/binary:main mobile_back_tflite:tflitebackend \
+  --host_cxxopt=-std=c++17 --cxxopt=-std=c++17 --copt=-march=native
+```
+
+assuming we have the model and images in right places,
+
+```shell
+bazel-bin/flutter/cpp/binary/main external snusr --mode=AccuracyOnly \
+  --output_dir=/tmp/sr_output \
+  --model_file=/tmp/tflite/pl_f32b7.tflite \
+  --images_directory=/tmp/sr/dataset/LR_jpg \
+  --ground_truth_directory=/tmp/sr/dataset/HR_jpg \
+  --lib_path=bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
 ```
