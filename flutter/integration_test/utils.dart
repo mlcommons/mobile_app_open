@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mlperfbench/ui/root/main_screen/ready.dart';
 import 'package:mlperfbench/ui/run/result_screen.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench/resources/result_manager.dart' as result_manager;
+import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart'
     as resource_manager;
 import 'package:mlperfbench/main.dart' as app;
@@ -36,9 +36,7 @@ Future<ExtendedResult> obtainResult() async {
   final applicationDirectory =
       await resource_manager.ResourceManager.getApplicationDirectory();
 
-  final rm = result_manager.ResultManager(applicationDirectory);
-  await rm.init();
-
+  final rm = await ResultManager.create(resultDir: applicationDirectory);
   return rm.getLastResult();
 }
 

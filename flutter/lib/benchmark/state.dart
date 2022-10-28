@@ -135,8 +135,7 @@ class BenchmarkState extends ChangeNotifier {
     required BackendInfo backendInfo,
   }) async {
     final resourceDir = await ResourceManager.getApplicationDirectory();
-    final resultManager = ResultManager(resourceDir);
-    await resultManager.init();
+    final resultManager = await ResultManager.create(resultDir: resourceDir);
     final resourceManager = await ResourceManager.create(
       store: store,
       resourceDir: resourceDir,
@@ -239,7 +238,7 @@ class BenchmarkState extends ChangeNotifier {
 
         _store.previousExtendedResult =
             const JsonEncoder().convert(lastResult!.toJson());
-        await resourceManager.resultManager.saveResult(lastResult!);
+        await resourceManager.resultManager.addResult(lastResult!);
       }
 
       _doneRunning = taskRunner.aborting ? null : true;
@@ -274,8 +273,7 @@ class BenchmarkState extends ChangeNotifier {
     try {
       lastResult = ExtendedResult.fromJson(
           jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
-      resourceManager.resultManager
-          .restoreResults(lastResult!.results, benchmarks);
+      ResultManager.restoreResults(lastResult!.results, benchmarks);
       _doneRunning = true;
       return;
     } catch (e, trace) {

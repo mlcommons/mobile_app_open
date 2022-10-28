@@ -7,12 +7,38 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'utils.dart';
 
-class _ExtendedResultList {
-  final List<ExtendedResult> list;
+class ResultManager {
+  static const _resultsFileName = 'results.json';
 
-  _ExtendedResultList(this.list);
+  final File jsonFile;
+  final List<ExtendedResult> results;
 
-  static _ExtendedResultList fromJson(List<dynamic> json) {
+  ResultManager({
+    required this.results,
+    required this.jsonFile,
+  });
+
+  static Future<ResultManager> create({required String resultDir}) async {
+    final jsonFile = File('$resultDir/$_resultsFileName');
+
+    List<dynamic> json = [];
+    if (await jsonFile.exists()) {
+      try {
+        json = jsonDecode(await jsonFile.readAsString()) as List<dynamic>;
+      } catch (e, trace) {
+        print('unable to read saved results: $e');
+        print(trace);
+      }
+    }
+    final results = parseResultJson(json);
+
+    return ResultManager(
+      jsonFile: jsonFile,
+      results: results,
+    );
+  }
+
+  static List<ExtendedResult> parseResultJson(List<dynamic> json) {
     final list = <ExtendedResult>[];
     for (var item in json) {
       try {
@@ -22,48 +48,11 @@ class _ExtendedResultList {
         print(trace);
       }
     }
-    return _ExtendedResultList(list);
-  }
-
-  List<dynamic> toJson() {
-    var result = <dynamic>[];
-    for (var item in list) {
-      result.add(item);
-    }
-    return result;
-  }
-}
-
-class ResultManager {
-  static const _resultsFileName = 'results.json';
-  final File jsonFile;
-  _ExtendedResultList _results = _ExtendedResultList([]);
-
-  List<ExtendedResult> get results => _results.list;
-
-  ResultManager(String applicationDirectory)
-      : jsonFile = File('$applicationDirectory/$_resultsFileName');
-
-  Future<void> init() async {
-    try {
-      _results = await _restoreResults();
-    } catch (e, trace) {
-      print('unable to read saved results: $e');
-      print(trace);
-    }
+    return list;
   }
 
   Future<void> _saveResults() async {
-    await jsonFile.writeAsString(jsonToStringIndented(_results));
-  }
-
-  Future<_ExtendedResultList> _restoreResults() async {
-    if (!await jsonFile.exists()) {
-      return _ExtendedResultList([]);
-    }
-
-    return _ExtendedResultList.fromJson(
-        jsonDecode(await jsonFile.readAsString()) as List<dynamic>);
+    await jsonFile.writeAsString(jsonToStringIndented(results));
   }
 
   Future<void> deleteResults() async {
@@ -73,29 +62,30 @@ class ResultManager {
   }
 
   Future<void> removeSelected(List<bool> selected) async {
-    if (selected.length != _results.list.length) {
+    if (selected.length != results.length) {
       throw 'selected.length != results.length';
     }
     var newResults = <ExtendedResult>[];
-    for (int i = 0; i < _results.list.length; i++) {
+    for (int i = 0; i < results.length; i++) {
       if (!selected[i]) {
-        newResults.add(_results.list[i]);
+        newResults.add(results[i]);
       }
     }
-    _results = _ExtendedResultList(newResults);
+    results.clear();
+    results.addAll(newResults);
     await _saveResults();
   }
 
-  Future<void> saveResult(ExtendedResult value) async {
-    _results.list.add(value);
+  Future<void> addResult(ExtendedResult value) async {
+    results.add(value);
     await _saveResults();
   }
 
   ExtendedResult getLastResult() {
-    return _results.list.last;
+    return results.last;
   }
 
-  void restoreResults(
+  static void restoreResults(
       List<BenchmarkExportResult> results, List<Benchmark> benchmarks) {
     for (final exportResult in results) {
       final benchmark = benchmarks
@@ -108,7 +98,7 @@ class ResultManager {
     }
   }
 
-  BenchmarkResult? _parseExportResult(
+  static BenchmarkResult? _parseExportResult(
       BenchmarkExportResult export, BenchmarkRunResult? runResult) {
     if (runResult == null) {
       return null;
