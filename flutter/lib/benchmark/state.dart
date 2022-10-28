@@ -140,24 +140,10 @@ class BenchmarkState extends ChangeNotifier {
     required Store store,
     required BridgeIsolate bridgeIsolate,
     required BackendInfo backendInfo,
+    required ResourceManager resourceManager,
+    required ConfigManager configManager,
+    required TaskRunner taskRunner,
   }) async {
-    final resourceDir = await ResourceManager.getApplicationDirectory();
-    final resultManager = await ResultManager.create(resultDir: resourceDir);
-    final resourceManager = await ResourceManager.create(
-      store: store,
-      resourceDir: resourceDir,
-      resultManager: resultManager,
-    );
-    final configManager = await ConfigManager.create(
-      applicationDirectory: resourceManager.resourceDir,
-      resourceManager: resourceManager,
-    );
-    final taskRunner = TaskRunner(
-      store: store,
-      resourceManager: resourceManager,
-      backendBridge: bridgeIsolate,
-      backendInfo: backendInfo,
-    );
     final result = BenchmarkState(
       store,
       backendInfo,

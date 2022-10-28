@@ -2,6 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mlperfbench/resources/config_manager.dart';
+import 'package:mlperfbench/resources/resource_manager.dart';
+import 'package:mlperfbench/resources/result_manager.dart';
+import 'package:mlperfbench/state/task_runner.dart';
 
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
@@ -50,10 +54,31 @@ Future<void> launchUi() async {
   final store = await Store.create();
   final bridgeIsolate = await BridgeIsolate.create();
   final backendInfo = BackendInfoHelper().findMatching();
+
+  final resourceDir = await ResourceManager.getApplicationDirectory();
+  final resultManager = await ResultManager.create(resultDir: resourceDir);
+  final resourceManager = await ResourceManager.create(
+    store: store,
+    resourceDir: resourceDir,
+    resultManager: resultManager,
+  );
+  final configManager = await ConfigManager.create(
+    applicationDirectory: resourceManager.resourceDir,
+    resourceManager: resourceManager,
+  );
+  final taskRunner = TaskRunner(
+    store: store,
+    resourceManager: resourceManager,
+    backendBridge: bridgeIsolate,
+    backendInfo: backendInfo,
+  );
   final benchmarkState = await BenchmarkState.create(
     store: store,
     bridgeIsolate: bridgeIsolate,
     backendInfo: backendInfo,
+    resourceManager: resourceManager,
+    configManager: configManager,
+    taskRunner: taskRunner,
   );
 
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
