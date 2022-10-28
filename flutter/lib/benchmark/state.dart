@@ -11,7 +11,6 @@ import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
-import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/resources/validation_helper.dart';
 import 'package:mlperfbench/state/last_result_manager.dart';
 import 'package:mlperfbench/state/task_runner.dart';
@@ -235,10 +234,11 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   void resetCurrentResults() {
-    for (var b in _middle.benchmarks) {
-      b.accuracyModeResult = null;
-      b.performanceModeResult = null;
-    }
+    lastResultManager.value = null;
+    // for (var b in _middle.benchmarks) {
+    //   b.accuracyModeResult = null;
+    //   b.performanceModeResult = null;
+    // }
   }
 
   void restoreLastResult() {
@@ -248,8 +248,8 @@ class BenchmarkState extends ChangeNotifier {
 
     try {
       lastResultManager.restore();
-      ResultManager.restoreResults(
-          lastResultManager.value!.results, benchmarks);
+      // ResultManager.restoreResults(
+      //     lastResultManager.value!.results, benchmarks);
       _doneRunning = true;
       return;
     } catch (e, trace) {

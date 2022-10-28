@@ -2,9 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
-import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'utils.dart';
 
 class ResultManager {
@@ -83,35 +81,5 @@ class ResultManager {
 
   ExtendedResult getLastResult() {
     return results.last;
-  }
-
-  static void restoreResults(
-      List<BenchmarkExportResult> results, List<Benchmark> benchmarks) {
-    for (final exportResult in results) {
-      final benchmark = benchmarks
-          .singleWhere((benchmark) => benchmark.id == exportResult.benchmarkId);
-
-      benchmark.performanceModeResult =
-          _parseExportResult(exportResult, exportResult.performanceRun);
-      benchmark.accuracyModeResult =
-          _parseExportResult(exportResult, exportResult.accuracyRun);
-    }
-  }
-
-  static BenchmarkResult? _parseExportResult(
-      BenchmarkExportResult export, BenchmarkRunResult? runResult) {
-    if (runResult == null) {
-      return null;
-    }
-
-    return BenchmarkResult(
-      throughput: runResult.throughput ?? 0.0,
-      accuracy: runResult.accuracy,
-      accuracy2: runResult.accuracy2,
-      backendName: export.backendInfo.backendName,
-      acceleratorName: export.backendInfo.acceleratorName,
-      batchSize: export.backendSettings.batchSize,
-      validity: runResult.loadgenInfo?.validity ?? false,
-    );
   }
 }

@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'package:collection/collection.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
@@ -12,6 +14,7 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/utils.dart';
+import 'package:mlperfbench/state/last_result_manager.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
@@ -183,24 +186,17 @@ class _ResultScreenState extends State<ResultScreen>
     );
   }
 
-  Column _makeBottomResultsView(BuildContext context, List<Benchmark> tasks) {
+  Column _makeBottomResultsView(
+    BuildContext context,
+    List<Benchmark> tasks,
+    List<BenchmarkExportResult> results,
+  ) {
     final list = <Widget>[];
     final l10n = AppLocalizations.of(context);
     final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
     for (final benchmark in tasks) {
-      late final _ResultViewHelper taskHelper;
-      switch (_screenMode) {
-        case _ScreenMode.performance:
-          taskHelper = _ResultViewHelper.performance(benchmark);
-          break;
-        case _ScreenMode.accuracy:
-          taskHelper = _ResultViewHelper.accuracy(benchmark);
-          break;
-        default:
-          throw 'unsupported _ScreenMode enum value';
-      }
-
+      final taskHelper = _makeTaskHelper(benchmark, results);
       list.add(_makeBottomTaskResultView(
         pictureSize: pictureEdgeSize,
         l10n: l10n,
@@ -260,19 +256,10 @@ class _ResultScreenState extends State<ResultScreen>
   List<Widget> _makeTopResultsView(
     BuildContext context,
     List<Benchmark> tasks,
+    List<BenchmarkExportResult> results,
   ) {
     final widgets = tasks.map((benchmark) {
-      late final _ResultViewHelper taskHelper;
-      switch (_screenMode) {
-        case _ScreenMode.performance:
-          taskHelper = _ResultViewHelper.performance(benchmark);
-          break;
-        case _ScreenMode.accuracy:
-          taskHelper = _ResultViewHelper.accuracy(benchmark);
-          break;
-        default:
-          throw 'unsupported _ScreenMode enum value';
-      }
+      final taskHelper = _makeTaskHelper(benchmark, results);
       return _makeTopTaskResultView(taskHelper);
     });
 
@@ -284,26 +271,47 @@ class _ResultScreenState extends State<ResultScreen>
         .toList();
   }
 
-  double calculateOverallPercentage(List<Benchmark> benchmarks) {
-    final benchmarksCount = benchmarks
-        .where((benchmark) => benchmark.performanceModeResult != null)
-        .length;
+  _ResultViewHelper _makeTaskHelper(
+    Benchmark task,
+    List<BenchmarkExportResult> results,
+  ) {
+    final exportResult = results
+        .firstWhereOrNull((e) => e.benchmarkName == task.taskConfig.name);
+    if (exportResult == null) {
+      return _ResultViewHelper.empty(task);
+    }
+    switch (_screenMode) {
+      case _ScreenMode.performance:
+        return _ResultViewHelper.performance(task, exportResult);
+      case _ScreenMode.accuracy:
+        return _ResultViewHelper.accuracy(task, exportResult);
+      default:
+        throw 'unsupported _ScreenMode enum value';
+    }
+  }
 
-    if (benchmarksCount == 0) return 0;
+  double geomean(List<double> values) {
+    return pow(
+      values.fold<double>(1.0, (prev, e) {
+        return prev * e;
+      }),
+      1.0 / values.length,
+    ).toDouble();
+  }
 
-    final summaryThroughput = pow(
-        benchmarks.fold<double>(1, (prev, i) {
-          return prev * (i.performanceModeResult?.throughput ?? 1.0);
-        }),
-        1.0 / benchmarksCount);
+  double calculateOverallPercentage(
+      List<Benchmark> tasks, List<BenchmarkExportResult> results) {
+    final perfResults =
+        results.where((e) => e.performanceRun?.throughput != null).toList();
 
-    final maxSummaryThroughput = pow(
-        benchmarks.fold<double>(1, (prev, i) {
-          return prev * (i.info.maxThroughput);
-        }),
-        1.0 / benchmarksCount);
+    if (perfResults.isEmpty) return 0;
 
-    return summaryThroughput / maxSummaryThroughput;
+    // TODO maybe geometric mean is not a good choice here?
+    final geomeanThroughput =
+        geomean(perfResults.map((e) => e.performanceRun!.throughput!).toList());
+    final geomeanMaxThroughput =
+        geomean(tasks.map((e) => e.info.maxThroughput).toList());
+    return geomeanThroughput / geomeanMaxThroughput;
   }
 
   @override
@@ -314,6 +322,9 @@ class _ResultScreenState extends State<ResultScreen>
         context.select<Store, bool>((value) => value.offlineMode);
     final stringResources = AppLocalizations.of(context);
     final scrollController = ScrollController();
+
+    final lastResultManager = context.watch<LastResultManager>();
+    final results = lastResultManager.value!.results;
 
     final resultsPage = Column(
       children: [
@@ -336,12 +347,13 @@ class _ResultScreenState extends State<ResultScreen>
                 ),
                 Expanded(
                   child: ResultCircle(
-                      calculateOverallPercentage(state.benchmarks)),
+                      calculateOverallPercentage(state.benchmarks, results)),
                 ),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: _makeTopResultsView(context, state.benchmarks),
+                    children:
+                        _makeTopResultsView(context, state.benchmarks, results),
                   ),
                 ),
               ],
@@ -387,7 +399,7 @@ class _ResultScreenState extends State<ResultScreen>
     final fm = context.watch<FirebaseManager?>();
 
     final detailedResultsPage = Column(children: [
-      _makeBottomResultsView(context, state.benchmarks),
+      _makeBottomResultsView(context, state.benchmarks, results),
       Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           child: TextButton(
@@ -579,47 +591,63 @@ class _ResultViewHelper {
     required this.batchSize,
   });
 
-  factory _ResultViewHelper.performance(Benchmark benchmark) {
-    final benchmarkResult = benchmark.performanceModeResult;
-    final throughput = benchmarkResult?.throughput;
+  factory _ResultViewHelper.empty(Benchmark benchmark) {
+    return _ResultViewHelper(
+      taskName: benchmark.taskConfig.name,
+      textResult: null,
+      numericResult: 0.0,
+      textResult2: null,
+      numericResult2: null,
+      resultIsValid: false,
+      backendInfoSubtitle: 'N/A',
+      batchSize: 'N/A',
+    );
+  }
+  factory _ResultViewHelper.performance(
+    Benchmark benchmark,
+    BenchmarkExportResult exportResult,
+  ) {
+    final runResult = exportResult.performanceRun;
+    if (runResult == null) {
+      return _ResultViewHelper.empty(benchmark);
+    }
+    final throughput = runResult.throughput;
     return _ResultViewHelper(
       taskName: benchmark.taskConfig.name,
       textResult: throughput?.toStringAsFixed(2),
       numericResult: (throughput ?? 0.0) / benchmark.info.maxThroughput,
       textResult2: null,
       numericResult2: null,
-      resultIsValid: benchmarkResult?.validity ?? false,
-      backendInfoSubtitle: _makeBackendSubtitle(benchmark),
-      batchSize: _makeBatchSize(benchmarkResult),
+      resultIsValid: runResult.loadgenInfo?.validity ?? false,
+      backendInfoSubtitle: _makeBackendSubtitle(exportResult),
+      batchSize: exportResult.backendSettings.batchSize.toString(),
     );
   }
-  factory _ResultViewHelper.accuracy(Benchmark benchmark) {
-    final benchmarkResult = benchmark.accuracyModeResult;
+  factory _ResultViewHelper.accuracy(
+    Benchmark benchmark,
+    BenchmarkExportResult exportResult,
+  ) {
+    final runResult = exportResult.accuracyRun;
+    if (runResult == null) {
+      return _ResultViewHelper.empty(benchmark);
+    }
     return _ResultViewHelper(
       taskName: benchmark.taskConfig.name,
-      textResult: benchmarkResult?.accuracy?.formatted,
-      numericResult: benchmarkResult?.accuracy?.normalized,
-      textResult2: benchmarkResult?.accuracy2?.formatted,
-      numericResult2: benchmarkResult?.accuracy2?.normalized,
-      resultIsValid: (benchmarkResult?.accuracy?.normalized ?? -1.0) >= 0.0 &&
-          (benchmarkResult?.accuracy?.normalized ?? -1.0) <= 1.0 &&
-          (benchmarkResult?.accuracy2?.normalized ?? -1.0) <= 1.0,
-      backendInfoSubtitle: _makeBackendSubtitle(benchmark),
-      batchSize: _makeBatchSize(benchmarkResult),
+      textResult: runResult.accuracy?.formatted,
+      numericResult: runResult.accuracy?.normalized,
+      textResult2: runResult.accuracy2?.formatted,
+      numericResult2: runResult.accuracy2?.normalized,
+      resultIsValid: (runResult.accuracy?.normalized ?? -1.0) >= 0.0 &&
+          (runResult.accuracy?.normalized ?? -1.0) <= 1.0 &&
+          (runResult.accuracy2?.normalized ?? -1.0) <= 1.0,
+      backendInfoSubtitle: _makeBackendSubtitle(exportResult),
+      batchSize: exportResult.backendSettings.batchSize.toString(),
     );
   }
 
-  static String _makeBackendSubtitle(Benchmark benchmark) {
-    final backendName = benchmark.performanceModeResult?.backendName ?? '';
-    final acceleratorName =
-        benchmark.performanceModeResult?.acceleratorName ?? '';
+  static String _makeBackendSubtitle(BenchmarkExportResult exportResult) {
+    final backendName = exportResult.backendInfo.backendName;
+    final acceleratorName = exportResult.backendInfo.acceleratorName;
     return '$backendName | $acceleratorName';
-  }
-
-  static String _makeBatchSize(BenchmarkResult? benchmarkResult) {
-    if (benchmarkResult == null) {
-      return 'N/A';
-    }
-    return benchmarkResult.batchSize.toString();
   }
 }
