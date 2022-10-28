@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
 
-import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/ui/history/app_bar_content.dart';
 import 'package:mlperfbench/ui/history/history_tab.dart';
 import 'package:mlperfbench/ui/history/online_tab.dart';
@@ -52,12 +52,12 @@ class _ListScreenState extends State<ListScreen>
   void initTabs(BuildContext context) {
     if (tabs.isNotEmpty) return;
 
-    final state = context.watch<BenchmarkState>();
+    final resultManager = context.watch<ResultManager>();
     final fm = context.watch<FirebaseManager?>();
 
     tabs.add(HistoryTab(
       pushAction: pushAction,
-      resultManager: state.resourceManager.resultManager,
+      resultManager: resultManager,
       triggerRebuild: triggerRebuild,
     ));
 

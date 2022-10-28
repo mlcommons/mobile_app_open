@@ -29,7 +29,7 @@ enum BenchmarkStateEnum {
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
   final BackendInfo backendInfo;
-  final ResourceManager resourceManager;
+  final ResourceManager _resourceManager;
   final ConfigManager configManager;
   final TaskRunner taskRunner;
 
@@ -41,7 +41,7 @@ class BenchmarkState extends ChangeNotifier {
   bool? _doneRunning;
 
   // Only if [state] == [BenchmarkStateEnum.downloading]
-  String get downloadingProgress => resourceManager.progress;
+  String get downloadingProgress => _resourceManager.progress;
 
   ExtendedResult? lastResult;
 
@@ -50,7 +50,7 @@ class BenchmarkState extends ChangeNotifier {
   late BenchmarkList _middle;
 
   BenchmarkStateEnum get state {
-    if (!resourceManager.done) return BenchmarkStateEnum.downloading;
+    if (!_resourceManager.done) return BenchmarkStateEnum.downloading;
     switch (_doneRunning) {
       case null:
         return BenchmarkStateEnum.waiting;
@@ -66,7 +66,7 @@ class BenchmarkState extends ChangeNotifier {
 
   ValidationHelper get validator {
     return ValidationHelper(
-      resourceManager: resourceManager,
+      resourceManager: _resourceManager,
       middle: _middle,
       selectedRunModes: taskRunner.selectedRunModes,
     );
@@ -75,17 +75,17 @@ class BenchmarkState extends ChangeNotifier {
   BenchmarkState(
     this._store,
     this.backendInfo,
-    this.resourceManager,
+    this._resourceManager,
     this.configManager,
     this.taskRunner,
   ) {
-    resourceManager.setUpdateNotifier(notifyListeners);
+    _resourceManager.setUpdateNotifier(notifyListeners);
     configManager.setUpdateNotifier(onConfigChange);
     taskRunner.setUpdateNotifier(notifyListeners);
   }
 
   Future<void> clearCache() async {
-    await resourceManager.cacheManager.deleteLoadedResources([], 0);
+    await _resourceManager.cacheManager.deleteLoadedResources([], 0);
     notifyListeners();
     try {
       await configManager.setConfig(name: _store.chosenConfigurationName);
@@ -122,7 +122,7 @@ class BenchmarkState extends ChangeNotifier {
 
     await Wakelock.enable();
     print('start loading resources');
-    await resourceManager.handleResources(
+    await _resourceManager.handleResources(
       _middle.listResources(
         modes: [taskRunner.perfMode, taskRunner.accuracyMode],
         skipInactive: false,
@@ -202,7 +202,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> runBenchmarks() async {
-    assert(resourceManager.done, 'Resource manager is not done.');
+    assert(_resourceManager.done, 'Resource manager is not done.');
     assert(_doneRunning != false, '_doneRunning is false');
     _store.previousExtendedResult = '';
     _doneRunning = false;
@@ -212,7 +212,7 @@ class BenchmarkState extends ChangeNotifier {
 
     final startTime = DateTime.now();
     final logDirName = startTime.toIso8601String().replaceAll(':', '-');
-    final currentLogDir = '${resourceManager.resourceDir}/logs/$logDirName';
+    final currentLogDir = '${_resourceManager.resourceDir}/logs/$logDirName';
 
     try {
       resetCurrentResults();
@@ -225,7 +225,7 @@ class BenchmarkState extends ChangeNotifier {
 
         _store.previousExtendedResult =
             const JsonEncoder().convert(lastResult!.toJson());
-        await resourceManager.resultManager.addResult(lastResult!);
+        await _resourceManager.resultManager.addResult(lastResult!);
       }
 
       _doneRunning = taskRunner.aborting ? null : true;

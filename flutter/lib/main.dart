@@ -2,10 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mlperfbench/resources/config_manager.dart';
-import 'package:mlperfbench/resources/resource_manager.dart';
-import 'package:mlperfbench/resources/result_manager.dart';
-import 'package:mlperfbench/state/task_runner.dart';
 
 import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +12,11 @@ import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/build_info.dart';
+import 'package:mlperfbench/resources/config_manager.dart';
+import 'package:mlperfbench/resources/resource_manager.dart';
+import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
+import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/root/main_screen/main_screen.dart';
 import 'package:mlperfbench/ui/root/unsupported_device_screen.dart';
@@ -99,7 +99,8 @@ Future<void> launchUi() async {
         ChangeNotifierProvider.value(value: store),
         Provider.value(value: FirebaseManager.instance),
         Provider.value(value: boardDecoder),
-        Provider.value(value: benchmarkState.configManager),
+        Provider.value(value: configManager),
+        Provider.value(value: resultManager),
       ],
       child: const MyApp(home: MyHomePage()),
     ),
@@ -117,7 +118,9 @@ void autostartHandler(BenchmarkState state, Store store) async {
   }
   if (state.state == BenchmarkStateEnum.done) {
     print(const String.fromEnvironment('resultsStringMark'));
-    final result = state.resourceManager.resultManager.getLastResult();
+    final resourceDir = await ResourceManager.getApplicationDirectory();
+    final resultManager = await ResultManager.create(resultDir: resourceDir);
+    final result = resultManager.getLastResult();
     print(jsonToStringIndented(result));
     print(const String.fromEnvironment('terminalStringMark'));
     exit(0);
