@@ -100,6 +100,7 @@ Future<void> launchUi() async {
         Provider.value(value: FirebaseManager.instance),
         Provider.value(value: boardDecoder),
         Provider.value(value: configManager),
+        Provider.value(value: resourceManager),
         Provider.value(value: resultManager),
       ],
       child: const MyApp(home: MyHomePage()),

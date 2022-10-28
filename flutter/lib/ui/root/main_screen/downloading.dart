@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/ui/root/main_screen/utils.dart';
 import 'package:mlperfbench/ui/run/app_bar.dart';
 
@@ -15,8 +16,9 @@ class MainScreenDownloading extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
+    final resourceManager = context.watch<ResourceManager>();
     final textLabel = Text(
-      state.downloadingProgress,
+      resourceManager.progress,
       style: const TextStyle(color: AppColors.lightText, fontSize: 40),
     );
 

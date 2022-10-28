@@ -40,9 +40,6 @@ class BenchmarkState extends ChangeNotifier {
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
 
-  // Only if [state] == [BenchmarkStateEnum.downloading]
-  String get downloadingProgress => _resourceManager.progress;
-
   ExtendedResult? lastResult;
 
   List<Benchmark> get benchmarks => _middle.benchmarks;
