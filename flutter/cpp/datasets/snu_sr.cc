@@ -98,9 +98,9 @@ void SNUSR::LoadSamplesToRam(const std::vector<QuerySampleIndex> &samples) {
     }
 
     // Move data out of preprocessing_stage_ so it can be reused.
-    int total_byte = input_format_[0].size * GetByte(input_format_[0]);
-    void *data_void = preprocessing_stage_->GetPreprocessedImageData();
-    std::vector<uint8_t, BackendAllocator<uint8_t>> *data_uint8 =
+    auto total_byte = input_format_[0].size * GetByte(input_format_[0]);
+    auto data_void = preprocessing_stage_->GetPreprocessedImageData();
+    auto data_uint8 =
         new std::vector<uint8_t, BackendAllocator<uint8_t>>(total_byte);
 
     std::copy(static_cast<uint8_t *>(data_void),
@@ -139,16 +139,14 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
       LOG(FATAL) << "Failed to load ground truth image " << filename;
     }
 
-    uint8_t *ground_truth_vector =
+    auto ground_truth_vector =
         (uint8_t *)gt_preprocessing_stage_->GetPreprocessedImageData();
 
     float *outputFloat = reinterpret_cast<float *>(outputs[0]);
-    int32_t *outputInt32 = reinterpret_cast<int32_t *>(outputs[0]);
     int8_t *outputInt8 = reinterpret_cast<int8_t *>(outputs[0]);
     uint8_t *outputUint8 = reinterpret_cast<uint8_t *>(outputs[0]);
 
     bool isOutputFloat = (output_format_.at(0).type == DataType::Float32);
-    bool isOutputInt32 = (output_format_.at(0).type == DataType::Int32);
     bool isOutputInt8 = (output_format_.at(0).type == DataType::Int8);
     bool isOutputUint8 = (output_format_.at(0).type == DataType::Uint8);
 
@@ -168,7 +166,7 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
       mse += (ground_truth_vector[i] - p) * (ground_truth_vector[i] - p) * 1.0;
     }
     mse = mse / n_pixels;
-    float sample_psnr_ = -10 * log10(mse / (255.0 * 255.0));
+    auto sample_psnr_ = -10 * log10f(mse / (255.0 * 255.0));
     // LOG(INFO) << "[" << filename << "] psnr : " << sample_psnr_;
 
     psnr_ += sample_psnr_;
