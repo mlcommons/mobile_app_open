@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
-import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:wakelock/wakelock.dart';
@@ -32,8 +30,8 @@ class BenchmarkState extends ChangeNotifier {
   final Store _store;
   final BridgeIsolate backendBridge;
   final BackendInfo backendInfo;
+  final ResourceManager resourceManager;
 
-  late final ResourceManager resourceManager;
   late final ConfigManager configManager;
   late final TaskRunner taskRunner;
 
@@ -52,6 +50,21 @@ class BenchmarkState extends ChangeNotifier {
   List<Benchmark> get benchmarks => _middle.benchmarks;
 
   late BenchmarkList _middle;
+
+  BenchmarkStateEnum get state {
+    if (!resourceManager.done) return BenchmarkStateEnum.downloading;
+    switch (_doneRunning) {
+      case null:
+        return BenchmarkStateEnum.waiting;
+      case false:
+        return taskRunner.aborting
+            ? BenchmarkStateEnum.aborting
+            : BenchmarkStateEnum.running;
+      case true:
+        return BenchmarkStateEnum.done;
+    }
+    throw StateError('unreachable');
+  }
 
   ValidationHelper get validator {
     return ValidationHelper(
@@ -141,8 +154,12 @@ class BenchmarkState extends ChangeNotifier {
       resourceDir: resourceDir,
       resultManager: resultManager,
     );
-    final result =
-        BenchmarkState._(store, bridgeIsolate, backendInfo, resourceManager);
+    final result = BenchmarkState._(
+      store,
+      bridgeIsolate,
+      backendInfo,
+      resourceManager,
+    );
 
     result.configManager = await ConfigManager.create(
       applicationDirectory: result.resourceManager.resourceDir,
@@ -197,21 +214,6 @@ class BenchmarkState extends ChangeNotifier {
 
   Future<void> saveTaskSelection() async {
     _store.taskSelection = jsonEncode(_middle.selection);
-  }
-
-  BenchmarkStateEnum get state {
-    if (!resourceManager.done) return BenchmarkStateEnum.downloading;
-    switch (_doneRunning) {
-      case null:
-        return BenchmarkStateEnum.waiting;
-      case false:
-        return taskRunner.aborting
-            ? BenchmarkStateEnum.aborting
-            : BenchmarkStateEnum.running;
-      case true:
-        return BenchmarkStateEnum.done;
-    }
-    throw StateError('unreachable');
   }
 
   Future<void> runBenchmarks() async {
