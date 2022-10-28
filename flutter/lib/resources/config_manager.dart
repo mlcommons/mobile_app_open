@@ -32,7 +32,7 @@ class ConfigManager {
   final TaskConfigDescription defaultConfig =
       TaskConfigDescription(_defaultConfigName, _defaultConfigUrl);
 
-  final void Function() onConfigChange;
+  void Function()? onConfigChange;
 
   Map<String, TaskConfigDescription> configList = {};
 
@@ -43,7 +43,6 @@ class ConfigManager {
   ConfigManager._({
     required this.applicationDirectory,
     required this.resourceManager,
-    required this.onConfigChange,
   });
 
   String get _defaultConfigFile => '$applicationDirectory/$_configListFileName';
@@ -51,15 +50,17 @@ class ConfigManager {
   static Future<ConfigManager> create({
     required String applicationDirectory,
     required ResourceManager resourceManager,
-    required void Function() onConfigChange,
   }) async {
     final result = ConfigManager._(
       applicationDirectory: applicationDirectory,
       resourceManager: resourceManager,
-      onConfigChange: onConfigChange,
     );
     await result.initConfigList();
     return result;
+  }
+
+  void setUpdateNotifier(void Function() callback) {
+    onConfigChange = callback;
   }
 
   Future<void> initConfigList() async {
@@ -114,7 +115,7 @@ class ConfigManager {
     }
     currentConfigName = name;
     currentConfig = await readConfig(config);
-    onConfigChange();
+    onConfigChange?.call();
   }
 
   Future<pb.MLPerfConfig> readConfig(TaskConfigDescription config) async {

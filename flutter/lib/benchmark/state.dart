@@ -28,12 +28,10 @@ enum BenchmarkStateEnum {
 
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
-  final BridgeIsolate backendBridge;
   final BackendInfo backendInfo;
   final ResourceManager resourceManager;
-
-  late final ConfigManager configManager;
-  late final TaskRunner taskRunner;
+  final ConfigManager configManager;
+  final TaskRunner taskRunner;
 
   Object? error;
   StackTrace? stackTrace;
@@ -74,20 +72,16 @@ class BenchmarkState extends ChangeNotifier {
     );
   }
 
-  BenchmarkState._(
+  BenchmarkState(
     this._store,
-    this.backendBridge,
     this.backendInfo,
     this.resourceManager,
+    this.configManager,
+    this.taskRunner,
   ) {
     resourceManager.setUpdateNotifier(notifyListeners);
-    taskRunner = TaskRunner(
-      store: _store,
-      notifyListeners: notifyListeners,
-      resourceManager: resourceManager,
-      backendBridge: backendBridge,
-      backendInfo: backendInfo,
-    );
+    configManager.setUpdateNotifier(onConfigChange);
+    taskRunner.setUpdateNotifier(notifyListeners);
   }
 
   Future<void> clearCache() async {
@@ -154,17 +148,22 @@ class BenchmarkState extends ChangeNotifier {
       resourceDir: resourceDir,
       resultManager: resultManager,
     );
-    final result = BenchmarkState._(
+    final configManager = await ConfigManager.create(
+      applicationDirectory: resourceManager.resourceDir,
+      resourceManager: resourceManager,
+    );
+    final taskRunner = TaskRunner(
+      store: store,
+      resourceManager: resourceManager,
+      backendBridge: bridgeIsolate,
+      backendInfo: backendInfo,
+    );
+    final result = BenchmarkState(
       store,
-      bridgeIsolate,
       backendInfo,
       resourceManager,
-    );
-
-    result.configManager = await ConfigManager.create(
-      applicationDirectory: result.resourceManager.resourceDir,
-      resourceManager: result.resourceManager,
-      onConfigChange: result.onConfigChange,
+      configManager,
+      taskRunner,
     );
     try {
       await result.configManager.setConfig(name: store.chosenConfigurationName);

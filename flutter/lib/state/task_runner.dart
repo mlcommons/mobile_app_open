@@ -39,10 +39,11 @@ class ProgressInfo {
 
 class TaskRunner {
   final Store store;
-  final void Function() notifyListeners;
   final ResourceManager resourceManager;
   final BridgeIsolate backendBridge;
   final BackendInfo backendInfo;
+
+  void Function()? notifyListeners;
 
   ProgressInfo progressInfo = ProgressInfo();
   bool aborting = false;
@@ -50,11 +51,14 @@ class TaskRunner {
 
   TaskRunner({
     required this.store,
-    required this.notifyListeners,
     required this.resourceManager,
     required this.backendBridge,
     required this.backendInfo,
   });
+
+  void setUpdateNotifier(void Function() callback) {
+    notifyListeners = callback;
+  }
 
   BenchmarkRunMode get perfMode => store.testMode
       ? BenchmarkRunMode.performanceTest
@@ -76,7 +80,7 @@ class TaskRunner {
   Future<void> abortBenchmarks() async {
     aborting = true;
     await CancelableOperation.fromFuture(_cooldownFuture).cancel();
-    notifyListeners();
+    notifyListeners?.call();
   }
 
   Future<ExtendedResult?> runBenchmarks(
@@ -114,7 +118,7 @@ class TaskRunner {
         progressInfo.calculateStageProgress = () {
           return timer.elapsed.inSeconds / progressInfo.cooldownDuration;
         };
-        notifyListeners();
+        notifyListeners?.call();
         await (_cooldownFuture = Future.delayed(cooldownPause));
         progressInfo.cooldown = false;
         timer.stop();
@@ -137,7 +141,7 @@ class TaskRunner {
             queryCounter < 0 ? 1.0 : queryCounter / minQueries;
         return min(timeProgress, queryProgress);
       };
-      notifyListeners();
+      notifyListeners?.call();
 
       final performanceRunInfo = await _NativeRunHelper(
         enableArtificialLoad: store.artificialCPULoadEnabled,
@@ -178,7 +182,7 @@ class TaskRunner {
               : queryCounter / backendBridge.getDatasetSize();
           return queryProgress;
         };
-        notifyListeners();
+        notifyListeners?.call();
         accuracyRunInfo = await _NativeRunHelper(
           enableArtificialLoad: store.artificialCPULoadEnabled,
           isTestMode: store.testMode,
