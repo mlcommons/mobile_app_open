@@ -197,7 +197,8 @@ class BenchmarkState extends ChangeNotifier {
     final currentLogDir = '${_resourceManager.resourceDir}/logs/$logDirName';
 
     try {
-      resetCurrentResults();
+      // we want last result to be null in case an exception is thrown
+      lastResultManager.value = null;
       lastResultManager.value =
           await taskRunner.runBenchmarks(_middle, currentLogDir);
       print('Benchmarks finished');
@@ -219,10 +220,6 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  void resetCurrentResults() {
-    lastResultManager.value = null;
-  }
-
   void restoreLastResult() {
     if (_store.previousExtendedResult == '') {
       return;
@@ -238,7 +235,7 @@ class BenchmarkState extends ChangeNotifier {
       error = e;
       stackTrace = trace;
       _store.previousExtendedResult = '';
-      resetCurrentResults();
+      lastResultManager.value = null;
       _doneRunning = null;
     }
   }
