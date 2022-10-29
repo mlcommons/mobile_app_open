@@ -4,7 +4,13 @@ substitutions:
   _APK_SUFFIX: t-123456
   # allow to optionally override device selection in trigger description
   _DEVICE_SELECTOR: model=redfin,version=30,locale=en,orientation=portrait
+  # Just a human-friendly description, to make reading logs easier
   _DEVICE_SELECTOR_DESCRIPTION: redfin is Pixel 5e
+  # optionally run test on more devices
+  # make empty to skip additional device tests
+  _DEVICE_SELECTOR2:
+  _DEVICE_SELECTOR3:
+  _DEVICE_SELECTOR4:
 
 steps:
   - id: pull-apks
@@ -17,7 +23,7 @@ steps:
         mkdir -p output
         gsutil cp -r gs://$_APK_LOCATION output
         mv output/$$(basename $_APK_LOCATION) output/apks
-  - id: firebase-instrumentation-test
+  - id: firebase-instrumentation-test-1
     name: gcr.io/cloud-builders/gcloud
     waitFor:
       - pull-apks
@@ -26,11 +32,15 @@ steps:
     args:
       - -xc
       - |
+        DEVICE_ARG="--device $_DEVICE_SELECTOR"
+        if [ ! -z "$_DEVICE_SELECTOR2" ]; then DEVICE_ARG="$$DEVICE_ARG --device $_DEVICE_SELECTOR2"; fi
+        if [ ! -z "$_DEVICE_SELECTOR3" ]; then DEVICE_ARG="$$DEVICE_ARG --device $_DEVICE_SELECTOR3"; fi
+        if [ ! -z "$_DEVICE_SELECTOR4" ]; then DEVICE_ARG="$$DEVICE_ARG --device $_DEVICE_SELECTOR4"; fi
         gcloud firebase test android run \
           --type instrumentation \
           --app output/apks/test-main-$_APK_SUFFIX.apk \
           --test output/apks/test-helper-$_APK_SUFFIX.apk \
           --timeout 20m \
-          --device $_DEVICE_SELECTOR
+          $$DEVICE_ARG
 
 timeout: 1500s # 25 minutes

@@ -173,6 +173,9 @@ steps:
           "substitutions": {
             "_APK_LOCATION": "$_ARTIFACT_UPLOAD_PATH/qti",
             "_APK_SUFFIX": "q-$SHORT_SHA",
+            "_DEVICE_SELECTOR2": "model=b2q,version=31,locale=en,orientation=portrait",
+            "_DEVICE_SELECTOR3": "model=f2q,version=30,locale=en,orientation=portrait",
+            "_DEVICE_SELECTOR4": "model=x1q,version=29,locale=en,orientation=portrait",
           },
           "commitSha": "$COMMIT_SHA"
         }
