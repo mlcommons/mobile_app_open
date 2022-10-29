@@ -14,7 +14,7 @@ import 'package:mlperfbench/state/last_result_manager.dart';
 import 'package:mlperfbench/state/task_list_manager.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
-import 'benchmark.dart';
+import '../benchmark/benchmark.dart';
 
 enum AppStateEnum {
   downloading,

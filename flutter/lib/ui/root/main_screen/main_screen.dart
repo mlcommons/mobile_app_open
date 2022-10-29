@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
-import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/state/app_state.dart';
 import 'package:mlperfbench/state/last_result_manager.dart';
 import 'package:mlperfbench/ui/root/main_screen/aborting.dart';
 import 'package:mlperfbench/ui/root/main_screen/downloading.dart';

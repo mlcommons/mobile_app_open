@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/state/app_state.dart';
 import 'package:mlperfbench/ui/run/progress_circles.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 

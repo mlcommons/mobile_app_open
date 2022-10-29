@@ -11,9 +11,9 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
-import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/utils.dart';
+import 'package:mlperfbench/state/app_state.dart';
 import 'package:mlperfbench/state/last_result_manager.dart';
 import 'package:mlperfbench/state/task_list_manager.dart';
 import 'package:mlperfbench/store.dart';
