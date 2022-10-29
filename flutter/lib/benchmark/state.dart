@@ -178,8 +178,12 @@ class BenchmarkState extends ChangeNotifier {
     try {
       // we want last result to be null in case an exception is thrown
       _lastResultManager.value = null;
-      _lastResultManager.value = await taskRunner.runBenchmarks(
+      final res = await taskRunner.runBenchmarks(
           _taskListManager.taskList, currentLogDir);
+      if (res != null) {
+        _lastResultManager.value = res;
+        await _resourceManager.resultManager.addResult(res);
+      }
       print('Benchmarks finished');
 
       state = BenchmarkStateEnum.ready;
