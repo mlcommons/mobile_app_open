@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
-import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/state/task_list_manager.dart';
+import 'package:mlperfbench/store.dart';
 
 class ConfigScreen extends StatefulWidget {
   const ConfigScreen({Key? key}) : super(key: key);
@@ -14,15 +15,22 @@ class ConfigScreen extends StatefulWidget {
 }
 
 class _ConfigScreen extends State<ConfigScreen> {
+  late Store store;
+  late TaskListManager taskListManager;
+
   @override
   void dispose() {
-    context.read<BenchmarkState>().saveTaskSelection();
+    store.taskSelection = BenchmarkList.serializeTaskSelection(
+        taskListManager.taskList.getTaskSelection());
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final taskList = context.watch<TaskListManager>().taskList;
+    store = context.watch<Store>();
+    taskListManager = context.watch<TaskListManager>();
+
+    final taskList = taskListManager.taskList;
     final stringResources = AppLocalizations.of(context);
     final childrenList = <Widget>[];
 

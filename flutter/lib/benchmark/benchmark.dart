@@ -136,6 +136,9 @@ class BenchmarkList {
   }
 
   static Map<String, bool> deserializeTaskSelection(String serialized) {
+    if (serialized.isEmpty) {
+      return {};
+    }
     try {
       final json = jsonDecode(serialized) as Map<String, dynamic>;
       Map<String, bool> result = {};
@@ -161,13 +164,8 @@ class BenchmarkList {
   void restoreSelection(Map<String, bool> selection) {
     const stateForUnknown = true;
 
-    try {
-      for (var task in benchmarks) {
-        task.isActive = selection[task.id] ?? stateForUnknown;
-      }
-    } catch (e, t) {
-      print('task selection parse fail: $e');
-      print(t);
+    for (var task in benchmarks) {
+      task.isActive = selection[task.id] ?? stateForUnknown;
     }
   }
 }
