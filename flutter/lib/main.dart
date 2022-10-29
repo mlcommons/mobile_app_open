@@ -91,8 +91,7 @@ Future<void> launchUi() async {
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));
     assert(const bool.hasEnvironment('terminalStringMark'));
-    store.previousExtendedResult = '';
-    benchmarkState.restoreLastResult();
+    lastResultManager.value = null;
     benchmarkState.addListener(
         () => autostartHandler(lastResultManager, benchmarkState, store));
   }

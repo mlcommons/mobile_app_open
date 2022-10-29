@@ -150,7 +150,7 @@ class BenchmarkState extends ChangeNotifier {
     if (state != BenchmarkStateEnum.ready) {
       throw 'app state != ready';
     }
-    _store.previousExtendedResult = '';
+    _lastResultManager.value = null;
     state = BenchmarkStateEnum.running;
 
     // disable screen sleep when benchmarks is running

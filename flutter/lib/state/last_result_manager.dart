@@ -22,11 +22,12 @@ class LastResultManager {
 
   LastResultManager(this._store);
 
+  // can throw exceptions
   void restore() {
     // reset value in case parsing throws an exception
-    value = null;
+    _value = null;
     if (_store.previousExtendedResult.isNotEmpty) {
-      value = ExtendedResult.fromJson(
+      _value = ExtendedResult.fromJson(
           jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
     }
   }
@@ -38,5 +39,6 @@ class LastResultManager {
       _store.previousExtendedResult =
           const JsonEncoder().convert(value!.toJson());
     }
+    print('save exit');
   }
 }
