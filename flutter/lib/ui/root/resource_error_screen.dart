@@ -17,11 +17,11 @@ class ResourceErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
-    final state = context.watch<BenchmarkState>();
+    final state = context.watch<AppState>();
     final configManager = context.watch<ConfigManager>();
 
     final error =
-        context.select<BenchmarkState, Object?>((value) => value.pendingError);
+        context.select<AppState, Object?>((value) => value.pendingError);
 
     final iconEdgeSize = MediaQuery.of(context).size.width * 0.66;
 

@@ -316,7 +316,7 @@ class _ResultScreenState extends State<ResultScreen>
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<BenchmarkState>();
+    final state = context.watch<AppState>();
     final shareEnabled = context.select<Store, bool>((value) => value.share);
     final offlineMode =
         context.select<Store, bool>((value) => value.offlineMode);

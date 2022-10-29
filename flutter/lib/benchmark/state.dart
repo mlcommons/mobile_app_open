@@ -16,7 +16,7 @@ import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 import 'benchmark.dart';
 
-enum BenchmarkStateEnum {
+enum AppStateEnum {
   downloading,
   resourceError,
   ready,
@@ -24,7 +24,7 @@ enum BenchmarkStateEnum {
   aborting,
 }
 
-class BenchmarkState extends ChangeNotifier {
+class AppState extends ChangeNotifier {
   final Store _store;
   final TaskListManager _taskListManager;
   final ResourceManager _resourceManager;
@@ -34,9 +34,9 @@ class BenchmarkState extends ChangeNotifier {
 
   Object? pendingError;
 
-  BenchmarkStateEnum _state = BenchmarkStateEnum.downloading;
-  BenchmarkStateEnum get state => _state;
-  set state(BenchmarkStateEnum value) {
+  AppStateEnum _state = AppStateEnum.downloading;
+  AppStateEnum get state => _state;
+  set state(AppStateEnum value) {
     _state = value;
     notifyListeners();
   }
@@ -49,7 +49,7 @@ class BenchmarkState extends ChangeNotifier {
     );
   }
 
-  BenchmarkState(
+  AppState(
     this._store,
     this._taskListManager,
     this._resourceManager,
@@ -65,13 +65,13 @@ class BenchmarkState extends ChangeNotifier {
   void _handleTaskRunnerStateChange() {
     switch (taskRunner.state) {
       case TaskRunnerState.ready:
-        state = BenchmarkStateEnum.ready;
+        state = AppStateEnum.ready;
         break;
       case TaskRunnerState.running:
-        state = BenchmarkStateEnum.running;
+        state = AppStateEnum.running;
         break;
       case TaskRunnerState.aborting:
-        state = BenchmarkStateEnum.aborting;
+        state = AppStateEnum.aborting;
         break;
       default:
         throw 'unsupported state';
@@ -84,7 +84,7 @@ class BenchmarkState extends ChangeNotifier {
         await _resourceManager.cacheManager.deleteLoadedResources([], 0);
         await _configManager.setConfig(name: _store.chosenConfigurationName);
       },
-      failedState: BenchmarkStateEnum.resourceError,
+      failedState: AppStateEnum.resourceError,
     );
   }
 
@@ -93,11 +93,11 @@ class BenchmarkState extends ChangeNotifier {
   void startLoadingResources() async {
     await _tryRun(
       () async {
-        state = BenchmarkStateEnum.downloading;
+        state = AppStateEnum.downloading;
         await _loadResources();
-        state = BenchmarkStateEnum.ready;
+        state = AppStateEnum.ready;
       },
-      failedState: BenchmarkStateEnum.resourceError,
+      failedState: AppStateEnum.resourceError,
     );
   }
 
@@ -120,7 +120,7 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.disable();
   }
 
-  static Future<BenchmarkState> create({
+  static Future<AppState> create({
     required Store store,
     required BridgeIsolate bridgeIsolate,
     required TaskListManager taskListManager,
@@ -129,7 +129,7 @@ class BenchmarkState extends ChangeNotifier {
     required TaskRunner taskRunner,
     required LastResultManager lastResultManager,
   }) async {
-    final result = BenchmarkState(
+    final result = AppState(
       store,
       taskListManager,
       resourceManager,
@@ -140,7 +140,7 @@ class BenchmarkState extends ChangeNotifier {
     await result._tryRun(
       () async => await result._configManager
           .setConfig(name: store.chosenConfigurationName),
-      failedState: BenchmarkStateEnum.resourceError,
+      failedState: AppStateEnum.resourceError,
     );
 
     return result;
@@ -158,7 +158,7 @@ class BenchmarkState extends ChangeNotifier {
   void startBenchmark() async {
     await _tryRun(
       _runTasks,
-      failedState: BenchmarkStateEnum.ready,
+      failedState: AppStateEnum.ready,
     );
   }
 
@@ -166,10 +166,10 @@ class BenchmarkState extends ChangeNotifier {
     // we want last result to be null in case an exception is thrown
     _lastResultManager.value = null;
 
-    if (state != BenchmarkStateEnum.ready) {
+    if (state != AppStateEnum.ready) {
       throw 'app state != ready';
     }
-    state = BenchmarkStateEnum.running;
+    state = AppStateEnum.running;
 
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
@@ -187,7 +187,7 @@ class BenchmarkState extends ChangeNotifier {
       }
       print('Benchmarks finished');
 
-      state = BenchmarkStateEnum.ready;
+      state = AppStateEnum.ready;
     } finally {
       if (currentLogDir.isNotEmpty && !_store.keepLogs) {
         await Directory(currentLogDir).delete(recursive: true);
@@ -200,7 +200,7 @@ class BenchmarkState extends ChangeNotifier {
   // this function catches all exceptions and saves them
   Future<void> _tryRun(
     Future Function() action, {
-    required BenchmarkStateEnum failedState,
+    required AppStateEnum failedState,
   }) async {
     try {
       await action();

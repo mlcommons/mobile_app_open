@@ -47,7 +47,7 @@ class _MainScreenReadyState extends State<MainScreenReady> {
   }
 
   void scheduleErrorPopup() {
-    final state = context.watch<BenchmarkState>();
+    final state = context.watch<AppState>();
     final e = state.pendingError;
     if (e == null) {
       return;
@@ -62,7 +62,7 @@ class _MainScreenReadyState extends State<MainScreenReady> {
   }
 
   Widget _goContainer(BuildContext context) {
-    final state = context.watch<BenchmarkState>();
+    final state = context.watch<AppState>();
     final store = context.watch<Store>();
     final stringResources = AppLocalizations.of(context);
 

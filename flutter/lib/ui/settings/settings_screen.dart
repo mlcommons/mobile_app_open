@@ -45,7 +45,7 @@ class _SettingsScreen extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<Store>();
-    final state = context.watch<BenchmarkState>();
+    final state = context.watch<AppState>();
     final stringResources = AppLocalizations.of(context);
     final buildInfo = BuildInfoHelper.info;
 
@@ -196,7 +196,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
                 if (!mounted) return;
-                if (state.state != BenchmarkStateEnum.ready) {
+                if (state.state != AppStateEnum.ready) {
                   _showUnableSpecifyConfigurationMessage(
                       context, stringResources);
                   return;

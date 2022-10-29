@@ -23,7 +23,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<BenchmarkState>();
+    final state = context.watch<AppState>();
     final taskRunner = state.taskRunner;
     final l10n = AppLocalizations.of(context);
     final progress = taskRunner.progressInfo;

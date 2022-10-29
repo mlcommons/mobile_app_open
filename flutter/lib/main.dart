@@ -79,7 +79,7 @@ Future<void> launchUi() async {
   final taskListManager = TaskListManager(
     backendSettings: backendInfo.settings,
   );
-  final benchmarkState = await BenchmarkState.create(
+  final benchmarkState = await AppState.create(
     store: store,
     bridgeIsolate: bridgeIsolate,
     taskListManager: taskListManager,
@@ -118,9 +118,9 @@ Future<void> launchUi() async {
   );
 }
 
-void autostartHandler(LastResultManager lastResultManager, BenchmarkState state,
-    Store store) async {
-  if (state.state != BenchmarkStateEnum.ready) {
+void autostartHandler(
+    LastResultManager lastResultManager, AppState state, Store store) async {
+  if (state.state != AppStateEnum.ready) {
     return;
   }
   if (lastResultManager.value == null) {

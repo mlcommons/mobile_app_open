@@ -16,24 +16,24 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<BenchmarkState>();
+    final state = context.watch<AppState>();
     final lastResultManager = context.watch<LastResultManager>();
 
     switch (state.state) {
-      case BenchmarkStateEnum.downloading:
+      case AppStateEnum.downloading:
         return const MainScreenDownloading();
-      case BenchmarkStateEnum.ready:
+      case AppStateEnum.ready:
         if (lastResultManager.value == null) {
           final showError = state.pendingError != null;
           return MainScreenReady(showError: showError);
         } else {
           return const ResultScreen();
         }
-      case BenchmarkStateEnum.aborting:
+      case AppStateEnum.aborting:
         return const MainScreenAborting();
-      case BenchmarkStateEnum.running:
+      case AppStateEnum.running:
         return const ProgressScreen();
-      case BenchmarkStateEnum.resourceError:
+      case AppStateEnum.resourceError:
         return const ResourceErrorScreen();
       default:
         throw 'unsupported app state';
