@@ -21,7 +21,7 @@ class ResourceErrorScreen extends StatelessWidget {
     final configManager = context.watch<ConfigManager>();
 
     final error =
-        context.select<BenchmarkState, Object?>((value) => value.error);
+        context.select<BenchmarkState, Object?>((value) => value.pendingError);
 
     final iconEdgeSize = MediaQuery.of(context).size.width * 0.66;
 

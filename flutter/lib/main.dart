@@ -127,7 +127,7 @@ void autostartHandler(LastResultManager lastResultManager, BenchmarkState state,
         const bool.fromEnvironment('submission', defaultValue: false);
     store.offlineMode =
         const bool.fromEnvironment('offline', defaultValue: false);
-    await state.runBenchmarks();
+    state.startBenchmark();
     return;
   } else {
     print(const String.fromEnvironment('resultsStringMark'));

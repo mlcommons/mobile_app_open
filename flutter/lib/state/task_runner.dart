@@ -91,6 +91,8 @@ class TaskRunner {
 
   Future<ExtendedResult?> runBenchmarks(
       BenchmarkList middle, String currentLogDir) async {
+    // TODO refactor this method
+
     state = TaskRunnerState.running;
 
     final cooldown = store.cooldown;

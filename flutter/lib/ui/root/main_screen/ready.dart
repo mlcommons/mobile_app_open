@@ -18,9 +18,18 @@ class MainScreenReadyKeys {
   static const String goButton = 'goButton';
 }
 
-class MainScreenReady extends StatelessWidget {
-  const MainScreenReady({super.key});
+class MainScreenReady extends StatefulWidget {
+  final bool showError;
 
+  const MainScreenReady({super.key, required this.showError});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _MainScreenReadyState();
+  }
+}
+
+class _MainScreenReadyState extends State<MainScreenReady> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -32,7 +41,24 @@ class MainScreenReady extends StatelessWidget {
 
     final taskList = context.watch<TaskListManager>().taskList;
 
+    scheduleErrorPopup();
+
     return utils.wrapCircle(l10n, appBar, circle, context, taskList.benchmarks);
+  }
+
+  void scheduleErrorPopup() {
+    final state = context.watch<BenchmarkState>();
+    final e = state.pendingError;
+    if (e == null) {
+      return;
+    }
+    state.pendingError = null;
+
+    final l10n = AppLocalizations.of(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await showErrorDialog(context, ['${l10n.runFail}:', e.toString()]);
+    });
   }
 
   Widget _goContainer(BuildContext context) {
@@ -74,18 +100,7 @@ class MainScreenReady extends StatelessWidget {
             }
           }
         }
-        try {
-          await state.runBenchmarks();
-        } catch (e, t) {
-          print(t);
-          // TODO (anhappdev): Uncomment the if line and remove the ignore line, when updated to Flutter v3.4.
-          // See https://github.com/flutter/flutter/issues/111488
-          // if (!context.mounted) return;
-          // ignore: use_build_context_synchronously
-          await showErrorDialog(
-              context, ['${stringResources.runFail}:', e.toString()]);
-          return;
-        }
+        state.startBenchmark();
       }),
     );
   }

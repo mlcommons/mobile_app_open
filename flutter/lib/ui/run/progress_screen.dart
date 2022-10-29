@@ -11,9 +11,6 @@ import 'package:mlperfbench/ui/run/progress_circles.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 
 class ProgressScreen extends StatefulWidget {
-  static final GlobalKey<ScaffoldState> scaffoldKey =
-      GlobalKey<ScaffoldState>();
-
   const ProgressScreen({Key? key}) : super(key: key);
 
   @override
@@ -173,7 +170,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
 
     return Scaffold(
-      key: ProgressScreen.scaffoldKey,
       body: Container(
         decoration: backgroundGradient,
         child: Column(

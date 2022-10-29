@@ -32,8 +32,7 @@ class BenchmarkState extends ChangeNotifier {
   final TaskRunner taskRunner;
   final LastResultManager _lastResultManager;
 
-  Object? error;
-  StackTrace? stackTrace;
+  Object? pendingError;
 
   BenchmarkStateEnum _state = BenchmarkStateEnum.downloading;
   BenchmarkStateEnum get state => _state;
@@ -161,11 +160,20 @@ class BenchmarkState extends ChangeNotifier {
         _taskListManager.taskList.getTaskSelection());
   }
 
-  Future<void> runBenchmarks() async {
+  void startBenchmark() async {
+    await _tryRun(
+      _runTasks,
+      failedState: BenchmarkStateEnum.ready,
+    );
+  }
+
+  Future<void> _runTasks() async {
+    // we want last result to be null in case an exception is thrown
+    _lastResultManager.value = null;
+
     if (state != BenchmarkStateEnum.ready) {
       throw 'app state != ready';
     }
-    _lastResultManager.value = null;
     state = BenchmarkStateEnum.running;
 
     // disable screen sleep when benchmarks is running
@@ -176,8 +184,6 @@ class BenchmarkState extends ChangeNotifier {
     final currentLogDir = '${_resourceManager.resourceDir}/logs/$logDirName';
 
     try {
-      // we want last result to be null in case an exception is thrown
-      _lastResultManager.value = null;
       final res = await taskRunner.runBenchmarks(
           _taskListManager.taskList, currentLogDir);
       if (res != null) {
@@ -191,8 +197,6 @@ class BenchmarkState extends ChangeNotifier {
       if (currentLogDir.isNotEmpty && !_store.keepLogs) {
         await Directory(currentLogDir).delete(recursive: true);
       }
-
-      notifyListeners();
 
       await Wakelock.disable();
     }
@@ -215,8 +219,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, t) {
       print('failed action: $e');
       print(t);
-      error = e;
-      stackTrace = t;
+      pendingError = e;
       state = failedState;
     }
   }

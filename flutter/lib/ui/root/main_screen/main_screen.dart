@@ -24,7 +24,8 @@ class MyHomePage extends StatelessWidget {
         return const MainScreenDownloading();
       case BenchmarkStateEnum.ready:
         if (lastResultManager.value == null) {
-          return const MainScreenReady();
+          final showError = state.pendingError != null;
+          return MainScreenReady(showError: showError);
         } else {
           return const ResultScreen();
         }

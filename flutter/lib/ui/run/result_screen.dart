@@ -25,7 +25,6 @@ import 'package:mlperfbench/ui/root/main_screen/utils.dart';
 import 'package:mlperfbench/ui/run/app_bar.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/run/result_circle.dart';
-import 'progress_screen.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -432,16 +431,7 @@ class _ResultScreenState extends State<ResultScreen>
                   }
                 }
               }
-              try {
-                await state.runBenchmarks();
-              } catch (e, t) {
-                print(t);
-                // current context may no longer be valid if runBenchmarks requested progress screen
-                await showErrorDialog(
-                    ProgressScreen.scaffoldKey.currentContext ?? context,
-                    ['${stringResources.runFail}:', e.toString()]);
-                return;
-              }
+              state.startBenchmark();
             },
             child: Padding(
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
