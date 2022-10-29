@@ -78,7 +78,7 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> clearCache() async {
+  void clearCache() async {
     await _tryRun(
       () async {
         await _resourceManager.cacheManager.deleteLoadedResources([], 0);
@@ -90,7 +90,7 @@ class BenchmarkState extends ChangeNotifier {
 
   // Start loading resources in background.
   // Return type 'void' is intended, this function must not be awaited.
-  void deferredLoadResources() async {
+  void startLoadingResources() async {
     await _tryRun(
       () async {
         state = BenchmarkStateEnum.downloading;
@@ -152,7 +152,7 @@ class BenchmarkState extends ChangeNotifier {
     _taskListManager.setAppConfig(_configManager.currentConfig);
     _taskListManager.taskList.restoreSelection(
         BenchmarkList.deserializeTaskSelection(_store.taskSelection));
-    deferredLoadResources();
+    startLoadingResources();
   }
 
   void startBenchmark() async {

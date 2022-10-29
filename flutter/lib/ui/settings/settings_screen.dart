@@ -214,7 +214,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 switch (await showConfirmDialog(
                     context, stringResources.settingsClearCacheConfirm)) {
                   case ConfirmDialogAction.ok:
-                    await state.clearCache();
+                    state.clearCache();
                     if (!mounted) return;
                     Navigator.pop(context);
                     break;
