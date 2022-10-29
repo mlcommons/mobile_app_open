@@ -18,10 +18,10 @@ import 'benchmark.dart';
 
 enum BenchmarkStateEnum {
   downloading,
-  waiting,
+  resourceError,
+  ready,
   running,
   aborting,
-  done,
 }
 
 class BenchmarkState extends ChangeNotifier {
@@ -35,23 +35,11 @@ class BenchmarkState extends ChangeNotifier {
   Object? error;
   StackTrace? stackTrace;
 
-  bool taskConfigFailedToLoad = false;
-  // null - downloading/waiting; false - running; true - done
-  bool? _doneRunning;
-
-  BenchmarkStateEnum get state {
-    if (!_resourceManager.done) return BenchmarkStateEnum.downloading;
-    switch (_doneRunning) {
-      case null:
-        return BenchmarkStateEnum.waiting;
-      case false:
-        return taskRunner.aborting
-            ? BenchmarkStateEnum.aborting
-            : BenchmarkStateEnum.running;
-      case true:
-        return BenchmarkStateEnum.done;
-    }
-    throw StateError('unreachable');
+  BenchmarkStateEnum _state = BenchmarkStateEnum.downloading;
+  BenchmarkStateEnum get state => _state;
+  set state(BenchmarkStateEnum value) {
+    _state = value;
+    notifyListeners();
   }
 
   ValidationHelper get validator {
@@ -76,33 +64,26 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> clearCache() async {
-    await _resourceManager.cacheManager.deleteLoadedResources([], 0);
-    notifyListeners();
-    try {
-      await _configManager.setConfig(name: _store.chosenConfigurationName);
-    } catch (e, trace) {
-      print("can't load resources: $e");
-      print(trace);
-      error = e;
-      stackTrace = trace;
-      taskConfigFailedToLoad = true;
-      notifyListeners();
-    }
+    await _tryRun(
+      () async {
+        await _resourceManager.cacheManager.deleteLoadedResources([], 0);
+        await _configManager.setConfig(name: _store.chosenConfigurationName);
+      },
+      failedState: BenchmarkStateEnum.resourceError,
+    );
   }
 
   // Start loading resources in background.
   // Return type 'void' is intended, this function must not be awaited.
   void deferredLoadResources() async {
-    try {
-      await loadResources();
-    } catch (e, trace) {
-      print("can't load resources: $e");
-      print(trace);
-      error = e;
-      stackTrace = trace;
-      taskConfigFailedToLoad = true;
-      notifyListeners();
-    }
+    await _tryRun(
+      () async {
+        state = BenchmarkStateEnum.downloading;
+        await loadResources();
+        state = BenchmarkStateEnum.ready;
+      },
+      failedState: BenchmarkStateEnum.resourceError,
+    );
   }
 
   Future<void> loadResources() async {
@@ -121,9 +102,6 @@ class BenchmarkState extends ChangeNotifier {
       needToPurgeCache,
     );
     print('finished loading resources');
-    error = null;
-    stackTrace = null;
-    taskConfigFailedToLoad = false;
     await Wakelock.disable();
   }
 
@@ -144,25 +122,17 @@ class BenchmarkState extends ChangeNotifier {
       taskRunner,
       lastResultManager,
     );
-    try {
-      await result._configManager
-          .setConfig(name: store.chosenConfigurationName);
-    } catch (e, trace) {
-      print("can't load resources: $e");
-      print(trace);
-      result.error = e;
-      result.stackTrace = trace;
-      result.taskConfigFailedToLoad = true;
-    }
+    await result._tryRun(
+      () async => await result._configManager
+          .setConfig(name: store.chosenConfigurationName),
+      failedState: BenchmarkStateEnum.resourceError,
+    );
 
     return result;
   }
 
   void onConfigChange() {
     _store.chosenConfigurationName = _configManager.currentConfigName;
-    error = null;
-    stackTrace = null;
-    taskConfigFailedToLoad = false;
 
     _taskListManager.setAppConfig(_configManager.currentConfig);
     _taskListManager.taskList.restoreSelection(
@@ -177,10 +147,11 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> runBenchmarks() async {
-    assert(_resourceManager.done, 'Resource manager is not done.');
-    assert(_doneRunning != false, '_doneRunning is false');
+    if (state != BenchmarkStateEnum.ready) {
+      throw 'app state != ready';
+    }
     _store.previousExtendedResult = '';
-    _doneRunning = false;
+    state = BenchmarkStateEnum.running;
 
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
@@ -196,10 +167,7 @@ class BenchmarkState extends ChangeNotifier {
           _taskListManager.taskList, currentLogDir);
       print('Benchmarks finished');
 
-      _doneRunning = taskRunner.aborting ? null : true;
-    } catch (e) {
-      _doneRunning = null;
-      rethrow;
+      state = BenchmarkStateEnum.ready;
     } finally {
       if (currentLogDir.isNotEmpty && !_store.keepLogs) {
         await Directory(currentLogDir).delete(recursive: true);
@@ -214,22 +182,25 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   void restoreLastResult() {
-    if (_store.previousExtendedResult == '') {
-      return;
-    }
+    _tryRun(
+      () async => _lastResultManager.restore(),
+      failedState: BenchmarkStateEnum.resourceError,
+    );
+  }
 
+  // this function catches all exceptions and saves them
+  Future<void> _tryRun(
+    Future Function() action, {
+    required BenchmarkStateEnum failedState,
+  }) async {
     try {
-      _lastResultManager.restore();
-      _doneRunning = true;
-      return;
-    } catch (e, trace) {
-      print('unable to restore previous extended result: $e');
-      print(trace);
+      await action();
+    } catch (e, t) {
+      print('failed action: $e');
+      print(t);
       error = e;
-      stackTrace = trace;
-      _store.previousExtendedResult = '';
-      _lastResultManager.value = null;
-      _doneRunning = null;
+      stackTrace = t;
+      state = failedState;
     }
   }
 }

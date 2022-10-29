@@ -93,7 +93,8 @@ Future<void> launchUi() async {
     assert(const bool.hasEnvironment('terminalStringMark'));
     store.previousExtendedResult = '';
     benchmarkState.restoreLastResult();
-    benchmarkState.addListener(() => autostartHandler(benchmarkState, store));
+    benchmarkState.addListener(
+        () => autostartHandler(lastResultManager, benchmarkState, store));
   }
 
   final BoardDecoder boardDecoder = BoardDecoder();
@@ -117,16 +118,19 @@ Future<void> launchUi() async {
   );
 }
 
-void autostartHandler(BenchmarkState state, Store store) async {
-  if (state.state == BenchmarkStateEnum.waiting) {
+void autostartHandler(LastResultManager lastResultManager, BenchmarkState state,
+    Store store) async {
+  if (state.state != BenchmarkStateEnum.ready) {
+    return;
+  }
+  if (lastResultManager.value == null) {
     store.submissionMode =
         const bool.fromEnvironment('submission', defaultValue: false);
     store.offlineMode =
         const bool.fromEnvironment('offline', defaultValue: false);
     await state.runBenchmarks();
     return;
-  }
-  if (state.state == BenchmarkStateEnum.done) {
+  } else {
     print(const String.fromEnvironment('resultsStringMark'));
     final resourceDir = await ResourceManager.getApplicationDirectory();
     final resultManager = await ResultManager.create(resultDir: resourceDir);

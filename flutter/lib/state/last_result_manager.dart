@@ -23,9 +23,9 @@ class LastResultManager {
   LastResultManager(this._store);
 
   void restore() {
-    if (_store.previousExtendedResult.isEmpty) {
-      value = null;
-    } else {
+    // reset value in case parsing throws an exception
+    value = null;
+    if (_store.previousExtendedResult.isNotEmpty) {
       value = ExtendedResult.fromJson(
           jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
     }

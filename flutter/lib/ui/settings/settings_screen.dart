@@ -195,15 +195,14 @@ class _SettingsScreen extends State<SettingsScreen> {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
-                if (state.state == BenchmarkStateEnum.done ||
-                    state.state == BenchmarkStateEnum.waiting) {
-                  if (!mounted) return;
-                  await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const TaskConfigScreen()));
-                } else {
+                if (!mounted) return;
+                if (state.state != BenchmarkStateEnum.ready) {
                   _showUnableSpecifyConfigurationMessage(
                       context, stringResources);
+                  return;
                 }
+                await Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const TaskConfigScreen()));
               },
             ),
             const Divider(),
