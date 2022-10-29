@@ -75,6 +75,7 @@ Future<void> launchUi() async {
     backendInfo: backendInfo,
   );
   final lastResultManager = LastResultManager(store);
+  lastResultManager.tryRestore();
   final taskListManager = TaskListManager(
     backendSettings: backendInfo.settings,
   );

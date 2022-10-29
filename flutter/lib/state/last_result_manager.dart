@@ -22,6 +22,17 @@ class LastResultManager {
 
   LastResultManager(this._store);
 
+  // guaranteed to finish successfully
+  // logs and ignores any errors
+  void tryRestore() {
+    try {
+      restore();
+    } catch (e, t) {
+      print('error during last result parsing: $e');
+      print(t);
+    }
+  }
+
   // can throw exceptions
   void restore() {
     // reset value in case parsing throws an exception

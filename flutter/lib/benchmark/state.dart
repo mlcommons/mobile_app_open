@@ -197,13 +197,6 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  void restoreLastResult() {
-    _tryRun(
-      () async => _lastResultManager.restore(),
-      failedState: BenchmarkStateEnum.resourceError,
-    );
-  }
-
   // this function catches all exceptions and saves them
   Future<void> _tryRun(
     Future Function() action, {
