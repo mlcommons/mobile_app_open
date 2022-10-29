@@ -44,6 +44,8 @@ enum TaskRunnerState {
 }
 
 class TaskRunner {
+  static const loadgenLogFileName = 'mlperf_log_detail.txt';
+
   final Store store;
   final ResourceManager resourceManager;
   final BridgeIsolate backendBridge;
@@ -323,9 +325,8 @@ class _NativeRunHelper {
   }
 
   Future<LoadgenInfo?> extractLoadgenInfo() async {
-    const logFileName = 'mlperf_log_detail.txt';
     return await LoadgenInfo.fromFile(
-      filepath: '$logDir/$logFileName',
+      filepath: '$logDir/${TaskRunner.loadgenLogFileName}',
     );
   }
 
