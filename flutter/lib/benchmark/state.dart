@@ -58,11 +58,11 @@ class BenchmarkState extends ChangeNotifier {
     this._lastResultManager,
   ) {
     _resourceManager.setUpdateNotifier(notifyListeners);
-    _configManager.setUpdateNotifier(onConfigChange);
-    taskRunner.setUpdateNotifier(handleTaskRunnerStateChange);
+    _configManager.setUpdateNotifier(_onConfigChange);
+    taskRunner.setUpdateNotifier(_handleTaskRunnerStateChange);
   }
 
-  void handleTaskRunnerStateChange() {
+  void _handleTaskRunnerStateChange() {
     switch (taskRunner.state) {
       case TaskRunnerState.ready:
         state = BenchmarkStateEnum.ready;
@@ -94,14 +94,14 @@ class BenchmarkState extends ChangeNotifier {
     await _tryRun(
       () async {
         state = BenchmarkStateEnum.downloading;
-        await loadResources();
+        await _loadResources();
         state = BenchmarkStateEnum.ready;
       },
       failedState: BenchmarkStateEnum.resourceError,
     );
   }
 
-  Future<void> loadResources() async {
+  Future<void> _loadResources() async {
     final newAppVersion =
         '${BuildInfoHelper.info.version}+${BuildInfoHelper.info.buildNumber}';
     var needToPurgeCache = _store.previousAppVersion != newAppVersion;
@@ -146,18 +146,13 @@ class BenchmarkState extends ChangeNotifier {
     return result;
   }
 
-  void onConfigChange() {
+  void _onConfigChange() {
     _store.chosenConfigurationName = _configManager.currentConfigName;
 
     _taskListManager.setAppConfig(_configManager.currentConfig);
     _taskListManager.taskList.restoreSelection(
         BenchmarkList.deserializeTaskSelection(_store.taskSelection));
     deferredLoadResources();
-  }
-
-  Future<void> saveTaskSelection() async {
-    _store.taskSelection = BenchmarkList.serializeTaskSelection(
-        _taskListManager.taskList.getTaskSelection());
   }
 
   void startBenchmark() async {
