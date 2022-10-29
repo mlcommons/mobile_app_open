@@ -90,6 +90,16 @@ class AppStateHelper {
   }
 }
 
+// All public methods in AppState should use the following structure:
+// void method() <possibly async> {
+// _tryRun(() {
+//    <invoke AppStateHelper methods>;
+//    <change state field>;
+// }, failedState: <something>);
+// }
+// All public methods should not be awaited. State updates should be done in next widget tree rebuilds.
+// AppState itself should only manage its `state` field, everything else should be in other classes.
+// Any other public methods or getters should be removed in refactoring.
 class AppState extends ChangeNotifier {
   final AppStateHelper _helper;
   Object? pendingError;
