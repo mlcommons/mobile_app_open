@@ -1,5 +1,6 @@
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
+// Contains raw data obtained from the dart_ffi_run_benchmark method,
 class NativeRunResult {
   final Accuracy? accuracy1;
   final Accuracy? accuracy2;

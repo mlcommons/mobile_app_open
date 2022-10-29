@@ -2,6 +2,7 @@
 
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 
+// Input parameters for the dart_ffi_run_benchmark method
 class RunSettings {
   static int single_stream_expected_latency_ns_max = 1000000;
 

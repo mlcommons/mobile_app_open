@@ -2,6 +2,7 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 
+// Hold an up-to-date reference to BenchmarkList instance
 class TaskListManager {
   final pb.BackendSetting backendSettings;
 
