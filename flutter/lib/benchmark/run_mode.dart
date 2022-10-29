@@ -8,39 +8,39 @@ class BenchmarkRunMode {
   static const _accuracyLogSuffix = 'accuracy';
 
   final String loadgenMode;
-  final String readable;
+  final String logSuffix;
   final pb.OneDatasetConfig Function(pb.TaskConfig taskConfig) chooseDataset;
 
   BenchmarkRunMode._({
     required this.loadgenMode,
-    required this.readable,
+    required this.logSuffix,
     required this.chooseDataset,
   });
 
   static BenchmarkRunMode performance = BenchmarkRunMode._(
     loadgenMode: _performanceModeString,
-    readable: _perfLogSuffix,
+    logSuffix: _perfLogSuffix,
     chooseDataset: (task) => task.datasets.lite,
   );
   static BenchmarkRunMode accuracy = BenchmarkRunMode._(
     loadgenMode: _accuracyModeString,
-    readable: _accuracyLogSuffix,
+    logSuffix: _accuracyLogSuffix,
     chooseDataset: (task) => task.datasets.full,
   );
 
   static BenchmarkRunMode performanceTest = BenchmarkRunMode._(
     loadgenMode: _performanceModeString,
-    readable: _perfLogSuffix,
+    logSuffix: _perfLogSuffix,
     chooseDataset: (task) => task.datasets.tiny,
   );
   static BenchmarkRunMode accuracyTest = BenchmarkRunMode._(
     loadgenMode: _accuracyModeString,
-    readable: _accuracyLogSuffix,
+    logSuffix: _accuracyLogSuffix,
     chooseDataset: (task) => task.datasets.tiny,
   );
 
   @override
   String toString() {
-    return readable;
+    return logSuffix;
   }
 }

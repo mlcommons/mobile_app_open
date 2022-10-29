@@ -241,7 +241,7 @@ class _NativeRunHelper {
     required List<pb.Setting> commonSettings,
     required String backendLibName,
     required String logParentDir,
-  }) : logDir = '$logParentDir/${benchmark.id}-${runMode.readable}' {
+  }) : logDir = '$logParentDir/${benchmark.id}-${runMode.logSuffix}' {
     runSettings = benchmark.createRunSettings(
       runMode: runMode,
       resourceManager: resourceManager,
