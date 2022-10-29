@@ -99,7 +99,7 @@ class TaskRunner {
 
     final cooldown = store.cooldown;
     final cooldownPause = store.testMode || isFastMode
-        ? const Duration(seconds: 10)
+        ? const Duration(seconds: 1)
         : Duration(minutes: store.cooldownDuration);
 
     final activeBenchmarks =
