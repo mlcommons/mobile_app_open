@@ -60,7 +60,23 @@ class BenchmarkState extends ChangeNotifier {
   ) {
     _resourceManager.setUpdateNotifier(notifyListeners);
     _configManager.setUpdateNotifier(onConfigChange);
-    taskRunner.setUpdateNotifier(notifyListeners);
+    taskRunner.setUpdateNotifier(handleTaskRunnerStateChange);
+  }
+
+  void handleTaskRunnerStateChange() {
+    switch (taskRunner.state) {
+      case TaskRunnerState.ready:
+        state = BenchmarkStateEnum.ready;
+        break;
+      case TaskRunnerState.running:
+        state = BenchmarkStateEnum.running;
+        break;
+      case TaskRunnerState.aborting:
+        state = BenchmarkStateEnum.aborting;
+        break;
+      default:
+        throw 'unsupported state';
+    }
   }
 
   Future<void> clearCache() async {
@@ -137,7 +153,6 @@ class BenchmarkState extends ChangeNotifier {
     _taskListManager.setAppConfig(_configManager.currentConfig);
     _taskListManager.taskList.restoreSelection(
         BenchmarkList.deserializeTaskSelection(_store.taskSelection));
-    restoreLastResult();
     deferredLoadResources();
   }
 
@@ -172,8 +187,6 @@ class BenchmarkState extends ChangeNotifier {
       if (currentLogDir.isNotEmpty && !_store.keepLogs) {
         await Directory(currentLogDir).delete(recursive: true);
       }
-
-      taskRunner.aborting = false;
 
       notifyListeners();
 

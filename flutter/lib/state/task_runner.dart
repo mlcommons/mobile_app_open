@@ -37,6 +37,12 @@ class ProgressInfo {
   double Function()? calculateStageProgress;
 }
 
+enum TaskRunnerState {
+  ready,
+  running,
+  aborting,
+}
+
 class TaskRunner {
   final Store store;
   final ResourceManager resourceManager;
@@ -46,7 +52,7 @@ class TaskRunner {
   void Function()? notifyListeners;
 
   ProgressInfo progressInfo = ProgressInfo();
-  bool aborting = false;
+  TaskRunnerState state = TaskRunnerState.ready;
   Future<void> _cooldownFuture = Future.value();
 
   TaskRunner({
@@ -78,16 +84,18 @@ class TaskRunner {
   }
 
   Future<void> abortBenchmarks() async {
-    aborting = true;
+    state = TaskRunnerState.aborting;
     await CancelableOperation.fromFuture(_cooldownFuture).cancel();
     notifyListeners?.call();
   }
 
   Future<ExtendedResult?> runBenchmarks(
       BenchmarkList middle, String currentLogDir) async {
+    state = TaskRunnerState.running;
+
     final cooldown = store.cooldown;
     final cooldownPause = store.testMode || isFastMode
-        ? const Duration(seconds: 1)
+        ? const Duration(seconds: 10)
         : Duration(minutes: store.cooldownDuration);
 
     final activeBenchmarks =
@@ -109,7 +117,7 @@ class TaskRunner {
       // increment counter for performance benchmark before cooldown
       progressInfo.currentStage++;
 
-      if (aborting) break;
+      if (state == TaskRunnerState.aborting) break;
 
       // we only do cooldown before performance benchmarks
       if (cooldown && !first) {
@@ -124,7 +132,7 @@ class TaskRunner {
         timer.stop();
       }
       first = false;
-      if (aborting) break;
+      if (state == TaskRunnerState.aborting) break;
 
       final perfTimer = Stopwatch()..start();
       progressInfo.accuracy = false;
@@ -157,7 +165,7 @@ class TaskRunner {
       perfTimer.stop();
       performanceRunInfo.loadgenInfo!;
 
-      if (aborting) break;
+      if (state == TaskRunnerState.aborting) break;
 
       RunInfo? accuracyRunInfo;
 
@@ -198,10 +206,11 @@ class TaskRunner {
       ));
     }
 
-    if (aborting) {
-      aborting = false;
+    if (state == TaskRunnerState.aborting) {
+      state = TaskRunnerState.ready;
       return null;
     }
+    state = TaskRunnerState.ready;
     return ExtendedResult(
       meta: ResultMetaInfo(uuid: const Uuid().v4()),
       environmentInfo: DeviceInfo.instance.envInfo,
