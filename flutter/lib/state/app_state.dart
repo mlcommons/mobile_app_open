@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 
 import 'package:wakelock/wakelock.dart';
 
-import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
@@ -25,32 +24,34 @@ enum AppStateEnum {
 }
 
 class AppStateHelper {
-  final Store _store;
-  final TaskListManager _taskListManager;
-  final ResourceManager _resourceManager;
-  final ConfigManager _configManager;
+  final Store store;
+  final TaskListManager taskListManager;
+  final ResourceManager resourceManager;
+  final ConfigManager configManager;
   final TaskRunner taskRunner;
-  final LastResultManager _lastResultManager;
+  final LastResultManager lastResultManager;
 
-  AppStateHelper(
-    this._store,
-    this._taskListManager,
-    this._resourceManager,
-    this._configManager,
-    this.taskRunner,
-    this._lastResultManager,
-  );
+  AppStateHelper({
+    required this.store,
+    required this.taskListManager,
+    required this.resourceManager,
+    required this.configManager,
+    required this.taskRunner,
+    required this.lastResultManager,
+  });
 
   Future<void> _loadResources() async {
+    // TODO refactor this method
+
     final newAppVersion =
         '${BuildInfoHelper.info.version}+${BuildInfoHelper.info.buildNumber}';
-    var needToPurgeCache = _store.previousAppVersion != newAppVersion;
-    _store.previousAppVersion = newAppVersion;
+    var needToPurgeCache = store.previousAppVersion != newAppVersion;
+    store.previousAppVersion = newAppVersion;
 
     await Wakelock.enable();
     print('start loading resources');
-    await _resourceManager.handleResources(
-      _taskListManager.taskList.listResources(
+    await resourceManager.handleResources(
+      taskListManager.taskList.listResources(
         modes: [taskRunner.perfMode, taskRunner.accuracyMode],
         skipInactive: false,
       ),
@@ -62,25 +63,25 @@ class AppStateHelper {
 
   Future<void> _runTasks() async {
     // we want last result to be null in case an exception is thrown
-    _lastResultManager.value = null;
+    lastResultManager.value = null;
 
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
 
     final startTime = DateTime.now();
     final logDirName = startTime.toIso8601String().replaceAll(':', '-');
-    final currentLogDir = '${_resourceManager.resourceDir}/logs/$logDirName';
+    final currentLogDir = '${resourceManager.resourceDir}/logs/$logDirName';
 
     try {
       final res = await taskRunner.runBenchmarks(
-          _taskListManager.taskList, currentLogDir);
+          taskListManager.taskList, currentLogDir);
       if (res != null) {
-        _lastResultManager.value = res;
-        await _resourceManager.resultManager.addResult(res);
+        lastResultManager.value = res;
+        await resourceManager.resultManager.addResult(res);
       }
       print('Benchmarks finished');
     } finally {
-      if (currentLogDir.isNotEmpty && !_store.keepLogs) {
+      if (currentLogDir.isNotEmpty && !store.keepLogs) {
         await Directory(currentLogDir).delete(recursive: true);
       }
 
@@ -103,8 +104,8 @@ class AppState extends ChangeNotifier {
   // TODO move this out of AppState class
   ValidationHelper get validator {
     return ValidationHelper(
-      resourceManager: _helper._resourceManager,
-      middle: _helper._taskListManager.taskList,
+      resourceManager: _helper.resourceManager,
+      middle: _helper.taskListManager.taskList,
       selectedRunModes: _helper.taskRunner.selectedRunModes,
     );
   }
@@ -116,10 +117,33 @@ class AppState extends ChangeNotifier {
     bindHelper();
   }
 
+  static Future<AppState> create({
+    required AppStateHelper appStateHelper,
+  }) async {
+    final result = AppState(appStateHelper);
+    await result._tryRun(
+      () async => await result._helper.configManager
+          .setConfig(name: appStateHelper.store.chosenConfigurationName),
+      failedState: AppStateEnum.resourceError,
+    );
+
+    return result;
+  }
+
   void bindHelper() {
-    _helper._resourceManager.setUpdateNotifier(notifyListeners);
-    _helper._configManager.setUpdateNotifier(_onConfigChange);
+    _helper.resourceManager.setUpdateNotifier(notifyListeners);
+    _helper.configManager.setUpdateNotifier(_onConfigChange);
     _helper.taskRunner.setUpdateNotifier(_handleTaskRunnerStateChange);
+  }
+
+  void _onConfigChange() {
+    _helper.store.chosenConfigurationName =
+        _helper.configManager.currentConfigName;
+
+    _helper.taskListManager.setAppConfig(_helper.configManager.currentConfig);
+    _helper.taskListManager.taskList.restoreSelection(
+        BenchmarkList.deserializeTaskSelection(_helper.store.taskSelection));
+    startLoadingResources();
   }
 
   void _handleTaskRunnerStateChange() {
@@ -141,10 +165,9 @@ class AppState extends ChangeNotifier {
   void clearCache() async {
     await _tryRun(
       () async {
-        await _helper._resourceManager.cacheManager
-            .deleteLoadedResources([], 0);
-        await _helper._configManager
-            .setConfig(name: _helper._store.chosenConfigurationName);
+        await _helper.resourceManager.cacheManager.deleteLoadedResources([], 0);
+        await _helper.configManager
+            .setConfig(name: _helper.store.chosenConfigurationName);
       },
       failedState: AppStateEnum.resourceError,
     );
@@ -161,43 +184,6 @@ class AppState extends ChangeNotifier {
       },
       failedState: AppStateEnum.resourceError,
     );
-  }
-
-  static Future<AppState> create({
-    required Store store,
-    required BridgeIsolate bridgeIsolate,
-    required TaskListManager taskListManager,
-    required ResourceManager resourceManager,
-    required ConfigManager configManager,
-    required TaskRunner taskRunner,
-    required LastResultManager lastResultManager,
-  }) async {
-    final appStateHelper = AppStateHelper(
-      store,
-      taskListManager,
-      resourceManager,
-      configManager,
-      taskRunner,
-      lastResultManager,
-    );
-    final result = AppState(appStateHelper);
-    await result._tryRun(
-      () async => await result._helper._configManager
-          .setConfig(name: store.chosenConfigurationName),
-      failedState: AppStateEnum.resourceError,
-    );
-
-    return result;
-  }
-
-  void _onConfigChange() {
-    _helper._store.chosenConfigurationName =
-        _helper._configManager.currentConfigName;
-
-    _helper._taskListManager.setAppConfig(_helper._configManager.currentConfig);
-    _helper._taskListManager.taskList.restoreSelection(
-        BenchmarkList.deserializeTaskSelection(_helper._store.taskSelection));
-    startLoadingResources();
   }
 
   void startBenchmark() async {

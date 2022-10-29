@@ -79,14 +79,17 @@ Future<void> launchUi() async {
   final taskListManager = TaskListManager(
     backendSettings: backendInfo.settings,
   );
-  final benchmarkState = await AppState.create(
+
+  final appStateHelper = AppStateHelper(
     store: store,
-    bridgeIsolate: bridgeIsolate,
     taskListManager: taskListManager,
     resourceManager: resourceManager,
     configManager: configManager,
     taskRunner: taskRunner,
     lastResultManager: lastResultManager,
+  );
+  final benchmarkState = await AppState.create(
+    appStateHelper: appStateHelper,
   );
 
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
