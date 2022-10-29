@@ -24,7 +24,7 @@ enum AppStateEnum {
   aborting,
 }
 
-class AppState extends ChangeNotifier {
+class AppStateHelper {
   final Store _store;
   final TaskListManager _taskListManager;
   final ResourceManager _resourceManager;
@@ -32,74 +32,14 @@ class AppState extends ChangeNotifier {
   final TaskRunner taskRunner;
   final LastResultManager _lastResultManager;
 
-  Object? pendingError;
-
-  AppStateEnum _state = AppStateEnum.downloading;
-  AppStateEnum get state => _state;
-  set state(AppStateEnum value) {
-    _state = value;
-    notifyListeners();
-  }
-
-  ValidationHelper get validator {
-    return ValidationHelper(
-      resourceManager: _resourceManager,
-      middle: _taskListManager.taskList,
-      selectedRunModes: taskRunner.selectedRunModes,
-    );
-  }
-
-  AppState(
+  AppStateHelper(
     this._store,
     this._taskListManager,
     this._resourceManager,
     this._configManager,
     this.taskRunner,
     this._lastResultManager,
-  ) {
-    _resourceManager.setUpdateNotifier(notifyListeners);
-    _configManager.setUpdateNotifier(_onConfigChange);
-    taskRunner.setUpdateNotifier(_handleTaskRunnerStateChange);
-  }
-
-  void _handleTaskRunnerStateChange() {
-    switch (taskRunner.state) {
-      case TaskRunnerState.ready:
-        state = AppStateEnum.ready;
-        break;
-      case TaskRunnerState.running:
-        state = AppStateEnum.running;
-        break;
-      case TaskRunnerState.aborting:
-        state = AppStateEnum.aborting;
-        break;
-      default:
-        throw 'unsupported state';
-    }
-  }
-
-  void clearCache() async {
-    await _tryRun(
-      () async {
-        await _resourceManager.cacheManager.deleteLoadedResources([], 0);
-        await _configManager.setConfig(name: _store.chosenConfigurationName);
-      },
-      failedState: AppStateEnum.resourceError,
-    );
-  }
-
-  // Start loading resources in background.
-  // Return type 'void' is intended, this function must not be awaited.
-  void startLoadingResources() async {
-    await _tryRun(
-      () async {
-        state = AppStateEnum.downloading;
-        await _loadResources();
-        state = AppStateEnum.ready;
-      },
-      failedState: AppStateEnum.resourceError,
-    );
-  }
+  );
 
   Future<void> _loadResources() async {
     final newAppVersion =
@@ -120,56 +60,9 @@ class AppState extends ChangeNotifier {
     await Wakelock.disable();
   }
 
-  static Future<AppState> create({
-    required Store store,
-    required BridgeIsolate bridgeIsolate,
-    required TaskListManager taskListManager,
-    required ResourceManager resourceManager,
-    required ConfigManager configManager,
-    required TaskRunner taskRunner,
-    required LastResultManager lastResultManager,
-  }) async {
-    final result = AppState(
-      store,
-      taskListManager,
-      resourceManager,
-      configManager,
-      taskRunner,
-      lastResultManager,
-    );
-    await result._tryRun(
-      () async => await result._configManager
-          .setConfig(name: store.chosenConfigurationName),
-      failedState: AppStateEnum.resourceError,
-    );
-
-    return result;
-  }
-
-  void _onConfigChange() {
-    _store.chosenConfigurationName = _configManager.currentConfigName;
-
-    _taskListManager.setAppConfig(_configManager.currentConfig);
-    _taskListManager.taskList.restoreSelection(
-        BenchmarkList.deserializeTaskSelection(_store.taskSelection));
-    startLoadingResources();
-  }
-
-  void startBenchmark() async {
-    await _tryRun(
-      _runTasks,
-      failedState: AppStateEnum.ready,
-    );
-  }
-
   Future<void> _runTasks() async {
     // we want last result to be null in case an exception is thrown
     _lastResultManager.value = null;
-
-    if (state != AppStateEnum.ready) {
-      throw 'app state != ready';
-    }
-    state = AppStateEnum.running;
 
     // disable screen sleep when benchmarks is running
     await Wakelock.enable();
@@ -186,8 +79,6 @@ class AppState extends ChangeNotifier {
         await _resourceManager.resultManager.addResult(res);
       }
       print('Benchmarks finished');
-
-      state = AppStateEnum.ready;
     } finally {
       if (currentLogDir.isNotEmpty && !_store.keepLogs) {
         await Directory(currentLogDir).delete(recursive: true);
@@ -195,6 +86,132 @@ class AppState extends ChangeNotifier {
 
       await Wakelock.disable();
     }
+  }
+}
+
+class AppState extends ChangeNotifier {
+  final AppStateHelper _helper;
+  Object? pendingError;
+
+  AppStateEnum _state = AppStateEnum.downloading;
+  AppStateEnum get state => _state;
+  set state(AppStateEnum value) {
+    _state = value;
+    notifyListeners();
+  }
+
+  // TODO move this out of AppState class
+  ValidationHelper get validator {
+    return ValidationHelper(
+      resourceManager: _helper._resourceManager,
+      middle: _helper._taskListManager.taskList,
+      selectedRunModes: _helper.taskRunner.selectedRunModes,
+    );
+  }
+
+  // TODO access task runner through context instead of this getter
+  TaskRunner get taskRunner => _helper.taskRunner;
+
+  AppState(this._helper) {
+    bindHelper();
+  }
+
+  void bindHelper() {
+    _helper._resourceManager.setUpdateNotifier(notifyListeners);
+    _helper._configManager.setUpdateNotifier(_onConfigChange);
+    _helper.taskRunner.setUpdateNotifier(_handleTaskRunnerStateChange);
+  }
+
+  void _handleTaskRunnerStateChange() {
+    switch (_helper.taskRunner.state) {
+      case TaskRunnerState.ready:
+        state = AppStateEnum.ready;
+        break;
+      case TaskRunnerState.running:
+        state = AppStateEnum.running;
+        break;
+      case TaskRunnerState.aborting:
+        state = AppStateEnum.aborting;
+        break;
+      default:
+        throw 'unsupported state';
+    }
+  }
+
+  void clearCache() async {
+    await _tryRun(
+      () async {
+        await _helper._resourceManager.cacheManager
+            .deleteLoadedResources([], 0);
+        await _helper._configManager
+            .setConfig(name: _helper._store.chosenConfigurationName);
+      },
+      failedState: AppStateEnum.resourceError,
+    );
+  }
+
+  // Start loading resources in background.
+  // Return type 'void' is intended, this function must not be awaited.
+  void startLoadingResources() async {
+    await _tryRun(
+      () async {
+        state = AppStateEnum.downloading;
+        await _helper._loadResources();
+        state = AppStateEnum.ready;
+      },
+      failedState: AppStateEnum.resourceError,
+    );
+  }
+
+  static Future<AppState> create({
+    required Store store,
+    required BridgeIsolate bridgeIsolate,
+    required TaskListManager taskListManager,
+    required ResourceManager resourceManager,
+    required ConfigManager configManager,
+    required TaskRunner taskRunner,
+    required LastResultManager lastResultManager,
+  }) async {
+    final appStateHelper = AppStateHelper(
+      store,
+      taskListManager,
+      resourceManager,
+      configManager,
+      taskRunner,
+      lastResultManager,
+    );
+    final result = AppState(appStateHelper);
+    await result._tryRun(
+      () async => await result._helper._configManager
+          .setConfig(name: store.chosenConfigurationName),
+      failedState: AppStateEnum.resourceError,
+    );
+
+    return result;
+  }
+
+  void _onConfigChange() {
+    _helper._store.chosenConfigurationName =
+        _helper._configManager.currentConfigName;
+
+    _helper._taskListManager.setAppConfig(_helper._configManager.currentConfig);
+    _helper._taskListManager.taskList.restoreSelection(
+        BenchmarkList.deserializeTaskSelection(_helper._store.taskSelection));
+    startLoadingResources();
+  }
+
+  void startBenchmark() async {
+    await _tryRun(
+      () async {
+        if (state != AppStateEnum.ready) {
+          throw 'app state != ready';
+        }
+        state = AppStateEnum.running;
+        await _helper._runTasks();
+        state = AppStateEnum.ready;
+      },
+      failedState: AppStateEnum.ready,
+    );
   }
 
   // this function catches all exceptions and saves them
