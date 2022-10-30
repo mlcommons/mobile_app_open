@@ -64,7 +64,12 @@ class ConfigManager {
   }
 
   Future<void> initConfigList() async {
-    configList = await readConfigList(_defaultConfigFile);
+    try {
+      configList = await readConfigList(_defaultConfigFile);
+    } catch (e, t) {
+      print('error while reading config list: $e');
+      print(t);
+    }
 
     if (configList[defaultConfig.name] == null ||
         configList[defaultConfig.name]!.path != defaultConfig.path) {
@@ -80,6 +85,9 @@ class ConfigManager {
   static Future<Map<String, TaskConfigDescription>> readConfigList(
       String configFile) async {
     final file = File(configFile);
+    if (!await file.exists()) {
+      return {};
+    }
     final jsonContent =
         jsonDecode(await file.readAsString()) as Map<String, dynamic>;
 
