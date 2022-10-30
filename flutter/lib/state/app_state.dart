@@ -90,16 +90,24 @@ class AppStateHelper {
   }
 }
 
-// All public methods in AppState should use the following structure:
+// All methods in AppState should have the following properties:
+//   - Public methods: return type `void`, public methods must not be awaited
+//   - Public methods: exceptions are never thrown
+//   - All methods: notifyListeners() call outside of `state` setter is forbidden
+//   - All methods: if notifyListeners() is needed when `state` field doesn't change,
+//        the class that contains the data that requires UI update should implement ChangeNotifier instead
+//   - All methods: complex logic should be moved to other classes, methods in AppState should only manage `state`
+//
+// Any methods or getters that don't satisfy these requirements should be subject to refactoring.
+//
+// Suggested code structure that satisfies this:
 // void method() <possibly async> {
 // _tryRun(() {
+//    <change state field>;
 //    <invoke AppStateHelper methods>;
 //    <change state field>;
 // }, failedState: <something>);
 // }
-// All public methods should not be awaited. State updates should be done in next widget tree rebuilds.
-// AppState itself should only manage its `state` field, everything else should be in other classes.
-// Any other public methods or getters should be removed in refactoring.
 class AppState extends ChangeNotifier {
   final AppStateHelper _helper;
   Object? pendingError;
@@ -111,7 +119,7 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // TODO move this out of AppState class
+  // TODO move this out of the AppState class
   ValidationHelper get validator {
     return ValidationHelper(
       resourceManager: _helper.resourceManager,
@@ -120,11 +128,11 @@ class AppState extends ChangeNotifier {
     );
   }
 
-  // TODO access task runner through context instead of this getter
+  // TODO provide task runner through context instead of this getter
   TaskRunner get taskRunner => _helper.taskRunner;
 
   AppState(this._helper) {
-    bindHelper();
+    bindCallbacks();
   }
 
   static Future<AppState> create({
@@ -140,7 +148,7 @@ class AppState extends ChangeNotifier {
     return result;
   }
 
-  void bindHelper() {
+  void bindCallbacks() {
     _helper.resourceManager.setUpdateNotifier(notifyListeners);
     _helper.configManager.setUpdateNotifier(_onConfigChange);
     _helper.taskRunner.setUpdateNotifier(_handleTaskRunnerStateChange);
@@ -183,8 +191,6 @@ class AppState extends ChangeNotifier {
     );
   }
 
-  // Start loading resources in background.
-  // Return type 'void' is intended, this function must not be awaited.
   void startLoadingResources() async {
     await _tryRun(
       () async {
@@ -210,7 +216,7 @@ class AppState extends ChangeNotifier {
     );
   }
 
-  // this function catches all exceptions and saves them
+  // catches all exceptions and saves them to show in UI
   Future<void> _tryRun(
     Future Function() action, {
     required AppStateEnum failedState,
