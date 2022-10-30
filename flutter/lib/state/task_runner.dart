@@ -113,7 +113,7 @@ class TaskRunner {
       if (aborting) break;
 
       // we only do cooldown before performance benchmarks
-      if (cooldown && !first && cooldownDuration.inMilliseconds != 0) {
+      if (cooldown && !first && cooldownDuration.inMilliseconds > 0) {
         progressInfo.cooldown = true;
         final timer = Stopwatch()..start();
         progressInfo.calculateStageProgress = () {

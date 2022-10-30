@@ -27,7 +27,7 @@ void main() {
   if (enablePerfTest) {
     prefs[StoreConstants.testMinDuration] = 15;
     prefs[StoreConstants.testMinQueryCount] = 64;
-    prefs[StoreConstants.testCooldown] = 10;
+    prefs[StoreConstants.testCooldownDuration] = 10;
   }
   SharedPreferences.setMockInitialValues(prefs);
 
@@ -58,7 +58,7 @@ void checkTasks(ExtendedResult extendedResults) {
 
     checkAccuracy(benchmarkResult);
     if (enablePerfTest) {
-      checkPerformance(benchmarkResult, extendedResults.environmentInfo);
+      checkThroughput(benchmarkResult, extendedResults.environmentInfo);
     }
   }
 }
@@ -102,7 +102,7 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   );
 }
 
-String getModel(EnvironmentInfo info) {
+String getDeviceModel(EnvironmentInfo info) {
   switch (info.platform) {
     case EnvPlatform.android:
       final value = info.value.android!;
@@ -118,7 +118,7 @@ String getModel(EnvironmentInfo info) {
   }
 }
 
-void checkPerformance(
+void checkThroughput(
   BenchmarkExportResult benchmarkResult,
   EnvironmentInfo environmentInfo,
 ) {
@@ -131,7 +131,7 @@ void checkPerformance(
   );
   expectedMap!;
 
-  final model = getModel(environmentInfo);
+  final model = getDeviceModel(environmentInfo);
   final deviceExpectedMap = expectedMap[model];
   expect(
     deviceExpectedMap,
