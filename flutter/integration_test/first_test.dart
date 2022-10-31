@@ -7,7 +7,7 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'expected_accuracy.dart';
-import 'expected_performance.dart';
+import 'expected_throughput.dart';
 import 'utils.dart';
 
 const enablePerfTest = bool.fromEnvironment(
@@ -152,31 +152,16 @@ void checkThroughput(
   final run = benchmarkResult.performanceRun;
   run!;
 
-  final deviceExpectedInstability = expectedInstabilityMap[model];
-  expect(
-    deviceExpectedInstability,
-    isNotNull,
-    reason: 'missing expected instability for $model',
-  );
-  deviceExpectedInstability!;
-  final expectedInstability = deviceExpectedInstability[backendTag];
-  expect(
-    expectedInstability,
-    isNotNull,
-    reason: 'missing expected instability for $model+$backendTag',
-  );
-  expectedInstability!;
-
   final value = run.throughput;
   value!;
   expect(
     value,
-    greaterThanOrEqualTo(expectedPerf / expectedInstability),
+    greaterThanOrEqualTo(expectedPerf.mean / expectedPerf.deviation),
     reason: 'performance for $taskId+$model+$backendTag is too low',
   );
   expect(
     value,
-    lessThanOrEqualTo(expectedPerf * expectedInstability),
+    lessThanOrEqualTo(expectedPerf.mean * expectedPerf.deviation),
     reason: 'performance for $taskId+$model+$backendTag is too high',
   );
 }
