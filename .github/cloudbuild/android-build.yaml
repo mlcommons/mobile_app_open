@@ -92,6 +92,7 @@ steps:
       - FLUTTER_ANDROID_APK_RELEASE=mlperfbench-t-$SHORT_SHA.apk
       - FLUTTER_ANDROID_APK_TEST_MAIN=test-main-t-$SHORT_SHA.apk
       - FLUTTER_ANDROID_APK_TEST_HELPER=test-helper-t-$SHORT_SHA.apk
+      - PERF_TEST=false
     args:
       - -xc
       - |
@@ -123,6 +124,7 @@ steps:
       - FLUTTER_ANDROID_APK_TEST_HELPER=test-helper-p-$SHORT_SHA.apk
       - WITH_TFLITE=0
       - WITH_PIXEL=1
+      - PERF_TEST=false
     args:
       - -xc
       - |

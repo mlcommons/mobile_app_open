@@ -98,9 +98,14 @@ class TaskRunner {
     state = TaskRunnerState.running;
 
     final cooldown = store.cooldown;
-    final cooldownPause = store.testMode || isFastMode
-        ? const Duration(seconds: 1)
-        : Duration(minutes: store.cooldownDuration);
+    late final Duration cooldownDuration;
+    if (store.testMode) {
+      cooldownDuration = Duration(seconds: store.testCooldown);
+    } else if (isFastMode) {
+      cooldownDuration = const Duration(seconds: 1);
+    } else {
+      cooldownDuration = Duration(minutes: store.cooldownDuration);
+    }
 
     final activeBenchmarks =
         middle.benchmarks.where((element) => element.isActive);
@@ -113,7 +118,7 @@ class TaskRunner {
       progressInfo.totalStages += activeBenchmarks.length;
     }
     progressInfo.currentStage = 0;
-    progressInfo.cooldownDuration = cooldownPause.inSeconds.toDouble();
+    progressInfo.cooldownDuration = cooldownDuration.inSeconds.toDouble();
 
     for (final benchmark in activeBenchmarks) {
       progressInfo.info = benchmark.info;
@@ -124,14 +129,14 @@ class TaskRunner {
       if (state == TaskRunnerState.aborting) break;
 
       // we only do cooldown before performance benchmarks
-      if (cooldown && !first) {
+      if (cooldown && !first && cooldownDuration.inMilliseconds > 0) {
         progressInfo.cooldown = true;
         final timer = Stopwatch()..start();
         progressInfo.calculateStageProgress = () {
           return timer.elapsed.inSeconds / progressInfo.cooldownDuration;
         };
         notifyListeners?.call();
-        await (_cooldownFuture = Future.delayed(cooldownPause));
+        await (_cooldownFuture = Future.delayed(cooldownDuration));
         progressInfo.cooldown = false;
         timer.stop();
       }
@@ -165,6 +170,8 @@ class TaskRunner {
         commonSettings: backendInfo.settings.commonSetting,
         backendLibName: backendInfo.libName,
         logParentDir: currentLogDir,
+        testMinQueryCount: store.testMinQueryCount,
+        testMinDuration: store.testMinDuration,
       ).run();
       perfTimer.stop();
       performanceRunInfo.loadgenInfo!;
@@ -194,6 +201,8 @@ class TaskRunner {
           commonSettings: backendInfo.settings.commonSetting,
           backendLibName: backendInfo.libName,
           logParentDir: currentLogDir,
+          testMinQueryCount: store.testMinQueryCount,
+          testMinDuration: store.testMinDuration,
         ).run();
       }
 
@@ -243,6 +252,8 @@ class _NativeRunHelper {
     required List<pb.Setting> commonSettings,
     required String backendLibName,
     required String logParentDir,
+    required int testMinQueryCount,
+    required int testMinDuration,
   }) : logDir = '$logParentDir/${benchmark.id}-${runMode.logSuffix}' {
     runSettings = benchmark.createRunSettings(
       runMode: runMode,
@@ -250,7 +261,8 @@ class _NativeRunHelper {
       commonSettings: commonSettings,
       backendLibName: backendLibName,
       logDir: logDir,
-      isTestMode: isTestMode,
+      testMinQueryCount: testMinQueryCount,
+      testMinDuration: testMinDuration,
     );
   }
 
