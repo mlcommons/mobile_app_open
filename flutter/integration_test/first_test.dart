@@ -77,7 +77,7 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   final expectedValue =
       expectedMap['$accelerator|$backendName'] ?? expectedMap[accelerator];
   final tag =
-      '${benchmarkResult.benchmarkId} [accelerator: $accelerator | backendName: $backendName]';
+      '[benchmarkId: ${benchmarkResult.benchmarkId} | accelerator: $accelerator | backendName: $backendName]';
   expect(
     expectedValue,
     isNotNull,
@@ -122,32 +122,35 @@ void checkThroughput(
   BenchmarkExportResult benchmarkResult,
   EnvironmentInfo environmentInfo,
 ) {
-  final taskId = benchmarkResult.benchmarkId;
-  final expectedMap = taskExpectedPerformance[taskId];
+  final benchmarkId = benchmarkResult.benchmarkId;
+  var tag = 'benchmarkId: $benchmarkId';
+  final expectedMap = taskExpectedPerformance[benchmarkId];
   expect(
     expectedMap,
     isNotNull,
-    reason: 'missing expected performance map for $taskId',
+    reason: 'missing expected throughput map for [$tag]',
   );
   expectedMap!;
 
   final model = getDeviceModel(environmentInfo);
+  tag += ' | model: $model';
   final deviceExpectedMap = expectedMap[model];
   expect(
     deviceExpectedMap,
     isNotNull,
-    reason: 'missing expected performance for $taskId+$model',
+    reason: 'missing expected throughput for [$tag]',
   );
   deviceExpectedMap!;
 
   final backendTag = benchmarkResult.backendInfo.filename;
-  final expectedPerf = deviceExpectedMap[backendTag];
+  tag += ' | backendTag: $backendTag';
+  final expectedThroughput = deviceExpectedMap[backendTag];
   expect(
-    expectedPerf,
+    expectedThroughput,
     isNotNull,
-    reason: 'missing expected performance for $taskId+$model+$backendTag',
+    reason: 'missing expected throughput for [$tag]',
   );
-  expectedPerf!;
+  expectedThroughput!;
 
   final run = benchmarkResult.performanceRun;
   run!;
@@ -157,11 +160,11 @@ void checkThroughput(
   expect(
     value,
     greaterThanOrEqualTo(expectedThroughput.min),
-    reason: 'throughput for $tag is too low',
+    reason: 'throughput for [$tag] is too low',
   );
   expect(
     value,
     lessThanOrEqualTo(expectedThroughput.max),
-    reason: 'throughput for $tag is too high',
+    reason: 'throughput for [$tag] is too high',
   );
 }
