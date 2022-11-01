@@ -10,6 +10,13 @@ import 'package:mlperfbench/resources/resource_manager.dart'
     as resource_manager;
 import 'package:mlperfbench/main.dart' as app;
 
+class Interval {
+  final double min;
+  final double max;
+
+  const Interval({required this.min, required this.max});
+}
+
 Future<void> runBenchmark(WidgetTester tester) async {
   const splashPauseSeconds = 4;
   const runTimeLimitMinutes = 20;

@@ -156,12 +156,12 @@ void checkThroughput(
   value!;
   expect(
     value,
-    greaterThanOrEqualTo(expectedPerf.mean / expectedPerf.deviation),
-    reason: 'performance for $taskId+$model+$backendTag is too low',
+    greaterThanOrEqualTo(expectedThroughput.min),
+    reason: 'throughput for $tag is too low',
   );
   expect(
     value,
-    lessThanOrEqualTo(expectedPerf.mean * expectedPerf.deviation),
-    reason: 'performance for $taskId+$model+$backendTag is too high',
+    lessThanOrEqualTo(expectedThroughput.max),
+    reason: 'throughput for $tag is too high',
   );
 }
