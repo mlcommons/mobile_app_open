@@ -15,7 +15,7 @@ const _tagPixel5 = 'Pixel 5';
 const _tagPixel6 = 'Pixel 6';
 
 // iOS
-const _tagIphone12mini = 'iPhone13,1';
+const _tagIphoneOnGitHubAction = 'iPhone15,3';
 const _tagIosSimMBP2019 = 'x86_64';
 
 const Map<String, Map<String, Interval>> _imageClassification = {
@@ -34,7 +34,7 @@ const Map<String, Map<String, Interval>> _imageClassification = {
   _tagPixel6: {
     _tagPixelSo: Interval(min: 900, max: 1100),
   },
-  _tagIphone12mini: {
+  _tagIphoneOnGitHubAction: {
     _tagTflite: Interval(min: 550, max: 750),
     _tagCoreml: Interval(min: 450, max: 650),
   },
@@ -59,7 +59,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   _tagPixel6: {
     _tagPixelSo: Interval(min: 380, max: 490),
   },
-  _tagIphone12mini: {
+  _tagIphoneOnGitHubAction: {
     _tagTflite: Interval(min: 200, max: 300),
     _tagCoreml: Interval(min: 250, max: 350),
   },
@@ -82,7 +82,7 @@ const Map<String, Map<String, Interval>> _imageSegmentation = {
   _tagPixel6: {
     _tagPixelSo: Interval(min: 140, max: 180),
   },
-  _tagIphone12mini: {
+  _tagIphoneOnGitHubAction: {
     _tagTflite: Interval(min: 18, max: 26),
     _tagCoreml: Interval(min: 60, max: 90),
   },
@@ -107,7 +107,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   _tagPixel6: {
     _tagPixelSo: Interval(min: 60, max: 75),
   },
-  _tagIphone12mini: {
+  _tagIphoneOnGitHubAction: {
     _tagTflite: Interval(min: 9, max: 15),
     _tagCoreml: Interval(min: 65, max: 95),
   },
@@ -132,7 +132,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
   _tagPixel6: {
     _tagPixelSo: Interval(min: 1400, max: 1700),
   },
-  _tagIphone12mini: {
+  _tagIphoneOnGitHubAction: {
     _tagTflite: Interval(min: 1300, max: 1900),
     _tagCoreml: Interval(min: 1000, max: 1500),
   },
