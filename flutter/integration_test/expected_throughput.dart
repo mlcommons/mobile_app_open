@@ -141,7 +141,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
   },
 };
 
-const taskExpectedPerformance = {
+const benchmarkExpectedThroughput = {
   'image_classification': _imageClassification,
   'object_detection': _objectDetection,
   'image_segmentation_v2': _imageSegmentation,

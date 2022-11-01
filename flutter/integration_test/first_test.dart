@@ -124,7 +124,7 @@ void checkThroughput(
 ) {
   final benchmarkId = benchmarkResult.benchmarkId;
   var tag = 'benchmarkId: $benchmarkId';
-  final expectedMap = taskExpectedPerformance[benchmarkId];
+  final expectedMap = benchmarkExpectedThroughput[benchmarkId];
   expect(
     expectedMap,
     isNotNull,
@@ -132,9 +132,9 @@ void checkThroughput(
   );
   expectedMap!;
 
-  final model = getDeviceModel(environmentInfo);
-  tag += ' | model: $model';
-  final deviceExpectedMap = expectedMap[model];
+  final deviceModel = getDeviceModel(environmentInfo);
+  tag += ' | deviceModel: $deviceModel';
+  final deviceExpectedMap = expectedMap[deviceModel];
   expect(
     deviceExpectedMap,
     isNotNull,
