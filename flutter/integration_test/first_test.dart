@@ -132,19 +132,19 @@ void checkThroughput(
   );
   expectedMap!;
 
-  final deviceModel = getDeviceModel(environmentInfo);
-  tag += ' | deviceModel: $deviceModel';
-  final deviceExpectedMap = expectedMap[deviceModel];
+  final backendTag = benchmarkResult.backendInfo.filename;
+  tag += ' | backendTag: $backendTag';
+  final backendExpectedMap = expectedMap[backendTag];
   expect(
-    deviceExpectedMap,
+    backendExpectedMap,
     isNotNull,
     reason: 'missing expected throughput for [$tag]',
   );
-  deviceExpectedMap!;
+  backendExpectedMap!;
 
-  final backendTag = benchmarkResult.backendInfo.filename;
-  tag += ' | backendTag: $backendTag';
-  final expectedThroughput = deviceExpectedMap[backendTag];
+  final deviceModel = getDeviceModel(environmentInfo);
+  tag += ' | deviceModel: $deviceModel';
+  final expectedThroughput = backendExpectedMap[deviceModel];
   expect(
     expectedThroughput,
     isNotNull,
