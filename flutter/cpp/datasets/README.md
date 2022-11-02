@@ -112,7 +112,7 @@ you need to replace `squad_eval_mini.tfrecord` by `squad_eval.tfrecord` in the
 3. Build command line tool to test performance and accuracy on x86 host
 
     ```shell
-    build  --cxxopt='--std=c++17' --host_cxxopt='--std=c++17' --copt=-march=native //cpp/binary:main
+    build  --cxxopt='--std=c++14' --host_cxxopt='--std=c++14' --copt=-march=native //cpp/binary:main
     ```
 
 4. test with the command line tool
@@ -178,7 +178,7 @@ On a x86 machine running Ubuntu 22.04,
 
 ```shell
 bazel build -c opt flutter/cpp/binary:main mobile_back_tflite:tflitebackend \
-  --host_cxxopt=-std=c++17 --cxxopt=-std=c++17 --copt=-march=native
+  --host_cxxopt=-std=c++14 --cxxopt=-std=c++14 --copt=-march=native
 ```
 
 assuming we have the model and images in right places,

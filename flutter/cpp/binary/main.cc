@@ -171,10 +171,10 @@ int Main(int argc, char *argv[]) {
           case DatasetConfig::ADE20K:
             benchmark_id = "image_segmentation_v1";
             break;
-          // Need to check this
           case DatasetConfig::SNUSR:
-            benchmark_id = "IS_uint8";
+            benchmark_id = "super_resolution";
             break;
+          // Need to check this
           case DatasetConfig::NONE:
           default:
             LOG(INFO) << "how come";
