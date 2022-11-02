@@ -66,6 +66,7 @@ SNUSR::SNUSR(Backend *backend, const std::string &image_dir,
   // Prepares the preprocessing stage.
   tflite::evaluation::ImagePreprocessingConfigBuilder builder(
       "image_preprocessing", DataType2TfType(input_format_.at(0).type));
+  builder.AddDefaultNormalizationStep();
   preprocessing_stage_.reset(
       new tflite::evaluation::ImagePreprocessingStage(builder.build()));
   if (preprocessing_stage_->Init() != kTfLiteOk) {
@@ -161,7 +162,7 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
       } else if (isOutputUint8) {
         p = outputUint8[i];
       } else {
-        p = (uint8_t)(0x000000ff & outputInt8[i]);
+        p = (uint8_t)(0x000000ff & (outputInt8[i] + 128));
       }
       mse += (ground_truth_vector[i] - p) * (ground_truth_vector[i] - p) * 1.0;
     }
