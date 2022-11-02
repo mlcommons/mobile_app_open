@@ -1,5 +1,10 @@
 import 'utils.dart';
 
+/*
+value: Interval of expected throughput
+key: model_code (Android or iOS) or cpuFullName (Windows)
+*/
+
 const _kTFLiteBackend = 'libtflitebackend';
 const _kPixelBackend = 'libtflitepixelbackend';
 const _kCoreMLBackend = 'libcoremlbackend';
