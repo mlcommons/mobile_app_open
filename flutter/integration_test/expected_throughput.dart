@@ -36,7 +36,7 @@ const Map<String, Map<String, Interval>> _imageClassification = {
     _kIphoneOnGitHubAction: Interval(min: 2, max: 7),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 900, max: 1100),
+    _kPixel6: Interval(min: 800, max: 1100),
   },
 };
 
@@ -53,7 +53,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kIphoneOnGitHubAction: Interval(min: 2, max: 7),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 380, max: 490),
+    _kPixel6: Interval(min: 300, max: 490),
   },
 };
 
@@ -70,7 +70,7 @@ const Map<String, Map<String, Interval>> _imageSegmentation = {
     _kIphoneOnGitHubAction: Interval(min: 0.5, max: 2),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 140, max: 180),
+    _kPixel6: Interval(min: 100, max: 180),
   },
 };
 
@@ -105,7 +105,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
     _kIphoneOnGitHubAction: Interval(min: 3, max: 15),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 1400, max: 1700),
+    _kPixel6: Interval(min: 1000, max: 1700),
   },
 };
 
