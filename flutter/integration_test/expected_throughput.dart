@@ -1,7 +1,7 @@
 import 'utils.dart';
 
 /*
-- value: Interval of expected throughput.
+- value: Interval of expected throughput
 - key: model_code (on Android or iOS) or cpuFullName (on Windows)
 */
 
