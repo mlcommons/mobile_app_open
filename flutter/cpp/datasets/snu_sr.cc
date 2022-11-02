@@ -66,7 +66,12 @@ SNUSR::SNUSR(Backend *backend, const std::string &image_dir,
   // Prepares the preprocessing stage.
   tflite::evaluation::ImagePreprocessingConfigBuilder builder(
       "image_preprocessing", DataType2TfType(input_format_.at(0).type));
-  builder.AddDefaultNormalizationStep();
+  // Only add noramlization layer for int8 input,
+  // floating point input expects data in [0.0, 255.0],
+  // uint8 input expects data in [0, 255]
+  if (input_format_.at(0).type == DataType::Int8) {
+    builder.AddDefaultNormalizationStep();
+  }
   preprocessing_stage_.reset(
       new tflite::evaluation::ImagePreprocessingStage(builder.build()));
   if (preprocessing_stage_->Init() != kTfLiteOk) {
