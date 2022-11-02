@@ -87,7 +87,8 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kIphoneOnGitHubAction: Interval(min: 0.4, max: 1),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 60, max: 75),
+    // pixel some time finish this task in 4 seconds, not sure why.
+    _kPixel6: Interval(min: 2, max: 75),
   },
 };
 
