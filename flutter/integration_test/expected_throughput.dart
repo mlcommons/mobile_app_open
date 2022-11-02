@@ -25,8 +25,8 @@ const _kIphoneOnMacbookM1 = 'iPhone14,7';
 
 const Map<String, Map<String, Interval>> _imageClassification = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 8, max: 11),
-    _kCloudBuildX28: Interval(min: 8, max: 12),
+    _kCloudBuildX23: Interval(min: 4, max: 11),
+    _kCloudBuildX28: Interval(min: 4, max: 12),
     _kRyzen5600: Interval(min: 31, max: 37),
     _kPixel5: Interval(min: 80, max: 120),
     _kIphoneOnGitHubAction: Interval(min: 550, max: 750),
@@ -59,7 +59,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
 
 const Map<String, Map<String, Interval>> _imageSegmentation = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 1, max: 3),
+    _kCloudBuildX23: Interval(min: 0.5, max: 3),
     _kCloudBuildX28: Interval(min: 0.5, max: 3),
     _kRyzen5600: Interval(min: 5, max: 7),
     _kPixel5: Interval(min: 25, max: 35),
@@ -93,8 +93,8 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
 
 const Map<String, Map<String, Interval>> _imageClassificationOffline = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 10, max: 14),
-    _kCloudBuildX28: Interval(min: 9, max: 14),
+    _kCloudBuildX23: Interval(min: 8, max: 14),
+    _kCloudBuildX28: Interval(min: 7, max: 14),
     _kRyzen5600: Interval(min: 45, max: 60),
     _kPixel5: Interval(min: 120, max: 180),
     _kIphoneOnGitHubAction: Interval(min: 1300, max: 1900),
