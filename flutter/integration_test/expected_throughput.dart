@@ -1,153 +1,115 @@
-const _tagTflite = 'libtflitebackend';
-const _tagPixelSo = 'libtflitepixelbackend';
-const _tagCoreml = 'libcoremlbackend';
+import 'utils.dart';
 
-/// Windows
-// cloudbuild n2-standard-4 machine
-const _tagCloudBuildX28 = 'Intel Xeon 2.80GHz';
-const _tagCloudBuildX23 = 'Intel Xeon 2.30GHz';
-const _tagRyzen5600 = 'AMD Ryzen 5 5600X 6-Core';
+/*
+value: Interval of expected throughput
+key: model_code (on Android or iOS) or cpuFullName (on Windows)
+*/
 
-const _tagPixel5 = 'Pixel 5';
-const _tagPixel6 = 'Pixel 6';
+const _kTFLiteBackend = 'libtflitebackend';
+const _kPixelBackend = 'libtflitepixelbackend';
+const _kCoreMLBackend = 'libcoremlbackend';
 
-const _tagIphone12mini = 'iPhone13,1';
-const _tagIosSimMBP2019 = 'x86_64';
+// Windows
+// Google Cloud Build n2-standard-4 machine
+const _kCloudBuildX23 = 'Intel Xeon 2.30GHz';
+const _kCloudBuildX28 = 'Intel Xeon 2.80GHz';
+const _kRyzen5600 = 'AMD Ryzen 5 5600X 6-Core';
 
-class ExpectedValue {
-  final double mean;
-  final double deviation;
+// Android
+const _kPixel5 = 'Pixel 5';
+const _kPixel6 = 'Pixel 6';
 
-  const ExpectedValue({
-    required this.mean,
-    required this.deviation,
-  });
-}
+// iOS
+const _kIphoneOnGitHubAction = 'iPhone15,3';
+const _kIphoneOnMacbookM1 = 'iPhone14,7';
 
-const Map<String, Map<String, ExpectedValue>> _imageClassification = {
-  _tagCloudBuildX23: {
-    _tagTflite: ExpectedValue(mean: 9.5, deviation: 1.15),
+const Map<String, Map<String, Interval>> _imageClassification = {
+  _kTFLiteBackend: {
+    _kCloudBuildX23: Interval(min: 4, max: 11),
+    _kCloudBuildX28: Interval(min: 4, max: 12),
+    _kRyzen5600: Interval(min: 31, max: 37),
+    _kPixel5: Interval(min: 80, max: 120),
+    _kIphoneOnGitHubAction: Interval(min: 550, max: 750),
+    _kIphoneOnMacbookM1: Interval(min: 19, max: 27),
   },
-  _tagCloudBuildX28: {
-    _tagTflite: ExpectedValue(mean: 10, deviation: 1.15),
+  _kCoreMLBackend: {
+    _kIphoneOnGitHubAction: Interval(min: 2, max: 7),
   },
-  _tagRyzen5600: {
-    _tagTflite: ExpectedValue(mean: 34, deviation: 1.05),
-  },
-  _tagPixel5: {
-    _tagTflite: ExpectedValue(mean: 104, deviation: 1.15),
-  },
-  _tagPixel6: {
-    _tagPixelSo: ExpectedValue(mean: 1015, deviation: 1.1),
-  },
-  _tagIphone12mini: {
-    _tagTflite: ExpectedValue(mean: 654, deviation: 1.15),
-    _tagCoreml: ExpectedValue(mean: 545, deviation: 1.15),
-  },
-  _tagIosSimMBP2019: {
-    _tagTflite: ExpectedValue(mean: 23, deviation: 1.15),
+  _kPixelBackend: {
+    _kPixel6: Interval(min: 800, max: 1100),
   },
 };
 
-const Map<String, Map<String, ExpectedValue>> _objectDetection = {
-  _tagCloudBuildX23: {
-    _tagTflite: ExpectedValue(mean: 5.2, deviation: 1.15),
+const Map<String, Map<String, Interval>> _objectDetection = {
+  _kTFLiteBackend: {
+    _kCloudBuildX23: Interval(min: 4, max: 7),
+    _kCloudBuildX28: Interval(min: 3.5, max: 7),
+    _kRyzen5600: Interval(min: 14, max: 22),
+    _kPixel5: Interval(min: 40, max: 55),
+    _kIphoneOnGitHubAction: Interval(min: 200, max: 300),
+    _kIphoneOnMacbookM1: Interval(min: 9, max: 16),
   },
-  _tagCloudBuildX28: {
-    _tagTflite: ExpectedValue(mean: 5.1, deviation: 1.15),
+  _kCoreMLBackend: {
+    _kIphoneOnGitHubAction: Interval(min: 2, max: 7),
   },
-  _tagRyzen5600: {
-    _tagTflite: ExpectedValue(mean: 18, deviation: 1.05),
-  },
-  _tagPixel5: {
-    _tagTflite: ExpectedValue(mean: 48, deviation: 1.15),
-  },
-  _tagPixel6: {
-    _tagPixelSo: ExpectedValue(mean: 440, deviation: 1.1),
-  },
-  _tagIphone12mini: {
-    _tagTflite: ExpectedValue(mean: 259, deviation: 1.15),
-    _tagCoreml: ExpectedValue(mean: 305, deviation: 1.15),
-  },
-  _tagIosSimMBP2019: {_tagTflite: ExpectedValue(mean: 12.5, deviation: 1.15)},
-};
-
-const Map<String, Map<String, ExpectedValue>> _imageSegmentation = {
-  _tagCloudBuildX23: {
-    _tagTflite: ExpectedValue(mean: 2.0, deviation: 1.15),
-  },
-  _tagCloudBuildX28: {
-    _tagTflite: ExpectedValue(mean: 1.9, deviation: 1.15),
-  },
-  _tagRyzen5600: {
-    _tagTflite: ExpectedValue(mean: 6, deviation: 1.05),
-  },
-  _tagPixel5: {
-    _tagTflite: ExpectedValue(mean: 30, deviation: 1.15),
-  },
-  _tagPixel6: {
-    _tagPixelSo: ExpectedValue(mean: 160, deviation: 1.1),
-  },
-  _tagIphone12mini: {
-    _tagTflite: ExpectedValue(mean: 22, deviation: 1.15),
-    _tagCoreml: ExpectedValue(mean: 75, deviation: 1.15),
-  },
-  _tagIosSimMBP2019: {
-    _tagTflite: ExpectedValue(mean: 4, deviation: 1.15),
+  _kPixelBackend: {
+    _kPixel6: Interval(min: 300, max: 490),
   },
 };
 
-const Map<String, Map<String, ExpectedValue>> _naturalLanguageProcessing = {
-  _tagCloudBuildX23: {
-    _tagTflite: ExpectedValue(mean: 0.9, deviation: 1.15),
+const Map<String, Map<String, Interval>> _imageSegmentation = {
+  _kTFLiteBackend: {
+    _kCloudBuildX23: Interval(min: 0.5, max: 3),
+    _kCloudBuildX28: Interval(min: 0.5, max: 3),
+    _kRyzen5600: Interval(min: 5, max: 7),
+    _kPixel5: Interval(min: 25, max: 35),
+    _kIphoneOnGitHubAction: Interval(min: 18, max: 26),
+    _kIphoneOnMacbookM1: Interval(min: 3, max: 6),
   },
-  _tagCloudBuildX28: {
-    _tagTflite: ExpectedValue(mean: 1, deviation: 1.15),
+  _kCoreMLBackend: {
+    _kIphoneOnGitHubAction: Interval(min: 0.5, max: 2),
   },
-  _tagRyzen5600: {
-    _tagTflite: ExpectedValue(mean: 3, deviation: 1.05),
-  },
-  _tagPixel5: {
-    _tagTflite: ExpectedValue(mean: 2.5, deviation: 1.15),
-  },
-  _tagPixel6: {
-    _tagPixelSo: ExpectedValue(mean: 67, deviation: 1.1),
-  },
-  _tagIphone12mini: {
-    _tagTflite: ExpectedValue(mean: 12, deviation: 1.15),
-    _tagCoreml: ExpectedValue(mean: 81, deviation: 1.15),
-  },
-  _tagIosSimMBP2019: {
-    _tagTflite: ExpectedValue(mean: 2.3, deviation: 1.15),
+  _kPixelBackend: {
+    _kPixel6: Interval(min: 100, max: 180),
   },
 };
 
-const Map<String, Map<String, ExpectedValue>> _imageClassificationOffline = {
-  _tagCloudBuildX23: {
-    _tagTflite: ExpectedValue(mean: 12, deviation: 1.15),
+const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
+  _kTFLiteBackend: {
+    _kCloudBuildX23: Interval(min: 0.7, max: 1.1),
+    _kCloudBuildX28: Interval(min: 0.5, max: 1.1),
+    _kRyzen5600: Interval(min: 2.8, max: 3.2),
+    _kPixel5: Interval(min: 2.3, max: 2.7),
+    _kIphoneOnGitHubAction: Interval(min: 9, max: 15),
+    _kIphoneOnMacbookM1: Interval(min: 1.8, max: 3),
   },
-  _tagCloudBuildX28: {
-    _tagTflite: ExpectedValue(mean: 12, deviation: 1.15),
+  _kCoreMLBackend: {
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 1),
   },
-  _tagRyzen5600: {
-    _tagTflite: ExpectedValue(mean: 52, deviation: 1.05),
-  },
-  _tagPixel5: {
-    _tagTflite: ExpectedValue(mean: 152, deviation: 1.15),
-  },
-  _tagPixel6: {
-    _tagPixelSo: ExpectedValue(mean: 1550, deviation: 1.1),
-  },
-  _tagIphone12mini: {
-    _tagTflite: ExpectedValue(mean: 1600, deviation: 1.15),
-    _tagCoreml: ExpectedValue(mean: 1250, deviation: 1.15),
-  },
-  _tagIosSimMBP2019: {
-    _tagTflite: ExpectedValue(mean: 35, deviation: 1.15),
+  _kPixelBackend: {
+    // pixel some time finish this task in 4 seconds, not sure why.
+    _kPixel6: Interval(min: 2, max: 75),
   },
 };
 
-const taskExpectedPerformance = {
+const Map<String, Map<String, Interval>> _imageClassificationOffline = {
+  _kTFLiteBackend: {
+    _kCloudBuildX23: Interval(min: 8, max: 14),
+    _kCloudBuildX28: Interval(min: 7, max: 14),
+    _kRyzen5600: Interval(min: 45, max: 60),
+    _kPixel5: Interval(min: 120, max: 180),
+    _kIphoneOnGitHubAction: Interval(min: 1300, max: 1900),
+    _kIphoneOnMacbookM1: Interval(min: 30, max: 45),
+  },
+  _kCoreMLBackend: {
+    _kIphoneOnGitHubAction: Interval(min: 3, max: 15),
+  },
+  _kPixelBackend: {
+    _kPixel6: Interval(min: 1000, max: 1700),
+  },
+};
+
+const benchmarkExpectedThroughput = {
   'image_classification': _imageClassification,
   'object_detection': _objectDetection,
   'image_segmentation_v2': _imageSegmentation,

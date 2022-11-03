@@ -1,9 +1,4 @@
-class Interval {
-  final double min;
-  final double max;
-
-  const Interval({required this.min, required this.max});
-}
+import 'utils.dart';
 
 /*
 value: Interval of expected accuracy

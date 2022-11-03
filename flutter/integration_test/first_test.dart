@@ -77,7 +77,7 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   final expectedValue =
       expectedMap['$accelerator|$backendName'] ?? expectedMap[accelerator];
   final tag =
-      '${benchmarkResult.benchmarkId} [accelerator: $accelerator | backendName: $backendName]';
+      '[benchmarkId: ${benchmarkResult.benchmarkId} | accelerator: $accelerator | backendName: $backendName]';
   expect(
     expectedValue,
     isNotNull,
@@ -122,32 +122,35 @@ void checkThroughput(
   BenchmarkExportResult benchmarkResult,
   EnvironmentInfo environmentInfo,
 ) {
-  final taskId = benchmarkResult.benchmarkId;
-  final expectedMap = taskExpectedPerformance[taskId];
+  final benchmarkId = benchmarkResult.benchmarkId;
+  var tag = 'benchmarkId: $benchmarkId';
+  final expectedMap = benchmarkExpectedThroughput[benchmarkId];
   expect(
     expectedMap,
     isNotNull,
-    reason: 'missing expected performance map for $taskId',
+    reason: 'missing expected throughput map for [$tag]',
   );
   expectedMap!;
 
-  final model = getDeviceModel(environmentInfo);
-  final deviceExpectedMap = expectedMap[model];
-  expect(
-    deviceExpectedMap,
-    isNotNull,
-    reason: 'missing expected performance for $taskId+$model',
-  );
-  deviceExpectedMap!;
-
   final backendTag = benchmarkResult.backendInfo.filename;
-  final expectedPerf = deviceExpectedMap[backendTag];
+  tag += ' | backendTag: $backendTag';
+  final backendExpectedMap = expectedMap[backendTag];
   expect(
-    expectedPerf,
+    backendExpectedMap,
     isNotNull,
-    reason: 'missing expected performance for $taskId+$model+$backendTag',
+    reason: 'missing expected throughput for [$tag]',
   );
-  expectedPerf!;
+  backendExpectedMap!;
+
+  final deviceModel = getDeviceModel(environmentInfo);
+  tag += ' | deviceModel: $deviceModel';
+  final expectedThroughput = backendExpectedMap[deviceModel];
+  expect(
+    expectedThroughput,
+    isNotNull,
+    reason: 'missing expected throughput for [$tag]',
+  );
+  expectedThroughput!;
 
   final run = benchmarkResult.performanceRun;
   run!;
@@ -156,12 +159,12 @@ void checkThroughput(
   value!;
   expect(
     value,
-    greaterThanOrEqualTo(expectedPerf.mean / expectedPerf.deviation),
-    reason: 'performance for $taskId+$model+$backendTag is too low',
+    greaterThanOrEqualTo(expectedThroughput.min),
+    reason: 'throughput for [$tag] is too low',
   );
   expect(
     value,
-    lessThanOrEqualTo(expectedPerf.mean * expectedPerf.deviation),
-    reason: 'performance for $taskId+$model+$backendTag is too high',
+    lessThanOrEqualTo(expectedThroughput.max),
+    reason: 'throughput for [$tag] is too high',
   );
 }

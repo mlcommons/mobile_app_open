@@ -110,7 +110,7 @@ docker run -i `
     --env "BAZEL_CACHE_ARG=--remote_cache=https://storage.googleapis.com/$cacheBucket --google_default_credentials" `
     --env GOOGLE_APPLICATION_CREDENTIALS=$localCredentials `
     --env FLUTTER_RELEASE_NAME=$releaseArchiveName `
-    --env PERF_TEST=false `
+    --env PERF_TEST=true `
     $imageTag `
     make flutter/windows/ci
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
