@@ -138,6 +138,13 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
   }
 
   if (!counted_[sample_idx]) {
+    // we need a local copy of output for macOS/iOS
+    auto output_size_byte = output_format_[0].size * GetByte(output_format_[0]);
+    auto local_output = new std::vector<char>(output_size_byte);
+    local_output->assign(
+        reinterpret_cast<const char *>(outputs[0]),
+        reinterpret_cast<const char *>(outputs[0]) + output_size_byte);
+
     std::string filename = ground_truth_list_.at(sample_idx);
 
     gt_preprocessing_stage_->SetImagePath(&filename);
@@ -148,9 +155,9 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
     auto ground_truth_vector =
         (uint8_t *)gt_preprocessing_stage_->GetPreprocessedImageData();
 
-    float *outputFloat = reinterpret_cast<float *>(outputs[0]);
-    int8_t *outputInt8 = reinterpret_cast<int8_t *>(outputs[0]);
-    uint8_t *outputUint8 = reinterpret_cast<uint8_t *>(outputs[0]);
+    float *outputFloat = reinterpret_cast<float *>(local_output->data());
+    int8_t *outputInt8 = reinterpret_cast<int8_t *>(local_output->data());
+    uint8_t *outputUint8 = reinterpret_cast<uint8_t *>(local_output->data());
 
     bool isOutputFloat = (output_format_.at(0).type == DataType::Float32);
     bool isOutputInt8 = (output_format_.at(0).type == DataType::Int8);
@@ -174,10 +181,12 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
     mse = mse / n_pixels;
     auto sample_psnr_ = -10 * log10f(mse / (255.0 * 255.0));
     // LOG(INFO) << "[" << filename << "] psnr : " << sample_psnr_;
-
     psnr_ += sample_psnr_;
 
     counted_[sample_idx] = true;
+
+    local_output->clear();
+    delete local_output;
   }
 
   return std::vector<uint8_t>();
