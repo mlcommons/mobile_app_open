@@ -73,6 +73,15 @@ benchmark_setting {
   model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
 }
 
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  accelerator: "npu"
+  accelerator_desc: "NPU"
+  framework: "TFLite NNAPI"
+  model_path: "https://github.com/freedomtan/some_super_resolution_tflite_models/raw/main/snu_edsr/tflite/pl_f32b5_fint8.tflite"
+  model_checksum: "a6a9739bf2e983388900eaec62cfd2dd"
+}
+
 )SETTINGS";
 
 #endif
