@@ -25,37 +25,43 @@ limitations under the License.
 #include <android/log.h>
 
 namespace sbe {
-enum DEVICE_ID {
-  CORE_INVALID = -1,
-  CORE_2100 = 0,
-  CORE_1200,
-  CORE_2200,
-  CORE_MAX
-};
+  enum DEVICE_ID {
+    CORE_INVALID=-1,
+    CORE_1200=0,
+    CORE_2100,
+    CORE_2200,
+    CORE_2300,
+    CORE_MAX
+	};
 
-#ifndef LOG_TAG
-#define LOG_TAG "sbe"
-#endif
+  #ifndef LOG_TAG
+  #define LOG_TAG "sbe"
+  #endif
 
-#define LOG_ENABLE
-#undef LOG_ENABLE
+  #define LOG_ENABLE
+  #undef LOG_ENABLE
 
-#define __SHARP_X(x) #x
-#define __STR(x) __SHARP_X(x)
-#define _MLOG(_loglevel, fmt, ...)                                          \
-  __android_log_print(_loglevel, "MLPerf",                                  \
-                      "[Backend][" LOG_TAG "] %s:" __STR(__LINE__) ": " fmt \
-                                                                   "\n",    \
-                      __FUNCTION__, ##__VA_ARGS__)
+  #define __SHARP_X(x) #x
+  #define __STR(x) __SHARP_X(x)
+  #define _MLOG(_loglevel, fmt, ...)                                          \
+    __android_log_print(_loglevel, "MLPerf",                                  \
+                        "[Backend][" LOG_TAG "] %s:" __STR(__LINE__) ": " fmt \
+                                                                    "\n",    \
+                        __FUNCTION__, ##__VA_ARGS__)
 
-#ifdef LOG_ENABLE
-#define MLOGV(fmt, ...) _MLOG(ANDROID_LOG_VERBOSE, fmt, ##__VA_ARGS__)
-#define MLOGD(fmt, ...) _MLOG(ANDROID_LOG_DEBUG, fmt, ##__VA_ARGS__)
-#define MLOGE(fmt, ...) _MLOG(ANDROID_LOG_ERROR, fmt, ##__VA_ARGS__)
-#else
-#define MLOGV(fmt, ...) _MLOG(ANDROID_LOG_VERBOSE, fmt, ##__VA_ARGS__)
-#define MLOGD(fmt, ...)
-#define MLOGE(fmt, ...)
-#endif
-}  // namespace sbe
+  #ifdef LOG_ENABLE
+  #define MLOGV(fmt, ...) _MLOG(ANDROID_LOG_VERBOSE, fmt, ##__VA_ARGS__)
+  #define MLOGD(fmt, ...) _MLOG(ANDROID_LOG_DEBUG, fmt, ##__VA_ARGS__)
+  #define MLOGE(fmt, ...) _MLOG(ANDROID_LOG_ERROR, fmt, ##__VA_ARGS__)
+  #else
+  #define MLOGV(fmt, ...) _MLOG(ANDROID_LOG_VERBOSE, fmt, ##__VA_ARGS__)
+  #define MLOGD(fmt, ...)
+  #define MLOGE(fmt, ...) _MLOG(ANDROID_LOG_ERROR, fmt, ##__VA_ARGS__)
+  #endif
+
+  #define IS_VALID(a, b)    \
+    if(a != b) {    \
+        MLOGV("NOT MATCHED ATTR %d, %d", a, b); \
+    }
+}	// namespace sbe
 #endif
