@@ -12,32 +12,39 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef SBE_HELPER_H_
-#define SBE_HELPER_H_
+#ifndef SBE_LOADER_H_
+#define SBE_LOADER_H_
 
 /**
- * @file sbe_helper.hpp
- * @brief helper class of samsung backend core for samsung exynos
+ * @file sbe_loader.hpp
+ * @brief dynamic loader for samsung exynos libraries
  * @date 2022-01-04
  * @author soobong Huh (soobong.huh@samsung.com)
  */
 
 #include <dlfcn.h>
-#include <stdint.h>
-#include <unistd.h>
-
-#include <string>
-
-#include "sbe_config.hpp"
+#include "type.h"
 #include "sbe_utils.hpp"
 
 namespace sbe {
-class core_ctrl {
- public:
-  static int support_sbe(const char *, const char *);
-  static const char *get_benchmark_config(int core_id);
-  static int get_core_id();
+std::string sbe_core_libs[CORE_MAX] = {
+  "libsbe1200_core.so",
+  "libsbe2100_core.so",
+  "libsbe2200_core.so",
+  "libsbe2300_core.so",
 };
-}  // namespace sbe
+
+void* load_symbol(void* dl_handle, const char* name) {
+  auto func_pt = dlsym(dl_handle, name);
+  if(func_pt==nullptr) {
+    MLOGE("dlopen fail. symbol[%s]", name);
+  }
+  return func_pt;
+}
+
+#define link_symbol(dl_handle, symbol_name) \
+  reinterpret_cast<symbol_name##_t>(    \
+  load_symbol(dl_handle, #symbol_name))
+}
 
 #endif
