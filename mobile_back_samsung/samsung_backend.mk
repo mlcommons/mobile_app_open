@@ -35,4 +35,8 @@ ifeq (${WITH_SAMSUNG},1)
     //mobile_back_samsung/samsung/lib:libsamsungbackend.so \
     //flutter/android/commonlibs:commonlibs
   backend_samsung_filename=libsamsungbackend
+
+	# variables needed to run make target flutter/android/libs/checksum
+  backend_samsung_lib_root=${MOBILE_BACK_SAMSUNG_LIB_ROOT}
+  backend_samsung_checksum_file=${MOBILE_BACK_SAMSUNG_LIB_ROOT}/checksums.txt
 endif
