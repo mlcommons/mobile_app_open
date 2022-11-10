@@ -1,6 +1,6 @@
-.bazelproject
 .DS_Store
 .aswb
+.clwb
 .idea
 .vscode
 /bazel-*
