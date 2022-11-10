@@ -17,9 +17,20 @@ include flutter/android/android-docker.mk
 
 flutter/android: flutter/android/libs
 flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk
-flutter/android/libs: flutter/android/libs/build flutter/android/libs/copy
+flutter/android/libs: flutter/android/libs/checksum flutter/android/libs/build flutter/android/libs/copy
 # run `make flutter/android/apk` before `flutter/android/test-apk`
 flutter/android/test-apk: flutter/android/test-apk/main flutter/android/test-apk/helper
+
+.PHONY: flutter/android/libs/checksum
+flutter/android/libs/checksum:
+ifeq (${WITH_SAMSUNG},1)
+	@echo "Validate checksum of Samsung lib files"
+	flutter/tool/validate_checksum \
+		-d ${backend_samsung_lib_root} \
+		-f ${backend_samsung_checksum_file}
+else
+	@echo "Skip checksum validation"
+endif
 
 .PHONY: flutter/android/libs/build
 flutter/android/libs/build:
@@ -65,12 +76,15 @@ flutter_android_apk_test_main_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDRO
 .PHONY: flutter/android/test-apk/main
 flutter/android/test-apk/main:
 	mkdir -p $$(dirname ${flutter_android_apk_test_main_path})
-	cd flutter/android && ./gradlew app:assembleDebug -Ptarget=integration_test/first_test.dart
+	flutter_android_apk_test_perf_arg=$$(printf enable-perf-test=${PERF_TEST} | base64) && \
+		cd flutter/android && \
+		./gradlew app:assembleDebug \
+		-Ptarget=integration_test/first_test.dart \
+		-Pdart-defines=$${flutter_android_apk_test_perf_arg}
 	cp -f flutter/build/app/outputs/apk/debug/app-debug.apk ${flutter_android_apk_test_main_path}
 
 FLUTTER_ANDROID_APK_TEST_HELPER?=test-helper.apk
 flutter_android_apk_test_helper_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_HELPER}
-# run `make flutter/android/apk` before this target
 .PHONY: flutter/android/test-apk/helper
 flutter/android/test-apk/helper:
 	mkdir -p $$(dirname ${flutter_android_apk_test_helper_path})

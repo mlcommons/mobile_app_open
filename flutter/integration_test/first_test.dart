@@ -1,20 +1,35 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'expected_accuracy.dart';
+import 'expected_throughput.dart';
 import 'utils.dart';
+
+const enablePerfTest = bool.fromEnvironment(
+  'enable-perf-test',
+  defaultValue: false,
+);
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  SharedPreferences.setMockInitialValues({
+  final prefs = <String, Object>{
     StoreConstants.testMode: true,
     StoreConstants.submissionMode: true,
-  });
+    StoreConstants.testMinDuration: 1,
+    StoreConstants.testMinQueryCount: 4,
+  };
+  if (enablePerfTest) {
+    prefs[StoreConstants.testMinDuration] = 15;
+    prefs[StoreConstants.testMinQueryCount] = 64;
+    prefs[StoreConstants.testCooldownDuration] = 10;
+  }
+  SharedPreferences.setMockInitialValues(prefs);
 
   group('integration tests', () {
     final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +57,9 @@ void checkTasks(ExtendedResult extendedResults) {
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
     checkAccuracy(benchmarkResult);
+    if (enablePerfTest) {
+      checkThroughput(benchmarkResult, extendedResults.environmentInfo);
+    }
   }
 }
 
@@ -59,7 +77,7 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   final expectedValue =
       expectedMap['$accelerator|$backendName'] ?? expectedMap[accelerator];
   final tag =
-      '${benchmarkResult.benchmarkId} [accelerator: $accelerator | backendName: $backendName]';
+      '[benchmarkId: ${benchmarkResult.benchmarkId} | accelerator: $accelerator | backendName: $backendName]';
   expect(
     expectedValue,
     isNotNull,
@@ -81,5 +99,72 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
     accuracyValue.normalized,
     lessThanOrEqualTo(expectedValue.max),
     reason: 'accuracy for $tag is too high',
+  );
+}
+
+String getDeviceModel(EnvironmentInfo info) {
+  switch (info.platform) {
+    case EnvPlatform.android:
+      final value = info.value.android!;
+      return value.modelCode!;
+    case EnvPlatform.ios:
+      final value = info.value.ios!;
+      return value.modelCode!;
+    case EnvPlatform.windows:
+      final value = info.value.windows!;
+      return value.cpuFullName;
+    default:
+      throw 'unsupported platform ${info.platform}';
+  }
+}
+
+void checkThroughput(
+  BenchmarkExportResult benchmarkResult,
+  EnvironmentInfo environmentInfo,
+) {
+  final benchmarkId = benchmarkResult.benchmarkId;
+  var tag = 'benchmarkId: $benchmarkId';
+  final expectedMap = benchmarkExpectedThroughput[benchmarkId];
+  expect(
+    expectedMap,
+    isNotNull,
+    reason: 'missing expected throughput map for [$tag]',
+  );
+  expectedMap!;
+
+  final backendTag = benchmarkResult.backendInfo.filename;
+  tag += ' | backendTag: $backendTag';
+  final backendExpectedMap = expectedMap[backendTag];
+  expect(
+    backendExpectedMap,
+    isNotNull,
+    reason: 'missing expected throughput for [$tag]',
+  );
+  backendExpectedMap!;
+
+  final deviceModel = getDeviceModel(environmentInfo);
+  tag += ' | deviceModel: $deviceModel';
+  final expectedThroughput = backendExpectedMap[deviceModel];
+  expect(
+    expectedThroughput,
+    isNotNull,
+    reason: 'missing expected throughput for [$tag]',
+  );
+  expectedThroughput!;
+
+  final run = benchmarkResult.performanceRun;
+  run!;
+
+  final value = run.throughput;
+  value!;
+  expect(
+    value,
+    greaterThanOrEqualTo(expectedThroughput.min),
+    reason: 'throughput for [$tag] is too low',
+  );
+  expect(
+    value,
+    lessThanOrEqualTo(expectedThroughput.max),
+    reason: 'throughput for [$tag] is too high',
   );
 }

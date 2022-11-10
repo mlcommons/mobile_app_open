@@ -91,13 +91,23 @@ class Benchmark {
     required List<pb.Setting> commonSettings,
     required String backendLibName,
     required String logDir,
-    required bool isTestMode,
+    required int testMinDuration,
+    required int testMinQueryCount,
   }) {
     final dataset = runMode.chooseDataset(taskConfig);
 
-    final fastMode = isTestMode || isFastMode;
-    var minQueryCount = fastMode ? 8 : taskConfig.minQueryCount;
-    var minDuration = fastMode ? 1.0 : taskConfig.minDuration;
+    int minQueryCount;
+    double minDuration;
+    if (testMinDuration != 0) {
+      minQueryCount = testMinQueryCount;
+      minDuration = testMinDuration.toDouble();
+    } else if (isFastMode) {
+      minQueryCount = 8;
+      minDuration = 1.0;
+    } else {
+      minQueryCount = taskConfig.minQueryCount;
+      minDuration = taskConfig.minDuration;
+    }
 
     final settings = pb.SettingList(
       setting: commonSettings,
@@ -114,7 +124,7 @@ class Benchmark {
       dataset_groundtruth_path: resourceManager.get(dataset.groundtruthPath),
       dataset_offset: taskConfig.model.offset,
       scenario: taskConfig.scenario,
-      mode: runMode.mode,
+      mode: runMode.loadgenMode,
       min_query_count: minQueryCount,
       min_duration: minDuration,
       single_stream_expected_latency_ns:
