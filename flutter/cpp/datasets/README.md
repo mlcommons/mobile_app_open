@@ -135,13 +135,13 @@ preparing datasets and models
 
     1. rotate 1080x1920 ones to 1920x1080 so that all the images are 1920x1080
 
-    2. convert all 1920x1080 jpg images to .png files
+    2. convert all 1920x1080 .png images to .jpg files, because so far .png is not supported by the preprocessing code
 
-    3. also generate scaled down 960x540 images
+    3. also generate scaled-down 960x540 images
 
 2. model:
 
-   1. generate a modelswith 960x540 input and 1920x1080 output
+   1. generate a model with 960x540 input and 1920x1080 output
 
 3. test with command line on Android device:
 
@@ -172,7 +172,7 @@ adb shell /data/local/tmp/sr/main_sr external snusr --mode=PerformanceOnly \
   --lib_path=/data/local/tmp/sr/libtflitebackend.so
 ```
 
-Or we can test on a host machine
+Or we can test this on a host machine too.
 
 On a x86 machine running Ubuntu 22.04,
 
