@@ -11,6 +11,7 @@
 #include "flutter/cpp/datasets/ade20k.h"
 #include "flutter/cpp/datasets/coco.h"
 #include "flutter/cpp/datasets/imagenet.h"
+#include "flutter/cpp/datasets/snu_sr.h"
 #include "flutter/cpp/datasets/squad.h"
 #include "flutter/cpp/mlperf_driver.h"
 #include "flutter/cpp/proto/backend_setting.pb.h"
@@ -91,6 +92,11 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
           31 /* num_classes, from RunMLPerfWorker.java */, 512,
           512 /* width, height */);
+      break;
+    case ::mlperf::mobile::DatasetConfig::SNUSR:
+      dataset = std::make_unique<::mlperf::mobile::SNUSR>(
+          backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
+          3 /* num_channels */, 2 /* scale */, 960, 540 /* width, height */);
       break;
     default:
       return nullptr;
