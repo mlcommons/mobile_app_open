@@ -63,6 +63,8 @@ class SNUSR : public Dataset {
   std::vector<uint8_t> ProcessOutput(
       const int sample_idx, const std::vector<void *> &outputs) override;
 
+  bool HasAccuracy() override;
+
   // ComputeAccuracy Calculate the accuracy if the processed outputs.
   float ComputeAccuracy() override;
 

@@ -192,17 +192,20 @@ std::vector<uint8_t> SNUSR::ProcessOutput(const int sample_idx,
   return std::vector<uint8_t>();
 }
 
+bool SNUSR::HasAccuracy() { return !ground_truth_list_.empty(); }
+
 float SNUSR::ComputeAccuracy() {
   if (ground_truth_list_.empty()) {
-    return 0.0;
+    return -1.0f;
   }
 
-  return psnr_ / ground_truth_list_.size();
+  // Frontend expects normalized accuracy between 0 and 1
+  return psnr_ / ground_truth_list_.size() / 100;
 }
 
 std::string SNUSR::ComputeAccuracyString() {
-  float result = ComputeAccuracy();
-  if (result == 0.0f) {
+  float result = ComputeAccuracy() * 100.0f;
+  if (result <= 0.0f) {
     return std::string("N/A");
   }
   std::stringstream stream;
