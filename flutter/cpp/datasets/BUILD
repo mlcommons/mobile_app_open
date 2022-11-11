@@ -49,6 +49,7 @@ cc_library(
     ],
     hdrs = [
         "imagenet.h",
+        "utils.h",
     ],
     copts = tflite_copts() + select({
         "//flutter/android/commonlibs:use_asan": [
@@ -78,6 +79,7 @@ cc_library(
     ],
     hdrs = [
         "coco.h",
+        "utils.h",
     ],
     copts = tflite_copts() + select({
         "//flutter/android/commonlibs:use_asan": [
@@ -136,6 +138,26 @@ cc_library(
     srcs = ["ade20k.cc"],
     hdrs = [
         "ade20k.h",
+        "utils.h",
+    ],
+    deps = [
+        ":allocator",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp:utils",
+        "//flutter/cpp/backends:external",
+        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:image_preprocessing_stage",
+    ],
+)
+
+cc_library(
+    name = "snu_sr",
+    srcs = ["snu_sr.cc"],
+    hdrs = [
+        "snu_sr.h",
+        "utils.h",
     ],
     deps = [
         ":allocator",

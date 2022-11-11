@@ -32,23 +32,6 @@ limitations under the License.
 namespace mlperf {
 namespace mobile {
 namespace {
-// TODO(b/145480762) Remove this code when preprocessing code is refactored.
-inline TfLiteType DataType2TfType(DataType::Type type) {
-  switch (type) {
-    case DataType::Float32:
-      return kTfLiteFloat32;
-    case DataType::Uint8:
-      return kTfLiteUInt8;
-    case DataType::Int8:
-      return kTfLiteInt8;
-    case DataType::Float16:
-      return kTfLiteFloat16;
-    default:
-      break;
-  }
-  return kTfLiteNoType;
-}
-
 // Default cropping fraction value.
 const float kCroppingFraction = 0.875;
 }  // namespace
