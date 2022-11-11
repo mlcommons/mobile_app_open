@@ -8,9 +8,9 @@
 REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
 #REPO_ROOT_DIR="/Users/freedom/work/mobile_app_open"
 
-tflite: tflite-build tflite-run-ic-offline
-coreml: coreml-build coreml-run-od
-coreml-all: coreml-build coreml-run-ic coreml-run-ic-offline coreml-run-od coreml-run-is coreml-run-lu
+tflite: tflite-build tflite-run-sr
+coreml: coreml-build coreml-run-sr
+coreml-all: coreml-build coreml-run-ic coreml-run-ic-offline coreml-run-od coreml-run-is coreml-run-lu coreml-run-sr
 
 backend=WITH_APPLE=1 WITH_TFLITE=0
 app:
@@ -79,6 +79,16 @@ tflite-run-lu:
 		--input_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/squad/squad_eval_mini.tfrecord" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/squad/squad_groundtruth.tfrecord"
 
+tflite-run-sr:
+	cd ${REPO_ROOT_DIR} && \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL SNUSR \
+		--mode=PerformanceOnly \
+		--output_dir="${REPO_ROOT_DIR}/output" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/edsr_zoo/tflite_fixed/pl_f28b5.tflite" \
+		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
+		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/LR_jpg" \
+		--ground_truth_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/HR_jpg"
+
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \
 	bazel build -c opt --cxxopt=-fobjc-arc --cxxopt=-xobjective-c++ --cxxopt=-std=c++14 --host_cxxopt=-std=c++14 \
@@ -140,3 +150,13 @@ coreml-run-lu:
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
 		--input_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/squad/squad_eval_mini.tfrecord" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/squad/squad_groundtruth.tfrecord"
+
+coreml-run-sr:
+	cd ${REPO_ROOT_DIR} && \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL SNUSR \
+		--mode=PerformanceOnly \
+		--output_dir="${REPO_ROOT_DIR}/output" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/edsr_zoo/coreml/pl_f28b5.mlmodel" \
+		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
+		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/LR_jpg" \
+		--ground_truth_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/HR_jpg"

@@ -20,7 +20,7 @@ const Map<String, Interval> _objectDetection = {
   'cpu': Interval(min: 0.31, max: 0.32),
   'npu': Interval(min: 0.28, max: 0.31),
   'tpu': Interval(min: 0.36, max: 0.38),
-  'ane|TFLite': Interval(min: 0.31, max: 0.32),
+  'ane|TFLite': Interval(min: 0.31, max: 0.34),
   'ane|Core ML': Interval(min: 0.45, max: 0.46),
 };
 
@@ -40,10 +40,19 @@ const Map<String, Interval> _naturalLanguageProcessing = {
   'gpu|Core ML': Interval(min: 0.80, max: 1.00),
 };
 
+const Map<String, Interval> _superResolution = {
+  'cpu': Interval(min: 0.32, max: 0.35),
+  'npu': Interval(min: 0.32, max: 0.35),
+  'tpu': Interval(min: 0.32, max: 0.35),
+  'ane|TFLite': Interval(min: 0.32, max: 0.35),
+  'ane|Core ML': Interval(min: 0.32, max: 0.35),
+};
+
 const benchmarkExpectedAccuracy = {
   'image_classification': _imageClassification,
   'object_detection': _objectDetection,
   'image_segmentation_v2': _imageSegmentation,
   'natural_language_processing': _naturalLanguageProcessing,
   'image_classification_offline': _imageClassification,
+  'super_resolution': _superResolution,
 };

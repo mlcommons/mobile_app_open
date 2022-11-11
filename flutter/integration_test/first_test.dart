@@ -47,7 +47,7 @@ void main() {
 
 void checkTasks(ExtendedResult extendedResults) {
   final length = extendedResults.results.length;
-  const expectedTasksCount = 5;
+  const expectedTasksCount = 6;
 
   expect(length, expectedTasksCount, reason: 'tasks count does not match');
 
