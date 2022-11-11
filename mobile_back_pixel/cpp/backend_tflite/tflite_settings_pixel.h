@@ -82,6 +82,15 @@ benchmark_setting {
   model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
 }
 
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  accelerator: "tpu"
+  accelerator_desc: "Google Edge TPU"
+  framework: "TFLite NNAPI"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/tflite/sr_pl_f28b5.tflite"
+  model_checksum: "acdb2527ad25fdb31ab1e134b7650860"
+}
+
 )SETTINGS";
 
 #endif
