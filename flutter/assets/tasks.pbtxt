@@ -22,7 +22,7 @@ task {
       groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/imagenet_val_tiny.txt"
     }
     tiny {
-      name: "Imagenet dataset for instrument test"
+      name: "Imagenet dataset for integration test"
       input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
       groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt"
     }
@@ -58,7 +58,7 @@ task {
       groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/coco_val_tiny.pbtxt"
     }
     tiny {
-      name: "Coco dataset for instrument test"
+      name: "Coco dataset for integration test"
       input_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/datasets/coco-test.zip"
       groundtruth_path: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/coco_val_tiny.pbtxt"
     }
@@ -161,7 +161,7 @@ task {
       groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/imagenet_val_tiny.txt"
     }
     tiny {
-      name: "Imagenet dataset for instrument test"
+      name: "Imagenet dataset for integration test"
       input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
       groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt"
     }
@@ -173,5 +173,39 @@ task {
     image_width: 224
     image_height: 224
     num_classes: 1000
+  }
+}
+
+task {
+  id: "super_resolution"
+  name: "Super Resolution "
+  min_query_count: 1024
+  min_duration: 60
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  datasets {
+    type: SNUSR
+    full {
+      name: "SNUSR dataset for accuracy test"
+      input_path: "local:///mlperf_datasets/snusr/lr"
+      groundtruth_path: "local:////mlperf_datasets/snusr/hr"
+    }
+    lite {
+      name: "SNUSR dataset for performance test"
+      input_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/datasets/snusr_lr.zip"
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/datasets/snusr_hr.zip"
+    }
+    tiny {
+      name: "SNUSR dataset for integration test"
+      input_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/datasets/snusr_lr_tiny.zip"
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/datasets/snusr_hr_tiny.zip"
+    }
+  }
+  model {
+    id: "edsr"
+    name: "EDSR"
+    image_width: 960
+    image_height: 540
   }
 }
