@@ -65,6 +65,15 @@ benchmark_setting {
   model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
 }
 
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  accelerator: "ane"
+  accelerator_desc: "ANE"
+  framework: "TFLite CoreML"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/tflite/sr_pl_f28b5.tflite"
+  model_checksum: "acdb2527ad25fdb31ab1e134b7650860"
+}
+
 )SETTINGS";
 
 const std::string tflite_settings_apple_iphoneX = R"SETTINGS(

@@ -11,6 +11,8 @@ enum DatasetTypeEnum {
   ade20k,
   @JsonValue('SQUAD')
   squad,
+  @JsonValue('SNUSR')
+  snusr,
 }
 
 extension DatasetTypeExtension on DatasetTypeEnum {

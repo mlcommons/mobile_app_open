@@ -22,5 +22,6 @@ class NativeRunResult {
   });
 
   @override
-  String toString() => 'RunResult(accuracy:$accuracy1, accuracy2:$accuracy2)';
+  String toString() =>
+      'NativeRunResult(accuracy:$accuracy1, accuracy2:$accuracy2)';
 }

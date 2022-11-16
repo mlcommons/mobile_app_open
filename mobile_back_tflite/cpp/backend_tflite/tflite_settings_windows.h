@@ -73,6 +73,15 @@ benchmark_setting {
   model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
 }
 
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  accelerator: "cpu"
+  accelerator_desc: "CPU"
+  framework: "TFLite"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/tflite/sr_pl_f28b5.tflite"
+  model_checksum: "acdb2527ad25fdb31ab1e134b7650860"
+}
+
 )SETTINGS";
 
 #endif

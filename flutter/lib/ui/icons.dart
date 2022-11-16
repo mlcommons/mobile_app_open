@@ -29,6 +29,7 @@ class AppIcons {
       _pAvd('ic_language_processing.xml');
   static final SvgPicture imageClassificationOffline =
       _pSvg('ic_image_classification_offline.svg');
+  static final SvgPicture superResolution = _pSvg('ic_super_resolution.svg');
 
   static final AvdPicture imageClassificationWhite =
       _iconWhiteAvd('ic_image_classification.xml');
@@ -40,6 +41,8 @@ class AppIcons {
       _iconWhiteAvd('ic_language_processing.xml');
   static final SvgPicture imageClassificationOfflineWhite =
       _pSvg('ic_image_classification_offline_white.svg');
+  static final SvgPicture superResolutionWhite =
+      _iconColorSvg('ic_super_resolution.svg', Colors.white);
 
   static final AvdPicture arrow = _pAvd('ic_arrow.xml');
   static final AvdPicture parameters = _pAvd('ic_parameters.xml');

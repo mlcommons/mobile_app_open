@@ -59,9 +59,10 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
   bool HasAccuracy() { return dataset_->HasAccuracy(); }
 
   // Asks the dataset to calculate the accuracy.
+  // The accuracy value is expected to be normalized between 0 and 1.
   float ComputeAccuracy() { return dataset_->ComputeAccuracy(); }
 
-  // Forms a string to report the accuracy.
+  // Forms a string to report the accuracy with its unit of measurement.
   std::string ComputeAccuracyString() {
     return dataset_->ComputeAccuracyString();
   }

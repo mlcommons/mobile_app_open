@@ -56,6 +56,13 @@ class BenchmarkInfo {
           detailsTitle: stringResources.benchInfoLanguageProcessing,
           detailsContent: stringResources.benchInfoLanguageProcessingDesc,
         );
+      case ('super_resolution'):
+        return BenchmarkLocalizationInfo(
+          name: stringResources.benchNameSuperResolution,
+          detailsTitle: stringResources.benchInfoSuperResolution,
+          // TODO (anhappdev): update text for benchInfoSuperResolutionDesc
+          detailsContent: stringResources.benchInfoSuperResolutionDesc,
+        );
       default:
         throw 'unhandled task id: ${task.id}';
     }
@@ -79,6 +86,7 @@ final _benchmarkIcons = {
   'image_segmentation_v2': AppIcons.imageSegmentation,
   'natural_language_processing': AppIcons.languageProcessing,
   'image_classification_offline': AppIcons.imageClassificationOffline,
+  'super_resolution': AppIcons.superResolution,
 };
 
 final _benchmarkIconsWhite = {
@@ -87,4 +95,5 @@ final _benchmarkIconsWhite = {
   'image_segmentation_v2': AppIcons.imageSegmentationWhite,
   'natural_language_processing': AppIcons.languageProcessingWhite,
   'image_classification_offline': AppIcons.imageClassificationOfflineWhite,
+  'super_resolution': AppIcons.superResolutionWhite,
 };
