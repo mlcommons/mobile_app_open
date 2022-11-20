@@ -71,8 +71,8 @@ benchmark_setting {
   accelerator: "ane"
   accelerator_desc: "Apple Neural Engine"
   framework: "Core ML"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/CoreML/sr_pl_f28b5.mlmodel"
-  model_checksum: "cb315f03ac2fd967a16fde0e8ec95a1c"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/CoreML/sr_pl_f32b5.mlmodel"
+  model_checksum: "f372d8be5388a6f405b442f9ffeffe46"
 }
 
 )SETTINGS";
