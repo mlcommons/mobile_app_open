@@ -1,3 +1,5 @@
+import 'package:mlperfbench/app_constants.dart';
+
 import 'utils.dart';
 
 /*
@@ -49,10 +51,10 @@ const Map<String, Interval> _superResolution = {
 };
 
 const benchmarkExpectedAccuracy = {
-  'image_classification': _imageClassification,
-  'object_detection': _objectDetection,
-  'image_segmentation_v2': _imageSegmentation,
-  'natural_language_processing': _naturalLanguageProcessing,
-  'image_classification_offline': _imageClassification,
-  'super_resolution': _superResolution,
+  BenchmarkId.imageClassification: _imageClassification,
+  BenchmarkId.objectDetection: _objectDetection,
+  BenchmarkId.imageSegmentationV2: _imageSegmentation,
+  BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
+  BenchmarkId.imageClassificationOffline: _imageClassification,
+  BenchmarkId.superResolution: _superResolution,
 };
