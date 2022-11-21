@@ -106,6 +106,7 @@ class SampleGenerator {
   BuildInfo get buildInfo => BuildInfo(
         version: '1.0',
         buildNumber: '10qwe',
+        buildDate: DateTime.now(),
         gitBranch: 'feature',
         gitCommit: 'as91230jr90qwe',
         gitDirtyFlag: false,

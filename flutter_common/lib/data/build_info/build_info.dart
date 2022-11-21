@@ -6,6 +6,7 @@ part 'build_info.g.dart';
 class BuildInfo {
   final String version;
   final String buildNumber;
+  final DateTime buildDate;
   final bool officialReleaseFlag;
   final bool devTestFlag;
   final List<String> backendList;
@@ -16,6 +17,7 @@ class BuildInfo {
   BuildInfo({
     required this.version,
     required this.buildNumber,
+    required this.buildDate,
     required this.officialReleaseFlag,
     required this.devTestFlag,
     required this.backendList,
