@@ -78,8 +78,8 @@ benchmark_setting {
   accelerator: "npu"
   accelerator_desc: "NPU"
   framework: "TFLite NNAPI"
-  model_path: "https://github.com/freedomtan/some_super_resolution_tflite_models/raw/main/snu_edsr/tflite/pl_f32b5_fint8.tflite"
-  model_checksum: "a6a9739bf2e983388900eaec62cfd2dd"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/tflite/sr_pl_f32b5.tflite"
+  model_checksum: "cb8b476ec5a747a80470affc79e487eb"
 }
 
 )SETTINGS";
