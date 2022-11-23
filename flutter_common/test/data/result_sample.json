@@ -1,7 +1,7 @@
 {
   "meta": {
-    "uuid": "853f2996-561e-49ce-8661-ff9fec22931a",
-    "upload_date": "2022-10-25T03:02:41.793867Z"
+    "uuid": "c96cf553-40de-4964-8530-7367b9341217",
+    "upload_date": "2022-11-20T08:31:40.637573Z"
   },
   "results": [
     {
@@ -41,7 +41,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-10-25T10:02:41.797448",
+        "start_datetime": "2022-11-20T15:31:40.641167",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -65,7 +65,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-10-25T10:02:41.797529",
+        "start_datetime": "2022-11-20T15:31:40.641241",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -117,7 +117,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-10-25T10:02:41.798781",
+        "start_datetime": "2022-11-20T15:31:40.642490",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -141,7 +141,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-10-25T10:02:41.798782",
+        "start_datetime": "2022-11-20T15:31:40.642490",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -190,6 +190,7 @@
   "build_info": {
     "version": "1.0",
     "build_number": "10qwe",
+    "build_date": "2022-11-20T15:31:40.640369",
     "official_release_flag": false,
     "dev_test_flag": true,
     "backend_list": [

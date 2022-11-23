@@ -19,8 +19,8 @@ class Interval {
 
 Future<void> runBenchmark(WidgetTester tester) async {
   const splashPauseSeconds = 4;
-  const runTimeLimitMinutes = 20;
-  const downloadTimeLimitMinutes = 10;
+  const runTimeLimitMinutes = 30;
+  const downloadTimeLimitMinutes = 20;
 
   await app.main();
   await tester.pumpAndSettle(const Duration(seconds: splashPauseSeconds));

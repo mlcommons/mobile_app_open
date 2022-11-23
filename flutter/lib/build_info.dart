@@ -20,6 +20,7 @@ class BuildInfoHelper {
     info = BuildInfo(
         version: packageInfo.version,
         buildNumber: packageInfo.buildNumber,
+        buildDate: DateTime.now(),
         officialReleaseFlag: isOfficialBuild,
         devTestFlag: isFastMode,
         backendList: BackendInfoHelper().getBackendsList(),

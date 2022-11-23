@@ -40,6 +40,10 @@
                 "build_number": {
                     "type": "string"
                 },
+                "build_date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
                 "official_release_flag": {
                     "type": "boolean"
                 },
@@ -64,6 +68,7 @@
             },
             "required": [
                 "backend_list",
+                "build_date",
                 "build_number",
                 "dev_test_flag",
                 "git_branch",
