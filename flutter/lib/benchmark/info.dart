@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mlperfbench/app_constants.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlperfbench/ui/icons.dart';
@@ -95,6 +95,7 @@ final _benchmarkIconsWhite = {
   BenchmarkId.objectDetection: AppIcons.objectDetectionWhite,
   BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentationWhite,
   BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessingWhite,
-  BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOfflineWhite,
+  BenchmarkId.imageClassificationOffline:
+      AppIcons.imageClassificationOfflineWhite,
   BenchmarkId.superResolution: AppIcons.superResolutionWhite,
 };
