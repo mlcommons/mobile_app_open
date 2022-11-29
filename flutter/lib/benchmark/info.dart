@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlperfbench/ui/icons.dart';
@@ -26,37 +27,37 @@ class BenchmarkInfo {
 
   BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
     switch (task.id) {
-      case ('image_classification'):
+      case (BenchmarkId.imageClassification):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameImageClassification,
           detailsTitle: stringResources.benchInfoImageClassification,
           detailsContent: stringResources.benchInfoImageClassificationDesc,
         );
-      case ('image_classification_offline'):
+      case (BenchmarkId.imageClassificationOffline):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameImageClassificationOffline,
           detailsTitle: stringResources.benchInfoImageClassification,
           detailsContent: stringResources.benchInfoImageClassificationDesc,
         );
-      case ('object_detection'):
+      case (BenchmarkId.objectDetection):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameObjectDetection,
           detailsTitle: stringResources.benchInfoObjectDetection,
           detailsContent: stringResources.benchInfoObjectDetectionDesc,
         );
-      case ('image_segmentation_v2'):
+      case (BenchmarkId.imageSegmentationV2):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameImageSegmentation,
           detailsTitle: stringResources.benchInfoImageSegmentation,
           detailsContent: stringResources.benchInfoImageSegmentationDesc,
         );
-      case ('natural_language_processing'):
+      case (BenchmarkId.naturalLanguageProcessing):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameLanguageProcessing,
           detailsTitle: stringResources.benchInfoLanguageProcessing,
           detailsContent: stringResources.benchInfoLanguageProcessingDesc,
         );
-      case ('super_resolution'):
+      case (BenchmarkId.superResolution):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameSuperResolution,
           detailsTitle: stringResources.benchInfoSuperResolution,
@@ -81,19 +82,20 @@ class BenchmarkInfo {
 }
 
 final _benchmarkIcons = {
-  'image_classification': AppIcons.imageClassification,
-  'object_detection': AppIcons.objectDetection,
-  'image_segmentation_v2': AppIcons.imageSegmentation,
-  'natural_language_processing': AppIcons.languageProcessing,
-  'image_classification_offline': AppIcons.imageClassificationOffline,
-  'super_resolution': AppIcons.superResolution,
+  BenchmarkId.imageClassification: AppIcons.imageClassification,
+  BenchmarkId.objectDetection: AppIcons.objectDetection,
+  BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentation,
+  BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessing,
+  BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOffline,
+  BenchmarkId.superResolution: AppIcons.superResolution,
 };
 
 final _benchmarkIconsWhite = {
-  'image_classification': AppIcons.imageClassificationWhite,
-  'object_detection': AppIcons.objectDetectionWhite,
-  'image_segmentation_v2': AppIcons.imageSegmentationWhite,
-  'natural_language_processing': AppIcons.languageProcessingWhite,
-  'image_classification_offline': AppIcons.imageClassificationOfflineWhite,
-  'super_resolution': AppIcons.superResolutionWhite,
+  BenchmarkId.imageClassification: AppIcons.imageClassificationWhite,
+  BenchmarkId.objectDetection: AppIcons.objectDetectionWhite,
+  BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentationWhite,
+  BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessingWhite,
+  BenchmarkId.imageClassificationOffline:
+      AppIcons.imageClassificationOfflineWhite,
+  BenchmarkId.superResolution: AppIcons.superResolutionWhite,
 };

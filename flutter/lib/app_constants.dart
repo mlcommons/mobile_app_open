@@ -79,3 +79,12 @@ class AppColors {
 
   static Color get shareTextButton => Colors.blue.shade900;
 }
+
+class BenchmarkId {
+  static const imageClassification = 'image_classification';
+  static const objectDetection = 'object_detection';
+  static const imageSegmentationV2 = 'image_segmentation_v2';
+  static const naturalLanguageProcessing = 'natural_language_processing';
+  static const imageClassificationOffline = 'image_classification_offline';
+  static const superResolution = 'super_resolution';
+}
