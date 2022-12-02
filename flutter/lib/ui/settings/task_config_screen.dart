@@ -233,28 +233,35 @@ class TaskConfigScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final store = context.watch<Store>();
+    final state = context.watch<BenchmarkState>();
+    List<Widget> items = [];
+    items.addAll(_configs.map((c) => getOptionPattern(
+          context,
+          c,
+          store.chosenConfigurationName,
+        )));
+    // On ios you need to properly request access to a folder outside of the app folder
+    // but file_picker plugin doesn't do it.
+    // see the following link for details:
+    // https://github.com/mlcommons/mobile_app_open/pull/562#discussion_r992167655
+    if (!Platform.isIOS) {
+      items.addAll([
+        _makeCacheFolderNotice(l10n),
+        _DataFolderSelectorHelper(context).build(),
+        const Divider(),
+        ListTile(
+            title: Text(l10n.settingsTaskDataFolderSelected),
+            subtitle: Text(state.resourceManager.getDataFolder())),
+        const Divider(),
+      ]);
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.settingsTaskConfigTitle),
       ),
       body: ListView(
-        children: [
-          // On ios you need to properly request access to a folder outside of the app folder
-          // but file_picker plugin doesn't do it.
-          // see the following link for details:
-          //    https://github.com/mlcommons/mobile_app_open/pull/562#discussion_r992167655
-          if (!Platform.isIOS) ...[
-            _makeCacheFolderNotice(l10n),
-            _DataFolderSelectorHelper(context).build(),
-            const Divider(),
-          ],
-          ..._configs.map((c) => getOptionPattern(
-                context,
-                c,
-                store.chosenConfigurationName,
-              )),
-        ],
+        children: items,
       ),
     );
   }
