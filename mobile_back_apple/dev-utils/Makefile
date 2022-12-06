@@ -84,7 +84,7 @@ tflite-run-sr:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL SNUSR \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/edsr_zoo/tflite_fixed/pl_f32b5.tflite" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/edsr_final/converted/edsr_f32b5_fp32.tflite" \
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/LR_raw" \
 		--ground_truth_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/HR_raw"
@@ -156,7 +156,7 @@ coreml-run-sr:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL SNUSR \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/edsr_zoo/coreml/pl_f28b5.mlmodel" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/edsr_final/converted/edsr_f32b5_fp32.mlmodel" \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/LR_jpg" \
 		--ground_truth_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/HR_jpg"
