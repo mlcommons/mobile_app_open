@@ -70,7 +70,7 @@ benchmark_setting {
   accelerator: "ane"
   accelerator_desc: "ANE"
   framework: "TFLite CoreML"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/super-resolution/v3_0/tflite/edsr_f32b5_fp32.tflite"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
   model_checksum: "672240427c1f3dc33baf2facacd9631f"
 }
 
