@@ -116,7 +116,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kCloudBuildX23: Interval(min: 0.1, max: 3),
     _kCloudBuildX28: Interval(min: 0.1, max: 3),
     _kRyzen5600: Interval(min: 0.1, max: 3),
-    _kPixel5: Interval(min: 4, max: 7),
+    _kPixel5: Interval(min: 0.1, max: 3),
     _kIphoneOnGitHubAction: Interval(min: 0.1, max: 3),
     _kIphoneOnMacbookM1: Interval(min: 0.1, max: 10),
   },
