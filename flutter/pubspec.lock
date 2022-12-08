@@ -231,7 +231,7 @@ packages:
       name: file_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.2.2"
+    version: "5.2.3"
   firebase_dart:
     dependency: "direct main"
     description:
