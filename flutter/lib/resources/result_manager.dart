@@ -9,9 +9,10 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'utils.dart';
 
 class ResultManager {
+  List<ExtendedResult> results = [];
+
   static const _resultsDirName = 'results';
   final Directory _resultsDir;
-  List<ExtendedResult> results = [];
   final List<File> _resultsFiles = [];
 
   ResultManager(String applicationDirectory)
@@ -33,7 +34,7 @@ class ResultManager {
         results.add(ExtendedResult.fromJson(json));
         _resultsFiles.add(file);
       } catch (e, trace) {
-        print('unable to parse result from file [$file]: $e');
+        print('Unable to parse result from [$file]: $e');
         print(trace);
       }
     }
@@ -60,6 +61,7 @@ class ResultManager {
     final String formatted = formatter.format(DateTime.now());
     final jsonFile = File('${_resultsDir.path}/$formatted.json');
     await jsonFile.writeAsString(jsonToStringIndented(value));
+    print('Result saved to $jsonFile');
   }
 
   ExtendedResult getLastResult() {
