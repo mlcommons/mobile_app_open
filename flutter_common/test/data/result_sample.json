@@ -1,7 +1,7 @@
 {
   "meta": {
-    "uuid": "6ffb7b7a-016e-4756-93d5-3ec7570b90be",
-    "upload_date": "2022-12-09T04:57:30.761794Z"
+    "uuid": "c2524f34-b209-4cda-bc15-b99dba34bdaf",
+    "upload_date": "2022-12-09T09:08:34.799863Z"
   },
   "results": [
     {
@@ -23,6 +23,12 @@
           }
         ]
       },
+      "backend_info": {
+        "filename": "tflite",
+        "vendor_name": "tflite",
+        "backend_name": "libtflitebackend",
+        "accelerator_name": "accelerator"
+      },
       "performance_run": {
         "throughput": 123.45,
         "accuracy": {
@@ -41,7 +47,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T11:57:30.765899",
+        "start_datetime": "2022-12-09T16:08:34.804033",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -65,20 +71,14 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T11:57:30.765982",
+        "start_datetime": "2022-12-09T16:08:34.804109",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
         }
       },
       "min_duration": 10.5,
-      "min_samples": 8,
-      "backend_info": {
-        "filename": "tflite",
-        "vendor_name": "tflite",
-        "backend_name": "libtflitebackend",
-        "accelerator_name": "accelerator"
-      }
+      "min_samples": 8
     },
     {
       "benchmark_id": "id",
@@ -99,6 +99,12 @@
           }
         ]
       },
+      "backend_info": {
+        "filename": "tflite",
+        "vendor_name": "tflite",
+        "backend_name": "libtflitebackend",
+        "accelerator_name": "accelerator"
+      },
       "performance_run": {
         "throughput": 123.45,
         "accuracy": {
@@ -117,7 +123,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T11:57:30.767215",
+        "start_datetime": "2022-12-09T16:08:34.805544",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -141,20 +147,14 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T11:57:30.767216",
+        "start_datetime": "2022-12-09T16:08:34.805545",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
         }
       },
       "min_duration": 10.5,
-      "min_samples": 8,
-      "backend_info": {
-        "filename": "tflite",
-        "vendor_name": "tflite",
-        "backend_name": "libtflitebackend",
-        "accelerator_name": "accelerator"
-      }
+      "min_samples": 8
     }
   ],
   "environment_info": {
@@ -190,7 +190,7 @@
   "build_info": {
     "version": "1.0",
     "build_number": "10qwe",
-    "build_date": "2022-12-09T11:57:30.765037",
+    "build_date": "2022-12-09T16:08:34.803145",
     "official_release_flag": false,
     "dev_test_flag": true,
     "backend_list": [
