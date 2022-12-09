@@ -152,8 +152,7 @@ class ResourceManager {
     await Directory(_loadedResourcesDir).create();
 
     cacheManager = CacheManager(_loadedResourcesDir);
-    resultManager = ResultManager(applicationDirectory);
-    await resultManager.init();
+    resultManager = await ResultManager.create(applicationDirectory);
   }
 
   Future<List<String>> validateResourcesExist(List<Resource> resources) async {

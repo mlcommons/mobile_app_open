@@ -43,9 +43,7 @@ Future<ExtendedResult> obtainResult() async {
   final applicationDirectory =
       await resource_manager.ResourceManager.getApplicationDirectory();
 
-  final rm = result_manager.ResultManager(applicationDirectory);
-  await rm.init();
-
+  final rm = await result_manager.ResultManager.create(applicationDirectory);
   return rm.getLastResult();
 }
 

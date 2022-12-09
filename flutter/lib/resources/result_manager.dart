@@ -9,16 +9,23 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'utils.dart';
 
 class ResultManager {
-  List<ExtendedResult> results = [];
-
   static const _resultsDirName = 'results';
-  final Directory _resultsDir;
-  final List<File> _resultsFiles = [];
 
-  ResultManager(String applicationDirectory)
-      : _resultsDir = Directory('$applicationDirectory/$_resultsDirName');
+  static Future<ResultManager> create(String applicationDirectory) async {
+    var resultManager = ResultManager._create(applicationDirectory);
+    await resultManager._loadResults();
+    return resultManager;
+  }
 
-  Future<void> init() async {
+  List<ExtendedResult> results = [];
+  late final Directory _resultsDir;
+  late final List<File> _resultsFiles;
+
+  ResultManager._create(String applicationDirectory) {
+    _resultsDir = Directory('$applicationDirectory/$_resultsDirName');
+  }
+
+  Future<void> _loadResults() async {
     if (!await _resultsDir.exists()) {
       await _resultsDir.create(recursive: true);
     }
