@@ -1,7 +1,13 @@
 {
   "meta": {
-    "uuid": "fe076c3f-3691-4039-a4da-513715d294b5",
-    "upload_date": "2022-12-09T09:09:20.498347Z"
+    "uuid": "d54641e8-ccc2-419b-8b4b-a0c2abfb8761",
+    "upload_date": "2022-12-09T10:15:39.348866Z"
+  },
+  "filter": {
+    "platform": "iOS",
+    "device_model": "iPhone XS",
+    "backend_name": "TFLite",
+    "manufacturer": "Apple"
   },
   "results": [
     {
@@ -24,10 +30,10 @@
         ]
       },
       "backend_info": {
-        "filename": "tflite",
-        "vendor_name": "tflite",
-        "backend_name": "libtflitebackend",
-        "accelerator_name": "accelerator"
+        "filename": "libtflitebackend",
+        "vendor_name": "Google",
+        "backend_name": "TFLite",
+        "accelerator_name": "ANE"
       },
       "performance_run": {
         "throughput": 123.45,
@@ -47,7 +53,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T16:09:20.502645",
+        "start_datetime": "2022-12-09T17:15:39.353877",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -71,7 +77,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T16:09:20.502728",
+        "start_datetime": "2022-12-09T17:15:39.353878",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -100,10 +106,10 @@
         ]
       },
       "backend_info": {
-        "filename": "tflite",
-        "vendor_name": "tflite",
-        "backend_name": "libtflitebackend",
-        "accelerator_name": "accelerator"
+        "filename": "libtflitebackend",
+        "vendor_name": "Google",
+        "backend_name": "TFLite",
+        "accelerator_name": "ANE"
       },
       "performance_run": {
         "throughput": 123.45,
@@ -123,7 +129,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T16:09:20.504286",
+        "start_datetime": "2022-12-09T17:15:39.353884",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -147,7 +153,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T16:09:20.504288",
+        "start_datetime": "2022-12-09T17:15:39.353884",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -190,7 +196,7 @@
   "build_info": {
     "version": "1.0",
     "build_number": "10qwe",
-    "build_date": "2022-12-09T16:09:20.501740",
+    "build_date": "2022-12-09T17:15:39.353454",
     "official_release_flag": false,
     "dev_test_flag": true,
     "backend_list": [
