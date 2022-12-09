@@ -126,7 +126,12 @@ class SampleGenerator {
           uploadDate: DateTime.now(),
           uuid: const Uuid().v4(),
         ),
-        filter: FilterInfo(backendName: exportResult.backendInfo.backendName),
+        filter: FilterInfo(
+          backendName: exportResult.backendInfo.backendName,
+          platform: 'iOS',
+          deviceModel: 'iPhone XS',
+          manufacturer: 'Apple',
+        ),
         buildInfo: buildInfo,
         environmentInfo: envInfo,
         results: [exportResult, exportResult],
