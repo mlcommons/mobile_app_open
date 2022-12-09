@@ -64,7 +64,7 @@ class ResultManager {
 
   Future<void> saveResult(ExtendedResult result) async {
     results.add(result);
-    final DateFormat formatter = DateFormat('yyyy-MM-dd_HHmmss');
+    final DateFormat formatter = DateFormat('yyyy-MM-ddTHH-mm-ss');
     final String datetime = formatter.format(result.meta.creationDate);
     final filename = '${_resultsDir.path}/${datetime}_${result.meta.uuid}.json';
     final jsonFile = File(filename);
