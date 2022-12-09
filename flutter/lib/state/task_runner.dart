@@ -32,6 +32,7 @@ class ProgressInfo {
   int totalStages = 0;
   int currentStage = 0;
   double cooldownDuration = 0;
+
   double get stageProgress => calculateStageProgress?.call() ?? 0.0;
 
   double Function()? calculateStageProgress;
@@ -232,7 +233,8 @@ class TaskRunner {
       return null;
     }
     return ExtendedResult(
-      meta: ResultMetaInfo(uuid: const Uuid().v4()),
+      meta:
+          ResultMetaInfo(creationDate: DateTime.now(), uuid: const Uuid().v4()),
       environmentInfo: DeviceInfo.instance.envInfo,
       results: exportResults,
       buildInfo: BuildInfoHelper.info,

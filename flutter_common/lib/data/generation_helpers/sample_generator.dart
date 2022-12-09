@@ -42,6 +42,7 @@ class SampleGenerator {
           validity: true,
         ),
       );
+
   BenchmarkExportResult get exportResult => BenchmarkExportResult(
         benchmarkId: 'id',
         benchmarkName: 'name',
@@ -73,6 +74,7 @@ class SampleGenerator {
         loadgenScenario:
             BenchmarkExportResult.parseLoadgenScenario('SingleStream'),
       );
+
   EnvironmentInfo get envInfo => EnvironmentInfo(
         platform: EnvPlatform.android,
         value: EnvInfoValue(
@@ -103,6 +105,7 @@ class SampleGenerator {
           ),
         ),
       );
+
   BuildInfo get buildInfo => BuildInfo(
         version: '1.0',
         buildNumber: '10qwe',
@@ -116,8 +119,10 @@ class SampleGenerator {
         ],
         officialReleaseFlag: false,
       );
+
   ExtendedResult get extendedResult => ExtendedResult(
         meta: ResultMetaInfo(
+          creationDate: DateTime.now(),
           uploadDate: DateTime.now(),
           uuid: const Uuid().v4(),
         ),

@@ -62,13 +62,13 @@ class ResultManager {
     }
   }
 
-  Future<void> saveResult(ExtendedResult value) async {
-    results.add(value);
+  Future<void> saveResult(ExtendedResult result) async {
+    results.add(result);
     final DateFormat formatter = DateFormat('yyyy-MM-dd_HHmmss');
-    final String formatted = formatter.format(DateTime.now());
-    final filename = '${_resultsDir.path}/${formatted}_${value.meta.uuid}.json';
+    final String datetime = formatter.format(result.meta.creationDate);
+    final filename = '${_resultsDir.path}/${datetime}_${result.meta.uuid}.json';
     final jsonFile = File(filename);
-    await jsonFile.writeAsString(jsonToStringIndented(value));
+    await jsonFile.writeAsString(jsonToStringIndented(result));
     print('Result saved to $jsonFile');
   }
 
