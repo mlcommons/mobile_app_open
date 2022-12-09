@@ -1,98 +1,69 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'utils.dart';
 
-class _ExtendedResultList {
-  final List<ExtendedResult> list;
-
-  _ExtendedResultList(this.list);
-
-  static _ExtendedResultList fromJson(List<dynamic> json) {
-    final list = <ExtendedResult>[];
-    for (var item in json) {
-      try {
-        list.add(ExtendedResult.fromJson(item as Map<String, dynamic>));
-      } catch (e, trace) {
-        print('unable to parse result from history: $e');
-        print(trace);
-      }
-    }
-    return _ExtendedResultList(list);
-  }
-
-  List<dynamic> toJson() {
-    var result = <dynamic>[];
-    for (var item in list) {
-      result.add(item);
-    }
-    return result;
-  }
-}
-
 class ResultManager {
-  static const _resultsFileName = 'results.json';
-  final File jsonFile;
-  _ExtendedResultList _results = _ExtendedResultList([]);
-
-  List<ExtendedResult> get results => _results.list;
+  static const _resultsDirName = 'results';
+  final Directory _resultsDir;
+  List<ExtendedResult> results = [];
+  final List<File> _resultsFiles = [];
 
   ResultManager(String applicationDirectory)
-      : jsonFile = File('$applicationDirectory/$_resultsFileName');
+      : _resultsDir = Directory('$applicationDirectory/$_resultsDirName');
 
   Future<void> init() async {
-    try {
-      _results = await _restoreResults();
-    } catch (e, trace) {
-      print('unable to read saved results: $e');
-      print(trace);
+    if (!await _resultsDir.exists()) {
+      await _resultsDir.create(recursive: true);
     }
-  }
-
-  Future<void> _saveResults() async {
-    await jsonFile.writeAsString(jsonToStringIndented(_results));
-  }
-
-  Future<_ExtendedResultList> _restoreResults() async {
-    if (!await jsonFile.exists()) {
-      return _ExtendedResultList([]);
+    final List<FileSystemEntity> entities = await _resultsDir.list().toList();
+    final Iterable<File> files = entities.whereType<File>();
+    if (files.isEmpty) {
+      print('No file found in $_resultsDir');
     }
-
-    return _ExtendedResultList.fromJson(
-        jsonDecode(await jsonFile.readAsString()) as List<dynamic>);
-  }
-
-  Future<void> deleteResults() async {
-    if (await jsonFile.exists()) {
-      await jsonFile.delete();
+    for (var file in files) {
+      final json =
+          jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+      try {
+        results.add(ExtendedResult.fromJson(json));
+        _resultsFiles.add(file);
+      } catch (e, trace) {
+        print('unable to parse result from file [$file]: $e');
+        print(trace);
+      }
     }
   }
 
   Future<void> removeSelected(List<bool> selected) async {
-    if (selected.length != _results.list.length) {
+    if (selected.length != results.length) {
       throw 'selected.length != results.length';
     }
-    var newResults = <ExtendedResult>[];
-    for (int i = 0; i < _results.list.length; i++) {
-      if (!selected[i]) {
-        newResults.add(_results.list[i]);
+    if (_resultsFiles.length != results.length) {
+      throw '_resultsFiles.length != results.length';
+    }
+    for (int i = 0; i < results.length; i++) {
+      if (selected[i]) {
+        results.removeAt(i);
+        await _resultsFiles[i].delete();
       }
     }
-    _results = _ExtendedResultList(newResults);
-    await _saveResults();
   }
 
   Future<void> saveResult(ExtendedResult value) async {
-    _results.list.add(value);
-    await _saveResults();
+    results.add(value);
+    final DateFormat formatter = DateFormat('yyyy-MM-dd_HHmmss');
+    final String formatted = formatter.format(DateTime.now());
+    final jsonFile = File('${_resultsDir.path}/$formatted.json');
+    await jsonFile.writeAsString(jsonToStringIndented(value));
   }
 
   ExtendedResult getLastResult() {
-    return _results.list.last;
+    return results.last;
   }
 
   void restoreResults(
