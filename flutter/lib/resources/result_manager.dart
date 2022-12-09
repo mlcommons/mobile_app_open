@@ -17,9 +17,9 @@ class ResultManager {
     return resultManager;
   }
 
-  List<ExtendedResult> results = [];
+  final List<ExtendedResult> results = [];
+  final List<File> _resultsFiles = [];
   late final Directory _resultsDir;
-  late final List<File> _resultsFiles;
 
   ResultManager._create(String applicationDirectory) {
     _resultsDir = Directory('$applicationDirectory/$_resultsDirName');
@@ -66,7 +66,8 @@ class ResultManager {
     results.add(value);
     final DateFormat formatter = DateFormat('yyyy-MM-dd_HHmmss');
     final String formatted = formatter.format(DateTime.now());
-    final jsonFile = File('${_resultsDir.path}/$formatted.json');
+    final filename = '${_resultsDir.path}/${formatted}_${value.meta.uuid}.json';
+    final jsonFile = File(filename);
     await jsonFile.writeAsString(jsonToStringIndented(value));
     print('Result saved to $jsonFile');
   }
