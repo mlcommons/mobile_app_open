@@ -56,10 +56,10 @@ class SampleGenerator {
         minDuration: 10.5,
         minSamples: 8,
         backendSettings: BackendSettingsInfo(
-          acceleratorCode: '',
-          acceleratorDesc: '',
-          framework: '',
-          modelPath: '',
+          acceleratorCode: 'ane',
+          acceleratorDesc: 'ANE',
+          framework: 'TFLite CoreML',
+          modelPath: 'https://example.com/model.tflite',
           batchSize: 0,
           extraSettings: <BackendExtraSetting>[
             BackendExtraSetting(

@@ -1,7 +1,7 @@
 {
   "meta": {
-    "uuid": "c96cf553-40de-4964-8530-7367b9341217",
-    "upload_date": "2022-11-20T08:31:40.637573Z"
+    "uuid": "6ffb7b7a-016e-4756-93d5-3ec7570b90be",
+    "upload_date": "2022-12-09T04:57:30.761794Z"
   },
   "results": [
     {
@@ -9,10 +9,10 @@
       "benchmark_name": "name",
       "loadgen_scenario": "SingleStream",
       "backend_settings": {
-        "accelerator_code": "",
-        "accelerator_desc": "",
-        "framework": "",
-        "model_path": "",
+        "accelerator_code": "ane",
+        "accelerator_desc": "ANE",
+        "framework": "TFLite CoreML",
+        "model_path": "https://example.com/model.tflite",
         "batch_size": 0,
         "extra_settings": [
           {
@@ -41,7 +41,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-11-20T15:31:40.641167",
+        "start_datetime": "2022-12-09T11:57:30.765899",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -65,7 +65,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-11-20T15:31:40.641241",
+        "start_datetime": "2022-12-09T11:57:30.765982",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -85,10 +85,10 @@
       "benchmark_name": "name",
       "loadgen_scenario": "SingleStream",
       "backend_settings": {
-        "accelerator_code": "",
-        "accelerator_desc": "",
-        "framework": "",
-        "model_path": "",
+        "accelerator_code": "ane",
+        "accelerator_desc": "ANE",
+        "framework": "TFLite CoreML",
+        "model_path": "https://example.com/model.tflite",
         "batch_size": 0,
         "extra_settings": [
           {
@@ -117,7 +117,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-11-20T15:31:40.642490",
+        "start_datetime": "2022-12-09T11:57:30.767215",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -141,7 +141,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-11-20T15:31:40.642490",
+        "start_datetime": "2022-12-09T11:57:30.767216",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -190,7 +190,7 @@
   "build_info": {
     "version": "1.0",
     "build_number": "10qwe",
-    "build_date": "2022-11-20T15:31:40.640369",
+    "build_date": "2022-12-09T11:57:30.765037",
     "official_release_flag": false,
     "dev_test_flag": true,
     "backend_list": [
