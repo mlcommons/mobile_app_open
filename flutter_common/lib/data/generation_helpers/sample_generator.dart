@@ -6,6 +6,7 @@ import 'package:mlperfbench_common/data/environment/env_ios.dart';
 import 'package:mlperfbench_common/data/environment/env_windows.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
+import 'package:mlperfbench_common/data/filter_info.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/data/results/backend_info.dart';
 import 'package:mlperfbench_common/data/results/backend_settings.dart';
@@ -66,10 +67,10 @@ class SampleGenerator {
           ],
         ),
         backendInfo: BackendReportedInfo(
-          filename: 'tflite',
-          vendorName: 'tflite',
-          backendName: 'libtflitebackend',
-          acceleratorName: 'accelerator',
+          filename: 'libtflitebackend',
+          vendorName: 'Google',
+          backendName: 'TFLite',
+          acceleratorName: 'ANE',
         ),
         loadgenScenario:
             BenchmarkExportResult.parseLoadgenScenario('SingleStream'),
@@ -125,6 +126,7 @@ class SampleGenerator {
           uploadDate: DateTime.now(),
           uuid: const Uuid().v4(),
         ),
+        filter: FilterInfo(backendName: exportResult.backendInfo.backendName),
         buildInfo: buildInfo,
         environmentInfo: envInfo,
         results: [exportResult, exportResult],
