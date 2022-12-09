@@ -10,10 +10,9 @@ class ResultMetaInfo {
 
   ResultMetaInfo({
     required this.uuid,
-    required DateTime creationDate,
+    required this.creationDate,
     DateTime? uploadDate,
-  })  : uploadDate = uploadDate?.toUtc(),
-        creationDate = creationDate.toUtc();
+  }) : uploadDate = uploadDate?.toUtc();
 
   factory ResultMetaInfo.fromJson(Map<String, dynamic> json) =>
       _$ResultMetaInfoFromJson(json);

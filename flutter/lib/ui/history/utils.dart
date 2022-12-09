@@ -16,7 +16,7 @@ class HistoryHelperUtils {
   HistoryHelperUtils(this.l10n);
 
   String formatDate(DateTime value) {
-    var dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+    var dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
     return dateFormat.format(value);
   }
 

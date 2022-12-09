@@ -84,6 +84,7 @@ class HistoryTab implements TabInterface {
   );
 
   late Widget delete;
+
   Widget _makeDeleteButton(BuildContext context) => IconButton(
         icon: const Icon(Icons.delete),
         tooltip: l10n.historyListSelectionDelete,
@@ -135,13 +136,10 @@ class HistoryTab implements TabInterface {
   ) {
     final item = itemList[index];
     final results = item.results;
-    final firstRunInfo = results.first;
-    final startDatetime = firstRunInfo.performanceRun?.startDatetime ??
-        firstRunInfo.accuracyRun!.startDatetime;
     bool isSelected = selected![index];
 
     return helper.makeListItem(
-      title: helper.formatDate(startDatetime.toLocal()),
+      title: helper.formatDate(item.meta.creationDate.toLocal()),
       specialTitleColor: results.any(
           (runRes) => !(runRes.performanceRun?.loadgenInfo?.validity ?? false)),
       trailing: isSelectionMode

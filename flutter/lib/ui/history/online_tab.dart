@@ -106,14 +106,10 @@ class OnlineTab implements TabInterface {
   ) {
     final item = itemList[index];
     final results = item.results;
-    final firstRunInfo = results.first;
-    final startDatetime = firstRunInfo.performanceRun?.startDatetime ??
-        firstRunInfo.accuracyRun!.startDatetime;
-
     final utils = HistoryHelperUtils(l10n);
 
     return helper.makeListItem(
-      title: helper.formatDate(startDatetime.toLocal()),
+      title: helper.formatDate(item.meta.creationDate.toLocal()),
       specialTitleColor: results.any(
           (runRes) => !(runRes.performanceRun?.loadgenInfo?.validity ?? false)),
       subtitle: utils.makeModelDescription(item.environmentInfo),
