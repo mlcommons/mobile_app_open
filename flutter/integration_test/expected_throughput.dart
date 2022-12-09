@@ -124,7 +124,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kIphoneOnGitHubAction: Interval(min: 0.1, max: 3),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 9, max: 12),
+    _kPixel6: Interval(min: 0.1, max: 12),
   },
 };
 
