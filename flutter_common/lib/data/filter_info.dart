@@ -1,9 +1,9 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench_common/constants.dart';
 import 'package:mlperfbench_common/data/build_info/build_info.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 part 'filter_info.g.dart';
 

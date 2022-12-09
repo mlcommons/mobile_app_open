@@ -126,6 +126,7 @@ docker/format: output/docker_mlperf_formatter.stamp
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
 		${FORMAT_DOCKER_ARGS} \
 		make format/dart/pub format
+	@echo "Done running docker/format"
 
 .PHONY: docker/format/--
 docker/format/--: output/docker_mlperf_formatter.stamp
