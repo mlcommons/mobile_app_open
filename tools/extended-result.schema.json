@@ -9,6 +9,9 @@
                 "meta": {
                     "$ref": "#/definitions/Meta"
                 },
+                "filter": {
+                    "$ref": "#/definitions/Filter"
+                },
                 "results": {
                     "type": "array",
                     "items": {
@@ -25,6 +28,7 @@
             "required": [
                 "build_info",
                 "environment_info",
+                "filter",
                 "meta",
                 "results"
             ],
@@ -241,6 +245,31 @@
             ],
             "title": "Windows"
         },
+        "Filter": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "platform": {
+                    "type": "string"
+                },
+                "device_model": {
+                    "type": "string"
+                },
+                "backend_name": {
+                    "type": "string"
+                },
+                "manufacturer": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "backend_name",
+                "device_model",
+                "manufacturer",
+                "platform"
+            ],
+            "title": "Filter"
+        },
         "Meta": {
             "type": "object",
             "additionalProperties": false,
@@ -283,6 +312,9 @@
                 "backend_settings": {
                     "$ref": "#/definitions/BackendSettings"
                 },
+                "backend_info": {
+                    "$ref": "#/definitions/BackendInfo"
+                },
                 "performance_run": {
                     "oneOf": [
                         {
@@ -308,9 +340,6 @@
                 },
                 "min_samples": {
                     "type": "integer"
-                },
-                "backend_info": {
-                    "$ref": "#/definitions/BackendInfo"
                 }
             },
             "required": [
