@@ -135,7 +135,7 @@ preparing datasets and models
 
     1. rotate 1080x1920 ones to 1920x1080 so that all the images are 1920x1080
 
-    2. convert all 1920x1080 .png images to .jpg files, because so far .png is not supported by the preprocessing code
+    2. convert all 1920x1080 .png images to raw rgb files with .rgb8 suffix, because so far .png is not supported by the preprocessing code and .jpg supported by the preprocessing code doesn't support lossless compression
 
     3. also generate scaled-down 960x540 images
 
@@ -145,49 +145,48 @@ preparing datasets and models
 
 3. test with command line on Android device:
 
-   Build the main command line program and tflite backend
+   Build the main command line program and tflite backend.
 
-```shell
-bazel build --config android_arm64 -c opt \
-  flutter/cpp/binary:main mobile_back_tflite:tflitebackend
-```
+    ```shell
+    bazel build --config android_arm64 -c opt \
+      flutter/cpp/binary:main mobile_back_tflite:tflitebackend
+    ```
+    
+    Push them to the target Android device
 
-  push them to the target Android device
-
-```shell
-adb push bazel-bin/flutter/cpp/binary/main /data/local/tmp/sr/main_sr
-adb push bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so \
-  /data/local/tmp/sr/
-```
-
-  Assuming we have the dataset and the model on the devices at
+    ```shell
+    adb push bazel-bin/flutter/cpp/binary/main /data/local/tmp/sr/main_sr
+    adb push bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so \
+      /data/local/tmp/sr/
+    ```
+    
+    Assuming we have the dataset and the model on the devices at
   `/data/local/tmp/sr/dataset/` and `/data/local/tmp/edsr/tflite/pl_f32b5.tflite`
 
-```shell
-adb shell /data/local/tmp/sr/main_sr external snusr --mode=PerformanceOnly \
-  --output_dir=/data/local/tmp/sr_output \
-  --model_file=/data/local/tmp/edsr/tflite/pl_f32b5.tflite \
-  --images_directory=/data/local/tmp/sr/dataset/LR_jpg \
-  --ground_truth_directory=/data/local/tmp/sr/dataset/HR_jpg \
-  --lib_path=/data/local/tmp/sr/libtflitebackend.so
-```
+    ```shell
+    adb shell /data/local/tmp/sr/main_sr external snusr --mode=PerformanceOnly \
+      --output_dir=/data/local/tmp/sr_output \
+      --model_file=/data/local/tmp/edsr/tflite/pl_f32b5.tflite \
+      --images_directory=/data/local/tmp/sr/dataset/LR_raw \
+      --ground_truth_directory=/data/local/tmp/sr/dataset/HR_raw \
+      --lib_path=/data/local/tmp/sr/libtflitebackend.so
+    ```
 
 Or we can test this on a host machine too.
 
 On a x86 machine running Ubuntu 22.04,
-
 ```shell
 bazel build -c opt flutter/cpp/binary:main mobile_back_tflite:tflitebackend \
-  --host_cxxopt=-std=c++14 --cxxopt=-std=c++14 --copt=-march=native
+      --host_cxxopt=-std=c++14 --cxxopt=-std=c++14 --copt=-march=native
 ```
 
-assuming we have the model and images in right places,
+Assuming we have the model and images in right places,
 
 ```shell
 bazel-bin/flutter/cpp/binary/main external snusr --mode=AccuracyOnly \
   --output_dir=/tmp/sr_output \
   --model_file=/tmp/tflite/pl_f32b7.tflite \
-  --images_directory=/tmp/sr/dataset/LR_jpg \
-  --ground_truth_directory=/tmp/sr/dataset/HR_jpg \
+  --images_directory=/tmp/sr/dataset/LR_raw \
+  --ground_truth_directory=/tmp/sr/dataset/HR_raw \
   --lib_path=bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
 ```
