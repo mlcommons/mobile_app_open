@@ -151,7 +151,7 @@ preparing datasets and models
     bazel build --config android_arm64 -c opt \
       flutter/cpp/binary:main mobile_back_tflite:tflitebackend
     ```
-    
+
     Push them to the target Android device
 
     ```shell
@@ -159,7 +159,7 @@ preparing datasets and models
     adb push bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so \
       /data/local/tmp/sr/
     ```
-    
+
     Assuming we have the dataset and the model on the devices at
   `/data/local/tmp/sr/dataset/` and `/data/local/tmp/edsr/tflite/pl_f32b5.tflite`
 
@@ -175,6 +175,7 @@ preparing datasets and models
 Or we can test this on a host machine too.
 
 On a x86 machine running Ubuntu 22.04,
+
 ```shell
 bazel build -c opt flutter/cpp/binary:main mobile_back_tflite:tflitebackend \
       --host_cxxopt=-std=c++14 --cxxopt=-std=c++14 --copt=-march=native
