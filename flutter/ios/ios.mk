@@ -48,6 +48,6 @@ flutter/ios/ipa:
 	cd flutter && flutter --no-version-check build \
 		ipa \
 		${flutter_official_build_arg} \
-		--build-number ${FLUTTER_BUILD_NUMBER}
+		${flutter_build_number_arg}
 	mkdir -p output/flutter/ios/
 	cp -rf flutter/build/ios/archive/Runner.xcarchive output/flutter/ios/release.xcarchive
