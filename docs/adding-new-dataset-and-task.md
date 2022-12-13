@@ -14,4 +14,3 @@ See the [PR #608](https://github.com/mlcommons/mobile_app_open/pull/608) for an 
 See the [issue #595](https://github.com/mlcommons/mobile_app_open/issues/595) for a complete discussion how we added the new super resolution task.
 
 [1] What does "a dataset" mean? A dataset here is to implement LoadGen's Query Sample Library (QSL). Actually, we can share some common methods and the MLPerfDriver uses interface defined in `flutter/cpp/dataset.h`, all the datasets in `flutter/cpp/datasets/` now inherit the `mlperf::mobile::Dataset`.
-
