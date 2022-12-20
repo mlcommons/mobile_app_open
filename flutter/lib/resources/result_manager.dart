@@ -11,9 +11,13 @@ import 'utils.dart';
 class ResultManager {
   static const _resultsDirName = 'results';
 
+  // A file named `result.json` is expected for the submission.
+  // See https://github.com/mlcommons/mobile_open/blob/main/rules/submissionRuleV2_0.adoc
+  static const _submissionFileName = 'result.json';
+
   static Future<ResultManager> create(String applicationDirectory) async {
     var resultManager = ResultManager._create(applicationDirectory);
-    await resultManager._loadResults();
+    await resultManager._loadResultsFromFiles();
     return resultManager;
   }
 
@@ -25,7 +29,7 @@ class ResultManager {
     _resultsDir = Directory('$applicationDirectory/$_resultsDirName');
   }
 
-  Future<void> _loadResults() async {
+  Future<void> _loadResultsFromFiles() async {
     if (!await _resultsDir.exists()) {
       await _resultsDir.create(recursive: true);
     }
@@ -35,6 +39,9 @@ class ResultManager {
       print('No file found in $_resultsDir');
     }
     for (var file in files) {
+      if (file.uri.pathSegments.last == _submissionFileName) {
+        continue;
+      }
       final json =
           jsonDecode(await file.readAsString()) as Map<String, dynamic>;
       try {
@@ -66,10 +73,12 @@ class ResultManager {
     results.add(result);
     final DateFormat formatter = DateFormat('yyyy-MM-ddTHH-mm-ss');
     final String datetime = formatter.format(result.meta.creationDate);
-    final filename = '${_resultsDir.path}/${datetime}_${result.meta.uuid}.json';
-    final jsonFile = File(filename);
-    await jsonFile.writeAsString(jsonToStringIndented(result));
-    print('Result saved to $jsonFile');
+    final resultFile =
+        File('${_resultsDir.path}/${datetime}_${result.meta.uuid}.json');
+    await resultFile.writeAsString(jsonToStringIndented(result));
+    final submissionFile = File('${_resultsDir.path}/$_submissionFileName');
+    await submissionFile.writeAsString(jsonToStringIndented(result));
+    print('Result saved to $resultFile and $submissionFile');
   }
 
   ExtendedResult getLastResult() {
