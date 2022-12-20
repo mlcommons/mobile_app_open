@@ -29,6 +29,12 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_ios_podfile_setup
 
+# [file_picker] Currently custom data folder is not supported on iOS.
+# See https://github.com/mlcommons/mobile_app_open/pull/562#discussion_r992167655
+Pod::PICKER_MEDIA = false
+Pod::PICKER_AUDIO = false
+Pod::PICKER_DOCUMENT = false
+
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
