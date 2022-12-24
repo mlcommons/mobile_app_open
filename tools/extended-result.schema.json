@@ -249,6 +249,10 @@
                     "type": "string",
                     "format": "uuid"
                 },
+                "creation_date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
                 "upload_date": {
                     "format": "date-time",
                     "oneOf": [
@@ -262,6 +266,7 @@
                 }
             },
             "required": [
+                "creation_date",
                 "upload_date",
                 "uuid"
             ],

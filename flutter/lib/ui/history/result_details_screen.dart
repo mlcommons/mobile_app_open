@@ -52,7 +52,7 @@ class _DetailsScreen extends State<DetailsScreen> {
     final res = widget.result;
 
     final firstResult = res.results.first;
-    final date = helper.formatDate(firstResult.performanceRun!.startDatetime);
+    final date = helper.formatDate(res.meta.creationDate);
     final backendName = firstResult.backendInfo.backendName;
 
     final averageThroughput =

@@ -5,10 +5,12 @@ part 'meta_info.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake)
 class ResultMetaInfo {
   final String uuid;
+  final DateTime creationDate;
   final DateTime? uploadDate;
 
   ResultMetaInfo({
     required this.uuid,
+    required this.creationDate,
     DateTime? uploadDate,
   }) : uploadDate = uploadDate?.toUtc();
 
