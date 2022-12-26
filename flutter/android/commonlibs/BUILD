@@ -28,7 +28,7 @@ genrule(
         "lib_arm64/libclang_rt.asan-aarch64-android.so",
     ],
     cmd = """\
-cp `find . -name libclang_rt.asan-aarch64-android.so` $(@)
+cp `find $(SRCS) -name libclang_rt.asan-aarch64-android.so` $(@)
     """,
 )
 
@@ -41,7 +41,7 @@ genrule(
         "lib_x86_64/libclang_rt.asan-x86_64-android.so",
     ],
     cmd = """\
-cp `find . -name libclang_rt.asan-x86_64-android.so` $(@)
+cp `find $(SRCS) -name libclang_rt.asan-x86_64-android.so` $(@)
     """,
 )
 
@@ -54,7 +54,7 @@ genrule(
         "lib_arm64/libc++_shared.so",
     ],
     cmd = """\
-cp `find . -name libc++_shared.so | grep arm64-v8a` $(@)
+cp `find $(SRCS) -name libc++_shared.so | grep aarch64-linux-android` $(@)
     """,
 )
 

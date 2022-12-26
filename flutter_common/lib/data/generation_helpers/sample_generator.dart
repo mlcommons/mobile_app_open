@@ -123,6 +123,7 @@ class SampleGenerator {
 
   ExtendedResult get extendedResult => ExtendedResult(
         meta: ResultMetaInfo(
+          creationDate: DateTime.now(),
           uploadDate: DateTime.now(),
           uuid: const Uuid().v4(),
         ),

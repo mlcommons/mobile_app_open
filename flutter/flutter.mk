@@ -46,6 +46,8 @@ FLUTTER_BUILD_NUMBER?=0
 flutter_build_number_arg=--build-number ${FLUTTER_BUILD_NUMBER}
 .PHONY: flutter/check/build-number
 flutter/check/build-number:
+	@echo FLUTTER_APP_VERSION=${FLUTTER_APP_VERSION}
+	@echo FLUTTER_BUILD_NUMBER=${FLUTTER_BUILD_NUMBER}
 	@[ -n "$$FLUTTER_BUILD_NUMBER" ] \
 		|| (echo FLUTTER_BUILD_NUMBER env must be explicitly set; exit 1)
 

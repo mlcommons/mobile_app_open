@@ -1,98 +1,88 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'utils.dart';
 
-class _ExtendedResultList {
-  final List<ExtendedResult> list;
+class ResultManager {
+  static const _resultsDirName = 'results';
 
-  _ExtendedResultList(this.list);
+  // A file named `result.json` is expected for the submission.
+  // See https://github.com/mlcommons/mobile_open/blob/main/rules/submissionRuleV2_0.adoc
+  static const _submissionFileName = 'result.json';
 
-  static _ExtendedResultList fromJson(List<dynamic> json) {
-    final list = <ExtendedResult>[];
-    for (var item in json) {
+  static Future<ResultManager> create(String applicationDirectory) async {
+    var resultManager = ResultManager._create(applicationDirectory);
+    await resultManager._loadResultsFromFiles();
+    return resultManager;
+  }
+
+  final List<ExtendedResult> results = [];
+  final List<File> _resultsFiles = [];
+  late final Directory _resultsDir;
+
+  ResultManager._create(String applicationDirectory) {
+    _resultsDir = Directory('$applicationDirectory/$_resultsDirName');
+  }
+
+  Future<void> _loadResultsFromFiles() async {
+    if (!await _resultsDir.exists()) {
+      await _resultsDir.create(recursive: true);
+    }
+    final List<FileSystemEntity> entities = await _resultsDir.list().toList();
+    final Iterable<File> files = entities.whereType<File>();
+    if (files.isEmpty) {
+      print('No file found in $_resultsDir');
+    }
+    for (var file in files) {
+      if (file.uri.pathSegments.last == _submissionFileName) {
+        continue;
+      }
+      final json =
+          jsonDecode(await file.readAsString()) as Map<String, dynamic>;
       try {
-        list.add(ExtendedResult.fromJson(item as Map<String, dynamic>));
+        results.add(ExtendedResult.fromJson(json));
+        _resultsFiles.add(file);
       } catch (e, trace) {
-        print('unable to parse result from history: $e');
+        print('Unable to parse result from [$file]: $e');
         print(trace);
       }
-    }
-    return _ExtendedResultList(list);
-  }
-
-  List<dynamic> toJson() {
-    var result = <dynamic>[];
-    for (var item in list) {
-      result.add(item);
-    }
-    return result;
-  }
-}
-
-class ResultManager {
-  static const _resultsFileName = 'results.json';
-  final File jsonFile;
-  _ExtendedResultList _results = _ExtendedResultList([]);
-
-  List<ExtendedResult> get results => _results.list;
-
-  ResultManager(String applicationDirectory)
-      : jsonFile = File('$applicationDirectory/$_resultsFileName');
-
-  Future<void> init() async {
-    try {
-      _results = await _restoreResults();
-    } catch (e, trace) {
-      print('unable to read saved results: $e');
-      print(trace);
-    }
-  }
-
-  Future<void> _saveResults() async {
-    await jsonFile.writeAsString(jsonToStringIndented(_results));
-  }
-
-  Future<_ExtendedResultList> _restoreResults() async {
-    if (!await jsonFile.exists()) {
-      return _ExtendedResultList([]);
-    }
-
-    return _ExtendedResultList.fromJson(
-        jsonDecode(await jsonFile.readAsString()) as List<dynamic>);
-  }
-
-  Future<void> deleteResults() async {
-    if (await jsonFile.exists()) {
-      await jsonFile.delete();
     }
   }
 
   Future<void> removeSelected(List<bool> selected) async {
-    if (selected.length != _results.list.length) {
+    if (selected.length != results.length) {
       throw 'selected.length != results.length';
     }
-    var newResults = <ExtendedResult>[];
-    for (int i = 0; i < _results.list.length; i++) {
-      if (!selected[i]) {
-        newResults.add(_results.list[i]);
+    if (_resultsFiles.length != results.length) {
+      throw '_resultsFiles.length != results.length';
+    }
+    for (int i = 0; i < results.length; i++) {
+      if (selected[i]) {
+        results.removeAt(i);
+        await _resultsFiles[i].delete();
       }
     }
-    _results = _ExtendedResultList(newResults);
-    await _saveResults();
   }
 
-  Future<void> saveResult(ExtendedResult value) async {
-    _results.list.add(value);
-    await _saveResults();
+  Future<void> saveResult(ExtendedResult result) async {
+    results.add(result);
+    final DateFormat formatter = DateFormat('yyyy-MM-ddTHH-mm-ss');
+    final String datetime = formatter.format(result.meta.creationDate);
+    final resultFile =
+        File('${_resultsDir.path}/${datetime}_${result.meta.uuid}.json');
+    await resultFile.writeAsString(jsonToStringIndented(result));
+    final submissionFile = File('${_resultsDir.path}/$_submissionFileName');
+    await submissionFile.writeAsString(jsonToStringIndented(result));
+    print('Result saved to $resultFile and $submissionFile');
   }
 
   ExtendedResult getLastResult() {
-    return _results.list.last;
+    return results.last;
   }
 
   void restoreResults(

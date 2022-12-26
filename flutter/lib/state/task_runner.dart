@@ -234,7 +234,8 @@ class TaskRunner {
       return null;
     }
     return ExtendedResult(
-      meta: ResultMetaInfo(uuid: const Uuid().v4()),
+      meta:
+          ResultMetaInfo(creationDate: DateTime.now(), uuid: const Uuid().v4()),
       filter: FilterInfo.create(DeviceInfo.instance.envInfo,
           BuildInfoHelper.info, exportResults.first),
       environmentInfo: DeviceInfo.instance.envInfo,
