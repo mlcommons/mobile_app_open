@@ -128,10 +128,12 @@ class SampleGenerator {
           uuid: const Uuid().v4(),
         ),
         filter: FilterInfo(
+          creationDate: DateTime.now(),
           backendName: exportResult.backendInfo.backendName,
           platform: 'iOS',
           deviceModel: 'iPhone XS',
           manufacturer: 'Apple',
+          soc: 'Apple A12',
         ),
         buildInfo: buildInfo,
         environmentInfo: envInfo,

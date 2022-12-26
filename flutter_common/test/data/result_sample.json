@@ -1,14 +1,16 @@
 {
   "meta": {
-    "uuid": "b550a0ed-e0ff-4633-846f-94063dc63887",
-    "creation_date": "2022-12-26T16:02:35.523180",
-    "upload_date": "2022-12-26T09:02:35.523181Z"
+    "uuid": "5d4d891f-ed6b-4208-83fc-1fcf58a33be7",
+    "creation_date": "2022-12-26T17:47:57.519522",
+    "upload_date": "2022-12-26T10:47:57.519523Z"
   },
   "filter": {
+    "creation_date": "2022-12-26T17:47:57.522322",
     "platform": "iOS",
     "device_model": "iPhone XS",
     "backend_name": "TFLite",
-    "manufacturer": "Apple"
+    "manufacturer": "Apple",
+    "soc": "Apple A12"
   },
   "results": [
     {
@@ -54,7 +56,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-26T16:02:35.528656",
+        "start_datetime": "2022-12-26T17:47:57.524523",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -78,7 +80,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-26T16:02:35.528657",
+        "start_datetime": "2022-12-26T17:47:57.524524",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -130,7 +132,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-26T16:02:35.528666",
+        "start_datetime": "2022-12-26T17:47:57.524530",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -154,7 +156,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-26T16:02:35.528666",
+        "start_datetime": "2022-12-26T17:47:57.524530",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -197,7 +199,7 @@
   "build_info": {
     "version": "1.0",
     "build_number": "10qwe",
-    "build_date": "2022-12-26T16:02:35.528215",
+    "build_date": "2022-12-26T17:47:57.524113",
     "official_release_flag": false,
     "dev_test_flag": true,
     "backend_list": [

@@ -249,6 +249,10 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "creation_date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
                 "platform": {
                     "type": "string"
                 },
@@ -260,13 +264,18 @@
                 },
                 "manufacturer": {
                     "type": "string"
+                },
+                "soc": {
+                    "type": "string"
                 }
             },
             "required": [
                 "backend_name",
+                "creation_date",
                 "device_model",
                 "manufacturer",
-                "platform"
+                "platform",
+                "soc"
             ],
             "title": "Filter"
         },
