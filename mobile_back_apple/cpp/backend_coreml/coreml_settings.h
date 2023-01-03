@@ -18,6 +18,7 @@ limitations under the License.
 
 #include <string>
 
+
 const std::string coreml_settings = R"SETTINGS(
 
 benchmark_setting {
