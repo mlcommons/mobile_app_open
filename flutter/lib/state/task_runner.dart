@@ -113,6 +113,7 @@ class TaskRunner {
     progressInfo.cooldownDuration = cooldownDuration.inSeconds.toDouble();
 
     var first = true;
+
     // run all benchmarks in performance mode first
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
@@ -130,22 +131,18 @@ class TaskRunner {
       }
       first = false;
       if (aborting) break;
-      final performanceRunInfo =
-          await runBenchmark(benchmark, perfMode, currentLogDir);
-      resultHelpers
-          .firstWhere((e) => e.benchmark == benchmark)
-          .performanceRunInfo = performanceRunInfo;
+      final resultHelper =
+          resultHelpers.firstWhere((e) => e.benchmark == benchmark);
+      await runBenchmark(resultHelper, perfMode, currentLogDir);
     }
 
     // then in accuracy mode
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
       if (!store.submissionMode) break;
-      final accuracyRunInfo =
-          await runBenchmark(benchmark, accuracyMode, currentLogDir);
-      resultHelpers
-          .firstWhere((e) => e.benchmark == benchmark)
-          .accuracyRunInfo = accuracyRunInfo;
+      final resultHelper =
+          resultHelpers.firstWhere((e) => e.benchmark == benchmark);
+      await runBenchmark(resultHelper, accuracyMode, currentLogDir);
     }
 
     final exportResults = <BenchmarkExportResult>[];
@@ -166,13 +163,10 @@ class TaskRunner {
     );
   }
 
-  Future<RunInfo> runBenchmark(
-      Benchmark benchmark, BenchmarkRunMode mode, String currentLogDir) async {
-    RunInfo runInfo;
-
+  Future<void> runBenchmark(ResultHelper resultHelper, BenchmarkRunMode mode,
+      String currentLogDir) async {
+    final benchmark = resultHelper.benchmark;
     progressInfo.info = benchmark.info;
-
-    // increment counter for performance benchmark before cooldown
     progressInfo.currentStage++;
 
     if (mode == perfMode) {
@@ -193,7 +187,7 @@ class TaskRunner {
       };
       notifyListeners();
 
-      runInfo = await _NativeRunHelper(
+      final performanceRunInfo = await _NativeRunHelper(
         enableArtificialLoad: store.artificialCPULoadEnabled,
         isTestMode: store.testMode,
         resourceManager: resourceManager,
@@ -207,18 +201,19 @@ class TaskRunner {
         testMinDuration: store.testMinDuration,
       ).run();
       perfTimer.stop();
-      runInfo.loadgenInfo!;
+      performanceRunInfo.loadgenInfo!;
 
-      final performanceResult = runInfo.result;
+      final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
-        throughput: runInfo.throughput ?? 0.0,
+        throughput: performanceRunInfo.throughput ?? 0.0,
         accuracy: performanceResult.accuracy1,
         accuracy2: performanceResult.accuracy2,
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
         batchSize: benchmark.benchmarkSettings.batchSize,
-        validity: runInfo.loadgenInfo!.validity,
+        validity: performanceRunInfo.loadgenInfo!.validity,
       );
+      resultHelper.performanceRunInfo = performanceRunInfo;
     } else if (mode == accuracyMode) {
       progressInfo.accuracy = true;
       progressInfo.calculateStageProgress = () {
@@ -229,7 +224,7 @@ class TaskRunner {
         return queryProgress;
       };
       notifyListeners();
-      runInfo = await _NativeRunHelper(
+      final accuracyRunInfo = await _NativeRunHelper(
         enableArtificialLoad: store.artificialCPULoadEnabled,
         isTestMode: store.testMode,
         resourceManager: resourceManager,
@@ -242,8 +237,8 @@ class TaskRunner {
         testMinQueryCount: store.testMinQueryCount,
         testMinDuration: store.testMinDuration,
       ).run();
-
-      final accuracyResult = runInfo.result;
+      resultHelper.accuracyRunInfo = accuracyRunInfo;
+      final accuracyResult = accuracyRunInfo.result;
       benchmark.accuracyModeResult = BenchmarkResult(
         // loadgen doesn't calculate latency for accuracy mode benchmarks
         // so throughput is infinity which is not a valid JSON numeric value
@@ -258,8 +253,6 @@ class TaskRunner {
     } else {
       throw 'Unknown BenchmarkRunMode: $mode';
     }
-
-    return runInfo;
   }
 }
 
