@@ -15,28 +15,37 @@ import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 class ResultHelper {
   final Benchmark benchmark;
   final BackendInfo backendInfo;
+  RunInfo? performanceRunInfo;
+  RunInfo? accuracyRunInfo;
+  BenchmarkRunMode performanceMode;
+  BenchmarkRunMode accuracyMode;
 
   ResultHelper({
     required this.benchmark,
     required this.backendInfo,
+    required this.performanceMode,
+    required this.accuracyMode,
   });
 
-  BenchmarkExportResult exportResultFromRunInfo({
-    required RunInfo performanceInfo,
-    required RunInfo? accuracyInfo,
-    required BenchmarkRunMode perfMode,
-    required BenchmarkRunMode accuracyMode,
-  }) {
+  BenchmarkExportResult getBenchmarkExportResult() {
+    RunInfo runInfo;
+    if (performanceRunInfo != null) {
+      runInfo = performanceRunInfo!;
+    } else if (accuracyRunInfo != null) {
+      runInfo = accuracyRunInfo!;
+    } else {
+      throw 'One of performanceRunInfo or accuracyRunInfo must not be null';
+    }
     return BenchmarkExportResult(
       benchmarkId: benchmark.id,
       benchmarkName: benchmark.taskConfig.name,
-      performanceRun: _makeRunResult(performanceInfo, perfMode),
-      accuracyRun: _makeRunResult(accuracyInfo, accuracyMode),
+      performanceRun: _makeRunResult(performanceRunInfo, performanceMode),
+      accuracyRun: _makeRunResult(accuracyRunInfo, accuracyMode),
       minDuration: benchmark.taskConfig.minDuration,
       minSamples: benchmark.taskConfig.minQueryCount,
-      backendInfo: _makeBackendInfo(performanceInfo.result),
+      backendInfo: _makeBackendInfo(runInfo.result),
       backendSettings:
-          _makeBackendSettingsInfo(performanceInfo.settings.backend_settings),
+          _makeBackendSettingsInfo(runInfo.settings.backend_settings),
       loadgenScenario: BenchmarkExportResult.parseLoadgenScenario(
           benchmark.taskConfig.scenario),
     );

@@ -81,7 +81,7 @@ class TaskRunner {
   }
 
   Future<ExtendedResult?> runBenchmarks(
-      BenchmarkList middle, String currentLogDir) async {
+      BenchmarkList benchmarkList, String currentLogDir) async {
     final cooldown = store.cooldown;
     late final Duration cooldownDuration;
     if (store.testMode) {
@@ -93,10 +93,17 @@ class TaskRunner {
     }
 
     final activeBenchmarks =
-        middle.benchmarks.where((element) => element.isActive);
+        benchmarkList.benchmarks.where((element) => element.isActive);
 
-    final exportResults = <BenchmarkExportResult>[];
-    var first = true;
+    final resultHelpers = <ResultHelper>[];
+    for (final benchmark in activeBenchmarks) {
+      final resultHelper = ResultHelper(
+          benchmark: benchmark,
+          backendInfo: backendInfo,
+          performanceMode: perfMode,
+          accuracyMode: accuracyMode);
+      resultHelpers.add(resultHelper);
+    }
 
     progressInfo.totalStages = activeBenchmarks.length;
     if (store.submissionMode) {
@@ -105,14 +112,10 @@ class TaskRunner {
     progressInfo.currentStage = 0;
     progressInfo.cooldownDuration = cooldownDuration.inSeconds.toDouble();
 
+    var first = true;
+    // run all performance benchmarks first then accuracy benchmarks.
     for (final benchmark in activeBenchmarks) {
-      progressInfo.info = benchmark.info;
-
-      // increment counter for performance benchmark before cooldown
-      progressInfo.currentStage++;
-
       if (aborting) break;
-
       // we only do cooldown before performance benchmarks
       if (cooldown && !first && cooldownDuration.inMilliseconds > 0) {
         progressInfo.cooldown = true;
@@ -127,7 +130,50 @@ class TaskRunner {
       }
       first = false;
       if (aborting) break;
+      final performanceRunInfo =
+          await runBenchmark(benchmark, perfMode, currentLogDir);
+      resultHelpers
+          .firstWhere((e) => e.benchmark == benchmark)
+          .performanceRunInfo = performanceRunInfo;
+    }
 
+    for (final benchmark in activeBenchmarks) {
+      if (aborting) break;
+      final accuracyRunInfo =
+          await runBenchmark(benchmark, accuracyMode, currentLogDir);
+      resultHelpers
+          .firstWhere((e) => e.benchmark == benchmark)
+          .accuracyRunInfo = accuracyRunInfo;
+    }
+
+    final exportResults = <BenchmarkExportResult>[];
+    for (final resultHelper in resultHelpers) {
+      exportResults.add(resultHelper.getBenchmarkExportResult());
+    }
+
+    if (aborting) {
+      aborting = false;
+      return null;
+    }
+    return ExtendedResult(
+      meta:
+          ResultMetaInfo(creationDate: DateTime.now(), uuid: const Uuid().v4()),
+      environmentInfo: DeviceInfo.instance.envInfo,
+      results: exportResults,
+      buildInfo: BuildInfoHelper.info,
+    );
+  }
+
+  Future<RunInfo> runBenchmark(
+      Benchmark benchmark, BenchmarkRunMode mode, String currentLogDir) async {
+    RunInfo runInfo;
+
+    progressInfo.info = benchmark.info;
+
+    // increment counter for performance benchmark before cooldown
+    progressInfo.currentStage++;
+
+    if (mode == perfMode) {
       final perfTimer = Stopwatch()..start();
       progressInfo.accuracy = false;
       progressInfo.calculateStageProgress = () {
@@ -145,7 +191,7 @@ class TaskRunner {
       };
       notifyListeners();
 
-      final performanceRunInfo = await _NativeRunHelper(
+      runInfo = await _NativeRunHelper(
         enableArtificialLoad: store.artificialCPULoadEnabled,
         isTestMode: store.testMode,
         resourceManager: resourceManager,
@@ -159,86 +205,59 @@ class TaskRunner {
         testMinDuration: store.testMinDuration,
       ).run();
       perfTimer.stop();
-      performanceRunInfo.loadgenInfo!;
+      runInfo.loadgenInfo!;
 
-      final performanceResult = performanceRunInfo.result;
+      final performanceResult = runInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
-        throughput: performanceRunInfo.throughput ?? 0.0,
+        throughput: runInfo.throughput ?? 0.0,
         accuracy: performanceResult.accuracy1,
         accuracy2: performanceResult.accuracy2,
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
         batchSize: benchmark.benchmarkSettings.batchSize,
-        validity: performanceRunInfo.loadgenInfo!.validity,
+        validity: runInfo.loadgenInfo!.validity,
       );
-
-      if (aborting) break;
-
-      RunInfo? accuracyRunInfo;
-
-      if (store.submissionMode) {
-        progressInfo.currentStage++;
-        progressInfo.accuracy = true;
-        progressInfo.calculateStageProgress = () {
-          final queryCounter = backendBridge.getQueryCounter();
-          final queryProgress = queryCounter < 0
-              ? 1.0
-              : queryCounter / backendBridge.getDatasetSize();
-          return queryProgress;
-        };
-        notifyListeners();
-        accuracyRunInfo = await _NativeRunHelper(
-          enableArtificialLoad: store.artificialCPULoadEnabled,
-          isTestMode: store.testMode,
-          resourceManager: resourceManager,
-          backendBridge: backendBridge,
-          benchmark: benchmark,
-          runMode: accuracyMode,
-          commonSettings: backendInfo.settings.commonSetting,
-          backendLibName: backendInfo.libName,
-          logParentDir: currentLogDir,
-          testMinQueryCount: store.testMinQueryCount,
-          testMinDuration: store.testMinDuration,
-        ).run();
-
-        final accuracyResult = accuracyRunInfo.result;
-        benchmark.accuracyModeResult = BenchmarkResult(
-          // loadgen doesn't calculate latency for accuracy mode benchmarks
-          // so throughput is infinity which is not a valid JSON numeric value
-          throughput: 0.0,
-          accuracy: accuracyResult.accuracy1,
-          accuracy2: accuracyResult.accuracy2,
-          backendName: accuracyResult.backendName,
-          acceleratorName: accuracyResult.acceleratorName,
-          batchSize: benchmark.benchmarkSettings.batchSize,
-          validity: false,
-        );
-      }
-
-      final resultHelper = ResultHelper(
+    } else if (mode == accuracyMode) {
+      progressInfo.accuracy = true;
+      progressInfo.calculateStageProgress = () {
+        final queryCounter = backendBridge.getQueryCounter();
+        final queryProgress = queryCounter < 0
+            ? 1.0
+            : queryCounter / backendBridge.getDatasetSize();
+        return queryProgress;
+      };
+      notifyListeners();
+      runInfo = await _NativeRunHelper(
+        enableArtificialLoad: store.artificialCPULoadEnabled,
+        isTestMode: store.testMode,
+        resourceManager: resourceManager,
+        backendBridge: backendBridge,
         benchmark: benchmark,
-        backendInfo: backendInfo,
+        runMode: accuracyMode,
+        commonSettings: backendInfo.settings.commonSetting,
+        backendLibName: backendInfo.libName,
+        logParentDir: currentLogDir,
+        testMinQueryCount: store.testMinQueryCount,
+        testMinDuration: store.testMinDuration,
+      ).run();
+
+      final accuracyResult = runInfo.result;
+      benchmark.accuracyModeResult = BenchmarkResult(
+        // loadgen doesn't calculate latency for accuracy mode benchmarks
+        // so throughput is infinity which is not a valid JSON numeric value
+        throughput: 0.0,
+        accuracy: accuracyResult.accuracy1,
+        accuracy2: accuracyResult.accuracy2,
+        backendName: accuracyResult.backendName,
+        acceleratorName: accuracyResult.acceleratorName,
+        batchSize: benchmark.benchmarkSettings.batchSize,
+        validity: false,
       );
-
-      exportResults.add(resultHelper.exportResultFromRunInfo(
-        performanceInfo: performanceRunInfo,
-        accuracyInfo: accuracyRunInfo,
-        perfMode: perfMode,
-        accuracyMode: accuracyMode,
-      ));
+    } else {
+      throw 'Unknown BenchmarkRunMode: $mode';
     }
 
-    if (aborting) {
-      aborting = false;
-      return null;
-    }
-    return ExtendedResult(
-      meta:
-          ResultMetaInfo(creationDate: DateTime.now(), uuid: const Uuid().v4()),
-      environmentInfo: DeviceInfo.instance.envInfo,
-      results: exportResults,
-      buildInfo: BuildInfoHelper.info,
-    );
+    return runInfo;
   }
 }
 
