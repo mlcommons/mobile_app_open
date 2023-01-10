@@ -113,7 +113,7 @@ class TaskRunner {
     progressInfo.cooldownDuration = cooldownDuration.inSeconds.toDouble();
 
     var first = true;
-    // run all performance benchmarks first then accuracy benchmarks.
+    // run all benchmarks in performance mode first
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
       // we only do cooldown before performance benchmarks
@@ -137,8 +137,10 @@ class TaskRunner {
           .performanceRunInfo = performanceRunInfo;
     }
 
+    // then in accuracy mode
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
+      if (!store.submissionMode) break;
       final accuracyRunInfo =
           await runBenchmark(benchmark, accuracyMode, currentLogDir);
       resultHelpers
