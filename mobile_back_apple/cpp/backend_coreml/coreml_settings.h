@@ -25,7 +25,7 @@ benchmark_setting {
   accelerator: "ane"
   accelerator_desc: "Apple Neural Engine"
   framework: "Core ML"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobilenetEdgeTPU.mlmodel"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
   model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
 }
 
@@ -35,7 +35,7 @@ benchmark_setting {
   accelerator_desc: "Apple Neural Engine"
   framework: "Core ML"
   batch_size: 32
-  model_path: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobilenetEdgeTPU.mlmodel"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
   model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
 }
 
@@ -44,7 +44,7 @@ benchmark_setting {
   accelerator: "ane"
   accelerator_desc: "Apple Neural Engine"
   framework: "Core ML"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobileDet.mlmodel"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileDet.mlmodel"
   model_checksum: "ef849fbf2132e205158f05ca42db25f4"
 }
 
@@ -53,7 +53,7 @@ benchmark_setting {
   accelerator: "gpu"
   accelerator_desc: "GPU"
   framework: "Core ML"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/MobileBERT.mlmodel"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileBERT.mlmodel"
   model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
 }
 
@@ -62,7 +62,7 @@ benchmark_setting {
   accelerator: "ane"
   accelerator_desc: "Apple Neural Engine"
   framework: "Core ML"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/coreml/beta/CoreML/Mosaic.mlmodel"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/Mosaic.mlmodel"
   model_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
 }
 
