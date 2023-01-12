@@ -21,7 +21,7 @@ void main() {
 
   final prefs = <String, Object>{
     StoreConstants.testMode: true,
-    StoreConstants.selectedBenchmarkRunMode: BenchmarkRunModeEnum.submissionRun,
+    StoreConstants.selectedBenchmarkRunMode: BenchmarkRunModeEnum.submissionRun.name,
     StoreConstants.testMinDuration: 1,
     StoreConstants.testMinQueryCount: 4,
   };
