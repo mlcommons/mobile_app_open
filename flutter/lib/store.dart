@@ -31,8 +31,8 @@ class Store extends ChangeNotifier {
 
   bool get share => _getBool(StoreConstants.share);
 
-  set share(bool shareFlag) {
-    _storeFromDisk.setBool(StoreConstants.share, shareFlag);
+  set share(bool value) {
+    _storeFromDisk.setBool(StoreConstants.share, value);
     notifyListeners();
   }
 
@@ -50,38 +50,37 @@ class Store extends ChangeNotifier {
 
   bool get submissionMode => _getBool(StoreConstants.submissionMode);
 
-  set submissionMode(bool submissionModeFlag) {
-    _storeFromDisk.setBool(StoreConstants.submissionMode, submissionModeFlag);
+  set submissionMode(bool value) {
+    _storeFromDisk.setBool(StoreConstants.submissionMode, value);
     notifyListeners();
   }
 
   bool get offlineMode => _getBool(StoreConstants.offlineMode);
 
-  set offlineMode(bool offlineModeFlag) {
-    _storeFromDisk.setBool(StoreConstants.offlineMode, offlineModeFlag);
+  set offlineMode(bool value) {
+    _storeFromDisk.setBool(StoreConstants.offlineMode, value);
     notifyListeners();
   }
 
   bool get artificialCPULoadEnabled =>
       _getBool(StoreConstants.artificialCPULoadEnabled, false);
 
-  set artificialCPULoadEnabled(bool artificialCPULoadEnabled) {
-    _storeFromDisk.setBool(
-        StoreConstants.artificialCPULoadEnabled, artificialCPULoadEnabled);
+  set artificialCPULoadEnabled(bool value) {
+    _storeFromDisk.setBool(StoreConstants.artificialCPULoadEnabled, value);
     notifyListeners();
   }
 
   bool get testMode => _getBool(StoreConstants.testMode);
 
-  set testMode(bool testModeFlag) {
-    _storeFromDisk.setBool(StoreConstants.testMode, testModeFlag);
+  set testMode(bool value) {
+    _storeFromDisk.setBool(StoreConstants.testMode, value);
     notifyListeners();
   }
 
   bool get cooldown => _getBool(StoreConstants.cooldown, true);
 
-  set cooldown(bool submissionModeFlag) {
-    _storeFromDisk.setBool(StoreConstants.cooldown, submissionModeFlag);
+  set cooldown(bool value) {
+    _storeFromDisk.setBool(StoreConstants.cooldown, value);
     notifyListeners();
   }
 
@@ -95,17 +94,16 @@ class Store extends ChangeNotifier {
   String get chosenConfigurationName =>
       _getString(StoreConstants.chosenConfigurationName);
 
-  set chosenConfigurationName(String configurationName) {
-    _storeFromDisk.setString(
-        StoreConstants.chosenConfigurationName, configurationName);
+  set chosenConfigurationName(String value) {
+    _storeFromDisk.setString(StoreConstants.chosenConfigurationName, value);
     notifyListeners();
   }
 
   String get previousExtendedResult =>
       _getString(StoreConstants.previousExtendedResult);
 
-  set previousExtendedResult(String result) {
-    _storeFromDisk.setString(StoreConstants.previousExtendedResult, result);
+  set previousExtendedResult(String value) {
+    _storeFromDisk.setString(StoreConstants.previousExtendedResult, value);
   }
 
   bool isShareOptionChosen() =>
