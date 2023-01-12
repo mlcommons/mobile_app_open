@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:mlperfbench/benchmark/run_mode.dart';
+
 class Store extends ChangeNotifier {
   final SharedPreferences _storeFromDisk;
 
@@ -31,6 +33,18 @@ class Store extends ChangeNotifier {
 
   set share(bool shareFlag) {
     _storeFromDisk.setBool(StoreConstants.share, shareFlag);
+    notifyListeners();
+  }
+
+  BenchmarkRunModeEnum get selectedBenchmarkRunMode {
+    String name = _getString(StoreConstants.selectedBenchmarkRunMode);
+    if (name == '') name = BenchmarkRunModeEnum.performanceOnly.name;
+    return BenchmarkRunModeEnum.values.byName(name);
+  }
+
+  set selectedBenchmarkRunMode(BenchmarkRunModeEnum value) {
+    _storeFromDisk.setString(
+        StoreConstants.selectedBenchmarkRunMode, value.name);
     notifyListeners();
   }
 
@@ -132,12 +146,15 @@ class Store extends ChangeNotifier {
   }
 
   int get testMinDuration => _getInt(StoreConstants.testMinDuration);
+
   int get testCooldown => _getInt(StoreConstants.testCooldownDuration);
+
   int get testMinQueryCount => _getInt(StoreConstants.testMinQueryCount);
 }
 
 class StoreConstants {
   static const share = 'share';
+  static const selectedBenchmarkRunMode = 'selectedBenchmarkRunMode';
   static const submissionMode = 'submission mode';
   static const artificialCPULoadEnabled = 'artificial cpu load enabled';
   static const offlineMode = 'offline mode';

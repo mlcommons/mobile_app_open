@@ -66,12 +66,12 @@ class TaskRunner {
       : BenchmarkRunMode.accuracy;
 
   List<BenchmarkRunMode> get selectedRunModes {
-    final result = <BenchmarkRunMode>[];
-    result.add(perfMode);
+    final modes = <BenchmarkRunMode>[];
+    modes.add(perfMode);
     if (store.submissionMode) {
-      result.add(accuracyMode);
+      modes.add(accuracyMode);
     }
-    return result;
+    return modes;
   }
 
   Future<void> abortBenchmarks() async {

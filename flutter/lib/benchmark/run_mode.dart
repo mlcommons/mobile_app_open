@@ -44,3 +44,9 @@ class BenchmarkRunMode {
     return readable;
   }
 }
+
+enum BenchmarkRunModeEnum {
+  performanceOnly,
+  accuracyOnly,
+  submissionRun,
+}
