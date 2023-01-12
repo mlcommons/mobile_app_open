@@ -81,7 +81,7 @@ class TaskRunner {
   }
 
   Future<ExtendedResult?> runBenchmarks(
-      BenchmarkList benchmarkList, String currentLogDir) async {
+      BenchmarkStore benchmarkStore, String currentLogDir) async {
     final cooldown = store.cooldown;
     late final Duration cooldownDuration;
     if (store.testMode) {
@@ -93,7 +93,7 @@ class TaskRunner {
     }
 
     final activeBenchmarks =
-        benchmarkList.benchmarks.where((element) => element.isActive);
+        benchmarkStore.benchmarks.where((element) => element.isActive);
 
     final resultHelpers = <ResultHelper>[];
     for (final benchmark in activeBenchmarks) {

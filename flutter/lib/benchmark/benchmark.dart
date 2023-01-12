@@ -135,10 +135,10 @@ class Benchmark {
   }
 }
 
-class BenchmarkList {
+class BenchmarkStore {
   final List<Benchmark> benchmarks = <Benchmark>[];
 
-  BenchmarkList({
+  BenchmarkStore({
     required pb.MLPerfConfig appConfig,
     required List<pb.BenchmarkSetting> backendConfig,
     required Map<String, bool> taskSelection,
