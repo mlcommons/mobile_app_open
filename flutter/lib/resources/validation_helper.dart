@@ -27,8 +27,8 @@ class ValidationHelper {
     if (!await Directory(dataFolderPath).exists()) {
       return 'Data folder does not exist';
     }
-    final resources =
-        benchmarkStore.listResources(modes: selectedRunModes, skipInactive: true);
+    final resources = benchmarkStore.listResources(
+        modes: selectedRunModes, skipInactive: true);
     final missing = await resourceManager.validateResourcesExist(resources);
     if (missing.isEmpty) return '';
 
@@ -37,8 +37,8 @@ class ValidationHelper {
   }
 
   Future<String> validateOfflineMode(String errorDescription) async {
-    final resources =
-        benchmarkStore.listResources(modes: selectedRunModes, skipInactive: true);
+    final resources = benchmarkStore.listResources(
+        modes: selectedRunModes, skipInactive: true);
     final internetResources = filterInternetResources(resources);
     if (internetResources.isEmpty) return '';
 

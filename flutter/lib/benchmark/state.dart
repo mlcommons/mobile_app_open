@@ -251,7 +251,8 @@ class BenchmarkState extends ChangeNotifier {
 
     try {
       resetCurrentResults();
-      lastResult = await taskRunner.runBenchmarks(_benchmarkStore, currentLogDir);
+      lastResult =
+          await taskRunner.runBenchmarks(_benchmarkStore, currentLogDir);
 
       if (lastResult == null) {
         print('benchmark aborted');
