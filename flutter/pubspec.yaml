@@ -41,7 +41,7 @@ dependencies:
   process_run: ^0.12.3+2
   flutter_lints: ^2.0.1
   device_marketing_names: ^0.5.0
-  file_picker: ^5.2.1
+  file_picker: ^5.2.3
   worker_manager: ^4.4.6
   ffi: ^2.0.1
   async: ^2.9.0
