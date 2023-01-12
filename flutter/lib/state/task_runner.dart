@@ -67,9 +67,17 @@ class TaskRunner {
 
   List<BenchmarkRunMode> get selectedRunModes {
     final modes = <BenchmarkRunMode>[];
-    modes.add(perfMode);
-    if (store.submissionMode) {
-      modes.add(accuracyMode);
+    switch (store.selectedBenchmarkRunMode) {
+      case BenchmarkRunModeEnum.performanceOnly:
+        modes.add(perfMode);
+        break;
+      case BenchmarkRunModeEnum.accuracyOnly:
+        modes.add(accuracyMode);
+        break;
+      case BenchmarkRunModeEnum.submissionRun:
+        modes.add(perfMode);
+        modes.add(accuracyMode);
+        break;
     }
     return modes;
   }
@@ -105,10 +113,18 @@ class TaskRunner {
       resultHelpers.add(resultHelper);
     }
 
-    progressInfo.totalStages = activeBenchmarks.length;
-    if (store.submissionMode) {
-      progressInfo.totalStages += activeBenchmarks.length;
+    switch (store.selectedBenchmarkRunMode) {
+      case BenchmarkRunModeEnum.performanceOnly:
+        progressInfo.totalStages = activeBenchmarks.length;
+        break;
+      case BenchmarkRunModeEnum.accuracyOnly:
+        progressInfo.totalStages = activeBenchmarks.length;
+        break;
+      case BenchmarkRunModeEnum.submissionRun:
+        progressInfo.totalStages = 2 * activeBenchmarks.length;
+        break;
     }
+
     progressInfo.currentStage = 0;
     progressInfo.cooldownDuration = cooldownDuration.inSeconds.toDouble();
 
@@ -117,6 +133,7 @@ class TaskRunner {
     // run all benchmarks in performance mode first
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
+      if (!store.selectedBenchmarkRunMode.doPerformanceRun) break;
       // we only do cooldown before performance benchmarks
       if (cooldown && !first && cooldownDuration.inMilliseconds > 0) {
         progressInfo.cooldown = true;
@@ -139,7 +156,7 @@ class TaskRunner {
     // then in accuracy mode
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
-      if (!store.submissionMode) break;
+      if (!store.selectedBenchmarkRunMode.doAccuracyRun) break;
       final resultHelper =
           resultHelpers.firstWhere((e) => e.benchmark == benchmark);
       await runBenchmark(resultHelper, accuracyMode, currentLogDir);

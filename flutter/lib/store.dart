@@ -48,13 +48,6 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get submissionMode => _getBool(StoreConstants.submissionMode);
-
-  set submissionMode(bool value) {
-    _storeFromDisk.setBool(StoreConstants.submissionMode, value);
-    notifyListeners();
-  }
-
   bool get offlineMode => _getBool(StoreConstants.offlineMode);
 
   set offlineMode(bool value) {
@@ -153,7 +146,6 @@ class Store extends ChangeNotifier {
 class StoreConstants {
   static const share = 'share';
   static const selectedBenchmarkRunMode = 'selectedBenchmarkRunMode';
-  static const submissionMode = 'submission mode';
   static const artificialCPULoadEnabled = 'artificial cpu load enabled';
   static const offlineMode = 'offline mode';
   static const testMode = 'test mode';

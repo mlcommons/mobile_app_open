@@ -50,3 +50,27 @@ enum BenchmarkRunModeEnum {
   accuracyOnly,
   submissionRun,
 }
+
+extension BenchmarkRunModeEnumExtension on BenchmarkRunModeEnum {
+  bool get doPerformanceRun {
+    switch (this) {
+      case BenchmarkRunModeEnum.performanceOnly:
+        return true;
+      case BenchmarkRunModeEnum.accuracyOnly:
+        return false;
+      case BenchmarkRunModeEnum.submissionRun:
+        return true;
+    }
+  }
+
+  bool get doAccuracyRun {
+    switch (this) {
+      case BenchmarkRunModeEnum.performanceOnly:
+        return false;
+      case BenchmarkRunModeEnum.accuracyOnly:
+        return true;
+      case BenchmarkRunModeEnum.submissionRun:
+        return true;
+    }
+  }
+}
