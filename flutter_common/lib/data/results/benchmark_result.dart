@@ -7,7 +7,7 @@ import 'dataset_info.dart';
 part 'benchmark_result.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class Throughput {
+class Throughput implements Comparable<Throughput> {
   final double value;
 
   Throughput({
@@ -20,13 +20,24 @@ class Throughput {
   Map<String, dynamic> toJson() => _$ThroughputToJson(this);
 
   @override
+  int compareTo(Throughput other) {
+    if ((value - other.value) > 0.0) {
+      return 1;
+    } else if ((value - other.value) < 0.0) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+
+  @override
   String toString() => value.toString();
 
   String toUIString() => value.toStringAsFixed(2);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class Accuracy {
+class Accuracy implements Comparable<Accuracy> {
   final double normalized;
   final String formatted;
 
@@ -43,6 +54,17 @@ class Accuracy {
   bool isInBounds({double min = 0.0, double max = 1.0}) {
     if (!normalized.isFinite) return false;
     return normalized >= min && normalized <= max;
+  }
+
+  @override
+  int compareTo(Accuracy other) {
+    if ((normalized - other.normalized) > 0.0) {
+      return 1;
+    } else if ((normalized - other.normalized) < 0.0) {
+      return -1;
+    } else {
+      return 0;
+    }
   }
 
   @override
