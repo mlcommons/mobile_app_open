@@ -7,6 +7,25 @@ import 'dataset_info.dart';
 part 'benchmark_result.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
+class Throughput {
+  final double value;
+
+  Throughput({
+    required this.value,
+  });
+
+  factory Throughput.fromJson(Map<String, dynamic> json) =>
+      _$ThroughputFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ThroughputToJson(this);
+
+  @override
+  String toString() => value.toString();
+
+  String toUIString() => value.toStringAsFixed(2);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Accuracy {
   final double normalized;
   final String formatted;
@@ -51,7 +70,7 @@ class BenchmarkLoadgenInfo {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class BenchmarkRunResult {
-  final double? throughput;
+  final Throughput? throughput;
   final Accuracy? accuracy;
   final Accuracy? accuracy2;
   final DatasetInfo dataset;

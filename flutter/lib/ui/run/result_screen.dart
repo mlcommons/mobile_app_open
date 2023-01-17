@@ -71,26 +71,27 @@ class _ResultScreenState extends State<ResultScreen>
     final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
     for (final benchmark in state.benchmarks) {
-      late final String? textResult;
-      late final double? numericResult;
-      late final String? textResult2;
-      late final double? numericResult2;
+      late final String? resultText;
+      late final double? progressBarValue;
+      late final String? resultText2;
+      late final double? progressBarValue2;
       late final BenchmarkResult? benchmarkResult;
       late final bool resultIsValid;
       if (_screenMode == _ScreenMode.performance) {
         benchmarkResult = benchmark.performanceModeResult;
         final throughput = benchmarkResult?.throughput;
-        textResult = throughput?.toStringAsFixed(2);
-        numericResult = (throughput ?? 0.0) / benchmark.info.maxThroughput;
-        textResult2 = null;
-        numericResult2 = null;
+        resultText = throughput?.toUIString();
+        progressBarValue =
+            (throughput?.value ?? 0.0) / benchmark.info.maxThroughput;
+        resultText2 = null;
+        progressBarValue2 = null;
         resultIsValid = benchmarkResult?.validity ?? false;
       } else if (_screenMode == _ScreenMode.accuracy) {
         benchmarkResult = benchmark.accuracyModeResult;
-        textResult = benchmarkResult?.accuracy?.formatted;
-        numericResult = benchmarkResult?.accuracy?.normalized;
-        textResult2 = benchmarkResult?.accuracy2?.formatted;
-        numericResult2 = benchmarkResult?.accuracy2?.normalized;
+        resultText = benchmarkResult?.accuracy?.formatted;
+        progressBarValue = benchmarkResult?.accuracy?.normalized;
+        resultText2 = benchmarkResult?.accuracy2?.formatted;
+        progressBarValue2 = benchmarkResult?.accuracy2?.normalized;
         resultIsValid =
             (benchmarkResult?.accuracy?.normalized ?? -1.0) >= 0.0 &&
                 (benchmarkResult?.accuracy?.normalized ?? -1.0) <= 1.0 &&
@@ -116,7 +117,7 @@ class _ResultScreenState extends State<ResultScreen>
               Column(
                 children: [
                   Text(
-                    textResult ?? 'N/A',
+                    resultText ?? 'N/A',
                     style: TextStyle(
                       color: resultIsValid
                           ? AppColors.darkText
@@ -125,9 +126,9 @@ class _ResultScreenState extends State<ResultScreen>
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (textResult2 != null)
+                  if (resultText2 != null)
                     Text(
-                      textResult2,
+                      resultText2,
                       style: TextStyle(
                         color: resultIsValid
                             ? AppColors.darkText
@@ -145,7 +146,7 @@ class _ResultScreenState extends State<ResultScreen>
       ));
       if (benchmark.info.isOffline) {
         String batchSize;
-        if (textResult == null) {
+        if (resultText == null) {
           batchSize = 'N/A';
         } else {
           batchSize = benchmarkResult?.batchSize.toString() ?? '';
@@ -166,10 +167,10 @@ class _ResultScreenState extends State<ResultScreen>
         ));
       }
       rowChildren.add(FractionallySizedBox(
-          widthFactor: 0.9, child: BlueProgressLine(numericResult ?? 0.0)));
-      if (numericResult2 != null) {
+          widthFactor: 0.9, child: BlueProgressLine(progressBarValue ?? 0.0)));
+      if (progressBarValue2 != null) {
         rowChildren.add(FractionallySizedBox(
-            widthFactor: 0.9, child: BlueProgressLine(numericResult2)));
+            widthFactor: 0.9, child: BlueProgressLine(progressBarValue2)));
       }
       list.add(
         Column(
@@ -205,7 +206,7 @@ class _ResultScreenState extends State<ResultScreen>
           ? benchmark.performanceModeResult
           : benchmark.accuracyModeResult;
       final text = _screenMode == _ScreenMode.performance
-          ? result?.throughput.toStringAsFixed(2)
+          ? result?.throughput?.toUIString()
           : result?.accuracy?.toUIString();
       final text2 = _screenMode == _ScreenMode.performance
           ? null
