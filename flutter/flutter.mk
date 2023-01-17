@@ -109,22 +109,22 @@ flutter/firebase/prefix:
 		| tee firebase_functions/functions/src/prefix.gen.ts
 
 RESULT_JSON_SAMPLE_PATH?=output/extended-result-example.json
-.PHONY: flutter/result/sample
-flutter/result/sample:
+.PHONY: flutter/result/gen-extended-sample
+flutter/result/gen-extended-sample:
 	cd flutter_common && \
 		${_start_args} dart run \
 		--define=jsonFileName=../${RESULT_JSON_SAMPLE_PATH} \
 		lib/data/generation_helpers/write_json_sample.main.dart
 
-.PHONY: flutter/result/test-sample
-flutter/result/test-sample:
-	make flutter/result/sample \
+.PHONY: flutter/result/gen-unittest-sample
+flutter/result/gen-unittest-sample:
+	make flutter/result/gen-extended-sample \
 		RESULT_JSON_SAMPLE_PATH=flutter_common/test/data/result_sample.json
 
 default_result_json_schema_path=tools/extended-result.schema.json
 RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
 .PHONY: flutter/result/schema
-flutter/result/schema: flutter/result/sample
+flutter/result/schema: flutter/result/gen-extended-sample
 	quicktype ${RESULT_JSON_SAMPLE_PATH} \
 		--lang schema \
 		--out ${RESULT_JSON_SCHEMA_PATH}

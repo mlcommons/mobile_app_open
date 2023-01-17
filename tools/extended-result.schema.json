@@ -338,7 +338,7 @@
                 "throughput": {
                     "oneOf": [
                         {
-                            "type": "number"
+                            "$ref": "#/definitions/Throughput"
                         },
                         {
                             "type": "null"
@@ -458,6 +458,19 @@
                 "validity"
             ],
             "title": "LoadgenInfo"
+        },
+        "Throughput": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "value"
+            ],
+            "title": "Throughput"
         },
         "BackendInfo": {
             "type": "object",
