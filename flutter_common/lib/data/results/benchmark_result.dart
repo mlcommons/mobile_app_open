@@ -21,9 +21,10 @@ class Throughput implements Comparable<Throughput> {
 
   @override
   int compareTo(Throughput other) {
-    if ((value - other.value) > 0.0) {
+    final diff = value - other.value;
+    if (diff > 0.0) {
       return 1;
-    } else if ((value - other.value) < 0.0) {
+    } else if (diff < 0.0) {
       return -1;
     } else {
       return 0;
@@ -58,9 +59,10 @@ class Accuracy implements Comparable<Accuracy> {
 
   @override
   int compareTo(Accuracy other) {
-    if ((normalized - other.normalized) > 0.0) {
+    final diff = normalized - other.normalized;
+    if (diff > 0.0) {
       return 1;
-    } else if ((normalized - other.normalized) < 0.0) {
+    } else if (diff < 0.0) {
       return -1;
     } else {
       return 0;
