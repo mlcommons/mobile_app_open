@@ -64,7 +64,7 @@ class _ResultScreenState extends State<ResultScreen>
     super.dispose();
   }
 
-  Column _createListOfBenchmarkResultWidgets(
+  Column _createListOfBenchmarkResultBottomWidgets(
       BuildContext context, BenchmarkState state) {
     final list = <Widget>[];
     final stringResources = AppLocalizations.of(context);
@@ -206,10 +206,10 @@ class _ResultScreenState extends State<ResultScreen>
           : benchmark.accuracyModeResult;
       final text = _screenMode == _ScreenMode.performance
           ? result?.throughput.toStringAsFixed(2)
-          : result?.accuracy?.normalized.toStringAsFixed(2);
+          : result?.accuracy?.toUIString();
       final text2 = _screenMode == _ScreenMode.performance
           ? null
-          : result?.accuracy2?.normalized.toStringAsFixed(2);
+          : result?.accuracy2?.toUIString();
       final resultIsValid = _screenMode == _ScreenMode.performance
           ? (result?.validity ?? false)
           : ((result?.accuracy?.normalized ?? -1.0) >= 0.0 &&
@@ -336,7 +336,7 @@ class _ResultScreenState extends State<ResultScreen>
             MaterialStateProperty.all<Size>(Size(minimumShareButtonWidth, 0)));
 
     final detailedResultsPage = Column(children: [
-      _createListOfBenchmarkResultWidgets(context, state),
+      _createListOfBenchmarkResultBottomWidgets(context, state),
       Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           child: TextButton(

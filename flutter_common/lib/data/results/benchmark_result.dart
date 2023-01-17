@@ -28,6 +28,9 @@ class Accuracy {
 
   @override
   String toString() => normalized.toString();
+
+  // We want to display 0.12345 as 12.3 in the overview screen.
+  String toUIString() => (normalized * 100).toStringAsFixed(1);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
