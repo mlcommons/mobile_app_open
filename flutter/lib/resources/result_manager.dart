@@ -105,7 +105,7 @@ class ResultManager {
     }
 
     return BenchmarkResult(
-      throughput: runResult.throughput ?? 0.0,
+      throughput: runResult.throughput,
       accuracy: runResult.accuracy,
       accuracy2: runResult.accuracy2,
       backendName: export.backendInfo.backendName,

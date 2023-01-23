@@ -205,7 +205,7 @@ class TaskRunner {
 
       final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
-        throughput: performanceRunInfo.throughput ?? 0.0,
+        throughput: performanceRunInfo.throughput,
         accuracy: performanceResult.accuracy1,
         accuracy2: performanceResult.accuracy2,
         backendName: performanceResult.backendName,
@@ -242,7 +242,7 @@ class TaskRunner {
       benchmark.accuracyModeResult = BenchmarkResult(
         // loadgen doesn't calculate latency for accuracy mode benchmarks
         // so throughput is infinity which is not a valid JSON numeric value
-        throughput: 0.0,
+        throughput: null,
         accuracy: accuracyResult.accuracy1,
         accuracy2: accuracyResult.accuracy2,
         backendName: accuracyResult.backendName,
@@ -330,8 +330,11 @@ class _NativeRunHelper {
 
   Future<RunInfo> _makeRunInfo(NativeRunResult nativeResult) async {
     final loadgenInfo = await extractLoadgenInfo();
-    final throughput = _calculateThroughput(nativeResult, loadgenInfo);
-
+    final throughputValue = _calculateThroughput(nativeResult, loadgenInfo);
+    Throughput? throughput;
+    if (throughputValue != null) {
+      throughput = Throughput(value: throughputValue);
+    }
     return RunInfo(
       settings: runSettings,
       result: nativeResult,

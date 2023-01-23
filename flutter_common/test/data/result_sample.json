@@ -1,8 +1,8 @@
 {
   "meta": {
-    "uuid": "7b18d7bf-7461-4bbb-8aa4-fb06d8e282f5",
-    "creation_date": "2022-12-09T15:35:11.583110",
-    "upload_date": "2022-12-09T08:35:11.583111Z"
+    "uuid": "d025f15c-0a4b-42ac-9303-232664acfcc6",
+    "creation_date": "2023-01-17T19:33:02.053904",
+    "upload_date": "2023-01-17T12:33:02.053904Z"
   },
   "results": [
     {
@@ -25,7 +25,9 @@
         ]
       },
       "performance_run": {
-        "throughput": 123.45,
+        "throughput": {
+          "value": 1234.45
+        },
         "accuracy": {
           "normalized": 0.123,
           "formatted": "12.3%"
@@ -42,14 +44,16 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T15:35:11.587791",
+        "start_datetime": "2023-01-17T19:33:02.057980",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
         }
       },
       "accuracy_run": {
-        "throughput": 123.45,
+        "throughput": {
+          "value": 1234.45
+        },
         "accuracy": {
           "normalized": 0.123,
           "formatted": "12.3%"
@@ -66,7 +70,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T15:35:11.587867",
+        "start_datetime": "2023-01-17T19:33:02.058049",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -101,7 +105,9 @@
         ]
       },
       "performance_run": {
-        "throughput": 123.45,
+        "throughput": {
+          "value": 1234.45
+        },
         "accuracy": {
           "normalized": 0.123,
           "formatted": "12.3%"
@@ -118,14 +124,16 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T15:35:11.589247",
+        "start_datetime": "2023-01-17T19:33:02.059334",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
         }
       },
       "accuracy_run": {
-        "throughput": 123.45,
+        "throughput": {
+          "value": 1234.45
+        },
         "accuracy": {
           "normalized": 0.123,
           "formatted": "12.3%"
@@ -142,7 +150,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-09T15:35:11.589248",
+        "start_datetime": "2023-01-17T19:33:02.059335",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -191,7 +199,7 @@
   "build_info": {
     "version": "1.0",
     "build_number": "10qwe",
-    "build_date": "2022-12-09T15:35:11.586901",
+    "build_date": "2023-01-17T19:33:02.057143",
     "official_release_flag": false,
     "dev_test_flag": true,
     "backend_list": [

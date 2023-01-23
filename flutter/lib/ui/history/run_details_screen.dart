@@ -69,7 +69,7 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
   List<Widget> _makePerformanceInfo(BenchmarkRunResult perf) {
     return [
       helper.makeInfo(l10n.historyRunDetailsPerfQps,
-          perf.throughput?.toStringAsFixed(2) ?? l10n.resultsNotAvailable),
+          perf.throughput?.toUIString() ?? l10n.resultsNotAvailable),
       helper.makeInfo(l10n.historyRunDetailsValid,
           (perf.loadgenInfo?.validity ?? false).toString()),
       helper.makeInfo(l10n.historyRunDetailsDuration,
