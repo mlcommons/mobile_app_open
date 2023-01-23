@@ -42,7 +42,7 @@ class _DetailsScreen extends State<DetailsScreen> {
       if (item.performanceRun == null) {
         continue;
       }
-      throughput += item.performanceRun!.throughput!;
+      throughput += item.performanceRun!.throughput!.value;
       count++;
     }
     return throughput / count;
@@ -112,7 +112,7 @@ class _DetailsScreen extends State<DetailsScreen> {
     return RowData(
       isHeader: false,
       name: runInfo.benchmarkName,
-      throughput: runInfo.performanceRun?.throughput?.toStringAsFixed(2) ??
+      throughput: runInfo.performanceRun?.throughput?.toUIString() ??
           l10n.resultsNotAvailable,
       throughputValid: runInfo.performanceRun?.loadgenInfo?.validity ?? false,
       accuracy:

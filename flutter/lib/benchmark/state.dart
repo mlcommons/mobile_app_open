@@ -62,7 +62,7 @@ class BenchmarkState extends ChangeNotifier {
 
     final summaryThroughput = pow(
         benchmarks.fold<double>(1, (prev, i) {
-          return prev * (i.performanceModeResult?.throughput ?? 1.0);
+          return prev * (i.performanceModeResult?.throughput?.value ?? 1.0);
         }),
         1.0 / benchmarksCount);
 
