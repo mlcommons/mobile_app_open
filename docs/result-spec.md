@@ -58,10 +58,11 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
     * `value_name`: string. Value from `setting.value.name` that is passed to backend
 * `performance_run`: map  
   May be null if performance was not tested in this benchmark.
-  * `throughput`: floating point number  
-    Throughput value for this run of the benchmark.
+  * `throughput`: map  
     May be null for an accuracy run.
-  * `accuracy`: map
+    * `value`: floating point number  
+      Throughput value for this run of the benchmark.
+  * `accuracy`: map  
     May be null for a performance run if groundtruth file is not provided.
     * `normalized`: floating point number  
       Accuracy value for this run of the benchmark.
