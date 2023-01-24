@@ -86,7 +86,7 @@ task {
     full {
       name: "ADE20K validation set"
       input_path: "local:///mlperf_datasets/ade20k/images"
-      groundtruth_path: "local:////mlperf_datasets/ade20k/annotations"
+      groundtruth_path: "local:///mlperf_datasets/ade20k/annotations"
     }
     lite {
       name: "Open images subset for segmentation"
@@ -189,7 +189,7 @@ task {
     full {
       name: "SNUSR dataset for accuracy test"
       input_path: "local:///mlperf_datasets/snusr/lr"
-      groundtruth_path: "local:////mlperf_datasets/snusr/hr"
+      groundtruth_path: "local:///mlperf_datasets/snusr/hr"
     }
     lite {
       name: "SNUSR dataset for performance test"
