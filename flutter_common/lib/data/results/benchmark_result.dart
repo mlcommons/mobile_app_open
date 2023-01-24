@@ -41,7 +41,7 @@ class Throughput implements Comparable<Throughput> {
 
   @override
   bool operator ==(Object other) {
-    return (other is Throughput) && other.value == value;
+    return (other is Throughput) && compareTo(other) == 0;
   }
 
   @override
@@ -95,7 +95,7 @@ class Accuracy implements Comparable<Accuracy> {
 
   @override
   bool operator ==(Object other) {
-    return (other is Accuracy) && other.normalized == normalized;
+    return (other is Accuracy) && compareTo(other) == 0;
   }
 
   @override
