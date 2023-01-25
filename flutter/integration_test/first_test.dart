@@ -88,15 +88,15 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   final accuracyRun = benchmarkResult.accuracyRun;
   accuracyRun!;
 
-  final accuracyValue = accuracyRun.accuracy;
-  accuracyValue!;
+  final accuracy = accuracyRun.accuracy;
+  accuracy!;
   expect(
-    accuracyValue.normalized,
+    accuracy.normalized,
     greaterThanOrEqualTo(expectedValue.min),
     reason: 'accuracy for $tag is too low',
   );
   expect(
-    accuracyValue.normalized,
+    accuracy.normalized,
     lessThanOrEqualTo(expectedValue.max),
     reason: 'accuracy for $tag is too high',
   );
@@ -144,27 +144,27 @@ void checkThroughput(
 
   final deviceModel = getDeviceModel(environmentInfo);
   tag += ' | deviceModel: $deviceModel';
-  final expectedThroughput = backendExpectedMap[deviceModel];
+  final expectedValue = backendExpectedMap[deviceModel];
   expect(
-    expectedThroughput,
+    expectedValue,
     isNotNull,
     reason: 'missing expected throughput for [$tag]',
   );
-  expectedThroughput!;
+  expectedValue!;
 
   final run = benchmarkResult.performanceRun;
   run!;
 
-  final value = run.throughput;
-  value!;
+  final throughput = run.throughput;
+  throughput!;
   expect(
-    value,
-    greaterThanOrEqualTo(expectedThroughput.min),
+    throughput.value,
+    greaterThanOrEqualTo(expectedValue.min),
     reason: 'throughput for [$tag] is too low',
   );
   expect(
-    value,
-    lessThanOrEqualTo(expectedThroughput.max),
+    throughput.value,
+    lessThanOrEqualTo(expectedValue.max),
     reason: 'throughput for [$tag] is too high',
   );
 }

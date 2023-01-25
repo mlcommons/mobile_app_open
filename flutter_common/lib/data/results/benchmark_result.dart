@@ -7,7 +7,38 @@ import 'dataset_info.dart';
 part 'benchmark_result.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class Accuracy {
+class Throughput implements Comparable<Throughput> {
+  final double value;
+
+  Throughput({
+    required this.value,
+  });
+
+  factory Throughput.fromJson(Map<String, dynamic> json) =>
+      _$ThroughputFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ThroughputToJson(this);
+
+  @override
+  int compareTo(Throughput other) {
+    final diff = value - other.value;
+    if (diff > 0.0) {
+      return 1;
+    } else if (diff < 0.0) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+
+  @override
+  String toString() => value.toString();
+
+  String toUIString() => value.toStringAsFixed(2);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class Accuracy implements Comparable<Accuracy> {
   final double normalized;
   final String formatted;
 
@@ -27,7 +58,22 @@ class Accuracy {
   }
 
   @override
+  int compareTo(Accuracy other) {
+    final diff = normalized - other.normalized;
+    if (diff > 0.0) {
+      return 1;
+    } else if (diff < 0.0) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+
+  @override
   String toString() => normalized.toString();
+
+  // We want to display 0.12345 as 12.3 in the overview screen.
+  String toUIString() => (normalized * 100).toStringAsFixed(1);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
@@ -48,7 +94,7 @@ class BenchmarkLoadgenInfo {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class BenchmarkRunResult {
-  final double? throughput;
+  final Throughput? throughput;
   final Accuracy? accuracy;
   final Accuracy? accuracy2;
   final DatasetInfo dataset;

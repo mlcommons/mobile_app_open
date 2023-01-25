@@ -1,11 +1,11 @@
 {
   "meta": {
-    "uuid": "5d4d891f-ed6b-4208-83fc-1fcf58a33be7",
-    "creation_date": "2022-12-26T17:47:57.519522",
-    "upload_date": "2022-12-26T10:47:57.519523Z"
+    "uuid": "f4f16ee5-ff0a-43b9-94d3-097b64943e39",
+    "creation_date": "2023-01-25T09:16:15.229817",
+    "upload_date": "2023-01-25T02:16:15.229817Z"
   },
   "filter": {
-    "creation_date": "2022-12-26T17:47:57.522322",
+    "creation_date": "2023-01-25T09:16:15.232773",
     "platform": "iOS",
     "device_model": "iPhone XS",
     "backend_name": "TFLite",
@@ -39,7 +39,9 @@
         "accelerator_name": "ANE"
       },
       "performance_run": {
-        "throughput": 123.45,
+        "throughput": {
+          "value": 1234.45
+        },
         "accuracy": {
           "normalized": 0.123,
           "formatted": "12.3%"
@@ -56,14 +58,16 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-26T17:47:57.524523",
+        "start_datetime": "2023-01-25T09:16:15.235005",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
         }
       },
       "accuracy_run": {
-        "throughput": 123.45,
+        "throughput": {
+          "value": 1234.45
+        },
         "accuracy": {
           "normalized": 0.123,
           "formatted": "12.3%"
@@ -80,7 +84,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-26T17:47:57.524524",
+        "start_datetime": "2023-01-25T09:16:15.235006",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -115,7 +119,9 @@
         "accelerator_name": "ANE"
       },
       "performance_run": {
-        "throughput": 123.45,
+        "throughput": {
+          "value": 1234.45
+        },
         "accuracy": {
           "normalized": 0.123,
           "formatted": "12.3%"
@@ -132,14 +138,16 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-26T17:47:57.524530",
+        "start_datetime": "2023-01-25T09:16:15.235012",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
         }
       },
       "accuracy_run": {
-        "throughput": 123.45,
+        "throughput": {
+          "value": 1234.45
+        },
         "accuracy": {
           "normalized": 0.123,
           "formatted": "12.3%"
@@ -156,7 +164,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2022-12-26T17:47:57.524530",
+        "start_datetime": "2023-01-25T09:16:15.235013",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -199,7 +207,7 @@
   "build_info": {
     "version": "1.0",
     "build_number": "10qwe",
-    "build_date": "2022-12-26T17:47:57.524113",
+    "build_date": "2023-01-25T09:16:15.234588",
     "official_release_flag": false,
     "dev_test_flag": true,
     "backend_list": [

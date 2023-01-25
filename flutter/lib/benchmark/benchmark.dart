@@ -12,7 +12,7 @@ import 'info.dart';
 import 'run_mode.dart';
 
 class BenchmarkResult {
-  final double throughput;
+  final Throughput? throughput;
   final Accuracy? accuracy;
   final Accuracy? accuracy2;
   final String backendName;
@@ -40,7 +40,8 @@ class BenchmarkResult {
   static BenchmarkResult? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
     return BenchmarkResult(
-      throughput: json[_tagThroughput] as double,
+      throughput:
+          Throughput.fromJson(json[_tagThroughput] as Map<String, dynamic>),
       accuracy: Accuracy.fromJson(json[_tagAccuracy] as Map<String, dynamic>),
       accuracy2: Accuracy.fromJson(json[_tagAccuracy2] as Map<String, dynamic>),
       backendName: json[_tagBackendName] as String,
