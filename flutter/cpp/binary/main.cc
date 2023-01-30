@@ -73,12 +73,70 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
 
 }  // namespace
 
+void report_accuracy(std::string test_results_file,
+                        std::string benchmark_id,
+                        std::string accuracy) {
+
+  std::ofstream results_file(test_results_file);
+  results_file << "#######" << benchmark_id << "##########" << std::endl;
+  LOG(INFO) << "Accuracy: " << accuracy;
+  results_file << "Accuracy: " << accuracy << std::endl;
+
+  results_file.close();
+}
+
+void report_performance(std::string loadgen_summary_file,
+                        std::string test_results_file,
+                        std::string benchmark_id,
+                        bool is_offline) {
+  std::ifstream  summary_file(loadgen_summary_file);
+
+  std::vector<std::string> keys = {"90.00 percentile latency (ns)",
+                                  "Result is"
+                                };
+  std::vector<std::string> values(keys.size());
+
+  std::string line;
+  std::string separator = ":";
+  int i;
+  while (getline(summary_file,line)) {
+    for (i=0;i<keys.size();i++) {
+      if (line.find(keys[i]) != std::string::npos) {
+        values[i] = line.substr(line.find(separator)+2);
+      }
+    }
+  }
+
+  keys.emplace_back("QPS");
+  long long latency = std::stoll(values[0].c_str());
+  float final_qps = 0;
+  if (latency != 0) {
+    final_qps = (1000000000.0/(float)latency);
+    if (is_offline) {
+      final_qps = (24576 * 1000000000.0/(float)latency);
+    }
+  }
+  values.emplace_back(std::to_string(final_qps));
+
+  LOG(INFO) << keys[2] << " : " << values[2];
+  std::ofstream results_file(test_results_file);
+  results_file << "#######" << benchmark_id << "##########" << std::endl;
+
+  for (i=0;i<keys.size();i++) {
+    results_file << keys[i] << " : " << values[i] << std::endl;
+  }
+
+  summary_file.close();
+  results_file.close();
+}
+
 int Main(int argc, char *argv[]) {
   using tflite::Flag;
   using tflite::Flags;
   std::string command_line = argv[0];
   // Flags for backend and dataset.
   std::string backend_name, dataset_name;
+  std::string benchmark_id;
   BackendType backend_type = BackendType::NONE;
   DatasetConfig::DatasetType dataset_type = DatasetConfig::NONE;
   std::vector<Flag> flag_list{
@@ -101,7 +159,7 @@ int Main(int argc, char *argv[]) {
   command_line += " " + backend_name + " " + dataset_name;
 
   // Command Line Flags for mlperf.
-  std::string mode, scenario = "SingleStream", output_dir;
+  std::string mode, scenario = "SingleStream", output_dir, results_file;
   int min_query_count = 100, min_duration = 100,
       single_stream_expected_latency_ns = 1000000;
   flag_list.clear();
@@ -121,7 +179,9 @@ int Main(int argc, char *argv[]) {
                         &single_stream_expected_latency_ns,
                         "single_stream_expected_latency_ns"),
        Flag::CreateFlag("output_dir", &output_dir,
-                        "The output directory of mlperf.", Flag::kRequired)});
+                        "The output directory of mlperf.", Flag::kRequired),
+       Flag::CreateFlag("results_file",&results_file,
+                        "The results summary file in json.", Flag::kRequired)});
 
   // Command Line Flags for backend.
   std::unique_ptr<Backend> backend;
@@ -150,7 +210,6 @@ int Main(int argc, char *argv[]) {
         std::string msg = mlperf::mobile::BackendFunctions::isSupported(
             lib_path, "", model_file_path, &pbdata);
         std::string backend_setting_string(pbdata, strlen(pbdata));
-        std::string benchmark_id;
         BackendSetting backend_setting;
 
         google::protobuf::TextFormat::ParseFromString(pbdata, &backend_setting);
@@ -370,7 +429,14 @@ int Main(int argc, char *argv[]) {
                       batch_size);
   driver.RunMLPerfTest(mode, min_query_count, min_duration / 1000.0,
                        single_stream_expected_latency_ns, output_dir);
-  LOG(INFO) << "Accuracy: " << driver.ComputeAccuracyString();
+
+  if (driver.HasAccuracy()) {
+    // Report accuracy if computed
+    report_accuracy(results_file,benchmark_id,driver.ComputeAccuracyString());
+  } else {
+    // Report performance
+    report_performance(output_dir+"\\mlperf_log_summary.txt",results_file,benchmark_id, scenario == "Offline");
+  }
   return 0;
 }
 
