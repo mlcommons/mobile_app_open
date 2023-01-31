@@ -73,10 +73,8 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
 
 }  // namespace
 
-void report_accuracy(std::string test_results_file,
-                        std::string benchmark_id,
-                        std::string accuracy) {
-
+void report_accuracy(std::string test_results_file, std::string benchmark_id,
+                     std::string accuracy) {
   std::ofstream results_file(test_results_file);
   results_file << "#######" << benchmark_id << "##########" << std::endl;
   LOG(INFO) << "Accuracy: " << accuracy;
@@ -86,23 +84,21 @@ void report_accuracy(std::string test_results_file,
 }
 
 void report_performance(std::string loadgen_summary_file,
-                        std::string test_results_file,
-                        std::string benchmark_id,
+                        std::string test_results_file, std::string benchmark_id,
                         bool is_offline) {
-  std::ifstream  summary_file(loadgen_summary_file);
+  std::ifstream summary_file(loadgen_summary_file);
 
   std::vector<std::string> keys = {"90.00 percentile latency (ns)",
-                                  "Result is"
-                                };
+                                   "Result is"};
   std::vector<std::string> values(keys.size());
 
   std::string line;
   std::string separator = ":";
   int i;
-  while (getline(summary_file,line)) {
-    for (i=0;i<keys.size();i++) {
+  while (getline(summary_file, line)) {
+    for (i = 0; i < keys.size(); i++) {
       if (line.find(keys[i]) != std::string::npos) {
-        values[i] = line.substr(line.find(separator)+2);
+        values[i] = line.substr(line.find(separator) + 2);
       }
     }
   }
@@ -111,9 +107,9 @@ void report_performance(std::string loadgen_summary_file,
   long long latency = std::stoll(values[0].c_str());
   float final_qps = 0;
   if (latency != 0) {
-    final_qps = (1000000000.0/(float)latency);
+    final_qps = (1000000000.0 / (float)latency);
     if (is_offline) {
-      final_qps = (24576 * 1000000000.0/(float)latency);
+      final_qps = (24576 * 1000000000.0 / (float)latency);
     }
   }
   values.emplace_back(std::to_string(final_qps));
@@ -122,7 +118,7 @@ void report_performance(std::string loadgen_summary_file,
   std::ofstream results_file(test_results_file);
   results_file << "#######" << benchmark_id << "##########" << std::endl;
 
-  for (i=0;i<keys.size();i++) {
+  for (i = 0; i < keys.size(); i++) {
     results_file << keys[i] << " : " << values[i] << std::endl;
   }
 
@@ -180,7 +176,7 @@ int Main(int argc, char *argv[]) {
                         "single_stream_expected_latency_ns"),
        Flag::CreateFlag("output_dir", &output_dir,
                         "The output directory of mlperf.", Flag::kRequired),
-       Flag::CreateFlag("results_file",&results_file,
+       Flag::CreateFlag("results_file", &results_file,
                         "The results summary file in json.", Flag::kRequired)});
 
   // Command Line Flags for backend.
@@ -432,10 +428,11 @@ int Main(int argc, char *argv[]) {
 
   if (driver.HasAccuracy()) {
     // Report accuracy if computed
-    report_accuracy(results_file,benchmark_id,driver.ComputeAccuracyString());
+    report_accuracy(results_file, benchmark_id, driver.ComputeAccuracyString());
   } else {
     // Report performance
-    report_performance(output_dir+"\\mlperf_log_summary.txt",results_file,benchmark_id, scenario == "Offline");
+    report_performance(output_dir + "\\mlperf_log_summary.txt", results_file,
+                       benchmark_id, scenario == "Offline");
   }
   return 0;
 }
