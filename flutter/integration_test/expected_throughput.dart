@@ -133,6 +133,6 @@ const benchmarkExpectedThroughput = {
   BenchmarkId.objectDetection: _objectDetection,
   BenchmarkId.imageSegmentationV2: _imageSegmentation,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
-  BenchmarkId.imageClassificationOffline: _imageClassificationOffline,
   BenchmarkId.superResolution: _superResolution,
+  BenchmarkId.imageClassificationOffline: _imageClassificationOffline,
 };

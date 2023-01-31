@@ -61,7 +61,6 @@ class BenchmarkInfo {
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameSuperResolution,
           detailsTitle: stringResources.benchInfoSuperResolution,
-          // TODO (anhappdev): update text for benchInfoSuperResolutionDesc
           detailsContent: stringResources.benchInfoSuperResolutionDesc,
         );
       default:
@@ -86,8 +85,8 @@ final _benchmarkIcons = {
   BenchmarkId.objectDetection: AppIcons.objectDetection,
   BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentation,
   BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessing,
-  BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOffline,
   BenchmarkId.superResolution: AppIcons.superResolution,
+  BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOffline,
 };
 
 final _benchmarkIconsWhite = {
@@ -95,7 +94,7 @@ final _benchmarkIconsWhite = {
   BenchmarkId.objectDetection: AppIcons.objectDetectionWhite,
   BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentationWhite,
   BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessingWhite,
+  BenchmarkId.superResolution: AppIcons.superResolutionWhite,
   BenchmarkId.imageClassificationOffline:
       AppIcons.imageClassificationOfflineWhite,
-  BenchmarkId.superResolution: AppIcons.superResolutionWhite,
 };
