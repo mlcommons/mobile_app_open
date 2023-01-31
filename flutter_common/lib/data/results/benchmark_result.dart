@@ -10,7 +10,7 @@ part 'benchmark_result.g.dart';
 class Throughput implements Comparable<Throughput> {
   final double value;
 
-  Throughput({
+  const Throughput({
     required this.value,
   });
 
@@ -31,6 +31,22 @@ class Throughput implements Comparable<Throughput> {
     }
   }
 
+  bool operator >(Throughput other) {
+    return compareTo(other) > 0;
+  }
+
+  bool operator <(Throughput other) {
+    return compareTo(other) < 0;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return (other is Throughput) && compareTo(other) == 0;
+  }
+
+  @override
+  int get hashCode => value.hashCode;
+
   @override
   String toString() => value.toString();
 
@@ -42,7 +58,7 @@ class Accuracy implements Comparable<Accuracy> {
   final double normalized;
   final String formatted;
 
-  Accuracy({
+  const Accuracy({
     required this.normalized,
     required this.formatted,
   });
@@ -68,6 +84,22 @@ class Accuracy implements Comparable<Accuracy> {
       return 0;
     }
   }
+
+  bool operator >(Accuracy other) {
+    return compareTo(other) > 0;
+  }
+
+  bool operator <(Accuracy other) {
+    return compareTo(other) < 0;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return (other is Accuracy) && compareTo(other) == 0;
+  }
+
+  @override
+  int get hashCode => normalized.hashCode;
 
   @override
   String toString() => normalized.toString();

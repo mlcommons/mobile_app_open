@@ -19,12 +19,12 @@ import 'package:mlperfbench_common/data/results/dataset_info.dart';
 /// It isn't even guaranteed to be logically consistent.
 class SampleGenerator {
   BenchmarkRunResult get runResult => BenchmarkRunResult(
-        throughput: Throughput(value: 1234.45),
-        accuracy: Accuracy(
+        throughput: const Throughput(value: 1234.45),
+        accuracy: const Accuracy(
           normalized: 0.123,
           formatted: '12.3%',
         ),
-        accuracy2: Accuracy(
+        accuracy2: const Accuracy(
           normalized: 0.123,
           formatted: '12.3%',
         ),
