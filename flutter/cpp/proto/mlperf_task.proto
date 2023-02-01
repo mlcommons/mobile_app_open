@@ -66,9 +66,12 @@ message DatasetConfig {
     SNUSR = 5;
   }
   required DatasetType type = 1;
-  // Path to the dataset.
+  // Config of the dataset.
+  // full is used for Accuracy run.
   required OneDatasetConfig full = 2;
+  // lite is used for Performance run.
   required OneDatasetConfig lite = 3;
+  // tiny is used for unit test.
   required OneDatasetConfig tiny = 4;
 }
 

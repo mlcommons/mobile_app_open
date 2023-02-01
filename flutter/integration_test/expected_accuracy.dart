@@ -55,6 +55,6 @@ const benchmarkExpectedAccuracy = {
   BenchmarkId.objectDetection: _objectDetection,
   BenchmarkId.imageSegmentationV2: _imageSegmentation,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
-  BenchmarkId.imageClassificationOffline: _imageClassification,
   BenchmarkId.superResolution: _superResolution,
+  BenchmarkId.imageClassificationOffline: _imageClassification,
 };
