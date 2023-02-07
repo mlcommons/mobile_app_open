@@ -7,6 +7,7 @@ import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/backend/unsupported_device_exception.dart';
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/resources/utils.dart';
@@ -69,8 +70,10 @@ Future<void> launchUi() async {
 
 void autostartHandler(BenchmarkState state, Store store) async {
   if (state.state == BenchmarkStateEnum.waiting) {
-    store.submissionMode =
-        const bool.fromEnvironment('submission', defaultValue: false);
+    store.selectedBenchmarkRunMode =
+        const bool.fromEnvironment('submission', defaultValue: false)
+            ? BenchmarkRunModeEnum.submissionRun
+            : BenchmarkRunModeEnum.performanceOnly;
     store.offlineMode =
         const bool.fromEnvironment('offline', defaultValue: false);
     await state.runBenchmarks();

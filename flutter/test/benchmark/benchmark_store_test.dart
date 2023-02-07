@@ -7,7 +7,7 @@ import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlperfbench/resources/resource.dart';
 
 void main() {
-  group('BenchmarkList tests', () {
+  group('BenchmarkStore tests', () {
     final task1 = pb.TaskConfig(
       id: 'task1',
       datasets: pb.DatasetConfig(
@@ -28,72 +28,72 @@ void main() {
     final backendSettings2 = pb.BenchmarkSetting(benchmarkId: 'task2');
 
     test('match', () async {
-      final list = BenchmarkList(
+      final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backendConfig: [backendSettings1],
         taskSelection: {},
       );
 
-      expect(list.benchmarks.length, 1);
+      expect(store.benchmarks.length, 1);
 
-      expect(list.benchmarks.first.taskConfig, task1);
-      expect(list.benchmarks.first.benchmarkSettings, backendSettings1);
+      expect(store.benchmarks.first.taskConfig, task1);
+      expect(store.benchmarks.first.benchmarkSettings, backendSettings1);
       expect(
-        list.benchmarks.first.isActive,
+        store.benchmarks.first.isActive,
         true,
         reason: 'benchmarks must be enabled by default',
       );
     });
 
     test('order', () async {
-      final list = BenchmarkList(
+      final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task2, task1]),
         backendConfig: [backendSettings1, backendSettings2],
         taskSelection: {},
       );
 
-      expect(list.benchmarks.length, 2);
+      expect(store.benchmarks.length, 2);
 
-      expect(list.benchmarks.first.taskConfig, task2);
-      expect(list.benchmarks.first.benchmarkSettings, backendSettings2);
+      expect(store.benchmarks.first.taskConfig, task2);
+      expect(store.benchmarks.first.benchmarkSettings, backendSettings2);
 
-      expect(list.benchmarks.last.taskConfig, task1);
-      expect(list.benchmarks.last.benchmarkSettings, backendSettings1);
+      expect(store.benchmarks.last.taskConfig, task1);
+      expect(store.benchmarks.last.benchmarkSettings, backendSettings1);
     });
 
     test('selection', () async {
-      final list = BenchmarkList(
+      final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backendConfig: [backendSettings1, backendSettings2],
         taskSelection: {task1.id: true, task2.id: false},
       );
 
-      expect(list.benchmarks.length, 2);
-      expect(list.benchmarks.first.isActive, true);
-      expect(list.benchmarks.last.isActive, false);
+      expect(store.benchmarks.length, 2);
+      expect(store.benchmarks.first.isActive, true);
+      expect(store.benchmarks.last.isActive, false);
     });
 
     test('resource list: skip', () async {
-      final list = BenchmarkList(
+      final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
         taskSelection: {task1.id: false},
       );
 
       final modes = [BenchmarkRunMode.accuracy];
-      final resources = list.listResources(modes: modes, skipInactive: true);
+      final resources = store.listResources(modes: modes, skipInactive: true);
 
       expect(resources.length, 0);
     });
     test('resource list: accuracy', () async {
-      final list = BenchmarkList(
+      final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
         taskSelection: {},
       );
 
       final modes = [BenchmarkRunMode.accuracy];
-      final resources = list.listResources(modes: modes, skipInactive: true);
+      final resources = store.listResources(modes: modes, skipInactive: true);
 
       expect(resources.length, 3);
       expect(
@@ -117,14 +117,14 @@ void main() {
           )));
     });
     test('resource list: performance', () async {
-      final list = BenchmarkList(
+      final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
         taskSelection: {},
       );
 
       final modes = [BenchmarkRunMode.performance];
-      final resources = list.listResources(modes: modes);
+      final resources = store.listResources(modes: modes);
 
       expect(resources.length, 2);
       expect(
@@ -142,7 +142,7 @@ void main() {
           )));
     });
     test('resource list: test', () async {
-      final list = BenchmarkList(
+      final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
         taskSelection: {},
@@ -152,7 +152,7 @@ void main() {
         BenchmarkRunMode.accuracyTest,
         BenchmarkRunMode.performanceTest,
       ];
-      final resources = list.listResources(modes: modes);
+      final resources = store.listResources(modes: modes);
 
       expect(resources.length, 2);
       expect(

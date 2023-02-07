@@ -66,12 +66,20 @@ class TaskRunner {
       : BenchmarkRunMode.accuracy;
 
   List<BenchmarkRunMode> get selectedRunModes {
-    final result = <BenchmarkRunMode>[];
-    result.add(perfMode);
-    if (store.submissionMode) {
-      result.add(accuracyMode);
+    final modes = <BenchmarkRunMode>[];
+    switch (store.selectedBenchmarkRunMode) {
+      case BenchmarkRunModeEnum.performanceOnly:
+        modes.add(perfMode);
+        break;
+      case BenchmarkRunModeEnum.accuracyOnly:
+        modes.add(accuracyMode);
+        break;
+      case BenchmarkRunModeEnum.submissionRun:
+        modes.add(perfMode);
+        modes.add(accuracyMode);
+        break;
     }
-    return result;
+    return modes;
   }
 
   Future<void> abortBenchmarks() async {
@@ -81,7 +89,7 @@ class TaskRunner {
   }
 
   Future<ExtendedResult?> runBenchmarks(
-      BenchmarkList benchmarkList, String currentLogDir) async {
+      BenchmarkStore benchmarkStore, String currentLogDir) async {
     final cooldown = store.cooldown;
     late final Duration cooldownDuration;
     if (store.testMode) {
@@ -93,7 +101,7 @@ class TaskRunner {
     }
 
     final activeBenchmarks =
-        benchmarkList.benchmarks.where((element) => element.isActive);
+        benchmarkStore.benchmarks.where((element) => element.isActive);
 
     final resultHelpers = <ResultHelper>[];
     for (final benchmark in activeBenchmarks) {
@@ -105,10 +113,18 @@ class TaskRunner {
       resultHelpers.add(resultHelper);
     }
 
-    progressInfo.totalStages = activeBenchmarks.length;
-    if (store.submissionMode) {
-      progressInfo.totalStages += activeBenchmarks.length;
+    switch (store.selectedBenchmarkRunMode) {
+      case BenchmarkRunModeEnum.performanceOnly:
+        progressInfo.totalStages = activeBenchmarks.length;
+        break;
+      case BenchmarkRunModeEnum.accuracyOnly:
+        progressInfo.totalStages = activeBenchmarks.length;
+        break;
+      case BenchmarkRunModeEnum.submissionRun:
+        progressInfo.totalStages = 2 * activeBenchmarks.length;
+        break;
     }
+
     progressInfo.currentStage = 0;
     progressInfo.cooldownDuration = cooldownDuration.inSeconds.toDouble();
 
@@ -117,6 +133,7 @@ class TaskRunner {
     // run all benchmarks in performance mode first
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
+      if (!store.selectedBenchmarkRunMode.doPerformanceRun) break;
       // we only do cooldown before performance benchmarks
       if (cooldown && !first && cooldownDuration.inMilliseconds > 0) {
         progressInfo.cooldown = true;
@@ -139,7 +156,7 @@ class TaskRunner {
     // then in accuracy mode
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
-      if (!store.submissionMode) break;
+      if (!store.selectedBenchmarkRunMode.doAccuracyRun) break;
       final resultHelper =
           resultHelpers.firstWhere((e) => e.benchmark == benchmark);
       await runBenchmark(resultHelper, accuracyMode, currentLogDir);

@@ -135,13 +135,10 @@ class HistoryTab implements TabInterface {
     int index,
   ) {
     final item = itemList[index];
-    final results = item.results;
     bool isSelected = selected![index];
 
     return helper.makeListItem(
       title: helper.formatDate(item.meta.creationDate.toLocal()),
-      specialTitleColor: results.any(
-          (runRes) => !(runRes.performanceRun?.loadgenInfo?.validity ?? false)),
       trailing: isSelectionMode
           ? Checkbox(
               value: isSelected,

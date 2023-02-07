@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
@@ -20,7 +21,8 @@ void main() {
 
   final prefs = <String, Object>{
     StoreConstants.testMode: true,
-    StoreConstants.submissionMode: true,
+    StoreConstants.selectedBenchmarkRunMode:
+        BenchmarkRunModeEnum.submissionRun.name,
     StoreConstants.testMinDuration: 1,
     StoreConstants.testMinQueryCount: 4,
   };
