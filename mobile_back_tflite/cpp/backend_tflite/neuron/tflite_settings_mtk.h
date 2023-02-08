@@ -80,10 +80,19 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   accelerator: "neuron"
-  accelerator_desc: "Neuron"
+  accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
   framework: "TFLite"
   model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
   model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+}
+
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  accelerator: "neuron"
+  accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
+  framework: "TFLite"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/sr_qat_full_int8/v3_0/tflite/edsr_f32b5_full_qint8.tflite"
+  model_checksum: "18ce6df0e4603f4b4ee5d04193708d9c"
 }
 
 )SETTINGS";
