@@ -15,6 +15,11 @@ class Interval {
   final double max;
 
   const Interval({required this.min, required this.max});
+
+  @override
+  toString() {
+    return '[$min, $max]';
+  }
 }
 
 Future<void> runBenchmark(WidgetTester tester) async {
