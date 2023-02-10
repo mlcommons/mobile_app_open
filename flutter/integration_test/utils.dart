@@ -22,7 +22,7 @@ class Interval {
   }
 }
 
-Future<void> runBenchmark(WidgetTester tester) async {
+Future<void> runBenchmarks(WidgetTester tester) async {
   const splashPauseSeconds = 4;
   const runTimeLimitMinutes = 30;
   const downloadTimeLimitMinutes = 20;
