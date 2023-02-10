@@ -75,14 +75,14 @@ class BenchmarkState extends ChangeNotifier {
     return summaryThroughput / maxSummaryThroughput;
   }
 
-  List<Benchmark> get benchmarks => _middle.benchmarks;
+  List<Benchmark> get benchmarks => _benchmarkStore.benchmarks;
 
-  late BenchmarkList _middle;
+  late BenchmarkStore _benchmarkStore;
 
   ValidationHelper get validator {
     return ValidationHelper(
       resourceManager: resourceManager,
-      middle: _middle,
+      benchmarkStore: _benchmarkStore,
       selectedRunModes: taskRunner.selectedRunModes,
     );
   }
@@ -143,7 +143,7 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.enable();
     print('start loading resources');
     await resourceManager.handleResources(
-      _middle.listResources(
+      _benchmarkStore.listResources(
         modes: [taskRunner.perfMode, taskRunner.accuracyMode],
         skipInactive: false,
       ),
@@ -208,7 +208,7 @@ class BenchmarkState extends ChangeNotifier {
       }
     }
 
-    _middle = BenchmarkList(
+    _benchmarkStore = BenchmarkStore(
       appConfig: configManager.decodedConfig,
       backendConfig: backendInfo.settings.benchmarkSetting,
       taskSelection: taskSelection,
@@ -217,7 +217,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> saveTaskSelection() async {
-    _store.taskSelection = jsonEncode(_middle.selection);
+    _store.taskSelection = jsonEncode(_benchmarkStore.selection);
   }
 
   BenchmarkStateEnum get state {
@@ -251,7 +251,8 @@ class BenchmarkState extends ChangeNotifier {
 
     try {
       resetCurrentResults();
-      lastResult = await taskRunner.runBenchmarks(_middle, currentLogDir);
+      lastResult =
+          await taskRunner.runBenchmarks(_benchmarkStore, currentLogDir);
 
       if (lastResult == null) {
         print('benchmark aborted');
@@ -281,7 +282,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   void resetCurrentResults() {
-    for (var b in _middle.benchmarks) {
+    for (var b in _benchmarkStore.benchmarks) {
       b.accuracyModeResult = null;
       b.performanceModeResult = null;
     }

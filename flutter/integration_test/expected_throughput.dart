@@ -111,6 +111,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
   },
 };
 
+// TODO (anhappdev): update min throughput for _superResolution after we gather some statistic
 const Map<String, Map<String, Interval>> _superResolution = {
   _kTFLiteBackend: {
     _kCloudBuildX23: Interval(min: 0.1, max: 3),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -84,6 +85,26 @@ class _SettingsScreen extends State<SettingsScreen> {
               title: Padding(
                 padding: const EdgeInsets.only(bottom: 5),
                 child: Text(
+                  stringResources.settingsRunMode,
+                ),
+              ),
+              subtitle: Text(stringResources.settingsRunModeSubtitle),
+              trailing: DropdownButton<BenchmarkRunModeEnum>(
+                  value: store.selectedBenchmarkRunMode,
+                  items: BenchmarkRunModeEnum.values
+                      .map((runMode) => DropdownMenuItem<BenchmarkRunModeEnum>(
+                            value: runMode,
+                            child: Text(runMode.name),
+                          ))
+                      .toList(),
+                  onChanged: (value) => setState(() {
+                        store.selectedBenchmarkRunMode = value!;
+                      })),
+            ),
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Text(
                   stringResources.settingsShare,
                 ),
               ),
@@ -106,21 +127,6 @@ class _SettingsScreen extends State<SettingsScreen> {
                 value: store.offlineMode,
                 onChanged: (flag) {
                   store.offlineMode = flag;
-                },
-              ),
-            ),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: Text(
-                  stringResources.settingsSubmission,
-                ),
-              ),
-              subtitle: Text(stringResources.settingsSubmissionSubtitle),
-              trailing: Switch(
-                value: store.submissionMode,
-                onChanged: (flag) {
-                  store.submissionMode = flag;
                 },
               ),
             ),
