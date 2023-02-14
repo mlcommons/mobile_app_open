@@ -80,9 +80,6 @@ namespace mbe
             strstr((char *)model, "A536") ||
             strstr((char *)model, "S5E8825"))
             core_id = SOC_1200;
-        else if(strstr((char *)model, "ERD8835") ||
-            strstr((char *)model, "S5E8835"))
-            core_id = SOC_1300;
         else if (strstr((char *)model, "G998") ||
                  strstr((char *)model, "G996") ||
                  strstr((char *)model, "G991") ||
@@ -111,8 +108,6 @@ namespace mbe
 
         if (strstr((char *)hardware, "8825"))
             core_id = SOC_1200;
-        else if (strstr((char *)hardware, "8835"))
-            core_id = SOC_1300;
         else if (strstr((char *)hardware, "2100"))
             core_id = SOC_2100;
         else if (strstr((char *)hardware, "9925"))

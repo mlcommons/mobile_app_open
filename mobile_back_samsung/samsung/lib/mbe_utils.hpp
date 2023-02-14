@@ -28,7 +28,6 @@ namespace mbe {
   enum DEVICE_ID {
     CORE_INVALID=-1,
     SOC_1200=0,
-    SOC_1300,
     SOC_2100,
     SOC_2200,
     SOC_2300,
