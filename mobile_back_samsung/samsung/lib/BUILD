@@ -12,17 +12,23 @@ cc_library(
     name = "libsamsungbackend.so",
     srcs = select({
         "android_arm64": [
-            "sbe_core.cc",
-            "sbe_helper.cc",
+            "mbe_core.cc",
+            "mbe_helper.cc",
         ],
     }),
     hdrs = [
         "backend_c.h",
-        "sbe_config.hpp",
-        "sbe_core.hpp",
-        "sbe_helper.hpp",
-        "sbe_loader.hpp",
-        "sbe_utils.hpp",
         "type.h",
+        "mbe_core.hpp",
+        "mbe_helper.hpp",
+        "mbe_loader.hpp",
+        "mbe_utils.hpp",
+        "mbe_config.hpp",
+        "mbe_config_2300.hpp",
+        "mbe_config_2200.hpp",
+        "mbe_config_2100.hpp",
+        "mbe_config_1200.hpp",
+        "mbe_model_container.hpp",
     ],
 )
+

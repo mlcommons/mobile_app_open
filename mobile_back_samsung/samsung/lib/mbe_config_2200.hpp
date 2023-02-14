@@ -1,4 +1,4 @@
-/* Copyright 2020 The MLPerf Authors. All Rights Reserved.
+/* Copyright 2020-2023 Samsung System LSI. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,28 +14,15 @@ limitations under the License.
 ==============================================================================*/
 #include <string>
 
-#ifndef SBE_CONFIG_H
-#define SBE_CONFIG_H
+#ifndef MBE_CONFIG_2200_H
+#define MBE_CONFIG_2200_H
 
-/**
- * @file sbe_config.hpp
- * @brief description of benchmark_setting for samsung backend core
- * @date 2022-01-04
- * @author soobong Huh (soobong.huh@samsung.com)
- */
-
-namespace sbe {
-
-const std::string sbe2200_flutter_config = R"SETTINGS(
+const std::string mbe2200_config = R"SETTINGS(
 benchmark_setting {
   benchmark_id: "image_classification"
-  accelerator: "samsung npu"
+  accelerator: "samsung_npu"
   accelerator_desc: "NPU"
-  framework: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
+  framework: "ENN"
   custom_setting {
     id: "preset"
     value: "1001"
@@ -49,12 +36,8 @@ benchmark_setting {
     value: "Float32"
   }
   custom_setting {
-    id: "fpc_mode"
+    id: "extension"
     value: "true"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "300"
   }
   custom_setting {
     id: "lazy_mode"
@@ -64,16 +47,11 @@ benchmark_setting {
   model_checksum: "a49175f3f4f37f59780995cec540dbf2"
   single_stream_expected_latency_ns: 900000
 }
-
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
-  accelerator: "samsung npu"
+  accelerator: "samsung_npu"
   accelerator_desc: "NPU"
-  framework: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
+  framework: "ENN"
   custom_setting {
     id: "preset"
     value: "1004"
@@ -87,12 +65,8 @@ benchmark_setting {
     value: "Uint8"
   }
   custom_setting {
-    id: "fpc_mode"
+    id: "extension"
     value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
   }
   custom_setting {
     id: "lazy_mode"
@@ -102,16 +76,40 @@ benchmark_setting {
   model_checksum: "f715f55818863f371336ad29ecba1183"
   single_stream_expected_latency_ns: 1000000
 }
-
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  accelerator: "samsung_npu"
+  accelerator_desc: "NPU"
+  framework: "ENN"
+  custom_setting {
+    id: "preset"
+    value: "1002"
+  }
+  custom_setting {
+    id: "i_type"
+    value: "Uint8"
+  }
+  custom_setting {
+    id: "o_type"
+    value: "Float32"
+  }
+  custom_setting {
+    id: "extension"
+    value: "true"
+  }
+  custom_setting {
+    id: "lazy_mode"
+    value: "true"
+  }
+  model_path: "local:///MLPerf_sideload/sr.nnc"
+  model_checksum: "6e725dffed620377b9eff463e106e6dd"
+  single_stream_expected_latency_ns: 1000000
+}
 benchmark_setting {
   benchmark_id: "object_detection"
-  accelerator: "samsung npu"
+  accelerator: "samsung_npu"
   accelerator_desc: "NPU"
-  framework: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
+  framework: "ENN"
   custom_setting {
     id: "preset"
     value: "1003"
@@ -125,12 +123,8 @@ benchmark_setting {
     value: "Float32"
   }
   custom_setting {
-    id: "fpc_mode"
+    id: "extension"
     value: "true"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "200"
   }
   custom_setting {
     id: "lazy_mode"
@@ -140,16 +134,11 @@ benchmark_setting {
   model_checksum: "6b34201b6696fa75311d0d43820e03d2"
   single_stream_expected_latency_ns: 1000000
 }
-
 benchmark_setting {
   benchmark_id: "natural_language_processing"
   accelerator: "gpu"
   accelerator_desc: "gpu"
-  framework: "Samsung Exynos"
-  custom_setting {
-    id: "mode"
-    value: "3"
-  }
+  framework: "ENN"
   custom_setting {
     id: "preset"
     value: "1000"
@@ -163,12 +152,8 @@ benchmark_setting {
     value: "Float32"
   }
   custom_setting {
-    id: "fpc_mode"
+    id: "extension"
     value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
   }
   custom_setting {
     id: "lazy_mode"
@@ -178,20 +163,15 @@ benchmark_setting {
   model_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
   single_stream_expected_latency_ns: 1000000
 }
-
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "samsung npu"
+  accelerator: "samsung_npu"
   accelerator_desc: "npu"
-  framework: "Samsung Exynos"
+  framework: "ENN"
   batch_size: 8192
   custom_setting {
     id: "scenario"
     value: "offline"
-  }
-  custom_setting {
-    id: "mode"
-    value: "1"
   }
   custom_setting {
     id: "preset"
@@ -206,12 +186,8 @@ benchmark_setting {
     value: "Float32"
   }
   custom_setting {
-    id: "fpc_mode"
+    id: "extension"
     value: "false"
-  }
-  custom_setting {
-    id: "freezing"
-    value: "0"
   }
   custom_setting {
     id: "lazy_mode"
@@ -221,62 +197,4 @@ benchmark_setting {
   model_checksum: "8832370c770fa820dfde83e039e3243c"
   single_stream_expected_latency_ns: 1000000
 })SETTINGS";
-
-const std::string sbe1200_config = R"SETTINGS(
-benchmark_setting {
-  benchmark_id: "image_classification"
-  accelerator: "npu"
-  accelerator_desc: "npu"
-  framework: "Samsung Exynos"
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
-  model_checksum: "a49175f3f4f37f59780995cec540dbf2"
-  single_stream_expected_latency_ns: 1000000
-}
-
-benchmark_setting {
-  benchmark_id: "object_detection"
-  accelerator: "npu"
-  accelerator_desc: "npu"
-  framework: "Samsung Exynos"
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
-  model_checksum: "6b34201b6696fa75311d0d43820e03d2"
-  single_stream_expected_latency_ns: 1000000
-}
-
-benchmark_setting {
-  benchmark_id: "image_classification_offline"
-  accelerator: "npu"
-  accelerator_desc: "npu"
-  framework: "Samsung Exynos"
-  batch_size: 48
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
-  model_checksum: "8832370c770fa820dfde83e039e3243c"
-  single_stream_expected_latency_ns: 1000000
-})SETTINGS";
-
-}  // namespace sbe
 #endif
