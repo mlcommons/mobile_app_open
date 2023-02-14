@@ -108,10 +108,10 @@ http_archive(
     patch_args = ["-p1"],
     patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
     patches = [],
-    sha256 = "6773b97450d3cfe153affd8e0c69ad2c85393b1867712e812ea0d32336fa7041",
-    strip_prefix = "inference-5dd9ed739cc8dfeae2c5d30ec06f4cb524a4dd74",
+    sha256 = "40d0123c8447a0bdd4d5c8fda5eea22c7b08f3b05501858d2ba89be4f44fc84b",
+    strip_prefix = "inference-f5367250115ad4febf1334b34881ab74f2e55bfe",
     urls = [
-        "https://github.com/mlcommons/inference/archive/5dd9ed739cc8dfeae2c5d30ec06f4cb524a4dd74.tar.gz",
+        "https://github.com/mlcommons/inference/archive/f5367250115ad4febf1334b34881ab74f2e55bfe.tar.gz",
     ],
 )
 
