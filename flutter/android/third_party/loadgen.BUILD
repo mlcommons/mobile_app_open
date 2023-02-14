@@ -14,6 +14,7 @@ cc_library(
         "loadgen/loadgen.cc",
         "loadgen/logging.cc",
         "loadgen/logging.h",
+        "loadgen/results.cc",
         "loadgen/test_settings_internal.cc",
         "loadgen/test_settings_internal.h",
         "loadgen/utils.cc",
