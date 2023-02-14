@@ -35,11 +35,13 @@ void main() {
 
   group('integration tests', () {
     final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
     binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
-    testWidgets('run all and check', (WidgetTester tester) async {
-      await runBenchmark(tester);
+    testWidgets('run benchmarks', (WidgetTester tester) async {
+      await runBenchmarks(tester);
+    });
+
+    testWidgets('check results', (WidgetTester tester) async {
       final extendedResults = await obtainResult();
       printResults(extendedResults);
       checkTasks(extendedResults);
@@ -66,6 +68,7 @@ void checkTasks(ExtendedResult extendedResults) {
 }
 
 void checkAccuracy(BenchmarkExportResult benchmarkResult) {
+  var tag = '[benchmarkId: ${benchmarkResult.benchmarkId}';
   final expectedMap = benchmarkExpectedAccuracy[benchmarkResult.benchmarkId];
   expect(
     expectedMap,
@@ -75,11 +78,12 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   expectedMap!;
 
   final accelerator = benchmarkResult.backendSettings.acceleratorCode;
+  tag += ' | accelerator: $accelerator';
   final backendName = benchmarkResult.backendInfo.backendName;
+  tag += ' | backendName: $backendName]';
   final expectedValue =
       expectedMap['$accelerator|$backendName'] ?? expectedMap[accelerator];
-  final tag =
-      '[benchmarkId: ${benchmarkResult.benchmarkId} | accelerator: $accelerator | backendName: $backendName]';
+  tag += ' | expectedValue: $expectedValue';
   expect(
     expectedValue,
     isNotNull,
@@ -147,6 +151,7 @@ void checkThroughput(
   final deviceModel = getDeviceModel(environmentInfo);
   tag += ' | deviceModel: $deviceModel';
   final expectedValue = backendExpectedMap[deviceModel];
+  tag += ' | expectedValue: $expectedValue';
   expect(
     expectedValue,
     isNotNull,

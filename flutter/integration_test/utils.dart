@@ -15,9 +15,14 @@ class Interval {
   final double max;
 
   const Interval({required this.min, required this.max});
+
+  @override
+  toString() {
+    return '[$min, $max]';
+  }
 }
 
-Future<void> runBenchmark(WidgetTester tester) async {
+Future<void> runBenchmarks(WidgetTester tester) async {
   const splashPauseSeconds = 4;
   const runTimeLimitMinutes = 30;
   const downloadTimeLimitMinutes = 20;
