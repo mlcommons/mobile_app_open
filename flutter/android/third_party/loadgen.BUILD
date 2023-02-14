@@ -28,6 +28,7 @@ cc_library(
         "loadgen/loadgen.h",
         "loadgen/query_sample.h",
         "loadgen/query_sample_library.h",
+        "loadgen/results.h",
         "loadgen/system_under_test.h",
         "loadgen/test_settings.h",
     ],

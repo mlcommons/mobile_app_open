@@ -40,7 +40,7 @@ class Squad : public Dataset {
         const std::string& gt_tfrecord);
 
   // Returns the name of the dataset.
-  const std::string& Name() const override { return name_; }
+  const std::string& Name() override { return name_; }
 
   // Total number of samples in library.
   size_t TotalSampleCount() override { return samples_.size(); }
