@@ -53,9 +53,8 @@ class Dataset : public ::mlperf::QuerySampleLibrary {
   // GetData returns the data of a specific input.
   virtual std::vector<void*> GetData(int sample_idx) = 0;
 
-  // ProcessOutput processes the output data before sending to mlperf. This
-  // function only get called on Accuracy mode so we don't need to care about
-  // its performance. The argument sample_idx should only be used to help the
+  // ProcessOutput processes the output data before sending to mlperf.
+  // The argument sample_idx should only be used to help the
   // Dataset calculating the accuracy; it should not affect the returned
   // result by any means.
   virtual std::vector<uint8_t> ProcessOutput(
