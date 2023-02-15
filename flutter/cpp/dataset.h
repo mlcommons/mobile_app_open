@@ -62,7 +62,7 @@ class Dataset : public ::mlperf::QuerySampleLibrary {
 
   virtual bool HasAccuracy() { return false; }
 
-  // ComputeAccuracy Calculate the accuracy if the processed outputs. This
+  // ComputeAccuracy calculates the accuracy of the processed outputs. This
   // function is optional, you don't need to implement it if you want to use
   // other scripts for accuracy calculation.
   virtual float ComputeAccuracy() { return -1.0f; }
