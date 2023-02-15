@@ -47,7 +47,7 @@ class TaskRunner {
 
   ProgressInfo progressInfo = ProgressInfo();
   bool aborting = false;
-  Future<void> _cooldownFuture = Future.value();
+  CancelableOperation? _cooldownOperation;
 
   TaskRunner({
     required this.store,
@@ -84,7 +84,7 @@ class TaskRunner {
 
   Future<void> abortBenchmarks() async {
     aborting = true;
-    await CancelableOperation.fromFuture(_cooldownFuture).cancel();
+    await _cooldownOperation?.cancel();
     notifyListeners();
   }
 
@@ -142,7 +142,9 @@ class TaskRunner {
           return timer.elapsed.inSeconds / progressInfo.cooldownDuration;
         };
         notifyListeners();
-        await (_cooldownFuture = Future.delayed(cooldownDuration));
+        final delayedFuture = Future.delayed(cooldownDuration);
+        _cooldownOperation = CancelableOperation.fromFuture(delayedFuture);
+        await _cooldownOperation?.valueOrCancellation();
         progressInfo.cooldown = false;
         timer.stop();
       }
@@ -162,14 +164,14 @@ class TaskRunner {
       await runBenchmark(resultHelper, accuracyMode, currentLogDir);
     }
 
-    final exportResults = <BenchmarkExportResult>[];
-    for (final resultHelper in resultHelpers) {
-      exportResults.add(resultHelper.getBenchmarkExportResult());
-    }
-
     if (aborting) {
       aborting = false;
       return null;
+    }
+
+    final exportResults = <BenchmarkExportResult>[];
+    for (final resultHelper in resultHelpers) {
+      exportResults.add(resultHelper.getBenchmarkExportResult());
     }
     return ExtendedResult(
       meta:
