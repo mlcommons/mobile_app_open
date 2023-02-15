@@ -24,28 +24,28 @@ limitations under the License.
  */
 
 #include <dlfcn.h>
-#include "type.h"
+
 #include "mbe_utils.hpp"
+#include "type.h"
 
 namespace mbe {
 std::string mbe_core_libs[CORE_MAX] = {
-  "libmbe1200_core.so",
-  "libmbe2100_core.so",
-  "libmbe2200_core.so",
-  "libmbe2300_core.so",
+    "libmbe1200_core.so",
+    "libmbe2100_core.so",
+    "libmbe2200_core.so",
+    "libmbe2300_core.so",
 };
 
 void* load_symbol(void* dl_handle, const char* name) {
   auto func_pt = dlsym(dl_handle, name);
-  if(func_pt==nullptr) {
+  if (func_pt == nullptr) {
     MLOGE("dlopen fail. symbol[%s]", name);
   }
   return func_pt;
 }
 
 #define link_symbol(dl_handle, symbol_name) \
-  reinterpret_cast<symbol_name##_t>(    \
-  load_symbol(dl_handle, #symbol_name))
-}
+  reinterpret_cast<symbol_name##_t>(load_symbol(dl_handle, #symbol_name))
+}  // namespace mbe
 
 #endif

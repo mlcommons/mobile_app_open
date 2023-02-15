@@ -22,28 +22,30 @@ limitations under the License.
  * @author soobong Huh (soobong.huh@samsung.com)
  */
 
-#include <stdint.h>
-#include <string>
-#include <unistd.h>
 #include <dlfcn.h>
+#include <stdint.h>
+#include <unistd.h>
+
+#include <string>
 #include <vector>
-#include "mbe_utils.hpp"
+
 #include "mbe_config.hpp"
+#include "mbe_utils.hpp"
 
 namespace mbe {
-    static int core_id;
-    #define DECO(x) #x
-    #define MAJOR DECO(2)
-    #define MINOR DECO(4)
-    #define PATCH DECO(3)
-    #define VERSION(a, b, c)   a "." b "." c
+static int core_id;
+#define DECO(x) #x
+#define MAJOR DECO(2)
+#define MINOR DECO(4)
+#define PATCH DECO(3)
+#define VERSION(a, b, c) a "." b "." c
 
-    class core_ctrl {
-        public:
-            static int support_mbe(const char *, const char *);
-            static const char* get_benchmark_config(int);
-            static int get_core_id();
-    };
-}
+class core_ctrl {
+ public:
+  static int support_mbe(const char *, const char *);
+  static const char *get_benchmark_config(int);
+  static int get_core_id();
+};
+}  // namespace mbe
 
 #endif
