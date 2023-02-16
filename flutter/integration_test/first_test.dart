@@ -35,11 +35,13 @@ void main() {
 
   group('integration tests', () {
     final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
     binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
-    testWidgets('run all and check', (WidgetTester tester) async {
-      await runBenchmark(tester);
+    testWidgets('run benchmarks', (WidgetTester tester) async {
+      await runBenchmarks(tester);
+    });
+
+    testWidgets('check results', (WidgetTester tester) async {
       final extendedResults = await obtainResult();
       printResults(extendedResults);
       checkTasks(extendedResults);

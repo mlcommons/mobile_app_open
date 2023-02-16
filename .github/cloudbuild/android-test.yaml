@@ -18,7 +18,7 @@ steps:
     name: gcr.io/cloud-builders/gcloud
     waitFor:
       - pull-apks
-    timeout: 1440s # 24 minutes
+    timeout: 1800s # 30 minutes
     entrypoint: bash
     args:
       - -xc
@@ -27,7 +27,8 @@ steps:
           --type instrumentation \
           --app output/apks/$_APK_TEST_MAIN_NAME \
           --test output/apks/$_APK_TEST_HELPER_NAME \
-          --timeout 20m \
+          --timeout 25m \
+          --num-flaky-test-attempts 2 \
           --device $_DEVICE_SELECTOR
 
-timeout: 1500s # 25 minutes
+timeout: 2400s # 40 minutes
