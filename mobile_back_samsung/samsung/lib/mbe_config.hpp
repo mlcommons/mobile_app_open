@@ -1,4 +1,4 @@
-/* Copyright 2020-2022 Samsung Electronics Co. LTD  All Rights Reserved.
+/* Copyright 2020-2023 Samsung System LSI. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,32 +12,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef SBE_HELPER_H_
-#define SBE_HELPER_H_
+#include <string>
+
+#ifndef MBE_CONFIG_H
+#define MBE_CONFIG_H
 
 /**
- * @file sbe_helper.hpp
- * @brief helper class of samsung backend core for samsung exynos
+ * @file mbe_config.hpp
+ * @brief description of benchmark_setting for samsung backend core
  * @date 2022-01-04
  * @author soobong Huh (soobong.huh@samsung.com)
  */
 
-#include <dlfcn.h>
-#include <stdint.h>
-#include <unistd.h>
-
-#include <string>
-
-#include "sbe_config.hpp"
-#include "sbe_utils.hpp"
-
-namespace sbe {
-class core_ctrl {
- public:
-  static int support_sbe(const char *, const char *);
-  static const char *get_benchmark_config(int core_id);
-  static int get_core_id();
-};
-}  // namespace sbe
-
+#include "mbe_config_1200.hpp"
+#include "mbe_config_2100.hpp"
+#include "mbe_config_2200.hpp"
+#include "mbe_config_2300.hpp"
 #endif
