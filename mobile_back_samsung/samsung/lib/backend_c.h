@@ -1,4 +1,4 @@
-/* Copyright 2020 The MLPerf Authors. All Rights Reserved.
+/* Copyright 2020-2023 Samsung Electronics Co. LTD  All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -73,11 +73,9 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
 // Optional functions
 void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
                                    int width, int height, uint8_t* data);
-
 void* mlperf_backend_get_buffer(size_t size);
 
 void mlperf_backend_release_buffer(void* p);
-
 #ifdef __cplusplus
 }
 #endif  // __cplusplus

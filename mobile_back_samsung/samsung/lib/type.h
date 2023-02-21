@@ -1,4 +1,4 @@
-/* Copyright 2020 The MLPerf Authors. All Rights Reserved.
+/* Copyright 2020-2023 Samsung Electronics Co. LTD  All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ typedef struct {
 const int kMaxMLPerfBackendConfigs = 256;
 typedef struct {
   const char* accelerator;
+  const char* accelerator_desc;
   uint32_t batch_size;
   int count = 0;
   const char* keys[kMaxMLPerfBackendConfigs];
