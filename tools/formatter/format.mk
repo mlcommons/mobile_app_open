@@ -14,14 +14,12 @@ format/clang:
 format/dart/pub:
 	cd flutter && ${_start_args} dart pub get
 	cd flutter_common && ${_start_args} dart pub get
-	cd website && ${_start_args} dart pub get
 
 .PHONY: format/dart
 format/dart:
 	cd flutter && ${_start_args} dart run import_sorter:main
 	cd flutter_common && ${_start_args} dart run import_sorter:main
-	cd website && ${_start_args} dart run import_sorter:main
-	dart format flutter flutter_common website
+	dart format flutter flutter_common
 
 .PHONY: format/ts
 format/ts:
@@ -49,7 +47,7 @@ lint/bazel:
 
 .PHONY: lint/dart
 lint/dart:
-	dart analyze --fatal-infos flutter flutter_common website
+	dart analyze --fatal-infos flutter flutter_common
 
 .PHONY: lint/yaml
 lint/yaml:
