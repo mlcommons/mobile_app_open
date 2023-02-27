@@ -11,8 +11,8 @@ format/bazel:
 format/clang:
 	git ls-files -z | grep --null-data "\.h$$\|\.hpp$$\|\.cc$$\|\.cpp$$\|\.proto$$" | xargs --null --no-run-if-empty clang-format -i -style=google
 
-.PHONY: format/dart/pub
-format/dart/pub:
+.PHONY: format/dart/pub-get
+format/dart/pub-get:
 	cd flutter && ${_start_args} dart pub get
 	cd flutter_common && ${_start_args} dart pub get
 
@@ -22,9 +22,12 @@ format/dart:
 	cd flutter_common && ${_start_args} dart run import_sorter:main
 	dart format flutter flutter_common
 
-.PHONY: format/ts
-format/ts:
+.PHONY: format/ts/install
+format/ts/install:
 	cd firebase_functions/functions && ${_start_args} npm install --production=false
+
+.PHONY: format/ts
+format/ts: format/ts/install
 	cd firebase_functions/functions && ${_start_args} npm run format
 	cd firebase_functions/functions && ${_start_args} npm run lint-fix
 
@@ -63,7 +66,7 @@ lint/yaml:
 	git ls-files -z | grep --null-data "\.yml$$\|\.yaml$$" | xargs --null --no-run-if-empty yamllint -c tools/formatter/configs/yamllint.yml
 
 .PHONY: lint/ts
-lint/ts:
+lint/ts: format/ts/install
 	cd firebase_functions/functions && ${_start_args} npm run lint
 
 .PHONY: lint/prohibited-extensions
@@ -130,13 +133,13 @@ FORMAT_DOCKER_ARGS= \
 docker/format: output/docker_mlperf_formatter.stamp
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
 		${FORMAT_DOCKER_ARGS} \
-		make flutter/prepare format/dart/pub format
+		make flutter/prepare format/dart/pub-get format
 
 .PHONY: docker/lint
 docker/lint: output/docker_mlperf_formatter.stamp
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
 		${FORMAT_DOCKER_ARGS} \
-		make flutter/prepare format/dart/pub lint
+		make flutter/prepare format/dart/pub-get lint
 
 .PHONY: docker/format/--
 docker/format/--: output/docker_mlperf_formatter.stamp

@@ -83,8 +83,10 @@ jobs:
       - name: dart
         run: |
           make flutter/prepare
-          make format/dart/pub
+          make format/dart/pub-get
           make lint/dart
+      - name: result-schema
+        run: make lint/result-schema
       - name: typescripts
         run: make lint/ts
 
