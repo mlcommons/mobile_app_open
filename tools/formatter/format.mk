@@ -39,14 +39,21 @@ format/markdown:
 		xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml --fix
 
 .PHONY: lint
-lint: lint/bazel lint/dart lint/ts lint/yaml lint/prohibited-extensions lint/big-files lint/result-schema
+lint: lint/bazel lint/clang lint/dart lint/ts lint/yaml lint/prohibited-extensions lint/big-files
 
 .PHONY: lint/bazel
 lint/bazel:
-	buildifier -lint=warn -r .
+	buildifier -lint=warn -mode=check -r .
+
+.PHONY: lint/clang
+lint/clang:
+	git ls-files -z | grep --null-data "\.h$$\|\.hpp$$\|\.cc$$\|\.cpp$$\|\.proto$$" | xargs --null --no-run-if-empty clang-format -i -style=google --Werror --dry-run
 
 .PHONY: lint/dart
 lint/dart:
+	cd flutter && ${_start_args} dart run import_sorter:main --exit-if-changed
+	cd flutter_common && ${_start_args} dart run import_sorter:main --exit-if-changed
+	dart format --output=none --set-exit-if-changed flutter
 	dart analyze --fatal-infos flutter flutter_common
 
 .PHONY: lint/yaml
