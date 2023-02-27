@@ -69,9 +69,9 @@ ENV UNAME=mlperf
 RUN git clone --branch "3.3.5" --single-branch --depth 1 \
     https://github.com/flutter/flutter.git /home/$UNAME/flutter
 RUN git config --global --add safe.directory /home/$UNAME/flutter
-ENV PATH=$PATH:/home/$UNAME/flutter/bin:/home/$UNAME/flutter/bin/cache/dart-sdk/bin
 # The PUB_CACHE directory will be mounted as a docker volume in format.mk
 ENV PUB_CACHE=/home/.pub-cache
+ENV PATH=$PATH:/home/$UNAME/flutter/bin:/home/$UNAME/flutter/bin/cache/dart-sdk/bin:$PUB_CACHE/bin
 RUN flutter doctor -v
 RUN dart pub global activate protoc_plugin
 
