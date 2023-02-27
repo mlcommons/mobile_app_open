@@ -33,7 +33,7 @@ ifdef SONAR_OUT_DIR
 endif
 
 # Use the same image tag used in `flutter_common_docker_flags`
-output/docker_mlperf_scanner.stamp: flutter/android/docker/image tools/scanner/Dockerfile
+output/docker_mlperf_scanner.stamp:
 	docker image build \
 		-t ${docker_image_tag} \
 		-t ${GHCR_IMAGE_TAG} \
@@ -49,8 +49,14 @@ scanner/image/pull:
 scanner/image/push:
 	docker push ${GHCR_IMAGE_TAG}
 
-.PHONY: scanner/image/build
-scanner/image/build: output/docker_mlperf_scanner.stamp
+.PHONY: scanner/image/build-base-image
+scanner/image/build-base-image: flutter/android/docker/image tools/scanner/Dockerfile
+	# cache base image
+	docker tag ${docker_image_tag} ${GHCR_IMAGE_TAG}
+	docker push ${GHCR_IMAGE_TAG}
+
+.PHONY: scanner/image/build-scanner-image
+scanner/image/build-scanner-image: output/docker_mlperf_scanner.stamp
 
 .PHONY: scanner/build
 scanner/build:

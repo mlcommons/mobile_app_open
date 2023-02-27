@@ -26,7 +26,7 @@ jobs:
       WITH_TFLITE: 1
       WITH_PIXEL: 1
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Log in to the Container registry
@@ -38,7 +38,8 @@ jobs:
       - name: Build scanner image
         run: |
           make scanner/image/pull || true
-          make scanner/image/build
+          make scanner/image/build-base-image
+          make scanner/image/build-scanner-image
           make scanner/image/push
       - name: Build app
         run: |
