@@ -12,7 +12,8 @@ env:
   IMAGE_NAME: mlcommons/mobile_app_open-formatter
 
 jobs:
-  build-and-push-image:
+  build:
+    name: Build image
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -45,8 +46,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  lint:
-    needs: build-and-push-image
+  run:
+    name: Run linter & formatter
+    needs: build
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
@@ -56,19 +58,29 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
-      - name: Run linter
+      - name: Run git config
+        run: git config --global --add safe.directory /__w/mobile_app_open/mobile_app_open
+      - name: prohibited-extensions
+        run: make lint/prohibited-extensions
+      - name: big-files
+        run: make lint/big-files
+      - name: line-endings
+        run: make lint/line-endings
+      - name: bazel
+        run: make lint/bazel
+      - name: clang
+        run: make lint/clang
+      - name: markdown
+        run: make lint/markdown
+      - name: yaml
+        run: make lint/yaml
+      - name: dart
         run: |
-          git config --global --add safe.directory /__w/mobile_app_open/mobile_app_open
-          make lint/bazel
-          make lint/clang
-          make lint/markdown
-          make lint/yaml
-          make lint/prohibited-extensions
-          make lint/big-files
-          make lint/line-endings
           make flutter/prepare
           make format/dart/pub
           make lint/dart
+      - name: typescripts
+        run: make lint/ts
 
   bazel:
     runs-on: ubuntu-latest
