@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}-formatter
+  IMAGE_NAME: mobile_app_open-formatter
 
 jobs:
   build-and-push-image:
@@ -44,7 +44,7 @@ jobs:
     needs: build-and-push-image
     runs-on: ubuntu-latest
     container:
-      image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
     steps:
       - uses: actions/checkout@v3
       - name: Run linter
