@@ -52,10 +52,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
-      options: --user root
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - name: Run git config
