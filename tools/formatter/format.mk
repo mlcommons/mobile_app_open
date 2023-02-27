@@ -132,6 +132,14 @@ docker/format: output/docker_mlperf_formatter.stamp
 		${FORMAT_DOCKER_ARGS} \
 		make format/dart/pub format
 
+.PHONY: docker/lint
+docker/lint: output/docker_mlperf_formatter.stamp
+	mkdir -p ~/.pub-cache
+	mkdir -p ~/.config/flutter
+	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
+		${FORMAT_DOCKER_ARGS} \
+		make format/dart/pub lint
+
 .PHONY: docker/format/--
 docker/format/--: output/docker_mlperf_formatter.stamp
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
