@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}-formatter
+  IMAGE_NAME: mlcommons/mobile_app_open-formatter
 
 jobs:
   build-and-push-image:
@@ -45,10 +45,15 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - name: Run linter
-        run: make lint
+        run: |
+          make format/dart/pub
+          make lint
 
   bazel:
     runs-on: ubuntu-latest
