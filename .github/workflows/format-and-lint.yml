@@ -46,7 +46,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   bazel:
-    needs: build
+    needs: build-image
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
@@ -58,7 +58,7 @@ jobs:
 
   cpp:
     name: C++
-    needs: build
+    needs: build-image
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
@@ -69,7 +69,7 @@ jobs:
         run: make lint/clang
 
   dart:
-    needs: build
+    needs: build-image
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
@@ -92,7 +92,7 @@ jobs:
         run: make lint/result-schema
 
   markdown:
-    needs: build
+    needs: build-image
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
@@ -107,7 +107,7 @@ jobs:
           use-verbose-mode: yes
 
   yaml:
-    needs: build
+    needs: build-image
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
@@ -119,7 +119,7 @@ jobs:
 
   ts:
     name: TypeScript
-    needs: build
+    needs: build-image
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
@@ -130,7 +130,7 @@ jobs:
         run: make lint/ts
 
   misc:
-    needs: build
+    needs: build-image
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
