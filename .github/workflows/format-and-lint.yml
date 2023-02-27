@@ -12,7 +12,7 @@ env:
   IMAGE_NAME: mlcommons/mobile_app_open-formatter
 
 jobs:
-  build:
+  build-image:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -45,45 +45,101 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  run:
+  bazel:
     needs: build
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - name: Run git config
-        run: git config --global --add safe.directory /__w/mobile_app_open/mobile_app_open
+      - name: bazel
+        run: make lint/bazel
+
+  cpp:
+    name: C++
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - name: clang
+        run: make lint/clang
+
+  dart:
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
       - name: Cache Flutter packages
         uses: actions/cache@v3
         with:
           path: /home/.pub-cache
           key: ${{ runner.os }}-pub-cache-${{ hashFiles('**/pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-cache-
-      - name: prohibited-extensions
-        run: make lint/prohibited-extensions
-      - name: big-files
-        run: make lint/big-files
-      - name: line-endings
-        run: make lint/line-endings
-      - name: bazel
-        run: make lint/bazel
-      - name: clang
-        run: make lint/clang
+      - name: flutter/prepare
+        run: make flutter/prepare
+      - name: pub-get
+        run: make format/dart/pub-get
+      - name: lint/dart
+        run: make lint/dart
+      - name: result-schema
+        run: make lint/result-schema
+
+  markdown:
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
       - name: markdown-format
         run: make lint/markdown
       - name: markdown-link
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           use-verbose-mode: yes
+
+  yaml:
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
       - name: yaml
         run: make lint/yaml
-      - name: dart
-        run: |
-          make flutter/prepare
-          make format/dart/pub-get
-          make lint/dart
-      - name: result-schema
-        run: make lint/result-schema
+
+  ts:
+    name: TypeScript
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
       - name: typescripts
         run: make lint/ts
+
+  misc:
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - name: prohibited-extensions
+        run: make lint/prohibited-extensions
+      - name: big-files
+        run: make lint/big-files
+      - name: line-endings
+        run: make lint/line-endings
