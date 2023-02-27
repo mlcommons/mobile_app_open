@@ -13,7 +13,6 @@ env:
 
 jobs:
   build:
-    name: Build image
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -47,7 +46,6 @@ jobs:
           cache-to: type=gha,mode=max
 
   run:
-    name: Run linter & formatter
     needs: build
     runs-on: ubuntu-latest
     container:
@@ -72,8 +70,12 @@ jobs:
         run: make lint/bazel
       - name: clang
         run: make lint/clang
-      - name: markdown
+      - name: markdown-format
         run: make lint/markdown
+      - name: markdown-link
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-verbose-mode: yes
       - name: yaml
         run: make lint/yaml
       - name: dart
@@ -85,137 +87,3 @@ jobs:
         run: make lint/result-schema
       - name: typescripts
         run: make lint/ts
-
-  bazel:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          path: ${{ github.workspace }}/src/github.com/${{ github.repository }}
-      - name: Setup Golang
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.16
-      - name: Set go env
-        run: echo GOPATH=$GITHUB_WORKSPACE >> $GITHUB_ENV
-      - name: Get buildifier
-        run: go get github.com/bazelbuild/buildtools/buildifier
-      - name: Run buildifier format check
-        run: $GOPATH/bin/buildifier -mode=check -r ${{ github.workspace }}/src/github.com/${{ github.repository }}
-      - name: Run buildifier linter
-        run: $GOPATH/bin/buildifier -lint=warn -r ${{ github.workspace }}/src/github.com/${{ github.repository }}
-  cpp:
-    name: C++
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v2
-      - name: Check C++ format
-        uses: jidicula/clang-format-action@v4.9.0
-        with:
-          clang-format-version: 12
-          check-path: .
-          fallback-style: Google
-  dart:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Flutter
-        uses: subosito/flutter-action@v1
-        with:
-          channel: 'stable'
-          flutter-version: '3.3.5'
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v1
-        with:
-          version: '3.x'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create ephemeral files
-        run: |
-          flutter config --no-analytics &&
-          dart pub global activate protoc_plugin &&
-          export PATH="$PATH:$HOME/.pub-cache/bin" &&
-          make flutter/prepare
-      - name: Run Dart format check
-        run: dart format --output=none --set-exit-if-changed flutter
-      - name: Run Dart linter
-        run: dart analyze --fatal-infos
-      - name: Run Dart import sorter
-        run: cd flutter && dart run import_sorter:main --exit-if-changed
-      - uses: actions/setup-node@v3
-        name: Setup Node
-        with:
-          node-version: '16'
-      - name: Install quicktype
-        run: |
-          npm install -g quicktype
-      - name: Check export result schema
-        run: make lint/result-schema
-  markdown:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v2
-      - run: npm install -g markdownlint-cli@0.26.0
-      - name: Run Markdown format check
-        run: make lint/markdown
-      - name: Check links in markdown files
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          use-verbose-mode: yes
-  yaml:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run YAML format check
-        uses: ibiqlik/action-yamllint@v3.1.0
-        with:
-          config_file: 'tools/formatter/configs/yamllint.yml'
-  ts:
-    name: TypeScript
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        name: Setup Node
-        with:
-          node-version: '16'
-      - name: Install quicktype
-        run: |
-          npm install -g quicktype
-      - name: Create ephemeral files
-        run: |
-          make flutter/result/ts flutter/firebase/prefix
-      - name: Install Prettier
-        working-directory: firebase_functions/functions
-        run: npm install prettier
-      - name: Run "Prettier"
-        working-directory: firebase_functions/functions
-        run: npx prettier --check .
-      - name: Install ESLint
-        run: |
-          npm install \
-            eslint \
-            eslint-plugin-import \
-            eslint-config-google \
-            @typescript-eslint/parser \
-            @typescript-eslint/eslint-plugin
-      - name: Run ESLint
-        run: make lint/ts
-  misc:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v2
-      - name: Check prohibited extensions
-        run: make lint/prohibited-extensions
-      - name: Check large files
-        run: make lint/big-files
-      - name: Install dos2unix
-        run: sudo apt-get install dos2unix
-      - name: Check line endings
-        run: make lint/line-endings

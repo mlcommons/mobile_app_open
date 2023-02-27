@@ -58,8 +58,8 @@ lint/clang:
 lint/dart: format/dart/pub-get
 	cd flutter && ${_start_args} dart run import_sorter:main --exit-if-changed
 	cd flutter_common && ${_start_args} dart run import_sorter:main --exit-if-changed
-	dart format --output=none --set-exit-if-changed flutter
-	dart analyze --fatal-infos flutter flutter_common
+	dart format --output=none --set-exit-if-changed flutter flutter_common
+	dart analyze --fatal-infos
 
 .PHONY: lint/yaml
 lint/yaml:
@@ -68,6 +68,7 @@ lint/yaml:
 .PHONY: lint/ts
 lint/ts: format/ts/install flutter/result/ts flutter/firebase/prefix
 	cd firebase_functions/functions && ${_start_args} npm run lint
+	cd firebase_functions/functions && npx prettier --check .
 
 .PHONY: lint/prohibited-extensions
 lint/prohibited-extensions:

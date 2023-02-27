@@ -53,6 +53,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
 RUN apt-get update && apt-get install -y nodejs && node -v
 RUN npm install --location=global npm@8.13.2 && npm --version
 RUN npm install -g quicktype
+RUN npm install -g prettier
 
 # Add Markdown formatter
 RUN npm install -g markdownlint-cli@0.26.0
