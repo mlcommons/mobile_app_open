@@ -34,7 +34,7 @@ endif
 
 # Use the same image tag used in `flutter_common_docker_flags`
 output/docker_mlperf_scanner.stamp: flutter/android/docker/image tools/scanner/Dockerfile
-	docker pull ${GHCR_IMAGE_TAG}
+	docker pull ${GHCR_IMAGE_TAG} || true
 	docker image build \
 		-t ${docker_image_tag} \
 		-t ${GHCR_IMAGE_TAG} \
