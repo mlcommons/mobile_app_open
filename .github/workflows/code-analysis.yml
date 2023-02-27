@@ -37,7 +37,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build scanner image
         run: |
-          make scanner/image
+          make scanner/image/pull || true
+          make scanner/image/build
+          make scanner/image/push
       - name: Build app
         run: |
           make docker/scanner/build

@@ -34,17 +34,23 @@ endif
 
 # Use the same image tag used in `flutter_common_docker_flags`
 output/docker_mlperf_scanner.stamp: flutter/android/docker/image tools/scanner/Dockerfile
-	docker pull ${GHCR_IMAGE_TAG} || true
 	docker image build \
 		-t ${docker_image_tag} \
 		-t ${GHCR_IMAGE_TAG} \
 		--build-arg DOCKER_IMAGE_TAG=${docker_image_tag} \
 		tools/scanner
 	touch $@
+
+.PHONY: scanner/image/pull
+scanner/image/pull:
+	docker pull ${GHCR_IMAGE_TAG}
+
+.PHONY: scanner/image/push
+scanner/image/push:
 	docker push ${GHCR_IMAGE_TAG}
 
-.PHONY: scanner/image
-scanner/image: output/docker_mlperf_scanner.stamp
+.PHONY: scanner/image/build
+scanner/image/build: output/docker_mlperf_scanner.stamp
 
 .PHONY: scanner/build
 scanner/build:
