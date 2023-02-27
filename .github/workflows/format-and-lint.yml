@@ -63,7 +63,7 @@ jobs:
           make lint/clang
           make lint/markdown
           make lint/yaml
-          make lint/prohibited-extensions 
+          make lint/prohibited-extensions
           make lint/big-files
           make lint/line-endings
           make flutter/prepare
