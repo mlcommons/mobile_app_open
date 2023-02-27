@@ -63,23 +63,16 @@ RUN apt-get update && apt-get install -y \
 	python3-pip
 RUN pip install yamllint==1.26.3
 
-# Setup permission to run Flutter as non-root user
-# this is needed to share Flutter cache with host machine
-ARG UNAME=mlperf
-ARG UID=1000
-ARG GID=1000
-RUN groupadd -g $GID -o $UNAME
-RUN useradd -m -u $UID -g $GID -o -s /bin/bash $UNAME
-USER $UNAME
 
 # Add Flutter SDK
+ENV UNAME=mlperf
 RUN git clone --branch "3.3.5" --single-branch --depth 1 \
     https://github.com/flutter/flutter.git /home/$UNAME/flutter
 RUN git config --global --add safe.directory /home/$UNAME/flutter
 ENV PATH=$PATH:/home/$UNAME/flutter/bin:/home/$UNAME/flutter/bin/cache/dart-sdk/bin
 # The PUB_CACHE directory will be mounted as a docker volume in format.mk
-ENV PUB_CACHE=/home/mlperf/.pub-cache
+ENV PUB_CACHE=/home/.pub-cache
 RUN flutter doctor -v
-
+RUN dart pub global activate protoc_plugin
 
 CMD /bin/bash
