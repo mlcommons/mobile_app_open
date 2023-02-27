@@ -22,6 +22,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 # Install dev packages
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     gcc make git curl wget zip unzip tar gzip
+RUN apt-get update && apt-get install -y build-essential
 
 ENV FORMATTER_HOME /opt/formatters/bin
 ENV PATH=${PATH}:${FORMATTER_HOME}
@@ -44,15 +45,14 @@ RUN apt-get update && apt-get install -y \
 RUN cp $(which clang-format-10) ${FORMATTER_HOME}/clang-format
 
 # Add dos2unix to format line endings
-RUN apt-get update && apt-get install -y \
-    dos2unix
+RUN apt-get update && apt-get install -y dos2unix
 
 # Install Node.js and NPM
 ENV NODE_ENV="production"
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
 RUN apt-get update && apt-get install -y nodejs && node -v
 RUN npm install --location=global npm@8.13.2 && npm --version
-RUN apt-get update && apt-get install -y build-essential
+RUN npm install -g quicktype
 
 # Add Markdown formatter
 RUN npm install -g markdownlint-cli@0.26.0
@@ -73,6 +73,7 @@ RUN git config --global --add safe.directory /home/$UNAME/flutter
 ENV PUB_CACHE=/home/.pub-cache
 ENV PATH=$PATH:/home/$UNAME/flutter/bin:/home/$UNAME/flutter/bin/cache/dart-sdk/bin:$PUB_CACHE/bin
 RUN flutter doctor -v
-RUN dart pub global activate protoc_plugin
+RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
+RUN apt-get install -y protobuf-compiler
 
 CMD /bin/bash

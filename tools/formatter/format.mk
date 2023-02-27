@@ -1,6 +1,7 @@
 
 .PHONY: format
 format: format/bazel format/clang format/dart format/ts format/line-endings format/markdown
+	@echo "Finished running make target: format"
 
 .PHONY: format/bazel
 format/bazel:
@@ -39,7 +40,8 @@ format/markdown:
 		xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml --fix
 
 .PHONY: lint
-lint: lint/bazel lint/clang lint/dart lint/ts lint/yaml lint/prohibited-extensions lint/big-files
+lint: lint/bazel lint/clang lint/dart lint/ts lint/yaml lint/prohibited-extensions lint/big-files lint/result-schema
+	@echo "Finished running make target: lint"
 
 .PHONY: lint/bazel
 lint/bazel:
@@ -119,25 +121,22 @@ output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 
 FORMAT_DOCKER_ARGS= \
 	--mount source=mlperf-pubcache,target=/home/.pub-cache \
+	--mount source=mlperf-output,target=/home/mlperf/mobile_app_open/output \
 	-v $(CURDIR):/home/mlperf/mobile_app_open \
 	-w /home/mlperf/mobile_app_open \
 	mlperf/formatter \
 
 .PHONY: docker/format
 docker/format: output/docker_mlperf_formatter.stamp
-	mkdir -p ~/.pub-cache
-	mkdir -p ~/.config/flutter
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
 		${FORMAT_DOCKER_ARGS} \
-		make format/dart/pub format
+		make flutter/prepare format/dart/pub format
 
 .PHONY: docker/lint
 docker/lint: output/docker_mlperf_formatter.stamp
-	mkdir -p ~/.pub-cache
-	mkdir -p ~/.config/flutter
 	MSYS2_ARG_CONV_EXCL="*" docker run -it --rm \
 		${FORMAT_DOCKER_ARGS} \
-		make format/dart/pub lint
+		make flutter/prepare format/dart/pub lint
 
 .PHONY: docker/format/--
 docker/format/--: output/docker_mlperf_formatter.stamp
