@@ -11,6 +11,9 @@ jobs:
     name: SonarScanner
     runs-on: ubuntu-20.04
     timeout-minutes: 120
+    permissions:
+      contents: read
+      packages: write
     env:
       GHCR_IMAGE_TAG: ghcr.io/mlcommons/mobile_app_open-scanner:latest
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
