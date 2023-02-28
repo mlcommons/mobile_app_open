@@ -4,7 +4,8 @@ package(
 )
 
 cc_library(
-    name = "tflitebackend",
+    name =   "tflitebackend",
+    
     srcs = ["//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.so"],
 )
 
