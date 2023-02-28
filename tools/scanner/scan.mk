@@ -32,34 +32,19 @@ ifdef SONAR_OUT_DIR
 	sonar_bazel_build_args=--spawn_strategy=local --strategy=Genrule=local
 endif
 
-# Use the same image tag used in `flutter_common_docker_flags`
+
 output/docker_mlperf_scanner.stamp:
 	docker image build \
 		-t ${docker_image_tag} \
-		-t ${GHCR_IMAGE_TAG} \
 		--build-arg DOCKER_IMAGE_TAG=${docker_image_tag} \
 		tools/scanner
 	touch $@
 
-.PHONY: scanner/image/pull
-scanner/image/pull:
-	docker pull ${GHCR_IMAGE_TAG}
+.PHONY: scanner/build-image
+scanner/build-image: output/docker_mlperf_scanner.stamp
 
-.PHONY: scanner/image/push
-scanner/image/push:
-	docker push ${GHCR_IMAGE_TAG}
-
-.PHONY: scanner/image/build-base-image
-scanner/image/build-base-image: flutter/android/docker/image tools/scanner/Dockerfile
-	# cache base image
-	docker tag ${docker_image_tag} ${GHCR_IMAGE_TAG}
-	docker push ${GHCR_IMAGE_TAG}
-
-.PHONY: scanner/image/build-scanner-image
-scanner/image/build-scanner-image: output/docker_mlperf_scanner.stamp
-
-.PHONY: scanner/build
-scanner/build:
+.PHONY: scanner/build-app
+scanner/build-app:
 	bazel clean
 	build-wrapper-linux-x86-64 --out-dir "${SONAR_OUT_DIR}" \
 		make flutter/android
@@ -84,11 +69,11 @@ scanner/scan:
 		-Dsonar.pullrequest.branch=${PR_BRANCH} \
 		-Dsonar.pullrequest.base=${PR_BASE}
 
-.PHONY: docker/scanner/build
-docker/scanner/build:
+.PHONY: docker/scanner/build-app
+docker/scanner/build-app:
 	MSYS2_ARG_CONV_EXCL="*" docker run \
 		${scanner_docker_args} ${flutter_common_docker_flags} \
-		make scanner/build
+		make scanner/build-app
 
 .PHONY: docker/scanner/scan
 docker/scanner/scan:
