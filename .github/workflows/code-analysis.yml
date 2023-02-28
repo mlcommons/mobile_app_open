@@ -40,7 +40,6 @@ jobs:
         id: meta-base
         uses: docker/metadata-action@v4
         with:
-          # Use the same image tag used in `flutter_common_docker_flags`
           images: ghcr.io/mlcommons/mlperf_mobile_flutter
           flavor: latest=true
       - name: Build and push base image
@@ -49,7 +48,7 @@ jobs:
           context: flutter/android/docker
           file: flutter/android/docker/Dockerfile
           push: true
-          tags: ${{ steps.meta-base.outputs.tags }},mlcommons/mlperf_mobile_flutter
+          tags: ${{ steps.meta-base.outputs.tags }}
           labels: ${{ steps.meta-base.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -64,7 +63,7 @@ jobs:
         with:
           context: tools/scanner
           file: tools/scanner/Dockerfile
-          build-args: DOCKER_IMAGE_TAG=mlcommons/mlperf_mobile_flutter
+          build-args: DOCKER_IMAGE_TAG=ghcr.io/mlcommons/mlperf_mobile_flutter
           push: true
           tags: ${{ steps.meta-scanner.outputs.tags }}
           labels: ${{ steps.meta-scanner.outputs.labels }}
@@ -72,6 +71,8 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Build app
         run: |
+          # Use the same image tag used in `flutter_common_docker_flags`
+          docker tag ghcr.io/mlcommons/mobile_app_open-scanner mlcommons/mlperf_mobile_flutter
           make docker/scanner/build-app
       - name: Scan code
         run: |
