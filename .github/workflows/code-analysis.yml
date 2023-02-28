@@ -16,7 +16,7 @@ jobs:
       packages: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_IMAGE_TAG: ghcr.io/mlcommons/mlperf_mobile_flutter
+      DOCKER_IMAGE_TAG: ghcr.io/mlcommons/mobile_app_open-scanner
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_OUT_DIR: sonar_build_wrapper_output
       PR_NUMBER: ${{ github.event.number }}
@@ -41,7 +41,7 @@ jobs:
         id: meta-base
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/mlcommons/mlperf_mobile_flutter
+          images: ghcr.io/mlcommons/mobile_app_open-base
           flavor: latest=true
       - name: Build and push base image
         uses: docker/build-push-action@v4
@@ -57,14 +57,14 @@ jobs:
         id: meta-scanner
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/mlcommons/mlperf_mobile_flutter
+          images: ghcr.io/mlcommons/mobile_app_open-scanner
           flavor: latest=true
       - name: Build and push scanner image
         uses: docker/build-push-action@v4
         with:
           context: tools/scanner
           file: tools/scanner/Dockerfile
-          build-args: DOCKER_IMAGE_TAG=ghcr.io/mlcommons/mlperf_mobile_flutter
+          build-args: BASE_DOCKER_IMAGE_TAG=ghcr.io/mlcommons/mobile_app_open-base
           push: true
           tags: ${{ steps.meta-scanner.outputs.tags }}
           labels: ${{ steps.meta-scanner.outputs.labels }}

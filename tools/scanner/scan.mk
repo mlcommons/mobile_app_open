@@ -36,7 +36,7 @@ endif
 output/docker_mlperf_scanner.stamp:
 	docker image build \
 		-t ${DOCKER_IMAGE_TAG} \
-		--build-arg DOCKER_IMAGE_TAG=${DOCKER_IMAGE_TAG} \
+		--build-arg BASE_DOCKER_IMAGE_TAG=${BASE_DOCKER_IMAGE_TAG} \
 		tools/scanner
 	touch $@
 

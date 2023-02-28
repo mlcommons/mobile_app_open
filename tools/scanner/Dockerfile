@@ -1,5 +1,5 @@
-ARG DOCKER_IMAGE_TAG
-FROM $DOCKER_IMAGE_TAG
+ARG BASE_DOCKER_IMAGE_TAG
+FROM $BASE_DOCKER_IMAGE_TAG
 
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y unzip
 
