@@ -49,7 +49,7 @@ jobs:
           context: flutter/android/docker
           file: flutter/android/docker/Dockerfile
           push: true
-          tags: ${{ steps.meta-base.outputs.tags }}
+          tags: ${{ steps.meta-base.outputs.tags }},mlcommons/mlperf_mobile_flutter
           labels: ${{ steps.meta-base.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
