@@ -36,7 +36,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for base image
+      - name: Extract metadata for base image
         id: meta-base
         uses: docker/metadata-action@v4
         with:
@@ -53,7 +53,7 @@ jobs:
           labels: ${{ steps.meta-base.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Extract metadata (tags, labels) for scanner image
+      - name: Extract metadata for scanner image
         id: meta-scanner
         uses: docker/metadata-action@v4
         with:

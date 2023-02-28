@@ -41,7 +41,7 @@ output/docker_mlperf_scanner.stamp:
 	touch $@
 
 .PHONY: scanner/build-image
-scanner/build-image: output/docker_mlperf_scanner.stamp
+scanner/build-image: flutter/android/docker/image output/docker_mlperf_scanner.stamp
 
 .PHONY: scanner/build-app
 scanner/build-app:
