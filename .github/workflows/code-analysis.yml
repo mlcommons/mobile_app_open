@@ -16,6 +16,7 @@ jobs:
       packages: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_IMAGE_TAG: ghcr.io/mlcommons/mlperf_mobile_flutter
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_OUT_DIR: sonar_build_wrapper_output
       PR_NUMBER: ${{ github.event.number }}
