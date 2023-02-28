@@ -8,6 +8,7 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:uuid/uuid.dart';
 import 'package:worker_manager/worker_manager.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
@@ -16,7 +17,6 @@ import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/device_info.dart';
@@ -159,7 +159,8 @@ class TaskRunner {
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
       if (!store.selectedBenchmarkRunMode.doAccuracyRun) break;
-      final resultHelper = resultHelpers.firstWhere((e) => e.benchmark == benchmark);
+      final resultHelper =
+          resultHelpers.firstWhere((e) => e.benchmark == benchmark);
       await runBenchmark(resultHelper, accuracyMode, currentLogDir);
     }
 
