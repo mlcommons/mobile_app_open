@@ -53,8 +53,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - name: Run git config
-        run: git config --global --add safe.directory /__w/mobile_app_open/mobile_app_open
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: bazel
         run: make lint/bazel
 
@@ -67,8 +67,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - name: Run git config
-        run: git config --global --add safe.directory /__w/mobile_app_open/mobile_app_open
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: clang
         run: make lint/clang
 
@@ -80,8 +80,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - name: Run git config
-        run: git config --global --add safe.directory /__w/mobile_app_open/mobile_app_open
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Cache Flutter packages
         uses: actions/cache@v3
         with:
@@ -105,8 +105,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - name: Run git config
-        run: git config --global --add safe.directory /__w/mobile_app_open/mobile_app_open
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: markdown-format
         run: make lint/markdown
       - name: markdown-link
@@ -122,8 +122,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - name: Run git config
-        run: git config --global --add safe.directory /__w/mobile_app_open/mobile_app_open
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: yaml
         run: make lint/yaml
 
@@ -136,8 +136,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - name: Run git config
-        run: git config --global --add safe.directory /__w/mobile_app_open/mobile_app_open
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: typescripts
         run: make lint/ts
 
@@ -149,8 +149,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - name: Run git config
-        run: git config --global --add safe.directory /__w/mobile_app_open/mobile_app_open
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: prohibited-extensions
         run: make lint/prohibited-extensions
       - name: big-files
