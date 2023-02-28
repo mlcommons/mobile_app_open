@@ -43,7 +43,7 @@ format/markdown:
 		xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml --fix
 
 .PHONY: lint
-lint: lint/bazel lint/clang lint/dart lint/ts lint/yaml lint/prohibited-extensions lint/big-files lint/result-schema
+lint: lint/bazel lint/clang lint/dart lint/result-schema lint/ts lint/yaml lint/markdown lint/prohibited-extensions lint/big-files
 	@echo "Finished running make target: lint"
 
 .PHONY: lint/bazel

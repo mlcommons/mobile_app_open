@@ -61,5 +61,5 @@ See [format.mk](tools/formatter/format.mk) for more commands.
 
 Running `make format` requires you to have all the tools installed locally on your computer.
 For your convenience we created a Docker image with all the tools needed.
-Running `make docker/format` will format the code files. 
+Running `make docker/format` will format the code files.
 Running `make docker/lint` will print linter's errors and warnings without changing the files.
