@@ -91,9 +91,9 @@ android_workspace()
 
 http_archive(
     name = "neuron_delegate",
-    sha256 = "2bef00cc7ba6f649a437e979fe1b36bdd94f575b5c00e0d08cb4e92e586f49a7",
-    strip_prefix = "tflite-neuron-delegate-2.8.0",
-    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/tags/v2.8.0.tar.gz"],
+    sha256 = "85c1b17acb34072baa12cf74011ff45aee9045a12603851b86ce85e3cef66747",
+    strip_prefix = "tflite-neuron-delegate-update_for_dujac",
+    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/heads/update_for_dujac.zip"],
 )
 
 new_local_repository(
