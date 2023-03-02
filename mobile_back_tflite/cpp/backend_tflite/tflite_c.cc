@@ -290,28 +290,25 @@ mlperf_backend_ptr_t mlperf_backend_create(
       options.disallow_nnapi_cpu = true;
       delegate = new tflite::StatefulNnApiDelegate(options);
 #if MTK_TFLITE_NEURON_BACKEND
-    } else if (strcmp(configs->accelerator, "neuron") == 0) {
+    } else if (strstr(configs->accelerator, "neuron") != NULL) {
       backend_data->accelerator = "Neuron";
-      // The kOptimizationBatchProcessor doesn't work yet.
-      // Use NNAPI instead.
-      if (configs->batch_size > 1) {
-        auto options = tflite::StatefulNnApiDelegate::Options();
-        options.allow_fp16 = true;
-        options.disallow_nnapi_cpu = true;
-        delegate = new tflite::StatefulNnApiDelegate(options);
-#if 0
-        auto options = TfLiteNeuronDelegateOptionsDefault();
-        options.execution_preference = kTurboBoost;
-        options.allow_fp16 = true;
-        delegate = TfLiteNeuronDelegateCreate(&options);
-#endif
-      } else {
-        auto options = TfLiteNeuronDelegateOptionsDefault();
-        options.optimization_hint = kOptimizationLowLatency;
-        options.execution_preference = kTurboBoost;
-        options.allow_fp16 = true;
-        delegate = TfLiteNeuronDelegateCreate(&options);
+      auto options = TfLiteNeuronDelegateOptionsDefault();
+      if (strcmp(configs->accelerator, "neuron-mdla") == 0) {
+        strcpy(options.accelerator_name, "mtk-mdla");
       }
+      if (configs->batch_size > 1) {
+        // The kOptimizationBatchProcessor doesn't work yet.
+        options.optimization_hint = 0;
+      } else {
+        options.optimization_hint = kOptimizationLowLatency;
+      }
+      if (strcmp(configs->accelerator, "neuron-no-ahwb") != 0) {
+        options.use_ahwb = true;
+        options.use_cacheable_buffer = true;
+      }
+      options.execution_preference = kTurboBoost;
+      options.allow_fp16 = true;
+      delegate = TfLiteNeuronDelegateCreate(&options);
 #endif  // MTK_TFLITE_NEURON_BACKEND
     }
 #endif  // __ANDROID__
