@@ -22,6 +22,7 @@ class ResultManager {
   }
 
   final List<ExtendedResult> results = [];
+  List<ExtendedResult> filteredResults = [];
   final List<File> _resultsFiles = [];
   late final Directory _resultsDir;
 
