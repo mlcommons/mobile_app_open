@@ -56,14 +56,14 @@ class _ResultListScreenState extends State<ResultListScreen> {
           final item = itemList[index];
           return ListTile(
             title: Text(helper.formatDate(item.meta.creationDate.toLocal())),
-            subtitle: Text(helper.makeModelDescription(item.environmentInfo)),
+            subtitle: Text(item.meta.uuid),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => DetailsScreen(result: item),
                 ),
-              );
+              ).then((value) => setState(() {}));
             },
           );
         },

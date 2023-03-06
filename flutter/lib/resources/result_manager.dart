@@ -71,6 +71,12 @@ class ResultManager {
     }
   }
 
+  Future<void> deleteResult(ExtendedResult result) async {
+    final idx = results.indexOf(result);
+    results.removeAt(idx);
+    await _resultsFiles[idx].delete();
+  }
+
   Future<void> saveResult(ExtendedResult result) async {
     results.add(result);
     final DateFormat formatter = DateFormat('yyyy-MM-ddTHH-mm-ss');

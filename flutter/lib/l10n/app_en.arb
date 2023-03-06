@@ -143,6 +143,8 @@
   "historyDetailsTableColName": "Benchmark name",
   "historyDetailsTableColPerf": "Throughput",
   "historyDetailsTableColAccuracy": "Accuracy",
+  "historyDetailsDeleteConfirm": "Delete this result?",
+  "historyDetailsDelete": "Delete",
 
   "historyRunDetailsTitle": "Run details",
   "historyRunDetailsBenchName": "Benchmark name",
