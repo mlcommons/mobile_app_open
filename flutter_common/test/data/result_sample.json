@@ -1,16 +1,8 @@
 {
   "meta": {
-    "uuid": "f4f16ee5-ff0a-43b9-94d3-097b64943e39",
-    "creation_date": "2023-01-25T09:16:15.229817",
-    "upload_date": "2023-01-25T02:16:15.229817Z"
-  },
-  "filter": {
-    "creation_date": "2023-01-25T09:16:15.232773",
-    "platform": "iOS",
-    "device_model": "iPhone XS",
-    "backend_name": "TFLite",
-    "manufacturer": "Apple",
-    "soc": "Apple A12"
+    "uuid": "387a7249-6a73-43fd-adef-0fc8fc4bb642",
+    "creation_date": "2023-03-06T12:11:56.385617",
+    "upload_date": "2023-03-06T05:11:56.385618Z"
   },
   "results": [
     {
@@ -58,7 +50,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2023-01-25T09:16:15.235005",
+        "start_datetime": "2023-03-06T12:11:56.389286",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -84,7 +76,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2023-01-25T09:16:15.235006",
+        "start_datetime": "2023-03-06T12:11:56.389362",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -138,7 +130,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2023-01-25T09:16:15.235012",
+        "start_datetime": "2023-03-06T12:11:56.390628",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -164,7 +156,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2023-01-25T09:16:15.235013",
+        "start_datetime": "2023-03-06T12:11:56.390628",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -207,7 +199,7 @@
   "build_info": {
     "version": "1.0",
     "build_number": "10qwe",
-    "build_date": "2023-01-25T09:16:15.234588",
+    "build_date": "2023-03-06T12:11:56.388514",
     "official_release_flag": false,
     "dev_test_flag": true,
     "backend_list": [

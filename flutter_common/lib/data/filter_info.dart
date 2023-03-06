@@ -1,13 +1,8 @@
-import 'package:json_annotation/json_annotation.dart';
-
 import 'package:mlperfbench_common/constants.dart';
 import 'package:mlperfbench_common/data/build_info/build_info.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
-part 'filter_info.g.dart';
-
-@JsonSerializable(fieldRename: FieldRename.snake)
 class FilterInfo {
   final DateTime creationDate;
   final String platform;
@@ -56,9 +51,4 @@ class FilterInfo {
       soc: soc ?? StringValue.unknown,
     );
   }
-
-  factory FilterInfo.fromJson(Map<String, dynamic> json) =>
-      _$FilterInfoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$FilterInfoToJson(this);
 }

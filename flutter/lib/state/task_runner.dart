@@ -178,8 +178,6 @@ class TaskRunner {
     final creationDate = DateTime.now();
     return ExtendedResult(
       meta: ResultMetaInfo(creationDate: creationDate, uuid: const Uuid().v4()),
-      filter: FilterInfo.create(creationDate, DeviceInfo.instance.envInfo,
-          BuildInfoHelper.info, exportResults.first),
       environmentInfo: DeviceInfo.instance.envInfo,
       results: exportResults,
       buildInfo: BuildInfoHelper.info,
