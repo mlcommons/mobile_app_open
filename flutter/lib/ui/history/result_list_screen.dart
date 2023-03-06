@@ -34,7 +34,9 @@ class _ResultListScreenState extends State<ResultListScreen> {
     return Scaffold(
       appBar: helper.makeAppBar(l10n.historyListTitle, actions: [
         IconButton(
-          icon: const Icon(Icons.filter_list),
+          icon: Icon(filter.anyFilterActive
+              ? Icons.filter_list
+              : Icons.filter_list_off),
           onPressed: () {
             Navigator.push(
               context,

@@ -125,6 +125,8 @@
   "historyListSelectionDelete": "Delete",
   "historyListSelectionDeleteConfirm": "Delete selected items?",
 
+  "historyFilterTitle": "Filter",
+
   "historyDetailsTitle": "Result details",
   "historyDetailsBuildTypeDebug": "debug build",
   "historyDetailsBuildTypeOfficial": "official",

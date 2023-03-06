@@ -49,7 +49,7 @@ class ResultFilter {
     return filter;
   }
 
-  // other should be the filter
+  // other should be an instance of ResultManager.resultFilter
   bool match(ResultFilter other) {
     bool platformMatched =
         other.platform == null ? true : platform == other.platform;
@@ -65,6 +65,15 @@ class ResultFilter {
         backendNameMatched &&
         manufacturerMatched &&
         socMatched;
+  }
+
+  bool get anyFilterActive {
+    return creationDate != null ||
+        platform != null ||
+        deviceModel != null ||
+        backendName != null ||
+        manufacturer != null ||
+        soc != null;
   }
 
   factory ResultFilter.fromJson(Map<String, dynamic> json) =>
