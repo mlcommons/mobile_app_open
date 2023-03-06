@@ -56,21 +56,6 @@ class ResultManager {
     }
   }
 
-  Future<void> removeSelected(List<bool> selected) async {
-    if (selected.length != results.length) {
-      throw 'selected.length != results.length';
-    }
-    if (_resultsFiles.length != results.length) {
-      throw '_resultsFiles.length != results.length';
-    }
-    for (int i = 0; i < results.length; i++) {
-      if (selected[i]) {
-        results.removeAt(i);
-        await _resultsFiles[i].delete();
-      }
-    }
-  }
-
   Future<void> deleteResult(ExtendedResult result) async {
     final idx = results.indexOf(result);
     results.removeAt(idx);

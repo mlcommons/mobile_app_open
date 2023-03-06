@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/ui/history/run_details_screen.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
+import 'package:mlperfbench/ui/history/run_details_screen.dart';
 import 'utils.dart';
 
 class DetailsScreen extends StatefulWidget {
