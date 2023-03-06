@@ -6,7 +6,6 @@ import 'package:mlperfbench_common/data/environment/env_ios.dart';
 import 'package:mlperfbench_common/data/environment/env_windows.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/filter_info.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/data/results/backend_info.dart';
 import 'package:mlperfbench_common/data/results/backend_settings.dart';

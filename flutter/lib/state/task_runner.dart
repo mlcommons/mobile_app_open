@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/filter_info.dart';
 import 'package:mlperfbench_common/data/meta_info.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:uuid/uuid.dart';
