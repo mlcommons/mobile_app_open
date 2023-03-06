@@ -29,7 +29,7 @@ endif
 
 flutter: flutter/prepare flutter/platform
 flutter/firebase: flutter/firebase/config flutter/firebase/prefix
-flutter/result: flutter/result/json flutter/result/schema flutter/result/ts
+flutter/result: flutter/result/json flutter/result/gen-schema flutter/result/ts
 flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 flutter/test: flutter/test/unit flutter/test/integration
@@ -123,8 +123,8 @@ flutter/result/gen-unittest-sample:
 
 default_result_json_schema_path=tools/extended-result.schema.json
 RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
-.PHONY: flutter/result/schema
-flutter/result/schema: flutter/result/gen-extended-sample
+.PHONY: flutter/result/gen-schema
+flutter/result/gen-schema: flutter/result/gen-extended-sample
 	quicktype ${RESULT_JSON_SAMPLE_PATH} \
 		--lang schema \
 		--out ${RESULT_JSON_SCHEMA_PATH}
