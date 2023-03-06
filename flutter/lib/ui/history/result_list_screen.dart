@@ -55,7 +55,10 @@ class _ResultListScreenState extends State<ResultListScreen> {
         itemBuilder: (context, index) {
           final item = itemList[index];
           return ListTile(
-            title: Text(helper.formatDate(item.meta.creationDate.toLocal())),
+            title: Text(
+              helper.formatDate(item.meta.creationDate.toLocal()),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             subtitle: Text(item.meta.uuid),
             onTap: () {
               Navigator.push(
