@@ -9,9 +9,6 @@
                 "meta": {
                     "$ref": "#/definitions/Meta"
                 },
-                "filter": {
-                    "$ref": "#/definitions/Filter"
-                },
                 "results": {
                     "type": "array",
                     "items": {
@@ -28,7 +25,6 @@
             "required": [
                 "build_info",
                 "environment_info",
-                "filter",
                 "meta",
                 "results"
             ],
@@ -244,40 +240,6 @@
                 "os_version"
             ],
             "title": "Windows"
-        },
-        "Filter": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "creation_date": {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "platform": {
-                    "type": "string"
-                },
-                "device_model": {
-                    "type": "string"
-                },
-                "backend_name": {
-                    "type": "string"
-                },
-                "manufacturer": {
-                    "type": "string"
-                },
-                "soc": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "backend_name",
-                "creation_date",
-                "device_model",
-                "manufacturer",
-                "platform",
-                "soc"
-            ],
-            "title": "Filter"
         },
         "Meta": {
             "type": "object",

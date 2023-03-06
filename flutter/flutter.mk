@@ -108,7 +108,7 @@ flutter/firebase/prefix:
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
 		| tee firebase_functions/functions/src/prefix.gen.ts
 
-RESULT_JSON_SAMPLE_PATH?=output/extended-result-example.json
+RESULT_JSON_SAMPLE_PATH?=output/extended_result_example.json
 .PHONY: flutter/result/gen-extended-sample
 flutter/result/gen-extended-sample:
 	cd flutter_common && \
@@ -119,9 +119,9 @@ flutter/result/gen-extended-sample:
 .PHONY: flutter/result/gen-unittest-sample
 flutter/result/gen-unittest-sample:
 	make flutter/result/gen-extended-sample \
-		RESULT_JSON_SAMPLE_PATH=flutter_common/test/data/result_sample.json
+		RESULT_JSON_SAMPLE_PATH=flutter_common/test/data/extended_result_unittest.json
 
-default_result_json_schema_path=tools/extended-result.schema.json
+default_result_json_schema_path=tools/extended_result_schema.json
 RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
 .PHONY: flutter/result/gen-schema
 flutter/result/gen-schema: flutter/result/gen-extended-sample

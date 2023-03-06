@@ -98,7 +98,7 @@ lint/markdown:
 		grep --null-data "\.md$$" --exclude="*LICENSE.md" | \
 		xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml
 
-lint_result_json_schema_path=output/extended-result.schema.json
+lint_result_json_schema_path=output/extended_result_schema.json
 .PHONY: lint/result-schema
 lint/result-schema:
 	mkdir -p $$(dirname ${lint_result_json_schema_path})
