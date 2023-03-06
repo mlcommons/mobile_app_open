@@ -3,10 +3,11 @@ import 'dart:io';
 
 import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
+import 'package:mlperfbench_common/data/result_filter.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
-import 'utils.dart';
+import 'package:mlperfbench/resources/utils.dart';
 
 class ResultManager {
   static const _resultsDirName = 'results';
@@ -22,7 +23,7 @@ class ResultManager {
   }
 
   final List<ExtendedResult> results = [];
-  List<ExtendedResult> filteredResults = [];
+  ResultFilter resultFilter = ResultFilter();
   final List<File> _resultsFiles = [];
   late final Directory _resultsDir;
 
