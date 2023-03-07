@@ -48,19 +48,13 @@ class SampleGenerator {
         benchmarkName: 'name',
         performanceRun: runResult,
         accuracyRun: runResult,
-        backendInfo: BackendReportedInfo(
-          filename: 'tflite',
-          vendorName: 'tflite',
-          backendName: 'libtflitebackend',
-          acceleratorName: 'accelerator',
-        ),
         minDuration: 10.5,
         minSamples: 8,
         backendSettings: BackendSettingsInfo(
-          acceleratorCode: '',
-          acceleratorDesc: '',
-          framework: '',
-          modelPath: '',
+          acceleratorCode: 'ane',
+          acceleratorDesc: 'ANE',
+          framework: 'TFLite CoreML',
+          modelPath: 'https://example.com/model.tflite',
           batchSize: 0,
           extraSettings: <BackendExtraSetting>[
             BackendExtraSetting(
@@ -70,6 +64,12 @@ class SampleGenerator {
               valueName: '2',
             ),
           ],
+        ),
+        backendInfo: BackendReportedInfo(
+          filename: 'libtflitebackend',
+          vendorName: 'Google',
+          backendName: 'TFLite',
+          acceleratorName: 'ANE',
         ),
         loadgenScenario:
             BenchmarkExportResult.parseLoadgenScenario('SingleStream'),

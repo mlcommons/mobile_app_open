@@ -288,6 +288,9 @@
                 "backend_settings": {
                     "$ref": "#/definitions/BackendSettings"
                 },
+                "backend_info": {
+                    "$ref": "#/definitions/BackendInfo"
+                },
                 "performance_run": {
                     "oneOf": [
                         {
@@ -313,9 +316,6 @@
                 },
                 "min_samples": {
                     "type": "integer"
-                },
-                "backend_info": {
-                    "$ref": "#/definitions/BackendInfo"
                 }
             },
             "required": [
@@ -511,7 +511,14 @@
                     "type": "string"
                 },
                 "model_path": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uri",
+                    "qt-uri-protocols": [
+                        "https"
+                    ],
+                    "qt-uri-extensions": [
+                        ".tflite"
+                    ]
                 },
                 "batch_size": {
                     "type": "integer"

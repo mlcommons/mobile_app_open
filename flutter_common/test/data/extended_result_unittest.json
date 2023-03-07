@@ -1,8 +1,8 @@
 {
   "meta": {
-    "uuid": "d025f15c-0a4b-42ac-9303-232664acfcc6",
-    "creation_date": "2023-01-17T19:33:02.053904",
-    "upload_date": "2023-01-17T12:33:02.053904Z"
+    "uuid": "6d7467fa-0d99-40cf-9940-0d35058d1d01",
+    "creation_date": "2023-03-06T12:44:09.185084",
+    "upload_date": "2023-03-06T05:44:09.185085Z"
   },
   "results": [
     {
@@ -10,10 +10,10 @@
       "benchmark_name": "name",
       "loadgen_scenario": "SingleStream",
       "backend_settings": {
-        "accelerator_code": "",
-        "accelerator_desc": "",
-        "framework": "",
-        "model_path": "",
+        "accelerator_code": "ane",
+        "accelerator_desc": "ANE",
+        "framework": "TFLite CoreML",
+        "model_path": "https://example.com/model.tflite",
         "batch_size": 0,
         "extra_settings": [
           {
@@ -23,6 +23,12 @@
             "value_name": "2"
           }
         ]
+      },
+      "backend_info": {
+        "filename": "libtflitebackend",
+        "vendor_name": "Google",
+        "backend_name": "TFLite",
+        "accelerator_name": "ANE"
       },
       "performance_run": {
         "throughput": {
@@ -44,7 +50,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2023-01-17T19:33:02.057980",
+        "start_datetime": "2023-03-06T12:44:09.189496",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -70,30 +76,24 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2023-01-17T19:33:02.058049",
+        "start_datetime": "2023-03-06T12:44:09.189575",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
         }
       },
       "min_duration": 10.5,
-      "min_samples": 8,
-      "backend_info": {
-        "filename": "tflite",
-        "vendor_name": "tflite",
-        "backend_name": "libtflitebackend",
-        "accelerator_name": "accelerator"
-      }
+      "min_samples": 8
     },
     {
       "benchmark_id": "id",
       "benchmark_name": "name",
       "loadgen_scenario": "SingleStream",
       "backend_settings": {
-        "accelerator_code": "",
-        "accelerator_desc": "",
-        "framework": "",
-        "model_path": "",
+        "accelerator_code": "ane",
+        "accelerator_desc": "ANE",
+        "framework": "TFLite CoreML",
+        "model_path": "https://example.com/model.tflite",
         "batch_size": 0,
         "extra_settings": [
           {
@@ -103,6 +103,12 @@
             "value_name": "2"
           }
         ]
+      },
+      "backend_info": {
+        "filename": "libtflitebackend",
+        "vendor_name": "Google",
+        "backend_name": "TFLite",
+        "accelerator_name": "ANE"
       },
       "performance_run": {
         "throughput": {
@@ -124,7 +130,7 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2023-01-17T19:33:02.059334",
+        "start_datetime": "2023-03-06T12:44:09.190988",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
@@ -150,20 +156,14 @@
         },
         "measured_duration": 123.456,
         "measured_samples": 8,
-        "start_datetime": "2023-01-17T19:33:02.059335",
+        "start_datetime": "2023-03-06T12:44:09.190989",
         "loadgen_info": {
           "validity": true,
           "duration": 10.6
         }
       },
       "min_duration": 10.5,
-      "min_samples": 8,
-      "backend_info": {
-        "filename": "tflite",
-        "vendor_name": "tflite",
-        "backend_name": "libtflitebackend",
-        "accelerator_name": "accelerator"
-      }
+      "min_samples": 8
     }
   ],
   "environment_info": {
@@ -199,7 +199,7 @@
   "build_info": {
     "version": "1.0",
     "build_number": "10qwe",
-    "build_date": "2023-01-17T19:33:02.057143",
+    "build_date": "2023-03-06T12:44:09.188609",
     "official_release_flag": false,
     "dev_test_flag": true,
     "backend_list": [
