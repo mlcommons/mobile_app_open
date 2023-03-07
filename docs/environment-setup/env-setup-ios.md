@@ -25,7 +25,7 @@ Otherwise, you can get errors about missing pods
   * Download flutter repo:
 
     ```bash
-    mkdir -p ~/tools && git clone --branch 3.3.5 --depth 1 https://github.com/flutter/flutter.git ~/tools/flutter
+    mkdir -p ~/tools && git clone --branch 3.7.2 --depth 1 https://github.com/flutter/flutter.git ~/tools/flutter
     ```
 
   * Add flutter binary folders to path: `export PATH="$PATH:$HOME/tools/flutter/bin:$HOME/.pub-cache/bin"`  
@@ -42,10 +42,10 @@ macOS 12.6
 Xcode 14.0.1
 
 $ flutter --version
-Flutter 3.3.5 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision d9111f6402 (7 hours ago) • 2022-10-19 12:27:13 -0700
-Engine • revision 3ad69d7be3
-Tools • Dart 2.18.2 • DevTools 2.15.0
+Flutter 3.7.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 32fb2f948e (4 weeks ago) • 2023-02-08 07:30:10 -0800
+Engine • revision f40b73f8a4
+Tools • Dart 2.19.2 • DevTools 2.20.1
 
 $ bazel --version
 bazel 5.0.0
