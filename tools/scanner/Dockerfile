@@ -1,12 +1,13 @@
-ARG DOCKER_IMAGE_TAG
-FROM $DOCKER_IMAGE_TAG
+ARG BASE_DOCKER_IMAGE_TAG
+FROM $BASE_DOCKER_IMAGE_TAG
 
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y unzip
 
 ARG SONAR_SCANNER_DIR=$HOME/.sonar
 
 # Install sonar-scanner
-ENV SONAR_SCANNER_VERSION=4.7.0.2747
+# Check for newer version here: https://binaries.sonarsource.com/?prefix=Distribution/sonar-scanner-cli/
+ENV SONAR_SCANNER_VERSION=4.8.0.2856
 RUN curl --create-dirs -sSLo $SONAR_SCANNER_DIR/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip
 RUN unzip -qq -o $SONAR_SCANNER_DIR/sonar-scanner.zip -d $SONAR_SCANNER_DIR/
 ENV PATH=$PATH:$SONAR_SCANNER_DIR/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin
