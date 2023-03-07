@@ -125,6 +125,8 @@
   "historyListSelectionDelete": "Delete",
   "historyListSelectionDeleteConfirm": "Delete selected items?",
 
+  "historyFilterTitle": "Filter",
+
   "historyDetailsTitle": "Result details",
   "historyDetailsBuildTypeDebug": "debug build",
   "historyDetailsBuildTypeOfficial": "official",
@@ -141,6 +143,8 @@
   "historyDetailsTableColName": "Benchmark name",
   "historyDetailsTableColPerf": "Throughput",
   "historyDetailsTableColAccuracy": "Accuracy",
+  "historyDetailsDeleteConfirm": "Delete this result?",
+  "historyDetailsDelete": "Delete",
 
   "historyRunDetailsTitle": "Run details",
   "historyRunDetailsBenchName": "Benchmark name",

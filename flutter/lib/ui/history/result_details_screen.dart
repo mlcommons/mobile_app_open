@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/history/run_details_screen.dart';
 import 'utils.dart';
 
@@ -30,7 +31,8 @@ class _DetailsScreen extends State<DetailsScreen> {
     state = context.watch<BenchmarkState>();
 
     return Scaffold(
-      appBar: helper.makeAppBar(l10n.historyDetailsTitle),
+      appBar: helper
+          .makeAppBar(l10n.historyDetailsTitle, actions: [_makeDeleteButton()]),
       body: ListView(children: _makeBody()),
     );
   }
@@ -124,6 +126,31 @@ class _DetailsScreen extends State<DetailsScreen> {
             builder: (context) => RunDetailsScreen(result: runInfo),
           ),
         );
+      },
+    );
+  }
+
+  Widget _makeDeleteButton() {
+    return IconButton(
+      icon: const Icon(Icons.delete),
+      tooltip: l10n.historyListSelectionDelete,
+      onPressed: () async {
+        final dialogResult = await showConfirmDialog(
+          context,
+          l10n.historyDetailsDeleteConfirm,
+          title: l10n.historyDetailsDelete,
+        );
+        switch (dialogResult) {
+          case ConfirmDialogAction.ok:
+            setState(() {
+              state.resourceManager.resultManager.deleteResult(widget.result);
+              Navigator.pop(context);
+            });
+            break;
+          case null:
+          case ConfirmDialogAction.cancel:
+            break;
+        }
       },
     );
   }

@@ -173,9 +173,10 @@ class TaskRunner {
     for (final resultHelper in resultHelpers) {
       exportResults.add(resultHelper.getBenchmarkExportResult());
     }
+
+    final creationDate = DateTime.now();
     return ExtendedResult(
-      meta:
-          ResultMetaInfo(creationDate: DateTime.now(), uuid: const Uuid().v4()),
+      meta: ResultMetaInfo(creationDate: creationDate, uuid: const Uuid().v4()),
       environmentInfo: DeviceInfo.instance.envInfo,
       results: exportResults,
       buildInfo: BuildInfoHelper.info,

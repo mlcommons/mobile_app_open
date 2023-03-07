@@ -13,13 +13,13 @@
 # limitations under the License.
 ##########################################################################
 
-docker_image_tag=mlcommons/mlperf_mobile_flutter
+DOCKER_IMAGE_TAG?=mlcommons/mlperf_mobile_flutter
 
 flutter_docker_postfix=$(shell id -u)
 .PHONY: flutter/android/docker/image
 flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp
 output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp: flutter/android/docker/Dockerfile
-	docker image build -t ${docker_image_tag} flutter/android/docker
+	docker image build -t ${DOCKER_IMAGE_TAG} flutter/android/docker
 	mkdir -p output/docker
 	touch $@
 
@@ -52,7 +52,7 @@ flutter_common_docker_flags= \
 		${proxy_docker_args} \
 		${backend_qti_flutter_docker_args} \
 		${backend_samsung_docker_args} \
-		${docker_image_tag}
+		${DOCKER_IMAGE_TAG}
 
 .PHONY: docker/flutter/android/libs
 docker/flutter/android/libs: flutter/android/docker/image

@@ -109,13 +109,13 @@ lint/markdown:
 		grep --null-data "\.md$$" --exclude="*LICENSE.md" | \
 		xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml
 
-lint_result_json_schema_path=output/extended-result.schema.json
+lint_result_json_schema_path=output/extended_result_schema.json
 .PHONY: lint/result-schema
 lint/result-schema:
 	mkdir -p $$(dirname ${lint_result_json_schema_path})
-	make RESULT_JSON_SCHEMA_PATH=${lint_result_json_schema_path} flutter/result/schema >/dev/null 2>/dev/null
+	make RESULT_JSON_SCHEMA_PATH=${lint_result_json_schema_path} flutter/result/gen-schema >/dev/null 2>/dev/null
 	@[ "$$(cat ${default_result_json_schema_path})" = "$$(cat ${lint_result_json_schema_path})" ] \
-		|| (echo ${default_result_json_schema_path} is outdated; echo run \`make flutter/result/schema\` to update it; exit 1)
+		|| (echo ${default_result_json_schema_path} is outdated; echo run \`make flutter/result/gen-schema\` to update it; exit 1)
 
 output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	docker build --progress=plain \

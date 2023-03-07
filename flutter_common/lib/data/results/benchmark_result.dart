@@ -171,22 +171,22 @@ class BenchmarkExportResult {
   final String benchmarkName;
   final LoadgenScenarioEnum loadgenScenario;
   final BackendSettingsInfo backendSettings;
+  final BackendReportedInfo backendInfo;
   final BenchmarkRunResult? performanceRun;
   final BenchmarkRunResult? accuracyRun;
   final double minDuration;
   final int minSamples;
-  final BackendReportedInfo backendInfo;
 
   BenchmarkExportResult({
     required this.benchmarkId,
     required this.benchmarkName,
     required this.loadgenScenario,
     required this.backendSettings,
+    required this.backendInfo,
     required this.performanceRun,
     required this.accuracyRun,
     required this.minDuration,
     required this.minSamples,
-    required this.backendInfo,
   });
 
   factory BenchmarkExportResult.fromJson(Map<String, dynamic> json) =>

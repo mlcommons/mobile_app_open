@@ -29,7 +29,7 @@ endif
 
 flutter: flutter/prepare flutter/platform
 flutter/firebase: flutter/firebase/config flutter/firebase/prefix
-flutter/result: flutter/result/json flutter/result/schema flutter/result/ts
+flutter/result: flutter/result/json flutter/result/gen-schema flutter/result/ts
 flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 flutter/test: flutter/test/unit flutter/test/integration
@@ -108,7 +108,7 @@ flutter/firebase/prefix:
 		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
 		| tee firebase_functions/functions/src/prefix.gen.ts
 
-RESULT_JSON_SAMPLE_PATH?=output/extended-result-example.json
+RESULT_JSON_SAMPLE_PATH?=output/extended_result_example.json
 .PHONY: flutter/result/gen-extended-sample
 flutter/result/gen-extended-sample:
 	cd flutter_common && \
@@ -119,12 +119,12 @@ flutter/result/gen-extended-sample:
 .PHONY: flutter/result/gen-unittest-sample
 flutter/result/gen-unittest-sample:
 	make flutter/result/gen-extended-sample \
-		RESULT_JSON_SAMPLE_PATH=flutter_common/test/data/result_sample.json
+		RESULT_JSON_SAMPLE_PATH=flutter_common/test/data/extended_result_unittest.json
 
-default_result_json_schema_path=tools/extended-result.schema.json
+default_result_json_schema_path=tools/extended_result_schema.json
 RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
-.PHONY: flutter/result/schema
-flutter/result/schema: flutter/result/gen-extended-sample
+.PHONY: flutter/result/gen-schema
+flutter/result/gen-schema: flutter/result/gen-extended-sample
 	quicktype ${RESULT_JSON_SAMPLE_PATH} \
 		--lang schema \
 		--out ${RESULT_JSON_SCHEMA_PATH}

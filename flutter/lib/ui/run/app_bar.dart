@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/ui/history/list_screen.dart';
+import 'package:mlperfbench/ui/config/config_screen.dart';
+import 'package:mlperfbench/ui/history/result_list_screen.dart';
 import 'package:mlperfbench/ui/icons.dart';
-import '../config/config_screen.dart';
-import '../settings/settings_screen.dart';
+import 'package:mlperfbench/ui/settings/settings_screen.dart';
 
 class MyAppBar {
   static PreferredSizeWidget buildAppBar(
@@ -17,7 +17,7 @@ class MyAppBar {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const ListScreen()),
+            MaterialPageRoute(builder: (context) => const ResultListScreen()),
           );
         },
       ));

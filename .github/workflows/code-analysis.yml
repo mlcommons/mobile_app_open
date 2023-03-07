@@ -11,8 +11,12 @@ jobs:
     name: SonarScanner
     runs-on: ubuntu-20.04
     timeout-minutes: 120
+    permissions:
+      contents: read
+      packages: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_IMAGE_TAG: ghcr.io/mlcommons/mobile_app_open-scanner
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_OUT_DIR: sonar_build_wrapper_output
       PR_NUMBER: ${{ github.event.number }}
@@ -22,15 +26,65 @@ jobs:
       WITH_TFLITE: 1
       WITH_PIXEL: 1
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Build scanner image
-        run: |
-          make scanner/image
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check if base Dockerfile changed
+        id: changed-base
+        uses: tj-actions/changed-files@v35
+        with:
+          files: flutter/android/docker/Dockerfile
+      - name: Extract metadata for base image
+        id: meta-base
+        if: steps.changed-base.outputs.any_changed == 'true'
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/mlcommons/mobile_app_open-base
+          flavor: latest=true
+      - name: Build and push base image
+        if: steps.changed-base.outputs.any_changed == 'true'
+        uses: docker/build-push-action@v4
+        with:
+          context: flutter/android/docker
+          file: flutter/android/docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta-base.outputs.tags }}
+          labels: ${{ steps.meta-base.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Check if scanner Dockerfile changed
+        id: changed-scanner
+        uses: tj-actions/changed-files@v35
+        with:
+          files: tools/scanner/Dockerfile
+      - name: Extract metadata for scanner image
+        id: meta-scanner
+        if: steps.changed-scanner.outputs.any_changed == 'true'
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/mlcommons/mobile_app_open-scanner
+          flavor: latest=true
+      - name: Build and push scanner image
+        if: steps.changed-scanner.outputs.any_changed == 'true'
+        uses: docker/build-push-action@v4
+        with:
+          context: tools/scanner
+          file: tools/scanner/Dockerfile
+          build-args: BASE_DOCKER_IMAGE_TAG=ghcr.io/mlcommons/mobile_app_open-base
+          push: true
+          tags: ${{ steps.meta-scanner.outputs.tags }}
+          labels: ${{ steps.meta-scanner.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Build app
-        run: |
-          make docker/scanner/build
+        run: make docker/scanner/build-app
       - name: Scan code
-        run: |
-          make docker/scanner/scan
+        run: make docker/scanner/scan
