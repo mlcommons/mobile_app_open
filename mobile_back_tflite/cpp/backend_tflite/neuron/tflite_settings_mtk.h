@@ -63,8 +63,8 @@ benchmark_setting {
   accelerator_desc: "MediaTek NN accelerator + VPU via the Neuron Delegate"
   framework: "TFLite"
   batch_size: 1
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_20200602.tflite"
-  model_checksum: "3a636c066ca2916e1858266857e96c72"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
+  model_checksum: "3944a2dee04a5f8a5fd016ac34c4d390"
 }
 
 benchmark_setting {
