@@ -115,6 +115,8 @@ class MyHomePage extends StatelessWidget {
             .validateExternalResourcesDirectory(
                 stringResources.dialogContentMissingFiles);
         if (wrongPathError.isNotEmpty) {
+          // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+          // ignore: use_build_context_synchronously
           if (!context.mounted) return;
           await showErrorDialog(context, [wrongPathError]);
           return;
@@ -123,6 +125,8 @@ class MyHomePage extends StatelessWidget {
           final offlineError = await state.validator
               .validateOfflineMode(stringResources.dialogContentOfflineWarning);
           if (offlineError.isNotEmpty) {
+            // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+            // ignore: use_build_context_synchronously
             if (!context.mounted) return;
             switch (await showConfirmDialog(context, offlineError)) {
               case ConfirmDialogAction.ok:
@@ -138,6 +142,8 @@ class MyHomePage extends StatelessWidget {
           await state.runBenchmarks();
         } catch (e, t) {
           print(t);
+          // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+          // ignore: use_build_context_synchronously
           if (!context.mounted) return;
           await showErrorDialog(
               context, ['${stringResources.runFail}:', e.toString()]);
