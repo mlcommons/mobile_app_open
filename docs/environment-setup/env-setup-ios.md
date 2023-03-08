@@ -48,7 +48,7 @@ Engine • revision f40b73f8a4
 Tools • Dart 2.19.2 • DevTools 2.20.1
 
 $ bazel --version
-bazel 5.0.0
+bazel 5.3.2
 
 $ protoc --version
 libprotoc 3.21.6

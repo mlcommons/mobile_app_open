@@ -34,7 +34,7 @@ These steps are required to build native libs only.
   * Install [bazelisk](https://bazel.build/install/bazelisk)
 
     ```bash
-    curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64 -o /usr/local/bin/bazel && \
+    curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 -o /usr/local/bin/bazel && \
       chmod +x /usr/local/bin/bazel
     ```
 
