@@ -7,137 +7,153 @@ on:
   pull_request:
     types: [ opened, synchronize, reopened ]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: mlcommons/mobile_app_open-formatter
+
 jobs:
-  bazel:
+  build-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          flavor: latest=true
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: tools/formatter
+          file: tools/formatter/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  bazel:
+    needs: build-image
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-        with:
-          path: ${{ github.workspace }}/src/github.com/${{ github.repository }}
-      - name: Setup Golang
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.16
-      - name: Set go env
-        run: echo GOPATH=$GITHUB_WORKSPACE >> $GITHUB_ENV
-      - name: Get buildifier
-        run: go get github.com/bazelbuild/buildtools/buildifier
-      - name: Run buildifier format check
-        run: $GOPATH/bin/buildifier -mode=check -r ${{ github.workspace }}/src/github.com/${{ github.repository }}
-      - name: Run buildifier linter
-        run: $GOPATH/bin/buildifier -lint=warn -r ${{ github.workspace }}/src/github.com/${{ github.repository }}
+      - uses: actions/checkout@v3
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: bazel
+        run: make lint/bazel
+
   cpp:
     name: C++
+    needs: build-image
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - name: Check C++ format
-        uses: jidicula/clang-format-action@v4.9.0
-        with:
-          clang-format-version: 12
-          check-path: .
-          fallback-style: Google
+      - uses: actions/checkout@v3
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: clang
+        run: make lint/clang
+
   dart:
+    needs: build-image
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - name: Install Flutter
-        uses: subosito/flutter-action@v1
+      - uses: actions/checkout@v3
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Cache Flutter packages
+        uses: actions/cache@v3
         with:
-          channel: 'stable'
-          flutter-version: '3.3.5'
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v1
-        with:
-          version: '3.x'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create ephemeral files
-        run: |
-          flutter config --no-analytics &&
-          dart pub global activate protoc_plugin &&
-          export PATH="$PATH:$HOME/.pub-cache/bin" &&
-          make flutter/prepare
-      - name: Run Dart format check
-        run: dart format --output=none --set-exit-if-changed flutter
-      - name: Run Dart linter
-        run: dart analyze --fatal-infos
-      - name: Run Dart import sorter
-        run: cd flutter && dart run import_sorter:main --exit-if-changed
-      - uses: actions/setup-node@v3
-        name: Setup Node
-        with:
-          node-version: '16'
-      - name: Install quicktype
-        run: |
-          npm install -g quicktype
-      - name: Check export result schema
+          path: /home/.pub-cache
+          key: ${{ runner.os }}-pub-cache-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-cache-
+      - name: flutter/prepare
+        run: make flutter/prepare
+      - name: pub-get
+        run: make format/dart/pub-get
+      - name: lint/dart
+        run: make lint/dart
+      - name: result-schema
         run: make lint/result-schema
+
   markdown:
+    needs: build-image
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - run: npm install -g markdownlint-cli@0.26.0
-      - name: Run Markdown format check
+      - uses: actions/checkout@v3
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: markdown-format
         run: make lint/markdown
-      - name: Check links in markdown files
+      - name: markdown-link
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           use-verbose-mode: yes
+
   yaml:
+    needs: build-image
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - name: Run YAML format check
-        uses: ibiqlik/action-yamllint@v3.1.0
-        with:
-          config_file: 'tools/formatter/configs/yamllint.yml'
+      - uses: actions/checkout@v3
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: yaml
+        run: make lint/yaml
+
   ts:
     name: TypeScript
+    needs: build-image
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        name: Setup Node
-        with:
-          node-version: '16'
-      - name: Install quicktype
-        run: |
-          npm install -g quicktype
-      - name: Create ephemeral files
-        run: |
-          make flutter/result/ts flutter/firebase/prefix
-      - name: Install Prettier
-        working-directory: firebase_functions/functions
-        run: npm install prettier
-      - name: Run "Prettier"
-        working-directory: firebase_functions/functions
-        run: npx prettier --check .
-      - name: Install ESLint
-        run: |
-          npm install \
-            eslint \
-            eslint-plugin-import \
-            eslint-config-google \
-            @typescript-eslint/parser \
-            @typescript-eslint/eslint-plugin
-      - name: Run ESLint
+      - uses: actions/checkout@v3
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: typescripts
         run: make lint/ts
+
   misc:
+    needs: build-image
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - name: Check prohibited extensions
+      - uses: actions/checkout@v3
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: prohibited-extensions
         run: make lint/prohibited-extensions
-      - name: Check large files
+      - name: big-files
         run: make lint/big-files
-      - name: Install dos2unix
-        run: sudo apt-get install dos2unix
-      - name: Check line endings
+      - name: line-endings
         run: make lint/line-endings
