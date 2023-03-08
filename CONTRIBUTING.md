@@ -60,4 +60,6 @@ to format all files or `make format/<bazel|java|clang|dart>` to format only cert
 See [format.mk](tools/formatter/format.mk) for more commands.
 
 Running `make format` requires you to have all the tools installed locally on your computer.
-For your convenience you can use a Docker image to format code files by running `make docker/format`.
+For your convenience we created a Docker image with all the tools needed.
+Running `make docker/format` will format the code files.
+Running `make docker/lint` will print linter's errors and warnings without changing the files.

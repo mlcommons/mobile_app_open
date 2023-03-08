@@ -22,6 +22,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 # Install dev packages
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     gcc make git curl wget zip unzip tar gzip
+RUN apt-get update && apt-get install -y build-essential
 
 ENV FORMATTER_HOME /opt/formatters/bin
 ENV PATH=${PATH}:${FORMATTER_HOME}
@@ -44,15 +45,15 @@ RUN apt-get update && apt-get install -y \
 RUN cp $(which clang-format-10) ${FORMATTER_HOME}/clang-format
 
 # Add dos2unix to format line endings
-RUN apt-get update && apt-get install -y \
-    dos2unix
+RUN apt-get update && apt-get install -y dos2unix
 
 # Install Node.js and NPM
 ENV NODE_ENV="production"
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
 RUN apt-get update && apt-get install -y nodejs && node -v
 RUN npm install --location=global npm@8.13.2 && npm --version
-RUN apt-get update && apt-get install -y build-essential
+RUN npm install -g quicktype
+RUN npm install -g prettier
 
 # Add Markdown formatter
 RUN npm install -g markdownlint-cli@0.26.0
@@ -63,22 +64,17 @@ RUN apt-get update && apt-get install -y \
 	python3-pip
 RUN pip install yamllint==1.26.3
 
-# Setup permission to run Flutter as non-root user
-# this is needed to share Flutter cache with host machine
-ARG UNAME=mlperf
-ARG UID=1000
-ARG GID=1000
-RUN groupadd -g $GID -o $UNAME
-RUN useradd -m -u $UID -g $GID -o -s /bin/bash $UNAME
-USER $UNAME
 
 # Add Flutter SDK
+ENV UNAME=mlperf
 RUN git clone --branch "3.7.2" --single-branch --depth 1 \
     https://github.com/flutter/flutter.git /home/$UNAME/flutter
-ENV PATH=$PATH:/home/$UNAME/flutter/bin:/home/$UNAME/flutter/bin/cache/dart-sdk/bin
+RUN git config --global --add safe.directory /home/$UNAME/flutter
 # The PUB_CACHE directory will be mounted as a docker volume in format.mk
-ENV PUB_CACHE=/home/mlperf/.pub-cache
+ENV PUB_CACHE=/home/.pub-cache
+ENV PATH=$PATH:/home/$UNAME/flutter/bin:/home/$UNAME/flutter/bin/cache/dart-sdk/bin:$PUB_CACHE/bin
 RUN flutter doctor -v
-
+RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
+RUN apt-get install -y protobuf-compiler
 
 CMD /bin/bash
