@@ -25,7 +25,7 @@ Otherwise, you can get errors about missing pods
   * Download flutter repo:
 
     ```bash
-    mkdir -p ~/tools && git clone --branch 3.7.2 --depth 1 https://github.com/flutter/flutter.git ~/tools/flutter
+    mkdir -p ~/tools && git clone --branch 3.7.6 --depth 1 https://github.com/flutter/flutter.git ~/tools/flutter
     ```
 
   * Add flutter binary folders to path: `export PATH="$PATH:$HOME/tools/flutter/bin:$HOME/.pub-cache/bin"`  
@@ -38,26 +38,26 @@ Otherwise, you can get errors about missing pods
 The app was built and tested successfully in this environment:
 
 ```shell
-macOS 12.6
-Xcode 14.0.1
+macOS 13.2.1
+Xcode 14.2
 
 $ flutter --version
-Flutter 3.7.2 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 32fb2f948e (4 weeks ago) • 2023-02-08 07:30:10 -0800
-Engine • revision f40b73f8a4
-Tools • Dart 2.19.2 • DevTools 2.20.1
+Flutter 3.7.6 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 12cb4eb7a0 (11 days ago) • 2023-03-01 10:29:26 -0800
+Engine • revision ada363ee93
+Tools • Dart 2.19.3 • DevTools 2.20.1
 
 $ bazel --version
 bazel 5.3.2
 
 $ protoc --version
-libprotoc 3.21.6
+libprotoc 3.21.9
 
 $ pod --version
 1.11.3
 
 $ python3 --version
-Python 3.9.14
+Python 3.9.16
 ```
 
 Note: the current version may crash with EXC_RESOURCE if built with XCode 13.0

@@ -75,7 +75,7 @@ Flutter requires native libs so you must complete [Setting up Bazel on Ubuntu](#
   * Install Flutter:
 
     ```bash
-    mkdir -p ~/tools && cd ~/tools && curl https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.7.2-stable.tar.xz | tar Jxf -
+    mkdir -p ~/tools && cd ~/tools && curl https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.7.6-stable.tar.xz | tar Jxf -
     ```
 
   * Add flutter binary folders to path: `export PATH=$PATH:~/tools/flutter/bin:~/.pub-cache/bin`  
