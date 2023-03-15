@@ -390,27 +390,25 @@ class _ResultScreenState extends State<ResultScreen>
               ),
             ),
           )),
-      store.share
-          ? Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: TextButton(
-                onPressed: () async {
-                  final result =
-                      state.resourceManager.resultManager.getLastResult();
-                  await Share.share(
-                    jsonToStringIndented(result),
-                    subject: stringResources.resultsShareSubject,
-                  );
-                },
-                child: Text(stringResources.resultsButtonShare,
-                    style: TextStyle(
-                      color: AppColors.shareTextButton,
-                      fontSize: 18,
-                    )),
-              ),
-            )
-          : Container(),
-      store.share && FirebaseConfig.enable
+      Padding(
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+        child: TextButton(
+          onPressed: () async {
+            final filePath =
+                state.resourceManager.resultManager.getSubmissionFile().path;
+            await Share.shareXFiles(
+              [XFile(filePath)],
+              subject: stringResources.resultsShareSubject,
+            );
+          },
+          child: Text(stringResources.resultsButtonShare,
+              style: TextStyle(
+                color: AppColors.shareTextButton,
+                fontSize: 18,
+              )),
+        ),
+      ),
+      FirebaseConfig.enable
           ? Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
