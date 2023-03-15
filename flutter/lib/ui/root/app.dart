@@ -49,8 +49,6 @@ class MyApp extends StatelessWidget {
       ),
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
-      // TODO sharing screen temporarily disabled
-      // home: store.isShareOptionChosen() ? MyHomePage() : ShareScreen(),
       home: home,
     );
   }

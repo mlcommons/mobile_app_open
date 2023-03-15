@@ -1,12 +1,6 @@
 {
   "@@locale": "en",
 
-  "shareScreenShare": "Share",
-  "shareScreenDontShare": "Don't Share",
-  "shareScreenPrivacyPrompt": "Would you like to share your anonymous and basic system information with MLCommons.org to help accelerate innovation?",
-  "shareScreenPromptSubText": "By clicking share you agree to our ",
-  "shareScreenPrivacyPolicyButton": "privacy policy.",
-
   "unsupportedMainMessage": "This device is not yet supported.",
   "unsupportedBackendError": "Error message",
   "unsupportedTryAnotherDevice": "Please try the app on another device",

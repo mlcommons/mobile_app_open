@@ -99,9 +99,6 @@ class Store extends ChangeNotifier {
     _storeFromDisk.setString(StoreConstants.previousExtendedResult, value);
   }
 
-  bool isShareOptionChosen() =>
-      _storeFromDisk.containsKey(StoreConstants.share);
-
   String get previousAppVersion =>
       _getString(StoreConstants.previousAppVersion);
 
