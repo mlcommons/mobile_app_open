@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/result_filter.dart';
 import 'package:provider/provider.dart';
@@ -31,11 +32,12 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
             actions: [_clearFilterButton(state.resourceManager.resultManager)]),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+          child: ListView(
             children: [
               const SizedBox(height: 18),
               _platformFilter(filter),
+              const SizedBox(height: 12),
+              _creationDateFilter(filter),
               const SizedBox(height: 12),
               _deviceModelFilter(filter),
               const SizedBox(height: 12),
@@ -47,6 +49,45 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
             ],
           ),
         ));
+  }
+
+  DateTimeRange? creationDateRange;
+
+  Widget _creationDateFilter(ResultFilter filter) {
+    final dateFormat = DateFormat('yyyy-MM-dd');
+    final controller = TextEditingController();
+    final fromDate = filter.fromCreationDate;
+    final toDate = filter.toCreationDate;
+    if (fromDate != null && toDate != null) {
+      final startDate = dateFormat.format(fromDate);
+      final endDate = dateFormat.format(toDate);
+      controller.text = '[$startDate] - [$endDate]';
+    }
+    return TextField(
+      controller: controller,
+      readOnly: true,
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: 'Creation Date',
+      ),
+      onTap: () async {
+        DateTimeRange? picked = await showDateRangePicker(
+          context: context,
+          firstDate: DateTime(2022, 1, 1),
+          lastDate: DateTime.now().add(const Duration(days: 1)),
+        );
+        if (picked != null) {
+          filter.fromCreationDate = picked.start;
+          // picked end date will be at 00:00:00.000 so we want to make it the end of that day.
+          filter.toCreationDate = picked.end
+              .add(const Duration(days: 1))
+              .subtract(const Duration(microseconds: 1));
+          final startDate = dateFormat.format(picked.start);
+          final endDate = dateFormat.format(picked.end);
+          controller.text = '[$startDate] - [$endDate]';
+        }
+      },
+    );
   }
 
   Widget _platformFilter(ResultFilter filter) {

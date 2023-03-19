@@ -8,7 +8,8 @@ part 'result_filter.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class ResultFilter {
-  DateTime? creationDate;
+  DateTime? fromCreationDate;
+  DateTime? toCreationDate;
   EnvPlatform? platform;
   String? deviceModel;
   String? backendName;
@@ -17,50 +18,52 @@ class ResultFilter {
 
   ResultFilter();
 
-  static ResultFilter from(ExtendedResult result) {
-    String? deviceModel;
-    String? manufacturer;
-    String? soc;
+  bool match(ExtendedResult result) {
+    String? resultDeviceModel;
+    String? resultManufacturer;
+    String? resultSoc;
     final envInfo = result.environmentInfo;
     switch (envInfo.platform) {
       case EnvPlatform.android:
-        deviceModel = envInfo.value.android?.modelName;
-        manufacturer = envInfo.value.android?.manufacturer;
-        soc = envInfo.value.android?.procCpuinfoSocName;
+        resultDeviceModel = envInfo.value.android?.modelName;
+        resultManufacturer = envInfo.value.android?.manufacturer;
+        resultSoc = envInfo.value.android?.procCpuinfoSocName;
         break;
       case EnvPlatform.ios:
-        deviceModel = envInfo.value.ios?.modelName;
-        manufacturer = StringValue.apple;
-        soc = envInfo.value.ios?.socName;
+        resultDeviceModel = envInfo.value.ios?.modelName;
+        resultManufacturer = StringValue.apple;
+        resultSoc = envInfo.value.ios?.socName;
         break;
       case EnvPlatform.windows:
-        deviceModel = envInfo.value.windows?.cpuFullName;
-        manufacturer = StringValue.unknown;
-        soc = envInfo.value.windows?.cpuFullName;
+        resultDeviceModel = envInfo.value.windows?.cpuFullName;
+        resultManufacturer = StringValue.unknown;
+        resultSoc = envInfo.value.windows?.cpuFullName;
         break;
     }
-    final filter = ResultFilter()
-      ..creationDate = result.meta.creationDate
-      ..backendName = result.results.first.backendInfo.backendName
-      ..platform = envInfo.platform
-      ..deviceModel = deviceModel ?? StringValue.unknown
-      ..manufacturer = manufacturer ?? StringValue.unknown
-      ..soc = soc ?? StringValue.unknown;
-    return filter;
-  }
+    DateTime resultCreationDate = result.meta.creationDate;
+    String resultBackendName = result.results.first.backendInfo.backendName;
+    EnvPlatform resultPlatform = envInfo.platform;
+    resultDeviceModel = resultDeviceModel ?? StringValue.unknown;
+    resultManufacturer = resultManufacturer ?? StringValue.unknown;
+    resultSoc = resultSoc ?? StringValue.unknown;
 
-  // other should be an instance of ResultManager.resultFilter
-  bool match(ResultFilter other) {
-    bool platformMatched =
-        other.platform == null ? true : platform == other.platform;
+    bool fromCreationDateMatched = fromCreationDate == null
+        ? true
+        : resultCreationDate.isAfter(fromCreationDate!);
+    bool toCreationDateMatched = toCreationDate == null
+        ? true
+        : resultCreationDate.isBefore(toCreationDate!);
+    bool platformMatched = platform == null ? true : platform == resultPlatform;
     bool deviceModelMatched =
-        deviceModel?.containsIgnoreCase(other.deviceModel ?? '') ?? false;
+        resultDeviceModel.containsIgnoreCase(deviceModel ?? '');
     bool backendNameMatched =
-        backendName?.containsIgnoreCase(other.backendName ?? '') ?? false;
+        resultBackendName.containsIgnoreCase(backendName ?? '');
     bool manufacturerMatched =
-        manufacturer?.containsIgnoreCase(other.manufacturer ?? '') ?? false;
-    bool socMatched = soc?.containsIgnoreCase(other.soc ?? '') ?? false;
-    return platformMatched &&
+        resultManufacturer.containsIgnoreCase(manufacturer ?? '');
+    bool socMatched = resultSoc.containsIgnoreCase(soc ?? '');
+    return fromCreationDateMatched &&
+        toCreationDateMatched &&
+        platformMatched &&
         deviceModelMatched &&
         backendNameMatched &&
         manufacturerMatched &&
@@ -68,7 +71,8 @@ class ResultFilter {
   }
 
   bool get anyFilterActive {
-    return creationDate != null ||
+    return fromCreationDate != null ||
+        toCreationDate != null ||
         platform != null ||
         deviceModel != null ||
         backendName != null ||
