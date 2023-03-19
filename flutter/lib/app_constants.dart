@@ -25,7 +25,7 @@ class AppColors {
       isOfficialBuild ? Colors.blue : Colors.brown;
 
   static Color get mainScreenAppBarBackground =>
-      isOfficialBuild ? const Color(0xFF31A3E2) : Colors.brown.shade400;
+      isOfficialBuild ? const Color(0xFF31A3E2) : Colors.brown;
 
   static const lightAppBarIconTheme = Colors.white;
   static const darkAppBarIconTheme = Color(0xFF135384);
@@ -39,11 +39,11 @@ class AppColors {
           const Color(0xFF0B4A7F),
         ]
       : [
-          Colors.brown.shade400,
-          Colors.brown.shade400,
-          Colors.brown.shade400,
           Colors.brown,
-          Colors.brown,
+          Colors.brown.shade500,
+          Colors.brown.shade500,
+          Colors.brown.shade700,
+          Colors.brown.shade800,
         ];
 
   static const runBenchmarkRectangle = Color(0xFF0DB526);
