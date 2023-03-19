@@ -6,7 +6,7 @@ import 'package:mlperfbench/ui/history/result_list_screen.dart';
 import 'package:mlperfbench/ui/icons.dart';
 import 'package:mlperfbench/ui/settings/settings_screen.dart';
 
-class MyAppBar {
+class MainScreenAppBar {
   static PreferredSizeWidget buildAppBar(
       String title, BuildContext context, bool addSettingsButton) {
     var actions = <Widget>[];

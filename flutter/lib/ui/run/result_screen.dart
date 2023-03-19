@@ -447,7 +447,7 @@ class _ResultScreenState extends State<ResultScreen>
         : '${stringResources.resultsTitleUnverified} $title';
 
     return Scaffold(
-      appBar: MyAppBar.buildAppBar(title, context, true),
+      appBar: MainScreenAppBar.buildAppBar(title, context, true),
       body: LayoutBuilder(
         builder: (context, constraint) {
           return SingleChildScrollView(
