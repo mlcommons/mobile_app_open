@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/result_filter.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +39,8 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
               _platformFilter(filter),
               const SizedBox(height: 12),
               _creationDateFilter(filter),
+              const SizedBox(height: 12),
+              _benchmarkIdFilter(filter),
               const SizedBox(height: 12),
               _deviceModelFilter(filter),
               const SizedBox(height: 12),
@@ -123,6 +126,36 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
         children: const <Widget>[Text('Android'), Text('iOS'), Text('Windows')],
       )
     ]);
+  }
+
+  Widget _benchmarkIdFilter(ResultFilter filter) {
+    final items = BenchmarkId.allIds
+        .map((id) => DropdownMenuItem<String>(
+              value: id,
+              child: Text(id),
+            ))
+        .toList();
+    return Container(
+      decoration: const ShapeDecoration(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+              color: Colors.grey, width: 1.0, style: BorderStyle.solid),
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+        ),
+      ),
+      child: DropdownButtonFormField<String>(
+          isExpanded: true,
+          decoration: const InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            labelText: 'Benchmark ID',
+          ),
+          value: filter.benchmarkId,
+          items: items,
+          onChanged: (value) => setState(() {
+                filter.benchmarkId = value!;
+              })),
+    );
   }
 
   Widget _backendNameFilter(ResultFilter filter) {

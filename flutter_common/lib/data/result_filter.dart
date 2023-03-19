@@ -15,6 +15,7 @@ class ResultFilter {
   String? backendName;
   String? manufacturer;
   String? soc;
+  String? benchmarkId;
 
   ResultFilter();
 
@@ -40,12 +41,13 @@ class ResultFilter {
         resultSoc = envInfo.value.windows?.cpuFullName;
         break;
     }
-    DateTime resultCreationDate = result.meta.creationDate;
-    String resultBackendName = result.results.first.backendInfo.backendName;
-    EnvPlatform resultPlatform = envInfo.platform;
     resultDeviceModel = resultDeviceModel ?? StringValue.unknown;
     resultManufacturer = resultManufacturer ?? StringValue.unknown;
     resultSoc = resultSoc ?? StringValue.unknown;
+
+    DateTime resultCreationDate = result.meta.creationDate;
+    String resultBackendName = result.results.first.backendInfo.backendName;
+    EnvPlatform resultPlatform = envInfo.platform;
 
     bool fromCreationDateMatched = fromCreationDate == null
         ? true
@@ -61,13 +63,18 @@ class ResultFilter {
     bool manufacturerMatched =
         resultManufacturer.containsIgnoreCase(manufacturer ?? '');
     bool socMatched = resultSoc.containsIgnoreCase(soc ?? '');
+    bool benchmarkIdMatched = benchmarkId == null
+        ? true
+        : result.results.any((e) => e.benchmarkId == benchmarkId);
+
     return fromCreationDateMatched &&
         toCreationDateMatched &&
         platformMatched &&
         deviceModelMatched &&
         backendNameMatched &&
         manufacturerMatched &&
-        socMatched;
+        socMatched &&
+        benchmarkIdMatched;
   }
 
   bool get anyFilterActive {

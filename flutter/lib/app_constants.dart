@@ -87,4 +87,13 @@ class BenchmarkId {
   static const naturalLanguageProcessing = 'natural_language_processing';
   static const imageClassificationOffline = 'image_classification_offline';
   static const superResolution = 'super_resolution';
+
+  static const allIds = [
+    imageClassification,
+    objectDetection,
+    imageSegmentationV2,
+    naturalLanguageProcessing,
+    imageClassificationOffline,
+    superResolution,
+  ];
 }
