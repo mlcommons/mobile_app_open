@@ -23,7 +23,6 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final l10n = AppLocalizations.of(context);
-    final helper = HistoryHelperUtils(l10n);
     final filter = state.resourceManager.resultManager.resultFilter;
 
     return Scaffold(
