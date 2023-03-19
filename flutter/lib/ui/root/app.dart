@@ -41,11 +41,11 @@ class MyApp extends StatelessWidget {
 
         // This theme of application app bar
         appBarTheme: const AppBarTheme(
-          titleTextStyle: TextStyle(color: AppColors.lightText, fontSize: 20),
-          elevation: 0,
-          backgroundColor: AppColors.darkAppBarThemeBackground,
-          iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
-        ),
+            titleTextStyle: TextStyle(color: AppColors.lightText, fontSize: 20),
+            elevation: 0,
+            backgroundColor: AppColors.darkAppBarThemeBackground,
+            iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
+            centerTitle: true),
       ),
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],

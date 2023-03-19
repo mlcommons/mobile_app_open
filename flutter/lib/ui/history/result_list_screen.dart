@@ -32,7 +32,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
         results.where((e) => ResultFilter.from(e).match(filter)).toList();
 
     return Scaffold(
-      appBar: helper.makeAppBar(l10n.historyListTitle, actions: [
+      appBar: AppBar(title: Text(l10n.historyListTitle), actions: [
         IconButton(
           icon: Icon(filter.anyFilterActive
               ? Icons.filter_list

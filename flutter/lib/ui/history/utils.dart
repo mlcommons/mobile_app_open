@@ -20,24 +20,6 @@ class HistoryHelperUtils {
     return dateFormat.format(value);
   }
 
-  AppBar makeAppBar(
-    String title, {
-    Widget? leading,
-    List<Widget>? actions,
-    PreferredSizeWidget? bottom,
-  }) {
-    return AppBar(
-      title: Text(
-        title,
-        style: const TextStyle(fontSize: 24, color: AppColors.lightText),
-      ),
-      centerTitle: true,
-      leading: leading,
-      actions: actions,
-      bottom: bottom,
-    );
-  }
-
   Widget makeHeader(String value) {
     return Center(
       child: Text(

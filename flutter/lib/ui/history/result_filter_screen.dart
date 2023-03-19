@@ -27,8 +27,10 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     final filter = state.resourceManager.resultManager.resultFilter;
 
     return Scaffold(
-        appBar: helper.makeAppBar(l10n.historyFilterTitle,
-            actions: [_clearFilterButton(state.resourceManager.resultManager)]),
+        appBar: AppBar(
+          title: Text(l10n.historyFilterTitle),
+          actions: [_clearFilterButton(state.resourceManager.resultManager)],
+        ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
