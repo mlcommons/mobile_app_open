@@ -36,9 +36,9 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
           child: ListView(
             children: [
               const SizedBox(height: 18),
-              _platformFilter(filter),
-              const SizedBox(height: 12),
               _creationDateFilter(filter),
+              const SizedBox(height: 12),
+              _platformFilter(filter),
               const SizedBox(height: 12),
               _benchmarkIdFilter(filter),
               const SizedBox(height: 12),
@@ -53,8 +53,6 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
           ),
         ));
   }
-
-  DateTimeRange? creationDateRange;
 
   Widget _creationDateFilter(ResultFilter filter) {
     final dateFormat = DateFormat('yyyy-MM-dd');
@@ -94,68 +92,23 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
   }
 
   Widget _platformFilter(ResultFilter filter) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      const Text('Platform'),
-      ToggleButtons(
-        direction: Axis.horizontal,
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
-        constraints: const BoxConstraints(
-          minHeight: 40.0,
-          minWidth: 80.0,
-        ),
-        onPressed: (int index) {
-          setState(() {
-            switch (index) {
-              case 0:
-                filter.platform = EnvPlatform.android;
-                break;
-              case 1:
-                filter.platform = EnvPlatform.ios;
-                break;
-              case 2:
-                filter.platform = EnvPlatform.windows;
-                break;
-            }
-          });
-        },
-        isSelected: <bool>[
-          filter.platform == EnvPlatform.android,
-          filter.platform == EnvPlatform.ios,
-          filter.platform == EnvPlatform.windows,
-        ],
-        children: const <Widget>[Text('Android'), Text('iOS'), Text('Windows')],
-      )
-    ]);
+    return _makeDropDownFilter(
+        labelText: 'Platform',
+        choices: EnvPlatform.values.map((e) => e.name).toList(),
+        value: filter.platform,
+        onChanged: (value) => setState(() {
+              filter.platform = value!;
+            }));
   }
 
   Widget _benchmarkIdFilter(ResultFilter filter) {
-    final items = BenchmarkId.allIds
-        .map((id) => DropdownMenuItem<String>(
-              value: id,
-              child: Text(id),
-            ))
-        .toList();
-    return Container(
-      decoration: const ShapeDecoration(
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-              color: Colors.grey, width: 1.0, style: BorderStyle.solid),
-          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-        ),
-      ),
-      child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          decoration: const InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            labelText: 'Benchmark ID',
-          ),
-          value: filter.benchmarkId,
-          items: items,
-          onChanged: (value) => setState(() {
-                filter.benchmarkId = value!;
-              })),
-    );
+    return _makeDropDownFilter(
+        labelText: 'Benchmark ID',
+        choices: BenchmarkId.allIds,
+        value: filter.benchmarkId,
+        onChanged: (value) => setState(() {
+              filter.benchmarkId = value!;
+            }));
   }
 
   Widget _backendNameFilter(ResultFilter filter) {
@@ -239,6 +192,38 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
           resultManager.resultFilter = ResultFilter();
         });
       },
+    );
+  }
+
+  Widget _makeDropDownFilter(
+      {required String labelText,
+      required String? value,
+      required List<String> choices,
+      required void Function(String?)? onChanged}) {
+    final items = choices
+        .map((e) => DropdownMenuItem<String>(
+              value: e,
+              child: Text(e),
+            ))
+        .toList();
+    return Container(
+      decoration: const ShapeDecoration(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+              color: Colors.grey, width: 1.0, style: BorderStyle.solid),
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+        ),
+      ),
+      child: DropdownButtonFormField<String>(
+          isExpanded: true,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            labelText: labelText,
+          ),
+          value: value,
+          items: items,
+          onChanged: onChanged),
     );
   }
 }

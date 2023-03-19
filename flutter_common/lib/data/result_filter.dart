@@ -10,7 +10,7 @@ part 'result_filter.g.dart';
 class ResultFilter {
   DateTime? fromCreationDate;
   DateTime? toCreationDate;
-  EnvPlatform? platform;
+  String? platform;
   String? deviceModel;
   String? backendName;
   String? manufacturer;
@@ -47,7 +47,7 @@ class ResultFilter {
 
     DateTime resultCreationDate = result.meta.creationDate;
     String resultBackendName = result.results.first.backendInfo.backendName;
-    EnvPlatform resultPlatform = envInfo.platform;
+    String resultPlatform = envInfo.platform.name;
 
     bool fromCreationDateMatched = fromCreationDate == null
         ? true
