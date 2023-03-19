@@ -50,7 +50,7 @@ class MyAppBar {
             style: const TextStyle(fontSize: 24, color: AppColors.lightText)),
       ),
       centerTitle: true,
-      backgroundColor: AppColors.darkAppBarBackground,
+      backgroundColor: AppColors.mainScreenAppBarBackground,
       iconTheme: const IconThemeData(color: AppColors.lightAppBarIconTheme),
       actions: actions,
     );

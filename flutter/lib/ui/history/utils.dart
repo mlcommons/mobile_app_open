@@ -32,8 +32,6 @@ class HistoryHelperUtils {
         style: const TextStyle(fontSize: 24, color: AppColors.lightText),
       ),
       centerTitle: true,
-      backgroundColor: AppColors.darkAppBarBackground,
-      iconTheme: const IconThemeData(color: AppColors.lightAppBarIconTheme),
       leading: leading,
       actions: actions,
       bottom: bottom,

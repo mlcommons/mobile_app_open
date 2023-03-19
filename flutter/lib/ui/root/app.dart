@@ -41,10 +41,10 @@ class MyApp extends StatelessWidget {
 
         // This theme of application app bar
         appBarTheme: const AppBarTheme(
-          titleTextStyle: TextStyle(color: AppColors.darkText, fontSize: 20),
+          titleTextStyle: TextStyle(color: AppColors.lightText, fontSize: 20),
           elevation: 0,
-          backgroundColor: AppColors.lightAppBarBackground,
-          iconTheme: IconThemeData(color: AppColors.darkAppBarIconTheme),
+          backgroundColor: AppColors.darkAppBarThemeBackground,
+          iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
         ),
       ),
       builder: BotToastInit(),

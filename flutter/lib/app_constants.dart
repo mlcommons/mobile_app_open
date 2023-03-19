@@ -21,8 +21,10 @@ class AppColors {
   static const snackBarBackground = Color(0xFFEDEDED);
 
   static const lightAppBarBackground = Colors.white;
+  static const darkAppBarThemeBackground =
+      isOfficialBuild ? Colors.blue : Colors.brown;
 
-  static Color get darkAppBarBackground =>
+  static Color get mainScreenAppBarBackground =>
       isOfficialBuild ? const Color(0xFF31A3E2) : Colors.brown.shade400;
 
   static const lightAppBarIconTheme = Colors.white;
