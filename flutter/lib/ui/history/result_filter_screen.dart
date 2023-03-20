@@ -200,12 +200,13 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
         shape: RoundedRectangleBorder(
           side: BorderSide(
               color: Colors.grey, width: 1.0, style: BorderStyle.solid),
-          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          borderRadius: BorderRadius.all(Radius.circular(3.0)),
         ),
       ),
       child: DropdownButtonFormField<String>(
           isExpanded: true,
           decoration: InputDecoration(
+            enabledBorder: InputBorder.none,
             filled: true,
             fillColor: Colors.white,
             labelText: labelText,
