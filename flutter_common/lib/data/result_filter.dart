@@ -52,9 +52,11 @@ class ResultFilter {
     bool fromCreationDateMatched = fromCreationDate == null
         ? true
         : resultCreationDate.isAfter(fromCreationDate!);
+    // toCreationDate will be at 00:00:00.000 but we want to include that day.
+    const oneDay = Duration(days: 1);
     bool toCreationDateMatched = toCreationDate == null
         ? true
-        : resultCreationDate.isBefore(toCreationDate!);
+        : resultCreationDate.isBefore(toCreationDate!.add(oneDay));
     bool platformMatched = platform == null ? true : platform == resultPlatform;
     bool deviceModelMatched =
         resultDeviceModel.containsIgnoreCase(deviceModel ?? '');

@@ -79,10 +79,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
         );
         if (picked != null) {
           filter.fromCreationDate = picked.start;
-          // picked end date will be at 00:00:00.000 so we want to make it the end of that day.
-          filter.toCreationDate = picked.end
-              .add(const Duration(days: 1))
-              .subtract(const Duration(microseconds: 1));
+          filter.toCreationDate = picked.end;
           final startDate = dateFormat.format(picked.start);
           final endDate = dateFormat.format(picked.end);
           controller.text = '[$startDate] - [$endDate]';
