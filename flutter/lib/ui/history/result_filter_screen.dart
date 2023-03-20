@@ -42,9 +42,9 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
               const SizedBox(height: 12),
               _benchmarkIdFilter(filter),
               const SizedBox(height: 12),
-              _deviceModelFilter(filter),
-              const SizedBox(height: 12),
               _backendNameFilter(filter),
+              const SizedBox(height: 12),
+              _deviceModelFilter(filter),
               const SizedBox(height: 12),
               _manufacturerFilter(filter),
               const SizedBox(height: 12),
@@ -109,21 +109,13 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
   }
 
   Widget _backendNameFilter(ResultFilter filter) {
-    TextEditingController controller = TextEditingController();
-    if (filter.backendName != null) {
-      controller.text = filter.backendName!;
-    }
-    return TextField(
-      controller: controller,
-      autocorrect: false,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'Backend Name',
-      ),
-      onSubmitted: (value) {
-        filter.backendName = value.isEmpty ? null : value;
-      },
-    );
+    return _makeDropDownFilter(
+        labelText: 'Backend ID',
+        choices: BackendId.allIds,
+        value: filter.backend,
+        onChanged: (value) => setState(() {
+              filter.backend = value!;
+            }));
   }
 
   Widget _deviceModelFilter(ResultFilter filter) {

@@ -12,7 +12,7 @@ class ResultFilter {
   DateTime? toCreationDate;
   String? platform;
   String? deviceModel;
-  String? backendName;
+  String? backend;
   String? manufacturer;
   String? soc;
   String? benchmarkId;
@@ -46,7 +46,7 @@ class ResultFilter {
     resultSoc = resultSoc ?? StringValue.unknown;
 
     DateTime resultCreationDate = result.meta.creationDate;
-    String resultBackendName = result.results.first.backendInfo.backendName;
+    String resultBackend = result.results.first.backendInfo.filename;
     String resultPlatform = envInfo.platform.name;
 
     bool fromCreationDateMatched = fromCreationDate == null
@@ -60,8 +60,7 @@ class ResultFilter {
     bool platformMatched = platform == null ? true : platform == resultPlatform;
     bool deviceModelMatched =
         resultDeviceModel.containsIgnoreCase(deviceModel ?? '');
-    bool backendNameMatched =
-        resultBackendName.containsIgnoreCase(backendName ?? '');
+    bool backendMatched = backend == null ? true : backend == resultBackend;
     bool manufacturerMatched =
         resultManufacturer.containsIgnoreCase(manufacturer ?? '');
     bool socMatched = resultSoc.containsIgnoreCase(soc ?? '');
@@ -73,7 +72,7 @@ class ResultFilter {
         toCreationDateMatched &&
         platformMatched &&
         deviceModelMatched &&
-        backendNameMatched &&
+        backendMatched &&
         manufacturerMatched &&
         socMatched &&
         benchmarkIdMatched;
@@ -84,7 +83,7 @@ class ResultFilter {
         toCreationDate != null ||
         platform != null ||
         deviceModel != null ||
-        backendName != null ||
+        backend != null ||
         manufacturer != null ||
         soc != null;
   }
