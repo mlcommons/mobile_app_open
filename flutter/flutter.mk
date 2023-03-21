@@ -143,7 +143,8 @@ flutter/result/ts:
 
 .PHONY: flutter/result/json
 flutter/result/json:
-	cd flutter_common && ${_start_args} flutter --no-version-check pub run build_runner build
+	cd flutter_common && ${_start_args} flutter --no-version-check pub run \
+		build_runner build --delete-conflicting-outputs
 
 .PHONY: flutter/build-info
 flutter/build-info:
