@@ -13,9 +13,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // TODO sharing screen temporarily disabled
-    // final store = context.watch<Store>();
-
     return MaterialApp(
       title: 'MLPerf Mobile',
       localizationsDelegates: const [AppLocalizations.delegate],
@@ -31,8 +28,6 @@ class MyApp extends StatelessWidget {
       ),
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
-      // TODO sharing screen temporarily disabled
-      // home: store.isShareOptionChosen() ? MyHomePage() : ShareScreen(),
       home: home,
     );
   }
