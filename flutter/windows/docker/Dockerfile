@@ -27,10 +27,10 @@ RUN curl -fSLo vs_BuildTools.exe https://aka.ms/vs/16/release/vs_buildtools.exe 
 RUN choco install -y --no-progress msys2 --version 20220319.0.0 --params "/NoUpdate"
 RUN setx path "%path%;C:/tools/msys64/usr/bin"
 
-RUN choco install -y --no-progress flutter --version 3.3.5
+RUN choco install -y --no-progress flutter --version 3.7.6
 RUN choco install -y --no-progress git --version 2.33.0.2
 RUN choco install -y --no-progress make --version 4.3
-RUN choco install -y --no-progress bazelisk --version 1.11.0.20220331
+RUN choco install -y --no-progress bazelisk --version 1.16.0
 RUN choco install -y --no-progress python3 --version 3.9.0 && copy "C:\Python39\python.exe" "C:\Python39\python3.exe"
 RUN choco install -y --no-progress protoc --version 3.18.1
 

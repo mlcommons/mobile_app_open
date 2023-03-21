@@ -94,7 +94,7 @@ export MC_FLUTTER_HOME=$MC_BUILD_HOME/flutter
 export PUB_CACHE=$MC_BUILD_HOME/.pub-cache
 
 mkdir -p "$MC_BUILD_HOME"
-test ! -d "$MC_FLUTTER_HOME" && git clone --branch 3.3.5 --depth 1 https://github.com/flutter/flutter.git "$MC_FLUTTER_HOME"
+test ! -d "$MC_FLUTTER_HOME" && git clone --branch 3.7.6 --depth 1 https://github.com/flutter/flutter.git "$MC_FLUTTER_HOME"
 export PATH="$PATH:$MC_FLUTTER_HOME/bin:$PUB_CACHE/bin"
 echo "$MC_LOG_PREFIX flutter version:" && flutter --version
 flutter config --no-analytics && dart --disable-analytics

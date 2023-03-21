@@ -67,7 +67,7 @@ RUN pip install yamllint==1.26.3
 
 # Add Flutter SDK
 ENV UNAME=mlperf
-RUN git clone --branch "3.3.5" --single-branch --depth 1 \
+RUN git clone --branch "3.7.6" --single-branch --depth 1 \
     https://github.com/flutter/flutter.git /home/$UNAME/flutter
 RUN git config --global --add safe.directory /home/$UNAME/flutter
 # The PUB_CACHE directory will be mounted as a docker volume in format.mk
