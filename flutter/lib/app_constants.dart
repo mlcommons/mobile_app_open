@@ -9,8 +9,6 @@ const defaultCacheFolder = String.fromEnvironment('default-cache-folder');
 const defaultDataFolder = String.fromEnvironment('default-data-folder');
 
 class AppColors {
-  static const primary = Colors.blue;
-  static const secondary = Colors.green;
   static const lightText = Colors.white;
   static const lightRedText = Color.fromARGB(255, 255, 120, 100);
   static const darkText = Colors.black;

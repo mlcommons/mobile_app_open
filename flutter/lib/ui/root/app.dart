@@ -20,76 +20,13 @@ class MyApp extends StatelessWidget {
       title: 'MLPerf Mobile',
       localizationsDelegates: const [AppLocalizations.delegate],
       supportedLocales: const [Locale('en', '')],
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: AppColors.primary,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        scaffoldBackgroundColor: AppColors.lightBackground,
-
-        // This theme of application app bar
+      theme: Theme.of(context).copyWith(
         appBarTheme: const AppBarTheme(
           centerTitle: true,
           titleTextStyle: TextStyle(color: AppColors.lightText, fontSize: 20),
           elevation: 0,
           backgroundColor: AppColors.darkAppBarThemeBackground,
           iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
-        ),
-        checkboxTheme: CheckboxThemeData(
-          fillColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) {
-            if (states.contains(MaterialState.disabled)) {
-              return null;
-            }
-            if (states.contains(MaterialState.selected)) {
-              return AppColors.secondary;
-            }
-            return null;
-          }),
-        ),
-        radioTheme: RadioThemeData(
-          fillColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) {
-            if (states.contains(MaterialState.disabled)) {
-              return null;
-            }
-            if (states.contains(MaterialState.selected)) {
-              return AppColors.secondary;
-            }
-            return null;
-          }),
-        ),
-        switchTheme: SwitchThemeData(
-          thumbColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) {
-            if (states.contains(MaterialState.disabled)) {
-              return null;
-            }
-            if (states.contains(MaterialState.selected)) {
-              return AppColors.secondary;
-            }
-            return null;
-          }),
-          trackColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) {
-            if (states.contains(MaterialState.disabled)) {
-              return null;
-            }
-            if (states.contains(MaterialState.selected)) {
-              return AppColors.secondary;
-            }
-            return null;
-          }),
         ),
       ),
       builder: BotToastInit(),
