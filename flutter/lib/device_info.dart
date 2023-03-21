@@ -81,10 +81,8 @@ class DeviceInfo {
 
     final modelCode = deviceInfo.model;
     String? modelName;
-    if (modelCode != null) {
-      modelName =
-          deviceNames.getSingleNameFromModel(DeviceType.android, modelCode);
-    }
+    modelName =
+        deviceNames.getSingleNameFromModel(DeviceType.android, modelCode);
     return EnvAndroid(
       osVersion: Platform.operatingSystemVersion,
       // deviceInfo.manufacturer is usually a human-readable string with proper capitalisation
@@ -118,6 +116,7 @@ class DeviceInfo {
 }
 
 const _androidChannel = MethodChannel('org.mlcommons.mlperfbench/android');
+
 Future<String> _getNativeLibraryPath() async {
   return await _androidChannel.invokeMethod('getNativeLibraryPath') as String;
 }
