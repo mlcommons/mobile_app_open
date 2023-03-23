@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
           centerTitle: true,
           titleTextStyle: TextStyle(color: AppColors.lightText, fontSize: 20),
           elevation: 0,
-          backgroundColor: AppColors.darkAppBarThemeBackground,
+          backgroundColor: AppColors.defaultAppBarBackground,
           iconTheme: IconThemeData(color: AppColors.lightAppBarIconTheme),
         ),
       ),
