@@ -50,8 +50,8 @@ class MainScreenAppBar {
             style: const TextStyle(fontSize: 24, color: AppColors.lightText)),
       ),
       centerTitle: true,
-      backgroundColor: AppColors.mainScreenAppBarBackground,
-      iconTheme: const IconThemeData(color: AppColors.lightAppBarIconTheme),
+      backgroundColor: AppColors.appBarBackground,
+      iconTheme: const IconThemeData(color: AppColors.appBarIcon),
       actions: actions,
     );
   }

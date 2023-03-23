@@ -13,16 +13,13 @@ class AppColors {
   static const lightRedText = Color.fromARGB(255, 255, 120, 100);
   static const darkText = Colors.black;
   static const darkRedText = Colors.red;
+
   static const dialogBackground = Colors.white;
   static const snackBarBackground = Color(0xFFEDEDED);
+  static const appBarBackground =
+      isOfficialBuild ? Color(0xFF31A3E2) : Colors.brown;
 
-  static const defaultAppBarBackground =
-      isOfficialBuild ? Colors.blue : Colors.brown;
-
-  static Color get mainScreenAppBarBackground =>
-      isOfficialBuild ? const Color(0xFF31A3E2) : Colors.brown;
-
-  static const lightAppBarIconTheme = Colors.white;
+  static const appBarIcon = Colors.white;
 
   static List<Color> get mainScreenGradient => isOfficialBuild
       ? [
