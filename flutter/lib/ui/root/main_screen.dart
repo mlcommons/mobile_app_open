@@ -40,11 +40,11 @@ class MyHomePage extends StatelessWidget {
     switch (state.state) {
       case BenchmarkStateEnum.downloading:
       case BenchmarkStateEnum.waiting:
-        appBar = MyAppBar.buildAppBar(
+        appBar = MainScreenAppBar.buildAppBar(
             stringResources.mainScreenTitle, context, true);
         break;
       case BenchmarkStateEnum.aborting:
-        appBar = MyAppBar.buildAppBar(
+        appBar = MainScreenAppBar.buildAppBar(
             stringResources.mainScreenTitle, context, false);
         break;
       case BenchmarkStateEnum.running:

@@ -31,8 +31,10 @@ class _DetailsScreen extends State<DetailsScreen> {
     state = context.watch<BenchmarkState>();
 
     return Scaffold(
-      appBar: helper
-          .makeAppBar(l10n.historyDetailsTitle, actions: [_makeDeleteButton()]),
+      appBar: AppBar(
+        title: Text(l10n.historyDetailsTitle),
+        actions: [_makeDeleteButton()],
+      ),
       body: ListView(children: _makeBody()),
     );
   }

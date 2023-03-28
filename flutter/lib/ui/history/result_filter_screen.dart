@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/result_manager.dart';
-import 'package:mlperfbench/ui/history/utils.dart';
 
 class ResultFilterScreen extends StatefulWidget {
   const ResultFilterScreen({Key? key}) : super(key: key);
@@ -23,12 +22,13 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final l10n = AppLocalizations.of(context);
-    final helper = HistoryHelperUtils(l10n);
     final filter = state.resourceManager.resultManager.resultFilter;
 
     return Scaffold(
-        appBar: helper.makeAppBar(l10n.historyFilterTitle,
-            actions: [_clearFilterButton(state.resourceManager.resultManager)]),
+        appBar: AppBar(
+          title: Text(l10n.historyFilterTitle),
+          actions: [_clearFilterButton(state.resourceManager.resultManager)],
+        ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
