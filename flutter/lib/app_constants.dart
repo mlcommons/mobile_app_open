@@ -9,24 +9,17 @@ const defaultCacheFolder = String.fromEnvironment('default-cache-folder');
 const defaultDataFolder = String.fromEnvironment('default-data-folder');
 
 class AppColors {
-  static const primary = Colors.blue;
-  static const secondary = Colors.green;
   static const lightText = Colors.white;
   static const lightRedText = Color.fromARGB(255, 255, 120, 100);
   static const darkText = Colors.black;
   static const darkRedText = Colors.red;
-  static const lightBackground = Colors.white;
-  static const dartBackground = Colors.black45;
+
   static const dialogBackground = Colors.white;
   static const snackBarBackground = Color(0xFFEDEDED);
+  static const appBarBackground =
+      isOfficialBuild ? Color(0xFF31A3E2) : Colors.brown;
 
-  static const lightAppBarBackground = Colors.white;
-
-  static Color get darkAppBarBackground =>
-      isOfficialBuild ? const Color(0xFF31A3E2) : Colors.brown.shade400;
-
-  static const lightAppBarIconTheme = Colors.white;
-  static const darkAppBarIconTheme = Color(0xFF135384);
+  static const appBarIcon = Colors.white;
 
   static List<Color> get mainScreenGradient => isOfficialBuild
       ? [
@@ -37,11 +30,11 @@ class AppColors {
           const Color(0xFF0B4A7F),
         ]
       : [
-          Colors.brown.shade400,
-          Colors.brown.shade400,
-          Colors.brown.shade400,
           Colors.brown,
-          Colors.brown,
+          Colors.brown.shade500,
+          Colors.brown.shade500,
+          Colors.brown.shade700,
+          Colors.brown.shade800,
         ];
 
   static const runBenchmarkRectangle = Color(0xFF0DB526);

@@ -51,7 +51,6 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
     isDismissible: false,
     enableDrag: false,
     isScrollControlled: true,
-    backgroundColor: Colors.white.withOpacity(0.8),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
     builder: (context) => Wrap(
       children: [
@@ -93,7 +92,7 @@ void showBenchmarkInfoBottomSheet(BuildContext context, Benchmark benchmark) {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
           child: Text(
             info.detailsContent,
             style: const TextStyle(fontSize: 16),

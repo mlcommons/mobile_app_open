@@ -18,9 +18,6 @@ import 'device_info.dart';
 import 'ui/root/app.dart';
 import 'ui/root/exception_screen.dart';
 
-// TODO sharing screen temporarily disabled
-// import 'package:mlperfbench/ui/share_screen.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations(

@@ -9,17 +9,16 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/icons.dart' as app_icons;
 import 'package:mlperfbench/ui/page_constraints.dart';
+import 'package:mlperfbench/ui/root/main_screen.dart';
 import 'package:mlperfbench/ui/run/app_bar.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/run/progress_screen.dart';
 import 'package:mlperfbench/ui/run/result_circle.dart';
-import '../root/main_screen.dart';
-import 'progress_screen.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -390,27 +389,25 @@ class _ResultScreenState extends State<ResultScreen>
               ),
             ),
           )),
-      store.share
-          ? Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: TextButton(
-                onPressed: () async {
-                  final result =
-                      state.resourceManager.resultManager.getLastResult();
-                  await Share.share(
-                    jsonToStringIndented(result),
-                    subject: stringResources.resultsShareSubject,
-                  );
-                },
-                child: Text(stringResources.resultsButtonShare,
-                    style: TextStyle(
-                      color: AppColors.shareTextButton,
-                      fontSize: 18,
-                    )),
-              ),
-            )
-          : Container(),
-      store.share && FirebaseConfig.enable
+      Padding(
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+        child: TextButton(
+          onPressed: () async {
+            final filePath =
+                state.resourceManager.resultManager.getSubmissionFile().path;
+            await Share.shareXFiles(
+              [XFile(filePath)],
+              subject: stringResources.resultsShareSubject,
+            );
+          },
+          child: Text(stringResources.resultsButtonShare,
+              style: TextStyle(
+                color: AppColors.shareTextButton,
+                fontSize: 18,
+              )),
+        ),
+      ),
+      FirebaseConfig.enable
           ? Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextButton(
@@ -447,7 +444,7 @@ class _ResultScreenState extends State<ResultScreen>
         : '${stringResources.resultsTitleUnverified} $title';
 
     return Scaffold(
-      appBar: MyAppBar.buildAppBar(title, context, true),
+      appBar: MainScreenAppBar.buildAppBar(title, context, true),
       body: LayoutBuilder(
         builder: (context, constraint) {
           return SingleChildScrollView(

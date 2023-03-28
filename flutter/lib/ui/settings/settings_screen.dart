@@ -105,20 +105,6 @@ class _SettingsScreen extends State<SettingsScreen> {
               title: Padding(
                 padding: const EdgeInsets.only(bottom: 5),
                 child: Text(
-                  stringResources.settingsShare,
-                ),
-              ),
-              subtitle: Text(stringResources.settingsShareSubtitle),
-              trailing: Switch(
-                  value: store.share,
-                  onChanged: (flag) {
-                    store.share = flag;
-                  }),
-            ),
-            ListTile(
-              title: Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: Text(
                   stringResources.settingsOffline,
                 ),
               ),

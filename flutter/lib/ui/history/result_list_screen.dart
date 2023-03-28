@@ -31,7 +31,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
     itemList.sort((a, b) => a.meta.creationDate.compareTo(b.meta.creationDate));
 
     return Scaffold(
-      appBar: helper.makeAppBar(l10n.historyListTitle, actions: [
+      appBar: AppBar(title: Text(l10n.historyListTitle), actions: [
         IconButton(
           icon: Icon(filter.anyFilterActive
               ? Icons.filter_list

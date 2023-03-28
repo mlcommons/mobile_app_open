@@ -1,12 +1,6 @@
 {
   "@@locale": "en",
 
-  "shareScreenShare": "Share",
-  "shareScreenDontShare": "Don't Share",
-  "shareScreenPrivacyPrompt": "Would you like to share your anonymous and basic system information with MLCommons.org to help accelerate innovation?",
-  "shareScreenPromptSubText": "By clicking share you agree to our ",
-  "shareScreenPrivacyPolicyButton": "privacy policy.",
-
   "unsupportedMainMessage": "This device is not yet supported.",
   "unsupportedBackendError": "Error message",
   "unsupportedTryAnotherDevice": "Please try the app on another device",
@@ -31,7 +25,7 @@
   "resultsTabTitleAccuracy": "Accuracy",
   "resultsTitleDetails": "Detailed Results",
   "resultsButtonTestAgain": "Test Again",
-  "resultsButtonShare": "Share Results",
+  "resultsButtonShare": "Share This Result",
   "resultsButtonUpload": "Upload results",
   "resultsShareSubject": "Experiment results",
   "resultsNotAvailable": "N/A",
@@ -42,8 +36,6 @@
   "runFail": "Error while running benchmarks",
 
   "settingsTitle": "Settings",
-  "settingsShare": "Sharing",
-  "settingsShareSubtitle": "Share your anonymous results and basic system information.",
   "settingsOffline": "Offline mode",
   "settingsOfflineSubtitle": "In offline mode, a warning will be raised if the app tries to use internet resources.",
   "settingsRunMode": "Run mode",

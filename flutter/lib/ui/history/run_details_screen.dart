@@ -26,7 +26,9 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
     helper = HistoryHelperUtils(l10n);
 
     return Scaffold(
-      appBar: helper.makeAppBar(widget.result.benchmarkName),
+      appBar: AppBar(
+        title: Text(widget.result.benchmarkName),
+      ),
       body: ListView(children: _makeBody()),
     );
   }
