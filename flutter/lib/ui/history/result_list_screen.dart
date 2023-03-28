@@ -36,6 +36,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
           icon: Icon(filter.anyFilterActive
               ? Icons.filter_list
               : Icons.filter_list_off),
+          tooltip: l10n.historyFilterTitle,
           onPressed: () {
             Navigator.push(
               context,

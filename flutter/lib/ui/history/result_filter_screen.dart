@@ -20,10 +20,12 @@ class ResultFilterScreen extends StatefulWidget {
 }
 
 class _ResultFilterScreenState extends State<ResultFilterScreen> {
+  late AppLocalizations l10n;
+
   @override
   Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
-    final l10n = AppLocalizations.of(context);
     final filter = state.resourceManager.resultManager.resultFilter;
 
     return Scaffold(
@@ -67,9 +69,9 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     return TextField(
       controller: controller,
       readOnly: true,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'Creation Date',
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        labelText: l10n.historyFilterCreationDate,
       ),
       onTap: () async {
         DateTimeRange? picked = await showDateRangePicker(
@@ -90,7 +92,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
 
   Widget _platformFilter(ResultFilter filter) {
     return _makeDropDownFilter(
-        labelText: 'Platform',
+        labelText: l10n.historyFilterPlatform,
         choices: EnvPlatform.values.map((e) => e.name).toList(),
         value: filter.platform,
         onChanged: (value) => setState(() {
@@ -100,7 +102,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
 
   Widget _benchmarkIdFilter(ResultFilter filter) {
     return _makeDropDownFilter(
-        labelText: 'Benchmark ID',
+        labelText: l10n.historyFilterBenchmarkID,
         choices: BenchmarkId.allIds,
         value: filter.benchmarkId,
         onChanged: (value) => setState(() {
@@ -110,7 +112,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
 
   Widget _backendNameFilter(ResultFilter filter) {
     return _makeDropDownFilter(
-        labelText: 'Backend ID',
+        labelText: l10n.historyFilterBackendID,
         choices: BackendId.allIds,
         value: filter.backend,
         onChanged: (value) => setState(() {
@@ -126,9 +128,9 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     return TextField(
       controller: controller,
       autocorrect: false,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'Device Model',
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        labelText: l10n.historyFilterDeviceModel,
       ),
       onSubmitted: (value) {
         filter.deviceModel = value.isEmpty ? null : value;
@@ -144,9 +146,9 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     return TextField(
       controller: controller,
       autocorrect: false,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'Manufacturer',
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        labelText: l10n.historyFilterManufacturer,
       ),
       onSubmitted: (value) {
         filter.manufacturer = value.isEmpty ? null : value;
@@ -162,9 +164,9 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     return TextField(
       controller: controller,
       autocorrect: false,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'SoC',
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        labelText: l10n.historyFilterSoC,
       ),
       onSubmitted: (value) {
         filter.soc = value.isEmpty ? null : value;
@@ -175,7 +177,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
   Widget _clearFilterButton(ResultManager resultManager) {
     return IconButton(
       icon: const Icon(Icons.clear),
-      tooltip: 'Clear',
+      tooltip: l10n.historyFilterClear,
       onPressed: () {
         setState(() {
           resultManager.resultFilter = ResultFilter();
