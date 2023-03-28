@@ -29,13 +29,6 @@ class Store extends ChangeNotifier {
     return value ?? '';
   }
 
-  bool get share => _getBool(StoreConstants.share);
-
-  set share(bool value) {
-    _storeFromDisk.setBool(StoreConstants.share, value);
-    notifyListeners();
-  }
-
   BenchmarkRunModeEnum get selectedBenchmarkRunMode {
     String name = _getString(StoreConstants.selectedBenchmarkRunMode);
     if (name == '') name = BenchmarkRunModeEnum.performanceOnly.name;
@@ -99,9 +92,6 @@ class Store extends ChangeNotifier {
     _storeFromDisk.setString(StoreConstants.previousExtendedResult, value);
   }
 
-  bool isShareOptionChosen() =>
-      _storeFromDisk.containsKey(StoreConstants.share);
-
   String get previousAppVersion =>
       _getString(StoreConstants.previousAppVersion);
 
@@ -144,7 +134,6 @@ class Store extends ChangeNotifier {
 }
 
 class StoreConstants {
-  static const share = 'share';
   static const selectedBenchmarkRunMode = 'selectedBenchmarkRunMode';
   static const artificialCPULoadEnabled = 'artificial cpu load enabled';
   static const offlineMode = 'offline mode';

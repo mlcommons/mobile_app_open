@@ -74,6 +74,10 @@ class ResultManager {
     print('Result saved to $resultFile and $submissionFile');
   }
 
+  File getSubmissionFile() {
+    return File('${_resultsDir.path}/$_submissionFileName');
+  }
+
   ExtendedResult getLastResult() {
     return results.last;
   }
