@@ -25,7 +25,7 @@ limitations under the License.
 namespace mlperf {
 namespace mobile {
 
-// CBackend represent the backend implented in C.
+// CBackend represent the backend implemented in C.
 struct BackendFunctions {
   // If lib_path is empty, try to check if symbol is already loaded.
   BackendFunctions(const std::string& lib_path);
@@ -68,10 +68,10 @@ struct BackendFunctions {
   using ConvertInputsPtr = std::add_pointer<void(mlperf_backend_ptr_t, int, int,
                                                  int, uint8_t*)>::type;
 
-  // Requrired functions.
+  // Required functions.
   BackendMatchesPtr match{nullptr};
   BackendCreatePtr create{nullptr};
-  BackendNamePtr name{nullptr};
+  BackendNamePtr backend_name{nullptr};
   BackendVendorPtr vendor{nullptr};
   AcceleratorNamePtr accelerator_name{nullptr};
   BackendDeletePtr destroy{nullptr};
@@ -143,7 +143,7 @@ class ExternalBackend : public Backend {
   }
 
   // A human-readable string for logging purposes.
-  const std::string& Name() const override { return name_; }
+  const std::string& Name() const override { return backend_name_; }
 
   const std::string& Vendor() const override { return vendor_; }
 
@@ -210,9 +210,9 @@ class ExternalBackend : public Backend {
   }
 
  private:
-  std::string name_ = "";
-  std::string vendor_ = "";
-  std::string accelerator_name_ = "";
+  std::string backend_name_;
+  std::string vendor_;
+  std::string accelerator_name_;
   std::string settings_;
   DataFormat input_format_;
   DataFormat output_format_;
