@@ -90,6 +90,7 @@ bool AddBackendConfiguration(mlperf_backend_configuration_t *configs,
 }
 
 void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs) {
+  delete configs->delegate_selected;
   delete configs->accelerator;
   delete configs->accelerator_desc;
   for (int i = 0; i < configs->count; ++i) {
@@ -101,6 +102,11 @@ void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs) {
 
 mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   mlperf_backend_configuration_t c_settings;
+  char *delegate_selected =
+      new char[settings.benchmark_setting().delegate_selected().length() + 1];
+  strcpy(delegate_selected,
+         settings.benchmark_setting().delegate_selected().c_str());
+  c_settings.delegate_selected = delegate_selected;
   char *accelerator =
       new char[settings.benchmark_setting().accelerator().length() + 1];
   strcpy(accelerator, settings.benchmark_setting().accelerator().c_str());

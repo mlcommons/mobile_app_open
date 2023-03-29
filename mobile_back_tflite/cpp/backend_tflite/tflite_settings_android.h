@@ -32,6 +32,10 @@ benchmark_setting {
   accelerator: "npu"
   accelerator_desc: "NPU"
   framework: "TFLite NNAPI"
+  delegate_selected: "NNAPI"
+  delegate_choice: "GPU"
+  delegate_choice: "NNAPI"
+  delegate_choice: "Hexagon"
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
   model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
 }
