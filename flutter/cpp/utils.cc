@@ -137,26 +137,10 @@ SettingList createSettingList(const BackendSetting &backend_setting,
   setting_index = 0;
   for (auto bm_setting : backend_setting.benchmark_setting()) {
     if (bm_setting.benchmark_id() == benchmark_id) {
-      LOG(INFO) << "benchmark_setting:";
-      LOG(INFO) << "  accelerator: " << bm_setting.accelerator();
-      LOG(INFO) << "  framework: " << bm_setting.framework();
-      for (auto custom_setting : bm_setting.custom_setting()) {
-        LOG(INFO) << "  custom_setting: " << custom_setting.id() << " "
-                  << custom_setting.value();
-      }
       setting_list.mutable_benchmark_setting()->CopyFrom(bm_setting);
-      LOG(INFO) << "SettingsList.benchmark_setting:";
-      LOG(INFO) << "  accelerator: "
-                << setting_list.benchmark_setting().accelerator();
-      LOG(INFO) << "  framework: "
-                << setting_list.benchmark_setting().framework();
-      for (auto custom_setting :
-           setting_list.benchmark_setting().custom_setting()) {
-        LOG(INFO) << "  custom_setting: " << custom_setting.id() << " "
-                  << custom_setting.value();
-      }
     }
   }
+  LOG(INFO) << "setting_list:" << std::endl << setting_list.DebugString();
   return setting_list;
 }
 
