@@ -9,7 +9,7 @@ format/bazel:
 
 .PHONY: format/clang
 format/clang:
-	git ls-files -z | grep --null-data "\.h$$\|\.hpp$$\|\.cc$$\|\.cpp$$\|\.proto$$" | xargs --null --no-run-if-empty clang-format -i -style=google
+	git ls-files -z | grep --null-data "\.h$$\|\.hpp$$\|\.cc$$\|\.cpp$$\|\.proto$$" | xargs --null --no-run-if-empty clang-format -i --style=file
 
 .PHONY: format/dart/pub-get
 format/dart/pub-get:
@@ -52,7 +52,7 @@ lint/bazel:
 
 .PHONY: lint/clang
 lint/clang:
-	git ls-files -z | grep --null-data "\.h$$\|\.hpp$$\|\.cc$$\|\.cpp$$\|\.proto$$" | xargs --null --no-run-if-empty clang-format -i -style=google --Werror --dry-run
+	git ls-files -z | grep --null-data "\.h$$\|\.hpp$$\|\.cc$$\|\.cpp$$\|\.proto$$" | xargs --null --no-run-if-empty clang-format -i --style=file --Werror --dry-run
 
 .PHONY: lint/dart
 lint/dart: format/dart/pub-get
