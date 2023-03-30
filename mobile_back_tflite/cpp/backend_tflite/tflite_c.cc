@@ -211,6 +211,9 @@ mlperf_backend_ptr_t mlperf_backend_create(
     return nullptr;
   }
 
+  LOG(INFO) << "configs->delegate_selected: " << configs->delegate_selected;
+  // TODO: Create backend with selected delegate.
+
   TFLiteBackendData *backend_data = new TFLiteBackendData();
 
   backendExists = true;
