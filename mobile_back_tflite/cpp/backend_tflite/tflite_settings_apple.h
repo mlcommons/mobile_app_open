@@ -57,8 +57,8 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
-  accelerator: "gpu_f16"
-  accelerator_desc: "GPU (FP16)"
+  accelerator: "gpu"
+  accelerator_desc: "GPU"
   framework: "TFLite"
   delegate_selected: "Metal"
   delegate_choice: "CPU"

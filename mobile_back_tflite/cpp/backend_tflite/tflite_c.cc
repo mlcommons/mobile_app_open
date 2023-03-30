@@ -67,6 +67,18 @@ struct TFLiteBackendData {
 
 static bool backendExists = false;
 
+static const char *kDelegateCpu = "CPU";
+
+#if defined(__ANDROID__)
+static const char *kDelegateGpu = "GPU";
+static const char *kDelegateNnapi = "NNAPI";
+#endif
+
+#if TARGET_OS_IPHONE
+static const char *kDelegateMetal = "Metal";
+static const char *kDelegateCoreMl = "Core ML";
+#endif
+
 #if defined(MTK_TFLITE_NEURON_BACKEND) && defined(__ANDROID__)
 static int mtk_perf_handle = 0;
 static bool mtk_use_gpu = false;
@@ -211,9 +223,6 @@ mlperf_backend_ptr_t mlperf_backend_create(
     return nullptr;
   }
 
-  LOG(INFO) << "configs->delegate_selected: " << configs->delegate_selected;
-  // TODO: Create backend with selected delegate.
-
   TFLiteBackendData *backend_data = new TFLiteBackendData();
 
   backendExists = true;
@@ -273,20 +282,18 @@ mlperf_backend_ptr_t mlperf_backend_create(
     }
 
 #if __ANDROID__
-    if (!is_emulator() && ((strcmp(configs->accelerator, "gpu_f16") == 0) ||
-                           (strcmp(configs->accelerator, "gpu") == 0))) {
+    if (strcmp(configs->delegate_selected, kDelegateCpu) == 0) {
+      backend_data->accelerator = "CPU";
+    } else if (!is_emulator() &&
+               (strcmp(configs->delegate_selected, kDelegateGpu) == 0)) {
+      backend_data->accelerator = "GPU";
       auto options = TfLiteGpuDelegateOptionsV2Default();
-      if (strcmp(configs->accelerator, "gpu_f16") == 0) {
-        backend_data->accelerator = "GPU (FP16)";
-        options.inference_priority1 = TFLITE_GPU_INFERENCE_PRIORITY_MIN_LATENCY;
-      } else {
-        backend_data->accelerator = "GPU";
-      }
+      options.inference_priority1 = TFLITE_GPU_INFERENCE_PRIORITY_MIN_LATENCY;
       delegate = TfLiteGpuDelegateV2Create(&options);
 #if MTK_TFLITE_NEURON_BACKEND
       mtk_use_gpu = true;
 #endif
-    } else if (strcmp(configs->accelerator, "npu") == 0) {
+    } else if (strcmp(configs->delegate_selected, kDelegateNnapi) == 0) {
       backend_data->accelerator = "NPU";
       auto options = tflite::StatefulNnApiDelegate::Options();
       options.allow_fp16 = true;
@@ -316,11 +323,16 @@ mlperf_backend_ptr_t mlperf_backend_create(
         delegate = TfLiteNeuronDelegateCreate(&options);
       }
 #endif  // MTK_TFLITE_NEURON_BACKEND
+    } else {
+      LOG(ERROR) << "Unknown delegate_selected: " << configs->delegate_selected;
     }
 #endif  // __ANDROID__
+
 #if TARGET_OS_SIMULATOR
 #elif TARGET_OS_IPHONE
-    if (strcmp(configs->accelerator, "gpu") == 0) {
+    if (strcmp(configs->delegate_selected, kDelegateCpu) == 0) {
+      backend_data->accelerator = "CPU";
+    } else if (strcmp(configs->delegate_selected, kDelegateMetal) == 0) {
       backend_data->accelerator = "GPU";
       TFLGpuDelegateOptions opts{
           .allow_precision_loss = false,
@@ -329,7 +341,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
       };
       delegate = TFLGpuDelegateCreate(&opts);
       std::cout << "Enabling Metal delegate " << delegate << "\n";
-    } else if (strcmp(configs->accelerator, "ane") == 0) {
+    } else if (strcmp(configs->delegate_selected, kDelegateCoreMl) == 0) {
       backend_data->accelerator = "ANE";
       TfLiteCoreMlDelegateOptions opts{
           .enabled_devices = TfLiteCoreMlDelegateAllDevices,
@@ -338,11 +350,15 @@ mlperf_backend_ptr_t mlperf_backend_create(
           .min_nodes_per_partition = 2,
       };
       delegate = TfLiteCoreMlDelegateCreate(&opts);
-      std::cout << "Enabling CoreML delegate " << delegate << "\n";
+      std::cout << "Enabling Core ML delegate " << delegate << "\n";
+    } else {
+      LOG(ERROR) << "Unknown delegate_selected: " << configs->delegate_selected;
     }
 #endif
     if (delegate != nullptr) {
       TfLiteInterpreterOptionsAddDelegate(option_ptr, delegate);
+    } else {
+      LOG(INFO) << "No delegate created.";
     }
   };
 
