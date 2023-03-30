@@ -68,8 +68,8 @@ struct TFLiteBackendData {
 static bool backendExists = false;
 
 #if defined(MTK_TFLITE_NEURON_BACKEND) && defined(__ANDROID__)
-static int perf_handle = 0;
-static bool use_gpu = false;
+static int mtk_perf_handle = 0;
+static bool mtk_use_gpu = false;
 #endif
 
 inline mlperf_data_t::Type TfType2Type(TfLiteType type) {
@@ -284,7 +284,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
       }
       delegate = TfLiteGpuDelegateV2Create(&options);
 #if MTK_TFLITE_NEURON_BACKEND
-      use_gpu = true;
+      mtk_use_gpu = true;
 #endif
     } else if (strcmp(configs->accelerator, "npu") == 0) {
       backend_data->accelerator = "NPU";
@@ -494,7 +494,7 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                          void *data) {
   TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
 #if defined(MTK_TFLITE_NEURON_BACKEND) && defined(__ANDROID__)
-  if (use_gpu) {
+  if (mtk_use_gpu) {
     static std::vector<int32_t> kParams = {
         0x00414000,  // PERF_RES_CPUFREQ_PERF_MODE
         1,
@@ -503,10 +503,11 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
         0x01000000,  // PERF_RES_DRAM_OPP_MIN,
         0};
 
-    // perf_handle =
-    //    acquirePerformanceLock(perf_handle, FAST_SINGLE_ANSWER_MODE, 2000);
-    perf_handle = acquirePerfParamsLock(perf_handle, 2000, kParams.data(),
-                                        kParams.size());
+    // mtk_perf_handle =
+    //    acquirePerformanceLock(mtk_perf_handle, FAST_SINGLE_ANSWER_MODE,
+    //    2000);
+    mtk_perf_handle = acquirePerfParamsLock(mtk_perf_handle, 2000,
+                                            kParams.data(), kParams.size());
   }
 #endif
   const int shard_index = batch_index / backend_data->real_batch_size;
