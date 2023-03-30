@@ -148,7 +148,8 @@ BackendFunctions::BackendFunctions(const std::string& lib_path) {
       GetSymbol("mlperf_backend_matches_hardware"));
   create =
       reinterpret_cast<decltype(create)>(GetSymbol("mlperf_backend_create"));
-  backend_name = reinterpret_cast<decltype(backend_name)>(GetSymbol("mlperf_backend_name"));
+  backend_name = reinterpret_cast<decltype(backend_name)>(
+      GetSymbol("mlperf_backend_name"));
   vendor = reinterpret_cast<decltype(vendor)>(
       GetSymbol("mlperf_backend_vendor_name"));
   accelerator_name = reinterpret_cast<decltype(accelerator_name)>(
