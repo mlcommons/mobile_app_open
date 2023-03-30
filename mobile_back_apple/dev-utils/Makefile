@@ -8,8 +8,9 @@
 REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
 #REPO_ROOT_DIR="/Users/freedom/work/mobile_app_open"
 
-tflite: tflite-build tflite-run-sr
-coreml: coreml-build coreml-run-sr
+tflite: tflite-build tflite-run-ic
+coreml: coreml-build coreml-run-ic
+tflite-all: tflite-build tflite-run-ic tflite-run-ic-offline tflite-run-od tflite-run-is tflite-run-lu tflite-run-sr
 coreml-all: coreml-build coreml-run-ic coreml-run-ic-offline coreml-run-od coreml-run-is coreml-run-lu coreml-run-sr
 
 backend=WITH_APPLE=1 WITH_TFLITE=0
