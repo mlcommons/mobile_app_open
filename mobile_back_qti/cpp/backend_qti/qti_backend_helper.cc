@@ -1,4 +1,4 @@
-/* Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,21 +18,21 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "DiagLog/IDiagLog.hpp"
-#include "DlContainer/IDlContainer.hpp"
-#include "DlSystem/DlEnums.hpp"
-#include "DlSystem/DlError.hpp"
-#include "DlSystem/IBufferAttributes.hpp"
-#include "DlSystem/IUserBuffer.hpp"
+#include "DiagLog/IDiagLog.h"
+#include "DlContainer/DlContainer.h"
+#include "DlSystem/DlEnums.h"
+#include "DlSystem/DlError.h"
+#include "DlSystem/IBufferAttributes.h"
+#include "DlSystem/IUserBuffer.h"
 #include "DlSystem/PlatformConfig.hpp"
-#include "DlSystem/StringList.hpp"
-#include "DlSystem/TensorMap.hpp"
-#include "DlSystem/TensorShape.hpp"
-#include "DlSystem/TensorShapeMap.hpp"
-#include "DlSystem/UserBufferMap.hpp"
-#include "SNPE/SNPEBuilder.hpp"
-#include "SNPE/SNPEFactory.hpp"
-#include "SNPE/UserBufferList.hpp"
+#include "DlSystem/StringList.h"
+#include "DlSystem/TensorMap.h"
+#include "DlSystem/TensorShape.h"
+#include "DlSystem/TensorShapeMap.h"
+#include "DlSystem/UserBufferMap.h"
+#include "SNPE/SNPEBuilder.h"
+#include "SNPE/SNPEUtil.h"
+#include "SNPE/UserBufferList.h"
 #include "absl/strings/ascii.h"
 #include "cpuctrl.h"
 #include "soc_utility.h"
@@ -43,8 +43,7 @@ int isSignedStatus = DEFAULT;
 
 enum snpe_runtimes_t { SNPE_DSP = 0, SNPE_AIP = 1, SNPE_GPU = 2, SNPE_CPU = 3 };
 
-static long calcSizeFromDims(const size_t rank,
-                             const zdl::DlSystem::Dimension *dims) {
+static size_t calcSizeFromDims(const size_t rank, const size_t *dims) {
   if (rank == 0) return 0;
   size_t size = 1;
   for (size_t i = rank; i > 0; i--) {
@@ -54,7 +53,7 @@ static long calcSizeFromDims(const size_t rank,
       size *= 10;
     dims++;
   }
-  return (long)size;
+  return size;
 }
 
 // Helper for splitting tokenized strings
@@ -72,49 +71,52 @@ static void split(std::vector<std::string> &split_string,
   }
 }
 
-static zdl::DlSystem::StringList ResolveOutputLayerNames(std::string &line) {
-  zdl::DlSystem::StringList outputLayers;
+static Snpe_StringList_Handle_t ResolveOutputLayerNames(std::string &line) {
+  Snpe_StringList_Handle_t outputLayersHandle = Snpe_StringList_Create();
   if (!line.empty()) {
     std::vector<std::string> names;
     split(names, line.substr(0), ',');
-    for (auto &name : names) outputLayers.append(name.c_str());
+    for (auto &name : names)
+      Snpe_StringList_Append(outputLayersHandle, name.c_str());
   }
-  return outputLayers;
+  return outputLayersHandle;
 }
 
-static std::vector<size_t> calcStrides(zdl::DlSystem::TensorShape dims,
-                                       size_t elementSize) {
-  std::vector<size_t> strides(dims.rank());
+static Snpe_TensorShape_Handle_t calcStrides(Snpe_TensorShape_Handle_t dimsHandle,
+                                      size_t elementSize) {
+  std::vector<size_t> strides(Snpe_TensorShape_Rank(dimsHandle));
   strides[strides.size() - 1] = elementSize;
   size_t stride = strides[strides.size() - 1];
-  for (size_t i = dims.rank() - 1; i > 0; i--) {
-    if (dims[i] != 0)
-      stride *= dims[i];
+  for (size_t i = Snpe_TensorShape_Rank(dimsHandle) - 1; i > 0; i--) {
+    if (Snpe_TensorShape_At(dimsHandle, i) != 0)
+      stride *= Snpe_TensorShape_At(dimsHandle, i);
     else
       stride *= 10;
     strides[i - 1] = stride;
   }
-  return strides;
+  Snpe_TensorShape_Handle_t tensorShapeHandle = Snpe_TensorShape_CreateDimsSize(
+      strides.data(), Snpe_TensorShape_Rank(dimsHandle));
+  return tensorShapeHandle;
 }
 
-static zdl::DlSystem::Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
-  zdl::DlSystem::Runtime_t runtime;
+static Snpe_Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
+  Snpe_Runtime_t runtime;
   bool isDSP = false;
 
   switch (delegate) {
     case SNPE_DSP:
-      runtime = zdl::DlSystem::Runtime_t::DSP;
+      runtime = SNPE_RUNTIME_DSP;
       isDSP = true;
       break;
     case SNPE_AIP:
-      runtime = zdl::DlSystem::Runtime_t::AIP_FIXED_TF;
+      runtime = SNPE_RUNTIME_AIP_FIXED_TF;
       isDSP = true;
       break;
     case SNPE_GPU:
-      runtime = zdl::DlSystem::Runtime_t::GPU;
+      runtime = SNPE_RUNTIME_GPU;
       break;
     case SNPE_CPU:
-      runtime = zdl::DlSystem::Runtime_t::CPU;
+      runtime = SNPE_RUNTIME_CPU;
       break;
     default:
       LOG(ERROR) << "runtime not supported";
@@ -123,14 +125,14 @@ static zdl::DlSystem::Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
 
   if (isDSP) {
     if (isSignedStatus == DEFAULT) {
-      if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-              runtime, zdl::DlSystem::RuntimeCheckOption_t::UNSIGNEDPD_CHECK)) {
+      if (Snpe_Util_IsRuntimeAvailableCheckOption(
+              runtime, SNPE_RUNTIME_CHECK_OPTION_UNSIGNEDPD_CHECK)) {
         isSignedStatus = UNSIGNED_PD;
         LOG(INFO) << "runtime " << delegate
                   << " is available on this platform with UnsignedPD";
       } else {
-        if (zdl::SNPE::SNPEFactory::isRuntimeAvailable(
-                runtime, zdl::DlSystem::RuntimeCheckOption_t::NORMAL_CHECK)) {
+        if (Snpe_Util_IsRuntimeAvailableCheckOption(
+                runtime, SNPE_RUNTIME_CHECK_OPTION_NORMAL_CHECK)) {
           isSignedStatus = SIGNED_PD;
           LOG(INFO) << "runtime " << delegate
                     << " is available on this platform with SignedPD";
@@ -144,7 +146,7 @@ static zdl::DlSystem::Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
 
     return runtime;
   } else {
-    if (!zdl::SNPE::SNPEFactory::isRuntimeAvailable(runtime)) {
+    if (!Snpe_Util_IsRuntimeAvailable(runtime)) {
       LOG(FATAL) << "runtime " << delegate
                  << " is not available on this platform";
     } else {
@@ -156,12 +158,11 @@ static zdl::DlSystem::Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
 
 void QTIBackendHelper::use_psnpe(const char *model_path) {
   uint32_t numInits = get_num_inits();
-  LOG(INFO) << "numInits: " << numInits;
+  LOG(INFO) << "Using PSNPE. numInits: " << numInits;
 
 // Enable debug logs
 #ifdef DEBUG_FLAG
-  if (zdl::SNPE::SNPEFactory::initializeLogging(
-          zdl::DlSystem::LogLevel_t::LOG_VERBOSE)) {
+  if (Snpe_Util_InitializeLogging(SNPE_LOG_LEVEL_VERBOSE)) {
     LOG(INFO) << "Debug logs successful";
   } else {
     LOG(INFO) << "Debug logs can not be intialized";
@@ -173,34 +174,40 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
   // So build the DLC twice to use the init cache generated in the first run
   for (int i = 0; i < numInits; i++) {
     // Open the DL container that contains the network to execute.
-    std::unique_ptr<zdl::DlContainer::IDlContainer> container;
+    Snpe_DlContainer_Handle_t containerHandle =
+        Snpe_DlContainer_Open(model_path);
     // destroys previous snpe instance and creates a new one.
-    psnpe_.reset(new zdl::PSNPE::PSNPE());
+    psnpe_.reset(new psnpe_handler());
     // Loads the container after destroying the previous instance
-    container = zdl::DlContainer::IDlContainer::open(model_path);
-    if (!container) {
+    if (!containerHandle) {
       LOG(FATAL) << "Container is not available " << model_path;
     }
 
-    zdl::PSNPE::BuildConfig buildConfig;
-    buildConfig.container = container.get();
-    buildConfig.runtimeConfigList = runtimeConfigsList;
-    buildConfig.inputOutputTransmissionMode =
-        zdl::PSNPE::InputOutputTransmissionMode::sync;
+    Snpe_BuildConfig_Handle_t buildConfigHandle = Snpe_BuildConfig_Create();
+    Snpe_BuildConfig_SetContainer(buildConfigHandle, containerHandle);
+    Snpe_BuildConfig_SetRuntimeConfigList(buildConfigHandle,
+                                          runtimeConfigsListHandle);
+    Snpe_BuildConfig_SetInputOutputTransmissionMode(
+        buildConfigHandle,
+        static_cast<Snpe_PSNPE_InputOutputTransmissionMode_t>(
+            SNPE_PSNPE_INPUTOUTPUTTRANSMISSIONMODE_SYNC));
 
-    zdl::DlSystem::StringList outputLayers =
+    Snpe_StringList_Handle_t outputLayers =
         ResolveOutputLayerNames(snpeOutputLayers_);
 
-    zdl::SNPE::SNPEBuilder snpeBuilder(container.get());
-    dummyInputRuntimeList.add(zdl::DlSystem::Runtime_t::CPU);
-    snpeBuilder.setPerformanceProfile(perfProfile_)
-        .setExecutionPriorityHint(zdl::DlSystem::ExecutionPriorityHint_t::HIGH)
-        .setRuntimeProcessorOrder(dummyInputRuntimeList)
-        .setOutputLayers(outputLayers);
+    Snpe_SNPEBuilder_Handle_t snpeBuilderHandle =
+        Snpe_SNPEBuilder_Create(containerHandle);
+    dummyInputRuntimeListHandle = Snpe_RuntimeList_Create();
+    Snpe_RuntimeList_Add(dummyInputRuntimeListHandle, SNPE_RUNTIME_CPU);
+    Snpe_SNPEBuilder_SetPerformanceProfile(snpeBuilderHandle, perfProfile_);
+    Snpe_SNPEBuilder_SetExecutionPriorityHint(snpeBuilderHandle,
+                                              SNPE_EXECUTION_PRIORITY_HIGH);
+    Snpe_SNPEBuilder_SetRuntimeProcessorOrder(snpeBuilderHandle,
+                                              dummyInputRuntimeListHandle);
+    Snpe_SNPEBuilder_SetOutputLayers(snpeBuilderHandle, outputLayers);
 
-    if (outputLayers.size() > 0) {
-      buildConfig.outputBufferNames = outputLayers;
-    }
+    if (Snpe_StringList_Size(outputLayers) > 0)
+      Snpe_BuildConfig_SetOutputBufferNames(buildConfigHandle, outputLayers);
 
     std::string platformOptionStr = "";
     if (Socs::get_use_dsp_features() && isSignedStatus == UNSIGNED_PD) {
@@ -209,41 +216,68 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
     }
 
     if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)) {
-      buildConfig.enableInitCache = true;
+      Snpe_BuildConfig_SetEnableInitCache(buildConfigHandle, true);
     }
-    buildConfig.platformOptions = platformOptionStr;
+    Snpe_BuildConfig_SetPlatformOptions(buildConfigHandle,
+                                        platformOptionStr.c_str());
 
-    zdl::DlSystem::PlatformConfig platformConfig;
-    bool setSuccess = platformConfig.setPlatformOptions(platformOptionStr);
-    bool isValid = platformConfig.isOptionsValid();
+    Snpe_PlatformConfig_Handle_t platformConfigHandle =
+        Snpe_PlatformConfig_Create();
+    bool setSuccess = Snpe_PlatformConfig_SetPlatformOptions(
+        platformConfigHandle, platformOptionStr.c_str());
+    bool isValid = Snpe_PlatformConfig_IsOptionsValid(platformConfigHandle);
     if (!isValid) {
       LOG(INFO) << "platformconfig option is invalid";
     }
-    snpeBuilder.setPlatformConfig(platformConfig);
-    snpe_ = snpeBuilder.build();
+    Snpe_SNPEBuilder_SetPlatformConfig(snpeBuilderHandle, platformConfigHandle);
+    snpe_->snpeHandle = Snpe_SNPEBuilder_Build(snpeBuilderHandle);
 
-    psnpe_buildStatus = psnpe_->build(buildConfig);
-
+    // psnpe_buildStatus = Snpe_PSNPE_Build(psnpe_->psnpeHandle,
+    // buildConfigHandle);
+    psnpe_buildStatus = (Snpe_PSNPE_Build(psnpe_->psnpeHandle,
+                                          buildConfigHandle) == SNPE_SUCCESS);
     // Saves the container if there is a modification in any of the record.
-    if (numInits > 1) container->save(model_path);
+    if (numInits > 1) Snpe_DlContainer_Save(containerHandle, model_path);
+
+    Snpe_DlContainer_Delete(containerHandle);
+    Snpe_BuildConfig_Delete(buildConfigHandle);
+    Snpe_StringList_Delete(outputLayers);
+    Snpe_SNPEBuilder_Delete(snpeBuilderHandle);
+    Snpe_PlatformConfig_Delete(platformConfigHandle);
   }
 
   if (!psnpe_buildStatus) {
-    LOG(FATAL) << "Error in init of psnpe_ ";
+    LOG(FATAL) << "Error in init of psnpe_ " << psnpe_buildStatus;
   }
-  if (!snpe_) {
-    LOG(FATAL) << "Error in init of snpe_ " << snpe_;
+  if (!snpe_->snpeHandle) {
+    LOG(FATAL) << "Error in init of snpe_ " << snpe_->snpeHandle;
   }
+  // Snpe_DlContainer_Delete(containerHandle);
+}
+
+mlperf_status_t QTIBackendHelper::execute() {
+  if (!useSnpe_) {
+    if (Snpe_PSNPE_Execute(psnpe_->psnpeHandle, inputMapListHandle_, outputMapListHandle_) !=
+                            SNPE_SUCCESS) {
+      return MLPERF_FAILURE;
+    }
+  } else {
+    auto in_ = Snpe_UserBufferList_At_Ref(inputMapListHandle_, 0);
+    auto out_ = Snpe_UserBufferList_At_Ref(outputMapListHandle_, 0);
+    if (Snpe_SNPE_ExecuteUserBuffers(snpe_->snpeHandle, in_, out_) != SNPE_SUCCESS) {
+      return MLPERF_FAILURE;
+    }
+  }
+  return MLPERF_SUCCESS;
 }
 
 void QTIBackendHelper::use_snpe(const char *model_path) {
   uint32_t numInits = get_num_inits();
-  LOG(INFO) << "numInits: " << numInits;
+  LOG(INFO) << "using SNPE. numInits: " << numInits;
 
 // Enable debug logs
 #ifdef DEBUG_FLAG
-  if (zdl::SNPE::SNPEFactory::initializeLogging(
-          zdl::DlSystem::LogLevel_t::LOG_VERBOSE)) {
+  if (Snpe_Util_InitializeLogging(SNPE_LOG_LEVEL_VERBOSE)) {
     LOG(INFO) << "Debug logs successful";
   } else {
     LOG(INFO) << "Debug logs can not be intialized";
@@ -253,45 +287,53 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
   // Use SNPE
   for (int i = 0; i < numInits; i++) {
     // Open the DL container that contains the network to execute.
-    std::unique_ptr<zdl::DlContainer::IDlContainer> container;
+    Snpe_DlContainer_Handle_t containerHandle =
+        Snpe_DlContainer_Open(model_path);
     // Loads the container after destroying the previous instance
-    container = zdl::DlContainer::IDlContainer::open(model_path);
-    if (!container) {
+    if (!containerHandle) {
       LOG(FATAL) << "Container is not available " << model_path;
     }
 
-    zdl::SNPE::SNPEBuilder snpeBuilder(container.get());
-    zdl::DlSystem::StringList outputLayers =
-        ResolveOutputLayerNames(snpeOutputLayers_);
+    Snpe_SNPEBuilder_Handle_t snpeBuilderHandle =
+        Snpe_SNPEBuilder_Create(containerHandle);
 
-    snpeBuilder.setPerformanceProfile(perfProfile_)
-        .setExecutionPriorityHint(zdl::DlSystem::ExecutionPriorityHint_t::HIGH)
-        .setRuntimeProcessorOrder(inputRuntimeList)
-        .setUseUserSuppliedBuffers(true)
-        .setOutputLayers(outputLayers);
+    Snpe_StringList_Handle_t outputLayers =
+        ResolveOutputLayerNames(snpeOutputLayers_);
+    Snpe_SNPEBuilder_SetPerformanceProfile(snpeBuilderHandle, perfProfile_);
+    Snpe_SNPEBuilder_SetExecutionPriorityHint(snpeBuilderHandle,
+                                              SNPE_EXECUTION_PRIORITY_HIGH);
+    Snpe_SNPEBuilder_SetRuntimeProcessorOrder(snpeBuilderHandle,
+                                              inputRuntimeListHandle);
+    Snpe_SNPEBuilder_SetUseUserSuppliedBuffers(snpeBuilderHandle, true);
+    Snpe_SNPEBuilder_SetOutputLayers(snpeBuilderHandle, outputLayers);
 
     std::string platformOptionStr = "";
     if (Socs::get_use_dsp_features() && isSignedStatus == UNSIGNED_PD) {
       // use unsignedPD feature for untrusted app.
       platformOptionStr += "unsignedPD:ON";
     }
-
     if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)) {
-      snpeBuilder.setInitCacheMode(true);
+      Snpe_SNPEBuilder_SetInitCacheMode(snpeBuilderHandle, true);
     }
-    zdl::DlSystem::PlatformConfig platformConfig;
-    bool setSuccess = platformConfig.setPlatformOptions(platformOptionStr);
-    bool isValid = platformConfig.isOptionsValid();
+    Snpe_PlatformConfig_Handle_t platformConfigHandle =
+        Snpe_PlatformConfig_Create();
+    bool setSuccess = Snpe_PlatformConfig_SetPlatformOptions(
+        platformConfigHandle, platformOptionStr.c_str());
+    bool isValid = Snpe_PlatformConfig_IsOptionsValid(platformConfigHandle);
     if (!isValid) {
       LOG(INFO) << "platformconfig option is invalid";
     }
-    snpeBuilder.setPlatformConfig(platformConfig);
-    snpe_ = snpeBuilder.build();
-
+    Snpe_SNPEBuilder_SetPlatformConfig(snpeBuilderHandle, platformConfigHandle);
+    snpe_->snpeHandle = Snpe_SNPEBuilder_Build(snpeBuilderHandle);
     // Saves the container if there is a modification in any of the record.
-    if (numInits > 1) container->save(model_path);
+    if (numInits > 1) Snpe_DlContainer_Save(containerHandle, model_path);
+
+    Snpe_DlContainer_Delete(containerHandle);
+    Snpe_SNPEBuilder_Delete(snpeBuilderHandle);
+    Snpe_StringList_Delete(outputLayers);
+    Snpe_PlatformConfig_Delete(platformConfigHandle);
   }
-  if (!snpe_) {
+  if (!snpe_->snpeHandle) {
     LOG(FATAL) << "Error in init of the model " << snpe_;
   }
 }
@@ -332,65 +374,84 @@ void QTIBackendHelper::get_accelerator_instances(int &num_dsp, int &num_aip,
 }
 
 void QTIBackendHelper::map_inputs() {
-  zdl::DlSystem::UserBufferMap inputMap;
-  for (int bi = 0; bi < batchSize_ / inputBatch_; bi++) {
-    for (const auto &name : networkInputTensorNames_) {
-      zdl::DlSystem::IUserBufferFactory &ubFactory =
-          zdl::SNPE::SNPEFactory::getUserBufferFactory();
-      auto ubaOpt = snpe_->getInputOutputBufferAttributes(name);
-      long bufSize = calcSizeFromDims((*ubaOpt)->getDims().rank(),
-                                      (*ubaOpt)->getDims().getDimensions());
-      std::vector<size_t> strides;
-      std::unique_ptr<zdl::DlSystem::IUserBuffer> ubPtr;
+  Snpe_UserBufferMap_Handle_t inputMapHandle = Snpe_UserBufferMap_Create();
 
-      LOG(INFO) << "inputbuffer: " << inputBufferType_ << " name: " << name;
+  for (int bi = 0; bi < batchSize_ / inputBatch_; bi++) {
+    for (size_t i = 0; i < Snpe_StringList_Size(networkInputTensorNamesHandle_);
+         ++i) {
+      const char *name = Snpe_StringList_At(networkInputTensorNamesHandle_, i);
+      Snpe_IBufferAttributes_Handle_t ubaOptHandle =
+          Snpe_SNPE_GetInputOutputBufferAttributes(snpe_->snpeHandle, name);
+      Snpe_TensorShape_Handle_t dimsHandle =
+          Snpe_IBufferAttributes_GetDims(ubaOptHandle);
+      long bufSize =
+          calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
+                           Snpe_TensorShape_GetDimensions(dimsHandle));
+      std::vector<Snpe_IUserBuffer_Handle_t> ubPtr;
+
+      // LOG(INFO) << "inputbuffer: " << inputBufferType_ << " name: " << name;
       if (inputBufferType_ == QTIBufferType::FLOAT_32) {
         // Prepare float buffer
         bufSize *= sizeof(float);
         std::vector<uint8_t> inputBuffer(bufSize);
-        strides = calcStrides((*ubaOpt)->getDims(), sizeof(float));
-        zdl::DlSystem::UserBufferEncodingFloat ubeFloat;
+        auto stridesHandle = calcStrides(
+            Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(float));
+        Snpe_UserBufferEncoding_Handle_t ubeFloatHandle =
+            Snpe_UserBufferEncodingFloat_Create();
+        ubPtr.push_back(Snpe_Util_CreateUserBuffer(
+            std::move(inputBuffer.data()), inputBuffer.size(), stridesHandle,
+            ubeFloatHandle));
+        Snpe_UserBufferMap_Add(inputMapHandle, name, ubPtr.back());
 
-        ubPtr =
-            ubFactory.createUserBuffer(std::move(inputBuffer.data()),
-                                       inputBuffer.size(), strides, &ubeFloat);
-        inputMap.add(name, ubPtr.release());
+        Snpe_TensorShape_Delete(stridesHandle);
+        Snpe_UserBufferEncodingFloat_Delete(ubeFloatHandle);
       } else {
         // Prepare tf8 buffer
         bufSize *= sizeof(uint8_t);
         // Pass the quantization parameters from the model to UB
-        zdl::DlSystem::UserBufferEncodingTfN *ubeTfN = nullptr;
-        zdl::DlSystem::UserBufferEncodingTfN temp(128.0, 1.0 / 255);
         std::vector<uint8_t> inputBuffer(bufSize);
-        strides = calcStrides((*ubaOpt)->getDims(), sizeof(uint8_t));
-        ubeTfN = dynamic_cast<zdl::DlSystem::UserBufferEncodingTfN *>(
-            (*ubaOpt)->getEncoding());
+        auto stridesHandle = calcStrides(
+            Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(uint8_t));
+        auto ubeTfN = Snpe_IUserBuffer_GetEncoding_Ref(ubaOptHandle);
 
         // Set the default QP for model which doesn't have QP.
         // HTP may not need to use the QP for the current set of DLCs
         // This may be required for AIP though.
         // LOG(INFO) << "QP parameters from model: " << ubeTfN;
-        if (!ubeTfN) ubeTfN = &temp;
+        if (!ubeTfN)
+          ubeTfN = Snpe_UserBufferEncodingTfN_Create(128.0, 1.0 / 255, 8);
 
-        ubPtr = ubFactory.createUserBuffer(std::move(inputBuffer.data()),
-                                           inputBuffer.size(), strides, ubeTfN);
-        inputMap.add(name, ubPtr.release());
+        ubPtr.push_back(Snpe_Util_CreateUserBuffer(
+            std::move(inputBuffer.data()), inputBuffer.size(), stridesHandle,
+            ubeTfN));
+        Snpe_UserBufferMap_Add(inputMapHandle, name, ubPtr.back());
+
+        Snpe_TensorShape_Delete(stridesHandle);
+        Snpe_UserBufferEncodingTfN_Delete(ubeTfN);
       }
+      Snpe_IBufferAttributes_Delete(ubaOptHandle);
+      Snpe_TensorShape_Delete(dimsHandle);
     }
-    inputMap_.push_back(inputMap);
+    Snpe_UserBufferList_PushBack(inputMapListHandle_, inputMapHandle);
   }
   bufs_.resize(batchSize_ / inputBatch_);
+  Snpe_UserBufferMap_Delete(inputMapHandle);
 }
 
 void QTIBackendHelper::map_outputs() {
-  zdl::DlSystem::UserBufferMap outputMap;
-  zdl::DlSystem::IUserBufferFactory &ubFactory =
-      zdl::SNPE::SNPEFactory::getUserBufferFactory();
+  Snpe_UserBufferMap_Handle_t outputMapHandle = Snpe_UserBufferMap_Create();
+
   for (int bi = 0; bi < batchSize_ / inputBatch_; bi++) {
-    for (const auto &name : networkOutputTensorNames_) {
-      auto ubaOpt = snpe_->getInputOutputBufferAttributes(name);
-      long bufSize = calcSizeFromDims((*ubaOpt)->getDims().rank(),
-                                      (*ubaOpt)->getDims().getDimensions());
+    for (size_t i = 0;
+         i < Snpe_StringList_Size(networkOutputTensorNamesHandle_); ++i) {
+      const char *name = Snpe_StringList_At(networkOutputTensorNamesHandle_, i);
+      Snpe_IBufferAttributes_Handle_t ubaOptHandle =
+          Snpe_SNPE_GetInputOutputBufferAttributes(snpe_->snpeHandle, name);
+      Snpe_TensorShape_Handle_t dimsHandle =
+          Snpe_IBufferAttributes_GetDims(ubaOptHandle);
+      long bufSize =
+          calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
+                           Snpe_TensorShape_GetDimensions(dimsHandle));
 
       outputBatchBufsize_ = bufSize;
       // LOG(INFO) << "outputBufferType: " << outputBufferType_
@@ -401,45 +462,88 @@ void QTIBackendHelper::map_outputs() {
         Allocator<uint8_t>::useDefaultAllocator();
       }
       if (outputBufferType_ == QTIBufferType::UINT_8) {
-        zdl::DlSystem::UserBufferEncodingTfN ubeTfN(0, 1.0f, 8);
+        auto ubeTfN = Snpe_UserBufferEncodingTfN_Create(0, 1.0f, 8);
+
+        std::vector<Snpe_IUserBuffer_Handle_t> x;
         bufs_[bi].emplace(std::string(name),
                           std::vector<uint8_t, Allocator<uint8_t>>(
                               bufSize * sizeof(uint8_t)));
-        auto x = ubFactory.createUserBuffer(
-            bufs_[bi].at(name).data(), bufSize * sizeof(uint8_t),
-            calcStrides((*ubaOpt)->getDims(), sizeof(uint8_t)), &ubeTfN);
-        outputMap.add(name, x.release());
+        auto stridesHandle = calcStrides(
+            Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(uint8_t));
+        x.push_back(Snpe_Util_CreateUserBuffer(bufs_[bi].at(name).data(),
+                                               bufSize * sizeof(uint8_t),
+                                               stridesHandle, ubeTfN));
+        Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
+
+        Snpe_UserBufferEncodingTfN_Delete(ubeTfN);
+        Snpe_TensorShape_Delete(stridesHandle);
+      } else if (outputBufferType_ == QTIBufferType::INT_32) {
+        auto ubeIntN = Snpe_UserBufferEncodingIntN_Create(32);
+        std::vector<Snpe_IUserBuffer_Handle_t> x;
+        bufs_[bi].emplace(std::string(name),
+                          std::vector<uint8_t, Allocator<uint8_t>>(
+                              bufSize * sizeof(int32_t)));
+        auto stridesHandle = calcStrides(
+            Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(int32_t));
+        x.push_back(Snpe_Util_CreateUserBuffer(bufs_[bi].at(name).data(),
+                                               bufSize * sizeof(int32_t),
+                                               stridesHandle, ubeIntN));
+
+        Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
+
+        Snpe_UserBufferEncodingIntN_Delete(ubeIntN);
+        Snpe_TensorShape_Delete(stridesHandle);
       } else {
-        zdl::DlSystem::UserBufferEncodingFloat userBufferEncodingFloat;
+        auto userBufferEncodingFloat = Snpe_UserBufferEncodingFloat_Create();
+
+        std::vector<Snpe_IUserBuffer_Handle_t> x;
         bufs_[bi].emplace(
             std::string(name),
             std::vector<uint8_t, Allocator<uint8_t>>(bufSize * sizeof(float)));
-        auto x = ubFactory.createUserBuffer(
-            bufs_[bi].at(name).data(), bufSize * sizeof(float),
-            calcStrides((*ubaOpt)->getDims(), sizeof(float)),
-            &userBufferEncodingFloat);
-        outputMap.add(name, x.release());
+        auto stridesHandle = calcStrides(
+            Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(float));
+        x.push_back(Snpe_Util_CreateUserBuffer(
+            bufs_[bi].at(name).data(), bufSize * sizeof(float), stridesHandle,
+            userBufferEncodingFloat));
+        Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
+
+        Snpe_UserBufferEncodingFloat_Delete(userBufferEncodingFloat);
+        Snpe_TensorShape_Delete(stridesHandle);
       }
+      Snpe_IBufferAttributes_Delete(ubaOptHandle);
+      Snpe_TensorShape_Delete(dimsHandle);
     }
-    outputMap_.push_back(outputMap);
+    Snpe_UserBufferList_PushBack(outputMapListHandle_, outputMapHandle);
   }
+  Snpe_UserBufferMap_Delete(outputMapHandle);
 }
 
 void QTIBackendHelper::get_data_formats() {
-  const auto &strList_input = snpe_->getInputTensorNames();
-  if (!strList_input) {
+  networkInputTensorNamesHandle_ =
+      Snpe_SNPE_GetInputTensorNames(snpe_->snpeHandle);
+  if (!networkInputTensorNamesHandle_) {
     throw std::runtime_error("Error obtaining Input tensor names");
   }
-  networkInputTensorNames_ = *strList_input;
 
-  zdl::DlSystem::TensorShape tensorShape;
-  tensorShape = snpe_->getInputDimensions();
-  inputBatch_ = tensorShape.getDimensions()[0];
+  for (size_t i = 0; i < Snpe_StringList_Size(networkInputTensorNamesHandle_);
+       ++i) {
+    const char *name = Snpe_StringList_At(networkInputTensorNamesHandle_, i);
+    auto inputShapeHandle =
+        Snpe_SNPE_GetInputDimensions(snpe_->snpeHandle, name);
 
-  for (const auto &name : networkInputTensorNames_) {
-    auto ubaOpt = snpe_->getInputOutputBufferAttributes(name);
-    long bufSize = calcSizeFromDims((*ubaOpt)->getDims().rank(),
-                                    (*ubaOpt)->getDims().getDimensions());
+    if (inputShapeHandle == nullptr)
+      throw std::runtime_error("Failed to obtain input dimensions");
+    inputBatch_ = Snpe_TensorShape_At(inputShapeHandle, 0);
+
+    Snpe_IBufferAttributes_Handle_t ubaOptHandle =
+        Snpe_SNPE_GetInputOutputBufferAttributes(snpe_->snpeHandle, name);
+
+    Snpe_TensorShape_Handle_t dimsHandle =
+        Snpe_IBufferAttributes_GetDims(ubaOptHandle);
+
+    long bufSize = calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
+                                    Snpe_TensorShape_GetDimensions(dimsHandle));
+
     if (inputBufferType_ == FLOAT_32) {
       // Input buffer type FLOAT
       inputFormat_.push_back(
@@ -449,18 +553,26 @@ void QTIBackendHelper::get_data_formats() {
       inputFormat_.push_back(
           {mlperf_data_t::Type::Uint8, bufSize / inputBatch_});
     }
+    Snpe_TensorShape_Delete(inputShapeHandle);
+    Snpe_IBufferAttributes_Delete(ubaOptHandle);
+    Snpe_TensorShape_Delete(dimsHandle);
   }
 
-  const auto &strList_output = snpe_->getOutputTensorNames();
-  if (!strList_output) {
+  networkOutputTensorNamesHandle_ =
+      Snpe_SNPE_GetOutputTensorNames(snpe_->snpeHandle);
+  if (!networkOutputTensorNamesHandle_) {
     throw std::runtime_error("Error obtaining Output tensor names");
   }
-  networkOutputTensorNames_ = *strList_output;
 
-  for (const auto &name : networkOutputTensorNames_) {
-    auto ubaOpt = snpe_->getInputOutputBufferAttributes(name);
-    long bufSize = calcSizeFromDims((*ubaOpt)->getDims().rank(),
-                                    (*ubaOpt)->getDims().getDimensions());
+  for (size_t i = 0; i < Snpe_StringList_Size(networkOutputTensorNamesHandle_);
+       ++i) {
+    const char *name = Snpe_StringList_At(networkOutputTensorNamesHandle_, i);
+    Snpe_IBufferAttributes_Handle_t ubaOptHandle =
+        Snpe_SNPE_GetInputOutputBufferAttributes(snpe_->snpeHandle, name);
+    Snpe_TensorShape_Handle_t dimsHandle =
+        Snpe_IBufferAttributes_GetDims(ubaOptHandle);
+    long bufSize = calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
+                                    Snpe_TensorShape_GetDimensions(dimsHandle));
     if (outputBufferType_ == FLOAT_32) {
       if (snpeOutputLayers_ == "transpose") {
         // For mobileBERT, return output size as half the size of computed
@@ -478,11 +590,17 @@ void QTIBackendHelper::get_data_formats() {
         outputFormat_.push_back(
             {mlperf_data_t::Type::Float32, bufSize / inputBatch_});
       }
+    } else if (outputBufferType_ == INT_32) {
+      // output buffer type INT32
+      outputFormat_.push_back(
+          {mlperf_data_t::Type::Int32, bufSize / inputBatch_});
     } else {
       // output buffer type UINT8
       outputFormat_.push_back(
           {mlperf_data_t::Type::Uint8, bufSize / inputBatch_});
     }
+    Snpe_IBufferAttributes_Delete(ubaOptHandle);
+    Snpe_TensorShape_Delete(dimsHandle);
   }
 }
 
@@ -490,54 +608,64 @@ void QTIBackendHelper::set_runtime_config() {
   int numDSP = 0, numAIP = 0, numGPU = 0, numCPU = 0;
   get_accelerator_instances(numDSP, numAIP, numGPU, numCPU);
 
-  zdl::DlSystem::Runtime_t runtime;
+  Snpe_Runtime_t runtime;
   for (int i = 0; i < numDSP; i++) {
     if (i == 0) {
       runtime = Str2Delegate(SNPE_DSP);
     }
-    zdl::PSNPE::RuntimeConfig runtimeConfig;
-    runtimeConfig.runtime = runtime;
-    runtimeConfig.perfProfile = perfProfile_;
-    runtimeConfigsList.push_back(runtimeConfig);
-    inputRuntimeList.add(runtime);
+    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
+
+    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
+    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
+                                    runtimeConfigHandle);
+    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
+
+    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
   }
 
   for (int i = 0; i < numAIP; i++) {
     if (i == 0) {
       runtime = Str2Delegate(SNPE_AIP);
     }
-    zdl::PSNPE::RuntimeConfig runtimeConfig;
-    runtimeConfig.runtime = runtime;
-    runtimeConfig.perfProfile = perfProfile_;
-    runtimeConfigsList.push_back(runtimeConfig);
-    inputRuntimeList.add(runtime);
+    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
+    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
+    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
+                                    runtimeConfigHandle);
+    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
+
+    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
   }
 
   for (int i = 0; i < numGPU; i++) {
     if (i == 0) {
       runtime = Str2Delegate(SNPE_GPU);
     }
-    zdl::PSNPE::RuntimeConfig runtimeConfig;
-    runtimeConfig.runtime = runtime;
-    runtimeConfig.perfProfile = perfProfile_;
-    runtimeConfigsList.push_back(runtimeConfig);
-    inputRuntimeList.add(runtime);
+    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
+    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
+    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
+                                    runtimeConfigHandle);
+    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
+    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
   }
 
   for (int i = 0; i < numCPU; i++) {
     if (i == 0) {
       runtime = Str2Delegate(SNPE_CPU);
     }
-    zdl::PSNPE::RuntimeConfig runtimeConfig;
-    runtimeConfig.runtime = runtime;
-    runtimeConfig.perfProfile = perfProfile_;
-    runtimeConfigsList.push_back(runtimeConfig);
-    inputRuntimeList.add(runtime);
+    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
+    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
+    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
+                                    runtimeConfigHandle);
+    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
+    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
   }
 }
 
 std::string QTIBackendHelper::get_snpe_version() {
-  zdl::DlSystem::Version_t version =
-      zdl::SNPE::SNPEFactory::getLibraryVersion();
-  return version.Build;
+  Snpe_DlVersion_Handle_t version = Snpe_Util_GetLibraryVersion();
+  return Snpe_DlVersion_GetBuild(version);
 }
