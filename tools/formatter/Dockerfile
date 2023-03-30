@@ -21,7 +21,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 
 # Install dev packages
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
-    gcc make git curl wget zip unzip tar gzip build-essential
+    gcc make git curl wget zip unzip tar gzip build-essential python3-pip
 
 ENV FORMATTER_HOME /opt/formatters/bin
 ENV PATH=${PATH}:${FORMATTER_HOME}
@@ -39,9 +39,7 @@ RUN /usr/lib/go-1.16/bin/go get github.com/bazelbuild/buildtools/buildifier@6.0.
 RUN cp ~/go/bin/buildifier ${FORMATTER_HOME}/
 
 # Add CLang formatter
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    clang-format-10
-RUN cp $(which clang-format-10) ${FORMATTER_HOME}/clang-format
+RUN pip install clang-format==16.0.0 && clang-format --version
 
 # Add dos2unix to format line endings
 RUN apt-get update && apt-get install -y --no-install-recommends dos2unix
@@ -59,8 +57,6 @@ RUN npm install -g markdownlint-cli@0.26.0
 RUN npm install -g markdown-link-check@3.9.0
 
 # Add YAML linter
-RUN apt-get update && apt-get install -y --no-install-recommends \
-	python3-pip
 RUN pip install yamllint==1.26.3
 
 
