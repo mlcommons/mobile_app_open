@@ -33,6 +33,48 @@ flutter/windows/libs:
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/backend_bridge.dll
 	chmod 777 --recursive ${flutter_windows_libs_folder}
 
+flutter_windows_cmdline_folder=output/flutter-windows/cmdline
+.PHONY: flutter/windows/cmdline
+flutter/windows/cmdline:
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} --output_base=C:\\b_cache1\\ build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
+		--config=windows_arm64 \
+		--cpu=x64_arm64_windows --worker_verbose\
+		${backend_tflite_windows_target} \
+		${backend_qti_windows_target} \
+		//flutter/cpp/binary:main
+	rm -rf ${flutter_windows_cmdline_folder}
+	mkdir -p ${flutter_windows_cmdline_folder}
+	cp -f --target-directory ${flutter_windows_cmdline_folder} \
+		${backend_tflite_windows_files} \
+		${backend_qti_windows_files} \
+		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/binary/main.exe
+	chmod 777 --recursive ${flutter_windows_cmdline_folder}
+
+# set parameters before running `make flutter/windows/cmdline/release`
+FLUTTER_MSVC_ARM_DLLS?=
+flutter_windows_cmd_releases=output/flutter-windows-releases
+.PHONY: flutter/windows/cmdline/release
+flutter/windows/cmdline/release: \
+	flutter/windows/cmdline/release/prepare-dlls \
+	flutter/windows/cmdline \
+	flutter/windows/cmdline/release/copy-dlls
+
+flutter_windows_arm_dlls_path=output/flutter-windows/win-redist-dlls
+flutter_windows_arm_dlls_list=msvcp140.dll vcruntime140.dll vcruntime140_1.dll msvcp140_codecvt_ids.dll
+.PHONY: flutter/windows/cmdline/release/prepare-dlls
+flutter/windows/cmdline/release/prepare-dlls:
+	@[ -n "${FLUTTER_MSVC_ARM_DLLS}" ] || (echo FLUTTER_MSVC_ARM_DLLS env must be set; exit 1)
+
+	rm -rf ${flutter_windows_arm_dlls_path}
+	mkdir -p ${flutter_windows_arm_dlls_path}
+	currentDir=$$(pwd) && cd "${FLUTTER_MSVC_ARM_DLLS}" && \
+		cp  --target-directory $$currentDir/${flutter_windows_arm_dlls_path} ${flutter_windows_arm_dlls_list}
+
+.PHONY: flutter/windows/cmdline/release/copy-dlls
+flutter/windows/cmdline/release/copy-dlls:
+	currentDir=$$(pwd) && cd "${flutter_windows_arm_dlls_path}" && \
+		cp  --target-directory $$currentDir/${flutter_windows_cmdline_folder} ${flutter_windows_arm_dlls_list}
+
 # set parameters before running `make flutter/windows/release`
 FLUTTER_MSVC_DLLS?=
 FLUTTER_RELEASE_NAME?=

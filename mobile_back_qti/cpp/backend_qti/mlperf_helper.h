@@ -1,4 +1,4 @@
-/* Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ static void process_config(const mlperf_backend_configuration_t *configs,
   backend_data->isTflite_ = false;
   backend_data->batchSize_ = 1;
   backend_data->useSnpe_ = false;
-  backend_data->perfProfile_ = zdl::DlSystem::PerformanceProfile_t::BURST;
+  backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
   backend_data->loadOffTime_ = 2;
   backend_data->loadOnTime_ = 100;
   backend_data->useIonBuffers_ = true;
@@ -75,6 +75,9 @@ static void process_config(const mlperf_backend_configuration_t *configs,
       if (std::strcmp(configs->values[i], "float_32") == 0) {
         backend_data->outputBufferType_ =
             QTIBackendHelper::QTIBufferType::FLOAT_32;
+      } else if (std::strcmp(configs->values[i], "int_32") == 0) {
+        backend_data->outputBufferType_ =
+            QTIBackendHelper::QTIBufferType::INT_32;
       } else {
         backend_data->outputBufferType_ =
             QTIBackendHelper::QTIBufferType::UINT_8;
@@ -89,35 +92,28 @@ static void process_config(const mlperf_backend_configuration_t *configs,
       perfProfile = configs->values[i];
       if ((std::strcmp(configs->values[i], "default") == 0) ||
           (std::strcmp(configs->values[i], "balanced") == 0)) {
-        backend_data->perfProfile_ =
-            zdl::DlSystem::PerformanceProfile_t::BALANCED;
+        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BALANCED;
       } else if (std::strcmp(configs->values[i], "high_performance") == 0) {
-        backend_data->perfProfile_ =
-            zdl::DlSystem::PerformanceProfile_t::HIGH_PERFORMANCE;
+        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_HIGH_PERFORMANCE;
       } else if (std::strcmp(configs->values[i], "power_saver") == 0) {
-        backend_data->perfProfile_ =
-            zdl::DlSystem::PerformanceProfile_t::POWER_SAVER;
+        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_POWER_SAVER;
       } else if (std::strcmp(configs->values[i], "system_settings") == 0) {
-        backend_data->perfProfile_ =
-            zdl::DlSystem::PerformanceProfile_t::SYSTEM_SETTINGS;
+        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_SYSTEM_SETTINGS;
       } else if (std::strcmp(configs->values[i],
                              "sustained_high_performance") == 0) {
         backend_data->perfProfile_ =
-            zdl::DlSystem::PerformanceProfile_t::SUSTAINED_HIGH_PERFORMANCE;
+            SNPE_PERFORMANCE_PROFILE_SUSTAINED_HIGH_PERFORMANCE;
       } else if (std::strcmp(configs->values[i], "burst") == 0) {
-        backend_data->perfProfile_ = zdl::DlSystem::PerformanceProfile_t::BURST;
+        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
       } else if (std::strcmp(configs->values[i], "low_power_saver") == 0) {
-        backend_data->perfProfile_ =
-            zdl::DlSystem::PerformanceProfile_t::LOW_POWER_SAVER;
+        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_LOW_POWER_SAVER;
       } else if (std::strcmp(configs->values[i], "high_power_saver") == 0) {
-        backend_data->perfProfile_ =
-            zdl::DlSystem::PerformanceProfile_t::HIGH_POWER_SAVER;
+        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_HIGH_POWER_SAVER;
       } else if (std::strcmp(configs->values[i], "low_balanced") == 0) {
-        backend_data->perfProfile_ =
-            zdl::DlSystem::PerformanceProfile_t::LOW_BALANCED;
+        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_LOW_BALANCED;
       } else {
         LOG(INFO) << "Unrecognized performance profile: " << perfProfile;
-        backend_data->perfProfile_ = zdl::DlSystem::PerformanceProfile_t::BURST;
+        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
         perfProfile = "burst";
       }
     }

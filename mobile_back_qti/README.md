@@ -1,28 +1,20 @@
-# MLPerf Mobile App SNPE Backend
+# MLPerf app for Android and Windows on Arm with SNPE Backend
 
-This subdirectory contains the QTI backend for the MLPerf mobile app, an app-based
-implementationn of [MLPerf Inference](https://github.com/mlperf/inference) tasks.
+This subdirectory contains the QTI backend for the MLPerf app, an app-based
+implementation of [MLPerf Inference](https://github.com/mlperf/inference) tasks.
 
-## Overview
+## MLPerf Flutter app for mobile
 
-This repository builds the libqtibackend.so backend and prepares the libraries and
-SNPE DLC files for integration with the MLPerf app. These DLC files have been
+Following instructions build the libqtibackend.so backend and prepares the libraries and
+SNPE DLC files for integration with the MLPerf flutter app. These DLC files have been
 uploaded with the other submission files to here: `<path where needs to be uploaded>`
 
 ## Requirements
 
 <!-- markdown-link-check-disable-next-line -->
-* [SNPE SDK](https://developer.qualcomm.com/downloads/qualcomm-neural-processing-sdk-ai-v1650)
-  * Version 1.65.0
+* [SNPE SDK](https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk/tools)
+  * Version 2.7.0
 * Linux machine capable of running Ubuntu 18.04 docker images
-
-After downloading and unzipping the SNPE SDK, make sure to set SNPE_SDK to its location:
-
-```shell
-cd /opt
-unzip snpe-1.65.0_rc2_3676.zip
-export SNPE_SDK=/opt/snpe-1.65.0.3676
-```
 
 ### Optional
 
@@ -40,13 +32,16 @@ export GITHUB_TOKEN=<your-personal-access-token>
 cd DLC/ && make
 ```
 
-It will take 5-6 hours on an 8-core Xeon workstation to generate the DLC files.
+It will take 2 hours on an 8-core Xeon workstation to generate the DLC files.
 
 ## Building the MLPerf app with the QTI backend
+Clone mlperf_app_open
+```shell
+git clone https://github.com/mlcommons/mobile_app_open
+cd mobile_app_open
+```
 
-Manual steps:
-
-* Extract the SNPE SDK (from Requirements above) and set SNPE_SDK to its location.
+* Download and extract the SNPE SDK (from Requirements above) to mobile_app_open/mobile_back_qti
 
 * If you have an HTTP proxy, you may need the following
 
@@ -55,15 +50,22 @@ sudo apt install ca-certificates-java
 export USE_PROXY_WORKAROUND=1
 ```
 
-Clone mlperf_app_open and build with the following build commands.
+Build with the following build command.
+
+```shell
+make OFFICIAL_BUILD=true FLUTTER_BUILD_NUMBER=1  WITH_QTI=1 docker/flutter/android/release
+```
+
+This will generate the MLPerf flutter app with QTI backend in ```mobile_app_open/output/android-apks/release.apk```
+
+## Building the QTI backend lib
+
+To build only the QTI backend:
 
 ```shell
 git clone https://github.com/mlcommons/mobile_app_open
-cd mobile_app_open
-make WITH_QTI=1 docker/flutter/android/apk
+make WITH_QTI=1 libqtibackend
 ```
-
-This will build the QTI backend into the MLPerf app.
 
 ## Backend Specific Task Config file
 
@@ -71,18 +73,71 @@ The task config settings are embedded in libqtibackend.so. These settings contai
 backend specific data for each task to be run. This backend assumes a few things about
 the settings:
 
-1. All the models use "SNPE" for the configuration name and use "snpe_aip", "snpe_dsp",
-   "psnpe_aip", or "psnpe_dsp" for the accelerator value when using SNPE / PSNPE.
+1. All the models use "SNPE" for the configuration name and use "snpe_dsp" or "psnpe_dsp" for the accelerator value when using SNPE / PSNPE.
+
+## MLPerf Commandline app for Windows on Arm
+
+Following instructions build the libqtibackend backend and prepares the binaries for running the MLPerf commandline app on Windows. The DLC files have been
+uploaded with the other submission files to here: `<path where needs to be uploaded>`
+
+## Requirements
+
+<!-- markdown-link-check-disable-next-line -->
+* [SNPE windows SDK] (https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk/tools)
+  * Version 2.7.0
+* Windows x86 machine
+## Setting up the environment
+
+* Install Visual Studio (atleast 2019): <https://visualstudio.microsoft.com/vs/> with ARM compilers. 
+* Visual Studio Community: <https://learn.microsoft.com/en-us/visualstudio/releases/2019/release-notes> is also supported.
+* Add 2019 in the name of the BAZEL_VC path
+* Follow the windows setup intructions from [here](https://github.com/mlcommons/mobile_app_open/blob/master/docs/environment-setup/env-setup-windows.md) 
+    * Flutter and protoc installation is not required
+    * Make sure to install the tested environment library versions `Use --version during choco install`
+
+
+## Building the MLPerf commandline app for Windows on Arm
+Clone mlperf_app_open
+```shell
+git clone https://github.com/mlcommons/mobile_app_open
+cd mobile_app_open
+git checkout <Qualcomm's branch>
+```
+
+Download and extract the SNPE SDK (from Requirements above) to mobile_app_open/mobile_back_qti
+
+Build with the following build command.
+
+```shell
+make WITH_QTI=1 WITH_TFLITE=0 FLUTTER_MSVC_ARM_DLLS=<path to arm64 RT files> flutter/windows/cmdline/release
+```
+```shell
+Sample path to arm64RT files: "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Redist\MSVC\14.29.30133\arm64\Microsoft.VC142.CRT"
+```
+This will generate binary files in output\flutter-windows\cmdline
+
+## Running the commandline app on Windows on Arm
+* push all the command line files in to the Windows device.
+* push all the datasets to the device to C:\Dropbox\lite_datasets and complete datasets to C:\Dropbox\mlperf_datasets
+* push all the models to the device to C:\Dropbox\mlperf_models
+* open powershell on the device. CD to the cmdline folder on the device.
+
+Run performance mode with following command
+```shell
+.\run_performance_tests.bat --models <path to mlperf_models> --dataset <path to mlperf_lite_datasets>
+```
+Run accuracy mode with following command
+```shell
+.\run_accuracy_test.bat --models <path to mlperf_models> --dataset <path to mlperf_datasets>
+```
+* see the results in accuracy_results.txt and performance_results.txt
+
 
 ## FAQ
 
-### Do I need to build the DLC files?
-
-No, the information to build the DLC files is only to show how they are created. But if you want, you may.
-
 ### What devices does this backend support?
 
-This backend only supports SDM865/SDM865 Pro ,SDM888/SDM888 Pro, SDM778G, SD7G1, SD8G1, SD8Pro G1 devices.
+This backend only supports SDM888/SDM888 Pro, SDM778G, SD7G1, SD8G1, SD8Pro G1, SD8G2 devices.
 Other Snapdragon based devices will not run the MLPerf app. Future updates of the app will provide
 additional device support.
 

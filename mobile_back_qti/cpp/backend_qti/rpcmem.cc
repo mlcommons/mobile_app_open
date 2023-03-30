@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,10 @@ limitations under the License.
 
 RpcMem::RpcMem() {
   if (Socs::needs_rpcmem()) {
+// TODO: Replace dlopen with tflite's shared libs handling
+#ifdef __ANDROID__
     libHandle_ = dlopen("libcdsprpc.so", RTLD_NOW);
+#endif
   } else {
     libHandle_ = nullptr;
   }
@@ -30,10 +33,12 @@ RpcMem::RpcMem() {
     LOG(ERROR) << "Can't open rpc lib";
     isSuccess_ = false;
   } else {
+#ifdef __ANDROID__
     rpcmemAlloc_ =
         reinterpret_cast<RpcMemAllocPtr>(dlsym(libHandle_, "rpcmem_alloc"));
     rpcmemFree_ =
         reinterpret_cast<RpcMemFreePtr>(dlsym(libHandle_, "rpcmem_free"));
+#endif
 
     if (rpcmemAlloc_ && rpcmemFree_) {
       isSuccess_ = true;
@@ -46,7 +51,9 @@ RpcMem::RpcMem() {
 
 RpcMem::~RpcMem() {
   isSuccess_ = false;
+#ifdef __ANDROID__
   dlclose(libHandle_);
+#endif
 }
 
 void *RpcMem::Alloc(int id, uint32_t flags, int size) {
