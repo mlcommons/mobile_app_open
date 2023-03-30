@@ -48,15 +48,15 @@ message BenchmarkSetting {
   required string accelerator_desc = 6;
   // Human-readable name of the underlying ML framework (software)
   required string framework = 7;
+  // Possible choice for delegate selection. This will be displayed to the user.
+  repeated string delegate_choice = 10;
+  // The delegate (software) selected by the user. This value will be passed to the backend.
+  optional string delegate_selected = 11;
   // batch_size is passed to the backend
   optional int32 batch_size = 8;
   // single_stream_expected_latency_ns is passed to the MLPerfDriver,
   // default to 1M, max 1M
   optional int32 single_stream_expected_latency_ns = 9 [default = 1000000];
-  // Possible delegate for selection.
-  repeated string delegate_choice = 10;
-  // Selected delegate by the user.
-  optional string delegate_selected = 11;
 }
 
 // Common setting of each benchmark
