@@ -101,6 +101,7 @@ class ResultHelper {
     return BackendSettingsInfo(
       acceleratorCode: taskSettings.accelerator,
       acceleratorDesc: taskSettings.acceleratorDesc,
+      delegate: taskSettings.delegateSelected,
       framework: taskSettings.framework,
       modelPath: taskSettings.modelPath,
       batchSize: taskSettings.batchSize,
