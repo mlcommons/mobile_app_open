@@ -28,7 +28,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
     final filter = state.resourceManager.resultManager.resultFilter;
     List<ExtendedResult> itemList = results;
     itemList = results.where((result) => filter.match(result)).toList();
-    itemList.sort((a, b) => a.meta.creationDate.compareTo(b.meta.creationDate));
+    itemList.sort((a, b) => b.meta.creationDate.compareTo(a.meta.creationDate));
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyListTitle), actions: [
