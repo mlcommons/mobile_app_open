@@ -1,6 +1,8 @@
 {
   "@@locale": "en",
 
+  "unknown": "Unknown",
+
   "unsupportedMainMessage": "This device is not yet supported.",
   "unsupportedBackendError": "Error message",
   "unsupportedTryAnotherDevice": "Please try the app on another device",
@@ -144,6 +146,7 @@
   "historyRunDetailsBackendName": "Backend name",
   "historyRunDetailsVendorName": "Vendor name",
   "historyRunDetailsAccelerator": "Accelerator",
+  "historyRunDetailsDelegate": "Delegate",
   "historyRunDetailsBatchSize": "Batch size",
   "historyRunDetailsPerfTitle": "Performance run",
   "historyRunDetailsPerfQps": "Throughput",
