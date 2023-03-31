@@ -264,7 +264,7 @@ typedef struct _ACPI_SRAT {
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 
 typedef struct _ACPI_SRAT_ENTRY {
   UCHAR Type;
@@ -435,7 +435,7 @@ typedef struct _ACPI_MPST {
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 
 typedef struct _POWER_STATE_CHARACTERISTICS {
   union {
@@ -1852,7 +1852,7 @@ C_ASSERT(WAET_DEV_RTC_ENLIGHTENED == 1);
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 
 //
 // Top-level IORT table
@@ -2155,7 +2155,7 @@ typedef struct _RHSA {
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 
 typedef struct _DMARTABLE {
   USHORT Type;
@@ -3610,7 +3610,7 @@ typedef struct _NFIT_PLATFORM_CAPABILITIES {
 #endif
 
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 
@@ -3646,7 +3646,7 @@ typedef struct _WSMT {
 #endif
 
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 
@@ -3692,7 +3692,7 @@ typedef struct _LPIT {
 #endif
 
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 
@@ -3844,7 +3844,7 @@ typedef struct _ACPI_PDTT {
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 
 #define HMAT_SIGNATURE 0x54414D48  // "HMAT"
 

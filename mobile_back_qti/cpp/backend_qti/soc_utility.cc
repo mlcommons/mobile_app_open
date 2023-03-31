@@ -135,9 +135,8 @@ uint32_t Socs::get_windows_soc_id(void) {
   }
 
   pptt = (PPPTT)buf;
-  PPROC_TOPOLOGY_NODE ptn =
-      (PPROC_TOPOLOGY_NODE)((BYTE *)&(pptt->HeirarchyNodes[0]) +
-                            pptt->HeirarchyNodes[0].Length);
+  PPROC_TOPOLOGY_NODE ptn = (PPROC_TOPOLOGY_NODE)(
+      (BYTE *)&(pptt->HeirarchyNodes[0]) + pptt->HeirarchyNodes[0].Length);
   uint64_t key = (ptn->IdNode.Level1 << 32) | (ptn->IdNode.Level2);
 
   auto it = pptt_mappings.find(key);
