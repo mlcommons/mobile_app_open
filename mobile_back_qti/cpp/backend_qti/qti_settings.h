@@ -19,13 +19,13 @@ limitations under the License.
 
 const std::string empty_settings = "";
 
-#include "qti_settings_sdm888.h"
-#include "qti_settings_sdm778.h"
 #include "qti_settings_sd7g1.h"
-#include "qti_settings_sd8g1.h"
-#include "qti_settings_sd8pg1.h"
 #include "qti_settings_sd7pg2.h"
-#include "qti_settings_sd8g2.h"
 #include "qti_settings_sd8cxg3.h"
+#include "qti_settings_sd8g1.h"
+#include "qti_settings_sd8g2.h"
+#include "qti_settings_sd8pg1.h"
+#include "qti_settings_sdm778.h"
+#include "qti_settings_sdm888.h"
 
 #endif

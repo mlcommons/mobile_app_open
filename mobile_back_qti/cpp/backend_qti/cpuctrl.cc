@@ -34,10 +34,14 @@ using namespace std::chrono;
 #define SET_AFFINITY(a, b) sched_setaffinity(gettid(), a, b)
 #define GET_AFFINITY(a, b) sched_getaffinity(gettid(), a, b)
 #else
-#define SET_AFFINITY(a, b) {}
-#define GET_AFFINITY(a, b) {}
-#define CPU_ZERO(a) {}
-#define CPU_SET(a,b) {}
+#define SET_AFFINITY(a, b) \
+  {}
+#define GET_AFFINITY(a, b) \
+  {}
+#define CPU_ZERO(a) \
+  {}
+#define CPU_SET(a, b) \
+  {}
 #endif
 
 static uint32_t soc_id_ = 0;
@@ -61,7 +65,8 @@ static void loop(void *unused) {
     auto now =
         duration_cast<milliseconds>(system_clock::now().time_since_epoch());
     if (now.count() % loadOnTime_ == 0 && active_) {
-      std::this_thread::sleep_for(std::chrono::microseconds(loadOffTime_ * 1000));
+      std::this_thread::sleep_for(
+          std::chrono::microseconds(loadOffTime_ * 1000));
 #ifndef __ANDROID__
       temp.clear();
 #endif

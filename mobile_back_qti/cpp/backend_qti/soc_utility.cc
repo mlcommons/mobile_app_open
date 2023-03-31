@@ -15,13 +15,15 @@ limitations under the License.
 #include <stdint.h>
 
 #include <fstream>
-#include <thread>
 #include <iostream>
+#include <thread>
 
 #include "tensorflow/core/platform/logging.h"
 #ifndef __ANDROID__
-#include <unordered_map>
 #include <Windows.h>
+
+#include <unordered_map>
+
 #include "acpitabl.h"
 #endif
 
@@ -74,7 +76,6 @@ std::map<uint32_t, SocInfo> socDetails =
         })
         .m_soc_details;
 
-
 #ifdef __ANDROID__
 uint32_t Socs::get_android_soc_id(void) {
   uint32_t id;
@@ -98,15 +99,14 @@ uint32_t Socs::get_android_soc_id(void) {
 }
 
 #else
-#define MAX_FADT_PPTT_SIZE    65536
-#define LEVEL_ID(LV1, LV2)    ((LV1<<32) | (LV2))
+#define MAX_FADT_PPTT_SIZE 65536
+#define LEVEL_ID(LV1, LV2) ((LV1 << 32) | (LV2))
 
 static std::unordered_map<uint64_t, int> pptt_mappings = {
-  {LEVEL_ID(113ULL, 449ULL), 435},  // SD8cxG3
+    {LEVEL_ID(113ULL, 449ULL), 435},  // SD8cxG3
 };
 
-uint32_t Socs::get_windows_soc_id(void)
-{
+uint32_t Socs::get_windows_soc_id(void) {
   DWORD bufsize = 0;
   int ret = 0;
   PPPTT pptt;
@@ -135,8 +135,9 @@ uint32_t Socs::get_windows_soc_id(void)
   }
 
   pptt = (PPPTT)buf;
-  PPROC_TOPOLOGY_NODE ptn = (PPROC_TOPOLOGY_NODE)((BYTE*)&(pptt->HeirarchyNodes[0]) +
-                                                           pptt->HeirarchyNodes[0].Length);
+  PPROC_TOPOLOGY_NODE ptn =
+      (PPROC_TOPOLOGY_NODE)((BYTE *)&(pptt->HeirarchyNodes[0]) +
+                            pptt->HeirarchyNodes[0].Length);
   uint64_t key = (ptn->IdNode.Level1 << 32) | (ptn->IdNode.Level2);
 
   auto it = pptt_mappings.find(key);
@@ -155,7 +156,7 @@ uint32_t Socs::get_windows_soc_id(void)
 
 void Socs::soc_info_init() {
   if (is_init_done) return;
-  
+
 #ifdef __ANDROID__
   uint32_t soc_id = get_android_soc_id();
 #else
@@ -280,7 +281,7 @@ bool Socs::needs_rpcmem() {
   soc_info_init();
 #ifdef __ANDROID__
   return m_soc_info.m_needs_rpcmem;
-#else 
+#else
   return false;
 #endif
 }

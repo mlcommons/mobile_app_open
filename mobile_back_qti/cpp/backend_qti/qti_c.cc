@@ -287,8 +287,7 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
   if (backend_data->snpeOutputLayers_ ==
       "Postprocessor/BatchMultiClassNonMaxSuppression") {
     // Reorder snpeOutputLayers_ for coco process_output
-    const char *outputLayerName =
-        backend_data->odLayerMap[outputIndex].c_str();
+    const char *outputLayerName = backend_data->odLayerMap[outputIndex].c_str();
     *data = backend_data->bufs_[batchIndex].at(outputLayerName).data();
     return MLPERF_SUCCESS;
   } else if (backend_data->snpeOutputLayers_ == "transpose") {

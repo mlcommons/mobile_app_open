@@ -82,8 +82,8 @@ static Snpe_StringList_Handle_t ResolveOutputLayerNames(std::string &line) {
   return outputLayersHandle;
 }
 
-static Snpe_TensorShape_Handle_t calcStrides(Snpe_TensorShape_Handle_t dimsHandle,
-                                      size_t elementSize) {
+static Snpe_TensorShape_Handle_t calcStrides(
+    Snpe_TensorShape_Handle_t dimsHandle, size_t elementSize) {
   std::vector<size_t> strides(Snpe_TensorShape_Rank(dimsHandle));
   strides[strides.size() - 1] = elementSize;
   size_t stride = strides[strides.size() - 1];
@@ -257,14 +257,15 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
 
 mlperf_status_t QTIBackendHelper::execute() {
   if (!useSnpe_) {
-    if (Snpe_PSNPE_Execute(psnpe_->psnpeHandle, inputMapListHandle_, outputMapListHandle_) !=
-                            SNPE_SUCCESS) {
+    if (Snpe_PSNPE_Execute(psnpe_->psnpeHandle, inputMapListHandle_,
+                           outputMapListHandle_) != SNPE_SUCCESS) {
       return MLPERF_FAILURE;
     }
   } else {
     auto in_ = Snpe_UserBufferList_At_Ref(inputMapListHandle_, 0);
     auto out_ = Snpe_UserBufferList_At_Ref(outputMapListHandle_, 0);
-    if (Snpe_SNPE_ExecuteUserBuffers(snpe_->snpeHandle, in_, out_) != SNPE_SUCCESS) {
+    if (Snpe_SNPE_ExecuteUserBuffers(snpe_->snpeHandle, in_, out_) !=
+        SNPE_SUCCESS) {
       return MLPERF_FAILURE;
     }
   }

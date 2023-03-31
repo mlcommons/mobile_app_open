@@ -87,7 +87,7 @@ class SocProperties {
 };
 
 class Socs {
-private: 
+ private:
 #ifdef __ANDROID__
   static uint32_t get_android_soc_id(void);
 #else
