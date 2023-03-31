@@ -9,7 +9,7 @@ Following instructions build the libqtibackend.so backend and prepares the libra
 SNPE DLC files for integration with the MLPerf flutter app. These DLC files have been
 uploaded with the other submission files to here: `<path where needs to be uploaded>`
 
-## Requirements
+## Requirements for LA
 
 <!-- markdown-link-check-disable-next-line -->
 * [SNPE SDK](https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk/tools)
@@ -35,7 +35,9 @@ cd DLC/ && make
 It will take 2 hours on an 8-core Xeon workstation to generate the DLC files.
 
 ## Building the MLPerf app with the QTI backend
+
 Clone mlperf_app_open
+
 ```shell
 git clone https://github.com/mlcommons/mobile_app_open
 cd mobile_app_open
@@ -80,24 +82,26 @@ the settings:
 Following instructions build the libqtibackend backend and prepares the binaries for running the MLPerf commandline app on Windows. The DLC files have been
 uploaded with the other submission files to here: `<path where needs to be uploaded>`
 
-## Requirements
+## Requirements for WoS
 
 <!-- markdown-link-check-disable-next-line -->
-* [SNPE windows SDK] (https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk/tools)
+* [SNPE windows SDK] (<https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk/tools>)
   * Version 2.7.0
 * Windows x86 machine
+
 ## Setting up the environment
 
-* Install Visual Studio (atleast 2019): <https://visualstudio.microsoft.com/vs/> with ARM compilers. 
+* Install Visual Studio (atleast 2019): <https://visualstudio.microsoft.com/vs/> with ARM compilers.
 * Visual Studio Community: <https://learn.microsoft.com/en-us/visualstudio/releases/2019/release-notes> is also supported.
 * Add 2019 in the name of the BAZEL_VC path
-* Follow the windows setup intructions from [here](https://github.com/mlcommons/mobile_app_open/blob/master/docs/environment-setup/env-setup-windows.md) 
-    * Flutter and protoc installation is not required
-    * Make sure to install the tested environment library versions `Use --version during choco install`
-
+* Follow the windows setup intructions from [here](https://github.com/mlcommons/mobile_app_open/blob/master/docs/environment-setup/env-setup-windows.md)
+  * Flutter and protoc installation is not required
+  * Make sure to install the tested environment library versions `Use --version during choco install`
 
 ## Building the MLPerf commandline app for Windows on Arm
+
 Clone mlperf_app_open
+
 ```shell
 git clone https://github.com/mlcommons/mobile_app_open
 cd mobile_app_open
@@ -111,27 +115,33 @@ Build with the following build command.
 ```shell
 make WITH_QTI=1 WITH_TFLITE=0 FLUTTER_MSVC_ARM_DLLS=<path to arm64 RT files> flutter/windows/cmdline/release
 ```
+
 ```shell
 Sample path to arm64RT files: "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Redist\MSVC\14.29.30133\arm64\Microsoft.VC142.CRT"
 ```
+
 This will generate binary files in output\flutter-windows\cmdline
 
 ## Running the commandline app on Windows on Arm
+
 * push all the command line files in to the Windows device.
 * push all the datasets to the device to C:\Dropbox\lite_datasets and complete datasets to C:\Dropbox\mlperf_datasets
 * push all the models to the device to C:\Dropbox\mlperf_models
 * open powershell on the device. CD to the cmdline folder on the device.
 
 Run performance mode with following command
+
 ```shell
 .\run_performance_tests.bat --models <path to mlperf_models> --dataset <path to mlperf_lite_datasets>
 ```
+
 Run accuracy mode with following command
+
 ```shell
 .\run_accuracy_test.bat --models <path to mlperf_models> --dataset <path to mlperf_datasets>
 ```
-* see the results in accuracy_results.txt and performance_results.txt
 
+* see the results in accuracy_results.txt and performance_results.txt
 
 ## FAQ
 

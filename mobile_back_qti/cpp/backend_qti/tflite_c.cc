@@ -19,7 +19,6 @@ limitations under the License.
 #include "tensorflow/core/platform/logging.h"
 #include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/c/common.h"
-
 #include "tensorflow/lite/delegates/gpu/delegate.h"
 #include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
 #endif
@@ -242,31 +241,39 @@ mlperf_status_t tflite_backend_get_output(mlperf_backend_ptr_t backend_ptr,
 void tflite_backend_delete(mlperf_backend_ptr_t backend_ptr) {}
 mlperf_backend_ptr_t tflite_backend_create(
     const char* model_path, mlperf_backend_configuration_t* configs) {
-    return NULL;
+  return NULL;
 }
-mlperf_status_t tflite_backend_issue_query(mlperf_backend_ptr_t backend_ptr) { return MLPERF_SUCCESS; }
-mlperf_status_t tflite_backend_flush_queries(mlperf_backend_ptr_t backend_ptr) { return MLPERF_SUCCESS; }
-int32_t tflite_backend_get_input_count(mlperf_backend_ptr_t backend_ptr) { return NULL; }
+mlperf_status_t tflite_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+  return MLPERF_SUCCESS;
+}
+mlperf_status_t tflite_backend_flush_queries(mlperf_backend_ptr_t backend_ptr) {
+  return MLPERF_SUCCESS;
+}
+int32_t tflite_backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
+  return NULL;
+}
 mlperf_data_t tflite_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
-    int32_t i) {
-    mlperf_data_t type;
-    return type;
+                                            int32_t i) {
+  mlperf_data_t type;
+  return type;
 }
 mlperf_status_t tflite_backend_set_input(mlperf_backend_ptr_t backend_ptr,
-    int32_t batchIndex, int32_t i,
-    void* data) {
-    return MLPERF_SUCCESS;
+                                         int32_t batchIndex, int32_t i,
+                                         void* data) {
+  return MLPERF_SUCCESS;
 }
-int32_t tflite_backend_get_output_count(mlperf_backend_ptr_t backend_ptr) { return NULL; }
+int32_t tflite_backend_get_output_count(mlperf_backend_ptr_t backend_ptr) {
+  return NULL;
+}
 mlperf_data_t tflite_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
-    int32_t i) {
-    mlperf_data_t type;
-    return type;
+                                             int32_t i) {
+  mlperf_data_t type;
+  return type;
 }
 mlperf_status_t tflite_backend_get_output(mlperf_backend_ptr_t backend_ptr,
-    uint32_t batchIndex, int32_t i,
-    void** data) {
-    return MLPERF_SUCCESS;
+                                          uint32_t batchIndex, int32_t i,
+                                          void** data) {
+  return MLPERF_SUCCESS;
 }
 
 #endif
