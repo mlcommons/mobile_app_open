@@ -50,7 +50,8 @@ message BenchmarkSetting {
   required string framework = 7;
   // Possible choice for delegate selection. This will be displayed to the user.
   repeated string delegate_choice = 10;
-  // The delegate (software) selected by the user. This value will be passed to the backend.
+  // The delegate (software) selected by the user. This value will be passed to
+  // the backend.
   optional string delegate_selected = 11;
   // batch_size is passed to the backend
   optional int32 batch_size = 8;
