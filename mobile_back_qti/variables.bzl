@@ -16,8 +16,8 @@
 
 def _impl(repository_ctx):
     if "windows" in repository_ctx.os.name:
-        print (repository_ctx.attr.workspace_dir + "/mobile_back_qti/")
-        found = repository_ctx.execute(["ls",repository_ctx.attr.workspace_dir + "/mobile_back_qti"])
+        print(repository_ctx.attr.workspace_dir + "/mobile_back_qti/")
+        found = repository_ctx.execute(["ls", repository_ctx.attr.workspace_dir + "/mobile_back_qti"])
         listoffiles = found.stdout
         if found.return_code != 0 or found.stdout == "" or found.stdout == "\n":
             fail("snpe folder is not found in the repo: " + found.stderr)
@@ -25,9 +25,9 @@ def _impl(repository_ctx):
         filepath = ""
         for x in filelist:
             if x.find("snpe-") == 0:
-                filepath=x
+                filepath = x
                 break
-        if filepath=="":
+        if filepath == "":
             fail("snpe folder is not found in the repo")
     else:
         found = repository_ctx.execute(["find", repository_ctx.attr.workspace_dir + "/mobile_back_qti/", "-maxdepth", "1", "-name", "snpe-*", "-type", "d", "-print", "-quit"])
