@@ -67,16 +67,16 @@ struct TFLiteBackendData {
 
 static bool backendExists = false;
 
-static constexpr char *kDelegateCpu = "CPU";
+static constexpr const char* const kDelegateCpu = "CPU";
 
 #if defined(__ANDROID__)
-static constexpr char *kDelegateGpu = "GPU";
-static constexpr char *kDelegateNnapi = "NNAPI";
+static constexpr const char* const kDelegateGpu = "GPU";
+static constexpr const char* const kDelegateNnapi = "NNAPI";
 #endif
 
 #if TARGET_OS_IPHONE
-static constexpr char *kDelegateMetal = "Metal";
-static constexpr char *kDelegateCoreMl = "Core ML";
+static constexpr const char* const kDelegateMetal = "Metal";
+static constexpr const char* const kDelegateCoreMl = "Core ML";
 #endif
 
 #if defined(MTK_TFLITE_NEURON_BACKEND) && defined(__ANDROID__)
