@@ -60,19 +60,19 @@ snpe_copts = [
 ]
 
 cc_library(
-	name = "qti_settings",
-	srcs = [],
-	hdrs = [
-		"qti_settings.h",
-		"qti_settings_sd8cxg3.h",
-		"qti_settings_sd7g1.h",
-		"qti_settings_sd8g1.h",
-		"qti_settings_sd8g2.h",
-		"qti_settings_sd8pg1.h",
-		"qti_settings_sdm778.h",
-		"qti_settings_sdm888.h",
-		"qti_settings_sd7pg2.h",
-	],
+    name = "qti_settings",
+    srcs = [],
+    hdrs = [
+        "qti_settings.h",
+        "qti_settings_sd7g1.h",
+        "qti_settings_sd7pg2.h",
+        "qti_settings_sd8cxg3.h",
+        "qti_settings_sd8g1.h",
+        "qti_settings_sd8g2.h",
+        "qti_settings_sd8pg1.h",
+        "qti_settings_sdm778.h",
+        "qti_settings_sdm888.h",
+    ],
 )
 
 cc_library(
@@ -85,8 +85,8 @@ cc_library(
     ],
     copts = tflite_copts() + snpe_copts,
     deps = [
-            "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-            ":qti_settings",
+        ":qti_settings",
+        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ],
     alwayslink = 1,
 )
@@ -117,25 +117,25 @@ cc_library(
 cc_library(
     name = "qti_c",
     srcs = [
-            "qti_c.cc",
-            "cpuctrl.cc",
-            "tflite_c.cc",
-            "qti_backend_helper.cc",
-            "soc_utility.cc",
-        ],
+        "cpuctrl.cc",
+        "qti_backend_helper.cc",
+        "qti_c.cc",
+        "soc_utility.cc",
+        "tflite_c.cc",
+    ],
     hdrs = [
-            "cpuctrl.h",
-            "tflite_c.h",
-            "qti_backend_helper.h",
-            "mlperf_helper.h",
-            "soc_utility.h",
-        ] + select({
-            "android_arm64": [],
-            "windows_arm64": [
-                "acpitabl.h"
-            ],
-            "//conditions:default": [],
-        }),
+        "cpuctrl.h",
+        "tflite_c.h",
+        "qti_backend_helper.h",
+        "mlperf_helper.h",
+        "soc_utility.h",
+    ] + select({
+        "android_arm64": [],
+        "windows_arm64": [
+            "acpitabl.h",
+        ],
+        "//conditions:default": [],
+    }),
     copts = tflite_copts() + snpe_copts,
     local_defines = ["SNPE_VERSION_STRING=" + SNPE_VERSION] +
                     select({

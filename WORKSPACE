@@ -40,8 +40,8 @@ http_archive(
     url = "https://github.com/pytorch/cpuinfo/archive/8ec7bd91ad0470e61cf38f618cc1f270dede599c.tar.gz",
 )
 
-
 load("//:platform.bzl", "tf_patch_finder")
+
 tf_patch_finder(
     name = "tf_patch_finder",
     workspace_dir = __workspace_dir__,
@@ -60,7 +60,7 @@ http_archive(
         "//:flutter/third_party/tflite_coreml_delegate_memory_leak.patch",
         "//:flutter/third_party/tensorflow-fix-llvm.patch",
         "//patches:feature_level.diff",
-        ] + PATCH_FILE,
+    ] + PATCH_FILE,
     sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
     strip_prefix = "tensorflow-2.8.0",
     urls = [

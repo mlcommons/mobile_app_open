@@ -2,9 +2,9 @@
 
 def _impl(repository_ctx):
     if "windows" in repository_ctx.os.name:
-        patch_file="[\"//patches:TF-Changes-to-add-windows_arm64.patch\"]"
+        patch_file = "[\"//patches:TF-Changes-to-add-windows_arm64.patch\"]"
     else:
-        patch_file=[]
+        patch_file = []
 
     repository_ctx.file("BUILD", "")
     repository_ctx.file(

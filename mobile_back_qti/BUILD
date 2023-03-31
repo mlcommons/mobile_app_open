@@ -26,13 +26,13 @@ config_setting(
 )
 
 cc_import(
-  name = "snpewindowslib",
-  hdrs = glob([
-    SNPE_VERSION + "/include/zdl/**/*.hpp",
-    SNPE_VERSION + "/include/zdl/**/*.h",
-  ]),
-  interface_library = SNPE_VERSION + "/lib/aarch64-windows-vc19/SNPE.lib",
-  shared_library = SNPE_VERSION + "/lib/aarch64-windows-vc19/SNPE.dll",
+    name = "snpewindowslib",
+    hdrs = glob([
+        SNPE_VERSION + "/include/zdl/**/*.hpp",
+        SNPE_VERSION + "/include/zdl/**/*.h",
+    ]),
+    interface_library = SNPE_VERSION + "/lib/aarch64-windows-vc19/SNPE.lib",
+    shared_library = SNPE_VERSION + "/lib/aarch64-windows-vc19/SNPE.dll",
 )
 
 cc_library(
@@ -42,8 +42,8 @@ cc_library(
         SNPE_VERSION + "/lib/aarch64-windows-vc19/SnpeHtpV68Stub.dll",
         SNPE_VERSION + "/lib/dsp/libSnpeHtpV68Skel.so",
     ],
-    deps = [":snpewindowslib",],
     linkstatic = 0,
+    deps = [":snpewindowslib"],
 )
 
 cc_library(
@@ -103,9 +103,9 @@ cc_library(
             "//mobile_back_qti/cpp/backend_qti:libqtibackend.dll",
         ],
     }),
-    deps = [
-        ":snpewindowslib",
-        ":snpe_depsdll",
-        ],
     linkstatic = 0,
+    deps = [
+        ":snpe_depsdll",
+        ":snpewindowslib",
+    ],
 )
