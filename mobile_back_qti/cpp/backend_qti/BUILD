@@ -125,10 +125,10 @@ cc_library(
     ],
     hdrs = [
         "cpuctrl.h",
-        "tflite_c.h",
-        "qti_backend_helper.h",
         "mlperf_helper.h",
+        "qti_backend_helper.h",
         "soc_utility.h",
+        "tflite_c.h",
     ] + select({
         "android_arm64": [],
         "windows_arm64": [
@@ -143,16 +143,16 @@ cc_library(
                         "//conditions:default": [],
                     }),
     deps = [
-        "//flutter/cpp/c:headers",
         ":qti_allocator",
         ":qti_settings",
+        "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ] + select({
         "android_arm64": [
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
+            "//mobile_back_qti:snpe",
             "@org_tensorflow//tensorflow/lite/c:c_api",
             "@org_tensorflow//tensorflow/lite/c:common",
-            "//mobile_back_qti:snpe",
+            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
         ],
         "windows_arm64": [
             "//mobile_back_qti:snpewindowslib",
