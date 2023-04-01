@@ -90,29 +90,33 @@ class _ConfigScreen extends State<ConfigScreen> {
   }
 
   Widget _delegateChoice(Benchmark benchmark) {
-    if (benchmark.benchmarkSettings.delegateChoice.isEmpty) {
+    final selected = benchmark.benchmarkSettings.delegateSelected;
+    final choices = benchmark.benchmarkSettings.delegateChoice;
+    if (choices.isEmpty) {
       return const SizedBox();
-    } else {
-      final dropDownButton = DropdownButton<String>(
-          underline: const SizedBox(),
-          value: benchmark.benchmarkSettings.delegateSelected,
-          items: benchmark.benchmarkSettings.delegateChoice
-              .map((item) => DropdownMenuItem<String>(
-                    value: item,
-                    child: Text(item),
-                  ))
-              .toList(),
-          onChanged: (value) => setState(() {
-                benchmark.benchmarkSettings.delegateSelected = value!;
-              }));
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const Text('Delegate:'),
-          const SizedBox(width: 4),
-          dropDownButton,
-        ],
-      );
     }
+    if (!choices.contains(selected)) {
+      throw 'delegate_selected=$selected must be one of delegate_choice=$choices';
+    }
+    final dropDownButton = DropdownButton<String>(
+        underline: const SizedBox(),
+        value: selected,
+        items: choices
+            .map((item) => DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(item),
+                ))
+            .toList(),
+        onChanged: (value) => setState(() {
+              benchmark.benchmarkSettings.delegateSelected = value!;
+            }));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const Text('Delegate:'),
+        const SizedBox(width: 4),
+        dropDownButton,
+      ],
+    );
   }
 }
