@@ -29,7 +29,7 @@ common_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification"
-  accelerator: "neuron"
+  accelerator: "neuron-mdla"
   accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
   framework: "TFLite"
   batch_size: 1
@@ -39,7 +39,7 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "neuron"
+  accelerator: "neuron-mdla"
   accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
   framework: "TFLite"
   batch_size: 256
@@ -59,12 +59,12 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
-  accelerator: "neuron"
+  accelerator: "neuron-no-ahwb"
   accelerator_desc: "MediaTek NN accelerator + VPU via the Neuron Delegate"
   framework: "TFLite"
   batch_size: 1
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_20200602.tflite"
-  model_checksum: "3a636c066ca2916e1858266857e96c72"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
+  model_checksum: "3944a2dee04a5f8a5fd016ac34c4d390"
 }
 
 benchmark_setting {
@@ -91,7 +91,7 @@ benchmark_setting {
   accelerator: "neuron"
   accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
   framework: "TFLite"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/sr_qat_full_int8/v3_0/tflite/edsr_f32b5_full_qint8.tflite"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_full_qint8.tflite"
   model_checksum: "18ce6df0e4603f4b4ee5d04193708d9c"
 }
 
