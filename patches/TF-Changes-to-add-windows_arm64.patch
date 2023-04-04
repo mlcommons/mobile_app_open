@@ -1,0 +1,1183 @@
+From 73810f11bd98f3f7dd59b67e769ab0e8ecebdf71 Mon Sep 17 00:00:00 2001
+From: Mohit Mundhra <quic_mmundhra@quicinc.com>
+Date: Fri, 2 Dec 2022 11:50:18 +0530
+Subject: [PATCH] Changes to compile MLPerf cmd line app
+
+---
+ tensorflow/BUILD                              |   4 +-
+ tensorflow/core/BUILD                         |  10 +-
+ tensorflow/core/lib/jpeg/BUILD                |   2 +-
+ tensorflow/core/platform/BUILD                |   2 +-
+ .../core/platform/default/build_config.bzl    |   6 +-
+ tensorflow/core/platform/default/env_time.cc  |   7 +-
+ tensorflow/core/platform/default/port.cc      |   2 +-
+ .../core/platform/profile_utils/cpu_utils.h   |   2 +-
+ tensorflow/lite/BUILD                         |   4 +-
+ tensorflow/lite/build_def.bzl                 |  11 +-
+ tensorflow/lite/delegates/nnapi/BUILD         |   6 +-
+ tensorflow/lite/kernels/internal/BUILD        |  12 +-
+ tensorflow/lite/special_rules.bzl             |   4 +-
+ tensorflow/tensorflow.bzl                     |  54 ++++----
+ tensorflow/tools/proto_text/BUILD             |   2 +-
+ tensorflow/workspace2.bzl                     |   4 +
+ third_party/clog/clog.BUILD                   |   6 +
+ third_party/double_conversion.BUILD           |   6 +
+ ..._conversion_change_for_windows_arm64.patch |  25 ++++
+ third_party/farmhash/farmhash.BUILD           |   2 +-
+ third_party/gif_fix_strtok_r.patch            |  12 ++
+ third_party/jpeg/jpeg.BUILD                   |   9 ++
+ third_party/mkl/build_defs.bzl                |   4 +-
+ ...threadpool_changes_for_windows_arm64.patch |  53 ++++++++
+ third_party/snappy.BUILD                      |  10 +-
+ .../nsync_changes_for_windows_arm64.patch     | 118 ++++++++++++++++++
+ ...xnnpack_changes-to-add-windows_arm64.patch |  89 +++++++++++++
+ third_party/zlib.BUILD                        |   2 +-
+ 28 files changed, 393 insertions(+), 75 deletions(-)
+ create mode 100644 third_party/double_conversion_change_for_windows_arm64.patch
+ create mode 100644 third_party/pthreadpool_changes_for_windows_arm64.patch
+ create mode 100644 third_party/systemlibs/nsync_changes_for_windows_arm64.patch
+ create mode 100644 third_party/xnnpack_changes-to-add-windows_arm64.patch
+
+diff --git a/tensorflow/BUILD b/tensorflow/BUILD
+index fcaecb415a8..ac5a84a8b07 100644
+--- a/tensorflow/BUILD
++++ b/tensorflow/BUILD
+@@ -242,7 +242,7 @@ config_setting(
+ )
+ 
+ config_setting(
+-    name = "windows",
++    name = "windows_arm64",
+     # Internal builds query the target OS.
+     flag_values = if_google(
+         {"//tools/cpp:cc_target_os": "windows"},
+@@ -250,7 +250,7 @@ config_setting(
+     ),
+     # OSS builds query the CPU type.
+     values = if_oss(
+-        {"cpu": "x64_windows"},
++        {"cpu": "x64_arm64_windows"},
+         {},
+     ),
+     visibility = ["//visibility:public"],
+diff --git a/tensorflow/core/BUILD b/tensorflow/core/BUILD
+index 0e849d54ee3..e633ddc28ea 100644
+--- a/tensorflow/core/BUILD
++++ b/tensorflow/core/BUILD
+@@ -394,7 +394,7 @@ cc_library(
+     ],
+     copts = tf_copts(),
+     linkopts = select({
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//conditions:default": ["-lm"],
+     }),
+     visibility = ["//visibility:public"],
+@@ -1280,7 +1280,7 @@ cc_library(
+     copts = tf_copts(),
+     linkopts = select({
+         "//tensorflow:freebsd": [],
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//tensorflow:android": [],
+         "//conditions:default": [
+             "-ldl",
+@@ -1305,7 +1305,7 @@ cc_library(
+     copts = tf_copts(),
+     linkopts = select({
+         "//tensorflow:freebsd": [],
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//tensorflow:android": [],
+         "//conditions:default": [
+             "-ldl",
+@@ -1516,7 +1516,7 @@ cc_library(
+     copts = tf_copts(),
+     linkopts = select({
+         "//tensorflow:freebsd": [],
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//conditions:default": [
+             "-ldl",
+         ],
+@@ -1651,7 +1651,7 @@ tf_cuda_library(
+     copts = tf_copts(),
+     linkopts = select({
+         "//tensorflow:freebsd": ["-lm"],
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//conditions:default": [
+             "-ldl",
+             "-lm",
+diff --git a/tensorflow/core/lib/jpeg/BUILD b/tensorflow/core/lib/jpeg/BUILD
+index e1b249cffc4..7426cb687a1 100644
+--- a/tensorflow/core/lib/jpeg/BUILD
++++ b/tensorflow/core/lib/jpeg/BUILD
+@@ -33,7 +33,7 @@ cc_library(
+     copts = tf_copts(),
+     linkopts = select({
+         "//tensorflow:freebsd": [],
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//conditions:default": ["-ldl"],
+     }),
+     deps = [
+diff --git a/tensorflow/core/platform/BUILD b/tensorflow/core/platform/BUILD
+index c9d6d8779c4..0a16cc0f716 100644
+--- a/tensorflow/core/platform/BUILD
++++ b/tensorflow/core/platform/BUILD
+@@ -1110,7 +1110,7 @@ cc_library(
+     srcs = ["test_main.cc"],
+     copts = tf_copts(),
+     linkopts = select({
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//conditions:default": ["-lm"],
+     }),
+     deps = [
+diff --git a/tensorflow/core/platform/default/build_config.bzl b/tensorflow/core/platform/default/build_config.bzl
+index aac2a269e33..c51bba481f3 100644
+--- a/tensorflow/core/platform/default/build_config.bzl
++++ b/tensorflow/core/platform/default/build_config.bzl
+@@ -572,7 +572,7 @@ def tf_additional_lib_hdrs():
+         "//tensorflow/core/platform/default:tracing_impl.h",
+         "//tensorflow/core/platform/default:unbounded_work_queue.h",
+     ] + select({
+-        "//tensorflow:windows": [
++        "//tensorflow:windows_arm64": [
+             "//tensorflow/core/platform/windows:intrinsics_port.h",
+             "//tensorflow/core/platform/windows:stacktrace.h",
+             "//tensorflow/core/platform/windows:subprocess.h",
+@@ -737,11 +737,11 @@ def tf_protobuf_compiler_deps():
+ 
+ def tf_windows_aware_platform_deps(name):
+     return select({
+-        "//tensorflow:windows": [
++        "//tensorflow:windows_arm64": [
+             "//tensorflow/core/platform/windows:" + name,
+         ],
+         "//conditions:default": [
+-            "//tensorflow/core/platform/default:" + name,
++            "//tensorflow/core/platform/windows:" + name,
+         ],
+     })
+ 
+diff --git a/tensorflow/core/platform/default/env_time.cc b/tensorflow/core/platform/default/env_time.cc
+index 8618fe84781..2d6df153ba3 100644
+--- a/tensorflow/core/platform/default/env_time.cc
++++ b/tensorflow/core/platform/default/env_time.cc
+@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
+ limitations under the License.
+ ==============================================================================*/
+ 
+-#include <sys/time.h>
++//#include <sys/time.h>
+ #include <time.h>
+ 
+ #include "tensorflow/core/platform/env_time.h"
+@@ -24,8 +24,9 @@ namespace tensorflow {
+ uint64 EnvTime::NowNanos() {
+   struct timespec ts;
+   clock_gettime(CLOCK_REALTIME, &ts);
+-  return (static_cast<uint64>(ts.tv_sec) * kSecondsToNanos +
+-          static_cast<uint64>(ts.tv_nsec));
++  //return (static_cast<uint64>(ts.tv_sec) * kSecondsToNanos +
++  //        static_cast<uint64>(ts.tv_nsec));
++  return 0;
+ }
+ 
+ }  // namespace tensorflow
+diff --git a/tensorflow/core/platform/default/port.cc b/tensorflow/core/platform/default/port.cc
+index ae385cebda4..9c0267a5ded 100644
+--- a/tensorflow/core/platform/default/port.cc
++++ b/tensorflow/core/platform/default/port.cc
+@@ -26,7 +26,7 @@ limitations under the License.
+ #include <sched.h>
+ #include <sys/sysinfo.h>
+ #else
+-#include <sys/syscall.h>
++//#include <sys/syscall.h>
+ #endif
+ 
+ #if (__x86_64__ || __i386__)
+diff --git a/tensorflow/core/platform/profile_utils/cpu_utils.h b/tensorflow/core/platform/profile_utils/cpu_utils.h
+index 2586eefceac..639e44ee8af 100644
+--- a/tensorflow/core/platform/profile_utils/cpu_utils.h
++++ b/tensorflow/core/platform/profile_utils/cpu_utils.h
+@@ -60,7 +60,7 @@ class CpuUtils {
+     return GetCpuUtilsHelperSingletonInstance().GetCurrentClockCycle();
+ // ----------------------------------------------------------------
+ #elif defined(_WIN32)
+-    return __rdtsc();
++    return 0; // __rdtsc();
+ // ----------------------------------------------------------------
+ #elif defined(__x86_64__) || defined(__amd64__)
+     uint64_t high, low;
+diff --git a/tensorflow/lite/BUILD b/tensorflow/lite/BUILD
+index 198f949b341..cca00121a39 100644
+--- a/tensorflow/lite/BUILD
++++ b/tensorflow/lite/BUILD
+@@ -279,7 +279,7 @@ cc_library(
+         "//tensorflow:android": [
+             "mmap_allocation.cc",
+         ],
+-        "//tensorflow:windows": [
++        "//tensorflow:windows_arm64": [
+             "mmap_allocation_disabled.cc",
+         ],
+         "//conditions:default": [
+@@ -1184,7 +1184,7 @@ tflite_cc_shared_object(
+         "//tensorflow:macos": [
+             "-Wl,-exported_symbols_list,$(location //tensorflow/lite:tflite_exported_symbols.lds)",
+         ],
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//conditions:default": [
+             "-Wl,-z,defs",
+             "-Wl,--version-script,$(location //tensorflow/lite:tflite_version_script.lds)",
+diff --git a/tensorflow/lite/build_def.bzl b/tensorflow/lite/build_def.bzl
+index 4c8e946f607..fe718417187 100644
+--- a/tensorflow/lite/build_def.bzl
++++ b/tensorflow/lite/build_def.bzl
+@@ -23,12 +23,11 @@ def tflite_copts():
+         clean_dep("//tensorflow:ios_x86_64"): [
+             "-msse4.1",
+         ],
+-        clean_dep("//tensorflow:windows"): [
++        clean_dep("//tensorflow:windows_arm64"): [
+             "/DTFL_COMPILE_LIBRARY",
+             "/wd4018",  # -Wno-sign-compare
+         ],
+         "//conditions:default": [
+-            "-Wno-sign-compare",
+         ],
+     }) + select({
+         clean_dep("//tensorflow:optimized"): ["-O3"],
+@@ -40,7 +39,7 @@ def tflite_copts():
+         ],
+         "//conditions:default": [],
+     }) + select({
+-        clean_dep("//tensorflow:windows"): [],
++        clean_dep("//tensorflow:windows_arm64"): [],
+         "//conditions:default": [
+             "-fno-exceptions",  # Exceptions are unused in TFLite.
+         ],
+@@ -54,7 +53,7 @@ def tflite_copts_warnings():
+     # TODO(b/155906820): Include with `tflite_copts()` after validating clients.
+ 
+     return select({
+-        clean_dep("//tensorflow:windows"): [
++        clean_dep("//tensorflow:windows_arm64"): [
+             # We run into trouble on Windows toolchains with warning flags,
+             # as mentioned in the comments below on each flag.
+             # We could be more aggressive in enabling supported warnings on each
+@@ -170,7 +169,7 @@ def tflite_jni_binary(
+             "-Wl,-exported_symbols_list,$(location {})".format(exported_symbols),
+             "-Wl,-install_name,@rpath/" + name,
+         ],
+-        clean_dep("//tensorflow:windows"): [],
++        clean_dep("//tensorflow:windows_arm64"): [],
+         "//conditions:default": [
+             "-Wl,--version-script,$(location {})".format(linkscript),
+             "-Wl,-soname," + name,
+@@ -433,7 +432,7 @@ def tflite_custom_cc_library(
+         ],
+         copts = tflite_copts(),
+         linkopts = select({
+-            "//tensorflow:windows": [],
++            "//tensorflow:windows_arm64": [],
+             "//conditions:default": ["-lm", "-ldl"],
+         }),
+         deps = depset([
+diff --git a/tensorflow/lite/delegates/nnapi/BUILD b/tensorflow/lite/delegates/nnapi/BUILD
+index aeff8a9996d..ca1d8f1594f 100644
+--- a/tensorflow/lite/delegates/nnapi/BUILD
++++ b/tensorflow/lite/delegates/nnapi/BUILD
+@@ -16,7 +16,7 @@ cc_library(
+         "//tensorflow:ios": [
+             "nnapi_delegate_disabled.cc",
+         ],
+-        "//tensorflow:windows": [
++        "//tensorflow:windows_arm64": [
+             "nnapi_delegate_disabled.cc",
+         ],
+         "//conditions:default": [
+@@ -76,7 +76,7 @@ cc_library(
+         "//tensorflow:ios": [
+             "nnapi_delegate_disabled.cc",
+         ],
+-        "//tensorflow:windows": [
++        "//tensorflow:windows_arm64": [
+             "nnapi_delegate_disabled.cc",
+         ],
+         "//conditions:default": [
+@@ -138,7 +138,7 @@ cc_library(
+         "//tensorflow:ios": [
+             "-DNNAPI_DELEGATE_DISABLED",
+         ],
+-        "//tensorflow:windows": [
++        "//tensorflow:windows_arm64": [
+             "-DNNAPI_DELEGATE_DISABLED",
+         ],
+         "//conditions:default": [],
+diff --git a/tensorflow/lite/kernels/internal/BUILD b/tensorflow/lite/kernels/internal/BUILD
+index 3ee17f59d26..1973babd37c 100644
+--- a/tensorflow/lite/kernels/internal/BUILD
++++ b/tensorflow/lite/kernels/internal/BUILD
+@@ -206,7 +206,7 @@ config_setting(
+ )
+ 
+ config_setting(
+-    name = "windows",
++    name = "windows_arm64",
+     values = {
+         "cpu": "x64_windows",
+     },
+@@ -233,7 +233,7 @@ selects.config_setting_group(
+         ":darwin",
+         ":darwin_x86_64",
+         ":freebsd",
+-        ":windows",
++        ":windows_arm64",
+     ],
+ )
+ 
+@@ -401,7 +401,7 @@ cc_library(
+     compatible_with = get_compatible_with_portable(),
+     copts = tflite_copts(),
+     linkopts = select({
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//conditions:default": ["-lm"],
+     }),
+     deps = [
+@@ -434,7 +434,7 @@ cc_library(
+         "TFLITE_SINGLE_ROUNDING=1",
+     ],
+     linkopts = select({
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//conditions:default": ["-lm"],
+     }),
+     deps = [
+@@ -882,7 +882,7 @@ cc_library(
+     hdrs = ["test_util.h"],
+     copts = tflite_copts(),
+     linkopts = select({
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//conditions:default": ["-lm"],
+     }),
+     deps = [
+@@ -1106,7 +1106,7 @@ cc_test(
+     name = "log_quantized_test",
+     srcs = ["log_quantized_test.cc"],
+     linkopts = select({
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//conditions:default": ["-lm"],
+     }),
+     deps = [
+diff --git a/tensorflow/lite/special_rules.bzl b/tensorflow/lite/special_rules.bzl
+index 244b7c50d3e..b19eedf401f 100644
+--- a/tensorflow/lite/special_rules.bzl
++++ b/tensorflow/lite/special_rules.bzl
+@@ -85,9 +85,9 @@ def if_nnapi(supported, not_supported = [], supported_android = None):
+         clean_dep("//tensorflow:emscripten"): not_supported,
+         clean_dep("//tensorflow:ios"): not_supported,
+         clean_dep("//tensorflow:macos"): not_supported,
+-        clean_dep("//tensorflow:windows"): not_supported,
++        clean_dep("//tensorflow:windows_arm64"): not_supported,
+         clean_dep("//tensorflow:android"): supported_android,
+-        "//conditions:default": supported,
++        "//conditions:default": not_supported,
+     })
+ 
+ def tflite_hexagon_mobile_test(name):
+diff --git a/tensorflow/tensorflow.bzl b/tensorflow/tensorflow.bzl
+index 61490437ba4..51a09955feb 100644
+--- a/tensorflow/tensorflow.bzl
++++ b/tensorflow/tensorflow.bzl
+@@ -258,13 +258,13 @@ def if_not_mobile_or_arm_or_lgpl_restricted(a):
+ 
+ def if_not_windows(a):
+     return select({
+-        clean_dep("//tensorflow:windows"): [],
+-        "//conditions:default": a,
++        clean_dep("//tensorflow:windows_arm64"): [],
++        "//conditions:default": [],
+     })
+ 
+ def if_windows(a, otherwise = []):
+     return select({
+-        clean_dep("//tensorflow:windows"): a,
++        clean_dep("//tensorflow:windows_arm64"): a,
+         "//conditions:default": otherwise,
+     })
+ 
+@@ -289,7 +289,7 @@ def if_override_eigen_strong_inline(a):
+ def if_nccl(if_true, if_false = []):
+     return select({
+         "//tensorflow:no_nccl_support": if_false,
+-        "//tensorflow:windows": if_false,
++        "//tensorflow:windows_arm64": if_false,
+         "//conditions:default": if_true,
+     })
+ 
+@@ -402,7 +402,7 @@ def tf_copts(
+             clean_dep("//tensorflow:android"): android_copts,
+             clean_dep("//tensorflow:emscripten"): [],
+             clean_dep("//tensorflow:macos"): [],
+-            clean_dep("//tensorflow:windows"): get_win_copts(is_external),
++            clean_dep("//tensorflow:windows_arm64"): get_win_copts(is_external),
+             clean_dep("//tensorflow:ios"): [],
+             clean_dep("//tensorflow:no_lgpl_deps"): ["-D__TENSORFLOW_NO_LGPL_DEPS__", "-pthread"],
+             "//conditions:default": ["-pthread"],
+@@ -526,7 +526,7 @@ def _rpath_linkopts(name):
+             "-Wl,%s" % (_make_search_paths("@loader_path", levels_to_root),),
+             "-Wl,-rename_section,__TEXT,text_env,__TEXT,__text",
+         ],
+-        clean_dep("//tensorflow:windows"): [],
++        clean_dep("//tensorflow:windows_arm64"): [],
+         "//conditions:default": [
+             "-Wl,%s" % (_make_search_paths("$$ORIGIN", levels_to_root),),
+         ],
+@@ -546,7 +546,7 @@ def _rpath_user_link_flags(name):
+             "-Wl,%s" % (_make_search_paths("@loader_path", levels_to_root),),
+             "-Wl,-rename_section,__TEXT,text_env,__TEXT,__text",
+         ],
+-        clean_dep("//tensorflow:windows"): [],
++        clean_dep("//tensorflow:windows_arm64"): [],
+         "//conditions:default": [
+             "-Wl,%s" % (_make_search_paths("$ORIGIN", levels_to_root),),
+         ],
+@@ -592,7 +592,7 @@ def tf_binary_pybind_deps():
+                 "//tensorflow/python:_pywrap_tensorflow_internal_macos",
+             ),
+         ],
+-        clean_dep("//tensorflow:windows"): [
++        clean_dep("//tensorflow:windows_arm64"): [
+             clean_dep(
+                 "//tensorflow/python:_pywrap_tensorflow_internal_windows",
+             ),
+@@ -613,7 +613,7 @@ def tf_shared_library_deps():
+             clean_dep("//tensorflow:libtensorflow.%s.dylib" % VERSION),
+         ],
+         clean_dep("//tensorflow:macos"): [],
+-        clean_dep("//tensorflow:windows"): [
++        clean_dep("//tensorflow:windows_arm64"): [
+             clean_dep("//tensorflow:tensorflow.dll"),
+             clean_dep("//tensorflow:tensorflow_dll_import_lib"),
+         ],
+@@ -732,7 +732,7 @@ def tf_cc_shared_object(
+                 clean_dep("//tensorflow:macos"): [
+                     "-Wl,-install_name,@rpath/" + soname,
+                 ],
+-                clean_dep("//tensorflow:windows"): [],
++                clean_dep("//tensorflow:windows_arm64"): [],
+                 "//conditions:default": [
+                     "-Wl,-soname," + soname,
+                 ],
+@@ -746,7 +746,7 @@ def tf_cc_shared_object(
+         native.filegroup(
+             name = name,
+             srcs = select({
+-                clean_dep("//tensorflow:windows"): [":%s.dll" % (name)],
++                clean_dep("//tensorflow:windows_arm64"): [":%s.dll" % (name)],
+                 clean_dep("//tensorflow:macos"): [":lib%s%s.dylib" % (name, longsuffix)],
+                 "//conditions:default": [":lib%s.so%s" % (name, longsuffix)],
+             }),
+@@ -831,7 +831,7 @@ def tf_cc_shared_library(
+                 clean_dep("//tensorflow:macos"): [
+                     "-Wl,-install_name,@rpath/" + soname,
+                 ],
+-                clean_dep("//tensorflow:windows"): [
++                clean_dep("//tensorflow:windows_arm64"): [
+                     "/DEF:$(location :%s)" % win_def_file,
+                     "/ignore:4070",
+                 ] if win_def_file else [],
+@@ -874,7 +874,7 @@ def tf_cc_shared_library(
+         native.filegroup(
+             name = name,
+             srcs = select({
+-                clean_dep("//tensorflow:windows"): [":%s.dll" % (name)],
++                clean_dep("//tensorflow:windows_arm64"): [":%s.dll" % (name)],
+                 clean_dep("//tensorflow:macos"): [":lib%s%s.dylib" % (name, longsuffix)],
+                 "//conditions:default": [":lib%s.so%s" % (name, longsuffix)],
+             }),
+@@ -931,7 +931,7 @@ def tf_cc_binary(
+         native.filegroup(
+             name = name,
+             srcs = select({
+-                "//tensorflow:windows": [":%s.dll" % name],
++                "//tensorflow:windows_arm64": [":%s.dll" % name],
+                 "//tensorflow:macos": [":lib%s.dylib" % name],
+                 "//conditions:default": [":lib%s.so" % name],
+             }),
+@@ -955,7 +955,7 @@ def tf_native_cc_binary(
+         name = name,
+         copts = copts,
+         linkopts = select({
+-            clean_dep("//tensorflow:windows"): [],
++            clean_dep("//tensorflow:windows_arm64"): [],
+             clean_dep("//tensorflow:macos"): [
+                 "-lm",
+             ],
+@@ -995,7 +995,7 @@ def tf_native_cc_shared_library(
+         data = data,
+         shared_lib_name = name,
+         user_link_flags = select({
+-            clean_dep("//tensorflow:windows"): [],
++            clean_dep("//tensorflow:windows_arm64"): [],
+             clean_dep("//tensorflow:macos"): [
+                 "-lm",
+             ],
+@@ -1345,7 +1345,7 @@ def tf_cc_test(
+             clean_dep("//tensorflow:android"): [
+                 "-pie",
+             ],
+-            clean_dep("//tensorflow:windows"): [],
++            clean_dep("//tensorflow:windows_arm64"): [],
+             clean_dep("//tensorflow:macos"): [
+                 "-lm",
+             ],
+@@ -1565,7 +1565,7 @@ def tf_cc_test_mkl(
+                 clean_dep("//tensorflow:android"): [
+                     "-pie",
+                 ],
+-                clean_dep("//tensorflow:windows"): [],
++                clean_dep("//tensorflow:windows_arm64"): [],
+                 "//conditions:default": [
+                     "-lpthread",
+                     "-lm",
+@@ -2154,7 +2154,7 @@ def tf_custom_op_library(name, srcs = [], gpu_srcs = [], deps = [], linkopts = [
+             "//conditions:default": [
+                 "-lm",
+             ],
+-            clean_dep("//tensorflow:windows"): [],
++            clean_dep("//tensorflow:windows_arm64"): [],
+             clean_dep("//tensorflow:macos"): [],
+         }),
+         **kwargs
+@@ -2293,14 +2293,14 @@ def pywrap_tensorflow_macro(
+             "-Wl,-w",
+             "-Wl,-exported_symbols_list,$(location %s.lds)" % vscriptname,
+         ],
+-        clean_dep("//tensorflow:windows"): [],
++        clean_dep("//tensorflow:windows_arm64"): [],
+         "//conditions:default": [
+             "-Wl,--version-script",
+             "$(location %s.lds)" % vscriptname,
+         ],
+     })
+     extra_deps += select({
+-        clean_dep("//tensorflow:windows"): [],
++        clean_dep("//tensorflow:windows_arm64"): [],
+         "//conditions:default": [
+             "%s.lds" % vscriptname,
+         ],
+@@ -2378,7 +2378,7 @@ def pywrap_tensorflow_macro(
+         srcs = [":" + name + ".py"],
+         srcs_version = "PY3",
+         data = select({
+-            clean_dep("//tensorflow:windows"): [":" + cc_library_pyd_name],
++            clean_dep("//tensorflow:windows_arm64"): [":" + cc_library_pyd_name],
+             "//conditions:default": [":" + cc_library_name],
+         }),
+     )
+@@ -2945,7 +2945,7 @@ def pybind_extension(
+                 "-fno-strict-aliasing",
+                 "-fexceptions",
+             ] + select({
+-                clean_dep("//tensorflow:windows"): [],
++                clean_dep("//tensorflow:windows_arm64"): [],
+                 "//conditions:default": [
+                     "-fvisibility=hidden",
+                 ],
+@@ -2957,7 +2957,7 @@ def pybind_extension(
+                     "-Wl,-w",
+                     "-Wl,-exported_symbols_list,$(location %s)" % exported_symbols_file,
+                 ],
+-                clean_dep("//tensorflow:windows"): [],
++                clean_dep("//tensorflow:windows_arm64"): [],
+                 "//conditions:default": [
+                     "-Wl,--version-script",
+                     "$(location %s)" % version_script_file,
+@@ -3001,7 +3001,7 @@ def pybind_extension(
+                 "-fno-strict-aliasing",
+                 "-fexceptions",
+             ] + select({
+-                clean_dep("//tensorflow:windows"): [],
++                clean_dep("//tensorflow:windows_arm64"): [],
+                 "//conditions:default": [
+                     "-fvisibility=hidden",
+                 ],
+@@ -3034,7 +3034,7 @@ def pybind_extension(
+                     "-Wl,-w",
+                     "-Wl,-exported_symbols_list,$(location %s)" % exported_symbols_file,
+                 ],
+-                clean_dep("//tensorflow:windows"): [],
++                clean_dep("//tensorflow:windows_arm64"): [],
+                 "//conditions:default": [
+                     "-Wl,--version-script",
+                     "$(location %s)" % version_script_file,
+@@ -3076,7 +3076,7 @@ def pybind_extension(
+     native.py_library(
+         name = name,
+         data = select({
+-            "@org_tensorflow//tensorflow:windows": [pyd_file],
++            "@org_tensorflow//tensorflow:windows_arm64": [pyd_file],
+             "//conditions:default": [so_file],
+         }) + pytype_srcs,
+         deps = pytype_deps,
+diff --git a/tensorflow/tools/proto_text/BUILD b/tensorflow/tools/proto_text/BUILD
+index 713a08f903f..c5f7b792018 100644
+--- a/tensorflow/tools/proto_text/BUILD
++++ b/tensorflow/tools/proto_text/BUILD
+@@ -47,7 +47,7 @@ cc_library(
+     hdrs = ["gen_proto_text_functions_lib.h"],
+     copts = if_ios(["-DGOOGLE_LOGGING"]),
+     linkopts = select({
+-        "//tensorflow:windows": [],
++        "//tensorflow:windows_arm64": [],
+         "//tensorflow:macos": [
+             "-lm",
+             "-lpthread",
+diff --git a/tensorflow/workspace2.bzl b/tensorflow/workspace2.bzl
+index 60deadb1962..47d21081dda 100644
+--- a/tensorflow/workspace2.bzl
++++ b/tensorflow/workspace2.bzl
+@@ -135,6 +135,7 @@ def _tf_repositories():
+     # LINT.IfChange
+     tf_http_archive(
+         name = "XNNPACK",
++		patch_file = ["//third_party:xnnpack_changes-to-add-windows_arm64.patch"],
+         sha256 = "8ce46328c9ac5f1b8359e5c4352a2bbafc39614eae7f647d32a6d43cb110ad01",
+         strip_prefix = "XNNPACK-113092317754c7dea47bfb3cb49c4f59c3c1fa10",
+         urls = tf_mirror_urls("https://github.com/google/XNNPACK/archive/113092317754c7dea47bfb3cb49c4f59c3c1fa10.zip"),
+@@ -150,6 +151,7 @@ def _tf_repositories():
+ 
+     tf_http_archive(
+         name = "pthreadpool",
++		patch_file = ["//third_party:pthreadpool_changes_for_windows_arm64.patch"],
+         sha256 = "b96413b10dd8edaa4f6c0a60c6cf5ef55eebeef78164d5d69294c8173457f0ec",
+         strip_prefix = "pthreadpool-b8374f80e42010941bda6c85b0e3f1a1bd77a1e0",
+         urls = tf_mirror_urls("https://github.com/Maratyszcza/pthreadpool/archive/b8374f80e42010941bda6c85b0e3f1a1bd77a1e0.zip"),
+@@ -467,6 +469,7 @@ def _tf_repositories():
+ 
+     tf_http_archive(
+         name = "nsync",
++        patch_file = ["//third_party/systemlibs:nsync_changes_for_windows_arm64.patch"],
+         sha256 = "caf32e6b3d478b78cff6c2ba009c3400f8251f646804bcb65465666a9cea93c4",
+         strip_prefix = "nsync-1.22.0",
+         system_build_file = "//third_party/systemlibs:nsync.BUILD",
+@@ -704,6 +707,7 @@ def _tf_repositories():
+ 
+     tf_http_archive(
+         name = "double_conversion",
++        patch_file = ["//third_party:double_conversion_change_for_windows_arm64.patch"],
+         build_file = "//third_party:double_conversion.BUILD",
+         sha256 = "2f7fbffac0d98d201ad0586f686034371a6d152ca67508ab611adc2386ad30de",
+         strip_prefix = "double-conversion-3992066a95b823efc8ccc1baf82a1cfc73f6e9b8",
+diff --git a/third_party/clog/clog.BUILD b/third_party/clog/clog.BUILD
+index e1d59304299..a9b76ca09b8 100644
+--- a/third_party/clog/clog.BUILD
++++ b/third_party/clog/clog.BUILD
+@@ -17,6 +17,7 @@ cc_library(
+     ],
+     copts = select({
+         ":windows": [],
++        ":windows_arm64": [],
+         "//conditions:default": ["-Wno-unused-result"],
+     }),
+     defines = select({
+@@ -46,6 +47,11 @@ config_setting(
+     values = {"cpu": "x64_windows"},
+ )
+ 
++config_setting(
++    name = "windows_arm64",
++    values = {"cpu": "x64_arm64_windows"},
++)
++
+ config_setting(
+     name = "macos_x86_64",
+     values = {
+diff --git a/third_party/double_conversion.BUILD b/third_party/double_conversion.BUILD
+index d875a1a2b5c..b06f50c4bee 100644
+--- a/third_party/double_conversion.BUILD
++++ b/third_party/double_conversion.BUILD
+@@ -9,6 +9,11 @@ config_setting(
+     values = {"cpu": "x64_windows"},
+ )
+ 
++config_setting(
++    name = "windows_arm64",
++    values = {"cpu": "x64_arm64_windows"},
++)
++
+ cc_library(
+     name = "double-conversion",
+     srcs = [
+@@ -36,6 +41,7 @@ cc_library(
+     includes = ["."],
+     linkopts = select({
+         ":windows": [],
++        ":windows_arm64": [],
+         "//conditions:default": ["-lm"],
+     }),
+     visibility = ["//visibility:public"],
+diff --git a/third_party/double_conversion_change_for_windows_arm64.patch b/third_party/double_conversion_change_for_windows_arm64.patch
+new file mode 100644
+index 00000000000..fa11d0152be
+--- /dev/null
++++ b/third_party/double_conversion_change_for_windows_arm64.patch
+@@ -0,0 +1,25 @@
++From 3b234d4a48995da9883fdbe8d778bf7726a59f54 Mon Sep 17 00:00:00 2001
++From: Mohit Mundhra <quic_mmundhra@quicinc.com>
++Date: Fri, 2 Dec 2022 16:39:44 +0530
++Subject: [PATCH] double_conversion_change_for_windows_arm64
++
++---
++ double-conversion/utils.h | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/double-conversion/utils.h b/double-conversion/utils.h
++index d2981ed..06a78b9 100644
++--- a/double-conversion/utils.h
+++++ b/double-conversion/utils.h
++@@ -89,7 +89,7 @@ inline void abort_noreturn() { abort(); }
++ #undef DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS
++ #endif  // _WIN32
++ #else
++-#error Target architecture was not detected as supported by Double-Conversion.
+++#undef DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS
++ #endif
++ 
++ #if defined(__GNUC__)
++-- 
++2.37.3
++
+diff --git a/third_party/farmhash/farmhash.BUILD b/third_party/farmhash/farmhash.BUILD
+index 4b8464684ae..7d8aabb8ccd 100644
+--- a/third_party/farmhash/farmhash.BUILD
++++ b/third_party/farmhash/farmhash.BUILD
+@@ -5,7 +5,7 @@ exports_files(["COPYING"])
+ config_setting(
+     name = "windows",
+     values = {
+-        "cpu": "x64_windows",
++        "cpu": "x64_arm64_windows",
+     },
+ )
+ 
+diff --git a/third_party/gif_fix_strtok_r.patch b/third_party/gif_fix_strtok_r.patch
+index c9c9c30c41f..88a225b7474 100644
+--- a/third_party/gif_fix_strtok_r.patch
++++ b/third_party/gif_fix_strtok_r.patch
+@@ -13,3 +13,15 @@ diff -r -u ./fixed_gif_font.c ./gif_font.c
+  /*****************************************************************************
+   Ascii 8 by 8 regular font - only first 128 characters are supported.
+  *****************************************************************************/
++ diff -r -u a/gif_hash.h b/gif_hash.h
++--- a/gif_hash.h	2022-12-02 16:17:25.324434984 +0530
+++++ b/gif_hash.h	2022-12-02 16:19:33.110906335 +0530
++@@ -9,7 +9,7 @@
++ #ifndef _GIF_HASH_H_
++ #define _GIF_HASH_H_
++
++-#include <unistd.h>
+++//#include <unistd.h>
++ #include <stdint.h>
++
++ #define HT_SIZE			8192	   /* 12bits = 4096 or twice as big! */
+\ No newline at end of file
+diff --git a/third_party/jpeg/jpeg.BUILD b/third_party/jpeg/jpeg.BUILD
+index cc17e06ff17..d2d85eda514 100644
+--- a/third_party/jpeg/jpeg.BUILD
++++ b/third_party/jpeg/jpeg.BUILD
+@@ -20,6 +20,7 @@ libjpegturbo_copts = select({
+         "-w",
+     ],
+     ":windows": WIN_COPTS,
++    ":windows_arm64": WIN_COPTS,
+     "//conditions:default": [
+         "-O3",
+         "-w",
+@@ -131,6 +132,7 @@ cc_library(
+         ":arm64-v8a": [":simd_armv8a"],
+         ":linux_ppc64le": [":simd_altivec"],
+         ":windows": [":simd_win_x86_64"],
++        ":windows_arm64": [":simd_none"],
+         "//conditions:default": [":simd_none"],
+     }),
+ )
+@@ -656,6 +658,7 @@ genrule(
+     outs = ["jconfig.h"],
+     cmd = select({
+         ":windows": "cp $(location jconfig_win.h) $@",
++        ":windows_arm64": "cp $(location jconfig_win.h) $@",
+         ":k8": "cp $(location jconfig_nowin_simd.h) $@",
+         ":armeabi-v7a": "cp $(location jconfig_nowin_simd.h) $@",
+         ":arm64-v8a": "cp $(location jconfig_nowin_simd.h) $@",
+@@ -673,6 +676,7 @@ genrule(
+     outs = ["jconfigint.h"],
+     cmd = select({
+         ":windows": "cp $(location jconfigint_win.h) $@",
++        ":windows_arm64": "cp $(location jconfigint_win.h) $@",
+         "//conditions:default": "cp $(location jconfigint_nowin.h) $@",
+     }),
+ )
+@@ -772,6 +776,11 @@ config_setting(
+     values = {"cpu": "x64_windows"},
+ )
+ 
++config_setting(
++    name = "windows_arm64",
++    values = {"cpu": "x64_arm64_windows"},
++)
++
+ config_setting(
+     name = "linux_ppc64le",
+     values = {"cpu": "ppc"},
+diff --git a/third_party/mkl/build_defs.bzl b/third_party/mkl/build_defs.bzl
+index 806b157bad6..1acf4b50929 100644
+--- a/third_party/mkl/build_defs.bzl
++++ b/third_party/mkl/build_defs.bzl
+@@ -34,7 +34,7 @@ def if_mkl(if_true, if_false = []):
+     return select({
+         "@org_tensorflow//third_party/mkl:build_with_mkl_aarch64": if_true,
+         "@org_tensorflow//tensorflow:linux_x86_64": if_true,
+-        "@org_tensorflow//tensorflow:windows": if_true,
++        "@org_tensorflow//tensorflow:windows_arm64": if_true,
+         "//conditions:default": if_false,
+     })
+ 
+@@ -103,7 +103,7 @@ def mkl_deps():
+     return select({
+         "@org_tensorflow//third_party/mkl:build_with_mkl_aarch64": ["@mkl_dnn_acl_compatible//:mkl_dnn_acl"],
+         "@org_tensorflow//tensorflow:linux_x86_64": ["@mkl_dnn_v1//:mkl_dnn"],
+-        "@org_tensorflow//tensorflow:windows": ["@mkl_dnn_v1//:mkl_dnn"],
++        "@org_tensorflow//tensorflow:windows_arm64": ["@mkl_dnn_v1//:mkl_dnn"],
+         "//conditions:default": [],
+     })
+ 
+diff --git a/third_party/pthreadpool_changes_for_windows_arm64.patch b/third_party/pthreadpool_changes_for_windows_arm64.patch
+new file mode 100644
+index 00000000000..c60afe71db1
+--- /dev/null
++++ b/third_party/pthreadpool_changes_for_windows_arm64.patch
+@@ -0,0 +1,53 @@
++From d359755287865b54f8fd96403c675b01b761b6f4 Mon Sep 17 00:00:00 2001
++From: Mohit Mundhra <quic_mmundhra@quicinc.com>
++Date: Fri, 2 Dec 2022 15:05:06 +0530
++Subject: [PATCH] changes_for_windows_arm64
++
++---
++ BUILD.bazel | 10 ++++++++++
++ 1 file changed, 10 insertions(+)
++
++diff --git a/BUILD.bazel b/BUILD.bazel
++index 40c5b9f..44dd5f7 100644
++--- a/BUILD.bazel
+++++ b/BUILD.bazel
++@@ -46,12 +46,14 @@ cc_library(
++         ":watchos": INTERNAL_HDRS + GCD_IMPL_SRCS,
++         ":tvos": INTERNAL_HDRS + GCD_IMPL_SRCS,
++         ":windows_x86_64": INTERNAL_HDRS + WINDOWS_IMPL_SRCS,
+++        ":windows_arm64": INTERNAL_HDRS + WINDOWS_IMPL_SRCS,
++         "//conditions:default": INTERNAL_HDRS + PTHREADS_IMPL_SRCS,
++     }) + select({
++         ":linux_x86_64": ARCH_SPECIFIC_SRCS,
++         ":android_x86": ARCH_SPECIFIC_SRCS,
++         ":android_x86_64": ARCH_SPECIFIC_SRCS,
++         ":windows_x86_64": ARCH_SPECIFIC_SRCS,
+++        ":windows_arm64": ARCH_SPECIFIC_SRCS,
++         ":macos_x86": ARCH_SPECIFIC_SRCS,
++         ":macos_x86_64": ARCH_SPECIFIC_SRCS,
++         ":macos_arm64": ARCH_SPECIFIC_SRCS,
++@@ -107,6 +109,7 @@ cc_library(
++         ":android_x86": ["-DPTHREADPOOL_USE_FASTPATH=1"],
++         ":android_x86_64": ["-DPTHREADPOOL_USE_FASTPATH=1"],
++         ":windows_x86_64": ["-DPTHREADPOOL_USE_FASTPATH=1"],
+++        ":windows_arm64": ["-DPTHREADPOOL_USE_FASTPATH=1"],
++         ":macos_x86": ["-DPTHREADPOOL_USE_FASTPATH=1"],
++         ":macos_x86_64": ["-DPTHREADPOOL_USE_FASTPATH=1"],
++         ":macos_arm64": ["-DPTHREADPOOL_USE_FASTPATH=1"],
++@@ -401,6 +404,13 @@ config_setting(
++     },
++ )
++ 
+++config_setting(
+++    name = "windows_arm64",
+++    values = {
+++        "cpu": "x64_arm64_windows",
+++    },
+++)
+++
++ config_setting(
++     name = "emscripten",
++     values = {
++-- 
++2.37.3
++
+diff --git a/third_party/snappy.BUILD b/third_party/snappy.BUILD
+index a2ab4924f29..cbf987bbe16 100644
+--- a/third_party/snappy.BUILD
++++ b/third_party/snappy.BUILD
+@@ -19,17 +19,13 @@ cc_library(
+     ],
+     hdrs = ["snappy.h"],
+     copts = ["-DHAVE_CONFIG_H"] + select({
+-        "@org_tensorflow//tensorflow:windows": [],
++        "@org_tensorflow//tensorflow:windows_arm64": [],
+         "//conditions:default": [
+-            "-fno-exceptions",
+-            "-Wno-sign-compare",
+-            "-Wno-shift-negative-value",
+-            "-Wno-implicit-function-declaration",
+         ],
+     }),
+     defines = select({
+-        "@org_tensorflow//tensorflow:windows": [],
+-        "//conditions:default": ["HAVE_SYS_UIO_H"],
++        "@org_tensorflow//tensorflow:windows_arm64": [],
++        "//conditions:default": [],
+     }),
+ )
+ 
+diff --git a/third_party/systemlibs/nsync_changes_for_windows_arm64.patch b/third_party/systemlibs/nsync_changes_for_windows_arm64.patch
+new file mode 100644
+index 00000000000..702ed88a0f5
+--- /dev/null
++++ b/third_party/systemlibs/nsync_changes_for_windows_arm64.patch
+@@ -0,0 +1,118 @@
++From 63aa235923a297f8c6198d59e5775a762410e8b8 Mon Sep 17 00:00:00 2001
++From: Mohit Mundhra <quic_mmundhra@quicinc.com>
++Date: Fri, 2 Dec 2022 15:37:33 +0530
++Subject: [PATCH] changes_for_windows_arm64
++
++---
++ BUILD | 27 +++++++++++++++++++++++++++
++ 1 file changed, 27 insertions(+)
++
++diff --git a/BUILD b/BUILD
++index 8b99116..9b18cc6 100644
++--- a/BUILD
+++++ b/BUILD
++@@ -91,6 +91,11 @@ config_setting(
++     values = {"cpu": "x64_windows"},
++ )
++ 
+++config_setting(
+++    name = "msvc_windows_arm64",
+++    values = {"cpu": "x64_arm64_windows"},
+++)
+++
++ config_setting(
++     name = "freebsd",
++     values = {"cpu": "freebsd"},
++@@ -126,6 +131,7 @@ NSYNC_OPTS_GENERIC = select({
++     ":android_arm": ["-I" + pkg_path_name() + "/platform/arm"],
++     ":android_arm64": ["-I" + pkg_path_name() + "/platform/aarch64"],
++     ":msvc_windows_x86_64": ["-I" + pkg_path_name() + "/platform/x86_64"],
+++    ":msvc_windows_arm64": ["-I" + pkg_path_name() + "/platform/aarch64"],
++     "//conditions:default": [],
++ }) + [
++     "-I" + pkg_path_name() + "/public",
++@@ -134,6 +140,8 @@ NSYNC_OPTS_GENERIC = select({
++ ] + select({
++     ":msvc_windows_x86_64": [
++     ],
+++    ":msvc_windows_arm64": [
+++    ],
++     ":freebsd": ["-pthread"],
++     "//conditions:default": [
++         "-D_POSIX_C_SOURCE=200809L",
++@@ -159,6 +167,7 @@ NSYNC_OPTS = select({
++     ":android_arm": ["-I" + pkg_path_name() + "/platform/linux"],
++     ":android_arm64": ["-I" + pkg_path_name() + "/platform/linux"],
++     ":msvc_windows_x86_64": ["-I" + pkg_path_name() + "/platform/win32"],
+++    ":msvc_windows_arm64": ["-I" + pkg_path_name() + "/platform/win32"],
++     "//conditions:default": [],
++ }) + select({
++     # Select the compiler include directory.
++@@ -177,6 +186,7 @@ NSYNC_OPTS = select({
++     ":android_arm": ["-I" + pkg_path_name() + "/platform/gcc"],
++     ":android_arm64": ["-I" + pkg_path_name() + "/platform/gcc"],
++     ":msvc_windows_x86_64": ["-I" + pkg_path_name() + "/platform/msvc"],
+++    ":msvc_windows_arm64": ["-I" + pkg_path_name() + "/platform/msvc"],
++ }) + select({
++     # Apple deprecated their atomics library, yet recent versions have no
++     # working version of stdatomic.h; so some recent versions need one, and
++@@ -191,6 +201,9 @@ NSYNC_OPTS_CPP = select({
++     ":msvc_windows_x86_64": [
++         "/TP",
++     ],
+++    ":msvc_windows_arm64": [
+++        "/TP",
+++    ],
++     "//conditions:default": [
++         "-x",
++         "c++",
++@@ -222,18 +235,24 @@ NSYNC_OPTS_CPP = select({
++         "-I" + pkg_path_name() + "/platform/win32",
++         "-I" + pkg_path_name() + "/platform/msvc",
++     ],
+++    ":msvc_windows_arm64": [
+++        "-I" + pkg_path_name() + "/platform/win32",
+++        "-I" + pkg_path_name() + "/platform/msvc",
+++    ],
++     "//conditions:default": ["-I" + pkg_path_name() + "/platform/gcc"],
++ }) + NSYNC_OPTS_GENERIC
++ 
++ # Link options (for tests) built in C (rather than C++11).
++ NSYNC_LINK_OPTS = select({
++     ":msvc_windows_x86_64": [],
+++    ":msvc_windows_arm64": [],
++     "//conditions:default": ["-pthread"],
++ })
++ 
++ # Link options (for tests) built in C++11 (rather than C).
++ NSYNC_LINK_OPTS_CPP = select({
++     ":msvc_windows_x86_64": [],
+++    ":msvc_windows_arm64": [],
++     "//conditions:default": ["-pthread"],
++ })
++ 
++@@ -415,6 +434,13 @@ NSYNC_SRC_PLATFORM_CPP = [
++         "platform/win32/src/pthread_key_win32.cc",
++         "platform/win32/src/per_thread_waiter.c",
++     ],
+++    ":msvc_windows_arm64": [
+++        "platform/win32/src/clock_gettime.c",
+++        # Windows has no thread-specific data with thread-exit destructors; we
+++        # must emulate it with C++ per-thread class destructors.
+++        "platform/win32/src/pthread_key_win32.cc",
+++        "platform/win32/src/per_thread_waiter.c",
+++    ],
++     # It's dangerous to use C++ class destructors if we can avoid it, because
++     # nsync may be linked into the address space multiple times.
++     "//conditions:default": ["platform/posix/src/per_thread_waiter.c"],
++@@ -527,6 +553,7 @@ NSYNC_TEST_SRC_PLATFORM = select({
++     ":android_arm": NSYNC_TEST_SRC_ANDROID,
++     ":android_arm64": NSYNC_TEST_SRC_ANDROID,
++     ":msvc_windows_x86_64": NSYNC_TEST_SRC_WINDOWS,
+++    ":msvc_windows_arm64": NSYNC_TEST_SRC_WINDOWS,
++ })
++ 
++ # C++11-specific (OS and architecture independent) test library source.
++-- 
++2.37.3
++
+diff --git a/third_party/xnnpack_changes-to-add-windows_arm64.patch b/third_party/xnnpack_changes-to-add-windows_arm64.patch
+new file mode 100644
+index 00000000000..93eda4be06f
+--- /dev/null
++++ b/third_party/xnnpack_changes-to-add-windows_arm64.patch
+@@ -0,0 +1,89 @@
++From 52d1ad0fab2ac9627c521228417890b8f61cbdce Mon Sep 17 00:00:00 2001
++From: Mohit Mundhra <quic_mmundhra@quicinc.com>
++Date: Fri, 2 Dec 2022 14:15:54 +0530
++Subject: [PATCH] Changes to add windows_arm64
++
++---
++ BUILD.bazel    | 5 +++++
++ build_defs.bzl | 7 +++++++
++ 2 files changed, 12 insertions(+)
++
++diff --git a/BUILD.bazel b/BUILD.bazel
++index 12ba1f2d6..15eb1c04e 100644
++--- a/BUILD.bazel
+++++ b/BUILD.bazel
++@@ -11506,6 +11506,11 @@ config_setting(
++     values = {"cpu": "x64_windows"},
++ )
++ 
+++config_setting(
+++    name = "windows_arm64",
+++    values = {"cpu": "x64_arm64_windows"},
+++)
+++
++ config_setting(
++     name = "windows_x86_64_clang",
++     values = {
++diff --git a/build_defs.bzl b/build_defs.bzl
++index d79ad63ca..5b751c26b 100644
++--- a/build_defs.bzl
+++++ b/build_defs.bzl
++@@ -151,6 +151,7 @@ def xnnpack_cc_library(
++             ":windows_x86_64_mingw": x86_srcs,
++             ":windows_x86_64_msys": x86_srcs,
++             ":windows_x86_64": x86_srcs,
+++            ":windows_arm64": x86_srcs,
++             ":android_armv7": aarch32_srcs,
++             ":android_arm64": aarch64_srcs,
++             ":android_x86": x86_srcs,
++@@ -186,6 +187,7 @@ def xnnpack_cc_library(
++             ":windows_x86_64_mingw": mingw_copts + gcc_x86_copts,
++             ":windows_x86_64_msys": msys_copts + gcc_x86_copts,
++             ":windows_x86_64": msvc_x86_64_copts,
+++            ":windows_arm64": msvc_x86_64_copts,
++             ":android_armv7": aarch32_copts,
++             ":android_arm64": aarch64_copts,
++             ":android_x86": gcc_x86_copts,
++@@ -209,6 +211,7 @@ def xnnpack_cc_library(
++             ":windows_x86_64_mingw": gcc_copts,
++             ":windows_x86_64_msys": gcc_copts,
++             ":windows_x86_64": msvc_copts,
+++            ":windows_arm64": msvc_copts,
++             "//conditions:default": gcc_copts,
++         }) + select({
++             ":optimized_build": optimized_copts,
++@@ -270,6 +273,7 @@ def xnnpack_aggregate_library(
++             ":windows_x86_64_mingw": x86_deps,
++             ":windows_x86_64_msys": x86_deps,
++             ":windows_x86_64": x86_deps,
+++            ":windows_arm64": aarch64_deps,
++             ":android_armv7": aarch32_nonios_deps,
++             ":android_arm64": aarch64_deps,
++             ":android_x86": x86_deps,
++@@ -326,6 +330,7 @@ def xnnpack_unit_test(name, srcs, copts = [], mingw_copts = [], msys_copts = [],
++                 ":windows_x86_64_mingw": ["-Wno-unused-function"],
++                 ":windows_x86_64_msys": ["-Wno-unused-function"],
++                 ":windows_x86_64": [],
+++                ":windows_arm64": [],
++                 "//conditions:default": ["-Wno-unused-function"],
++             }) + copts,
++             linkopts = select({
++@@ -359,6 +364,7 @@ def xnnpack_unit_test(name, srcs, copts = [], mingw_copts = [], msys_copts = [],
++                 ":windows_x86_64_mingw": ["-Wno-unused-function"],
++                 ":windows_x86_64_msys": ["-Wno-unused-function"],
++                 ":windows_x86_64": [],
+++                ":windows_arm64": [],
++                 "//conditions:default": ["-Wno-unused-function"],
++             }) + copts,
++             linkopts = select({
++@@ -426,6 +432,7 @@ def xnnpack_benchmark(name, srcs, copts = [], deps = [], tags = []):
++             ":windows_x86_64_mingw": ["-Wno-unused-function"],
++             ":windows_x86_64_msys": ["-Wno-unused-function"],
++             ":windows_x86_64": [],
+++            ":windows_arm64": [],
++             "//conditions:default": ["-Wno-unused-function"],
++         }) + copts,
++         linkopts = select({
++-- 
++2.37.3
++
+diff --git a/third_party/zlib.BUILD b/third_party/zlib.BUILD
+index 33694eaaaed..22afe53f771 100644
+--- a/third_party/zlib.BUILD
++++ b/third_party/zlib.BUILD
+@@ -33,7 +33,7 @@ cc_library(
+     ],
+     hdrs = ["zlib.h"],
+     copts = select({
+-        "@org_tensorflow//tensorflow:windows": [],
++        "@org_tensorflow//tensorflow:windows_arm64": [],
+         "//conditions:default": [
+             "-Wno-shift-negative-value",
+             "-DZ_HAVE_UNISTD_H",
+-- 
+2.37.3
+

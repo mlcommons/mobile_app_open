@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,11 @@ config_setting(
     values = {"cpu": "arm64-v8a"},
 )
 
+config_setting(
+    name = "windows_arm64",
+    values = {"cpu": "x64_arm64_windows"},
+)
+
 string_flag(
     name = "with_qti",
     build_setting_default = "1",
@@ -55,16 +60,34 @@ snpe_copts = [
 ]
 
 cc_library(
+    name = "qti_settings",
+    srcs = [],
+    hdrs = [
+        "qti_settings.h",
+        "qti_settings_sd7g1.h",
+        "qti_settings_sd7pg2.h",
+        "qti_settings_sd8cxg3.h",
+        "qti_settings_sd8g1.h",
+        "qti_settings_sd8g2.h",
+        "qti_settings_sd8pg1.h",
+        "qti_settings_sdm778.h",
+        "qti_settings_sdm888.h",
+    ],
+)
+
+cc_library(
     name = "qti_rpcmem",
     srcs = ["rpcmem.cc"],
     hdrs = [
         "cpuctrl.h",
-        "qti_settings.h",
         "rpcmem.h",
         "soc_utility.h",
     ],
     copts = tflite_copts() + snpe_copts,
-    deps = ["@org_tensorflow//tensorflow/core:tflite_portable_logging"],
+    deps = [
+        ":qti_settings",
+        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
+    ],
     alwayslink = 1,
 )
 
@@ -93,24 +116,25 @@ cc_library(
 
 cc_library(
     name = "qti_c",
-    srcs = select({
-        "android_arm64": [
-            "qti_c.cc",
-            "cpuctrl.cc",
-            "tflite_c.cc",
-            "qti_backend_helper.cc",
-            "soc_utility.cc",
+    srcs = [
+        "cpuctrl.cc",
+        "qti_backend_helper.cc",
+        "qti_c.cc",
+        "soc_utility.cc",
+        "tflite_c.cc",
+    ],
+    hdrs = [
+        "cpuctrl.h",
+        "tflite_c.h",
+        "qti_backend_helper.h",
+        "mlperf_helper.h",
+        "soc_utility.h",
+    ] + select({
+        "android_arm64": [],
+        "windows_arm64": [
+            "acpitabl.h",
         ],
-    }),
-    hdrs = [] + select({
-        "android_arm64": [
-            "qti_settings.h",
-            "cpuctrl.h",
-            "tflite_c.h",
-            "qti_backend_helper.h",
-            "mlperf_helper.h",
-            "soc_utility.h",
-        ],
+        "//conditions:default": [],
     }),
     copts = tflite_copts() + snpe_copts,
     local_defines = ["SNPE_VERSION_STRING=" + SNPE_VERSION] +
@@ -121,14 +145,19 @@ cc_library(
     deps = [
         "//flutter/cpp/c:headers",
         ":qti_allocator",
+        ":qti_settings",
+        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ] + select({
         "android_arm64": [
+            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
             "@org_tensorflow//tensorflow/lite/c:c_api",
             "@org_tensorflow//tensorflow/lite/c:common",
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
-            "@org_tensorflow//tensorflow/core:tflite_portable_logging",
             "//mobile_back_qti:snpe",
         ],
+        "windows_arm64": [
+            "//mobile_back_qti:snpewindowslib",
+        ],
+        "//conditions:default": [],
     }),
     alwayslink = 1,
 )
@@ -136,6 +165,15 @@ cc_library(
 tflite_jni_binary(
     name = "libqtibackend.so",
     linkscript = "//flutter/cpp/c:version_script.lds",
+    deps = [
+        ":qti_c",
+    ],
+)
+
+cc_binary(
+    name = "libqtibackend.dll",
+    linkshared = 1,
+    win_def_file = "//flutter/cpp/c:dll_export.def",
     deps = [
         ":qti_c",
     ],

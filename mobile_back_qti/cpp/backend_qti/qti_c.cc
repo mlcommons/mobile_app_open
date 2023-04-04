@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -106,11 +106,13 @@ mlperf_backend_ptr_t mlperf_backend_create(
     backend_data->releaseBuffer_ = std_release_buffer;
   }
 
+#ifdef __ANDROID__
   std::stringstream adsp_lib_path;
   adsp_lib_path << native_lib_path << ";";
   adsp_lib_path << "/system/lib/rfsa/adsp;/system/vendor/lib/rfsa/adsp;/dsp";
   LOG(INFO) << "lib_path: " << adsp_lib_path.str();
   setenv("ADSP_LIBRARY_PATH", adsp_lib_path.str().c_str(), 1 /*override*/);
+#endif
   std::string snpe_version = xverstr(SNPE_VERSION_STRING);
   if (snpe_version.compare("default") != 0) {
     int dotPosition = snpe_version.find_last_of(".");
@@ -177,6 +179,8 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
 
 // Run the inference for a sample.
 mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+  mlperf_status_t ret = MLPERF_FAILURE;
+
 #ifdef DEBUG_FLAG
   auto start = high_resolution_clock::now();
 #endif
@@ -184,17 +188,9 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
   if (backend_data->isTflite_) {
     return tflite_backend_issue_query(backend_data->tfliteBackend_);
   }
-  if (!backend_data->useSnpe_) {
-    if (!backend_data->psnpe_->execute(backend_data->inputMap_,
-                                       backend_data->outputMap_)) {
-      return MLPERF_FAILURE;
-    }
-  } else {
-    if (!backend_data->snpe_->execute(backend_data->inputMap_[0],
-                                      backend_data->outputMap_[0])) {
-      return MLPERF_FAILURE;
-    }
-  }
+
+  ret = backend_data->execute();
+
 #ifdef DEBUG_FLAG
   auto end = high_resolution_clock::now();
   auto duration = duration_cast<microseconds>(end - start);
@@ -202,7 +198,7 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
             << "Inference Time(ms): " << duration.count();
 #endif
   backend_data->queryCount_++;
-  return MLPERF_SUCCESS;
+  return ret;
 }
 
 // Flush the staged queries immediately.
@@ -252,9 +248,12 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
   //   LOG(INFO) << "TESTING: Using " << batchedDataPtr << " instead of " <<
   //   data;
   // }
-  backend_data->inputMap_[batchIndex / backend_data->inputBatch_]
-      .getUserBuffer(backend_data->networkInputTensorNames_.at(i))
-      ->setBufferAddress(batchedDataPtr);
+  Snpe_IUserBuffer_SetBufferAddress(
+      Snpe_UserBufferMap_GetUserBuffer_Ref(
+          Snpe_UserBufferList_At_Ref(backend_data->inputMapListHandle_,
+                                     batchIndex / backend_data->inputBatch_),
+          Snpe_StringList_At(backend_data->networkInputTensorNamesHandle_, i)),
+      batchedDataPtr);
   return MLPERF_SUCCESS;
 }
 
@@ -288,28 +287,13 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
   if (backend_data->snpeOutputLayers_ ==
       "Postprocessor/BatchMultiClassNonMaxSuppression") {
     // Reorder snpeOutputLayers_ for coco process_output
-    std::unordered_map<int, std::string> mapIndexLayer;
-    mapIndexLayer[0] = "boxes";
-    mapIndexLayer[1] = "classes";
-    mapIndexLayer[2] = "scores";
-    mapIndexLayer[3] = "num_detections";
-    const char *outputLayerName;
-
-    for (int idx = 0; idx < backend_data->networkOutputTensorNames_.size();
-         idx++) {
-      if (strstr(backend_data->networkOutputTensorNames_.at(idx),
-                 mapIndexLayer[outputIndex].c_str())) {
-        // layer name found
-        outputLayerName = backend_data->networkOutputTensorNames_.at(idx);
-        break;
-      }
-    }
-
+    const char *outputLayerName = backend_data->odLayerMap[outputIndex].c_str();
     *data = backend_data->bufs_[batchIndex].at(outputLayerName).data();
     return MLPERF_SUCCESS;
   } else if (backend_data->snpeOutputLayers_ == "transpose") {
     *data = backend_data->bufs_[int(batchIndex / backend_data->inputBatch_)]
-                .at(backend_data->networkOutputTensorNames_.at(0))
+                .at(Snpe_StringList_At(
+                    backend_data->networkOutputTensorNamesHandle_, 0))
                 .data() +
             (1 - outputIndex) * 384 * sizeof(float);
     return MLPERF_SUCCESS;
@@ -322,7 +306,8 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
 
   *data =
       backend_data->bufs_[int(batchIndex / backend_data->inputBatch_)]
-          .at(backend_data->networkOutputTensorNames_.at(outputIndex))
+          .at(Snpe_StringList_At(backend_data->networkOutputTensorNamesHandle_,
+                                 outputIndex))
           .data() +
       (batchIndex % backend_data->inputBatch_) *
           int(backend_data->outputBatchBufsize_ / backend_data->inputBatch_) *

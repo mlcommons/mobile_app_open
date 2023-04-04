@@ -39,7 +39,6 @@ C_TARGS := $(patsubst $(C_SRC_DIR)/%.jpg,$(C_DEST_DIR)/%.jpg,$(C_SRC))
 S_DEST_DIR := ${BUILDDIR}/output/calibration_set/squad
 
 all: ${BUILDDIR}/output/state/datasets.stamp ${BUILDDIR}/output/state/calibration.stamp
-
 print-% : ; @echo $* = $($*)
 
 ${BUILDDIR}/output/state/datasets.stamp: ${BUILDDIR}/output/state/ade20k.stamp ${BUILDDIR}/output/state/coco.stamp \
@@ -47,7 +46,21 @@ ${BUILDDIR}/output/state/datasets.stamp: ${BUILDDIR}/output/state/ade20k.stamp $
 	touch $@
 
 ${BUILDDIR}/output/state/calibration.stamp: ${BUILDDIR}/output/state/ade20k_calibration.stamp ${BUILDDIR}/output/state/coco_calibration.stamp \
-			${BUILDDIR}/output/state/imagenet_calibration.stamp ${BUILDDIR}/output/state/squad_calibration.stamp
+			${BUILDDIR}/output/state/imagenet_calibration.stamp ${BUILDDIR}/output/state/squad_calibration.stamp ${BUILDDIR}/output/state/snusr_calibration.stamp
+	touch $@
+	
+snusr_calibration : ${BUILDDIR}/output/state/snusr_calibration.stamp
+
+${BUILDDIR}/output/state/snusr_calibration.stamp: ${BUILDDIR}/downloads/snusr/SNUSR.zip
+	mkdir -p ${BUILDDIR}/output/snusr
+	unzip $< -d ${BUILDDIR}/output/snusr
+	mkdir -p ${BUILDDIR}/output/state
+	touch $@
+
+${BUILDDIR}/downloads/snusr/SNUSR.zip: 
+	# Fetching SNUSR.zip
+	mkdir -p ${BUILDDIR}/downloads/snusr
+	curl -o $@ -L https://github.com/mlcommons/mobile_models/raw/main/v3_0/datasets/snusr_lr.zip
 	touch $@
 
 # Ade20k

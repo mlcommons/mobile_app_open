@@ -30,6 +30,7 @@ limitations under the License.
 #include "flutter/cpp/mlperf_driver.h"
 #include "flutter/cpp/proto/mlperf_task.pb.h"
 #include "flutter/cpp/utils.h"
+#include "google/protobuf/text_format.h"
 #include "tensorflow/lite/tools/command_line_flags.h"
 
 namespace mlperf {
@@ -169,7 +170,7 @@ int Main(int argc, char *argv[]) {
             benchmark_id = "natural_language_processing";
             break;
           case DatasetConfig::ADE20K:
-            benchmark_id = "image_segmentation_v1";
+            benchmark_id = "image_segmentation_v2";
             break;
           case DatasetConfig::SNUSR:
             benchmark_id = "super_resolution";
