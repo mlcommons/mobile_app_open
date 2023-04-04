@@ -1,7 +1,7 @@
 ARG BASE_DOCKER_IMAGE_TAG
 FROM $BASE_DOCKER_IMAGE_TAG
 
-RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y unzip
+RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends unzip
 
 ARG SONAR_SCANNER_DIR=$HOME/.sonar
 
@@ -24,5 +24,5 @@ RUN chmod -R 777 $SONAR_SCANNER_DIR
 # Install Node.js and NPM for JS analysis
 ENV NODE_ENV="production"
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
-RUN apt-get update && apt-get install -y nodejs && node -v
+RUN apt-get update && apt-get install -y --no-install-recommends nodejs && node -v
 RUN npm install --ignore-scripts --location=global npm@8.13.2 && npm --version

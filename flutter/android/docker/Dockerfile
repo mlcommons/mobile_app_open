@@ -5,11 +5,15 @@ FROM ubuntu:20.04
 #   which makes reading layer info harder, so we set this env for for individual commands only.
 # JDK package downloads ~500 MB from slow mirrors, which can take a lot of time,
 #   so a separate layer for it makes image rebuild faster in case we change any other dependencies.
-RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-11-jdk-headless
-RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    openjdk-11-jdk-headless
+RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    build-essential \
     apt-transport-https \
     curl \
     git \
+    unzip \
+    pwgen \
     gnupg \
     make \
     protobuf-compiler \
@@ -44,10 +48,13 @@ ENV ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
 ENV HOME=/image-workdir
 WORKDIR $HOME
 
+# Add Flutter SDK
+RUN git clone --branch "3.7.6" --single-branch --depth 1 \
+    https://github.com/flutter/flutter.git $HOME/flutter
 ENV PUB_CACHE=$HOME/.cache/.pub-cache
 ENV PATH=$PATH:$HOME/flutter/bin:$PUB_CACHE/bin
-RUN curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.7.6-stable.tar.xz | tar Jxf - && chmod --recursive a=u $HOME/flutter
 RUN git config --global --add safe.directory $HOME/flutter
+RUN flutter doctor -v
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
 
@@ -57,7 +64,8 @@ ENV GRADLE_USER_HOME=$HOME/.cache/.gradle
 ENV ANDROID_SDK_HOME=$HOME/.cache/.android
 
 RUN mkdir $ANDROID_SDK_HOME && chmod 777 $HOME/.cache/.android && \
-    keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
+    PASSWD=$(pwgen -s -y 20 1) && keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore \
+    -storepass $PASSWD -alias androiddebugkey -keypass $PASSWD -dname "CN=Android Debug,O=Android,C=US"
 
 RUN chmod 777 $HOME
 
