@@ -113,14 +113,14 @@ Download and extract the SNPE SDK (from Requirements above) to mobile_app_open/m
 Build with the following build command.
 
 ```shell
-make WITH_QTI=1 WITH_TFLITE=0 FLUTTER_MSVC_ARM_DLLS=<path to arm64 RT files> flutter/windows/cmdline/release
+make WITH_QTI=1 WITH_TFLITE=0 MSVC_ARM_DLLS=<path to arm64 RT files> cmdline/windows/release
 ```
 
 ```shell
 Sample path to arm64RT files: "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Redist\MSVC\14.29.30133\arm64\Microsoft.VC142.CRT"
 ```
 
-This will generate binary files in output\flutter-windows\cmdline
+This will generate binary files in output\flutter\cmdline
 
 ## Running the commandline app on Windows on Arm
 
