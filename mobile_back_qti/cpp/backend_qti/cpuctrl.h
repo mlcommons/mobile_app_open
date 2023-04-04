@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@ limitations under the License.
 ==============================================================================*/
 #pragma once
 
+#ifdef __ANDROID__
 #include <EGL/egl.h>
 #include <GLES/gl.h>
+#endif
 #include <stdint.h>
 
 class CpuCtrl {

@@ -16,6 +16,7 @@
 include flutter/ios/ios.mk
 include flutter/windows/windows.mk
 include flutter/android/android.mk
+include flutter/cpp/binary/cmdline.mk
 
 ifeq (${OS},Windows_NT)
 flutter/platform: flutter/windows
