@@ -48,13 +48,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends dos2unix
 ENV NODE_ENV="production"
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
 RUN apt-get update && apt-get install -y --no-install-recommends nodejs && node -v
-RUN npm install --location=global npm@8.13.2 && npm --version
-RUN npm install -g quicktype
-RUN npm install -g prettier
+RUN npm install --ignore-scripts --location=global npm@8.13.2 && npm --version
+RUN npm install --ignore-scripts -g quicktype
+RUN npm install --ignore-scripts -g prettier
 
 # Add Markdown formatter
-RUN npm install -g markdownlint-cli@0.26.0
-RUN npm install -g markdown-link-check@3.9.0
+RUN npm install --ignore-scripts -g markdownlint-cli@0.26.0
+RUN npm install --ignore-scripts -g markdown-link-check@3.9.0
 
 # Add YAML linter
 RUN pip install yamllint==1.26.3

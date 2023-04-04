@@ -25,4 +25,4 @@ RUN chmod -R 777 $SONAR_SCANNER_DIR
 ENV NODE_ENV="production"
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
 RUN apt-get update && apt-get install -y nodejs && node -v
-RUN npm install --location=global npm@8.13.2 && npm --version
+RUN npm install --ignore-scripts --location=global npm@8.13.2 && npm --version
