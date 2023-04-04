@@ -44,9 +44,9 @@ cc_library(
     local_defines = ["MTK_TFLITE_NEURON_BACKEND"],
     deps = [
         "//flutter/cpp/c:headers",
+        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
         "@org_tensorflow//tensorflow/lite/c:c_api",
         "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             ":neuron_delegate",

@@ -1,0 +1,69 @@
+From c38f071c9d3293b5c719b4fb374eb5716f2b451e Mon Sep 17 00:00:00 2001
+From: Mohit Mundhra <quic_mmundhra@quicinc.com>
+Date: Fri, 2 Dec 2022 12:14:46 +0530
+Subject: [PATCH] Changes to add windows_arm64
+
+---
+ BUILD.bazel           | 9 ++++++++-
+ deps/clog/BUILD.bazel | 6 ++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 90bef8d..71516c3 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -114,6 +114,7 @@ cc_library(
+         ":linux_s390x": COMMON_SRCS + LINUX_SRCS,
+         ":macos_x86_64": COMMON_SRCS + X86_SRCS + MACH_SRCS + MACH_X86_SRCS,
+         ":macos_arm64": COMMON_SRCS + MACH_SRCS + MACH_ARM_SRCS,
++        ":windows_arm64": COMMON_SRCS,
+         ":windows_x86_64": COMMON_SRCS + X86_SRCS + WINDOWS_X86_SRCS,
+         ":android_armv7": COMMON_SRCS + ARM_SRCS + LINUX_SRCS + LINUX_ARM32_SRCS + ANDROID_ARM_SRCS,
+         ":android_arm64": COMMON_SRCS + ARM_SRCS + LINUX_SRCS + LINUX_ARM64_SRCS + ANDROID_ARM_SRCS,
+@@ -135,6 +136,7 @@ cc_library(
+     }),
+     copts = select({
+         ":windows_x86_64": [],
++        ":windows_arm64": [],
+         "//conditions:default": C99OPTS,
+     }) + [
+         "-Iexternal/cpuinfo/include",
+@@ -253,6 +255,11 @@ config_setting(
+     values = {"cpu": "x64_windows"},
+ )
+ 
++config_setting(
++    name = "windows_arm64",
++    values = {"cpu": "x64_arm64_windows"},
++)
++
+ config_setting(
+     name = "android_armv7",
+     values = {
+diff --git a/deps/clog/BUILD.bazel b/deps/clog/BUILD.bazel
+index 7dc52ea..ad8736c 100644
+--- a/deps/clog/BUILD.bazel
++++ b/deps/clog/BUILD.bazel
+@@ -20,6 +20,7 @@ cc_library(
+     ],
+     copts = select({
+         ":windows": [],
++        ":windows_arm64": [],
+         "//conditions:default": ["-Wno-unused-result"],
+     }),
+     defines = select({
+@@ -49,6 +50,11 @@ config_setting(
+     values = {"cpu": "x64_windows"},
+ )
+ 
++config_setting(
++    name = "windows_arm64",
++    values = {"cpu": "x64_arm64_windows"},
++)
++
+ config_setting(
+     name = "macos_x86_64",
+     values = {
+-- 
+2.37.3
+

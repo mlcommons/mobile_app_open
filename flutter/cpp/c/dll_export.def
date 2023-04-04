@@ -13,3 +13,5 @@ EXPORTS
     mlperf_backend_get_output_count
     mlperf_backend_get_output_type
     mlperf_backend_get_output
+    mlperf_backend_get_buffer
+    mlperf_backend_release_buffer

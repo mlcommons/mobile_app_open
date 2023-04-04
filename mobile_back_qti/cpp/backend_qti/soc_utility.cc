@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -15,9 +15,17 @@ limitations under the License.
 #include <stdint.h>
 
 #include <fstream>
+#include <iostream>
 #include <thread>
 
 #include "tensorflow/core/platform/logging.h"
+#ifndef __ANDROID__
+#include <Windows.h>
+
+#include <unordered_map>
+
+#include "acpitabl.h"
+#endif
 
 SocInfo unsupportedSoc = SocInfo(UNSUPPORTED_SOC_STR);
 SocInfo Socs::m_soc_info;
@@ -32,10 +40,7 @@ std::map<uint32_t, SocInfo> socDetails =
             // hlc,
             // llc,
             // max_cores, needs_rpcmem
-            {356, SocInfo(1, 6, 0, 0, false, qti_settings_sdm865, "SDM865", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, false)},
-            {415, SocInfo(2, 0, 4, 0, true, qti_settings_sdm888, "SDM888", 1,
+            {415, SocInfo(2, 0, 0, 0, true, qti_settings_sdm888, "SDM888", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
             {475, SocInfo(2, 0, 0, 0, true, qti_settings_sdm778, "SDM778", 1,
@@ -56,12 +61,24 @@ std::map<uint32_t, SocInfo> socDetails =
             {530, SocInfo(2, 0, 0, 0, true, qti_settings_sd8pg1, "SD8PG1", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
+            {519, SocInfo(2, 0, 0, 0, true, qti_settings_sd8g2, "SD8G2", 1,
+                          std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, true)},
+            {536, SocInfo(2, 0, 0, 0, true, qti_settings_sd8g2, "SD8G2", 1,
+                          std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, true)},
+            {591, SocInfo(2, 0, 0, 0, true, qti_settings_sd7pg2, "SD7PG2", 1,
+                          std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, true)},
+            {435, SocInfo(2, 0, 0, 0, true, qti_settings_sd8cxg3, "SD8cxG3", 1,
+                          std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, false)},
         })
         .m_soc_details;
 
-void Socs::soc_info_init() {
-  if (is_init_done) return;
-
+#ifdef __ANDROID__
+uint32_t Socs::get_android_soc_id(void) {
+  uint32_t id;
   std::ifstream in_file;
   std::vector<char> line(5);
   in_file.open("/sys/devices/soc0/soc_id");
@@ -71,16 +88,86 @@ void Socs::soc_info_init() {
   if (in_file.fail()) {
     m_soc_info = unsupportedSoc;
     LOG(INFO) << "Failed to read SOC file: ";
-    return;
+    return UNSUPPORTED_SOC_ID;
   }
 
   in_file.read(line.data(), 5);
   in_file.close();
-  uint32_t soc_id = (uint32_t)std::atoi(line.data());
+  id = (uint32_t)std::atoi(line.data());
+
+  return id;
+}
+
+#else
+#define MAX_FADT_PPTT_SIZE 65536
+#define LEVEL_ID(LV1, LV2) ((LV1 << 32) | (LV2))
+
+static std::unordered_map<uint64_t, int> pptt_mappings = {
+    {LEVEL_ID(113ULL, 449ULL), 435},  // SD8cxG3
+};
+
+uint32_t Socs::get_windows_soc_id(void) {
+  DWORD bufsize = 0;
+  int ret = 0;
+  PPPTT pptt;
+  BYTE *buf = NULL;
+  int id = 0;
+
+  buf = (BYTE *)malloc(MAX_FADT_PPTT_SIZE);
+  if (!buf) {
+    return 0;
+  }
+
+  // start to try newer approach, level 1 ID, level 2 ID in PPTT
+  ret = GetSystemFirmwareTable('ACPI', 'TTPP', 0, 0);
+  if (!ret) {
+    m_soc_info = unsupportedSoc;
+    free(buf);
+    return 0;
+  }
+
+  bufsize = ret;
+  ret = GetSystemFirmwareTable('ACPI', 'TTPP', buf, bufsize);
+  if (!ret) {
+    m_soc_info = unsupportedSoc;
+    free(buf);
+    return 0;
+  }
+
+  pptt = (PPPTT)buf;
+  PPROC_TOPOLOGY_NODE ptn =
+      (PPROC_TOPOLOGY_NODE)((BYTE *)&(pptt->HeirarchyNodes[0]) +
+                            pptt->HeirarchyNodes[0].Length);
+  uint64_t key = (ptn->IdNode.Level1 << 32) | (ptn->IdNode.Level2);
+
+  auto it = pptt_mappings.find(key);
+  if (it != pptt_mappings.end()) {
+    id = it->second;
+  } else {
+    m_soc_info = unsupportedSoc;
+    id = 0;
+    return 0;
+  }
+
+  free(buf);
+  return id;
+}
+#endif
+
+void Socs::soc_info_init() {
+  if (is_init_done) return;
+
+#ifdef __ANDROID__
+  uint32_t soc_id = get_android_soc_id();
+#else
+  uint32_t soc_id = get_windows_soc_id();
+#endif
 
   LOG(INFO) << "Soc ID: " << soc_id;
   if (socDetails.find(soc_id) != socDetails.end()) {
     m_soc_info = socDetails.find(soc_id)->second;
+  } else {
+    m_soc_info = unsupportedSoc;
   }
 }
 
@@ -110,8 +197,8 @@ int Socs::soc_num_inits() {
 
 bool Socs::isSnapDragon(const char *manufacturer) {
   soc_info_init();
+#ifdef __ANDROID__
   bool is_qcom = false;
-
   if (strncmp("QUALCOMM", manufacturer, 7) == 0) {
     // This is a test device
     LOG(INFO) << "QTI test device detected";
@@ -146,6 +233,11 @@ bool Socs::isSnapDragon(const char *manufacturer) {
     LOG(INFO) << "vendor: " << vendor;
   }
   return is_qcom;
+#else
+  // Always return true for Windows
+  // TODO: Find a way to determine a QTI device on Windows
+  return true;
+#endif
 }
 
 int Socs::soc_check_feature(bool &useIonBuffers_,
@@ -187,7 +279,11 @@ bool Socs::soc_settings(const char **settings,
 
 bool Socs::needs_rpcmem() {
   soc_info_init();
+#ifdef __ANDROID__
   return m_soc_info.m_needs_rpcmem;
+#else
+  return false;
+#endif
 }
 
 bool Socs::get_use_dsp_features() {

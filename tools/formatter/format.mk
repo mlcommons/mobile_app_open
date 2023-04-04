@@ -4,7 +4,7 @@ format: format/bazel format/clang format/dart format/ts format/line-endings form
 
 .PHONY: format/bazel
 format/bazel:
-	buildifier -r .
+	buildifier -lint=warn -mode=check -r .
 
 .PHONY: format/clang
 format/clang:
