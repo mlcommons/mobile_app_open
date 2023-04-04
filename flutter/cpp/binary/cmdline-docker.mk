@@ -13,8 +13,6 @@
 # limitations under the License.
 ##########################################################################
 
-include flutter/android/android-docker.mk
-
 .PHONY: docker/cmdline/android/release
 docker/cmdline/android/release:
 	MSYS2_ARG_CONV_EXCL="*" docker run \

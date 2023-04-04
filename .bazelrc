@@ -20,7 +20,6 @@ build:verbose_logs --output_filter=
 build:android --copt=-w
 build:ios --copt=-w
 build:windows --copt=/W0
-build:windows_arm64 --copt=/W0
 
 # Build in C++ 14 mode.
 build:android --cxxopt=-std=c++14
@@ -30,8 +29,6 @@ build:ios --host_cxxopt=-std=c++14
 build:ios --cxxopt=-xobjective-c++
 build:windows --cxxopt=/std:c++14
 build:windows --host_cxxopt=/std:c++14
-build:windows_arm64 --cxxopt=/std:c++14
-build:windows_arm64 --host_cxxopt=/std:c++14
 
 # Android configs
 build:android --crosstool_top=//external:android/crosstool
@@ -56,10 +53,7 @@ build:windows --copt=-DWIN32_LEAN_AND_MEAN
 build:windows --host_copt=-DWIN32_LEAN_AND_MEAN
 build:windows --copt=-DNOGDI
 build:windows --host_copt=-DNOGDI
-build:windows_arm64 --copt=-DWIN32_LEAN_AND_MEAN
-build:windows_arm64 --host_copt=-DWIN32_LEAN_AND_MEAN
-build:windows_arm64 --copt=-DNOGDI
-build:windows_arm64 --host_copt=-DNOGDI
+build:windows_arm64 --config=windows
 build:windows_arm64 --cpu=x64_arm64_windows
 build:windows_arm64 --fat_apk_cpu=x64_arm64_windows
 
@@ -67,14 +61,10 @@ build:windows_arm64 --fat_apk_cpu=x64_arm64_windows
 # _USE_MATH_DEFINES is defined.
 build:windows --copt=/D_USE_MATH_DEFINES
 build:windows --host_copt=/D_USE_MATH_DEFINES
-build:windows_arm64 --copt=/D_USE_MATH_DEFINES
-build:windows_arm64 --host_copt=/D_USE_MATH_DEFINES
 
 # See https://docs.microsoft.com/en-us/cpp/preprocessor/preprocessor-experimental-overview
 build:windows --copt=/Zc:preprocessor
 build:windows --host_copt=/Zc:preprocessor
-build:windows_arm64 --copt=/Zc:preprocessor
-build:windows_arm64 --host_copt=/Zc:preprocessor
 
 build:windows --linkopt=/DEBUG
 build:windows --host_linkopt=/DEBUG
@@ -82,12 +72,6 @@ build:windows --linkopt=/OPT:REF
 build:windows --host_linkopt=/OPT:REF
 build:windows --linkopt=/OPT:ICF
 build:windows --host_linkopt=/OPT:ICF
-build:windows_arm64 --linkopt=/DEBUG
-build:windows_arm64 --host_linkopt=/DEBUG
-build:windows_arm64 --linkopt=/OPT:REF
-build:windows_arm64 --host_linkopt=/OPT:REF
-build:windows_arm64 --linkopt=/OPT:ICF
-build:windows_arm64 --host_linkopt=/OPT:ICF
 
 # Address sanitizer
 build:asan --strip=never

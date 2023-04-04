@@ -47,3 +47,44 @@ cmdline/android/bins/copy:
 		${cmdline_android_bin_release_path}
 		@# macos doesn't support --recursive flag
 		chmod -R 777 ${cmdline_android_bin_release_path}
+
+windows_cmdline_folder=output/windows/cmdline
+.PHONY: cmdline/windows/bins
+cmdline/windows/bins:
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} --output_base=C:\\b_cache1\\ build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
+		--config=windows_arm64 \
+		--cpu=x64_arm64_windows --worker_verbose\
+		${backend_tflite_windows_target} \
+		${backend_qti_windows_target} \
+		//flutter/cpp/binary:main
+	rm -rf ${windows_cmdline_folder}
+	mkdir -p ${windows_cmdline_folder}
+	cp -f --target-directory ${windows_cmdline_folder} \
+		${backend_tflite_windows_files} \
+		${backend_qti_windows_files} \
+		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/binary/main.exe
+	chmod 777 --recursive ${windows_cmdline_folder}
+
+# set parameters before running `make cmdline/windows/release`
+MSVC_ARM_DLLS?=
+.PHONY: cmdline/windows/release
+cmdline/windows/release: \
+	cmdline/windows/prepare-dlls \
+	cmdline/windows/bins \
+	cmdline/windows/copy-dlls
+
+msvc_arm_dlls_path=output/windows/win-redist-dlls
+msvc_arm_dlls_list=msvcp140.dll vcruntime140.dll vcruntime140_1.dll msvcp140_codecvt_ids.dll
+.PHONY: cmdline/windows/prepare-dlls
+cmdline/windows/prepare-dlls:
+	@[ -n "${MSVC_ARM_DLLS}" ] || (echo MSVC_ARM_DLLS env must be set; exit 1)
+
+	rm -rf ${msvc_arm_dlls_path}
+	mkdir -p ${msvc_arm_dlls_path}
+	currentDir=$$(pwd) && cd "${MSVC_ARM_DLLS}" && \
+		cp  --target-directory $$currentDir/${msvc_arm_dlls_path} ${msvc_arm_dlls_list}
+
+.PHONY: cmdline/windows/copy-dlls
+cmdline/windows/copy-dlls:
+	currentDir=$$(pwd) && cd "${msvc_arm_dlls_path}" && \
+		cp  --target-directory $$currentDir/${windows_cmdline_folder} ${msvc_arm_dlls_list}		
