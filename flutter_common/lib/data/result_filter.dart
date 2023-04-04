@@ -8,70 +8,82 @@ part 'result_filter.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class ResultFilter {
-  DateTime? creationDate;
-  EnvPlatform? platform;
+  DateTime? fromCreationDate;
+  DateTime? toCreationDate;
+  String? platform;
   String? deviceModel;
-  String? backendName;
+  String? backend;
   String? manufacturer;
   String? soc;
+  String? benchmarkId;
 
   ResultFilter();
 
-  static ResultFilter from(ExtendedResult result) {
-    String? deviceModel;
-    String? manufacturer;
-    String? soc;
+  bool match(ExtendedResult result) {
+    String? resultDeviceModel;
+    String? resultManufacturer;
+    String? resultSoc;
     final envInfo = result.environmentInfo;
     switch (envInfo.platform) {
       case EnvPlatform.android:
-        deviceModel = envInfo.value.android?.modelName;
-        manufacturer = envInfo.value.android?.manufacturer;
-        soc = envInfo.value.android?.procCpuinfoSocName;
+        resultDeviceModel = envInfo.value.android?.modelName;
+        resultManufacturer = envInfo.value.android?.manufacturer;
+        resultSoc = envInfo.value.android?.procCpuinfoSocName;
         break;
       case EnvPlatform.ios:
-        deviceModel = envInfo.value.ios?.modelName;
-        manufacturer = StringValue.apple;
-        soc = envInfo.value.ios?.socName;
+        resultDeviceModel = envInfo.value.ios?.modelName;
+        resultManufacturer = StringValue.apple;
+        resultSoc = envInfo.value.ios?.socName;
         break;
       case EnvPlatform.windows:
-        deviceModel = envInfo.value.windows?.cpuFullName;
-        manufacturer = StringValue.unknown;
-        soc = envInfo.value.windows?.cpuFullName;
+        resultDeviceModel = envInfo.value.windows?.cpuFullName;
+        resultManufacturer = StringValue.unknown;
+        resultSoc = envInfo.value.windows?.cpuFullName;
         break;
     }
-    final filter = ResultFilter()
-      ..creationDate = result.meta.creationDate
-      ..backendName = result.results.first.backendInfo.backendName
-      ..platform = envInfo.platform
-      ..deviceModel = deviceModel ?? StringValue.unknown
-      ..manufacturer = manufacturer ?? StringValue.unknown
-      ..soc = soc ?? StringValue.unknown;
-    return filter;
-  }
+    resultDeviceModel = resultDeviceModel ?? StringValue.unknown;
+    resultManufacturer = resultManufacturer ?? StringValue.unknown;
+    resultSoc = resultSoc ?? StringValue.unknown;
 
-  // other should be an instance of ResultManager.resultFilter
-  bool match(ResultFilter other) {
-    bool platformMatched =
-        other.platform == null ? true : platform == other.platform;
+    DateTime resultCreationDate = result.meta.creationDate;
+    String resultBackend = result.results.first.backendInfo.filename;
+    String resultPlatform = envInfo.platform.name;
+
+    bool fromCreationDateMatched = fromCreationDate == null
+        ? true
+        : resultCreationDate.isAfter(fromCreationDate!);
+    // toCreationDate will be at 00:00:00.000 but we want to include that day.
+    const oneDay = Duration(days: 1);
+    bool toCreationDateMatched = toCreationDate == null
+        ? true
+        : resultCreationDate.isBefore(toCreationDate!.add(oneDay));
+    bool platformMatched = platform == null ? true : platform == resultPlatform;
     bool deviceModelMatched =
-        deviceModel?.containsIgnoreCase(other.deviceModel ?? '') ?? false;
-    bool backendNameMatched =
-        backendName?.containsIgnoreCase(other.backendName ?? '') ?? false;
+        resultDeviceModel.containsIgnoreCase(deviceModel ?? '');
+    bool backendMatched = backend == null ? true : backend == resultBackend;
     bool manufacturerMatched =
-        manufacturer?.containsIgnoreCase(other.manufacturer ?? '') ?? false;
-    bool socMatched = soc?.containsIgnoreCase(other.soc ?? '') ?? false;
-    return platformMatched &&
+        resultManufacturer.containsIgnoreCase(manufacturer ?? '');
+    bool socMatched = resultSoc.containsIgnoreCase(soc ?? '');
+    bool benchmarkIdMatched = benchmarkId == null
+        ? true
+        : result.results.any((e) => e.benchmarkId == benchmarkId);
+
+    return fromCreationDateMatched &&
+        toCreationDateMatched &&
+        platformMatched &&
         deviceModelMatched &&
-        backendNameMatched &&
+        backendMatched &&
         manufacturerMatched &&
-        socMatched;
+        socMatched &&
+        benchmarkIdMatched;
   }
 
   bool get anyFilterActive {
-    return creationDate != null ||
+    return fromCreationDate != null ||
+        toCreationDate != null ||
         platform != null ||
         deviceModel != null ||
-        backendName != null ||
+        backend != null ||
         manufacturer != null ||
         soc != null;
   }
