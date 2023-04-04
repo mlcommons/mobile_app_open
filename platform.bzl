@@ -1,7 +1,8 @@
 """Find platform and decide TF patch and pass it to bazel build config"""
 
 def _impl(repository_ctx):
-    if "windows" in repository_ctx.os.name:
+    # Use the patch only for Windows_Qualcomm environment
+    if "windows" in repository_ctx.os.name and repository_ctx.os.environ["WITH_QTI"] == "1":
         patch_file = "[\"//patches:TF-Changes-to-add-windows_arm64.patch\"]"
     else:
         patch_file = []
