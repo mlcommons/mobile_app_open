@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/result_filter.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
@@ -28,8 +27,8 @@ class _ResultListScreenState extends State<ResultListScreen> {
     final results = state.resourceManager.resultManager.results;
     final filter = state.resourceManager.resultManager.resultFilter;
     List<ExtendedResult> itemList = results;
-    itemList =
-        results.where((e) => ResultFilter.from(e).match(filter)).toList();
+    itemList = results.where((result) => filter.match(result)).toList();
+    itemList.sort((a, b) => b.meta.creationDate.compareTo(a.meta.creationDate));
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyListTitle), actions: [
@@ -37,6 +36,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
           icon: Icon(filter.anyFilterActive
               ? Icons.filter_list
               : Icons.filter_list_off),
+          tooltip: l10n.historyFilterTitle,
           onPressed: () {
             Navigator.push(
               context,

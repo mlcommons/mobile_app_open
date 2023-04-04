@@ -80,4 +80,31 @@ class BenchmarkId {
   static const naturalLanguageProcessing = 'natural_language_processing';
   static const imageClassificationOffline = 'image_classification_offline';
   static const superResolution = 'super_resolution';
+
+  static const allIds = [
+    imageClassification,
+    objectDetection,
+    imageSegmentationV2,
+    naturalLanguageProcessing,
+    imageClassificationOffline,
+    superResolution,
+  ];
+}
+
+class BackendId {
+  static const tflite = 'libtflitebackend';
+  static const pixel = 'libtflitepixelbackend';
+  static const mediatek = 'libtfliteneuronbackend';
+  static const samsung = 'libsamsungbackend';
+  static const qti = 'libqtibackend';
+  static const apple = 'libcoremlbackend';
+
+  static const allIds = [
+    tflite,
+    pixel,
+    mediatek,
+    samsung,
+    qti,
+    apple,
+  ];
 }

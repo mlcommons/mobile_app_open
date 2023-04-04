@@ -117,7 +117,15 @@
   "historyListSelectionDelete": "Delete",
   "historyListSelectionDeleteConfirm": "Delete selected items?",
 
-  "historyFilterTitle": "Filter",
+  "historyFilterTitle": "Filters",
+  "historyFilterClear": "Clear Filters",
+  "historyFilterCreationDate": "Creation Date",
+  "historyFilterPlatform": "Platform",
+  "historyFilterBenchmarkID": "Benchmark ID",
+  "historyFilterBackendID": "Backend ID",
+  "historyFilterDeviceModel": "Device Model",
+  "historyFilterManufacturer": "Manufacturer",
+  "historyFilterSoC": "SoC",
 
   "historyDetailsTitle": "Result details",
   "historyDetailsBuildTypeDebug": "debug build",
