@@ -18,7 +18,6 @@ include flutter/android/android-docker.mk
 flutter/android: flutter/android/libs
 flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk
 flutter/android/libs: flutter/android/libs/checksum flutter/android/libs/build flutter/android/libs/copy
-cmdline/android/bins/release: cmdline/android/bins/build cmdline/android/bins/copy
 # run `make flutter/android/apk` before `flutter/android/test-apk`
 flutter/android/test-apk: flutter/android/test-apk/main flutter/android/test-apk/helper
 
@@ -44,37 +43,6 @@ flutter/android/libs/build:
 		${backend_qti_android_target} \
 		${backend_samsung_android_target} \
 		//flutter/cpp/flutter:libbackendbridge.so
-
-.PHONY: cmdline/android/bins/build
-cmdline/android/bins/build:
-	bazel ${BAZEL_ARGS_GLOBAL} ${sonar_bazel_startup_options} \
-		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
-		--config=android_arm64 \
-		${backend_tflite_android_target} \
-		${backend_mediatek_android_target} \
-		${backend_pixel_android_target} \
-		${backend_qti_android_target} \
-		${backend_samsung_android_target} \
-		//flutter/cpp/flutter:libbackendbridge.so \
-		//flutter/cpp/binary:main
-
-cmdline_android_bin_release_path=output/cmdline_bins/release
-.PHONY: cmdline/android/bins/copy
-cmdline/android/bins/copy:
-	rm -rf ${cmdline_android_bin_release_path}
-	mkdir -p ${cmdline_android_bin_release_path}
-	@# macos doesn't support --target-directory flag
-	cp -f \
-		${backend_tflite_android_files} \
-		${backend_mediatek_android_files} \
-		${backend_pixel_android_files} \
-		${backend_qti_cmdline_files} \
-		${backend_samsung_android_files} \
-		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/libbackendbridge.so \
-		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/binary/main \
-		${cmdline_android_bin_release_path}
-		@# macos doesn't support --recursive flag
-		chmod -R 777 ${cmdline_android_bin_release_path}
 
 flutter_android_libs_folder=flutter/android/app/src/main/jniLibs/arm64-v8a
 .PHONY: flutter/android/libs/copy
