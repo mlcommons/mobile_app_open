@@ -22,13 +22,13 @@ RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python3 -m pip install numpy absl-py
 
-RUN curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 -o /usr/local/bin/bazel && \
+RUN curl --proto '=https' -L https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 -o /usr/local/bin/bazel && \
     chmod +x /usr/local/bin/bazel
 
 ENV ANDROID_SDK_ROOT=/opt/android
 WORKDIR $ANDROID_SDK_ROOT/cmdline-tools
 # sdkmanager expects to be placed into `$ANDROID_SDK_ROOT/cmdline-tools/tools`
-RUN curl -L https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip | jar x && \
+RUN curl --proto '=https' -L https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip | jar x && \
     mv cmdline-tools tools && \
     chmod --recursive +x tools/bin
 ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin
@@ -48,13 +48,10 @@ ENV ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
 ENV HOME=/image-workdir
 WORKDIR $HOME
 
-# Add Flutter SDK
-RUN git clone --branch "3.7.6" --single-branch --depth 1 \
-    https://github.com/flutter/flutter.git $HOME/flutter
 ENV PUB_CACHE=$HOME/.cache/.pub-cache
 ENV PATH=$PATH:$HOME/flutter/bin:$PUB_CACHE/bin
+RUN curl --proto '=https' -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.7.6-stable.tar.xz | tar Jxf - && chmod --recursive a=u $HOME/flutter
 RUN git config --global --add safe.directory $HOME/flutter
-RUN flutter doctor -v
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
 
