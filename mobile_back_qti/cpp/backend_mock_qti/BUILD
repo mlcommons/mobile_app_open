@@ -47,3 +47,12 @@ tflite_jni_binary(
     linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [":qti_mock"],
 )
+
+cc_binary(
+    name = "libqtibackend.dll",
+    linkshared = 1,
+    win_def_file = "//android/cpp/c:dll_export.def",
+    deps = [
+        ":qti_mock",
+    ],
+)
