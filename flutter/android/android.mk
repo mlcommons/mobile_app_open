@@ -63,7 +63,7 @@ flutter/android/libs/copy:
 
 FLUTTER_ANDROID_APK_FOLDER?=output/android-apks
 
-FLUTTER_ANDROID_APK_RELEASE?=release.apk
+FLUTTER_ANDROID_APK_RELEASE?=$(shell flutter/tool/generate-apk-filename.sh)
 flutter_android_apk_release_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_RELEASE}
 .PHONY: flutter/android/apk
 flutter/android/apk:
