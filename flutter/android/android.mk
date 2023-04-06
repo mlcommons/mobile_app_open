@@ -25,7 +25,7 @@ flutter/android/test-apk: flutter/android/test-apk/main flutter/android/test-apk
 flutter/android/libs/checksum:
 ifeq (${WITH_SAMSUNG},1)
 	@echo "Validate checksum of Samsung lib files"
-	flutter/tool/validate_checksum \
+	flutter/tool/validate-checksum.sh \
 		-d ${backend_samsung_lib_root} \
 		-f ${backend_samsung_checksum_file}
 else
