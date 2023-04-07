@@ -1,26 +1,32 @@
 {
   "meta": {
-    "uuid": "6d7467fa-0d99-40cf-9940-0d35058d1d01",
-    "creation_date": "2023-03-06T12:44:09.185084",
-    "upload_date": "2023-03-06T05:44:09.185085Z"
+    "uuid": "e4985125-ed30-4b1d-be77-eb427f416d1c",
+    "creation_date": "2023-04-07T12:01:53.635863",
+    "upload_date": null
   },
   "results": [
     {
-      "benchmark_id": "id",
-      "benchmark_name": "name",
+      "benchmark_id": "image_classification",
+      "benchmark_name": "Image Classification",
       "loadgen_scenario": "SingleStream",
       "backend_settings": {
         "accelerator_code": "ane",
         "accelerator_desc": "ANE",
         "framework": "TFLite CoreML",
-        "model_path": "https://example.com/model.tflite",
+        "model_path": "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite",
         "batch_size": 0,
         "extra_settings": [
           {
+            "id": "num_threads",
+            "name": "Number of threads",
+            "value": "4",
+            "value_name": "4 threads"
+          },
+          {
             "id": "shards_num",
-            "name": "Shards number",
-            "value": "2",
-            "value_name": "2"
+            "name": "Number of threads for inference",
+            "value": "4",
+            "value_name": "4"
           }
         ]
       },
@@ -32,75 +38,50 @@
       },
       "performance_run": {
         "throughput": {
-          "value": 1234.45
+          "value": 615.3217579004238
         },
-        "accuracy": {
-          "normalized": 0.123,
-          "formatted": "12.3%"
-        },
-        "accuracy2": {
-          "normalized": 0.123,
-          "formatted": "12.3%"
-        },
+        "accuracy": null,
+        "accuracy2": null,
         "dataset": {
-          "name": "Imagenet classification validation set",
+          "name": "Open images subset for classification",
           "type": "IMAGENET",
-          "data_path": "mlperf_datasets/imagenet/img",
-          "groundtruth_path": "mlperf_datasets/imagenet/imagenet_val_full.txt"
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip",
+          "groundtruth_path": ""
         },
-        "measured_duration": 123.456,
-        "measured_samples": 8,
-        "start_datetime": "2023-03-06T12:44:09.189496",
+        "measured_duration": 60.89502716064453,
+        "measured_samples": 38475,
+        "start_datetime": "2023-04-07T11:54:12.502961",
         "loadgen_info": {
           "validity": true,
-          "duration": 10.6
+          "duration": 59.930352899999995
         }
       },
-      "accuracy_run": {
-        "throughput": {
-          "value": 1234.45
-        },
-        "accuracy": {
-          "normalized": 0.123,
-          "formatted": "12.3%"
-        },
-        "accuracy2": {
-          "normalized": 0.123,
-          "formatted": "12.3%"
-        },
-        "dataset": {
-          "name": "Imagenet classification validation set",
-          "type": "IMAGENET",
-          "data_path": "mlperf_datasets/imagenet/img",
-          "groundtruth_path": "mlperf_datasets/imagenet/imagenet_val_full.txt"
-        },
-        "measured_duration": 123.456,
-        "measured_samples": 8,
-        "start_datetime": "2023-03-06T12:44:09.189575",
-        "loadgen_info": {
-          "validity": true,
-          "duration": 10.6
-        }
-      },
-      "min_duration": 10.5,
-      "min_samples": 8
+      "accuracy_run": null,
+      "min_duration": 60.0,
+      "min_samples": 1024
     },
     {
-      "benchmark_id": "id",
-      "benchmark_name": "name",
+      "benchmark_id": "object_detection",
+      "benchmark_name": "Object Detection",
       "loadgen_scenario": "SingleStream",
       "backend_settings": {
         "accelerator_code": "ane",
         "accelerator_desc": "ANE",
         "framework": "TFLite CoreML",
-        "model_path": "https://example.com/model.tflite",
+        "model_path": "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite",
         "batch_size": 0,
         "extra_settings": [
           {
+            "id": "num_threads",
+            "name": "Number of threads",
+            "value": "4",
+            "value_name": "4 threads"
+          },
+          {
             "id": "shards_num",
-            "name": "Shards number",
-            "value": "2",
-            "value_name": "2"
+            "name": "Number of threads for inference",
+            "value": "4",
+            "value_name": "4"
           }
         ]
       },
@@ -112,101 +93,273 @@
       },
       "performance_run": {
         "throughput": {
-          "value": 1234.45
+          "value": 227.34589131411383
         },
-        "accuracy": {
-          "normalized": 0.123,
-          "formatted": "12.3%"
-        },
-        "accuracy2": {
-          "normalized": 0.123,
-          "formatted": "12.3%"
-        },
+        "accuracy": null,
+        "accuracy2": null,
         "dataset": {
-          "name": "Imagenet classification validation set",
-          "type": "IMAGENET",
-          "data_path": "mlperf_datasets/imagenet/img",
-          "groundtruth_path": "mlperf_datasets/imagenet/imagenet_val_full.txt"
+          "name": "Open images subset for detection",
+          "type": "COCO",
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco.zip",
+          "groundtruth_path": ""
         },
-        "measured_duration": 123.456,
-        "measured_samples": 8,
-        "start_datetime": "2023-03-06T12:44:09.190988",
+        "measured_duration": 61.21785354614258,
+        "measured_samples": 13830,
+        "start_datetime": "2023-04-07T11:55:14.179725",
         "loadgen_info": {
           "validity": true,
-          "duration": 10.6
+          "duration": 59.94827865
         }
       },
-      "accuracy_run": {
+      "accuracy_run": null,
+      "min_duration": 60.0,
+      "min_samples": 1024
+    },
+    {
+      "benchmark_id": "image_segmentation_v2",
+      "benchmark_name": "v2.0 Image Segmentation",
+      "loadgen_scenario": "SingleStream",
+      "backend_settings": {
+        "accelerator_code": "ane",
+        "accelerator_desc": "ANE",
+        "framework": "TFLite CoreML",
+        "model_path": "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite",
+        "batch_size": 0,
+        "extra_settings": [
+          {
+            "id": "num_threads",
+            "name": "Number of threads",
+            "value": "4",
+            "value_name": "4 threads"
+          },
+          {
+            "id": "shards_num",
+            "name": "Number of threads for inference",
+            "value": "4",
+            "value_name": "4"
+          }
+        ]
+      },
+      "backend_info": {
+        "filename": "libtflitebackend",
+        "vendor_name": "Google",
+        "backend_name": "TFLite",
+        "accelerator_name": "ANE"
+      },
+      "performance_run": {
         "throughput": {
-          "value": 1234.45
+          "value": 16.868870727450314
         },
-        "accuracy": {
-          "normalized": 0.123,
-          "formatted": "12.3%"
-        },
-        "accuracy2": {
-          "normalized": 0.123,
-          "formatted": "12.3%"
-        },
+        "accuracy": null,
+        "accuracy2": null,
         "dataset": {
-          "name": "Imagenet classification validation set",
-          "type": "IMAGENET",
-          "data_path": "mlperf_datasets/imagenet/img",
-          "groundtruth_path": "mlperf_datasets/imagenet/imagenet_val_full.txt"
+          "name": "Open images subset for segmentation",
+          "type": "ADE20K",
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k.zip",
+          "groundtruth_path": ""
         },
-        "measured_duration": 123.456,
-        "measured_samples": 8,
-        "start_datetime": "2023-03-06T12:44:09.190989",
+        "measured_duration": 61.133907318115234,
+        "measured_samples": 1039,
+        "start_datetime": "2023-04-07T11:56:16.557238",
         "loadgen_info": {
           "validity": true,
-          "duration": 10.6
+          "duration": 60.065548997
         }
       },
-      "min_duration": 10.5,
-      "min_samples": 8
+      "accuracy_run": null,
+      "min_duration": 60.0,
+      "min_samples": 1024
+    },
+    {
+      "benchmark_id": "natural_language_processing",
+      "benchmark_name": "Language Understanding",
+      "loadgen_scenario": "SingleStream",
+      "backend_settings": {
+        "accelerator_code": "gpu_f16",
+        "accelerator_desc": "GPU (FP16)",
+        "framework": "TFLite Metal",
+        "model_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite",
+        "batch_size": 0,
+        "extra_settings": [
+          {
+            "id": "num_threads",
+            "name": "Number of threads",
+            "value": "4",
+            "value_name": "4 threads"
+          },
+          {
+            "id": "shards_num",
+            "name": "Number of threads for inference",
+            "value": "4",
+            "value_name": "4"
+          }
+        ]
+      },
+      "backend_info": {
+        "filename": "libtflitebackend",
+        "vendor_name": "Google",
+        "backend_name": "TFLite",
+        "accelerator_name": "CPU"
+      },
+      "performance_run": {
+        "throughput": {
+          "value": 5.830463224647649
+        },
+        "accuracy": null,
+        "accuracy2": null,
+        "dataset": {
+          "name": "Squad V1.1 mini set",
+          "type": "SQUAD",
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord",
+          "groundtruth_path": ""
+        },
+        "measured_duration": 160.6459197998047,
+        "measured_samples": 1024,
+        "start_datetime": "2023-04-07T11:57:18.523857",
+        "loadgen_info": {
+          "validity": true,
+          "duration": 160.542519296
+        }
+      },
+      "accuracy_run": null,
+      "min_duration": 60.0,
+      "min_samples": 1024
+    },
+    {
+      "benchmark_id": "super_resolution",
+      "benchmark_name": "Super Resolution ",
+      "loadgen_scenario": "SingleStream",
+      "backend_settings": {
+        "accelerator_code": "ane",
+        "accelerator_desc": "ANE",
+        "framework": "TFLite CoreML",
+        "model_path": "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite",
+        "batch_size": 0,
+        "extra_settings": [
+          {
+            "id": "num_threads",
+            "name": "Number of threads",
+            "value": "4",
+            "value_name": "4 threads"
+          },
+          {
+            "id": "shards_num",
+            "name": "Number of threads for inference",
+            "value": "4",
+            "value_name": "4"
+          }
+        ]
+      },
+      "backend_info": {
+        "filename": "libtflitebackend",
+        "vendor_name": "Google",
+        "backend_name": "TFLite",
+        "accelerator_name": "ANE"
+      },
+      "performance_run": {
+        "throughput": {
+          "value": 12.803721560437689
+        },
+        "accuracy": null,
+        "accuracy2": null,
+        "dataset": {
+          "name": "SNUSR dataset for performance test",
+          "type": "SNUSR",
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v3_0/datasets/snusr_lr.zip",
+          "groundtruth_path": ""
+        },
+        "measured_duration": 79.64620208740234,
+        "measured_samples": 1024,
+        "start_datetime": "2023-04-07T11:59:59.280636",
+        "loadgen_info": {
+          "validity": true,
+          "duration": 79.264366592
+        }
+      },
+      "accuracy_run": null,
+      "min_duration": 60.0,
+      "min_samples": 1024
+    },
+    {
+      "benchmark_id": "image_classification_offline",
+      "benchmark_name": "Image Classification (Offline)",
+      "loadgen_scenario": "Offline",
+      "backend_settings": {
+        "accelerator_code": "ane",
+        "accelerator_desc": "ANE",
+        "framework": "TFLite CoreML",
+        "model_path": "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite",
+        "batch_size": 8,
+        "extra_settings": [
+          {
+            "id": "num_threads",
+            "name": "Number of threads",
+            "value": "4",
+            "value_name": "4 threads"
+          },
+          {
+            "id": "shards_num",
+            "name": "Number of threads for inference",
+            "value": "4",
+            "value_name": "4"
+          }
+        ]
+      },
+      "backend_info": {
+        "filename": "libtflitebackend",
+        "vendor_name": "Google",
+        "backend_name": "TFLite",
+        "accelerator_name": "ANE"
+      },
+      "performance_run": {
+        "throughput": {
+          "value": 892.0395056683618
+        },
+        "accuracy": null,
+        "accuracy2": null,
+        "dataset": {
+          "name": "Open images subset for classification",
+          "type": "IMAGENET",
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip",
+          "groundtruth_path": ""
+        },
+        "measured_duration": 28.399919509887695,
+        "measured_samples": 24576,
+        "start_datetime": "2023-04-07T12:01:20.886635",
+        "loadgen_info": {
+          "validity": true,
+          "duration": 27.550349333
+        }
+      },
+      "accuracy_run": null,
+      "min_duration": 0.0,
+      "min_samples": 24576
     }
   ],
   "environment_info": {
-    "platform": "android",
+    "platform": "ios",
     "value": {
-      "android": {
-        "os_version": "",
-        "manufacturer": "",
-        "model_code": "",
-        "model_name": "",
-        "board_code": "",
-        "proc_cpuinfo_soc_name": "",
-        "props": [
-          {
-            "type": "socName",
-            "name": "",
-            "value": ""
-          }
-        ]
-      },
+      "android": null,
       "ios": {
-        "os_version": "",
-        "model_code": "",
-        "model_name": "",
+        "os_version": "Version 16.2 (Build 20C65)",
+        "model_code": "iPad8,10",
+        "model_name": "iPad Pro 11 inch (2nd generation) Wi-Fi + Cellular",
         "soc_name": ""
       },
-      "windows": {
-        "os_version": "",
-        "cpu_full_name": ""
-      }
+      "windows": null
     }
   },
   "build_info": {
-    "version": "1.0",
-    "build_number": "10qwe",
-    "build_date": "2023-03-06T12:44:09.188609",
+    "version": "3.0.0",
+    "build_number": "1",
+    "build_date": "2023-04-07T11:52:22.018132",
     "official_release_flag": false,
-    "dev_test_flag": true,
+    "dev_test_flag": false,
     "backend_list": [
       "libtflitebackend"
     ],
-    "git_branch": "feature",
-    "git_commit": "as91230jr90qwe",
-    "git_dirty_flag": false
+    "git_branch": "anh/add-unittest-result-filter",
+    "git_commit": "b42ba443fa398c8b7f57dd4fd33d2ce7a926158c",
+    "git_dirty_flag": true
   }
 }
