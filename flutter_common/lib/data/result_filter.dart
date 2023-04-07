@@ -85,7 +85,8 @@ class ResultFilter {
         deviceModel != null ||
         backend != null ||
         manufacturer != null ||
-        soc != null;
+        soc != null ||
+        benchmarkId != null;
   }
 
   factory ResultFilter.fromJson(Map<String, dynamic> json) =>
