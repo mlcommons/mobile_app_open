@@ -78,7 +78,7 @@ benchmark_setting {
   accelerator: "npu"
   accelerator_desc: "NPU"
   framework: "TFLite NNAPI"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_full_qint8.tflite"
   model_checksum: "672240427c1f3dc33baf2facacd9631f"
 }
 
