@@ -17,7 +17,8 @@ const enablePerfTest = bool.fromEnvironment(
 );
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
   final prefs = <String, Object>{
     StoreConstants.testMode: true,
@@ -38,6 +39,8 @@ void main() {
     binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
     testWidgets('run benchmarks', (WidgetTester tester) async {
+      await startApp(tester);
+      await validateSettings(tester);
       await runBenchmarks(tester);
     });
 

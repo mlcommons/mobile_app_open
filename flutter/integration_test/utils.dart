@@ -1,7 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/ui/root/main_screen.dart';
 import 'package:mlperfbench/ui/run/result_screen.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
@@ -22,13 +25,28 @@ class Interval {
   }
 }
 
-Future<void> runBenchmarks(WidgetTester tester) async {
+Future<void> startApp(WidgetTester tester) async {
   const splashPauseSeconds = 4;
-  const runTimeLimitMinutes = 30;
-  const downloadTimeLimitMinutes = 20;
-
   await app.main();
   await tester.pumpAndSettle(const Duration(seconds: splashPauseSeconds));
+}
+
+Future<void> validateSettings(WidgetTester tester) async {
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  for (var benchmark in benchmarkState.benchmarks) {
+    final selected = benchmark.benchmarkSettings.delegateSelected;
+    final choices = benchmark.benchmarkSettings.delegateChoice;
+    expect(choices.isEmpty == selected.isEmpty, isTrue);
+    final reason =
+        'delegate_selected=$selected must be one of delegate_choice=$choices';
+    expect(choices.contains(selected), isTrue, reason: reason);
+  }
+}
+
+Future<void> runBenchmarks(WidgetTester tester) async {
+  const runTimeLimitMinutes = 30;
+  const downloadTimeLimitMinutes = 20;
 
   var goButtonIsPresented = await waitFor(
       tester, downloadTimeLimitMinutes, const Key(MainKeys.goButton));
