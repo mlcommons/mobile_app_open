@@ -38,9 +38,11 @@ Future<void> validateSettings(WidgetTester tester) async {
     final selected = benchmark.benchmarkSettings.delegateSelected;
     final choices = benchmark.benchmarkSettings.delegateChoice;
     expect(choices.isEmpty == selected.isEmpty, isTrue);
-    final reason =
-        'delegate_selected=$selected must be one of delegate_choice=$choices';
-    expect(choices.contains(selected), isTrue, reason: reason);
+    if (choices.isNotEmpty) {
+      final reason =
+          'delegate_selected=$selected must be one of delegate_choice=$choices';
+      expect(choices.contains(selected), isTrue, reason: reason);
+    }
   }
 }
 
