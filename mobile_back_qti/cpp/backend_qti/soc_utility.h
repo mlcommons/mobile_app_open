@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -13,8 +13,10 @@ limitations under the License.
 #ifndef MOBILE_APP_OPEN_SOC_UTILITY_H
 #define MOBILE_APP_OPEN_SOC_UTILITY_H
 
+#ifdef __ANDROID__
 #include <EGL/egl.h>
 #include <GLES/gl.h>
+#endif
 #include <stdint.h>
 
 #include <map>
@@ -25,6 +27,7 @@ limitations under the License.
 
 #define DEFAULT_SOC_STR "Default"
 #define UNSUPPORTED_SOC_STR "Unsupported"
+#define UNSUPPORTED_SOC_ID 0
 
 class SocInfo {
  public:
@@ -84,6 +87,12 @@ class SocProperties {
 };
 
 class Socs {
+ private:
+#ifdef __ANDROID__
+  static uint32_t get_android_soc_id(void);
+#else
+  static uint32_t get_windows_soc_id(void);
+#endif
  public:
   static void soc_info_init();
 

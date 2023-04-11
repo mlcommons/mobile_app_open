@@ -124,8 +124,8 @@ output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	touch $@
 
 FORMAT_DOCKER_ARGS= \
-	--mount source=mlperf-pubcache,target=/home/.pub-cache \
-	--mount source=mlperf-output,target=/home/mlperf/mobile_app_open/output \
+	--mount source=mlperf-formatter-pubcache,target=/home/mlperf/.pub-cache \
+	--mount source=mlperf-formatter-output,target=/home/mlperf/mobile_app_open/output \
 	-v $(CURDIR):/home/mlperf/mobile_app_open \
 	-w /home/mlperf/mobile_app_open \
 	mlperf/formatter \

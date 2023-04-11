@@ -5,11 +5,15 @@ FROM ubuntu:20.04
 #   which makes reading layer info harder, so we set this env for for individual commands only.
 # JDK package downloads ~500 MB from slow mirrors, which can take a lot of time,
 #   so a separate layer for it makes image rebuild faster in case we change any other dependencies.
-RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-11-jdk-headless
-RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    openjdk-11-jdk-headless
+RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    build-essential \
     apt-transport-https \
     curl \
     git \
+    unzip \
+    pwgen \
     gnupg \
     make \
     protobuf-compiler \
@@ -18,13 +22,13 @@ RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python3 -m pip install numpy absl-py
 
-RUN curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 -o /usr/local/bin/bazel && \
+RUN curl --proto '=https' -L https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 -o /usr/local/bin/bazel && \
     chmod +x /usr/local/bin/bazel
 
 ENV ANDROID_SDK_ROOT=/opt/android
 WORKDIR $ANDROID_SDK_ROOT/cmdline-tools
 # sdkmanager expects to be placed into `$ANDROID_SDK_ROOT/cmdline-tools/tools`
-RUN curl -L https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip | jar x && \
+RUN curl --proto '=https' -L https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip | jar x && \
     mv cmdline-tools tools && \
     chmod --recursive +x tools/bin
 ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin
@@ -46,7 +50,7 @@ WORKDIR $HOME
 
 ENV PUB_CACHE=$HOME/.cache/.pub-cache
 ENV PATH=$PATH:$HOME/flutter/bin:$PUB_CACHE/bin
-RUN curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.7.6-stable.tar.xz | tar Jxf - && chmod --recursive a=u $HOME/flutter
+RUN curl --proto '=https' -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.7.6-stable.tar.xz | tar Jxf - && chmod --recursive a=u $HOME/flutter
 RUN git config --global --add safe.directory $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
@@ -57,7 +61,8 @@ ENV GRADLE_USER_HOME=$HOME/.cache/.gradle
 ENV ANDROID_SDK_HOME=$HOME/.cache/.android
 
 RUN mkdir $ANDROID_SDK_HOME && chmod 777 $HOME/.cache/.android && \
-    keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
+    PASSWD=$(pwgen -s -y 20 1) && keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore \
+    -storepass $PASSWD -alias androiddebugkey -keypass $PASSWD -dname "CN=Android Debug,O=Android,C=US"
 
 RUN chmod 777 $HOME
 

@@ -594,3 +594,7 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
   }
   return MLPERF_SUCCESS;
 }
+
+void *mlperf_backend_get_buffer(size_t n) { return malloc(n); }
+
+void mlperf_backend_release_buffer(void *p) { free(p); }
