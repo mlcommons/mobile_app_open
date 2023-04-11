@@ -167,7 +167,7 @@ flutter/protobuf:
 
 .PHONY: flutter/update-splash-screen
 flutter/update-splash-screen:
-	cd flutter && FLUTTER_APP_VERSION='$(FLUTTER_APP_VERSION)' tool/update-splash-screen
+	cd flutter && FLUTTER_APP_VERSION='$(FLUTTER_APP_VERSION)' tool/update-splash-screen.sh
 
 .PHONY: flutter/l10n
 flutter/l10n:
