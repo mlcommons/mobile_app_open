@@ -292,7 +292,7 @@ class _NativeRunHelper {
     required this.runMode,
     required bool isTestMode,
     required ResourceManager resourceManager,
-    required List<pb.Setting> commonSettings,
+    required List<pb.CommonSetting> commonSettings,
     required String backendLibName,
     required String logParentDir,
     required int testMinQueryCount,

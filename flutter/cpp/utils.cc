@@ -119,7 +119,7 @@ mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   c_settings.accelerator_desc = accelerator_desc;
 
   // Add common settings
-  for (Setting s : settings.setting()) {
+  for (CommonSetting s : settings.setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value().value());
   }
   for (CustomSetting s : settings.benchmark_setting().custom_setting()) {

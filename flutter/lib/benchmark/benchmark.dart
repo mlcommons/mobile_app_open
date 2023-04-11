@@ -89,7 +89,7 @@ class Benchmark {
   RunSettings createRunSettings({
     required BenchmarkRunMode runMode,
     required ResourceManager resourceManager,
-    required List<pb.Setting> commonSettings,
+    required List<pb.CommonSetting> commonSettings,
     required String backendLibName,
     required String logDir,
     required int testMinDuration,

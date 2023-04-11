@@ -110,7 +110,7 @@ class ResultHelper {
   }
 
   List<BackendExtraSetting> _extraSettingsFromCommon(
-      List<pb.Setting> commonSettings) {
+      List<pb.CommonSetting> commonSettings) {
     final list = <BackendExtraSetting>[];
     for (var item in commonSettings) {
       list.add(BackendExtraSetting(
