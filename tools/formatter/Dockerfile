@@ -46,15 +46,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends dos2unix
 
 # Install Node.js and NPM
 ENV NODE_ENV="production"
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+RUN curl --proto '=https' -fsSL https://deb.nodesource.com/setup_lts.x | bash -
 RUN apt-get update && apt-get install -y --no-install-recommends nodejs && node -v
-RUN npm install --location=global npm@8.13.2 && npm --version
-RUN npm install -g quicktype
-RUN npm install -g prettier
+RUN npm install --ignore-scripts --location=global npm@8.13.2 && npm --version
+RUN npm install --ignore-scripts -g quicktype
+RUN npm install --ignore-scripts -g prettier
 
 # Add Markdown formatter
-RUN npm install -g markdownlint-cli@0.26.0
-RUN npm install -g markdown-link-check@3.9.0
+RUN npm install --ignore-scripts -g markdownlint-cli@0.26.0
+RUN npm install --ignore-scripts -g markdown-link-check@3.9.0
 
 # Add YAML linter
 RUN pip install yamllint==1.26.3
@@ -66,10 +66,12 @@ RUN git clone --branch "3.7.6" --single-branch --depth 1 \
     https://github.com/flutter/flutter.git /home/$UNAME/flutter
 RUN git config --global --add safe.directory /home/$UNAME/flutter
 # The PUB_CACHE directory will be mounted as a docker volume in format.mk
-ENV PUB_CACHE=/home/.pub-cache
+ENV PUB_CACHE=/home/mlperf/.pub-cache
 ENV PATH=$PATH:/home/$UNAME/flutter/bin:/home/$UNAME/flutter/bin/cache/dart-sdk/bin:$PUB_CACHE/bin
 RUN flutter doctor -v
 RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
 RUN apt-get install -y --no-install-recommends protobuf-compiler
+# The /home/mlperf/mobile_app_open directory will be mounted
+RUN git config --global --add safe.directory /home/mlperf/mobile_app_open
 
 CMD /bin/bash

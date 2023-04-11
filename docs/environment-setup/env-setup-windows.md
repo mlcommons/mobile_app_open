@@ -25,6 +25,7 @@ However, using Chocolatey greatly simplifies installation.
   * `choco install -y msys2`
   * `choco install -y flutter`
   * `choco install -y protoc`
+  * `dart pub global activate protoc_plugin`
 * Configure python
   * You must have command `python3` in your PATH.  
   Python installed via Chocolatey provides only `python.exe` file, so you will need to create `python3` yourself.  
@@ -44,6 +45,10 @@ However, using Chocolatey greatly simplifies installation.
 * Turn on the developer mode in Windows settings.
   * This option should be located in `Update & Security` → `For developers`.
   * Or you can open this page from command line: `start ms-settings:developers`
+
+**Note**: Keep the bazel base path short, because some of the commands during tflite compilation
+can become very long and throw some error. You can change the path by
+using --output_base=<some\short\path>
 
 **Note**: If you have a WSL distro installed on your PC, you may need to set `BAZEL_SH` environment variable.
 Without it bazel could call `bash` provided by WSL instead of MSYS2's one.

@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,8 +34,9 @@ void* ChunkAllocator::GetBuffer(size_t n, size_t chunks_per_block) {
 
 void ChunkAllocator::ReleaseBuffer(void* p) {
   Block* block = Block::block_map_[p];
+  int chunkSize = block->GetChunkSize();
   getAllocator().at(block->GetChunkSize()).ReleaseChunk(block, p);
-  if (getAllocator().at(block->GetChunkSize()).IsChunkEmpty()) {
+  if (getAllocator().at(chunkSize).IsChunkEmpty()) {
     getAllocator().clear();
   }
 }

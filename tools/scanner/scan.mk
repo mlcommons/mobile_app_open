@@ -59,6 +59,7 @@ scanner/scan:
 		-Dsonar.python.version="3.8, 3.9, 3.10" \
 		-Dsonar.cfamily.build-wrapper-output="${SONAR_OUT_DIR}" \
 		-Dsonar.cfamily.analysisCache.mode=server \
+		-Dsonar.java.libraries=**/*.jar \
 		-Dsonar.host.url=https://sonarcloud.io \
 		-Dsonar.scm.provider=git \
 		-Dsonar.pullrequest.provider=github \
