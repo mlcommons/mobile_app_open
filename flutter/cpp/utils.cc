@@ -100,25 +100,22 @@ void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs) {
 }
 
 mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
-  mlperf_backend_configuration_t c_settings;
-  char *accelerator =
-      new char[settings.benchmark_setting().accelerator().length() + 1];
-  strcpy(accelerator, settings.benchmark_setting().accelerator().c_str());
-  c_settings.accelerator = accelerator;
+  mlperf_backend_configuration_t c_settings = {};
+  c_settings.accelerator =
+      strdup(settings.benchmark_setting().accelerator().c_str());
   c_settings.batch_size = settings.benchmark_setting().batch_size();
-  char *accelerator_desc =
-      new char[settings.benchmark_setting().accelerator_desc().length() + 1];
-  strcpy(accelerator_desc,
-         settings.benchmark_setting().accelerator_desc().c_str());
-  c_settings.accelerator_desc = accelerator_desc;
+  c_settings.accelerator_desc =
+      strdup(settings.benchmark_setting().accelerator_desc().c_str());
 
   // Add common settings
-  for (Setting s : settings.setting()) {
+  for (const auto &s : settings.setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value().value());
   }
-  for (CustomSetting s : settings.benchmark_setting().custom_setting()) {
+
+  for (const auto &s : settings.benchmark_setting().custom_setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value());
   }
+
   return c_settings;
 }
 
