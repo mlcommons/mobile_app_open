@@ -29,7 +29,7 @@ RUN curl -OL https://github.com/google/protobuf/releases/download/v3.6.1/protoc-
     rm -rf protoc-3.6.1-linux-x86_64.zip protoc3
 
 # Install bazel
-RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
+RUN echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
 RUN curl https://bazel.build/bazel-release.pub.gpg | apt-key add -
 RUN apt-get update && \
     apt-get install -y --allow-unauthenticated bazel-3.7.2
