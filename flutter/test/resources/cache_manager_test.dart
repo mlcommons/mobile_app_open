@@ -6,40 +6,77 @@ import 'package:mlperfbench/resources/cache_manager.dart';
 void main() async {
   group('CacheManager', () {
     late CacheManager manager;
-    final paths = [
-      'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-zip-file.zip',
-    ];
+    const zipRemotePath =
+        'https://github.com/mlcommons/mobile_models/raw/main/v3_0/datasets/coco-test.zip';
+    const txtRemotePath =
+        'https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt';
+    final paths = [zipRemotePath, txtRemotePath];
+
     setUp(() async {
       manager = CacheManager('/tmp/resources');
       await manager.cache(paths, (val) {}, true);
     });
 
     test('get', () async {
-      expect(manager.get('non-existent'), isNull,
-          reason: 'path should be null');
-      final localPath = manager.get(paths[0]);
-      expect(localPath, isNotNull, reason: 'path should not be null');
-      final file = File(localPath!);
-      expect(await file.exists(), isTrue, reason: 'file should exist');
+      expect(manager.get('foo/bar'), isNull, reason: 'path should be null');
+      final txtLocalPath = manager.get(txtRemotePath);
+      expect(txtLocalPath, isNotNull,
+          reason: 'path [$txtLocalPath] should not be null');
+      final txtFile = File(txtLocalPath!);
+      expect(await txtFile.exists(), isTrue,
+          reason: 'file should exist at path [$txtLocalPath]');
+      final zipLocalPath = manager.get(zipRemotePath);
+      expect(zipLocalPath, isNotNull,
+          reason: 'path [$zipLocalPath] should not be null');
+      final zipDirectory = Directory(zipLocalPath!);
+      expect(await zipDirectory.exists(), isTrue,
+          reason: 'directory should exist at path [$zipLocalPath]');
     });
 
     test('getArchive', () {
-      expect(manager.getArchive('/downloads/file'), isNull,
+      expect(manager.getArchive('/foo/bar'), isNull,
           reason: 'returned path should be null');
-      expect(manager.getArchive(paths[0]), isNotNull,
+      expect(manager.getArchive(txtRemotePath), isNull,
+          reason: 'returned path should be null');
+      expect(manager.getArchive(zipRemotePath), isNotNull,
           reason: 'returned path should not be null');
     });
 
     test('isResourceAnArchive', () {
-      expect(manager.isResourceAnArchive('/downloads/file'), isFalse,
+      expect(manager.isResourceAnArchive(txtRemotePath), isFalse,
           reason: 'resource should not be an archive');
-      expect(manager.isResourceAnArchive('/downloads/file.zip'), isTrue,
+      expect(manager.isResourceAnArchive(zipRemotePath), isTrue,
           reason: 'resource should be an archive');
     });
 
     test('deleteArchives', () async {
       await manager.deleteArchives(paths);
-      expect(manager.getArchive(paths[0]), isNull);
+      final zipLocalPath = manager.getArchive(zipRemotePath);
+      expect(zipLocalPath, isNotNull);
+      expect(await File(zipLocalPath!).exists(), isFalse,
+          reason: 'file should not exist at path [$zipLocalPath]');
+      expect(manager.getArchive(txtRemotePath), isNull);
+    });
+
+    test('deleteLoadedResources', () async {
+      await manager.deleteLoadedResources(paths);
+
+      final zipLocalFilePath = manager.getArchive(zipRemotePath);
+      expect(zipLocalFilePath, isNotNull);
+      expect(await File(zipLocalFilePath!).exists(), isFalse,
+          reason: 'file should not exist at path [$zipLocalFilePath]');
+
+      final zipLocalDirectoryPath = manager.get(zipRemotePath);
+      expect(zipLocalDirectoryPath, isNotNull,
+          reason: 'path [$zipLocalDirectoryPath] should not be null');
+      final zipDirectory = Directory(zipLocalDirectoryPath!);
+      expect(await zipDirectory.exists(), isFalse,
+          reason: 'directory should exist at path [$zipLocalDirectoryPath]');
+
+      final txtLocalPath = manager.get(txtRemotePath);
+      expect(txtLocalPath, isNotNull);
+      expect(await File(txtLocalPath!).exists(), isFalse,
+          reason: 'file should not exist at path [$txtLocalPath]');
     });
   });
 }
