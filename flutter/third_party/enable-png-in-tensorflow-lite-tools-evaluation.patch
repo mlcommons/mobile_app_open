@@ -1,0 +1,94 @@
+From 2d14d34ef780b60f063e48178b30cc7ab043f196 Mon Sep 17 00:00:00 2001
+From: Koan-Sin Tan <koansin.tan@gmail.com>
+Date: Fri, 31 Mar 2023 17:11:28 +0800
+Subject: [PATCH] enable png in tensorflow/lite/tools/evaluation
+
+---
+ tensorflow/lite/tools/evaluation/stages/BUILD |  2 ++
+ .../stages/image_preprocessing_stage.cc       | 26 +++++++++++++++++++
+ .../stages/image_preprocessing_stage_test.cc  |  2 +-
+ 3 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/tensorflow/lite/tools/evaluation/stages/BUILD b/tensorflow/lite/tools/evaluation/stages/BUILD
+index 9f649588145..e81b284709c 100644
+--- a/tensorflow/lite/tools/evaluation/stages/BUILD
++++ b/tensorflow/lite/tools/evaluation/stages/BUILD
+@@ -53,9 +53,11 @@ cc_library(
+     ] + select({
+         "//tensorflow:android": [
+             "//tensorflow/core:portable_jpeg_internal",
++            "//tensorflow/core/lib/png:png_io",
+         ],
+         "//conditions:default": [
+             "//tensorflow/core:jpeg_internal",
++            "//tensorflow/core/lib/png:png_io",
+         ],
+     }),
+ )
+diff --git a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
+index a1418c3bcb6..a9750141b3d 100644
+--- a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
++++ b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
+@@ -29,6 +29,7 @@ limitations under the License.
+ #include "absl/strings/ascii.h"
+ #include "tensorflow/core/lib/jpeg/jpeg_handle.h"
+ #include "tensorflow/core/lib/jpeg/jpeg_mem.h"
++#include "tensorflow/core/lib/png/png_io.h"
+ #include "tensorflow/core/platform/logging.h"
+ #include "tensorflow/lite/kernels/internal/reference/reference_ops.h"
+ #include "tensorflow/lite/kernels/internal/types.h"
+@@ -107,6 +108,29 @@ inline void LoadImageJpeg(std::string* filename, ImageData* image_data) {
+   image_data->data.reset(float_image);
+ }
+ 
++// Loads the png image.
++inline void LoadImagePng(std::string* filename, ImageData* image_data) {
++  // Reads image.
++  std::ifstream t(*filename);
++  std::string image_str((std::istreambuf_iterator<char>(t)),
++                        std::istreambuf_iterator<char>());
++
++  tensorflow::png::DecodeContext context;
++  CHECK(CommonInitDecode(image_str, 3 /*RGB*/, 8 /*uint8*/, &context));
++  char* image_buffer = new char[3 * context.width * context.height];
++  CHECK(CommonFinishDecode(absl::bit_cast<png_byte*>(image_buffer),
++                           3 * context.width /*stride*/, &context));
++
++  image_data->width = context.width;
++  image_data->height = context.height;
++  std::vector<float>* float_image = new std::vector<float>();
++  float_image->reserve(3 * context.width * context.height);
++  for (int i = 0; i < 3 * context.width * context.height; ++i) {
++    float_image->push_back(static_cast<float>(image_buffer[i]));
++  }
++  image_data->data.reset(float_image);
++}
++
+ // Central-cropping.
+ inline void Crop(ImageData* image_data, const CroppingParams& crop_params) {
+   int crop_height, crop_width;
+@@ -284,6 +308,8 @@ TfLiteStatus ImagePreprocessingStage::Run() {
+     LoadImageRaw(image_path_, &image_data);
+   } else if (image_ext == ".jpg" || image_ext == ".jpeg") {
+     LoadImageJpeg(image_path_, &image_data);
++  } else if (image_ext == ".png") {
++    LoadImagePng(image_path_, &image_data);
+   } else {
+     LOG(ERROR) << "Extension " << image_ext << " is not supported";
+     return kTfLiteError;
+diff --git a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage_test.cc b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage_test.cc
+index 32105cbe7b4..05b83d0705b 100644
+--- a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage_test.cc
++++ b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage_test.cc
+@@ -28,7 +28,7 @@ namespace {
+ constexpr char kImagePreprocessingStageName[] = "inception_preprocessing_stage";
+ constexpr char kTestImage[] =
+     "tensorflow/lite/tools/evaluation/stages/testdata/"
+-    "grace_hopper.jpg";
++    "grace_hopper.png";
+ constexpr int kImageDim = 224;
+ 
+ TEST(ImagePreprocessingStage, NoParams) {
+-- 
+2.34.1
+
