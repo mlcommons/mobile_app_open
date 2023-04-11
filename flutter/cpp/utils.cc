@@ -79,12 +79,8 @@ bool AddBackendConfiguration(mlperf_backend_configuration_t *configs,
     return false;
   }
   // Copy data in case of key, value deallocated.
-  char *c_key = new char[key.length() + 1];
-  strcpy(c_key, key.c_str());
-  char *c_value = new char[value.length() + 1];
-  strcpy(c_value, value.c_str());
-  configs->keys[configs->count] = c_key;
-  configs->values[configs->count] = c_value;
+  configs->keys[configs->count] = strdup(key.c_str());
+  configs->values[configs->count] = strdup(value.c_str());
   configs->count++;
   return true;
 }
