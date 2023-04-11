@@ -117,11 +117,6 @@ flutter/result/gen-extended-sample:
 		--define=jsonFileName=../${RESULT_JSON_SAMPLE_PATH} \
 		lib/data/generation_helpers/write_json_sample.main.dart
 
-.PHONY: flutter/result/gen-unittest-sample
-flutter/result/gen-unittest-sample:
-	make flutter/result/gen-extended-sample \
-		RESULT_JSON_SAMPLE_PATH=flutter_common/test/data/extended_result_unittest.json
-
 default_result_json_schema_path=tools/extended_result_schema.json
 RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
 .PHONY: flutter/result/gen-schema
