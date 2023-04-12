@@ -13,10 +13,30 @@ class BackendInfoHelper {
     for (var name in getBackendsList()) {
       final backendSettings = match(name);
       if (backendSettings != null) {
-        return BackendInfo._(backendSettings, name);
+        final migratedBackendSettings = migrateBackendSetting(backendSettings);
+        return BackendInfo._(migratedBackendSettings, name);
       }
     }
     throw 'no matching backend found';
+  }
+
+  // Support old benchmark_setting with no delegate_choice.
+  // Remove this after deprecated fields are removed from backend_setting.proto
+  pb.BackendSetting migrateBackendSetting(pb.BackendSetting setting) {
+    for (final benchmarkSetting in setting.benchmarkSetting) {
+      if (benchmarkSetting.delegateChoice.isEmpty) {
+        final delegateChoice = pb.DelegateSetting(
+          delegateName: '',
+          acceleratorName: benchmarkSetting.accelerator,
+          acceleratorDesc: benchmarkSetting.acceleratorDesc,
+          modelPath: benchmarkSetting.modelPath,
+          modelChecksum: benchmarkSetting.modelChecksum,
+          batchSize: benchmarkSetting.batchSize,
+        );
+        benchmarkSetting.delegateChoice.add(delegateChoice);
+      }
+    }
+    return setting;
   }
 
   pb.BackendSetting? match(String libName) {

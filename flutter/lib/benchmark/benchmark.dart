@@ -87,17 +87,7 @@ class Benchmark {
 
   pb.DelegateSetting get selectedDelegate {
     final delegate = benchmarkSettings.delegateChoice.firstWhere(
-        (e) => e.delegateName == benchmarkSettings.delegateSelected,
-        // Support old benchmark_setting with no delegate_choice.
-        // Remove this after deprecated fields are removed from backend_setting.proto
-        // ignore_for_file: deprecated_member_use_from_same_package
-        orElse: () => pb.DelegateSetting(
-              modelPath: benchmarkSettings.modelPath,
-              modelChecksum: benchmarkSettings.modelChecksum,
-              acceleratorName: benchmarkSettings.accelerator,
-              acceleratorDesc: benchmarkSettings.acceleratorDesc,
-              batchSize: benchmarkSettings.batchSize,
-            ));
+        (e) => e.delegateName == benchmarkSettings.delegateSelected);
     return delegate;
   }
 
@@ -198,24 +188,13 @@ class BenchmarkStore {
         result.addAll([data, groundtruth]);
       }
 
-      if (b.benchmarkSettings.delegateChoice.isEmpty) {
-        // Support old benchmark_setting with no delegate_choice.
-        // Remove this after deprecated fields are removed from backend_setting.proto
+      for (final delegate in b.benchmarkSettings.delegateChoice) {
         final model = Resource(
-          path: b.selectedDelegate.modelPath,
+          path: delegate.modelPath,
           type: ResourceTypeEnum.model,
-          md5Checksum: b.selectedDelegate.modelChecksum,
+          md5Checksum: delegate.modelChecksum,
         );
         result.add(model);
-      } else {
-        for (var delegate in b.benchmarkSettings.delegateChoice) {
-          final model = Resource(
-            path: delegate.modelPath,
-            type: ResourceTypeEnum.model,
-            md5Checksum: delegate.modelChecksum,
-          );
-          result.add(model);
-        }
       }
     }
 

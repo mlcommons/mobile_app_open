@@ -97,6 +97,9 @@ class _ConfigScreen extends State<ConfigScreen> {
     if (choices.isEmpty) {
       return const SizedBox();
     }
+    if (choices.length == 1 && choices.first.isEmpty) {
+      return const SizedBox();
+    }
     if (!choices.contains(selected)) {
       throw 'delegate_selected=$selected must be one of delegate_choice=$choices';
     }

@@ -104,25 +104,16 @@ mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   mlperf_backend_configuration_t c_settings = {};
   auto &bs = settings.benchmark_setting();
 
-  // Support old benchmark_setting with no delegate_choice.
-  // Remove this after deprecated fields are removed from backend_setting.proto
-  if (bs.delegate_choice().empty()) {
-    c_settings.delegate_selected = strdup("");
-    c_settings.batch_size = bs.batch_size();
-    c_settings.accelerator = strdup(bs.accelerator().c_str());
-    c_settings.accelerator_desc = strdup(bs.accelerator_desc().c_str());
-  } else {
-    for (const auto &d : bs.delegate_choice()) {
-      if (d.delegate_name() == bs.delegate_selected()) {
-        c_settings.delegate_selected = strdup(d.delegate_name().c_str());
-        c_settings.batch_size = d.batch_size();
-        c_settings.accelerator = strdup(d.accelerator_name().c_str());
-        c_settings.accelerator_desc = strdup(d.accelerator_desc().c_str());
-        for (const auto &s : d.custom_setting()) {
-          AddBackendConfiguration(&c_settings, s.id(), s.value());
-        }
-        break;
+  for (const auto &d : bs.delegate_choice()) {
+    if (d.delegate_name() == bs.delegate_selected()) {
+      c_settings.delegate_selected = strdup(d.delegate_name().c_str());
+      c_settings.accelerator = strdup(d.accelerator_name().c_str());
+      c_settings.accelerator_desc = strdup(d.accelerator_desc().c_str());
+      c_settings.batch_size = d.batch_size();
+      for (const auto &s : d.custom_setting()) {
+        AddBackendConfiguration(&c_settings, s.id(), s.value());
       }
+      break;
     }
   }
 
