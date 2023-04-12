@@ -19,6 +19,9 @@ void main() {
         tiny: pb.OneDatasetConfig(inputPath: 'tiny-inputPath'),
       ),
     );
+    // Support old benchmark_setting with no delegate_choice.
+    // Remove this after deprecated fields are removed from backend_setting.proto
+    // ignore_for_file: deprecated_member_use_from_same_package
     final backendSettings1 = pb.BenchmarkSetting(
       benchmarkId: 'task1',
       modelPath: 'model1-path',

@@ -59,7 +59,7 @@ lint/dart: format/dart/pub-get
 	cd flutter && ${_start_args} dart run import_sorter:main --exit-if-changed
 	cd flutter_common && ${_start_args} dart run import_sorter:main --exit-if-changed
 	dart format --output=none --set-exit-if-changed flutter flutter_common
-	dart analyze --fatal-infos
+	dart analyze --fatal-infos flutter flutter_common
 
 .PHONY: lint/yaml
 lint/yaml:
