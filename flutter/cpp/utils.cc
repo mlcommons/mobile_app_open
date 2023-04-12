@@ -101,28 +101,34 @@ void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs) {
 }
 
 mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
-  mlperf_backend_configuration_t c_settings;
-  char *delegate_selected =
-      new char[settings.benchmark_setting().delegate_selected().length() + 1];
-  strcpy(delegate_selected,
-         settings.benchmark_setting().delegate_selected().c_str());
-  c_settings.delegate_selected = delegate_selected;
-  char *accelerator =
-      new char[settings.benchmark_setting().accelerator().length() + 1];
-  strcpy(accelerator, settings.benchmark_setting().accelerator().c_str());
-  c_settings.accelerator = accelerator;
-  c_settings.batch_size = settings.benchmark_setting().batch_size();
-  char *accelerator_desc =
-      new char[settings.benchmark_setting().accelerator_desc().length() + 1];
-  strcpy(accelerator_desc,
-         settings.benchmark_setting().accelerator_desc().c_str());
-  c_settings.accelerator_desc = accelerator_desc;
+  mlperf_backend_configuration_t c_settings = {};
+  auto &bs = settings.benchmark_setting();
+
+  // Support old benchmark_setting with no delegate_choice.
+  // Remove this after deprecated fields are removed from backend_setting.proto
+  if (bs.delegate_choice().empty()) {
+    c_settings.delegate_selected = strdup("");
+    c_settings.batch_size = bs.batch_size();
+    c_settings.accelerator = strdup(bs.accelerator().c_str());
+    c_settings.accelerator_desc = strdup(bs.accelerator_desc().c_str());
+  } else {
+    for (const auto &d : bs.delegate_choice()) {
+      if (d.delegate_name() == bs.delegate_selected()) {
+        c_settings.delegate_selected = strdup(d.delegate_name().c_str());
+        c_settings.batch_size = d.batch_size();
+        c_settings.accelerator = strdup(d.accelerator_name().c_str());
+        c_settings.accelerator_desc = strdup(d.accelerator_desc().c_str());
+        break;
+      }
+    }
+  }
 
   // Add common settings
-  for (CommonSetting s : settings.setting()) {
+  for (const auto &s : settings.setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value().value());
   }
-  for (CustomSetting s : settings.benchmark_setting().custom_setting()) {
+
+  for (const auto &s : bs.custom_setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value());
   }
   return c_settings;

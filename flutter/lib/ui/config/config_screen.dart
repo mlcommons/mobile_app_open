@@ -91,7 +91,9 @@ class _ConfigScreen extends State<ConfigScreen> {
 
   Widget _delegateChoice(Benchmark benchmark) {
     final selected = benchmark.benchmarkSettings.delegateSelected;
-    final choices = benchmark.benchmarkSettings.delegateChoice;
+    final choices = benchmark.benchmarkSettings.delegateChoice
+        .map((e) => e.delegateName)
+        .toList();
     if (choices.isEmpty) {
       return const SizedBox();
     }

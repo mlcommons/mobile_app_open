@@ -81,10 +81,24 @@ class Benchmark {
     required this.taskConfig,
     required this.isActive,
   })  : info = BenchmarkInfo(taskConfig),
-        backendRequestDescription =
-            '${benchmarkSettings.framework} | ${benchmarkSettings.acceleratorDesc}';
+        backendRequestDescription = benchmarkSettings.framework;
 
   String get id => taskConfig.id;
+
+  pb.DelegateSetting get selectedDelegate {
+    final delegate = benchmarkSettings.delegateChoice.firstWhere(
+        (e) => e.delegateName == benchmarkSettings.delegateSelected,
+        // Support old benchmark_setting with no delegate_choice.
+        // Remove this after deprecated fields are removed from backend_setting.proto
+        orElse: () => pb.DelegateSetting(
+              modelPath: benchmarkSettings.modelPath,
+              modelChecksum: benchmarkSettings.modelChecksum,
+              acceleratorName: benchmarkSettings.accelerator,
+              acceleratorDesc: benchmarkSettings.acceleratorDesc,
+              batchSize: benchmarkSettings.batchSize,
+            ));
+    return delegate;
+  }
 
   RunSettings createRunSettings({
     required BenchmarkRunMode runMode,
@@ -116,7 +130,7 @@ class Benchmark {
     );
 
     return RunSettings(
-      backend_model_path: resourceManager.get(benchmarkSettings.modelPath),
+      backend_model_path: resourceManager.get(selectedDelegate.modelPath),
       backend_lib_name: backendLibName,
       backend_settings: settings,
       backend_native_lib_path: DeviceInfo.instance.nativeLibraryPath,
@@ -183,12 +197,25 @@ class BenchmarkStore {
         result.addAll([data, groundtruth]);
       }
 
-      final model = Resource(
-        path: b.benchmarkSettings.modelPath,
-        type: ResourceTypeEnum.model,
-        md5Checksum: b.benchmarkSettings.modelChecksum,
-      );
-      result.add(model);
+      if (b.benchmarkSettings.delegateChoice.isEmpty) {
+        // Support old benchmark_setting with no delegate_choice.
+        // Remove this after deprecated fields are removed from backend_setting.proto
+        final model = Resource(
+          path: b.selectedDelegate.modelPath,
+          type: ResourceTypeEnum.model,
+          md5Checksum: b.selectedDelegate.modelChecksum,
+        );
+        result.add(model);
+      } else {
+        for (var delegate in b.benchmarkSettings.delegateChoice) {
+          final model = Resource(
+            path: delegate.modelPath,
+            type: ResourceTypeEnum.model,
+            md5Checksum: delegate.modelChecksum,
+          );
+          result.add(model);
+        }
+      }
     }
 
     final set = <Resource>{};

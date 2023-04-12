@@ -36,7 +36,9 @@ Future<void> validateSettings(WidgetTester tester) async {
   final benchmarkState = state.context.read<BenchmarkState>();
   for (var benchmark in benchmarkState.benchmarks) {
     final selected = benchmark.benchmarkSettings.delegateSelected;
-    final choices = benchmark.benchmarkSettings.delegateChoice;
+    final choices = benchmark.benchmarkSettings.delegateChoice
+        .map((e) => e.delegateName)
+        .toList();
     expect(choices.isEmpty == selected.isEmpty, isTrue);
     if (choices.isNotEmpty) {
       final reason =

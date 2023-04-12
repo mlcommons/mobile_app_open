@@ -230,7 +230,7 @@ class TaskRunner {
         accuracy2: performanceResult.accuracy2,
         backendName: performanceResult.backendName,
         acceleratorName: performanceResult.acceleratorName,
-        batchSize: benchmark.benchmarkSettings.batchSize,
+        batchSize: benchmark.selectedDelegate.batchSize,
         validity: performanceRunInfo.loadgenInfo!.validity,
       );
       resultHelper.performanceRunInfo = performanceRunInfo;
@@ -267,7 +267,7 @@ class TaskRunner {
         accuracy2: accuracyResult.accuracy2,
         backendName: accuracyResult.backendName,
         acceleratorName: accuracyResult.acceleratorName,
-        batchSize: benchmark.benchmarkSettings.batchSize,
+        batchSize: benchmark.selectedDelegate.batchSize,
         validity: false,
       );
     } else {
