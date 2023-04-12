@@ -22,6 +22,7 @@ class BackendInfoHelper {
 
   // Support old benchmark_setting with no delegate_choice.
   // Remove this after deprecated fields are removed from backend_setting.proto
+  // ignore_for_file: deprecated_member_use_from_same_package
   pb.BackendSetting migrateBackendSetting(pb.BackendSetting setting) {
     for (final benchmarkSetting in setting.benchmarkSetting) {
       if (benchmarkSetting.delegateChoice.isEmpty) {
