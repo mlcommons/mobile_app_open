@@ -98,7 +98,8 @@ class ResultHelper {
   BackendSettingsInfo _makeBackendSettingsInfo(
       Benchmark benchmark, List<pb.CommonSetting> commonSettings) {
     final delegate = benchmark.selectedDelegate;
-
+    final extraSettings = _extraSettingsFromCommon(commonSettings) +
+        _extraSettingsFromCustom(benchmark.selectedDelegate.customSetting);
     return BackendSettingsInfo(
       acceleratorCode: delegate.acceleratorName,
       acceleratorDesc: delegate.acceleratorDesc,
@@ -106,7 +107,7 @@ class ResultHelper {
       framework: benchmark.benchmarkSettings.framework,
       modelPath: delegate.modelPath,
       batchSize: delegate.batchSize,
-      extraSettings: _extraSettingsFromCommon(commonSettings),
+      extraSettings: extraSettings,
     );
   }
 
@@ -119,6 +120,20 @@ class ResultHelper {
           name: item.name,
           value: item.value.value,
           valueName: item.value.name));
+    }
+    return list;
+  }
+
+  List<BackendExtraSetting> _extraSettingsFromCustom(
+      List<pb.CustomSetting> settings) {
+    final list = <BackendExtraSetting>[];
+    for (var item in settings) {
+      list.add(BackendExtraSetting(
+        id: item.id,
+        name: '',
+        value: item.value,
+        valueName: '',
+      ));
     }
     return list;
   }

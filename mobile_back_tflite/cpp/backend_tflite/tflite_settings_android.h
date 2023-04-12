@@ -37,6 +37,10 @@ benchmark_setting {
     accelerator_desc: "NPU"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
     model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+    custom_setting: {
+      id: "sample id"
+      value: "sample value"
+    }
   }
   delegate_choice: {
     priority: 1

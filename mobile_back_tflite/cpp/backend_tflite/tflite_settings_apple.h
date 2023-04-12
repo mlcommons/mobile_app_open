@@ -39,6 +39,10 @@ benchmark_setting {
     accelerator_desc: "ANE"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
     model_checksum: "66bb4eba50987221608f8487ed405794"
+    custom_setting: {
+      id: "sample id"
+      value: "sample value"
+    }
   }
   delegate_choice: {
     priority: 1

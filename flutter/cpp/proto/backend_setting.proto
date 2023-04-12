@@ -32,11 +32,11 @@ message BackendSetting {
 
 // Config of a benchmark.
 //
-// Next ID: 11
+// Next ID: 12
 message BenchmarkSetting {
   // Id of the benchmark. Must match the value in TaskConfig::id.
   required string benchmark_id = 1;
-  // Backend custom model settings
+  // Custom setting for this benchmark.
   repeated CustomSetting custom_setting = 2;
   // Human-readable name of the underlying ML framework (software)
   required string framework = 7;
@@ -49,25 +49,22 @@ message BenchmarkSetting {
   // Must be one of DelegateSetting.delegate_name.
   optional string delegate_selected = 11;
 
+  // The fields below are deprecated and will be removed in the future.
+  // Use delegate_choice instead.
   // URL or local path of the model file
-  // Deprecated, use delegate instead
   optional string model_path = 3 [deprecated = true];
   // MD5 checksum to validate the model file
-  // Deprecated, use delegate instead
   optional string model_checksum = 4 [deprecated = true];
   // Name of the accelerator (hardware), which is passed to the backend.
-  // Deprecated, use delegate instead
   optional string accelerator = 5 [deprecated = true];
   // Human-readable name of the accelerator (hardware)
-  // Deprecated, use delegate instead
   optional string accelerator_desc = 6 [deprecated = true];
   // batch_size is passed to the backend
-  // Deprecated, use delegate instead
   optional int32 batch_size = 8 [deprecated = true];
 }
 
 // Config of a delegate.
-// Next ID: 7
+// Next ID: 8
 message DelegateSetting {
   // Priority of the delegate. Used for sorting delegate choices in frontend.
   optional int32 priority = 1 [default = 0];
@@ -83,6 +80,8 @@ message DelegateSetting {
   required string model_checksum = 6;
   // The batch size to be used when running the model.
   optional int32 batch_size = 7;
+  // Custom setting for this delegate.
+  repeated CustomSetting custom_setting = 8;
 }
 
 // Common setting of each benchmark
