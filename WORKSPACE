@@ -53,6 +53,8 @@ http_archive(
     name = "org_tensorflow",
     patch_args = ["-p1"],
     patches = [
+        # Add patch for adding png in tflite evaluation code
+        "//:flutter/third_party/enable-png-in-tensorflow-lite-tools-evaluation.patch",
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",

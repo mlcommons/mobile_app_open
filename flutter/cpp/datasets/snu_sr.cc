@@ -44,7 +44,7 @@ SNUSR::SNUSR(Backend *backend, const std::string &image_dir,
   }
 
   // Finds all images under image_dir.
-  std::unordered_set<std::string> exts{".rgb8", ".jpg", ".jpeg"};
+  std::unordered_set<std::string> exts{".rgb8", ".jpg", ".jpeg", ".png"};
   image_list_ = GetSortedFileNames(image_dir, exts);
   if (image_list_.empty()) {
     LOG(FATAL) << "Failed to list all the image files in provided path";
@@ -56,7 +56,7 @@ SNUSR::SNUSR(Backend *backend, const std::string &image_dir,
       image_list_.size());
   // Finds all ground truth files under ground_truth_dir.
 
-  std::unordered_set<std::string> gt_exts{".rgb8", ".jpg", ".jpeg"};
+  std::unordered_set<std::string> gt_exts{".rgb8", ".jpg", ".jpeg", ".png"};
   ground_truth_list_ = GetSortedFileNames(ground_truth_dir, gt_exts);
   if (ground_truth_list_.empty()) {
     LOG(ERROR) << "Failed to list all the ground truth files in provided path. "
