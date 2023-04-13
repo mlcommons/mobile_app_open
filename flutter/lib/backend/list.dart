@@ -35,6 +35,12 @@ class BackendInfoHelper {
           batchSize: benchmarkSetting.batchSize,
         );
         benchmarkSetting.delegateChoice.add(delegateChoice);
+        benchmarkSetting.clearAccelerator();
+        benchmarkSetting.clearAcceleratorDesc();
+        benchmarkSetting.clearModelPath();
+        benchmarkSetting.clearModelChecksum();
+        benchmarkSetting.clearBatchSize();
+        benchmarkSetting.delegateSelected = '';
       }
     }
     return setting;

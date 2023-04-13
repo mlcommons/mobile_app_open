@@ -90,6 +90,7 @@ void MigrateBackendSetting(BackendSetting *setting) {
     bs.clear_model_path();
     bs.clear_model_checksum();
     bs.clear_batch_size();
+    bs.set_delegate_selected("");
   }
 }
 
