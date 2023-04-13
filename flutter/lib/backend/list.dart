@@ -25,23 +25,25 @@ class BackendInfoHelper {
   // ignore_for_file: deprecated_member_use_from_same_package
   pb.BackendSetting migrateBackendSetting(pb.BackendSetting setting) {
     for (final benchmarkSetting in setting.benchmarkSetting) {
-      if (benchmarkSetting.delegateChoice.isEmpty) {
-        final delegateChoice = pb.DelegateSetting(
-          delegateName: '',
-          acceleratorName: benchmarkSetting.accelerator,
-          acceleratorDesc: benchmarkSetting.acceleratorDesc,
-          modelPath: benchmarkSetting.modelPath,
-          modelChecksum: benchmarkSetting.modelChecksum,
-          batchSize: benchmarkSetting.batchSize,
-        );
-        benchmarkSetting.delegateChoice.add(delegateChoice);
-        benchmarkSetting.clearAccelerator();
-        benchmarkSetting.clearAcceleratorDesc();
-        benchmarkSetting.clearModelPath();
-        benchmarkSetting.clearModelChecksum();
-        benchmarkSetting.clearBatchSize();
-        benchmarkSetting.delegateSelected = '';
+      if (benchmarkSetting.delegateChoice.isNotEmpty) {
+        continue;
       }
+      final delegateChoice = pb.DelegateSetting(
+        delegateName: '',
+        acceleratorName: benchmarkSetting.accelerator,
+        acceleratorDesc: benchmarkSetting.acceleratorDesc,
+        modelPath: benchmarkSetting.modelPath,
+        modelChecksum: benchmarkSetting.modelChecksum,
+        batchSize: benchmarkSetting.batchSize,
+      );
+      benchmarkSetting.delegateChoice.add(delegateChoice);
+      benchmarkSetting.clearAccelerator();
+      benchmarkSetting.clearAcceleratorDesc();
+      benchmarkSetting.clearModelPath();
+      benchmarkSetting.clearModelChecksum();
+      benchmarkSetting.clearBatchSize();
+      benchmarkSetting.delegateSelected = '';
+      print('Migrated benchmarkSetting of: ${benchmarkSetting.benchmarkId}');
     }
     return setting;
   }
