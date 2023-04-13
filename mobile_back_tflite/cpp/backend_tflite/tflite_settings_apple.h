@@ -57,38 +57,54 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "object_detection"
-  accelerator: "ane"
-  accelerator_desc: "ANE"
   framework: "TFLite"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
-  model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
+    model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+  }
+  delegate_selected: "Core ML"
 }
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
-  accelerator: "gpu"
-  accelerator_desc: "GPU"
   framework: "TFLite"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
-  model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+    model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+  }
+  delegate_selected: "Metal"
 }
 
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
-  accelerator: "ane"
-  accelerator_desc: "ANE"
   framework: "TFLite"
-  model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
-  model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
+    model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+  }
+  delegate_selected: "Core ML"
 }
 
 benchmark_setting {
   benchmark_id: "super_resolution"
-  accelerator: "ane"
-  accelerator_desc: "ANE"
   framework: "TFLite"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
-  model_checksum: "672240427c1f3dc33baf2facacd9631f"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
+    model_checksum: "672240427c1f3dc33baf2facacd9631f"
+  }
+  delegate_selected: "Core ML"
 }
 
 )SETTINGS";
