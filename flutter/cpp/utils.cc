@@ -79,12 +79,8 @@ bool AddBackendConfiguration(mlperf_backend_configuration_t *configs,
     return false;
   }
   // Copy data in case of key, value deallocated.
-  char *c_key = new char[key.length() + 1];
-  strcpy(c_key, key.c_str());
-  char *c_value = new char[value.length() + 1];
-  strcpy(c_value, value.c_str());
-  configs->keys[configs->count] = c_key;
-  configs->values[configs->count] = c_value;
+  configs->keys[configs->count] = strdup(key.c_str());
+  configs->values[configs->count] = strdup(value.c_str());
   configs->count++;
   return true;
 }
@@ -100,25 +96,22 @@ void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs) {
 }
 
 mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
-  mlperf_backend_configuration_t c_settings;
-  char *accelerator =
-      new char[settings.benchmark_setting().accelerator().length() + 1];
-  strcpy(accelerator, settings.benchmark_setting().accelerator().c_str());
-  c_settings.accelerator = accelerator;
+  mlperf_backend_configuration_t c_settings = {};
+  c_settings.accelerator =
+      strdup(settings.benchmark_setting().accelerator().c_str());
   c_settings.batch_size = settings.benchmark_setting().batch_size();
-  char *accelerator_desc =
-      new char[settings.benchmark_setting().accelerator_desc().length() + 1];
-  strcpy(accelerator_desc,
-         settings.benchmark_setting().accelerator_desc().c_str());
-  c_settings.accelerator_desc = accelerator_desc;
+  c_settings.accelerator_desc =
+      strdup(settings.benchmark_setting().accelerator_desc().c_str());
 
   // Add common settings
-  for (Setting s : settings.setting()) {
+  for (const auto &s : settings.setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value().value());
   }
-  for (CustomSetting s : settings.benchmark_setting().custom_setting()) {
+
+  for (const auto &s : settings.benchmark_setting().custom_setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value());
   }
+
   return c_settings;
 }
 
@@ -137,26 +130,10 @@ SettingList createSettingList(const BackendSetting &backend_setting,
   setting_index = 0;
   for (auto bm_setting : backend_setting.benchmark_setting()) {
     if (bm_setting.benchmark_id() == benchmark_id) {
-      LOG(INFO) << "benchmark_setting:";
-      LOG(INFO) << "  accelerator: " << bm_setting.accelerator();
-      LOG(INFO) << "  framework: " << bm_setting.framework();
-      for (auto custom_setting : bm_setting.custom_setting()) {
-        LOG(INFO) << "  custom_setting: " << custom_setting.id() << " "
-                  << custom_setting.value();
-      }
       setting_list.mutable_benchmark_setting()->CopyFrom(bm_setting);
-      LOG(INFO) << "SettingsList.benchmark_setting:";
-      LOG(INFO) << "  accelerator: "
-                << setting_list.benchmark_setting().accelerator();
-      LOG(INFO) << "  framework: "
-                << setting_list.benchmark_setting().framework();
-      for (auto custom_setting :
-           setting_list.benchmark_setting().custom_setting()) {
-        LOG(INFO) << "  custom_setting: " << custom_setting.id() << " "
-                  << custom_setting.value();
-      }
     }
   }
+  LOG(INFO) << "setting_list:" << std::endl << setting_list.DebugString();
   return setting_list;
 }
 
