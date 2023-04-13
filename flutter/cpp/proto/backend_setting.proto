@@ -78,8 +78,8 @@ message DelegateSetting {
   required string model_path = 5;
   // MD5 checksum to validate the model file
   required string model_checksum = 6;
-  // The batch size to be used when running the model.
-  optional int32 batch_size = 7;
+  // The batch size to be used when running the model. Default to 1.
+  optional int32 batch_size = 7 [default = 1];
   // Custom setting for this delegate.
   repeated CustomSetting custom_setting = 8;
 }

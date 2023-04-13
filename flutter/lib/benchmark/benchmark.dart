@@ -131,6 +131,7 @@ class Benchmark {
       dataset_offset: taskConfig.model.offset,
       scenario: taskConfig.scenario,
       mode: runMode.loadgenMode,
+      batch_size: selectedDelegate.batchSize,
       min_query_count: minQueryCount,
       min_duration: minDuration,
       single_stream_expected_latency_ns:

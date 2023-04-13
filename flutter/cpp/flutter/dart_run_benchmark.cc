@@ -38,6 +38,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   lin(dataset_offset);
   lin(scenario);
   lin(mode);
+  lin(batch_size);
   lin(min_query_count);
   lin(min_duration);
   lin(single_stream_expected_latency_ns);
@@ -50,9 +51,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   ::mlperf::mobile::SettingList settings;
   if (settings.ParseFromArray(in->backend_settings_data,
                               in->backend_settings_len)) {
-    std::string s;
-    google::protobuf::TextFormat::PrintToString(settings, &s);
-    LOG(INFO) << "Using settings:\n" << s;
+    LOG(INFO) << "Using settings:\n" << settings.DebugString();
   } else {
     LOG(ERROR) << "ERROR parsing settings";
     return nullptr;
@@ -103,9 +102,8 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   datasetTotalSamples = dataset->TotalSampleCount();
 
-  ::mlperf::mobile::MlperfDriver driver(
-      std::move(dataset), std::move(backend), in->scenario,
-      settings.benchmark_setting().batch_size());
+  ::mlperf::mobile::MlperfDriver driver(std::move(dataset), std::move(backend),
+                                        in->scenario, in->batch_size);
   li;
 
   {
