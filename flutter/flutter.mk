@@ -144,8 +144,7 @@ flutter/pub:
 	[ -z "${FLUTTER_FORCE_PUB_GET}" ] || rm -rf output/flutter/pub
 	make \
 		output/flutter/pub/flutter.stamp \
-		output/flutter/pub/flutter_common.stamp \
-		output/flutter/pub/website.stamp
+		output/flutter/pub/flutter_common.stamp
 	[ -z "${FLUTTER_FORCE_PUB_GET}" ] || rm -rf output/flutter/pub
 output/flutter/pub/%.stamp: %/pubspec.yaml
 	cd $(shell basename $@ .stamp) && ${_start_args} flutter --no-version-check pub get

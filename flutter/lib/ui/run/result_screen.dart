@@ -406,29 +406,6 @@ class _ResultScreenState extends State<ResultScreen>
               )),
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-        child: TextButton(
-          onPressed: () async {
-            try {
-              await state.uploadLastResult();
-              if (!mounted) return;
-              await showSuccessDialog(context, [stringResources.uploadSuccess]);
-            } catch (e, s) {
-              print(e);
-              print(s);
-              await showErrorDialog(
-                  context, [stringResources.uploadFail, e.toString()]);
-              return;
-            }
-          },
-          child: Text(stringResources.resultsButtonUpload,
-              style: TextStyle(
-                color: AppColors.shareTextButton,
-                fontSize: 18,
-              )),
-        ),
-      ),
     ]);
 
     String title;
