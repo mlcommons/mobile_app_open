@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/firebase/config.gen.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:share_plus/share_plus.dart';
@@ -407,32 +406,29 @@ class _ResultScreenState extends State<ResultScreen>
               )),
         ),
       ),
-      FirebaseConfig.enable
-          ? Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: TextButton(
-                onPressed: () async {
-                  try {
-                    await state.uploadLastResult();
-                    if (!mounted) return;
-                    await showSuccessDialog(
-                        context, [stringResources.uploadSuccess]);
-                  } catch (e, s) {
-                    print(e);
-                    print(s);
-                    await showErrorDialog(
-                        context, [stringResources.uploadFail, e.toString()]);
-                    return;
-                  }
-                },
-                child: Text(stringResources.resultsButtonUpload,
-                    style: TextStyle(
-                      color: AppColors.shareTextButton,
-                      fontSize: 18,
-                    )),
-              ),
-            )
-          : Container(),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+        child: TextButton(
+          onPressed: () async {
+            try {
+              await state.uploadLastResult();
+              if (!mounted) return;
+              await showSuccessDialog(context, [stringResources.uploadSuccess]);
+            } catch (e, s) {
+              print(e);
+              print(s);
+              await showErrorDialog(
+                  context, [stringResources.uploadFail, e.toString()]);
+              return;
+            }
+          },
+          child: Text(stringResources.resultsButtonUpload,
+              style: TextStyle(
+                color: AppColors.shareTextButton,
+                fontSize: 18,
+              )),
+        ),
+      ),
     ]);
 
     String title;

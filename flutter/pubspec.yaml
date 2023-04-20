@@ -32,7 +32,6 @@ dependencies:
   uuid: ^3.0.4
   package_info_plus: ^3.0.0
   share_plus: ^6.0.0
-  firebase_dart: ^1.0.4
   mlperfbench_common:
     path: ../flutter_common
   crypto: ^3.0.1

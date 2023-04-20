@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/backend/unsupported_device_exception.dart';
@@ -41,10 +40,8 @@ Future<void> main() async {
 Future<void> launchUi() async {
   await DeviceInfo.staticInit();
   await BuildInfoHelper.staticInit();
-  await FirebaseManager.staticInit();
   final store = await Store.create();
-  final benchmarkState =
-      await BenchmarkState.create(store, FirebaseManager.instance);
+  final benchmarkState = await BenchmarkState.create(store);
 
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));

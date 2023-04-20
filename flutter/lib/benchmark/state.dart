@@ -8,7 +8,6 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/firebase/manager.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/backend/bridge/isolate.dart';
@@ -33,7 +32,6 @@ enum BenchmarkStateEnum {
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
   final BridgeIsolate backendBridge;
-  final FirebaseManager? firebaseManager;
 
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
@@ -45,6 +43,7 @@ class BenchmarkState extends ChangeNotifier {
   StackTrace? stackTrace;
 
   bool taskConfigFailedToLoad = false;
+
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
 
@@ -87,7 +86,7 @@ class BenchmarkState extends ChangeNotifier {
     );
   }
 
-  BenchmarkState._(this._store, this.backendBridge, this.firebaseManager) {
+  BenchmarkState._(this._store, this.backendBridge) {
     resourceManager = ResourceManager(notifyListeners, _store);
     backendInfo = BackendInfoHelper().findMatching();
     taskRunner = TaskRunner(
@@ -100,7 +99,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> uploadLastResult() async {
-    await firebaseManager!.restHelper.upload(lastResult!);
+    // TODO: implement uploadLastResult
   }
 
   Future<void> clearCache() async {
@@ -156,10 +155,8 @@ class BenchmarkState extends ChangeNotifier {
     await Wakelock.disable();
   }
 
-  static Future<BenchmarkState> create(
-      Store store, FirebaseManager? firebaseManager) async {
-    final result =
-        BenchmarkState._(store, await BridgeIsolate.create(), firebaseManager);
+  static Future<BenchmarkState> create(Store store) async {
+    final result = BenchmarkState._(store, await BridgeIsolate.create());
 
     await result.resourceManager.initSystemPaths();
     result.configManager = ConfigManager(

@@ -1,6 +1,7 @@
 .DS_Store
 .aswb
 .clwb
+.ijwb
 .idea
 .vscode
 /bazel-*
