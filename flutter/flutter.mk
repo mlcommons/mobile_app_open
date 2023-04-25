@@ -29,9 +29,8 @@ endif
 endif
 
 flutter: flutter/prepare flutter/platform
-flutter/firebase: flutter/firebase/config flutter/firebase/prefix
-flutter/result: flutter/result/json flutter/result/gen-schema flutter/result/ts
-flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/firebase flutter/build-info flutter/set-windows-build-number
+flutter/result: flutter/result/json flutter/result/gen-schema
+flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/build-info flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 flutter/test: flutter/test/unit flutter/test/integration
 
@@ -76,39 +75,6 @@ flutter/backend-list:
 		> flutter/lib/backend/list.gen.dart
 	dart format flutter/lib/backend/list.gen.dart
 
-ifeq (${FIREBASE_CONFIG_ENV_PATH},)
-FIREBASE_CONFIG_ENV_PATH=output/flutter/empty.sh
-FIREBASE_FLUTTER_ENABLE=false
-$(shell mkdir -p output/flutter)
-$(shell touch ${FIREBASE_CONFIG_ENV_PATH})
-$(shell chmod +x ${FIREBASE_CONFIG_ENV_PATH})
-else
-FIREBASE_FLUTTER_ENABLE=true
-endif
-
-.PHONY: flutter/firebase/config
-flutter/firebase/config:
-	@echo using firebase config: FIREBASE_CONFIG_ENV_PATH=${FIREBASE_CONFIG_ENV_PATH}
-	. ${FIREBASE_CONFIG_ENV_PATH} && \
-		cat flutter_common/lib/firebase/config.in | sed \
-		-e "s,FIREBASE_FLUTTER_ENABLE,${FIREBASE_FLUTTER_ENABLE}," \
-		-e "s,FIREBASE_FLUTTER_CONFIG_API_KEY,$$FIREBASE_FLUTTER_CONFIG_API_KEY," \
-		-e "s,FIREBASE_FLUTTER_CONFIG_PROJECT_ID,$$FIREBASE_FLUTTER_CONFIG_PROJECT_ID," \
-		-e "s,FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID,$$FIREBASE_FLUTTER_CONFIG_MESSAGING_SENDER_ID," \
-		-e "s,FIREBASE_FLUTTER_CONFIG_APP_ID,$$FIREBASE_FLUTTER_CONFIG_APP_ID," \
-		-e "s,FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID,$$FIREBASE_FLUTTER_CONFIG_MEASUREMENT_ID," \
-		-e "s,FIREBASE_FLUTTER_FUNCTIONS_URL,$$FIREBASE_FLUTTER_FUNCTIONS_URL," \
-		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
-		| tee flutter_common/lib/firebase/config.gen.dart
-	dart format flutter_common/lib/firebase/config.gen.dart
-
-.PHONY: flutter/firebase/prefix
-flutter/firebase/prefix:
-	. ${FIREBASE_CONFIG_ENV_PATH} && \
-		cat firebase_functions/functions/src/prefix.in | sed \
-		-e "s,FIREBASE_FLUTTER_FUNCTIONS_PREFIX,$$FIREBASE_FLUTTER_FUNCTIONS_PREFIX," \
-		| tee firebase_functions/functions/src/prefix.gen.ts
-
 RESULT_JSON_SAMPLE_PATH?=output/extended_result_example.json
 .PHONY: flutter/result/gen-extended-sample
 flutter/result/gen-extended-sample:
@@ -128,14 +94,6 @@ flutter/result/gen-schema: flutter/result/gen-extended-sample
 		${_start_args} dart run \
 		--define=schemaPath=../${RESULT_JSON_SCHEMA_PATH} \
 		lib/data/generation_helpers/edit_json_schema.main.dart
-
-.PHONY: flutter/result/ts
-flutter/result/ts:
-	quicktype ${RESULT_JSON_SCHEMA_PATH} \
-		--src-lang schema \
-		--lang ts \
-		--top-level ExtendedResult \
-		--out firebase_functions/functions/src/extended-result.gen.ts
 
 .PHONY: flutter/result/json
 flutter/result/json:
@@ -186,8 +144,7 @@ flutter/pub:
 	[ -z "${FLUTTER_FORCE_PUB_GET}" ] || rm -rf output/flutter/pub
 	make \
 		output/flutter/pub/flutter.stamp \
-		output/flutter/pub/flutter_common.stamp \
-		output/flutter/pub/website.stamp
+		output/flutter/pub/flutter_common.stamp
 	[ -z "${FLUTTER_FORCE_PUB_GET}" ] || rm -rf output/flutter/pub
 output/flutter/pub/%.stamp: %/pubspec.yaml
 	cd $(shell basename $@ .stamp) && ${_start_args} flutter --no-version-check pub get

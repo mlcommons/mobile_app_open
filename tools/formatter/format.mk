@@ -22,14 +22,9 @@ format/dart: format/dart/pub-get
 	cd flutter_common && ${_start_args} dart run import_sorter:main
 	dart format flutter flutter_common
 
-.PHONY: format/ts/install
-format/ts/install:
-	cd firebase_functions/functions && ${_start_args} npm install --production=false
-
 .PHONY: format/ts
-format/ts: format/ts/install flutter/result/ts flutter/firebase/prefix
-	cd firebase_functions/functions && ${_start_args} npm run format
-	cd firebase_functions/functions && ${_start_args} npm run lint-fix
+format/ts:
+	@echo "No typescripts files to format"
 
 .PHONY: format/line-endings
 format/line-endings:
@@ -66,9 +61,8 @@ lint/yaml:
 	git ls-files -z | grep --null-data "\.yml$$\|\.yaml$$" | xargs --null --no-run-if-empty yamllint -c tools/formatter/configs/yamllint.yml
 
 .PHONY: lint/ts
-lint/ts: format/ts/install flutter/result/ts flutter/firebase/prefix
-	cd firebase_functions/functions && ${_start_args} npm run lint
-	cd firebase_functions/functions && npx prettier --check .
+lint/ts:
+	@echo "No typescripts files to lint"
 
 .PHONY: lint/prohibited-extensions
 lint/prohibited-extensions:
