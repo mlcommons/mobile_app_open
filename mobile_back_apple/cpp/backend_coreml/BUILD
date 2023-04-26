@@ -16,6 +16,7 @@
 # we borrow tflite_jni_binary even for non-tflite one
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
 load("@build_bazel_rules_apple//apple:apple.bzl", "apple_xcframework")
+load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -59,14 +60,21 @@ cc_library(
     ],
 )
 
+pbtxt2header(
+    name = "coreml_settings",
+    srcs = [
+        "coreml_settings.pbtxt",
+    ],
+)
+
 cc_library(
     name = "coreml_c",
     srcs = [
-        "coreml_settings.h",
         "main.cc",
     ],
     deps = [
         ":apple_frameworks",
+        ":coreml_settings",
         ":coreml_util",
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",

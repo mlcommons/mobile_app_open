@@ -1,24 +1,6 @@
-/* Copyright 2022 The MLPerf Authors. All Rights Reserved.
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
-
-#ifndef COREML_SETTINGS_H
-#define COREML_SETTINGS_H
-
-#include <string>
-
-const std::string coreml_settings = R"SETTINGS(
 
 benchmark_setting {
   benchmark_id: "image_classification"
@@ -74,7 +56,3 @@ benchmark_setting {
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/edsr_f32b5_fp32.mlmodel"
   model_checksum: "62489706f20b0c2ae561fb2204eefb61"
 }
-
-)SETTINGS";
-
-#endif
