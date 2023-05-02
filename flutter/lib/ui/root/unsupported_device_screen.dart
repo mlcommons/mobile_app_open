@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/icons.dart' show AppIcons;
 import 'package:mlperfbench/ui/page_constraints.dart';
