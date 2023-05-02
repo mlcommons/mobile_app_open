@@ -9,6 +9,7 @@ import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
+import 'package:mlperfbench/firebase/firebase_service.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/root/main_screen.dart';
@@ -42,6 +43,9 @@ Future<void> launchUi() async {
   await BuildInfoHelper.staticInit();
   final store = await Store.create();
   final benchmarkState = await BenchmarkState.create(store);
+  if (FirebaseService.enabled) {
+    await FirebaseService.instance.initialize();
+  }
 
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));

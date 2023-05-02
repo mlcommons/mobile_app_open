@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mlperfbench/firebase/firebase_service.dart';
 
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
@@ -406,6 +407,25 @@ class _ResultScreenState extends State<ResultScreen>
               )),
         ),
       ),
+      Visibility(
+        visible: FirebaseService.enabled,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+          child: TextButton(
+            onPressed: () async {
+              final result =
+                  state.resourceManager.resultManager.getLastResult();
+              await FirebaseService.instance.uploadResult(result);
+            },
+            child: Text('Upload to Firebase',
+                style: TextStyle(
+                  color: AppColors.shareTextButton,
+                  fontSize: 18,
+                )),
+          ),
+        ),
+      ),
+      const SizedBox(height: 20)
     ]);
 
     String title;

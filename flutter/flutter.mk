@@ -63,6 +63,21 @@ flutter_cache_folder_arg=
 endif
 flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
 
+FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
+-include ${FIREBASE_ENV_FILE}
+export
+flutter_firebase_arg= \
+	--dart-define=FIREBASE_ANDROID_API_KEY=${FIREBASE_ANDROID_API_KEY} \
+	--dart-define=FIREBASE_ANDROID_APP_ID=${FIREBASE_ANDROID_APP_ID} \
+	--dart-define=FIREBASE_IOS_API_KEY=${FIREBASE_IOS_API_KEY} \
+	--dart-define=FIREBASE_IOS_APP_ID=${FIREBASE_IOS_APP_ID} \
+	--dart-define=FIREBASE_IOS_CLIENT_ID=${FIREBASE_IOS_CLIENT_ID} \
+	--dart-define=FIREBASE_IOS_BUNDLE_ID=${FIREBASE_IOS_BUNDLE_ID} \
+	--dart-define=FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID} \
+	--dart-define=FIREBASE_MESSAGING_SENDER_ID=${FIREBASE_MESSAGING_SENDER_ID} \
+	--dart-define=FIREBASE_DATABASE_URL=${FIREBASE_DATABASE_URL} \
+	--dart-define=FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}
+
 .PHONY: flutter/backend-list
 flutter/backend-list:
 	cat flutter/lib/backend/list.in | sed \
@@ -170,7 +185,8 @@ flutter/test/integration:
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
 		${flutter_perf_test_arg} \
-		${flutter_folder_args}
+		${flutter_folder_args} \
+		${flutter_firebase_arg}
 
 .PHONY: flutter/run
 flutter/run:
@@ -179,7 +195,8 @@ flutter/run:
 		run \
 		${flutter_folder_args} \
 		${flutter_test_device_arg} \
-		${flutter_official_build_arg}
+		${flutter_official_build_arg} \
+		${flutter_firebase_arg}
 
 .PHONY: flutter/clean
 flutter/clean:
