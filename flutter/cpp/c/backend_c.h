@@ -23,7 +23,11 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-// Should return true if current hardware is supported.
+// Should return true and set not_allowed_message to a nullptr if the current hardware is supported.
+// Case 1: Return true and set not_allowed_message to a nullptr. The app will run with matched backend.
+// Case 2: Return true and set not_allowed_message to a string. The app will show an error screen with the text from not_allowed_message.
+// Case 3: Return false and set not_allowed_message to a nullptr. The app will load the next backend in the backend list.
+// Case 4: Return false and set not_allowed_message to a string. The app will load the next backend in the backend list.
 bool mlperf_backend_matches_hardware(const char** not_allowed_message,
                                      const char** settings,
                                      const mlperf_device_info_t* device_info);
