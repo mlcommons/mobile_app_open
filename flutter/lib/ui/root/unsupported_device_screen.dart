@@ -13,47 +13,58 @@ class UnsupportedDeviceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     final iconEdgeSize = MediaQuery.of(context).size.width * 0.66;
-
     return Scaffold(
       body: getSinglePageView(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Expanded(
-                flex: 3,
-                child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: SizedBox(
-                        height: iconEdgeSize,
-                        width: iconEdgeSize,
-                        child: AppIcons.error))),
-            Expanded(
-                child: Padding(
-                    padding: const EdgeInsets.fromLTRB(35, 0, 35, 0),
-                    child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Column(
-                          children: [
-                            Text(stringResources.unsupportedMainMessage,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 15, color: AppColors.darkText)),
-                            Text(
-                                '${stringResources.unsupportedBackendError}: $backendError',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 15, color: AppColors.darkText)),
-                            Text(stringResources.unsupportedTryAnotherDevice,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 15, color: AppColors.darkText)),
-                          ],
-                        )))),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(top: 50),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  height: iconEdgeSize,
+                  width: iconEdgeSize,
+                  child: AppIcons.error,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.unsupportedMainMessage,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      l10n.unsupportedTryAnotherDevice,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    const Divider(height: 32),
+                    Text(
+                      l10n.unsupportedBackendError,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      backendError,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
