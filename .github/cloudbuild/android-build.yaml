@@ -85,7 +85,6 @@ steps:
     timeout: 600s # 10 minutes
     entrypoint: bash
     env:
-      - CI=true
       - OFFICIAL_BUILD=true
       - FLUTTER_BUILD_NUMBER=0
       - FLUTTER_FORCE_PUB_GET=1
@@ -124,7 +123,6 @@ steps:
     timeout: 600s # 10 minutes
     entrypoint: bash
     env:
-      - CI=true
       - OFFICIAL_BUILD=true
       - FLUTTER_BUILD_NUMBER=0
       - FLUTTER_FORCE_PUB_GET=1

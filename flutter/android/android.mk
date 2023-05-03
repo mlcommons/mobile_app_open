@@ -71,8 +71,7 @@ flutter/android/apk:
 	cd flutter && ${_start_args} flutter --no-version-check build apk \
 		${flutter_official_build_arg} \
 		${flutter_build_number_arg} \
-		${flutter_folder_args} \
-		${flutter_firebase_arg}
+		${flutter_folder_args}
 	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk ${flutter_android_apk_release_path}
 
 FLUTTER_ANDROID_APK_TEST_MAIN?=test-main.apk

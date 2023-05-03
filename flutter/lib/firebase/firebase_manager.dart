@@ -4,9 +4,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/firebase/firebase_auth_service.dart';
-import 'package:mlperfbench/firebase/firebase_options.dart';
+import 'package:mlperfbench/firebase/firebase_options.gen.dart';
 import 'package:mlperfbench/firebase/firebase_storage_service.dart';
 import 'package:mlperfbench/resources/utils.dart';
 
@@ -31,8 +30,11 @@ class FirebaseManager {
     auth.firebaseAuth = FirebaseAuth.instance;
     storage.firebaseStorage = FirebaseStorage.instance;
     print('Firebase initialized using projectId: ${app.options.projectId}');
-    if (onCI) {
-      await auth.signInUsingCICredential();
+    if (DefaultFirebaseOptions.ciUserEmail.isNotEmpty) {
+      await auth.signIn(
+        email: DefaultFirebaseOptions.ciUserEmail,
+        password: DefaultFirebaseOptions.ciUserPassword,
+      );
     } else {
       await auth.signInAnonymously();
     }

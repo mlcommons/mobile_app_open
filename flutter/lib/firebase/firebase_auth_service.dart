@@ -5,19 +5,12 @@ class FirebaseAuthService {
 
   late final User user;
 
-  signInUsingCICredential() async {
-    await _signIn(
-      email: const String.fromEnvironment('FIREBASE_CI_USER_EMAIL'),
-      password: const String.fromEnvironment('FIREBASE_CI_USER_PASSWORD'),
-    );
-  }
-
   signInAnonymously() async {
     final userCredential = await firebaseAuth.signInAnonymously();
     user = await _getUserFromCredential(userCredential);
   }
 
-  _signIn({required String email, required String password}) async {
+  signIn({required String email, required String password}) async {
     try {
       UserCredential userCredential =
           await firebaseAuth.signInWithEmailAndPassword(
