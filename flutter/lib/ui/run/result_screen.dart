@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mlperfbench/firebase/firebase_service.dart';
 
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
@@ -8,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
@@ -408,14 +408,14 @@ class _ResultScreenState extends State<ResultScreen>
         ),
       ),
       Visibility(
-        visible: FirebaseService.enabled,
+        visible: FirebaseManager.enabled,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           child: TextButton(
             onPressed: () async {
               final result =
                   state.resourceManager.resultManager.getLastResult();
-              await FirebaseService.instance.uploadResult(result);
+              await FirebaseManager.instance.uploadResult(result);
             },
             child: Text('Upload to Firebase',
                 style: TextStyle(
