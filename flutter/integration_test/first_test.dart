@@ -43,9 +43,9 @@ void main() {
     });
 
     testWidgets('check results', (WidgetTester tester) async {
-      final extendedResults = await obtainResult();
-      printResults(extendedResults);
-      checkTasks(extendedResults);
+      final extendedResult = await obtainResult();
+      printResults(extendedResult);
+      checkTasks(extendedResult);
     });
 
     testWidgets('upload results', (WidgetTester tester) async {
@@ -55,20 +55,20 @@ void main() {
   });
 }
 
-void checkTasks(ExtendedResult extendedResults) {
-  final length = extendedResults.results.length;
+void checkTasks(ExtendedResult extendedResult) {
+  final length = extendedResult.results.length;
   const expectedTasksCount = 6;
 
   expect(length, expectedTasksCount, reason: 'tasks count does not match');
 
-  for (final benchmarkResult in extendedResults.results) {
+  for (final benchmarkResult in extendedResult.results) {
     print('checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
     checkAccuracy(benchmarkResult);
     if (enablePerfTest) {
-      checkThroughput(benchmarkResult, extendedResults.environmentInfo);
+      checkThroughput(benchmarkResult, extendedResult.environmentInfo);
     }
   }
 }
