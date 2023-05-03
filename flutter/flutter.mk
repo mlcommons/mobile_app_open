@@ -67,6 +67,7 @@ FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
 -include ${FIREBASE_ENV_FILE}
 export
 flutter_firebase_arg= \
+	--dart-define=CI=${CI} \
 	--dart-define=FIREBASE_ANDROID_API_KEY=${FIREBASE_ANDROID_API_KEY} \
 	--dart-define=FIREBASE_ANDROID_APP_ID=${FIREBASE_ANDROID_APP_ID} \
 	--dart-define=FIREBASE_IOS_API_KEY=${FIREBASE_IOS_API_KEY} \
@@ -76,7 +77,9 @@ flutter_firebase_arg= \
 	--dart-define=FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID} \
 	--dart-define=FIREBASE_MESSAGING_SENDER_ID=${FIREBASE_MESSAGING_SENDER_ID} \
 	--dart-define=FIREBASE_DATABASE_URL=${FIREBASE_DATABASE_URL} \
-	--dart-define=FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}
+	--dart-define=FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET} \
+	--dart-define=FIREBASE_CI_USER_EMAIL=${FIREBASE_CI_USER_EMAIL} \
+	--dart-define=FIREBASE_CI_USER_PASSWORD=${FIREBASE_CI_USER_PASSWORD}
 
 .PHONY: flutter/backend-list
 flutter/backend-list:

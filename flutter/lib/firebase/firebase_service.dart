@@ -7,6 +7,8 @@ import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench/firebase/firebase_options.dart';
 import 'package:mlperfbench/resources/utils.dart';
 
+import 'package:mlperfbench/app_constants.dart';
+
 class FirebaseService {
   FirebaseService._();
 
@@ -26,7 +28,11 @@ class FirebaseService {
     );
     final projectId = firebaseApp.options.projectId;
     print('Firebase initialized using projectId: $projectId');
-    await signInAnonymously();
+    if (onCI) {
+      await signInUsingCICredential();
+    } else {
+      await signInAnonymously();
+    }
     return firebaseApp;
   }
 
@@ -64,6 +70,36 @@ class FirebaseService {
     } catch (e) {
       return false;
     }
+  }
+
+  Future<User> signIn({required String email, required String password}) async {
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final user = userCredential.user;
+      if (user == null) {
+        throw Exception('User is not signed in');
+      }
+      print('Signed in with email $email using uid: ${user.uid}');
+      return user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+      rethrow;
+    }
+  }
+
+  Future<User> signInUsingCICredential() async {
+    return await signIn(
+      email: const String.fromEnvironment('FIREBASE_CI_USER_EMAIL'),
+      password: const String.fromEnvironment('FIREBASE_CI_USER_PASSWORD'),
+    );
   }
 
   Future<User> signInAnonymously() async {

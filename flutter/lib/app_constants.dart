@@ -7,6 +7,7 @@ const isFastMode = bool.fromEnvironment('fast-mode', defaultValue: false);
 
 const defaultCacheFolder = String.fromEnvironment('default-cache-folder');
 const defaultDataFolder = String.fromEnvironment('default-data-folder');
+const onCI = bool.fromEnvironment('CI', defaultValue: false);
 
 class AppColors {
   static const lightText = Colors.white;
