@@ -31,7 +31,7 @@ class _ShareButton extends State<ShareButton> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          _buildUploadButton(context),
+          _buildShareButton(context),
           const SizedBox(height: 16.0),
           _isSharing ? _buildProgressIndicator() : Container(),
           const SizedBox(height: 16.0),
@@ -67,40 +67,59 @@ class _ShareButton extends State<ShareButton> {
     }
   }
 
-  Widget _buildUploadButton(BuildContext context) {
+  Widget _buildShareButton(BuildContext context) {
     return TextButton(
       onPressed: () {
         showModalBottomSheet(
           context: context,
           builder: (context) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const SizedBox(height: 20.0),
-                ListTile(
-                  leading: const Icon(Icons.share),
-                  title: Text(
-                    l10n.shareButtonOther,
-                    style: Theme.of(context).textTheme.titleMedium,
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _handleSharing(_ShareDestination.local);
+                    },
+                    child: Row(
+                      children: [
+                        const Icon(Icons.share),
+                        const SizedBox(width: 20),
+                        Text(
+                          l10n.shareButtonOther,
+                          style: TextStyle(
+                            color: AppColors.shareTextButton,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _handleSharing(_ShareDestination.local);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.cloud_upload),
-                  title: Text(
-                    l10n.shareButtonMLCommons,
-                    style: Theme.of(context).textTheme.titleMedium,
+                  TextButton(
+                    onPressed: !FirebaseManager.enabled
+                        ? null
+                        : () {
+                            Navigator.of(context).pop();
+                            _handleSharing(_ShareDestination.cloud);
+                          },
+                    child: Row(
+                      children: [
+                        const Icon(Icons.cloud_upload),
+                        const SizedBox(width: 20),
+                        Text(
+                          l10n.shareButtonMLCommons,
+                          style: TextStyle(
+                            color: AppColors.shareTextButton,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _handleSharing(_ShareDestination.cloud);
-                  },
-                ),
-                const SizedBox(height: 56.0),
-              ],
+                ],
+              ),
             );
           },
         );
