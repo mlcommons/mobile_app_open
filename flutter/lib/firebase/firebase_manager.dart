@@ -13,16 +13,20 @@ import 'package:mlperfbench/resources/utils.dart';
 class FirebaseManager {
   FirebaseManager._();
 
-  static final currentPlatform = DefaultFirebaseOptions.currentPlatform;
-
   // Firebase should not be required to run this app.
-  static final enabled = currentPlatform.apiKey.isNotEmpty;
+  static final enabled = DefaultFirebaseOptions.available();
   static final instance = FirebaseManager._();
 
   final auth = FirebaseAuthService();
   final storage = FirebaseStorageService();
 
-  Future<FirebaseApp> initialize() async {
+  bool _isInitialized = false;
+
+  Future<FirebaseManager> initialize() async {
+    if (_isInitialized) {
+      return instance;
+    }
+    final currentPlatform = DefaultFirebaseOptions.currentPlatform;
     final app = await Firebase.initializeApp(options: currentPlatform);
     auth.firebaseAuth = FirebaseAuth.instance;
     storage.firebaseStorage = FirebaseStorage.instance;
@@ -33,7 +37,8 @@ class FirebaseManager {
       await auth.signInAnonymously();
     }
     print('User has uid: ${auth.user.uid} and email: ${auth.user.email}');
-    return app;
+    _isInitialized = true;
+    return instance;
   }
 
   Future<void> uploadResult(ExtendedResult result) async {
