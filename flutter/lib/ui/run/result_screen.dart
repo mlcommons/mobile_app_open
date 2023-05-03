@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
-import 'package:share_plus/share_plus.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
@@ -19,6 +17,7 @@ import 'package:mlperfbench/ui/run/app_bar.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/run/progress_screen.dart';
 import 'package:mlperfbench/ui/run/result_circle.dart';
+import 'package:mlperfbench/ui/run/share_button.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -389,41 +388,9 @@ class _ResultScreenState extends State<ResultScreen>
               ),
             ),
           )),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-        child: TextButton(
-          onPressed: () async {
-            final filePath =
-                state.resourceManager.resultManager.getSubmissionFile().path;
-            await Share.shareXFiles(
-              [XFile(filePath)],
-              subject: stringResources.resultsShareSubject,
-            );
-          },
-          child: Text(stringResources.resultsButtonShare,
-              style: TextStyle(
-                color: AppColors.shareTextButton,
-                fontSize: 18,
-              )),
-        ),
-      ),
-      Visibility(
-        visible: FirebaseManager.enabled,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-          child: TextButton(
-            onPressed: () async {
-              final result =
-                  state.resourceManager.resultManager.getLastResult();
-              await FirebaseManager.instance.uploadResult(result);
-            },
-            child: Text('Upload to Firebase',
-                style: TextStyle(
-                  color: AppColors.shareTextButton,
-                  fontSize: 18,
-                )),
-          ),
-        ),
+      const Padding(
+        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+        child: ShareButton(),
       ),
       const SizedBox(height: 20)
     ]);
