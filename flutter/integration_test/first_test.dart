@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
+import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
@@ -45,6 +46,11 @@ void main() {
       final extendedResults = await obtainResult();
       printResults(extendedResults);
       checkTasks(extendedResults);
+    });
+
+    testWidgets('upload results', (WidgetTester tester) async {
+      final extendedResult = await obtainResult();
+      await uploadResult(extendedResult);
     });
   });
 }
@@ -174,4 +180,13 @@ void checkThroughput(
     lessThanOrEqualTo(expectedValue.max),
     reason: 'throughput for [$tag] is too high',
   );
+}
+
+Future<void> uploadResult(ExtendedResult result) async {
+  if (FirebaseManager.enabled) {
+    await FirebaseManager.instance.initialize();
+    await FirebaseManager.instance.uploadResult(result);
+  } else {
+    print('Firebase is disabled, skipping upload');
+  }
 }
