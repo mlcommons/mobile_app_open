@@ -1,6 +1,6 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
