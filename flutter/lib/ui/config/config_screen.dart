@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -92,6 +93,7 @@ class _ConfigScreen extends State<ConfigScreen> {
   Widget _delegateChoice(Benchmark benchmark) {
     final selected = benchmark.benchmarkSettings.delegateSelected;
     final choices = benchmark.benchmarkSettings.delegateChoice
+        .sorted((b, a) => a.priority.compareTo(b.priority))
         .map((e) => e.delegateName)
         .toList();
     if (choices.isEmpty) {
