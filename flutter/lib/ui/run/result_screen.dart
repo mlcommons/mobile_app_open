@@ -97,10 +97,10 @@ class _ResultScreenState extends State<ResultScreen>
       } else {
         continue;
       }
-      final backendName = benchmark.performanceModeResult?.backendName ?? '';
-      final acceleratorName =
-          benchmark.performanceModeResult?.acceleratorName ?? '';
-
+      final perfResult = benchmark.performanceModeResult;
+      final backendName = perfResult?.backendName ?? '';
+      final delegateName = perfResult?.delegateName ?? '';
+      final acceleratorName = perfResult?.acceleratorName ?? '';
       var rowChildren = <Widget>[];
       rowChildren.add(Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +108,7 @@ class _ResultScreenState extends State<ResultScreen>
         children: [
           Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text('$backendName | $acceleratorName')),
+              child: Text('$backendName | $delegateName | $acceleratorName')),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

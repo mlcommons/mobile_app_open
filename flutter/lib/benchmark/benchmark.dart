@@ -17,6 +17,7 @@ class BenchmarkResult {
   final Accuracy? accuracy2;
   final String backendName;
   final String acceleratorName;
+  final String delegateName;
   final int batchSize;
   final bool validity;
 
@@ -26,6 +27,7 @@ class BenchmarkResult {
       required this.accuracy2,
       required this.backendName,
       required this.acceleratorName,
+      required this.delegateName,
       required this.batchSize,
       required this.validity});
 }
