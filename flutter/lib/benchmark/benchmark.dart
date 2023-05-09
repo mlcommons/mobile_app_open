@@ -3,13 +3,13 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
+import 'package:mlperfbench/benchmark/info.dart';
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlperfbench/resources/resource.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
-import 'info.dart';
-import 'run_mode.dart';
 
 class BenchmarkResult {
   final Throughput? throughput;
@@ -28,38 +28,6 @@ class BenchmarkResult {
       required this.acceleratorName,
       required this.batchSize,
       required this.validity});
-
-  static const _tagThroughput = 'throughput';
-  static const _tagAccuracy = 'accuracy';
-  static const _tagAccuracy2 = 'accuracy2';
-  static const _tagBackendName = 'backend_name';
-  static const _tagAcceleratorName = 'accelerator_name';
-  static const _tagBatchSize = 'batch_size';
-  static const _tagValidity = 'validity';
-
-  static BenchmarkResult? fromJson(Map<String, dynamic>? json) {
-    if (json == null) return null;
-    return BenchmarkResult(
-      throughput:
-          Throughput.fromJson(json[_tagThroughput] as Map<String, dynamic>),
-      accuracy: Accuracy.fromJson(json[_tagAccuracy] as Map<String, dynamic>),
-      accuracy2: Accuracy.fromJson(json[_tagAccuracy2] as Map<String, dynamic>),
-      backendName: json[_tagBackendName] as String,
-      acceleratorName: json[_tagAcceleratorName] as String,
-      batchSize: json[_tagBatchSize] as int,
-      validity: json[_tagValidity] as bool,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        _tagThroughput: throughput,
-        _tagAccuracy: accuracy,
-        _tagAccuracy2: accuracy2,
-        _tagBackendName: backendName,
-        _tagAcceleratorName: acceleratorName,
-        _tagBatchSize: batchSize,
-        _tagValidity: validity,
-      };
 }
 
 class Benchmark {
