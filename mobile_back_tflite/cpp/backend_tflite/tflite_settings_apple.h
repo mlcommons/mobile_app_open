@@ -31,47 +31,80 @@ common_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification"
-  accelerator: "ane"
-  accelerator_desc: "ANE"
-  framework: "TFLite CoreML"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  model_checksum: "66bb4eba50987221608f8487ed405794"
+  framework: "TFLite"
+  delegate_choice: {
+    priority: 2
+    delegate_name: "Core ML"
+    accelerator_name: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+    model_checksum: "66bb4eba50987221608f8487ed405794"
+    custom_setting: {
+      id: "sample id"
+      value: "sample value"
+    }
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+    model_checksum: "66bb4eba50987221608f8487ed405794"
+  }
+  delegate_selected: "Core ML"
 }
 
 benchmark_setting {
   benchmark_id: "object_detection"
-  accelerator: "ane"
-  accelerator_desc: "ANE"
-  framework: "TFLite CoreML"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
-  model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator_name: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
+    model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+  }
+  delegate_selected: "Core ML"
 }
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
-  accelerator: "gpu_f16"
-  accelerator_desc: "GPU (FP16)"
-  framework: "TFLite Metal"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
-  model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+    model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+  }
+  delegate_selected: "Metal"
 }
 
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
-  accelerator: "ane"
-  accelerator_desc: "ANE"
-  framework: "TFLite CoreML"
-  model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
-  model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator_name: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
+    model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+  }
+  delegate_selected: "Core ML"
 }
 
 benchmark_setting {
   benchmark_id: "super_resolution"
-  accelerator: "ane"
-  accelerator_desc: "ANE"
-  framework: "TFLite CoreML"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
-  model_checksum: "672240427c1f3dc33baf2facacd9631f"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator_name: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
+    model_checksum: "672240427c1f3dc33baf2facacd9631f"
+  }
+  delegate_selected: "Core ML"
 }
 
 )SETTINGS";
@@ -80,12 +113,16 @@ const std::string tflite_settings_apple_iphoneX = R"SETTINGS(
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "ane"
-  accelerator_desc: "ANE"
-  framework: "TFLite CoreML"
-  batch_size: 32
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  model_checksum: "66bb4eba50987221608f8487ed405794"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator_name: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+    model_checksum: "66bb4eba50987221608f8487ed405794"
+    batch_size: 32
+  }
+  delegate_selected: "Core ML"
 }
 
 common_setting {
@@ -103,12 +140,16 @@ const std::string tflite_settings_apple_iphone11 = R"SETTINGS(
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "ane"
-  accelerator_desc: "ANE"
-  framework: "TFLite CoreML"
-  batch_size: 64
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  model_checksum: "66bb4eba50987221608f8487ed405794"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator_name: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+    model_checksum: "66bb4eba50987221608f8487ed405794"
+    batch_size: 64
+  }
+  delegate_selected: "Core ML"
 }
 
 common_setting {
@@ -126,12 +167,16 @@ const std::string tflite_settings_apple_iphone12 = R"SETTINGS(
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "ane"
-  accelerator_desc: "ANE"
-  framework: "TFLite CoreML"
-  batch_size: 8
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  model_checksum: "66bb4eba50987221608f8487ed405794"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator_name: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+    model_checksum: "66bb4eba50987221608f8487ed405794"
+    batch_size: 8
+  }
+  delegate_selected: "Core ML"
 }
 
 common_setting {

@@ -36,6 +36,7 @@ class ResultHelper {
     } else {
       throw 'One of performanceRunInfo or accuracyRunInfo must not be null';
     }
+    final commonSettings = runInfo.settings.backend_settings.setting;
     return BenchmarkExportResult(
       benchmarkId: benchmark.id,
       benchmarkName: benchmark.taskConfig.name,
@@ -44,8 +45,7 @@ class ResultHelper {
       minDuration: benchmark.taskConfig.minDuration,
       minSamples: benchmark.taskConfig.minQueryCount,
       backendInfo: _makeBackendInfo(runInfo.result),
-      backendSettings:
-          _makeBackendSettingsInfo(runInfo.settings.backend_settings),
+      backendSettings: _makeBackendSettingsInfo(benchmark, commonSettings),
       loadgenScenario: BenchmarkExportResult.parseLoadgenScenario(
           benchmark.taskConfig.scenario),
     );
@@ -95,21 +95,24 @@ class ResultHelper {
     );
   }
 
-  BackendSettingsInfo _makeBackendSettingsInfo(pb.SettingList settings) {
-    final taskSettings = settings.benchmarkSetting;
-
+  BackendSettingsInfo _makeBackendSettingsInfo(
+      Benchmark benchmark, List<pb.CommonSetting> commonSettings) {
+    final delegate = benchmark.selectedDelegate;
+    final extraSettings = _extraSettingsFromCommon(commonSettings) +
+        _extraSettingsFromCustom(benchmark.selectedDelegate.customSetting);
     return BackendSettingsInfo(
-      acceleratorCode: taskSettings.accelerator,
-      acceleratorDesc: taskSettings.acceleratorDesc,
-      framework: taskSettings.framework,
-      modelPath: taskSettings.modelPath,
-      batchSize: taskSettings.batchSize,
-      extraSettings: _extraSettingsFromCommon(settings.setting),
+      acceleratorCode: delegate.acceleratorName,
+      acceleratorDesc: delegate.acceleratorDesc,
+      delegate: delegate.delegateName,
+      framework: benchmark.benchmarkSettings.framework,
+      modelPath: delegate.modelPath,
+      batchSize: delegate.batchSize,
+      extraSettings: extraSettings,
     );
   }
 
   List<BackendExtraSetting> _extraSettingsFromCommon(
-      List<pb.Setting> commonSettings) {
+      List<pb.CommonSetting> commonSettings) {
     final list = <BackendExtraSetting>[];
     for (var item in commonSettings) {
       list.add(BackendExtraSetting(
@@ -117,6 +120,20 @@ class ResultHelper {
           name: item.name,
           value: item.value.value,
           valueName: item.value.name));
+    }
+    return list;
+  }
+
+  List<BackendExtraSetting> _extraSettingsFromCustom(
+      List<pb.CustomSetting> settings) {
+    final list = <BackendExtraSetting>[];
+    for (var item in settings) {
+      list.add(BackendExtraSetting(
+        id: item.id,
+        name: '',
+        value: item.value,
+        valueName: '',
+      ));
     }
     return list;
   }
