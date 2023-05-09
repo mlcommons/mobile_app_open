@@ -23,27 +23,26 @@ static ::std::mutex global_driver_mutex;
 static std::atomic<int32_t> datasetTotalSamples;
 
 #define li LOG(INFO) << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__
-#define lip(X) LOG(INFO) << #X "=" << in->X << ";"
+#define lin(X) LOG(INFO) << "in->" << #X "=" << in->X
+#define lout(X) LOG(INFO) << "out->" << #X "=" << out->X
 
 struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     const struct dart_ffi_run_benchmark_in* in) {
-  lip(backend_model_path);
-  lip(backend_lib_path);
-  lip(backend_settings_len);
-  lip(backend_native_lib_path);
-
-  lip(dataset_type);
-  lip(dataset_data_path);
-  lip(dataset_groundtruth_path);
-  lip(dataset_offset);
-
-  lip(scenario);
-
-  lip(mode);
-  lip(min_query_count);
-  lip(min_duration);
-  lip(single_stream_expected_latency_ns);
-  lip(output_dir);
+  lin(backend_model_path);
+  lin(backend_lib_path);
+  lin(backend_settings_len);
+  lin(backend_native_lib_path);
+  lin(dataset_type);
+  lin(dataset_data_path);
+  lin(dataset_groundtruth_path);
+  lin(dataset_offset);
+  lin(scenario);
+  lin(mode);
+  lin(batch_size);
+  lin(min_query_count);
+  lin(min_duration);
+  lin(single_stream_expected_latency_ns);
+  lin(output_dir);
 
   li;
 
@@ -52,9 +51,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   ::mlperf::mobile::SettingList settings;
   if (settings.ParseFromArray(in->backend_settings_data,
                               in->backend_settings_len)) {
-    std::string s;
-    google::protobuf::TextFormat::PrintToString(settings, &s);
-    LOG(INFO) << "Using settings:\n" << s;
+    LOG(INFO) << "Using settings:\n" << settings.DebugString();
   } else {
     LOG(ERROR) << "ERROR parsing settings";
     return nullptr;
@@ -105,9 +102,8 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   datasetTotalSamples = dataset->TotalSampleCount();
 
-  ::mlperf::mobile::MlperfDriver driver(
-      std::move(dataset), std::move(backend), in->scenario,
-      settings.benchmark_setting().batch_size());
+  ::mlperf::mobile::MlperfDriver driver(std::move(dataset), std::move(backend),
+                                        in->scenario, in->batch_size);
   li;
 
   {
@@ -143,6 +139,14 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   out->accuracy2 = nullptr;
 
   li;
+  lout(run_ok);
+  lout(num_samples);
+  lout(duration);
+  lout(accuracy1);
+  lout(accuracy2);
+  lout(backend_name);
+  lout(backend_vendor);
+  lout(accelerator_name);
 
   return out;
 }

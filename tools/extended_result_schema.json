@@ -510,6 +510,9 @@
                 "framework": {
                     "type": "string"
                 },
+                "delegate": {
+                    "type": "string"
+                },
                 "model_path": {
                     "type": "string",
                     "format": "uri",
@@ -534,6 +537,7 @@
                 "accelerator_code",
                 "accelerator_desc",
                 "batch_size",
+                "delegate",
                 "extra_settings",
                 "framework",
                 "model_path"

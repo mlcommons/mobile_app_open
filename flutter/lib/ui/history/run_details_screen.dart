@@ -61,6 +61,8 @@ class _RunDetailsScreen extends State<RunDetailsScreen> {
       helper.makeInfo(
           l10n.historyRunDetailsVendorName, res.backendInfo.vendorName),
       helper.makeInfo(
+          l10n.historyRunDetailsDelegate, res.backendSettings.delegate),
+      helper.makeInfo(
           l10n.historyRunDetailsAccelerator, res.backendInfo.acceleratorName),
       if (res.loadgenScenario == LoadgenScenarioEnum.offline)
         helper.makeInfo(l10n.historyRunDetailsBatchSize,

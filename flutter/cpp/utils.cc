@@ -86,6 +86,7 @@ bool AddBackendConfiguration(mlperf_backend_configuration_t *configs,
 }
 
 void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs) {
+  delete configs->delegate_selected;
   delete configs->accelerator;
   delete configs->accelerator_desc;
   for (int i = 0; i < configs->count; ++i) {
@@ -97,18 +98,27 @@ void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs) {
 
 mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   mlperf_backend_configuration_t c_settings = {};
-  c_settings.accelerator =
-      strdup(settings.benchmark_setting().accelerator().c_str());
-  c_settings.batch_size = settings.benchmark_setting().batch_size();
-  c_settings.accelerator_desc =
-      strdup(settings.benchmark_setting().accelerator_desc().c_str());
+  auto &bs = settings.benchmark_setting();
+
+  for (const auto &d : bs.delegate_choice()) {
+    if (d.delegate_name() == bs.delegate_selected()) {
+      c_settings.delegate_selected = strdup(d.delegate_name().c_str());
+      c_settings.accelerator = strdup(d.accelerator_name().c_str());
+      c_settings.accelerator_desc = strdup(d.accelerator_desc().c_str());
+      c_settings.batch_size = d.batch_size();
+      for (const auto &s : d.custom_setting()) {
+        AddBackendConfiguration(&c_settings, s.id(), s.value());
+      }
+      break;
+    }
+  }
 
   // Add common settings
   for (const auto &s : settings.setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value().value());
   }
 
-  for (const auto &s : settings.benchmark_setting().custom_setting()) {
+  for (const auto &s : bs.custom_setting()) {
     AddBackendConfiguration(&c_settings, s.id(), s.value());
   }
 
