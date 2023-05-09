@@ -74,7 +74,7 @@ After building the application, if you would like to set a new application icon,
 * Find `flutter_icons` configuration and change value of option `image_path` to the path of desirable application icon
 * Use `flutter pub run flutter_launcher_icons:main` command to set the icon
 
-Please note that iOS icons should not have any transparency. See more guidelines [here](https://developer.apple.com/design/human-interface-guidelines/ios/icons-and-images/app-icon/).
+Please note that iOS icons should not have any transparency. See more guidelines [here](https://developer.apple.com/design/human-interface-guidelines/app-icons).
 
 ## Formatting
 
