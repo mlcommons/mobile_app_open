@@ -29,57 +29,94 @@ common_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification"
-  accelerator: "npu"
-  accelerator_desc: "NPU"
-  framework: "TFLite NNAPI"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  framework: "TFLite"
+  delegate_choice: {
+    priority: 2
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+    model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+    custom_setting: {
+      id: "sample id"
+      value: "sample value"
+    }
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+    model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  }
+  delegate_selected: "NNAPI"
 }
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "npu"
-  accelerator_desc: "NPU"
-  framework: "TFLite NNAPI"
-  batch_size: 2
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+    model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+    batch_size: 2
+  }
+  delegate_selected: "NNAPI"
 }
 
 benchmark_setting {
   benchmark_id: "object_detection"
-  accelerator: "npu"
-  accelerator_desc: "NPU"
-  framework: "TFLite NNAPI"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
-  model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+    model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
+  }
+  delegate_selected: "NNAPI"
 }
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
-  accelerator: "gpu_f16"
-  accelerator_desc: "GPU (FP16)"
-  framework: "TFLite GPU"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
-  model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+    model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+  }
+  delegate_selected: "GPU"
 }
 
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
-  accelerator: "npu"
-  accelerator_desc: "NPU"
-  framework: "TFLite NNAPI"
-  model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
-  model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+    model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+  }
+  delegate_selected: "NNAPI"
 }
 
 benchmark_setting {
   benchmark_id: "super_resolution"
-  accelerator: "npu"
-  accelerator_desc: "NPU"
-  framework: "TFLite NNAPI"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_full_qint8.tflite"
-  model_checksum: "18ce6df0e4603f4b4ee5d04193708d9c"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_full_qint8.tflite"
+    model_checksum: "18ce6df0e4603f4b4ee5d04193708d9c"
+  }
+  delegate_selected: "NNAPI"
 }
 
 )SETTINGS";

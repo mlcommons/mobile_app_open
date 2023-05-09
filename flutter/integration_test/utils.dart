@@ -1,7 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+
+import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/ui/root/main_screen.dart';
 import 'package:mlperfbench/ui/run/result_screen.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
@@ -22,13 +25,39 @@ class Interval {
   }
 }
 
-Future<void> runBenchmarks(WidgetTester tester) async {
+Future<void> startApp(WidgetTester tester) async {
   const splashPauseSeconds = 4;
-  const runTimeLimitMinutes = 30;
-  const downloadTimeLimitMinutes = 20;
-
   await app.main();
   await tester.pumpAndSettle(const Duration(seconds: splashPauseSeconds));
+}
+
+Future<void> validateSettings(WidgetTester tester) async {
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  for (var benchmark in benchmarkState.benchmarks) {
+    expect(benchmark.selectedDelegate.batchSize, greaterThanOrEqualTo(0));
+    expect(benchmark.selectedDelegate.modelPath.isNotEmpty, isTrue);
+    expect(benchmark.selectedDelegate.modelChecksum.isNotEmpty, isTrue);
+    expect(benchmark.selectedDelegate.acceleratorName.isNotEmpty, isTrue);
+    expect(benchmark.selectedDelegate.acceleratorDesc.isNotEmpty, isTrue);
+    expect(benchmark.benchmarkSettings.framework.isNotEmpty, isTrue);
+    expect(benchmark.selectedDelegate.delegateName,
+        equals(benchmark.benchmarkSettings.delegateSelected));
+
+    final selected = benchmark.benchmarkSettings.delegateSelected;
+    final choices = benchmark.benchmarkSettings.delegateChoice
+        .map((e) => e.delegateName)
+        .toList();
+    expect(choices.isNotEmpty, isTrue);
+    final reason =
+        'delegate_selected=$selected must be one of delegate_choice=$choices';
+    expect(choices.contains(selected), isTrue, reason: reason);
+  }
+}
+
+Future<void> runBenchmarks(WidgetTester tester) async {
+  const runTimeLimitMinutes = 30;
+  const downloadTimeLimitMinutes = 20;
 
   var goButtonIsPresented = await waitFor(
       tester, downloadTimeLimitMinutes, const Key(MainKeys.goButton));

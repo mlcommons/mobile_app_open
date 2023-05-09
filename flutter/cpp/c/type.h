@@ -46,6 +46,7 @@ typedef struct {
 
 const int kMaxMLPerfBackendConfigs = 256;
 typedef struct {
+  const char* delegate_selected;
   const char* accelerator;
   const char* accelerator_desc;
   uint32_t batch_size;

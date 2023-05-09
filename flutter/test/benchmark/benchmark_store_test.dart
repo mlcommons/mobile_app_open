@@ -19,9 +19,13 @@ void main() {
         tiny: pb.OneDatasetConfig(inputPath: 'tiny-inputPath'),
       ),
     );
+    final choice1 = pb.DelegateSetting(
+      delegateName: 'delegate1',
+      modelPath: 'model1-path',
+    );
     final backendSettings1 = pb.BenchmarkSetting(
       benchmarkId: 'task1',
-      modelPath: 'model1-path',
+      delegateChoice: [choice1],
     );
 
     final task2 = pb.TaskConfig(id: 'task2');
@@ -111,7 +115,7 @@ void main() {
       expect(
           resources,
           contains(Resource(
-            path: backendSettings1.modelPath,
+            path: backendSettings1.delegateChoice.first.modelPath,
             type: ResourceTypeEnum.model,
             md5Checksum: '',
           )));
@@ -136,7 +140,7 @@ void main() {
       expect(
           resources,
           contains(Resource(
-            path: backendSettings1.modelPath,
+            path: backendSettings1.delegateChoice.first.modelPath,
             type: ResourceTypeEnum.model,
             md5Checksum: '',
           )));
@@ -164,7 +168,7 @@ void main() {
       expect(
           resources,
           contains(Resource(
-            path: backendSettings1.modelPath,
+            path: backendSettings1.delegateChoice.first.modelPath,
             type: ResourceTypeEnum.model,
             md5Checksum: '',
           )));

@@ -81,15 +81,20 @@ class Benchmark {
     required this.taskConfig,
     required this.isActive,
   })  : info = BenchmarkInfo(taskConfig),
-        backendRequestDescription =
-            '${benchmarkSettings.framework} | ${benchmarkSettings.acceleratorDesc}';
+        backendRequestDescription = benchmarkSettings.framework;
 
   String get id => taskConfig.id;
+
+  pb.DelegateSetting get selectedDelegate {
+    final delegate = benchmarkSettings.delegateChoice.firstWhere(
+        (e) => e.delegateName == benchmarkSettings.delegateSelected);
+    return delegate;
+  }
 
   RunSettings createRunSettings({
     required BenchmarkRunMode runMode,
     required ResourceManager resourceManager,
-    required List<pb.Setting> commonSettings,
+    required List<pb.CommonSetting> commonSettings,
     required String backendLibName,
     required String logDir,
     required int testMinDuration,
@@ -116,7 +121,7 @@ class Benchmark {
     );
 
     return RunSettings(
-      backend_model_path: resourceManager.get(benchmarkSettings.modelPath),
+      backend_model_path: resourceManager.get(selectedDelegate.modelPath),
       backend_lib_name: backendLibName,
       backend_settings: settings,
       backend_native_lib_path: DeviceInfo.instance.nativeLibraryPath,
@@ -126,6 +131,7 @@ class Benchmark {
       dataset_offset: taskConfig.model.offset,
       scenario: taskConfig.scenario,
       mode: runMode.loadgenMode,
+      batch_size: selectedDelegate.batchSize,
       min_query_count: minQueryCount,
       min_duration: minDuration,
       single_stream_expected_latency_ns:
@@ -183,12 +189,14 @@ class BenchmarkStore {
         result.addAll([data, groundtruth]);
       }
 
-      final model = Resource(
-        path: b.benchmarkSettings.modelPath,
-        type: ResourceTypeEnum.model,
-        md5Checksum: b.benchmarkSettings.modelChecksum,
-      );
-      result.add(model);
+      for (final delegate in b.benchmarkSettings.delegateChoice) {
+        final model = Resource(
+          path: delegate.modelPath,
+          type: ResourceTypeEnum.model,
+          md5Checksum: delegate.modelChecksum,
+        );
+        result.add(model);
+      }
     }
 
     final set = <Resource>{};

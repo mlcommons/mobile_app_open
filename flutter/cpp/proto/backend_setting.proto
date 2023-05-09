@@ -25,34 +25,63 @@ option java_package = "org.mlperf.proto";
 // Next ID: 3
 message BackendSetting {
   // Common setting for all benchmarks.
-  repeated Setting common_setting = 1;
+  repeated CommonSetting common_setting = 1;
   // Setting that is specialized for each benchmark.
   repeated BenchmarkSetting benchmark_setting = 2;
 }
 
 // Config of a benchmark.
 //
-// Next ID: 10
+// Next ID: 12
 message BenchmarkSetting {
   // Id of the benchmark. Must match the value in TaskConfig::id.
   required string benchmark_id = 1;
-  // Backend custom model settings
+  // Custom setting for this benchmark.
   repeated CustomSetting custom_setting = 2;
-  // URL or local path of the model file
-  required string model_path = 3;
-  // MD5 checksum to validate the model file
-  required string model_checksum = 4;
-  // Name of the accelerator (hardware), which is passed to the backend.
-  required string accelerator = 5;
-  // Human-readable name of the accelerator (hardware)
-  required string accelerator_desc = 6;
   // Human-readable name of the underlying ML framework (software)
   required string framework = 7;
-  // batch_size is passed to the backend
-  optional int32 batch_size = 8;
   // single_stream_expected_latency_ns is passed to the MLPerfDriver,
   // default to 1M, max 1M
   optional int32 single_stream_expected_latency_ns = 9 [default = 1000000];
+  // Setting for each delegate.
+  repeated DelegateSetting delegate_choice = 10;
+  // Name of the default selected delegate. Will be updated by the frontend.
+  // Must be one of DelegateSetting.delegate_name.
+  optional string delegate_selected = 11;
+
+  // The fields below are deprecated and will be removed in the future.
+  // Use delegate_choice instead.
+  // URL or local path of the model file
+  optional string model_path = 3 [deprecated = true];
+  // MD5 checksum to validate the model file
+  optional string model_checksum = 4 [deprecated = true];
+  // Name of the accelerator (hardware), which is passed to the backend.
+  optional string accelerator = 5 [deprecated = true];
+  // Human-readable name of the accelerator (hardware)
+  optional string accelerator_desc = 6 [deprecated = true];
+  // batch_size is passed to the backend
+  optional int32 batch_size = 8 [deprecated = true];
+}
+
+// Config of a delegate.
+// Next ID: 8
+message DelegateSetting {
+  // Priority of the delegate. Used for sorting delegate choices in frontend.
+  optional int32 priority = 1 [default = 0];
+  // Name of the delegate (software)
+  required string delegate_name = 2;
+  // Name of the accelerator (hardware)
+  required string accelerator_name = 3;
+  // Human-readable name of the accelerator (hardware)
+  required string accelerator_desc = 4;
+  // URL or local path of the model file
+  required string model_path = 5;
+  // MD5 checksum to validate the model file
+  required string model_checksum = 6;
+  // The batch size to be used when running the model. Default to 1.
+  optional int32 batch_size = 7 [default = 1];
+  // Custom setting for this delegate.
+  repeated CustomSetting custom_setting = 8;
 }
 
 // Common setting of each benchmark
@@ -60,7 +89,7 @@ message BenchmarkSetting {
 // a list of acceptable values
 //
 // Next ID: 5
-message Setting {
+message CommonSetting {
   message Value {
     required string value = 1;
     required string name = 2;
@@ -91,6 +120,6 @@ message CustomSetting {
 //
 // Next ID: 2
 message SettingList {
-  repeated Setting setting = 1;
+  repeated CommonSetting setting = 1;
   optional BenchmarkSetting benchmark_setting = 2;
 }

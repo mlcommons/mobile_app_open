@@ -28,6 +28,8 @@ class _RunIn extends Struct {
 
   external Pointer<Utf8> mode;
   @Int32()
+  external int batch_size;
+  @Int32()
   external int min_query_count;
   @Double()
   external double min_duration;
@@ -42,7 +44,7 @@ class _RunIn extends Struct {
 
     final backendSettings = rs.backend_settings.writeToBuffer();
     backend_settings_len = backendSettings.length;
-    backend_settings_data = malloc.allocate<Uint8>(backendSettings.length);
+    backend_settings_data = calloc<Uint8>(backendSettings.length);
     backend_settings_data
         .asTypedList(backendSettings.length)
         .setAll(0, backendSettings);
@@ -56,6 +58,7 @@ class _RunIn extends Struct {
     scenario = rs.scenario.toNativeUtf8();
 
     mode = rs.mode.toNativeUtf8();
+    batch_size = rs.batch_size;
     min_query_count = rs.min_query_count;
     min_duration = rs.min_duration;
     single_stream_expected_latency_ns = rs.single_stream_expected_latency_ns;
@@ -138,9 +141,10 @@ final _getDatasetSize = getBridgeHandle()
 NativeRunResult runBenchmark(RunSettings rs) {
   final startTime = DateTime.now();
 
-  var runIn = malloc.allocate<_RunIn>(sizeOf<_RunIn>());
-  Pointer<_RunOut> runOut;
+  late final Pointer<_RunIn> runIn;
+  late final Pointer<_RunOut> runOut;
   try {
+    runIn = calloc<_RunIn>(sizeOf<_RunIn>());
     runIn.ref.set(rs);
 
     runOut = _run(runIn);
@@ -150,7 +154,7 @@ NativeRunResult runBenchmark(RunSettings rs) {
     }
   } finally {
     runIn.ref.free();
-    malloc.free(runIn);
+    calloc.free(runIn);
   }
 
   try {
@@ -164,10 +168,6 @@ NativeRunResult runBenchmark(RunSettings rs) {
   }
 }
 
-int getQueryCounter() {
-  return _getQuery();
-}
+int getQueryCounter() => _getQuery();
 
-int getDatasetSize() {
-  return _getDatasetSize();
-}
+int getDatasetSize() => _getDatasetSize();

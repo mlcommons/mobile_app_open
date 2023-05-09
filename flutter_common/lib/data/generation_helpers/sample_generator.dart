@@ -53,7 +53,8 @@ class SampleGenerator {
         backendSettings: BackendSettingsInfo(
           acceleratorCode: 'ane',
           acceleratorDesc: 'ANE',
-          framework: 'TFLite CoreML',
+          framework: 'TFLite',
+          delegate: 'Core ML',
           modelPath: 'https://example.com/model.tflite',
           batchSize: 0,
           extraSettings: <BackendExtraSetting>[
