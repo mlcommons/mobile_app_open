@@ -51,8 +51,7 @@ objc_library(
 cc_library(
     name = "coreml_util",
     srcs = [
-        "coreml_util.cc",
-        "coreml_util.h",
+        "coreml_util.swift",
     ],
     deps = [
         ":apple_frameworks",

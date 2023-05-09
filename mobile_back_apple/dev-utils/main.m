@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 
 #import <Foundation/Foundation.h>
-#import "../cpp/backend_coreml/coreml_util.h"
+#include "CoreMLUtil.h"
 
 
 void testIC() {
@@ -27,10 +27,10 @@ void testIC() {
   [coreMLExecutor getInputCount];
   [coreMLExecutor getOutputCount];
 
-  MLMultiArrayDataType inputType = [coreMLExecutor getInputTypeAt:0];
-  assert(inputType == MLMultiArrayDataTypeFloat32);
-  MLMultiArrayDataType outputType = [coreMLExecutor getOutputTypeAt:0];
-  assert(outputType == MLMultiArrayDataTypeFloat32);
+  MLMultiArrayDataTypeWrapper *inputType = [coreMLExecutor getInputTypeAt:0];
+  assert(inputType.dataType == MLMultiArrayDataTypeFloat32);
+    MLMultiArrayDataTypeWrapper *outputType = [coreMLExecutor getOutputTypeAt:0];
+  assert(outputType.dataType == MLMultiArrayDataTypeFloat32);
 
   int fd = open(inputFile, O_RDONLY);
   int inputSize = [coreMLExecutor getInputSizeAt:0];
@@ -123,10 +123,10 @@ void testLU() {
   [coreMLExecutor getInputCount];
   [coreMLExecutor getOutputCount];
 
-  MLMultiArrayDataType inputType = [coreMLExecutor getInputTypeAt:0];
-  assert(inputType == MLMultiArrayDataTypeInt32);
-  MLMultiArrayDataType outputType = [coreMLExecutor getOutputTypeAt:0];
-  assert(outputType == MLMultiArrayDataTypeFloat32);
+  MLMultiArrayDataTypeWrapper *inputType = [coreMLExecutor getInputTypeAt:0];
+  assert(inputType.dataType == MLMultiArrayDataTypeInt32);
+  MLMultiArrayDataTypeWrapper *outputType = [coreMLExecutor getOutputTypeAt:0];
+  assert(outputType.dataType == MLMultiArrayDataTypeFloat32);
 
   int inputSize = [coreMLExecutor getInputSizeAt:0];
   assert(inputSize == 1*384);

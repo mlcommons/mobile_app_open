@@ -18,7 +18,7 @@ limitations under the License.
 #include <cstring>
 
 #include "coreml_settings.h"
-#include "coreml_util.h"
+#include "CoreMLUtil.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/utils.h"
