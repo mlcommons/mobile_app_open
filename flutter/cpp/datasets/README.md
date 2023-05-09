@@ -81,6 +81,7 @@ you need to replace `squad_eval_mini.tfrecord` by `squad_eval.tfrecord` in the
 2. prepare 512x512 images and and ground truth file with something like the following
 
    using .jpg inputs:
+
     ```python
     import os
     import tensorflow as tf
@@ -113,6 +114,7 @@ you need to replace `squad_eval_mini.tfrecord` by `squad_eval.tfrecord` in the
     ```
 
    using .png inputs:
+
     ```python
     home = os.getenv("HOME")
     ADE20K_PATH = home + '/tf-models/research/deeplab/datasets/ADE20K/ADEChallengeData2016/'
