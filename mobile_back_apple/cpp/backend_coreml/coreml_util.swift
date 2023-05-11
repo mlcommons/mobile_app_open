@@ -2,9 +2,10 @@ import Foundation
 import CoreML
 
 struct MLFeature {
-    var data: UnsafeMutableRawPointer?
-    var description: MLFeatureDescription?
+    public var data: UnsafeMutableRawPointer?
+    public var description: MLFeatureDescription?
 }
+
 
 class MLMultiArrayFeatureProvider: NSObject, MLFeatureProvider {
     private let inputs: [MLFeature]
@@ -80,8 +81,8 @@ class MLMultiArrayBatchProvider: NSObject, MLBatchProvider {
 
 @objc
 class MLMultiArrayDataTypeWrapper: NSObject {
-    let dataType: MLMultiArrayDataType?
-    init(dataType: MLMultiArrayDataType?) {
+    public let dataType: MLMultiArrayDataType?
+    public init(dataType: MLMultiArrayDataType?) {
         self.dataType = dataType
         super.init()
     }
@@ -178,9 +179,10 @@ class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func getInputTypeAt(_ i: Int) -> MLMultiArrayDataTypeWrapper? {
+    func getInputTypeAt(_ i: Int) -> MLMultiArrayDataType? {
         let input = getInputAt(i)
-        return MLMultiArrayDataTypeWrapper(dataType: input?.multiArrayConstraint!.dataType)
+//        return MLMultiArrayDataTypeWrapper(dataType: input?.multiArrayConstraint!.dataType)
+        return input?.multiArrayConstraint!.dataType
     }
     
     @objc

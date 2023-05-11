@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 
 #import <Foundation/Foundation.h>
-#include "CoreMLUtil.h"
+#import <mobile_back_apple-Swift.h>
 
 
 void testIC() {

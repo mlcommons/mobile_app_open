@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3ECA15632A04158D0087810B /* coreml_util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ECA15622A04158D0087810B /* coreml_util.swift */; };
+		3E9C865C2A0C222100E87350 /* coreml_util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E9C865B2A0C222100E87350 /* coreml_util.swift */; };
 		BD823FFE287D91F8003A6A2B /* CoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD823FFD287D91F8003A6A2B /* CoreML.framework */; };
 		BD94904D287D8E540055FE69 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BD94904C287D8E540055FE69 /* main.m */; };
 /* End PBXBuildFile section */
@@ -25,12 +25,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3ECA15622A04158D0087810B /* coreml_util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = coreml_util.swift; sourceTree = "<group>"; };
-		3ECA15642A0522450087810B /* CoreMLUtil.swiftmodule */ = {isa = PBXFileReference; lastKnownFileType = file; path = CoreMLUtil.swiftmodule; sourceTree = "<group>"; };
-		3ECA15652A0522450087810B /* CoreMLUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreMLUtil.h; sourceTree = "<group>"; };
-		3ECA15662A0522450087810B /* CoreMLUtil.swiftdoc */ = {isa = PBXFileReference; lastKnownFileType = file; path = CoreMLUtil.swiftdoc; sourceTree = "<group>"; };
-		3ECA15672A0522450087810B /* CoreMLUtil.abi.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = CoreMLUtil.abi.json; sourceTree = "<group>"; };
-		3ECA15682A0522450087810B /* CoreMLUtil.swiftsourceinfo */ = {isa = PBXFileReference; lastKnownFileType = file; path = CoreMLUtil.swiftsourceinfo; sourceTree = "<group>"; };
+		3E9C865A2A0C222100E87350 /* mobile_back_apple-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "mobile_back_apple-Bridging-Header.h"; sourceTree = "<group>"; };
+		3E9C865B2A0C222100E87350 /* coreml_util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = coreml_util.swift; sourceTree = "<group>"; };
 		BD823FF1287D8F36003A6A2B /* coreml_settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = coreml_settings.h; sourceTree = "<group>"; };
 		BD823FF3287D8F36003A6A2B /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
 		BD823FFD287D91F8003A6A2B /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
@@ -63,15 +59,11 @@
 		BD823FEE287D8F36003A6A2B /* backend_coreml */ = {
 			isa = PBXGroup;
 			children = (
-				3ECA15672A0522450087810B /* CoreMLUtil.abi.json */,
-				3ECA15652A0522450087810B /* CoreMLUtil.h */,
-				3ECA15662A0522450087810B /* CoreMLUtil.swiftdoc */,
-				3ECA15642A0522450087810B /* CoreMLUtil.swiftmodule */,
-				3ECA15682A0522450087810B /* CoreMLUtil.swiftsourceinfo */,
 				BDB5512B2892591E004DAF5E /* main.cc */,
 				BD823FF1287D8F36003A6A2B /* coreml_settings.h */,
 				BD823FF3287D8F36003A6A2B /* BUILD */,
-				3ECA15622A04158D0087810B /* coreml_util.swift */,
+				3E9C865B2A0C222100E87350 /* coreml_util.swift */,
+				3E9C865A2A0C222100E87350 /* mobile_back_apple-Bridging-Header.h */,
 			);
 			path = backend_coreml;
 			sourceTree = "<group>";
@@ -161,7 +153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BD94904D287D8E540055FE69 /* main.m in Sources */,
-				3ECA15632A04158D0087810B /* coreml_util.swift in Sources */,
+				3E9C865C2A0C222100E87350 /* coreml_util.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,6 +282,7 @@
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "../cpp/backend_coreml/mobile_back_apple-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -306,6 +299,7 @@
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "../cpp/backend_coreml/mobile_back_apple-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
