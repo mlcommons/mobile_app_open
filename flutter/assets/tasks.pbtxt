@@ -95,8 +95,8 @@ task {
     }
     tiny {
       name: "Open images subset for segmentation"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k_tiny.zip"
-      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/ade20k_tiny_annotations.zip"
+      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/datasets/ade20k_tiny.zip"
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/datasets/ade20k_tiny_annotations.zip"
     }
   }
   model {
