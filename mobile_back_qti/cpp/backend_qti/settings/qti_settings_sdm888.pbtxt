@@ -1,22 +1,6 @@
-/* Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
-
-#ifndef QTI_SETTINGS_SD7G1_H
-#define QTI_SETTINGS_SD7G1_H
-
-const std::string qti_settings_sd7g1 = R"SETTINGS(
 common_setting {
   id: "num_threads"
   name: "Number of threads"
@@ -49,8 +33,8 @@ benchmark_setting {
     id: "scenario"
     value: "Offline"
   }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/SNPE/mobilenet_edgetpu_224_1.0_htp_batched_sd7g1.dlc"
-  model_checksum: "dc8c71f98e67af3667c7dcdf531ce661"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/SNPE/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
+  model_checksum: "b9034e23621f96c86160101928e8e8ea"
 }
 
 benchmark_setting {
@@ -139,6 +123,4 @@ benchmark_setting {
   }
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/SNPE/snusr_htp.dlc"
   model_checksum: "3dc4b1e7ae23620704d76b56f88527d0"
-})SETTINGS";
-
-#endif
+}
