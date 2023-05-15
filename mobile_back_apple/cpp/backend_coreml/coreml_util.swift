@@ -7,7 +7,7 @@ struct MLFeature {
 }
 
 
-class MLMultiArrayFeatureProvider: NSObject, MLFeatureProvider {
+private class MLMultiArrayFeatureProvider: NSObject, MLFeatureProvider {
     private let inputs: [MLFeature]
     private var featureValues: [String: MLFeatureValue]
     
@@ -62,7 +62,7 @@ class MLMultiArrayFeatureProvider: NSObject, MLFeatureProvider {
     }
 }
 
-class MLMultiArrayBatchProvider: NSObject, MLBatchProvider {
+private class MLMultiArrayBatchProvider: NSObject, MLBatchProvider {
     
     var count: Int
     
@@ -80,16 +80,7 @@ class MLMultiArrayBatchProvider: NSObject, MLBatchProvider {
 }
 
 @objc
-class MLMultiArrayDataTypeWrapper: NSObject {
-    public let dataType: MLMultiArrayDataType?
-    public init(dataType: MLMultiArrayDataType?) {
-        self.dataType = dataType
-        super.init()
-    }
-}
-
-@objc
-class CoreMLExecutor: NSObject {
+public class CoreMLExecutor: NSObject {
     private var modelURL: URL?
     private var mlmodel: MLModel?
     private var batchSize: UInt = 0
@@ -179,10 +170,13 @@ class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func getInputTypeAt(_ i: Int) -> MLMultiArrayDataType? {
+    func getInputTypeAt(_ i: Int) -> NSNumber? {
         let input = getInputAt(i)
-//        return MLMultiArrayDataTypeWrapper(dataType: input?.multiArrayConstraint!.dataType)
-        return input?.multiArrayConstraint!.dataType
+        
+        if let inputType = input?.multiArrayConstraint?.dataType {
+                return NSNumber(value: inputType.rawValue)
+            }
+        return nil
     }
     
     @objc
@@ -205,9 +199,12 @@ class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func getOutputTypeAt(_ i: Int) -> MLMultiArrayDataTypeWrapper? {
+    func getOutputTypeAt(_ i: Int) -> NSNumber? {
         let output = getOutputAt(i)
-        return MLMultiArrayDataTypeWrapper(dataType: output?.multiArrayConstraint?.dataType)
+        if let outputType = output?.multiArrayConstraint?.dataType {
+                return NSNumber(value: outputType.rawValue)
+            }
+        return nil
     }
     
     @objc
