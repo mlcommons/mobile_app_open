@@ -35,7 +35,7 @@ benchmark_setting {
     id: "bg_load"
     value: "true"
   }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/SNPE/mobilenet_edgetpu_224_1.0_htp.dlc"
+  model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/mobilenet_edgetpu_224_1.0_htp.dlc"
   model_checksum: "2e7c4d33b480b5566bdf05e1204b6152"
   single_stream_expected_latency_ns: 600000
 }
@@ -54,7 +54,7 @@ benchmark_setting {
     id: "bg_load"
     value: "true"
   }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/SNPE/mobilenet_edgetpu_224_1.0_htp_batched_sd8cxg3.dlc"
+  model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/mobilenet_edgetpu_224_1.0_htp_batched_sd8cxg3.dlc"
   model_checksum: "4a73e95f0b48384daf94fc53d4a2aec3"
 }
 
@@ -71,7 +71,7 @@ benchmark_setting {
     id: "bg_load"
     value: "true"
   }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/SNPE/ssd_mobiledet_qat_htp.dlc"
+  model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/ssd_mobiledet_qat_htp.dlc"
   model_checksum: "65937d5b58414d86fc42872945e2f5cf"
 }
 
@@ -96,7 +96,7 @@ benchmark_setting {
     id: "use_ion_buffer"
     value: "false"
   }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/SNPE/mobilebert_quantized_htp.dlc"
+  model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/mobilebert_quantized_htp.dlc"
   model_checksum: "6dc1f1a47a764381b00c8423b07caac1"
 }
 
@@ -117,7 +117,7 @@ benchmark_setting {
     id: "output_buffer_type"
     value: "int_32"
   }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/SNPE/mobile_mosaic_htp.dlc"
+  model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/mobile_mosaic_htp.dlc"
   model_checksum: "e921828320d251a5f7160952bbd750ec"
 }
 
@@ -130,7 +130,7 @@ benchmark_setting {
     id: "bg_load"
     value: "true"
   }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/SNPE/snusr_htp.dlc"
+  model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/snusr_htp.dlc"
   model_checksum: "3dc4b1e7ae23620704d76b56f88527d0"
 })SETTINGS";
 
