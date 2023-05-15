@@ -17,10 +17,22 @@ load(
     "tflite_copts",
     "tflite_jni_binary",
 )
+load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
 
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
+)
+
+pbtxt2header(
+    name = "tflite_settings",
+    srcs = [
+        "backend_settings/tflite_settings_android.pbtxt",
+        "backend_settings/tflite_settings_apple_iphone11.pbtxt",
+        "backend_settings/tflite_settings_apple_iphone12.pbtxt",
+        "backend_settings/tflite_settings_apple_iphoneX.pbtxt",
+        "backend_settings/tflite_settings_apple_main.pbtxt",
+    ],
 )
 
 cc_library(
@@ -43,6 +55,7 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
+        ":tflite_settings",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/lite/c:c_api",
         "@org_tensorflow//tensorflow/lite/c:common",
