@@ -23,7 +23,9 @@ const std::string empty_settings = "";
 #define STRINGIFY(X) STRINGIFY2(X)
 #define STRINGIFY2(X) #X
 
-#define INCLUDE_SETTINGS(device) STRINGIFY(mobile_back_qti/cpp/backend_qti/settings/qti_settings_##device.pbtxt.h)
+#define INCLUDE_SETTINGS(device)                             \
+  STRINGIFY(mobile_back_qti / cpp / backend_qti / settings / \
+            qti_settings_##device.pbtxt.h)
 
 #define SETTINGS_LHS(device) const std::string qti_settings_##device
 #define SETTINGS_RHS(device) qti_settings_##device##_pbtxt

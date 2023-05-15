@@ -79,9 +79,9 @@ cc_library(
     srcs = ["rpcmem.cc"],
     hdrs = [
         "cpuctrl.h",
+        "qti_settings.h",
         "rpcmem.h",
         "soc_utility.h",
-        "qti_settings.h",
     ],
     copts = tflite_copts() + snpe_copts,
     deps = [
