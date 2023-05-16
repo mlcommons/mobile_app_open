@@ -22,10 +22,10 @@ const std::string empty_settings = "";
 // Macro for adding quotes
 #define STRINGIFY(X) STRINGIFY2(X)
 #define STRINGIFY2(X) #X
-
+// clang-format off
 #define INCLUDE_SETTINGS(device)                             \
   STRINGIFY(mobile_back_qti/cpp/backend_qti/settings/qti_settings_##device.pbtxt.h)
-
+// clang-format on
 #define SETTINGS_LHS(device) const std::string qti_settings_##device
 #define SETTINGS_RHS(device) qti_settings_##device##_pbtxt
 #define STRING_SETTINGS(device) SETTINGS_LHS(device) = SETTINGS_RHS(device);
