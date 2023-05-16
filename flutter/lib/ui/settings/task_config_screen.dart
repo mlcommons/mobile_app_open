@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -255,6 +256,12 @@ class TaskConfigScreen extends StatelessWidget {
       ]);
     }
 
+    // On Android we need MANAGE_EXTERNAL_STORAGE permission
+    // see https://github.com/mlcommons/mobile_app_open/issues/702
+    if (Platform.isAndroid) {
+      items.add(const ManageFilePermissionSwitch());
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.settingsTaskConfigTitle),
@@ -262,6 +269,46 @@ class TaskConfigScreen extends StatelessWidget {
       body: ListView(
         children: items,
       ),
+    );
+  }
+}
+
+class ManageFilePermissionSwitch extends StatefulWidget {
+  const ManageFilePermissionSwitch({super.key});
+
+  @override
+  State<ManageFilePermissionSwitch> createState() =>
+      _ManageFilePermissionSwitchState();
+}
+
+class _ManageFilePermissionSwitchState
+    extends State<ManageFilePermissionSwitch> {
+  Future<bool> _permissionGranted = Permission.manageExternalStorage.isGranted;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return FutureBuilder<bool>(
+      future: _permissionGranted,
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+        var granted = false;
+        if (snapshot.data == true) {
+          granted = true;
+        }
+        return ListTile(
+          title: Text(l10n.settingsTaskDataFolderPermissionTitle),
+          subtitle: Text(l10n.settingsTaskDataFolderPermissionSubtitle),
+          trailing: Switch(
+            value: granted,
+            onChanged: (flag) {
+              setState(() {
+                final status = Permission.manageExternalStorage.request();
+                _permissionGranted = status.isGranted;
+              });
+            },
+          ),
+        );
+      },
     );
   }
 }

@@ -61,6 +61,8 @@
   "settingsTaskDataFolderCustom": "Custom folder",
   "settingsTaskDataFolderSelected": "Selected data folder",
   "settingsTaskDataFolderWarning": "Folder <path> does not exist or is not accessible",
+  "settingsTaskDataFolderPermissionTitle": "Grant manage all file permission",
+  "settingsTaskDataFolderPermissionSubtitle": "Mange all file permission is needed to use custom folder",
   "settingsTaskCacheFolderTitle": "Cache folder",
   "settingsTaskCacheFolderDesc": "Cache folder contains downloadable data.\nThis folder can only be changed during build.",
   "settingsTaskCacheFolderDefault": "Default",
