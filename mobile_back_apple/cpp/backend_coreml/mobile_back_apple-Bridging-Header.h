@@ -3,5 +3,3 @@
 //
 
 #import <CoreML/CoreML.h>
-
-#import "coreml_util.h"

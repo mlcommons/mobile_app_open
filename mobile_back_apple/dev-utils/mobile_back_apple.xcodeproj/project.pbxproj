@@ -27,7 +27,6 @@
 /* Begin PBXFileReference section */
 		3E9C865B2A0C222100E87350 /* coreml_util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = coreml_util.swift; sourceTree = "<group>"; };
 		3E9C865D2A0CD69100E87350 /* mobile_back_apple-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mobile_back_apple-Bridging-Header.h"; sourceTree = "<group>"; };
-		3ED07CC02A1161F9009BAF5C /* coreml_util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = coreml_util.h; sourceTree = "<group>"; };
 		BD823FF1287D8F36003A6A2B /* coreml_settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = coreml_settings.h; sourceTree = "<group>"; };
 		BD823FF3287D8F36003A6A2B /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
 		BD823FFD287D91F8003A6A2B /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
@@ -65,7 +64,6 @@
 				BD823FF1287D8F36003A6A2B /* coreml_settings.h */,
 				BD823FF3287D8F36003A6A2B /* BUILD */,
 				3E9C865B2A0C222100E87350 /* coreml_util.swift */,
-				3ED07CC02A1161F9009BAF5C /* coreml_util.h */,
 			);
 			path = backend_coreml;
 			sourceTree = "<group>";

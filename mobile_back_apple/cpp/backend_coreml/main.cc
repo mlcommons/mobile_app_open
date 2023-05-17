@@ -14,8 +14,7 @@ limitations under the License.
 ==============================================================================*/
 
 #import <CoreML/CoreML.h>
-
-#include "coreml_util.h"
+#import <mobile_back_apple-Swift.h>
 
 #include <cstring>
 

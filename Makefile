@@ -17,12 +17,12 @@
 all: flutter
 
 # available backends
-WITH_TFLITE?=1
+WITH_TFLITE?=0
 WITH_QTI?=0
 WITH_SAMSUNG?=0
 WITH_PIXEL?=0
 WITH_MEDIATEK?=0
-WITH_APPLE?=0
+WITH_APPLE?=1
 
 include tools/common.mk
 include tools/formatter/format.mk

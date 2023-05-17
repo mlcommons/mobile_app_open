@@ -54,6 +54,7 @@ swift_library(
     srcs = [
         "coreml_util.swift",
     ],
+    generates_header=True,
     deps = [
         ":apple_frameworks",
     ],
@@ -63,7 +64,6 @@ cc_library(
     name = "coreml_c",
     srcs = [
         "coreml_settings.h",
-        "coreml_util.h",
         "main.cc",
     ],
     deps = [
