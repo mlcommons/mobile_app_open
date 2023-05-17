@@ -27,11 +27,11 @@ const Map<String, Interval> _objectDetection = {
 };
 
 const Map<String, Interval> _imageSegmentation = {
-  'cpu': Interval(min: 0.83, max: 0.84),
-  'npu': Interval(min: 0.48, max: 0.49),
-  'tpu': Interval(min: 0.48, max: 0.49),
-  'ane|TFLite': Interval(min: 0.80, max: 0.84),
-  'ane|Core ML': Interval(min: 0.82, max: 0.84),
+  'cpu': Interval(min: 0.38, max: 0.40),
+  'npu': Interval(min: 0.33, max: 0.34),
+  'tpu': Interval(min: 0.33, max: 0.34),
+  'ane|TFLite': Interval(min: 0.38, max: 0.40),
+  'ane|Core ML': Interval(min: 0.38, max: 0.40),
 };
 
 const Map<String, Interval> _naturalLanguageProcessing = {

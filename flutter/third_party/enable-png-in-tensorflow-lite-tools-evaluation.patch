@@ -44,7 +44,7 @@ index a1418c3bcb6..a9750141b3d 100644
 +// Loads the png image.
 +inline void LoadImagePng(std::string* filename, ImageData* image_data) {
 +  // Reads image.
-+  std::ifstream t(*filename);
++  std::ifstream t(*filename, std::ios::binary);
 +  std::string image_str((std::istreambuf_iterator<char>(t)),
 +                        std::istreambuf_iterator<char>());
 +
