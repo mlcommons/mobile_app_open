@@ -15,19 +15,13 @@ benchmark_setting {
   benchmark_id: "image_classification"
   framework: "TFLite"
   delegate_choice: {
-    priority: 2
     delegate_name: "Core ML"
     accelerator_name: "ane"
     accelerator_desc: "ANE"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
     model_checksum: "66bb4eba50987221608f8487ed405794"
-    custom_setting: {
-      id: "sample id"
-      value: "sample value"
-    }
   }
   delegate_choice: {
-    priority: 1
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
@@ -44,6 +38,13 @@ benchmark_setting {
     delegate_name: "Core ML"
     accelerator_name: "ane"
     accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
+    model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
     model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
   }
@@ -73,6 +74,13 @@ benchmark_setting {
     model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
     model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
   }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
+    model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+  }
   delegate_selected: "Core ML"
 }
 
@@ -83,6 +91,13 @@ benchmark_setting {
     delegate_name: "Core ML"
     accelerator_name: "ane"
     accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
+    model_checksum: "672240427c1f3dc33baf2facacd9631f"
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
     model_checksum: "672240427c1f3dc33baf2facacd9631f"
   }
