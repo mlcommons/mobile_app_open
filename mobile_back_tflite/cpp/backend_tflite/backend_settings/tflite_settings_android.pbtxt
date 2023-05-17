@@ -20,10 +20,6 @@ benchmark_setting {
     accelerator_desc: "NPU"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
     model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
-    custom_setting: {
-      id: "sample id"
-      value: "sample value"
-    }
   }
   delegate_choice: {
     delegate_name: "GPU"
@@ -44,14 +40,6 @@ benchmark_setting {
     accelerator_desc: "NPU"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
     model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
-    batch_size: 2
-  }
-  delegate_choice: {
-    delegate_name: "GPU"
-    accelerator_name: "gpu"
-    accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-    model_checksum: "0da3fa6adc8bbaaeb0b5647e2d46c8a4"
     batch_size: 2
   }
   delegate_selected: "NNAPI"
