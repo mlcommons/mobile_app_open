@@ -259,7 +259,10 @@ class TaskConfigScreen extends StatelessWidget {
     // On Android we need MANAGE_EXTERNAL_STORAGE permission
     // see https://github.com/mlcommons/mobile_app_open/issues/702
     if (Platform.isAndroid) {
-      items.add(const ManageFilePermissionSwitch());
+      items.addAll([
+        const ManageFilePermissionWidget(),
+        const Divider(),
+      ]);
     }
 
     return Scaffold(
@@ -273,16 +276,16 @@ class TaskConfigScreen extends StatelessWidget {
   }
 }
 
-class ManageFilePermissionSwitch extends StatefulWidget {
-  const ManageFilePermissionSwitch({super.key});
+class ManageFilePermissionWidget extends StatefulWidget {
+  const ManageFilePermissionWidget({super.key});
 
   @override
-  State<ManageFilePermissionSwitch> createState() =>
-      _ManageFilePermissionSwitchState();
+  State<ManageFilePermissionWidget> createState() =>
+      _ManageFilePermissionWidgetState();
 }
 
-class _ManageFilePermissionSwitchState
-    extends State<ManageFilePermissionSwitch> {
+class _ManageFilePermissionWidgetState
+    extends State<ManageFilePermissionWidget> {
   Future<bool> _permissionGranted = Permission.manageExternalStorage.isGranted;
 
   @override
@@ -291,22 +294,23 @@ class _ManageFilePermissionSwitchState
     return FutureBuilder<bool>(
       future: _permissionGranted,
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-        var granted = false;
+        final title = l10n.settingsTaskDataFolderPermissionRequired;
+        var subtitle = l10n.settingsTaskDataFolderPermissionNotGranted;
+        var iconColor = Colors.grey;
         if (snapshot.data == true) {
-          granted = true;
+          subtitle = l10n.settingsTaskDataFolderPermissionGranted;
+          iconColor = Colors.green;
         }
         return ListTile(
-          title: Text(l10n.settingsTaskDataFolderPermissionTitle),
-          subtitle: Text(l10n.settingsTaskDataFolderPermissionSubtitle),
-          trailing: Switch(
-            value: granted,
-            onChanged: (flag) {
-              setState(() {
-                final status = Permission.manageExternalStorage.request();
-                _permissionGranted = status.isGranted;
-              });
-            },
-          ),
+          title: Text(title),
+          subtitle: Text(subtitle),
+          trailing: Icon(color: iconColor, Icons.check_circle),
+          onTap: () {
+            setState(() {
+              final status = Permission.manageExternalStorage.request();
+              _permissionGranted = status.isGranted;
+            });
+          },
         );
       },
     );
