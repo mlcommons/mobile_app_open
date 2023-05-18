@@ -19,13 +19,33 @@ limitations under the License.
 
 const std::string empty_settings = "";
 
-#include "qti_settings_sd7g1.h"
-#include "qti_settings_sd7pg2.h"
-#include "qti_settings_sd8cxg3.h"
-#include "qti_settings_sd8g1.h"
-#include "qti_settings_sd8g2.h"
-#include "qti_settings_sd8pg1.h"
-#include "qti_settings_sdm778.h"
-#include "qti_settings_sdm888.h"
+// Macro for adding quotes
+#define STRINGIFY(X) STRINGIFY2(X)
+#define STRINGIFY2(X) #X
+// clang-format off
+#define INCLUDE_SETTINGS(device)                             \
+  STRINGIFY(mobile_back_qti/cpp/backend_qti/settings/qti_settings_##device.pbtxt.h)
+// clang-format on
+#define SETTINGS_LHS(device) const std::string qti_settings_##device
+#define SETTINGS_RHS(device) qti_settings_##device##_pbtxt
+#define STRING_SETTINGS(device) SETTINGS_LHS(device) = SETTINGS_RHS(device);
+
+#include INCLUDE_SETTINGS(sd7g1)
+#include INCLUDE_SETTINGS(sd7pg2)
+#include INCLUDE_SETTINGS(sd8cxg3)
+#include INCLUDE_SETTINGS(sd8g1)
+#include INCLUDE_SETTINGS(sd8g2)
+#include INCLUDE_SETTINGS(sd8pg1)
+#include INCLUDE_SETTINGS(sdm778)
+#include INCLUDE_SETTINGS(sdm888)
+
+STRING_SETTINGS(sd7g1)
+STRING_SETTINGS(sd7pg2)
+STRING_SETTINGS(sd8cxg3)
+STRING_SETTINGS(sd8g1)
+STRING_SETTINGS(sd8g2)
+STRING_SETTINGS(sd8pg1)
+STRING_SETTINGS(sdm778)
+STRING_SETTINGS(sdm888)
 
 #endif
