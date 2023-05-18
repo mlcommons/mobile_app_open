@@ -56,3 +56,9 @@ cc_binary(
         "@org_tensorflow//tensorflow/lite/tools:command_line_flags",
     ],
 )
+
+py_binary(
+    name = "pbtxt2header",
+    srcs = ["pbtxt2header.py"],
+    main = "pbtxt2header.py",
+)
