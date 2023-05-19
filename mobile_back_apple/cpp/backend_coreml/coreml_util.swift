@@ -94,7 +94,7 @@ public class CoreMLExecutor: NSObject {
     
     
     @objc
-    init?(modelPath: UnsafePointer<CChar>, batchSize: Int) {
+    public init?(modelPath: UnsafePointer<CChar>, batchSize: Int) {
         pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0)
         
         let config = MLModelConfiguration()
@@ -150,7 +150,7 @@ public class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func getInputCount() -> Int {
+    public func getInputCount() -> Int {
         return Int(inputCount)
     }
     
@@ -161,7 +161,7 @@ public class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func getInputSizeAt(_ i: Int) -> Int {
+    public func getInputSizeAt(_ i: Int) -> Int {
         let input = getInputAt(i)
         let shape = input?.multiArrayConstraint?.shape
         let inputSize = shape?.reduce(1, { $0 * $1.intValue }) ?? 0
@@ -170,7 +170,7 @@ public class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func getInputTypeAt(_ i: Int) -> NSNumber? {
+    public func getInputTypeAt(_ i: Int) -> NSNumber? {
         let input = getInputAt(i)
         
         if let inputType = input?.multiArrayConstraint?.dataType {
@@ -180,7 +180,7 @@ public class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func getOutputCount() -> Int {
+    public func getOutputCount() -> Int {
         return Int(outputCount)
     }
     
@@ -190,7 +190,7 @@ public class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func getOutputSizeAt(_ i: Int) -> Int {
+    public func getOutputSizeAt(_ i: Int) -> Int {
         let output = getOutputAt(i)
         let shape = output?.multiArrayConstraint!.shape
         let outputSize = shape?.reduce(1, { $0 * $1.intValue }) ?? 0
@@ -199,7 +199,7 @@ public class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func getOutputTypeAt(_ i: Int) -> NSNumber? {
+    public func getOutputTypeAt(_ i: Int) -> NSNumber? {
         let output = getOutputAt(i)
         if let outputType = output?.multiArrayConstraint?.dataType {
                 return NSNumber(value: outputType.rawValue)
@@ -208,14 +208,14 @@ public class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func setInputData(_ data: UnsafeMutableRawPointer, at i: Int, batchIndex: Int) -> Bool {
+    public func setInputData(_ data: UnsafeMutableRawPointer, at i: Int, batchIndex: Int) -> Bool {
         let input = getInputAt(i)
         inputFeatures?[batchIndex][i] = MLFeature(data: data, description: input)
         return true
     }
     
     @objc
-    func issueQueries() -> Bool {
+    public func issueQueries() -> Bool {
         autoreleasepool {
             do {
                 let batchProvider = MLMultiArrayBatchProvider(inputs: inputFeatures!)
@@ -248,14 +248,14 @@ public class CoreMLExecutor: NSObject {
     }
     
     @objc
-    func flushQueries() -> Bool {
+    public func flushQueries() -> Bool {
         clearFeatureVector()
         prepareFeatureVector()
         return true
     }
     
     @objc
-    func getOutputData(_ data: UnsafeMutableRawPointer, at i: Int, batchIndex: Int) -> Bool {
+    public func getOutputData(_ data: UnsafeMutableRawPointer, at i: Int, batchIndex: Int) -> Bool {
         let outputFeature = outputFeatures?[batchIndex][i]
         guard let outputFeature = outputFeature, let data = outputFeature.data else {
             return false

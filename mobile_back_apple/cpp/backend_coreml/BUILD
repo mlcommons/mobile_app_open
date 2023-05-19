@@ -53,7 +53,7 @@ objc_library(
 swift_library(
     name = "coreml_util",
     srcs = [
-        "coreml_util.swift",
+        "coreml_util.swift"
     ],
     generates_header=True,
     deps = [
@@ -68,11 +68,12 @@ pbtxt2header(
     ],
 )
 
-cc_library(
+objc_library(
     name = "coreml_c",
     srcs = [
-        "main.cc",
+        "main.mm",
     ],
+    includes = ["."],
     deps = [
         ":apple_frameworks",
         ":coreml_settings",

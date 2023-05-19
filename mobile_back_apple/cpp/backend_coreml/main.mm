@@ -14,15 +14,14 @@ limitations under the License.
 ==============================================================================*/
 
 #import <CoreML/CoreML.h>
-#import <mobile_back_apple-Swift.h>
 
 #include <cstring>
 
-#include "coreml_settings.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/utils.h"
 #include "mobile_back_apple/cpp/backend_coreml/coreml_settings.pbtxt.h"
+#include "coreml_util-Swift.h"
 
 struct CoreMLBackendData {
   const char *name = "Core ML";
