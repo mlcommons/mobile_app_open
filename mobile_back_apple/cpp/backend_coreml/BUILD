@@ -53,9 +53,9 @@ objc_library(
 swift_library(
     name = "coreml_util",
     srcs = [
-        "coreml_util.swift"
+        "coreml_util.swift",
     ],
-    generates_header=True,
+    generates_header = True,
     deps = [
         ":apple_frameworks",
     ],
