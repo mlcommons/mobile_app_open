@@ -17,11 +17,11 @@ limitations under the License.
 
 #include <cstring>
 
-#include "coreml_settings.h"
 #include "coreml_util.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/utils.h"
+#include "mobile_back_apple/cpp/backend_coreml/coreml_settings.pbtxt.h"
 
 struct CoreMLBackendData {
   const char *name = "Core ML";
@@ -66,7 +66,7 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const mlperf_device_info_t *device_info) {
   (void)device_info;
   *not_allowed_message = nullptr;
-  *settings = coreml_settings.c_str();
+  *settings = coreml_settings_pbtxt.c_str();
   return true;
 }
 

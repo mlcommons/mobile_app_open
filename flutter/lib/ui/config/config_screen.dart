@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
@@ -14,6 +15,7 @@ class ConfigScreen extends StatefulWidget {
 
 class _ConfigScreen extends State<ConfigScreen> {
   late BenchmarkState state;
+  late double pictureEdgeSize;
 
   @override
   void dispose() {
@@ -24,32 +26,13 @@ class _ConfigScreen extends State<ConfigScreen> {
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
+    pictureEdgeSize = 0.1 * MediaQuery.of(context).size.width;
     final stringResources = AppLocalizations.of(context);
     final childrenList = <Widget>[];
 
     for (var benchmark in state.benchmarks) {
-      childrenList.add(ListTile(
-        title: Padding(
-          padding: const EdgeInsets.only(bottom: 5),
-          child: Text(
-            benchmark.info.taskName,
-          ),
-        ),
-        subtitle:
-            Text('${benchmark.id} | ${benchmark.backendRequestDescription}'),
-        leading: Checkbox(
-            value: benchmark.isActive,
-            onChanged: (bool? value) {
-              setState(() {
-                benchmark.isActive = value!;
-              });
-            }),
-        onTap: () {
-          setState(() {
-            benchmark.isActive = !benchmark.isActive;
-          });
-        },
-      ));
+      childrenList.add(_listTile(benchmark));
+      childrenList.add(const Divider(height: 20));
     }
 
     return Scaffold(
@@ -59,9 +42,86 @@ class _ConfigScreen extends State<ConfigScreen> {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.fromLTRB(8, 20, 8, 20),
         children: childrenList,
       ),
+    );
+  }
+
+  Widget _listTile(Benchmark benchmark) {
+    return ListTile(
+      leading: SizedBox(
+          width: pictureEdgeSize,
+          height: pictureEdgeSize,
+          child: benchmark.info.icon),
+      title: _name(benchmark),
+      subtitle: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _description(benchmark),
+          _delegateChoice(benchmark),
+        ],
+      ),
+      trailing: _activeToggle(benchmark),
+    );
+  }
+
+  Widget _name(Benchmark benchmark) {
+    return Text(benchmark.info.taskName);
+  }
+
+  Widget _description(Benchmark benchmark) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Text(benchmark.backendRequestDescription),
+    );
+  }
+
+  Widget _activeToggle(Benchmark benchmark) {
+    return Switch(
+      value: benchmark.isActive,
+      onChanged: (flag) {
+        setState(() {
+          benchmark.isActive = flag;
+        });
+      },
+    );
+  }
+
+  Widget _delegateChoice(Benchmark benchmark) {
+    final selected = benchmark.benchmarkSettings.delegateSelected;
+    final choices = benchmark.benchmarkSettings.delegateChoice
+        .map((e) => e.delegateName)
+        .toList();
+    if (choices.isEmpty) {
+      return const SizedBox();
+    }
+    if (choices.length == 1 && choices.first.isEmpty) {
+      return const SizedBox();
+    }
+    if (!choices.contains(selected)) {
+      throw 'delegate_selected=$selected must be one of delegate_choice=$choices';
+    }
+    final dropDownButton = DropdownButton<String>(
+        underline: const SizedBox(),
+        value: selected,
+        items: choices
+            .map((item) => DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(item),
+                ))
+            .toList(),
+        onChanged: (value) => setState(() {
+              benchmark.benchmarkSettings.delegateSelected = value!;
+            }));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const Text('Delegate:'),
+        const SizedBox(width: 4),
+        dropDownButton,
+      ],
     );
   }
 }

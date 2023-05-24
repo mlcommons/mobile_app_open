@@ -15,6 +15,7 @@ class RunSettings {
   final int dataset_offset;
   final String scenario;
   final String mode; // Submission/Accuracy/Performance
+  final int batch_size;
   final int min_query_count;
   final double min_duration;
   final int single_stream_expected_latency_ns;
@@ -32,6 +33,7 @@ class RunSettings {
     required this.dataset_offset,
     required this.scenario,
     required this.mode, // Submission/Accuracy/Performance
+    required this.batch_size,
     required this.min_query_count,
     required this.min_duration,
     required this.single_stream_expected_latency_ns,

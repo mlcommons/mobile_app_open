@@ -23,6 +23,7 @@
 load("@snpe_version_loader//:snpe_var_def.bzl", "SNPE_VERSION")
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -59,19 +60,17 @@ snpe_copts = [
     "-lc++_shared",
 ]
 
-cc_library(
+pbtxt2header(
     name = "qti_settings",
-    srcs = [],
-    hdrs = [
-        "qti_settings.h",
-        "qti_settings_sd7g1.h",
-        "qti_settings_sd7pg2.h",
-        "qti_settings_sd8cxg3.h",
-        "qti_settings_sd8g1.h",
-        "qti_settings_sd8g2.h",
-        "qti_settings_sd8pg1.h",
-        "qti_settings_sdm778.h",
-        "qti_settings_sdm888.h",
+    srcs = [
+        "settings/qti_settings_sd7g1.pbtxt",
+        "settings/qti_settings_sd7pg2.pbtxt",
+        "settings/qti_settings_sd8cxg3.pbtxt",
+        "settings/qti_settings_sd8g1.pbtxt",
+        "settings/qti_settings_sd8g2.pbtxt",
+        "settings/qti_settings_sd8pg1.pbtxt",
+        "settings/qti_settings_sdm778.pbtxt",
+        "settings/qti_settings_sdm888.pbtxt",
     ],
 )
 
@@ -80,6 +79,7 @@ cc_library(
     srcs = ["rpcmem.cc"],
     hdrs = [
         "cpuctrl.h",
+        "qti_settings.h",
         "rpcmem.h",
         "soc_utility.h",
     ],
@@ -129,6 +129,7 @@ cc_library(
         "qti_backend_helper.h",
         "mlperf_helper.h",
         "soc_utility.h",
+        "qti_settings.h",
     ] + select({
         "android_arm64": [],
         "windows_arm64": [
