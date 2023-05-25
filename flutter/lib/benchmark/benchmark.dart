@@ -103,6 +103,7 @@ class Benchmark {
     final dataset = runMode.chooseDataset(taskConfig);
 
     int minQueryCount;
+    double maxDuration = 10 * 60; // 10 minutes
     double minDuration;
     if (testMinDuration != 0) {
       minQueryCount = testMinQueryCount;
@@ -134,6 +135,7 @@ class Benchmark {
       batch_size: selectedDelegate.batchSize,
       min_query_count: minQueryCount,
       min_duration: minDuration,
+      max_duration: maxDuration,
       single_stream_expected_latency_ns:
           benchmarkSettings.singleStreamExpectedLatencyNs,
       output_dir: logDir,

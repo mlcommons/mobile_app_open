@@ -33,7 +33,9 @@ tflite-run-ic:
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/images" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/imagenet_val.txt" \
-		--offset=1
+		--offset=1 \
+		--max_duration_ms=600000 \
+		--min_duration_ms=100
 
 tflite-run-ic-offline:
 	cd ${REPO_ROOT_DIR} && \
