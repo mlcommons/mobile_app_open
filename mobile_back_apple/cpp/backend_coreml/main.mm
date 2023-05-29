@@ -84,10 +84,11 @@ mlperf_backend_ptr_t mlperf_backend_create(
   backendExists = true;
 
   // Load the model.
+  NSError *error;
   CoreMLExecutor *coreMLExecutor =
       [[CoreMLExecutor alloc] initWithModelPath:model_path
-                                      batchSize:configs->batch_size];
-  if (!coreMLExecutor) {
+                                      batchSize:configs->batch_size error: &error];
+  if (!coreMLExecutor || error) {
     LOG(ERROR) << "Cannot create CoreMLExecutor";
     return nullptr;
   }

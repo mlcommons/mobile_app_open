@@ -19,12 +19,14 @@
 
 
 void testIC() {
-    const char * modelPath = "/Users/anh/dev/mlcommons/mobile_app_open/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel";
-    const char * inputFile = "/Users/anh/dev/mlcommons/mobile_app_open/mobile_back_apple/dev-resources/imagenet/grace_hopper.raw";
+    const char * modelPath = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel";
+    const char * inputFile = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/imagenet/grace_hopper.raw";
     const int expectedPredictedIndex = 653; // expected index for grace_hopper is 653
     
     int batchSize = 32;
-    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:batchSize];
+    NSError *error = nil;
+    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:batchSize error: &error];
+    assert(error == nil);
     [coreMLExecutor getInputCount];
     [coreMLExecutor getOutputCount];
     
@@ -84,14 +86,16 @@ void testIC() {
 }
 
 void testOD() {
-    const char * modelPath = "/Users/anh/dev/mlcommons/mobile_app_open/mobile_back_apple/dev-resources/mobiledet/dummy_od.mlmodel";
+    const char * modelPath = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/mobiledet/MobileDet.mlmodel";
     
-    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:1];
+    NSError *error = nil;
+    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:1 error: &error];
+    assert(error == nil);
     [coreMLExecutor getInputCount];
     [coreMLExecutor getOutputCount];
     
     int inputSize = [coreMLExecutor getInputSizeAt:0];
-    assert(inputSize == 150528);
+    assert(inputSize == 307200);
     
     float *inputData_float = (float *)malloc(inputSize * sizeof(float));
     for (int i = 0; i < inputSize; i++) {
@@ -121,9 +125,11 @@ void testIS() {
 }
 
 void testLU() {
-    const char * modelPath = "/Users/anh/dev/mlcommons/mobile_app_open/mobile_back_apple/dev-resources/mobilebert/MobileBERT.mlmodel";
+    const char * modelPath = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/mobilebert/MobileBERT.mlmodel";
     
-    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:1];
+    NSError *error = nil;
+    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:1 error: &error];
+    assert(error == nil);
     [coreMLExecutor getInputCount];
     [coreMLExecutor getOutputCount];
     
@@ -155,6 +161,7 @@ void testLU() {
     
     float *outputData = (float *)malloc(outputSize_0 * sizeof(float));
     [coreMLExecutor getOutputData:(void **)&outputData at:0 batchIndex:0];
+    
     
     [coreMLExecutor flushQueries];
     coreMLExecutor = nil;

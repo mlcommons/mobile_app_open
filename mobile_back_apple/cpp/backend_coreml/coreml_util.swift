@@ -6,6 +6,19 @@ struct MLFeature {
     public var description: MLFeatureDescription?
 }
 
+struct MLError: Error {
+    let message: String
+}
+
+private class EmptyFeatureProvider: MLFeatureProvider {
+    var featureNames: Set<String> {
+        return []
+    }
+    
+    func featureValue(for featureName: String) -> MLFeatureValue? {
+        return nil
+    }
+}
 
 private class MLMultiArrayFeatureProvider: NSObject, MLFeatureProvider {
     private let inputs: [MLFeature]
@@ -13,21 +26,20 @@ private class MLMultiArrayFeatureProvider: NSObject, MLFeatureProvider {
     
     var featureNames: Set<String> = Set<String>()
     
-    init?(inputs: [MLFeature]) {
+    init(inputs: [MLFeature]) throws {
         self.inputs = inputs
         self.featureValues = [:]
         
         for input in inputs {
-            let featureName = input.description?.name
-            
-            guard let featureName = featureName else { return nil }
-            guard featureName.isEmpty else { return nil }
+            guard let featureName = input.description?.name, !featureName.isEmpty else {
+                throw MLError(message: "Feature name is missing")
+            }
             
             featureNames.insert(featureName)
             
-            let constraint = input.description?.multiArrayConstraint
-            
-            guard let constraint = constraint else { return nil }
+            guard let constraint = input.description?.multiArrayConstraint else {
+                throw MLError(message: "Constraint is missing")
+            }
             
             let shape = constraint.shape
             var strides = [NSNumber](repeating: 1, count: shape.count)
@@ -37,15 +49,14 @@ private class MLMultiArrayFeatureProvider: NSObject, MLFeatureProvider {
                 strides[i - 1] = NSNumber(value: stride)
             }
             
-            guard let mlArray = try? MLMultiArray(
-                dataPointer: input.data!,
+            guard let data = input.data,  let mlArray = try? MLMultiArray(
+                dataPointer: data,
                 shape: constraint.shape,
                 dataType: constraint.dataType,
                 strides: strides,
                 deallocator: nil
             ) else {
-                NSLog("Failed to create MLMultiArray for feature \(featureName)")
-                return nil
+                throw MLError(message: "Failed to create MLMultiArray for feature \(featureName)")
             }
             
             let mlFeatureValue = MLFeatureValue(multiArray: mlArray)
@@ -75,7 +86,13 @@ private class MLMultiArrayBatchProvider: NSObject, MLBatchProvider {
     
     func features(at index: Int) -> MLFeatureProvider {
         let inputFeatures = inputs[index]
-        return MLMultiArrayFeatureProvider(inputs: inputFeatures)!
+        do {
+            let result = try MLMultiArrayFeatureProvider(inputs: inputFeatures)
+            return result
+        } catch {
+            NSLog("Empty feature provider is used");
+            return EmptyFeatureProvider()
+        }
     }
 }
 
@@ -86,17 +103,16 @@ public class CoreMLExecutor: NSObject {
     private var batchSize: UInt = 0
     private var inputCount: UInt = 0
     private var outputCount: UInt = 0
-    private var inputFeatures: [[MLFeature]]?
-    private var outputFeatures: [[MLFeature]]?
+    private var inputFeatures: [[MLFeature]] = []
+    private var outputFeatures: [[MLFeature]] = []
     private var inputNames: [String] = []
     private var outputNames: [String] = []
     private var outputProvider: MLBatchProvider?
     
     
     @objc
-    public init?(modelPath: UnsafePointer<CChar>, batchSize: Int) {
+    public init(modelPath: UnsafePointer<CChar>, batchSize: Int) throws {
         pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0)
-        
         let config = MLModelConfiguration()
         config.computeUnits = MLComputeUnits.all
         
@@ -104,7 +120,7 @@ public class CoreMLExecutor: NSObject {
               let compiledModelURL = try? MLModel.compileModel(at: url),
               let mlmodel = try? MLModel(contentsOf: compiledModelURL, configuration: config) else {
             NSLog("Failed to load Core ML model")
-            return nil
+            throw MLError(message: "Failed to load Core ML model");
         }
         
         let inputNames = mlmodel.modelDescription.inputDescriptionsByName.keys.sorted()
@@ -117,36 +133,35 @@ public class CoreMLExecutor: NSObject {
         self.outputCount = UInt(outputNames.count)
         self.inputNames = inputNames
         self.outputNames = outputNames
-        self.inputFeatures = []
-        self.outputFeatures = []
         self.outputProvider = nil
         
         super.init()
-    
+        
         self.prepareFeatureVector()
         
         NSLog("inputNames: \(inputNames)")
         NSLog("outputNames: \(outputNames)")
         NSLog("batchSize: \(batchSize)")
+        
+        NSLog("CoreMLExecutor init finished")
     }
     
     @objc
     func prepareFeatureVector() {
         let inputFeatures = [[MLFeature]](repeating: [MLFeature](repeating: MLFeature(data: nil, description: nil), count: Int(inputCount)), count: Int(batchSize))
-      self.inputFeatures = inputFeatures
-      
+        self.inputFeatures = inputFeatures
         let outputFeatures = [[MLFeature]](repeating: [MLFeature](repeating: MLFeature(data: nil, description: nil), count: Int(outputCount)), count: Int(batchSize))
-      self.outputFeatures = outputFeatures
+        self.outputFeatures = outputFeatures
     }
     
     private func clearFeatureVector() {
-        inputFeatures?.removeAll()
-        outputFeatures?.removeAll()
+        inputFeatures.removeAll()
+        outputFeatures.removeAll()
     }
     
     deinit {
         clearFeatureVector()
-        NSLog("[CoreMLExecutor dealloc]")
+        NSLog("deinit")
     }
     
     @objc
@@ -174,8 +189,8 @@ public class CoreMLExecutor: NSObject {
         let input = getInputAt(i)
         
         if let inputType = input?.multiArrayConstraint?.dataType {
-                return NSNumber(value: inputType.rawValue)
-            }
+            return NSNumber(value: inputType.rawValue)
+        }
         return nil
     }
     
@@ -192,7 +207,7 @@ public class CoreMLExecutor: NSObject {
     @objc
     public func getOutputSizeAt(_ i: Int) -> Int {
         let output = getOutputAt(i)
-        let shape = output?.multiArrayConstraint!.shape
+        let shape = output?.multiArrayConstraint?.shape
         let outputSize = shape?.reduce(1, { $0 * $1.intValue }) ?? 0
         assert(outputSize > 0)
         return outputSize
@@ -202,15 +217,15 @@ public class CoreMLExecutor: NSObject {
     public func getOutputTypeAt(_ i: Int) -> NSNumber? {
         let output = getOutputAt(i)
         if let outputType = output?.multiArrayConstraint?.dataType {
-                return NSNumber(value: outputType.rawValue)
-            }
+            return NSNumber(value: outputType.rawValue)
+        }
         return nil
     }
     
     @objc
     public func setInputData(_ data: UnsafeMutableRawPointer, at i: Int, batchIndex: Int) -> Bool {
         let input = getInputAt(i)
-        inputFeatures?[batchIndex][i] = MLFeature(data: data, description: input)
+        inputFeatures[batchIndex][i] = MLFeature(data: data, description: input)
         return true
     }
     
@@ -218,8 +233,8 @@ public class CoreMLExecutor: NSObject {
     public func issueQueries() -> Bool {
         autoreleasepool {
             do {
-                let batchProvider = MLMultiArrayBatchProvider(inputs: inputFeatures!)
-                let outputProvider = try mlmodel?.predictions(fromBatch: batchProvider)
+                let batchProvider = MLMultiArrayBatchProvider(inputs: inputFeatures)
+                outputProvider = try mlmodel?.predictions(fromBatch: batchProvider)
                 
                 for batchIndex in 0..<batchSize {
                     let outputFeature = outputProvider?.features(at: Int(batchIndex))
@@ -229,16 +244,14 @@ public class CoreMLExecutor: NSObject {
                             NSLog("Feature \(name) not found")
                             return false
                         }
-                        
                         guard let outputArray = outputValue.multiArrayValue else {
                             return false
                         }
                         
                         let data = outputArray.dataPointer
-                        outputFeatures?[Int(batchIndex)][outputIndex] = MLFeature(data: data, description: nil)
+                        outputFeatures[Int(batchIndex)][outputIndex] = MLFeature(data: data, description: nil)
                     }
                 }
-                
                 return true
             } catch let error as NSError {
                 NSLog("Failed to predict with error: \(error.localizedDescription)")
@@ -255,12 +268,10 @@ public class CoreMLExecutor: NSObject {
     }
     
     @objc
-    public func getOutputData(_ data: UnsafeMutableRawPointer, at i: Int, batchIndex: Int) -> Bool {
-        let outputFeature = outputFeatures?[batchIndex][i]
-        guard let outputFeature = outputFeature, let data = outputFeature.data else {
-            return false
-        }
-        data.copyMemory(from: data, byteCount: getOutputSizeAt(i))
+    public func getOutputData(_ data: UnsafeMutablePointer<UnsafeMutableRawPointer?>, at i: Int, batchIndex: Int) -> Bool {
+        NSLog("data: \(data)")
+        let outputFeature = outputFeatures[batchIndex][i]
+        data.pointee = outputFeature.data
         return true
     }
 }

@@ -57,9 +57,9 @@ cc_library(
     deps = [
         ":tflite_settings",
         "//flutter/cpp/c:headers",
+        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
         "@org_tensorflow//tensorflow/lite/c:c_api",
         "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
