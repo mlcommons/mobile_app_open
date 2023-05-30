@@ -103,7 +103,7 @@ class Benchmark {
     final dataset = runMode.chooseDataset(taskConfig);
 
     int minQueryCount;
-    double maxDuration = 10 * 60; // 10 minutes
+    double maxDuration = BenchmarkSettings.maxDuration;
     double minDuration;
     if (testMinDuration != 0) {
       minQueryCount = testMinQueryCount;
