@@ -76,7 +76,8 @@ RUN git config --global --add safe.directory /home/mlperf/mobile_app_open
 
 # Add Swift formatter
 ENV PATH=$PATH:/usr/local/swift/usr/bin
-RUN apt-get install -y clang libpython2.7 libpython2.7-dev libxml2-dev
+RUN arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && echo "Arch is $arch"
+RUN apt-get update && apt-get install -y --no-install-recommends clang libpython2.7 libpython2.7-dev libxml2-dev
 RUN wget https://download.swift.org/swift-5.8-release/ubuntu2004-aarch64/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu20.04-aarch64.tar.gz && \
     tar xzf swift-5.8-RELEASE-ubuntu20.04-aarch64.tar.gz && \
     mv swift-5.8-RELEASE-ubuntu20.04-aarch64 /usr/local/swift && \
@@ -89,4 +90,6 @@ RUN git clone https://github.com/apple/swift-format.git && \
     mv .build/release/swift-format /usr/local/swift/usr/bin/swift-format && \
     chmod +x /usr/local/swift/usr/bin/swift-format
 
+# clean up
+RUN rm -rf /var/lib/apt/lists/*
 CMD /bin/bash
