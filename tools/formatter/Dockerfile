@@ -74,4 +74,19 @@ RUN apt-get install -y --no-install-recommends protobuf-compiler
 # The /home/mlperf/mobile_app_open directory will be mounted
 RUN git config --global --add safe.directory /home/mlperf/mobile_app_open
 
+# Add Swift formatter
+ENV PATH=$PATH:/usr/local/swift/usr/bin
+RUN apt-get install -y clang libpython2.7 libpython2.7-dev libxml2-dev
+RUN wget https://download.swift.org/swift-5.8-release/ubuntu2004-aarch64/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu20.04-aarch64.tar.gz && \
+    tar xzf swift-5.8-RELEASE-ubuntu20.04-aarch64.tar.gz && \
+    mv swift-5.8-RELEASE-ubuntu20.04-aarch64 /usr/local/swift && \
+    swift -v
+ARG SWFIFT_FORMAT_VERSION=508.0.1
+RUN git clone https://github.com/apple/swift-format.git && \
+    cd swift-format && \
+    git checkout "tags/$SWFIFT_FORMAT_VERSION" && \
+    swift build -c release && \
+    mv .build/release/swift-format /usr/local/swift/usr/bin/swift-format && \
+    chmod +x /usr/local/swift/usr/bin/swift-format
+
 CMD /bin/bash
