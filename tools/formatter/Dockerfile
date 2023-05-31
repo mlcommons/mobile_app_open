@@ -75,21 +75,31 @@ RUN apt-get install -y --no-install-recommends protobuf-compiler
 RUN git config --global --add safe.directory /home/mlperf/mobile_app_open
 
 # Add Swift formatter
-ENV PATH=$PATH:/usr/local/swift/usr/bin
-RUN arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && echo "Arch is $arch"
 RUN apt-get update && apt-get install -y --no-install-recommends clang libpython2.7 libpython2.7-dev libxml2-dev
-RUN wget https://download.swift.org/swift-5.8-release/ubuntu2004-aarch64/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu20.04-aarch64.tar.gz && \
-    tar xzf swift-5.8-RELEASE-ubuntu20.04-aarch64.tar.gz && \
-    mv swift-5.8-RELEASE-ubuntu20.04-aarch64 /usr/local/swift && \
+ENV PATH=$PATH:/usr/local/swift/bin
+ARG BUILDARCH
+RUN if [ "$BUILDARCH" = "amd64" ]; then \
+        SWIFT_URL=https://download.swift.org/swift-5.8-release/ubuntu2004/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu20.04.tar.gz; \
+    elif [ "$BUILDARCH" = "arm64" ]; then \
+        SWIFT_URL=https://download.swift.org/swift-5.8-release/ubuntu2004-aarch64/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu20.04-aarch64.tar.gz; \
+    else \
+        echo "Unknown architecture"; exit 1; \
+    fi && \
+    echo "Building for $BUILDARCH" && \
+    curl --proto '=https' -fsSL $SWIFT_URL -o swift.tar.gz && \
+    tar xzf swift.tar.gz && \
+    mv $(tar tf swift.tar.gz | head -1) /usr/local/swift && \
+    rm -f swift.tar.gz && \
     swift -v
 ARG SWFIFT_FORMAT_VERSION=508.0.1
 RUN git clone https://github.com/apple/swift-format.git && \
     cd swift-format && \
     git checkout "tags/$SWFIFT_FORMAT_VERSION" && \
     swift build -c release && \
-    mv .build/release/swift-format /usr/local/swift/usr/bin/swift-format && \
-    chmod +x /usr/local/swift/usr/bin/swift-format
+    mv .build/release/swift-format /usr/local/swift/bin/swift-format && \
+    chmod +x /usr/local/swift/bin/swift-format
 
 # clean up
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 CMD /bin/bash
