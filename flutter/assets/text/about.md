@@ -16,6 +16,7 @@ The MLPerf app uses NNAPI on the following families:
 * Pixel 6 and Pixel 6 PRO using Tensor G1 SOC
 * Pixel 7 and Pixel 7 PRO using Tensor G2 SOC
 
+<!-- markdown-link-check-disable-next-line -->
 For More Info: [https://developer.android.com/ndk/guides/neuralnetworks](https://developer.android.com/ndk/guides/neuralnetworks)
 
 ## MediaTek Neuron Delegate
