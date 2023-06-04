@@ -68,10 +68,10 @@ pbtxt2header(
     ],
 )
 
-objc_library(
+cc_library(
     name = "coreml_c",
     srcs = [
-        "main.mm",
+        "main.cc",
     ],
     includes = ["."],
     deps = [

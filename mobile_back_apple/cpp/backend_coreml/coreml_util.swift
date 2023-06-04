@@ -123,24 +123,24 @@ public class CoreMLExecutor: NSObject {
             throw MLError(message: "Failed to load Core ML model");
         }
         
-        let inputNames = mlmodel.modelDescription.inputDescriptionsByName.keys.sorted()
-        let outputNames = mlmodel.modelDescription.outputDescriptionsByName.keys.sorted()
+        let modelInputNames = mlmodel.modelDescription.inputDescriptionsByName.keys.sorted()
+        let modelOutputNames = mlmodel.modelDescription.outputDescriptionsByName.keys.sorted()
         
         self.modelURL = url
         self.mlmodel = mlmodel
         self.batchSize = UInt(batchSize > 1 ? batchSize : 1)
-        self.inputCount = UInt(inputNames.count)
-        self.outputCount = UInt(outputNames.count)
-        self.inputNames = inputNames
-        self.outputNames = outputNames
+        self.inputCount = UInt(modelInputNames.count)
+        self.outputCount = UInt(modelOutputNames.count)
+        self.inputNames = modelInputNames
+        self.outputNames = modelOutputNames
         self.outputProvider = nil
         
         super.init()
         
         self.prepareFeatureVector()
         
-        NSLog("inputNames: \(inputNames)")
-        NSLog("outputNames: \(outputNames)")
+        NSLog("inputNames: \(self.inputNames)")
+        NSLog("outputNames: \(self.outputNames)")
         NSLog("batchSize: \(batchSize)")
         
         NSLog("CoreMLExecutor init finished")
@@ -148,10 +148,10 @@ public class CoreMLExecutor: NSObject {
     
     @objc
     func prepareFeatureVector() {
-        let inputFeatures = [[MLFeature]](repeating: [MLFeature](repeating: MLFeature(data: nil, description: nil), count: Int(inputCount)), count: Int(batchSize))
-        self.inputFeatures = inputFeatures
-        let outputFeatures = [[MLFeature]](repeating: [MLFeature](repeating: MLFeature(data: nil, description: nil), count: Int(outputCount)), count: Int(batchSize))
-        self.outputFeatures = outputFeatures
+        let modelInputFeatures = [[MLFeature]](repeating: [MLFeature](repeating: MLFeature(data: nil, description: nil), count: Int(inputCount)), count: Int(batchSize))
+        self.inputFeatures = modelInputFeatures
+        let modelOutputFeatures = [[MLFeature]](repeating: [MLFeature](repeating: MLFeature(data: nil, description: nil), count: Int(outputCount)), count: Int(batchSize))
+        self.outputFeatures = modelOutputFeatures
     }
     
     private func clearFeatureVector() {
