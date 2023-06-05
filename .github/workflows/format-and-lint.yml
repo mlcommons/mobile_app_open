@@ -97,6 +97,19 @@ jobs:
       - name: result-schema
         run: make lint/result-schema
 
+  swift:
+    needs: build-image
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-formatter:latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - name: configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: swift
+        run: make lint/swift
+
   markdown:
     needs: build-image
     runs-on: ubuntu-latest
