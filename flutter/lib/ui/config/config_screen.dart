@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/settings/about_screen.dart';
 
 class ConfigScreen extends StatefulWidget {
   const ConfigScreen({Key? key}) : super(key: key);
@@ -51,6 +52,18 @@ class _ConfigScreen extends State<ConfigScreen> {
         },
       ));
     }
+
+    childrenList.addAll([
+      const Divider(),
+      ListTile(
+          title: Text(stringResources.settingsAbout),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () async {
+            await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const AboutScreen(),
+            ));
+          }),
+    ]);
 
     return Scaffold(
       appBar: AppBar(

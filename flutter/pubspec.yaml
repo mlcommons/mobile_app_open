@@ -47,6 +47,7 @@ dependencies:
   async: ^2.9.0
   archive: ^3.3.0
   intl: ^0.17.0
+  flutter_markdown: ^0.6.15
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +71,7 @@ flutter:
   assets:
     - assets/
     - assets/icons/
+    - assets/text/
     - assets/android-boards/database.json
   generate: true
   uses-material-design: true
