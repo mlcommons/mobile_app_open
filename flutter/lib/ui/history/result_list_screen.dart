@@ -19,6 +19,8 @@ class ResultListScreen extends StatefulWidget {
 }
 
 class _ResultListScreenState extends State<ResultListScreen> {
+  bool _ascendingOrder = true;
+
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
@@ -28,10 +30,27 @@ class _ResultListScreenState extends State<ResultListScreen> {
     final filter = state.resourceManager.resultManager.resultFilter;
     List<ExtendedResult> itemList = results;
     itemList = results.where((result) => filter.match(result)).toList();
-    itemList.sort((a, b) => b.meta.creationDate.compareTo(a.meta.creationDate));
+
+    if (_ascendingOrder) {
+      itemList
+          .sort((a, b) => a.meta.creationDate.compareTo(b.meta.creationDate));
+    } else {
+      itemList
+          .sort((a, b) => b.meta.creationDate.compareTo(a.meta.creationDate));
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyListTitle), actions: [
+        IconButton(
+          icon:
+              Icon(_ascendingOrder ? Icons.arrow_downward : Icons.arrow_upward),
+          tooltip: l10n.historyFilterTitle,
+          onPressed: () {
+            setState(() {
+              _ascendingOrder = !_ascendingOrder;
+            });
+          },
+        ),
         IconButton(
           icon: Icon(filter.anyFilterActive
               ? Icons.filter_list
