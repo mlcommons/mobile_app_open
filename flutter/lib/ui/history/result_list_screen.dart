@@ -44,7 +44,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
         IconButton(
           icon:
               Icon(_ascendingOrder ? Icons.arrow_downward : Icons.arrow_upward),
-          tooltip: l10n.historyFilterTitle,
+          tooltip: l10n.historyListSortOrder,
           onPressed: () {
             setState(() {
               _ascendingOrder = !_ascendingOrder;

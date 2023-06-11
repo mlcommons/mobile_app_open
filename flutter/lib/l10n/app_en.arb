@@ -121,6 +121,7 @@
   "historyListSelectionDeselect": "Clear selection",
   "historyListSelectionDelete": "Delete",
   "historyListSelectionDeleteConfirm": "Delete selected items?",
+  "historyListSortOrder": "Sorting",
 
   "historyFilterTitle": "Filters",
   "historyFilterClear": "Clear Filters",
