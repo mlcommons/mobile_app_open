@@ -23,6 +23,10 @@ load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependen
 
 apple_support_dependencies()
 
+load("@build_bazel_rules_swift//swift:repositories.bzl", "swift_rules_dependencies")
+
+swift_rules_dependencies()
+
 # This lib must be named exactly "cpuinfo".
 # This name is used by org_tensorflow lib.
 # When we use any different name, compilation may fail
