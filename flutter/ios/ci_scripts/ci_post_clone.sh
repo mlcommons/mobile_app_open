@@ -51,7 +51,7 @@ echo "$MC_LOG_PREFIX runner is ${runner}"
 
 echo "$MC_LOG_PREFIX ========== Install dependencies =========="
 
-brew update
+brew update --quiet
 echo "$MC_LOG_PREFIX brew version:" && brew config
 
 # `brew install` failed often due to connection issue so we try several times
@@ -64,6 +64,7 @@ echo "$MC_LOG_PREFIX protobuf version:" && protoc --version
 brew install cocoapods || brew install cocoapods || brew install cocoapods
 echo "$MC_LOG_PREFIX cocoapods version:" && pod --version
 
+brew install python@3.11
 echo "$MC_LOG_PREFIX python version:" && python3 --version
 pip3 install --upgrade pip
 pip3 install \
