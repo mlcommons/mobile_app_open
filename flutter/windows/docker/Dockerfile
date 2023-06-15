@@ -4,6 +4,7 @@ FROM mcr.microsoft.com/windows:1809
 # SHELL [ "powershell", "-command" ]
 SHELL ["cmd", "/S", "/C"]
 
+ENV chocolateyVersion=1.4.0
 RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
     iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
