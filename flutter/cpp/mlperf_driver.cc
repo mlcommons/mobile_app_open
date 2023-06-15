@@ -98,19 +98,18 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
   mlperf_settings.qsl_rng_seed = 10003631887983097364UL;
   mlperf_settings.sample_index_rng_seed = 17183018601990103738UL;
   mlperf_settings.schedule_rng_seed = 12134888396634371638UL;
+  mlperf_settings.min_duration_ms =
+      static_cast<uint64_t>(std::ceil(min_duration * 1000.0));
   mlperf_settings.max_duration_ms =
       static_cast<uint64_t>(std::ceil(max_duration * 1000.0));
 
   if (scenario_ == "Offline") {
     mlperf_settings.scenario = ::mlperf::TestScenario::Offline;
-    mlperf_settings.min_duration_ms = 0;
   } else {
     // Run MLPerf in SingleStream mode by default.
     mlperf_settings.scenario = ::mlperf::TestScenario::SingleStream;
     mlperf_settings.single_stream_expected_latency_ns =
         single_stream_expected_latency_ns;
-    mlperf_settings.min_duration_ms =
-        static_cast<uint64_t>(std::ceil(min_duration * 1000.0));
   }
 
   ::mlperf::StartTest(this, dataset_.get(), mlperf_settings, log_settings);
