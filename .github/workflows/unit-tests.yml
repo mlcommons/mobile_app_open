@@ -26,7 +26,7 @@ jobs:
       - name: Create ephemeral files
         run: |
           flutter config --no-analytics &&
-          dart pub global activate protoc_plugin &&
+          dart pub global activate protoc_plugin ^20.0.1 &&
           export PATH="$PATH:$HOME/.pub-cache/bin" &&
           make flutter/prepare
       - name: Run Flutter tests
