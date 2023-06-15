@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BD823FFB287D8F36003A6A2B /* coreml_util.cc in Sources */ = {isa = PBXBuildFile; fileRef = BD823FF0287D8F36003A6A2B /* coreml_util.cc */; };
+		3E9C865C2A0C222100E87350 /* coreml_util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E9C865B2A0C222100E87350 /* coreml_util.swift */; };
 		BD823FFE287D91F8003A6A2B /* CoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD823FFD287D91F8003A6A2B /* CoreML.framework */; };
 		BD94904D287D8E540055FE69 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BD94904C287D8E540055FE69 /* main.m */; };
 /* End PBXBuildFile section */
@@ -25,14 +25,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		BD823FF0287D8F36003A6A2B /* coreml_util.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = coreml_util.cc; sourceTree = "<group>"; };
-		BD823FF1287D8F36003A6A2B /* coreml_settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = coreml_settings.h; sourceTree = "<group>"; };
-		BD823FF2287D8F36003A6A2B /* coreml_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = coreml_util.h; sourceTree = "<group>"; };
+		3E9C865B2A0C222100E87350 /* coreml_util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = coreml_util.swift; sourceTree = "<group>"; };
+		3E9C865D2A0CD69100E87350 /* mobile_back_apple-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mobile_back_apple-Bridging-Header.h"; sourceTree = "<group>"; };
 		BD823FF3287D8F36003A6A2B /* BUILD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BUILD; sourceTree = "<group>"; };
 		BD823FFD287D91F8003A6A2B /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
 		BD949049287D8E540055FE69 /* mobile_back_apple */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mobile_back_apple; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD94904C287D8E540055FE69 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		BDB5512B2892591E004DAF5E /* main.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,11 +57,9 @@
 		BD823FEE287D8F36003A6A2B /* backend_coreml */ = {
 			isa = PBXGroup;
 			children = (
-				BDB5512B2892591E004DAF5E /* main.cc */,
-				BD823FF2287D8F36003A6A2B /* coreml_util.h */,
-				BD823FF0287D8F36003A6A2B /* coreml_util.cc */,
-				BD823FF1287D8F36003A6A2B /* coreml_settings.h */,
+				3E9C865D2A0CD69100E87350 /* mobile_back_apple-Bridging-Header.h */,
 				BD823FF3287D8F36003A6A2B /* BUILD */,
+				3E9C865B2A0C222100E87350 /* coreml_util.swift */,
 			);
 			path = backend_coreml;
 			sourceTree = "<group>";
@@ -125,6 +121,7 @@
 				TargetAttributes = {
 					BD949048287D8E540055FE69 = {
 						CreatedOnToolsVersion = 13.4.1;
+						LastSwiftMigration = 1430;
 					};
 				};
 			};
@@ -152,7 +149,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BD94904D287D8E540055FE69 /* main.m in Sources */,
-				BD823FFB287D8F36003A6A2B /* coreml_util.cc in Sources */,
+				3E9C865C2A0C222100E87350 /* coreml_util.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,12 +271,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "../cpp/backend_coreml/mobile_back_apple-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -287,12 +288,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "../cpp/backend_coreml/mobile_back_apple-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
