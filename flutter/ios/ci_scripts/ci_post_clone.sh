@@ -100,7 +100,7 @@ test ! -d "$MC_FLUTTER_HOME" && git clone --branch 3.7.6 --depth 1 https://githu
 export PATH="$PATH:$MC_FLUTTER_HOME/bin:$PUB_CACHE/bin"
 echo "$MC_LOG_PREFIX flutter version:" && flutter --version
 flutter config --no-analytics && dart --disable-analytics
-dart pub global activate protoc_plugin
+dart pub global activate protoc_plugin ^20.0.1
 cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 
 echo "$MC_LOG_PREFIX ========== Build app =========="

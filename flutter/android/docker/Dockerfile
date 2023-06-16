@@ -53,7 +53,7 @@ ENV PATH=$PATH:$HOME/flutter/bin:$PUB_CACHE/bin
 RUN curl --proto '=https' -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.7.6-stable.tar.xz | tar Jxf - && chmod --recursive a=u $HOME/flutter
 RUN git config --global --add safe.directory $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
-RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
+RUN dart pub global activate protoc_plugin ^20.0.1 && chmod --recursive a=u $PUB_CACHE
 
 RUN mkdir -p $HOME/.cache/ && chmod 777 $HOME/.cache/
 RUN mkdir -p $HOME/.cache/.gradle && chmod 777 $HOME/.cache/.gradle
