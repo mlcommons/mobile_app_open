@@ -108,3 +108,15 @@ class BackendId {
     apple,
   ];
 }
+
+class SortBy {
+  static const dateAsc = 'Date: from oldest to most recent';
+  static const dateDesc = 'Date: from most recent to oldest';
+  static const task = 'Task';
+
+  static const options = [
+    dateAsc,
+    dateDesc,
+    task,
+  ];
+}

@@ -51,6 +51,8 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
               _manufacturerFilter(filter),
               const SizedBox(height: 12),
               _socFilter(filter),
+              const SizedBox(height: 12),
+              _sortBy(filter),
             ],
           ),
         ));
@@ -172,6 +174,16 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
         filter.soc = value.isEmpty ? null : value;
       },
     );
+  }
+
+  Widget _sortBy(ResultFilter filter) {
+    return _makeDropDownFilter(
+        labelText: l10n.historySortBy,
+        choices: SortBy.options,
+        value: filter.sortBy,
+        onChanged: (value) => setState(() {
+              filter.sortBy = value!;
+            }));
   }
 
   Widget _clearFilterButton(ResultManager resultManager) {

@@ -16,6 +16,7 @@ class ResultFilter {
   String? manufacturer;
   String? soc;
   String? benchmarkId;
+  String? sortBy;
 
   ResultFilter();
 

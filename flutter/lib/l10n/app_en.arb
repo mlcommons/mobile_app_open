@@ -121,7 +121,6 @@
   "historyListSelectionDeselect": "Clear selection",
   "historyListSelectionDelete": "Delete",
   "historyListSelectionDeleteConfirm": "Delete selected items?",
-  "historyListSortOrder": "Sorting",
 
   "historyFilterTitle": "Filters",
   "historyFilterClear": "Clear Filters",
@@ -132,6 +131,7 @@
   "historyFilterDeviceModel": "Device Model",
   "historyFilterManufacturer": "Manufacturer",
   "historyFilterSoC": "SoC",
+  "historySortBy": "Sort by",
 
   "historyDetailsTitle": "Result details",
   "historyDetailsBuildTypeDebug": "debug build",

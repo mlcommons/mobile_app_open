@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/result_details_screen.dart';
@@ -19,8 +20,6 @@ class ResultListScreen extends StatefulWidget {
 }
 
 class _ResultListScreenState extends State<ResultListScreen> {
-  bool _ascendingOrder = true;
-
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
@@ -31,26 +30,10 @@ class _ResultListScreenState extends State<ResultListScreen> {
     List<ExtendedResult> itemList = results;
     itemList = results.where((result) => filter.match(result)).toList();
 
-    if (_ascendingOrder) {
-      itemList
-          .sort((a, b) => a.meta.creationDate.compareTo(b.meta.creationDate));
-    } else {
-      itemList
-          .sort((a, b) => b.meta.creationDate.compareTo(a.meta.creationDate));
-    }
+    _sortItems(itemList, filter.sortBy);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyListTitle), actions: [
-        IconButton(
-          icon:
-              Icon(_ascendingOrder ? Icons.arrow_downward : Icons.arrow_upward),
-          tooltip: l10n.historyListSortOrder,
-          onPressed: () {
-            setState(() {
-              _ascendingOrder = !_ascendingOrder;
-            });
-          },
-        ),
         IconButton(
           icon: Icon(filter.anyFilterActive
               ? Icons.filter_list
@@ -91,5 +74,15 @@ class _ResultListScreenState extends State<ResultListScreen> {
         },
       ),
     );
+  }
+
+  void _sortItems(List<ExtendedResult> itemList, String? sortBy) {
+    if (sortBy == SortBy.dateAsc) {
+      itemList
+          .sort((a, b) => a.meta.creationDate.compareTo(b.meta.creationDate));
+    } else if (sortBy == SortBy.dateDesc) {
+      itemList
+          .sort((a, b) => b.meta.creationDate.compareTo(a.meta.creationDate));
+    } else if (sortBy == SortBy.task) {}
   }
 }
