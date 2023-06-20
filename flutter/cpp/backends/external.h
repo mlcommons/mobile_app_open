@@ -36,8 +36,9 @@ struct BackendFunctions {
     }
   }
   // Types for function pointer.
-  using BackendMatchesPtr = std::add_pointer<bool(
-      const char**, const char**, const mlperf_device_info_t*)>::type;
+  using BackendMatchesPtr =
+      std::add_pointer<bool(const char**, const char**,
+                            const mlperf_device_info_t*, const char*)>::type;
   using BackendCreatePtr = std::add_pointer<mlperf_backend_ptr_t(
       const char*, mlperf_backend_configuration_t*, const char*)>::type;
   using BackendNamePtr =
@@ -96,7 +97,8 @@ struct BackendFunctions {
 
   static std::string isSupported(const std::string& lib_path,
                                  const std::string& manufacturer,
-                                 const std::string& model, const char** pbdata);
+                                 const std::string& model, const char** pbdata,
+                                 const std::string& native_lib_path);
 
  private:
   bool isloaded = false;

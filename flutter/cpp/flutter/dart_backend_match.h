@@ -11,7 +11,8 @@ struct dart_ffi_backend_match_result {
 };
 
 struct dart_ffi_backend_match_result *dart_ffi_backend_match(
-    const char *lib_path, const char *manufacturer, const char *model);
+    const char *lib_path, const char *manufacturer, const char *model,
+    const char *native_lib_path);
 
 void dart_ffi_backend_match_free(struct dart_ffi_backend_match_result *result);
 

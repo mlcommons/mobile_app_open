@@ -32,13 +32,15 @@ static std::string pbdataStr;
 std::string BackendFunctions::isSupported(const std::string& lib_path,
                                           const std::string& manufacturer,
                                           const std::string& model,
-                                          const char** pbdata) {
+                                          const char** pbdata,
+                                          const std::string& native_lib_path) {
   const char* msg = nullptr;
   *pbdata = nullptr;
   BackendFunctions backend(lib_path);
   if (backend.isLoaded()) {
     mlperf_device_info_t device_info{model.c_str(), manufacturer.c_str()};
-    bool match = backend.match(&msg, pbdata, &device_info);
+    bool match =
+        backend.match(&msg, pbdata, &device_info, native_lib_path.c_str());
     if (match) {
       pbdataStr = *pbdata;
       *pbdata = pbdataStr.c_str();

@@ -31,6 +31,9 @@
     <!-- QTI -->
     <uses-native-library android:name="libcdsprpc.so"
                          android:required="false"/>
+    <!-- QTI -->
+    <uses-native-library android:name="libOpenCL.so"
+                         android:required="false"/>
     <!-- Mediatek -->
     <uses-native-library android:name="libneuronusdk_adapter.mtk.so"
                          android:required="false"/>

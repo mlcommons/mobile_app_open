@@ -8,7 +8,8 @@
 #include "flutter/cpp/proto/backend_setting.pb.h"
 
 extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
-    const char *lib_path, const char *manufacturer, const char *model) {
+    const char *lib_path, const char *manufacturer, const char *model,
+    const char *native_lib_path) {
   LOG(INFO) << "checking backend '" << lib_path << "' ...";
   ::mlperf::mobile::BackendFunctions backend(lib_path);
   if (*lib_path != '\0' && !backend.isLoaded()) {
@@ -26,7 +27,8 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
   auto result = new dart_ffi_backend_match_result;
   result->pbdata = nullptr;
   result->error_message = nullptr;
-  result->matches = backend.match(&error_message, &pb_settings, &device_info);
+  result->matches = backend.match(&error_message, &pb_settings, &device_info,
+                                  native_lib_path);
   if (!result->matches) {
     LOG(ERROR) << "backend doesn't match: '" << lib_path << "'";
     return result;
