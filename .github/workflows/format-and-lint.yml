@@ -28,7 +28,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          image: ghcr.io/mlcommons/mobile_app_open-formatter
+          images: ghcr.io/mlcommons/mobile_app_open-formatter
           flavor: latest=true
           tags: type=raw,value=${{ github.run_number }}
       - name: Build and push Docker image
