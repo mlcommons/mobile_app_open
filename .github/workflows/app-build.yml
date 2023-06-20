@@ -29,6 +29,8 @@ jobs:
         with:
           images: ghcr.io/mlcommons/mobile_app_open-android
           flavor: latest=true
+          tags: |
+            type=raw,value=${{ github.run_number }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
@@ -44,7 +46,7 @@ jobs:
     needs: build-android-image
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mlcommons/mobile_app_open-android:pr-${{ github.event.number }}
+      image: ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v3
