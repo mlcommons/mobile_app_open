@@ -29,8 +29,7 @@ jobs:
         with:
           images: ghcr.io/mlcommons/mobile_app_open-android
           flavor: latest=true
-          tags: |
-            type=raw,value=${{ github.run_number }}
+          tags: type=raw,value=${{ github.run_number }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
