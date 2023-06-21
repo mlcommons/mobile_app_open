@@ -35,7 +35,7 @@ const char* mlperf_backend_accelerator_name(mlperf_backend_ptr_t backend_ptr) {
 bool mlperf_backend_matches_hardware(const char** not_allowed_message,
                                      const char** settings,
                                      const mlperf_device_info_t* device_info,
-                                     const char *native_lib_path) {
+                                     const char* native_lib_path) {
   (void)settings;
   (void)device_info;
   *not_allowed_message = "This is a stub backend";

@@ -4,7 +4,7 @@
 bool mlperf_backend_matches_hardware(const char** not_allowed_message,
                                      const char** settings,
                                      const mlperf_device_info_t* device_info,
-                                     const char *native_lib_path) {
+                                     const char* native_lib_path) {
   return false;
 }
 
