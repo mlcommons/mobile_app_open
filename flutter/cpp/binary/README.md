@@ -1,7 +1,7 @@
 # MLPerf backends
 
 This directory provides a main binary file which can be used to evaluate the
-MLPerf benchmark with a specific set of (backend, dataset).
+MLPerf benchmark with a specific set of (backend, benchmark_id).
 
 ## Build the TFLite backend
 
@@ -13,7 +13,7 @@ bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
 
 ## Run the TFLite backend
 
-For example, use the following command to run TFLite with the ImageNet dataset:
+For example, use the following command to run TFLite with the `image_classification` benchmark:
 
 1. build the command program `//flutter/cpp/binary:main`
 
@@ -25,42 +25,41 @@ For example, use the following command to run TFLite with the ImageNet dataset:
 2. run it
 
    ```bash
-   bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET
+   bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification
      --mode=SubmissionRun \
      --model_file=<path to the model file> \
      --output_dir=<mlperf output directory>
      ....
    ```
 
-Each set of (backend, dataset) has a different set of arguments, so please use
+Each set of (backend, benchmark_id) has a different set of arguments, so please use
 `--help` argument to check which flags are available. E.g., with
 
 ```bash
-bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET --help
+bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification --help
 ```
 
 we get
 
 ```shell
-usage: bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET <flags>
+usage: bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification <flags>
 Flags:
-  --mode=                                     string  required Mode is one among PerformanceOnly, AccuracyOnly, SubmissionRun.
-  --output_dir=                               string  required The output directory of mlperf.
-  --model_file=                               string  required Path to model file.
-  --images_directory=                         string  required Path to ground truth images.
-  --offset=1                                  int32   required The offset of the first meaningful class in the classification model.
-  --groundtruth_file=                         string  required Path to the imagenet ground truth file.
-  --min_query_count=100                       int32   optional The test will guarantee to run at least this number of samples in performance mode.
-  --min_duration=100                          int32   optional The test will guarantee to run at least this duration in performance mode. The duration is in ms.
-  --single_stream_expected_latency_ns=1000000 int32   optional single_stream_expected_latency_ns
-  --lib_path=                                 string  optional Path to the backend library .so file.
-  --native_lib_path=                          string  optional Path to the additioal .so files for the backend.
-  --scenario=SingleStream                     string  optional Scenario to run the benchmark.
-  --image_width=224                           int32   optional The width of the processed image.
-  --image_height=224                          int32   optional The height of the processed image.
-  --scenario=SingleStream                     string  optional Scenario to run the benchmark.
-  --batch_size=1                              int32   optional Batch size.
-
+  --mode=                                         string  required        Mode is one among PerformanceOnly, AccuracyOnly, SubmissionRun.
+  --output_dir=                                   string  required        The output directory of mlperf.
+  --model_file=                                   string  required        Path to model file.
+  --images_directory=                             string  required        Path to ground truth images.
+  --offset=1                                      int32   required        The offset of the first meaningful class in the classification model.
+  --groundtruth_file=                             string  required        Path to the imagenet ground truth file.
+  --min_query_count=100                           int32   optional        The test will guarantee to run at least this number of samples in performance mode.
+  --min_duration_ms=100                           int32   optional        The test will guarantee to run at least this duration in performance mode. The duration is in ms.
+  --max_duration_ms=600000                        int32   optional        The test will early exit when max duration is reached.The duration is in ms.
+  --single_stream_expected_latency_ns=1000000     int32   optional        A hint used by the loadgen to pre-generate enough samples to meet the minimum test duration.
+  --lib_path=                                     string  optional        Path to the backend library .so file.
+  --native_lib_path=                              string  optional        Path to the additional .so files for the backend.
+  --scenario=SingleStream                         string  optional        Scenario to run the benchmark.
+  --batch_size=1                                  int32   optional        Batch size.
+  --image_width=224                               int32   optional        The width of the processed image.
+  --image_height=224                              int32   optional        The height of the processed image.
 ```
 
 The supported backends and datasets for this binary is listed in the enum

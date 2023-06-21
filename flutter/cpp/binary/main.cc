@@ -72,6 +72,23 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
   }
 }
 
+DatasetConfig::DatasetType BenchmarkId2DatasetType(absl::string_view name) {
+  if (absl::StartsWith(name, "image_classification")) {
+    return DatasetConfig::IMAGENET;
+  } else if (absl::StartsWith(name, "object_detection")) {
+    return DatasetConfig::COCO;
+  } else if (absl::StartsWith(name, "natural_language_processing")) {
+    return DatasetConfig::SQUAD;
+  } else if (absl::StartsWith(name, "image_segmentation")) {
+    return DatasetConfig::ADE20K;
+  } else if (absl::StartsWith(name, "super_resolution")) {
+    return DatasetConfig::SNUSR;
+  } else {
+    LOG(FATAL) << "Unrecognized benchmark_id: " << name;
+    return DatasetConfig::NONE;
+  }
+}
+
 void MigrateBackendSetting(BackendSetting *setting) {
   for (auto &bs : *setting->mutable_benchmark_setting()) {
     if (!bs.delegate_choice().empty()) {
@@ -102,7 +119,7 @@ int Main(int argc, char *argv[]) {
   using tflite::Flags;
   std::string command_line = argv[0];
   // Flags for backend and dataset.
-  std::string backend_name, dataset_name;
+  std::string backend_name, benchmark_id;
   BackendType backend_type = BackendType::NONE;
   DatasetConfig::DatasetType dataset_type = DatasetConfig::NONE;
   std::vector<Flag> flag_list{
@@ -110,19 +127,27 @@ int Main(int argc, char *argv[]) {
                        "Backend. Only TFLite is supported at the moment.",
                        Flag::kPositional),
       Flag::CreateFlag(
-          "dataset", &dataset_name,
-          "Dataset. One of ade20k, imagenet, coco, squad, or snusr",
+          "benchmark", &benchmark_id,
+          "Benchmark ID. One of image_classification, "
+          "image_classification_v2, object_detection, "
+          "natural_language_processing, "
+          "image_segmentation_v2, super_resolution, "
+          "image_classification_offline, image_classification_offline_v2",
           Flag::kPositional)};
   Flags::Parse(&argc, const_cast<const char **>(argv), flag_list);
   backend_type = Str2BackendType(backend_name);
-  dataset_type = Str2DatasetType(dataset_name);
   if (backend_type == BackendType::NONE) {
+    LOG(FATAL) << Flags::Usage(command_line, flag_list);
+    return 1;
+  }
+  dataset_type = BenchmarkId2DatasetType(benchmark_id);
+  if (dataset_type == DatasetConfig::NONE) {
     LOG(FATAL) << Flags::Usage(command_line, flag_list);
     return 1;
   }
 
   // Treats positional flags as subcommands.
-  command_line += " " + backend_name + " " + dataset_name;
+  command_line += " " + backend_name + " " + benchmark_id;
 
   // Command Line Flags for mlperf.
   std::string mode, scenario = "SingleStream", output_dir;
@@ -169,17 +194,18 @@ int Main(int argc, char *argv[]) {
                             "Path to model file.", Flag::kRequired),
            Flag::CreateFlag("lib_path", &lib_path,
                             "Path to the backend library .so file."),
-           Flag::CreateFlag("native_lib_path", &native_lib_path,
-                            "Path to the additioal .so files for the backend."),
+           Flag::CreateFlag(
+               "native_lib_path", &native_lib_path,
+               "Path to the additional .so files for the backend."),
            Flag::CreateFlag("scenario", &scenario,
-                            "Scenario to run the benchmark.")});
+                            "Scenario to run the benchmark."),
+           Flag::CreateFlag("batch_size", &batch_size, "Batch size.")});
 
       if (Flags::Parse(&argc, const_cast<const char **>(argv), flag_list)) {
         const char *pbdata;
         std::string msg = mlperf::mobile::BackendFunctions::isSupported(
             lib_path, "", model_file_path, &pbdata);
         std::string backend_setting_string(pbdata, strlen(pbdata));
-        std::string benchmark_id;
         BackendSetting backend_setting;
 
         google::protobuf::TextFormat::ParseFromString(pbdata, &backend_setting);
@@ -188,39 +214,24 @@ int Main(int argc, char *argv[]) {
         // backend_setting.proto
         MigrateBackendSetting(&backend_setting);
 
-        switch (dataset_type) {
-          case DatasetConfig::IMAGENET: {
-            if (scenario == "Offline")
-              benchmark_id = "image_classification_offline";
-            else
-              benchmark_id = "image_classification";
-          }; break;
-          case DatasetConfig::COCO:
-            benchmark_id = "object_detection";
-            break;
-          case DatasetConfig::SQUAD:
-            benchmark_id = "natural_language_processing";
-            break;
-          case DatasetConfig::ADE20K:
-            benchmark_id = "image_segmentation_v2";
-            break;
-          case DatasetConfig::SNUSR:
-            benchmark_id = "super_resolution";
-            break;
-          // Need to check this
-          case DatasetConfig::NONE:
-          default:
-            LOG(INFO) << "how come";
-            break;
+        // If batch_size flag is set, override the backend_setting
+        for (auto &bs : *backend_setting.mutable_benchmark_setting()) {
+          if (bs.benchmark_id() != benchmark_id) {
+            continue;
+          }
+          for (auto &ds : *bs.mutable_delegate_choice()) {
+            if (batch_size > 1) {
+              ds.set_batch_size(batch_size);
+              LOG(INFO) << "Override benchmark " << benchmark_id
+                        << " with batch_size " << batch_size;
+            } else {
+              batch_size = ds.batch_size() == 0 ? 1 : ds.batch_size();
+            }
+          }
         }
 
         SettingList setting_list =
             createSettingList(backend_setting, benchmark_id);
-
-        // If batch size is not specified the default is 0, so set to 1
-        batch_size = setting_list.benchmark_setting().batch_size() == 0
-                         ? 1
-                         : setting_list.benchmark_setting().batch_size();
 
         ExternalBackend *external_backend = new ExternalBackend(
             model_file_path, lib_path, setting_list, native_lib_path);
@@ -251,10 +262,6 @@ int Main(int argc, char *argv[]) {
                            "The width of the processed image."),
           Flag::CreateFlag("image_height", &image_height,
                            "The height of the processed image."),
-          Flag::CreateFlag("scenario", &scenario,
-                           "Scenario to run the benchmark."),
-          Flag::CreateFlag("batch_size", &batch_size, "Batch size."),
-
       };
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
