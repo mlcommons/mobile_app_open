@@ -63,7 +63,8 @@ const char *mlperf_backend_name(mlperf_backend_ptr_t backend_ptr) {
 // Should return true if current hardware is supported.
 bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const char **settings,
-                                     const mlperf_device_info_t *device_info) {
+                                     const mlperf_device_info_t *device_info,
+                                     const char *native_lib_path) {
   (void)device_info;
   *not_allowed_message = nullptr;
   *settings = coreml_settings_pbtxt.c_str();

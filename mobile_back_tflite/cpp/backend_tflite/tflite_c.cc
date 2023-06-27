@@ -156,7 +156,8 @@ static bool neuron_tflite_backend(const char **not_allowed_message,
 // TFLite is the standard backend for all hardwares.
 bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const char **settings,
-                                     const mlperf_device_info_t *device_info) {
+                                     const mlperf_device_info_t *device_info,
+                                     const char *native_lib_path) {
   *not_allowed_message = nullptr;
 #if MTK_TFLITE_NEURON_BACKEND && defined(__ANDROID__)
   *settings = tflite_settings_mtk.c_str();
