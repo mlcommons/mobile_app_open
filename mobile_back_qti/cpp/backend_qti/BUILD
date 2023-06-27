@@ -74,9 +74,6 @@ pbtxt2header(
         "settings/qti_settings_sd8pg1.pbtxt",
         "settings/qti_settings_sdm778.pbtxt",
         "settings/qti_settings_sdm888.pbtxt",
-        "settings/qti_settings_default_cpu.pbtxt",
-        "settings/qti_settings_default_dsp.pbtxt",
-        "settings/qti_settings_default_gpu.pbtxt",
     ],
 )
 
