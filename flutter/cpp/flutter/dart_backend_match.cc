@@ -8,8 +8,8 @@
 #include "flutter/cpp/proto/backend_setting.pb.h"
 
 extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
-    const char *lib_path, const char *manufacturer, const char *model,
-    const char *native_lib_path) {
+    const char *lib_path, const char *native_lib_path, const char *manufacturer,
+    const char *model) {
   LOG(INFO) << "checking backend '" << lib_path << "' ...";
   ::mlperf::mobile::BackendFunctions backend(lib_path);
   if (*lib_path != '\0' && !backend.isLoaded()) {
@@ -17,7 +17,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
     return nullptr;
   }
 
-  mlperf_device_info_t device_info{model, manufacturer};
+  mlperf_device_info_t device_info{model, manufacturer, native_lib_path};
 
   // backends should allocate string values in static memory,
   // so we don't need to free it
@@ -27,8 +27,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
   auto result = new dart_ffi_backend_match_result;
   result->pbdata = nullptr;
   result->error_message = nullptr;
-  result->matches = backend.match(&error_message, &pb_settings, &device_info,
-                                  native_lib_path);
+  result->matches = backend.match(&error_message, &pb_settings, &device_info);
   if (!result->matches) {
     LOG(ERROR) << "backend doesn't match: '" << lib_path << "'";
     return result;

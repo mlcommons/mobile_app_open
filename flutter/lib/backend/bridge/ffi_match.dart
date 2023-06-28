@@ -24,9 +24,9 @@ const _freeName = 'dart_ffi_backend_match_free';
 
 typedef _Run = Pointer<_RunOut> Function(
     Pointer<Utf8> libPath,
+    Pointer<Utf8> nativeLibPath,
     Pointer<Utf8> manufacturer,
-    Pointer<Utf8> model,
-    Pointer<Utf8> nativeLibPath);
+    Pointer<Utf8> model);
 final _run = getBridgeHandle().lookupFunction<_Run, _Run>(_runName);
 
 typedef _Free1 = Void Function(Pointer<_RunOut>);
@@ -45,7 +45,7 @@ pb.BackendSetting? backendMatch({
   final nativeLibPathUtf8 =
       DeviceInfo.instance.nativeLibraryPath.toNativeUtf8();
   final runOut =
-      _run(libPathUtf8, manufacturerUtf8, modelUtf8, nativeLibPathUtf8);
+      _run(libPathUtf8, nativeLibPathUtf8, manufacturerUtf8, modelUtf8);
   malloc.free(libPathUtf8);
   malloc.free(manufacturerUtf8);
   malloc.free(modelUtf8);

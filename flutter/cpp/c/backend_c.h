@@ -35,8 +35,7 @@ extern "C" {
 //         The app will load the next backend in the backend list.
 bool mlperf_backend_matches_hardware(const char** not_allowed_message,
                                      const char** settings,
-                                     const mlperf_device_info_t* device_info,
-                                     const char* native_lib_path);
+                                     const mlperf_device_info_t* device_info);
 
 // Create a new backend and return the pointer to it.
 mlperf_backend_ptr_t mlperf_backend_create(

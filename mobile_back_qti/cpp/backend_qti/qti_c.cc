@@ -45,8 +45,7 @@ extern "C" {
 // Should return true if current hardware is supported.
 bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const char **settings,
-                                     const mlperf_device_info_t *device_info,
-                                     const char *native_lib_path) {
+                                     const mlperf_device_info_t *device_info) {
   if (device_info && device_info->model && device_info->manufacturer) {
     LOG(INFO) << "QTI HW supported check: model: " << device_info->model
               << ", manufacturer: " << device_info->manufacturer;
@@ -54,6 +53,7 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 
   std::ifstream in_file;
 #ifdef __ANDROID__
+  const char *native_lib_path = device_info->native_lib_path;
   std::stringstream adsp_lib_path;
   adsp_lib_path << native_lib_path << ";";
   adsp_lib_path << "/system/lib/rfsa/adsp;/system/vendor/lib/rfsa/adsp;/dsp";
