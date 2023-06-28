@@ -81,8 +81,7 @@ size_t TFLiteNumElements(const TfLiteTensor* tensor) {
 // TFLite is the standard backend for all hardwares.
 bool mlperf_backend_matches_hardware(const char** not_allowed_message,
                                      const char** settings,
-                                     const mlperf_device_info_t* device_info,
-                                     const char* native_lib_path) {
+                                     const mlperf_device_info_t* device_info) {
   *not_allowed_message = nullptr;
   *settings = tflite_settings.c_str();
 

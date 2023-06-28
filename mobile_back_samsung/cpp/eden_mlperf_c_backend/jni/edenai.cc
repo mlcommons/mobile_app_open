@@ -915,8 +915,7 @@ bool jni_GetEdenVersion(uint32_t modelId, int32_t* versions) {
 // Should return true if current hardware is supported.
 bool mlperf_backend_matches_hardware(const char** not_allowed_message,
                                      const char** settings,
-                                     mlperf_device_info_t* device_info,
-                                     const char* native_lib_path) {
+                                     mlperf_device_info_t* device_info) {
   MLOGD("Check for support  manufacturer: %s  model: %s",
         device_info->manufacturer, device_info->model);
 
