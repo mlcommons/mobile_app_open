@@ -16,7 +16,7 @@ index a9750141b3d..47b5ed09a20 100644
 
    tensorflow::png::DecodeContext context;
 -  CHECK(CommonInitDecode(image_str, 3 /*RGB*/, 8 /*uint8*/, &context));
--  char* image_buffer = new char[3 * context.width * context.height];
+-  unsigned char* image_buffer = new unsigned char[3 * context.width * context.height];
 +  // 0: channels is detected from the input
 +  CHECK(CommonInitDecode(image_str, 0, 8 /*uint8*/, &context));
 +  char* image_buffer =
