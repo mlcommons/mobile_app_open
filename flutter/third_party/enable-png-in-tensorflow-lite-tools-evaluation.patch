@@ -50,7 +50,7 @@ index a1418c3bcb6..a9750141b3d 100644
 +
 +  tensorflow::png::DecodeContext context;
 +  CHECK(CommonInitDecode(image_str, 3 /*RGB*/, 8 /*uint8*/, &context));
-+  unsigned char* image_buffer = new unsigned char[3 * context.width * context.height];
++  char* image_buffer = new char[3 * context.width * context.height];
 +  CHECK(CommonFinishDecode(absl::bit_cast<png_byte*>(image_buffer),
 +                           3 * context.width /*stride*/, &context));
 +
