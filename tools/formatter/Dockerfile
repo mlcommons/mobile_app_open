@@ -69,7 +69,7 @@ RUN git config --global --add safe.directory /home/$UNAME/flutter
 ENV PUB_CACHE=/home/mlperf/.pub-cache
 ENV PATH=$PATH:/home/$UNAME/flutter/bin:/home/$UNAME/flutter/bin/cache/dart-sdk/bin:$PUB_CACHE/bin
 RUN flutter doctor -v
-RUN dart pub global activate protoc_plugin && chmod --recursive a=u $PUB_CACHE
+RUN dart pub global activate protoc_plugin ^20.0.1 && chmod --recursive a=u $PUB_CACHE
 RUN apt-get install -y --no-install-recommends protobuf-compiler
 # The /home/mlperf/mobile_app_open directory will be mounted
 RUN git config --global --add safe.directory /home/mlperf/mobile_app_open

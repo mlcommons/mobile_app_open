@@ -34,7 +34,7 @@ endif
 
 .PHONY: flutter/android/libs/build
 flutter/android/libs/build:
-	bazel ${BAZEL_ARGS_GLOBAL} ${sonar_bazel_startup_options} \
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} ${proxy_bazel_args} ${sonar_bazel_startup_options} \
 		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
 		--config=android_arm64 \
 		${backend_tflite_android_target} \

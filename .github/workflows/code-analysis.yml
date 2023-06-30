@@ -49,6 +49,7 @@ jobs:
         with:
           images: ghcr.io/mlcommons/mobile_app_open-base
           flavor: latest=true
+          tags: type=raw,value=${{ github.run_number }}
       - name: Build and push base image
         if: steps.changed-base.outputs.any_changed == 'true'
         uses: docker/build-push-action@v4
@@ -78,7 +79,7 @@ jobs:
         with:
           context: tools/scanner
           file: tools/scanner/Dockerfile
-          build-args: BASE_DOCKER_IMAGE_TAG=ghcr.io/mlcommons/mobile_app_open-base
+          build-args: BASE_DOCKER_IMAGE_TAG=ghcr.io/mlcommons/mobile_app_open-base:${{ github.run_number }}
           push: true
           tags: ${{ steps.meta-scanner.outputs.tags }}
           labels: ${{ steps.meta-scanner.outputs.labels }}

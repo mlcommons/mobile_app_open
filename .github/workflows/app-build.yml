@@ -1,0 +1,107 @@
+name: App Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build-android-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata for Docker image
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/mlcommons/mobile_app_open-android
+          flavor: latest=true
+          tags: type=raw,value=${{ github.run_number }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: flutter/android/docker
+          file: flutter/android/docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-android-apk:
+    needs: build-android-image
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install AWS CLI
+        run: |
+          python3 -m pip install awscli
+      - name: Download Samsung libraries
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_AWS_KEY }}
+        run: |
+          aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
+          cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.0/samsung_libs_v3.0.zip /tmp/ && \
+          unzip -P ${AWS_SECRET_ACCESS_KEY} /tmp/samsung_libs_v3.0.zip -d /tmp/samsung_libs_v3.0 && \
+          mv /tmp/samsung_libs_v3.0/lib/* mobile_back_samsung/samsung/lib/
+      - name: Download QTI libraries
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_AWS_KEY }}
+        run: |
+          aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
+          cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.0/snpe-2.7.0.4264-linux.zip /tmp/ && \
+          unzip -P ${AWS_SECRET_ACCESS_KEY} /tmp/snpe-2.7.0.4264-linux.zip -d /tmp/snpe-2.7.0.4264-linux && \
+          mv /tmp/snpe-2.7.0.4264-linux/snpe-2.7.0.4264 mobile_back_qti/
+      - name: Cache bazel
+        uses: actions/cache@v3
+        with:
+          path: |
+            /tmp/bazel_output
+            /tmp/bazel_cache
+          key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-bazel_cache-
+      - name: Run Flutter unit tests
+        run: |
+          make flutter/prepare && \
+          make flutter/test/unit
+      - name: Build Android app
+        env:
+          BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
+          BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
+          OFFICIAL_BUILD: true
+          FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
+          WITH_TFLITE: 1
+          WITH_PIXEL: 1
+          WITH_MEDIATEK: 1
+          WITH_QTI: 1
+          WITH_SAMSUNG: 1
+          WITH_APPLE: 0
+        run: |
+          make flutter/android/release
+      - name: Archive Android APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apks-${{ github.run_number }}
+          path: output/android-apks/*.apk
+          retention-days: 30
+          if-no-files-found: error
