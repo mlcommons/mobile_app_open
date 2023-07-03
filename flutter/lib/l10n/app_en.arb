@@ -132,6 +132,9 @@
   "historyFilterManufacturer": "Manufacturer",
   "historyFilterSoC": "SoC",
   "historySortBy": "Sort by",
+  "historySortByDateAsc": "Date: from oldest to most recent",
+  "historySortByDateDesc": "Date: from most recent to oldest",
+  "historySortByTaskThroughputAsc": "Task throughput: from highest to lowest",
 
   "historyDetailsTitle": "Result details",
   "historyDetailsBuildTypeDebug": "debug build",

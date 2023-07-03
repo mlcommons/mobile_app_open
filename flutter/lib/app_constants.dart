@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench_common/data/result_sort.dart';
+
+import 'localizations/app_localizations.dart';
+
 const isOfficialBuild =
     bool.fromEnvironment('official-build', defaultValue: false);
 
@@ -109,14 +113,20 @@ class BackendId {
   ];
 }
 
-class SortBy {
-  static const dateAsc = 'Date: from oldest to most recent';
-  static const dateDesc = 'Date: from most recent to oldest';
-  static const taskThroughputDesc = 'Task throughput: from highest to lowest';
+class SortByItem {
+  String label;
+  SortByValues value;
 
-  static const options = [
-    dateAsc,
-    dateDesc,
-    taskThroughputDesc,
-  ];
+  SortByItem(this.label, this.value);
+}
+
+class SortBy {
+  static List<SortByItem> options(AppLocalizations l10n) {
+    return [
+      SortByItem(l10n.historySortByDateAsc, SortByValues.dateAsc),
+      SortByItem(l10n.historySortByDateDesc, SortByValues.dateDesc),
+      SortByItem(
+          l10n.historySortByTaskThroughputAsc, SortByValues.taskThroughputDesc),
+    ];
+  }
 }
