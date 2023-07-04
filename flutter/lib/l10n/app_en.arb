@@ -97,7 +97,7 @@
   "dialogCancel": "Cancel",
   "dialogTitleConfirm": "Confirm?",
   "dialogContentOfflineWarning": "Offline mode is enabled but following internet resources are defined in the configuration. Do you want to continue?",
-  "dialogContentMissingFiles": "Selected datasets directory does not contain files for following benchmarks:",
+  "dialogContentMissingFiles": "The following files don't exist:",
   "dialogContentChecksumError": "The following files failed checksum validation:",
   "dialogContentNoSelectedBenchmarkError": "Please select at least one benchmark.",
 

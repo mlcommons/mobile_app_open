@@ -167,7 +167,8 @@ class ResourceManager {
     final missingResources = <String>[];
     for (var r in resources) {
       if (!await isResourceExist(r.path)) {
-        missingResources.add(r.path);
+        final resolvedPath = get(r.path);
+        missingResources.add(resolvedPath);
       }
     }
     return missingResources;
