@@ -33,7 +33,9 @@ tflite-run-ic:
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/images" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/imagenet_val.txt" \
-		--offset=1
+		--offset=1 \
+		--max_duration_ms=600000 \
+		--min_duration_ms=100
 
 tflite-run-ic-offline:
 	cd ${REPO_ROOT_DIR} && \
@@ -46,7 +48,9 @@ tflite-run-ic-offline:
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/images" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/imagenet_val.txt" \
-		--offset=1
+		--offset=1 \
+		--max_duration_ms=600000 \
+		--min_duration_ms=100
 
 tflite-run-od:
 	cd ${REPO_ROOT_DIR} && \
@@ -87,8 +91,8 @@ tflite-run-sr:
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/edsr_final/converted/edsr_f32b5_fp32.tflite" \
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
-		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/LR_raw" \
-		--ground_truth_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/HR_raw"
+		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/LR" \
+		--ground_truth_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/HR" \
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \

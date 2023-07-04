@@ -18,6 +18,7 @@ class RunSettings {
   final int batch_size;
   final int min_query_count;
   final double min_duration;
+  final double max_duration;
   final int single_stream_expected_latency_ns;
   final String output_dir;
   final String benchmark_id;
@@ -36,6 +37,7 @@ class RunSettings {
     required this.batch_size,
     required this.min_query_count,
     required this.min_duration,
+    required this.max_duration,
     required this.single_stream_expected_latency_ns,
     required this.output_dir,
     required this.benchmark_id,
