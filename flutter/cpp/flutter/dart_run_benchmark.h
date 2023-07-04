@@ -22,6 +22,7 @@ struct dart_ffi_run_benchmark_in {
   int32_t batch_size;
   int32_t min_query_count;
   double min_duration;
+  double max_duration;
   int32_t single_stream_expected_latency_ns;
   const char *output_dir;
 };
