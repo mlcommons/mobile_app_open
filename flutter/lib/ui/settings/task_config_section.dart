@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -183,12 +182,6 @@ class TaskConfigSection extends StatelessWidget {
       ]);
     }
 
-    // On Android we need MANAGE_EXTERNAL_STORAGE permission
-    // see https://github.com/mlcommons/mobile_app_open/issues/702
-    if (Platform.isAndroid) {
-      items.add(const ManageFilePermissionWidget());
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: items,
@@ -258,47 +251,6 @@ class TaskConfigSection extends StatelessWidget {
           ),
         )
       ],
-    );
-  }
-}
-
-class ManageFilePermissionWidget extends StatefulWidget {
-  const ManageFilePermissionWidget({super.key});
-
-  @override
-  State<ManageFilePermissionWidget> createState() =>
-      _ManageFilePermissionWidgetState();
-}
-
-class _ManageFilePermissionWidgetState
-    extends State<ManageFilePermissionWidget> {
-  Future<bool> _permissionGranted = Permission.manageExternalStorage.isGranted;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return FutureBuilder<bool>(
-      future: _permissionGranted,
-      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-        final title = l10n.settingsTaskDataFolderPermissionRequired;
-        var subtitle = l10n.settingsTaskDataFolderPermissionNotGranted;
-        var iconColor = Colors.grey;
-        if (snapshot.data == true) {
-          subtitle = l10n.settingsTaskDataFolderPermissionGranted;
-          iconColor = Colors.green;
-        }
-        return ListTile(
-          title: Text(title),
-          subtitle: Text(subtitle),
-          trailing: Icon(color: iconColor, Icons.check_circle),
-          onTap: () {
-            setState(() {
-              final status = Permission.manageExternalStorage.request();
-              _permissionGranted = status.isGranted;
-            });
-          },
-        );
-      },
     );
   }
 }
