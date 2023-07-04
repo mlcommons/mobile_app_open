@@ -113,6 +113,7 @@ class BackendId {
   ];
 }
 
+<<<<<<< HEAD
 class SortByItem {
   String label;
   SortByValues value;
@@ -129,4 +130,8 @@ class SortBy {
           l10n.historySortByTaskThroughputAsc, SortByValues.taskThroughputDesc),
     ];
   }
+=======
+class BenchmarkSettings {
+  static const double maxDuration = 10 * 60; // 10 minutes
+>>>>>>> master
 }

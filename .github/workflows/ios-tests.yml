@@ -15,6 +15,12 @@ jobs:
     timeout-minutes: 120
     env:
       PERF_TEST: true
+      WITH_APPLE: 1
+      WITH_TFLITE: 0
+      WITH_PIXEL: 0
+      WITH_MEDIATEK: 0
+      WITH_QTI: 0
+      WITH_SAMSUNG: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,11 +39,17 @@ jobs:
       - name: Cache bazel
         uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/bazel_cache
-          key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD') }}
+          path: |
+            /tmp/bazel_output
+            /tmp/bazel_cache
+          key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
           restore-keys: ${{ runner.os }}-bazel_cache-
-      - name: Run test
+      - name: Build iOS app
         env:
-          BAZEL_CACHE_PATH: ${{ github.workspace }}/bazel_cache
-        run: >-
+          BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
+          BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
+        run: |
           cd flutter/ios/ci_scripts/ && bash ci_post_clone.sh
+      - name: Run iOS tests
+        run: |
+          open -a Simulator && make flutter/test

@@ -4,6 +4,7 @@ FROM mcr.microsoft.com/windows:1809
 # SHELL [ "powershell", "-command" ]
 SHELL ["cmd", "/S", "/C"]
 
+ENV chocolateyVersion=1.4.0
 RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
     iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
@@ -37,7 +38,7 @@ RUN choco install -y --no-progress protoc --version 3.18.1
 RUN python3 -m pip install --user numpy absl-py
 
 RUN dart --disable-analytics && `
-    dart pub global activate protoc_plugin && `
+    dart pub global activate protoc_plugin ^20.0.1 && `
     setx path "%path%;%LOCALAPPDATA%/Pub/Cache/bin"
 
 ENTRYPOINT ["cmd", "/S", "/C"]

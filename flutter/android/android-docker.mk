@@ -43,7 +43,8 @@ flutter_common_docker_flags= \
 		--env WITH_SAMSUNG=${WITH_SAMSUNG} \
 		--env WITH_PIXEL=${WITH_PIXEL} \
 		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
-		--env BAZEL_ARGS_GLOBAL="${proxy_bazel_args} --output_user_root=/mnt/cache/bazel" \
+		--env proxy_bazel_args=${proxy_bazel_args} \
+		--env BAZEL_OUTPUT_ROOT_ARG="--output_user_root=/mnt/cache/bazel" \
 		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
 		--env FLUTTER_BUILD_NUMBER=${FLUTTER_BUILD_NUMBER} \
 		--env FLUTTER_FORCE_PUB_GET=1 \

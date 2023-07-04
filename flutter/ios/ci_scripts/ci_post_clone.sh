@@ -33,12 +33,12 @@ if [ -n "$CI_DERIVED_DATA_PATH" ]; then
   # with key=GC_CREDS and value=<output of cmd `base64 mobile-app-build-290400-1b26aafa8afd.json`>
   GC_CREDS_FILE=$CI_WORKSPACE/mobile-app-build-290400-1b26aafa8afd.json
   echo "$GC_CREDS" | base64 --decode >"$GC_CREDS_FILE"
+  export BAZEL_OUTPUT_ROOT_ARG="--output_user_root=$MC_BUILD_HOME/bazel"
   export BAZEL_CACHE_ARG="--remote_cache=https://storage.googleapis.com/$CACHE_BUCKET --google_credentials=$GC_CREDS_FILE"
   runner=$XCODE_CLOUD
 elif [ -n "$GITHUB_WORKSPACE" ]; then
   echo "$MC_LOG_PREFIX Running on GitHub Actions"
   export MC_BUILD_HOME=$GITHUB_WORKSPACE/mobile_app_open_build
-  export BAZEL_CACHE_ARG="--disk_cache=$BAZEL_CACHE_PATH"
   runner=$GITHUB_ACTIONS
 else
   echo "$MC_LOG_PREFIX Running on local machine"
@@ -51,7 +51,7 @@ echo "$MC_LOG_PREFIX runner is ${runner}"
 
 echo "$MC_LOG_PREFIX ========== Install dependencies =========="
 
-brew update
+brew update --quiet
 echo "$MC_LOG_PREFIX brew version:" && brew config
 
 # `brew install` failed often due to connection issue so we try several times
@@ -64,11 +64,12 @@ echo "$MC_LOG_PREFIX protobuf version:" && protoc --version
 brew install cocoapods || brew install cocoapods || brew install cocoapods
 echo "$MC_LOG_PREFIX cocoapods version:" && pod --version
 
+brew install python@3.11 || brew link --overwrite python@3.11
 echo "$MC_LOG_PREFIX python version:" && python3 --version
 pip3 install --upgrade pip
 pip3 install \
-  numpy==1.23.4 \
-  absl-py==1.3.0
+  "numpy>=1.23,<2.0" \
+  "absl-py>=1.3,<2.0"
 
 if [ $runner = $GITHUB_ACTIONS ]; then
   echo "$MC_LOG_PREFIX ========== Install Android SDK =========="
@@ -96,13 +97,18 @@ export PUB_CACHE=$MC_BUILD_HOME/.pub-cache
 mkdir -p "$MC_BUILD_HOME"
 test ! -d "$MC_FLUTTER_HOME" && git clone --branch 3.7.6 --depth 1 https://github.com/flutter/flutter.git "$MC_FLUTTER_HOME"
 export PATH="$PATH:$MC_FLUTTER_HOME/bin:$PUB_CACHE/bin"
+if [ $runner = $GITHUB_ACTIONS ]; then
+  # make Flutter available in the subsequent GitHub Actions steps
+  echo "$MC_FLUTTER_HOME/bin" >> "$GITHUB_PATH"
+  echo "$PUB_CACHE/bin" >> "$GITHUB_PATH"
+fi
+
 echo "$MC_LOG_PREFIX flutter version:" && flutter --version
 flutter config --no-analytics && dart --disable-analytics
-dart pub global activate protoc_plugin
+dart pub global activate protoc_plugin ^20.0.1
 cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 
 echo "$MC_LOG_PREFIX ========== Build app =========="
-export BAZEL_OUTPUT_ROOT_ARG=--output_user_root=$MC_BUILD_HOME/bazel
 export WITH_TFLITE=0
 export WITH_APPLE=1
 
@@ -119,11 +125,6 @@ if [ $runner = $XCODE_CLOUD ]; then
 fi
 
 cd "$MC_REPO_HOME"/flutter/ios && pod install
-
-if [ $runner = $GITHUB_ACTIONS ]; then
-  open -a Simulator
-  cd "$MC_REPO_HOME" && make flutter/test
-fi
 
 echo "$MC_LOG_PREFIX END ci_post_clone"
 exit 0
