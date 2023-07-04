@@ -51,7 +51,7 @@ echo "$MC_LOG_PREFIX runner is ${runner}"
 
 echo "$MC_LOG_PREFIX ========== Install dependencies =========="
 
-brew update --quiet
+brew update --quiet || true
 echo "$MC_LOG_PREFIX brew version:" && brew config
 
 # `brew install` failed often due to connection issue so we try several times
