@@ -41,6 +41,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   lin(batch_size);
   lin(min_query_count);
   lin(min_duration);
+  lin(max_duration);
   lin(single_stream_expected_latency_ns);
   lin(output_dir);
 
@@ -113,7 +114,8 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   auto start = std::chrono::steady_clock::now();
   driver.RunMLPerfTest(in->mode, in->min_query_count, in->min_duration,
-                       in->single_stream_expected_latency_ns, in->output_dir);
+                       in->max_duration, in->single_stream_expected_latency_ns,
+                       in->output_dir);
   auto end = std::chrono::steady_clock::now();
   li;
 
