@@ -204,7 +204,7 @@ int Main(int argc, char *argv[]) {
       if (Flags::Parse(&argc, const_cast<const char **>(argv), flag_list)) {
         const char *pbdata;
         std::string msg = mlperf::mobile::BackendFunctions::isSupported(
-            lib_path, "", model_file_path, &pbdata);
+            lib_path, native_lib_path, "", model_file_path, &pbdata);
         std::string backend_setting_string(pbdata, strlen(pbdata));
         BackendSetting backend_setting;
 
