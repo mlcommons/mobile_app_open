@@ -60,6 +60,7 @@ http_archive(
         # Add patches for adding png in tflite evaluation code
         "//:flutter/third_party/enable-png-in-tensorflow-lite-tools-evaluation.patch",
         "//:flutter/third_party/png-with-number-of-channels-detected.patch",
+        "//:flutter/third_party/use_unsigned_char.patch",
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
