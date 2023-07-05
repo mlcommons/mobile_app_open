@@ -58,6 +58,7 @@ typedef struct {
 typedef struct {
   const char* model;
   const char* manufacturer;
+  const char* native_lib_path;
 } mlperf_device_info_t;
 
 #ifdef __cplusplus
