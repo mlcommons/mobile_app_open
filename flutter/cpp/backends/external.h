@@ -95,6 +95,7 @@ struct BackendFunctions {
   bool isLoaded() { return isloaded; }
 
   static std::string isSupported(const std::string& lib_path,
+                                 const std::string& native_lib_path,
                                  const std::string& manufacturer,
                                  const std::string& model, const char** pbdata);
 
