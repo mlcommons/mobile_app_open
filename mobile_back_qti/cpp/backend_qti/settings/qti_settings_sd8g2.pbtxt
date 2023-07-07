@@ -33,8 +33,8 @@ benchmark_setting {
     accelerator_desc: "HTP"
     model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/mobilenet_edgetpu_224_1.0_htp.dlc"
     model_checksum: "2e7c4d33b480b5566bdf05e1204b6152"
-    single_stream_expected_latency_ns: 500000
   }
+  single_stream_expected_latency_ns: 500000
   delegate_selected: "SNPE_DSP"
 }
 
