@@ -23,42 +23,41 @@ benchmark_setting {
   benchmark_id: "image_classification"
   framework: "SNPE"
   custom_setting {
-    id: "bg_load"
-    value: "true"
+    id: "use_ion_buffer"
+    value: "false"
   }
   delegate_choice: {
     priority: 1
-    delegate_name: "SNPE_DSP"
-    accelerator_name: "snpe_dsp"
-    accelerator_desc: "HTP"
+    delegate_name: "SNPE_CPU"
+    accelerator_name: "snpe_cpu"
+    accelerator_desc: "CPU"
     model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/mobilenet_edgetpu_224_1.0_htp.dlc"
     model_checksum: "2e7c4d33b480b5566bdf05e1204b6152"
   }
-  single_stream_expected_latency_ns: 800000
-  delegate_selected: "SNPE_DSP"
+  delegate_selected: "SNPE_CPU"
 }
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
   framework: "SNPE"
-  batch_size: 12288
+  batch_size: 128
+  custom_setting {
+    id: "use_ion_buffer"
+    value: "false"
+  }
   custom_setting {
     id: "scenario"
     value: "Offline"
   }
-  custom_setting {
-    id: "bg_load"
-    value: "true"
-  }
   delegate_choice: {
     priority: 1
-    delegate_name: "SNPE_DSP"
-    accelerator_name: "psnpe_dsp"
-    accelerator_desc: "HTP"
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/mobilenet_edgetpu_224_1.0_htp_batched.dlc"
-    model_checksum: "b9034e23621f96c86160101928e8e8ea"
+    delegate_name: "SNPE_CPU"
+    accelerator_name: "psnpe_cpu"
+    accelerator_desc: "CPU"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/mobilenet_edgetpu_224_1.0_htp_batched_sd8g2.dlc"
+    model_checksum: "78a54fc8913d4fa654dcd41a26850c1e"
   }
-  delegate_selected: "SNPE_DSP"
+  delegate_selected: "SNPE_CPU"
 }
 
 benchmark_setting {
@@ -69,30 +68,28 @@ benchmark_setting {
     value: "Postprocessor/BatchMultiClassNonMaxSuppression"
   }
   custom_setting {
-    id: "bg_load"
-    value: "true"
+    id: "use_ion_buffer"
+    value: "false"
   }
   delegate_choice: {
     priority: 1
-    delegate_name: "SNPE_DSP"
-    accelerator_name: "snpe_dsp"
-    accelerator_desc: "HTP"
+    delegate_name: "SNPE_CPU"
+    accelerator_name: "snpe_cpu"
+    accelerator_desc: "CPU"
     model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/ssd_mobiledet_qat_htp.dlc"
     model_checksum: "65937d5b58414d86fc42872945e2f5cf"
   }
-  delegate_selected: "SNPE_DSP"
+  delegate_selected: "SNPE_CPU"
 }
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
+  accelerator: "snpe_dsp"
+  accelerator_desc: "HTP"
   framework: "SNPE"
   custom_setting {
     id: "snpe_output_layers"
     value: "transpose"
-  }
-  custom_setting {
-    id: "bg_load"
-    value: "true"
   }
   custom_setting {
     id: "input_buffer_type"
@@ -102,19 +99,15 @@ benchmark_setting {
     id: "use_ion_buffer"
     value: "false"
   }
-  custom_setting {
-    id: "perf_profile"
-    value: "high_performance"
-  }
   delegate_choice: {
     priority: 1
-    delegate_name: "SNPE_DSP"
-    accelerator_name: "snpe_dsp"
-    accelerator_desc: "DSP"
+    delegate_name: "SNPE_CPU"
+    accelerator_name: "snpe_cpu"
+    accelerator_desc: "CPU"
     model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/mobilebert_quantized_htp.dlc"
     model_checksum: "6dc1f1a47a764381b00c8423b07caac1"
   }
-  delegate_selected: "SNPE_DSP"
+  delegate_selected: "SNPE_CPU"
 }
 
 benchmark_setting {
@@ -125,46 +118,42 @@ benchmark_setting {
     value: "uint_8"
   }
   custom_setting {
-    id: "bg_load"
-    value: "true"
-  }
-  custom_setting {
     id: "output_buffer_type"
     value: "int_32"
   }
+  custom_setting {
+    id: "use_ion_buffer"
+    value: "false"
+  }
   delegate_choice: {
     priority: 1
-    delegate_name: "SNPE_DSP"
-    accelerator_name: "snpe_dsp"
-    accelerator_desc: "DSP"
+    delegate_name: "SNPE_CPU"
+    accelerator_name: "snpe_cpu"
+    accelerator_desc: "CPU"
     model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/mobile_mosaic_htp.dlc"
     model_checksum: "e921828320d251a5f7160952bbd750ec"
   }
-  delegate_selected: "SNPE_DSP"
+  delegate_selected: "SNPE_CPU"
 }
 
 benchmark_setting {
   benchmark_id: "super_resolution"
   framework: "SNPE"
   custom_setting {
-    id: "bg_load"
-    value: "true"
-  }
-  custom_setting {
     id: "input_buffer_type"
     value: "uint_8"
   }
   custom_setting {
-    id: "perf_profile"
-    value: "burst"
+    id: "use_ion_buffer"
+    value: "false"
   }
   delegate_choice: {
     priority: 1
-    delegate_name: "SNPE_DSP"
-    accelerator_name: "snpe_dsp"
-    accelerator_desc: "DSP"
+    delegate_name: "SNPE_CPU"
+    accelerator_name: "snpe_cpu"
+    accelerator_desc: "CPU"
     model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.0-snpe/snusr_htp.dlc"
     model_checksum: "3dc4b1e7ae23620704d76b56f88527d0"
   }
-  delegate_selected: "SNPE_DSP"
+  delegate_selected: "SNPE_CPU"
 }

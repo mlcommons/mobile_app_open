@@ -38,6 +38,9 @@ const std::string empty_settings = "";
 #include INCLUDE_SETTINGS(sd8pg1)
 #include INCLUDE_SETTINGS(sdm778)
 #include INCLUDE_SETTINGS(sdm888)
+#include INCLUDE_SETTINGS(default_dsp)
+#include INCLUDE_SETTINGS(default_cpu)
+#include INCLUDE_SETTINGS(default_gpu)
 
 STRING_SETTINGS(sd7g1)
 STRING_SETTINGS(sd7pg2)
@@ -47,5 +50,8 @@ STRING_SETTINGS(sd8g2)
 STRING_SETTINGS(sd8pg1)
 STRING_SETTINGS(sdm778)
 STRING_SETTINGS(sdm888)
+STRING_SETTINGS(default_dsp)
+STRING_SETTINGS(default_cpu)
+STRING_SETTINGS(default_gpu)
 
 #endif

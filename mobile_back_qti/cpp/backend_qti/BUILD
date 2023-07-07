@@ -63,6 +63,9 @@ snpe_copts = [
 pbtxt2header(
     name = "qti_settings",
     srcs = [
+        "settings/qti_settings_default_cpu.pbtxt",
+        "settings/qti_settings_default_dsp.pbtxt",
+        "settings/qti_settings_default_gpu.pbtxt",
         "settings/qti_settings_sd7g1.pbtxt",
         "settings/qti_settings_sd7pg2.pbtxt",
         "settings/qti_settings_sd8cxg3.pbtxt",
