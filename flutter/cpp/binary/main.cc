@@ -126,7 +126,8 @@ int Main(int argc, char *argv[]) {
 
   // Command Line Flags for mlperf.
   std::string mode, scenario = "SingleStream", output_dir;
-  int min_query_count = 100, min_duration = 100,
+  int min_query_count = 100, min_duration_ms = 100,
+      max_duration_ms = 10 * 60 * 1000,
       single_stream_expected_latency_ns = 1000000;
   flag_list.clear();
   flag_list.insert(
@@ -138,12 +139,16 @@ int Main(int argc, char *argv[]) {
        Flag::CreateFlag("min_query_count", &min_query_count,
                         "The test will guarantee to run at least this "
                         "number of samples in performance mode."),
-       Flag::CreateFlag("min_duration", &min_duration,
+       Flag::CreateFlag("min_duration_ms", &min_duration_ms,
                         "The test will guarantee to run at least this "
                         "duration in performance mode. The duration is in ms."),
+       Flag::CreateFlag("max_duration_ms", &max_duration_ms,
+                        "The test will early exit when max duration is reached."
+                        "The duration is in ms."),
        Flag::CreateFlag("single_stream_expected_latency_ns",
                         &single_stream_expected_latency_ns,
-                        "single_stream_expected_latency_ns"),
+                        "A hint used by the loadgen to pre-generate "
+                        "enough samples to meet the minimum test duration."),
        Flag::CreateFlag("output_dir", &output_dir,
                         "The output directory of mlperf.", Flag::kRequired)});
 
@@ -172,7 +177,7 @@ int Main(int argc, char *argv[]) {
       if (Flags::Parse(&argc, const_cast<const char **>(argv), flag_list)) {
         const char *pbdata;
         std::string msg = mlperf::mobile::BackendFunctions::isSupported(
-            lib_path, "", model_file_path, &pbdata);
+            lib_path, native_lib_path, "", model_file_path, &pbdata);
         std::string backend_setting_string(pbdata, strlen(pbdata));
         std::string benchmark_id;
         BackendSetting backend_setting;
@@ -396,7 +401,8 @@ int Main(int argc, char *argv[]) {
   // Running mlperf.
   MlperfDriver driver(std::move(dataset), std::move(backend), scenario,
                       batch_size);
-  driver.RunMLPerfTest(mode, min_query_count, min_duration / 1000.0,
+  driver.RunMLPerfTest(mode, min_query_count, min_duration_ms / 1000.0,
+                       max_duration_ms / 1000.0,
                        single_stream_expected_latency_ns, output_dir);
   LOG(INFO) << "Accuracy: " << driver.ComputeAccuracyString();
   return 0;

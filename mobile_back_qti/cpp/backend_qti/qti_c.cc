@@ -52,6 +52,19 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
   }
 
   std::ifstream in_file;
+#ifdef __ANDROID__
+  const char *native_lib_path = device_info->native_lib_path;
+  std::stringstream adsp_lib_path;
+  adsp_lib_path << native_lib_path << ";";
+  adsp_lib_path << "/system/lib/rfsa/adsp;/system/vendor/lib/rfsa/adsp;/dsp";
+  LOG(INFO) << "adsp_lib_path: " << adsp_lib_path.str();
+  setenv("ADSP_LIBRARY_PATH", adsp_lib_path.str().c_str(), 1 /*override*/);
+  std::stringstream ld_lib_path;
+  ld_lib_path << native_lib_path << ";";
+  ld_lib_path << "/system/vendor/lib64";
+  LOG(INFO) << "ld_lib_path: " << ld_lib_path.str();
+  setenv("LD_LIBRARY_PATH", ld_lib_path.str().c_str(), 1 /*override*/);
+#endif
 
   *not_allowed_message = nullptr;
   bool isQSoC = Socs::isSnapDragon(device_info->manufacturer);
