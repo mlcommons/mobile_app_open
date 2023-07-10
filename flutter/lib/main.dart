@@ -26,15 +26,9 @@ Future<void> main() async {
   try {
     await launchUi();
   } on UnsupportedDeviceException catch (e) {
-    runApp(MyApp(
-      home: UnsupportedDeviceScreen(
-        backendError: e.backendError,
-      ),
-    ));
+    await showUnsupportedDeviceScreen(e);
   } catch (e, s) {
-    print('Exception: $e');
-    print('Exception stack: $s');
-    runApp(ExceptionWidget(e, s));
+    await showExceptionScreen(e, s);
   }
 }
 
@@ -64,6 +58,20 @@ Future<void> launchUi() async {
       child: const MyApp(home: MyHomePage()),
     ),
   );
+}
+
+Future<void> showUnsupportedDeviceScreen(UnsupportedDeviceException e) async {
+  runApp(MyApp(
+    home: UnsupportedDeviceScreen(
+      backendError: e.backendError,
+    ),
+  ));
+}
+
+Future<void> showExceptionScreen(Object e, StackTrace s) async {
+  print('Exception: $e');
+  print('Exception stack: $s');
+  runApp(ExceptionWidget(e, s));
 }
 
 void autostartHandler(BenchmarkState state, Store store) async {
