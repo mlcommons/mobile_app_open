@@ -99,10 +99,10 @@ Future<bool> waitFor(WidgetTester tester, int timeLimitMinutes, Key key) async {
   return element;
 }
 
-void printResults(ExtendedResult extendedResults) {
+void printResults(ExtendedResult extendedResult) {
   print('benchmark result json:');
   for (final line in const JsonEncoder.withIndent('  ')
-      .convert(extendedResults)
+      .convert(extendedResult)
       .split('\n')) {
     print(line);
   }

@@ -17,11 +17,11 @@ limitations under the License.
 
 #include <cstring>
 
-#include "coreml_settings.h"
-#include "coreml_util.h"
+#include "coreml_util-Swift.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/utils.h"
+#include "mobile_back_apple/cpp/backend_coreml/coreml_settings.pbtxt.h"
 
 struct CoreMLBackendData {
   const char *name = "Core ML";
@@ -66,7 +66,7 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const mlperf_device_info_t *device_info) {
   (void)device_info;
   *not_allowed_message = nullptr;
-  *settings = coreml_settings.c_str();
+  *settings = coreml_settings_pbtxt.c_str();
   return true;
 }
 
@@ -84,10 +84,12 @@ mlperf_backend_ptr_t mlperf_backend_create(
   backendExists = true;
 
   // Load the model.
+  NSError *error;
   CoreMLExecutor *coreMLExecutor =
       [[CoreMLExecutor alloc] initWithModelPath:model_path
-                                      batchSize:configs->batch_size];
-  if (!coreMLExecutor) {
+                                      batchSize:configs->batch_size
+                                          error:&error];
+  if (!coreMLExecutor || error) {
     LOG(ERROR) << "Cannot create CoreMLExecutor";
     return nullptr;
   }
@@ -130,7 +132,9 @@ mlperf_data_t mlperf_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
                                             int32_t i) {
   mlperf_data_t data;
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
-  auto coreml_type = [backend_data->coreMLExecutor getInputTypeAt:i];
+  NSNumber *inputTypeNumber = [backend_data->coreMLExecutor getInputTypeAt:i];
+  MLMultiArrayDataType coreml_type =
+      (MLMultiArrayDataType)inputTypeNumber.integerValue;
   data.type = MLMultiArrayDataType2MLPerfDataType(coreml_type);
   data.size = [backend_data->coreMLExecutor getInputSizeAt:i];
   return data;
@@ -158,7 +162,10 @@ mlperf_data_t mlperf_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
                                              int32_t i) {
   mlperf_data_t data;
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
-  auto coreml_type = [backend_data->coreMLExecutor getOutputTypeAt:i];
+
+  NSNumber *outputTypeNumber = [backend_data->coreMLExecutor getOutputTypeAt:i];
+  MLMultiArrayDataType coreml_type =
+      (MLMultiArrayDataType)outputTypeNumber.integerValue;
   data.type = MLMultiArrayDataType2MLPerfDataType(coreml_type);
   data.size = [backend_data->coreMLExecutor getOutputSizeAt:i];
   return data;

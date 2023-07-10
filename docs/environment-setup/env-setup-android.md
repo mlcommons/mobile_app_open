@@ -91,7 +91,7 @@ Flutter requires native libs so you must complete [Setting up Bazel on Ubuntu](#
 
     You will need to restart your WSL instance to apply changes.  
     Run `wsl --shutdown` in Windows, and then reopen WSL.
-* Enable protobuf plugin: `dart pub global activate protoc_plugin`
+* Enable protobuf plugin: `dart pub global activate protoc_plugin ^20.0.1`
 
 * Install dependencies via sdkmanager, accept licenses for dependencies:
 

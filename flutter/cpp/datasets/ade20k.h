@@ -84,6 +84,9 @@ class ADE20K : public Dataset {
   // preprocessing_stage_ conducts preprocessing of images.
   std::unique_ptr<tflite::evaluation::ImagePreprocessingStage>
       preprocessing_stage_;
+  // gt_preprocessing_stage_ for loading groundtruth images.
+  std::unique_ptr<tflite::evaluation::ImagePreprocessingStage>
+      gt_preprocessing_stage_;
 
   // Number of classes in the output of the model.
   int num_classes_;

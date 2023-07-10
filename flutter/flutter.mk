@@ -30,7 +30,7 @@ endif
 
 flutter: flutter/prepare flutter/platform
 flutter/result: flutter/result/json flutter/result/gen-schema
-flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/build-info flutter/set-windows-build-number
+flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/build-info flutter/firebase-config flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 flutter/test: flutter/test/unit flutter/test/integration
 
@@ -62,6 +62,27 @@ else
 flutter_cache_folder_arg=
 endif
 flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
+
+FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
+-include ${FIREBASE_ENV_FILE}
+export
+.PHONY: flutter/firebase-config
+flutter/firebase-config:
+	cat flutter/lib/firebase/firebase_options.template.dart | sed \
+  -e "s,FIREBASE_CI_USER_EMAIL,${FIREBASE_CI_USER_EMAIL}," \
+  -e "s,FIREBASE_CI_USER_PASSWORD,${FIREBASE_CI_USER_PASSWORD}," \
+  -e "s,FIREBASE_ANDROID_API_KEY,${FIREBASE_ANDROID_API_KEY}," \
+  -e "s,FIREBASE_ANDROID_APP_ID,${FIREBASE_ANDROID_APP_ID}," \
+  -e "s,FIREBASE_IOS_API_KEY,${FIREBASE_IOS_API_KEY}," \
+  -e "s,FIREBASE_IOS_APP_ID,${FIREBASE_IOS_APP_ID}," \
+  -e "s,FIREBASE_IOS_CLIENT_ID,${FIREBASE_IOS_CLIENT_ID}," \
+  -e "s,FIREBASE_IOS_BUNDLE_ID,${FIREBASE_IOS_BUNDLE_ID}," \
+  -e "s,FIREBASE_PROJECT_ID,${FIREBASE_PROJECT_ID}," \
+  -e "s,FIREBASE_MESSAGING_SENDER_ID,${FIREBASE_MESSAGING_SENDER_ID}," \
+  -e "s,FIREBASE_DATABASE_URL,${FIREBASE_DATABASE_URL}," \
+  -e "s,FIREBASE_STORAGE_BUCKET,${FIREBASE_STORAGE_BUCKET}," | tee \
+  flutter/lib/firebase/firebase_options.gen.dart >/dev/null
+	dart format flutter/lib/firebase/firebase_options.gen.dart
 
 .PHONY: flutter/backend-list
 flutter/backend-list:

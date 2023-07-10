@@ -80,6 +80,8 @@ you need to replace `squad_eval_mini.tfrecord` by `squad_eval.tfrecord` in the
 1. follow [DeepLab's instruction](https://github.com/tensorflow/models/blob/master/research/deeplab/g3doc/ade20k.md) to download the ADE20K dataset
 2. prepare 512x512 images and and ground truth file with something like the following
 
+   using .jpg inputs:
+
     ```python
     import os
     import tensorflow as tf
@@ -94,19 +96,47 @@ you need to replace `squad_eval_mini.tfrecord` by `squad_eval.tfrecord` in the
     for i in range(1, 2001):
         image_jpeg = ADE20K_PATH+f'images/validation/ADE_val_0000{i:04}.jpg'
         label_png = ADE20K_PATH+f'annotations/validation/ADE_val_0000{i:04}.png'
+
+        image_jpeg_data = tf.io.read_file(image_jpeg)
+        image_tensor = tf.io.decode_jpeg(image_jpeg_data)
+        label_png_data = tf.io.read_file(label_png)
+        label_tensor = tf.io.decode_png(label_png_data)
+        o_image, p_image, p_label = deeplab.input_preprocess.preprocess_image_and_label(image_tensor, label_tensor, 512, 512, 512, 512, is_training=False)
+    
+        target_image_jpeg = f'/tmp/ade20k_512/images/validation/ADE_val_0000{i:04}.jpg'
+        target_label_png = f'/tmp/ade20k_512/annotations/ADE_val_0000{i:04}.png'
+    
+        resized_image = Image.fromarray(tf.reshape(tf.cast(p_image, tf.uint8), [512, 512, 3]).numpy())
+        resized_image.save(target_image_jpeg, quality=100, subsampling=0))
+
+        resized_label = Image.fromarray(tf.reshape(tf.cast(p_label, tf.uint8), [512, 512]).numpy())
+        resized_label.save(target_label_png)
+    ```
+
+   using .png inputs:
+
+    ```python
+    home = os.getenv("HOME")
+    ADE20K_PATH = home + '/tf-models/research/deeplab/datasets/ADE20K/ADEChallengeData2016/'
+
+    for i in range(1, 2001):
+        image_jpeg = ADE20K_PATH+f'images/validation/ADE_val_0000{i:04}.jpg'
+        label_png = ADE20K_PATH+f'annotations/validation/ADE_val_0000{i:04}.png'
         # print(image_jpeg)
         image_jpeg_data = tf.io.read_file(image_jpeg)
         image_tensor = tf.io.decode_jpeg(image_jpeg_data)
         label_png_data = tf.io.read_file(label_png)
-        label_tensor = tf.io.decode_jpeg(label_png_data)
+        label_tensor = tf.io.decode_png(label_png_data)
         o_image, p_image, p_label = deeplab.input_preprocess.preprocess_image_and_label(image_tensor, label_tensor, 512, 512, 512, 512, is_training=False)
-    
-        target_image_jpeg = f'/tmp/ade20k_512/images/validation/ADE_val_0000{i:04}.jpg'
-        target_label_raw = f'/tmp/ade20k_512/annotations/raw/ADE_val_0000{i:04}.raw'
-    
+
+        target_image_png = f'/tmp/ade20k_512/images/validation/ADE_val_0000{i:04}.png'
+        target_label_png = f'/tmp/ade20k_512/annotations/ADE_val_0000{i:04}.png'
+
         resized_image = Image.fromarray(tf.reshape(tf.cast(p_image, tf.uint8), [512, 512, 3]).numpy())
-        resized_image.save(target_image_jpeg)
-        tf.reshape(tf.cast(p_label, tf.uint8), [512, 512]).numpy().tofile(target_label_raw)
+        resized_image.save(target_image_png)
+
+        resized_label = Image.fromarray(tf.reshape(tf.cast(p_label, tf.uint8), [512, 512]).numpy())
+        resized_label.save(target_label_png)
     ```
 
 3. Build command line tool to test performance and accuracy on x86 host

@@ -41,8 +41,6 @@ limitations under the License.
 
 int isSignedStatus = DEFAULT;
 
-enum snpe_runtimes_t { SNPE_DSP = 0, SNPE_AIP = 1, SNPE_GPU = 2, SNPE_CPU = 3 };
-
 static size_t calcSizeFromDims(const size_t rank, const size_t *dims) {
   if (rank == 0) return 0;
   size_t size = 1;
@@ -97,6 +95,28 @@ static Snpe_TensorShape_Handle_t calcStrides(
   Snpe_TensorShape_Handle_t tensorShapeHandle = Snpe_TensorShape_CreateDimsSize(
       strides.data(), Snpe_TensorShape_Rank(dimsHandle));
   return tensorShapeHandle;
+}
+
+bool QTIBackendHelper::IsRuntimeAvailable(const snpe_runtimes_t delegate) {
+  Snpe_Runtime_t runtime;
+
+  switch (delegate) {
+    case SNPE_DSP:
+      runtime = SNPE_RUNTIME_DSP;
+      break;
+    case SNPE_GPU:
+      runtime = SNPE_RUNTIME_GPU;
+      break;
+    case SNPE_CPU:
+      runtime = SNPE_RUNTIME_CPU;
+      break;
+    default:
+      LOG(ERROR) << "runtime not supported";
+      break;
+  }
+
+  return Snpe_Util_IsRuntimeAvailableCheckOption(
+      runtime, SNPE_RUNTIME_CHECK_OPTION_UNSIGNEDPD_CHECK);
 }
 
 static Snpe_Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {

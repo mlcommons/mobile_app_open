@@ -45,6 +45,8 @@ class psnpe_handler {
   ~psnpe_handler() { Snpe_PSNPE_Delete(psnpeHandle); }
 };
 
+enum snpe_runtimes_t { SNPE_DSP = 0, SNPE_AIP = 1, SNPE_GPU = 2, SNPE_CPU = 3 };
+
 class QTIBackendHelper {
  private:
   Snpe_RuntimeList_Handle_t inputRuntimeListHandle;
@@ -102,6 +104,8 @@ class QTIBackendHelper {
   void get_data_formats();
   void set_runtime_config();
   std::string get_snpe_version();
+
+  static bool IsRuntimeAvailable(const snpe_runtimes_t delegate);
 
   QTIBackendHelper()
       : inputRuntimeListHandle(Snpe_RuntimeList_Create()),

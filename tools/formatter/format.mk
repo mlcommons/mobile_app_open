@@ -22,6 +22,10 @@ format/dart: format/dart/pub-get
 	cd flutter_common && ${_start_args} dart run import_sorter:main
 	dart format flutter flutter_common
 
+.PHONY: format/swift
+format/swift:
+	git ls-files -z | grep --null-data "\.swift$$" | xargs --null --no-run-if-empty swift-format format --in-place
+
 .PHONY: format/ts
 format/ts:
 	@echo "No typescripts files to format"
@@ -59,6 +63,10 @@ lint/dart: format/dart/pub-get
 .PHONY: lint/yaml
 lint/yaml:
 	git ls-files -z | grep --null-data "\.yml$$\|\.yaml$$" | xargs --null --no-run-if-empty yamllint -c tools/formatter/configs/yamllint.yml
+
+.PHONY: lint/swift
+lint/swift:
+	git ls-files -z | grep --null-data "\.swift$$" | xargs --null --no-run-if-empty swift-format lint --strict
 
 .PHONY: lint/ts
 lint/ts:

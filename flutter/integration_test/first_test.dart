@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
+import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
@@ -42,27 +43,32 @@ void main() {
     });
 
     testWidgets('check results', (WidgetTester tester) async {
-      final extendedResults = await obtainResult();
-      printResults(extendedResults);
-      checkTasks(extendedResults);
+      final extendedResult = await obtainResult();
+      printResults(extendedResult);
+      checkTasks(extendedResult);
+    });
+
+    testWidgets('upload results', (WidgetTester tester) async {
+      final extendedResult = await obtainResult();
+      await uploadResult(extendedResult);
     });
   });
 }
 
-void checkTasks(ExtendedResult extendedResults) {
-  final length = extendedResults.results.length;
+void checkTasks(ExtendedResult extendedResult) {
+  final length = extendedResult.results.length;
   const expectedTasksCount = 6;
 
   expect(length, expectedTasksCount, reason: 'tasks count does not match');
 
-  for (final benchmarkResult in extendedResults.results) {
+  for (final benchmarkResult in extendedResult.results) {
     print('checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
     checkAccuracy(benchmarkResult);
     if (enablePerfTest) {
-      checkThroughput(benchmarkResult, extendedResults.environmentInfo);
+      checkThroughput(benchmarkResult, extendedResult.environmentInfo);
     }
   }
 }
@@ -174,4 +180,13 @@ void checkThroughput(
     lessThanOrEqualTo(expectedValue.max),
     reason: 'throughput for [$tag] is too high',
   );
+}
+
+Future<void> uploadResult(ExtendedResult result) async {
+  if (FirebaseManager.enabled) {
+    await FirebaseManager.instance.initialize();
+    await FirebaseManager.instance.uploadResult(result);
+  } else {
+    print('Firebase is disabled, skipping upload');
+  }
 }

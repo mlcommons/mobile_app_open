@@ -43,7 +43,7 @@ ADE20K::ADE20K(Backend *backend, const std::string &image_dir,
   }
 
   // Finds all images under image_dir.
-  std::unordered_set<std::string> exts{".rgb8", ".jpg", ".jpeg"};
+  std::unordered_set<std::string> exts{".rgb8", ".jpg", ".jpeg", ".png"};
   image_list_ = GetSortedFileNames(image_dir, exts);
   if (image_list_.empty()) {
     LOG(FATAL) << "Failed to list all the image files in provided path";
@@ -53,7 +53,7 @@ ADE20K::ADE20K(Backend *backend, const std::string &image_dir,
       std::vector<std::vector<uint8_t, BackendAllocator<uint8_t>> *>>(
       image_list_.size());
   // Finds all ground truth files under ground_truth_dir.
-  std::unordered_set<std::string> gt_exts{".raw"};
+  std::unordered_set<std::string> gt_exts{".png"};
   ground_truth_list_ = GetSortedFileNames(ground_truth_dir, gt_exts);
   if (ground_truth_list_.empty()) {
     LOG(WARNING)
@@ -69,6 +69,15 @@ ADE20K::ADE20K(Backend *backend, const std::string &image_dir,
       new tflite::evaluation::ImagePreprocessingStage(builder.build()));
   if (preprocessing_stage_->Init() != kTfLiteOk) {
     LOG(FATAL) << "Failed to init preprocessing stage";
+  }
+
+  // Always use uint8_t for ground truth image
+  tflite::evaluation::ImagePreprocessingConfigBuilder gt_builder("ground_truth",
+                                                                 kTfLiteUInt8);
+  gt_preprocessing_stage_.reset(
+      new tflite::evaluation::ImagePreprocessingStage(gt_builder.build()));
+  if (gt_preprocessing_stage_->Init() != kTfLiteOk) {
+    LOG(FATAL) << "Failed to init gt preprocessing stage";
   }
 
   counted_ = std::vector<bool>(image_list_.size(), false);
@@ -127,10 +136,13 @@ std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
 
   if (!counted_[sample_idx]) {
     std::string filename = ground_truth_list_.at(sample_idx);
-    std::ifstream stream(filename, std::ios::in | std::ios::binary);
-    std::vector<uint8_t> ground_truth_vector(
-        (std::istreambuf_iterator<char>(stream)),
-        std::istreambuf_iterator<char>());
+    gt_preprocessing_stage_->SetImagePath(&filename);
+    if (gt_preprocessing_stage_->Run() != kTfLiteOk) {
+      LOG(FATAL) << "Failed to load ground truth image " << filename;
+    }
+
+    auto ground_truth_vector =
+        (uint8_t *)gt_preprocessing_stage_->GetPreprocessedImageData();
 
     float *outputFloat = reinterpret_cast<float *>(outputs[0]);
     int32_t *outputInt = reinterpret_cast<int32_t *>(outputs[0]);

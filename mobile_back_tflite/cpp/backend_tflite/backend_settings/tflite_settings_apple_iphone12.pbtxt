@@ -1,0 +1,34 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator_name: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+    model_checksum: "66bb4eba50987221608f8487ed405794"
+    batch_size: 8
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+    model_checksum: "66bb4eba50987221608f8487ed405794"
+    batch_size: 8
+  }
+  delegate_selected: "Core ML"
+}
+
+common_setting {
+  id: "shards_num"
+  name: "Number of threads for inference"
+  value {
+    value: "4"
+    name: "4"
+  }
+}

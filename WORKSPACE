@@ -23,6 +23,10 @@ load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependen
 
 apple_support_dependencies()
 
+load("@build_bazel_rules_swift//swift:repositories.bzl", "swift_rules_dependencies")
+
+swift_rules_dependencies()
+
 # This lib must be named exactly "cpuinfo".
 # This name is used by org_tensorflow lib.
 # When we use any different name, compilation may fail
@@ -53,8 +57,10 @@ http_archive(
     name = "org_tensorflow",
     patch_args = ["-p1"],
     patches = [
-        # Add patch for adding png in tflite evaluation code
+        # Add patches for adding png in tflite evaluation code
         "//:flutter/third_party/enable-png-in-tensorflow-lite-tools-evaluation.patch",
+        "//:flutter/third_party/png-with-number-of-channels-detected.patch",
+        "//:flutter/third_party/use_unsigned_char.patch",
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",

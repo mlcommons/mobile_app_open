@@ -18,6 +18,7 @@ limitations under the License.
 #include <iostream>
 #include <thread>
 
+#include "qti_backend_helper.h"
 #include "tensorflow/core/platform/logging.h"
 #ifndef __ANDROID__
 #include <Windows.h>
@@ -73,6 +74,10 @@ std::map<uint32_t, SocInfo> socDetails =
             {435, SocInfo(2, 0, 0, 0, true, qti_settings_sd8cxg3, "SD8cxG3", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, false)},
+            {UNSUPPORTED_SOC_ID,
+             SocInfo(2, 0, 0, 0, true, qti_settings_default_dsp, "Snapdragon",
+                     1, std::vector<int>({0, 1, 2, 3}),
+                     std::vector<int>({4, 5, 6, 7}), 8, false)},
         })
         .m_soc_details;
 
@@ -166,6 +171,15 @@ void Socs::soc_info_init() {
   LOG(INFO) << "Soc ID: " << soc_id;
   if (socDetails.find(soc_id) != socDetails.end()) {
     m_soc_info = socDetails.find(soc_id)->second;
+    if (soc_id == UNSUPPORTED_SOC_ID) {
+      if (QTIBackendHelper::IsRuntimeAvailable(SNPE_DSP)) {
+        m_soc_info.m_settings = qti_settings_default_dsp;
+      } else if (QTIBackendHelper::IsRuntimeAvailable(SNPE_GPU)) {
+        m_soc_info.m_settings = qti_settings_default_gpu;
+      } else {
+        m_soc_info.m_settings = qti_settings_default_cpu;
+      }
+    }
   } else {
     m_soc_info = unsupportedSoc;
   }

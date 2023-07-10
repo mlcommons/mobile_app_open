@@ -48,18 +48,28 @@ Include a license at the top of new files.
 
 #### Coding styles
 
-The code was originally contributed by Google so it conforms to the
+To ensure code quality and maintain consistency, it's important to run a linting tool before pushing any changes to the codebase.
+This helps identify and fix any syntax or style issues that may have been introduced during development.
+To check for errors using a linter, run the command `make lint`.
+If there are any errors or warnings reported by the linter, you should address them before committing and pushing your changes.
+
+The code was originally contributed by Google, so it conforms to the
 [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) and
-[Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).  
-For makefiles we follow the [standard makefile code-style](https://style-guides.readthedocs.io/en/latest/makefile.html).  
-We use the default code style in bazel and dart files, enforced by `buildifier` and `dart format` respectively.  
-For Markdown files we use [markdownlint](https://github.com/DavidAnson/markdownlint).
+[Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
+
+* For makefiles we follow the [standard makefile code-style](https://style-guides.readthedocs.io/en/latest/makefile.html).
+* We use the default code style in bazel and dart files, enforced by `buildifier` and `dart format` respectively.
+* For Markdown files we use [markdownlint](https://github.com/DavidAnson/markdownlint).
+* For Swift files we use [swift-format](https://github.com/apple/swift-format).
 
 From the root directory you can run the command `make format`
-to format all files or `make format/<bazel|java|clang|dart>` to format only certain files in the directory.
+to format all files or `make format/<bazel|clang|dart|swift>` to format only certain files in the directory.
 See [format.mk](tools/formatter/format.mk) for more commands.
 
 Running `make format` requires you to have all the tools installed locally on your computer.
 For your convenience we created a Docker image with all the tools needed.
-Running `make docker/format` will format the code files.
-Running `make docker/lint` will print linter's errors and warnings without changing the files.
+
+* Running `make docker/format` will format all the source files inplace.
+* Running `make docker/lint` will print linter's errors and warnings without changing the files.
+* Running `make docker/format/--` will attach to the Docker container shell and let you run individual
+  `make format/<bazel|clang|dart|swift>` command.
