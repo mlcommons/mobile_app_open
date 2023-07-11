@@ -11,9 +11,9 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
+import 'package:mlperfbench/ui/home/app_drawer.dart';
+import 'package:mlperfbench/ui/home/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/icons.dart';
-import 'package:mlperfbench/ui/run/app_drawer.dart';
-import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
 
 class MainKeys {
   // list of widget keys that need to be accessed in the test code
