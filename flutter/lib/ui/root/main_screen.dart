@@ -13,7 +13,6 @@ import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/icons.dart';
 import 'package:mlperfbench/ui/root/resource_error_screen.dart';
-import 'package:mlperfbench/ui/run/app_bar.dart';
 import 'package:mlperfbench/ui/run/app_drawer.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/run/progress_screen.dart';
@@ -30,23 +29,17 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     if (state.taskConfigFailedToLoad) {
       return const ResourceErrorScreen();
     }
 
-    PreferredSizeWidget? appBar;
-
     switch (state.state) {
       case BenchmarkStateEnum.downloading:
       case BenchmarkStateEnum.waiting:
-        appBar = MainScreenAppBar.buildAppBar(
-            stringResources.mainScreenTitle, context, true);
         break;
       case BenchmarkStateEnum.aborting:
-        appBar = MainScreenAppBar.buildAppBar(
-            stringResources.mainScreenTitle, context, false);
         break;
       case BenchmarkStateEnum.running:
         return const ProgressScreen();
@@ -55,7 +48,7 @@ class MyHomePage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: appBar,
+      appBar: AppBar(title: Text(l10n.mainScreenTitle)),
       drawer: const AppDrawer(),
       body: SafeArea(
         child: Column(
@@ -65,7 +58,7 @@ class MyHomePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(30),
               child: Text(
-                stringResources.mainScreenMeasureTitle,
+                l10n.mainScreenMeasureTitle,
                 style: const TextStyle(
                   fontSize: 16,
                   color: AppColors.darkText,
