@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mlperfbench/localizations/app_localizations.dart';
 
+import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/config/config_screen.dart';
 import 'package:mlperfbench/ui/history/result_list_screen.dart';
+import 'package:mlperfbench/ui/settings/about_screen.dart';
 import 'package:mlperfbench/ui/settings/settings_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -73,6 +74,11 @@ class AppDrawer extends StatelessWidget {
             title: Text(l10n.menuAbout),
             onTap: () {
               Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutScreen(),
+                  ));
             },
           ),
         ],
