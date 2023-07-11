@@ -15,7 +15,7 @@ import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/root/app.dart';
 import 'package:mlperfbench/ui/root/exception_screen.dart';
-import 'package:mlperfbench/ui/root/main_screen.dart';
+import 'package:mlperfbench/ui/root/home.dart';
 import 'package:mlperfbench/ui/root/unsupported_device_screen.dart';
 
 Future<void> main() async {
@@ -55,7 +55,7 @@ Future<void> launchUi() async {
         ChangeNotifierProvider.value(value: benchmarkState),
         ChangeNotifierProvider.value(value: store)
       ],
-      child: const MyApp(home: MyHomePage()),
+      child: const MyApp(home: MyHome()),
     ),
   );
 }

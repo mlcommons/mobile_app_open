@@ -3,6 +3,7 @@
 
   "unknown": "Unknown",
 
+  "menuHome": "MLPerf Mobile",
   "menuHistory": "History",
   "menuBenchmarkConfiguration": "Benchmark Configuration",
   "menuSettings": "Settings",
@@ -12,7 +13,6 @@
   "unsupportedBackendError": "Error message",
   "unsupportedTryAnotherDevice": "Please try the app on another device",
 
-  "mainScreenTitle": "Measure",
   "mainScreenLoading": "Loading content...",
   "mainScreenGo": "GO",
   "mainScreenMeasureTitle": "Measure your device performance for:",

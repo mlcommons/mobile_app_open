@@ -12,43 +12,24 @@ import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/icons.dart';
-import 'package:mlperfbench/ui/root/resource_error_screen.dart';
 import 'package:mlperfbench/ui/run/app_drawer.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
-import 'package:mlperfbench/ui/run/progress_screen.dart';
-import 'package:mlperfbench/ui/run/result_screen.dart';
 
 class MainKeys {
   // list of widget keys that need to be accessed in the test code
   static const String goButton = 'goButton';
 }
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class StartScreen extends StatelessWidget {
+  const StartScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final l10n = AppLocalizations.of(context);
 
-    if (state.taskConfigFailedToLoad) {
-      return const ResourceErrorScreen();
-    }
-
-    switch (state.state) {
-      case BenchmarkStateEnum.downloading:
-      case BenchmarkStateEnum.waiting:
-        break;
-      case BenchmarkStateEnum.aborting:
-        break;
-      case BenchmarkStateEnum.running:
-        return const ProgressScreen();
-      case BenchmarkStateEnum.done:
-        return const ResultScreen();
-    }
-
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.mainScreenTitle)),
+      appBar: AppBar(title: Text(l10n.menuHome)),
       drawer: const AppDrawer(),
       body: SafeArea(
         child: Column(

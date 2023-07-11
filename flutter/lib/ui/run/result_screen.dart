@@ -12,12 +12,12 @@ import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/icons.dart' as app_icons;
 import 'package:mlperfbench/ui/page_constraints.dart';
-import 'package:mlperfbench/ui/root/main_screen.dart';
 import 'package:mlperfbench/ui/run/app_drawer.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/run/progress_screen.dart';
 import 'package:mlperfbench/ui/run/result_circle.dart';
 import 'package:mlperfbench/ui/run/share_button.dart';
+import 'package:mlperfbench/ui/run/start_screen.dart';
 
 enum _ScreenMode { performance, accuracy }
 
