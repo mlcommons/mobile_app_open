@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mlperfbench/ui/home/start_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/ui/root/main_screen.dart';
 import 'package:mlperfbench/ui/home/result_screen.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench/resources/result_manager.dart' as result_manager;
