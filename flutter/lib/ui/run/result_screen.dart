@@ -14,6 +14,7 @@ import 'package:mlperfbench/ui/icons.dart' as app_icons;
 import 'package:mlperfbench/ui/page_constraints.dart';
 import 'package:mlperfbench/ui/root/main_screen.dart';
 import 'package:mlperfbench/ui/run/app_bar.dart';
+import 'package:mlperfbench/ui/run/app_drawer.dart';
 import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/run/progress_screen.dart';
 import 'package:mlperfbench/ui/run/result_circle.dart';
@@ -405,6 +406,7 @@ class _ResultScreenState extends State<ResultScreen>
 
     return Scaffold(
       appBar: MainScreenAppBar.buildAppBar(title, context, true),
+      drawer: const AppDrawer(),
       body: LayoutBuilder(
         builder: (context, constraint) {
           return SingleChildScrollView(
