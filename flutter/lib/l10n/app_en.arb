@@ -3,6 +3,11 @@
 
   "unknown": "Unknown",
 
+  "menuHistory": "History",
+  "menuBenchmarkConfiguration": "Benchmark Configuration",
+  "menuSettings": "Settings",
+  "menuAbout": "About",
+
   "unsupportedMainMessage": "This device is not yet supported.",
   "unsupportedBackendError": "Error message",
   "unsupportedTryAnotherDevice": "Please try the app on another device",
@@ -12,8 +17,6 @@
   "mainScreenGo": "GO",
   "mainScreenMeasureTitle": "Measure your device performance for:",
   "mainScreenWaitFinish": "Wait for benchmark to finish",
-
-  "benchConfigTitle": "Configuration",
 
   "progressMeasuring": "Measuring...",
   "progressDontClose": "Don't close the app!",
@@ -39,7 +42,6 @@
   "uploadFail": "Error uploading results",
   "runFail": "Error while running benchmarks",
 
-  "settingsTitle": "Settings",
   "settingsOffline": "Offline mode",
   "settingsOfflineSubtitle": "In offline mode, a warning will be raised if the app tries to use internet resources.",
   "settingsRunMode": "Run mode",
@@ -116,7 +118,6 @@
   "listScreenOnlineDisabled": "Online results are unavailable",
   "listScreenNoResultsFound": "No results found",
 
-  "historyListTitle": "Past results",
   "historyListSelectionCancel": "Cancel",
   "historyListSelectionEnable": "Enable selection",
   "historyListSelectionSelectAll": "Select all",

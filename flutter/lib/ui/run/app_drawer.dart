@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
 
 import 'package:mlperfbench/ui/config/config_screen.dart';
 import 'package:mlperfbench/ui/history/result_list_screen.dart';
@@ -9,6 +10,7 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Drawer(
       // Add a ListView to the drawer. This ensures the user can scroll
       // through the options in the drawer if there isn't enough vertical
@@ -29,7 +31,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.access_time),
-            title: const Text('History'),
+            title: Text(l10n.menuHistory),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -42,7 +44,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.tune),
-            title: const Text('Configuration'),
+            title: Text(l10n.menuBenchmarkConfiguration),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -55,7 +57,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
+            title: Text(l10n.menuSettings),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -67,8 +69,8 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.question_mark),
-            title: const Text('Help'),
+            leading: const Icon(Icons.info),
+            title: Text(l10n.menuAbout),
             onTap: () {
               Navigator.pop(context);
             },

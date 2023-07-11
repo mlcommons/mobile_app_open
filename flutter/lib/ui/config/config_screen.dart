@@ -27,7 +27,7 @@ class _ConfigScreen extends State<ConfigScreen> {
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
     pictureEdgeSize = 0.1 * MediaQuery.of(context).size.width;
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
     final childrenList = <Widget>[];
 
     for (var benchmark in state.benchmarks) {
@@ -36,11 +36,7 @@ class _ConfigScreen extends State<ConfigScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          stringResources.benchConfigTitle,
-        ),
-      ),
+      appBar: AppBar(title: Text(l10n.menuBenchmarkConfiguration)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(8, 20, 8, 20),
         children: childrenList,
