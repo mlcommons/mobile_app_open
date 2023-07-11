@@ -65,7 +65,7 @@ class _ResultScreenState extends State<ResultScreen>
   Column _createListOfBenchmarkResultBottomWidgets(
       BuildContext context, BenchmarkState state) {
     final list = <Widget>[];
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
     final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
     for (final benchmark in state.benchmarks) {
@@ -97,10 +97,14 @@ class _ResultScreenState extends State<ResultScreen>
       } else {
         continue;
       }
-      final backendName = benchmark.performanceModeResult?.backendName ?? '';
-      final acceleratorName =
-          benchmark.performanceModeResult?.acceleratorName ?? '';
-
+      final perfResult = benchmark.performanceModeResult;
+      var backendInfo = l10n.na;
+      if (perfResult != null) {
+        final backendName = perfResult.backendName;
+        final delegateName = perfResult.delegateName;
+        final acceleratorName = perfResult.acceleratorName;
+        backendInfo = '$backendName | $delegateName | $acceleratorName';
+      }
       var rowChildren = <Widget>[];
       rowChildren.add(Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,14 +112,14 @@ class _ResultScreenState extends State<ResultScreen>
         children: [
           Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text('$backendName | $acceleratorName')),
+              child: Text(backendInfo)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Column(
                 children: [
                   Text(
-                    resultText ?? 'N/A',
+                    resultText ?? l10n.na,
                     style: TextStyle(
                       color: resultIsValid
                           ? AppColors.darkText
@@ -145,7 +149,7 @@ class _ResultScreenState extends State<ResultScreen>
       if (benchmark.info.isOffline) {
         String batchSize;
         if (resultText == null) {
-          batchSize = 'N/A';
+          batchSize = l10n.na;
         } else {
           batchSize = benchmarkResult?.batchSize.toString() ?? '';
         }
@@ -154,8 +158,7 @@ class _ResultScreenState extends State<ResultScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              stringResources.resultsBatchSize
-                  .replaceAll('<batchSize>', batchSize),
+              l10n.resultsBatchSize.replaceAll('<batchSize>', batchSize),
               style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 14.0,
@@ -199,6 +202,7 @@ class _ResultScreenState extends State<ResultScreen>
 
   List<Widget> _createListOfBenchmarkResultTopWidgets(
       BenchmarkState state, BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final widgets = state.benchmarks.map((benchmark) {
       final result = _screenMode == _ScreenMode.performance
           ? benchmark.performanceModeResult
@@ -228,7 +232,7 @@ class _ResultScreenState extends State<ResultScreen>
             ),
           ),
           Text(
-            text ?? 'N/A',
+            text ?? l10n.na,
             style: TextStyle(
                 fontSize: 32.0,
                 color: resultIsValid
