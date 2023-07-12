@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/ui/history/result_details_screen.dart';
 import 'package:mlperfbench/ui/history/result_filter_screen.dart';
-import 'package:mlperfbench/ui/history/result_item.dart';
 import 'package:mlperfbench/ui/history/result_list_item.dart';
-import 'package:mlperfbench/ui/history/results_data_provider.dart';
+import 'package:mlperfbench/ui/history/benchmarks_data_provider.dart';
 import 'package:mlperfbench/ui/history/run_details_screen.dart';
 import 'list_item.dart';
 
@@ -30,9 +27,10 @@ class _ResultListScreenState extends State<ResultListScreen> {
     final l10n = AppLocalizations.of(context);
     final results = state.resourceManager.resultManager.results;
     final filter = state.resourceManager.resultManager.resultFilter;
-    final resultsDataProvider = ResultsDataProvider(results, filter);
+    final sort = state.resourceManager.resultManager.resultSort;
+    final resultsDataProvider = BenchmarksDataProvider(results);
 
-    List<ResultItem> resultItems = resultsDataProvider.resultItems();
+    List<BenchmarkExportResult> resultItems = resultsDataProvider.resultItems(filter, sort);
 
     List<ListItem> itemsList = _listItems(resultItems);
 
@@ -66,12 +64,9 @@ class _ResultListScreenState extends State<ResultListScreen> {
     );
   }
 
-  List<ListItem> _listItems(List<ResultItem> resultItems) {
+  List<ListItem> _listItems(List<BenchmarkExportResult> resultItems) {
     return resultItems.map((resultItem) {
-      if (resultItem.item is BenchmarkExportResult) {
-        return _benchmarkListItem(resultItem.item as BenchmarkExportResult);
-      }
-      return _resultListItem(resultItem.item as ExtendedResult);
+      return _benchmarkListItem(resultItem);
     }).toList();
   }
 
@@ -81,17 +76,6 @@ class _ResultListScreenState extends State<ResultListScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => RunDetailsScreen(result: item),
-        ),
-      ).then((value) => setState(() {}));
-    });
-  }
-
-  ListItem _resultListItem(ExtendedResult item) {
-    return ExtendedResultListItem(item, () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DetailsScreen(result: item),
         ),
       ).then((value) => setState(() {}));
     });

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/result_filter.dart';
 import 'package:mlperfbench_common/data/result_sort.dart';
+import 'package:mlperfbench_common/data/sort_by_item.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -29,6 +30,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     l10n = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
     final filter = state.resourceManager.resultManager.resultFilter;
+    final sort = state.resourceManager.resultManager.resultSort;
 
     return Scaffold(
         appBar: AppBar(
@@ -54,7 +56,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
               const SizedBox(height: 12),
               _socFilter(filter),
               const SizedBox(height: 12),
-              _sortBy(filter),
+              _sortBy(sort),
             ],
           ),
         ));
@@ -191,10 +193,10 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     );
   }
 
-  Widget _sortBy(ResultFilter filter) {
+  Widget _sortBy(ResultSort sort) {
     List<SortByItem> sortItems = SortBy.options(l10n);
     SortByItem? selectedSortItem = sortItems.firstWhereOrNull(
-        (SortByItem sortItem) => sortItem.value == filter.sortBy);
+        (SortByItem sortItem) => sortItem.value == sort.sortBy);
     return _makeDropDownFilter(
         labelText: l10n.historySortBy,
         choices: sortItems
@@ -204,7 +206,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
             ? DropdownOption(selectedSortItem.value, selectedSortItem.label)
             : null,
         onChanged: (option) => setState(() {
-              filter.sortBy = option?.value as SortByValues;
+              sort.sortBy = option?.value as SortByValues;
             }));
   }
 

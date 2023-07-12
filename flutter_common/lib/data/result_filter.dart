@@ -3,7 +3,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:mlperfbench_common/constants.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/result_sort.dart';
 
 part 'result_filter.g.dart';
 
@@ -17,7 +16,6 @@ class ResultFilter {
   String? manufacturer;
   String? soc;
   String? benchmarkId;
-  SortByValues? sortBy;
 
   ResultFilter();
 

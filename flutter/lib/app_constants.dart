@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/data/result_sort.dart';
+import 'package:mlperfbench_common/data/sort_by_item.dart';
 
 import 'localizations/app_localizations.dart';
 
@@ -111,13 +111,6 @@ class BackendId {
     qti,
     apple,
   ];
-}
-
-class SortByItem {
-  String label;
-  SortByValues value;
-
-  SortByItem(this.label, this.value);
 }
 
 class SortBy {
