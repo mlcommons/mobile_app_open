@@ -109,6 +109,7 @@ class ResultManager {
       accuracy2: runResult.accuracy2,
       backendName: export.backendInfo.backendName,
       acceleratorName: export.backendInfo.acceleratorName,
+      delegateName: export.backendSettings.delegate,
       batchSize: export.backendSettings.batchSize,
       validity: runResult.loadgenInfo?.validity ?? false,
     );

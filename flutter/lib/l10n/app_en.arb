@@ -2,6 +2,7 @@
   "@@locale": "en",
 
   "unknown": "Unknown",
+  "na": "N/A",
 
   "unsupportedMainMessage": "This device is not yet supported.",
   "unsupportedBackendError": "Error message",
@@ -28,10 +29,12 @@
   "resultsTitleDetails": "Detailed Results",
   "resultsButtonTestAgain": "Test Again",
   "resultsButtonShare": "Share This Result",
-  "resultsButtonUpload": "Upload results",
-  "resultsShareSubject": "Experiment results",
   "resultsNotAvailable": "N/A",
   "resultsBatchSize": "Batches: <batchSize>",
+
+  "shareButtonMLCommons": "Share with MLCommons",
+  "shareButtonOther": "Share with others",
+  "shareButtonOtherSubject": "Benchmark result",
 
   "uploadSuccess": "Results uploaded successfully",
   "uploadFail": "Error uploading results",

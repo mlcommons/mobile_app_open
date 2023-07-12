@@ -12,6 +12,7 @@ Refer to the [root README file](../README.md) for general overview of the repo.
 * [Environment setup for Android builds](./environment-setup/env-setup-android.md)
 * [Environment setup for iOS builds](./environment-setup/env-setup-ios.md)
 * [Environment setup for Windows builds](./environment-setup/env-setup-windows.md)
+* [Environment setup for Firebase](./environment-setup/env-setup-firebase.md)
 * [Build and Run the app](./build-and-run.md)
 * [Adding support for a new custom backend](./adding-custom-backend.md)
 * [Using custom benchmark configuration](./custom-tasks.md)
