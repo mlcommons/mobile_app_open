@@ -5,8 +5,7 @@ class ResultSort {
   SortByValues? sortBy;
   ResultSort();
 
-  List<BenchmarkExportResult> apply(
-      List<BenchmarkExportResult> items) {
+  List<BenchmarkExportResult> apply(List<BenchmarkExportResult> items) {
     List<BenchmarkExportResult> sortedItems =
         List<BenchmarkExportResult>.from(items);
     switch (sortBy) {
@@ -14,7 +13,7 @@ class ResultSort {
         sortedItems.sort((a, b) => sortByDates(a, b, true));
         break;
       case SortByValues.dateDesc:
-        sortedItems.sort((a, b) => sortByDates(b, a, false));
+        sortedItems.sort((a, b) => sortByDates(a, b, false));
         break;
       case SortByValues.taskThroughputDesc:
         sortedItems.sort((a, b) => sortByTaskThroughput(a, b));
@@ -26,8 +25,12 @@ class ResultSort {
 }
 
 int sortByDates(BenchmarkExportResult a, BenchmarkExportResult b, bool isAsc) {
-  DateTime aDateTime = a.performanceRun?.startDatetime ?? a.accuracyRun?.startDatetime ?? DateTime.now();
-  DateTime bDateTime = b.performanceRun?.startDatetime ?? b.accuracyRun?.startDatetime ?? DateTime.now();
+  DateTime aDateTime = a.performanceRun?.startDatetime ??
+      a.accuracyRun?.startDatetime ??
+      DateTime.now();
+  DateTime bDateTime = b.performanceRun?.startDatetime ??
+      b.accuracyRun?.startDatetime ??
+      DateTime.now();
 
   if (isAsc) {
     return aDateTime.compareTo(bDateTime);

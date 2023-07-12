@@ -8,8 +8,10 @@ class BenchmarksDataProvider {
 
   BenchmarksDataProvider(this.results);
 
-  List<BenchmarkExportResult> resultItems(ResultFilter filter, ResultSort sort) {
-    final benchmarks = results.where((result) => filter.match(result))
+  List<BenchmarkExportResult> resultItems(
+      ResultFilter filter, ResultSort sort) {
+    final benchmarks = results
+        .where((result) => filter.match(result))
         .expand((item) => item.results)
         .toList();
     return sort.apply(benchmarks);

@@ -30,7 +30,8 @@ class _ResultListScreenState extends State<ResultListScreen> {
     final sort = state.resourceManager.resultManager.resultSort;
     final resultsDataProvider = BenchmarksDataProvider(results);
 
-    List<BenchmarkExportResult> resultItems = resultsDataProvider.resultItems(filter, sort);
+    List<BenchmarkExportResult> resultItems =
+        resultsDataProvider.resultItems(filter, sort);
 
     List<ListItem> itemsList = _listItems(resultItems);
 
