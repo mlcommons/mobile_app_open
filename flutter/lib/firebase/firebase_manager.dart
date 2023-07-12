@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -50,5 +52,21 @@ class FirebaseManager {
     final uid = auth.user.uid;
     final jsonString = jsonToStringIndented(result);
     await storage.upload(jsonString, uid, fileName);
+  }
+
+  Future<List<ExtendedResult>> downloadResults() async {
+    final uid = auth.user.uid;
+    final fileNames = await storage.list(uid);
+    List<ExtendedResult> results = [];
+    for (final fileName in fileNames) {
+      print('fileName: $fileName');
+      final content = await storage.download(uid, fileName);
+      final json = jsonDecode(content) as Map<String, dynamic>;
+      final result = ExtendedResult.fromJson(json);
+      print('result: ${result.meta.uuid}');
+      print('result: ${result.results.first.benchmarkId}');
+      results.add(result);
+    }
+    return results;
   }
 }
