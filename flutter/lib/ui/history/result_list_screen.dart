@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench_common/data/benchmarks_data_provider.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/ui/history/benchmarks_data_provider.dart';
 import 'package:mlperfbench/ui/history/result_filter_screen.dart';
 import 'package:mlperfbench/ui/history/result_list_item.dart';
 import 'package:mlperfbench/ui/history/run_details_screen.dart';
