@@ -63,6 +63,6 @@ class BenchmarkListItem implements ListItem {
   }
 
   String itemAdditionalInfo() {
-    return '(Backend: ${item.backendInfo.backendName} | Accelerator: ${item.backendInfo.acceleratorName} | Delegate: ${item.backendSettings.delegate})';
+    return '(Backend: ${item.backendInfo.backendName}, Accelerator: ${item.backendInfo.acceleratorName}, Delegate: ${item.backendSettings.delegate})';
   }
 }

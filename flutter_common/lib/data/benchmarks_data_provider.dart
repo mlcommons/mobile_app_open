@@ -13,6 +13,7 @@ class BenchmarksDataProvider {
     final benchmarks = results
         .where((result) => filter.match(result))
         .expand((item) => item.results)
+        .where((benchmark) => filter.matchBenchmark(benchmark))
         .toList();
     return sort.apply(benchmarks);
   }
