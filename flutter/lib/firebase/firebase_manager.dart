@@ -66,10 +66,10 @@ class FirebaseManager {
         print('Exclude local existed result [$fileName] from download');
         continue;
       }
+      print('Download online result [$fileName]');
       final content = await storage.download(uid, fileName);
       final json = jsonDecode(content) as Map<String, dynamic>;
       final result = ExtendedResult.fromJson(json);
-      print('Downloaded result with uuid: ${result.meta.uuid}');
       results.add(result);
     }
     return results;
