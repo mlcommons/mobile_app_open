@@ -156,26 +156,25 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   static Future<BenchmarkState> create(Store store) async {
-    final result = BenchmarkState._(store, await BridgeIsolate.create());
-
-    await result.resourceManager.initSystemPaths();
-    result.configManager = ConfigManager(
-        result.resourceManager.applicationDirectory, result.resourceManager);
+    final state = BenchmarkState._(store, await BridgeIsolate.create());
+    await state.resourceManager.initSystemPaths();
+    state.configManager = ConfigManager(
+        state.resourceManager.applicationDirectory, state.resourceManager);
     try {
-      await result.setTaskConfig(name: store.chosenConfigurationName);
-      result.deferredLoadResources();
+      await state.setTaskConfig(name: store.chosenConfigurationName);
+      state.deferredLoadResources();
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
-      result.error = e;
-      result.stackTrace = trace;
-      result.taskConfigFailedToLoad = true;
+      state.error = e;
+      state.stackTrace = trace;
+      state.taskConfigFailedToLoad = true;
     }
 
-    result.boardDecoder = BoardDecoder();
-    await result.boardDecoder.init();
+    state.boardDecoder = BoardDecoder();
+    await state.boardDecoder.init();
 
-    return result;
+    return state;
   }
 
   /// Reads config but doesn't update resources that depend on config.
