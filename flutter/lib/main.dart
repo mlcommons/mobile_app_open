@@ -43,9 +43,6 @@ Future<void> launchUi() async {
   await BuildInfoHelper.staticInit();
   final store = await Store.create();
   final benchmarkState = await BenchmarkState.create(store);
-  if (FirebaseManager.enabled) {
-    await FirebaseManager.instance.initialize();
-  }
 
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));

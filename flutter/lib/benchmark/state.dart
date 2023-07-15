@@ -14,6 +14,7 @@ import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/build_info.dart';
+import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/resources/validation_helper.dart';
@@ -148,6 +149,15 @@ class BenchmarkState extends ChangeNotifier {
       ),
       needToPurgeCache,
     );
+    if (FirebaseManager.enabled) {
+      await FirebaseManager.instance.initialize();
+      final excluded = resourceManager.resultManager.results
+          .map((e) => e.meta.uuid)
+          .toList();
+      final onlineResults =
+          await FirebaseManager.instance.downloadResults(excluded);
+      resourceManager.resultManager.results.addAll(onlineResults);
+    }
     print('finished loading resources');
     error = null;
     stackTrace = null;

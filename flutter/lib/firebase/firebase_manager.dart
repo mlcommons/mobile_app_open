@@ -48,23 +48,28 @@ class FirebaseManager {
   Future<void> uploadResult(ExtendedResult result) async {
     final DateFormat formatter = DateFormat('yyyy-MM-ddTHH-mm-ss');
     final String datetime = formatter.format(result.meta.creationDate);
+    // Example fileName: 2023-06-06T13-38-01_125ef847-ca9a-45e0-bf36-8fd22f493b8d.json
     final fileName = '${datetime}_${result.meta.uuid}.json';
     final uid = auth.user.uid;
     final jsonString = jsonToStringIndented(result);
     await storage.upload(jsonString, uid, fileName);
   }
 
-  Future<List<ExtendedResult>> downloadResults() async {
+  Future<List<ExtendedResult>> downloadResults(List<String> excluded) async {
     final uid = auth.user.uid;
     final fileNames = await storage.list(uid);
     List<ExtendedResult> results = [];
     for (final fileName in fileNames) {
-      print('fileName: $fileName');
+      // Example fileName: 2023-06-06T13-38-01_125ef847-ca9a-45e0-bf36-8fd22f493b8d.json
+      final resultUuid = fileName.replaceAll('.json', '').split('_').last;
+      if (excluded.contains(resultUuid)) {
+        print('Exclude local existed result [$fileName] from download');
+        continue;
+      }
       final content = await storage.download(uid, fileName);
       final json = jsonDecode(content) as Map<String, dynamic>;
       final result = ExtendedResult.fromJson(json);
-      print('result: ${result.meta.uuid}');
-      print('result: ${result.results.first.benchmarkId}');
+      print('Downloaded result with uuid: ${result.meta.uuid}');
       results.add(result);
     }
     return results;
