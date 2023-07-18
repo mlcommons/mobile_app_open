@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/result_filter.dart';
+import 'package:mlperfbench_common/data/result_sort.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
@@ -24,6 +25,7 @@ class ResultManager {
 
   final List<ExtendedResult> results = [];
   ResultFilter resultFilter = ResultFilter();
+  ResultSort resultSort = ResultSort();
   final List<File> _resultsFiles = [];
   late final Directory _resultsDir;
 
