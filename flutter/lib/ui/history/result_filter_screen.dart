@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/result_filter.dart';
+import 'package:mlperfbench_common/data/result_sort.dart';
+import 'package:mlperfbench_common/data/sort_by_item.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -27,6 +30,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     l10n = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
     final filter = state.resourceManager.resultManager.resultFilter;
+    final sort = state.resourceManager.resultManager.resultSort;
 
     return Scaffold(
         appBar: AppBar(
@@ -51,6 +55,8 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
               _manufacturerFilter(filter),
               const SizedBox(height: 12),
               _socFilter(filter),
+              const SizedBox(height: 12),
+              _sortBy(sort),
             ],
           ),
         ));
@@ -93,30 +99,43 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
   Widget _platformFilter(ResultFilter filter) {
     return _makeDropDownFilter(
         labelText: l10n.historyFilterPlatform,
-        choices: EnvPlatform.values.map((e) => e.name).toList(),
-        value: filter.platform,
-        onChanged: (value) => setState(() {
-              filter.platform = value!;
+        choices: EnvPlatform.values
+            .map((e) => DropdownOption(e.name, e.name))
+            .toList(),
+        value: filter.platform != null
+            ? DropdownOption(filter.platform, filter.platform ?? '')
+            : null,
+        onChanged: (option) => setState(() {
+              filter.platform = option?.value as String;
             }));
   }
 
   Widget _benchmarkIdFilter(ResultFilter filter) {
     return _makeDropDownFilter(
         labelText: l10n.historyFilterBenchmarkID,
-        choices: BenchmarkId.allIds,
-        value: filter.benchmarkId,
-        onChanged: (value) => setState(() {
-              filter.benchmarkId = value!;
+        choices: BenchmarkId.allIds
+            .map((benchmarkId) => DropdownOption(benchmarkId, benchmarkId))
+            .toList(),
+        value: filter.benchmarkId != null
+            ? DropdownOption(filter.benchmarkId, filter.benchmarkId ?? '')
+            : null,
+        onChanged: (option) => setState(() {
+              filter.benchmarkId = option?.value as String;
             }));
   }
 
   Widget _backendNameFilter(ResultFilter filter) {
     return _makeDropDownFilter(
         labelText: l10n.historyFilterBackendID,
-        choices: BackendId.allIds,
-        value: filter.backend,
-        onChanged: (value) => setState(() {
-              filter.backend = value!;
+        choices: BackendId.allIds
+            .map((backendId) => DropdownOption(backendId, backendId))
+            .toList(),
+        value: filter.backend != null
+            ? DropdownOption(
+                filter.backend, filter.backend ?? BackendId.allIds[0])
+            : null,
+        onChanged: (option) => setState(() {
+              filter.backend = option?.value as String;
             }));
   }
 
@@ -174,6 +193,23 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     );
   }
 
+  Widget _sortBy(ResultSort sort) {
+    List<SortByItem> sortItems = SortBy.options(l10n);
+    SortByItem? selectedSortItem = sortItems.firstWhereOrNull(
+        (SortByItem sortItem) => sortItem.value == sort.sortBy);
+    return _makeDropDownFilter(
+        labelText: l10n.historySortBy,
+        choices: sortItems
+            .map((sortItem) => DropdownOption(sortItem.value, sortItem.label))
+            .toList(),
+        value: selectedSortItem != null
+            ? DropdownOption(selectedSortItem.value, selectedSortItem.label)
+            : null,
+        onChanged: (option) => setState(() {
+              sort.sortBy = option?.value as SortByValues;
+            }));
+  }
+
   Widget _clearFilterButton(ResultManager resultManager) {
     return IconButton(
       icon: const Icon(Icons.clear),
@@ -188,13 +224,13 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
 
   Widget _makeDropDownFilter(
       {required String labelText,
-      required String? value,
-      required List<String> choices,
-      required void Function(String?)? onChanged}) {
+      required DropdownOption? value,
+      required List<DropdownOption> choices,
+      required void Function(DropdownOption?)? onChanged}) {
     final items = choices
-        .map((e) => DropdownMenuItem<String>(
+        .map((e) => DropdownMenuItem<DropdownOption>(
               value: e,
-              child: Text(e),
+              child: Text(e.label),
             ))
         .toList();
     return Container(
@@ -205,7 +241,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
           borderRadius: BorderRadius.all(Radius.circular(3.0)),
         ),
       ),
-      child: DropdownButtonFormField<String>(
+      child: DropdownButtonFormField<DropdownOption>(
           isExpanded: true,
           decoration: InputDecoration(
             enabledBorder: InputBorder.none,
@@ -218,4 +254,18 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
           onChanged: onChanged),
     );
   }
+}
+
+class DropdownOption<T> {
+  final T value;
+  final String label;
+
+  DropdownOption(this.value, this.label);
+
+  @override
+  bool operator ==(dynamic other) =>
+      other != null && other is DropdownOption && this.value == other.value;
+
+  @override
+  int get hashCode => value.hashCode ^ label.hashCode;
 }

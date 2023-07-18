@@ -26,7 +26,7 @@ tflite-build:
 
 tflite-run-ic:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/mobilenet_edgetpu_224_1.0_float.tflite" \
@@ -39,10 +39,10 @@ tflite-run-ic:
 
 tflite-run-ic-offline:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification_offline \
 		--mode=PerformanceOnly \
 		--scenario=Offline \
-		--batch_size=8 \
+		--batch_size=32 \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/mobilenet_edgetpu_224_1.0_float.tflite" \
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
@@ -54,7 +54,7 @@ tflite-run-ic-offline:
 
 tflite-run-od:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL COCO \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL object_detection \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobiledet/mobiledet.tflite" \
@@ -66,7 +66,7 @@ tflite-run-od:
 
 tflite-run-is:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL ADE20K \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL image_segmentation_v2 \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mosaic/mobile_segmenter_r4_argmax_f32.tflite" \
@@ -76,7 +76,7 @@ tflite-run-is:
 
 tflite-run-lu:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL SQUAD \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL natural_language_processing \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilebert/mobilebert_float_384_gpu.tflite" \
@@ -86,7 +86,7 @@ tflite-run-lu:
 
 tflite-run-sr:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL SNUSR \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL super_resolution \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/edsr_final/converted/edsr_f32b5_fp32.tflite" \
@@ -101,7 +101,7 @@ coreml-build:
 
 coreml-run-ic:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel" \
@@ -110,10 +110,9 @@ coreml-run-ic:
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/imagenet_val.txt" \
 		--offset=1
 
-# batch_size defined here must match with batch_size in coreml_settings.h
 coreml-run-ic-offline:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL IMAGENET \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification_offline \
 		--mode=PerformanceOnly \
 		--scenario=Offline \
 		--batch_size=32 \
@@ -126,7 +125,7 @@ coreml-run-ic-offline:
 
 coreml-run-od:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL COCO \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL object_detection \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobiledet/MobileDet.mlmodel" \
@@ -138,7 +137,7 @@ coreml-run-od:
 
 coreml-run-is:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL ADE20K \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL image_segmentation_v2 \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mosaic/Mosaic.mlmodel" \
@@ -148,7 +147,7 @@ coreml-run-is:
 
 coreml-run-lu:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL SQUAD \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL natural_language_processing \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilebert/MobileBERT.mlmodel" \
@@ -158,7 +157,7 @@ coreml-run-lu:
 
 coreml-run-sr:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL SNUSR \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL super_resolution \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/edsr_final/converted/edsr_f32b5_fp32.mlmodel" \

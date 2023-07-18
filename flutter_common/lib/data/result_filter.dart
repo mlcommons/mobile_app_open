@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:mlperfbench_common/constants.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 part 'result_filter.g.dart';
 
@@ -64,9 +65,6 @@ class ResultFilter {
     bool manufacturerMatched =
         resultManufacturer.containsIgnoreCase(manufacturer ?? '');
     bool socMatched = resultSoc.containsIgnoreCase(soc ?? '');
-    bool benchmarkIdMatched = benchmarkId == null
-        ? true
-        : result.results.any((e) => e.benchmarkId == benchmarkId);
 
     return fromCreationDateMatched &&
         toCreationDateMatched &&
@@ -74,8 +72,13 @@ class ResultFilter {
         deviceModelMatched &&
         backendMatched &&
         manufacturerMatched &&
-        socMatched &&
-        benchmarkIdMatched;
+        socMatched;
+  }
+
+  bool matchBenchmark(BenchmarkExportResult result) {
+    bool benchmarkIdMatched =
+        benchmarkId == null ? true : result.benchmarkId == benchmarkId;
+    return benchmarkIdMatched;
   }
 
   bool get anyFilterActive {
