@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/result_filter.dart';
+import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 void main() {
   group('ResultFilter', () {
@@ -79,12 +80,19 @@ void main() {
 
     test('benchmarkId matched', () {
       final filter = ResultFilter()..benchmarkId = 'image_classification';
-      expect(filter.match(result), isTrue);
+      List<BenchmarkExportResult> benchmarks = result.results
+          .where((benchmark) => filter.matchBenchmark(benchmark))
+          .toList();
+
+      expect(benchmarks.length == 1, isTrue);
     });
 
     test('benchmarkId not matched', () {
       final filter = ResultFilter()..benchmarkId = 'image_classification_v2';
-      expect(filter.match(result), isFalse);
+      List<BenchmarkExportResult> benchmarks = result.results
+          .where((benchmark) => filter.matchBenchmark(benchmark))
+          .toList();
+      expect(benchmarks.length == 1, isFalse);
     });
 
     test('multiple filters matched', () {
