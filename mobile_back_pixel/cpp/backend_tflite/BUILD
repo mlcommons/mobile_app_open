@@ -17,7 +17,6 @@ load(
     "tflite_copts",
     "tflite_jni_binary",
 )
-
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
 
 package(

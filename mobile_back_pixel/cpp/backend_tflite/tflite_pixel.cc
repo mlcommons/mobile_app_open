@@ -51,7 +51,7 @@ struct TFLiteBackendData {
 
 static bool backendExists = false;
 
-static constexpr const char *const kDelegateCpu = "CPU";
+static constexpr const char* const kDelegateCpu = "CPU";
 
 inline mlperf_data_t::Type TfType2Type(TfLiteType type) {
   switch (type) {
