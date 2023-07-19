@@ -18,9 +18,18 @@ load(
     "tflite_jni_binary",
 )
 
+load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
+
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
+)
+
+pbtxt2header(
+    name = "pixel_settings",
+    srcs = [
+        "settings/tflite_settings_pixel6.pbtxt",
+    ],
 )
 
 cc_library(
@@ -59,6 +68,7 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
+        ":pixel_settings",
         ":resize_bilinear_op",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/lite/c:c_api",
