@@ -15,20 +15,20 @@ void main() {
 
     test('sort by Date ASC (from oldest to most recent)', () {
       final sort = ResultSort();
-      sort.sortBy = SortByValues.dateAsc;
+      sort.sortBy = SortByEnum.dateAsc;
       expect(sort.apply(benchmarks)[0] == benchmarks[0], isTrue);
     });
 
     test('sort by Date DESC (from most recent to oldest)', () {
       final sort = ResultSort();
-      sort.sortBy = SortByValues.dateDesc;
+      sort.sortBy = SortByEnum.dateDesc;
       expect(sort.apply(benchmarks)[0] == benchmarks[benchmarks.length - 1],
           isTrue);
     });
 
     test('sort by Task Throughput DESC (from highest to lowest)', () {
       final sort = ResultSort();
-      sort.sortBy = SortByValues.taskThroughputDesc;
+      sort.sortBy = SortByEnum.taskThroughputDesc;
       final maxTaskThroughput = benchmarks
           .map((benchmark) => benchmark.performanceRun?.throughput?.value ?? 0)
           .reduce((a, b) => a > b ? a : b);

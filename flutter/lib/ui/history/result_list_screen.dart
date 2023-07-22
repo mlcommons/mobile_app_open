@@ -38,13 +38,13 @@ class _ResultListScreenState extends State<ResultListScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyListTitle), actions: [
-        PopupMenuButton<SortByValues>(
+        PopupMenuButton<SortByEnum>(
           constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width,
           ),
           initialValue: sort.sortBy,
           // Callback that sets the selected popup menu item.
-          onSelected: (SortByValues item) {
+          onSelected: (SortByEnum item) {
             setState(() {
               sort.sortBy = item;
             });
@@ -52,17 +52,17 @@ class _ResultListScreenState extends State<ResultListScreen> {
           icon: const Icon(Icons.sort),
           itemBuilder: (context) {
             return [
-              PopupMenuItem<SortByValues>(
-                value: SortByValues.dateDesc,
+              PopupMenuItem<SortByEnum>(
+                value: SortByEnum.dateDesc,
                 child: Text(l10n.historySortByDateDesc),
               ),
-              PopupMenuItem<SortByValues>(
-                value: SortByValues.dateAsc,
+              PopupMenuItem<SortByEnum>(
+                value: SortByEnum.dateAsc,
                 child: Text(l10n.historySortByDateAsc),
               ),
               const PopupMenuDivider(),
-              PopupMenuItem<SortByValues>(
-                value: SortByValues.taskThroughputDesc,
+              PopupMenuItem<SortByEnum>(
+                value: SortByEnum.taskThroughputDesc,
                 child: Text(l10n.historySortByTaskThroughputDesc),
               ),
             ];

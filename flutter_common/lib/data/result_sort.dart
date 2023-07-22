@@ -1,9 +1,9 @@
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
-enum SortByValues { dateAsc, dateDesc, taskThroughputDesc }
+enum SortByEnum { dateAsc, dateDesc, taskThroughputDesc }
 
 class ResultSort {
-  SortByValues sortBy = SortByValues.dateDesc;
+  SortByEnum sortBy = SortByEnum.dateDesc;
 
   ResultSort();
 
@@ -11,13 +11,13 @@ class ResultSort {
     List<BenchmarkExportResult> sortedItems =
         List<BenchmarkExportResult>.from(items);
     switch (sortBy) {
-      case SortByValues.dateAsc:
+      case SortByEnum.dateAsc:
         sortedItems.sort((a, b) => sortByDates(a, b, true));
         break;
-      case SortByValues.dateDesc:
+      case SortByEnum.dateDesc:
         sortedItems.sort((a, b) => sortByDates(a, b, false));
         break;
-      case SortByValues.taskThroughputDesc:
+      case SortByEnum.taskThroughputDesc:
         sortedItems.sort((a, b) => sortByTaskThroughput(a, b));
         break;
     }
