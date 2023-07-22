@@ -13,29 +13,50 @@ void main() {
     final result = ExtendedResult.fromJson(jsonDecode(data));
     final benchmarks = result.results;
 
+    test('number of benchmarks', () {
+      expect(benchmarks.length, 6);
+    });
+
+    final earliestBenchmark = benchmarks.first;
+    final latestBenchmark = benchmarks.last;
+
+    final minTaskThroughput = benchmarks
+        .map((benchmark) => benchmark.performanceRun?.throughput?.value ?? 0)
+        .reduce((a, b) => a < b ? a : b);
+    final maxTaskThroughput = benchmarks
+        .map((benchmark) => benchmark.performanceRun?.throughput?.value ?? 0)
+        .reduce((a, b) => a > b ? a : b);
+
     test('sort by Date ASC (from oldest to most recent)', () {
       final sort = ResultSort();
       sort.sortBy = SortByEnum.dateAsc;
-      expect(sort.apply(benchmarks)[0] == benchmarks[0], isTrue);
+      expect(sort.apply(benchmarks).first, earliestBenchmark);
+      expect(sort.apply(benchmarks).last, latestBenchmark);
     });
 
     test('sort by Date DESC (from most recent to oldest)', () {
       final sort = ResultSort();
       sort.sortBy = SortByEnum.dateDesc;
-      expect(sort.apply(benchmarks)[0] == benchmarks[benchmarks.length - 1],
-          isTrue);
+      expect(sort.apply(benchmarks).first, latestBenchmark);
+      expect(sort.apply(benchmarks).last, earliestBenchmark);
+    });
+
+    test('sort by Task Throughput ASC (from lowest to highest)', () {
+      final sort = ResultSort();
+      sort.sortBy = SortByEnum.taskThroughputAsc;
+      expect(sort.apply(benchmarks).first.performanceRun?.throughput?.value,
+          minTaskThroughput);
+      expect(sort.apply(benchmarks).last.performanceRun?.throughput?.value,
+          maxTaskThroughput);
     });
 
     test('sort by Task Throughput DESC (from highest to lowest)', () {
       final sort = ResultSort();
       sort.sortBy = SortByEnum.taskThroughputDesc;
-      final maxTaskThroughput = benchmarks
-          .map((benchmark) => benchmark.performanceRun?.throughput?.value ?? 0)
-          .reduce((a, b) => a > b ? a : b);
-      expect(
-          sort.apply(benchmarks)[0].performanceRun?.throughput?.value ==
-              maxTaskThroughput,
-          isTrue);
+      expect(sort.apply(benchmarks).first.performanceRun?.throughput?.value,
+          maxTaskThroughput);
+      expect(sort.apply(benchmarks).last.performanceRun?.throughput?.value,
+          minTaskThroughput);
     });
   });
 }

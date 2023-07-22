@@ -43,7 +43,6 @@ class _ResultListScreenState extends State<ResultListScreen> {
             maxWidth: MediaQuery.of(context).size.width,
           ),
           initialValue: sort.sortBy,
-          // Callback that sets the selected popup menu item.
           onSelected: (SortByEnum item) {
             setState(() {
               sort.sortBy = item;
