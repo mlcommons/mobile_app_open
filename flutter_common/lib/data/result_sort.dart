@@ -1,5 +1,6 @@
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
-import 'package:mlperfbench_common/data/sort_by_item.dart';
+
+enum SortByValues { dateAsc, dateDesc, taskThroughputDesc }
 
 class ResultSort {
   SortByValues sortBy = SortByValues.dateDesc;

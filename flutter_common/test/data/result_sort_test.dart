@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/result_sort.dart';
-import 'package:mlperfbench_common/data/sort_by_item.dart';
 
 void main() {
   group('ResultSort', () {
@@ -27,7 +26,7 @@ void main() {
           isTrue);
     });
 
-    test('sort by Task Throughtput DESC (from highest to lowest)', () {
+    test('sort by Task Throughput DESC (from highest to lowest)', () {
       final sort = ResultSort();
       sort.sortBy = SortByValues.taskThroughputDesc;
       final maxTaskThroughput = benchmarks

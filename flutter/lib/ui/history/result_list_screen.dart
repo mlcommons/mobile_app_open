@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/benchmarks_data_provider.dart';
+import 'package:mlperfbench_common/data/result_sort.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:provider/provider.dart';
 
@@ -37,6 +38,36 @@ class _ResultListScreenState extends State<ResultListScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyListTitle), actions: [
+        PopupMenuButton<SortByValues>(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width,
+          ),
+          initialValue: sort.sortBy,
+          // Callback that sets the selected popup menu item.
+          onSelected: (SortByValues item) {
+            setState(() {
+              sort.sortBy = item;
+            });
+          },
+          icon: const Icon(Icons.sort),
+          itemBuilder: (context) {
+            return [
+              PopupMenuItem<SortByValues>(
+                value: SortByValues.dateDesc,
+                child: Text(l10n.historySortByDateDesc),
+              ),
+              PopupMenuItem<SortByValues>(
+                value: SortByValues.dateAsc,
+                child: Text(l10n.historySortByDateAsc),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem<SortByValues>(
+                value: SortByValues.taskThroughputDesc,
+                child: Text(l10n.historySortByTaskThroughputDesc),
+              ),
+            ];
+          },
+        ),
         IconButton(
           icon: Icon(filter.anyFilterActive
               ? Icons.filter_list

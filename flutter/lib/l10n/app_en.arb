@@ -137,7 +137,8 @@
   "historySortBy": "Sort by",
   "historySortByDateAsc": "Date: from oldest to most recent",
   "historySortByDateDesc": "Date: from most recent to oldest",
-  "historySortByTaskThroughputAsc": "Task throughput: from highest to lowest",
+  "historySortByTaskThroughputDesc": "Task throughput: from highest to lowest",
+  "historySortByTaskThroughputAsc": "Task throughput: from lowest to highest",
 
   "historyDetailsTitle": "Result details",
   "historyDetailsBuildTypeDebug": "debug build",
