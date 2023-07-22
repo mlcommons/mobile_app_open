@@ -65,6 +65,10 @@ class _ResultListScreenState extends State<ResultListScreen> {
                 value: SortByEnum.taskThroughputDesc,
                 child: Text(l10n.historySortByTaskThroughputDesc),
               ),
+              PopupMenuItem<SortByEnum>(
+                value: SortByEnum.taskThroughputAsc,
+                child: Text(l10n.historySortByTaskThroughputAsc),
+              ),
             ];
           },
         ),
