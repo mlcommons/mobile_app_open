@@ -8,7 +8,8 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/history/run_details_screen.dart';
-import 'utils.dart';
+import 'package:mlperfbench/ui/history/utils.dart';
+import 'package:mlperfbench/ui/time_utils.dart';
 
 class DetailsScreen extends StatefulWidget {
   final ExtendedResult result;
@@ -56,7 +57,7 @@ class _DetailsScreen extends State<DetailsScreen> {
     final res = widget.result;
 
     final firstResult = res.results.first;
-    final date = helper.formatDate(res.meta.creationDate);
+    final date = formatDateTime(res.meta.creationDate);
     final backendName = firstResult.backendInfo.backendName;
 
     final averageThroughput =

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:bot_toast/bot_toast.dart';
-import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/environment/env_android.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 
@@ -14,11 +13,6 @@ class HistoryHelperUtils {
   final AppLocalizations l10n;
 
   HistoryHelperUtils(this.l10n);
-
-  String formatDate(DateTime value) {
-    var dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-    return dateFormat.format(value);
-  }
 
   Widget makeHeader(String value) {
     return Center(

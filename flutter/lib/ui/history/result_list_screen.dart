@@ -6,10 +6,10 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/history/list_item.dart';
 import 'package:mlperfbench/ui/history/result_filter_screen.dart';
 import 'package:mlperfbench/ui/history/result_list_item.dart';
 import 'package:mlperfbench/ui/history/run_details_screen.dart';
-import 'list_item.dart';
 
 class ResultListScreen extends StatefulWidget {
   const ResultListScreen({Key? key}) : super(key: key);
@@ -54,7 +54,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
       ]),
       body: ListView.separated(
         controller: ScrollController(),
-        padding: const EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.only(top: 0, bottom: 0),
         itemCount: itemsList.length,
         separatorBuilder: (context, index) => const Divider(),
         itemBuilder: (context, index) {
