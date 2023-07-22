@@ -2,7 +2,8 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench_common/data/sort_by_item.dart';
 
 class ResultSort {
-  SortByValues? sortBy;
+  SortByValues sortBy = SortByValues.dateDesc;
+
   ResultSort();
 
   List<BenchmarkExportResult> apply(List<BenchmarkExportResult> items) {
@@ -18,7 +19,6 @@ class ResultSort {
       case SortByValues.taskThroughputDesc:
         sortedItems.sort((a, b) => sortByTaskThroughput(a, b));
         break;
-      default:
     }
     return sortedItems;
   }
