@@ -124,11 +124,16 @@ class _RunOut extends Struct {
 
 const _runName = 'dart_ffi_run_benchmark';
 const _freeName = 'dart_ffi_run_benchmark_free';
+const _abortName = 'dart_ffi_abort_benchmark';
 const _getQueryName = 'dart_ffi_get_query_counter';
 const _getDatasetSizeName = 'dart_ffi_get_dataset_size';
 
 typedef _Run = Pointer<_RunOut> Function(Pointer<_RunIn>);
 final _run = getBridgeHandle().lookupFunction<_Run, _Run>(_runName);
+
+typedef _Abort1 = Void Function();
+typedef _Abort2 = void Function();
+final _abort = getBridgeHandle().lookupFunction<_Abort1, _Abort2>(_abortName);
 
 typedef _Free1 = Void Function(Pointer<_RunOut>);
 typedef _Free2 = void Function(Pointer<_RunOut>);
@@ -170,6 +175,8 @@ NativeRunResult runBenchmark(RunSettings rs) {
     _free(runOut);
   }
 }
+
+void abortBenchmark() => _abort();
 
 int getQueryCounter() => _getQuery();
 

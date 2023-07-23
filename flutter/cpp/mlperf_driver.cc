@@ -16,6 +16,7 @@ limitations under the License.
 #include <memory>
 #include <string>
 #include <vector>
+#include <thread>
 
 #include "flutter/cpp/backend.h"
 #include "flutter/cpp/dataset.h"
@@ -115,6 +116,11 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
   }
 
   ::mlperf::StartTest(this, dataset_.get(), mlperf_settings, log_settings);
+}
+
+void MlperfDriver::AbortMLPerfTest() {
+  std::thread t(::mlperf::AbortTest);
+  t.join();
 }
 
 }  // namespace mobile

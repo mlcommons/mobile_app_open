@@ -168,6 +168,10 @@ void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out* out) {
   delete out;
 }
 
+void dart_ffi_abort_benchmark() {
+  ::mlperf::mobile::MlperfDriver::AbortMLPerfTest();
+}
+
 int32_t dart_ffi_get_dataset_size() { return datasetTotalSamples.load(); }
 
 int32_t dart_ffi_get_query_counter() {

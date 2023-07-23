@@ -49,6 +49,8 @@ struct dart_ffi_run_benchmark_out *dart_ffi_run_benchmark(
     const struct dart_ffi_run_benchmark_in *in);
 void dart_ffi_run_benchmark_free(struct dart_ffi_run_benchmark_out *out);
 
+void dart_ffi_abort_benchmark();
+
 int32_t dart_ffi_get_dataset_size();
 int32_t dart_ffi_get_query_counter();
 

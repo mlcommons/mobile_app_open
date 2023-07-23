@@ -48,6 +48,9 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
                      int single_stream_expected_latency_ns,
                      const std::string& output_dir);
 
+  // Abort a running MLPerf test
+  static void AbortMLPerfTest();
+
   // A human-readable string for logging purposes.
   const std::string& Name() override { return backend_->Name(); }
 

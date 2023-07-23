@@ -59,6 +59,10 @@ class BridgeIsolate {
     }
   }
 
+  Future<void> abort() async {
+    ffi_run.abortBenchmark();
+  }
+
   int getQueryCounter() {
     return ffi_run.getQueryCounter();
   }

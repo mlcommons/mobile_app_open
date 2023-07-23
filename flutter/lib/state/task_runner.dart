@@ -85,6 +85,7 @@ class TaskRunner {
   Future<void> abortBenchmarks() async {
     aborting = true;
     await _cooldownOperation?.cancel();
+    await backendBridge.abort();
     notifyListeners();
   }
 
