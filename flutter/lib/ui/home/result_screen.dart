@@ -10,14 +10,14 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
+import 'package:mlperfbench/ui/home/app_drawer.dart';
+import 'package:mlperfbench/ui/home/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/home/progress_screen.dart';
+import 'package:mlperfbench/ui/home/result_circle.dart';
+import 'package:mlperfbench/ui/home/share_button.dart';
+import 'package:mlperfbench/ui/home/start_screen.dart';
 import 'package:mlperfbench/ui/icons.dart' as app_icons;
 import 'package:mlperfbench/ui/page_constraints.dart';
-import 'package:mlperfbench/ui/root/main_screen.dart';
-import 'package:mlperfbench/ui/run/app_bar.dart';
-import 'package:mlperfbench/ui/run/list_of_benchmark_items.dart';
-import 'package:mlperfbench/ui/run/progress_screen.dart';
-import 'package:mlperfbench/ui/run/result_circle.dart';
-import 'package:mlperfbench/ui/run/share_button.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -266,7 +266,7 @@ class _ResultScreenState extends State<ResultScreen>
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final store = context.watch<Store>();
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
     final scrollController = ScrollController();
 
     final resultsPage = Column(
@@ -283,8 +283,8 @@ class _ResultScreenState extends State<ResultScreen>
                     indicator: const UnderlineTabIndicator(),
                     indicatorSize: TabBarIndicatorSize.label,
                     tabs: [
-                      Tab(text: stringResources.resultsTabTitlePerformance),
-                      Tab(text: stringResources.resultsTabTitleAccuracy),
+                      Tab(text: l10n.resultsTabTitlePerformance),
+                      Tab(text: l10n.resultsTabTitleAccuracy),
                     ],
                   ),
                 ),
@@ -308,7 +308,7 @@ class _ResultScreenState extends State<ResultScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                stringResources.resultsTitleDetails,
+                l10n.resultsTitleDetails,
                 textAlign: TextAlign.left,
                 style: const TextStyle(
                     fontSize: 17.0, fontWeight: FontWeight.bold),
@@ -349,15 +349,15 @@ class _ResultScreenState extends State<ResultScreen>
               // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
               final wrongPathError = await state.validator
                   .validateExternalResourcesDirectory(
-                      stringResources.dialogContentMissingFiles);
+                      l10n.dialogContentMissingFiles);
               if (wrongPathError.isNotEmpty) {
                 if (!mounted) return;
                 await showErrorDialog(context, [wrongPathError]);
                 return;
               }
               if (store.offlineMode) {
-                final offlineError = await state.validator.validateOfflineMode(
-                    stringResources.dialogContentOfflineWarning);
+                final offlineError = await state.validator
+                    .validateOfflineMode(l10n.dialogContentOfflineWarning);
                 if (offlineError.isNotEmpty) {
                   if (!mounted) return;
                   switch (await showConfirmDialog(context, offlineError)) {
@@ -377,14 +377,14 @@ class _ResultScreenState extends State<ResultScreen>
                 // current context may no longer be valid if runBenchmarks requested progress screen
                 await showErrorDialog(
                     ProgressScreen.scaffoldKey.currentContext ?? context,
-                    ['${stringResources.runFail}:', e.toString()]);
+                    ['${l10n.runFail}:', e.toString()]);
                 return;
               }
             },
             child: Padding(
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: Text(
-                stringResources.resultsButtonTestAgain,
+                l10n.resultsButtonTestAgain,
                 style: const TextStyle(
                   fontSize: 20.0,
                   color: AppColors.lightText,
@@ -401,14 +401,13 @@ class _ResultScreenState extends State<ResultScreen>
 
     String title;
     title = _screenMode == _ScreenMode.performance
-        ? stringResources.resultsTitlePerformance
-        : stringResources.resultsTitleAccuracy;
-    title = isOfficialBuild
-        ? title
-        : '${stringResources.resultsTitleUnverified} $title';
+        ? l10n.resultsTitlePerformance
+        : l10n.resultsTitleAccuracy;
+    title = isOfficialBuild ? title : '${l10n.resultsTitleUnverified} $title';
 
     return Scaffold(
-      appBar: MainScreenAppBar.buildAppBar(title, context, true),
+      appBar: AppBar(title: Text(title)),
+      drawer: const AppDrawer(),
       body: LayoutBuilder(
         builder: (context, constraint) {
           return SingleChildScrollView(

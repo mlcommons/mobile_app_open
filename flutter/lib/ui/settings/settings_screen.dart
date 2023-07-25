@@ -47,7 +47,7 @@ class _SettingsScreen extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final store = context.watch<Store>();
     final state = context.watch<BenchmarkState>();
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
     final buildInfo = BuildInfoHelper.info;
 
     Widget artificialLoadSwitch;
@@ -55,11 +55,9 @@ class _SettingsScreen extends State<SettingsScreen> {
       artificialLoadSwitch = ListTile(
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
-          child: Text(
-            stringResources.settingsArtificialCPULoadTitle,
-          ),
+          child: Text(l10n.settingsArtificialCPULoadTitle),
         ),
-        subtitle: Text(stringResources.settingsArtificialCPULoadSubtitle),
+        subtitle: Text(l10n.settingsArtificialCPULoadSubtitle),
         trailing: Switch(
           value: store.artificialCPULoadEnabled,
           onChanged: (flag) {
@@ -72,11 +70,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            stringResources.settingsTitle,
-          ),
-        ),
+        appBar: AppBar(title: Text(l10n.menuSettings)),
         body: SafeArea(
             child: ListView(
           padding: const EdgeInsets.only(top: 20),
@@ -84,11 +78,9 @@ class _SettingsScreen extends State<SettingsScreen> {
             ListTile(
               title: Padding(
                 padding: const EdgeInsets.only(bottom: 5),
-                child: Text(
-                  stringResources.settingsRunMode,
-                ),
+                child: Text(l10n.settingsRunMode),
               ),
-              subtitle: Text(stringResources.settingsRunModeSubtitle),
+              subtitle: Text(l10n.settingsRunModeSubtitle),
               trailing: DropdownButton<BenchmarkRunModeEnum>(
                   value: store.selectedBenchmarkRunMode,
                   items: BenchmarkRunModeEnum.values
@@ -104,11 +96,9 @@ class _SettingsScreen extends State<SettingsScreen> {
             ListTile(
               title: Padding(
                 padding: const EdgeInsets.only(bottom: 5),
-                child: Text(
-                  stringResources.settingsOffline,
-                ),
+                child: Text(l10n.settingsOffline),
               ),
-              subtitle: Text(stringResources.settingsOfflineSubtitle),
+              subtitle: Text(l10n.settingsOfflineSubtitle),
               trailing: Switch(
                 value: store.offlineMode,
                 onChanged: (flag) {
@@ -119,11 +109,9 @@ class _SettingsScreen extends State<SettingsScreen> {
             ListTile(
               title: Padding(
                 padding: const EdgeInsets.only(bottom: 5),
-                child: Text(
-                  stringResources.settingsKeepLogs,
-                ),
+                child: Text(l10n.settingsKeepLogs),
               ),
-              subtitle: Text(stringResources.settingsKeepLogsSubtitle),
+              subtitle: Text(l10n.settingsKeepLogsSubtitle),
               trailing: Switch(
                 value: store.keepLogs,
                 onChanged: (flag) {
@@ -135,13 +123,10 @@ class _SettingsScreen extends State<SettingsScreen> {
             ListTile(
               title: Padding(
                 padding: const EdgeInsets.only(bottom: 5),
-                child: Text(
-                  stringResources.settingsCooldown,
-                ),
+                child: Text(l10n.settingsCooldown),
               ),
-              subtitle: Text(stringResources.settingsCooldownSubtitle
-                  .replaceAll(
-                      '<cooldownPause>', store.cooldownDuration.toString())),
+              subtitle: Text(l10n.settingsCooldownSubtitle.replaceAll(
+                  '<cooldownPause>', store.cooldownDuration.toString())),
               trailing: Switch(
                   value: store.cooldown,
                   onChanged: (flag) {
@@ -164,15 +149,13 @@ class _SettingsScreen extends State<SettingsScreen> {
             ),
             const Divider(),
             ListTile(
-              title: Text(
-                stringResources.settingsPrivacyPolicy,
-              ),
+              title: Text(l10n.settingsPrivacyPolicy),
               trailing: const Icon(Icons.chevron_right),
               onTap: () =>
                   launchUrl(Uri.parse('https://mlcommons.org/mobile_privacy')),
             ),
             ListTile(
-              title: Text(stringResources.settingsEula),
+              title: Text(l10n.settingsEula),
               trailing: const Icon(Icons.chevron_right),
               onTap: () =>
                   launchUrl(Uri.parse('https://mlcommons.org/mobile_eula')),
@@ -181,9 +164,7 @@ class _SettingsScreen extends State<SettingsScreen> {
             ListTile(
               title: Padding(
                 padding: const EdgeInsets.only(bottom: 5),
-                child: Text(
-                  stringResources.settingsTaskConfigTitle,
-                ),
+                child: Text(l10n.settingsTaskConfigTitle),
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
@@ -195,8 +176,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                   await Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => TaskConfigScreen(taskConfigs)));
                 } else {
-                  _showUnableSpecifyConfigurationMessage(
-                      context, stringResources);
+                  _showUnableSpecifyConfigurationMessage(context, l10n);
                 }
               },
             ),
@@ -207,7 +187,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               ),
               onPressed: () async {
                 switch (await showConfirmDialog(
-                    context, stringResources.settingsClearCacheConfirm)) {
+                    context, l10n.settingsClearCacheConfirm)) {
                   case ConfirmDialogAction.ok:
                     await state.clearCache();
                     if (!mounted) return;
@@ -219,7 +199,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                     break;
                 }
               },
-              child: Text(stringResources.settingsClearCache),
+              child: Text(l10n.settingsClearCache),
             ),
             const Divider(),
             Text(

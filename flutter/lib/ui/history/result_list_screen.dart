@@ -37,7 +37,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
     List<ListItem> itemsList = _listItems(resultItems);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.historyListTitle), actions: [
+      appBar: AppBar(title: Text(l10n.menuHistory), actions: [
         PopupMenuButton<SortByEnum>(
           constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width,
