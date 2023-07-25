@@ -3,8 +3,9 @@ import 'dart:io';
 
 const fileNameEnv = 'schemaPath';
 
-void makeNullable(Map<String, dynamic> fieldDescription) {
+void makeNullable(dynamic fieldDescription) {
   // print(jsonEncode(fieldDescription));
+  fieldDescription = fieldDescription as Map<String, dynamic>;
   dynamic originalType;
   var originalKey = '';
   const possibleDescriptions = <String>['type', '\$ref'];

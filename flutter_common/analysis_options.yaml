@@ -1,13 +1,11 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  exclude:
-    - lib/data/generation_helpers/edit_json_schema.main.dart
-    - lib/data/generation_helpers/write_json_sample.main.dart
   language:
     strict-casts: true
 
 linter:
+  # https://dart.dev/tools/linter-rules
   rules:
     avoid_print: false
     unawaited_futures: true

@@ -8,6 +8,7 @@ analyzer:
     strict-casts: true
 
 linter:
+  # https://dart.dev/tools/linter-rules
   rules:
     avoid_print: false
     unawaited_futures: true
