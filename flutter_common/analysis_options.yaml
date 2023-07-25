@@ -1,5 +1,12 @@
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    - lib/localizations/**
+    - lib/protos/**
+  language:
+    strict-casts: true
+
 linter:
   rules:
     avoid_print: false

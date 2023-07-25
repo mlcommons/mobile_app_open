@@ -4,8 +4,8 @@ analyzer:
   exclude:
     - lib/localizations/**
     - lib/protos/**
-  strong-mode:
-    implicit-casts: false
+  language:
+    strict-casts: true
 
 linter:
   rules:
