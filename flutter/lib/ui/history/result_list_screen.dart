@@ -36,7 +36,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
     List<ListItem> itemsList = _listItems(resultItems);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.historyListTitle), actions: [
+      appBar: AppBar(title: Text(l10n.menuHistory), actions: [
         IconButton(
           icon: Icon(filter.anyFilterActive
               ? Icons.filter_list
