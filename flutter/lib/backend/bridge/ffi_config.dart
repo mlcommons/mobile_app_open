@@ -2,8 +2,8 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
+import 'package:mlperfbench/backend/bridge/handle.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
-import 'handle.dart';
 
 class _RunOut extends Struct {
   @Int32()

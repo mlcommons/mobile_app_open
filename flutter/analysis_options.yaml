@@ -13,3 +13,4 @@ linter:
     unawaited_futures: true
     prefer_single_quotes: true
     prefer_function_declarations_over_variables: false
+    always_use_package_imports: true

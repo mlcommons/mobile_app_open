@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/sort_by_item.dart';
 
-import 'localizations/app_localizations.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
 
 const isOfficialBuild =
     bool.fromEnvironment('official-build', defaultValue: false);

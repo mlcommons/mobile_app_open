@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:archive/archive_io.dart';
 
-import 'file_cache_helper.dart';
+import 'package:mlperfbench/resources/file_cache_helper.dart';
 
 class ArchiveCacheHelper {
   static const extension = '.zip';

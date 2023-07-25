@@ -4,10 +4,10 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
+import 'package:mlperfbench/backend/bridge/handle.dart';
 import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
-import 'handle.dart';
 
 class _RunOut extends Struct {
   @Int32()

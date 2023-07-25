@@ -2,7 +2,7 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import 'handle.dart';
+import 'package:mlperfbench/backend/bridge/handle.dart';
 
 class _RunOut extends Struct {
   external Pointer<Utf8> socName;

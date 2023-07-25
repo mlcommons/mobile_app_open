@@ -12,6 +12,7 @@ import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
@@ -19,7 +20,6 @@ import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/resources/validation_helper.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
-import 'benchmark.dart';
 
 enum BenchmarkStateEnum {
   downloading,

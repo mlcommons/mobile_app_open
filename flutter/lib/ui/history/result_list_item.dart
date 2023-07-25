@@ -5,8 +5,8 @@ import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/history/list_item.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
-import 'list_item.dart';
 
 class ExtendedResultListItem implements ListItem {
   final ExtendedResult item;
