@@ -2,8 +2,8 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
-    - lib/localizations/**
-    - lib/protos/**
+    - lib/data/generation_helpers/edit_json_schema.main.dart
+    - lib/data/generation_helpers/write_json_sample.main.dart
   language:
     strict-casts: true
 

@@ -11,8 +11,9 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 void main() {
   group('ResultFilter', () {
     const file = 'test/data/extended_result_unittest.json';
-    final data = File(file).readAsStringSync();
-    final result = ExtendedResult.fromJson(jsonDecode(data));
+    final jsonString = File(file).readAsStringSync();
+    final data = jsonDecode(jsonString) as Map<String, dynamic>;
+    final result = ExtendedResult.fromJson(data);
 
     test('creationDate matched', () {
       final filter = ResultFilter();

@@ -43,11 +43,9 @@ void main() {
     });
     test('full result parsing', () async {
       final file = File('test/data/extended_result_unittest.json');
-      final data = await file.readAsString();
-
-      final json = jsonDecode(data);
-
-      ExtendedResult.fromJson(json);
+      final jsonString = await file.readAsString();
+      final data = jsonDecode(jsonString) as Map<String, dynamic>;
+      ExtendedResult.fromJson(data);
     });
   });
 }

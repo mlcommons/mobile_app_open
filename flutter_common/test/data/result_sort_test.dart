@@ -10,8 +10,9 @@ import 'package:mlperfbench_common/data/sort_by_item.dart';
 void main() {
   group('ResultSort', () {
     const file = 'test/data/extended_result_unittest.json';
-    final data = File(file).readAsStringSync();
-    final result = ExtendedResult.fromJson(jsonDecode(data));
+    final jsonString = File(file).readAsStringSync();
+    final data = jsonDecode(jsonString) as Map<String, dynamic>;
+    final result = ExtendedResult.fromJson(data);
     final benchmarks = result.results;
 
     test('sort by Date ASC (from oldest to most recent)', () {
