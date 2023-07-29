@@ -10,7 +10,6 @@ import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/device_info.dart';
-import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/root/app.dart';
@@ -26,15 +25,9 @@ Future<void> main() async {
   try {
     await launchUi();
   } on UnsupportedDeviceException catch (e) {
-    runApp(MyApp(
-      home: UnsupportedDeviceScreen(
-        backendError: e.backendError,
-      ),
-    ));
+    await showUnsupportedDeviceScreen(e);
   } catch (e, s) {
-    print('Exception: $e');
-    print('Exception stack: $s');
-    runApp(ExceptionWidget(e, s));
+    await showExceptionScreen(e, s);
   }
 }
 
@@ -43,9 +36,6 @@ Future<void> launchUi() async {
   await BuildInfoHelper.staticInit();
   final store = await Store.create();
   final benchmarkState = await BenchmarkState.create(store);
-  if (FirebaseManager.enabled) {
-    await FirebaseManager.instance.initialize();
-  }
 
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));
@@ -61,9 +51,23 @@ Future<void> launchUi() async {
         ChangeNotifierProvider.value(value: benchmarkState),
         ChangeNotifierProvider.value(value: store)
       ],
-      child: const MyApp(home: MyHomePage()),
+      child: const MyApp(home: MainScreen()),
     ),
   );
+}
+
+Future<void> showUnsupportedDeviceScreen(UnsupportedDeviceException e) async {
+  runApp(MyApp(
+    home: UnsupportedDeviceScreen(
+      backendError: e.backendError,
+    ),
+  ));
+}
+
+Future<void> showExceptionScreen(Object e, StackTrace s) async {
+  print('Exception: $e');
+  print('Exception stack: $s');
+  runApp(ExceptionWidget(e, s));
 }
 
 void autostartHandler(BenchmarkState state, Store store) async {
