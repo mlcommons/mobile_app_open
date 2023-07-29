@@ -21,11 +21,12 @@
 void testIC() {
     const char * modelPath = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel";
     const char * inputFile = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/imagenet/grace_hopper.raw";
+    const char *acceleratorName = "cpuAndGPU";
     const int expectedPredictedIndex = 653; // expected index for grace_hopper is 653
     
     int batchSize = 32;
     NSError *error = nil;
-    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:batchSize error: &error];
+    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:batchSize acceleratorName:acceleratorName error: &error];
     assert(error == nil);
     [coreMLExecutor getInputCount];
     [coreMLExecutor getOutputCount];
@@ -87,9 +88,9 @@ void testIC() {
 
 void testOD() {
     const char * modelPath = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/mobiledet/MobileDet.mlmodel";
-    
+    const char *acceleratorName = "cpuAndGPU";
     NSError *error = nil;
-    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:1 error: &error];
+    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:1 acceleratorName:acceleratorName error: &error];
     assert(error == nil);
     [coreMLExecutor getInputCount];
     [coreMLExecutor getOutputCount];
@@ -126,9 +127,9 @@ void testIS() {
 
 void testLU() {
     const char * modelPath = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/mobilebert/MobileBERT.mlmodel";
-    
+    const char *acceleratorName = "cpuAndGPU";
     NSError *error = nil;
-    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:1 error: &error];
+    CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:1 acceleratorName:acceleratorName error: &error];
     assert(error == nil);
     [coreMLExecutor getInputCount];
     [coreMLExecutor getOutputCount];

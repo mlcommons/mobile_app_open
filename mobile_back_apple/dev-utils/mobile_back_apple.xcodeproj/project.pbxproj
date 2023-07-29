@@ -278,6 +278,7 @@
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_OBJC_BRIDGING_HEADER = "../cpp/backend_coreml/mobile_back_apple-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -295,6 +296,7 @@
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_OBJC_BRIDGING_HEADER = "../cpp/backend_coreml/mobile_back_apple-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
