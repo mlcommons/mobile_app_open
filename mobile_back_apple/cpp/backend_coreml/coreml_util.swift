@@ -99,9 +99,9 @@ private class MLMultiArrayBatchProvider: NSObject, MLBatchProvider {
 }
 
 enum ComputationUnitNameEnum: String {
-  case all = "all"
+  case all = "cpu&gpu&ane"
   case cpuAndGPU = "cpu&gpu"
-  case cpuAndNeuralEngine = "cpu&ne"
+  case cpuAndNeuralEngine = "cpu&ane"
   case cpuOnly = "cpuOnly"
   case unknown = "uknown"
 }
@@ -122,7 +122,7 @@ private class MLCommonsComputationUnit {
       return MLComputeUnits.cpuAndGPU
     case .cpuAndNeuralEngine:
       if #available(iOS 16.0, *) {
-        return MLComputeUnits.all
+        return MLComputeUnits.cpuAndNeuralEngine
       }
       return MLComputeUnits.cpuAndGPU
     case .cpuOnly:
@@ -346,7 +346,9 @@ public class CoreMLExecutor: NSObject {
   }
 
   @objc
-  public func acceleratorName() -> String {
-    return accelerator.computationUnitName.rawValue
+  public func getAccelerator() -> UnsafePointer<CChar>? {
+    let name = accelerator.computationUnitName.rawValue
+    let cs = (name as NSString).utf8String
+    return UnsafePointer<Int8>(cs)
   }
 }

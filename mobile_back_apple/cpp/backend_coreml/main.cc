@@ -95,7 +95,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
     return nullptr;
   }
   backend_data->coreMLExecutor = coreMLExecutor;
-  backend_data->accelerator = configs->accelerator;
+  backend_data->accelerator = [backend_data->coreMLExecutor getAccelerator];
 
   return backend_data;
 }
