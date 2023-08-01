@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/data/sort_by_item.dart';
-
-import 'package:mlperfbench/localizations/app_localizations.dart';
-
 const isOfficialBuild =
     bool.fromEnvironment('official-build', defaultValue: false);
 
@@ -111,17 +107,6 @@ class BackendId {
     qti,
     apple,
   ];
-}
-
-class SortBy {
-  static List<SortByItem> options(AppLocalizations l10n) {
-    return [
-      SortByItem(l10n.historySortByDateAsc, SortByValues.dateAsc),
-      SortByItem(l10n.historySortByDateDesc, SortByValues.dateDesc),
-      SortByItem(
-          l10n.historySortByTaskThroughputAsc, SortByValues.taskThroughputDesc),
-    ];
-  }
 }
 
 class BenchmarkSettings {

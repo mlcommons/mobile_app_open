@@ -174,8 +174,8 @@ output/flutter/pub/%.stamp: %/pubspec.yaml
 
 .PHONY: flutter/test/unit
 flutter/test/unit:
-	cd flutter && ${_start_args} flutter --no-version-check test test
-	cd flutter_common && ${_start_args} flutter --no-version-check test test
+	cd flutter && ${_start_args} flutter --no-version-check test test -r expanded
+	cd flutter_common && ${_start_args} flutter --no-version-check test test -r expanded
 
 ifneq (${FLUTTER_TEST_DEVICE},)
 flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"

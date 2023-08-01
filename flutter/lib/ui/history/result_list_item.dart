@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
-import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/list_item.dart';
-import 'package:mlperfbench/ui/history/utils.dart';
+import 'package:mlperfbench/ui/time_utils.dart';
 
 class ExtendedResultListItem implements ListItem {
   final ExtendedResult item;
@@ -16,12 +14,9 @@ class ExtendedResultListItem implements ListItem {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final helper = HistoryHelperUtils(l10n);
-
     return ListTile(
       title: Text(
-        helper.formatDate(item.meta.creationDate.toLocal()),
+        formatDateTime(item.meta.creationDate.toLocal()),
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       subtitle: Text(item.meta.uuid),
@@ -42,27 +37,48 @@ class BenchmarkListItem implements ListItem {
           item.benchmarkName,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text('${itemScore()}\n${itemAdditionalInfo()}'),
-        trailing: Text(itemDateTime()),
+        subtitle: Text(
+          '${itemAdditionalInfo()}\n${itemDateTime()}',
+          style: const TextStyle(fontWeight: FontWeight.normal, height: 1.4),
+        ),
+        trailing: Text(
+          itemScore(),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         isThreeLine: true,
         onTap: tapHandler,
       );
 
-  double itemScore() {
-    final prScore = item.performanceRun?.throughput?.value;
-    final arScore = item.accuracyRun?.throughput?.value;
-    return prScore ?? arScore ?? 0;
+  String itemScore() {
+    final throughput = item.performanceRun?.throughput;
+    final accuracy = item.accuracyRun?.accuracy;
+    if (throughput != null) {
+      return throughput.toUIString();
+    } else if (accuracy != null) {
+      return accuracy.formatted;
+    } else {
+      return 'unknown';
+    }
   }
 
   String itemDateTime() {
     final prDateTime = item.performanceRun?.startDatetime;
     final arDateTime = item.accuracyRun?.startDatetime;
-
-    return DateFormat('yyyy-MM-dd HH:mm:ss')
-        .format(prDateTime ?? arDateTime ?? DateTime.now());
+    if (prDateTime != null) {
+      return formatDateTime(prDateTime);
+    } else if (arDateTime != null) {
+      return formatDateTime(arDateTime);
+    } else {
+      return 'unknown';
+    }
   }
 
   String itemAdditionalInfo() {
-    return '(Backend: ${item.backendInfo.backendName}, Accelerator: ${item.backendInfo.acceleratorName}, Delegate: ${item.backendSettings.delegate})';
+    final backendName = item.backendInfo.backendName;
+    final delegateName = item.backendSettings.delegate;
+    final acceleratorName = item.backendInfo.acceleratorName;
+    // This matched the UI in ResultScreen._createListOfBenchmarkResultBottomWidgets()
+    final backendInfo = '$backendName | $delegateName | $acceleratorName';
+    return backendInfo;
   }
 }

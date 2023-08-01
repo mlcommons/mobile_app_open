@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseStorageService {
@@ -6,11 +8,11 @@ class FirebaseStorageService {
   static const _uidPlaceholder = '<UID>';
   static const _filePlaceholder = '<FILE>';
   static const _pathTemplate = 'user/$_uidPlaceholder/result/$_filePlaceholder';
+  static const _oneMegabyte = 1024 * 1024;
 
-  upload(String jsonString, String uid, String fileName) async {
-    final path = _getCloudStorageFilePath(uid, fileName);
-    final storageRef = FirebaseStorage.instance.ref();
-    final fileRef = storageRef.child(path);
+  Future<void> upload(String jsonString, String uid, String fileName) async {
+    final path = _getCloudStoragePath(uid, fileName);
+    final fileRef = firebaseStorage.ref().child(path);
     if (await _exists(fileRef)) {
       print('File $fileName already uploaded');
     } else {
@@ -21,14 +23,26 @@ class FirebaseStorageService {
   }
 
   Future<String> download(String uid, String fileName) async {
-    final path = _getCloudStorageFilePath(uid, fileName);
-    final url = firebaseStorage.ref(path).getDownloadURL();
-    return url;
+    final path = _getCloudStoragePath(uid, fileName);
+    final ref = firebaseStorage.ref(path);
+    final Uint8List? data = await ref.getData(_oneMegabyte);
+    if (data == null) {
+      throw 'Cannot get data from path: $path';
+    }
+    final String content = String.fromCharCodes(data);
+    return content;
   }
 
-  delete(String uid, String fileName) async {
-    final path = _getCloudStorageFilePath(uid, fileName);
+  Future<void> delete(String uid, String fileName) async {
+    final path = _getCloudStoragePath(uid, fileName);
     await firebaseStorage.ref(path).delete();
+  }
+
+  Future<List<String>> list(String uid) async {
+    final dir = _getCloudStoragePath(uid, '');
+    final ListResult result = await firebaseStorage.ref(dir).listAll();
+    final fileNames = result.items.map((e) => e.name).toList();
+    return fileNames;
   }
 
   Future<bool> _exists(Reference ref) async {
@@ -40,7 +54,7 @@ class FirebaseStorageService {
     }
   }
 
-  String _getCloudStorageFilePath(String uid, String fileName) {
+  String _getCloudStoragePath(String uid, String fileName) {
     return _pathTemplate
         .replaceAll(_uidPlaceholder, uid)
         .replaceAll(_filePlaceholder, fileName);

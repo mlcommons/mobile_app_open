@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:mlperfbench_common/data/result_filter.dart';
-import 'package:mlperfbench_common/data/result_sort.dart';
-import 'package:mlperfbench_common/data/sort_by_item.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -30,7 +27,6 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     l10n = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
     final filter = state.resourceManager.resultManager.resultFilter;
-    final sort = state.resourceManager.resultManager.resultSort;
 
     return Scaffold(
         appBar: AppBar(
@@ -55,8 +51,6 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
               _manufacturerFilter(filter),
               const SizedBox(height: 12),
               _socFilter(filter),
-              const SizedBox(height: 12),
-              _sortBy(sort),
             ],
           ),
         ));
@@ -191,23 +185,6 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
         filter.soc = value.isEmpty ? null : value;
       },
     );
-  }
-
-  Widget _sortBy(ResultSort sort) {
-    List<SortByItem> sortItems = SortBy.options(l10n);
-    SortByItem? selectedSortItem = sortItems.firstWhereOrNull(
-        (SortByItem sortItem) => sortItem.value == sort.sortBy);
-    return _makeDropDownFilter(
-        labelText: l10n.historySortBy,
-        choices: sortItems
-            .map((sortItem) => DropdownOption(sortItem.value, sortItem.label))
-            .toList(),
-        value: selectedSortItem != null
-            ? DropdownOption(selectedSortItem.value, selectedSortItem.label)
-            : null,
-        onChanged: (option) => setState(() {
-              sort.sortBy = option?.value as SortByValues;
-            }));
   }
 
   Widget _clearFilterButton(ResultManager resultManager) {

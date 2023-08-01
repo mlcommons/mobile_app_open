@@ -10,7 +10,6 @@ import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/device_info.dart';
-import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/root/app.dart';
@@ -37,9 +36,6 @@ Future<void> launchUi() async {
   await BuildInfoHelper.staticInit();
   final store = await Store.create();
   final benchmarkState = await BenchmarkState.create(store);
-  if (FirebaseManager.enabled) {
-    await FirebaseManager.instance.initialize();
-  }
 
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench_common/data/benchmarks_data_provider.dart';
+import 'package:mlperfbench_common/data/result_sort.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:provider/provider.dart';
 
@@ -37,6 +38,39 @@ class _ResultListScreenState extends State<ResultListScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.menuHistory), actions: [
+        PopupMenuButton<SortByEnum>(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width,
+          ),
+          initialValue: sort.sortBy,
+          onSelected: (SortByEnum item) {
+            setState(() {
+              sort.sortBy = item;
+            });
+          },
+          icon: const Icon(Icons.sort),
+          itemBuilder: (context) {
+            return [
+              PopupMenuItem<SortByEnum>(
+                value: SortByEnum.dateDesc,
+                child: Text(l10n.historySortByDateDesc),
+              ),
+              PopupMenuItem<SortByEnum>(
+                value: SortByEnum.dateAsc,
+                child: Text(l10n.historySortByDateAsc),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem<SortByEnum>(
+                value: SortByEnum.taskThroughputDesc,
+                child: Text(l10n.historySortByTaskThroughputDesc),
+              ),
+              PopupMenuItem<SortByEnum>(
+                value: SortByEnum.taskThroughputAsc,
+                child: Text(l10n.historySortByTaskThroughputAsc),
+              ),
+            ];
+          },
+        ),
         IconButton(
           icon: Icon(filter.anyFilterActive
               ? Icons.filter_list
@@ -54,7 +88,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
       ]),
       body: ListView.separated(
         controller: ScrollController(),
-        padding: const EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.only(top: 0, bottom: 0),
         itemCount: itemsList.length,
         separatorBuilder: (context, index) => const Divider(),
         itemBuilder: (context, index) {
