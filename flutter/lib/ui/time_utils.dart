@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 String formatDuration(double seconds) {
   var intSeconds = seconds.ceil();
   var minutes = intSeconds ~/ Duration.secondsPerMinute;
@@ -13,4 +15,9 @@ String formatDuration(double seconds) {
   tokens.add(intSeconds.toString().padLeft(2, '0'));
 
   return tokens.join(':');
+}
+
+String formatDateTime(DateTime value) {
+  var dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+  return dateFormat.format(value);
 }
