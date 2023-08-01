@@ -4,8 +4,8 @@ import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:mlperfbench_common/data/results/dataset_info.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/history/utils.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
-import 'utils.dart';
 
 class RunDetailsScreen extends StatefulWidget {
   final BenchmarkExportResult result;

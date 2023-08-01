@@ -7,7 +7,7 @@ import 'package:mlperfbench/backend/bridge/ffi_config.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 import 'package:mlperfbench/resources/resource_manager.dart';
-import 'utils.dart';
+import 'package:mlperfbench/resources/utils.dart';
 
 const _configListFileName = 'benchmarksConfigurations.json';
 const _defaultConfigName = 'default';

@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'archive_cache_helper.dart';
-import 'file_cache_helper.dart';
+import 'package:mlperfbench/resources/archive_cache_helper.dart';
+import 'package:mlperfbench/resources/file_cache_helper.dart';
 
 const _oldFilesAgeInDays = 30 * 9;
 

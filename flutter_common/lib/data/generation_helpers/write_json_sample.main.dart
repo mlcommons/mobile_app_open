@@ -26,7 +26,8 @@ Future<void> main() async {
   final sample = generator.extendedResult;
   final indent = ' ' * 2;
   final converted = JsonEncoder.withIndent(indent).convert(sample);
+  final data = jsonDecode(converted) as Map<String, dynamic>;
   // at least check that parsing doesn't throw exceptions
-  final _ = ExtendedResult.fromJson(jsonDecode(converted));
+  final _ = ExtendedResult.fromJson(data);
   await file.writeAsString(converted);
 }

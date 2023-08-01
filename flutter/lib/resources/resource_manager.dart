@@ -6,12 +6,12 @@ import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/resources/cache_manager.dart';
+import 'package:mlperfbench/resources/resource.dart';
+import 'package:mlperfbench/resources/result_manager.dart';
+import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/settings/data_folder_type.dart';
-import 'cache_manager.dart';
-import 'resource.dart';
-import 'result_manager.dart';
-import 'utils.dart';
 
 class ResourceManager {
   static const _dataPrefix = 'local://';
