@@ -1,5 +1,4 @@
-
-/* Copyright 2020-2022 Samsung Electronics Co. LTD  All Rights Reserved.
+/* Copyright 2020-2023 Samsung Electronics Co. LTD  All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,39 +12,38 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef SBE_CORE_H_
-#define SBE_CORE_H_
+#ifndef MBE_CORE_HOLDER_H_
+#define MBE_CORE_HOLDER_H_
 
 /**
- * @file sbe_core.hpp
+ * @file mbe_core.hpp
  * @brief main core object for samsung backend
  * @date 2022-01-03
  * @author soobong Huh (soobong.huh@samsung.com)
  */
 
-#include "backend_c.h"
-#include "sbe_helper.hpp"
-#include "sbe_loader.hpp"
-#include "type.h"
+#include "type_interfaced.h"
+#include "mbe_loader.hpp"
+#include "mbe_helper.hpp"
 
-namespace sbe {
-class sbe_core_holder {
+namespace mbe {
+class mbe_core_holder {
  public:
-  ~sbe_core_holder() { MLOGD("Destruct a sbe_core_holder object"); }
+  ~mbe_core_holder() { MLOGD("Destruct a mbe_core_holder object"); }
 
   using backend_create_t = std::add_pointer<bool(
-      const char *, mlperf_backend_configuration_t *, const char *)>::type;
+      const char *, intf_mlperf_backend_configuration_t *, const char *)>::type;
   using backend_get_input_count_t = std::add_pointer<int(void)>::type;
   using backend_get_input_type_t =
-      std::add_pointer<mlperf_data_t(int32_t)>::type;
+      std::add_pointer<intf_mlperf_data_t(int32_t)>::type;
   using backend_set_input_t =
-      std::add_pointer<mlperf_status_t(int32_t, int32_t, void *)>::type;
+      std::add_pointer<intf_mlperf_status_t(int32_t, int32_t, void *)>::type;
   using backend_get_output_count_t = std::add_pointer<int32_t(void)>::type;
   using backend_get_output_type_t =
-      std::add_pointer<mlperf_data_t(int32_t)>::type;
+      std::add_pointer<intf_mlperf_data_t(int32_t)>::type;
   using backend_get_output_t =
-      std::add_pointer<mlperf_status_t(int32_t, int32_t, void **)>::type;
-  using backend_issue_query_t = std::add_pointer<mlperf_status_t(void)>::type;
+      std::add_pointer<intf_mlperf_status_t(int32_t, int32_t, void **)>::type;
+  using backend_issue_query_t = std::add_pointer<intf_mlperf_status_t(void)>::type;
   using backend_convert_inputs_t =
       std::add_pointer<void(int, int, int, uint8_t *)>::type;
   using backend_delete_t = std::add_pointer<void(void)>::type;
@@ -67,23 +65,23 @@ class sbe_core_holder {
 
   bool load_core_library(const char *lib_path) {
     char *error = nullptr;
-    /* load sbe core */
-    int core_id = core_ctrl::get_core_id();
-    MLOGD("acquired core id[%d]", core_id);
+    /* load mbe core */
+    mbe::core_id = core_ctrl::get_core_id();
+    MLOGD("acquired core id[%d]", mbe::core_id);
 
     if (core_id == CORE_INVALID) {
-      MLOGD("fail to get sbe core libarary. core_id[%d]", core_id);
+      MLOGE("fail to get mbe core libarary. core_id[%d]", mbe::core_id);
       return false;
     }
 
     std::string core_lib_path =
-        std::string(lib_path) + "/" + sbe_core_libs[core_id];
+        std::string(lib_path) + "/" + mbe_core_libs[mbe::core_id];
     void *handle = dlopen(core_lib_path.c_str(), RTLD_NOW);
     MLOGD("native library path[%s], handle[%p]", core_lib_path.c_str(), handle);
     if (!handle) {
-      MLOGD("fail to get handle of shared library");
+      MLOGE("fail to get handle of shared library");
       if ((error = dlerror()) != NULL) {
-        MLOGD("dlopen error with %s\n", error);
+        MLOGE("dlopen error with %s\n", error);
       }
       return false;
     }
@@ -108,7 +106,7 @@ class sbe_core_holder {
     MLOGD("unload native library");
   }
 
-  sbe_core_holder()
+  mbe_core_holder()
       : create_fp(nullptr),
         delete_fp(nullptr),
         issue_query_fp(nullptr),
@@ -121,8 +119,8 @@ class sbe_core_holder {
         convert_inputs_fp(nullptr),
         get_buffer_fp(nullptr),
         release_buffer_fp(nullptr) {
-    MLOGD("Construct a sbe_core_holder object");
+    MLOGD("Construct a mbe_core_holder object");
   }
 };
-}  // namespace sbe
+}  // namespace mbe
 #endif

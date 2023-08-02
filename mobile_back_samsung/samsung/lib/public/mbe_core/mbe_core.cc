@@ -12,10 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include "mbe_core.hpp"
-
 #include <android/log.h>
-
 #include <array>
 #include <atomic>
 #include <condition_variable>
@@ -27,11 +24,74 @@ limitations under the License.
 #include <string>
 #include <thread>
 
+#include "flutter/cpp/c/backend_c.h"
+#include "flutter/cpp/c/type.h"
+#include "type_interfaced.h"
 #include "mbe_utils.hpp"
+#include "mbe_core_holder.hpp"
 
 using namespace mbe;
 
 static mbe_core_holder *mbe_core = nullptr;
+
+int convert_backend_configuration(mlperf_backend_configuration_t *in_config, intf_mlperf_backend_configuration_t *out_config) {
+  if (!in_config || !out_config) {
+    return -1;
+  }
+  out_config->delegate_selected = in_config->delegate_selected;
+  out_config->accelerator = in_config->accelerator;
+  out_config->accelerator_desc = in_config->accelerator_desc;
+  out_config->batch_size = in_config->batch_size;
+  out_config->count = in_config->count;
+  memcpy(out_config->keys, in_config->keys, kMaxMLPerfBackendConfigs_intf);
+  memcpy(out_config->values, in_config->values, kMaxMLPerfBackendConfigs_intf);
+  return 0;
+}
+
+int convert_backend_status(intf_mlperf_status_t in_status, mlperf_status_t *out_status) {
+  if (in_status == INTF_MLPERF_SUCCESS) {
+    *out_status = MLPERF_SUCCESS;
+    return 0;
+  } else if (in_status == INTF_MLPERF_FAILURE) {
+    *out_status = MLPERF_FAILURE;
+    return 0;
+  } else {
+    return -1;
+  }
+}
+
+int convert_backend_data(intf_mlperf_data_t *in_data, mlperf_data_t *out_data) {
+  if (!in_data || !out_data) {
+    return -1;
+  }
+  out_data->size = in_data->size;
+
+  mlperf_data_t::Type type_ret;
+  switch (in_data->type) {
+    case intf_mlperf_data_t::Type::Float32:
+      type_ret = mlperf_data_t::Type::Float32;
+      break;
+    case intf_mlperf_data_t::Type::Uint8:
+      type_ret = mlperf_data_t::Type::Uint8;
+      break;
+    case intf_mlperf_data_t::Type::Int8:
+      type_ret = mlperf_data_t::Type::Int8;
+      break;
+    case intf_mlperf_data_t::Type::Float16:
+      type_ret = mlperf_data_t::Type::Float16;
+      break;
+    case intf_mlperf_data_t::Type::Int32:
+      type_ret = mlperf_data_t::Type::Int32;
+      break;
+    case intf_mlperf_data_t::Type::Int64:
+      type_ret = mlperf_data_t::Type::Int64;
+      break;
+    default:
+      return -1;
+  }
+  out_data->type = type_ret;
+  return 0;
+}
 
 bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const char **settings,
@@ -87,7 +147,12 @@ mlperf_backend_ptr_t mlperf_backend_create(
   mbe_core = new mbe_core_holder();
   bool ret = mbe_core->load_core_library(native_lib_path);
   if (ret == false) return nullptr;
-  mbe_core->create_fp(model_path, configs, native_lib_path);
+  intf_mlperf_backend_configuration_t intf_configs;
+  if (convert_backend_configuration(configs, &intf_configs)) {
+    return nullptr;
+  }
+
+  mbe_core->create_fp(model_path, &intf_configs, native_lib_path);
   MLOGD("ptr of mbe_core[%p]", mbe_core);
   return (mlperf_backend_ptr_t)mbe_core;
 }
@@ -102,7 +167,13 @@ mlperf_data_t mlperf_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
                                             int32_t i) {
   mbe_core_holder *ptr = (mbe_core_holder *)backend_ptr;
   MLOGD("+ mlperf_backend_get_input_type with ptr[%p]", ptr);
-  return ptr->get_input_type_fp(i);
+  intf_mlperf_data_t intf_data = ptr->get_input_type_fp(i);
+
+  mlperf_data_t data = {mlperf_data_t::Type::Uint8, 0};
+  if (convert_backend_data(&intf_data, &data)) {
+    MLOGE("fail to convert backend_data. return size 0.\n");
+  }
+  return data;
 }
 
 mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
@@ -110,7 +181,13 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                          void *data) {
   mbe_core_holder *ptr = (mbe_core_holder *)backend_ptr;
   MLOGD("+ mlperf_backend_set_input with mbe_core_holder[%p]", ptr);
-  return ptr->set_input_fp(batchIndex, i, data);
+  intf_mlperf_status_t intf_status =  ptr->set_input_fp(batchIndex, i, data);
+
+  mlperf_status_t status;
+  if (convert_backend_status(intf_status, &status)) {
+    return MLPERF_FAILURE;
+  }
+  return status;
 }
 
 int32_t mlperf_backend_get_output_count(mlperf_backend_ptr_t backend_ptr) {
@@ -123,13 +200,25 @@ mlperf_data_t mlperf_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
                                              int32_t i) {
   mbe_core_holder *ptr = (mbe_core_holder *)backend_ptr;
   MLOGD("+ mlperf_backend_get_output_type with ptr[%p]", ptr);
-  return ptr->get_output_type_fp(i);
+  intf_mlperf_data_t intf_data = ptr->get_output_type_fp(i);
+
+  mlperf_data_t data = {mlperf_data_t::Type::Uint8, 0};
+  if (convert_backend_data(&intf_data, &data)) {
+    MLOGE("fail to convert backend_data. return size 0.\n");
+  }
+  return data;
 }
 
 mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
   mbe_core_holder *ptr = (mbe_core_holder *)backend_ptr;
   MLOGD("+ mlperf_backend_issue_query with ptr[%p]", ptr);
-  return ptr->issue_query_fp();
+  intf_mlperf_status_t intf_status = ptr->issue_query_fp();
+
+  mlperf_status_t status;
+  if (convert_backend_status(intf_status, &status)) {
+    return MLPERF_FAILURE;
+  }
+  return status;
 }
 
 mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
@@ -137,7 +226,13 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                           void **data) {
   mbe_core_holder *ptr = (mbe_core_holder *)backend_ptr;
   MLOGD("+ mlperf_backend_get_output with ptr[%p]", ptr);
-  return ptr->get_output_fp(batchIndex, i, data);
+  intf_mlperf_status_t intf_status = ptr->get_output_fp(batchIndex, i, data);
+
+  mlperf_status_t status;
+  if (convert_backend_status(intf_status, &status)) {
+    return MLPERF_FAILURE;
+  }
+  return status;
 }
 
 void mlperf_backend_convert_inputs(void *backend_ptr, int bytes, int width,
