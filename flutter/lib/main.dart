@@ -70,7 +70,7 @@ Future<void> showExceptionScreen(Object e, StackTrace s) async {
   runApp(ExceptionWidget(e, s));
 }
 
-void autostartHandler(BenchmarkState state, Store store) async {
+Future<void> autostartHandler(BenchmarkState state, Store store) async {
   if (state.state == BenchmarkStateEnum.waiting) {
     store.selectedBenchmarkRunMode =
         const bool.fromEnvironment('submission', defaultValue: false)

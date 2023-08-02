@@ -108,7 +108,7 @@ class BenchmarkState extends ChangeNotifier {
     notifyListeners();
     try {
       await setTaskConfig(name: _store.chosenConfigurationName);
-      deferredLoadResources();
+      await deferredLoadResources();
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
@@ -121,7 +121,7 @@ class BenchmarkState extends ChangeNotifier {
 
   // Start loading resources in background.
   // Return type 'void' is intended, this function must not be awaited.
-  void deferredLoadResources() async {
+  Future<void> deferredLoadResources() async {
     try {
       await loadResources();
     } catch (e, trace) {
@@ -172,7 +172,7 @@ class BenchmarkState extends ChangeNotifier {
         state.resourceManager.applicationDirectory, state.resourceManager);
     try {
       await state.setTaskConfig(name: store.chosenConfigurationName);
-      state.deferredLoadResources();
+      await state.deferredLoadResources();
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
