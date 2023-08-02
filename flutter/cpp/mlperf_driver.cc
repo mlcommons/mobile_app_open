@@ -87,17 +87,18 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
                                  double min_duration, double max_duration,
                                  int single_stream_expected_latency_ns,
                                  const std::string& output_dir) {
-  // Setting the mlperf configs.
-  ::mlperf::TestSettings mlperf_settings;
   ::mlperf::LogSettings log_settings;
   log_settings.log_output.outdir = output_dir;
   log_settings.log_output.copy_summary_to_stdout = true;
 
+  ::mlperf::TestSettings mlperf_settings;
+  // https://github.com/mlcommons/inference/blob/master/mlperf.conf
+  mlperf_settings.qsl_rng_seed = 148687905518835231UL;
+  mlperf_settings.sample_index_rng_seed = 520418551913322573UL;
+  mlperf_settings.schedule_rng_seed = 811580660758947900UL;
+
   mlperf_settings.min_query_count = min_query_count;
   mlperf_settings.mode = Str2TestMode(mode);
-  mlperf_settings.qsl_rng_seed = 10003631887983097364UL;
-  mlperf_settings.sample_index_rng_seed = 17183018601990103738UL;
-  mlperf_settings.schedule_rng_seed = 12134888396634371638UL;
   mlperf_settings.min_duration_ms =
       static_cast<uint64_t>(std::ceil(min_duration * 1000.0));
   // Note: max_duration_ms works only in SingleStream scenario.
