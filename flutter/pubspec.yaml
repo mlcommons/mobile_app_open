@@ -47,9 +47,12 @@ dependencies:
   intl: ^0.17.0
   permission_handler: ^10.4.3
   flutter_markdown: ^0.6.15
-  firebase_core: ^2.15.0
-  firebase_storage: ^11.2.5
-  firebase_auth: ^4.7.2
+  # Use specific versions for Firebase to avoid build error on Windows
+  firebase_core: 2.10.0
+  firebase_storage: 11.1.1
+  firebase_auth: 4.4.2
+  # Fix https://github.com/firebase/flutterfire/issues/10909
+  firebase_core_platform_interface: 4.6.0
 
 dev_dependencies:
   flutter_test:
