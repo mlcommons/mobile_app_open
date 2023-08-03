@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 #include <android/log.h>
+
 #include <array>
 #include <atomic>
 #include <condition_variable>
@@ -26,15 +27,17 @@ limitations under the License.
 
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
-#include "type_interfaced.h"
-#include "mbe_utils.hpp"
 #include "mbe_core_holder.hpp"
+#include "mbe_utils.hpp"
+#include "type_interfaced.h"
 
 using namespace mbe;
 
 static mbe_core_holder *mbe_core = nullptr;
 
-int convert_backend_configuration(mlperf_backend_configuration_t *in_config, intf_mlperf_backend_configuration_t *out_config) {
+int convert_backend_configuration(
+    mlperf_backend_configuration_t *in_config,
+    intf_mlperf_backend_configuration_t *out_config) {
   if (!in_config || !out_config) {
     return -1;
   }
@@ -48,7 +51,8 @@ int convert_backend_configuration(mlperf_backend_configuration_t *in_config, int
   return 0;
 }
 
-int convert_backend_status(intf_mlperf_status_t in_status, mlperf_status_t *out_status) {
+int convert_backend_status(intf_mlperf_status_t in_status,
+                           mlperf_status_t *out_status) {
   if (in_status == INTF_MLPERF_SUCCESS) {
     *out_status = MLPERF_SUCCESS;
     return 0;
@@ -181,7 +185,7 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                          void *data) {
   mbe_core_holder *ptr = (mbe_core_holder *)backend_ptr;
   MLOGD("+ mlperf_backend_set_input with mbe_core_holder[%p]", ptr);
-  intf_mlperf_status_t intf_status =  ptr->set_input_fp(batchIndex, i, data);
+  intf_mlperf_status_t intf_status = ptr->set_input_fp(batchIndex, i, data);
 
   mlperf_status_t status;
   if (convert_backend_status(intf_status, &status)) {

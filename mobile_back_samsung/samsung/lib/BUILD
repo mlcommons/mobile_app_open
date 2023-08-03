@@ -22,7 +22,6 @@ pbtxt2header(
 
 cc_library(
     name = "samsungbackend",
-    includes = ["public/include", "include"],
     srcs = select({
         "android_arm64": [
             "public/mbe_core/mbe_core.cc",
@@ -38,11 +37,17 @@ cc_library(
         "public/include/mbe_core_holder.hpp",
         "public/include/mbe_helper.hpp",
         "public/include/mbe_loader.hpp",
-        "public/include/mbe_utils.hpp"
+        "public/include/mbe_utils.hpp",
     ],
-    deps = ["//flutter/cpp/c:headers",
-            ":mbe_config_pbtxt"],
+    includes = [
+        "include",
+        "public/include",
+    ],
     linkopts = [
         "-llog",
-    ]
+    ],
+    deps = [
+        ":mbe_config_pbtxt",
+        "//flutter/cpp/c:headers",
+    ],
 )
