@@ -114,12 +114,6 @@ http_archive(
     urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/heads/update_for_dujac.zip"],
 )
 
-new_local_repository(
-    name = "samsungbackend",
-    build_file = "samsung_backend/BUILD",
-    path = "mobile_back_samsung",
-)
-
 http_archive(
     name = "org_mlperf_inference",
     build_file = "@//flutter/android/third_party:loadgen.BUILD",
