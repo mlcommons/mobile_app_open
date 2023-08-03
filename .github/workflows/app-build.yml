@@ -62,7 +62,8 @@ jobs:
           aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
           cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/samsung_libs_v3.1.zip /tmp/ && \
           unzip -P ${AWS_SECRET_ACCESS_KEY} /tmp/samsung_libs_v3.1.zip -d /tmp/samsung_libs_v3.1 && \
-          mv /tmp/samsung_libs_v3.1/internal/* mobile_back_samsung/samsung/lib/internal
+          mkdir -p mobile_back_samsung/samsung/lib/internal && \
+          mv /tmp/samsung_libs_v3.1/internal/* mobile_back_samsung/samsung/lib/internal/
       - name: Download QTI libraries
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_AWS_ID }}
