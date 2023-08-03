@@ -1,3 +1,6 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
 benchmark_setting {
   benchmark_id: "image_classification"
   accelerator: "samsung_npu"

@@ -1,3 +1,6 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
 common_setting {
   id: "num_threads"
   name: "Number of threads"
