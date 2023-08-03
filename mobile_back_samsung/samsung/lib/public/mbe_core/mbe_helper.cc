@@ -116,15 +116,15 @@ int core_ctrl::support_mbe(const char *manufacturer, const char *model) {
 
 const char *core_ctrl::get_benchmark_config(int core_id) {
   const char *settings = nullptr;
-  ;
+
   if (core_id == SOC_1200) {
-    settings = mbe1200_config.c_str();
+    settings = mbe_config_1200_pbtxt.c_str();
   } else if (core_id == SOC_2100) {
-    settings = mbe2100_config.c_str();
+    settings = mbe_config_2100_pbtxt.c_str();
   } else if (core_id == SOC_2200) {
-    settings = mbe2200_config.c_str();
+    settings = mbe_config_2200_pbtxt.c_str();
   } else if (core_id == SOC_2300) {
-    settings = mbe2300_config.c_str();
+    settings = mbe_config_2300_pbtxt.c_str();
   }
   return settings;
 }

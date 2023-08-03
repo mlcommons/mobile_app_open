@@ -1,23 +1,6 @@
-/* Copyright 2020-2023 Samsung System LSI. All Rights Reserved.
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
-#include <string>
-
-#ifndef MBE_CONFIG_2100_H
-#define MBE_CONFIG_2100_H
-
-const std::string mbe2100_config = R"SETTINGS(
 common_setting {
   id: "num_threads"
   name: "Number of threads"
@@ -145,5 +128,4 @@ benchmark_setting {
   model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/ic_offline.nncgo"
   model_checksum: "c38acf6c66ca32c525c14ce25ead823a"
   single_stream_expected_latency_ns: 1000000
-})SETTINGS";
-#endif
+}

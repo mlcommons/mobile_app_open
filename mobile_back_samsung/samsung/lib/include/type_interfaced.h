@@ -1,4 +1,4 @@
-/* Copyright 2020 The MLPerf Authors. All Rights Reserved.
+/* Copyright 2023 The MLPerf Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,8 +12,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef MLPERF_C_TYPE_H_
-#define MLPERF_C_TYPE_H_
+#ifndef TYPE_INTERFACED_H_
+#define TYPE_INTERFACED_H_
+
+/**
+ * @file type_interfaced.h
+ * @brief converted mlperf type for samsung backend
+ * @date 2023-07-10
+ * @author Myungjong Kim (mj.kim010@samsung.com)
+ */
 
 #include <stdint.h>
 
@@ -21,12 +28,10 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-typedef void* mlperf_backend_ptr_t;
-
 typedef enum {
-  MLPERF_SUCCESS = 0,
-  MLPERF_FAILURE = 1,
-} mlperf_status_t;
+  INTF_MLPERF_SUCCESS = 0,
+  INTF_MLPERF_FAILURE = 1,
+} intf_mlperf_status_t;
 
 // Requirements of the data for a specific input. It contains the type and size
 // of that input.
@@ -42,24 +47,21 @@ typedef struct {
 
   enum Type type;
   int64_t size;
-} mlperf_data_t;
+} intf_mlperf_data_t;
 
-const int kMaxMLPerfBackendConfigs = 256;
+const int kMaxMLPerfBackendConfigs_intf = 256;
 typedef struct {
+  const char* delegate_selected;
   const char* accelerator;
+  const char* accelerator_desc;
   uint32_t batch_size;
   int count = 0;
-  const char* keys[kMaxMLPerfBackendConfigs];
-  const char* values[kMaxMLPerfBackendConfigs];
-} mlperf_backend_configuration_t;
-
-typedef struct {
-  const char* model;
-  const char* manufacturer;
-} mlperf_device_info_t;
+  const char* keys[kMaxMLPerfBackendConfigs_intf];
+  const char* values[kMaxMLPerfBackendConfigs_intf];
+} intf_mlperf_backend_configuration_t;
 
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
 
-#endif  // MLPERF_C_TYPE_H_
+#endif  // TYPE_INTERFACED_H_

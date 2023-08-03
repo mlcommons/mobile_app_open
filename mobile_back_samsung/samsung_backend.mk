@@ -21,18 +21,19 @@ ifeq (${WITH_SAMSUNG},1)
 
   backend_samsung_android_files= \
     	${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so \
-    	${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libsamsungbackend.so \
-   	${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libenn_public_api_cpp.so \
-	${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libenn_extension.so \
-        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libmbe2300_core.so \
-        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libmbe2200_core.so \
-        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libmbe2100_core.so \
-        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libmbe1200_core.so \
-    	${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libc++.so \
-    	${MOBILE_BACK_SAMSUNG_LIB_ROOT}/libeden_nn_on_system.so \
+        ${BAZEL_LINKS_PREFIX}bin/mobile_back_samsung/samsung/lib/libsamsungbackend.so \
+		${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libenn_public_api_cpp.so \
+		${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libenn_extension.so \
+        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2300_core.so \
+        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2200_core.so \
+        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2100_core.so \
+        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe1200_core.so \
+        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libc++.so \
+        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libeden_nn_on_system.so \
+
   # main binaries for Samsung backend are prebuilt
   backend_samsung_android_target= \
-    //mobile_back_samsung/samsung/lib:libsamsungbackend.so \
+    //mobile_back_samsung/samsung/lib:samsungbackend \
     //flutter/android/commonlibs:commonlibs
   backend_samsung_filename=libsamsungbackend
 
