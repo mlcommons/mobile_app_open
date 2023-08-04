@@ -12,185 +12,209 @@ common_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification"
-  accelerator: "samsung_npu"
-  accelerator_desc: "NPU"
   framework: "ENN"
-  custom_setting {
-    id: "preset"
-    value: "1009"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1009"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/ic_single_fence.nnc"
+    model_checksum: "a451da1f48b1fad01c17fb7a49e5822e"
   }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "extension"
-    value: "true"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "true"
-  }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/ic_single_fence.nnc"
-  model_checksum: "a451da1f48b1fad01c17fb7a49e5822e"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 500000
 }
 
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
-  accelerator: "samsung_npu"
-  accelerator_desc: "NPU"
   framework: "ENN"
-  custom_setting {
-    id: "preset"
-    value: "1009"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1009"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/sm_uint8_fence.nnc"
+    model_checksum: "08fa7b354f82140a8863fed57c2d499b"
   }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "extension"
-    value: "true"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "true"
-  }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/sm_uint8_fence.nnc"
-  model_checksum: "08fa7b354f82140a8863fed57c2d499b"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
   benchmark_id: "object_detection"
-  accelerator: "samsung_npu"
-  accelerator_desc: "NPU"
   framework: "ENN"
-  custom_setting {
-    id: "preset"
-    value: "1009"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1009"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/od_fence.nnc"
+    model_checksum: "8a7e1808446072545c990f3d219255c6"
   }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "extension"
-    value: "true"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "true"
-  }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/od_fence.nnc"
-  model_checksum: "8a7e1808446072545c990f3d219255c6"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
   benchmark_id: "super_resolution"
-  accelerator: "samsung_npu"
-  accelerator_desc: "NPU"
   framework: "ENN"
-  custom_setting {
-    id: "preset"
-    value: "1002"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1002"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_path: "local:///MLPerf_sideload/sr.nnc"
+    model_checksum: "6e725dffed620377b9eff463e106e6dd"
   }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "extension"
-    value: "true"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "true"
-  }
-  model_path: "local:///MLPerf_sideload/sr.nnc"
-  model_checksum: "6e725dffed620377b9eff463e106e6dd"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
-  accelerator: "npu"
-  accelerator_desc: "npu"
   framework: "ENN"
-  custom_setting {
-    id: "preset"
-    value: "1009"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "npu"
+    accelerator_desc: "npu"
+    custom_setting {
+      id: "preset"
+      value: "1009"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Int32"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/mobile_bert_fence.nnc"
+    model_checksum: "5fb666b684a9bd0b68d497128b990137"
   }
-  custom_setting {
-    id: "i_type"
-    value: "Int32"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "extension"
-    value: "true"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "true"
-  }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/mobile_bert_fence.nnc"
-  model_checksum: "5fb666b684a9bd0b68d497128b990137"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "samsung_npu"
-  accelerator_desc: "npu"
   framework: "ENN"
-  batch_size: 8192
-  custom_setting {
-    id: "scenario"
-    value: "offline"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "npu"
+    batch_size: 8192
+    custom_setting {
+      id: "scenario"
+      value: "offline"
+    }
+    custom_setting {
+      id: "preset"
+      value: "1002"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "false"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "false"
+    }
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/ic_offline.nnc"
+    model_checksum: "6885f281a3d7a7ec3549d629dff8c8ac"
   }
-  custom_setting {
-    id: "preset"
-    value: "1002"
-  }
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  custom_setting {
-    id: "extension"
-    value: "false"
-  }
-  custom_setting {
-    id: "lazy_mode"
-    value: "false"
-  }
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/ic_offline.nnc"
-  model_checksum: "6885f281a3d7a7ec3549d629dff8c8ac"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
