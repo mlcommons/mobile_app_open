@@ -15,73 +15,8 @@ limitations under the License.
 #ifndef TFLITE_SETTINGS_WINDOWS_H
 #define TFLITE_SETTINGS_WINDOWS_H
 
-#include <string>
+#include "mobile_back_tflite/cpp/backend_tflite/backend_settings/tflite_settings_windows.pbtxt.h"
 
-const std::string tflite_settings_windows = R"SETTINGS(
-common_setting {
-  id: "num_threads"
-  name: "Number of threads"
-  value {
-    value: "4"
-    name: "4 threads"
-  }
-}
-
-benchmark_setting {
-  benchmark_id: "image_classification"
-  accelerator: "cpu"
-  accelerator_desc: "CPU"
-  framework: "TFLite"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  model_checksum: "66bb4eba50987221608f8487ed405794"
-}
-
-benchmark_setting {
-  benchmark_id: "image_classification_offline"
-  accelerator: "cpu"
-  accelerator_desc: "CPU"
-  framework: "TFLite"
-  batch_size: 2
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-  model_checksum: "66bb4eba50987221608f8487ed405794"
-}
-
-benchmark_setting {
-  benchmark_id: "object_detection"
-  accelerator: "cpu"
-  accelerator_desc: "CPU"
-  framework: "TFLite"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
-  model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
-}
-
-benchmark_setting {
-  benchmark_id: "natural_language_processing"
-  accelerator: "cpu"
-  accelerator_desc: "CPU"
-  framework: "TFLite"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
-  model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
-}
-
-benchmark_setting {
-  benchmark_id: "image_segmentation_v2"
-  accelerator: "cpu"
-  accelerator_desc: "CPU"
-  framework: "TFLite"
-  model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
-  model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
-}
-
-benchmark_setting {
-  benchmark_id: "super_resolution"
-  accelerator: "cpu"
-  accelerator_desc: "CPU"
-  framework: "TFLite"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
-  model_checksum: "672240427c1f3dc33baf2facacd9631f"
-}
-
-)SETTINGS";
+const std::string tflite_settings_windows = tflite_settings_windows_pbtxt;
 
 #endif
