@@ -9,6 +9,7 @@ key: <accelerator> OR <accelerator>|<backendName>
 - npu -> Android TFLite
 - tpu -> Android Pixel
 - ane -> iOS TFLite or Core ML
+- cpu|gpu|ane -> IOS Core ML
 */
 
 const Map<String, Interval> _imageClassification = {
@@ -16,6 +17,7 @@ const Map<String, Interval> _imageClassification = {
   'npu': Interval(min: 0.89, max: 0.91),
   'tpu': Interval(min: 0.89, max: 0.91),
   'ane': Interval(min: 1.00, max: 1.00),
+  'cpu|gpu|ane': Interval(min: 1.00, max: 1.00)
 };
 
 const Map<String, Interval> _objectDetection = {
@@ -24,6 +26,7 @@ const Map<String, Interval> _objectDetection = {
   'tpu': Interval(min: 0.36, max: 0.38),
   'ane|TFLite': Interval(min: 0.31, max: 0.34),
   'ane|Core ML': Interval(min: 0.45, max: 0.46),
+  'cpu|gpu|ane': Interval(min: 0.45, max: 0.46)
 };
 
 const Map<String, Interval> _imageSegmentation = {
@@ -32,6 +35,7 @@ const Map<String, Interval> _imageSegmentation = {
   'tpu': Interval(min: 0.33, max: 0.34),
   'ane|TFLite': Interval(min: 0.38, max: 0.40),
   'ane|Core ML': Interval(min: 0.38, max: 0.40),
+  'cpu|gpu|ane': Interval(min: 0.38, max: 0.40)
 };
 
 const Map<String, Interval> _naturalLanguageProcessing = {
@@ -40,6 +44,7 @@ const Map<String, Interval> _naturalLanguageProcessing = {
   'gpu|TFLite': Interval(min: 1.00, max: 1.00),
   // 1.00 in simulator, 0.80 on iphone 12 mini
   'gpu|Core ML': Interval(min: 0.80, max: 1.00),
+  'cpu|gpu|ane': Interval(min: 0.80, max: 1.00)
 };
 
 const Map<String, Interval> _superResolution = {
@@ -48,6 +53,7 @@ const Map<String, Interval> _superResolution = {
   'tpu': Interval(min: 0.32, max: 0.35),
   'ane|TFLite': Interval(min: 0.32, max: 0.35),
   'ane|Core ML': Interval(min: 0.32, max: 0.35),
+  'cpu|gpu|ane': Interval(min: 0.32, max: 0.35)
 };
 
 const benchmarkExpectedAccuracy = {
