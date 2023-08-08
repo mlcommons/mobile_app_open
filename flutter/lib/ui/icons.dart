@@ -1,56 +1,51 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_svg/avd.dart';
 import 'package:flutter_svg/svg.dart';
 
 class AppIcons {
-  static AvdPicture _pAvd(String name) {
-    return AvdPicture.asset('assets/icons/$name');
+  static SvgPicture _pSvgWhite(String name) {
+    const colorFilter = ColorFilter.mode(Colors.white, BlendMode.srcIn);
+    return SvgPicture.asset('assets/icons/$name', colorFilter: colorFilter);
   }
 
-  static AvdPicture _iconWhiteAvd(String name) {
-    return AvdPicture.asset('assets/icons/$name', color: Colors.white);
+  static SvgPicture _pSvgBlack(String name) {
+    const colorFilter = ColorFilter.mode(Colors.black, BlendMode.srcIn);
+    return SvgPicture.asset('assets/icons/$name', colorFilter: colorFilter);
   }
 
   static SvgPicture _pSvg(String name) {
     return SvgPicture.asset('assets/icons/$name');
   }
 
-  static SvgPicture _iconColorSvg(String name, Color color) {
-    return SvgPicture.asset('assets/icons/$name', color: color);
-  }
-
-  static final AvdPicture imageClassification =
-      _pAvd('ic_image_classification.xml');
+  static final SvgPicture imageClassification =
+      _pSvg('ic_image_classification.svg');
   static final SvgPicture imageSegmentation =
       _pSvg('ic_image_segmentation.svg');
-  static final AvdPicture objectDetection = _pAvd('ic_object_detection.xml');
-  static final AvdPicture languageProcessing =
-      _pAvd('ic_language_processing.xml');
+  static final SvgPicture objectDetection = _pSvg('ic_object_detection.svg');
+  static final SvgPicture languageProcessing =
+      _pSvg('ic_language_processing.svg');
   static final SvgPicture imageClassificationOffline =
       _pSvg('ic_image_classification_offline.svg');
   static final SvgPicture superResolution = _pSvg('ic_super_resolution.svg');
 
-  static final AvdPicture imageClassificationWhite =
-      _iconWhiteAvd('ic_image_classification.xml');
+  static final SvgPicture imageClassificationWhite =
+      _pSvgWhite('ic_image_classification.svg');
   static final SvgPicture imageSegmentationWhite =
-      _iconColorSvg('ic_image_segmentation.svg', Colors.white);
-  static final AvdPicture objectDetectionWhite =
-      _iconWhiteAvd('ic_object_detection.xml');
-  static final AvdPicture languageProcessingWhite =
-      _iconWhiteAvd('ic_language_processing.xml');
+      _pSvgWhite('ic_image_segmentation.svg');
+  static final SvgPicture objectDetectionWhite =
+      _pSvgWhite('ic_object_detection.svg');
+  static final SvgPicture languageProcessingWhite =
+      _pSvgWhite('ic_language_processing.svg');
   static final SvgPicture imageClassificationOfflineWhite =
       _pSvg('ic_image_classification_offline_white.svg');
   static final SvgPicture superResolutionWhite =
-      _iconColorSvg('ic_super_resolution.svg', Colors.white);
+      _pSvgWhite('ic_super_resolution.svg');
 
-  static final AvdPicture arrow = _pAvd('ic_arrow.xml');
-  static final AvdPicture parameters = _pAvd('ic_parameters.xml');
-  static final AvdPicture settings = _pAvd('ic_settings.xml');
+  static final SvgPicture arrow = _pSvg('ic_arrow.svg');
 
-  static final AvdPicture logo = _pAvd('ic_logo.xml');
+  static final SvgPicture logo = _pSvg('ic_logo.svg');
 
-  static final SvgPicture error = _iconColorSvg('ic_error.svg', Colors.black);
+  static final SvgPicture error = _pSvgBlack('ic_error.svg');
 
   static final SvgPicture performanceHand = _pSvg('ic_performance_hand.svg');
 

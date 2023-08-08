@@ -120,10 +120,10 @@ http_archive(
     patch_args = ["-p1"],
     patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
     patches = [],
-    sha256 = "40d0123c8447a0bdd4d5c8fda5eea22c7b08f3b05501858d2ba89be4f44fc84b",
-    strip_prefix = "inference-f5367250115ad4febf1334b34881ab74f2e55bfe",
+    sha256 = "e664f980e84fcab3573447c0cc3adddd1fcf900367c5dcbff17179ece24c484e",
+    strip_prefix = "inference-2da0c52666e21e4b296b09e1dbd287bf3a814e96",
     urls = [
-        "https://github.com/mlcommons/inference/archive/f5367250115ad4febf1334b34881ab74f2e55bfe.tar.gz",
+        "https://github.com/mlcommons/inference/archive/2da0c52666e21e4b296b09e1dbd287bf3a814e96.tar.gz",
     ],
 )
 

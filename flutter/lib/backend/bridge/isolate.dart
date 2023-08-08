@@ -67,7 +67,7 @@ class BridgeIsolate {
     return ffi_run.getDatasetSize();
   }
 
-  static void _isolateRun(SendPort sendPort) async {
+  static Future<void> _isolateRun(SendPort sendPort) async {
     var port = ReceivePort();
     sendPort.send(port.sendPort);
     await for (var settings in port.cast<RunSettings>()) {

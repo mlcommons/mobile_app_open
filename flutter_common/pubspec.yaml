@@ -10,17 +10,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^0.13.5
+  http: ^0.13.6
   import_sorter: ^4.6.0
-  json_annotation: ^4.8.0
-  path_provider: ^2.0.13
+  json_annotation: ^4.8.1
+  path_provider: ^2.0.15
   uuid: ^3.0.7
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.2
-  json_serializable: ^6.6.1
+  json_serializable: ^6.6.2
   build_runner: ^2.3.3
 
 # For information on the generic Dart part of this file, see the
