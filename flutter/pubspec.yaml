@@ -47,10 +47,11 @@ dependencies:
   intl: ^0.17.0
   permission_handler: ^10.4.3
   flutter_markdown: ^0.6.15
-  firebase_storage: ^11.2.5
   firebase_core: ^2.15.0
+  firebase_storage: ^11.2.5
   firebase_auth: ^4.7.2
   firebase_ui_auth: ^1.6.2
+  firebase_crashlytics: ^3.3.5
 
 dev_dependencies:
   flutter_test:
