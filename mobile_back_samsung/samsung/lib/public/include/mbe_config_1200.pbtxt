@@ -9,106 +9,134 @@ common_setting {
     name: "4 threads"
   }
 }
+
 benchmark_setting {
   benchmark_id: "image_classification"
-  accelerator: "npu"
-  accelerator_desc: "npu"
   framework: "ENN"
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "npu"
+    accelerator_desc: "npu"
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    model_path: "local:///MLPerf_sideload/ic.nnc"
+    model_checksum: "a1f2b667ba702531fb85d83bb4ff4e94"
   }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  model_path: "local:///MLPerf_sideload/ic.nnc"
-  model_checksum: "a1f2b667ba702531fb85d83bb4ff4e94"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 900000
 }
+
 benchmark_setting {
   benchmark_id: "object_detection"
-  accelerator: "npu"
-  accelerator_desc: "npu"
   framework: "ENN"
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "npu"
+    accelerator_desc: "npu"
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    model_path: "local:///MLPerf_sideload/od.nnc"
+    model_checksum: "0d11a82c8b39da82f620dd972caac3f2"
   }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  model_path: "local:///MLPerf_sideload/od.nnc"
-  model_checksum: "0d11a82c8b39da82f620dd972caac3f2"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
+
 benchmark_setting {
   benchmark_id: "image_segmentation_v1"
-  accelerator: "npu"
-  accelerator_desc: "npu"
   framework: "ENN"
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
-  }
-  custom_setting {
-    id: "o_type"
-    value: "Int32"
-  }
-  model_path: "local:///MLPerf_sideload/is.nnc"
-  model_checksum: "e852f29a81cafad37e803a0d1af7c533"
+  delegate_choice: { delegate_name: "ENN_NPU"
+    accelerator_name: "npu"
+    accelerator_desc: "npu"
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Int32"
+    }
+    model_path: "local:///MLPerf_sideload/is.nnc"
+    model_checksum: "e852f29a81cafad37e803a0d1af7c533" }
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
+
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
-  accelerator: "npu"
-  accelerator_desc: "npu"
   framework: "ENN"
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "npu"
+    accelerator_desc: "npu"
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Int32"
+    }
+    model_path: "local:///MLPerf_sideload/sm_uint8.nnc"
+    model_checksum: "34fa011cfbf145ccc06072840974d9a1"
   }
-  custom_setting {
-    id: "o_type"
-    value: "Int32"
-  }
-  model_path: "local:///MLPerf_sideload/sm_uint8.nnc"
-  model_checksum: "34fa011cfbf145ccc06072840974d9a1"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
+
 benchmark_setting {
   benchmark_id: "super_resolution"
-  accelerator: "samsung_npu"
-  accelerator_desc: "NPU"
   framework: "ENN"
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    model_path: "local:///MLPerf_sideload/sr.nnc"
+    model_checksum: "6e725dffed620377b9eff463e106e6dd"
   }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  model_path: "local:///MLPerf_sideload/sr.nnc"
-  model_checksum: "6e725dffed620377b9eff463e106e6dd"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
+
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "npu"
-  accelerator_desc: "npu"
   framework: "ENN"
-  batch_size: 48
-  custom_setting {
-    id: "i_type"
-    value: "Uint8"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "npu"
+    accelerator_desc: "npu"
+    batch_size: 48
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    model_path: "local:///MLPerf_sideload/ic_offline.nnc"
+    model_checksum: "a1f2b667ba702531fb85d83bb4ff4e94"
   }
-  custom_setting {
-    id: "o_type"
-    value: "Float32"
-  }
-  model_path: "local:///MLPerf_sideload/ic_offline.nnc"
-  model_checksum: "a1f2b667ba702531fb85d83bb4ff4e94"
+  delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
