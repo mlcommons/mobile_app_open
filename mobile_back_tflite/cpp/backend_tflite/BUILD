@@ -32,6 +32,7 @@ pbtxt2header(
         "backend_settings/tflite_settings_apple_iphone12.pbtxt",
         "backend_settings/tflite_settings_apple_iphoneX.pbtxt",
         "backend_settings/tflite_settings_apple_main.pbtxt",
+        "backend_settings/tflite_settings_windows.pbtxt",
     ],
 )
 

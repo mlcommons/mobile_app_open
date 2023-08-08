@@ -48,19 +48,6 @@ message BenchmarkSetting {
   // Name of the default selected delegate. Will be updated by the frontend.
   // Must be one of DelegateSetting.delegate_name.
   optional string delegate_selected = 11;
-
-  // The fields below are deprecated and will be removed in the future.
-  // Use delegate_choice instead.
-  // URL or local path of the model file
-  optional string model_path = 3 [deprecated = true];
-  // MD5 checksum to validate the model file
-  optional string model_checksum = 4 [deprecated = true];
-  // Name of the accelerator (hardware), which is passed to the backend.
-  optional string accelerator = 5 [deprecated = true];
-  // Human-readable name of the accelerator (hardware)
-  optional string accelerator_desc = 6 [deprecated = true];
-  // batch_size is passed to the backend
-  optional int32 batch_size = 8 [deprecated = true];
 }
 
 // Config of a delegate.

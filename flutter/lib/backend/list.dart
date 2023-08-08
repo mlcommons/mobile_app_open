@@ -13,39 +13,10 @@ class BackendInfoHelper {
     for (var name in getBackendsList()) {
       final backendSettings = match(name);
       if (backendSettings != null) {
-        final migratedBackendSettings = migrateBackendSetting(backendSettings);
-        return BackendInfo._(migratedBackendSettings, name);
+        return BackendInfo._(backendSettings, name);
       }
     }
     throw 'no matching backend found';
-  }
-
-  // Support old benchmark_setting with no delegate_choice.
-  // Remove this after deprecated fields are removed from backend_setting.proto
-  // ignore_for_file: deprecated_member_use_from_same_package
-  pb.BackendSetting migrateBackendSetting(pb.BackendSetting setting) {
-    for (final benchmarkSetting in setting.benchmarkSetting) {
-      if (benchmarkSetting.delegateChoice.isNotEmpty) {
-        continue;
-      }
-      final delegateChoice = pb.DelegateSetting(
-        delegateName: '',
-        acceleratorName: benchmarkSetting.accelerator,
-        acceleratorDesc: benchmarkSetting.acceleratorDesc,
-        modelPath: benchmarkSetting.modelPath,
-        modelChecksum: benchmarkSetting.modelChecksum,
-        batchSize: benchmarkSetting.batchSize,
-      );
-      benchmarkSetting.delegateChoice.add(delegateChoice);
-      benchmarkSetting.clearAccelerator();
-      benchmarkSetting.clearAcceleratorDesc();
-      benchmarkSetting.clearModelPath();
-      benchmarkSetting.clearModelChecksum();
-      benchmarkSetting.clearBatchSize();
-      benchmarkSetting.delegateSelected = '';
-      print('Migrated benchmarkSetting of: ${benchmarkSetting.benchmarkId}');
-    }
-    return setting;
   }
 
   pb.BackendSetting? match(String libName) {

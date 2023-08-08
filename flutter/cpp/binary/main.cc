@@ -89,29 +89,6 @@ DatasetConfig::DatasetType BenchmarkId2DatasetType(absl::string_view name) {
   }
 }
 
-void MigrateBackendSetting(BackendSetting *setting) {
-  for (auto &bs : *setting->mutable_benchmark_setting()) {
-    if (!bs.delegate_choice().empty()) {
-      continue;
-    }
-    DelegateSetting choice;
-    choice.set_delegate_name("");
-    choice.set_accelerator_name(bs.accelerator());
-    choice.set_accelerator_desc(bs.accelerator_desc());
-    choice.set_model_path(bs.model_path());
-    choice.set_model_checksum(bs.model_checksum());
-    choice.set_batch_size(bs.batch_size());
-    *bs.mutable_delegate_choice()->Add() = choice;
-    bs.clear_accelerator();
-    bs.clear_accelerator_desc();
-    bs.clear_model_path();
-    bs.clear_model_checksum();
-    bs.clear_batch_size();
-    bs.set_delegate_selected("");
-    LOG(INFO) << "Migrated benchmarkSetting of: " << bs.benchmark_id();
-  }
-}
-
 }  // namespace
 
 int Main(int argc, char *argv[]) {
@@ -207,12 +184,7 @@ int Main(int argc, char *argv[]) {
             lib_path, native_lib_path, "", model_file_path, &pbdata);
         std::string backend_setting_string(pbdata, strlen(pbdata));
         BackendSetting backend_setting;
-
         google::protobuf::TextFormat::ParseFromString(pbdata, &backend_setting);
-        // Support old benchmark_setting with no delegate_choice.
-        // Remove this after deprecated fields are removed from
-        // backend_setting.proto
-        MigrateBackendSetting(&backend_setting);
 
         // If batch_size flag is set, override the backend_setting
         for (auto &bs : *backend_setting.mutable_benchmark_setting()) {
