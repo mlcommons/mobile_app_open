@@ -6,7 +6,8 @@ FROM ubuntu:20.04
 # JDK package downloads ~500 MB from slow mirrors, which can take a lot of time,
 #   so a separate layer for it makes image rebuild faster in case we change any other dependencies.
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    openjdk-11-jdk-headless
+    openjdk-11-jdk-headless && \
+    rm -rf /var/lib/apt/lists/*
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     build-essential \
     apt-transport-https \
@@ -18,7 +19,8 @@ RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install 
     make \
     protobuf-compiler \
     python3 \
-    python3-pip
+    python3-pip && \
+    rm -rf /var/lib/apt/lists/*
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python3 -m pip install numpy absl-py
 
