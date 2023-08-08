@@ -41,7 +41,7 @@ class _ShareButton extends State<ShareButton> {
     );
   }
 
-  void _handleSharing(_ShareDestination destination) async {
+  Future<void> _handleSharing(_ShareDestination destination) async {
     final resultManager = state.resourceManager.resultManager;
     switch (destination) {
       case _ShareDestination.local:
