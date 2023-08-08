@@ -98,6 +98,66 @@ private class MLMultiArrayBatchProvider: NSObject, MLBatchProvider {
   }
 }
 
+enum ComputationUnitNameEnum: String {
+  case all = "cpu&gpu&ane"
+  case cpuAndGPU = "cpu&gpu"
+  case cpuAndNeuralEngine = "cpu&ane"
+  case cpuOnly = "cpuOnly"
+  case unknown = "uknown"
+}
+
+private class MLCommonsComputationUnit {
+  private var unit: MLComputeUnits = .all
+
+  init(unitName: ComputationUnitNameEnum) {
+    unit = getComputationUnit(unitName)
+  }
+
+  private func getComputationUnit(_ computationUnitName: ComputationUnitNameEnum) -> MLComputeUnits
+  {
+    switch computationUnitName {
+    case .all:
+      return MLComputeUnits.all
+    case .cpuAndGPU:
+      return MLComputeUnits.cpuAndGPU
+    case .cpuAndNeuralEngine:
+      if #available(iOS 16.0, *) {
+        return MLComputeUnits.cpuAndNeuralEngine
+      }
+      return MLComputeUnits.cpuAndGPU
+    case .cpuOnly:
+      return MLComputeUnits.cpuOnly
+    case .unknown:
+      return MLComputeUnits.all
+    }
+  }
+
+  private func getNameForComputationUnit(_ computationUnit: MLComputeUnits)
+    -> ComputationUnitNameEnum
+  {
+    switch computationUnit {
+    case .all:
+      return ComputationUnitNameEnum.all
+    case .cpuAndNeuralEngine:
+      return ComputationUnitNameEnum.cpuAndNeuralEngine
+    case .cpuAndGPU:
+      return ComputationUnitNameEnum.cpuAndGPU
+    case .cpuOnly:
+      return ComputationUnitNameEnum.cpuOnly
+    @unknown default:
+      return ComputationUnitNameEnum.unknown
+    }
+  }
+
+  var computeUnits: MLComputeUnits {
+    return unit
+  }
+
+  var computationUnitName: ComputationUnitNameEnum {
+    return getNameForComputationUnit(unit)
+  }
+}
+
 @objc
 public class CoreMLExecutor: NSObject {
   private var modelURL: URL?
@@ -110,12 +170,21 @@ public class CoreMLExecutor: NSObject {
   private var inputNames: [String] = []
   private var outputNames: [String] = []
   private var outputProvider: MLBatchProvider?
+  private var accelerator: MLCommonsComputationUnit = MLCommonsComputationUnit(unitName: .all)
 
   @objc
-  public init(modelPath: UnsafePointer<CChar>, batchSize: Int) throws {
+  public init(
+    modelPath: UnsafePointer<CChar>, batchSize: Int, acceleratorName: UnsafePointer<CChar>
+  ) throws {
     pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0)
     let config = MLModelConfiguration()
-    config.computeUnits = MLComputeUnits.all
+
+    let unitName = String(validatingUTF8: acceleratorName)
+
+    if let name = unitName, let computationUnit = ComputationUnitNameEnum(rawValue: name) {
+      accelerator = MLCommonsComputationUnit(unitName: computationUnit)
+      config.computeUnits = accelerator.computeUnits
+    }
 
     guard let modelPathString = String(validatingUTF8: modelPath),
       let url = URL(string: modelPathString),
@@ -274,5 +343,12 @@ public class CoreMLExecutor: NSObject {
     let outputFeature = outputFeatures[batchIndex][i]
     data.pointee = outputFeature.data
     return true
+  }
+
+  @objc
+  public func getAccelerator() -> UnsafePointer<CChar>? {
+    let name = accelerator.computationUnitName.rawValue
+    let cs = (name as NSString).utf8String
+    return UnsafePointer<Int8>(cs)
   }
 }
