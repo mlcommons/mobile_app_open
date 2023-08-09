@@ -103,7 +103,6 @@ enum ComputationUnitNameEnum: String {
   case cpuAndGPU = "cpu&gpu"
   case cpuAndNeuralEngine = "cpu&ane"
   case cpuOnly = "cpuOnly"
-  case unknown = "uknown"
 }
 
 private class MLCommonsComputationUnit {
@@ -117,18 +116,21 @@ private class MLCommonsComputationUnit {
   {
     switch computationUnitName {
     case .all:
-      return MLComputeUnits.all
+      if Device.hasANE == true {
+        return MLComputeUnits.all
+      } else {
+        return MLComputeUnits.cpuAndGPU
+      }
     case .cpuAndGPU:
       return MLComputeUnits.cpuAndGPU
     case .cpuAndNeuralEngine:
-      if #available(iOS 16.0, macOS 13.0, *) {
+      if Device.hasANE == true, #available(iOS 16.0, macOS 13.0, *) {
         return MLComputeUnits.cpuAndNeuralEngine
+      } else {
+        return MLComputeUnits.cpuOnly
       }
-      return MLComputeUnits.cpuAndGPU
     case .cpuOnly:
       return MLComputeUnits.cpuOnly
-    case .unknown:
-      return MLComputeUnits.all
     }
   }
 
@@ -145,7 +147,8 @@ private class MLCommonsComputationUnit {
     case .cpuOnly:
       return ComputationUnitNameEnum.cpuOnly
     @unknown default:
-      return ComputationUnitNameEnum.unknown
+      NSLog("Unknown MLComputeUnits: \(computationUnit)")
+      return ComputationUnitNameEnum.all
     }
   }
 

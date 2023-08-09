@@ -22,7 +22,7 @@ NSString * rootDir = @"/Users/anh/dev/mlcommons/mobile_app_open/";
 void testIC() {
     const char * modelPath = [[rootDir stringByAppendingString: @"mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel"] UTF8String];
     const char * inputFile = [[rootDir stringByAppendingString: @"mobile_back_apple/dev-resources/imagenet/grace_hopper.raw" ] UTF8String];
-    const char *acceleratorName = "cpu&gpu";
+    const char *acceleratorName = "cpu&ane";
     const int expectedPredictedIndex = 653; // expected index for grace_hopper is 653
     
     int batchSize = 32;
