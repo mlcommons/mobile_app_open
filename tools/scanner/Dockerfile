@@ -1,13 +1,16 @@
 ARG BASE_DOCKER_IMAGE_TAG
 FROM $BASE_DOCKER_IMAGE_TAG
 
-RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends unzip
+# Install minimum recommended Java version
+RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    openjdk-17-jdk-headless && \
+    rm -rf /var/lib/apt/lists/*
 
 ARG SONAR_SCANNER_DIR=$HOME/.sonar
 
 # Install sonar-scanner
 # Check for newer version here: https://binaries.sonarsource.com/?prefix=Distribution/sonar-scanner-cli/
-ENV SONAR_SCANNER_VERSION=4.8.0.2856
+ENV SONAR_SCANNER_VERSION=5.0.1.3006
 RUN curl --proto '=https' --create-dirs -sSLo $SONAR_SCANNER_DIR/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip
 RUN unzip -qq -o $SONAR_SCANNER_DIR/sonar-scanner.zip -d $SONAR_SCANNER_DIR/
 ENV PATH=$PATH:$SONAR_SCANNER_DIR/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin
