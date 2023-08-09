@@ -17,10 +17,11 @@
 #import <mobile_back_apple-Swift.h>
 #import "mobile_back_apple-Bridging-Header.h"
 
+NSString * rootDir = @"/Users/anh/dev/mlcommons/mobile_app_open/";
 
 void testIC() {
-    const char * modelPath = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel";
-    const char * inputFile = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/imagenet/grace_hopper.raw";
+    const char * modelPath = [[rootDir stringByAppendingString: @"mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel"] UTF8String];
+    const char * inputFile = [[rootDir stringByAppendingString: @"mobile_back_apple/dev-resources/imagenet/grace_hopper.raw" ] UTF8String];
     const char *acceleratorName = "cpu&gpu";
     const int expectedPredictedIndex = 653; // expected index for grace_hopper is 653
     
@@ -87,7 +88,7 @@ void testIC() {
 }
 
 void testOD() {
-    const char * modelPath = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/mobiledet/MobileDet.mlmodel";
+    const char * modelPath = [[rootDir stringByAppendingString: @"mobile_back_apple/dev-resources/mobiledet/MobileDet.mlmodel"] UTF8String];
     const char *acceleratorName = "cpu&gpu";
     NSError *error = nil;
     CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:1 acceleratorName:acceleratorName error: &error];
@@ -126,7 +127,7 @@ void testIS() {
 }
 
 void testLU() {
-    const char * modelPath = "/Volumes/work/Programming/ScopicSoftware/MLCommons/mobile/mobile_back_apple/dev-resources/mobilebert/MobileBERT.mlmodel";
+    const char * modelPath = [[rootDir stringByAppendingString: @"mobile_back_apple/dev-resources/mobilebert/MobileBERT.mlmodel"] UTF8String];
     const char *acceleratorName = "cpu&gpu";
     NSError *error = nil;
     CoreMLExecutor *coreMLExecutor = [[CoreMLExecutor alloc] initWithModelPath:modelPath batchSize:1 acceleratorName:acceleratorName error: &error];
