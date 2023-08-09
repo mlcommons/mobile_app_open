@@ -102,13 +102,6 @@ benchmark_setting {
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileBERT.mlmodel"
     model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
   }
-   delegate_choice: {
-    delegate_name: "CPU & ANE"
-    accelerator_name: "cpu&ane"
-    accelerator_desc: "CPU and Neural Engine"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileBERT.mlmodel"
-    model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
-  }
   delegate_selected: "CPU & GPU & ANE"
 }
 
