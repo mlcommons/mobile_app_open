@@ -116,7 +116,7 @@ private class MLCommonsComputationUnit {
   {
     switch computationUnitName {
     case .all:
-      if Device.hasANE == true {
+      if let hasANE = Device.hasANE, hasANE {
         return MLComputeUnits.all
       } else {
         return MLComputeUnits.cpuAndGPU
@@ -124,7 +124,7 @@ private class MLCommonsComputationUnit {
     case .cpuAndGPU:
       return MLComputeUnits.cpuAndGPU
     case .cpuAndNeuralEngine:
-      if Device.hasANE == true, #available(iOS 16.0, macOS 13.0, *) {
+      if let hasANE = Device.hasANE, hasANE, #available(iOS 16.0, macOS 13.0, *) {
         return MLComputeUnits.cpuAndNeuralEngine
       } else {
         return MLComputeUnits.cpuOnly
