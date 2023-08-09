@@ -5,7 +5,7 @@ benchmark_setting {
   benchmark_id: "image_classification"
   framework: "Core ML"
   delegate_choice: {
-    delegate_name: "All"
+    delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
@@ -25,14 +25,14 @@ benchmark_setting {
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
     model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
   }
-  delegate_selected: "All"
+  delegate_selected: "CPU & GPU & ANE"
 }
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
   framework: "Core ML"
   delegate_choice: {
-    delegate_name: "All"
+    delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     batch_size: 32
@@ -55,14 +55,14 @@ benchmark_setting {
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
     model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
   }
-  delegate_selected: "All"
+  delegate_selected: "CPU & GPU & ANE"
 }
 
 benchmark_setting {
   benchmark_id: "object_detection"
   framework: "Core ML"
   delegate_choice: {
-    delegate_name: "All"
+    delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileDet.mlmodel"
@@ -82,14 +82,14 @@ benchmark_setting {
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileDet.mlmodel"
     model_checksum: "ef849fbf2132e205158f05ca42db25f4"
   }
-  delegate_selected: "All"
+  delegate_selected: "CPU & GPU & ANE"
 }
 
 benchmark_setting {
   benchmark_id: "natural_language_processing"
   framework: "Core ML"
   delegate_choice: {
-    delegate_name: "All"
+    delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileBERT.mlmodel"
@@ -109,14 +109,14 @@ benchmark_setting {
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileBERT.mlmodel"
     model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
   }
-  delegate_selected: "All"
+  delegate_selected: "CPU & GPU & ANE"
 }
 
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   framework: "Core ML"
   delegate_choice: {
-    delegate_name: "All"
+    delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/Mosaic.mlmodel"
@@ -136,14 +136,14 @@ benchmark_setting {
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/Mosaic.mlmodel"
     model_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
   }
-  delegate_selected: "All"
+  delegate_selected: "CPU & GPU & ANE"
 }
 
 benchmark_setting {
   benchmark_id: "super_resolution"
   framework: "Core ML"
   delegate_choice: {
-    delegate_name: "All"
+    delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/edsr_f32b5_fp32.mlmodel"
@@ -163,5 +163,5 @@ benchmark_setting {
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/edsr_f32b5_fp32.mlmodel"
     model_checksum: "62489706f20b0c2ae561fb2204eefb61"
   }
-  delegate_selected: "All"
+  delegate_selected: "CPU & GPU & ANE"
 }
