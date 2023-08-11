@@ -94,7 +94,7 @@ class ResourceErrorScreen extends StatelessWidget {
                           try {
                             await state.setTaskConfig(
                                 name: store.chosenConfigurationName);
-                            await state.deferredLoadResources();
+                            state.deferredLoadResources();
                           } catch (e, trace) {
                             print("can't change task config: $e");
                             print(trace);
