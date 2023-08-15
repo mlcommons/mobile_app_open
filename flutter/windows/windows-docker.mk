@@ -40,11 +40,14 @@ flutter/windows/ci:
 
 	# Only run `make flutter/windows/ci/*` inside the docker windows container
 	make flutter/windows/ci/copy-mount-to-local
+	# A work-around to have `pub get` not updating committed, generated files in CI env.
+	flutter config --no-enable-windows-desktop
 	cd ${fwc_local_project} && make \
 		BAZEL_OUTPUT_ROOT_ARG=--output_user_root=C:/bazel-root/ \
 		BAZEL_LINKS_PREFIX=C:/bazel-links/ \
 		flutter/prepare \
 		flutter/windows/libs
+	flutter config --enable-windows-desktop
 	cd ${fwc_local_project} && make \
 		flutter/test/integration
 	cd ${fwc_local_project} && make \
