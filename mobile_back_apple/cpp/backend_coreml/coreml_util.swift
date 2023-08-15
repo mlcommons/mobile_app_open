@@ -103,7 +103,6 @@ enum ComputationUnitNameEnum: String {
   case cpuAndGPU = "cpu&gpu"
   case cpuAndNeuralEngine = "cpu&ane"
   case cpuOnly = "cpuOnly"
-  case unknown = "uknown"
 }
 
 private class MLCommonsComputationUnit {
@@ -117,18 +116,21 @@ private class MLCommonsComputationUnit {
   {
     switch computationUnitName {
     case .all:
-      return MLComputeUnits.all
+      if let hasANE = Device.hasANE, hasANE {
+        return MLComputeUnits.all
+      } else {
+        return MLComputeUnits.cpuAndGPU
+      }
     case .cpuAndGPU:
       return MLComputeUnits.cpuAndGPU
     case .cpuAndNeuralEngine:
-      if #available(iOS 16.0, *) {
+      if let hasANE = Device.hasANE, hasANE, #available(iOS 16.0, macOS 13.0, *) {
         return MLComputeUnits.cpuAndNeuralEngine
+      } else {
+        return MLComputeUnits.cpuOnly
       }
-      return MLComputeUnits.cpuAndGPU
     case .cpuOnly:
       return MLComputeUnits.cpuOnly
-    case .unknown:
-      return MLComputeUnits.all
     }
   }
 
@@ -145,7 +147,8 @@ private class MLCommonsComputationUnit {
     case .cpuOnly:
       return ComputationUnitNameEnum.cpuOnly
     @unknown default:
-      return ComputationUnitNameEnum.unknown
+      NSLog("Unknown MLComputeUnits: \(computationUnit)")
+      return ComputationUnitNameEnum.all
     }
   }
 
@@ -351,4 +354,52 @@ public class CoreMLExecutor: NSObject {
     let cs = (name as NSString).utf8String
     return UnsafePointer<Int8>(cs)
   }
+}
+
+class Device {
+
+  // iPhone10,3
+  static var firmwareIdentifier: String {
+    var systemInfo = utsname()
+    uname(&systemInfo)
+    let machineMirror = Mirror(reflecting: systemInfo.machine)
+    let identifier = machineMirror.children.reduce("") { identifier, element in
+      guard let value = element.value as? Int8, value != 0
+      else { return identifier }
+      return identifier + String(UnicodeScalar(UInt8(value)))
+    }
+    return identifier
+  }
+
+  // firmwareIdentifier = iPhone10,3 -> firmwareNumber = (major: 10, minor: 3)
+  static var firmwareNumber: (major: Int, minor: Int) {
+    let numberElements =
+      firmwareIdentifier
+      .components(separatedBy: CharacterSet.decimalDigits.inverted)
+      .suffix(2)
+    let majorStr = numberElements.first ?? "0"
+    let minorStr = numberElements.last ?? "0"
+    let majorNum = Int(majorStr) ?? 0
+    let minorNum = Int(minorStr) ?? 0
+    return (major: majorNum, minor: minorNum)
+  }
+
+  // Map firmwareIdentifier to device name: https://gist.github.com/adamawolf/3048717
+  // Devices with ANE: https://github.com/hollance/neural-engine/blob/master/docs/supported-devices.md
+  static var hasANE: Bool? {
+    if firmwareIdentifier.contains("iPhone") {
+      // iPhone11,2 : iPhone XS
+      return firmwareNumber.major >= 11
+    }
+    if firmwareIdentifier.contains("iPad") {
+      // iPad8,1 : iPad Pro 11 inch 3rd Gen (WiFi)
+      return firmwareNumber.major >= 8
+    }
+    if firmwareIdentifier.contains("arm64") {
+      // arm64: Macs with Apple Silicon
+      return true
+    }
+    return nil
+  }
+
 }
