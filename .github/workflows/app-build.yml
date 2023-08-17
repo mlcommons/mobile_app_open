@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-android-image:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: read
       packages: write
@@ -42,12 +42,21 @@ jobs:
 
   build-android-apk:
     needs: build-android-image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
       image: ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v3
+      # Preinstalled tools from host at `/opt/hostedtoolcache` is not needed since we run commands inside our own Docker container.
+      # `/opt/hostedtoolcache` is mounted to `/__t`. We delete it to free up disk space.
+      - name: Free up disk space
+        run: |
+          echo BEFORE:
+          df -h
+          rm -rf /__t/*
+          echo AFTER:
+          df -h
       - name: Configure Git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Install AWS CLI
