@@ -2,14 +2,13 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 
 import 'package:mlperfbench/firebase/firebase_auth_service.dart';
+import 'package:mlperfbench/firebase/firebase_crashlytics_service.dart';
 import 'package:mlperfbench/firebase/firebase_options.gen.dart';
 import 'package:mlperfbench/firebase/firebase_storage_service.dart';
 import 'package:mlperfbench/resources/utils.dart';
@@ -23,6 +22,7 @@ class FirebaseManager {
 
   final _authService = FirebaseAuthService();
   final _storageService = FirebaseStorageService();
+  final _crashlyticsService = FirebaseCrashlyticsService();
 
   bool _isInitialized = false;
 
@@ -36,8 +36,6 @@ class FirebaseManager {
 
     await _initAuthentication();
     _initStorage();
-    _initCrashlytics();
-
     _isInitialized = true;
     return instance;
   }
@@ -59,18 +57,6 @@ class FirebaseManager {
 
   void _initStorage() {
     _storageService.firebaseStorage = FirebaseStorage.instance;
-  }
-
-  void _initCrashlytics() {
-    // Pass all uncaught "fatal" errors from the framework to Crashlytics
-    FlutterError.onError = (errorDetails) {
-      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-    };
-    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
   }
 }
 
@@ -121,5 +107,15 @@ extension Storage on FirebaseManager {
       results.add(result);
     }
     return results;
+  }
+}
+
+extension Crashlytics on FirebaseManager {
+  void configureCrashlytics(bool enabled) {
+    if (enabled) {
+      _crashlyticsService.enableCrashlytics();
+    } else {
+      _crashlyticsService.disableCrashlytics();
+    }
   }
 }
