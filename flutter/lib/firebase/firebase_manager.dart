@@ -52,6 +52,7 @@ class FirebaseManager {
     }
     FirebaseAuth.instance.userChanges().listen((User? user) {
       print('User did change uid: ${user?.uid} | email: ${user?.email}');
+      _crashlyticsService.setUserIdentifier(user?.uid ?? '');
     });
   }
 
