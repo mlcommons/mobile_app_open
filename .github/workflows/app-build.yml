@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-android-image:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: read
       packages: write
@@ -42,12 +42,21 @@ jobs:
 
   build-android-apk:
     needs: build-android-image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
       image: ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v3
+      # Preinstalled tools from host at `/opt/hostedtoolcache` is not needed since we run commands inside our own Docker container.
+      # `/opt/hostedtoolcache` is mounted to `/__t`. We delete it to free up disk space.
+      - name: Free up disk space
+        run: |
+          echo BEFORE:
+          df -h
+          rm -rf /__t/*
+          echo AFTER:
+          df -h
       - name: Configure Git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Install AWS CLI
@@ -84,7 +93,7 @@ jobs:
         run: |
           make flutter/prepare && \
           make flutter/test/unit
-      - name: Build Android app
+      - name: Build Android release APK
         env:
           BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
           BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
@@ -104,10 +113,33 @@ jobs:
           WITH_APPLE: 0
         run: |
           make flutter/android/release
-      - name: Archive Android APK
+      - name: Archive Android release APK
         uses: actions/upload-artifact@v3
         with:
           name: android-apks-${{ github.run_number }}
           path: output/android-apks/*.apk
           retention-days: 30
           if-no-files-found: error
+      - name: Build Android test APK
+        env:
+          BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
+          BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
+          OFFICIAL_BUILD: false
+          FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
+          WITH_TFLITE: 1
+          WITH_PIXEL: 1
+          WITH_MEDIATEK: 1
+          WITH_QTI: 1
+          WITH_SAMSUNG: 1
+          WITH_APPLE: 0
+        run: |
+          make flutter/android/apk flutter/android/test-apk
+      - name: Upload Android test APK
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.MLPERF_ARM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.MLPERF_ARM_AWS_KEY }}
+        run: |
+          aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
+          cp --quiet output/android-apks/test-main.apk s3://mlcommons-mobile-mlperf-arm/builds/${{ github.run_number }}/ && \
+          aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
+          cp --quiet output/android-apks/test-helper.apk s3://mlcommons-mobile-mlperf-arm/builds/${{ github.run_number }}/
