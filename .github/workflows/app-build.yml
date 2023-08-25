@@ -142,4 +142,6 @@ jobs:
           aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
           cp --quiet output/android-apks/test-main.apk s3://mlcommons-mobile-mlperf-arm/builds/${{ github.run_number }}/ && \
           aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
-          cp --quiet output/android-apks/test-helper.apk s3://mlcommons-mobile-mlperf-arm/builds/${{ github.run_number }}/
+          cp --quiet output/android-apks/test-helper.apk s3://mlcommons-mobile-mlperf-arm/builds/${{ github.run_number }}/ && \
+          aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
+          cp --quiet flutter/build/app/outputs/flutter-apk/app-release.apk s3://mlcommons-mobile-mlperf-arm/builds/${{ github.run_number }}/
