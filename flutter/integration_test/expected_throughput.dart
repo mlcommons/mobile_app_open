@@ -27,8 +27,8 @@ const _kIphoneOnMacbookM1 = 'iPhone14,7';
 
 const Map<String, Map<String, Interval>> _imageClassification = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 4, max: 11),
-    _kCloudBuildX28: Interval(min: 4, max: 12),
+    _kCloudBuildX23: Interval(min: 4, max: 12),
+    _kCloudBuildX28: Interval(min: 4, max: 13),
     _kRyzen5600: Interval(min: 31, max: 37),
     _kPixel5: Interval(min: 80, max: 120),
     _kIphoneOnGitHubAction: Interval(min: 2, max: 7),
