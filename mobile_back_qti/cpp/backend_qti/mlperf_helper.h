@@ -30,7 +30,7 @@ static void process_config(const mlperf_backend_configuration_t *configs,
   backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
   backend_data->loadOffTime_ = 2;
   backend_data->loadOnTime_ = 100;
-  backend_data->useIonBuffers_ = true;
+  backend_data->useIonBuffers_ = false;
   backend_data->acceleratorName_ = configs->accelerator_desc;
 
   std::string &delegate = backend_data->delegate_;
@@ -52,6 +52,7 @@ static void process_config(const mlperf_backend_configuration_t *configs,
 
   // Handle custom settings
   std::string perfProfile = "burst";
+  std::string profileLevel = "off";
   for (int i = 0; i < configs->count; ++i) {
     if (strcmp(configs->keys[i], "scenario") == 0) {
       backend_data->scenario_ = configs->values[i];
@@ -116,6 +117,27 @@ static void process_config(const mlperf_backend_configuration_t *configs,
         backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
         perfProfile = "burst";
       }
+    } else if (strcmp(configs->keys[i], "profiling_level") == 0) {
+      profileLevel = configs->values[i];
+      if (std::strcmp(configs->values[i], "off") == 0) {
+        backend_data->profilingLevel_ = SNPE_PROFILING_LEVEL_OFF;
+      } else if (std::strcmp(configs->values[i], "basic") == 0) {
+        backend_data->profilingLevel_ = SNPE_PROFILING_LEVEL_BASIC;
+      } else if (std::strcmp(configs->values[i], "moderate") == 0) {
+        backend_data->profilingLevel_ = SNPE_PROFILING_LEVEL_MODERATE;
+      } else if (std::strcmp(configs->values[i], "detailed") == 0) {
+        backend_data->profilingLevel_ = SNPE_PROFILING_LEVEL_DETAILED;
+      } else {
+        LOG(INFO) << "Unrecognized profiling level: " << profileLevel;
+        backend_data->profilingLevel_ = SNPE_PROFILING_LEVEL_OFF;
+        profileLevel = "off";
+      }
+    } else if (strcmp(configs->keys[i], "cpu_int8") == 0) {
+        if (std::strcmp(configs->values[i], "true") == 0) {
+            backend_data->useCpuInt8_ = true;
+        } else {
+            backend_data->useCpuInt8_ = false;
+        }
     }
   }
 
@@ -131,8 +153,10 @@ static void process_config(const mlperf_backend_configuration_t *configs,
             << " | inputBufferType: " << backend_data->inputBufferType_
             << " | outputBufferType: " << backend_data->outputBufferType_
             << " | perfProfile: " << perfProfile
+            << " | profileLevel: " << profileLevel
             << " | useIonBuffer: " << backend_data->useIonBuffers_
-            << " | acceleratorName: " << backend_data->acceleratorName_;
+            << " | acceleratorName: " << backend_data->acceleratorName_
+            << " | useCpuInt8: " << backend_data->useCpuInt8_;
 }
 
 #endif

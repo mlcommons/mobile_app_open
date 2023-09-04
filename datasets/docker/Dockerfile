@@ -15,7 +15,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y && \
 
 RUN pip3 install pip==19.3.1 setuptools==31.0.1
 RUN pip3 install tensorflow-cpu==1.15
-RUN pip3 install Pillow opencv-python setuptools matplotlib tensorflow_hub tf-slim \
+RUN pip3 install Pillow opencv-python==4.3.0.38 setuptools matplotlib tensorflow_hub tf-slim \
                  absl-py numpy pyyaml
 
 RUN ln -s /usr/bin/python3 /usr/bin/python

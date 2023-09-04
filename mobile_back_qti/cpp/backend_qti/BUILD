@@ -55,7 +55,7 @@ config_setting(
 )
 
 snpe_copts = [
-    "-Imobile_back_qti/" + SNPE_VERSION + "/include/zdl",
+    "-Imobile_back_qti/" + SNPE_VERSION + "/include/SNPE",
     "-fexceptions",
     "-lc++_shared",
 ]
@@ -69,11 +69,14 @@ pbtxt2header(
         "settings/qti_settings_sd7g1.pbtxt",
         "settings/qti_settings_sd7pg2.pbtxt",
         "settings/qti_settings_sd8cxg3.pbtxt",
+        "settings/qti_settings_sd7cxg3.pbtxt",
         "settings/qti_settings_sd8g1.pbtxt",
         "settings/qti_settings_sd8g2.pbtxt",
+        "settings/qti_settings_gpufp16.pbtxt",
         "settings/qti_settings_sd8pg1.pbtxt",
         "settings/qti_settings_sdm778.pbtxt",
         "settings/qti_settings_sdm888.pbtxt",
+        "settings/qti_settings_sm4450.pbtxt",
     ],
 )
 

@@ -12,9 +12,10 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 ## Requirements for LA
 
 <!-- markdown-link-check-disable-next-line -->
-* [SNPE SDK](https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk/tools)
-  * Version 2.7.0
-* Linux machine capable of running Ubuntu 18.04 docker images
+* [Qualcomm Package Manager 3] (https://qpm.qualcomm.com/#/main/tools/details/QPM3)
+* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk)
+  * Version 2.13.4.<TODO>
+* Linux machine capable of running Ubuntu docker images
 
 ### Optional
 
@@ -28,11 +29,10 @@ Use your browser to download the SNPE SDK using the links above.
 Create your Github personal access token.
 
 ```shell
-export GITHUB_TOKEN=<your-personal-access-token>
 cd DLC/ && make
 ```
 
-It will take 2 hours on an 8-core Xeon workstation to generate the DLC files.
+It will take about 2 hours on an 8-core Xeon workstation to generate the DLC files.
 
 ## Building the MLPerf app with the QTI backend
 
@@ -43,7 +43,15 @@ git clone https://github.com/mlcommons/mobile_app_open
 cd mobile_app_open
 ```
 
-* Download and extract the SNPE SDK (from Requirements above) to mobile_app_open/mobile_back_qti
+* Install Qualcomm Package manager on the linux machine
+```shell
+sudo apt-get install ./QualcommPackageManager3.3.0.84.3.Linux-x86.deb
+```
+* Extract the SNPE SDK (from Requirements above) to mobile_app_open/mobile_back_qti
+```shell
+qpm-cli --extract ./qualcomm_neural_processing_sdk.2.13.0.230730.Linux-AnyCPU.qik
+cp -rv /opt/qcom/aistack/snpe/2.13.0.230730 mobile_app_open/mobile_back_qti/qaisw-2.13.4.230831
+```
 
 * If you have an HTTP proxy, you may need the following
 
@@ -58,7 +66,7 @@ Build with the following build command.
 make OFFICIAL_BUILD=true FLUTTER_BUILD_NUMBER=1  WITH_QTI=1 docker/flutter/android/release
 ```
 
-This will generate the MLPerf flutter app with QTI backend in ```mobile_app_open/output/android-apks/release.apk```
+This will generate the MLPerf flutter app with QTI backend in ```mobile_app_open/output/android-apks/<date>_mlperfbench-<commit_id>-<qtpsm>.apk```
 
 ## Building the QTI backend lib
 
@@ -86,7 +94,7 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 
 <!-- markdown-link-check-disable-next-line -->
 * [SNPE windows SDK] (<https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk/tools>)
-  * Version 2.7.0
+  * Version 2.7.0 (windows version hasn't been updated in this release)
 * Windows x86 machine
 
 ## Setting up the environment
@@ -147,9 +155,8 @@ Run accuracy mode with following command
 
 ### What devices does this backend support?
 
-This backend only supports SDM888/SDM888 Pro, SDM778G, SD7G1, SD8G1, SD8Pro G1, SD8G2 devices.
-Other Snapdragon based devices will not run the MLPerf app. Future updates of the app will provide
-additional device support.
+This backend only supports SDM888/SDM888 Pro, SDM778G, SD7G1, SD8G1, SD8Pro G1, SD7PG2, SD8G2 devices.
+Other already launched Snapdragon based devices can also run the MLPerf app as default fallback.
 
 ### Is SNPE used to run all the models?
 

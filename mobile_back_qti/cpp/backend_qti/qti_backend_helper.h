@@ -25,10 +25,6 @@ limitations under the License.
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
 
-#define SIGNED_PD 0
-#define UNSIGNED_PD 1
-#define DEFAULT -1
-
 class snpe_handler {
  public:
   Snpe_SNPE_Handle_t snpeHandle;
@@ -45,7 +41,7 @@ class psnpe_handler {
   ~psnpe_handler() { Snpe_PSNPE_Delete(psnpeHandle); }
 };
 
-enum snpe_runtimes_t { SNPE_DSP = 0, SNPE_AIP = 1, SNPE_GPU = 2, SNPE_CPU = 3 };
+enum snpe_runtimes_t { SNPE_DSP = 0, SNPE_GPU = 1, SNPE_CPU = 2, SNPE_GPU_FP16 =3 };
 
 class QTIBackendHelper {
  private:
@@ -54,13 +50,11 @@ class QTIBackendHelper {
   Snpe_RuntimeConfigList_Handle_t runtimeConfigsListHandle;
 
   inline int get_num_inits();
-  void get_accelerator_instances(int &numDSP, int &numAIP, int &numGPU,
-                                 int &numCPU);
+  void get_accelerator_instances(int &numDSP, int &numGPU,
+                                 int &numCPU, int &numGPU_FP16);
 
  public:
   enum QTIBufferType { FLOAT_32 = 0, UINT_8 = 1, INT_32 = 2 };
-  using GetBufferFn = std::add_pointer<void *(size_t, int)>::type;
-  using ReleaseBufferFn = std::add_pointer<void(void *)>::type;
   const char *name_ = "snpe";
   const char *acceleratorName_;
   std::string snpeOutputLayers_;
@@ -69,6 +63,7 @@ class QTIBackendHelper {
   std::unique_ptr<psnpe_handler> psnpe_;
   std::unique_ptr<snpe_handler> snpe_;
   Snpe_UserBufferList_Handle_t inputMapListHandle_, outputMapListHandle_;
+  Snpe_UserMemoryMap_Handle_t ionBufferMapHandle_;
   std::vector<
       std::unordered_map<std::string, std::vector<uint8_t, Allocator<uint8_t>>>>
       bufs_;
@@ -77,6 +72,7 @@ class QTIBackendHelper {
   Snpe_StringList_Handle_t networkInputTensorNamesHandle_;
   Snpe_StringList_Handle_t networkOutputTensorNamesHandle_;
   Snpe_PerformanceProfile_t perfProfile_;
+  Snpe_ProfilingLevel_t profilingLevel_;
 
   bool isTflite_;
   bool useSnpe_;
@@ -85,15 +81,15 @@ class QTIBackendHelper {
   int queryCount_;
   int inputBatch_;
   int outputBatchBufsize_;
-  GetBufferFn getBuffer_;
-  ReleaseBufferFn releaseBuffer_;
   bool bgLoad_;
   std::string delegate_;
   QTIBufferType inputBufferType_ = UINT_8;
   QTIBufferType outputBufferType_ = FLOAT_32;
   uint32_t loadOffTime_ = 2;
   uint32_t loadOnTime_ = 100;
-  bool useIonBuffers_ = true;
+  bool useIonBuffers_ = false;
+  bool useCpuInt8_ = false;
+  bool isIonRegistered;
 
   /* exposed functions */
   void use_psnpe(const char *model_path);
@@ -122,6 +118,8 @@ class QTIBackendHelper {
     odLayerMap[2] = "detection_scores:0";
     odLayerMap[3] =
         "Postprocessor/BatchMultiClassNonMaxSuppression_num_detections";
+    ionBufferMapHandle_ = Snpe_UserMemoryMap_Create();
+    isIonRegistered = false;
   }
 
   ~QTIBackendHelper() {

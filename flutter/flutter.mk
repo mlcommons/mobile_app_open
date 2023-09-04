@@ -65,9 +65,9 @@ flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
 
 FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
 -include ${FIREBASE_ENV_FILE}
-export
 .PHONY: flutter/firebase-config
 flutter/firebase-config:
+	export
 	cat flutter/lib/firebase/firebase_options.template.dart | sed \
   -e "s,FIREBASE_CI_USER_EMAIL,${FIREBASE_CI_USER_EMAIL}," \
   -e "s,FIREBASE_CI_USER_PASSWORD,${FIREBASE_CI_USER_PASSWORD}," \

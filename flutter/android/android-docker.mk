@@ -16,10 +16,18 @@
 DOCKER_IMAGE_TAG?=mlcommons/mlperf_mobile_flutter
 
 flutter_docker_postfix=$(shell id -u)
+
+ifeq (${WITH_INTERNAL_DOCKER_OPTION},1)
+host_ip=$(shell nslookup docker-registry.qualcomm.com | grep -n Address | grep ^8 | cut -c12-)
+internal_docker_option=--add-host=docker:${host_ip}
+else
+internal_docker_option=
+endif
+
 .PHONY: flutter/android/docker/image
 flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp
 output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp: flutter/android/docker/Dockerfile
-	docker image build -t ${DOCKER_IMAGE_TAG} flutter/android/docker
+	docker image build ${internal_docker_option} -t ${DOCKER_IMAGE_TAG} flutter/android/docker
 	mkdir -p output/docker
 	touch $@
 

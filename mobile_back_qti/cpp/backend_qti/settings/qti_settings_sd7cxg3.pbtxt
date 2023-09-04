@@ -54,7 +54,7 @@ benchmark_setting {
     accelerator_name: "psnpe_dsp"
     accelerator_desc: "HTP"
     batch_size: 12288
-    model_path: "local:///mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc"
+    model_path: "local:///mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched_8.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_DSP"
@@ -101,10 +101,6 @@ benchmark_setting {
     id: "use_ion_buffer"
     value: "false"
   }
-  custom_setting {
-    id: "perf_profile"
-    value: "high_performance"
-  }
   delegate_choice: {
     priority: 1
     delegate_name: "SNPE_DSP"
@@ -150,16 +146,8 @@ benchmark_setting {
     value: "true"
   }
   custom_setting {
-    id: "input_buffer_type"
-    value: "uint_8"
-  }
-  custom_setting {
     id: "use_ion_buffer"
     value: "false"
-  }
-  custom_setting {
-    id: "perf_profile"
-    value: "burst"
   }
   delegate_choice: {
     priority: 1

@@ -1,4 +1,4 @@
-# Copyright 2023 The MLPerf Authors. All Rights Reserved.
+# Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,9 @@
 # limitations under the License.
 ##########################################################################
 
-.PHONY: docker/cmdline/android/release
-docker/cmdline/android/release: flutter/android/docker/image
-	MSYS2_ARG_CONV_EXCL="*" docker run \
-		${flutter_common_docker_flags} \
-		make cmdline/android/bins/release
+ifeq (${WITH_INTERNAL_DOCKER_OPTION},1)
+host_ip=$(shell nslookup docker-registry.qualcomm.com | grep -n Address | grep ^8 | cut -c12-)
+internal_docker_option=--add-host=docker:${host_ip}
+else
+internal_docker_option=
+endif
