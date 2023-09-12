@@ -7,6 +7,7 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/home/user_profile.dart';
 
 enum _ShareDestination { local, cloud }
 
@@ -55,8 +56,7 @@ class _ShareButton extends State<ShareButton> {
         setState(() {
           _isSharing = true;
         });
-        final result = resultManager.getLastResult();
-        await FirebaseManager.instance.uploadResult(result);
+        await resultManager.uploadLastResult();
         setState(() {
           _isSharing = false;
           _shareStatus = l10n.uploadSuccess;
@@ -98,12 +98,17 @@ class _ShareButton extends State<ShareButton> {
                     ),
                   ),
                   TextButton(
-                    onPressed: !FirebaseManager.enabled
-                        ? null
-                        : () {
-                            Navigator.of(context).pop();
-                            _handleSharing(_ShareDestination.cloud);
-                          },
+                    onPressed: () {
+                      if (!FirebaseManager.enabled) {
+                        return;
+                      }
+                      if (!FirebaseManager.instance.isSignedIn) {
+                        _buildProfileModal(context);
+                        return;
+                      }
+                      Navigator.of(context).pop();
+                      _handleSharing(_ShareDestination.cloud);
+                    },
                     child: Row(
                       children: [
                         const Icon(Icons.cloud_upload),
@@ -138,5 +143,30 @@ class _ShareButton extends State<ShareButton> {
     return const CircularProgressIndicator(
       valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
     );
+  }
+
+  Future<void> _buildProfileModal(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  l10n.shareButtonMLCommons,
+                  style:
+                      TextStyle(color: AppColors.shareTextButton, fontSize: 18),
+                ),
+                const SizedBox(height: 20),
+                Text(l10n.uploadRequiredSignedIn),
+                const SizedBox(height: 20),
+                const UserProfile(),
+              ],
+            ),
+          );
+        });
   }
 }

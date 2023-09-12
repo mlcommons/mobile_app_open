@@ -9,6 +9,13 @@
   "menuBenchmarkConfiguration": "Benchmark Configuration",
   "menuSettings": "Settings",
   "menuAbout": "About",
+  "menuProfile": "Profile",
+  "menuSignIn": "Sign In",
+
+  "userAnonymousUser": "Anonymous User",
+  "userSignInAnonymously": "Sign in anonymously",
+  "userSignInEmailPassword": "Sign in with email/password",
+  "userProfile": "User Profile",
 
   "unsupportedMainMessage": "This device is not yet supported.",
   "unsupportedBackendError": "Error message",
@@ -41,6 +48,7 @@
 
   "uploadSuccess": "Results uploaded successfully",
   "uploadFail": "Error uploading results",
+  "uploadRequiredSignedIn": "An account is required to upload result.",
   "runFail": "Error while running benchmarks",
 
   "settingsOffline": "Offline mode",

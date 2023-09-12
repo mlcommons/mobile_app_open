@@ -8,6 +8,7 @@ import 'package:mlperfbench_common/data/result_sort.dart';
 import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
+import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 
 class ResultManager {
@@ -23,9 +24,10 @@ class ResultManager {
     return resultManager;
   }
 
-  final List<ExtendedResult> results = [];
   ResultFilter resultFilter = ResultFilter();
   ResultSort resultSort = ResultSort();
+  final List<ExtendedResult> localResults = [];
+  final List<ExtendedResult> remoteResults = [];
   final List<File> _resultsFiles = [];
   late final Directory _resultsDir;
 
@@ -49,7 +51,7 @@ class ResultManager {
       final json =
           jsonDecode(await file.readAsString()) as Map<String, dynamic>;
       try {
-        results.add(ExtendedResult.fromJson(json));
+        localResults.add(ExtendedResult.fromJson(json));
         _resultsFiles.add(file);
       } catch (e, trace) {
         print('Unable to parse result from [$file]: $e');
@@ -59,13 +61,13 @@ class ResultManager {
   }
 
   Future<void> deleteResult(ExtendedResult result) async {
-    final idx = results.indexOf(result);
-    results.removeAt(idx);
+    final idx = localResults.indexOf(result);
+    localResults.removeAt(idx);
     await _resultsFiles[idx].delete();
   }
 
   Future<void> saveResult(ExtendedResult result) async {
-    results.add(result);
+    localResults.add(result);
     final DateFormat formatter = DateFormat('yyyy-MM-ddTHH-mm-ss');
     final String datetime = formatter.format(result.meta.creationDate);
     final resultFile =
@@ -81,7 +83,7 @@ class ResultManager {
   }
 
   ExtendedResult getLastResult() {
-    return results.last;
+    return localResults.last;
   }
 
   void restoreResults(
@@ -113,5 +115,20 @@ class ResultManager {
       batchSize: export.backendSettings.batchSize,
       validity: runResult.loadgenInfo?.validity ?? false,
     );
+  }
+
+  Future<void> uploadLastResult() async {
+    await FirebaseManager.instance.uploadResult(localResults.last);
+  }
+
+  Future<void> downloadRemoteResults() async {
+    final excluded = localResults.map((e) => e.meta.uuid).toList();
+    final downloaded = await FirebaseManager.instance.downloadResults(excluded);
+    remoteResults.clear();
+    remoteResults.addAll(downloaded);
+  }
+
+  Future<void> clearRemoteResult() async {
+    remoteResults.clear();
   }
 }

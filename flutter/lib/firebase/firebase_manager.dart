@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 
@@ -18,8 +19,8 @@ class FirebaseManager {
   static final enabled = DefaultFirebaseOptions.available();
   static final instance = FirebaseManager._();
 
-  final auth = FirebaseAuthService();
-  final storage = FirebaseStorageService();
+  final _authService = FirebaseAuthService();
+  final _storageService = FirebaseStorageService();
 
   bool _isInitialized = false;
 
@@ -29,35 +30,67 @@ class FirebaseManager {
     }
     final currentPlatform = DefaultFirebaseOptions.currentPlatform;
     final app = await Firebase.initializeApp(options: currentPlatform);
-    auth.firebaseAuth = FirebaseAuth.instance;
-    storage.firebaseStorage = FirebaseStorage.instance;
     print('Firebase initialized using projectId: ${app.options.projectId}');
-    if (DefaultFirebaseOptions.ciUserEmail.isNotEmpty) {
-      await auth.signIn(
-        email: DefaultFirebaseOptions.ciUserEmail,
-        password: DefaultFirebaseOptions.ciUserPassword,
-      );
-    } else {
-      await auth.signInAnonymously();
-    }
-    print('User has uid: ${auth.user.uid} and email: ${auth.user.email}');
+
+    await _initAuthentication();
+    _initStorage();
+
     _isInitialized = true;
     return instance;
   }
 
+  Future<void> _initAuthentication() async {
+    FirebaseUIAuth.configureProviders(FirebaseAuthService.providers);
+    _authService.firebaseAuth = FirebaseAuth.instance;
+    if (DefaultFirebaseOptions.ciUserEmail.isNotEmpty) {
+      final user = await _authService.signIn(
+        email: DefaultFirebaseOptions.ciUserEmail,
+        password: DefaultFirebaseOptions.ciUserPassword,
+      );
+      print('Signed in as CI user with email: ${user.email}');
+    }
+    FirebaseAuth.instance.userChanges().listen((User? user) {
+      print('User did change uid: ${user?.uid} | email: ${user?.email}');
+    });
+  }
+
+  void _initStorage() {
+    _storageService.firebaseStorage = FirebaseStorage.instance;
+  }
+}
+
+extension Authentication on FirebaseManager {
+  List<AuthProvider> get authProviders {
+    return FirebaseAuthService.providers;
+  }
+
+  bool get isSignedIn {
+    return FirebaseAuth.instance.currentUser != null;
+  }
+
+  Future<User> signInAnonymously() async {
+    return _authService.signInAnonymously();
+  }
+
+  Future<User> link(AuthCredential authCred) async {
+    return _authService.link(authCred);
+  }
+}
+
+extension Storage on FirebaseManager {
   Future<void> uploadResult(ExtendedResult result) async {
     final DateFormat formatter = DateFormat('yyyy-MM-ddTHH-mm-ss');
     final String datetime = formatter.format(result.meta.creationDate);
     // Example fileName: 2023-06-06T13-38-01_125ef847-ca9a-45e0-bf36-8fd22f493b8d.json
     final fileName = '${datetime}_${result.meta.uuid}.json';
-    final uid = auth.user.uid;
     final jsonString = jsonToStringIndented(result);
-    await storage.upload(jsonString, uid, fileName);
+    await _storageService.upload(
+        jsonString, _authService.currentUser.uid, fileName);
   }
 
   Future<List<ExtendedResult>> downloadResults(List<String> excluded) async {
-    final uid = auth.user.uid;
-    final fileNames = await storage.list(uid);
+    final uid = _authService.currentUser.uid;
+    final fileNames = await _storageService.list(uid);
     List<ExtendedResult> results = [];
     for (final fileName in fileNames) {
       // Example fileName: 2023-06-06T13-38-01_125ef847-ca9a-45e0-bf36-8fd22f493b8d.json
@@ -67,7 +100,7 @@ class FirebaseManager {
         continue;
       }
       print('Download online result [$fileName]');
-      final content = await storage.download(uid, fileName);
+      final content = await _storageService.download(uid, fileName);
       final json = jsonDecode(content) as Map<String, dynamic>;
       final result = ExtendedResult.fromJson(json);
       results.add(result);

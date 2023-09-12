@@ -26,9 +26,11 @@ class _ResultListScreenState extends State<ResultListScreen> {
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final l10n = AppLocalizations.of(context);
-    final results = state.resourceManager.resultManager.results;
+    final localResults = state.resourceManager.resultManager.localResults;
+    final remoteResults = state.resourceManager.resultManager.remoteResults;
     final filter = state.resourceManager.resultManager.resultFilter;
     final sort = state.resourceManager.resultManager.resultSort;
+    final results = localResults + remoteResults;
     final resultsDataProvider = BenchmarksDataProvider(results);
 
     List<BenchmarkExportResult> resultItems =
