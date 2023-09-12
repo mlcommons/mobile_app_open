@@ -68,21 +68,7 @@ FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
 export
 .PHONY: flutter/firebase-config
 flutter/firebase-config:
-	cat flutter/lib/firebase/firebase_options.template.dart | sed \
-  -e "s,FIREBASE_CI_USER_EMAIL,${FIREBASE_CI_USER_EMAIL}," \
-  -e "s,FIREBASE_CI_USER_PASSWORD,${FIREBASE_CI_USER_PASSWORD}," \
-  -e "s,FIREBASE_ANDROID_API_KEY,${FIREBASE_ANDROID_API_KEY}," \
-  -e "s,FIREBASE_ANDROID_APP_ID,${FIREBASE_ANDROID_APP_ID}," \
-  -e "s,FIREBASE_IOS_API_KEY,${FIREBASE_IOS_API_KEY}," \
-  -e "s,FIREBASE_IOS_APP_ID,${FIREBASE_IOS_APP_ID}," \
-  -e "s,FIREBASE_IOS_CLIENT_ID,${FIREBASE_IOS_CLIENT_ID}," \
-  -e "s,FIREBASE_IOS_BUNDLE_ID,${FIREBASE_IOS_BUNDLE_ID}," \
-  -e "s,FIREBASE_PROJECT_ID,${FIREBASE_PROJECT_ID}," \
-  -e "s,FIREBASE_MESSAGING_SENDER_ID,${FIREBASE_MESSAGING_SENDER_ID}," \
-  -e "s,FIREBASE_DATABASE_URL,${FIREBASE_DATABASE_URL}," \
-  -e "s,FIREBASE_STORAGE_BUCKET,${FIREBASE_STORAGE_BUCKET}," | tee \
-  flutter/lib/firebase/firebase_options.gen.dart >/dev/null
-	dart format flutter/lib/firebase/firebase_options.gen.dart
+	bash flutter/tool/generate-firebase-config-files.sh
 
 .PHONY: flutter/backend-list
 flutter/backend-list:
@@ -186,8 +172,8 @@ flutter_perf_test_arg=--dart-define=enable-perf-test=${PERF_TEST}
 .PHONY: flutter/test/integration
 flutter/test/integration:
 	cd flutter && ${_start_args} \
-		flutter --no-version-check test --no-pub \
-		integration_test \
+		flutter --no-version-check test --no-pub -r expanded \
+		integration_test/first_test.dart \
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
 		${flutter_perf_test_arg} \

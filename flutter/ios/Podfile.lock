@@ -19,7 +19,7 @@ PODS:
   - Firebase/Storage (10.12.0):
     - Firebase/CoreOnly
     - FirebaseStorage (~> 10.12.0)
-  - firebase_auth (4.7.2):
+  - firebase_auth (4.8.0):
     - Firebase/Auth (= 10.12.0)
     - firebase_core
     - Flutter
@@ -30,11 +30,11 @@ PODS:
     - Firebase/Crashlytics (= 10.12.0)
     - firebase_core
     - Flutter
-  - firebase_dynamic_links (5.3.4):
+  - firebase_dynamic_links (5.3.5):
     - Firebase/DynamicLinks (= 10.12.0)
     - firebase_core
     - Flutter
-  - firebase_storage (11.2.5):
+  - firebase_storage (11.2.6):
     - Firebase/Storage (= 10.12.0)
     - firebase_core
     - Flutter
@@ -219,11 +219,11 @@ SPEC CHECKSUMS:
   device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
   file_picker: ec55172937ec2d774460eb4538bad01df0171d81
   Firebase: 07150e75d142fb9399f6777fa56a187b17f833a0
-  firebase_auth: 3f7820b22557dd4a1b024f4d86947d1a0ff8a10f
+  firebase_auth: 604e47908bc2dcd7baa113bbd37ab74000bff488
   firebase_core: 4a3246a02f828a01c74a2c26427037786d90f17f
   firebase_crashlytics: df144edf7d04ace42beb3a3e29d825bfa49dd04b
-  firebase_dynamic_links: d85cf455646322fd101c8a5a5942c3d47132fe80
-  firebase_storage: d5c1b95383db1230d9fed88c76cb257d8d1ec1d6
+  firebase_dynamic_links: cc3fd36190c7b58c27353915271d2c0d031ee11b
+  firebase_storage: 90a6038e00d3903c7f665dcfc57a9a98c7c8366b
   FirebaseAppCheckInterop: 5e12dc623d443dedffcde9c6f3ed41510125d8ef
   FirebaseAuth: a66c1e14ec58f41d154a4b41ce1a23ea00ad4805
   FirebaseAuthInterop: 74875bde5d15636522a8fe98beb561df7a54db58

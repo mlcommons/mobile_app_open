@@ -7,16 +7,18 @@ You can use your own Firebase project by creating a `.env` file.
 touch flutter/lib/firebase/firebase_options.env
 ```
 
-The content of the file should be as follows.
+Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project or select an existing one.
 Replace the values with your own Firebase project values.
+The content of the `firebase_options.env` file should be as follows:
 
-```shell
+```dotenv
 FIREBASE_ANDROID_API_KEY=foo
 FIREBASE_ANDROID_APP_ID=foo
 
 FIREBASE_IOS_API_KEY=foo
 FIREBASE_IOS_APP_ID=foo
 FIREBASE_IOS_CLIENT_ID=foo
+FIREBASE_IOS_REVERSED_CLIENT_ID=foo
 FIREBASE_IOS_BUNDLE_ID=foo
 
 FIREBASE_PROJECT_ID=foo

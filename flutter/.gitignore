@@ -1,3 +1,8 @@
+# Generated files for Firebase
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+lib/firebase/firebase_options.gen.dart
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
