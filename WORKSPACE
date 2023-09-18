@@ -3,11 +3,24 @@ workspace(name = "mlperf_app")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
-    name = "com_google_protobuf",
-    sha256 = "528927e398f4e290001886894dac17c5c6a2e5548f3fb68004cfb01af901b53a",
-    strip_prefix = "protobuf-3.17.3",
-    urls = ["https://github.com/google/protobuf/archive/v3.17.3.zip"],
+    name = "bazel_skylib",
+    sha256 = "66ffd9315665bfaafc96b52278f57c7e2dd09f5ede279ea6d39b2be471e7e3aa",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.4.2/bazel-skylib-1.4.2.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.4.2/bazel-skylib-1.4.2.tar.gz",
+    ],
 )
+
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
+bazel_skylib_workspace()
+
+#http_archive(
+#    name = "com_google_protobuf",
+#    sha256 = "528927e398f4e290001886894dac17c5c6a2e5548f3fb68004cfb01af901b53a",
+#    strip_prefix = "protobuf-3.17.3",
+#    urls = ["https://github.com/google/protobuf/archive/v3.17.3.zip"],
+#)
 
 http_archive(
     name = "build_bazel_rules_apple",
@@ -76,6 +89,20 @@ http_archive(
     ],
 )
 
+# TF version to match what QNN release note said
+http_archive(
+    name = "org_tensorflow",
+    patch_args = ["-p1"],
+    patches = [
+        "//patches:ndk_25_r13.diff",
+    ],
+    sha256 = "e58c939079588623e6fa1d054aec2f90f95018266e0a970fd353a5244f5173dc",
+    strip_prefix = "tensorflow-2.13.0",
+    urls = [
+        "https://github.com/tensorflow/tensorflow/archive/v2.13.0.tar.gz",
+    ],
+)
+
 # Initialize tensorflow workspace.
 # Must be after apple dependencies
 # because it loads older version of build_bazel_rules_apple
@@ -87,14 +114,22 @@ load("@org_tensorflow//tensorflow:workspace2.bzl", "tf_workspace2")
 
 tf_workspace2()
 
+load("@org_tensorflow//tensorflow:workspace1.bzl", "tf_workspace1")
+
+tf_workspace1()
+
+load("@org_tensorflow//tensorflow:workspace0.bzl", "tf_workspace0")
+
+tf_workspace0()
+
 # Android.
-load("@//flutter/third_party/android:android_configure.bzl", "android_configure")
+#load("@//flutter/third_party/android:android_configure.bzl", "android_configure")
 
-android_configure(name = "local_config_android")
+#android_configure(name = "local_config_android")
 
-load("@local_config_android//:android_configure.bzl", "android_workspace")
+#load("@local_config_android//:android_configure.bzl", "android_workspace")
 
-android_workspace()
+#android_workspace()
 
 # avoid using android_{sdk,ndk}_repo because of bazel 5.0
 #
