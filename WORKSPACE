@@ -15,48 +15,6 @@ load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
 
-#http_archive(
-#    name = "com_google_protobuf",
-#    sha256 = "528927e398f4e290001886894dac17c5c6a2e5548f3fb68004cfb01af901b53a",
-#    strip_prefix = "protobuf-3.17.3",
-#    urls = ["https://github.com/google/protobuf/archive/v3.17.3.zip"],
-#)
-
-http_archive(
-    name = "build_bazel_rules_apple",
-    sha256 = "36072d4f3614d309d6a703da0dfe48684ec4c65a89611aeb9590b45af7a3e592",
-    url = "https://github.com/bazelbuild/rules_apple/releases/download/1.0.1/rules_apple.1.0.1.tar.gz",
-)
-
-load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
-
-apple_rules_dependencies()
-
-load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
-
-apple_support_dependencies()
-
-load("@build_bazel_rules_swift//swift:repositories.bzl", "swift_rules_dependencies")
-
-swift_rules_dependencies()
-
-# This lib must be named exactly "cpuinfo".
-# This name is used by org_tensorflow lib.
-# When we use any different name, compilation may fail
-# because there will be files from several different versions of cpuinfo.
-# We may also need to override clog dependency, which uses the same sources, if we encounter any similar errors.
-http_archive(
-    name = "cpuinfo",
-    patch_args = ["-p1"],
-    patches = [
-        "//patches:cpuinfo-bazel-patch.diff",
-        "//patches:cpuinfo-changes-to-add-windows_arm64.patch",
-    ],
-    sha256 = "3389494589a97122779cd8d57fbffb1ac1e1ca3e795981c1d8d71b92281ae8c4",
-    strip_prefix = "cpuinfo-8ec7bd91ad0470e61cf38f618cc1f270dede599c",
-    url = "https://github.com/pytorch/cpuinfo/archive/8ec7bd91ad0470e61cf38f618cc1f270dede599c.tar.gz",
-)
-
 load("//:platform.bzl", "tf_patch_finder")
 
 tf_patch_finder(
@@ -77,25 +35,9 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
-        # fix memory leak in coreml delegate
-        "//:flutter/third_party/tflite_coreml_delegate_memory_leak.patch",
-        "//:flutter/third_party/tensorflow-fix-llvm.patch",
-        "//patches:feature_level.diff",
-    ] + PATCH_FILE,
-    sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
-    strip_prefix = "tensorflow-2.8.0",
-    urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.8.0.zip",
-    ],
-)
-
-# TF version to match what QNN release note said
-http_archive(
-    name = "org_tensorflow",
-    patch_args = ["-p1"],
-    patches = [
+	# NDK 25 support
         "//patches:ndk_25_r13.diff",
-    ],
+    ] + PATCH_FILE,
     sha256 = "e58c939079588623e6fa1d054aec2f90f95018266e0a970fd353a5244f5173dc",
     strip_prefix = "tensorflow-2.13.0",
     urls = [
@@ -121,26 +63,6 @@ tf_workspace1()
 load("@org_tensorflow//tensorflow:workspace0.bzl", "tf_workspace0")
 
 tf_workspace0()
-
-# Android.
-#load("@//flutter/third_party/android:android_configure.bzl", "android_configure")
-
-#android_configure(name = "local_config_android")
-
-#load("@local_config_android//:android_configure.bzl", "android_workspace")
-
-#android_workspace()
-
-# avoid using android_{sdk,ndk}_repo because of bazel 5.0
-#
-#android_sdk_repository(
-#    name = "androidsdk",
-#    api_level = 30,
-#)
-#
-#android_ndk_repository(
-#    name = "androidndk",
-#)
 
 http_archive(
     name = "neuron_delegate",
