@@ -35,7 +35,7 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
-	# NDK 25 support
+        # NDK 25 support
         "//patches:ndk_25_r13.diff",
     ] + PATCH_FILE,
     sha256 = "e58c939079588623e6fa1d054aec2f90f95018266e0a970fd353a5244f5173dc",

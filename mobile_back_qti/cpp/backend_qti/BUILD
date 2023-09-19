@@ -20,9 +20,9 @@
 # precision floating point values.
 #
 
-load("@snpe_version_loader//:snpe_var_def.bzl", "SNPE_VERSION")
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
+load("@snpe_version_loader//:snpe_var_def.bzl", "SNPE_VERSION")
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
 
 package(
@@ -128,11 +128,11 @@ cc_library(
     ],
     hdrs = [
         "cpuctrl.h",
-        "tflite_c.h",
-        "qti_backend_helper.h",
         "mlperf_helper.h",
-        "soc_utility.h",
+        "qti_backend_helper.h",
         "qti_settings.h",
+        "soc_utility.h",
+        "tflite_c.h",
     ] + select({
         "android_arm64": [],
         "windows_arm64": [
@@ -147,16 +147,16 @@ cc_library(
                         "//conditions:default": [],
                     }),
     deps = [
-        "//flutter/cpp/c:headers",
         ":qti_allocator",
         ":qti_settings",
+        "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ] + select({
         "android_arm64": [
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
+            "//mobile_back_qti:snpe",
             "@org_tensorflow//tensorflow/lite/c:c_api",
             "@org_tensorflow//tensorflow/lite/c:common",
-            "//mobile_back_qti:snpe",
+            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
         ],
         "windows_arm64": [
             "//mobile_back_qti:snpewindowslib",
