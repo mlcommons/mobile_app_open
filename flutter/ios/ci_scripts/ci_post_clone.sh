@@ -82,6 +82,8 @@ if [ $runner = $GITHUB_ACTIONS ]; then
   # make Flutter available in the subsequent GitHub Actions steps
   echo "$MC_FLUTTER_HOME/bin" >> "$GITHUB_PATH"
   echo "$PUB_CACHE/bin" >> "$GITHUB_PATH"
+  export ANDROID_NDK_VERSION=0
+  export ANDROID_NDK_API_LEVEL=0
 fi
 
 echo "$MC_LOG_PREFIX flutter version:" && flutter --version
