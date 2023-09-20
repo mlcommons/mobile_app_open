@@ -50,7 +50,7 @@ frameworks contributed by the broader MLPerf community.
 * [datasets](./datasets) - Contains scripts to prepare test and calibration data used for accuracy evaluation and model quantization
 * [docs](./docs) - contains documentation
 * [flutter](./flutter) - Contains the Flutter (cross-platform) version of the app
-* [mobile_back_apple](./mobile_back_apple) - Apple backend (Core ML) for iOS
+* [mobile_back_apple](./mobile_back_apple) - Apple (Core ML) backend for iOS
 * [mobile_back_pixel](./mobile_back_pixel) - Google Pixel backend for Android
 * [mobile_back_qti](./mobile_back_qti) - QTI backend for Android
 * [mobile_back_samsung](./mobile_back_samsung) - Samsung backend for Android
@@ -62,7 +62,6 @@ frameworks contributed by the broader MLPerf community.
 * [inference](https://github.com/mlcommons/inference): Reference implementations of MLPerf inference benchmarks.
 * [mobile_models](https://github.com/mlcommons/mobile_models): Storage for ML models and task definition file.
 * [mobile_open](https://github.com/mlcommons/mobile_open): MLPerf Mobile benchmarks.
-* [mobile_submission_1.1](https://github.com/mlcommons/mobile_submission_1.1): MLPerf Mobile inference v1.1 results.
 * [mobile_datasets](https://github.com/mlcommons/mobile_datasets): Scripts to create performance-only test sets for
   MLPerf Mobile
 * [mobile_app_open/flutter/cpp/datasets](https://github.com/mlcommons/mobile_app_open/tree/master/flutter/cpp/datasets):
