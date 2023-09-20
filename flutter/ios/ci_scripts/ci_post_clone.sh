@@ -71,25 +71,6 @@ python3 -m pip install \
   "numpy>=1.23,<2.0" \
   "absl-py>=1.3,<2.0"
 
-if [ $runner = $GITHUB_ACTIONS ]; then
-  echo "$MC_LOG_PREFIX ========== Install Android SDK =========="
-  export ANDROID_HOME=$HOME/Library/Android/sdk
-  mkdir -p $ANDROID_HOME/cmdline-tools
-  # sdkmanager expects to be placed into `$ANDROID_HOME/cmdline-tools/tools`
-  curl -L https://dl.google.com/android/repository/commandlinetools-mac-7583922_latest.zip | jar x &&
-    mv cmdline-tools $ANDROID_HOME/cmdline-tools/tools &&
-    chmod -R +x $ANDROID_HOME/cmdline-tools/tools/bin
-  export PATH=$PATH:$ANDROID_HOME/cmdline-tools/tools/bin
-  yes | sdkmanager --licenses >/dev/null
-  yes | sdkmanager \
-    "platform-tools" \
-    "build-tools;30.0.3" \
-    "platforms;android-29" \
-    "platforms;android-31" \
-    "ndk;21.4.7075529"
-  export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529
-fi
-
 echo "$MC_LOG_PREFIX ========== Install Flutter =========="
 export MC_FLUTTER_HOME=$MC_BUILD_HOME/flutter
 export PUB_CACHE=$MC_BUILD_HOME/.pub-cache
