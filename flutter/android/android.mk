@@ -15,7 +15,7 @@
 
 include flutter/android/android-docker.mk
 
-flutter/android: flutter/android/libs
+flutter/android: flutter/android/libs flutter/check/firebase-env
 flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk
 flutter/android/libs: flutter/android/libs/checksum flutter/android/libs/build flutter/android/libs/copy
 # run `make flutter/android/apk` before `flutter/android/test-apk`

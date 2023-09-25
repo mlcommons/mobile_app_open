@@ -1,6 +1,7 @@
 # Firebase setup guide
 
 This app is configured to use Firebase for authentication and storage.
+A Firebase project is required to build the iOS or Android app.
 You can use your own Firebase project by creating a `.env` file.
 
 ```shell

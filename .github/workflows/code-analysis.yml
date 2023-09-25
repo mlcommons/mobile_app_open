@@ -25,6 +25,7 @@ jobs:
       CONNECT_TTY_TO_DOCKER: 0
       WITH_TFLITE: 1
       WITH_PIXEL: 1
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v3
         with:

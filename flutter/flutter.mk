@@ -70,6 +70,11 @@ export
 flutter/firebase-config:
 	bash flutter/tool/generate-firebase-config-files.sh
 
+.PHONY: flutter/check/firebase-env
+flutter/check/firebase-env:
+	@echo FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+	@[ -n "${FIREBASE_PROJECT_ID}" ] || (echo FIREBASE_PROJECT_ID env must be set; exit 1)
+
 .PHONY: flutter/backend-list
 flutter/backend-list:
 	cat flutter/lib/backend/list.in | sed \
