@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
+import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
@@ -67,6 +68,26 @@ class _SettingsScreen extends State<SettingsScreen> {
       );
     } else {
       artificialLoadSwitch = const SizedBox(width: 0, height: 0);
+    }
+
+    Widget crashlyticsSwitch;
+    if (FirebaseManager.enabled) {
+      crashlyticsSwitch = ListTile(
+        title: Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: Text(l10n.settingsCrashlyticsTitle),
+        ),
+        subtitle: Text(l10n.settingsCrashlyticsSubtitle),
+        trailing: Switch(
+          value: store.crashlyticsEnabled,
+          onChanged: (enabled) {
+            store.crashlyticsEnabled = enabled;
+            FirebaseManager.instance.configureCrashlytics(enabled);
+          },
+        ),
+      );
+    } else {
+      crashlyticsSwitch = const SizedBox(width: 0, height: 0);
     }
 
     return Scaffold(
@@ -147,6 +168,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                     }
                   : null,
             ),
+            const Divider(),
+            crashlyticsSwitch,
             const Divider(),
             ListTile(
               title: Text(l10n.settingsPrivacyPolicy),

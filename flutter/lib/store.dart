@@ -126,6 +126,14 @@ class Store extends ChangeNotifier {
     _storeFromDisk.setString(StoreConstants.taskSelection, value);
   }
 
+  bool get crashlyticsEnabled =>
+      _getBool(StoreConstants.crashlyticsEnabled, false);
+
+  set crashlyticsEnabled(bool value) {
+    _storeFromDisk.setBool(StoreConstants.crashlyticsEnabled, value);
+    notifyListeners();
+  }
+
   int get testMinDuration => _getInt(StoreConstants.testMinDuration);
 
   int get testCooldown => _getInt(StoreConstants.testCooldownDuration);
@@ -150,4 +158,5 @@ class StoreConstants {
   static const testMinDuration = 'test min duration';
   static const testCooldownDuration = 'test cooldown duration';
   static const testMinQueryCount = 'test min query count';
+  static const crashlyticsEnabled = 'crashlyticsEnabled';
 }

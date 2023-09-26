@@ -7,7 +7,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # version format: <semantic_app_version>+<build_number>.
 # Note: build_number will be set by CI using the CLI option --build-number
-version: 3.1.0+1
+version: 3.1.1+1
 
 environment:
   sdk: ">=2.18.0 <3.0.0"
@@ -43,14 +43,15 @@ dependencies:
   worker_manager: ^5.0.3
   ffi: ^2.0.2
   async: ^2.10.0
-  archive: ^3.3.2
+  archive: ^3.3.9
   intl: ^0.17.0
   permission_handler: ^10.4.3
   flutter_markdown: ^0.6.15
-  firebase_storage: ^11.2.5
   firebase_core: ^2.15.0
+  firebase_storage: ^11.2.5
   firebase_auth: ^4.7.2
   firebase_ui_auth: ^1.6.2
+  firebase_crashlytics: ^3.3.5
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +63,10 @@ dev_dependencies:
   flutter_lints: ^2.0.2
   pedantic: ^1.11.0
   protoc_plugin: ^21.0.2
+
+dependency_overrides:
+  # https://github.com/mlcommons/mobile_app_open/issues/777
+  archive: ^3.3.9
 
 flutter_icons:
   ios: true
