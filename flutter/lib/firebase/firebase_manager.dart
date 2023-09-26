@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:mlperfbench_common/data/extended_result.dart';
 
 import 'package:mlperfbench/firebase/firebase_auth_service.dart';
+import 'package:mlperfbench/firebase/firebase_crashlytics_service.dart';
 import 'package:mlperfbench/firebase/firebase_options.gen.dart';
 import 'package:mlperfbench/firebase/firebase_storage_service.dart';
 import 'package:mlperfbench/resources/utils.dart';
@@ -21,6 +22,7 @@ class FirebaseManager {
 
   final _authService = FirebaseAuthService();
   final _storageService = FirebaseStorageService();
+  final _crashlyticsService = FirebaseCrashlyticsService();
 
   bool _isInitialized = false;
 
@@ -34,7 +36,6 @@ class FirebaseManager {
 
     await _initAuthentication();
     _initStorage();
-
     _isInitialized = true;
     return instance;
   }
@@ -51,6 +52,7 @@ class FirebaseManager {
     }
     FirebaseAuth.instance.userChanges().listen((User? user) {
       print('User did change uid: ${user?.uid} | email: ${user?.email}');
+      _crashlyticsService.setUserIdentifier(user?.uid ?? '');
     });
   }
 
@@ -106,5 +108,15 @@ extension Storage on FirebaseManager {
       results.add(result);
     }
     return results;
+  }
+}
+
+extension Crashlytics on FirebaseManager {
+  void configureCrashlytics(bool enabled) {
+    if (enabled) {
+      _crashlyticsService.enableCrashlytics();
+    } else {
+      _crashlyticsService.disableCrashlytics();
+    }
   }
 }

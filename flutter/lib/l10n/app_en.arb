@@ -57,6 +57,8 @@
   "settingsRunModeSubtitle": "Choose a benchmark run mode",
   "settingsArtificialCPULoadTitle": "Artificial CPU Load",
   "settingsArtificialCPULoadSubtitle": "Some devices perform better with an additional artificial CPU load during test",
+  "settingsCrashlyticsTitle": "Crash reporting",
+  "settingsCrashlyticsSubtitle": "Send crash log to MLCommons",
   "settingsKeepLogs": "Keep logs",
   "settingsKeepLogsSubtitle": "Keep loadgen logs of future runs.\nThis option doesn't affect past logs.",
   "settingsCooldown": "Cooldown",

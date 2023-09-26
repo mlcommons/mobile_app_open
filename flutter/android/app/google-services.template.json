@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "FIREBASE_MESSAGING_SENDER_ID",
+    "firebase_url": "FIREBASE_DATABASE_URL",
+    "project_id": "FIREBASE_PROJECT_ID",
+    "storage_bucket": "FIREBASE_STORAGE_BUCKET"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "FIREBASE_ANDROID_APP_ID",
+        "android_client_info": {
+          "package_name": "org.mlcommons.android.mlperfbench"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "FIREBASE_ANDROID_CLIENT_ID",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "FIREBASE_ANDROID_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "FIREBASE_ANDROID_CLIENT_ID",
+              "client_type": 3
+            },
+            {
+              "client_id": "FIREBASE_IOS_CLIENT_ID",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "FIREBASE_IOS_BUNDLE_ID"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
