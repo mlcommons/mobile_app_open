@@ -58,11 +58,11 @@ These steps are required to build native libs only.
 
     ```bash
     sudo $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager \
-      "ndk;21.4.7075529"
+      "ndk;25.2.9519653"
     ```
 
-  * Set ANDROID_NDK_HOME: `export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529`  
-  If you use bash: `echo export ANDROID_NDK_HOME=\$ANDROID_HOME/ndk/21.4.7075529 >>~/.bashrc`
+  * Set ANDROID_NDK_HOME: `export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653`  
+  If you use bash: `echo export ANDROID_NDK_HOME=\$ANDROID_HOME/ndk/25.2.9519653 >>~/.bashrc`
 
 ## Setting up Flutter on Ubuntu
 

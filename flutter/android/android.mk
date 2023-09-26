@@ -15,6 +15,9 @@
 
 include flutter/android/android-docker.mk
 
+ANDROID_NDK_VERSION?=25
+ANDROID_NDK_API_LEVEL?=33
+
 flutter/android: flutter/android/libs
 flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk
 flutter/android/libs: flutter/android/libs/checksum flutter/android/libs/build flutter/android/libs/copy
