@@ -43,7 +43,7 @@ dependencies:
   worker_manager: ^5.0.3
   ffi: ^2.0.2
   async: ^2.10.0
-  archive: ^3.3.2
+  archive: ^3.3.9
   intl: ^0.17.0
   permission_handler: ^10.4.3
   flutter_markdown: ^0.6.15
@@ -63,6 +63,10 @@ dev_dependencies:
   flutter_lints: ^2.0.2
   pedantic: ^1.11.0
   protoc_plugin: ^21.0.2
+
+dependency_overrides:
+  # https://github.com/mlcommons/mobile_app_open/issues/777
+  archive: ^3.3.9
 
 flutter_icons:
   ios: true
