@@ -39,6 +39,7 @@ Future<void> launchUi() async {
   final benchmarkState = await BenchmarkState.create(store);
   if (FirebaseManager.enabled) {
     await FirebaseManager.instance.initialize();
+    FirebaseManager.instance.configureCrashlytics(store.crashlyticsEnabled);
   }
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));

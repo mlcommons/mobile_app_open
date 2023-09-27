@@ -185,6 +185,9 @@ void checkThroughput(
 Future<void> uploadResult(ExtendedResult result) async {
   if (FirebaseManager.enabled) {
     await FirebaseManager.instance.initialize();
+    if (!FirebaseManager.instance.isSignedIn) {
+      await FirebaseManager.instance.signInAnonymously();
+    }
     await FirebaseManager.instance.uploadResult(result);
   } else {
     print('Firebase is disabled, skipping upload');
