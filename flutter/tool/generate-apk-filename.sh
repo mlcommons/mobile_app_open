@@ -12,7 +12,6 @@ if [ "${WITH_PIXEL}" = 1 ]; then suffix+="g"; fi
 if [ "${WITH_TFLITE}" = 1 ]; then suffix+="t"; fi
 
 today=$(date +%F)
-git config --global --add safe.directory /mnt/project
 commit=$(git rev-parse --short HEAD)
 
 output="${today}_mlperfbench-${commit}-${suffix}.apk"
