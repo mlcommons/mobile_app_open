@@ -12,7 +12,7 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 ## Requirements for LA
 
 <!-- markdown-link-check-disable-next-line -->
-* [Qualcomm Package Manager 3] (https://qpm.qualcomm.com/#/main/tools/details/QPM3)
+* [Qualcomm Package Manager 3] (<https://qpm.qualcomm.com/#/main/tools/details/QPM3>)
 * [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk)
   * Version 2.13.4.<TODO>
 * Linux machine capable of running Ubuntu docker images
@@ -44,10 +44,13 @@ cd mobile_app_open
 ```
 
 * Install Qualcomm Package manager on the linux machine
+
 ```shell
 sudo apt-get install ./QualcommPackageManager3.3.0.84.3.Linux-x86.deb
 ```
+
 * Extract the SNPE SDK (from Requirements above) to mobile_app_open/mobile_back_qti
+
 ```shell
 qpm-cli --extract ./qualcomm_neural_processing_sdk.2.13.0.230730.Linux-AnyCPU.qik
 cp -rv /opt/qcom/aistack/snpe/2.13.0.230730 mobile_app_open/mobile_back_qti/qaisw-2.13.4.230831

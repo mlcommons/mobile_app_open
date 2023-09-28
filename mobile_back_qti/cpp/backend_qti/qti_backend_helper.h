@@ -41,7 +41,12 @@ class psnpe_handler {
   ~psnpe_handler() { Snpe_PSNPE_Delete(psnpeHandle); }
 };
 
-enum snpe_runtimes_t { SNPE_DSP = 0, SNPE_GPU = 1, SNPE_CPU = 2, SNPE_GPU_FP16 =3 };
+enum snpe_runtimes_t {
+  SNPE_DSP = 0,
+  SNPE_GPU = 1,
+  SNPE_CPU = 2,
+  SNPE_GPU_FP16 = 3
+};
 
 class QTIBackendHelper {
  private:
@@ -50,8 +55,8 @@ class QTIBackendHelper {
   Snpe_RuntimeConfigList_Handle_t runtimeConfigsListHandle;
 
   inline int get_num_inits();
-  void get_accelerator_instances(int &numDSP, int &numGPU,
-                                 int &numCPU, int &numGPU_FP16);
+  void get_accelerator_instances(int &numDSP, int &numGPU, int &numCPU,
+                                 int &numGPU_FP16);
 
  public:
   enum QTIBufferType { FLOAT_32 = 0, UINT_8 = 1, INT_32 = 2 };

@@ -41,7 +41,7 @@ std::map<uint32_t, SocInfo> socDetails =
             // hlc,
             // llc,
             // max_cores, needs_rpcmem
-            {415, SocInfo(2, 0, 0, 0,true, qti_settings_sdm888, "SDM888", 1,
+            {415, SocInfo(2, 0, 0, 0, true, qti_settings_sdm888, "SDM888", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
             {475, SocInfo(2, 0, 0, 0, true, qti_settings_sdm778, "SDM778", 1,
@@ -77,9 +77,6 @@ std::map<uint32_t, SocInfo> socDetails =
             {568, SocInfo(0, 0, 1, 0, false, qti_settings_sm4450, "SM4450", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {538, SocInfo(2, 0, 0, 0, false, qti_settings_sd8cxg3, "SD8cxG3", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, false)},
             {475, SocInfo(2, 0, 0, 0, false, qti_settings_sd7cxg3, "SD7cxG3", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, false)},
@@ -117,13 +114,7 @@ uint32_t Socs::get_android_soc_id(void) {
 #define LEVEL_ID(LV1, LV2) ((LV1 << 32) | (LV2))
 
 static std::unordered_map<uint64_t, int> pptt_mappings = {
-  {LEVEL_ID(113ULL, 449ULL), 435},  // SD8cxG3
-  {LEVEL_ID(136ULL, 555ULL), 538},  // SD8cxG4 Hamoa (SCP_HAMOA)
-  {LEVEL_ID(118ULL, 487ULL), 475},  // SD7cxG3 (SC7280)
-  {LEVEL_ID(118ULL, 488ULL), 475},  // SD7cxG3 (SC7295)
-  {LEVEL_ID(118ULL, 546ULL), 475},  // SD7cxG3 (SC7280P)
-  {LEVEL_ID(118ULL, 553ULL), 475},  // SD7cxG3 (SC8270)
-  {LEVEL_ID(118ULL, 563ULL), 475}   // SD7cxG3 (SC8270P)
+    {LEVEL_ID(113ULL, 449ULL), 435},  // SD8cxG3
 };
 
 uint32_t Socs::get_windows_soc_id(void) {
@@ -154,11 +145,11 @@ uint32_t Socs::get_windows_soc_id(void) {
     return 0;
   }
 
-
   pptt = (PPPTT)buf;
   uint64_t key = 0;
   for (uint32_t i = 0; i < pptt->Header.Length; i++) {
-    PPROC_TOPOLOGY_NODE ptn = (PPROC_TOPOLOGY_NODE)((BYTE *)&(pptt->HeirarchyNodes[0]) + i);
+    PPROC_TOPOLOGY_NODE ptn =
+        (PPROC_TOPOLOGY_NODE)((BYTE *)&(pptt->HeirarchyNodes[0]) + i);
     // According to ACPI spec, type = 2 is the PPTT_ID_TABLE_TYPE
     if (ptn->Type == 2) {
       key = (ptn->IdNode.Level1 << 32) | (ptn->IdNode.Level2);
@@ -211,8 +202,8 @@ std::string Socs::get_soc_name() {
   return m_soc_info.m_soc_name;
 }
 
-void Socs::soc_offline_core_instance(int &num_dsp, int &num_gpu,
-                                     int &num_cpu, int &num_gpu_fp16, std::string &delegate) {
+void Socs::soc_offline_core_instance(int &num_dsp, int &num_gpu, int &num_cpu,
+                                     int &num_gpu_fp16, std::string &delegate) {
   soc_info_init();
   num_dsp = m_soc_info.m_num_dsp;
   num_gpu = m_soc_info.m_num_gpu;

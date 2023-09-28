@@ -133,11 +133,11 @@ static void process_config(const mlperf_backend_configuration_t *configs,
         profileLevel = "off";
       }
     } else if (strcmp(configs->keys[i], "cpu_int8") == 0) {
-        if (std::strcmp(configs->values[i], "true") == 0) {
-            backend_data->useCpuInt8_ = true;
-        } else {
-            backend_data->useCpuInt8_ = false;
-        }
+      if (std::strcmp(configs->values[i], "true") == 0) {
+        backend_data->useCpuInt8_ = true;
+      } else {
+        backend_data->useCpuInt8_ = false;
+      }
     }
   }
 

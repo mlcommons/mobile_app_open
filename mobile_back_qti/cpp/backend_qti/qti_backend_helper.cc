@@ -116,17 +116,19 @@ static Snpe_Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
       break;
   }
 
-  if (Snpe_Util_IsRuntimeAvailableCheckOption(runtime, SNPE_RUNTIME_CHECK_OPTION_UNSIGNEDPD_CHECK)) {
+  if (Snpe_Util_IsRuntimeAvailableCheckOption(
+          runtime, SNPE_RUNTIME_CHECK_OPTION_UNSIGNEDPD_CHECK)) {
     LOG(INFO) << "runtime " << delegate << " is available on this platform";
   } else {
-    LOG(FATAL) << "runtime " << delegate << " is not available on this platform";
+    LOG(FATAL) << "runtime " << delegate
+               << " is not available on this platform";
   }
 
   return runtime;
 }
 
 bool QTIBackendHelper::IsRuntimeAvailable(const snpe_runtimes_t delegate) {
-  return (Str2Delegate (delegate) != SNPE_RUNTIME_UNSET);
+  return (Str2Delegate(delegate) != SNPE_RUNTIME_UNSET);
 }
 
 void QTIBackendHelper::use_psnpe(const char *model_path) {
@@ -183,7 +185,7 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
       Snpe_BuildConfig_SetOutputBufferNames(buildConfigHandle, outputLayers);
 
     std::string platformOptionStr = "";
-    if(useCpuInt8_){
+    if (useCpuInt8_) {
       platformOptionStr = "enableCpuFxpMode:ON";
     }
     if (Socs::get_use_dsp_features()) {
@@ -228,30 +230,31 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
     LOG(FATAL) << "Error in init of snpe_ " << snpe_->snpeHandle;
   }
 
-  if(profilingLevel_ !=  SNPE_PROFILING_LEVEL_OFF){
+  if (profilingLevel_ != SNPE_PROFILING_LEVEL_OFF) {
     auto diagLogHandle = Snpe_SNPE_GetDiagLogInterface_Ref(snpe_->snpeHandle);
-    if (!diagLogHandle)
-      LOG(INFO)<<"Get diagLogHandle failed";
+    if (!diagLogHandle) LOG(INFO) << "Get diagLogHandle failed";
     auto optionsHandle = Snpe_IDiagLog_GetOptions(diagLogHandle);
     std::string OutputDir = ".\diaglogs";
-    #ifdef __ANDROID__
-    OutputDir = "/sdcard/Android/data/org.mlcommons.android.mlperfbench/files/diaglogs";
-    #endif
+#ifdef __ANDROID__
+    OutputDir =
+        "/sdcard/Android/data/org.mlcommons.android.mlperfbench/files/diaglogs";
+#endif
     Snpe_Options_SetLogFileDirectory(optionsHandle, OutputDir.c_str());
 
-    if(Snpe_IDiagLog_SetOptions(diagLogHandle, optionsHandle) != SNPE_SUCCESS)
-      LOG(INFO)<<"Failed to set DiagLog options";
+    if (Snpe_IDiagLog_SetOptions(diagLogHandle, optionsHandle) != SNPE_SUCCESS)
+      LOG(INFO) << "Failed to set DiagLog options";
 
     if (Snpe_IDiagLog_Start(diagLogHandle) != SNPE_SUCCESS)
-    LOG(INFO)<<"Failed to start logger ";
+      LOG(INFO) << "Failed to start logger ";
   }
   // Snpe_DlContainer_Delete(containerHandle);
 }
 
 mlperf_status_t QTIBackendHelper::execute() {
-  if(useIonBuffers_ && !isIonRegistered) {
-    if(Snpe_SNPE_RegisterIonBuffers(snpe_->snpeHandle, ionBufferMapHandle_) == SNPE_SUCCESS)
-    LOG(INFO)<<"Ion Buffer Registration Successful";
+  if (useIonBuffers_ && !isIonRegistered) {
+    if (Snpe_SNPE_RegisterIonBuffers(snpe_->snpeHandle, ionBufferMapHandle_) ==
+        SNPE_SUCCESS)
+      LOG(INFO) << "Ion Buffer Registration Successful";
     isIonRegistered = true;
   }
   if (!useSnpe_) {
@@ -333,29 +336,30 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
     LOG(FATAL) << "Error in init of the model " << snpe_;
   }
 
-  if(profilingLevel_ !=  SNPE_PROFILING_LEVEL_OFF){
+  if (profilingLevel_ != SNPE_PROFILING_LEVEL_OFF) {
     auto diagLogHandle = Snpe_SNPE_GetDiagLogInterface_Ref(snpe_->snpeHandle);
-     if (!diagLogHandle)
-      LOG(INFO)<<"Get diagLogHandle failed";
+    if (!diagLogHandle) LOG(INFO) << "Get diagLogHandle failed";
     auto optionsHandle = Snpe_IDiagLog_GetOptions(diagLogHandle);
     std::string OutputDir = ".\diaglogs";
-    #ifdef __ANDROID__
-    OutputDir = "/sdcard/Android/data/org.mlcommons.android.mlperfbench/files/diaglogs";
-    #endif
+#ifdef __ANDROID__
+    OutputDir =
+        "/sdcard/Android/data/org.mlcommons.android.mlperfbench/files/diaglogs";
+#endif
     Snpe_Options_SetLogFileDirectory(optionsHandle, OutputDir.c_str());
 
-    if(Snpe_IDiagLog_SetOptions(diagLogHandle, optionsHandle) != SNPE_SUCCESS)
-      LOG(INFO)<<"Failed to set DiagLog options";
+    if (Snpe_IDiagLog_SetOptions(diagLogHandle, optionsHandle) != SNPE_SUCCESS)
+      LOG(INFO) << "Failed to set DiagLog options";
 
     if (Snpe_IDiagLog_Start(diagLogHandle) != SNPE_SUCCESS)
-    LOG(INFO)<<"Failed to start logger ";
+      LOG(INFO) << "Failed to start logger ";
   }
 }
 
 inline int QTIBackendHelper::get_num_inits() { return Socs::soc_num_inits(); }
 
-void QTIBackendHelper::get_accelerator_instances(int &num_dsp,
-                                                 int &num_gpu, int &num_cpu, int &num_gpu_fp16) {
+void QTIBackendHelper::get_accelerator_instances(int &num_dsp, int &num_gpu,
+                                                 int &num_cpu,
+                                                 int &num_gpu_fp16) {
   std::string &delegate = delegate_;
   num_dsp = 0;
   num_gpu = 0;
@@ -377,14 +381,13 @@ void QTIBackendHelper::get_accelerator_instances(int &num_dsp,
     } else if (delegate == "snpe_gpu_fp16" || delegate == "psnpe_gpu_fp16") {
       num_gpu_fp16 = 1;
       Socs::set_use_dsp_features(false);
+    } else {
+      LOG(FATAL) << "Error: Unsupported delegate " << delegate << " SoC ID "
+                 << Socs::get_soc_name();
     }
-      else {
-        LOG(FATAL) << "Error: Unsupported delegate " << delegate << " SoC ID "
-                   << Socs::get_soc_name();
-      }
-    }
-  LOG(INFO) << "Using " << num_dsp << " dsp " << num_gpu
-            << " gpu" << num_cpu << " cpu" << num_gpu_fp16 << " gpu_fp16";
+  }
+  LOG(INFO) << "Using " << num_dsp << " dsp " << num_gpu << " gpu" << num_cpu
+            << " cpu" << num_gpu_fp16 << " gpu_fp16";
 }
 
 void QTIBackendHelper::map_inputs() {
@@ -488,8 +491,9 @@ void QTIBackendHelper::map_outputs() {
                                                bufSize * sizeof(uint8_t),
                                                stridesHandle, ubeTfN));
         Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
-        if(useIonBuffers_)
-          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name, bufs_[bi].at(name).data());
+        if (useIonBuffers_)
+          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name,
+                                 bufs_[bi].at(name).data());
 
         Snpe_UserBufferEncodingTfN_Delete(ubeTfN);
         Snpe_TensorShape_Delete(stridesHandle);
@@ -506,8 +510,9 @@ void QTIBackendHelper::map_outputs() {
                                                stridesHandle, ubeIntN));
 
         Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
-        if(useIonBuffers_)
-          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name, bufs_[bi].at(name).data());
+        if (useIonBuffers_)
+          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name,
+                                 bufs_[bi].at(name).data());
 
         Snpe_UserBufferEncodingIntN_Delete(ubeIntN);
         Snpe_TensorShape_Delete(stridesHandle);
@@ -524,8 +529,9 @@ void QTIBackendHelper::map_outputs() {
             bufs_[bi].at(name).data(), bufSize * sizeof(float), stridesHandle,
             userBufferEncodingFloat));
         Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
-        if(useIonBuffers_)
-            Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name, bufs_[bi].at(name).data());
+        if (useIonBuffers_)
+          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name,
+                                 bufs_[bi].at(name).data());
 
         Snpe_UserBufferEncodingFloat_Delete(userBufferEncodingFloat);
         Snpe_TensorShape_Delete(stridesHandle);
@@ -625,7 +631,7 @@ void QTIBackendHelper::get_data_formats() {
 }
 
 void QTIBackendHelper::set_runtime_config() {
-  int numDSP = 0, numGPU = 0, numCPU = 0, numGPU_FP16=0;
+  int numDSP = 0, numGPU = 0, numCPU = 0, numGPU_FP16 = 0;
   get_accelerator_instances(numDSP, numGPU, numCPU, numGPU_FP16);
 
   Snpe_Runtime_t runtime;

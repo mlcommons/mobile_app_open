@@ -96,8 +96,8 @@ class Socs {
  public:
   static void soc_info_init();
 
-  static void soc_offline_core_instance(int &num_dsp,
-                                        int &num_gpu, int &num_cpu, int &num_gpu_fp16,
+  static void soc_offline_core_instance(int &num_dsp, int &num_gpu,
+                                        int &num_cpu, int &num_gpu_fp16,
                                         std::string &delegate);
   static int soc_num_inits();
 
