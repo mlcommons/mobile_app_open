@@ -18,8 +18,6 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_python/releases/download/0.25.0/rules_python-0.25.0.tar.gz",
 )
 
-load("@rules_python//python:repositories.bzl", "python_register_toolchains")
-
 load("//:platform.bzl", "tf_patch_finder")
 
 tf_patch_finder(
