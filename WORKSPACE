@@ -11,9 +11,14 @@ http_archive(
     ],
 )
 
-load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+http_archive(
+    name = "rules_python",
+    sha256 = "5868e73107a8e85d8f323806e60cad7283f34b32163ea6ff1020cf27abef6036",
+    strip_prefix = "rules_python-0.25.0",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.25.0/rules_python-0.25.0.tar.gz",
+)
 
-bazel_skylib_workspace()
+load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 
 load("//:platform.bzl", "tf_patch_finder")
 
@@ -36,18 +41,32 @@ http_archive(
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
         # NDK 25 support
-        "//patches:ndk_25_r13.diff",
+        "//patches:ndk_25_r14.diff",
     ] + PATCH_FILE,
-    sha256 = "e58c939079588623e6fa1d054aec2f90f95018266e0a970fd353a5244f5173dc",
-    strip_prefix = "tensorflow-2.13.0",
+    sha256 = "ce357fd0728f0d1b0831d1653f475591662ec5bca736a94ff789e6b1944df19f",
+    strip_prefix = "tensorflow-2.14.0",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.13.0.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/v2.14.0.tar.gz",
     ],
 )
 
+load("@rules_python//python:repositories.bzl", "python_register_toolchains")
+load(
+    "@org_tensorflow//tensorflow/tools/toolchains/python:python_repo.bzl",
+    "python_repository",
+)
+
+python_repository(name = "python_version_repo")
+
+load("@python_version_repo//:py_version.bzl", "HERMETIC_PYTHON_VERSION")
+
+python_register_toolchains(
+    name = "python",
+    ignore_root_user_error = True,
+    python_version = HERMETIC_PYTHON_VERSION,
+)
+
 # Initialize tensorflow workspace.
-# Must be after apple dependencies
-# because it loads older version of build_bazel_rules_apple
 load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
 
 tf_workspace3()

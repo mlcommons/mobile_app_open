@@ -1,0 +1,184 @@
+diff --git a/configure.py b/configure.py
+index 262637734a5..b6eb015463b 100644
+--- a/configure.py
++++ b/configure.py
+@@ -17,6 +17,7 @@
+ import argparse
+ import errno
+ import glob
++import json
+ import os
+ import platform
+ import re
+@@ -36,7 +37,7 @@ _DEFAULT_TENSORRT_VERSION = '6'
+ _DEFAULT_CUDA_COMPUTE_CAPABILITIES = '3.5,7.0'
+ 
+ _SUPPORTED_ANDROID_NDK_VERSIONS = [
+-    19, 20, 21
++    19, 20, 21, 25
+ ]
+ 
+ _DEFAULT_PROMPT_ASK_ATTEMPTS = 10
+@@ -744,20 +745,16 @@ def get_ndk_api_level(environ_cp, android_ndk_home_path):
+           'another version. Compiling Android targets may result in confusing '
+           'errors.\n' %
+           (android_ndk_home_path, ndk_version, _SUPPORTED_ANDROID_NDK_VERSIONS))
++  write_action_env_to_bazelrc('ANDROID_NDK_VERSION', ndk_version)
+ 
+   # Now grab the NDK API level to use. Note that this is different from the
+   # SDK API level, as the NDK API level is effectively the *min* target SDK
+   # version.
+-  platforms = os.path.join(android_ndk_home_path, 'platforms')
+-  api_levels = sorted(os.listdir(platforms))
+-  api_levels = [
+-      x.replace('android-', '') for x in api_levels if 'android-' in x
+-  ]
+-
+-  def valid_api_level(api_level):
+-    return os.path.exists(
+-        os.path.join(android_ndk_home_path, 'platforms', 'android-' + api_level)
+-    )
++  meta = open(os.path.join(android_ndk_home_path, 'meta/platforms.json'))
++  platforms = json.load(meta)
++  meta.close
++  aliases = platforms['aliases']
++  api_levels = sorted(list(set([ aliases[i] for i in aliases ])))
+ 
+   android_ndk_api_level = prompt_loop_or_load_from_env(
+       environ_cp,
+@@ -768,7 +765,7 @@ def get_ndk_api_level(environ_cp, android_ndk_home_path):
+           '[Available levels: %s]'
+       )
+       % api_levels,
+-      check_success=valid_api_level,
++      check_success=(lambda *_: True),
+       error_msg='Android-%s is not present in the NDK path.',
+   )
+ 
+diff --git a/tensorflow/workspace2.bzl b/tensorflow/workspace2.bzl
+index 7e9faa558a4..3ea52dc3948 100644
+--- a/tensorflow/workspace2.bzl
++++ b/tensorflow/workspace2.bzl
+@@ -816,6 +816,13 @@ def _tf_repositories():
+         urls = tf_mirror_urls("https://github.com/bazelbuild/rules_android/archive/v0.1.1.zip"),
+     )
+ 
++    tf_http_archive(
++        name = "rules_android_ndk",
++        sha256 = "b29409496439cdcdb50a8e161c4953ca78a548e16d3ee729a1b5cd719ffdacbf",
++        strip_prefix = "rules_android_ndk-81ec8b79dc50ee97e336a25724fdbb28e33b8d41",
++        urls = tf_mirror_urls("https://github.com/bazelbuild/rules_android_ndk/archive/81ec8b79dc50ee97e336a25724fdbb28e33b8d41.zip"),
++    )
++
+     # Apple and Swift rules.
+     # https://github.com/bazelbuild/rules_apple/releases
+     tf_http_archive(
+diff --git a/third_party/android/android.bzl.tpl b/third_party/android/android.bzl.tpl
+index e6ed4994f3b..802873f9cb4 100644
+--- a/third_party/android/android.bzl.tpl
++++ b/third_party/android/android.bzl.tpl
+@@ -1,3 +1,5 @@
++MAYBE_ANDROID_NDK_STARLARK_RULES
++
+ """Set up configurable Android SDK and NDK dependencies."""
+ 
+ def android_workspace():
+diff --git a/third_party/android/android_configure.bzl b/third_party/android/android_configure.bzl
+index 2b364118073..bd1a1933172 100644
+--- a/third_party/android/android_configure.bzl
++++ b/third_party/android/android_configure.bzl
+@@ -14,8 +14,9 @@
+ 
+ _ANDROID_NDK_HOME = "ANDROID_NDK_HOME"
+ _ANDROID_SDK_HOME = "ANDROID_SDK_HOME"
+-_ANDROID_NDK_API_VERSION = "ANDROID_NDK_API_LEVEL"
+-_ANDROID_SDK_API_VERSION = "ANDROID_SDK_API_LEVEL"
++_ANDROID_NDK_VERSION = "ANDROID_NDK_VERSION"
++_ANDROID_NDK_API_LEVEL = "ANDROID_NDK_API_LEVEL"
++_ANDROID_SDK_API_LEVEL = "ANDROID_SDK_API_LEVEL"
+ _ANDROID_BUILD_TOOLS_VERSION = "ANDROID_BUILD_TOOLS_VERSION"
+ 
+ _ANDROID_SDK_REPO_TEMPLATE = """
+@@ -27,7 +28,7 @@ _ANDROID_SDK_REPO_TEMPLATE = """
+     )
+ """
+ 
+-_ANDROID_NDK_REPO_TEMPLATE = """
++_ANDROID_NDK_REPO_TEMPLATE_INTERNAL = """
+     native.android_ndk_repository(
+         name="androidndk",
+         path="%s",
+@@ -35,15 +36,36 @@ _ANDROID_NDK_REPO_TEMPLATE = """
+     )
+ """
+ 
++_ANDROID_NDK_REPO_TEMPLATE_STARLARK = """
++    android_ndk_repository(
++        name="androidndk",
++        path="%s",
++        api_level=%s,
++    )
++
++    # Bind android/crosstool to support legacy select()
++    # https://github.com/bazelbuild/rules_android_ndk/issues/31#issuecomment-1396182185
++    native.bind(
++        name = "android/crosstool",
++        actual = "@androidndk//:toolchain",
++    )
++"""
++
++# Import NDK Starlark rules. Shouldn't have any indentation.
++_ANDROID_NDK_STARLARK_RULES = """
++load("@rules_android_ndk//:rules.bzl", "android_ndk_repository")
++"""
++
+ def _android_autoconf_impl(repository_ctx):
+     """Implementation of the android_autoconf repository rule."""
+     sdk_home = repository_ctx.os.environ.get(_ANDROID_SDK_HOME)
+-    sdk_api_level = repository_ctx.os.environ.get(_ANDROID_SDK_API_VERSION)
++    sdk_api_level = repository_ctx.os.environ.get(_ANDROID_SDK_API_LEVEL)
+     build_tools_version = repository_ctx.os.environ.get(
+         _ANDROID_BUILD_TOOLS_VERSION,
+     )
+     ndk_home = repository_ctx.os.environ.get(_ANDROID_NDK_HOME)
+-    ndk_api_level = repository_ctx.os.environ.get(_ANDROID_NDK_API_VERSION)
++    ndk_api_level = repository_ctx.os.environ.get(_ANDROID_NDK_API_LEVEL)
++    ndk_version = int(repository_ctx.os.environ.get(_ANDROID_NDK_VERSION))
+ 
+     sdk_rule = ""
+     if all([sdk_home, sdk_api_level, build_tools_version]):
+@@ -54,8 +76,13 @@ def _android_autoconf_impl(repository_ctx):
+         )
+ 
+     ndk_rule = ""
++    ndk_starlark_rules = ""
+     if all([ndk_home, ndk_api_level]):
+-        ndk_rule = _ANDROID_NDK_REPO_TEMPLATE % (ndk_home, ndk_api_level)
++        if ndk_version >= 25:
++            ndk_starlark_rules = _ANDROID_NDK_STARLARK_RULES
++            ndk_rule = _ANDROID_NDK_REPO_TEMPLATE_STARLARK % (ndk_home, ndk_api_level)
++        else:
++            ndk_rule = _ANDROID_NDK_REPO_TEMPLATE_INTERNAL % (ndk_home, ndk_api_level)
+ 
+     if ndk_rule == "" and sdk_rule == "":
+         sdk_rule = "pass"
+@@ -68,6 +95,7 @@ def _android_autoconf_impl(repository_ctx):
+         "android.bzl",
+         Label("//third_party/android:android.bzl.tpl"),
+         substitutions = {
++            "MAYBE_ANDROID_NDK_STARLARK_RULES": ndk_starlark_rules,
+             "MAYBE_ANDROID_SDK_REPOSITORY": sdk_rule,
+             "MAYBE_ANDROID_NDK_REPOSITORY": ndk_rule,
+         },
+@@ -76,8 +104,9 @@ def _android_autoconf_impl(repository_ctx):
+ android_configure = repository_rule(
+     implementation = _android_autoconf_impl,
+     environ = [
+-        _ANDROID_SDK_API_VERSION,
+-        _ANDROID_NDK_API_VERSION,
++        _ANDROID_SDK_API_LEVEL,
++        _ANDROID_NDK_VERSION,
++        _ANDROID_NDK_API_LEVEL,
+         _ANDROID_BUILD_TOOLS_VERSION,
+         _ANDROID_NDK_HOME,
+         _ANDROID_SDK_HOME,
