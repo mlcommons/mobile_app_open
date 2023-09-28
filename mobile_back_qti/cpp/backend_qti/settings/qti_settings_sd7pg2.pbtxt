@@ -31,7 +31,7 @@ benchmark_setting {
     delegate_name: "SNPE_DSP"
     accelerator_name: "snpe_dsp"
     accelerator_desc: "HTP"
-    model_path: "local:///mlperf_models/mobilenet_edgetpu_224_1.0_htp.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/mobilenet_edgetpu_224_1.0_htp.dlc"
     model_checksum: ""
   }
   single_stream_expected_latency_ns: 600000
@@ -55,7 +55,7 @@ benchmark_setting {
     accelerator_name: "psnpe_dsp"
     accelerator_desc: "HTP"
     batch_size: 12288
-    model_path: "local:///mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_DSP"
@@ -77,7 +77,7 @@ benchmark_setting {
     delegate_name: "SNPE_DSP"
     accelerator_name: "snpe_dsp"
     accelerator_desc: "HTP"
-    model_path: "local:///mlperf_models/ssd_mobiledet_qat_htp.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/ssd_mobiledet_qat_htp.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_DSP"
@@ -111,7 +111,7 @@ benchmark_setting {
     delegate_name: "SNPE_DSP"
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
-    model_path: "local:///mlperf_models/mobilebert_quantized_htp.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/mobilebert_quantized_htp.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_DSP"
@@ -137,7 +137,7 @@ benchmark_setting {
     delegate_name: "SNPE_DSP"
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
-    model_path: "local:///mlperf_models/mobile_mosaic_htp.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/mobile_mosaic_htp.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_DSP"
@@ -167,7 +167,7 @@ benchmark_setting {
     delegate_name: "SNPE_DSP"
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
-    model_path: "local:///mlperf_models//snusr_htp.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe//snusr_htp.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_DSP"

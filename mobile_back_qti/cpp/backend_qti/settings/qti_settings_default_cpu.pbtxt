@@ -31,7 +31,7 @@ benchmark_setting {
     delegate_name: "SNPE_CPU"
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
-    model_path: "local:///mlperf_models/mobilenet_edgetpu_224_1.0_htp.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/mobilenet_edgetpu_224_1.0_htp.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_CPU"
@@ -54,7 +54,7 @@ benchmark_setting {
     accelerator_name: "psnpe_cpu"
     accelerator_desc: "CPU"
     batch_size: 128
-    model_path: "local:///mlperf_models/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_CPU"
@@ -76,7 +76,7 @@ benchmark_setting {
     delegate_name: "SNPE_CPU"
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
-    model_path: "local:///mlperf_models/ssd_mobiledet_qat_htp.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/ssd_mobiledet_qat_htp.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_CPU"
@@ -102,7 +102,7 @@ benchmark_setting {
     delegate_name: "SNPE_CPU"
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
-    model_path: "local:///mlperf_models/mobilebert_quantized_htp.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/mobilebert_quantized_htp.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_CPU"
@@ -128,7 +128,7 @@ benchmark_setting {
     delegate_name: "SNPE_CPU"
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
-    model_path: "local:///mlperf_models/mobile_mosaic_htp.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/mobile_mosaic_htp.dlc"
     model_checksum: ""
   delegate_selected: "SNPE_CPU"
 }
@@ -149,7 +149,7 @@ benchmark_setting {
     delegate_name: "SNPE_CPU"
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
-    model_path: "local:///mlperf_models/snusr_htp.dlc"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v3.1-snpe/snusr_htp.dlc"
     model_checksum: ""
   }
   delegate_selected: "SNPE_CPU"
