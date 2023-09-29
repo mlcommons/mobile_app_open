@@ -12,9 +12,8 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 ## Requirements for LA
 
 <!-- markdown-link-check-disable-next-line -->
-* [Qualcomm Package Manager 3] (<https://qpm.qualcomm.com/#/main/tools/details/QPM3>)
-* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk)
-  * Version 2.13.4.<TODO>
+* [Qualcomm Package Manager 3](https://qpm.qualcomm.com/#/main/tools/details/QPM3)
+* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk) (Version 2.13.4)
 * Linux machine capable of running Ubuntu docker images
 
 ### Optional
