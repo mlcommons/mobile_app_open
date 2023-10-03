@@ -1,4 +1,5 @@
 # Docker image name: mlperf_snusr_docker
+#sensitive
 FROM ubuntu:focal
 LABEL maintainer="quic_mmundhra@quicinc.com"
 
@@ -22,5 +23,6 @@ RUN pip3 install Pillow setuptools matplotlib tensorflow_hub tf-slim \
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN apt-get clean
 
+#sensitive
 RUN mkdir -p /home/mlperf && chmod 777 /home/mlperf
 ENV HOME /home/mlperf
