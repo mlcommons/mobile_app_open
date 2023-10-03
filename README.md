@@ -50,7 +50,7 @@ frameworks contributed by the broader MLPerf community.
 * [datasets](./datasets) - Contains scripts to prepare test and calibration data used for accuracy evaluation and model quantization
 * [docs](./docs) - contains documentation
 * [flutter](./flutter) - Contains the Flutter (cross-platform) version of the app
-* [mobile_back_apple](./mobile_back_apple) - Apple backend (Core ML) for iOS
+* [mobile_back_apple](./mobile_back_apple) - Apple (Core ML) backend for iOS
 * [mobile_back_pixel](./mobile_back_pixel) - Google Pixel backend for Android
 * [mobile_back_qti](./mobile_back_qti) - QTI backend for Android
 * [mobile_back_samsung](./mobile_back_samsung) - Samsung backend for Android
