@@ -17,6 +17,7 @@ pbtxt2header(
         "public/include/mbe_config_2100.pbtxt",
         "public/include/mbe_config_2200.pbtxt",
         "public/include/mbe_config_2300.pbtxt",
+        "public/include/mbe_config_2400.pbtxt"
     ],
 )
 
@@ -34,6 +35,7 @@ cc_library(
         "public/include/mbe_config_2100.hpp",
         "public/include/mbe_config_2200.hpp",
         "public/include/mbe_config_2300.hpp",
+        "public/include/mbe_config_2400.hpp",
         "public/include/mbe_core_holder.hpp",
         "public/include/mbe_helper.hpp",
         "public/include/mbe_loader.hpp",

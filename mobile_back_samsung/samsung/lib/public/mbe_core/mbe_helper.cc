@@ -81,6 +81,13 @@ static int get_core_id_from_model(const char *model) {
   else if (strstr((char *)model, "ERD9935") ||
            strstr((char *)model, "S5E9935") || strstr((char *)model, "S919O"))
     core_id = SOC_2300;
+  else if (strstr((char *)model, "ERD9945") ||
+            strstr((char *)model, "S5E9945") ||
+            strstr((char *)model, "MU3S") ||
+            strstr((char *)model, "S921") ||
+            strstr((char *)model, "S926") ||
+            strstr((char *)model, "S928"))
+    core_id = SOC_2400;
   else
     return CORE_INVALID;
   return retrieve_model_surfix(model, core_id) ? core_id : CORE_INVALID;
@@ -98,6 +105,8 @@ static int get_core_id_from_hardware(const char *hardware) {
     core_id = SOC_2200;
   else if (strstr((char *)hardware, "9935"))
     core_id = SOC_2300;
+  else if (strstr((char *)hardware, "9945"))
+    core_id = SOC_2400;
   else
     return CORE_INVALID;
   return core_id;
@@ -125,6 +134,8 @@ const char *core_ctrl::get_benchmark_config(int core_id) {
     settings = mbe_config_2200_pbtxt.c_str();
   } else if (core_id == SOC_2300) {
     settings = mbe_config_2300_pbtxt.c_str();
+  } else if (core_id == SOC_2400) {
+    settings = mbe_config_2400_pbtxt.c_str();
   }
   return settings;
 }
