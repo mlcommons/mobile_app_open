@@ -82,11 +82,9 @@ static int get_core_id_from_model(const char *model) {
            strstr((char *)model, "S5E9935") || strstr((char *)model, "S919O"))
     core_id = SOC_2300;
   else if (strstr((char *)model, "ERD9945") ||
-            strstr((char *)model, "S5E9945") ||
-            strstr((char *)model, "MU3S") ||
-            strstr((char *)model, "S921") ||
-            strstr((char *)model, "S926") ||
-            strstr((char *)model, "S928"))
+           strstr((char *)model, "S5E9945") || strstr((char *)model, "MU3S") ||
+           strstr((char *)model, "S921") || strstr((char *)model, "S926") ||
+           strstr((char *)model, "S928"))
     core_id = SOC_2400;
   else
     return CORE_INVALID;

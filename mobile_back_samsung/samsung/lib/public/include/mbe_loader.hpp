@@ -29,11 +29,8 @@ limitations under the License.
 
 namespace mbe {
 std::string mbe_core_libs[CORE_MAX] = {
-    "libmbe1200_core.so",
-    "libmbe2100_core.so",
-    "libmbe2200_core.so",
-    "libmbe2300_core.so",
-    "libmbe2400_core.so",
+    "libmbe1200_core.so", "libmbe2100_core.so", "libmbe2200_core.so",
+    "libmbe2300_core.so", "libmbe2400_core.so",
 };
 
 void* load_symbol(void* dl_handle, const char* name) {
