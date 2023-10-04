@@ -17,7 +17,7 @@ pbtxt2header(
         "public/include/mbe_config_2100.pbtxt",
         "public/include/mbe_config_2200.pbtxt",
         "public/include/mbe_config_2300.pbtxt",
-        "public/include/mbe_config_2400.pbtxt"
+        "public/include/mbe_config_2400.pbtxt",
     ],
 )
 
