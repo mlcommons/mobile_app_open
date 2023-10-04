@@ -1,6 +1,11 @@
 # Docker image name: mlcommons/mlperf_dlc_prepare
-#sensitive
 FROM ubuntu:focal
+RUN addgroup -S mlperfuser \
+    && adduser -S mlperfuser -G mlperfuser
+
+USER mlperfuser
+
+ENTRYPOINT["id"]
 LABEL maintainer="quic_mmundhra@quicinc.com"
 
 # Update the apt configuration and set timezone first or image creation waits
@@ -23,6 +28,5 @@ RUN pip3 install Pillow opencv-python==4.3.0.38 setuptools matplotlib tensorflow
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN apt-get clean
 
-#sensitive
-RUN mkdir -p /home/mlperf && chmod 777 /home/mlperf
+RUN mkdir -p /home/mlperf && chmod 754 /home/mlperf
 ENV HOME /home/mlperf

@@ -69,8 +69,7 @@ RUN mkdir $ANDROID_SDK_HOME && chmod 777 $HOME/.cache/.android && \
     PASSWD=$(pwgen -s -y 20 1) && keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore \
     -storepass $PASSWD -alias androiddebugkey -keypass $PASSWD -dname "CN=Android Debug,O=Android,C=US"
 
-#sensitive
-RUN chmod -R 777 $HOME
+RUN chmod -R 754 $HOME
 
 RUN mkdir -p /mnt/cache && chmod 777 /mnt/cache
 RUN mkdir -p /mnt/project/flutter/build && chmod 777 /mnt/project/flutter/build
