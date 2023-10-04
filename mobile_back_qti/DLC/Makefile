@@ -16,7 +16,6 @@
 # This file must be called from top level Makefile
 
 include ../make/builddir.mk
-include ../make/qti_docker_intialization.mk
 
 DATASETS:=${TOPDIR}/datasets
 DATASETS_OUT:=${DATASETS}/output

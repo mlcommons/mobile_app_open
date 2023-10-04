@@ -1,11 +1,7 @@
 # Docker image name: mlperf_mosaic_docker
 FROM ubuntu:focal
-RUN addgroup -S mlperfuser \
-    && adduser -S mlperfuser -G mlperfuser
-
-USER mlperfuser
-
-ENTRYPOINT["id"]
+RUN groupadd -r mlperfuser \
+    && useradd -r mlperfuser -g mlperfuser
 LABEL maintainer="quic_mmundhra@quicinc.com"
 
 # Update the apt configuration and set timezone first or image creation waits
@@ -30,3 +26,5 @@ RUN apt-get clean
 
 RUN mkdir -p /home/mlperf && chmod 754 /home/mlperf
 ENV HOME /home/mlperf
+
+USER mlperfuser
