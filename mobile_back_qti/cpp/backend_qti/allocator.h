@@ -176,29 +176,16 @@ class Allocator {
 template <class T>
 bool Allocator<T>::useIonBuffer = true;
 
-static void *get_ion_buffer(size_t n, int chunkSize = 3) {
+static void *get_buffer(size_t n, int chunkSize = 3) {
   void *p = ChunkAllocator::GetBuffer(n, chunkSize);
   // LOG(INFO) << "QTI backend SNPE allocator " << n << " bytes at " << p << "
   // with chunk size: " << chunkSize;
   return p;
 }
 
-static void *std_get_buffer(size_t n, int chunkSize = 1) {
-  // chunkSize is always ignored. definition needs to be consistent with
-  // get_ion_buffer above
-  void *p = std::malloc(n);
-  // LOG(INFO) << "QTI backend STD allocator " << n << " bytes at " << p;
-  return p;
-}
-
-static void release_ion_buffer(void *p) {
+static void release_buffer(void *p) {
   // LOG(INFO) << "QTI backend SNPE free " << p;
   ChunkAllocator::ReleaseBuffer(p);
-}
-
-static void std_release_buffer(void *p) {
-  // LOG(INFO) << "QTI backend STD free " << p;
-  std::free(p);
 }
 
 #endif

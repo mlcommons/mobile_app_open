@@ -33,9 +33,9 @@ class SocInfo {
  public:
   SocInfo(std::string soc_name = DEFAULT_SOC_STR)
       : m_num_dsp(0),
-        m_num_aip(0),
         m_num_gpu(0),
         m_num_cpu(0),
+        m_num_gpu_fp16(0),
         m_useDspFeatures(false),
         m_settings(empty_settings),
         m_soc_name(soc_name),
@@ -43,14 +43,14 @@ class SocInfo {
         m_max_cores(0),
         m_needs_rpcmem(false) {}
 
-  SocInfo(int num_dsp, int num_aip, int num_gpu, int num_cpu,
+  SocInfo(int num_dsp, int num_gpu, int num_cpu, int num_gpu_fp16,
           bool useDspFeatures, const std::string settings, std::string soc_name,
           int num_inits, std::vector<int> hlc, std::vector<int> llc,
           int max_cores, bool needs_rpcmem)
       : m_num_dsp(num_dsp),
-        m_num_aip(num_aip),
         m_num_gpu(num_gpu),
         m_num_cpu(num_cpu),
+        m_num_gpu_fp16(num_gpu_fp16),
         m_useDspFeatures(useDspFeatures),
         m_settings(settings),
         m_soc_name(soc_name),
@@ -65,9 +65,9 @@ class SocInfo {
   }
 
   int m_num_dsp;
-  int m_num_aip;
   int m_num_gpu;
   int m_num_cpu;
+  int m_num_gpu_fp16;
   int m_num_inits;
   bool m_useDspFeatures;
   std::string m_settings;
@@ -96,8 +96,8 @@ class Socs {
  public:
   static void soc_info_init();
 
-  static void soc_offline_core_instance(int &num_dsp, int &num_aip,
-                                        int &num_gpu, int &num_cpu,
+  static void soc_offline_core_instance(int &num_dsp, int &num_gpu,
+                                        int &num_cpu, int &num_gpu_fp16,
                                         std::string &delegate);
   static int soc_num_inits();
 

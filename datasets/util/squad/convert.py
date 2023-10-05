@@ -60,15 +60,18 @@ def main():
         input_ids = single_sample["input_ids"]
         segment_ids = single_sample["segment_ids"]
         np_mask = np.asarray(input_mask).astype(np.float32)
+        file_name_1_prefix = "input_mask:0:="
         file_name_1 = "input_mask_{}.raw".format(i)
         np_mask.astype(np.float32).tofile(os.path.join(args.output_dir,file_name_1))
         np_ids = np.asarray(input_ids).astype(np.float32)
+        file_name_2_prefix = "bert/embeddings/ExpandDims:0:="
         file_name_2 = "input_ids_{}.raw".format(i)
         np_ids.astype(np.float32).tofile(os.path.join(args.output_dir,file_name_2))
         np_segment = np.asarray(segment_ids).astype(np.float32)
+        file_name_3_prefix = "segment_ids:0:="
         file_name_3 = "segment_ids_{}.raw".format(i)
         np_segment.astype(np.float32).tofile(os.path.join(args.output_dir,file_name_3))
-        file.write("{} {} {}\n".format(file_name_2,file_name_1,file_name_3))
+        file.write("{} {} {}\n".format(file_name_2_prefix + file_name_2,file_name_1_prefix + file_name_1,file_name_3_prefix + file_name_3))
     file.close()
 
 if __name__=="__main__":

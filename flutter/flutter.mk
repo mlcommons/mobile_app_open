@@ -65,9 +65,9 @@ flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
 
 FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
 -include ${FIREBASE_ENV_FILE}
-export
 .PHONY: flutter/firebase-config
 flutter/firebase-config:
+    export
 	bash flutter/tool/generate-firebase-config-files.sh
 
 .PHONY: flutter/check/firebase-env

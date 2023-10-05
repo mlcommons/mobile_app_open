@@ -35,7 +35,7 @@ bool Socs::is_init_done;
 std::map<uint32_t, SocInfo> socDetails =
     SocProperties(
         {
-            // num_dsp, num_aip, num_gpu, num_cpu,
+            // num_dsp, num_gpu, num_cpu,
             // useDspFeatures, settings,
             // soc_name, num_inits,
             // hlc,
@@ -72,6 +72,12 @@ std::map<uint32_t, SocInfo> socDetails =
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
             {435, SocInfo(2, 0, 0, 0, true, qti_settings_sd8cxg3, "SD8cxG3", 1,
+                          std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, false)},
+            {568, SocInfo(0, 0, 1, 0, false, qti_settings_sm4450, "SM4450", 1,
+                          std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, true)},
+            {475, SocInfo(2, 0, 0, 0, false, qti_settings_sd7cxg3, "SD7cxG3", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, false)},
             {UNSUPPORTED_SOC_ID,
@@ -140,10 +146,16 @@ uint32_t Socs::get_windows_soc_id(void) {
   }
 
   pptt = (PPPTT)buf;
-  PPROC_TOPOLOGY_NODE ptn =
-      (PPROC_TOPOLOGY_NODE)((BYTE *)&(pptt->HeirarchyNodes[0]) +
-                            pptt->HeirarchyNodes[0].Length);
-  uint64_t key = (ptn->IdNode.Level1 << 32) | (ptn->IdNode.Level2);
+  uint64_t key = 0;
+  for (uint32_t i = 0; i < pptt->Header.Length; i++) {
+    PPROC_TOPOLOGY_NODE ptn =
+        (PPROC_TOPOLOGY_NODE)((BYTE *)&(pptt->HeirarchyNodes[0]) + i);
+    // According to ACPI spec, type = 2 is the PPTT_ID_TABLE_TYPE
+    if (ptn->Type == 2) {
+      key = (ptn->IdNode.Level1 << 32) | (ptn->IdNode.Level2);
+      break;
+    }
+  }
 
   auto it = pptt_mappings.find(key);
   if (it != pptt_mappings.end()) {
@@ -190,16 +202,17 @@ std::string Socs::get_soc_name() {
   return m_soc_info.m_soc_name;
 }
 
-void Socs::soc_offline_core_instance(int &num_dsp, int &num_aip, int &num_gpu,
-                                     int &num_cpu, std::string &delegate) {
+void Socs::soc_offline_core_instance(int &num_dsp, int &num_gpu, int &num_cpu,
+                                     int &num_gpu_fp16, std::string &delegate) {
   soc_info_init();
   num_dsp = m_soc_info.m_num_dsp;
-  num_aip = m_soc_info.m_num_aip;
   num_gpu = m_soc_info.m_num_gpu;
   num_cpu = m_soc_info.m_num_cpu;
+  num_gpu_fp16 = m_soc_info.m_num_gpu_fp16;
 
-  if ((num_aip > 0 && delegate != "snpe_aip" && delegate != "psnpe_aip") ||
-      (delegate != "snpe_dsp" && delegate != "psnpe_dsp")) {
+  if (delegate != "snpe_dsp" && delegate != "psnpe_dsp" &&
+      delegate != "psnpe_cpu" && delegate != "snpe_gpu_fp16" &&
+      delegate != "psnpe_gpu_fp16") {
     LOG(FATAL) << "Error: Unsupported delegate for offline mode";
   }
 }
@@ -264,7 +277,6 @@ int Socs::soc_check_feature(bool &useIonBuffers_,
     if (useIonBuffers_) {
       platformOptionStr += ";useDspZeroCopy:ON";
     }
-    platformOptionStr += ";dspPowerSettingContext:ON";
     return 1;
   }
   return 0;
