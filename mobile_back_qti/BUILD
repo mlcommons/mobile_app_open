@@ -28,19 +28,19 @@ config_setting(
 cc_import(
     name = "snpewindowslib",
     hdrs = glob([
-        SNPE_VERSION + "/include/zdl/**/*.hpp",
-        SNPE_VERSION + "/include/zdl/**/*.h",
+        SNPE_VERSION + "/include/SNPE/**/*.hpp",
+        SNPE_VERSION + "/include/SNPE/**/*.h",
     ]),
-    interface_library = SNPE_VERSION + "/lib/aarch64-windows-vc19/SNPE.lib",
-    shared_library = SNPE_VERSION + "/lib/aarch64-windows-vc19/SNPE.dll",
+    interface_library = SNPE_VERSION + "/lib/aarch64-windows-msvc/SNPE.lib",
+    shared_library = SNPE_VERSION + "/lib/aarch64-windows-msvc/SNPE.dll",
 )
 
 cc_library(
     name = "snpe_depsdll",
     srcs = [
-        SNPE_VERSION + "/lib/aarch64-windows-vc19/SNPE.dll",
-        SNPE_VERSION + "/lib/aarch64-windows-vc19/SnpeHtpV68Stub.dll",
-        SNPE_VERSION + "/lib/dsp/libSnpeHtpV68Skel.so",
+        SNPE_VERSION + "/lib/aarch64-windows-msvc/SNPE.dll",
+        SNPE_VERSION + "/lib/aarch64-windows-msvc/SnpeHtpV68Stub.dll",
+        SNPE_VERSION + "/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so",
     ],
     linkstatic = 0,
     deps = [":snpewindowslib"],
@@ -49,28 +49,28 @@ cc_library(
 cc_library(
     name = "snpe",
     srcs = [
-        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSNPE.so",
+        SNPE_VERSION + "/lib/aarch64-android/libSNPE.so",
     ],
     hdrs = glob([
-        SNPE_VERSION + "/include/zdl/**/*.hpp",
-        SNPE_VERSION + "/include/zdl/**/*.h",
+        SNPE_VERSION + "/include/SNPE/**/*.hpp",
+        SNPE_VERSION + "/include/SNPE/**/*.h",
     ]),
-    copts = ["-I" + SNPE_VERSION + "/include/zdl"],
+    copts = ["-I" + SNPE_VERSION + "/include/SNPE"],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "snpe_deps",
     srcs = [
-        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libhta.so",
-        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSnpeHtpV73Stub.so",
-        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSnpeHtpV69Stub.so",
-        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSnpeHtpV68Stub.so",
-        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSNPE.so",
-        SNPE_VERSION + "/lib/aarch64-android-clang8.0/libSnpeHtpPrepare.so",
-        SNPE_VERSION + "/lib/dsp/libSnpeHtpV69Skel.so",
-        SNPE_VERSION + "/lib/dsp/libSnpeHtpV68Skel.so",
-        SNPE_VERSION + "/lib/dsp/libSnpeHtpV73Skel.so",
+        SNPE_VERSION + "/lib/aarch64-android/libhta.so",
+        SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV73Stub.so",
+        SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV69Stub.so",
+        SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV68Stub.so",
+        SNPE_VERSION + "/lib/aarch64-android/libSNPE.so",
+        SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpPrepare.so",
+        SNPE_VERSION + "/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so",
+        SNPE_VERSION + "/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so",
+        SNPE_VERSION + "/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so",
     ],
 )
 

@@ -49,6 +49,7 @@ The MLPerf Application uses the SNPE Hexagon Processor runtimes on the following
 
 The Qualcomm backend utilizes the Snapdragon platform's AI hardware to accelerate neural network execution.
 
+<!-- markdown-link-check-disable-next-line -->
 Link to Qualcomm Neural Processing SDK: [https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk](https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk)
 
 Link to Snapdragon Platform: [https://www.qualcomm.com/snapdragon](https://www.qualcomm.com/snapdragon)
