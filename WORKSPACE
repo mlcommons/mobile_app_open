@@ -1,6 +1,7 @@
 workspace(name = "mlperf_app")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
 http_archive(
     name = "com_google_protobuf",
@@ -114,17 +115,14 @@ http_archive(
     urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/heads/update_for_dujac.zip"],
 )
 
-http_archive(
+new_git_repository(
     name = "org_mlperf_inference",
     build_file = "@//flutter/android/third_party:loadgen.BUILD",
+    commit = "df3b2ec623af405e51843aa9ed269eb3e233c988",
     patch_args = ["-p1"],
     patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
     patches = [],
-    sha256 = "e664f980e84fcab3573447c0cc3adddd1fcf900367c5dcbff17179ece24c484e",
-    strip_prefix = "inference-2da0c52666e21e4b296b09e1dbd287bf3a814e96",
-    urls = [
-        "https://github.com/mlcommons/inference/archive/2da0c52666e21e4b296b09e1dbd287bf3a814e96.tar.gz",
-    ],
+    remote = "https://github.com/mlcommons/inference.git",
 )
 
 # This is required to pass SNPE SDK path from external environment to sources,
