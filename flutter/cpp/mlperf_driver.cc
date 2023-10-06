@@ -105,6 +105,7 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
   // See https://github.com/mlcommons/inference/issues/1397
   mlperf_settings.max_duration_ms =
       static_cast<uint64_t>(std::ceil(max_duration * 1000.0));
+  mlperf_settings.enforce_max_duration = false;
 
   if (scenario_ == "Offline") {
     mlperf_settings.scenario = ::mlperf::TestScenario::Offline;
