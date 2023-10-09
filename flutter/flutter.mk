@@ -67,7 +67,7 @@ FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
 -include ${FIREBASE_ENV_FILE}
 .PHONY: flutter/firebase-config
 flutter/firebase-config:
-    export
+	export
 	bash flutter/tool/generate-firebase-config-files.sh
 
 .PHONY: flutter/check/firebase-env
