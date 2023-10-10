@@ -102,22 +102,11 @@ mlperf_backend_ptr_t mlperf_backend_create(
   if (backend_data->isTflite_) {
     CpuCtrl::highLatency();
     backend_data->tfliteBackend_ = tflite_backend_create(model_path, configs);
-    backend_data->getBuffer_ = std_get_buffer;
-    backend_data->releaseBuffer_ = std_release_buffer;
     return backend_data;
   }
 
   // use lowLatency cores for all snpe models
   CpuCtrl::lowLatency();
-
-  // Set buffers to be used for snpe
-  if (backend_data->useIonBuffers_) {
-    backend_data->getBuffer_ = get_ion_buffer;
-    backend_data->releaseBuffer_ = release_ion_buffer;
-  } else {
-    backend_data->getBuffer_ = std_get_buffer;
-    backend_data->releaseBuffer_ = std_release_buffer;
-  }
 
 #ifdef __ANDROID__
   std::stringstream adsp_lib_path;
@@ -329,11 +318,33 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
 }
 
 void *mlperf_backend_get_buffer(size_t n) {
-  return backend_data_->getBuffer_(n, backend_data_->inputBatch_);
+  auto batchedDataPtr = get_buffer(n, backend_data_->inputBatch_);
+
+  if (backend_data_->useIonBuffers_) {
+    const char *name =
+        Snpe_StringList_At(backend_data_->networkInputTensorNamesHandle_, 0);
+    Snpe_UserMemoryMap_Add(backend_data_->ionBufferMapHandle_, name,
+                           batchedDataPtr);
+  }
+  return batchedDataPtr;
 }
 
 void mlperf_backend_release_buffer(void *p) {
-  backend_data_->releaseBuffer_(p);
+  if (backend_data_->useIonBuffers_ && backend_data_->isIonRegistered) {
+    Snpe_StringList_Handle_t userBufferNames =
+        Snpe_UserMemoryMap_GetUserBufferNames(
+            backend_data_->ionBufferMapHandle_);
+    if (Snpe_SNPE_DeregisterIonBuffers(backend_data_->snpe_->snpeHandle,
+                                       userBufferNames) != SNPE_SUCCESS)
+      LOG(INFO) << "Deregistration Failed !";
+
+    auto input_buffer_name = Snpe_StringList_At(userBufferNames, 0);
+    Snpe_UserMemoryMap_Remove(backend_data_->ionBufferMapHandle_,
+                              input_buffer_name);
+    Snpe_StringList_Delete(userBufferNames);
+    backend_data_->isIonRegistered = false;
+  }
+  release_buffer(p);
 }
 
 #ifdef __cplusplus
