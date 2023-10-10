@@ -110,5 +110,5 @@ class BackendId {
 }
 
 class BenchmarkSettings {
-  static const double maxDuration = 30 * 60; // 30 minutes
+  static const double maxDuration = 10 * 60; // 10 minutes
 }
