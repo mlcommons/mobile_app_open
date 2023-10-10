@@ -60,8 +60,8 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
   backend_qti_filename=libqtibackend
 endif
 
-.PHONY: flutter/libqtibackend/patchlibs
-flutter/libqtibackend/patchlibs:
+.PHONY: flutter/android/libs/qti/patchlibs
+flutter/android/libs/qti/patchlibs:
 ifeq ($(WITH_QTI),)
   $(info not patching libs)
 else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))

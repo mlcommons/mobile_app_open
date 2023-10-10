@@ -17,7 +17,7 @@ include flutter/android/android-docker.mk
 
 flutter/android: flutter/android/libs flutter/check/firebase-env
 flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk
-flutter/android/libs: flutter/android/libs/checksum flutter/android/libs/build flutter/android/libs/copy
+flutter/android/libs: flutter/android/libs/checksum flutter/android/libs/qti/patchlibs flutter/android/libs/build flutter/android/libs/copy
 # run `make flutter/android/apk` before `flutter/android/test-apk`
 flutter/android/test-apk: flutter/android/test-apk/main flutter/android/test-apk/helper
 
@@ -33,7 +33,7 @@ else
 endif
 
 .PHONY: flutter/android/libs/build
-flutter/android/libs/build: flutter/libqtibackend/patchlibs
+flutter/android/libs/build:
 	bazel ${BAZEL_OUTPUT_ROOT_ARG} ${proxy_bazel_args} ${sonar_bazel_startup_options} \
 		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
 		--config=android_arm64 \
