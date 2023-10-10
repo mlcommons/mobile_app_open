@@ -52,6 +52,7 @@ windows_cmdline_folder=output/windows/cmdline
 .PHONY: cmdline/windows/bins
 cmdline/windows/bins:
 	bazel ${BAZEL_OUTPUT_ROOT_ARG} --output_base=C:\\b_cache1\\ build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
+		--experimental_distdir=C:\b_cache1\manual-download \
 		--config=windows_arm64 \
 		--cpu=x64_arm64_windows --worker_verbose\
 		${backend_tflite_windows_target} \

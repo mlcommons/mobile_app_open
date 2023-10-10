@@ -19,28 +19,28 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
     backend_qti_flutter_docker_args=-v "${SNPE_SDK}:/mnt/project/mobile_back_qti/$(shell basename ${SNPE_SDK})"
   endif
   $(info WITH_QTI=$(WITH_QTI))
-  local_snpe_sdk_root=$(shell echo mobile_back_qti/snpe-* | awk '{print $$NF}')
+  local_snpe_sdk_root=$(shell echo mobile_back_qti/qaisw-* | awk '{print $$NF}')
   $(info detected SNPE SDK: ${local_snpe_sdk_root})
   backend_qti_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
-    ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSNPE.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSnpeHtpV73Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSnpeHtpV69Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSnpeHtpV68Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSnpeHtpPrepare.so \
-    ${local_snpe_sdk_root}/lib/dsp/libSnpeHtpV73Skel.so \
-    ${local_snpe_sdk_root}/lib/dsp/libSnpeHtpV69Skel.so \
-    ${local_snpe_sdk_root}/lib/dsp/libSnpeHtpV68Skel.so
+    ${local_snpe_sdk_root}/lib/aarch64-android_patched/libc++_qti.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android_patched/libSNPE.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android_patched/libSnpeHtpV73Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android_patched/libSnpeHtpV69Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android_patched/libSnpeHtpV68Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android_patched/libSnpeHtpPrepare.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so
   backend_qti_cmdline_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
-    ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSNPE.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSnpeHtpV73Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSnpeHtpV69Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSnpeHtpV68Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android-clang8.0/libSnpeHtpPrepare.so \
-    ${local_snpe_sdk_root}/lib/dsp/libSnpeHtpV73Skel.so \
-    ${local_snpe_sdk_root}/lib/dsp/libSnpeHtpV69Skel.so \
-    ${local_snpe_sdk_root}/lib/dsp/libSnpeHtpV68Skel.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libc++_shared.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSNPE.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV73Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV69Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV68Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpPrepare.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so \
     mobile_back_qti/run_accuracy_tests.sh \
     mobile_back_qti/run_performance_tests.sh
   backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so \
@@ -50,11 +50,28 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
   endif
 
   backend_qti_windows_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.dll \
-    ${local_snpe_sdk_root}/lib/aarch64-windows-vc19/SNPE.dll \
-    ${local_snpe_sdk_root}/lib/aarch64-windows-vc19/SnpeHtpV68Stub.dll \
-    ${local_snpe_sdk_root}/lib/dsp/libSnpeHtpV68Skel.so \
+    ${local_snpe_sdk_root}/lib/aarch64-windows-msvc/SNPE.dll \
+    ${local_snpe_sdk_root}/lib/aarch64-windows-msvc/SnpeHtpV68Stub.dll \
+    ${local_snpe_sdk_root}/lib/aarch64-windows-msvc/SnpeHtpPrepare.dll \
+    ${local_snpe_sdk_root}/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so \
     mobile_back_qti/run_performance_tests.bat \
     mobile_back_qti/run_accuracy_tests.bat
   backend_qti_windows_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.dll
   backend_qti_filename=libqtibackend
+endif
+
+.PHONY: flutter/android/libs/qti/patchlibs
+flutter/android/libs/qti/patchlibs:
+ifeq ($(WITH_QTI),)
+  $(info not patching libs)
+else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
+	rm -rf ${local_snpe_sdk_root}/lib/aarch64-android_patched
+	cp -r ${local_snpe_sdk_root}/lib/aarch64-android ${local_snpe_sdk_root}/lib/aarch64-android_patched
+	patchelf --replace-needed libc++_shared.so libc++_qti.so ${local_snpe_sdk_root}/lib/aarch64-android_patched/libSNPE.so
+	patchelf --replace-needed libc++_shared.so libc++_qti.so ${local_snpe_sdk_root}/lib/aarch64-android_patched/libSnpeHtpV73Stub.so
+	patchelf --replace-needed libc++_shared.so libc++_qti.so ${local_snpe_sdk_root}/lib/aarch64-android_patched/libSnpeHtpV69Stub.so
+	patchelf --replace-needed libc++_shared.so libc++_qti.so ${local_snpe_sdk_root}/lib/aarch64-android_patched/libSnpeHtpV68Stub.so
+	patchelf --replace-needed libc++_shared.so libc++_qti.so ${local_snpe_sdk_root}/lib/aarch64-android_patched/libSnpeHtpPrepare.so
+	patchelf --set-soname libfoo.so ${local_snpe_sdk_root}/lib/aarch64-android_patched/libc++_shared.so
+	mv ${local_snpe_sdk_root}/lib/aarch64-android_patched/libc++_shared.so ${local_snpe_sdk_root}/lib/aarch64-android_patched/libc++_qti.so
 endif

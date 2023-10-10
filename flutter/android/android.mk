@@ -20,7 +20,7 @@ ANDROID_NDK_API_LEVEL?=33
 
 flutter/android: flutter/android/libs flutter/check/firebase-env
 flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk
-flutter/android/libs: flutter/android/libs/checksum flutter/android/libs/build flutter/android/libs/copy
+flutter/android/libs: flutter/android/libs/checksum flutter/android/libs/qti/patchlibs flutter/android/libs/build flutter/android/libs/copy
 # run `make flutter/android/apk` before `flutter/android/test-apk`
 flutter/android/test-apk: flutter/android/test-apk/main flutter/android/test-apk/helper
 

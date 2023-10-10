@@ -19,19 +19,19 @@ def _impl(repository_ctx):
         # print(repository_ctx.attr.workspace_dir + "/mobile_back_qti/")
         found = repository_ctx.execute(["ls", repository_ctx.attr.workspace_dir + "/mobile_back_qti"])
         if found.return_code != 0 or found.stdout == "" or found.stdout == "\n":
-            fail("snpe folder is not found in the repo: " + found.stderr)
+            fail("qaisw folder is not found in the repo: " + found.stderr)
         filelist = found.stdout.split("\n")
         filepath = ""
         for x in filelist:
-            if x.find("snpe-") == 0:
+            if x.find("qaisw-") == 0:
                 filepath = x
                 break
         if filepath == "":
-            fail("snpe folder is not found in the repo")
+            fail("qaisw folder is not found in the repo")
     else:
-        found = repository_ctx.execute(["find", repository_ctx.attr.workspace_dir + "/mobile_back_qti/", "-maxdepth", "1", "-name", "snpe-*", "-type", "d", "-print", "-quit"])
+        found = repository_ctx.execute(["find", repository_ctx.attr.workspace_dir + "/mobile_back_qti/", "-maxdepth", "1", "-name", "qaisw-*", "-type", "d", "-print", "-quit"])
         if found.return_code != 0 or found.stdout == "" or found.stdout == "\n":
-            fail("snpe folder is not found in the repo")
+            fail("qaisw folder is not found in the repo")
         filepath = found.stdout[:-1]
 
     sdk_version = filepath[found.stdout.rfind("/") + 1:]

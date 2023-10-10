@@ -16,6 +16,7 @@
 DOCKER_IMAGE_TAG?=mlcommons/mlperf_mobile_flutter
 
 flutter_docker_postfix=$(shell id -u)
+
 .PHONY: flutter/android/docker/image
 flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp
 output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp: flutter/android/docker/Dockerfile
