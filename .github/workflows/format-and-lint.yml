@@ -2,8 +2,7 @@ name: Format & lint
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master, submission-v* ]
   pull_request:
     types: [ opened, synchronize, reopened ]
 
