@@ -75,3 +75,4 @@ RUN chmod -R 754 $HOME
 RUN mkdir -p /mnt/cache && chmod 777 /mnt/cache
 RUN mkdir -p /mnt/project/flutter/build && chmod 777 /mnt/project/flutter/build
 RUN mkdir -p $HOME/.cache/bazelisk && chmod 777 $HOME/.cache/bazelisk
+ENV FIREBASE_PROJECT_ID=0
