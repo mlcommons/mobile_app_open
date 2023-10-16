@@ -181,7 +181,7 @@ void Socs::soc_info_init() {
 #endif
 
   LOG(INFO) << "Soc ID: " << soc_id;
-  if(soc_id != UNSUPPORTED_SOC_ID) {
+  if (soc_id != UNSUPPORTED_SOC_ID) {
     if (socDetails.find(soc_id) == socDetails.end()) {
       soc_id = UNSUPPORTED_SOC_ID;
     }
