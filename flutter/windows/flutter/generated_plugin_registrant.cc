@@ -11,10 +11,6 @@
 #include <url_launcher_windows/url_launcher_windows.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
-  DesktopWebviewAuthPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("DesktopWebviewAuthPlugin"));
-  FirebaseCorePluginCApiRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("FirebaseCorePluginCApi"));
   PermissionHandlerWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("PermissionHandlerWindowsPlugin"));
   SharePlusWindowsPluginCApiRegisterWithRegistrar(
