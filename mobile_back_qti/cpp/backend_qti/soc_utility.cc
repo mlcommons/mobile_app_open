@@ -181,7 +181,11 @@ void Socs::soc_info_init() {
 #endif
 
   LOG(INFO) << "Soc ID: " << soc_id;
-  if (socDetails.find(soc_id) != socDetails.end()) {
+  if(soc_id != UNSUPPORTED_SOC_ID) {
+    if (socDetails.find(soc_id) == socDetails.end()) {
+      soc_id = UNSUPPORTED_SOC_ID;
+    }
+
     m_soc_info = socDetails.find(soc_id)->second;
     if (soc_id == UNSUPPORTED_SOC_ID) {
       if (QTIBackendHelper::IsRuntimeAvailable(SNPE_DSP)) {
@@ -223,7 +227,6 @@ int Socs::soc_num_inits() {
 }
 
 bool Socs::isSnapDragon(const char *manufacturer) {
-  soc_info_init();
 #ifdef __ANDROID__
   bool is_qcom = false;
   if (strncmp("QUALCOMM", manufacturer, 7) == 0) {
