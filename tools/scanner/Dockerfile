@@ -29,3 +29,8 @@ ENV NODE_ENV="production"
 RUN curl --proto '=https' -fsSL https://deb.nodesource.com/setup_lts.x | bash -
 RUN apt-get update && apt-get install -y --no-install-recommends nodejs && node -v
 RUN npm install --ignore-scripts --location=global npm@8.13.2 && npm --version
+
+RUN echo "Show env vars:" && env
+
+ENV ANDROID_NDK_VERSION=25
+ENV ANDROID_NDK_API_LEVEL=33

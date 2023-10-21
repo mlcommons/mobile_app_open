@@ -46,6 +46,7 @@ scanner/build-image: flutter/android/docker/image output/docker_mlperf_scanner.s
 
 .PHONY: scanner/build-app
 scanner/build-app:
+	env
 	bazel clean
 	build-wrapper-linux-x86-64 --out-dir "${SONAR_OUT_DIR}" \
 		make flutter/android
