@@ -72,6 +72,6 @@ RUN mkdir $ANDROID_SDK_HOME && chmod 777 $HOME/.cache/.android && \
 
 RUN chmod -R 754 $HOME
 
-RUN mkdir -p /mnt/cache && chmod 777 /mnt/cache
-RUN mkdir -p /mnt/project/flutter/build && chmod 777 /mnt/project/flutter/build
-RUN mkdir -p $HOME/.cache/bazelisk && chmod 777 $HOME/.cache/bazelisk
+RUN mkdir -p /mnt/cache && chmod -R 754 /mnt/cache
+RUN mkdir -p /mnt/project/flutter/build && chmod -R 754 /mnt/project/flutter/build
+RUN mkdir -p $HOME/.cache/bazelisk && chmod -R 754 $HOME/.cache/bazelisk
