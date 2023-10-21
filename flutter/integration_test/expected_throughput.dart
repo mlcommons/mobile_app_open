@@ -48,11 +48,11 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kCloudBuildX28: Interval(min: 3.5, max: 8),
     _kRyzen5600: Interval(min: 14, max: 22),
     _kPixel5: Interval(min: 40, max: 60),
-    _kIphoneOnGitHubAction: Interval(min: 2, max: 8),
+    _kIphoneOnGitHubAction: Interval(min: 1.5, max: 4),
     _kIphoneOnMacbookM1: Interval(min: 9, max: 16),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 2, max: 8),
+    _kIphoneOnGitHubAction: Interval(min: 1.5, max: 4),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 300, max: 490),
