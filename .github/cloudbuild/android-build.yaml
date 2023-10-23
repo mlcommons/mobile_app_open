@@ -50,7 +50,6 @@ steps:
       - |
         DOCKERFILE_COMMIT=$$(git log -n 1 --pretty=format:%H -- flutter/android/docker/Dockerfile)
         docker build \
-          --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) --build-arg USER_NAME=$(whoami) \
           -t gcr.io/$PROJECT_ID/$_BUILDER_IMAGE_NAME:$$DOCKERFILE_COMMIT \
           -t gcr.io/$PROJECT_ID/$_BUILDER_IMAGE_NAME:latest \
           --cache-from gcr.io/$PROJECT_ID/$_BUILDER_IMAGE_NAME:$$DOCKERFILE_COMMIT \
