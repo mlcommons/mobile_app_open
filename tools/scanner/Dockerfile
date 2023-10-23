@@ -1,6 +1,5 @@
 ARG BASE_DOCKER_IMAGE_TAG
 FROM $BASE_DOCKER_IMAGE_TAG
-USER root
 
 # Install minimum recommended Java version
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \

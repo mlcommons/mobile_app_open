@@ -29,12 +29,6 @@ RUN python3 -m pip install numpy absl-py
 RUN curl --proto '=https' -L https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 -o /usr/local/bin/bazel && \
     chmod +x /usr/local/bin/bazel
 
-ARG USER_ID
-ARG GROUP_ID
-ARG USER_NAME
-RUN groupadd -g $GROUP_ID $USER_NAME && useradd -u $USER_ID -g $USER_NAME $USER_NAME
-USER $USER_NAME
-
 ENV ANDROID_SDK_ROOT=/opt/android
 WORKDIR $ANDROID_SDK_ROOT/cmdline-tools
 # sdkmanager expects to be placed into `$ANDROID_SDK_ROOT/cmdline-tools/tools`
@@ -74,3 +68,6 @@ ENV ANDROID_SDK_HOME=$HOME/.cache/.android
 RUN mkdir $ANDROID_SDK_HOME && \
     PASSWD=$(pwgen -s -y 20 1) && keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore \
     -storepass $PASSWD -alias androiddebugkey -keypass $PASSWD -dname "CN=Android Debug,O=Android,C=US"
+
+# Git repo will be mounted at '/image-workdir/project'
+RUN git config --global --add safe.directory /image-workdir/project
