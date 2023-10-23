@@ -86,7 +86,5 @@ jobs:
           labels: ${{ steps.meta-scanner.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Build app
-        run: make docker/scanner/build-app
       - name: Scan code
         run: make docker/scanner/scan
