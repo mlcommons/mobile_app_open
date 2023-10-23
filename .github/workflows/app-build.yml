@@ -41,8 +41,8 @@ jobs:
           file: flutter/android/docker/Dockerfile
           build-args: |
             USER_ID=1001
-            GROUP_ID=115
-            USER_NAME=github
+            GROUP_ID=127
+            USER_NAME=runner
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -57,6 +57,11 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v3
+      - name: Show user and group id
+        run: |
+          echo "User ID: $(id -u)"
+          echo "Group ID: $(id -g)"
+          echo "Username: $(whoami)"
       # Preinstalled tools from host at `/opt/hostedtoolcache` is not needed since we run commands inside our own Docker container.
       # `/opt/hostedtoolcache` is mounted to `/__t`. We delete it to free up disk space.
       - name: Free up disk space

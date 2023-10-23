@@ -64,8 +64,8 @@ jobs:
           file: flutter/android/docker/Dockerfile
           build-args: |
             USER_ID=1001
-            GROUP_ID=115
-            USER_NAME=github
+            GROUP_ID=127
+            USER_NAME=runner
           push: true
           tags: ${{ steps.meta-base.outputs.tags }}
           labels: ${{ steps.meta-base.outputs.labels }}
