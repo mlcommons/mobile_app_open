@@ -15,12 +15,16 @@
 
 DOCKER_IMAGE_TAG?=mlcommons/mlperf_mobile_flutter
 
-flutter_docker_postfix=$(shell id -u)
+user_id=$(shell id -u)
+group_id=$(shell id -g)
+user_name=$(shell whoami)
 
 .PHONY: flutter/android/docker/image
-flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp
-output/docker/mlperf_mobile_flutter_android_${flutter_docker_postfix}.stamp: flutter/android/docker/Dockerfile
-	docker image build -t ${DOCKER_IMAGE_TAG} flutter/android/docker
+flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android_${user_id}.stamp
+output/docker/mlperf_mobile_flutter_android_${user_id}.stamp: flutter/android/docker/Dockerfile
+	docker image build \
+	  --build-arg USER_ID=${user_id} --build-arg GROUP_ID=${group_id} --build-arg USER_NAME=${user_name} \
+	  -t ${DOCKER_IMAGE_TAG} flutter/android/docker
 	mkdir -p output/docker
 	touch $@
 
@@ -33,19 +37,18 @@ flutter_common_docker_flags= \
 		--rm \
 		${flutter_docker_tty_arg} \
 		--init \
-		--user `id -u`:`id -g` \
-		--env USER=mlperf \
-		-v $(CURDIR):/mnt/project \
-		--workdir /mnt/project \
-		-v /mnt/project/flutter/build \
-		-v mlperf-mobile-flutter-cache-bazel-${flutter_docker_postfix}:/mnt/cache \
+		--user ${user_id}:${group_id} \
+		--env USER=${user_name} \
+		-v $(CURDIR):/image-workdir/project \
+		--workdir /image-workdir/project \
+		-v mlperf-mobile-flutter-cache-bazel-${user_id}:/image-workdir/cache/bazel \
+		--env BAZEL_CACHE_ARG="--disk_cache=/image-workdir/cache/bazel" \
 		--env WITH_TFLITE=${WITH_TFLITE} \
 		--env WITH_QTI=${WITH_QTI} \
 		--env WITH_SAMSUNG=${WITH_SAMSUNG} \
 		--env WITH_PIXEL=${WITH_PIXEL} \
 		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
 		--env proxy_bazel_args=${proxy_bazel_args} \
-		--env BAZEL_OUTPUT_ROOT_ARG="--output_user_root=/mnt/cache/bazel" \
 		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
 		--env FLUTTER_BUILD_NUMBER=${FLUTTER_BUILD_NUMBER} \
 		--env FLUTTER_FORCE_PUB_GET=1 \

@@ -29,6 +29,12 @@ RUN python3 -m pip install numpy absl-py
 RUN curl --proto '=https' -L https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 -o /usr/local/bin/bazel && \
     chmod +x /usr/local/bin/bazel
 
+ARG USER_ID
+ARG GROUP_ID
+ARG USER_NAME
+RUN groupadd -g $GROUP_ID $USER_NAME && useradd -u $USER_ID -g $USER_NAME $USER_NAME
+USER $USER_NAME
+
 ENV ANDROID_SDK_ROOT=/opt/android
 WORKDIR $ANDROID_SDK_ROOT/cmdline-tools
 # sdkmanager expects to be placed into `$ANDROID_SDK_ROOT/cmdline-tools/tools`
@@ -61,17 +67,10 @@ RUN flutter config --no-analytics && dart --disable-analytics
 RUN flutter doctor -v
 RUN dart pub global activate protoc_plugin ^20.0.1 && chmod --recursive a=u $PUB_CACHE
 
-RUN mkdir -p $HOME/.cache/ && chmod 777 $HOME/.cache/
-RUN mkdir -p $HOME/.cache/.gradle && chmod 777 $HOME/.cache/.gradle
+RUN mkdir -p $HOME/.cache/.gradle
 ENV GRADLE_USER_HOME=$HOME/.cache/.gradle
 ENV ANDROID_SDK_HOME=$HOME/.cache/.android
 
-RUN mkdir $ANDROID_SDK_HOME && chmod 777 $HOME/.cache/.android && \
+RUN mkdir $ANDROID_SDK_HOME && \
     PASSWD=$(pwgen -s -y 20 1) && keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore \
     -storepass $PASSWD -alias androiddebugkey -keypass $PASSWD -dname "CN=Android Debug,O=Android,C=US"
-
-RUN chmod -R 777 $HOME
-
-RUN mkdir -p /mnt/cache && chmod 777 /mnt/cache
-RUN mkdir -p /mnt/project/flutter/build && chmod 777 /mnt/project/flutter/build
-RUN mkdir -p $HOME/.cache/bazelisk && chmod 777 $HOME/.cache/bazelisk
