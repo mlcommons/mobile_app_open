@@ -58,9 +58,9 @@ jobs:
           context: flutter/android/docker
           file: flutter/android/docker/Dockerfile
           build-args: |
-            USER_ID: 1000
-            GROUP_ID: 1000
-            USER_NAME: mlperf
+            USER_ID=1000
+            GROUP_ID=1000
+            USER_NAME=mlperf
           push: true
           tags: ${{ steps.meta-base.outputs.tags }}
           labels: ${{ steps.meta-base.outputs.labels }}
