@@ -6,6 +6,7 @@ task {
   name: "Image Classification"
   min_query_count: 1024
   min_duration: 60
+  max_duration: 600
   max_throughput: 1000
   max_accuracy: 1.0
   scenario: "SingleStream"
@@ -42,6 +43,7 @@ task {
   name: "Object Detection"
   min_query_count: 1024
   min_duration: 60
+  max_duration: 600
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
@@ -78,6 +80,7 @@ task {
   name: "v2.0 Image Segmentation"
   min_query_count: 1024
   min_duration: 60
+  max_duration: 600
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
@@ -113,6 +116,7 @@ task {
   name: "Language Understanding"
   min_query_count: 1024
   min_duration: 60
+  max_duration: 600
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
@@ -145,6 +149,7 @@ task {
   name: "Super Resolution "
   min_query_count: 1024
   min_duration: 60
+  max_duration: 600
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
@@ -179,6 +184,7 @@ task {
   name: "Image Classification (Offline)"
   min_query_count: 24576
   min_duration: 0
+  max_duration: 0
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "Offline"
