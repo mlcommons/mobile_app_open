@@ -17,7 +17,7 @@
 
 import tensorflow as tf
 import coremltools as ct
-from coremltools.models.neural_network import quantization_utils
+import coremltools.optimize.coreml as cto
 
 
 def main():
@@ -26,31 +26,20 @@ def main():
   saved_model_source_dir = '../dev-resources/mobilebert/float_saved_model'
   input_names = ['input_ids', 'input_mask', 'segment_ids']
   output_names = ['start_logits', 'end_logits']
-  output_shapes = [(1, 384), (1, 384)]
-  coreml_export_filepath = '../dev-resources/mobilebert/MobileBERT.mlmodel'
+  coreml_export_filepath = '../dev-resources/mobilebert/MobileBERT'
 
   tfmodel = tf.saved_model.load(saved_model_source_dir, tags={'serve'})
   pruned = tfmodel.prune([e + ':0' for e in input_names],
                          [e + ':0' for e in output_names])
-  model = ct.convert(
+  mlmodel = ct.convert(
     [pruned],
     source='tensorflow',
   )
-  model_quantized = quantization_utils.quantize_weights(model, nbits=16)
+  op_config = cto.OpLinearQuantizerConfig()
+  config = cto.OptimizationConfig(op_config)
+  mlmodel = cto.linear_quantize_weights(mlmodel, config)
 
-  spec = model_quantized.get_spec()
-  for i, shape in enumerate(output_shapes):
-    for n in shape:
-      spec.description.output[i].type.multiArrayType.shape.append(n)
-
-  dtype_int32 = ct.proto.FeatureTypes_pb2.ArrayFeatureType.INT32
-  for i, _ in enumerate(input_names):
-    spec.description.input[i].type.multiArrayType.dataType = dtype_int32
-
-  print(spec.description)
-
-  model_quantized = ct.models.MLModel(spec)
-  model_quantized.save(coreml_export_filepath)
+  mlmodel.save(coreml_export_filepath)
 
 
 if __name__ == "__main__":
