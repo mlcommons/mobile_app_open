@@ -28,13 +28,13 @@ class ArchiveCacheHelper {
       return '';
     }
     var file = await fileCacheHelper.get(url, true);
-    await _unzipFile(file);
-    return cachePath;
+    Directory directory = await _unzipFile(file);
+    return directory.path;
   }
 
   Future<Directory> _unzipFile(String archivePath) async {
     print('unpacking $archivePath');
-    final result = Directory(_getArchiveFolder(archivePath));
+    var result = Directory(_getArchiveFolder(archivePath));
     await result.create(recursive: true);
 
     try {
@@ -42,11 +42,23 @@ class ArchiveCacheHelper {
           ZipDecoder().decodeBytes(await File(archivePath).readAsBytes());
 
       for (final archiveFile in archive) {
-        final filePath = '${result.path}/${archiveFile.name}';
-        final file = await File(filePath).create(recursive: true);
+        final itemPath = '${result.path}/${archiveFile.name}';
+        if (archiveFile.isFile) {
+          final file = await File(itemPath).create(recursive: true);
 
-        final data = archiveFile.content as List<int>;
-        await file.writeAsBytes(data);
+          final data = archiveFile.content as List<int>;
+          await file.writeAsBytes(data);
+        } else {
+          final directoryResult = Directory(itemPath);
+          await directoryResult.create(recursive: true);
+        }
+      }
+
+      final firstItem = archive.first;
+
+      if (!firstItem.isFile) {
+        final itemPath = '${result.path}/${firstItem.name}';
+        return Directory(itemPath);
       }
 
       return result;
