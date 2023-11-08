@@ -16,7 +16,7 @@ jobs:
       packages: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_IMAGE_TAG: ghcr.io/mlcommons/mobile_app_open-scanner
+      DOCKER_IMAGE_TAG: ghcr.io/mlcommons/mobile_app_open-scanner:${{ github.run_number }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_OUT_DIR: sonar_build_wrapper_output
       PR_NUMBER: ${{ github.event.number }}
@@ -38,23 +38,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check if Dockerfile changed
-        id: changed
-        uses: tj-actions/changed-files@v40
-        with:
-          files: |
-            flutter/android/docker/Dockerfile
-            tools/scanner/Dockerfile
       - name: Extract metadata for base image
         id: meta-base
-        if: steps.changed.outputs.any_changed == 'true'
         uses: docker/metadata-action@v4
         with:
           images: ghcr.io/mlcommons/mobile_app_open-base
           flavor: latest=true
           tags: type=raw,value=${{ github.run_number }}
       - name: Build and push base image
-        if: steps.changed.outputs.any_changed == 'true'
         uses: docker/build-push-action@v4
         with:
           context: flutter/android/docker
@@ -66,13 +57,12 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Extract metadata for scanner image
         id: meta-scanner
-        if: steps.changed.outputs.any_changed == 'true'
         uses: docker/metadata-action@v4
         with:
           images: ghcr.io/mlcommons/mobile_app_open-scanner
           flavor: latest=true
+          tags: type=raw,value=${{ github.run_number }}
       - name: Build and push scanner image
-        if: steps.changed.outputs.any_changed == 'true'
         uses: docker/build-push-action@v4
         with:
           context: tools/scanner
