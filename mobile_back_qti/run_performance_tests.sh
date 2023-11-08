@@ -18,7 +18,7 @@
 
 export cooldown_period=300
 export min_query=1000
-export min_duration=60000
+export min_duration_ms=60000
 export results_prefix=performance_results_
 export results_suffix=.txt
 export test_case_suffix=_performance_logs
@@ -58,7 +58,7 @@ fi
 export test_case=image_classification
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL imagenet --mode=PerformanceOnly --images_directory=$dataset_path/imagenet/img --offset=1 --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration=$min_duration --single_stream_expected_latency_ns=1000000 --groundtruth_file="" --model_file=$models_path/mobilenet_edgetpu_224_1.0_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL imagenet --mode=PerformanceOnly --images_directory=$dataset_path/imagenet/img --offset=1 --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration_ms=$min_duration_ms --single_stream_expected_latency_ns=1000000 --groundtruth_file="" --model_file=$models_path/mobilenet_edgetpu_224_1.0_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "90th percentile latency (ns)" $use_case_results_file >> $results_file
 grep "Result is" $use_case_results_file >> $results_file
@@ -68,7 +68,7 @@ sleep $cooldown_period
 export test_case=object_detection
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL coco --mode=PerformanceOnly --images_directory=$dataset_path/coco/img --offset=1 --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration=$min_duration --single_stream_expected_latency_ns=1000000 --groundtruth_file="" --model_file=$models_path/ssd_mobiledet_qat_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. --num_classes=91 > $use_case_results_file 2>&1
+./main EXTERNAL coco --mode=PerformanceOnly --images_directory=$dataset_path/coco/img --offset=1 --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration_ms=$min_duration_ms --single_stream_expected_latency_ns=1000000 --groundtruth_file="" --model_file=$models_path/ssd_mobiledet_qat_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. --num_classes=91 > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "90th percentile latency (ns)" $use_case_results_file >> $results_file
 grep "Result is" $use_case_results_file >> $results_file
@@ -78,7 +78,7 @@ sleep $cooldown_period
 export test_case=image_segmentation
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL ade20k --mode=PerformanceOnly --images_directory=$dataset_path/ade20k/images --num_class=31 --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration=$min_duration --single_stream_expected_latency_ns=1000000 --ground_truth_directory= --model_file=$models_path/mobile_mosaic_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL ade20k --mode=PerformanceOnly --images_directory=$dataset_path/ade20k/images --num_class=31 --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration_ms=$min_duration_ms --single_stream_expected_latency_ns=1000000 --ground_truth_directory= --model_file=$models_path/mobile_mosaic_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "90th percentile latency (ns)" $use_case_results_file >> $results_file
 grep "Result is" $use_case_results_file >> $results_file
@@ -88,7 +88,7 @@ sleep $cooldown_period
 export test_case=language_understanding
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL squad --mode=PerformanceOnly --input_file=$dataset_path/squad/squad_eval_mini.tfrecord --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration=$min_duration --single_stream_expected_latency_ns=1000000 --groundtruth_file= --model_file=$models_path/mobilebert_quantized_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL squad --mode=PerformanceOnly --input_file=$dataset_path/squad/squad_eval_mini.tfrecord --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration_ms=$min_duration_ms --single_stream_expected_latency_ns=1000000 --groundtruth_file= --model_file=$models_path/mobilebert_quantized_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "90th percentile latency (ns)" $use_case_results_file >> $results_file
 grep "Result is" $use_case_results_file >> $results_file
@@ -98,7 +98,7 @@ sleep $cooldown_period
 export test_case=super_resolution
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL SNUSR --mode=PerformanceOnly --images_directory=$dataset_path/snusr/lr --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration=$min_duration --single_stream_expected_latency_ns=1000000 --ground_truth_directory= --model_file=$models_path/snusr_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL SNUSR --mode=PerformanceOnly --images_directory=$dataset_path/snusr/lr --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration_ms=$min_duration_ms --single_stream_expected_latency_ns=1000000 --ground_truth_directory= --model_file=$models_path/snusr_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "90th percentile latency (ns)" $use_case_results_file >> $results_file
 grep "Result is" $use_case_results_file >> $results_file
@@ -108,7 +108,7 @@ sleep $cooldown_period
 export test_case=image_classification_offline
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL imagenet --mode=PerformanceOnly --scenario=Offline --batch_size=12288 --images_directory=$dataset_path/imagenet/img --offset=1 --output_dir=$test_case$test_case_suffix --min_query_count=24576 --min_duration=0 --single_stream_expected_latency_ns=1000000 --groundtruth_file= --model_file=$models_path/mobilenet_edgetpu_224_1.0_htp_batched_sd8pg1.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL imagenet --mode=PerformanceOnly --scenario=Offline --batch_size=12288 --images_directory=$dataset_path/imagenet/img --offset=1 --output_dir=$test_case$test_case_suffix --min_query_count=24576 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000 --groundtruth_file= --model_file=$models_path/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "Result is" $use_case_results_file >> $results_file
 grep "Samples per second" $use_case_results_file >> $results_file

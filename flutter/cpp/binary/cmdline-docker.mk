@@ -14,7 +14,7 @@
 ##########################################################################
 
 .PHONY: docker/cmdline/android/release
-docker/cmdline/android/release:
+docker/cmdline/android/release: flutter/android/docker/image
 	MSYS2_ARG_CONV_EXCL="*" docker run \
 		${flutter_common_docker_flags} \
 		make cmdline/android/bins/release

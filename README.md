@@ -62,6 +62,7 @@ frameworks contributed by the broader MLPerf community.
 * [inference](https://github.com/mlcommons/inference): Reference implementations of MLPerf inference benchmarks.
 * [mobile_models](https://github.com/mlcommons/mobile_models): Storage for ML models and task definition file.
 * [mobile_open](https://github.com/mlcommons/mobile_open): MLPerf Mobile benchmarks.
+* [mobile_submission_3.1](https://github.com/mlcommons/mobile_results_v3.1): MLPerf Mobile inference v3.1 results.
 * [mobile_datasets](https://github.com/mlcommons/mobile_datasets): Scripts to create performance-only test sets for
   MLPerf Mobile
 * [mobile_app_open/flutter/cpp/datasets](https://github.com/mlcommons/mobile_app_open/tree/master/flutter/cpp/datasets):

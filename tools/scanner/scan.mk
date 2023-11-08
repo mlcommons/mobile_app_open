@@ -51,7 +51,7 @@ scanner/build-app:
 		make flutter/android
 
 .PHONY: scanner/scan
-scanner/scan:
+scanner/scan: scanner/build-app
 	sonar-scanner \
 		-Dsonar.organization=mlcommons \
 		-Dsonar.projectKey=mlcommons_mobile_app_open \
@@ -70,12 +70,6 @@ scanner/scan:
 		-Dsonar.pullrequest.key=${PR_NUMBER} \
 		-Dsonar.pullrequest.branch=${PR_BRANCH} \
 		-Dsonar.pullrequest.base=${PR_BASE}
-
-.PHONY: docker/scanner/build-app
-docker/scanner/build-app:
-	MSYS2_ARG_CONV_EXCL="*" docker run \
-		${scanner_docker_args} ${flutter_common_docker_flags} \
-		make scanner/build-app
 
 .PHONY: docker/scanner/scan
 docker/scanner/scan:

@@ -2,7 +2,7 @@ name: App Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, submission-v* ]
   pull_request:
     types: [ opened, synchronize, reopened ]
 
@@ -68,21 +68,21 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_AWS_KEY }}
         run: |
           aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
-          cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/samsung_libs_v3.1.zip /tmp/ && \
-          unzip -P ${AWS_SECRET_ACCESS_KEY} /tmp/samsung_libs_v3.1.zip -d /tmp/samsung_libs_v3.1 && \
-          rm /tmp/samsung_libs_v3.1.zip && \
+          cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/samsung_libs_v3.1_20230926.zip /tmp/ && \
+          unzip -P ${AWS_SECRET_ACCESS_KEY} /tmp/samsung_libs_v3.1_20230926.zip -d /tmp/samsung_libs_v3.1_20230926 && \
+          rm /tmp/samsung_libs_v3.1_20230926.zip && \
           mkdir -p mobile_back_samsung/samsung/lib/internal && \
-          mv /tmp/samsung_libs_v3.1/internal/* mobile_back_samsung/samsung/lib/internal/
+          mv /tmp/samsung_libs_v3.1_20230926/internal/* mobile_back_samsung/samsung/lib/internal/
       - name: Download QTI libraries
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_AWS_KEY }}
         run: |
           aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
-          cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.0/snpe-2.7.0.4264-linux.zip /tmp/ && \
-          unzip -P ${AWS_SECRET_ACCESS_KEY} /tmp/snpe-2.7.0.4264-linux.zip -d /tmp/snpe-2.7.0.4264-linux && \
-          rm /tmp/snpe-2.7.0.4264-linux.zip && \
-          mv /tmp/snpe-2.7.0.4264-linux/snpe-2.7.0.4264 mobile_back_qti/
+          cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/qaisw-2.13.4.230831213719_60417-linux.zip /tmp/ && \
+          unzip -P ${AWS_SECRET_ACCESS_KEY} /tmp/qaisw-2.13.4.230831213719_60417-linux.zip -d /tmp/qaisw-2.13.4.230831213719_60417-linux && \
+          rm /tmp/qaisw-2.13.4.230831213719_60417-linux.zip && \
+          mv /tmp/qaisw-2.13.4.230831213719_60417-linux/qaisw-2.13.4.230831213719_60417 mobile_back_qti/
       - name: Cache bazel
         uses: actions/cache@v3
         with:
