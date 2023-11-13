@@ -18,7 +18,6 @@ RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install 
     gnupg \
     make \
     protobuf-compiler \
-    patchelf \
     python3 \
     python3-pip && \
     rm -rf /var/lib/apt/lists/*
