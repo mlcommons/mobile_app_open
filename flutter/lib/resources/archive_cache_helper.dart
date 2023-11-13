@@ -28,8 +28,8 @@ class ArchiveCacheHelper {
       return '';
     }
     var file = await fileCacheHelper.get(url, true);
-    Directory directory = await _unzipFile(file);
-    return directory.path;
+    await _unzipFile(file);
+    return cachePath;
   }
 
   Future<Directory> _unzipFile(String archivePath) async {
