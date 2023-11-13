@@ -41,26 +41,29 @@ class ArchiveCacheHelper {
       final archive =
           ZipDecoder().decodeBytes(await File(archivePath).readAsBytes());
 
-      for (final archiveFile in archive) {
-        final itemPath = '${result.path}/${archiveFile.name}';
+      var archiveParentPath = result.path;
+      if (!archive.first.isFile) {
+        archiveParentPath = result.parent.path;
+      }
+
+      for (int i = 0; i < archive.files.length; i++) {
+        final archiveFile = archive.files[i];
+        final itemPath = '$archiveParentPath/${archiveFile.name}';
         if (archiveFile.isFile) {
           final file = await File(itemPath).create(recursive: true);
 
           final data = archiveFile.content as List<int>;
           await file.writeAsBytes(data);
         } else {
+          // skip the first item, since it's already created as the archive directory
+          if (i == 0) {
+            continue;
+          }
+          final itemPath = '$archiveParentPath/${archiveFile.name}';
           final directoryResult = Directory(itemPath);
           await directoryResult.create(recursive: true);
         }
       }
-
-      final firstItem = archive.first;
-
-      if (!firstItem.isFile) {
-        final itemPath = '${result.path}/${firstItem.name}';
-        return Directory(itemPath);
-      }
-
       return result;
     } catch (e) {
       await result.delete(recursive: true);
