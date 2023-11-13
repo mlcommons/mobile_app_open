@@ -1,3 +1,4 @@
+
 # Glossary
 
 **Note**: This is not an official definition. It should be a description /
@@ -22,5 +23,5 @@ the same understanding of a term.
 
 **Helpful links**:
 
-* v1.1 Results of Mobile Inference: <https://mlcommons.org/en/inference-mobile-11>
+* Mobile Inference Results: <https://mlcommons.org/benchmarks/inference-mobile/>
 * MLPerf Inference Rules: <https://github.com/mlcommons/inference_policies/blob/master/inference_rules.adoc>

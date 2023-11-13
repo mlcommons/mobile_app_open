@@ -31,6 +31,7 @@ enum DEVICE_ID {
   SOC_2100,
   SOC_2200,
   SOC_2300,
+  SOC_2400,
   CORE_MAX
 };
 
