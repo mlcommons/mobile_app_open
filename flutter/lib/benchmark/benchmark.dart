@@ -73,7 +73,6 @@ class Benchmark {
     final dataset = runMode.chooseDataset(taskConfig);
 
     int minQueryCount;
-    double maxDuration = BenchmarkSettings.maxDuration;
     double minDuration;
     if (testMinDuration != 0) {
       minQueryCount = testMinQueryCount;
@@ -85,6 +84,7 @@ class Benchmark {
       minQueryCount = taskConfig.minQueryCount;
       minDuration = taskConfig.minDuration;
     }
+    double maxDuration = taskConfig.maxDuration;
 
     final settings = pb.SettingList(
       setting: commonSettings,
