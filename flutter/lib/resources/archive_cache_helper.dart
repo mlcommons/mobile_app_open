@@ -34,7 +34,7 @@ class ArchiveCacheHelper {
 
   Future<Directory> _unzipFile(String archivePath) async {
     print('unpacking $archivePath');
-    var result = Directory(_getArchiveFolder(archivePath));
+    final result = Directory(_getArchiveFolder(archivePath));
     await result.create(recursive: true);
 
     try {
@@ -51,17 +51,10 @@ class ArchiveCacheHelper {
         final itemPath = '$archiveParentPath/${archiveFile.name}';
         if (archiveFile.isFile) {
           final file = await File(itemPath).create(recursive: true);
-
           final data = archiveFile.content as List<int>;
           await file.writeAsBytes(data);
-        } else {
-          // skip the first item, since it's already created as the archive directory
-          if (i == 0) {
-            continue;
-          }
-          final itemPath = '$archiveParentPath/${archiveFile.name}';
-          final directoryResult = Directory(itemPath);
-          await directoryResult.create(recursive: true);
+        } else if (i != 0) {
+          await Directory(itemPath).create(recursive: true);
         }
       }
       return result;
