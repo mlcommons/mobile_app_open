@@ -47,6 +47,7 @@ cc_library(
     ],
     linkopts = [
         "-llog",
+        "-lc++_shared",
     ],
     deps = [
         ":mbe_config_pbtxt",

@@ -1,7 +1,7 @@
 # Building MLPerf Open app with Samsung backend
 
 <!-- markdown-link-check-disable-next-line -->
-1. Update the "lib/internal" folder at 'mobile_app_open/mobile_back_samsung/samsung/lib/internal' by copying the libs from [here](https://github.com/mlcommons/mobile_back_samsung/tree/master/samsung_libs)
+1. Update the "lib/internal" folder at 'mobile_app_open/mobile_back_samsung/samsung/lib/internal' by copying the libs from [here](https://github.com/mlcommons/mobile_back_samsung/tree/submission_v3.1_samsung_backend_ndk25/samsung_libs)
 2. Change directory to the main path (mobile_app_open)
 3. Run the build command
 
