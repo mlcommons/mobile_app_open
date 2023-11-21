@@ -22,39 +22,39 @@ package(
 genrule(
     name = "asan_arm64",
     srcs = [
-        "@androidndk//:default_crosstool",
+        "@androidndk//:toolchain",
     ],
     outs = [
         "lib_arm64/libclang_rt.asan-aarch64-android.so",
     ],
     cmd = """\
-cp `find $(SRCS) -name libclang_rt.asan-aarch64-android.so` $(@)
+cp `find $(locations @androidndk//:toolchain) -name libclang_rt.asan-aarch64-android.so` $(@)
     """,
 )
 
 genrule(
     name = "asan_x86_64",
     srcs = [
-        "@androidndk//:default_crosstool",
+        "@androidndk//:toolchain",
     ],
     outs = [
         "lib_x86_64/libclang_rt.asan-x86_64-android.so",
     ],
     cmd = """\
-cp `find $(SRCS) -name libclang_rt.asan-x86_64-android.so` $(@)
+cp `find  $(locations @androidndk//:toolchain) -name libclang_rt.asan-x86_64-android.so` $(@)
     """,
 )
 
 genrule(
     name = "libcpp_shared_arm64",
     srcs = [
-        "@androidndk//:default_crosstool",
+        "@androidndk//:toolchain",
     ],
     outs = [
         "lib_arm64/libc++_shared.so",
     ],
     cmd = """\
-cp `find $(SRCS) -name libc++_shared.so | grep aarch64-linux-android` $(@)
+cp `find $(locations @androidndk//:toolchain) -name libc++_shared.so | grep aarch64-linux-android` $(@)
     """,
 )
 

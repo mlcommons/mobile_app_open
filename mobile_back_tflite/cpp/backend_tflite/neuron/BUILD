@@ -54,9 +54,9 @@ cc_library(
         ":tflite_settings",
         "//flutter/cpp/c:headers",
         "//mobile_back_tflite/cpp/backend_tflite:tflite_settings",
+        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
         "@org_tensorflow//tensorflow/lite/c:c_api",
         "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             ":neuron_delegate",

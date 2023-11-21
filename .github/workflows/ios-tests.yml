@@ -15,7 +15,7 @@ jobs:
     env:
       PERF_TEST: true
       WITH_APPLE: 1
-      WITH_TFLITE: 0
+      WITH_TFLITE: 1
       WITH_PIXEL: 0
       WITH_MEDIATEK: 0
       WITH_QTI: 0
