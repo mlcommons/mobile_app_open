@@ -59,6 +59,25 @@ benchmark_setting {
 }
 
 benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  accelerator: "ane"
+  accelerator_desc: "Apple Neural Engine"
+  framework: "Core ML"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/CoreML/MobilenetEdgeTPUv2.mlmodel"
+  model_checksum: "875730de6fa07333051ca0f283fb23fd"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  accelerator: "ane"
+  accelerator_desc: "Apple Neural Engine"
+  framework: "Core ML"
+  batch_size: 32
+  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/CoreML/MobilenetEdgeTPUv2.mlmodel"
+  model_checksum: "875730de6fa07333051ca0f283fb23fd"
+}
+
+benchmark_setting {
   benchmark_id: "object_detection"
   framework: "Core ML"
   delegate_choice: {

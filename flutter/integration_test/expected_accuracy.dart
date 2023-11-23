@@ -20,6 +20,13 @@ const Map<String, Interval> _imageClassification = {
   'cpu&gpu&ane': Interval(min: 1.00, max: 1.00)
 };
 
+const Map<String, Interval> _imageClassificationV2 = {
+  'cpu': Interval(min: 0.69, max: 0.71),
+  'npu': Interval(min: 0.69, max: 0.71),
+  'tpu': Interval(min: 0.69, max: 0.71),
+  'ane': Interval(min: 0.69, max: 0.71),
+};
+
 const Map<String, Interval> _objectDetection = {
   'cpu': Interval(min: 0.31, max: 0.32),
   'npu': Interval(min: 0.28, max: 0.31),
@@ -58,9 +65,11 @@ const Map<String, Interval> _superResolution = {
 
 const benchmarkExpectedAccuracy = {
   BenchmarkId.imageClassification: _imageClassification,
+  BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
   BenchmarkId.imageSegmentationV2: _imageSegmentation,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.imageClassificationOffline: _imageClassification,
+  BenchmarkId.imageClassificationOfflineV2: _imageClassificationV2,
 };

@@ -27,7 +27,7 @@ steps:
           --type instrumentation \
           --app output/apks/$_APK_TEST_MAIN_NAME \
           --test output/apks/$_APK_TEST_HELPER_NAME \
-          --timeout 25m \
+          --timeout 30m \
           --num-flaky-test-attempts 2 \
           --device $_DEVICE_SELECTOR
 

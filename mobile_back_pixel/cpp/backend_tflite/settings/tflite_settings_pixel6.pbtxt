@@ -31,6 +31,15 @@ benchmark_setting {
 }
 
 benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  accelerator: "tpu"
+  accelerator_desc: "Google Edge TPU"
+  framework: "TFLite NNAPI"
+  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/tflite/mobilenet-edgetpu-v2-L_int8.tflite"
+  model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
+}
+
+benchmark_setting {
   benchmark_id: "image_classification_offline"
   framework: "TFLite"
   delegate_choice: {
@@ -50,6 +59,16 @@ benchmark_setting {
     batch_size: 2
   }
   delegate_selected: "NNAPI"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  accelerator: "tpu"
+  accelerator_desc: "Google Edge TPU"
+  framework: "TFLite NNAPI"
+  batch_size: 16
+  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/tflite/mobilenet-edgetpu-v2-L_int8.tflite"
+  model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
 }
 
 benchmark_setting {

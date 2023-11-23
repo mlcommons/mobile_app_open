@@ -82,19 +82,24 @@ class BenchmarkInfo {
 
 final _benchmarkIcons = {
   BenchmarkId.imageClassification: AppIcons.imageClassification,
+  BenchmarkId.imageClassificationV2: AppIcons.imageClassification,
   BenchmarkId.objectDetection: AppIcons.objectDetection,
   BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentation,
   BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessing,
   BenchmarkId.superResolution: AppIcons.superResolution,
   BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOffline,
+  BenchmarkId.imageClassificationOfflineV2: AppIcons.imageClassificationOffline,
 };
 
 final _benchmarkIconsWhite = {
   BenchmarkId.imageClassification: AppIcons.imageClassificationWhite,
+  BenchmarkId.imageClassificationV2: AppIcons.imageClassificationWhite,
   BenchmarkId.objectDetection: AppIcons.objectDetectionWhite,
   BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentationWhite,
   BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessingWhite,
   BenchmarkId.superResolution: AppIcons.superResolutionWhite,
   BenchmarkId.imageClassificationOffline:
+      AppIcons.imageClassificationOfflineWhite,
+  BenchmarkId.imageClassificationOfflineV2:
       AppIcons.imageClassificationOfflineWhite,
 };
