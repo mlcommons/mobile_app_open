@@ -221,6 +221,7 @@ task {
   name: "Image Classification v2"
   min_query_count: 1024
   min_duration: 60
+  max_duration: 600
   max_throughput: 1000
   max_accuracy: 1.0
   scenario: "SingleStream"
@@ -257,6 +258,7 @@ task {
   name: "Image Classification v2 (Offline)"
   min_query_count: 24576
   min_duration: 0
+  max_duration: 0
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "Offline"
