@@ -108,3 +108,8 @@ class BackendId {
     apple,
   ];
 }
+
+class Url {
+  static const privacyPolicy = 'https://mlcommons.org/mobile_privacy';
+  static const eula = 'https://mlcommons.org/mobile_eula';
+}
