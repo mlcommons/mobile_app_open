@@ -35,3 +35,11 @@ for file_mapping in "${files[@]}"; do
     dart format "$output_file"
   fi
 done
+
+
+# By default we do not upload debug symbol to Firebase in Android build
+if [ "${FIREBASE_CRASHLYTICS_ENABLED}" = "1" ]; then
+    echo "Set 'mappingFileUploadEnabled true' in 'flutter/android/app/build.gradle'"
+    sed "s|mappingFileUploadEnabled false|mappingFileUploadEnabled true|" \
+        flutter/android/app/build.gradle > tmpfile && mv tmpfile flutter/android/app/build.gradle
+fi
