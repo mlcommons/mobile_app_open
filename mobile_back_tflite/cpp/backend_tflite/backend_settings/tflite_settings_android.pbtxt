@@ -38,7 +38,7 @@ benchmark_setting {
     delegate_name: "NNAPI"
     accelerator_name: "npu"
     accelerator_desc: "NPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/tflite/mobilenet-edgetpu-v2-L_int8.tflite"
+    model_path: "local:///small.tflite"
     model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
   }
   delegate_choice: {
@@ -80,7 +80,7 @@ benchmark_setting {
     delegate_name: "NNAPI"
     accelerator_name: "npu"
     accelerator_desc: "NPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/tflite/mobilenet-edgetpu-v2-L_int8.tflite"
+    model_path: "local:///small.tflite"
     model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
     batch_size: 2
   }

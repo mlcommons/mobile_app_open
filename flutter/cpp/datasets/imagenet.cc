@@ -62,10 +62,9 @@ Imagenet::Imagenet(Backend *backend, const std::string &image_dir,
   // Prepares the preprocessing stage.
   tflite::evaluation::ImagePreprocessingConfigBuilder builder(
       "image_preprocessing", DataType2TfType(input_format_.at(0).type));
-  builder.AddResizingStep(image_width / kCroppingFraction,
-                          image_height / kCroppingFraction, true);
-  builder.AddCroppingStep(image_width, image_height, false);
-  builder.AddDefaultNormalizationStep();
+  builder.AddCroppingStep(kCroppingFraction, true);
+  builder.AddResizingStep(image_width, image_height, false);
+  builder.AddPerChannelNormalizationStep(123.675, 116.28, 103.53, 1/57.0);
   preprocessing_stage_.reset(
       new tflite::evaluation::ImagePreprocessingStage(builder.build()));
   if (preprocessing_stage_->Init() != kTfLiteOk) {
