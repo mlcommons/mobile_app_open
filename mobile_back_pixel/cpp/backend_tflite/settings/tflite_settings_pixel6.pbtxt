@@ -35,7 +35,7 @@ benchmark_setting {
   accelerator: "tpu"
   accelerator_desc: "Google Edge TPU"
   framework: "TFLite NNAPI"
-  model_path: "local:///small.tflite"
+  model_path: "local:///medium.tflite"
   model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
 }
 
@@ -87,7 +87,7 @@ benchmark_setting {
   accelerator_desc: "Google Edge TPU"
   framework: "TFLite NNAPI"
   batch_size: 16
-  model_path: "local:///small.tflite"
+  model_path: "local:///medium.tflite"
   model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
 }
 
