@@ -59,8 +59,14 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
+
+            // By default we do not upload mapping file to Firebase
             firebaseCrashlytics {
-                mappingFileUploadEnabled false
+                if (System.env['FIREBASE_CRASHLYTICS_ENABLED'] == '1') {
+                    mappingFileUploadEnabled true
+                } else {
+                    mappingFileUploadEnabled false
+                }
             }
         }
     }
