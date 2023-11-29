@@ -31,7 +31,8 @@ FIREBASE_STORAGE_BUCKET=foo
 **Note about Firebase Crashlytics**:
 
 By default, we disable the upload of mapping file (in Android build) or debug symbol (dSYM) file in iOS build
-as described in https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
+as described
+in [Get readable crash reports in the Crashlytics dashboard](https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports?platform=flutter).
 
 To enable it, you need to set the environment variable:
 
