@@ -379,7 +379,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Upload dSYM files\n\"${PODS_ROOT}/FirebaseCrashlytics/run\" \\\n  -gsp \"${PROJECT_DIR}/Runner/GoogleService-Info.plist\" \\\n  -p ios \\\n  \"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}\"\n";
+			shellScript = "# By default we do not upload debug symbol (dSYM file) to Firebase\nif [ \"${FIREBASE_CRASHLYTICS_ENABLED}\" = \"1\" ]; then\n  \"${PODS_ROOT}/FirebaseCrashlytics/run\" \\\n    -gsp \"${PROJECT_DIR}/Runner/GoogleService-Info.plist\" \\\n    -p ios \\\n    \"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}\"\nfi\n";
 		};
 		D5A11810053EEA7778D10F3D /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
