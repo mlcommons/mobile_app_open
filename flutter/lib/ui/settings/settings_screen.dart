@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mlperfbench/app_constants.dart';
 
 import 'package:provider/provider.dart';
 
@@ -70,7 +71,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     }
 
     Widget crashlyticsSwitch;
-    if (FirebaseManager.enabled) {
+    if (FirebaseManager.enabled && firebaseCrashlyticsEnabled) {
       crashlyticsSwitch = ListTile(
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),

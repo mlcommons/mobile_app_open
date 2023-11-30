@@ -64,6 +64,8 @@ endif
 flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
 
 FIREBASE_CRASHLYTICS_ENABLED?=0
+flutter_firebase_crashlytics_arg="--dart-define=FIREBASE_CRASHLYTICS_ENABLED=${FIREBASE_CRASHLYTICS_ENABLED}"
+
 FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
 -include ${FIREBASE_ENV_FILE}
 export
@@ -182,6 +184,7 @@ flutter/test/integration:
 		integration_test/first_test.dart \
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
+		${flutter_firebase_crashlytics_arg} \
 		${flutter_perf_test_arg} \
 		${flutter_folder_args}
 
@@ -192,7 +195,8 @@ flutter/run:
 		run \
 		${flutter_folder_args} \
 		${flutter_test_device_arg} \
-		${flutter_official_build_arg}
+		${flutter_official_build_arg} \
+		${flutter_firebase_crashlytics_arg}
 
 .PHONY: flutter/clean
 flutter/clean:

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 const isOfficialBuild =
     bool.fromEnvironment('OFFICIAL_BUILD', defaultValue: false);
-
+const firebaseCrashlyticsEnabled =
+    bool.fromEnvironment('FIREBASE_CRASHLYTICS_ENABLED', defaultValue: false);
 const isFastMode = bool.fromEnvironment('FAST_MODE', defaultValue: false);
-
 const defaultCacheFolder = String.fromEnvironment('FLUTTER_CACHE_FOLDER');
 const defaultDataFolder = String.fromEnvironment('FLUTTER_DATA_FOLDER');
 
