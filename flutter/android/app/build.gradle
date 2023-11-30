@@ -62,7 +62,7 @@ android {
 
             // By default we do not upload mapping file to Firebase
             firebaseCrashlytics {
-                if (System.env['FIREBASE_CRASHLYTICS_ENABLED'] == '1') {
+                if (System.env['FIREBASE_CRASHLYTICS_ENABLED'] == 'true') {
                     mappingFileUploadEnabled true
                 } else {
                     mappingFileUploadEnabled false

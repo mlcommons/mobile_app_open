@@ -37,7 +37,7 @@ in [Get readable crash reports in the Crashlytics dashboard](https://firebase.go
 To enable it, you need to set the environment variable:
 
 ```shell
-export FIREBASE_CRASHLYTICS_ENABLED=1
+export FIREBASE_CRASHLYTICS_ENABLED=true
 ```
 
 That's it! You can now run the app with your own Firebase project.

@@ -63,7 +63,7 @@ flutter_cache_folder_arg=
 endif
 flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
 
-FIREBASE_CRASHLYTICS_ENABLED?=0
+FIREBASE_CRASHLYTICS_ENABLED?=false
 flutter_firebase_crashlytics_arg="--dart-define=FIREBASE_CRASHLYTICS_ENABLED=${FIREBASE_CRASHLYTICS_ENABLED}"
 
 FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
