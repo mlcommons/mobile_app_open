@@ -57,8 +57,8 @@ class ResourceManager {
   String getDataFolder() {
     switch (parseDataFolderType(store.dataFolderType)) {
       case DataFolderType.default_:
-        if (defaultDataFolder.isNotEmpty) {
-          return defaultDataFolder;
+        if (DartDefine.defaultDataFolder.isNotEmpty) {
+          return DartDefine.defaultDataFolder;
         } else {
           return applicationDirectory;
         }
@@ -144,8 +144,8 @@ class ResourceManager {
   Future<void> initSystemPaths() async {
     applicationDirectory = await getApplicationDirectory();
     await Directory(applicationDirectory).create(recursive: true);
-    if (defaultCacheFolder.isNotEmpty) {
-      _loadedResourcesDir = defaultCacheFolder;
+    if (DartDefine.defaultCacheFolder.isNotEmpty) {
+      _loadedResourcesDir = DartDefine.defaultCacheFolder;
     } else {
       _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
     }

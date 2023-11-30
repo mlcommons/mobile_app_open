@@ -77,7 +77,7 @@ class Benchmark {
     if (testMinDuration != 0) {
       minQueryCount = testMinQueryCount;
       minDuration = testMinDuration.toDouble();
-    } else if (isFastMode) {
+    } else if (DartDefine.isFastMode) {
       minQueryCount = 8;
       minDuration = 1.0;
     } else {

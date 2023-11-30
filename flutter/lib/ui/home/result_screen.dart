@@ -403,7 +403,9 @@ class _ResultScreenState extends State<ResultScreen>
     title = _screenMode == _ScreenMode.performance
         ? l10n.resultsTitlePerformance
         : l10n.resultsTitleAccuracy;
-    title = isOfficialBuild ? title : '${l10n.resultsTitleUnverified} $title';
+    title = DartDefine.isOfficialBuild
+        ? title
+        : '${l10n.resultsTitleUnverified} $title';
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
