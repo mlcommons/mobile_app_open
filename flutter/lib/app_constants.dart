@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 const isOfficialBuild =
-    bool.fromEnvironment('official-build', defaultValue: false);
+    bool.fromEnvironment('OFFICIAL_BUILD', defaultValue: false);
 
-const isFastMode = bool.fromEnvironment('fast-mode', defaultValue: false);
+const isFastMode = bool.fromEnvironment('FAST_MODE', defaultValue: false);
 
-const defaultCacheFolder = String.fromEnvironment('default-cache-folder');
-const defaultDataFolder = String.fromEnvironment('default-data-folder');
+const defaultCacheFolder = String.fromEnvironment('FLUTTER_CACHE_FOLDER');
+const defaultDataFolder = String.fromEnvironment('FLUTTER_DATA_FOLDER');
 
 class AppColors {
   static const lightText = Colors.white;

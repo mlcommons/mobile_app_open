@@ -43,7 +43,7 @@ If you want to run or debug the Flutter app for any platform using graphical use
 you can use [VS Code with Flutter extension](https://docs.flutter.dev/get-started/editor?tab=vscode).
 
 If you want to test something without spending a lot of time on the benchmark,
-you can use flag `--dart-define=fast-mode=true` to speed up the benchmark.
+you can use flag `--dart-define=FAST_MODE=true` to speed up the benchmark.
 You should not evaluate performance when using this flag.
 
 Add `WITH_<VENDOR>=1` to make commands to build the the app with backends.
@@ -59,7 +59,7 @@ The app is built with an unofficial UI (different color and text) by default.
 To build with an official UI, you need to set
 
 * the environment variable `OFFICIAL_BUILD=true` if `make` is used (e.g. `OFFICIAL_BUILD=true make flutter/android/apk`), or
-* the argument `--dart-define=official-build=true` if `flutter` is used (e.g. `flutter build apk --dart-define=official-build=true`).
+* the argument `--dart-define=OFFICIAL_BUILD=true` if `flutter` is used (e.g. `flutter build apk --dart-define=OFFICIAL_BUILD=true`).
 
 When making a release build you must specify `OFFICIAL_BUILD` and `FLUTTER_BUILD_NUMBER` environment variables, otherwise the build will fail.
 This is a requirement for `flutter/android/release`, `docker/flutter/android/release`, `flutter/ios/release` make targets.
