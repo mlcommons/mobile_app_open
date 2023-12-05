@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/ui/home/progress_screen.dart';
+import 'package:mlperfbench/ui/home/resource_loading_screen.dart';
 import 'package:mlperfbench/ui/home/result_screen.dart';
 import 'package:mlperfbench/ui/home/start_screen.dart';
 import 'package:mlperfbench/ui/root/resource_error_screen.dart';
@@ -21,7 +22,7 @@ class MainScreen extends StatelessWidget {
 
     switch (state.state) {
       case BenchmarkStateEnum.downloading:
-        return const StartScreen();
+        return const ResourceLoadingScreen();
       case BenchmarkStateEnum.waiting:
         return const StartScreen();
       case BenchmarkStateEnum.aborting:
