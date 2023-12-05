@@ -131,7 +131,8 @@ class StartScreen extends StatelessWidget {
 
   Widget _downloadContainer(BuildContext context) {
     final stringResources = AppLocalizations.of(context);
-    final textLabel = Text(context.watch<BenchmarkState>().downloadingProgress,
+    final textLabel = Text(
+        '${(context.watch<BenchmarkState>().loadingProgress * 100).round()}%',
         style: const TextStyle(color: AppColors.lightText, fontSize: 40));
 
     return _circleContainerWithContent(

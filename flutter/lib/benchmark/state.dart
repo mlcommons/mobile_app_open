@@ -48,7 +48,8 @@ class BenchmarkState extends ChangeNotifier {
   bool? _doneRunning;
 
   // Only if [state] == [BenchmarkStateEnum.downloading]
-  String get downloadingProgress => resourceManager.progress;
+  String get loadingPath => resourceManager.loadingPath;
+  double get loadingProgress => resourceManager.loadingProgress;
 
   ExtendedResult? lastResult;
 
