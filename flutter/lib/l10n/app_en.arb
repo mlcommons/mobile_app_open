@@ -21,7 +21,7 @@
   "unsupportedBackendError": "Error message",
   "unsupportedTryAnotherDevice": "Please try the app on another device",
 
-  "mainScreenLoading": "Loading content...",
+  "mainScreenLoading": "Loading Content",
   "mainScreenGo": "GO",
   "mainScreenMeasureTitle": "Measure your device performance for:",
   "mainScreenWaitFinish": "Wait for benchmark to finish",

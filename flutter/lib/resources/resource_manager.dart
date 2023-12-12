@@ -21,7 +21,8 @@ class ResourceManager {
   final Store store;
 
   bool _done = false;
-  String _progressString = '0%';
+  String _loadingPath = '';
+  double _loadingProgress = 0.0;
 
   late final String applicationDirectory;
   late final String _loadedResourcesDir;
@@ -33,8 +34,12 @@ class ResourceManager {
 
   bool get done => _done;
 
-  String get progress {
-    return _progressString;
+  double get loadingProgress {
+    return _loadingProgress;
+  }
+
+  String get loadingPath {
+    return _loadingPath;
   }
 
   String get(String uri) {
@@ -87,7 +92,8 @@ class ResourceManager {
 
   Future<void> handleResources(
       List<Resource> resources, bool purgeOldCache) async {
-    _progressString = '0%';
+    _loadingPath = '';
+    _loadingProgress = 0.0;
     _done = false;
     _onUpdate();
 
@@ -102,8 +108,10 @@ class ResourceManager {
     }
 
     final internetPaths = internetResources.map((e) => e.path).toList();
-    await cacheManager.cache(internetPaths, (double val) {
-      _progressString = '${(val * 100).round()}%';
+    await cacheManager.cache(internetPaths,
+        (double currentProgress, String currentPath) {
+      _loadingProgress = currentProgress;
+      _loadingPath = currentPath;
       _onUpdate();
     }, purgeOldCache);
 
