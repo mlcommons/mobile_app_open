@@ -101,7 +101,7 @@ if [ $runner = $XCODE_CLOUD ]; then
   if [ "$CI_XCODEBUILD_ACTION" = "build-for-testing" ]; then
     cd "$MC_REPO_HOME"/flutter && flutter build ios --config-only integration_test/first_test.dart
   else
-    cd "$MC_REPO_HOME"/flutter && flutter build ios --config-only --dart-define=official-build="$OFFICIAL_BUILD" --build-number "$CI_BUILD_NUMBER"
+    cd "$MC_REPO_HOME"/flutter && flutter build ios --config-only --dart-define=OFFICIAL_BUILD="$OFFICIAL_BUILD" --build-number "$CI_BUILD_NUMBER"
   fi
 fi
 

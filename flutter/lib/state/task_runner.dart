@@ -94,7 +94,7 @@ class TaskRunner {
     late final Duration cooldownDuration;
     if (store.testMode) {
       cooldownDuration = Duration(seconds: store.testCooldown);
-    } else if (isFastMode) {
+    } else if (DartDefine.isFastMode) {
       cooldownDuration = const Duration(seconds: 1);
     } else {
       cooldownDuration = Duration(minutes: store.cooldownDuration);

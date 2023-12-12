@@ -59,13 +59,13 @@ Absolute path is only available for the task config path. All local resources in
 
 You can change the data folder without using graphical interface.
 
-Use `--dart-define=default-data-folder=<value>` to specify the folder you want to use.
+Use `--dart-define=FLUTTER_DATA_FOLDER=<value>` to specify the folder you want to use.
 It will still be possible to choose a different folder via UI but the app will use specified folder by default.
 
 If you build the app using makefile commands, use `FLUTTER_DATA_FOLDER` environment variable. For example: `make flutter/test/integration FLUTTER_CACHE_FOLDER=/my/folder/path`
 
 You can also override app cache folder.  
-Use `--dart-define=default-cache-folder=<value>` for manual build or `FLUTTER_CACHE_FOLDER` env for makefile script.  
+Use `--dart-define=FLUTTER_CACHE_FOLDER=<value>` for manual build or `FLUTTER_CACHE_FOLDER` env for makefile script.  
 Note that it's impossible to change the cache folder from the UI.
 
 These options are intended for CI use, and possibly for internal testing.

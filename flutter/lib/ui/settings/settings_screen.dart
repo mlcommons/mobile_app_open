@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
@@ -70,7 +71,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     }
 
     Widget crashlyticsSwitch;
-    if (FirebaseManager.enabled) {
+    if (FirebaseManager.enabled && DartDefine.firebaseCrashlyticsEnabled) {
       crashlyticsSwitch = ListTile(
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),

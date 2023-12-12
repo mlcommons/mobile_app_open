@@ -40,7 +40,7 @@ class _DataFolderSelectorHelper {
     items.add(dataFolderTitle);
 
     items.add(_makeDefaultOption());
-    if (defaultDataFolder.isNotEmpty) {
+    if (DartDefine.defaultDataFolder.isNotEmpty) {
       items.add(_makeAppFolderOption());
     }
     items.add(_makeCustomOption());
@@ -58,10 +58,10 @@ class _DataFolderSelectorHelper {
 
   Widget _makeDefaultOption() {
     late final String defaultOptionSubtitle;
-    if (defaultDataFolder.isEmpty) {
+    if (DartDefine.defaultDataFolder.isEmpty) {
       defaultOptionSubtitle = l10n.settingsTaskDataFolderApp;
     } else {
-      defaultOptionSubtitle = defaultDataFolder;
+      defaultOptionSubtitle = DartDefine.defaultDataFolder;
     }
     return ListTile(
       title: Text(l10n.settingsTaskDataFolderDefault),
@@ -201,7 +201,7 @@ class TaskConfigScreen extends StatelessWidget {
   }
 
   Widget _makeCacheFolderNotice(AppLocalizations l10n) {
-    if (defaultCacheFolder.isEmpty) {
+    if (DartDefine.defaultCacheFolder.isEmpty) {
       return const SizedBox.shrink();
     }
     return Column(
@@ -218,7 +218,7 @@ class TaskConfigScreen extends StatelessWidget {
         ListTile(
           enabled: false,
           title: Text(l10n.settingsTaskCacheFolderDefault),
-          subtitle: const Text(defaultCacheFolder),
+          subtitle: const Text(DartDefine.defaultCacheFolder),
           leading: const Radio<bool>(
             value: true,
             groupValue: true,
