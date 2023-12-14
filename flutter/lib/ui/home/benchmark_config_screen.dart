@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 
 class BenchmarkConfigScreen extends StatefulWidget {
   const BenchmarkConfigScreen({Key? key}) : super(key: key);
@@ -60,7 +61,14 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
           _delegateChoice(benchmark),
         ],
       ),
-      trailing: _activeToggle(benchmark),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          _activeToggle(benchmark),
+          _infoButton(benchmark),
+        ],
+      ),
     );
   }
 
@@ -84,6 +92,10 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
         });
       },
     );
+  }
+
+  Widget _infoButton(Benchmark benchmark) {
+    return BenchmarkInfoButton(benchmark: benchmark);
   }
 
   Widget _delegateChoice(Benchmark benchmark) {

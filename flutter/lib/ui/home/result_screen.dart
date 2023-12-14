@@ -11,9 +11,9 @@ import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
+import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/home/benchmark_running_screen.dart';
 import 'package:mlperfbench/ui/home/benchmark_start_screen.dart';
-import 'package:mlperfbench/ui/home/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
 import 'package:mlperfbench/ui/icons.dart' as app_icons;
@@ -141,7 +141,6 @@ class _ResultScreenState extends State<ResultScreen>
                     ),
                 ],
               ),
-              const Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
         ],
@@ -190,7 +189,7 @@ class _ResultScreenState extends State<ResultScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: rowChildren,
               ),
-              onTap: () => showBenchmarkInfoBottomSheet(context, benchmark),
+              trailing: BenchmarkInfoButton(benchmark: benchmark),
             ),
             const Divider()
           ],
