@@ -7,14 +7,14 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
-class ConfigScreen extends StatefulWidget {
-  const ConfigScreen({Key? key}) : super(key: key);
+class BenchmarkConfigScreen extends StatefulWidget {
+  const BenchmarkConfigScreen({Key? key}) : super(key: key);
 
   @override
-  State<ConfigScreen> createState() => _ConfigScreen();
+  State<BenchmarkConfigScreen> createState() => _BenchmarkConfigScreen();
 }
 
-class _ConfigScreen extends State<ConfigScreen> {
+class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
   late BenchmarkState state;
   late double pictureEdgeSize;
 

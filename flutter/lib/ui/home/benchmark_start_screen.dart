@@ -12,7 +12,7 @@ import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
-import 'package:mlperfbench/ui/home/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/home/benchmark_config_screen.dart';
 import 'package:mlperfbench/ui/icons.dart';
 
 class MainKeys {
@@ -29,29 +29,24 @@ class BenchmarkStartScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
+      backgroundColor: const Color(0xFF0B4A7F),
       appBar: AppBar(title: Text(l10n.menuHome)),
       drawer: const AppDrawer(),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Expanded(flex: 6, child: _getContainer(context, state.state)),
-            Padding(
-              padding: const EdgeInsets.all(30),
-              child: Text(
-                l10n.mainScreenMeasureTitle,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: AppColors.darkText,
-                ),
-              ),
-            ),
             Expanded(
-              flex: 5,
-              child: Align(
-                  alignment: Alignment.topCenter,
-                  child: createListOfBenchmarkItemsWidgets(context, state)),
+              flex: 4,
+              child: _getContainer(context, state.state),
             ),
+            const Expanded(
+              flex: 6,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: BenchmarkConfigScreen(),
+              ),
+            )
           ],
         ),
       ),
