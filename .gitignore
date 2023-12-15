@@ -26,3 +26,15 @@ __pycache__/
 *.g.dart
 *.gen.dart
 *.gen.h
+
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+.firebase
