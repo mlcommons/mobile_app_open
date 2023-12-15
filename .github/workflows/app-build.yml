@@ -103,6 +103,7 @@ jobs:
           FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
           FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
           FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_CRASHLYTICS_ENABLED: true
           OFFICIAL_BUILD: true
           FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
           WITH_TFLITE: 1

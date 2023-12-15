@@ -35,7 +35,7 @@ flutter/check-release-env: flutter/check/official-build flutter/check/build-numb
 flutter/test: flutter/test/unit flutter/test/integration
 
 OFFICIAL_BUILD?=false
-flutter_official_build_arg=--dart-define=official-build=${OFFICIAL_BUILD}
+flutter_official_build_arg=--dart-define=OFFICIAL_BUILD=${OFFICIAL_BUILD}
 .PHONY: flutter/check/official-build
 flutter/check/official-build:
 	@[ "$$OFFICIAL_BUILD" = "true" ] || [ "$$OFFICIAL_BUILD" = "false" ] \
@@ -52,16 +52,19 @@ flutter/check/build-number:
 		|| (echo FLUTTER_BUILD_NUMBER env must be explicitly set; exit 1)
 
 ifneq (${FLUTTER_DATA_FOLDER},)
-flutter_data_folder_arg="--dart-define=default-data-folder=${FLUTTER_DATA_FOLDER}"
+flutter_data_folder_arg="--dart-define=FLUTTER_DATA_FOLDER=${FLUTTER_DATA_FOLDER}"
 else
 flutter_data_folder_arg=
 endif
 ifneq (${FLUTTER_CACHE_FOLDER},)
-flutter_cache_folder_arg="--dart-define=default-cache-folder=${FLUTTER_CACHE_FOLDER}"
+flutter_cache_folder_arg="--dart-define=FLUTTER_CACHE_FOLDER=${FLUTTER_CACHE_FOLDER}"
 else
 flutter_cache_folder_arg=
 endif
 flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
+
+FIREBASE_CRASHLYTICS_ENABLED?=false
+flutter_firebase_crashlytics_arg="--dart-define=FIREBASE_CRASHLYTICS_ENABLED=${FIREBASE_CRASHLYTICS_ENABLED}"
 
 FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
 -include ${FIREBASE_ENV_FILE}
@@ -181,6 +184,7 @@ flutter/test/integration:
 		integration_test/first_test.dart \
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
+		${flutter_firebase_crashlytics_arg} \
 		${flutter_perf_test_arg} \
 		${flutter_folder_args}
 
@@ -191,7 +195,8 @@ flutter/run:
 		run \
 		${flutter_folder_args} \
 		${flutter_test_device_arg} \
-		${flutter_official_build_arg}
+		${flutter_official_build_arg} \
+		${flutter_firebase_crashlytics_arg}
 
 .PHONY: flutter/clean
 flutter/clean:

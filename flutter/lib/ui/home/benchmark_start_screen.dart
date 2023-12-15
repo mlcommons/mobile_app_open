@@ -20,8 +20,8 @@ class MainKeys {
   static const String goButton = 'goButton';
 }
 
-class StartScreen extends StatelessWidget {
-  const StartScreen({Key? key}) : super(key: key);
+class BenchmarkStartScreen extends StatelessWidget {
+  const BenchmarkStartScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -61,13 +61,11 @@ class StartScreen extends StatelessWidget {
   Widget _getContainer(BuildContext context, BenchmarkStateEnum state) {
     if (state == BenchmarkStateEnum.aborting) {
       return _waitContainer(context);
-    }
-
-    if (state == BenchmarkStateEnum.waiting) {
+    } else if (state == BenchmarkStateEnum.waiting) {
       return _goContainer(context);
+    } else {
+      throw 'Unknown BenchmarkState: ${state.name}';
     }
-
-    return _downloadContainer(context);
   }
 
   Widget _waitContainer(BuildContext context) {
@@ -127,15 +125,6 @@ class StartScreen extends StatelessWidget {
         }
       }),
     );
-  }
-
-  Widget _downloadContainer(BuildContext context) {
-    final stringResources = AppLocalizations.of(context);
-    final textLabel = Text(context.watch<BenchmarkState>().downloadingProgress,
-        style: const TextStyle(color: AppColors.lightText, fontSize: 40));
-
-    return _circleContainerWithContent(
-        context, textLabel, stringResources.mainScreenLoading);
   }
 }
 

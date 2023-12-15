@@ -58,7 +58,7 @@ mkdir -p "$OUTPUT_LOG_PATH"
 echo "building and running the app... (this will take a while, see log file for intermediate results)"
 flutter run \
     --dart-define=autostart=true \
-    --dart-define=official-build=$official_build \
+    --dart-define=OFFICIAL_BUILD=$official_build \
     --dart-define=submission=$submission_mode \
     --dart-define=resultsStringMark=resultsStringMark \
     --dart-define=terminalStringMark=terminalStringMark \

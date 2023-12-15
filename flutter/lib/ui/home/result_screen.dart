@@ -11,11 +11,11 @@ import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
+import 'package:mlperfbench/ui/home/benchmark_running_screen.dart';
+import 'package:mlperfbench/ui/home/benchmark_start_screen.dart';
 import 'package:mlperfbench/ui/home/list_of_benchmark_items.dart';
-import 'package:mlperfbench/ui/home/progress_screen.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
-import 'package:mlperfbench/ui/home/start_screen.dart';
 import 'package:mlperfbench/ui/icons.dart' as app_icons;
 import 'package:mlperfbench/ui/page_constraints.dart';
 
@@ -376,7 +376,8 @@ class _ResultScreenState extends State<ResultScreen>
                 print(t);
                 // current context may no longer be valid if runBenchmarks requested progress screen
                 await showErrorDialog(
-                    ProgressScreen.scaffoldKey.currentContext ?? context,
+                    BenchmarkRunningScreen.scaffoldKey.currentContext ??
+                        context,
                     ['${l10n.runFail}:', e.toString()]);
                 return;
               }
@@ -403,7 +404,9 @@ class _ResultScreenState extends State<ResultScreen>
     title = _screenMode == _ScreenMode.performance
         ? l10n.resultsTitlePerformance
         : l10n.resultsTitleAccuracy;
-    title = isOfficialBuild ? title : '${l10n.resultsTitleUnverified} $title';
+    title = DartDefine.isOfficialBuild
+        ? title
+        : '${l10n.resultsTitleUnverified} $title';
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
