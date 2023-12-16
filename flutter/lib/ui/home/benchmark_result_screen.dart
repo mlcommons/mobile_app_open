@@ -341,33 +341,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
           child: TextButton(
             style: buttonStyle,
             onPressed: () async {
-              // TODO (anhappdev) Refactor the code here to avoid duplicated code.
-              // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
-              final wrongPathError = await state.validator
-                  .validateExternalResourcesDirectory(
-                      l10n.dialogContentMissingFiles);
-              if (wrongPathError.isNotEmpty) {
-                if (!mounted) return;
-                await showErrorDialog(context, [wrongPathError]);
-                return;
-              }
-              if (store.offlineMode) {
-                final offlineError = await state.validator
-                    .validateOfflineMode(l10n.dialogContentOfflineWarning);
-                if (offlineError.isNotEmpty) {
-                  if (!mounted) return;
-                  switch (await showConfirmDialog(context, offlineError)) {
-                    case ConfirmDialogAction.ok:
-                      break;
-                    case ConfirmDialogAction.cancel:
-                      return;
-                    default:
-                      break;
-                  }
-                }
-              }
               try {
-                await state.runBenchmarks();
+                await state.resetBenchmarkState();
               } catch (e, t) {
                 print(t);
                 // current context may no longer be valid if runBenchmarks requested progress screen

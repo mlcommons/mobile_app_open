@@ -229,6 +229,12 @@ class BenchmarkState extends ChangeNotifier {
     throw StateError('unreachable');
   }
 
+  Future<void> resetBenchmarkState() async {
+    _doneRunning = null;
+    resetCurrentResults();
+    notifyListeners();
+  }
+
   Future<void> runBenchmarks() async {
     assert(resourceManager.done, 'Resource manager is not done.');
     assert(_doneRunning != false, '_doneRunning is false');
