@@ -40,11 +40,14 @@ class BenchmarkStartScreen extends StatelessWidget {
               flex: 35,
               child: _getContainer(context, state.state),
             ),
-            const Expanded(
+            Expanded(
               flex: 65,
               child: Align(
                 alignment: Alignment.topCenter,
-                child: BenchmarkConfigScreen(),
+                child: AbsorbPointer(
+                  absorbing: state.state != BenchmarkStateEnum.waiting,
+                  child: const BenchmarkConfigScreen(),
+                ),
               ),
             )
           ],
