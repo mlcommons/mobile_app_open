@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -17,6 +18,7 @@ class BenchmarkConfigScreen extends StatefulWidget {
 
 class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
   late BenchmarkState state;
+  late AppLocalizations l10n;
   late double pictureEdgeSize;
 
   @override
@@ -28,8 +30,8 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
+    l10n = AppLocalizations.of(context);
     pictureEdgeSize = 0.1 * MediaQuery.of(context).size.width;
-    final l10n = AppLocalizations.of(context);
     final childrenList = <Widget>[];
 
     for (var benchmark in state.benchmarks) {
@@ -38,12 +40,37 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.menuBenchmarkConfiguration)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(8, 20, 8, 20),
-        children: childrenList,
+      backgroundColor: Colors.transparent,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(32.0),
+        child: AppBar(
+          shape: Border.all(color: AppColors.darBlue),
+          backgroundColor: AppColors.darBlue,
+          elevation: 0,
+          title: _header(),
+        ),
+      ),
+      body: Container(
+        color: Colors.white,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+          children: childrenList,
+        ),
       ),
     );
+  }
+
+  Widget _header() {
+    final selectedCount =
+        state.benchmarks.where((e) => e.isActive).length.toString();
+    final totalCount = state.benchmarks.length.toString();
+    final title = l10n.mainScreenBenchmarkSelected
+        .replaceAll('<selected>', selectedCount)
+        .replaceAll('<total>', totalCount);
+    return Text(title,
+        style: Theme.of(context).textTheme.titleSmall!.copyWith(
+              color: Theme.of(context).colorScheme.onPrimary,
+            ));
   }
 
   Widget _listTile(Benchmark benchmark) {

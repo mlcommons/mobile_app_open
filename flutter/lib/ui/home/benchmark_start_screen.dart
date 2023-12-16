@@ -29,7 +29,7 @@ class BenchmarkStartScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0B4A7F),
+      backgroundColor: AppColors.darBlue,
       appBar: AppBar(title: Text(l10n.menuHome)),
       drawer: const AppDrawer(),
       body: SafeArea(
@@ -37,11 +37,11 @@ class BenchmarkStartScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Expanded(
-              flex: 4,
+              flex: 35,
               child: _getContainer(context, state.state),
             ),
             const Expanded(
-              flex: 6,
+              flex: 65,
               child: Align(
                 alignment: Alignment.topCenter,
                 child: BenchmarkConfigScreen(),
@@ -64,16 +64,16 @@ class BenchmarkStartScreen extends StatelessWidget {
   }
 
   Widget _waitContainer(BuildContext context) {
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return _circleContainerWithContent(
-        context, AppIcons.waiting, stringResources.mainScreenWaitFinish);
+        context, AppIcons.waiting, l10n.mainScreenWaitFinish);
   }
 
   Widget _goContainer(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final store = context.watch<Store>();
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return CustomPaint(
       painter: MyPaintBottom(),
@@ -81,8 +81,7 @@ class BenchmarkStartScreen extends StatelessWidget {
         // TODO (anhappdev) Refactor the code here to avoid duplicated code.
         // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
         final wrongPathError = await state.validator
-            .validateExternalResourcesDirectory(
-                stringResources.dialogContentMissingFiles);
+            .validateExternalResourcesDirectory(l10n.dialogContentMissingFiles);
         if (wrongPathError.isNotEmpty) {
           // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
           // ignore: use_build_context_synchronously
@@ -92,7 +91,7 @@ class BenchmarkStartScreen extends StatelessWidget {
         }
         if (store.offlineMode) {
           final offlineError = await state.validator
-              .validateOfflineMode(stringResources.dialogContentOfflineWarning);
+              .validateOfflineMode(l10n.dialogContentOfflineWarning);
           if (offlineError.isNotEmpty) {
             // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
             // ignore: use_build_context_synchronously
@@ -114,8 +113,7 @@ class BenchmarkStartScreen extends StatelessWidget {
           // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
           // ignore: use_build_context_synchronously
           if (!context.mounted) return;
-          await showErrorDialog(
-              context, ['${stringResources.runFail}:', e.toString()]);
+          await showErrorDialog(context, ['${l10n.runFail}:', e.toString()]);
           return;
         }
       }),
@@ -148,7 +146,7 @@ class GoButtonGradient extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     var decoration = BoxDecoration(
       shape: BoxShape.circle,
@@ -168,7 +166,7 @@ class GoButtonGradient extends StatelessWidget {
 
     return Container(
       decoration: decoration,
-      width: MediaQuery.of(context).size.width * 0.35,
+      width: MediaQuery.of(context).size.width * 0.32,
       child: MaterialButton(
         key: const Key(MainKeys.goButton),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -176,7 +174,7 @@ class GoButtonGradient extends StatelessWidget {
         shape: const CircleBorder(),
         onPressed: onPressed,
         child: Text(
-          stringResources.mainScreenGo,
+          l10n.mainScreenGo,
           style: const TextStyle(
             color: AppColors.lightText,
             fontSize: 40,

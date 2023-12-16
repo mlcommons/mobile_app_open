@@ -6,7 +6,6 @@
 
   "menuHome": "MLPerf Mobile",
   "menuHistory": "History",
-  "menuBenchmarkConfiguration": "Benchmark Configuration",
   "menuSettings": "Settings",
   "menuAbout": "About",
   "menuProfile": "Profile",
@@ -25,6 +24,7 @@
   "mainScreenGo": "GO",
   "mainScreenMeasureTitle": "Measure your device performance for:",
   "mainScreenWaitFinish": "Wait for benchmark to finish",
+  "mainScreenBenchmarkSelected": "Benchmarks (<selected>/<total> selected)",
 
   "progressMeasuring": "Measuring...",
   "progressDontClose": "Don't close the app!",
