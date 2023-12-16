@@ -8,7 +8,7 @@ import 'package:mlperfbench/data/result_sort.dart';
 
 void main() {
   group('ResultSort', () {
-    const file = 'test/data/extended_result_unittest.json';
+    const file = 'unit_test/data/extended_result_unittest.json';
     final jsonString = File(file).readAsStringSync();
     final data = jsonDecode(jsonString) as Map<String, dynamic>;
     final result = ExtendedResult.fromJson(data);

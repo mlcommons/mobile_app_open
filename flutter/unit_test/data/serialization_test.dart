@@ -42,7 +42,7 @@ void main() {
       }, throwsA(isA<TypeError>()));
     });
     test('full result parsing', () async {
-      final file = File('test/data/extended_result_unittest.json');
+      final file = File('unit_test/data/extended_result_unittest.json');
       final jsonString = await file.readAsString();
       final data = jsonDecode(jsonString) as Map<String, dynamic>;
       ExtendedResult.fromJson(data);

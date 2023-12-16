@@ -10,7 +10,7 @@ import 'package:mlperfbench/data/results/benchmark_result.dart';
 
 void main() {
   group('ResultFilter', () {
-    const file = 'test/data/extended_result_unittest.json';
+    const file = 'unit_test/data/extended_result_unittest.json';
     final jsonString = File(file).readAsStringSync();
     final data = jsonDecode(jsonString) as Map<String, dynamic>;
     final result = ExtendedResult.fromJson(data);
