@@ -1,10 +1,10 @@
 import { useLocation } from "react-router-dom";
-import { BenchmarkRunType, ResultType } from "../models/benchmark";
+import { BenchmarkRun, Result } from "../models/benchmarks.model";
 import { Box, Divider, Heading, List, ListItem } from "@chakra-ui/react";
 
 const BenchmarkDetailsPage = () => {
   const location = useLocation();
-  const benchmark: ResultType = JSON.parse(location.state);
+  const benchmark: Result = JSON.parse(location.state);
 
   const makeBody = () => {
     const mainInfo = makeMainInfo(benchmark);
@@ -25,7 +25,7 @@ const BenchmarkDetailsPage = () => {
     ];
   };
 
-  const makeMainInfo = (res: ResultType) => {
+  const makeMainInfo = (res: Result) => {
     return [
       makeInfo("Benchmark Name", res.benchmark_name),
       makeInfo("Scenario", res.loadgen_scenario),
@@ -38,7 +38,7 @@ const BenchmarkDetailsPage = () => {
     ];
   };
 
-  const makePerformanceInfo = (perf: BenchmarkRunType) => {
+  const makePerformanceInfo = (perf: BenchmarkRun) => {
     return [
       makeInfo("QPS", perf.throughput?.value ?? "resultsNotAvailable"),
       makeInfo("Valid", perf.loadgen_info?.validity.toString() ?? "false"),
@@ -49,7 +49,7 @@ const BenchmarkDetailsPage = () => {
     ];
   };
 
-  const makeAccuracyInfo = (accuracy: BenchmarkRunType) => {
+  const makeAccuracyInfo = (accuracy: BenchmarkRun) => {
     return [
       makeInfo(
         "Accuracy",

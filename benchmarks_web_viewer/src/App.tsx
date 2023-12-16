@@ -6,16 +6,23 @@ import theme from "./styles/theme";
 import Router from "./modules/Router";
 import AppQueryClient from "./AppQueryClient";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import store, { persistedStore } from "./store";
+import { Provider as ReduxProvider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
 function App() {
   return (
     <ChakraProvider theme={theme}>
-      <AppQueryClient>
-        <BrowserRouter>
-          <Router />
-        </BrowserRouter>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </AppQueryClient>
+      <ReduxProvider store={store}>
+        <AppQueryClient>
+          <PersistGate loading={null} persistor={persistedStore}>
+            <BrowserRouter>
+              <Router />
+            </BrowserRouter>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </PersistGate>
+        </AppQueryClient>
+      </ReduxProvider>
     </ChakraProvider>
   );
 }

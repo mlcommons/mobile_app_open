@@ -1,7 +1,7 @@
 import * as firebaseStorageService from "../../../services/firebaseStorageService";
 import axios from "axios";
 import { convertBlobToJson } from "../../../utilities/utilities";
-import { BenchmarkResultType } from "../models/benchmark";
+import { BenchmarkResult } from "../models/benchmarks.model";
 
 export const listResults = async (userId: string | undefined) => {
   if (userId) {
@@ -12,9 +12,9 @@ export const listResults = async (userId: string | undefined) => {
 
 export const downloadResults = async (
   userId: string | undefined,
-  benchmarkResults: BenchmarkResultType[] | undefined,
+  benchmarkResults: BenchmarkResult[] | undefined,
 ) => {
-  const results: BenchmarkResultType[] = benchmarkResults
+  const results: BenchmarkResult[] = benchmarkResults
     ? [...benchmarkResults]
     : [];
   if (userId) {
@@ -31,7 +31,7 @@ export const downloadResults = async (
       }
       const itemUrl = await firebaseStorageService.getDownloadUrl(item.path);
       const jsonObj = await downloadFile(itemUrl);
-      results.push(jsonObj as BenchmarkResultType);
+      results.push(jsonObj as BenchmarkResult);
     }
   }
   return results;
@@ -46,8 +46,4 @@ const downloadFile = async (fileUrl: string) => {
     .then((result) => {
       return convertBlobToJson(result.data);
     });
-};
-
-export const fetchBenchmark = async (benchmarkId: string) => {
-  return null;
 };

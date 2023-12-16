@@ -4,12 +4,14 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { QUERY_KEY } from "../../../constants/queryKeys";
-import { BenchmarkResultType } from "../models/benchmark";
+import { BenchmarkResult } from "../models/benchmarks.model";
+import { QUERY_KEY } from "../../../constants/constants";
+import { useFilters } from "../../filters/hooks/useFilters";
 
 export const useBenchmarks = (userId: string | undefined) => {
   const queryClient = useQueryClient();
-  const benchmarkResults: BenchmarkResultType[] | undefined =
+  const { resultFilter } = useFilters();
+  const benchmarkResults: BenchmarkResult[] | undefined =
     queryClient.getQueryData([QUERY_KEY.BENCHMARKS, userId]);
 
   return useQuery({
@@ -17,7 +19,11 @@ export const useBenchmarks = (userId: string | undefined) => {
       benchmarksDataService.downloadResults(userId, benchmarkResults),
     queryKey: [QUERY_KEY.BENCHMARKS, userId],
     select: (data) =>
-      data.flatMap((benchmarkResult) => benchmarkResult.results),
+      data
+        .map((benchmarkResult) =>
+          resultFilter.match(benchmarkResult) ? benchmarkResult.results : [],
+        )
+        .filter((results) => results.length > 0),
     placeholderData: keepPreviousData,
   });
 };
