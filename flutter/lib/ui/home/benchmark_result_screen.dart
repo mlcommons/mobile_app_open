@@ -7,8 +7,6 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/store.dart';
-import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
@@ -21,11 +19,11 @@ import 'package:mlperfbench/ui/page_constraints.dart';
 
 enum _ScreenMode { performance, accuracy }
 
-class ResultScreen extends StatefulWidget {
-  const ResultScreen({Key? key}) : super(key: key);
+class BenchmarkResultScreen extends StatefulWidget {
+  const BenchmarkResultScreen({Key? key}) : super(key: key);
 
   @override
-  State<ResultScreen> createState() => _ResultScreenState();
+  State<BenchmarkResultScreen> createState() => _BenchmarkResultScreenState();
 }
 
 class ResultKeys {
@@ -33,7 +31,7 @@ class ResultKeys {
   static const String scrollResultsButton = 'scrollResultsButton';
 }
 
-class _ResultScreenState extends State<ResultScreen>
+class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   _ScreenMode _screenMode = _ScreenMode.performance;
@@ -264,7 +262,6 @@ class _ResultScreenState extends State<ResultScreen>
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
-    final store = context.watch<Store>();
     final l10n = AppLocalizations.of(context);
     final scrollController = ScrollController();
 
