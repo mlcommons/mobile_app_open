@@ -3,10 +3,10 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mlperfbench_common/data/environment/environment_info.dart';
-import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/result_filter.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
+import 'package:mlperfbench/data/environment/environment_info.dart';
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/result_filter.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 
 void main() {
   group('ResultFilter', () {

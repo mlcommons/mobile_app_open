@@ -93,7 +93,7 @@ flutter/backend-list:
 RESULT_JSON_SAMPLE_PATH?=output/extended_result_example.json
 .PHONY: flutter/result/gen-extended-sample
 flutter/result/gen-extended-sample:
-	cd flutter_common && \
+	cd flutter && \
 		${_start_args} dart run \
 		--define=jsonFileName=../${RESULT_JSON_SAMPLE_PATH} \
 		lib/data/generation_helpers/write_json_sample.main.dart
@@ -105,14 +105,17 @@ flutter/result/gen-schema: flutter/result/gen-extended-sample
 	quicktype ${RESULT_JSON_SAMPLE_PATH} \
 		--lang schema \
 		--out ${RESULT_JSON_SCHEMA_PATH}
-	cd flutter_common && \
+	cd flutter && \
 		${_start_args} dart run \
 		--define=schemaPath=../${RESULT_JSON_SCHEMA_PATH} \
 		lib/data/generation_helpers/edit_json_schema.main.dart
 
 .PHONY: flutter/result/json
 flutter/result/json:
-	cd flutter_common && ${_start_args} flutter --no-version-check pub run \
+	@echo "Generate .g.dart files for the @JsonSerializable annotation"
+	@# https://github.com/dart-lang/build/issues/2835#issuecomment-1047849076
+	cd flutter && ${_start_args} flutter packages pub get
+	cd flutter && ${_start_args} flutter --no-version-check pub run \
 		build_runner build --delete-conflicting-outputs
 
 .PHONY: flutter/build-info
@@ -157,9 +160,7 @@ flutter/set-windows-build-number:
 .PHONY: flutter/pub
 flutter/pub:
 	[ -z "${FLUTTER_FORCE_PUB_GET}" ] || rm -rf output/flutter/pub
-	make \
-		output/flutter/pub/flutter.stamp \
-		output/flutter/pub/flutter_common.stamp
+	make output/flutter/pub/flutter.stamp
 	[ -z "${FLUTTER_FORCE_PUB_GET}" ] || rm -rf output/flutter/pub
 output/flutter/pub/%.stamp: %/pubspec.yaml
 	cd $(shell basename $@ .stamp) && ${_start_args} flutter --no-version-check pub get
@@ -168,8 +169,7 @@ output/flutter/pub/%.stamp: %/pubspec.yaml
 
 .PHONY: flutter/test/unit
 flutter/test/unit:
-	cd flutter && ${_start_args} flutter --no-version-check test --no-pub test -r expanded
-	cd flutter_common && ${_start_args} flutter --no-version-check test --no-pub test -r expanded
+	cd flutter && ${_start_args} flutter --no-version-check test --no-pub test/* -r expanded
 
 ifneq (${FLUTTER_TEST_DEVICE},)
 flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"
@@ -201,6 +201,5 @@ flutter/run:
 .PHONY: flutter/clean
 flutter/clean:
 	cd flutter && ${_start_args} flutter --no-version-check clean
-	cd flutter_common && ${_start_args} flutter --no-version-check clean
 	rm -rf output/flutter/pub
 

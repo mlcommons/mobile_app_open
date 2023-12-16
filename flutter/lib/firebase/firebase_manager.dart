@@ -5,8 +5,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:intl/intl.dart';
-import 'package:mlperfbench_common/data/extended_result.dart';
 
+import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/firebase/firebase_auth_service.dart';
 import 'package:mlperfbench/firebase/firebase_crashlytics_service.dart';
 import 'package:mlperfbench/firebase/firebase_options.gen.dart';

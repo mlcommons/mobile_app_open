@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/results/backend_info.dart';
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/results/backend_info.dart';
 
 void main() {
   group('json serialization', () {
