@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
@@ -71,7 +71,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     }
 
     Widget crashlyticsSwitch;
-    if (FirebaseManager.enabled) {
+    if (FirebaseManager.enabled && DartDefine.firebaseCrashlyticsEnabled) {
       crashlyticsSwitch = ListTile(
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
@@ -170,19 +170,6 @@ class _SettingsScreen extends State<SettingsScreen> {
             ),
             const Divider(),
             crashlyticsSwitch,
-            const Divider(),
-            ListTile(
-              title: Text(l10n.settingsPrivacyPolicy),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () =>
-                  launchUrl(Uri.parse('https://mlcommons.org/mobile_privacy')),
-            ),
-            ListTile(
-              title: Text(l10n.settingsEula),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () =>
-                  launchUrl(Uri.parse('https://mlcommons.org/mobile_eula')),
-            ),
             const Divider(),
             ListTile(
               title: Padding(

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
-
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/ui/history/list_item.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 

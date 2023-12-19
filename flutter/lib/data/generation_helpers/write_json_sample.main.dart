@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/generation_helpers/sample_generator.dart';
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/generation_helpers/sample_generator.dart';
 
 //
 // This file generates a sample of result data and writes it into specified place.

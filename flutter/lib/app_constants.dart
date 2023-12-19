@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
 
-const isOfficialBuild =
-    bool.fromEnvironment('official-build', defaultValue: false);
-
-const isFastMode = bool.fromEnvironment('fast-mode', defaultValue: false);
-
-const defaultCacheFolder = String.fromEnvironment('default-cache-folder');
-const defaultDataFolder = String.fromEnvironment('default-data-folder');
+class DartDefine {
+  static const isOfficialBuild =
+      bool.fromEnvironment('OFFICIAL_BUILD', defaultValue: false);
+  static const firebaseCrashlyticsEnabled =
+      bool.fromEnvironment('FIREBASE_CRASHLYTICS_ENABLED', defaultValue: false);
+  static const isFastMode =
+      bool.fromEnvironment('FAST_MODE', defaultValue: false);
+  static const defaultCacheFolder =
+      String.fromEnvironment('FLUTTER_CACHE_FOLDER');
+  static const defaultDataFolder =
+      String.fromEnvironment('FLUTTER_DATA_FOLDER');
+}
 
 class AppColors {
   static const lightText = Colors.white;
   static const lightRedText = Color.fromARGB(255, 255, 120, 100);
   static const darkText = Colors.black;
   static const darkRedText = Colors.red;
+  static const darBlue = Color(0xFF0B3A61);
 
   static const dialogBackground = Colors.white;
   static const snackBarBackground = Color(0xFFEDEDED);
   static const appBarBackground =
-      isOfficialBuild ? Color(0xFF31A3E2) : Colors.brown;
+      DartDefine.isOfficialBuild ? Color(0xFF31A3E2) : Colors.brown;
 
   static const appBarIcon = Colors.white;
 
-  static List<Color> get mainScreenGradient => isOfficialBuild
+  static List<Color> get mainScreenGradient => DartDefine.isOfficialBuild
       ? [
           const Color(0xFF31A3E2),
           const Color(0xFF31A3E2),
@@ -44,7 +50,7 @@ class AppColors {
         const Color(0xFF0DB526), // 0DB526
       ];
 
-  static List<Color> get progressScreenGradient => isOfficialBuild
+  static List<Color> get progressScreenGradient => DartDefine.isOfficialBuild
       ? [const Color(0xff3189E2), const Color(0xff0B4A7F)]
       : [Colors.brown.shade400, Colors.brown];
 
@@ -111,4 +117,9 @@ class BackendId {
     qti,
     apple,
   ];
+}
+
+class Url {
+  static const privacyPolicy = 'https://mlcommons.org/mobile_privacy';
+  static const eula = 'https://mlcommons.org/mobile_eula';
 }

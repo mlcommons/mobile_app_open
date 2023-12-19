@@ -6,7 +6,6 @@
 
   "menuHome": "MLPerf Mobile",
   "menuHistory": "History",
-  "menuBenchmarkConfiguration": "Benchmark Configuration",
   "menuSettings": "Settings",
   "menuAbout": "About",
   "menuProfile": "Profile",
@@ -21,10 +20,11 @@
   "unsupportedBackendError": "Error message",
   "unsupportedTryAnotherDevice": "Please try the app on another device",
 
-  "mainScreenLoading": "Loading content...",
+  "mainScreenLoading": "Loading Content",
   "mainScreenGo": "GO",
   "mainScreenMeasureTitle": "Measure your device performance for:",
   "mainScreenWaitFinish": "Wait for benchmark to finish",
+  "mainScreenBenchmarkSelected": "Benchmarks (<selected>/<total> selected)",
 
   "progressMeasuring": "Measuring...",
   "progressDontClose": "Don't close the app!",
@@ -63,7 +63,7 @@
   "settingsKeepLogsSubtitle": "Keep loadgen logs of future runs.\nThis option doesn't affect past logs.",
   "settingsCooldown": "Cooldown",
   "settingsCooldownSubtitle": "Pause <cooldownPause> minutes before running each benchmark to avoid thermal throttling.",
-  "settingsPrivacyPolicy": "Privacy policy",
+  "settingsPrivacyPolicy": "Privacy Policy",
   "settingsEula": "End User License Agreement",
   "settingsTaskConfigTitle": "Task configuration",
   "settingsTaskConfigInternetResource": "downloadable",

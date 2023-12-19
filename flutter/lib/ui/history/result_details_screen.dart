@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/history/run_details_screen.dart';

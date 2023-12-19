@@ -121,7 +121,7 @@ benchmark_setting {
     accelerator_desc: "NPU"
     custom_setting {
       id: "preset"
-      value: "1005"
+      value: "100005"
     }
     custom_setting {
       id: "i_type"

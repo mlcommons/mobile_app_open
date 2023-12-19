@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/ui/config/config_screen.dart';
 import 'package:mlperfbench/ui/history/result_list_screen.dart';
 import 'package:mlperfbench/ui/home/user_profile.dart';
 import 'package:mlperfbench/ui/settings/about_screen.dart';
@@ -16,12 +18,7 @@ class AppDrawer extends StatelessWidget {
     final header = buildHeader(context);
     final menuList = buildMenuList(context);
     return Drawer(
-      // Add a ListView to the drawer. This ensures the user can scroll
-      // through the options in the drawer if there isn't enough vertical
-      // space to fit everything.
-      child: ListView(
-        // Important: Remove any padding from the ListView.
-        padding: EdgeInsets.zero,
+      child: Column(
         children: [header] + menuList,
       ),
     );
@@ -70,19 +67,6 @@ class AppDrawer extends StatelessWidget {
         },
       ),
       ListTile(
-        leading: const Icon(Icons.tune),
-        title: Text(l10n.menuBenchmarkConfiguration),
-        onTap: () {
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ConfigScreen(),
-            ),
-          );
-        },
-      ),
-      ListTile(
         leading: const Icon(Icons.settings),
         title: Text(l10n.menuSettings),
         onTap: () {
@@ -106,6 +90,16 @@ class AppDrawer extends StatelessWidget {
                 builder: (context) => const AboutScreen(),
               ));
         },
+      ),
+      const Spacer(),
+      const Divider(),
+      ListTile(
+        title: Text(l10n.settingsPrivacyPolicy),
+        onTap: () => launchUrl(Uri.parse(Url.privacyPolicy)),
+      ),
+      ListTile(
+        title: Text(l10n.settingsEula),
+        onTap: () => launchUrl(Uri.parse(Url.eula)),
       ),
     ];
   }

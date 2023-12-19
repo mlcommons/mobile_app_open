@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/results/backend_info.dart';
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/results/backend_info.dart';
 
 void main() {
   group('json serialization', () {
@@ -42,7 +42,7 @@ void main() {
       }, throwsA(isA<TypeError>()));
     });
     test('full result parsing', () async {
-      final file = File('test/data/extended_result_unittest.json');
+      final file = File('unit_test/data/extended_result_unittest.json');
       final jsonString = await file.readAsString();
       final data = jsonDecode(jsonString) as Map<String, dynamic>;
       ExtendedResult.fromJson(data);

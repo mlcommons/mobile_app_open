@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
@@ -77,7 +77,7 @@ class Benchmark {
     if (testMinDuration != 0) {
       minQueryCount = testMinQueryCount;
       minDuration = testMinDuration.toDouble();
-    } else if (isFastMode) {
+    } else if (DartDefine.isFastMode) {
       minQueryCount = 8;
       minDuration = 1.0;
     } else {

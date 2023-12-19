@@ -10,17 +10,17 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/home/progress_circles.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 
-class ProgressScreen extends StatefulWidget {
+class BenchmarkRunningScreen extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey =
       GlobalKey<ScaffoldState>();
 
-  const ProgressScreen({Key? key}) : super(key: key);
+  const BenchmarkRunningScreen({Key? key}) : super(key: key);
 
   @override
-  State<ProgressScreen> createState() => _ProgressScreenState();
+  State<BenchmarkRunningScreen> createState() => _BenchmarkRunningScreenState();
 }
 
-class _ProgressScreenState extends State<ProgressScreen> {
+class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   static const double progressCircleEdgeSize = 150;
   late final Timer _timer;
 
@@ -172,7 +172,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
 
     return Scaffold(
-      key: ProgressScreen.scaffoldKey,
+      key: BenchmarkRunningScreen.scaffoldKey,
       body: Container(
         decoration: backgroundGradient,
         child: Column(
