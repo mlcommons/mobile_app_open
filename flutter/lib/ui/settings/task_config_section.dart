@@ -216,29 +216,32 @@ class TaskConfigSection extends StatelessWidget {
     final state = context.watch<BenchmarkState>();
     final isSelected = chosenConfigName == configuration.name;
 
-    return ListTile(
-      selected: isSelected,
-      title: Padding(
-        padding: const EdgeInsets.only(bottom: 5),
-        child: Text(configuration.name),
+    return AbsorbPointer(
+      absorbing: _configs.length <= 1,
+      child: ListTile(
+        selected: isSelected,
+        title: Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: Text(configuration.name),
+        ),
+        subtitle: Text(configuration.path),
+        trailing: Text(configuration.getType(l10n)),
+        onTap: () async {
+          try {
+            await state.setTaskConfig(name: configuration.name);
+            // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+            // ignore: use_build_context_synchronously
+            if (!context.mounted) return;
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            await state.loadResources();
+          } catch (e) {
+            await showErrorDialog(
+              context,
+              <String>[l10n.settingsTaskConfigError, e.toString()],
+            );
+          }
+        },
       ),
-      subtitle: Text(configuration.path),
-      trailing: Text(configuration.getType(l10n)),
-      onTap: () async {
-        try {
-          await state.setTaskConfig(name: configuration.name);
-          // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-          // ignore: use_build_context_synchronously
-          if (!context.mounted) return;
-          Navigator.of(context).popUntil((route) => route.isFirst);
-          await state.loadResources();
-        } catch (e) {
-          await showErrorDialog(
-            context,
-            <String>[l10n.settingsTaskConfigError, e.toString()],
-          );
-        }
-      },
     );
   }
 
