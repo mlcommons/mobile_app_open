@@ -1,8 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:mlperfbench_common/data/environment/env_android.dart';
-import 'package:mlperfbench_common/data/environment/env_ios.dart';
-import 'package:mlperfbench_common/data/environment/env_windows.dart';
+import 'package:mlperfbench/data/environment/env_android.dart';
+import 'package:mlperfbench/data/environment/env_ios.dart';
+import 'package:mlperfbench/data/environment/env_windows.dart';
 
 part 'environment_info.g.dart';
 

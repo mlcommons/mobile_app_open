@@ -1,17 +1,17 @@
 import 'package:uuid/uuid.dart';
 
-import 'package:mlperfbench_common/data/build_info/build_info.dart';
-import 'package:mlperfbench_common/data/environment/env_android.dart';
-import 'package:mlperfbench_common/data/environment/env_ios.dart';
-import 'package:mlperfbench_common/data/environment/env_windows.dart';
-import 'package:mlperfbench_common/data/environment/environment_info.dart';
-import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/meta_info.dart';
-import 'package:mlperfbench_common/data/results/backend_info.dart';
-import 'package:mlperfbench_common/data/results/backend_settings.dart';
-import 'package:mlperfbench_common/data/results/backend_settings_extra.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
-import 'package:mlperfbench_common/data/results/dataset_info.dart';
+import 'package:mlperfbench/data/build_info/build_info.dart';
+import 'package:mlperfbench/data/environment/env_android.dart';
+import 'package:mlperfbench/data/environment/env_ios.dart';
+import 'package:mlperfbench/data/environment/env_windows.dart';
+import 'package:mlperfbench/data/environment/environment_info.dart';
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/meta_info.dart';
+import 'package:mlperfbench/data/results/backend_info.dart';
+import 'package:mlperfbench/data/results/backend_settings.dart';
+import 'package:mlperfbench/data/results/backend_settings_extra.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
+import 'package:mlperfbench/data/results/dataset_info.dart';
 
 /// Generates sample data.
 ///

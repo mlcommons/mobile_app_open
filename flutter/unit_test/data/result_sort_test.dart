@@ -3,12 +3,12 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/result_sort.dart';
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/result_sort.dart';
 
 void main() {
   group('ResultSort', () {
-    const file = 'test/data/extended_result_unittest.json';
+    const file = 'unit_test/data/extended_result_unittest.json';
     final jsonString = File(file).readAsStringSync();
     final data = jsonDecode(jsonString) as Map<String, dynamic>;
     final result = ExtendedResult.fromJson(data);

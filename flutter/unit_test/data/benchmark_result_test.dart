@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 
 void main() {
   group('Accuracy', () {

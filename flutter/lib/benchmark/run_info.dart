@@ -1,8 +1,7 @@
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
-
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'package:mlperfbench/backend/loadgen_info.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 
 class RunInfo {
   final RunSettings settings;

@@ -1,7 +1,7 @@
-import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/result_filter.dart';
-import 'package:mlperfbench_common/data/result_sort.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/result_filter.dart';
+import 'package:mlperfbench/data/result_sort.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 
 class BenchmarksDataProvider {
   List<ExtendedResult> results;
