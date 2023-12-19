@@ -10,10 +10,10 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/build_info.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
-import 'package:mlperfbench/ui/settings/snack_bar.dart';
-import 'package:mlperfbench/ui/settings/task_config_screen.dart';
+import 'package:mlperfbench/ui/settings/task_config_section.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -23,7 +23,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreen extends State<SettingsScreen> {
-  bool _isSnackBarShowing = false;
   late AppLocalizations l10n;
   late BenchmarkState state;
   late Store store;
@@ -59,33 +58,26 @@ class _SettingsScreen extends State<SettingsScreen> {
             cooldownSlider,
             const Divider(),
             crashlyticsSwitch,
-            const Divider(),
             taskConfig,
             const Divider(),
             clearCacheButton,
             const Divider(),
-            versionText
+            versionText,
+            const SizedBox(height: 20)
           ],
         )));
   }
 
   Widget _taskConfig(BuildContext context) {
-    return ListTile(
-      title: Padding(
-        padding: const EdgeInsets.only(bottom: 5),
-        child: Text(l10n.settingsTaskConfigTitle),
-      ),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () async {
-        if (state.state == BenchmarkStateEnum.done ||
-            state.state == BenchmarkStateEnum.waiting) {
-          final taskConfigs = await state.configManager.getConfigs();
-
-          if (!mounted) return;
-          await Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => TaskConfigScreen(taskConfigs)));
+    final taskConfigs = state.configManager.getConfigs();
+    return FutureBuilder<List<TaskConfigDescription>>(
+      future: taskConfigs,
+      builder: (BuildContext context,
+          AsyncSnapshot<List<TaskConfigDescription>> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          return TaskConfigSection(snapshot.data!);
         } else {
-          _showUnableSpecifyConfigurationMessage(context);
+          return const Text('Loading data');
         }
       },
     );
@@ -251,22 +243,5 @@ class _SettingsScreen extends State<SettingsScreen> {
       crashlyticsSwitch = const SizedBox(width: 0, height: 0);
     }
     return crashlyticsSwitch;
-  }
-
-  void _showUnableSpecifyConfigurationMessage(BuildContext context) {
-    if (!_isSnackBarShowing) {
-      final snackBar = getSnackBar(l10n.settingsUnableSpecifyConfiguration);
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(snackBar)
-          .closed
-          .whenComplete(() => setState(() {
-                _isSnackBarShowing = false;
-              }));
-
-      setState(() {
-        _isSnackBarShowing = true;
-      });
-    }
   }
 }

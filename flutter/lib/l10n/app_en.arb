@@ -118,8 +118,8 @@
   "progressScreenCooldown": "Remaining time: <remaining>",
 
   "resourceErrorMessage": "Some resources failed to load.\nIf you didn't change config from default you can try clearing the cache.\nIf you use a custom configuration file ensure that it has correct structure or switch back to default config.",
-  "resourceErrorSwitchToDefault": "Select Task config",
-  "resourceErrorCurrentConfig": "Current config file: ",
+  "resourceErrorSelectTaskFile": "Update task configuration",
+  "resourceErrorCurrentConfig": "Current task config file: ",
   "resourceErrorRereadConfig": "I have fixed current config, try again",
   "resourceErrorFail": "Config failed to load",
 
