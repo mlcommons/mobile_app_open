@@ -21,7 +21,9 @@ export const useBenchmarks = (userId: string | undefined) => {
     select: (data) =>
       data
         .map((benchmarkResult) =>
-          resultFilter.match(benchmarkResult) ? benchmarkResult.results : [],
+          resultFilter ?
+            (resultFilter.match(benchmarkResult) ? benchmarkResult.results : []) :
+            benchmarkResult.results,
         )
         .filter((results) => results.length > 0)
         .flat(),
