@@ -23,7 +23,8 @@ export const useBenchmarks = (userId: string | undefined) => {
         .map((benchmarkResult) =>
           resultFilter.match(benchmarkResult) ? benchmarkResult.results : [],
         )
-        .filter((results) => results.length > 0),
+        .filter((results) => results.length > 0)
+        .flat(),
     placeholderData: keepPreviousData,
   });
 };

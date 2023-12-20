@@ -1,10 +1,10 @@
 import React from "react";
 import { Box, Text, ListItem } from "@chakra-ui/react";
 import { formatDateTime } from "../../../utilities/timeUtils";
-import { ResultType } from "../models/benchmark";
+import { Result } from "../models/benchmarks.model";
 
 type BenchmarkListItemProps = {
-  item: ResultType;
+  item: Result;
   tapHandler?: () => void;
 };
 const BenchmarkListItem: React.FC<BenchmarkListItemProps> = ({

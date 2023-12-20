@@ -1,7 +1,7 @@
 import { loginUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEY } from "../../../constants/queryKeys";
+import { QUERY_KEY } from "../../../constants/constants";
 
 export type FormValTypes = {
   email: string;
