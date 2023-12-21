@@ -5,7 +5,6 @@ import "./App.css";
 import theme from "./styles/theme";
 import Router from "./modules/Router";
 import AppQueryClient from "./AppQueryClient";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import store, { persistedStore } from "./store";
 import { Provider as ReduxProvider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
@@ -19,7 +18,6 @@ function App() {
             <BrowserRouter>
               <Router />
             </BrowserRouter>
-            <ReactQueryDevtools initialIsOpen={false} />
           </PersistGate>
         </AppQueryClient>
       </ReduxProvider>

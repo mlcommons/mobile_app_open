@@ -62,7 +62,7 @@ const LoginPage = () => {
       });
       navigate(window.location.pathname);
     }
-  }, [showError]);
+  }, [showError, navigate, toast]);
 
   const hookFormVals = useForm<FormValTypes>({
     resolver: yupResolver(schema),

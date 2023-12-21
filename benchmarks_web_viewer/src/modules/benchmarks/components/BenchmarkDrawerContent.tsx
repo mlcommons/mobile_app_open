@@ -1,12 +1,22 @@
-import { useLocation } from "react-router-dom";
 import { BenchmarkRun, Result } from "../models/benchmarks.model";
-import { Box, Divider, Heading, List, ListItem } from "@chakra-ui/react";
+import { Box, Divider, Heading, Icon, List, ListItem } from "@chakra-ui/react";
+import { useUser } from "../../auth/hooks/useUser";
+import { useBenchmarks } from "../hooks/useBenchmarks";
+import { GrClose } from "react-icons/gr";
 
-const BenchmarkDetailsPage = () => {
-  const location = useLocation();
-  const benchmark: Result = JSON.parse(location.state);
+type Props = {
+  onClose: any;
+  benchmarkId: string;
+  isOpen?: boolean;
+};
 
-  const makeBody = () => {
+const BenchmarkDrawerContent = ({ onClose, benchmarkId, isOpen }: Props) => {
+  const user = useUser();
+  const { getBenchmarkById } = useBenchmarks(user?.uid);
+
+  const benchmark = getBenchmarkById(benchmarkId);
+
+  const makeBody = (benchmark: Result) => {
     const mainInfo = makeMainInfo(benchmark);
     const performanceRun = benchmark.performance_run
       ? makePerformanceInfo(benchmark.performance_run)
@@ -85,14 +95,26 @@ const BenchmarkDetailsPage = () => {
     return `${seconds} seconds`; // Placeholder implementation
   };
 
-  console.log("body:", makeBody());
+  const onCloseDrawer = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    onClose();
+  };
 
   return (
     <Box padding={2}>
-      <Heading>{benchmark.benchmark_name}</Heading>
-      <List>{makeBody()}</List>
+      <Heading>{benchmark?.benchmark_name}</Heading>
+      {benchmark && <List>{makeBody(benchmark)}</List>}
+      <Icon
+        as={GrClose}
+        fontSize="25px"
+        cursor="pointer"
+        onClick={onCloseDrawer}
+        pos="absolute"
+        top="30px"
+        right="30px"
+      />
     </Box>
   );
 };
 
-export default BenchmarkDetailsPage;
+export default BenchmarkDrawerContent;

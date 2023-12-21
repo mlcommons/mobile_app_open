@@ -12,9 +12,7 @@ const Login = React.lazy(() => import("./auth/components/Login.page"));
 const BenchmarkList = React.lazy(
   () => import("./benchmarks/components/BenchmarkList.page"),
 );
-const BenchmarkDetailsPage = React.lazy(
-  () => import("./benchmarks/components/BenchmarkDetails.page"),
-);
+const Main = React.lazy(() => import("./main/components/Main.page"));
 
 const GuardedRoute = ({ children }: PropsWithChildren) => {
   const user = useUser();
@@ -29,30 +27,17 @@ const Router = () => {
     <Suspense fallback={<CenterSpinner />}>
       <Routes>
         <Route path="/auth/sign-in" element={<Login />} />
+
         <Route
-          path="/"
+          path="/*"
           element={
             <GuardedRoute>
-              <BenchmarkList />
+              <Main />
             </GuardedRoute>
           }
-        />
-        <Route
-          path="/benchmarks"
-          element={
-            <GuardedRoute>
-              <BenchmarkList />
-            </GuardedRoute>
-          }
-        />
-        <Route
-          path="/benchmarks/:id"
-          element={
-            <GuardedRoute>
-              <BenchmarkDetailsPage />
-            </GuardedRoute>
-          }
-        />
+        >
+          <Route path="benchmarks" element={<BenchmarkList />} />
+        </Route>
       </Routes>
     </Suspense>
   );

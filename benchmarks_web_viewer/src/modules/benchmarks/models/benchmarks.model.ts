@@ -1,3 +1,14 @@
+export type BenchmarkResultItem = {
+  id: string;
+  benchmarkId: string;
+  benchmarkName?: string;
+  backendName?: string;
+  delegateName?: string;
+  acceleratorName?: string;
+  date?: string;
+  score?: string;
+};
+
 export type BenchmarkResult = {
   meta: Meta;
   results: Result[];
@@ -12,6 +23,7 @@ export type Meta = {
 };
 
 export type Result = {
+  id: string;
   benchmark_id: string;
   benchmark_name: string;
   loadgen_scenario: string;

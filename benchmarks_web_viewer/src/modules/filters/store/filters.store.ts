@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { useDispatch, useSelector } from "react-redux";
 import { ResultFilter } from "../models/filters.model";
 
 interface FiltersState {
