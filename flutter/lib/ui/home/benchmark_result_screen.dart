@@ -29,9 +29,13 @@ class ResultKeys {
 
 class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     with SingleTickerProviderStateMixin {
+  _ScreenMode _screenMode = _ScreenMode.performance;
+
   late final TabController _tabController;
   late final ScrollController _scrollController;
-  _ScreenMode _screenMode = _ScreenMode.performance;
+
+  late AppLocalizations l10n;
+  late BenchmarkState state;
 
   @override
   void initState() {
@@ -58,10 +62,128 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     super.dispose();
   }
 
-  Column _createListOfBenchmarkResultBottomWidgets(
-      BuildContext context, BenchmarkState state) {
+  @override
+  Widget build(BuildContext context) {
+    state = context.watch<BenchmarkState>();
+    l10n = AppLocalizations.of(context);
+
+    final sharingSection = _sharingSection();
+    final summarySection = _summarySection();
+    final detailSection = _detailSection();
+
+    String title;
+    title = _screenMode == _ScreenMode.performance
+        ? l10n.resultsTitlePerformance
+        : l10n.resultsTitleAccuracy;
+    title = DartDefine.isOfficialBuild
+        ? title
+        : '${l10n.resultsTitleUnverified} $title';
+
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      drawer: const AppDrawer(),
+      body: LayoutBuilder(
+        builder: (context, constraint) {
+          return SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            controller: _scrollController,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                summarySection,
+                const SizedBox(height: 20),
+                detailSection,
+                const SizedBox(height: 20),
+                sharingSection,
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _sharingSection() {
+    final minimumShareButtonWidth = MediaQuery.of(context).size.width - 40;
+    final buttonStyle = ButtonStyle(
+        backgroundColor:
+            MaterialStateProperty.all<Color>(AppColors.runBenchmarkRectangle),
+        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14.0),
+            side: const BorderSide(color: Colors.white))),
+        minimumSize:
+            MaterialStateProperty.all<Size>(Size(minimumShareButtonWidth, 0)));
+    return Column(
+      children: [
+        Padding(
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+            child: TextButton(
+              style: buttonStyle,
+              onPressed: () async {
+                try {
+                  await state.resetBenchmarkState();
+                } catch (e, t) {
+                  print(t);
+                  // current context may no longer be valid if runBenchmarks requested progress screen
+                  await showErrorDialog(
+                      BenchmarkRunningScreen.scaffoldKey.currentContext ??
+                          context,
+                      ['${l10n.runFail}:', e.toString()]);
+                  return;
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                child: Text(
+                  l10n.resultsButtonTestAgain,
+                  style: const TextStyle(
+                    fontSize: 20.0,
+                    color: AppColors.lightText,
+                  ),
+                ),
+              ),
+            )),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+          child: ShareButton(),
+        ),
+      ],
+    );
+  }
+
+  Widget _summarySection() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.lightBlue,
+            AppColors.darkBlue,
+          ],
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          TabBar(
+            controller: _tabController,
+            indicator: const UnderlineTabIndicator(),
+            indicatorSize: TabBarIndicatorSize.label,
+            tabs: [
+              Tab(text: l10n.resultsTabTitlePerformance),
+              Tab(text: l10n.resultsTabTitleAccuracy),
+            ],
+          ),
+          ResultCircle(state.result),
+        ],
+      ),
+    );
+  }
+
+  Widget _detailSection() {
     final list = <Widget>[];
-    final l10n = AppLocalizations.of(context);
     final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
 
     for (final benchmark in state.benchmarks) {
@@ -193,126 +315,6 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       );
     }
     return Column(children: list);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final state = context.watch<BenchmarkState>();
-    final l10n = AppLocalizations.of(context);
-
-    final summarySection = _summarySection(context, l10n, state);
-    final detailSection = _detailSection(context, state, l10n);
-
-    String title;
-    title = _screenMode == _ScreenMode.performance
-        ? l10n.resultsTitlePerformance
-        : l10n.resultsTitleAccuracy;
-    title = DartDefine.isOfficialBuild
-        ? title
-        : '${l10n.resultsTitleUnverified} $title';
-
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      drawer: const AppDrawer(),
-      body: LayoutBuilder(
-        builder: (context, constraint) {
-          return SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            controller: _scrollController,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                summarySection,
-                const SizedBox(height: 20),
-                detailSection,
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _summarySection(
-      BuildContext context, AppLocalizations l10n, BenchmarkState state) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.lightBlue,
-            AppColors.darkBlue,
-          ],
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          TabBar(
-            controller: _tabController,
-            indicator: const UnderlineTabIndicator(),
-            indicatorSize: TabBarIndicatorSize.label,
-            tabs: [
-              Tab(text: l10n.resultsTabTitlePerformance),
-              Tab(text: l10n.resultsTabTitleAccuracy),
-            ],
-          ),
-          ResultCircle(state.result),
-        ],
-      ),
-    );
-  }
-
-  Widget _detailSection(
-      BuildContext context, BenchmarkState state, AppLocalizations l10n) {
-    final minimumShareButtonWidth = MediaQuery.of(context).size.width - 40;
-    final buttonStyle = ButtonStyle(
-        backgroundColor:
-            MaterialStateProperty.all<Color>(AppColors.runBenchmarkRectangle),
-        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.0),
-            side: const BorderSide(color: Colors.white))),
-        minimumSize:
-            MaterialStateProperty.all<Size>(Size(minimumShareButtonWidth, 0)));
-    final detailedResultsPage = Column(children: [
-      _createListOfBenchmarkResultBottomWidgets(context, state),
-      Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-          child: TextButton(
-            style: buttonStyle,
-            onPressed: () async {
-              try {
-                await state.resetBenchmarkState();
-              } catch (e, t) {
-                print(t);
-                // current context may no longer be valid if runBenchmarks requested progress screen
-                await showErrorDialog(
-                    BenchmarkRunningScreen.scaffoldKey.currentContext ??
-                        context,
-                    ['${l10n.runFail}:', e.toString()]);
-                return;
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: Text(
-                l10n.resultsButtonTestAgain,
-                style: const TextStyle(
-                  fontSize: 20.0,
-                  color: AppColors.lightText,
-                ),
-              ),
-            ),
-          )),
-      const Padding(
-        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-        child: ShareButton(),
-      ),
-      const SizedBox(height: 20)
-    ]);
-    return detailedResultsPage;
   }
 }
 
