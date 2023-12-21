@@ -239,6 +239,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     return Container(
       color: AppColors.appBarBackground,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.75,
@@ -253,29 +255,6 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
             ),
           ),
           ResultCircle(state.result),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.resultsTitleDetails,
-                  textAlign: TextAlign.left,
-                  style: const TextStyle(
-                      fontSize: 17.0, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                    key: const Key(ResultKeys.scrollResultsButton),
-                    icon: app_icons.AppIcons.arrow,
-                    onPressed: () {
-                      _scrollController.animateTo(
-                          _scrollController.position.maxScrollExtent,
-                          duration: const Duration(milliseconds: 200),
-                          curve: Curves.ease);
-                    })
-              ],
-            ),
-          ),
         ],
       ),
     );
