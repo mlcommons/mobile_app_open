@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
-import 'package:quiver/iterables.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
@@ -11,7 +10,6 @@ import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/home/benchmark_running_screen.dart';
-import 'package:mlperfbench/ui/home/benchmark_start_screen.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
 import 'package:mlperfbench/ui/icons.dart' as app_icons;
@@ -34,12 +32,12 @@ class ResultKeys {
 class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  late final ScrollController _scrollController;
   _ScreenMode _screenMode = _ScreenMode.performance;
 
   @override
   void initState() {
     super.initState();
-
     _tabController = TabController(vsync: this, length: 2);
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
@@ -52,11 +50,13 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         }
       }
     });
+    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -197,133 +197,92 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     return Column(children: list);
   }
 
-  List<Widget> _createListOfBenchmarkResultTopWidgets(
-      BenchmarkState state, BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final widgets = state.benchmarks.map((benchmark) {
-      final result = _screenMode == _ScreenMode.performance
-          ? benchmark.performanceModeResult
-          : benchmark.accuracyModeResult;
-      final text = _screenMode == _ScreenMode.performance
-          ? result?.throughput?.toUIString()
-          : result?.accuracy?.toUIString();
-      final text2 = _screenMode == _ScreenMode.performance
-          ? null
-          : result?.accuracy2?.toUIString();
-      final resultIsValid = _screenMode == _ScreenMode.performance
-          ? (result?.validity ?? false)
-          : ((result?.accuracy?.normalized ?? -1.0) >= 0.0 &&
-              (result?.accuracy?.normalized ?? -1.0) <= 1.0 &&
-              (result?.accuracy2?.normalized ?? -1.0) <= 1.0);
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child:
-            Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              benchmark.taskConfig.name.split(' ').join('\n').toUpperCase(),
-              textAlign: TextAlign.center,
-              style:
-                  const TextStyle(fontSize: 12.0, color: AppColors.lightText),
-            ),
-          ),
-          Text(
-            text ?? l10n.na,
-            style: TextStyle(
-                fontSize: 32.0,
-                color: resultIsValid
-                    ? AppColors.lightText
-                    : AppColors.lightRedText,
-                fontWeight: FontWeight.bold),
-          ),
-          if (text2 != null)
-            Text(
-              text2,
-              style: TextStyle(
-                  fontSize: 32.0,
-                  color: resultIsValid
-                      ? AppColors.lightText
-                      : AppColors.lightRedText,
-                  fontWeight: FontWeight.bold),
-            ),
-        ]),
-      );
-    });
-
-    return partition(widgets, 3)
-        .map((row) => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: row,
-            ))
-        .toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final l10n = AppLocalizations.of(context);
-    final scrollController = ScrollController();
 
-    final resultsPage = Column(
-      children: [
-        Expanded(
-          child: CustomPaint(
-            painter: MyPaintBottom(),
+    final summarySection = _summarySection(context, l10n, state);
+    final detailSection = _detailSection(context, state, l10n);
+
+    String title;
+    title = _screenMode == _ScreenMode.performance
+        ? l10n.resultsTitlePerformance
+        : l10n.resultsTitleAccuracy;
+    title = DartDefine.isOfficialBuild
+        ? title
+        : '${l10n.resultsTitleUnverified} $title';
+
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      drawer: const AppDrawer(),
+      body: LayoutBuilder(
+        builder: (context, constraint) {
+          return SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            controller: _scrollController,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: TabBar(
-                    controller: _tabController,
-                    indicator: const UnderlineTabIndicator(),
-                    indicatorSize: TabBarIndicatorSize.label,
-                    tabs: [
-                      Tab(text: l10n.resultsTabTitlePerformance),
-                      Tab(text: l10n.resultsTabTitleAccuracy),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ResultCircle(state.result),
-                ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children:
-                        _createListOfBenchmarkResultTopWidgets(state, context),
-                  ),
-                ),
+                summarySection,
+                detailSection,
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _summarySection(
+      BuildContext context, AppLocalizations l10n, BenchmarkState state) {
+    return Container(
+      color: AppColors.appBarBackground,
+      child: Column(
+        children: <Widget>[
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.75,
+            child: TabBar(
+              controller: _tabController,
+              indicator: const UnderlineTabIndicator(),
+              indicatorSize: TabBarIndicatorSize.label,
+              tabs: [
+                Tab(text: l10n.resultsTabTitlePerformance),
+                Tab(text: l10n.resultsTabTitleAccuracy),
               ],
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                l10n.resultsTitleDetails,
-                textAlign: TextAlign.left,
-                style: const TextStyle(
-                    fontSize: 17.0, fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                  key: const Key(ResultKeys.scrollResultsButton),
-                  icon: app_icons.AppIcons.arrow,
-                  onPressed: () {
-                    scrollController.animateTo(
-                        scrollController.position.maxScrollExtent,
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.ease);
-                  })
-            ],
+          ResultCircle(state.result),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.resultsTitleDetails,
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(
+                      fontSize: 17.0, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                    key: const Key(ResultKeys.scrollResultsButton),
+                    icon: app_icons.AppIcons.arrow,
+                    onPressed: () {
+                      _scrollController.animateTo(
+                          _scrollController.position.maxScrollExtent,
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.ease);
+                    })
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
+  }
 
+  Widget _detailSection(
+      BuildContext context, BenchmarkState state, AppLocalizations l10n) {
     final minimumShareButtonWidth = MediaQuery.of(context).size.width - 40;
     final buttonStyle = ButtonStyle(
         backgroundColor:
@@ -333,7 +292,6 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
             side: const BorderSide(color: Colors.white))),
         minimumSize:
             MaterialStateProperty.all<Size>(Size(minimumShareButtonWidth, 0)));
-
     final detailedResultsPage = Column(children: [
       _createListOfBenchmarkResultBottomWidgets(context, state),
       Padding(
@@ -370,34 +328,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       ),
       const SizedBox(height: 20)
     ]);
-
-    String title;
-    title = _screenMode == _ScreenMode.performance
-        ? l10n.resultsTitlePerformance
-        : l10n.resultsTitleAccuracy;
-    title = DartDefine.isOfficialBuild
-        ? title
-        : '${l10n.resultsTitleUnverified} $title';
-
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      drawer: const AppDrawer(),
-      body: LayoutBuilder(
-        builder: (context, constraint) {
-          return SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            controller: scrollController,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                getPageWidget(constraint, resultsPage),
-                getPageWidget(constraint, detailedResultsPage)
-              ],
-            ),
-          );
-        },
-      ),
-    );
+    return detailedResultsPage;
   }
 }
 
