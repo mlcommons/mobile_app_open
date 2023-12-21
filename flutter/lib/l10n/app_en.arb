@@ -95,6 +95,10 @@
   "dialogContentMissingFiles": "Selected datasets directory does not contain files for following benchmarks:",
   "dialogContentChecksumError": "The following files failed checksum validation:",
 
+
+  "benchModePerformanceOnly": "Performance Only",
+  "benchModeAccuracyOnly": "Accuracy Only",
+  "benchModeSubmissionRun": "Submission Run",
   "benchNameImageClassification": "Image Classification",
   "benchNameObjectDetection": "Object detection",
   "benchNameImageSegmentation": "Image Segmentation",

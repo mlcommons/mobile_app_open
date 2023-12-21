@@ -191,7 +191,7 @@ class _SettingsScreen extends State<SettingsScreen> {
           items: BenchmarkRunModeEnum.values
               .map((runMode) => DropdownMenuItem<BenchmarkRunModeEnum>(
                     value: runMode,
-                    child: Text(runMode.name),
+                    child: Text(runMode.localizedName(l10n)),
                   ))
               .toList(),
           onChanged: (value) => setState(() {
