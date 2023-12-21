@@ -44,8 +44,8 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(32.0),
         child: AppBar(
-          shape: Border.all(color: AppColors.darBlue),
-          backgroundColor: AppColors.darBlue,
+          shape: Border.all(color: AppColors.darkBlue),
+          backgroundColor: AppColors.darkBlue,
           elevation: 0,
           title: _header(),
         ),

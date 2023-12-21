@@ -29,7 +29,7 @@ class BenchmarkStartScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.darBlue,
+      backgroundColor: AppColors.darkBlue,
       appBar: AppBar(title: Text(l10n.menuHome)),
       drawer: const AppDrawer(),
       body: SafeArea(

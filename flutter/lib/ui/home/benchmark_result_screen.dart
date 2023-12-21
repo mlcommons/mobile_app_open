@@ -12,8 +12,6 @@ import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/home/benchmark_running_screen.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
-import 'package:mlperfbench/ui/icons.dart' as app_icons;
-import 'package:mlperfbench/ui/page_constraints.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -225,6 +223,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 summarySection,
+                const SizedBox(height: 20),
                 detailSection,
               ],
             ),
@@ -237,22 +236,28 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
   Widget _summarySection(
       BuildContext context, AppLocalizations l10n, BenchmarkState state) {
     return Container(
-      color: AppColors.appBarBackground,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.lightBlue,
+            AppColors.darkBlue,
+          ],
+        ),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.75,
-            child: TabBar(
-              controller: _tabController,
-              indicator: const UnderlineTabIndicator(),
-              indicatorSize: TabBarIndicatorSize.label,
-              tabs: [
-                Tab(text: l10n.resultsTabTitlePerformance),
-                Tab(text: l10n.resultsTabTitleAccuracy),
-              ],
-            ),
+          TabBar(
+            controller: _tabController,
+            indicator: const UnderlineTabIndicator(),
+            indicatorSize: TabBarIndicatorSize.label,
+            tabs: [
+              Tab(text: l10n.resultsTabTitlePerformance),
+              Tab(text: l10n.resultsTabTitleAccuracy),
+            ],
           ),
           ResultCircle(state.result),
         ],
