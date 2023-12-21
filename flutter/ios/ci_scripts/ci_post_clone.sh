@@ -64,7 +64,6 @@ echo "$MC_LOG_PREFIX protobuf version:" && protoc --version
 brew install cocoapods || brew install cocoapods || brew install cocoapods
 echo "$MC_LOG_PREFIX cocoapods version:" && pod --version
 
-brew install python@3.11 || brew link --overwrite python@3.11
 echo "$MC_LOG_PREFIX python version:" && python3 --version
 python3 -m pip install --upgrade pip
 python3 -m pip install \
