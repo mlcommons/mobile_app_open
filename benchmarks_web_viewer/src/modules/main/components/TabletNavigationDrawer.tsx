@@ -22,7 +22,7 @@ import {
 
 import { Link, useLocation } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { ReactComponent as MLCommonsLogo } from "..//assets/MLCommonsLogo.svg";
+import { ReactComponent as MLCommonsLogo } from "../../../assets/MLCommonsLogo.svg";
 import sidebarLinks from "../../../constants/sidebarLinks";
 import theme from "../../../styles/theme";
 

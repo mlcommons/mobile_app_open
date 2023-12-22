@@ -7,7 +7,7 @@ import {
   useToast,
   InputGroup,
   InputRightElement,
-  chakra,
+  chakra, Icon,
 } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
@@ -18,6 +18,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useLoginMutation } from "../hooks/useLoginMutation";
 import { useUser } from "../hooks/useUser";
+import { ReactComponent as MLCommonsLogo } from "../../../assets/MLCommonsLogo.svg";
 
 export type FormValTypes = {
   email: string;
@@ -101,7 +102,7 @@ const LoginPage = () => {
         bg="#fff"
         justify="center"
         w={{ base: "100%", sm: "452px" }}
-        h="300px"
+        h="500px"
         boxShadow={{
           base: "none",
           sm: "0px 0px 20px rgba(0, 0, 0, 0.15)",
@@ -113,6 +114,9 @@ const LoginPage = () => {
           alignItems="center"
           minW={{ base: "100%", sm: "354px" }}
         >
+          <Flex justify="center">
+            <Icon as={MLCommonsLogo} fontSize="150px" />
+          </Flex>
           <Flex flexDir="column" w={{ base: "88%", sm: "auto" }}>
             <chakra.form onSubmit={handleSubmit(onSubmit)}>
               <Flex flexDir="column" w="100%" mx="auto">

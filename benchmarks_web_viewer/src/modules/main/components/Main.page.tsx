@@ -14,7 +14,7 @@ import React from "react";
 import sidebarLinks from "../../../constants/sidebarLinks";
 import theme from "../../../styles/theme";
 
-import { ReactComponent as MLCommonsLogo } from "../assets/MLCommonsLogo.svg";
+import { ReactComponent as MLCommonsLogo } from "../../../assets/MLCommonsLogo.svg";
 import MainContent from "./MainContent";
 
 const hoverColor = "#E3EBFC";
