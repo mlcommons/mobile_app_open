@@ -7,19 +7,28 @@ import {
   HStack,
   Icon,
   Text,
+  useAccordionItemState
 } from "@chakra-ui/react";
 
-import { Link } from "react-router-dom";
-import React from "react";
+import {Link, useLocation} from "react-router-dom";
+import React, {useState} from "react";
 import sidebarLinks from "../../../constants/sidebarLinks";
 import theme from "../../../styles/theme";
 
 import { ReactComponent as MLCommonsLogo } from "../../../assets/MLCommonsLogo.svg";
 import MainContent from "./MainContent";
-
-const hoverColor = "#E3EBFC";
+import ModuleTypes from "../../../constants/moduleTypes";
 
 const Main = () => {
+
+  const { pathname: currPath } = useLocation();
+  const currModule = currPath.split("/")[1];
+  const getBgColor = (moduleType: string) => {
+    return currModule === moduleType ? hoverColor : "transparent";
+  };
+
+  const hoverColor = "#E3EBFC";
+
   return (
     <Box display="flex" flexDir="column" h="100%" minH="100vh">
       <Box display="flex" h="100%" minH="100vh">
@@ -40,6 +49,7 @@ const Main = () => {
                 _hover={{
                   bg: hoverColor,
                 }}
+                bg={getBgColor(ModuleTypes.benchmarks)}
                 as={Link}
                 to={sidebarLinks.BENCHMARKS.path}
                 minH="55px"

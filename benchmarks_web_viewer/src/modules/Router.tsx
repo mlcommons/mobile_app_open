@@ -37,6 +37,7 @@ const Router = () => {
           }
         >
           <Route path="benchmarks" element={<BenchmarkList />} />
+          <Route path="*" element={<BenchmarkList />} />
         </Route>
       </Routes>
     </Suspense>
