@@ -46,11 +46,6 @@ class AppColors {
 
   static const runBenchmarkRectangle = Color(0xFF0DB526);
 
-  static List<Color> get runBenchmarkCircleGradient => [
-        Color.lerp(const Color(0xFF0DB526), Colors.white, 0.65)!,
-        const Color(0xFF0DB526), // 0DB526
-      ];
-
   static List<Color> get progressScreenGradient => DartDefine.isOfficialBuild
       ? [const Color(0xff3189E2), const Color(0xff0B4A7F)]
       : [Colors.brown.shade400, Colors.brown];
@@ -78,6 +73,10 @@ class AppColors {
   static const shareRectangle = Colors.green;
 
   static Color get shareTextButton => Colors.blue.shade900;
+}
+
+class WidgetSizes {
+  static const circleWidthFactor = 0.32;
 }
 
 class BenchmarkId {
