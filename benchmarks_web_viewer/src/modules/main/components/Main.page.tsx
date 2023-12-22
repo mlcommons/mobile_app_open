@@ -27,15 +27,11 @@ const Main = () => {
           flexDir="column"
           minW={{ base: "15%", lg: "220px" }}
           display={{ base: "none", xl: "flex" }}
-          bg="#fff"
-          pb="20px"
-          fontSize="30px"
           fontWeight="bold"
           overflowY="hidden"
         >
-          <Flex justify="center" align="center">
-            {" "}
-            <Icon as={MLCommonsLogo} fontSize="150px" />
+          <Flex justify="left" pl="10%">
+            <Icon as={MLCommonsLogo} fontSize="120px" />
           </Flex>
 
           <Accordion allowToggle>
@@ -50,7 +46,7 @@ const Main = () => {
                 pl="10%"
               >
                 <HStack>
-                  {/*<Icon as={DashboardIcon} fontSize="20px" />*/}
+                  {/*<Icon as={BenchmarksIcon} fontSize="20px" />*/}
                   <Text
                     color="#1033A5"
                     fontWeight={700}
