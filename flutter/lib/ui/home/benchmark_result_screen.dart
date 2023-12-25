@@ -13,6 +13,7 @@ import 'package:mlperfbench/ui/home/benchmark_running_screen.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
 import 'package:mlperfbench/ui/home/shared_styles.dart';
+import 'package:mlperfbench/ui/time_utils.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -100,9 +101,18 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
   }
 
   Widget _sharingSection() {
-    Widget deviceName = Text(
-        state.lastResult?.environmentInfo.platform.toString() ??
-            'Unknown platform');
+    final lastResult = state.lastResult;
+    Widget infoSection = Container();
+    if (lastResult != null) {
+      infoSection = Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(lastResult.environmentInfo.modelDescription),
+          Text(formatDateTime(lastResult.meta.creationDate)),
+        ],
+      );
+    }
     Widget testAgainButton = IconButton(
       icon: const Icon(Icons.replay),
       color: Colors.white,
@@ -137,14 +147,14 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     );
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 0, 10, 0),
-      color: AppColors.lightBlue,
+      color: AppColors.mediumBlue,
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Colors.white),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            deviceName,
+            infoSection,
             const Spacer(),
             testAgainButton,
             deleteResultButton,
