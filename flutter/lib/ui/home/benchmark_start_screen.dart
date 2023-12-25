@@ -171,6 +171,16 @@ class BenchmarkStartScreen extends StatelessWidget {
                   }
                 }
               }
+              final selectedCount =
+                  state.benchmarks.where((e) => e.isActive).length;
+              if (selectedCount < 1) {
+                // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+                // ignore: use_build_context_synchronously
+                if (!context.mounted) return;
+                await showErrorDialog(
+                    context, [l10n.dialogContentNoSelectedBenchmarkError]);
+                return;
+              }
               try {
                 await state.runBenchmarks();
               } catch (e, t) {

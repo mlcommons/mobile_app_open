@@ -114,7 +114,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       );
     }
     Widget testAgainButton = IconButton(
-      icon: const Icon(Icons.replay),
+      icon: const Icon(Icons.restart_alt),
       color: Colors.white,
       onPressed: () async {
         try {

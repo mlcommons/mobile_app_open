@@ -94,6 +94,7 @@
   "dialogContentOfflineWarning": "Offline mode is enabled but following internet resources are defined in the configuration. Do you want to continue?",
   "dialogContentMissingFiles": "Selected datasets directory does not contain files for following benchmarks:",
   "dialogContentChecksumError": "The following files failed checksum validation:",
+  "dialogContentNoSelectedBenchmarkError": "Please select at least one benchmark.",
 
   "benchNameImageClassification": "Image Classification",
   "benchNameObjectDetection": "Object detection",
