@@ -12,6 +12,7 @@ import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/home/benchmark_running_screen.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
+import 'package:mlperfbench/ui/home/shared_styles.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -67,10 +68,6 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context);
 
-    final sharingSection = _sharingSection();
-    final summarySection = _summarySection();
-    final detailSection = _detailSection();
-
     String title;
     title = _screenMode == _ScreenMode.performance
         ? l10n.resultsTitlePerformance
@@ -90,11 +87,10 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                summarySection,
+                (_sharingSection()),
+                (_summarySection()),
                 const SizedBox(height: 20),
-                detailSection,
-                const SizedBox(height: 20),
-                sharingSection,
+                (_detailSection()),
               ],
             ),
           );
@@ -104,65 +100,64 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
   }
 
   Widget _sharingSection() {
-    final minimumShareButtonWidth = MediaQuery.of(context).size.width - 40;
-    final buttonStyle = ButtonStyle(
-        backgroundColor:
-            MaterialStateProperty.all<Color>(AppColors.runBenchmarkRectangle),
-        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.0),
-            side: const BorderSide(color: Colors.white))),
-        minimumSize:
-            MaterialStateProperty.all<Size>(Size(minimumShareButtonWidth, 0)));
-    return Column(
-      children: [
-        Padding(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-            child: TextButton(
-              style: buttonStyle,
-              onPressed: () async {
-                try {
-                  await state.resetBenchmarkState();
-                } catch (e, t) {
-                  print(t);
-                  // current context may no longer be valid if runBenchmarks requested progress screen
-                  await showErrorDialog(
-                      BenchmarkRunningScreen.scaffoldKey.currentContext ??
-                          context,
-                      ['${l10n.runFail}:', e.toString()]);
-                  return;
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                child: Text(
-                  l10n.resultsButtonTestAgain,
-                  style: const TextStyle(
-                    fontSize: 20.0,
-                    color: AppColors.lightText,
-                  ),
-                ),
-              ),
-            )),
-        const Padding(
-          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-          child: ShareButton(),
+    Widget deviceName = Text(
+        state.lastResult?.environmentInfo.platform.toString() ??
+            'Unknown platform');
+    Widget testAgainButton = IconButton(
+      icon: const Icon(Icons.replay),
+      color: Colors.white,
+      onPressed: () async {
+        try {
+          await state.resetBenchmarkState();
+        } catch (e, t) {
+          print(t);
+          // current context may no longer be valid if runBenchmarks requested progress screen
+          await showErrorDialog(
+              BenchmarkRunningScreen.scaffoldKey.currentContext ?? context,
+              ['${l10n.runFail}:', e.toString()]);
+          return;
+        }
+      },
+    );
+    Widget deleteResultButton = IconButton(
+      icon: const Icon(Icons.delete),
+      color: Colors.white,
+      onPressed: () async {
+        try {
+          print('hello world');
+        } catch (e, t) {
+          print(t);
+          // current context may no longer be valid if runBenchmarks requested progress screen
+          await showErrorDialog(
+              BenchmarkRunningScreen.scaffoldKey.currentContext ?? context,
+              ['${l10n.runFail}:', e.toString()]);
+          return;
+        }
+      },
+    );
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 0, 10, 0),
+      color: AppColors.lightBlue,
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(color: Colors.white),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            deviceName,
+            const Spacer(),
+            testAgainButton,
+            deleteResultButton,
+            const ShareButton()
+          ],
         ),
-      ],
+      ),
     );
   }
 
   Widget _summarySection() {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.lightBlue,
-            AppColors.darkBlue,
-          ],
-        ),
-      ),
+      decoration: mainLinearGradientDecoration,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
