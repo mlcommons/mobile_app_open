@@ -101,7 +101,7 @@ const BenchmarkDrawerContent = ({ onClose, benchmarkId, isOpen }: Props) => {
   };
 
   return (
-    <Box padding={2} zIndex={10}>
+    <Box padding={2}>
       <Heading>{benchmark?.benchmark_name}</Heading>
       {benchmark && <List>{makeBody(benchmark)}</List>}
       <Icon

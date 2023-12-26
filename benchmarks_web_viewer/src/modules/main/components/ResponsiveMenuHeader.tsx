@@ -99,7 +99,6 @@ const ResponsiveMenuHeader = ({ onToggle, isOpen }: Props) => {
           box-shadow: 0 0 10px rgb(0 0 0 / 15%);
         }
       `}
-      zIndex={5}
     >
       <FilterIcon onClick={onOpen} />
       <FiltersModal disclosureProps={disclosureProps} />
