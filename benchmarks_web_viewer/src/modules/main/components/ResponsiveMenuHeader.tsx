@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
-import { Flex, useMediaQuery } from "@chakra-ui/react";
+import { Flex, useDisclosure, useMediaQuery } from "@chakra-ui/react";
 import ChakraBreakpoints from "../../../constants/breakpoints";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { css } from "@emotion/react";
 import sidebarLinks from "../../../constants/sidebarLinks";
 import TabletNavigationDrawer from "./TabletNavigationDrawer";
+import { Box, IconButton } from "@chakra-ui/react";
+import { FaFilter } from "react-icons/fa";
+import FiltersModal from "../../filters/components/FiltersModal";
 
 type Props = {
   onToggle: () => void;
@@ -50,11 +53,36 @@ const ResponsiveMenuHeader = ({ onToggle, isOpen }: Props) => {
     }
   }, [currPath, currSelectVal, initVal]);
 
-  const navigate = useNavigate();
-
   const [isBelowXl] = useMediaQuery(`(max-width: ${ChakraBreakpoints.xl})`);
 
   const isDrawerVisible = isBelowXl;
+
+  const disclosureProps = useDisclosure();
+  const { onOpen } = disclosureProps;
+
+  type FilterIconProps = {
+    onClick: any;
+  };
+
+  const FilterIcon = ({ onClick }: FilterIconProps) => {
+    return (
+      <Box
+        position="fixed"
+        top="1rem"
+        right="2rem"
+        display="flex"
+        justifyContent="flex-end"
+        alignItems="flex-start"
+      >
+        <IconButton
+          icon={<FaFilter />}
+          onClick={onOpen}
+          aria-label="Filter"
+          variant="ghost"
+        />
+      </Box>
+    );
+  };
 
   const renderFullHeader = () => (
     <Flex
@@ -73,6 +101,8 @@ const ResponsiveMenuHeader = ({ onToggle, isOpen }: Props) => {
       `}
       zIndex={5}
     >
+      <FilterIcon onClick={onOpen} />
+      <FiltersModal disclosureProps={disclosureProps} />
       {isDrawerVisible ? (
         <Flex mr={2}>
           {" "}

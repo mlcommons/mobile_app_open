@@ -7,11 +7,11 @@ import {
   HStack,
   Icon,
   Text,
-  useAccordionItemState
+  useAccordionItemState,
 } from "@chakra-ui/react";
 
-import {Link, useLocation} from "react-router-dom";
-import React, {useState} from "react";
+import { Link, useLocation } from "react-router-dom";
+import React, { useState } from "react";
 import sidebarLinks from "../../../constants/sidebarLinks";
 import theme from "../../../styles/theme";
 
@@ -20,7 +20,6 @@ import MainContent from "./MainContent";
 import ModuleTypes from "../../../constants/moduleTypes";
 
 const Main = () => {
-
   const { pathname: currPath } = useLocation();
   const currModule = currPath.split("/")[1];
   const getBgColor = (moduleType: string) => {

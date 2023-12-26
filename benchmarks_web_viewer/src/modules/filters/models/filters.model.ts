@@ -7,7 +7,18 @@ export enum Platform {
   Windows = "windows",
 }
 
-export class ResultFilter {
+export interface ResultFilterType {
+  fromCreationDate?: Date | null;
+  toCreationDate?: Date | null;
+  platform?: string | null;
+  deviceModel?: string | null;
+  backend?: string | null;
+  manufacturer?: string | null;
+  soc?: string | null;
+  benchmarkId?: string | null;
+}
+
+export class ResultFilter implements ResultFilterType {
   fromCreationDate?: Date | null;
   toCreationDate?: Date | null;
   platform?: string | null;

@@ -7,7 +7,8 @@ import {
   useToast,
   InputGroup,
   InputRightElement,
-  chakra, Icon,
+  chakra,
+  Icon,
 } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
