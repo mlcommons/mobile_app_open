@@ -6,10 +6,8 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
-import 'package:mlperfbench/ui/home/benchmark_running_screen.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
 import 'package:mlperfbench/ui/home/shared_styles.dart';
@@ -117,32 +115,15 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       icon: const Icon(Icons.restart_alt),
       color: Colors.white,
       onPressed: () async {
-        try {
-          await state.resetBenchmarkState();
-        } catch (e, t) {
-          print(t);
-          // current context may no longer be valid if runBenchmarks requested progress screen
-          await showErrorDialog(
-              BenchmarkRunningScreen.scaffoldKey.currentContext ?? context,
-              ['${l10n.runFail}:', e.toString()]);
-          return;
-        }
+        await state.resetBenchmarkState();
       },
     );
     Widget deleteResultButton = IconButton(
       icon: const Icon(Icons.delete),
       color: Colors.white,
       onPressed: () async {
-        try {
-          print('hello world');
-        } catch (e, t) {
-          print(t);
-          // current context may no longer be valid if runBenchmarks requested progress screen
-          await showErrorDialog(
-              BenchmarkRunningScreen.scaffoldKey.currentContext ?? context,
-              ['${l10n.runFail}:', e.toString()]);
-          return;
-        }
+        await state.resourceManager.resultManager.deleteLastResult();
+        await state.resetBenchmarkState();
       },
     );
     return Container(
