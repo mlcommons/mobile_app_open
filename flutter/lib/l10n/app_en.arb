@@ -86,7 +86,8 @@
   "settingsClearCacheConfirm": "All loaded resources will be deleted and downloaded again. Continue?",
   "settingsUnableSpecifyConfiguration": "Could not specify until benchmarks is running or content is loading",
 
-  "dialogTitleError": "Errors",
+  "dialogTitleWarning": "Warning",
+  "dialogTitleError": "Error",
   "dialogTitleSuccess": "Success",
   "dialogOk": "Ok",
   "dialogCancel": "Cancel",
