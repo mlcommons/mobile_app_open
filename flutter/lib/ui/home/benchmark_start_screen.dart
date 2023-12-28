@@ -13,11 +13,6 @@ import 'package:mlperfbench/ui/home/benchmark_config_screen.dart';
 import 'package:mlperfbench/ui/home/shared_styles.dart';
 import 'package:mlperfbench/ui/icons.dart';
 
-class MainKeys {
-  // list of widget keys that need to be accessed in the test code
-  static const String goButton = 'goButton';
-}
-
 class BenchmarkStartScreen extends StatelessWidget {
   const BenchmarkStartScreen({Key? key}) : super(key: key);
 
@@ -131,7 +126,7 @@ class BenchmarkStartScreen extends StatelessWidget {
         Container(
           alignment: Alignment.center,
           child: ElevatedButton(
-            key: const Key(MainKeys.goButton),
+            key: const Key(WidgetKeys.goButton),
             style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 shape: const CircleBorder(),

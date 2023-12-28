@@ -13,6 +13,12 @@ class DartDefine {
       String.fromEnvironment('FLUTTER_DATA_FOLDER');
 }
 
+class WidgetKeys {
+  // list of widget keys that need to be accessed in the test code
+  static const String goButton = 'goButton';
+  static const String totalScoreCircle = 'totalScoreCircle';
+}
+
 class AppColors {
   static const lightText = Colors.white;
   static const lightRedText = Color.fromARGB(255, 255, 120, 100);

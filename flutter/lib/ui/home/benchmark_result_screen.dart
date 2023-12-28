@@ -24,17 +24,11 @@ class BenchmarkResultScreen extends StatefulWidget {
   State<BenchmarkResultScreen> createState() => _BenchmarkResultScreenState();
 }
 
-class ResultKeys {
-  // list of widget keys that need to be accessed in the test code
-  static const String scrollResultsButton = 'scrollResultsButton';
-}
-
 class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     with SingleTickerProviderStateMixin {
   _ScreenMode _screenMode = _ScreenMode.performance;
 
   late final TabController _tabController;
-  late final ScrollController _scrollController;
 
   late AppLocalizations l10n;
   late BenchmarkState state;
@@ -54,13 +48,11 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         }
       }
     });
-    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -90,7 +82,6 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         builder: (context, constraint) {
           return SingleChildScrollView(
             physics: const ClampingScrollPhysics(),
-            controller: _scrollController,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -185,7 +176,10 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
               Tab(text: l10n.resultsTabTitleAccuracy),
             ],
           ),
-          ResultCircle(state.result),
+          ResultCircle(
+            key: const Key(WidgetKeys.totalScoreCircle),
+            state.result,
+          ),
         ],
       ),
     );
