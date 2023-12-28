@@ -240,7 +240,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       final acceleratorName = perfResult.acceleratorName;
       backendInfo = '$backendName | $delegateName | $acceleratorName';
     }
-    var rows = <Widget>[];
+    var subtitleColumnChildren = <Widget>[];
     final resultTextStyle = TextStyle(
       color: resultIsValid ? AppColors.resultValid : AppColors.resultInvalid,
       fontSize: 18.0,
@@ -255,7 +255,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       ],
     );
     final backendInfoRow = Text(backendInfo);
-    rows.add(backendInfoRow);
+    subtitleColumnChildren.add(backendInfoRow);
 
     if (benchmark.info.isOffline) {
       String batchSize;
@@ -276,21 +276,21 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
           ),
         ],
       );
-      rows.add(batchSizeRow);
+      subtitleColumnChildren.add(batchSizeRow);
     }
 
     final progressBarRow = FractionallySizedBox(
       widthFactor: 0.9,
       child: BlueProgressLine(progressBarValue ?? 0.0),
     );
-    rows.add(progressBarRow);
+    subtitleColumnChildren.add(progressBarRow);
 
     if (progressBarValue2 != null) {
       final progressBarRow2 = FractionallySizedBox(
         widthFactor: 0.9,
         child: BlueProgressLine(progressBarValue2),
       );
-      rows.add(progressBarRow2);
+      subtitleColumnChildren.add(progressBarRow2);
     }
 
     return ListTile(
@@ -309,7 +309,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: rows,
+          children: subtitleColumnChildren,
         ),
       ),
       trailing: SizedBox(
