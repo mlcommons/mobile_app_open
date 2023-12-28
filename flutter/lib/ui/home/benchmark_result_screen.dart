@@ -241,6 +241,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       backendInfo = '$backendName | $delegateName | $acceleratorName';
     }
     var subtitleColumnChildren = <Widget>[];
+    subtitleColumnChildren.add(const SizedBox(height: 4));
     final resultTextStyle = TextStyle(
       color: resultIsValid ? AppColors.resultValid : AppColors.resultInvalid,
       fontSize: 18.0,
@@ -256,6 +257,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     );
     final backendInfoRow = Text(backendInfo);
     subtitleColumnChildren.add(backendInfoRow);
+    subtitleColumnChildren.add(const SizedBox(height: 8));
 
     if (benchmark.info.isOffline) {
       String batchSize;
@@ -277,6 +279,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         ],
       );
       subtitleColumnChildren.add(batchSizeRow);
+      subtitleColumnChildren.add(const SizedBox(height: 8));
     }
 
     final progressBarRow = FractionallySizedBox(
