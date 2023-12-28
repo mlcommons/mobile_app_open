@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ResultFilter } from "../models/filters.model";
+import { ResultFilterType } from "../models/filters.model";
 
 interface FiltersState {
-  resultFilter: ResultFilter | null;
+  resultFilter: ResultFilterType | null;
 }
 
 const initialState: FiltersState = {
@@ -13,7 +13,7 @@ export const filtersSlice = createSlice({
   name: "filtersState",
   initialState,
   reducers: {
-    setFilters: (state, { payload }: PayloadAction<ResultFilter>) => {
+    setFilters: (state, { payload }: PayloadAction<ResultFilterType>) => {
       state.resultFilter = payload;
     },
   },
@@ -21,5 +21,5 @@ export const filtersSlice = createSlice({
 
 export const filtersReducer = filtersSlice.reducer;
 
-export const selectFilters = (state: any): ResultFilter =>
+export const selectFilters = (state: any): ResultFilterType =>
   state.filtersState.resultFilter;

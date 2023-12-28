@@ -1,12 +1,13 @@
-import { Button, Flex, SimpleGrid, Text } from "@chakra-ui/react";
+import { Button, Flex, Text } from "@chakra-ui/react";
 import React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import DatePicker from "react-date-picker";
 import { partialRight } from "ramda";
-import { ResultFilterType } from "../models/filters.model";
-import { css } from "@emotion/react";
+import { ResultFilter, ResultFilterType } from "../models/filters.model";
+import { useFilters } from "../hooks/useFilters";
+import PlatformFilter from "./PlatformFilter";
+import DateFilter from "./DateFilter";
 
 const schema = yup.object().shape({
   fromCreationDate: yup.date().nullable(),
@@ -24,18 +25,19 @@ type Props = {
 };
 
 const FiltersForm = ({ onClose }: Props) => {
+  const { resultFilter, setResultFilter } = useFilters();
   const { handleSubmit, control, formState, register, reset, watch } =
     useForm<ResultFilterType>({
       resolver: yupResolver(schema),
       defaultValues: {
-        fromCreationDate: null,
-        toCreationDate: null,
-        platform: null,
-        deviceModel: null,
-        backend: null,
-        manufacturer: null,
-        soc: null,
-        benchmarkId: null,
+        fromCreationDate: resultFilter.fromCreationDate,
+        toCreationDate: resultFilter.toCreationDate,
+        platform: resultFilter.platform,
+        deviceModel: resultFilter.deviceModel,
+        backend: resultFilter.backend,
+        manufacturer: resultFilter.manufacturer,
+        soc: resultFilter.soc,
+        benchmarkId: resultFilter.benchmarkId,
       },
     });
 
@@ -58,7 +60,7 @@ const FiltersForm = ({ onClose }: Props) => {
   const renderErr = partialRight(renderInputErr, [errors]);
 
   const onFormReset = () => {
-    reset({
+    const formValues = {
       fromCreationDate: null,
       toCreationDate: null,
       platform: null,
@@ -67,40 +69,24 @@ const FiltersForm = ({ onClose }: Props) => {
       manufacturer: null,
       soc: null,
       benchmarkId: null,
-    });
+    };
+    reset(formValues);
+    setResultFilter(new ResultFilter(formValues));
   };
   const onSubmit = (formValues: ResultFilterType) => {
+    setResultFilter(new ResultFilter(formValues));
     onClose();
   };
 
   return (
     <Flex p={10} flexDir="column" w="100%">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <SimpleGrid mt={2} columns={[1, 2]} spacingX={2}>
-          <Flex alignItems={"center"}>
-            <Text>From Creation Date:</Text>
-          </Flex>
-          <Flex css={datePickerWrapperStyles} flexDir="column">
-            <Controller
-              name="fromCreationDate"
-              control={control}
-              render={({ field }) => {
-                const { value, onChange } = field;
-                return (
-                  <DatePicker
-                    calendarAriaLabel="Date"
-                    clearIcon={null}
-                    calendarIcon={null}
-                    value={value}
-                    onChange={(newDate: any) => onChange(newDate)}
-                  />
-                );
-              }}
-            />
-            {renderErr("localStartDate")}
-          </Flex>
-        </SimpleGrid>
-
+        <DateFilter control={control} renderErr={renderErr} />
+        <PlatformFilter
+          control={control}
+          register={register}
+          renderErr={renderErr}
+        />
         <Flex mt={8} justifyContent="flex-end">
           <Button
             onClick={onFormReset}
@@ -120,22 +106,4 @@ const FiltersForm = ({ onClose }: Props) => {
     </Flex>
   );
 };
-
 export default FiltersForm;
-
-const datePickerWrapperStyles = css`
-  .react-date-picker__wrapper {
-    /* border: 0px !important; */
-    /* border-top: 0px; */
-    border: 0px !important;
-    border-bottom: 1px solid #cbd8f1 !important;
-    height: 40px;
-    text-indent: 10px;
-  }
-  .date-filter {
-    background: #e4ecfc;
-    border: 1px solid #cbd8f1;
-    box-sizing: border-box;
-    border-radius: 40px;
-  }
-`;

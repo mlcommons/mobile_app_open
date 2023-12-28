@@ -42,9 +42,6 @@ const LoginPage = () => {
   const toast = useToast();
   const [show, setShow] = useState(false);
 
-  const user = useUser();
-
-  console.log("login user", user);
   const handleClick = () => setShow(!show);
 
   const isExpiredSession = window.location.search.includes("expired=true");

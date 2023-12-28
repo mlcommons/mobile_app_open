@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { ResultFilter } from "../models/filters.model";
+import { ResultFilter, ResultFilterType } from "../models/filters.model";
 import { filtersSlice, selectFilters } from "../store/filters.store";
 
 export const useFilters = () => {
@@ -8,9 +8,9 @@ export const useFilters = () => {
 
   const { setFilters } = actions;
 
-  const resultFilter = useSelector(selectFilters);
+  const resultFilter = new ResultFilter(useSelector(selectFilters));
 
-  const setResultFilter = (resultFilter: ResultFilter) =>
+  const setResultFilter = (resultFilter: ResultFilterType) =>
     dispatch(setFilters(resultFilter));
 
   return {

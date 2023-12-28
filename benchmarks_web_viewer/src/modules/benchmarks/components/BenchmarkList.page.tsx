@@ -19,7 +19,6 @@ const BenchmarkListPage = () => {
   };
 
   const onInternalOpen = (data: BenchmarkResultItem) => {
-    console.log("data", data);
     setBenchmarkId(data.id);
     onOpen();
   };

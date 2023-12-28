@@ -28,6 +28,17 @@ export class ResultFilter implements ResultFilterType {
   soc?: string | null;
   benchmarkId?: string | null;
 
+  constructor(filter: ResultFilterType = {}) {
+    this.fromCreationDate = filter.fromCreationDate || null;
+    this.toCreationDate = filter.toCreationDate || null;
+    this.platform = filter.platform || null;
+    this.deviceModel = filter.deviceModel || null;
+    this.backend = filter.backend || null;
+    this.manufacturer = filter.manufacturer || null;
+    this.soc = filter.soc || null;
+    this.benchmarkId = filter.benchmarkId || null;
+  }
+
   match(result: BenchmarkResult): boolean {
     let resultDeviceModel: string | null = null;
     let resultManufacturer: string | null = null;
