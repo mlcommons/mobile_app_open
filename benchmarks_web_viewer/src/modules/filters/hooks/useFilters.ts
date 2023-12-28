@@ -8,7 +8,7 @@ export const useFilters = () => {
 
   const { setFilters } = actions;
 
-  const resultFilter = new ResultFilter(useSelector(selectFilters));
+  const resultFilter = new ResultFilter(useSelector(selectFilters) || {});
 
   const setResultFilter = (resultFilter: ResultFilterType) =>
     dispatch(setFilters(resultFilter));
