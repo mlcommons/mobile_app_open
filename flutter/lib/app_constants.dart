@@ -17,6 +17,8 @@ class AppColors {
   static const lightText = Colors.white;
   static const lightRedText = Color.fromARGB(255, 255, 120, 100);
   static const darkText = Colors.black;
+  static const resultValid = Colors.indigo;
+  static const resultInvalid = Colors.red;
   static const darkRedText = Colors.red;
   static const lightBlue = Color(0XFF2C92CB);
   static const darkBlue = Color(0xFF0B3A61);

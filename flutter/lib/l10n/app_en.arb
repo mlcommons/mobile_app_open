@@ -36,9 +36,7 @@
   "resultsTitleAccuracy": "Results",
   "resultsTabTitlePerformance": "Performance",
   "resultsTabTitleAccuracy": "Accuracy",
-  "resultsTitleDetails": "Detailed Results",
-  "resultsButtonTestAgain": "Test Again",
-  "resultsButtonShare": "Share This Result",
+  "resultsDeleteConfirm": "Delete this results?",
   "resultsNotAvailable": "N/A",
   "resultsBatchSize": "Batches: <batchSize>",
 

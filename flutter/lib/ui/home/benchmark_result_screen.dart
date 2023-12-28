@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
@@ -76,7 +78,13 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         : '${l10n.resultsTitleUnverified} $title';
 
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(title),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: _sharingSection(),
+        ),
+      ),
       drawer: const AppDrawer(),
       body: LayoutBuilder(
         builder: (context, constraint) {
@@ -86,10 +94,9 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                (_sharingSection()),
-                (_summarySection()),
+                _totalScoreSection(),
                 const SizedBox(height: 20),
-                (_detailSection()),
+                _detailSection(),
               ],
             ),
           );
@@ -100,17 +107,24 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
 
   Widget _sharingSection() {
     final lastResult = state.lastResult;
-    Widget infoSection = Container();
+    Text deviceInfoText;
+    Text benchmarkDateText;
     if (lastResult != null) {
-      infoSection = Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(lastResult.environmentInfo.modelDescription),
-          Text(formatDateTime(lastResult.meta.creationDate)),
-        ],
-      );
+      deviceInfoText = Text(lastResult.environmentInfo.modelDescription);
+      benchmarkDateText = Text(formatDateTime(lastResult.meta.creationDate));
+    } else {
+      deviceInfoText = Text(DeviceInfo.instance.envInfo.modelDescription);
+      benchmarkDateText = const Text('');
     }
+    final infoSection = Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        deviceInfoText,
+        const SizedBox(height: 4),
+        benchmarkDateText,
+      ],
+    );
     Widget testAgainButton = IconButton(
       icon: const Icon(Icons.restart_alt),
       color: Colors.white,
@@ -122,12 +136,21 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       icon: const Icon(Icons.delete),
       color: Colors.white,
       onPressed: () async {
-        await state.resourceManager.resultManager.deleteLastResult();
-        await state.resetBenchmarkState();
+        if (!context.mounted) return;
+        switch (await showConfirmDialog(context, l10n.resultsDeleteConfirm)) {
+          case ConfirmDialogAction.ok:
+            await state.resourceManager.resultManager.deleteLastResult();
+            await state.resetBenchmarkState();
+            break;
+          case ConfirmDialogAction.cancel:
+            return;
+          default:
+            break;
+        }
       },
     );
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 0, 10, 0),
+      padding: const EdgeInsets.fromLTRB(20, 10, 10, 10),
       color: AppColors.mediumBlue,
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Colors.white),
@@ -146,7 +169,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     );
   }
 
-  Widget _summarySection() {
+  Widget _totalScoreSection() {
     return Container(
       decoration: mainLinearGradientDecoration,
       child: Column(
@@ -169,17 +192,31 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
   }
 
   Widget _detailSection() {
-    final list = <Widget>[];
-    final pictureEdgeSize = 0.08 * MediaQuery.of(context).size.width;
-
+    final children = <Widget>[];
     for (final benchmark in state.benchmarks) {
-      late final String? resultText;
-      late final double? progressBarValue;
-      late final String? resultText2;
-      late final double? progressBarValue2;
-      late final BenchmarkResult? benchmarkResult;
-      late final bool resultIsValid;
-      if (_screenMode == _ScreenMode.performance) {
+      final row = _benchmarkResultRow(benchmark);
+      children.add(row);
+      children.add(const Divider());
+    }
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: children,
+    );
+  }
+
+  Widget _benchmarkResultRow(Benchmark benchmark) {
+    final leadingWidth = 0.12 * MediaQuery.of(context).size.width;
+    final subtitleWidth = 0.70 * MediaQuery.of(context).size.width;
+    final trailingWidth = 0.28 * MediaQuery.of(context).size.width;
+    late final String? resultText;
+    late final double? progressBarValue;
+    late final String? resultText2;
+    late final double? progressBarValue2;
+    late final BenchmarkResult? benchmarkResult;
+    late final bool resultIsValid;
+    switch (_screenMode) {
+      case _ScreenMode.performance:
         benchmarkResult = benchmark.performanceModeResult;
         final throughput = benchmarkResult?.throughput;
         resultText = throughput?.toUIString();
@@ -188,7 +225,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         resultText2 = null;
         progressBarValue2 = null;
         resultIsValid = benchmarkResult?.validity ?? false;
-      } else if (_screenMode == _ScreenMode.accuracy) {
+        break;
+      case _ScreenMode.accuracy:
         benchmarkResult = benchmark.accuracyModeResult;
         resultText = benchmarkResult?.accuracy?.formatted;
         progressBarValue = benchmarkResult?.accuracy?.normalized;
@@ -198,109 +236,100 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
             (benchmarkResult?.accuracy?.normalized ?? -1.0) >= 0.0 &&
                 (benchmarkResult?.accuracy?.normalized ?? -1.0) <= 1.0 &&
                 (benchmarkResult?.accuracy2?.normalized ?? -1.0) <= 1.0;
+        break;
+    }
+    final perfResult = benchmark.performanceModeResult;
+    var backendInfo = l10n.na;
+    if (perfResult != null) {
+      final backendName = perfResult.backendName;
+      final delegateName = perfResult.delegateName;
+      final acceleratorName = perfResult.acceleratorName;
+      backendInfo = '$backendName | $delegateName | $acceleratorName';
+    }
+    var rows = <Widget>[];
+    final resultTextStyle = TextStyle(
+      color: resultIsValid ? AppColors.resultValid : AppColors.resultInvalid,
+      fontSize: 18.0,
+      fontWeight: FontWeight.bold,
+    );
+    final benchmarkScore = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(resultText ?? l10n.na, style: resultTextStyle),
+        if (resultText2 != null) Text(resultText2, style: resultTextStyle),
+      ],
+    );
+    final backendInfoRow = Text(backendInfo);
+    rows.add(backendInfoRow);
+
+    if (benchmark.info.isOffline) {
+      String batchSize;
+      if (resultText == null) {
+        batchSize = l10n.na;
       } else {
-        continue;
+        batchSize = benchmarkResult?.batchSize.toString() ?? '';
       }
-      final perfResult = benchmark.performanceModeResult;
-      var backendInfo = l10n.na;
-      if (perfResult != null) {
-        final backendName = perfResult.backendName;
-        final delegateName = perfResult.delegateName;
-        final acceleratorName = perfResult.acceleratorName;
-        backendInfo = '$backendName | $delegateName | $acceleratorName';
-      }
-      var rowChildren = <Widget>[];
-      rowChildren.add(Row(
+      final batchSizeRow = Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Text(backendInfo)),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    resultText ?? l10n.na,
-                    style: TextStyle(
-                      color: resultIsValid
-                          ? AppColors.darkText
-                          : AppColors.darkRedText,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (resultText2 != null)
-                    Text(
-                      resultText2,
-                      style: TextStyle(
-                        color: resultIsValid
-                            ? AppColors.darkText
-                            : AppColors.darkRedText,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                ],
-              ),
-            ],
+          Text(
+            l10n.resultsBatchSize.replaceAll('<batchSize>', batchSize),
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 14.0,
+            ),
           ),
         ],
-      ));
-      if (benchmark.info.isOffline) {
-        String batchSize;
-        if (resultText == null) {
-          batchSize = l10n.na;
-        } else {
-          batchSize = benchmarkResult?.batchSize.toString() ?? '';
-        }
+      );
+      rows.add(batchSizeRow);
+    }
 
-        rowChildren.add(Row(
+    final progressBarRow = FractionallySizedBox(
+      widthFactor: 0.9,
+      child: BlueProgressLine(progressBarValue ?? 0.0),
+    );
+    rows.add(progressBarRow);
+
+    if (progressBarValue2 != null) {
+      final progressBarRow2 = FractionallySizedBox(
+        widthFactor: 0.9,
+        child: BlueProgressLine(progressBarValue2),
+      );
+      rows.add(progressBarRow2);
+    }
+
+    return ListTile(
+      contentPadding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+      minVerticalPadding: 0,
+      leading: SizedBox(
+          width: leadingWidth,
+          height: leadingWidth,
+          child: benchmark.info.icon),
+      title: SizedBox(
+        width: subtitleWidth,
+        child: Text(benchmark.taskConfig.name),
+      ),
+      subtitle: SizedBox(
+        width: subtitleWidth,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
+          children: rows,
+        ),
+      ),
+      trailing: SizedBox(
+        width: trailingWidth,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              l10n.resultsBatchSize.replaceAll('<batchSize>', batchSize),
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 14.0,
-              ),
-            ),
-          ],
-        ));
-      }
-      rowChildren.add(FractionallySizedBox(
-          widthFactor: 0.9, child: BlueProgressLine(progressBarValue ?? 0.0)));
-      if (progressBarValue2 != null) {
-        rowChildren.add(FractionallySizedBox(
-            widthFactor: 0.9, child: BlueProgressLine(progressBarValue2)));
-      }
-      list.add(
-        Column(
-          children: [
-            ListTile(
-              minVerticalPadding: 0,
-              leading: SizedBox(
-                  width: pictureEdgeSize,
-                  height: pictureEdgeSize,
-                  child: benchmark.info.icon),
-              title: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child: Text(benchmark.taskConfig.name),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: rowChildren,
-              ),
-              trailing: BenchmarkInfoButton(benchmark: benchmark),
-            ),
-            const Divider()
+            ClipRect(child: benchmarkScore),
+            BenchmarkInfoButton(benchmark: benchmark),
           ],
         ),
-      );
-    }
-    return Column(children: list);
+      ),
+    );
   }
 }
 
