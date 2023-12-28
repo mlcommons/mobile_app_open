@@ -19,7 +19,6 @@ class BenchmarkConfigScreen extends StatefulWidget {
 class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
   late BenchmarkState state;
   late AppLocalizations l10n;
-  late double pictureEdgeSize;
 
   @override
   void dispose() {
@@ -31,7 +30,6 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context);
-    pictureEdgeSize = 0.1 * MediaQuery.of(context).size.width;
     final childrenList = <Widget>[];
 
     for (var benchmark in state.benchmarks) {
@@ -74,27 +72,36 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
   }
 
   Widget _listTile(Benchmark benchmark) {
+    final leadingWidth = 0.12 * MediaQuery.of(context).size.width;
+    final subtitleWidth = 0.70 * MediaQuery.of(context).size.width;
+    final trailingWidth = 0.28 * MediaQuery.of(context).size.width;
     return ListTile(
       leading: SizedBox(
-          width: pictureEdgeSize,
-          height: pictureEdgeSize,
+          width: leadingWidth,
+          height: leadingWidth,
           child: benchmark.info.icon),
       title: _name(benchmark),
-      subtitle: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _description(benchmark),
-          _delegateChoice(benchmark),
-        ],
+      subtitle: SizedBox(
+        width: subtitleWidth,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _backendDescription(benchmark),
+            _delegateChoice(benchmark),
+          ],
+        ),
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          _activeToggle(benchmark),
-          _infoButton(benchmark),
-        ],
+      trailing: SizedBox(
+        width: trailingWidth,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _activeToggle(benchmark),
+            _infoButton(benchmark),
+          ],
+        ),
       ),
     );
   }
@@ -103,7 +110,7 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
     return Text(benchmark.info.taskName);
   }
 
-  Widget _description(Benchmark benchmark) {
+  Widget _backendDescription(Benchmark benchmark) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Text(benchmark.backendRequestDescription),
@@ -154,6 +161,7 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
             }));
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const Text('Delegate:'),
         const SizedBox(width: 4),
