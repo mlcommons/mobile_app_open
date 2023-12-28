@@ -33,6 +33,7 @@ export const useBenchmarks = (userId: string | undefined) => {
         )
         .filter((results) => results.length > 0)
         .flat()
+        .filter((result: Result) => resultFilter.matchBenchmark(result))
         .map((result) => {
           return { ...result, id: `${composeId(result)}` };
         }),

@@ -1,4 +1,7 @@
-import { BenchmarkResult } from "../../benchmarks/models/benchmarks.model";
+import {
+  BenchmarkResult,
+  Result,
+} from "../../benchmarks/models/benchmarks.model";
 import { StringValue } from "../../../constants/constants";
 
 export enum Platform {
@@ -105,5 +108,11 @@ export class ResultFilter implements ResultFilterType {
       manufacturerMatched &&
       socMatched
     );
+  }
+
+  matchBenchmark(result: Result): boolean {
+    return this.benchmarkId == null
+      ? true
+      : result.benchmark_id === this.benchmarkId;
   }
 }

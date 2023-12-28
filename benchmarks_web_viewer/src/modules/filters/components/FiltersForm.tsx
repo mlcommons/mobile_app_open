@@ -8,6 +8,7 @@ import { ResultFilter, ResultFilterType } from "../models/filters.model";
 import { useFilters } from "../hooks/useFilters";
 import PlatformFilter from "./PlatformFilter";
 import DateFilter from "./DateFilter";
+import BenchmarkIdFilter from "./BenchmarkIdFilter";
 
 const schema = yup.object().shape({
   fromCreationDate: yup.date().nullable(),
@@ -74,6 +75,7 @@ const FiltersForm = ({ onClose }: Props) => {
     setResultFilter(new ResultFilter(formValues));
   };
   const onSubmit = (formValues: ResultFilterType) => {
+    console.log(formValues);
     setResultFilter(new ResultFilter(formValues));
     onClose();
   };
@@ -83,6 +85,11 @@ const FiltersForm = ({ onClose }: Props) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <DateFilter control={control} renderErr={renderErr} />
         <PlatformFilter
+          control={control}
+          register={register}
+          renderErr={renderErr}
+        />
+        <BenchmarkIdFilter
           control={control}
           register={register}
           renderErr={renderErr}
