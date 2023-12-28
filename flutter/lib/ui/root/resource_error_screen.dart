@@ -9,14 +9,14 @@ import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/icons.dart' show AppIcons;
 import 'package:mlperfbench/ui/page_constraints.dart';
-import 'package:mlperfbench/ui/settings/task_config_screen.dart';
+import 'package:mlperfbench/ui/settings/task_config_section.dart';
 
 class ResourceErrorScreen extends StatelessWidget {
   const ResourceErrorScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
     final store = context.watch<Store>();
 
@@ -54,7 +54,7 @@ class ResourceErrorScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        stringResources.resourceErrorMessage,
+                        l10n.resourceErrorMessage,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 15,
@@ -62,7 +62,7 @@ class ResourceErrorScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${stringResources.resourceErrorCurrentConfig} ${state.configManager.configLocation}',
+                        '${l10n.resourceErrorCurrentConfig} ${state.configManager.configLocation}',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 15,
@@ -73,7 +73,7 @@ class ResourceErrorScreen extends StatelessWidget {
                         onPressed: () {
                           state.clearCache();
                         },
-                        child: Text(stringResources.settingsClearCache),
+                        child: Text(l10n.settingsClearCache),
                       ),
                       TextButton(
                         onPressed: () async {
@@ -82,12 +82,14 @@ class ResourceErrorScreen extends StatelessWidget {
                           // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
                           // ignore: use_build_context_synchronously
                           if (!context.mounted) return;
-                          await Navigator.of(context).push(MaterialPageRoute(
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
                               builder: (context) =>
-                                  TaskConfigScreen(taskConfigs)));
+                                  TaskConfigErrorScreen(configs: taskConfigs),
+                            ),
+                          );
                         },
-                        child:
-                            Text(stringResources.resourceErrorSwitchToDefault),
+                        child: Text(l10n.resourceErrorSelectTaskFile),
                       ),
                       TextButton(
                         onPressed: () async {
@@ -98,12 +100,11 @@ class ResourceErrorScreen extends StatelessWidget {
                           } catch (e, trace) {
                             print("can't change task config: $e");
                             print(trace);
-                            await showErrorDialog(context, [
-                              '${stringResources.resourceErrorFail}: ${e.toString()}'
-                            ]);
+                            await showErrorDialog(context,
+                                ['${l10n.resourceErrorFail}: ${e.toString()}']);
                           }
                         },
-                        child: Text(stringResources.resourceErrorRereadConfig),
+                        child: Text(l10n.resourceErrorRereadConfig),
                       ),
                     ],
                   ),

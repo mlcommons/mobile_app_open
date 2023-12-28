@@ -1,3 +1,4 @@
+import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 
 class BenchmarkRunMode {
@@ -71,6 +72,17 @@ extension BenchmarkRunModeEnumExtension on BenchmarkRunModeEnum {
         return true;
       case BenchmarkRunModeEnum.submissionRun:
         return true;
+    }
+  }
+
+  String localizedName(AppLocalizations l10n) {
+    switch (this) {
+      case BenchmarkRunModeEnum.performanceOnly:
+        return l10n.benchModePerformanceOnly;
+      case BenchmarkRunModeEnum.accuracyOnly:
+        return l10n.benchModeAccuracyOnly;
+      case BenchmarkRunModeEnum.submissionRun:
+        return l10n.benchModeSubmissionRun;
     }
   }
 }

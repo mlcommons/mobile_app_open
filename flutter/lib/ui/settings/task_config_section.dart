@@ -158,29 +158,74 @@ class _DataFolderSelectorHelper {
   }
 }
 
-class TaskConfigScreen extends StatelessWidget {
+class TaskConfigSection extends StatelessWidget {
   final List<TaskConfigDescription> _configs;
 
-  const TaskConfigScreen(this._configs, {Key? key}) : super(key: key);
+  const TaskConfigSection(this._configs, {Key? key}) : super(key: key);
 
-  Card getOptionPattern(
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final store = context.watch<Store>();
+    final state = context.watch<BenchmarkState>();
+    List<Widget> items = [];
+    items.add(ListTile(
+      leading: Text(
+        l10n.settingsTaskConfigTitle,
+        style: Theme.of(context).textTheme.headlineSmall,
+      ),
+    ));
+    items.addAll(
+      _configs.map(
+        (c) => _getConfigChoice(context, c, store.chosenConfigurationName),
+      ),
+    );
+    // On ios you need to properly request access to a folder outside of the app folder
+    // but file_picker plugin doesn't do it.
+    // see the following link for details:
+    // https://github.com/mlcommons/mobile_app_open/pull/562#discussion_r992167655
+    if (!Platform.isIOS) {
+      items.addAll([
+        _makeCacheFolderNotice(l10n),
+        _DataFolderSelectorHelper(context).build(),
+        const Divider(),
+        ListTile(
+            title: Text(l10n.settingsTaskDataFolderSelected),
+            subtitle: Text(state.resourceManager.getDataFolder())),
+      ]);
+    }
+
+    // On Android we need MANAGE_EXTERNAL_STORAGE permission
+    // see https://github.com/mlcommons/mobile_app_open/issues/702
+    if (Platform.isAndroid) {
+      items.add(const ManageFilePermissionWidget());
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: items,
+    );
+  }
+
+  Widget _getConfigChoice(
     BuildContext context,
     TaskConfigDescription configuration,
     String chosenConfigName,
   ) {
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
     final state = context.watch<BenchmarkState>();
-    final wasChosen = chosenConfigName == configuration.name;
+    final isSelected = chosenConfigName == configuration.name;
 
-    return Card(
+    return AbsorbPointer(
+      absorbing: _configs.length <= 1,
       child: ListTile(
-        selected: wasChosen,
+        selected: isSelected,
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Text(configuration.name),
         ),
         subtitle: Text(configuration.path),
-        trailing: Text(configuration.getType(stringResources)),
+        trailing: Text(configuration.getType(l10n)),
         onTap: () async {
           try {
             await state.setTaskConfig(name: configuration.name);
@@ -190,10 +235,10 @@ class TaskConfigScreen extends StatelessWidget {
             Navigator.of(context).popUntil((route) => route.isFirst);
             await state.loadResources();
           } catch (e) {
-            await showErrorDialog(context, <String>[
-              stringResources.settingsTaskConfigError,
-              e.toString()
-            ]);
+            await showErrorDialog(
+              context,
+              <String>[l10n.settingsTaskConfigError, e.toString()],
+            );
           }
         },
       ),
@@ -226,52 +271,6 @@ class TaskConfigScreen extends StatelessWidget {
           ),
         )
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final store = context.watch<Store>();
-    final state = context.watch<BenchmarkState>();
-    List<Widget> items = [];
-    items.addAll(_configs.map((c) => getOptionPattern(
-          context,
-          c,
-          store.chosenConfigurationName,
-        )));
-    // On ios you need to properly request access to a folder outside of the app folder
-    // but file_picker plugin doesn't do it.
-    // see the following link for details:
-    // https://github.com/mlcommons/mobile_app_open/pull/562#discussion_r992167655
-    if (!Platform.isIOS) {
-      items.addAll([
-        _makeCacheFolderNotice(l10n),
-        _DataFolderSelectorHelper(context).build(),
-        const Divider(),
-        ListTile(
-            title: Text(l10n.settingsTaskDataFolderSelected),
-            subtitle: Text(state.resourceManager.getDataFolder())),
-        const Divider(),
-      ]);
-    }
-
-    // On Android we need MANAGE_EXTERNAL_STORAGE permission
-    // see https://github.com/mlcommons/mobile_app_open/issues/702
-    if (Platform.isAndroid) {
-      items.addAll([
-        const ManageFilePermissionWidget(),
-        const Divider(),
-      ]);
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsTaskConfigTitle),
-      ),
-      body: ListView(
-        children: items,
-      ),
     );
   }
 }
@@ -313,6 +312,23 @@ class _ManageFilePermissionWidgetState
           },
         );
       },
+    );
+  }
+}
+
+class TaskConfigErrorScreen extends StatelessWidget {
+  final List<TaskConfigDescription> configs;
+
+  const TaskConfigErrorScreen({required this.configs, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.resourceErrorSelectTaskFile),
+      ),
+      body: TaskConfigSection(configs),
     );
   }
 }
