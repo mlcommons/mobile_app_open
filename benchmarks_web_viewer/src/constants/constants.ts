@@ -25,3 +25,21 @@ export class BenchmarkId {
     BenchmarkId.superResolution,
   ];
 }
+
+export class BackendId {
+  static readonly tflite = "libtflitebackend";
+  static readonly pixel = "libtflitepixelbackend";
+  static readonly mediatek = "libtfliteneuronbackend";
+  static readonly samsung = "libsamsungbackend";
+  static readonly qti = "libqtibackend";
+  static readonly apple = "libcoremlbackend";
+
+  static readonly allIds = [
+    BackendId.tflite,
+    BackendId.pixel,
+    BackendId.mediatek,
+    BackendId.samsung,
+    BackendId.qti,
+    BackendId.apple,
+  ];
+}

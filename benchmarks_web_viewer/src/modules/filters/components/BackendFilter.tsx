@@ -2,7 +2,7 @@ import React from "react";
 import { Select, Flex, Text, SimpleGrid } from "@chakra-ui/react";
 import { Controller, Control, UseFormRegister } from "react-hook-form";
 import { ResultFilterType } from "../models/filters.model";
-import { BenchmarkId } from "../../../constants/constants";
+import { BackendId } from "../../../constants/constants";
 
 type Props = {
   control: Control<ResultFilterType, any>;
@@ -10,35 +10,36 @@ type Props = {
   renderErr: any;
 };
 
-const BenchmarkIdFilter = ({ control, register }: Props) => {
+const BackendFilter = ({ control, register, renderErr }: Props) => {
   return (
     <SimpleGrid mt={2} columns={[1, 2]} spacingX={2}>
       <Flex alignItems={"center"}>
-        <Text>Benchmark:</Text>
+        <Text>Backend:</Text>
       </Flex>
       <Flex flexDir="column">
         <Controller
-          name="benchmarkId"
+          name="backend"
           control={control}
           render={({ field }) => {
             return (
               <Select
                 variant="flushed"
                 placeholder="Select an option"
-                {...register("benchmarkId")}
+                {...register("backend")}
               >
-                {Object.values(BenchmarkId.allIds).map((benchmarkId) => (
-                  <option key={benchmarkId} value={benchmarkId}>
-                    {benchmarkId}
+                {Object.values(BackendId.allIds).map((backendId) => (
+                  <option key={backendId} value={backendId}>
+                    {backendId}
                   </option>
                 ))}
               </Select>
             );
           }}
         />
+        {renderErr("localStartDate")}
       </Flex>
     </SimpleGrid>
   );
 };
 
-export default BenchmarkIdFilter;
+export default BackendFilter;

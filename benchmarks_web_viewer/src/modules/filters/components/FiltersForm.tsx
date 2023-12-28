@@ -9,6 +9,7 @@ import { useFilters } from "../hooks/useFilters";
 import PlatformFilter from "./PlatformFilter";
 import DateFilter from "./DateFilter";
 import BenchmarkIdFilter from "./BenchmarkIdFilter";
+import BackendFilter from "./BackendFilter";
 
 const schema = yup.object().shape({
   fromCreationDate: yup.date().nullable(),
@@ -90,6 +91,11 @@ const FiltersForm = ({ onClose }: Props) => {
           renderErr={renderErr}
         />
         <BenchmarkIdFilter
+          control={control}
+          register={register}
+          renderErr={renderErr}
+        />
+        <BackendFilter
           control={control}
           register={register}
           renderErr={renderErr}
