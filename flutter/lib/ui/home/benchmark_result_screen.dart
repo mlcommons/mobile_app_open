@@ -73,7 +73,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       appBar: AppBar(
         title: Text(title),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60.0),
+          preferredSize: const Size.fromHeight(56.0),
           child: _sharingSection(),
         ),
       ),
@@ -141,7 +141,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       },
     );
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 10, 10, 10),
+      padding: const EdgeInsets.fromLTRB(20, 8, 10, 8),
       color: AppColors.mediumBlue,
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Colors.white),
@@ -294,7 +294,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     }
 
     return ListTile(
-      contentPadding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+      contentPadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
       minVerticalPadding: 0,
       leading: SizedBox(
           width: leadingWidth,
@@ -315,11 +315,19 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       trailing: SizedBox(
         width: trailingWidth,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ClipRect(child: benchmarkScore),
-            BenchmarkInfoButton(benchmark: benchmark),
+            Flexible(
+              flex: 7,
+              fit: FlexFit.tight,
+              child: benchmarkScore,
+            ),
+            Flexible(
+              flex: 3,
+              fit: FlexFit.tight,
+              child: BenchmarkInfoButton(benchmark: benchmark),
+            ),
           ],
         ),
       ),
