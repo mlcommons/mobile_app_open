@@ -10,10 +10,13 @@ export const useFilters = () => {
 
   const resultFilter = new ResultFilter(useSelector(selectFilters) || {});
 
+  const isFilterActive = Object.values(resultFilter).some(value => value !== null);
+
   const setResultFilter = (resultFilter: ResultFilterType) =>
     dispatch(setFilters(resultFilter));
 
   return {
+    isFilterActive,
     resultFilter,
     setResultFilter,
   };

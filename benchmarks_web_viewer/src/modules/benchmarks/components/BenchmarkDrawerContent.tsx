@@ -20,17 +20,17 @@ const BenchmarkDrawerContent = ({ onClose, benchmarkId, isOpen }: Props) => {
     const mainInfo = makeMainInfo(benchmark);
     const performanceRun = benchmark.performance_run
       ? makePerformanceInfo(benchmark.performance_run)
-      : [makeSubHeader("resultsNotAvailable")];
+      : [makeSubHeader("N/A")];
     const accuracyRun = benchmark.accuracy_run
       ? makeAccuracyInfo(benchmark.accuracy_run)
-      : [makeSubHeader("resultsNotAvailable")];
+      : [makeSubHeader("N/A")];
     return [
       ...mainInfo,
       <Divider key="divider1" padding={2} />,
-      makeHeader("Perf", "historyRunDetailsPerfTitle"),
+      makeHeader("Perf", "Performance run"),
       ...performanceRun,
       <Divider key="divider2" padding={2} />,
-      makeHeader("Accuracy", "historyRunDetailsAccuracyTitle"),
+      makeHeader("Accuracy", "Accuracy run"),
       ...accuracyRun,
     ];
   };
@@ -50,10 +50,10 @@ const BenchmarkDrawerContent = ({ onClose, benchmarkId, isOpen }: Props) => {
 
   const makePerformanceInfo = (perf: BenchmarkRun) => {
     return [
-      makeInfo("QPS", perf.throughput?.value ?? "resultsNotAvailable"),
-      makeInfo("Valid", perf.loadgen_info?.validity.toString() ?? "false"),
+      makeInfo("QPS", perf.throughput?.value ?? "N/A"),
+      makeInfo("Run is valid", perf.loadgen_info?.validity.toString() ?? "false"),
       makeInfo("Duration", formatDuration(perf.measured_duration)),
-      makeInfo("Samples", perf.measured_samples.toString()),
+      makeInfo("Samples count", perf.measured_samples.toString()),
       makeInfo("Dataset Type", perf.dataset.type),
       makeInfo("Dataset Name", perf.dataset.name),
     ];
@@ -63,7 +63,7 @@ const BenchmarkDrawerContent = ({ onClose, benchmarkId, isOpen }: Props) => {
     return [
       makeInfo(
         "Accuracy",
-        accuracy.accuracy?.formatted ?? "resultsNotAvailable",
+        accuracy.accuracy?.formatted ?? "N/A",
       ),
       makeInfo("Duration", formatDuration(accuracy.measured_duration)),
       makeInfo("Samples", accuracy.measured_samples.toString()),
@@ -85,9 +85,9 @@ const BenchmarkDrawerContent = ({ onClose, benchmarkId, isOpen }: Props) => {
   );
 
   const makeSubHeader = (translationKey: string) => (
-    <Heading key="subheader" fontStyle="italic" mb={4}>
+    <ListItem key="subheader" fontStyle="italic" mb={4}>
       {translationKey}
-    </Heading>
+    </ListItem>
   );
 
   const formatDuration = (seconds: number) => {
