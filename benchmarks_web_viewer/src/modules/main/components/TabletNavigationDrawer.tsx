@@ -36,7 +36,6 @@ const TabletNavigationDrawer = () => {
       <IconButton
         bg="#fff"
         onClick={onOpen}
-        // colorScheme="blue"
         aria-label="menu"
         icon={<Icon color="#1033A5" as={GiHamburgerMenu} fontSize="24px" />}
       />
@@ -57,7 +56,6 @@ const TabletNavigationDrawer = () => {
             >
               Close
             </Button>
-            {/* <Button colorScheme="blue">Save</Button> */}
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

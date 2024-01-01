@@ -18,7 +18,6 @@ const signIn = async (formData: FormValTypes) => {
 export const useLoginMutation = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  // const { setUser } = useUser();
 
   return useMutation({
     mutationFn: signIn,
