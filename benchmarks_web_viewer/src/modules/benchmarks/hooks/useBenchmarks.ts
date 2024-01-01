@@ -22,21 +22,24 @@ export const useBenchmarks = (userId: string | undefined) => {
     queryFn: ({ queryKey }) =>
       benchmarksDataService.downloadResults(userId, benchmarkResults),
     queryKey: [QUERY_KEY.BENCHMARKS, userId],
-    select: (data) =>
-      data
-        .map((benchmarkResult) =>
-          resultFilter
-            ? resultFilter.match(benchmarkResult)
-              ? benchmarkResult.results
-              : []
-            : benchmarkResult.results,
-        )
+    select: (data) => {
+      return data
+        .map((benchmarkResult) => {
+          // Check if the filter matches, or if no filter is set
+          if (resultFilter ? resultFilter.match(benchmarkResult) : true) {
+            // Expand each result with the platform and id property
+            return benchmarkResult.results.map((result) => ({
+              ...result,
+              platform: benchmarkResult.environment_info.platform,
+              id: `${composeId(result)}`
+            }));
+          }
+          return [];
+        })
         .filter((results) => results.length > 0)
         .flat()
-        .filter((result: Result) => resultFilter.matchBenchmark(result))
-        .map((result) => {
-          return { ...result, id: `${composeId(result)}` };
-        }),
+        .filter((result) => resultFilter.matchBenchmark(result));
+    },
     placeholderData: keepPreviousData,
   });
 

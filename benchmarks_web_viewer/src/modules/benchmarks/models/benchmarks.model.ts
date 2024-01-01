@@ -7,6 +7,7 @@ export type BenchmarkResultItem = {
   acceleratorName?: string;
   date?: string;
   score?: string;
+  platform?: string;
 };
 
 export type BenchmarkResult = {
@@ -33,6 +34,7 @@ export type Result = {
   accuracy_run: BenchmarkRun;
   min_duration: number;
   min_samples: number;
+  platform: string;
 };
 
 export type BackendSettings = {

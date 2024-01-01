@@ -37,6 +37,7 @@ export const data = (items: Result[]): BenchmarkResultItem[] => {
       acceleratorName: item.backend_info.accelerator_name,
       date: itemDateTime(item),
       score: itemScore(item),
+      platform: item.platform
     };
   });
 };
@@ -44,6 +45,10 @@ export const data = (items: Result[]): BenchmarkResultItem[] => {
 export const columns = () => {
   const columnHelper = createColumnHelper<BenchmarkResultItem>();
   return [
+    columnHelper.accessor("platform", {
+      cell: (info) => info.getValue(),
+      header: "Platform",
+    }),
     columnHelper.accessor("benchmarkName", {
       cell: (info) => info.getValue(),
       header: "Benchmark Name",
