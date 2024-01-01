@@ -36,7 +36,6 @@ const BackendFilter = ({ control, register, renderErr }: Props) => {
             );
           }}
         />
-        {renderErr("localStartDate")}
       </Flex>
     </SimpleGrid>
   );

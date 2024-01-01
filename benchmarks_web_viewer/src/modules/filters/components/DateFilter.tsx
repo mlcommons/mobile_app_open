@@ -4,7 +4,6 @@ import { Flex, SimpleGrid, Text } from "@chakra-ui/react";
 import DatePicker from "react-date-picker";
 import React from "react";
 import { css } from "@emotion/react";
-import PlatformFilter from "./PlatformFilter";
 
 type Props = {
   control: Control<ResultFilterType, any>;

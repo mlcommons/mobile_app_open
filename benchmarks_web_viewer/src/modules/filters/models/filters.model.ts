@@ -89,15 +89,17 @@ export class ResultFilter implements ResultFilterType {
 
     const platformMatched =
       this.platform === null || this.platform === resultPlatform;
-    const deviceModelMatched = resultDeviceModel.includes(
-      (this.deviceModel || "").toLowerCase(),
-    );
+    const deviceModelMatched = resultDeviceModel
+      .toLowerCase()
+      .includes((this.deviceModel || "").toLowerCase());
     const backendMatched =
       this.backend === null || this.backend === resultBackend;
-    const manufacturerMatched = resultManufacturer.includes(
-      (this.manufacturer || "").toLowerCase(),
-    );
-    const socMatched = resultSoc.includes((this.soc || "").toLowerCase());
+    const manufacturerMatched = resultManufacturer
+      .toLowerCase()
+      .includes((this.manufacturer || "").toLowerCase());
+    const socMatched = resultSoc
+      .toLowerCase()
+      .includes((this.soc || "").toLowerCase());
 
     return (
       fromCreationDateMatched &&

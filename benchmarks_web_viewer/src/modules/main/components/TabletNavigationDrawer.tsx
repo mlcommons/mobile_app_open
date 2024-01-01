@@ -7,12 +7,7 @@ import {
   DrawerContent,
 } from "@chakra-ui/react";
 
-import {
-  useDisclosure,
-  Button,
-  Icon,
-  IconButton,
-} from "@chakra-ui/react";
+import { useDisclosure, Button, Icon, IconButton } from "@chakra-ui/react";
 
 import { GiHamburgerMenu } from "react-icons/gi";
 import MenuContent from "./MenuContent";

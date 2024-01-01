@@ -10,6 +10,9 @@ import PlatformFilter from "./PlatformFilter";
 import DateFilter from "./DateFilter";
 import BenchmarkIdFilter from "./BenchmarkIdFilter";
 import BackendFilter from "./BackendFilter";
+import DeviceModelFilter from "./DeviceModelFilter";
+import ManufacturerFilter from "./ManufacturerFilter";
+import SoCFilter from "./SoCFilter";
 
 const schema = yup.object().shape({
   fromCreationDate: yup.date().nullable(),
@@ -76,7 +79,6 @@ const FiltersForm = ({ onClose }: Props) => {
     setResultFilter(new ResultFilter(formValues));
   };
   const onSubmit = (formValues: ResultFilterType) => {
-    console.log(formValues);
     setResultFilter(new ResultFilter(formValues));
     onClose();
   };
@@ -96,6 +98,21 @@ const FiltersForm = ({ onClose }: Props) => {
           renderErr={renderErr}
         />
         <BackendFilter
+          control={control}
+          register={register}
+          renderErr={renderErr}
+        />
+        <DeviceModelFilter
+          control={control}
+          register={register}
+          renderErr={renderErr}
+        />
+        <ManufacturerFilter
+          control={control}
+          register={register}
+          renderErr={renderErr}
+        />
+        <SoCFilter
           control={control}
           register={register}
           renderErr={renderErr}
