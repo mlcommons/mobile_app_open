@@ -14,13 +14,11 @@ format/clang:
 .PHONY: format/dart/pub-get
 format/dart/pub-get:
 	cd flutter && ${_start_args} dart pub get
-	cd flutter_common && ${_start_args} dart pub get
 
 .PHONY: format/dart
 format/dart: format/dart/pub-get
 	cd flutter && ${_start_args} dart run import_sorter:main
-	cd flutter_common && ${_start_args} dart run import_sorter:main
-	dart format flutter flutter_common
+	dart format flutter
 
 .PHONY: format/swift
 format/swift:
@@ -56,9 +54,8 @@ lint/clang:
 .PHONY: lint/dart
 lint/dart: format/dart/pub-get
 	cd flutter && ${_start_args} dart run import_sorter:main --exit-if-changed
-	cd flutter_common && ${_start_args} dart run import_sorter:main --exit-if-changed
-	dart format --output=none --set-exit-if-changed flutter flutter_common
-	dart analyze --fatal-infos flutter flutter_common
+	dart format --output=none --set-exit-if-changed flutter
+	dart analyze --fatal-infos flutter
 
 .PHONY: lint/yaml
 lint/yaml:

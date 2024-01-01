@@ -1,4 +1,4 @@
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 
 enum SortByEnum { dateAsc, dateDesc, taskThroughputAsc, taskThroughputDesc }
 

@@ -1,8 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:mlperfbench_common/data/results/backend_info.dart';
-import 'package:mlperfbench_common/data/results/backend_settings.dart';
-import 'package:mlperfbench_common/data/results/dataset_info.dart';
+import 'package:mlperfbench/data/results/backend_info.dart';
+import 'package:mlperfbench/data/results/backend_settings.dart';
+import 'package:mlperfbench/data/results/dataset_info.dart';
 
 part 'benchmark_result.g.dart';
 

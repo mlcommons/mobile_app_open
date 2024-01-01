@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:mlperfbench_common/constants.dart';
-import 'package:mlperfbench_common/data/results/backend_settings_extra.dart';
+import 'package:mlperfbench/data/results/backend_settings_extra.dart';
+import 'package:mlperfbench/data/string_constants.dart';
 
 part 'backend_settings.g.dart';
 

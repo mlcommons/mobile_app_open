@@ -18,6 +18,7 @@ class AppColors {
   static const lightRedText = Color.fromARGB(255, 255, 120, 100);
   static const darkText = Colors.black;
   static const darkRedText = Colors.red;
+  static const darBlue = Color(0xFF0B3A61);
 
   static const dialogBackground = Colors.white;
   static const snackBarBackground = Color(0xFFEDEDED);

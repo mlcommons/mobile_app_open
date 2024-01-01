@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:bot_toast/bot_toast.dart';
-import 'package:mlperfbench_common/data/environment/env_android.dart';
-import 'package:mlperfbench_common/data/environment/environment_info.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/data/environment/env_android.dart';
+import 'package:mlperfbench/data/environment/environment_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 class HistoryHelperUtils {

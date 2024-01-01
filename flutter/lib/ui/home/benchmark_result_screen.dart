@@ -7,13 +7,11 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/store.dart';
-import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
+import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/home/benchmark_running_screen.dart';
 import 'package:mlperfbench/ui/home/benchmark_start_screen.dart';
-import 'package:mlperfbench/ui/home/list_of_benchmark_items.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
 import 'package:mlperfbench/ui/icons.dart' as app_icons;
@@ -21,11 +19,11 @@ import 'package:mlperfbench/ui/page_constraints.dart';
 
 enum _ScreenMode { performance, accuracy }
 
-class ResultScreen extends StatefulWidget {
-  const ResultScreen({Key? key}) : super(key: key);
+class BenchmarkResultScreen extends StatefulWidget {
+  const BenchmarkResultScreen({Key? key}) : super(key: key);
 
   @override
-  State<ResultScreen> createState() => _ResultScreenState();
+  State<BenchmarkResultScreen> createState() => _BenchmarkResultScreenState();
 }
 
 class ResultKeys {
@@ -33,7 +31,7 @@ class ResultKeys {
   static const String scrollResultsButton = 'scrollResultsButton';
 }
 
-class _ResultScreenState extends State<ResultScreen>
+class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   _ScreenMode _screenMode = _ScreenMode.performance;
@@ -141,7 +139,6 @@ class _ResultScreenState extends State<ResultScreen>
                     ),
                 ],
               ),
-              const Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
         ],
@@ -190,7 +187,7 @@ class _ResultScreenState extends State<ResultScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: rowChildren,
               ),
-              onTap: () => showBenchmarkInfoBottomSheet(context, benchmark),
+              trailing: BenchmarkInfoButton(benchmark: benchmark),
             ),
             const Divider()
           ],
@@ -265,7 +262,6 @@ class _ResultScreenState extends State<ResultScreen>
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
-    final store = context.watch<Store>();
     final l10n = AppLocalizations.of(context);
     final scrollController = ScrollController();
 
@@ -345,33 +341,8 @@ class _ResultScreenState extends State<ResultScreen>
           child: TextButton(
             style: buttonStyle,
             onPressed: () async {
-              // TODO (anhappdev) Refactor the code here to avoid duplicated code.
-              // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
-              final wrongPathError = await state.validator
-                  .validateExternalResourcesDirectory(
-                      l10n.dialogContentMissingFiles);
-              if (wrongPathError.isNotEmpty) {
-                if (!mounted) return;
-                await showErrorDialog(context, [wrongPathError]);
-                return;
-              }
-              if (store.offlineMode) {
-                final offlineError = await state.validator
-                    .validateOfflineMode(l10n.dialogContentOfflineWarning);
-                if (offlineError.isNotEmpty) {
-                  if (!mounted) return;
-                  switch (await showConfirmDialog(context, offlineError)) {
-                    case ConfirmDialogAction.ok:
-                      break;
-                    case ConfirmDialogAction.cancel:
-                      return;
-                    default:
-                      break;
-                  }
-                }
-              }
               try {
-                await state.runBenchmarks();
+                await state.resetBenchmarkState();
               } catch (e, t) {
                 print(t);
                 // current context may no longer be valid if runBenchmarks requested progress screen

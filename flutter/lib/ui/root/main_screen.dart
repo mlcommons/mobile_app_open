@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/ui/home/benchmark_result_screen.dart';
 import 'package:mlperfbench/ui/home/benchmark_running_screen.dart';
 import 'package:mlperfbench/ui/home/benchmark_start_screen.dart';
 import 'package:mlperfbench/ui/home/resource_loading_screen.dart';
-import 'package:mlperfbench/ui/home/result_screen.dart';
 import 'package:mlperfbench/ui/root/resource_error_screen.dart';
 
 class MainScreen extends StatelessWidget {
@@ -30,7 +30,7 @@ class MainScreen extends StatelessWidget {
       case BenchmarkStateEnum.running:
         return const BenchmarkRunningScreen();
       case BenchmarkStateEnum.done:
-        return const ResultScreen();
+        return const BenchmarkResultScreen();
     }
   }
 }

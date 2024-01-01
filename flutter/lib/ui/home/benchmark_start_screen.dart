@@ -12,7 +12,7 @@ import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
-import 'package:mlperfbench/ui/home/list_of_benchmark_items.dart';
+import 'package:mlperfbench/ui/home/benchmark_config_screen.dart';
 import 'package:mlperfbench/ui/icons.dart';
 
 class MainKeys {
@@ -29,29 +29,27 @@ class BenchmarkStartScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
+      backgroundColor: AppColors.darBlue,
       appBar: AppBar(title: Text(l10n.menuHome)),
       drawer: const AppDrawer(),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Expanded(flex: 6, child: _getContainer(context, state.state)),
-            Padding(
-              padding: const EdgeInsets.all(30),
-              child: Text(
-                l10n.mainScreenMeasureTitle,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: AppColors.darkText,
-                ),
-              ),
+            Expanded(
+              flex: 35,
+              child: _getContainer(context, state.state),
             ),
             Expanded(
-              flex: 5,
+              flex: 65,
               child: Align(
-                  alignment: Alignment.topCenter,
-                  child: createListOfBenchmarkItemsWidgets(context, state)),
-            ),
+                alignment: Alignment.topCenter,
+                child: AbsorbPointer(
+                  absorbing: state.state != BenchmarkStateEnum.waiting,
+                  child: const BenchmarkConfigScreen(),
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -69,25 +67,22 @@ class BenchmarkStartScreen extends StatelessWidget {
   }
 
   Widget _waitContainer(BuildContext context) {
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return _circleContainerWithContent(
-        context, AppIcons.waiting, stringResources.mainScreenWaitFinish);
+        context, AppIcons.waiting, l10n.mainScreenWaitFinish);
   }
 
   Widget _goContainer(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final store = context.watch<Store>();
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return CustomPaint(
       painter: MyPaintBottom(),
       child: GoButtonGradient(() async {
-        // TODO (anhappdev) Refactor the code here to avoid duplicated code.
-        // The checks before calling state.runBenchmarks() in main_screen and result_screen are similar.
         final wrongPathError = await state.validator
-            .validateExternalResourcesDirectory(
-                stringResources.dialogContentMissingFiles);
+            .validateExternalResourcesDirectory(l10n.dialogContentMissingFiles);
         if (wrongPathError.isNotEmpty) {
           // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
           // ignore: use_build_context_synchronously
@@ -97,7 +92,7 @@ class BenchmarkStartScreen extends StatelessWidget {
         }
         if (store.offlineMode) {
           final offlineError = await state.validator
-              .validateOfflineMode(stringResources.dialogContentOfflineWarning);
+              .validateOfflineMode(l10n.dialogContentOfflineWarning);
           if (offlineError.isNotEmpty) {
             // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
             // ignore: use_build_context_synchronously
@@ -119,8 +114,7 @@ class BenchmarkStartScreen extends StatelessWidget {
           // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
           // ignore: use_build_context_synchronously
           if (!context.mounted) return;
-          await showErrorDialog(
-              context, ['${stringResources.runFail}:', e.toString()]);
+          await showErrorDialog(context, ['${l10n.runFail}:', e.toString()]);
           return;
         }
       }),
@@ -153,7 +147,7 @@ class GoButtonGradient extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
 
     var decoration = BoxDecoration(
       shape: BoxShape.circle,
@@ -173,7 +167,7 @@ class GoButtonGradient extends StatelessWidget {
 
     return Container(
       decoration: decoration,
-      width: MediaQuery.of(context).size.width * 0.35,
+      width: MediaQuery.of(context).size.width * 0.32,
       child: MaterialButton(
         key: const Key(MainKeys.goButton),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -181,7 +175,7 @@ class GoButtonGradient extends StatelessWidget {
         shape: const CircleBorder(),
         onPressed: onPressed,
         child: Text(
-          stringResources.mainScreenGo,
+          l10n.mainScreenGo,
           style: const TextStyle(
             color: AppColors.lightText,
             fontSize: 40,

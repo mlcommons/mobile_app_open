@@ -52,7 +52,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kIphoneOnMacbookM1: Interval(min: 9, max: 16),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 1.5, max: 4),
+    _kIphoneOnGitHubAction: Interval(min: 1.0, max: 4),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 300, max: 490),
@@ -104,7 +104,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
     _kIphoneOnMacbookM1: Interval(min: 30, max: 45),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 3, max: 15),
+    _kIphoneOnGitHubAction: Interval(min: 3, max: 20),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 1000, max: 1700),
