@@ -75,7 +75,7 @@ class _DetailsScreen extends State<DetailsScreen> {
         .replaceFirst('<buildType>', appVersionType);
 
     final utils = HistoryHelperUtils(l10n);
-    final modelDescription = utils.makeModelDescription(res.environmentInfo);
+    final modelDescription = res.environmentInfo.modelDescription;
     final socDescription = utils.makeSocName(state, res.environmentInfo);
 
     return [
