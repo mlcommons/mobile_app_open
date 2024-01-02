@@ -1,0 +1,23 @@
+name: Deploy to Preview Channel
+
+on:
+  pull_request:
+
+jobs:
+  build_and_preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: yarn install --immutable --immutable-cache --check-cache
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}"
+          expires: 30d
+          projectId: mobile-app-build-290400
+          entryPoint: "./benchmarks_web_viewer"
+      - name: Check outputs
+        run: |
+          echo urls ${{steps.firebase_hosting_preview.outputs.url}}
+          echo expire_time ${{steps.firebase_hosting_preview.outputs.expire_time}}
+          echo details_url ${{steps.firebase_hosting_preview.outputs.details_url}}          
