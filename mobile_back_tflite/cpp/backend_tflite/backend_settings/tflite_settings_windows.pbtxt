@@ -62,6 +62,7 @@ benchmark_setting {
     model_checksum: "4b7ce0a82f8eaa542404d2ab2ee4e575"
   }
 }
+
 benchmark_setting {
   benchmark_id: "object_detection"
   framework: "TFLite"

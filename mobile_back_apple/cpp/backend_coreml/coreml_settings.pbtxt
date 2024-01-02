@@ -60,21 +60,59 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification_v2"
-  accelerator: "ane"
-  accelerator_desc: "Apple Neural Engine"
   framework: "Core ML"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/CoreML/MobilenetEdgeTPUv2.mlmodel"
-  model_checksum: "875730de6fa07333051ca0f283fb23fd"
+  delegate_choice: {
+    delegate_name: "CPU & GPU & ANE"
+    accelerator_name: "cpu&gpu&ane"
+    accelerator_desc: "All compute units"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/CoreML/MobilenetEdgeTPUv2.mlmodel"
+    model_checksum: "875730de6fa07333051ca0f283fb23fd"
+  }
+  delegate_choice: {
+    delegate_name: "CPU & GPU"
+    accelerator_name: "cpu&gpu"
+    accelerator_desc: "CPU and GPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/CoreML/MobilenetEdgeTPUv2.mlmodel"
+    model_checksum: "875730de6fa07333051ca0f283fb23fd"
+  }
+  delegate_choice: {
+    delegate_name: "CPU & ANE"
+    accelerator_name: "cpu&ane"
+    accelerator_desc: "CPU and Neural Engine"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/CoreML/MobilenetEdgeTPUv2.mlmodel"
+    model_checksum: "875730de6fa07333051ca0f283fb23fd"
+  }
+  delegate_selected: "CPU & GPU & ANE"
 }
 
 benchmark_setting {
   benchmark_id: "image_classification_offline_v2"
-  accelerator: "ane"
-  accelerator_desc: "Apple Neural Engine"
   framework: "Core ML"
-  batch_size: 32
-  model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/CoreML/MobilenetEdgeTPUv2.mlmodel"
-  model_checksum: "875730de6fa07333051ca0f283fb23fd"
+  delegate_choice: {
+    delegate_name: "CPU & GPU & ANE"
+    accelerator_name: "cpu&gpu&ane"
+    accelerator_desc: "All compute units"
+    batch_size: 32
+    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/CoreML/MobilenetEdgeTPUv2.mlmodel"
+    model_checksum: "875730de6fa07333051ca0f283fb23fd"
+  }
+  delegate_choice: {
+    delegate_name: "CPU & GPU"
+    accelerator_name: "cpu&gpu"
+    accelerator_desc: "CPU and GPU"
+    batch_size: 32
+    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/CoreML/MobilenetEdgeTPUv2.mlmodel"
+    model_checksum: "875730de6fa07333051ca0f283fb23fd"
+  }
+  delegate_choice: {
+    delegate_name: "CPU & ANE"
+    accelerator_name: "cpu&ane"
+    accelerator_desc: "CPU and Neural Engine"
+    batch_size: 32
+    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/CoreML/MobilenetEdgeTPUv2.mlmodel"
+    model_checksum: "875730de6fa07333051ca0f283fb23fd"
+  }
+  delegate_selected: "CPU & GPU & ANE"
 }
 
 benchmark_setting {
