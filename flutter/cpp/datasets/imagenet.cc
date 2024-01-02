@@ -67,6 +67,7 @@ Imagenet::Imagenet(Backend *backend, const std::string &image_dir,
   switch (input_format_.at(0).type) {
     case DataType::Float32:
       builder.AddPerChannelNormalizationStep(123.675, 116.28, 103.53, 1 / 57.0);
+      break;
     default:
       builder.AddDefaultNormalizationStep();
   }
