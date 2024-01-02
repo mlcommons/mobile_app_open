@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -13,12 +10,8 @@ import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_config_screen.dart';
+import 'package:mlperfbench/ui/home/shared_styles.dart';
 import 'package:mlperfbench/ui/icons.dart';
-
-class MainKeys {
-  // list of widget keys that need to be accessed in the test code
-  static const String goButton = 'goButton';
-}
 
 class BenchmarkStartScreen extends StatelessWidget {
   const BenchmarkStartScreen({Key? key}) : super(key: key);
@@ -29,16 +22,17 @@ class BenchmarkStartScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.darBlue,
+      backgroundColor: AppColors.darkBlue,
       appBar: AppBar(title: Text(l10n.menuHome)),
       drawer: const AppDrawer(),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Expanded(
               flex: 35,
-              child: _getContainer(context, state.state),
+              child: _getTopContainer(context, state.state),
             ),
             Expanded(
               flex: 65,
@@ -56,7 +50,7 @@ class BenchmarkStartScreen extends StatelessWidget {
     );
   }
 
-  Widget _getContainer(BuildContext context, BenchmarkStateEnum state) {
+  Widget _getTopContainer(BuildContext context, BenchmarkStateEnum state) {
     if (state == BenchmarkStateEnum.aborting) {
       return _waitContainer(context);
     } else if (state == BenchmarkStateEnum.waiting) {
@@ -68,160 +62,135 @@ class BenchmarkStartScreen extends StatelessWidget {
 
   Widget _waitContainer(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final circleWidth =
+        MediaQuery.of(context).size.width * WidgetSizes.circleWidthFactor;
 
-    return _circleContainerWithContent(
-        context, AppIcons.waiting, l10n.mainScreenWaitFinish);
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width,
+          alignment: Alignment.center,
+          decoration: mainLinearGradientDecoration,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text(
+            l10n.mainScreenWaitFinish,
+            style: const TextStyle(color: AppColors.lightText, fontSize: 15),
+          ),
+        ),
+        Stack(
+          children: [
+            Container(
+              width: circleWidth,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.progressCircle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    offset: Offset(15, 15),
+                    blurRadius: 10,
+                  )
+                ],
+              ),
+            ),
+            Container(
+              width: circleWidth,
+              alignment: Alignment.center,
+              child: AppIcons.waiting,
+            )
+          ],
+        )
+      ],
+    );
   }
 
   Widget _goContainer(BuildContext context) {
     final state = context.watch<BenchmarkState>();
     final store = context.watch<Store>();
     final l10n = AppLocalizations.of(context);
+    final circleWidth =
+        MediaQuery.of(context).size.width * WidgetSizes.circleWidthFactor;
 
-    return CustomPaint(
-      painter: MyPaintBottom(),
-      child: GoButtonGradient(() async {
-        final wrongPathError = await state.validator
-            .validateExternalResourcesDirectory(l10n.dialogContentMissingFiles);
-        if (wrongPathError.isNotEmpty) {
-          // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-          // ignore: use_build_context_synchronously
-          if (!context.mounted) return;
-          await showErrorDialog(context, [wrongPathError]);
-          return;
-        }
-        if (store.offlineMode) {
-          final offlineError = await state.validator
-              .validateOfflineMode(l10n.dialogContentOfflineWarning);
-          if (offlineError.isNotEmpty) {
-            // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-            // ignore: use_build_context_synchronously
-            if (!context.mounted) return;
-            switch (await showConfirmDialog(context, offlineError)) {
-              case ConfirmDialogAction.ok:
-                break;
-              case ConfirmDialogAction.cancel:
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width,
+          alignment: Alignment.center,
+          decoration: mainLinearGradientDecoration,
+        ),
+        Container(
+          alignment: Alignment.center,
+          child: ElevatedButton(
+            key: const Key(WidgetKeys.goButton),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: const CircleBorder(),
+                minimumSize: Size.fromWidth(circleWidth)),
+            child: Text(
+              l10n.mainScreenGo,
+              style: const TextStyle(
+                color: AppColors.lightText,
+                fontSize: 40,
+              ),
+            ),
+            onPressed: () async {
+              final wrongPathError = await state.validator
+                  .validateExternalResourcesDirectory(
+                      l10n.dialogContentMissingFiles);
+              if (wrongPathError.isNotEmpty) {
+                // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+                // ignore: use_build_context_synchronously
+                if (!context.mounted) return;
+                await showErrorDialog(context, [wrongPathError]);
                 return;
-              default:
-                break;
-            }
-          }
-        }
-        try {
-          await state.runBenchmarks();
-        } catch (e, t) {
-          print(t);
-          // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-          // ignore: use_build_context_synchronously
-          if (!context.mounted) return;
-          await showErrorDialog(context, ['${l10n.runFail}:', e.toString()]);
-          return;
-        }
-      }),
-    );
-  }
-}
-
-class MyPaintBottom extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect =
-        Rect.fromCircle(center: Offset(size.width / 2, 0), radius: size.height);
-    final paint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomLeft,
-        colors: AppColors.mainScreenGradient,
-      ).createShader(rect);
-    canvas.drawArc(rect, 0, pi, true, paint);
-  } // paint
-
-  @override
-  bool shouldRepaint(MyPaintBottom oldDelegate) => false;
-}
-
-class GoButtonGradient extends StatelessWidget {
-  final AsyncCallback onPressed;
-
-  const GoButtonGradient(this.onPressed, {Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    var decoration = BoxDecoration(
-      shape: BoxShape.circle,
-      gradient: LinearGradient(
-        colors: AppColors.runBenchmarkCircleGradient,
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-      ),
-      boxShadow: const [
-        BoxShadow(
-          color: Colors.black12,
-          offset: Offset(15, 15),
-          blurRadius: 10,
-        )
+              }
+              if (store.offlineMode) {
+                final offlineError = await state.validator
+                    .validateOfflineMode(l10n.dialogContentOfflineWarning);
+                if (offlineError.isNotEmpty) {
+                  // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+                  // ignore: use_build_context_synchronously
+                  if (!context.mounted) return;
+                  switch (await showConfirmDialog(context, offlineError)) {
+                    case ConfirmDialogAction.ok:
+                      break;
+                    case ConfirmDialogAction.cancel:
+                      return;
+                    default:
+                      break;
+                  }
+                }
+              }
+              final selectedCount =
+                  state.benchmarks.where((e) => e.isActive).length;
+              if (selectedCount < 1) {
+                // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+                // ignore: use_build_context_synchronously
+                if (!context.mounted) return;
+                await showErrorDialog(
+                    context, [l10n.dialogContentNoSelectedBenchmarkError]);
+                return;
+              }
+              try {
+                await state.runBenchmarks();
+              } catch (e, t) {
+                print(t);
+                // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+                // ignore: use_build_context_synchronously
+                if (!context.mounted) return;
+                await showErrorDialog(
+                    context, ['${l10n.runFail}:', e.toString()]);
+                return;
+              }
+            },
+          ),
+        ),
       ],
     );
-
-    return Container(
-      decoration: decoration,
-      width: MediaQuery.of(context).size.width * 0.32,
-      child: MaterialButton(
-        key: const Key(MainKeys.goButton),
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        splashColor: Colors.black,
-        shape: const CircleBorder(),
-        onPressed: onPressed,
-        child: Text(
-          l10n.mainScreenGo,
-          style: const TextStyle(
-            color: AppColors.lightText,
-            fontSize: 40,
-          ),
-        ),
-      ),
-    );
   }
-}
-
-Widget _circleContainerWithContent(
-    BuildContext context, Widget contentInCircle, String label) {
-  return CustomPaint(
-    painter: MyPaintBottom(),
-    child: Stack(alignment: Alignment.topCenter, children: [
-      Padding(
-        padding: const EdgeInsets.all(20),
-        child: Text(
-          label,
-          style: const TextStyle(color: AppColors.lightText, fontSize: 15),
-        ),
-      ),
-      Stack(
-        children: [
-          Container(
-            width: MediaQuery.of(context).size.width * 0.35,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.progressCircle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(15, 15),
-                  blurRadius: 10,
-                )
-              ],
-            ),
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width * 0.35,
-            alignment: Alignment.center,
-            child: contentInCircle,
-          )
-        ],
-      )
-    ]),
-  );
 }

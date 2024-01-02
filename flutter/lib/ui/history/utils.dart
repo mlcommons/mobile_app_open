@@ -129,27 +129,6 @@ class HistoryHelperUtils {
     );
   }
 
-  String makeModelDescription(EnvironmentInfo info) {
-    switch (info.platform) {
-      case EnvPlatform.android:
-        final android = info.value.android;
-        if (android == null) {
-          return 'Unknown Android device';
-        }
-        return '${android.manufacturer} ${android.modelName}';
-      case EnvPlatform.ios:
-        final ios = info.value.ios;
-        if (ios == null) {
-          return 'Unknown iOS device';
-        }
-        return 'Apple ${ios.modelName}';
-      case EnvPlatform.windows:
-        return 'PC';
-      default:
-        return '';
-    }
-  }
-
   String makeSocName(BenchmarkState state, EnvironmentInfo info) {
     switch (info.platform) {
       case EnvPlatform.android:

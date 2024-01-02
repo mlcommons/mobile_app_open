@@ -36,9 +36,7 @@
   "resultsTitleAccuracy": "Results",
   "resultsTabTitlePerformance": "Performance",
   "resultsTabTitleAccuracy": "Accuracy",
-  "resultsTitleDetails": "Detailed Results",
-  "resultsButtonTestAgain": "Test Again",
-  "resultsButtonShare": "Share This Result",
+  "resultsDeleteConfirm": "Delete this results?",
   "resultsNotAvailable": "N/A",
   "resultsBatchSize": "Batches: <batchSize>",
 
@@ -86,7 +84,8 @@
   "settingsClearCacheConfirm": "All loaded resources will be deleted and downloaded again. Continue?",
   "settingsUnableSpecifyConfiguration": "Could not specify until benchmarks is running or content is loading",
 
-  "dialogTitleError": "Errors",
+  "dialogTitleWarning": "Warning",
+  "dialogTitleError": "Error",
   "dialogTitleSuccess": "Success",
   "dialogOk": "Ok",
   "dialogCancel": "Cancel",
@@ -94,6 +93,7 @@
   "dialogContentOfflineWarning": "Offline mode is enabled but following internet resources are defined in the configuration. Do you want to continue?",
   "dialogContentMissingFiles": "Selected datasets directory does not contain files for following benchmarks:",
   "dialogContentChecksumError": "The following files failed checksum validation:",
+  "dialogContentNoSelectedBenchmarkError": "Please select at least one benchmark.",
 
 
   "benchModePerformanceOnly": "Performance Only",

@@ -21,6 +21,9 @@ class ResultFilter {
   ResultFilter();
 
   bool match(ExtendedResult result) {
+    if (result.results.isEmpty) {
+      return false;
+    }
     String? resultDeviceModel;
     String? resultManufacturer;
     String? resultSoc;

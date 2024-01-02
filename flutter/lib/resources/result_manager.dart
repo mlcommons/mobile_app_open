@@ -82,6 +82,16 @@ class ResultManager {
     return File('${_resultsDir.path}/$_submissionFileName');
   }
 
+  Future<void> deleteLastResult() async {
+    if (localResults.isNotEmpty) {
+      await deleteResult(localResults.last);
+    }
+    final submissionFile = getSubmissionFile();
+    if (await submissionFile.exists()) {
+      await submissionFile.delete();
+    }
+  }
+
   ExtendedResult getLastResult() {
     return localResults.last;
   }

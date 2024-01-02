@@ -122,5 +122,12 @@ void main() {
       final filter = ResultFilter();
       expect(filter.anyFilterActive, isFalse);
     });
+
+    test('empty result list', () {
+      final filter = ResultFilter();
+      final emptyResult = ExtendedResult.fromJson(data);
+      emptyResult.results.clear();
+      expect(filter.match(emptyResult), isFalse);
+    });
   });
 }

@@ -46,6 +46,27 @@ class EnvironmentInfo {
       _$EnvironmentInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$EnvironmentInfoToJson(this);
+
+  String get modelDescription {
+    switch (platform) {
+      case EnvPlatform.android:
+        final android = value.android;
+        if (android == null) {
+          return 'Unknown Android device';
+        }
+        return '${android.manufacturer} ${android.modelName}';
+      case EnvPlatform.ios:
+        final ios = value.ios;
+        if (ios == null) {
+          return 'Unknown iOS device';
+        }
+        return 'Apple ${ios.modelName}';
+      case EnvPlatform.windows:
+        return 'PC';
+      default:
+        return '';
+    }
+  }
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)

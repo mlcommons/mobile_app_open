@@ -2,11 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mlperfbench/ui/home/benchmark_start_screen.dart';
+import 'package:mlperfbench/app_constants.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/ui/home/benchmark_result_screen.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/resources/result_manager.dart' as result_manager;
 import 'package:mlperfbench/resources/resource_manager.dart'
@@ -56,21 +55,21 @@ Future<void> validateSettings(WidgetTester tester) async {
 }
 
 Future<void> runBenchmarks(WidgetTester tester) async {
-  const runTimeLimitMinutes = 30;
   const downloadTimeLimitMinutes = 20;
+  const runTimeLimitMinutes = 30;
 
   var goButtonIsPresented = await waitFor(
-      tester, downloadTimeLimitMinutes, const Key(MainKeys.goButton));
+      tester, downloadTimeLimitMinutes, const Key(WidgetKeys.goButton));
 
   expect(goButtonIsPresented, true,
       reason: 'Problems with downloading of datasets or models');
-  final goButton = find.byKey(const Key(MainKeys.goButton));
+  final goButton = find.byKey(const Key(WidgetKeys.goButton));
   await tester.tap(goButton);
 
-  var scrollButtonIsPresented = await waitFor(
-      tester, runTimeLimitMinutes, const Key(ResultKeys.scrollResultsButton));
+  var totalScoreIsPresented = await waitFor(
+      tester, runTimeLimitMinutes, const Key(WidgetKeys.totalScoreCircle));
 
-  expect(scrollButtonIsPresented, true, reason: 'Test results were not found');
+  expect(totalScoreIsPresented, true, reason: 'Result screen is not presented');
 }
 
 Future<ExtendedResult> obtainResult() async {
