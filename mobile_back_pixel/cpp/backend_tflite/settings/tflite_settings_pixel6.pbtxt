@@ -32,11 +32,22 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification_v2"
-  accelerator: "tpu"
-  accelerator_desc: "Google Edge TPU"
-  framework: "TFLite NNAPI"
-  model_path: "local:///medium.tflite"
-  model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "tpu"
+    accelerator_desc: "Google EdgeTPU"
+    model_path: "local:///medium.tflite"
+    model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+    model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
+  }
+  delegate_selected: "NNAPI"
 }
 
 benchmark_setting {
@@ -44,7 +55,7 @@ benchmark_setting {
   framework: "TFLite"
   delegate_choice: {
     delegate_name: "NNAPI"
-    accelerator_name: "tpu"
+    accelerator: "tpu"
     accelerator_desc: "Google EdgeTPU"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
     model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
@@ -63,12 +74,25 @@ benchmark_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification_offline_v2"
-  accelerator: "tpu"
-  accelerator_desc: "Google Edge TPU"
-  framework: "TFLite NNAPI"
-  batch_size: 16
-  model_path: "local:///medium.tflite"
-  model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "tpu"
+    accelerator_desc: "Google EdgeTPU"
+    model_path: "local:///medium.tflite"
+    model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+    batch_size: 64
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+    model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
+    batch_size: 2
+  }
+  delegate_selected: "NNAPI"
+
 }
 
 benchmark_setting {
