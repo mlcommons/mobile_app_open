@@ -48,6 +48,7 @@ benchmark_setting {
     model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/tflite/mobilenet-edgetpu-v2-L_fp32.tflite"
     model_checksum: "4b7ce0a82f8eaa542404d2ab2ee4e575"
   }
+  delegate_selected: "CPU"
 }
 
 benchmark_setting {
@@ -61,6 +62,7 @@ benchmark_setting {
     model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/tflite/mobilenet-edgetpu-v2-L_fp32.tflite"
     model_checksum: "4b7ce0a82f8eaa542404d2ab2ee4e575"
   }
+  delegate_selected: "CPU"
 }
 
 benchmark_setting {

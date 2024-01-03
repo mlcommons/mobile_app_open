@@ -34,23 +34,31 @@ Future<void> validateSettings(WidgetTester tester) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
   for (var benchmark in benchmarkState.benchmarks) {
-    expect(benchmark.selectedDelegate.batchSize, greaterThanOrEqualTo(0));
-    expect(benchmark.selectedDelegate.modelPath.isNotEmpty, isTrue);
-    expect(benchmark.selectedDelegate.modelChecksum.isNotEmpty, isTrue);
-    expect(benchmark.selectedDelegate.acceleratorName.isNotEmpty, isTrue);
-    expect(benchmark.selectedDelegate.acceleratorDesc.isNotEmpty, isTrue);
-    expect(benchmark.benchmarkSettings.framework.isNotEmpty, isTrue);
+    expect(benchmark.selectedDelegate.batchSize, greaterThanOrEqualTo(0),
+        reason: 'batchSize must >= 0');
+    expect(benchmark.selectedDelegate.modelPath.isNotEmpty, isTrue,
+        reason: 'modelPath cannot be empty');
+    expect(benchmark.selectedDelegate.modelChecksum.isNotEmpty, isTrue,
+        reason: 'modelChecksum cannot be empty');
+    expect(benchmark.selectedDelegate.acceleratorName.isNotEmpty, isTrue,
+        reason: 'acceleratorName cannot be empty');
+    expect(benchmark.selectedDelegate.acceleratorDesc.isNotEmpty, isTrue,
+        reason: 'acceleratorDesc cannot be empty');
+    expect(benchmark.benchmarkSettings.framework.isNotEmpty, isTrue,
+        reason: 'framework cannot be empty');
     expect(benchmark.selectedDelegate.delegateName,
-        equals(benchmark.benchmarkSettings.delegateSelected));
+        equals(benchmark.benchmarkSettings.delegateSelected),
+        reason: 'delegateSelected must be the same as delegateName');
 
     final selected = benchmark.benchmarkSettings.delegateSelected;
     final choices = benchmark.benchmarkSettings.delegateChoice
         .map((e) => e.delegateName)
         .toList();
-    expect(choices.isNotEmpty, isTrue);
-    final reason =
-        'delegate_selected=$selected must be one of delegate_choice=$choices';
-    expect(choices.contains(selected), isTrue, reason: reason);
+    expect(choices.isNotEmpty, isTrue,
+        reason: 'There must be at least one delegate choice');
+    expect(choices.contains(selected), isTrue,
+        reason:
+            'delegate_selected=$selected must be one of delegate_choice=$choices');
   }
 }
 
