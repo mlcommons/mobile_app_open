@@ -11,56 +11,66 @@ key: <accelerator> OR <accelerator>|<backendName>
 - ane -> iOS TFLite or Core ML
 - cpu&gpu&ane -> IOS Core ML
 */
+const _kCpu = 'cpu';
+const _kNpu = 'npu';
+const _kTpu = 'tpu';
+const _kAne = 'ane';
+const _kCpuGpuAne = 'cpu&gpu&ane';
+const _kAneTflite = 'ane|TFLite';
+const _kAneCoreml = 'ane|Core ML';
+const _kGpuTflite = 'gpu|TFLite';
+const _kGpuCoreml = 'gpu|Core ML';
 
 const Map<String, Interval> _imageClassification = {
-  'cpu': Interval(min: 1.00, max: 1.00),
-  'npu': Interval(min: 0.89, max: 0.91),
-  'tpu': Interval(min: 0.89, max: 0.91),
-  'ane': Interval(min: 1.00, max: 1.00),
-  'cpu&gpu&ane': Interval(min: 1.00, max: 1.00)
+  _kCpu: Interval(min: 1.00, max: 1.00),
+  _kNpu: Interval(min: 0.89, max: 0.91),
+  _kTpu: Interval(min: 0.89, max: 0.91),
+  _kAne: Interval(min: 1.00, max: 1.00),
+  _kCpuGpuAne: Interval(min: 1.00, max: 1.00)
 };
 
 const Map<String, Interval> _imageClassificationV2 = {
-  'cpu': Interval(min: 0.69, max: 0.71),
-  'npu': Interval(min: 0.69, max: 0.71),
-  'tpu': Interval(min: 0.69, max: 0.71),
-  'ane': Interval(min: 0.69, max: 0.71),
+  _kCpu: Interval(min: 0.69, max: 0.71),
+  _kNpu: Interval(min: 0.69, max: 0.71),
+  _kTpu: Interval(min: 0.69, max: 0.71),
+  _kAne: Interval(min: 0.69, max: 0.71),
+  _kCpuGpuAne: Interval(min: 0.69, max: 0.71),
 };
 
 const Map<String, Interval> _objectDetection = {
-  'cpu': Interval(min: 0.31, max: 0.32),
-  'npu': Interval(min: 0.28, max: 0.31),
-  'tpu': Interval(min: 0.36, max: 0.38),
-  'ane|TFLite': Interval(min: 0.31, max: 0.34),
-  'ane|Core ML': Interval(min: 0.45, max: 0.46),
-  'cpu&gpu&ane': Interval(min: 0.45, max: 0.46)
+  _kCpu: Interval(min: 0.31, max: 0.32),
+  _kNpu: Interval(min: 0.28, max: 0.31),
+  _kTpu: Interval(min: 0.36, max: 0.38),
+  _kAneTflite: Interval(min: 0.31, max: 0.34),
+  _kAneCoreml: Interval(min: 0.45, max: 0.46),
+  _kCpuGpuAne: Interval(min: 0.45, max: 0.46)
 };
 
 const Map<String, Interval> _imageSegmentation = {
-  'cpu': Interval(min: 0.38, max: 0.40),
-  'npu': Interval(min: 0.33, max: 0.34),
-  'tpu': Interval(min: 0.33, max: 0.34),
-  'ane|TFLite': Interval(min: 0.38, max: 0.40),
-  'ane|Core ML': Interval(min: 0.38, max: 0.40),
-  'cpu&gpu&ane': Interval(min: 0.38, max: 0.40)
+  _kCpu: Interval(min: 0.38, max: 0.40),
+  _kNpu: Interval(min: 0.33, max: 0.34),
+  _kTpu: Interval(min: 0.33, max: 0.34),
+  _kAneTflite: Interval(min: 0.38, max: 0.40),
+  _kAneCoreml: Interval(min: 0.38, max: 0.40),
+  _kCpuGpuAne: Interval(min: 0.38, max: 0.40)
 };
 
 const Map<String, Interval> _naturalLanguageProcessing = {
-  'cpu': Interval(min: 1.00, max: 1.00),
-  'tpu': Interval(min: 1.00, max: 1.00),
-  'gpu|TFLite': Interval(min: 1.00, max: 1.00),
+  _kCpu: Interval(min: 1.00, max: 1.00),
+  _kTpu: Interval(min: 1.00, max: 1.00),
+  _kGpuTflite: Interval(min: 1.00, max: 1.00),
   // 1.00 in simulator, 0.80 on iphone 12 mini
-  'gpu|Core ML': Interval(min: 0.80, max: 1.00),
-  'cpu&gpu&ane': Interval(min: 0.80, max: 1.00)
+  _kGpuCoreml: Interval(min: 0.80, max: 1.00),
+  _kCpuGpuAne: Interval(min: 0.80, max: 1.00)
 };
 
 const Map<String, Interval> _superResolution = {
-  'cpu': Interval(min: 0.32, max: 0.35),
-  'npu': Interval(min: 0.32, max: 0.35),
-  'tpu': Interval(min: 0.32, max: 0.35),
-  'ane|TFLite': Interval(min: 0.32, max: 0.35),
-  'ane|Core ML': Interval(min: 0.32, max: 0.35),
-  'cpu&gpu&ane': Interval(min: 0.32, max: 0.35)
+  _kCpu: Interval(min: 0.32, max: 0.35),
+  _kNpu: Interval(min: 0.32, max: 0.35),
+  _kTpu: Interval(min: 0.32, max: 0.35),
+  _kAneTflite: Interval(min: 0.32, max: 0.35),
+  _kAneCoreml: Interval(min: 0.32, max: 0.35),
+  _kCpuGpuAne: Interval(min: 0.32, max: 0.35)
 };
 
 const benchmarkExpectedAccuracy = {
