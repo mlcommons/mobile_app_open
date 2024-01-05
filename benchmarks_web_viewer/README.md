@@ -31,15 +31,25 @@ You need to use your own Firebase project to run this web app.
    source firebase.env
    ```
 
-1. Start the web app
+## Run and deploy the app to Firebase Hosting
 
-   ```shell
-   yarn start
-   ```
+To deploy the app using Firebase Hosting please
+visit [Get started with Firebase Hosting](https://firebase.google.com/docs/hosting/quickstart) for more
+information.
 
-## Deploy the app to Firebase Hosting
+You will need [Firebase CLI](https://firebase.google.com/docs/cli#install_the_firebase_cli) for the following commands.
 
-To deploy the app using the Firebase Hosting please check these
-instructions: <https://firebase.google.com/docs/hosting/quickstart>
+To run the web app locally:
+
+```shell
+yarn build
+firebase serve --only hosting --project <FIREBASE_PROJECT_ID>
+```
+
+To deploy the web app to Firebase Hosting
+
+```shell
+firebase deploy --only hosting --project <FIREBASE_PROJECT_ID>
+```
 
 To enable CORS: <https://firebase.google.com/docs/storage/web/download-files>
