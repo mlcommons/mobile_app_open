@@ -1,7 +1,10 @@
-name: Deploy to Preview Channel
+name: Deploy Web App
 
 on:
+  push:
+    branches: [ master, submission-v* ]
   pull_request:
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   build_and_preview:
@@ -24,15 +27,20 @@ jobs:
           yarn install --immutable --immutable-cache --check-cache
           CI=false yarn build
       - uses: FirebaseExtended/action-hosting-deploy@v0
-        id: firebase_hosting_preview
+        name: Deploy to Firebase Hosting on Preview channel
+        if: github.ref != 'refs/heads/master'
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}"
-          expires: 30d
           projectId: mobile-app-build-290400
           entryPoint: "./benchmarks_web_viewer"
-      - name: Check outputs
-        run: |
-          echo urls ${{steps.firebase_hosting_preview.outputs.url}}
-          echo expire_time ${{steps.firebase_hosting_preview.outputs.expire_time}}
-          echo details_url ${{steps.firebase_hosting_preview.outputs.details_url}}          
+          expires: 30d
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        name: Deploy to Firebase Hosting on Live channel
+        if: github.ref == 'refs/heads/master'
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}"
+          projectId: mobile-app-build-290400
+          entryPoint: "./benchmarks_web_viewer"
+          channelId: live
