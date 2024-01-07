@@ -24,7 +24,7 @@ const GuardedRoute = ({ children }: PropsWithChildren) => {
 
 const Router = () => {
   return (
-    <Suspense fallback={<CenterSpinner />}>
+    <Suspense>
       <Routes>
         <Route path="/auth/sign-in" element={<Login />} />
 

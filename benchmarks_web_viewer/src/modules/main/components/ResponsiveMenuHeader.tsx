@@ -8,7 +8,7 @@ import TabletNavigationDrawer from "./TabletNavigationDrawer";
 import { Box, IconButton } from "@chakra-ui/react";
 import { FaFilter } from "react-icons/fa";
 import FiltersModal from "../../filters/components/FiltersModal";
-import {useFilters} from "../../filters/hooks/useFilters";
+import { useFilters } from "../../filters/hooks/useFilters";
 
 type Props = {
   onToggle: () => void;
@@ -48,7 +48,7 @@ const ResponsiveMenuHeader = ({ onToggle, isOpen }: Props) => {
 
   const [currSelectVal, setCurrSelectVal] = useState(initVal);
 
-  const {isFilterActive} = useFilters();
+  const { isFilterActive } = useFilters();
 
   useEffect(() => {
     if (currSelectVal !== initVal) {
@@ -82,7 +82,7 @@ const ResponsiveMenuHeader = ({ onToggle, isOpen }: Props) => {
           onClick={onOpen}
           aria-label="Filter"
           variant="ghost"
-          color={isFilterActive ? 'blue' : 'gray'}
+          color={isFilterActive ? "blue" : "gray"}
         />
       </Box>
     );

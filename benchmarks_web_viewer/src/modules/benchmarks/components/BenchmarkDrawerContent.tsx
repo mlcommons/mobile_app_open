@@ -51,7 +51,10 @@ const BenchmarkDrawerContent = ({ onClose, benchmarkId, isOpen }: Props) => {
   const makePerformanceInfo = (perf: BenchmarkRun) => {
     return [
       makeInfo("QPS", perf.throughput?.value ?? "N/A"),
-      makeInfo("Run is valid", perf.loadgen_info?.validity.toString() ?? "false"),
+      makeInfo(
+        "Run is valid",
+        perf.loadgen_info?.validity.toString() ?? "false",
+      ),
       makeInfo("Duration", formatDuration(perf.measured_duration)),
       makeInfo("Samples count", perf.measured_samples.toString()),
       makeInfo("Dataset Type", perf.dataset.type),
@@ -61,10 +64,7 @@ const BenchmarkDrawerContent = ({ onClose, benchmarkId, isOpen }: Props) => {
 
   const makeAccuracyInfo = (accuracy: BenchmarkRun) => {
     return [
-      makeInfo(
-        "Accuracy",
-        accuracy.accuracy?.formatted ?? "N/A",
-      ),
+      makeInfo("Accuracy", accuracy.accuracy?.formatted ?? "N/A"),
       makeInfo("Duration", formatDuration(accuracy.measured_duration)),
       makeInfo("Samples", accuracy.measured_samples.toString()),
       makeInfo("Dataset Type", accuracy.dataset.type),

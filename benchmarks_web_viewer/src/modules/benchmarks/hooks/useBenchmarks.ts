@@ -31,7 +31,7 @@ export const useBenchmarks = (userId: string | undefined) => {
             return benchmarkResult.results.map((result) => ({
               ...result,
               platform: benchmarkResult.environment_info.platform,
-              id: `${composeId(result)}`
+              id: `${composeId(result)}`,
             }));
           }
           return [];

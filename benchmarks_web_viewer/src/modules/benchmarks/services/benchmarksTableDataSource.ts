@@ -37,7 +37,7 @@ export const data = (items: Result[]): BenchmarkResultItem[] => {
       acceleratorName: item.backend_info.accelerator_name,
       date: itemDateTime(item),
       score: itemScore(item),
-      platform: item.platform
+      platform: item.platform,
     };
   });
 };
