@@ -18,7 +18,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useLoginMutation } from "../hooks/useLoginMutation";
-import { useUser } from "../hooks/useUser";
 import { ReactComponent as MLCommonsLogo } from "../../../assets/MLCommonsLogo.svg";
 
 export type FormValTypes = {
@@ -165,11 +164,11 @@ const LoginPage = () => {
                 {errors?.password?.message && renderErr("password")}
               </InputGroup>
 
-              <Flex justifyContent="flex-end">
-                <Button mt={2.5} variant="link" onClick={onForgotPassword}>
-                  Forgot password?
-                </Button>
-              </Flex>
+              {/*<Flex justifyContent="flex-end">*/}
+              {/*  <Button mt={2.5} variant="link" onClick={onForgotPassword}>*/}
+              {/*    Forgot password?*/}
+              {/*  </Button>*/}
+              {/*</Flex>*/}
 
               <Button
                 variant={"purple"}
