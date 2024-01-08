@@ -16,17 +16,20 @@
 
 from PIL import Image
 import os
+
+def center_crop(img):
+  frac=0.875
+  left = img.size[0]*((1-frac)/2)
+  upper = img.size[1]*((1-frac)/2)
+  right = img.size[0]-((1-frac)/2)*img.size[0]
+  bottom = img.size[1]-((1-frac)/2)*img.size[1]
+  img = img.crop((left, upper, right, bottom))
+  return img
+
 for f in os.listdir(os.sys.argv[1]):
+  print(os.sys.argv[1]+"/"+f)
   img = Image.open(os.sys.argv[1]+"/"+f)
-  img256 = img.resize((256, 256), Image.ANTIALIAS)
-
-  # Seems like the required algo is to resize to 256x256
-  # Then center crop a 224x244 image
-  left = (256 - 224)/2
-  top = (256 - 224)/2
-  right = (256 + 224)/2
-  bottom = (256 + 224)/2
-
-  # Crop 224x224 image from the center
-  img224 = img256.crop((left, top, right, bottom))
-  img224.save(os.sys.argv[2]+"/"+f)
+  # center crop
+  img = center_crop(img)
+  img = img.resize((384, 384), resample= Image.Resampling.BILINEAR)
+  img.save(os.sys.argv[2]+"/"+f)

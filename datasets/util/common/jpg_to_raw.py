@@ -35,9 +35,16 @@ for image in image_list:
     original_im = Image.open(BytesIO(jpeg_str))
     converted_image = original_im.convert('RGB')
     npimage = np.asarray(converted_image).astype(np.float32)
-    npimage = npimage * 0.00784313771874
-    npimage = npimage - 1.0
-    img_ndarray = np.array(npimage)
+
+    red = npimage[:,:,0]
+    blue = npimage[:,:,1]
+    green = npimage[:,:,2]
+
+    red=(red-123.675)*0.0175438596
+    blue=(blue-116.28)*0.0175438596
+    green=(green-103.53)*0.0175438596
+
+    npimage = np.dstack([red,blue,green])
     tmp = dst.split(".")
     tmp[-1] = "raw"
     f_name = ".".join(tmp)
