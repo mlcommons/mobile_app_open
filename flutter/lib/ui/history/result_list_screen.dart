@@ -90,7 +90,7 @@ class _ResultListScreenState extends State<ResultListScreen> {
       ]),
       body: ListView.separated(
         controller: ScrollController(),
-        padding: const EdgeInsets.only(top: 0, bottom: 0),
+        padding: const EdgeInsets.only(top: 20, bottom: 20),
         itemCount: itemsList.length,
         separatorBuilder: (context, index) => const Divider(),
         itemBuilder: (context, index) {

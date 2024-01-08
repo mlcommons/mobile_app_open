@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/ui/history/list_item.dart';
+import 'package:mlperfbench/ui/icons.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 
 class ExtendedResultListItem implements ListItem {
@@ -31,33 +33,73 @@ class BenchmarkListItem implements ListItem {
   BenchmarkListItem(this.item, this.tapHandler);
 
   @override
-  Widget build(BuildContext context) => ListTile(
-        title: Text(
+  Widget build(BuildContext context) {
+    final leadingWidth = 0.08 * MediaQuery.of(context).size.width;
+    final subtitleWidth = 0.64 * MediaQuery.of(context).size.width;
+    final trailingWidth = 0.28 * MediaQuery.of(context).size.width;
+    return ListTile(
+      contentPadding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
+      minVerticalPadding: 0,
+      leading: SizedBox(
+        width: leadingWidth,
+        height: leadingWidth,
+        child: BenchmarkIcons.getDarkIcon(item.benchmarkId),
+      ),
+      title: SizedBox(
+        width: subtitleWidth,
+        child: Text(
           item.benchmarkName,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text(
+      ),
+      subtitle: SizedBox(
+        width: subtitleWidth,
+        child: Text(
           '${itemAdditionalInfo()}\n${itemDateTime()}',
           style: const TextStyle(fontWeight: FontWeight.normal, height: 1.4),
         ),
-        trailing: Text(
-          itemScore(),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        isThreeLine: true,
-        onTap: tapHandler,
-      );
+      ),
+      trailing: SizedBox(
+          width: trailingWidth,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                flex: 8,
+                fit: FlexFit.tight,
+                child: Text(
+                  itemScore(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0,
+                    color: AppColors.resultValid,
+                  ),
+                ),
+              ),
+              const Flexible(
+                flex: 2,
+                fit: FlexFit.tight,
+                child: Icon(Icons.chevron_right),
+              ),
+            ],
+          )),
+      onTap: tapHandler,
+    );
+  }
 
   String itemScore() {
     final throughput = item.performanceRun?.throughput;
     final accuracy = item.accuracyRun?.accuracy;
+    var throughputString = 'n/a';
+    var accuracyString = 'n/a';
     if (throughput != null) {
-      return throughput.toUIString();
-    } else if (accuracy != null) {
-      return accuracy.formatted;
-    } else {
-      return 'unknown';
+      throughputString = throughput.toUIString();
     }
+    if (accuracy != null) {
+      accuracyString = accuracy.formatted;
+    }
+    return '$throughputString\n$accuracyString';
   }
 
   String itemDateTime() {
