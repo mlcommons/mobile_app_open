@@ -5,12 +5,13 @@ import { useUser } from "../../auth/hooks/useUser";
 import BenchmarkTableDrawer from "./BenchmarkTableDrawer";
 import BenchmarksTable from "./BenchmarksTable";
 import { BenchmarkResultItem } from "../models/benchmarks.model";
+import CenterSpinner from "../../../sharedComponents/CenterSpinner";
 
 const BenchmarkListPage = () => {
   const { isOpen, onToggle, onClose, onOpen } = useDisclosure();
 
   const user = useUser();
-  const { benchmarks } = useBenchmarks(user?.uid);
+  const { benchmarks, isLoading } = useBenchmarks(user?.uid);
 
   const [benchmarkId, setBenchmarkId] = useState<string | null>();
   const onInternalClose = () => {
@@ -28,6 +29,7 @@ const BenchmarkListPage = () => {
       {benchmarks && (
         <BenchmarksTable data={benchmarks} onClick={onInternalOpen} />
       )}
+      {isLoading && <CenterSpinner />}
       {benchmarkId && (
         <BenchmarkTableDrawer
           benchmarkId={benchmarkId}

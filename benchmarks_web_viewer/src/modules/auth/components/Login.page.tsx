@@ -18,7 +18,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useLoginMutation } from "../hooks/useLoginMutation";
-import { useUser } from "../hooks/useUser";
 import { ReactComponent as MLCommonsLogo } from "../../../assets/MLCommonsLogo.svg";
 
 export type FormValTypes = {
@@ -37,31 +36,10 @@ const schema = yup.object().shape({
 });
 
 const LoginPage = () => {
-  const { mutate } = useLoginMutation();
-  const navigate = useNavigate();
-  const toast = useToast();
+  const { mutate, isPending } = useLoginMutation();
   const [show, setShow] = useState(false);
 
   const handleClick = () => setShow(!show);
-
-  const isExpiredSession = window.location.search.includes("expired=true");
-  const showError = useMemo(
-    () => Boolean(isExpiredSession),
-    [isExpiredSession],
-  );
-
-  useEffect(() => {
-    if (showError) {
-      toast({
-        title: "Session Expired",
-        description: "Please login again",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      navigate(window.location.pathname);
-    }
-  }, [showError, navigate, toast]);
 
   const hookFormVals = useForm<FormValTypes>({
     resolver: yupResolver(schema),
@@ -165,11 +143,11 @@ const LoginPage = () => {
                 {errors?.password?.message && renderErr("password")}
               </InputGroup>
 
-              <Flex justifyContent="flex-end">
-                <Button mt={2.5} variant="link" onClick={onForgotPassword}>
-                  Forgot password?
-                </Button>
-              </Flex>
+              {/*<Flex justifyContent="flex-end">*/}
+              {/*  <Button mt={2.5} variant="link" onClick={onForgotPassword}>*/}
+              {/*    Forgot password?*/}
+              {/*  </Button>*/}
+              {/*</Flex>*/}
 
               <Button
                 variant={"purple"}
@@ -177,6 +155,7 @@ const LoginPage = () => {
                 fontSize={16}
                 type="submit"
                 w={"100%"}
+                isLoading={isPending}
               >
                 Login
               </Button>

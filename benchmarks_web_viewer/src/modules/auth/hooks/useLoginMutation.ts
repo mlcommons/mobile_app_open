@@ -2,6 +2,7 @@ import { loginUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEY } from "../../../constants/constants";
+import { useToast } from "@chakra-ui/react";
 
 export type FormValTypes = {
   email: string;
@@ -18,6 +19,7 @@ const signIn = async (formData: FormValTypes) => {
 export const useLoginMutation = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   return useMutation({
     mutationFn: signIn,
@@ -29,7 +31,13 @@ export const useLoginMutation = () => {
       }
     },
     onError(error) {
-      // onError && onError(error);
+      toast({
+        title: "Login Error",
+        description: "Login Failed.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
     },
     onSettled() {
       // onSettled && onSettled();
