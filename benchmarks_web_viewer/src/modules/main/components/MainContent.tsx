@@ -4,7 +4,7 @@ import React from "react";
 import ResponsiveMenuHeader from "./ResponsiveMenuHeader";
 
 const MainContentWithHeader = () => {
-  const { onToggle, isOpen, onClose } = useDisclosure();
+  const { onToggle, isOpen } = useDisclosure();
 
   return (
     <Flex flexDir="column" flexGrow={1} minWidth={0}>

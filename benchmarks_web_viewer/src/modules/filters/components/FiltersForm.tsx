@@ -31,7 +31,7 @@ type Props = {
 
 const FiltersForm = ({ onClose }: Props) => {
   const { resultFilter, setResultFilter } = useFilters();
-  const { handleSubmit, control, formState, register, reset, watch } =
+  const { handleSubmit, control, formState, register, reset } =
     useForm<ResultFilterType>({
       resolver: yupResolver(schema),
       defaultValues: {

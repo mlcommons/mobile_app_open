@@ -50,10 +50,6 @@ const LoginPage = () => {
     mutate(formData);
   };
 
-  const onForgotPassword = () => {
-    // navigate("/forgot-password");
-  };
-
   const renderErr = (errKey: string) => {
     const message = errors[errKey]?.message;
 
