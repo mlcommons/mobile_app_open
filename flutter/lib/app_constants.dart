@@ -33,7 +33,7 @@ class AppColors {
   static const dialogBackground = Colors.white;
   static const snackBarBackground = Color(0xFFEDEDED);
   static const appBarBackground =
-      DartDefine.isOfficialBuild ? Color(0xFF31A3E2) : Colors.brown;
+      DartDefine.isOfficialBuild ? Color(0xFF166299) : Colors.brown;
 
   static const appBarIcon = Colors.white;
 
@@ -86,6 +86,7 @@ class AppColors {
 
 class WidgetSizes {
   static const circleWidthFactor = 0.32;
+  static const borderRadius = 8.0;
 }
 
 class BenchmarkId {

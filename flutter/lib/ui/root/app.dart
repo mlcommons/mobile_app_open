@@ -25,6 +25,11 @@ class MyApp extends StatelessWidget {
           backgroundColor: AppColors.appBarBackground,
           iconTheme: IconThemeData(color: AppColors.appBarIcon),
         ),
+        popupMenuTheme: PopupMenuThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
+          ),
+        ),
       ),
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],

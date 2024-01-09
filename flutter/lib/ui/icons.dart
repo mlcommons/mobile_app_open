@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/svg.dart';
 
+import 'package:mlperfbench/app_constants.dart';
+
 class AppIcons {
   static SvgPicture _pSvgWhite(String name) {
     const colorFilter = ColorFilter.mode(Colors.white, BlendMode.srcIn);
@@ -55,4 +57,31 @@ class AppIcons {
     return const DecorationImage(
         image: AssetImage('assets/splash.png'), fit: BoxFit.fill);
   }
+}
+
+class BenchmarkIcons {
+  static final darkSet = {
+    BenchmarkId.imageClassification: AppIcons.imageClassification,
+    BenchmarkId.objectDetection: AppIcons.objectDetection,
+    BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentation,
+    BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessing,
+    BenchmarkId.superResolution: AppIcons.superResolution,
+    BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOffline,
+  };
+
+  static final lightSet = {
+    BenchmarkId.imageClassification: AppIcons.imageClassificationWhite,
+    BenchmarkId.objectDetection: AppIcons.objectDetectionWhite,
+    BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentationWhite,
+    BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessingWhite,
+    BenchmarkId.superResolution: AppIcons.superResolutionWhite,
+    BenchmarkId.imageClassificationOffline:
+        AppIcons.imageClassificationOfflineWhite,
+  };
+
+  static Widget getDarkIcon(String benchmarkId) =>
+      darkSet[benchmarkId] ?? AppIcons.logo;
+
+  static Widget getLightIcon(String benchmarkId) =>
+      lightSet[benchmarkId] ?? AppIcons.logo;
 }

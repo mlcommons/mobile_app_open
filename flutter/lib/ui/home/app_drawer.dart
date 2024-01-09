@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/ui/history/result_list_screen.dart';
+import 'package:mlperfbench/ui/history/history_list_screen.dart';
 import 'package:mlperfbench/ui/home/user_profile.dart';
 import 'package:mlperfbench/ui/settings/about_screen.dart';
 import 'package:mlperfbench/ui/settings/settings_screen.dart';
@@ -61,7 +61,7 @@ class AppDrawer extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const ResultListScreen(),
+              builder: (context) => const HistoryListScreen(),
             ),
           );
         },

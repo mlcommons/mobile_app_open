@@ -148,6 +148,7 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
       throw 'delegate_selected=$selected must be one of delegate_choice=$choices';
     }
     final dropDownButton = DropdownButton<String>(
+        borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
         underline: const SizedBox(),
         value: selected,
         items: choices

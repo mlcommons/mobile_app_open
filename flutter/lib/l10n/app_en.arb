@@ -142,6 +142,7 @@
 
   "historyFilterTitle": "Filters",
   "historyFilterClear": "Clear Filters",
+  "historyFilterApply": "Apply Filters",
   "historyFilterCreationDate": "Creation Date",
   "historyFilterPlatform": "Platform",
   "historyFilterBenchmarkID": "Benchmark ID",
@@ -150,10 +151,8 @@
   "historyFilterManufacturer": "Manufacturer",
   "historyFilterSoC": "SoC",
   "historySortBy": "Sort by",
-  "historySortByDateAsc": "Date: from oldest to most recent",
-  "historySortByDateDesc": "Date: from most recent to oldest",
-  "historySortByTaskThroughputDesc": "Task throughput: from highest to lowest",
-  "historySortByTaskThroughputAsc": "Task throughput: from lowest to highest",
+  "historySortByDate": "Date",
+  "historySortByTaskThroughput": "Task Throughput",
 
   "historyDetailsTitle": "Result details",
   "historyDetailsBuildTypeDebug": "debug build",

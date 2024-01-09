@@ -187,6 +187,7 @@ class _SettingsScreen extends State<SettingsScreen> {
       ),
       subtitle: Text(l10n.settingsRunModeSubtitle),
       trailing: DropdownButton<BenchmarkRunModeEnum>(
+          borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
           value: store.selectedBenchmarkRunMode,
           items: BenchmarkRunModeEnum.values
               .map((runMode) => DropdownMenuItem<BenchmarkRunModeEnum>(

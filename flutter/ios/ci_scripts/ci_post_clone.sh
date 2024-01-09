@@ -31,7 +31,7 @@ if [ -n "$CI_DERIVED_DATA_PATH" ]; then
   CACHE_BUCKET=xcodecloud-bazel-ios---mobile-app-build-290400
   # Required that a secret env existed in the XCode Cloud workflow
   # with key=GC_CREDS and value=<output of cmd `base64 mobile-app-build-290400-1b26aafa8afd.json`>
-  GC_CREDS_FILE=$CI_WORKSPACE/mobile-app-build-290400-1b26aafa8afd.json
+  GC_CREDS_FILE=$CI_PRIMARY_REPOSITORY_PATH/mobile-app-build-290400-1b26aafa8afd.json
   echo "$GC_CREDS" | base64 --decode >"$GC_CREDS_FILE"
   export BAZEL_OUTPUT_ROOT_ARG="--output_user_root=$MC_BUILD_HOME/bazel"
   export BAZEL_CACHE_ARG="--remote_cache=https://storage.googleapis.com/$CACHE_BUCKET --google_credentials=$GC_CREDS_FILE"
