@@ -31,7 +31,10 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text(l10n.historyFilterTitle),
-          actions: [_clearFilterButton(state.resourceManager.resultManager)],
+          actions: [
+            _applyFilterButton(),
+            _clearFilterButton(state.resourceManager.resultManager),
+          ],
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -183,6 +186,16 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
       ),
       onSubmitted: (value) {
         filter.soc = value.isEmpty ? null : value;
+      },
+    );
+  }
+
+  Widget _applyFilterButton() {
+    return IconButton(
+      icon: const Icon(Icons.done),
+      tooltip: l10n.historyFilterApply,
+      onPressed: () {
+        Navigator.pop(context);
       },
     );
   }

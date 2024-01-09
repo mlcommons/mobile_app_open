@@ -142,6 +142,7 @@
 
   "historyFilterTitle": "Filters",
   "historyFilterClear": "Clear Filters",
+  "historyFilterApply": "Apply Filters",
   "historyFilterCreationDate": "Creation Date",
   "historyFilterPlatform": "Platform",
   "historyFilterBenchmarkID": "Benchmark ID",
