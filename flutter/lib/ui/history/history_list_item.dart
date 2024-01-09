@@ -1,36 +1,16 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/ui/history/list_item.dart';
 import 'package:mlperfbench/ui/icons.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 
-class ExtendedResultListItem implements ListItem {
-  final ExtendedResult item;
-  final void Function()? tapHandler;
-
-  ExtendedResultListItem(this.item, this.tapHandler);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        formatDateTime(item.meta.creationDate.toLocal()),
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-      subtitle: Text(item.meta.uuid),
-      onTap: tapHandler,
-    );
-  }
-}
-
-class BenchmarkListItem implements ListItem {
+class HistoryListItem implements ListItem {
   final BenchmarkExportResult item;
   final void Function()? tapHandler;
 
-  BenchmarkListItem(this.item, this.tapHandler);
+  HistoryListItem(this.item, this.tapHandler);
 
   @override
   Widget build(BuildContext context) {

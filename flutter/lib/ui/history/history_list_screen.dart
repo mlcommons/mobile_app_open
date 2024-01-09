@@ -7,21 +7,19 @@ import 'package:mlperfbench/data/benchmarks_data_provider.dart';
 import 'package:mlperfbench/data/result_sort.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/history/benchmark_export_result_screen.dart';
+import 'package:mlperfbench/ui/history/history_filter_screen.dart';
+import 'package:mlperfbench/ui/history/history_list_item.dart';
 import 'package:mlperfbench/ui/history/list_item.dart';
-import 'package:mlperfbench/ui/history/result_filter_screen.dart';
-import 'package:mlperfbench/ui/history/result_list_item.dart';
-import 'package:mlperfbench/ui/history/run_details_screen.dart';
 
-class ResultListScreen extends StatefulWidget {
-  const ResultListScreen({Key? key}) : super(key: key);
+class HistoryListScreen extends StatefulWidget {
+  const HistoryListScreen({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() {
-    return _ResultListScreenState();
-  }
+  State<StatefulWidget> createState() => _HistoryListScreenState();
 }
 
-class _ResultListScreenState extends State<ResultListScreen> {
+class _HistoryListScreenState extends State<HistoryListScreen> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
@@ -108,11 +106,11 @@ class _ResultListScreenState extends State<ResultListScreen> {
   }
 
   ListItem _benchmarkListItem(BenchmarkExportResult item) {
-    return BenchmarkListItem(item, () {
+    return HistoryListItem(item, () {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => RunDetailsScreen(result: item),
+          builder: (context) => BenchmarkExportResultScreen(result: item),
         ),
       ).then((value) => setState(() {}));
     });

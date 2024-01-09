@@ -7,20 +7,21 @@ import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
-import 'package:mlperfbench/ui/history/run_details_screen.dart';
+import 'package:mlperfbench/ui/history/benchmark_export_result_screen.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 
-class DetailsScreen extends StatefulWidget {
+class ExtendedResultScreen extends StatefulWidget {
   final ExtendedResult result;
 
-  const DetailsScreen({Key? key, required this.result}) : super(key: key);
+  const ExtendedResultScreen({Key? key, required this.result})
+      : super(key: key);
 
   @override
-  State<DetailsScreen> createState() => _DetailsScreen();
+  State<ExtendedResultScreen> createState() => _ExtendedResultScreenState();
 }
 
-class _DetailsScreen extends State<DetailsScreen> {
+class _ExtendedResultScreenState extends State<ExtendedResultScreen> {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
   late BenchmarkState state;
@@ -126,7 +127,7 @@ class _DetailsScreen extends State<DetailsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RunDetailsScreen(result: runInfo),
+            builder: (context) => BenchmarkExportResultScreen(result: runInfo),
           ),
         );
       },

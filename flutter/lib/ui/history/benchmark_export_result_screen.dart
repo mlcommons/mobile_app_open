@@ -6,16 +6,19 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 
-class RunDetailsScreen extends StatefulWidget {
+class BenchmarkExportResultScreen extends StatefulWidget {
   final BenchmarkExportResult result;
 
-  const RunDetailsScreen({Key? key, required this.result}) : super(key: key);
+  const BenchmarkExportResultScreen({Key? key, required this.result})
+      : super(key: key);
 
   @override
-  State<RunDetailsScreen> createState() => _RunDetailsScreen();
+  State<BenchmarkExportResultScreen> createState() =>
+      _BenchmarkExportResultScreenState();
 }
 
-class _RunDetailsScreen extends State<RunDetailsScreen> {
+class _BenchmarkExportResultScreenState
+    extends State<BenchmarkExportResultScreen> {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
 
