@@ -86,6 +86,7 @@ class AppColors {
 
 class WidgetSizes {
   static const circleWidthFactor = 0.32;
+  static const borderRadius = 8.0;
 }
 
 class BenchmarkId {
