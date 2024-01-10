@@ -1,17 +1,18 @@
-name: Deploy Web App
+name: Web Deploy
 
 on:
   push:
     branches: [ master, submission-v* ]
+    paths: [ 'benchmarks_web_viewer/**' ]
   pull_request:
     types: [ opened, synchronize, reopened ]
+    paths: [ 'benchmarks_web_viewer/**' ]
 
 jobs:
-  build_and_preview:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      # TODO: fix the warnings in code and remove CI=false
       - name: Build website
         env:
           REACT_APP_FIREBASE_WEB_API_KEY: ${{ secrets.FIREBASE_WEB_API_KEY }}
@@ -25,7 +26,7 @@ jobs:
         run: |
           cd ./benchmarks_web_viewer
           yarn install --immutable --immutable-cache --check-cache
-          CI=false yarn build
+          yarn build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         name: Deploy to Firebase Hosting on Preview channel
         if: github.ref != 'refs/heads/master'
