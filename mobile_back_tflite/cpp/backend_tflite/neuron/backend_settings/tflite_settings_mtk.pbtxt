@@ -84,7 +84,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "image_classification_offline"
+  benchmark_id: "image_classification_offline_v2"
   framework: "TFLite"
   delegate_choice: {
     delegate_name: "Neuron"
