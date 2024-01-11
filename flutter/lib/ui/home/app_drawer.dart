@@ -38,7 +38,7 @@ class AppDrawer extends StatelessWidget {
         child: ListView(
           children: [
             appTitle,
-            const UserProfile(),
+            const UserProfileSection(),
           ],
         ),
       );
