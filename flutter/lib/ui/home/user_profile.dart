@@ -27,9 +27,9 @@ class _UserProfileState extends State<UserProfile> {
     l10n = AppLocalizations.of(context);
 
     final currentUser = FirebaseAuth.instance.currentUser;
-    final signInWithEmailButton = _buildSignInWithEmailButton(context);
-    final signInAnonymouslyButton = _buildSignInAnonymouslyButton(context);
-    final profileButton = _buildProfileButton(context);
+    final signInWithEmailButton = _buildSignInWithEmailButton();
+    final signInAnonymouslyButton = _buildSignInAnonymouslyButton();
+    final profileButton = _buildProfileButton();
 
     List<Widget> children = [];
     if (currentUser == null) {
@@ -52,7 +52,7 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-  Widget _buildSignInAnonymouslyButton(BuildContext context) {
+  Widget _buildSignInAnonymouslyButton() {
     return ElevatedButton(
       onPressed: () {
         FirebaseManager.instance.signInAnonymously();
@@ -62,7 +62,7 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-  Widget _buildSignInWithEmailButton(BuildContext context) {
+  Widget _buildSignInWithEmailButton() {
     final resultManager = state.resourceManager.resultManager;
     final signInScreenActions = [
       AuthStateChangeAction<SignedIn>((context, state) {
@@ -102,7 +102,7 @@ class _UserProfileState extends State<UserProfile> {
     return signInButton;
   }
 
-  Widget _buildProfileButton(BuildContext context) {
+  Widget _buildProfileButton() {
     final resultManager = state.resourceManager.resultManager;
     var profileScreenActions = [
       SignedOutAction((context) {
@@ -119,11 +119,19 @@ class _UserProfileState extends State<UserProfile> {
           MaterialPageRoute(
             builder: (context) {
               return Scaffold(
-                  appBar: AppBar(title: Text(l10n.menuProfile)),
-                  body: ProfileScreen(
-                    providers: FirebaseManager.instance.authProviders,
-                    actions: profileScreenActions,
-                  ));
+                appBar: AppBar(title: Text(l10n.menuProfile)),
+                body: ProfileScreen(
+                  providers: FirebaseManager.instance.authProviders,
+                  actions: profileScreenActions,
+                  children: [
+                    const Divider(),
+                    const SizedBox(height: 8),
+                    _buildUserInfoSection(),
+                    const SizedBox(height: 8),
+                    const Divider(),
+                  ],
+                ),
+              );
             },
           ),
         );
@@ -131,5 +139,40 @@ class _UserProfileState extends State<UserProfile> {
       child: Text(l10n.userProfile),
     );
     return profileButton;
+  }
+
+  Widget _buildUserInfoSection() {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      return Text(l10n.unknown);
+    }
+    List<Widget> children = [];
+    final titleTextStyle = Theme.of(context).textTheme.titleMedium;
+    final subtitleTextStyle = Theme.of(context).textTheme.bodyMedium;
+    const spacing = SizedBox(height: 12);
+    final email = currentUser.email;
+    if (email != null) {
+      children.add(Text(email, style: titleTextStyle));
+    }
+    if (currentUser.isAnonymous) {
+      children.add(Text(l10n.userAnonymousUser, style: titleTextStyle));
+    }
+    children.add(spacing);
+
+    final userId = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(l10n.userId, style: titleTextStyle),
+        Text(currentUser.uid, style: subtitleTextStyle),
+      ],
+    );
+    children.add(userId);
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    );
   }
 }
