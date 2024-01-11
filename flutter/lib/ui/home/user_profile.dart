@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/time_utils.dart';
 
 class UserProfileSection extends StatefulWidget {
   const UserProfileSection({Key? key}) : super(key: key);
@@ -168,8 +169,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
     List<Widget> children = [];
     final titleTextStyle = Theme.of(context).textTheme.titleMedium;
-    final subtitleTextStyle = Theme.of(context).textTheme.bodyMedium;
-    const spacing = SizedBox(height: 12);
+    final subtitleTextStyle = Theme.of(context)
+        .textTheme
+        .titleMedium
+        ?.copyWith(color: Colors.black.withOpacity(0.6));
     final email = currentUser.email;
     if (email != null) {
       children.add(Text(email, style: titleTextStyle));
@@ -177,7 +180,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     if (currentUser.isAnonymous) {
       children.add(Text(l10n.userAnonymousUser, style: titleTextStyle));
     }
-    children.add(spacing);
+    children.add(const Divider());
 
     final userId = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -189,9 +192,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
     children.add(userId);
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final creationTime = currentUser.metadata.creationTime;
+    if (creationTime != null) {
+      final creationTimeRow = Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(l10n.userCreated, style: titleTextStyle),
+          Text(formatDateTime(creationTime), style: subtitleTextStyle),
+        ],
+      );
+      children.add(creationTimeRow);
+    }
+
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
       children: children,
     );
   }
