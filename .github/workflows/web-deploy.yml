@@ -3,10 +3,10 @@ name: Web Deploy
 on:
   push:
     branches: [ master, submission-v* ]
-    paths: [ 'benchmarks_web_viewer/**' ]
+    paths: [ 'react/**' ]
   pull_request:
     types: [ opened, synchronize, reopened ]
-    paths: [ 'benchmarks_web_viewer/**' ]
+    paths: [ 'react/**' ]
 
 jobs:
   build-and-deploy:
@@ -24,7 +24,7 @@ jobs:
           REACT_APP_FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
           REACT_APP_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
         run: |
-          cd ./benchmarks_web_viewer
+          cd ./react
           yarn install --immutable --immutable-cache --check-cache
           yarn build
       - uses: FirebaseExtended/action-hosting-deploy@v0
@@ -34,7 +34,7 @@ jobs:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}"
           projectId: mobile-app-build-290400
-          entryPoint: "./benchmarks_web_viewer"
+          entryPoint: "./react"
           expires: 30d
       - uses: FirebaseExtended/action-hosting-deploy@v0
         name: Deploy to Firebase Hosting on Live channel
@@ -43,5 +43,5 @@ jobs:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}"
           projectId: mobile-app-build-290400
-          entryPoint: "./benchmarks_web_viewer"
+          entryPoint: "./react"
           channelId: live
