@@ -8,7 +8,6 @@ const MotionFlex = motion<FlexProps>(Flex);
 
 type Props = {
   isOpen: boolean;
-  onToggle: () => void;
   onClose: () => void;
   benchmarkId: string;
 };

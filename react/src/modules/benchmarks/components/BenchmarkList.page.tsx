@@ -8,7 +8,7 @@ import { BenchmarkResultItem } from "../models/benchmarks.model";
 import CenterSpinner from "../../../sharedComponents/CenterSpinner";
 
 const BenchmarkListPage = () => {
-  const { isOpen, onToggle, onClose, onOpen } = useDisclosure();
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
   const user = useUser();
   const { benchmarks, isLoading } = useBenchmarks(user?.uid);
@@ -35,7 +35,6 @@ const BenchmarkListPage = () => {
           benchmarkId={benchmarkId}
           isOpen={isOpen}
           onClose={onInternalClose}
-          onToggle={onToggle}
         />
       )}
     </ChakraProvider>
