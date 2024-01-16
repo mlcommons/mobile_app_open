@@ -5,23 +5,94 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
+import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/history/benchmark_export_result_screen.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 
-class ExtendedResultScreen extends StatefulWidget {
-  final ExtendedResult result;
+class RemoteExtendedResultScreen extends StatefulWidget {
+  final String fileName;
 
-  const ExtendedResultScreen({Key? key, required this.result})
+  const RemoteExtendedResultScreen({Key? key, required this.fileName})
       : super(key: key);
 
   @override
-  State<ExtendedResultScreen> createState() => _ExtendedResultScreenState();
+  State<StatefulWidget> createState() => _RemoteExtendedResultScreenState();
 }
 
-class _ExtendedResultScreenState extends State<ExtendedResultScreen> {
+class _RemoteExtendedResultScreenState
+    extends State<RemoteExtendedResultScreen> {
+  late AppLocalizations l10n;
+
+  Future<ExtendedResult> downloadResult() =>
+      FirebaseManager.instance.downloadResult(widget.fileName);
+
+  @override
+  Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.historyDetailsTitle),
+        actions: [_deleteButton()],
+      ),
+      body: FutureBuilder(
+        future: downloadResult(),
+        builder: (context, AsyncSnapshot<ExtendedResult> snapshot) {
+          Widget child;
+          final result = snapshot.data;
+          if (snapshot.hasData && result != null) {
+            child = ExtendedResultView(result: result);
+          } else if (snapshot.hasError) {
+            child = Text('${snapshot.error}');
+          } else {
+            child = const CircularProgressIndicator();
+          }
+          return Container(color: Colors.white, child: Center(child: child));
+        },
+      ),
+    );
+  }
+
+  Widget _deleteButton() {
+    return IconButton(
+      icon: const Icon(Icons.delete),
+      tooltip: l10n.historyListSelectionDelete,
+      onPressed: () async {
+        final dialogResult = await showConfirmDialog(
+          context,
+          l10n.historyDetailsDeleteConfirm,
+          title: l10n.historyDetailsDelete,
+        );
+        switch (dialogResult) {
+          case ConfirmDialogAction.ok:
+            setState(() {
+              FirebaseManager.instance.deleteResult(widget.fileName);
+              Navigator.pop(context);
+            });
+            break;
+          case null:
+          case ConfirmDialogAction.cancel:
+            break;
+        }
+      },
+    );
+  }
+}
+
+class LocalExtendedResultScreen extends StatefulWidget {
+  final ExtendedResult result;
+
+  const LocalExtendedResultScreen({Key? key, required this.result})
+      : super(key: key);
+
+  @override
+  State<LocalExtendedResultScreen> createState() =>
+      _LocalExtendedResultScreenState();
+}
+
+class _LocalExtendedResultScreenState extends State<LocalExtendedResultScreen> {
   late AppLocalizations l10n;
   late HistoryHelperUtils helper;
   late BenchmarkState state;
@@ -35,10 +106,58 @@ class _ExtendedResultScreenState extends State<ExtendedResultScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.historyDetailsTitle),
-        actions: [_makeDeleteButton()],
+        actions: [_deleteButton()],
       ),
-      body: ListView(children: _makeBody()),
+      body: ExtendedResultView(result: widget.result),
     );
+  }
+
+  Widget _deleteButton() {
+    return IconButton(
+      icon: const Icon(Icons.delete),
+      tooltip: l10n.historyListSelectionDelete,
+      onPressed: () async {
+        final dialogResult = await showConfirmDialog(
+          context,
+          l10n.historyDetailsDeleteConfirm,
+          title: l10n.historyDetailsDelete,
+        );
+        switch (dialogResult) {
+          case ConfirmDialogAction.ok:
+            setState(() {
+              state.resourceManager.resultManager.deleteResult(widget.result);
+              Navigator.pop(context);
+            });
+            break;
+          case null:
+          case ConfirmDialogAction.cancel:
+            break;
+        }
+      },
+    );
+  }
+}
+
+class ExtendedResultView extends StatefulWidget {
+  final ExtendedResult result;
+
+  const ExtendedResultView({Key? key, required this.result}) : super(key: key);
+
+  @override
+  State<ExtendedResultView> createState() => _ExtendedResultViewState();
+}
+
+class _ExtendedResultViewState extends State<ExtendedResultView> {
+  late AppLocalizations l10n;
+  late HistoryHelperUtils helper;
+  late BenchmarkState state;
+
+  @override
+  Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
+    helper = HistoryHelperUtils(l10n);
+    state = context.watch<BenchmarkState>();
+    return ListView(children: _makeBody());
   }
 
   double calculateAverageThroughput(List<BenchmarkExportResult> results) {
@@ -130,31 +249,6 @@ class _ExtendedResultScreenState extends State<ExtendedResultScreen> {
             builder: (context) => BenchmarkExportResultScreen(result: runInfo),
           ),
         );
-      },
-    );
-  }
-
-  Widget _makeDeleteButton() {
-    return IconButton(
-      icon: const Icon(Icons.delete),
-      tooltip: l10n.historyListSelectionDelete,
-      onPressed: () async {
-        final dialogResult = await showConfirmDialog(
-          context,
-          l10n.historyDetailsDeleteConfirm,
-          title: l10n.historyDetailsDelete,
-        );
-        switch (dialogResult) {
-          case ConfirmDialogAction.ok:
-            setState(() {
-              state.resourceManager.resultManager.deleteResult(widget.result);
-              Navigator.pop(context);
-            });
-            break;
-          case null:
-          case ConfirmDialogAction.cancel:
-            break;
-        }
       },
     );
   }

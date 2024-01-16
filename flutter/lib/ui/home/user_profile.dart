@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/home/uploaded_files_screen.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 
 class UserProfileSection extends StatefulWidget {
@@ -157,6 +158,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           _buildUserInfoSection(),
           const SizedBox(height: 8),
           const Divider(),
+          _buildManageUploadedFileButton(),
         ],
       ),
     );
@@ -209,6 +211,30 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       spacing: 12,
       runSpacing: 12,
       children: children,
+    );
+  }
+
+  Widget _buildManageUploadedFileButton() {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return const UploadedFilesScreen();
+            },
+          ),
+        );
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Icon(Icons.cloud),
+          const SizedBox(width: 8),
+          Text(l10n.userManageUploadedResults),
+        ],
+      ),
     );
   }
 }

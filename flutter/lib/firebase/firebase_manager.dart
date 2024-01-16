@@ -90,6 +90,20 @@ extension Storage on FirebaseManager {
         jsonString, _authService.currentUser.uid, fileName);
   }
 
+  Future<void> deleteResult(String fileName) async {
+    final uid = _authService.currentUser.uid;
+    await _storageService.delete(uid, fileName);
+  }
+
+  Future<ExtendedResult> downloadResult(String fileName) async {
+    print('Download online result [$fileName]');
+    final uid = _authService.currentUser.uid;
+    final content = await _storageService.download(uid, fileName);
+    final json = jsonDecode(content) as Map<String, dynamic>;
+    final result = ExtendedResult.fromJson(json);
+    return result;
+  }
+
   Future<List<ExtendedResult>> downloadResults(List<String> excluded) async {
     final uid = _authService.currentUser.uid;
     final fileNames = await _storageService.list(uid);
@@ -101,13 +115,16 @@ extension Storage on FirebaseManager {
         print('Exclude local existed result [$fileName] from download');
         continue;
       }
-      print('Download online result [$fileName]');
-      final content = await _storageService.download(uid, fileName);
-      final json = jsonDecode(content) as Map<String, dynamic>;
-      final result = ExtendedResult.fromJson(json);
+      final result = await downloadResult(fileName);
       results.add(result);
     }
     return results;
+  }
+
+  Future<List<String>> listResults() async {
+    final uid = _authService.currentUser.uid;
+    final fileNames = await _storageService.list(uid);
+    return fileNames;
   }
 }
 
