@@ -13,7 +13,12 @@ type Props = {
   benchmarkId: string;
 };
 
-const BenchmarkTableDrawer = ({ isOpen, onClose, benchmarkId }: Props) => {
+const BenchmarkTableDrawer = ({
+  isOpen,
+  onClose,
+  onToggle,
+  benchmarkId,
+}: Props) => {
   const drawerRef = React.useRef<HTMLElement | null>(null);
 
   const getDrawerContents = () => {
@@ -21,6 +26,7 @@ const BenchmarkTableDrawer = ({ isOpen, onClose, benchmarkId }: Props) => {
       <BenchmarkDrawerContent
         onClose={onClose}
         isOpen={isOpen}
+        onToggle={onToggle}
         benchmarkId={benchmarkId}
       />
     );

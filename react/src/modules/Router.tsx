@@ -5,8 +5,6 @@ import CenterSpinner from "../sharedComponents/CenterSpinner";
 import { useUser } from "./auth/hooks/useUser";
 import { useIsRestoring } from "@tanstack/react-query";
 
-// import useUser from "./auth/store/user.state";
-
 const Login = React.lazy(() => import("./auth/components/Login.page"));
 
 const BenchmarkList = React.lazy(

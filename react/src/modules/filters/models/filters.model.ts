@@ -32,14 +32,14 @@ export class ResultFilter implements ResultFilterType {
   benchmarkId?: string | null;
 
   constructor(filter: ResultFilterType = {}) {
-    this.fromCreationDate = filter.fromCreationDate || null;
-    this.toCreationDate = filter.toCreationDate || null;
-    this.platform = filter.platform || null;
-    this.deviceModel = filter.deviceModel || null;
-    this.backend = filter.backend || null;
-    this.manufacturer = filter.manufacturer || null;
-    this.soc = filter.soc || null;
-    this.benchmarkId = filter.benchmarkId || null;
+    this.fromCreationDate = filter.fromCreationDate ?? null;
+    this.toCreationDate = filter.toCreationDate ?? null;
+    this.platform = filter.platform ?? null;
+    this.deviceModel = filter.deviceModel ?? null;
+    this.backend = filter.backend ?? null;
+    this.manufacturer = filter.manufacturer ?? null;
+    this.soc = filter.soc ?? null;
+    this.benchmarkId = filter.benchmarkId ?? null;
   }
 
   match(result: BenchmarkResult): boolean {
@@ -50,26 +50,26 @@ export class ResultFilter implements ResultFilterType {
 
     switch (envInfo.platform) {
       case Platform.Android:
-        resultDeviceModel = envInfo.value.android?.model_name || null;
-        resultManufacturer = envInfo.value.android?.manufacturer || null;
-        resultSoc = envInfo.value.android?.proc_cpuinfo_soc_name || null;
+        resultDeviceModel = envInfo.value.android?.model_name ?? null;
+        resultManufacturer = envInfo.value.android?.manufacturer ?? null;
+        resultSoc = envInfo.value.android?.proc_cpuinfo_soc_name ?? null;
         break;
 
       case Platform.iOS:
-        resultDeviceModel = envInfo.value.ios?.model_name || null;
+        resultDeviceModel = envInfo.value.ios?.model_name ?? null;
         resultManufacturer = "Apple";
-        resultSoc = envInfo.value.ios?.soc_name || null;
+        resultSoc = envInfo.value.ios?.soc_name ?? null;
         break;
 
       case Platform.Windows:
-        resultDeviceModel = envInfo.value.windows?.cpu_full_name || null;
+        resultDeviceModel = envInfo.value.windows?.cpu_full_name ?? null;
         resultManufacturer = StringValue.unknown;
-        resultSoc = envInfo.value.windows?.cpu_full_name || null;
+        resultSoc = envInfo.value.windows?.cpu_full_name ?? null;
         break;
     }
 
-    resultDeviceModel = resultDeviceModel || StringValue.unknown;
-    resultManufacturer = resultManufacturer || StringValue.unknown;
+    resultDeviceModel = resultDeviceModel ?? StringValue.unknown;
+    resultManufacturer = resultManufacturer ?? StringValue.unknown;
     resultSoc = resultSoc || StringValue.unknown;
 
     const resultCreationDate = new Date(result.meta.creation_date);
@@ -91,15 +91,15 @@ export class ResultFilter implements ResultFilterType {
       this.platform === null || this.platform === resultPlatform;
     const deviceModelMatched = resultDeviceModel
       .toLowerCase()
-      .includes((this.deviceModel || "").toLowerCase());
+      .includes((this.deviceModel ?? "").toLowerCase());
     const backendMatched =
       this.backend === null || this.backend === resultBackend;
     const manufacturerMatched = resultManufacturer
       .toLowerCase()
-      .includes((this.manufacturer || "").toLowerCase());
+      .includes((this.manufacturer ?? "").toLowerCase());
     const socMatched = resultSoc
       .toLowerCase()
-      .includes((this.soc || "").toLowerCase());
+      .includes((this.soc ?? "").toLowerCase());
 
     return (
       fromCreationDateMatched &&

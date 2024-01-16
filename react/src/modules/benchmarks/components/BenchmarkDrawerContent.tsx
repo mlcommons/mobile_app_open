@@ -7,10 +7,11 @@ import { GrClose } from "react-icons/gr";
 type Props = {
   onClose: any;
   benchmarkId: string;
+  onToggle: () => void;
   isOpen?: boolean;
 };
 
-const BenchmarkDrawerContent = ({ onClose, benchmarkId, isOpen }: Props) => {
+const BenchmarkDrawerContent = ({ onClose, benchmarkId }: Props) => {
   const user = useUser();
   const { getBenchmarkById } = useBenchmarks(user?.uid);
 

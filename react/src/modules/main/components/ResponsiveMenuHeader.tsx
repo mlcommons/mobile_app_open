@@ -1,11 +1,16 @@
 import { useState, useEffect } from "react";
-import { Flex, useDisclosure, useMediaQuery } from "@chakra-ui/react";
+import {
+  Flex,
+  useDisclosure,
+  useMediaQuery,
+  Box,
+  IconButton,
+} from "@chakra-ui/react";
 import ChakraBreakpoints from "../../../constants/breakpoints";
 import { useLocation } from "react-router-dom";
 import { css } from "@emotion/react";
 import sidebarLinks from "../../../constants/sidebarLinks";
 import TabletNavigationDrawer from "./TabletNavigationDrawer";
-import { Box, IconButton } from "@chakra-ui/react";
 import { FaFilter } from "react-icons/fa";
 import FiltersModal from "../../filters/components/FiltersModal";
 import { useFilters } from "../../filters/hooks/useFilters";
@@ -44,7 +49,7 @@ const ResponsiveMenuHeader = ({ onToggle, isOpen }: Props) => {
   const matchedPath = options.find(
     (item) => item?.value === currPath?.slice(1),
   );
-  const initVal = matchedPath?.value || options[0]?.value;
+  const initVal = matchedPath?.value ?? options[0]?.value;
 
   const [currSelectVal, setCurrSelectVal] = useState(initVal);
 

@@ -39,8 +39,5 @@ export const useLoginMutation = () => {
         isClosable: true,
       });
     },
-    onSettled() {
-      // onSettled && onSettled();
-    },
   });
 };

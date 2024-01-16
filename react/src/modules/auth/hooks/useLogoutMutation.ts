@@ -18,11 +18,5 @@ export const useLogoutMutation = () => {
       queryClient.setQueryData([QUERY_KEY.USER], null);
       navigate("/auth/sign-in");
     },
-    onError(error) {
-      // onError && onError(error);
-    },
-    onSettled() {
-      // onSettled && onSettled();
-    },
   });
 };

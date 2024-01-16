@@ -20,7 +20,7 @@ export function DataTable<Data extends object>({
   data,
   columns,
   onClick,
-}: DataTableProps<Data>) {
+}: Readonly<DataTableProps<Data>>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
     columns,
@@ -32,6 +32,17 @@ export function DataTable<Data extends object>({
       sorting,
     },
   });
+
+  const renderSortIcon = (isSorted: string | boolean) => {
+    if (isSorted) {
+      return isSorted === "desc" ? (
+        <TriangleDownIcon aria-label="sorted descending" />
+      ) : (
+        <TriangleUpIcon aria-label="sorted ascending" />
+      );
+    }
+    return null;
+  };
 
   return (
     <Table>
@@ -52,13 +63,7 @@ export function DataTable<Data extends object>({
                   )}
 
                   <chakra.span pl="4">
-                    {header.column.getIsSorted() ? (
-                      header.column.getIsSorted() === "desc" ? (
-                        <TriangleDownIcon aria-label="sorted descending" />
-                      ) : (
-                        <TriangleUpIcon aria-label="sorted ascending" />
-                      )
-                    ) : null}
+                    {renderSortIcon(header.column.getIsSorted())}
                   </chakra.span>
                 </Th>
               );
