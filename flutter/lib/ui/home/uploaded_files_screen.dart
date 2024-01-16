@@ -49,8 +49,8 @@ class _UploadedFilesScreenState extends State<UploadedFilesScreen> {
                   },
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
-                    onPressed: () {
-                      _deleteFile(fileName);
+                    onPressed: () async {
+                      await _deleteFile(fileName);
                     },
                   ),
                 );
@@ -67,9 +67,9 @@ class _UploadedFilesScreenState extends State<UploadedFilesScreen> {
     );
   }
 
-  void _deleteFile(String fileName) {
+  Future<void> _deleteFile(String fileName) async {
+    await FirebaseManager.instance.deleteResult(fileName);
     setState(() {
-      FirebaseManager.instance.deleteResult(fileName);
       fetchFileList();
     });
   }

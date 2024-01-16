@@ -67,10 +67,10 @@ class _RemoteExtendedResultScreenState
         );
         switch (dialogResult) {
           case ConfirmDialogAction.ok:
-            setState(() {
-              FirebaseManager.instance.deleteResult(widget.fileName);
+            await FirebaseManager.instance.deleteResult(widget.fileName);
+            if (context.mounted) {
               Navigator.pop(context);
-            });
+            }
             break;
           case null:
           case ConfirmDialogAction.cancel:
