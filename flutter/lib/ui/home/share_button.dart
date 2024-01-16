@@ -161,7 +161,7 @@ class _ShareButton extends State<ShareBottomSheet> {
                 const SizedBox(height: 20),
                 Text(l10n.uploadRequiredSignedIn),
                 const SizedBox(height: 20),
-                const UserProfile(),
+                const UserProfileSection(),
               ],
             ),
           );

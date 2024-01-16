@@ -15,6 +15,8 @@
   "userSignInAnonymously": "Sign in anonymously",
   "userSignInEmailPassword": "Sign in with email/password",
   "userProfile": "User Profile",
+  "userId": "User ID",
+  "userCreated": "Created",
 
   "unsupportedMainMessage": "This device is not yet supported.",
   "unsupportedBackendError": "Error message",
