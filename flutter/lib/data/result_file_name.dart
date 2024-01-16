@@ -1,12 +1,14 @@
 import 'package:intl/intl.dart';
 
 class ResultFileName {
+  // Filename Format: <DateTime>_<UUID>.json
   // Example fileName: 2023-06-06T13-38-01_125ef847-ca9a-45e0-bf36-8fd22f493b8d.json
   late String fileName;
   late String uuid;
   late DateTime dateTime;
 
   ResultFileName(this.uuid, this.dateTime) {
+    // Custom date format for valid file name (avoid colon and space)
     final DateFormat formatter = DateFormat('yyyy-MM-ddTHH-mm-ss');
     final String datetimeString = formatter.format(dateTime);
     fileName = '${datetimeString}_$uuid.json';
