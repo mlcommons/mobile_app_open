@@ -1,5 +1,6 @@
 import {
   BenchmarkResult,
+  EnvironmentInfo,
   Result,
 } from "../../benchmarks/models/benchmarks.model";
 import { StringValue } from "../../../constants/constants";
@@ -22,14 +23,14 @@ export interface ResultFilterType {
 }
 
 export class ResultFilter implements ResultFilterType {
-  fromCreationDate?: Date | null;
-  toCreationDate?: Date | null;
-  platform?: string | null;
-  deviceModel?: string | null;
-  backend?: string | null;
-  manufacturer?: string | null;
-  soc?: string | null;
-  benchmarkId?: string | null;
+  fromCreationDate: Date | null;
+  toCreationDate: Date | null;
+  platform: string | null;
+  deviceModel: string | null;
+  backend: string | null;
+  manufacturer: string | null;
+  soc: string | null;
+  benchmarkId: string | null;
 
   constructor(filter: ResultFilterType = {}) {
     this.fromCreationDate = filter.fromCreationDate ?? null;
@@ -42,74 +43,78 @@ export class ResultFilter implements ResultFilterType {
     this.benchmarkId = filter.benchmarkId ?? null;
   }
 
-  match(result: BenchmarkResult): boolean {
-    let resultDeviceModel: string | null = null;
-    let resultManufacturer: string | null = null;
-    let resultSoc: string | null = null;
-    const envInfo = result.environment_info;
-
-    switch (envInfo.platform) {
-      case Platform.Android:
-        resultDeviceModel = envInfo.value.android?.model_name ?? null;
-        resultManufacturer = envInfo.value.android?.manufacturer ?? null;
-        resultSoc = envInfo.value.android?.proc_cpuinfo_soc_name ?? null;
-        break;
-
-      case Platform.iOS:
-        resultDeviceModel = envInfo.value.ios?.model_name ?? null;
-        resultManufacturer = "Apple";
-        resultSoc = envInfo.value.ios?.soc_name ?? null;
-        break;
-
-      case Platform.Windows:
-        resultDeviceModel = envInfo.value.windows?.cpu_full_name ?? null;
-        resultManufacturer = StringValue.unknown;
-        resultSoc = envInfo.value.windows?.cpu_full_name ?? null;
-        break;
-    }
-
-    resultDeviceModel = resultDeviceModel ?? StringValue.unknown;
-    resultManufacturer = resultManufacturer ?? StringValue.unknown;
-    resultSoc = resultSoc || StringValue.unknown;
-
+  match(result: BenchmarkResult) {
+    const { deviceModel, manufacturer, soc } = this.getDeviceDetails(
+      result.environment_info,
+    );
     const resultCreationDate = new Date(result.meta.creation_date);
     const resultBackend = result.results[0].backend_info.filename;
-    const resultPlatform = envInfo.platform;
 
-    const oneDay: number = 24 * 60 * 60 * 1000;
-
-    const fromCreationDateMatched =
-      this.fromCreationDate === null ||
-      this.fromCreationDate === undefined ||
-      resultCreationDate > this.fromCreationDate;
-    const toCreationDateMatched =
-      this.toCreationDate === null ||
-      this.toCreationDate === undefined ||
-      resultCreationDate < new Date(this.toCreationDate.getTime() + oneDay);
-
-    const platformMatched =
-      this.platform === null || this.platform === resultPlatform;
-    const deviceModelMatched = resultDeviceModel
-      .toLowerCase()
-      .includes((this.deviceModel ?? "").toLowerCase());
-    const backendMatched =
+    const platformMatches =
+      this.platform === null ||
+      this.platform === result.environment_info.platform;
+    const backendMatches =
       this.backend === null || this.backend === resultBackend;
-    const manufacturerMatched = resultManufacturer
-      .toLowerCase()
-      .includes((this.manufacturer ?? "").toLowerCase());
-    const socMatched = resultSoc
-      .toLowerCase()
-      .includes((this.soc ?? "").toLowerCase());
 
     return (
-      fromCreationDateMatched &&
-      toCreationDateMatched &&
-      platformMatched &&
-      deviceModelMatched &&
-      backendMatched &&
-      manufacturerMatched &&
-      socMatched
+      this.isDateWithinRange(
+        resultCreationDate,
+        this.fromCreationDate,
+        this.toCreationDate,
+      ) &&
+      platformMatches &&
+      this.stringMatches(deviceModel, this.deviceModel) &&
+      this.stringMatches(manufacturer, this.manufacturer) &&
+      this.stringMatches(soc, this.soc) &&
+      backendMatches
     );
+  }
+
+  getDeviceDetails(envInfo: EnvironmentInfo) {
+    switch (envInfo.platform) {
+      case Platform.Android:
+        return {
+          deviceModel: envInfo.value.android?.model_name ?? StringValue.unknown,
+          manufacturer:
+            envInfo.value.android?.manufacturer ?? StringValue.unknown,
+          soc:
+            envInfo.value.android?.proc_cpuinfo_soc_name ?? StringValue.unknown,
+        };
+      case Platform.iOS:
+        return {
+          deviceModel: envInfo.value.ios?.model_name ?? StringValue.unknown,
+          manufacturer: "Apple",
+          soc: envInfo.value.ios?.soc_name ?? StringValue.unknown,
+        };
+      case Platform.Windows:
+        return {
+          deviceModel:
+            envInfo.value.windows?.cpu_full_name ?? StringValue.unknown,
+          manufacturer: StringValue.unknown,
+          soc: envInfo.value.windows?.cpu_full_name ?? StringValue.unknown,
+        };
+      default:
+        return {
+          deviceModel: StringValue.unknown,
+          manufacturer: StringValue.unknown,
+          soc: StringValue.unknown,
+        };
+    }
+  }
+
+  // Helper function for date comparison
+  isDateWithinRange(date: Date, fromDate: Date | null, toDate: Date | null) {
+    const oneDay = 24 * 60 * 60 * 1000;
+    const toDateAdjusted = toDate ? new Date(toDate.getTime() + oneDay) : null;
+    return (
+      (!fromDate || date > fromDate) &&
+      (!toDateAdjusted || date < toDateAdjusted)
+    );
+  }
+
+  // Helper function for string matching
+  stringMatches(value: string, pattern: string | null) {
+    return value.toLowerCase().includes((pattern ?? "").toLowerCase());
   }
 
   matchBenchmark(result: Result): boolean {
