@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench/data/result_file_name.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/extended_result_screen.dart';
+import 'package:mlperfbench/ui/time_utils.dart';
 
 class UploadedFilesScreen extends StatefulWidget {
   const UploadedFilesScreen({Key? key}) : super(key: key);
@@ -35,12 +37,11 @@ class _UploadedFilesScreenState extends State<UploadedFilesScreen> {
               separatorBuilder: (_, __) => const Divider(),
               itemBuilder: (context, index) {
                 final fileName = fileList[index];
-                // Example fileName: 2023-06-06T13-38-01_125ef847-ca9a-45e0-bf36-8fd22f493b8d.json
-                final date = fileName.split('_').first;
+                final resultFileName = ResultFileName.fromFileName(fileName);
                 return ListTile(
                   title: Padding(
                     padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
-                    child: Text(date),
+                    child: Text(formatDateTime(resultFileName.dateTime)),
                   ),
                   subtitle: Text(fileName),
                   onTap: () {
