@@ -130,8 +130,8 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
         progress.cooldown
             ? l10n.progressScreenCooldown.replaceAll(
                 '<remaining>',
-                formatDuration(
-                    progress.cooldownDuration * (1.0 - progress.stageProgress)))
+                (progress.cooldownDuration * (1.0 - progress.stageProgress))
+                    .toDurationUIString())
             : l10n.progressScreenStage.replaceFirst(
                 '<percent>',
                 (progress.stageProgress * 100)
