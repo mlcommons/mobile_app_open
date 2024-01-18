@@ -86,9 +86,9 @@ class HistoryListItem implements ListItem {
     final prDateTime = item.performanceRun?.startDatetime;
     final arDateTime = item.accuracyRun?.startDatetime;
     if (prDateTime != null) {
-      return formatDateTime(prDateTime);
+      return prDateTime.toUIString();
     } else if (arDateTime != null) {
-      return formatDateTime(arDateTime);
+      return arDateTime.toUIString();
     } else {
       return 'unknown';
     }

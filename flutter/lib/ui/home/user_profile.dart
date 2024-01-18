@@ -201,7 +201,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(l10n.userCreated, style: titleTextStyle),
-          Text(formatDateTime(creationTime), style: subtitleTextStyle),
+          Text(creationTime.toUIString(), style: subtitleTextStyle),
         ],
       );
       children.add(creationTimeRow);

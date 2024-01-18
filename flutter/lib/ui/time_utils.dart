@@ -17,7 +17,9 @@ String formatDuration(double seconds) {
   return tokens.join(':');
 }
 
-String formatDateTime(DateTime value) {
-  var dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-  return dateFormat.format(value);
+extension DateTimeFormat on DateTime {
+  String toUIString() {
+    var dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+    return dateFormat.format(this);
+  }
 }

@@ -177,7 +177,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
     final res = widget.result;
 
     final firstResult = res.results.first;
-    final date = formatDateTime(res.meta.creationDate);
+    final date = res.meta.creationDate.toUIString();
     final backendName = firstResult.backendInfo.backendName;
 
     final averageThroughput =

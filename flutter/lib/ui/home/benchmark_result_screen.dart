@@ -102,7 +102,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     Text benchmarkDateText;
     if (lastResult != null) {
       deviceInfoText = Text(lastResult.environmentInfo.modelDescription);
-      benchmarkDateText = Text(formatDateTime(lastResult.meta.creationDate));
+      benchmarkDateText = Text(lastResult.meta.creationDate.toUIString());
     } else {
       deviceInfoText = Text(DeviceInfo.instance.envInfo.modelDescription);
       benchmarkDateText = const Text('');

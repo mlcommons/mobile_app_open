@@ -41,7 +41,7 @@ class _UploadedFilesScreenState extends State<UploadedFilesScreen> {
                 return ListTile(
                   title: Padding(
                     padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
-                    child: Text(formatDateTime(resultFileName.dateTime)),
+                    child: Text(resultFileName.dateTime.toUIString()),
                   ),
                   subtitle: Text(fileName),
                   onTap: () {
