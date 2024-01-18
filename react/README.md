@@ -1,4 +1,6 @@
-# Web app
+# Web App
+
+This directory contains the React web app for viewing the submitted benchmark results.
 
 ## Update Firebase configuration
 

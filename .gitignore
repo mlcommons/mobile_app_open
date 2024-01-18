@@ -22,19 +22,3 @@ __pycache__/
 *.log
 *.iml
 *.env
-
-*.g.dart
-*.gen.dart
-*.gen.h
-
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# production
-/build
-
-.firebase
