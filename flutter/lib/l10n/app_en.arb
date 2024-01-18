@@ -26,7 +26,7 @@
   "mainScreenGo": "GO",
   "mainScreenMeasureTitle": "Measure your device performance for:",
   "mainScreenWaitFinish": "Wait for benchmark to finish",
-  "mainScreenBenchmarkSelected": "Benchmarks (<selected>/<total> selected)",
+  "mainScreenBenchmarkSelected": "<selected>/<total> benchmarks selected",
 
   "progressMeasuring": "Measuring...",
   "progressDontClose": "Don't close the app!",

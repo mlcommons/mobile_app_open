@@ -9,14 +9,14 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 
-class BenchmarkConfigScreen extends StatefulWidget {
-  const BenchmarkConfigScreen({Key? key}) : super(key: key);
+class BenchmarkConfigSection extends StatefulWidget {
+  const BenchmarkConfigSection({Key? key}) : super(key: key);
 
   @override
-  State<BenchmarkConfigScreen> createState() => _BenchmarkConfigScreen();
+  State<BenchmarkConfigSection> createState() => _BenchmarkConfigSectionState();
 }
 
-class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
+class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
   late BenchmarkState state;
   late AppLocalizations l10n;
 
@@ -37,38 +37,13 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
       childrenList.add(const Divider(height: 20));
     }
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(32.0),
-        child: AppBar(
-          shape: Border.all(color: AppColors.darkBlue),
-          backgroundColor: AppColors.darkBlue,
-          elevation: 0,
-          title: _header(),
-        ),
-      ),
-      body: Container(
-        color: Colors.white,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
-          children: childrenList,
-        ),
+    return Container(
+      color: Colors.white,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+        children: childrenList,
       ),
     );
-  }
-
-  Widget _header() {
-    final selectedCount =
-        state.benchmarks.where((e) => e.isActive).length.toString();
-    final totalCount = state.benchmarks.length.toString();
-    final title = l10n.mainScreenBenchmarkSelected
-        .replaceAll('<selected>', selectedCount)
-        .replaceAll('<total>', totalCount);
-    return Text(title,
-        style: Theme.of(context).textTheme.titleSmall!.copyWith(
-              color: Theme.of(context).colorScheme.onPrimary,
-            ));
   }
 
   Widget _listTile(Benchmark benchmark) {
@@ -123,6 +98,7 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
       onChanged: (flag) {
         setState(() {
           benchmark.isActive = flag;
+          state.notifyListeners();
         });
       },
     );

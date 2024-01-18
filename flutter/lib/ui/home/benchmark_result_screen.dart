@@ -105,7 +105,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       benchmarkDateText = Text(formatDateTime(lastResult.meta.creationDate));
     } else {
       deviceInfoText = Text(DeviceInfo.instance.envInfo.modelDescription);
-      benchmarkDateText = const Text('');
+      benchmarkDateText = Text(l10n.na);
     }
     final infoSection = Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
