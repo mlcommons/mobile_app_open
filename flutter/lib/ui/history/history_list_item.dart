@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
+import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/history/list_item.dart';
 import 'package:mlperfbench/ui/icons.dart';
-import 'package:mlperfbench/ui/time_utils.dart';
 
 class HistoryListItem implements ListItem {
   final BenchmarkExportResult item;

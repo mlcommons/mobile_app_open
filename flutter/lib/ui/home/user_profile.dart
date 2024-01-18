@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/uploaded_files_screen.dart';
-import 'package:mlperfbench/ui/time_utils.dart';
 
 class UserProfileSection extends StatefulWidget {
   const UserProfileSection({Key? key}) : super(key: key);

@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/progress_circles.dart';
-import 'package:mlperfbench/ui/time_utils.dart';
 
 class BenchmarkRunningScreen extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey =

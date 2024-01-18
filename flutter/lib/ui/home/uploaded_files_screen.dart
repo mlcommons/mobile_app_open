@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:mlperfbench/data/result_file_name.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/history/extended_result_screen.dart';
-import 'package:mlperfbench/ui/time_utils.dart';
 
 class UploadedFilesScreen extends StatefulWidget {
   const UploadedFilesScreen({Key? key}) : super(key: key);

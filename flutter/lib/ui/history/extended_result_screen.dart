@@ -8,9 +8,9 @@ import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
+import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/history/benchmark_export_result_screen.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
-import 'package:mlperfbench/ui/time_utils.dart';
 
 class RemoteExtendedResultScreen extends StatefulWidget {
   final String fileName;
