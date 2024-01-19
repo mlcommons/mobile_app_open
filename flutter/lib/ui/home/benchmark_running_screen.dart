@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench/state/task_runner.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -21,13 +22,14 @@ class BenchmarkRunningScreen extends StatefulWidget {
 }
 
 class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
-  static const double progressCircleEdgeSize = 150;
   late final Timer _timer;
+  late BenchmarkState state;
+  late AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<BenchmarkState>();
-    final l10n = AppLocalizations.of(context);
+    state = context.watch<BenchmarkState>();
+    l10n = AppLocalizations.of(context);
     final progress = state.taskRunner.progressInfo;
 
     final backgroundGradient = BoxDecoration(
@@ -37,72 +39,60 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
         end: Alignment.bottomCenter,
       ),
     );
-    final title = Padding(
-      padding: const EdgeInsets.fromLTRB(40, 80, 20, 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.progressMeasuring,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.lightText,
-              fontSize: 30,
-            ),
-          ),
-          Text(
-            l10n.progressDontClose,
-            style: const TextStyle(
-              color: AppColors.lightText,
-              fontSize: 17,
-            ),
-          ),
-        ],
+    final title = _title();
+    final circle = _circle(progress);
+    final namedIcon = _namedIcon(progress);
+    final cancelButton = _cancelButton();
+
+    return Scaffold(
+      key: BenchmarkRunningScreen.scaffoldKey,
+      body: Container(
+        decoration: backgroundGradient,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            title,
+            circle,
+            namedIcon,
+            cancelButton,
+          ],
+        ),
       ),
     );
-    final circle = Stack(
-      alignment: AlignmentDirectional.centerStart,
-      children: <Widget>[
-        Center(
-          child: Container(
-            width: progressCircleEdgeSize,
-            height: progressCircleEdgeSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: AppColors.progressCircleGradient,
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(15, 15),
-                  blurRadius: 10,
-                )
-              ],
-            ),
-            child: Center(
-              child: Text(
-                '${progress.currentStage.toString()}/${progress.totalStages.toString()}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.lightText,
-                ),
-                textScaleFactor: 3,
-              ),
+  }
+
+  Widget _cancelButton() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+      child: TextButton(
+        style: ButtonStyle(
+          backgroundColor:
+              MaterialStateProperty.all(AppColors.progressCancelButton),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: const BorderSide(color: Colors.white),
             ),
           ),
         ),
-        const Center(
-          child: ProgressCircles(
-            Size(progressCircleEdgeSize + 40, progressCircleEdgeSize + 40),
+        onPressed: () async => await state.taskRunner.abortBenchmarks(),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: Text(
+            l10n.progressCancel,
+            style: const TextStyle(
+              fontSize: 15.0,
+              color: AppColors.lightText,
+            ),
           ),
         ),
-      ],
+      ),
     );
-    final namedIcon = Column(children: [
+  }
+
+  Widget _namedIcon(ProgressInfo progress) {
+    return Column(children: [
       Padding(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
         child: SizedBox(
@@ -144,47 +134,73 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
         ),
       ),
     ]);
-    final cancelButton = Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-      child: TextButton(
-        style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all(AppColors.progressCancelButton),
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18.0),
-              side: const BorderSide(color: Colors.white),
-            ),
-          ),
-        ),
-        onPressed: () async => await state.taskRunner.abortBenchmarks(),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          child: Text(
-            l10n.progressCancel,
-            style: const TextStyle(
-              fontSize: 15.0,
-              color: AppColors.lightText,
-            ),
-          ),
-        ),
-      ),
-    );
+  }
 
-    return Scaffold(
-      key: BenchmarkRunningScreen.scaffoldKey,
-      body: Container(
-        decoration: backgroundGradient,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            title,
-            circle,
-            namedIcon,
-            cancelButton,
-          ],
+  Widget _circle(ProgressInfo progress) {
+    final containerWidth = 0.64 * MediaQuery.of(context).size.width;
+    final progressCircleSize = Size(containerWidth + 40, containerWidth + 40);
+    return Stack(
+      alignment: AlignmentDirectional.centerStart,
+      children: <Widget>[
+        Center(
+          child: Container(
+            width: containerWidth,
+            height: containerWidth,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: AppColors.progressCircleGradient,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  offset: Offset(15, 15),
+                  blurRadius: 10,
+                )
+              ],
+            ),
+            child: Center(
+              child: Text(
+                '${progress.currentStage.toString()}/${progress.totalStages.toString()}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.lightText,
+                ),
+                textScaleFactor: 3,
+              ),
+            ),
+          ),
         ),
+        Center(child: ProgressCircles(progressCircleSize))
+      ],
+    );
+  }
+
+  Widget _title() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(40, 80, 20, 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.progressMeasuring,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.lightText,
+              fontSize: 30,
+            ),
+          ),
+          Text(
+            l10n.progressDontClose,
+            style: const TextStyle(
+              color: AppColors.lightText,
+              fontSize: 17,
+            ),
+          ),
+        ],
       ),
     );
   }
