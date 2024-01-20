@@ -159,7 +159,6 @@ class TaskRunner {
       final resultHelper =
           resultHelpers.firstWhere((e) => e.benchmark == benchmark);
       await runBenchmark(resultHelper, perfMode, currentLogDir);
-      progressInfo.completedBenchmarks.add(benchmark.info);
     }
 
     // then in accuracy mode
@@ -170,7 +169,6 @@ class TaskRunner {
       final resultHelper =
           resultHelpers.firstWhere((e) => e.benchmark == benchmark);
       await runBenchmark(resultHelper, accuracyMode, currentLogDir);
-      progressInfo.completedBenchmarks.add(benchmark.info);
     }
 
     if (aborting) {
@@ -284,6 +282,8 @@ class TaskRunner {
     } else {
       throw 'Unknown BenchmarkRunMode: $mode';
     }
+    progressInfo.completedBenchmarks.add(benchmark.info);
+    progressInfo.currentBenchmark = null;
   }
 }
 

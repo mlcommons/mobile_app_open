@@ -65,8 +65,9 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     progress.completedBenchmarks.add(state.benchmarks[1].info);
     progress.currentBenchmark = state.benchmarks[2].info;
     progress.accuracy = true;
-    progress.cooldown = false;
-    // END
+    progress.cooldown = true;
+    progress.cooldownDuration = 36;
+    // END Mockup
 
     final backgroundGradient = BoxDecoration(
       gradient: LinearGradient(
@@ -123,43 +124,34 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
       children: <Widget>[
         Center(
           child: Container(
-              width: containerWidth,
-              height: containerWidth,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: AppColors.progressCircleGradient,
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    offset: Offset(15, 15),
-                    blurRadius: 10,
-                  )
-                ],
+            width: containerWidth,
+            height: containerWidth,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: AppColors.progressCircleGradient,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
-              child: Center(
-                child: ClipOval(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: _circleContent(),
-                    ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  offset: Offset(15, 15),
+                  blurRadius: 10,
+                )
+              ],
+            ),
+            child: Center(
+              child: ClipOval(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: _circleContent(),
                   ),
                 ),
-              )
-              // child: Text(
-              //   '${progress.currentStage.toString()}/${progress.totalStages.toString()}',
-              //   style: const TextStyle(
-              //     fontWeight: FontWeight.bold,
-              //     color: AppColors.lightText,
-              //   ),
-              //   textScaleFactor: 3,
-              // ),
-              // ),
               ),
+            ),
+          ),
         ),
         Center(
           child: InfiniteProgressCircle(
@@ -172,21 +164,32 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   }
 
   Widget _circleContent() {
-    Widget? taskIcon;
+    Widget? topWidget;
     String progressString;
     String taskNameString;
+    const textStyle = TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      color: AppColors.lightText,
+    );
     if (progress.cooldown) {
-      taskIcon = null;
-      progressString = l10n.progressScreenCooldown.replaceAll(
-          '<remaining>',
-          formatDuration(
-              progress.cooldownDuration * (1.0 - progress.stageProgress)));
-      taskNameString = l10n.progressCooldown;
+      topWidget = Text(
+        l10n.progressCooldown,
+        textAlign: TextAlign.center,
+        style: textStyle,
+      );
+      progressString = formatDuration(
+          progress.cooldownDuration * (1.0 - progress.stageProgress));
+      taskNameString = l10n.progressRemainingTime;
     } else {
+      topWidget = SizedBox(
+        width: 32,
+        height: 32,
+        child: progress.currentBenchmark!.iconWhite,
+      );
       progressString =
           '${(progress.stageProgress * 100).round().clamp(0, 100)}%';
       taskNameString = progress.currentBenchmark!.taskName;
-      taskIcon = progress.currentBenchmark!.iconWhite;
     }
 
     return Column(
@@ -198,11 +201,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           child: Container(
             alignment: Alignment.bottomCenter,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 40),
-            child: SizedBox(
-              width: 32,
-              height: 32,
-              child: taskIcon,
-            ),
+            child: topWidget,
           ),
         ),
         Expanded(
@@ -227,11 +226,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
             child: Text(
               taskNameString,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppColors.lightText,
-              ),
+              style: textStyle,
             ),
           ),
         ),
