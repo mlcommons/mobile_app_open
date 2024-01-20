@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mlperfbench/benchmark/benchmark.dart';
 
-import 'package:mlperfbench/state/task_runner.dart';
+import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/ui/home/progress_circles.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 
@@ -105,8 +105,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   }
 
   Widget _circle() {
-    final containerWidth = 0.64 * MediaQuery.of(context).size.width;
-    final progressCircleSize = Size(containerWidth + 60, containerWidth + 60);
+    final containerWidth = 0.68 * MediaQuery.of(context).size.width;
     return Stack(
       alignment: AlignmentDirectional.centerStart,
       children: <Widget>[
@@ -150,7 +149,12 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
               // ),
               ),
         ),
-        Center(child: ProgressCircles(progressCircleSize))
+        Center(
+          child: InfiniteProgressCircle(
+            size: containerWidth,
+            strokeWidth: 6.0,
+          ),
+        ),
       ],
     );
   }
