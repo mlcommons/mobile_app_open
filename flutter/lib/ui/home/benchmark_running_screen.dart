@@ -26,23 +26,9 @@ class BenchmarkRunningScreen extends StatefulWidget {
 }
 
 class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
-  late final Timer _timer;
   late BenchmarkState state;
   late AppLocalizations l10n;
   late ProgressInfo progress;
-
-  @override
-  void initState() {
-    // UI should update every 2 seconds to refresh stageProgress
-    _timer = Timer.periodic(const Duration(seconds: 2), (_) => setState(() {}));
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +112,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
               child: ClipOval(
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(4),
                     child: _circleContent(),
                   ),
                 ),
@@ -146,7 +132,6 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
 
   Widget _circleContent() {
     Widget? topWidget;
-    String progressString;
     String taskNameString;
     const textStyle = TextStyle(
       fontSize: 14,
@@ -159,8 +144,6 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
         textAlign: TextAlign.center,
         style: textStyle,
       );
-      progressString = formatDuration(
-          progress.cooldownDuration * (1.0 - progress.stageProgress));
       taskNameString = l10n.progressRemainingTime;
     } else {
       topWidget = SizedBox(
@@ -168,8 +151,6 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
         height: 32,
         child: progress.currentBenchmark!.iconWhite,
       );
-      progressString =
-          '${(progress.stageProgress * 100).round().clamp(0, 100)}%';
       taskNameString = progress.currentBenchmark!.taskName;
     }
 
@@ -189,21 +170,14 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           flex: 4,
           child: Container(
             alignment: Alignment.center,
-            child: Text(
-              progressString,
-              style: const TextStyle(
-                fontSize: 54,
-                fontWeight: FontWeight.bold,
-                color: AppColors.lightText,
-              ),
-            ),
+            child: _StageProgressText(),
           ),
         ),
         Expanded(
           flex: 3,
           child: Container(
             alignment: Alignment.topCenter,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 40),
             child: Text(
               taskNameString,
               textAlign: TextAlign.center,
@@ -370,6 +344,49 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _StageProgressText extends StatefulWidget {
+  @override
+  _StageProgressTextState createState() => _StageProgressTextState();
+}
+
+class _StageProgressTextState extends State<_StageProgressText> {
+  late final Timer _timer;
+
+  @override
+  void initState() {
+    // UI should update every 1 second to refresh stageProgress
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<BenchmarkState>();
+    final progress = state.taskRunner.progressInfo;
+    String progressStr;
+    if (progress.cooldown) {
+      progressStr = formatDuration(
+          progress.cooldownDuration * (1.0 - progress.stageProgress));
+    } else {
+      progressStr = '${(progress.stageProgress * 100).round().clamp(0, 100)}%';
+    }
+    return Text(
+      progressStr,
+      style: const TextStyle(
+        fontSize: 54,
+        fontWeight: FontWeight.bold,
+        color: AppColors.lightText,
+      ),
     );
   }
 }
