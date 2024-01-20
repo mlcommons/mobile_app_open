@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
 import 'package:mlperfbench/benchmark/info.dart';
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/state/task_runner.dart';
@@ -50,6 +50,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     progress = state.taskRunner.progressInfo;
 
     // TODO: to delete mockup
+    progress.runMode = BenchmarkRunModeEnum.submissionRun;
     progress.currentStage = 2;
     progress.calculateStageProgress = () {
       return 0.44;
@@ -63,6 +64,8 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     progress.completedBenchmarks.add(state.benchmarks[0].info);
     progress.completedBenchmarks.add(state.benchmarks[1].info);
     progress.currentBenchmark = state.benchmarks[2].info;
+    progress.accuracy = true;
+    progress.cooldown = false;
     // END
 
     final backgroundGradient = BoxDecoration(
@@ -94,14 +97,21 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   }
 
   Widget _title() {
+    // The TaskRunner always run all benchmarks in performance mode first then in accuracy mode.
+    var runModeStage = '1/1';
+    if (progress.runMode == BenchmarkRunModeEnum.submissionRun) {
+      runModeStage = progress.accuracy ? '2/2' : '1/2';
+    }
+    var runModeName =
+        progress.accuracy ? l10n.progressAccuracy : l10n.progressPerformance;
     return Padding(
-        padding: const EdgeInsets.fromLTRB(40, 40, 40, 4),
+        padding: const EdgeInsets.fromLTRB(40, 48, 40, 4),
         child: Text(
-          progress.accuracy ? l10n.progressAccuracy : l10n.progressPerformance,
+          '($runModeStage) $runModeName',
           style: const TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
             color: AppColors.lightText,
-            fontSize: 24,
+            fontSize: 20,
           ),
         ));
   }

@@ -31,6 +31,7 @@ class ProgressInfo {
   BenchmarkInfo? currentBenchmark;
   List<BenchmarkInfo> completedBenchmarks = [];
   List<BenchmarkInfo> activeBenchmarks = [];
+  late BenchmarkRunModeEnum runMode;
   int totalStages = 0;
   int currentStage = 0;
   double cooldownDuration = 0;
@@ -116,6 +117,7 @@ class TaskRunner {
       resultHelpers.add(resultHelper);
     }
 
+    progressInfo.runMode = store.selectedBenchmarkRunMode;
     switch (store.selectedBenchmarkRunMode) {
       case BenchmarkRunModeEnum.performanceOnly:
         progressInfo.totalStages = activeBenchmarks.length;
