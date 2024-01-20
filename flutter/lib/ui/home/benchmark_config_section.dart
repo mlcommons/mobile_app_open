@@ -47,9 +47,9 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
   }
 
   Widget _listTile(Benchmark benchmark) {
-    final leadingWidth = 0.12 * MediaQuery.of(context).size.width;
+    final leadingWidth = 0.10 * MediaQuery.of(context).size.width;
     final subtitleWidth = 0.70 * MediaQuery.of(context).size.width;
-    final trailingWidth = 0.28 * MediaQuery.of(context).size.width;
+    final trailingWidth = 0.20 * MediaQuery.of(context).size.width;
     return ListTile(
       leading: SizedBox(
           width: leadingWidth,
@@ -73,8 +73,8 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _activeToggle(benchmark),
-            _infoButton(benchmark),
+            Expanded(flex: 2, child: _activeToggle(benchmark)),
+            Expanded(flex: 1, child: _infoButton(benchmark)),
           ],
         ),
       ),
@@ -88,7 +88,10 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
   Widget _backendDescription(Benchmark benchmark) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: Text(benchmark.backendRequestDescription),
+      child: Text(
+        benchmark.backendRequestDescription,
+        style: Theme.of(context).textTheme.labelLarge,
+      ),
     );
   }
 
@@ -123,27 +126,24 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
     if (!choices.contains(selected)) {
       throw 'delegate_selected=$selected must be one of delegate_choice=$choices';
     }
-    final dropDownButton = DropdownButton<String>(
-        borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
-        underline: const SizedBox(),
-        value: selected,
-        items: choices
-            .map((item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                ))
-            .toList(),
-        onChanged: (value) => setState(() {
-              benchmark.benchmarkSettings.delegateSelected = value!;
-            }));
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const Text('Delegate:'),
-        const SizedBox(width: 4),
-        dropDownButton,
-      ],
+    return DropdownButton<String>(
+      isExpanded: true,
+      isDense: false,
+      borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
+      underline: const SizedBox(),
+      value: selected,
+      items: choices
+          .map((item) => DropdownMenuItem<String>(
+                value: item,
+                child: Text(
+                  'Delegate: $item',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ))
+          .toList(),
+      onChanged: (value) => setState(() {
+        benchmark.benchmarkSettings.delegateSelected = value!;
+      }),
     );
   }
 }

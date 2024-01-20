@@ -25,7 +25,7 @@
   "mainScreenLoading": "Loading Content",
   "mainScreenGo": "GO",
   "mainScreenMeasureTitle": "Measure your device performance for:",
-  "mainScreenBenchmarkSelected": "<selected>/<total> benchmarks selected",
+  "mainScreenBenchmarkSelected": "Benchmarks (<selected>/<total> selected)",
 
   "progressPerformance": "Performance",
   "progressAccuracy": "Accuracy",

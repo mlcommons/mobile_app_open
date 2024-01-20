@@ -76,6 +76,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
           preferredSize: const Size.fromHeight(56.0),
           child: _sharingSection(),
         ),
+        backgroundColor: AppColors.lightBlue,
       ),
       drawer: const AppDrawer(),
       body: LayoutBuilder(
@@ -149,11 +150,10 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            infoSection,
-            const Spacer(),
-            testAgainButton,
-            deleteResultButton,
-            const ShareButton()
+            Expanded(flex: 70, child: infoSection),
+            Expanded(flex: 10, child: testAgainButton),
+            Expanded(flex: 10, child: deleteResultButton),
+            const Expanded(flex: 10, child: ShareButton()),
           ],
         ),
       ),

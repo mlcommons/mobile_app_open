@@ -32,13 +32,9 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
     l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.darkBlue,
       appBar: AppBar(
         title: Text(l10n.menuHome),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(44.0),
-          child: _infoSection(),
-        ),
+        backgroundColor: AppColors.lightBlue,
       ),
       drawer: const AppDrawer(),
       body: SafeArea(
@@ -47,11 +43,15 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Expanded(
-              flex: 35,
+              flex: 32,
               child: _goButtonSection(context),
             ),
             Expanded(
-              flex: 65,
+              flex: 8,
+              child: _infoSection(),
+            ),
+            Expanded(
+              flex: 60,
               child: Align(
                 alignment: Alignment.topCenter,
                 child: AbsorbPointer(
@@ -73,6 +73,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
     final selectedBenchmarkText = l10n.mainScreenBenchmarkSelected
         .replaceAll('<selected>', selectedCount)
         .replaceAll('<total>', totalCount);
+    var deviceDescription = DeviceInfo.instance.envInfo.modelDescription;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 8, 10, 8),
       width: double.infinity,
@@ -80,12 +81,12 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Colors.white, fontSize: 14),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(DeviceInfo.instance.envInfo.modelDescription),
+            Expanded(flex: 1, child: Text(deviceDescription)),
             const SizedBox(height: 4),
-            Text(selectedBenchmarkText)
+            Expanded(flex: 1, child: Text(selectedBenchmarkText))
           ],
         ),
       ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -53,6 +54,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(flex: 14, child: _title()),
+            const SizedBox(height: 20),
             Expanded(flex: 30, child: _circle()),
             const SizedBox(height: 20),
             Expanded(flex: 40, child: _taskList()),
@@ -85,46 +87,40 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   }
 
   Widget _circle() {
-    final containerWidth = 0.56 * MediaQuery.of(context).size.width;
+    var containerWidth = 0.50 * MediaQuery.of(context).size.width;
+    containerWidth = max(containerWidth, 160);
+    containerWidth = min(containerWidth, 240);
     return Stack(
-      alignment: AlignmentDirectional.centerStart,
+      alignment: AlignmentDirectional.center,
       children: <Widget>[
-        Center(
-          child: Container(
-            width: containerWidth,
-            height: containerWidth,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: AppColors.progressCircleGradient,
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(15, 15),
-                  blurRadius: 10,
-                )
-              ],
+        Container(
+          width: containerWidth,
+          height: containerWidth,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: AppColors.progressCircleGradient,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            child: Center(
-              child: ClipOval(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(4),
-                    child: _circleContent(),
-                  ),
-                ),
-              ),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                offset: Offset(15, 15),
+                blurRadius: 10,
+              )
+            ],
+          ),
+          child: ClipOval(
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: _circleContent(),
             ),
           ),
         ),
-        Center(
-          child: InfiniteProgressCircle(
-            size: containerWidth + 20,
-            strokeWidth: 6.0,
-          ),
+        InfiniteProgressCircle(
+          size: containerWidth + 20,
+          strokeWidth: 6.0,
         ),
       ],
     );
@@ -177,7 +173,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           flex: 3,
           child: Container(
             alignment: Alignment.topCenter,
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 40),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
             child: Text(
               taskNameString,
               textAlign: TextAlign.center,
@@ -256,8 +252,8 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _footerText(),
-          _cancelButton(),
+          Expanded(flex: 4, child: _footerText()),
+          Expanded(flex: 6, child: _cancelButton()),
         ],
       );
     }
