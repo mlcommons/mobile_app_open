@@ -12,7 +12,6 @@ import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_config_section.dart';
 import 'package:mlperfbench/ui/home/shared_styles.dart';
-import 'package:mlperfbench/ui/icons.dart';
 
 class BenchmarkStartScreen extends StatefulWidget {
   const BenchmarkStartScreen({Key? key}) : super(key: key);
@@ -49,7 +48,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
           children: <Widget>[
             Expanded(
               flex: 35,
-              child: _getTopContainer(context, state.state),
+              child: _goButtonSection(context),
             ),
             Expanded(
               flex: 65,
@@ -93,64 +92,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
     );
   }
 
-  Widget _getTopContainer(BuildContext context, BenchmarkStateEnum state) {
-    if (state == BenchmarkStateEnum.aborting) {
-      return _waitContainer(context);
-    } else if (state == BenchmarkStateEnum.waiting) {
-      return _goContainer(context);
-    } else {
-      throw 'Unknown BenchmarkState: ${state.name}';
-    }
-  }
-
-  Widget _waitContainer(BuildContext context) {
-    final circleWidth =
-        MediaQuery.of(context).size.width * WidgetSizes.circleWidthFactor;
-
-    return Stack(
-      alignment: Alignment.topCenter,
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width,
-          alignment: Alignment.center,
-          decoration: mainLinearGradientDecoration,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text(
-            l10n.mainScreenWaitFinish,
-            style: const TextStyle(color: AppColors.lightText, fontSize: 15),
-          ),
-        ),
-        Stack(
-          children: [
-            Container(
-              width: circleWidth,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.progressCircle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    offset: Offset(15, 15),
-                    blurRadius: 10,
-                  )
-                ],
-              ),
-            ),
-            Container(
-              width: circleWidth,
-              alignment: Alignment.center,
-              child: AppIcons.waiting,
-            )
-          ],
-        )
-      ],
-    );
-  }
-
-  Widget _goContainer(BuildContext context) {
+  Widget _goButtonSection(BuildContext context) {
     final circleWidth =
         MediaQuery.of(context).size.width * WidgetSizes.circleWidthFactor;
 

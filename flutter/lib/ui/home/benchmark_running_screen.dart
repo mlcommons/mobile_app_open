@@ -3,15 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
-import 'package:mlperfbench/benchmark/info.dart';
-import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/benchmark/info.dart';
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/ui/home/progress_circles.dart';
+import 'package:mlperfbench/ui/icons.dart';
 import 'package:mlperfbench/ui/time_utils.dart';
 
 class BenchmarkRunningScreen extends StatefulWidget {
@@ -65,7 +66,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     progress.completedBenchmarks.add(state.benchmarks[1].info);
     progress.currentBenchmark = state.benchmarks[2].info;
     progress.accuracy = true;
-    progress.cooldown = true;
+    progress.cooldown = false;
     progress.cooldownDuration = 36;
     // END Mockup
 
@@ -294,14 +295,18 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   }
 
   Widget _footer() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _footerText(),
-        _cancelButton(),
-      ],
-    );
+    if (state.state == BenchmarkStateEnum.aborting) {
+      return _abortingHint();
+    } else {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _footerText(),
+          _cancelButton(),
+        ],
+      );
+    }
   }
 
   Widget _footerText() {
@@ -350,6 +355,41 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _abortingHint() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 18,
+              alignment: Alignment.center,
+              child: AppIcons.waiting,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              l10n.progressAborting,
+              style: const TextStyle(
+                fontSize: 18,
+                color: AppColors.lightText,
+              ),
+            )
+          ],
+        ),
+        Text(
+          l10n.progressWaiting,
+          style: const TextStyle(
+            fontSize: 14,
+            color: AppColors.lightText,
+          ),
+        ),
+      ],
     );
   }
 }

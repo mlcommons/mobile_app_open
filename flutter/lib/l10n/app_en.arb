@@ -25,7 +25,6 @@
   "mainScreenLoading": "Loading Content",
   "mainScreenGo": "GO",
   "mainScreenMeasureTitle": "Measure your device performance for:",
-  "mainScreenWaitFinish": "Wait for benchmark to finish",
   "mainScreenBenchmarkSelected": "<selected>/<total> benchmarks selected",
 
   "progressPerformance": "Performance",
@@ -34,6 +33,8 @@
   "progressCancel": "Cancel",
   "progressCooldown": "Cooldown Pause",
   "progressRemainingTime": "Remaining Time",
+  "progressAborting": "Aborting",
+  "progressWaiting": "Wait for current benchmark to finish!",
 
   "resultsTitleUnverified": "Unverified",
   "resultsTitlePerformance": "Results (qps)",
