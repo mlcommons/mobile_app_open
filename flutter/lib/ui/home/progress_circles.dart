@@ -41,7 +41,7 @@ class _InfiniteProgressCircleState extends State<InfiniteProgressCircle>
         progress: 1.0,
         // Specify the progress value between 0 and 1
         gradient: const LinearGradient(
-          colors: [Colors.white, Colors.transparent],
+          colors: [Colors.white, Colors.white, Colors.white10, Colors.white10],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

@@ -28,7 +28,9 @@ import 'package:mlperfbench/store.dart';
 class ProgressInfo {
   bool cooldown = false;
   bool accuracy = false;
-  BenchmarkInfo? info;
+  BenchmarkInfo? currentBenchmark;
+  List<BenchmarkInfo> completedBenchmarks = [];
+  List<BenchmarkInfo> activeBenchmarks = [];
   int totalStages = 0;
   int currentStage = 0;
   double cooldownDuration = 0;
@@ -105,6 +107,7 @@ class TaskRunner {
 
     final resultHelpers = <ResultHelper>[];
     for (final benchmark in activeBenchmarks) {
+      progressInfo.activeBenchmarks.add(benchmark.info);
       final resultHelper = ResultHelper(
           benchmark: benchmark,
           backendInfo: backendInfo,
@@ -131,6 +134,7 @@ class TaskRunner {
     var first = true;
 
     // run all benchmarks in performance mode first
+    progressInfo.completedBenchmarks.clear();
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
       if (!store.selectedBenchmarkRunMode.doPerformanceRun) break;
@@ -153,15 +157,18 @@ class TaskRunner {
       final resultHelper =
           resultHelpers.firstWhere((e) => e.benchmark == benchmark);
       await runBenchmark(resultHelper, perfMode, currentLogDir);
+      progressInfo.completedBenchmarks.add(benchmark.info);
     }
 
     // then in accuracy mode
+    progressInfo.completedBenchmarks.clear();
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
       if (!store.selectedBenchmarkRunMode.doAccuracyRun) break;
       final resultHelper =
           resultHelpers.firstWhere((e) => e.benchmark == benchmark);
       await runBenchmark(resultHelper, accuracyMode, currentLogDir);
+      progressInfo.completedBenchmarks.add(benchmark.info);
     }
 
     if (aborting) {
@@ -186,7 +193,7 @@ class TaskRunner {
   Future<void> runBenchmark(ResultHelper resultHelper, BenchmarkRunMode mode,
       String currentLogDir) async {
     final benchmark = resultHelper.benchmark;
-    progressInfo.info = benchmark.info;
+    progressInfo.currentBenchmark = benchmark.info;
     progressInfo.currentStage++;
 
     if (mode == perfMode) {

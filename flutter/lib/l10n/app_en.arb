@@ -28,7 +28,8 @@
   "mainScreenWaitFinish": "Wait for benchmark to finish",
   "mainScreenBenchmarkSelected": "<selected>/<total> benchmarks selected",
 
-  "progressMeasuring": "Measuring...",
+  "progressPerformance": "Performance",
+  "progressAccuracy": "Accuracy",
   "progressDontClose": "Don't close the app!",
   "progressCancel": "Cancel",
   "progressCooldown": "Cooldown pause",
