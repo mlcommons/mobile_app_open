@@ -49,6 +49,10 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
 
     // TODO: to delete mockup
     progress.info = state.benchmarks.last.info;
+    progress.currentStage = 2;
+    progress.calculateStageProgress = () {
+      return 0.44;
+    };
     for (var e in state.benchmarks) {
       e.isActive = true;
     }
@@ -125,7 +129,16 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
                   )
                 ],
               ),
-              child: Center(child: _circleContent())
+              child: Center(
+                child: ClipOval(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: _circleContent(),
+                    ),
+                  ),
+                ),
+              )
               // child: Text(
               //   '${progress.currentStage.toString()}/${progress.totalStages.toString()}',
               //   style: const TextStyle(
@@ -161,37 +174,48 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     }
 
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 40, 20, 10),
-          child: SizedBox(
-            width: 32,
-            height: 32,
-            child: taskIcon,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-          child: Text(
-            progressString,
-            style: const TextStyle(
-              fontSize: 60,
-              fontWeight: FontWeight.bold,
-              color: AppColors.lightText,
+        Expanded(
+          flex: 3,
+          child: Container(
+            alignment: Alignment.bottomCenter,
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+            child: SizedBox(
+              width: 32,
+              height: 32,
+              child: taskIcon,
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-          child: Text(
-            taskNameString,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: AppColors.lightText,
+        Expanded(
+          flex: 4,
+          child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              progressString,
+              style: const TextStyle(
+                fontSize: 60,
+                fontWeight: FontWeight.bold,
+                color: AppColors.lightText,
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: Container(
+            alignment: Alignment.topCenter,
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+            child: Text(
+              taskNameString,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.lightText,
+              ),
             ),
           ),
         ),
@@ -214,17 +238,21 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   }
 
   Widget _listTile(Benchmark benchmark, bool isEven) {
-    final leadingWidth = 0.08 * MediaQuery.of(context).size.width;
-    final titleWidth = 0.70 * MediaQuery.of(context).size.width;
-    final trailingWidth = 0.12 * MediaQuery.of(context).size.width;
+    final leadingWidth = 0.16 * MediaQuery.of(context).size.width;
+    final titleWidth = 0.60 * MediaQuery.of(context).size.width;
+    final trailingWidth = 0.16 * MediaQuery.of(context).size.width;
+    var doneIcon = const Icon(Icons.done);
+    if (progress.info!.taskName == benchmark.info.taskName) {
+      doneIcon = const Icon(Icons.done_outline_outlined, color: Colors.green);
+    }
     return ListTile(
       tileColor: isEven ? AppColors.mediumBlue : Colors.transparent,
       textColor: AppColors.lightText,
       dense: true,
       minVerticalPadding: 0,
       leading: SizedBox(
-          width: leadingWidth,
-          height: leadingWidth,
+          width: leadingWidth * 0.4,
+          height: leadingWidth * 0.4,
           child: benchmark.info.iconWhite),
       title: SizedBox(
         width: titleWidth,
@@ -239,7 +267,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
       trailing: SizedBox(
         width: trailingWidth,
         height: trailingWidth,
-        child: const Icon(Icons.done),
+        child: doneIcon,
       ),
     );
   }
