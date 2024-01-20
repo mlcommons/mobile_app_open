@@ -48,7 +48,7 @@ class TaskRunner {
   final BridgeIsolate backendBridge;
   final BackendInfo backendInfo;
 
-  ProgressInfo progressInfo = ProgressInfo();
+  late ProgressInfo progressInfo;
   bool aborting = false;
   CancelableOperation? _cooldownOperation;
 
@@ -93,6 +93,7 @@ class TaskRunner {
 
   Future<ExtendedResult?> runBenchmarks(
       BenchmarkStore benchmarkStore, String currentLogDir) async {
+    progressInfo = ProgressInfo();
     final cooldown = store.cooldown;
     late final Duration cooldownDuration;
     if (store.testMode) {

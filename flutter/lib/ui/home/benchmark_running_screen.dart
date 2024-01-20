@@ -33,8 +33,8 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
 
   @override
   void initState() {
-    // UI should update every 1 seconds to refresh stageProgress
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+    // UI should update every 2 seconds to refresh stageProgress
+    _timer = Timer.periodic(const Duration(seconds: 2), (_) => setState(() {}));
     super.initState();
   }
 
@@ -49,26 +49,6 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context);
     progress = state.taskRunner.progressInfo;
-
-    // TODO: to delete mockup
-    progress.runMode = BenchmarkRunModeEnum.submissionRun;
-    progress.currentStage = 2;
-    progress.calculateStageProgress = () {
-      return 0.44;
-    };
-    progress.activeBenchmarks.clear();
-    progress.completedBenchmarks.clear();
-    for (var benchmark in state.benchmarks) {
-      benchmark.isActive = true;
-      progress.activeBenchmarks.add(benchmark.info);
-    }
-    progress.completedBenchmarks.add(state.benchmarks[0].info);
-    progress.completedBenchmarks.add(state.benchmarks[1].info);
-    progress.currentBenchmark = state.benchmarks[2].info;
-    progress.accuracy = true;
-    progress.cooldown = false;
-    progress.cooldownDuration = 36;
-    // END Mockup
 
     final backgroundGradient = BoxDecoration(
       gradient: LinearGradient(
