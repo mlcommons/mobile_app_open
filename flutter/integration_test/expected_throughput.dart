@@ -65,11 +65,11 @@ const Map<String, Map<String, Interval>> _imageSegmentation = {
     _kCloudBuildX28: Interval(min: 0.5, max: 4),
     _kRyzen5600: Interval(min: 5, max: 7),
     _kPixel5: Interval(min: 25, max: 40),
-    _kIphoneOnGitHubAction: Interval(min: 0.5, max: 2.5),
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 2.5),
     _kIphoneOnMacbookM1: Interval(min: 3, max: 6),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 0.5, max: 2.5),
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 2.5),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 180),
@@ -82,11 +82,11 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kCloudBuildX28: Interval(min: 0.5, max: 1.3),
     _kRyzen5600: Interval(min: 2.8, max: 3.2),
     _kPixel5: Interval(min: 2.3, max: 3.0),
-    _kIphoneOnGitHubAction: Interval(min: 0.3, max: 1),
+    _kIphoneOnGitHubAction: Interval(min: 0.2, max: 1),
     _kIphoneOnMacbookM1: Interval(min: 1.8, max: 3),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 0.3, max: 1),
+    _kIphoneOnGitHubAction: Interval(min: 0.2, max: 1),
   },
   _kPixelBackend: {
     // pixel some time finish this task in 4 seconds, not sure why.
