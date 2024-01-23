@@ -136,14 +136,24 @@ jobs:
           WITH_APPLE: 0
         run: |
           make flutter/android/apk flutter/android/test-apk
-      - name: Upload Android test APK
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.MLPERF_ARM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.MLPERF_ARM_AWS_KEY }}
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+          project_id: ${{ secrets.FIREBASE_PROJECT_ID }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: ${{ secrets.FIREBASE_PROJECT_ID }}
+      - name: Print Google Cloud SDK version
+        run: gcloud info
+      - name: Trigger Firebase Test Lab
         run: |
-          aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
-          cp --quiet output/android-apks/test-main.apk s3://mlcommons-mobile-mlperf-arm/builds/${{ github.run_number }}/ && \
-          aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
-          cp --quiet output/android-apks/test-helper.apk s3://mlcommons-mobile-mlperf-arm/builds/${{ github.run_number }}/ && \
-          aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
-          cp --quiet flutter/build/app/outputs/flutter-apk/app-release.apk s3://mlcommons-mobile-mlperf-arm/builds/${{ github.run_number }}/
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app output/android-apks/test-main.apk \
+            --test output/android-apks/test-helper.apk \
+            --timeout 25m \
+            --num-flaky-test-attempts 2 \
+            --device model=redfin,version=30,locale=en,orientation=portrait
