@@ -50,6 +50,13 @@ jobs:
       BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
       BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
       FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
+      FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
+      FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+      FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+      FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+      FIREBASE_CRASHLYTICS_ENABLED: true
     steps:
       - uses: actions/checkout@v3
       # Preinstalled tools from host at `/opt/hostedtoolcache` is not needed since we run commands inside our own Docker container.
@@ -156,13 +163,6 @@ jobs:
           gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-samsung.apk
       - name: Build Android release APK with all backends
         env:
-          FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
-          FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
-          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-          FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
-          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
-          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
-          FIREBASE_CRASHLYTICS_ENABLED: true
           OFFICIAL_BUILD: true
           WITH_TFLITE: 1
           WITH_PIXEL: 1
