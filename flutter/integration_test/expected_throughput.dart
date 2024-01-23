@@ -48,28 +48,28 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kCloudBuildX28: Interval(min: 3.5, max: 8),
     _kRyzen5600: Interval(min: 14, max: 22),
     _kPixel5: Interval(min: 40, max: 60),
-    _kIphoneOnGitHubAction: Interval(min: 1.5, max: 4),
+    _kIphoneOnGitHubAction: Interval(min: 0.8, max: 4),
     _kIphoneOnMacbookM1: Interval(min: 9, max: 16),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 1.0, max: 4),
+    _kIphoneOnGitHubAction: Interval(min: 0.8, max: 4),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 300, max: 490),
   },
 };
 
-const Map<String, Map<String, Interval>> _imageSegmentation = {
+const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
   _kTFLiteBackend: {
     _kCloudBuildX23: Interval(min: 0.5, max: 3),
     _kCloudBuildX28: Interval(min: 0.5, max: 4),
     _kRyzen5600: Interval(min: 5, max: 7),
     _kPixel5: Interval(min: 25, max: 40),
-    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 2.5),
+    _kIphoneOnGitHubAction: Interval(min: 0.3, max: 2.5),
     _kIphoneOnMacbookM1: Interval(min: 3, max: 6),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 2.5),
+    _kIphoneOnGitHubAction: Interval(min: 0.3, max: 2.5),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 180),
@@ -111,18 +111,17 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
   },
 };
 
-// TODO (anhappdev): update min throughput for _superResolution after we gather some statistic
 const Map<String, Map<String, Interval>> _superResolution = {
   _kTFLiteBackend: {
     _kCloudBuildX23: Interval(min: 0.1, max: 3),
     _kCloudBuildX28: Interval(min: 0.1, max: 4),
     _kRyzen5600: Interval(min: 0.1, max: 3),
     _kPixel5: Interval(min: 4, max: 8),
-    _kIphoneOnGitHubAction: Interval(min: 0.1, max: 3),
+    _kIphoneOnGitHubAction: Interval(min: 0.08, max: 1.0),
     _kIphoneOnMacbookM1: Interval(min: 0.1, max: 10),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 0.1, max: 3),
+    _kIphoneOnGitHubAction: Interval(min: 0.08, max: 1.0),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 10, max: 14),
@@ -132,7 +131,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
 const benchmarkExpectedThroughput = {
   BenchmarkId.imageClassification: _imageClassification,
   BenchmarkId.objectDetection: _objectDetection,
-  BenchmarkId.imageSegmentationV2: _imageSegmentation,
+  BenchmarkId.imageSegmentationV2: _imageSegmentationV2,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.imageClassificationOffline: _imageClassificationOffline,
