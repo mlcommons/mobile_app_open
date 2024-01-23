@@ -22,7 +22,3 @@ __pycache__/
 *.log
 *.iml
 *.env
-
-*.g.dart
-*.gen.dart
-*.gen.h
