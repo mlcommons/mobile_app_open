@@ -46,6 +46,10 @@ jobs:
     container:
       image: ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
     timeout-minutes: 120
+    env:
+      BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
+      BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
+      FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
     steps:
       - uses: actions/checkout@v3
       # Preinstalled tools from host at `/opt/hostedtoolcache` is not needed since we run commands inside our own Docker container.
@@ -59,6 +63,15 @@ jobs:
           df -h
       - name: Configure Git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
       - name: Install AWS CLI
         run: |
           python3 -m pip install awscli
@@ -91,12 +104,58 @@ jobs:
           restore-keys: ${{ runner.os }}-bazel_cache-
       - name: Run Flutter unit tests
         run: |
-          make flutter/prepare && \
-          make flutter/test/unit
-      - name: Build Android release APK
+          make flutter/prepare && make flutter/test/unit
+      - name: Build and upload Android test APK for TFLite
         env:
-          BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
-          BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-tflite.apk
+          gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-tflite.apk
+      - name: Build and upload Android test APK for Pixel
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 0
+          WITH_PIXEL: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-pixel.apk
+          gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-pixel.apk
+      - name: Build and upload Android test APK for QTI
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 0
+          WITH_QTI: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-qti.apk
+          gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-qti.apk
+      - name: Build and upload Android test APK for MediaTek
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 0
+          WITH_MEDIATEK: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-mtk.apk
+          gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-mtk.apk
+      - name: Build and upload Android test APK for Samsung
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 0
+          WITH_SAMSUNG: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-samsung.apk
+          gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-samsung.apk
+      - name: Build Android release APK with all backends
+        env:
           FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
           FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
@@ -105,7 +164,6 @@ jobs:
           FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
           FIREBASE_CRASHLYTICS_ENABLED: true
           OFFICIAL_BUILD: true
-          FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
           WITH_TFLITE: 1
           WITH_PIXEL: 1
           WITH_MEDIATEK: 1
@@ -114,28 +172,18 @@ jobs:
           WITH_APPLE: 0
         run: |
           make flutter/android/release
-      - name: Archive Android release APK
+      - name: Archive Android APKs
         uses: actions/upload-artifact@v3
         with:
           name: android-apks-${{ github.run_number }}
           path: output/android-apks/*.apk
           retention-days: 30
           if-no-files-found: error
-      - name: Build Android test APK
-        env:
-          BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
-          BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
-          OFFICIAL_BUILD: false
-          PERF_TEST: true
-          FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
-          WITH_TFLITE: 1
-          WITH_PIXEL: 1
-          WITH_MEDIATEK: 1
-          WITH_QTI: 1
-          WITH_SAMSUNG: 1
-          WITH_APPLE: 0
-        run: |
-          make flutter/android/apk flutter/android/test-apk
+
+  test-android-apk-tflite:
+    needs: build-android-apk
+    runs-on: ubuntu-22.04
+    steps:
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
@@ -145,14 +193,85 @@ jobs:
         with:
           version: '>= 363.0.0'
           project_id: mobile-app-build-290400
-      - name: Print Google Cloud SDK version
-        run: gcloud info
-      - name: Trigger Firebase Test Lab
+      - name: Trigger Firebase Test Lab for [Google Pixel 5](redfin)
         run: |
           gcloud firebase test android run \
             --type instrumentation \
-            --app output/android-apks/test-main.apk \
-            --test output/android-apks/test-helper.apk \
-            --timeout 25m \
+            --app gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-tflite.apk \
+            --test gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-tflite.apk \
+            --timeout 30m \
             --num-flaky-test-attempts 2 \
-            --device model=b0q,version=33,locale=en,orientation=portrait # Samsung Galaxy S22 Ultra
+            --device model=redfin,version=30,locale=en,orientation=portrait \
+            --client-details=buildNumber=${{ github.run_number }}
+
+  test-android-apk-pixel:
+    needs: build-android-apk
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Trigger Firebase Test Lab for [Google Pixel 6](oriole)
+        run: |
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-pixel.apk \
+            --test gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-pixel.apk \
+            --timeout 30m \
+            --num-flaky-test-attempts 2 \
+            --device model=oriole,version=33,locale=en,orientation=portrait \
+            --client-details=buildNumber=${{ github.run_number }}
+
+  test-android-apk-qti:
+    needs: build-android-apk
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Trigger Firebase Test Lab for [Samsung Galaxy S22 Ultra](b0q)
+        run: |
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-qti.apk \
+            --test gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-qti.apk \
+            --timeout 30m \
+            --num-flaky-test-attempts 2 \
+            --device model=b0q,version=33,locale=en,orientation=portrait \
+            --client-details=buildNumber=${{ github.run_number }}
+
+  test-android-apk-mtk:
+    needs: build-android-apk
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Trigger Firebase Test Lab for [OnePlus DN2103](OP515BL1)
+        run: |
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-mtk.apk \
+            --test gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-mtk.apk \
+            --timeout 30m \
+            --num-flaky-test-attempts 2 \
+            --device model=OP515BL1,version=33,locale=en,orientation=portrait \
+            --client-details=buildNumber=${{ github.run_number }}
