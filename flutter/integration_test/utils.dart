@@ -55,11 +55,11 @@ Future<void> validateSettings(WidgetTester tester) async {
 }
 
 Future<void> runBenchmarks(WidgetTester tester) async {
-  const downloadTimeLimitMinutes = 20;
-  const runTimeLimitMinutes = 30;
+  const downloadTimeout = 20 * 60; // 20 minutes
+  const runBenchmarkTimeout = 30 * 60; // 30 minutes
 
-  var goButtonIsPresented = await waitFor(
-      tester, downloadTimeLimitMinutes, const Key(WidgetKeys.goButton));
+  var goButtonIsPresented =
+      await waitFor(tester, downloadTimeout, const Key(WidgetKeys.goButton));
 
   expect(goButtonIsPresented, true,
       reason: 'Problems with downloading of datasets or models');
@@ -67,7 +67,7 @@ Future<void> runBenchmarks(WidgetTester tester) async {
   await tester.tap(goButton);
 
   var totalScoreIsPresented = await waitFor(
-      tester, runTimeLimitMinutes, const Key(WidgetKeys.totalScoreCircle));
+      tester, runBenchmarkTimeout, const Key(WidgetKeys.totalScoreCircle));
 
   expect(totalScoreIsPresented, true, reason: 'Result screen is not presented');
 }
@@ -80,13 +80,11 @@ Future<ExtendedResult> obtainResult() async {
   return rm.getLastResult();
 }
 
-Future<bool> waitFor(WidgetTester tester, int timeLimitMinutes, Key key) async {
+Future<bool> waitFor(WidgetTester tester, int timeout, Key key) async {
   var element = false;
 
-  for (var counter = 0;
-      counter < timeLimitMinutes * Duration.secondsPerMinute;
-      counter++) {
-    await tester.pumpAndSettle(const Duration(seconds: 1));
+  for (var counter = 0; counter < timeout; counter++) {
+    await tester.pump(const Duration(seconds: 1));
     final searchResult = find.byKey(key);
 
     if (tester.any(searchResult)) {

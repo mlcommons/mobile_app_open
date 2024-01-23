@@ -26,7 +26,7 @@ class MainScreen extends StatelessWidget {
       case BenchmarkStateEnum.waiting:
         return const BenchmarkStartScreen();
       case BenchmarkStateEnum.aborting:
-        return const BenchmarkStartScreen();
+        return const BenchmarkRunningScreen();
       case BenchmarkStateEnum.running:
         return const BenchmarkRunningScreen();
       case BenchmarkStateEnum.done:

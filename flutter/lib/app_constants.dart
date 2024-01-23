@@ -27,8 +27,8 @@ class AppColors {
   static const resultInvalid = Colors.red;
   static const darkRedText = Colors.red;
   static const lightBlue = Color(0XFF2C92CB);
-  static const darkBlue = Color(0xFF0B3A61);
   static const mediumBlue = Color(0xFF135384);
+  static const darkBlue = Color(0xFF0B3A61);
 
   static const dialogBackground = Colors.white;
   static const snackBarBackground = Color(0xFFEDEDED);
