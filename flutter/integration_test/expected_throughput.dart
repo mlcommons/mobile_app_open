@@ -10,6 +10,7 @@ key: model_code (on Android or iOS) or cpuFullName (on Windows)
 const _kTFLiteBackend = 'libtflitebackend';
 const _kPixelBackend = 'libtflitepixelbackend';
 const _kCoreMLBackend = 'libcoremlbackend';
+const _kQtiBackend = 'libqtibackend';
 
 // Windows
 // Google Cloud Build n2-standard-4 machine
@@ -20,6 +21,7 @@ const _kRyzen5600 = 'AMD Ryzen 5 5600X 6-Core';
 // Android
 const _kPixel5 = 'Pixel 5';
 const _kPixel6 = 'Pixel 6';
+const _kS22Ultra = 'SM-S908U1'; // Galaxy S22 Ultra
 
 // iOS
 const _kIphoneOnGitHubAction = 'iPhone15,3';
@@ -40,6 +42,9 @@ const Map<String, Map<String, Interval>> _imageClassification = {
   _kPixelBackend: {
     _kPixel6: Interval(min: 800, max: 1100),
   },
+  _kQtiBackend: {
+    _kS22Ultra: Interval(min: 1900, max: 2200),
+  },
 };
 
 const Map<String, Map<String, Interval>> _objectDetection = {
@@ -57,6 +62,9 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   _kPixelBackend: {
     _kPixel6: Interval(min: 300, max: 490),
   },
+  _kQtiBackend: {
+    _kS22Ultra: Interval(min: 850, max: 1100),
+  },
 };
 
 const Map<String, Map<String, Interval>> _imageSegmentation = {
@@ -73,6 +81,9 @@ const Map<String, Map<String, Interval>> _imageSegmentation = {
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 180),
+  },
+  _kQtiBackend: {
+    _kS22Ultra: Interval(min: 450, max: 650),
   },
 };
 
@@ -92,6 +103,9 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     // pixel some time finish this task in 4 seconds, not sure why.
     _kPixel6: Interval(min: 2, max: 75),
   },
+  _kQtiBackend: {
+    _kS22Ultra: Interval(min: 120, max: 160),
+  },
 };
 
 const Map<String, Map<String, Interval>> _imageClassificationOffline = {
@@ -108,6 +122,9 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 1000, max: 1700),
+  },
+  _kQtiBackend: {
+    _kS22Ultra: Interval(min: 2600, max: 3000),
   },
 };
 
@@ -126,6 +143,9 @@ const Map<String, Map<String, Interval>> _superResolution = {
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 10, max: 14),
+  },
+  _kQtiBackend: {
+    _kS22Ultra: Interval(min: 35, max: 45),
   },
 };
 
