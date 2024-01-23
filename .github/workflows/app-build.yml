@@ -139,12 +139,12 @@ jobs:
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SDK }}
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: '>= 363.0.0'
-          project_id: ${{ secrets.FIREBASE_PROJECT_ID }}
+          project_id: mobile-app-build-290400
       - name: Print Google Cloud SDK version
         run: gcloud info
       - name: Trigger Firebase Test Lab
@@ -155,4 +155,4 @@ jobs:
             --test output/android-apks/test-helper.apk \
             --timeout 25m \
             --num-flaky-test-attempts 2 \
-            --device model=redfin,version=30,locale=en,orientation=portrait
+            --device model=b0q,version=33,locale=en,orientation=portrait # Samsung Galaxy S22 Ultra
