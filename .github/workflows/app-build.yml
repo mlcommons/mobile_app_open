@@ -139,8 +139,7 @@ jobs:
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
-          project_id: ${{ secrets.FIREBASE_PROJECT_ID }}
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SDK }}
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
