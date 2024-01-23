@@ -9,14 +9,14 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 
-class BenchmarkConfigScreen extends StatefulWidget {
-  const BenchmarkConfigScreen({Key? key}) : super(key: key);
+class BenchmarkConfigSection extends StatefulWidget {
+  const BenchmarkConfigSection({Key? key}) : super(key: key);
 
   @override
-  State<BenchmarkConfigScreen> createState() => _BenchmarkConfigScreen();
+  State<BenchmarkConfigSection> createState() => _BenchmarkConfigSectionState();
 }
 
-class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
+class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
   late BenchmarkState state;
   late AppLocalizations l10n;
 
@@ -37,44 +37,19 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
       childrenList.add(const Divider(height: 20));
     }
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(32.0),
-        child: AppBar(
-          shape: Border.all(color: AppColors.darkBlue),
-          backgroundColor: AppColors.darkBlue,
-          elevation: 0,
-          title: _header(),
-        ),
-      ),
-      body: Container(
-        color: Colors.white,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
-          children: childrenList,
-        ),
+    return Container(
+      color: Colors.white,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+        children: childrenList,
       ),
     );
   }
 
-  Widget _header() {
-    final selectedCount =
-        state.benchmarks.where((e) => e.isActive).length.toString();
-    final totalCount = state.benchmarks.length.toString();
-    final title = l10n.mainScreenBenchmarkSelected
-        .replaceAll('<selected>', selectedCount)
-        .replaceAll('<total>', totalCount);
-    return Text(title,
-        style: Theme.of(context).textTheme.titleSmall!.copyWith(
-              color: Theme.of(context).colorScheme.onPrimary,
-            ));
-  }
-
   Widget _listTile(Benchmark benchmark) {
-    final leadingWidth = 0.12 * MediaQuery.of(context).size.width;
+    final leadingWidth = 0.10 * MediaQuery.of(context).size.width;
     final subtitleWidth = 0.70 * MediaQuery.of(context).size.width;
-    final trailingWidth = 0.28 * MediaQuery.of(context).size.width;
+    final trailingWidth = 0.20 * MediaQuery.of(context).size.width;
     return ListTile(
       leading: SizedBox(
           width: leadingWidth,
@@ -98,8 +73,8 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _activeToggle(benchmark),
-            _infoButton(benchmark),
+            Expanded(flex: 2, child: _activeToggle(benchmark)),
+            Expanded(flex: 1, child: _infoButton(benchmark)),
           ],
         ),
       ),
@@ -113,7 +88,10 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
   Widget _backendDescription(Benchmark benchmark) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: Text(benchmark.backendRequestDescription),
+      child: Text(
+        benchmark.backendRequestDescription,
+        style: Theme.of(context).textTheme.labelLarge,
+      ),
     );
   }
 
@@ -123,6 +101,7 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
       onChanged: (flag) {
         setState(() {
           benchmark.isActive = flag;
+          state.notifyListeners();
         });
       },
     );
@@ -147,27 +126,24 @@ class _BenchmarkConfigScreen extends State<BenchmarkConfigScreen> {
     if (!choices.contains(selected)) {
       throw 'delegate_selected=$selected must be one of delegate_choice=$choices';
     }
-    final dropDownButton = DropdownButton<String>(
-        borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
-        underline: const SizedBox(),
-        value: selected,
-        items: choices
-            .map((item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                ))
-            .toList(),
-        onChanged: (value) => setState(() {
-              benchmark.benchmarkSettings.delegateSelected = value!;
-            }));
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const Text('Delegate:'),
-        const SizedBox(width: 4),
-        dropDownButton,
-      ],
+    return DropdownButton<String>(
+      isExpanded: true,
+      isDense: false,
+      borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
+      underline: const SizedBox(),
+      value: selected,
+      items: choices
+          .map((item) => DropdownMenuItem<String>(
+                value: item,
+                child: Text(
+                  'Delegate: $item',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ))
+          .toList(),
+      onChanged: (value) => setState(() {
+        benchmark.benchmarkSettings.delegateSelected = value!;
+      }),
     );
   }
 }

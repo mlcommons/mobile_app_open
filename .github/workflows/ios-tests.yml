@@ -31,7 +31,7 @@ jobs:
       FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
       FIREBASE_CI_USER_EMAIL: ${{ secrets.FIREBASE_CI_USER_EMAIL }}
       FIREBASE_CI_USER_PASSWORD: ${{ secrets.FIREBASE_CI_USER_PASSWORD }}
-      FIREBASE_CRASHLYTICS_ENABLED: true
+      FIREBASE_CRASHLYTICS_ENABLED: false
     steps:
       - name: Checkout
         uses: actions/checkout@v3

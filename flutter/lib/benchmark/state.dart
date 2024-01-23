@@ -310,4 +310,9 @@ class BenchmarkState extends ChangeNotifier {
       _doneRunning = null;
     }
   }
+
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+  }
 }

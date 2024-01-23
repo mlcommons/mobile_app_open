@@ -25,6 +25,7 @@ class DeviceInfo {
 
   static Future<void> staticInit() async {
     instance = await createFromEnvironment();
+    print('Device: ${instance.envInfo.modelDescription}');
   }
 
   static Future<DeviceInfo> createFromEnvironment() async {
