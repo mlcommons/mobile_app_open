@@ -56,7 +56,6 @@ jobs:
       FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
       FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
-      FIREBASE_CRASHLYTICS_ENABLED: true
     steps:
       - uses: actions/checkout@v3
       # Preinstalled tools from host at `/opt/hostedtoolcache` is not needed since we run commands inside our own Docker container.
@@ -112,7 +111,7 @@ jobs:
       - name: Run Flutter unit tests
         run: |
           make flutter/prepare && make flutter/test/unit
-      - name: Build and upload Android test APK for TFLite
+      - name: Build and upload test APK for TFLite
         env:
           OFFICIAL_BUILD: false
           PERF_TEST: true
@@ -121,7 +120,7 @@ jobs:
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-tflite.apk
           gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-tflite.apk
-      - name: Build and upload Android test APK for Pixel
+      - name: Build and upload test APK for Pixel
         env:
           OFFICIAL_BUILD: false
           PERF_TEST: true
@@ -131,7 +130,7 @@ jobs:
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-pixel.apk
           gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-pixel.apk
-      - name: Build and upload Android test APK for QTI
+      - name: Build and upload test APK for QTI
         env:
           OFFICIAL_BUILD: false
           PERF_TEST: true
@@ -141,7 +140,7 @@ jobs:
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-qti.apk
           gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-qti.apk
-      - name: Build and upload Android test APK for MediaTek
+      - name: Build and upload test APK for MediaTek
         env:
           OFFICIAL_BUILD: false
           PERF_TEST: true
@@ -151,7 +150,7 @@ jobs:
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-mtk.apk
           gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-mtk.apk
-      - name: Build and upload Android test APK for Samsung
+      - name: Build and upload test APK for Samsung
         env:
           OFFICIAL_BUILD: false
           PERF_TEST: true
@@ -164,6 +163,7 @@ jobs:
       - name: Build Android release APK with all backends
         env:
           OFFICIAL_BUILD: true
+          FIREBASE_CRASHLYTICS_ENABLED: true
           WITH_TFLITE: 1
           WITH_PIXEL: 1
           WITH_MEDIATEK: 1
