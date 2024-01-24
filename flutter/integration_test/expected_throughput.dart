@@ -65,7 +65,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kIphoneOnGitHubAction: Interval(min: 1.0, max: 4),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 300, max: 490),
+    _kPixel6: Interval(min: 250, max: 450),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 800, max: 1100),
