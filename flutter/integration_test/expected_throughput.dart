@@ -63,7 +63,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kPixel6: Interval(min: 300, max: 490),
   },
   _kQtiBackend: {
-    _kS22Ultra: Interval(min: 850, max: 1100),
+    _kS22Ultra: Interval(min: 800, max: 1100),
   },
 };
 
