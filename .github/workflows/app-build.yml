@@ -184,6 +184,7 @@ jobs:
     needs: build-android-apk
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
@@ -208,6 +209,7 @@ jobs:
     needs: build-android-apk
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
@@ -232,6 +234,7 @@ jobs:
     needs: build-android-apk
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
@@ -256,6 +259,7 @@ jobs:
     needs: build-android-apk
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
