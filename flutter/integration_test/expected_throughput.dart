@@ -11,6 +11,7 @@ const _kTFLiteBackend = 'libtflitebackend';
 const _kPixelBackend = 'libtflitepixelbackend';
 const _kCoreMLBackend = 'libcoremlbackend';
 const _kQtiBackend = 'libqtibackend';
+const _kMediatekBackend = 'libtfliteneuronbackend';
 
 // Windows
 // Google Cloud Build n2-standard-4 machine
@@ -19,9 +20,10 @@ const _kCloudBuildX28 = 'Intel Xeon 2.80GHz';
 const _kRyzen5600 = 'AMD Ryzen 5 5600X 6-Core';
 
 // Android
-const _kPixel5 = 'Pixel 5';
-const _kPixel6 = 'Pixel 6';
+const _kPixel5 = 'Pixel 5'; // Google Pixel 5
+const _kPixel6 = 'Pixel 6'; // Google Pixel 6
 const _kS22Ultra = 'SM-S908U1'; // Galaxy S22 Ultra
+const _kDN2103 = 'DN2103'; // OnePlus DN2103
 
 // iOS
 const _kIphoneOnGitHubAction = 'iPhone15,3';
@@ -45,6 +47,9 @@ const Map<String, Map<String, Interval>> _imageClassification = {
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 1900, max: 2200),
   },
+  _kMediatekBackend: {
+    _kDN2103: Interval(min: 30, max: 50),
+  },
 };
 
 const Map<String, Map<String, Interval>> _objectDetection = {
@@ -65,6 +70,9 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 800, max: 1100),
   },
+  _kMediatekBackend: {
+    _kDN2103: Interval(min: 120, max: 180),
+  },
 };
 
 const Map<String, Map<String, Interval>> _imageSegmentation = {
@@ -84,6 +92,9 @@ const Map<String, Map<String, Interval>> _imageSegmentation = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 450, max: 650),
+  },
+  _kMediatekBackend: {
+    _kDN2103: Interval(min: 45, max: 65),
   },
 };
 
@@ -106,6 +117,32 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 120, max: 160),
   },
+  _kMediatekBackend: {
+    _kDN2103: Interval(min: 1, max: 5),
+  },
+};
+
+const Map<String, Map<String, Interval>> _superResolution = {
+  _kTFLiteBackend: {
+    _kCloudBuildX23: Interval(min: 0.1, max: 3),
+    _kCloudBuildX28: Interval(min: 0.1, max: 4),
+    _kRyzen5600: Interval(min: 0.1, max: 3),
+    _kPixel5: Interval(min: 4, max: 8),
+    _kIphoneOnGitHubAction: Interval(min: 0.1, max: 3),
+    _kIphoneOnMacbookM1: Interval(min: 0.1, max: 10),
+  },
+  _kCoreMLBackend: {
+    _kIphoneOnGitHubAction: Interval(min: 0.1, max: 3),
+  },
+  _kPixelBackend: {
+    _kPixel6: Interval(min: 10, max: 14),
+  },
+  _kQtiBackend: {
+    _kS22Ultra: Interval(min: 35, max: 45),
+  },
+  _kMediatekBackend: {
+    _kDN2103: Interval(min: 5, max: 12),
+  },
 };
 
 const Map<String, Map<String, Interval>> _imageClassificationOffline = {
@@ -126,26 +163,8 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 2600, max: 3000),
   },
-};
-
-// TODO (anhappdev): update min throughput for _superResolution after we gather some statistic
-const Map<String, Map<String, Interval>> _superResolution = {
-  _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 0.1, max: 3),
-    _kCloudBuildX28: Interval(min: 0.1, max: 4),
-    _kRyzen5600: Interval(min: 0.1, max: 3),
-    _kPixel5: Interval(min: 4, max: 8),
-    _kIphoneOnGitHubAction: Interval(min: 0.1, max: 3),
-    _kIphoneOnMacbookM1: Interval(min: 0.1, max: 10),
-  },
-  _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 0.1, max: 3),
-  },
-  _kPixelBackend: {
-    _kPixel6: Interval(min: 10, max: 14),
-  },
-  _kQtiBackend: {
-    _kS22Ultra: Interval(min: 35, max: 45),
+  _kMediatekBackend: {
+    _kDN2103: Interval(min: 75, max: 110),
   },
 };
 
