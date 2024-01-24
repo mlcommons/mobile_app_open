@@ -25,7 +25,6 @@ const Map<String, Interval> _imageClassification = {
   'snpe_dsp': Interval(min: 0.78, max: 0.82),
   'psnpe_dsp': Interval(min: 0.78, max: 0.82),
   'neuron-mdla': Interval(min: 0.88, max: 0.91),
-  'neuron': Interval(min: 0.88, max: 0.91),
 };
 
 const Map<String, Interval> _objectDetection = {
@@ -37,7 +36,6 @@ const Map<String, Interval> _objectDetection = {
   'cpu&gpu&ane': Interval(min: 0.45, max: 0.46),
   'snpe_dsp': Interval(min: 0.32, max: 0.35),
   'psnpe_dsp': Interval(min: 0.32, max: 0.35),
-  'neuron-mdla': Interval(min: 0.28, max: 0.31),
   'neuron': Interval(min: 0.28, max: 0.31),
 };
 
@@ -50,7 +48,6 @@ const Map<String, Interval> _imageSegmentation = {
   'cpu&gpu&ane': Interval(min: 0.38, max: 0.40),
   'snpe_dsp': Interval(min: 0.35, max: 0.38),
   'psnpe_dsp': Interval(min: 0.35, max: 0.38),
-  'neuron-mdla': Interval(min: 0.32, max: 0.34),
   'neuron': Interval(min: 0.32, max: 0.34),
 };
 
@@ -63,8 +60,7 @@ const Map<String, Interval> _naturalLanguageProcessing = {
   'cpu&gpu&ane': Interval(min: 0.80, max: 1.00),
   'snpe_dsp': Interval(min: 1.00, max: 1.00),
   'psnpe_dsp': Interval(min: 1.00, max: 1.00),
-  'neuron-mdla': Interval(min: 1.00, max: 1.00),
-  'neuron': Interval(min: 1.00, max: 1.00),
+  'neuron-no-ahwb': Interval(min: 1.00, max: 1.00),
 };
 
 const Map<String, Interval> _superResolution = {
@@ -76,7 +72,6 @@ const Map<String, Interval> _superResolution = {
   'cpu&gpu&ane': Interval(min: 0.32, max: 0.35),
   'snpe_dsp': Interval(min: 0.32, max: 0.35),
   'psnpe_dsp': Interval(min: 0.32, max: 0.35),
-  'neuron-mdla': Interval(min: 0.32, max: 0.35),
   'neuron': Interval(min: 0.32, max: 0.35),
 };
 
