@@ -1,10 +1,13 @@
-name: App Build
+name: Android Build & Test
 
 on:
   push:
     branches: [ master, submission-v* ]
   pull_request:
     types: [ opened, synchronize, reopened ]
+
+env:
+  GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}
 
 jobs:
   build-android-image:
@@ -118,8 +121,8 @@ jobs:
           WITH_TFLITE: 1
         run: |
           make flutter/android/release flutter/android/apk flutter/android/test-apk
-          gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-tflite.apk
-          gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-tflite.apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-tflite.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-tflite.apk
       - name: Build and upload test APK for Pixel
         env:
           OFFICIAL_BUILD: false
@@ -128,8 +131,8 @@ jobs:
           WITH_PIXEL: 1
         run: |
           make flutter/android/release flutter/android/apk flutter/android/test-apk
-          gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-pixel.apk
-          gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-pixel.apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-pixel.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-pixel.apk
       - name: Build and upload test APK for QTI
         env:
           OFFICIAL_BUILD: false
@@ -138,8 +141,8 @@ jobs:
           WITH_QTI: 1
         run: |
           make flutter/android/release flutter/android/apk flutter/android/test-apk
-          gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-qti.apk
-          gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-qti.apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-qti.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-qti.apk
       - name: Build and upload test APK for MediaTek
         env:
           OFFICIAL_BUILD: false
@@ -148,8 +151,8 @@ jobs:
           WITH_MEDIATEK: 1
         run: |
           make flutter/android/release flutter/android/apk flutter/android/test-apk
-          gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-mtk.apk
-          gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-mtk.apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-mtk.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-mtk.apk
       - name: Build and upload test APK for Samsung
         env:
           OFFICIAL_BUILD: false
@@ -158,8 +161,8 @@ jobs:
           WITH_SAMSUNG: 1
         run: |
           make flutter/android/release flutter/android/apk flutter/android/test-apk
-          gsutil mv output/android-apks/test-main.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-samsung.apk
-          gsutil mv output/android-apks/test-helper.apk gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-samsung.apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-samsung.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-samsung.apk
       - name: Build Android release APK with all backends
         env:
           OFFICIAL_BUILD: true
@@ -198,8 +201,8 @@ jobs:
         run: |
           gcloud firebase test android run \
             --type instrumentation \
-            --app gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-tflite.apk \
-            --test gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-tflite.apk \
+            --app $GCLOUD_BUCKET_PATH/test-main-tflite.apk \
+            --test $GCLOUD_BUCKET_PATH/test-helper-tflite.apk \
             --timeout 30m \
             --num-flaky-test-attempts 2 \
             --device model=redfin,version=30,locale=en,orientation=portrait \
@@ -223,8 +226,8 @@ jobs:
         run: |
           gcloud firebase test android run \
             --type instrumentation \
-            --app gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-pixel.apk \
-            --test gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-pixel.apk \
+            --app $GCLOUD_BUCKET_PATH/test-main-pixel.apk \
+            --test $GCLOUD_BUCKET_PATH/test-helper-pixel.apk \
             --timeout 30m \
             --num-flaky-test-attempts 2 \
             --device model=oriole,version=32,locale=en,orientation=portrait \
@@ -248,8 +251,8 @@ jobs:
         run: |
           gcloud firebase test android run \
             --type instrumentation \
-            --app gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-qti.apk \
-            --test gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-qti.apk \
+            --app $GCLOUD_BUCKET_PATH/test-main-qti.apk \
+            --test $GCLOUD_BUCKET_PATH/test-helper-qti.apk \
             --timeout 30m \
             --num-flaky-test-attempts 2 \
             --device model=b0q,version=33,locale=en,orientation=portrait \
@@ -273,8 +276,8 @@ jobs:
         run: |
           gcloud firebase test android run \
             --type instrumentation \
-            --app gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-main-mtk.apk \
-            --test gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}/test-helper-mtk.apk \
+            --app $GCLOUD_BUCKET_PATH/test-main-mtk.apk \
+            --test $GCLOUD_BUCKET_PATH/test-helper-mtk.apk \
             --timeout 30m \
             --num-flaky-test-attempts 2 \
             --device model=OP515BL1,version=33,locale=en,orientation=portrait \
