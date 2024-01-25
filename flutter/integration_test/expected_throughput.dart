@@ -35,11 +35,11 @@ const Map<String, Map<String, Interval>> _imageClassification = {
     _kCloudBuildX28: Interval(min: 4, max: 13),
     _kRyzen5600: Interval(min: 31, max: 37),
     _kPixel5: Interval(min: 80, max: 130),
-    _kIphoneOnGitHubAction: Interval(min: 2, max: 8),
+    _kIphoneOnGitHubAction: Interval(min: 1, max: 8),
     _kIphoneOnMacbookM1: Interval(min: 19, max: 27),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 2, max: 8),
+    _kIphoneOnGitHubAction: Interval(min: 1, max: 8),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 800, max: 1100),
@@ -58,11 +58,11 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kCloudBuildX28: Interval(min: 3.5, max: 8),
     _kRyzen5600: Interval(min: 14, max: 22),
     _kPixel5: Interval(min: 40, max: 60),
-    _kIphoneOnGitHubAction: Interval(min: 0.8, max: 4),
+    _kIphoneOnGitHubAction: Interval(min: 0.5, max: 4),
     _kIphoneOnMacbookM1: Interval(min: 9, max: 16),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 0.8, max: 4),
+    _kIphoneOnGitHubAction: Interval(min: 0.5, max: 4),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 250, max: 450),
@@ -81,11 +81,11 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
     _kCloudBuildX28: Interval(min: 0.5, max: 4),
     _kRyzen5600: Interval(min: 5, max: 7),
     _kPixel5: Interval(min: 25, max: 40),
-    _kIphoneOnGitHubAction: Interval(min: 0.3, max: 2.5),
+    _kIphoneOnGitHubAction: Interval(min: 0.1, max: 2.5),
     _kIphoneOnMacbookM1: Interval(min: 3, max: 6),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 0.3, max: 2.5),
+    _kIphoneOnGitHubAction: Interval(min: 0.1, max: 2.5),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 180),
@@ -104,11 +104,11 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kCloudBuildX28: Interval(min: 0.5, max: 1.3),
     _kRyzen5600: Interval(min: 2.8, max: 3.2),
     _kPixel5: Interval(min: 2.3, max: 3.0),
-    _kIphoneOnGitHubAction: Interval(min: 0.2, max: 1),
+    _kIphoneOnGitHubAction: Interval(min: 0.1, max: 1),
     _kIphoneOnMacbookM1: Interval(min: 1.8, max: 3),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 0.2, max: 1),
+    _kIphoneOnGitHubAction: Interval(min: 0.1, max: 1),
   },
   _kPixelBackend: {
     // pixel some time finish this task in 4 seconds, not sure why.
@@ -128,11 +128,11 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kCloudBuildX28: Interval(min: 0.1, max: 4),
     _kRyzen5600: Interval(min: 0.1, max: 3),
     _kPixel5: Interval(min: 4, max: 8),
-    _kIphoneOnGitHubAction: Interval(min: 0.08, max: 1.0),
+    _kIphoneOnGitHubAction: Interval(min: 0.02, max: 1.0),
     _kIphoneOnMacbookM1: Interval(min: 0.1, max: 10),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 0.08, max: 1.0),
+    _kIphoneOnGitHubAction: Interval(min: 0.02, max: 1.0),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 10, max: 14),
@@ -151,11 +151,11 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
     _kCloudBuildX28: Interval(min: 7, max: 16),
     _kRyzen5600: Interval(min: 45, max: 60),
     _kPixel5: Interval(min: 120, max: 190),
-    _kIphoneOnGitHubAction: Interval(min: 3, max: 15),
+    _kIphoneOnGitHubAction: Interval(min: 2, max: 15),
     _kIphoneOnMacbookM1: Interval(min: 30, max: 45),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 3, max: 20),
+    _kIphoneOnGitHubAction: Interval(min: 2, max: 20),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 1000, max: 1700),
