@@ -63,14 +63,10 @@ class _ResultCircleState extends State<ResultCircle>
         margin: const EdgeInsets.only(bottom: 20.0),
         width: edgeSize,
         height: edgeSize,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          gradient: LinearGradient(
-            colors: AppGradients.resultCircle,
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          boxShadow: const [
+          color: AppColors.progressCircle,
+          boxShadow: [
             BoxShadow(
               color: Colors.black12,
               offset: Offset(15, 15),

@@ -1,63 +1,63 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench/app_constants.dart';
-
 class AppColors {
+  AppColors._();
+
+  static const _blue1 = Color(0XFF2C92CB);
+  static const _blue2 = Color(0XFF2980B7);
+  static const _blue3 = Color(0XFF166299);
+  static const _blue4 = Color(0XFF135384);
+  static const _blue5 = Color(0xFF0B3A61);
+  static const _green = Color(0xFF41C555);
+
   static const lightText = Colors.white;
   static const darkText = Colors.black;
-  static const resultValid = Colors.indigo;
-  static const resultInvalid = Colors.red;
-  static const darkRedText = Colors.red;
+  static const resultValidText = Colors.indigo;
+  static const resultInvalidText = Colors.red;
+  static const errorText = Colors.red;
 
-  static const blue1 = Color(0XFF2C92CB);
-  static Color mediumBlue = Colors.lightBlue.shade900;
-  static const blue12 = Color(0xFF0B3A61);
-  static const blue9 = Color(0xFF166299);
+  static const primary = _blue2;
+  static const secondary = _blue1;
 
-  static const dialogBackground = Colors.white;
-  static const snackBarBackground = Color(0xFFEDEDED);
-  static Color appBarBackground =
-      DartDefine.isOfficialBuild ? blue9 : Colors.brown;
-
+  static const appBarBackground = _blue3;
+  static const appBarBackgroundSecondary = _blue1;
   static const appBarIcon = Colors.white;
-
-  static const progressCircle = Color(0xff135384);
-
-  static const progressCancelButton = Color(0x000B4A7F);
-
-  static Color get shareTextButton => Colors.blue.shade900;
+  static const drawerBackground = _blue4;
+  static const drawerForeground = Colors.white;
+  static const dialogBackground = Colors.white;
+  static const shareTextButton = _blue2;
+  static const shareSectionBackground = _blue4;
+  static const infoSectionBackground = _blue5;
+  static const progressCircle = _blue4;
+  static const goCircle = _green;
 }
 
 class AppGradients {
-  static List<Color> fullScreen = DartDefine.isOfficialBuild
-      ? [const Color(0xff3189E2), const Color(0xff0B4A7F)]
-      : [Colors.brown.shade400, Colors.brown];
+  AppGradients._();
+
+  static List<Color> fullScreen = [
+    AppColors._blue1,
+    AppColors._blue2,
+    AppColors._blue3,
+    AppColors._blue4,
+  ];
 
   static List<Color> halfScreen = [
-    AppColors.blue1,
-    AppColors.blue12,
+    AppColors._blue1,
+    AppColors._blue2,
+    AppColors._blue3,
   ];
 
-  static List<Color> get resultBar => [
-        const Color(0xFF135384),
-        const Color(0xFF3183E2),
-        const Color(0xFF31B8E2),
-        const Color(0xFF7DD5F0),
-        const Color(0xFF6AD7F9)
+  static List<Color> get scoreBar => [
+        AppColors._blue3,
+        AppColors._blue2,
+        AppColors._blue1,
       ];
-
-  static List<Color> progressCircle = [
-    const Color(0xff135384),
-    const Color(0xff135384)
-  ];
-
-  static List<Color> resultCircle = [
-    Color.lerp(const Color(0xFF328BE2), Colors.white, 1 - 0.65)!,
-    const Color(0xFF328BE2), // 328BE2
-  ];
 }
 
 class WidgetSizes {
+  WidgetSizes._();
+
   static const circleWidthFactor = 0.32;
   static const borderRadius = 8.0;
 }

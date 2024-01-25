@@ -25,3 +25,9 @@ extension DateTimeFormat on DateTime {
     return dateFormat.format(this);
   }
 }
+
+extension StringFormat on String {
+  String toUIString() {
+    return toBeginningOfSentenceCase(this) ?? this;
+  }
+}

@@ -50,7 +50,7 @@ class ResourceErrorScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 15,
-                          color: AppColors.darkRedText,
+                          color: AppColors.errorText,
                         ),
                       ),
                       Text(

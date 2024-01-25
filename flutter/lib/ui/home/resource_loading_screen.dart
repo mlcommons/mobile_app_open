@@ -22,58 +22,32 @@ class _ResourceLoadingScreenState extends State<ResourceLoadingScreen> {
     final l10n = AppLocalizations.of(context);
     final loadingProgressText = '${(state.loadingProgress * 100).round()}%';
 
-    final progressCircle = Stack(
-      alignment: AlignmentDirectional.center,
-      children: <Widget>[
-        Center(
-          child: Container(
-            width: progressCircleEdgeSize,
-            height: progressCircleEdgeSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: AppGradients.progressCircle,
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(15, 15),
-                  blurRadius: 10,
-                )
-              ],
+    final progressCircle = Center(
+      child: Container(
+        width: progressCircleEdgeSize,
+        height: progressCircleEdgeSize,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.progressCircle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(15, 15),
+              blurRadius: 10,
+            )
+          ],
+        ),
+        child: Center(
+          child: Text(
+            loadingProgressText,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.lightText,
             ),
-            child: Center(
-              child: Text(
-                loadingProgressText,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.lightText,
-                ),
-                textScaleFactor: 2,
-              ),
-            ),
+            textScaleFactor: 2,
           ),
         ),
-        Center(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.35,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.progressCircle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(15, 15),
-                  blurRadius: 10,
-                )
-              ],
-            ),
-          ),
-        ),
-      ],
+      ),
     );
 
     final statusText = Padding(

@@ -14,7 +14,6 @@ import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
-import 'package:mlperfbench/ui/home/shared_styles.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -75,9 +74,9 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         title: Text(title),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(56.0),
-          child: _sharingSection(),
+          child: _shareSection(),
         ),
-        backgroundColor: AppColors.blue1,
+        backgroundColor: AppColors.appBarBackgroundSecondary,
       ),
       drawer: const AppDrawer(),
       body: LayoutBuilder(
@@ -98,7 +97,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     );
   }
 
-  Widget _sharingSection() {
+  Widget _shareSection() {
     final lastResult = state.lastResult;
     Text deviceInfoText;
     Text benchmarkDateText;
@@ -143,8 +142,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       },
     );
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 8, 10, 8),
-      color: AppColors.mediumBlue,
+      padding: const EdgeInsets.fromLTRB(20, 4, 10, 4),
+      color: AppColors.shareSectionBackground,
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Colors.white),
         child: Row(
@@ -250,7 +249,9 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     var subtitleColumnChildren = <Widget>[];
     subtitleColumnChildren.add(const SizedBox(height: 4));
     final resultTextStyle = TextStyle(
-      color: resultIsValid ? AppColors.resultValid : AppColors.resultInvalid,
+      color: resultIsValid
+          ? AppColors.resultValidText
+          : AppColors.resultInvalidText,
       fontSize: 18.0,
       fontWeight: FontWeight.bold,
     );
@@ -309,7 +310,10 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       leading: SizedBox(
           width: leadingWidth,
           height: leadingWidth,
-          child: benchmark.info.icon),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: benchmark.info.icon,
+          )),
       title: SizedBox(
         width: subtitleWidth,
         child: Text(benchmark.taskConfig.name),
@@ -364,15 +368,14 @@ class BlueProgressLine extends Container {
       widthFactor: _progressValue,
       child: Container(
         alignment: Alignment.topLeft,
-        margin: const EdgeInsets.only(bottom: 10.0),
-        height: 10,
+        margin: const EdgeInsets.only(bottom: 8.0),
+        height: 8.0,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5.0),
+          borderRadius: BorderRadius.circular(4.0),
           gradient: LinearGradient(
-            colors: AppGradients.resultBar,
+            colors: AppGradients.scoreBar,
             begin: Alignment.topLeft,
-            end: Alignment(1 / _progressValue, 0),
-            stops: const [0, 0.36, 0.61, 0.83, 1.0],
+            end: Alignment.bottomRight,
           ),
         ),
       ),

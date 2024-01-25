@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:mlperfbench/data/environment/env_android.dart';
 import 'package:mlperfbench/data/environment/env_ios.dart';
 import 'package:mlperfbench/data/environment/env_windows.dart';
+import 'package:mlperfbench/ui/formatter.dart';
 
 part 'environment_info.g.dart';
 
@@ -54,7 +55,7 @@ class EnvironmentInfo {
         if (android == null) {
           return 'Unknown Android device';
         }
-        return '${android.manufacturer} ${android.modelName}';
+        return '${android.manufacturer} ${android.modelName}'.toUIString();
       case EnvPlatform.ios:
         final ios = value.ios;
         if (ios == null) {

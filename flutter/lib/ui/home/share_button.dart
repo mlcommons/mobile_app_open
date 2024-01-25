@@ -95,7 +95,7 @@ class _ShareButton extends State<ShareBottomSheet> {
                 const SizedBox(width: 20),
                 Text(
                   l10n.shareButtonOther,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.shareTextButton,
                     fontSize: 18,
                   ),
@@ -120,7 +120,7 @@ class _ShareButton extends State<ShareBottomSheet> {
                 const SizedBox(width: 20),
                 Text(
                   l10n.shareButtonMLCommons,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.shareTextButton,
                     fontSize: 18,
                   ),
@@ -155,8 +155,8 @@ class _ShareButton extends State<ShareBottomSheet> {
               children: <Widget>[
                 Text(
                   l10n.shareButtonMLCommons,
-                  style:
-                      TextStyle(color: AppColors.shareTextButton, fontSize: 18),
+                  style: const TextStyle(
+                      color: AppColors.shareTextButton, fontSize: 18),
                 ),
                 const SizedBox(height: 20),
                 Text(l10n.uploadRequiredSignedIn),

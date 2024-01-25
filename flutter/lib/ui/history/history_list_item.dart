@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/data/results/benchmark_result.dart';
-import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
+import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/history/list_item.dart';
 import 'package:mlperfbench/ui/icons.dart';
 
@@ -53,7 +53,7 @@ class HistoryListItem implements ListItem {
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.0,
-                    color: AppColors.resultValid,
+                    color: AppColors.resultValidText,
                   ),
                 ),
               ),

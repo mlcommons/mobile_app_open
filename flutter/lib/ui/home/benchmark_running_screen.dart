@@ -96,14 +96,10 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
         Container(
           width: containerWidth,
           height: containerWidth,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: AppGradients.progressCircle,
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            boxShadow: const [
+            color: AppColors.progressCircle,
+            boxShadow: [
               BoxShadow(
                 color: Colors.black12,
                 offset: Offset(15, 15),
@@ -218,7 +214,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     }
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 32),
-      tileColor: isEven ? AppColors.mediumBlue : Colors.transparent,
+      tileColor: isEven ? AppColors.progressCircle : Colors.transparent,
       textColor: AppColors.lightText,
       dense: true,
       minVerticalPadding: 0,
@@ -284,8 +280,6 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
       child: TextButton(
         style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all(AppColors.progressCancelButton),
           shape: MaterialStateProperty.all(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),

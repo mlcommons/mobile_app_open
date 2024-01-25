@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/history/history_list_screen.dart';
 import 'package:mlperfbench/ui/home/user_profile.dart';
 import 'package:mlperfbench/ui/settings/about_screen.dart';
@@ -18,8 +19,26 @@ class AppDrawer extends StatelessWidget {
     final header = buildHeader(context);
     final menuList = buildMenuList(context);
     return Drawer(
-      child: Column(
-        children: [header] + menuList,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          textTheme: Theme.of(context).textTheme.apply(
+                bodyColor: AppColors.drawerForeground,
+                displayColor: AppColors.drawerForeground,
+                decorationColor: AppColors.drawerForeground,
+              ),
+          listTileTheme: const ListTileThemeData(
+            iconColor: AppColors.drawerForeground,
+          ),
+          iconTheme: const IconThemeData(
+            color: AppColors.drawerForeground,
+          ),
+        ),
+        child: Container(
+          color: AppColors.drawerBackground,
+          child: Column(
+            children: [header] + menuList,
+          ),
+        ),
       ),
     );
   }

@@ -92,7 +92,7 @@ class HistoryHelperUtils {
         final style = rowData.isHeader ? headerStyle : rowStyle;
         final perfStyle = rowData.throughputValid
             ? style
-            : const TextStyle(color: AppColors.darkRedText);
+            : const TextStyle(color: AppColors.resultInvalidText);
         final firstColumnText = Text(rowData.name, style: style);
         final firstColumn = rowData.isHeader
             ? firstColumnText

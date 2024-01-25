@@ -54,7 +54,10 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
       leading: SizedBox(
           width: leadingWidth,
           height: leadingWidth,
-          child: benchmark.info.icon),
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: benchmark.info.icon,
+          )),
       title: _name(benchmark),
       subtitle: SizedBox(
         width: subtitleWidth,

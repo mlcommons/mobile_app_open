@@ -18,13 +18,16 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: const [AppLocalizations.delegate],
       supportedLocales: const [Locale('en', '')],
       theme: Theme.of(context).copyWith(
-        appBarTheme: AppBarTheme(
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: AppColors.primary,
+          secondary: AppColors.secondary,
+        ),
+        appBarTheme: const AppBarTheme(
           centerTitle: true,
-          titleTextStyle:
-              const TextStyle(color: AppColors.lightText, fontSize: 20),
+          titleTextStyle: TextStyle(color: AppColors.lightText, fontSize: 20),
           elevation: 0,
           backgroundColor: AppColors.appBarBackground,
-          iconTheme: const IconThemeData(color: AppColors.appBarIcon),
+          iconTheme: IconThemeData(color: AppColors.appBarIcon),
         ),
         popupMenuTheme: PopupMenuThemeData(
           shape: RoundedRectangleBorder(

@@ -122,7 +122,7 @@ class _DataFolderSelectorHelper {
             return Text(
               l10n.settingsTaskDataFolderWarning
                   .replaceFirst('<path>', store.customDataFolder),
-              style: const TextStyle(color: AppColors.darkRedText),
+              style: const TextStyle(color: AppColors.errorText),
             );
           }
           return const SizedBox.shrink();
