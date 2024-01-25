@@ -34,7 +34,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.menuHome),
-        backgroundColor: AppColors.appBarBackgroundSecondary,
+        backgroundColor: AppColors.secondaryAppBarBackground,
       ),
       drawer: const AppDrawer(),
       body: SafeArea(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench/app_constants.dart';
+
 class AppColors {
   AppColors._();
 
@@ -9,6 +11,7 @@ class AppColors {
   static const _blue4 = Color(0XFF135384);
   static const _blue5 = Color(0xFF0B3A61);
   static const _green = Color(0xFF41C555);
+  static const _brown = Colors.brown;
 
   static const lightText = Colors.white;
   static const darkText = Colors.black;
@@ -19,8 +22,10 @@ class AppColors {
   static const primary = _blue2;
   static const secondary = _blue1;
 
-  static const appBarBackground = _blue3;
-  static const appBarBackgroundSecondary = _blue1;
+  static const primaryAppBarBackground =
+      DartDefine.isOfficialBuild ? _blue3 : _brown;
+  static const secondaryAppBarBackground =
+      DartDefine.isOfficialBuild ? _blue1 : _brown;
   static const appBarIcon = Colors.white;
   static const drawerBackground = _blue4;
   static const drawerForeground = Colors.white;

@@ -76,7 +76,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
           preferredSize: const Size.fromHeight(56.0),
           child: _shareSection(),
         ),
-        backgroundColor: AppColors.appBarBackgroundSecondary,
+        backgroundColor: AppColors.secondaryAppBarBackground,
       ),
       drawer: const AppDrawer(),
       body: LayoutBuilder(

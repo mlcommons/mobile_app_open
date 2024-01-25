@@ -1,4 +1,6 @@
 class DartDefine {
+  DartDefine._();
+
   static const isOfficialBuild =
       bool.fromEnvironment('OFFICIAL_BUILD', defaultValue: false);
   static const firebaseCrashlyticsEnabled =
