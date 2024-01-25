@@ -13,6 +13,9 @@ lib/firebase/firebase_options.gen.dart
 .pub-cache/
 .pub/
 /build/
+*.g.dart
+*.gen.dart
+*.gen.h
 
 # Web related
 lib/generated_plugin_registrant.dart

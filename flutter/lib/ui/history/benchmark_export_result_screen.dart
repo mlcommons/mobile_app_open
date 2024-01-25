@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/data/results/dataset_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/history/utils.dart';
-import 'package:mlperfbench/ui/time_utils.dart';
 
 class BenchmarkExportResultScreen extends StatefulWidget {
   final BenchmarkExportResult result;
@@ -79,7 +79,7 @@ class _BenchmarkExportResultScreenState
       helper.makeInfo(l10n.historyRunDetailsValid,
           (perf.loadgenInfo?.validity ?? false).toString()),
       helper.makeInfo(l10n.historyRunDetailsDuration,
-          formatDuration(perf.measuredDuration)),
+          perf.measuredDuration.toDurationUIString()),
       helper.makeInfo(
           l10n.historyRunDetailsSamples, perf.measuredSamples.toString()),
       helper.makeInfo(
@@ -92,10 +92,8 @@ class _BenchmarkExportResultScreenState
     return [
       helper.makeInfo(l10n.historyRunDetailsAccuracy,
           accuracy.accuracy?.formatted ?? l10n.resultsNotAvailable),
-      helper.makeInfo(
-        l10n.historyRunDetailsDuration,
-        formatDuration(accuracy.measuredDuration),
-      ),
+      helper.makeInfo(l10n.historyRunDetailsDuration,
+          accuracy.measuredDuration.toDurationUIString()),
       helper.makeInfo(
           l10n.historyRunDetailsSamples, accuracy.measuredSamples.toString()),
       helper.makeInfo(

@@ -8,12 +8,12 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
+import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
 import 'package:mlperfbench/ui/home/shared_styles.dart';
-import 'package:mlperfbench/ui/time_utils.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -103,7 +103,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     Text benchmarkDateText;
     if (lastResult != null) {
       deviceInfoText = Text(lastResult.environmentInfo.modelDescription);
-      benchmarkDateText = Text(formatDateTime(lastResult.meta.creationDate));
+      benchmarkDateText = Text(lastResult.meta.creationDate.toUIString());
     } else {
       deviceInfoText = Text(DeviceInfo.instance.envInfo.modelDescription);
       benchmarkDateText = Text(l10n.na);
