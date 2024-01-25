@@ -36,6 +36,7 @@ class FirebaseStorageService {
   Future<void> delete(String uid, String fileName) async {
     final path = _getCloudStoragePath(uid, fileName);
     await firebaseStorage.ref(path).delete();
+    print('Deleted: $path');
   }
 
   Future<List<String>> list(String uid) async {

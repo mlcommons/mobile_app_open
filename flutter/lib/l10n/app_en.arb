@@ -17,6 +17,8 @@
   "userProfile": "User Profile",
   "userId": "User ID",
   "userCreated": "Created",
+  "userManageUploadedResults": "Manage uploaded results",
+  "userUploadedFiles": "Uploaded Files",
 
   "unsupportedMainMessage": "This device is not yet supported.",
   "unsupportedBackendError": "Error message",

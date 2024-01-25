@@ -12,9 +12,9 @@ import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/state/task_runner.dart';
+import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/progress_circles.dart';
 import 'package:mlperfbench/ui/icons.dart';
-import 'package:mlperfbench/ui/time_utils.dart';
 
 class BenchmarkRunningScreen extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey =
@@ -371,8 +371,8 @@ class _StageProgressTextState extends State<_StageProgressText> {
     final progress = state.taskRunner.progressInfo;
     String progressStr;
     if (progress.cooldown) {
-      progressStr = formatDuration(
-          progress.cooldownDuration * (1.0 - progress.stageProgress));
+      progressStr = (progress.cooldownDuration * (1.0 - progress.stageProgress))
+          .toDurationUIString();
     } else {
       progressStr = '${(progress.stageProgress * 100).round().clamp(0, 100)}%';
     }
