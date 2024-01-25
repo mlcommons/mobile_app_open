@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/state/task_runner.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/progress_circles.dart';
 import 'package:mlperfbench/ui/icons.dart';
@@ -39,7 +39,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
 
     final backgroundGradient = BoxDecoration(
       gradient: LinearGradient(
-        colors: AppColors.progressScreenGradient,
+        colors: AppGradients.fullScreen,
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),
@@ -99,7 +99,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
-              colors: AppColors.progressCircleGradient,
+              colors: AppGradients.progressCircle,
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),

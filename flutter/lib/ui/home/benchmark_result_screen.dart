@@ -7,6 +7,7 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
@@ -76,7 +77,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
           preferredSize: const Size.fromHeight(56.0),
           child: _sharingSection(),
         ),
-        backgroundColor: AppColors.lightBlue,
+        backgroundColor: AppColors.blue1,
       ),
       drawer: const AppDrawer(),
       body: LayoutBuilder(
@@ -162,7 +163,13 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
 
   Widget _totalScoreSection() {
     return Container(
-      decoration: mainLinearGradientDecoration,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: AppGradients.halfScreen,
+        ),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -362,7 +369,7 @@ class BlueProgressLine extends Container {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5.0),
           gradient: LinearGradient(
-            colors: AppColors.resultBarGradient,
+            colors: AppGradients.resultBar,
             begin: Alignment.topLeft,
             end: Alignment(1 / _progressValue, 0),
             stops: const [0, 0.36, 0.61, 0.83, 1.0],

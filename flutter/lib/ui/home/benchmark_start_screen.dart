@@ -7,11 +7,11 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_config_section.dart';
-import 'package:mlperfbench/ui/home/shared_styles.dart';
 
 class BenchmarkStartScreen extends StatefulWidget {
   const BenchmarkStartScreen({Key? key}) : super(key: key);
@@ -34,7 +34,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.menuHome),
-        backgroundColor: AppColors.lightBlue,
+        backgroundColor: AppColors.blue1,
       ),
       drawer: const AppDrawer(),
       body: SafeArea(
@@ -103,7 +103,13 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
         Container(
           width: MediaQuery.of(context).size.width,
           alignment: Alignment.center,
-          decoration: mainLinearGradientDecoration,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: AppGradients.halfScreen,
+            ),
+          ),
         ),
         Container(
           alignment: Alignment.center,

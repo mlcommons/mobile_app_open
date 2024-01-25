@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 
 class ResourceLoadingScreen extends StatefulWidget {
   const ResourceLoadingScreen({super.key});
@@ -32,7 +32,7 @@ class _ResourceLoadingScreenState extends State<ResourceLoadingScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: AppColors.progressCircleGradient,
+                colors: AppGradients.progressCircle,
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -104,7 +104,7 @@ class _ResourceLoadingScreenState extends State<ResourceLoadingScreen> {
 
     final backgroundGradient = BoxDecoration(
       gradient: LinearGradient(
-        colors: AppColors.progressScreenGradient,
+        colors: AppGradients.fullScreen,
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class DartDefine {
   static const isOfficialBuild =
       bool.fromEnvironment('OFFICIAL_BUILD', defaultValue: false);
@@ -17,76 +15,6 @@ class WidgetKeys {
   // list of widget keys that need to be accessed in the test code
   static const String goButton = 'goButton';
   static const String totalScoreCircle = 'totalScoreCircle';
-}
-
-class AppColors {
-  static const lightText = Colors.white;
-  static const lightRedText = Color.fromARGB(255, 255, 120, 100);
-  static const darkText = Colors.black;
-  static const resultValid = Colors.indigo;
-  static const resultInvalid = Colors.red;
-  static const darkRedText = Colors.red;
-  static const lightBlue = Color(0XFF2C92CB);
-  static const mediumBlue = Color(0xFF135384);
-  static const darkBlue = Color(0xFF0B3A61);
-
-  static const dialogBackground = Colors.white;
-  static const snackBarBackground = Color(0xFFEDEDED);
-  static const appBarBackground =
-      DartDefine.isOfficialBuild ? Color(0xFF166299) : Colors.brown;
-
-  static const appBarIcon = Colors.white;
-
-  static List<Color> get mainScreenGradient => DartDefine.isOfficialBuild
-      ? [
-          const Color(0xFF31A3E2),
-          const Color(0xFF31A3E2),
-          const Color(0xFF31A3E2),
-          const Color(0xFF3189E2),
-          const Color(0xFF0B4A7F),
-        ]
-      : [
-          Colors.brown,
-          Colors.brown.shade500,
-          Colors.brown.shade500,
-          Colors.brown.shade700,
-          Colors.brown.shade800,
-        ];
-
-  static const runBenchmarkRectangle = Color(0xFF0DB526);
-
-  static List<Color> get progressScreenGradient => DartDefine.isOfficialBuild
-      ? [const Color(0xff3189E2), const Color(0xff0B4A7F)]
-      : [Colors.brown.shade400, Colors.brown];
-
-  static const progressCircle = Color(0xff135384);
-
-  static const progressCancelButton = Color(0x000B4A7F);
-
-  static List<Color> get progressCircleGradient =>
-      [const Color(0xff135384), const Color(0xff135384)];
-
-  static List<Color> get resultCircleGradient => [
-        Color.lerp(const Color(0xFF328BE2), Colors.white, 1 - 0.65)!,
-        const Color(0xFF328BE2), // 328BE2
-      ];
-
-  static List<Color> get resultBarGradient => [
-        const Color(0xFF135384),
-        const Color(0xFF3183E2),
-        const Color(0xFF31B8E2),
-        const Color(0xFF7DD5F0),
-        const Color(0xFF6AD7F9)
-      ];
-
-  static const shareRectangle = Colors.green;
-
-  static Color get shareTextButton => Colors.blue.shade900;
-}
-
-class WidgetSizes {
-  static const circleWidthFactor = 0.32;
-  static const borderRadius = 8.0;
 }
 
 class BenchmarkId {

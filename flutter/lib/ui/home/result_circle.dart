@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/icons.dart' as app_icons;
 
 class ResultCircle extends StatefulWidget {
@@ -66,7 +66,7 @@ class _ResultCircleState extends State<ResultCircle>
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: LinearGradient(
-            colors: AppColors.resultCircleGradient,
+            colors: AppGradients.resultCircle,
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
