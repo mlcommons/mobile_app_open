@@ -70,6 +70,8 @@ dev_dependencies:
 dependency_overrides:
   # https://github.com/mlcommons/mobile_app_open/issues/777
   archive: ^3.3.9
+  # https://stackoverflow.com/questions/77468892/error-authprovider-is-imported-from-both:
+  firebase_auth: "4.12.0"
 
 flutter_icons:
   ios: true
