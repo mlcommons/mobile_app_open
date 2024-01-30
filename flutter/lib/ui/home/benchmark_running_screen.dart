@@ -196,8 +196,8 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   }
 
   Widget _listTile(BenchmarkInfo benchmarkInfo, bool isEven) {
-    final leadingWidth = 0.16 * MediaQuery.of(context).size.width;
-    final titleWidth = 0.60 * MediaQuery.of(context).size.width;
+    final leadingWidth = 0.10 * MediaQuery.of(context).size.width;
+    final titleWidth = 0.70 * MediaQuery.of(context).size.width;
     const trailingWidth = 24.0;
     Widget? doneIcon;
     if (progress.currentBenchmark?.taskName == benchmarkInfo.taskName) {
@@ -219,9 +219,12 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
       dense: true,
       minVerticalPadding: 0,
       leading: SizedBox(
-          width: leadingWidth * 0.4,
-          height: leadingWidth * 0.4,
-          child: benchmarkInfo.iconWhite),
+          width: leadingWidth,
+          height: leadingWidth,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: benchmarkInfo.iconWhite,
+          )),
       title: SizedBox(
         width: titleWidth,
         child: Text(
