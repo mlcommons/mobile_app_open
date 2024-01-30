@@ -251,8 +251,9 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(flex: 4, child: _footerText()),
-          Expanded(flex: 6, child: _cancelButton()),
+          const Spacer(),
+          Expanded(flex: 2, child: _footerText()),
+          _cancelButton(),
         ],
       );
     }
