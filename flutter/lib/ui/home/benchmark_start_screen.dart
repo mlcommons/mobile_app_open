@@ -7,11 +7,11 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_config_section.dart';
-import 'package:mlperfbench/ui/home/shared_styles.dart';
 
 class BenchmarkStartScreen extends StatefulWidget {
   const BenchmarkStartScreen({Key? key}) : super(key: key);
@@ -34,7 +34,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.menuHome),
-        backgroundColor: AppColors.lightBlue,
+        backgroundColor: AppColors.secondaryAppBarBackground,
       ),
       drawer: const AppDrawer(),
       body: SafeArea(
@@ -43,11 +43,11 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Expanded(
-              flex: 32,
+              flex: 34,
               child: _goButtonSection(context),
             ),
             Expanded(
-              flex: 8,
+              flex: 6,
               child: _infoSection(),
             ),
             Expanded(
@@ -75,9 +75,9 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
         .replaceAll('<total>', totalCount);
     var deviceDescription = DeviceInfo.instance.envInfo.modelDescription;
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 8, 10, 8),
+      padding: const EdgeInsets.fromLTRB(20, 4, 10, 4),
       width: double.infinity,
-      color: AppColors.mediumBlue,
+      color: AppColors.infoSectionBackground,
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Colors.white, fontSize: 14),
         child: Column(
@@ -85,7 +85,6 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(flex: 1, child: Text(deviceDescription)),
-            const SizedBox(height: 4),
             Expanded(flex: 1, child: Text(selectedBenchmarkText))
           ],
         ),
@@ -103,14 +102,20 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
         Container(
           width: MediaQuery.of(context).size.width,
           alignment: Alignment.center,
-          decoration: mainLinearGradientDecoration,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: AppGradients.halfScreen,
+            ),
+          ),
         ),
         Container(
           alignment: Alignment.center,
           child: ElevatedButton(
             key: const Key(WidgetKeys.goButton),
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.goCircle,
                 shape: const CircleBorder(),
                 minimumSize: Size.fromWidth(circleWidth)),
             child: Text(

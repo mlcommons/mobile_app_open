@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 
 class BenchmarkConfigSection extends StatefulWidget {
@@ -54,7 +54,10 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
       leading: SizedBox(
           width: leadingWidth,
           height: leadingWidth,
-          child: benchmark.info.icon),
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: benchmark.info.icon,
+          )),
       title: _name(benchmark),
       subtitle: SizedBox(
         width: subtitleWidth,

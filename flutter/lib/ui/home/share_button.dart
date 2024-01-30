@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/home/user_profile.dart';
 
 enum _ShareDestination { local, cloud }
@@ -95,7 +95,7 @@ class _ShareButton extends State<ShareBottomSheet> {
                 const SizedBox(width: 20),
                 Text(
                   l10n.shareButtonOther,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.shareTextButton,
                     fontSize: 18,
                   ),
@@ -120,7 +120,7 @@ class _ShareButton extends State<ShareBottomSheet> {
                 const SizedBox(width: 20),
                 Text(
                   l10n.shareButtonMLCommons,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.shareTextButton,
                     fontSize: 18,
                   ),
@@ -155,8 +155,8 @@ class _ShareButton extends State<ShareBottomSheet> {
               children: <Widget>[
                 Text(
                   l10n.shareButtonMLCommons,
-                  style:
-                      TextStyle(color: AppColors.shareTextButton, fontSize: 18),
+                  style: const TextStyle(
+                      color: AppColors.shareTextButton, fontSize: 18),
                 ),
                 const SizedBox(height: 20),
                 Text(l10n.uploadRequiredSignedIn),

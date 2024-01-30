@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 
 enum DialogTypeEnum { error, warning, success }
 

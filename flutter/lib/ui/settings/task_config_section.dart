@@ -11,6 +11,7 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/settings/data_folder_type.dart';
 
@@ -121,7 +122,7 @@ class _DataFolderSelectorHelper {
             return Text(
               l10n.settingsTaskDataFolderWarning
                   .replaceFirst('<path>', store.customDataFolder),
-              style: const TextStyle(color: AppColors.darkRedText),
+              style: const TextStyle(color: AppColors.errorText),
             );
           }
           return const SizedBox.shrink();

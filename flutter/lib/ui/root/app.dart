@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:bot_toast/bot_toast.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 
 class MyApp extends StatelessWidget {
   final Widget home;
@@ -18,11 +18,15 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: const [AppLocalizations.delegate],
       supportedLocales: const [Locale('en', '')],
       theme: Theme.of(context).copyWith(
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: AppColors.primary,
+          secondary: AppColors.secondary,
+        ),
         appBarTheme: const AppBarTheme(
           centerTitle: true,
           titleTextStyle: TextStyle(color: AppColors.lightText, fontSize: 20),
           elevation: 0,
-          backgroundColor: AppColors.appBarBackground,
+          backgroundColor: AppColors.primaryAppBarBackground,
           iconTheme: IconThemeData(color: AppColors.appBarIcon),
         ),
         popupMenuTheme: PopupMenuThemeData(
