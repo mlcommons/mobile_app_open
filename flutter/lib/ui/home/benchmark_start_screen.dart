@@ -37,31 +37,29 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
         backgroundColor: AppColors.secondaryAppBarBackground,
       ),
       drawer: const AppDrawer(),
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              flex: 34,
-              child: _goButtonSection(context),
-            ),
-            Expanded(
-              flex: 6,
-              child: _infoSection(),
-            ),
-            Expanded(
-              flex: 60,
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: AbsorbPointer(
-                  absorbing: state.state != BenchmarkStateEnum.waiting,
-                  child: const BenchmarkConfigSection(),
-                ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            flex: 34,
+            child: _goButtonSection(context),
+          ),
+          Expanded(
+            flex: 6,
+            child: _infoSection(),
+          ),
+          Expanded(
+            flex: 60,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: AbsorbPointer(
+                absorbing: state.state != BenchmarkStateEnum.waiting,
+                child: const BenchmarkConfigSection(),
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
