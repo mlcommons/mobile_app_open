@@ -101,12 +101,21 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     final lastResult = state.lastResult;
     Text deviceInfoText;
     Text benchmarkDateText;
+    Widget shareButton;
+    int shareButtonFlex;
     if (lastResult != null) {
       deviceInfoText = Text(lastResult.environmentInfo.modelDescription);
       benchmarkDateText = Text(lastResult.meta.creationDate.toUIString());
+      shareButton = const ShareButton();
+      shareButtonFlex = 10;
     } else {
       deviceInfoText = Text(DeviceInfo.instance.envInfo.modelDescription);
-      benchmarkDateText = Text(l10n.na);
+      benchmarkDateText = Text(
+        l10n.resultsBenchmarkAborted,
+        style: const TextStyle(color: AppColors.resultInvalidText),
+      );
+      shareButton = const SizedBox();
+      shareButtonFlex = 0;
     }
     final infoSection = Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -153,7 +162,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
             Expanded(flex: 70, child: infoSection),
             Expanded(flex: 10, child: testAgainButton),
             Expanded(flex: 10, child: deleteResultButton),
-            const Expanded(flex: 10, child: ShareButton()),
+            Expanded(flex: shareButtonFlex, child: shareButton),
           ],
         ),
       ),

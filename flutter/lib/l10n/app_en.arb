@@ -46,6 +46,7 @@
   "resultsTabTitleAccuracy": "Accuracy",
   "resultsDeleteConfirm": "Delete this results?",
   "resultsNotAvailable": "N/A",
+  "resultsBenchmarkAborted": "Benchmark aborted!",
   "resultsBatchSize": "Batches: <batchSize>",
 
   "shareButtonMLCommons": "Share with MLCommons",
