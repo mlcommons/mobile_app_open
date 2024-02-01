@@ -247,8 +247,8 @@ task {
     id: "MobileNetEdgeTPUv2-L"
     name: "MobileNetEdgeTPUv2-L"
     offset: 0
-    image_width: 224
-    image_height: 224
+    image_width: 384
+    image_height: 384
     num_classes: 1000
   }
 }
@@ -283,9 +283,9 @@ task {
   model {
     id: "MobileNetEdgeTPUv2-L"
     name: "MobileNetEdgeTPUv2-L"
-    offset: 1
-    image_width: 224
-    image_height: 224
+    offset: 0
+    image_width: 384
+    image_height: 384
     num_classes: 1000
   }
 }
