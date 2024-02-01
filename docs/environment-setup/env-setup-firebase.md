@@ -1,4 +1,6 @@
-# Firebase setup guide
+# Firebase Setup Guide
+
+## Firebase Authentication and Storage
 
 This app is configured to use Firebase for authentication and storage.
 A Firebase project is required to build the iOS or Android app.
@@ -28,7 +30,7 @@ FIREBASE_DATABASE_URL=foo
 FIREBASE_STORAGE_BUCKET=foo
 ```
 
-**Note about Firebase Crashlytics**:
+## Firebase Crashlytics
 
 By default, we disable the upload of mapping file (in Android build) or debug symbol (dSYM) file in iOS build
 as described
@@ -41,3 +43,9 @@ export FIREBASE_CRASHLYTICS_ENABLED=true
 ```
 
 That's it! You can now run the app with your own Firebase project.
+
+## Firebase Extension
+
+Following Firebase extensions are recommended to use when you set up your own Firebase project:
+
+* [Delete User Data](https://extensions.dev/extensions/firebase/delete-user-data)

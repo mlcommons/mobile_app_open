@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/svg.dart';
 
-class AppIcons {
-  static SvgPicture _pSvgWhite(String name) {
-    const colorFilter = ColorFilter.mode(Colors.white, BlendMode.srcIn);
-    return SvgPicture.asset('assets/icons/$name', colorFilter: colorFilter);
-  }
+import 'package:mlperfbench/app_constants.dart';
 
+class AppIcons {
   static SvgPicture _pSvgBlack(String name) {
     const colorFilter = ColorFilter.mode(Colors.black, BlendMode.srcIn);
     return SvgPicture.asset('assets/icons/$name', colorFilter: colorFilter);
@@ -18,28 +15,30 @@ class AppIcons {
   }
 
   static final SvgPicture imageClassification =
-      _pSvg('ic_image_classification.svg');
+      _pSvg('ic_task_image_classification.svg');
   static final SvgPicture imageSegmentation =
-      _pSvg('ic_image_segmentation.svg');
-  static final SvgPicture objectDetection = _pSvg('ic_object_detection.svg');
+      _pSvg('ic_task_image_segmentation.svg');
+  static final SvgPicture objectDetection =
+      _pSvg('ic_task_object_detection.svg');
   static final SvgPicture languageProcessing =
-      _pSvg('ic_language_processing.svg');
+      _pSvg('ic_task_language_processing.svg');
   static final SvgPicture imageClassificationOffline =
-      _pSvg('ic_image_classification_offline.svg');
-  static final SvgPicture superResolution = _pSvg('ic_super_resolution.svg');
+      _pSvg('ic_task_image_classification_offline.svg');
+  static final SvgPicture superResolution =
+      _pSvg('ic_task_super_resolution.svg');
 
   static final SvgPicture imageClassificationWhite =
-      _pSvgWhite('ic_image_classification.svg');
+      _pSvg('ic_task_image_classification_white.svg');
   static final SvgPicture imageSegmentationWhite =
-      _pSvgWhite('ic_image_segmentation.svg');
+      _pSvg('ic_task_image_segmentation_white.svg');
   static final SvgPicture objectDetectionWhite =
-      _pSvgWhite('ic_object_detection.svg');
+      _pSvg('ic_task_object_detection_white.svg');
   static final SvgPicture languageProcessingWhite =
-      _pSvgWhite('ic_language_processing.svg');
+      _pSvg('ic_task_language_processing_white.svg');
   static final SvgPicture imageClassificationOfflineWhite =
-      _pSvg('ic_image_classification_offline_white.svg');
+      _pSvg('ic_task_image_classification_offline_white.svg');
   static final SvgPicture superResolutionWhite =
-      _pSvgWhite('ic_super_resolution.svg');
+      _pSvg('ic_task_super_resolution_white.svg');
 
   static final SvgPicture arrow = _pSvg('ic_arrow.svg');
 
@@ -55,4 +54,31 @@ class AppIcons {
     return const DecorationImage(
         image: AssetImage('assets/splash.png'), fit: BoxFit.fill);
   }
+}
+
+class BenchmarkIcons {
+  static final darkSet = {
+    BenchmarkId.imageClassification: AppIcons.imageClassification,
+    BenchmarkId.objectDetection: AppIcons.objectDetection,
+    BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentation,
+    BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessing,
+    BenchmarkId.superResolution: AppIcons.superResolution,
+    BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOffline,
+  };
+
+  static final lightSet = {
+    BenchmarkId.imageClassification: AppIcons.imageClassificationWhite,
+    BenchmarkId.objectDetection: AppIcons.objectDetectionWhite,
+    BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentationWhite,
+    BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessingWhite,
+    BenchmarkId.superResolution: AppIcons.superResolutionWhite,
+    BenchmarkId.imageClassificationOffline:
+        AppIcons.imageClassificationOfflineWhite,
+  };
+
+  static Widget getDarkIcon(String benchmarkId) =>
+      darkSet[benchmarkId] ?? AppIcons.logo;
+
+  static Widget getLightIcon(String benchmarkId) =>
+      lightSet[benchmarkId] ?? AppIcons.logo;
 }

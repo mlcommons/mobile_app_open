@@ -12,6 +12,7 @@ import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/settings/task_config_section.dart';
 
@@ -187,6 +188,7 @@ class _SettingsScreen extends State<SettingsScreen> {
       ),
       subtitle: Text(l10n.settingsRunModeSubtitle),
       trailing: DropdownButton<BenchmarkRunModeEnum>(
+          borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
           value: store.selectedBenchmarkRunMode,
           items: BenchmarkRunModeEnum.values
               .map((runMode) => DropdownMenuItem<BenchmarkRunModeEnum>(

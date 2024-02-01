@@ -4,26 +4,38 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
-import 'package:mlperfbench/ui/home/benchmark_config_screen.dart';
-import 'package:mlperfbench/ui/home/shared_styles.dart';
-import 'package:mlperfbench/ui/icons.dart';
+import 'package:mlperfbench/ui/home/benchmark_config_section.dart';
 
-class BenchmarkStartScreen extends StatelessWidget {
+class BenchmarkStartScreen extends StatefulWidget {
   const BenchmarkStartScreen({Key? key}) : super(key: key);
 
   @override
+  State<BenchmarkStartScreen> createState() => _BenchmarkStartScreenState();
+}
+
+class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
+  late BenchmarkState state;
+  late Store store;
+  late AppLocalizations l10n;
+
+  @override
   Widget build(BuildContext context) {
-    final state = context.watch<BenchmarkState>();
-    final l10n = AppLocalizations.of(context);
+    state = context.watch<BenchmarkState>();
+    store = context.watch<Store>();
+    l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.darkBlue,
-      appBar: AppBar(title: Text(l10n.menuHome)),
+      appBar: AppBar(
+        title: Text(l10n.menuHome),
+        backgroundColor: AppColors.secondaryAppBarBackground,
+      ),
       drawer: const AppDrawer(),
       body: SafeArea(
         child: Column(
@@ -31,16 +43,20 @@ class BenchmarkStartScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Expanded(
-              flex: 35,
-              child: _getTopContainer(context, state.state),
+              flex: 34,
+              child: _goButtonSection(context),
             ),
             Expanded(
-              flex: 65,
+              flex: 6,
+              child: _infoSection(),
+            ),
+            Expanded(
+              flex: 60,
               child: Align(
                 alignment: Alignment.topCenter,
                 child: AbsorbPointer(
                   absorbing: state.state != BenchmarkStateEnum.waiting,
-                  child: const BenchmarkConfigScreen(),
+                  child: const BenchmarkConfigSection(),
                 ),
               ),
             )
@@ -50,68 +66,33 @@ class BenchmarkStartScreen extends StatelessWidget {
     );
   }
 
-  Widget _getTopContainer(BuildContext context, BenchmarkStateEnum state) {
-    if (state == BenchmarkStateEnum.aborting) {
-      return _waitContainer(context);
-    } else if (state == BenchmarkStateEnum.waiting) {
-      return _goContainer(context);
-    } else {
-      throw 'Unknown BenchmarkState: ${state.name}';
-    }
-  }
-
-  Widget _waitContainer(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final circleWidth =
-        MediaQuery.of(context).size.width * WidgetSizes.circleWidthFactor;
-
-    return Stack(
-      alignment: Alignment.topCenter,
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width,
-          alignment: Alignment.center,
-          decoration: mainLinearGradientDecoration,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text(
-            l10n.mainScreenWaitFinish,
-            style: const TextStyle(color: AppColors.lightText, fontSize: 15),
-          ),
-        ),
-        Stack(
+  Widget _infoSection() {
+    final selectedCount =
+        state.benchmarks.where((e) => e.isActive).length.toString();
+    final totalCount = state.benchmarks.length.toString();
+    final selectedBenchmarkText = l10n.mainScreenBenchmarkSelected
+        .replaceAll('<selected>', selectedCount)
+        .replaceAll('<total>', totalCount);
+    var deviceDescription = DeviceInfo.instance.envInfo.modelDescription;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 4, 10, 4),
+      width: double.infinity,
+      color: AppColors.infoSectionBackground,
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(color: Colors.white, fontSize: 14),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-              width: circleWidth,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.progressCircle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    offset: Offset(15, 15),
-                    blurRadius: 10,
-                  )
-                ],
-              ),
-            ),
-            Container(
-              width: circleWidth,
-              alignment: Alignment.center,
-              child: AppIcons.waiting,
-            )
+            Expanded(flex: 1, child: Text(deviceDescription)),
+            Expanded(flex: 1, child: Text(selectedBenchmarkText))
           ],
-        )
-      ],
+        ),
+      ),
     );
   }
 
-  Widget _goContainer(BuildContext context) {
-    final state = context.watch<BenchmarkState>();
-    final store = context.watch<Store>();
-    final l10n = AppLocalizations.of(context);
+  Widget _goButtonSection(BuildContext context) {
     final circleWidth =
         MediaQuery.of(context).size.width * WidgetSizes.circleWidthFactor;
 
@@ -121,14 +102,20 @@ class BenchmarkStartScreen extends StatelessWidget {
         Container(
           width: MediaQuery.of(context).size.width,
           alignment: Alignment.center,
-          decoration: mainLinearGradientDecoration,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: AppGradients.halfScreen,
+            ),
+          ),
         ),
         Container(
           alignment: Alignment.center,
           child: ElevatedButton(
             key: const Key(WidgetKeys.goButton),
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.goCircle,
                 shape: const CircleBorder(),
                 minimumSize: Size.fromWidth(circleWidth)),
             child: Text(

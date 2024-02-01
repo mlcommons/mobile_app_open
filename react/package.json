@@ -1,0 +1,87 @@
+{
+  "name": "ml-commons-results-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@hookform/error-message": "^2.0.1",
+    "@hookform/resolvers": "^3.3.2",
+    "@react-firebase/auth": "^0.2.10",
+    "@react-native-async-storage/async-storage": "^1.21.0",
+    "@reduxjs/toolkit": "^2.0.1",
+    "@tanstack/query-async-storage-persister": "^5.12.1",
+    "@tanstack/react-query": "^5.12.2",
+    "@tanstack/react-query-devtools": "^5.13.3",
+    "@tanstack/react-query-persist-client": "^5.12.2",
+    "@tanstack/react-table": "^8.11.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.66",
+    "@types/ramda": "^0.29.9",
+    "@types/react": "^18.2.39",
+    "@types/react-dom": "^18.2.17",
+    "axios": "^1.6.2",
+    "date-fns": "^2.30.0",
+    "firebase": "^10.7.0",
+    "framer-motion": "^10.16.12",
+    "ramda": "^0.29.1",
+    "react": "^18.2.0",
+    "react-date-picker": "^8.4.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.2",
+    "react-icons": "^4.12.0",
+    "react-redux": "^9.0.4",
+    "react-router-dom": "^6.20.0",
+    "react-scripts": "5.0.1",
+    "react-table": "^7.8.0",
+    "redux-persist": "^6.0.0",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4",
+    "yup": "^1.3.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "check-types": "tsc --pretty --noEmit",
+    "check-format": "prettier --check .",
+    "check-lint": "eslint . --ext ts --ext tsx --ext js",
+    "format": "prettier --write ."
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "ignorePatterns": [
+      "build"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "prettier": "^3.1.0"
+  },
+  "resolutions": {
+    "react-scripts/@svgr/webpack/@svgr/plugin-svgo/svgo/css-select/nth-check": "^2.1.1",
+    "react-scripts/resolve-url-loader/postcss": "^8.4.31"
+  }
+
+}

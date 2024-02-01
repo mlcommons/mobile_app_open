@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:intl/intl.dart';
-
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/result_file_name.dart';
 import 'package:mlperfbench/data/result_filter.dart';
 import 'package:mlperfbench/data/result_sort.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
@@ -68,10 +67,9 @@ class ResultManager {
 
   Future<void> saveResult(ExtendedResult result) async {
     localResults.add(result);
-    final DateFormat formatter = DateFormat('yyyy-MM-ddTHH-mm-ss');
-    final String datetime = formatter.format(result.meta.creationDate);
-    final resultFile =
-        File('${_resultsDir.path}/${datetime}_${result.meta.uuid}.json');
+    final resultFileName =
+        ResultFileName(result.meta.uuid, result.meta.creationDate);
+    final resultFile = File('${_resultsDir.path}/${resultFileName.fileName}');
     await resultFile.writeAsString(jsonToStringIndented(result));
     final submissionFile = File('${_resultsDir.path}/$_submissionFileName');
     await submissionFile.writeAsString(jsonToStringIndented(result));

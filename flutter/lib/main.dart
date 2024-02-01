@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
@@ -39,7 +40,9 @@ Future<void> launchUi() async {
   final benchmarkState = await BenchmarkState.create(store);
   if (FirebaseManager.enabled) {
     await FirebaseManager.instance.initialize();
-    FirebaseManager.instance.configureCrashlytics(store.crashlyticsEnabled);
+    if (DartDefine.firebaseCrashlyticsEnabled && store.crashlyticsEnabled) {
+      FirebaseManager.instance.configureCrashlytics(true);
+    }
   }
   if (const bool.fromEnvironment('autostart', defaultValue: false)) {
     assert(const bool.hasEnvironment('resultsStringMark'));

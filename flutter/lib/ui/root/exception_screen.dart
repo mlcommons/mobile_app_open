@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 
 class ExceptionWidget extends StatelessWidget {
   final Object error;

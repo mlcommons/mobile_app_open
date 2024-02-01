@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 
 import 'package:bot_toast/bot_toast.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/data/environment/env_android.dart';
 import 'package:mlperfbench/data/environment/environment_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 
 class HistoryHelperUtils {
   final AppLocalizations l10n;
@@ -92,7 +92,7 @@ class HistoryHelperUtils {
         final style = rowData.isHeader ? headerStyle : rowStyle;
         final perfStyle = rowData.throughputValid
             ? style
-            : const TextStyle(color: AppColors.darkRedText);
+            : const TextStyle(color: AppColors.resultInvalidText);
         final firstColumnText = Text(rowData.name, style: style);
         final firstColumn = rowData.isHeader
             ? firstColumnText

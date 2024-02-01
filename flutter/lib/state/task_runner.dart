@@ -28,7 +28,10 @@ import 'package:mlperfbench/store.dart';
 class ProgressInfo {
   bool cooldown = false;
   bool accuracy = false;
-  BenchmarkInfo? info;
+  BenchmarkInfo? currentBenchmark;
+  List<BenchmarkInfo> completedBenchmarks = [];
+  List<BenchmarkInfo> activeBenchmarks = [];
+  late BenchmarkRunModeEnum runMode;
   int totalStages = 0;
   int currentStage = 0;
   double cooldownDuration = 0;
@@ -45,7 +48,7 @@ class TaskRunner {
   final BridgeIsolate backendBridge;
   final BackendInfo backendInfo;
 
-  ProgressInfo progressInfo = ProgressInfo();
+  late ProgressInfo progressInfo;
   bool aborting = false;
   CancelableOperation? _cooldownOperation;
 
@@ -90,6 +93,7 @@ class TaskRunner {
 
   Future<ExtendedResult?> runBenchmarks(
       BenchmarkStore benchmarkStore, String currentLogDir) async {
+    progressInfo = ProgressInfo();
     final cooldown = store.cooldown;
     late final Duration cooldownDuration;
     if (store.testMode) {
@@ -105,6 +109,7 @@ class TaskRunner {
 
     final resultHelpers = <ResultHelper>[];
     for (final benchmark in activeBenchmarks) {
+      progressInfo.activeBenchmarks.add(benchmark.info);
       final resultHelper = ResultHelper(
           benchmark: benchmark,
           backendInfo: backendInfo,
@@ -113,6 +118,7 @@ class TaskRunner {
       resultHelpers.add(resultHelper);
     }
 
+    progressInfo.runMode = store.selectedBenchmarkRunMode;
     switch (store.selectedBenchmarkRunMode) {
       case BenchmarkRunModeEnum.performanceOnly:
         progressInfo.totalStages = activeBenchmarks.length;
@@ -131,6 +137,7 @@ class TaskRunner {
     var first = true;
 
     // run all benchmarks in performance mode first
+    progressInfo.completedBenchmarks.clear();
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
       if (!store.selectedBenchmarkRunMode.doPerformanceRun) break;
@@ -156,6 +163,7 @@ class TaskRunner {
     }
 
     // then in accuracy mode
+    progressInfo.completedBenchmarks.clear();
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
       if (!store.selectedBenchmarkRunMode.doAccuracyRun) break;
@@ -186,7 +194,7 @@ class TaskRunner {
   Future<void> runBenchmark(ResultHelper resultHelper, BenchmarkRunMode mode,
       String currentLogDir) async {
     final benchmark = resultHelper.benchmark;
-    progressInfo.info = benchmark.info;
+    progressInfo.currentBenchmark = benchmark.info;
     progressInfo.currentStage++;
 
     if (mode == perfMode) {
@@ -275,6 +283,8 @@ class TaskRunner {
     } else {
       throw 'Unknown BenchmarkRunMode: $mode';
     }
+    progressInfo.completedBenchmarks.add(benchmark.info);
+    progressInfo.currentBenchmark = null;
   }
 }
 
