@@ -100,6 +100,7 @@ class Benchmark {
       dataset_data_path: resourceManager.get(dataset.inputPath),
       dataset_groundtruth_path: resourceManager.get(dataset.groundtruthPath),
       dataset_offset: taskConfig.model.offset,
+      model_num_classes: taskConfig.model.numClasses,
       image_width: taskConfig.model.imageWidth,
       image_height: taskConfig.model.imageHeight,
       scenario: taskConfig.scenario,
