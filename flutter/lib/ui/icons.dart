@@ -64,6 +64,8 @@ class BenchmarkIcons {
     BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessing,
     BenchmarkId.superResolution: AppIcons.superResolution,
     BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOffline,
+    BenchmarkId.imageClassificationV2: AppIcons.imageClassification,
+    BenchmarkId.imageClassificationOfflineV2: AppIcons.imageClassificationOffline,
   };
 
   static final lightSet = {
@@ -73,6 +75,9 @@ class BenchmarkIcons {
     BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessingWhite,
     BenchmarkId.superResolution: AppIcons.superResolutionWhite,
     BenchmarkId.imageClassificationOffline:
+        AppIcons.imageClassificationOfflineWhite,
+    BenchmarkId.imageClassificationV2: AppIcons.imageClassificationWhite,
+    BenchmarkId.imageClassificationOfflineV2:
         AppIcons.imageClassificationOfflineWhite,
   };
 
