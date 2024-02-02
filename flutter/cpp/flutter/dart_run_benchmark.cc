@@ -35,9 +35,9 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   lin(dataset_type);
   lin(dataset_data_path);
   lin(dataset_groundtruth_path);
-  lin(dataset_offset);
-  lin(image_width);
-  lin(image_height);
+  lin(model_offset);
+  lin(model_image_width);
+  lin(model_image_height);
   lin(model_num_classes);
   lin(scenario);
   lin(mode);
@@ -76,13 +76,13 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     case ::mlperf::mobile::DatasetConfig::IMAGENET:
       dataset = std::make_unique<::mlperf::mobile::Imagenet>(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
-          in->dataset_offset, in->image_width, in->image_height);
+          in->model_offset, in->model_image_width, in->model_image_height);
       break;
     case ::mlperf::mobile::DatasetConfig::COCO:
       dataset = std::make_unique<::mlperf::mobile::Coco>(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
-          in->dataset_offset, in->model_num_classes, in->image_width,
-          in->image_height);
+          in->model_offset, in->model_num_classes, in->model_image_width,
+          in->model_image_height);
       break;
     case ::mlperf::mobile::DatasetConfig::SQUAD:
       dataset = std::make_unique<::mlperf::mobile::Squad>(
@@ -91,13 +91,13 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     case ::mlperf::mobile::DatasetConfig::ADE20K:
       dataset = std::make_unique<::mlperf::mobile::ADE20K>(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
-          in->model_num_classes, in->image_width, in->image_height);
+          in->model_num_classes, in->model_image_width, in->model_image_height);
       break;
     case ::mlperf::mobile::DatasetConfig::SNUSR:
       dataset = std::make_unique<::mlperf::mobile::SNUSR>(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
-          3 /* num_channels */, 2 /* scale */, in->image_width,
-          in->image_height);
+          3 /* num_channels */, 2 /* scale */, in->model_image_width,
+          in->model_image_height);
       break;
     default:
       return nullptr;
