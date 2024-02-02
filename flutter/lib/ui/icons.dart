@@ -65,7 +65,8 @@ class BenchmarkIcons {
     BenchmarkId.superResolution: AppIcons.superResolution,
     BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOffline,
     BenchmarkId.imageClassificationV2: AppIcons.imageClassification,
-    BenchmarkId.imageClassificationOfflineV2: AppIcons.imageClassificationOffline,
+    BenchmarkId.imageClassificationOfflineV2:
+        AppIcons.imageClassificationOffline,
   };
 
   static final lightSet = {
