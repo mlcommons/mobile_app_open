@@ -36,6 +36,8 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   lin(dataset_data_path);
   lin(dataset_groundtruth_path);
   lin(dataset_offset);
+  lin(image_width);
+  lin(image_height);
   lin(scenario);
   lin(mode);
   lin(batch_size);
@@ -73,13 +75,13 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     case ::mlperf::mobile::DatasetConfig::IMAGENET:
       dataset = std::make_unique<::mlperf::mobile::Imagenet>(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
-          in->dataset_offset, 224, 224 /* width, height */);
+          in->dataset_offset, in->image_width, in->image_height);
       break;
     case ::mlperf::mobile::DatasetConfig::COCO:
       dataset = std::make_unique<::mlperf::mobile::Coco>(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
           in->dataset_offset, 91 /* num_classes, from RunMLPerfWorker.java */,
-          320, 320 /* width, height */);
+          in->image_width, in->image_height);
       break;
     case ::mlperf::mobile::DatasetConfig::SQUAD:
       dataset = std::make_unique<::mlperf::mobile::Squad>(
@@ -88,13 +90,14 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     case ::mlperf::mobile::DatasetConfig::ADE20K:
       dataset = std::make_unique<::mlperf::mobile::ADE20K>(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
-          31 /* num_classes, from RunMLPerfWorker.java */, 512,
-          512 /* width, height */);
+          31 /* num_classes, from RunMLPerfWorker.java */, in->image_width,
+          in->image_height);
       break;
     case ::mlperf::mobile::DatasetConfig::SNUSR:
       dataset = std::make_unique<::mlperf::mobile::SNUSR>(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
-          3 /* num_channels */, 2 /* scale */, 960, 540 /* width, height */);
+          3 /* num_channels */, 2 /* scale */, in->image_width,
+          in->image_height);
       break;
     default:
       return nullptr;

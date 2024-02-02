@@ -13,6 +13,8 @@ class RunSettings {
   final String dataset_data_path;
   final String dataset_groundtruth_path;
   final int dataset_offset;
+  final int image_width;
+  final int image_height;
   final String scenario;
   final String mode; // Submission/Accuracy/Performance
   final int batch_size;
@@ -32,6 +34,8 @@ class RunSettings {
     required this.dataset_data_path,
     required this.dataset_groundtruth_path,
     required this.dataset_offset,
+    required this.image_width,
+    required this.image_height,
     required this.scenario,
     required this.mode, // Submission/Accuracy/Performance
     required this.batch_size,
