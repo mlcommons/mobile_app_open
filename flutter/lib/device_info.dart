@@ -4,13 +4,13 @@ import 'package:flutter/services.dart';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
-import 'package:mlperfbench_common/data/environment/env_android.dart';
-import 'package:mlperfbench_common/data/environment/env_ios.dart';
-import 'package:mlperfbench_common/data/environment/env_windows.dart';
-import 'package:mlperfbench_common/data/environment/environment_info.dart';
 import 'package:process_run/shell.dart';
 
 import 'package:mlperfbench/backend/bridge/ffi_cpuinfo.dart';
+import 'package:mlperfbench/data/environment/env_android.dart';
+import 'package:mlperfbench/data/environment/env_ios.dart';
+import 'package:mlperfbench/data/environment/env_windows.dart';
+import 'package:mlperfbench/data/environment/environment_info.dart';
 
 class DeviceInfo {
   final EnvironmentInfo envInfo;
@@ -25,6 +25,7 @@ class DeviceInfo {
 
   static Future<void> staticInit() async {
     instance = await createFromEnvironment();
+    print('Device: ${instance.envInfo.modelDescription}');
   }
 
   static Future<DeviceInfo> createFromEnvironment() async {

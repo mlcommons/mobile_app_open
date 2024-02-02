@@ -72,29 +72,10 @@ class BenchmarkInfo {
 
   double get maxThroughput => task.maxThroughput;
 
-  Widget get icon => _benchmarkIcons[task.id] ?? AppIcons.logo;
+  Widget get icon => BenchmarkIcons.getDarkIcon(task.id);
 
-  Widget get iconWhite => _benchmarkIconsWhite[task.id] ?? AppIcons.logo;
+  Widget get iconWhite => BenchmarkIcons.getLightIcon(task.id);
 
   @override
   String toString() => 'Benchmark:${task.id}';
 }
-
-final _benchmarkIcons = {
-  BenchmarkId.imageClassification: AppIcons.imageClassification,
-  BenchmarkId.objectDetection: AppIcons.objectDetection,
-  BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentation,
-  BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessing,
-  BenchmarkId.superResolution: AppIcons.superResolution,
-  BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOffline,
-};
-
-final _benchmarkIconsWhite = {
-  BenchmarkId.imageClassification: AppIcons.imageClassificationWhite,
-  BenchmarkId.objectDetection: AppIcons.objectDetectionWhite,
-  BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentationWhite,
-  BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessingWhite,
-  BenchmarkId.superResolution: AppIcons.superResolutionWhite,
-  BenchmarkId.imageClassificationOffline:
-      AppIcons.imageClassificationOfflineWhite,
-};

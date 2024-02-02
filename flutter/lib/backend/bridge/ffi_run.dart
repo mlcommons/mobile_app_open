@@ -3,11 +3,11 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 
 import 'package:mlperfbench/backend/bridge/handle.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 
 class _RunIn extends Struct {
   external Pointer<Utf8> backend_model_path;

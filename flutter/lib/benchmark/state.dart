@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench_common/data/extended_result.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'package:mlperfbench/backend/bridge/isolate.dart';
@@ -15,6 +14,7 @@ import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/board_decoder.dart';
 import 'package:mlperfbench/build_info.dart';
+import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/resources/validation_helper.dart';
@@ -48,7 +48,8 @@ class BenchmarkState extends ChangeNotifier {
   bool? _doneRunning;
 
   // Only if [state] == [BenchmarkStateEnum.downloading]
-  String get downloadingProgress => resourceManager.progress;
+  String get loadingPath => resourceManager.loadingPath;
+  double get loadingProgress => resourceManager.loadingProgress;
 
   ExtendedResult? lastResult;
 
@@ -228,6 +229,12 @@ class BenchmarkState extends ChangeNotifier {
     throw StateError('unreachable');
   }
 
+  Future<void> resetBenchmarkState() async {
+    _doneRunning = null;
+    resetCurrentResults();
+    notifyListeners();
+  }
+
   Future<void> runBenchmarks() async {
     assert(resourceManager.done, 'Resource manager is not done.');
     assert(_doneRunning != false, '_doneRunning is false');
@@ -302,5 +309,10 @@ class BenchmarkState extends ChangeNotifier {
       resetCurrentResults();
       _doneRunning = null;
     }
+  }
+
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
   }
 }

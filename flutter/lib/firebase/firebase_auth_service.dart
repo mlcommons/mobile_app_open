@@ -19,7 +19,9 @@ class FirebaseAuthService {
 
   Future<User> signInAnonymously() async {
     final userCredential = await firebaseAuth.signInAnonymously();
-    return _getUserFromCredential(userCredential);
+    final user = await _getUserFromCredential(userCredential);
+    await user.updateDisplayName('Anonymous');
+    return user;
   }
 
   Future<User> signIn({required String email, required String password}) async {

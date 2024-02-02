@@ -25,7 +25,7 @@ namespace mobile {
 // GroundTruthRecord is equivlent to records in the ground truth tfrecord file.
 struct GroundTruthRecord {
   explicit GroundTruthRecord(const tensorflow::tstring& record) {
-    using string = google::protobuf::string;
+    using string = std::string;
     tensorflow::Example example;
     CHECK(example.ParseFromString(record));
 
@@ -66,7 +66,7 @@ class SampleRecord : public ISampleRecord {
  public:
   explicit SampleRecord(const tensorflow::tstring& record) {
     using int64 = google::protobuf::int64;
-    using string = google::protobuf::string;
+    using string = std::string;
     tensorflow::Example example;
     CHECK(example.ParseFromString(record));
     // Data is stored as int64 in the tfrecord file so they need to be

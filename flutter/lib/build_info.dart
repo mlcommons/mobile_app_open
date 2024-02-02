@@ -1,8 +1,8 @@
-import 'package:mlperfbench_common/data/build_info/build_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/list.dart';
+import 'package:mlperfbench/data/build_info/build_info.dart';
 
 part 'build_info.gen.dart';
 
@@ -21,8 +21,8 @@ class BuildInfoHelper {
         version: packageInfo.version,
         buildNumber: packageInfo.buildNumber,
         buildDate: DateTime.now(),
-        officialReleaseFlag: isOfficialBuild,
-        devTestFlag: isFastMode,
+        officialReleaseFlag: DartDefine.isOfficialBuild,
+        devTestFlag: DartDefine.isFastMode,
         backendList: BackendInfoHelper().getBackendsList(),
         gitBranch: GeneratedBuildInfo.gitBranch,
         gitCommit: GeneratedBuildInfo.gitCommit,

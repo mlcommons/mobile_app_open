@@ -31,7 +31,7 @@ if [ -n "$CI_DERIVED_DATA_PATH" ]; then
   CACHE_BUCKET=xcodecloud-bazel-ios---mobile-app-build-290400
   # Required that a secret env existed in the XCode Cloud workflow
   # with key=GC_CREDS and value=<output of cmd `base64 mobile-app-build-290400-1b26aafa8afd.json`>
-  GC_CREDS_FILE=$CI_WORKSPACE/mobile-app-build-290400-1b26aafa8afd.json
+  GC_CREDS_FILE=$CI_PRIMARY_REPOSITORY_PATH/mobile-app-build-290400-1b26aafa8afd.json
   echo "$GC_CREDS" | base64 --decode >"$GC_CREDS_FILE"
   export BAZEL_OUTPUT_ROOT_ARG="--output_user_root=$MC_BUILD_HOME/bazel"
   export BAZEL_CACHE_ARG="--remote_cache=https://storage.googleapis.com/$CACHE_BUCKET --google_credentials=$GC_CREDS_FILE"
@@ -64,31 +64,11 @@ echo "$MC_LOG_PREFIX protobuf version:" && protoc --version
 brew install cocoapods || brew install cocoapods || brew install cocoapods
 echo "$MC_LOG_PREFIX cocoapods version:" && pod --version
 
-brew install python@3.11 || brew link --overwrite python@3.11
 echo "$MC_LOG_PREFIX python version:" && python3 --version
 python3 -m pip install --upgrade pip
 python3 -m pip install \
   "numpy>=1.23,<2.0" \
   "absl-py>=1.3,<2.0"
-
-if [ $runner = $GITHUB_ACTIONS ]; then
-  echo "$MC_LOG_PREFIX ========== Install Android SDK =========="
-  export ANDROID_HOME=$HOME/Library/Android/sdk
-  mkdir -p $ANDROID_HOME/cmdline-tools
-  # sdkmanager expects to be placed into `$ANDROID_HOME/cmdline-tools/tools`
-  curl -L https://dl.google.com/android/repository/commandlinetools-mac-7583922_latest.zip | jar x &&
-    mv cmdline-tools $ANDROID_HOME/cmdline-tools/tools &&
-    chmod -R +x $ANDROID_HOME/cmdline-tools/tools/bin
-  export PATH=$PATH:$ANDROID_HOME/cmdline-tools/tools/bin
-  yes | sdkmanager --licenses >/dev/null
-  yes | sdkmanager \
-    "platform-tools" \
-    "build-tools;30.0.3" \
-    "platforms;android-29" \
-    "platforms;android-31" \
-    "ndk;21.4.7075529"
-  export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529
-fi
 
 echo "$MC_LOG_PREFIX ========== Install Flutter =========="
 export MC_FLUTTER_HOME=$MC_BUILD_HOME/flutter
@@ -120,7 +100,7 @@ if [ $runner = $XCODE_CLOUD ]; then
   if [ "$CI_XCODEBUILD_ACTION" = "build-for-testing" ]; then
     cd "$MC_REPO_HOME"/flutter && flutter build ios --config-only integration_test/first_test.dart
   else
-    cd "$MC_REPO_HOME"/flutter && flutter build ios --config-only --dart-define=official-build="$OFFICIAL_BUILD" --build-number "$CI_BUILD_NUMBER"
+    cd "$MC_REPO_HOME"/flutter && flutter build ios --config-only --dart-define=OFFICIAL_BUILD="$OFFICIAL_BUILD" --build-number "$CI_BUILD_NUMBER"
   fi
 fi
 

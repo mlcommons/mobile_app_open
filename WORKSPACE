@@ -4,45 +4,19 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
 http_archive(
-    name = "com_google_protobuf",
-    sha256 = "528927e398f4e290001886894dac17c5c6a2e5548f3fb68004cfb01af901b53a",
-    strip_prefix = "protobuf-3.17.3",
-    urls = ["https://github.com/google/protobuf/archive/v3.17.3.zip"],
-)
-
-http_archive(
-    name = "build_bazel_rules_apple",
-    sha256 = "36072d4f3614d309d6a703da0dfe48684ec4c65a89611aeb9590b45af7a3e592",
-    url = "https://github.com/bazelbuild/rules_apple/releases/download/1.0.1/rules_apple.1.0.1.tar.gz",
-)
-
-load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
-
-apple_rules_dependencies()
-
-load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
-
-apple_support_dependencies()
-
-load("@build_bazel_rules_swift//swift:repositories.bzl", "swift_rules_dependencies")
-
-swift_rules_dependencies()
-
-# This lib must be named exactly "cpuinfo".
-# This name is used by org_tensorflow lib.
-# When we use any different name, compilation may fail
-# because there will be files from several different versions of cpuinfo.
-# We may also need to override clog dependency, which uses the same sources, if we encounter any similar errors.
-http_archive(
-    name = "cpuinfo",
-    patch_args = ["-p1"],
-    patches = [
-        "//patches:cpuinfo-bazel-patch.diff",
-        "//patches:cpuinfo-changes-to-add-windows_arm64.patch",
+    name = "bazel_skylib",
+    sha256 = "66ffd9315665bfaafc96b52278f57c7e2dd09f5ede279ea6d39b2be471e7e3aa",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.4.2/bazel-skylib-1.4.2.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.4.2/bazel-skylib-1.4.2.tar.gz",
     ],
-    sha256 = "3389494589a97122779cd8d57fbffb1ac1e1ca3e795981c1d8d71b92281ae8c4",
-    strip_prefix = "cpuinfo-8ec7bd91ad0470e61cf38f618cc1f270dede599c",
-    url = "https://github.com/pytorch/cpuinfo/archive/8ec7bd91ad0470e61cf38f618cc1f270dede599c.tar.gz",
+)
+
+http_archive(
+    name = "rules_python",
+    sha256 = "5868e73107a8e85d8f323806e60cad7283f34b32163ea6ff1020cf27abef6036",
+    strip_prefix = "rules_python-0.25.0",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.25.0/rules_python-0.25.0.tar.gz",
 )
 
 load("//:platform.bzl", "tf_patch_finder")
@@ -65,21 +39,33 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
-        # fix memory leak in coreml delegate
-        "//:flutter/third_party/tflite_coreml_delegate_memory_leak.patch",
-        "//:flutter/third_party/tensorflow-fix-llvm.patch",
-        "//patches:feature_level.diff",
+        # NDK 25 support
+        "//patches:ndk_25_r14.diff",
     ] + PATCH_FILE,
-    sha256 = "d2948c066a0bc3f45cb8072def03c85f50af8a75606bbdff91715ef8c5f2a28c",
-    strip_prefix = "tensorflow-2.8.0",
+    sha256 = "ce357fd0728f0d1b0831d1653f475591662ec5bca736a94ff789e6b1944df19f",
+    strip_prefix = "tensorflow-2.14.0",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.8.0.zip",
+        "https://github.com/tensorflow/tensorflow/archive/v2.14.0.tar.gz",
     ],
 )
 
+load("@rules_python//python:repositories.bzl", "python_register_toolchains")
+load(
+    "@org_tensorflow//tensorflow/tools/toolchains/python:python_repo.bzl",
+    "python_repository",
+)
+
+python_repository(name = "python_version_repo")
+
+load("@python_version_repo//:py_version.bzl", "HERMETIC_PYTHON_VERSION")
+
+python_register_toolchains(
+    name = "python",
+    ignore_root_user_error = True,
+    python_version = HERMETIC_PYTHON_VERSION,
+)
+
 # Initialize tensorflow workspace.
-# Must be after apple dependencies
-# because it loads older version of build_bazel_rules_apple
 load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
 
 tf_workspace3()
@@ -88,25 +74,13 @@ load("@org_tensorflow//tensorflow:workspace2.bzl", "tf_workspace2")
 
 tf_workspace2()
 
-# Android.
-load("@//flutter/third_party/android:android_configure.bzl", "android_configure")
+load("@org_tensorflow//tensorflow:workspace1.bzl", "tf_workspace1")
 
-android_configure(name = "local_config_android")
+tf_workspace1()
 
-load("@local_config_android//:android_configure.bzl", "android_workspace")
+load("@org_tensorflow//tensorflow:workspace0.bzl", "tf_workspace0")
 
-android_workspace()
-
-# avoid using android_{sdk,ndk}_repo because of bazel 5.0
-#
-#android_sdk_repository(
-#    name = "androidsdk",
-#    api_level = 30,
-#)
-#
-#android_ndk_repository(
-#    name = "androidndk",
-#)
+tf_workspace0()
 
 http_archive(
     name = "neuron_delegate",

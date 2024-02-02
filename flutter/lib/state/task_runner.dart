@@ -2,9 +2,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:async/async.dart';
-import 'package:mlperfbench_common/data/extended_result.dart';
-import 'package:mlperfbench_common/data/meta_info.dart';
-import 'package:mlperfbench_common/data/results/benchmark_result.dart';
 import 'package:uuid/uuid.dart';
 import 'package:worker_manager/worker_manager.dart';
 
@@ -19,6 +16,9 @@ import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/build_info.dart';
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/meta_info.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/export_result_helper.dart';
@@ -28,7 +28,10 @@ import 'package:mlperfbench/store.dart';
 class ProgressInfo {
   bool cooldown = false;
   bool accuracy = false;
-  BenchmarkInfo? info;
+  BenchmarkInfo? currentBenchmark;
+  List<BenchmarkInfo> completedBenchmarks = [];
+  List<BenchmarkInfo> activeBenchmarks = [];
+  late BenchmarkRunModeEnum runMode;
   int totalStages = 0;
   int currentStage = 0;
   double cooldownDuration = 0;
@@ -45,7 +48,7 @@ class TaskRunner {
   final BridgeIsolate backendBridge;
   final BackendInfo backendInfo;
 
-  ProgressInfo progressInfo = ProgressInfo();
+  late ProgressInfo progressInfo;
   bool aborting = false;
   CancelableOperation? _cooldownOperation;
 
@@ -90,11 +93,12 @@ class TaskRunner {
 
   Future<ExtendedResult?> runBenchmarks(
       BenchmarkStore benchmarkStore, String currentLogDir) async {
+    progressInfo = ProgressInfo();
     final cooldown = store.cooldown;
     late final Duration cooldownDuration;
     if (store.testMode) {
       cooldownDuration = Duration(seconds: store.testCooldown);
-    } else if (isFastMode) {
+    } else if (DartDefine.isFastMode) {
       cooldownDuration = const Duration(seconds: 1);
     } else {
       cooldownDuration = Duration(minutes: store.cooldownDuration);
@@ -105,6 +109,7 @@ class TaskRunner {
 
     final resultHelpers = <ResultHelper>[];
     for (final benchmark in activeBenchmarks) {
+      progressInfo.activeBenchmarks.add(benchmark.info);
       final resultHelper = ResultHelper(
           benchmark: benchmark,
           backendInfo: backendInfo,
@@ -113,6 +118,7 @@ class TaskRunner {
       resultHelpers.add(resultHelper);
     }
 
+    progressInfo.runMode = store.selectedBenchmarkRunMode;
     switch (store.selectedBenchmarkRunMode) {
       case BenchmarkRunModeEnum.performanceOnly:
         progressInfo.totalStages = activeBenchmarks.length;
@@ -131,6 +137,7 @@ class TaskRunner {
     var first = true;
 
     // run all benchmarks in performance mode first
+    progressInfo.completedBenchmarks.clear();
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
       if (!store.selectedBenchmarkRunMode.doPerformanceRun) break;
@@ -156,6 +163,7 @@ class TaskRunner {
     }
 
     // then in accuracy mode
+    progressInfo.completedBenchmarks.clear();
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
       if (!store.selectedBenchmarkRunMode.doAccuracyRun) break;
@@ -186,7 +194,7 @@ class TaskRunner {
   Future<void> runBenchmark(ResultHelper resultHelper, BenchmarkRunMode mode,
       String currentLogDir) async {
     final benchmark = resultHelper.benchmark;
-    progressInfo.info = benchmark.info;
+    progressInfo.currentBenchmark = benchmark.info;
     progressInfo.currentStage++;
 
     if (mode == perfMode) {
@@ -275,6 +283,8 @@ class TaskRunner {
     } else {
       throw 'Unknown BenchmarkRunMode: $mode';
     }
+    progressInfo.completedBenchmarks.add(benchmark.info);
+    progressInfo.currentBenchmark = null;
   }
 }
 

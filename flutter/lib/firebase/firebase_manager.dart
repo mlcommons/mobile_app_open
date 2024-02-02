@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:intl/intl.dart';
-import 'package:mlperfbench_common/data/extended_result.dart';
 
+import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/data/result_file_name.dart';
 import 'package:mlperfbench/firebase/firebase_auth_service.dart';
 import 'package:mlperfbench/firebase/firebase_crashlytics_service.dart';
 import 'package:mlperfbench/firebase/firebase_options.gen.dart';
@@ -81,13 +81,25 @@ extension Authentication on FirebaseManager {
 
 extension Storage on FirebaseManager {
   Future<void> uploadResult(ExtendedResult result) async {
-    final DateFormat formatter = DateFormat('yyyy-MM-ddTHH-mm-ss');
-    final String datetime = formatter.format(result.meta.creationDate);
-    // Example fileName: 2023-06-06T13-38-01_125ef847-ca9a-45e0-bf36-8fd22f493b8d.json
-    final fileName = '${datetime}_${result.meta.uuid}.json';
+    final resultFile =
+        ResultFileName(result.meta.uuid, result.meta.creationDate);
     final jsonString = jsonToStringIndented(result);
     await _storageService.upload(
-        jsonString, _authService.currentUser.uid, fileName);
+        jsonString, _authService.currentUser.uid, resultFile.fileName);
+  }
+
+  Future<void> deleteResult(String fileName) async {
+    final uid = _authService.currentUser.uid;
+    await _storageService.delete(uid, fileName);
+  }
+
+  Future<ExtendedResult> downloadResult(String fileName) async {
+    print('Download online result [$fileName]');
+    final uid = _authService.currentUser.uid;
+    final content = await _storageService.download(uid, fileName);
+    final json = jsonDecode(content) as Map<String, dynamic>;
+    final result = ExtendedResult.fromJson(json);
+    return result;
   }
 
   Future<List<ExtendedResult>> downloadResults(List<String> excluded) async {
@@ -95,19 +107,21 @@ extension Storage on FirebaseManager {
     final fileNames = await _storageService.list(uid);
     List<ExtendedResult> results = [];
     for (final fileName in fileNames) {
-      // Example fileName: 2023-06-06T13-38-01_125ef847-ca9a-45e0-bf36-8fd22f493b8d.json
-      final resultUuid = fileName.replaceAll('.json', '').split('_').last;
-      if (excluded.contains(resultUuid)) {
+      final resultFile = ResultFileName.fromFileName(fileName);
+      if (excluded.contains(resultFile.uuid)) {
         print('Exclude local existed result [$fileName] from download');
         continue;
       }
-      print('Download online result [$fileName]');
-      final content = await _storageService.download(uid, fileName);
-      final json = jsonDecode(content) as Map<String, dynamic>;
-      final result = ExtendedResult.fromJson(json);
+      final result = await downloadResult(fileName);
       results.add(result);
     }
     return results;
+  }
+
+  Future<List<String>> listResults() async {
+    final uid = _authService.currentUser.uid;
+    final fileNames = await _storageService.list(uid);
+    return fileNames;
   }
 }
 

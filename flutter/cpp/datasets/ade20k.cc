@@ -168,7 +168,7 @@ std::vector<uint8_t> ADE20K::ProcessOutput(const int sample_idx,
         auto g = ground_truth_vector[i];
 
         // trichotomy
-        if ((p == c) or (g == c)) {
+        if ((p == c) || (g == c)) {
           if (p == g) {
             true_positive++;
           } else if (p == c) {

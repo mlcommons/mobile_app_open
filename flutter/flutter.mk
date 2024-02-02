@@ -35,7 +35,7 @@ flutter/check-release-env: flutter/check/official-build flutter/check/build-numb
 flutter/test: flutter/test/unit flutter/test/integration
 
 OFFICIAL_BUILD?=false
-flutter_official_build_arg=--dart-define=official-build=${OFFICIAL_BUILD}
+flutter_official_build_arg=--dart-define=OFFICIAL_BUILD=${OFFICIAL_BUILD}
 .PHONY: flutter/check/official-build
 flutter/check/official-build:
 	@[ "$$OFFICIAL_BUILD" = "true" ] || [ "$$OFFICIAL_BUILD" = "false" ] \
@@ -52,16 +52,19 @@ flutter/check/build-number:
 		|| (echo FLUTTER_BUILD_NUMBER env must be explicitly set; exit 1)
 
 ifneq (${FLUTTER_DATA_FOLDER},)
-flutter_data_folder_arg="--dart-define=default-data-folder=${FLUTTER_DATA_FOLDER}"
+flutter_data_folder_arg="--dart-define=FLUTTER_DATA_FOLDER=${FLUTTER_DATA_FOLDER}"
 else
 flutter_data_folder_arg=
 endif
 ifneq (${FLUTTER_CACHE_FOLDER},)
-flutter_cache_folder_arg="--dart-define=default-cache-folder=${FLUTTER_CACHE_FOLDER}"
+flutter_cache_folder_arg="--dart-define=FLUTTER_CACHE_FOLDER=${FLUTTER_CACHE_FOLDER}"
 else
 flutter_cache_folder_arg=
 endif
 flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
+
+FIREBASE_CRASHLYTICS_ENABLED?=false
+flutter_firebase_crashlytics_arg="--dart-define=FIREBASE_CRASHLYTICS_ENABLED=${FIREBASE_CRASHLYTICS_ENABLED}"
 
 FIREBASE_ENV_FILE?=flutter/lib/firebase/firebase_options.env
 -include ${FIREBASE_ENV_FILE}
@@ -90,7 +93,7 @@ flutter/backend-list:
 RESULT_JSON_SAMPLE_PATH?=output/extended_result_example.json
 .PHONY: flutter/result/gen-extended-sample
 flutter/result/gen-extended-sample:
-	cd flutter_common && \
+	cd flutter && \
 		${_start_args} dart run \
 		--define=jsonFileName=../${RESULT_JSON_SAMPLE_PATH} \
 		lib/data/generation_helpers/write_json_sample.main.dart
@@ -102,14 +105,17 @@ flutter/result/gen-schema: flutter/result/gen-extended-sample
 	quicktype ${RESULT_JSON_SAMPLE_PATH} \
 		--lang schema \
 		--out ${RESULT_JSON_SCHEMA_PATH}
-	cd flutter_common && \
+	cd flutter && \
 		${_start_args} dart run \
 		--define=schemaPath=../${RESULT_JSON_SCHEMA_PATH} \
 		lib/data/generation_helpers/edit_json_schema.main.dart
 
 .PHONY: flutter/result/json
 flutter/result/json:
-	cd flutter_common && ${_start_args} flutter --no-version-check pub run \
+	@echo "Generate .g.dart files for the @JsonSerializable annotation"
+	@# https://github.com/dart-lang/build/issues/2835#issuecomment-1047849076
+	cd flutter && ${_start_args} flutter packages pub get
+	cd flutter && ${_start_args} flutter --no-version-check pub run \
 		build_runner build --delete-conflicting-outputs
 
 .PHONY: flutter/build-info
@@ -154,9 +160,7 @@ flutter/set-windows-build-number:
 .PHONY: flutter/pub
 flutter/pub:
 	[ -z "${FLUTTER_FORCE_PUB_GET}" ] || rm -rf output/flutter/pub
-	make \
-		output/flutter/pub/flutter.stamp \
-		output/flutter/pub/flutter_common.stamp
+	make output/flutter/pub/flutter.stamp
 	[ -z "${FLUTTER_FORCE_PUB_GET}" ] || rm -rf output/flutter/pub
 output/flutter/pub/%.stamp: %/pubspec.yaml
 	cd $(shell basename $@ .stamp) && ${_start_args} flutter --no-version-check pub get
@@ -165,8 +169,7 @@ output/flutter/pub/%.stamp: %/pubspec.yaml
 
 .PHONY: flutter/test/unit
 flutter/test/unit:
-	cd flutter && ${_start_args} flutter --no-version-check test --no-pub test -r expanded
-	cd flutter_common && ${_start_args} flutter --no-version-check test --no-pub test -r expanded
+	cd flutter && ${_start_args} flutter --no-version-check test --no-pub unit_test/* -r expanded
 
 ifneq (${FLUTTER_TEST_DEVICE},)
 flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"
@@ -181,6 +184,7 @@ flutter/test/integration:
 		integration_test/first_test.dart \
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
+		${flutter_firebase_crashlytics_arg} \
 		${flutter_perf_test_arg} \
 		${flutter_folder_args}
 
@@ -191,11 +195,11 @@ flutter/run:
 		run \
 		${flutter_folder_args} \
 		${flutter_test_device_arg} \
-		${flutter_official_build_arg}
+		${flutter_official_build_arg} \
+		${flutter_firebase_crashlytics_arg}
 
 .PHONY: flutter/clean
 flutter/clean:
 	cd flutter && ${_start_args} flutter --no-version-check clean
-	cd flutter_common && ${_start_args} flutter --no-version-check clean
 	rm -rf output/flutter/pub
 

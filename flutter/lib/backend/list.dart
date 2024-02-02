@@ -1,8 +1,7 @@
 import 'dart:io' show Platform;
 
-import 'package:mlperfbench_common/data/environment/environment_info.dart';
-
 import 'package:mlperfbench/backend/bridge/ffi_match.dart';
+import 'package:mlperfbench/data/environment/environment_info.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 
