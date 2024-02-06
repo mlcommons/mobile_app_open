@@ -82,7 +82,7 @@ benchmark_setting {
     accelerator_desc: "Google EdgeTPU"
     model_path: "local:///large.tflite"
     model_checksum: "60f651765fa0d52b468f2e1c15c47f91"
-    batch_size: 64
+    batch_size: 32
   }
   delegate_choice: {
     delegate_name: "GPU"
