@@ -73,7 +73,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
     case ::mlperf::mobile::DatasetConfig::IMAGENET:
       dataset = std::make_unique<::mlperf::mobile::Imagenet>(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
-          in->dataset_offset, 384, 384 /* width, height */);
+          in->dataset_offset, 224, 224 /* width, height */);
       break;
     case ::mlperf::mobile::DatasetConfig::COCO:
       dataset = std::make_unique<::mlperf::mobile::Coco>(
