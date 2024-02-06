@@ -12,7 +12,10 @@ class RunSettings {
   final int dataset_type; // 0: Imagenet; 1: Coco; 2: Squad; 3: Ade20k, 4: SNUSR
   final String dataset_data_path;
   final String dataset_groundtruth_path;
-  final int dataset_offset;
+  final int model_offset;
+  final int model_num_classes;
+  final int model_image_width;
+  final int model_image_height;
   final String scenario;
   final String mode; // Submission/Accuracy/Performance
   final int batch_size;
@@ -31,7 +34,10 @@ class RunSettings {
     required this.dataset_type, // 0: Imagenet, 1: Coco, 2: Squad, 3: Ade20k, 4: SNUSR
     required this.dataset_data_path,
     required this.dataset_groundtruth_path,
-    required this.dataset_offset,
+    required this.model_offset,
+    required this.model_num_classes,
+    required this.model_image_width,
+    required this.model_image_height,
     required this.scenario,
     required this.mode, // Submission/Accuracy/Performance
     required this.batch_size,
