@@ -19,6 +19,7 @@ class AppDrawer extends StatelessWidget {
     final header = buildHeader(context);
     final menuList = buildMenuList(context);
     return Drawer(
+      backgroundColor: AppColors.drawerBackground,
       child: Theme(
         data: Theme.of(context).copyWith(
           textTheme: Theme.of(context).textTheme.apply(
@@ -35,8 +36,10 @@ class AppDrawer extends StatelessWidget {
         ),
         child: Container(
           color: AppColors.drawerBackground,
-          child: Column(
-            children: [header] + menuList,
+          child: SafeArea(
+            child: Column(
+              children: [header] + menuList,
+            ),
           ),
         ),
       ),

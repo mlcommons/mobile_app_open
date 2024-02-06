@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:provider/provider.dart';
@@ -59,6 +60,10 @@ class _UserProfileSectionState extends State<UserProfileSection> {
       onPressed: () {
         FirebaseManager.instance.signInAnonymously();
         Navigator.pop(context);
+        BotToast.showSimpleNotification(
+          title: l10n.userSignedInAnonymously,
+          hideCloseButton: true,
+        );
       },
       child: Text(l10n.userSignInAnonymously),
     );

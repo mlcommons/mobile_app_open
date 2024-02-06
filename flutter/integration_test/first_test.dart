@@ -3,6 +3,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
+import 'package:mlperfbench/firebase/firebase_options.gen.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/data/environment/environment_info.dart';
 import 'package:mlperfbench/data/extended_result.dart';
@@ -186,8 +187,16 @@ void checkThroughput(
 Future<void> uploadResult(ExtendedResult result) async {
   if (FirebaseManager.enabled) {
     await FirebaseManager.instance.initialize();
+    if (DefaultFirebaseOptions.ciUserEmail.isNotEmpty) {
+      final user = await FirebaseManager.instance.signIn(
+        email: DefaultFirebaseOptions.ciUserEmail,
+        password: DefaultFirebaseOptions.ciUserPassword,
+      );
+      print('Signed in as CI user with email: ${user.email}');
+    }
     if (!FirebaseManager.instance.isSignedIn) {
       await FirebaseManager.instance.signInAnonymously();
+      print('Signed in anonymously.');
     }
     await FirebaseManager.instance.uploadResult(result);
   } else {

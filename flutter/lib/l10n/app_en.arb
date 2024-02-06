@@ -13,6 +13,7 @@
 
   "userAnonymousUser": "Anonymous User",
   "userSignInAnonymously": "Sign in anonymously",
+  "userSignedInAnonymously": "Signed in anonymously",
   "userSignInEmailPassword": "Sign in with email/password",
   "userProfile": "User Profile",
   "userId": "User ID",
@@ -45,6 +46,7 @@
   "resultsTabTitleAccuracy": "Accuracy",
   "resultsDeleteConfirm": "Delete this results?",
   "resultsNotAvailable": "N/A",
+  "resultsBenchmarkAborted": "Benchmark aborted!",
   "resultsBatchSize": "Batches: <batchSize>",
 
   "shareButtonMLCommons": "Share with MLCommons",

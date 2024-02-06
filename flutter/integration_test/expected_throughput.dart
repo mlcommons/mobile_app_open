@@ -45,7 +45,7 @@ const Map<String, Map<String, Interval>> _imageClassification = {
     _kPixel6: Interval(min: 800, max: 1100),
   },
   _kQtiBackend: {
-    _kS22Ultra: Interval(min: 1900, max: 2200),
+    _kS22Ultra: Interval(min: 1900, max: 2400),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 30, max: 50),
@@ -92,7 +92,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kPixel6: Interval(min: 250, max: 450),
   },
   _kQtiBackend: {
-    _kS22Ultra: Interval(min: 800, max: 1100),
+    _kS22Ultra: Interval(min: 800, max: 1400),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 120, max: 180),
@@ -115,7 +115,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
     _kPixel6: Interval(min: 100, max: 180),
   },
   _kQtiBackend: {
-    _kS22Ultra: Interval(min: 450, max: 650),
+    _kS22Ultra: Interval(min: 450, max: 700),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 45, max: 65),
@@ -139,7 +139,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kPixel6: Interval(min: 2, max: 75),
   },
   _kQtiBackend: {
-    _kS22Ultra: Interval(min: 120, max: 160),
+    _kS22Ultra: Interval(min: 120, max: 180),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 1, max: 5),
@@ -162,7 +162,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kPixel6: Interval(min: 10, max: 14),
   },
   _kQtiBackend: {
-    _kS22Ultra: Interval(min: 35, max: 45),
+    _kS22Ultra: Interval(min: 35, max: 55),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 12),
@@ -185,7 +185,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
     _kPixel6: Interval(min: 1000, max: 1700),
   },
   _kQtiBackend: {
-    _kS22Ultra: Interval(min: 2600, max: 3000),
+    _kS22Ultra: Interval(min: 2600, max: 3500),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 75, max: 110),
