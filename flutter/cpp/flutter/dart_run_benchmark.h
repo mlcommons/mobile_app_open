@@ -14,7 +14,10 @@ struct dart_ffi_run_benchmark_in {
   int dataset_type;
   const char *dataset_data_path;
   const char *dataset_groundtruth_path;
-  int32_t dataset_offset;
+  int32_t model_offset;
+  int32_t model_num_classes;
+  int32_t model_image_width;
+  int32_t model_image_height;
 
   const char *scenario;
 

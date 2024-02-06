@@ -33,7 +33,29 @@ const DateFilter = ({ control, renderErr }: Props) => {
             );
           }}
         />
-        {renderErr("localStartDate")}
+        {renderErr("fromCreationDate")}
+      </Flex>
+      <Flex alignItems={"center"}>
+        <Text>To Creation Date:</Text>
+      </Flex>
+      <Flex css={datePickerWrapperStyles} flexDir="column">
+        <Controller
+          name="toCreationDate"
+          control={control}
+          render={({ field }) => {
+            const { value, onChange } = field;
+            return (
+              <DatePicker
+                calendarAriaLabel="Date"
+                clearIcon={null}
+                calendarIcon={null}
+                value={value}
+                onChange={(newDate: any) => onChange(newDate)}
+              />
+            );
+          }}
+        />
+        {renderErr("toCreationDate")}
       </Flex>
     </SimpleGrid>
   );
