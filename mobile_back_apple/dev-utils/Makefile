@@ -8,6 +8,9 @@
 REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
 #REPO_ROOT_DIR="/Users/freedom/work/mobile_app_open"
 
+export ANDROID_NDK_VERSION=25
+export ANDROID_NDK_API_LEVEL=33
+
 tflite: tflite-build tflite-run-ic-v2 tflite-run-ic-offline-v2
 coreml: coreml-build coreml-run-ic-v2 coreml-run-ic-offline-v2
 tflite-all: tflite-build tflite-run-ic tflite-run-ic-offline tflite-run-od tflite-run-is tflite-run-lu tflite-run-sr tflite-run-ic-v2 tflite-run-ic-offline-v2
@@ -22,7 +25,7 @@ app:
 
 tflite-build:
 	cd ${REPO_ROOT_DIR} && \
-	bazel build -c opt --cxxopt=-std=c++14 --host_cxxopt=-std=c++14 //flutter/cpp/binary:main //mobile_back_tflite:tflitebackend
+	bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 //flutter/cpp/binary:main //mobile_back_tflite:tflitebackend
 
 tflite-run-ic:
 	cd ${REPO_ROOT_DIR} && \
@@ -120,7 +123,7 @@ tflite-run-sr:
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \
-	bazel build -c opt --cxxopt=-fobjc-arc --cxxopt=-xobjective-c++ --cxxopt=-std=c++14 --host_cxxopt=-std=c++14 \
+	bazel build -c opt --cxxopt=-fobjc-arc --cxxopt=-xobjective-c++ --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
 	//flutter/cpp/binary:main //mobile_back_apple:coremlbackend
 
 coreml-run-ic:
