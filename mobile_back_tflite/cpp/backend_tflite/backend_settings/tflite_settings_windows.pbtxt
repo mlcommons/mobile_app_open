@@ -45,8 +45,11 @@ benchmark_setting {
     delegate_name: "CPU"
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/tflite/mobilenet-edgetpu-v2-L_fp32.tflite"
-    model_checksum: "4b7ce0a82f8eaa542404d2ab2ee4e575"
+    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+    model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+   }
+   delegate_selected: "NNAPI"
+
   }
   delegate_selected: "CPU"
 }
@@ -59,8 +62,8 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     batch_size: 2
-    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/tflite/mobilenet-edgetpu-v2-L_fp32.tflite"
-    model_checksum: "4b7ce0a82f8eaa542404d2ab2ee4e575"
+    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+    model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
   }
   delegate_selected: "CPU"
 }
