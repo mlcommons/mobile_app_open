@@ -204,7 +204,7 @@ jobs:
             --app $GCLOUD_BUCKET_PATH/test-main-tflite.apk \
             --test $GCLOUD_BUCKET_PATH/test-helper-tflite.apk \
             --timeout 30m \
-            --num-flaky-test-attempts 2 \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
             --device model=redfin,version=30,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
 
@@ -229,7 +229,7 @@ jobs:
             --app $GCLOUD_BUCKET_PATH/test-main-pixel.apk \
             --test $GCLOUD_BUCKET_PATH/test-helper-pixel.apk \
             --timeout 30m \
-            --num-flaky-test-attempts 2 \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
             --device model=oriole,version=32,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
 
@@ -254,7 +254,7 @@ jobs:
             --app $GCLOUD_BUCKET_PATH/test-main-qti.apk \
             --test $GCLOUD_BUCKET_PATH/test-helper-qti.apk \
             --timeout 30m \
-            --num-flaky-test-attempts 2 \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
             --device model=b0q,version=33,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
 
@@ -279,6 +279,6 @@ jobs:
             --app $GCLOUD_BUCKET_PATH/test-main-mtk.apk \
             --test $GCLOUD_BUCKET_PATH/test-helper-mtk.apk \
             --timeout 30m \
-            --num-flaky-test-attempts 2 \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
             --device model=OP515BL1,version=33,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
