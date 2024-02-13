@@ -45,8 +45,8 @@ benchmark_setting {
     delegate_name: "CPU"
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
-    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
-    model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
   }
   delegate_selected: "CPU"
 }
@@ -59,8 +59,8 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     batch_size: 2
-    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
-    model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
   }
   delegate_selected: "CPU"
 }
