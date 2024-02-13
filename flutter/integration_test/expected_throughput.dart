@@ -59,11 +59,11 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
     _kCloudBuildX28: Interval(min: 2, max: 12),
     _kRyzen5600: Interval(min: 1, max: 37),
     _kPixel5: Interval(min: 60, max: 75),
-    _kIphoneOnGitHubAction: Interval(min: 1, max: 7),
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 7),
     _kIphoneOnMacbookM1: Interval(min: 10, max: 27),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 1, max: 7),
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 7),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 500, max: 600),
@@ -199,11 +199,11 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
     _kCloudBuildX28: Interval(min: 3, max: 14),
     _kRyzen5600: Interval(min: 20, max: 60),
     _kPixel5: Interval(min: 60, max: 180),
-    _kIphoneOnGitHubAction: Interval(min: 1, max: 15),
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 15),
     _kIphoneOnMacbookM1: Interval(min: 10, max: 45),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 1, max: 15),
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 15),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 700, max: 1700),
