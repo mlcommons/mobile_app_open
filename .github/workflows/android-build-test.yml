@@ -102,7 +102,7 @@ jobs:
         run: |
           aws s3 --endpoint-url=https://c2686074cb2caf5cbaf6d134bdba8b47.r2.cloudflarestorage.com \
           cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/qaisw-2.13.4.230831213719_60417-linux.zip /tmp/ && \
-          unzip -P ${AWS_SECRET_ACCESS_KEY} /tmp/qaisw-2.13.4.230831213719_60417-linux.zip -d /tmp/qaisw-2.13.4.230831213719_60417-linux && \
+          unzip -P ${{ secrets.READONLY_AWS_KEY }} /tmp/qaisw-2.13.4.230831213719_60417-linux.zip -d /tmp/qaisw-2.13.4.230831213719_60417-linux && \
           rm /tmp/qaisw-2.13.4.230831213719_60417-linux.zip && \
           mv /tmp/qaisw-2.13.4.230831213719_60417-linux/qaisw-2.13.4.230831213719_60417 mobile_back_qti/
       - name: Cache bazel
