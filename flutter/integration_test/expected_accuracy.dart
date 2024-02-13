@@ -28,14 +28,14 @@ const Map<String, Interval> _imageClassification = {
 };
 
 const Map<String, Interval> _imageClassificationV2 = {
-  'cpu': Interval(min: 0.69, max: 0.71),
-  'npu': Interval(min: 0.69, max: 0.71),
-  'tpu': Interval(min: 0.69, max: 0.71),
-  'ane': Interval(min: 0.69, max: 0.71),
-  'cpu&gpu&ane': Interval(min: 0.69, max: 0.71),
-  'snpe_dsp': Interval(min: 0.69, max: 0.71),
-  'psnpe_dsp': Interval(min: 0.69, max: 0.71),
-  'neuron-mdla': Interval(min: 0.69, max: 0.71),
+  'cpu': Interval(min: 0.88, max: 0.91),
+  'npu': Interval(min: 0.88, max: 0.91),
+  'tpu': Interval(min: 0.88, max: 0.91),
+  'ane': Interval(min: 0.88, max: 0.91),
+  'cpu&gpu&ane': Interval(min: 0.88, max: 0.91),
+  'snpe_dsp': Interval(min: 0.88, max: 0.91),
+  'psnpe_dsp': Interval(min: 0.88, max: 0.91),
+  'neuron-mdla': Interval(min: 0.79, max: 0.81),
 };
 
 const Map<String, Interval> _objectDetection = {
