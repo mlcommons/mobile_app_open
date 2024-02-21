@@ -79,7 +79,7 @@ benchmark_setting {
     delegate_name: "NNAPI"
     accelerator_name: "tpu"
     accelerator_desc: "Google EdgeTPU"
-    batch_size: 32
+    batch_size: 16
     model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
     model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
   }
