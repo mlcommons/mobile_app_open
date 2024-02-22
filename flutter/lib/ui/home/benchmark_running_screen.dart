@@ -13,7 +13,6 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/formatter.dart';
-import 'package:mlperfbench/ui/home/progress_circles.dart';
 import 'package:mlperfbench/ui/icons.dart';
 
 class BenchmarkRunningScreen extends StatefulWidget {
