@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
-import 'package:mlperfbench/ui/home/dotted_progress_circle.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/info.dart';
@@ -12,8 +11,11 @@ import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/state/task_runner.dart';
+import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/formatter.dart';
+import 'package:mlperfbench/ui/home/dotted_progress_circle.dart';
+import 'package:mlperfbench/ui/home/infinite_progress_circle.dart';
 import 'package:mlperfbench/ui/icons.dart';
 
 class BenchmarkRunningScreen extends StatefulWidget {
@@ -30,11 +32,13 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   late BenchmarkState state;
   late AppLocalizations l10n;
   late ProgressInfo progress;
+  late Store store;
 
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context);
+    store = context.watch<Store>();
     progress = state.taskRunner.progressInfo;
 
     final backgroundGradient = BoxDecoration(
@@ -90,6 +94,20 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     var containerWidth = 0.50 * MediaQuery.of(context).size.width;
     containerWidth = max(containerWidth, 160);
     containerWidth = min(containerWidth, 240);
+    Widget animation;
+    if (store.progressAnimationMode == 1) {
+      animation = DottedProgressCircle(
+        circleSize: containerWidth + 40,
+        dotSize: 10,
+      );
+    } else if (store.progressAnimationMode == 2) {
+      animation = GradientProgressCircle(
+        size: containerWidth + 20,
+        strokeWidth: 6.0,
+      );
+    } else {
+      animation = const SizedBox(height: 0);
+    }
     return Stack(
       alignment: AlignmentDirectional.center,
       children: <Widget>[
@@ -114,10 +132,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
             ),
           ),
         ),
-        DottedProgressCircle(
-          circleSize: containerWidth + 20,
-          dotSize: 10,
-        ),
+        animation,
       ],
     );
   }
@@ -201,10 +216,19 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     const trailingWidth = 24.0;
     Widget? doneIcon;
     if (progress.currentBenchmark?.taskName == benchmarkInfo.taskName) {
-      doneIcon = const DottedProgressCircle(
-        circleSize: trailingWidth + 20,
-        dotSize: 2,
-      );
+      if (store.progressAnimationMode == 1) {
+        doneIcon = const DottedProgressCircle(
+          circleSize: trailingWidth,
+          dotSize: 2.0,
+        );
+      } else if (store.progressAnimationMode == 2) {
+        doneIcon = const GradientProgressCircle(
+          size: trailingWidth,
+          strokeWidth: 2.0,
+        );
+      } else {
+        doneIcon = const SizedBox(height: 0);
+      }
     } else if (progress.completedBenchmarks.contains(benchmarkInfo)) {
       doneIcon = const Icon(
         Icons.check_circle,

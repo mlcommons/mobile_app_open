@@ -34,6 +34,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context);
 
+    Widget progressAnimationDropdown = _progressAnimationDropdown();
     Widget artificialLoadSwitch = _artificialLoadSwitch();
     Widget crashlyticsSwitch = _crashlyticsSwitch();
     Widget runModeDropdown = _runModeDropdown();
@@ -51,6 +52,7 @@ class _SettingsScreen extends State<SettingsScreen> {
             child: ListView(
           padding: const EdgeInsets.only(top: 20),
           children: [
+            progressAnimationDropdown,
             runModeDropdown,
             offlineModeSwitch,
             keepLogSwitch,
@@ -177,6 +179,27 @@ class _SettingsScreen extends State<SettingsScreen> {
           store.offlineMode = flag;
         },
       ),
+    );
+  }
+
+  Widget _progressAnimationDropdown() {
+    return ListTile(
+      title: const Padding(
+        padding: EdgeInsets.only(bottom: 5),
+        child: Text('Progress Animation'),
+      ),
+      subtitle: const Text('Progress animation during a benchmark run'),
+      trailing: DropdownButton<int>(
+          borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
+          value: store.progressAnimationMode,
+          items: const [
+            DropdownMenuItem<int>(value: 0, child: Text('No animation')),
+            DropdownMenuItem<int>(value: 1, child: Text('Dotted Circle')),
+            DropdownMenuItem<int>(value: 2, child: Text('Gradient Circle')),
+          ],
+          onChanged: (value) => setState(() {
+                store.progressAnimationMode = value!;
+              })),
     );
   }
 

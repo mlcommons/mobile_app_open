@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/ui/home/gradient_circular_progress_indicator.dart';
 
-class InfiniteProgressCircle extends StatefulWidget {
+class GradientProgressCircle extends StatefulWidget {
   final double size;
   final double strokeWidth;
 
-  const InfiniteProgressCircle(
+  const GradientProgressCircle(
       {Key? key, required this.size, required this.strokeWidth})
       : super(key: key);
 
   @override
-  State<InfiniteProgressCircle> createState() => _InfiniteProgressCircleState();
+  State<GradientProgressCircle> createState() => _GradientProgressCircleState();
 }
 
-class _InfiniteProgressCircleState extends State<InfiniteProgressCircle>
+class _GradientProgressCircleState extends State<GradientProgressCircle>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
