@@ -13,6 +13,7 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/formatter.dart';
+import 'package:mlperfbench/ui/home/progress_circle.dart';
 import 'package:mlperfbench/ui/icons.dart';
 
 class BenchmarkRunningScreen extends StatefulWidget {
@@ -113,10 +114,10 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
             ),
           ),
         ),
-        // InfiniteProgressCircle(
-        //   size: containerWidth + 20,
-        //   strokeWidth: 6.0,
-        // ),
+        ProgressCircle(
+          strokeWidth: 6,
+          size: containerWidth + 20,
+        ),
       ],
     );
   }
@@ -200,7 +201,10 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     const trailingWidth = 24.0;
     Widget? doneIcon;
     if (progress.currentBenchmark?.taskName == benchmarkInfo.taskName) {
-      doneIcon = null;
+      doneIcon = const ProgressCircle(
+        strokeWidth: 2,
+        size: trailingWidth - 4,
+      );
     } else if (progress.completedBenchmarks.contains(benchmarkInfo)) {
       doneIcon = const Icon(
         Icons.check_circle,
@@ -234,7 +238,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
       trailing: SizedBox(
         width: trailingWidth,
         height: trailingWidth,
-        child: doneIcon,
+        child: Center(child: doneIcon),
       ),
     );
   }
