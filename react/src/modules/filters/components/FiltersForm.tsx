@@ -16,7 +16,10 @@ import SoCFilter from "./SoCFilter";
 
 const schema = yup.object().shape({
   fromCreationDate: yup.date().nullable(),
-  toCreationDate: yup.date().nullable(),
+  toCreationDate: yup
+    .date()
+    .nullable()
+    .min(yup.ref("fromCreationDate"), "To date must be after From date"),
   platform: yup.string().nullable(),
   deviceModel: yup.string().nullable(),
   backend: yup.string().nullable(),
@@ -31,20 +34,26 @@ type Props = {
 
 const FiltersForm = ({ onClose }: Props) => {
   const { resultFilter, setResultFilter } = useFilters();
-  const { handleSubmit, control, formState, register, reset } =
-    useForm<ResultFilterType>({
-      resolver: yupResolver(schema),
-      defaultValues: {
-        fromCreationDate: resultFilter.fromCreationDate,
-        toCreationDate: resultFilter.toCreationDate,
-        platform: resultFilter.platform,
-        deviceModel: resultFilter.deviceModel,
-        backend: resultFilter.backend,
-        manufacturer: resultFilter.manufacturer,
-        soc: resultFilter.soc,
-        benchmarkId: resultFilter.benchmarkId,
-      },
-    });
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+    register,
+    reset,
+  } = useForm<ResultFilterType>({
+    mode: "all",
+    resolver: yupResolver(schema),
+    defaultValues: {
+      fromCreationDate: resultFilter.fromCreationDate,
+      toCreationDate: resultFilter.toCreationDate,
+      platform: resultFilter.platform,
+      deviceModel: resultFilter.deviceModel,
+      backend: resultFilter.backend,
+      manufacturer: resultFilter.manufacturer,
+      soc: resultFilter.soc,
+      benchmarkId: resultFilter.benchmarkId,
+    },
+  });
 
   const renderInputErr = (
     errKey: string,
@@ -61,7 +70,6 @@ const FiltersForm = ({ onClose }: Props) => {
     );
   };
 
-  const { errors } = formState;
   const renderErr = partialRight(renderInputErr, [errors]);
 
   const onFormReset = () => {

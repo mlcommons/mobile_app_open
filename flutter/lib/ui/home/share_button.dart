@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -41,8 +42,6 @@ class ShareBottomSheet extends StatefulWidget {
 class _ShareButton extends State<ShareBottomSheet> {
   late BenchmarkState state;
   late AppLocalizations l10n;
-  bool _isSharing = false;
-  String _shareStatus = '';
 
   @override
   Widget build(BuildContext context) {
@@ -64,14 +63,13 @@ class _ShareButton extends State<ShareBottomSheet> {
         );
         break;
       case _ShareDestination.cloud:
-        setState(() {
-          _isSharing = true;
-        });
+        var cancel = BotToast.showLoading();
         await resultManager.uploadLastResult();
-        setState(() {
-          _isSharing = false;
-          _shareStatus = l10n.uploadSuccess;
-        });
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+        cancel();
+        BotToast.showText(text: l10n.uploadSuccess);
         break;
       default:
         throw Exception('Unknown destination: $destination');
@@ -80,7 +78,7 @@ class _ShareButton extends State<ShareBottomSheet> {
 
   Padding _buildShareModal(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -128,18 +126,8 @@ class _ShareButton extends State<ShareBottomSheet> {
               ],
             ),
           ),
-          SizedBox(
-            height: 40,
-            child: _isSharing ? _buildProgressIndicator() : Text(_shareStatus),
-          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return const CircularProgressIndicator(
-      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
     );
   }
 

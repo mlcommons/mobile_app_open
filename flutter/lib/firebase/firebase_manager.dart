@@ -43,13 +43,6 @@ class FirebaseManager {
   Future<void> _initAuthentication() async {
     FirebaseUIAuth.configureProviders(FirebaseAuthService.providers);
     _authService.firebaseAuth = FirebaseAuth.instance;
-    if (DefaultFirebaseOptions.ciUserEmail.isNotEmpty) {
-      final user = await _authService.signIn(
-        email: DefaultFirebaseOptions.ciUserEmail,
-        password: DefaultFirebaseOptions.ciUserPassword,
-      );
-      print('Signed in as CI user with email: ${user.email}');
-    }
     FirebaseAuth.instance.userChanges().listen((User? user) {
       print('User did change uid: ${user?.uid} | email: ${user?.email}');
       _crashlyticsService.setUserIdentifier(user?.uid ?? '');
@@ -72,6 +65,10 @@ extension Authentication on FirebaseManager {
 
   Future<User> signInAnonymously() async {
     return _authService.signInAnonymously();
+  }
+
+  Future<User> signIn({required String email, required String password}) async {
+    return _authService.signIn(email: email, password: password);
   }
 
   Future<User> link(AuthCredential authCred) async {

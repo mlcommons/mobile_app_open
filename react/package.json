@@ -81,7 +81,7 @@
   },
   "resolutions": {
     "react-scripts/@svgr/webpack/@svgr/plugin-svgo/svgo/css-select/nth-check": "^2.1.1",
-    "react-scripts/resolve-url-loader/postcss": "^8.4.31"
+    "react-scripts/resolve-url-loader/postcss": "^8.4.31",
+    "react-scripts/http-proxy/follow-redirects": "^1.15.0"
   }
-
 }
