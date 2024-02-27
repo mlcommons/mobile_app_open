@@ -29,14 +29,6 @@ class Store extends ChangeNotifier {
     return value ?? '';
   }
 
-  int get progressAnimationMode =>
-      _getInt(StoreConstants.progressAnimationMode, 0);
-
-  set progressAnimationMode(int value) {
-    _storeFromDisk.setInt(StoreConstants.progressAnimationMode, value);
-    notifyListeners();
-  }
-
   BenchmarkRunModeEnum get selectedBenchmarkRunMode {
     String name = _getString(StoreConstants.selectedBenchmarkRunMode);
     if (name == '') name = BenchmarkRunModeEnum.performanceOnly.name;
@@ -150,7 +142,6 @@ class Store extends ChangeNotifier {
 }
 
 class StoreConstants {
-  static const progressAnimationMode = 'progressAnimationMode';
   static const selectedBenchmarkRunMode = 'selectedBenchmarkRunMode';
   static const artificialCPULoadEnabled = 'artificial cpu load enabled';
   static const offlineMode = 'offline mode';
