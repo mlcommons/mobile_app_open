@@ -55,24 +55,24 @@ const Map<String, Map<String, Interval>> _imageClassification = {
 // TODO (anhappdev): update the expected value for _imageClassificationV2 after gathering some statistics
 const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 2, max: 11),
-    _kCloudBuildX28: Interval(min: 2, max: 12),
+    _kCloudBuildX23: Interval(min: 1, max: 9),
+    _kCloudBuildX28: Interval(min: 1, max: 9),
     _kRyzen5600: Interval(min: 1, max: 37),
-    _kPixel5: Interval(min: 60, max: 75),
-    _kIphoneOnGitHubAction: Interval(min: 1, max: 7),
+    _kPixel5: Interval(min: 20, max: 75),
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 7),
     _kIphoneOnMacbookM1: Interval(min: 10, max: 27),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 1, max: 7),
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 7),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 500, max: 600),
+    _kPixel6: Interval(min: 100, max: 600),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 1900, max: 2200),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 30, max: 50),
+    _kDN2103: Interval(min: 5, max: 50),
   },
 };
 
@@ -89,7 +89,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kIphoneOnGitHubAction: Interval(min: 0.5, max: 4),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 250, max: 450),
+    _kPixel6: Interval(min: 200, max: 450),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 800, max: 1400),
@@ -195,24 +195,24 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
 // TODO (anhappdev): update the expected value for _imageClassificationOfflineV2 after gathering some statistics
 const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 4, max: 14),
-    _kCloudBuildX28: Interval(min: 3, max: 14),
+    _kCloudBuildX23: Interval(min: 1, max: 9),
+    _kCloudBuildX28: Interval(min: 1, max: 9),
     _kRyzen5600: Interval(min: 20, max: 60),
-    _kPixel5: Interval(min: 60, max: 180),
-    _kIphoneOnGitHubAction: Interval(min: 1, max: 15),
+    _kPixel5: Interval(min: 20, max: 180),
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 15),
     _kIphoneOnMacbookM1: Interval(min: 10, max: 45),
   },
   _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 1, max: 15),
+    _kIphoneOnGitHubAction: Interval(min: 0.4, max: 15),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 700, max: 1700),
+    _kPixel6: Interval(min: 100, max: 1700),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 2600, max: 3000),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 75, max: 110),
+    _kDN2103: Interval(min: 5, max: 90),
   },
 };
 

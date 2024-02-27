@@ -38,15 +38,15 @@ benchmark_setting {
     delegate_name: "Core ML"
     accelerator_name: "ane"
     accelerator_desc: "ANE"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/tflite/mobilenet-edgetpu-v2-L_fp32.tflite"
-    model_checksum: "4b7ce0a82f8eaa542404d2ab2ee4e575"
+    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
   }
   delegate_choice: {
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/anh/add-MNEdgeTPU-V2-L/v3_1/tflite/mobilenet-edgetpu-v2-L_fp32.tflite"
-    model_checksum: "4b7ce0a82f8eaa542404d2ab2ee4e575"
+    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
   }
   delegate_selected: "Core ML"
 }
