@@ -26,7 +26,6 @@ class _BorderedCircle extends StatelessWidget {
   final Color color;
 
   const _BorderedCircle({
-    super.key,
     required this.strokeWidth,
     required this.radius,
     required this.color,
