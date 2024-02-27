@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
-import 'package:mlperfbench/ui/home/dotted_progress_circle.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/info.dart';
@@ -114,10 +113,10 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
             ),
           ),
         ),
-        DottedProgressCircle(
-          circleSize: containerWidth + 20,
-          dotSize: 10,
-        ),
+        // InfiniteProgressCircle(
+        //   size: containerWidth + 20,
+        //   strokeWidth: 6.0,
+        // ),
       ],
     );
   }
@@ -201,10 +200,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     const trailingWidth = 24.0;
     Widget? doneIcon;
     if (progress.currentBenchmark?.taskName == benchmarkInfo.taskName) {
-      doneIcon = const DottedProgressCircle(
-        circleSize: trailingWidth + 20,
-        dotSize: 2,
-      );
+      doneIcon = null;
     } else if (progress.completedBenchmarks.contains(benchmarkInfo)) {
       doneIcon = const Icon(
         Icons.check_circle,
