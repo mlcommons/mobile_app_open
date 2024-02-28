@@ -355,11 +355,18 @@ class _NativeRunHelper {
     }
 
     final runInfo = await _makeRunInfo(nativeResult);
-    print('$logPrefix throughput: ${runInfo.throughput}');
-    print('$logPrefix isMinDurationMet: ${runInfo.loadgenInfo?.isMinDurationMet}');
-    print('$logPrefix isMinQueryMet: ${runInfo.loadgenInfo?.isMinQueryMet}');
-    print('$logPrefix isEarlyStoppingMet: ${runInfo.loadgenInfo?.isEarlyStoppingMet}');
-    print('$logPrefix isResultValid: ${runInfo.loadgenInfo?.isResultValid}');
+
+    final throughput = runInfo.throughput;
+    if (throughput != null) {
+      print('$logPrefix throughput: $throughput');
+    }
+    final loadgenInfo = runInfo.loadgenInfo;
+    if (loadgenInfo != null) {
+      print('$logPrefix isMinDurationMet: ${loadgenInfo.isMinDurationMet}');
+      print('$logPrefix isMinQueryMet: ${loadgenInfo.isMinQueryMet}');
+      print('$logPrefix isEarlyStoppingMet: ${loadgenInfo.isEarlyStoppingMet}');
+      print('$logPrefix isResultValid: ${loadgenInfo.isResultValid}');
+    }
 
     return runInfo;
   }
