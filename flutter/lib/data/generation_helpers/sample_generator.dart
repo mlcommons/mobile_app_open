@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 
+import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/data/build_info/build_info.dart';
 import 'package:mlperfbench/data/environment/env_android.dart';
 import 'package:mlperfbench/data/environment/env_ios.dart';
@@ -37,9 +38,14 @@ class SampleGenerator {
         measuredDuration: 123.456,
         measuredSamples: 8,
         startDatetime: DateTime.now(),
-        loadgenInfo: BenchmarkLoadgenInfo(
-          duration: 10.6,
-          validity: true,
+        loadgenInfo: LoadgenInfo(
+          queryCount: 12345,
+          latencyMean: 0.123,
+          latency90: 0.123,
+          isMinDurationMet: true,
+          isMinQueryMet: true,
+          isEarlyStoppingMet: true,
+          isResultValid: true,
         ),
       );
 

@@ -223,7 +223,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     late final String? resultText2;
     late final double? progressBarValue2;
     late final BenchmarkResult? benchmarkResult;
-    late final bool resultIsValid;
+    late final Color resultTextColor;
     switch (_screenMode) {
       case _ScreenMode.performance:
         benchmarkResult = benchmark.performanceModeResult;
@@ -233,7 +233,22 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
             (throughput?.value ?? 0.0) / benchmark.info.maxThroughput;
         resultText2 = null;
         progressBarValue2 = null;
-        resultIsValid = benchmarkResult?.validity ?? false;
+        final loadgenInfo = benchmarkResult?.loadgenInfo;
+        if (loadgenInfo != null) {
+          if (loadgenInfo.isMinDurationMet == true &&
+              loadgenInfo.isMinQueryMet == true &&
+              loadgenInfo.isEarlyStoppingMet == true) {
+            resultTextColor = AppColors.resultValidText;
+          } else if (loadgenInfo.isMinDurationMet == true &&
+              loadgenInfo.isMinQueryMet == false &&
+              loadgenInfo.isEarlyStoppingMet == true) {
+            resultTextColor = AppColors.resultSemiValidText;
+          } else {
+            resultTextColor = AppColors.resultInvalidText;
+          }
+        } else {
+          resultTextColor = AppColors.resultInvalidText;
+        }
         break;
       case _ScreenMode.accuracy:
         benchmarkResult = benchmark.accuracyModeResult;
@@ -241,10 +256,13 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         progressBarValue = benchmarkResult?.accuracy?.normalized;
         resultText2 = benchmarkResult?.accuracy2?.formatted;
         progressBarValue2 = benchmarkResult?.accuracy2?.normalized;
-        resultIsValid =
-            (benchmarkResult?.accuracy?.normalized ?? -1.0) >= 0.0 &&
-                (benchmarkResult?.accuracy?.normalized ?? -1.0) <= 1.0 &&
-                (benchmarkResult?.accuracy2?.normalized ?? -1.0) <= 1.0;
+        if ((benchmarkResult?.accuracy?.normalized ?? -1.0) >= 0.0 &&
+            (benchmarkResult?.accuracy?.normalized ?? -1.0) <= 1.0 &&
+            (benchmarkResult?.accuracy2?.normalized ?? -1.0) <= 1.0) {
+          resultTextColor = AppColors.resultValidText;
+        } else {
+          resultTextColor = AppColors.resultInvalidText;
+        }
         break;
     }
     final perfResult = benchmark.performanceModeResult;
@@ -258,9 +276,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     var subtitleColumnChildren = <Widget>[];
     subtitleColumnChildren.add(const SizedBox(height: 4));
     final resultTextStyle = TextStyle(
-      color: resultIsValid
-          ? AppColors.resultValidText
-          : AppColors.resultInvalidText,
+      color: resultTextColor,
       fontSize: 18.0,
       fontWeight: FontWeight.bold,
     );

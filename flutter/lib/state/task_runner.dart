@@ -240,7 +240,7 @@ class TaskRunner {
         acceleratorName: performanceResult.acceleratorName,
         delegateName: benchmark.benchmarkSettings.delegateSelected,
         batchSize: benchmark.selectedDelegate.batchSize,
-        validity: performanceRunInfo.loadgenInfo!.validity,
+        loadgenInfo: performanceRunInfo.loadgenInfo!,
       );
       resultHelper.performanceRunInfo = performanceRunInfo;
     } else if (mode == accuracyMode) {
@@ -278,7 +278,7 @@ class TaskRunner {
         acceleratorName: accuracyResult.acceleratorName,
         delegateName: benchmark.benchmarkSettings.delegateSelected,
         batchSize: benchmark.selectedDelegate.batchSize,
-        validity: false,
+        loadgenInfo: accuracyRunInfo.loadgenInfo,
       );
     } else {
       throw 'Unknown BenchmarkRunMode: $mode';
@@ -341,21 +341,25 @@ class _NativeRunHelper {
   }
 
   Future<RunInfo> _invokeNativeRun() async {
-    final logPrefix = '${benchmark.id}: $runMode mode';
+    final logPrefix = '[${benchmark.id}: $runMode mode]';
 
-    print('$logPrefix: starting...');
+    print('$logPrefix starting...');
     final stopwatch = Stopwatch()..start();
     final nativeResult = await backendBridge.run(runSettings);
     final elapsed = stopwatch.elapsed;
-    print('$logPrefix: elapsed: $elapsed');
-    print('$logPrefix: result: $nativeResult');
+    print('$logPrefix elapsed: $elapsed');
+    print('$logPrefix result: $nativeResult');
 
     if (!_checkAccuracy(nativeResult)) {
-      throw '$logPrefix: accuracy is invalid (backend may be corrupted)';
+      throw '$logPrefix accuracy is invalid (backend may be corrupted)';
     }
 
     final runInfo = await _makeRunInfo(nativeResult);
-    print('$logPrefix: throughput: ${runInfo.throughput}');
+    print('$logPrefix throughput: ${runInfo.throughput}');
+    print('$logPrefix isMinDurationMet: ${runInfo.loadgenInfo?.isMinDurationMet}');
+    print('$logPrefix isMinQueryMet: ${runInfo.loadgenInfo?.isMinQueryMet}');
+    print('$logPrefix isEarlyStoppingMet: ${runInfo.loadgenInfo?.isEarlyStoppingMet}');
+    print('$logPrefix isResultValid: ${runInfo.loadgenInfo?.isResultValid}');
 
     return runInfo;
   }

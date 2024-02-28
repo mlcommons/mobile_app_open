@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
+import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
@@ -19,17 +20,18 @@ class BenchmarkResult {
   final String acceleratorName;
   final String delegateName;
   final int batchSize;
-  final bool validity;
+  final LoadgenInfo? loadgenInfo;
 
-  BenchmarkResult(
-      {required this.throughput,
-      required this.accuracy,
-      required this.accuracy2,
-      required this.backendName,
-      required this.acceleratorName,
-      required this.delegateName,
-      required this.batchSize,
-      required this.validity});
+  BenchmarkResult({
+    required this.throughput,
+    required this.accuracy,
+    required this.accuracy2,
+    required this.backendName,
+    required this.acceleratorName,
+    required this.delegateName,
+    required this.batchSize,
+    required this.loadgenInfo,
+  });
 }
 
 class Benchmark {

@@ -76,12 +76,22 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
     Actual duration of the benchmark in seconds from start to finish.
   * `measured_samples`: integer number  
     Actual number of samples evaluated during the benchmark
-  * `loadgen_info`: map  
+  * `loadgen`: map  
     Info provided by loadgen. May be null for accuracy runs.
-    * `validity`: bool  
-      Indicates whether all constraints were satisfied or not.
-    * `duration`: floating point number  
-      Duration of the benchmark without loadgen overhead in seconds.
+    * `queryCount`: bool  
+      Number of queries performed.
+    * `latencyMean`: bool  
+      Mean latency in seconds.
+    * `latency90`: bool  
+      90th percentile in seconds.
+    * `isMinDurationMet`: bool
+      Indicates whether the min duration condition is met or not.
+    * `isMinQueryMet`: bool
+      Indicates whether the min query condition is met or not.
+    * `isEarlyStoppingMet`: bool
+      Indicates whether the early stopping condition is met or not.
+    * `isResultValid`: bool  
+      Indicates whether the result is valid or not.
   * `start_datetime`: string  
     Datetime of the moment when benchmark started  
     Format is Iso 8601 in UTC timezone: `2022-04-14T03:54:54.687Z`

@@ -1,19 +1,28 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'loadgen_info.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class LoadgenInfo {
-  // Mean latency in seconds
-  final double meanLatency;
   final int queryCount;
-  // 90th percentile in seconds
-  final double latency90;
-  final bool validity;
+  final double latencyMean; // Mean latency in seconds
+  final double latency90; // 90th percentile in seconds
+  final bool isMinDurationMet;
+  final bool isMinQueryMet;
+  final bool isEarlyStoppingMet;
+  final bool isResultValid;
 
   LoadgenInfo({
-    required this.meanLatency,
     required this.queryCount,
+    required this.latencyMean,
     required this.latency90,
-    required this.validity,
+    required this.isMinDurationMet,
+    required this.isMinQueryMet,
+    required this.isEarlyStoppingMet,
+    required this.isResultValid,
   });
 
   static Future<LoadgenInfo?> fromFile({required String filepath}) {
@@ -57,6 +66,10 @@ class LoadgenInfo {
     const latency90Key = 'result_90.00_percentile_latency_ns';
     // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1028-L1029
     const validityKey = 'result_validity';
+    // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1033C23-L1035
+    const minDurationMetKey = 'result_min_duration_met';
+    const minQueriesMetKey = 'result_min_queries_met';
+    const earlyStoppingMetKey = 'early_stopping_met';
 
     final result = await extractKeys(
       logLines: logLines,
@@ -65,6 +78,9 @@ class LoadgenInfo {
         queryCountKey,
         latency90Key,
         validityKey,
+        minDurationMetKey,
+        minQueriesMetKey,
+        earlyStoppingMetKey,
       },
     );
 
@@ -72,15 +88,23 @@ class LoadgenInfo {
       return null;
     }
 
-    final validity = result[validityKey] as String == 'VALID';
+    final isResultValid = result[validityKey] as String == 'VALID';
 
     const nanosecondsPerSecond = 1000 * Duration.microsecondsPerSecond;
 
     return LoadgenInfo(
-      meanLatency: (result[latencyKey] as int) / nanosecondsPerSecond,
       queryCount: result[queryCountKey] as int,
+      latencyMean: (result[latencyKey] as int) / nanosecondsPerSecond,
       latency90: (result[latency90Key] as int) / nanosecondsPerSecond,
-      validity: validity,
+      isMinDurationMet: result[minDurationMetKey] as bool,
+      isMinQueryMet: result[minQueriesMetKey] as bool,
+      isEarlyStoppingMet: result[earlyStoppingMetKey] as bool,
+      isResultValid: isResultValid,
     );
   }
+
+  factory LoadgenInfo.fromJson(Map<String, dynamic> json) =>
+      _$LoadgenInfoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LoadgenInfoToJson(this);
 }
