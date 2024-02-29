@@ -92,7 +92,7 @@ http_archive(
 new_git_repository(
     name = "org_mlperf_inference",
     build_file = "@//flutter/android/third_party:loadgen.BUILD",
-    commit = "a2bd576faab125f955a42114d9d9853530bb7d53",
+    commit = "238d035ab41d7ddd390b35471af169ea641380f6",
     patch_args = ["-p1"],
     patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
     patches = [],
