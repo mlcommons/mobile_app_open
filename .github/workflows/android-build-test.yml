@@ -205,7 +205,7 @@ jobs:
             --test $GCLOUD_BUCKET_PATH/test-helper-tflite.apk \
             --timeout 30m \
             --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
-            --device model=oriole,version=33,locale=en,orientation=portrait \
+            --device model=oriole,version=31,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
 
   test-android-apk-pixel:
