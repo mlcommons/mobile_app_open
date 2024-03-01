@@ -35,6 +35,7 @@ const Map<String, Map<String, Interval>> _imageClassification = {
     _kCloudBuildX28: Interval(min: 4, max: 13),
     _kRyzen5600: Interval(min: 31, max: 37),
     _kPixel5: Interval(min: 80, max: 130),
+    _kPixel6: Interval(min: 600, max: 1100),
     _kIphoneOnGitHubAction: Interval(min: 1, max: 8),
     _kIphoneOnMacbookM1: Interval(min: 19, max: 27),
   },
@@ -48,7 +49,7 @@ const Map<String, Map<String, Interval>> _imageClassification = {
     _kS22Ultra: Interval(min: 1900, max: 2400),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 30, max: 50),
+    _kDN2103: Interval(min: 30, max: 55),
   },
 };
 
@@ -82,6 +83,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kCloudBuildX28: Interval(min: 3.5, max: 8),
     _kRyzen5600: Interval(min: 14, max: 22),
     _kPixel5: Interval(min: 40, max: 60),
+    _kPixel6: Interval(min: 200, max: 450),
     _kIphoneOnGitHubAction: Interval(min: 0.5, max: 4),
     _kIphoneOnMacbookM1: Interval(min: 9, max: 16),
   },
@@ -95,7 +97,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kS22Ultra: Interval(min: 800, max: 1400),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 120, max: 180),
+    _kDN2103: Interval(min: 120, max: 210),
   },
 };
 
@@ -105,6 +107,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
     _kCloudBuildX28: Interval(min: 0.5, max: 4),
     _kRyzen5600: Interval(min: 5, max: 7),
     _kPixel5: Interval(min: 25, max: 40),
+    _kPixel6: Interval(min: 80, max: 180),
     _kIphoneOnGitHubAction: Interval(min: 0.1, max: 2.5),
     _kIphoneOnMacbookM1: Interval(min: 3, max: 6),
   },
@@ -118,7 +121,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
     _kS22Ultra: Interval(min: 450, max: 700),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 45, max: 65),
+    _kDN2103: Interval(min: 45, max: 70),
   },
 };
 
@@ -128,6 +131,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kCloudBuildX28: Interval(min: 0.5, max: 1.3),
     _kRyzen5600: Interval(min: 2.8, max: 3.2),
     _kPixel5: Interval(min: 2.3, max: 3.0),
+    _kPixel6: Interval(min: 2, max: 75),
     _kIphoneOnGitHubAction: Interval(min: 0.1, max: 1),
     _kIphoneOnMacbookM1: Interval(min: 1.8, max: 3),
   },
@@ -142,7 +146,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kS22Ultra: Interval(min: 120, max: 180),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 1, max: 5),
+    _kDN2103: Interval(min: 1, max: 6),
   },
 };
 
@@ -152,6 +156,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kCloudBuildX28: Interval(min: 0.1, max: 4),
     _kRyzen5600: Interval(min: 0.1, max: 3),
     _kPixel5: Interval(min: 4, max: 8),
+    _kPixel6: Interval(min: 7, max: 14),
     _kIphoneOnGitHubAction: Interval(min: 0.02, max: 1.0),
     _kIphoneOnMacbookM1: Interval(min: 0.1, max: 10),
   },
@@ -165,7 +170,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kS22Ultra: Interval(min: 35, max: 55),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 5, max: 12),
+    _kDN2103: Interval(min: 5, max: 15),
   },
 };
 
@@ -175,6 +180,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
     _kCloudBuildX28: Interval(min: 7, max: 16),
     _kRyzen5600: Interval(min: 45, max: 60),
     _kPixel5: Interval(min: 120, max: 190),
+    _kPixel6: Interval(min: 800, max: 1700),
     _kIphoneOnGitHubAction: Interval(min: 2, max: 15),
     _kIphoneOnMacbookM1: Interval(min: 30, max: 45),
   },
@@ -188,7 +194,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOffline = {
     _kS22Ultra: Interval(min: 2600, max: 3500),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 75, max: 110),
+    _kDN2103: Interval(min: 75, max: 140),
   },
 };
 
