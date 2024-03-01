@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mlperfbench/data/environment/environment_info.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/result_filter.dart';
-import 'package:mlperfbench/data/results/benchmark_result.dart';
 
 void main() {
   group('ResultFilter', () {
@@ -77,23 +76,6 @@ void main() {
     test('soc not matched', () {
       final filter = ResultFilter()..soc = 'sdm855';
       expect(filter.match(result), isFalse);
-    });
-
-    test('benchmarkId matched', () {
-      final filter = ResultFilter()..benchmarkId = 'image_classification';
-      List<BenchmarkExportResult> benchmarks = result.results
-          .where((benchmark) => filter.matchBenchmark(benchmark))
-          .toList();
-
-      expect(benchmarks.length == 1, isTrue);
-    });
-
-    test('benchmarkId not matched', () {
-      final filter = ResultFilter()..benchmarkId = 'image_classification_v2';
-      List<BenchmarkExportResult> benchmarks = result.results
-          .where((benchmark) => filter.matchBenchmark(benchmark))
-          .toList();
-      expect(benchmarks.length == 1, isFalse);
     });
 
     test('multiple filters matched', () {

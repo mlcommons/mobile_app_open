@@ -12,8 +12,7 @@ if [ "${WITH_PIXEL}" = 1 ]; then suffix+="g"; fi
 if [ "${WITH_TFLITE}" = 1 ]; then suffix+="t"; fi
 
 today=$(date +%F)
-commit=$(git rev-parse --short HEAD)
 
-output="${today}_mlperfbench-${commit}-${suffix}.apk"
+output="${today}_mlperfbench-${suffix}-${FLUTTER_BUILD_NUMBER}"
 
 echo "${output}"

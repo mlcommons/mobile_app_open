@@ -16,7 +16,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Log in to the Container registry
@@ -55,12 +55,18 @@ jobs:
       FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
       FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
       FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
-      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      FIREBASE_PROJECT_ID: mobile-app-build-290400
       FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
       FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+      SIGNING_FOR_RELEASE: true
+      SIGNING_STORE_FILE: /tmp/mlperf-keystore.jks
+      SIGNING_STORE_FILE_BASE64: ${{ secrets.SIGNING_STORE_FILE_BASE64 }}
+      SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+      SIGNING_KEY_ALIAS: upload
+      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # Preinstalled tools from host at `/opt/hostedtoolcache` is not needed since we run commands inside our own Docker container.
       # `/opt/hostedtoolcache` is mounted to `/__t`. We delete it to free up disk space.
       - name: Free up disk space
@@ -72,6 +78,10 @@ jobs:
           df -h
       - name: Configure Git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Create keystore file
+        run: |
+          echo "$SIGNING_STORE_FILE_BASE64" | base64 -d > "$SIGNING_STORE_FILE"
+          echo e4699f58310b85cbcb9e835e569e7e17  "$SIGNING_STORE_FILE" | md5sum --check -
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
@@ -81,30 +91,24 @@ jobs:
         with:
           version: '>= 363.0.0'
           project_id: mobile-app-build-290400
-      - name: Install AWS CLI
-        run: |
-          python3 -m pip install awscli
       - name: Download Samsung libraries
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_R2_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_R2_SECRET_KEY }}
+          SAMSUNG_LIB: samsung_libs_v3.1_20231116
         run: |
-          aws s3 --endpoint-url=https://c2686074cb2caf5cbaf6d134bdba8b47.r2.cloudflarestorage.com \
-          cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/samsung_libs_v3.1_20231116.zip /tmp/ && \
-          unzip /tmp/samsung_libs_v3.1_20231116.zip -d /tmp/samsung_libs_v3.1_20231116 && \
-          rm /tmp/samsung_libs_v3.1_20231116.zip && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v3.1/${SAMSUNG_LIB}.zip /tmp/ && \
+          unzip /tmp/${SAMSUNG_LIB}.zip -d /tmp/${SAMSUNG_LIB} && \
+          rm /tmp/${SAMSUNG_LIB}.zip && \
           mkdir -p mobile_back_samsung/samsung/lib/internal && \
-          mv /tmp/samsung_libs_v3.1_20231116/* mobile_back_samsung/samsung/lib/internal/
+          mv /tmp/${SAMSUNG_LIB}/* mobile_back_samsung/samsung/lib/internal/
       - name: Download QTI libraries
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_R2_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_R2_SECRET_KEY }}
+          QTI_LIB: qaisw-2.13.4.230831213719_60417
         run: |
-          aws s3 --endpoint-url=https://c2686074cb2caf5cbaf6d134bdba8b47.r2.cloudflarestorage.com \
-          cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/qaisw-2.13.4.230831213719_60417-linux.zip /tmp/ && \
-          unzip -P ${{ secrets.READONLY_AWS_KEY }} /tmp/qaisw-2.13.4.230831213719_60417-linux.zip -d /tmp/qaisw-2.13.4.230831213719_60417-linux && \
-          rm /tmp/qaisw-2.13.4.230831213719_60417-linux.zip && \
-          mv /tmp/qaisw-2.13.4.230831213719_60417-linux/qaisw-2.13.4.230831213719_60417 mobile_back_qti/
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v3.1/${QTI_LIB}.zip /tmp/ && \
+          unzip /tmp/${QTI_LIB}.zip -d /tmp/${QTI_LIB} && \
+          rm /tmp/${QTI_LIB}.zip && \
+          mkdir -p mobile_back_qti/${QTI_LIB} && \
+          mv /tmp/${QTI_LIB}/* mobile_back_qti/${QTI_LIB}/
       - name: Cache bazel
         uses: actions/cache@v3
         with:
@@ -175,12 +179,14 @@ jobs:
           WITH_APPLE: 0
         run: |
           make flutter/android/release
+          gsutil cp flutter/build/app/outputs/bundle/release/app-release.aab $GCLOUD_BUCKET_PATH/app-release.aab
+          gsutil cp flutter/build/app/outputs/flutter-apk/app-release.apk $GCLOUD_BUCKET_PATH/app-release.apk
       - name: Archive Android APKs
         uses: actions/upload-artifact@v3
         with:
           name: android-apks-${{ github.run_number }}
           path: output/android-apks/*.apk
-          retention-days: 30
+          retention-days: 28
           if-no-files-found: error
 
   test-android-apk-tflite:
@@ -282,3 +288,33 @@ jobs:
             --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
             --device model=OP515BL1,version=33,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
+
+  deploy-playstore:
+    needs:
+      - build-android-apk
+      - test-android-apk-tflite
+    runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Download Android release app
+        run: |
+          gsutil cp $GCLOUD_BUCKET_PATH/app-release.aab /tmp/app-release.aab
+      - name: Upload Android release app to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          releaseFiles: /tmp/app-release.aab
+          packageName: org.mlcommons.android.mlperfbench
+          serviceAccountJsonPlainText: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+          # track: "alpha", "beta", "internal" or "production"
+          track: internal
+          status: draft
