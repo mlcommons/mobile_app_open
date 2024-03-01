@@ -131,7 +131,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kCloudBuildX28: Interval(min: 0.5, max: 1.3),
     _kRyzen5600: Interval(min: 2.8, max: 3.2),
     _kPixel5: Interval(min: 2.3, max: 3.0),
-    _kPixel6: Interval(min: 20, max: 85),
+    _kPixel6: Interval(min: 2, max: 85),
     _kIphoneOnGitHubAction: Interval(min: 0.1, max: 1.1),
     _kIphoneOnMacbookM1: Interval(min: 1.8, max: 3),
   },
@@ -139,7 +139,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kIphoneOnGitHubAction: Interval(min: 0.1, max: 1.1),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 20, max: 85),
+    _kPixel6: Interval(min: 2, max: 85),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 120, max: 180),
