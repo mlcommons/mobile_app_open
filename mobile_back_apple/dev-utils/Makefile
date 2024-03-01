@@ -60,11 +60,13 @@ tflite-run-ic-v2:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification_v2 \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/mobilenet-edgetpu-v2-L_fp32.tflite" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_v4/MobileNetV4-Conv-Large-fp32.tflite" \
+		--image_width=384 \
+		--image_height=384 \
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/images" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/imagenet_val.txt" \
-		--offset=1
+		--offset=0
 
 tflite-run-ic-offline-v2:
 	cd ${REPO_ROOT_DIR} && \
@@ -73,11 +75,13 @@ tflite-run-ic-offline-v2:
 		--scenario=Offline \
 		--batch_size=32 \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/mobilenet-edgetpu-v2-L_fp32.tflite" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_v4/MobileNetV4-Conv-Large-fp32.tflite" \
+		--image_width=384 \
+		--image_height=384 \
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/images" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/imagenet_val.txt" \
-		--offset=1
+		--offset=0
 
 tflite-run-od:
 	cd ${REPO_ROOT_DIR} && \
@@ -155,11 +159,13 @@ coreml-run-ic-v2:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPUv2.mlmodel" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_v4/MobilenetV4_Large.mlmodel" \
+		--image_width=384 \
+		--image_height=384 \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/images" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/imagenet_val.txt" \
-		--offset=1
+		--offset=0
 
 coreml-run-ic-offline-v2:
 	cd ${REPO_ROOT_DIR} && \
@@ -168,11 +174,13 @@ coreml-run-ic-offline-v2:
 		--scenario=Offline \
 		--batch_size=32 \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_edgetpu/MobilenetEdgeTPUv2.mlmodel" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_v4/MobilenetV4_Large.mlmodel" \
+		--image_width=384 \
+		--image_height=384 \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/images" \
 		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/imagenet/imagenet_val.txt" \
-		--offset=1
+		--offset=0
 
 coreml-run-od:
 	cd ${REPO_ROOT_DIR} && \

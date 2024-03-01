@@ -16,36 +16,34 @@
 # limitations under the License.
 
 import coremltools as ct
-import tensorflow as tf
-import tensorflow_hub as hub
 
 
 def main():
-  print("Retrieve model from TFHub...")
-  keras_layer = hub.KerasLayer('https://tfhub.dev/google/edgetpu/vision/mobilenet-edgetpu-v2/l/1')
-  keras_model = tf.keras.Sequential([keras_layer])
-  keras_model.build([None, 224, 224, 3])
-  input_tensor = tf.ones((4, 224, 224, 3))
-  output_tensor = keras_model(input_tensor)
-  print("output_tensor.shape:", output_tensor.shape)
-
+  """
+  Download the MobileNetV4-Conv-Large-fp32 from https://github.com/mlcommons/mobile_open/releases
+  Tested with tensorflow==2.15.0 and coremltools==7.1
+  """
+  saved_model_dir = '../dev-resources/mobilenet_v4/MobileNetV4-Conv-Large-saved-model'
+  export_fpath = '../dev-resources/mobilenet_v4/MobilenetV4_Large.mlmodel'
+  print("Converting model...")
   model = ct.convert(
-    keras_model,
+    saved_model_dir,
+    source="tensorflow",
     convert_to="neuralnetwork",
-    inputs=[ct.TensorType(shape=(1, 224, 224, 3))],
+    inputs=[ct.TensorType(shape=(1, 384, 384, 3))],
   )
-  model.short_description = "MobilenetEdgeTPUv2 from https://tfhub.dev/google/edgetpu/vision/mobilenet-edgetpu-v2/l/1"
+  model.short_description = "MobileNetV4-Conv-Large-fp32 from https://github.com/mlcommons/mobile_open"
 
   spec = model.get_spec()
   for n in (1, 1001):
     spec.description.output[0].type.multiArrayType.shape.append(n)
 
-  ct.utils.rename_feature(spec, "keras_layer_input", "images")
+  ct.utils.rename_feature(spec, "inputs", "images")
   ct.utils.rename_feature(spec, "Identity", "Softmax")
   print(spec.description)
 
-  export_fpath = '../dev-resources/mobilenet_edgetpu/MobilenetEdgeTPUv2.mlmodel'
   ct.models.MLModel(spec).save(export_fpath)
+  print("Done! Core ML model exported to:", export_fpath)
 
 
 if __name__ == "__main__":
