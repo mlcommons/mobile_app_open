@@ -86,10 +86,10 @@ jobs:
           python3 -m pip install awscli
       - name: Download Samsung libraries
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_AWS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_R2_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_R2_SECRET_KEY }}
         run: |
-          aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
+          aws s3 --endpoint-url=https://c2686074cb2caf5cbaf6d134bdba8b47.r2.cloudflarestorage.com \
           cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/samsung_libs_v3.1_20231116.zip /tmp/ && \
           unzip /tmp/samsung_libs_v3.1_20231116.zip -d /tmp/samsung_libs_v3.1_20231116 && \
           rm /tmp/samsung_libs_v3.1_20231116.zip && \
@@ -97,12 +97,12 @@ jobs:
           mv /tmp/samsung_libs_v3.1_20231116/* mobile_back_samsung/samsung/lib/internal/
       - name: Download QTI libraries
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_AWS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_R2_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_R2_SECRET_KEY }}
         run: |
-          aws s3 --endpoint-url=https://s3.us-east-1.lyvecloud.seagate.com \
+          aws s3 --endpoint-url=https://c2686074cb2caf5cbaf6d134bdba8b47.r2.cloudflarestorage.com \
           cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/qaisw-2.13.4.230831213719_60417-linux.zip /tmp/ && \
-          unzip -P ${AWS_SECRET_ACCESS_KEY} /tmp/qaisw-2.13.4.230831213719_60417-linux.zip -d /tmp/qaisw-2.13.4.230831213719_60417-linux && \
+          unzip -P ${{ secrets.READONLY_AWS_KEY }} /tmp/qaisw-2.13.4.230831213719_60417-linux.zip -d /tmp/qaisw-2.13.4.230831213719_60417-linux && \
           rm /tmp/qaisw-2.13.4.230831213719_60417-linux.zip && \
           mv /tmp/qaisw-2.13.4.230831213719_60417-linux/qaisw-2.13.4.230831213719_60417 mobile_back_qti/
       - name: Cache bazel
@@ -197,15 +197,15 @@ jobs:
         with:
           version: '>= 363.0.0'
           project_id: mobile-app-build-290400
-      - name: Trigger Firebase Test Lab for [Google Pixel 5](redfin)
+      - name: Trigger Firebase Test Lab for [Google Pixel 6](oriole)
         run: |
           gcloud firebase test android run \
             --type instrumentation \
             --app $GCLOUD_BUCKET_PATH/test-main-tflite.apk \
             --test $GCLOUD_BUCKET_PATH/test-helper-tflite.apk \
             --timeout 30m \
-            --num-flaky-test-attempts 2 \
-            --device model=redfin,version=30,locale=en,orientation=portrait \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
+            --device model=oriole,version=31,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
 
   test-android-apk-pixel:
@@ -229,7 +229,7 @@ jobs:
             --app $GCLOUD_BUCKET_PATH/test-main-pixel.apk \
             --test $GCLOUD_BUCKET_PATH/test-helper-pixel.apk \
             --timeout 30m \
-            --num-flaky-test-attempts 2 \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
             --device model=oriole,version=32,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
 
@@ -254,7 +254,7 @@ jobs:
             --app $GCLOUD_BUCKET_PATH/test-main-qti.apk \
             --test $GCLOUD_BUCKET_PATH/test-helper-qti.apk \
             --timeout 30m \
-            --num-flaky-test-attempts 2 \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
             --device model=b0q,version=33,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
 
@@ -279,6 +279,6 @@ jobs:
             --app $GCLOUD_BUCKET_PATH/test-main-mtk.apk \
             --test $GCLOUD_BUCKET_PATH/test-helper-mtk.apk \
             --timeout 30m \
-            --num-flaky-test-attempts 2 \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
             --device model=OP515BL1,version=33,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}

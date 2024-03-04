@@ -77,7 +77,7 @@ class _BenchmarkExportResultScreenState
       helper.makeInfo(l10n.historyRunDetailsPerfQps,
           perf.throughput?.toUIString() ?? l10n.resultsNotAvailable),
       helper.makeInfo(l10n.historyRunDetailsValid,
-          (perf.loadgenInfo?.validity ?? false).toString()),
+          (perf.loadgenInfo?.isResultValid).toString()),
       helper.makeInfo(l10n.historyRunDetailsDuration,
           perf.measuredDuration.toDurationUIString()),
       helper.makeInfo(

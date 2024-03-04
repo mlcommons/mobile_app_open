@@ -239,7 +239,8 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
       name: runInfo.benchmarkName,
       throughput: runInfo.performanceRun?.throughput?.toUIString() ??
           l10n.resultsNotAvailable,
-      throughputValid: runInfo.performanceRun?.loadgenInfo?.validity ?? false,
+      throughputValid:
+          runInfo.performanceRun?.loadgenInfo?.isResultValid ?? false,
       accuracy:
           runInfo.accuracyRun?.accuracy?.formatted ?? l10n.resultsNotAvailable,
       onTap: () {

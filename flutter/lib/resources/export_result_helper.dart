@@ -1,6 +1,5 @@
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/list.dart';
-import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
@@ -71,17 +70,7 @@ class ResultHelper {
       measuredDuration: result.duration,
       measuredSamples: result.numSamples,
       startDatetime: result.startTime,
-      loadgenInfo: _makeLoadgenInfo(info.loadgenInfo),
-    );
-  }
-
-  BenchmarkLoadgenInfo? _makeLoadgenInfo(LoadgenInfo? source) {
-    if (source == null) {
-      return null;
-    }
-    return BenchmarkLoadgenInfo(
-      validity: source.validity,
-      duration: source.meanLatency * source.queryCount,
+      loadgenInfo: info.loadgenInfo,
     );
   }
 
