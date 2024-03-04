@@ -121,7 +121,7 @@ class ResultManager {
       acceleratorName: export.backendInfo.acceleratorName,
       delegateName: export.backendSettings.delegate,
       batchSize: export.backendSettings.batchSize,
-      validity: runResult.loadgenInfo?.validity ?? false,
+      loadgenInfo: runResult.loadgenInfo,
     );
   }
 

@@ -8,7 +8,7 @@
 REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
 #REPO_ROOT_DIR="/Users/freedom/work/mobile_app_open"
 
-tflite: tflite-build tflite-run-ic
+tflite: tflite-build tflite-run-sr
 coreml: coreml-build coreml-run-ic
 tflite-all: tflite-build tflite-run-ic tflite-run-ic-offline tflite-run-od tflite-run-is tflite-run-lu tflite-run-sr
 coreml-all: coreml-build coreml-run-ic coreml-run-ic-offline coreml-run-od coreml-run-is coreml-run-lu coreml-run-sr
@@ -22,7 +22,7 @@ app:
 
 tflite-build:
 	cd ${REPO_ROOT_DIR} && \
-	bazel build -c opt --cxxopt=-std=c++14 --host_cxxopt=-std=c++14 //flutter/cpp/binary:main //mobile_back_tflite:tflitebackend
+	bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 //flutter/cpp/binary:main //mobile_back_tflite:tflitebackend
 
 tflite-run-ic:
 	cd ${REPO_ROOT_DIR} && \
@@ -93,10 +93,12 @@ tflite-run-sr:
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/LR" \
 		--ground_truth_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/HR" \
+		--max_duration_ms=60000 \
+		--min_duration_ms=100
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \
-	bazel build -c opt --cxxopt=-fobjc-arc --cxxopt=-xobjective-c++ --cxxopt=-std=c++14 --host_cxxopt=-std=c++14 \
+	bazel build -c opt --cxxopt=-fobjc-arc --cxxopt=-xobjective-c++ --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
 	//flutter/cpp/binary:main //mobile_back_apple:coremlbackend
 
 coreml-run-ic:

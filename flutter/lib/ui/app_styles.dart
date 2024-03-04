@@ -17,6 +17,7 @@ class AppColors {
   static const darkText = Colors.black;
   static const resultValidText = Colors.indigo;
   static const resultInvalidText = Colors.red;
+  static const resultSemiValidText = Colors.purple;
   static const errorText = Colors.red;
 
   static const primary = _blue2;
