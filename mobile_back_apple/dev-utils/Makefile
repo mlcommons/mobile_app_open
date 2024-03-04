@@ -124,6 +124,8 @@ tflite-run-sr:
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
 		--images_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/LR" \
 		--ground_truth_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/HR" \
+		--max_duration_ms=60000 \
+		--min_duration_ms=100
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \

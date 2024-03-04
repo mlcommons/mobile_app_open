@@ -377,10 +377,10 @@
                 "start_datetime": {
                     "type": "string"
                 },
-                "loadgen_info": {
+                "loadgen": {
                     "oneOf": [
                         {
-                            "$ref": "#/definitions/LoadgenInfo"
+                            "$ref": "#/definitions/Loadgen"
                         },
                         {
                             "type": "null"
@@ -392,7 +392,7 @@
                 "accuracy",
                 "accuracy2",
                 "dataset",
-                "loadgen_info",
+                "loadgen",
                 "measured_duration",
                 "measured_samples",
                 "start_datetime",
@@ -442,22 +442,42 @@
             ],
             "title": "Dataset"
         },
-        "LoadgenInfo": {
+        "Loadgen": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "validity": {
+                "query_count": {
+                    "type": "integer"
+                },
+                "latency_mean": {
+                    "type": "number"
+                },
+                "latency90": {
+                    "type": "number"
+                },
+                "is_min_duration_met": {
                     "type": "boolean"
                 },
-                "duration": {
-                    "type": "number"
+                "is_min_query_met": {
+                    "type": "boolean"
+                },
+                "is_early_stopping_met": {
+                    "type": "boolean"
+                },
+                "is_result_valid": {
+                    "type": "boolean"
                 }
             },
             "required": [
-                "duration",
-                "validity"
+                "is_early_stopping_met",
+                "is_min_duration_met",
+                "is_min_query_met",
+                "is_result_valid",
+                "latency90",
+                "latency_mean",
+                "query_count"
             ],
-            "title": "LoadgenInfo"
+            "title": "Loadgen"
         },
         "Throughput": {
             "type": "object",

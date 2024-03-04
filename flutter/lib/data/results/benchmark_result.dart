@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/data/results/backend_info.dart';
 import 'package:mlperfbench/data/results/backend_settings.dart';
 import 'package:mlperfbench/data/results/dataset_info.dart';
@@ -109,22 +110,6 @@ class Accuracy implements Comparable<Accuracy> {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class BenchmarkLoadgenInfo {
-  final bool validity;
-  final double duration;
-
-  BenchmarkLoadgenInfo({
-    required this.validity,
-    required this.duration,
-  });
-
-  factory BenchmarkLoadgenInfo.fromJson(Map<String, dynamic> json) =>
-      _$BenchmarkLoadgenInfoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$BenchmarkLoadgenInfoToJson(this);
-}
-
-@JsonSerializable(fieldRename: FieldRename.snake)
 class BenchmarkRunResult {
   final Throughput? throughput;
   final Accuracy? accuracy;
@@ -133,7 +118,8 @@ class BenchmarkRunResult {
   final double measuredDuration;
   final int measuredSamples;
   final DateTime startDatetime;
-  final BenchmarkLoadgenInfo? loadgenInfo;
+  @JsonKey(name: 'loadgen')
+  final LoadgenInfo? loadgenInfo;
 
   BenchmarkRunResult({
     required this.throughput,
