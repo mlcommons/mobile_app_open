@@ -2,8 +2,8 @@
 # proto-message: MLPerfConfig
 
 task {
-  id: "image_classification"
-  name: "Image Classification"
+  id: "image_classification_v2"
+  name: "Image Classification v2"
   min_query_count: 1024
   min_duration: 60
   max_duration: 600
@@ -29,11 +29,11 @@ task {
     }
   }
   model {
-    id: "mobilenetedgetpu_224_v1_0"
-    name: "MobileNetEdgeTPU 224 1.0"
-    offset: 1
-    image_width: 224
-    image_height: 224
+    id: "MobileNetEdgeTPUv2-L"
+    name: "MobileNetEdgeTPUv2-L"
+    offset: 0
+    image_width: 384
+    image_height: 384
     num_classes: 1000
   }
 }
@@ -77,7 +77,7 @@ task {
 
 task {
   id: "image_segmentation_v2"
-  name: "v2.0 Image Segmentation"
+  name: "Image Segmentation v2"
   min_query_count: 1024
   min_duration: 60
   max_duration: 600
@@ -176,6 +176,80 @@ task {
     name: "EDSR"
     image_width: 960
     image_height: 540
+  }
+}
+
+task {
+  id: "image_classification_offline_v2"
+  name: "Image Classification v2 (Offline)"
+  min_query_count: 24576
+  min_duration: 0
+  max_duration: 0
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "Offline"
+  datasets {
+    type: IMAGENET
+    full {
+      name: "Imagenet classification validation set"
+      input_path: "local:///mlperf_datasets/imagenet/img"
+      groundtruth_path: "local:///mlperf_datasets/imagenet/imagenet_val_full.txt"
+    }
+    lite {
+      name: "Open images subset for classification"
+      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
+      groundtruth_path: ""
+    }
+    tiny {
+      name: "Imagenet dataset for integration test"
+      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt"
+    }
+  }
+  model {
+    id: "MobileNetEdgeTPUv2-L"
+    name: "MobileNetEdgeTPUv2-L"
+    offset: 0
+    image_width: 384
+    image_height: 384
+    num_classes: 1000
+  }
+}
+
+task {
+  id: "image_classification"
+  name: "Image Classification"
+  min_query_count: 1024
+  min_duration: 60
+  max_duration: 600
+  max_throughput: 1000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  datasets {
+    type: IMAGENET
+    full {
+      name: "Imagenet classification validation set"
+      input_path: "local:///mlperf_datasets/imagenet/img"
+      groundtruth_path: "local:///mlperf_datasets/imagenet/imagenet_val_full.txt"
+    }
+    lite {
+      name: "Open images subset for classification"
+      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
+      groundtruth_path: ""
+    }
+    tiny {
+      name: "Imagenet dataset for integration test"
+      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
+      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt"
+    }
+  }
+  model {
+    id: "mobilenetedgetpu_224_v1_0"
+    name: "MobileNetEdgeTPU 224 1.0"
+    offset: 1
+    image_width: 224
+    image_height: 224
+    num_classes: 1000
   }
 }
 

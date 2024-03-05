@@ -24,6 +24,28 @@ benchmark_setting {
   delegate_selected: "Core ML"
 }
 
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator_name: "ane"
+    accelerator_desc: "ANE"
+    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    batch_size: 64
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    batch_size: 64
+  }
+  delegate_selected: "Core ML"
+}
+
 common_setting {
   id: "shards_num"
   name: "Number of threads for inference"
