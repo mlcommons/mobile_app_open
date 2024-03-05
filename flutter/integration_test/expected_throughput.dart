@@ -73,7 +73,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
     _kS22Ultra: Interval(min: 1700, max: 2400),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 30, max: 55),
+    _kDN2103: Interval(min: 5, max: 90),
   },
 };
 
