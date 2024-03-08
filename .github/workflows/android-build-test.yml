@@ -59,6 +59,11 @@ jobs:
       FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
       FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+      SIGNING_FOR_RELEASE: true
+      SIGNING_STORE_FILE: /tmp/mlperf-keystore.jks
+      SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+      SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v3
       # Preinstalled tools from host at `/opt/hostedtoolcache` is not needed since we run commands inside our own Docker container.
@@ -72,6 +77,9 @@ jobs:
           df -h
       - name: Configure Git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Create keystore file
+        run: |
+          echo "$SIGNING_STORE_FILE_BASE64" | base64 -d > "$SIGNING_STORE_FILE"
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
@@ -166,7 +174,6 @@ jobs:
       - name: Build Android release APK with all backends
         env:
           OFFICIAL_BUILD: true
-          SIGNING_FOR_RELEASE: true
           FIREBASE_CRASHLYTICS_ENABLED: true
           WITH_TFLITE: 1
           WITH_PIXEL: 1
@@ -176,6 +183,8 @@ jobs:
           WITH_APPLE: 0
         run: |
           make flutter/android/release
+          gsutil cp flutter/build/app/outputs/bundle/release/app-release.aab $GCLOUD_BUCKET_PATH/app-release.aab
+          gsutil cp flutter/build/app/outputs/bundle/release/app-release.apk $GCLOUD_BUCKET_PATH/app-release.apk
       - name: Archive Android APKs
         uses: actions/upload-artifact@v3
         with:
@@ -283,3 +292,31 @@ jobs:
             --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
             --device model=OP515BL1,version=33,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
+
+  deploy-playstore:
+    needs:
+      - build-android-apk
+      - test-android-apk-tflite
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Download Android release app
+        run: |
+          gsutil cp $GCLOUD_BUCKET_PATH/app-release.aab /tmp/app-release.aab
+      - name: Upload Android release app to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          releaseFiles: /tmp/app-release.aab
+          packageName: org.mlcommons.android.mlperfbench
+          serviceAccountJsonPlainText: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+          # track: "alpha", "beta", "qa" or "production"
+          track: qa
