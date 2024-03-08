@@ -166,6 +166,7 @@ jobs:
       - name: Build Android release APK with all backends
         env:
           OFFICIAL_BUILD: true
+          SIGNING_FOR_RELEASE: true
           FIREBASE_CRASHLYTICS_ENABLED: true
           WITH_TFLITE: 1
           WITH_PIXEL: 1

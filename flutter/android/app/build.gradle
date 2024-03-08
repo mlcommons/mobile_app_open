@@ -29,12 +29,6 @@ apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-   keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
-
 android {
     compileSdkVersion 33
 
@@ -62,23 +56,30 @@ android {
 
    signingConfigs {
        release {
-           keyAlias keystoreProperties['keyAlias']
-           keyPassword keystoreProperties['keyPassword']
-           storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-           storePassword keystoreProperties['storePassword']
+           keyAlias System.env['SIGNING_KEY_ALIAS']
+           keyPassword System.env['SIGNING_KEY_PASSWORD']
+           storeFile System.env['SIGNING_STORE_FILE'] ? file(System.env['SIGNING_STORE_FILE']) : null
+           storePassword System.env['SIGNING_STORE_PASSWORD']
        }
    }
 
     buildTypes {
         release {
-            // https://docs.flutter.dev/deployment/android#reference-the-keystore-from-the-app
-            signingConfig signingConfigs.release
-
+            // https://docs.flutter.dev/deployment/android#sign-the-app
+            if (System.env['SIGNING_FOR_RELEASE'] == 'true') {
+                println 'Using signingConfigs.release'
+                signingConfig signingConfigs.release
+            } else {
+                println 'Using signingConfigs.debug'
+                signingConfig signingConfigs.debug
+            }
             // By default we do not upload mapping file to Firebase
             firebaseCrashlytics {
                 if (System.env['FIREBASE_CRASHLYTICS_ENABLED'] == 'true') {
+                    println 'mappingFileUploadEnabled set to true'
                     mappingFileUploadEnabled true
                 } else {
+                    println 'mappingFileUploadEnabled set to false'
                     mappingFileUploadEnabled false
                 }
             }
