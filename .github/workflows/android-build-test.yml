@@ -61,6 +61,7 @@ jobs:
       FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
       SIGNING_FOR_RELEASE: true
       SIGNING_STORE_FILE: /tmp/mlperf-keystore.jks
+      SIGNING_STORE_FILE_BASE64: ${{ secrets.SIGNING_STORE_FILE_BASE64 }}
       SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
       SIGNING_KEY_ALIAS: upload
       SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
@@ -81,7 +82,7 @@ jobs:
         run: |
           echo "$SIGNING_STORE_FILE_BASE64" | base64 -d > "$SIGNING_STORE_FILE"
           echo e4699f58310b85cbcb9e835e569e7e17  "$SIGNING_STORE_FILE" | md5sum --check -
-          ll "$SIGNING_STORE_FILE"
+          ls -l "$SIGNING_STORE_FILE"
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
