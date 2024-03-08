@@ -82,7 +82,6 @@ jobs:
         run: |
           echo "$SIGNING_STORE_FILE_BASE64" | base64 -d > "$SIGNING_STORE_FILE"
           echo e4699f58310b85cbcb9e835e569e7e17  "$SIGNING_STORE_FILE" | md5sum --check -
-          ls -l "$SIGNING_STORE_FILE"
       - name: Set up authentication for Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
@@ -187,13 +186,13 @@ jobs:
         run: |
           make flutter/android/release
           gsutil cp flutter/build/app/outputs/bundle/release/app-release.aab $GCLOUD_BUCKET_PATH/app-release.aab
-          gsutil cp flutter/build/app/outputs/bundle/release/app-release.apk $GCLOUD_BUCKET_PATH/app-release.apk
+          gsutil cp flutter/build/app/outputs/flutter-apk/app-release.apk $GCLOUD_BUCKET_PATH/app-release.apk
       - name: Archive Android APKs
         uses: actions/upload-artifact@v3
         with:
           name: android-apks-${{ github.run_number }}
           path: output/android-apks/*.apk
-          retention-days: 30
+          retention-days: 28
           if-no-files-found: error
 
   test-android-apk-tflite:
