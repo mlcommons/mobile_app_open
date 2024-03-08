@@ -116,6 +116,7 @@ or run `make flutter/android/apk` after `make flutter/prepare` and you already h
 
 By default, the Android app will be signed with a debug key. To sign it with a release key for publishing to Play Store,
 follow the instructions at <https://docs.flutter.dev/deployment/android#sign-the-app> and set the environment variables:
+
 ```shell
 export SIGNING_FOR_RELEASE=true
 export SIGNING_STORE_FILE=/path/to/keystore.jks
