@@ -33,7 +33,8 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
     List<ExtendedResult> results = localResults + remoteResults;
     results = results.where((result) => filter.match(result)).toList();
     results = sort.apply(results);
-    List<ListItem> itemsList = _listItems(results);
+
+    List<ListItem> itemsList = results.map((e) => _listItem(e)).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -111,16 +112,14 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
     );
   }
 
-  List<ListItem> _listItems(List<ExtendedResult> results) {
-    return results.map((result) {
-      return HistoryListItem(result, () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LocalExtendedResultScreen(result: result),
-          ),
-        ).then((value) => setState(() {}));
-      });
-    }).toList();
+  HistoryListItem _listItem(ExtendedResult result) {
+    return HistoryListItem(result, () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LocalExtendedResultScreen(result: result),
+        ),
+      ).then((value) => setState(() {}));
+    });
   }
 }
