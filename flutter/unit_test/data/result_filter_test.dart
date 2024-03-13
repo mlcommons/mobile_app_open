@@ -79,23 +79,6 @@ void main() {
       expect(filter.match(result), isFalse);
     });
 
-    test('benchmarkId matched', () {
-      final filter = ResultFilter()..benchmarkId = 'image_classification';
-      List<BenchmarkExportResult> benchmarks = result.results
-          .where((benchmark) => filter.matchBenchmark(benchmark))
-          .toList();
-
-      expect(benchmarks.length == 1, isTrue);
-    });
-
-    test('benchmarkId not matched', () {
-      final filter = ResultFilter()..benchmarkId = 'image_classification_v2';
-      List<BenchmarkExportResult> benchmarks = result.results
-          .where((benchmark) => filter.matchBenchmark(benchmark))
-          .toList();
-      expect(benchmarks.length == 1, isFalse);
-    });
-
     test('multiple filters matched', () {
       final filter = ResultFilter()
         ..platform = EnvPlatform.ios.name

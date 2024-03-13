@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench/data/results/benchmark_result.dart';
+import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/history/list_item.dart';
-import 'package:mlperfbench/ui/icons.dart';
 
 class HistoryListItem implements ListItem {
-  final BenchmarkExportResult item;
+  final ExtendedResult item;
   final void Function()? tapHandler;
 
   HistoryListItem(this.item, this.tapHandler);
@@ -23,12 +22,12 @@ class HistoryListItem implements ListItem {
       leading: SizedBox(
         width: leadingWidth,
         height: leadingWidth,
-        child: BenchmarkIcons.getDarkIcon(item.benchmarkId),
+        child: const Text('leading'),
       ),
       title: SizedBox(
         width: subtitleWidth,
         child: Text(
-          item.benchmarkName,
+          item.meta.uuid,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -44,20 +43,20 @@ class HistoryListItem implements ListItem {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+            children: const [
               Flexible(
                 flex: 8,
                 fit: FlexFit.tight,
                 child: Text(
-                  itemScore(),
-                  style: const TextStyle(
+                  'itemScore()',
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.0,
                     color: AppColors.resultValidText,
                   ),
                 ),
               ),
-              const Flexible(
+              Flexible(
                 flex: 2,
                 fit: FlexFit.tight,
                 child: Icon(Icons.chevron_right),
@@ -68,36 +67,14 @@ class HistoryListItem implements ListItem {
     );
   }
 
-  String itemScore() {
-    final throughput = item.performanceRun?.throughput;
-    final accuracy = item.accuracyRun?.accuracy;
-    var throughputString = 'n/a';
-    var accuracyString = 'n/a';
-    if (throughput != null) {
-      throughputString = throughput.toUIString();
-    }
-    if (accuracy != null) {
-      accuracyString = accuracy.formatted;
-    }
-    return '$throughputString\n$accuracyString';
-  }
-
   String itemDateTime() {
-    final prDateTime = item.performanceRun?.startDatetime;
-    final arDateTime = item.accuracyRun?.startDatetime;
-    if (prDateTime != null) {
-      return prDateTime.toUIString();
-    } else if (arDateTime != null) {
-      return arDateTime.toUIString();
-    } else {
-      return 'unknown';
-    }
+    return item.meta.creationDate.toUIString();
   }
 
   String itemAdditionalInfo() {
-    final backendName = item.backendInfo.backendName;
-    final delegateName = item.backendSettings.delegate;
-    final acceleratorName = item.backendInfo.acceleratorName;
+    final backendName = item.results.first.backendInfo.backendName;
+    final delegateName = item.results.first.backendSettings.delegate;
+    final acceleratorName = item.results.first.backendInfo.acceleratorName;
     // This matched the UI in ResultScreen._createListOfBenchmarkResultBottomWidgets()
     final backendInfo = '$backendName | $delegateName | $acceleratorName';
     return backendInfo;

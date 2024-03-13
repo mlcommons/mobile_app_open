@@ -68,20 +68,17 @@ class ResultFilter {
     bool manufacturerMatched =
         resultManufacturer.containsIgnoreCase(manufacturer ?? '');
     bool socMatched = resultSoc.containsIgnoreCase(soc ?? '');
-
+    bool benchmarkIdMatched = benchmarkId == null
+        ? true
+        : result.results.any((e) => e.benchmarkId == benchmarkId);
     return fromCreationDateMatched &&
         toCreationDateMatched &&
         platformMatched &&
         deviceModelMatched &&
         backendMatched &&
         manufacturerMatched &&
-        socMatched;
-  }
-
-  bool matchBenchmark(BenchmarkExportResult result) {
-    bool benchmarkIdMatched =
-        benchmarkId == null ? true : result.benchmarkId == benchmarkId;
-    return benchmarkIdMatched;
+        socMatched &&
+        benchmarkIdMatched;
   }
 
   bool get anyFilterActive {
