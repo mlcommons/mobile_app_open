@@ -4,7 +4,9 @@ import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/data/extended_result.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/history/list_item.dart';
 import 'package:mlperfbench/ui/icons.dart';
 
@@ -26,7 +28,7 @@ class HistoryListItem implements ListItem {
       title: SizedBox(
         width: subtitleWidth,
         child: Text(
-          item.environmentInfo.modelDescription,
+          '${item.environmentInfo.modelDescription}\n',
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -57,7 +59,7 @@ class HistoryListItem implements ListItem {
               const Flexible(
                 flex: 1,
                 fit: FlexFit.tight,
-                child: Icon(Icons.chevron_right),
+                child: Icon(Icons.chevron_right, color: AppColors.primary),
               ),
             ],
           )),
@@ -70,6 +72,8 @@ class HistoryListItem implements ListItem {
     for (String id in BenchmarkId.allIds) {
       final benchmark =
           item.results.firstWhereOrNull((e) => e.benchmarkId == id);
+      Color throughputTextColor = AppColors.resultValidText;
+      Color accuracyTextColor = AppColors.resultValidText;
       final icon = SizedBox(
         width: 20,
         height: 20,
@@ -80,9 +84,14 @@ class HistoryListItem implements ListItem {
         iconWidget = icon;
       } else {
         iconWidget = ColorFiltered(
-          colorFilter: _matrixColorFilter,
-          child: icon,
+          colorFilter: _greyscaleColorFilter,
+          child: Opacity(
+            opacity: 0.4,
+            child: icon,
+          ),
         );
+        throughputTextColor = Colors.transparent;
+        accuracyTextColor = Colors.transparent;
       }
       final throughput = benchmark?.performanceRun?.throughput;
       final accuracy = benchmark?.accuracyRun?.accuracy;
@@ -90,13 +99,29 @@ class HistoryListItem implements ListItem {
       var accuracyString = 'n/a';
       if (throughput != null) {
         throughputString = throughput.value.toStringAsFixed(0);
+        switch (benchmark?.performanceRun?.loadgenInfo?.resultValidity) {
+          case ResultValidityEnum.valid:
+            throughputTextColor = AppColors.resultValidText;
+            break;
+          case ResultValidityEnum.invalid:
+            throughputTextColor = AppColors.resultInvalidText;
+            break;
+          case ResultValidityEnum.semivalid:
+            throughputTextColor = AppColors.resultSemiValidText;
+            break;
+          case null:
+            break;
+        }
       }
       if (accuracy != null) {
         accuracyString = accuracy.normalized.toStringAsFixed(2);
+        accuracyTextColor = accuracy.isInBounds()
+            ? AppColors.resultValidText
+            : AppColors.resultInvalidText;
       }
       children.add(
         Container(
-          width: 60,
+          width: 44,
           height: 80,
           padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
           child: Column(
@@ -107,14 +132,14 @@ class HistoryListItem implements ListItem {
                 fit: BoxFit.fitWidth,
                 child: Text(
                   throughputString,
-                  style: const TextStyle(fontSize: 12),
+                  style: TextStyle(fontSize: 12, color: throughputTextColor),
                 ),
               ),
               FittedBox(
                 fit: BoxFit.fitWidth,
                 child: Text(
                   accuracyString,
-                  style: const TextStyle(fontSize: 12),
+                  style: TextStyle(fontSize: 12, color: accuracyTextColor),
                 ),
               ),
             ],
@@ -129,7 +154,7 @@ class HistoryListItem implements ListItem {
   }
 }
 
-const _matrixColorFilter = ColorFilter.matrix(<double>[
+const _greyscaleColorFilter = ColorFilter.matrix(<double>[
   0.2126,
   0.7152,
   0.0722,
