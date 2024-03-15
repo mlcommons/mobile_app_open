@@ -125,24 +125,34 @@ class HistoryListItem implements ListItem {
       children.add(
         Container(
           width: 44,
-          height: 80,
           padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              iconWidget,
+              Expanded(
+                flex: 4,
+                child: iconWidget,
+              ),
               const SizedBox(height: 8),
-              FittedBox(
-                fit: BoxFit.fitWidth,
-                child: Text(
-                  throughputString,
-                  style: TextStyle(fontSize: 12, color: throughputTextColor),
+              Expanded(
+                flex: 3,
+                child: FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Text(
+                    throughputString,
+                    style: TextStyle(fontSize: 12, color: throughputTextColor),
+                  ),
                 ),
               ),
-              FittedBox(
-                fit: BoxFit.fitWidth,
-                child: Text(
-                  accuracyString,
-                  style: TextStyle(fontSize: 12, color: accuracyTextColor),
+              Expanded(
+                flex: 3,
+                child: FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Text(
+                    accuracyString,
+                    style: TextStyle(fontSize: 12, color: accuracyTextColor),
+                  ),
                 ),
               ),
             ],

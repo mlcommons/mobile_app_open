@@ -154,9 +154,7 @@
   "historyFilterDeviceModel": "Device Model",
   "historyFilterManufacturer": "Manufacturer",
   "historyFilterSoC": "SoC",
-  "historySortBy": "Sort by",
   "historySortByDate": "Date",
-  "historySortByTaskThroughput": "Task Throughput",
 
   "historyDetailsTitle": "Result details",
   "historyDetailsBuildTypeDebug": "debug build",
