@@ -7,8 +7,11 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
-import 'package:mlperfbench/ui/history/list_item.dart';
 import 'package:mlperfbench/ui/icons.dart';
+
+abstract class ListItem {
+  Widget build(BuildContext context);
+}
 
 class HistoryListItem implements ListItem {
   final ExtendedResult item;

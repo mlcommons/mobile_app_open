@@ -10,7 +10,6 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/history/extended_result_screen.dart';
 import 'package:mlperfbench/ui/history/history_filter_screen.dart';
 import 'package:mlperfbench/ui/history/history_list_item.dart';
-import 'package:mlperfbench/ui/history/list_item.dart';
 
 class HistoryListScreen extends StatefulWidget {
   const HistoryListScreen({Key? key}) : super(key: key);
@@ -34,7 +33,7 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
     results = results.where((result) => filter.match(result)).toList();
     results = sort.apply(results);
 
-    List<ListItem> itemsList = results.map((e) => _listItem(e)).toList();
+    final itemsList = results.map((e) => _listItem(e)).toList();
 
     return Scaffold(
       appBar: AppBar(

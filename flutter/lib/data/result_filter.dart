@@ -2,7 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 import 'package:mlperfbench/data/environment/environment_info.dart';
 import 'package:mlperfbench/data/extended_result.dart';
-import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/data/string_constants.dart';
 
 part 'result_filter.g.dart';
