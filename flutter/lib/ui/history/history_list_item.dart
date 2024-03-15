@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
+import 'package:intl/intl.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/data/extended_result.dart';
-import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/history/list_item.dart';
 import 'package:mlperfbench/ui/icons.dart';
 
@@ -13,6 +13,8 @@ class HistoryListItem implements ListItem {
   final void Function()? tapHandler;
 
   HistoryListItem(this.item, this.tapHandler);
+
+  final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
   @override
   Widget build(BuildContext context) {
@@ -25,14 +27,20 @@ class HistoryListItem implements ListItem {
         width: subtitleWidth,
         child: Text(
           item.environmentInfo.modelDescription,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       subtitle: SizedBox(
         width: subtitleWidth,
-        child: Text(
-          _itemDateTime(),
-          style: const TextStyle(fontWeight: FontWeight.normal, height: 1.4),
+        height: 24,
+        child: FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Text(
+            dateFormat.format(item.meta.creationDate),
+            style: const TextStyle(fontWeight: FontWeight.normal),
+          ),
         ),
       ),
       trailing: SizedBox(
@@ -42,12 +50,12 @@ class HistoryListItem implements ListItem {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Flexible(
-                flex: 8,
+                flex: 9,
                 fit: FlexFit.tight,
                 child: _resultList(),
               ),
               const Flexible(
-                flex: 2,
+                flex: 1,
                 fit: FlexFit.tight,
                 child: Icon(Icons.chevron_right),
               ),
@@ -55,10 +63,6 @@ class HistoryListItem implements ListItem {
           )),
       onTap: tapHandler,
     );
-  }
-
-  String _itemDateTime() {
-    return item.meta.creationDate.toUIString();
   }
 
   Widget _resultList() {
@@ -82,13 +86,13 @@ class HistoryListItem implements ListItem {
       }
       final throughput = benchmark?.performanceRun?.throughput;
       final accuracy = benchmark?.accuracyRun?.accuracy;
-      var throughputString = '';
-      var accuracyString = '';
+      var throughputString = 'n/a';
+      var accuracyString = 'n/a';
       if (throughput != null) {
-        throughputString = throughput.toUIString();
+        throughputString = throughput.value.toStringAsFixed(0);
       }
       if (accuracy != null) {
-        accuracyString = accuracy.formatted;
+        accuracyString = accuracy.normalized.toStringAsFixed(2);
       }
       children.add(
         Container(
@@ -103,14 +107,14 @@ class HistoryListItem implements ListItem {
                 fit: BoxFit.fitWidth,
                 child: Text(
                   throughputString,
-                  style: const TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 12),
                 ),
               ),
               FittedBox(
                 fit: BoxFit.fitWidth,
                 child: Text(
                   accuracyString,
-                  style: const TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 12),
                 ),
               ),
             ],
