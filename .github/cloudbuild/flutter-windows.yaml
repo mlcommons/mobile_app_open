@@ -34,7 +34,7 @@ steps:
       - --region=$_CE_REGION
       - --zone=$_CE_ZONE
       - --machineType=$_CE_MACHINE_TYPE
-      - --image=projects/windows-cloud/global/images/windows-server-2019-dc-v20240313
+      - --image=projects/gce-uefi-images/global/images/windows-server-2019-dc-for-containers-v20200512
       # When using other disk types image pulling and image building could take up to 3 hours
       - --diskType=pd-ssd
       - --workspace-bucket=$_WORKSPACE_TMP_BUCKET
