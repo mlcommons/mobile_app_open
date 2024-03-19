@@ -1,0 +1,284 @@
+name: Android Build & Test
+
+on:
+  push:
+    branches: [ master, submission-v* ]
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+env:
+  GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}
+
+jobs:
+  build-android-image:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata for Docker image
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/mlcommons/mobile_app_open-android
+          flavor: latest=true
+          tags: type=raw,value=${{ github.run_number }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: flutter/android/docker
+          file: flutter/android/docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-android-apk:
+    needs: build-android-image
+    runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
+    timeout-minutes: 120
+    env:
+      BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
+      BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
+      FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
+      FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
+      FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+      FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+      FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+    steps:
+      - uses: actions/checkout@v3
+      # Preinstalled tools from host at `/opt/hostedtoolcache` is not needed since we run commands inside our own Docker container.
+      # `/opt/hostedtoolcache` is mounted to `/__t`. We delete it to free up disk space.
+      - name: Free up disk space
+        run: |
+          echo BEFORE:
+          df -h
+          rm -rf /__t/*
+          echo AFTER:
+          df -h
+      - name: Configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Install AWS CLI
+        run: |
+          python3 -m pip install awscli
+      - name: Download Samsung libraries
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_R2_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_R2_SECRET_KEY }}
+        run: |
+          aws s3 --endpoint-url=https://c2686074cb2caf5cbaf6d134bdba8b47.r2.cloudflarestorage.com \
+          cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/samsung_libs_v3.1_20231116.zip /tmp/ && \
+          unzip /tmp/samsung_libs_v3.1_20231116.zip -d /tmp/samsung_libs_v3.1_20231116 && \
+          rm /tmp/samsung_libs_v3.1_20231116.zip && \
+          mkdir -p mobile_back_samsung/samsung/lib/internal && \
+          mv /tmp/samsung_libs_v3.1_20231116/* mobile_back_samsung/samsung/lib/internal/
+      - name: Download QTI libraries
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.READONLY_R2_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.READONLY_R2_SECRET_KEY }}
+        run: |
+          aws s3 --endpoint-url=https://c2686074cb2caf5cbaf6d134bdba8b47.r2.cloudflarestorage.com \
+          cp --quiet s3://mlcommons-mobile-wg-private/libs/v3.1/qaisw-2.13.4.230831213719_60417-linux.zip /tmp/ && \
+          unzip -P ${{ secrets.READONLY_AWS_KEY }} /tmp/qaisw-2.13.4.230831213719_60417-linux.zip -d /tmp/qaisw-2.13.4.230831213719_60417-linux && \
+          rm /tmp/qaisw-2.13.4.230831213719_60417-linux.zip && \
+          mv /tmp/qaisw-2.13.4.230831213719_60417-linux/qaisw-2.13.4.230831213719_60417 mobile_back_qti/
+      - name: Cache bazel
+        uses: actions/cache@v3
+        with:
+          path: /tmp/bazel_cache
+          key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-bazel_cache-
+      - name: Run Flutter unit tests
+        run: |
+          make flutter/prepare && make flutter/test/unit
+      - name: Build and upload test APK for TFLite
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-tflite.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-tflite.apk
+      - name: Build and upload test APK for Pixel
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 0
+          WITH_PIXEL: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-pixel.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-pixel.apk
+      - name: Build and upload test APK for QTI
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 0
+          WITH_QTI: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-qti.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-qti.apk
+      - name: Build and upload test APK for MediaTek
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 0
+          WITH_MEDIATEK: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-mtk.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-mtk.apk
+      - name: Build and upload test APK for Samsung
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 0
+          WITH_SAMSUNG: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-samsung.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-samsung.apk
+      - name: Build Android release APK with all backends
+        env:
+          OFFICIAL_BUILD: true
+          FIREBASE_CRASHLYTICS_ENABLED: true
+          WITH_TFLITE: 1
+          WITH_PIXEL: 1
+          WITH_MEDIATEK: 1
+          WITH_QTI: 1
+          WITH_SAMSUNG: 1
+          WITH_APPLE: 0
+        run: |
+          make flutter/android/release
+      - name: Archive Android APKs
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apks-${{ github.run_number }}
+          path: output/android-apks/*.apk
+          retention-days: 30
+          if-no-files-found: error
+
+  test-android-apk-tflite:
+    needs: build-android-apk
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Trigger Firebase Test Lab for [Google Pixel 6](oriole)
+        run: |
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app $GCLOUD_BUCKET_PATH/test-main-tflite.apk \
+            --test $GCLOUD_BUCKET_PATH/test-helper-tflite.apk \
+            --timeout 30m \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
+            --device model=oriole,version=31,locale=en,orientation=portrait \
+            --client-details=buildNumber=${{ github.run_number }}
+
+  test-android-apk-pixel:
+    needs: build-android-apk
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Trigger Firebase Test Lab for [Google Pixel 6](oriole)
+        run: |
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app $GCLOUD_BUCKET_PATH/test-main-pixel.apk \
+            --test $GCLOUD_BUCKET_PATH/test-helper-pixel.apk \
+            --timeout 30m \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
+            --device model=oriole,version=32,locale=en,orientation=portrait \
+            --client-details=buildNumber=${{ github.run_number }}
+
+  test-android-apk-qti:
+    needs: build-android-apk
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Trigger Firebase Test Lab for [Samsung Galaxy S22 Ultra](b0q)
+        run: |
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app $GCLOUD_BUCKET_PATH/test-main-qti.apk \
+            --test $GCLOUD_BUCKET_PATH/test-helper-qti.apk \
+            --timeout 30m \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
+            --device model=b0q,version=33,locale=en,orientation=portrait \
+            --client-details=buildNumber=${{ github.run_number }}
+
+  test-android-apk-mtk:
+    needs: build-android-apk
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Trigger Firebase Test Lab for [OnePlus DN2103](OP515BL1)
+        run: |
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app $GCLOUD_BUCKET_PATH/test-main-mtk.apk \
+            --test $GCLOUD_BUCKET_PATH/test-helper-mtk.apk \
+            --timeout 30m \
+            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
+            --device model=OP515BL1,version=33,locale=en,orientation=portrait \
+            --client-details=buildNumber=${{ github.run_number }}
