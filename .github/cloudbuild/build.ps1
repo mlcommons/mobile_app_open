@@ -35,6 +35,10 @@ echo "script run time: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $startTime
 echo "previous step took: $("{0:HH:mm:ss}" -f ([datetime]$($(get-date) - $stepTime).Ticks))"
 $stepTime = $(get-date)
 
+echo "installing Docker CE..."
+Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/Windows-Containers/Main/helpful_tools/Install-DockerCE/install-docker-ce.ps1" -o install-docker-ce.ps1
+.\install-docker-ce.ps1
+
 echo "configuring docker for GCR access..."
 cmd /S /C "gcloud auth configure-docker <NUL"
 if (!$?) { echo "error code: $($LastExitCode)"; [System.Environment]::Exit($LastExitCode) }
