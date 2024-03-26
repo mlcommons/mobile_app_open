@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/device_info.dart';
@@ -233,21 +234,19 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
             (throughput?.value ?? 0.0) / benchmark.info.maxThroughput;
         resultText2 = null;
         progressBarValue2 = null;
-        final loadgenInfo = benchmarkResult?.loadgenInfo;
-        if (loadgenInfo != null) {
-          if (loadgenInfo.isMinDurationMet == true &&
-              loadgenInfo.isMinQueryMet == true &&
-              loadgenInfo.isEarlyStoppingMet == true) {
+        switch (benchmarkResult?.loadgenInfo?.resultValidity) {
+          case ResultValidityEnum.valid:
             resultTextColor = AppColors.resultValidText;
-          } else if (loadgenInfo.isMinDurationMet == true &&
-              loadgenInfo.isMinQueryMet == false &&
-              loadgenInfo.isEarlyStoppingMet == true) {
-            resultTextColor = AppColors.resultSemiValidText;
-          } else {
+            break;
+          case ResultValidityEnum.invalid:
             resultTextColor = AppColors.resultInvalidText;
-          }
-        } else {
-          resultTextColor = AppColors.resultInvalidText;
+            break;
+          case ResultValidityEnum.semivalid:
+            resultTextColor = AppColors.resultSemiValidText;
+            break;
+          case null:
+            resultTextColor = AppColors.resultInvalidText;
+            break;
         }
         break;
       case _ScreenMode.accuracy:
