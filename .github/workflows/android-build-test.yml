@@ -320,5 +320,5 @@ jobs:
           releaseFiles: /tmp/app-release.aab
           packageName: org.mlcommons.android.mlperfbench
           serviceAccountJsonPlainText: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
-          # track: "alpha", "beta", "qa" or "production"
-          track: qa
+          # track: "alpha", "beta", "internal" or "production"
+          track: internal
