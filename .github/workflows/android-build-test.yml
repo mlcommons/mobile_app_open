@@ -316,3 +316,4 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
           # track: "alpha", "beta", "internal" or "production"
           track: internal
+          status: draft
