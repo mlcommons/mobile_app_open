@@ -92,19 +92,23 @@ jobs:
           version: '>= 363.0.0'
           project_id: mobile-app-build-290400
       - name: Download Samsung libraries
+        env:
+          SAMSUNG_LIB: samsung_libs_v3.1_20231116
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v3.1/samsung_libs_v3.1_20231116.zip /tmp/ && \
-          unzip /tmp/samsung_libs_v3.1_20231116.zip -d /tmp/samsung_libs_v3.1_20231116 && \
-          rm /tmp/samsung_libs_v3.1_20231116.zip && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v3.1/${SAMSUNG_LIB}.zip /tmp/ && \
+          unzip /tmp/${SAMSUNG_LIB}.zip -d /tmp/${SAMSUNG_LIB} && \
+          rm /tmp/${SAMSUNG_LIB}.zip && \
           mkdir -p mobile_back_samsung/samsung/lib/internal && \
-          mv /tmp/samsung_libs_v3.1_20231116/* mobile_back_samsung/samsung/lib/internal/
+          mv /tmp/${SAMSUNG_LIB}/* mobile_back_samsung/samsung/lib/internal/
       - name: Download QTI libraries
+        env:
+          QTI_LIB: qaisw-2.13.4.230831213719_60417
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v3.1/qaisw-2.13.4.230831213719_60417-linux.zip /tmp/ && \
-          unzip /tmp/qaisw-2.13.4.230831213719_60417-linux.zip -d /tmp/qaisw-2.13.4.230831213719_60417-linux && \
-          rm /tmp/qaisw-2.13.4.230831213719_60417-linux.zip && \
-          mkdir -p mobile_back_qti/qaisw-2.13.4.230831213719_60417 && \
-          mv /tmp/qaisw-2.13.4.230831213719_60417-linux/* mobile_back_qti/qaisw-2.13.4.230831213719_60417/
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v3.1/${QTI_LIB}.zip /tmp/ && \
+          unzip /tmp/${QTI_LIB}.zip -d /tmp/${QTI_LIB} && \
+          rm /tmp/${QTI_LIB}.zip && \
+          mkdir -p mobile_back_qti/${QTI_LIB} && \
+          mv /tmp/${QTI_LIB}/* mobile_back_qti/${QTI_LIB}/
       - name: Cache bazel
         uses: actions/cache@v3
         with:
