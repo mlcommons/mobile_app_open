@@ -19,7 +19,7 @@ ANDROID_NDK_VERSION?=25
 ANDROID_NDK_API_LEVEL?=33
 
 flutter/android: flutter/android/libs flutter/check/firebase-env
-flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk
+flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk flutter/android/appbundle
 flutter/android/libs: flutter/android/libs/checksum flutter/android/libs/build flutter/android/libs/copy
 # run `make flutter/android/apk` before `flutter/android/test-apk`
 flutter/android/test-apk: flutter/android/test-apk/main flutter/android/test-apk/helper
@@ -76,7 +76,16 @@ flutter/android/apk:
 		${flutter_firebase_crashlytics_arg} \
 		${flutter_build_number_arg} \
 		${flutter_folder_args}
-	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk ${flutter_android_apk_release_path}
+	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk ${flutter_android_apk_release_path}.apk
+.PHONY: flutter/android/appbundle
+flutter/android/appbundle:
+	mkdir -p $$(dirname ${flutter_android_apk_release_path})
+	cd flutter && ${_start_args} flutter --no-version-check build appbundle \
+		${flutter_official_build_arg} \
+		${flutter_firebase_crashlytics_arg} \
+		${flutter_build_number_arg} \
+		${flutter_folder_args}
+	cp -f flutter/build/app/outputs/bundle/release/app-release.aab ${flutter_android_apk_release_path}.aab
 
 FLUTTER_ANDROID_APK_TEST_MAIN?=test-main.apk
 flutter_android_apk_test_main_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_MAIN}

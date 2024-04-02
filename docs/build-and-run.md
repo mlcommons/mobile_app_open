@@ -114,6 +114,17 @@ See [Windows environment setup guide](./environment-setup/env-setup-windows.md#s
 Run `make OFFICIAL_BUILD=false FLUTTER_BUILD_NUMBER=0 flutter/android/release` to build APK from scratch,
 or run `make flutter/android/apk` after `make flutter/prepare` and you already have native libs.
 
+By default, the Android app will be signed with a debug key. To sign it with a release key for publishing to Play Store,
+follow the instructions at <https://docs.flutter.dev/deployment/android#sign-the-app> and set the environment variables:
+
+```shell
+export SIGNING_FOR_RELEASE=true
+export SIGNING_STORE_FILE=/path/to/keystore.jks
+export SIGNING_STORE_PASSWORD=abc
+export SIGNING_KEY_ALIAS=abc
+export SIGNING_KEY_PASSWORD=abc
+```
+
 You can build the app using docker.  
 Run `make OFFICIAL_BUILD=false FLUTTER_BUILD_NUMBER=0 docker/flutter/android/release` to build release APK.  
 Run `make docker/flutter/android/libs` to build just `.so` libs. This command is helpful if you want to build Android version of the app on Windows.
