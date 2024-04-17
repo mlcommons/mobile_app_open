@@ -1,42 +1,51 @@
 import 'package:flutter/material.dart';
 
-import 'package:mlperfbench/data/results/benchmark_result.dart';
+import 'package:collection/collection.dart';
+import 'package:intl/intl.dart';
+
+import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/backend/loadgen_info.dart';
+import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
-import 'package:mlperfbench/ui/formatter.dart';
-import 'package:mlperfbench/ui/history/list_item.dart';
 import 'package:mlperfbench/ui/icons.dart';
 
+abstract class ListItem {
+  Widget build(BuildContext context);
+}
+
 class HistoryListItem implements ListItem {
-  final BenchmarkExportResult item;
+  final ExtendedResult item;
   final void Function()? tapHandler;
 
   HistoryListItem(this.item, this.tapHandler);
 
+  final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+
   @override
   Widget build(BuildContext context) {
-    final leadingWidth = 0.08 * MediaQuery.of(context).size.width;
-    final subtitleWidth = 0.64 * MediaQuery.of(context).size.width;
-    final trailingWidth = 0.28 * MediaQuery.of(context).size.width;
+    final subtitleWidth = 0.40 * MediaQuery.of(context).size.width;
+    final trailingWidth = 0.60 * MediaQuery.of(context).size.width;
     return ListTile(
       contentPadding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
       minVerticalPadding: 0,
-      leading: SizedBox(
-        width: leadingWidth,
-        height: leadingWidth,
-        child: BenchmarkIcons.getDarkIcon(item.benchmarkId),
-      ),
       title: SizedBox(
         width: subtitleWidth,
         child: Text(
-          item.benchmarkName,
+          '${item.environmentInfo.modelDescription}\n',
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       subtitle: SizedBox(
         width: subtitleWidth,
-        child: Text(
-          '${itemAdditionalInfo()}\n${itemDateTime()}',
-          style: const TextStyle(fontWeight: FontWeight.normal, height: 1.4),
+        height: 24,
+        child: FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Text(
+            dateFormat.format(item.meta.creationDate),
+            style: const TextStyle(fontWeight: FontWeight.normal),
+          ),
         ),
       ),
       trailing: SizedBox(
@@ -46,21 +55,14 @@ class HistoryListItem implements ListItem {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Flexible(
-                flex: 8,
+                flex: 9,
                 fit: FlexFit.tight,
-                child: Text(
-                  itemScore(),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.0,
-                    color: AppColors.resultValidText,
-                  ),
-                ),
+                child: _resultList(),
               ),
               const Flexible(
-                flex: 2,
+                flex: 1,
                 fit: FlexFit.tight,
-                child: Icon(Icons.chevron_right),
+                child: Icon(Icons.chevron_right, color: AppColors.primary),
               ),
             ],
           )),
@@ -68,38 +70,122 @@ class HistoryListItem implements ListItem {
     );
   }
 
-  String itemScore() {
-    final throughput = item.performanceRun?.throughput;
-    final accuracy = item.accuracyRun?.accuracy;
-    var throughputString = 'n/a';
-    var accuracyString = 'n/a';
-    if (throughput != null) {
-      throughputString = throughput.toUIString();
+  Widget _resultList() {
+    List<Widget> children = [];
+    for (String id in BenchmarkId.allIds) {
+      final benchmark =
+          item.results.firstWhereOrNull((e) => e.benchmarkId == id);
+      Color throughputTextColor = AppColors.resultValidText;
+      Color accuracyTextColor = AppColors.resultValidText;
+      final icon = SizedBox(
+        width: 20,
+        height: 20,
+        child: BenchmarkIcons.getDarkIcon(id),
+      );
+      Widget iconWidget;
+      if (benchmark != null) {
+        iconWidget = icon;
+      } else {
+        iconWidget = ColorFiltered(
+          colorFilter: _greyscaleColorFilter,
+          child: Opacity(
+            opacity: 0.4,
+            child: icon,
+          ),
+        );
+        throughputTextColor = Colors.transparent;
+        accuracyTextColor = Colors.transparent;
+      }
+      final throughput = benchmark?.performanceRun?.throughput;
+      final accuracy = benchmark?.accuracyRun?.accuracy;
+      var throughputString = 'n/a';
+      var accuracyString = 'n/a';
+      if (throughput != null) {
+        throughputString = throughput.value.toStringAsFixed(0);
+        switch (benchmark?.performanceRun?.loadgenInfo?.resultValidity) {
+          case ResultValidityEnum.valid:
+            throughputTextColor = AppColors.resultValidText;
+            break;
+          case ResultValidityEnum.invalid:
+            throughputTextColor = AppColors.resultInvalidText;
+            break;
+          case ResultValidityEnum.semivalid:
+            throughputTextColor = AppColors.resultSemiValidText;
+            break;
+          case null:
+            break;
+        }
+      }
+      if (accuracy != null) {
+        accuracyString = accuracy.normalized.toStringAsFixed(2);
+        accuracyTextColor = accuracy.isInBounds()
+            ? AppColors.resultValidText
+            : AppColors.resultInvalidText;
+      }
+      children.add(
+        Container(
+          width: 44,
+          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 4,
+                child: iconWidget,
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                flex: 3,
+                child: FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Text(
+                    throughputString,
+                    style: TextStyle(fontSize: 12, color: throughputTextColor),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Text(
+                    accuracyString,
+                    style: TextStyle(fontSize: 12, color: accuracyTextColor),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
-    if (accuracy != null) {
-      accuracyString = accuracy.formatted;
-    }
-    return '$throughputString\n$accuracyString';
-  }
-
-  String itemDateTime() {
-    final prDateTime = item.performanceRun?.startDatetime;
-    final arDateTime = item.accuracyRun?.startDatetime;
-    if (prDateTime != null) {
-      return prDateTime.toUIString();
-    } else if (arDateTime != null) {
-      return arDateTime.toUIString();
-    } else {
-      return 'unknown';
-    }
-  }
-
-  String itemAdditionalInfo() {
-    final backendName = item.backendInfo.backendName;
-    final delegateName = item.backendSettings.delegate;
-    final acceleratorName = item.backendInfo.acceleratorName;
-    // This matched the UI in ResultScreen._createListOfBenchmarkResultBottomWidgets()
-    final backendInfo = '$backendName | $delegateName | $acceleratorName';
-    return backendInfo;
+    return ListView(
+      scrollDirection: Axis.horizontal,
+      children: children,
+    );
   }
 }
+
+const _greyscaleColorFilter = ColorFilter.matrix(<double>[
+  0.2126,
+  0.7152,
+  0.0722,
+  0,
+  0,
+  0.2126,
+  0.7152,
+  0.0722,
+  0,
+  0,
+  0.2126,
+  0.7152,
+  0.0722,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+]);

@@ -71,9 +71,15 @@ dependency_overrides:
   # https://github.com/mlcommons/mobile_app_open/issues/777
   archive: ^3.3.9
 
-flutter_icons:
-  ios: true
+flutter_launcher_icons:
   image_path: "assets/ic_launcher_ios.png"
+  ios: true
+  android: "ic_launcher"
+  min_sdk_android: 21
+  windows:
+    generate: true
+    image_path: "assets/ic_launcher_ios.png"
+    icon_size: 256
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
