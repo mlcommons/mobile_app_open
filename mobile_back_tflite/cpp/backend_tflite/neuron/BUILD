@@ -9,6 +9,7 @@ pbtxt2header(
     name = "tflite_settings",
     srcs = [
         "backend_settings/tflite_settings_mtk.pbtxt",
+        "backend_settings/tflite_settings_mtk_mt6989.pbtxt",
     ],
 )
 
@@ -29,8 +30,16 @@ cc_library(
 
 cc_library(
     name = "tflite_neuron_c",
-    srcs = ["//mobile_back_tflite/cpp/backend_tflite:tflite_c.cc"],
+    srcs = [
+        "neuron_backend.cc",
+        "//mobile_back_tflite/cpp/backend_tflite:tflite_c.cc",
+    ],
     hdrs = [
+        "APUWareUtilsLib.h",
+        "NeuronAdapter.h",
+        "NeuronAdapterShim.h",
+        "neuron_backend.h",
+        "neuron_builder.h",
         "tflite_settings_mtk.h",
         "//mobile_back_tflite/cpp/backend_tflite:tflite_settings_android.h",
         "//mobile_back_tflite/cpp/backend_tflite:tflite_settings_apple.h",

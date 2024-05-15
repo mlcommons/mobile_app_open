@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2022 Qualcomm Innovation Center, Inc. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -28,6 +28,8 @@ limitations under the License.
 #define DEFAULT_SOC_STR "Default"
 #define UNSUPPORTED_SOC_STR "Unsupported"
 #define UNSUPPORTED_SOC_ID 0
+
+extern bool useIonBuffer_g;
 
 class SocInfo {
  public:
@@ -95,6 +97,10 @@ class Socs {
 #endif
  public:
   static void soc_info_init();
+#ifndef __ANDROID__
+  static std::string getServiceBinaryPath(std::wstring const &serviceName);
+#endif
+  static std::string get_external_config_string();
 
   static void soc_offline_core_instance(int &num_dsp, int &num_gpu,
                                         int &num_cpu, int &num_gpu_fp16,

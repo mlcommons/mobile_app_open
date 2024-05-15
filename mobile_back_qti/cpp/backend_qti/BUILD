@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,6 +54,20 @@ config_setting(
     flag_values = {":with_qti": "2"},
 )
 
+string_flag(
+    name = "external_config",
+    build_setting_default = "2",
+    values = [
+        "1",
+        "2",
+    ],
+)
+
+config_setting(
+    name = "config_option",
+    flag_values = {":external_config": "1"},
+)
+
 snpe_copts = [
     "-Imobile_back_qti/" + SNPE_VERSION + "/include/SNPE",
     "-fexceptions",
@@ -73,10 +87,13 @@ pbtxt2header(
         "settings/qti_settings_sd8cxg3.pbtxt",
         "settings/qti_settings_sd8g1.pbtxt",
         "settings/qti_settings_sd8g2.pbtxt",
+        "settings/qti_settings_sd8g3.pbtxt",
         "settings/qti_settings_sd8pg1.pbtxt",
         "settings/qti_settings_sdm778.pbtxt",
         "settings/qti_settings_sdm888.pbtxt",
         "settings/qti_settings_sm4450.pbtxt",
+        "settings/qti_settings_sm7550.pbtxt",
+        "settings/qti_settings_sm8635.pbtxt",
     ],
 )
 
@@ -148,6 +165,7 @@ cc_library(
                     select({
                         "debug_option": ["DEBUG_FLAG"],
                         "//conditions:default": [],
+                        "config_option": ["EXTERNAL_CONFIG"],
                     }),
     deps = [
         ":qti_allocator",

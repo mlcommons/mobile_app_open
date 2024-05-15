@@ -1,4 +1,4 @@
-/* Copyright 2019-2021 The MLPerf Authors. All Rights Reserved.
+/* Copyright 2019-2021,2024 The MLPerf Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -221,6 +221,12 @@ int Main(int argc, char *argv[]) {
       LOG(INFO) << "Using Imagenet dataset";
       std::string images_directory, groundtruth_file;
       int offset = 1, image_width = 224, image_height = 224;
+      if (benchmark_id == "image_classification_v2" ||
+          benchmark_id == "image_classification_offline_v2") {
+        offset = 0;
+        image_width = 384;
+        image_height = 384;
+      }
       std::vector<Flag> dataset_flags{
           Flag::CreateFlag("images_directory", &images_directory,
                            "Path to ground truth images.", Flag::kRequired),

@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -16,6 +16,8 @@ limitations under the License.
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <thread>
 
 #include "qti_backend_helper.h"
@@ -23,6 +25,7 @@ limitations under the License.
 #ifndef __ANDROID__
 #include <Windows.h>
 
+#include <codecvt>
 #include <unordered_map>
 
 #include "acpitabl.h"
@@ -31,6 +34,28 @@ limitations under the License.
 SocInfo unsupportedSoc = SocInfo(UNSUPPORTED_SOC_STR);
 SocInfo Socs::m_soc_info;
 bool Socs::is_init_done;
+bool external_config =
+#ifdef EXTERNAL_CONFIG
+    true  // reads the external config file in device
+#else
+    false  // defaults to internal config
+#endif
+    ;
+
+std::string Socs::get_external_config_string() {
+  std::string file_path = "/data/local/tmp/external/qti_settings.pbtxt";
+  std::ifstream f(file_path);  // taking file as inputstream
+  std::string str;
+  if (f) {
+    std::ostringstream ss;
+    ss << f.rdbuf();  // reading data
+    str = ss.str();
+    return str;
+  } else {
+    LOG(FATAL) << "The external config file qti_settings.pbtxt is not present "
+                  "in //data/local/tmp/external";
+  }
+}
 
 std::map<uint32_t, SocInfo> socDetails =
     SocProperties(
@@ -73,13 +98,25 @@ std::map<uint32_t, SocInfo> socDetails =
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
             {435, SocInfo(2, 0, 0, 0, true, qti_settings_sd8cxg3, "SD8cxG3", 1,
                           std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, false)},
+                          std::vector<int>({4, 5, 6, 7}), 8, true)},
             {568, SocInfo(0, 0, 1, 0, false, qti_settings_sm4450, "SM4450", 1,
                           std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, true)},
+            {538, SocInfo(2, 0, 0, 0, false, qti_settings_sd8cxg3, "SDX_Elite",
+                          1, std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
             {475, SocInfo(2, 0, 0, 0, false, qti_settings_sd7cxg3, "SD7cxG3", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, false)},
+            {557, SocInfo(2, 0, 0, 0, true, qti_settings_sd8g3, "SD8G3", 1,
+                          std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, true)},
+            {614, SocInfo(2, 0, 0, 0, true, qti_settings_sm8635, "SM8635", 1,
+                          std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, true)},
+            {608, SocInfo(2, 0, 0, 0, true, qti_settings_sm7550, "SM7550", 1,
+                          std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, true)},
             {UNSUPPORTED_SOC_ID,
              SocInfo(2, 0, 0, 0, true, qti_settings_default_dsp, "Snapdragon",
                      1, std::vector<int>({0, 1, 2, 3}),
@@ -115,6 +152,13 @@ uint32_t Socs::get_android_soc_id(void) {
 
 static std::unordered_map<uint64_t, int> pptt_mappings = {
     {LEVEL_ID(113ULL, 449ULL), 435},  // SD8cxG3
+    {LEVEL_ID(136ULL, 555ULL), 538},  // SDX_Elite
+    {LEVEL_ID(136ULL, 615ULL), 538},  // SDX_Elite (C10)
+    {LEVEL_ID(118ULL, 487ULL), 475},  // SD7cxG3 (SC7280)
+    {LEVEL_ID(118ULL, 488ULL), 475},  // SD7cxG3 (SC7295)
+    {LEVEL_ID(118ULL, 546ULL), 475},  // SD7cxG3 (SC7280P)
+    {LEVEL_ID(118ULL, 553ULL), 475},  // SD7cxG3 (SC8270)
+    {LEVEL_ID(118ULL, 563ULL), 475}   // SD7cxG3 (SC8270P)
 };
 
 uint32_t Socs::get_windows_soc_id(void) {
@@ -169,6 +213,95 @@ uint32_t Socs::get_windows_soc_id(void) {
   free(buf);
   return id;
 }
+
+std::string Socs::getServiceBinaryPath(std::wstring const &serviceName) {
+  SC_HANDLE handleSCManager = OpenSCManagerW(NULL, NULL, STANDARD_RIGHTS_READ);
+  if (NULL == handleSCManager) {
+    LOG(ERROR) << "Failed to open SCManager which is required to access "
+                  "service configuration on Windows.";
+    return "";
+  }
+
+  SC_HANDLE handleService =
+      OpenServiceW(handleSCManager, serviceName.c_str(), SERVICE_QUERY_CONFIG);
+
+  if (NULL == handleService) {
+    LOG(ERROR) << "Failed to open service which is required to query service "
+                  "information.";
+    CloseServiceHandle(handleSCManager);
+    return "";
+  }
+
+  DWORD bufferSize;
+  if (!QueryServiceConfigW(handleService, NULL, 0, &bufferSize) &&
+      (GetLastError() != ERROR_INSUFFICIENT_BUFFER)) {
+    CloseServiceHandle(handleService);
+    CloseServiceHandle(handleSCManager);
+    LOG(ERROR) << "Failed to query service configuration to get size of config "
+                  "object. Error: "
+               << GetLastError();
+    return "";
+  }
+
+  LPQUERY_SERVICE_CONFIGW serviceConfig =
+      static_cast<LPQUERY_SERVICE_CONFIGW>(LocalAlloc(LMEM_FIXED, bufferSize));
+  if (!QueryServiceConfigW(handleService, serviceConfig, bufferSize,
+                           &bufferSize)) {
+    LocalFree(serviceConfig);
+    CloseServiceHandle(handleService);
+    CloseServiceHandle(handleSCManager);
+    LOG(ERROR) << "Failed to query service configuration. Error: "
+               << GetLastError();
+    return "";
+  }
+
+  // Read the driver file path
+  std::wstring driverPath = std::wstring(serviceConfig->lpBinaryPathName);
+  // Get the parent directory of the driver file
+  driverPath = driverPath.substr(0, driverPath.find_last_of(L"\\"));
+
+  // Clean up resources
+  LocalFree(serviceConfig);
+  CloseServiceHandle(handleService);
+  CloseServiceHandle(handleSCManager);
+
+  const std::wstring systemRootPlaceholder = L"\\SystemRoot";
+  if (0 != driverPath.compare(0, systemRootPlaceholder.length(),
+                              systemRootPlaceholder)) {
+    LOG(ERROR)
+        << "The string pattern does not match. We expect that we can find "
+        << std::wstring_convert<std::codecvt_utf8<wchar_t> >()
+               .to_bytes(systemRootPlaceholder)
+               .c_str()
+        << " in the beginning of the queried path "
+        << std::wstring_convert<std::codecvt_utf8<wchar_t> >()
+               .to_bytes(driverPath)
+               .c_str();
+    return "";
+  }
+
+  const std::wstring systemRootEnv = L"windir";
+
+  DWORD numWords = GetEnvironmentVariableW(systemRootEnv.c_str(), NULL, 0);
+  if (numWords == 0) {
+    LOG(ERROR) << "Failed to query the buffer size when calling "
+                  "GetEnvironmentVariableW().";
+    return "";
+  }
+
+  std::vector<wchar_t> systemRoot(numWords + 1);
+  numWords = GetEnvironmentVariableW(systemRootEnv.c_str(), systemRoot.data(),
+                                     numWords + 1);
+  if (numWords == 0) {
+    LOG(ERROR) << "Failed to read value from environment variables.";
+    return "";
+  }
+  driverPath.replace(0, systemRootPlaceholder.length(),
+                     std::wstring(systemRoot.data()));
+
+  return std::wstring_convert<std::codecvt_utf8<wchar_t> >().to_bytes(
+      driverPath);
+}
 #endif
 
 void Socs::soc_info_init() {
@@ -187,6 +320,12 @@ void Socs::soc_info_init() {
     }
 
     m_soc_info = socDetails.find(soc_id)->second;
+
+    if (external_config) {
+      LOG(INFO) << "Config settings derived externally from "
+                   "//data/local/tmp/external/qti_settings.pbtxt";
+      m_soc_info.m_settings = get_external_config_string();
+    }
     if (soc_id == UNSUPPORTED_SOC_ID) {
       if (QTIBackendHelper::IsRuntimeAvailable(SNPE_DSP)) {
         m_soc_info.m_settings = qti_settings_default_dsp;
@@ -227,6 +366,7 @@ int Socs::soc_num_inits() {
 }
 
 bool Socs::isSnapDragon(const char *manufacturer) {
+  soc_info_init();
 #ifdef __ANDROID__
   bool is_qcom = false;
   if (strncmp("QUALCOMM", manufacturer, 7) == 0) {
@@ -308,11 +448,7 @@ bool Socs::soc_settings(const char **settings,
 
 bool Socs::needs_rpcmem() {
   soc_info_init();
-#ifdef __ANDROID__
   return m_soc_info.m_needs_rpcmem;
-#else
-  return false;
-#endif
 }
 
 bool Socs::get_use_dsp_features() {

@@ -13,7 +13,7 @@
 # limitations under the License.
 ##########################################################################
 
-flutter/ios: flutter/ios/libs flutter/ios/clean flutter/update-splash-screen flutter/check/firebase-env
+flutter/ios: flutter/ios/libs flutter/ios/clean flutter/update-splash-screen
 
 backend_bridge_ios_target=//flutter/cpp/flutter:backend_bridge_fw
 backend_bridge_ios_zip=${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/backend_bridge_fw.xcframework.zip

@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ limitations under the License.
 #include "soc_utility.h"
 #include "tensorflow/core/platform/logging.h"
 #include "tflite_c.h"
+
 #ifdef DEBUG_FLAG
 #include <chrono>
 using namespace std::chrono;
@@ -37,6 +38,7 @@ using namespace std::chrono;
 #endif
 
 static QTIBackendHelper *backend_data_ = nullptr;
+bool useIonBuffer_g;
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,6 +97,14 @@ mlperf_backend_ptr_t mlperf_backend_create(
 
   process_config(configs, backend_data);
 
+  backend_data->useIonBuffers_ =
+      (backend_data->useIonBuffers_ && Socs::needs_rpcmem());
+  useIonBuffer_g = backend_data->useIonBuffers_;
+  if (useIonBuffer_g) {
+    useIonBuffer_g = (useIonBuffer_g && get_rpc_status());
+    backend_data_->useIonBuffers_ = useIonBuffer_g;
+  }
+
   if (backend_data->bgLoad_) {
     CpuCtrl::startLoad(backend_data->loadOffTime_, backend_data->loadOnTime_);
   }
@@ -121,7 +131,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
     snpe_version = snpe_version.substr(dotPosition + 1);
   }
 
-  if (snpe_version.compare(backend_data->get_snpe_version()) != 0) {
+  if (backend_data->get_snpe_version().find_first_of(snpe_version) != 0) {
     LOG(FATAL) << "Snpe libs modified. expected: " << snpe_version
                << " found: " << backend_data->get_snpe_version();
   }
@@ -240,22 +250,30 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
     return tflite_backend_set_input(backend_data->tfliteBackend_, batchIndex, i,
                                     data);
   }
-  // The inputs are in contiguous batches of backend_data->inputBatch_ inputs
-  // If the value is a pad value for batched case then use the pointer to
-  // its contiguous block
-  void *batchedDataPtr = (backend_data->inputBatch_ > 1)
-                             ? ChunkAllocator::GetBatchPtr(data)
-                             : data;
-  // if (batchedDataPtr != data) {
-  //   LOG(INFO) << "TESTING: Using " << batchedDataPtr << " instead of " <<
-  //   data;
-  // }
+  void *batchedDataPtr = ((backend_data->useIonBuffers_ == false) &&
+                          (backend_data->inputBatch_ <= 1))
+                             ? data
+                             : ChunkAllocator::GetBatchPtr(data);
+
   Snpe_IUserBuffer_SetBufferAddress(
       Snpe_UserBufferMap_GetUserBuffer_Ref(
           Snpe_UserBufferList_At_Ref(backend_data->inputMapListHandle_,
                                      batchIndex / backend_data->inputBatch_),
           Snpe_StringList_At(backend_data->networkInputTensorNamesHandle_, i)),
       batchedDataPtr);
+
+  if (backend_data->useIonBuffers_ == true) {
+    uint64_t offset = ChunkAllocator::GetOffset(data);
+
+    Snpe_IUserBuffer_SetBufferAddressOffset(
+        Snpe_UserBufferMap_GetUserBuffer_Ref(
+            Snpe_UserBufferList_At_Ref(backend_data->inputMapListHandle_,
+                                       batchIndex / backend_data->inputBatch_),
+            Snpe_StringList_At(backend_data->networkInputTensorNamesHandle_,
+                               i)),
+        offset);
+  }
+
   return MLPERF_SUCCESS;
 }
 
@@ -305,7 +323,6 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
       QTIBackendHelper::QTIBufferType::UINT_8) {
     size = sizeof(uint8_t);
   }
-
   *data =
       backend_data->bufs_[int(batchIndex / backend_data->inputBatch_)]
           .at(Snpe_StringList_At(backend_data->networkOutputTensorNamesHandle_,
@@ -314,17 +331,25 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
       (batchIndex % backend_data->inputBatch_) *
           int(backend_data->outputBatchBufsize_ / backend_data->inputBatch_) *
           size;
+
   return MLPERF_SUCCESS;
 }
 
 void *mlperf_backend_get_buffer(size_t n) {
-  auto batchedDataPtr = get_buffer(n, backend_data_->inputBatch_);
+  void *batchedDataPtr = nullptr;
 
   if (backend_data_->useIonBuffers_) {
     const char *name =
         Snpe_StringList_At(backend_data_->networkInputTensorNamesHandle_, 0);
-    Snpe_UserMemoryMap_Add(backend_data_->ionBufferMapHandle_, name,
-                           batchedDataPtr);
+
+    batchedDataPtr = get_buffer(n, ChunkAllocator::GetSize(n));
+    uint64_t Offset = ChunkAllocator::GetOffset(batchedDataPtr);
+    Snpe_UserMemoryMap_AddFdOffset(
+        backend_data_->userMemoryMappedBufferMapHandle_, name,
+        ChunkAllocator::GetBatchPtr(batchedDataPtr),
+        n * ChunkAllocator::GetSize(n), backend_data_->fd, Offset);
+  } else {
+    batchedDataPtr = get_buffer(n, backend_data_->inputBatch_);
   }
   return batchedDataPtr;
 }
@@ -333,13 +358,13 @@ void mlperf_backend_release_buffer(void *p) {
   if (backend_data_->useIonBuffers_ && backend_data_->isIonRegistered) {
     Snpe_StringList_Handle_t userBufferNames =
         Snpe_UserMemoryMap_GetUserBufferNames(
-            backend_data_->ionBufferMapHandle_);
-    if (Snpe_SNPE_DeregisterIonBuffers(backend_data_->snpe_->snpeHandle,
-                                       userBufferNames) != SNPE_SUCCESS)
+            backend_data_->userMemoryMappedBufferMapHandle_);
+    if (Snpe_SNPE_DeregisterUserMemoryMappedBuffers(
+            backend_data_->snpe_->snpeHandle, userBufferNames) != SNPE_SUCCESS)
       LOG(INFO) << "Deregistration Failed !";
 
     auto input_buffer_name = Snpe_StringList_At(userBufferNames, 0);
-    Snpe_UserMemoryMap_Remove(backend_data_->ionBufferMapHandle_,
+    Snpe_UserMemoryMap_Remove(backend_data_->userMemoryMappedBufferMapHandle_,
                               input_buffer_name);
     Snpe_StringList_Delete(userBufferNames);
     backend_data_->isIonRegistered = false;

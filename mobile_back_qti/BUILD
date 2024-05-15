@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@ cc_library(
     name = "snpe_deps",
     srcs = [
         SNPE_VERSION + "/lib/aarch64-android/libhta.so",
+        SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV75Stub.so",
         SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV73Stub.so",
         SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV69Stub.so",
         SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV68Stub.so",
@@ -71,6 +72,7 @@ cc_library(
         SNPE_VERSION + "/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so",
         SNPE_VERSION + "/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so",
         SNPE_VERSION + "/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so",
+        SNPE_VERSION + "/lib/hexagon-v75/unsigned/libSnpeHtpV75Skel.so",
     ],
 )
 
