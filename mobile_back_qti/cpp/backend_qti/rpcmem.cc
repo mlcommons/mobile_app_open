@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,13 +17,24 @@ limitations under the License.
 
 #include "cpuctrl.h"
 #include "soc_utility.h"
+
+#ifndef __ANDROID__
+#include "windows.h"
+#endif
+
 #include "tensorflow/core/platform/logging.h"
 
 RpcMem::RpcMem() {
-  if (Socs::needs_rpcmem()) {
+  if (useIonBuffer_g) {
 // TODO: Replace dlopen with tflite's shared libs handling
 #ifdef __ANDROID__
     libHandle_ = dlopen("libcdsprpc.so", RTLD_NOW);
+#else
+    std::string windowsRpcPath = Socs::getServiceBinaryPath(L"qcnspmcdm");
+    ;
+    std::string windowsLibName = "libcdsprpc.dll";
+    windowsRpcPath = windowsRpcPath + '\\' + windowsLibName;
+    libHandle_ = LoadLibrary(windowsRpcPath.c_str());
 #endif
   } else {
     libHandle_ = nullptr;
@@ -38,8 +49,12 @@ RpcMem::RpcMem() {
         reinterpret_cast<RpcMemAllocPtr>(dlsym(libHandle_, "rpcmem_alloc"));
     rpcmemFree_ =
         reinterpret_cast<RpcMemFreePtr>(dlsym(libHandle_, "rpcmem_free"));
+#else
+    rpcmemAlloc_ = reinterpret_cast<RpcMemAllocPtr>((
+        void *)(intptr_t)GetProcAddress((HINSTANCE)libHandle_, "rpcmem_alloc"));
+    rpcmemFree_ = reinterpret_cast<RpcMemFreePtr>(
+        (void *)(intptr_t)GetProcAddress((HINSTANCE)libHandle_, "rpcmem_free"));
 #endif
-
     if (rpcmemAlloc_ && rpcmemFree_) {
       isSuccess_ = true;
     } else {
@@ -73,3 +88,5 @@ void RpcMem::Free(void *data) {
     return std::free(data);
   }
 }
+
+bool RpcMem::getRpcStatus() { return isSuccess_; }

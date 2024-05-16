@@ -1,4 +1,4 @@
-/* Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class QTIBackendHelper {
   std::unique_ptr<psnpe_handler> psnpe_;
   std::unique_ptr<snpe_handler> snpe_;
   Snpe_UserBufferList_Handle_t inputMapListHandle_, outputMapListHandle_;
-  Snpe_UserMemoryMap_Handle_t ionBufferMapHandle_;
+  Snpe_UserMemoryMap_Handle_t userMemoryMappedBufferMapHandle_;
   std::vector<
       std::unordered_map<std::string, std::vector<uint8_t, Allocator<uint8_t>>>>
       bufs_;
@@ -78,7 +78,7 @@ class QTIBackendHelper {
   Snpe_StringList_Handle_t networkOutputTensorNamesHandle_;
   Snpe_PerformanceProfile_t perfProfile_;
   Snpe_ProfilingLevel_t profilingLevel_;
-
+  int32_t fd = -1;
   bool isTflite_;
   bool useSnpe_;
   mlperf_backend_ptr_t tfliteBackend_;
@@ -92,7 +92,7 @@ class QTIBackendHelper {
   QTIBufferType outputBufferType_ = FLOAT_32;
   uint32_t loadOffTime_ = 2;
   uint32_t loadOnTime_ = 100;
-  bool useIonBuffers_ = false;
+  bool useIonBuffers_ = true;
   bool useCpuInt8_ = false;
   bool isIonRegistered;
 
@@ -123,7 +123,7 @@ class QTIBackendHelper {
     odLayerMap[2] = "detection_scores:0";
     odLayerMap[3] =
         "Postprocessor/BatchMultiClassNonMaxSuppression_num_detections";
-    ionBufferMapHandle_ = Snpe_UserMemoryMap_Create();
+    userMemoryMappedBufferMapHandle_ = Snpe_UserMemoryMap_Create();
     isIonRegistered = false;
   }
 
