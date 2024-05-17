@@ -19,6 +19,7 @@ jobs:
       DOCKER_IMAGE_TAG: ghcr.io/mlcommons/mobile_app_open-scanner:${{ github.run_number }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_OUT_DIR: sonar_build_wrapper_output
+      REPO_NAME: ${{ github.event.repository.name }}
       PR_NUMBER: ${{ github.event.number }}
       PR_BRANCH: ${{ github.HEAD_REF }}
       PR_BASE: ${{ github.BASE_REF }}

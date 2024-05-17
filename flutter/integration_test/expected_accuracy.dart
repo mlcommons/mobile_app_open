@@ -27,6 +27,17 @@ const Map<String, Interval> _imageClassification = {
   'neuron-mdla': Interval(min: 0.88, max: 0.91),
 };
 
+const Map<String, Interval> _imageClassificationV2 = {
+  'cpu': Interval(min: 0.88, max: 0.91),
+  'npu': Interval(min: 0.88, max: 0.91),
+  'tpu': Interval(min: 0.88, max: 0.91),
+  'ane': Interval(min: 0.79, max: 0.91),
+  'cpu&gpu&ane': Interval(min: 0.79, max: 0.91),
+  'snpe_dsp': Interval(min: 0.88, max: 0.91),
+  'psnpe_dsp': Interval(min: 0.88, max: 0.91),
+  'neuron-mdla': Interval(min: 0.79, max: 0.81),
+};
+
 const Map<String, Interval> _objectDetection = {
   'cpu': Interval(min: 0.31, max: 0.32),
   'npu': Interval(min: 0.28, max: 0.31),
@@ -77,9 +88,11 @@ const Map<String, Interval> _superResolution = {
 
 const benchmarkExpectedAccuracy = {
   BenchmarkId.imageClassification: _imageClassification,
+  BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
   BenchmarkId.imageSegmentationV2: _imageSegmentation,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.imageClassificationOffline: _imageClassification,
+  BenchmarkId.imageClassificationOfflineV2: _imageClassificationV2,
 };

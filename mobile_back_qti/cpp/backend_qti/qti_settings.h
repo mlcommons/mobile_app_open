@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,6 +41,9 @@ const std::string empty_settings = "";
 #include INCLUDE_SETTINGS(sdm778)
 #include INCLUDE_SETTINGS(sdm888)
 #include INCLUDE_SETTINGS(sm4450)
+#include INCLUDE_SETTINGS(sd8g3)
+#include INCLUDE_SETTINGS(sm8635)
+#include INCLUDE_SETTINGS(sm7550)
 #include INCLUDE_SETTINGS(default_dsp)
 #include INCLUDE_SETTINGS(default_cpu)
 #include INCLUDE_SETTINGS(default_gpu)
@@ -56,6 +59,9 @@ STRING_SETTINGS(sd8pg1)
 STRING_SETTINGS(sdm778)
 STRING_SETTINGS(sdm888)
 STRING_SETTINGS(sm4450)
+STRING_SETTINGS(sd8g3)
+STRING_SETTINGS(sm8635)
+STRING_SETTINGS(sm7550)
 STRING_SETTINGS(default_dsp)
 STRING_SETTINGS(default_cpu)
 STRING_SETTINGS(default_gpu)

@@ -91,8 +91,8 @@ benchmark_setting {
       id: "o_type"
       value: "Float32"
     }
-    model_path: "local:///MLPerf_sideload/sr.nnc"
-    model_checksum: "6e725dffed620377b9eff463e106e6dd"
+    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sr.nnc"
+    model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000

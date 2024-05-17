@@ -84,9 +84,9 @@ tf_workspace0()
 
 http_archive(
     name = "neuron_delegate",
-    sha256 = "85c1b17acb34072baa12cf74011ff45aee9045a12603851b86ce85e3cef66747",
-    strip_prefix = "tflite-neuron-delegate-update_for_dujac",
-    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/heads/update_for_dujac.zip"],
+    sha256 = "7918cc54a2bab63c30eb87a90de8ce3f3730b5572e0269a2b57a0c9bcd28cd69",
+    strip_prefix = "tflite-neuron-delegate-update_for_leroy",
+    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/heads/update_for_leroy.zip"],
 )
 
 new_git_repository(

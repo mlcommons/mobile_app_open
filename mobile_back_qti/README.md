@@ -13,7 +13,7 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 
 <!-- markdown-link-check-disable-next-line -->
 * [Qualcomm Package Manager 3](https://qpm.qualcomm.com/#/main/tools/details/QPM3)
-* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk) (Version 2.13.4)
+* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk) (Version 2.20.0)
 * Linux machine capable of running Ubuntu docker images
 
 ### Optional
@@ -45,14 +45,14 @@ cd mobile_app_open
 * Install Qualcomm Package manager on the linux machine
 
 ```shell
-sudo apt-get install ./QualcommPackageManager3.3.0.84.3.Linux-x86.deb
+sudo apt-get install ./QualcommPackageManager3.3.0.99.0.Linux-x86.deb
 ```
 
 * Extract the SNPE SDK (from Requirements above) to mobile_app_open/mobile_back_qti
 
 ```shell
-qpm-cli --extract ./qualcomm_neural_processing_sdk.2.13.0.230730.Linux-AnyCPU.qik
-cp -rv /opt/qcom/aistack/snpe/2.13.0.230730 mobile_app_open/mobile_back_qti/qaisw-2.13.4.230831
+qpm-cli --extract ./qualcomm_neural_processing_sdk.2.20.0.240223.Linux-AnyCPU.qik
+cp -rv /opt/qcom/aistack/snpe/2.20.0.240223/. mobile_app_open/mobile_back_qti/qaisw-2.20.0.240223
 ```
 
 * If you have an HTTP proxy, you may need the following
@@ -96,7 +96,7 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 
 <!-- markdown-link-check-disable-next-line -->
 * [SNPE windows SDK] (<https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk/tools>)
-  * Version 2.7.0 (windows version hasn't been updated in this release)
+  * Version 2.20.0
 * Windows x86 machine
 
 ## Setting up the environment
@@ -142,22 +142,23 @@ This will generate binary files in output\flutter\cmdline
 Run performance mode with following command
 
 ```shell
-.\run_performance_tests.bat --models <path to mlperf_models> --dataset <path to mlperf_lite_datasets>
+.\run_mlperf_tests.bat --models <path to mlperf_models> --dataset <path to mlperf_lite_datasets> --usecase <optional, can be one of below mentioned usecases> --mode performance
 ```
 
 Run accuracy mode with following command
 
 ```shell
-.\run_accuracy_test.bat --models <path to mlperf_models> --dataset <path to mlperf_datasets>
+.\run_mlperf_test.bat --models <path to mlperf_models> --dataset <path to mlperf_datasets> --usecase <optional, can be one of below mentioned usecases> --mode accuracy
 ```
 
+* --usecase parameter can take one of these arguments => image_classification_v2, image_classification, object_detection, image_segmentation, language_understanding, super_resolution, image_classification_offline_v2, image_classification_offline
 * see the results in accuracy_results.txt and performance_results.txt
 
 ## FAQ
 
 ### What devices does this backend support?
 
-This backend only supports SDM888/SDM888 Pro, SDM778G, SD7G1, SD8G1, SD8Pro G1, SD7PG2, SD8G2 devices.
+This backend only supports SDX_Elite, SD7G3, SD8SG3, SD8G3 devices.
 Other already launched Snapdragon based devices can also run the MLPerf app as default fallback.
 
 ### Is SNPE used to run all the models?

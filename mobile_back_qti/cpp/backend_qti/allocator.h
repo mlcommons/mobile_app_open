@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,6 +31,10 @@ class ChunkAllocator {
   static void ReleaseBuffer(void *p);
 
   static void *GetBatchPtr(void *p);
+
+  static int GetSize(int n);
+
+  static uint64_t GetOffset(void *p);
 
   static void DumpState();
 
@@ -70,6 +74,8 @@ class ChunkAllocator {
       Block::block_map_.erase(p);
     }
 
+    uint64_t GetOffset(void *p) { return (uint8_t *)p - (uint8_t *)ptr_; }
+
     bool IsFull() { return free_chunks_ == 0; }
     bool IsEmpty() { return free_chunks_ == num_chunks_; }
 
@@ -105,6 +111,8 @@ class ChunkAllocator {
     Block::block_map_[p] = block;
     return p;
   }
+
+  uint64_t GetOffset(Block *block, void *p) { return block->GetOffset(p); }
 
   void ReleaseChunk(Block *block, void *p) {
     // Block::ReleaseChunk updates Block::block_map_
@@ -177,15 +185,22 @@ template <class T>
 bool Allocator<T>::useIonBuffer = true;
 
 static void *get_buffer(size_t n, int chunkSize = 3) {
+  // LOG(INFO) << chunkSize;
   void *p = ChunkAllocator::GetBuffer(n, chunkSize);
   // LOG(INFO) << "QTI backend SNPE allocator " << n << " bytes at " << p << "
   // with chunk size: " << chunkSize;
   return p;
 }
 
+static uint64_t get_offset(void *p) { return ChunkAllocator::GetOffset(p); }
+
 static void release_buffer(void *p) {
   // LOG(INFO) << "QTI backend SNPE free " << p;
   ChunkAllocator::ReleaseBuffer(p);
+}
+
+static bool get_rpc_status() {
+  return ChunkAllocator::getRpcMem().getRpcStatus();
 }
 
 #endif

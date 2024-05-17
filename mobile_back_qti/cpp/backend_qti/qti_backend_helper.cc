@@ -1,4 +1,4 @@
-/* Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -252,10 +252,12 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
 
 mlperf_status_t QTIBackendHelper::execute() {
   if (useIonBuffers_ && !isIonRegistered) {
-    if (Snpe_SNPE_RegisterIonBuffers(snpe_->snpeHandle, ionBufferMapHandle_) ==
-        SNPE_SUCCESS)
+    if (Snpe_SNPE_RegisterUserMemoryMappedBuffers(
+            snpe_->snpeHandle, userMemoryMappedBufferMapHandle_) ==
+        SNPE_SUCCESS) {
       LOG(INFO) << "Ion Buffer Registration Successful";
-    isIonRegistered = true;
+      isIonRegistered = true;
+    }
   }
   if (!useSnpe_) {
     if (Snpe_PSNPE_Execute(psnpe_->psnpeHandle, inputMapListHandle_,
@@ -415,8 +417,8 @@ void QTIBackendHelper::map_inputs() {
             Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(float));
         Snpe_UserBufferEncoding_Handle_t ubeFloatHandle =
             Snpe_UserBufferEncodingFloat_Create();
-        ubPtr.push_back(Snpe_Util_CreateUserBuffer(
-            std::move(inputBuffer.data()), inputBuffer.size(), stridesHandle,
+        ubPtr.push_back(Snpe_Util_CreateUserBufferShared(
+            std::move(inputBuffer.data()), inputBuffer.size(), 0, stridesHandle,
             ubeFloatHandle));
         Snpe_UserBufferMap_Add(inputMapHandle, name, ubPtr.back());
 
@@ -438,8 +440,8 @@ void QTIBackendHelper::map_inputs() {
         if (!ubeTfN)
           ubeTfN = Snpe_UserBufferEncodingTfN_Create(128.0, 1.0 / 255, 8);
 
-        ubPtr.push_back(Snpe_Util_CreateUserBuffer(
-            std::move(inputBuffer.data()), inputBuffer.size(), stridesHandle,
+        ubPtr.push_back(Snpe_Util_CreateUserBufferShared(
+            std::move(inputBuffer.data()), inputBuffer.size(), 0, stridesHandle,
             ubeTfN));
         Snpe_UserBufferMap_Add(inputMapHandle, name, ubPtr.back());
 
@@ -471,8 +473,7 @@ void QTIBackendHelper::map_outputs() {
                            Snpe_TensorShape_GetDimensions(dimsHandle));
 
       outputBatchBufsize_ = bufSize;
-      // LOG(INFO) << "outputBufferType: " << outputBufferType_
-      //          << " name: " << name;
+
       if (useIonBuffers_) {
         Allocator<uint8_t>::useIonAllocator();
       } else {
@@ -492,7 +493,7 @@ void QTIBackendHelper::map_outputs() {
                                                stridesHandle, ubeTfN));
         Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
         if (useIonBuffers_)
-          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name,
+          Snpe_UserMemoryMap_Add(userMemoryMappedBufferMapHandle_, name,
                                  bufs_[bi].at(name).data());
 
         Snpe_UserBufferEncodingTfN_Delete(ubeTfN);
@@ -511,8 +512,9 @@ void QTIBackendHelper::map_outputs() {
 
         Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
         if (useIonBuffers_)
-          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name,
-                                 bufs_[bi].at(name).data());
+          Snpe_UserMemoryMap_AddFdOffset(userMemoryMappedBufferMapHandle_, name,
+                                         bufs_[bi].at(name).data(),
+                                         bufSize * sizeof(int32_t), fd, 0);
 
         Snpe_UserBufferEncodingIntN_Delete(ubeIntN);
         Snpe_TensorShape_Delete(stridesHandle);
@@ -529,10 +531,11 @@ void QTIBackendHelper::map_outputs() {
             bufs_[bi].at(name).data(), bufSize * sizeof(float), stridesHandle,
             userBufferEncodingFloat));
         Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
-        if (useIonBuffers_)
-          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name,
-                                 bufs_[bi].at(name).data());
-
+        if (useIonBuffers_) {
+          Snpe_UserMemoryMap_AddFdOffset(userMemoryMappedBufferMapHandle_, name,
+                                         bufs_[bi].at(name).data(),
+                                         bufSize * sizeof(float), fd, 0);
+        }
         Snpe_UserBufferEncodingFloat_Delete(userBufferEncodingFloat);
         Snpe_TensorShape_Delete(stridesHandle);
       }

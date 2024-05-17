@@ -93,18 +93,18 @@ jobs:
           project_id: mobile-app-build-290400
       - name: Download Samsung libraries
         env:
-          SAMSUNG_LIB: samsung_libs_v3.1_20231116
+          SAMSUNG_LIB: samsung_libs_v4.0_20240409
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v3.1/${SAMSUNG_LIB}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.0/${SAMSUNG_LIB}.zip /tmp/ && \
           unzip /tmp/${SAMSUNG_LIB}.zip -d /tmp/${SAMSUNG_LIB} && \
           rm /tmp/${SAMSUNG_LIB}.zip && \
           mkdir -p mobile_back_samsung/samsung/lib/internal && \
           mv /tmp/${SAMSUNG_LIB}/* mobile_back_samsung/samsung/lib/internal/
       - name: Download QTI libraries
         env:
-          QTI_LIB: qaisw-2.13.4.230831213719_60417
+          QTI_LIB: qaisw-2.20.0.240223_linux
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v3.1/${QTI_LIB}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.0/${QTI_LIB}.zip /tmp/ && \
           unzip /tmp/${QTI_LIB}.zip -d /tmp/${QTI_LIB} && \
           rm /tmp/${QTI_LIB}.zip && \
           mkdir -p mobile_back_qti/${QTI_LIB} && \

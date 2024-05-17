@@ -1,3 +1,18 @@
+# Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+##########################################################################
+
 # Docker image name: mlcommons/mlperf_mobile
 FROM ubuntu:bionic
 LABEL maintainer="quic_mcharleb@quicinc.com"
@@ -13,7 +28,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y && \
        git locales openssh-client ca-certificates tar gzip parallel \
        zip bzip2 gnupg wget python3-six python3-pip libncurses5 openjdk-11-jdk-headless clang-format-10 golang-1.13-go build-essential
 
-RUN pip3 install pip==19.3.1 setuptools==31.0.1
+RUN pip3 install pip==21.3.1 setuptools==31.0.1
 RUN pip3 install tensorflow-cpu==1.15
 RUN pip3 install Pillow opencv-python==4.3.0.38 setuptools matplotlib tensorflow_hub tf-slim \
                  absl-py numpy pyyaml
@@ -83,11 +98,6 @@ RUN cd /tmp &&  wget -nv https://dl.google.com/android/repository/${ndk_version}
 
 ENV ANDROID_NDK_HOME ${android_ndk_home}
 
-# Add Java format checker and buildifier
-ENV GOBIN /opt/formatters/bin
-RUN mkdir -p ${GOBIN} && curl --output `dirname ${GOBIN}`/google-java-format-1.9-all-deps.jar -L https://github.com/google/google-java-format/releases/download/google-java-format-1.9/google-java-format-1.9-all-deps.jar
-RUN /usr/lib/go-1.13/bin/go get github.com/bazelbuild/buildtools/buildifier
-ENV PATH=${PATH}:${GOBIN}
 
 RUN mkdir -p /home/mlperf && chmod 777 /home/mlperf
 ENV HOME /home/mlperf

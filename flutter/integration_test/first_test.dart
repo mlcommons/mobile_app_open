@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/firebase/firebase_manager.dart';
 import 'package:mlperfbench/firebase/firebase_options.gen.dart';
@@ -32,7 +33,7 @@ void main() {
   if (enablePerfTest) {
     prefs[StoreConstants.testMinDuration] = 15;
     prefs[StoreConstants.testMinQueryCount] = 64;
-    prefs[StoreConstants.testCooldownDuration] = 10;
+    prefs[StoreConstants.testCooldownDuration] = 2;
   }
   SharedPreferences.setMockInitialValues(prefs);
 
@@ -57,10 +58,10 @@ void main() {
 }
 
 void checkTasks(ExtendedResult extendedResult) {
-  final length = extendedResult.results.length;
-  const expectedTasksCount = 6;
+  final tasksCount = extendedResult.results.length;
+  final expectedTasksCount = BenchmarkId.allIds.length;
 
-  expect(length, expectedTasksCount, reason: 'tasks count does not match');
+  expect(tasksCount, expectedTasksCount, reason: 'tasks count does not match');
 
   for (final benchmarkResult in extendedResult.results) {
     print('checking ${benchmarkResult.benchmarkId}');

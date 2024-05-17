@@ -64,3 +64,8 @@ docker/flutter/android/release: flutter/check-release-env flutter/android/docker
 	MSYS2_ARG_CONV_EXCL="*" docker run \
 		${flutter_common_docker_flags} \
 		make flutter/android/release
+
+docker/flutter/clean: flutter/check-release-env
+	MSYS2_ARG_CONV_EXCL="*" docker run \
+		${flutter_common_docker_flags} \
+		make flutter/clean

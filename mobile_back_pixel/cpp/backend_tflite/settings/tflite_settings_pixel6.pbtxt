@@ -31,6 +31,26 @@ benchmark_setting {
 }
 
 benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "tpu"
+    accelerator_desc: "Google EdgeTPU"
+    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+    model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+  }
+  delegate_selected: "NNAPI"
+}
+
+benchmark_setting {
   benchmark_id: "image_classification_offline"
   framework: "TFLite"
   delegate_choice: {
@@ -47,6 +67,28 @@ benchmark_setting {
     accelerator_desc: "GPU"
     model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
     model_checksum: "66bb4eba50987221608f8487ed405794"
+    batch_size: 2
+  }
+  delegate_selected: "NNAPI"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "tpu"
+    accelerator_desc: "Google EdgeTPU"
+    batch_size: 16
+    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+    model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
     batch_size: 2
   }
   delegate_selected: "NNAPI"
@@ -70,7 +112,6 @@ benchmark_setting {
     model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
   }
   delegate_selected: "NNAPI"
-
 }
 
 benchmark_setting {

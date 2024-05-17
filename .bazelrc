@@ -21,7 +21,7 @@ build:android --copt=-w
 build:ios --copt=-w
 build:windows --copt=/W0
 
-# Build in C++ 14 mode.
+# Build in C++ 17 mode.
 build:android --cxxopt=-std=c++17
 build:android --host_cxxopt=-std=c++17
 build:ios --cxxopt=-std=c++17
