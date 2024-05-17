@@ -7,7 +7,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # version format: <semantic_app_version>+<build_number>.
 # Note: build_number will be set by CI using the CLI option --build-number
-version: 4.0.0+1
+version: 4.1.0+1
 
 environment:
   sdk: ">=2.18.0 <3.0.0"
