@@ -17,7 +17,7 @@ import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/settings/task_config_section.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreen();

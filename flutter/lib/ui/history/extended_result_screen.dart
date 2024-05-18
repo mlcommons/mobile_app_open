@@ -15,8 +15,7 @@ import 'package:mlperfbench/ui/history/utils.dart';
 class RemoteExtendedResultScreen extends StatefulWidget {
   final String fileName;
 
-  const RemoteExtendedResultScreen({Key? key, required this.fileName})
-      : super(key: key);
+  const RemoteExtendedResultScreen({super.key, required this.fileName});
 
   @override
   State<StatefulWidget> createState() => _RemoteExtendedResultScreenState();
@@ -84,8 +83,7 @@ class _RemoteExtendedResultScreenState
 class LocalExtendedResultScreen extends StatefulWidget {
   final ExtendedResult result;
 
-  const LocalExtendedResultScreen({Key? key, required this.result})
-      : super(key: key);
+  const LocalExtendedResultScreen({super.key, required this.result});
 
   @override
   State<LocalExtendedResultScreen> createState() =>
@@ -141,7 +139,7 @@ class _LocalExtendedResultScreenState extends State<LocalExtendedResultScreen> {
 class ExtendedResultView extends StatefulWidget {
   final ExtendedResult result;
 
-  const ExtendedResultView({Key? key, required this.result}) : super(key: key);
+  const ExtendedResultView({super.key, required this.result});
 
   @override
   State<ExtendedResultView> createState() => _ExtendedResultViewState();
@@ -227,7 +225,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
               throughputValid: true,
               accuracy: l10n.historyDetailsTableColAccuracy,
               onTap: null),
-          ...list.map(_makeRowData).toList(),
+          ...list.map(_makeRowData),
         ],
       ),
     );

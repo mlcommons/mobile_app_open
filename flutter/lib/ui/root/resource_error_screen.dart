@@ -12,7 +12,7 @@ import 'package:mlperfbench/ui/page_constraints.dart';
 import 'package:mlperfbench/ui/settings/task_config_section.dart';
 
 class ResourceErrorScreen extends StatelessWidget {
-  const ResourceErrorScreen({Key? key}) : super(key: key);
+  const ResourceErrorScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -12,7 +12,7 @@ import 'package:mlperfbench/ui/history/history_filter_screen.dart';
 import 'package:mlperfbench/ui/history/history_list_item.dart';
 
 class HistoryListScreen extends StatefulWidget {
-  const HistoryListScreen({Key? key}) : super(key: key);
+  const HistoryListScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _HistoryListScreenState();

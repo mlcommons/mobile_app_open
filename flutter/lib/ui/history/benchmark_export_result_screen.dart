@@ -9,8 +9,7 @@ import 'package:mlperfbench/ui/history/utils.dart';
 class BenchmarkExportResultScreen extends StatefulWidget {
   final BenchmarkExportResult result;
 
-  const BenchmarkExportResultScreen({Key? key, required this.result})
-      : super(key: key);
+  const BenchmarkExportResultScreen({super.key, required this.result});
 
   @override
   State<BenchmarkExportResultScreen> createState() =>

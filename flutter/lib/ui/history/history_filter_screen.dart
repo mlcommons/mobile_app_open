@@ -11,7 +11,7 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/result_manager.dart';
 
 class ResultFilterScreen extends StatefulWidget {
-  const ResultFilterScreen({Key? key}) : super(key: key);
+  const ResultFilterScreen({super.key});
 
   @override
   State<StatefulWidget> createState() {

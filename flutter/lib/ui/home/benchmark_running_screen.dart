@@ -20,7 +20,7 @@ class BenchmarkRunningScreen extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey =
       GlobalKey<ScaffoldState>();
 
-  const BenchmarkRunningScreen({Key? key}) : super(key: key);
+  const BenchmarkRunningScreen({super.key});
 
   @override
   State<BenchmarkRunningScreen> createState() => _BenchmarkRunningScreenState();

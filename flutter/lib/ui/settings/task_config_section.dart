@@ -162,7 +162,7 @@ class _DataFolderSelectorHelper {
 class TaskConfigSection extends StatelessWidget {
   final List<TaskConfigDescription> _configs;
 
-  const TaskConfigSection(this._configs, {Key? key}) : super(key: key);
+  const TaskConfigSection(this._configs, {super.key});
 
   @override
   Widget build(BuildContext context) {

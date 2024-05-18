@@ -8,7 +8,7 @@ import 'package:mlperfbench/ui/app_styles.dart';
 class MyApp extends StatelessWidget {
   final Widget home;
 
-  const MyApp({Key? key, required this.home}) : super(key: key);
+  const MyApp({super.key, required this.home});
 
   // This widget is the root of your application.
   @override

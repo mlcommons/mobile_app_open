@@ -14,7 +14,7 @@ import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_config_section.dart';
 
 class BenchmarkStartScreen extends StatefulWidget {
-  const BenchmarkStartScreen({Key? key}) : super(key: key);
+  const BenchmarkStartScreen({super.key});
 
   @override
   State<BenchmarkStartScreen> createState() => _BenchmarkStartScreenState();

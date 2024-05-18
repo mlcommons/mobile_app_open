@@ -13,7 +13,7 @@ import 'package:mlperfbench/ui/home/user_profile.dart';
 enum _ShareDestination { local, cloud }
 
 class ShareButton extends StatelessWidget {
-  const ShareButton({Key? key}) : super(key: key);
+  const ShareButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +23,8 @@ class ShareButton extends StatelessWidget {
       onPressed: () {
         showModalBottomSheet(
           context: context,
-          builder: (_) => Wrap(
-            children: const [ShareBottomSheet()],
+          builder: (_) => const Wrap(
+            children: [ShareBottomSheet()],
           ),
         );
       },
@@ -33,7 +33,7 @@ class ShareButton extends StatelessWidget {
 }
 
 class ShareBottomSheet extends StatefulWidget {
-  const ShareBottomSheet({Key? key}) : super(key: key);
+  const ShareBottomSheet({super.key});
 
   @override
   State<ShareBottomSheet> createState() => _ShareButton();

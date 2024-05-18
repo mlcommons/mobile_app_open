@@ -61,10 +61,8 @@ class DeviceInfo {
     final modelCode = deviceInfo.utsname.machine;
     String? modelName;
     var machine = deviceInfo.utsname.machine;
-    if (machine != null) {
-      modelName = deviceNames.getSingleNameFromModel(DeviceType.ios, machine);
-    }
-    return EnvIos(
+    modelName = deviceNames.getSingleNameFromModel(DeviceType.ios, machine);
+      return EnvIos(
       osVersion: Platform.operatingSystemVersion,
       modelCode: modelCode,
       modelName: modelName,

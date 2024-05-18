@@ -19,7 +19,7 @@ import 'package:mlperfbench/ui/home/share_button.dart';
 enum _ScreenMode { performance, accuracy }
 
 class BenchmarkResultScreen extends StatefulWidget {
-  const BenchmarkResultScreen({Key? key}) : super(key: key);
+  const BenchmarkResultScreen({super.key});
 
   @override
   State<BenchmarkResultScreen> createState() => _BenchmarkResultScreenState();
@@ -376,7 +376,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
 class BlueProgressLine extends Container {
   final double _progress;
 
-  BlueProgressLine(this._progress, {Key? key}) : super(key: key);
+  BlueProgressLine(this._progress, {super.key});
 
   double get _progressValue {
     final rangedProgress = _progress.clamp(0, 1);

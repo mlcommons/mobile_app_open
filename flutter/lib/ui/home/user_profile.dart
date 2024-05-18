@@ -12,7 +12,7 @@ import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/uploaded_files_screen.dart';
 
 class UserProfileSection extends StatefulWidget {
-  const UserProfileSection({Key? key}) : super(key: key);
+  const UserProfileSection({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -129,7 +129,7 @@ class _UserProfileSectionState extends State<UserProfileSection> {
 }
 
 class UserProfileScreen extends StatefulWidget {
-  const UserProfileScreen({Key? key}) : super(key: key);
+  const UserProfileScreen({super.key});
 
   @override
   State<StatefulWidget> createState() {

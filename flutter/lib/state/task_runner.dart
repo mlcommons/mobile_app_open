@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:uuid/uuid.dart';
-import 'package:worker_manager/worker_manager.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';

@@ -6,8 +6,7 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 class BenchmarkInfoButton extends StatelessWidget {
   final Benchmark benchmark;
 
-  const BenchmarkInfoButton({Key? key, required this.benchmark})
-      : super(key: key);
+  const BenchmarkInfoButton({super.key, required this.benchmark});
 
   @override
   Widget build(BuildContext context) {
