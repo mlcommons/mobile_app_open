@@ -26,7 +26,7 @@ These steps are required to build native libs only.
     gnupg \
     make \
     python3 python3-pip \
-    openjdk-11-jdk-headless \
+    openjdk-17-jdk-headless \
     protobuf-compiler
   ```
 

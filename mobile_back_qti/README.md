@@ -28,6 +28,7 @@ Use your browser to download the SNPE SDK using the links above.
 Create your Github personal access token.
 
 ```shell
+export SNPE_SDK=</path/to/snpe-sdk>
 cd DLC/ && make
 ```
 

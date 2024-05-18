@@ -29,7 +29,7 @@ RUN mkdir -p ${FORMATTER_HOME}
 
 # Install Java
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    openjdk-11-jdk-headless
+    openjdk-17-jdk-headless
 
 # Add buildifier
 RUN apt-get update && apt-get install -y --no-install-recommends \

@@ -6,7 +6,7 @@ FROM ubuntu:20.04
 # JDK package downloads ~500 MB from slow mirrors, which can take a lot of time,
 #   so a separate layer for it makes image rebuild faster in case we change any other dependencies.
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    openjdk-11-jdk-headless && \
+    openjdk-17-jdk-headless && \
     rm -rf /var/lib/apt/lists/*
 RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     build-essential \
@@ -19,6 +19,7 @@ RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install 
     make \
     protobuf-compiler \
     python3 \
+    python3-dev \
     python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
@@ -40,9 +41,11 @@ RUN yes | sdkmanager --licenses >/dev/null
 RUN yes | sdkmanager \
     "platform-tools" \
     "build-tools;30.0.3" \
+    "build-tools;34.0.0" \
     "platforms;android-29" \
     "platforms;android-31" \
-    "platforms;android-33"
+    "platforms;android-33" \
+    "platforms;android-34"
 # Install NDK in a separate layer to decrease max layer size.
 RUN yes | sdkmanager "ndk;25.2.9519653"
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/25.2.9519653
@@ -65,7 +68,7 @@ ENV GRADLE_USER_HOME=$HOME/.cache/.gradle
 ENV ANDROID_SDK_HOME=$HOME/.cache/.android
 
 RUN mkdir $ANDROID_SDK_HOME && \
-    PASSWD=$(pwgen -s -y 20 1) && keytool -genkey -v -keystore $ANDROID_SDK_HOME/debug.keystore \
+    PASSWD=$(pwgen -s -y 20 1) && keytool -genkey -v -keyalg RSA -keystore $ANDROID_SDK_HOME/debug.keystore \
     -storepass $PASSWD -alias androiddebugkey -keypass $PASSWD -dname "CN=Android Debug,O=Android,C=US"
 
 # Git repo will be mounted at '/image-workdir/project'
