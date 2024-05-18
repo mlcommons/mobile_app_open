@@ -16,7 +16,7 @@ class ResourceErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final state = context.watch<BenchmarkState>();
     final store = context.watch<Store>();
 

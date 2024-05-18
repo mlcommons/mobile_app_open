@@ -23,7 +23,7 @@ class _BenchmarkExportResultScreenState
 
   @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     helper = HistoryHelperUtils(l10n);
 
     return Scaffold(

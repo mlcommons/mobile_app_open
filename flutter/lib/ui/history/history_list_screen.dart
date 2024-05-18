@@ -24,7 +24,7 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     final localResults = state.resourceManager.resultManager.localResults;
     final remoteResults = state.resourceManager.resultManager.remoteResults;
     final filter = state.resourceManager.resultManager.resultFilter;

@@ -10,28 +10,28 @@ Future<ConfirmDialogAction?> showConfirmDialog(
   String message, {
   String? title,
 }) async {
-  final stringResources = AppLocalizations.of(context);
+  final l10n = AppLocalizations.of(context)!;
 
   Widget cancelButton = TextButton(
       style: TextButton.styleFrom(
         textStyle: const TextStyle(fontSize: 18),
       ),
       onPressed: () => Navigator.pop(context, ConfirmDialogAction.cancel),
-      child: Text(stringResources.dialogCancel));
+      child: Text(l10n.dialogCancel));
 
   Widget okButton = TextButton(
       style: TextButton.styleFrom(
         textStyle: const TextStyle(fontSize: 18),
       ),
       onPressed: () => Navigator.pop(context, ConfirmDialogAction.ok),
-      child: Text(stringResources.dialogOk));
+      child: Text(l10n.dialogOk));
 
   return await showDialog<ConfirmDialogAction>(
     context: context,
     builder: (context) {
       return AlertDialog(
         backgroundColor: AppColors.dialogBackground,
-        title: Text(title ?? stringResources.dialogTitleConfirm),
+        title: Text(title ?? l10n.dialogTitleConfirm),
         content: SingleChildScrollView(child: Text(message)),
         actions: [cancelButton, okButton],
       );

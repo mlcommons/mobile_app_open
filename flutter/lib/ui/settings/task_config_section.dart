@@ -21,7 +21,7 @@ class _DataFolderSelectorHelper {
   final DataFolderType selectedOption;
 
   _DataFolderSelectorHelper(BuildContext context)
-      : l10n = AppLocalizations.of(context),
+      : l10n = AppLocalizations.of(context)!,
         store = context.watch<Store>(),
         selectedOption =
             parseDataFolderType(context.read<Store>().dataFolderType);
@@ -166,7 +166,7 @@ class TaskConfigSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final store = context.watch<Store>();
     final state = context.watch<BenchmarkState>();
     List<Widget> items = [];
@@ -213,7 +213,7 @@ class TaskConfigSection extends StatelessWidget {
     TaskConfigDescription configuration,
     String chosenConfigName,
   ) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final state = context.watch<BenchmarkState>();
     final isSelected = chosenConfigName == configuration.name;
 
@@ -290,7 +290,7 @@ class _ManageFilePermissionWidgetState
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<bool>(
       future: _permissionGranted,
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -324,7 +324,7 @@ class TaskConfigErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.resourceErrorSelectTaskFile),

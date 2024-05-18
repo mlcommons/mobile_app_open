@@ -32,7 +32,7 @@ class _SettingsScreen extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     store = context.watch<Store>();
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
 
     Widget artificialLoadSwitch = _artificialLoadSwitch();
     Widget crashlyticsSwitch = _crashlyticsSwitch();

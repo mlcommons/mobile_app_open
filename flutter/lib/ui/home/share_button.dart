@@ -46,7 +46,7 @@ class _ShareButton extends State<ShareBottomSheet> {
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     return Center(
       child: _buildShareModal(context),
     );
@@ -132,7 +132,7 @@ class _ShareButton extends State<ShareBottomSheet> {
   }
 
   Future<void> _buildProfileModal(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return showModalBottomSheet(
         context: context,
         builder: (context) {

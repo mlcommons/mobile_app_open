@@ -29,7 +29,7 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     final childrenList = <Widget>[];
 
     for (var benchmark in state.benchmarks) {

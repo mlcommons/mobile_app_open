@@ -29,7 +29,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
     store = context.watch<Store>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(

@@ -19,9 +19,9 @@ class BenchmarkInfoButton extends StatelessWidget {
   }
 
   void _showBottomSheet(BuildContext context, Benchmark benchmark) {
-    final stringResources = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
-    final info = benchmark.info.getLocalizedInfo(stringResources);
+    final info = benchmark.info.getLocalizedInfo(l10n);
 
     showModalBottomSheet(
       context: context,

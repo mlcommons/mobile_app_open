@@ -15,8 +15,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MLPerf Mobile',
-      localizationsDelegates: const [AppLocalizations.delegate],
-      supportedLocales: const [Locale('en', '')],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: Theme.of(context).copyWith(
         colorScheme: ColorScheme.fromSwatch().copyWith(
           primary: AppColors.primary,

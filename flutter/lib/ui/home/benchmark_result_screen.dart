@@ -60,7 +60,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
 
     String title;
     title = _screenMode == _ScreenMode.performance

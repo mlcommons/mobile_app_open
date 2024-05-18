@@ -137,9 +137,9 @@ flutter/update-splash-screen:
 
 .PHONY: flutter/l10n
 flutter/l10n:
-	flutter --no-version-check gen-l10n \
-		--arb-dir=flutter/lib/l10n \
-		--output-dir=flutter/lib/localizations \
+	cd flutter && flutter --no-version-check gen-l10n \
+		--arb-dir=lib/l10n \
+		--output-dir=lib/localizations \
 		--template-arb-file=app_en.arb \
 		--output-localization-file=app_localizations.dart \
 		--no-synthetic-package

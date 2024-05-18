@@ -11,7 +11,7 @@ class UnsupportedDeviceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final iconEdgeSize = MediaQuery.of(context).size.width * 0.66;
     return Scaffold(

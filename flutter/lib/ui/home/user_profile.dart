@@ -27,7 +27,7 @@ class _UserProfileSectionState extends State<UserProfileSection> {
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
 
     final currentUser = FirebaseAuth.instance.currentUser;
     final signInWithEmailButton = _buildSignInWithEmailButton();
@@ -143,7 +143,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     state = context.watch<BenchmarkState>();
     final resultManager = state.resourceManager.resultManager;
     var profileScreenActions = [

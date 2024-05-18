@@ -30,7 +30,7 @@ class _RemoteExtendedResultScreenState
 
   @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.historyDetailsTitle),
@@ -97,7 +97,7 @@ class _LocalExtendedResultScreenState extends State<LocalExtendedResultScreen> {
 
   @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     helper = HistoryHelperUtils(l10n);
     state = context.watch<BenchmarkState>();
 
@@ -152,7 +152,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
 
   @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     helper = HistoryHelperUtils(l10n);
     state = context.watch<BenchmarkState>();
     return ListView(children: _makeBody());

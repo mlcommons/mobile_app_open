@@ -47,7 +47,7 @@ class AppDrawer extends StatelessWidget {
   }
 
   Widget buildHeader(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final appTitle = Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
@@ -73,7 +73,7 @@ class AppDrawer extends StatelessWidget {
   }
 
   List<Widget> buildMenuList(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return [
       ListTile(
         leading: const Icon(Icons.access_time),

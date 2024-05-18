@@ -34,7 +34,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     progress = state.taskRunner.progressInfo;
 
     final backgroundGradient = BoxDecoration(

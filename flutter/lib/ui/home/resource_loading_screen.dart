@@ -19,7 +19,7 @@ class _ResourceLoadingScreenState extends State<ResourceLoadingScreen> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final loadingProgressText = '${(state.loadingProgress * 100).round()}%';
 
     final progressCircle = Center(
