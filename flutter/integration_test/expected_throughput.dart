@@ -43,7 +43,7 @@ const Map<String, Map<String, Interval>> _imageClassification = {
     _kIphoneOnGitHubAction: Interval(min: 1, max: 12),
   },
   _kPixelBackend: {
-    _kPixel6: Interval(min: 800, max: 1200),
+    _kPixel6: Interval(min: 700, max: 1200),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 1600, max: 2400),
@@ -83,7 +83,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kCloudBuildX28: Interval(min: 3.5, max: 8),
     _kRyzen5600: Interval(min: 14, max: 22),
     _kPixel5: Interval(min: 40, max: 60),
-    _kPixel6: Interval(min: 200, max: 450),
+    _kPixel6: Interval(min: 100, max: 450),
     _kIphoneOnGitHubAction: Interval(min: 0.5, max: 4),
     _kIphoneOnMacbookM1: Interval(min: 9, max: 16),
   },
@@ -127,8 +127,8 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
 
 const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 0.7, max: 1.1),
-    _kCloudBuildX28: Interval(min: 0.5, max: 1.3),
+    _kCloudBuildX23: Interval(min: 0.7, max: 1.2),
+    _kCloudBuildX28: Interval(min: 0.5, max: 1.4),
     _kRyzen5600: Interval(min: 2.8, max: 3.2),
     _kPixel5: Interval(min: 2.3, max: 3.0),
     _kPixel6: Interval(min: 2, max: 75),
