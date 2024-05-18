@@ -98,11 +98,12 @@ class _SettingsScreen extends State<SettingsScreen> {
         textStyle: const TextStyle(fontSize: 20),
       ),
       onPressed: () async {
-        switch (
-            await showConfirmDialog(context, l10n.settingsClearCacheConfirm)) {
+        final dialogAction =
+            await showConfirmDialog(context, l10n.settingsClearCacheConfirm);
+        switch (dialogAction) {
           case ConfirmDialogAction.ok:
             await state.clearCache();
-            if (!mounted) return;
+            if (!context.mounted) return;
             Navigator.pop(context);
             break;
           case ConfirmDialogAction.cancel:

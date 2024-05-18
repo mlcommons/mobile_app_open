@@ -128,8 +128,6 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                   .validateExternalResourcesDirectory(
                       l10n.dialogContentMissingFiles);
               if (wrongPathError.isNotEmpty) {
-                // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-                // ignore: use_build_context_synchronously
                 if (!context.mounted) return;
                 await showErrorDialog(context, [wrongPathError]);
                 return;
@@ -138,8 +136,6 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                 final offlineError = await state.validator
                     .validateOfflineMode(l10n.dialogContentOfflineWarning);
                 if (offlineError.isNotEmpty) {
-                  // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-                  // ignore: use_build_context_synchronously
                   if (!context.mounted) return;
                   switch (await showConfirmDialog(context, offlineError)) {
                     case ConfirmDialogAction.ok:

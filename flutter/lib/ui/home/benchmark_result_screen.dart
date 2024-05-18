@@ -138,8 +138,9 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       icon: const Icon(Icons.delete),
       color: Colors.white,
       onPressed: () async {
-        if (!context.mounted) return;
-        switch (await showConfirmDialog(context, l10n.resultsDeleteConfirm)) {
+        final dialogAction =
+            await showConfirmDialog(context, l10n.resultsDeleteConfirm);
+        switch (dialogAction) {
           case ConfirmDialogAction.ok:
             await state.resourceManager.resultManager.deleteLastResult();
             await state.resetBenchmarkState();

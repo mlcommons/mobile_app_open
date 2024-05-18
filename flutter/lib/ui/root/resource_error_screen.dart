@@ -79,8 +79,6 @@ class ResourceErrorScreen extends StatelessWidget {
                         onPressed: () async {
                           final taskConfigs =
                               await state.configManager.getConfigs();
-                          // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-                          // ignore: use_build_context_synchronously
                           if (!context.mounted) return;
                           await Navigator.of(context).push(
                             MaterialPageRoute(
@@ -100,6 +98,7 @@ class ResourceErrorScreen extends StatelessWidget {
                           } catch (e, trace) {
                             print("can't change task config: $e");
                             print(trace);
+                            if (!context.mounted) return;
                             await showErrorDialog(context,
                                 ['${l10n.resourceErrorFail}: ${e.toString()}']);
                           }

@@ -230,12 +230,11 @@ class TaskConfigSection extends StatelessWidget {
         onTap: () async {
           try {
             await state.setTaskConfig(name: configuration.name);
-            // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-            // ignore: use_build_context_synchronously
             if (!context.mounted) return;
             Navigator.of(context).popUntil((route) => route.isFirst);
             await state.loadResources();
           } catch (e) {
+            if (!context.mounted) return;
             await showErrorDialog(
               context,
               <String>[l10n.settingsTaskConfigError, e.toString()],

@@ -65,7 +65,7 @@ class _ShareButton extends State<ShareBottomSheet> {
       case _ShareDestination.cloud:
         var cancel = BotToast.showLoading();
         await resultManager.uploadLastResult();
-        if (context.mounted) {
+        if (mounted) {
           Navigator.of(context).pop();
         }
         cancel();
