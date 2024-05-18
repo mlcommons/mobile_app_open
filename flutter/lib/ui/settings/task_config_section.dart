@@ -131,18 +131,8 @@ class _DataFolderSelectorHelper {
     }
     return ListTile(
       title: Text(l10n.settingsTaskDataFolderCustom),
-      subtitle: PopScope(
-        canPop: false,
-        onPopInvoked: (bool didPop) async {
-          if (didPop) return;
-          if (store.customDataFolder.isEmpty ||
-              !await Directory(store.customDataFolder).exists()) {
-            setValue(DataFolderType.default_);
-          }
-        },
-        child: Column(
-          children: [pathField, dirWarning],
-        ),
+      subtitle: Column(
+        children: [pathField, dirWarning],
       ),
       leading: Radio<DataFolderType>(
         value: DataFolderType.custom,
@@ -150,11 +140,7 @@ class _DataFolderSelectorHelper {
         onChanged: setValue,
       ),
       onTap: () async {
-        if (store.customDataFolder.isEmpty) {
-          await pickFolder();
-        } else {
-          setValue(DataFolderType.custom);
-        }
+        await pickFolder();
       },
     );
   }
