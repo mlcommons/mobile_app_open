@@ -253,8 +253,8 @@ class DropdownOption<T> {
   DropdownOption(this.value, this.label);
 
   @override
-  bool operator ==(dynamic other) =>
-      other != null && other is DropdownOption && this.value == other.value;
+  bool operator ==(Object other) =>
+      other is DropdownOption && this.value == other.value;
 
   @override
   int get hashCode => value.hashCode ^ label.hashCode;

@@ -44,7 +44,7 @@ class _ResourceLoadingScreenState extends State<ResourceLoadingScreen> {
               fontWeight: FontWeight.bold,
               color: AppColors.lightText,
             ),
-            textScaleFactor: 2,
+            textScaler: const TextScaler.linear(2),
           ),
         ),
       ),

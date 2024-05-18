@@ -131,13 +131,14 @@ class _DataFolderSelectorHelper {
     }
     return ListTile(
       title: Text(l10n.settingsTaskDataFolderCustom),
-      subtitle: WillPopScope(
-        onWillPop: () async {
+      subtitle: PopScope(
+        canPop: false,
+        onPopInvoked: (bool didPop) async {
+          if (didPop) return;
           if (store.customDataFolder.isEmpty ||
               !await Directory(store.customDataFolder).exists()) {
             setValue(DataFolderType.default_);
           }
-          return true;
         },
         child: Column(
           children: [pathField, dirWarning],
