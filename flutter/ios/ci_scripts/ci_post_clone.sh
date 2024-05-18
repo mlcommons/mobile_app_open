@@ -75,7 +75,7 @@ export MC_FLUTTER_HOME=$MC_BUILD_HOME/flutter
 export PUB_CACHE=$MC_BUILD_HOME/.pub-cache
 
 mkdir -p "$MC_BUILD_HOME"
-test ! -d "$MC_FLUTTER_HOME" && git clone --branch 3.7.6 --depth 1 https://github.com/flutter/flutter.git "$MC_FLUTTER_HOME"
+test ! -d "$MC_FLUTTER_HOME" && git clone --branch 3.19.6 --depth 1 https://github.com/flutter/flutter.git "$MC_FLUTTER_HOME"
 export PATH="$PATH:$MC_FLUTTER_HOME/bin:$PUB_CACHE/bin"
 if [ $runner = $GITHUB_ACTIONS ]; then
   # make Flutter available in the subsequent GitHub Actions steps

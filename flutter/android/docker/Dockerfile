@@ -54,7 +54,7 @@ WORKDIR $HOME
 
 ENV PUB_CACHE=$HOME/.cache/.pub-cache
 ENV PATH=$PATH:$HOME/flutter/bin:$HOME/flutter/bin/cache/dart-sdk/bin:$PUB_CACHE/bin
-RUN git clone --branch "3.7.6" --single-branch --depth 1 https://github.com/flutter/flutter.git $HOME/flutter
+RUN git clone --branch "3.19.6" --single-branch --depth 1 https://github.com/flutter/flutter.git $HOME/flutter
 RUN git config --global --add safe.directory $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN flutter doctor -v
