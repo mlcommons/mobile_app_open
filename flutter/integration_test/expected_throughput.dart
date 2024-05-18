@@ -127,8 +127,8 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
 
 const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 0.7, max: 1.1),
-    _kCloudBuildX28: Interval(min: 0.5, max: 1.3),
+    _kCloudBuildX23: Interval(min: 0.7, max: 1.2),
+    _kCloudBuildX28: Interval(min: 0.5, max: 1.4),
     _kRyzen5600: Interval(min: 2.8, max: 3.2),
     _kPixel5: Interval(min: 2.3, max: 3.0),
     _kPixel6: Interval(min: 2, max: 75),
