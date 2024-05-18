@@ -22,6 +22,9 @@ class AppDrawer extends StatelessWidget {
       backgroundColor: AppColors.drawerBackground,
       child: Theme(
         data: Theme.of(context).copyWith(
+          // TODO: https://docs.flutter.dev/release/breaking-changes/material-3-migration
+          // ignore: deprecated_member_use
+          useMaterial3: false,
           textTheme: Theme.of(context).textTheme.apply(
                 bodyColor: AppColors.drawerForeground,
                 displayColor: AppColors.drawerForeground,

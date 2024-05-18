@@ -18,6 +18,9 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: Theme.of(context).copyWith(
+        // TODO: https://docs.flutter.dev/release/breaking-changes/material-3-migration
+        // ignore: deprecated_member_use
+        useMaterial3: false,
         colorScheme: ColorScheme.fromSwatch().copyWith(
           primary: AppColors.primary,
           secondary: AppColors.secondary,
