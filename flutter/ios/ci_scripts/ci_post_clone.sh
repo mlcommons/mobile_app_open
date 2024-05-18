@@ -85,7 +85,7 @@ fi
 
 echo "$MC_LOG_PREFIX flutter version:" && flutter --version
 flutter config --no-analytics && dart --disable-analytics
-dart pub global activate protoc_plugin ^20.0.1
+dart pub global activate protoc_plugin ^21.1.2
 cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 
 echo "$MC_LOG_PREFIX ========== Build app =========="

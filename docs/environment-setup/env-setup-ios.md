@@ -30,7 +30,7 @@ Otherwise, you can get errors about missing pods
 
   * Add flutter binary folders to path: `export PATH="$PATH:$HOME/tools/flutter/bin:$HOME/.pub-cache/bin"`  
     If you use zsh: `echo export PATH="\$PATH:\$HOME/tools/flutter/bin:\$HOME/.pub-cache/bin" >>~/.zshrc`
-  * Enable protobuf plugin: `dart pub global activate protoc_plugin ^20.0.1`
+  * Enable protobuf plugin: `dart pub global activate protoc_plugin ^21.1.2`
 * Go to `ios` directory and install pods: `pod install`
 
 ## Tested environment

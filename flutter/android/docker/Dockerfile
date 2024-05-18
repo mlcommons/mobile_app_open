@@ -58,7 +58,7 @@ RUN git clone --branch "3.7.6" --single-branch --depth 1 https://github.com/flut
 RUN git config --global --add safe.directory $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN flutter doctor -v
-RUN dart pub global activate protoc_plugin ^20.0.1 && chmod --recursive a=u $PUB_CACHE
+RUN dart pub global activate protoc_plugin ^21.1.2 && chmod --recursive a=u $PUB_CACHE
 
 RUN mkdir -p $HOME/.cache/.gradle
 ENV GRADLE_USER_HOME=$HOME/.cache/.gradle
