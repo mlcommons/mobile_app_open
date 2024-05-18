@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:uuid/uuid.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
@@ -325,17 +326,22 @@ class _NativeRunHelper {
 
     if (enableArtificialLoad) {
       print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
-      const value = 999999999999999.0;
-
-      // execute() returns Cancelable, which should in theory allow you to stop the isolate
-      // unfortunately, it doesn't work, artificial load doesn't stop
-      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
+      final _ = workerManager.execute(
+        () async {
+          const value = 999999999999999.0;
+          var newValue = value;
+          while (true) {
+            newValue = newValue * 0.999999999999999;
+          }
+        },
+        priority: WorkPriority.immediately,
+      );
     }
 
     try {
       return await _invokeNativeRun();
     } finally {
-      await Executor().dispose();
+      await workerManager.dispose();
     }
   }
 
@@ -409,13 +415,5 @@ class _NativeRunHelper {
     return await LoadgenInfo.fromFile(
       filepath: '$logDir/$logFileName',
     );
-  }
-
-  // This function needs to be either a static function or a top level function to be accessible as a Flutter entry point.
-  static void _doSomethingCPUIntensive(double value, TypeSendPort port) {
-    var newValue = value;
-    while (true) {
-      newValue = newValue * 0.999999999999999;
-    }
   }
 }
