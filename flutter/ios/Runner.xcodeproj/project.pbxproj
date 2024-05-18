@@ -230,14 +230,14 @@
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
 			buildPhases = (
 				ECF63E70EE94C1A007B886BF /* [CP] Check Pods Manifest.lock */,
-				9740EEB61CF901F6004384FC /* Run Script xcode_backend */,
+				19C134552876922700263A48 /* Embed Frameworks */,
+				9740EEB61CF901F6004384FC /* [Script] [Flutter] Run Script xcode_backend */,
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
-				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
+				3B06AD1E1E4923F5004D2608 /* [Script] [Flutter] Thin Binary */,
+				BD70EE9B2A93C96B00C2A803 /* [Script] [Crashlytics] Upload dSYM files */,
 				D5A11810053EEA7778D10F3D /* [CP] Embed Pods Frameworks */,
-				19C134552876922700263A48 /* Embed Frameworks */,
-				BD70EE9B2A93C96B00C2A803 /* [Crashlytics] Upload dSYM files */,
 			);
 			buildRules = (
 			);
@@ -255,7 +255,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1510;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					2C25ABBA270595F000518142 = {
@@ -310,15 +310,16 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		3B06AD1E1E4923F5004D2608 /* Thin Binary */ = {
+		3B06AD1E1E4923F5004D2608 /* [Script] [Flutter] Thin Binary */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}",
 			);
-			name = "Thin Binary";
+			name = "[Script] [Flutter] Thin Binary";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -347,7 +348,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		9740EEB61CF901F6004384FC /* Run Script xcode_backend */ = {
+		9740EEB61CF901F6004384FC /* [Script] [Flutter] Run Script xcode_backend */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -355,14 +356,14 @@
 			);
 			inputPaths = (
 			);
-			name = "Run Script xcode_backend";
+			name = "[Script] [Flutter] Run Script xcode_backend";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build\n";
 		};
-		BD70EE9B2A93C96B00C2A803 /* [Crashlytics] Upload dSYM files */ = {
+		BD70EE9B2A93C96B00C2A803 /* [Script] [Crashlytics] Upload dSYM files */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -372,7 +373,7 @@
 			);
 			inputPaths = (
 			);
-			name = "[Crashlytics] Upload dSYM files";
+			name = "[Script] [Crashlytics] Upload dSYM files";
 			outputFileListPaths = (
 			);
 			outputPaths = (
