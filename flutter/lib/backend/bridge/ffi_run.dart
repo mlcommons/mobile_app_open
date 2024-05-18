@@ -9,7 +9,7 @@ import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
 
-class _RunIn extends Struct {
+final class _RunIn extends Struct {
   external Pointer<Utf8> backend_model_path;
   external Pointer<Utf8> backend_lib_path;
   external Pointer<Uint8> backend_settings_data;
@@ -91,7 +91,7 @@ class _RunIn extends Struct {
   }
 }
 
-class _RunOutAccuracy extends Struct {
+final class _RunOutAccuracy extends Struct {
   @Float()
   external double normalized;
   external Pointer<Utf8> formatted;
@@ -104,7 +104,7 @@ class _RunOutAccuracy extends Struct {
   }
 }
 
-class _RunOut extends Struct {
+final class _RunOut extends Struct {
   @Bool()
   external bool runOk;
   external Pointer<_RunOutAccuracy> accuracy1;
