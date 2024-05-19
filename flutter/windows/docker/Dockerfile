@@ -33,7 +33,7 @@ RUN choco install -y --no-progress git --version 2.33.0.2
 RUN choco install -y --no-progress make --version 4.3
 RUN choco install -y --no-progress bazelisk --version 1.16.0
 RUN choco install -y --no-progress python3 --version 3.11 && copy "C:\Python311\python.exe" "C:\Python311\python3.exe"
-RUN choco install -y --no-progress protoc --version 3.18.1
+RUN choco install -y --no-progress protoc --version 23.2
 
 RUN python3 -m pip install --user numpy absl-py
 
