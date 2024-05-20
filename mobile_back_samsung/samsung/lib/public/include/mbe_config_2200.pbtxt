@@ -70,40 +70,6 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "super_resolution"
-  framework: "ENN"
-  delegate_choice: {
-    delegate_name: "ENN_NPU"
-    accelerator_name: "samsung_npu"
-    accelerator_desc: "NPU"
-    custom_setting {
-      id: "preset"
-      value: "1002"
-    }
-    custom_setting {
-      id: "i_type"
-      value: "Uint8"
-    }
-    custom_setting {
-      id: "o_type"
-      value: "Float32"
-    }
-    custom_setting {
-      id: "extension"
-      value: "true"
-    }
-    custom_setting {
-      id: "lazy_mode"
-      value: "true"
-    }
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sr.nnc"
-    model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
-  }
-  delegate_selected: "ENN_NPU"
-  single_stream_expected_latency_ns: 1000000
-}
-
-benchmark_setting {
   benchmark_id: "object_detection"
   framework: "ENN"
   delegate_choice: {
