@@ -29,7 +29,8 @@ class BenchmarkInfoButton extends StatelessWidget {
       isDismissible: false,
       enableDrag: false,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (context) => Wrap(
         children: [
           Padding(
