@@ -39,6 +39,18 @@ class BenchmarkInfo {
           detailsTitle: stringResources.benchInfoImageClassification,
           detailsContent: stringResources.benchInfoImageClassificationDesc,
         );
+      case (BenchmarkId.imageClassificationV2):
+        return BenchmarkLocalizationInfo(
+          name: stringResources.benchNameImageClassification,
+          detailsTitle: stringResources.benchInfoImageClassification,
+          detailsContent: stringResources.benchInfoImageClassificationV2Desc,
+        );
+      case (BenchmarkId.imageClassificationOfflineV2):
+        return BenchmarkLocalizationInfo(
+          name: stringResources.benchNameImageClassificationOffline,
+          detailsTitle: stringResources.benchInfoImageClassification,
+          detailsContent: stringResources.benchInfoImageClassificationV2Desc,
+        );
       case (BenchmarkId.objectDetection):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameObjectDetection,
