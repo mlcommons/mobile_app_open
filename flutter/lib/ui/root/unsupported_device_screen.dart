@@ -7,12 +7,11 @@ import 'package:mlperfbench/ui/page_constraints.dart';
 class UnsupportedDeviceScreen extends StatelessWidget {
   final String backendError;
 
-  const UnsupportedDeviceScreen({Key? key, required this.backendError})
-      : super(key: key);
+  const UnsupportedDeviceScreen({super.key, required this.backendError});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final iconEdgeSize = MediaQuery.of(context).size.width * 0.66;
     return Scaffold(

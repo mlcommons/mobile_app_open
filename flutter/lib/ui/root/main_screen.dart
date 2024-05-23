@@ -10,7 +10,7 @@ import 'package:mlperfbench/ui/home/resource_loading_screen.dart';
 import 'package:mlperfbench/ui/root/resource_error_screen.dart';
 
 class MainScreen extends StatelessWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

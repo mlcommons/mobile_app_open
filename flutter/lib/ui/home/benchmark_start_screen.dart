@@ -14,7 +14,7 @@ import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_config_section.dart';
 
 class BenchmarkStartScreen extends StatefulWidget {
-  const BenchmarkStartScreen({Key? key}) : super(key: key);
+  const BenchmarkStartScreen({super.key});
 
   @override
   State<BenchmarkStartScreen> createState() => _BenchmarkStartScreenState();
@@ -29,7 +29,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
     store = context.watch<Store>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -128,8 +128,6 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                   .validateExternalResourcesDirectory(
                       l10n.dialogContentMissingFiles);
               if (wrongPathError.isNotEmpty) {
-                // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-                // ignore: use_build_context_synchronously
                 if (!context.mounted) return;
                 await showErrorDialog(context, [wrongPathError]);
                 return;
@@ -138,8 +136,6 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                 final offlineError = await state.validator
                     .validateOfflineMode(l10n.dialogContentOfflineWarning);
                 if (offlineError.isNotEmpty) {
-                  // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-                  // ignore: use_build_context_synchronously
                   if (!context.mounted) return;
                   switch (await showConfirmDialog(context, offlineError)) {
                     case ConfirmDialogAction.ok:

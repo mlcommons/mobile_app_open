@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -12,6 +11,9 @@ import 'package:mlperfbench/firebase/firebase_crashlytics_service.dart';
 import 'package:mlperfbench/firebase/firebase_options.gen.dart';
 import 'package:mlperfbench/firebase/firebase_storage_service.dart';
 import 'package:mlperfbench/resources/utils.dart';
+
+import 'package:firebase_auth/firebase_auth.dart'
+    hide EmailAuthProvider, AuthProvider;
 
 class FirebaseManager {
   FirebaseManager._();

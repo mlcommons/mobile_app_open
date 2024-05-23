@@ -13,7 +13,7 @@ import 'package:mlperfbench/ui/home/user_profile.dart';
 enum _ShareDestination { local, cloud }
 
 class ShareButton extends StatelessWidget {
-  const ShareButton({Key? key}) : super(key: key);
+  const ShareButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +23,8 @@ class ShareButton extends StatelessWidget {
       onPressed: () {
         showModalBottomSheet(
           context: context,
-          builder: (_) => Wrap(
-            children: const [ShareBottomSheet()],
+          builder: (_) => const Wrap(
+            children: [ShareBottomSheet()],
           ),
         );
       },
@@ -33,7 +33,7 @@ class ShareButton extends StatelessWidget {
 }
 
 class ShareBottomSheet extends StatefulWidget {
-  const ShareBottomSheet({Key? key}) : super(key: key);
+  const ShareBottomSheet({super.key});
 
   @override
   State<ShareBottomSheet> createState() => _ShareButton();
@@ -46,7 +46,7 @@ class _ShareButton extends State<ShareBottomSheet> {
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     return Center(
       child: _buildShareModal(context),
     );
@@ -65,7 +65,7 @@ class _ShareButton extends State<ShareBottomSheet> {
       case _ShareDestination.cloud:
         var cancel = BotToast.showLoading();
         await resultManager.uploadLastResult();
-        if (context.mounted) {
+        if (mounted) {
           Navigator.of(context).pop();
         }
         cancel();
@@ -132,7 +132,7 @@ class _ShareButton extends State<ShareBottomSheet> {
   }
 
   Future<void> _buildProfileModal(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return showModalBottomSheet(
         context: context,
         builder: (context) {

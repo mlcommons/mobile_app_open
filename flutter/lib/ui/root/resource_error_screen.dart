@@ -12,11 +12,11 @@ import 'package:mlperfbench/ui/page_constraints.dart';
 import 'package:mlperfbench/ui/settings/task_config_section.dart';
 
 class ResourceErrorScreen extends StatelessWidget {
-  const ResourceErrorScreen({Key? key}) : super(key: key);
+  const ResourceErrorScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final state = context.watch<BenchmarkState>();
     final store = context.watch<Store>();
 
@@ -79,8 +79,6 @@ class ResourceErrorScreen extends StatelessWidget {
                         onPressed: () async {
                           final taskConfigs =
                               await state.configManager.getConfigs();
-                          // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-                          // ignore: use_build_context_synchronously
                           if (!context.mounted) return;
                           await Navigator.of(context).push(
                             MaterialPageRoute(
@@ -100,6 +98,7 @@ class ResourceErrorScreen extends StatelessWidget {
                           } catch (e, trace) {
                             print("can't change task config: $e");
                             print(trace);
+                            if (!context.mounted) return;
                             await showErrorDialog(context,
                                 ['${l10n.resourceErrorFail}: ${e.toString()}']);
                           }

@@ -49,6 +49,7 @@ class BenchmarkState extends ChangeNotifier {
 
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get loadingPath => resourceManager.loadingPath;
+
   double get loadingProgress => resourceManager.loadingProgress;
 
   ExtendedResult? lastResult;
@@ -226,7 +227,6 @@ class BenchmarkState extends ChangeNotifier {
       case true:
         return BenchmarkStateEnum.done;
     }
-    throw StateError('unreachable');
   }
 
   Future<void> resetBenchmarkState() async {

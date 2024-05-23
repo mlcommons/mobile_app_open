@@ -10,7 +10,7 @@ import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 
 class BenchmarkConfigSection extends StatefulWidget {
-  const BenchmarkConfigSection({Key? key}) : super(key: key);
+  const BenchmarkConfigSection({super.key});
 
   @override
   State<BenchmarkConfigSection> createState() => _BenchmarkConfigSectionState();
@@ -29,7 +29,7 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     final childrenList = <Widget>[];
 
     for (var benchmark in state.benchmarks) {

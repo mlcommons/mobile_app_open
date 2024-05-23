@@ -20,7 +20,7 @@ class BenchmarkRunningScreen extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey =
       GlobalKey<ScaffoldState>();
 
-  const BenchmarkRunningScreen({Key? key}) : super(key: key);
+  const BenchmarkRunningScreen({super.key});
 
   @override
   State<BenchmarkRunningScreen> createState() => _BenchmarkRunningScreenState();
@@ -34,7 +34,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     progress = state.taskRunner.progressInfo;
 
     final backgroundGradient = BoxDecoration(

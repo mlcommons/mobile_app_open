@@ -17,7 +17,7 @@ import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/settings/task_config_section.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreen();
@@ -32,7 +32,7 @@ class _SettingsScreen extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     store = context.watch<Store>();
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
 
     Widget artificialLoadSwitch = _artificialLoadSwitch();
     Widget crashlyticsSwitch = _crashlyticsSwitch();
@@ -98,11 +98,12 @@ class _SettingsScreen extends State<SettingsScreen> {
         textStyle: const TextStyle(fontSize: 20),
       ),
       onPressed: () async {
-        switch (
-            await showConfirmDialog(context, l10n.settingsClearCacheConfirm)) {
+        final dialogAction =
+            await showConfirmDialog(context, l10n.settingsClearCacheConfirm);
+        switch (dialogAction) {
           case ConfirmDialogAction.ok:
             await state.clearCache();
-            if (!mounted) return;
+            if (!context.mounted) return;
             Navigator.pop(context);
             break;
           case ConfirmDialogAction.cancel:

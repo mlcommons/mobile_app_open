@@ -7,7 +7,7 @@ import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/history/extended_result_screen.dart';
 
 class UploadedFilesScreen extends StatefulWidget {
-  const UploadedFilesScreen({Key? key}) : super(key: key);
+  const UploadedFilesScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _UploadedFilesScreenState();
@@ -19,7 +19,7 @@ class _UploadedFilesScreenState extends State<UploadedFilesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.userUploadedFiles),

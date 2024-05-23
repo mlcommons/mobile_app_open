@@ -22,6 +22,9 @@ class AppDrawer extends StatelessWidget {
       backgroundColor: AppColors.drawerBackground,
       child: Theme(
         data: Theme.of(context).copyWith(
+          // TODO: https://docs.flutter.dev/release/breaking-changes/material-3-migration
+          // ignore: deprecated_member_use
+          useMaterial3: false,
           textTheme: Theme.of(context).textTheme.apply(
                 bodyColor: AppColors.drawerForeground,
                 displayColor: AppColors.drawerForeground,
@@ -47,7 +50,7 @@ class AppDrawer extends StatelessWidget {
   }
 
   Widget buildHeader(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final appTitle = Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
@@ -73,7 +76,7 @@ class AppDrawer extends StatelessWidget {
   }
 
   List<Widget> buildMenuList(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return [
       ListTile(
         leading: const Icon(Icons.access_time),

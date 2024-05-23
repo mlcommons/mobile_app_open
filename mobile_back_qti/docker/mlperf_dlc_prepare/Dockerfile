@@ -28,7 +28,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y && \
     apt-get install -y --no-install-recommends \
        python3 python3-pip libpython3.8-dev python3.8-venv libgl1-mesa-glx libglib2.0-0 cython3 gcc make curl unzip libc++1-8 \
        git locales openssh-client ca-certificates tar gzip parallel \
-       zip bzip2 gnupg wget python3-six python3-pip libncurses5 openjdk-11-jdk-headless clang-format-10 golang-1.13-go build-essential
+       zip bzip2 gnupg wget python3-six python3-pip libncurses5 openjdk-17-jdk-headless clang-format-10 golang-1.13-go build-essential
 
 RUN pip3 install pip==21.3.1 setuptools==31.0.1
 RUN pip3 install tensorflow-cpu==2.13.1

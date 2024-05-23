@@ -5,7 +5,7 @@ import 'package:ffi/ffi.dart';
 import 'package:mlperfbench/backend/bridge/handle.dart';
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as pb;
 
-class _RunOut extends Struct {
+final class _RunOut extends Struct {
   @Int32()
   external int size;
 

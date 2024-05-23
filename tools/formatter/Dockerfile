@@ -29,7 +29,7 @@ RUN mkdir -p ${FORMATTER_HOME}
 
 # Install Java
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    openjdk-11-jdk-headless
+    openjdk-17-jdk-headless
 
 # Add buildifier
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -62,14 +62,14 @@ RUN pip install yamllint==1.26.3
 
 # Add Flutter SDK
 ENV UNAME=mlperf
-RUN git clone --branch "3.7.6" --single-branch --depth 1 \
+RUN git clone --branch "3.19.6" --single-branch --depth 1 \
     https://github.com/flutter/flutter.git /home/$UNAME/flutter
 RUN git config --global --add safe.directory /home/$UNAME/flutter
 # The PUB_CACHE directory will be mounted as a docker volume in format.mk
 ENV PUB_CACHE=/home/mlperf/.pub-cache
 ENV PATH=$PATH:/home/$UNAME/flutter/bin:/home/$UNAME/flutter/bin/cache/dart-sdk/bin:$PUB_CACHE/bin
 RUN flutter doctor -v
-RUN dart pub global activate protoc_plugin ^20.0.1 && chmod --recursive a=u $PUB_CACHE
+RUN dart pub global activate protoc_plugin ^21.1.2 && chmod --recursive a=u $PUB_CACHE
 RUN apt-get install -y --no-install-recommends protobuf-compiler
 # The /home/mlperf/mobile_app_open directory will be mounted
 RUN git config --global --add safe.directory /home/mlperf/mobile_app_open

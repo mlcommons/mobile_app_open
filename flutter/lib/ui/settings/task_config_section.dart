@@ -21,7 +21,7 @@ class _DataFolderSelectorHelper {
   final DataFolderType selectedOption;
 
   _DataFolderSelectorHelper(BuildContext context)
-      : l10n = AppLocalizations.of(context),
+      : l10n = AppLocalizations.of(context)!,
         store = context.watch<Store>(),
         selectedOption =
             parseDataFolderType(context.read<Store>().dataFolderType);
@@ -131,17 +131,8 @@ class _DataFolderSelectorHelper {
     }
     return ListTile(
       title: Text(l10n.settingsTaskDataFolderCustom),
-      subtitle: WillPopScope(
-        onWillPop: () async {
-          if (store.customDataFolder.isEmpty ||
-              !await Directory(store.customDataFolder).exists()) {
-            setValue(DataFolderType.default_);
-          }
-          return true;
-        },
-        child: Column(
-          children: [pathField, dirWarning],
-        ),
+      subtitle: Column(
+        children: [pathField, dirWarning],
       ),
       leading: Radio<DataFolderType>(
         value: DataFolderType.custom,
@@ -149,11 +140,7 @@ class _DataFolderSelectorHelper {
         onChanged: setValue,
       ),
       onTap: () async {
-        if (store.customDataFolder.isEmpty) {
-          await pickFolder();
-        } else {
-          setValue(DataFolderType.custom);
-        }
+        await pickFolder();
       },
     );
   }
@@ -162,11 +149,11 @@ class _DataFolderSelectorHelper {
 class TaskConfigSection extends StatelessWidget {
   final List<TaskConfigDescription> _configs;
 
-  const TaskConfigSection(this._configs, {Key? key}) : super(key: key);
+  const TaskConfigSection(this._configs, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final store = context.watch<Store>();
     final state = context.watch<BenchmarkState>();
     List<Widget> items = [];
@@ -213,7 +200,7 @@ class TaskConfigSection extends StatelessWidget {
     TaskConfigDescription configuration,
     String chosenConfigName,
   ) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final state = context.watch<BenchmarkState>();
     final isSelected = chosenConfigName == configuration.name;
 
@@ -230,12 +217,11 @@ class TaskConfigSection extends StatelessWidget {
         onTap: () async {
           try {
             await state.setTaskConfig(name: configuration.name);
-            // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-            // ignore: use_build_context_synchronously
             if (!context.mounted) return;
             Navigator.of(context).popUntil((route) => route.isFirst);
             await state.loadResources();
           } catch (e) {
+            if (!context.mounted) return;
             await showErrorDialog(
               context,
               <String>[l10n.settingsTaskConfigError, e.toString()],
@@ -290,7 +276,7 @@ class _ManageFilePermissionWidgetState
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<bool>(
       future: _permissionGranted,
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -324,7 +310,7 @@ class TaskConfigErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.resourceErrorSelectTaskFile),

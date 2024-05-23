@@ -12,7 +12,7 @@ import 'package:mlperfbench/ui/history/history_filter_screen.dart';
 import 'package:mlperfbench/ui/history/history_list_item.dart';
 
 class HistoryListScreen extends StatefulWidget {
-  const HistoryListScreen({Key? key}) : super(key: key);
+  const HistoryListScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _HistoryListScreenState();
@@ -24,7 +24,7 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     final localResults = state.resourceManager.resultManager.localResults;
     final remoteResults = state.resourceManager.resultManager.remoteResults;
     final filter = state.resourceManager.resultManager.resultFilter;

@@ -7,7 +7,7 @@ enum DialogTypeEnum { error, warning, success }
 
 Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
     String title, List<String> messages) async {
-  final l10n = AppLocalizations.of(context);
+  final l10n = AppLocalizations.of(context)!;
 
   Icon? icon;
   Color titleColor;
@@ -63,21 +63,21 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
 
 Future<void> showWarningDialog(
     BuildContext context, List<String> messages) async {
-  final l10n = AppLocalizations.of(context);
+  final l10n = AppLocalizations.of(context)!;
   await _showPopupDialog(
       context, DialogTypeEnum.warning, l10n.dialogTitleWarning, messages);
 }
 
 Future<void> showErrorDialog(
     BuildContext context, List<String> messages) async {
-  final l10n = AppLocalizations.of(context);
+  final l10n = AppLocalizations.of(context)!;
   await _showPopupDialog(
       context, DialogTypeEnum.error, l10n.dialogTitleError, messages);
 }
 
 Future<void> showSuccessDialog(
     BuildContext context, List<String> messages) async {
-  final l10n = AppLocalizations.of(context);
+  final l10n = AppLocalizations.of(context)!;
   await _showPopupDialog(
       context, DialogTypeEnum.success, l10n.dialogTitleSuccess, messages);
 }

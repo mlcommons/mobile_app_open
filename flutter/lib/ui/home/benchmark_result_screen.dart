@@ -19,7 +19,7 @@ import 'package:mlperfbench/ui/home/share_button.dart';
 enum _ScreenMode { performance, accuracy }
 
 class BenchmarkResultScreen extends StatefulWidget {
-  const BenchmarkResultScreen({Key? key}) : super(key: key);
+  const BenchmarkResultScreen({super.key});
 
   @override
   State<BenchmarkResultScreen> createState() => _BenchmarkResultScreenState();
@@ -60,7 +60,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
 
     String title;
     title = _screenMode == _ScreenMode.performance
@@ -138,8 +138,9 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       icon: const Icon(Icons.delete),
       color: Colors.white,
       onPressed: () async {
-        if (!context.mounted) return;
-        switch (await showConfirmDialog(context, l10n.resultsDeleteConfirm)) {
+        final dialogAction =
+            await showConfirmDialog(context, l10n.resultsDeleteConfirm);
+        switch (dialogAction) {
           case ConfirmDialogAction.ok:
             await state.resourceManager.resultManager.deleteLastResult();
             await state.resetBenchmarkState();
@@ -376,7 +377,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
 class BlueProgressLine extends Container {
   final double _progress;
 
-  BlueProgressLine(this._progress, {Key? key}) : super(key: key);
+  BlueProgressLine(this._progress, {super.key});
 
   double get _progressValue {
     final rangedProgress = _progress.clamp(0, 1);
