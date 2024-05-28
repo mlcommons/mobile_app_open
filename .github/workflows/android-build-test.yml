@@ -294,7 +294,7 @@ jobs:
       - build-android-apk
       - test-android-apk-tflite
     runs-on: ubuntu-22.04
-    if: github.ref == 'refs/heads/master'
+#    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
