@@ -7,10 +7,6 @@ class DartDefine {
       bool.fromEnvironment('FIREBASE_CRASHLYTICS_ENABLED', defaultValue: false);
   static const isFastMode =
       bool.fromEnvironment('FAST_MODE', defaultValue: false);
-  static const defaultCacheFolder =
-      String.fromEnvironment('FLUTTER_CACHE_FOLDER');
-  static const defaultDataFolder =
-      String.fromEnvironment('FLUTTER_DATA_FOLDER');
 }
 
 class WidgetKeys {

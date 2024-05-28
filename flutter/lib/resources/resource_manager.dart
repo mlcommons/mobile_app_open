@@ -5,13 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/resources/cache_manager.dart';
 import 'package:mlperfbench/resources/resource.dart';
 import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
-import 'package:mlperfbench/ui/settings/data_folder_type.dart';
 
 class ResourceManager {
   static const _dataPrefix = 'local://';
@@ -60,18 +58,11 @@ class ResourceManager {
   }
 
   String getDataFolder() {
-    switch (parseDataFolderType(store.dataFolderType)) {
-      case DataFolderType.default_:
-        if (DartDefine.defaultDataFolder.isNotEmpty) {
-          return DartDefine.defaultDataFolder;
-        } else {
-          return applicationDirectory;
-        }
-      case DataFolderType.appFolder:
-        return applicationDirectory;
-      case DataFolderType.custom:
-        return store.customDataFolder;
-    }
+    return applicationDirectory;
+  }
+
+  String getDataPrefix() {
+    return _dataPrefix;
   }
 
   Future<bool> isResourceExist(String? uri) async {
@@ -152,11 +143,7 @@ class ResourceManager {
   Future<void> initSystemPaths() async {
     applicationDirectory = await getApplicationDirectory();
     await Directory(applicationDirectory).create(recursive: true);
-    if (DartDefine.defaultCacheFolder.isNotEmpty) {
-      _loadedResourcesDir = DartDefine.defaultCacheFolder;
-    } else {
-      _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
-    }
+    _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
     await Directory(_loadedResourcesDir).create();
 
     cacheManager = CacheManager(_loadedResourcesDir);

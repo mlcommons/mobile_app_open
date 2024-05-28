@@ -51,18 +51,6 @@ flutter/check/build-number:
 	@[ -n "$$FLUTTER_BUILD_NUMBER" ] \
 		|| (echo FLUTTER_BUILD_NUMBER env must be explicitly set; exit 1)
 
-ifneq (${FLUTTER_DATA_FOLDER},)
-flutter_data_folder_arg="--dart-define=FLUTTER_DATA_FOLDER=${FLUTTER_DATA_FOLDER}"
-else
-flutter_data_folder_arg=
-endif
-ifneq (${FLUTTER_CACHE_FOLDER},)
-flutter_cache_folder_arg="--dart-define=FLUTTER_CACHE_FOLDER=${FLUTTER_CACHE_FOLDER}"
-else
-flutter_cache_folder_arg=
-endif
-flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
-
 FIREBASE_CRASHLYTICS_ENABLED?=false
 flutter_firebase_crashlytics_arg="--dart-define=FIREBASE_CRASHLYTICS_ENABLED=${FIREBASE_CRASHLYTICS_ENABLED}"
 
@@ -180,15 +168,13 @@ flutter/test/integration:
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
 		${flutter_firebase_crashlytics_arg} \
-		${flutter_perf_test_arg} \
-		${flutter_folder_args}
+		${flutter_perf_test_arg}
 
 .PHONY: flutter/run
 flutter/run:
 	cd flutter && ${_start_args} \
 		flutter --no-version-check \
 		run \
-		${flutter_folder_args} \
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
 		${flutter_firebase_crashlytics_arg}

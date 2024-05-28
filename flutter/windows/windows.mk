@@ -66,8 +66,7 @@ flutter/windows/release/build:
 	cd flutter && ${_start_args} flutter --no-version-check build windows --no-pub \
 		${flutter_official_build_arg} \
 		${flutter_firebase_crashlytics_arg} \
-		${flutter_build_number_arg} \
-		${flutter_folder_args}
+		${flutter_build_number_arg}
 
 .PHONY: flutter/windows/release/name
 flutter/windows/release/name:

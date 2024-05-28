@@ -106,20 +106,6 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  String get dataFolderType => _getString(StoreConstants.dataFolderType);
-
-  set dataFolderType(String value) {
-    _storeFromDisk.setString(StoreConstants.dataFolderType, value);
-    notifyListeners();
-  }
-
-  String get customDataFolder => _getString(StoreConstants.customDataFolder);
-
-  set customDataFolder(String value) {
-    _storeFromDisk.setString(StoreConstants.customDataFolder, value);
-    notifyListeners();
-  }
-
   String get taskSelection => _getString(StoreConstants.taskSelection);
 
   set taskSelection(String value) {
@@ -152,8 +138,6 @@ class StoreConstants {
   static const previousExtendedResult = 'previous extended result';
   static const previousAppVersion = 'previous app version';
   static const keepLogs = 'keep_logs';
-  static const dataFolderType = 'data folder type';
-  static const customDataFolder = 'custom data folder';
   static const taskSelection = 'disabled_tasks';
   static const testMinDuration = 'test min duration';
   static const testCooldownDuration = 'test cooldown duration';
