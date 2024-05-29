@@ -79,7 +79,7 @@ jobs:
       - name: configure Git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Cache Flutter packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /home/mlperf/.pub-cache
           key: ${{ runner.os }}-pub-cache-${{ hashFiles('**/pubspec.lock') }}

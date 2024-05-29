@@ -110,7 +110,7 @@ jobs:
           mkdir -p mobile_back_qti/${QTI_LIB} && \
           mv /tmp/${QTI_LIB}/* mobile_back_qti/${QTI_LIB}/
       - name: Cache bazel
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/bazel_cache
           key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
