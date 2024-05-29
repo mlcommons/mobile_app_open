@@ -48,7 +48,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract metadata for base image
         id: meta-base
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ghcr.io/mlcommons/mobile_app_open-base
           flavor: latest=true
@@ -65,7 +65,7 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Extract metadata for scanner image
         id: meta-scanner
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ghcr.io/mlcommons/mobile_app_open-scanner
           flavor: latest=true
