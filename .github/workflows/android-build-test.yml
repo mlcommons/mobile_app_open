@@ -181,11 +181,46 @@ jobs:
           make flutter/android/release
           gsutil cp flutter/build/app/outputs/bundle/release/app-release.aab $GCLOUD_BUCKET_PATH/app-release.aab
           gsutil cp flutter/build/app/outputs/flutter-apk/app-release.apk $GCLOUD_BUCKET_PATH/app-release.apk
-      - name: Archive Android APKs
-        uses: actions/upload-artifact@v3
+      - name: Archive APK with TFLite backend
+        uses: actions/upload-artifact@v4
         with:
-          name: android-apks-${{ github.run_number }}
-          path: output/android-apks/*.apk
+          name: android-apk-tflite-${{ github.run_number }}
+          path: output/android-apks/*-t-${{ github.run_number }}.apk
+          retention-days: 28
+          if-no-files-found: error
+      - name: Archive APK with Pixel backend
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-pixel-${{ github.run_number }}
+          path: output/android-apks/*-g-${{ github.run_number }}.apk
+          retention-days: 28
+          if-no-files-found: error
+      - name: Archive APK with QTI backend
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-qti-${{ github.run_number }}
+          path: output/android-apks/*-q-${{ github.run_number }}.apk
+          retention-days: 28
+          if-no-files-found: error
+      - name: Archive APK with MediaTek backend
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-mtk-${{ github.run_number }}
+          path: output/android-apks/*-m-${{ github.run_number }}.apk
+          retention-days: 28
+          if-no-files-found: error
+      - name: Archive APK with Samsung backend
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-samsung-${{ github.run_number }}
+          path: output/android-apks/*-s-${{ github.run_number }}.apk
+          retention-days: 28
+          if-no-files-found: error
+      - name: Archive APK with unified backend
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-unified-${{ github.run_number }}
+          path: output/android-apks/*-qsmgt-${{ github.run_number }}.apk
           retention-days: 28
           if-no-files-found: error
 
