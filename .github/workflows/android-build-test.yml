@@ -329,7 +329,7 @@ jobs:
       - build-android-apk
       - test-android-apk-tflite
     runs-on: ubuntu-22.04
-#    if: github.ref == 'refs/heads/master'
+    # if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
@@ -352,4 +352,4 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
           track: internal  # "alpha", "beta", "internal" or "production"
           status: draft
-          changesNotSentForReview: true
+          changesNotSentForReview: ${{ vars.CHANGES_NOT_SENT_FOR_REVIEW }}
