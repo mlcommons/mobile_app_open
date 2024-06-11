@@ -36,13 +36,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Cache CocoaPods
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/flutter/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
           restore-keys: ${{ runner.os }}-pods-
       - name: Cache bazel
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/bazel_cache
           key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
