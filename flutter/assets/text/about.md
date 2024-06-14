@@ -13,8 +13,9 @@ Google Pixel smartphones use the Android NNAPI run time. The Android Neural Netw
 
 The MLPerf app uses NNAPI on the following families:
 
-* Pixel 6 and Pixel 6 PRO using Tensor G1 SOC
-* Pixel 7 and Pixel 7 PRO using Tensor G2 SOC
+* Pixel 8 and Pixel 8 Pro (Tensor G3 SoC)
+* Pixel 7 and Pixel 7 Pro (Tensor G2 ScC)
+* Pixel 6 and Pixel 6 Pro (Tensor G1 ScC)
 
 <!-- markdown-link-check-disable-next-line -->
 For More Info: [https://developer.android.com/ndk/guides/neuralnetworks](https://developer.android.com/ndk/guides/neuralnetworks)
@@ -25,9 +26,8 @@ The MediaTek Neuron Delegate is a TensorFlow Lite delegate designed to work with
 
 The MLPerf app uses the Neuron delegate on the following families:
 
-* Dimensity 9000 series (9000/9000+/9200/9200+)
+* Dimensity 9000 series (9000/9000+/9200/9200+/9300/9300+)
 * Dimensity 8000 series (8000/8020/8050/8100/8200)
-* Dimensity 7000 series (7020/7050/7200)
 
 Link to MediaTek Neuron Delegate: [https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate](https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate)
 
@@ -39,6 +39,9 @@ The Qualcomm Neural Processing SDK (SNPE) is a software accelerated runtime and 
 
 The MLPerf Application uses the SNPE Hexagon Processor runtimes on the following families:
 
+* Snapdragon 8 Gen 3
+* Snapdragon 8s Gen 3
+* Snapdragon 7 Gen 3
 * Snapdragon 8 Gen 2
 * Snapdragon 7+ Gen 2
 * Snapdragon 8+ Gen 1
@@ -62,6 +65,8 @@ Official website URL: [https://developer.samsung.com/neural/overview.html](https
 
 The MLPerf Mobile Benchmarking App uses the Exynos Neural Network SDK on the following families of Exynos processors [https://semiconductor.samsung.com/processor/](https://semiconductor.samsung.com/processor/):
 
-* Exynos 990
-* Exynos 2100
+* Exynos 2400
+* Exynos 2300
 * Exynos 2200
+* Exynos 2100
+* Exynos 990
