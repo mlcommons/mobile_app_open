@@ -184,3 +184,27 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
     return MLPERF_SUCCESS;
   return MLPERF_FAILURE;
 }
+
+void convert_nhwc_to_nchw(uint8_t *data_nhwc, int N, int H, int W, int C) {
+  uint8_t *data_nchw = new uint8_t[N * C * H * W];
+  for (int n = 0; n < N; ++n) {
+    for (int c = 0; c < C; ++c) {
+      for (int h = 0; h < H; ++h) {
+        for (int w = 0; w < W; ++w) {
+          int index_nchw = ((n * C + c) * H + h) * W + w;
+          int index_nhwc = ((n * H + h) * W + w) * C + c;
+          data_nchw[index_nchw] = data_nhwc[index_nhwc];
+        }
+      }
+    }
+  }
+  std::memcpy(data_nhwc, data_nchw, N * H * W * C * sizeof(uint8_t));
+  delete[] data_nchw;
+}
+
+void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
+                                   int width, int height, uint8_t *data) {
+  CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
+  int N = 1, H = height, W = width, C = 3;
+  convert_nhwc_to_nchw(data, N, H, W, C);
+}
