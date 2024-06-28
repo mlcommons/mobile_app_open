@@ -202,9 +202,35 @@ void convert_nhwc_to_nchw(uint8_t *data_nhwc, int N, int H, int W, int C) {
   delete[] data_nchw;
 }
 
+void test_convert_nhwc_to_nchw() {
+  const int N = 1, H = 2, W = 2, C = 3;
+  uint8_t data_nhwc[N * H * W * C] = {
+      1, 2, 3, 4, 5, 6,
+      7, 8, 9, 10, 11, 12
+  };
+  uint8_t expected_data_nchw[N * C * H * W] = {
+      1, 4, 7, 10,
+      2, 5, 8, 11,
+      3, 6, 9, 12
+  };
+
+  convert_nhwc_to_nchw(data_nhwc, N, H, W, C);
+
+  for (int i = 0; i < N * C * H * W; ++i) {
+    if (data_nhwc[i] != expected_data_nchw[i]) {
+      std::cout << "Test failed at index " << i << ": expected "
+                << (int)expected_data_nchw[i] << ", got " << (int)data_nhwc[i]
+                << std::endl;
+      return;
+    }
+  }
+  std::cout << "Test passed!" << std::endl;
+}
+
 void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
                                    int width, int height, uint8_t *data) {
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
   int N = 1, H = height, W = width, C = 3;
   convert_nhwc_to_nchw(data, N, H, W, C);
+  // test_convert_nhwc_to_nchw();
 }
