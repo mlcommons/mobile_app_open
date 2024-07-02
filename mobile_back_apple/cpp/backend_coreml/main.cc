@@ -28,6 +28,7 @@ struct CoreMLBackendData {
   const char *vendor = "Apple";
   const char *accelerator{nullptr};
   CoreMLExecutor *coreMLExecutor{nullptr};
+  bool expectNCHW = false;
 };
 
 inline mlperf_data_t::Type MLMultiArrayDataType2MLPerfDataType(
@@ -82,6 +83,10 @@ mlperf_backend_ptr_t mlperf_backend_create(
 
   CoreMLBackendData *backend_data = new CoreMLBackendData();
   backendExists = true;
+  // quick hack for checking if model expects NCHW input.
+  if (strcasestr(model_path, "NCHW") != nullptr) {
+    backend_data->expectNCHW = true;
+  }
 
   // Load the model.
   NSError *error;
@@ -230,7 +235,10 @@ void test_convert_nhwc_to_nchw() {
 void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
                                    int width, int height, uint8_t *data) {
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
-  int N = 1, H = height, W = width, C = 3;
-  convert_nhwc_to_nchw(data, N, H, W, C);
-  // test_convert_nhwc_to_nchw();
+  if (backend_data->expectNCHW) {
+    LOG(INFO) << "Converting inputs from NHWC to NCHW!";
+    int N = 1, H = height, W = width, C = 3;
+    convert_nhwc_to_nchw(data, N, H, W, C);
+    // test_convert_nhwc_to_nchw();
+  }
 }
