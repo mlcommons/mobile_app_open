@@ -223,6 +223,13 @@ jobs:
           path: output/android-apks/*-qsmgt-${{ github.run_number }}.apk
           retention-days: 28
           if-no-files-found: error
+      - name: Archive AAB with unified backend
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab-unified-${{ github.run_number }}
+          path: output/android-apks/*-qsmgt-${{ github.run_number }}.aab
+          retention-days: 28
+          if-no-files-found: error
 
   test-android-apk-tflite:
     needs: build-android-apk
