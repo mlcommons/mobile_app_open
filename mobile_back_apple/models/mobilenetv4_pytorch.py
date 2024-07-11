@@ -17,10 +17,26 @@ from PIL import Image
 C = 3
 H = 384
 W = 384
-MODEL_NAME = "hf-hub:timm/mobilenetv4_conv_large.e600_r384_in1k"
 
-def load_dummy_images(count=9):
-  # TODO: Replace this with actual loading of images
+INPUT_NAME = 'images'
+OUTPUT_NAME = 'softmax'
+MODEL_NAME = 'hf-hub:timm/mobilenetv4_conv_large.e600_r384_in1k'
+
+MLMODEL_FILE_FP32 = 'mobilenetv4_fp32.mlpackage'
+MLMODEL_FILE_W8 = "mobilenetv4_w8.mlpackage"
+MLMODEL_FILE_W8A8 = "mobilenetv4_w8a8.mlpackage"
+
+IMAGE_DIR = './imagenet'
+LABELS_FILE = 'imagenet_val_full.txt'
+
+
+def load_labels(labels_file: str) -> list[str]:
+  with open(labels_file, 'r') as f:
+    lines = f.readlines()
+    return lines
+
+
+def load_dummy_images(count: int = 9) -> list[Image]:
   images = []
   for _ in range(count):
     dummy_image = np.random.randint(0, 256, (H, W, C), dtype=np.uint8)
@@ -28,25 +44,23 @@ def load_dummy_images(count=9):
   return images
 
 
-def load_images_from_folder(folder, max_images=99):
+def load_images_from_folder(folder: str, max_images: int = None) -> list[Image]:
   images = []
   filenames = os.listdir(folder)
-  if len(filenames) > max_images:
-    filenames = np.random.choice(filenames, max_images, replace=False)
+  filenames.sort()
+  if max_images is not None and len(filenames) > max_images:
+    filenames = filenames[:max_images]
   for filename in filenames:
     if filename.lower().endswith((".jpg", ".jpeg", ".png")):
       img_path = os.path.join(folder, filename)
       img = Image.open(img_path).convert('RGB')
-      img_array = np.array(img)
-      images.append(img_array)
+      images.append(img)
+      print(f'Loaded: {filename}')
+  print(f'Loaded {len(images)} images from {folder}')
   return images
 
 
-def load_sample_data():
-  # sample_images = load_dummy_images(count=9)
-  folder_path = './imagenet'
-  sample_images = load_images_from_folder(folder_path, max_images=999)
-  print(f'Loaded {len(sample_images)} images from {folder_path}')
+def preprocess_images(pil_images: list[Image]) -> list[dict]:
   # mean and std for ImageNet
   mean = [0.485, 0.456, 0.406]
   std = [0.229, 0.224, 0.225]
@@ -57,17 +71,40 @@ def load_sample_data():
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(mean, std)
   ])
-  sample_data = []
-  for image in sample_images:
-    img_normalized = transform(image)
-    img_np = np.array(img_normalized)
+  transformed_images = transform(pil_images)
+  data = []
+  for image in transformed_images:
+    img_np = image.numpy()
     img_np = img_np.reshape(1, C, H, W)
     assert (img_np.shape == (1, C, H, W))
-    sample_data.append({'images': img_np})
-  return sample_data
+    data.append({INPUT_NAME: img_np})
+  return data
 
 
-def main():
+def quantize_weights(mlmodel: ct.models.MLModel) -> ct.models.MLModel:
+  # quantize weights to 8 bits
+  weight_quant_op_config = cto.OpLinearQuantizerConfig(mode="linear_symmetric",
+                                                       dtype="int8")
+  weight_quant_model_config = cto.OptimizationConfig(weight_quant_op_config)
+  mlmodel_quantized = cto.linear_quantize_weights(mlmodel,
+                                                  weight_quant_model_config)
+  print('Weights quantization finished.')
+  return mlmodel_quantized
+
+
+def quantize_activations(mlmodel: ct.models.MLModel, sample_data: list[dict]) -> ct.models.MLModel:
+  # quantize activations to 8 bits
+  act_quant_op_config = OpActivationLinearQuantizerConfig(mode="linear_symmetric",
+                                                          dtype="int8")
+  act_quant_model_config = cto.OptimizationConfig(global_config=act_quant_op_config)
+  mlmodel_quantized = linear_quantize_activations(mlmodel,
+                                                  act_quant_model_config,
+                                                  sample_data=sample_data)
+  print('Activations quantization finished.')
+  return mlmodel_quantized
+
+
+def convert_model():
   # Load the pretrained model
   torch_model = timm.create_model(MODEL_NAME, pretrained=True)
   torch_model.eval()
@@ -85,45 +122,55 @@ def main():
   ml_model = ct.convert(
     traced_model,
     convert_to="mlprogram",
-    inputs=[ct.TensorType(name="images", shape=example_input.shape)],
-    outputs=[ct.TensorType(name="softmax")],
+    inputs=[ct.TensorType(name=INPUT_NAME, shape=example_input.shape)],
+    outputs=[ct.TensorType(name=OUTPUT_NAME)],
     # minimum_deployment_target=ct.target.iOS18
   )
 
   ml_model.short_description = MODEL_NAME
 
-  ml_model.save("mobilenetv4_fp32.mlpackage")
+  ml_model.save(MLMODEL_FILE_FP32)
   print('Model converted from PyTorch to Core ML.')
 
   mlmodel_quantized = quantize_weights(ml_model)
-  mlmodel_quantized.save("mobilenetv4_w8.mlpackage")
+  mlmodel_quantized.save(MLMODEL_FILE_W8)
 
-  sample_data = load_sample_data()
+  # pil_images = load_dummy_images(count=9)
+  pil_images = load_images_from_folder(IMAGE_DIR, max_images=999)
+  sample_data = preprocess_images(pil_images)
   mlmodel_quantized = quantize_activations(mlmodel_quantized, sample_data)
-  mlmodel_quantized.save("mobilenetv4_w8a8.mlpackage")
+  mlmodel_quantized.save(MLMODEL_FILE_W8A8)
 
 
-def quantize_weights(mlmodel):
-  # quantize weights to 8 bits
-  weight_quant_op_config = cto.OpLinearQuantizerConfig(mode="linear_symmetric",
-                                                       dtype="int8")
-  weight_quant_model_config = cto.OptimizationConfig(weight_quant_op_config)
-  mlmodel_quantized = cto.linear_quantize_weights(mlmodel,
-                                                  weight_quant_model_config)
-  print('Weights quantization finished.')
-  return mlmodel_quantized
+def test_accuracy(mlmodel_file: str):
+  expected_labels = load_labels(LABELS_FILE)
+  pil_images = load_images_from_folder(IMAGE_DIR)
+  mlmodel = ct.models.MLModel(mlmodel_file)
+  batch_size = 999
+  correct_predictions = 0
+  total_predictions = 0
+  total_images = len(pil_images)
+  for i in range(0, len(pil_images), batch_size):
+    batch_images = pil_images[i:i + batch_size]
+    image_data = preprocess_images(batch_images)
+    predictions = mlmodel.predict(image_data)
+    assert (len(predictions) == len(image_data))
+    for j in range(len(image_data)):
+      total_predictions += 1
+      predicted_label = np.argmax(predictions[j][OUTPUT_NAME])
+      expected_label = int(expected_labels[i + j])
+      if predicted_label == expected_label:
+        correct_predictions += 1
+    moving_accuracy = correct_predictions / total_predictions
+    print(f'Moving Accuracy: {moving_accuracy * 100:.2f}%. Images processed: {total_predictions}/{total_images}.')
+  assert (total_predictions == len(pil_images))
+  accuracy = correct_predictions / total_predictions
+  print(f'Accuracy: {accuracy * 100:.2f}%. Images processed: {total_predictions}/{total_images}.')
 
 
-def quantize_activations(mlmodel, sample_data):
-  # quantize activations to 8 bits
-  act_quant_op_config = OpActivationLinearQuantizerConfig(mode="linear_symmetric",
-                                                          dtype="int8")
-  act_quant_model_config = cto.OptimizationConfig(global_config=act_quant_op_config)
-  mlmodel_quantized = linear_quantize_activations(mlmodel,
-                                                  act_quant_model_config,
-                                                  sample_data=sample_data)
-  print('Activations quantization finished.')
-  return mlmodel_quantized
+def main():
+  convert_model()
+  test_accuracy(mlmodel_file=MLMODEL_FILE_W8A8)
 
 
 if __name__ == "__main__":
