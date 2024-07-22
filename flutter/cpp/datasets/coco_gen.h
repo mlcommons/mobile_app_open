@@ -75,6 +75,7 @@ class CocoGen : public Dataset {
 
   // Loaded samples in RAM.
   std::vector<std::unique_ptr<CaptionRecord>> samples_;
+  std::vector<uint8_t*> outputs_;
 };
 
 }  // namespace mobile
