@@ -52,11 +52,7 @@ class CocoGen : public Dataset {
   // GetData returns the data of a specific input.
   std::vector<void*> GetData(int sample_idx) override {
     std::vector<void*> data;
-#if 0
-    data.push_back(samples_.at(sample_idx)->get_input_ids());
-    data.push_back(samples_.at(sample_idx)->get_input_mask());
-    data.push_back(samples_.at(sample_idx)->get_segment_ids());
-#endif
+    data.push_back(samples_.at(sample_idx)->get_tokenized_ids());
     return data;
   }
 
@@ -77,8 +73,8 @@ class CocoGen : public Dataset {
   // The random access reader to read input TFRecord file.
   TFRecordReader sample_reader_;
 
-    // Loaded samples in RAM.
-  std::vector<int64_t> samples_;
+  // Loaded samples in RAM.
+  std::vector<CaptionRecord*> samples_;
 };
 
 }  // namespace mobile

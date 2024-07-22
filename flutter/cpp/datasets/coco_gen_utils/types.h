@@ -32,39 +32,52 @@ struct CaptionRecord {
     id = tensorflow::GetFeatureValues<int64_t>("id", example)[0];
     // std::cout << "id: " << id << "\n";
 
-    auto caption_list = tensorflow::GetFeatureValues<string>("caption", example);
-    caption = std::vector<std::string>(caption_list.begin(), caption_list.end());
+    auto caption_list =
+        tensorflow::GetFeatureValues<string>("caption", example);
+    caption =
+        std::vector<std::string>(caption_list.begin(), caption_list.end());
 
-    auto tokenized_id_list = tensorflow::GetFeatureValues<int64_t>("tokenized_ids", example);
-    tokenized_ids = std::vector<int64_t>(tokenized_id_list.begin(), tokenized_id_list.end());
+    auto tokenized_id_list =
+        tensorflow::GetFeatureValues<int64_t>("tokenized_ids", example);
+    tokenized_ids = std::vector<int32_t>(tokenized_id_list.begin(),
+                                         tokenized_id_list.end());
 
-    auto filename_list = tensorflow::GetFeatureValues<string>("file_name", example);
-    filename = std::vector<std::string>(filename_list.begin(), filename_list.end());
+    auto filename_list =
+        tensorflow::GetFeatureValues<string>("file_name", example);
+    filename =
+        std::vector<std::string>(filename_list.begin(), filename_list.end());
 
-    auto clip_score_list = tensorflow::GetFeatureValues<float>("clip_score", example);
-    clip_score = std::vector<float>(clip_score_list.begin(), clip_score_list.end())[0];
+    auto clip_score_list =
+        tensorflow::GetFeatureValues<float>("clip_score", example);
+    clip_score =
+        std::vector<float>(clip_score_list.begin(), clip_score_list.end())[0];
   }
 
   void dump() {
     std::cout << "  id: " << id << "\n";
     std::cout << "  caption: " << caption[0] << "\n";
     std::cout << "  token_id: ";
-    for (auto t: tokenized_ids) {
-            std::cout << t << ", ";
+    for (auto t : tokenized_ids) {
+      std::cout << t << ", ";
     }
     std::cout << "\n";
     std::cout << "  file_name: " << filename[0] << "\n";
     std::cout << "  clip_score: " << clip_score << "\n";
   }
 
+ int32_t *get_tokenized_ids(){
+    return tokenized_ids.data();
+ }
+
+ private:
   int64_t id;
   std::vector<std::string> caption;
-  std::vector<int64_t> tokenized_ids;
+  std::vector<int32_t> tokenized_ids;
   std::vector<std::string> filename;
   float clip_score;
 };
 
-}
-}
+}  // namespace mobile
+}  // namespace mlperf
 
 #endif  // MLPERF_DATASETS_COCO_GEN_UTILS_TYPES_H_
