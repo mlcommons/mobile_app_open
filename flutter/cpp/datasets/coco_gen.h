@@ -74,7 +74,7 @@ class CocoGen : public Dataset {
   TFRecordReader sample_reader_;
 
   // Loaded samples in RAM.
-  std::vector<CaptionRecord*> samples_;
+  std::vector<std::unique_ptr<CaptionRecord>> samples_;
 };
 
 }  // namespace mobile
