@@ -65,9 +65,7 @@ struct CaptionRecord {
     std::cout << "  clip_score: " << clip_score << "\n";
   }
 
- int32_t *get_tokenized_ids(){
-    return tokenized_ids.data();
- }
+  int32_t* get_tokenized_ids() { return tokenized_ids.data(); }
 
  private:
   int64_t id;
