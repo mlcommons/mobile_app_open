@@ -24,16 +24,27 @@ void CocoGen::UnloadSamplesFromRam(
   }
 }
 
+
+#define OUTPUT_SIZE 512*512*3
 std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
                                             const std::vector<void*>& outputs) {
   void* output = outputs.at(0);
+  std::vector<uint8_t> output_pixels(OUTPUT_SIZE);
   if (output_format_[0].type == DataType::Uint8) {
-    std::vector<uint8_t> output_pixels(512 * 512 * 3);
     uint8_t* temp_data = reinterpret_cast<uint8_t*>(output);
     std::copy(temp_data, temp_data + output_pixels.size(),
               output_pixels.begin());
     return output_pixels;
+  } else if (output_format_[0].type == DataType::Float32) {
+    float* temp_data = reinterpret_cast<float*>(output);
+
+    // [-1.0, 1.0] -> [0, 255]
+    for (int i=0; i < OUTPUT_SIZE; i++) {
+     output_pixels[i] = (uint8_t) ((*(temp_data + i) + 1) / 2 * 255);
+    }
+    return output_pixels;
   }
+  return std::vector<uint8_t>();
 }
 
 bool CocoGen::HasAccuracy() { return true; }
