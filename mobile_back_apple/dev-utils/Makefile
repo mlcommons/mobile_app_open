@@ -161,7 +161,7 @@ coreml-run-ic-v2:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_v4/mobilenetv4_NCHW.mlpackage" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_v4/mobilenetv4_fp32_NCHW.mlpackage" \
 		--image_width=384 \
 		--image_height=384 \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
