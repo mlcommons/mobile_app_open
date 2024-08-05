@@ -34,7 +34,8 @@ steps:
       - --region=$_CE_REGION
       - --zone=$_CE_ZONE
       - --machineType=$_CE_MACHINE_TYPE
-      - --image=projects/gce-uefi-images/global/images/windows-server-2019-dc-for-containers-v20200512
+      # The image is a custom image created manually to have Docker preinstalled
+      - --image=projects/mobile-app-build-290400/global/images/mlperf-windows-server-2019-dc-v20240723
       # When using other disk types image pulling and image building could take up to 3 hours
       - --diskType=pd-ssd
       - --workspace-bucket=$_WORKSPACE_TMP_BUCKET

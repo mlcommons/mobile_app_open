@@ -84,6 +84,12 @@
     "react-scripts/@svgr/webpack/@svgr/plugin-svgo/svgo/css-select/nth-check": ">=2.1.1",
     "react-scripts/resolve-url-loader/postcss": ">=8.4.31",
     "react-scripts/http-proxy/follow-redirects": ">=1.15.6",
-    "webpack-dev-middleware": ">=5.3.4"
+    "webpack-dev-middleware": ">=5.3.4",
+    "ws": ">=8.17.1",
+    "braces": ">=3.0.3",
+    "@grpc/grpc-js": ">=1.9.15",
+    "ejs": ">=3.1.10",
+    "express": ">=4.19.2",
+    "undici": ">=5.28.4"
   }
 }
