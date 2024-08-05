@@ -12,7 +12,7 @@ export ANDROID_NDK_VERSION=25
 export ANDROID_NDK_API_LEVEL=33
 
 tflite: tflite-build tflite-run-ic-v2 tflite-run-ic-offline-v2
-coreml: coreml-build coreml-run-ic-v2
+coreml: coreml-build coreml-run-ic-v2 coreml-run-ic-offline-v2
 tflite-all: tflite-build tflite-run-ic tflite-run-ic-offline tflite-run-od tflite-run-is tflite-run-lu tflite-run-sr tflite-run-ic-v2 tflite-run-ic-offline-v2
 coreml-all: coreml-build coreml-run-ic coreml-run-ic-offline coreml-run-od coreml-run-is coreml-run-lu coreml-run-sr coreml-run-ic-v2 coreml-run-ic-offline-v2
 
@@ -158,7 +158,7 @@ coreml-run-ic-offline:
 
 coreml-run-ic-v2:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification_v2 \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_v4/mobilenetv4_fp32_NCHW.mlpackage" \
@@ -171,7 +171,7 @@ coreml-run-ic-v2:
 
 coreml-run-ic-offline-v2:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification_offline \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification_offline_v2 \
 		--mode=PerformanceOnly \
 		--scenario=Offline \
 		--batch_size=32 \
