@@ -46,6 +46,24 @@ inline mlperf_data_t::Type MLMultiArrayDataType2MLPerfDataType(
 
 static bool backendExists = false;
 
+template <typename T>
+void convert_nhwc_to_nchw(T* data_nhwc, int N, int H, int W, int C) {
+  T* data_nchw = new T[N * C * H * W];
+  for (int n = 0; n < N; ++n) {
+    for (int c = 0; c < C; ++c) {
+      for (int h = 0; h < H; ++h) {
+        for (int w = 0; w < W; ++w) {
+          int index_nchw = ((n * C + c) * H + h) * W + w;
+          int index_nhwc = ((n * H + h) * W + w) * C + c;
+          data_nchw[index_nchw] = data_nhwc[index_nhwc];
+        }
+      }
+    }
+  }
+  std::memcpy(data_nhwc, data_nchw, N * H * W * C * sizeof(T));
+  delete[] data_nchw;
+}
+
 // Return the name of the backend
 const char *mlperf_backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
   return ((CoreMLBackendData *)backend_ptr)->vendor;
@@ -86,6 +104,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
   // quick hack for checking if model expects NCHW input.
   if (strcasestr(model_path, "NCHW") != nullptr) {
     backend_data->expectNCHW = true;
+    LOG(INFO) << "Will convert inputs from NHWC to NCHW!";
   }
 
   // Load the model.
@@ -152,6 +171,11 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                          int32_t batch_index, int32_t i,
                                          void *data) {
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
+//  if (backend_data->expectNCHW) {
+//    LOG(INFO) << "Converting inputs from NHWC to NCHW!";
+//    int N = 1, H = 384, W = 384, C = 3;
+//    convert_nhwc_to_nchw(reinterpret_cast<float*>(data), N, H, W, C);
+//  }
   if ([backend_data->coreMLExecutor setInputData:data
                                               at:i
                                       batchIndex:batch_index])
@@ -190,55 +214,11 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
   return MLPERF_FAILURE;
 }
 
-void convert_nhwc_to_nchw(uint8_t *data_nhwc, int N, int H, int W, int C) {
-  uint8_t *data_nchw = new uint8_t[N * C * H * W];
-  for (int n = 0; n < N; ++n) {
-    for (int c = 0; c < C; ++c) {
-      for (int h = 0; h < H; ++h) {
-        for (int w = 0; w < W; ++w) {
-          int index_nchw = ((n * C + c) * H + h) * W + w;
-          int index_nhwc = ((n * H + h) * W + w) * C + c;
-          data_nchw[index_nchw] = data_nhwc[index_nhwc];
-        }
-      }
-    }
-  }
-  std::memcpy(data_nhwc, data_nchw, N * H * W * C * sizeof(uint8_t));
-  delete[] data_nchw;
-}
-
-void test_convert_nhwc_to_nchw() {
-  const int N = 1, H = 2, W = 2, C = 3;
-  uint8_t data_nhwc[N * H * W * C] = {
-      1, 2, 3, 4, 5, 6,
-      7, 8, 9, 10, 11, 12
-  };
-  uint8_t expected_data_nchw[N * C * H * W] = {
-      1, 4, 7, 10,
-      2, 5, 8, 11,
-      3, 6, 9, 12
-  };
-
-  convert_nhwc_to_nchw(data_nhwc, N, H, W, C);
-
-  for (int i = 0; i < N * C * H * W; ++i) {
-    if (data_nhwc[i] != expected_data_nchw[i]) {
-      std::cout << "Test failed at index " << i << ": expected "
-                << (int)expected_data_nchw[i] << ", got " << (int)data_nhwc[i]
-                << std::endl;
-      return;
-    }
-  }
-  std::cout << "Test passed!" << std::endl;
-}
-
 void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
                                    int width, int height, uint8_t *data) {
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
   if (backend_data->expectNCHW) {
-    LOG(INFO) << "Converting inputs from NHWC to NCHW!";
     int N = 1, H = height, W = width, C = 3;
-    convert_nhwc_to_nchw(data, N, H, W, C);
-    // test_convert_nhwc_to_nchw();
+    convert_nhwc_to_nchw(reinterpret_cast<float*>(data), N, H, W, C);
   }
 }
