@@ -47,8 +47,8 @@ inline mlperf_data_t::Type MLMultiArrayDataType2MLPerfDataType(
 static bool backendExists = false;
 
 template <typename T>
-void convert_nhwc_to_nchw(T* data_nhwc, int N, int H, int W, int C) {
-  T* data_nchw = new T[N * C * H * W];
+void convert_nhwc_to_nchw(T *data_nhwc, int N, int H, int W, int C) {
+  T *data_nchw = new T[N * C * H * W];
   for (int n = 0; n < N; ++n) {
     for (int c = 0; c < C; ++c) {
       for (int h = 0; h < H; ++h) {
@@ -171,11 +171,6 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                          int32_t batch_index, int32_t i,
                                          void *data) {
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
-//  if (backend_data->expectNCHW) {
-//    LOG(INFO) << "Converting inputs from NHWC to NCHW!";
-//    int N = 1, H = 384, W = 384, C = 3;
-//    convert_nhwc_to_nchw(reinterpret_cast<float*>(data), N, H, W, C);
-//  }
   if ([backend_data->coreMLExecutor setInputData:data
                                               at:i
                                       batchIndex:batch_index])
@@ -219,6 +214,6 @@ void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
   if (backend_data->expectNCHW) {
     int N = 1, H = height, W = width, C = 3;
-    convert_nhwc_to_nchw(reinterpret_cast<float*>(data), N, H, W, C);
+    convert_nhwc_to_nchw(reinterpret_cast<float *>(data), N, H, W, C);
   }
 }
