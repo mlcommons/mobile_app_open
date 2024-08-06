@@ -158,10 +158,10 @@ coreml-run-ic-offline:
 
 coreml-run-ic-v2:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification_v2 \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_v4/MobilenetV4_Large.mlmodel" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/mobilenet_v4/mobilenetv4_fp32_NCHW.mlpackage" \
 		--image_width=384 \
 		--image_height=384 \
 		--lib_path="bazel-bin/mobile_back_apple/cpp/backend_coreml/libcoremlbackend.so" \
@@ -171,7 +171,7 @@ coreml-run-ic-v2:
 
 coreml-run-ic-offline-v2:
 	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification_offline \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL image_classification_offline_v2 \
 		--mode=PerformanceOnly \
 		--scenario=Offline \
 		--batch_size=32 \
