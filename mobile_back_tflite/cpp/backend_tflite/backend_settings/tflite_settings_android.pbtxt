@@ -174,3 +174,23 @@ benchmark_setting {
   }
   delegate_selected: "NNAPI"
 }
+
+benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_path: "TODO"
+    model_checksum: ""
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_path: "TODO"
+    model_checksum: ""
+  }
+  delegate_selected: "NNAPI"
+}

@@ -10,6 +10,7 @@
 #include "flutter/cpp/backends/external.h"
 #include "flutter/cpp/datasets/ade20k.h"
 #include "flutter/cpp/datasets/coco.h"
+#include "flutter/cpp/datasets/coco_gen.h"
 #include "flutter/cpp/datasets/imagenet.h"
 #include "flutter/cpp/datasets/snu_sr.h"
 #include "flutter/cpp/datasets/squad.h"
@@ -98,6 +99,10 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
           3 /* num_channels */, 2 /* scale */, in->model_image_width,
           in->model_image_height);
+      break;
+    case ::mlperf::mobile::DatasetConfig::COCOGEN:
+      dataset = std::make_unique<::mlperf::mobile::CocoGen>(
+          backend.get(), in->dataset_data_path);
       break;
     default:
       return nullptr;

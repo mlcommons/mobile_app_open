@@ -289,3 +289,36 @@ task {
     num_classes: 1000
   }
 }
+
+task {
+  id: "stable_diffusion"
+  name: "Stable Diffusion"
+  min_query_count: 1024
+  min_duration: 60
+  max_duration: 600
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  datasets {
+    type: COCOGEN
+    full {
+      name: "COCO validation set for Stable Diffusion"
+      input_path: ""
+      groundtruth_path: ""
+    }
+    lite {
+      name: "COCO validation set for Stable Diffusion"
+      input_path: ""
+      groundtruth_path: ""
+    }
+    tiny {
+      name: "COCO validation set for Stable Diffusion"
+      input_path: ""
+      groundtruth_path: ""
+    }
+  }
+  model {
+    id: "stable_diffusion"
+    name: "StableDiffusion"
+  }
+}

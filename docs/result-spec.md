@@ -104,6 +104,7 @@ If you enable Submission mode, both `performance_run` and `accuracy_run` values 
       * `COCO`
       * `ADE20K`
       * `SQUAD`
+      * `COCOGEN`
     * `data_path`: string
     * `groundtruth_path`: string
 * `accuracy_run`: map  
