@@ -132,10 +132,10 @@ tflite-run-sd:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL stable_diffusion \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/dummy.tflite" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_tflite/cpp/backend_dummy/dummy_stable_diffusion.tflite" \
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
-		--input_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/val_toke_ids_and_clip_scores.tfrecord" \
-		--groundtruth_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/val_toke_ids_and_clip_scores.tfrecord"
+		--input_file="${REPO_ROOT_DIR}/flutter/cpp/datasets/val_toke_ids_and_clip_scores.tfrecord" \
+		--groundtruth_file="${REPO_ROOT_DIR}/flutter/cpp/datasets/val_toke_ids_and_clip_scores.tfrecord"
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \

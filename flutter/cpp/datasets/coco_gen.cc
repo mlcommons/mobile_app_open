@@ -51,7 +51,9 @@ bool CocoGen::HasAccuracy() { return true; }
 
 float CocoGen::ComputeAccuracy() { return 0.0; }
 
-std::string CocoGen::ComputeAccuracyString() {}
+std::string CocoGen::ComputeAccuracyString() {
+  return {"0.0%"};
+}
 
 }  // namespace mobile
 }  // namespace mlperf
