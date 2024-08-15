@@ -12,7 +12,7 @@
 //    std::cout << i << ": " << r.size() << ", " << reader.Size() << "\n";
 //    mlperf::mobile::CaptionRecord *d = new mlperf::mobile::CaptionRecord(r);
 //    // d->dump();
-//    auto ids = d->get_tokenized_ids();
+//    auto ids = d->get_input_ids();
 //    for (int i = 0; i < 77; i++) {
 //      if (i == 0)
 //        std::cout << "[" << ids[i] << ", ";

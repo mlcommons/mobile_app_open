@@ -22,7 +22,7 @@ limitations under the License.
 namespace mlperf {
 namespace mobile {
 
-// CaptionRecord is equivlent to records in the ground truth tfrecord file.
+// CaptionRecord is equivalent to records in the ground truth tfrecord file.
 struct CaptionRecord {
   explicit CaptionRecord(const tensorflow::tstring& record) {
     using string = std::string;
@@ -37,10 +37,15 @@ struct CaptionRecord {
     caption =
         std::vector<std::string>(caption_list.begin(), caption_list.end());
 
-    auto tokenized_id_list =
-        tensorflow::GetFeatureValues<int64_t>("tokenized_ids", example);
-    tokenized_ids = std::vector<int32_t>(tokenized_id_list.begin(),
-                                         tokenized_id_list.end());
+    auto input_id_list =
+        tensorflow::GetFeatureValues<int64_t>("input_ids", example);
+    input_ids =
+        std::vector<int32_t>(input_id_list.begin(), input_id_list.end());
+
+    auto attention_mask_list =
+        tensorflow::GetFeatureValues<int64_t>("attention_mask", example);
+    attention_mask = std::vector<int32_t>(attention_mask_list.begin(),
+                                          attention_mask_list.end());
 
     auto filename_list =
         tensorflow::GetFeatureValues<string>("file_name", example);
@@ -54,23 +59,39 @@ struct CaptionRecord {
   }
 
   void dump() {
+    std::cout << "CaptionRecord:\n";
     std::cout << "  id: " << id << "\n";
     std::cout << "  caption: " << caption[0] << "\n";
-    std::cout << "  token_id: ";
-    for (auto t : tokenized_ids) {
-      std::cout << t << ", ";
+    std::cout << "  input_ids: ";
+    for (size_t i = 0; i < input_ids.size(); ++i) {
+      std::cout << input_ids[i];
+      if (i != input_ids.size() - 1) {
+        std::cout << ", ";
+      } else {
+        std::cout << "\n";
+      }
     }
-    std::cout << "\n";
+    std::cout << "  attention_mask: ";
+    for (size_t i = 0; i < attention_mask.size(); ++i) {
+      std::cout << attention_mask[i];
+      if (i != attention_mask.size() - 1) {
+        std::cout << ", ";
+      } else {
+        std::cout << "\n";
+      }
+    }
     std::cout << "  file_name: " << filename[0] << "\n";
     std::cout << "  clip_score: " << clip_score << "\n";
   }
 
-  int32_t* get_tokenized_ids() { return tokenized_ids.data(); }
+  int32_t* get_input_ids() { return input_ids.data(); }
+  int32_t* get_attention_mask() { return attention_mask.data(); }
 
  private:
   int64_t id;
   std::vector<std::string> caption;
-  std::vector<int32_t> tokenized_ids;
+  std::vector<int32_t> input_ids;
+  std::vector<int32_t> attention_mask;
   std::vector<std::string> filename;
   float clip_score;
 };

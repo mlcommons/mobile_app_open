@@ -52,7 +52,7 @@ class CocoGen : public Dataset {
   // GetData returns the data of a specific input.
   std::vector<void*> GetData(int sample_idx) override {
     std::vector<void*> data;
-    data.push_back(samples_.at(sample_idx)->get_tokenized_ids());
+    data.push_back(samples_.at(sample_idx)->get_input_ids());
     return data;
   }
 
