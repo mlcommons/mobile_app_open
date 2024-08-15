@@ -22,6 +22,7 @@ cc_library(
     name = "coco_gen_utils",
     hdrs = [
         "types.h",
+        "clip_score.h",
     ],
     copts = select({
         "//flutter/android/commonlibs:use_asan": [
@@ -42,6 +43,7 @@ cc_library(
             "@org_tensorflow//tensorflow/core:framework",
             "@org_tensorflow//tensorflow/core:lib",
             "@org_tensorflow//tensorflow/core:protos_all_cc",
+            "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         ],
     }),
 )
