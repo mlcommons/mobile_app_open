@@ -369,17 +369,22 @@ int Main(int argc, char *argv[]) {
     } break;
     case DatasetConfig::COCOGEN: {
       LOG(INFO) << "Using COCO 2014 dataset for Stable Diffusion benchmark";
-      std::string input_tfrecord;
+      std::string input_tfrecord, input_clip_model;
       std::vector<Flag> dataset_flags{
           Flag::CreateFlag(
-              "input_file", &input_tfrecord,
+              "input_tfrecord", &input_tfrecord,
               "Path to the tfrecord file containing inputs for the model.",
+              Flag::kRequired),
+          Flag::CreateFlag(
+              "input_clip_model", &input_clip_model,
+              "Path to the CLIP model (TFLite) file for score prediction.",
               Flag::kRequired),
       };
 
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
-        dataset.reset(new CocoGen(backend.get(), input_tfrecord));
+        dataset.reset(
+            new CocoGen(backend.get(), input_tfrecord, input_clip_model));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),

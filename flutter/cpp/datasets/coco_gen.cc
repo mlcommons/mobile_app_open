@@ -1,12 +1,16 @@
 #include "coco_gen.h"
 
+#include <iomanip>
+
 namespace mlperf {
 namespace mobile {
 namespace {}  // namespace
 
-CocoGen::CocoGen(Backend* backend, const std::string& input_tfrecord)
+CocoGen::CocoGen(Backend* backend, const std::string& input_tfrecord,
+                 const std::string& input_clip_model)
     : Dataset(backend),
       sample_reader_(input_tfrecord),
+      clip_score_predictor_(input_clip_model),
       samples_(sample_reader_.Size()) {}
 
 void CocoGen::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
@@ -24,8 +28,7 @@ void CocoGen::UnloadSamplesFromRam(
   }
 }
 
-
-#define OUTPUT_SIZE 512*512*3
+#define OUTPUT_SIZE 512 * 512 * 3
 std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
                                             const std::vector<void*>& outputs) {
   void* output = outputs.at(0);
@@ -34,25 +37,53 @@ std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
     uint8_t* temp_data = reinterpret_cast<uint8_t*>(output);
     std::copy(temp_data, temp_data + output_pixels.size(),
               output_pixels.begin());
-    return output_pixels;
   } else if (output_format_[0].type == DataType::Float32) {
     float* temp_data = reinterpret_cast<float*>(output);
 
     // [-1.0, 1.0] -> [0, 255]
-    for (int i=0; i < OUTPUT_SIZE; i++) {
-     output_pixels[i] = (uint8_t) ((*(temp_data + i) + 1) / 2 * 255);
+    for (int i = 0; i < OUTPUT_SIZE; i++) {
+      output_pixels[i] = (uint8_t)((*(temp_data + i) + 1) / 2 * 255);
     }
-    return output_pixels;
   }
-  return std::vector<uint8_t>();
+  if (!output_pixels.empty()) {
+    CaptionRecord* record = samples_.at(sample_idx).get();
+    auto input_ids = record->get_input_ids_vector();
+    auto attention_mask = record->get_attention_mask_vector();
+    // TODO: resize output_pixels to 224x224 and assign to pixel_values
+    std::vector<float> pixel_values(3 * 224 * 224, 1.0f);
+    float score =
+        clip_score_predictor_.predict(input_ids, attention_mask, pixel_values);
+    LOG(INFO) << "Score: " << score << " for sample_idx: " << sample_idx;
+    scores_.push_back(score);
+    return output_pixels;
+  } else {
+    return std::vector<uint8_t>();
+  }
 }
 
 bool CocoGen::HasAccuracy() { return true; }
 
-float CocoGen::ComputeAccuracy() { return 0.0; }
+float CocoGen::ComputeAccuracy() {
+  LOG(INFO) << "Computing accuracy";
+  if (scores_.empty()) {
+    return -1.0f;
+  }
+  float total_score = 0.0f;
+  for (auto score : scores_) {
+    total_score += score;
+  }
+  float avg_score = total_score / static_cast<float>(scores_.size());
+  return avg_score;
+}
 
 std::string CocoGen::ComputeAccuracyString() {
-  return {"0.0%"};
+  float result = ComputeAccuracy();
+  if (result < 0.0f) {
+    return {"N/A"};
+  }
+  std::stringstream stream;
+  stream << std::fixed << std::setprecision(4) << result;
+  return stream.str();
 }
 
 }  // namespace mobile

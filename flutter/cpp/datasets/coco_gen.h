@@ -24,6 +24,7 @@ limitations under the License.
 #include <vector>
 
 #include "flutter/cpp/dataset.h"
+#include "flutter/cpp/datasets/coco_gen_utils/clip_score.h"
 #include "flutter/cpp/datasets/coco_gen_utils/types.h"
 #include "flutter/cpp/datasets/squad_utils/tfrecord_reader.h"
 
@@ -32,8 +33,9 @@ namespace mobile {
 
 class CocoGen : public Dataset {
  public:
-  // CocoGen need a TFRecord file
-  CocoGen(Backend* backend, const std::string& input_tfrecord);
+  // CocoGen need a TFRecord file and a clip model file.
+  CocoGen(Backend* backend, const std::string& input_tfrecord,
+          const std::string& input_clip_model);
 
   // Returns the name of the dataset.
   const std::string& Name() override { return name_; }
@@ -75,7 +77,9 @@ class CocoGen : public Dataset {
 
   // Loaded samples in RAM.
   std::vector<std::unique_ptr<CaptionRecord>> samples_;
-  std::vector<uint8_t*> outputs_;
+
+  CLIPScorePredictor clip_score_predictor_;
+  std::vector<float> scores_;
 };
 
 }  // namespace mobile

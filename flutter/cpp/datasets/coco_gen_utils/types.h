@@ -86,6 +86,8 @@ struct CaptionRecord {
 
   int32_t* get_input_ids() { return input_ids.data(); }
   int32_t* get_attention_mask() { return attention_mask.data(); }
+  std::vector<int32_t> get_input_ids_vector() { return input_ids; }
+  std::vector<int32_t> get_attention_mask_vector() { return attention_mask; }
 
  private:
   int64_t id;
