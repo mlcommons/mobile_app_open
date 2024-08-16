@@ -194,8 +194,8 @@ cc_library(
         "//flutter/cpp:mlperf_driver",
         "//flutter/cpp:utils",
         "//flutter/cpp/backends:external",
-        "//flutter/cpp/datasets/squad_utils",
         "//flutter/cpp/datasets/coco_gen_utils",
+        "//flutter/cpp/datasets/squad_utils",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_protobuf//:protobuf",
         "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
@@ -211,6 +211,6 @@ cc_binary(
         "test_coco_gen.cc",
     ],
     deps = [
-	    ":coco_gen",
-    ]
+        ":coco_gen",
+    ],
 )

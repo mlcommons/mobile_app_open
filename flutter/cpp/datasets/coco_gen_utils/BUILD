@@ -21,8 +21,8 @@ package(
 cc_library(
     name = "coco_gen_utils",
     hdrs = [
-        "types.h",
         "clip_score.h",
+        "types.h",
     ],
     copts = select({
         "//flutter/android/commonlibs:use_asan": [
