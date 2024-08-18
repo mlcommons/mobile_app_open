@@ -78,8 +78,12 @@ class CocoGen : public Dataset {
   // Loaded samples in RAM.
   std::vector<std::unique_ptr<CaptionRecord>> samples_;
 
+  // CLIP score calculation
   CLIPScorePredictor score_predictor_;
-  std::vector<float> scores_;
+  std::set<int> sample_ids_;
+  std::unordered_map<int, std::vector<uint8_t>> output_pixels_map;
+  std::unordered_map<int, std::vector<int32_t>> attention_mask_map;
+  std::unordered_map<int, std::vector<int32_t>> input_ids_map;
 };
 
 }  // namespace mobile

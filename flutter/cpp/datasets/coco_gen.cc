@@ -46,35 +46,36 @@ std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
     }
   }
   if (!output_pixels.empty()) {
+    sample_ids_.insert(sample_idx);
     CaptionRecord* record = samples_.at(sample_idx).get();
-    auto input_ids = record->get_input_ids_vector();
-    auto attention_mask = record->get_attention_mask_vector();
-    std::vector<float> pixel_values(OUTPUT_SIZE);
-    for (int i = 0; i < OUTPUT_SIZE; i++) {
-      pixel_values[i] = static_cast<float>(output_pixels[i]);
-    }
-    float score =
-        score_predictor_.predict(attention_mask, input_ids, pixel_values);
-    LOG(INFO) << "Score: " << score << " for sample_idx: " << sample_idx;
-    scores_.push_back(score);
+    output_pixels_map[sample_idx] = output_pixels;
+    attention_mask_map[sample_idx] = record->get_attention_mask_vector();
+    input_ids_map[sample_idx] = record->get_input_ids_vector();
     return output_pixels;
   } else {
     return std::vector<uint8_t>();
   }
 }
 
-bool CocoGen::HasAccuracy() { return true; }
+bool CocoGen::HasAccuracy() { return !sample_ids_.empty(); }
 
 float CocoGen::ComputeAccuracy() {
-  LOG(INFO) << "Computing accuracy";
-  if (scores_.empty()) {
-    return -1.0f;
-  }
   float total_score = 0.0f;
-  for (auto score : scores_) {
+  float total_samples = static_cast<float>(sample_ids_.size());
+  for (int sample_idx : sample_ids_) {
+    std::vector<int32_t> input_ids = input_ids_map[sample_idx];
+    std::vector<int32_t> attention_mask = attention_mask_map[sample_idx];
+    std::vector<uint8_t> output_pixels = output_pixels_map[sample_idx];
+    std::vector<float> pixel_values(OUTPUT_SIZE);
+    for (int i = 0; i < OUTPUT_SIZE; i++) {
+      pixel_values[i] = static_cast<float>(output_pixels[i]);
+    }
+    float score =
+        score_predictor_.predict(attention_mask, input_ids, pixel_values);
+    LOG(INFO) << "sample_idx: " << sample_idx << " score: " << score;
     total_score += score;
   }
-  float avg_score = total_score / static_cast<float>(scores_.size());
+  float avg_score = total_score / total_samples;
   return avg_score;
 }
 

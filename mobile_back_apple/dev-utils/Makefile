@@ -140,8 +140,8 @@ tflite-run-sd:
 		--model_file="${REPO_ROOT_DIR}/mobile_back_tflite/cpp/backend_dummy/dummy_stable_diffusion.tflite" \
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
 		--input_tfrecord="${REPO_ROOT_DIR}/flutter/cpp/datasets/coco_gen_utils/coco_gen.tfrecord" \
-		--input_clip_model="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/clip_model.tflite" \
-		--min_query_count=3
+		--input_clip_model="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/clip_model_512x512.tflite" \
+		--min_query_count=5
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \
