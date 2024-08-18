@@ -86,6 +86,19 @@ const Map<String, Interval> _superResolution = {
   'neuron': Interval(min: 0.32, max: 0.35),
 };
 
+// TODO (anhappdev): update expected accuracy for stable diffusion
+const Map<String, Interval> _stableDiffusion = {
+  'cpu': Interval(min: 0, max: 100),
+  'npu': Interval(min: 0, max: 100),
+  'tpu': Interval(min: 0, max: 100),
+  'ane|TFLite': Interval(min: 0, max: 100),
+  'ane|Core ML': Interval(min: 0, max: 100),
+  'cpu&gpu&ane': Interval(min: 0, max: 100),
+  'snpe_dsp': Interval(min: 0, max: 100),
+  'psnpe_dsp': Interval(min: 0, max: 100),
+  'neuron': Interval(min: 0, max: 100),
+};
+
 const benchmarkExpectedAccuracy = {
   BenchmarkId.imageClassification: _imageClassification,
   BenchmarkId.imageClassificationV2: _imageClassificationV2,
@@ -93,6 +106,7 @@ const benchmarkExpectedAccuracy = {
   BenchmarkId.imageSegmentationV2: _imageSegmentation,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
+  BenchmarkId.stableDiffusion: _stableDiffusion,
   BenchmarkId.imageClassificationOffline: _imageClassification,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationV2,
 };

@@ -173,6 +173,31 @@ const Map<String, Map<String, Interval>> _superResolution = {
   },
 };
 
+// TODO (anhappdev): update expected throughput for stable diffusion
+const Map<String, Map<String, Interval>> _stableDiffusion = {
+  _kTFLiteBackend: {
+    _kCloudBuildX23: Interval(min: 0, max: 100),
+    _kCloudBuildX28: Interval(min: 0, max: 100),
+    _kRyzen5600: Interval(min: 0, max: 100),
+    _kPixel5: Interval(min: 0, max: 100),
+    _kPixel6: Interval(min: 0, max: 100),
+    _kIphoneOnGitHubAction: Interval(min: 0, max: 100),
+    _kIphoneOnMacbookM1: Interval(min: 0, max: 100),
+  },
+  _kCoreMLBackend: {
+    _kIphoneOnGitHubAction: Interval(min: 0, max: 100),
+  },
+  _kPixelBackend: {
+    _kPixel6: Interval(min: 0, max: 100),
+  },
+  _kQtiBackend: {
+    _kS22Ultra: Interval(min: 0, max: 100),
+  },
+  _kMediatekBackend: {
+    _kDN2103: Interval(min: 0, max: 100),
+  },
+};
+
 const Map<String, Map<String, Interval>> _imageClassificationOffline = {
   _kTFLiteBackend: {
     _kCloudBuildX23: Interval(min: 8, max: 14),
@@ -228,6 +253,7 @@ const benchmarkExpectedThroughput = {
   BenchmarkId.imageSegmentationV2: _imageSegmentationV2,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
+  BenchmarkId.stableDiffusion: _stableDiffusion,
   BenchmarkId.imageClassificationOffline: _imageClassificationOffline,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };
