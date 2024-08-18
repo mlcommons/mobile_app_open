@@ -51,8 +51,8 @@ class CLIPScorePredictor {
     }
   }
 
-  float predict(const std::vector<int32_t>& input_ids,
-                const std::vector<int32_t>& attention_mask,
+  float predict(const std::vector<int32_t>& attention_mask,
+                const std::vector<int32_t>& input_ids,
                 const std::vector<float>& pixel_values) {
     constexpr int kInputIndexMask = 0;
     constexpr int kInputIndexIds = 1;
@@ -61,9 +61,9 @@ class CLIPScorePredictor {
     constexpr int kOutputIndexLogitsPerText = 2;
 
     // Ensure the input tensor dimensions match
-    if (!verifyInputSizes(kInputIndexIds, input_ids.size(), sizeof(int32_t)) ||
-        !verifyInputSizes(kInputIndexMask, attention_mask.size(),
+    if (!verifyInputSizes(kInputIndexMask, attention_mask.size(),
                           sizeof(int32_t)) ||
+        !verifyInputSizes(kInputIndexIds, input_ids.size(), sizeof(int32_t)) ||
         !verifyInputSizes(kInputIndexPixels, pixel_values.size(),
                           sizeof(float))) {
       LOG(FATAL) << "Input tensor sizes do not match the expected dimensions";

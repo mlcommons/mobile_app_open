@@ -10,8 +10,8 @@ CocoGen::CocoGen(Backend* backend, const std::string& input_tfrecord,
                  const std::string& input_clip_model)
     : Dataset(backend),
       sample_reader_(input_tfrecord),
-      clip_score_predictor_(input_clip_model),
-      samples_(sample_reader_.Size()) {}
+      samples_(sample_reader_.Size()),
+      score_predictor_(input_clip_model) {}
 
 void CocoGen::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
   for (QuerySampleIndex sample_idx : samples) {
@@ -49,10 +49,12 @@ std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
     CaptionRecord* record = samples_.at(sample_idx).get();
     auto input_ids = record->get_input_ids_vector();
     auto attention_mask = record->get_attention_mask_vector();
-    // TODO: resize output_pixels to 224x224 and assign to pixel_values
-    std::vector<float> pixel_values(3 * 224 * 224, 1.0f);
+    std::vector<float> pixel_values(OUTPUT_SIZE);
+    for (int i = 0; i < OUTPUT_SIZE; i++) {
+      pixel_values[i] = static_cast<float>(output_pixels[i]);
+    }
     float score =
-        clip_score_predictor_.predict(input_ids, attention_mask, pixel_values);
+        score_predictor_.predict(attention_mask, input_ids, pixel_values);
     LOG(INFO) << "Score: " << score << " for sample_idx: " << sample_idx;
     scores_.push_back(score);
     return output_pixels;

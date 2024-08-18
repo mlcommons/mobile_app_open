@@ -78,7 +78,7 @@ class CocoGen : public Dataset {
   // Loaded samples in RAM.
   std::vector<std::unique_ptr<CaptionRecord>> samples_;
 
-  CLIPScorePredictor clip_score_predictor_;
+  CLIPScorePredictor score_predictor_;
   std::vector<float> scores_;
 };
 
