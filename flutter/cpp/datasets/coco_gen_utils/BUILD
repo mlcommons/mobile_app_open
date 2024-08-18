@@ -20,6 +20,9 @@ package(
 
 cc_library(
     name = "coco_gen_utils",
+    srcs = [
+        "clip_score.cpp",
+    ],
     hdrs = [
         "clip_score.h",
         "types.h",
@@ -34,7 +37,9 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
+        "//flutter/cpp:utils",
         "@com_google_absl//absl/strings",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/core:portable_tensorflow_lib_lite",
@@ -43,7 +48,6 @@ cc_library(
             "@org_tensorflow//tensorflow/core:framework",
             "@org_tensorflow//tensorflow/core:lib",
             "@org_tensorflow//tensorflow/core:protos_all_cc",
-            "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         ],
     }),
 )
