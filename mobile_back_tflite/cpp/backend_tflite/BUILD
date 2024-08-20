@@ -44,6 +44,7 @@ cc_library(
         "tflite_c.cc",
     ],
     hdrs = [
+        "pipeline.h",
         "single_model_pipeline.h",
         "stable_diffusion_pipeline.h",
         "tflite_settings_android.h",

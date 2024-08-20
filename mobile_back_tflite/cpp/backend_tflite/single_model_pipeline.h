@@ -10,67 +10,63 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef TFLITE_SINGLE_MODEL_PIPELINE_H
-#define TFLITE_SINGLE_MODEL_PIPELINE_H
+#ifndef TFLITE_SINGLE_MODEL_PIPELINE_H_
+#define TFLITE_SINGLE_MODEL_PIPELINE_H_
 
 #include "flutter/cpp/c/type.h"
+#include "pipeline.h"
 #include "tensorflow/lite/c/c_api.h"
 
 // A simple pipeline which runs a single model.
-class SingleModelPipeline {
+class SingleModelPipeline : public Pipeline {
  public:
-  // Destroy the backend pointer and its data.
-  void backend_delete(mlperf_backend_ptr_t backend_ptr);
+  SingleModelPipeline() = default;
 
-  // Create a new backend and return the pointer to it.
+  ~SingleModelPipeline() override = default;
+
+  void backend_delete(mlperf_backend_ptr_t backend_ptr) override;
+
   mlperf_backend_ptr_t backend_create(const char *model_path,
                                       mlperf_backend_configuration_t *configs,
-                                      const char *native_lib_path);
+                                      const char *native_lib_path) override;
 
-  // Vendor name who create this backend.
-  const char *backend_vendor_name(mlperf_backend_ptr_t backend_ptr);
+  const char *backend_vendor_name(mlperf_backend_ptr_t backend_ptr) override;
 
-  // Return the name of the accelerator.
-  const char *backend_accelerator_name(mlperf_backend_ptr_t backend_ptr);
+  const char *backend_accelerator_name(
+      mlperf_backend_ptr_t backend_ptr) override;
 
-  // Return the name of this backend.
-  const char *backend_name(mlperf_backend_ptr_t backend_ptr);
+  const char *backend_name(mlperf_backend_ptr_t backend_ptr) override;
 
-  // Run the inference for a sample.
-  mlperf_status_t backend_issue_query(mlperf_backend_ptr_t backend_ptr);
+  mlperf_status_t backend_issue_query(
+      mlperf_backend_ptr_t backend_ptr) override;
 
-  // Flush the staged queries immediately.
-  mlperf_status_t backend_flush_queries(mlperf_backend_ptr_t backend_ptr);
+  mlperf_status_t backend_flush_queries(
+      mlperf_backend_ptr_t backend_ptr) override;
 
-  // Return the number of inputs of the model.
-  int32_t backend_get_input_count(mlperf_backend_ptr_t backend_ptr);
+  int32_t backend_get_input_count(mlperf_backend_ptr_t backend_ptr) override;
 
-  // Return the type of the ith input.
   mlperf_data_t backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
-                                       int32_t i);
+                                       int32_t i) override;
 
-  // Set the data for ith input.
   mlperf_status_t backend_set_input(mlperf_backend_ptr_t backend_ptr,
-                                    int32_t batch_index, int32_t i, void *data);
+                                    int32_t batch_index, int32_t i,
+                                    void *data) override;
 
-  // Return the number of outputs for the model.
-  int32_t backend_get_output_count(mlperf_backend_ptr_t backend_ptr);
+  int32_t backend_get_output_count(mlperf_backend_ptr_t backend_ptr) override;
 
-  // Return the type of the ith output.
   mlperf_data_t backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
-                                        int32_t i);
+                                        int32_t i) override;
 
-  // Get the data from ith output.
   mlperf_status_t backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                      uint32_t batchIndex, int32_t i,
-                                     void **data);
+                                     void **data) override;
 
   void backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
-                              int width, int height, uint8_t *data);
+                              int width, int height, uint8_t *data) override;
 
-  void *backend_get_buffer(size_t n);
+  void *backend_get_buffer(size_t n) override;
 
-  void backend_release_buffer(void *p);
+  void backend_release_buffer(void *p) override;
 };
 
 #endif  // TFLITE_SINGLE_MODEL_PIPELINE_H
