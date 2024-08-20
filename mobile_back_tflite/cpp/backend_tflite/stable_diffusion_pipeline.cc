@@ -10,6 +10,10 @@ extern "C" {
 mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
     const char* model_path, mlperf_backend_configuration_t* configs,
     const char* native_lib_path) {
+  // The model_path received from main.cc or the app can be a file path or a
+  // directory path. Assuming for Stable Diffusion task, the model_path point
+  // to a directory where all model files are located and the file names are
+  // known beforehand.
   return nullptr;
 }
 
