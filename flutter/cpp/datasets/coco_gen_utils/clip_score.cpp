@@ -14,8 +14,8 @@ limitations under the License.
 ==============================================================================*/
 
 #include "flutter/cpp/datasets/coco_gen_utils/clip_score.h"
-#include "flutter/cpp/utils.h"
 
+#include "flutter/cpp/utils.h"
 #include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
