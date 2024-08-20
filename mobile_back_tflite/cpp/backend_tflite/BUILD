@@ -40,10 +40,12 @@ cc_library(
     name = "tflite_c",
     srcs = [
         "single_model_pipeline.cc",
+        "stable_diffusion_pipeline.cc",
         "tflite_c.cc",
     ],
     hdrs = [
         "single_model_pipeline.h",
+        "stable_diffusion_pipeline.h",
         "tflite_settings_android.h",
         "tflite_settings_apple.h",
         "tflite_settings_windows.h",
