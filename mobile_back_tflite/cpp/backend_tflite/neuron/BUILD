@@ -32,6 +32,8 @@ cc_library(
     name = "tflite_neuron_c",
     srcs = [
         "neuron_backend.cc",
+        "//mobile_back_tflite/cpp/backend_tflite:single_model_pipeline.cc",
+        "//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_pipeline.cc",
         "//mobile_back_tflite/cpp/backend_tflite:tflite_c.cc",
     ],
     hdrs = [
@@ -41,6 +43,9 @@ cc_library(
         "neuron_backend.h",
         "neuron_builder.h",
         "tflite_settings_mtk.h",
+        "//mobile_back_tflite/cpp/backend_tflite:pipeline.h",
+        "//mobile_back_tflite/cpp/backend_tflite:single_model_pipeline.h",
+        "//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_pipeline.h",
         "//mobile_back_tflite/cpp/backend_tflite:tflite_settings_android.h",
         "//mobile_back_tflite/cpp/backend_tflite:tflite_settings_apple.h",
         "//mobile_back_tflite/cpp/backend_tflite:tflite_settings_windows.h",
