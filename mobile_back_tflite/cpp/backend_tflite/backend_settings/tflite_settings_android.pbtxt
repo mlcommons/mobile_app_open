@@ -185,12 +185,9 @@ benchmark_setting {
     model_path: "https://github.com/anhappdev/tmp/releases/download/3/dummy_stable_diffusion.tflite"
     model_checksum: ""
   }
-  delegate_choice: {
-    delegate_name: "GPU"
-    accelerator_name: "gpu"
-    accelerator_desc: "GPU"
-    model_path: "https://github.com/anhappdev/tmp/releases/download/3/dummy_stable_diffusion.tflite"
-    model_checksum: ""
-  }
   delegate_selected: "NNAPI"
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
 }
