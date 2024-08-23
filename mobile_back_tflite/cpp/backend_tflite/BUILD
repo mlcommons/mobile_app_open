@@ -42,6 +42,8 @@ cc_library(
         "single_model_pipeline.cc",
         "stable_diffusion_pipeline.cc",
         "tflite_c.cc",
+        "stable_diffusion_invoker.cc",
+        "sd_utils.cc"
     ],
     hdrs = [
         "pipeline.h",
@@ -52,6 +54,8 @@ cc_library(
         "tflite_settings_windows.h",
         "thread_pool.h",
         "utils.h",
+        "stable_diffusion_invoker.h",
+        "sd_utils.h"
     ],
     copts = tflite_copts() + select({
         "//flutter/android/commonlibs:use_asan": [
