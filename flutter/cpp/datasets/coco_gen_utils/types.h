@@ -84,6 +84,7 @@ struct CaptionRecord {
     std::cout << "  clip_score: " << clip_score << "\n";
   }
 
+  int64_t get_id() const { return id; }
   int32_t* get_input_ids() { return input_ids.data(); }
   int32_t* get_attention_mask() { return attention_mask.data(); }
   std::vector<int32_t> get_input_ids_vector() { return input_ids; }
