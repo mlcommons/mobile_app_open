@@ -13,24 +13,24 @@ limitations under the License.
 #ifndef TFLITE_STABLE_DIFFUSION_PIPELINE_H_
 #define TFLITE_STABLE_DIFFUSION_PIPELINE_H_
 
-#include "flutter/cpp/c/type.h"
-#include "pipeline.h"
-#include "tensorflow/lite/c/c_api.h"
-#include "tensorflow/core/platform/logging.h"
-#include "thread_pool.h"
-
 #include <vector>
 
-struct SDBackendData {
-  TfLiteModel* text_encoder_model{nullptr};
-  TfLiteModel* first_model{nullptr};
-  TfLiteModel* second_model{nullptr};
-  TfLiteModel* decoder_model{nullptr};
+#include "flutter/cpp/c/type.h"
+#include "pipeline.h"
+#include "tensorflow/core/platform/logging.h"
+#include "tensorflow/lite/c/c_api.h"
+#include "thread_pool.h"
 
-  TfLiteInterpreter* text_encoder_interpreter{nullptr};
-  TfLiteInterpreter* first_interpreter{nullptr};
-  TfLiteInterpreter* second_interpreter{nullptr};
-  TfLiteInterpreter* decoder_interpreter{nullptr};
+struct SDBackendData {
+  TfLiteModel *text_encoder_model{nullptr};
+  TfLiteModel *first_model{nullptr};
+  TfLiteModel *second_model{nullptr};
+  TfLiteModel *decoder_model{nullptr};
+
+  TfLiteInterpreter *text_encoder_interpreter{nullptr};
+  TfLiteInterpreter *first_interpreter{nullptr};
+  TfLiteInterpreter *second_interpreter{nullptr};
+  TfLiteInterpreter *decoder_interpreter{nullptr};
 
   std::vector<int> input_prompt_tokens;
   std::vector<int> unconditional_tokens;
@@ -93,8 +93,8 @@ class StableDiffusionPipeline : public Pipeline {
 
   void backend_release_buffer(void *p) override;
 
-  private:
-     TfLiteInterpreter* create_interpreter(TfLiteModel* model);
+ private:
+  TfLiteInterpreter *create_interpreter(TfLiteModel *model);
 };
 
 #endif  // TFLITE_STABLE_DIFFUSION_PIPELINE_H_
