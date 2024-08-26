@@ -38,9 +38,6 @@ std::unique_ptr<Pipeline> pipeline;
 
 void init_pipeline(const char *pipeline_type) {
   bool sd_pipeline = (strcmp(pipeline_type, "StableDiffusionPipeline") == 0);
-  // TODO (anhappdev): Remove next line after implementing
-  // StableDiffusionPipeline in stable_diffusion_pipeline.cc
-  sd_pipeline = false;
   if (sd_pipeline) {
     LOG(INFO) << "Initializing StableDiffusionPipeline";
     pipeline = std::make_unique<StableDiffusionPipeline>();
