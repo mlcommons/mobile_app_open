@@ -22,6 +22,10 @@ limitations under the License.
 #include "thread_pool.h"
 
 struct SDBackendData {
+  const char *name = "TFLite";
+  const char *vendor = "Google";
+  const char *accelerator = "CPU";
+
   TfLiteModel *text_encoder_model{nullptr};
   TfLiteModel *first_model{nullptr};
   TfLiteModel *second_model{nullptr};
@@ -35,7 +39,8 @@ struct SDBackendData {
   std::vector<int> input_prompt_tokens;
   std::vector<int> unconditional_tokens;
 
-  int num_steps{50};  // Default value, can be modified
+
+  int num_steps{15};  // Default value, can be modified
   int seed{42};       // Default seed, can be modified
 
   std::vector<uint8_t> output_image;

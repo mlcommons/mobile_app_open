@@ -20,8 +20,6 @@ class StableDiffusionInvoker {
  private:
   // Helper methods to encapsulate different stages of the pipeline
   std::vector<float> encode_prompt(const std::vector<int>& prompt);
-  std::vector<float> encode_unconditional(
-      const std::vector<int>& unconditional_tokens);
   std::vector<float> diffusion_step(const std::vector<float>& latent,
                                     const std::vector<float>& t_emb,
                                     const std::vector<float>& context);

@@ -7,12 +7,42 @@
 #include "tensorflow/lite/c/common.h"
 #include "thread_pool.h"
 #include "utils.h"
+#include "bpe.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
 static bool backendExists = false;
+
+inline mlperf_data_t::Type TfType2Type(TfLiteType type) {
+  switch (type) {
+    case kTfLiteFloat32:
+      return mlperf_data_t::Float32;
+    case kTfLiteUInt8:
+      return mlperf_data_t::Uint8;
+    case kTfLiteInt8:
+      return mlperf_data_t::Int8;
+    case kTfLiteFloat16:
+      return mlperf_data_t::Float16;
+    case kTfLiteInt32:
+      return mlperf_data_t::Int32;
+    case kTfLiteInt64:
+      return mlperf_data_t::Int64;
+    default:
+      LOG(ERROR) << "TfLiteType " << type << " is not supported";
+      return mlperf_data_t::Float32;
+  }
+}
+
+// Add definition for TFLiteNumElements
+size_t TFLiteNumElements(const TfLiteTensor* tensor) {
+  size_t result = 1;
+  for (int i = 0; i < TfLiteTensorNumDims(tensor); ++i) {
+    result *= TfLiteTensorDim(tensor, i);
+  }
+  return result;
+}
 
 mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
     const char* model_path, mlperf_backend_configuration_t* configs,
@@ -24,12 +54,10 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
 
   // Verify only one instance of the backend exists at any time
   if (backendExists) {
-    // LOG(ERROR) << "Only one backend instance should exist at a time";
     return nullptr;
   }
 
   SDBackendData* backend_data = new SDBackendData();
-
   backendExists = true;
 
   // Load models from the provided directory path
@@ -90,17 +118,20 @@ TfLiteInterpreter* StableDiffusionPipeline::create_interpreter(
 
 const char* StableDiffusionPipeline::backend_vendor_name(
     mlperf_backend_ptr_t backend_ptr) {
-  return "";
+  SDBackendData* backend_data = static_cast<SDBackendData*>(backend_ptr);
+  return backend_data->vendor;
 }
 
 const char* StableDiffusionPipeline::backend_accelerator_name(
     mlperf_backend_ptr_t backend_ptr) {
-  return "";
+  SDBackendData* backend_data = static_cast<SDBackendData*>(backend_ptr);
+  return backend_data->accelerator;
 }
 
 const char* StableDiffusionPipeline::backend_name(
     mlperf_backend_ptr_t backend_ptr) {
-  return "";
+  SDBackendData* backend_data = static_cast<SDBackendData*>(backend_ptr);
+  return backend_data->name;
 }
 
 void StableDiffusionPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
@@ -120,38 +151,68 @@ mlperf_status_t StableDiffusionPipeline::backend_issue_query(
   SDBackendData* backend_data = (SDBackendData*)backend_ptr;
   StableDiffusionInvoker* invoker = new StableDiffusionInvoker(backend_data);
   invoker->invoke();
+  return MLPERF_SUCCESS;
 }
 
 mlperf_status_t StableDiffusionPipeline::backend_flush_queries(
     mlperf_backend_ptr_t backend_ptr) {
-  return MLPERF_FAILURE;
+  return MLPERF_SUCCESS;
 }
 
 int32_t StableDiffusionPipeline::backend_get_input_count(
     mlperf_backend_ptr_t backend_ptr) {
-  return 2;  // We expect prompt tokens and unconditional tokens
+  return 1;
 }
 
 mlperf_data_t StableDiffusionPipeline::backend_get_input_type(
     mlperf_backend_ptr_t backend_ptr, int32_t i) {
+  // Cast the backend pointer to SDBackendData
+  SDBackendData* backend_data = static_cast<SDBackendData*>(backend_ptr);
+
+  // Initialize the result with a default type and size
   mlperf_data_t result;
-  result.type = mlperf_data_t::Float32;
+  result.type = mlperf_data_t::Float32;  // Default type, will be updated below
   result.size = 0;
+
+  const TfLiteTensor* tensor = nullptr;
+
+  switch (i) {
+    case 0:
+      tensor = TfLiteInterpreterGetInputTensor(
+          backend_data->text_encoder_interpreter, 0);
+      break;
+    default:
+      std::cerr << "Unsupported input index: " << i << std::endl;
+      return result;
+  }
+
+  if (tensor) {
+    // Map the TensorFlow Lite type to mlperf_data_t::Type
+    result.type = TfType2Type(TfLiteTensorType(tensor));
+    // Calculate the total number of elements in the tensor
+    result.size = TFLiteNumElements(tensor);
+  } else {
+    std::cerr << "Failed to retrieve tensor for input index: " << i
+              << std::endl;
+  }
+
   return result;
 }
+
 mlperf_status_t StableDiffusionPipeline::backend_set_input(
     mlperf_backend_ptr_t backend_ptr, int32_t batchIndex, int32_t i,
     void* data) {
   SDBackendData* backend_data = static_cast<SDBackendData*>(backend_ptr);
 
-  // Assuming "data" is a vector of integers representing the tokens
   int* tokens = static_cast<int*>(data);
   size_t token_count = backend_data->input_prompt_tokens.size();
 
+  bpe bpe_encoder;
+  auto unconditioned_tokens = bpe_encoder.unconditioned_tokens();
+
   if (i == 0) {
     backend_data->input_prompt_tokens.assign(tokens, tokens + token_count);
-  } else if (i == 1) {
-    backend_data->unconditional_tokens.assign(tokens, tokens + token_count);
+    backend_data->unconditional_tokens.assign(unconditioned_tokens.begin(), unconditioned_tokens.end());
   } else {
     return MLPERF_FAILURE;
   }
@@ -166,9 +227,32 @@ int32_t StableDiffusionPipeline::backend_get_output_count(
 
 mlperf_data_t StableDiffusionPipeline::backend_get_output_type(
     mlperf_backend_ptr_t backend_ptr, int32_t i) {
+  SDBackendData* backend_data = static_cast<SDBackendData*>(backend_ptr);
+
   mlperf_data_t result;
   result.type = mlperf_data_t::Float32;
   result.size = 0;
+
+  const TfLiteTensor* tensor = nullptr;
+
+  switch (i) {
+    case 0:
+      tensor = TfLiteInterpreterGetOutputTensor(
+          backend_data->decoder_interpreter, 0);
+      break;
+    default:
+      std::cerr << "Unsupported output index: " << i << std::endl;
+      return result;
+  }
+
+  if (tensor) {
+    result.type = TfType2Type(TfLiteTensorType(tensor));
+    result.size = TFLiteNumElements(tensor);
+  } else {
+    std::cerr << "Failed to retrieve tensor for output index: " << i
+              << std::endl;
+  }
+
   return result;
 }
 
@@ -189,8 +273,13 @@ void StableDiffusionPipeline::backend_convert_inputs(
     mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
     uint8_t* data) {}
 
-void* StableDiffusionPipeline::backend_get_buffer(size_t n) { return nullptr; }
-void StableDiffusionPipeline::backend_release_buffer(void* p) {}
+void* StableDiffusionPipeline::backend_get_buffer(size_t n) {
+  return ::operator new(n);
+}
+
+void StableDiffusionPipeline::backend_release_buffer(void* p) {
+  ::operator delete(p);
+}
 
 #ifdef __cplusplus
 }
