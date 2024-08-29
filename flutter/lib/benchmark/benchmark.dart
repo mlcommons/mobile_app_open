@@ -92,9 +92,11 @@ class Benchmark {
       setting: commonSettings,
       benchmarkSetting: benchmarkSettings,
     );
-
+    // TODO: put multiple model files into one directory and pass them to backend
+    final backendModelPath =
+        resourceManager.get(selectedDelegate.modelFile.first.modelPath);
     return RunSettings(
-      backend_model_path: resourceManager.get(selectedDelegate.modelPath),
+      backend_model_path: backendModelPath,
       backend_lib_name: backendLibName,
       backend_settings: settings,
       backend_native_lib_path: DeviceInfo.instance.nativeLibraryPath,
@@ -167,12 +169,14 @@ class BenchmarkStore {
       }
 
       for (final delegate in b.benchmarkSettings.delegateChoice) {
-        final model = Resource(
-          path: delegate.modelPath,
-          type: ResourceTypeEnum.model,
-          md5Checksum: delegate.modelChecksum,
-        );
-        result.add(model);
+        for (final modelFile in delegate.modelFile) {
+          final model = Resource(
+            path: modelFile.modelPath,
+            type: ResourceTypeEnum.model,
+            md5Checksum: modelFile.modelChecksum,
+          );
+          result.add(model);
+        }
       }
     }
 
