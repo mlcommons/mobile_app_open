@@ -17,15 +17,19 @@ benchmark_setting {
     delegate_name: "NNAPI"
     accelerator_name: "tpu"
     accelerator_desc: "Google EdgeTPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-    model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+      model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+    }
   }
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-    model_checksum: "0da3fa6adc8bbaaeb0b5647e2d46c8a4"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_checksum: "0da3fa6adc8bbaaeb0b5647e2d46c8a4"
+    }
   }
   delegate_selected: "NNAPI"
 }
@@ -37,15 +41,19 @@ benchmark_setting {
     delegate_name: "NNAPI"
     accelerator_name: "tpu"
     accelerator_desc: "Google EdgeTPU"
-    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
-    model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+    }
   }
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
-    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
   }
   delegate_selected: "NNAPI"
 }
@@ -57,16 +65,20 @@ benchmark_setting {
     delegate_name: "NNAPI"
     accelerator_name: "tpu"
     accelerator_desc: "Google EdgeTPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-    model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+      model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
+    }
     batch_size: 64
   }
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-    model_checksum: "66bb4eba50987221608f8487ed405794"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_checksum: "66bb4eba50987221608f8487ed405794"
+    }
     batch_size: 2
   }
   delegate_selected: "NNAPI"
@@ -80,15 +92,19 @@ benchmark_setting {
     accelerator_name: "tpu"
     accelerator_desc: "Google EdgeTPU"
     batch_size: 16
-    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
-    model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+    }
   }
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
-    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
     batch_size: 2
   }
   delegate_selected: "NNAPI"
@@ -101,15 +117,19 @@ benchmark_setting {
     delegate_name: "NNAPI"
     accelerator_name: "tpu"
     accelerator_desc: "Google EdgeTPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
-    model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+      model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
+    }
   }
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
-    model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
+      model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+    }
   }
   delegate_selected: "NNAPI"
 }
@@ -121,15 +141,19 @@ benchmark_setting {
     delegate_name: "NNAPI"
     accelerator_name: "tpu"
     accelerator_desc: "GPU EdgeTPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
-    model_checksum: "3944a2dee04a5f8a5fd016ac34c4d390"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
+      model_checksum: "3944a2dee04a5f8a5fd016ac34c4d390"
+    }
   }
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
-    model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+      model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+    }
   }
   delegate_selected: "NNAPI"
 
@@ -142,15 +166,19 @@ benchmark_setting {
     delegate_name: "NNAPI"
     accelerator_name: "tpu"
     accelerator_desc: "Google EdgeTPU"
-    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
-    model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+      model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+    }
   }
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
-    model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
+      model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+    }
   }
   delegate_selected: "NNAPI"
 
@@ -163,15 +191,19 @@ benchmark_setting {
     delegate_name: "NNAPI"
     accelerator_name: "tpu"
     accelerator_desc: "Google EdgeTPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_full_qint8.tflite"
-    model_checksum: "18ce6df0e4603f4b4ee5d04193708d9c"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_full_qint8.tflite"
+      model_checksum: "18ce6df0e4603f4b4ee5d04193708d9c"
+    }
   }
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
-    model_checksum: "672240427c1f3dc33baf2facacd9631f"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
+      model_checksum: "672240427c1f3dc33baf2facacd9631f"
+    }
   }
   delegate_selected: "NNAPI"
 }
