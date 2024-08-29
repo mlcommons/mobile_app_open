@@ -15,7 +15,7 @@ class StableDiffusionInvoker {
   StableDiffusionInvoker(SDBackendData* backend_data);
 
   // The main method to invoke the Stable Diffusion process
-  std::vector<uint8_t> invoke();
+  std::vector<float> invoke();
 
  private:
   // Helper methods to encapsulate different stages of the pipeline
@@ -27,7 +27,7 @@ class StableDiffusionInvoker {
       const std::vector<float>& encoded_text,
       const std::vector<float>& unconditional_encoded_text, int num_steps,
       int seed);
-  std::vector<uint8_t> decode_image(const std::vector<float>& latent);
+  std::vector<float> decode_image(const std::vector<float>& latent);
 
   // Utility methods
   std::vector<float> run_inference(TfLiteInterpreter* interpreter,

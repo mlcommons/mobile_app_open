@@ -39,11 +39,10 @@ struct SDBackendData {
   std::vector<int> input_prompt_tokens;
   std::vector<int> unconditional_tokens;
 
+  int num_steps{10};
+  int seed{42};
 
-  int num_steps{15};  // Default value, can be modified
-  int seed{42};       // Default seed, can be modified
-
-  std::vector<uint8_t> output_image;
+  std::vector<float> output;
   std::unique_ptr<Threadpool> executer;
 };
 

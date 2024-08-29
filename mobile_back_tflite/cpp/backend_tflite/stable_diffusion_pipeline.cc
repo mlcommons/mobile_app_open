@@ -1,13 +1,13 @@
 
 #include "stable_diffusion_pipeline.h"
 
+#include "bpe.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "stable_diffusion_invoker.h"
 #include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/c/common.h"
 #include "thread_pool.h"
 #include "utils.h"
-#include "bpe.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -150,7 +150,7 @@ mlperf_status_t StableDiffusionPipeline::backend_issue_query(
     mlperf_backend_ptr_t backend_ptr) {
   SDBackendData* backend_data = (SDBackendData*)backend_ptr;
   StableDiffusionInvoker* invoker = new StableDiffusionInvoker(backend_data);
-  invoker->invoke();
+  backend_data->output = invoker->invoke();
   return MLPERF_SUCCESS;
 }
 
@@ -206,16 +206,12 @@ mlperf_status_t StableDiffusionPipeline::backend_set_input(
 
   int* tokens = static_cast<int*>(data);
   size_t token_count = backend_data->input_prompt_tokens.size();
-
   bpe bpe_encoder;
   auto unconditioned_tokens = bpe_encoder.unconditioned_tokens();
 
-  if (i == 0) {
-    backend_data->input_prompt_tokens.assign(tokens, tokens + token_count);
-    backend_data->unconditional_tokens.assign(unconditioned_tokens.begin(), unconditioned_tokens.end());
-  } else {
-    return MLPERF_FAILURE;
-  }
+  backend_data->input_prompt_tokens.assign(tokens, tokens + token_count);
+  backend_data->unconditional_tokens.assign(unconditioned_tokens.begin(),
+                                            unconditioned_tokens.end());
 
   return MLPERF_SUCCESS;
 }
@@ -262,7 +258,7 @@ mlperf_status_t StableDiffusionPipeline::backend_get_output(
   SDBackendData* backend_data = static_cast<SDBackendData*>(backend_ptr);
 
   if (i == 0) {
-    *data = backend_data->output_image.data();
+    *data = backend_data->output.data();
     return MLPERF_SUCCESS;
   }
 

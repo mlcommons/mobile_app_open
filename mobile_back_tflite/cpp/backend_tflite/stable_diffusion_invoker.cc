@@ -24,7 +24,7 @@ std::vector<float> get_normal(unsigned numbers, unsigned seed = 5,
 StableDiffusionInvoker::StableDiffusionInvoker(SDBackendData* backend_data)
     : backend_data_(backend_data) {}
 
-std::vector<uint8_t> StableDiffusionInvoker::invoke() {
+std::vector<float> StableDiffusionInvoker::invoke() {
   std::cout << "Prompt encoding started" << std::endl;
   auto encoded_text = encode_prompt(backend_data_->input_prompt_tokens);
   auto unconditional_encoded_text =
@@ -134,20 +134,9 @@ std::vector<float> StableDiffusionInvoker::diffusion_process(
   return latent;
 }
 
-std::vector<uint8_t> StableDiffusionInvoker::decode_image(
+std::vector<float> StableDiffusionInvoker::decode_image(
     const std::vector<float>& latent) {
-  auto decoded = run_inference(backend_data_->decoder_interpreter, latent);
-
-  std::valarray<float> d(decoded.data(), decoded.size());
-  d = (d + 1) / 2 * 255;
-  std::vector<uint8_t> decoded_uint8;
-  decoded_uint8.reserve(d.size());  // Pre-allocate memory
-  for (auto e : d) {
-    e = std::clamp(e, 0.0f, 255.0f);
-    decoded_uint8.push_back(static_cast<uint8_t>(e));
-  }
-
-  return decoded_uint8;
+  return run_inference(backend_data_->decoder_interpreter, latent);
 }
 
 std::vector<float> StableDiffusionInvoker::run_inference(

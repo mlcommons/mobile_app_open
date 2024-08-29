@@ -39,14 +39,15 @@ pbtxt2header(
 cc_library(
     name = "tflite_c",
     srcs = [
+        "bpe.cc",
         "sd_utils.cc",
         "single_model_pipeline.cc",
         "stable_diffusion_invoker.cc",
         "stable_diffusion_pipeline.cc",
         "tflite_c.cc",
-        "bpe.cc",
     ],
     hdrs = [
+        "bpe.h",
         "pipeline.h",
         "sd_utils.h",
         "single_model_pipeline.h",
@@ -57,7 +58,6 @@ cc_library(
         "tflite_settings_windows.h",
         "thread_pool.h",
         "utils.h",
-        "bpe.h",
     ],
     copts = tflite_copts() + select({
         "//flutter/android/commonlibs:use_asan": [
