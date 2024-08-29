@@ -51,7 +51,7 @@ message BenchmarkSetting {
 }
 
 // Config of a delegate.
-// Next ID: 8
+// Next ID: 10
 message DelegateSetting {
   // Priority of the delegate. Used for sorting delegate choices in frontend.
   optional int32 priority = 1 [default = 0];
@@ -61,10 +61,8 @@ message DelegateSetting {
   required string accelerator_name = 3;
   // Human-readable name of the accelerator (hardware)
   required string accelerator_desc = 4;
-  // URL or local path of the model file
-  required string model_path = 5;
-  // MD5 checksum to validate the model file
-  required string model_checksum = 6;
+  // The model file to be used when using this delegate
+  repeated ModelFile model_file = 9;
   // The batch size to be used when running the model. Default to 1.
   optional int32 batch_size = 7 [default = 1];
   // Custom setting for this delegate.
@@ -109,4 +107,12 @@ message CustomSetting {
 message SettingList {
   repeated CommonSetting setting = 1;
   optional BenchmarkSetting benchmark_setting = 2;
+}
+
+// ModelFile will downloaded by the app and passed to the vendor backend
+message ModelFile {
+  // URL or local path of the model file
+  required string model_path = 5;
+  // MD5 checksum to validate the model file
+  required string model_checksum = 6;
 }
