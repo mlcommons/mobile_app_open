@@ -36,10 +36,12 @@ Future<void> validateSettings(WidgetTester tester) async {
   for (var benchmark in benchmarkState.benchmarks) {
     expect(benchmark.selectedDelegate.batchSize, greaterThanOrEqualTo(0),
         reason: 'batchSize must >= 0');
-    expect(benchmark.selectedDelegate.modelPath.isNotEmpty, isTrue,
-        reason: 'modelPath cannot be empty');
-    expect(benchmark.selectedDelegate.modelChecksum.isNotEmpty, isTrue,
-        reason: 'modelChecksum cannot be empty');
+    for (var modelFile in benchmark.selectedDelegate.modelFile) {
+      expect(modelFile.modelPath.isNotEmpty, isTrue,
+          reason: 'modelPath cannot be empty');
+      expect(modelFile.modelChecksum.isNotEmpty, isTrue,
+          reason: 'modelChecksum cannot be empty');
+    }
     expect(benchmark.selectedDelegate.acceleratorName.isNotEmpty, isTrue,
         reason: 'acceleratorName cannot be empty');
     expect(benchmark.selectedDelegate.acceleratorDesc.isNotEmpty, isTrue,
