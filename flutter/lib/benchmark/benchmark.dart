@@ -63,7 +63,7 @@ class Benchmark {
     return delegate;
   }
 
-  RunSettings createRunSettings({
+  Future<RunSettings> createRunSettings({
     required BenchmarkRunMode runMode,
     required ResourceManager resourceManager,
     required List<pb.CommonSetting> commonSettings,
@@ -71,7 +71,7 @@ class Benchmark {
     required String logDir,
     required int testMinDuration,
     required int testMinQueryCount,
-  }) {
+  }) async {
     final dataset = runMode.chooseDataset(taskConfig);
 
     int minQueryCount;
@@ -92,9 +92,10 @@ class Benchmark {
       setting: commonSettings,
       benchmarkSetting: benchmarkSettings,
     );
-    // TODO: put multiple model files into one directory and pass them to backend
+    final uris = selectedDelegate.modelFile.map((e) => e.modelPath).toList();
+    final modelDirName = selectedDelegate.delegateName.replaceAll(' ', '_');
     final backendModelPath =
-        resourceManager.get(selectedDelegate.modelFile.first.modelPath);
+        await resourceManager.getModelPath(uris, modelDirName);
     return RunSettings(
       backend_model_path: backendModelPath,
       backend_lib_name: backendLibName,
