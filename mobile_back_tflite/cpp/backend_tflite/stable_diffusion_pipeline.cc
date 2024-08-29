@@ -1,7 +1,11 @@
 
 #include "stable_diffusion_pipeline.h"
 
-#include "bpe.h"
+#include <cstring>  // For memcpy
+#include <iostream>
+#include <random>
+#include <valarray>
+
 #include "flutter/cpp/c/backend_c.h"
 #include "stable_diffusion_invoker.h"
 #include "tensorflow/lite/c/c_api.h"
@@ -151,6 +155,7 @@ mlperf_status_t StableDiffusionPipeline::backend_issue_query(
   SDBackendData* backend_data = (SDBackendData*)backend_ptr;
   StableDiffusionInvoker* invoker = new StableDiffusionInvoker(backend_data);
   backend_data->output = invoker->invoke();
+
   return MLPERF_SUCCESS;
 }
 
@@ -205,9 +210,13 @@ mlperf_status_t StableDiffusionPipeline::backend_set_input(
   SDBackendData* backend_data = static_cast<SDBackendData*>(backend_ptr);
 
   int* tokens = static_cast<int*>(data);
-  size_t token_count = backend_data->input_prompt_tokens.size();
-  bpe bpe_encoder;
-  auto unconditioned_tokens = bpe_encoder.unconditioned_tokens();
+  size_t token_count = 0;
+  while (tokens[token_count] != 0) {
+    ++token_count;
+  }
+
+  std::vector<int> unconditioned_tokens(77, 49407);
+  unconditioned_tokens[0] = 49406;
 
   backend_data->input_prompt_tokens.assign(tokens, tokens + token_count);
   backend_data->unconditional_tokens.assign(unconditioned_tokens.begin(),

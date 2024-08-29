@@ -39,7 +39,6 @@ pbtxt2header(
 cc_library(
     name = "tflite_c",
     srcs = [
-        "bpe.cc",
         "sd_utils.cc",
         "single_model_pipeline.cc",
         "stable_diffusion_invoker.cc",
@@ -47,7 +46,6 @@ cc_library(
         "tflite_c.cc",
     ],
     hdrs = [
-        "bpe.h",
         "pipeline.h",
         "sd_utils.h",
         "single_model_pipeline.h",
