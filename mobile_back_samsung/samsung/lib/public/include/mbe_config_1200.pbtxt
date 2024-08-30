@@ -25,8 +25,10 @@ benchmark_setting {
       id: "o_type"
       value: "Float32"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/ic.nnc"
-    model_checksum: "1a84db0b3dc40a6e217b7f2c8eb2980b"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/ic.nnc"
+      model_checksum: "1a84db0b3dc40a6e217b7f2c8eb2980b"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 900000
@@ -47,8 +49,10 @@ benchmark_setting {
       id: "o_type"
       value: "Float32"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/od.nnc"
-    model_checksum: "5e7abcc8fa6f7c3e0bd8955a9ef1e8cb"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/od.nnc"
+      model_checksum: "5e7abcc8fa6f7c3e0bd8955a9ef1e8cb"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -68,8 +72,10 @@ benchmark_setting {
       id: "o_type"
       value: "Int32"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/is.nnc"
-    model_checksum: "b501ed669da753b08a151639798af37e"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/is.nnc"
+      model_checksum: "b501ed669da753b08a151639798af37e"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -90,8 +96,10 @@ benchmark_setting {
       id: "o_type"
       value: "Int32"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sm_uint8.nnc"
-    model_checksum: "b02531ae19686c6574857bb18406966c"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sm_uint8.nnc"
+      model_checksum: "b02531ae19686c6574857bb18406966c"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -112,8 +120,10 @@ benchmark_setting {
       id: "o_type"
       value: "Float32"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sr.nnc"
-    model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sr.nnc"
+      model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -135,8 +145,10 @@ benchmark_setting {
       id: "o_type"
       value: "Float32"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/ic_offline.nnc"
-    model_checksum: "9fcba01bf828b5cb5b1a39b55a8a7ed9"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/ic_offline.nnc"
+      model_checksum: "9fcba01bf828b5cb5b1a39b55a8a7ed9"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000

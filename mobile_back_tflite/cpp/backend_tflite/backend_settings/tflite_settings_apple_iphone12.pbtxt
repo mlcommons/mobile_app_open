@@ -9,16 +9,20 @@ benchmark_setting {
     delegate_name: "Core ML"
     accelerator_name: "ane"
     accelerator_desc: "ANE"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-    model_checksum: "66bb4eba50987221608f8487ed405794"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_checksum: "66bb4eba50987221608f8487ed405794"
+    }
     batch_size: 8
   }
   delegate_choice: {
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-    model_checksum: "66bb4eba50987221608f8487ed405794"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_checksum: "66bb4eba50987221608f8487ed405794"
+    }
     batch_size: 8
   }
   delegate_selected: "Core ML"
@@ -31,16 +35,20 @@ benchmark_setting {
     delegate_name: "Core ML"
     accelerator_name: "ane"
     accelerator_desc: "ANE"
-    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
-    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
     batch_size: 8
   }
   delegate_choice: {
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
-    model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
     batch_size: 8
   }
   delegate_selected: "Core ML"

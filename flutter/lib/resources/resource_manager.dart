@@ -14,6 +14,7 @@ import 'package:mlperfbench/store.dart';
 class ResourceManager {
   static const _dataPrefix = 'local://';
   static const _loadedResourcesDirName = 'loaded_resources';
+  static const _symlinksDirName = 'symlinks';
 
   final VoidCallback _onUpdate;
   final Store store;
@@ -55,6 +56,27 @@ class ResourceManager {
     }
 
     throw 'invalid resource path: $uri';
+  }
+
+  // Creates symlinks to the given file paths and put them in one cache directory.
+  Future<String> getModelPath(List<String> paths, String dirName) async {
+    String modelPath;
+    if (paths.isEmpty) {
+      throw 'List of URIs cannot be empty';
+    }
+    if (dirName.contains(' ')) {
+      throw 'Directory name cannot contain spaces';
+    }
+    final cacheDir = await getApplicationCacheDirectory();
+    final modelDir = Directory('${cacheDir.path}/$_symlinksDirName/$dirName');
+    final files = paths.map((uri) => File(get(uri))).toList();
+    final symlinks = await _createSymlinks(files, modelDir);
+    if (paths.length == 1) {
+      modelPath = symlinks.first;
+    } else {
+      modelPath = modelDir.path;
+    }
+    return modelPath;
   }
 
   String getDataFolder() {
@@ -179,5 +201,23 @@ class ResourceManager {
       }
     }
     return checksumFailedResources;
+  }
+
+  Future<List<String>> _createSymlinks(
+      List<File> files, Directory cacheDir) async {
+    if (!await cacheDir.exists()) {
+      await cacheDir.create(recursive: true);
+    }
+    List<String> symlinkPaths = [];
+    for (final file in files) {
+      final symlinkPath = '${cacheDir.path}/${file.uri.pathSegments.last}';
+      symlinkPaths.add(symlinkPath);
+      final link = Link(symlinkPath);
+      if (await link.exists()) {
+        await link.delete();
+      }
+      await link.create(file.path);
+    }
+    return symlinkPaths;
   }
 }

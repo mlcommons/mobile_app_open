@@ -46,7 +46,7 @@ class FileCacheHelper {
   Future<File> _download(String url) async {
     print('downloading $url');
     const successStatusCode = 200;
-
+    _httpClient.idleTimeout = const Duration(seconds: 60);
     final response = await _httpClient
         .getUrl(Uri.parse(url))
         .then((request) => request.close());
