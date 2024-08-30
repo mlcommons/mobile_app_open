@@ -27,6 +27,8 @@ class StableDiffusionInvoker {
       const std::vector<float>& encoded_text,
       const std::vector<float>& unconditional_encoded_text, int num_steps,
       int seed);
+  int get_tensor_index_by_name(TfLiteInterpreter* interpreter,
+                               const std::string& name, bool is_input);
   std::vector<float> decode_image(const std::vector<float>& latent);
 
   // Utility methods

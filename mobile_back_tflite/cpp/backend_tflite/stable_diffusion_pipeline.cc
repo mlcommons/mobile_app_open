@@ -1,7 +1,7 @@
 
 #include "stable_diffusion_pipeline.h"
 
-#include <cstring>  // For memcpy
+#include <fstream>
 #include <iostream>
 #include <random>
 #include <valarray>
@@ -155,7 +155,6 @@ mlperf_status_t StableDiffusionPipeline::backend_issue_query(
   SDBackendData* backend_data = (SDBackendData*)backend_ptr;
   StableDiffusionInvoker* invoker = new StableDiffusionInvoker(backend_data);
   backend_data->output = invoker->invoke();
-
   return MLPERF_SUCCESS;
 }
 
@@ -215,7 +214,7 @@ mlperf_status_t StableDiffusionPipeline::backend_set_input(
     ++token_count;
   }
 
-  std::vector<int> unconditioned_tokens(77, 49407);
+  std::vector<int> unconditioned_tokens(87, 49407);
   unconditioned_tokens[0] = 49406;
 
   backend_data->input_prompt_tokens.assign(tokens, tokens + token_count);
