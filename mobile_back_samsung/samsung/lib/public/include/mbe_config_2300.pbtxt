@@ -37,8 +37,10 @@ benchmark_setting {
       id: "lazy_mode"
       value: "true"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/ic_single_fence.nnc"
-    model_checksum: "a451da1f48b1fad01c17fb7a49e5822e"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/ic_single_fence.nnc"
+      model_checksum: "a451da1f48b1fad01c17fb7a49e5822e"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 500000
@@ -71,8 +73,10 @@ benchmark_setting {
       id: "lazy_mode"
       value: "true"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/sm_uint8_fence.nnc"
-    model_checksum: "08fa7b354f82140a8863fed57c2d499b"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/sm_uint8_fence.nnc"
+      model_checksum: "08fa7b354f82140a8863fed57c2d499b"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -105,8 +109,10 @@ benchmark_setting {
       id: "lazy_mode"
       value: "true"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/od_fence.nnc"
-    model_checksum: "8a7e1808446072545c990f3d219255c6"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/od_fence.nnc"
+      model_checksum: "8a7e1808446072545c990f3d219255c6"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -139,8 +145,10 @@ benchmark_setting {
       id: "lazy_mode"
       value: "true"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sr.nnc"
-    model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sr.nnc"
+      model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -173,8 +181,10 @@ benchmark_setting {
       id: "lazy_mode"
       value: "true"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/mobile_bert_fence.nnc"
-    model_checksum: "5fb666b684a9bd0b68d497128b990137"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/mobile_bert_fence.nnc"
+      model_checksum: "5fb666b684a9bd0b68d497128b990137"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -212,8 +222,10 @@ benchmark_setting {
       id: "lazy_mode"
       value: "false"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/ic_offline.nnc"
-    model_checksum: "6885f281a3d7a7ec3549d629dff8c8ac"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/ic_offline.nnc"
+      model_checksum: "6885f281a3d7a7ec3549d629dff8c8ac"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000

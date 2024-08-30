@@ -31,8 +31,10 @@ benchmark_setting {
     delegate_name: "SNPE_GPU_FP16"
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_edgetpu_224_1.0_htp.dlc"
-    model_checksum: "cdf1fe622b309f692e05781661248a2b"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_edgetpu_224_1.0_htp.dlc"
+      model_checksum: "cdf1fe622b309f692e05781661248a2b"
+    }
   }
   single_stream_expected_latency_ns: 500000
   delegate_selected: "SNPE_GPU_FP16"
@@ -50,8 +52,10 @@ benchmark_setting {
     delegate_name: "SNPE_GPU_FP16"
     accelerator_name: "snpe_gpu_fp16
     accelerator_desc: "GPU_FP16"
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_v4_htp.dlc"
-    model_checksum: "dbab3e231e5f83aabc80d5b69e6dad32"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_v4_htp.dlc"
+      model_checksum: "dbab3e231e5f83aabc80d5b69e6dad32"
+    }
   }
   single_stream_expected_latency_ns: 500000
   delegate_selected: "SNPE_GPU_FP16"
@@ -73,8 +77,10 @@ benchmark_setting {
     accelerator_name: "psnpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
     batch_size: 12288
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc"
-    model_checksum: "6523060565b8d3f326f3f323c531fc1c"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc"
+      model_checksum: "6523060565b8d3f326f3f323c531fc1c"
+    }
   }
   delegate_selected: "SNPE_GPU_FP16"
 }
@@ -95,8 +101,10 @@ benchmark_setting {
     accelerator_name: "psnpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
     batch_size: 12360
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_v4_htp_batched_4.dlc"
-    model_checksum: "0de3b75022ce5c27d5902a080ec1cea0"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_v4_htp_batched_4.dlc"
+      model_checksum: "0de3b75022ce5c27d5902a080ec1cea0"
+    }
   }
   delegate_selected: "SNPE_GPU_FP16"
 }
@@ -128,9 +136,11 @@ benchmark_setting {
     delegate_name: "SNPE_GPU_FP16"
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilebert_quantized_htp.dlc"
-    model_checksum: "7a641e4df84fc06a1237b7fe1b1c5b08"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilebert_quantized_htp.dlc"
+      model_checksum: "7a641e4df84fc06a1237b7fe1b1c5b08"
     }
+  }
   delegate_selected: "SNPE_GPU_FP16"
 }
 benchmark_setting {
@@ -153,8 +163,10 @@ benchmark_setting {
     delegate_name: "SNPE_GPU_FP16"
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobile_mosaic_htp.dlc"
-    model_checksum: "e870526444c1e48df4f0505e530ecfdf"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobile_mosaic_htp.dlc"
+      model_checksum: "e870526444c1e48df4f0505e530ecfdf"
+    }
   }
   delegate_selected: "SNPE_GPU_FP16"
 }
@@ -186,8 +198,10 @@ benchmark_setting {
     delegate_name: "SNPE_GPU_FP16"
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
-    model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/snusr_htp.dlc"
-    model_checksum: "84ef0d9c2e7b710381cea962a22a0b41"
+    model_file: {
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/snusr_htp.dlc"
+      model_checksum: "84ef0d9c2e7b710381cea962a22a0b41"
+    }
   }
   delegate_selected: "SNPE_GPU_FP16"
 }

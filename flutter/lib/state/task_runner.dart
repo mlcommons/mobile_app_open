@@ -215,19 +215,21 @@ class TaskRunner {
       };
       notifyListeners();
 
-      final performanceRunInfo = await _NativeRunHelper(
+      final runHelper = _NativeRunHelper(
         enableArtificialLoad: store.artificialCPULoadEnabled,
-        isTestMode: store.testMode,
-        resourceManager: resourceManager,
         backendBridge: backendBridge,
         benchmark: benchmark,
         runMode: perfMode,
+        logParentDir: currentLogDir,
+      );
+      await runHelper.initRunSettings(
+        resourceManager: resourceManager,
         commonSettings: backendInfo.settings.commonSetting,
         backendLibName: backendInfo.libName,
-        logParentDir: currentLogDir,
         testMinQueryCount: store.testMinQueryCount,
         testMinDuration: store.testMinDuration,
-      ).run();
+      );
+      final performanceRunInfo = await runHelper.run();
       perfTimer.stop();
       performanceRunInfo.loadgenInfo!;
 
@@ -253,19 +255,21 @@ class TaskRunner {
         return queryProgress;
       };
       notifyListeners();
-      final accuracyRunInfo = await _NativeRunHelper(
+      final runHelper = _NativeRunHelper(
         enableArtificialLoad: store.artificialCPULoadEnabled,
-        isTestMode: store.testMode,
-        resourceManager: resourceManager,
         backendBridge: backendBridge,
         benchmark: benchmark,
         runMode: accuracyMode,
+        logParentDir: currentLogDir,
+      );
+      await runHelper.initRunSettings(
+        resourceManager: resourceManager,
         commonSettings: backendInfo.settings.commonSetting,
         backendLibName: backendInfo.libName,
-        logParentDir: currentLogDir,
         testMinQueryCount: store.testMinQueryCount,
         testMinDuration: store.testMinDuration,
-      ).run();
+      );
+      final accuracyRunInfo = await runHelper.run();
       resultHelper.accuracyRunInfo = accuracyRunInfo;
       final accuracyResult = accuracyRunInfo.result;
       benchmark.accuracyModeResult = BenchmarkResult(
@@ -302,15 +306,17 @@ class _NativeRunHelper {
     required this.backendBridge,
     required this.benchmark,
     required this.runMode,
-    required bool isTestMode,
+    required String logParentDir,
+  }) : logDir = '$logParentDir/${benchmark.id}-${runMode.readable}';
+
+  Future<void> initRunSettings({
     required ResourceManager resourceManager,
     required List<pb.CommonSetting> commonSettings,
     required String backendLibName,
-    required String logParentDir,
     required int testMinQueryCount,
     required int testMinDuration,
-  }) : logDir = '$logParentDir/${benchmark.id}-${runMode.readable}' {
-    runSettings = benchmark.createRunSettings(
+  }) async {
+    runSettings = await benchmark.createRunSettings(
       runMode: runMode,
       resourceManager: resourceManager,
       commonSettings: commonSettings,

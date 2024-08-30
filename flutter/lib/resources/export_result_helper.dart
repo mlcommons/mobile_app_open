@@ -88,12 +88,15 @@ class ResultHelper {
     final delegate = benchmark.selectedDelegate;
     final extraSettings = _extraSettingsFromCommon(commonSettings) +
         _extraSettingsFromCustom(benchmark.selectedDelegate.customSetting);
+    final modelPathsJoined =
+        delegate.modelFile.map((e) => e.modelPath).join(', ');
+    final modelPathString = '[$modelPathsJoined]';
     return BackendSettingsInfo(
       acceleratorCode: delegate.acceleratorName,
       acceleratorDesc: delegate.acceleratorDesc,
       delegate: delegate.delegateName,
       framework: benchmark.benchmarkSettings.framework,
-      modelPath: delegate.modelPath,
+      modelPath: modelPathString,
       batchSize: delegate.batchSize,
       extraSettings: extraSettings,
     );
