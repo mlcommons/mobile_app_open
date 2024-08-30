@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 
 import 'package:mlperfbench/app_constants.dart';
-import 'package:mlperfbench/backend/loadgen_info.dart';
+import 'package:mlperfbench/benchmark/performance_result_validity.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/icons.dart';
@@ -102,19 +102,11 @@ class HistoryListItem implements ListItem {
       var accuracyString = 'n/a';
       if (throughput != null) {
         throughputString = throughput.value.toStringAsFixed(0);
-        switch (benchmark?.performanceRun?.loadgenInfo?.resultValidity) {
-          case ResultValidityEnum.valid:
-            throughputTextColor = AppColors.resultValidText;
-            break;
-          case ResultValidityEnum.invalid:
-            throughputTextColor = AppColors.resultInvalidText;
-            break;
-          case ResultValidityEnum.semivalid:
-            throughputTextColor = AppColors.resultSemiValidText;
-            break;
-          case null:
-            break;
-        }
+        final resultValidity =
+            PerformanceResultValidityEnum.forBenchmarkExportResult(
+          benchmarkExportResult: benchmark,
+        );
+        throughputTextColor = resultValidity.color;
       }
       if (accuracy != null) {
         accuracyString = accuracy.normalized.toStringAsFixed(2);
