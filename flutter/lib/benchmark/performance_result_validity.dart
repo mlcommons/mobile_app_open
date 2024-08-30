@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
@@ -53,6 +54,10 @@ enum PerformanceResultValidityEnum {
     required bool isMinQueryMet,
     required bool isEarlyStoppingMet,
   }) {
+    // For stable_diffusion task, we ignore the early-stopping condition.
+    if (benchmarkId == BenchmarkId.stableDiffusion) {
+      isEarlyStoppingMet = true;
+    }
     if (isMinDurationMet == true &&
         isMinQueryMet == true &&
         isEarlyStoppingMet == true) {
