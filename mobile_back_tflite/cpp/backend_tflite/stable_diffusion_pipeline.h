@@ -13,9 +13,38 @@ limitations under the License.
 #ifndef TFLITE_STABLE_DIFFUSION_PIPELINE_H_
 #define TFLITE_STABLE_DIFFUSION_PIPELINE_H_
 
+#include <vector>
+
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"
+#include "tensorflow/core/platform/logging.h"
 #include "tensorflow/lite/c/c_api.h"
+#include "thread_pool.h"
+
+struct SDBackendData {
+  const char *name = "TFLite";
+  const char *vendor = "Google";
+  const char *accelerator = "CPU";
+
+  TfLiteModel *text_encoder_model{nullptr};
+  TfLiteModel *first_model{nullptr};
+  TfLiteModel *second_model{nullptr};
+  TfLiteModel *decoder_model{nullptr};
+
+  TfLiteInterpreter *text_encoder_interpreter{nullptr};
+  TfLiteInterpreter *first_interpreter{nullptr};
+  TfLiteInterpreter *second_interpreter{nullptr};
+  TfLiteInterpreter *decoder_interpreter{nullptr};
+
+  std::vector<int> input_prompt_tokens;
+  std::vector<int> unconditional_tokens;
+
+  int num_steps{10};
+  int seed{0};
+
+  std::vector<float> output;
+  std::unique_ptr<Threadpool> executer;
+};
 
 // A pipeline for Stable Diffusion.
 class StableDiffusionPipeline : public Pipeline {
@@ -67,6 +96,9 @@ class StableDiffusionPipeline : public Pipeline {
   void *backend_get_buffer(size_t n) override;
 
   void backend_release_buffer(void *p) override;
+
+ private:
+  TfLiteInterpreter *create_interpreter(TfLiteModel *model);
 };
 
 #endif  // TFLITE_STABLE_DIFFUSION_PIPELINE_H_
