@@ -137,7 +137,7 @@ tflite-run-sd:
 	bazel-bin/flutter/cpp/binary/main EXTERNAL stable_diffusion \
 		--mode=PerformanceOnly \
 		--output_dir="${REPO_ROOT_DIR}/output" \
-		--model_file="${REPO_ROOT_DIR}/mobile_back_tflite/cpp/backend_dummy/dummy_stable_diffusion.tflite" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/sd-models" \
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
 		--input_tfrecord="${REPO_ROOT_DIR}/flutter/cpp/datasets/coco_gen_utils/coco_gen.tfrecord" \
 		--input_clip_model="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/clip_model_512x512.tflite" \

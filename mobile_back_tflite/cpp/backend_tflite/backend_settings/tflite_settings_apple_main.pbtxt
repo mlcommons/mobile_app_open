@@ -153,8 +153,10 @@ benchmark_setting {
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/anhappdev/tmp/releases/download/3/dummy_stable_diffusion.tflite"
-    model_checksum: ""
+    model_file: {
+      model_path: "https://github.com/anhappdev/tmp/releases/download/3/dummy_stable_diffusion.tflite"
+      model_checksum: ""
+    }
   }
   delegate_selected: "Metal"
   custom_setting {
