@@ -22,12 +22,6 @@ app:
 	cd ${REPO_ROOT_DIR}/flutter && flutter build ios
 	open ${REPO_ROOT_DIR}/flutter/ios/Runner.xcworkspace
 
-test-dataset:
-	cd ${REPO_ROOT_DIR} && \
-	bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 //flutter/cpp/datasets:test_coco_gen
-	cd ${REPO_ROOT_DIR} && \
-	bazel-bin/flutter/cpp/datasets/test_coco_gen
-
 tflite-build:
 	cd ${REPO_ROOT_DIR} && \
 	bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 //flutter/cpp/binary:main //mobile_back_tflite:tflitebackend

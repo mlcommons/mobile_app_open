@@ -204,13 +204,3 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:object_detection_average_precision_stage",
     ],
 )
-
-cc_binary(
-    name = "test_coco_gen",
-    srcs = [
-        "test_coco_gen.cc",
-    ],
-    deps = [
-        ":coco_gen",
-    ],
-)
