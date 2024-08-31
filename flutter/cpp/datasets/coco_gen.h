@@ -81,7 +81,7 @@ class CocoGen : public Dataset {
   // CLIP score calculation
   CLIPScorePredictor score_predictor_;
   std::set<int> sample_ids_;
-  std::unordered_map<int, int64_t> record_ids_map;
+  std::unordered_map<int, std::string> caption_map;
   std::unordered_map<int, std::vector<uint8_t>> output_pixels_map;
   std::unordered_map<int, std::vector<int32_t>> attention_mask_map;
   std::unordered_map<int, std::vector<int32_t>> input_ids_map;

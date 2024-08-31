@@ -21,8 +21,7 @@ Run with the following command:
 python generate_tfrecords.py \
   --input_tsv ./captions_source.tsv \
   --output_tfrecord ./coco_gen.tfrecord \
-  --image_dir ./coco2014 \
-  --num_images 50
+  --image_dir ./coco2014
 ```
 """
 
@@ -42,7 +41,7 @@ MODEL_NAME = "openai/clip-vit-large-patch14"
 def parse_args():
   parser = argparse.ArgumentParser(description="Process prompts from TSV file and save the results to TFRecord.")
   parser.add_argument('--input_tsv', type=str, required=True, help="Path to the input TSV file.")
-  parser.add_argument('--num_images', type=int, required=True, help="Number of images to use.")
+  parser.add_argument('--num_images', type=int, required=False, help="Number of images to use.")
   parser.add_argument('--image_dir', type=str, required=True, help="Path to the image directory.")
   parser.add_argument('--output_tfrecord', type=str, required=True, help="Path to the output TFRecord file.")
   return parser.parse_args()
@@ -57,11 +56,9 @@ def download_image(url, file_path):
     print(f"Downloaded image to {file_path}")
 
 
-def serialize_example(id, image_id, caption, input_ids, attention_mask, file_name, clip_score):
+def serialize_example(caption, input_ids, attention_mask, file_name, clip_score):
   """Creates a tf.train.Example message ready to be written to a file."""
   feature = {
-    'id': tf.train.Feature(int64_list=tf.train.Int64List(value=[id])),
-    'image_id': tf.train.Feature(int64_list=tf.train.Int64List(value=[image_id])),
     'caption': tf.train.Feature(bytes_list=tf.train.BytesList(value=[caption.encode()])),
     'input_ids': tf.train.Feature(int64_list=tf.train.Int64List(value=input_ids)),
     'attention_mask': tf.train.Feature(int64_list=tf.train.Int64List(value=attention_mask)),
@@ -81,6 +78,7 @@ def main():
 
   # Load the TSV file
   df = pd.read_csv(args.input_tsv, sep='\t')
+  print(df.columns)
 
   # Initialize the CLIP processor and model
   processor = CLIPProcessor.from_pretrained(MODEL_NAME)
@@ -89,7 +87,6 @@ def main():
   with tf.io.TFRecordWriter(args.output_tfrecord, options='ZLIB') as writer:
     total = len(df)
     for idx, row in df.iterrows():
-      image_id = row['image_id']
       caption = row['caption']
       file_name = row['file_name']
       coco_url = row['coco_url']
@@ -107,8 +104,6 @@ def main():
       clip_score = outputs.logits_per_image.numpy().flatten().tolist()
 
       example = serialize_example(
-        id=row['id'],
-        image_id=image_id,
         caption=caption,
         input_ids=input_ids,
         attention_mask=attention_mask,
@@ -116,8 +111,9 @@ def main():
         clip_score=clip_score,
       )
       writer.write(example)
-      print(f"Processed: {idx + 1}/{total} | Image ID: {image_id} | Caption: {caption} | CLIP Score: {clip_score}")
-      if idx + 1 >= args.num_images:
+      print(f"Processed: {idx + 1}/{total} | Caption: {caption} | CLIP Score: {clip_score}")
+      if args.num_images is not None and idx + 1 >= args.num_images:
+        print(f"Early stopping at {args.num_images} images")
         break
 
   print(f"TFRecord file created at {args.output_tfrecord}")
