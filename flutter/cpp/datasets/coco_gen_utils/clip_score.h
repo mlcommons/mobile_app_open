@@ -34,6 +34,8 @@ class CLIPScorePredictor {
                 const std::vector<int32_t>& input_ids,
                 const std::vector<float>& pixel_values);
 
+  bool getCanPredict();
+
  private:
   std::unique_ptr<tflite::FlatBufferModel> model;
   std::unique_ptr<tflite::Interpreter> interpreter;
@@ -41,6 +43,7 @@ class CLIPScorePredictor {
   bool verifyInputSizes(int input_index, size_t input_size,
                         size_t element_size) const;
   bool extractOutput(int output_index, std::vector<float>& output_data) const;
+  bool canPredict;
 };
 
 }  // namespace mobile
