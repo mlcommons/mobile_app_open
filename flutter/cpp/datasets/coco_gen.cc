@@ -23,7 +23,15 @@ CocoGen::CocoGen(Backend* backend, const std::string& input_tfrecord,
     : Dataset(backend),
       sample_reader_(input_tfrecord),
       samples_(sample_reader_.Size()),
-      score_predictor_(input_clip_model) {}
+      score_predictor_(input_clip_model)
+{
+  if (input_format_.size() != 1 || output_format_.size() != 1) {
+    LOG(FATAL) << "Coco_gen only supports 1 input and 1 output";
+    return;
+  }
+
+  isModelFound=score_predictor_.getCanPredict();
+}
 
 void CocoGen::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
   for (QuerySampleIndex sample_idx : samples) {
@@ -43,6 +51,7 @@ void CocoGen::UnloadSamplesFromRam(
 #define OUTPUT_SIZE 512 * 512 * 3
 std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
                                             const std::vector<void*>& outputs) {
+  if (!isModelFound) return std::vector<uint8_t>();
   void* output = outputs.at(0);
   std::vector<uint8_t> output_pixels(OUTPUT_SIZE);
   if (output_format_[0].type == DataType::Uint8) {
@@ -60,17 +69,19 @@ std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
   if (!output_pixels.empty()) {
     sample_ids_.insert(sample_idx);
     CaptionRecord* record = samples_.at(sample_idx).get();
+    LOG(INFO) << "caption: "  << record->get_caption();
     caption_map[sample_idx] = record->get_caption();
     output_pixels_map[sample_idx] = output_pixels;
     attention_mask_map[sample_idx] = record->get_attention_mask_vector();
     input_ids_map[sample_idx] = record->get_input_ids_vector();
+
     return output_pixels;
   } else {
     return std::vector<uint8_t>();
   }
 }
 
-bool CocoGen::HasAccuracy() { return !sample_ids_.empty(); }
+bool CocoGen::HasAccuracy() { return isModelFound; }
 
 float CocoGen::ComputeAccuracy() {
   float total_score = 0.0f;
@@ -82,7 +93,7 @@ float CocoGen::ComputeAccuracy() {
     std::vector<uint8_t> output_pixels = output_pixels_map[sample_idx];
     std::vector<float> pixel_values(OUTPUT_SIZE);
     for (int i = 0; i < OUTPUT_SIZE; i++) {
-      pixel_values[i] = static_cast<float>(output_pixels[i]);
+      pixel_values[i] = static_cast<float>((output_pixels[i] / 128.0) - 1.0);
     }
     float score =
         score_predictor_.predict(attention_mask, input_ids, pixel_values);

@@ -24,6 +24,14 @@ namespace mlperf {
 namespace mobile {
 
 CLIPScorePredictor::CLIPScorePredictor(const std::string& model_path) {
+
+  if (model_path == "")
+  {
+    canPredict = false;
+    return;
+  }
+  else canPredict = true;
+
   // Load the model
   model = tflite::FlatBufferModel::BuildFromFile(model_path.c_str());
   if (!model) {
@@ -42,6 +50,8 @@ CLIPScorePredictor::CLIPScorePredictor(const std::string& model_path) {
     LOG(FATAL) << "Failed to allocate tensors for the interpreter";
   }
 }
+
+bool CLIPScorePredictor::getCanPredict() { return canPredict; }
 
 float CLIPScorePredictor::predict(const std::vector<int32_t>& attention_mask,
                                   const std::vector<int32_t>& input_ids,
