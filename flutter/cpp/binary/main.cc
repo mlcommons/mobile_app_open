@@ -369,7 +369,7 @@ int Main(int argc, char *argv[]) {
     } break;
     case DatasetConfig::COCOGEN: {
       LOG(INFO) << "Using COCO 2014 dataset for Stable Diffusion benchmark";
-      std::string input_tfrecord, input_clip_model="";
+      std::string input_tfrecord, input_clip_model = "";
       std::vector<Flag> dataset_flags{
           Flag::CreateFlag(
               "input_tfrecord", &input_tfrecord,

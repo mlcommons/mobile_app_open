@@ -24,13 +24,11 @@ namespace mlperf {
 namespace mobile {
 
 CLIPScorePredictor::CLIPScorePredictor(const std::string& model_path) {
-
-  if (model_path == "")
-  {
+  if (model_path == "") {
     canPredict = false;
     return;
-  }
-  else canPredict = true;
+  } else
+    canPredict = true;
 
   // Load the model
   model = tflite::FlatBufferModel::BuildFromFile(model_path.c_str());

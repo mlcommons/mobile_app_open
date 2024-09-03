@@ -23,14 +23,13 @@ CocoGen::CocoGen(Backend* backend, const std::string& input_tfrecord,
     : Dataset(backend),
       sample_reader_(input_tfrecord),
       samples_(sample_reader_.Size()),
-      score_predictor_(input_clip_model)
-{
+      score_predictor_(input_clip_model) {
   if (input_format_.size() != 1 || output_format_.size() != 1) {
     LOG(FATAL) << "Coco_gen only supports 1 input and 1 output";
     return;
   }
 
-  isModelFound=score_predictor_.getCanPredict();
+  isModelFound = score_predictor_.getCanPredict();
 }
 
 void CocoGen::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
@@ -69,7 +68,7 @@ std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
   if (!output_pixels.empty()) {
     sample_ids_.insert(sample_idx);
     CaptionRecord* record = samples_.at(sample_idx).get();
-    LOG(INFO) << "caption: "  << record->get_caption();
+    LOG(INFO) << "caption: " << record->get_caption();
     caption_map[sample_idx] = record->get_caption();
     output_pixels_map[sample_idx] = output_pixels;
     attention_mask_map[sample_idx] = record->get_attention_mask_vector();
