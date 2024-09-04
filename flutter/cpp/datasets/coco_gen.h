@@ -35,7 +35,7 @@ class CocoGen : public Dataset {
  public:
   // CocoGen need a TFRecord file and a clip model file.
   CocoGen(Backend* backend, const std::string& input_tfrecord,
-          const std::string& input_clip_model);
+          const std::string& input_clip_model, const std::string& output_dir);
 
   // Returns the name of the dataset.
   const std::string& Name() override { return name_; }
@@ -82,6 +82,7 @@ class CocoGen : public Dataset {
   CLIPScorePredictor score_predictor_;
   std::set<int> sample_ids_;
   bool isModelFound;
+  std::string raw_output_dir_;
   std::unordered_map<int, std::string> caption_map;
   std::unordered_map<int, std::vector<uint8_t>> output_pixels_map;
   std::unordered_map<int, std::vector<int32_t>> attention_mask_map;

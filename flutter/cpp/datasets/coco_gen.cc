@@ -12,14 +12,38 @@ limitations under the License.
 
 #include "coco_gen.h"
 
+#include <fstream>
 #include <iomanip>
 
 namespace mlperf {
 namespace mobile {
-namespace {}  // namespace
+
+void dump_output_pixels(const std::vector<uint8_t>& output_pixels,
+                        const std::string& output_filename) {
+  std::ofstream output_file(output_filename, std::ios::binary);
+  if (!output_file) {
+    LOG(ERROR) << "Could not open file for writing: " << output_filename;
+    return;
+  }
+
+  output_file.write(
+      reinterpret_cast<const char*>(output_pixels.data()),
+      static_cast<std::streamsize>(output_pixels.size() * sizeof(uint8_t)));
+
+  if (!output_file) {
+    LOG(ERROR) << "Failed to write data to: " << output_filename;
+  }
+
+  output_file.close();
+  if (!output_file) {
+    LOG(ERROR) << "Could not close the file " << output_filename;
+  }
+  LOG(INFO) << "File saved to: " << output_filename;
+}
 
 CocoGen::CocoGen(Backend* backend, const std::string& input_tfrecord,
-                 const std::string& input_clip_model)
+                 const std::string& input_clip_model,
+                 const std::string& output_dir)
     : Dataset(backend),
       sample_reader_(input_tfrecord),
       samples_(sample_reader_.Size()),
@@ -30,6 +54,15 @@ CocoGen::CocoGen(Backend* backend, const std::string& input_tfrecord,
   }
 
   isModelFound = score_predictor_.getCanPredict();
+
+  raw_output_dir_ = output_dir + "/cocogen_outputs";
+  std::error_code ec;
+  std::__fs::filesystem::create_directories(raw_output_dir_, ec);
+  if (ec) {
+    LOG(ERROR) << "Error: Could not create directory " << raw_output_dir_
+               << ": " << ec.message();
+    return;
+  }
 }
 
 void CocoGen::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
@@ -50,7 +83,6 @@ void CocoGen::UnloadSamplesFromRam(
 #define OUTPUT_SIZE 512 * 512 * 3
 std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
                                             const std::vector<void*>& outputs) {
-  if (!isModelFound) return std::vector<uint8_t>();
   void* output = outputs.at(0);
   std::vector<uint8_t> output_pixels(OUTPUT_SIZE);
   if (output_format_[0].type == DataType::Uint8) {
@@ -65,6 +97,13 @@ std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
       output_pixels[i] = (uint8_t)((*(temp_data + i) + 1) / 2 * 255);
     }
   }
+
+  std::string raw_output_filename =
+      raw_output_dir_ + "/output_" + std::to_string(sample_idx) + ".rgb8";
+  dump_output_pixels(output_pixels, raw_output_filename);
+
+  if (!isModelFound) return std::vector<uint8_t>();
+
   if (!output_pixels.empty()) {
     sample_ids_.insert(sample_idx);
     CaptionRecord* record = samples_.at(sample_idx).get();
@@ -73,7 +112,6 @@ std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
     output_pixels_map[sample_idx] = output_pixels;
     attention_mask_map[sample_idx] = record->get_attention_mask_vector();
     input_ids_map[sample_idx] = record->get_input_ids_vector();
-
     return output_pixels;
   } else {
     return std::vector<uint8_t>();

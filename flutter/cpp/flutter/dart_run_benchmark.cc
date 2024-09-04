@@ -102,7 +102,8 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       break;
     case ::mlperf::mobile::DatasetConfig::COCOGEN:
       dataset = std::make_unique<::mlperf::mobile::CocoGen>(
-          backend.get(), in->dataset_data_path, in->dataset_groundtruth_path);
+          backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
+          in->output_dir);
       break;
     default:
       return nullptr;
