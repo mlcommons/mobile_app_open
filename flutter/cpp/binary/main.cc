@@ -382,8 +382,8 @@ int Main(int argc, char *argv[]) {
 
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
-        dataset.reset(
-            new CocoGen(backend.get(), input_tfrecord, input_clip_model));
+        dataset.reset(new CocoGen(backend.get(), input_tfrecord,
+                                  input_clip_model, output_dir));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),
