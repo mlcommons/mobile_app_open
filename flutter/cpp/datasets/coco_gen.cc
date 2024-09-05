@@ -12,6 +12,7 @@ limitations under the License.
 
 #include "coco_gen.h"
 
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 
@@ -57,7 +58,7 @@ CocoGen::CocoGen(Backend* backend, const std::string& input_tfrecord,
 
   raw_output_dir_ = output_dir + "/cocogen_outputs";
   std::error_code ec;
-  std::__fs::filesystem::create_directories(raw_output_dir_, ec);
+  std::filesystem::create_directories(raw_output_dir_, ec);
   if (ec) {
     LOG(ERROR) << "Error: Could not create directory " << raw_output_dir_
                << ": " << ec.message();
