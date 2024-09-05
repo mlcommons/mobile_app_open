@@ -83,6 +83,7 @@ void CocoGen::UnloadSamplesFromRam(
 #define OUTPUT_SIZE 512 * 512 * 3
 std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
                                             const std::vector<void*>& outputs) {
+  if (!isModelFound) return std::vector<uint8_t>();
   void* output = outputs.at(0);
   std::vector<uint8_t> output_pixels(OUTPUT_SIZE);
   if (output_format_[0].type == DataType::Uint8) {
@@ -101,8 +102,6 @@ std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
   std::string raw_output_filename =
       raw_output_dir_ + "/output_" + std::to_string(sample_idx) + ".rgb8";
   dump_output_pixels(output_pixels, raw_output_filename);
-
-  if (!isModelFound) return std::vector<uint8_t>();
 
   if (!output_pixels.empty()) {
     sample_ids_.insert(sample_idx);
