@@ -47,6 +47,8 @@ void main() {
     testWidgets('check results', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       printResults(extendedResult);
+      // TODO (anhappdev) uncomment when stable_diffusion is ready
+      // checkTaskCount(extendedResult);
       checkTasks(extendedResult);
     });
 
@@ -57,13 +59,13 @@ void main() {
   });
 }
 
-void checkTasks(ExtendedResult extendedResult) {
+void checkTaskCount(ExtendedResult extendedResult) {
   final tasksCount = extendedResult.results.length;
   final expectedTasksCount = BenchmarkId.allIds.length;
+  expect(tasksCount, expectedTasksCount, reason: 'tasks count does not match');
+}
 
-  // TODO (anhappdev) uncomment when stable_diffusion is ready
-  // expect(tasksCount, expectedTasksCount, reason: 'tasks count does not match');
-
+void checkTasks(ExtendedResult extendedResult) {
   for (final benchmarkResult in extendedResult.results) {
     print('checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
