@@ -47,8 +47,7 @@ void main() {
     testWidgets('check results', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       printResults(extendedResult);
-      // TODO (anhappdev) uncomment when stable_diffusion is ready
-      // checkTaskCount(extendedResult);
+      checkTaskCount(extendedResult);
       checkTasks(extendedResult);
     });
 
