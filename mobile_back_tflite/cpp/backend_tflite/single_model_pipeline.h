@@ -69,4 +69,4 @@ class SingleModelPipeline : public Pipeline {
   void backend_release_buffer(void *p) override;
 };
 
-#endif  // TFLITE_SINGLE_MODEL_PIPELINE_H
+#endif  // TFLITE_SINGLE_MODEL_PIPELINE_H_

@@ -27,6 +27,10 @@ class AppIcons {
   static final SvgPicture superResolution =
       _pSvg('ic_task_super_resolution.svg');
 
+  // TODO (anhappdev): update icon
+  static final SvgPicture stableDiffusion =
+      _pSvg('ic_task_super_resolution.svg');
+
   static final SvgPicture imageClassificationWhite =
       _pSvg('ic_task_image_classification_white.svg');
   static final SvgPicture imageSegmentationWhite =
@@ -38,6 +42,10 @@ class AppIcons {
   static final SvgPicture imageClassificationOfflineWhite =
       _pSvg('ic_task_image_classification_offline_white.svg');
   static final SvgPicture superResolutionWhite =
+      _pSvg('ic_task_super_resolution_white.svg');
+
+  // TODO (anhappdev): update icon
+  static final SvgPicture stableDiffusionWhite =
       _pSvg('ic_task_super_resolution_white.svg');
 
   static final SvgPicture arrow = _pSvg('ic_arrow.svg');

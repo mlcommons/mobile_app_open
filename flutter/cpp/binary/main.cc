@@ -24,6 +24,7 @@ limitations under the License.
 #include "flutter/cpp/backends/external.h"
 #include "flutter/cpp/datasets/ade20k.h"
 #include "flutter/cpp/datasets/coco.h"
+#include "flutter/cpp/datasets/coco_gen.h"
 #include "flutter/cpp/datasets/imagenet.h"
 #include "flutter/cpp/datasets/snu_sr.h"
 #include "flutter/cpp/datasets/squad.h"
@@ -64,6 +65,8 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
     return DatasetConfig::ADE20K;
   } else if (absl::EqualsIgnoreCase(name, "SNUSR")) {
     return DatasetConfig::SNUSR;
+  } else if (absl::EqualsIgnoreCase(name, "COCOGEN")) {
+    return DatasetConfig::COCOGEN;
   } else if (absl::EqualsIgnoreCase(name, "DUMMY")) {
     return DatasetConfig::NONE;
   } else {
@@ -83,6 +86,8 @@ DatasetConfig::DatasetType BenchmarkId2DatasetType(absl::string_view name) {
     return DatasetConfig::ADE20K;
   } else if (absl::StartsWith(name, "super_resolution")) {
     return DatasetConfig::SNUSR;
+  } else if (absl::StartsWith(name, "stable_diffusion")) {
+    return DatasetConfig::COCOGEN;
   } else {
     LOG(FATAL) << "Unrecognized benchmark_id: " << name;
     return DatasetConfig::NONE;
@@ -108,7 +113,7 @@ int Main(int argc, char *argv[]) {
           "Benchmark ID. One of image_classification, "
           "image_classification_v2, object_detection, "
           "natural_language_processing, "
-          "image_segmentation_v2, super_resolution, "
+          "image_segmentation_v2, super_resolution, stable_diffusion, "
           "image_classification_offline, image_classification_offline_v2",
           Flag::kPositional)};
   Flags::Parse(&argc, const_cast<const char **>(argv), flag_list);
@@ -357,6 +362,28 @@ int Main(int argc, char *argv[]) {
         dataset.reset(new SNUSR(backend.get(), images_directory,
                                 ground_truth_directory, num_channels, scale,
                                 image_width, image_height));
+      }
+      // Adds to flag_list for showing help.
+      flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                       dataset_flags.end());
+    } break;
+    case DatasetConfig::COCOGEN: {
+      LOG(INFO) << "Using COCO 2014 dataset for Stable Diffusion benchmark";
+      std::string input_tfrecord, input_clip_model = "";
+      std::vector<Flag> dataset_flags{
+          Flag::CreateFlag(
+              "input_tfrecord", &input_tfrecord,
+              "Path to the tfrecord file containing inputs for the model.",
+              Flag::kRequired),
+          Flag::CreateFlag(
+              "input_clip_model", &input_clip_model,
+              "Path to the CLIP model (TFLite) file for score prediction."),
+      };
+
+      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+          backend) {
+        dataset.reset(new CocoGen(backend.get(), input_tfrecord,
+                                  input_clip_model, output_dir));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),

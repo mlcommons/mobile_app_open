@@ -5,8 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'loadgen_info.g.dart';
 
-enum ResultValidityEnum { valid, invalid, semivalid }
-
 @JsonSerializable(fieldRename: FieldRename.snake)
 class LoadgenInfo {
   final int queryCount;
@@ -109,18 +107,4 @@ class LoadgenInfo {
       _$LoadgenInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$LoadgenInfoToJson(this);
-
-  ResultValidityEnum get resultValidity {
-    if (isMinDurationMet == true &&
-        isMinQueryMet == true &&
-        isEarlyStoppingMet == true) {
-      return ResultValidityEnum.valid;
-    } else if (isMinDurationMet == true &&
-        isMinQueryMet == false &&
-        isEarlyStoppingMet == true) {
-      return ResultValidityEnum.semivalid;
-    } else {
-      return ResultValidityEnum.invalid;
-    }
-  }
 }

@@ -36,7 +36,8 @@ extern "C" {
 
 std::unique_ptr<Pipeline> pipeline;
 
-void init_pipeline(bool sd_pipeline) {
+void init_pipeline(const char *pipeline_type) {
+  bool sd_pipeline = (strcmp(pipeline_type, "StableDiffusionPipeline") == 0);
   if (sd_pipeline) {
     LOG(INFO) << "Initializing StableDiffusionPipeline";
     pipeline = std::make_unique<StableDiffusionPipeline>();
@@ -144,7 +145,14 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 mlperf_backend_ptr_t mlperf_backend_create(
     const char *model_path, mlperf_backend_configuration_t *configs,
     const char *native_lib_path) {
-  init_pipeline(false);
+  const char *pipeline_type = "";
+  for (int i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], "pipeline") == 0) {
+      pipeline_type = configs->values[i];
+      break;
+    }
+  }
+  init_pipeline(pipeline_type);
   return pipeline->backend_create(model_path, configs, native_lib_path);
 }
 

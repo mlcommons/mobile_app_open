@@ -39,13 +39,17 @@ pbtxt2header(
 cc_library(
     name = "tflite_c",
     srcs = [
+        "sd_utils.cc",
         "single_model_pipeline.cc",
+        "stable_diffusion_invoker.cc",
         "stable_diffusion_pipeline.cc",
         "tflite_c.cc",
     ],
     hdrs = [
         "pipeline.h",
+        "sd_utils.h",
         "single_model_pipeline.h",
+        "stable_diffusion_invoker.h",
         "stable_diffusion_pipeline.h",
         "tflite_settings_android.h",
         "tflite_settings_apple.h",

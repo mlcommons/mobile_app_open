@@ -24,6 +24,7 @@ class BenchmarkId {
   static const imageClassificationOffline = 'image_classification_offline';
   static const imageClassificationV2 = 'image_classification_v2';
   static const imageClassificationOfflineV2 = 'image_classification_offline_v2';
+  static const stableDiffusion = 'stable_diffusion';
 
   static const allIds = [
     imageClassification,
@@ -34,6 +35,7 @@ class BenchmarkId {
     imageClassificationOffline,
     imageClassificationV2,
     imageClassificationOfflineV2,
+    stableDiffusion,
   ];
 }
 

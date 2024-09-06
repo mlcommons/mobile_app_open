@@ -11,7 +11,7 @@ REPO_ROOT_DIR="/Users/anh/dev/mlcommons/mobile_app_open"
 export ANDROID_NDK_VERSION=25
 export ANDROID_NDK_API_LEVEL=33
 
-tflite: tflite-build tflite-run-ic-v2 tflite-run-ic-offline-v2
+tflite: tflite-build tflite-run-sd
 coreml: coreml-build coreml-run-ic-v2 coreml-run-ic-offline-v2
 tflite-all: tflite-build tflite-run-ic tflite-run-ic-offline tflite-run-od tflite-run-is tflite-run-lu tflite-run-sr tflite-run-ic-v2 tflite-run-ic-offline-v2
 coreml-all: coreml-build coreml-run-ic coreml-run-ic-offline coreml-run-od coreml-run-is coreml-run-lu coreml-run-sr coreml-run-ic-v2 coreml-run-ic-offline-v2
@@ -21,7 +21,6 @@ app:
 	cd ${REPO_ROOT_DIR} && make flutter/prepare ${backend} && make flutter/ios ${backend}
 	cd ${REPO_ROOT_DIR}/flutter && flutter build ios
 	open ${REPO_ROOT_DIR}/flutter/ios/Runner.xcworkspace
-
 
 tflite-build:
 	cd ${REPO_ROOT_DIR} && \
@@ -126,6 +125,17 @@ tflite-run-sr:
 		--ground_truth_directory="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/psnr/HR" \
 		--max_duration_ms=60000 \
 		--min_duration_ms=100
+
+tflite-run-sd:
+	cd ${REPO_ROOT_DIR} && \
+	bazel-bin/flutter/cpp/binary/main EXTERNAL stable_diffusion \
+		--mode=PerformanceOnly \
+		--output_dir="${REPO_ROOT_DIR}/output" \
+		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/sd-models" \
+		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
+		--input_tfrecord="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/coco_gen_full.tfrecord" \
+		--input_clip_model="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/clip_model_512x512.tflite" \
+		--min_query_count=5
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \
