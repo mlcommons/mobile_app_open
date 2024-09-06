@@ -27,13 +27,11 @@ struct SDBackendData {
   const char *accelerator = "CPU";
 
   TfLiteModel *text_encoder_model{nullptr};
-  TfLiteModel *first_model{nullptr};
-  TfLiteModel *second_model{nullptr};
+  TfLiteModel *sd_model{nullptr};
   TfLiteModel *decoder_model{nullptr};
 
   TfLiteInterpreter *text_encoder_interpreter{nullptr};
-  TfLiteInterpreter *first_interpreter{nullptr};
-  TfLiteInterpreter *second_interpreter{nullptr};
+  TfLiteInterpreter *sd_interpreter{nullptr};
   TfLiteInterpreter *decoder_interpreter{nullptr};
 
   std::vector<int> input_prompt_tokens;

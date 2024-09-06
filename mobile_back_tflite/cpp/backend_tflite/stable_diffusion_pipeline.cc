@@ -67,38 +67,28 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   // Load models from the provided directory path
   std::string text_encoder_path =
       std::string(model_path) + "/text_encoder.tflite";
-  std::string first_model_path =
-      std::string(model_path) + "/first_model.tflite";
-  std::string second_model_path =
-      std::string(model_path) + "/second_model.tflite";
+  std::string sd_model_path = std::string(model_path) + "/sd_model.tflite";
   std::string decoder_path = std::string(model_path) + "/decoder.tflite";
 
   backend_data->text_encoder_model =
       TfLiteModelCreateFromFile(text_encoder_path.c_str());
-  backend_data->first_model =
-      TfLiteModelCreateFromFile(first_model_path.c_str());
-  backend_data->second_model =
-      TfLiteModelCreateFromFile(second_model_path.c_str());
+  backend_data->sd_model = TfLiteModelCreateFromFile(sd_model_path.c_str());
   backend_data->decoder_model = TfLiteModelCreateFromFile(decoder_path.c_str());
 
-  if (!backend_data->text_encoder_model || !backend_data->first_model ||
-      !backend_data->second_model || !backend_data->decoder_model) {
+  if (!backend_data->text_encoder_model || !backend_data->sd_model ||
+      !backend_data->decoder_model) {
     delete backend_data;
     return nullptr;
   }
 
   backend_data->text_encoder_interpreter =
       create_interpreter(backend_data->text_encoder_model);
-  backend_data->first_interpreter =
-      create_interpreter(backend_data->first_model);
-  backend_data->second_interpreter =
-      create_interpreter(backend_data->second_model);
+  backend_data->sd_interpreter = create_interpreter(backend_data->sd_model);
   backend_data->decoder_interpreter =
       create_interpreter(backend_data->decoder_model);
 
   if (!backend_data->text_encoder_interpreter ||
-      !backend_data->first_interpreter || !backend_data->second_interpreter ||
-      !backend_data->decoder_interpreter) {
+      !backend_data->sd_interpreter || !backend_data->decoder_interpreter) {
     backend_delete(backend_data);
     return nullptr;
   }
@@ -142,8 +132,7 @@ void StableDiffusionPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
   SDBackendData* backend_data = static_cast<SDBackendData*>(backend_ptr);
   if (backend_data) {
     TfLiteModelDelete(backend_data->text_encoder_model);
-    TfLiteModelDelete(backend_data->first_model);
-    TfLiteModelDelete(backend_data->second_model);
+    TfLiteModelDelete(backend_data->sd_model);
     TfLiteModelDelete(backend_data->decoder_model);
     delete backend_data;
   }
