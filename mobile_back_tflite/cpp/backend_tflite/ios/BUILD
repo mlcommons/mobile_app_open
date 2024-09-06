@@ -14,7 +14,7 @@ apple_xcframework(
         "device": ["arm64"],
     },
     minimum_os_versions = {
-        "ios": "12.0",
+        "ios": "13.1",
     },
     deps = [
         "//mobile_back_tflite/cpp/backend_tflite:tflite_c",
