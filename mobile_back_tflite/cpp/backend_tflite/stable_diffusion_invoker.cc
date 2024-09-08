@@ -46,19 +46,19 @@ std::vector<float> StableDiffusionInvoker::diffusion_step(
     const std::vector<float>& context) {
   // Prepare the sd model's inputs
 
-  auto first_input_details =
+  auto latent_input_details =
       TfLiteInterpreterGetInputTensor(backend_data_->sd_interpreter, 0);
-  auto second_input_details =
+  auto context_input_details =
       TfLiteInterpreterGetInputTensor(backend_data_->sd_interpreter, 1);
-  auto third_input_details =
+  auto time_stamp_embedding_input_details =
       TfLiteInterpreterGetInputTensor(backend_data_->sd_interpreter, 2);
 
   std::copy(context.begin(), context.end(),
-            reinterpret_cast<float*>(TfLiteTensorData(first_input_details)));
+            reinterpret_cast<float*>(TfLiteTensorData(context_input_details)));
   std::copy(t_emb.begin(), t_emb.end(),
-            reinterpret_cast<float*>(TfLiteTensorData(second_input_details)));
+            reinterpret_cast<float*>(TfLiteTensorData(time_stamp_embedding_input_details)));
   std::copy(latent.begin(), latent.end(),
-            reinterpret_cast<float*>(TfLiteTensorData(third_input_details)));
+            reinterpret_cast<float*>(TfLiteTensorData(latent_input_details)));
 
   // Invoke the model
   if (TfLiteInterpreterInvoke(backend_data_->sd_interpreter) != kTfLiteOk) {
@@ -154,9 +154,9 @@ std::vector<float> StableDiffusionInvoker::run_inference(
 
   // Access the input tensors
   void* pos_ids_input_data =
-      TfLiteTensorData(TfLiteInterpreterGetInputTensor(interpreter, 0));
-  void* encoded_input_data =
       TfLiteTensorData(TfLiteInterpreterGetInputTensor(interpreter, 1));
+  void* encoded_input_data =
+      TfLiteTensorData(TfLiteInterpreterGetInputTensor(interpreter, 0));
 
   // Copy data to input tensors (type cast required for correct copy operation)
   std::memcpy(pos_ids_input_data, pos_ids.data(), pos_ids.size() * sizeof(int));
