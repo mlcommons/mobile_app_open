@@ -44,8 +44,6 @@ std::vector<float> StableDiffusionInvoker::encode_prompt(
 std::vector<float> StableDiffusionInvoker::diffusion_step(
     const std::vector<float>& latent, const std::vector<float>& t_emb,
     const std::vector<float>& context) {
-  // Prepare the sd model's inputs
-
   auto latent_input_details =
       TfLiteInterpreterGetInputTensor(backend_data_->sd_interpreter, 0);
   auto context_input_details =
@@ -56,7 +54,8 @@ std::vector<float> StableDiffusionInvoker::diffusion_step(
   std::copy(context.begin(), context.end(),
             reinterpret_cast<float*>(TfLiteTensorData(context_input_details)));
   std::copy(t_emb.begin(), t_emb.end(),
-            reinterpret_cast<float*>(TfLiteTensorData(time_stamp_embedding_input_details)));
+            reinterpret_cast<float*>(
+                TfLiteTensorData(time_stamp_embedding_input_details)));
   std::copy(latent.begin(), latent.end(),
             reinterpret_cast<float*>(TfLiteTensorData(latent_input_details)));
 

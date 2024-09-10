@@ -67,8 +67,10 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   // Load models from the provided directory path
   std::string text_encoder_path =
       std::string(model_path) + "/sd_text_encoder_dynamic.tflite";
-  std::string sd_model_path = std::string(model_path) + "/sd_diffusion_model_dynamic.tflite";
-  std::string decoder_path = std::string(model_path) + "/sd_decoder_dynamic.tflite";
+  std::string sd_model_path =
+      std::string(model_path) + "/sd_diffusion_model_dynamic.tflite";
+  std::string decoder_path =
+      std::string(model_path) + "/sd_decoder_dynamic.tflite";
 
   backend_data->text_encoder_model =
       TfLiteModelCreateFromFile(text_encoder_path.c_str());
