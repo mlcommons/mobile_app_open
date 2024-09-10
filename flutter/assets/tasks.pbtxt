@@ -293,9 +293,9 @@ task {
 task {
   id: "stable_diffusion"
   name: "Stable Diffusion"
-  min_query_count: 5
+  min_query_count: 1024
   min_duration: 60
-  max_duration: 600
+  max_duration: 300
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
