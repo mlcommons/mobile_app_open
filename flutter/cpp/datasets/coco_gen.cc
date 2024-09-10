@@ -139,7 +139,7 @@ float CocoGen::ComputeAccuracy() {
     total_score += score;
   }
   float avg_score = total_score / total_samples;
-  return avg_score;
+  return avg_score / 100;
 }
 
 std::string CocoGen::ComputeAccuracyString() {
