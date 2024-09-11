@@ -44,79 +44,31 @@ std::vector<float> StableDiffusionInvoker::encode_prompt(
 std::vector<float> StableDiffusionInvoker::diffusion_step(
     const std::vector<float>& latent, const std::vector<float>& t_emb,
     const std::vector<float>& context) {
-  // Prepare the first model's inputs
-
-  auto first_input_details =
-      TfLiteInterpreterGetInputTensor(backend_data_->first_interpreter, 0);
-  auto second_input_details =
-      TfLiteInterpreterGetInputTensor(backend_data_->first_interpreter, 1);
-  auto third_input_details =
-      TfLiteInterpreterGetInputTensor(backend_data_->first_interpreter, 2);
+  auto latent_input_details =
+      TfLiteInterpreterGetInputTensor(backend_data_->sd_interpreter, 0);
+  auto context_input_details =
+      TfLiteInterpreterGetInputTensor(backend_data_->sd_interpreter, 1);
+  auto time_stamp_embedding_input_details =
+      TfLiteInterpreterGetInputTensor(backend_data_->sd_interpreter, 2);
 
   std::copy(context.begin(), context.end(),
-            reinterpret_cast<float*>(TfLiteTensorData(first_input_details)));
+            reinterpret_cast<float*>(TfLiteTensorData(context_input_details)));
   std::copy(t_emb.begin(), t_emb.end(),
-            reinterpret_cast<float*>(TfLiteTensorData(second_input_details)));
+            reinterpret_cast<float*>(
+                TfLiteTensorData(time_stamp_embedding_input_details)));
   std::copy(latent.begin(), latent.end(),
-            reinterpret_cast<float*>(TfLiteTensorData(third_input_details)));
+            reinterpret_cast<float*>(TfLiteTensorData(latent_input_details)));
 
-  // Invoke the first model
-  if (TfLiteInterpreterInvoke(backend_data_->first_interpreter) != kTfLiteOk) {
+  // Invoke the model
+  if (TfLiteInterpreterInvoke(backend_data_->sd_interpreter) != kTfLiteOk) {
     std::cerr << "Failed to invoke the first diffusion model!" << std::endl;
     exit(-1);
   }
 
-  // Output names from the first model and corresponding input names for the
-  // second model
-  std::vector<std::string> output_names = {
-      "Identity_6",  "Identity_4", "Identity",    "input_1",    "Identity_12",
-      "Identity_11", "Identity_3", "Identity_10", "Identity_9", "Identity_5",
-      "Identity_8",  "Identity_7", "Identity_2"};
-
-  std::vector<std::string> input_names = {
-      "args_0",    "args_0_1",  "args_0_2", "args_0_4", "args_0_3",
-      "args_0_5",  "args_0_6",  "args_0_7", "args_0_8", "args_0_9",
-      "args_0_10", "args_0_11", "args_0_12"};
-
-  // Copy outputs of the first model to the inputs of the second model based on
-  // names
-  for (size_t i = 0; i < input_names.size(); ++i) {
-    int input_index = get_tensor_index_by_name(
-        backend_data_->second_interpreter, input_names[i], true);
-    int output_index = get_tensor_index_by_name(
-        backend_data_->first_interpreter, output_names[i], false);
-
-    if (input_index == -1 || output_index == -1) {
-      std::cerr << "Failed to find matching input or output tensor by name!"
-                << std::endl;
-      exit(-1);
-    }
-
-    auto first_model_output_details = TfLiteInterpreterGetOutputTensor(
-        backend_data_->first_interpreter, output_index);
-
-    float* output_data =
-        reinterpret_cast<float*>(TfLiteTensorData(first_model_output_details));
-    int output_size =
-        TfLiteTensorByteSize(first_model_output_details) / sizeof(float);
-
-    float* input_data = reinterpret_cast<float*>(
-        TfLiteTensorData(TfLiteInterpreterGetInputTensor(
-            backend_data_->second_interpreter, input_index)));
-
-    std::copy(output_data, output_data + output_size, input_data);
-  }
-
-  // Invoke the second model
-  if (TfLiteInterpreterInvoke(backend_data_->second_interpreter) != kTfLiteOk) {
-    std::cerr << "Failed to invoke the second diffusion model!" << std::endl;
-    exit(-1);
-  }
-
   float* output = reinterpret_cast<float*>(TfLiteTensorData(
-      TfLiteInterpreterGetOutputTensor(backend_data_->second_interpreter, 0)));
+      TfLiteInterpreterGetOutputTensor(backend_data_->sd_interpreter, 0)));
   int output_size = TfLiteTensorByteSize(TfLiteInterpreterGetOutputTensor(
-                        backend_data_->second_interpreter, 0)) /
+                        backend_data_->sd_interpreter, 0)) /
                     sizeof(float);
   return std::vector<float>(output, output + output_size);
 }
@@ -201,9 +153,9 @@ std::vector<float> StableDiffusionInvoker::run_inference(
 
   // Access the input tensors
   void* pos_ids_input_data =
-      TfLiteTensorData(TfLiteInterpreterGetInputTensor(interpreter, 0));
-  void* encoded_input_data =
       TfLiteTensorData(TfLiteInterpreterGetInputTensor(interpreter, 1));
+  void* encoded_input_data =
+      TfLiteTensorData(TfLiteInterpreterGetInputTensor(interpreter, 0));
 
   // Copy data to input tensors (type cast required for correct copy operation)
   std::memcpy(pos_ids_input_data, pos_ids.data(), pos_ids.size() * sizeof(int));
