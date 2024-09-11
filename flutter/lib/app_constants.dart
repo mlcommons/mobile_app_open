@@ -16,23 +16,19 @@ class WidgetKeys {
 }
 
 class BenchmarkId {
-  static const imageClassification = 'image_classification';
   static const objectDetection = 'object_detection';
   static const imageSegmentationV2 = 'image_segmentation_v2';
   static const naturalLanguageProcessing = 'natural_language_processing';
   static const superResolution = 'super_resolution';
-  static const imageClassificationOffline = 'image_classification_offline';
   static const imageClassificationV2 = 'image_classification_v2';
   static const imageClassificationOfflineV2 = 'image_classification_offline_v2';
   static const stableDiffusion = 'stable_diffusion';
 
   static const allIds = [
-    imageClassification,
     objectDetection,
     imageSegmentationV2,
     naturalLanguageProcessing,
     superResolution,
-    imageClassificationOffline,
     imageClassificationV2,
     imageClassificationOfflineV2,
     stableDiffusion,

@@ -29,30 +29,6 @@ const _kDN2103 = 'DN2103'; // OnePlus DN2103
 const _kIphoneOnGitHubAction = 'iPhone15,3';
 const _kIphoneOnMacbookM1 = 'iPhone14,7';
 
-const Map<String, Map<String, Interval>> _imageClassification = {
-  _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 4, max: 12),
-    _kCloudBuildX28: Interval(min: 4, max: 13),
-    _kRyzen5600: Interval(min: 31, max: 37),
-    _kPixel5: Interval(min: 80, max: 130),
-    _kPixel6: Interval(min: 600, max: 1100),
-    _kIphoneOnGitHubAction: Interval(min: 1, max: 8),
-    _kIphoneOnMacbookM1: Interval(min: 19, max: 27),
-  },
-  _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 1, max: 12),
-  },
-  _kPixelBackend: {
-    _kPixel6: Interval(min: 700, max: 1200),
-  },
-  _kQtiBackend: {
-    _kS22Ultra: Interval(min: 1600, max: 2400),
-  },
-  _kMediatekBackend: {
-    _kDN2103: Interval(min: 30, max: 55),
-  },
-};
-
 const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   _kTFLiteBackend: {
     _kCloudBuildX23: Interval(min: 1, max: 9),
@@ -198,30 +174,6 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
   },
 };
 
-const Map<String, Map<String, Interval>> _imageClassificationOffline = {
-  _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 8, max: 14),
-    _kCloudBuildX28: Interval(min: 7, max: 16),
-    _kRyzen5600: Interval(min: 45, max: 60),
-    _kPixel5: Interval(min: 120, max: 190),
-    _kPixel6: Interval(min: 800, max: 1700),
-    _kIphoneOnGitHubAction: Interval(min: 2, max: 15),
-    _kIphoneOnMacbookM1: Interval(min: 30, max: 45),
-  },
-  _kCoreMLBackend: {
-    _kIphoneOnGitHubAction: Interval(min: 2, max: 20),
-  },
-  _kPixelBackend: {
-    _kPixel6: Interval(min: 900, max: 1800),
-  },
-  _kQtiBackend: {
-    _kS22Ultra: Interval(min: 2400, max: 3500),
-  },
-  _kMediatekBackend: {
-    _kDN2103: Interval(min: 75, max: 140),
-  },
-};
-
 const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   _kTFLiteBackend: {
     _kCloudBuildX23: Interval(min: 1, max: 9),
@@ -247,13 +199,11 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
 };
 
 const benchmarkExpectedThroughput = {
-  BenchmarkId.imageClassification: _imageClassification,
   BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
   BenchmarkId.imageSegmentationV2: _imageSegmentationV2,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.stableDiffusion: _stableDiffusion,
-  BenchmarkId.imageClassificationOffline: _imageClassificationOffline,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };

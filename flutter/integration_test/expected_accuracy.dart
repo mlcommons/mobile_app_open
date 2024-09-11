@@ -16,17 +16,6 @@ key: <accelerator> OR <accelerator>|<backendName>
 - neuron > Android MediaTek
 */
 
-const Map<String, Interval> _imageClassification = {
-  'cpu': Interval(min: 1.00, max: 1.00),
-  'npu': Interval(min: 0.89, max: 0.91),
-  'tpu': Interval(min: 0.89, max: 0.91),
-  'ane': Interval(min: 1.00, max: 1.00),
-  'cpu&gpu&ane': Interval(min: 1.00, max: 1.00),
-  'snpe_dsp': Interval(min: 0.78, max: 0.82),
-  'psnpe_dsp': Interval(min: 0.78, max: 0.82),
-  'neuron-mdla': Interval(min: 0.88, max: 0.91),
-};
-
 const Map<String, Interval> _imageClassificationV2 = {
   'cpu': Interval(min: 0.88, max: 0.91),
   'npu': Interval(min: 0.88, max: 0.91),
@@ -100,13 +89,11 @@ const Map<String, Interval> _stableDiffusion = {
 };
 
 const benchmarkExpectedAccuracy = {
-  BenchmarkId.imageClassification: _imageClassification,
   BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
   BenchmarkId.imageSegmentationV2: _imageSegmentation,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.stableDiffusion: _stableDiffusion,
-  BenchmarkId.imageClassificationOffline: _imageClassification,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationV2,
 };
