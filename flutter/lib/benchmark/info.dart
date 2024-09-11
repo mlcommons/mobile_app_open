@@ -27,18 +27,6 @@ class BenchmarkInfo {
 
   BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
     switch (task.id) {
-      case (BenchmarkId.imageClassification):
-        return BenchmarkLocalizationInfo(
-          name: stringResources.benchNameImageClassification,
-          detailsTitle: stringResources.benchInfoImageClassification,
-          detailsContent: stringResources.benchInfoImageClassificationDesc,
-        );
-      case (BenchmarkId.imageClassificationOffline):
-        return BenchmarkLocalizationInfo(
-          name: stringResources.benchNameImageClassificationOffline,
-          detailsTitle: stringResources.benchInfoImageClassification,
-          detailsContent: stringResources.benchInfoImageClassificationDesc,
-        );
       case (BenchmarkId.imageClassificationV2):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameImageClassification,
