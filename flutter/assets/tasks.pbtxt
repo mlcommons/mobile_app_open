@@ -180,6 +180,39 @@ task {
 }
 
 task {
+  id: "stable_diffusion"
+  name: "Stable Diffusion"
+  min_query_count: 1024
+  min_duration: 60
+  max_duration: 300
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  datasets {
+    type: COCOGEN
+    full {
+      name: "COCO dataset for accuracy test"
+      input_path: "https://github.com/anhappdev/tmp/releases/download/5/coco_gen_test.tfrecord"
+      groundtruth_path: "local:///mlperf_models/stable-diffusion/clip_model_512x512.tflite"
+    }
+    lite {
+      name: "COCO dataset for performance test"
+      input_path: "https://github.com/anhappdev/tmp/releases/download/5/coco_gen_full.tfrecord"
+      groundtruth_path: ""
+    }
+    tiny {
+      name: "COCO dataset for integration test"
+      input_path: "https://github.com/anhappdev/tmp/releases/download/2/coco_gen.tfrecord"
+      groundtruth_path: "local:///mlperf_models/stable-diffusion/clip_model_512x512.tflite"
+    }
+  }
+  model {
+    id: "stable_diffusion"
+    name: "StableDiffusion"
+  }
+}
+
+task {
   id: "image_classification_offline_v2"
   name: "Image Classification v2 (Offline)"
   min_query_count: 24576
@@ -213,38 +246,5 @@ task {
     image_width: 384
     image_height: 384
     num_classes: 1000
-  }
-}
-
-task {
-  id: "stable_diffusion"
-  name: "Stable Diffusion"
-  min_query_count: 1024
-  min_duration: 60
-  max_duration: 300
-  max_throughput: 2000
-  max_accuracy: 1.0
-  scenario: "SingleStream"
-  datasets {
-    type: COCOGEN
-    full {
-      name: "COCO validation set for Stable Diffusion"
-      input_path: "https://github.com/anhappdev/tmp/releases/download/5/coco_gen_test.tfrecord"
-      groundtruth_path: "local:///mlperf_models/stable-diffusion/clip_model_512x512.tflite"
-    }
-    lite {
-      name: "COCO validation set for Stable Diffusion"
-      input_path: "https://github.com/anhappdev/tmp/releases/download/5/coco_gen_full.tfrecord"
-      groundtruth_path: ""
-    }
-    tiny {
-      name: "COCO validation set for Stable Diffusion"
-      input_path: "https://github.com/anhappdev/tmp/releases/download/2/coco_gen.tfrecord"
-      groundtruth_path: "local:///mlperf_models/stable-diffusion/clip_model_512x512.tflite"
-    }
-  }
-  model {
-    id: "stable_diffusion"
-    name: "StableDiffusion"
   }
 }
