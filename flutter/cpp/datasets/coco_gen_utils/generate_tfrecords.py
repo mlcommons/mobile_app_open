@@ -56,9 +56,10 @@ def download_image(url, file_path):
     print(f"Downloaded image to {file_path}")
 
 
-def serialize_example(caption, input_ids, attention_mask, file_name, clip_score):
+def serialize_example(caption_id, caption, input_ids, attention_mask, file_name, clip_score):
   """Creates a tf.train.Example message ready to be written to a file."""
   feature = {
+    'caption_id': tf.train.Feature(int64_list=tf.train.Int64List(value=caption_id)),
     'caption': tf.train.Feature(bytes_list=tf.train.BytesList(value=[caption.encode()])),
     'input_ids': tf.train.Feature(int64_list=tf.train.Int64List(value=input_ids)),
     'attention_mask': tf.train.Feature(int64_list=tf.train.Int64List(value=attention_mask)),
@@ -87,6 +88,7 @@ def main():
   with tf.io.TFRecordWriter(args.output_tfrecord, options='ZLIB') as writer:
     total = len(df)
     for idx, row in df.iterrows():
+      caption_id = row['id']
       caption = row['caption']
       file_name = row['file_name']
       coco_url = row['coco_url']
@@ -104,6 +106,7 @@ def main():
       clip_score = outputs.logits_per_image.numpy().flatten().tolist()
 
       example = serialize_example(
+        caption_id=[int(caption_id)],
         caption=caption,
         input_ids=input_ids,
         attention_mask=attention_mask,
