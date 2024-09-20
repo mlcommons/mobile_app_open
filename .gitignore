@@ -10,7 +10,7 @@
 /datasets/output
 /datasets/downloads
 /mobile_back_qti/snpe-*
-/mobile_back_qti/qaisw-*
+/mobile_back_qti/qairt
 *.so
 * .apk
 * .tflite
@@ -22,3 +22,7 @@ __pycache__/
 *.log
 *.iml
 *.env
+
+*.g.dart
+*.gen.dart
+*.gen.h

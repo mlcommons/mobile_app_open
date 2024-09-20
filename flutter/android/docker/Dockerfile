@@ -73,3 +73,136 @@ RUN mkdir $ANDROID_SDK_HOME && \
 
 # Git repo will be mounted at '/image-workdir/project'
 RUN git config --global --add safe.directory /image-workdir/project
+
+# Add 32-bit support since the adb in our sdk's are 32-bit binaries
+RUN dpkg --add-architecture i386
+ARG DEBIAN_FRONTEND=noninteractive
+ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
+
+# build-essential: for rest-kit(rest-kit needed for crad-repo)
+# file : used by ndk to determine if host is 32 or 64 bit
+# libtbb-dev: used for parallelization of postprocessing for pose-estimation
+# libcanberra-gtk-module, libgtk2.0-dev: required by opencv runtime
+# libstdc++6:i386: to add support for 32 bit binaries.
+# libxtst6 : required to run ide(e.g intellij) inside docker
+RUN apt-get update && apt-get install --no-install-recommends -y build-essential \
+    cmake \
+    curl \
+    git \
+    emacs \
+    file \
+    less \
+    libcanberra-gtk-module \
+    libgtk2.0-dev \
+    libtbb-dev \
+    libstdc++6:i386 \
+    libxtst6
+
+# pkg-config: required by opencv runtime
+# software-properties-common: for curl
+# xterm : to make resize available for avoiding line wrapping
+# zip : required when sourcing snpe envsetup
+RUN apt-get update && apt-get install --no-install-recommends -y mc \
+    meld \
+    pkg-config \
+    python3-dev \
+    software-properties-common \
+    sudo \
+    tmux \
+    tree \
+    unzip \
+    vim \
+    wget \
+    xterm \
+    zip \
+    ffmpeg \
+    libjpeg-dev \
+    zlib1g-dev && \
+    apt-get clean autoclean
+
+# Flatbuffers before installing Python3
+# RUN apt-add-repository ppa:hnakamur/flatbuffers
+RUN apt update && apt install -y 'flatbuffers-compiler' && apt install -y 'libflatbuffers-dev'
+ENV PATH "/usr/bin/flatc:${PATH}"
+
+# OpenJDK-11
+# NOTE: JDK is required for Android SDK which is required for openCV 3.4.7
+RUN apt-get update && \
+    apt-get install -y openjdk-17-jdk && \
+    apt-get install -y ant && \
+    apt-get clean
+# Fix certificate issues
+RUN apt-get update && \
+    apt-get install ca-certificates-java && \
+    apt-get clean && \
+    update-ca-certificates -f
+# Setup JAVA_HOME
+ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
+
+# Get and install android command line tool which will be used to install android-sdk
+RUN cd /opt && mkdir -p ./Android/cmdline-tools && \
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip && \
+    unzip commandlinetools-linux-8512546_latest.zip -d ./Android/cmdline-tools/ && \
+    mv ./Android/cmdline-tools/cmdline-tools ./Android/cmdline-tools/tools && \
+    rm -rf commandlinetools-linux-8512546_latest.zip
+
+# Android SDK
+RUN cd /opt/Android/cmdline-tools/tools/bin && \
+    yes | ./sdkmanager "platforms;android-33" "build-tools;30.0.2" "sources;android-33" \
+    "extras;google;m2repository" "extras;android;m2repository" && \
+    yes | ./sdkmanager --licenses && \
+    yes | ./sdkmanager --update
+# Setup ANDROID_HOME
+ENV ANDROID_HOME /opt/Android
+
+# Android NDK
+RUN cd /opt/Android/cmdline-tools/tools/bin && \
+    yes | ./sdkmanager --install "ndk;25.2.9519653"
+# Setup ANDROID_NDK and add into PATH
+ENV ANDROID_NDK /opt/Android/ndk/25.2.9519653
+ENV PATH "${ANDROID_NDK}:${PATH}"
+
+# Get cmake-3.19.3
+# apt has 3.10.2 as latest version, so remove it
+RUN apt-get remove --no-install-recommends -y cmake
+RUN wget -q https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh -O /opt/cmake-3.19.3-Linux-x86_64.sh && \
+    chmod +x /opt/cmake-3.19.3-Linux-x86_64.sh && mkdir -p /opt/cmake && \
+    bash /opt/cmake-3.19.3-Linux-x86_64.sh --skip-license --prefix=/opt/cmake && \
+    rm -rf /opt/cmake-3.19.3-Linux-x86_64.sh
+# Add CMAKE into PATH
+ENV PATH "/opt/cmake/bin:${PATH}"
+
+# OpenCV
+ENV CMAKE_TOOLCHAIN_FILE "${ANDROID_NDK}/build/cmake/android.toolchain.cmake"
+ENV ANDROID_ABI "arm64-v8a"
+ENV API_LEVEL "31"
+ENV ANDROID_TOOLCHAIN_NAME "aarch64-linux-android-4.9"
+ARG COMMON_CMAKE_OPTIONS="-DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=release \
+                          -DBUILD_ZLIB=ON -DWITH_FFMPEG=ON -DBUILD_TESTS=OFF \
+                          -DWITH_TBB=ON -DBUILD_PERF_TESTS=OFF -DWITH_IPP=OFF \
+                          -DWITH_OPENEXR=ON -DWITH_JASPER=ON -WITH_PNG=ON -DBUILD_FAT_JAVA_LIB=OFF WITH_IMGCODEC=ON"
+# Ref: https://docs.opencv.org/3.4.0/d7/d9f/tutorial_linux_install.html
+RUN wget -q https://github.com/opencv/opencv/archive/3.4.7/opencv-3.4.7.tar.gz -O /tmp/3.4.7.tar.gz && \
+    tar -C /tmp -xvf /tmp/3.4.7.tar.gz  && \
+    # First build for arm-android
+    cd /tmp/opencv-3.4.7 && mkdir -p /opt/opencv-3.4.7_android/ release_android && cd release_android && \
+    cmake -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}" \
+          -DANDROID_NDK="${ANDROID_NDK}" \
+          -DANDROID_HOME="${ANDROID_HOME}" \
+          -DANDROID_STL=c++_shared  \
+          -DBUILD_ANDROID_PROJECTS=OFF \
+          -DANDROID_NATIVE_API_LEVEL="${API_LEVEL}" \
+          -DANDROID_ABI="${ANDROID_ABI}" \
+          -DWITH_CUDA=ON -DWITH_OPENCL=ON \
+          $COMMON_CMAKE_OPTIONS \
+          -D WITH_ITT=OFF \
+          -DCMAKE_INSTALL_PREFIX=/opt/opencv-3.4.7_android/ .. && \
+    make -j16  && \
+    sudo make -j16 install  && cp -rf ./3rdparty/ /opt/opencv-3.4.7_android/
+
+# Set the variables to be used for actual app development/build
+ENV ANDROID_SYSROOT "${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+ENV ANDROID_PLATFORM "${API_LEVEL}"
+ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/platform-tools"
+ENV PATH "${ANDROID_PLATFORM_TOOLS}:${PATH}"
+ENV LD_LIBRARY_PATH "/usr/local/lib/:${LD_LIBRARY_PATH}"

@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The MLPerf Authors. All Rights Reserved.
+# Copyright 2020-2024 The MLPerf Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@ user_id=$(shell id -u)
 .PHONY: flutter/android/docker/image
 flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android_${user_id}.stamp
 output/docker/mlperf_mobile_flutter_android_${user_id}.stamp: flutter/android/docker/Dockerfile
+	## TODO: change if clause according to make file
+	rm -f ./mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv
+	ln -s /opt/opencv-3.4.7_android/sdk/native ./mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv
 	docker image build -t ${DOCKER_IMAGE_TAG} flutter/android/docker
 	mkdir -p output/docker
 	touch $@
@@ -42,6 +45,7 @@ flutter_common_docker_flags= \
 		--env WITH_PIXEL=${WITH_PIXEL} \
 		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
 		--env proxy_bazel_args=${proxy_bazel_args} \
+		--env BAZEL_OUTPUT_ROOT_ARG="--output_user_root=/image-workdir/cache/bazel" \
 		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
 		--env FIREBASE_CRASHLYTICS_ENABLED=${FIREBASE_CRASHLYTICS_ENABLED} \
 		--env FLUTTER_BUILD_NUMBER=${FLUTTER_BUILD_NUMBER} \

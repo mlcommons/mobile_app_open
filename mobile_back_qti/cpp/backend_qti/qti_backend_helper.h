@@ -25,6 +25,10 @@ limitations under the License.
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
 
+#ifdef STABLEDIFFUSION_FLAG
+#include "StableDiffusionShared/include/QnnApiHelpers.hpp"
+#endif
+
 class snpe_handler {
  public:
   Snpe_SNPE_Handle_t snpeHandle;
@@ -63,10 +67,16 @@ class QTIBackendHelper {
   const char *name_ = "snpe";
   const char *acceleratorName_;
   std::string snpeOutputLayers_;
+  std::string snpeOutputTensors_;
   std::vector<mlperf_data_t> inputFormat_;
   std::vector<mlperf_data_t> outputFormat_;
   std::unique_ptr<psnpe_handler> psnpe_;
   std::unique_ptr<snpe_handler> snpe_;
+#ifdef STABLEDIFFUSION_FLAG
+  QnnApiHelpers *sd_pipeline;
+#else
+  void *sd_pipeline;
+#endif
   Snpe_UserBufferList_Handle_t inputMapListHandle_, outputMapListHandle_;
   Snpe_UserMemoryMap_Handle_t userMemoryMappedBufferMapHandle_;
   std::vector<
@@ -95,6 +105,7 @@ class QTIBackendHelper {
   bool useIonBuffers_ = true;
   bool useCpuInt8_ = false;
   bool isIonRegistered;
+  bool isStableDiffusion = false;
 
   /* exposed functions */
   void use_psnpe(const char *model_path);
@@ -105,6 +116,18 @@ class QTIBackendHelper {
   void get_data_formats();
   void set_runtime_config();
   std::string get_snpe_version();
+
+  void initSd(const char *model_path, const char *native_lib_path);
+  bool preprocessInputSd(void *data);
+  bool executeSd();
+  void deinitSd();
+  bool getOutputSd(void **data);
+
+  int num_steps;
+  int seed;
+  float guidance_scale;
+  std::string native_lib_path;
+  std::string data_folder_path;
 
   static bool IsRuntimeAvailable(const snpe_runtimes_t delegate);
 
@@ -117,7 +140,8 @@ class QTIBackendHelper {
         inputMapListHandle_(Snpe_UserBufferList_Create()),
         outputMapListHandle_(Snpe_UserBufferList_Create()),
         snpe_(new snpe_handler()),
-        psnpe_(new psnpe_handler()) {
+        psnpe_(new psnpe_handler()),
+        sd_pipeline(nullptr) {
     odLayerMap[0] = "detection_boxes:0";
     odLayerMap[1] = "Postprocessor/BatchMultiClassNonMaxSuppression_classes";
     odLayerMap[2] = "detection_scores:0";
@@ -125,15 +149,23 @@ class QTIBackendHelper {
         "Postprocessor/BatchMultiClassNonMaxSuppression_num_detections";
     userMemoryMappedBufferMapHandle_ = Snpe_UserMemoryMap_Create();
     isIonRegistered = false;
+
+    num_steps = 20;
+    seed = 0;
+    guidance_scale = 7.5;
   }
 
   ~QTIBackendHelper() {
-    Snpe_RuntimeList_Delete(inputRuntimeListHandle);
-    Snpe_RuntimeList_Delete(dummyInputRuntimeListHandle);
-    Snpe_StringList_Delete(networkInputTensorNamesHandle_);
-    Snpe_StringList_Delete(networkOutputTensorNamesHandle_);
-    Snpe_UserBufferList_Delete(inputMapListHandle_);
-    Snpe_UserBufferList_Delete(outputMapListHandle_);
+    if (isStableDiffusion) {
+        deinitSd();
+    } else {
+        Snpe_RuntimeList_Delete(inputRuntimeListHandle);
+        Snpe_RuntimeList_Delete(dummyInputRuntimeListHandle);
+        Snpe_StringList_Delete(networkInputTensorNamesHandle_);
+        Snpe_StringList_Delete(networkOutputTensorNamesHandle_);
+        Snpe_UserBufferList_Delete(inputMapListHandle_);
+        Snpe_UserBufferList_Delete(outputMapListHandle_);
+    }
   }
 };
 

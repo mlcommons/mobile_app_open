@@ -44,18 +44,8 @@ bool useIonBuffer_g;
 extern "C" {
 #endif  // __cplusplus
 
-// Should return true if current hardware is supported.
-bool mlperf_backend_matches_hardware(const char **not_allowed_message,
-                                     const char **settings,
-                                     const mlperf_device_info_t *device_info) {
-  if (device_info && device_info->model && device_info->manufacturer) {
-    LOG(INFO) << "QTI HW supported check: model: " << device_info->model
-              << ", manufacturer: " << device_info->manufacturer;
-  }
-
-  std::ifstream in_file;
+bool set_system_paths(const char *native_lib_path) {
 #ifdef __ANDROID__
-  const char *native_lib_path = device_info->native_lib_path;
   std::stringstream adsp_lib_path;
   adsp_lib_path << native_lib_path << ";";
   adsp_lib_path << "/system/lib/rfsa/adsp;/system/vendor/lib/rfsa/adsp;/dsp";
@@ -67,6 +57,21 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
   LOG(INFO) << "ld_lib_path: " << ld_lib_path.str();
   setenv("LD_LIBRARY_PATH", ld_lib_path.str().c_str(), 1 /*override*/);
 #endif
+
+  return false;
+}
+
+// Should return true if current hardware is supported.
+bool mlperf_backend_matches_hardware(const char **not_allowed_message,
+                                     const char **settings,
+                                     const mlperf_device_info_t *device_info) {
+  if (device_info && device_info->model && device_info->manufacturer) {
+    LOG(INFO) << "QTI HW supported check: model: " << device_info->model
+              << ", manufacturer: " << device_info->manufacturer;
+  }
+
+  std::ifstream in_file;
+  set_system_paths(device_info->native_lib_path);
 
   *not_allowed_message = nullptr;
   bool isQSoC = Socs::isSnapDragon(device_info->manufacturer);
@@ -117,14 +122,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
 
   // use lowLatency cores for all snpe models
   CpuCtrl::lowLatency();
+  set_system_paths(native_lib_path);
 
-#ifdef __ANDROID__
-  std::stringstream adsp_lib_path;
-  adsp_lib_path << native_lib_path << ";";
-  adsp_lib_path << "/system/lib/rfsa/adsp;/system/vendor/lib/rfsa/adsp;/dsp";
-  LOG(INFO) << "lib_path: " << adsp_lib_path.str();
-  setenv("ADSP_LIBRARY_PATH", adsp_lib_path.str().c_str(), 1 /*override*/);
-#endif
   std::string snpe_version = xverstr(SNPE_VERSION_STRING);
   if (snpe_version.compare("default") != 0) {
     int dotPosition = snpe_version.find_last_of(".");
@@ -137,23 +136,31 @@ mlperf_backend_ptr_t mlperf_backend_create(
   }
   LOG(INFO) << "snpe_version: " << snpe_version;
 
-  // set runtime config
-  backend_data->set_runtime_config();
-  // Use PSNPE or SNPE
-  if (backend_data->useSnpe_) {
-    backend_data->use_snpe(model_path);
+  // Stable Diffusion initialization
+  if(backend_data->isStableDiffusion)
+  {
+    backend_data->initSd(model_path, native_lib_path);
+
+    LOG(INFO) << "StableDiffusion build completed successfully";
   } else {
-    backend_data->use_psnpe(model_path);
+
+    // set runtime config
+    backend_data->set_runtime_config();
+    // Use PSNPE or SNPE
+    if (backend_data->useSnpe_) {
+        backend_data->use_snpe(model_path);
+    } else {
+        backend_data->use_psnpe(model_path);
+    }
+
+    backend_data->queryCount_ = 0;
+
+    backend_data->get_data_formats();
+    backend_data->map_inputs();
+    backend_data->map_outputs();
+
+    LOG(INFO) << "SNPE build completed successfully";
   }
-
-  backend_data->queryCount_ = 0;
-
-  backend_data->get_data_formats();
-  backend_data->map_inputs();
-  backend_data->map_outputs();
-
-  LOG(INFO) << "SNPE build completed successfully";
-
   return backend_data;
 }
 
@@ -185,6 +192,9 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
   if (backend_data->isTflite_) {
     tflite_backend_delete(backend_data->tfliteBackend_);
   }
+  if (backend_data->isStableDiffusion) {
+      backend_data->deinitSd();
+  }
   delete backend_data;
   backend_data_ = nullptr;
 }
@@ -201,7 +211,15 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
     return tflite_backend_issue_query(backend_data->tfliteBackend_);
   }
 
-  ret = backend_data->execute();
+  if (backend_data->isStableDiffusion) {
+    if (backend_data->executeSd()) {
+        ret = MLPERF_SUCCESS;
+    } else {
+        ret = MLPERF_FAILURE;
+    }
+  } else {
+    ret = backend_data->execute();
+  }
 
 #ifdef DEBUG_FLAG
   auto end = high_resolution_clock::now();
@@ -250,6 +268,16 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
     return tflite_backend_set_input(backend_data->tfliteBackend_, batchIndex, i,
                                     data);
   }
+
+  if(backend_data->isStableDiffusion)
+  {
+     if (backend_data->preprocessInputSd(data)) {
+        return MLPERF_SUCCESS;
+     } else {
+        return MLPERF_FAILURE;
+     }
+  }
+
   void *batchedDataPtr = ((backend_data->useIonBuffers_ == false) &&
                           (backend_data->inputBatch_ <= 1))
                              ? data
@@ -304,13 +332,24 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
     return tflite_backend_get_output(backend_data->tfliteBackend_, batchIndex,
                                      outputIndex, data);
   }
-  if (backend_data->snpeOutputLayers_ ==
-      "Postprocessor/BatchMultiClassNonMaxSuppression") {
+
+  if (backend_data->isStableDiffusion) {
+    if (backend_data->getOutputSd(data)) {
+        return MLPERF_SUCCESS;
+    } else {
+        *data = nullptr;
+        return MLPERF_FAILURE;
+    }
+  }
+
+  if (backend_data->snpeOutputTensors_.find("Postprocessor/BatchMultiClassNonMaxSuppression_classes") != std::string::npos
+        || backend_data->snpeOutputLayers_ == "Postprocessor/BatchMultiClassNonMaxSuppression") {
     // Reorder snpeOutputLayers_ for coco process_output
     const char *outputLayerName = backend_data->odLayerMap[outputIndex].c_str();
     *data = backend_data->bufs_[batchIndex].at(outputLayerName).data();
     return MLPERF_SUCCESS;
-  } else if (backend_data->snpeOutputLayers_ == "transpose") {
+  } else if (backend_data->snpeOutputTensors_.find("transpose:0") != std::string::npos
+        || backend_data->snpeOutputLayers_ == "transpose") {
     *data = backend_data->bufs_[int(batchIndex / backend_data->inputBatch_)]
                 .at(Snpe_StringList_At(
                     backend_data->networkOutputTensorNamesHandle_, 0))

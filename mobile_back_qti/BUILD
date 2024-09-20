@@ -28,11 +28,11 @@ config_setting(
 cc_import(
     name = "snpewindowslib",
     hdrs = glob([
-        SNPE_VERSION + "/include/SNPE/**/*.hpp",
-        SNPE_VERSION + "/include/SNPE/**/*.h",
+        "qairt/" + SNPE_VERSION + "/include/SNPE/**/*.hpp",
+        "qairt/" + SNPE_VERSION + "/include/SNPE/**/*.h",
     ]),
-    interface_library = SNPE_VERSION + "/lib/aarch64-windows-msvc/SNPE.lib",
-    shared_library = SNPE_VERSION + "/lib/aarch64-windows-msvc/SNPE.dll",
+    interface_library = "qairt/" + SNPE_VERSION + "/lib/aarch64-windows-msvc/SNPE.lib",
+    shared_library = "qairt/" + SNPE_VERSION + "/lib/aarch64-windows-msvc/SNPE.dll",
 )
 
 cc_library(
@@ -49,30 +49,36 @@ cc_library(
 cc_library(
     name = "snpe",
     srcs = [
-        SNPE_VERSION + "/lib/aarch64-android/libSNPE.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSNPE.so"
     ],
     hdrs = glob([
-        SNPE_VERSION + "/include/SNPE/**/*.hpp",
-        SNPE_VERSION + "/include/SNPE/**/*.h",
+        "qairt/" + SNPE_VERSION + "/include/SNPE/**/*.hpp",
+        "qairt/" + SNPE_VERSION + "/include/SNPE/**/*.h",
+	    "qairt/" + SNPE_VERSION + "/include/QNN/**/*.h",
+        "qairt/" + SNPE_VERSION + "/include/QNN/*.h"
     ]),
-    copts = ["-I" + SNPE_VERSION + "/include/SNPE"],
+    copts = ["-I" + "qairt/" + SNPE_VERSION + "/include/SNPE", "-I" + SNPE_VERSION + "/include/QNN"],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "snpe_deps",
     srcs = [
-        SNPE_VERSION + "/lib/aarch64-android/libhta.so",
-        SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV75Stub.so",
-        SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV73Stub.so",
-        SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV69Stub.so",
-        SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV68Stub.so",
-        SNPE_VERSION + "/lib/aarch64-android/libSNPE.so",
-        SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpPrepare.so",
-        SNPE_VERSION + "/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so",
-        SNPE_VERSION + "/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so",
-        SNPE_VERSION + "/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so",
-        SNPE_VERSION + "/lib/hexagon-v75/unsigned/libSnpeHtpV75Skel.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libhta.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV75Stub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV73Stub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV69Stub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV68Stub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSNPE.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpPrepare.so",
+        "qairt/" + SNPE_VERSION + "/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so",
+        "qairt/" + SNPE_VERSION + "/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so",
+        "qairt/" + SNPE_VERSION + "/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so",
+        "qairt/" + SNPE_VERSION + "/lib/hexagon-v75/unsigned/libSnpeHtpV75Skel.so",
+	"qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV73Stub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtp.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpPrepare.so",
+        "qairt/" + SNPE_VERSION + "/lib/hexagon-v73/unsigned/libQnnHtpV73Skel.so",
     ],
 )
 

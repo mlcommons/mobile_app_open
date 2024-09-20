@@ -21,6 +21,7 @@
 #
 
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
 load("@snpe_version_loader//:snpe_var_def.bzl", "SNPE_VERSION")
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
@@ -49,6 +50,35 @@ string_flag(
     ],
 )
 
+string_flag(
+    name = "with_stablediffusion",
+    build_setting_default = "2",
+    values = [
+        "1",
+        "2",
+    ],
+)
+
+config_setting(
+    name = "stablediffusion_option",
+    flag_values = {":with_stablediffusion": "1"},
+)
+
+config_setting(
+    name = "nostablediffusion_option",
+    flag_values = {":with_stablediffusion": "2"},
+)
+
+selects.config_setting_group(
+    name = "android_with_stablediffusion",
+    match_all = ["android_arm64","stablediffusion_option"],
+)
+
+selects.config_setting_group(
+    name = "android_without_stablediffusion",
+    match_all = ["android_arm64","nostablediffusion_option"],
+)
+
 config_setting(
     name = "debug_option",
     flag_values = {":with_qti": "2"},
@@ -69,10 +99,13 @@ config_setting(
 )
 
 snpe_copts = [
-    "-Imobile_back_qti/" + SNPE_VERSION + "/include/SNPE",
-    "-fexceptions",
+    "-Imobile_back_qti/" + "qairt/" + SNPE_VERSION + "/include/SNPE",
+    "-Imobile_back_qti/" + "qairt/" + SNPE_VERSION + "/include/QNN",
+    "-Imobile_back_qti/" + "qairt/" + SNPE_VERSION + "/include/QNN/HTP",
+    "-fcxx-exceptions",
     "-lc++_shared",
 ]
+
 
 pbtxt2header(
     name = "qti_settings",
@@ -94,6 +127,7 @@ pbtxt2header(
         "settings/qti_settings_sm4450.pbtxt",
         "settings/qti_settings_sm7550.pbtxt",
         "settings/qti_settings_sm8635.pbtxt",
+        "settings/qti_settings_stablediffusion.pbtxt",
     ],
 )
 
@@ -166,18 +200,29 @@ cc_library(
                         "debug_option": ["DEBUG_FLAG"],
                         "//conditions:default": [],
                         "config_option": ["EXTERNAL_CONFIG"],
+                    }) +
+                    select({
+                        "stablediffusion_option": ["STABLEDIFFUSION_FLAG"],
+                        "//conditions:default": [],
                     }),
     deps = [
+        "//flutter/cpp/c:headers",
         ":qti_allocator",
         ":qti_settings",
-        "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ] + select({
-        "android_arm64": [
-            "//mobile_back_qti:snpe",
+        ":android_without_stablediffusion": [
+            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
             "@org_tensorflow//tensorflow/lite/c:c_api",
             "@org_tensorflow//tensorflow/lite/c:common",
+            "//mobile_back_qti:snpe",
+        ],
+        ":android_with_stablediffusion": [
             "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
+            "@org_tensorflow//tensorflow/lite/c:c_api",
+            "@org_tensorflow//tensorflow/lite/c:common",
+            "//mobile_back_qti:snpe",
+            "//mobile_back_qti/cpp/backend_qti/StableDiffusionShared:StableDiffusionShared",
         ],
         "windows_arm64": [
             "//mobile_back_qti:snpewindowslib",

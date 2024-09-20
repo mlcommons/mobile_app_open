@@ -1,0 +1,46 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
+benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "QNN"
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "false"
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "QNN_DSP"
+    accelerator_name: "snpe_dsp"
+    accelerator_desc: "DSP"
+    model_file: {
+      model_path: "local:///mlperf_models/stable_diffusion/betas.bin"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "local:///mlperf_models/stable_diffusion/lambdas.bin"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "local:///mlperf_models/stable_diffusion/sd_precompute_data.tar"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "local:///mlperf_models/stable_diffusion/text_encoder.serialized.bin"
+      model_checksum: ""
+    }
+    model_file: {
+        model_path: "local:///mlperf_models/stable_diffusion/unet.serialized.bin"
+        model_checksum: ""
+    }
+    model_file: {
+        model_path: "local:///mlperf_models/stable_diffusion/vae_decoder.serialized.bin"
+        model_checksum: ""
+    }
+  }
+  delegate_selected: "QNN_DSP"
+}
