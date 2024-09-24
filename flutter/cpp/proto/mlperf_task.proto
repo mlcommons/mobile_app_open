@@ -110,7 +110,8 @@ message ModelConfig {
 }
 
 // CustomConfig are task specific configuration.
-// The TaskConfig.CustomConfig will be converted to BenchmarkSetting.CustomSetting and passed to the backend.
+// The TaskConfig.CustomConfig will be converted to
+// BenchmarkSetting.CustomSetting and passed to the backend.
 // To avoid name collision, the id should be prefixed with TaskConfig.id.
 message CustomConfig {
   // Id of this config.
