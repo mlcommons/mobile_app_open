@@ -65,8 +65,9 @@ void DeleteBackendConfiguration(mlperf_backend_configuration_t *configs);
 
 mlperf_backend_configuration_t CppToCSettings(const SettingList &settings);
 
-SettingList createSettingList(const BackendSetting &backend_setting,
-                              std::string benchmark_id);
+SettingList CreateSettingList(const BackendSetting &backend_setting,
+                              const std::string &custom_config,
+                              const std::string &benchmark_id);
 
 }  // namespace mobile
 }  // namespace mlperf

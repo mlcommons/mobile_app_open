@@ -125,22 +125,61 @@ mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   return c_settings;
 }
 
-SettingList createSettingList(const BackendSetting &backend_setting,
-                              std::string benchmark_id) {
+// Split the string by a given delimiter
+std::vector<std::string> _splitString(const std::string &str, char delimiter) {
+  std::vector<std::string> tokens;
+  std::stringstream ss(str);
+  std::string token;
+  while (std::getline(ss, token, delimiter)) {
+    tokens.push_back(token);
+  }
+  return tokens;
+}
+
+// Parse the key:value string list
+std::unordered_map<std::string, std::string> _parseKeyValueList(
+    const std::string &input) {
+  std::unordered_map<std::string, std::string> keyValueMap;
+  std::vector<std::string> pairs = _splitString(input, ',');  // Split by comma
+
+  for (const std::string &pair : pairs) {
+    std::vector<std::string> keyValue =
+        _splitString(pair, ':');  // Split by colon
+    if (keyValue.size() == 2) {
+      keyValueMap[keyValue[0]] = keyValue[1];
+    } else {
+      LOG(ERROR) << "Invalid key:value pair: " << pair;
+    }
+  }
+  return keyValueMap;
+}
+
+// Create the setting list for backend
+SettingList CreateSettingList(const BackendSetting &backend_setting,
+                              const std::string &custom_config,
+                              const std::string &benchmark_id) {
   SettingList setting_list;
   int setting_index = 0;
-
-  for (auto setting : backend_setting.common_setting()) {
+  for (const auto &setting : backend_setting.common_setting()) {
     setting_list.add_setting();
     (*setting_list.mutable_setting(setting_index)) = setting;
     setting_index++;
   }
 
   // Copy the benchmark specific settings
-  setting_index = 0;
-  for (auto bm_setting : backend_setting.benchmark_setting()) {
+  for (const auto &bm_setting : backend_setting.benchmark_setting()) {
     if (bm_setting.benchmark_id() == benchmark_id) {
       setting_list.mutable_benchmark_setting()->CopyFrom(bm_setting);
+
+      auto parsed = _parseKeyValueList(custom_config);
+      for (const auto &kv : parsed) {
+        CustomSetting custom_setting = CustomSetting();
+        custom_setting.set_id(kv.first);
+        custom_setting.set_value(kv.second);
+        setting_list.mutable_benchmark_setting()->mutable_custom_setting()->Add(
+            std::move(custom_setting));
+      }
+      break;
     }
   }
   LOG(INFO) << "setting_list:" << std::endl << setting_list.DebugString();
