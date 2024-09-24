@@ -24,15 +24,15 @@ StableDiffusionInvoker::StableDiffusionInvoker(SDBackendData* backend_data)
     : backend_data_(backend_data) {}
 
 std::vector<float> StableDiffusionInvoker::invoke() {
-  std::cout << "Prompt encoding started" << std::endl;
+  LOG(INFO) << "Prompt encoding started";
   auto encoded_text = encode_prompt(backend_data_->input_prompt_tokens);
   auto unconditional_encoded_text =
       encode_prompt(backend_data_->unconditional_tokens);
-  std::cout << "Diffusion process started" << std::endl;
+  LOG(INFO) << "Diffusion process started";
   auto latent =
       diffusion_process(encoded_text, unconditional_encoded_text,
                         backend_data_->num_steps, backend_data_->seed);
-  std::cout << "Image decoding started" << std::endl;
+  LOG(INFO) << "Image decoding started";
   return decode_image(latent);
 }
 
@@ -108,7 +108,7 @@ std::vector<float> StableDiffusionInvoker::diffusion_process(
   auto alphas_prev = std::get<1>(alphas_tuple);
 
   for (int i = timesteps.size() - 1; i >= 0; --i) {
-    std::cout << "Step " << timesteps.size() - 1 - i << "\n";
+    LOG(INFO) << "Step " << timesteps.size() - 1 - i;
 
     auto latent_prev = latent;
     auto t_emb = get_timestep_embedding(timesteps[i]);

@@ -31,7 +31,7 @@ message MLPerfConfig {
 // Config of the mlperf tasks.
 // A task is basically a combination of models and a dataset.
 //
-// Next ID: 11
+// Next ID: 12
 message TaskConfig {
   // Must be unique in one task file. Ex: image_classification
   // used to match backend settings
@@ -52,6 +52,7 @@ message TaskConfig {
   required string scenario = 7;
   required DatasetConfig datasets = 8;
   required ModelConfig model = 9;
+  repeated CustomConfig custom_config = 11;
 }
 
 // Datasets for a task
@@ -106,4 +107,15 @@ message ModelConfig {
   optional int32 image_height = 5;
   // Number of detection classes if applicable
   optional int32 num_classes = 6;
+}
+
+// CustomConfig are task specific configuration.
+// The TaskConfig.CustomConfig will be converted to
+// BenchmarkSetting.CustomSetting and passed to the backend.
+// To avoid name collision, the id should be prefixed with TaskConfig.id.
+message CustomConfig {
+  // Id of this config.
+  required string id = 1;
+  // Value of this config.
+  required string value = 2;
 }

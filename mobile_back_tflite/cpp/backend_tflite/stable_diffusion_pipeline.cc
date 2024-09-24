@@ -64,6 +64,15 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   SDBackendData* backend_data = new SDBackendData();
   backendExists = true;
 
+  for (int i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], "stable_diffusion_seed") == 0) {
+      backend_data->seed = atoi(configs->values[i]);
+    }
+    if (strcmp(configs->keys[i], "stable_diffusion_num_steps") == 0) {
+      backend_data->num_steps = atoi(configs->values[i]);
+    }
+  }
+
   // Load models from the provided directory path
   std::string text_encoder_path =
       std::string(model_path) + "/sd_text_encoder_dynamic.tflite";
