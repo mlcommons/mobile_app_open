@@ -19,9 +19,6 @@ user_id=$(shell id -u)
 .PHONY: flutter/android/docker/image
 flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android_${user_id}.stamp
 output/docker/mlperf_mobile_flutter_android_${user_id}.stamp: flutter/android/docker/Dockerfile
-	## TODO: change if clause according to make file
-	rm -f ./mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv
-	ln -s /opt/opencv-3.4.7_android/sdk/native ./mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv
 	docker image build -t ${DOCKER_IMAGE_TAG} flutter/android/docker
 	mkdir -p output/docker
 	touch $@

@@ -30,6 +30,7 @@ RUN curl --proto '=https' -L https://github.com/bazelbuild/bazelisk/releases/dow
     chmod +x /usr/local/bin/bazel
 
 ENV ANDROID_SDK_ROOT=/opt/android
+ENV ANDROID_HOME=/opt/android
 WORKDIR $ANDROID_SDK_ROOT/cmdline-tools
 # sdkmanager expects to be placed into `$ANDROID_SDK_ROOT/cmdline-tools/tools`
 RUN curl --proto '=https' -L https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip | jar x && \
@@ -120,48 +121,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y mc \
     zlib1g-dev && \
     apt-get clean autoclean
 
-# Flatbuffers before installing Python3
-# RUN apt-add-repository ppa:hnakamur/flatbuffers
-RUN apt update && apt install -y 'flatbuffers-compiler' && apt install -y 'libflatbuffers-dev'
-ENV PATH "/usr/bin/flatc:${PATH}"
-
-# OpenJDK-11
-# NOTE: JDK is required for Android SDK which is required for openCV 3.4.7
-RUN apt-get update && \
-    apt-get install -y openjdk-17-jdk && \
-    apt-get install -y ant && \
-    apt-get clean
-# Fix certificate issues
-RUN apt-get update && \
-    apt-get install ca-certificates-java && \
-    apt-get clean && \
-    update-ca-certificates -f
-# Setup JAVA_HOME
-ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
-
-# Get and install android command line tool which will be used to install android-sdk
-RUN cd /opt && mkdir -p ./Android/cmdline-tools && \
-    wget -q https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip && \
-    unzip commandlinetools-linux-8512546_latest.zip -d ./Android/cmdline-tools/ && \
-    mv ./Android/cmdline-tools/cmdline-tools ./Android/cmdline-tools/tools && \
-    rm -rf commandlinetools-linux-8512546_latest.zip
-
-# Android SDK
-RUN cd /opt/Android/cmdline-tools/tools/bin && \
-    yes | ./sdkmanager "platforms;android-33" "build-tools;30.0.2" "sources;android-33" \
-    "extras;google;m2repository" "extras;android;m2repository" && \
-    yes | ./sdkmanager --licenses && \
-    yes | ./sdkmanager --update
-# Setup ANDROID_HOME
-ENV ANDROID_HOME /opt/Android
-
-# Android NDK
-RUN cd /opt/Android/cmdline-tools/tools/bin && \
-    yes | ./sdkmanager --install "ndk;25.2.9519653"
-# Setup ANDROID_NDK and add into PATH
-ENV ANDROID_NDK /opt/Android/ndk/25.2.9519653
-ENV PATH "${ANDROID_NDK}:${PATH}"
-
 # Get cmake-3.19.3
 # apt has 3.10.2 as latest version, so remove it
 RUN apt-get remove --no-install-recommends -y cmake
@@ -173,7 +132,7 @@ RUN wget -q https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.1
 ENV PATH "/opt/cmake/bin:${PATH}"
 
 # OpenCV
-ENV CMAKE_TOOLCHAIN_FILE "${ANDROID_NDK}/build/cmake/android.toolchain.cmake"
+ENV CMAKE_TOOLCHAIN_FILE "${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake"
 ENV ANDROID_ABI "arm64-v8a"
 ENV API_LEVEL "31"
 ENV ANDROID_TOOLCHAIN_NAME "aarch64-linux-android-4.9"

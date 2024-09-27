@@ -67,6 +67,8 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
   endif
 
   ifeq ($(WITH_STABLEDIFFUSION),1)
+	backend_qti_libs_deps = rm -f ./mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv && \
+	                             ln -s /opt/opencv-3.4.7_android/sdk/native mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv
 	backend_qti_flutter_docker_args = --env WITH_STABLEDIFFUSION=${WITH_STABLEDIFFUSION}
 	backend_qti_android_target+=--//mobile_back_qti/cpp/backend_qti:with_stablediffusion=${WITH_STABLEDIFFUSION}
 	backend_qti_cmdline_files+=mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv/libs/arm64-v8a/libopencv_core.so \
