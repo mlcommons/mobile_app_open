@@ -186,5 +186,45 @@ SettingList CreateSettingList(const BackendSetting &backend_setting,
   return setting_list;
 }
 
+template <typename T>
+T GetConfigValue(mlperf_backend_configuration_t *configs, const char *key,
+                 T defaultValue);
+
+template <>
+int GetConfigValue<int>(mlperf_backend_configuration_t *configs,
+                        const char *key, int defaultValue) {
+  for (int i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], key) == 0) {
+      const char *valueStr = configs->values[i];
+      char *endptr = nullptr;
+      errno = 0;
+      long value =
+          strtol(valueStr, &endptr, 10);  // Base 10 for decimal conversion
+      if (errno == ERANGE || value < INT_MIN || value > INT_MAX) {
+        LOG(ERROR) << "Value out of range for int: " << valueStr;
+        return defaultValue;
+      }
+      if (endptr == valueStr || *endptr != '\0') {
+        LOG(ERROR) << "Invalid value for int: " << valueStr;
+        return defaultValue;
+      }
+      return static_cast<int>(value);
+    }
+  }
+  return defaultValue;
+}
+
+template <>
+std::string GetConfigValue<std::string>(mlperf_backend_configuration_t *configs,
+                                        const char *key,
+                                        std::string defaultValue) {
+  for (int i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], key) == 0) {
+      return std::string(configs->values[i]);
+    }
+  }
+  return defaultValue;
+}
+
 }  // namespace mobile
 }  // namespace mlperf
