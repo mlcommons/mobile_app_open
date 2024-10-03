@@ -14,7 +14,6 @@
 ##########################################################################
 
 load("@stable_diffusion_external_deps_shared//:stable_diffusion_var_def_shared.bzl", "OPENCV_ROOT_DIR")
-load("@snpe_version_loader//:snpe_var_def.bzl", "SNPE_VERSION")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -42,7 +41,7 @@ cc_library(
 
 cc_library(
     name = "StableDiffusionShared",
-    srcs = glob(["libStableDiffusion.so"]),
+    srcs = "libStableDiffusion.so",
     hdrs = glob([
         "include/*.hpp",
         "include/**/*.hpp",
