@@ -157,14 +157,14 @@ class QTIBackendHelper {
 
   ~QTIBackendHelper() {
     if (isStableDiffusion) {
-        deinitSd();
+      deinitSd();
     } else {
-        Snpe_RuntimeList_Delete(inputRuntimeListHandle);
-        Snpe_RuntimeList_Delete(dummyInputRuntimeListHandle);
-        Snpe_StringList_Delete(networkInputTensorNamesHandle_);
-        Snpe_StringList_Delete(networkOutputTensorNamesHandle_);
-        Snpe_UserBufferList_Delete(inputMapListHandle_);
-        Snpe_UserBufferList_Delete(outputMapListHandle_);
+      Snpe_RuntimeList_Delete(inputRuntimeListHandle);
+      Snpe_RuntimeList_Delete(dummyInputRuntimeListHandle);
+      Snpe_StringList_Delete(networkInputTensorNamesHandle_);
+      Snpe_StringList_Delete(networkOutputTensorNamesHandle_);
+      Snpe_UserBufferList_Delete(inputMapListHandle_);
+      Snpe_UserBufferList_Delete(outputMapListHandle_);
     }
   }
 };

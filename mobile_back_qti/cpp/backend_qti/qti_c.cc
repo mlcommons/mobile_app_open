@@ -137,20 +137,18 @@ mlperf_backend_ptr_t mlperf_backend_create(
   LOG(INFO) << "snpe_version: " << snpe_version;
 
   // Stable Diffusion initialization
-  if(backend_data->isStableDiffusion)
-  {
+  if (backend_data->isStableDiffusion) {
     backend_data->initSd(model_path, native_lib_path);
 
     LOG(INFO) << "StableDiffusion build completed successfully";
   } else {
-
     // set runtime config
     backend_data->set_runtime_config();
     // Use PSNPE or SNPE
     if (backend_data->useSnpe_) {
-        backend_data->use_snpe(model_path);
+      backend_data->use_snpe(model_path);
     } else {
-        backend_data->use_psnpe(model_path);
+      backend_data->use_psnpe(model_path);
     }
 
     backend_data->queryCount_ = 0;
@@ -193,7 +191,7 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
     tflite_backend_delete(backend_data->tfliteBackend_);
   }
   if (backend_data->isStableDiffusion) {
-      backend_data->deinitSd();
+    backend_data->deinitSd();
   }
   delete backend_data;
   backend_data_ = nullptr;
@@ -213,9 +211,9 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
 
   if (backend_data->isStableDiffusion) {
     if (backend_data->executeSd()) {
-        ret = MLPERF_SUCCESS;
+      ret = MLPERF_SUCCESS;
     } else {
-        ret = MLPERF_FAILURE;
+      ret = MLPERF_FAILURE;
     }
   } else {
     ret = backend_data->execute();
@@ -269,13 +267,12 @@ mlperf_status_t mlperf_backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                     data);
   }
 
-  if(backend_data->isStableDiffusion)
-  {
-     if (backend_data->preprocessInputSd(data)) {
-        return MLPERF_SUCCESS;
-     } else {
-        return MLPERF_FAILURE;
-     }
+  if (backend_data->isStableDiffusion) {
+    if (backend_data->preprocessInputSd(data)) {
+      return MLPERF_SUCCESS;
+    } else {
+      return MLPERF_FAILURE;
+    }
   }
 
   void *batchedDataPtr = ((backend_data->useIonBuffers_ == false) &&
@@ -335,21 +332,25 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
 
   if (backend_data->isStableDiffusion) {
     if (backend_data->getOutputSd(data)) {
-        return MLPERF_SUCCESS;
+      return MLPERF_SUCCESS;
     } else {
-        *data = nullptr;
-        return MLPERF_FAILURE;
+      *data = nullptr;
+      return MLPERF_FAILURE;
     }
   }
 
-  if (backend_data->snpeOutputTensors_.find("Postprocessor/BatchMultiClassNonMaxSuppression_classes") != std::string::npos
-        || backend_data->snpeOutputLayers_ == "Postprocessor/BatchMultiClassNonMaxSuppression") {
+  if (backend_data->snpeOutputTensors_.find(
+          "Postprocessor/BatchMultiClassNonMaxSuppression_classes") !=
+          std::string::npos ||
+      backend_data->snpeOutputLayers_ ==
+          "Postprocessor/BatchMultiClassNonMaxSuppression") {
     // Reorder snpeOutputLayers_ for coco process_output
     const char *outputLayerName = backend_data->odLayerMap[outputIndex].c_str();
     *data = backend_data->bufs_[batchIndex].at(outputLayerName).data();
     return MLPERF_SUCCESS;
-  } else if (backend_data->snpeOutputTensors_.find("transpose:0") != std::string::npos
-        || backend_data->snpeOutputLayers_ == "transpose") {
+  } else if (backend_data->snpeOutputTensors_.find("transpose:0") !=
+                 std::string::npos ||
+             backend_data->snpeOutputLayers_ == "transpose") {
     *data = backend_data->bufs_[int(batchIndex / backend_data->inputBatch_)]
                 .at(Snpe_StringList_At(
                     backend_data->networkOutputTensorNamesHandle_, 0))

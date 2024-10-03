@@ -49,15 +49,18 @@ cc_library(
 cc_library(
     name = "snpe",
     srcs = [
-        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSNPE.so"
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSNPE.so",
     ],
     hdrs = glob([
         "qairt/" + SNPE_VERSION + "/include/SNPE/**/*.hpp",
         "qairt/" + SNPE_VERSION + "/include/SNPE/**/*.h",
-	    "qairt/" + SNPE_VERSION + "/include/QNN/**/*.h",
-        "qairt/" + SNPE_VERSION + "/include/QNN/*.h"
+        "qairt/" + SNPE_VERSION + "/include/QNN/**/*.h",
+        "qairt/" + SNPE_VERSION + "/include/QNN/*.h",
     ]),
-    copts = ["-I" + "qairt/" + SNPE_VERSION + "/include/SNPE", "-I" + SNPE_VERSION + "/include/QNN"],
+    copts = [
+        "-I" + "qairt/" + SNPE_VERSION + "/include/SNPE",
+        "-I" + SNPE_VERSION + "/include/QNN",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -75,7 +78,7 @@ cc_library(
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so",
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so",
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v75/unsigned/libSnpeHtpV75Skel.so",
-	"qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV73Stub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV73Stub.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtp.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpPrepare.so",
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v73/unsigned/libQnnHtpV73Skel.so",

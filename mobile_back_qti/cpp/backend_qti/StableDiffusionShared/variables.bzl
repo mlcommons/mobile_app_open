@@ -28,4 +28,3 @@ stable_diffusion_external_deps_shared = repository_rule(
     local = True,
     attrs = {"workspace_dir": attr.string(mandatory = True)},
 )
-

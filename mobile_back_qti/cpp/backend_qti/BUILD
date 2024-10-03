@@ -71,12 +71,18 @@ config_setting(
 
 selects.config_setting_group(
     name = "android_with_stablediffusion",
-    match_all = ["android_arm64","stablediffusion_option"],
+    match_all = [
+        "android_arm64",
+        "stablediffusion_option",
+    ],
 )
 
 selects.config_setting_group(
     name = "android_without_stablediffusion",
-    match_all = ["android_arm64","nostablediffusion_option"],
+    match_all = [
+        "android_arm64",
+        "nostablediffusion_option",
+    ],
 )
 
 config_setting(
@@ -105,7 +111,6 @@ snpe_copts = [
     "-fcxx-exceptions",
     "-lc++_shared",
 ]
-
 
 pbtxt2header(
     name = "qti_settings",

@@ -144,11 +144,11 @@ static void process_config(const mlperf_backend_configuration_t *configs,
         backend_data->useCpuInt8_ = false;
       }
     } else if (strcmp(configs->keys[i], "pipeline") == 0) {
-        if (std::strcmp(configs->values[i], "StableDiffusionPipeline") == 0) {
-            backend_data->isStableDiffusion = true;
-        } else {
-            backend_data->isStableDiffusion = false;
-        }
+      if (std::strcmp(configs->values[i], "StableDiffusionPipeline") == 0) {
+        backend_data->isStableDiffusion = true;
+      } else {
+        backend_data->isStableDiffusion = false;
+      }
     }
   }
 

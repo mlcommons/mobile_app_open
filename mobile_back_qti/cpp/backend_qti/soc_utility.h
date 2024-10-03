@@ -71,7 +71,6 @@ class SocInfo {
       m_settings += qti_settings_stablediffusion;
 #endif
     }
-
   }
 
   int m_num_dsp;

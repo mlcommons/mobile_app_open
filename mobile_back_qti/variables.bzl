@@ -34,7 +34,7 @@ def _impl(repository_ctx):
             fail("qairt folder is not found in the repo")
         filepath = found.stdout[:-1]
     sdk_version = filepath[found.stdout.rfind("/") + 1:]
-    
+
     print("Update SNPE version: " + sdk_version)  # buildifier: disable=print
     repository_ctx.read(Label("@//:mobile_back_qti/qairt/" + sdk_version + "/ReleaseNotes.txt"))
 

@@ -27,11 +27,10 @@ Use your browser to download the SNPE SDK using the links above.
 
 Create your Github personal access token.
 
-
 ### Note for Stable Diffusion
 
-To generate stable diffusion model, please follow the instructions mentioned at 
-[<code><b><path/to/mobile_app_open/mobile_back_qti/DLC/util/StableDiffusion/README.md></b></code>](DLC/util/StableDiffusion/README.md)
+To generate stable diffusion model, please follow the instructions mentioned at
+`<path/to/mobile_app_open/mobile_back_qti/DLC/util/StableDiffusion/README.md>`(DLC/util/StableDiffusion/README.md)
 
 ```shell
 export SNPE_SDK=</path/to/snpe-sdk>
@@ -76,11 +75,13 @@ Build with the following build command.
 make OFFICIAL_BUILD=true FLUTTER_BUILD_NUMBER=1 WITH_QTI=1 docker/flutter/android/release
 ```
 
-Build with the following build command to include <code><b>stable_diffusion</b></code>.
-* Download <code><b>Notebook for stable diffusion</b></code> from QPM Manager.
-* Copy <code><b>include folder</b></code> from <code><b>path_to_notebook>/model/example3/host_linux_target_android_with_MLPerf/include</b></code> to <code><b>mobile_back_qti/cpp/backend_qti/StableDiffusionShared/</b></code>
-* Copy <code><b>libStableDiffusionShared.so</b></code> from <code><b><path_to_notebook>/model/example3/host_linux_target_android_with_MLPerf/libs/aarch64-android/</b></code> to <code><b>mobile_back_qti/cpp/backend_qti/StableDiffusionShared/</b></code>
+Build with the following build command to include `stable_diffusion`
+
+* Download `Tutorial for stable diffusion` from QPM Manager.
+* Copy `include folder` from `<path_to_tutorial>/model/example3/host_linux_target_android_with_MLPerf/include` to `mobile_back_qti/cpp/backend_qti/StableDiffusionShared/`
+* Copy `libStableDiffusionShared.so` from `<path_to_notebook>/model/example3/host_linux_target_android_with_MLPerf/libs/aarch64-android/` to `mobile_back_qti/cpp/backend_qti/StableDiffusionShared/`
 * Run the command below:
+
 ```shell
 make OFFICIAL_BUILD=true FLUTTER_BUILD_NUMBER=1 WITH_STABLEDIFFUSION=1 WITH_QTI=1 docker/flutter/android/release
 ```

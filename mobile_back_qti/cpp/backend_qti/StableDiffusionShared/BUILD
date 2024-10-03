@@ -28,22 +28,28 @@ config_setting(
 
 cc_library(
     name = "opencv_core",
-    srcs = [OPENCV_ROOT_DIR + "/libs/arm64-v8a/libopencv_core.so",
-            OPENCV_ROOT_DIR + "/libs/arm64-v8a/libopencv_imgcodecs.so",],
-    includes = [OPENCV_ROOT_DIR + "/jni/include/"],
+    srcs = [
+        OPENCV_ROOT_DIR + "/libs/arm64-v8a/libopencv_core.so",
+        OPENCV_ROOT_DIR + "/libs/arm64-v8a/libopencv_imgcodecs.so",
+    ],
     hdrs = glob([
-         OPENCV_ROOT_DIR + "/jni/include/opencv2/*.hpp",
-         OPENCV_ROOT_DIR + "/jni/include/opencv2/**/*.hpp",
+        OPENCV_ROOT_DIR + "/jni/include/opencv2/*.hpp",
+        OPENCV_ROOT_DIR + "/jni/include/opencv2/**/*.hpp",
     ]),
+    includes = [OPENCV_ROOT_DIR + "/jni/include/"],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "StableDiffusionShared",
     srcs = glob(["libStableDiffusion.so"]),
-    hdrs =  glob(["include/*.hpp","include/**/*.hpp","include/**/*.h"]),
+    hdrs = glob([
+        "include/*.hpp",
+        "include/**/*.hpp",
+        "include/**/*.h",
+    ]),
     visibility = ["//visibility:public"],
     deps = [
-            ":opencv_core",
+        ":opencv_core",
     ],
 )
