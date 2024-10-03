@@ -37,8 +37,8 @@ struct SDBackendData {
   std::vector<int> input_prompt_tokens;
   std::vector<int> unconditional_tokens;
 
-  int num_steps{10};
-  int seed{0};
+  int num_steps{20};
+  int seed{633994880};
 
   std::vector<float> output;
   std::unique_ptr<Threadpool> executer;
