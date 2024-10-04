@@ -139,7 +139,7 @@ tflite-run-sd:
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \
-	bazel build -c opt --cxxopt=-fobjc-arc --cxxopt=-xobjective-c++ --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
+	bazel build -c opt --cxxopt=-fobjc-arc --cxxopt=-xobjective-c++ --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 --macos_minimum_os=13.0 \
 	//flutter/cpp/binary:main //mobile_back_apple:coremlbackend
 
 coreml-run-ic:

@@ -68,6 +68,10 @@ mlperf_backend_configuration_t CppToCSettings(const SettingList &settings);
 SettingList createSettingList(const BackendSetting &backend_setting,
                               std::string benchmark_id);
 
+template <typename T>
+T GetConfigValue(mlperf_backend_configuration_t *configs, const char *key,
+                 T defaultValue);
+
 }  // namespace mobile
 }  // namespace mlperf
 
