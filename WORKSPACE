@@ -107,3 +107,10 @@ snpe_version_loader(
     name = "snpe_version_loader",
     workspace_dir = __workspace_dir__,
 )
+
+load("//mobile_back_qti/cpp/backend_qti/StableDiffusionShared:variables.bzl", "stable_diffusion_external_deps_shared")
+
+stable_diffusion_external_deps_shared(
+    name = "stable_diffusion_external_deps_shared",
+    workspace_dir = __workspace_dir__,
+)

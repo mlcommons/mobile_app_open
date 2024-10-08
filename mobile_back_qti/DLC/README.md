@@ -1,6 +1,6 @@
 # DLC
 
-This Makefile will create the DLCs used by the QTI backend.
+This Makefile will create the DLCs / Bins used by the QTI backend.
 
 The DLCs are already checked into [Mobile Models](https://github.com/mlcommons/mobile_models)
 

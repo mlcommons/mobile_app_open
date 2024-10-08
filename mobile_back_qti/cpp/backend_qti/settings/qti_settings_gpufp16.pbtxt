@@ -20,27 +20,6 @@ common_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "image_classification"
-  framework: "SNPE"
-  custom_setting {
-    id: "bg_load"
-    value: "false"
-  }
-  delegate_choice: {
-    priority: 1
-    delegate_name: "SNPE_GPU_FP16"
-    accelerator_name: "snpe_gpu_fp16"
-    accelerator_desc: "GPU_FP16"
-    model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_edgetpu_224_1.0_htp.dlc"
-      model_checksum: "cdf1fe622b309f692e05781661248a2b"
-    }
-  }
-  single_stream_expected_latency_ns: 500000
-  delegate_selected: "SNPE_GPU_FP16"
-}
-
-benchmark_setting {
   benchmark_id: "image_classification_v2"
   framework: "SNPE"
   custom_setting {
@@ -53,37 +32,14 @@ benchmark_setting {
     accelerator_name: "snpe_gpu_fp16
     accelerator_desc: "GPU_FP16"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_v4_htp.dlc"
-      model_checksum: "dbab3e231e5f83aabc80d5b69e6dad32"
+      model_path: "local:///mlperf_models/mobilenet_v4_htp.dlc"
+      model_checksum: ""
     }
   }
   single_stream_expected_latency_ns: 500000
   delegate_selected: "SNPE_GPU_FP16"
 }
-benchmark_setting {
-  benchmark_id: "image_classification_offline"
-  framework: "SNPE"
-  custom_setting {
-    id: "scenario"
-    value: "Offline"
-  }
-  custom_setting {
-    id: "bg_load"
-    value: "false"
-  }
-  delegate_choice: {
-    priority: 1
-    delegate_name: "SNPE_GPU_FP16"
-    accelerator_name: "psnpe_gpu_fp16"
-    accelerator_desc: "GPU_FP16"
-    batch_size: 12288
-    model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc"
-      model_checksum: "6523060565b8d3f326f3f323c531fc1c"
-    }
-  }
-  delegate_selected: "SNPE_GPU_FP16"
-}
+
 benchmark_setting {
   benchmark_id: "image_classification_offline_v2"
   framework: "SNPE"
@@ -102,18 +58,19 @@ benchmark_setting {
     accelerator_desc: "GPU_FP16"
     batch_size: 12360
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilenet_v4_htp_batched_4.dlc"
-      model_checksum: "0de3b75022ce5c27d5902a080ec1cea0"
+      model_path: "local:///mobilenet_v4_htp_batched_4.dlc"
+      model_checksum: ""
     }
   }
   delegate_selected: "SNPE_GPU_FP16"
 }
+
 benchmark_setting {
   benchmark_id: "natural_language_processing"
   framework: "SNPE"
   custom_setting {
-    id: "snpe_output_layers"
-    value: "transpose"
+    id: "snpe_output_tensors"
+    value: "transpose:0"
   }
   custom_setting {
     id: "bg_load"
@@ -137,12 +94,13 @@ benchmark_setting {
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobilebert_quantized_htp.dlc"
-      model_checksum: "7a641e4df84fc06a1237b7fe1b1c5b08"
+      model_path: "local:///mlperf_models/mobilebert_quantized_htp.dlc"
+      model_checksum: ""
     }
   }
   delegate_selected: "SNPE_GPU_FP16"
 }
+
 benchmark_setting {
   benchmark_id: "image_segmentation_v2"
   framework: "SNPE"
@@ -164,8 +122,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/mobile_mosaic_htp.dlc"
-      model_checksum: "e870526444c1e48df4f0505e530ecfdf"
+      model_path: "local:///mlperf_models/mobile_mosaic_htp.dlc"
+      model_checksum: ""
     }
   }
   delegate_selected: "SNPE_GPU_FP16"
@@ -199,8 +157,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-snpe/snusr_htp.dlc"
-      model_checksum: "84ef0d9c2e7b710381cea962a22a0b41"
+      model_path: "local:///mlperf_models/snusr_htp.dlc"
+      model_checksum: ""
     }
   }
   delegate_selected: "SNPE_GPU_FP16"
