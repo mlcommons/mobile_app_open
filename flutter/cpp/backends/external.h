@@ -67,6 +67,8 @@ struct BackendFunctions {
       mlperf_backend_ptr_t, uint32_t, int32_t, void**)>::type;
   using ConvertInputsPtr = std::add_pointer<void(mlperf_backend_ptr_t, int, int,
                                                  int, uint8_t*)>::type;
+  using ConvertOutputsPtr = std::add_pointer<void(mlperf_backend_ptr_t, int,
+                                                  int, int, uint8_t*)>::type;
 
   // Required functions.
   BackendMatchesPtr match{nullptr};
@@ -91,6 +93,7 @@ struct BackendFunctions {
   AllocatorMgr::GetBufferFn get_buffer{nullptr};
   AllocatorMgr::ReleaseBufferFn release_buffer{nullptr};
   ConvertInputsPtr convert_inputs{nullptr};
+  ConvertOutputsPtr convert_outputs{nullptr};
 
   bool isLoaded() { return isloaded; }
 
@@ -207,6 +210,15 @@ class ExternalBackend : public Backend {
     if (backend_functions_.convert_inputs) {
       backend_functions_.convert_inputs(backend_ptr_, bytes, width, height,
                                         data);
+    }
+  }
+
+  // Optional function to do output data re-formatting
+  void ConvertOutputs(int bytes, int width, int height,
+                      uint8_t* data) override {
+    if (backend_functions_.convert_outputs) {
+      backend_functions_.convert_outputs(backend_ptr_, bytes, width, height,
+                                         data);
     }
   }
 
