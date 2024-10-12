@@ -15,6 +15,7 @@ apple_xcframework(
     },
     minimum_os_versions = {
         "ios": "13.1",
+        "macos": "12.1",
     },
     deps = [
         "//mobile_back_tflite/cpp/backend_tflite:tflite_c",

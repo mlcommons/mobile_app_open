@@ -55,6 +55,7 @@ apple_xcframework(
     },
     minimum_os_versions = {
         "ios": "13.1",
+        "macos": "12.1",
     },
     deps = [
         "//flutter/cpp/flutter:bridge",
