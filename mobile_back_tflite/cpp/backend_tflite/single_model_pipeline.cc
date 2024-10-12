@@ -635,6 +635,10 @@ void SingleModelPipeline::backend_convert_inputs(
 #endif
 }
 
+void SingleModelPipeline::backend_convert_outputs(
+    mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
+    uint8_t *data) {}
+
 void *SingleModelPipeline::backend_get_buffer(size_t n) {
 #ifdef MTK_TFLITE_NEURON_BACKEND
   if (neuron_backend != nullptr) {
