@@ -78,8 +78,8 @@ make OFFICIAL_BUILD=true FLUTTER_BUILD_NUMBER=1 WITH_QTI=1 docker/flutter/androi
 Build with the following build command to include `stable_diffusion`
 
 * Download `Tutorial for stable diffusion` from QPM Manager.
-* Copy `include folder` from `<path_to_tutorial>/model/example3/host_linux_target_android_with_MLPerf/include` to `mobile_back_qti/cpp/backend_qti/StableDiffusionShared/`
-* Copy `libStableDiffusionShared.so` from `<path_to_notebook>/model/example3/host_linux_target_android_with_MLPerf/libs/aarch64-android/` to `mobile_back_qti/cpp/backend_qti/StableDiffusionShared/`
+* Copy `include` folder from `<path_to_tutorial>/model/example3/host_linux_target_android_with_MLPerf/include` to `mobile_back_qti/cpp/backend_qti/StableDiffusionShared/`
+* Copy `libStableDiffusion.so` from `<path_to_notebook>/model/example3/host_linux_target_android_with_MLPerf/libs/aarch64-android/` to `mobile_back_qti/cpp/backend_qti/StableDiffusionShared/`
 * Run the command below:
 
 ```shell

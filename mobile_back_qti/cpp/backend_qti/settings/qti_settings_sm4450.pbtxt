@@ -40,8 +40,8 @@ benchmark_setting {
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "local:///mlperf_models/mobilenet_v4_htp.dlc"
-      model_checksum: ""
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/mobilenet_v4_htp.dlc"
+      model_checksum: "56e5039260e20e5c2a0b54cc0fac8098"
     }
   }
   delegate_selected: "SNPE_CPU"
@@ -77,8 +77,8 @@ benchmark_setting {
     accelerator_desc: "CPU"
     batch_size: 12360
     model_file: {
-      model_path: "local:///mlperf_models/mobilenet_v4_htp_batched_4.dlc"
-      model_checksum: ""
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/mobilenet_v4_htp_batched_4.dlc"
+      model_checksum: "7863deea588936fe6e09565ed47dde95"
     }
   }
   delegate_selected: "SNPE_CPU"
@@ -109,8 +109,8 @@ benchmark_setting {
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "local:///mlperf_models/ssd_mobiledet_qat_htp.dlc"
-      model_checksum: ""
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/ssd_mobiledet_qat_htp.dlc"
+      model_checksum: "49c6afbfefffb78269fe73a6ee1b4a85"
     }
   }
   delegate_selected: "SNPE_CPU"
@@ -145,8 +145,8 @@ benchmark_setting {
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "local:///mlperf_models/mobilebert_quantized_htp.dlc"
-      model_checksum: ""
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/mobilebert_quantized_htp.dlc"
+      model_checksum: "96d947175f04950898a372890907dda1"
     }
   }
   delegate_selected: "SNPE_CPU"
@@ -181,8 +181,8 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-      model_path: "local:///mlperf_models/mobile_mosaic_htp.dlc"
-      model_checksum: ""
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/mobile_mosaic_htp.dlc"
+      model_checksum: "3c0dfbacda053773d6afb34503d9991a"
     }
   }
   delegate_selected: "SNPE_CPU"
@@ -225,8 +225,8 @@ benchmark_setting {
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "local:///mlperf_models/snusr_htp.dlc"
-      model_checksum: ""
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/snusr_htp.dlc"
+      model_checksum: "668da9816073d67972704e237137a50f"
     }
   }
   delegate_selected: "SNPE_CPU"

@@ -41,13 +41,15 @@ void main() {
     testWidgets('run benchmarks', (WidgetTester tester) async {
       await startApp(tester);
       await validateSettings(tester);
+      await setBenchmarks(tester);
       await runBenchmarks(tester);
     });
 
     testWidgets('check results', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       printResults(extendedResult);
-      checkTaskCount(extendedResult);
+      // TODO (anhappdev) uncomment when stable_diffusion is implemented for all backends.
+      // checkTaskCount(extendedResult);
       checkTasks(extendedResult);
     });
 

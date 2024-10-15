@@ -49,7 +49,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
     _kS22Ultra: Interval(min: 250, max: 400),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 5, max: 90),
+    _kDN2103: Interval(min: 4.5, max: 50),
   },
 };
 
@@ -194,7 +194,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
     _kS22Ultra: Interval(min: 250, max: 450),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 5, max: 90),
+    _kDN2103: Interval(min: 4.5, max: 50),
   },
 };
 

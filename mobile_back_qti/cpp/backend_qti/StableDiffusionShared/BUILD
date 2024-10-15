@@ -41,7 +41,7 @@ cc_library(
 
 cc_library(
     name = "StableDiffusionShared",
-    srcs = "libStableDiffusion.so",
+    srcs = ["libStableDiffusion.so"],
     hdrs = glob([
         "include/*.hpp",
         "include/**/*.hpp",
