@@ -247,4 +247,12 @@ task {
     id: "stable_diffusion"
     name: "StableDiffusion"
   }
+  custom_config {
+    id: "stable_diffusion_seed"
+    value: "633994880"
+  }
+  custom_config {
+    id: "stable_diffusion_num_steps"
+    value: "20"
+  }
 }

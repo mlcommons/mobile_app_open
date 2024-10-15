@@ -92,6 +92,11 @@ class Benchmark {
       setting: commonSettings,
       benchmarkSetting: benchmarkSettings,
     );
+    // Convert TaskConfig.CustomConfig to BenchmarkSetting.CustomSetting
+    final customConfigs = taskConfig.customConfig
+        .map((e) => pb.CustomSetting(id: e.id, value: e.value))
+        .toList();
+    benchmarkSettings.customSetting.addAll(customConfigs);
     final uris = selectedDelegate.modelFile.map((e) => e.modelPath).toList();
     final modelDirName = selectedDelegate.delegateName.replaceAll(' ', '_');
     final backendModelPath =
