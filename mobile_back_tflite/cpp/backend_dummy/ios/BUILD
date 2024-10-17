@@ -29,7 +29,7 @@ apple_xcframework(
     },
     minimum_os_versions = {
         "ios": "13.1",
-        "macos": "12.1",
+        "macos": "13.1",
     },
     deps = [
         "//mobile_back_tflite/cpp/backend_dummy:dummy_backend",
@@ -50,7 +50,7 @@ apple_xcframework(
     },
     minimum_os_versions = {
         "ios": "13.1",
-        "macos": "12.1",
+        "macos": "13.1",
     },
     deps = [
         "//mobile_back_tflite/cpp/backend_dummy:dummy_backend",
