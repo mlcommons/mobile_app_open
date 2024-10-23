@@ -91,6 +91,9 @@ class StableDiffusionPipeline : public Pipeline {
   void backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
                               int width, int height, uint8_t *data) override;
 
+  void backend_convert_outputs(mlperf_backend_ptr_t backend_ptr, int bytes,
+                               int width, int height, uint8_t *data) override;
+
   void *backend_get_buffer(size_t n) override;
 
   void backend_release_buffer(void *p) override;

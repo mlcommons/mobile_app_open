@@ -187,7 +187,9 @@ BackendFunctions::BackendFunctions(const std::string& lib_path) {
   // Backends may need to change the format of the inputs (e.g. channel order)
   convert_inputs = reinterpret_cast<decltype(convert_inputs)>(
       CheckSymbol("mlperf_backend_convert_inputs"));
-
+  // Backends may need to change the format of the outputs (e.g. channel order)
+  convert_outputs = reinterpret_cast<decltype(convert_outputs)>(
+      CheckSymbol("mlperf_backend_convert_outputs"));
   // If both functions are defined, then update
   if (get_buffer && release_buffer) {
     LOG(INFO) << "Using backend allocator";
