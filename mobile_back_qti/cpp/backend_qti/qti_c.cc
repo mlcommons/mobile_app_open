@@ -58,7 +58,7 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
   const char *native_lib_path = device_info->native_lib_path;
   std::stringstream adsp_lib_path;
   adsp_lib_path << native_lib_path << ";";
-  adsp_lib_path << "/system/lib/rfsa/adsp;/system/vendor/lib/rfsa/adsp;/dsp";
+  adsp_lib_path << "/sdcard/Android/data/org.mlcommons.android.mlperfbench/files/libs;/system/lib/rfsa/adsp;/system/vendor/lib/rfsa/adsp;/dsp";
   LOG(INFO) << "adsp_lib_path: " << adsp_lib_path.str();
   setenv("ADSP_LIBRARY_PATH", adsp_lib_path.str().c_str(), 1 /*override*/);
   std::stringstream ld_lib_path;
@@ -121,7 +121,7 @@ mlperf_backend_ptr_t mlperf_backend_create(
 #ifdef __ANDROID__
   std::stringstream adsp_lib_path;
   adsp_lib_path << native_lib_path << ";";
-  adsp_lib_path << "/system/lib/rfsa/adsp;/system/vendor/lib/rfsa/adsp;/dsp";
+  adsp_lib_path << "/sdcard/Android/data/org.mlcommons.android.mlperfbench/files/libs;/system/lib/rfsa/adsp;/system/vendor/lib/rfsa/adsp;/dsp";
   LOG(INFO) << "lib_path: " << adsp_lib_path.str();
   setenv("ADSP_LIBRARY_PATH", adsp_lib_path.str().c_str(), 1 /*override*/);
 #endif
