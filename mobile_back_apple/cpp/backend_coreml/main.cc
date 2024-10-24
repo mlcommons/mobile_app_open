@@ -101,8 +101,9 @@ mlperf_backend_ptr_t mlperf_backend_create(
 
   CoreMLBackendData *backend_data = new CoreMLBackendData();
   backendExists = true;
-  // quick hack for checking if model expects NCHW input.
-  if (strcasestr(model_path, "NCHW") != nullptr) {
+  std::string dataFormat =
+      mlperf::mobile::GetConfigValue(configs, "data-format", std::string(""));
+  if (dataFormat == "NCHW") {
     backend_data->expectNCHW = true;
     LOG(INFO) << "Will convert inputs from NHWC to NCHW!";
   }
