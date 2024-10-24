@@ -7,6 +7,7 @@
 #include <valarray>
 
 #include "flutter/cpp/c/backend_c.h"
+#include "flutter/cpp/utils.h"
 #include "stable_diffusion_invoker.h"
 #include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/c/common.h"
@@ -58,21 +59,26 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
 
   // Verify only one instance of the backend exists at any time
   if (backendExists) {
+    LOG(ERROR) << "Backend already exists";
     return nullptr;
   }
 
   SDBackendData* backend_data = new SDBackendData();
   backendExists = true;
 
-  for (int i = 0; i < configs->count; ++i) {
-    if (strcmp(configs->keys[i], "stable_diffusion_seed") == 0) {
-      backend_data->seed = atoi(configs->values[i]);
-    }
-    if (strcmp(configs->keys[i], "stable_diffusion_num_steps") == 0) {
-      backend_data->num_steps = atoi(configs->values[i]);
-    }
+  // Read seed and num_steps value from SD task settings
+  backend_data->seed =
+      mlperf::mobile::GetConfigValue(configs, "stable_diffusion_seed", 0);
+  if (backend_data->seed == 0) {
+    LOG(ERROR) << "Cannot get stable_diffusion_seed";
+    return nullptr;
   }
-
+  backend_data->num_steps =
+      mlperf::mobile::GetConfigValue(configs, "stable_diffusion_num_steps", 0);
+  if (backend_data->num_steps == 0) {
+    LOG(ERROR) << "Cannot get stable_diffusion_num_steps";
+    return nullptr;
+  }
   // Load models from the provided directory path
   std::string text_encoder_path =
       std::string(model_path) + "/sd_text_encoder_dynamic.tflite";
