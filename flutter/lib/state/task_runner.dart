@@ -225,6 +225,7 @@ class TaskRunner {
       await runHelper.initRunSettings(
         resourceManager: resourceManager,
         commonSettings: backendInfo.settings.commonSetting,
+        libsSettings: backendInfo.settings.libsSetting,
         backendLibName: backendInfo.libName,
         testMinQueryCount: store.testMinQueryCount,
         testMinDuration: store.testMinDuration,
@@ -265,6 +266,7 @@ class TaskRunner {
       await runHelper.initRunSettings(
         resourceManager: resourceManager,
         commonSettings: backendInfo.settings.commonSetting,
+        libsSettings: backendInfo.settings.libsSetting,
         backendLibName: backendInfo.libName,
         testMinQueryCount: store.testMinQueryCount,
         testMinDuration: store.testMinDuration,
@@ -312,6 +314,7 @@ class _NativeRunHelper {
   Future<void> initRunSettings({
     required ResourceManager resourceManager,
     required List<pb.CommonSetting> commonSettings,
+    required List<pb.LibsSetting> libsSettings,
     required String backendLibName,
     required int testMinQueryCount,
     required int testMinDuration,
@@ -320,6 +323,7 @@ class _NativeRunHelper {
       runMode: runMode,
       resourceManager: resourceManager,
       commonSettings: commonSettings,
+      libsSettings: libsSettings,
       backendLibName: backendLibName,
       logDir: logDir,
       testMinQueryCount: testMinQueryCount,

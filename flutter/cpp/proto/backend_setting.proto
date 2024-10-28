@@ -28,6 +28,18 @@ message BackendSetting {
   repeated CommonSetting common_setting = 1;
   // Setting that is specialized for each benchmark.
   repeated BenchmarkSetting benchmark_setting = 2;
+  // Setting to download the specific library file
+  repeated LibsSetting libs_setting = 3;
+}
+
+// Config for the required libs
+//
+// Next ID:
+message LibsSetting {
+  // Id of this setting.
+  required string id = 1;
+  // Name of this setting.
+  required string lib_path = 2;
 }
 
 // Config of a benchmark.

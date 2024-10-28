@@ -19,6 +19,11 @@ common_setting {
   }
 }
 
+libs_setting {
+  id: "v75_skel_lib"
+  lib_path: "local:///libs/libSnpeHtpV75Skel.so"
+}
+
 benchmark_setting {
   benchmark_id: "image_classification"
   framework: "SNPE"
