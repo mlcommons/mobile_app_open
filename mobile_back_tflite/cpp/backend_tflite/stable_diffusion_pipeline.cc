@@ -6,6 +6,7 @@
 #include <random>
 #include <valarray>
 
+#include "embedding_utils.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "stable_diffusion_invoker.h"
 #include "tensorflow/lite/c/c_api.h"
@@ -100,6 +101,17 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
 
   if (!backend_data->text_encoder_interpreter ||
       !backend_data->sd_interpreter || !backend_data->decoder_interpreter) {
+    backend_delete(backend_data);
+    return nullptr;
+  }
+
+  std::string ts_embedding_path =
+      std::string(model_path) +
+      "/timestep_steps_20_int32_embedding_1x1280_float32.bin.ts";
+  if (!EmbeddingManager::getInstance().load_timestamp_embeddings(
+          ts_embedding_path)) {
+    LOG(ERROR) << "Failed to load timestamp embeddings from "
+               << ts_embedding_path;
     backend_delete(backend_data);
     return nullptr;
   }

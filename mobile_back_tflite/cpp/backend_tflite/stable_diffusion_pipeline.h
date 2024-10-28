@@ -37,7 +37,7 @@ struct SDBackendData {
   std::vector<int> input_prompt_tokens;
   std::vector<int> unconditional_tokens;
 
-  int num_steps{10};
+  int num_steps{20};
   int seed{0};
 
   std::vector<float> output;
