@@ -28,11 +28,17 @@
     <uses-native-library android:name="libeden_rt_stub.edensdk.samsung.so"
                          android:required="false"/>
     <!-- QTI -->
-    <uses-native-library android:name="libcdsprpc.so"
-                         android:required="false"/>
-    <!-- QTI -->
-    <uses-native-library android:name="libOpenCL.so"
-                         android:required="false"/>
+    <uses-native-library android:name="libcdsprpc.so" android:required="false"/>
+    <uses-native-library android:name="libOpenCL.so" android:required="false"/>
+    <uses-native-library android:name="libSnpeHtpV75Stub.so" android:required="false"/>
+    <uses-native-library android:name="libSnpeHtpV73Stub.so" android:required="false"/>
+    <uses-native-library android:name="libSnpeHtpV69Stub.so" android:required="false"/>
+    <uses-native-library android:name="libSnpeHtpV68Stub.so" android:required="false"/>
+    <uses-native-library android:name="libSnpeHtpPrepare.so" android:required="false"/>
+    <uses-native-library android:name="libSnpeHtpV75Skel.so" android:required="false"/>
+    <uses-native-library android:name="libSnpeHtpV73Skel.so" android:required="false"/>
+    <uses-native-library android:name="libSnpeHtpV69Skel.so" android:required="false"/>
+    <uses-native-library android:name="libSnpeHtpV68Skel.so" android:required="false"/>
     <!-- Mediatek -->
     <uses-native-library android:name="libneuronusdk_adapter.mtk.so"
                          android:required="false"/>
