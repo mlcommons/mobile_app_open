@@ -10,6 +10,7 @@ import 'package:mlperfbench/ui/history/history_list_screen.dart';
 import 'package:mlperfbench/ui/home/user_profile.dart';
 import 'package:mlperfbench/ui/settings/about_screen.dart';
 import 'package:mlperfbench/ui/settings/settings_screen.dart';
+import 'package:mlperfbench/ui/settings/resources_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -100,6 +101,19 @@ class AppDrawer extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => const SettingsScreen(),
+            ),
+          );
+        },
+      ),
+      ListTile(
+        leading: const Icon(Icons.file_present),
+        title: Text(l10n.menuResources),
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ResourcesScreen(),
             ),
           );
         },
