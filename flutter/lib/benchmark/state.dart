@@ -140,13 +140,11 @@ class BenchmarkState extends ChangeNotifier {
 
     await Wakelock.enable();
     print('start loading resources');
-    await resourceManager.handleResources(
-      _benchmarkStore.listResources(
-        modes: [taskRunner.perfMode, taskRunner.accuracyMode],
-        skipInactive: false,
-      ),
-      needToPurgeCache,
+    final resources = _benchmarkStore.listResources(
+      modes: [taskRunner.perfMode, taskRunner.accuracyMode],
+      benchmarks: benchmarks,
     );
+    await resourceManager.handleResources(resources, needToPurgeCache);
     print('finished loading resources');
     error = null;
     stackTrace = null;
