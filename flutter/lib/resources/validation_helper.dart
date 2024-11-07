@@ -54,4 +54,13 @@ class ValidationHelper {
             .mapIndexed((i, element) => '\n${i + 1}) $element')
             .join();
   }
+
+  Future<bool> validateResourcesExist(Benchmark benchmark) async {
+    final resources = benchmarkStore.listResources(
+      modes: [BenchmarkRunMode.performance, BenchmarkRunMode.accuracy],
+      benchmarks: [benchmark],
+    );
+    final missing = await resourceManager.validateResourcesExist(resources);
+    return missing.isEmpty;
+  }
 }

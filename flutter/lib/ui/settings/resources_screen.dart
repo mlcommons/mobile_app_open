@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:bot_toast/bot_toast.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 
@@ -41,7 +43,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     final children = <Widget>[];
 
     for (var benchmark in state.benchmarks) {
-      children.add(_listTile(benchmark));
+      children.add(_listTileBuilder(benchmark));
       children.add(const Divider(height: 20));
     }
     children.add(Text(loadingProgressText));
@@ -62,10 +64,11 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     );
   }
 
-  Widget _listTile(Benchmark benchmark) {
+  Widget _listTile(Benchmark benchmark, bool downloaded) {
     final leadingWidth = 0.10 * MediaQuery.of(context).size.width;
     final subtitleWidth = 0.70 * MediaQuery.of(context).size.width;
     final trailingWidth = 0.20 * MediaQuery.of(context).size.width;
+    final status = downloaded ? 'downloaded' : 'not downloaded';
     return ListTile(
       leading: SizedBox(
           width: leadingWidth,
@@ -77,12 +80,26 @@ class _ResourcesScreen extends State<ResourcesScreen> {
       title: Text(benchmark.info.taskName),
       subtitle: SizedBox(
         width: subtitleWidth,
-        child: const Text('Download progress...'),
+        child: Text(status),
       ),
       trailing: SizedBox(
         width: trailingWidth,
         child: _downloadButton(benchmark),
       ),
+    );
+  }
+
+  Widget _listTileBuilder(Benchmark benchmark) {
+    return FutureBuilder<bool>(
+      future: state.validator.validateResourcesExist(benchmark),
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          final downloaded = snapshot.data!;
+          return _listTile(benchmark, downloaded);
+        } else {
+          return const Text('Checking download status');
+        }
+      },
     );
   }
 
