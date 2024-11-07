@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
 
 import 'package:provider/provider.dart';
 
@@ -34,20 +35,94 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context)!;
 
+    final loadingProgressText =
+        'Loading progress: ${(state.loadingProgress * 100).round()}%';
+
+    final children = <Widget>[];
+
+    for (var benchmark in state.benchmarks) {
+      children.add(_listTile(benchmark));
+      children.add(const Divider(height: 20));
+    }
+    children.add(Text(loadingProgressText));
+    children.add(const Divider(height: 20));
+    children.add(_clearCacheButton());
+
     return Scaffold(
-        appBar: AppBar(title: Text(l10n.menuResources)),
-        body: SafeArea(
-            child: ListView(
-          padding: const EdgeInsets.only(top: 20),
-          children: [
-            _mainSection(),
-            const Divider(),
-            const SizedBox(height: 20)
-          ],
-        )));
+      appBar: AppBar(title: Text(l10n.menuResources)),
+      body: SafeArea(
+        child: Container(
+          color: Colors.white,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+            children: children,
+          ),
+        ),
+      ),
+    );
   }
 
-  Widget _mainSection() {
-    return const Text('data');
+  Widget _listTile(Benchmark benchmark) {
+    final leadingWidth = 0.10 * MediaQuery.of(context).size.width;
+    final subtitleWidth = 0.70 * MediaQuery.of(context).size.width;
+    final trailingWidth = 0.20 * MediaQuery.of(context).size.width;
+    return ListTile(
+      leading: SizedBox(
+          width: leadingWidth,
+          height: leadingWidth,
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: benchmark.info.icon,
+          )),
+      title: Text(benchmark.info.taskName),
+      subtitle: SizedBox(
+        width: subtitleWidth,
+        child: const Text('Download progress...'),
+      ),
+      trailing: SizedBox(
+        width: trailingWidth,
+        child: _downloadButton(benchmark),
+      ),
+    );
+  }
+
+  Widget _downloadButton(Benchmark benchmark) {
+    return ElevatedButton(
+      onPressed: () {
+        print('download files for ${benchmark.info.taskName}');
+        print(benchmark.taskConfig.datasets.lite.inputPath);
+        print(benchmark.taskConfig.datasets.lite.groundtruthPath);
+      },
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: const Text('Download'),
+      ),
+    );
+  }
+
+  Widget _clearCacheButton() {
+    return TextButton(
+      style: TextButton.styleFrom(
+        textStyle: const TextStyle(fontSize: 20),
+      ),
+      onPressed: () async {
+        final dialogAction =
+            await showConfirmDialog(context, l10n.settingsClearCacheConfirm);
+        switch (dialogAction) {
+          case ConfirmDialogAction.ok:
+            await state.clearCache();
+            BotToast.showSimpleNotification(
+              title: l10n.settingsClearCacheFinished,
+              hideCloseButton: true,
+            );
+            break;
+          case ConfirmDialogAction.cancel:
+            break;
+          default:
+            break;
+        }
+      },
+      child: Text(l10n.settingsClearCache),
+    );
   }
 }

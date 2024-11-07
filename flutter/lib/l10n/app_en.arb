@@ -79,7 +79,8 @@
   "settingsTaskConfigError": "Path to config is invalid:",
   "settingsTaskDataFolderTitle": "Data folder",
   "settingsClearCache": "Clear cache",
-  "settingsClearCacheConfirm": "All loaded resources will be deleted and downloaded again. Continue?",
+  "settingsClearCacheConfirm": "All downloaded resources will be deleted. Continue?",
+  "settingsClearCacheFinished": "Cache cleared.",
   "settingsUnableSpecifyConfiguration": "Could not specify until benchmarks is running or content is loading",
 
   "dialogTitleWarning": "Warning",
