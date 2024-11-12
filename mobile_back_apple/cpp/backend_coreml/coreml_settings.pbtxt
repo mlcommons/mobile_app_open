@@ -22,7 +22,7 @@ benchmark_setting {
       model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
     }
   }
-   delegate_choice: {
+  delegate_choice: {
     delegate_name: "CPU & ANE"
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
@@ -57,7 +57,7 @@ benchmark_setting {
       model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
     }
   }
-   delegate_choice: {
+  delegate_choice: {
     delegate_name: "CPU & ANE"
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
@@ -81,6 +81,10 @@ benchmark_setting {
       model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-coreml/mobilenetv4_fp32_NCHW.mlpackage.zip"
       model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
     }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
+    }
   }
   delegate_choice: {
     delegate_name: "CPU & GPU"
@@ -90,6 +94,10 @@ benchmark_setting {
       model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-coreml/mobilenetv4_fp32_NCHW.mlpackage.zip"
       model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
     }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
+    }
   }
   delegate_choice: {
     delegate_name: "CPU & ANE"
@@ -98,6 +106,10 @@ benchmark_setting {
     model_file: {
       model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-coreml/mobilenetv4_fp32_NCHW.mlpackage.zip"
       model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
+    }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
     }
   }
   delegate_selected: "CPU & GPU & ANE"
@@ -115,6 +127,10 @@ benchmark_setting {
       model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-coreml/mobilenetv4_fp32_NCHW.mlpackage.zip"
       model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
     }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
+    }
   }
   delegate_choice: {
     delegate_name: "CPU & GPU"
@@ -125,6 +141,10 @@ benchmark_setting {
       model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-coreml/mobilenetv4_fp32_NCHW.mlpackage.zip"
       model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
     }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
+    }
   }
   delegate_choice: {
     delegate_name: "CPU & ANE"
@@ -134,6 +154,10 @@ benchmark_setting {
     model_file: {
       model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-coreml/mobilenetv4_fp32_NCHW.mlpackage.zip"
       model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
+    }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
     }
   }
   delegate_selected: "CPU & GPU & ANE"
@@ -160,7 +184,7 @@ benchmark_setting {
       model_checksum: "ef849fbf2132e205158f05ca42db25f4"
     }
   }
-   delegate_choice: {
+  delegate_choice: {
     delegate_name: "CPU & ANE"
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
@@ -217,7 +241,7 @@ benchmark_setting {
       model_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
     }
   }
-   delegate_choice: {
+  delegate_choice: {
     delegate_name: "CPU & ANE"
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
@@ -250,7 +274,7 @@ benchmark_setting {
       model_checksum: "62489706f20b0c2ae561fb2204eefb61"
     }
   }
-   delegate_choice: {
+  delegate_choice: {
     delegate_name: "CPU & ANE"
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
