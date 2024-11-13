@@ -49,7 +49,8 @@ class ResourceManager {
       return resourceSystemPath;
     }
     if (isInternetResource(uri)) {
-      return cacheManager.get(uri)!;
+      final resourceSystemPath = cacheManager.get(uri);
+      return resourceSystemPath ?? '';
     }
     if (File(uri).isAbsolute) {
       return uri;
@@ -85,16 +86,6 @@ class ResourceManager {
 
   String getDataPrefix() {
     return _dataPrefix;
-  }
-
-  Future<bool> isResourceExist(String? uri) async {
-    if (uri == null) return false;
-
-    final path = get(uri);
-
-    return path == '' ||
-        await File(path).exists() ||
-        await Directory(path).exists();
   }
 
   Future<bool> isChecksumMatched(String filePath, String md5Checksum) async {
@@ -175,9 +166,15 @@ class ResourceManager {
   Future<List<String>> validateResourcesExist(List<Resource> resources) async {
     final missingResources = <String>[];
     for (var r in resources) {
-      if (!await isResourceExist(r.path)) {
-        final resolvedPath = get(r.path);
-        missingResources.add(resolvedPath);
+      final resolvedPath = get(r.path);
+      if (resolvedPath.isEmpty) {
+        missingResources.add(r.path);
+      } else {
+        final isResourceExist = await File(resolvedPath).exists() ||
+            await Directory(resolvedPath).exists();
+        if (!isResourceExist) {
+          missingResources.add(resolvedPath);
+        }
       }
     }
     return missingResources;
