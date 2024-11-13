@@ -94,8 +94,8 @@ class ResourceManager {
     return checksum == md5Checksum;
   }
 
-  Future<void> handleResources(
-      List<Resource> resources, bool purgeOldCache) async {
+  Future<void> handleResources(List<Resource> resources, bool purgeOldCache,
+      bool downloadMissing) async {
     _loadingPath = '';
     _loadingProgress = 0.0;
     _done = false;
@@ -112,12 +112,16 @@ class ResourceManager {
     }
 
     final internetPaths = internetResources.map((e) => e.path).toList();
-    await cacheManager.cache(internetPaths,
-        (double currentProgress, String currentPath) {
-      _loadingProgress = currentProgress;
-      _loadingPath = currentPath;
-      _onUpdate();
-    }, purgeOldCache);
+    await cacheManager.cache(
+      internetPaths,
+      (double currentProgress, String currentPath) {
+        _loadingProgress = currentProgress;
+        _loadingPath = currentPath;
+        _onUpdate();
+      },
+      purgeOldCache,
+      downloadMissing,
+    );
 
     final checksumFailed = await validateResourcesChecksum(resources);
     if (checksumFailed.isNotEmpty) {

@@ -81,8 +81,11 @@ class CacheManager {
     return deleteLoadedResources(currentResources, atLeastDaysOld);
   }
 
-  Future<void> cache(List<String> urls,
-      void Function(double, String) reportProgress, bool purgeOldCache) async {
+  Future<void> cache(
+      List<String> urls,
+      void Function(double, String) reportProgress,
+      bool purgeOldCache,
+      bool downloadMissing) async {
     final resourcesToDownload = <String>[];
     _resourcesMap = {};
 
@@ -106,8 +109,9 @@ class CacheManager {
 
       continue;
     }
-    await _download(resourcesToDownload, reportProgress);
-
+    if (downloadMissing) {
+      await _download(resourcesToDownload, reportProgress);
+    }
     if (purgeOldCache) {
       await purgeOutdatedCache(_oldFilesAgeInDays);
     }

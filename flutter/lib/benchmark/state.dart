@@ -120,7 +120,7 @@ class BenchmarkState extends ChangeNotifier {
   // ignore: avoid_void_async
   void deferredLoadResources() async {
     try {
-      await loadResources();
+      await loadResources(downloadMissing: false);
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
@@ -131,7 +131,7 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> loadResources() async {
+  Future<void> loadResources({required bool downloadMissing}) async {
     final newAppVersion =
         '${BuildInfoHelper.info.version}+${BuildInfoHelper.info.buildNumber}';
     var needToPurgeCache = _store.previousAppVersion != newAppVersion;
@@ -143,7 +143,11 @@ class BenchmarkState extends ChangeNotifier {
       modes: [taskRunner.perfMode, taskRunner.accuracyMode],
       benchmarks: benchmarks,
     );
-    await resourceManager.handleResources(resources, needToPurgeCache);
+    await resourceManager.handleResources(
+      resources,
+      needToPurgeCache,
+      downloadMissing,
+    );
     print('finished loading resources');
     error = null;
     stackTrace = null;
