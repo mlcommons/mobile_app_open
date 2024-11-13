@@ -22,7 +22,6 @@ import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 
 enum BenchmarkStateEnum {
-  downloading,
   waiting,
   running,
   aborting,
@@ -214,7 +213,6 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   BenchmarkStateEnum get state {
-    if (!resourceManager.done) return BenchmarkStateEnum.downloading;
     switch (_doneRunning) {
       case null:
         return BenchmarkStateEnum.waiting;

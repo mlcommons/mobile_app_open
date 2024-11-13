@@ -21,8 +21,6 @@ class MainScreen extends StatelessWidget {
     }
 
     switch (state.state) {
-      case BenchmarkStateEnum.downloading:
-        return const ResourceLoadingScreen();
       case BenchmarkStateEnum.waiting:
         return const BenchmarkStartScreen();
       case BenchmarkStateEnum.aborting:
