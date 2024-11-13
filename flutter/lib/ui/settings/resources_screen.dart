@@ -37,16 +37,13 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context)!;
 
-    final loadingProgressText =
-        'Loading progress: ${(state.loadingProgress * 100).round()}%';
-
     final children = <Widget>[];
 
     for (var benchmark in state.benchmarks) {
       children.add(_listTileBuilder(benchmark));
       children.add(const Divider(height: 20));
     }
-    children.add(Text(loadingProgressText));
+    children.add(_downloadButton());
     children.add(const Divider(height: 20));
     children.add(_clearCacheButton());
 
@@ -56,7 +53,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
         child: Container(
           color: Colors.white,
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+            padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
             children: children,
           ),
         ),
@@ -64,11 +61,9 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     );
   }
 
-  Widget _listTile(Benchmark benchmark, bool downloaded) {
+  Widget _listTileBuilder(Benchmark benchmark) {
     final leadingWidth = 0.10 * MediaQuery.of(context).size.width;
-    final subtitleWidth = 0.70 * MediaQuery.of(context).size.width;
-    final trailingWidth = 0.20 * MediaQuery.of(context).size.width;
-    final status = downloaded ? 'downloaded' : 'not downloaded';
+    final subtitleWidth = 0.90 * MediaQuery.of(context).size.width;
     return ListTile(
       leading: SizedBox(
           width: leadingWidth,
@@ -80,22 +75,35 @@ class _ResourcesScreen extends State<ResourcesScreen> {
       title: Text(benchmark.info.taskName),
       subtitle: SizedBox(
         width: subtitleWidth,
-        child: Text(status),
-      ),
-      trailing: SizedBox(
-        width: trailingWidth,
-        child: _downloadButton(benchmark),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _downloadStatus(benchmark, BenchmarkRunMode.performance),
+            _downloadStatus(benchmark, BenchmarkRunMode.accuracy),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _listTileBuilder(Benchmark benchmark) {
+  Widget _downloadStatus(Benchmark benchmark, BenchmarkRunMode mode) {
     return FutureBuilder<bool>(
-      future: state.validator.validateResourcesExist(benchmark),
+      future: state.validator.validateResourcesExist(benchmark, mode),
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           final downloaded = snapshot.data!;
-          return _listTile(benchmark, downloaded);
+          const downloadedIcon =
+              Icon(Icons.check_circle, size: 16, color: Colors.green);
+          const notDownloadedIcon =
+              Icon(Icons.check_circle_outline, size: 16, color: Colors.grey);
+          return Row(
+            children: [
+              downloaded ? downloadedIcon : notDownloadedIcon,
+              const SizedBox(width: 10),
+              Text(mode.readable),
+            ],
+          );
         } else {
           return const Text('Checking download status');
         }
@@ -103,25 +111,20 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     );
   }
 
-  Widget _downloadButton(Benchmark benchmark) {
+  Widget _downloadButton() {
     return ElevatedButton(
       onPressed: () {
-        print('download files for ${benchmark.info.taskName}');
-        print(benchmark.taskConfig.datasets.lite.inputPath);
-        print(benchmark.taskConfig.datasets.lite.groundtruthPath);
+        print('download resources');
       },
-      child: FittedBox(
+      child: const FittedBox(
         fit: BoxFit.scaleDown,
-        child: const Text('Download'),
+        child: Text('Download'),
       ),
     );
   }
 
   Widget _clearCacheButton() {
-    return TextButton(
-      style: TextButton.styleFrom(
-        textStyle: const TextStyle(fontSize: 20),
-      ),
+    return ElevatedButton(
       onPressed: () async {
         final dialogAction =
             await showConfirmDialog(context, l10n.settingsClearCacheConfirm);
@@ -139,7 +142,11 @@ class _ResourcesScreen extends State<ResourcesScreen> {
             break;
         }
       },
-      child: Text(l10n.settingsClearCache),
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(l10n.settingsClearCache),
+      ),
     );
   }
 }

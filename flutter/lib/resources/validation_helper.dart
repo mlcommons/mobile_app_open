@@ -55,9 +55,10 @@ class ValidationHelper {
             .join();
   }
 
-  Future<bool> validateResourcesExist(Benchmark benchmark) async {
+  Future<bool> validateResourcesExist(
+      Benchmark benchmark, BenchmarkRunMode mode) async {
     final resources = benchmarkStore.listResources(
-      modes: [BenchmarkRunMode.performance, BenchmarkRunMode.accuracy],
+      modes: [mode],
       benchmarks: [benchmark],
     );
     final missing = await resourceManager.validateResourcesExist(resources);
