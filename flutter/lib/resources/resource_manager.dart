@@ -167,8 +167,11 @@ class ResourceManager {
     resultManager = await ResultManager.create(applicationDirectory);
   }
 
-  Future<List<String>> validateResourcesExist(List<Resource> resources) async {
+  // Returns a map of { true: [existedResources], false: [missingResources] }
+  Future<Map<bool, List<String>>> validateResourcesExist(
+      List<Resource> resources) async {
     final missingResources = <String>[];
+    final existedResources = <String>[];
     for (var r in resources) {
       final resolvedPath = get(r.path);
       if (resolvedPath.isEmpty) {
@@ -176,12 +179,18 @@ class ResourceManager {
       } else {
         final isResourceExist = await File(resolvedPath).exists() ||
             await Directory(resolvedPath).exists();
-        if (!isResourceExist) {
-          missingResources.add(resolvedPath);
+        if (isResourceExist) {
+          existedResources.add(r.path);
+        } else {
+          missingResources.add(r.path);
         }
       }
     }
-    return missingResources;
+    final result = {
+      false: missingResources,
+      true: existedResources,
+    };
+    return result;
   }
 
   Future<List<Resource>> validateResourcesChecksum(

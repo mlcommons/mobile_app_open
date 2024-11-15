@@ -34,7 +34,8 @@ class ValidationHelper {
       modes: selectedRunModes,
       benchmarks: activeBenchmarks,
     );
-    final missing = await resourceManager.validateResourcesExist(resources);
+    final result = await resourceManager.validateResourcesExist(resources);
+    final missing = result[false] ?? [];
     if (missing.isEmpty) return '';
 
     return errorDescription +
@@ -55,13 +56,13 @@ class ValidationHelper {
             .join();
   }
 
-  Future<bool> validateResourcesExist(
+  Future<Map<bool, List<String>>> validateResourcesExist(
       Benchmark benchmark, BenchmarkRunMode mode) async {
     final resources = benchmarkStore.listResources(
       modes: [mode],
       benchmarks: [benchmark],
     );
-    final missing = await resourceManager.validateResourcesExist(resources);
-    return missing.isEmpty;
+    final result = await resourceManager.validateResourcesExist(resources);
+    return result;
   }
 }

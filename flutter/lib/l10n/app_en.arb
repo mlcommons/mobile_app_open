@@ -119,6 +119,7 @@
   "resourceDownload": "Download",
   "resourceClear": "Clear",
   "resourceChecking": "Checking download status",
+  "resourceDownloading": "Downloading",
   "resourceErrorMessage": "Some resources failed to load.\nIf you didn't change config from default you can try clearing the cache.\nIf you use a custom configuration file ensure that it has correct structure or switch back to default config.",
   "resourceErrorSelectTaskFile": "Update task configuration",
   "resourceErrorCurrentConfig": "Current task config file: ",

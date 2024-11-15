@@ -9,8 +9,8 @@ import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/history/history_list_screen.dart';
 import 'package:mlperfbench/ui/home/user_profile.dart';
 import 'package:mlperfbench/ui/settings/about_screen.dart';
-import 'package:mlperfbench/ui/settings/settings_screen.dart';
 import 'package:mlperfbench/ui/settings/resources_screen.dart';
+import 'package:mlperfbench/ui/settings/settings_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});

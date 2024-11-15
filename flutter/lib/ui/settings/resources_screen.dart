@@ -1,9 +1,9 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:mlperfbench/benchmark/benchmark.dart';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -84,18 +84,43 @@ class _ResourcesScreen extends State<ResourcesScreen> {
   }
 
   Widget _downloadStatus(Benchmark benchmark, BenchmarkRunMode mode) {
-    return FutureBuilder<bool>(
+    return FutureBuilder<Map<bool, List<String>>>(
       future: state.validator.validateResourcesExist(benchmark, mode),
-      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+      builder: (BuildContext context,
+          AsyncSnapshot<Map<bool, List<String>>> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
-          final downloaded = snapshot.data!;
+          const double size = 18;
           const downloadedIcon =
-              Icon(Icons.check_circle, size: 16, color: Colors.green);
+              Icon(Icons.check_circle, size: size, color: Colors.green);
           const notDownloadedIcon =
-              Icon(Icons.check_circle_outline, size: 16, color: Colors.grey);
+              Icon(Icons.check_circle_outline, size: size, color: Colors.grey);
+          final result = snapshot.data!;
+          final missing = result[false] ?? [];
+          final existed = result[true] ?? [];
+          final downloaded = missing.isEmpty;
           return Row(
             children: [
-              downloaded ? downloadedIcon : notDownloadedIcon,
+              SizedBox(
+                height: size,
+                width: size,
+                child: IconButton(
+                  padding: const EdgeInsets.all(0),
+                  icon: downloaded ? downloadedIcon : notDownloadedIcon,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return _ResourcesTable(
+                          taskName: benchmark.info.taskName,
+                          modeName: mode.readable,
+                          missing: missing,
+                          existed: existed,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
               const SizedBox(width: 10),
               Text(mode.readable),
             ],
@@ -118,12 +143,15 @@ class _ResourcesScreen extends State<ResourcesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+            l10n.resourceDownloading,
+            maxLines: 1,
+            style: const TextStyle(fontSize: 12),
+          ),
+          Text(
             state.loadingPath,
             maxLines: 5,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12.0,
-            ),
+            style: const TextStyle(fontSize: 12),
           ),
           const SizedBox(height: 8),
           LinearProgressIndicator(
@@ -181,6 +209,74 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           child: Text(l10n.resourceClear),
         ),
       ),
+    );
+  }
+}
+
+class _ResourcesTable extends StatelessWidget {
+  final String taskName;
+  final String modeName;
+  final List<String> missing;
+  final List<String> existed;
+
+  const _ResourcesTable({
+    required this.taskName,
+    required this.modeName,
+    required this.missing,
+    required this.existed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Column(
+          children: [
+            Text(taskName),
+            Text(modeName),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Table(
+              columnWidths: const {
+                0: FixedColumnWidth(40),
+                1: FlexColumnWidth(),
+              },
+              border: TableBorder.all(color: Colors.grey),
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: [
+                for (var path in missing) _row(path, false),
+                for (var path in existed) _row(path, true),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  TableRow _row(String path, bool existed) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Icon(
+            existed ? Icons.check_circle : Icons.check_circle_outline,
+            color: existed
+                ? Colors.green
+                : Colors.grey, // Grey check mark for missing
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(path),
+        ),
+      ],
     );
   }
 }
