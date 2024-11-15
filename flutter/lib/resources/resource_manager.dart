@@ -97,7 +97,7 @@ class ResourceManager {
   Future<void> handleResources(List<Resource> resources, bool purgeOldCache,
       bool downloadMissing) async {
     _loadingPath = '';
-    _loadingProgress = 0.0;
+    _loadingProgress = 0.001;
     _done = false;
     _onUpdate();
 
@@ -132,6 +132,8 @@ class ResourceManager {
     // delete downloaded archives to free up disk space
     await cacheManager.deleteArchives(internetPaths);
 
+    _loadingPath = '';
+    _loadingProgress = 1.0;
     _done = true;
     _onUpdate();
   }

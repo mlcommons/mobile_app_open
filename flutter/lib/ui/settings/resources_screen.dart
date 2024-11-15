@@ -180,7 +180,6 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     );
   }
 
-  // TODO: add confirm dialog
   Widget _clearCacheButton() {
     return AbsorbPointer(
       absorbing: downloading,

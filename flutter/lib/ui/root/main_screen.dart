@@ -6,7 +6,6 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/ui/home/benchmark_result_screen.dart';
 import 'package:mlperfbench/ui/home/benchmark_running_screen.dart';
 import 'package:mlperfbench/ui/home/benchmark_start_screen.dart';
-import 'package:mlperfbench/ui/home/resource_loading_screen.dart';
 import 'package:mlperfbench/ui/root/resource_error_screen.dart';
 
 class MainScreen extends StatelessWidget {
