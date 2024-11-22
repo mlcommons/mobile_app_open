@@ -90,7 +90,7 @@ flutter_android_apk_test_main_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDRO
 .PHONY: flutter/android/test-apk/main
 flutter/android/test-apk/main:
 	mkdir -p $$(dirname ${flutter_android_apk_test_main_path})
-	flutter_android_apk_test_perf_arg=$$(printf enable-perf-test=${PERF_TEST} | base64) && \
+	flutter_android_apk_test_perf_arg=$$(printf PERF_TEST=${PERF_TEST} | base64) && \
 		cd flutter/android && \
 		./gradlew app:assembleDebug \
 		-Ptarget=integration_test/first_test.dart \

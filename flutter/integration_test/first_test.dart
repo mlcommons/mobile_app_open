@@ -14,11 +14,6 @@ import 'expected_accuracy.dart';
 import 'expected_throughput.dart';
 import 'utils.dart';
 
-const enablePerfTest = bool.fromEnvironment(
-  'enable-perf-test',
-  defaultValue: false,
-);
-
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
@@ -30,7 +25,7 @@ void main() {
     StoreConstants.testMinDuration: 1,
     StoreConstants.testMinQueryCount: 4,
   };
-  if (enablePerfTest) {
+  if (DartDefine.perfTestEnabled) {
     prefs[StoreConstants.testMinDuration] = 15;
     prefs[StoreConstants.testMinQueryCount] = 64;
     prefs[StoreConstants.testCooldownDuration] = 2;
@@ -72,7 +67,7 @@ void checkTasks(ExtendedResult extendedResult) {
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
     checkAccuracy(benchmarkResult);
-    if (enablePerfTest) {
+    if (DartDefine.perfTestEnabled) {
       checkThroughput(benchmarkResult, extendedResult.environmentInfo);
     }
   }
