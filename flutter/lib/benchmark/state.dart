@@ -138,7 +138,7 @@ class BenchmarkState extends ChangeNotifier {
     _store.previousAppVersion = newAppVersion;
 
     await Wakelock.enable();
-    print('start loading resources');
+    print('Start loading resources with downloadMissing=$downloadMissing');
     final resources = _benchmarkStore.listResources(
       modes: [taskRunner.perfMode, taskRunner.accuracyMode],
       benchmarks: benchmarks,
@@ -148,7 +148,7 @@ class BenchmarkState extends ChangeNotifier {
       needToPurgeCache,
       downloadMissing,
     );
-    print('finished loading resources');
+    print('Finished loading resources with downloadMissing=$downloadMissing');
     error = null;
     stackTrace = null;
     taskConfigFailedToLoad = false;
