@@ -9,7 +9,7 @@ benchmark_setting {
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobilenetEdgeTPU.mlmodel"
       model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
     }
   }
@@ -18,7 +18,7 @@ benchmark_setting {
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobilenetEdgeTPU.mlmodel"
       model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
     }
   }
@@ -27,7 +27,7 @@ benchmark_setting {
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobilenetEdgeTPU.mlmodel"
       model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
     }
   }
@@ -43,7 +43,7 @@ benchmark_setting {
     accelerator_desc: "All compute units"
     batch_size: 32
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobilenetEdgeTPU.mlmodel"
       model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
     }
   }
@@ -53,7 +53,7 @@ benchmark_setting {
     accelerator_desc: "CPU and GPU"
     batch_size: 32
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobilenetEdgeTPU.mlmodel"
       model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
     }
   }
@@ -63,7 +63,7 @@ benchmark_setting {
     accelerator_desc: "CPU and Neural Engine"
     batch_size: 32
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobilenetEdgeTPU.mlmodel"
       model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
     }
   }
