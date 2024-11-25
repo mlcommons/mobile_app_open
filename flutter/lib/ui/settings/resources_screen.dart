@@ -91,9 +91,9 @@ class _ResourcesScreen extends State<ResourcesScreen> {
         if (snapshot.hasData && snapshot.data != null) {
           const double size = 18;
           const downloadedIcon =
-              Icon(Icons.check_circle, size: size, color: Colors.green);
+              Icon(Icons.download_done, size: size, color: Colors.green);
           const notDownloadedIcon =
-              Icon(Icons.check_circle_outline, size: size, color: Colors.grey);
+              Icon(Icons.download_done, size: size, color: Colors.grey);
           final result = snapshot.data!;
           final missing = result[false] ?? [];
           final existed = result[true] ?? [];
@@ -260,16 +260,13 @@ class _ResourcesTable extends StatelessWidget {
   }
 
   TableRow _row(String path, bool existed) {
+    const downloadedIcon = Icon(Icons.download_done, color: Colors.green);
+    const notDownloadedIcon = Icon(Icons.download_done, color: Colors.grey);
     return TableRow(
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Icon(
-            existed ? Icons.check_circle : Icons.check_circle_outline,
-            color: existed
-                ? Colors.green
-                : Colors.grey, // Grey check mark for missing
-          ),
+          child: existed ? downloadedIcon : notDownloadedIcon,
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
