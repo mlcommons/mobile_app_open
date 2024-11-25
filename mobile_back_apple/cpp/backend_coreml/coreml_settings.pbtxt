@@ -171,7 +171,7 @@ benchmark_setting {
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileDet.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobileDet.mlmodel"
       model_checksum: "ef849fbf2132e205158f05ca42db25f4"
     }
   }
@@ -180,7 +180,7 @@ benchmark_setting {
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileDet.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobileDet.mlmodel"
       model_checksum: "ef849fbf2132e205158f05ca42db25f4"
     }
   }
@@ -189,7 +189,7 @@ benchmark_setting {
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileDet.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobileDet.mlmodel"
       model_checksum: "ef849fbf2132e205158f05ca42db25f4"
     }
   }
