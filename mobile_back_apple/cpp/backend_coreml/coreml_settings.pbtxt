@@ -204,7 +204,7 @@ benchmark_setting {
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileBERT.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobileBERT.mlmodel"
       model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
     }
   }
@@ -213,7 +213,7 @@ benchmark_setting {
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileBERT.mlmodel"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/MobileBERT.mlmodel"
       model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
     }
   }
