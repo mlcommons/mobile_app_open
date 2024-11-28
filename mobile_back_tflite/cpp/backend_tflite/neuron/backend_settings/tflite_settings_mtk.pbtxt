@@ -186,7 +186,7 @@ benchmark_setting {
     accelerator_name: "neuron-no-ahwb"
     accelerator_desc: "MediaTek NN accelerator + VPU via the Neuron Delegate"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v0_7/mobilebert_int8_384_nnapi.tflite"
       model_checksum: "3944a2dee04a5f8a5fd016ac34c4d390"
     }
     batch_size: 1
@@ -196,7 +196,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v0_7/mobilebert_int8_384_nnapi.tflite"
       model_checksum: "3944a2dee04a5f8a5fd016ac34c4d390"
     }
   }
