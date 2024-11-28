@@ -229,17 +229,17 @@ task {
     type: COCOGEN
     full {
       name: "COCO validation set for Stable Diffusion"
-      input_path: "https://github.com/anhappdev/tmp/releases/download/5/coco_gen_test.tfrecord"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v4_1/coco_gen_test.tfrecord"
       groundtruth_path: "local:///mlperf_models/stable-diffusion/clip_model_512x512.tflite"
     }
     lite {
       name: "COCO validation set for Stable Diffusion"
-      input_path: "https://github.com/anhappdev/tmp/releases/download/5/coco_gen_full.tfrecord"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v4_1/coco_gen_full.tfrecord"
       groundtruth_path: ""
     }
     tiny {
       name: "COCO validation set for Stable Diffusion"
-      input_path: "https://github.com/anhappdev/tmp/releases/download/2/coco_gen.tfrecord"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v4_1/coco_gen.tfrecord"
       groundtruth_path: "local:///mlperf_models/stable-diffusion/clip_model_512x512.tflite"
     }
   }
