@@ -182,7 +182,7 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "MediaTek NN accelerator + CPU via the Neuron Delegate"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v1_0/mobiledet_qat.tflite"
       model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
     }
   }
@@ -191,7 +191,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v1_0/mobiledet_qat.tflite"
       model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
     }
   }
