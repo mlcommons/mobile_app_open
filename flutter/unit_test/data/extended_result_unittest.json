@@ -210,7 +210,7 @@
         "dataset": {
           "name": "Squad V1.1 mini set",
           "type": "SQUAD",
-          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord",
+          "data_path": "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_mini.tfrecord",
           "groundtruth_path": ""
         },
         "measured_duration": 160.6459197998047,
