@@ -167,7 +167,7 @@ benchmark_setting {
     accelerator_name: "tpu"
     accelerator_desc: "Google EdgeTPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v2_0/mobile_segmenter_r4_quant_argmax_uint8.tflite"
       model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
     }
   }
