@@ -45,7 +45,7 @@
         "dataset": {
           "name": "Open images subset for classification",
           "type": "IMAGENET",
-          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip",
+          "data_path": "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet.zip",
           "groundtruth_path": ""
         },
         "measured_duration": 60.89502716064453,
@@ -320,7 +320,7 @@
         "dataset": {
           "name": "Open images subset for classification",
           "type": "IMAGENET",
-          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip",
+          "data_path": "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet.zip",
           "groundtruth_path": ""
         },
         "measured_duration": 28.399919509887695,

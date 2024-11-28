@@ -19,7 +19,7 @@ task {
     }
     lite {
       name: "Open images subset for classification"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet.zip"
       groundtruth_path: ""
     }
     tiny {
@@ -197,7 +197,7 @@ task {
     }
     lite {
       name: "Open images subset for classification"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet.zip"
       groundtruth_path: ""
     }
     tiny {
