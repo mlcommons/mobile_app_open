@@ -19,7 +19,7 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v1_1/mobilenet_edgetpu_224_1.0_float.tflite"
       model_checksum: "66bb4eba50987221608f8487ed405794"
     }
   }
@@ -35,7 +35,7 @@ benchmark_setting {
     accelerator_desc: "CPU"
     batch_size: 2
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v1_1/mobilenet_edgetpu_224_1.0_float.tflite"
       model_checksum: "66bb4eba50987221608f8487ed405794"
     }
   }
