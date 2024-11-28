@@ -43,7 +43,7 @@ benchmark_setting {
     accelerator_name: "ane"
     accelerator_desc: "ANE"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
       model_checksum: "b57cc2a027607c3b36873a15ace84acb"
     }
   }
@@ -52,7 +52,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
       model_checksum: "b57cc2a027607c3b36873a15ace84acb"
     }
   }
