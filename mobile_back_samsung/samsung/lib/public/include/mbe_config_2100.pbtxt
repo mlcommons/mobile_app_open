@@ -50,7 +50,7 @@ benchmark_setting {
       value: "Uint8"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/is.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v1_0/is.nnc"
       model_checksum: "b501ed669da753b08a151639798af37e"
     }
   }
