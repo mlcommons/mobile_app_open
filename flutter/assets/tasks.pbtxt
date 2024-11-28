@@ -61,7 +61,7 @@ task {
     }
     tiny {
       name: "Coco dataset for integration test"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/datasets/coco-test.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/coco-test.zip"
       groundtruth_path: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/coco_val_tiny.pbtxt"
     }
   }
