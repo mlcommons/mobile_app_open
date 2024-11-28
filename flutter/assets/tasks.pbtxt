@@ -93,7 +93,7 @@ task {
     }
     lite {
       name: "Open images subset for segmentation"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/ade20k.zip"
       groundtruth_path: ""
     }
     tiny {

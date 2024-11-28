@@ -155,7 +155,7 @@
         "dataset": {
           "name": "Open images subset for segmentation",
           "type": "ADE20K",
-          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k.zip",
+          "data_path": "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/ade20k.zip",
           "groundtruth_path": ""
         },
         "measured_duration": 61.133907318115234,
