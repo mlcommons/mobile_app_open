@@ -134,7 +134,7 @@ task {
     }
     tiny {
       name: "Squad V1.1 mini set"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_tiny.tfrecord"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_tiny.tfrecord"
       groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_groundtruth.tfrecord"
     }
   }
