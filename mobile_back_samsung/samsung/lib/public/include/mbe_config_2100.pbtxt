@@ -74,7 +74,7 @@ benchmark_setting {
       value: "Uint8"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/sm_uint8.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v1_0/sm_uint8.nnc"
       model_checksum: "483eee2df253ecc135a6e8701cc0c909"
     }
   }
