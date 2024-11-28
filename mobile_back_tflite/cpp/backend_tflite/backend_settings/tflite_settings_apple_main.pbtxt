@@ -130,7 +130,7 @@ benchmark_setting {
     accelerator_name: "ane"
     accelerator_desc: "ANE"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/edsr_f32b5_fp32.tflite"
       model_checksum: "672240427c1f3dc33baf2facacd9631f"
     }
   }
@@ -139,7 +139,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v3_0/edsr_f32b5_fp32.tflite"
       model_checksum: "672240427c1f3dc33baf2facacd9631f"
     }
   }
