@@ -162,7 +162,7 @@ task {
     }
     lite {
       name: "SNUSR dataset for performance test"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/datasets/snusr_lr_png.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/snusr_lr_png.zip"
       groundtruth_path: ""
     }
     tiny {
