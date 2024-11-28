@@ -45,7 +45,7 @@
         "dataset": {
           "name": "Open images subset for classification",
           "type": "IMAGENET",
-          "data_path": "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet.zip",
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip",
           "groundtruth_path": ""
         },
         "measured_duration": 60.89502716064453,
@@ -100,7 +100,7 @@
         "dataset": {
           "name": "Open images subset for detection",
           "type": "COCO",
-          "data_path": "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/coco.zip",
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco.zip",
           "groundtruth_path": ""
         },
         "measured_duration": 61.21785354614258,
@@ -155,7 +155,7 @@
         "dataset": {
           "name": "Open images subset for segmentation",
           "type": "ADE20K",
-          "data_path": "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/ade20k.zip",
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k.zip",
           "groundtruth_path": ""
         },
         "measured_duration": 61.133907318115234,
@@ -178,7 +178,7 @@
         "accelerator_code": "gpu_f16",
         "accelerator_desc": "GPU (FP16)",
         "framework": "TFLite Metal",
-        "model_path": "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_float_384_gpu.tflite",
+        "model_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite",
         "batch_size": 0,
         "extra_settings": [
           {
@@ -210,7 +210,7 @@
         "dataset": {
           "name": "Squad V1.1 mini set",
           "type": "SQUAD",
-          "data_path": "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_mini.tfrecord",
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord",
           "groundtruth_path": ""
         },
         "measured_duration": 160.6459197998047,
@@ -320,7 +320,7 @@
         "dataset": {
           "name": "Open images subset for classification",
           "type": "IMAGENET",
-          "data_path": "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet.zip",
+          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip",
           "groundtruth_path": ""
         },
         "measured_duration": 28.399919509887695,
