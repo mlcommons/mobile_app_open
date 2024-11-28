@@ -100,7 +100,7 @@
         "dataset": {
           "name": "Open images subset for detection",
           "type": "COCO",
-          "data_path": "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco.zip",
+          "data_path": "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/coco.zip",
           "groundtruth_path": ""
         },
         "measured_duration": 61.21785354614258,

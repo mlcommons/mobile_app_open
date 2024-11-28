@@ -56,7 +56,7 @@ task {
     }
     lite {
       name: "Open images subset for detection"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/coco.zip"
       groundtruth_path: ""
     }
     tiny {
