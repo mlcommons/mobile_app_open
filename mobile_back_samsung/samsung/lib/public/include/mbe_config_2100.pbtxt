@@ -26,7 +26,7 @@ benchmark_setting {
       value: "Float32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/ic.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v1_0/ic.nnc"
       model_checksum: "955ef2ac3c134820eab901f3dac9f732"
     }
   }
