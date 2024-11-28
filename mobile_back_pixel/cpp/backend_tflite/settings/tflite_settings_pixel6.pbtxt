@@ -42,7 +42,7 @@ benchmark_setting {
     accelerator_name: "tpu"
     accelerator_desc: "Google EdgeTPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite"
       model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
     }
   }
@@ -93,7 +93,7 @@ benchmark_setting {
     accelerator_desc: "Google EdgeTPU"
     batch_size: 16
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite"
       model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
     }
   }
