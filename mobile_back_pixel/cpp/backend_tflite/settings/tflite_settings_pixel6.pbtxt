@@ -151,7 +151,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v0_7/mobilebert_float_384_gpu.tflite"
       model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
     }
   }
