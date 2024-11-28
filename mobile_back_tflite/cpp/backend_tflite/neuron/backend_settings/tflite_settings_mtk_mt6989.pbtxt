@@ -287,7 +287,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v2_0/mobile_segmenter_r4_argmax_f32.tflite"
       model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
     }
   }
