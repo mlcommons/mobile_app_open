@@ -42,7 +42,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/v0_7/mobilenet_edgetpu_224_1.0_uint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilenet_edgetpu_224_1.0_uint8.tflite"
       model_checksum: "abc"
     }
     custom_setting {
@@ -60,7 +60,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/v0_7/mobilenet_edgetpu_224_1.0_uint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilenet_edgetpu_224_1.0_uint8.tflite"
       model_checksum: "abc"
     }
     custom_setting {
