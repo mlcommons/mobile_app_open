@@ -146,7 +146,7 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sr.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/v4_0/samsung/sr.nnc"
       model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
     }
   }
