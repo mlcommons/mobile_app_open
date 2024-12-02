@@ -207,3 +207,30 @@ benchmark_setting {
   }
   delegate_selected: "NNAPI"
 }
+
+benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_file: {
+      model_path: "local:///mlperf_models/sd_decoder_dynamic.tflite"
+      model_checksum: "68acdb62f99e1dc2c7f5db8cdd0e007c"
+    }
+    model_file: {
+      model_path: "local:///mlperf_models/sd_diffusion_model_dynamic.tflite"
+      model_checksum: "7cbdadf5282b71561ce5eda75e868c19"
+    }
+    model_file: {
+      model_path: "local:///mlperf_models/sd_text_encoder_dynamic.tflite"
+      model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
+    }
+  }
+  delegate_selected: "NNAPI"
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+}

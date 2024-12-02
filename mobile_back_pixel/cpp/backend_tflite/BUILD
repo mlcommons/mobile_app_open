@@ -52,10 +52,21 @@ cc_library(
     name = "tflite_pixel",
     srcs = [
         "tflite_pixel.cc",
+        "pixel_single_model_pipeline.cc",
+	"//mobile_back_tflite/cpp/backend_tflite:sd_utils.cc",
+	"//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_pipeline.cc",
+	"//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_invoker.cc",
     ],
     hdrs = [
         "tflite_settings_pixel.h",
         "thread_pool.h",
+	"//mobile_back_tflite/cpp/backend_tflite:pipeline.h",
+	"//mobile_back_tflite/cpp/backend_tflite:sd_utils.h",
+	"//mobile_back_tflite/cpp/backend_tflite:single_model_pipeline.h",
+	"//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_invoker.h",
+	"//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_pipeline.h",
+	"//mobile_back_tflite/cpp/backend_tflite:thread_pool.h",
+	"//mobile_back_tflite/cpp/backend_tflite:utils.h",
     ],
     copts = tflite_copts() + select({
         "//flutter/android/commonlibs:use_asan": [
@@ -64,11 +75,15 @@ cc_library(
             "-O1",
             "-fno-omit-frame-pointer",
         ],
-        "//conditions:default": [],
+        "//conditions:default": [
+	  "-Imobile_back_pixel/cpp/backend_tflite",
+	  "-Imobile_back_tflite/cpp/backend_tflite",
+	],
     }),
     deps = [
         ":pixel_settings",
         ":resize_bilinear_op",
+	"//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
         "@org_tensorflow//tensorflow/lite/c:c_api",
