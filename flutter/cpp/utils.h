@@ -69,6 +69,10 @@ SettingList CreateSettingList(const BackendSetting &backend_setting,
                               const std::string &custom_config,
                               const std::string &benchmark_id);
 
+template <typename T>
+T GetConfigValue(mlperf_backend_configuration_t *configs, const char *key,
+                 T defaultValue);
+
 }  // namespace mobile
 }  // namespace mlperf
 

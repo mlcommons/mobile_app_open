@@ -11,7 +11,8 @@
                    android:maxSdkVersion="29"/>
 
   <application android:label="MLPerf Mobile"
-               android:icon="@mipmap/ic_launcher">
+               android:icon="@mipmap/ic_launcher"
+               android:extractNativeLibs="true">
 
     <!-- TFLite -->
     <uses-library android:name="libOpenCL.so"

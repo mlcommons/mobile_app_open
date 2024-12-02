@@ -70,6 +70,7 @@ cc_library(
     }),
     deps = [
         ":tflite_settings",
+        "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
         "@org_tensorflow//tensorflow/lite/c:c_api",
