@@ -100,6 +100,7 @@ std::vector<float> StableDiffusionInvoker::diffusion_process(
     const std::vector<float>& unconditional_encoded_text, int num_steps,
     int seed) {
   float unconditional_guidance_scale = 7.5f;
+
   auto noise = get_normal(64 * 64 * 4, seed);
   auto latent = noise;
 
@@ -113,15 +114,25 @@ std::vector<float> StableDiffusionInvoker::diffusion_process(
   }
 
   auto alphas_tuple = get_initial_alphas(timesteps);
+
   auto alphas = std::get<0>(alphas_tuple);
   auto alphas_prev = std::get<1>(alphas_tuple);
 
   for (int i = timesteps.size() - 1; i >= 0; --i) {
     LOG(INFO) << "Step " << timesteps.size() - 1 - i;
 
+    std::cout << "\n=== Processing Step " << timesteps.size() - 1 - i
+              << " (timestamp: " << timesteps[i] << ") ===" << std::endl;
+
     auto latent_prev = latent;
-    // Get pre-calculated timestamp embedding
-    auto t_emb = embedding_manager.get_timestamp_embedding(i, num_steps);
+
+    auto t_emb = embedding_manager.get_timestep_embedding(i, num_steps);
+
+    if (t_emb.empty()) {
+      LOG(ERROR) << "Failed to get timestamp embedding for step " << i;
+      return std::vector<float>();
+    }
+
     if (t_emb.empty()) {
       LOG(ERROR) << "Failed to get timestamp embedding for step " << i;
       return std::vector<float>();
@@ -146,6 +157,7 @@ std::vector<float> StableDiffusionInvoker::diffusion_process(
     latent.assign(std::begin(l), std::end(l));
   }
 
+  std::cout << "\nDiffusion process completed" << std::endl;
   return latent;
 }
 

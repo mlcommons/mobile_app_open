@@ -1,41 +1,37 @@
-// embedding_utils.h
 #ifndef EMBEDDING_UTILS_H_
 #define EMBEDDING_UTILS_H_
 
-#include <cstdint>
+#include <algorithm>
+#include <filesystem>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <map>
+#include <memory>
+#include <numeric>
+#include <sstream>
 #include <string>
 #include <vector>
 
 using float32_t = float;
 using tensor_data_float32_t = std::vector<float32_t>;
 
-#define TS_EMBEDDING_ELEMENT_COUNT (1 * 1280)
-
-class FileParser {
+class TsEmbeddingParser {
  public:
-  virtual bool parse(std::ifstream& fin, size_t file_size) = 0;
-  virtual ~FileParser() = default;
-};
-
-class TsEmbeddingParser : public FileParser {
- public:
-  TsEmbeddingParser() = default;
-  ~TsEmbeddingParser() override = default;
-
-  bool parse(std::ifstream& fin, size_t file_size) override;
-
-  // Retrieves the timestamp embedding for a specific step
-  std::vector<float> get_timestamp_embedding(int32_t steps,
-                                             int32_t step_index) const;
-
-  // Get all timesteps for a specific number of steps
+  bool parse(std::ifstream& fin, size_t file_size);
+  std::vector<float> get_timestep_embedding(int32_t steps,
+                                            int32_t step_index) const;
   std::vector<int32_t> get_timesteps(int32_t steps) const;
+  bool saveToJson(const std::string& filename) const;
 
  private:
+  static std::string vectorToJsonArray(const std::vector<float>& vec,
+                                       bool full_output = false);
+  static std::string vectorToJsonArray(const std::vector<int32_t>& vec);
+
+  static constexpr size_t TS_EMBEDDING_ELEMENT_COUNT = 1280;
   std::map<int32_t, std::vector<int32_t>> ts_seq_map_;
-  std::map<int32_t, std::vector<tensor_data_float32_t>> ts_embedding_seq_map_;
+  std::map<int32_t, std::vector<std::vector<float>>> ts_embedding_seq_map_;
 };
 
 class EmbeddingManager {
@@ -45,9 +41,9 @@ class EmbeddingManager {
     return instance;
   }
 
-  bool load_timestamp_embeddings(const std::string& filename);
-  std::vector<float> get_timestamp_embedding(int32_t timestep,
-                                             int num_steps) const;
+  bool load_timestep_embeddings(const std::string& filename);
+  std::vector<float> get_timestep_embedding(int32_t timestep,
+                                            int num_steps) const;
   std::vector<int32_t> get_timesteps(int num_steps) const;
 
  private:

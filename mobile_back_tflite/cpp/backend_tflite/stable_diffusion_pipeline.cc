@@ -65,6 +65,8 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   SDBackendData* backend_data = new SDBackendData();
   backendExists = true;
 
+  backend_data->model_dir = model_path;
+
   for (int i = 0; i < configs->count; ++i) {
     if (strcmp(configs->keys[i], "stable_diffusion_seed") == 0) {
       backend_data->seed = atoi(configs->values[i]);
@@ -77,8 +79,10 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   // Load models from the provided directory path
   std::string text_encoder_path =
       std::string(model_path) + "/sd_text_encoder_dynamic.tflite";
+
   std::string sd_model_path =
-      std::string(model_path) + "/sd_diffusion_model_dynamic.tflite";
+      std::string(model_path) +
+      "/sd_diffusion_full_model_dynamic_int8_mlperfv41.tflite";
   std::string decoder_path =
       std::string(model_path) + "/sd_decoder_dynamic.tflite";
 
@@ -108,9 +112,9 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   std::string ts_embedding_path =
       std::string(model_path) +
       "/timestep_steps_20_int32_embedding_1x1280_float32.bin.ts";
-  if (!EmbeddingManager::getInstance().load_timestamp_embeddings(
+  if (!EmbeddingManager::getInstance().load_timestep_embeddings(
           ts_embedding_path)) {
-    LOG(ERROR) << "Failed to load timestamp embeddings from "
+    LOG(ERROR) << "Failed to load timestep embeddings from "
                << ts_embedding_path;
     backend_delete(backend_data);
     return nullptr;

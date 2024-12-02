@@ -29,6 +29,7 @@ struct SDBackendData {
   TfLiteModel *text_encoder_model{nullptr};
   TfLiteModel *sd_model{nullptr};
   TfLiteModel *decoder_model{nullptr};
+  std::string model_dir;
 
   TfLiteInterpreter *text_encoder_interpreter{nullptr};
   TfLiteInterpreter *sd_interpreter{nullptr};
