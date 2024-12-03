@@ -68,8 +68,6 @@ dev_dependencies:
 
 dependency_overrides:
   win32: 5.5.0
-  # Fix Nuget.exe not found error by using an older version of permission_handler_windows
-  permission_handler_windows: 0.1.3
 
 flutter_launcher_icons:
   image_path: "assets/ic_launcher_ios.png"

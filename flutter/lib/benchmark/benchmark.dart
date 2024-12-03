@@ -154,13 +154,11 @@ class BenchmarkStore {
 
   List<Resource> listResources({
     required List<BenchmarkRunMode> modes,
-    bool skipInactive = false,
+    required List<Benchmark> benchmarks,
   }) {
     final result = <Resource>[];
 
     for (final b in benchmarks) {
-      if (skipInactive && !b.isActive) continue;
-
       for (var mode in modes) {
         final dataset = mode.chooseDataset(b.taskConfig);
         final data = Resource(

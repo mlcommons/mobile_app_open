@@ -68,6 +68,10 @@ Future<void> runBenchmarks(WidgetTester tester) async {
   const downloadTimeout = 20 * 60; // 20 minutes
   const runBenchmarkTimeout = 30 * 60; // 30 minutes
 
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  await benchmarkState.loadResources(downloadMissing: true);
+
   var goButtonIsPresented =
       await waitFor(tester, downloadTimeout, const Key(WidgetKeys.goButton));
 

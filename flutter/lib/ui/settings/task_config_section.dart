@@ -75,7 +75,7 @@ class TaskConfigSection extends StatelessWidget {
             await state.setTaskConfig(name: configuration.name);
             if (!context.mounted) return;
             Navigator.of(context).popUntil((route) => route.isFirst);
-            await state.loadResources();
+            await state.loadResources(downloadMissing: false);
           } catch (e) {
             if (!context.mounted) return;
             await showErrorDialog(

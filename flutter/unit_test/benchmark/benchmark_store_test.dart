@@ -88,7 +88,12 @@ void main() {
       );
 
       final modes = [BenchmarkRunMode.accuracy];
-      final resources = store.listResources(modes: modes, skipInactive: true);
+      final activeBenchmarks =
+          store.benchmarks.where((e) => e.isActive).toList();
+      final resources = store.listResources(
+        modes: modes,
+        benchmarks: activeBenchmarks,
+      );
 
       expect(resources.length, 0);
     });
@@ -100,7 +105,12 @@ void main() {
       );
 
       final modes = [BenchmarkRunMode.accuracy];
-      final resources = store.listResources(modes: modes, skipInactive: true);
+      final activeBenchmarks =
+          store.benchmarks.where((e) => e.isActive).toList();
+      final resources = store.listResources(
+        modes: modes,
+        benchmarks: activeBenchmarks,
+      );
 
       expect(resources.length, 3);
       expect(
@@ -132,7 +142,12 @@ void main() {
       );
 
       final modes = [BenchmarkRunMode.performance];
-      final resources = store.listResources(modes: modes);
+      final activeBenchmarks =
+          store.benchmarks.where((e) => e.isActive).toList();
+      final resources = store.listResources(
+        modes: modes,
+        benchmarks: activeBenchmarks,
+      );
 
       expect(resources.length, 2);
       expect(
@@ -161,7 +176,12 @@ void main() {
         BenchmarkRunMode.accuracyTest,
         BenchmarkRunMode.performanceTest,
       ];
-      final resources = store.listResources(modes: modes);
+      final activeBenchmarks =
+          store.benchmarks.where((e) => e.isActive).toList();
+      final resources = store.listResources(
+        modes: modes,
+        benchmarks: activeBenchmarks,
+      );
 
       expect(resources.length, 2);
       expect(

@@ -7,6 +7,7 @@
   "menuHome": "MLPerf Mobile",
   "menuHistory": "History",
   "menuSettings": "Settings",
+  "menuResources": "Resources",
   "menuAbout": "About",
   "menuProfile": "Profile",
   "menuSignIn": "Sign In",
@@ -78,7 +79,8 @@
   "settingsTaskConfigError": "Path to config is invalid:",
   "settingsTaskDataFolderTitle": "Data folder",
   "settingsClearCache": "Clear cache",
-  "settingsClearCacheConfirm": "All loaded resources will be deleted and downloaded again. Continue?",
+  "settingsClearCacheConfirm": "All downloaded resources will be deleted. Continue?",
+  "settingsClearCacheFinished": "Cache cleared.",
   "settingsUnableSpecifyConfiguration": "Could not specify until benchmarks is running or content is loading",
 
   "dialogTitleWarning": "Warning",
@@ -114,6 +116,10 @@
   "benchInfoLanguageProcessingDesc": "Question Answering finds the best answer to an input question based on a body of text, and is commonly employed in applications such as virtual assistants and chatbots. The reference model, MobileBERT, is evaluated on the Stanford Question Answering Dataset (SQUAD) v1.1 Dev-mini. The task requires a minimum F1-score of 87.4% (93% of FP32 F1-score of 93.08%).\n\nMobileBERT is a streamlined, mobile-optimized version of the larger BERT_LARGE network. It features bottleneck structures and a carefully designed balance between self-attention and feed-forward networks. While BERT is task-agnostic and can be applied to various downstream natural language processing tasks, the MobileBERT variant used in MLPerf is specifically fine-tuned for question answering.",
   "benchInfoSuperResolutionDesc": "Image Super Resolution (SR) upscales a lower resolution input into a higher resolution output image, enhancing the quality and detail. It is a common task in many mobile applications such as digital zoom. The reference model, EDSR F32B5, is a lightweight member of the Enhanced Deep Super Resolution (EDSR) family that is trained for 2X super resolution on the DIV2K dataset with bicubic downsampling and tested on the OpenSR test-set which comprises 25 selected 1920x1080 HDR images. The benchmark requires a minimum accuracy of 33 dB Peak Signal to Noise Ratio (PSNR) relative to a 33.58 dB accuracy with FP32.\n\nThe EDSR family of models demonstrated excellent performance by winning a super resolution challenge at CVPR 2017. The EDSR F32B5 reference model features five EDSR blocks, each with 32 feature maps. The EDSR block is a simple residual block consisting of a residual connection on one branch and a convolution-ReLU-convolution on the other branch. The final upsampling layer is a depth-to-space operator, which facilitates the x2 super resolution process.",
 
+  "resourceDownload": "Download",
+  "resourceClear": "Clear",
+  "resourceChecking": "Checking download status",
+  "resourceDownloading": "Downloading",
   "resourceErrorMessage": "Some resources failed to load.\nIf you didn't change config from default you can try clearing the cache.\nIf you use a custom configuration file ensure that it has correct structure or switch back to default config.",
   "resourceErrorSelectTaskFile": "Update task configuration",
   "resourceErrorCurrentConfig": "Current task config file: ",

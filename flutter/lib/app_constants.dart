@@ -7,6 +7,9 @@ class DartDefine {
       bool.fromEnvironment('FIREBASE_CRASHLYTICS_ENABLED', defaultValue: false);
   static const isFastMode =
       bool.fromEnvironment('FAST_MODE', defaultValue: false);
+
+  static const perfTestEnabled =
+      bool.fromEnvironment('PERF_TEST', defaultValue: false);
 }
 
 class WidgetKeys {

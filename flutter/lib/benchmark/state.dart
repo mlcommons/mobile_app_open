@@ -22,7 +22,6 @@ import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 
 enum BenchmarkStateEnum {
-  downloading,
   waiting,
   running,
   aborting,
@@ -121,7 +120,7 @@ class BenchmarkState extends ChangeNotifier {
   // ignore: avoid_void_async
   void deferredLoadResources() async {
     try {
-      await loadResources();
+      await loadResources(downloadMissing: false);
     } catch (e, trace) {
       print("can't load resources: $e");
       print(trace);
@@ -132,22 +131,24 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> loadResources() async {
+  Future<void> loadResources({required bool downloadMissing}) async {
     final newAppVersion =
         '${BuildInfoHelper.info.version}+${BuildInfoHelper.info.buildNumber}';
     var needToPurgeCache = _store.previousAppVersion != newAppVersion;
     _store.previousAppVersion = newAppVersion;
 
     await Wakelock.enable();
-    print('start loading resources');
-    await resourceManager.handleResources(
-      _benchmarkStore.listResources(
-        modes: [taskRunner.perfMode, taskRunner.accuracyMode],
-        skipInactive: false,
-      ),
-      needToPurgeCache,
+    print('Start loading resources with downloadMissing=$downloadMissing');
+    final resources = _benchmarkStore.listResources(
+      modes: [taskRunner.perfMode, taskRunner.accuracyMode],
+      benchmarks: benchmarks,
     );
-    print('finished loading resources');
+    await resourceManager.handleResources(
+      resources,
+      needToPurgeCache,
+      downloadMissing,
+    );
+    print('Finished loading resources with downloadMissing=$downloadMissing');
     error = null;
     stackTrace = null;
     taskConfigFailedToLoad = false;
@@ -216,7 +217,6 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   BenchmarkStateEnum get state {
-    if (!resourceManager.done) return BenchmarkStateEnum.downloading;
     switch (_doneRunning) {
       case null:
         return BenchmarkStateEnum.waiting;

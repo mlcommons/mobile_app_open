@@ -28,7 +28,7 @@ class CacheManager {
     return archiveFilePath;
   }
 
-  Future<void> deleteLoadedResources(List<String> nonRemovableResources,
+  Future<void> deleteLoadedResources(List<String> excludes,
       [int atLeastDaysOld = 0]) async {
     final directory = Directory(loadedResourcesDir);
 
@@ -40,8 +40,8 @@ class CacheManager {
       final relativePath = file.path
           .replaceAll('\\', '/')
           .substring(loadedResourcesDir.length + 1);
-      var nonRemovable = false;
-      for (var resource in nonRemovableResources) {
+      var keep = false;
+      for (var resource in excludes) {
         // relativePath.startsWith(resource): if we want to preserve a folder resource
         // resource.startsWith(relativePath): if we want to preserve a file resource
         //   for example:
@@ -49,11 +49,11 @@ class CacheManager {
         //   resource is 'github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k'
         if (relativePath.startsWith(resource) ||
             resource.startsWith(relativePath)) {
-          nonRemovable = true;
+          keep = true;
           break;
         }
       }
-      if (nonRemovable) continue;
+      if (keep) continue;
       if (atLeastDaysOld > 0) {
         var stat = await file.stat();
         if (DateTime.now().difference(stat.modified).inDays < atLeastDaysOld) {
@@ -81,8 +81,11 @@ class CacheManager {
     return deleteLoadedResources(currentResources, atLeastDaysOld);
   }
 
-  Future<void> cache(List<String> urls,
-      void Function(double, String) reportProgress, bool purgeOldCache) async {
+  Future<void> cache(
+      List<String> urls,
+      void Function(double, String) reportProgress,
+      bool purgeOldCache,
+      bool downloadMissing) async {
     final resourcesToDownload = <String>[];
     _resourcesMap = {};
 
@@ -106,8 +109,9 @@ class CacheManager {
 
       continue;
     }
-    await _download(resourcesToDownload, reportProgress);
-
+    if (downloadMissing) {
+      await _download(resourcesToDownload, reportProgress);
+    }
     if (purgeOldCache) {
       await purgeOutdatedCache(_oldFilesAgeInDays);
     }

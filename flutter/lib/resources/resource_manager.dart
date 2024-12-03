@@ -49,7 +49,8 @@ class ResourceManager {
       return resourceSystemPath;
     }
     if (isInternetResource(uri)) {
-      return cacheManager.get(uri)!;
+      final resourceSystemPath = cacheManager.get(uri);
+      return resourceSystemPath ?? '';
     }
     if (File(uri).isAbsolute) {
       return uri;
@@ -87,26 +88,16 @@ class ResourceManager {
     return _dataPrefix;
   }
 
-  Future<bool> isResourceExist(String? uri) async {
-    if (uri == null) return false;
-
-    final path = get(uri);
-
-    return path == '' ||
-        await File(path).exists() ||
-        await Directory(path).exists();
-  }
-
   Future<bool> isChecksumMatched(String filePath, String md5Checksum) async {
     var fileStream = File(filePath).openRead();
     final checksum = (await md5.bind(fileStream).first).toString();
     return checksum == md5Checksum;
   }
 
-  Future<void> handleResources(
-      List<Resource> resources, bool purgeOldCache) async {
+  Future<void> handleResources(List<Resource> resources, bool purgeOldCache,
+      bool downloadMissing) async {
     _loadingPath = '';
-    _loadingProgress = 0.0;
+    _loadingProgress = 0.001;
     _done = false;
     _onUpdate();
 
@@ -121,12 +112,16 @@ class ResourceManager {
     }
 
     final internetPaths = internetResources.map((e) => e.path).toList();
-    await cacheManager.cache(internetPaths,
-        (double currentProgress, String currentPath) {
-      _loadingProgress = currentProgress;
-      _loadingPath = currentPath;
-      _onUpdate();
-    }, purgeOldCache);
+    await cacheManager.cache(
+      internetPaths,
+      (double currentProgress, String currentPath) {
+        _loadingProgress = currentProgress;
+        _loadingPath = currentPath;
+        _onUpdate();
+      },
+      purgeOldCache,
+      downloadMissing,
+    );
 
     final checksumFailed = await validateResourcesChecksum(resources);
     if (checksumFailed.isNotEmpty) {
@@ -137,6 +132,8 @@ class ResourceManager {
     // delete downloaded archives to free up disk space
     await cacheManager.deleteArchives(internetPaths);
 
+    _loadingPath = '';
+    _loadingProgress = 1.0;
     _done = true;
     _onUpdate();
   }
@@ -172,15 +169,30 @@ class ResourceManager {
     resultManager = await ResultManager.create(applicationDirectory);
   }
 
-  Future<List<String>> validateResourcesExist(List<Resource> resources) async {
+  // Returns a map of { true: [existedResources], false: [missingResources] }
+  Future<Map<bool, List<String>>> validateResourcesExist(
+      List<Resource> resources) async {
     final missingResources = <String>[];
+    final existedResources = <String>[];
     for (var r in resources) {
-      if (!await isResourceExist(r.path)) {
-        final resolvedPath = get(r.path);
-        missingResources.add(resolvedPath);
+      final resolvedPath = get(r.path);
+      if (resolvedPath.isEmpty) {
+        missingResources.add(r.path);
+      } else {
+        final isResourceExist = await File(resolvedPath).exists() ||
+            await Directory(resolvedPath).exists();
+        if (isResourceExist) {
+          existedResources.add(r.path);
+        } else {
+          missingResources.add(r.path);
+        }
       }
     }
-    return missingResources;
+    final result = {
+      false: missingResources,
+      true: existedResources,
+    };
+    return result;
   }
 
   Future<List<Resource>> validateResourcesChecksum(

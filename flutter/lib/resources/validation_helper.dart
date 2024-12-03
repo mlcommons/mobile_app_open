@@ -18,6 +18,9 @@ class ValidationHelper {
     required this.selectedRunModes,
   });
 
+  List<Benchmark> get activeBenchmarks =>
+      benchmarkStore.benchmarks.where((e) => e.isActive).toList();
+
   Future<String> validateExternalResourcesDirectory(
       String errorDescription) async {
     final dataFolderPath = resourceManager.getDataFolder();
@@ -28,8 +31,11 @@ class ValidationHelper {
       return 'Data folder does not exist';
     }
     final resources = benchmarkStore.listResources(
-        modes: selectedRunModes, skipInactive: true);
-    final missing = await resourceManager.validateResourcesExist(resources);
+      modes: selectedRunModes,
+      benchmarks: activeBenchmarks,
+    );
+    final result = await resourceManager.validateResourcesExist(resources);
+    final missing = result[false] ?? [];
     if (missing.isEmpty) return '';
 
     return errorDescription +
@@ -38,7 +44,9 @@ class ValidationHelper {
 
   Future<String> validateOfflineMode(String errorDescription) async {
     final resources = benchmarkStore.listResources(
-        modes: selectedRunModes, skipInactive: true);
+      modes: selectedRunModes,
+      benchmarks: activeBenchmarks,
+    );
     final internetResources = filterInternetResources(resources);
     if (internetResources.isEmpty) return '';
 
@@ -46,5 +54,15 @@ class ValidationHelper {
         internetResources
             .mapIndexed((i, element) => '\n${i + 1}) $element')
             .join();
+  }
+
+  Future<Map<bool, List<String>>> validateResourcesExist(
+      Benchmark benchmark, BenchmarkRunMode mode) async {
+    final resources = benchmarkStore.listResources(
+      modes: [mode],
+      benchmarks: [benchmark],
+    );
+    final result = await resourceManager.validateResourcesExist(resources);
+    return result;
   }
 }
