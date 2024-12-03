@@ -10,7 +10,8 @@
 class TsEmbeddingParser {
  public:
   bool parse_pickle(const std::string& filename);
-  std::vector<float> get_timestep_embedding(int32_t steps, int32_t step_index) const;
+  std::vector<float> get_timestep_embedding(int32_t steps,
+                                            int32_t step_index) const;
   std::vector<int32_t> get_timesteps(int32_t steps) const;
 
  private:
@@ -27,7 +28,8 @@ class EmbeddingManager {
   }
 
   bool load_timestep_embeddings(const std::string& filename);
-  std::vector<float> get_timestep_embedding(int32_t timestep, int num_steps) const;
+  std::vector<float> get_timestep_embedding(int32_t timestep,
+                                            int num_steps) const;
   std::vector<int32_t> get_timesteps(int num_steps) const;
 
  private:

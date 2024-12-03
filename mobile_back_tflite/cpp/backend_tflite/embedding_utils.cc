@@ -1,4 +1,5 @@
 #include "embedding_utils.h"
+
 #include <iostream>
 
 bool TsEmbeddingParser::parse_pickle(const std::string& filename) {
@@ -13,13 +14,15 @@ bool TsEmbeddingParser::parse_pickle(const std::string& filename) {
   uint32_t num_timesteps;
   file.read(reinterpret_cast<char*>(&num_timesteps), sizeof(uint32_t));
   timesteps.resize(num_timesteps);
-  file.read(reinterpret_cast<char*>(timesteps.data()), num_timesteps * sizeof(int32_t));
+  file.read(reinterpret_cast<char*>(timesteps.data()),
+            num_timesteps * sizeof(int32_t));
 
   // Read embeddings array
   std::vector<std::vector<float>> embeddings(num_timesteps);
   for (auto& emb : embeddings) {
     emb.resize(EMBEDDING_DIM);
-    file.read(reinterpret_cast<char*>(emb.data()), EMBEDDING_DIM * sizeof(float));
+    file.read(reinterpret_cast<char*>(emb.data()),
+              EMBEDDING_DIM * sizeof(float));
   }
 
   // Store in maps
@@ -29,7 +32,8 @@ bool TsEmbeddingParser::parse_pickle(const std::string& filename) {
   return true;
 }
 
-std::vector<float> TsEmbeddingParser::get_timestep_embedding(int32_t steps, int32_t step_index) const {
+std::vector<float> TsEmbeddingParser::get_timestep_embedding(
+    int32_t steps, int32_t step_index) const {
   auto emb_it = embeddings_.find(steps);
   if (emb_it == embeddings_.end() || step_index >= emb_it->second.size()) {
     return {};
@@ -50,7 +54,8 @@ bool EmbeddingManager::load_timestep_embeddings(const std::string& filename) {
   return ts_parser_->parse_pickle(filename);
 }
 
-std::vector<float> EmbeddingManager::get_timestep_embedding(int32_t timestep, int num_steps) const {
+std::vector<float> EmbeddingManager::get_timestep_embedding(
+    int32_t timestep, int num_steps) const {
   if (!ts_parser_) return {};
   return ts_parser_->get_timestep_embedding(num_steps, timestep);
 }
