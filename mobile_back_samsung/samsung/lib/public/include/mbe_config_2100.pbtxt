@@ -26,7 +26,7 @@ benchmark_setting {
       value: "Float32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/ic.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/ic.nnc"
       model_checksum: "955ef2ac3c134820eab901f3dac9f732"
     }
   }
@@ -50,7 +50,7 @@ benchmark_setting {
       value: "Uint8"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/is.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/is.nnc"
       model_checksum: "b501ed669da753b08a151639798af37e"
     }
   }
@@ -74,7 +74,7 @@ benchmark_setting {
       value: "Uint8"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/sm_uint8.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/sm_uint8.nnc"
       model_checksum: "483eee2df253ecc135a6e8701cc0c909"
     }
   }
@@ -98,7 +98,7 @@ benchmark_setting {
       value: "Float32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/od.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/od.nnc"
       model_checksum: "a3c7b5e8d6b978c05807e8926584758c"
     }
   }
@@ -122,7 +122,7 @@ benchmark_setting {
       value: "Float32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/lu.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/lu.nnc"
       model_checksum: "215ee3b9224d15dc50b30d56fa7b7396"
     }
   }
@@ -147,7 +147,7 @@ benchmark_setting {
       value: "Float32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/ic_offline.nncgo"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/ic_offline.nncgo"
       model_checksum: "c38acf6c66ca32c525c14ce25ead823a"
     }
   }
