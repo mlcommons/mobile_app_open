@@ -31,11 +31,10 @@ limitations under the License.
 #include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
 #endif
 #include "resize_argmax_op.h"
-#include "tflite_settings_pixel.h"
-#include "thread_pool.h"
-
 #include "single_model_pipeline.h"
 #include "stable_diffusion_pipeline.h"
+#include "tflite_settings_pixel.h"
+#include "thread_pool.h"
 
 #define N_OFFLINE_INTERPRETERS 8
 
@@ -238,19 +237,22 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
 }
 
 // Vendor name who create this backend.
-const char* SingleModelPipeline::backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
+const char* SingleModelPipeline::backend_vendor_name(
+    mlperf_backend_ptr_t backend_ptr) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   return backend_data->vendor;
 }
 
 // TODO: Return the name of the accelerator.
-const char* SingleModelPipeline::backend_accelerator_name(mlperf_backend_ptr_t backend_ptr) {
+const char* SingleModelPipeline::backend_accelerator_name(
+    mlperf_backend_ptr_t backend_ptr) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   return backend_data->accelerator;
 }
 
 // Return the name of this backend.
-const char* SingleModelPipeline::backend_name(mlperf_backend_ptr_t backend_ptr) {
+const char* SingleModelPipeline::backend_name(
+    mlperf_backend_ptr_t backend_ptr) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   return backend_data->name;
 }
@@ -268,7 +270,8 @@ void SingleModelPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
 }
 
 // Run the inference for a sample.
-mlperf_status_t SingleModelPipeline::backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+mlperf_status_t SingleModelPipeline::backend_issue_query(
+    mlperf_backend_ptr_t backend_ptr) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   auto task = [&backend_data](int index) -> TfLiteStatus {
     return TfLiteInterpreterInvoke(backend_data->interpreter[index]);
@@ -296,19 +299,21 @@ mlperf_status_t SingleModelPipeline::backend_issue_query(mlperf_backend_ptr_t ba
 }
 
 // Flush the staged queries immediately.
-mlperf_status_t SingleModelPipeline::backend_flush_queries(mlperf_backend_ptr_t backend_ptr) {
+mlperf_status_t SingleModelPipeline::backend_flush_queries(
+    mlperf_backend_ptr_t backend_ptr) {
   return MLPERF_SUCCESS;
 }
 
 // Return the number of inputs of the model.
-int32_t SingleModelPipeline::backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
+int32_t SingleModelPipeline::backend_get_input_count(
+    mlperf_backend_ptr_t backend_ptr) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   return TfLiteInterpreterGetInputTensorCount(backend_data->interpreter[0]);
 }
 
 // Return the type of the ith input.
-mlperf_data_t SingleModelPipeline::backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
-                                            int32_t i) {
+mlperf_data_t SingleModelPipeline::backend_get_input_type(
+    mlperf_backend_ptr_t backend_ptr, int32_t i) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   const TfLiteTensor* tensor =
       TfLiteInterpreterGetInputTensor(backend_data->interpreter[0], i);
@@ -320,9 +325,9 @@ mlperf_data_t SingleModelPipeline::backend_get_input_type(mlperf_backend_ptr_t b
 }
 
 // Set the data for ith input.
-mlperf_status_t SingleModelPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
-                                         int32_t batch_index, int32_t i,
-                                         void* data) {
+mlperf_status_t SingleModelPipeline::backend_set_input(
+    mlperf_backend_ptr_t backend_ptr, int32_t batch_index, int32_t i,
+    void* data) {
   cpu_set_t cpuset;
   CPU_ZERO(&cpuset);
   CPU_SET(6, &cpuset);
@@ -343,14 +348,15 @@ mlperf_status_t SingleModelPipeline::backend_set_input(mlperf_backend_ptr_t back
 }
 
 // Return the number of outputs for the model.
-int32_t SingleModelPipeline::backend_get_output_count(mlperf_backend_ptr_t backend_ptr) {
+int32_t SingleModelPipeline::backend_get_output_count(
+    mlperf_backend_ptr_t backend_ptr) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   return TfLiteInterpreterGetOutputTensorCount(backend_data->interpreter[0]);
 }
 
 // Return the type of ith output.
-mlperf_data_t SingleModelPipeline::backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
-                                             int32_t i) {
+mlperf_data_t SingleModelPipeline::backend_get_output_type(
+    mlperf_backend_ptr_t backend_ptr, int32_t i) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   const TfLiteTensor* tensor =
       TfLiteInterpreterGetOutputTensor(backend_data->interpreter[0], i);
@@ -362,9 +368,9 @@ mlperf_data_t SingleModelPipeline::backend_get_output_type(mlperf_backend_ptr_t 
 }
 
 // Get the data from ith output.
-mlperf_status_t SingleModelPipeline::backend_get_output(mlperf_backend_ptr_t backend_ptr,
-                                          uint32_t batch_index, int32_t i,
-                                          void** data) {
+mlperf_status_t SingleModelPipeline::backend_get_output(
+    mlperf_backend_ptr_t backend_ptr, uint32_t batch_index, int32_t i,
+    void** data) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   const int shard_index = batch_index / backend_data->real_batch_size;
 
@@ -405,18 +411,16 @@ mlperf_status_t SingleModelPipeline::backend_get_output(mlperf_backend_ptr_t bac
 
 void SingleModelPipeline::backend_convert_inputs(
     mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
-    uint8_t *data) {
-} 
+    uint8_t* data) {}
 
 void SingleModelPipeline::backend_convert_outputs(
     mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
-    uint8_t *data) {
-} 
+    uint8_t* data) {}
 
-void *SingleModelPipeline::backend_get_buffer(size_t n) {
+void* SingleModelPipeline::backend_get_buffer(size_t n) {
   return ::operator new(n);
 }
 
-void SingleModelPipeline::backend_release_buffer(void *p) {
+void SingleModelPipeline::backend_release_buffer(void* p) {
   ::operator delete(p);
 }
