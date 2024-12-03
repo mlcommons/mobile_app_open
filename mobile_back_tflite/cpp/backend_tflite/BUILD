@@ -37,6 +37,16 @@ pbtxt2header(
 )
 
 cc_library(
+    name = "embedding_utils",
+    srcs = ["embedding_utils.cc"],
+    hdrs = ["embedding_utils.h"],
+    deps = [
+        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "tflite_c",
     srcs = [
         "embedding_utils.cc",
@@ -70,6 +80,7 @@ cc_library(
     }),
     deps = [
         ":tflite_settings",
+        ":embedding_utils",
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
