@@ -40,10 +40,10 @@ cc_library(
     name = "embedding_utils",
     srcs = ["embedding_utils.cc"],
     hdrs = ["embedding_utils.h"],
+    visibility = ["//visibility:public"],
     deps = [
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -79,8 +79,8 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        ":tflite_settings",
         ":embedding_utils",
+        ":tflite_settings",
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",

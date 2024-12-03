@@ -112,8 +112,7 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   }
 
   std::string ts_embedding_path =
-      std::string(model_path) +
-      "/timestep_steps_20_int32_embedding_1x1280_float32.bin.ts";
+      std::string(model_path) + "/timestep_embeddings_data.pkl";
   if (!EmbeddingManager::getInstance().load_timestep_embeddings(
           ts_embedding_path)) {
     LOG(ERROR) << "Failed to load timestep embeddings from "
