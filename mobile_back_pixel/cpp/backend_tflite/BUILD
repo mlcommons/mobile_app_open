@@ -76,7 +76,6 @@ cc_library(
             "-fno-omit-frame-pointer",
         ],
         "//conditions:default": [
-            "-Imobile_back_pixel/cpp/backend_tflite",
             "-Imobile_back_tflite/cpp/backend_tflite",
         ],
     }),
