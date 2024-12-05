@@ -331,6 +331,49 @@ jobs:
             --device model=OP515BL1,version=33,locale=en,orientation=portrait \
             --client-details=buildNumber=${{ github.run_number }}
 
+  test-android-apk-samsung:
+    needs: build-android-apk
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+      - name: Download test APK
+        run: |
+          gsutil cp $GCLOUD_BUCKET_PATH/test-main-samsung.apk /tmp/test-main-samsung.apk
+          gsutil cp $GCLOUD_BUCKET_PATH/test-helper-samsung.apk /tmp/test-helper-samsung.apk
+      - name: Upload main app
+        run: |
+          curl -u "${{ secrets.BROWSERSTACK_API_ACCESS_KEY }}" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
+          -F "file=@/tmp/test-main-samsung.apk" \
+          -F "custom_id=MLPerfMobileApp-${{ github.run_number }}"
+      - name: Upload test suite
+        run: |
+          curl -u "${{ secrets.BROWSERSTACK_API_ACCESS_KEY }}" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
+          -F "file=@/tmp/test-helper-samsung.apk" \
+          -F "custom_id=MLPerfMobileTestSuite-${{ github.run_number }}"
+      - name: Trigger App Automate for [Samsung Galaxy S24]
+        run: |
+          curl -u "${{ secrets.BROWSERSTACK_API_ACCESS_KEY }}" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/build" \
+          -d '{
+          "devices": ["Samsung Galaxy S24-14.0"], 
+          "deviceLogs": true, 
+          "project" : "mobile-app-build-290400", 
+          "app": "MLPerfMobileApp-${{ github.run_number }}", 
+          "testSuite": "MLPerfMobileTestSuite-${{ github.run_number }}", 
+          "buildTag": ${{ github.run_number }}
+          }' \
+          -H "Content-Type: application/json"
+
   deploy-playstore:
     needs:
       - build-android-apk
