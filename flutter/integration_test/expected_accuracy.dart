@@ -42,7 +42,7 @@ const Map<String, Interval> _objectDetection = {
   'samsung_npu': Interval(min: 0.36, max: 0.39),
 };
 
-const Map<String, Interval> _imageSegmentation = {
+const Map<String, Interval> _imageSegmentationV2 = {
   'cpu': Interval(min: 0.38, max: 0.40),
   'npu': Interval(min: 0.33, max: 0.34),
   'tpu': Interval(min: 0.33, max: 0.34),
@@ -98,7 +98,7 @@ const Map<String, Interval> _stableDiffusion = {
 const benchmarkExpectedAccuracy = {
   BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
-  BenchmarkId.imageSegmentationV2: _imageSegmentation,
+  BenchmarkId.imageSegmentationV2: _imageSegmentationV2,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.stableDiffusion: _stableDiffusion,

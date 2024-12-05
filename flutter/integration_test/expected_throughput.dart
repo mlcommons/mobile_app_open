@@ -54,7 +54,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
     _kDN2103: Interval(min: 5, max: 90),
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 800, max: 1000),
+    _kS24: Interval(min: 700, max: 1000),
   },
 };
 
@@ -81,7 +81,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kDN2103: Interval(min: 120, max: 210),
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 1800, max: 2500),
+    _kS24: Interval(min: 1500, max: 2400),
   },
 };
 
@@ -135,7 +135,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kDN2103: Interval(min: 1, max: 6),
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 250, max: 400),
+    _kS24: Interval(min: 220, max: 350),
   },
 };
 
@@ -162,7 +162,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kDN2103: Interval(min: 5, max: 15),
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 120, max: 180),
+    _kS24: Interval(min: 100, max: 180),
   },
 };
 
@@ -217,7 +217,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
     _kDN2103: Interval(min: 5, max: 90),
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 1000, max: 1200),
+    _kS24: Interval(min: 900, max: 1200),
   },
 };
 
