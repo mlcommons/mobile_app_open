@@ -334,6 +334,7 @@ jobs:
   test-android-apk-samsung:
     needs: build-android-apk
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
@@ -350,29 +351,24 @@ jobs:
           gsutil cp $GCLOUD_BUCKET_PATH/test-helper-samsung.apk /tmp/test-helper-samsung.apk
       - name: Upload main app
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_API_ACCESS_KEY }}" \
+          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
           -F "file=@/tmp/test-main-samsung.apk" \
           -F "custom_id=MLPerfMobileApp-${{ github.run_number }}"
       - name: Upload test suite
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_API_ACCESS_KEY }}" \
+          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
           -F "file=@/tmp/test-helper-samsung.apk" \
           -F "custom_id=MLPerfMobileTestSuite-${{ github.run_number }}"
       - name: Trigger App Automate for [Samsung Galaxy S24]
+        env:
+          BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_APP: MLPerfMobileApp-${{ github.run_number }}
+          BROWSERSTACK_TEST_SUITE: MLPerfMobileTestSuite-${{ github.run_number }}
+          BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_API_ACCESS_KEY }}" \
-          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/build" \
-          -d '{
-          "devices": ["Samsung Galaxy S24-14.0"], 
-          "deviceLogs": true, 
-          "project" : "mobile-app-build-290400", 
-          "app": "MLPerfMobileApp-${{ github.run_number }}", 
-          "testSuite": "MLPerfMobileTestSuite-${{ github.run_number }}", 
-          "buildTag": ${{ github.run_number }}
-          }' \
-          -H "Content-Type: application/json"
+          bash .github/workflows/scripts/browserstack-app-automate.sh
 
   deploy-playstore:
     needs:
