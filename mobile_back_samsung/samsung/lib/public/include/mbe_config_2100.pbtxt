@@ -15,7 +15,7 @@ benchmark_setting {
   framework: "ENN"
   delegate_choice: {
     delegate_name: "ENN_NPU"
-    accelerator_name: "npu"
+    accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     custom_setting {
       id: "i_type"
@@ -39,7 +39,7 @@ benchmark_setting {
   framework: "ENN"
   delegate_choice: {
     delegate_name: "ENN_NPU"
-    accelerator_name: "npu"
+    accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     custom_setting {
       id: "i_type"
@@ -63,7 +63,7 @@ benchmark_setting {
   framework: "ENN"
   delegate_choice: {
     delegate_name: "ENN_NPU"
-    accelerator_name: "npu"
+    accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     custom_setting {
       id: "i_type"
@@ -87,7 +87,7 @@ benchmark_setting {
   framework: "ENN"
   delegate_choice: {
     delegate_name: "ENN_NPU"
-    accelerator_name: "npu"
+    accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     custom_setting {
       id: "i_type"
