@@ -335,6 +335,9 @@ jobs:
     needs: build-android-apk
     runs-on: ubuntu-22.04
     timeout-minutes: 30
+    env:
+      MAIN_APK_NAME: test-main-samsung-${{ github.run_number }}.apk
+      HELPER_APK_NAME: test-helper-samsung-${{ github.run_number }}.apk
     steps:
       - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
@@ -347,25 +350,25 @@ jobs:
           version: '>= 363.0.0'
       - name: Download test APK
         run: |
-          gsutil cp $GCLOUD_BUCKET_PATH/test-main-samsung.apk /tmp/test-main-samsung.apk
-          gsutil cp $GCLOUD_BUCKET_PATH/test-helper-samsung.apk /tmp/test-helper-samsung.apk
+          gsutil cp $GCLOUD_BUCKET_PATH/test-main-samsung.apk /tmp/$MAIN_APK_NAME
+          gsutil cp $GCLOUD_BUCKET_PATH/test-helper-samsung.apk /tmp/$HELPER_APK_NAME
       - name: Upload main app
         run: |
           curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
-          -F "file=@/tmp/test-main-samsung.apk" \
-          -F "custom_id=MLPerfMobileApp-${{ github.run_number }}"
+          -F "file=@/tmp/$MAIN_APK_NAME" \
+          -F "custom_id=$MAIN_APK_NAME"
       - name: Upload test suite
         run: |
           curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
-          -F "file=@/tmp/test-helper-samsung.apk" \
-          -F "custom_id=MLPerfMobileTestSuite-${{ github.run_number }}"
+          -F "file=@/tmp/$HELPER_APK_NAME" \
+          -F "custom_id=$HELPER_APK_NAME"
       - name: Trigger App Automate for [Samsung Galaxy S24]
         env:
           BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
-          BROWSERSTACK_APP: MLPerfMobileApp-${{ github.run_number }}
-          BROWSERSTACK_TEST_SUITE: MLPerfMobileTestSuite-${{ github.run_number }}
+          BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
+          BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
           BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
         run: |
           bash .github/workflows/scripts/browserstack-app-automate.sh

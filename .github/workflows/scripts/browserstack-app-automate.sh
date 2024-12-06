@@ -27,7 +27,7 @@ if [[ -z "$CREDENTIALS" ]]; then
 fi
 
 if [[ -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" ]]; then
-  echo "Error: Environment variables APP, TEST_SUITE and BUILD_TAG must be set."
+  echo "Error: Environment variables BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE and BROWSERSTACK_BUILD_TAG must be set."
   exit 1
 fi
 
@@ -60,8 +60,7 @@ check_build_status() {
   local build_id=$1
   local response=$(curl -s -u "$CREDENTIALS" -X GET "$STATUS_URL/$build_id")
   local status=$(echo "$response" | jq -r '.status')
-  echo "Build Status: $status"
-
+  echo "$(date +'%Y-%m-%d %H:%M:%S') Build Status: $status"
   if [[ "$status" == "passed" ]]; then
     echo "Build completed successfully!"
     exit 0
@@ -79,6 +78,5 @@ echo "See the build status at: https://app-automate.browserstack.com/dashboard/v
 echo "Checking build status..."
 while true; do
   check_build_status "$BUILD_ID"
-  echo "Retrying in $RETRY_INTERVAL seconds..."
   sleep "$RETRY_INTERVAL"
 done
