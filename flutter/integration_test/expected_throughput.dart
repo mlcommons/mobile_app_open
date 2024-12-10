@@ -7,11 +7,12 @@ value: Interval of expected throughput
 key: model_code (on Android or iOS) or cpuFullName (on Windows)
 */
 
-const _kTFLiteBackend = 'libtflitebackend';
-const _kPixelBackend = 'libtflitepixelbackend';
-const _kCoreMLBackend = 'libcoremlbackend';
-const _kQtiBackend = 'libqtibackend';
-const _kMediatekBackend = 'libtfliteneuronbackend';
+const _kTFLiteBackend = BackendId.tflite;
+const _kPixelBackend = BackendId.pixel;
+const _kCoreMLBackend = BackendId.apple;
+const _kQtiBackend = BackendId.qti;
+const _kMediatekBackend = BackendId.mediatek;
+const _kSamsungBackend = BackendId.samsung;
 
 // Windows
 // Google Cloud Build n2-standard-4 machine
@@ -24,6 +25,7 @@ const _kPixel5 = 'Pixel 5'; // Google Pixel 5
 const _kPixel6 = 'Pixel 6'; // Google Pixel 6
 const _kS22Ultra = 'SM-S908U1'; // Galaxy S22 Ultra
 const _kDN2103 = 'DN2103'; // OnePlus DN2103
+const _kS24 = 'SM-S921B'; // Galaxy S24
 
 // iOS
 const _kIphoneOnGitHubAction = 'iPhone16,2';
@@ -51,6 +53,9 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 90),
   },
+  _kSamsungBackend: {
+    _kS24: Interval(min: 700, max: 1000),
+  },
 };
 
 const Map<String, Map<String, Interval>> _objectDetection = {
@@ -74,6 +79,9 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 120, max: 210),
+  },
+  _kSamsungBackend: {
+    _kS24: Interval(min: 1500, max: 2400),
   },
 };
 
@@ -99,6 +107,9 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
   _kMediatekBackend: {
     _kDN2103: Interval(min: 45, max: 70),
   },
+  _kSamsungBackend: {
+    _kS24: Interval(min: 1000, max: 1500),
+  },
 };
 
 const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
@@ -123,6 +134,9 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   _kMediatekBackend: {
     _kDN2103: Interval(min: 1, max: 6),
   },
+  _kSamsungBackend: {
+    _kS24: Interval(min: 220, max: 350),
+  },
 };
 
 const Map<String, Map<String, Interval>> _superResolution = {
@@ -146,6 +160,9 @@ const Map<String, Map<String, Interval>> _superResolution = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 15),
+  },
+  _kSamsungBackend: {
+    _kS24: Interval(min: 100, max: 180),
   },
 };
 
@@ -172,6 +189,9 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
   _kMediatekBackend: {
     _kDN2103: Interval(min: 0, max: 100),
   },
+  _kSamsungBackend: {
+    _kS24: Interval(min: 0, max: 100),
+  },
 };
 
 const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
@@ -195,6 +215,9 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 90),
+  },
+  _kSamsungBackend: {
+    _kS24: Interval(min: 900, max: 1200),
   },
 };
 
