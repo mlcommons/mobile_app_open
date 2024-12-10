@@ -378,15 +378,19 @@ jobs:
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
           -F "file=@/tmp/$HELPER_APK_NAME" \
           -F "custom_id=$HELPER_APK_NAME"
-      - name: Trigger App Automate for [Samsung Galaxy S24]
+      - uses: nick-fields/retry@v3
+        name: Trigger App Automate for [Samsung Galaxy S24]
         env:
           BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
           BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
           BROWSERSTACK_DEVICES: '["Samsung Galaxy S24-14.0"]'
-        run: |
-          bash .github/workflows/scripts/browserstack-app-automate.sh
+        with:
+          timeout_minutes: 45
+          max_attempts: 2
+          command: |
+            bash .github/workflows/scripts/browserstack-app-automate.sh
 
   test-android-apk-unified:
     needs: build-android-apk
