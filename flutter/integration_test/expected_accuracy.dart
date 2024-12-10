@@ -25,7 +25,7 @@ const Map<String, Interval> _imageClassificationV2 = {
   'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
   'snpe_dsp': Interval(min: 0.88, max: 0.91),
   'psnpe_dsp': Interval(min: 0.88, max: 0.91),
-  'neuron-mdla': Interval(min: 0.79, max: 0.81),
+  'neuron-mdla': Interval(min: 0.79, max: 0.91),
   'samsung_npu': Interval(min: 0.99, max: 1.0),
 };
 
@@ -38,7 +38,7 @@ const Map<String, Interval> _objectDetection = {
   'cpu&gpu&ane': Interval(min: 0.45, max: 0.46),
   'snpe_dsp': Interval(min: 0.32, max: 0.35),
   'psnpe_dsp': Interval(min: 0.32, max: 0.35),
-  'neuron': Interval(min: 0.28, max: 0.31),
+  'neuron': Interval(min: 0.28, max: 0.35),
   'samsung_npu': Interval(min: 0.36, max: 0.39),
 };
 

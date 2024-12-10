@@ -20,13 +20,16 @@ const _kCloudBuildX23 = 'Intel Xeon 2.30GHz';
 const _kCloudBuildX28 = 'Intel Xeon 2.80GHz';
 const _kRyzen5600 = 'AMD Ryzen 5 5600X 6-Core';
 
-// Android
+// Android devices on Firebase TestLab
 const _kPixel5 = 'Pixel 5'; // Google Pixel 5
 const _kPixel6 = 'Pixel 6'; // Google Pixel 6
-const _kPixel9Pro = 'Pixel 9 Pro'; // Google Pixel 9 Pro
-const _kS22Ultra = 'SM-S908U1'; // Galaxy S22 Ultra
+const _kS22Ultra = 'SM-S908U1'; // Samsung Galaxy S22 Ultra
 const _kDN2103 = 'DN2103'; // OnePlus DN2103
-const _kS24 = 'SM-S921B'; // Galaxy S24
+
+// Android devices on BrowserStack App Automate
+const _kPixel9Pro = 'Pixel 9 Pro'; // Google Pixel 9 Pro
+const _kS24 = 'SM-S921B'; // Samsung Galaxy S24
+const _kS10Plus = 'SM-X826B'; // Samsung Galaxy Tab S10 Plus
 
 // iOS
 const _kIphoneOnGitHubAction = 'iPhone16,2';
@@ -54,6 +57,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 90),
+    _kS10Plus: Interval(min: 400, max: 800)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 700, max: 1000),
@@ -82,6 +86,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 120, max: 210),
+    _kS10Plus: Interval(min: 1200, max: 1800)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 1400, max: 2400),
@@ -110,6 +115,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 45, max: 70),
+    _kS10Plus: Interval(min: 800, max: 1400)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 900, max: 1500),
@@ -138,6 +144,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 1, max: 6),
+    _kS10Plus: Interval(min: 100, max: 300)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 220, max: 350),
@@ -166,6 +173,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 15),
+    _kS10Plus: Interval(min: 150, max: 250)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 100, max: 180),
@@ -195,6 +203,7 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 0, max: 100),
+    _kS10Plus: Interval(min: 0, max: 100)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 0, max: 100),
@@ -223,6 +232,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 90),
+    _kS10Plus: Interval(min: 700, max: 1200)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 900, max: 1200),

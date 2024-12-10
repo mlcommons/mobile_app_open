@@ -434,6 +434,7 @@ jobs:
           BROWSERSTACK_DEVICES: >-
             ["Samsung Galaxy S24-14.0",
             "Samsung Galaxy S24 Ultra-14.0",
+            "Samsung Galaxy Tab S10 Plus-14.0",
             "Google Pixel 9 Pro-15.0"]
         run: |
           bash .github/workflows/scripts/browserstack-app-automate.sh
