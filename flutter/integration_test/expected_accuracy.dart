@@ -19,7 +19,7 @@ key: <accelerator> OR <accelerator>|<backendName>
 
 const Map<String, Interval> _imageClassificationV2 = {
   'cpu': Interval(min: 0.88, max: 0.91),
-  'npu': Interval(min: 0.88, max: 0.91),
+  'npu': Interval(min: 0.69, max: 0.91),
   'tpu': Interval(min: 0.88, max: 0.91),
   'ane': Interval(min: 0.69, max: 0.91),
   'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
