@@ -5,7 +5,6 @@
 set -e
 
 # Build parameters
-DEVICES='["Samsung Galaxy S24-14.0"]'
 PROJECT="mobile-app-build-290400"
 DEVICE_LOGS=true
 RETRY_INTERVAL=10
@@ -19,6 +18,7 @@ CREDENTIALS="${BROWSERSTACK_CREDENTIALS:-}"
 APP="${BROWSERSTACK_APP:-}"
 TEST_SUITE="${BROWSERSTACK_TEST_SUITE:-}"
 BUILD_TAG="${BROWSERSTACK_BUILD_TAG:-}"
+DEVICES="${BROWSERSTACK_DEVICES:-}"
 
 # Validate required environment variables
 if [[ -z "$CREDENTIALS" ]]; then
@@ -26,8 +26,10 @@ if [[ -z "$CREDENTIALS" ]]; then
   exit 1
 fi
 
-if [[ -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" ]]; then
-  echo "Error: Environment variables BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE and BROWSERSTACK_BUILD_TAG must be set."
+if [[ -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" || -z "$DEVICES" ]]; then
+  echo "Error: Environment variables"\
+  "BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE, BROWSERSTACK_BUILD_TAG and BROWSERSTACK_DEVICES"\
+  "must be set."
   exit 1
 fi
 
