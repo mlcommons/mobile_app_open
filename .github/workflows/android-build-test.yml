@@ -167,6 +167,20 @@ jobs:
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-samsung.apk
           gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-samsung.apk
+      - name: Build and upload test APK for all backends
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 1
+          WITH_PIXEL: 1
+          WITH_MEDIATEK: 1
+          WITH_QTI: 1
+          WITH_SAMSUNG: 1
+          WITH_APPLE: 0
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-unified.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-unified.apk
       - name: Build Android release APK with all backends
         env:
           OFFICIAL_BUILD: true
