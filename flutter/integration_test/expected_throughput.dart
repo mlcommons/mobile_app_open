@@ -29,6 +29,7 @@ const _kDN2103 = 'DN2103'; // OnePlus DN2103
 // Android devices on BrowserStack App Automate
 const _kPixel9Pro = 'Pixel 9 Pro'; // Google Pixel 9 Pro
 const _kS24 = 'SM-S921B'; // Samsung Galaxy S24
+const _kS24Ultra = 'SM-S928B'; // Samsung Galaxy S24 Ultra
 const _kS10Plus = 'SM-X826B'; // Samsung Galaxy Tab S10 Plus
 
 // iOS
@@ -54,6 +55,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 250, max: 400),
+    _kS24Ultra: Interval(min: 800, max: 1400),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 90),
@@ -83,6 +85,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 700, max: 1400),
+    _kS24Ultra: Interval(min: 1800, max: 2400),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 120, max: 210),
@@ -112,6 +115,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 400, max: 750),
+    _kS24Ultra: Interval(min: 1200, max: 1600),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 45, max: 70),
@@ -141,6 +145,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 100, max: 200),
+    _kS24Ultra: Interval(min: 250, max: 450),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 1, max: 6),
@@ -170,6 +175,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 25, max: 75),
+    _kS24Ultra: Interval(min: 120, max: 180),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 15),
@@ -200,6 +206,7 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 0, max: 100),
+    _kS24Ultra: Interval(min: 0, max: 100),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 0, max: 100),
@@ -229,6 +236,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 250, max: 450),
+    _kS24Ultra: Interval(min: 900, max: 1400),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 90),
