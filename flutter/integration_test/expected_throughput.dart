@@ -23,6 +23,7 @@ const _kRyzen5600 = 'AMD Ryzen 5 5600X 6-Core';
 // Android
 const _kPixel5 = 'Pixel 5'; // Google Pixel 5
 const _kPixel6 = 'Pixel 6'; // Google Pixel 6
+const _kPixel9Pro = 'Pixel 9 Pro'; // Google Pixel 9 Pro
 const _kS22Ultra = 'SM-S908U1'; // Galaxy S22 Ultra
 const _kDN2103 = 'DN2103'; // OnePlus DN2103
 const _kS24 = 'SM-S921B'; // Galaxy S24
@@ -46,6 +47,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 600),
+    _kPixel9Pro: Interval(min: 100, max: 600),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 250, max: 400),
@@ -73,6 +75,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 200, max: 500),
+    _kPixel9Pro: Interval(min: 200, max: 500),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 700, max: 1400),
@@ -100,6 +103,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 190),
+    _kPixel9Pro: Interval(min: 200, max: 500),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 400, max: 750),
@@ -127,6 +131,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 2, max: 85),
+    _kPixel9Pro: Interval(min: 60, max: 150),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 100, max: 200),
@@ -154,6 +159,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 7, max: 17),
+    _kPixel9Pro: Interval(min: 30, max: 70),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 25, max: 75),
@@ -182,6 +188,7 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 0, max: 100),
+    _kPixel9Pro: Interval(min: 0, max: 100),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 0, max: 100),
@@ -209,6 +216,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 700),
+    _kPixel9Pro: Interval(min: 300, max: 700),
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 250, max: 450),
