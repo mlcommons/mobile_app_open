@@ -18,7 +18,7 @@ benchmark_setting {
     accelerator_name: "neuron-mdla"
     accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilenet_edgetpu_224_1.0_uint8.tflite"
       model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
     }
     batch_size: 1
@@ -28,7 +28,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilenet_edgetpu_224_1.0_uint8.tflite"
       model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
     }
   }
@@ -37,7 +37,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilenet_edgetpu_224_1.0_float.tflite"
       model_checksum: "0da3fa6adc8bbaaeb0b5647e2d46c8a4"
     }
   }
@@ -52,7 +52,7 @@ benchmark_setting {
     accelerator_name: "neuron-mdla"
     accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite"
       model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
     }
   }
@@ -61,7 +61,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite"
       model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
     }
   }
@@ -70,7 +70,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
       model_checksum: "b57cc2a027607c3b36873a15ace84acb"
     }
   }
@@ -85,7 +85,7 @@ benchmark_setting {
     accelerator_name: "neuron-mdla"
     accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilenet_edgetpu_224_1.0_uint8.tflite"
       model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
     }
     batch_size: 256
@@ -95,7 +95,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilenet_edgetpu_224_1.0_uint8.tflite"
       model_checksum: "008dfcb1c1962fedbeef1b998d4c84f2"
     }
   }
@@ -104,7 +104,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilenet_edgetpu_224_1.0_float.tflite"
       model_checksum: "0da3fa6adc8bbaaeb0b5647e2d46c8a4"
     }
   }
@@ -119,7 +119,7 @@ benchmark_setting {
     accelerator_name: "neuron-mdla"
     accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite"
       model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
     }
     batch_size: 256
@@ -129,7 +129,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mobilenetV4/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite"
       model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
     }
   }
@@ -138,7 +138,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/releases/download/model_upload/MobileNetV4-Conv-Large-fp32.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
       model_checksum: "b57cc2a027607c3b36873a15ace84acb"
     }
   }
@@ -153,7 +153,7 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "MediaTek NN accelerator + CPU via the Neuron Delegate"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet_qat.tflite"
       model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
     }
   }
@@ -162,7 +162,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet_qat.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet_qat.tflite"
       model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
     }
   }
@@ -171,7 +171,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet.tflite"
       model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
     }
   }
@@ -186,7 +186,7 @@ benchmark_setting {
     accelerator_name: "neuron-no-ahwb"
     accelerator_desc: "MediaTek NN accelerator + VPU via the Neuron Delegate"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_int8_384_nnapi.tflite"
       model_checksum: "3944a2dee04a5f8a5fd016ac34c4d390"
     }
     batch_size: 1
@@ -196,7 +196,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_int8_384_nnapi.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_int8_384_nnapi.tflite"
       model_checksum: "3944a2dee04a5f8a5fd016ac34c4d390"
     }
   }
@@ -205,7 +205,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_float_384_gpu.tflite"
       model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
     }
   }
@@ -220,7 +220,7 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_quant_argmax_uint8.tflite"
       model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
     }
   }
@@ -229,7 +229,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_quant_argmax_uint8.tflite"
       model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
     }
   }
@@ -238,7 +238,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_argmax_f32.tflite"
       model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
     }
   }
@@ -253,7 +253,7 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "MediaTek NN accelerator + CPU via the Neuron Delegate"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_full_qint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_full_qint8.tflite"
       model_checksum: "18ce6df0e4603f4b4ee5d04193708d9c"
     }
   }
@@ -262,7 +262,7 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_full_qint8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_full_qint8.tflite"
       model_checksum: "18ce6df0e4603f4b4ee5d04193708d9c"
     }
   }
@@ -271,7 +271,7 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_fp32.tflite"
       model_checksum: "672240427c1f3dc33baf2facacd9631f"
     }
   }

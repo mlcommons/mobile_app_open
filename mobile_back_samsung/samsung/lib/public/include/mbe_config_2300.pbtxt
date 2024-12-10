@@ -38,7 +38,7 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/ic_single_fence.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_1/ic_single_fence.nnc"
       model_checksum: "a451da1f48b1fad01c17fb7a49e5822e"
     }
   }
@@ -74,7 +74,7 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/sm_uint8_fence.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_1/sm_uint8_fence.nnc"
       model_checksum: "08fa7b354f82140a8863fed57c2d499b"
     }
   }
@@ -110,7 +110,7 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/od_fence.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_1/od_fence.nnc"
       model_checksum: "8a7e1808446072545c990f3d219255c6"
     }
   }
@@ -146,7 +146,7 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sr.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/sr.nnc"
       model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
     }
   }
@@ -182,7 +182,7 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/mobile_bert_fence.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_1/mobile_bert_fence.nnc"
       model_checksum: "5fb666b684a9bd0b68d497128b990137"
     }
   }
@@ -223,7 +223,7 @@ benchmark_setting {
       value: "false"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_1/Samsung/ic_offline.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_1/ic_offline.nnc"
       model_checksum: "6885f281a3d7a7ec3549d629dff8c8ac"
     }
   }

@@ -19,13 +19,13 @@ task {
     }
     lite {
       name: "Open images subset for classification"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet.zip"
       groundtruth_path: ""
     }
     tiny {
       name: "Imagenet dataset for integration test"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
-      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet_tiny.zip"
+      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/imagenet_tiny-groundtruth.txt"
     }
   }
   model {
@@ -56,13 +56,13 @@ task {
     }
     lite {
       name: "Open images subset for detection"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/coco.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/coco.zip"
       groundtruth_path: ""
     }
     tiny {
       name: "Coco dataset for integration test"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/datasets/coco-test.zip"
-      groundtruth_path: "https://raw.githubusercontent.com/mlcommons/mobile_models/main/v1_0/assets/coco_val_tiny.pbtxt"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/coco-test.zip"
+      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/coco_val_tiny.pbtxt"
     }
   }
   model {
@@ -93,13 +93,13 @@ task {
     }
     lite {
       name: "Open images subset for segmentation"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/ade20k.zip"
       groundtruth_path: ""
     }
     tiny {
       name: "ADE20K validation subset for integration test"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/datasets/ade20k_tiny.zip"
-      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/datasets/ade20k_tiny_annotations.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/ade20k_tiny.zip"
+      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/ade20k_tiny_annotations.zip"
     }
   }
   model {
@@ -124,18 +124,18 @@ task {
     type: SQUAD
     full {
       name: "Squad V1.1 validation set"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord"
-      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/squad_groundtruth.tfrecord"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_mini.tfrecord"
+      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_groundtruth.tfrecord"
     }
     lite {
       name: "Squad V1.1 mini set"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_mini.tfrecord"
       groundtruth_path: ""
     }
     tiny {
       name: "Squad V1.1 mini set"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_tiny.tfrecord"
-      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/squad_groundtruth.tfrecord"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_tiny.tfrecord"
+      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_groundtruth.tfrecord"
     }
   }
   model {
@@ -162,13 +162,13 @@ task {
     }
     lite {
       name: "SNUSR dataset for performance test"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/datasets/snusr_lr_png.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/snusr_lr_png.zip"
       groundtruth_path: ""
     }
     tiny {
       name: "SNUSR dataset for integration test"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/datasets/snusr_lr_png_tiny.zip"
-      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/datasets/snusr_hr_png_tiny.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/snusr_lr_png_tiny.zip"
+      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/snusr_hr_png_tiny.zip"
     }
   }
   model {
@@ -197,13 +197,13 @@ task {
     }
     lite {
       name: "Open images subset for classification"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet.zip"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet.zip"
       groundtruth_path: ""
     }
     tiny {
       name: "Imagenet dataset for integration test"
-      input_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/imagenet_tiny.zip"
-      groundtruth_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet_tiny.zip"
+      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/imagenet_tiny-groundtruth.txt"
     }
   }
   model {
@@ -229,17 +229,17 @@ task {
     type: COCOGEN
     full {
       name: "COCO validation set for Stable Diffusion"
-      input_path: "https://github.com/anhappdev/tmp/releases/download/5/coco_gen_test.tfrecord"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v4_1/coco_gen_test.tfrecord"
       groundtruth_path: "local:///mlperf_models/stable-diffusion/clip_model_512x512.tflite"
     }
     lite {
       name: "COCO validation set for Stable Diffusion"
-      input_path: "https://github.com/anhappdev/tmp/releases/download/5/coco_gen_full.tfrecord"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v4_1/coco_gen_full.tfrecord"
       groundtruth_path: ""
     }
     tiny {
       name: "COCO validation set for Stable Diffusion"
-      input_path: "https://github.com/anhappdev/tmp/releases/download/2/coco_gen.tfrecord"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v4_1/coco_gen.tfrecord"
       groundtruth_path: "local:///mlperf_models/stable-diffusion/clip_model_512x512.tflite"
     }
   }

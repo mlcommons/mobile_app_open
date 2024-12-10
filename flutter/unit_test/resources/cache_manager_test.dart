@@ -8,9 +8,9 @@ void main() async {
   group('CacheManager', () {
     late CacheManager manager;
     const zipRemotePath =
-        'https://github.com/mlcommons/mobile_models/raw/main/v3_0/datasets/coco-test.zip';
+        'https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/coco-test.zip';
     const txtRemotePath =
-        'https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt';
+        'https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/imagenet_tiny-groundtruth.txt';
     final paths = [zipRemotePath, txtRemotePath];
 
     setUp(() async {

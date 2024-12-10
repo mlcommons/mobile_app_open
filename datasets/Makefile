@@ -225,11 +225,11 @@ ${BUILDDIR}/output/state/squad_calibration.stamp: \
 
 ${BUILDDIR}/output/mlperf_datasets/squad/squad_eval_mini.tfrecord:
 	mkdir -p ${BUILDDIR}/output/mlperf_datasets/squad
-	curl -o $@ -L https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord
+	curl -o $@ -L https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_mini.tfrecord
 
 ${BUILDDIR}/output/mlperf_datasets/squad/squad_groundtruth.tfrecord:
 	mkdir -p ${BUILDDIR}/output/mlperf_datasets/squad
-	curl -o $@ -L https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/squad_groundtruth.tfrecord
+	curl -o $@ -L https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_groundtruth.tfrecord
 
 ${BUILDDIR}/output/state/squad.stamp: \
 		${BUILDDIR}/output/mlperf_datasets/squad/squad_eval_mini.tfrecord \

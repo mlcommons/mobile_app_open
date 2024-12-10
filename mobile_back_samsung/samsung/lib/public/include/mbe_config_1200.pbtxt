@@ -26,7 +26,7 @@ benchmark_setting {
       value: "Float32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/ic.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/ic.nnc"
       model_checksum: "1a84db0b3dc40a6e217b7f2c8eb2980b"
     }
   }
@@ -50,7 +50,7 @@ benchmark_setting {
       value: "Float32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/od.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/od.nnc"
       model_checksum: "5e7abcc8fa6f7c3e0bd8955a9ef1e8cb"
     }
   }
@@ -73,7 +73,7 @@ benchmark_setting {
       value: "Int32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/Samsung/is.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/is.nnc"
       model_checksum: "b501ed669da753b08a151639798af37e"
     }
   }
@@ -97,7 +97,7 @@ benchmark_setting {
       value: "Int32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sm_uint8.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/sm_uint8.nnc"
       model_checksum: "b02531ae19686c6574857bb18406966c"
     }
   }
@@ -121,7 +121,7 @@ benchmark_setting {
       value: "Float32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/sr.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/sr.nnc"
       model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
     }
   }
@@ -146,7 +146,7 @@ benchmark_setting {
       value: "Float32"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.0-samsung/ic_offline.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/ic_offline.nnc"
       model_checksum: "9fcba01bf828b5cb5b1a39b55a8a7ed9"
     }
   }
