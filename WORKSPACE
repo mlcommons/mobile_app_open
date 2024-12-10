@@ -1,7 +1,7 @@
 workspace(name = "mlperf_app")
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "bazel_skylib",
@@ -49,11 +49,11 @@ http_archive(
     ],
 )
 
-load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 load(
     "@org_tensorflow//tensorflow/tools/toolchains/python:python_repo.bzl",
     "python_repository",
 )
+load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 
 python_repository(name = "python_version_repo")
 

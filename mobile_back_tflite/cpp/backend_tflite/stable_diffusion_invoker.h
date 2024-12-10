@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "stable_diffusion_pipeline.h"  // Include the backend data structure
+#include "stable_diffusion_pipeline.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/model_builder.h"
 
