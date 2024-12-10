@@ -389,7 +389,9 @@ jobs:
           bash .github/workflows/scripts/browserstack-app-automate.sh
 
   test-android-apk-unified:
+    needs: build-android-apk
     runs-on: ubuntu-22.04
+    timeout-minutes: 60
     env:
       MAIN_APK_NAME: test-main-unified-${{ github.run_number }}.apk
       HELPER_APK_NAME: test-helper-unified-${{ github.run_number }}.apk
