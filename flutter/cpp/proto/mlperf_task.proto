@@ -85,10 +85,14 @@ message DatasetConfig {
 message OneDatasetConfig {
   // Human-readable name of the dataset
   required string name = 1;
-  // URL or local path to dataset input files
+  // URL or local path to dataset input file
   required string input_path = 2;
-  // URL or local path to dataset groundtruth files
+  // MD5 checksum to validate the input file
+  required string input_checksum = 4;
+  // URL or local path to dataset groundtruth file
   required string groundtruth_path = 3;
+  // MD5 checksum to validate the groundtruth file
+  required string groundtruth_checksum = 5;
 }
 
 // Config of a model.

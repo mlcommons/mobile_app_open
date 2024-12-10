@@ -200,7 +200,7 @@ class ResourceManager {
     final checksumFailedResources = <Resource>[];
     for (final resource in resources) {
       final md5Checksum = resource.md5Checksum;
-      if (md5Checksum == null || md5Checksum.isEmpty) continue;
+      if (md5Checksum.isEmpty) continue;
       String? localPath;
       if (cacheManager.isResourceAnArchive(resource.path)) {
         localPath = cacheManager.getArchive(resource.path);

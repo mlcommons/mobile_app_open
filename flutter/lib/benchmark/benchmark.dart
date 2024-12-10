@@ -162,12 +162,14 @@ class BenchmarkStore {
       for (var mode in modes) {
         final dataset = mode.chooseDataset(b.taskConfig);
         final data = Resource(
-          path: dataset.inputPath,
           type: ResourceTypeEnum.datasetData,
+          path: dataset.inputPath,
+          md5Checksum: dataset.inputChecksum,
         );
         final groundtruth = Resource(
-          path: dataset.groundtruthPath,
           type: ResourceTypeEnum.datasetGroundtruth,
+          path: dataset.groundtruthPath,
+          md5Checksum: dataset.groundtruthChecksum,
         );
         result.addAll([data, groundtruth]);
       }
