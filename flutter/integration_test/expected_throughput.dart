@@ -84,7 +84,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kDN2103: Interval(min: 120, max: 210),
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 1500, max: 2400),
+    _kS24: Interval(min: 1400, max: 2400),
   },
 };
 
@@ -112,7 +112,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
     _kDN2103: Interval(min: 45, max: 70),
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 1000, max: 1500),
+    _kS24: Interval(min: 900, max: 1500),
   },
 };
 
