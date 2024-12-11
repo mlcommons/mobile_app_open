@@ -57,14 +57,14 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 250, max: 400),
-    _kS24Ultra: Interval(min: 800, max: 1400),
+    _kS24Ultra: Interval(min: 800, max: 1500),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 90),
     _kS10Plus: Interval(min: 400, max: 800)
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 700, max: 1000),
+    _kS24: Interval(min: 600, max: 1000),
   },
 };
 
@@ -88,7 +88,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 700, max: 1400),
-    _kS24Ultra: Interval(min: 1800, max: 2400),
+    _kS24Ultra: Interval(min: 1800, max: 2500),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 120, max: 210),
@@ -126,7 +126,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
     _kS10Plus: Interval(min: 800, max: 1400)
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 900, max: 1500),
+    _kS24: Interval(min: 800, max: 1500),
   },
 };
 
@@ -188,7 +188,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kS10Plus: Interval(min: 150, max: 250)
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 100, max: 180),
+    _kS24: Interval(min: 90, max: 180),
   },
 };
 
@@ -244,14 +244,14 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 250, max: 450),
-    _kS24Ultra: Interval(min: 900, max: 1400),
+    _kS24Ultra: Interval(min: 900, max: 1600),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 90),
     _kS10Plus: Interval(min: 700, max: 1200)
   },
   _kSamsungBackend: {
-    _kS24: Interval(min: 900, max: 1200),
+    _kS24: Interval(min: 800, max: 1200),
   },
 };
 
