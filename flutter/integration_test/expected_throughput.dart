@@ -26,7 +26,7 @@ const _kS22Ultra = 'SM-S908U1'; // Galaxy S22 Ultra
 const _kDN2103 = 'DN2103'; // OnePlus DN2103
 
 // iOS
-const _kIphoneOnGitHubAction = 'iPhone15,3';
+const _kIphoneOnGitHubAction = 'iPhone16,2';
 const _kIphoneOnMacbookM1 = 'iPhone14,7';
 
 const Map<String, Map<String, Interval>> _imageClassificationV2 = {
