@@ -130,7 +130,11 @@ class BenchmarkStore {
     required List<pb.BenchmarkSetting> backendConfig,
     required Map<String, bool> taskSelection,
   }) {
-    for (final task in appConfig.task) {
+    // sort the order of task based on BenchmarkId.allIds
+    final List<pb.TaskConfig> sortedTasks = List.from(appConfig.task)
+      ..sort((a, b) =>
+          BenchmarkId.allIds.indexOf(a.id) - BenchmarkId.allIds.indexOf(b.id));
+    for (final task in sortedTasks) {
       final backendSettings = backendConfig
           .singleWhereOrNull((setting) => setting.benchmarkId == task.id);
       if (backendSettings == null) {

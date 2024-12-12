@@ -24,14 +24,15 @@ class BenchmarkId {
   static const imageClassificationOfflineV2 = 'image_classification_offline_v2';
   static const stableDiffusion = 'stable_diffusion';
 
+  // The sort order of this list will be used in the UI
   static const allIds = [
+    imageClassificationV2,
     objectDetection,
     imageSegmentationV2,
     naturalLanguageProcessing,
     superResolution,
-    imageClassificationV2,
-    imageClassificationOfflineV2,
     stableDiffusion,
+    imageClassificationOfflineV2,
   ];
 }
 
