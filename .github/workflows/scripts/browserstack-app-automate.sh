@@ -61,7 +61,19 @@ check_build_status() {
   local build_id=$1
   local response=$(curl -s -u "$CREDENTIALS" -X GET "$STATUS_URL/$build_id")
   local status=$(echo "$response" | jq -r '.status')
+
   echo "$(date +'%Y-%m-%d %H:%M:%S') Build Status: $status"
+
+  # Display device status
+  echo "$response" | jq -r '
+    .devices[] |
+    "Device: " + .device +
+    ", OS Version: " + .os_version +
+    ", Duration: " + (.sessions[0].duration | tostring) + "s" +
+    ", Status: " + (.sessions[0].status)
+  '
+
+  # Display build status
   if [[ "$status" == "passed" ]]; then
     echo "Build completed successfully!"
     exit 0
