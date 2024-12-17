@@ -116,14 +116,16 @@ void main() {
       expect(
           resources,
           contains(Resource(
-            path: task1.datasets.full.inputPath,
             type: ResourceTypeEnum.datasetData,
+            path: task1.datasets.full.inputPath,
+            md5Checksum: task1.datasets.full.inputChecksum,
           )));
       expect(
           resources,
           contains(Resource(
-            path: task1.datasets.full.groundtruthPath,
             type: ResourceTypeEnum.datasetGroundtruth,
+            path: task1.datasets.full.groundtruthPath,
+            md5Checksum: task1.datasets.full.groundtruthChecksum,
           )));
       expect(
           resources,
@@ -153,8 +155,9 @@ void main() {
       expect(
           resources,
           contains(Resource(
-            path: task1.datasets.lite.inputPath,
             type: ResourceTypeEnum.datasetData,
+            path: task1.datasets.lite.inputPath,
+            md5Checksum: task1.datasets.lite.inputChecksum,
           )));
       expect(
           resources,
@@ -187,8 +190,9 @@ void main() {
       expect(
           resources,
           contains(Resource(
-            path: task1.datasets.tiny.inputPath,
             type: ResourceTypeEnum.datasetData,
+            path: task1.datasets.tiny.inputPath,
+            md5Checksum: task1.datasets.tiny.inputChecksum,
           )));
       expect(
           resources,
