@@ -4,6 +4,7 @@
 .ijwb
 .idea
 .vscode
+.fvm
 /bazel-*
 /output
 /output_logs
