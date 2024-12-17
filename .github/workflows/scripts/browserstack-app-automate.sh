@@ -2,8 +2,6 @@
 
 # This script is used to trigger a build on BrowserStack App Automate and monitor its status.
 
-set -e
-
 # Build parameters
 PROJECT="mobile-app-build-290400"
 DEVICE_LOGS=true
@@ -51,10 +49,11 @@ trigger_build() {
 
   if [[ "$build_id" == "null" || -z "$build_id" ]]; then
     echo "Failed to trigger the build. Response: $response"
-    exit 1
+    return 1
+  else
+    echo "$build_id"
+    return 0
   fi
-
-  echo "$build_id"
 }
 
 # Function to check build status
@@ -73,7 +72,11 @@ check_build_status() {
 }
 
 # Main
-BUILD_ID=$(trigger_build)
+if ! BUILD_ID=$(trigger_build); then
+  echo "Trigger build failed. Message: $BUILD_ID"
+  exit 1
+fi
+
 echo "Build triggered successfully. Build ID: $BUILD_ID"
 echo "See the build status at: https://app-automate.browserstack.com/dashboard/v2/builds/$BUILD_ID"
 
