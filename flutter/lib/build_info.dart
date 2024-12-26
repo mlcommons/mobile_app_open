@@ -22,7 +22,7 @@ class BuildInfoHelper {
         buildNumber: packageInfo.buildNumber,
         buildDate: DateTime.now(),
         officialReleaseFlag: DartDefine.isOfficialBuild,
-        devTestFlag: DartDefine.isFastMode,
+        devTestFlag: DartDefine.perfTestEnabled,
         backendList: BackendInfoHelper().getBackendsList(),
         gitBranch: GeneratedBuildInfo.gitBranch,
         gitCommit: GeneratedBuildInfo.gitCommit,

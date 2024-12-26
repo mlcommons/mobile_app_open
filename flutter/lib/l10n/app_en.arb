@@ -91,6 +91,7 @@
   "dialogTitleConfirm": "Confirm?",
   "dialogContentOfflineWarning": "Offline mode is enabled but following internet resources are defined in the configuration. Do you want to continue?",
   "dialogContentMissingFiles": "The following files don't exist:",
+  "dialogContentMissingFilesHint": "Please go to the menu Resources to download the missing files.",
   "dialogContentChecksumError": "The following files failed checksum validation:",
   "dialogContentNoSelectedBenchmarkError": "Please select at least one benchmark.",
 
@@ -98,6 +99,8 @@
   "benchModePerformanceOnly": "Performance Only",
   "benchModeAccuracyOnly": "Accuracy Only",
   "benchModeSubmissionRun": "Submission Run",
+  "benchModeQuickRun": "Quick Run",
+  "benchModeIntegrationTestRun": "Integration Test Run",
   "benchNameImageClassification": "Image Classification",
   "benchNameObjectDetection": "Object detection",
   "benchNameImageSegmentation": "Image Segmentation",

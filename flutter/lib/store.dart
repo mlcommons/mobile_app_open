@@ -56,13 +56,6 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get testMode => _getBool(StoreConstants.testMode);
-
-  set testMode(bool value) {
-    _storeFromDisk.setBool(StoreConstants.testMode, value);
-    notifyListeners();
-  }
-
   bool get cooldown => _getBool(StoreConstants.cooldown, true);
 
   set cooldown(bool value) {
@@ -119,12 +112,6 @@ class Store extends ChangeNotifier {
     _storeFromDisk.setBool(StoreConstants.crashlyticsEnabled, value);
     notifyListeners();
   }
-
-  int get testMinDuration => _getInt(StoreConstants.testMinDuration);
-
-  int get testCooldown => _getInt(StoreConstants.testCooldownDuration);
-
-  int get testMinQueryCount => _getInt(StoreConstants.testMinQueryCount);
 }
 
 class StoreConstants {
@@ -139,8 +126,5 @@ class StoreConstants {
   static const previousAppVersion = 'previous app version';
   static const keepLogs = 'keep_logs';
   static const taskSelection = 'disabled_tasks';
-  static const testMinDuration = 'test min duration';
-  static const testCooldownDuration = 'test cooldown duration';
-  static const testMinQueryCount = 'test min query count';
   static const crashlyticsEnabled = 'crashlyticsEnabled';
 }
