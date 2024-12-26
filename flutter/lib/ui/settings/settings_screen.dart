@@ -92,9 +92,9 @@ class _SettingsScreen extends State<SettingsScreen> {
   Widget _cooldownSlider() {
     return Slider(
       value: store.cooldownDuration.toDouble(),
-      min: 1,
-      max: 10,
-      divisions: 9,
+      min: 0,
+      max: 10 * 60,
+      divisions: null,
       label: store.cooldownDuration.toString(),
       onChanged: store.cooldown
           ? (double value) {

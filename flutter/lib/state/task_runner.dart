@@ -78,7 +78,7 @@ class TaskRunner {
       BenchmarkStore benchmarkStore, String currentLogDir) async {
     progressInfo = ProgressInfo();
     final cooldown = store.cooldown;
-    final cooldownDuration = Duration(minutes: store.cooldownDuration);
+    final cooldownDuration = Duration(seconds: store.cooldownDuration);
 
     final activeBenchmarks =
         benchmarkStore.benchmarks.where((element) => element.isActive);

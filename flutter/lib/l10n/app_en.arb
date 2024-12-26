@@ -70,7 +70,7 @@
   "settingsKeepLogs": "Keep logs",
   "settingsKeepLogsSubtitle": "Keep loadgen logs of future runs.\nThis option doesn't affect past logs.",
   "settingsCooldown": "Cooldown",
-  "settingsCooldownSubtitle": "Pause <cooldownPause> minutes before running each benchmark to avoid thermal throttling.",
+  "settingsCooldownSubtitle": "Pause <cooldownPause> seconds before running next benchmark to avoid thermal throttling.",
   "settingsPrivacyPolicy": "Privacy Policy",
   "settingsEula": "End User License Agreement",
   "settingsTaskConfigTitle": "Task configuration",
