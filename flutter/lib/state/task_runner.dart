@@ -174,14 +174,11 @@ class TaskRunner {
       progressInfo.calculateStageProgress = () {
         // UI updates once per second so using 1 second as lower bound should not affect it.
         final minDuration = max(taskMinDuration, 1);
-        final timeProgress = perfTimer.elapsedMilliseconds /
-            Duration.millisecondsPerSecond /
-            minDuration;
-
+        final timeProgress = perfTimer.elapsed.inSeconds / minDuration;
         final minQueries = max(taskMinQueryCount, 1);
         final queryCounter = backendBridge.getQueryCounter();
         final queryProgress =
-            queryCounter < 0 ? 1.0 : queryCounter / minQueries;
+            queryCounter < 0 ? 0.0 : queryCounter / minQueries;
         return min(timeProgress, queryProgress);
       };
       notifyListeners();
