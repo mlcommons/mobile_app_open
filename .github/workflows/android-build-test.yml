@@ -285,11 +285,11 @@ jobs:
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
           BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
           BROWSERSTACK_DEVICES: >-
-            ["Samsung Galaxy S24-14.0",
+            ["Samsung Galaxy M32-11.0",
+            "Samsung Galaxy S24-14.0",
             "Samsung Galaxy S24 Ultra-14.0",
             "Samsung Galaxy Tab S10 Plus-14.0",
-            "Google Pixel 9 Pro-15.0",
-            "Samsung Galaxy M32-11.0"]
+            "Google Pixel 9 Pro-15.0"]
         run: |
           bash .github/workflows/scripts/browserstack-app-automate.sh
 
