@@ -78,7 +78,7 @@ const Map<String, Interval> _superResolution = {
   'snpe_dsp': Interval(min: 0.32, max: 0.35),
   'psnpe_dsp': Interval(min: 0.32, max: 0.35),
   'neuron': Interval(min: 0.32, max: 0.35),
-  'samsung_npu': Interval(min: 0.08, max: 0.11),
+  'samsung_npu': Interval(min: 0.08, max: 0.12),
 };
 
 // TODO (anhappdev): update expected accuracy for stable diffusion

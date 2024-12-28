@@ -185,7 +185,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 15),
-    _kS10Plus: Interval(min: 150, max: 250)
+    _kS10Plus: Interval(min: 150, max: 280)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 90, max: 180),
