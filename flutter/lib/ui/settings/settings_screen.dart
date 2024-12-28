@@ -165,6 +165,7 @@ class _SettingsScreen extends State<SettingsScreen> {
           borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
           value: store.selectedBenchmarkRunMode,
           items: BenchmarkRunModeEnum.values
+              .where((e) => !e.isHiddenFromUI)
               .map((runMode) => DropdownMenuItem<BenchmarkRunModeEnum>(
                     value: runMode,
                     child: Text(runMode.localizedName(l10n)),

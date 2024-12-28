@@ -96,6 +96,15 @@ extension BenchmarkRunModeEnumExtension on BenchmarkRunModeEnum {
     }
   }
 
+  bool get isHiddenFromUI {
+    switch (this) {
+      case BenchmarkRunModeEnum.integrationTestRun:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   BenchmarkRunMode get performanceRunMode {
     BenchmarkRunMode mode = BenchmarkRunMode._(
       loadgenMode: LoadgenModeEnum.performanceOnly,
