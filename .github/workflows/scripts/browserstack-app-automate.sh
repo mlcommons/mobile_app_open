@@ -65,13 +65,15 @@ check_build_status() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') Build Status: $status"
 
   # Display device status
-  echo "$response" | jq -r '
-    .devices[] |
-    "Device: " + .device +
-    ", OS Version: " + .os_version +
-    ", Duration: " + (.sessions[0].duration | tostring) + "s" +
-    ", Status: " + (.sessions[0].status)
-  '
+  if [[ "$status" != "running" ]]; then
+    echo "$response" | jq -r '
+      .devices[] |
+      "Device: " + .device +
+      ", OS Version: " + .os_version +
+      ", Duration: " + (.sessions[0].duration | tostring) + "s" +
+      ", Status: " + (.sessions[0].status)
+    '
+  fi
 
   # Display build status
   if [[ "$status" == "passed" ]]; then
