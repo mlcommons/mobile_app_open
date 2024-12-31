@@ -167,6 +167,20 @@ jobs:
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-samsung.apk
           gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-samsung.apk
+      - name: Build and upload test APK for all backends
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 1
+          WITH_PIXEL: 1
+          WITH_MEDIATEK: 1
+          WITH_QTI: 1
+          WITH_SAMSUNG: 1
+          WITH_APPLE: 0
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-unified.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-unified.apk
       - name: Build Android release APK with all backends
         env:
           OFFICIAL_BUILD: true
@@ -231,113 +245,13 @@ jobs:
           retention-days: 28
           if-no-files-found: error
 
-  test-android-apk-tflite:
+  test-android-apk-unified:
     needs: build-android-apk
     runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up authentication for Google Cloud SDK
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          version: '>= 363.0.0'
-          project_id: mobile-app-build-290400
-      - name: Trigger Firebase Test Lab for [Google Pixel 6](oriole)
-        run: |
-          gcloud firebase test android run \
-            --type instrumentation \
-            --app $GCLOUD_BUCKET_PATH/test-main-tflite.apk \
-            --test $GCLOUD_BUCKET_PATH/test-helper-tflite.apk \
-            --timeout 30m \
-            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
-            --device model=oriole,version=31,locale=en,orientation=portrait \
-            --client-details=buildNumber=${{ github.run_number }}
-
-  test-android-apk-pixel:
-    needs: build-android-apk
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up authentication for Google Cloud SDK
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          version: '>= 363.0.0'
-          project_id: mobile-app-build-290400
-      - name: Trigger Firebase Test Lab for [Google Pixel 6](oriole)
-        run: |
-          gcloud firebase test android run \
-            --type instrumentation \
-            --app $GCLOUD_BUCKET_PATH/test-main-pixel.apk \
-            --test $GCLOUD_BUCKET_PATH/test-helper-pixel.apk \
-            --timeout 30m \
-            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
-            --device model=oriole,version=32,locale=en,orientation=portrait \
-            --client-details=buildNumber=${{ github.run_number }}
-
-  test-android-apk-qti:
-    needs: build-android-apk
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up authentication for Google Cloud SDK
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          version: '>= 363.0.0'
-          project_id: mobile-app-build-290400
-      - name: Trigger Firebase Test Lab for [Samsung Galaxy S22 Ultra](b0q)
-        run: |
-          gcloud firebase test android run \
-            --type instrumentation \
-            --app $GCLOUD_BUCKET_PATH/test-main-qti.apk \
-            --test $GCLOUD_BUCKET_PATH/test-helper-qti.apk \
-            --timeout 30m \
-            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
-            --device model=b0q,version=33,locale=en,orientation=portrait \
-            --client-details=buildNumber=${{ github.run_number }}
-
-  test-android-apk-mtk:
-    needs: build-android-apk
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up authentication for Google Cloud SDK
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          version: '>= 363.0.0'
-          project_id: mobile-app-build-290400
-      - name: Trigger Firebase Test Lab for [OnePlus DN2103](OP515BL1)
-        run: |
-          gcloud firebase test android run \
-            --type instrumentation \
-            --app $GCLOUD_BUCKET_PATH/test-main-mtk.apk \
-            --test $GCLOUD_BUCKET_PATH/test-helper-mtk.apk \
-            --timeout 30m \
-            --num-flaky-test-attempts ${{ vars.NUM_FLAKY_TEST_ATTEMPTS }} \
-            --device model=OP515BL1,version=33,locale=en,orientation=portrait \
-            --client-details=buildNumber=${{ github.run_number }}
-
-  test-android-apk-samsung:
-    needs: build-android-apk
-    runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
-      MAIN_APK_NAME: test-main-samsung-${{ github.run_number }}.apk
-      HELPER_APK_NAME: test-helper-samsung-${{ github.run_number }}.apk
+      MAIN_APK_NAME: test-main-unified-${{ github.run_number }}.apk
+      HELPER_APK_NAME: test-helper-unified-${{ github.run_number }}.apk
     steps:
       - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
@@ -350,8 +264,8 @@ jobs:
           version: '>= 363.0.0'
       - name: Download test APK
         run: |
-          gsutil cp $GCLOUD_BUCKET_PATH/test-main-samsung.apk /tmp/$MAIN_APK_NAME
-          gsutil cp $GCLOUD_BUCKET_PATH/test-helper-samsung.apk /tmp/$HELPER_APK_NAME
+          gsutil cp $GCLOUD_BUCKET_PATH/test-main-unified.apk /tmp/$MAIN_APK_NAME
+          gsutil cp $GCLOUD_BUCKET_PATH/test-helper-unified.apk /tmp/$HELPER_APK_NAME
       - name: Upload main app
         run: |
           curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
@@ -364,19 +278,25 @@ jobs:
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
           -F "file=@/tmp/$HELPER_APK_NAME" \
           -F "custom_id=$HELPER_APK_NAME"
-      - name: Trigger App Automate for [Samsung Galaxy S24]
+      - name: Trigger App Automate
         env:
           BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
           BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
+          BROWSERSTACK_DEVICES: >-
+            ["Samsung Galaxy M32-11.0",
+            "Samsung Galaxy S24-14.0",
+            "Samsung Galaxy S24 Ultra-14.0",
+            "Samsung Galaxy Tab S10 Plus-14.0",
+            "Google Pixel 9 Pro-15.0"]
         run: |
           bash .github/workflows/scripts/browserstack-app-automate.sh
 
   deploy-playstore:
     needs:
       - build-android-apk
-      - test-android-apk-tflite
+      - test-android-apk-unified
     runs-on: ubuntu-22.04
     # if: github.ref == 'refs/heads/master'
     steps:

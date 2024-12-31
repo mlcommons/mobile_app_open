@@ -2,10 +2,7 @@
 
 # This script is used to trigger a build on BrowserStack App Automate and monitor its status.
 
-set -e
-
 # Build parameters
-DEVICES='["Samsung Galaxy S24-14.0"]'
 PROJECT="mobile-app-build-290400"
 DEVICE_LOGS=true
 RETRY_INTERVAL=10
@@ -19,6 +16,7 @@ CREDENTIALS="${BROWSERSTACK_CREDENTIALS:-}"
 APP="${BROWSERSTACK_APP:-}"
 TEST_SUITE="${BROWSERSTACK_TEST_SUITE:-}"
 BUILD_TAG="${BROWSERSTACK_BUILD_TAG:-}"
+DEVICES="${BROWSERSTACK_DEVICES:-}"
 
 # Validate required environment variables
 if [[ -z "$CREDENTIALS" ]]; then
@@ -26,8 +24,10 @@ if [[ -z "$CREDENTIALS" ]]; then
   exit 1
 fi
 
-if [[ -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" ]]; then
-  echo "Error: Environment variables BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE and BROWSERSTACK_BUILD_TAG must be set."
+if [[ -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" || -z "$DEVICES" ]]; then
+  echo "Error: Environment variables"\
+  "BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE, BROWSERSTACK_BUILD_TAG and BROWSERSTACK_DEVICES"\
+  "must be set."
   exit 1
 fi
 
@@ -49,10 +49,11 @@ trigger_build() {
 
   if [[ "$build_id" == "null" || -z "$build_id" ]]; then
     echo "Failed to trigger the build. Response: $response"
-    exit 1
+    return 1
+  else
+    echo "$build_id"
+    return 0
   fi
-
-  echo "$build_id"
 }
 
 # Function to check build status
@@ -60,7 +61,21 @@ check_build_status() {
   local build_id=$1
   local response=$(curl -s -u "$CREDENTIALS" -X GET "$STATUS_URL/$build_id")
   local status=$(echo "$response" | jq -r '.status')
+
   echo "$(date +'%Y-%m-%d %H:%M:%S') Build Status: $status"
+
+  # Display device status
+  if [[ "$status" != "running" ]]; then
+    echo "$response" | jq -r '
+      .devices[] |
+      "Device: " + .device +
+      ", OS Version: " + .os_version +
+      ", Duration: " + (.sessions[0].duration | tostring) + "s" +
+      ", Status: " + (.sessions[0].status)
+    '
+  fi
+
+  # Display build status
   if [[ "$status" == "passed" ]]; then
     echo "Build completed successfully!"
     exit 0
@@ -71,7 +86,11 @@ check_build_status() {
 }
 
 # Main
-BUILD_ID=$(trigger_build)
+if ! BUILD_ID=$(trigger_build); then
+  echo "Trigger build failed. Message: $BUILD_ID"
+  exit 1
+fi
+
 echo "Build triggered successfully. Build ID: $BUILD_ID"
 echo "See the build status at: https://app-automate.browserstack.com/dashboard/v2/builds/$BUILD_ID"
 
