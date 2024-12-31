@@ -26,8 +26,8 @@ bool TsEmbeddingParser::parse_pickle(const std::string& filename) {
   }
 
   // Reverse both timesteps and embeddings before storing
-    std::reverse(timesteps.begin(), timesteps.end());
-    std::reverse(embeddings.begin(), embeddings.end());
+  std::reverse(timesteps.begin(), timesteps.end());
+  std::reverse(embeddings.begin(), embeddings.end());
 
   // Store in maps
   timesteps_[num_timesteps] = std::move(timesteps);
