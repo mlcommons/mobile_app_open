@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
 import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/benchmark/info.dart';
@@ -69,24 +68,13 @@ class Benchmark {
     required List<pb.CommonSetting> commonSettings,
     required String backendLibName,
     required String logDir,
-    required int testMinDuration,
-    required int testMinQueryCount,
   }) async {
     final dataset = runMode.chooseDataset(taskConfig);
+    final runConfig = runMode.chooseRunConfig(taskConfig);
 
-    int minQueryCount;
-    double minDuration;
-    if (testMinDuration != 0) {
-      minQueryCount = testMinQueryCount;
-      minDuration = testMinDuration.toDouble();
-    } else if (DartDefine.isFastMode) {
-      minQueryCount = 8;
-      minDuration = 1.0;
-    } else {
-      minQueryCount = taskConfig.minQueryCount;
-      minDuration = taskConfig.minDuration;
-    }
-    double maxDuration = taskConfig.maxDuration;
+    int minQueryCount = runConfig.minQueryCount;
+    double minDuration = runConfig.minDuration;
+    double maxDuration = runConfig.maxDuration;
 
     final settings = pb.SettingList(
       setting: commonSettings,
@@ -114,7 +102,7 @@ class Benchmark {
       model_image_width: taskConfig.model.imageWidth,
       model_image_height: taskConfig.model.imageHeight,
       scenario: taskConfig.scenario,
-      mode: runMode.loadgenMode,
+      mode: runMode.loadgenMode.name,
       batch_size: selectedDelegate.batchSize,
       min_query_count: minQueryCount,
       min_duration: minDuration,

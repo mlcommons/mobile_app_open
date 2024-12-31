@@ -19,17 +19,12 @@ void main() {
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
   final prefs = <String, Object>{
-    StoreConstants.testMode: true,
     StoreConstants.selectedBenchmarkRunMode:
-        BenchmarkRunModeEnum.submissionRun.name,
-    StoreConstants.testMinDuration: 1,
-    StoreConstants.testMinQueryCount: 4,
+        BenchmarkRunModeEnum.integrationTestRun.name,
+    StoreConstants.cooldown: true,
+    StoreConstants.cooldownDuration:
+        BenchmarkRunModeEnum.integrationTestRun.cooldownDuration,
   };
-  if (DartDefine.perfTestEnabled) {
-    prefs[StoreConstants.testMinDuration] = 15;
-    prefs[StoreConstants.testMinQueryCount] = 64;
-    prefs[StoreConstants.testCooldownDuration] = 2;
-  }
   SharedPreferences.setMockInitialValues(prefs);
 
   group('integration tests', () {
@@ -67,9 +62,7 @@ void checkTasks(ExtendedResult extendedResult) {
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
     checkAccuracy(benchmarkResult);
-    if (DartDefine.perfTestEnabled) {
-      checkThroughput(benchmarkResult, extendedResult.environmentInfo);
-    }
+    checkThroughput(benchmarkResult, extendedResult.environmentInfo);
   }
 }
 

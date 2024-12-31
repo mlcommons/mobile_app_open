@@ -75,8 +75,10 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _downloadStatus(benchmark, BenchmarkRunMode.performance),
-            _downloadStatus(benchmark, BenchmarkRunMode.accuracy),
+            _downloadStatus(
+                benchmark, store.selectedBenchmarkRunMode.performanceRunMode),
+            _downloadStatus(
+                benchmark, store.selectedBenchmarkRunMode.accuracyRunMode),
           ],
         ),
       ),
