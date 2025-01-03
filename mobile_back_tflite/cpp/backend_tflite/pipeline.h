@@ -72,10 +72,15 @@ class Pipeline {
   virtual mlperf_status_t backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                              uint32_t batchIndex, int32_t i,
                                              void **data) = 0;
-
+  // Optional function to convert the inputs
   virtual void backend_convert_inputs(mlperf_backend_ptr_t backend_ptr,
                                       int bytes, int width, int height,
                                       uint8_t *data) = 0;
+
+  // Optional function to convert the outputs
+  virtual void backend_convert_outputs(mlperf_backend_ptr_t backend_ptr,
+                                       int bytes, int width, int height,
+                                       uint8_t *data) = 0;
 
   virtual void *backend_get_buffer(size_t n) = 0;
 

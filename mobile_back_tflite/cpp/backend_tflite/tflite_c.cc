@@ -229,6 +229,12 @@ void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
                                           data);
 }
 
+void mlperf_backend_convert_outputs(mlperf_backend_ptr_t backend_ptr, int bytes,
+                                    int width, int height, uint8_t *data) {
+  return pipeline->backend_convert_outputs(backend_ptr, bytes, width, height,
+                                           data);
+}
+
 void *mlperf_backend_get_buffer(size_t n) {
   return pipeline->backend_get_buffer(n);
 }

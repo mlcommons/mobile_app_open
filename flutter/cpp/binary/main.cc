@@ -132,7 +132,7 @@ int Main(int argc, char *argv[]) {
   command_line += " " + backend_name + " " + benchmark_id;
 
   // Command Line Flags for mlperf.
-  std::string mode, scenario = "SingleStream", output_dir;
+  std::string mode, scenario = "SingleStream", output_dir, custom_config;
   int min_query_count = 100, min_duration_ms = 100,
       max_duration_ms = 10 * 60 * 1000,
       single_stream_expected_latency_ns = 1000000;
@@ -157,8 +157,9 @@ int Main(int argc, char *argv[]) {
                         "A hint used by the loadgen to pre-generate "
                         "enough samples to meet the minimum test duration."),
        Flag::CreateFlag("output_dir", &output_dir,
-                        "The output directory of mlperf.", Flag::kRequired)});
-
+                        "The output directory of mlperf.", Flag::kRequired),
+       Flag::CreateFlag("custom_config", &custom_config,
+                        "Custom config in form key1:val1,key2:val2.")});
   // Command Line Flags for backend.
   std::unique_ptr<Backend> backend;
   std::unique_ptr<Dataset> dataset;
@@ -207,9 +208,8 @@ int Main(int argc, char *argv[]) {
             }
           }
         }
-
         SettingList setting_list =
-            createSettingList(backend_setting, benchmark_id);
+            CreateSettingList(backend_setting, custom_config, benchmark_id);
 
         ExternalBackend *external_backend = new ExternalBackend(
             model_file_path, lib_path, setting_list, native_lib_path);

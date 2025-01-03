@@ -139,9 +139,11 @@ int test_proto() {
   std::list<std::string> benchmarks;
   benchmarks.push_back("image_classification");
   benchmarks.push_back("image_classification_offline");
+  std::string custom_config = "key1:val1,key2:val2";
   for (auto benchmark_id : benchmarks) {
     // Convert to SettingList
-    SettingList setting_list = createSettingList(backend_setting, benchmark_id);
+    SettingList setting_list =
+        CreateSettingList(backend_setting, custom_config, benchmark_id);
 
     std::cout << "SettingList for " << benchmark_id << ":\n";
     dumpSettingList(setting_list);

@@ -125,26 +125,105 @@ mlperf_backend_configuration_t CppToCSettings(const SettingList &settings) {
   return c_settings;
 }
 
-SettingList createSettingList(const BackendSetting &backend_setting,
-                              std::string benchmark_id) {
+// Split the string by a given delimiter
+std::vector<std::string> _splitString(const std::string &str, char delimiter) {
+  std::vector<std::string> tokens;
+  std::stringstream ss(str);
+  std::string token;
+  while (std::getline(ss, token, delimiter)) {
+    tokens.push_back(token);
+  }
+  return tokens;
+}
+
+// Parse the key:value string list
+std::unordered_map<std::string, std::string> _parseKeyValueList(
+    const std::string &input) {
+  std::unordered_map<std::string, std::string> keyValueMap;
+  std::vector<std::string> pairs = _splitString(input, ',');  // Split by comma
+
+  for (const std::string &pair : pairs) {
+    std::vector<std::string> keyValue =
+        _splitString(pair, ':');  // Split by colon
+    if (keyValue.size() == 2) {
+      keyValueMap[keyValue[0]] = keyValue[1];
+    } else {
+      LOG(ERROR) << "Invalid key:value pair: " << pair;
+    }
+  }
+  return keyValueMap;
+}
+
+// Create the setting list for backend
+SettingList CreateSettingList(const BackendSetting &backend_setting,
+                              const std::string &custom_config,
+                              const std::string &benchmark_id) {
   SettingList setting_list;
   int setting_index = 0;
-
-  for (auto setting : backend_setting.common_setting()) {
+  for (const auto &setting : backend_setting.common_setting()) {
     setting_list.add_setting();
     (*setting_list.mutable_setting(setting_index)) = setting;
     setting_index++;
   }
 
   // Copy the benchmark specific settings
-  setting_index = 0;
-  for (auto bm_setting : backend_setting.benchmark_setting()) {
+  for (const auto &bm_setting : backend_setting.benchmark_setting()) {
     if (bm_setting.benchmark_id() == benchmark_id) {
       setting_list.mutable_benchmark_setting()->CopyFrom(bm_setting);
+
+      auto parsed = _parseKeyValueList(custom_config);
+      for (const auto &kv : parsed) {
+        CustomSetting custom_setting = CustomSetting();
+        custom_setting.set_id(kv.first);
+        custom_setting.set_value(kv.second);
+        setting_list.mutable_benchmark_setting()->mutable_custom_setting()->Add(
+            std::move(custom_setting));
+      }
+      break;
     }
   }
   LOG(INFO) << "setting_list:" << std::endl << setting_list.DebugString();
   return setting_list;
+}
+
+template <typename T>
+T GetConfigValue(mlperf_backend_configuration_t *configs, const char *key,
+                 T defaultValue);
+
+template <>
+int GetConfigValue<int>(mlperf_backend_configuration_t *configs,
+                        const char *key, int defaultValue) {
+  for (int i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], key) == 0) {
+      const char *valueStr = configs->values[i];
+      char *endptr = nullptr;
+      errno = 0;
+      long value =
+          strtol(valueStr, &endptr, 10);  // Base 10 for decimal conversion
+      if (errno == ERANGE || value < INT_MIN || value > INT_MAX) {
+        LOG(ERROR) << "Value out of range for int: " << valueStr;
+        return defaultValue;
+      }
+      if (endptr == valueStr || *endptr != '\0') {
+        LOG(ERROR) << "Invalid value for int: " << valueStr;
+        return defaultValue;
+      }
+      return static_cast<int>(value);
+    }
+  }
+  return defaultValue;
+}
+
+template <>
+std::string GetConfigValue<std::string>(mlperf_backend_configuration_t *configs,
+                                        const char *key,
+                                        std::string defaultValue) {
+  for (int i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], key) == 0) {
+      return std::string(configs->values[i]);
+    }
+  }
+  return defaultValue;
 }
 
 }  // namespace mobile
