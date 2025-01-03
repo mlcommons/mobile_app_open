@@ -110,7 +110,8 @@ std::map<uint32_t, SocInfo> socDetails =
                           std::vector<int>({4, 5, 6, 7}), 8, false)},
             {557, SocInfo(2, 0, 0, 0, true, qti_settings_sd8g3, "SD8G3", 1,
                           std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
+                          std::vector<int>({4, 5, 6, 7}), 8, true,
+                          /* stable_diffusion */ true)},
             {614, SocInfo(2, 0, 0, 0, true, qti_settings_sm8635, "SM8635", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
@@ -314,29 +315,22 @@ void Socs::soc_info_init() {
 #endif
 
   LOG(INFO) << "Soc ID: " << soc_id;
-  if (soc_id != UNSUPPORTED_SOC_ID) {
-    if (socDetails.find(soc_id) == socDetails.end()) {
-      soc_id = UNSUPPORTED_SOC_ID;
-    }
 
-    m_soc_info = socDetails.find(soc_id)->second;
+  m_soc_info = socDetails.find(soc_id)->second;
 
-    if (external_config) {
-      LOG(INFO) << "Config settings derived externally from "
-                   "//data/local/tmp/external/qti_settings.pbtxt";
-      m_soc_info.m_settings = get_external_config_string();
+  if (external_config) {
+    LOG(INFO) << "Config settings derived externally from "
+                 "//data/local/tmp/external/qti_settings.pbtxt";
+    m_soc_info.m_settings = get_external_config_string();
+  }
+  if (soc_id == UNSUPPORTED_SOC_ID) {
+    if (QTIBackendHelper::IsRuntimeAvailable(SNPE_DSP)) {
+      m_soc_info.m_settings = qti_settings_default_dsp;
+    } else if (QTIBackendHelper::IsRuntimeAvailable(SNPE_GPU)) {
+      m_soc_info.m_settings = qti_settings_default_gpu;
+    } else {
+      m_soc_info.m_settings = qti_settings_default_cpu;
     }
-    if (soc_id == UNSUPPORTED_SOC_ID) {
-      if (QTIBackendHelper::IsRuntimeAvailable(SNPE_DSP)) {
-        m_soc_info.m_settings = qti_settings_default_dsp;
-      } else if (QTIBackendHelper::IsRuntimeAvailable(SNPE_GPU)) {
-        m_soc_info.m_settings = qti_settings_default_gpu;
-      } else {
-        m_soc_info.m_settings = qti_settings_default_cpu;
-      }
-    }
-  } else {
-    m_soc_info = unsupportedSoc;
   }
 }
 
@@ -429,20 +423,10 @@ bool Socs::soc_settings(const char **settings,
                         const char **not_allowed_message) {
   soc_info_init();
 
-  if (m_soc_info.m_soc_name == UNSUPPORTED_SOC_STR) {
-    // it's a QTI SOC, but can't access soc_id
-    *not_allowed_message = "Unsupported app";
-    *settings = empty_settings.c_str();
-    return true;
-  }
-
   // Check if this SoC is supported
   *not_allowed_message = nullptr;
   *settings = m_soc_info.m_settings.c_str();
-  if (m_soc_info.m_soc_name == DEFAULT_SOC_STR) {
-    // it's a QTI SOC, but the chipset is not yet supported
-    *not_allowed_message = "Unsupported QTI SoC";
-  }
+
   return true;
 }
 

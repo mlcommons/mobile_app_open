@@ -13,12 +13,12 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 
 <!-- markdown-link-check-disable-next-line -->
 * [Qualcomm Package Manager 3](https://qpm.qualcomm.com/#/main/tools/details/QPM3)
-* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk) (Version 2.20.0)
+* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk) (Version 2.25.0.240728)
 * Linux machine capable of running Ubuntu docker images
 
 ### Optional
 
-If you wish to rebuild the DLC files yourself, you will have these additional requirements:
+To rebuild the DLC files yourself, you will have these additional requirements:
 
 * Imagenet dataset (LSVRC2012_img_val.tar) put in the build/imagenet/downloads directory
 * Linux machine also capable of running Tensorflow debian based docker images
@@ -26,6 +26,11 @@ If you wish to rebuild the DLC files yourself, you will have these additional re
 Use your browser to download the SNPE SDK using the links above.
 
 Create your Github personal access token.
+
+### Note for Stable Diffusion
+
+To generate stable diffusion model, please follow the instructions mentioned at
+`<path/to/mobile_app_open/mobile_back_qti/DLC/util/StableDiffusion/README.md>`(DLC/util/StableDiffusion/README.md)
 
 ```shell
 export SNPE_SDK=</path/to/snpe-sdk>
@@ -46,14 +51,15 @@ cd mobile_app_open
 * Install Qualcomm Package manager on the linux machine
 
 ```shell
-sudo apt-get install ./QualcommPackageManager3.3.0.99.0.Linux-x86.deb
+sudo dpkg -i ./QualcommPackageManager3.3.0.111.1.Linux-x86.deb
 ```
 
-* Extract the SNPE SDK (from Requirements above) to mobile_app_open/mobile_back_qti
+* Extract the QAIRT SDK (from Requirements above) to mobile_app_open/mobile_back_qti
 
 ```shell
-qpm-cli --extract ./qualcomm_neural_processing_sdk.2.20.0.240223.Linux-AnyCPU.qik
-cp -rv /opt/qcom/aistack/snpe/2.20.0.240223/. mobile_app_open/mobile_back_qti/qaisw-2.20.0.240223
+qpm-cli --extract ./qualcomm_neural_processing_sdk.2.25.0.240728.Linux-AnyCPU.qik
+mkdir mobile_app_open/mobile_back_qti/qairt/
+cp -rv /opt/qcom/aistack/qairt/2.25.0.240728 mobile_app_open/mobile_back_qti/qairt/
 ```
 
 * If you have an HTTP proxy, you may need the following
@@ -66,7 +72,18 @@ export USE_PROXY_WORKAROUND=1
 Build with the following build command.
 
 ```shell
-make OFFICIAL_BUILD=true FLUTTER_BUILD_NUMBER=1  WITH_QTI=1 docker/flutter/android/release
+make OFFICIAL_BUILD=true FLUTTER_BUILD_NUMBER=1 WITH_QTI=1 docker/flutter/android/release
+```
+
+Build with the following build command to include `stable_diffusion`
+
+* Download `Tutorial for stable diffusion` from QPM Manager.
+* Copy `include` folder from `<path_to_tutorial>/model/example3/host_linux_target_android_with_MLPerf/include` to `mobile_back_qti/cpp/backend_qti/StableDiffusionShared/`
+* Copy `libStableDiffusion.so` from `<path_to_notebook>/model/example3/host_linux_target_android_with_MLPerf/libs/aarch64-android/` to `mobile_back_qti/cpp/backend_qti/StableDiffusionShared/`
+* Run the command below:
+
+```shell
+make OFFICIAL_BUILD=true FLUTTER_BUILD_NUMBER=1 WITH_STABLEDIFFUSION=1 WITH_QTI=1 docker/flutter/android/release
 ```
 
 This will generate the MLPerf flutter app with QTI backend in ```mobile_app_open/output/android-apks/<date>_mlperfbench-<commit_id>-<qtpsm>.apk```
@@ -95,9 +112,8 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 
 ## Requirements for WoS
 
-<!-- markdown-link-check-disable-next-line -->
-* [SNPE windows SDK] (<https://developer.qualcomm.com/software/qualcomm-neural-processing-sdk/tools>)
-  * Version 2.20.0
+* [SNPE windows SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk)
+  * Version 2.25.0.240728
 * Windows x86 machine
 
 ## Setting up the environment
@@ -152,16 +168,20 @@ Run accuracy mode with following command
 .\run_mlperf_test.bat --models <path to mlperf_models> --dataset <path to mlperf_datasets> --usecase <optional, can be one of below mentioned usecases> --mode accuracy
 ```
 
-* --usecase parameter can take one of these arguments => image_classification_v2, image_classification, object_detection, image_segmentation, language_understanding, super_resolution, image_classification_offline_v2, image_classification_offline
+* --usecase parameter can take one of these arguments => image_classification_v2, object_detection, image_segmentation, language_understanding, super_resolution, image_classification_offline_v2
 * see the results in accuracy_results.txt and performance_results.txt
 
 ## FAQ
 
 ### What devices does this backend support?
 
-This backend only supports SDX_Elite, SD7G3, SD8SG3, SD8G3 devices.
+This backend only supports SDX_Elite, SD8SG3, SD8G3 devices.
 Other already launched Snapdragon based devices can also run the MLPerf app as default fallback.
 
 ### Is SNPE used to run all the models?
 
-Yes. All the models use SNPE for execution for current version.
+Yes. All the models use Qualcomm AI Runtime(QAIRT) for execution for current version.
+
+### What devices supports stable diffusion?
+
+Currently, SD8G3 device supports stable_diffusion.

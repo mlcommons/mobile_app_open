@@ -24,8 +24,7 @@ app:
 
 tflite-build:
 	cd ${REPO_ROOT_DIR} && \
-	bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 --macos_minimum_os=13.1 \
-	//flutter/cpp/binary:main //mobile_back_tflite:tflitebackend
+	bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 //flutter/cpp/binary:main //mobile_back_tflite:tflitebackend
 
 tflite-run-ic:
 	cd ${REPO_ROOT_DIR} && \
@@ -134,14 +133,13 @@ tflite-run-sd:
 		--output_dir="${REPO_ROOT_DIR}/output" \
 		--model_file="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/dynamic-sd-models" \
 		--lib_path="bazel-bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so" \
-		--custom_config="stable_diffusion_num_steps:20,stable_diffusion_seed:633994880" \
-		--input_tfrecord="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/coco_gen_full.tfrecord" \
+		--input_tfrecord="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/coco_gen_test.tfrecord" \
 		--input_clip_model="${REPO_ROOT_DIR}/mobile_back_apple/dev-resources/stable_diffusion/clip_model_512x512.tflite" \
 		--min_query_count=5
 
 coreml-build:
 	cd ${REPO_ROOT_DIR} && \
-	bazel build -c opt --cxxopt=-fobjc-arc --cxxopt=-xobjective-c++ --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 --macos_minimum_os=13.1 \
+	bazel build -c opt --cxxopt=-fobjc-arc --cxxopt=-xobjective-c++ --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
 	//flutter/cpp/binary:main //mobile_back_apple:coremlbackend
 
 coreml-run-ic:
