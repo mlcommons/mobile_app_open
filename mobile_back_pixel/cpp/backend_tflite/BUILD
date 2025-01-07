@@ -56,6 +56,7 @@ cc_library(
         "//mobile_back_tflite/cpp/backend_tflite:sd_utils.cc",
         "//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_invoker.cc",
         "//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_pipeline.cc",
+        "//mobile_back_tflite/cpp/backend_tflite:embedding_utils.cc"
     ],
     hdrs = [
         "tflite_settings_pixel.h",
