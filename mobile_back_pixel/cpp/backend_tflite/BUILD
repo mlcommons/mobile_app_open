@@ -60,6 +60,7 @@ cc_library(
     hdrs = [
         "tflite_settings_pixel.h",
         "thread_pool.h",
+        "//mobile_back_tflite/cpp/backend_tflite:embedding_utils.h",
         "//mobile_back_tflite/cpp/backend_tflite:pipeline.h",
         "//mobile_back_tflite/cpp/backend_tflite:sd_utils.h",
         "//mobile_back_tflite/cpp/backend_tflite:single_model_pipeline.h",
