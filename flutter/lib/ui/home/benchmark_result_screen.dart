@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mlperfbench/benchmark/run_mode.dart';
 
 import 'package:provider/provider.dart';
 
@@ -118,6 +119,10 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       shareButton = const SizedBox();
       shareButtonFlex = 0;
     }
+    String runModeString =
+        state.lastResult?.meta.runMode?.localizedName(l10n) ?? l10n.unknown;
+    Text runModeText = Text('${l10n.settingsRunMode}: $runModeString');
+
     final infoSection = Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,6 +130,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         deviceInfoText,
         const SizedBox(height: 4),
         benchmarkDateText,
+        const SizedBox(height: 4),
+        runModeText,
       ],
     );
     Widget testAgainButton = IconButton(
