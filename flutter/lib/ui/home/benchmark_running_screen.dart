@@ -29,12 +29,14 @@ class BenchmarkRunningScreen extends StatefulWidget {
 
 class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   late BenchmarkState state;
+  late Store store;
   late AppLocalizations l10n;
   late ProgressInfo progress;
 
   @override
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
+    store = context.watch<Store>();
     l10n = AppLocalizations.of(context)!;
     progress = state.taskRunner.progressInfo;
 
@@ -69,21 +71,35 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
 
   Widget _title() {
     // The TaskRunner always run all benchmarks in performance mode first then in accuracy mode.
-    var runModeStage = '1/1';
+    var loadgenRunModeStage = '1/1';
     if (progress.runMode.selectedRunModes.length > 1) {
-      runModeStage = progress.accuracy ? '2/2' : '1/2';
+      loadgenRunModeStage = progress.accuracy ? '2/2' : '1/2';
     }
-    var runModeName =
+    final loadgenRunModeName =
         progress.accuracy ? l10n.progressAccuracy : l10n.progressPerformance;
+    final benchmarkRunModeName =
+        store.selectedBenchmarkRunMode.localizedName(l10n);
     return Padding(
         padding: const EdgeInsets.fromLTRB(40, 48, 40, 4),
-        child: Text(
-          '($runModeStage) $runModeName',
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            color: AppColors.lightText,
-            fontSize: 20,
-          ),
+        child: Column(
+          children: [
+            Text(
+              '($loadgenRunModeStage) $loadgenRunModeName',
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: AppColors.lightText,
+                fontSize: 20,
+              ),
+            ),
+            Text(
+              benchmarkRunModeName,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: AppColors.lightText,
+                fontSize: 14,
+              ),
+            ),
+          ],
         ));
   }
 
