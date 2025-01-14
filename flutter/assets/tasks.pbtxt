@@ -15,7 +15,7 @@ task {
     }
     quick {
       min_query_count: 128
-      min_duration: 6
+      min_duration: 10
       max_duration: 60
     }
     rapid {
@@ -72,7 +72,7 @@ task {
     }
     quick {
       min_query_count: 128
-      min_duration: 6
+      min_duration: 10
       max_duration: 60
     }
     rapid {
@@ -129,7 +129,7 @@ task {
     }
     quick {
       min_query_count: 128
-      min_duration: 6
+      min_duration: 10
       max_duration: 60
     }
     rapid {
@@ -185,7 +185,7 @@ task {
     }
     quick {
       min_query_count: 128
-      min_duration: 6
+      min_duration: 10
       max_duration: 60
     }
     rapid {
@@ -238,7 +238,7 @@ task {
     }
     quick {
       min_query_count: 128
-      min_duration: 6
+      min_duration: 10
       max_duration: 60
     }
     rapid {
@@ -298,8 +298,8 @@ task {
     }
     rapid {
       min_query_count: 64
-      min_duration: 6
-      max_duration: 60
+      min_duration: 0
+      max_duration: 0
     }
   }
   datasets {
@@ -350,8 +350,8 @@ task {
     }
     quick {
       min_query_count: 128
-      min_duration: 6
-      max_duration: 30
+      min_duration: 10
+      max_duration: 40
     }
     rapid {
       min_query_count: 64
