@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mlperfbench/benchmark/run_mode.dart';
 
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/performance_result_validity.dart';
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';

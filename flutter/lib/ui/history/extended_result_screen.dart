@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mlperfbench/benchmark/run_mode.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';

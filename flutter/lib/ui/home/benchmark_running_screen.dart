@@ -11,6 +11,7 @@ import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/state/task_runner.dart';
+import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/progress_circle.dart';

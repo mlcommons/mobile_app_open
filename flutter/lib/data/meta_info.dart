@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 import 'package:mlperfbench/benchmark/run_mode.dart';
 
 part 'meta_info.g.dart';
