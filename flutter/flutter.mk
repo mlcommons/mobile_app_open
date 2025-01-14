@@ -76,9 +76,8 @@ flutter/backend-list:
 .PHONY: flutter/result/json
 flutter/result/json:
 	@echo "Generate .g.dart files for the @JsonSerializable annotation"
-	@# https://github.com/dart-lang/build/issues/2835#issuecomment-1047849076
-	cd flutter && ${_start_args} flutter packages pub get
-	cd flutter && ${_start_args} flutter --no-version-check pub run \
+	cd flutter && ${_start_args} dart pub get
+	cd flutter && ${_start_args} dart run \
 		build_runner build --delete-conflicting-outputs
 
 .PHONY: flutter/build-info
