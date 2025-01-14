@@ -69,7 +69,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   Widget _title() {
     // The TaskRunner always run all benchmarks in performance mode first then in accuracy mode.
     var runModeStage = '1/1';
-    if (progress.runMode == BenchmarkRunModeEnum.submissionRun) {
+    if (progress.runMode.selectedRunModes.length > 1) {
       runModeStage = progress.accuracy ? '2/2' : '1/2';
     }
     var runModeName =

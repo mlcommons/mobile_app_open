@@ -4,12 +4,26 @@
 task {
   id: "image_classification_v2"
   name: "Image Classification v2"
-  min_query_count: 1024
-  min_duration: 60
-  max_duration: 600
   max_throughput: 1000
   max_accuracy: 1.0
   scenario: "SingleStream"
+  runs {
+    normal {
+      min_query_count: 1024
+      min_duration: 60
+      max_duration: 600
+    }
+    quick {
+      min_query_count: 128
+      min_duration: 6
+      max_duration: 60
+    }
+    rapid {
+      min_query_count: 64
+      min_duration: 6
+      max_duration: 60
+    }
+  }
   datasets {
     type: IMAGENET
     full {
@@ -47,12 +61,26 @@ task {
 task {
   id: "object_detection"
   name: "Object Detection"
-  min_query_count: 1024
-  min_duration: 60
-  max_duration: 600
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
+  runs {
+    normal {
+      min_query_count: 1024
+      min_duration: 60
+      max_duration: 600
+    }
+    quick {
+      min_query_count: 128
+      min_duration: 6
+      max_duration: 60
+    }
+    rapid {
+      min_query_count: 64
+      min_duration: 6
+      max_duration: 60
+    }
+  }
   datasets {
     type: COCO
     full {
@@ -90,12 +118,26 @@ task {
 task {
   id: "image_segmentation_v2"
   name: "Image Segmentation v2"
-  min_query_count: 1024
-  min_duration: 60
-  max_duration: 600
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
+  runs {
+    normal {
+      min_query_count: 1024
+      min_duration: 60
+      max_duration: 600
+    }
+    quick {
+      min_query_count: 128
+      min_duration: 6
+      max_duration: 60
+    }
+    rapid {
+      min_query_count: 64
+      min_duration: 6
+      max_duration: 60
+    }
+  }
   datasets {
     type: ADE20K
     full {
@@ -132,12 +174,26 @@ task {
 task {
   id: "natural_language_processing"
   name: "Language Understanding"
-  min_query_count: 1024
-  min_duration: 60
-  max_duration: 600
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
+  runs {
+    normal {
+      min_query_count: 1024
+      min_duration: 60
+      max_duration: 600
+    }
+    quick {
+      min_query_count: 128
+      min_duration: 6
+      max_duration: 60
+    }
+    rapid {
+      min_query_count: 64
+      min_duration: 6
+      max_duration: 60
+    }
+  }
   datasets {
     type: SQUAD
     full {
@@ -171,12 +227,26 @@ task {
 task {
   id: "super_resolution"
   name: "Super Resolution "
-  min_query_count: 1024
-  min_duration: 60
-  max_duration: 600
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
+  runs {
+    normal {
+      min_query_count: 1024
+      min_duration: 60
+      max_duration: 600
+    }
+    quick {
+      min_query_count: 128
+      min_duration: 6
+      max_duration: 60
+    }
+    rapid {
+      min_query_count: 64
+      min_duration: 6
+      max_duration: 60
+    }
+  }
   datasets {
     type: SNUSR
     full {
@@ -212,12 +282,26 @@ task {
 task {
   id: "image_classification_offline_v2"
   name: "Image Classification v2 (Offline)"
-  min_query_count: 24576
-  min_duration: 0
-  max_duration: 0
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "Offline"
+  runs {
+    normal {
+      min_query_count: 24576
+      min_duration: 0
+      max_duration: 0
+    }
+    quick {
+      min_query_count: 2457
+      min_duration: 0
+      max_duration: 0
+    }
+    rapid {
+      min_query_count: 64
+      min_duration: 6
+      max_duration: 60
+    }
+  }
   datasets {
     type: IMAGENET
     full {
@@ -255,12 +339,26 @@ task {
 task {
   id: "stable_diffusion"
   name: "Stable Diffusion"
-  min_query_count: 1024
-  min_duration: 60
-  max_duration: 300
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
+  runs {
+    normal {
+      min_query_count: 1024
+      min_duration: 60
+      max_duration: 300
+    }
+    quick {
+      min_query_count: 128
+      min_duration: 6
+      max_duration: 30
+    }
+    rapid {
+      min_query_count: 64
+      min_duration: 6
+      max_duration: 60
+    }
+  }
   datasets {
     type: COCOGEN
     full {

@@ -5,7 +5,6 @@ import 'package:async/async.dart';
 import 'package:uuid/uuid.dart';
 import 'package:worker_manager/worker_manager.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
@@ -60,30 +59,14 @@ class TaskRunner {
     required this.backendInfo,
   });
 
-  BenchmarkRunMode get perfMode => store.testMode
-      ? BenchmarkRunMode.performanceTest
-      : BenchmarkRunMode.performance;
+  BenchmarkRunMode get perfMode =>
+      store.selectedBenchmarkRunMode.performanceRunMode;
 
-  BenchmarkRunMode get accuracyMode => store.testMode
-      ? BenchmarkRunMode.accuracyTest
-      : BenchmarkRunMode.accuracy;
+  BenchmarkRunMode get accuracyMode =>
+      store.selectedBenchmarkRunMode.accuracyRunMode;
 
-  List<BenchmarkRunMode> get selectedRunModes {
-    final modes = <BenchmarkRunMode>[];
-    switch (store.selectedBenchmarkRunMode) {
-      case BenchmarkRunModeEnum.performanceOnly:
-        modes.add(perfMode);
-        break;
-      case BenchmarkRunModeEnum.accuracyOnly:
-        modes.add(accuracyMode);
-        break;
-      case BenchmarkRunModeEnum.submissionRun:
-        modes.add(perfMode);
-        modes.add(accuracyMode);
-        break;
-    }
-    return modes;
-  }
+  List<BenchmarkRunMode> get selectedRunModes =>
+      store.selectedBenchmarkRunMode.selectedRunModes;
 
   Future<void> abortBenchmarks() async {
     aborting = true;
@@ -95,14 +78,7 @@ class TaskRunner {
       BenchmarkStore benchmarkStore, String currentLogDir) async {
     progressInfo = ProgressInfo();
     final cooldown = store.cooldown;
-    late final Duration cooldownDuration;
-    if (store.testMode) {
-      cooldownDuration = Duration(seconds: store.testCooldown);
-    } else if (DartDefine.isFastMode) {
-      cooldownDuration = const Duration(seconds: 1);
-    } else {
-      cooldownDuration = Duration(minutes: store.cooldownDuration);
-    }
+    final cooldownDuration = Duration(seconds: store.cooldownDuration);
 
     final activeBenchmarks =
         benchmarkStore.benchmarks.where((element) => element.isActive);
@@ -118,18 +94,10 @@ class TaskRunner {
       resultHelpers.add(resultHelper);
     }
 
+    print('Starting in run mode: ${store.selectedBenchmarkRunMode}');
     progressInfo.runMode = store.selectedBenchmarkRunMode;
-    switch (store.selectedBenchmarkRunMode) {
-      case BenchmarkRunModeEnum.performanceOnly:
-        progressInfo.totalStages = activeBenchmarks.length;
-        break;
-      case BenchmarkRunModeEnum.accuracyOnly:
-        progressInfo.totalStages = activeBenchmarks.length;
-        break;
-      case BenchmarkRunModeEnum.submissionRun:
-        progressInfo.totalStages = 2 * activeBenchmarks.length;
-        break;
-    }
+    progressInfo.totalStages =
+        selectedRunModes.length * activeBenchmarks.length;
 
     progressInfo.currentStage = 0;
     progressInfo.cooldownDuration = cooldownDuration.inSeconds.toDouble();
@@ -196,21 +164,21 @@ class TaskRunner {
     final benchmark = resultHelper.benchmark;
     progressInfo.currentBenchmark = benchmark.info;
     progressInfo.currentStage++;
-
-    if (mode == perfMode) {
+    if (mode.loadgenMode == LoadgenModeEnum.performanceOnly) {
       final perfTimer = Stopwatch()..start();
       progressInfo.accuracy = false;
+      double taskMinDuration =
+          mode.chooseRunConfig(benchmark.taskConfig).minDuration;
+      int taskMinQueryCount =
+          mode.chooseRunConfig(benchmark.taskConfig).minQueryCount;
       progressInfo.calculateStageProgress = () {
         // UI updates once per second so using 1 second as lower bound should not affect it.
-        final minDuration = max(benchmark.taskConfig.minDuration, 1);
-        final timeProgress = perfTimer.elapsedMilliseconds /
-            Duration.millisecondsPerSecond /
-            minDuration;
-
-        final minQueries = max(benchmark.taskConfig.minQueryCount, 1);
+        final minDuration = max(taskMinDuration, 1);
+        final timeProgress = perfTimer.elapsed.inSeconds / minDuration;
+        final minQueries = max(taskMinQueryCount, 1);
         final queryCounter = backendBridge.getQueryCounter();
         final queryProgress =
-            queryCounter < 0 ? 1.0 : queryCounter / minQueries;
+            queryCounter < 0 ? 0.0 : queryCounter / minQueries;
         return min(timeProgress, queryProgress);
       };
       notifyListeners();
@@ -226,8 +194,6 @@ class TaskRunner {
         resourceManager: resourceManager,
         commonSettings: backendInfo.settings.commonSetting,
         backendLibName: backendInfo.libName,
-        testMinQueryCount: store.testMinQueryCount,
-        testMinDuration: store.testMinDuration,
       );
       final performanceRunInfo = await runHelper.run();
       perfTimer.stop();
@@ -245,7 +211,7 @@ class TaskRunner {
         loadgenInfo: performanceRunInfo.loadgenInfo!,
       );
       resultHelper.performanceRunInfo = performanceRunInfo;
-    } else if (mode == accuracyMode) {
+    } else if (mode.loadgenMode == LoadgenModeEnum.accuracyOnly) {
       progressInfo.accuracy = true;
       progressInfo.calculateStageProgress = () {
         final queryCounter = backendBridge.getQueryCounter();
@@ -266,8 +232,6 @@ class TaskRunner {
         resourceManager: resourceManager,
         commonSettings: backendInfo.settings.commonSetting,
         backendLibName: backendInfo.libName,
-        testMinQueryCount: store.testMinQueryCount,
-        testMinDuration: store.testMinDuration,
       );
       final accuracyRunInfo = await runHelper.run();
       resultHelper.accuracyRunInfo = accuracyRunInfo;
@@ -285,6 +249,7 @@ class TaskRunner {
         loadgenInfo: accuracyRunInfo.loadgenInfo,
       );
     } else {
+      print('Unknown BenchmarkRunMode: $mode');
       throw 'Unknown BenchmarkRunMode: $mode';
     }
     progressInfo.completedBenchmarks.add(benchmark.info);
@@ -313,8 +278,6 @@ class _NativeRunHelper {
     required ResourceManager resourceManager,
     required List<pb.CommonSetting> commonSettings,
     required String backendLibName,
-    required int testMinQueryCount,
-    required int testMinDuration,
   }) async {
     runSettings = await benchmark.createRunSettings(
       runMode: runMode,
@@ -322,8 +285,6 @@ class _NativeRunHelper {
       commonSettings: commonSettings,
       backendLibName: backendLibName,
       logDir: logDir,
-      testMinQueryCount: testMinQueryCount,
-      testMinDuration: testMinDuration,
     );
   }
 

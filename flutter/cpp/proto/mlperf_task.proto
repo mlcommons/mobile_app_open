@@ -31,28 +31,40 @@ message MLPerfConfig {
 // Config of the mlperf tasks.
 // A task is basically a combination of models and a dataset.
 //
-// Next ID: 12
+// Next ID: 13
 message TaskConfig {
   // Must be unique in one task file. Ex: image_classification
   // used to match backend settings
   required string id = 1;
   // Human-readable name. Ex: Image classification.
   required string name = 2;
-  // Minimum number of samples the test should run in the performance mode.
-  required int32 min_query_count = 3;
-  // Minimum duration the test should run in the performance mode, in seconds.
-  required double min_duration = 4 [default = 60];
-  // Maximum duration the test should run in the performance mode, in seconds.
-  required double max_duration = 10 [default = 600];
   // Max expected throughput score
   required float max_throughput = 5;
   // Max expected accuracy
   required float max_accuracy = 6;
   // LoadGen parameter. Allowed values: SingleStream, Offline
   required string scenario = 7;
+  required RunConfig runs = 12;
   required DatasetConfig datasets = 8;
   required ModelConfig model = 9;
   repeated CustomConfig custom_config = 11;
+}
+
+// Run configurations
+message RunConfig {
+  required OneRunConfig normal = 1;
+  required OneRunConfig quick = 2;
+  required OneRunConfig rapid = 3;
+}
+
+// Config of one run
+message OneRunConfig {
+  // Minimum number of samples the test should run in the performance mode.
+  required int32 min_query_count = 3;
+  // Minimum duration the test should run in the performance mode, in seconds.
+  required double min_duration = 4 [default = 60];
+  // Maximum duration the test should run in the performance mode, in seconds.
+  required double max_duration = 10 [default = 600];
 }
 
 // Datasets for a task

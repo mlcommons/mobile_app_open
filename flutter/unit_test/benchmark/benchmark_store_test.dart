@@ -87,7 +87,7 @@ void main() {
         taskSelection: {task1.id: false},
       );
 
-      final modes = [BenchmarkRunMode.accuracy];
+      final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
       final activeBenchmarks =
           store.benchmarks.where((e) => e.isActive).toList();
       final resources = store.listResources(
@@ -104,7 +104,7 @@ void main() {
         taskSelection: {},
       );
 
-      final modes = [BenchmarkRunMode.accuracy];
+      final modes = [BenchmarkRunModeEnum.accuracyOnly.accuracyRunMode];
       final activeBenchmarks =
           store.benchmarks.where((e) => e.isActive).toList();
       final resources = store.listResources(
@@ -143,7 +143,7 @@ void main() {
         taskSelection: {},
       );
 
-      final modes = [BenchmarkRunMode.performance];
+      final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
       final activeBenchmarks =
           store.benchmarks.where((e) => e.isActive).toList();
       final resources = store.listResources(
@@ -176,8 +176,8 @@ void main() {
       );
 
       final modes = [
-        BenchmarkRunMode.accuracyTest,
-        BenchmarkRunMode.performanceTest,
+        BenchmarkRunModeEnum.integrationTestRun.accuracyRunMode,
+        BenchmarkRunModeEnum.integrationTestRun.performanceRunMode,
       ];
       final activeBenchmarks =
           store.benchmarks.where((e) => e.isActive).toList();
