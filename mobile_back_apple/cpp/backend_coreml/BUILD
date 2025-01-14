@@ -39,6 +39,7 @@ apple_xcframework(
     },
     minimum_os_versions = {
         "ios": "13.1",
+        "macos": "13.1",
     },
     deps = [
         "//mobile_back_apple/cpp/backend_coreml:coreml_c",

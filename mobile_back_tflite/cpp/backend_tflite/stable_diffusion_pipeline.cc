@@ -6,7 +6,9 @@
 #include <random>
 #include <valarray>
 
+#include "embedding_utils.h"
 #include "flutter/cpp/c/backend_c.h"
+#include "flutter/cpp/utils.h"
 #include "stable_diffusion_invoker.h"
 #include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/c/common.h"
@@ -58,12 +60,26 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
 
   // Verify only one instance of the backend exists at any time
   if (backendExists) {
+    LOG(ERROR) << "Backend already exists";
     return nullptr;
   }
 
   SDBackendData* backend_data = new SDBackendData();
   backendExists = true;
 
+  // Read seed and num_steps value from SD task settings
+  backend_data->seed =
+      mlperf::mobile::GetConfigValue(configs, "stable_diffusion_seed", 0);
+  if (backend_data->seed == 0) {
+    LOG(ERROR) << "Cannot get stable_diffusion_seed";
+    return nullptr;
+  }
+  backend_data->num_steps =
+      mlperf::mobile::GetConfigValue(configs, "stable_diffusion_num_steps", 0);
+  if (backend_data->num_steps == 0) {
+    LOG(ERROR) << "Cannot get stable_diffusion_num_steps";
+    return nullptr;
+  }
   // Load models from the provided directory path
   std::string text_encoder_path =
       std::string(model_path) + "/sd_text_encoder_dynamic.tflite";
@@ -91,6 +107,16 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
 
   if (!backend_data->text_encoder_interpreter ||
       !backend_data->sd_interpreter || !backend_data->decoder_interpreter) {
+    backend_delete(backend_data);
+    return nullptr;
+  }
+
+  std::string ts_embedding_path =
+      std::string(model_path) + "/timestep_embeddings_data.bin.ts";
+  if (!EmbeddingManager::getInstance().load_timestep_embeddings(
+          ts_embedding_path)) {
+    LOG(ERROR) << "Failed to load timestep embeddings from "
+               << ts_embedding_path;
     backend_delete(backend_data);
     return nullptr;
   }
@@ -265,6 +291,10 @@ mlperf_status_t StableDiffusionPipeline::backend_get_output(
 }
 
 void StableDiffusionPipeline::backend_convert_inputs(
+    mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
+    uint8_t* data) {}
+
+void StableDiffusionPipeline::backend_convert_outputs(
     mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
     uint8_t* data) {}
 
