@@ -18,27 +18,27 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/betas.bin"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/betas.bin"
       model_checksum: "09d2e4306d319caf1b34e6afb5c63c22"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/lambdas.bin"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/lambdas.bin"
       model_checksum: "c7179725ec31a6e2c7daf008a5e1ff23"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/sd_precompute_data.tar"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/sd_precompute_data.tar"
       model_checksum: "beb7fe2da40042fb585bb8cb95d86b4d"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/text_encoder.serialized.bin"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/text_encoder.serialized.bin"
       model_checksum: "6da7b95fa467e99af2b9f80c7afe3734"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/unet.serialized.bin"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/unet.serialized.bin"
       model_checksum: "3b504b92cbd788d713ca9cfc5b19d596"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/vae_decoder.serialized.bin"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/vae_decoder.serialized.bin"
       model_checksum: "c7762e64c2596abe7f16614709cc5482"
     }
   }
