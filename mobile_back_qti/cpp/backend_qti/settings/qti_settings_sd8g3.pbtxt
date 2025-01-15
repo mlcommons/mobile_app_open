@@ -107,7 +107,7 @@ benchmark_setting {
     accelerator_desc: "HTP"
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/ssd_mobiledet_qat_htp.dlc"
-      model_checksum: ""
+      model_checksum: "49c6afbfefffb78269fe73a6ee1b4a85"
     }
   }
   single_stream_expected_latency_ns: 500000
