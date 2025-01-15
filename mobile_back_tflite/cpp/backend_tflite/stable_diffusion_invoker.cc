@@ -154,7 +154,7 @@ std::vector<float> StableDiffusionInvoker::diffusion_process(
     latent.assign(std::begin(l), std::end(l));
   }
 
-  std::cout << "\nDiffusion process completed" << std::endl;
+  LOG(INFO) << "Diffusion process completed!";
   return latent;
 }
 
