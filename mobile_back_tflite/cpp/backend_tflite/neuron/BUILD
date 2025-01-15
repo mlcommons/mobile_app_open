@@ -72,6 +72,7 @@ cc_library(
         ":tflite_settings",
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
+        "//mobile_back_tflite/cpp/backend_tflite:embedding_utils",
         "//mobile_back_tflite/cpp/backend_tflite:tflite_settings",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
         "@org_tensorflow//tensorflow/lite/c:c_api",

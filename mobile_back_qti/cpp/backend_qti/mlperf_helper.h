@@ -57,6 +57,8 @@ static void process_config(const mlperf_backend_configuration_t *configs,
       backend_data->scenario_ = configs->values[i];
     } else if (strcmp(configs->keys[i], "snpe_output_layers") == 0) {
       backend_data->snpeOutputLayers_ = configs->values[i];
+    } else if (strcmp(configs->keys[i], "snpe_output_tensors") == 0) {
+      backend_data->snpeOutputTensors_ = configs->values[i];
     } else if (strcmp(configs->keys[i], "bg_load") == 0) {
       if (strcmp(configs->values[i], "true") == 0) {
         backend_data->bgLoad_ = true;
@@ -141,12 +143,19 @@ static void process_config(const mlperf_backend_configuration_t *configs,
       } else {
         backend_data->useCpuInt8_ = false;
       }
+    } else if (strcmp(configs->keys[i], "pipeline") == 0) {
+      if (std::strcmp(configs->values[i], "StableDiffusionPipeline") == 0) {
+        backend_data->isStableDiffusion = true;
+      } else {
+        backend_data->isStableDiffusion = false;
+      }
     }
   }
 
   LOG(INFO) << "Config: delegate: " << delegate
             << " | scenario: " << backend_data->scenario_
-            << " | output: " << backend_data->snpeOutputLayers_
+            << " | output layer: " << backend_data->snpeOutputLayers_
+            << " | output tensor: " << backend_data->snpeOutputTensors_
             << " | isTfLite: " << backend_data->isTflite_
             << " | batchSize: " << backend_data->batchSize_
             << " | useSNPE: " << backend_data->useSnpe_
@@ -159,7 +168,8 @@ static void process_config(const mlperf_backend_configuration_t *configs,
             << " | profileLevel: " << profileLevel
             << " | useIonBuffer: " << backend_data->useIonBuffers_
             << " | acceleratorName: " << backend_data->acceleratorName_
-            << " | useCpuInt8: " << backend_data->useCpuInt8_;
+            << " | useCpuInt8: " << backend_data->useCpuInt8_
+            << " | isStableDiffusion: " << backend_data->isStableDiffusion;
 }
 
 #endif

@@ -37,8 +37,19 @@ pbtxt2header(
 )
 
 cc_library(
+    name = "embedding_utils",
+    srcs = ["embedding_utils.cc"],
+    hdrs = ["embedding_utils.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
+    ],
+)
+
+cc_library(
     name = "tflite_c",
     srcs = [
+        "embedding_utils.cc",
         "sd_utils.cc",
         "single_model_pipeline.cc",
         "stable_diffusion_invoker.cc",
@@ -46,6 +57,7 @@ cc_library(
         "tflite_c.cc",
     ],
     hdrs = [
+        "embedding_utils.h",
         "pipeline.h",
         "sd_utils.h",
         "single_model_pipeline.h",
@@ -67,6 +79,7 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
+        ":embedding_utils",
         ":tflite_settings",
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",

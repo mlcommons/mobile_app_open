@@ -31,7 +31,6 @@ RpcMem::RpcMem() {
     libHandle_ = dlopen("libcdsprpc.so", RTLD_NOW);
 #else
     std::string windowsRpcPath = Socs::getServiceBinaryPath(L"qcnspmcdm");
-    ;
     std::string windowsLibName = "libcdsprpc.dll";
     windowsRpcPath = windowsRpcPath + '\\' + windowsLibName;
     libHandle_ = LoadLibrary(windowsRpcPath.c_str());
@@ -55,6 +54,7 @@ RpcMem::RpcMem() {
     rpcmemFree_ = reinterpret_cast<RpcMemFreePtr>(
         (void *)(intptr_t)GetProcAddress((HINSTANCE)libHandle_, "rpcmem_free"));
 #endif
+
     if (rpcmemAlloc_ && rpcmemFree_) {
       isSuccess_ = true;
     } else {

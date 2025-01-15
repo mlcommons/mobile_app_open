@@ -60,7 +60,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
     _kS24Ultra: Interval(min: 800, max: 1500),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 5, max: 90),
+    _kDN2103: Interval(min: 4.5, max: 90),
     _kS10Plus: Interval(min: 400, max: 800)
   },
   _kSamsungBackend: {
@@ -247,7 +247,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
     _kS24Ultra: Interval(min: 900, max: 1600),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 5, max: 90),
+    _kDN2103: Interval(min: 4.5, max: 90),
     _kS10Plus: Interval(min: 700, max: 1200)
   },
   _kSamsungBackend: {

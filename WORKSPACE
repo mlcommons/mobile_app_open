@@ -1,7 +1,7 @@
 workspace(name = "mlperf_app")
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "bazel_skylib",
@@ -49,11 +49,11 @@ http_archive(
     ],
 )
 
-load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 load(
     "@org_tensorflow//tensorflow/tools/toolchains/python:python_repo.bzl",
     "python_repository",
 )
+load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 
 python_repository(name = "python_version_repo")
 
@@ -105,5 +105,12 @@ load("//mobile_back_qti:variables.bzl", "snpe_version_loader")
 
 snpe_version_loader(
     name = "snpe_version_loader",
+    workspace_dir = __workspace_dir__,
+)
+
+load("//mobile_back_qti/cpp/backend_qti/StableDiffusionShared:variables.bzl", "stable_diffusion_external_deps_shared")
+
+stable_diffusion_external_deps_shared(
+    name = "stable_diffusion_external_deps_shared",
     workspace_dir = __workspace_dir__,
 )
