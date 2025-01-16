@@ -106,18 +106,20 @@ std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
   backend_->ConvertOutputs(total_byte, OUTPUT_WIDTH, OUTPUT_HEIGHT,
                            output_pixels.data());
 
-  std::string raw_output_filename =
-      raw_output_dir_ + "/output_" + std::to_string(sample_idx) + ".rgb8";
-  dump_output_pixels(output_pixels, raw_output_filename);
-
   if (!output_pixels.empty()) {
     sample_ids_.insert(sample_idx);
     CaptionRecord* record = samples_.at(sample_idx).get();
-    LOG(INFO) << "caption: " << record->get_caption();
-    caption_map[sample_idx] = record->get_caption();
+    LOG(INFO) << "caption_id: " << record->get_caption_id()
+              << " caption_text: " << record->get_caption_text();
+    caption_id_map[sample_idx] = record->get_caption_id();
+    caption_text_map[sample_idx] = record->get_caption_text();
     output_pixels_map[sample_idx] = output_pixels;
     attention_mask_map[sample_idx] = record->get_attention_mask_vector();
     input_ids_map[sample_idx] = record->get_input_ids_vector();
+    std::string raw_output_filename = raw_output_dir_ + "/caption_id_" +
+                                      std::to_string(record->get_caption_id()) +
+                                      ".rgb8";
+    dump_output_pixels(output_pixels, raw_output_filename);
     return output_pixels;
   } else {
     return std::vector<uint8_t>();
@@ -130,7 +132,8 @@ float CocoGen::ComputeAccuracy() {
   float total_score = 0.0f;
   float total_samples = static_cast<float>(sample_ids_.size());
   for (int sample_idx : sample_ids_) {
-    std::string caption = caption_map[sample_idx];
+    int caption_id = caption_id_map[sample_idx];
+    std::string caption_text = caption_text_map[sample_idx];
     std::vector<int32_t> input_ids = input_ids_map[sample_idx];
     std::vector<int32_t> attention_mask = attention_mask_map[sample_idx];
     std::vector<uint8_t> output_pixels = output_pixels_map[sample_idx];
@@ -140,8 +143,8 @@ float CocoGen::ComputeAccuracy() {
     }
     float score =
         score_predictor_.predict(attention_mask, input_ids, pixel_values);
-    LOG(INFO) << "sample_idx: " << sample_idx << " caption: " << caption
-              << " score: " << score;
+    LOG(INFO) << "sample_idx: " << sample_idx << " caption_id: " << caption_id
+              << " caption_text: " << caption_text << " score: " << score;
     total_score += score;
   }
   float avg_score = total_score / total_samples;

@@ -34,7 +34,7 @@ rem # use --models argument to pass models path as value
 rem # use --mode argument to run in performance or accuracy mode. Defaults to performance mode.
 rem # valid values for --mode argument: performance, accuracy.
 rem # use --usecase argument to pass name of usecase to run as value (if not mentioned, by default runs all 8 usecases)
-rem # valid values for --usecase argument: image_classification_v2, image_classification, object_detection, image_segmentation, language_understanding, super_resolution, image_classification_offline_v2, image_classification_offline
+rem # valid values for --usecase argument: image_classification_v2, object_detection, image_segmentation, language_understanding, super_resolution, image_classification_offline_v2
 
 :loop
 IF NOT "%1"=="" (
@@ -115,14 +115,6 @@ IF "%usecase_name%"=="image_classification_offline_v2" (
     call :image_classification_offline_v2_performance
     goto :eof
 )
-IF "%usecase_name%"=="image_classification" (
-    call :image_classification_performance
-    goto :eof
-)
-IF "%usecase_name%"=="image_classification_offline" (
-    call :image_classification_offline_performance
-    goto :eof
-)
 IF  %usecase_name%=="" (
     call :image_classification_v2_performance
     echo ## cooldown intitated ##
@@ -140,12 +132,6 @@ IF  %usecase_name%=="" (
     echo ## cooldown intitated ##
     timeout /t %cooldown_period% /nobreak
     call :image_classification_offline_v2_performance
-    echo ## cooldown intitated ##
-    timeout /t %cooldown_period% /nobreak
-    call :image_classification_performance
-    echo ## cooldown intitated ##
-    timeout /t %cooldown_period% /nobreak
-    call :image_classification_offline_performance
     goto :eof
 )
 )
@@ -176,14 +162,6 @@ IF "%usecase_name%"=="image_classification_offline_v2" (
     call :image_classification_offline_v2_accuracy
     goto :eof
 )
-IF "%usecase_name%"=="image_classification" (
-    call :image_classification_accuracy
-    goto :eof
-)
-IF "%usecase_name%"=="image_classification_offline" (
-    call :image_classification_offline_accuracy
-    goto :eof
-)
 IF  %usecase_name%=="" (
     call :image_classification_v2_accuracy
     echo ## cooldown intitated ##
@@ -201,12 +179,6 @@ IF  %usecase_name%=="" (
     echo ## cooldown intitated ##
     timeout /t %cooldown_period% /nobreak
     call :image_classification_offline_v2_accuracy
-    echo ## cooldown intitated ##
-    timeout /t %cooldown_period% /nobreak
-    call :image_classification_accuracy
-    echo ## cooldown intitated ##
-    timeout /t %cooldown_period% /nobreak
-    call :image_classification_offline_accuracy
     goto :eof
 )
 )
@@ -293,31 +265,6 @@ findstr /C:"Samples per second" %use_case_results_file% >> %results_file%
 echo ####### Image classification offline V2 is complete #######
 EXIT /B 0
 
-:image_classification_performance
-echo ####### Performance:: Image classification in progress #######
-set test_case=image_classification
-mkdir %test_case%%test_case_suffix%
-set use_case_results_file=%results_prefix%%test_case%%results_suffix%
-.\main.exe EXTERNAL %test_case% --mode=PerformanceOnly --images_directory=%dataset_path%\imagenet\img --offset=1 --output_dir=%test_case%%test_case_suffix% --min_query_count=%min_query% --min_duration_ms=%min_duration_ms% --single_stream_expected_latency_ns=600000 --groundtruth_file=%dataset_path% --model_file=%models_path%\mobilenet_edgetpu_224_1.0_htp.dlc --lib_path=libqtibackend.dll --native_lib_path=. > %use_case_results_file% 2>&1
-echo #######%test_case%###### >> %results_file%
-findstr /C:"90th percentile latency (ns)" %use_case_results_file% >> %results_file%
-findstr /C:"Result is" %use_case_results_file% >> %results_file%
-findstr /C:"QPS w/o loadgen overhead" %use_case_results_file% >> %results_file%
-echo ####### Image classification is complete #######
-EXIT /B 0
-
-:image_classification_offline_performance
-echo ####### Performance:: Image classification offline in progress #######
-set test_case=image_classification_offline
-mkdir %test_case%%test_case_suffix%
-set use_case_results_file=%results_prefix%%test_case%%results_suffix%
-.\main.exe EXTERNAL %test_case% --mode=PerformanceOnly --scenario=Offline --batch_size=12288 --images_directory=%dataset_path%\imagenet\img --offset=1 --output_dir=%test_case%%test_case_suffix% --min_query_count=24576 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000 --groundtruth_file=%dataset_path% --model_file=%models_path%\mobilenet_edgetpu_224_1.0_htp_batched_8.dlc --lib_path=libqtibackend.dll --native_lib_path=. > %use_case_results_file% 2>&1
-echo #######%test_case%###### >> %results_file%
-findstr /C:"Result is" %use_case_results_file% >> %results_file%
-findstr /C:"Samples per second" %use_case_results_file% >> %results_file%
-echo ####### Image classification offline is complete #######
-EXIT /B 0
-
 rem ####### Accuracy usecase functions #######
 
 :image_classification_v2_accuracy
@@ -384,28 +331,6 @@ set use_case_results_file=%results_prefix%%test_case%%results_suffix%
 echo #######%test_case%###### >> %results_file%
 findstr "Accuracy" %use_case_results_file% >> %results_file%
 echo ####### Image classification offline V2 is complete #######
-EXIT /B 0
-
-:image_classification_accuracy
-echo ####### Accuracy:: Image classification in progress #######
-set test_case=image_classification
-mkdir %test_case%%test_case_suffix%
-set use_case_results_file=%results_prefix%%test_case%%results_suffix%
-.\main.exe EXTERNAL %test_case% --mode=AccuracyOnly --images_directory=%dataset_path%\imagenet\img --offset=1 --output_dir=%test_case%%test_case_suffix% --min_query_count=%min_query% --min_duration_ms=%min_duration_ms% --single_stream_expected_latency_ns=600000 --groundtruth_file=%dataset_path%\imagenet\imagenet_val_full.txt --model_file=%models_path%\mobilenet_edgetpu_224_1.0_htp.dlc --lib_path=libqtibackend.dll --native_lib_path=. > %use_case_results_file% 2>&1
-echo #######%test_case%###### >> %results_file%
-findstr "Accuracy" %use_case_results_file% >> %results_file%
-echo ####### Image classification is complete #######
-EXIT /B 0
-
-:image_classification_offline_accuracy
-echo ####### Accuracy:: Image classification offline in progress #######
-set test_case=image_classification_offline
-mkdir %test_case%%test_case_suffix%
-set use_case_results_file=%results_prefix%%test_case%%results_suffix%
-.\main.exe EXTERNAL %test_case% --mode=AccuracyOnly --scenario=Offline --batch_size=12288 --images_directory=%dataset_path%\imagenet\img --offset=1 --output_dir=%test_case%%test_case_suffix% --min_query_count=24576 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000 --groundtruth_file=%dataset_path%\imagenet\imagenet_val_full.txt --model_file=%models_path%\mobilenet_edgetpu_224_1.0_htp_batched_8.dlc --lib_path=libqtibackend.dll --native_lib_path=. > %use_case_results_file%  2>&1
-echo #######%test_case%###### >> %results_file%
-findstr "Accuracy" %use_case_results_file% >> %results_file%
-echo ####### Image classification offline is complete #######
 EXIT /B 0
 
 :dataset_end

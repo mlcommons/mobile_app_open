@@ -63,6 +63,12 @@ class BenchmarkInfo {
           detailsTitle: stringResources.benchInfoSuperResolution,
           detailsContent: stringResources.benchInfoSuperResolutionDesc,
         );
+      case (BenchmarkId.stableDiffusion):
+        return BenchmarkLocalizationInfo(
+          name: stringResources.benchNameStableDiffusion,
+          detailsTitle: stringResources.benchInfoStableDiffusion,
+          detailsContent: stringResources.benchInfoStableDiffusionDesc,
+        );
       default:
         throw 'unhandled task id: ${task.id}';
     }

@@ -29,9 +29,14 @@ struct CaptionRecord {
     tensorflow::Example example;
     example.ParseFromString(record);
 
+    auto caption_id_list =
+        tensorflow::GetFeatureValues<int64_t>("caption_id", example);
+    caption_id =
+        std::vector<int32_t>(caption_id_list.begin(), caption_id_list.end())[0];
+
     auto caption_list =
         tensorflow::GetFeatureValues<string>("caption", example);
-    caption =
+    caption_text =
         std::vector<std::string>(caption_list.begin(), caption_list.end());
 
     auto input_id_list =
@@ -57,7 +62,8 @@ struct CaptionRecord {
 
   void dump() {
     std::cout << "CaptionRecord:\n";
-    std::cout << "  caption: " << get_caption() << "\n";
+    std::cout << "  caption_id: " << get_caption_id() << "\n";
+    std::cout << "  caption_text: " << get_caption_text() << "\n";
     std::cout << "  input_ids: ";
     for (size_t i = 0; i < input_ids.size(); ++i) {
       std::cout << input_ids[i];
@@ -80,7 +86,8 @@ struct CaptionRecord {
     std::cout << "  clip_score: " << clip_score << "\n";
   }
 
-  std::string get_caption() const { return caption[0]; }
+  int get_caption_id() const { return caption_id; }
+  std::string get_caption_text() const { return caption_text[0]; }
   std::string get_filename() const { return filename[0]; }
   int32_t* get_input_ids() { return input_ids.data(); }
   int32_t* get_attention_mask() { return attention_mask.data(); }
@@ -88,7 +95,8 @@ struct CaptionRecord {
   std::vector<int32_t> get_attention_mask_vector() { return attention_mask; }
 
  private:
-  std::vector<std::string> caption;
+  int caption_id;
+  std::vector<std::string> caption_text;
   std::vector<int32_t> input_ids;
   std::vector<int32_t> attention_mask;
   std::vector<std::string> filename;

@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The MLPerf Authors. All Rights Reserved.
+# Copyright 2020-2024 The MLPerf Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ flutter_common_docker_flags= \
 		--env WITH_PIXEL=${WITH_PIXEL} \
 		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
 		--env proxy_bazel_args=${proxy_bazel_args} \
+		--env BAZEL_OUTPUT_ROOT_ARG="--output_user_root=/image-workdir/cache/bazel" \
 		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
 		--env FIREBASE_CRASHLYTICS_ENABLED=${FIREBASE_CRASHLYTICS_ENABLED} \
 		--env FLUTTER_BUILD_NUMBER=${FLUTTER_BUILD_NUMBER} \

@@ -32,7 +32,7 @@ export LD_LIBRARY_PATH=.
 # use --mode argument to run in performance or accuracy mode. Defaults to performance mode.
 # valid values for --mode argument: performance, accuracy.
 # use --usecase argument to pass name of usecase to run as value (if not mentioned, by default runs all 8 usecases)
-# valid values for --usecase argument: image_classification_v2, image_classification, object_detection, image_segmentation, language_understanding, super_resolution, image_classification_offline_v2, image_classification_offline
+# valid values for --usecase argument: image_classification_v2, object_detection, image_segmentation, language_understanding, super_resolution, image_classification_offline_v2
 
 while [[ $# -gt 0 ]]
 do
@@ -170,31 +170,18 @@ grep "Samples per second" $use_case_results_file >> $results_file
 echo "####### Image classification offline V2 is complete #######"
 }
 
-image_classification_performance(){
-echo "####### Performance:: Image classification in progress #######"
-export test_case=image_classification
+stable_diffusion_performance(){
+echo "####### Performance:: Stable diffusion in progress #######"
+export test_case=stable_diffusion
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL $test_case --mode=PerformanceOnly --images_directory=$dataset_path/imagenet/img --offset=1 --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration_ms=$min_duration_ms --single_stream_expected_latency_ns=500000 --groundtruth_file="" --model_file=$models_path/mobilenet_edgetpu_224_1.0_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL $test_case --mode=PerformanceOnly --input_tfrecord=$dataset_path/stable_diffusion/coco_gen_full.tfrecord --output_dir=$test_case$test_case_suffix --min_query_count=1024 --min_duration_ms=60000 --max_duration_ms=300000 --single_stream_expected_latency_ns=1000000  --model_file=$models_path/stable_diffusion --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "90th percentile latency (ns)" $use_case_results_file >> $results_file
 grep "Result is" $use_case_results_file >> $results_file
 grep "QPS w/o loadgen overhead" $use_case_results_file >> $results_file
-echo "####### Image classification is complete #######"
+echo "####### Stable Diffusion is complete #######"
 }
-
-image_classification_offline_performance(){
-echo "####### Performance:: Image classification offline in progress #######"
-export test_case=image_classification_offline
-mkdir -p $test_case$test_case_suffix
-export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL $test_case --mode=PerformanceOnly --scenario=Offline --batch_size=12288 --images_directory=$dataset_path/imagenet/img --offset=1 --output_dir=$test_case$test_case_suffix --min_query_count=24576 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000 --groundtruth_file= --model_file=$models_path/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
-echo "#######$test_case######" >> $results_file
-grep "Result is" $use_case_results_file >> $results_file
-grep "Samples per second" $use_case_results_file >> $results_file
-echo "####### Image classification offline is complete #######"
-}
-
 
 ####### Accuracy usecase functions #######
 
@@ -236,7 +223,7 @@ echo "####### Accuracy:: Natural language processing in progress #######"
 export test_case=natural_language_processing
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL $test_case --mode=AccuracyOnly --input_file=$dataset_path/squad/squad_eval.tfrecord --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration_ms=$min_duration_ms --single_stream_expected_latency_ns=1000000 --groundtruth_file=$dataset_path/squad/squad_groundtruth.tfrecord --model_file=$models_path/mobilebert_quantized_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL $test_case --mode=AccuracyOnly --input_file=$dataset_path/squad/squad_eval_mini.tfrecord --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration_ms=$min_duration_ms --single_stream_expected_latency_ns=1000000 --groundtruth_file=$dataset_path/squad/squad_groundtruth.tfrecord --model_file=$models_path/mobilebert_quantized_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "Accuracy" $use_case_results_file >> $results_file
 echo "####### Natural language processing is complete #######"
@@ -264,29 +251,18 @@ grep "Accuracy" $use_case_results_file >> $results_file
 echo "####### Image classification offline V2 is complete #######"
 }
 
-image_classification_accuracy(){
-echo "####### Accuracy:: Image classification in progress #######"
-export test_case=image_classification
+stable_diffusion_accuracy(){
+echo "####### Accuracy:: Stable diffusion in progress #######"
+export test_case=stable_diffusion
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL $test_case --mode=AccuracyOnly --images_directory=$dataset_path/imagenet/img --offset=1 --output_dir=$test_case$test_case_suffix --min_query_count=$min_query --min_duration_ms=$min_duration_ms --single_stream_expected_latency_ns=1000000 --groundtruth_file=$dataset_path/imagenet/imagenet_val_full.txt --model_file=$models_path/mobilenet_edgetpu_224_1.0_htp.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL $test_case --mode=AccuracyOnly --input_tfrecord=$dataset_path/stable_diffusion/coco_gen_test.tfrecord --input_clip_model=$models_path/stable_diffusion/clip_model_512x512.tflite --output_dir=$test_case$test_case_suffix --min_query_count=100 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000  --model_file=$models_path/stable_diffusion --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "Accuracy" $use_case_results_file >> $results_file
-echo "####### Image classification is complete #######"
+echo "####### Stable Diffusion is complete #######"
 }
 
-image_classification_offline_accuracy(){
-echo "####### Accuracy:: Image classification offline in progress #######"
-export test_case=image_classification_offline
-mkdir -p $test_case$test_case_suffix
-export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL $test_case --mode=AccuracyOnly --scenario=Offline --batch_size=12288 --images_directory=$dataset_path/imagenet/img --offset=1 --output_dir=$test_case$test_case_suffix --min_query_count=24576 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000 --groundtruth_file=$dataset_path/imagenet/imagenet_val_full.txt --model_file=$models_path/mobilenet_edgetpu_224_1.0_htp_batched_4.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
-echo "#######$test_case######" >> $results_file
-grep "Accuracy" $use_case_results_file >> $results_file
-echo "####### Image classification offline is complete #######"
-}
-
-if [[ "$mode" == "performance" || "$mode" == "" ]] 
+if [[ "$mode" == "performance" || "$mode" == "" ]]
 then
 case $usecase_name in
   "image_classification_v2")
@@ -307,11 +283,8 @@ case $usecase_name in
   "image_classification_offline_v2")
     image_classification_offline_v2_performance
     ;;
-  "image_classification")
-    image_classification_performance
-    ;;
-  "image_classification_offline")
-    image_classification_offline_performance
+  "stable_diffusion")
+    stable_diffusion_performance
     ;;
   *)
     image_classification_v2_performance
@@ -332,10 +305,7 @@ case $usecase_name in
     image_classification_offline_v2_performance
     echo "## cooldown intitated ##"
     sleep $cooldown_period
-    image_classification_performance
-    echo "## cooldown intitated ##"
-    sleep $cooldown_period
-    image_classification_offline_performance
+    stable_diffusion_performance
     ;;
 esac
 fi
@@ -361,11 +331,8 @@ case $usecase_name in
   "image_classification_offline_v2")
     image_classification_offline_v2_accuracy
     ;;
-  "image_classification")
-    image_classification_accuracy
-    ;;
-  "image_classification_offline")
-    image_classification_offline_accuracy
+  "stable_diffusion")
+    stable_diffusion_accuracy
     ;;
   *)
     image_classification_v2_accuracy
@@ -386,10 +353,7 @@ case $usecase_name in
     image_classification_offline_v2_accuracy
     echo "## cooldown intitated ##"
     sleep $cooldown_period
-    image_classification_accuracy
-    echo "## cooldown intitated ##"
-    sleep $cooldown_period
-    image_classification_offline_accuracy
+    stable_diffusion_accuracy
     ;;
 esac
 fi

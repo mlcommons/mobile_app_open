@@ -47,6 +47,7 @@ const std::string empty_settings = "";
 #include INCLUDE_SETTINGS(default_dsp)
 #include INCLUDE_SETTINGS(default_cpu)
 #include INCLUDE_SETTINGS(default_gpu)
+#include INCLUDE_SETTINGS(stablediffusion)
 
 STRING_SETTINGS(sd7g1)
 STRING_SETTINGS(sd7pg2)
@@ -65,5 +66,6 @@ STRING_SETTINGS(sm7550)
 STRING_SETTINGS(default_dsp)
 STRING_SETTINGS(default_cpu)
 STRING_SETTINGS(default_gpu)
+STRING_SETTINGS(stablediffusion)
 
 #endif

@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "qti_backend_helper.h"
 
+#include <random>
 #include <string>
 #include <vector>
 
@@ -67,15 +68,15 @@ static void split(std::vector<std::string> &split_string,
   }
 }
 
-static Snpe_StringList_Handle_t ResolveOutputLayerNames(std::string &line) {
-  Snpe_StringList_Handle_t outputLayersHandle = Snpe_StringList_Create();
+static Snpe_StringList_Handle_t ResolveCommaSeparatedList(std::string &line) {
+  Snpe_StringList_Handle_t stringListHandle = Snpe_StringList_Create();
   if (!line.empty()) {
     std::vector<std::string> names;
     split(names, line.substr(0), ',');
     for (auto &name : names)
-      Snpe_StringList_Append(outputLayersHandle, name.c_str());
+      Snpe_StringList_Append(stringListHandle, name.c_str());
   }
-  return outputLayersHandle;
+  return stringListHandle;
 }
 
 static Snpe_TensorShape_Handle_t calcStrides(
@@ -168,7 +169,10 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
             SNPE_PSNPE_INPUTOUTPUTTRANSMISSIONMODE_SYNC));
 
     Snpe_StringList_Handle_t outputLayers =
-        ResolveOutputLayerNames(snpeOutputLayers_);
+        ResolveCommaSeparatedList(snpeOutputLayers_);
+
+    Snpe_StringList_Handle_t outputTensors =
+        ResolveCommaSeparatedList(snpeOutputTensors_);
 
     Snpe_SNPEBuilder_Handle_t snpeBuilderHandle =
         Snpe_SNPEBuilder_Create(containerHandle);
@@ -180,6 +184,7 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
     Snpe_SNPEBuilder_SetRuntimeProcessorOrder(snpeBuilderHandle,
                                               dummyInputRuntimeListHandle);
     Snpe_SNPEBuilder_SetOutputLayers(snpeBuilderHandle, outputLayers);
+    Snpe_SNPEBuilder_SetOutputTensors(snpeBuilderHandle, outputTensors);
 
     if (Snpe_StringList_Size(outputLayers) > 0)
       Snpe_BuildConfig_SetOutputBufferNames(buildConfigHandle, outputLayers);
@@ -302,7 +307,9 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
         Snpe_SNPEBuilder_Create(containerHandle);
     Snpe_SNPEBuilder_SetCpuFixedPointMode(snpeBuilderHandle, useCpuInt8_);
     Snpe_StringList_Handle_t outputLayers =
-        ResolveOutputLayerNames(snpeOutputLayers_);
+        ResolveCommaSeparatedList(snpeOutputLayers_);
+    Snpe_StringList_Handle_t outputTensors =
+        ResolveCommaSeparatedList(snpeOutputTensors_);
     Snpe_SNPEBuilder_SetPerformanceProfile(snpeBuilderHandle, perfProfile_);
     Snpe_SNPEBuilder_SetProfilingLevel(snpeBuilderHandle, profilingLevel_);
     Snpe_SNPEBuilder_SetExecutionPriorityHint(snpeBuilderHandle,
@@ -311,6 +318,7 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
                                               inputRuntimeListHandle);
     Snpe_SNPEBuilder_SetUseUserSuppliedBuffers(snpeBuilderHandle, true);
     Snpe_SNPEBuilder_SetOutputLayers(snpeBuilderHandle, outputLayers);
+    Snpe_SNPEBuilder_SetOutputTensors(snpeBuilderHandle, outputTensors);
 
     std::string platformOptionStr = "";
     if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)) {
@@ -603,7 +611,8 @@ void QTIBackendHelper::get_data_formats() {
     long bufSize = calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
                                     Snpe_TensorShape_GetDimensions(dimsHandle));
     if (outputBufferType_ == FLOAT_32) {
-      if (snpeOutputLayers_ == "transpose") {
+      if (snpeOutputLayers_ == "transpose" ||
+          snpeOutputTensors_ == "transpose:0") {
         // For mobileBERT, return output size as half the size of computed
         // values,
         // because the DLC returns only single layer as output but the app needs
@@ -697,4 +706,109 @@ void QTIBackendHelper::set_runtime_config() {
 std::string QTIBackendHelper::get_snpe_version() {
   Snpe_DlVersion_Handle_t version = Snpe_Util_GetLibraryVersion();
   return Snpe_DlVersion_GetBuild(version);
+}
+
+std::vector<float> get_normal(unsigned numbers, unsigned seed = 5,
+                              float mean = 0.0, float stddev = 1.0) {
+  std::default_random_engine generator(seed);
+  std::normal_distribution<float> distribution(mean, stddev);
+
+  std::vector<float> d;
+  for (unsigned i = 0; i < numbers; i++) d.push_back(distribution(generator));
+
+  return d;
+}
+
+void QTIBackendHelper::initSd(const char *model_path, const char *lib_path) {
+#ifdef STABLEDIFFUSION_FLAG
+  bool use_mmap = false;  // we don't want to use cached
+  uint64_t context_bin_mmap_read_budget = 100000;
+  std::string temp(lib_path);
+  native_lib_path = temp;
+  std::string newtemp(model_path);
+  data_folder_path = newtemp;
+
+  // TODO: Below vars are using in preprocessInputSd
+  // May need to be set from the configuration from MLC. Hardcoded for now.
+  num_steps = 20;
+  seed = 633994880;
+  guidance_scale = 7.5;
+
+  mlperf_data_t input;
+  input.type = mlperf_data_t::Int32;
+  input.size = 77 * 1;  // tokenized inputs 77 numbers
+  inputFormat_.push_back(input);
+
+  mlperf_data_t output;
+  output.type = mlperf_data_t::Uint8;
+  output.size = 512 * 512 * 3;
+  outputFormat_.push_back(output);
+
+  sd_pipeline = new QnnApiHelpers();
+
+  if (0 != sd_pipeline->Init(data_folder_path, native_lib_path, 768, 77, 1.0,
+                             512, 512, 3.0, use_mmap,
+                             context_bin_mmap_read_budget)) {
+    LOG(FATAL) << "Initialization Failure";
+  }
+#endif
+}
+
+bool QTIBackendHelper::preprocessInputSd(void *data) {
+#ifdef STABLEDIFFUSION_FLAG
+  int32_t *input_prompt_ids = (int32_t *)data;
+  std::vector<float32_t> noise = get_normal(64 * 64 * 4, seed);
+  return sd_pipeline->PreProcessInput(input_prompt_ids, noise, num_steps,
+                                      guidance_scale);
+#else
+  return false;
+#endif
+}
+
+bool QTIBackendHelper::executeSd() {
+#ifdef STABLEDIFFUSION_FLAG
+  for (int stepIdx = 0; stepIdx < num_steps; stepIdx++) {
+    bool runVAE = ((stepIdx + 1) == num_steps);
+    if (true != sd_pipeline->RunInference(runVAE)) {
+      LOG(FATAL) << "RunInference failure";
+      return false;
+    }
+  }
+  return true;
+#else
+  return false;
+#endif
+}
+
+bool QTIBackendHelper::getOutputSd(void **data) {
+#ifdef STABLEDIFFUSION_FLAG
+  JniHelpers::InferenceReturn inferenceReturn;
+  if (true != sd_pipeline->PostProcessOutput(false, false, inferenceReturn)) {
+    LOG(FATAL) << "PostProcessOutput failure";
+    return false;
+  }
+  *data = inferenceReturn.m_ImageData;
+
+  // delete sd_pipeline;
+  // sd_pipeline = new QnnApiHelpers();
+  return true;
+#else
+  return false;
+#endif
+}
+
+void QTIBackendHelper::deinitSd() {
+#ifdef STABLEDIFFUSION_FLAG
+  bool use_mmap = false;  // we don't want to use cached
+  uint64_t context_bin_mmap_read_budget = 100000;
+  /*if (0 != sd_pipeline->Init(data_folder_path, native_lib_path,
+                     768, 77, 1.0,
+                     512, 512, 3.0,
+                     use_mmap, context_bin_mmap_read_budget)) {
+                     LOG(FATAL) << "Initialization Failure";
+                     }
+*/
+  delete sd_pipeline;
+  sd_pipeline = nullptr;
+#endif
 }

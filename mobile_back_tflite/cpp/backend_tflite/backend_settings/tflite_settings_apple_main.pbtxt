@@ -146,7 +146,6 @@ benchmark_setting {
   delegate_selected: "Core ML"
 }
 
-# TODO (anhappdev) uncomment when stable_diffusion is ready
 #benchmark_setting {
 #  benchmark_id: "stable_diffusion"
 #  framework: "TFLite"

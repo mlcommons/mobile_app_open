@@ -64,6 +64,21 @@ Future<void> validateSettings(WidgetTester tester) async {
   }
 }
 
+Future<void> setBenchmarks(WidgetTester tester) async {
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  for (var benchmark in benchmarkState.benchmarks) {
+    // Disable test for stable diffusion since it take too long to finish.
+    if (benchmark.id == BenchmarkId.stableDiffusion) {
+      benchmark.isActive = false;
+      print('Benchmark ${benchmark.id} is disabled');
+    } else {
+      benchmark.isActive = true;
+      print('Benchmark ${benchmark.id} is enabled');
+    }
+  }
+}
+
 Future<void> runBenchmarks(WidgetTester tester) async {
   const downloadTimeout = 20 * 60; // 20 minutes
   const runBenchmarkTimeout = 30 * 60; // 30 minutes

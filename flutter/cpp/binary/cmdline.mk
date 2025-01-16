@@ -15,7 +15,11 @@
 
 include flutter/cpp/binary/cmdline-docker.mk
 
-cmdline/android/bins/release: cmdline/android/bins/build cmdline/android/bins/copy
+cmdline/android/bins/release: cmdline/android/libs/deps cmdline/android/bins/build cmdline/android/bins/copy
+
+.PHONY: cmdline/android/libs/deps
+cmdline/android/libs/deps:
+	${backend_qti_libs_deps}
 
 .PHONY: cmdline/android/bins/build
 cmdline/android/bins/build:
