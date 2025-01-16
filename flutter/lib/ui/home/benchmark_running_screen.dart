@@ -56,13 +56,13 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Expanded(flex: 14, child: _title()),
+            Expanded(flex: 18, child: _title()),
             const SizedBox(height: 20),
-            Expanded(flex: 30, child: _circle()),
+            Expanded(flex: 28, child: _circle()),
             const SizedBox(height: 20),
             Expanded(flex: 40, child: _taskList()),
             const SizedBox(height: 20),
-            Expanded(flex: 16, child: _footer()),
+            Expanded(flex: 14, child: _footer()),
           ],
         ),
       ),
@@ -82,6 +82,8 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     return Padding(
         padding: const EdgeInsets.fromLTRB(40, 48, 40, 4),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               '($loadgenRunModeStage) $loadgenRunModeName',
