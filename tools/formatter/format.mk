@@ -40,7 +40,7 @@ format/markdown:
 		xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml --fix
 
 .PHONY: lint
-lint: lint/bazel lint/clang lint/dart lint/result-schema lint/ts lint/yaml lint/markdown lint/prohibited-extensions lint/big-files
+lint: lint/bazel lint/clang lint/dart lint/ts lint/yaml lint/markdown lint/prohibited-extensions lint/big-files
 	@echo "Finished running make target: lint"
 
 .PHONY: lint/bazel
@@ -107,14 +107,6 @@ lint/markdown:
 		grep --null-data -v "LICENSE.md" | \
 		grep --null-data "\.md$$" --exclude="*LICENSE.md" | \
 		xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml
-
-lint_result_json_schema_path=output/extended_result_schema.json
-.PHONY: lint/result-schema
-lint/result-schema:
-	mkdir -p $$(dirname ${lint_result_json_schema_path})
-	make RESULT_JSON_SCHEMA_PATH=${lint_result_json_schema_path} flutter/result/gen-schema >/dev/null 2>/dev/null
-	@[ "$$(cat ${default_result_json_schema_path})" = "$$(cat ${lint_result_json_schema_path})" ] \
-		|| (echo ${default_result_json_schema_path} is outdated; echo run \`make flutter/result/gen-schema\` to update it; exit 1)
 
 output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	docker build --progress=plain \

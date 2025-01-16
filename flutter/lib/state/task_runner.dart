@@ -151,8 +151,13 @@ class TaskRunner {
     }
 
     final creationDate = DateTime.now();
+    final meta = ResultMetaInfo(
+      creationDate: creationDate,
+      uuid: const Uuid().v4(),
+      runMode: store.selectedBenchmarkRunMode,
+    );
     return ExtendedResult(
-      meta: ResultMetaInfo(creationDate: creationDate, uuid: const Uuid().v4()),
+      meta: meta,
       environmentInfo: DeviceInfo.instance.envInfo,
       results: exportResults,
       buildInfo: BuildInfoHelper.info,

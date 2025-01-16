@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 
 import 'package:mlperfbench/backend/loadgen_info.dart';
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/data/build_info/build_info.dart';
 import 'package:mlperfbench/data/environment/env_android.dart';
 import 'package:mlperfbench/data/environment/env_ios.dart';
@@ -132,6 +133,7 @@ class SampleGenerator {
           creationDate: DateTime.now(),
           uploadDate: DateTime.now(),
           uuid: const Uuid().v4(),
+          runMode: BenchmarkRunModeEnum.submissionRun,
         ),
         buildInfo: buildInfo,
         environmentInfo: envInfo,

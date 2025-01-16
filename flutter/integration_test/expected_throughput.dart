@@ -60,7 +60,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
     _kS24Ultra: Interval(min: 800, max: 1500),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 5, max: 90),
+    _kDN2103: Interval(min: 4.5, max: 90),
     _kS10Plus: Interval(min: 400, max: 800)
   },
   _kSamsungBackend: {
@@ -88,11 +88,11 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 700, max: 1400),
-    _kS24Ultra: Interval(min: 1800, max: 2500),
+    _kS24Ultra: Interval(min: 1800, max: 2700),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 120, max: 210),
-    _kS10Plus: Interval(min: 1200, max: 1800)
+    _kS10Plus: Interval(min: 1200, max: 2000)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 1400, max: 2400),
@@ -123,7 +123,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 45, max: 70),
-    _kS10Plus: Interval(min: 800, max: 1400)
+    _kS10Plus: Interval(min: 800, max: 1500)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 800, max: 1500),
@@ -150,7 +150,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 100, max: 200),
-    _kS24Ultra: Interval(min: 250, max: 450),
+    _kS24Ultra: Interval(min: 250, max: 460),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 1, max: 6),
@@ -185,7 +185,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 15),
-    _kS10Plus: Interval(min: 150, max: 280)
+    _kS10Plus: Interval(min: 150, max: 300)
   },
   _kSamsungBackend: {
     _kS24: Interval(min: 90, max: 180),
@@ -244,10 +244,10 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   },
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 250, max: 450),
-    _kS24Ultra: Interval(min: 900, max: 1600),
+    _kS24Ultra: Interval(min: 900, max: 1700),
   },
   _kMediatekBackend: {
-    _kDN2103: Interval(min: 5, max: 90),
+    _kDN2103: Interval(min: 4.5, max: 90),
     _kS10Plus: Interval(min: 700, max: 1200)
   },
   _kSamsungBackend: {

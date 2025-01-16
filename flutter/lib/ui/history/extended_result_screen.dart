@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
@@ -195,6 +196,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
     final utils = HistoryHelperUtils(l10n);
     final modelDescription = res.environmentInfo.modelDescription;
     final socDescription = utils.makeSocName(state, res.environmentInfo);
+    final runMode = res.meta.runMode?.localizedName(l10n) ?? l10n.unknown;
 
     return [
       helper.makeInfo(l10n.historyDetailsDate, date),
@@ -204,6 +206,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
       helper.makeInfo(l10n.historyDetailsBackendName, backendName),
       helper.makeInfo(l10n.historyDetailsModelName, modelDescription),
       helper.makeInfo(l10n.historyDetailsSocName, socDescription),
+      helper.makeInfo(l10n.settingsRunMode, runMode),
       const Divider(),
       helper.makeHeader(l10n.historyDetailsTableTitle),
       makeBenchmarkTable(context, res.results),
