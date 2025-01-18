@@ -16,6 +16,7 @@ import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/progress_circle.dart';
 import 'package:mlperfbench/ui/icons.dart';
+import 'package:mlperfbench/ui/auto_size_text.dart';
 
 class BenchmarkRunningScreen extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey =
@@ -56,13 +57,13 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Expanded(flex: 18, child: _title()),
+            _title(),
             const SizedBox(height: 20),
-            Expanded(flex: 28, child: _circle()),
+            _circle(),
             const SizedBox(height: 20),
-            Expanded(flex: 40, child: _taskList()),
+            Expanded(child: _taskList()),
             const SizedBox(height: 20),
-            Expanded(flex: 14, child: _footer()),
+            _footer(),
           ],
         ),
       ),
@@ -109,51 +110,62 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     var containerWidth = 0.50 * MediaQuery.of(context).size.width;
     containerWidth = max(containerWidth, 160);
     containerWidth = min(containerWidth, 240);
-    return Stack(
-      alignment: AlignmentDirectional.center,
-      children: <Widget>[
-        Container(
-          width: containerWidth,
-          height: containerWidth,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.progressCircle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                offset: Offset(15, 15),
-                blurRadius: 10,
-              )
-            ],
-          ),
-          child: ClipOval(
-            child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: _circleContent(),
+    return SizedBox(
+      width: containerWidth,
+      height: containerWidth,
+      child: Stack(
+        alignment: AlignmentDirectional.center,
+        children: <Widget>[
+          Container(
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.progressCircle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  offset: Offset(15, 15),
+                  blurRadius: 10,
+                )
+              ],
+            ),
+            child: ClipOval(
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: _circleContent(containerWidth),
+              ),
             ),
           ),
-        ),
-        ProgressCircle(
-          strokeWidth: 6,
-          size: containerWidth + 20,
-        ),
-      ],
+          ProgressCircle(
+            strokeWidth: 6,
+            size: containerWidth + 20,
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _circleContent() {
+  Widget _circleContent(double containerWidth) {
     Widget? topWidget;
     String taskNameString;
+
+    final double containerRadius = containerWidth / 2;
+    final double creepFactor =
+        2 + ((containerWidth - 160) / 20); // lerp 2-6 at 160-240
+    final double horizontalPadding = containerRadius -
+        sqrt(pow(containerRadius, 2) -
+            pow((containerRadius - (8 * creepFactor)), 2));
+
     const textStyle = TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,
       color: AppColors.lightText,
     );
     if (progress.cooldown) {
-      topWidget = Text(
+      topWidget = AutoSizeCircleText(
         l10n.progressCooldown,
         textAlign: TextAlign.center,
         style: textStyle,
+        circularPadding: horizontalPadding,
       );
       taskNameString = l10n.progressRemainingTime;
     } else {
@@ -173,7 +185,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           flex: 3,
           child: Container(
             alignment: Alignment.bottomCenter,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+            padding: const EdgeInsets.symmetric(vertical: 4),
             child: topWidget,
           ),
         ),
@@ -188,11 +200,14 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           flex: 3,
           child: Container(
             alignment: Alignment.topCenter,
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
-            child: Text(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: AutoSizeCircleText(
               taskNameString,
               textAlign: TextAlign.center,
               style: textStyle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              circularPadding: horizontalPadding,
             ),
           ),
         ),
@@ -269,9 +284,9 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const Spacer(),
-          Expanded(flex: 2, child: _footerText()),
+          _footerText(),
           _cancelButton(),
         ],
       );
@@ -397,6 +412,7 @@ class _StageProgressTextState extends State<_StageProgressText> {
       progressStr,
       style: const TextStyle(
         fontSize: 54,
+        height: 1.0,
         fontWeight: FontWeight.bold,
         color: AppColors.lightText,
       ),
