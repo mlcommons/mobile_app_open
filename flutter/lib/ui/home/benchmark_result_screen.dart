@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/performance_result_validity.dart';
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -100,24 +101,35 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
 
   Widget _shareSection() {
     final lastResult = state.lastResult;
-    Text deviceInfoText;
+    String deviceInfoString;
+    String runModeString;
     Text benchmarkDateText;
     Widget shareButton;
     int shareButtonFlex;
     if (lastResult != null) {
-      deviceInfoText = Text(lastResult.environmentInfo.modelDescription);
+      deviceInfoString = lastResult.environmentInfo.modelDescription;
       benchmarkDateText = Text(lastResult.meta.creationDate.toUIString());
+      runModeString =
+          lastResult.meta.runMode?.localizedName(l10n) ?? l10n.unknown;
       shareButton = const ShareButton();
       shareButtonFlex = 10;
     } else {
-      deviceInfoText = Text(DeviceInfo.instance.envInfo.modelDescription);
+      deviceInfoString = DeviceInfo.instance.envInfo.modelDescription;
       benchmarkDateText = Text(
         l10n.resultsBenchmarkAborted,
         style: const TextStyle(color: AppColors.resultInvalidText),
       );
+      runModeString = l10n.unknown;
       shareButton = const SizedBox();
       shareButtonFlex = 0;
     }
+
+    Text runModeText = Text('${l10n.settingsRunMode}: $runModeString');
+    Text deviceInfoText = Text(
+      deviceInfoString,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
     final infoSection = Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,6 +137,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         deviceInfoText,
         const SizedBox(height: 4),
         benchmarkDateText,
+        const SizedBox(height: 4),
+        runModeText,
       ],
     );
     Widget testAgainButton = IconButton(

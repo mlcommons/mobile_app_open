@@ -106,7 +106,7 @@ class BenchmarkState extends ChangeNotifier {
       await setTaskConfig(name: _store.chosenConfigurationName);
       deferredLoadResources();
     } catch (e, trace) {
-      print("can't load resources: $e");
+      print("Can't load resources: $e");
       print(trace);
       error = e;
       stackTrace = trace;
@@ -122,7 +122,7 @@ class BenchmarkState extends ChangeNotifier {
     try {
       await loadResources(downloadMissing: false);
     } catch (e, trace) {
-      print("can't load resources: $e");
+      print("Can't load resources: $e");
       print(trace);
       error = e;
       stackTrace = trace;
@@ -164,7 +164,7 @@ class BenchmarkState extends ChangeNotifier {
       await state.setTaskConfig(name: store.chosenConfigurationName);
       state.deferredLoadResources();
     } catch (e, trace) {
-      print("can't load resources: $e");
+      print("Can't load resources: $e");
       print(trace);
       state.error = e;
       state.stackTrace = trace;
@@ -199,7 +199,7 @@ class BenchmarkState extends ChangeNotifier {
           taskSelection[kv.key] = kv.value as bool;
         }
       } catch (e, t) {
-        print('task selection parse fail: $e');
+        print('Task selection parse fail: $e');
         print(t);
       }
     }
@@ -255,7 +255,7 @@ class BenchmarkState extends ChangeNotifier {
           await taskRunner.runBenchmarks(_benchmarkStore, currentLogDir);
 
       if (lastResult == null) {
-        print('benchmark aborted');
+        print('Benchmark aborted');
       } else {
         print('Benchmarks finished');
 
@@ -267,6 +267,7 @@ class BenchmarkState extends ChangeNotifier {
       _doneRunning = taskRunner.aborting ? null : true;
     } catch (e) {
       _doneRunning = null;
+      print('Error: $e');
       rethrow;
     } finally {
       if (currentLogDir.isNotEmpty && !_store.keepLogs) {
