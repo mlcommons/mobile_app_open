@@ -94,6 +94,7 @@
   "dialogContentMissingFilesHint": "Please go to the menu Resources to download the missing files.",
   "dialogContentChecksumError": "The following files failed checksum validation:",
   "dialogContentNoSelectedBenchmarkError": "Please select at least one benchmark.",
+  "dialogNoInternetError": "A network error has occured. Please make sure you're connected to the internet.",
 
 
   "benchModePerformanceOnly": "Performance Only",
