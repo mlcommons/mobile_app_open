@@ -12,11 +12,13 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/protos/mlperf_task.pb.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/progress_circle.dart';
 import 'package:mlperfbench/ui/icons.dart';
 import 'package:mlperfbench/ui/auto_size_text.dart';
+import 'package:mlperfbench/resources/utils.dart';
 
 class BenchmarkRunningScreen extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey =
@@ -107,12 +109,11 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
   }
 
   Widget _circle() {
-    var containerWidth = 0.50 * MediaQuery.of(context).size.width;
-    containerWidth = max(containerWidth, 160);
-    containerWidth = min(containerWidth, 240);
+    var diameter = 0.50 * MediaQuery.of(context).size.width;
+    diameter = diameter.clamp(160.0, 240.0);
     return SizedBox(
-      width: containerWidth,
-      height: containerWidth,
+      width: diameter,
+      height: diameter,
       child: Stack(
         alignment: AlignmentDirectional.center,
         children: <Widget>[
@@ -131,29 +132,29 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
             child: ClipOval(
               child: Padding(
                 padding: const EdgeInsets.all(4),
-                child: _circleContent(containerWidth),
+                child: _circleContent(diameter),
               ),
             ),
           ),
           ProgressCircle(
             strokeWidth: 6,
-            size: containerWidth + 20,
+            size: diameter + 20,
           ),
         ],
       ),
     );
   }
 
-  Widget _circleContent(double containerWidth) {
+  Widget _circleContent(double diameter) {
     Widget? topWidget;
     String taskNameString;
 
-    final double containerRadius = containerWidth / 2;
-    final double creepFactor =
-        2 + ((containerWidth - 160) / 20); // lerp 2-6 at 160-240
+    final double containerRadius = diameter / 2;
+    final double creepFactor = lerpRange(2, 6, 160, 240, diameter)!;
     final double horizontalPadding = containerRadius -
         sqrt(pow(containerRadius, 2) -
-            pow((containerRadius - (8 * creepFactor)), 2));
+            pow((containerRadius - (8 * creepFactor)),
+                2)); // 8 is the padding from the bottom of the circle to the bottom of the text
 
     const textStyle = TextStyle(
       fontSize: 14,

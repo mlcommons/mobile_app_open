@@ -254,6 +254,8 @@ class _AutoSizeCircleTextState extends State<AutoSizeCircleText> {
 
       _validateProperties(style, maxLines);
 
+      size = size.copyWith(maxWidth: size.maxWidth-20);
+
       final initialResult = _calculateFontSize(size, style, 1);
       final fontSizeSingle = initialResult[0] as double;
       final textFitsSingle = initialResult[1] as bool;
@@ -267,9 +269,9 @@ class _AutoSizeCircleTextState extends State<AutoSizeCircleText> {
       text = _buildText(
           textFitsSingle ? fontSizeSingle : fontSize,
           style,
-          maxLines,
+          textFitsSingle ? 1 : maxLines,
           textFitsSingle
-              ? const EdgeInsets.symmetric(horizontal: 20)
+              ? const EdgeInsets.symmetric(horizontal: 10)
               : EdgeInsets.symmetric(horizontal: widget.circularPadding));
 
       if (widget.overflowReplacement != null && !textFits) {
