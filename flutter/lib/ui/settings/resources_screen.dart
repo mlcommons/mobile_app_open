@@ -9,6 +9,7 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
+import 'package:mlperfbench/ui/nil.dart';
 
 class ResourcesScreen extends StatefulWidget {
   const ResourcesScreen({super.key});
@@ -136,32 +137,29 @@ class _ResourcesScreen extends State<ResourcesScreen> {
 
   Widget _downloadProgress() {
     if (!downloading) {
-      return const SizedBox(height: 0);
+      return nil;
     }
-    return SizedBox(
-      height: 88,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.resourceDownloading,
-            maxLines: 1,
-            style: const TextStyle(fontSize: 12),
-          ),
-          Text(
-            state.loadingPath,
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12),
-          ),
-          const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: state.loadingProgress,
-            minHeight: 8,
-          ),
-        ],
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.resourceDownloading,
+          maxLines: 1,
+          style: const TextStyle(fontSize: 12),
+        ),
+        Text(
+          state.loadingPath,
+          maxLines: 5,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 12),
+        ),
+        const SizedBox(height: 8),
+        LinearProgressIndicator(
+          value: state.loadingProgress,
+          minHeight: 8,
+        ),
+      ],
     );
   }
 

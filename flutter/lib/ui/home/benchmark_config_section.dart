@@ -7,6 +7,7 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
+import 'package:mlperfbench/ui/nil.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 
 class BenchmarkConfigSection extends StatefulWidget {
@@ -121,10 +122,10 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
         .map((e) => e.delegateName)
         .toList();
     if (choices.isEmpty) {
-      return const SizedBox();
+      return nil;
     }
     if (choices.length == 1 && choices.first.isEmpty) {
-      return const SizedBox();
+      return nil;
     }
     if (!choices.contains(selected)) {
       throw 'delegate_selected=$selected must be one of delegate_choice=$choices';
@@ -133,7 +134,7 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
       isExpanded: true,
       isDense: false,
       borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
-      underline: const SizedBox(),
+      underline: nil,
       value: selected,
       items: choices
           .map((item) => DropdownMenuItem<String>(
