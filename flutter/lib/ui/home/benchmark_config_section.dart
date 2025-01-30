@@ -7,8 +7,8 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
-import 'package:mlperfbench/ui/nil.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
+import 'package:mlperfbench/ui/nil.dart';
 
 class BenchmarkConfigSection extends StatefulWidget {
   const BenchmarkConfigSection({super.key});

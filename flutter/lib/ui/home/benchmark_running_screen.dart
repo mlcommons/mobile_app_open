@@ -10,15 +10,15 @@ import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/protos/mlperf_task.pb.dart';
+import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
-import 'package:mlperfbench/protos/mlperf_task.pb.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
+import 'package:mlperfbench/ui/auto_size_text.dart';
 import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/progress_circle.dart';
 import 'package:mlperfbench/ui/icons.dart';
-import 'package:mlperfbench/ui/auto_size_text.dart';
-import 'package:mlperfbench/resources/utils.dart';
 
 class BenchmarkRunningScreen extends StatefulWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey =

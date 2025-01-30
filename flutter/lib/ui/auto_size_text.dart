@@ -254,7 +254,7 @@ class _AutoSizeCircleTextState extends State<AutoSizeCircleText> {
 
       _validateProperties(style, maxLines);
 
-      size = size.copyWith(maxWidth: size.maxWidth-20);
+      size = size.copyWith(maxWidth: size.maxWidth - 20);
 
       final initialResult = _calculateFontSize(size, style, 1);
       final fontSizeSingle = initialResult[0] as double;
