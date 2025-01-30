@@ -178,7 +178,8 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           } on SocketException {
             await state.clearCache();
             if (!context.mounted) return;
-            await showErrorDialog(context, <String>[l10n.dialogNoInternetError]);
+            await showErrorDialog(
+                context, <String>[l10n.dialogNoInternetError]);
           }
         },
         style: ElevatedButton.styleFrom(
