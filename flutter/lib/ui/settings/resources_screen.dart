@@ -177,7 +177,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
             await state.loadResources(downloadMissing: true);
           } on SocketException {
             await state.clearCache();
-            if (!context.mounted) return;
+            if (!mounted) return;
             await showErrorDialog(
                 context, <String>[l10n.dialogNoInternetError]);
           }
