@@ -35,7 +35,7 @@ class AutoSizeCircleText extends StatefulWidget {
   /// closest enclosing [DefaultTextStyle].
   const AutoSizeCircleText(
     String this.data, {
-    Key? key,
+    super.key,
     this.textKey,
     this.style,
     this.strutStyle,
@@ -50,17 +50,16 @@ class AutoSizeCircleText extends StatefulWidget {
     this.wrapWords = true,
     this.overflow,
     this.overflowReplacement,
-    this.textScaleFactor,
+    this.textScaleFactor = 1.0,
     this.maxLines,
     this.semanticsLabel,
     this.circularPadding = 20,
-  })  : textSpan = null,
-        super(key: key);
+  }) : textSpan = null;
 
   /// Creates a [AutoSizeCircleText] widget with a [TextSpan].
   const AutoSizeCircleText.rich(
     TextSpan this.textSpan, {
-    Key? key,
+    super.key,
     this.textKey,
     this.style,
     this.strutStyle,
@@ -75,12 +74,11 @@ class AutoSizeCircleText extends StatefulWidget {
     this.wrapWords = true,
     this.overflow,
     this.overflowReplacement,
-    this.textScaleFactor,
+    this.textScaleFactor = 1.0,
     this.maxLines,
     this.semanticsLabel,
     this.circularPadding = 20,
-  })  : data = null,
-        super(key: key);
+  }) : data = null;
 
   /// Sets the key for the resulting [Text] widget.
   ///
@@ -199,9 +197,8 @@ class AutoSizeCircleText extends StatefulWidget {
   /// This property also affects [minFontSize], [maxFontSize] and [presetFontSizes].
   ///
   /// The value given to the constructor as textScaleFactor. If null, will
-  /// use the [MediaQueryData.textScaleFactor] obtained from the ambient
-  /// [MediaQuery], or 1.0 if there is no [MediaQuery] in scope.
-  final double? textScaleFactor;
+  /// use 1.0.
+  final double textScaleFactor;
 
   /// An optional maximum number of lines for the text to span, wrapping if necessary.
   /// If the text exceeds the given number of lines, it will be resized according
@@ -233,10 +230,10 @@ class AutoSizeCircleText extends StatefulWidget {
   final double circularPadding;
 
   @override
-  _AutoSizeCircleTextState createState() => _AutoSizeCircleTextState();
+  AutoSizeCircleTextState createState() => AutoSizeCircleTextState();
 }
 
-class _AutoSizeCircleTextState extends State<AutoSizeCircleText> {
+class AutoSizeCircleTextState extends State<AutoSizeCircleText> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, size) {
@@ -321,8 +318,7 @@ class _AutoSizeCircleTextState extends State<AutoSizeCircleText> {
       recognizer: widget.textSpan?.recognizer,
     );
 
-    final userScale =
-        widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context);
+    final userScale = widget.textScaleFactor;
 
     int left;
     int right;
@@ -386,7 +382,7 @@ class _AutoSizeCircleTextState extends State<AutoSizeCircleText> {
         ),
         textAlign: widget.textAlign ?? TextAlign.left,
         textDirection: widget.textDirection ?? TextDirection.ltr,
-        textScaleFactor: scale,
+        textScaler: TextScaler.linear(scale),
         maxLines: words.length,
         locale: widget.locale,
         strutStyle: widget.strutStyle,
@@ -404,7 +400,7 @@ class _AutoSizeCircleTextState extends State<AutoSizeCircleText> {
       text: text,
       textAlign: widget.textAlign ?? TextAlign.left,
       textDirection: widget.textDirection ?? TextDirection.ltr,
-      textScaleFactor: scale,
+      textScaler: TextScaler.linear(scale),
       maxLines: maxLines,
       locale: widget.locale,
       strutStyle: widget.strutStyle,
@@ -432,7 +428,7 @@ class _AutoSizeCircleTextState extends State<AutoSizeCircleText> {
           locale: widget.locale,
           softWrap: widget.softWrap,
           overflow: widget.overflow,
-          textScaleFactor: 1,
+          textScaler: const TextScaler.linear(1),
           maxLines: maxLines,
           semanticsLabel: widget.semanticsLabel,
         ),
@@ -448,14 +444,10 @@ class _AutoSizeCircleTextState extends State<AutoSizeCircleText> {
         locale: widget.locale,
         softWrap: widget.softWrap,
         overflow: widget.overflow,
-        textScaleFactor: fontSize / style.fontSize!,
+        textScaler: TextScaler.linear(fontSize / style.fontSize!),
         maxLines: maxLines,
         semanticsLabel: widget.semanticsLabel,
       );
     }
-  }
-
-  void _notifySync() {
-    setState(() {});
   }
 }

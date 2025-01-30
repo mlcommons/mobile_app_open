@@ -10,7 +10,6 @@ import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/protos/mlperf_task.pb.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
