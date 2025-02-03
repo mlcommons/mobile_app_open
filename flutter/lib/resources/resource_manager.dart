@@ -100,42 +100,49 @@ class ResourceManager {
     _loadingProgress = 0.001;
     _done = false;
     _onUpdate();
-
-    var internetResources = <Resource>[];
-    for (final resource in resources) {
-      if (resource.path.startsWith(_dataPrefix)) continue;
-      if (isInternetResource(resource.path)) {
-        internetResources.add(resource);
-        continue;
+    try {
+      var internetResources = <Resource>[];
+      for (final resource in resources) {
+        if (resource.path.startsWith(_dataPrefix)) continue;
+        if (isInternetResource(resource.path)) {
+          internetResources.add(resource);
+          continue;
+        }
+        throw 'forbidden path: ${resource.path} (only http://, https:// and local:// resources are allowed)';
       }
-      throw 'forbidden path: ${resource.path} (only http://, https:// and local:// resources are allowed)';
+
+      final internetPaths = internetResources.map((e) => e.path).toList();
+      await cacheManager.cache(
+        internetPaths,
+        (double currentProgress, String currentPath) {
+          _loadingProgress = currentProgress;
+          _loadingPath = currentPath;
+          _onUpdate();
+        },
+        purgeOldCache,
+        downloadMissing,
+      );
+
+      final checksumFailed = await validateResourcesChecksum(resources);
+      if (checksumFailed.isNotEmpty) {
+        final mismatchedPaths = checksumFailed.map((e) => '\n${e.path}').join();
+        throw 'Checksum validation failed for: $mismatchedPaths';
+      }
+
+      // delete downloaded archives to free up disk space
+      await cacheManager.deleteArchives(internetPaths);
+
+      _loadingPath = '';
+      _loadingProgress = 1.0;
+      _done = true;
+      _onUpdate();
+    } catch (e) {
+      _loadingPath = '';
+      _loadingProgress = 1.0;
+      _done = true;
+      _onUpdate();
+      rethrow;
     }
-
-    final internetPaths = internetResources.map((e) => e.path).toList();
-    await cacheManager.cache(
-      internetPaths,
-      (double currentProgress, String currentPath) {
-        _loadingProgress = currentProgress;
-        _loadingPath = currentPath;
-        _onUpdate();
-      },
-      purgeOldCache,
-      downloadMissing,
-    );
-
-    final checksumFailed = await validateResourcesChecksum(resources);
-    if (checksumFailed.isNotEmpty) {
-      final mismatchedPaths = checksumFailed.map((e) => '\n${e.path}').join();
-      throw 'Checksum validation failed for: $mismatchedPaths';
-    }
-
-    // delete downloaded archives to free up disk space
-    await cacheManager.deleteArchives(internetPaths);
-
-    _loadingPath = '';
-    _loadingProgress = 1.0;
-    _done = true;
-    _onUpdate();
   }
 
   static Future<String> getApplicationDirectory() async {

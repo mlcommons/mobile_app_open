@@ -173,10 +173,12 @@ class _ResourcesScreen extends State<ResourcesScreen> {
       absorbing: downloading,
       child: ElevatedButton(
         onPressed: () async {
-          try {
-            await state.loadResources(downloadMissing: true);
-          } on SocketException {
-            await state.clearCache();
+          await state.loadResources(downloadMissing: true);
+          if (state.error != null) {
+            // Reset both the error and stacktrace for further operation
+            state.error = null;
+            state.stackTrace = null;
+
             if (!mounted) return;
             await showErrorDialog(
                 context, <String>[l10n.dialogNoInternetError]);

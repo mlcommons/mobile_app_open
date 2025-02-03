@@ -143,15 +143,21 @@ class BenchmarkState extends ChangeNotifier {
       modes: [taskRunner.perfMode, taskRunner.accuracyMode],
       benchmarks: benchmarks,
     );
-    await resourceManager.handleResources(
-      resources,
-      needToPurgeCache,
-      downloadMissing,
-    );
-    print('Finished loading resources with downloadMissing=$downloadMissing');
-    error = null;
-    stackTrace = null;
-    taskConfigFailedToLoad = false;
+    try {
+      await resourceManager.handleResources(
+        resources,
+        needToPurgeCache,
+        downloadMissing,
+      );
+      print('Finished loading resources with downloadMissing=$downloadMissing');
+      error = null;
+      stackTrace = null;
+      taskConfigFailedToLoad = false;
+    } on SocketException catch (e, s) {
+      print('Could not load resources due to error: $e');
+      error = e;
+      stackTrace = s;
+    }
     await Wakelock.disable();
   }
 
