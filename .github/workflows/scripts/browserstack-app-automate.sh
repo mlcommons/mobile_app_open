@@ -88,7 +88,7 @@ check_build_status() {
 # Main
 if ! BUILD_ID=$(trigger_build); then
   echo "Trigger build failed. Message: $BUILD_ID"
-  exit 1
+  exit 9
 fi
 
 echo "Build triggered successfully. Build ID: $BUILD_ID"
