@@ -82,6 +82,9 @@ check_build_status() {
   elif [[ "$status" == "failed" ]]; then
     echo "Build failed."
     exit 1
+  elif [[ "$status" == "error" ]]; then
+    echo "Build has error."
+    exit 9
   fi
 }
 
