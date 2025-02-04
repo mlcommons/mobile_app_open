@@ -300,7 +300,9 @@ jobs:
             bash .github/workflows/scripts/browserstack-app-automate.sh
 
   test-android-apk-single:
-    needs: test-android-apk-unified
+    needs:
+      - build-android-apk
+      - test-android-apk-unified
     if: failure()
     runs-on: ubuntu-22.04
     timeout-minutes: 60
