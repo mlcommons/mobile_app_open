@@ -135,7 +135,7 @@ class ResourceManager {
 
       // delete downloaded archives to free up disk space
       await cacheManager.deleteArchives(internetPaths);
-    }  finally {
+    } finally {
       _loadingPath = '';
       _loadingProgress = 1.0;
       _done = true;
