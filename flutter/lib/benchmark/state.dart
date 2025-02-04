@@ -153,7 +153,7 @@ class BenchmarkState extends ChangeNotifier {
       error = null;
       stackTrace = null;
       taskConfigFailedToLoad = false;
-    } on SocketException catch (e, s) {
+    } catch (e, s) {
       print('Could not load resources due to error: $e');
       error = e;
       stackTrace = s;

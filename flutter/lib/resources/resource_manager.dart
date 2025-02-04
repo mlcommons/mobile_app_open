@@ -112,16 +112,20 @@ class ResourceManager {
       }
 
       final internetPaths = internetResources.map((e) => e.path).toList();
-      await cacheManager.cache(
-        internetPaths,
-        (double currentProgress, String currentPath) {
-          _loadingProgress = currentProgress;
-          _loadingPath = currentPath;
-          _onUpdate();
-        },
-        purgeOldCache,
-        downloadMissing,
-      );
+      try {
+        await cacheManager.cache(
+          internetPaths,
+          (double currentProgress, String currentPath) {
+            _loadingProgress = currentProgress;
+            _loadingPath = currentPath;
+            _onUpdate();
+          },
+          purgeOldCache,
+          downloadMissing,
+        );
+      } on SocketException {
+        throw 'A network error has occurred. Please make sure you are connected to the internet.';
+      }
 
       final checksumFailed = await validateResourcesChecksum(resources);
       if (checksumFailed.isNotEmpty) {
@@ -131,17 +135,11 @@ class ResourceManager {
 
       // delete downloaded archives to free up disk space
       await cacheManager.deleteArchives(internetPaths);
-
+    }  finally {
       _loadingPath = '';
       _loadingProgress = 1.0;
       _done = true;
       _onUpdate();
-    } catch (e) {
-      _loadingPath = '';
-      _loadingProgress = 1.0;
-      _done = true;
-      _onUpdate();
-      rethrow;
     }
   }
 

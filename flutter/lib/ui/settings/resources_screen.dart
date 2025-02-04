@@ -173,13 +173,11 @@ class _ResourcesScreen extends State<ResourcesScreen> {
         onPressed: () async {
           await state.loadResources(downloadMissing: true);
           if (state.error != null) {
+            if (!mounted) return;
+            await showErrorDialog(context, <String>[state.error.toString()]);
             // Reset both the error and stacktrace for further operation
             state.error = null;
             state.stackTrace = null;
-
-            if (!mounted) return;
-            await showErrorDialog(
-                context, <String>[l10n.dialogNoInternetError]);
           }
         },
         style: ElevatedButton.styleFrom(
