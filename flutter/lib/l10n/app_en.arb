@@ -95,7 +95,6 @@
   "dialogContentChecksumError": "The following files failed checksum validation:",
   "dialogContentNoSelectedBenchmarkError": "Please select at least one benchmark.",
 
-
   "benchModePerformanceOnly": "Performance Only",
   "benchModeAccuracyOnly": "Accuracy Only",
   "benchModeSubmissionRun": "Submission Run",

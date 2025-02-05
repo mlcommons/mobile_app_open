@@ -9,6 +9,7 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
+import 'package:mlperfbench/ui/error_dialog.dart';
 
 class ResourcesScreen extends StatefulWidget {
   const ResourcesScreen({super.key});
@@ -169,8 +170,15 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     return AbsorbPointer(
       absorbing: downloading,
       child: ElevatedButton(
-        onPressed: () {
-          state.loadResources(downloadMissing: true);
+        onPressed: () async {
+          await state.loadResources(downloadMissing: true);
+          if (state.error != null) {
+            if (!mounted) return;
+            await showErrorDialog(context, <String>[state.error.toString()]);
+            // Reset both the error and stacktrace for further operation
+            state.error = null;
+            state.stackTrace = null;
+          }
         },
         style: ElevatedButton.styleFrom(
             backgroundColor: downloading ? Colors.grey : Colors.blue),
