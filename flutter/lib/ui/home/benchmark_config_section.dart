@@ -134,7 +134,7 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
       isExpanded: true,
       isDense: false,
       borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
-      underline: nil,
+      underline: const SizedBox(),
       value: selected,
       items: choices
           .map((item) => DropdownMenuItem<String>(
