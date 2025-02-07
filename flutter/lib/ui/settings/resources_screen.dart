@@ -9,8 +9,8 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
-import 'package:mlperfbench/ui/nil.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
+import 'package:mlperfbench/ui/nil.dart';
 
 class ResourcesScreen extends StatefulWidget {
   const ResourcesScreen({super.key});
