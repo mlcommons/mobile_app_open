@@ -8,6 +8,7 @@ import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 
@@ -103,32 +104,31 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           final missing = result[false] ?? [];
           final existed = result[true] ?? [];
           final downloaded = missing.isEmpty;
-          return Row(
-            children: [
-              SizedBox(
-                height: size,
-                width: size,
-                child: IconButton(
-                  padding: const EdgeInsets.all(0),
-                  icon: downloaded ? downloadedIcon : notDownloadedIcon,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return _ResourcesTable(
-                          taskName: benchmark.info.taskName,
-                          modeName: mode.readable,
-                          missing: missing,
-                          existed: existed,
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(mode.readable),
-            ],
+          return TextButton.icon(
+            icon: downloaded ? downloadedIcon : notDownloadedIcon,
+            label: Text(
+              mode.readable,
+              style: const TextStyle(color: AppColors.darkText),
+            ),
+            //iconAlignment: IconAlignment.start,
+            style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(50, 30),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                alignment: Alignment.centerLeft),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return _ResourcesTable(
+                    taskName: benchmark.info.taskName,
+                    modeName: mode.readable,
+                    missing: missing,
+                    existed: existed,
+                  );
+                },
+              );
+            },
           );
         } else {
           return Text(l10n.resourceChecking);
