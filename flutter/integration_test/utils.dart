@@ -33,7 +33,7 @@ Future<void> startApp(WidgetTester tester) async {
 Future<void> validateSettings(WidgetTester tester) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
-  for (var benchmark in benchmarkState.benchmarks) {
+  for (var benchmark in benchmarkState.allBenchmarks) {
     expect(benchmark.selectedDelegate.batchSize, greaterThanOrEqualTo(0),
         reason: 'batchSize must >= 0');
     for (var modelFile in benchmark.selectedDelegate.modelFile) {

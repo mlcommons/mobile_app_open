@@ -54,20 +54,20 @@ class BenchmarkState extends ChangeNotifier {
   ExtendedResult? lastResult;
 
   num get result {
-    final benchmarksCount = benchmarks
+    final benchmarksCount = allBenchmarks
         .where((benchmark) => benchmark.performanceModeResult != null)
         .length;
 
     if (benchmarksCount == 0) return 0;
 
     final summaryThroughput = pow(
-        benchmarks.fold<double>(1, (prev, i) {
+        allBenchmarks.fold<double>(1, (prev, i) {
           return prev * (i.performanceModeResult?.throughput?.value ?? 1.0);
         }),
         1.0 / benchmarksCount);
 
     final maxSummaryThroughput = pow(
-        benchmarks.fold<double>(1, (prev, i) {
+        allBenchmarks.fold<double>(1, (prev, i) {
           return prev * (i.info.maxThroughput);
         }),
         1.0 / benchmarksCount);
@@ -75,7 +75,9 @@ class BenchmarkState extends ChangeNotifier {
     return summaryThroughput / maxSummaryThroughput;
   }
 
-  List<Benchmark> get benchmarks => _benchmarkStore.benchmarks;
+  List<Benchmark> get allBenchmarks => _benchmarkStore.allBenchmarks;
+
+  List<Benchmark> get activeBenchmarks => _benchmarkStore.activeBenchmarks;
 
   late BenchmarkStore _benchmarkStore;
 
@@ -289,7 +291,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   void resetCurrentResults() {
-    for (var b in _benchmarkStore.benchmarks) {
+    for (var b in _benchmarkStore.allBenchmarks) {
       b.accuracyModeResult = null;
       b.performanceModeResult = null;
     }
@@ -304,7 +306,7 @@ class BenchmarkState extends ChangeNotifier {
       lastResult = ExtendedResult.fromJson(
           jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
       resourceManager.resultManager
-          .restoreResults(lastResult!.results, benchmarks);
+          .restoreResults(lastResult!.results, allBenchmarks);
       _doneRunning = true;
       return;
     } catch (e, trace) {

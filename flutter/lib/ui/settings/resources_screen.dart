@@ -34,7 +34,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
 
     final children = <Widget>[];
 
-    for (var benchmark in state.benchmarks) {
+    for (var benchmark in state.allBenchmarks) {
       children.add(_listTileBuilder(benchmark));
       children.add(const Divider(height: 20));
     }

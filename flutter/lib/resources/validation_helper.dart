@@ -18,9 +18,6 @@ class ValidationHelper {
     required this.selectedRunModes,
   });
 
-  List<Benchmark> get activeBenchmarks =>
-      benchmarkStore.benchmarks.where((e) => e.isActive).toList();
-
   Future<String> validateExternalResourcesDirectory(
       String errorDescription) async {
     final dataFolderPath = resourceManager.getDataFolder();
@@ -32,7 +29,7 @@ class ValidationHelper {
     }
     final resources = benchmarkStore.listResources(
       modes: selectedRunModes,
-      benchmarks: activeBenchmarks,
+      benchmarks: benchmarkStore.activeBenchmarks,
     );
     final result = await resourceManager.validateResourcesExist(resources);
     final missing = result[false] ?? [];
@@ -45,7 +42,7 @@ class ValidationHelper {
   Future<String> validateOfflineMode(String errorDescription) async {
     final resources = benchmarkStore.listResources(
       modes: selectedRunModes,
-      benchmarks: activeBenchmarks,
+      benchmarks: benchmarkStore.activeBenchmarks,
     );
     final internetResources = filterInternetResources(resources);
     if (internetResources.isEmpty) return '';

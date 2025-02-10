@@ -80,8 +80,7 @@ class TaskRunner {
     final cooldown = store.cooldown;
     final cooldownDuration = Duration(seconds: store.cooldownDuration);
 
-    final activeBenchmarks =
-        benchmarkStore.benchmarks.where((element) => element.isActive);
+    final activeBenchmarks = benchmarkStore.activeBenchmarks;
 
     final resultHelpers = <ResultHelper>[];
     for (final benchmark in activeBenchmarks) {
