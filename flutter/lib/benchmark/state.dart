@@ -133,25 +133,39 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> loadResources({required bool downloadMissing}) async {
+  Future<void> loadResources(
+      {required bool downloadMissing,
+      List<Benchmark> benchmarks = const []}) async {
     final newAppVersion =
         '${BuildInfoHelper.info.version}+${BuildInfoHelper.info.buildNumber}';
     var needToPurgeCache = _store.previousAppVersion != newAppVersion;
     _store.previousAppVersion = newAppVersion;
 
+    final selectedBenchmarks = benchmarks.isEmpty ? allBenchmarks : benchmarks;
     await Wakelock.enable();
-    print('Start loading resources with downloadMissing=$downloadMissing');
-    final resources = _benchmarkStore.listResources(
+    final selectedResources = _benchmarkStore.listResources(
       modes: [taskRunner.perfMode, taskRunner.accuracyMode],
-      benchmarks: benchmarks,
+      benchmarks: selectedBenchmarks,
+    );
+    final allResources = _benchmarkStore.listResources(
+      modes: [taskRunner.perfMode, taskRunner.accuracyMode],
+      benchmarks: allBenchmarks,
     );
     try {
+      final selectedBenchmarkIds = selectedBenchmarks
+          .map((e) => e.benchmarkSettings.benchmarkId)
+          .join(', ');
+      print('Start loading resources with downloadMissing=$downloadMissing '
+          'for $selectedBenchmarkIds');
       await resourceManager.handleResources(
-        resources,
+        selectedResources,
         needToPurgeCache,
         downloadMissing,
       );
       print('Finished loading resources with downloadMissing=$downloadMissing');
+      // We still need to load all resources after download selected resources.
+      // TODO (anhappdev): Split download and load (read) resources into two functions.
+      await resourceManager.handleResources(allResources, false, false);
       error = null;
       stackTrace = null;
       taskConfigFailedToLoad = false;

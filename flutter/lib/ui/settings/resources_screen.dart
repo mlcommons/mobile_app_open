@@ -40,7 +40,8 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     }
     children.add(const SizedBox(height: 20));
     children.add(_downloadProgress());
-    children.add(_downloadButton());
+    children
+        .add(_downloadButton(state.allBenchmarks, l10n.resourceDownloadAll));
     children.add(const SizedBox(height: 20));
     children.add(_clearCacheButton());
 
@@ -83,6 +84,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           ],
         ),
       ),
+      trailing: _downloadButton([benchmark], l10n.resourceDownload),
     );
   }
 
@@ -166,12 +168,15 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     );
   }
 
-  Widget _downloadButton() {
+  Widget _downloadButton(List<Benchmark> benchmarks, String title) {
     return AbsorbPointer(
       absorbing: downloading,
       child: ElevatedButton(
         onPressed: () async {
-          await state.loadResources(downloadMissing: true);
+          await state.loadResources(
+            downloadMissing: true,
+            benchmarks: benchmarks,
+          );
           if (state.error != null) {
             if (!mounted) return;
             await showErrorDialog(context, <String>[state.error.toString()]);
@@ -184,7 +189,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
             backgroundColor: downloading ? Colors.grey : Colors.blue),
         child: FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text(l10n.resourceDownload),
+          child: Text(title),
         ),
       ),
     );
@@ -215,7 +220,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
             backgroundColor: downloading ? Colors.grey : Colors.red),
         child: FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text(l10n.resourceClear),
+          child: Text(l10n.resourceClearAll),
         ),
       ),
     );
