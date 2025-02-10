@@ -116,7 +116,11 @@ class Benchmark {
 }
 
 class BenchmarkStore {
-  final List<Benchmark> benchmarks = <Benchmark>[];
+  final List<Benchmark> allBenchmarks = <Benchmark>[];
+
+  List<Benchmark> get activeBenchmarks {
+    return allBenchmarks.where((e) => e.isActive).toList();
+  }
 
   BenchmarkStore({
     required pb.MLPerfConfig appConfig,
@@ -132,7 +136,7 @@ class BenchmarkStore {
       }
 
       final enabled = taskSelection[task.id] ?? true;
-      benchmarks.add(Benchmark(
+      allBenchmarks.add(Benchmark(
         taskConfig: task,
         benchmarkSettings: backendSettings,
         isActive: enabled,
@@ -181,7 +185,7 @@ class BenchmarkStore {
 
   Map<String, bool> get selection {
     Map<String, bool> result = {};
-    for (var item in benchmarks) {
+    for (var item in allBenchmarks) {
       result[item.id] = item.isActive;
     }
     return result;
