@@ -207,34 +207,33 @@ benchmark_setting {
   delegate_selected: "NNAPI"
 }
 
-# TODO (anhappdev) uncomment when stable_diffusion is ready
-#benchmark_setting {
-#  benchmark_id: "stable_diffusion"
-#  framework: "TFLite"
-#  delegate_choice: {
-#    delegate_name: "NNAPI"
-#    accelerator_name: "npu"
-#    accelerator_desc: "NPU"
-#    model_file: {
-#      model_path: "local:///mlperf_models/stable-diffusion/decoder.tflite"
-#      model_checksum: "491385ad873880ba1876e1d097fcc0e3"
-#    }
-#    model_file: {
-#      model_path: "local:///mlperf_models/stable-diffusion/text_encoder.tflite"
-#      model_checksum: "8985768b09fe31b805e66b6048da9125"
-#    }
-#    model_file: {
-#      model_path: "local:///mlperf_models/stable-diffusion/first_model.tflite"
-#      model_checksum: "f0d6f45a2d702456a234c0a9b192816a"
-#    }
-#    model_file: {
-#      model_path: "local:///mlperf_models/stable-diffusion/second_model.tflite"
-#      model_checksum: "cea07208776347a8a5334106a09444fe"
-#    }
-#  }
-#  delegate_selected: "NNAPI"
-#  custom_setting {
-#    id: "pipeline"
-#    value: "StableDiffusionPipeline"
-#  }
-#}
+benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/tflite/sd_decoder_dynamic.tflite"
+      model_checksum: "68acdb62f99e1dc2c7f5db8cdd0e007c"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/tflite/sd_diffusion_model_dynamic.tflite"
+      model_checksum: "309e95f76ac8de01130942037a28aa8f"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/tflite/sd_text_encoder_dynamic.tflite"
+      model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/tflite/timestep_embeddings_data.bin.ts"
+      model_checksum: "798b772155a69de5df44b304327bb3cc"
+    }
+  }
+  delegate_selected: "NNAPI"
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+}

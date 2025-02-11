@@ -233,7 +233,6 @@ std::vector<float> get_timestep_embedding(int timestep, int batch_size, int dim,
     embedding_cos.push_back(cosf(timestep * freq));
     embedding_sin.push_back(sinf(timestep * freq));
   }
-
   std::vector<float> embedding;
   for (int i = 0; i < batch_size; i++) {
     embedding.insert(embedding.end(),

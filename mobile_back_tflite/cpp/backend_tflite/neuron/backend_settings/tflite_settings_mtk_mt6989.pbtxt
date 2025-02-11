@@ -63,8 +63,8 @@ benchmark_setting {
     accelerator_name: "neuron-mdla"
     accelerator_desc: "MediaTek NN accelerator via the Neuron Delegate"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/mediatek/MobileNetV4-Conv-Large-int8-ptq.dla"
-      model_checksum: "07055309718ff681d8cd2c00f5e4b5db"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/mediatek/MobileNetV4-Conv-Large-int8-ptq.dla"
+      model_checksum: "ff9e3705d4a62c4b78e2597156bb7599"
     }
   }
   delegate_choice: {
@@ -173,8 +173,8 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "MediaTek NN accelerator + CPU via the Neuron Delegate"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/mediatek/mobiledet_qat.dla"
-      model_checksum: "14b9572f121caa093cd8bf690fde997c"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/mediatek/mobiledet_qat.dla"
+      model_checksum: "97cc339e205dfe5503d7dc256b12f472"
     }
   }
   delegate_choice: {
@@ -216,8 +216,8 @@ benchmark_setting {
     accelerator_name: "neuron-no-ahwb"
     accelerator_desc: "MediaTek NN accelerator + VPU via the Neuron Delegate"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/mediatek/mobilebert_int8_384_nnapi.dla"
-      model_checksum: "8c6ce45cc49bbf8bb26609bfb219164a"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/mediatek/mobilebert_int8_384_nnapi.dla"
+      model_checksum: "2c81eebd87e3f620373897cc56dbc3e7"
     }
     batch_size: 1
   }
@@ -260,8 +260,8 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/mediatek/mobile_segmenter_r4_quant_argmax_uint8.dla"
-      model_checksum: "fe62a283e6da531647da15b3f26e680a"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/mediatek/mobile_segmenter_r4_quant_argmax_uint8.dla"
+      model_checksum: "105fa48160803201dedec155445dd4e9"
     }
   }
   delegate_choice: {
@@ -302,8 +302,8 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "MediaTek NN accelerator + CPU via the Neuron Delegate"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/mediatek/edsr_f32b5_full_qint8.dla"
-      model_checksum: "fcd91d276036be666153c663c03fb69e"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/mediatek/edsr_f32b5_full_qint8.dla"
+      model_checksum: "cc40f7f0e97cf34c8586883fd3357354"
     }
   }
   delegate_choice: {

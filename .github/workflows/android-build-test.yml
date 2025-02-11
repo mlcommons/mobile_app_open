@@ -100,15 +100,22 @@ jobs:
           rm /tmp/${SAMSUNG_LIB}.zip && \
           mkdir -p mobile_back_samsung/samsung/lib/internal && \
           mv /tmp/${SAMSUNG_LIB}/* mobile_back_samsung/samsung/lib/internal/
+      - name: Download QTI SDK
+        env:
+          QTI_SDK: qairt-2.25.0.240728-linux
+        run: |
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.1/${QTI_SDK}.zip /tmp/ && \
+          unzip /tmp/${QTI_SDK}.zip -d /tmp/${QTI_SDK} && \
+          rm /tmp/${QTI_SDK}.zip && \
+          mv /tmp/${QTI_SDK}/* mobile_back_qti/
       - name: Download QTI libraries
         env:
-          QTI_LIB: qaisw-2.20.0.240223_linux
+          QTI_LIB: StableDiffusionShared
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.0/${QTI_LIB}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.1/${QTI_LIB}.zip /tmp/ && \
           unzip /tmp/${QTI_LIB}.zip -d /tmp/${QTI_LIB} && \
           rm /tmp/${QTI_LIB}.zip && \
-          mkdir -p mobile_back_qti/${QTI_LIB} && \
-          mv /tmp/${QTI_LIB}/* mobile_back_qti/${QTI_LIB}/
+          mv /tmp/${QTI_LIB}/* mobile_back_qti/cpp/backend_qti/StableDiffusionShared/
       - name: Cache bazel
         uses: actions/cache@v4
         with:
@@ -143,6 +150,7 @@ jobs:
           PERF_TEST: true
           WITH_TFLITE: 0
           WITH_QTI: 1
+          WITH_STABLEDIFFUSION: 1
         run: |
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-qti.apk
@@ -191,6 +199,7 @@ jobs:
           WITH_QTI: 1
           WITH_SAMSUNG: 1
           WITH_APPLE: 0
+          WITH_STABLEDIFFUSION: 1
         run: |
           make flutter/android/release
           gsutil cp flutter/build/app/outputs/bundle/release/app-release.aab $GCLOUD_BUCKET_PATH/app-release.aab

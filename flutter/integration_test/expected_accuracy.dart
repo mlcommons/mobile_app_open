@@ -83,16 +83,16 @@ const Map<String, Interval> _superResolution = {
 
 // TODO (anhappdev): update expected accuracy for stable diffusion
 const Map<String, Interval> _stableDiffusion = {
-  'cpu': Interval(min: 0, max: 100),
-  'npu': Interval(min: 0, max: 100),
-  'tpu': Interval(min: 0, max: 100),
-  'ane|TFLite': Interval(min: 0, max: 100),
-  'ane|Core ML': Interval(min: 0, max: 100),
-  'cpu&gpu&ane': Interval(min: 0, max: 100),
-  'snpe_dsp': Interval(min: 0, max: 100),
-  'psnpe_dsp': Interval(min: 0, max: 100),
-  'neuron': Interval(min: 0, max: 100),
-  'samsung_npu': Interval(min: 0, max: 100),
+  'cpu': Interval(min: 0, max: 1.0),
+  'npu': Interval(min: 0, max: 1.0),
+  'tpu': Interval(min: 0, max: 1.0),
+  'ane|TFLite': Interval(min: 0, max: 1.0),
+  'ane|Core ML': Interval(min: 0, max: 1.0),
+  'cpu&gpu&ane': Interval(min: 0, max: 1.0),
+  'snpe_dsp': Interval(min: 0, max: 1.0),
+  'psnpe_dsp': Interval(min: 0, max: 1.0),
+  'neuron': Interval(min: 0, max: 1.0),
+  'samsung_npu': Interval(min: 0, max: 1.0),
 };
 
 const benchmarkExpectedAccuracy = {
