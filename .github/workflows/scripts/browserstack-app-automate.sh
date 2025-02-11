@@ -82,13 +82,16 @@ check_build_status() {
   elif [[ "$status" == "failed" ]]; then
     echo "Build failed."
     exit 1
+  elif [[ "$status" == "error" ]]; then
+    echo "Build has error."
+    exit 9
   fi
 }
 
 # Main
 if ! BUILD_ID=$(trigger_build); then
   echo "Trigger build failed. Message: $BUILD_ID"
-  exit 1
+  exit 9
 fi
 
 echo "Build triggered successfully. Build ID: $BUILD_ID"
