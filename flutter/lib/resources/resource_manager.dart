@@ -129,8 +129,11 @@ class ResourceManager {
 
       final checksumFailed = await validateResourcesChecksum(resources);
       if (checksumFailed.isNotEmpty) {
-        final mismatchedPaths = checksumFailed.map((e) => '\n${e.path}').join();
-        throw 'Checksum validation failed for: $mismatchedPaths';
+        final checksumFailedPathString =
+            checksumFailed.map((e) => '\n${e.path}').join();
+        final checksumFailedPaths = checksumFailed.map((e) => e.path).toList();
+        await cacheManager.deleteFiles(checksumFailedPaths);
+        throw 'Checksum validation failed for: $checksumFailedPathString. \nPlease download the missing files again.';
       }
 
       // delete downloaded archives to free up disk space
