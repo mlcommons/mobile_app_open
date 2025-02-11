@@ -360,7 +360,6 @@ int Socs::soc_num_inits() {
 }
 
 bool Socs::isSnapDragon(const char *manufacturer) {
-  soc_info_init();
 #ifdef __ANDROID__
   bool is_qcom = false;
   if (strncmp("QUALCOMM", manufacturer, 7) == 0) {
