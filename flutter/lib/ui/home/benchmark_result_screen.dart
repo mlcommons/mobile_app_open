@@ -16,6 +16,7 @@ import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
+import 'package:mlperfbench/ui/nil.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -74,27 +75,27 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(56.0),
-          child: _shareSection(),
-        ),
         backgroundColor: AppColors.secondaryAppBarBackground,
       ),
       drawer: const AppDrawer(),
-      body: LayoutBuilder(
-        builder: (context, constraint) {
-          return SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _totalScoreSection(),
-                const SizedBox(height: 20),
-                _detailSection(),
-              ],
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _shareSection(),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _totalScoreSection(),
+                  const SizedBox(height: 20),
+                  _detailSection(),
+                ],
+              ),
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
@@ -120,7 +121,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         style: const TextStyle(color: AppColors.resultInvalidText),
       );
       runModeString = l10n.unknown;
-      shareButton = const SizedBox();
+      shareButton = nil;
       shareButtonFlex = 0;
     }
 
