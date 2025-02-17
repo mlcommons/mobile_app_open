@@ -39,6 +39,18 @@ class ValidationHelper {
         missing.mapIndexed((i, element) => '\n${i + 1}) $element').join();
   }
 
+  Future<String> validateChecksum(String errorDescription) async {
+    final resources = benchmarkStore.listResources(
+      modes: selectedRunModes,
+      benchmarks: benchmarkStore.activeBenchmarks,
+    );
+    final checksumFailed =
+        await resourceManager.validateResourcesChecksum(resources);
+    if (checksumFailed.isEmpty) return '';
+    final mismatchedPaths = checksumFailed.map((e) => '\n${e.path}').join();
+    return errorDescription + mismatchedPaths;
+  }
+
   Future<String> validateOfflineMode(String errorDescription) async {
     final resources = benchmarkStore.listResources(
       modes: selectedRunModes,

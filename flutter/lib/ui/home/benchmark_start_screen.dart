@@ -135,6 +135,17 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                 await showErrorDialog(context, messages);
                 return;
               }
+              final checksumError = await state.validator
+                  .validateChecksum(l10n.dialogContentChecksumError);
+              if (checksumError.isNotEmpty) {
+                if (!context.mounted) return;
+                final messages = [
+                  checksumError,
+                  l10n.dialogContentChecksumErrorHint
+                ];
+                await showErrorDialog(context, messages);
+                return;
+              }
               if (store.offlineMode) {
                 final offlineError = await state.validator
                     .validateOfflineMode(l10n.dialogContentOfflineWarning);

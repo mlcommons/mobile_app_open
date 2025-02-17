@@ -93,6 +93,7 @@
   "dialogContentMissingFiles": "The following files don't exist:",
   "dialogContentMissingFilesHint": "Please go to the menu Resources to download the missing files.",
   "dialogContentChecksumError": "The following files failed checksum validation:",
+  "dialogContentChecksumErrorHint": "Please go to the menu Resources to clear the cache and download the files again.",
   "dialogContentNoSelectedBenchmarkError": "Please select at least one benchmark.",
 
   "benchModePerformanceOnly": "Performance Only",
