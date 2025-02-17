@@ -49,7 +49,7 @@ ARG ndk_version=android-ndk-r25c
 ARG android_ndk_home=/opt/android/${ndk_version}
 # Install the NDK
 # Use wget instead of curl to avoid "Error in the HTTP2 framing layer"
-RUN cd /tmp &&  wget -nv https://dl.google.com/android/repository/${ndk_version}-linux.zip && \
+RUN cd /tmp &&  wget --max-redirect=0 -nv https://dl.google.com/android/repository/${ndk_version}-linux.zip && \
     unzip -q /tmp/${ndk_version}-linux.zip -d /opt/android && \
     rm /tmp/${ndk_version}-linux.zip
 

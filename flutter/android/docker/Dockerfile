@@ -113,7 +113,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y mc \
     tree \
     unzip \
     vim \
-    wget \
     xterm \
     zip \
     ffmpeg \
@@ -124,7 +123,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y mc \
 # Get cmake-3.19.3
 # apt has 3.10.2 as latest version, so remove it
 RUN apt-get remove --no-install-recommends -y cmake
-RUN wget -q https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh -O /opt/cmake-3.19.3-Linux-x86_64.sh && \
+RUN curl --proto '=https' -L https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh -o /opt/cmake-3.19.3-Linux-x86_64.sh && \
     chmod +x /opt/cmake-3.19.3-Linux-x86_64.sh && mkdir -p /opt/cmake && \
     bash /opt/cmake-3.19.3-Linux-x86_64.sh --skip-license --prefix=/opt/cmake && \
     rm -rf /opt/cmake-3.19.3-Linux-x86_64.sh
@@ -141,7 +140,7 @@ ARG COMMON_CMAKE_OPTIONS="-DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=release \
                           -DWITH_TBB=ON -DBUILD_PERF_TESTS=OFF -DWITH_IPP=OFF \
                           -DWITH_OPENEXR=ON -DWITH_JASPER=ON -WITH_PNG=ON -DBUILD_FAT_JAVA_LIB=OFF WITH_IMGCODEC=ON"
 # Ref: https://docs.opencv.org/3.4.0/d7/d9f/tutorial_linux_install.html
-RUN wget -q https://github.com/opencv/opencv/archive/3.4.7/opencv-3.4.7.tar.gz -O /tmp/3.4.7.tar.gz && \
+RUN curl --proto '=https' -L https://github.com/opencv/opencv/archive/3.4.7/opencv-3.4.7.tar.gz -o /tmp/3.4.7.tar.gz && \
     tar -C /tmp -xvf /tmp/3.4.7.tar.gz  && \
     # First build for arm-android
     cd /tmp/opencv-3.4.7 && mkdir -p /opt/opencv-3.4.7_android/ release_android && cd release_android && \

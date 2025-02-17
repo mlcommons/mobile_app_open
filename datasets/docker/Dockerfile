@@ -61,7 +61,7 @@ ARG android_home=/opt/android/sdk
 
 # Install Android SDK and NDK
 RUN mkdir -p ${android_home} && \
-    wget -O /tmp/sdk_tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip && \
+    wget --max-redirect=0 -O /tmp/sdk_tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip && \
     unzip -q /tmp/sdk_tools.zip -d ${android_home}/cmdline-tools/ && \
     mv ${android_home}/cmdline-tools/cmdline-tools ${android_home}/cmdline-tools/tools && \
     rm /tmp/sdk_tools.zip
@@ -92,7 +92,7 @@ ARG android_ndk_home=/opt/android/${ndk_version}
 
 # Install the NDK
 # Use wget instead of curl to avoid "Error in the HTTP2 framing layer"
-RUN cd /tmp &&  wget -nv https://dl.google.com/android/repository/${ndk_version}-linux-x86_64.zip && \
+RUN cd /tmp && wget --max-redirect=0 -nv https://dl.google.com/android/repository/${ndk_version}-linux-x86_64.zip && \
     unzip -q /tmp/${ndk_version}-linux-x86_64.zip -d /opt/android && \
     rm /tmp/${ndk_version}-linux-x86_64.zip
 
