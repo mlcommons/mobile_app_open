@@ -64,6 +64,14 @@ void main() async {
       expect(manager.getArchive(txtRemotePath), isNull);
     });
 
+    test('deleteFiles', () async {
+      await manager.deleteFiles(paths);
+      final txtLocalPath = manager.get(txtRemotePath);
+      expect(txtLocalPath, isNotNull);
+      expect(await File(txtLocalPath!).exists(), isFalse,
+          reason: 'file should not exist at path [$txtLocalPath]');
+    });
+
     test('deleteLoadedResources', () async {
       await manager.deleteLoadedResources(paths);
 

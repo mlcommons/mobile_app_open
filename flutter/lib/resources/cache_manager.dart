@@ -73,6 +73,16 @@ class CacheManager {
     }
   }
 
+  Future<void> deleteFiles(List<String> resources) async {
+    for (final resource in resources) {
+      final filePath = get(resource);
+      if (filePath == null) continue;
+      final file = File(filePath);
+      if (await file.exists()) await file.delete();
+      print('Deleted resource $resource stored at ${file.path}');
+    }
+  }
+
   Future<void> purgeOutdatedCache(int atLeastDaysOld) async {
     var currentResources = <String>[];
     for (var r in _resourcesMap.values) {

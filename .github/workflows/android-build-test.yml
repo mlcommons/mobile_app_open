@@ -100,15 +100,22 @@ jobs:
           rm /tmp/${SAMSUNG_LIB}.zip && \
           mkdir -p mobile_back_samsung/samsung/lib/internal && \
           mv /tmp/${SAMSUNG_LIB}/* mobile_back_samsung/samsung/lib/internal/
+      - name: Download QTI SDK
+        env:
+          QTI_SDK: qairt-2.25.0.240728-linux
+        run: |
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.1/${QTI_SDK}.zip /tmp/ && \
+          unzip /tmp/${QTI_SDK}.zip -d /tmp/${QTI_SDK} && \
+          rm /tmp/${QTI_SDK}.zip && \
+          mv /tmp/${QTI_SDK}/* mobile_back_qti/
       - name: Download QTI libraries
         env:
-          QTI_LIB: qaisw-2.20.0.240223_linux
+          QTI_LIB: StableDiffusionShared
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.0/${QTI_LIB}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.1/${QTI_LIB}.zip /tmp/ && \
           unzip /tmp/${QTI_LIB}.zip -d /tmp/${QTI_LIB} && \
           rm /tmp/${QTI_LIB}.zip && \
-          mkdir -p mobile_back_qti/${QTI_LIB} && \
-          mv /tmp/${QTI_LIB}/* mobile_back_qti/${QTI_LIB}/
+          mv /tmp/${QTI_LIB}/* mobile_back_qti/cpp/backend_qti/StableDiffusionShared/
       - name: Cache bazel
         uses: actions/cache@v4
         with:
@@ -143,6 +150,7 @@ jobs:
           PERF_TEST: true
           WITH_TFLITE: 0
           WITH_QTI: 1
+          WITH_STABLEDIFFUSION: 1
         run: |
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-qti.apk
@@ -191,6 +199,7 @@ jobs:
           WITH_QTI: 1
           WITH_SAMSUNG: 1
           WITH_APPLE: 0
+          WITH_STABLEDIFFUSION: 1
         run: |
           make flutter/android/release
           gsutil cp flutter/build/app/outputs/bundle/release/app-release.aab $GCLOUD_BUCKET_PATH/app-release.aab
@@ -278,7 +287,8 @@ jobs:
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
           -F "file=@/tmp/$HELPER_APK_NAME" \
           -F "custom_id=$HELPER_APK_NAME"
-      - name: Trigger App Automate
+      - uses: nick-fields/retry@v3
+        name: Trigger App Automate
         env:
           BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
@@ -290,8 +300,81 @@ jobs:
             "Samsung Galaxy S24 Ultra-14.0",
             "Samsung Galaxy Tab S10 Plus-14.0",
             "Google Pixel 9 Pro-15.0"]
+        with:
+          timeout_minutes: 60
+          max_attempts: 2
+          retry_wait_seconds: 300
+          retry_on_exit_code: 9
+          command: |
+            bash .github/workflows/scripts/browserstack-app-automate.sh
+
+  test-android-apk-single:
+    needs:
+      - build-android-apk
+      - test-android-apk-unified
+    if: failure()
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - backend: "tflite"
+            device: "Samsung Galaxy M32-11.0"
+          - backend: "pixel"
+            device: "Google Pixel 9 Pro-15.0"
+          - backend: "mtk"
+            device: "Samsung Galaxy Tab S10 Plus-14.0"
+          - backend: "qti"
+            device: "Samsung Galaxy S24 Ultra-14.0"
+          - backend: "samsung"
+            device: "Samsung Galaxy S24-14.0"
+    env:
+      MAIN_APK_NAME: test-main-${{ matrix.backend }}-${{ github.run_number }}.apk
+      HELPER_APK_NAME: test-helper-${{ matrix.backend }}-${{ github.run_number }}.apk
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+      - name: Download test APK
         run: |
-          bash .github/workflows/scripts/browserstack-app-automate.sh
+          gsutil cp $GCLOUD_BUCKET_PATH/test-main-${{ matrix.backend }}.apk /tmp/$MAIN_APK_NAME
+          gsutil cp $GCLOUD_BUCKET_PATH/test-helper-${{ matrix.backend }}.apk /tmp/$HELPER_APK_NAME
+      - name: Upload main app
+        run: |
+          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
+          -F "file=@/tmp/$MAIN_APK_NAME" \
+          -F "custom_id=$MAIN_APK_NAME"
+      - name: Upload test suite
+        run: |
+          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
+          -F "file=@/tmp/$HELPER_APK_NAME" \
+          -F "custom_id=$HELPER_APK_NAME"
+      - uses: nick-fields/retry@v3
+        name: Trigger App Automate
+        env:
+          BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
+          BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
+          BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
+          BROWSERSTACK_DEVICES: >-
+            ["${{ matrix.device }}"]
+        with:
+          timeout_minutes: 60
+          max_attempts: 2
+          retry_wait_seconds: 300
+          retry_on_exit_code: 9
+          command: |
+            bash .github/workflows/scripts/browserstack-app-automate.sh
 
   deploy-playstore:
     needs:

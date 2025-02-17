@@ -41,22 +41,12 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          _goButtonSection(context),
+          _infoSection(),
           Expanded(
-            flex: 34,
-            child: _goButtonSection(context),
-          ),
-          Expanded(
-            flex: 6,
-            child: _infoSection(),
-          ),
-          Expanded(
-            flex: 60,
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: AbsorbPointer(
-                absorbing: state.state != BenchmarkStateEnum.waiting,
-                child: const BenchmarkConfigSection(),
-              ),
+            child: AbsorbPointer(
+              absorbing: state.state != BenchmarkStateEnum.waiting,
+              child: const BenchmarkConfigSection(),
             ),
           )
         ],
@@ -80,10 +70,8 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(flex: 1, child: Text(deviceDescription)),
-            Expanded(flex: 1, child: Text(selectedBenchmarkText))
-          ],
+          mainAxisSize: MainAxisSize.min,
+          children: [Text(deviceDescription), Text(selectedBenchmarkText)],
         ),
       ),
     );
@@ -92,99 +80,104 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
   Widget _goButtonSection(BuildContext context) {
     final circleWidth =
         MediaQuery.of(context).size.width * WidgetSizes.circleWidthFactor;
+    const double verticalPadding = 8.0;
+    final sectionHeight = circleWidth + verticalPadding * 2.0;
 
-    return Stack(
-      alignment: Alignment.topCenter,
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: AppGradients.halfScreen,
-            ),
-          ),
-        ),
-        Container(
-          alignment: Alignment.center,
-          child: ElevatedButton(
-            key: const Key(WidgetKeys.goButton),
-            style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.goCircle,
-                shape: const CircleBorder(),
-                minimumSize: Size.fromWidth(circleWidth)),
-            child: Text(
-              l10n.mainScreenGo,
-              style: const TextStyle(
-                color: AppColors.lightText,
-                fontSize: 40,
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: sectionHeight,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: AppGradients.halfScreen,
               ),
             ),
-            onPressed: () async {
-              final wrongPathError = await state.validator
-                  .validateExternalResourcesDirectory(
-                      l10n.dialogContentMissingFiles);
-              if (wrongPathError.isNotEmpty) {
-                if (!context.mounted) return;
-                final messages = [
-                  wrongPathError,
-                  l10n.dialogContentMissingFilesHint
-                ];
-                await showErrorDialog(context, messages);
-                return;
-              }
-              final checksumError = await state.validator
-                  .validateChecksum(l10n.dialogContentChecksumError);
-              if (checksumError.isNotEmpty) {
-                if (!context.mounted) return;
-                final messages = [
-                  checksumError,
-                  l10n.dialogContentChecksumErrorHint
-                ];
-                await showErrorDialog(context, messages);
-                return;
-              }
-              if (store.offlineMode) {
-                final offlineError = await state.validator
-                    .validateOfflineMode(l10n.dialogContentOfflineWarning);
-                if (offlineError.isNotEmpty) {
+          ),
+          Container(
+            alignment: Alignment.center,
+            child: ElevatedButton(
+              key: const Key(WidgetKeys.goButton),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.goCircle,
+                  shape: const CircleBorder(),
+                  minimumSize: Size.fromWidth(circleWidth)),
+              child: Text(
+                l10n.mainScreenGo,
+                style: const TextStyle(
+                  color: AppColors.lightText,
+                  fontSize: 40,
+                ),
+              ),
+              onPressed: () async {
+                final wrongPathError = await state.validator
+                    .validateExternalResourcesDirectory(
+                        l10n.dialogContentMissingFiles);
+                if (wrongPathError.isNotEmpty) {
                   if (!context.mounted) return;
-                  switch (await showConfirmDialog(context, offlineError)) {
-                    case ConfirmDialogAction.ok:
-                      break;
-                    case ConfirmDialogAction.cancel:
-                      return;
-                    default:
-                      break;
+                  final messages = [
+                    wrongPathError,
+                    l10n.dialogContentMissingFilesHint
+                  ];
+                  await showErrorDialog(context, messages);
+                  return;
+                }
+                final checksumError = await state.validator
+                    .validateChecksum(l10n.dialogContentChecksumError);
+                if (checksumError.isNotEmpty) {
+                  if (!context.mounted) return;
+                  final messages = [
+                    checksumError,
+                    l10n.dialogContentChecksumErrorHint
+                  ];
+                  await showErrorDialog(context, messages);
+                  return;
+                }
+                if (store.offlineMode) {
+                  final offlineError = await state.validator
+                      .validateOfflineMode(l10n.dialogContentOfflineWarning);
+                  if (offlineError.isNotEmpty) {
+                    if (!context.mounted) return;
+                    switch (await showConfirmDialog(context, offlineError)) {
+                      case ConfirmDialogAction.ok:
+                        break;
+                      case ConfirmDialogAction.cancel:
+                        return;
+                      default:
+                        break;
+                    }
                   }
                 }
-              }
-              final selectedCount = state.activeBenchmarks.length;
-              if (selectedCount < 1) {
-                // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-                // ignore: use_build_context_synchronously
-                if (!context.mounted) return;
-                await showErrorDialog(
-                    context, [l10n.dialogContentNoSelectedBenchmarkError]);
-                return;
-              }
-              try {
-                await state.runBenchmarks();
-              } catch (e, t) {
-                print(t);
-                // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
-                // ignore: use_build_context_synchronously
-                if (!context.mounted) return;
-                await showErrorDialog(
-                    context, ['${l10n.runFail}:', e.toString()]);
-                return;
-              }
-            },
+                final selectedCount = state.activeBenchmarks.length;
+                if (selectedCount < 1) {
+                  // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+                  // ignore: use_build_context_synchronously
+                  if (!context.mounted) return;
+                  await showErrorDialog(
+                      context, [l10n.dialogContentNoSelectedBenchmarkError]);
+                  return;
+                }
+                try {
+                  await state.runBenchmarks();
+                } catch (e, t) {
+                  print(t);
+                  // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
+                  // ignore: use_build_context_synchronously
+                  if (!context.mounted) return;
+                  await showErrorDialog(
+                      context, ['${l10n.runFail}:', e.toString()]);
+                  return;
+                }
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

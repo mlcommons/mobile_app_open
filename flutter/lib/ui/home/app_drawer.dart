@@ -41,8 +41,11 @@ class AppDrawer extends StatelessWidget {
         child: Container(
           color: AppColors.drawerBackground,
           child: SafeArea(
-            child: Column(
-              children: [header] + menuList,
+            child: ScrollConfiguration(
+              behavior: NoGlowScrollBehavior(),
+              child: ListView(
+                children: [header] + menuList,
+              ),
             ),
           ),
         ),
@@ -141,5 +144,14 @@ class AppDrawer extends StatelessWidget {
         onTap: () => launchUrl(Uri.parse(Url.eula)),
       ),
     ];
+  }
+}
+
+// Custom ScrollBehavior
+class NoGlowScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child; // Disable glow effect
   }
 }

@@ -19,22 +19,9 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
     backend_qti_flutter_docker_args=-v "${SNPE_SDK}:/mnt/project/mobile_back_qti/$(shell basename ${SNPE_SDK})"
   endif
   $(info WITH_QTI=$(WITH_QTI))
-  local_snpe_sdk_root=$(shell echo mobile_back_qti/qaisw-* | awk '{print $$NF}')
+  local_snpe_sdk_root=$(shell echo mobile_back_qti/qairt/* | awk '{print $$NF}')
   $(info detected SNPE SDK: ${local_snpe_sdk_root})
   backend_qti_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
-    ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSNPE.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV75Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV73Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV69Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV68Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpPrepare.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libSnpeHtpV75Skel.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so
-  backend_qti_cmdline_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
-    ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSNPE.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV75Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV73Stub.so \
@@ -45,13 +32,53 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
     ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so \
-    mobile_back_qti/run_mlperf_tests.sh
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtp.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpNetRunExtensions.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV75Stub.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libQnnHtpV75Skel.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnSystem.so \
+    ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so
+  backend_qti_cmdline_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSNPE.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV75Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV73Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV69Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV68Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpPrepare.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libSnpeHtpV75Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so \
+    mobile_back_qti/run_mlperf_tests.sh \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtp.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpNetRunExtensions.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV75Stub.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libQnnHtpV75Skel.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnSystem.so \
+    ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so
+
+  backend_qti_android_target_sd=//mobile_back_qti/cpp/backend_qti/StableDiffusion:stableDiffusion
   backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so \
                                  //flutter/android/commonlibs:commonlibs
 
   ifeq ($(EXTERNAL_CONFIG),1)
 	backend_qti_flutter_docker_args = --env EXTERNAL_CONFIG=${EXTERNAL_CONFIG}
 	backend_qti_android_target+=--//mobile_back_qti/cpp/backend_qti:external_config=${EXTERNAL_CONFIG}
+  endif
+
+  ifeq ($(WITH_STABLEDIFFUSION),1)
+	backend_qti_libs_deps = rm -f ./mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv && \
+	                             ln -s /opt/opencv-3.4.7_android/sdk/native mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv
+	backend_qti_flutter_docker_args = --env WITH_STABLEDIFFUSION=${WITH_STABLEDIFFUSION}
+	backend_qti_android_target+=--//mobile_back_qti/cpp/backend_qti:with_stablediffusion=${WITH_STABLEDIFFUSION}
+	backend_qti_cmdline_files+=mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv/libs/arm64-v8a/libopencv_core.so \
+                               mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv/libs/arm64-v8a/libopencv_imgcodecs.so \
+                               mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv/libs/arm64-v8a/libopencv_imgproc.so \
+                               mobile_back_qti/cpp/backend_qti/StableDiffusionShared/libStableDiffusion.so
+	backend_qti_android_files+=mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv/libs/arm64-v8a/libopencv_core.so \
+                               mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv/libs/arm64-v8a/libopencv_imgcodecs.so \
+                               mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv/libs/arm64-v8a/libopencv_imgproc.so \
+                               mobile_back_qti/cpp/backend_qti/StableDiffusionShared/libStableDiffusion.so
   endif
 
   backend_qti_windows_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.dll \

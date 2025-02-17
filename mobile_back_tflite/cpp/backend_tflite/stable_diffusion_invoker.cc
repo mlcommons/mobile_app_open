@@ -4,6 +4,7 @@
 #include <random>
 #include <valarray>
 
+#include "embedding_utils.h"
 #include "sd_utils.h"
 #include "stable_diffusion_pipeline.h"
 #include "tensorflow/lite/c/c_api.h"
@@ -99,11 +100,21 @@ std::vector<float> StableDiffusionInvoker::diffusion_process(
     const std::vector<float>& unconditional_encoded_text, int num_steps,
     int seed) {
   float unconditional_guidance_scale = 7.5f;
+
   auto noise = get_normal(64 * 64 * 4, seed);
   auto latent = noise;
 
-  auto timesteps = get_timesteps(1, 1000, 1000 / num_steps);
+  // Get pre-calculated timesteps and embeddings
+  auto& embedding_manager = EmbeddingManager::getInstance();
+  auto timesteps = embedding_manager.get_timesteps(num_steps);
+
+  if (timesteps.empty()) {
+    LOG(ERROR) << "Failed to get timesteps for " << num_steps << " steps";
+    return std::vector<float>();
+  }
+
   auto alphas_tuple = get_initial_alphas(timesteps);
+
   auto alphas = std::get<0>(alphas_tuple);
   auto alphas_prev = std::get<1>(alphas_tuple);
 
@@ -111,7 +122,18 @@ std::vector<float> StableDiffusionInvoker::diffusion_process(
     LOG(INFO) << "Step " << timesteps.size() - 1 - i;
 
     auto latent_prev = latent;
-    auto t_emb = get_timestep_embedding(timesteps[i]);
+
+    auto t_emb = embedding_manager.get_timestep_embedding(i, num_steps);
+
+    if (t_emb.empty()) {
+      LOG(ERROR) << "Failed to get timestamp embedding for step " << i;
+      return std::vector<float>();
+    }
+
+    if (t_emb.empty()) {
+      LOG(ERROR) << "Failed to get timestamp embedding for step " << i;
+      return std::vector<float>();
+    }
 
     auto unconditional_latent =
         diffusion_step(latent, t_emb, unconditional_encoded_text);
@@ -132,6 +154,7 @@ std::vector<float> StableDiffusionInvoker::diffusion_process(
     latent.assign(std::begin(l), std::end(l));
   }
 
+  LOG(INFO) << "Diffusion process completed!";
   return latent;
 }
 
