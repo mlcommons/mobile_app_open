@@ -10,10 +10,10 @@ ARG SONAR_SCANNER_DIR=$HOME/.sonar
 
 # Install sonar-scanner
 # Check for newer version here: https://binaries.sonarsource.com/?prefix=Distribution/sonar-scanner-cli/
-ENV SONAR_SCANNER_VERSION=5.0.1.3006
-RUN curl --proto '=https' --create-dirs -sSLo $SONAR_SCANNER_DIR/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip
+ENV SONAR_SCANNER_VERSION=7.0.2.4839
+RUN curl --proto '=https' --create-dirs -sSLo $SONAR_SCANNER_DIR/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux-x64.zip
 RUN unzip -qq -o $SONAR_SCANNER_DIR/sonar-scanner.zip -d $SONAR_SCANNER_DIR/
-ENV PATH=$PATH:$SONAR_SCANNER_DIR/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin
+ENV PATH=$PATH:$SONAR_SCANNER_DIR/sonar-scanner-${SONAR_SCANNER_VERSION}-linux-x64/bin
 ENV SONAR_SCANNER_OPTS="-server"
 RUN sonar-scanner --version
 
