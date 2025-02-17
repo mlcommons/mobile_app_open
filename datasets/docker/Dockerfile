@@ -37,7 +37,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN apt-get clean
 
 # Protoc 3.6.1
-RUN curl -OL https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip && \
+RUN curl --proto '=https' -OL https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip && \
     unzip protoc-3.6.1-linux-x86_64.zip -d protoc3 && \
     mv protoc3/bin/* /usr/local/bin/ && \
     mv protoc3/include/* /usr/local/include/ && \
@@ -45,7 +45,7 @@ RUN curl -OL https://github.com/google/protobuf/releases/download/v3.6.1/protoc-
 
 # Install bazel
 RUN echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
-RUN curl https://bazel.build/bazel-release.pub.gpg | apt-key add -
+RUN curl --proto '=https' https://bazel.build/bazel-release.pub.gpg | apt-key add -
 RUN apt-get update && \
     apt-get install -y -no-install-recommends --allow-unauthenticated bazel-3.7.2
 RUN apt-get clean
