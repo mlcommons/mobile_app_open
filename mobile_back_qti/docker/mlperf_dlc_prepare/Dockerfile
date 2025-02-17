@@ -42,7 +42,7 @@ RUN pip3 install onnx==1.12.0 onnxruntime packaging
 RUN curl -SL http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz | tar -xJC /usr/local/. && \
     mv /usr/local/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04 /usr/local/clang-9.0.0
 
-RUN apt-get update && apt-get install -y bash coreutils
+RUN apt-get update && apt-get install -y --no-install-recommends bash coreutils
 RUN which readlink
 
 ARG ndk_version=android-ndk-r25c
