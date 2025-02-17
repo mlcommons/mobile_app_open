@@ -158,14 +158,17 @@ class BenchmarkState extends ChangeNotifier {
       print('Start loading resources with downloadMissing=$downloadMissing '
           'for $selectedBenchmarkIds');
       await resourceManager.handleResources(
-        selectedResources,
-        needToPurgeCache,
-        downloadMissing,
+        resources: selectedResources,
+        purgeOldCache: needToPurgeCache,
+        downloadMissing: downloadMissing,
       );
       print('Finished loading resources with downloadMissing=$downloadMissing');
       // We still need to load all resources after download selected resources.
-      // TODO (anhappdev): Split download and load (read) resources into two functions.
-      await resourceManager.handleResources(allResources, false, false);
+      await resourceManager.handleResources(
+        resources: allResources,
+        purgeOldCache: false,
+        downloadMissing: false,
+      );
       error = null;
       stackTrace = null;
       taskConfigFailedToLoad = false;

@@ -81,11 +81,12 @@ class CacheManager {
     return deleteLoadedResources(currentResources, atLeastDaysOld);
   }
 
-  Future<void> cache(
-      List<String> urls,
-      void Function(double, String) reportProgress,
-      bool purgeOldCache,
-      bool downloadMissing) async {
+  Future<void> cache({
+    required List<String> urls,
+    required void Function(double, String) onProgressUpdate,
+    required bool purgeOldCache,
+    required bool downloadMissing,
+  }) async {
     final resourcesToDownload = <String>[];
     _resourcesMap = {};
 
@@ -110,7 +111,7 @@ class CacheManager {
       continue;
     }
     if (downloadMissing) {
-      await _download(resourcesToDownload, reportProgress);
+      await _download(resourcesToDownload, onProgressUpdate);
     }
     if (purgeOldCache) {
       await purgeOutdatedCache(_oldFilesAgeInDays);
@@ -122,18 +123,20 @@ class CacheManager {
   }
 
   Future<void> _download(
-      List<String> urls, void Function(double, String) reportProgress) async {
+    List<String> urls,
+    void Function(double, String) onProgressUpdate,
+  ) async {
     var progress = 0.0;
     for (var url in urls) {
       progress += 0.1 / urls.length;
-      reportProgress(progress, url);
+      onProgressUpdate(progress, url);
       if (isResourceAnArchive(url)) {
         _resourcesMap[url] = await archiveCacheHelper.get(url, true);
       } else {
         _resourcesMap[url] = await fileCacheHelper.get(url, true);
       }
       progress += 0.9 / urls.length;
-      reportProgress(progress, url);
+      onProgressUpdate(progress, url);
     }
   }
 }

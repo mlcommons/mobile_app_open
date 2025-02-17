@@ -15,7 +15,12 @@ void main() async {
 
     setUp(() async {
       manager = CacheManager('/tmp/resources');
-      await manager.cache(paths, (val, str) {}, true, true);
+      await manager.cache(
+        urls: paths,
+        onProgressUpdate: (val, str) {},
+        purgeOldCache: true,
+        downloadMissing: true,
+      );
     });
 
     test('get', () async {
