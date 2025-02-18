@@ -37,17 +37,17 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN apt-get clean
 
 # Protoc 3.6.1
-RUN curl -OL https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip && \
-    unzip protoc-3.6.1-linux-x86_64.zip -d protoc3 && \
+ADD https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip /tmp/protoc-3.6.1-linux-x86_64.zip
+RUN unzip /tmp/protoc-3.6.1-linux-x86_64.zip -d protoc3 && \
     mv protoc3/bin/* /usr/local/bin/ && \
     mv protoc3/include/* /usr/local/include/ && \
-    rm -rf protoc-3.6.1-linux-x86_64.zip protoc3
+    rm -rf /tmp/protoc-3.6.1-linux-x86_64.zip protoc3
 
 # Install bazel
 RUN echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
-RUN curl https://bazel.build/bazel-release.pub.gpg | apt-key add -
+RUN curl --proto '=https' https://bazel.build/bazel-release.pub.gpg | apt-key add -
 RUN apt-get update && \
-    apt-get install -y --allow-unauthenticated bazel-3.7.2
+    apt-get install -y -no-install-recommends --allow-unauthenticated bazel-3.7.2
 RUN apt-get clean
 
 # Set timezone to UTC by default
@@ -61,7 +61,7 @@ ARG android_home=/opt/android/sdk
 
 # Install Android SDK and NDK
 RUN mkdir -p ${android_home} && \
-    wget -O /tmp/sdk_tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip && \
+    wget --max-redirect=0 -O /tmp/sdk_tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip && \
     unzip -q /tmp/sdk_tools.zip -d ${android_home}/cmdline-tools/ && \
     mv ${android_home}/cmdline-tools/cmdline-tools ${android_home}/cmdline-tools/tools && \
     rm /tmp/sdk_tools.zip
@@ -92,7 +92,7 @@ ARG android_ndk_home=/opt/android/${ndk_version}
 
 # Install the NDK
 # Use wget instead of curl to avoid "Error in the HTTP2 framing layer"
-RUN cd /tmp &&  wget -nv https://dl.google.com/android/repository/${ndk_version}-linux-x86_64.zip && \
+RUN cd /tmp && wget --max-redirect=0 -nv https://dl.google.com/android/repository/${ndk_version}-linux-x86_64.zip && \
     unzip -q /tmp/${ndk_version}-linux-x86_64.zip -d /opt/android && \
     rm /tmp/${ndk_version}-linux-x86_64.zip
 
