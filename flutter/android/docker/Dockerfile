@@ -26,8 +26,7 @@ RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python3 -m pip install numpy absl-py
 
-RUN curl --proto '=https' -L https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 -o /usr/local/bin/bazel && \
-    chmod +x /usr/local/bin/bazel
+ADD --chmod=755 https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 /usr/local/bin/bazel
 
 ENV ANDROID_SDK_ROOT=/opt/android
 ENV ANDROID_HOME=/opt/android
@@ -113,7 +112,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y mc \
     tree \
     unzip \
     vim \
-    wget \
     xterm \
     zip \
     ffmpeg \
@@ -124,8 +122,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y mc \
 # Get cmake-3.19.3
 # apt has 3.10.2 as latest version, so remove it
 RUN apt-get remove --no-install-recommends -y cmake
-RUN wget -q https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh -O /opt/cmake-3.19.3-Linux-x86_64.sh && \
-    chmod +x /opt/cmake-3.19.3-Linux-x86_64.sh && mkdir -p /opt/cmake && \
+ADD https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh /opt/cmake-3.19.3-Linux-x86_64.sh
+RUN chmod +x /opt/cmake-3.19.3-Linux-x86_64.sh && mkdir -p /opt/cmake && \
     bash /opt/cmake-3.19.3-Linux-x86_64.sh --skip-license --prefix=/opt/cmake && \
     rm -rf /opt/cmake-3.19.3-Linux-x86_64.sh
 # Add CMAKE into PATH
@@ -141,8 +139,8 @@ ARG COMMON_CMAKE_OPTIONS="-DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=release \
                           -DWITH_TBB=ON -DBUILD_PERF_TESTS=OFF -DWITH_IPP=OFF \
                           -DWITH_OPENEXR=ON -DWITH_JASPER=ON -WITH_PNG=ON -DBUILD_FAT_JAVA_LIB=OFF WITH_IMGCODEC=ON"
 # Ref: https://docs.opencv.org/3.4.0/d7/d9f/tutorial_linux_install.html
-RUN wget -q https://github.com/opencv/opencv/archive/3.4.7/opencv-3.4.7.tar.gz -O /tmp/3.4.7.tar.gz && \
-    tar -C /tmp -xvf /tmp/3.4.7.tar.gz  && \
+ADD https://github.com/opencv/opencv/archive/3.4.7/opencv-3.4.7.tar.gz /tmp/3.4.7.tar.gz
+RUN tar -C /tmp -xvf /tmp/3.4.7.tar.gz  && \
     # First build for arm-android
     cd /tmp/opencv-3.4.7 && mkdir -p /opt/opencv-3.4.7_android/ release_android && cd release_android && \
     cmake -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}" \

@@ -60,7 +60,7 @@ scanner/scan: scanner/build-app
 		-Dsonar.sources=. \
 		-Dsonar.exclusions=**/*.java \
 		-Dsonar.python.version="3.8, 3.9, 3.10" \
-		-Dsonar.cfamily.build-wrapper-output="${SONAR_OUT_DIR}" \
+		-Dsonar.cfamily.compile-commands="${SONAR_OUT_DIR}/compile_commands.json" \
 		-Dsonar.cfamily.analysisCache.mode=server \
 		-Dsonar.host.url=https://sonarcloud.io \
 		-Dsonar.scm.provider=git \
