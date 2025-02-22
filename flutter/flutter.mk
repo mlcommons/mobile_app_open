@@ -30,7 +30,7 @@ endif
 
 flutter: flutter/prepare flutter/platform
 flutter/result: flutter/result/json
-flutter/prepare: flutter/pub flutter/result/json flutter/backend-list lint/pbtxt flutter/protobuf flutter/l10n flutter/build-info flutter/firebase-config flutter/set-windows-build-number
+flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/build-info flutter/firebase-config flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 flutter/test: flutter/test/unit flutter/test/integration
 
