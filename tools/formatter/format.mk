@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 
 .PHONY: format
 format: format/bazel format/clang format/dart format/ts format/line-endings format/markdown
