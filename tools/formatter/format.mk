@@ -108,6 +108,21 @@ lint/markdown:
 		grep --null-data "\.md$$" --exclude="*LICENSE.md" | \
 		xargs --null --no-run-if-empty markdownlint -c tools/formatter/configs/markdownlint.yml
 
+.PHONY: lint/pbtxt
+lint/pbtxt:
+	@{ \
+  	echo "Linting: flutter/assets/tasks.pbtxt"; \
+		protoc --encode=mlperf.mobile.MLPerfConfig --proto_path=flutter/cpp/proto mlperf_task.proto < flutter/assets/tasks.pbtxt > /dev/null; \
+	}
+	@git ls-files -z | grep -zE '^mobile_back_[^/]*/.*\.pbtxt$$' | { \
+  	err=0; \
+		while IFS= read -r -d '' file; do \
+			echo "Linting: $$file"; \
+			protoc --encode=mlperf.mobile.BackendSetting --proto_path=flutter/cpp/proto backend_setting.proto < "$$file" >  /dev/null || err=1; \
+		done; \
+		exit $$err; \
+	}
+
 output/docker_mlperf_formatter.stamp: tools/formatter/Dockerfile
 	docker build --progress=plain \
 		--build-arg UID=`id -u` --build-arg GID=`id -g` \
