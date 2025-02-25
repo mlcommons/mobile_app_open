@@ -18,15 +18,27 @@ key: <accelerator> OR <accelerator>|<backendName>
 */
 
 const Map<String, Interval> _imageClassificationV2 = {
-  'cpu': Interval(min: 0.88, max: 0.91),
-  'npu': Interval(min: 0.69, max: 0.91),
-  'tpu': Interval(min: 0.88, max: 0.91),
+  'cpu': Interval(min: 0.82, max: 0.84),
+  'npu': Interval(min: 0.80, max: 0.82),
+  'tpu': Interval(min: 0.82, max: 0.84),
   'ane': Interval(min: 0.69, max: 0.91),
   'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
-  'snpe_dsp': Interval(min: 0.88, max: 0.91),
-  'psnpe_dsp': Interval(min: 0.88, max: 0.91),
-  'neuron-mdla': Interval(min: 0.79, max: 0.91),
-  'samsung_npu': Interval(min: 0.99, max: 1.0),
+  'snpe_dsp': Interval(min: 0.83, max: 0.85),
+  'psnpe_dsp': Interval(min: 0.83, max: 0.85),
+  'neuron-mdla': Interval(min: 0.81, max: 0.83),
+  'samsung_npu': Interval(min: 0.83, max: 0.85),
+};
+
+const Map<String, Interval> _imageClassificationOfflineV2 = {
+  'cpu': Interval(min: 0.88, max: 0.91),
+  'npu': Interval(min: 0.69, max: 0.71),
+  'tpu': Interval(min: 0.89, max: 0.91),
+  'ane': Interval(min: 0.69, max: 0.91),
+  'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
+  'snpe_dsp': Interval(min: 0.89, max: 0.91),
+  'psnpe_dsp': Interval(min: 0.83, max: 0.85),
+  'neuron-mdla': Interval(min: 0.79, max: 0.81),
+  'samsung_npu': Interval(min: 0.98, max: 1.0),
 };
 
 const Map<String, Interval> _objectDetection = {
@@ -102,5 +114,5 @@ const benchmarkExpectedAccuracy = {
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.stableDiffusion: _stableDiffusion,
-  BenchmarkId.imageClassificationOfflineV2: _imageClassificationV2,
+  BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };
