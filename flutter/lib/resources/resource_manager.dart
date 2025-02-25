@@ -94,8 +94,11 @@ class ResourceManager {
     return checksum == md5Checksum;
   }
 
-  Future<void> handleResources(List<Resource> resources, bool purgeOldCache,
-      bool downloadMissing) async {
+  Future<void> handleResources({
+    required List<Resource> resources,
+    required bool purgeOldCache,
+    required bool downloadMissing,
+  }) async {
     _loadingPath = '';
     _loadingProgress = 0.001;
     _done = false;
@@ -114,14 +117,14 @@ class ResourceManager {
       final internetPaths = internetResources.map((e) => e.path).toList();
       try {
         await cacheManager.cache(
-          internetPaths,
-          (double currentProgress, String currentPath) {
+          urls: internetPaths,
+          onProgressUpdate: (double currentProgress, String currentPath) {
             _loadingProgress = currentProgress;
             _loadingPath = currentPath;
             _onUpdate();
           },
-          purgeOldCache,
-          downloadMissing,
+          purgeOldCache: purgeOldCache,
+          downloadMissing: downloadMissing,
         );
       } on SocketException {
         throw 'A network error has occurred. Please make sure you are connected to the internet.';

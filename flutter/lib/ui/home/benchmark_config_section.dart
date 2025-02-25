@@ -33,7 +33,7 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
     l10n = AppLocalizations.of(context)!;
     final childrenList = <Widget>[];
 
-    for (var benchmark in state.benchmarks) {
+    for (var benchmark in state.allBenchmarks) {
       childrenList.add(_listTile(benchmark));
       childrenList.add(const Divider(height: 20));
     }

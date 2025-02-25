@@ -219,7 +219,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
 
   Widget _detailSection() {
     final children = <Widget>[];
-    for (final benchmark in state.benchmarks) {
+    for (final benchmark in state.allBenchmarks) {
       final row = _benchmarkResultRow(benchmark);
       children.add(row);
       children.add(const Divider());

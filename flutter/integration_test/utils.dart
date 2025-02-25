@@ -33,7 +33,7 @@ Future<void> startApp(WidgetTester tester) async {
 Future<void> validateSettings(WidgetTester tester) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
-  for (var benchmark in benchmarkState.benchmarks) {
+  for (var benchmark in benchmarkState.allBenchmarks) {
     expect(benchmark.selectedDelegate.batchSize, greaterThanOrEqualTo(0),
         reason: 'batchSize must >= 0');
     for (var modelFile in benchmark.selectedDelegate.modelFile) {
@@ -67,7 +67,7 @@ Future<void> validateSettings(WidgetTester tester) async {
 Future<void> setBenchmarks(WidgetTester tester) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
-  for (var benchmark in benchmarkState.benchmarks) {
+  for (var benchmark in benchmarkState.allBenchmarks) {
     // Disable test for stable diffusion since it take too long to finish.
     if (benchmark.id == BenchmarkId.stableDiffusion) {
       benchmark.isActive = false;

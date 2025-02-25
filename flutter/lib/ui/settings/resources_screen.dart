@@ -8,6 +8,7 @@ import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/store.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/nil.dart';
@@ -35,13 +36,14 @@ class _ResourcesScreen extends State<ResourcesScreen> {
 
     final children = <Widget>[];
 
-    for (var benchmark in state.benchmarks) {
+    for (var benchmark in state.allBenchmarks) {
       children.add(_listTileBuilder(benchmark));
       children.add(const Divider(height: 20));
     }
     children.add(const SizedBox(height: 20));
     children.add(_downloadProgress());
-    children.add(_downloadButton());
+    children
+        .add(_downloadButton(state.allBenchmarks, l10n.resourceDownloadAll));
     children.add(const SizedBox(height: 20));
     children.add(_clearCacheButton());
 
@@ -84,6 +86,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           ],
         ),
       ),
+      trailing: _downloadButton([benchmark], l10n.resourceDownload),
     );
   }
 
@@ -102,32 +105,31 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           final missing = result[false] ?? [];
           final existed = result[true] ?? [];
           final downloaded = missing.isEmpty;
-          return Row(
-            children: [
-              SizedBox(
-                height: size,
-                width: size,
-                child: IconButton(
-                  padding: const EdgeInsets.all(0),
-                  icon: downloaded ? downloadedIcon : notDownloadedIcon,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return _ResourcesTable(
-                          taskName: benchmark.info.taskName,
-                          modeName: mode.readable,
-                          missing: missing,
-                          existed: existed,
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(mode.readable),
-            ],
+          return TextButton.icon(
+            icon: downloaded ? downloadedIcon : notDownloadedIcon,
+            label: Text(
+              mode.readable,
+              style: const TextStyle(color: AppColors.darkText),
+            ),
+            //iconAlignment: IconAlignment.start,
+            style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(50, 30),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                alignment: Alignment.centerLeft),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return _ResourcesTable(
+                    taskName: benchmark.info.taskName,
+                    modeName: mode.readable,
+                    missing: missing,
+                    existed: existed,
+                  );
+                },
+              );
+            },
           );
         } else {
           return Text(l10n.resourceChecking);
@@ -164,12 +166,15 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     );
   }
 
-  Widget _downloadButton() {
+  Widget _downloadButton(List<Benchmark> benchmarks, String title) {
     return AbsorbPointer(
       absorbing: downloading,
       child: ElevatedButton(
         onPressed: () async {
-          await state.loadResources(downloadMissing: true);
+          await state.loadResources(
+            downloadMissing: true,
+            benchmarks: benchmarks,
+          );
           if (state.error != null) {
             if (!mounted) return;
             await showErrorDialog(context, <String>[state.error.toString()]);
@@ -182,7 +187,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
             backgroundColor: downloading ? Colors.grey : Colors.blue),
         child: FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text(l10n.resourceDownload),
+          child: Text(title),
         ),
       ),
     );
@@ -213,7 +218,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
             backgroundColor: downloading ? Colors.grey : Colors.red),
         child: FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text(l10n.resourceClear),
+          child: Text(l10n.resourceClearAll),
         ),
       ),
     );

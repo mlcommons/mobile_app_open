@@ -55,9 +55,8 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
   }
 
   Widget _infoSection() {
-    final selectedCount =
-        state.benchmarks.where((e) => e.isActive).length.toString();
-    final totalCount = state.benchmarks.length.toString();
+    final selectedCount = state.activeBenchmarks.length.toString();
+    final totalCount = state.allBenchmarks.length.toString();
     final selectedBenchmarkText = l10n.mainScreenBenchmarkSelected
         .replaceAll('<selected>', selectedCount)
         .replaceAll('<total>', totalCount);
@@ -128,6 +127,17 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                   await showErrorDialog(context, messages);
                   return;
                 }
+                final checksumError = await state.validator
+                    .validateChecksum(l10n.dialogContentChecksumError);
+                if (checksumError.isNotEmpty) {
+                  if (!context.mounted) return;
+                  final messages = [
+                    checksumError,
+                    l10n.dialogContentChecksumErrorHint
+                  ];
+                  await showErrorDialog(context, messages);
+                  return;
+                }
                 if (store.offlineMode) {
                   final offlineError = await state.validator
                       .validateOfflineMode(l10n.dialogContentOfflineWarning);
@@ -143,8 +153,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                     }
                   }
                 }
-                final selectedCount =
-                    state.benchmarks.where((e) => e.isActive).length;
+                final selectedCount = state.activeBenchmarks.length;
                 if (selectedCount < 1) {
                   // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
                   // ignore: use_build_context_synchronously

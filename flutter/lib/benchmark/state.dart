@@ -54,20 +54,20 @@ class BenchmarkState extends ChangeNotifier {
   ExtendedResult? lastResult;
 
   num get result {
-    final benchmarksCount = benchmarks
+    final benchmarksCount = allBenchmarks
         .where((benchmark) => benchmark.performanceModeResult != null)
         .length;
 
     if (benchmarksCount == 0) return 0;
 
     final summaryThroughput = pow(
-        benchmarks.fold<double>(1, (prev, i) {
+        allBenchmarks.fold<double>(1, (prev, i) {
           return prev * (i.performanceModeResult?.throughput?.value ?? 1.0);
         }),
         1.0 / benchmarksCount);
 
     final maxSummaryThroughput = pow(
-        benchmarks.fold<double>(1, (prev, i) {
+        allBenchmarks.fold<double>(1, (prev, i) {
           return prev * (i.info.maxThroughput);
         }),
         1.0 / benchmarksCount);
@@ -75,7 +75,9 @@ class BenchmarkState extends ChangeNotifier {
     return summaryThroughput / maxSummaryThroughput;
   }
 
-  List<Benchmark> get benchmarks => _benchmarkStore.benchmarks;
+  List<Benchmark> get allBenchmarks => _benchmarkStore.allBenchmarks;
+
+  List<Benchmark> get activeBenchmarks => _benchmarkStore.activeBenchmarks;
 
   late BenchmarkStore _benchmarkStore;
 
@@ -131,25 +133,42 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> loadResources({required bool downloadMissing}) async {
+  Future<void> loadResources(
+      {required bool downloadMissing,
+      List<Benchmark> benchmarks = const []}) async {
     final newAppVersion =
         '${BuildInfoHelper.info.version}+${BuildInfoHelper.info.buildNumber}';
     var needToPurgeCache = _store.previousAppVersion != newAppVersion;
     _store.previousAppVersion = newAppVersion;
 
+    final selectedBenchmarks = benchmarks.isEmpty ? allBenchmarks : benchmarks;
     await Wakelock.enable();
-    print('Start loading resources with downloadMissing=$downloadMissing');
-    final resources = _benchmarkStore.listResources(
+    final selectedResources = _benchmarkStore.listResources(
       modes: [taskRunner.perfMode, taskRunner.accuracyMode],
-      benchmarks: benchmarks,
+      benchmarks: selectedBenchmarks,
+    );
+    final allResources = _benchmarkStore.listResources(
+      modes: [taskRunner.perfMode, taskRunner.accuracyMode],
+      benchmarks: allBenchmarks,
     );
     try {
+      final selectedBenchmarkIds = selectedBenchmarks
+          .map((e) => e.benchmarkSettings.benchmarkId)
+          .join(', ');
+      print('Start loading resources with downloadMissing=$downloadMissing '
+          'for $selectedBenchmarkIds');
       await resourceManager.handleResources(
-        resources,
-        needToPurgeCache,
-        downloadMissing,
+        resources: selectedResources,
+        purgeOldCache: needToPurgeCache,
+        downloadMissing: downloadMissing,
       );
       print('Finished loading resources with downloadMissing=$downloadMissing');
+      // We still need to load all resources after download selected resources.
+      await resourceManager.handleResources(
+        resources: allResources,
+        purgeOldCache: false,
+        downloadMissing: false,
+      );
       error = null;
       stackTrace = null;
       taskConfigFailedToLoad = false;
@@ -289,7 +308,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   void resetCurrentResults() {
-    for (var b in _benchmarkStore.benchmarks) {
+    for (var b in _benchmarkStore.allBenchmarks) {
       b.accuracyModeResult = null;
       b.performanceModeResult = null;
     }
@@ -304,7 +323,7 @@ class BenchmarkState extends ChangeNotifier {
       lastResult = ExtendedResult.fromJson(
           jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
       resourceManager.resultManager
-          .restoreResults(lastResult!.results, benchmarks);
+          .restoreResults(lastResult!.results, allBenchmarks);
       _doneRunning = true;
       return;
     } catch (e, trace) {

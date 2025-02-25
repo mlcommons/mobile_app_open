@@ -93,6 +93,7 @@
   "dialogContentMissingFiles": "The following files don't exist:",
   "dialogContentMissingFilesHint": "Please go to the menu Resources to download the missing files.",
   "dialogContentChecksumError": "The following files failed checksum validation:",
+  "dialogContentChecksumErrorHint": "Please go to the menu Resources to clear the cache and download the files again.",
   "dialogContentNoSelectedBenchmarkError": "Please select at least one benchmark.",
 
   "benchModePerformanceOnly": "Performance Only",
@@ -122,7 +123,9 @@
   "benchInfoStableDiffusionDesc": "The Text to Image Gen AI benchmark adopts Stable Diffusion v1.5 for generating images from text prompts. It is a latent diffusion model. The benchmarked Stable Diffusion v1.5 refers to a specific configuration of the model architecture that uses a downsampling-factor 8 autoencoder with an 860M UNet,123M CLIP ViT-L/14 text encoder for the diffusion model, and VAE Decoder of 49.5M parameters. The model was trained on 595k steps at resolution of 512x512, which enables it to generate high quality images. We refer you to https://huggingface.co/benjamin-paine/stable-diffusion-v1-5 for more information. The benchmark runs 20 denoising steps for inference, and uses a precalculated time embedding of size 1x1280. Reference models can be found here https://github.com/mlcommons/mobile_open/releases.\n\nFor latency benchmarking, we benchmark end to end, excluding the time embedding calculation and the tokenizer. For accuracy calculations, the app adopts the CLIP metric for text-to-image consistency, and further evaluation of the generated images using this Image Quality Aesthetic Assessment metric https://github.com/idealo/image-quality-assessment/tree/master?tab=readme-ov-file",
 
   "resourceDownload": "Download",
+  "resourceDownloadAll": "Download all",
   "resourceClear": "Clear",
+  "resourceClearAll": "Clear all",
   "resourceChecking": "Checking download status",
   "resourceDownloading": "Downloading",
   "resourceErrorMessage": "Some resources failed to load.\nIf you didn't change config from default you can try clearing the cache.\nIf you use a custom configuration file ensure that it has correct structure or switch back to default config.",
