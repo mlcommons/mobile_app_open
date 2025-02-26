@@ -36,7 +36,7 @@ const Map<String, Interval> _imageClassificationOfflineV2 = {
   'ane': Interval(min: 0.69, max: 0.91),
   'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
   'snpe_dsp': Interval(min: 0.89, max: 0.91),
-  'psnpe_dsp': Interval(min: 0.83, max: 0.85),
+  'psnpe_dsp': Interval(min: 0.89, max: 0.91),
   'neuron-mdla': Interval(min: 0.79, max: 0.81),
   'samsung_npu': Interval(min: 0.98, max: 1.0),
 };
