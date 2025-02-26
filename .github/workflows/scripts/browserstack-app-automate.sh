@@ -67,11 +67,13 @@ check_build_status() {
   # Display device status
   if [[ "$status" != "running" ]]; then
     echo "$response" | jq -r '
-      .devices[] |
-      "Device: " + .device +
-      ", OS Version: " + .os_version +
-      ", Duration: " + (.sessions[0].duration | tostring) + "s" +
-      ", Status: " + (.sessions[0].status)
+      "App: " + .input_capabilities.app +
+      ( .devices[] |
+        ", Device: " + .device +
+        ", OS Version: " + .os_version +
+        ", Duration: " + (.sessions[0].duration | tostring) + "s" +
+        ", Status: " + (.sessions[0].status)
+      )
     '
   fi
 
