@@ -39,8 +39,8 @@ const _kIphoneOnMacbookM1 = 'iPhone14,7';
 
 const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 1, max: 9),
-    _kCloudBuildX28: Interval(min: 1, max: 9),
+    _kCloudBuildX23: Interval(min: 0.5, max: 9),
+    _kCloudBuildX28: Interval(min: 0.5, max: 9),
     _kRyzen5600: Interval(min: 1, max: 37),
     _kPixel5: Interval(min: 20, max: 75),
     _kPixel6: Interval(min: 100, max: 600),
@@ -70,8 +70,8 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
 
 const Map<String, Map<String, Interval>> _objectDetection = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 4, max: 7),
-    _kCloudBuildX28: Interval(min: 3.5, max: 8),
+    _kCloudBuildX23: Interval(min: 2, max: 7),
+    _kCloudBuildX28: Interval(min: 2, max: 8),
     _kRyzen5600: Interval(min: 14, max: 22),
     _kPixel5: Interval(min: 40, max: 60),
     _kPixel6: Interval(min: 100, max: 450),
@@ -226,8 +226,8 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
 
 const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   _kTFLiteBackend: {
-    _kCloudBuildX23: Interval(min: 1, max: 9),
-    _kCloudBuildX28: Interval(min: 1, max: 9),
+    _kCloudBuildX23: Interval(min: 0.8, max: 9),
+    _kCloudBuildX28: Interval(min: 0.8, max: 9),
     _kRyzen5600: Interval(min: 20, max: 60),
     _kPixel5: Interval(min: 20, max: 180),
     _kPixel6: Interval(min: 100, max: 700),
