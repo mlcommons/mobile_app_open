@@ -3,7 +3,6 @@
 # This script is used to trigger a build on BrowserStack App Automate and monitor its status.
 
 # Build parameters
-PROJECT="mobile-app-build-290400"
 DEVICE_LOGS=true
 RETRY_INTERVAL=10
 
@@ -13,6 +12,7 @@ STATUS_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-
 
 # Retrieve vars from environment variables
 CREDENTIALS="${BROWSERSTACK_CREDENTIALS:-}"
+PROJECT="${BROWSERSTACK_PROJECT:-}"
 APP="${BROWSERSTACK_APP:-}"
 TEST_SUITE="${BROWSERSTACK_TEST_SUITE:-}"
 BUILD_TAG="${BROWSERSTACK_BUILD_TAG:-}"
@@ -26,7 +26,7 @@ fi
 
 if [[ -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" || -z "$DEVICES" ]]; then
   echo "Error: Environment variables"\
-  "BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE, BROWSERSTACK_BUILD_TAG and BROWSERSTACK_DEVICES"\
+  "BROWSERSTACK_PROJECT, BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE, BROWSERSTACK_BUILD_TAG and BROWSERSTACK_DEVICES"\
   "must be set."
   exit 1
 fi
