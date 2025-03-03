@@ -381,7 +381,7 @@ jobs:
       - build-android-apk
       - test-android-apk-unified
     runs-on: ubuntu-22.04
-    # if: github.ref == 'refs/heads/master'
+    if: vars.DEPLOY_PLAYSTORE == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
