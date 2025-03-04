@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -119,20 +119,17 @@ pbtxt2header(
         "settings/qti_settings_default_dsp.pbtxt",
         "settings/qti_settings_default_gpu.pbtxt",
         "settings/qti_settings_gpufp16.pbtxt",
+        "settings/qti_settings_sd4g2.pbtxt",
         "settings/qti_settings_sd7cxg3.pbtxt",
-        "settings/qti_settings_sd7g1.pbtxt",
-        "settings/qti_settings_sd7pg2.pbtxt",
+        "settings/qti_settings_sd7g3.pbtxt",
+        "settings/qti_settings_sd7sg3.pbtxt",
         "settings/qti_settings_sd8cxg3.pbtxt",
-        "settings/qti_settings_sd8g1.pbtxt",
-        "settings/qti_settings_sd8g2.pbtxt",
+        "settings/qti_settings_sd8elite.pbtxt",
         "settings/qti_settings_sd8g3.pbtxt",
-        "settings/qti_settings_sd8pg1.pbtxt",
-        "settings/qti_settings_sdm778.pbtxt",
-        "settings/qti_settings_sdm888.pbtxt",
-        "settings/qti_settings_sm4450.pbtxt",
-        "settings/qti_settings_sm7550.pbtxt",
-        "settings/qti_settings_sm8635.pbtxt",
+        "settings/qti_settings_sd8sg3.pbtxt",
         "settings/qti_settings_stablediffusion.pbtxt",
+        "settings/qti_settings_stablediffusion_v75.pbtxt",
+        "settings/qti_settings_stablediffusion_v79.pbtxt",
     ],
 )
 
