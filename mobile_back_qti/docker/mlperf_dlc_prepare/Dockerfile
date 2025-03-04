@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y && \
        zip bzip2 gnupg wget python3-six python3-pip libncurses5 openjdk-11-jdk-headless clang-format golang-1.13-go build-essential
 
 RUN pip3 install pip==24.1.1 setuptools==45.0.0
-RUN pip3 install numpy==1.23.1 opencv-python tensorflow-cpu==2.13.1
+RUN pip3 install numpy==1.26.4 opencv-python tensorflow-cpu==2.10.1
 RUN pip3 install protobuf==3.6.0
 RUN pip3 install Pillow tensorflow_hub tf-slim \
                  absl-py pyyaml

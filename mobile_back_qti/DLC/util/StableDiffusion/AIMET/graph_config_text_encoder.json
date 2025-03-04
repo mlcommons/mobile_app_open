@@ -7,7 +7,7 @@
     }],
     "devices": [
         {   "pd_session": "unsigned",
-            "dsp_arch": "v75",
+            "dsp_arch": "v79",
             "cores":[{
                 "rpc_control_latency": 100,
                 "perf_profile": "burst"

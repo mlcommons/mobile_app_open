@@ -13,7 +13,7 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 
 <!-- markdown-link-check-disable-next-line -->
 * [Qualcomm Package Manager 3](https://qpm.qualcomm.com/#/main/tools/details/QPM3)
-* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk) (Version 2.25.0.240728)
+* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk) (Version 2.29.0.241129)
 * Linux machine capable of running Ubuntu docker images
 
 ### Optional
@@ -113,7 +113,7 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 ## Requirements for WoS
 
 * [SNPE windows SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk)
-  * Version 2.25.0.240728
+  * Version 2.29.0.241129
 * Windows x86 machine
 
 ## Setting up the environment
@@ -175,7 +175,7 @@ Run accuracy mode with following command
 
 ### What devices does this backend support?
 
-This backend only supports SDX_Elite, SD8SG3, SD8G3 devices.
+This backend only supports SD8_Elite, SD7SG3, SDX_Elite, SD8SG3, SD8G3 devices.
 Other already launched Snapdragon based devices can also run the MLPerf app as default fallback.
 
 ### Is SNPE used to run all the models?
@@ -184,4 +184,4 @@ Yes. All the models use Qualcomm AI Runtime(QAIRT) for execution for current ver
 
 ### What devices supports stable diffusion?
 
-Currently, SD8G3 device supports stable_diffusion.
+Currently, SD8_Elite and SD8G3 device supports stable_diffusion.
