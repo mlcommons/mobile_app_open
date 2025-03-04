@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -68,7 +68,14 @@ class SocInfo {
     }
     if (m_needs_stablediffusion) {
 #ifdef STABLEDIFFUSION_FLAG
-      m_settings += qti_settings_stablediffusion;
+      if (m_soc_name == "SD8G3")
+        m_settings += qti_settings_stablediffusion_v75;
+      else if (m_soc_name == "SD8Elite")
+        m_settings += qti_settings_stablediffusion_v79;
+      else
+        // set m_needs_stablediffusion flag to "true" in SocInfo table to enable
+        // default stable diffusion settings
+        m_settings += qti_settings_stablediffusion;
 #endif
     }
   }

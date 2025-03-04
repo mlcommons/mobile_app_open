@@ -31,8 +31,14 @@ ifeq (${WITH_SAMSUNG},1)
 	flutter/tool/validate-checksum.sh \
 		-d ${backend_samsung_lib_root} \
 		-f ${backend_samsung_checksum_file}
-else
-	@echo "Skip checksum validation"
+endif
+ifeq (${WITH_QTI},1)
+ifeq (${WITH_STABLEDIFFUSION},1)
+	@echo "Validate checksum of QTI lib files"
+	flutter/tool/validate-checksum.sh \
+		-d ${backend_qti_lib_root} \
+		-f ${backend_qti_checksum_file}
+endif
 endif
 
 .PHONY: flutter/android/libs/deps

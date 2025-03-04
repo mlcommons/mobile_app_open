@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,8 +46,8 @@ void* ChunkAllocator::GetBatchPtr(void* p) {
 }
 
 int ChunkAllocator::GetSize(int n) {
-  // 500 values equates to the value of max RAM used in apps dataset
-  return (500 * 1e6 / n);
+  // Max size allowed for data
+  return ((500 * 1e6) / n);
 }
 
 uint64_t ChunkAllocator::GetOffset(void* p) {
