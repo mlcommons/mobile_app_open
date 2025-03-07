@@ -22,21 +22,17 @@
 
 * Clone the mobile_app_open repository
 
-* Install Qualcomm Package manager on the linux machine
+* Extract the QAIRT SDK from <https://softwarecenter.qualcomm.com/api/download/software/qualcomm_neural_processing_sdk/v2.29.0.241129.zip>
 
-```shell
-sudo dpkg -i ./QualcommPackageManager3.3.0.111.1.Linux-x86.deb
-```
-
-* Extract the SNPE SDK (from Requirements above) to mobile_app_open/mobile_back_qti
-
-```shell
-qpm-cli --extract ./qualcomm_neural_processing_sdk.2.25.0.240728.Linux-AnyCPU.qik
-mkdir mobile_app_open/mobile_back_qti/qairt/
-cp -rv /opt/qcom/aistack/qairt/2.25.0.240728 mobile_app_open/mobile_back_qti/qairt/
-```
+* Copy the qairt folder from the extract into mobile_app_open/mobile_back_qti
 
 Once done,
+
+* Install Qualcomm Package manager on the linux machine to get access AIMET SD notebook.You need to search for "notebook for stable diffusion" in QPM.
+
+ ```shell
+ sudo dpkg -i ./QualcommPackageManager3.3.0.111.1.Linux-x86.deb
+ ```
 
 * Clone the AIMET SD notebook repository inside
   `<path_to_mobile_app_open>/mobile_back_qti/DLC/util/StableDiffusion/AIMET`

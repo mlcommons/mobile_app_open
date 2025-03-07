@@ -32,8 +32,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobilenet_v4_htp.dlc"
-      model_checksum: "56e5039260e20e5c2a0b54cc0fac8098"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobilenet_v4_htp.dlc"
+      model_checksum: "4dc06ff76d00a442be24b796651a27df"
     }
   }
   delegate_choice: {
@@ -42,9 +42,13 @@ benchmark_setting {
     accelerator_name: "psnpe_cpu"
     accelerator_desc: "CPU"
     batch_size: 128
+    custom_setting {
+      id: "cpu_int8"
+      value: "true"
+    }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobilenet_v4_htp.dlc"
-      model_checksum: "56e5039260e20e5c2a0b54cc0fac8098"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobilenet_v4_htp.dlc"
+      model_checksum: "4dc06ff76d00a442be24b796651a27df"
     }
   }
   delegate_selected: "SNPE_GPU"
@@ -54,12 +58,12 @@ benchmark_setting {
   benchmark_id: "image_classification_offline_v2"
   framework: "SNPE"
   custom_setting {
-    id: "use_ion_buffer"
-    value: "false"
-  }
-  custom_setting {
     id: "scenario"
     value: "Offline"
+  }
+  custom_setting {
+    id: "use_ion_buffer"
+    value: "false"
   }
   delegate_choice: {
     priority: 1
@@ -68,8 +72,8 @@ benchmark_setting {
     accelerator_desc: "GPU"
     batch_size: 12360
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobilenet_v4_htp_batched_4.dlc"
-      model_checksum: "7863deea588936fe6e09565ed47dde95"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobilenet_v4_htp_batched_4.dlc"
+      model_checksum: "07d1d4f86d09e950434bc0c790d8b00a"
     }
   }
   delegate_choice: {
@@ -78,9 +82,13 @@ benchmark_setting {
     accelerator_name: "psnpe_cpu"
     accelerator_desc: "CPU"
     batch_size: 128
+    custom_setting {
+      id: "cpu_int8"
+      value: "true"
+    }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobilenet_v4_htp_batched_4.dlc"
-      model_checksum: "7863deea588936fe6e09565ed47dde95"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobilenet_v4_htp_batched_4.dlc"
+      model_checksum: "07d1d4f86d09e950434bc0c790d8b00a"
     }
   }
   delegate_selected: "SNPE_GPU"
@@ -103,8 +111,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/ssd_mobiledet_qat_htp.dlc"
-      model_checksum: "49c6afbfefffb78269fe73a6ee1b4a85"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/ssd_mobiledet_qat_htp.dlc"
+      model_checksum: "eadf4fbaa84fd524079a74512d40cbc6"
     }
   }
   delegate_choice: {
@@ -112,9 +120,13 @@ benchmark_setting {
     delegate_name: "SNPE_CPU"
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
+    custom_setting {
+      id: "cpu_int8"
+      value: "true"
+    }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/ssd_mobiledet_qat_htp.dlc"
-      model_checksum: "49c6afbfefffb78269fe73a6ee1b4a85"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/ssd_mobiledet_qat_htp.dlc"
+      model_checksum: "eadf4fbaa84fd524079a74512d40cbc6"
     }
   }
   delegate_selected: "SNPE_GPU"
@@ -128,12 +140,12 @@ benchmark_setting {
     value: "transpose:0"
   }
   custom_setting {
-    id: "input_buffer_type"
-    value: "float_32"
-  }
-  custom_setting {
     id: "use_ion_buffer"
     value: "false"
+  }
+  custom_setting {
+    id: "input_buffer_type"
+    value: "float_32"
   }
   delegate_choice: {
     priority: 1
@@ -141,8 +153,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobilebert_quantized_htp.dlc"
-      model_checksum: "96d947175f04950898a372890907dda1"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobilebert_quantized_htp.dlc"
+      model_checksum: "4cfaced53aed0ea563628d626bf2570b"
     }
   }
   delegate_choice: {
@@ -150,9 +162,13 @@ benchmark_setting {
     delegate_name: "SNPE_CPU"
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
+    custom_setting {
+      id: "cpu_int8"
+      value: "true"
+    }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobilebert_quantized_htp.dlc"
-      model_checksum: "96d947175f04950898a372890907dda1"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobilebert_quantized_htp.dlc"
+      model_checksum: "4cfaced53aed0ea563628d626bf2570b"
     }
   }
   delegate_selected: "SNPE_GPU"
@@ -166,12 +182,12 @@ benchmark_setting {
     value: "uint_8"
   }
   custom_setting {
-    id: "output_buffer_type"
-    value: "int_32"
-  }
-  custom_setting {
     id: "use_ion_buffer"
     value: "false"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "int_32"
   }
   delegate_choice: {
     priority: 1
@@ -179,8 +195,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobile_mosaic_htp.dlc"
-      model_checksum: "3c0dfbacda053773d6afb34503d9991a"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobile_mosaic_htp.dlc"
+      model_checksum: "b2b2a51ae3a52d97b1eb44c00432b713"
     }
   }
   delegate_choice: {
@@ -188,9 +204,13 @@ benchmark_setting {
     delegate_name: "SNPE_CPU"
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
+    custom_setting {
+      id: "cpu_int8"
+      value: "true"
+    }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobile_mosaic_htp.dlc"
-      model_checksum: "3c0dfbacda053773d6afb34503d9991a"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobile_mosaic_htp.dlc"
+      model_checksum: "b2b2a51ae3a52d97b1eb44c00432b713"
     }
   }
   delegate_selected: "SNPE_GPU"
@@ -204,12 +224,12 @@ benchmark_setting {
     value: "uint_8"
   }
   custom_setting {
-    id: "output_buffer_type"
-    value: "uint_8"
-  }
-  custom_setting {
     id: "use_ion_buffer"
     value: "false"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "uint_8"
   }
   delegate_choice: {
     priority: 1
@@ -217,8 +237,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/snusr_htp.dlc"
-      model_checksum: "668da9816073d67972704e237137a50f"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/snusr_htp.dlc"
+      model_checksum: "8ff44a39cf911b3fd04809f4967d1501"
     }
   }
   delegate_choice: {
@@ -226,9 +246,13 @@ benchmark_setting {
     delegate_name: "SNPE_CPU"
     accelerator_name: "snpe_cpu"
     accelerator_desc: "CPU"
+    custom_setting {
+      id: "cpu_int8"
+      value: "true"
+    }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/snusr_htp.dlc"
-      model_checksum: "668da9816073d67972704e237137a50f"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/snusr_htp.dlc"
+      model_checksum: "8ff44a39cf911b3fd04809f4967d1501"
     }
   }
   delegate_selected: "SNPE_GPU"

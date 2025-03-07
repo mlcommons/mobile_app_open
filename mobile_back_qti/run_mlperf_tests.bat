@@ -1,6 +1,6 @@
 @echo off
 REM ##########################################################################
-REM # Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+REM # Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 REM #
 REM # Licensed under the Apache License, Version 2.0 (the "License");
 REM # you may not use this file except in compliance with the License.

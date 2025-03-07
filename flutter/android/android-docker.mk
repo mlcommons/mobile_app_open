@@ -37,6 +37,7 @@ flutter_common_docker_flags= \
 		-v mlperf-mobile-flutter-cache-bazel-${user_id}:/image-workdir/cache/bazel \
 		--env BAZEL_CACHE_ARG="--disk_cache=/image-workdir/cache/bazel" \
 		--env WITH_TFLITE=${WITH_TFLITE} \
+		--env USER_ID=${user_id} \
 		--env WITH_QTI=${WITH_QTI} \
 		--env WITH_SAMSUNG=${WITH_SAMSUNG} \
 		--env WITH_PIXEL=${WITH_PIXEL} \

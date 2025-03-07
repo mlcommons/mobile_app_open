@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2025 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ ${AIMETBUILDDIR}/nvidia_docker_runtime.stamp: \
 
 aimet_calibration: \
 	clean \
-	${AIMETBUILDDIR}/aimet_calibration.stamp \
 	${AIMETBUILDDIR}/input_vectors_generation.stamp \
 	copy_files_to_ouptut \
 	copy_configs_to_ouptut
