@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Without DEBIAN_FRONTEND=noninteractive arg apt-get waits for user input.
 #   Docker desktop shows all previously defined args for each of the commands,

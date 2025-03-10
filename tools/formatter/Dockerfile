@@ -15,7 +15,7 @@
 
 # This Docker image is used to run code formatter
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND="noninteractive"
 
@@ -79,9 +79,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends clang libpython
 ENV PATH=$PATH:/usr/local/swift/bin
 ARG BUILDARCH
 RUN if [ "$BUILDARCH" = "amd64" ]; then \
-        SWIFT_URL=https://download.swift.org/swift-5.8-release/ubuntu2004/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu20.04.tar.gz; \
+        SWIFT_URL=https://download.swift.org/swift-5.8-release/ubuntu2004/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu22.04.tar.gz; \
     elif [ "$BUILDARCH" = "arm64" ]; then \
-        SWIFT_URL=https://download.swift.org/swift-5.8-release/ubuntu2004-aarch64/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu20.04-aarch64.tar.gz; \
+        SWIFT_URL=https://download.swift.org/swift-5.8-release/ubuntu2004-aarch64/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu22.04-aarch64.tar.gz; \
     else \
         echo "Unknown architecture"; exit 1; \
     fi && \
