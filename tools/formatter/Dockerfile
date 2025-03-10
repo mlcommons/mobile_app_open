@@ -35,7 +35,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     golang-1.23-go
 ENV PATH=$PATH:/usr/lib/go-1.23/bin:~/go/bin
-RUN /usr/lib/go-1.23/bin/go get github.com/bazelbuild/buildtools/buildifier@6.0.1
+RUN /usr/lib/go-1.23/bin/go install github.com/bazelbuild/buildtools/buildifier@6.0.1
 RUN cp ~/go/bin/buildifier ${FORMATTER_HOME}/
 
 # Add CLang formatter
@@ -79,9 +79,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends clang libpython
 ENV PATH=$PATH:/usr/local/swift/bin
 ARG BUILDARCH
 RUN if [ "$BUILDARCH" = "amd64" ]; then \
-        SWIFT_URL=https://download.swift.org/swift-5.8-release/ubuntu2004/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu22.04.tar.gz; \
+        SWIFT_URL=https://download.swift.org/swift-5.10.1-release/ubuntu2204/swift-5.10.1-RELEASE/swift-5.10.1-RELEASE-ubuntu22.04.tar.gz; \
     elif [ "$BUILDARCH" = "arm64" ]; then \
-        SWIFT_URL=https://download.swift.org/swift-5.8-release/ubuntu2004-aarch64/swift-5.8-RELEASE/swift-5.8-RELEASE-ubuntu22.04-aarch64.tar.gz; \
+        SWIFT_URL=https://download.swift.org/swift-5.10.1-release/ubuntu2204-aarch64/swift-5.10.1-RELEASE/swift-5.10.1-RELEASE-ubuntu22.04-aarch64.tar.gz; \
     else \
         echo "Unknown architecture"; exit 1; \
     fi && \
