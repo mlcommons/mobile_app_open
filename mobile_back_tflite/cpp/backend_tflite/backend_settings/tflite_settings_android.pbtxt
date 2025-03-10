@@ -215,15 +215,15 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-tflite/sd_decoder_dynamic.tflite"
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-tflite/sd_decoder_dynamic_fp16.tflite"
       model_checksum: "68acdb62f99e1dc2c7f5db8cdd0e007c"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-tflite/sd_diffusion_model_dynamic.tflite"
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-tflite/sd_diffusion_model_dynamic_int8.tflite"
       model_checksum: "309e95f76ac8de01130942037a28aa8f"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-tflite/sd_text_encoder_dynamic.tflite"
+      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-tflite/sd_text_encoder_dynamic_int8.tflite"
       model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
     }
     model_file: {
@@ -235,5 +235,25 @@ benchmark_setting {
   custom_setting {
     id: "pipeline"
     value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "text_encoder_filename"
+    value: "sd_text_encoder_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "diffusion_model_filename"
+    value: "sd_diffusion_model_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "decoder_filename"
+    value: "sd_decoder_dynamic_fp16.tflite"
+  }
+  custom_setting {
+    id: "timestep_embeddings_filename"
+    value: "timestep_embeddings_data.bin.ts"
   }
 }
