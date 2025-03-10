@@ -33,9 +33,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Add buildifier
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    golang-1.16-go
-ENV PATH=$PATH:/usr/lib/go-1.16/bin:~/go/bin
-RUN /usr/lib/go-1.16/bin/go get github.com/bazelbuild/buildtools/buildifier@6.0.1
+    golang-1.23-go
+ENV PATH=$PATH:/usr/lib/go-1.23/bin:~/go/bin
+RUN /usr/lib/go-1.23/bin/go get github.com/bazelbuild/buildtools/buildifier@6.0.1
 RUN cp ~/go/bin/buildifier ${FORMATTER_HOME}/
 
 # Add CLang formatter
