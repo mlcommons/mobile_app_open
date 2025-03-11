@@ -161,8 +161,9 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
       color: AppColors.lightText,
     );
     if (progress.cooldown) {
-      topWidget = AutoSizeCircleText(
+      topWidget = AutoSizeText(
         l10n.progressCooldown,
+        circle: true,
         textAlign: TextAlign.center,
         style: textStyle,
         circularPadding: horizontalPadding,
@@ -201,8 +202,9 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           child: Container(
             alignment: Alignment.topCenter,
             padding: const EdgeInsets.symmetric(vertical: 4),
-            child: AutoSizeCircleText(
+            child: AutoSizeText(
               taskNameString,
+              circle: true,
               textAlign: TextAlign.center,
               style: textStyle,
               maxLines: 2,

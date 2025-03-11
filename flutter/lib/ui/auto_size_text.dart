@@ -26,16 +26,15 @@ import 'package:flutter/widgets.dart';
 /// All size constraints as well as maxLines are taken into account. If the text
 /// overflows anyway, you should check if the parent widget actually constraints
 /// the size of this widget.
-
-// TODO(Farook): make the circle padding part completely optional for general use.
-class AutoSizeCircleText extends StatefulWidget {
-  /// Creates a [AutoSizeCircleText] widget.
+class AutoSizeText extends StatefulWidget {
+  /// Creates a [AutoSizeText] widget.
   ///
   /// If the [style] argument is null, the text will use the style from the
   /// closest enclosing [DefaultTextStyle].
-  const AutoSizeCircleText(
+  const AutoSizeText(
     String this.data, {
     super.key,
+    this.circle = false,
     this.textKey,
     this.style,
     this.strutStyle,
@@ -56,10 +55,11 @@ class AutoSizeCircleText extends StatefulWidget {
     this.circularPadding = 20,
   }) : textSpan = null;
 
-  /// Creates a [AutoSizeCircleText] widget with a [TextSpan].
-  const AutoSizeCircleText.rich(
+  /// Creates a [AutoSizeText] widget with a [TextSpan].
+  const AutoSizeText.rich(
     TextSpan this.textSpan, {
     super.key,
+    this.circle = false,
     this.textKey,
     this.style,
     this.strutStyle,
@@ -84,6 +84,8 @@ class AutoSizeCircleText extends StatefulWidget {
   ///
   /// This allows you to find the actual `Text` widget built by `AutoSizeText`.
   final Key? textKey;
+
+  final bool circle;
 
   /// The text to display.
   ///
@@ -230,10 +232,10 @@ class AutoSizeCircleText extends StatefulWidget {
   final double circularPadding;
 
   @override
-  AutoSizeCircleTextState createState() => AutoSizeCircleTextState();
+  AutoSizeTextState createState() => AutoSizeTextState();
 }
 
-class AutoSizeCircleTextState extends State<AutoSizeCircleText> {
+class AutoSizeTextState extends State<AutoSizeText> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, size) {
@@ -244,16 +246,19 @@ class AutoSizeCircleTextState extends State<AutoSizeCircleText> {
         style = defaultTextStyle.style.merge(widget.style);
       }
       if (style!.fontSize == null) {
-        style = style.copyWith(fontSize: AutoSizeCircleText._defaultFontSize);
+        style = style.copyWith(fontSize: AutoSizeText._defaultFontSize);
       }
 
       final maxLines = widget.maxLines ?? defaultTextStyle.maxLines;
 
       _validateProperties(style, maxLines);
 
-      size = size.copyWith(maxWidth: size.maxWidth - 20);
+      if (widget.circle) {
+        size = size.copyWith(maxWidth: size.maxWidth - 20);
+      }
 
-      final initialResult = _calculateFontSize(size, style, 1);
+      final initialResult =
+          widget.circle ? _calculateFontSize(size, style, 1) : [0.0, false];
       final fontSizeSingle = initialResult[0] as double;
       final textFitsSingle = initialResult[1] as bool;
 
@@ -417,7 +422,7 @@ class AutoSizeCircleTextState extends State<AutoSizeCircleText> {
       double fontSize, TextStyle style, int? maxLines, EdgeInsets padding) {
     if (widget.data != null) {
       return Padding(
-        padding: padding,
+        padding: widget.circle ? padding : const EdgeInsets.all(0.0),
         child: Text(
           widget.data!,
           key: widget.textKey,
