@@ -44,7 +44,7 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "HTP"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/mobilenet_v4_htp.dlc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobilenet_v4_htp.dlc"
       model_checksum: "56e5039260e20e5c2a0b54cc0fac8098"
     }
   }
@@ -82,7 +82,7 @@ benchmark_setting {
     accelerator_desc: "HTP"
     batch_size: 12360
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/mobilenet_v4_htp_batched_4.dlc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobilenet_v4_htp_batched_4.dlc"
       model_checksum: "7863deea588936fe6e09565ed47dde95"
     }
   }
@@ -110,7 +110,7 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "HTP"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/ssd_mobiledet_qat_htp.dlc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/ssd_mobiledet_qat_htp.dlc"
       model_checksum: "49c6afbfefffb78269fe73a6ee1b4a85"
     }
   }
@@ -142,7 +142,7 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/mobilebert_quantized_htp.dlc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobilebert_quantized_htp.dlc"
       model_checksum: "96d947175f04950898a372890907dda1"
     }
   }
@@ -174,7 +174,7 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm/mobile_mosaic_htp.dlc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm/mobile_mosaic_htp.dlc"
       model_checksum: "3c0dfbacda053773d6afb34503d9991a"
     }
   }
@@ -202,7 +202,7 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/releases/download/v4.1-qualcomm//snusr_htp.dlc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/qualcomm//snusr_htp.dlc"
       model_checksum: "668da9816073d67972704e237137a50f"
     }
   }

@@ -29,7 +29,7 @@ benchmark_setting {
       value: "false"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_single.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/ic_single.nnc"
       model_checksum: "a49175f3f4f37f59780995cec540dbf2"
     }
   }
@@ -65,7 +65,7 @@ benchmark_setting {
       value: "false"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/sm_uint8.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/sm_uint8.nnc"
       model_checksum: "f715f55818863f371336ad29ecba1183"
     }
   }
@@ -101,7 +101,7 @@ benchmark_setting {
       value: "false"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/od.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/od.nnc"
       model_checksum: "6b34201b6696fa75311d0d43820e03d2"
     }
   }
@@ -137,7 +137,7 @@ benchmark_setting {
       value: "false"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/mobile_bert_gpu.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_bert_gpu.nnc"
       model_checksum: "d98dfcc37ad33fa7081d6fbb5bc6ddd1"
     }
   }
@@ -178,7 +178,7 @@ benchmark_setting {
       value: "false"
     }
     model_file: {
-      model_path: "https://github.com/mlcommons/mobile_models/raw/main/v2_0/Samsung/ic_offline.nnc"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/ic_offline.nnc"
       model_checksum: "8832370c770fa820dfde83e039e3243c"
     }
   }

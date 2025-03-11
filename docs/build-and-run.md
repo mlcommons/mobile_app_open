@@ -42,11 +42,7 @@ flutter run
 If you want to run or debug the Flutter app for any platform using graphical user interface,
 you can use [VS Code with Flutter extension](https://docs.flutter.dev/get-started/editor?tab=vscode).
 
-If you want to test something without spending a lot of time on the benchmark,
-you can use flag `--dart-define=FAST_MODE=true` to speed up the benchmark.
-You should not evaluate performance when using this flag.
-
-Add `WITH_<VENDOR>=1` to make commands to build the the app with backends.
+Add `WITH_<VENDOR>=1` to make commands to build the app with certain backends.
 For example:
 
 ```bash

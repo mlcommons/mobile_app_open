@@ -8,6 +8,7 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
+import 'package:mlperfbench/ui/nil.dart';
 
 class BenchmarkConfigSection extends StatefulWidget {
   const BenchmarkConfigSection({super.key});
@@ -32,7 +33,7 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
     l10n = AppLocalizations.of(context)!;
     final childrenList = <Widget>[];
 
-    for (var benchmark in state.benchmarks) {
+    for (var benchmark in state.allBenchmarks) {
       childrenList.add(_listTile(benchmark));
       childrenList.add(const Divider(height: 20));
     }
@@ -121,10 +122,10 @@ class _BenchmarkConfigSectionState extends State<BenchmarkConfigSection> {
         .map((e) => e.delegateName)
         .toList();
     if (choices.isEmpty) {
-      return const SizedBox();
+      return nil;
     }
     if (choices.length == 1 && choices.first.isEmpty) {
-      return const SizedBox();
+      return nil;
     }
     if (!choices.contains(selected)) {
       throw 'delegate_selected=$selected must be one of delegate_choice=$choices';

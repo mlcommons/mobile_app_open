@@ -69,24 +69,13 @@ class Benchmark {
     required List<pb.CommonSetting> commonSettings,
     required String backendLibName,
     required String logDir,
-    required int testMinDuration,
-    required int testMinQueryCount,
   }) async {
     final dataset = runMode.chooseDataset(taskConfig);
+    final runConfig = runMode.chooseRunConfig(taskConfig);
 
-    int minQueryCount;
-    double minDuration;
-    if (testMinDuration != 0) {
-      minQueryCount = testMinQueryCount;
-      minDuration = testMinDuration.toDouble();
-    } else if (DartDefine.isFastMode) {
-      minQueryCount = 8;
-      minDuration = 1.0;
-    } else {
-      minQueryCount = taskConfig.minQueryCount;
-      minDuration = taskConfig.minDuration;
-    }
-    double maxDuration = taskConfig.maxDuration;
+    int minQueryCount = runConfig.minQueryCount;
+    double minDuration = runConfig.minDuration;
+    double maxDuration = runConfig.maxDuration;
 
     final settings = pb.SettingList(
       setting: commonSettings,
@@ -114,7 +103,7 @@ class Benchmark {
       model_image_width: taskConfig.model.imageWidth,
       model_image_height: taskConfig.model.imageHeight,
       scenario: taskConfig.scenario,
-      mode: runMode.loadgenMode,
+      mode: runMode.loadgenMode.name,
       batch_size: selectedDelegate.batchSize,
       min_query_count: minQueryCount,
       min_duration: minDuration,
@@ -128,7 +117,11 @@ class Benchmark {
 }
 
 class BenchmarkStore {
-  final List<Benchmark> benchmarks = <Benchmark>[];
+  final List<Benchmark> allBenchmarks = <Benchmark>[];
+
+  List<Benchmark> get activeBenchmarks {
+    return allBenchmarks.where((e) => e.isActive).toList();
+  }
 
   BenchmarkStore({
     required pb.MLPerfConfig appConfig,
@@ -148,7 +141,7 @@ class BenchmarkStore {
       }
 
       final enabled = taskSelection[task.id] ?? true;
-      benchmarks.add(Benchmark(
+      allBenchmarks.add(Benchmark(
         taskConfig: task,
         benchmarkSettings: backendSettings,
         isActive: enabled,
@@ -158,22 +151,22 @@ class BenchmarkStore {
 
   List<Resource> listResources({
     required List<BenchmarkRunMode> modes,
-    bool skipInactive = false,
+    required List<Benchmark> benchmarks,
   }) {
     final result = <Resource>[];
 
     for (final b in benchmarks) {
-      if (skipInactive && !b.isActive) continue;
-
       for (var mode in modes) {
         final dataset = mode.chooseDataset(b.taskConfig);
         final data = Resource(
-          path: dataset.inputPath,
           type: ResourceTypeEnum.datasetData,
+          path: dataset.inputPath,
+          md5Checksum: dataset.inputChecksum,
         );
         final groundtruth = Resource(
-          path: dataset.groundtruthPath,
           type: ResourceTypeEnum.datasetGroundtruth,
+          path: dataset.groundtruthPath,
+          md5Checksum: dataset.groundtruthChecksum,
         );
         result.addAll([data, groundtruth]);
       }
@@ -197,7 +190,7 @@ class BenchmarkStore {
 
   Map<String, bool> get selection {
     Map<String, bool> result = {};
-    for (var item in benchmarks) {
+    for (var item in allBenchmarks) {
       result[item.id] = item.isActive;
     }
     return result;

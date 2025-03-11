@@ -41,12 +41,12 @@ void main() {
         taskSelection: {},
       );
 
-      expect(store.benchmarks.length, 1);
+      expect(store.allBenchmarks.length, 1);
 
-      expect(store.benchmarks.first.taskConfig, task1);
-      expect(store.benchmarks.first.benchmarkSettings, backendSettings1);
+      expect(store.allBenchmarks.first.taskConfig, task1);
+      expect(store.allBenchmarks.first.benchmarkSettings, backendSettings1);
       expect(
-        store.benchmarks.first.isActive,
+        store.allBenchmarks.first.isActive,
         true,
         reason: 'benchmarks must be enabled by default',
       );
@@ -59,13 +59,13 @@ void main() {
         taskSelection: {},
       );
 
-      expect(store.benchmarks.length, 2);
+      expect(store.allBenchmarks.length, 2);
 
-      expect(store.benchmarks.first.taskConfig, task2);
-      expect(store.benchmarks.first.benchmarkSettings, backendSettings2);
+      expect(store.allBenchmarks.first.taskConfig, task2);
+      expect(store.allBenchmarks.first.benchmarkSettings, backendSettings2);
 
-      expect(store.benchmarks.last.taskConfig, task1);
-      expect(store.benchmarks.last.benchmarkSettings, backendSettings1);
+      expect(store.allBenchmarks.last.taskConfig, task1);
+      expect(store.allBenchmarks.last.benchmarkSettings, backendSettings1);
     });
 
     test('selection', () async {
@@ -75,9 +75,9 @@ void main() {
         taskSelection: {task1.id: true, task2.id: false},
       );
 
-      expect(store.benchmarks.length, 2);
-      expect(store.benchmarks.first.isActive, true);
-      expect(store.benchmarks.last.isActive, false);
+      expect(store.allBenchmarks.length, 2);
+      expect(store.allBenchmarks.first.isActive, true);
+      expect(store.allBenchmarks.last.isActive, false);
     });
 
     test('resource list: skip', () async {
@@ -87,8 +87,11 @@ void main() {
         taskSelection: {task1.id: false},
       );
 
-      final modes = [BenchmarkRunMode.accuracy];
-      final resources = store.listResources(modes: modes, skipInactive: true);
+      final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
+      final resources = store.listResources(
+        modes: modes,
+        benchmarks: store.activeBenchmarks,
+      );
 
       expect(resources.length, 0);
     });
@@ -99,21 +102,26 @@ void main() {
         taskSelection: {},
       );
 
-      final modes = [BenchmarkRunMode.accuracy];
-      final resources = store.listResources(modes: modes, skipInactive: true);
+      final modes = [BenchmarkRunModeEnum.accuracyOnly.accuracyRunMode];
+      final resources = store.listResources(
+        modes: modes,
+        benchmarks: store.activeBenchmarks,
+      );
 
       expect(resources.length, 3);
       expect(
           resources,
           contains(Resource(
-            path: task1.datasets.full.inputPath,
             type: ResourceTypeEnum.datasetData,
+            path: task1.datasets.full.inputPath,
+            md5Checksum: task1.datasets.full.inputChecksum,
           )));
       expect(
           resources,
           contains(Resource(
-            path: task1.datasets.full.groundtruthPath,
             type: ResourceTypeEnum.datasetGroundtruth,
+            path: task1.datasets.full.groundtruthPath,
+            md5Checksum: task1.datasets.full.groundtruthChecksum,
           )));
       expect(
           resources,
@@ -131,15 +139,20 @@ void main() {
         taskSelection: {},
       );
 
-      final modes = [BenchmarkRunMode.performance];
-      final resources = store.listResources(modes: modes);
+      final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
+      final activeBenchmarks = store.activeBenchmarks;
+      final resources = store.listResources(
+        modes: modes,
+        benchmarks: activeBenchmarks,
+      );
 
       expect(resources.length, 2);
       expect(
           resources,
           contains(Resource(
-            path: task1.datasets.lite.inputPath,
             type: ResourceTypeEnum.datasetData,
+            path: task1.datasets.lite.inputPath,
+            md5Checksum: task1.datasets.lite.inputChecksum,
           )));
       expect(
           resources,
@@ -158,17 +171,22 @@ void main() {
       );
 
       final modes = [
-        BenchmarkRunMode.accuracyTest,
-        BenchmarkRunMode.performanceTest,
+        BenchmarkRunModeEnum.integrationTestRun.accuracyRunMode,
+        BenchmarkRunModeEnum.integrationTestRun.performanceRunMode,
       ];
-      final resources = store.listResources(modes: modes);
+      final activeBenchmarks = store.activeBenchmarks;
+      final resources = store.listResources(
+        modes: modes,
+        benchmarks: activeBenchmarks,
+      );
 
       expect(resources.length, 2);
       expect(
           resources,
           contains(Resource(
-            path: task1.datasets.tiny.inputPath,
             type: ResourceTypeEnum.datasetData,
+            path: task1.datasets.tiny.inputPath,
+            md5Checksum: task1.datasets.tiny.inputChecksum,
           )));
       expect(
           resources,

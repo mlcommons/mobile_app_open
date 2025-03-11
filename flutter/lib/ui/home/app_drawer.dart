@@ -9,6 +9,7 @@ import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/history/history_list_screen.dart';
 import 'package:mlperfbench/ui/home/user_profile.dart';
 import 'package:mlperfbench/ui/settings/about_screen.dart';
+import 'package:mlperfbench/ui/settings/resources_screen.dart';
 import 'package:mlperfbench/ui/settings/settings_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -40,8 +41,11 @@ class AppDrawer extends StatelessWidget {
         child: Container(
           color: AppColors.drawerBackground,
           child: SafeArea(
-            child: Column(
-              children: [header] + menuList,
+            child: ScrollConfiguration(
+              behavior: NoGlowScrollBehavior(),
+              child: ListView(
+                children: [header] + menuList,
+              ),
             ),
           ),
         ),
@@ -105,6 +109,19 @@ class AppDrawer extends StatelessWidget {
         },
       ),
       ListTile(
+        leading: const Icon(Icons.file_present),
+        title: Text(l10n.menuResources),
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ResourcesScreen(),
+            ),
+          );
+        },
+      ),
+      ListTile(
         leading: const Icon(Icons.info),
         title: Text(l10n.menuAbout),
         onTap: () {
@@ -127,5 +144,14 @@ class AppDrawer extends StatelessWidget {
         onTap: () => launchUrl(Uri.parse(Url.eula)),
       ),
     ];
+  }
+}
+
+// Custom ScrollBehavior
+class NoGlowScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child; // Disable glow effect
   }
 }

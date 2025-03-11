@@ -20,8 +20,8 @@
 # precision floating point values.
 #
 
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@bazel_skylib//lib:selects.bzl", "selects")
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
 load("@snpe_version_loader//:snpe_var_def.bzl", "SNPE_VERSION")
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
@@ -211,23 +211,23 @@ cc_library(
                         "//conditions:default": [],
                     }),
     deps = [
-        "//flutter/cpp/c:headers",
         ":qti_allocator",
         ":qti_settings",
+        "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ] + select({
         ":android_without_stablediffusion": [
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
+            "//mobile_back_qti:snpe",
             "@org_tensorflow//tensorflow/lite/c:c_api",
             "@org_tensorflow//tensorflow/lite/c:common",
-            "//mobile_back_qti:snpe",
+            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
         ],
         ":android_with_stablediffusion": [
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
+            "//mobile_back_qti:snpe",
+            "//mobile_back_qti/cpp/backend_qti/StableDiffusionShared",
             "@org_tensorflow//tensorflow/lite/c:c_api",
             "@org_tensorflow//tensorflow/lite/c:common",
-            "//mobile_back_qti:snpe",
-            "//mobile_back_qti/cpp/backend_qti/StableDiffusionShared:StableDiffusionShared",
+            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
         ],
         "windows_arm64": [
             "//mobile_back_qti:snpewindowslib",

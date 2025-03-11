@@ -8,14 +8,19 @@ void main() async {
   group('CacheManager', () {
     late CacheManager manager;
     const zipRemotePath =
-        'https://github.com/mlcommons/mobile_models/raw/main/v3_0/datasets/coco-test.zip';
+        'https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/coco-test.zip';
     const txtRemotePath =
-        'https://github.com/mlcommons/mobile_models/raw/main/v3_0/assets/imagenet_tiny-groundtruth.txt';
+        'https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/imagenet_tiny-groundtruth.txt';
     final paths = [zipRemotePath, txtRemotePath];
 
     setUp(() async {
       manager = CacheManager('/tmp/resources');
-      await manager.cache(paths, (val, str) {}, true);
+      await manager.cache(
+        urls: paths,
+        onProgressUpdate: (val, str) {},
+        purgeOldCache: true,
+        downloadMissing: true,
+      );
     });
 
     test('get', () async {
@@ -57,6 +62,14 @@ void main() async {
       expect(await File(zipLocalPath!).exists(), isFalse,
           reason: 'file should not exist at path [$zipLocalPath]');
       expect(manager.getArchive(txtRemotePath), isNull);
+    });
+
+    test('deleteFiles', () async {
+      await manager.deleteFiles(paths);
+      final txtLocalPath = manager.get(txtRemotePath);
+      expect(txtLocalPath, isNotNull);
+      expect(await File(txtLocalPath!).exists(), isFalse,
+          reason: 'file should not exist at path [$txtLocalPath]');
     });
 
     test('deleteLoadedResources', () async {

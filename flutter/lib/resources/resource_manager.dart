@@ -49,7 +49,8 @@ class ResourceManager {
       return resourceSystemPath;
     }
     if (isInternetResource(uri)) {
-      return cacheManager.get(uri)!;
+      final resourceSystemPath = cacheManager.get(uri);
+      return resourceSystemPath ?? '';
     }
     if (File(uri).isAbsolute) {
       return uri;
@@ -87,58 +88,65 @@ class ResourceManager {
     return _dataPrefix;
   }
 
-  Future<bool> isResourceExist(String? uri) async {
-    if (uri == null) return false;
-
-    final path = get(uri);
-
-    return path == '' ||
-        await File(path).exists() ||
-        await Directory(path).exists();
-  }
-
   Future<bool> isChecksumMatched(String filePath, String md5Checksum) async {
     var fileStream = File(filePath).openRead();
     final checksum = (await md5.bind(fileStream).first).toString();
     return checksum == md5Checksum;
   }
 
-  Future<void> handleResources(
-      List<Resource> resources, bool purgeOldCache) async {
+  Future<void> handleResources({
+    required List<Resource> resources,
+    required bool purgeOldCache,
+    required bool downloadMissing,
+  }) async {
     _loadingPath = '';
-    _loadingProgress = 0.0;
+    _loadingProgress = 0.001;
     _done = false;
     _onUpdate();
-
-    var internetResources = <Resource>[];
-    for (final resource in resources) {
-      if (resource.path.startsWith(_dataPrefix)) continue;
-      if (isInternetResource(resource.path)) {
-        internetResources.add(resource);
-        continue;
+    try {
+      var internetResources = <Resource>[];
+      for (final resource in resources) {
+        if (resource.path.startsWith(_dataPrefix)) continue;
+        if (isInternetResource(resource.path)) {
+          internetResources.add(resource);
+          continue;
+        }
+        throw 'forbidden path: ${resource.path} (only http://, https:// and local:// resources are allowed)';
       }
-      throw 'forbidden path: ${resource.path} (only http://, https:// and local:// resources are allowed)';
-    }
 
-    final internetPaths = internetResources.map((e) => e.path).toList();
-    await cacheManager.cache(internetPaths,
-        (double currentProgress, String currentPath) {
-      _loadingProgress = currentProgress;
-      _loadingPath = currentPath;
+      final internetPaths = internetResources.map((e) => e.path).toList();
+      try {
+        await cacheManager.cache(
+          urls: internetPaths,
+          onProgressUpdate: (double currentProgress, String currentPath) {
+            _loadingProgress = currentProgress;
+            _loadingPath = currentPath;
+            _onUpdate();
+          },
+          purgeOldCache: purgeOldCache,
+          downloadMissing: downloadMissing,
+        );
+      } on SocketException {
+        throw 'A network error has occurred. Please make sure you are connected to the internet.';
+      }
+
+      final checksumFailed = await validateResourcesChecksum(resources);
+      if (checksumFailed.isNotEmpty) {
+        final checksumFailedPathString =
+            checksumFailed.map((e) => '\n${e.path}').join();
+        final checksumFailedPaths = checksumFailed.map((e) => e.path).toList();
+        await cacheManager.deleteFiles(checksumFailedPaths);
+        throw 'Checksum validation failed for: $checksumFailedPathString. \nPlease download the missing files again.';
+      }
+
+      // delete downloaded archives to free up disk space
+      await cacheManager.deleteArchives(internetPaths);
+    } finally {
+      _loadingPath = '';
+      _loadingProgress = 1.0;
+      _done = true;
       _onUpdate();
-    }, purgeOldCache);
-
-    final checksumFailed = await validateResourcesChecksum(resources);
-    if (checksumFailed.isNotEmpty) {
-      final mismatchedPaths = checksumFailed.map((e) => '\n${e.path}').join();
-      throw 'Checksum validation failed for: $mismatchedPaths';
     }
-
-    // delete downloaded archives to free up disk space
-    await cacheManager.deleteArchives(internetPaths);
-
-    _done = true;
-    _onUpdate();
   }
 
   static Future<String> getApplicationDirectory() async {
@@ -172,15 +180,30 @@ class ResourceManager {
     resultManager = await ResultManager.create(applicationDirectory);
   }
 
-  Future<List<String>> validateResourcesExist(List<Resource> resources) async {
+  // Returns a map of { true: [existedResources], false: [missingResources] }
+  Future<Map<bool, List<String>>> validateResourcesExist(
+      List<Resource> resources) async {
     final missingResources = <String>[];
+    final existedResources = <String>[];
     for (var r in resources) {
-      if (!await isResourceExist(r.path)) {
-        final resolvedPath = get(r.path);
-        missingResources.add(resolvedPath);
+      final resolvedPath = get(r.path);
+      if (resolvedPath.isEmpty) {
+        missingResources.add(r.path);
+      } else {
+        final isResourceExist = await File(resolvedPath).exists() ||
+            await Directory(resolvedPath).exists();
+        if (isResourceExist) {
+          existedResources.add(r.path);
+        } else {
+          missingResources.add(r.path);
+        }
       }
     }
-    return missingResources;
+    final result = {
+      false: missingResources,
+      true: existedResources,
+    };
+    return result;
   }
 
   Future<List<Resource>> validateResourcesChecksum(
@@ -188,7 +211,7 @@ class ResourceManager {
     final checksumFailedResources = <Resource>[];
     for (final resource in resources) {
       final md5Checksum = resource.md5Checksum;
-      if (md5Checksum == null || md5Checksum.isEmpty) continue;
+      if (md5Checksum.isEmpty) continue;
       String? localPath;
       if (cacheManager.isResourceAnArchive(resource.path)) {
         localPath = cacheManager.getArchive(resource.path);

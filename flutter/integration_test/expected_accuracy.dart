@@ -14,17 +14,19 @@ key: <accelerator> OR <accelerator>|<backendName>
 - psnpe_dsp -> Android QTI
 - neuron-mdla > Android MediaTek
 - neuron > Android MediaTek
+- samsung_npu > Android Samsung
 */
 
 const Map<String, Interval> _imageClassificationV2 = {
   'cpu': Interval(min: 0.88, max: 0.91),
-  'npu': Interval(min: 0.88, max: 0.91),
+  'npu': Interval(min: 0.69, max: 0.91),
   'tpu': Interval(min: 0.88, max: 0.91),
   'ane': Interval(min: 0.69, max: 0.91),
   'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
   'snpe_dsp': Interval(min: 0.88, max: 0.91),
   'psnpe_dsp': Interval(min: 0.88, max: 0.91),
-  'neuron-mdla': Interval(min: 0.79, max: 0.81),
+  'neuron-mdla': Interval(min: 0.79, max: 0.91),
+  'samsung_npu': Interval(min: 0.99, max: 1.0),
 };
 
 const Map<String, Interval> _objectDetection = {
@@ -36,10 +38,11 @@ const Map<String, Interval> _objectDetection = {
   'cpu&gpu&ane': Interval(min: 0.45, max: 0.46),
   'snpe_dsp': Interval(min: 0.32, max: 0.35),
   'psnpe_dsp': Interval(min: 0.32, max: 0.35),
-  'neuron': Interval(min: 0.28, max: 0.31),
+  'neuron': Interval(min: 0.28, max: 0.35),
+  'samsung_npu': Interval(min: 0.36, max: 0.39),
 };
 
-const Map<String, Interval> _imageSegmentation = {
+const Map<String, Interval> _imageSegmentationV2 = {
   'cpu': Interval(min: 0.38, max: 0.40),
   'npu': Interval(min: 0.33, max: 0.34),
   'tpu': Interval(min: 0.33, max: 0.34),
@@ -49,6 +52,7 @@ const Map<String, Interval> _imageSegmentation = {
   'snpe_dsp': Interval(min: 0.35, max: 0.38),
   'psnpe_dsp': Interval(min: 0.35, max: 0.38),
   'neuron': Interval(min: 0.32, max: 0.34),
+  'samsung_npu': Interval(min: 0.36, max: 0.39),
 };
 
 const Map<String, Interval> _naturalLanguageProcessing = {
@@ -61,6 +65,7 @@ const Map<String, Interval> _naturalLanguageProcessing = {
   'snpe_dsp': Interval(min: 1.00, max: 1.00),
   'psnpe_dsp': Interval(min: 1.00, max: 1.00),
   'neuron-no-ahwb': Interval(min: 1.00, max: 1.00),
+  'samsung_npu': Interval(min: 1.00, max: 1.00),
 };
 
 const Map<String, Interval> _superResolution = {
@@ -73,6 +78,7 @@ const Map<String, Interval> _superResolution = {
   'snpe_dsp': Interval(min: 0.32, max: 0.35),
   'psnpe_dsp': Interval(min: 0.32, max: 0.35),
   'neuron': Interval(min: 0.32, max: 0.35),
+  'samsung_npu': Interval(min: 0.08, max: 0.12),
 };
 
 // TODO (anhappdev): update expected accuracy for stable diffusion
@@ -86,12 +92,13 @@ const Map<String, Interval> _stableDiffusion = {
   'snpe_dsp': Interval(min: 0, max: 1.0),
   'psnpe_dsp': Interval(min: 0, max: 1.0),
   'neuron': Interval(min: 0, max: 1.0),
+  'samsung_npu': Interval(min: 0, max: 1.0),
 };
 
 const benchmarkExpectedAccuracy = {
   BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
-  BenchmarkId.imageSegmentationV2: _imageSegmentation,
+  BenchmarkId.imageSegmentationV2: _imageSegmentationV2,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.stableDiffusion: _stableDiffusion,

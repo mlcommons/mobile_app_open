@@ -81,6 +81,8 @@ void CocoGen::UnloadSamplesFromRam(
   }
 }
 
+#define OUTPUT_WIDTH 512
+#define OUTPUT_HEIGHT 512
 #define OUTPUT_SIZE 512 * 512 * 3
 std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
                                             const std::vector<void*>& outputs) {
@@ -99,6 +101,10 @@ std::vector<uint8_t> CocoGen::ProcessOutput(const int sample_idx,
       output_pixels[i] = (uint8_t)((*(temp_data + i) + 1) / 2 * 255);
     }
   }
+
+  auto total_byte = output_format_[0].size * GetByte(output_format_[0]);
+  backend_->ConvertOutputs(total_byte, OUTPUT_WIDTH, OUTPUT_HEIGHT,
+                           output_pixels.data());
 
   if (!output_pixels.empty()) {
     sample_ids_.insert(sample_idx);

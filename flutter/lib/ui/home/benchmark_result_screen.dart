@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/performance_result_validity.dart';
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
@@ -15,6 +16,7 @@ import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/home/result_circle.dart';
 import 'package:mlperfbench/ui/home/share_button.dart';
+import 'package:mlperfbench/ui/nil.dart';
 
 enum _ScreenMode { performance, accuracy }
 
@@ -73,51 +75,62 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(56.0),
-          child: _shareSection(),
-        ),
         backgroundColor: AppColors.secondaryAppBarBackground,
       ),
       drawer: const AppDrawer(),
-      body: LayoutBuilder(
-        builder: (context, constraint) {
-          return SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _totalScoreSection(),
-                const SizedBox(height: 20),
-                _detailSection(),
-              ],
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _shareSection(),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _totalScoreSection(),
+                  const SizedBox(height: 20),
+                  _detailSection(),
+                ],
+              ),
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
 
   Widget _shareSection() {
     final lastResult = state.lastResult;
-    Text deviceInfoText;
+    String deviceInfoString;
+    String runModeString;
     Text benchmarkDateText;
     Widget shareButton;
     int shareButtonFlex;
     if (lastResult != null) {
-      deviceInfoText = Text(lastResult.environmentInfo.modelDescription);
+      deviceInfoString = lastResult.environmentInfo.modelDescription;
       benchmarkDateText = Text(lastResult.meta.creationDate.toUIString());
+      runModeString =
+          lastResult.meta.runMode?.localizedName(l10n) ?? l10n.unknown;
       shareButton = const ShareButton();
       shareButtonFlex = 10;
     } else {
-      deviceInfoText = Text(DeviceInfo.instance.envInfo.modelDescription);
+      deviceInfoString = DeviceInfo.instance.envInfo.modelDescription;
       benchmarkDateText = Text(
         l10n.resultsBenchmarkAborted,
         style: const TextStyle(color: AppColors.resultInvalidText),
       );
-      shareButton = const SizedBox();
+      runModeString = l10n.unknown;
+      shareButton = nil;
       shareButtonFlex = 0;
     }
+
+    Text runModeText = Text('${l10n.settingsRunMode}: $runModeString');
+    Text deviceInfoText = Text(
+      deviceInfoString,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
     final infoSection = Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,6 +138,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         deviceInfoText,
         const SizedBox(height: 4),
         benchmarkDateText,
+        const SizedBox(height: 4),
+        runModeText,
       ],
     );
     Widget testAgainButton = IconButton(
@@ -204,7 +219,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
 
   Widget _detailSection() {
     final children = <Widget>[];
-    for (final benchmark in state.benchmarks) {
+    for (final benchmark in state.allBenchmarks) {
       final row = _benchmarkResultRow(benchmark);
       children.add(row);
       children.add(const Divider());

@@ -33,7 +33,7 @@ Future<void> startApp(WidgetTester tester) async {
 Future<void> validateSettings(WidgetTester tester) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
-  for (var benchmark in benchmarkState.benchmarks) {
+  for (var benchmark in benchmarkState.allBenchmarks) {
     expect(benchmark.selectedDelegate.batchSize, greaterThanOrEqualTo(0),
         reason: 'batchSize must >= 0');
     for (var modelFile in benchmark.selectedDelegate.modelFile) {
@@ -67,7 +67,7 @@ Future<void> validateSettings(WidgetTester tester) async {
 Future<void> setBenchmarks(WidgetTester tester) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
-  for (var benchmark in benchmarkState.benchmarks) {
+  for (var benchmark in benchmarkState.allBenchmarks) {
     // Disable test for stable diffusion since it take too long to finish.
     if (benchmark.id == BenchmarkId.stableDiffusion) {
       benchmark.isActive = false;
@@ -82,6 +82,10 @@ Future<void> setBenchmarks(WidgetTester tester) async {
 Future<void> runBenchmarks(WidgetTester tester) async {
   const downloadTimeout = 20 * 60; // 20 minutes
   const runBenchmarkTimeout = 30 * 60; // 30 minutes
+
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  await benchmarkState.loadResources(downloadMissing: true);
 
   var goButtonIsPresented =
       await waitFor(tester, downloadTimeout, const Key(WidgetKeys.goButton));

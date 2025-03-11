@@ -22,7 +22,6 @@ import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 
 enum BenchmarkStateEnum {
-  downloading,
   waiting,
   running,
   aborting,
@@ -55,20 +54,20 @@ class BenchmarkState extends ChangeNotifier {
   ExtendedResult? lastResult;
 
   num get result {
-    final benchmarksCount = benchmarks
+    final benchmarksCount = allBenchmarks
         .where((benchmark) => benchmark.performanceModeResult != null)
         .length;
 
     if (benchmarksCount == 0) return 0;
 
     final summaryThroughput = pow(
-        benchmarks.fold<double>(1, (prev, i) {
+        allBenchmarks.fold<double>(1, (prev, i) {
           return prev * (i.performanceModeResult?.throughput?.value ?? 1.0);
         }),
         1.0 / benchmarksCount);
 
     final maxSummaryThroughput = pow(
-        benchmarks.fold<double>(1, (prev, i) {
+        allBenchmarks.fold<double>(1, (prev, i) {
           return prev * (i.info.maxThroughput);
         }),
         1.0 / benchmarksCount);
@@ -76,7 +75,9 @@ class BenchmarkState extends ChangeNotifier {
     return summaryThroughput / maxSummaryThroughput;
   }
 
-  List<Benchmark> get benchmarks => _benchmarkStore.benchmarks;
+  List<Benchmark> get allBenchmarks => _benchmarkStore.allBenchmarks;
+
+  List<Benchmark> get activeBenchmarks => _benchmarkStore.activeBenchmarks;
 
   late BenchmarkStore _benchmarkStore;
 
@@ -107,7 +108,7 @@ class BenchmarkState extends ChangeNotifier {
       await setTaskConfig(name: _store.chosenConfigurationName);
       deferredLoadResources();
     } catch (e, trace) {
-      print("can't load resources: $e");
+      print("Can't load resources: $e");
       print(trace);
       error = e;
       stackTrace = trace;
@@ -121,9 +122,9 @@ class BenchmarkState extends ChangeNotifier {
   // ignore: avoid_void_async
   void deferredLoadResources() async {
     try {
-      await loadResources();
+      await loadResources(downloadMissing: false);
     } catch (e, trace) {
-      print("can't load resources: $e");
+      print("Can't load resources: $e");
       print(trace);
       error = e;
       stackTrace = trace;
@@ -132,25 +133,50 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> loadResources() async {
+  Future<void> loadResources(
+      {required bool downloadMissing,
+      List<Benchmark> benchmarks = const []}) async {
     final newAppVersion =
         '${BuildInfoHelper.info.version}+${BuildInfoHelper.info.buildNumber}';
     var needToPurgeCache = _store.previousAppVersion != newAppVersion;
     _store.previousAppVersion = newAppVersion;
 
+    final selectedBenchmarks = benchmarks.isEmpty ? allBenchmarks : benchmarks;
     await Wakelock.enable();
-    print('start loading resources');
-    await resourceManager.handleResources(
-      _benchmarkStore.listResources(
-        modes: [taskRunner.perfMode, taskRunner.accuracyMode],
-        skipInactive: false,
-      ),
-      needToPurgeCache,
+    final selectedResources = _benchmarkStore.listResources(
+      modes: [taskRunner.perfMode, taskRunner.accuracyMode],
+      benchmarks: selectedBenchmarks,
     );
-    print('finished loading resources');
-    error = null;
-    stackTrace = null;
-    taskConfigFailedToLoad = false;
+    final allResources = _benchmarkStore.listResources(
+      modes: [taskRunner.perfMode, taskRunner.accuracyMode],
+      benchmarks: allBenchmarks,
+    );
+    try {
+      final selectedBenchmarkIds = selectedBenchmarks
+          .map((e) => e.benchmarkSettings.benchmarkId)
+          .join(', ');
+      print('Start loading resources with downloadMissing=$downloadMissing '
+          'for $selectedBenchmarkIds');
+      await resourceManager.handleResources(
+        resources: selectedResources,
+        purgeOldCache: needToPurgeCache,
+        downloadMissing: downloadMissing,
+      );
+      print('Finished loading resources with downloadMissing=$downloadMissing');
+      // We still need to load all resources after download selected resources.
+      await resourceManager.handleResources(
+        resources: allResources,
+        purgeOldCache: false,
+        downloadMissing: false,
+      );
+      error = null;
+      stackTrace = null;
+      taskConfigFailedToLoad = false;
+    } catch (e, s) {
+      print('Could not load resources due to error: $e');
+      error = e;
+      stackTrace = s;
+    }
     await Wakelock.disable();
   }
 
@@ -163,7 +189,7 @@ class BenchmarkState extends ChangeNotifier {
       await state.setTaskConfig(name: store.chosenConfigurationName);
       state.deferredLoadResources();
     } catch (e, trace) {
-      print("can't load resources: $e");
+      print("Can't load resources: $e");
       print(trace);
       state.error = e;
       state.stackTrace = trace;
@@ -198,7 +224,7 @@ class BenchmarkState extends ChangeNotifier {
           taskSelection[kv.key] = kv.value as bool;
         }
       } catch (e, t) {
-        print('task selection parse fail: $e');
+        print('Task selection parse fail: $e');
         print(t);
       }
     }
@@ -216,7 +242,6 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   BenchmarkStateEnum get state {
-    if (!resourceManager.done) return BenchmarkStateEnum.downloading;
     switch (_doneRunning) {
       case null:
         return BenchmarkStateEnum.waiting;
@@ -255,7 +280,7 @@ class BenchmarkState extends ChangeNotifier {
           await taskRunner.runBenchmarks(_benchmarkStore, currentLogDir);
 
       if (lastResult == null) {
-        print('benchmark aborted');
+        print('Benchmark aborted');
       } else {
         print('Benchmarks finished');
 
@@ -267,6 +292,7 @@ class BenchmarkState extends ChangeNotifier {
       _doneRunning = taskRunner.aborting ? null : true;
     } catch (e) {
       _doneRunning = null;
+      print('Error: $e');
       rethrow;
     } finally {
       if (currentLogDir.isNotEmpty && !_store.keepLogs) {
@@ -282,7 +308,7 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   void resetCurrentResults() {
-    for (var b in _benchmarkStore.benchmarks) {
+    for (var b in _benchmarkStore.allBenchmarks) {
       b.accuracyModeResult = null;
       b.performanceModeResult = null;
     }
@@ -297,7 +323,7 @@ class BenchmarkState extends ChangeNotifier {
       lastResult = ExtendedResult.fromJson(
           jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
       resourceManager.resultManager
-          .restoreResults(lastResult!.results, benchmarks);
+          .restoreResults(lastResult!.results, allBenchmarks);
       _doneRunning = true;
       return;
     } catch (e, trace) {

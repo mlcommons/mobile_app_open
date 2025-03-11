@@ -9,8 +9,8 @@ RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
     iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-RUN curl -fSLo vs_BuildTools.exe https://aka.ms/vs/16/release/vs_buildtools.exe `
-    && start /w vs_BuildTools --quiet --norestart --nocache --wait`
+ADD https://aka.ms/vs/16/release/vs_buildtools.exe vs_BuildTools.exe
+RUN start /w vs_BuildTools --quiet --norestart --nocache --wait`
     --add Microsoft.VisualStudio.Workload.VCTools `
     --add Microsoft.VisualStudio.Component.Windows10SDK.19041 `
     --add Microsoft.VisualStudio.Component.VC.CMake.Project `

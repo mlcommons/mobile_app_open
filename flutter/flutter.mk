@@ -29,7 +29,7 @@ endif
 endif
 
 flutter: flutter/prepare flutter/platform
-flutter/result: flutter/result/json flutter/result/gen-schema
+flutter/result: flutter/result/json
 flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/build-info flutter/firebase-config flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 flutter/test: flutter/test/unit flutter/test/integration
@@ -73,32 +73,11 @@ flutter/backend-list:
 		> flutter/lib/backend/list.gen.dart
 	dart format flutter/lib/backend/list.gen.dart
 
-RESULT_JSON_SAMPLE_PATH?=output/extended_result_example.json
-.PHONY: flutter/result/gen-extended-sample
-flutter/result/gen-extended-sample:
-	cd flutter && \
-		${_start_args} dart run \
-		--define=jsonFileName=../${RESULT_JSON_SAMPLE_PATH} \
-		lib/data/generation_helpers/write_json_sample.main.dart
-
-default_result_json_schema_path=tools/extended_result_schema.json
-RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
-.PHONY: flutter/result/gen-schema
-flutter/result/gen-schema: flutter/result/gen-extended-sample
-	quicktype ${RESULT_JSON_SAMPLE_PATH} \
-		--lang schema \
-		--out ${RESULT_JSON_SCHEMA_PATH}
-	cd flutter && \
-		${_start_args} dart run \
-		--define=schemaPath=../${RESULT_JSON_SCHEMA_PATH} \
-		lib/data/generation_helpers/edit_json_schema.main.dart
-
 .PHONY: flutter/result/json
 flutter/result/json:
 	@echo "Generate .g.dart files for the @JsonSerializable annotation"
-	@# https://github.com/dart-lang/build/issues/2835#issuecomment-1047849076
-	cd flutter && ${_start_args} flutter packages pub get
-	cd flutter && ${_start_args} flutter --no-version-check pub run \
+	cd flutter && ${_start_args} dart pub get
+	cd flutter && ${_start_args} dart run \
 		build_runner build --delete-conflicting-outputs
 
 .PHONY: flutter/build-info
@@ -159,7 +138,7 @@ flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"
 else
 flutter_test_device_arg=
 endif
-flutter_perf_test_arg=--dart-define=enable-perf-test=${PERF_TEST}
+flutter_perf_test_arg=--dart-define=PERF_TEST=${PERF_TEST}
 .PHONY: flutter/test/integration
 flutter/test/integration:
 	cd flutter && ${_start_args} \

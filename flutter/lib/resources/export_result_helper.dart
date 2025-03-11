@@ -35,13 +35,18 @@ class ResultHelper {
       throw 'One of performanceRunInfo or accuracyRunInfo must not be null';
     }
     final commonSettings = runInfo.settings.backend_settings.setting;
+    final performanceModeRunConfig =
+        performanceMode.chooseRunConfig(benchmark.taskConfig);
+    final accuracyModeRunConfig =
+        accuracyMode.chooseRunConfig(benchmark.taskConfig);
+    assert(performanceModeRunConfig == accuracyModeRunConfig);
     return BenchmarkExportResult(
       benchmarkId: benchmark.id,
       benchmarkName: benchmark.taskConfig.name,
       performanceRun: _makeRunResult(performanceRunInfo, performanceMode),
       accuracyRun: _makeRunResult(accuracyRunInfo, accuracyMode),
-      minDuration: benchmark.taskConfig.minDuration,
-      minSamples: benchmark.taskConfig.minQueryCount,
+      minDuration: performanceModeRunConfig.minDuration,
+      minSamples: performanceModeRunConfig.minQueryCount,
       backendInfo: _makeBackendInfo(runInfo.result),
       backendSettings: _makeBackendSettingsInfo(benchmark, commonSettings),
       loadgenScenario: BenchmarkExportResult.parseLoadgenScenario(
