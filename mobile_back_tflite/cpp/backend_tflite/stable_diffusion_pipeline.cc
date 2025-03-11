@@ -80,7 +80,7 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
     LOG(ERROR) << "Cannot get stable_diffusion_num_steps";
     return nullptr;
   }
-  
+
   std::string text_encoder_name = "";
   std::string diffusion_model_name = "";
   std::string decoder_name = "";
