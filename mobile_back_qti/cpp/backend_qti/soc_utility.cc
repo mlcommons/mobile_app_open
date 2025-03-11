@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -66,40 +66,10 @@ std::map<uint32_t, SocInfo> socDetails =
             // hlc,
             // llc,
             // max_cores, needs_rpcmem
-            {415, SocInfo(2, 0, 0, 0, true, qti_settings_sdm888, "SDM888", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {475, SocInfo(2, 0, 0, 0, true, qti_settings_sdm778, "SDM778", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {506, SocInfo(2, 0, 0, 0, true, qti_settings_sd7g1, "SD7G1", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {457, SocInfo(2, 0, 0, 0, true, qti_settings_sd8g1, "SD8G1", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {552, SocInfo(2, 0, 0, 0, true, qti_settings_sd8pg1, "SD8PG1 4G", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {540, SocInfo(2, 0, 0, 0, true, qti_settings_sd8pg1,
-                          "SD8PG1 prime ", 1, std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {530, SocInfo(2, 0, 0, 0, true, qti_settings_sd8pg1, "SD8PG1", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {519, SocInfo(2, 0, 0, 0, true, qti_settings_sd8g2, "SD8G2", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {536, SocInfo(2, 0, 0, 0, true, qti_settings_sd8g2, "SD8G2", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {591, SocInfo(2, 0, 0, 0, true, qti_settings_sd7pg2, "SD7PG2", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
             {435, SocInfo(2, 0, 0, 0, true, qti_settings_sd8cxg3, "SD8cxG3", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {568, SocInfo(0, 0, 1, 0, false, qti_settings_sm4450, "SM4450", 1,
+            {568, SocInfo(0, 0, 1, 0, false, qti_settings_sd4g2, "SD4G2", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
             {538, SocInfo(2, 0, 0, 0, false, qti_settings_sd8cxg3, "SDX_Elite",
@@ -112,12 +82,19 @@ std::map<uint32_t, SocInfo> socDetails =
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true,
                           /* stable_diffusion */ true)},
-            {614, SocInfo(2, 0, 0, 0, true, qti_settings_sm8635, "SM8635", 1,
+            {614, SocInfo(2, 0, 0, 0, true, qti_settings_sd8sg3, "SD8SG3", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
-            {608, SocInfo(2, 0, 0, 0, true, qti_settings_sm7550, "SM7550", 1,
+            {608, SocInfo(2, 0, 0, 0, true, qti_settings_sd7g3, "SD7G3", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true)},
+            {636, SocInfo(2, 0, 0, 0, true, qti_settings_sd7sg3, "SD7SG3", 1,
+                          std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, true)},
+            {618, SocInfo(2, 0, 0, 0, true, qti_settings_sd8elite, "SD8Elite",
+                          1, std::vector<int>({0, 1, 2, 3, 4, 5}),
+                          std::vector<int>({6, 7}), 8, true,
+                          /* stable_diffusion */ true)},
             {UNSUPPORTED_SOC_ID,
              SocInfo(2, 0, 0, 0, true, qti_settings_default_dsp, "Snapdragon",
                      1, std::vector<int>({0, 1, 2, 3}),
@@ -315,9 +292,11 @@ void Socs::soc_info_init() {
 #endif
 
   LOG(INFO) << "Soc ID: " << soc_id;
+  if (socDetails.find(soc_id) == socDetails.end()) {
+    soc_id = UNSUPPORTED_SOC_ID;
+  }
 
   m_soc_info = socDetails.find(soc_id)->second;
-
   if (external_config) {
     LOG(INFO) << "Config settings derived externally from "
                  "//data/local/tmp/external/qti_settings.pbtxt";
