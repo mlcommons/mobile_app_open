@@ -102,17 +102,17 @@ jobs:
           mv /tmp/${SAMSUNG_LIB}/* mobile_back_samsung/samsung/lib/internal/
       - name: Download QTI SDK
         env:
-          QTI_SDK: qairt-2.25.0.240728-linux
+          QTI_SDK: qairt-2.29.0.241129-linux
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.1/${QTI_SDK}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v5.0/${QTI_SDK}.zip /tmp/ && \
           unzip /tmp/${QTI_SDK}.zip -d /tmp/${QTI_SDK} && \
           rm /tmp/${QTI_SDK}.zip && \
           mv /tmp/${QTI_SDK}/* mobile_back_qti/
       - name: Download QTI libraries
         env:
-          QTI_LIB: StableDiffusionShared
+          QTI_LIB: StableDiffusionShared.0.1.1.250124
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.1/${QTI_LIB}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v5.0/${QTI_LIB}.zip /tmp/ && \
           unzip /tmp/${QTI_LIB}.zip -d /tmp/${QTI_LIB} && \
           rm /tmp/${QTI_LIB}.zip && \
           mv /tmp/${QTI_LIB}/* mobile_back_qti/cpp/backend_qti/StableDiffusionShared/
@@ -291,6 +291,7 @@ jobs:
         name: Trigger App Automate
         env:
           BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
           BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
@@ -363,6 +364,7 @@ jobs:
         name: Trigger App Automate
         env:
           BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
           BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
@@ -381,7 +383,7 @@ jobs:
       - build-android-apk
       - test-android-apk-unified
     runs-on: ubuntu-22.04
-    # if: github.ref == 'refs/heads/master'
+    if: vars.DEPLOY_PLAYSTORE == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK

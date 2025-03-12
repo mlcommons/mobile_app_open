@@ -9,7 +9,7 @@ on:
 jobs:
   sonar:
     name: SonarScanner
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 120
     permissions:
       contents: read
@@ -83,3 +83,22 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Scan code
         run: make docker/scanner/scan
+
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java-kotlin, javascript-typescript, python, actions
+          build-mode: none
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
