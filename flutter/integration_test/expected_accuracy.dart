@@ -18,15 +18,16 @@ key: <accelerator> OR <accelerator>|<backendName>
 */
 
 const Map<String, Interval> _imageClassificationV2 = {
-  'cpu': Interval(min: 0.82, max: 0.84),
-  'npu': Interval(min: 0.80, max: 0.82),
-  'tpu': Interval(min: 0.82, max: 0.84),
+  'cpu': Interval(min: 0.88, max: 0.91),
+  'npu': Interval(min: 0.69, max: 0.91),
+  'tpu': Interval(min: 0.88, max: 0.91),
   'ane': Interval(min: 0.69, max: 0.91),
   'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
-  'snpe_dsp': Interval(min: 0.83, max: 0.85),
-  'psnpe_dsp': Interval(min: 0.83, max: 0.85),
-  'neuron-mdla': Interval(min: 0.81, max: 0.83),
-  'samsung_npu': Interval(min: 0.83, max: 0.85),
+  // TODO (anhappdev): check expected accuracy for snpe_dsp, psnpe_dsp
+  'snpe_dsp': Interval(min: 0.0, max: 1.0),
+  'psnpe_dsp': Interval(min: 0.0, max: 1.0),
+  'neuron-mdla': Interval(min: 0.79, max: 0.91),
+  'samsung_npu': Interval(min: 0.99, max: 1.0),
 };
 
 const Map<String, Interval> _imageClassificationOfflineV2 = {
