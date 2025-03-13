@@ -42,10 +42,10 @@ task {
     }
     tiny {
       name: "Imagenet dataset for integration test"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet_tiny.zip"
-      input_checksum: "42cb83d80d0341d6719d68b32322adf2"
-      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/imagenet_tiny-groundtruth.txt"
-      groundtruth_checksum: "cc6d83ca25daeb2475f36c079e53bc26"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v5_0/imagenet_tiny.zip"
+      input_checksum: "2cde6f1d741b9c1834db261ac6e43a6e"
+      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v5_0/imagenet_tiny_val.txt"
+      groundtruth_checksum: "086f99eff3d1b93fd41e7f35498570a7"
     }
   }
   model {
