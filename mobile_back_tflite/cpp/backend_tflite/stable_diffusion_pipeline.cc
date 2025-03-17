@@ -121,9 +121,9 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   }
 
   if (!EmbeddingManager::getInstance().load_timestep_embeddings(
-      ts_embedding_path)) {
+          ts_embedding_path)) {
     LOG(ERROR) << "Failed to load timestep embeddings from "
-        << ts_embedding_path;
+               << ts_embedding_path;
     backend_delete(backend_data);
     return nullptr;
   }
@@ -199,7 +199,7 @@ mlperf_data_t StableDiffusionPipeline::backend_get_input_type(
 
   // Initialize the result with a default type and size
   mlperf_data_t result;
-  result.type = mlperf_data_t::Float32; // Default type, will be updated below
+  result.type = mlperf_data_t::Float32;  // Default type, will be updated below
   result.size = 0;
 
   const TfLiteTensor* tensor = nullptr;
@@ -221,7 +221,7 @@ mlperf_data_t StableDiffusionPipeline::backend_get_input_type(
     result.size = TFLiteNumElements(tensor);
   } else {
     std::cerr << "Failed to retrieve tensor for input index: " << i
-        << std::endl;
+              << std::endl;
   }
 
   return result;
@@ -278,7 +278,7 @@ mlperf_data_t StableDiffusionPipeline::backend_get_output_type(
     result.size = TFLiteNumElements(tensor);
   } else {
     std::cerr << "Failed to retrieve tensor for output index: " << i
-        << std::endl;
+              << std::endl;
   }
 
   return result;
@@ -299,13 +299,11 @@ mlperf_status_t StableDiffusionPipeline::backend_get_output(
 
 void StableDiffusionPipeline::backend_convert_inputs(
     mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
-    uint8_t* data) {
-}
+    uint8_t* data) {}
 
 void StableDiffusionPipeline::backend_convert_outputs(
     mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
-    uint8_t* data) {
-}
+    uint8_t* data) {}
 
 void* StableDiffusionPipeline::backend_get_buffer(size_t n) {
   return ::operator new(n);
