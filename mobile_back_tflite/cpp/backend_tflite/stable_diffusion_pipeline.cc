@@ -1,4 +1,3 @@
-
 #include "stable_diffusion_pipeline.h"
 
 #include <fstream>
@@ -81,23 +80,14 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
     return nullptr;
   }
 
-  std::string text_encoder_name = "";
-  std::string diffusion_model_name = "";
-  std::string decoder_name = "";
-  std::string timestep_embeddings_name = "";
-
-  // Look for custom model filename settings
-  for (int i = 0; i < configs->count; ++i) {
-    if (strcmp(configs->keys[i], "text_encoder_filename") == 0) {
-      text_encoder_name = configs->values[i];
-    } else if (strcmp(configs->keys[i], "diffusion_model_filename") == 0) {
-      diffusion_model_name = configs->values[i];
-    } else if (strcmp(configs->keys[i], "decoder_filename") == 0) {
-      decoder_name = configs->values[i];
-    } else if (strcmp(configs->keys[i], "timestep_embeddings_filename") == 0) {
-      timestep_embeddings_name = configs->values[i];
-    }
-  }
+  std::string text_encoder_name = mlperf::mobile::GetConfigValue(
+      configs, "text_encoder_filename", std::string(""));
+  std::string diffusion_model_name = mlperf::mobile::GetConfigValue(
+      configs, "diffusion_model_filename", std::string(""));
+  std::string decoder_name = mlperf::mobile::GetConfigValue(
+      configs, "decoder_filename", std::string(""));
+  std::string timestep_embeddings_name = mlperf::mobile::GetConfigValue(
+      configs, "timestep_embeddings_filename", std::string(""));
 
   std::string text_encoder_path =
       std::string(model_path) + "/" + text_encoder_name;
@@ -131,9 +121,9 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   }
 
   if (!EmbeddingManager::getInstance().load_timestep_embeddings(
-          ts_embedding_path)) {
+      ts_embedding_path)) {
     LOG(ERROR) << "Failed to load timestep embeddings from "
-               << ts_embedding_path;
+        << ts_embedding_path;
     backend_delete(backend_data);
     return nullptr;
   }
@@ -209,7 +199,7 @@ mlperf_data_t StableDiffusionPipeline::backend_get_input_type(
 
   // Initialize the result with a default type and size
   mlperf_data_t result;
-  result.type = mlperf_data_t::Float32;  // Default type, will be updated below
+  result.type = mlperf_data_t::Float32; // Default type, will be updated below
   result.size = 0;
 
   const TfLiteTensor* tensor = nullptr;
@@ -231,7 +221,7 @@ mlperf_data_t StableDiffusionPipeline::backend_get_input_type(
     result.size = TFLiteNumElements(tensor);
   } else {
     std::cerr << "Failed to retrieve tensor for input index: " << i
-              << std::endl;
+        << std::endl;
   }
 
   return result;
@@ -288,7 +278,7 @@ mlperf_data_t StableDiffusionPipeline::backend_get_output_type(
     result.size = TFLiteNumElements(tensor);
   } else {
     std::cerr << "Failed to retrieve tensor for output index: " << i
-              << std::endl;
+        << std::endl;
   }
 
   return result;
@@ -309,11 +299,13 @@ mlperf_status_t StableDiffusionPipeline::backend_get_output(
 
 void StableDiffusionPipeline::backend_convert_inputs(
     mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
-    uint8_t* data) {}
+    uint8_t* data) {
+}
 
 void StableDiffusionPipeline::backend_convert_outputs(
     mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
-    uint8_t* data) {}
+    uint8_t* data) {
+}
 
 void* StableDiffusionPipeline::backend_get_buffer(size_t n) {
   return ::operator new(n);
