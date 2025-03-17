@@ -154,19 +154,19 @@ benchmark_setting {
     accelerator_name: "npu"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://github.com/RSMNYS/ml_sd_models/releases/download/publish/sd_decoder_dynamic_fp16.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_decoder_dynamic_fp16.tflite"
       model_checksum: "165b70a01643e70a23e5e54a949be306"
     }
     model_file: {
-      model_path: "https://github.com/RSMNYS/ml_sd_models/releases/download/publish/sd_diffusion_model_dynamic_int8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_diffusion_model_dynamic_int8.tflite"
       model_checksum: "ccfd761a2f8186c3669948515d40a880"
     }
     model_file: {
-      model_path: "https://github.com/RSMNYS/ml_sd_models/releases/download/publish/sd_text_encoder_dynamic_int8.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_text_encoder_dynamic_int8.tflite"
       model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
     }
     model_file: {
-      model_path: "https://github.com/RSMNYS/ml_sd_models/releases/download/publish/timestep_embeddings_data.bin.ts"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/timestep_embeddings_data.bin.ts"
       model_checksum: "798b772155a69de5df44b304327bb3cc"
     }
   }
