@@ -9,6 +9,7 @@ RETRY_INTERVAL=10
 # API URLs
 TRIGGER_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/build"
 STATUS_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/builds"
+DEVICES_URL="https://api-cloud.browserstack.com/app-automate/devices"
 
 # Retrieve vars from environment variables
 CREDENTIALS="${BROWSERSTACK_CREDENTIALS:-}"
@@ -24,12 +25,24 @@ if [[ -z "$CREDENTIALS" ]]; then
   exit 1
 fi
 
-if [[ -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" || -z "$DEVICES" ]]; then
+if [[ -z "$PROJECT" ||  -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" || -z "$DEVICES" ]]; then
   echo "Error: Environment variables"\
   "BROWSERSTACK_PROJECT, BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE, BROWSERSTACK_BUILD_TAG and BROWSERSTACK_DEVICES"\
   "must be set."
   exit 1
 fi
+
+# Function to get a list of available devices
+get_available_devices() {
+  local response=$(curl -s -u "$CREDENTIALS" -X GET "$DEVICES_URL")
+  if [[ -z "$response" ]]; then
+    echo "Failed to fetch available devices."
+    return 1
+  fi
+
+  echo "Available devices:"
+  echo "$response" | jq -r '.[] | "Device: " + .device + ", OS Version: " + .os_version'
+}
 
 # Function to trigger the build
 trigger_build() {
@@ -91,6 +104,10 @@ check_build_status() {
 }
 
 # Main
+if [[ "$ACTIONS_RUNNER_DEBUG" == "true" ]]; then
+  get_available_devices
+fi
+
 if ! BUILD_ID=$(trigger_build); then
   echo "Trigger build failed. Message: $BUILD_ID"
   exit 9
