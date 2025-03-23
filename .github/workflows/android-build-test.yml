@@ -298,7 +298,7 @@ jobs:
           BROWSERSTACK_DEVICES: >-
             ["Samsung Galaxy M32-11.0",
             "Samsung Galaxy S24-14.0",
-            "Samsung Galaxy S24 Ultra-14.0",
+            "Samsung Galaxy S25 Ultra-15.0",
             "Samsung Galaxy Tab S10 Plus-14.0",
             "Google Pixel 9 Pro-15.0"]
         with:
@@ -328,7 +328,7 @@ jobs:
           - backend: "mtk"
             device: "Samsung Galaxy Tab S10 Plus-14.0"
           - backend: "qti"
-            device: "Samsung Galaxy S24 Ultra-14.0"
+            device: "Samsung Galaxy S25 Ultra-15.0"
           - backend: "samsung"
             device: "Samsung Galaxy S24-14.0"
     env:
