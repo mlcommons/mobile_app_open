@@ -85,7 +85,10 @@ Future<void> runBenchmarks(WidgetTester tester) async {
 
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
-  await benchmarkState.loadResources(downloadMissing: true);
+  await benchmarkState.loadResources(
+    downloadMissing: true,
+    benchmarks: benchmarkState.activeBenchmarks,
+  );
 
   var goButtonIsPresented =
       await waitFor(tester, downloadTimeout, const Key(WidgetKeys.goButton));

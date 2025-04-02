@@ -1,4 +1,3 @@
-
 #include "stable_diffusion_pipeline.h"
 
 #include <fstream>
@@ -80,13 +79,23 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
     LOG(ERROR) << "Cannot get stable_diffusion_num_steps";
     return nullptr;
   }
-  // Load models from the provided directory path
+
+  std::string text_encoder_name = mlperf::mobile::GetConfigValue(
+      configs, "text_encoder_filename", std::string(""));
+  std::string diffusion_model_name = mlperf::mobile::GetConfigValue(
+      configs, "diffusion_model_filename", std::string(""));
+  std::string decoder_name = mlperf::mobile::GetConfigValue(
+      configs, "decoder_filename", std::string(""));
+  std::string timestep_embeddings_name = mlperf::mobile::GetConfigValue(
+      configs, "timestep_embeddings_filename", std::string(""));
+
   std::string text_encoder_path =
-      std::string(model_path) + "/sd_text_encoder_dynamic.tflite";
+      std::string(model_path) + "/" + text_encoder_name;
   std::string sd_model_path =
-      std::string(model_path) + "/sd_diffusion_model_dynamic.tflite";
-  std::string decoder_path =
-      std::string(model_path) + "/sd_decoder_dynamic.tflite";
+      std::string(model_path) + "/" + diffusion_model_name;
+  std::string decoder_path = std::string(model_path) + "/" + decoder_name;
+  std::string ts_embedding_path =
+      std::string(model_path) + "/" + timestep_embeddings_name;
 
   backend_data->text_encoder_model =
       TfLiteModelCreateFromFile(text_encoder_path.c_str());
@@ -111,8 +120,6 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
     return nullptr;
   }
 
-  std::string ts_embedding_path =
-      std::string(model_path) + "/timestep_embeddings_data.bin.ts";
   if (!EmbeddingManager::getInstance().load_timestep_embeddings(
           ts_embedding_path)) {
     LOG(ERROR) << "Failed to load timestep embeddings from "
