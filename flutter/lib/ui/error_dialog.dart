@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
+import 'package:mlperfbench/ui/settings/resources_screen.dart';
 
 enum DialogTypeEnum { error, warning, success }
 
@@ -75,9 +76,63 @@ Future<void> showErrorDialog(
       context, DialogTypeEnum.error, l10n.dialogTitleError, messages);
 }
 
+Future<void> showResourceErrorDialog(
+    BuildContext context, List<String> messages) async {
+  final l10n = AppLocalizations.of(context)!;
+  
+  Icon icon = const Icon(Icons.error, color: Colors.red);
+  Color titleColor = Colors.red;
+
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        backgroundColor: AppColors.dialogBackground,
+        titlePadding: const EdgeInsets.all(10),
+        contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(l10n.dialogTitleError, style: TextStyle(color: titleColor)),
+            Align(alignment: Alignment.topRight, child: icon),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: [
+              ...messages.map((e) => Text(
+                    e,
+                    style: const TextStyle(fontSize: 14),
+                  ))
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.dialogOk),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ResourcesScreen(),
+                ),
+              );
+            },
+            child: Text(l10n.resourceDownload),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 Future<void> showSuccessDialog(
     BuildContext context, List<String> messages) async {
   final l10n = AppLocalizations.of(context)!;
   await _showPopupDialog(
       context, DialogTypeEnum.success, l10n.dialogTitleSuccess, messages);
-}
+} 
