@@ -120,12 +120,12 @@ Future<void> showErrorDialog(
       context, DialogTypeEnum.error, l10n.dialogTitleError, messages);
 }
 
-Future<void> showResourceErrorDialog(
+Future<void> showResourceMissingDialog(
     BuildContext context, List<String> messages) async {
   final l10n = AppLocalizations.of(context)!;
 
-  Icon icon = const Icon(Icons.error_outline, color: Colors.red, size: 32);
-  Color titleColor = Colors.red;
+  Icon icon = const Icon(Icons.info_outline, color: Colors.grey, size: 32);
+  Color titleColor = Colors.grey;
 
   await showDialog(
     context: context,
@@ -145,7 +145,7 @@ Future<void> showResourceErrorDialog(
               children: [
                 Flexible(
                   child: Text(
-                    l10n.dialogTitleError,
+                    l10n.dialogTitleWarning,
                     style: TextStyle(
                       color: titleColor,
                       fontWeight: FontWeight.bold,
