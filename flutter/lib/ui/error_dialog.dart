@@ -35,17 +35,17 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
     builder: (context) {
       return AlertDialog(
         backgroundColor: AppColors.dialogBackground,
-        titlePadding: const EdgeInsets.all(15),
-        contentPadding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+        titlePadding: const EdgeInsets.all(12),
+        contentPadding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(12),
         ),
         title: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
+                Flexible(
                   child: Text(
                     title,
                     style: TextStyle(
@@ -58,7 +58,7 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
                 icon,
               ],
             ),
-            const Divider(color: Colors.grey, height: 20),
+            const Divider(color: Colors.grey, height: 12),
           ],
         ),
         content: SingleChildScrollView(
@@ -143,7 +143,7 @@ Future<void> showResourceErrorDialog(
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
+                Flexible(
                   child: Text(
                     l10n.dialogTitleError,
                     style: TextStyle(
@@ -175,7 +175,7 @@ Future<void> showResourceErrorDialog(
                   children: [
                     const Icon(Icons.info_outline, color: Colors.amber),
                     const SizedBox(width: 10),
-                    Expanded(
+                    Flexible(
                       child: Text(
                         l10n.dialogContentMissingFilesHint,
                         style: const TextStyle(
