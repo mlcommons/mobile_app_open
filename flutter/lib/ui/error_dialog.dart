@@ -79,8 +79,8 @@ Future<void> showErrorDialog(
 Future<void> showResourceErrorDialog(
     BuildContext context, List<String> messages) async {
   final l10n = AppLocalizations.of(context)!;
-  
-  Icon icon = const Icon(Icons.error, color: Colors.red);
+
+  Icon icon = const Icon(Icons.error_outline, color: Colors.red, size: 32);
   Color titleColor = Colors.red;
 
   await showDialog(
@@ -89,40 +89,105 @@ Future<void> showResourceErrorDialog(
     builder: (context) {
       return AlertDialog(
         backgroundColor: AppColors.dialogBackground,
-        titlePadding: const EdgeInsets.all(10),
-        contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        titlePadding: const EdgeInsets.all(12),
+        contentPadding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        title: Column(
           children: [
-            Text(l10n.dialogTitleError, style: TextStyle(color: titleColor)),
-            Align(alignment: Alignment.topRight, child: icon),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.dialogTitleError,
+                    style: TextStyle(
+                      color: titleColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                icon,
+              ],
+            ),
+            const Divider(color: Colors.grey, height: 12),
           ],
         ),
         content: SingleChildScrollView(
-          child: ListBody(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ...messages.map((e) => Text(
-                    e,
-                    style: const TextStyle(fontSize: 14),
-                  ))
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.amber, width: 1),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: Colors.amber),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        l10n.dialogContentMissingFilesHint,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              ...messages.map((e) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      e,
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  )),
             ],
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.dialogOk),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ResourcesScreen(),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey[700],
+                  ),
+                  child: Text(l10n.dialogOk),
                 ),
-              );
-            },
-            child: Text(l10n.resourceDownload),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.download, size: 18),
+                  label: Text(l10n.resourceDownload),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const ResourcesScreen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       );
@@ -135,4 +200,4 @@ Future<void> showSuccessDialog(
   final l10n = AppLocalizations.of(context)!;
   await _showPopupDialog(
       context, DialogTypeEnum.success, l10n.dialogTitleSuccess, messages);
-} 
+}
