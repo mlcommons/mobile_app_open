@@ -10,19 +10,21 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
     String title, List<String> messages) async {
   final l10n = AppLocalizations.of(context)!;
 
-  Icon? icon;
-  Color titleColor;
+  late Icon icon;
+  late Color titleColor;
   switch (type) {
     case DialogTypeEnum.error:
-      icon = const Icon(Icons.error, color: Colors.red);
+      icon = const Icon(Icons.error_outline, color: Colors.red, size: 32);
       titleColor = Colors.red;
       break;
     case DialogTypeEnum.warning:
-      icon = const Icon(Icons.warning, color: Colors.yellow);
-      titleColor = Colors.yellow;
+      icon = const Icon(Icons.warning_amber_outlined,
+          color: Colors.amber, size: 32);
+      titleColor = Colors.amber;
       break;
     case DialogTypeEnum.success:
-      icon = const Icon(Icons.done, color: Colors.green);
+      icon =
+          const Icon(Icons.check_circle_outline, color: Colors.green, size: 32);
       titleColor = Colors.green;
       break;
   }
@@ -33,29 +35,71 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
     builder: (context) {
       return AlertDialog(
         backgroundColor: AppColors.dialogBackground,
-        titlePadding: const EdgeInsets.all(10),
-        contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        titlePadding: const EdgeInsets.all(15),
+        contentPadding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        title: Column(
           children: [
-            Text(title, style: TextStyle(color: titleColor)),
-            Align(alignment: Alignment.topRight, child: icon),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: titleColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                icon,
+              ],
+            ),
+            const Divider(color: Colors.grey, height: 20),
           ],
         ),
         content: SingleChildScrollView(
-          child: ListBody(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ...messages.map((e) => Text(
-                    e,
-                    style: const TextStyle(fontSize: 14),
-                  ))
+              ...messages.map((e) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      e,
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  )),
             ],
           ),
         ),
         actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.dialogOk))
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: type == DialogTypeEnum.error
+                        ? Colors.red
+                        : type == DialogTypeEnum.warning
+                            ? Colors.amber
+                            : Colors.green,
+                    foregroundColor: Colors.white,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                  child: Text(l10n.dialogOk),
+                ),
+              ],
+            ),
+          ),
         ],
       );
     },
