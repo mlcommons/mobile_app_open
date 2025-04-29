@@ -20,10 +20,10 @@ void main() {
 
   final prefs = <String, Object>{
     StoreConstants.selectedBenchmarkRunMode:
-        BenchmarkRunModeEnum.integrationTestRun.name,
+        BenchmarkRunModeEnum.quickRun.name,
     StoreConstants.cooldown: true,
     StoreConstants.cooldownDuration:
-        BenchmarkRunModeEnum.integrationTestRun.cooldownDuration,
+        BenchmarkRunModeEnum.quickRun.cooldownDuration,
   };
   SharedPreferences.setMockInitialValues(prefs);
 
