@@ -23,7 +23,7 @@ void main() {
         BenchmarkRunModeEnum.performanceOnly.name,
     StoreConstants.cooldown: true,
     StoreConstants.cooldownDuration:
-        BenchmarkRunModeEnum.performanceOnly.cooldownDuration,
+        BenchmarkRunModeEnum.quickRun.cooldownDuration,
   };
   SharedPreferences.setMockInitialValues(prefs);
 
