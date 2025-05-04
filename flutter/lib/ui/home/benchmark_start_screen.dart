@@ -120,11 +120,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                         l10n.dialogContentMissingFiles);
                 if (wrongPathError.isNotEmpty) {
                   if (!context.mounted) return;
-                  final messages = [
-                    wrongPathError,
-                    l10n.dialogContentMissingFilesHint
-                  ];
-                  await showErrorDialog(context, messages);
+                  await showResourceMissingDialog(context, [wrongPathError]);
                   return;
                 }
                 final checksumError = await state.validator
