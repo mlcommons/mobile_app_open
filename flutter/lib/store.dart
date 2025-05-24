@@ -31,7 +31,7 @@ class Store extends ChangeNotifier {
 
   BenchmarkRunModeEnum get selectedBenchmarkRunMode {
     String name = _getString(StoreConstants.selectedBenchmarkRunMode);
-    if (name == '') name = BenchmarkRunModeEnum.performanceOnly.name;
+    if (name == '') name = BenchmarkRunModeEnum.quickRun.name;
     return BenchmarkRunModeEnum.values.byName(name);
   }
 
