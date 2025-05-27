@@ -37,15 +37,15 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     final children = <Widget>[];
 
     for (var benchmark in state.allBenchmarks) {
-      children.add(_listTileBuilder(benchmark));
-      children.add(const Divider(height: 20));
+      children.addAll([_listTileBuilder(benchmark), const Divider(height: 20)]);
     }
-    children.add(const SizedBox(height: 20));
-    children.add(_downloadProgress());
-    children
-        .add(_downloadButton(state.allBenchmarks, l10n.resourceDownloadAll));
-    children.add(const SizedBox(height: 20));
-    children.add(_clearCacheButton());
+    children.addAll([
+      const SizedBox(height: 20),
+      _downloadProgress(),
+      _downloadButton(state.allBenchmarks, l10n.resourceDownloadAll),
+      const SizedBox(height: 20),
+      _clearCacheButton(),
+    ]);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.menuResources)),
@@ -167,63 +167,63 @@ class _ResourcesScreen extends State<ResourcesScreen> {
   }
 
   Widget _downloadButton(List<Benchmark> benchmarks, String title) {
-    return AbsorbPointer(
-      absorbing: downloading,
-      child: ElevatedButton(
-        onPressed: () async {
-          await state.loadResources(
-            downloadMissing: true,
-            benchmarks: benchmarks,
-          );
-          if (state.error != null) {
-            if (!mounted) return;
-            await showErrorDialog(context, <String>[state.error.toString()]);
-            // Reset both the error and stacktrace for further operation
-            state.error = null;
-            state.stackTrace = null;
-          }
-        },
-        style: ElevatedButton.styleFrom(
-            backgroundColor: downloading ? Colors.grey : Colors.blue),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(title),
-        ),
-      ),
+    return TextButton(
+      onPressed: downloading
+          ? null
+          : () async {
+              await state.loadResources(
+                downloadMissing: true,
+                benchmarks: benchmarks,
+              );
+              if (state.error != null) {
+                if (!mounted) return;
+                await showErrorDialog(
+                    context, <String>[state.error.toString()]);
+                // Reset both the error and stacktrace for further operation
+                state.error = null;
+                state.stackTrace = null;
+              }
+            },
+      style: _downloadButtonStyle,
+      child: Text(title),
     );
   }
 
   Widget _clearCacheButton() {
-    return AbsorbPointer(
-      absorbing: downloading,
-      child: ElevatedButton(
-        onPressed: () async {
-          final dialogAction =
-              await showConfirmDialog(context, l10n.settingsClearCacheConfirm);
-          switch (dialogAction) {
-            case ConfirmDialogAction.ok:
-              await state.clearCache();
-              BotToast.showSimpleNotification(
-                title: l10n.settingsClearCacheFinished,
-                hideCloseButton: true,
-              );
-              break;
-            case ConfirmDialogAction.cancel:
-              break;
-            default:
-              break;
-          }
-        },
-        style: ElevatedButton.styleFrom(
-            backgroundColor: downloading ? Colors.grey : Colors.red),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(l10n.resourceClearAll),
-        ),
-      ),
+    return TextButton(
+      onPressed: downloading
+          ? null
+          : () async {
+              final dialogAction = await showConfirmDialog(
+                  context, l10n.settingsClearCacheConfirm);
+              switch (dialogAction) {
+                case ConfirmDialogAction.ok:
+                  await state.clearCache();
+                  BotToast.showSimpleNotification(
+                    title: l10n.settingsClearCacheFinished,
+                    hideCloseButton: true,
+                  );
+                  break;
+                case ConfirmDialogAction.cancel:
+                  break;
+                default:
+                  break;
+              }
+            },
+      style: _clearButtonStyle,
+      child: Text(l10n.resourceClearAll),
     );
   }
 }
+
+const ButtonStyle _downloadButtonStyle = ButtonStyle(
+    backgroundColor: WidgetStateColor.fromMap(
+        {WidgetState.disabled: Colors.grey, WidgetState.any: Colors.blue}),
+    foregroundColor: WidgetStatePropertyAll(Colors.white));
+const ButtonStyle _clearButtonStyle = ButtonStyle(
+    backgroundColor: WidgetStateColor.fromMap(
+        {WidgetState.disabled: Colors.grey, WidgetState.any: Colors.red}),
+    foregroundColor: WidgetStatePropertyAll(Colors.white));
 
 class _ResourcesTable extends StatelessWidget {
   final String taskName;
