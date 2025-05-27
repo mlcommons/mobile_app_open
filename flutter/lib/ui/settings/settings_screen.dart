@@ -93,7 +93,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     return Slider(
       value: store.cooldownDuration.toDouble(),
       min: 0,
-      max: 10 * 60,
+      max: 30 * 60,
       divisions: null,
       label: store.cooldownDuration.toString(),
       onChanged: store.cooldown
