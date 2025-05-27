@@ -82,7 +82,7 @@ Future<void> autostartHandler(BenchmarkState state, Store store) async {
     store.selectedBenchmarkRunMode =
         const bool.fromEnvironment('submission', defaultValue: false)
             ? BenchmarkRunModeEnum.submissionRun
-            : BenchmarkRunModeEnum.performanceOnly;
+            : BenchmarkRunModeEnum.quickRun;
     store.offlineMode =
         const bool.fromEnvironment('offline', defaultValue: false);
     await state.runBenchmarks();
