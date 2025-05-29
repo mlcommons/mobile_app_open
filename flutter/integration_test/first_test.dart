@@ -52,8 +52,7 @@ void main() {
     testWidgets('check results', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       printResults(extendedResult);
-      // TODO (anhappdev) uncomment when stable_diffusion is implemented for all backends.
-      // checkTaskCount(extendedResult);
+      checkTaskCount(extendedResult, benchmarkIds.length);
       checkTasks(extendedResult);
     });
 
@@ -64,9 +63,8 @@ void main() {
   });
 }
 
-void checkTaskCount(ExtendedResult extendedResult) {
+void checkTaskCount(ExtendedResult extendedResult, int expectedTasksCount) {
   final tasksCount = extendedResult.results.length;
-  final expectedTasksCount = BenchmarkId.allIds.length;
   expect(tasksCount, expectedTasksCount, reason: 'tasks count does not match');
 }
 
