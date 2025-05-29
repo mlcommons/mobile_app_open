@@ -356,7 +356,7 @@ jobs:
     needs:
       - build-android-apk
       - test-android-apk-unified
-    if: failure()
+    if: needs.build-android-apk.result == 'success' && needs.test-android-apk-unified.result == 'failure'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
