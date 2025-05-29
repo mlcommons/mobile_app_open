@@ -44,6 +44,8 @@ void main() {
       await validateSettings(tester);
       await setBenchmarks(tester, benchmarkIds);
       await downloadResources(tester);
+      print('Wait 1 minute before running benchmarks');
+      await Future.delayed(const Duration(minutes: 1));
       await runBenchmarks(tester);
     });
 
