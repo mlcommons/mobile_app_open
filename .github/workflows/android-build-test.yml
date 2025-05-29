@@ -255,11 +255,13 @@ jobs:
           if-no-files-found: error
 
   test-android-apk-unified:
+    name: test-android-apk-unified (${{ matrix.benchmark_group.name }})
     needs: build-android-apk
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         benchmark_group:
           - name: "image_classification_v2"
