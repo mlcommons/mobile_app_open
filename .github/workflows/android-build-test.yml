@@ -258,9 +258,26 @@ jobs:
     needs: build-android-apk
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        benchmark_group:
+          - name: "image_classification_v2"
+            ids: "image_classification_v2"
+          - name: "object_detection"
+            ids: "object_detection"
+          - name: "image_segmentation_v2"
+            ids: "image_segmentation_v2"
+          - name: "natural_language_processing"
+            ids: "natural_language_processing"
+          - name: "super_resolution"
+            ids: "super_resolution"
+          - name: "image_classification_offline_v2"
+            ids: "image_classification_offline_v2"
     env:
       MAIN_APK_NAME: test-main-unified-${{ github.run_number }}.apk
       HELPER_APK_NAME: test-helper-unified-${{ github.run_number }}.apk
+      BENCHMARK_IDS: ${{ matrix.benchmark_group.ids }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
@@ -288,13 +305,13 @@ jobs:
           -F "file=@/tmp/$HELPER_APK_NAME" \
           -F "custom_id=$HELPER_APK_NAME"
       - uses: nick-fields/retry@v3
-        name: Trigger App Automate
+        name: Trigger App Automate for ${{ matrix.benchmark_group.name }}
         env:
           BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
           BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
-          BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
+          BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}-${{ matrix.benchmark_group.name }}
           BROWSERSTACK_DEVICES: >-
             ["Samsung Galaxy M32-11.0",
             "Samsung Galaxy S24-14.0",
