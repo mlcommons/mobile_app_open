@@ -138,7 +138,7 @@ flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"
 else
 flutter_test_device_arg=
 endif
-flutter_perf_test_arg=--dart-define=PERF_TEST=${PERF_TEST}
+flutter_perf_test_arg=--dart-define=PERF_TEST=${PERF_TEST} --dart-define=BENCHMARK_IDS=${BENCHMARK_IDS}
 .PHONY: flutter/test/integration
 flutter/test/integration:
 	cd flutter && ${_start_args} \

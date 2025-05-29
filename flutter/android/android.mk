@@ -100,11 +100,13 @@ flutter_android_apk_test_main_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDRO
 .PHONY: flutter/android/test-apk/main
 flutter/android/test-apk/main:
 	mkdir -p $$(dirname ${flutter_android_apk_test_main_path})
-	flutter_android_apk_test_perf_arg=$$(printf PERF_TEST=${PERF_TEST} | base64) && \
+	flutter_android_apk_perf_test_arg=$$(printf PERF_TEST=${PERF_TEST} | base64) && \
+	flutter_android_apk_benchmark_ids_arg=$$(printf BENCHMARK_IDS=${BENCHMARK_IDS} | base64) && \
 		cd flutter/android && \
 		./gradlew app:assembleDebug \
 		-Ptarget=integration_test/first_test.dart \
-		-Pdart-defines=$${flutter_android_apk_test_perf_arg}
+		-Pdart-defines=$${flutter_android_apk_perf_test_arg} \
+		-Pdart-defines=$${flutter_android_apk_benchmark_ids_arg}
 	cp -f flutter/build/app/outputs/apk/debug/app-debug.apk ${flutter_android_apk_test_main_path}
 
 FLUTTER_ANDROID_APK_TEST_HELPER?=test-helper.apk

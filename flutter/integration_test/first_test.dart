@@ -29,6 +29,10 @@ void main() {
   // Get benchmark IDs from environment variables
   const benchmarkIdsStr =
       String.fromEnvironment('BENCHMARK_IDS', defaultValue: '');
+
+  print('benchmarkIdsStr: $benchmarkIdsStr');
+  if (benchmarkIdsStr.isEmpty) return;
+
   var benchmarkIds = BenchmarkId.allIds;
   if (benchmarkIdsStr.isNotEmpty) {
     benchmarkIds = benchmarkIdsStr.split(',');
