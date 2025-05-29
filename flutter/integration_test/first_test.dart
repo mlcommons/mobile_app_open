@@ -43,6 +43,7 @@ void main() {
       await startApp(tester);
       await validateSettings(tester);
       await setBenchmarks(tester, benchmarkIds);
+      await downloadResources(tester);
       await runBenchmarks(tester);
     });
 

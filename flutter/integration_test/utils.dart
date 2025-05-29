@@ -81,9 +81,8 @@ Future<void> setBenchmarks(
   }
 }
 
-Future<void> runBenchmarks(WidgetTester tester) async {
+Future<void> downloadResources(WidgetTester tester) async {
   const downloadTimeout = 20 * 60; // 20 minutes
-  const runBenchmarkTimeout = 30 * 60; // 30 minutes
 
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
@@ -91,18 +90,19 @@ Future<void> runBenchmarks(WidgetTester tester) async {
     downloadMissing: true,
     benchmarks: benchmarkState.activeBenchmarks,
   );
-
   var goButtonIsPresented =
       await waitFor(tester, downloadTimeout, const Key(WidgetKeys.goButton));
-
   expect(goButtonIsPresented, true,
       reason: 'Problems with downloading of datasets or models');
+}
+
+Future<void> runBenchmarks(WidgetTester tester) async {
+  const runBenchmarkTimeout = 30 * 60; // 30 minutes
+
   final goButton = find.byKey(const Key(WidgetKeys.goButton));
   await tester.tap(goButton);
-
   var totalScoreIsPresented = await waitFor(
       tester, runBenchmarkTimeout, const Key(WidgetKeys.totalScoreCircle));
-
   expect(totalScoreIsPresented, true, reason: 'Result screen is not presented');
 }
 
