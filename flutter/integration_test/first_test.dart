@@ -18,11 +18,11 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
+  const runMode = BenchmarkRunModeEnum.integrationTestRun;
   final prefs = <String, Object>{
-    StoreConstants.selectedBenchmarkRunMode: BenchmarkRunModeEnum.quickRun.name,
+    StoreConstants.selectedBenchmarkRunMode: runMode.name,
     StoreConstants.cooldown: true,
-    StoreConstants.cooldownDuration:
-        BenchmarkRunModeEnum.quickRun.cooldownDuration,
+    StoreConstants.cooldownDuration: runMode.cooldownDuration,
   };
   SharedPreferences.setMockInitialValues(prefs);
 
