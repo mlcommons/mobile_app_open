@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mlperfbench/app_constants.dart';
+import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
@@ -64,17 +65,19 @@ Future<void> validateSettings(WidgetTester tester) async {
   }
 }
 
-Future<void> setBenchmarks(WidgetTester tester) async {
+Future<void> setBenchmarks(
+  WidgetTester tester,
+  List<String> activeBenchmarks,
+) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
   for (var benchmark in benchmarkState.allBenchmarks) {
-    // Disable test for stable diffusion since it take too long to finish.
-    if (benchmark.id == BenchmarkId.stableDiffusion) {
-      benchmark.isActive = false;
-      print('Benchmark ${benchmark.id} is disabled');
-    } else {
+    if (activeBenchmarks.contains(benchmark.id)) {
       benchmark.isActive = true;
       print('Benchmark ${benchmark.id} is enabled');
+    } else {
+      benchmark.isActive = false;
+      print('Benchmark ${benchmark.id} is disabled');
     }
   }
 }

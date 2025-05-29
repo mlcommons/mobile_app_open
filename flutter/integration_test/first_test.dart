@@ -19,19 +19,27 @@ void main() {
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
   final prefs = <String, Object>{
-    StoreConstants.selectedBenchmarkRunMode:
-        BenchmarkRunModeEnum.integrationTestRun.name,
+    StoreConstants.selectedBenchmarkRunMode: BenchmarkRunModeEnum.quickRun.name,
     StoreConstants.cooldown: true,
     StoreConstants.cooldownDuration:
-        BenchmarkRunModeEnum.integrationTestRun.cooldownDuration,
+        BenchmarkRunModeEnum.quickRun.cooldownDuration,
   };
   SharedPreferences.setMockInitialValues(prefs);
 
-  group('integration tests', () {
+  // Get benchmark IDs from environment variables
+  const benchmarkIdsStr =
+      String.fromEnvironment('BENCHMARK_IDS', defaultValue: '');
+  var benchmarkIds = BenchmarkId.allIds;
+  if (benchmarkIdsStr.isNotEmpty) {
+    benchmarkIds = benchmarkIdsStr.split(',');
+  }
+  print('Running benchmarks: $benchmarkIds');
+
+  group('integration tests for benchmarks: $benchmarkIds', () {
     testWidgets('run benchmarks', (WidgetTester tester) async {
       await startApp(tester);
       await validateSettings(tester);
-      await setBenchmarks(tester);
+      await setBenchmarks(tester, benchmarkIds);
       await runBenchmarks(tester);
     });
 
