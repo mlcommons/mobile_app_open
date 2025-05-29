@@ -31,7 +31,10 @@ void main() {
       String.fromEnvironment('BENCHMARK_IDS', defaultValue: '');
 
   print('benchmarkIdsStr: $benchmarkIdsStr');
-  if (benchmarkIdsStr.isEmpty) return;
+  expect(benchmarkIdsStr, isNotEmpty);
+  if (benchmarkIdsStr.isEmpty) {
+    throw 'benchmarkIdsStr is empty';
+  }
 
   var benchmarkIds = BenchmarkId.allIds;
   if (benchmarkIdsStr.isNotEmpty) {
