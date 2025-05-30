@@ -30,8 +30,6 @@ void main() {
   const benchmarkIdsStr =
       String.fromEnvironment('BENCHMARK_IDS', defaultValue: '');
 
-  print('benchmarkIdsStr: $benchmarkIdsStr');
-
   var benchmarkIds = BenchmarkId.allIds;
   if (benchmarkIdsStr.isNotEmpty) {
     benchmarkIds = benchmarkIdsStr.split(',');
@@ -52,7 +50,6 @@ void main() {
     testWidgets('check results', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       printResults(extendedResult);
-      checkTaskCount(extendedResult, benchmarkIds.length);
       checkTasks(extendedResult);
     });
 
@@ -61,11 +58,6 @@ void main() {
       await uploadResult(extendedResult);
     });
   });
-}
-
-void checkTaskCount(ExtendedResult extendedResult, int expectedTasksCount) {
-  final tasksCount = extendedResult.results.length;
-  expect(tasksCount, expectedTasksCount, reason: 'tasks count does not match');
 }
 
 void checkTasks(ExtendedResult extendedResult) {

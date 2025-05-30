@@ -200,7 +200,7 @@ extension BenchmarkRunModeEnumExtension on BenchmarkRunModeEnum {
       case BenchmarkRunModeEnum.quickRun:
         return 1 * 60;
       case BenchmarkRunModeEnum.integrationTestRun:
-        return 5;
+        return 1 * 60;
     }
   }
 }
