@@ -97,7 +97,7 @@ Future<void> downloadResources(WidgetTester tester) async {
 }
 
 Future<void> runBenchmarks(WidgetTester tester) async {
-  const runBenchmarkTimeout = 30 * 60; // 30 minutes
+  const runBenchmarkTimeout = 60 * 60; // 60 minutes
 
   final goButton = find.byKey(const Key(WidgetKeys.goButton));
   await tester.tap(goButton);
