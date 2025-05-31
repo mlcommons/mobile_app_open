@@ -128,8 +128,8 @@ extension BenchmarkRunModeEnumExtension on BenchmarkRunModeEnum {
         mode.chooseRunConfig = (pb.TaskConfig t) => t.runs.quick;
         break;
       case BenchmarkRunModeEnum.integrationTestRun:
-        mode.chooseDataset = (pb.TaskConfig t) => t.datasets.tiny;
-        mode.chooseRunConfig = (pb.TaskConfig t) => t.runs.rapid;
+        mode.chooseDataset = (pb.TaskConfig t) => t.datasets.lite;
+        mode.chooseRunConfig = (pb.TaskConfig t) => t.runs.quick;
         break;
     }
     return mode;
@@ -159,7 +159,7 @@ extension BenchmarkRunModeEnumExtension on BenchmarkRunModeEnum {
         break;
       case BenchmarkRunModeEnum.integrationTestRun:
         mode.chooseDataset = (pb.TaskConfig t) => t.datasets.tiny;
-        mode.chooseRunConfig = (pb.TaskConfig t) => t.runs.rapid;
+        mode.chooseRunConfig = (pb.TaskConfig t) => t.runs.quick;
         break;
     }
     return mode;
@@ -200,7 +200,7 @@ extension BenchmarkRunModeEnumExtension on BenchmarkRunModeEnum {
       case BenchmarkRunModeEnum.quickRun:
         return 1 * 60;
       case BenchmarkRunModeEnum.integrationTestRun:
-        return 5;
+        return 1 * 60;
     }
   }
 }

@@ -180,13 +180,13 @@ void main() {
         benchmarks: activeBenchmarks,
       );
 
-      expect(resources.length, 2);
+      expect(resources.length, 3);
       expect(
           resources,
           contains(Resource(
             type: ResourceTypeEnum.datasetData,
-            path: task1.datasets.tiny.inputPath,
-            md5Checksum: task1.datasets.tiny.inputChecksum,
+            path: task1.datasets.lite.inputPath,
+            md5Checksum: task1.datasets.lite.inputChecksum,
           )));
       expect(
           resources,

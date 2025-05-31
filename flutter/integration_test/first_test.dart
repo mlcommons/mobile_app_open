@@ -18,28 +18,38 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
+  const runMode = BenchmarkRunModeEnum.integrationTestRun;
   final prefs = <String, Object>{
-    StoreConstants.selectedBenchmarkRunMode:
-        BenchmarkRunModeEnum.integrationTestRun.name,
+    StoreConstants.selectedBenchmarkRunMode: runMode.name,
     StoreConstants.cooldown: true,
-    StoreConstants.cooldownDuration:
-        BenchmarkRunModeEnum.integrationTestRun.cooldownDuration,
+    StoreConstants.cooldownDuration: runMode.cooldownDuration,
   };
   SharedPreferences.setMockInitialValues(prefs);
 
-  group('integration tests', () {
+  // Get benchmark IDs from environment variables
+  const benchmarkIdsStr =
+      String.fromEnvironment('BENCHMARK_IDS', defaultValue: '');
+
+  var benchmarkIds = BenchmarkId.allIds;
+  if (benchmarkIdsStr.isNotEmpty) {
+    benchmarkIds = benchmarkIdsStr.split(',');
+  }
+  print('Running benchmarks: $benchmarkIds');
+
+  group('integration tests for benchmarks: $benchmarkIds', () {
     testWidgets('run benchmarks', (WidgetTester tester) async {
       await startApp(tester);
       await validateSettings(tester);
-      await setBenchmarks(tester);
+      await setBenchmarks(tester, benchmarkIds);
+      await downloadResources(tester);
+      print('Wait 1 minute before running benchmarks');
+      await Future.delayed(const Duration(minutes: 1));
       await runBenchmarks(tester);
     });
 
     testWidgets('check results', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       printResults(extendedResult);
-      // TODO (anhappdev) uncomment when stable_diffusion is implemented for all backends.
-      // checkTaskCount(extendedResult);
       checkTasks(extendedResult);
     });
 
@@ -48,12 +58,6 @@ void main() {
       await uploadResult(extendedResult);
     });
   });
-}
-
-void checkTaskCount(ExtendedResult extendedResult) {
-  final tasksCount = extendedResult.results.length;
-  final expectedTasksCount = BenchmarkId.allIds.length;
-  expect(tasksCount, expectedTasksCount, reason: 'tasks count does not match');
 }
 
 void checkTasks(ExtendedResult extendedResult) {
