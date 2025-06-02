@@ -216,14 +216,28 @@ class _ResourcesScreen extends State<ResourcesScreen> {
   }
 }
 
-const ButtonStyle _downloadButtonStyle = ButtonStyle(
-    backgroundColor: MaterialStateColor.fromMap(
-        {MaterialState.disabled: Colors.grey, MaterialState.any: Colors.blue}),
-    foregroundColor: MaterialStatePropertyAll(Colors.white));
-const ButtonStyle _clearButtonStyle = ButtonStyle(
-    backgroundColor: MaterialStateColor.fromMap(
-        {MaterialState.disabled: Colors.grey, MaterialState.any: Colors.red}),
-    foregroundColor: MaterialStatePropertyAll(Colors.white));
+ButtonStyle _downloadButtonStyle = ButtonStyle(
+  backgroundColor: ResourceButtonColor(),
+  foregroundColor: const MaterialStatePropertyAll(Colors.white),
+);
+
+ButtonStyle _clearButtonStyle = ButtonStyle(
+  backgroundColor: ResourceButtonColor(defaultColor: Colors.red),
+  foregroundColor: const MaterialStatePropertyAll(Colors.white),
+);
+
+class ResourceButtonColor extends MaterialStateColor {
+  ResourceButtonColor({this.defaultColor = Colors.blue})
+      : super(defaultColor.value);
+
+  final Color defaultColor;
+
+  @override
+  Color resolve(Set<MaterialState> states) {
+    if (states.contains(MaterialState.disabled)) return Colors.grey;
+    return defaultColor;
+  }
+}
 
 class _ResourcesTable extends StatelessWidget {
   final String taskName;
