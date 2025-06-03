@@ -67,10 +67,6 @@ void testBenchmarks(List<String> benchmarkIds) {
       final extendedResult = await obtainResult();
       await uploadResult(extendedResult);
     });
-
-    testWidgets('clear result', (WidgetTester tester) async {
-      await clearResult(tester);
-    });
   });
 }
 

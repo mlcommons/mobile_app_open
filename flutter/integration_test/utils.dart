@@ -94,11 +94,17 @@ Future<void> runBenchmarks(WidgetTester tester) async {
   const runBenchmarkTimeout = 60 * 60; // 60 minutes
 
   final goButton = find.byKey(const Key(WidgetKeys.goButton));
+  final testAgainButton = find.byKey(const Key(WidgetKeys.testAgainButton));
   if (tester.any(goButton)) {
     await tester.tap(goButton);
-  } else {
-    throw 'Go button not found on screen';
   }
+  if (tester.any(testAgainButton)) {
+    await tester.tap(testAgainButton);
+    await waitFor(tester, 5, const Key(WidgetKeys.goButton));
+    final goButton = find.byKey(const Key(WidgetKeys.goButton));
+    await tester.tap(goButton);
+  }
+
   var progressCircleIsPresented =
       await waitFor(tester, 5, const Key(WidgetKeys.progressCircle));
   expect(progressCircleIsPresented, true,
