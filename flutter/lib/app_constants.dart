@@ -14,6 +14,7 @@ class WidgetKeys {
   static const String goButton = 'goButton';
   static const String testAgainButton = 'testAgainButton';
   static const String totalScoreCircle = 'totalScoreCircle';
+  static const String progressCircle = 'progressCircle';
 }
 
 class BenchmarkId {

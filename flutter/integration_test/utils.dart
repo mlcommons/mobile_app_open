@@ -82,18 +82,12 @@ Future<void> setBenchmarks(
 }
 
 Future<void> downloadResources(WidgetTester tester) async {
-  const downloadTimeout = 20 * 60; // 20 minutes
-
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
   await benchmarkState.loadResources(
     downloadMissing: true,
     benchmarks: benchmarkState.activeBenchmarks,
   );
-  var goButtonIsPresented =
-      await waitFor(tester, downloadTimeout, const Key(WidgetKeys.goButton));
-  expect(goButtonIsPresented, true,
-      reason: 'Problems with downloading of datasets or models');
 }
 
 Future<void> runBenchmarks(WidgetTester tester) async {
@@ -109,6 +103,10 @@ Future<void> runBenchmarks(WidgetTester tester) async {
   } else {
     throw 'Neither goButton nor testAgainButton found on screen';
   }
+  var progressCircleIsPresented =
+      await waitFor(tester, 5, const Key(WidgetKeys.progressCircle));
+  expect(progressCircleIsPresented, true,
+      reason: 'Progress screen is not presented');
 
   var totalScoreIsPresented = await waitFor(
       tester, runBenchmarkTimeout, const Key(WidgetKeys.totalScoreCircle));

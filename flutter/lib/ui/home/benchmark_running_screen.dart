@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
+import 'package:mlperfbench/app_constants.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/info.dart';
@@ -136,6 +137,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
             ),
           ),
           ProgressCircle(
+            key: const Key(WidgetKeys.progressCircle),
             strokeWidth: 6,
             size: diameter + 20,
           ),
