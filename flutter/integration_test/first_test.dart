@@ -35,8 +35,15 @@ void main() {
   if (benchmarkIdsStr.isNotEmpty) {
     benchmarkIds = benchmarkIdsStr.split(',');
   }
-  debugPrint('Running benchmarks: $benchmarkIds');
+  debugPrint('Benchmarks to test: $benchmarkIds');
 
+  // Run each benchmark separately to avoid idle timout error on BrowserStack
+  for (var benchmarkId in benchmarkIds) {
+    testBenchmarks([benchmarkId]);
+  }
+}
+
+void testBenchmarks(List<String> benchmarkIds) {
   group('integration tests for benchmarks: $benchmarkIds', () {
     testWidgets('run benchmarks', (WidgetTester tester) async {
       await startApp(tester);
