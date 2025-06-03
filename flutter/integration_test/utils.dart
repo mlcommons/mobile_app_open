@@ -73,10 +73,10 @@ Future<void> setBenchmarks(
   for (var benchmark in benchmarkState.allBenchmarks) {
     if (activeBenchmarks.contains(benchmark.id)) {
       benchmark.isActive = true;
-      print('Benchmark ${benchmark.id} is enabled');
+      debugPrint('Benchmark ${benchmark.id} is enabled');
     } else {
       benchmark.isActive = false;
-      print('Benchmark ${benchmark.id} is disabled');
+      debugPrint('Benchmark ${benchmark.id} is disabled');
     }
   }
 }
@@ -131,10 +131,10 @@ Future<bool> waitFor(WidgetTester tester, int timeout, Key key) async {
 }
 
 void printResults(ExtendedResult extendedResult) {
-  print('benchmark result json:');
+  debugPrint('benchmark result json:');
   for (final line in const JsonEncoder.withIndent('  ')
       .convert(extendedResult)
       .split('\n')) {
-    print(line);
+    debugPrint(line);
   }
 }

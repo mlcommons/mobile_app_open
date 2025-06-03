@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mlperfbench/app_constants.dart';
@@ -34,7 +35,7 @@ void main() {
   if (benchmarkIdsStr.isNotEmpty) {
     benchmarkIds = benchmarkIdsStr.split(',');
   }
-  print('Running benchmarks: $benchmarkIds');
+  debugPrint('Running benchmarks: $benchmarkIds');
 
   group('integration tests for benchmarks: $benchmarkIds', () {
     testWidgets('run benchmarks', (WidgetTester tester) async {
@@ -42,7 +43,7 @@ void main() {
       await validateSettings(tester);
       await setBenchmarks(tester, benchmarkIds);
       await downloadResources(tester);
-      print('Wait 1 minute before running benchmarks');
+      debugPrint('Wait 1 minute before running benchmarks');
       await Future.delayed(const Duration(minutes: 1));
       // Avoid idle / timeout error on BrowserStack
       for (int i = 0; i < 10; i++) {
@@ -69,7 +70,7 @@ void main() {
 
 void checkTasks(ExtendedResult extendedResult) {
   for (final benchmarkResult in extendedResult.results) {
-    print('checking ${benchmarkResult.benchmarkId}');
+    debugPrint('checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
@@ -195,14 +196,14 @@ Future<void> uploadResult(ExtendedResult result) async {
         email: DefaultFirebaseOptions.ciUserEmail,
         password: DefaultFirebaseOptions.ciUserPassword,
       );
-      print('Signed in as CI user with email: ${user.email}');
+      debugPrint('Signed in as CI user with email: ${user.email}');
     }
     if (!FirebaseManager.instance.isSignedIn) {
       await FirebaseManager.instance.signInAnonymously();
-      print('Signed in anonymously.');
+      debugPrint('Signed in anonymously.');
     }
     await FirebaseManager.instance.uploadResult(result);
   } else {
-    print('Firebase is disabled, skipping upload');
+    debugPrint('Firebase is disabled, skipping upload');
   }
 }
