@@ -12,6 +12,7 @@ class DartDefine {
 class WidgetKeys {
   // list of widget keys that need to be accessed in the test code
   static const String goButton = 'goButton';
+  static const String testAgainButton = 'testAgainButton';
   static const String totalScoreCircle = 'totalScoreCircle';
 }
 
