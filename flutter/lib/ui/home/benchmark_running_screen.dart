@@ -112,6 +112,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     var diameter = 0.50 * MediaQuery.of(context).size.width;
     diameter = diameter.clamp(160.0, 240.0);
     return SizedBox(
+      key: const Key(WidgetKeys.progressCircle),
       width: diameter,
       height: diameter,
       child: Stack(
@@ -137,7 +138,6 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
             ),
           ),
           ProgressCircle(
-            key: const Key(WidgetKeys.progressCircle),
             strokeWidth: 6,
             size: diameter + 20,
           ),

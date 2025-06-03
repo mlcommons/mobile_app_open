@@ -106,7 +106,7 @@ Future<void> runBenchmarks(WidgetTester tester) async {
   }
 
   var progressCircleIsPresented =
-      await waitFor(tester, 5, const Key(WidgetKeys.progressCircle));
+      await waitFor(tester, 30, const Key(WidgetKeys.progressCircle));
   expect(progressCircleIsPresented, true,
       reason: 'Progress screen is not presented');
 

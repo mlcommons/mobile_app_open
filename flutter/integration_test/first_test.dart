@@ -46,7 +46,7 @@ void main() {
 
 void testBenchmarks(List<String> benchmarkIds) {
   group('integration tests for benchmarks: $benchmarkIds', () {
-    testWidgets('run benchmarks', (WidgetTester tester) async {
+    testWidgets('run benchmarks: $benchmarkIds', (WidgetTester tester) async {
       await startApp(tester);
       await validateSettings(tester);
       await setBenchmarks(tester, benchmarkIds);
@@ -57,13 +57,13 @@ void testBenchmarks(List<String> benchmarkIds) {
       await runBenchmarks(tester);
     });
 
-    testWidgets('check result', (WidgetTester tester) async {
+    testWidgets('check result: $benchmarkIds', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       printResults(extendedResult);
       checkTasks(extendedResult);
     });
 
-    testWidgets('upload result', (WidgetTester tester) async {
+    testWidgets('upload result: $benchmarkIds', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       await uploadResult(extendedResult);
     });

@@ -151,7 +151,6 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       },
     );
     Widget deleteResultButton = IconButton(
-      key: const Key(WidgetKeys.deleteResultButton),
       icon: const Icon(Icons.delete),
       color: Colors.white,
       onPressed: () async {
