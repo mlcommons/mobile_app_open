@@ -15,15 +15,16 @@ import 'expected_accuracy.dart';
 import 'expected_throughput.dart';
 import 'utils.dart';
 
+const _runMode = BenchmarkRunModeEnum.integrationTestRun;
+
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
-  const runMode = BenchmarkRunModeEnum.integrationTestRun;
   final prefs = <String, Object>{
-    StoreConstants.selectedBenchmarkRunMode: runMode.name,
+    StoreConstants.selectedBenchmarkRunMode: _runMode.name,
     StoreConstants.cooldown: true,
-    StoreConstants.cooldownDuration: runMode.cooldownDuration,
+    StoreConstants.cooldownDuration: _runMode.cooldownDuration,
   };
   SharedPreferences.setMockInitialValues(prefs);
 
@@ -50,8 +51,9 @@ void testBenchmarks(List<String> benchmarkIds) {
       await validateSettings(tester);
       await setBenchmarks(tester, benchmarkIds);
       await downloadResources(tester);
-      debugPrint('Wait 1 minute before running benchmarks');
-      await Future.delayed(const Duration(minutes: 1));
+      final cooldownDuration = _runMode.cooldownDuration;
+      debugPrint('Wait $cooldownDuration seconds before running benchmarks');
+      await Future.delayed(Duration(seconds: cooldownDuration));
       await runBenchmarks(tester);
     });
 
