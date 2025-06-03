@@ -57,15 +57,19 @@ void testBenchmarks(List<String> benchmarkIds) {
       await runBenchmarks(tester);
     });
 
-    testWidgets('check results', (WidgetTester tester) async {
+    testWidgets('check result', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       printResults(extendedResult);
       checkTasks(extendedResult);
     });
 
-    testWidgets('upload results', (WidgetTester tester) async {
+    testWidgets('upload result', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       await uploadResult(extendedResult);
+    });
+
+    testWidgets('clear result', (WidgetTester tester) async {
+      await clearResult(tester);
     });
   });
 }

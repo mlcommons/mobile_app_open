@@ -94,14 +94,10 @@ Future<void> runBenchmarks(WidgetTester tester) async {
   const runBenchmarkTimeout = 60 * 60; // 60 minutes
 
   final goButton = find.byKey(const Key(WidgetKeys.goButton));
-  final testAgainButton = find.byKey(const Key(WidgetKeys.testAgainButton));
-
   if (tester.any(goButton)) {
     await tester.tap(goButton);
-  } else if (tester.any(testAgainButton)) {
-    await tester.tap(testAgainButton);
   } else {
-    throw 'Neither goButton nor testAgainButton found on screen';
+    throw 'Go button not found on screen';
   }
   var progressCircleIsPresented =
       await waitFor(tester, 5, const Key(WidgetKeys.progressCircle));
@@ -111,6 +107,13 @@ Future<void> runBenchmarks(WidgetTester tester) async {
   var totalScoreIsPresented = await waitFor(
       tester, runBenchmarkTimeout, const Key(WidgetKeys.totalScoreCircle));
   expect(totalScoreIsPresented, true, reason: 'Result screen is not presented');
+}
+
+Future<void> clearResult(WidgetTester tester) async {
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  await benchmarkState.resourceManager.resultManager.deleteLastResult();
+  await benchmarkState.resetBenchmarkState();
 }
 
 Future<ExtendedResult> obtainResult() async {
