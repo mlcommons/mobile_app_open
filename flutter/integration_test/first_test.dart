@@ -44,6 +44,13 @@ void main() {
       await downloadResources(tester);
       print('Wait 1 minute before running benchmarks');
       await Future.delayed(const Duration(minutes: 1));
+      // Avoid idle / timeout error on BrowserStack
+      for (int i = 0; i < 10; i++) {
+        await Future.delayed(const Duration(seconds: 60));
+        await tester.pump(); // triggers a UI frame
+        // Or tap a hidden widget to simulate interaction
+        // await tester.tap(find.byKey(ValueKey('invisible_widget')));
+      }
       await runBenchmarks(tester);
     });
 
