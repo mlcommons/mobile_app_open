@@ -361,8 +361,6 @@ jobs:
             device: "Samsung Galaxy M32-11.0"
           - backend: "pixel"
             device: "Google Pixel 9 Pro-15.0"
-          - backend: "mtk"
-            device: "Samsung Galaxy Tab S10 Plus-15.0"
           - backend: "qti"
             device: "Samsung Galaxy S25 Ultra-15.0"
           - backend: "samsung"
