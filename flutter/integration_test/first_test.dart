@@ -40,32 +40,28 @@ void main() {
 
   // Run each benchmark separately to avoid idle timout error on BrowserStack
   for (var benchmarkId in benchmarkIds) {
-    testBenchmarks([benchmarkId]);
+    testBenchmark(benchmarkId);
   }
 }
 
-void testBenchmarks(List<String> benchmarkIds) {
-  group('integration tests for benchmarks: $benchmarkIds', () {
-    testWidgets('run benchmarks: $benchmarkIds', (WidgetTester tester) async {
+void testBenchmark(String benchmarkId) {
+  group('integration tests for benchmark: $benchmarkId', () {
+    testWidgets('run benchmarks: $benchmarkId', (WidgetTester tester) async {
       await startApp(tester);
       await validateSettings(tester);
-      await setBenchmarks(tester, benchmarkIds);
+      if (!hasBenchmark(tester, benchmarkId)) {
+        markTestSkipped('Backend does not support benchmark $benchmarkId');
+        return;
+      }
+      await setBenchmarks(tester, [benchmarkId]);
       await downloadResources(tester);
       final cooldownDuration = _runMode.cooldownDuration;
       debugPrint('Wait $cooldownDuration seconds before running benchmarks');
       await Future.delayed(Duration(seconds: cooldownDuration));
       await runBenchmarks(tester);
-    });
-
-    testWidgets('check result: $benchmarkIds', (WidgetTester tester) async {
       final extendedResult = await obtainResult();
       printResults(extendedResult);
       checkTasks(extendedResult);
-    });
-
-    testWidgets('upload result: $benchmarkIds', (WidgetTester tester) async {
-      final extendedResult = await obtainResult();
-      await uploadResult(extendedResult);
     });
   });
 }

@@ -64,6 +64,12 @@ Future<void> validateSettings(WidgetTester tester) async {
   }
 }
 
+bool hasBenchmark(WidgetTester tester, String benchmarkId) {
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  return benchmarkState.allBenchmarks.map((e) => e.id).contains(benchmarkId);
+}
+
 Future<void> setBenchmarks(
   WidgetTester tester,
   List<String> activeBenchmarks,
