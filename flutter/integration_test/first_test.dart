@@ -59,7 +59,7 @@ void testBenchmark(String benchmarkId) {
       debugPrint('Wait $cooldownDuration seconds before running benchmarks');
       await Future.delayed(Duration(seconds: cooldownDuration));
       await runBenchmarks(tester);
-      final extendedResult = await obtainResult();
+      final extendedResult = await getLastResult(tester);
       printResults(extendedResult);
       checkTasks(extendedResult);
     });

@@ -121,19 +121,10 @@ Future<void> runBenchmarks(WidgetTester tester) async {
   expect(totalScoreIsPresented, true, reason: 'Result screen is not presented');
 }
 
-Future<void> clearResult(WidgetTester tester) async {
+Future<ExtendedResult> getLastResult(WidgetTester tester) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
-  await benchmarkState.resourceManager.resultManager.deleteLastResult();
-  await benchmarkState.resetBenchmarkState();
-}
-
-Future<ExtendedResult> obtainResult() async {
-  final applicationDirectory =
-      await resource_manager.ResourceManager.getApplicationDirectory();
-
-  final rm = await result_manager.ResultManager.create(applicationDirectory);
-  return rm.getLastResult();
+  return benchmarkState.resourceManager.resultManager.getLastResult();
 }
 
 Future<bool> waitFor(WidgetTester tester, int timeout, Key key) async {
