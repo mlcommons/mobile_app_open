@@ -50,6 +50,8 @@ void testBenchmark(String benchmarkId) {
       return;
     }
     await setBenchmarks(tester, [benchmarkId]);
+    debugPrint('Wait 5 seconds to let the app finishing loading resources');
+    await Future.delayed(const Duration(seconds: 5));
     await downloadResources(tester);
     final cooldownDuration = _runMode.cooldownDuration;
     debugPrint('Wait $cooldownDuration seconds before running benchmark');
