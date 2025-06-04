@@ -45,6 +45,10 @@ void testBenchmark(String benchmarkId) {
       markTestSkipped('Backend does not support benchmark $benchmarkId');
       return;
     }
+    if (!canRunBenchmark(tester, benchmarkId)) {
+      markTestSkipped('Backend can not run benchmark $benchmarkId');
+      return;
+    }
     await setBenchmarks(tester, [benchmarkId]);
     await downloadResources(tester);
     final cooldownDuration = _runMode.cooldownDuration;

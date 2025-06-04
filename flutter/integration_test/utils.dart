@@ -73,6 +73,20 @@ bool hasBenchmark(WidgetTester tester, String benchmarkId) {
   return benchmarkState.allBenchmarks.map((e) => e.id).contains(benchmarkId);
 }
 
+bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
+  if (benchmarkId == 'stable_diffusion') {
+    final state = tester.state(find.byType(MaterialApp));
+    final benchmarkState = state.context.read<BenchmarkState>();
+    final libName = benchmarkState.backendInfo.libName;
+    if (libName == BackendId.qti) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
 Future<void> setBenchmarks(
   WidgetTester tester,
   List<String> activeBenchmarks,
