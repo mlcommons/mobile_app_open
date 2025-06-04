@@ -7,9 +7,6 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/data/extended_result.dart';
-import 'package:mlperfbench/resources/result_manager.dart' as result_manager;
-import 'package:mlperfbench/resources/resource_manager.dart'
-    as resource_manager;
 import 'package:mlperfbench/main.dart' as app;
 
 class Interval {
@@ -144,7 +141,7 @@ Future<bool> waitFor(WidgetTester tester, int timeout, Key key) async {
 }
 
 void printResults(ExtendedResult extendedResult) {
-  debugPrint('benchmark result json:');
+  debugPrint('Benchmark result json:');
   for (final line in const JsonEncoder.withIndent('  ')
       .convert(extendedResult)
       .split('\n')) {

@@ -45,7 +45,7 @@ void main() {
 }
 
 void testBenchmark(String benchmarkId) {
-  testWidgets('test benchmark: $benchmarkId', (WidgetTester tester) async {
+  testWidgets('Test benchmark: $benchmarkId', (WidgetTester tester) async {
     await startApp(tester);
     await validateSettings(tester);
     if (!hasBenchmark(tester, benchmarkId)) {
@@ -55,7 +55,7 @@ void testBenchmark(String benchmarkId) {
     await setBenchmarks(tester, [benchmarkId]);
     await downloadResources(tester);
     final cooldownDuration = _runMode.cooldownDuration;
-    debugPrint('Wait $cooldownDuration seconds before running benchmarks');
+    debugPrint('Wait $cooldownDuration seconds before running benchmark');
     await Future.delayed(Duration(seconds: cooldownDuration));
     await runBenchmarks(tester);
     final extendedResult = await getLastResult(tester);
@@ -66,7 +66,7 @@ void testBenchmark(String benchmarkId) {
 
 void checkTasks(ExtendedResult extendedResult) {
   for (final benchmarkResult in extendedResult.results) {
-    debugPrint('checking ${benchmarkResult.benchmarkId}');
+    debugPrint('Checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
