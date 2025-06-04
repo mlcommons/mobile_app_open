@@ -60,5 +60,6 @@ void testBenchmark(String benchmarkId) {
     final extendedResult = await getLastResult(tester);
     printResults(extendedResult);
     checkTasks(extendedResult);
+    await deleteResources(tester);
   });
 }

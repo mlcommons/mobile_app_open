@@ -113,6 +113,12 @@ Future<void> downloadResources(WidgetTester tester) async {
   );
 }
 
+Future<void> deleteResources(WidgetTester tester) async {
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  await benchmarkState.clearCache();
+}
+
 Future<void> runBenchmarks(WidgetTester tester) async {
   const runBenchmarkTimeout = 60 * 60; // 60 minutes
 
