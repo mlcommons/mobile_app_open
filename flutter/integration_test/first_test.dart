@@ -45,24 +45,22 @@ void main() {
 }
 
 void testBenchmark(String benchmarkId) {
-  group('integration tests for benchmark: $benchmarkId', () {
-    testWidgets('run benchmarks: $benchmarkId', (WidgetTester tester) async {
-      await startApp(tester);
-      await validateSettings(tester);
-      if (!hasBenchmark(tester, benchmarkId)) {
-        markTestSkipped('Backend does not support benchmark $benchmarkId');
-        return;
-      }
-      await setBenchmarks(tester, [benchmarkId]);
-      await downloadResources(tester);
-      final cooldownDuration = _runMode.cooldownDuration;
-      debugPrint('Wait $cooldownDuration seconds before running benchmarks');
-      await Future.delayed(Duration(seconds: cooldownDuration));
-      await runBenchmarks(tester);
-      final extendedResult = await getLastResult(tester);
-      printResults(extendedResult);
-      checkTasks(extendedResult);
-    });
+  testWidgets('test benchmark: $benchmarkId', (WidgetTester tester) async {
+    await startApp(tester);
+    await validateSettings(tester);
+    if (!hasBenchmark(tester, benchmarkId)) {
+      markTestSkipped('Backend does not support benchmark $benchmarkId');
+      return;
+    }
+    await setBenchmarks(tester, [benchmarkId]);
+    await downloadResources(tester);
+    final cooldownDuration = _runMode.cooldownDuration;
+    debugPrint('Wait $cooldownDuration seconds before running benchmarks');
+    await Future.delayed(Duration(seconds: cooldownDuration));
+    await runBenchmarks(tester);
+    final extendedResult = await getLastResult(tester);
+    printResults(extendedResult);
+    checkTasks(extendedResult);
   });
 }
 
