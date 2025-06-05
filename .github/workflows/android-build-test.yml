@@ -5,6 +5,7 @@ on:
     branches: [ master, submission-v* ]
   pull_request:
     types: [ opened, synchronize, reopened ]
+  workflow_dispatch:
 
 env:
   GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}
@@ -256,6 +257,7 @@ jobs:
 
   test-android-apk-unified:
     needs: build-android-apk
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
@@ -347,7 +349,7 @@ jobs:
     needs:
       - build-android-apk
       - test-android-apk-unified
-    if: failure() && needs.build-android-apk.result == 'success' && needs.test-android-apk-unified.result == 'failure'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
