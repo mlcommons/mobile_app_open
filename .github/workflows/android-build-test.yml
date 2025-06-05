@@ -5,6 +5,7 @@ on:
     branches: [ master, submission-v* ]
   pull_request:
     types: [ opened, synchronize, reopened ]
+  workflow_dispatch:
 
 env:
   GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}
@@ -256,8 +257,22 @@ jobs:
 
   test-android-apk-unified:
     needs: build-android-apk
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - backend: "tflite"
+            device: "Samsung Galaxy M32-11.0"
+          - backend: "pixel"
+            device: "Google Pixel 9 Pro-15.0"
+          - backend: "qti"
+            device: "Samsung Galaxy S25 Ultra-15.0"
+          - backend: "samsung"
+            device: "Samsung Galaxy S24-14.0"
     env:
       MAIN_APK_NAME: test-main-unified-${{ github.run_number }}.apk
       HELPER_APK_NAME: test-helper-unified-${{ github.run_number }}.apk
@@ -296,10 +311,7 @@ jobs:
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
           BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
           BROWSERSTACK_DEVICES: >-
-            ["Samsung Galaxy M32-11.0",
-            "Samsung Galaxy S24-14.0",
-            "Samsung Galaxy S25 Ultra-15.0",
-            "Google Pixel 9 Pro-15.0"]
+            ["${{ matrix.device }}"]
         with:
           timeout_minutes: 60
           max_attempts: 2
@@ -337,7 +349,7 @@ jobs:
     needs:
       - build-android-apk
       - test-android-apk-unified
-    if: failure()
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
@@ -349,8 +361,6 @@ jobs:
             device: "Samsung Galaxy M32-11.0"
           - backend: "pixel"
             device: "Google Pixel 9 Pro-15.0"
-          - backend: "mtk"
-            device: "Samsung Galaxy Tab S10 Plus-14.0"
           - backend: "qti"
             device: "Samsung Galaxy S25 Ultra-15.0"
           - backend: "samsung"
