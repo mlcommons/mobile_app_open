@@ -10,6 +10,7 @@ RETRY_INTERVAL=10
 TRIGGER_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/build"
 STATUS_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/builds"
 DEVICES_URL="https://api-cloud.browserstack.com/app-automate/devices"
+BUILDS_URL="https://api.browserstack.com/app-automate/flutter-integration-tests/builds"
 
 # Retrieve vars from environment variables
 CREDENTIALS="${BROWSERSTACK_CREDENTIALS:-}"
@@ -18,6 +19,7 @@ APP="${BROWSERSTACK_APP:-}"
 TEST_SUITE="${BROWSERSTACK_TEST_SUITE:-}"
 BUILD_TAG="${BROWSERSTACK_BUILD_TAG:-}"
 DEVICES="${BROWSERSTACK_DEVICES:-}"
+LOGS_DIR="${BROWSERSTACK_LOGS_DIR:-}"
 
 # Validate required environment variables
 if [[ -z "$CREDENTIALS" ]]; then
@@ -69,6 +71,27 @@ trigger_build() {
   fi
 }
 
+# Function to download device logs
+download_device_logs() {
+  local build_id=$1
+  local session_id=$2
+
+  echo "Downloading device logs for build $build_id, session $session_id..."
+
+  # Create logs directory if it doesn't exist
+  mkdir -p "$LOGS_DIR"
+
+  # Download device logs
+  local log_file="$LOGS_DIR/${session_id}.log"
+  curl -s -u "$CREDENTIALS" -X GET "$BUILDS_URL/$build_id/sessions/tests/$session_id/devicelogs" -o "$log_file"
+
+  if [ -f "$log_file" ]; then
+    echo "Device logs downloaded successfully to $log_file"
+  else
+    echo "Failed to download device logs for session $session_id"
+  fi
+}
+
 # Function to check build status
 check_build_status() {
   local build_id=$1
@@ -88,6 +111,17 @@ check_build_status() {
         ", Status: " + (.sessions[0].status)
       )
     '
+  fi
+
+  # Download device logs for all sessions if build is not running
+  if [[ "$status" != "running" ]]; then
+    echo "Downloading device logs for all sessions..."
+    # Extract session IDs and download logs for each session
+    echo "$response" | jq -r '.devices[] | .sessions[] | .id' | while read -r session_id; do
+      if [[ -n "$session_id" ]]; then
+        download_device_logs "$build_id" "$session_id"
+      fi
+    done
   fi
 
   # Display build status
