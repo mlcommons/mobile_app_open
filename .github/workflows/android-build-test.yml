@@ -276,6 +276,7 @@ jobs:
     env:
       MAIN_APK_NAME: test-main-unified-${{ github.run_number }}.apk
       HELPER_APK_NAME: test-helper-unified-${{ github.run_number }}.apk
+      BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
     steps:
       - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
@@ -310,6 +311,7 @@ jobs:
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
           BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
+          BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
           BROWSERSTACK_DEVICES: >-
             ["${{ matrix.device }}"]
         with:
@@ -319,6 +321,14 @@ jobs:
           retry_on_exit_code: 9
           command: |
             bash .github/workflows/scripts/browserstack-app-automate.sh
+      - name: Upload BrowserStack logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browserstack-device-logs-unified-${{ matrix.backend }}-${{ github.run_number }}
+          path: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          retention-days: 28
+          if-no-files-found: error
 
   test-android-apk-unified-mtk:
     needs: build-android-apk
@@ -368,6 +378,7 @@ jobs:
     env:
       MAIN_APK_NAME: test-main-${{ matrix.backend }}-${{ github.run_number }}.apk
       HELPER_APK_NAME: test-helper-${{ matrix.backend }}-${{ github.run_number }}.apk
+      BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
     steps:
       - uses: actions/checkout@v4
       - name: Set up authentication for Google Cloud SDK
@@ -402,6 +413,7 @@ jobs:
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
           BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
+          BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
           BROWSERSTACK_DEVICES: >-
             ["${{ matrix.device }}"]
         with:
@@ -411,6 +423,14 @@ jobs:
           retry_on_exit_code: 9
           command: |
             bash .github/workflows/scripts/browserstack-app-automate.sh
+      - name: Upload BrowserStack logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browserstack-device-logs-single-${{ matrix.backend }}-${{ github.run_number }}
+          path: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          retention-days: 28
+          if-no-files-found: error
 
   deploy-playstore:
     needs:
