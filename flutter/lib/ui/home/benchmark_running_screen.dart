@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
@@ -111,6 +112,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     var diameter = 0.50 * MediaQuery.of(context).size.width;
     diameter = diameter.clamp(160.0, 240.0);
     return SizedBox(
+      key: const Key(WidgetKeys.progressCircle),
       width: diameter,
       height: diameter,
       child: Stack(

@@ -23,9 +23,14 @@ class DeviceInfo {
     required this.nativeLibraryPath,
   });
 
+  static bool _isInitialized = false;
+
   static Future<void> staticInit() async {
-    instance = await createFromEnvironment();
-    print('Device: ${instance.envInfo.modelDescription}');
+    if (!_isInitialized) {
+      instance = await createFromEnvironment();
+      print('Device: ${instance.envInfo.modelDescription}');
+      _isInitialized = true;
+    }
   }
 
   static Future<DeviceInfo> createFromEnvironment() async {
