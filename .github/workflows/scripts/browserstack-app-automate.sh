@@ -115,6 +115,7 @@ check_build_status() {
 
   # Download device logs for all sessions if build is not running
   if [[ "$status" != "running" ]]; then
+    sleep 5
     echo "Downloading device logs for all sessions..."
     # Extract session IDs and download logs for each session
     echo "$response" | jq -r '.devices[] | .sessions[] | .id' | while read -r session_id; do
