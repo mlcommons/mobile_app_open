@@ -84,29 +84,27 @@ download_device_logs() {
   # Get the status of the session
   local response=$(curl -s -u "$CREDENTIALS" -X GET "$STATUS_URL/$build_id/sessions/$session_id")
 
-  # Extract all test case IDs and their device log URLs
-  echo "Extracting test case information from session response..."
+  echo "Extracting last test case information from session response..."
 
-  # Use jq to extract all test cases with their IDs and device log URLs
-  echo "$response" | jq -c '.testcases.data[].testcases[]' | while read -r testcase; do
-    local test_id=$(echo "$testcase" | jq -r '.id')
-    local device_log_url=$(echo "$testcase" | jq -r '.device_log')
+  # Use jq to extract the last test case with its ID and device log URL
+  local last_testcase=$(echo "$response" | jq -c '.testcases.data[].testcases | .[-1]')
+  local test_id=$(echo "$last_testcase" | jq -r '.id')
+  local device_log_url=$(echo "$last_testcase" | jq -r '.device_log')
 
-    if [[ -n "$test_id" && "$test_id" != "null" && -n "$device_log_url" && "$device_log_url" != "null" ]]; then
-      echo "Found test case $test_id with device log URL"
+  if [[ -n "$test_id" && "$test_id" != "null" && -n "$device_log_url" && "$device_log_url" != "null" ]]; then
+    echo "Found last test case $test_id with device log URL"
 
-      # Download device logs using the extracted URL
-      local log_file="$LOGS_DIR/${test_id}.log"
-      echo "Downloading device log to $log_file"
-      curl -s -u "$CREDENTIALS" -X GET "$device_log_url" -o "$log_file"
+    # Download device logs using the extracted URL
+    local log_file="$LOGS_DIR/${test_id}.log"
+    echo "Downloading device log to $log_file"
+    curl -s -u "$CREDENTIALS" -X GET "$device_log_url" -o "$log_file"
 
-      if [ -f "$log_file" ]; then
-        echo "Device logs downloaded successfully to $log_file"
-      else
-        echo "Failed to download device logs for test case $test_id"
-      fi
+    if [ -f "$log_file" ]; then
+      echo "Device logs downloaded successfully to $log_file"
+    else
+      echo "Failed to download device logs for test case $test_id"
     fi
-  done
+  fi
 }
 
 # Function to check build status
