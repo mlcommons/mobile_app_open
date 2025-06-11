@@ -76,20 +76,37 @@ download_device_logs() {
   local build_id=$1
   local session_id=$2
 
-  echo "Downloading device logs for build $build_id, session $session_id..."
+  echo "Downloading device logs for build $build_id, session $session_id"
 
   # Create logs directory if it doesn't exist
   mkdir -p "$LOGS_DIR"
 
-  # Download device logs
-  local log_file="$LOGS_DIR/${session_id}.log"
-  curl -s -u "$CREDENTIALS" -X GET "$BUILDS_URL/$build_id/sessions/tests/$session_id/devicelogs" -o "$log_file"
+  # Get the status of the session
+  local response=$(curl -s -u "$CREDENTIALS" -X GET "$STATUS_URL/$build_id/sessions/$session_id")
 
-  if [ -f "$log_file" ]; then
-    echo "Device logs downloaded successfully to $log_file"
-  else
-    echo "Failed to download device logs for session $session_id"
-  fi
+  # Extract all test case IDs and their device log URLs
+  echo "Extracting test case information from session response..."
+
+  # Use jq to extract all test cases with their IDs and device log URLs
+  echo "$response" | jq -c '.testcases.data[].testcases[]' | while read -r testcase; do
+    local test_id=$(echo "$testcase" | jq -r '.id')
+    local device_log_url=$(echo "$testcase" | jq -r '.device_log')
+
+    if [[ -n "$test_id" && "$test_id" != "null" && -n "$device_log_url" && "$device_log_url" != "null" ]]; then
+      echo "Found test case $test_id with device log URL"
+
+      # Download device logs using the extracted URL
+      local log_file="$LOGS_DIR/${test_id}.log"
+      echo "Downloading device log to $log_file"
+      curl -s -u "$CREDENTIALS" -X GET "$device_log_url" -o "$log_file"
+
+      if [ -f "$log_file" ]; then
+        echo "Device logs downloaded successfully to $log_file"
+      else
+        echo "Failed to download device logs for test case $test_id"
+      fi
+    fi
+  done
 }
 
 # Function to check build status
