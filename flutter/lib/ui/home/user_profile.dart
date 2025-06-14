@@ -82,6 +82,10 @@ class _UserProfileSectionState extends State<UserProfileSection> {
           FirebaseManager.instance.link(authCred);
         }
         Navigator.pop(context);
+        BotToast.showSimpleNotification(
+          title: l10n.userSuccessfullyRegistered,
+          hideCloseButton: true,
+        );
       }),
       AuthStateChangeAction<CredentialLinked>((context, state) {
         Navigator.pop(context);
