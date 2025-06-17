@@ -10,6 +10,7 @@ RETRY_INTERVAL=10
 TRIGGER_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/build"
 STATUS_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/builds"
 DEVICES_URL="https://api-cloud.browserstack.com/app-automate/devices"
+BUILDS_URL="https://api.browserstack.com/app-automate/flutter-integration-tests/builds"
 
 # Retrieve vars from environment variables
 CREDENTIALS="${BROWSERSTACK_CREDENTIALS:-}"
@@ -18,6 +19,7 @@ APP="${BROWSERSTACK_APP:-}"
 TEST_SUITE="${BROWSERSTACK_TEST_SUITE:-}"
 BUILD_TAG="${BROWSERSTACK_BUILD_TAG:-}"
 DEVICES="${BROWSERSTACK_DEVICES:-}"
+LOGS_DIR="${BROWSERSTACK_LOGS_DIR:-}"
 
 # Validate required environment variables
 if [[ -z "$CREDENTIALS" ]]; then
@@ -69,6 +71,42 @@ trigger_build() {
   fi
 }
 
+# Function to download device logs
+download_device_logs() {
+  local build_id=$1
+  local session_id=$2
+
+  echo "Downloading device logs for build $build_id, session $session_id"
+
+  # Create logs directory if it doesn't exist
+  mkdir -p "$LOGS_DIR"
+
+  # Get the status of the session
+  local response=$(curl -s -u "$CREDENTIALS" -X GET "$STATUS_URL/$build_id/sessions/$session_id")
+
+  echo "Extracting last test case information from session response..."
+
+  # Use jq to extract the last test case with its ID and device log URL
+  local last_testcase=$(echo "$response" | jq -c '.testcases.data[].testcases | .[-1]')
+  local test_id=$(echo "$last_testcase" | jq -r '.id')
+  local device_log_url=$(echo "$last_testcase" | jq -r '.device_log')
+
+  if [[ -n "$test_id" && "$test_id" != "null" && -n "$device_log_url" && "$device_log_url" != "null" ]]; then
+    echo "Found last test case $test_id with device log URL"
+
+    # Download device logs using the extracted URL
+    local log_file="$LOGS_DIR/${test_id}.log"
+    echo "Downloading device log to $log_file"
+    curl -s -u "$CREDENTIALS" -X GET "$device_log_url" -o "$log_file"
+
+    if [ -f "$log_file" ]; then
+      echo "Device logs downloaded successfully to $log_file"
+    else
+      echo "Failed to download device logs for test case $test_id"
+    fi
+  fi
+}
+
 # Function to check build status
 check_build_status() {
   local build_id=$1
@@ -88,6 +126,18 @@ check_build_status() {
         ", Status: " + (.sessions[0].status)
       )
     '
+  fi
+
+  # Download device logs for all sessions if build is not running
+  if [[ "$status" != "running" ]]; then
+    sleep 5
+    echo "Downloading device logs for all sessions..."
+    # Extract session IDs and download logs for each session
+    echo "$response" | jq -r '.devices[] | .sessions[] | .id' | while read -r session_id; do
+      if [[ -n "$session_id" ]]; then
+        download_device_logs "$build_id" "$session_id"
+      fi
+    done
   fi
 
   # Display build status
