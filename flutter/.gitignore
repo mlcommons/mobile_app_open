@@ -30,3 +30,6 @@ app.*.map.json
 # Project specific
 /lib/protos
 /lib/localizations
+
+# FVM Version Cache
+.fvm/

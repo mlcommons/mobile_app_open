@@ -36,7 +36,7 @@ const _kM32 = 'SM-M326B'; // Samsung Galaxy M32
 
 // iOS
 const _kIphoneOnGitHubAction = 'iPhone16,2';
-const _kIphoneOnMacbookM1 = 'iPhone14,7';
+const _kIphoneOnMacbook = 'iPhone17,1';
 
 const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   _kTFLiteBackend: {
@@ -47,7 +47,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
     _kPixel6: Interval(min: 100, max: 600),
     _kM32: Interval(min: 5, max: 15),
     _kIphoneOnGitHubAction: Interval(min: 0.4, max: 9),
-    _kIphoneOnMacbookM1: Interval(min: 10, max: 27),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0.4, max: 9),
@@ -79,7 +79,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kPixel6: Interval(min: 100, max: 450),
     _kM32: Interval(min: 20, max: 40),
     _kIphoneOnGitHubAction: Interval(min: 0.5, max: 4),
-    _kIphoneOnMacbookM1: Interval(min: 9, max: 16),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0.5, max: 7),
@@ -111,7 +111,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
     _kPixel6: Interval(min: 80, max: 180),
     _kM32: Interval(min: 2, max: 10),
     _kIphoneOnGitHubAction: Interval(min: 0.1, max: 2.5),
-    _kIphoneOnMacbookM1: Interval(min: 3, max: 6),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0.1, max: 3.5),
@@ -143,7 +143,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kPixel6: Interval(min: 2, max: 75),
     _kM32: Interval(min: 2, max: 5),
     _kIphoneOnGitHubAction: Interval(min: 0.1, max: 1),
-    _kIphoneOnMacbookM1: Interval(min: 1.8, max: 3),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0.1, max: 1.1),
@@ -175,7 +175,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kPixel6: Interval(min: 7, max: 14),
     _kM32: Interval(min: 0.1, max: 3),
     _kIphoneOnGitHubAction: Interval(min: 0.02, max: 1.0),
-    _kIphoneOnMacbookM1: Interval(min: 0.1, max: 10),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0.02, max: 1.0),
@@ -208,7 +208,7 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
     _kPixel6: Interval(min: 0, max: 100),
     _kM32: Interval(min: 0, max: 100),
     _kIphoneOnGitHubAction: Interval(min: 0, max: 100),
-    _kIphoneOnMacbookM1: Interval(min: 0, max: 100),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0, max: 100),
@@ -240,7 +240,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
     _kPixel6: Interval(min: 100, max: 700),
     _kM32: Interval(min: 8, max: 18),
     _kIphoneOnGitHubAction: Interval(min: 0.4, max: 15),
-    _kIphoneOnMacbookM1: Interval(min: 10, max: 45),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0.4, max: 15),

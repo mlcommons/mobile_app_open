@@ -19,6 +19,7 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final header = buildHeader(context);
     final menuList = buildMenuList(context);
+    final footer = buildFooter(context);
     return Drawer(
       backgroundColor: AppColors.drawerBackground,
       child: Theme(
@@ -43,8 +44,16 @@ class AppDrawer extends StatelessWidget {
           child: SafeArea(
             child: ScrollConfiguration(
               behavior: NoGlowScrollBehavior(),
-              child: ListView(
-                children: [header] + menuList,
+              child: Column(
+                children: [
+                  header,
+                  Expanded(
+                    child: ListView(
+                      children: menuList,
+                    ),
+                  ),
+                  footer,
+                ],
               ),
             ),
           ),
@@ -133,7 +142,15 @@ class AppDrawer extends StatelessWidget {
               ));
         },
       ),
-      const Spacer(),
+    ];
+  }
+}
+
+Widget buildFooter(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
       const Divider(),
       ListTile(
         title: Text(l10n.settingsPrivacyPolicy),
@@ -143,8 +160,8 @@ class AppDrawer extends StatelessWidget {
         title: Text(l10n.settingsEula),
         onTap: () => launchUrl(Uri.parse(Url.eula)),
       ),
-    ];
-  }
+    ],
+  );
 }
 
 // Custom ScrollBehavior

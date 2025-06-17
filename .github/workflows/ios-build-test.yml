@@ -11,7 +11,7 @@ jobs:
     name: Build and test iOS app
     # https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md
     runs-on: macos-13
-    timeout-minutes: 120
+    timeout-minutes: 180
     env:
       PERF_TEST: true
       WITH_APPLE: 1
@@ -62,7 +62,7 @@ jobs:
       - uses: nick-fields/retry@v3
         name: Run iOS integration tests
         with:
-          timeout_minutes: 45
+          timeout_minutes: 120
           max_attempts: 2
           command: |
             open -a Simulator

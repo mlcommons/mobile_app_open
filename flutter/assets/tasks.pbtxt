@@ -365,7 +365,7 @@ task {
       name: "COCO validation set for Stable Diffusion"
       input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v4_1/coco_gen_test.tfrecord"
       input_checksum: "b564d2c228a867148fa7d6df415a0368"
-      groundtruth_path: "local:///mlperf_models/stable-diffusion/clip_model_512x512_openai-clip-vit-large-patch14.tflite"
+      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v4_1/clip_model_512x512_openai-clip-vit-large-patch14.tflite"
       groundtruth_checksum: "39a07ffaea0806ee6148874ef228cc77"
     }
     lite {
@@ -379,7 +379,7 @@ task {
       name: "COCO validation set for Stable Diffusion"
       input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v4_1/coco_gen_test.tfrecord"
       input_checksum: "b564d2c228a867148fa7d6df415a0368"
-      groundtruth_path: "local:///mlperf_models/stable-diffusion/clip_model_512x512_openai-clip-vit-large-patch14.tflite"
+      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v4_1/clip_model_512x512_openai-clip-vit-large-patch14.tflite"
       groundtruth_checksum: "39a07ffaea0806ee6148874ef228cc77"
     }
   }
