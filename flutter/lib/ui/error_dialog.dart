@@ -124,7 +124,8 @@ Future<void> showResourceMissingDialog(
     BuildContext context, List<String> messages) async {
   final l10n = AppLocalizations.of(context)!;
 
-  Icon icon = const Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 32);
+  Icon icon =
+      const Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 32);
   Color titleColor = Colors.grey;
 
   await showDialog(
@@ -189,7 +190,9 @@ Future<void> showResourceMissingDialog(
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const ResourcesScreen(autoStart: true,),
+                        builder: (context) => const ResourcesScreen(
+                          autoStart: true,
+                        ),
                       ),
                     );
                   },
