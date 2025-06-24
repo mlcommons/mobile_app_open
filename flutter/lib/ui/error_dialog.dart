@@ -124,7 +124,7 @@ Future<void> showResourceMissingDialog(
     BuildContext context, List<String> messages) async {
   final l10n = AppLocalizations.of(context)!;
 
-  Icon icon = const Icon(Icons.info_outline, color: Colors.grey, size: 32);
+  Icon icon = const Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 32);
   Color titleColor = Colors.grey;
 
   await showDialog(
@@ -164,37 +164,7 @@ Future<void> showResourceMissingDialog(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber, width: 1),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline, color: Colors.amber),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: Text(
-                        l10n.dialogContentMissingFilesHint,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              ...messages.map((e) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(
-                      e,
-                      style: const TextStyle(fontSize: 15),
-                    ),
-                  )),
+              Text(l10n.dialogContentMissingFiles),
             ],
           ),
         ),
@@ -219,7 +189,7 @@ Future<void> showResourceMissingDialog(
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const ResourcesScreen(),
+                        builder: (context) => const ResourcesScreen(autoStart: true,),
                       ),
                     );
                   },
