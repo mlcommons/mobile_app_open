@@ -91,7 +91,7 @@
   "dialogCancel": "Cancel",
   "dialogTitleConfirm": "Confirm?",
   "dialogContentOfflineWarning": "Offline mode is enabled but following internet resources are defined in the configuration. Do you want to continue?",
-  "dialogContentMissingFiles": "The following files don't exist:",
+  "dialogContentMissingFiles": "MLPerf Mobile needs to download some ML model files used by the various benchmark tests. Some of these files can be fairly large, so we recommend connecting to Wi-Fi before downloading, if possible.\n\nOnce the files are downloaded, they will be cached and can be used to run the benchmark tests repeatedly. You can manage the downloaded model files by going to Resources in the app menu.",
   "dialogContentMissingFilesHint": "Please go to the menu Resources to download the missing files.",
   "dialogContentChecksumError": "The following files failed checksum validation:",
   "dialogContentChecksumErrorHint": "Please go to the menu Resources to clear the cache and download the files again.",

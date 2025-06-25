@@ -14,7 +14,9 @@ import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/nil.dart';
 
 class ResourcesScreen extends StatefulWidget {
-  const ResourcesScreen({super.key});
+  final bool autoStart;
+
+  const ResourcesScreen({this.autoStart = false, super.key});
 
   @override
   State<ResourcesScreen> createState() => _ResourcesScreen();
@@ -29,23 +31,43 @@ class _ResourcesScreen extends State<ResourcesScreen> {
       (state.loadingProgress > 0.0 && state.loadingProgress < 0.999);
 
   @override
+  void initState() {
+    if (widget.autoStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await state.loadResources(
+          downloadMissing: true,
+          benchmarks: state.activeBenchmarks,
+        );
+        if (state.error != null) {
+          if (!mounted) return;
+          await showErrorDialog(context, <String>[state.error.toString()]);
+          // Reset both the error and stacktrace for further operation
+          state.error = null;
+          state.stackTrace = null;
+        }
+      });
+
+      super.initState();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     store = context.watch<Store>();
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context)!;
 
-    final children = <Widget>[];
-
-    for (var benchmark in state.allBenchmarks) {
-      children.addAll([_listTileBuilder(benchmark), const Divider(height: 20)]);
-    }
-    children.addAll([
-      const SizedBox(height: 20),
-      _downloadProgress(),
+    final children = <Widget>[
       _downloadButton(state.allBenchmarks, l10n.resourceDownloadAll),
       const SizedBox(height: 20),
+      for (var benchmark in state.allBenchmarks) ...[
+        _listTileBuilder(benchmark),
+        const Divider(height: 20),
+      ],
+      _downloadProgress(),
+      const SizedBox(height: 20),
       _clearCacheButton(),
-    ]);
+    ];
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.menuResources)),
