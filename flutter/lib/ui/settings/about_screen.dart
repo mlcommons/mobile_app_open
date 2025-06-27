@@ -6,11 +6,11 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 class AboutScreen extends StatelessWidget {
-  const AboutScreen({Key? key}) : super(key: key);
+  const AboutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.menuAbout)),
       body: const Center(child: AboutText()),
@@ -19,7 +19,7 @@ class AboutScreen extends StatelessWidget {
 }
 
 class AboutText extends StatefulWidget {
-  const AboutText({Key? key}) : super(key: key);
+  const AboutText({super.key});
 
   @override
   State<AboutText> createState() => _AboutText();

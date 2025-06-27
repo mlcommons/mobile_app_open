@@ -26,6 +26,8 @@ class AppIcons {
       _pSvg('ic_task_image_classification_offline.svg');
   static final SvgPicture superResolution =
       _pSvg('ic_task_super_resolution.svg');
+  static final SvgPicture stableDiffusion =
+      _pSvg('ic_task_stable_diffusion.svg');
 
   static final SvgPicture imageClassificationWhite =
       _pSvg('ic_task_image_classification_white.svg');
@@ -39,6 +41,8 @@ class AppIcons {
       _pSvg('ic_task_image_classification_offline_white.svg');
   static final SvgPicture superResolutionWhite =
       _pSvg('ic_task_super_resolution_white.svg');
+  static final SvgPicture stableDiffusionWhite =
+      _pSvg('ic_task_stable_diffusion_white.svg');
 
   static final SvgPicture arrow = _pSvg('ic_arrow.svg');
 
@@ -58,21 +62,24 @@ class AppIcons {
 
 class BenchmarkIcons {
   static final darkSet = {
-    BenchmarkId.imageClassification: AppIcons.imageClassification,
+    BenchmarkId.imageClassificationV2: AppIcons.imageClassification,
     BenchmarkId.objectDetection: AppIcons.objectDetection,
     BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentation,
     BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessing,
     BenchmarkId.superResolution: AppIcons.superResolution,
-    BenchmarkId.imageClassificationOffline: AppIcons.imageClassificationOffline,
+    BenchmarkId.stableDiffusion: AppIcons.stableDiffusion,
+    BenchmarkId.imageClassificationOfflineV2:
+        AppIcons.imageClassificationOffline,
   };
 
   static final lightSet = {
-    BenchmarkId.imageClassification: AppIcons.imageClassificationWhite,
+    BenchmarkId.imageClassificationV2: AppIcons.imageClassificationWhite,
     BenchmarkId.objectDetection: AppIcons.objectDetectionWhite,
     BenchmarkId.imageSegmentationV2: AppIcons.imageSegmentationWhite,
     BenchmarkId.naturalLanguageProcessing: AppIcons.languageProcessingWhite,
     BenchmarkId.superResolution: AppIcons.superResolutionWhite,
-    BenchmarkId.imageClassificationOffline:
+    BenchmarkId.stableDiffusion: AppIcons.stableDiffusionWhite,
+    BenchmarkId.imageClassificationOfflineV2:
         AppIcons.imageClassificationOfflineWhite,
   };
 

@@ -36,26 +36,38 @@ common_setting {
 
 benchmark_setting {
   benchmark_id: "image_classification"
-  accelerator: "npu"
-  accelerator_desc: "NPU"
   framework: "TFLite NNAPI"
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  custom_setting {
-    id: "bgLoad2"
-    value: "true"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_file {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilenet_edgetpu_224_1.0_uint8.tflite"
+      model_checksum: "abc"
+    }
+    custom_setting {
+      id: "bgLoad2"
+      value: "true"
+    }
   }
 }
 
 benchmark_setting {
   benchmark_id: "image_classification_offline"
-  accelerator: "npu"
-  accelerator_desc: "NPU"
   framework: "TFLite NNAPI"
-  batch_size: 2
-  model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilenet_edgetpu_224_1.0_uint8.tflite"
-  custom_setting {
-    id: "bgLoad2"
-    value: "true"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_file {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilenet_edgetpu_224_1.0_uint8.tflite"
+      model_checksum: "abc"
+    }
+    custom_setting {
+      id: "bgLoad2"
+      value: "true"
+    }
+    batch_size: 2
   }
 })SETTINGS";
 
@@ -75,7 +87,7 @@ void dumpCustomSetting(const mlperf::mobile::CustomSetting &custom_setting) {
   std::cout << "      Value: " << custom_setting.value() << std::endl;
 }
 
-void dumpSetting(const mlperf::mobile::Setting &setting) {
+void dumpSetting(const mlperf::mobile::CommonSetting &setting) {
   std::cout << "    ID: " << setting.id() << std::endl;
   std::cout << "    Name: " << setting.name() << std::endl;
   std::cout << "    Value: " << std::endl;
@@ -86,14 +98,17 @@ void dumpSetting(const mlperf::mobile::Setting &setting) {
 void dumpBenchmarkSetting(const BenchmarkSetting &benchmark_setting) {
   std::cout << "    benchmark_id: " << benchmark_setting.benchmark_id()
             << std::endl;
-  std::cout << "    accelerator: " << benchmark_setting.accelerator()
+  std::cout << "    accelerator: "
+            << benchmark_setting.delegate_choice(0).accelerator_name()
             << std::endl;
-  std::cout << "    accelerator_desc: " << benchmark_setting.accelerator_desc()
+  std::cout << "    accelerator_desc: "
+            << benchmark_setting.delegate_choice(0).accelerator_desc()
             << std::endl;
   std::cout << "    framework: " << benchmark_setting.framework() << std::endl;
-  std::cout << "    batch_size: " << benchmark_setting.batch_size()
-            << std::endl;
-  std::cout << "    model_path: " << benchmark_setting.model_path()
+  std::cout << "    batch_size: "
+            << benchmark_setting.delegate_choice(0).batch_size() << std::endl;
+  std::cout << "    model_path: "
+            << benchmark_setting.delegate_choice(0).model_file(0).model_path()
             << std::endl;
   std::cout << "    Custom Settings: " << std::endl;
   for (auto s : benchmark_setting.custom_setting()) {
@@ -124,9 +139,11 @@ int test_proto() {
   std::list<std::string> benchmarks;
   benchmarks.push_back("image_classification");
   benchmarks.push_back("image_classification_offline");
+  std::string custom_config = "key1:val1,key2:val2";
   for (auto benchmark_id : benchmarks) {
     // Convert to SettingList
-    SettingList setting_list = createSettingList(backend_setting, benchmark_id);
+    SettingList setting_list =
+        CreateSettingList(backend_setting, custom_config, benchmark_id);
 
     std::cout << "SettingList for " << benchmark_id << ":\n";
     dumpSettingList(setting_list);

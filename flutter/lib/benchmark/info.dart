@@ -27,17 +27,17 @@ class BenchmarkInfo {
 
   BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
     switch (task.id) {
-      case (BenchmarkId.imageClassification):
+      case (BenchmarkId.imageClassificationV2):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameImageClassification,
           detailsTitle: stringResources.benchInfoImageClassification,
-          detailsContent: stringResources.benchInfoImageClassificationDesc,
+          detailsContent: stringResources.benchInfoImageClassificationV2Desc,
         );
-      case (BenchmarkId.imageClassificationOffline):
+      case (BenchmarkId.imageClassificationOfflineV2):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameImageClassificationOffline,
           detailsTitle: stringResources.benchInfoImageClassification,
-          detailsContent: stringResources.benchInfoImageClassificationDesc,
+          detailsContent: stringResources.benchInfoImageClassificationV2Desc,
         );
       case (BenchmarkId.objectDetection):
         return BenchmarkLocalizationInfo(
@@ -62,6 +62,12 @@ class BenchmarkInfo {
           name: stringResources.benchNameSuperResolution,
           detailsTitle: stringResources.benchInfoSuperResolution,
           detailsContent: stringResources.benchInfoSuperResolutionDesc,
+        );
+      case (BenchmarkId.stableDiffusion):
+        return BenchmarkLocalizationInfo(
+          name: stringResources.benchNameStableDiffusion,
+          detailsTitle: stringResources.benchInfoStableDiffusion,
+          detailsContent: stringResources.benchInfoStableDiffusionDesc,
         );
       default:
         throw 'unhandled task id: ${task.id}';

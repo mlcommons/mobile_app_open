@@ -29,7 +29,7 @@ endif
 endif
 
 flutter: flutter/prepare flutter/platform
-flutter/result: flutter/result/json flutter/result/gen-schema
+flutter/result: flutter/result/json
 flutter/prepare: flutter/pub flutter/result/json flutter/backend-list flutter/protobuf flutter/l10n flutter/build-info flutter/firebase-config flutter/set-windows-build-number
 flutter/check-release-env: flutter/check/official-build flutter/check/build-number
 flutter/test: flutter/test/unit flutter/test/integration
@@ -51,18 +51,6 @@ flutter/check/build-number:
 	@[ -n "$$FLUTTER_BUILD_NUMBER" ] \
 		|| (echo FLUTTER_BUILD_NUMBER env must be explicitly set; exit 1)
 
-ifneq (${FLUTTER_DATA_FOLDER},)
-flutter_data_folder_arg="--dart-define=FLUTTER_DATA_FOLDER=${FLUTTER_DATA_FOLDER}"
-else
-flutter_data_folder_arg=
-endif
-ifneq (${FLUTTER_CACHE_FOLDER},)
-flutter_cache_folder_arg="--dart-define=FLUTTER_CACHE_FOLDER=${FLUTTER_CACHE_FOLDER}"
-else
-flutter_cache_folder_arg=
-endif
-flutter_folder_args=${flutter_data_folder_arg} ${flutter_cache_folder_arg}
-
 FIREBASE_CRASHLYTICS_ENABLED?=false
 flutter_firebase_crashlytics_arg="--dart-define=FIREBASE_CRASHLYTICS_ENABLED=${FIREBASE_CRASHLYTICS_ENABLED}"
 
@@ -72,11 +60,6 @@ export
 .PHONY: flutter/firebase-config
 flutter/firebase-config:
 	bash flutter/tool/generate-firebase-config-files.sh
-
-.PHONY: flutter/check/firebase-env
-flutter/check/firebase-env:
-	@echo FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
-	@[ -n "${FIREBASE_PROJECT_ID}" ] || (echo FIREBASE_PROJECT_ID env must be set; exit 1)
 
 .PHONY: flutter/backend-list
 flutter/backend-list:
@@ -90,32 +73,11 @@ flutter/backend-list:
 		> flutter/lib/backend/list.gen.dart
 	dart format flutter/lib/backend/list.gen.dart
 
-RESULT_JSON_SAMPLE_PATH?=output/extended_result_example.json
-.PHONY: flutter/result/gen-extended-sample
-flutter/result/gen-extended-sample:
-	cd flutter && \
-		${_start_args} dart run \
-		--define=jsonFileName=../${RESULT_JSON_SAMPLE_PATH} \
-		lib/data/generation_helpers/write_json_sample.main.dart
-
-default_result_json_schema_path=tools/extended_result_schema.json
-RESULT_JSON_SCHEMA_PATH?=${default_result_json_schema_path}
-.PHONY: flutter/result/gen-schema
-flutter/result/gen-schema: flutter/result/gen-extended-sample
-	quicktype ${RESULT_JSON_SAMPLE_PATH} \
-		--lang schema \
-		--out ${RESULT_JSON_SCHEMA_PATH}
-	cd flutter && \
-		${_start_args} dart run \
-		--define=schemaPath=../${RESULT_JSON_SCHEMA_PATH} \
-		lib/data/generation_helpers/edit_json_schema.main.dart
-
 .PHONY: flutter/result/json
 flutter/result/json:
 	@echo "Generate .g.dart files for the @JsonSerializable annotation"
-	@# https://github.com/dart-lang/build/issues/2835#issuecomment-1047849076
-	cd flutter && ${_start_args} flutter packages pub get
-	cd flutter && ${_start_args} flutter --no-version-check pub run \
+	cd flutter && ${_start_args} dart pub get
+	cd flutter && ${_start_args} dart run \
 		build_runner build --delete-conflicting-outputs
 
 .PHONY: flutter/build-info
@@ -142,9 +104,9 @@ flutter/update-splash-screen:
 
 .PHONY: flutter/l10n
 flutter/l10n:
-	flutter --no-version-check gen-l10n \
-		--arb-dir=flutter/lib/l10n \
-		--output-dir=flutter/lib/localizations \
+	cd flutter && flutter --no-version-check gen-l10n \
+		--arb-dir=lib/l10n \
+		--output-dir=lib/localizations \
 		--template-arb-file=app_en.arb \
 		--output-localization-file=app_localizations.dart \
 		--no-synthetic-package
@@ -176,7 +138,7 @@ flutter_test_device_arg=--device-id "${FLUTTER_TEST_DEVICE}"
 else
 flutter_test_device_arg=
 endif
-flutter_perf_test_arg=--dart-define=enable-perf-test=${PERF_TEST}
+flutter_perf_test_arg=--dart-define=PERF_TEST=${PERF_TEST} --dart-define=BENCHMARK_IDS=${BENCHMARK_IDS}
 .PHONY: flutter/test/integration
 flutter/test/integration:
 	cd flutter && ${_start_args} \
@@ -185,15 +147,13 @@ flutter/test/integration:
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
 		${flutter_firebase_crashlytics_arg} \
-		${flutter_perf_test_arg} \
-		${flutter_folder_args}
+		${flutter_perf_test_arg}
 
 .PHONY: flutter/run
 flutter/run:
 	cd flutter && ${_start_args} \
 		flutter --no-version-check \
 		run \
-		${flutter_folder_args} \
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
 		${flutter_firebase_crashlytics_arg}

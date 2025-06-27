@@ -31,13 +31,14 @@ class Store extends ChangeNotifier {
 
   BenchmarkRunModeEnum get selectedBenchmarkRunMode {
     String name = _getString(StoreConstants.selectedBenchmarkRunMode);
-    if (name == '') name = BenchmarkRunModeEnum.performanceOnly.name;
+    if (name == '') name = BenchmarkRunModeEnum.quickRun.name;
     return BenchmarkRunModeEnum.values.byName(name);
   }
 
   set selectedBenchmarkRunMode(BenchmarkRunModeEnum value) {
     _storeFromDisk.setString(
         StoreConstants.selectedBenchmarkRunMode, value.name);
+    cooldownDuration = value.cooldownDuration;
     notifyListeners();
   }
 
@@ -56,13 +57,6 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get testMode => _getBool(StoreConstants.testMode);
-
-  set testMode(bool value) {
-    _storeFromDisk.setBool(StoreConstants.testMode, value);
-    notifyListeners();
-  }
-
   bool get cooldown => _getBool(StoreConstants.cooldown, true);
 
   set cooldown(bool value) {
@@ -70,7 +64,7 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  int get cooldownDuration => _getInt(StoreConstants.cooldownDuration, 5);
+  int get cooldownDuration => _getInt(StoreConstants.cooldownDuration, 5 * 60);
 
   set cooldownDuration(int value) {
     _storeFromDisk.setInt(StoreConstants.cooldownDuration, value);
@@ -106,20 +100,6 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  String get dataFolderType => _getString(StoreConstants.dataFolderType);
-
-  set dataFolderType(String value) {
-    _storeFromDisk.setString(StoreConstants.dataFolderType, value);
-    notifyListeners();
-  }
-
-  String get customDataFolder => _getString(StoreConstants.customDataFolder);
-
-  set customDataFolder(String value) {
-    _storeFromDisk.setString(StoreConstants.customDataFolder, value);
-    notifyListeners();
-  }
-
   String get taskSelection => _getString(StoreConstants.taskSelection);
 
   set taskSelection(String value) {
@@ -133,12 +113,6 @@ class Store extends ChangeNotifier {
     _storeFromDisk.setBool(StoreConstants.crashlyticsEnabled, value);
     notifyListeners();
   }
-
-  int get testMinDuration => _getInt(StoreConstants.testMinDuration);
-
-  int get testCooldown => _getInt(StoreConstants.testCooldownDuration);
-
-  int get testMinQueryCount => _getInt(StoreConstants.testMinQueryCount);
 }
 
 class StoreConstants {
@@ -152,11 +126,6 @@ class StoreConstants {
   static const previousExtendedResult = 'previous extended result';
   static const previousAppVersion = 'previous app version';
   static const keepLogs = 'keep_logs';
-  static const dataFolderType = 'data folder type';
-  static const customDataFolder = 'custom data folder';
   static const taskSelection = 'disabled_tasks';
-  static const testMinDuration = 'test min duration';
-  static const testCooldownDuration = 'test cooldown duration';
-  static const testMinQueryCount = 'test min query count';
   static const crashlyticsEnabled = 'crashlyticsEnabled';
 }

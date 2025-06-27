@@ -1,4 +1,4 @@
-/* Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "qti_backend_helper.h"
 
+#include <random>
 #include <string>
 #include <vector>
 
@@ -67,15 +68,15 @@ static void split(std::vector<std::string> &split_string,
   }
 }
 
-static Snpe_StringList_Handle_t ResolveOutputLayerNames(std::string &line) {
-  Snpe_StringList_Handle_t outputLayersHandle = Snpe_StringList_Create();
+static Snpe_StringList_Handle_t ResolveCommaSeparatedList(std::string &line) {
+  Snpe_StringList_Handle_t stringListHandle = Snpe_StringList_Create();
   if (!line.empty()) {
     std::vector<std::string> names;
     split(names, line.substr(0), ',');
     for (auto &name : names)
-      Snpe_StringList_Append(outputLayersHandle, name.c_str());
+      Snpe_StringList_Append(stringListHandle, name.c_str());
   }
-  return outputLayersHandle;
+  return stringListHandle;
 }
 
 static Snpe_TensorShape_Handle_t calcStrides(
@@ -168,7 +169,10 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
             SNPE_PSNPE_INPUTOUTPUTTRANSMISSIONMODE_SYNC));
 
     Snpe_StringList_Handle_t outputLayers =
-        ResolveOutputLayerNames(snpeOutputLayers_);
+        ResolveCommaSeparatedList(snpeOutputLayers_);
+
+    Snpe_StringList_Handle_t outputTensors =
+        ResolveCommaSeparatedList(snpeOutputTensors_);
 
     Snpe_SNPEBuilder_Handle_t snpeBuilderHandle =
         Snpe_SNPEBuilder_Create(containerHandle);
@@ -180,6 +184,7 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
     Snpe_SNPEBuilder_SetRuntimeProcessorOrder(snpeBuilderHandle,
                                               dummyInputRuntimeListHandle);
     Snpe_SNPEBuilder_SetOutputLayers(snpeBuilderHandle, outputLayers);
+    Snpe_SNPEBuilder_SetOutputTensors(snpeBuilderHandle, outputTensors);
 
     if (Snpe_StringList_Size(outputLayers) > 0)
       Snpe_BuildConfig_SetOutputBufferNames(buildConfigHandle, outputLayers);
@@ -191,9 +196,6 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
     if (Socs::get_use_dsp_features()) {
       // use unsignedPD feature for untrusted app.
       platformOptionStr += "unsignedPD:ON";
-    }
-    if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)) {
-      Snpe_BuildConfig_SetEnableInitCache(buildConfigHandle, true);
     }
     Snpe_BuildConfig_SetPlatformOptions(buildConfigHandle,
                                         platformOptionStr.c_str());
@@ -252,10 +254,25 @@ void QTIBackendHelper::use_psnpe(const char *model_path) {
 
 mlperf_status_t QTIBackendHelper::execute() {
   if (useIonBuffers_ && !isIonRegistered) {
-    if (Snpe_SNPE_RegisterIonBuffers(snpe_->snpeHandle, ionBufferMapHandle_) ==
-        SNPE_SUCCESS)
-      LOG(INFO) << "Ion Buffer Registration Successful";
-    isIonRegistered = true;
+    if (!useSnpe_) {
+      if (Snpe_PSNPE_RegisterUserMemoryMappedBuffers(
+              psnpe_->psnpeHandle, userMemoryMappedBufferMapHandle_) ==
+          SNPE_SUCCESS) {
+        LOG(INFO) << "Ion Buffer Registration Successful";
+        isIonRegistered = true;
+      } else {
+        LOG(FATAL) << "Not able to do registration";
+      }
+    } else {
+      if (Snpe_SNPE_RegisterUserMemoryMappedBuffers(
+              snpe_->snpeHandle, userMemoryMappedBufferMapHandle_) ==
+          SNPE_SUCCESS) {
+        LOG(INFO) << "Ion Buffer Registration Successful";
+        isIonRegistered = true;
+      } else {
+        LOG(FATAL) << "Not able to do registration";
+      }
+    }
   }
   if (!useSnpe_) {
     if (Snpe_PSNPE_Execute(psnpe_->psnpeHandle, inputMapListHandle_,
@@ -300,7 +317,9 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
         Snpe_SNPEBuilder_Create(containerHandle);
     Snpe_SNPEBuilder_SetCpuFixedPointMode(snpeBuilderHandle, useCpuInt8_);
     Snpe_StringList_Handle_t outputLayers =
-        ResolveOutputLayerNames(snpeOutputLayers_);
+        ResolveCommaSeparatedList(snpeOutputLayers_);
+    Snpe_StringList_Handle_t outputTensors =
+        ResolveCommaSeparatedList(snpeOutputTensors_);
     Snpe_SNPEBuilder_SetPerformanceProfile(snpeBuilderHandle, perfProfile_);
     Snpe_SNPEBuilder_SetProfilingLevel(snpeBuilderHandle, profilingLevel_);
     Snpe_SNPEBuilder_SetExecutionPriorityHint(snpeBuilderHandle,
@@ -309,11 +328,9 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
                                               inputRuntimeListHandle);
     Snpe_SNPEBuilder_SetUseUserSuppliedBuffers(snpeBuilderHandle, true);
     Snpe_SNPEBuilder_SetOutputLayers(snpeBuilderHandle, outputLayers);
+    Snpe_SNPEBuilder_SetOutputTensors(snpeBuilderHandle, outputTensors);
 
     std::string platformOptionStr = "";
-    if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)) {
-      Snpe_SNPEBuilder_SetInitCacheMode(snpeBuilderHandle, true);
-    }
     Snpe_PlatformConfig_Handle_t platformConfigHandle =
         Snpe_PlatformConfig_Create();
     bool setSuccess = Snpe_PlatformConfig_SetPlatformOptions(
@@ -393,6 +410,9 @@ void QTIBackendHelper::get_accelerator_instances(int &num_dsp, int &num_gpu,
 void QTIBackendHelper::map_inputs() {
   Snpe_UserBufferMap_Handle_t inputMapHandle = Snpe_UserBufferMap_Create();
 
+  uint64_t offset = 0;
+  std::vector<uint8_t> inputBufferShared;
+
   for (int bi = 0; bi < batchSize_ / inputBatch_; bi++) {
     for (size_t i = 0; i < Snpe_StringList_Size(networkInputTensorNamesHandle_);
          ++i) {
@@ -405,19 +425,33 @@ void QTIBackendHelper::map_inputs() {
           calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
                            Snpe_TensorShape_GetDimensions(dimsHandle));
       std::vector<Snpe_IUserBuffer_Handle_t> ubPtr;
+      std::vector<uint8_t> inputBuffer;
 
-      // LOG(INFO) << "inputbuffer: " << inputBufferType_ << " name: " << name;
       if (inputBufferType_ == QTIBufferType::FLOAT_32) {
         // Prepare float buffer
         bufSize *= sizeof(float);
-        std::vector<uint8_t> inputBuffer(bufSize);
+
+        if (useIonBuffers_ && inputBatch_ > 1) {
+          if (bi == 0) {
+            inputBufferShared.resize(bufSize * (batchSize_ / inputBatch_));
+          }
+        } else {
+          inputBuffer.resize(bufSize);
+        }
         auto stridesHandle = calcStrides(
             Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(float));
         Snpe_UserBufferEncoding_Handle_t ubeFloatHandle =
             Snpe_UserBufferEncodingFloat_Create();
-        ubPtr.push_back(Snpe_Util_CreateUserBuffer(
-            std::move(inputBuffer.data()), inputBuffer.size(), stridesHandle,
-            ubeFloatHandle));
+
+        if (useIonBuffers_ && inputBatch_ > 1) {
+          ubPtr.push_back(Snpe_Util_CreateUserBufferShared(
+              std::move(inputBufferShared.data()), bufSize, offset,
+              stridesHandle, ubeFloatHandle));
+        } else {
+          ubPtr.push_back(Snpe_Util_CreateUserBuffer(
+              std::move(inputBuffer.data()), inputBuffer.size(), stridesHandle,
+              ubeFloatHandle));
+        }
         Snpe_UserBufferMap_Add(inputMapHandle, name, ubPtr.back());
 
         Snpe_TensorShape_Delete(stridesHandle);
@@ -426,7 +460,14 @@ void QTIBackendHelper::map_inputs() {
         // Prepare tf8 buffer
         bufSize *= sizeof(uint8_t);
         // Pass the quantization parameters from the model to UB
-        std::vector<uint8_t> inputBuffer(bufSize);
+        if (useIonBuffers_ && inputBatch_ > 1) {
+          if (bi == 0) {
+            inputBufferShared.resize(bufSize * (batchSize_ / inputBatch_));
+          }
+        } else {
+          inputBuffer.resize(bufSize);
+        }
+
         auto stridesHandle = calcStrides(
             Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(uint8_t));
         auto ubeTfN = Snpe_IUserBuffer_GetEncoding_Ref(ubaOptHandle);
@@ -438,17 +479,26 @@ void QTIBackendHelper::map_inputs() {
         if (!ubeTfN)
           ubeTfN = Snpe_UserBufferEncodingTfN_Create(128.0, 1.0 / 255, 8);
 
-        ubPtr.push_back(Snpe_Util_CreateUserBuffer(
-            std::move(inputBuffer.data()), inputBuffer.size(), stridesHandle,
-            ubeTfN));
+        if (useIonBuffers_ && inputBatch_ > 1) {
+          ubPtr.push_back(Snpe_Util_CreateUserBufferShared(
+              std::move(inputBufferShared.data()), bufSize, offset,
+              stridesHandle, ubeTfN));
+        } else {
+          ubPtr.push_back(Snpe_Util_CreateUserBuffer(
+              std::move(inputBuffer.data()), inputBuffer.size(), stridesHandle,
+              ubeTfN));
+        }
+
         Snpe_UserBufferMap_Add(inputMapHandle, name, ubPtr.back());
 
         Snpe_TensorShape_Delete(stridesHandle);
         Snpe_UserBufferEncodingTfN_Delete(ubeTfN);
       }
+      inputBatchBufsize_ = bufSize;
       Snpe_IBufferAttributes_Delete(ubaOptHandle);
       Snpe_TensorShape_Delete(dimsHandle);
     }
+    offset += inputBatchBufsize_;
     Snpe_UserBufferList_PushBack(inputMapListHandle_, inputMapHandle);
   }
   bufs_.resize(batchSize_ / inputBatch_);
@@ -457,6 +507,8 @@ void QTIBackendHelper::map_inputs() {
 
 void QTIBackendHelper::map_outputs() {
   Snpe_UserBufferMap_Handle_t outputMapHandle = Snpe_UserBufferMap_Create();
+
+  uint64_t offset = 0;
 
   for (int bi = 0; bi < batchSize_ / inputBatch_; bi++) {
     for (size_t i = 0;
@@ -471,8 +523,7 @@ void QTIBackendHelper::map_outputs() {
                            Snpe_TensorShape_GetDimensions(dimsHandle));
 
       outputBatchBufsize_ = bufSize;
-      // LOG(INFO) << "outputBufferType: " << outputBufferType_
-      //          << " name: " << name;
+
       if (useIonBuffers_) {
         Allocator<uint8_t>::useIonAllocator();
       } else {
@@ -482,19 +533,39 @@ void QTIBackendHelper::map_outputs() {
         auto ubeTfN = Snpe_UserBufferEncodingTfN_Create(0, 1.0f, 8);
 
         std::vector<Snpe_IUserBuffer_Handle_t> x;
-        bufs_[bi].emplace(std::string(name),
-                          std::vector<uint8_t, Allocator<uint8_t>>(
-                              bufSize * sizeof(uint8_t)));
+
         auto stridesHandle = calcStrides(
             Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(uint8_t));
-        x.push_back(Snpe_Util_CreateUserBuffer(bufs_[bi].at(name).data(),
-                                               bufSize * sizeof(uint8_t),
-                                               stridesHandle, ubeTfN));
-        Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
-        if (useIonBuffers_)
-          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name,
-                                 bufs_[bi].at(name).data());
 
+        if (useIonBuffers_ && inputBatch_ > 1) {
+          if (bi == 0) {
+            bufs_[bi].emplace(
+                std::string(name),
+                std::vector<uint8_t, Allocator<uint8_t>>(
+                    bufSize * sizeof(uint8_t) * (batchSize_ / inputBatch_)));
+          }
+          x.push_back(Snpe_Util_CreateUserBufferShared(bufs_[0].at(name).data(),
+                                                       bufSize, offset,
+                                                       stridesHandle, ubeTfN));
+        } else {
+          bufs_[bi].emplace(std::string(name),
+                            std::vector<uint8_t, Allocator<uint8_t>>(
+                                bufSize * sizeof(uint8_t)));
+          x.push_back(Snpe_Util_CreateUserBuffer(
+              bufs_[bi].at(name).data(), bufSize, stridesHandle, ubeTfN));
+        }
+
+        Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
+        if (useIonBuffers_ && inputBatch_ > 1) {
+          Snpe_UserMemoryMap_AddFdOffset(
+              userMemoryMappedBufferMapHandle_, name, bufs_[0].at(name).data(),
+              bufSize * sizeof(uint8_t) * (batchSize_ / inputBatch_), fd,
+              offset);
+        } else if (useIonBuffers_) {
+          Snpe_UserMemoryMap_AddFdOffset(userMemoryMappedBufferMapHandle_, name,
+                                         bufs_[bi].at(name).data(),
+                                         bufSize * sizeof(uint8_t), fd, 0);
+        }
         Snpe_UserBufferEncodingTfN_Delete(ubeTfN);
         Snpe_TensorShape_Delete(stridesHandle);
       } else if (outputBufferType_ == QTIBufferType::INT_32) {
@@ -511,8 +582,9 @@ void QTIBackendHelper::map_outputs() {
 
         Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
         if (useIonBuffers_)
-          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name,
-                                 bufs_[bi].at(name).data());
+          Snpe_UserMemoryMap_AddFdOffset(userMemoryMappedBufferMapHandle_, name,
+                                         bufs_[bi].at(name).data(),
+                                         bufSize * sizeof(int32_t), fd, 0);
 
         Snpe_UserBufferEncodingIntN_Delete(ubeIntN);
         Snpe_TensorShape_Delete(stridesHandle);
@@ -529,16 +601,19 @@ void QTIBackendHelper::map_outputs() {
             bufs_[bi].at(name).data(), bufSize * sizeof(float), stridesHandle,
             userBufferEncodingFloat));
         Snpe_UserBufferMap_Add(outputMapHandle, name, x.back());
-        if (useIonBuffers_)
-          Snpe_UserMemoryMap_Add(ionBufferMapHandle_, name,
-                                 bufs_[bi].at(name).data());
-
+        if (useIonBuffers_) {
+          Snpe_UserMemoryMap_AddFdOffset(userMemoryMappedBufferMapHandle_, name,
+                                         bufs_[bi].at(name).data(),
+                                         bufSize * sizeof(float), fd, 0);
+        }
         Snpe_UserBufferEncodingFloat_Delete(userBufferEncodingFloat);
         Snpe_TensorShape_Delete(stridesHandle);
       }
       Snpe_IBufferAttributes_Delete(ubaOptHandle);
       Snpe_TensorShape_Delete(dimsHandle);
     }
+
+    offset += outputBatchBufsize_;
     Snpe_UserBufferList_PushBack(outputMapListHandle_, outputMapHandle);
   }
   Snpe_UserBufferMap_Delete(outputMapHandle);
@@ -600,7 +675,8 @@ void QTIBackendHelper::get_data_formats() {
     long bufSize = calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
                                     Snpe_TensorShape_GetDimensions(dimsHandle));
     if (outputBufferType_ == FLOAT_32) {
-      if (snpeOutputLayers_ == "transpose") {
+      if (snpeOutputLayers_ == "transpose" ||
+          snpeOutputTensors_ == "transpose:0") {
         // For mobileBERT, return output size as half the size of computed
         // values,
         // because the DLC returns only single layer as output but the app needs
@@ -694,4 +770,109 @@ void QTIBackendHelper::set_runtime_config() {
 std::string QTIBackendHelper::get_snpe_version() {
   Snpe_DlVersion_Handle_t version = Snpe_Util_GetLibraryVersion();
   return Snpe_DlVersion_GetBuild(version);
+}
+
+std::vector<float> get_normal(unsigned numbers, unsigned seed = 5,
+                              float mean = 0.0, float stddev = 1.0) {
+  std::default_random_engine generator(seed);
+  std::normal_distribution<float> distribution(mean, stddev);
+
+  std::vector<float> d;
+  for (unsigned i = 0; i < numbers; i++) d.push_back(distribution(generator));
+
+  return d;
+}
+
+void QTIBackendHelper::initSd(const char *model_path, const char *lib_path) {
+#ifdef STABLEDIFFUSION_FLAG
+  bool use_mmap = false;  // we don't want to use cached
+  uint64_t context_bin_mmap_read_budget = 100000;
+  std::string temp(lib_path);
+  native_lib_path = temp;
+  std::string newtemp(model_path);
+  data_folder_path = newtemp;
+
+  // TODO: Below vars are using in preprocessInputSd
+  // May need to be set from the configuration from MLC. Hardcoded for now.
+  num_steps = 20;
+  seed = 633994880;
+  guidance_scale = 7.5;
+
+  mlperf_data_t input;
+  input.type = mlperf_data_t::Int32;
+  input.size = 77 * 1;  // tokenized inputs 77 numbers
+  inputFormat_.push_back(input);
+
+  mlperf_data_t output;
+  output.type = mlperf_data_t::Uint8;
+  output.size = 512 * 512 * 3;
+  outputFormat_.push_back(output);
+
+  sd_pipeline = new QnnApiHelpers();
+
+  if (0 != sd_pipeline->Init(data_folder_path, native_lib_path, 768, 77, 1.0,
+                             512, 512, 3.0, use_mmap,
+                             context_bin_mmap_read_budget)) {
+    LOG(FATAL) << "Initialization Failure";
+  }
+#endif
+}
+
+bool QTIBackendHelper::preprocessInputSd(void *data) {
+#ifdef STABLEDIFFUSION_FLAG
+  int32_t *input_prompt_ids = (int32_t *)data;
+  std::vector<float32_t> noise = get_normal(64 * 64 * 4, seed);
+  return sd_pipeline->PreProcessInput(input_prompt_ids, noise, num_steps,
+                                      guidance_scale);
+#else
+  return false;
+#endif
+}
+
+bool QTIBackendHelper::executeSd() {
+#ifdef STABLEDIFFUSION_FLAG
+  for (int stepIdx = 0; stepIdx < num_steps; stepIdx++) {
+    bool runVAE = ((stepIdx + 1) == num_steps);
+    if (true != sd_pipeline->RunInference(runVAE)) {
+      LOG(FATAL) << "RunInference failure";
+      return false;
+    }
+  }
+  return true;
+#else
+  return false;
+#endif
+}
+
+bool QTIBackendHelper::getOutputSd(void **data) {
+#ifdef STABLEDIFFUSION_FLAG
+  JniHelpers::InferenceReturn inferenceReturn;
+  if (true != sd_pipeline->PostProcessOutput(false, false, inferenceReturn)) {
+    LOG(FATAL) << "PostProcessOutput failure";
+    return false;
+  }
+  *data = inferenceReturn.m_ImageData;
+
+  // delete sd_pipeline;
+  // sd_pipeline = new QnnApiHelpers();
+  return true;
+#else
+  return false;
+#endif
+}
+
+void QTIBackendHelper::deinitSd() {
+#ifdef STABLEDIFFUSION_FLAG
+  bool use_mmap = false;  // we don't want to use cached
+  uint64_t context_bin_mmap_read_budget = 100000;
+  /*if (0 != sd_pipeline->Init(data_folder_path, native_lib_path,
+                     768, 77, 1.0,
+                     512, 512, 3.0,
+                     use_mmap, context_bin_mmap_read_budget)) {
+                     LOG(FATAL) << "Initialization Failure";
+                     }
+*/
+  delete sd_pipeline;
+  sd_pipeline = nullptr;
+#endif
 }

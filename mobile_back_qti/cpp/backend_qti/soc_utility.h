@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -29,6 +29,8 @@ limitations under the License.
 #define UNSUPPORTED_SOC_STR "Unsupported"
 #define UNSUPPORTED_SOC_ID 0
 
+extern bool useIonBuffer_g;
+
 class SocInfo {
  public:
   SocInfo(std::string soc_name = DEFAULT_SOC_STR)
@@ -41,12 +43,13 @@ class SocInfo {
         m_soc_name(soc_name),
         m_num_inits(0),
         m_max_cores(0),
-        m_needs_rpcmem(false) {}
+        m_needs_rpcmem(false),
+        m_needs_stablediffusion(false) {}
 
   SocInfo(int num_dsp, int num_gpu, int num_cpu, int num_gpu_fp16,
           bool useDspFeatures, const std::string settings, std::string soc_name,
           int num_inits, std::vector<int> hlc, std::vector<int> llc,
-          int max_cores, bool needs_rpcmem)
+          int max_cores, bool needs_rpcmem, bool needs_stablediffusion = false)
       : m_num_dsp(num_dsp),
         m_num_gpu(num_gpu),
         m_num_cpu(num_cpu),
@@ -58,9 +61,22 @@ class SocInfo {
         m_high_latency_cores(hlc),
         m_low_latency_cores(llc),
         m_max_cores(max_cores),
-        m_needs_rpcmem(needs_rpcmem) {
+        m_needs_rpcmem(needs_rpcmem),
+        m_needs_stablediffusion(needs_stablediffusion) {
     if (m_useDspFeatures == false) {
       m_num_inits = 1;
+    }
+    if (m_needs_stablediffusion) {
+#ifdef STABLEDIFFUSION_FLAG
+      if (m_soc_name == "SD8G3")
+        m_settings += qti_settings_stablediffusion_v75;
+      else if (m_soc_name == "SD8Elite")
+        m_settings += qti_settings_stablediffusion_v79;
+      else
+        // set m_needs_stablediffusion flag to "true" in SocInfo table to enable
+        // default stable diffusion settings
+        m_settings += qti_settings_stablediffusion;
+#endif
     }
   }
 
@@ -76,6 +92,7 @@ class SocInfo {
   std::vector<int> m_low_latency_cores;
   int m_max_cores;
   bool m_needs_rpcmem;
+  bool m_needs_stablediffusion;
 };
 
 class SocProperties {
@@ -95,6 +112,10 @@ class Socs {
 #endif
  public:
   static void soc_info_init();
+#ifndef __ANDROID__
+  static std::string getServiceBinaryPath(std::wstring const &serviceName);
+#endif
+  static std::string get_external_config_string();
 
   static void soc_offline_core_instance(int &num_dsp, int &num_gpu,
                                         int &num_cpu, int &num_gpu_fp16,

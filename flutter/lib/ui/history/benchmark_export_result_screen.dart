@@ -9,8 +9,7 @@ import 'package:mlperfbench/ui/history/utils.dart';
 class BenchmarkExportResultScreen extends StatefulWidget {
   final BenchmarkExportResult result;
 
-  const BenchmarkExportResultScreen({Key? key, required this.result})
-      : super(key: key);
+  const BenchmarkExportResultScreen({super.key, required this.result});
 
   @override
   State<BenchmarkExportResultScreen> createState() =>
@@ -24,7 +23,7 @@ class _BenchmarkExportResultScreenState
 
   @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     helper = HistoryHelperUtils(l10n);
 
     return Scaffold(

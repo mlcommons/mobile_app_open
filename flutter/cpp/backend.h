@@ -74,6 +74,10 @@ class Backend {
   virtual void ConvertInputs(int bytes, int image_width, int image_height,
                              uint8_t* data) = 0;
 
+  // Allow backend to do output layout change
+  virtual void ConvertOutputs(int bytes, int image_width, int image_height,
+                              uint8_t* data) = 0;
+
  private:
   BackendSetting settings_;
 };

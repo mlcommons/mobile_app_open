@@ -15,7 +15,7 @@ benchmark_setting {
   framework: "ENN"
   delegate_choice: {
     delegate_name: "ENN_NPU"
-    accelerator_name: "npu"
+    accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     custom_setting {
       id: "i_type"
@@ -25,8 +25,10 @@ benchmark_setting {
       id: "o_type"
       value: "Float32"
     }
-    model_path: "local:///MLPerf_sideload/ic.nnc"
-    model_checksum: "a1f2b667ba702531fb85d83bb4ff4e94"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/ic.nnc"
+      model_checksum: "1a84db0b3dc40a6e217b7f2c8eb2980b"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 900000
@@ -37,7 +39,7 @@ benchmark_setting {
   framework: "ENN"
   delegate_choice: {
     delegate_name: "ENN_NPU"
-    accelerator_name: "npu"
+    accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     custom_setting {
       id: "i_type"
@@ -47,8 +49,10 @@ benchmark_setting {
       id: "o_type"
       value: "Float32"
     }
-    model_path: "local:///MLPerf_sideload/od.nnc"
-    model_checksum: "0d11a82c8b39da82f620dd972caac3f2"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/od.nnc"
+      model_checksum: "5e7abcc8fa6f7c3e0bd8955a9ef1e8cb"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -58,7 +62,7 @@ benchmark_setting {
   benchmark_id: "image_segmentation_v1"
   framework: "ENN"
   delegate_choice: { delegate_name: "ENN_NPU"
-    accelerator_name: "npu"
+    accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     custom_setting {
       id: "i_type"
@@ -68,8 +72,11 @@ benchmark_setting {
       id: "o_type"
       value: "Int32"
     }
-    model_path: "local:///MLPerf_sideload/is.nnc"
-    model_checksum: "e852f29a81cafad37e803a0d1af7c533" }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/is.nnc"
+      model_checksum: "b501ed669da753b08a151639798af37e"
+    }
+  }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
@@ -79,7 +86,7 @@ benchmark_setting {
   framework: "ENN"
   delegate_choice: {
     delegate_name: "ENN_NPU"
-    accelerator_name: "npu"
+    accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     custom_setting {
       id: "i_type"
@@ -89,8 +96,10 @@ benchmark_setting {
       id: "o_type"
       value: "Int32"
     }
-    model_path: "local:///MLPerf_sideload/sm_uint8.nnc"
-    model_checksum: "34fa011cfbf145ccc06072840974d9a1"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/sm_uint8.nnc"
+      model_checksum: "b02531ae19686c6574857bb18406966c"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -111,8 +120,10 @@ benchmark_setting {
       id: "o_type"
       value: "Float32"
     }
-    model_path: "local:///MLPerf_sideload/sr.nnc"
-    model_checksum: "6e725dffed620377b9eff463e106e6dd"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/sr.nnc"
+      model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
@@ -123,7 +134,7 @@ benchmark_setting {
   framework: "ENN"
   delegate_choice: {
     delegate_name: "ENN_NPU"
-    accelerator_name: "npu"
+    accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     batch_size: 48
     custom_setting {
@@ -134,8 +145,10 @@ benchmark_setting {
       id: "o_type"
       value: "Float32"
     }
-    model_path: "local:///MLPerf_sideload/ic_offline.nnc"
-    model_checksum: "a1f2b667ba702531fb85d83bb4ff4e94"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/ic_offline.nnc"
+      model_checksum: "9fcba01bf828b5cb5b1a39b55a8a7ed9"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000

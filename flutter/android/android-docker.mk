@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The MLPerf Authors. All Rights Reserved.
+# Copyright 2020-2024 The MLPerf Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,17 +37,17 @@ flutter_common_docker_flags= \
 		-v mlperf-mobile-flutter-cache-bazel-${user_id}:/image-workdir/cache/bazel \
 		--env BAZEL_CACHE_ARG="--disk_cache=/image-workdir/cache/bazel" \
 		--env WITH_TFLITE=${WITH_TFLITE} \
+		--env USER_ID=${user_id} \
 		--env WITH_QTI=${WITH_QTI} \
 		--env WITH_SAMSUNG=${WITH_SAMSUNG} \
 		--env WITH_PIXEL=${WITH_PIXEL} \
 		--env WITH_MEDIATEK=${WITH_MEDIATEK} \
 		--env proxy_bazel_args=${proxy_bazel_args} \
+		--env BAZEL_OUTPUT_ROOT_ARG="--output_user_root=/image-workdir/cache/bazel" \
 		--env OFFICIAL_BUILD=${OFFICIAL_BUILD} \
 		--env FIREBASE_CRASHLYTICS_ENABLED=${FIREBASE_CRASHLYTICS_ENABLED} \
 		--env FLUTTER_BUILD_NUMBER=${FLUTTER_BUILD_NUMBER} \
 		--env FLUTTER_FORCE_PUB_GET=1 \
-		--env FLUTTER_DATA_FOLDER=${FLUTTER_DATA_FOLDER} \
-		--env FLUTTER_CACHE_FOLDER=${FLUTTER_CACHE_FOLDER} \
 		${proxy_docker_args} \
 		${backend_qti_flutter_docker_args} \
 		${backend_samsung_docker_args} \
@@ -64,3 +64,8 @@ docker/flutter/android/release: flutter/check-release-env flutter/android/docker
 	MSYS2_ARG_CONV_EXCL="*" docker run \
 		${flutter_common_docker_flags} \
 		make flutter/android/release
+
+docker/flutter/clean: flutter/check-release-env
+	MSYS2_ARG_CONV_EXCL="*" docker run \
+		${flutter_common_docker_flags} \
+		make flutter/clean

@@ -1,4 +1,4 @@
-/* Copyright 2019-2021 The MLPerf Authors. All Rights Reserved.
+/* Copyright 2019-2021,2024 The MLPerf Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ limitations under the License.
 #include "flutter/cpp/backends/external.h"
 #include "flutter/cpp/datasets/ade20k.h"
 #include "flutter/cpp/datasets/coco.h"
+#include "flutter/cpp/datasets/coco_gen.h"
 #include "flutter/cpp/datasets/imagenet.h"
 #include "flutter/cpp/datasets/snu_sr.h"
 #include "flutter/cpp/datasets/squad.h"
@@ -64,6 +65,8 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
     return DatasetConfig::ADE20K;
   } else if (absl::EqualsIgnoreCase(name, "SNUSR")) {
     return DatasetConfig::SNUSR;
+  } else if (absl::EqualsIgnoreCase(name, "COCOGEN")) {
+    return DatasetConfig::COCOGEN;
   } else if (absl::EqualsIgnoreCase(name, "DUMMY")) {
     return DatasetConfig::NONE;
   } else {
@@ -83,6 +86,8 @@ DatasetConfig::DatasetType BenchmarkId2DatasetType(absl::string_view name) {
     return DatasetConfig::ADE20K;
   } else if (absl::StartsWith(name, "super_resolution")) {
     return DatasetConfig::SNUSR;
+  } else if (absl::StartsWith(name, "stable_diffusion")) {
+    return DatasetConfig::COCOGEN;
   } else {
     LOG(FATAL) << "Unrecognized benchmark_id: " << name;
     return DatasetConfig::NONE;
@@ -108,7 +113,7 @@ int Main(int argc, char *argv[]) {
           "Benchmark ID. One of image_classification, "
           "image_classification_v2, object_detection, "
           "natural_language_processing, "
-          "image_segmentation_v2, super_resolution, "
+          "image_segmentation_v2, super_resolution, stable_diffusion, "
           "image_classification_offline, image_classification_offline_v2",
           Flag::kPositional)};
   Flags::Parse(&argc, const_cast<const char **>(argv), flag_list);
@@ -127,7 +132,7 @@ int Main(int argc, char *argv[]) {
   command_line += " " + backend_name + " " + benchmark_id;
 
   // Command Line Flags for mlperf.
-  std::string mode, scenario = "SingleStream", output_dir;
+  std::string mode, scenario = "SingleStream", output_dir, custom_config;
   int min_query_count = 100, min_duration_ms = 100,
       max_duration_ms = 10 * 60 * 1000,
       single_stream_expected_latency_ns = 1000000;
@@ -152,8 +157,9 @@ int Main(int argc, char *argv[]) {
                         "A hint used by the loadgen to pre-generate "
                         "enough samples to meet the minimum test duration."),
        Flag::CreateFlag("output_dir", &output_dir,
-                        "The output directory of mlperf.", Flag::kRequired)});
-
+                        "The output directory of mlperf.", Flag::kRequired),
+       Flag::CreateFlag("custom_config", &custom_config,
+                        "Custom config in form key1:val1,key2:val2.")});
   // Command Line Flags for backend.
   std::unique_ptr<Backend> backend;
   std::unique_ptr<Dataset> dataset;
@@ -202,9 +208,8 @@ int Main(int argc, char *argv[]) {
             }
           }
         }
-
         SettingList setting_list =
-            createSettingList(backend_setting, benchmark_id);
+            CreateSettingList(backend_setting, custom_config, benchmark_id);
 
         ExternalBackend *external_backend = new ExternalBackend(
             model_file_path, lib_path, setting_list, native_lib_path);
@@ -221,6 +226,12 @@ int Main(int argc, char *argv[]) {
       LOG(INFO) << "Using Imagenet dataset";
       std::string images_directory, groundtruth_file;
       int offset = 1, image_width = 224, image_height = 224;
+      if (benchmark_id == "image_classification_v2" ||
+          benchmark_id == "image_classification_offline_v2") {
+        offset = 0;
+        image_width = 384;
+        image_height = 384;
+      }
       std::vector<Flag> dataset_flags{
           Flag::CreateFlag("images_directory", &images_directory,
                            "Path to ground truth images.", Flag::kRequired),
@@ -351,6 +362,28 @@ int Main(int argc, char *argv[]) {
         dataset.reset(new SNUSR(backend.get(), images_directory,
                                 ground_truth_directory, num_channels, scale,
                                 image_width, image_height));
+      }
+      // Adds to flag_list for showing help.
+      flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                       dataset_flags.end());
+    } break;
+    case DatasetConfig::COCOGEN: {
+      LOG(INFO) << "Using COCO 2014 dataset for Stable Diffusion benchmark";
+      std::string input_tfrecord, input_clip_model = "";
+      std::vector<Flag> dataset_flags{
+          Flag::CreateFlag(
+              "input_tfrecord", &input_tfrecord,
+              "Path to the tfrecord file containing inputs for the model.",
+              Flag::kRequired),
+          Flag::CreateFlag(
+              "input_clip_model", &input_clip_model,
+              "Path to the CLIP model (TFLite) file for score prediction."),
+      };
+
+      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+          backend) {
+        dataset.reset(new CocoGen(backend.get(), input_tfrecord,
+                                  input_clip_model, output_dir));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),

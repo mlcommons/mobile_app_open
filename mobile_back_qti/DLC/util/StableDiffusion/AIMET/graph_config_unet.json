@@ -1,0 +1,17 @@
+{
+    "graphs": [{
+        "graph_names":["unet"],
+        "vtcm_mb":8,
+        "O" : 3,
+        "fp16_relaxed_precision": 0
+    }],
+    "devices": [
+        {   "pd_session": "unsigned",
+            "dsp_arch": "v79",
+            "cores":[{
+                "rpc_control_latency": 100,
+                "perf_profile": "burst"
+            }]
+        }
+    ]
+  }

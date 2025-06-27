@@ -14,17 +14,31 @@ key: <accelerator> OR <accelerator>|<backendName>
 - psnpe_dsp -> Android QTI
 - neuron-mdla > Android MediaTek
 - neuron > Android MediaTek
+- samsung_npu > Android Samsung
 */
 
-const Map<String, Interval> _imageClassification = {
-  'cpu': Interval(min: 1.00, max: 1.00),
-  'npu': Interval(min: 0.89, max: 0.91),
+const Map<String, Interval> _imageClassificationV2 = {
+  'cpu': Interval(min: 0.82, max: 0.84),
+  'npu': Interval(min: 0.80, max: 0.82),
+  'tpu': Interval(min: 0.82, max: 0.84),
+  'ane': Interval(min: 0.69, max: 0.91),
+  'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
+  'snpe_dsp': Interval(min: 0.83, max: 0.85),
+  'psnpe_dsp': Interval(min: 0.83, max: 0.85),
+  'neuron-mdla': Interval(min: 0.81, max: 0.83),
+  'samsung_npu': Interval(min: 0.83, max: 0.85),
+};
+
+const Map<String, Interval> _imageClassificationOfflineV2 = {
+  'cpu': Interval(min: 0.88, max: 0.91),
+  'npu': Interval(min: 0.69, max: 0.71),
   'tpu': Interval(min: 0.89, max: 0.91),
-  'ane': Interval(min: 1.00, max: 1.00),
-  'cpu&gpu&ane': Interval(min: 1.00, max: 1.00),
-  'snpe_dsp': Interval(min: 0.78, max: 0.82),
-  'psnpe_dsp': Interval(min: 0.78, max: 0.82),
-  'neuron-mdla': Interval(min: 0.88, max: 0.91),
+  'ane': Interval(min: 0.69, max: 0.91),
+  'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
+  'snpe_dsp': Interval(min: 0.88, max: 0.91),
+  'psnpe_dsp': Interval(min: 0.89, max: 0.91),
+  'neuron-mdla': Interval(min: 0.79, max: 0.81),
+  'samsung_npu': Interval(min: 0.98, max: 1.0),
 };
 
 const Map<String, Interval> _objectDetection = {
@@ -34,21 +48,23 @@ const Map<String, Interval> _objectDetection = {
   'ane|TFLite': Interval(min: 0.31, max: 0.34),
   'ane|Core ML': Interval(min: 0.45, max: 0.46),
   'cpu&gpu&ane': Interval(min: 0.45, max: 0.46),
-  'snpe_dsp': Interval(min: 0.32, max: 0.35),
-  'psnpe_dsp': Interval(min: 0.32, max: 0.35),
-  'neuron': Interval(min: 0.28, max: 0.31),
+  'snpe_dsp': Interval(min: 0.34, max: 0.35),
+  'psnpe_dsp': Interval(min: 0.34, max: 0.35),
+  'neuron': Interval(min: 0.28, max: 0.35),
+  'samsung_npu': Interval(min: 0.36, max: 0.39),
 };
 
-const Map<String, Interval> _imageSegmentation = {
+const Map<String, Interval> _imageSegmentationV2 = {
   'cpu': Interval(min: 0.38, max: 0.40),
   'npu': Interval(min: 0.33, max: 0.34),
   'tpu': Interval(min: 0.33, max: 0.34),
   'ane|TFLite': Interval(min: 0.38, max: 0.40),
   'ane|Core ML': Interval(min: 0.38, max: 0.40),
   'cpu&gpu&ane': Interval(min: 0.38, max: 0.40),
-  'snpe_dsp': Interval(min: 0.35, max: 0.38),
-  'psnpe_dsp': Interval(min: 0.35, max: 0.38),
+  'snpe_dsp': Interval(min: 0.36, max: 0.37),
+  'psnpe_dsp': Interval(min: 0.36, max: 0.37),
   'neuron': Interval(min: 0.32, max: 0.34),
+  'samsung_npu': Interval(min: 0.36, max: 0.39),
 };
 
 const Map<String, Interval> _naturalLanguageProcessing = {
@@ -61,6 +77,7 @@ const Map<String, Interval> _naturalLanguageProcessing = {
   'snpe_dsp': Interval(min: 1.00, max: 1.00),
   'psnpe_dsp': Interval(min: 1.00, max: 1.00),
   'neuron-no-ahwb': Interval(min: 1.00, max: 1.00),
+  'samsung_npu': Interval(min: 1.00, max: 1.00),
 };
 
 const Map<String, Interval> _superResolution = {
@@ -70,16 +87,32 @@ const Map<String, Interval> _superResolution = {
   'ane|TFLite': Interval(min: 0.32, max: 0.35),
   'ane|Core ML': Interval(min: 0.32, max: 0.35),
   'cpu&gpu&ane': Interval(min: 0.32, max: 0.35),
-  'snpe_dsp': Interval(min: 0.32, max: 0.35),
-  'psnpe_dsp': Interval(min: 0.32, max: 0.35),
+  'snpe_dsp': Interval(min: 0.33, max: 0.34),
+  'psnpe_dsp': Interval(min: 0.33, max: 0.34),
   'neuron': Interval(min: 0.32, max: 0.35),
+  'samsung_npu': Interval(min: 0.08, max: 0.12),
+};
+
+// TODO (anhappdev): update expected accuracy for stable diffusion
+const Map<String, Interval> _stableDiffusion = {
+  'cpu': Interval(min: 0, max: 1.0),
+  'npu': Interval(min: 0, max: 1.0),
+  'tpu': Interval(min: 0, max: 1.0),
+  'ane|TFLite': Interval(min: 0, max: 1.0),
+  'ane|Core ML': Interval(min: 0, max: 1.0),
+  'cpu&gpu&ane': Interval(min: 0, max: 1.0),
+  'snpe_dsp': Interval(min: 0, max: 1.0),
+  'psnpe_dsp': Interval(min: 0, max: 1.0),
+  'neuron': Interval(min: 0, max: 1.0),
+  'samsung_npu': Interval(min: 0, max: 1.0),
 };
 
 const benchmarkExpectedAccuracy = {
-  BenchmarkId.imageClassification: _imageClassification,
+  BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
-  BenchmarkId.imageSegmentationV2: _imageSegmentation,
+  BenchmarkId.imageSegmentationV2: _imageSegmentationV2,
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
-  BenchmarkId.imageClassificationOffline: _imageClassification,
+  BenchmarkId.stableDiffusion: _stableDiffusion,
+  BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };

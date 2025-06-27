@@ -11,7 +11,7 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/result_manager.dart';
 
 class ResultFilterScreen extends StatefulWidget {
-  const ResultFilterScreen({Key? key}) : super(key: key);
+  const ResultFilterScreen({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -24,7 +24,7 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     final state = context.watch<BenchmarkState>();
     final filter = state.resourceManager.resultManager.resultFilter;
 
@@ -253,8 +253,8 @@ class DropdownOption<T> {
   DropdownOption(this.value, this.label);
 
   @override
-  bool operator ==(dynamic other) =>
-      other != null && other is DropdownOption && this.value == other.value;
+  bool operator ==(Object other) =>
+      other is DropdownOption && this.value == other.value;
 
   @override
   int get hashCode => value.hashCode ^ label.hashCode;

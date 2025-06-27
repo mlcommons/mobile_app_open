@@ -8,22 +8,28 @@ benchmark_setting {
     delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
-    model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobilenetEdgeTPU.mlmodel"
+      model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    }
   }
   delegate_choice: {
     delegate_name: "CPU & GPU"
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
-    model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobilenetEdgeTPU.mlmodel"
+      model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    }
   }
-   delegate_choice: {
+  delegate_choice: {
     delegate_name: "CPU & ANE"
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
-    model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobilenetEdgeTPU.mlmodel"
+      model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    }
   }
   delegate_selected: "CPU & GPU & ANE"
 }
@@ -36,24 +42,123 @@ benchmark_setting {
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     batch_size: 32
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
-    model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobilenetEdgeTPU.mlmodel"
+      model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    }
   }
   delegate_choice: {
     delegate_name: "CPU & GPU"
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
     batch_size: 32
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
-    model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobilenetEdgeTPU.mlmodel"
+      model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    }
   }
-   delegate_choice: {
+  delegate_choice: {
     delegate_name: "CPU & ANE"
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
     batch_size: 32
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobilenetEdgeTPU.mlmodel"
-    model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobilenetEdgeTPU.mlmodel"
+      model_checksum: "39483b20b878d46144ab4cfe9a3e5600"
+    }
+  }
+  delegate_selected: "CPU & GPU & ANE"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  framework: "Core ML"
+  delegate_choice: {
+    delegate_name: "CPU & GPU & ANE"
+    accelerator_name: "cpu&gpu&ane"
+    accelerator_desc: "All compute units"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/apple/mobilenetv4_fp32_NCHW.mlpackage.zip"
+      model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
+    }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "CPU & GPU"
+    accelerator_name: "cpu&gpu"
+    accelerator_desc: "CPU and GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/apple/mobilenetv4_fp32_NCHW.mlpackage.zip"
+      model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
+    }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "CPU & ANE"
+    accelerator_name: "cpu&ane"
+    accelerator_desc: "CPU and Neural Engine"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/apple/mobilenetv4_fp32_NCHW.mlpackage.zip"
+      model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
+    }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
+    }
+  }
+  delegate_selected: "CPU & GPU & ANE"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  framework: "Core ML"
+  delegate_choice: {
+    delegate_name: "CPU & GPU & ANE"
+    accelerator_name: "cpu&gpu&ane"
+    accelerator_desc: "All compute units"
+    batch_size: 32
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/apple/mobilenetv4_fp32_NCHW.mlpackage.zip"
+      model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
+    }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "CPU & GPU"
+    accelerator_name: "cpu&gpu"
+    accelerator_desc: "CPU and GPU"
+    batch_size: 32
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/apple/mobilenetv4_fp32_NCHW.mlpackage.zip"
+      model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
+    }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "CPU & ANE"
+    accelerator_name: "cpu&ane"
+    accelerator_desc: "CPU and Neural Engine"
+    batch_size: 32
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_1/apple/mobilenetv4_fp32_NCHW.mlpackage.zip"
+      model_checksum: "164c504eb3e9af6c730c1765b8b81b32"
+    }
+    custom_setting {
+      id: "data-format"
+      value: "NCHW"
+    }
   }
   delegate_selected: "CPU & GPU & ANE"
 }
@@ -65,22 +170,28 @@ benchmark_setting {
     delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileDet.mlmodel"
-    model_checksum: "ef849fbf2132e205158f05ca42db25f4"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobileDet.mlmodel"
+      model_checksum: "ef849fbf2132e205158f05ca42db25f4"
+    }
   }
   delegate_choice: {
     delegate_name: "CPU & GPU"
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileDet.mlmodel"
-    model_checksum: "ef849fbf2132e205158f05ca42db25f4"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobileDet.mlmodel"
+      model_checksum: "ef849fbf2132e205158f05ca42db25f4"
+    }
   }
-   delegate_choice: {
+  delegate_choice: {
     delegate_name: "CPU & ANE"
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileDet.mlmodel"
-    model_checksum: "ef849fbf2132e205158f05ca42db25f4"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobileDet.mlmodel"
+      model_checksum: "ef849fbf2132e205158f05ca42db25f4"
+    }
   }
   delegate_selected: "CPU & GPU & ANE"
 }
@@ -92,15 +203,19 @@ benchmark_setting {
     delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileBERT.mlmodel"
-    model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobileBERT.mlmodel"
+      model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
+    }
   }
   delegate_choice: {
     delegate_name: "CPU & GPU"
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/MobileBERT.mlmodel"
-    model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/MobileBERT.mlmodel"
+      model_checksum: "c7d544b5b3bd6cd9df7ebe8f04ecb7f9"
+    }
   }
   delegate_selected: "CPU & GPU & ANE"
 }
@@ -112,22 +227,28 @@ benchmark_setting {
     delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/Mosaic.mlmodel"
-    model_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/Mosaic.mlmodel"
+      model_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
+    }
   }
   delegate_choice: {
     delegate_name: "CPU & GPU"
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/Mosaic.mlmodel"
-    model_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/Mosaic.mlmodel"
+      model_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
+    }
   }
-   delegate_choice: {
+  delegate_choice: {
     delegate_name: "CPU & ANE"
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/Mosaic.mlmodel"
-    model_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/Mosaic.mlmodel"
+      model_checksum: "362d6b5bb1b8e10ae5b4e223f60d4d10"
+    }
   }
   delegate_selected: "CPU & GPU & ANE"
 }
@@ -139,22 +260,28 @@ benchmark_setting {
     delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/edsr_f32b5_fp32.mlmodel"
-    model_checksum: "62489706f20b0c2ae561fb2204eefb61"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_fp32.mlmodel"
+      model_checksum: "62489706f20b0c2ae561fb2204eefb61"
+    }
   }
   delegate_choice: {
     delegate_name: "CPU & GPU"
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/edsr_f32b5_fp32.mlmodel"
-    model_checksum: "62489706f20b0c2ae561fb2204eefb61"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_fp32.mlmodel"
+      model_checksum: "62489706f20b0c2ae561fb2204eefb61"
+    }
   }
-   delegate_choice: {
+  delegate_choice: {
     delegate_name: "CPU & ANE"
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/CoreML/edsr_f32b5_fp32.mlmodel"
-    model_checksum: "62489706f20b0c2ae561fb2204eefb61"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_fp32.mlmodel"
+      model_checksum: "62489706f20b0c2ae561fb2204eefb61"
+    }
   }
   delegate_selected: "CPU & GPU & ANE"
 }

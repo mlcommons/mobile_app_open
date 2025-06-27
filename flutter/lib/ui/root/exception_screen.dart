@@ -6,8 +6,7 @@ class ExceptionWidget extends StatelessWidget {
   final Object error;
   final StackTrace stackTrace;
 
-  const ExceptionWidget(this.error, this.stackTrace, {Key? key})
-      : super(key: key);
+  const ExceptionWidget(this.error, this.stackTrace, {super.key});
 
   @override
   Widget build(BuildContext context) {

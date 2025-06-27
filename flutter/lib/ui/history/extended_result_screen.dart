@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
@@ -15,8 +16,7 @@ import 'package:mlperfbench/ui/history/utils.dart';
 class RemoteExtendedResultScreen extends StatefulWidget {
   final String fileName;
 
-  const RemoteExtendedResultScreen({Key? key, required this.fileName})
-      : super(key: key);
+  const RemoteExtendedResultScreen({super.key, required this.fileName});
 
   @override
   State<StatefulWidget> createState() => _RemoteExtendedResultScreenState();
@@ -31,7 +31,7 @@ class _RemoteExtendedResultScreenState
 
   @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.historyDetailsTitle),
@@ -68,7 +68,7 @@ class _RemoteExtendedResultScreenState
         switch (dialogResult) {
           case ConfirmDialogAction.ok:
             await FirebaseManager.instance.deleteResult(widget.fileName);
-            if (context.mounted) {
+            if (mounted) {
               Navigator.pop(context);
             }
             break;
@@ -84,8 +84,7 @@ class _RemoteExtendedResultScreenState
 class LocalExtendedResultScreen extends StatefulWidget {
   final ExtendedResult result;
 
-  const LocalExtendedResultScreen({Key? key, required this.result})
-      : super(key: key);
+  const LocalExtendedResultScreen({super.key, required this.result});
 
   @override
   State<LocalExtendedResultScreen> createState() =>
@@ -99,7 +98,7 @@ class _LocalExtendedResultScreenState extends State<LocalExtendedResultScreen> {
 
   @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     helper = HistoryHelperUtils(l10n);
     state = context.watch<BenchmarkState>();
 
@@ -141,7 +140,7 @@ class _LocalExtendedResultScreenState extends State<LocalExtendedResultScreen> {
 class ExtendedResultView extends StatefulWidget {
   final ExtendedResult result;
 
-  const ExtendedResultView({Key? key, required this.result}) : super(key: key);
+  const ExtendedResultView({super.key, required this.result});
 
   @override
   State<ExtendedResultView> createState() => _ExtendedResultViewState();
@@ -154,7 +153,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
 
   @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     helper = HistoryHelperUtils(l10n);
     state = context.watch<BenchmarkState>();
     return ListView(children: _makeBody());
@@ -197,6 +196,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
     final utils = HistoryHelperUtils(l10n);
     final modelDescription = res.environmentInfo.modelDescription;
     final socDescription = utils.makeSocName(state, res.environmentInfo);
+    final runMode = res.meta.runMode?.localizedName(l10n) ?? l10n.unknown;
 
     return [
       helper.makeInfo(l10n.historyDetailsDate, date),
@@ -206,6 +206,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
       helper.makeInfo(l10n.historyDetailsBackendName, backendName),
       helper.makeInfo(l10n.historyDetailsModelName, modelDescription),
       helper.makeInfo(l10n.historyDetailsSocName, socDescription),
+      helper.makeInfo(l10n.settingsRunMode, runMode),
       const Divider(),
       helper.makeHeader(l10n.historyDetailsTableTitle),
       makeBenchmarkTable(context, res.results),
@@ -227,7 +228,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
               throughputValid: true,
               accuracy: l10n.historyDetailsTableColAccuracy,
               onTap: null),
-          ...list.map(_makeRowData).toList(),
+          ...list.map(_makeRowData),
         ],
       ),
     );

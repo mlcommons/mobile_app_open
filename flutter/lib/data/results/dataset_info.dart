@@ -13,6 +13,8 @@ enum DatasetTypeEnum {
   squad,
   @JsonValue('SNUSR')
   snusr,
+  @JsonValue('COCOGEN')
+  cocogen,
 }
 
 extension DatasetTypeExtension on DatasetTypeEnum {

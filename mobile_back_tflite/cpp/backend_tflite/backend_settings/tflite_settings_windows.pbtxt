@@ -18,8 +18,10 @@ benchmark_setting {
     delegate_name: "CPU"
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-    model_checksum: "66bb4eba50987221608f8487ed405794"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_1/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_checksum: "66bb4eba50987221608f8487ed405794"
+    }
   }
   delegate_selected: "CPU"
 }
@@ -32,8 +34,41 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     batch_size: 2
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-    model_checksum: "66bb4eba50987221608f8487ed405794"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_1/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_checksum: "66bb4eba50987221608f8487ed405794"
+    }
+  }
+  delegate_selected: "CPU"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
+  }
+  delegate_selected: "CPU"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    batch_size: 2
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
   }
   delegate_selected: "CPU"
 }
@@ -45,8 +80,10 @@ benchmark_setting {
     delegate_name: "CPU"
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
-    model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet.tflite"
+      model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+    }
   }
   delegate_selected: "CPU"
 }
@@ -58,8 +95,10 @@ benchmark_setting {
     delegate_name: "CPU"
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
-    model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_float_384_gpu.tflite"
+      model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+    }
   }
   delegate_selected: "CPU"
 }
@@ -71,8 +110,10 @@ benchmark_setting {
     delegate_name: "CPU"
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
-    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
-    model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_argmax_f32.tflite"
+      model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+    }
   }
   delegate_selected: "CPU"
 }
@@ -84,8 +125,10 @@ benchmark_setting {
     delegate_name: "CPU"
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
-    model_checksum: "672240427c1f3dc33baf2facacd9631f"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_fp32.tflite"
+      model_checksum: "672240427c1f3dc33baf2facacd9631f"
+    }
   }
   delegate_selected: "CPU"
 }

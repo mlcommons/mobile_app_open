@@ -58,16 +58,15 @@ flutter/windows/release/prepare-dlls:
 .PHONY: flutter/windows/release/copy-dlls
 flutter/windows/release/copy-dlls:
 	currentDir=$$(pwd) && cd "${flutter_windows_dlls_path}" && \
-		cp  --target-directory $$currentDir/flutter/build/windows/runner/Release ${flutter_windows_dlls_list}
+		cp  --target-directory $$currentDir/flutter/build/windows/x64/runner/Release ${flutter_windows_dlls_list}
 
 .PHONY: flutter/windows/release/build
 flutter/windows/release/build:
-	rm -rf flutter/build/windows/runner/Release
+	rm -rf flutter/build/windows/x64/runner/Release
 	cd flutter && ${_start_args} flutter --no-version-check build windows --no-pub \
 		${flutter_official_build_arg} \
 		${flutter_firebase_crashlytics_arg} \
-		${flutter_build_number_arg} \
-		${flutter_folder_args}
+		${flutter_build_number_arg}
 
 .PHONY: flutter/windows/release/name
 flutter/windows/release/name:
@@ -75,7 +74,7 @@ flutter/windows/release/name:
 
 	rm -rf ${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}
 	mkdir -p ${flutter_windows_releases}
-	mv flutter/build/windows/runner/Release ${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}
+	mv flutter/build/windows/x64/runner/Release ${flutter_windows_releases}/${FLUTTER_RELEASE_NAME}
 
 .PHONY: flutter/windows/release/archive
 flutter/windows/release/archive:

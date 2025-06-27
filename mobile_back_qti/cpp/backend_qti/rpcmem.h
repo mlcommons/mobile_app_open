@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ class RpcMem {
   void *Alloc(int heapid, uint32_t flags, int nbytes);
   void *Alloc(int nbytes);
   void Free(void *data);
+  bool getRpcStatus();
 
  private:
   void *libHandle_;

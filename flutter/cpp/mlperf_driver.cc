@@ -93,9 +93,9 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
 
   ::mlperf::TestSettings mlperf_settings;
   // https://github.com/mlcommons/inference/blob/master/mlperf.conf
-  mlperf_settings.qsl_rng_seed = 148687905518835231UL;
-  mlperf_settings.sample_index_rng_seed = 520418551913322573UL;
-  mlperf_settings.schedule_rng_seed = 811580660758947900UL;
+  mlperf_settings.qsl_rng_seed = 3066443479025735752UL;
+  mlperf_settings.sample_index_rng_seed = 10688027786191513374UL;
+  mlperf_settings.schedule_rng_seed = 14962580496156340209UL;
 
   mlperf_settings.min_query_count = min_query_count;
   mlperf_settings.mode = Str2TestMode(mode);

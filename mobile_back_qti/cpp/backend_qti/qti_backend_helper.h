@@ -1,4 +1,4 @@
-/* Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,6 +24,10 @@ limitations under the License.
 #include "allocator.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
+
+#ifdef STABLEDIFFUSION_FLAG
+#include "StableDiffusionShared/include/QnnApiHelpers.hpp"
+#endif
 
 class snpe_handler {
  public:
@@ -63,12 +67,18 @@ class QTIBackendHelper {
   const char *name_ = "snpe";
   const char *acceleratorName_;
   std::string snpeOutputLayers_;
+  std::string snpeOutputTensors_;
   std::vector<mlperf_data_t> inputFormat_;
   std::vector<mlperf_data_t> outputFormat_;
   std::unique_ptr<psnpe_handler> psnpe_;
   std::unique_ptr<snpe_handler> snpe_;
+#ifdef STABLEDIFFUSION_FLAG
+  QnnApiHelpers *sd_pipeline;
+#else
+  void *sd_pipeline;
+#endif
   Snpe_UserBufferList_Handle_t inputMapListHandle_, outputMapListHandle_;
-  Snpe_UserMemoryMap_Handle_t ionBufferMapHandle_;
+  Snpe_UserMemoryMap_Handle_t userMemoryMappedBufferMapHandle_;
   std::vector<
       std::unordered_map<std::string, std::vector<uint8_t, Allocator<uint8_t>>>>
       bufs_;
@@ -78,7 +88,7 @@ class QTIBackendHelper {
   Snpe_StringList_Handle_t networkOutputTensorNamesHandle_;
   Snpe_PerformanceProfile_t perfProfile_;
   Snpe_ProfilingLevel_t profilingLevel_;
-
+  int32_t fd = -1;
   bool isTflite_;
   bool useSnpe_;
   mlperf_backend_ptr_t tfliteBackend_;
@@ -86,15 +96,17 @@ class QTIBackendHelper {
   int queryCount_;
   int inputBatch_;
   int outputBatchBufsize_;
+  int inputBatchBufsize_;
   bool bgLoad_;
   std::string delegate_;
   QTIBufferType inputBufferType_ = UINT_8;
   QTIBufferType outputBufferType_ = FLOAT_32;
   uint32_t loadOffTime_ = 2;
   uint32_t loadOnTime_ = 100;
-  bool useIonBuffers_ = false;
+  bool useIonBuffers_ = true;
   bool useCpuInt8_ = false;
   bool isIonRegistered;
+  bool isStableDiffusion = false;
 
   /* exposed functions */
   void use_psnpe(const char *model_path);
@@ -105,6 +117,18 @@ class QTIBackendHelper {
   void get_data_formats();
   void set_runtime_config();
   std::string get_snpe_version();
+
+  void initSd(const char *model_path, const char *native_lib_path);
+  bool preprocessInputSd(void *data);
+  bool executeSd();
+  void deinitSd();
+  bool getOutputSd(void **data);
+
+  int num_steps;
+  int seed;
+  float guidance_scale;
+  std::string native_lib_path;
+  std::string data_folder_path;
 
   static bool IsRuntimeAvailable(const snpe_runtimes_t delegate);
 
@@ -117,23 +141,32 @@ class QTIBackendHelper {
         inputMapListHandle_(Snpe_UserBufferList_Create()),
         outputMapListHandle_(Snpe_UserBufferList_Create()),
         snpe_(new snpe_handler()),
-        psnpe_(new psnpe_handler()) {
+        psnpe_(new psnpe_handler()),
+        sd_pipeline(nullptr) {
     odLayerMap[0] = "detection_boxes:0";
     odLayerMap[1] = "Postprocessor/BatchMultiClassNonMaxSuppression_classes";
     odLayerMap[2] = "detection_scores:0";
     odLayerMap[3] =
         "Postprocessor/BatchMultiClassNonMaxSuppression_num_detections";
-    ionBufferMapHandle_ = Snpe_UserMemoryMap_Create();
+    userMemoryMappedBufferMapHandle_ = Snpe_UserMemoryMap_Create();
     isIonRegistered = false;
+
+    num_steps = 20;
+    seed = 0;
+    guidance_scale = 7.5;
   }
 
   ~QTIBackendHelper() {
-    Snpe_RuntimeList_Delete(inputRuntimeListHandle);
-    Snpe_RuntimeList_Delete(dummyInputRuntimeListHandle);
-    Snpe_StringList_Delete(networkInputTensorNamesHandle_);
-    Snpe_StringList_Delete(networkOutputTensorNamesHandle_);
-    Snpe_UserBufferList_Delete(inputMapListHandle_);
-    Snpe_UserBufferList_Delete(outputMapListHandle_);
+    if (isStableDiffusion) {
+      deinitSd();
+    } else {
+      Snpe_RuntimeList_Delete(inputRuntimeListHandle);
+      Snpe_RuntimeList_Delete(dummyInputRuntimeListHandle);
+      Snpe_StringList_Delete(networkInputTensorNamesHandle_);
+      Snpe_StringList_Delete(networkOutputTensorNamesHandle_);
+      Snpe_UserBufferList_Delete(inputMapListHandle_);
+      Snpe_UserBufferList_Delete(outputMapListHandle_);
+    }
   }
 };
 

@@ -1,7 +1,7 @@
 workspace(name = "mlperf_app")
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "bazel_skylib",
@@ -49,11 +49,11 @@ http_archive(
     ],
 )
 
-load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 load(
     "@org_tensorflow//tensorflow/tools/toolchains/python:python_repo.bzl",
     "python_repository",
 )
+load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 
 python_repository(name = "python_version_repo")
 
@@ -84,9 +84,9 @@ tf_workspace0()
 
 http_archive(
     name = "neuron_delegate",
-    sha256 = "85c1b17acb34072baa12cf74011ff45aee9045a12603851b86ce85e3cef66747",
-    strip_prefix = "tflite-neuron-delegate-update_for_dujac",
-    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/heads/update_for_dujac.zip"],
+    sha256 = "7918cc54a2bab63c30eb87a90de8ce3f3730b5572e0269a2b57a0c9bcd28cd69",
+    strip_prefix = "tflite-neuron-delegate-update_for_leroy",
+    urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/heads/update_for_leroy.zip"],
 )
 
 new_git_repository(
@@ -105,5 +105,12 @@ load("//mobile_back_qti:variables.bzl", "snpe_version_loader")
 
 snpe_version_loader(
     name = "snpe_version_loader",
+    workspace_dir = __workspace_dir__,
+)
+
+load("//mobile_back_qti/cpp/backend_qti/StableDiffusionShared:variables.bzl", "stable_diffusion_external_deps_shared")
+
+stable_diffusion_external_deps_shared(
+    name = "stable_diffusion_external_deps_shared",
     workspace_dir = __workspace_dir__,
 )

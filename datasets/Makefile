@@ -102,11 +102,11 @@ ${BUILDDIR}/downloads/v2.3.0.zip:
 	mkdir -p ${BUILDDIR}/downloads/
 	(curl -o $@ -L https://github.com/tensorflow/models/archive/v2.3.0.zip)
 
-${BUILDDIR}/output/state/mlperf_docker_1.1.stamp:
-	# Building mlperf_mobile docker
-	mkdir -p ${BUILDDIR}/output/state
-	docker image build -t mlperf_mobile:1.1 $(dir $(abspath ${ROOTDIR}/datasets/docker/Dockerfile))
-	touch $@
+ifeq ($(INTERNAL_DOCKER),1)
+include load_from_image.mk
+else
+include load_from_dockerfile.mk
+endif
 
 # No preprocessing is applied to the files
 ${BUILDDIR}/output/state/ade20k_calibration.stamp: ${BUILDDIR}/output/state/ade20k.stamp
@@ -225,11 +225,11 @@ ${BUILDDIR}/output/state/squad_calibration.stamp: \
 
 ${BUILDDIR}/output/mlperf_datasets/squad/squad_eval_mini.tfrecord:
 	mkdir -p ${BUILDDIR}/output/mlperf_datasets/squad
-	curl -o $@ -L https://github.com/mlcommons/mobile_models/raw/main/v1_0/datasets/squad_eval_mini.tfrecord
+	curl -o $@ -L https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_mini.tfrecord
 
 ${BUILDDIR}/output/mlperf_datasets/squad/squad_groundtruth.tfrecord:
 	mkdir -p ${BUILDDIR}/output/mlperf_datasets/squad
-	curl -o $@ -L https://github.com/mlcommons/mobile_models/raw/main/v1_0/assets/squad_groundtruth.tfrecord
+	curl -o $@ -L https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_groundtruth.tfrecord
 
 ${BUILDDIR}/output/state/squad.stamp: \
 		${BUILDDIR}/output/mlperf_datasets/squad/squad_eval_mini.tfrecord \

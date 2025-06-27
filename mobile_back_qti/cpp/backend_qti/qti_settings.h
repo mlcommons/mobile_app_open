@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,34 +30,36 @@ const std::string empty_settings = "";
 #define SETTINGS_RHS(device) qti_settings_##device##_pbtxt
 #define STRING_SETTINGS(device) SETTINGS_LHS(device) = SETTINGS_RHS(device);
 
-#include INCLUDE_SETTINGS(sd7g1)
-#include INCLUDE_SETTINGS(sd7pg2)
 #include INCLUDE_SETTINGS(sd8cxg3)
 #include INCLUDE_SETTINGS(sd7cxg3)
-#include INCLUDE_SETTINGS(sd8g1)
-#include INCLUDE_SETTINGS(sd8g2)
+#include INCLUDE_SETTINGS(sd4g2)
+#include INCLUDE_SETTINGS(sd8g3)
+#include INCLUDE_SETTINGS(sd8elite)
+#include INCLUDE_SETTINGS(sd8sg3)
+#include INCLUDE_SETTINGS(sd7g3)
+#include INCLUDE_SETTINGS(sd7sg3)
 #include INCLUDE_SETTINGS(gpufp16)
-#include INCLUDE_SETTINGS(sd8pg1)
-#include INCLUDE_SETTINGS(sdm778)
-#include INCLUDE_SETTINGS(sdm888)
-#include INCLUDE_SETTINGS(sm4450)
 #include INCLUDE_SETTINGS(default_dsp)
 #include INCLUDE_SETTINGS(default_cpu)
 #include INCLUDE_SETTINGS(default_gpu)
+#include INCLUDE_SETTINGS(stablediffusion)
+#include INCLUDE_SETTINGS(stablediffusion_v75)
+#include INCLUDE_SETTINGS(stablediffusion_v79)
 
-STRING_SETTINGS(sd7g1)
-STRING_SETTINGS(sd7pg2)
 STRING_SETTINGS(sd8cxg3)
 STRING_SETTINGS(sd7cxg3)
-STRING_SETTINGS(sd8g1)
-STRING_SETTINGS(sd8g2)
+STRING_SETTINGS(sd4g2)
+STRING_SETTINGS(sd8g3)
+STRING_SETTINGS(sd8elite)
+STRING_SETTINGS(sd8sg3)
+STRING_SETTINGS(sd7g3)
+STRING_SETTINGS(sd7sg3)
 STRING_SETTINGS(gpufp16)
-STRING_SETTINGS(sd8pg1)
-STRING_SETTINGS(sdm778)
-STRING_SETTINGS(sdm888)
-STRING_SETTINGS(sm4450)
 STRING_SETTINGS(default_dsp)
 STRING_SETTINGS(default_cpu)
 STRING_SETTINGS(default_gpu)
+STRING_SETTINGS(stablediffusion)
+STRING_SETTINGS(stablediffusion_v75)
+STRING_SETTINGS(stablediffusion_v79)
 
 #endif

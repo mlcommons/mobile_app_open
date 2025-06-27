@@ -37,11 +37,49 @@ benchmark_setting {
       id: "lazy_mode"
       value: "true"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/samsung/ic.nnc"
-    model_checksum: "1756e790704bea5be37431877a196ea1"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/ic.nnc"
+      model_checksum: "1a84db0b3dc40a6e217b7f2c8eb2980b"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 200000
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1005"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/mnv4_large.nnc"
+      model_checksum: "4a4a6b332ebcabc1a06eca019a1d7d0c"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
@@ -71,11 +109,13 @@ benchmark_setting {
       id: "lazy_mode"
       value: "true"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/samsung/sm_uint8.nnc"
-    model_checksum: "c58979294a01c1a8b7306cbf213ffd42"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/sm_uint8.nnc"
+      model_checksum: "b02531ae19686c6574857bb18406966c"
+    }
   }
   delegate_selected: "ENN_NPU"
-  single_stream_expected_latency_ns: 500000
+  single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
@@ -105,8 +145,10 @@ benchmark_setting {
       id: "lazy_mode"
       value: "true"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/samsung/od.nnc"
-    model_checksum: "6ec9c58af2b1cd772fb45ac51db07c31"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/od.nnc"
+      model_checksum: "5e7abcc8fa6f7c3e0bd8955a9ef1e8cb"
+    }
   }
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 450000
@@ -121,7 +163,7 @@ benchmark_setting {
     accelerator_desc: "NPU"
     custom_setting {
       id: "preset"
-      value: "100005"
+      value: "1005"
     }
     custom_setting {
       id: "i_type"
@@ -139,11 +181,13 @@ benchmark_setting {
       id: "lazy_mode"
       value: "true"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/samsung/sr.nnc"
-    model_checksum: "2542bd74108b286822fcd1fc4b8bc316"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/sr.nnc"
+      model_checksum: "3fea2aa73be65efceb783364f4d7ae8d"
+    }
   }
   delegate_selected: "ENN_NPU"
-  single_stream_expected_latency_ns: 990000
+  single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
@@ -151,7 +195,7 @@ benchmark_setting {
   framework: "ENN"
   delegate_choice: {
     delegate_name: "ENN_NPU"
-    accelerator_name: "npu"
+    accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     custom_setting {
       id: "preset"
@@ -173,11 +217,13 @@ benchmark_setting {
       id: "lazy_mode"
       value: "true"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/samsung/mobile_bert.nnc"
-    model_checksum: "82dee62592db68a095396da3caacf67b"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/mobile_bert.nnc"
+      model_checksum: "59356d4fa598d2d4369ca43f2051aff2"
+    }
   }
   delegate_selected: "ENN_NPU"
-  single_stream_expected_latency_ns: 990000
+  single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
@@ -212,8 +258,52 @@ benchmark_setting {
       id: "lazy_mode"
       value: "false"
     }
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_1/samsung/ic_offline.nnc"
-    model_checksum: "0c4c08850eb790dcaa7c77cc352dbfc1"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/ic_offline.nnc"
+      model_checksum: "9fcba01bf828b5cb5b1a39b55a8a7ed9"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+
+  single_stream_expected_latency_ns: 140000
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "npu"
+    batch_size: 6144
+    custom_setting {
+      id: "scenario"
+      value: "offline"
+    }
+    custom_setting {
+      id: "preset"
+      value: "1003"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "false"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "false"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/samsung/mnv4_large_offline.nnc"
+      model_checksum: "eec18f3bcca9d34f15ff73b73b7b0a2f"
+    }
   }
   delegate_selected: "ENN_NPU"
 

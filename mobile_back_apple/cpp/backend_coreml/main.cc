@@ -28,6 +28,7 @@ struct CoreMLBackendData {
   const char *vendor = "Apple";
   const char *accelerator{nullptr};
   CoreMLExecutor *coreMLExecutor{nullptr};
+  bool expectNCHW = false;
 };
 
 inline mlperf_data_t::Type MLMultiArrayDataType2MLPerfDataType(
@@ -44,6 +45,24 @@ inline mlperf_data_t::Type MLMultiArrayDataType2MLPerfDataType(
 }
 
 static bool backendExists = false;
+
+template <typename T>
+void convert_nhwc_to_nchw(T *data_nhwc, int N, int H, int W, int C) {
+  T *data_nchw = new T[N * C * H * W];
+  for (int n = 0; n < N; ++n) {
+    for (int c = 0; c < C; ++c) {
+      for (int h = 0; h < H; ++h) {
+        for (int w = 0; w < W; ++w) {
+          int index_nchw = ((n * C + c) * H + h) * W + w;
+          int index_nhwc = ((n * H + h) * W + w) * C + c;
+          data_nchw[index_nchw] = data_nhwc[index_nhwc];
+        }
+      }
+    }
+  }
+  std::memcpy(data_nhwc, data_nchw, N * H * W * C * sizeof(T));
+  delete[] data_nchw;
+}
 
 // Return the name of the backend
 const char *mlperf_backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
@@ -82,6 +101,12 @@ mlperf_backend_ptr_t mlperf_backend_create(
 
   CoreMLBackendData *backend_data = new CoreMLBackendData();
   backendExists = true;
+  std::string dataFormat =
+      mlperf::mobile::GetConfigValue(configs, "data-format", std::string(""));
+  if (dataFormat == "NCHW") {
+    backend_data->expectNCHW = true;
+    LOG(INFO) << "Will convert inputs from NHWC to NCHW!";
+  }
 
   // Load the model.
   NSError *error;
@@ -183,4 +208,13 @@ mlperf_status_t mlperf_backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                        batchIndex:batch_index])
     return MLPERF_SUCCESS;
   return MLPERF_FAILURE;
+}
+
+void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
+                                   int width, int height, uint8_t *data) {
+  CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
+  if (backend_data->expectNCHW) {
+    int N = 1, H = height, W = width, C = 3;
+    convert_nhwc_to_nchw(reinterpret_cast<float *>(data), N, H, W, C);
+  }
 }

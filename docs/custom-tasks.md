@@ -55,24 +55,6 @@ Data directory can be changed in settings, except for iOS, and its possible loca
 You can specify the full path, which will not depend on the data folder.  
 Absolute path is only available for the task config path. All local resources in the task config must point to the data folder.
 
-## Overriding default folders
-
-You can change the data folder without using graphical interface.
-
-Use `--dart-define=FLUTTER_DATA_FOLDER=<value>` to specify the folder you want to use.
-It will still be possible to choose a different folder via UI but the app will use specified folder by default.
-
-If you build the app using makefile commands, use `FLUTTER_DATA_FOLDER` environment variable. For example: `make flutter/test/integration FLUTTER_CACHE_FOLDER=/my/folder/path`
-
-You can also override app cache folder.  
-Use `--dart-define=FLUTTER_CACHE_FOLDER=<value>` for manual build or `FLUTTER_CACHE_FOLDER` env for makefile script.  
-Note that it's impossible to change the cache folder from the UI.
-
-These options are intended for CI use, and possibly for internal testing.
-Never use them for any public builds.
-
-These options are not available on iOS.
-
 ## Using external resources on an iPhone
 
 On iOS an application resource folder can be found in `On My iPhone` -> `<app name>`.

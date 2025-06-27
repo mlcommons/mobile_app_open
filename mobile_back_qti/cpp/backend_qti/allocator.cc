@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,6 +43,15 @@ void ChunkAllocator::ReleaseBuffer(void* p) {
 
 void* ChunkAllocator::GetBatchPtr(void* p) {
   return Block::block_map_[p]->ptr_;
+}
+
+int ChunkAllocator::GetSize(int n) {
+  // Max size allowed for data
+  return ((500 * 1e6) / n);
+}
+
+uint64_t ChunkAllocator::GetOffset(void* p) {
+  return ((uint64_t)p - (uint64_t)Block::block_map_[p]->ptr_);
 }
 
 void ChunkAllocator::DumpState() {

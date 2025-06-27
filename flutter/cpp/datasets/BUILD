@@ -170,3 +170,37 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:image_preprocessing_stage",
     ],
 )
+
+cc_library(
+    name = "coco_gen",
+    srcs = [
+        "coco_gen.cc",
+    ],
+    hdrs = [
+        "coco_gen.h",
+        "utils.h",
+    ],
+    copts = tflite_copts() + select({
+        "//flutter/android/commonlibs:use_asan": [
+            "-fsanitize=address",
+            "-g",
+            "-O1",
+            "-fno-omit-frame-pointer",
+        ],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":allocator",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp:utils",
+        "//flutter/cpp/backends:external",
+        "//flutter/cpp/datasets/coco_gen_utils",
+        "//flutter/cpp/datasets/squad_utils",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_protobuf//:protobuf",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:image_preprocessing_stage",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:object_detection_average_precision_stage",
+    ],
+)

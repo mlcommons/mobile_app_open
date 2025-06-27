@@ -28,7 +28,7 @@ class CacheManager {
     return archiveFilePath;
   }
 
-  Future<void> deleteLoadedResources(List<String> nonRemovableResources,
+  Future<void> deleteLoadedResources(List<String> excludes,
       [int atLeastDaysOld = 0]) async {
     final directory = Directory(loadedResourcesDir);
 
@@ -40,8 +40,8 @@ class CacheManager {
       final relativePath = file.path
           .replaceAll('\\', '/')
           .substring(loadedResourcesDir.length + 1);
-      var nonRemovable = false;
-      for (var resource in nonRemovableResources) {
+      var keep = false;
+      for (var resource in excludes) {
         // relativePath.startsWith(resource): if we want to preserve a folder resource
         // resource.startsWith(relativePath): if we want to preserve a file resource
         //   for example:
@@ -49,11 +49,11 @@ class CacheManager {
         //   resource is 'github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k'
         if (relativePath.startsWith(resource) ||
             resource.startsWith(relativePath)) {
-          nonRemovable = true;
+          keep = true;
           break;
         }
       }
-      if (nonRemovable) continue;
+      if (keep) continue;
       if (atLeastDaysOld > 0) {
         var stat = await file.stat();
         if (DateTime.now().difference(stat.modified).inDays < atLeastDaysOld) {
@@ -73,6 +73,16 @@ class CacheManager {
     }
   }
 
+  Future<void> deleteFiles(List<String> resources) async {
+    for (final resource in resources) {
+      final filePath = get(resource);
+      if (filePath == null) continue;
+      final file = File(filePath);
+      if (await file.exists()) await file.delete();
+      print('Deleted resource $resource stored at ${file.path}');
+    }
+  }
+
   Future<void> purgeOutdatedCache(int atLeastDaysOld) async {
     var currentResources = <String>[];
     for (var r in _resourcesMap.values) {
@@ -81,8 +91,12 @@ class CacheManager {
     return deleteLoadedResources(currentResources, atLeastDaysOld);
   }
 
-  Future<void> cache(List<String> urls,
-      void Function(double, String) reportProgress, bool purgeOldCache) async {
+  Future<void> cache({
+    required List<String> urls,
+    required void Function(double, String) onProgressUpdate,
+    required bool purgeOldCache,
+    required bool downloadMissing,
+  }) async {
     final resourcesToDownload = <String>[];
     _resourcesMap = {};
 
@@ -106,8 +120,9 @@ class CacheManager {
 
       continue;
     }
-    await _download(resourcesToDownload, reportProgress);
-
+    if (downloadMissing) {
+      await _download(resourcesToDownload, onProgressUpdate);
+    }
     if (purgeOldCache) {
       await purgeOutdatedCache(_oldFilesAgeInDays);
     }
@@ -118,18 +133,20 @@ class CacheManager {
   }
 
   Future<void> _download(
-      List<String> urls, void Function(double, String) reportProgress) async {
+    List<String> urls,
+    void Function(double, String) onProgressUpdate,
+  ) async {
     var progress = 0.0;
     for (var url in urls) {
       progress += 0.1 / urls.length;
-      reportProgress(progress, url);
+      onProgressUpdate(progress, url);
       if (isResourceAnArchive(url)) {
         _resourcesMap[url] = await archiveCacheHelper.get(url, true);
       } else {
         _resourcesMap[url] = await fileCacheHelper.get(url, true);
       }
       progress += 0.9 / urls.length;
-      reportProgress(progress, url);
+      onProgressUpdate(progress, url);
     }
   }
 }

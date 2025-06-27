@@ -1,6 +1,8 @@
 import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -12,6 +14,9 @@ import 'package:mlperfbench/firebase/firebase_crashlytics_service.dart';
 import 'package:mlperfbench/firebase/firebase_options.gen.dart';
 import 'package:mlperfbench/firebase/firebase_storage_service.dart';
 import 'package:mlperfbench/resources/utils.dart';
+
+import 'package:firebase_auth/firebase_auth.dart'
+    hide EmailAuthProvider, AuthProvider;
 
 class FirebaseManager {
   FirebaseManager._();
@@ -32,12 +37,30 @@ class FirebaseManager {
     }
     final currentPlatform = DefaultFirebaseOptions.currentPlatform;
     final app = await Firebase.initializeApp(options: currentPlatform);
-    print('Firebase initialized using projectId: ${app.options.projectId}');
-
+    // _initAppCheck() must run before any Firebase services,
+    // but after calling Firebase.initializeApp();
+    await _initAppCheck();
     await _initAuthentication();
     _initStorage();
     _isInitialized = true;
+    print('Firebase initialized using projectId: ${app.options.projectId}');
     return instance;
+  }
+
+  Future<void> _initAppCheck() async {
+    if (kReleaseMode) {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.playIntegrity,
+        appleProvider: AppleProvider.deviceCheck,
+      );
+      print('Init Firebase App Check in release mode');
+    } else {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.debug,
+        appleProvider: AppleProvider.debug,
+      );
+      print('Init Firebase App Check in debug mode');
+    }
   }
 
   Future<void> _initAuthentication() async {

@@ -13,11 +13,10 @@ import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/resources/config_manager.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
-import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/settings/task_config_section.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreen();
@@ -32,7 +31,7 @@ class _SettingsScreen extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     store = context.watch<Store>();
     state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
 
     Widget artificialLoadSwitch = _artificialLoadSwitch();
     Widget crashlyticsSwitch = _crashlyticsSwitch();
@@ -41,7 +40,6 @@ class _SettingsScreen extends State<SettingsScreen> {
     Widget keepLogSwitch = _keepLogSwitch();
     Widget cooldownSwitch = _cooldownSwitch();
     Widget cooldownSlider = _cooldownSlider();
-    Widget clearCacheButton = _clearCacheButton(context);
     Widget versionText = _versionText();
     Widget taskConfig = _taskConfig(context);
 
@@ -61,7 +59,6 @@ class _SettingsScreen extends State<SettingsScreen> {
             crashlyticsSwitch,
             taskConfig,
             const Divider(),
-            clearCacheButton,
             const Divider(),
             versionText,
             const SizedBox(height: 20)
@@ -92,35 +89,12 @@ class _SettingsScreen extends State<SettingsScreen> {
     );
   }
 
-  Widget _clearCacheButton(BuildContext context) {
-    return TextButton(
-      style: TextButton.styleFrom(
-        textStyle: const TextStyle(fontSize: 20),
-      ),
-      onPressed: () async {
-        switch (
-            await showConfirmDialog(context, l10n.settingsClearCacheConfirm)) {
-          case ConfirmDialogAction.ok:
-            await state.clearCache();
-            if (!mounted) return;
-            Navigator.pop(context);
-            break;
-          case ConfirmDialogAction.cancel:
-            break;
-          default:
-            break;
-        }
-      },
-      child: Text(l10n.settingsClearCache),
-    );
-  }
-
   Widget _cooldownSlider() {
     return Slider(
       value: store.cooldownDuration.toDouble(),
-      min: 1,
-      max: 10,
-      divisions: 9,
+      min: 0,
+      max: 30 * 60,
+      divisions: null,
       label: store.cooldownDuration.toString(),
       onChanged: store.cooldown
           ? (double value) {
@@ -191,6 +165,7 @@ class _SettingsScreen extends State<SettingsScreen> {
           borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
           value: store.selectedBenchmarkRunMode,
           items: BenchmarkRunModeEnum.values
+              .where((e) => !e.isHiddenFromUI)
               .map((runMode) => DropdownMenuItem<BenchmarkRunModeEnum>(
                     value: runMode,
                     child: Text(runMode.localizedName(l10n)),

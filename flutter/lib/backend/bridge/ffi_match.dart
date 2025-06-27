@@ -9,7 +9,7 @@ import 'package:mlperfbench/backend/unsupported_device_exception.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 
-class _RunOut extends Struct {
+final class _RunOut extends Struct {
   @Int32()
   external int matches;
   external Pointer<Utf8> error_message;

@@ -25,12 +25,12 @@ Otherwise, you can get errors about missing pods
   * Download flutter repo:
 
     ```bash
-    mkdir -p ~/tools && git clone --branch 3.7.6 --depth 1 https://github.com/flutter/flutter.git ~/tools/flutter
+    mkdir -p ~/tools && git clone --branch 3.19.6 --depth 1 https://github.com/flutter/flutter.git ~/tools/flutter
     ```
 
   * Add flutter binary folders to path: `export PATH="$PATH:$HOME/tools/flutter/bin:$HOME/.pub-cache/bin"`  
     If you use zsh: `echo export PATH="\$PATH:\$HOME/tools/flutter/bin:\$HOME/.pub-cache/bin" >>~/.zshrc`
-  * Enable protobuf plugin: `dart pub global activate protoc_plugin ^20.0.1`
+  * Enable protobuf plugin: `dart pub global activate protoc_plugin ^21.1.2`
 * Go to `ios` directory and install pods: `pod install`
 
 ## Tested environment
@@ -38,23 +38,23 @@ Otherwise, you can get errors about missing pods
 The app was built and tested successfully in this environment:
 
 ```shell
-macOS 13.2.1
-Xcode 14.2
+macOS 14.4.1
+Xcode 15.4
 
 $ flutter --version
-Flutter 3.7.6 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 12cb4eb7a0 (11 days ago) • 2023-03-01 10:29:26 -0800
-Engine • revision ada363ee93
-Tools • Dart 2.19.3 • DevTools 2.20.1
+Flutter 3.19.6 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 54e66469a9 (4 weeks ago) • 2024-04-17 13:08:03 -0700
+Engine • revision c4cd48e186
+Tools • Dart 3.3.4 • DevTools 2.31.1
 
 $ bazel --version
-bazel 5.3.2
+bazel 6.3.2
 
 $ protoc --version
-libprotoc 3.21.9
+libprotoc 23.2
 
 $ pod --version
-1.11.3
+1.15.2
 
 $ python3 --version
 Python 3.9.16

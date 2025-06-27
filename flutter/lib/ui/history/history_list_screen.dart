@@ -3,18 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/data/benchmarks_data_provider.dart';
+import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/result_filter.dart';
 import 'package:mlperfbench/data/result_sort.dart';
-import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/ui/history/benchmark_export_result_screen.dart';
+import 'package:mlperfbench/ui/history/extended_result_screen.dart';
 import 'package:mlperfbench/ui/history/history_filter_screen.dart';
 import 'package:mlperfbench/ui/history/history_list_item.dart';
-import 'package:mlperfbench/ui/history/list_item.dart';
 
 class HistoryListScreen extends StatefulWidget {
-  const HistoryListScreen({Key? key}) : super(key: key);
+  const HistoryListScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _HistoryListScreenState();
@@ -26,18 +24,16 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<BenchmarkState>();
-    l10n = AppLocalizations.of(context);
+    l10n = AppLocalizations.of(context)!;
     final localResults = state.resourceManager.resultManager.localResults;
     final remoteResults = state.resourceManager.resultManager.remoteResults;
     final filter = state.resourceManager.resultManager.resultFilter;
     final sort = state.resourceManager.resultManager.resultSort;
-    final results = localResults + remoteResults;
-    final resultsDataProvider = BenchmarksDataProvider(results);
+    List<ExtendedResult> results = localResults + remoteResults;
+    results = results.where((result) => filter.match(result)).toList();
+    results = sort.apply(results);
 
-    List<BenchmarkExportResult> resultItems =
-        resultsDataProvider.resultItems(filter, sort);
-
-    List<ListItem> itemsList = _listItems(resultItems);
+    final itemsList = results.map((e) => _listItem(e)).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -94,27 +90,6 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
               title: Text(l10n.historySortByDate),
             ),
           ),
-          const PopupMenuDivider(),
-          PopupMenuItem<SortByEnum>(
-            value: SortByEnum.taskThroughputDesc,
-            child: ListTile(
-              contentPadding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-              minLeadingWidth: 32,
-              leading: const Icon(Icons.speed),
-              trailing: const Icon(Icons.south),
-              title: Text(l10n.historySortByTaskThroughput),
-            ),
-          ),
-          PopupMenuItem<SortByEnum>(
-            value: SortByEnum.taskThroughputAsc,
-            child: ListTile(
-              contentPadding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-              minLeadingWidth: 32,
-              leading: const Icon(Icons.speed),
-              trailing: const Icon(Icons.north),
-              title: Text(l10n.historySortByTaskThroughput),
-            ),
-          ),
         ];
       },
     );
@@ -136,18 +111,12 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
     );
   }
 
-  List<ListItem> _listItems(List<BenchmarkExportResult> resultItems) {
-    return resultItems.map((resultItem) {
-      return _benchmarkListItem(resultItem);
-    }).toList();
-  }
-
-  ListItem _benchmarkListItem(BenchmarkExportResult item) {
-    return HistoryListItem(item, () {
+  HistoryListItem _listItem(ExtendedResult result) {
+    return HistoryListItem(result, () {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BenchmarkExportResultScreen(result: item),
+          builder: (context) => LocalExtendedResultScreen(result: result),
         ),
       ).then((value) => setState(() {}));
     });

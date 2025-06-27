@@ -5,7 +5,6 @@ import 'package:async/async.dart';
 import 'package:uuid/uuid.dart';
 import 'package:worker_manager/worker_manager.dart';
 
-import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
@@ -60,30 +59,14 @@ class TaskRunner {
     required this.backendInfo,
   });
 
-  BenchmarkRunMode get perfMode => store.testMode
-      ? BenchmarkRunMode.performanceTest
-      : BenchmarkRunMode.performance;
+  BenchmarkRunMode get perfMode =>
+      store.selectedBenchmarkRunMode.performanceRunMode;
 
-  BenchmarkRunMode get accuracyMode => store.testMode
-      ? BenchmarkRunMode.accuracyTest
-      : BenchmarkRunMode.accuracy;
+  BenchmarkRunMode get accuracyMode =>
+      store.selectedBenchmarkRunMode.accuracyRunMode;
 
-  List<BenchmarkRunMode> get selectedRunModes {
-    final modes = <BenchmarkRunMode>[];
-    switch (store.selectedBenchmarkRunMode) {
-      case BenchmarkRunModeEnum.performanceOnly:
-        modes.add(perfMode);
-        break;
-      case BenchmarkRunModeEnum.accuracyOnly:
-        modes.add(accuracyMode);
-        break;
-      case BenchmarkRunModeEnum.submissionRun:
-        modes.add(perfMode);
-        modes.add(accuracyMode);
-        break;
-    }
-    return modes;
-  }
+  List<BenchmarkRunMode> get selectedRunModes =>
+      store.selectedBenchmarkRunMode.selectedRunModes;
 
   Future<void> abortBenchmarks() async {
     aborting = true;
@@ -95,17 +78,9 @@ class TaskRunner {
       BenchmarkStore benchmarkStore, String currentLogDir) async {
     progressInfo = ProgressInfo();
     final cooldown = store.cooldown;
-    late final Duration cooldownDuration;
-    if (store.testMode) {
-      cooldownDuration = Duration(seconds: store.testCooldown);
-    } else if (DartDefine.isFastMode) {
-      cooldownDuration = const Duration(seconds: 1);
-    } else {
-      cooldownDuration = Duration(minutes: store.cooldownDuration);
-    }
+    final cooldownDuration = Duration(seconds: store.cooldownDuration);
 
-    final activeBenchmarks =
-        benchmarkStore.benchmarks.where((element) => element.isActive);
+    final activeBenchmarks = benchmarkStore.activeBenchmarks;
 
     final resultHelpers = <ResultHelper>[];
     for (final benchmark in activeBenchmarks) {
@@ -118,18 +93,10 @@ class TaskRunner {
       resultHelpers.add(resultHelper);
     }
 
+    print('Starting in run mode: ${store.selectedBenchmarkRunMode}');
     progressInfo.runMode = store.selectedBenchmarkRunMode;
-    switch (store.selectedBenchmarkRunMode) {
-      case BenchmarkRunModeEnum.performanceOnly:
-        progressInfo.totalStages = activeBenchmarks.length;
-        break;
-      case BenchmarkRunModeEnum.accuracyOnly:
-        progressInfo.totalStages = activeBenchmarks.length;
-        break;
-      case BenchmarkRunModeEnum.submissionRun:
-        progressInfo.totalStages = 2 * activeBenchmarks.length;
-        break;
-    }
+    progressInfo.totalStages =
+        selectedRunModes.length * activeBenchmarks.length;
 
     progressInfo.currentStage = 0;
     progressInfo.cooldownDuration = cooldownDuration.inSeconds.toDouble();
@@ -183,8 +150,13 @@ class TaskRunner {
     }
 
     final creationDate = DateTime.now();
+    final meta = ResultMetaInfo(
+      creationDate: creationDate,
+      uuid: const Uuid().v4(),
+      runMode: store.selectedBenchmarkRunMode,
+    );
     return ExtendedResult(
-      meta: ResultMetaInfo(creationDate: creationDate, uuid: const Uuid().v4()),
+      meta: meta,
       environmentInfo: DeviceInfo.instance.envInfo,
       results: exportResults,
       buildInfo: BuildInfoHelper.info,
@@ -196,38 +168,38 @@ class TaskRunner {
     final benchmark = resultHelper.benchmark;
     progressInfo.currentBenchmark = benchmark.info;
     progressInfo.currentStage++;
-
-    if (mode == perfMode) {
+    if (mode.loadgenMode == LoadgenModeEnum.performanceOnly) {
       final perfTimer = Stopwatch()..start();
       progressInfo.accuracy = false;
+      double taskMinDuration =
+          mode.chooseRunConfig(benchmark.taskConfig).minDuration;
+      int taskMinQueryCount =
+          mode.chooseRunConfig(benchmark.taskConfig).minQueryCount;
       progressInfo.calculateStageProgress = () {
         // UI updates once per second so using 1 second as lower bound should not affect it.
-        final minDuration = max(benchmark.taskConfig.minDuration, 1);
-        final timeProgress = perfTimer.elapsedMilliseconds /
-            Duration.millisecondsPerSecond /
-            minDuration;
-
-        final minQueries = max(benchmark.taskConfig.minQueryCount, 1);
+        final minDuration = max(taskMinDuration, 1);
+        final timeProgress = perfTimer.elapsed.inSeconds / minDuration;
+        final minQueries = max(taskMinQueryCount, 1);
         final queryCounter = backendBridge.getQueryCounter();
         final queryProgress =
-            queryCounter < 0 ? 1.0 : queryCounter / minQueries;
+            queryCounter < 0 ? 0.0 : queryCounter / minQueries;
         return min(timeProgress, queryProgress);
       };
       notifyListeners();
 
-      final performanceRunInfo = await _NativeRunHelper(
+      final runHelper = _NativeRunHelper(
         enableArtificialLoad: store.artificialCPULoadEnabled,
-        isTestMode: store.testMode,
-        resourceManager: resourceManager,
         backendBridge: backendBridge,
         benchmark: benchmark,
         runMode: perfMode,
+        logParentDir: currentLogDir,
+      );
+      await runHelper.initRunSettings(
+        resourceManager: resourceManager,
         commonSettings: backendInfo.settings.commonSetting,
         backendLibName: backendInfo.libName,
-        logParentDir: currentLogDir,
-        testMinQueryCount: store.testMinQueryCount,
-        testMinDuration: store.testMinDuration,
-      ).run();
+      );
+      final performanceRunInfo = await runHelper.run();
       perfTimer.stop();
       performanceRunInfo.loadgenInfo!;
 
@@ -243,7 +215,7 @@ class TaskRunner {
         loadgenInfo: performanceRunInfo.loadgenInfo!,
       );
       resultHelper.performanceRunInfo = performanceRunInfo;
-    } else if (mode == accuracyMode) {
+    } else if (mode.loadgenMode == LoadgenModeEnum.accuracyOnly) {
       progressInfo.accuracy = true;
       progressInfo.calculateStageProgress = () {
         final queryCounter = backendBridge.getQueryCounter();
@@ -253,19 +225,19 @@ class TaskRunner {
         return queryProgress;
       };
       notifyListeners();
-      final accuracyRunInfo = await _NativeRunHelper(
+      final runHelper = _NativeRunHelper(
         enableArtificialLoad: store.artificialCPULoadEnabled,
-        isTestMode: store.testMode,
-        resourceManager: resourceManager,
         backendBridge: backendBridge,
         benchmark: benchmark,
         runMode: accuracyMode,
+        logParentDir: currentLogDir,
+      );
+      await runHelper.initRunSettings(
+        resourceManager: resourceManager,
         commonSettings: backendInfo.settings.commonSetting,
         backendLibName: backendInfo.libName,
-        logParentDir: currentLogDir,
-        testMinQueryCount: store.testMinQueryCount,
-        testMinDuration: store.testMinDuration,
-      ).run();
+      );
+      final accuracyRunInfo = await runHelper.run();
       resultHelper.accuracyRunInfo = accuracyRunInfo;
       final accuracyResult = accuracyRunInfo.result;
       benchmark.accuracyModeResult = BenchmarkResult(
@@ -281,6 +253,7 @@ class TaskRunner {
         loadgenInfo: accuracyRunInfo.loadgenInfo,
       );
     } else {
+      print('Unknown BenchmarkRunMode: $mode');
       throw 'Unknown BenchmarkRunMode: $mode';
     }
     progressInfo.completedBenchmarks.add(benchmark.info);
@@ -302,22 +275,20 @@ class _NativeRunHelper {
     required this.backendBridge,
     required this.benchmark,
     required this.runMode,
-    required bool isTestMode,
+    required String logParentDir,
+  }) : logDir = '$logParentDir/${benchmark.id}-${runMode.readable}';
+
+  Future<void> initRunSettings({
     required ResourceManager resourceManager,
     required List<pb.CommonSetting> commonSettings,
     required String backendLibName,
-    required String logParentDir,
-    required int testMinQueryCount,
-    required int testMinDuration,
-  }) : logDir = '$logParentDir/${benchmark.id}-${runMode.readable}' {
-    runSettings = benchmark.createRunSettings(
+  }) async {
+    runSettings = await benchmark.createRunSettings(
       runMode: runMode,
       resourceManager: resourceManager,
       commonSettings: commonSettings,
       backendLibName: backendLibName,
       logDir: logDir,
-      testMinQueryCount: testMinQueryCount,
-      testMinDuration: testMinDuration,
     );
   }
 
@@ -326,17 +297,22 @@ class _NativeRunHelper {
 
     if (enableArtificialLoad) {
       print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
-      const value = 999999999999999.0;
-
-      // execute() returns Cancelable, which should in theory allow you to stop the isolate
-      // unfortunately, it doesn't work, artificial load doesn't stop
-      final _ = Executor().execute(arg1: value, fun1: _doSomethingCPUIntensive);
+      final _ = workerManager.execute(
+        () async {
+          const value = 999999999999999.0;
+          var newValue = value;
+          while (true) {
+            newValue = newValue * 0.999999999999999;
+          }
+        },
+        priority: WorkPriority.immediately,
+      );
     }
 
     try {
       return await _invokeNativeRun();
     } finally {
-      await Executor().dispose();
+      await workerManager.dispose();
     }
   }
 
@@ -410,13 +386,5 @@ class _NativeRunHelper {
     return await LoadgenInfo.fromFile(
       filepath: '$logDir/$logFileName',
     );
-  }
-
-  // This function needs to be either a static function or a top level function to be accessible as a Flutter entry point.
-  static void _doSomethingCPUIntensive(double value, TypeSendPort port) {
-    var newValue = value;
-    while (true) {
-      newValue = newValue * 0.999999999999999;
-    }
   }
 }

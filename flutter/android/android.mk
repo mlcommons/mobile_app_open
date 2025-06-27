@@ -18,9 +18,9 @@ include flutter/android/android-docker.mk
 ANDROID_NDK_VERSION?=25
 ANDROID_NDK_API_LEVEL?=33
 
-flutter/android: flutter/android/libs flutter/check/firebase-env
-flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk
-flutter/android/libs: flutter/android/libs/checksum flutter/android/libs/build flutter/android/libs/copy
+flutter/android: flutter/android/libs
+flutter/android/release: flutter/check-release-env flutter/android flutter/prepare flutter/android/apk flutter/android/appbundle
+flutter/android/libs: flutter/android/libs/deps flutter/android/libs/checksum flutter/android/libs/build flutter/android/libs/copy
 # run `make flutter/android/apk` before `flutter/android/test-apk`
 flutter/android/test-apk: flutter/android/test-apk/main flutter/android/test-apk/helper
 
@@ -31,9 +31,19 @@ ifeq (${WITH_SAMSUNG},1)
 	flutter/tool/validate-checksum.sh \
 		-d ${backend_samsung_lib_root} \
 		-f ${backend_samsung_checksum_file}
-else
-	@echo "Skip checksum validation"
 endif
+ifeq (${WITH_QTI},1)
+ifeq (${WITH_STABLEDIFFUSION},1)
+	@echo "Validate checksum of QTI lib files"
+	flutter/tool/validate-checksum.sh \
+		-d ${backend_qti_lib_root} \
+		-f ${backend_qti_checksum_file}
+endif
+endif
+
+.PHONY: flutter/android/libs/deps
+flutter/android/libs/deps:
+	${backend_qti_libs_deps}
 
 .PHONY: flutter/android/libs/build
 flutter/android/libs/build:
@@ -74,20 +84,29 @@ flutter/android/apk:
 	cd flutter && ${_start_args} flutter --no-version-check build apk \
 		${flutter_official_build_arg} \
 		${flutter_firebase_crashlytics_arg} \
-		${flutter_build_number_arg} \
-		${flutter_folder_args}
-	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk ${flutter_android_apk_release_path}
+		${flutter_build_number_arg}
+	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk ${flutter_android_apk_release_path}.apk
+.PHONY: flutter/android/appbundle
+flutter/android/appbundle:
+	mkdir -p $$(dirname ${flutter_android_apk_release_path})
+	cd flutter && ${_start_args} flutter --no-version-check build appbundle \
+		${flutter_official_build_arg} \
+		${flutter_firebase_crashlytics_arg} \
+		${flutter_build_number_arg}
+	cp -f flutter/build/app/outputs/bundle/release/app-release.aab ${flutter_android_apk_release_path}.aab
 
 FLUTTER_ANDROID_APK_TEST_MAIN?=test-main.apk
 flutter_android_apk_test_main_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_MAIN}
 .PHONY: flutter/android/test-apk/main
 flutter/android/test-apk/main:
 	mkdir -p $$(dirname ${flutter_android_apk_test_main_path})
-	flutter_android_apk_test_perf_arg=$$(printf enable-perf-test=${PERF_TEST} | base64) && \
+	flutter_android_apk_perf_test_arg=$$(printf PERF_TEST=${PERF_TEST} | base64) && \
+	flutter_android_apk_benchmark_ids_arg=$$(printf BENCHMARK_IDS=${BENCHMARK_IDS} | base64) && \
 		cd flutter/android && \
 		./gradlew app:assembleDebug \
 		-Ptarget=integration_test/first_test.dart \
-		-Pdart-defines=$${flutter_android_apk_test_perf_arg}
+		-Pdart-defines=$${flutter_android_apk_perf_test_arg} \
+		-Pdart-defines=$${flutter_android_apk_benchmark_ids_arg}
 	cp -f flutter/build/app/outputs/apk/debug/app-debug.apk ${flutter_android_apk_test_main_path}
 
 FLUTTER_ANDROID_APK_TEST_HELPER?=test-helper.apk

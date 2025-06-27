@@ -30,6 +30,7 @@ cc_library(
         "//flutter/cpp/backends:external",
         "//flutter/cpp/datasets:ade20k",
         "//flutter/cpp/datasets:coco",
+        "//flutter/cpp/datasets:coco_gen",
         "//flutter/cpp/datasets:imagenet",
         "//flutter/cpp/datasets:snu_sr",
         "//flutter/cpp/datasets:squad",
@@ -53,7 +54,8 @@ apple_xcframework(
         "device": ["arm64"],
     },
     minimum_os_versions = {
-        "ios": "12.0",
+        "ios": "13.1",
+        "macos": "13.1",
     },
     deps = [
         "//flutter/cpp/flutter:bridge",

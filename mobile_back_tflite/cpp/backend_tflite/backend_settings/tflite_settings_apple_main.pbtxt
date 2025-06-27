@@ -18,15 +18,43 @@ benchmark_setting {
     delegate_name: "Core ML"
     accelerator_name: "ane"
     accelerator_desc: "ANE"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-    model_checksum: "66bb4eba50987221608f8487ed405794"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_1/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_checksum: "66bb4eba50987221608f8487ed405794"
+    }
   }
   delegate_choice: {
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_1/tflite/mobilenet_edgetpu_224_1.0_float.tflite"
-    model_checksum: "66bb4eba50987221608f8487ed405794"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_1/mobilenet_edgetpu_224_1.0_float.tflite"
+      model_checksum: "66bb4eba50987221608f8487ed405794"
+    }
+  }
+  delegate_selected: "Core ML"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "Core ML"
+    accelerator_name: "ane"
+    accelerator_desc: "ANE"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
   }
   delegate_selected: "Core ML"
 }
@@ -38,15 +66,19 @@ benchmark_setting {
     delegate_name: "Core ML"
     accelerator_name: "ane"
     accelerator_desc: "ANE"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
-    model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet.tflite"
+      model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+    }
   }
   delegate_choice: {
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v1_0/tflite/mobiledet.tflite"
-    model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet.tflite"
+      model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+    }
   }
   delegate_selected: "Core ML"
 }
@@ -58,8 +90,10 @@ benchmark_setting {
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v0_7/tflite/mobilebert_float_384_gpu.tflite"
-    model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_float_384_gpu.tflite"
+      model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+    }
   }
   delegate_selected: "Metal"
 }
@@ -71,15 +105,19 @@ benchmark_setting {
     delegate_name: "Core ML"
     accelerator_name: "ane"
     accelerator_desc: "ANE"
-    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
-    model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_argmax_f32.tflite"
+      model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+    }
   }
   delegate_choice: {
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_open/raw/main/vision/mosaic/models_and_checkpoints/R4/mobile_segmenter_r4_argmax_f32.tflite"
-    model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_argmax_f32.tflite"
+      model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+    }
   }
   delegate_selected: "Core ML"
 }
@@ -91,15 +129,70 @@ benchmark_setting {
     delegate_name: "Core ML"
     accelerator_name: "ane"
     accelerator_desc: "ANE"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
-    model_checksum: "672240427c1f3dc33baf2facacd9631f"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_fp32.tflite"
+      model_checksum: "672240427c1f3dc33baf2facacd9631f"
+    }
   }
   delegate_choice: {
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
-    model_path: "https://github.com/mlcommons/mobile_models/raw/main/v3_0/tflite/edsr_f32b5_fp32.tflite"
-    model_checksum: "672240427c1f3dc33baf2facacd9631f"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_fp32.tflite"
+      model_checksum: "672240427c1f3dc33baf2facacd9631f"
+    }
   }
   delegate_selected: "Core ML"
+}
+
+benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "NNAPI"
+    accelerator_name: "npu"
+    accelerator_desc: "NPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_decoder_dynamic_fp16.tflite"
+      model_checksum: "165b70a01643e70a23e5e54a949be306"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_diffusion_model_dynamic_int8.tflite"
+      model_checksum: "ccfd761a2f8186c3669948515d40a880"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_text_encoder_dynamic_int8.tflite"
+      model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/timestep_embeddings_data.bin.ts"
+      model_checksum: "798b772155a69de5df44b304327bb3cc"
+    }
+  }
+  delegate_selected: "NNAPI"
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "text_encoder_filename"
+    value: "sd_text_encoder_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "diffusion_model_filename"
+    value: "sd_diffusion_model_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "decoder_filename"
+    value: "sd_decoder_dynamic_fp16.tflite"
+  }
+  custom_setting {
+    id: "timestep_embeddings_filename"
+    value: "timestep_embeddings_data.bin.ts"
+  }
 }

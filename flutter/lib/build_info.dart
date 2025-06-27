@@ -8,8 +8,13 @@ part 'build_info.gen.dart';
 
 class BuildInfoHelper {
   static late final BuildInfo info;
+  static bool _initialized = false;
 
   static Future<void> staticInit() async {
+    if (_initialized) {
+      return;
+    }
+    _initialized = true;
     final packageInfo = await PackageInfo.fromPlatform();
     print('packageInfo.appName = ${packageInfo.appName}');
     print('packageInfo.buildNumber = ${packageInfo.buildNumber}');
@@ -22,7 +27,7 @@ class BuildInfoHelper {
         buildNumber: packageInfo.buildNumber,
         buildDate: DateTime.now(),
         officialReleaseFlag: DartDefine.isOfficialBuild,
-        devTestFlag: DartDefine.isFastMode,
+        devTestFlag: DartDefine.perfTestEnabled,
         backendList: BackendInfoHelper().getBackendsList(),
         gitBranch: GeneratedBuildInfo.gitBranch,
         gitCommit: GeneratedBuildInfo.gitCommit,
