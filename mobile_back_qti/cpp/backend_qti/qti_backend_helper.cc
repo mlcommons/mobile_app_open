@@ -18,6 +18,7 @@ limitations under the License.
 #include <random>
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include "DiagLog/IDiagLog.h"
 #include "DlContainer/DlContainer.h"
@@ -96,8 +97,9 @@ static Snpe_TensorShape_Handle_t calcStrides(
   return tensorShapeHandle;
 }
 
-static Snpe_Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
+static Snpe_Runtime_t Str2Delegate(const snpe_runtimes_t delegate, bool isFatal = false) {
   Snpe_Runtime_t runtime;
+
   switch (delegate) {
     case SNPE_DSP:
       runtime = SNPE_RUNTIME_DSP;
@@ -121,8 +123,12 @@ static Snpe_Runtime_t Str2Delegate(const snpe_runtimes_t delegate) {
           runtime, SNPE_RUNTIME_CHECK_OPTION_UNSIGNEDPD_CHECK)) {
     LOG(INFO) << "runtime " << delegate << " is available on this platform";
   } else {
-    LOG(FATAL) << "runtime " << delegate
-               << " is not available on this platform";
+    std::stringstream log_err_string;
+    log_err_string << "runtime " << delegate << " is not available on this platform";
+    if(isFatal)
+      LOG(FATAL) << log_err_string.str();
+    else
+      LOG(ERROR) << log_err_string.str();
   }
 
   return runtime;
@@ -713,7 +719,7 @@ void QTIBackendHelper::set_runtime_config() {
   Snpe_Runtime_t runtime;
   for (int i = 0; i < numDSP; i++) {
     if (i == 0) {
-      runtime = Str2Delegate(SNPE_DSP);
+      runtime = Str2Delegate(SNPE_DSP, true);
     }
     auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
 
@@ -728,7 +734,7 @@ void QTIBackendHelper::set_runtime_config() {
 
   for (int i = 0; i < numGPU; i++) {
     if (i == 0) {
-      runtime = Str2Delegate(SNPE_GPU);
+      runtime = Str2Delegate(SNPE_GPU, true);
     }
     auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
     Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
@@ -741,7 +747,7 @@ void QTIBackendHelper::set_runtime_config() {
 
   for (int i = 0; i < numCPU; i++) {
     if (i == 0) {
-      runtime = Str2Delegate(SNPE_CPU);
+      runtime = Str2Delegate(SNPE_CPU, true);
     }
     auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
     Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
@@ -875,4 +881,4 @@ void QTIBackendHelper::deinitSd() {
   delete sd_pipeline;
   sd_pipeline = nullptr;
 #endif
-}
+}}}
