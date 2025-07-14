@@ -2,9 +2,9 @@
 
 The MLPerf Mobile App supports the following runtime backends to run AI tasks on different mobile devices.
 
-## TFLite Backend
+## LiteRT Backend
 
-TensorFlow Lite is Google’s cross-platform framework for deploying machine learning (ML) models on mobile and embedded systems. The runtime uses a set of custom operators that are optimized for efficiency, offering lower latency and smaller binary size compared to the full TensorFlow runtime. It can perform inference on CPUs using optimized kernels that take advantage of ARM’s Neon vector instructions on any platform. The runtime can also execute on a variety of accelerator delegates to take advantage of specialized APIs and hardware. For example, it can target GPUs for iOS and Android, Core ML for newer iOS devices, and the Android NNAPI delegate which can target GPUs, DSPs, NPUs, and custom back-ends.
+LiteRT (formerly TensorFlow Lite) is Google’s cross-platform framework for deploying machine learning (ML) models on mobile and embedded systems. The runtime uses a set of custom operators that are optimized for efficiency, offering lower latency and smaller binary size compared to the full TensorFlow runtime. It can perform inference on CPUs using optimized kernels that take advantage of ARM’s Neon vector instructions on any platform. The runtime can also execute on a variety of accelerator delegates to take advantage of specialized APIs and hardware. For example, it can target GPUs for iOS and Android, Core ML for newer iOS devices, and the Android NNAPI delegate which can target GPUs, DSPs, NPUs, and custom back-ends.
 When invoked on the CPU it will use 4 threads.
 
 ## Google Pixel
