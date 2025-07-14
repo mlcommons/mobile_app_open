@@ -78,3 +78,9 @@ The MLPerf Mobile App is also available for iOS devices, optimized to leverage A
 The iOS version of the MLPerf Mobile App supports the same benchmarks as the Android version, allowing for consistent cross-platform performance comparisons. The app takes advantage of the Metal Performance Shaders (MPS) and Apple's Neural Engine to provide optimized performance on iOS devices.
 
 For more information about Core ML, visit [https://developer.apple.com/documentation/coreml](https://developer.apple.com/documentation/coreml)
+
+## Licensing Information
+
+The MLPerf Mobile App code is licensed under the Apache 2.0 License. The models used in the benchmarks are subject to their respective licenses. For detailed licensing information, please refer to the [LICENSE.md](https://github.com/mlcommons/mobile_app_open/blob/master/LICENSE.md) file in the repository.
+
+The datasets used for benchmarking are subject to their original licenses and terms of use. Please consult the documentation of each specific dataset for details on usage rights and restrictions.
