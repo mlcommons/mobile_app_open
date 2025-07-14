@@ -70,3 +70,11 @@ The MLPerf Mobile Benchmarking App uses the Exynos Neural Network SDK on the fol
 * Exynos 2200
 * Exynos 2100
 * Exynos 990
+
+## iOS App
+
+The MLPerf Mobile App is also available for iOS devices, optimized to leverage Apple's neural engine and Core ML framework. Core ML is Apple's machine learning framework that helps integrate machine learning models into iOS applications. On supported iOS devices, the app utilizes the Neural Engine available in Apple Silicon (A-series and M-series chips) to accelerate machine learning workloads.
+
+The iOS version of the MLPerf Mobile App supports the same benchmarks as the Android version, allowing for consistent cross-platform performance comparisons. The app takes advantage of the Metal Performance Shaders (MPS) and Apple's Neural Engine to provide optimized performance on iOS devices.
+
+For more information about Core ML, visit [https://developer.apple.com/documentation/coreml](https://developer.apple.com/documentation/coreml)
