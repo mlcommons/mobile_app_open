@@ -98,9 +98,8 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    // firebase-bom v32.8.1 is required to use minSdkVersion 21
-    // https://firebase.google.com/support/release-notes/android#2024-05-02
-    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    // https://firebase.google.com/support/release-notes/android
+    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
     implementation("com.google.firebase:firebase-appcheck-debug")
