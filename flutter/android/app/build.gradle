@@ -97,7 +97,10 @@ dependencies {
 
     // firebase-bom v32.8.1 is required to use minSdkVersion 21
     // https://firebase.google.com/support/release-notes/android#2024-05-02
-    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
     implementation("com.google.firebase:firebase-appcheck-debug")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-crashlytics-ndk")
 }
