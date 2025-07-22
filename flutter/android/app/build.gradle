@@ -75,11 +75,13 @@ android {
             // By default we do not upload mapping file to Firebase
             firebaseCrashlytics {
                 if (System.env['FIREBASE_CRASHLYTICS_ENABLED'] == 'true') {
-                    println 'mappingFileUploadEnabled set to true'
+                    println 'mappingFileUploadEnabled and nativeSymbolUploadEnabled set to true'
                     mappingFileUploadEnabled true
+                    nativeSymbolUploadEnabled true
                 } else {
-                    println 'mappingFileUploadEnabled set to false'
+                    println 'mappingFileUploadEnabled and nativeSymbolUploadEnabled set to false'
                     mappingFileUploadEnabled false
+                    nativeSymbolUploadEnabled false
                 }
             }
         }
