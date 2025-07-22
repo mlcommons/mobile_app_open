@@ -113,3 +113,13 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-crashlytics-ndk")
 }
+
+afterEvaluate {
+    if (System.env['FIREBASE_CRASHLYTICS_ENABLED'] == 'true') {
+        tasks.configureEach {
+            if (name == 'assembleRelease' || name == 'bundleRelease') {
+                finalizedBy 'uploadCrashlyticsSymbolFileRelease'
+            }
+        }
+    }
+}
