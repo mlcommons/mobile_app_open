@@ -89,7 +89,7 @@ android {
                     println 'mappingFileUploadEnabled and nativeSymbolUploadEnabled set to true'
                     mappingFileUploadEnabled true
                     nativeSymbolUploadEnabled true
-                    unstrippedNativeLibsDir file("../../../bazel-bin")
+                    unstrippedNativeLibsDir file("${buildDir}/intermediates/merged_native_libs/release/out/lib/")
                     symbolGeneratorType "csym"
                 } else {
                     println 'mappingFileUploadEnabled and nativeSymbolUploadEnabled set to false'
