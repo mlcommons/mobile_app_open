@@ -35,13 +35,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    // https://stackoverflow.com/a/70873876
-    packagingOptions {
-        jniLibs {
-            useLegacyPackaging = true
-        }
-    }
-
     kotlinOptions {
         jvmTarget = '1.8'
     }
