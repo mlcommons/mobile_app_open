@@ -117,6 +117,9 @@ dependencies {
 
 afterEvaluate {
     if (System.env['FIREBASE_CRASHLYTICS_ENABLED'] == 'true') {
+        tasks.named('generateCrashlyticsSymbolFileRelease') {
+            dependsOn 'mergeReleaseNativeLibs'
+        }
         tasks.configureEach {
             if (name == 'assembleRelease' || name == 'bundleRelease') {
                 finalizedBy 'uploadCrashlyticsSymbolFileRelease'
