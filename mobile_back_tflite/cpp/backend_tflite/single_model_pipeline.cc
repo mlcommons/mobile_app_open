@@ -495,7 +495,8 @@ mlperf_data_t SingleModelPipeline::backend_get_input_type(
   neuron_data_t neuronType;
   if (neuron_get_in_out_datatype(backend_data->neuronBackendData, i,
                                  /* isIn */ true, &neuronType)) {
-    AdapterBackendData *neuron_data = (AdapterBackendData *)backend_data->neuronBackendData;
+    AdapterBackendData *neuron_data =
+        (AdapterBackendData *)backend_data->neuronBackendData;
     mlperf_data_t type;
     type.type = NeuronType2Type(neuronType.type);
     type.size = neuronType.size / neuron_data->real_batch_size;
@@ -573,7 +574,8 @@ mlperf_data_t SingleModelPipeline::backend_get_output_type(
   neuron_data_t neuronType;
   if (neuron_get_in_out_datatype(backend_data->neuronBackendData, i,
                                  /* isIn */ false, &neuronType)) {
-    AdapterBackendData *neuron_data = (AdapterBackendData *)backend_data->neuronBackendData;
+    AdapterBackendData *neuron_data =
+        (AdapterBackendData *)backend_data->neuronBackendData;
     mlperf_data_t type;
     type.type = NeuronType2Type(neuronType.type);
     type.size = neuronType.size / neuron_data->real_batch_size;
@@ -595,7 +597,8 @@ mlperf_status_t SingleModelPipeline::backend_get_output(
     void **data) {
   TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
 #ifdef MTK_TFLITE_NEURON_BACKEND
-  if (neuron_get_output(backend_data->neuronBackendData, batch_index, i, data)) {
+  if (neuron_get_output(backend_data->neuronBackendData, batch_index, i,
+                        data)) {
     return MLPERF_SUCCESS;
   }
 #endif

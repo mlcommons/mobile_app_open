@@ -60,8 +60,7 @@
 #define unlikely(x) __builtin_expect((x), 0)
 
 namespace {
-int32_t CreateNeuronMemoryWithAHWB(uint32_t byte_size,
-                                   uint64_t ahwb_type,
+int32_t CreateNeuronMemoryWithAHWB(uint32_t byte_size, uint64_t ahwb_type,
                                    NeuronMemory **memory,
                                    AHardwareBuffer **abuffer) {
   if (byte_size == 0) {
@@ -126,7 +125,8 @@ int32_t AhwbNeuronMemoryWrapper::lockAhwbData(void **out_data_ptr) {
     LOG(ERROR) << "No AHWB allocated";
     return NEURON_BAD_STATE;
   }
-  if (AHardwareBuffer_lock(abuffer_, ahwb_type_, -1, nullptr, out_data_ptr) != 0) {
+  if (AHardwareBuffer_lock(abuffer_, ahwb_type_, -1, nullptr, out_data_ptr) !=
+      0) {
     LOG(ERROR) << "AHWB lock fail";
     return NEURON_BAD_STATE;
   }
@@ -172,9 +172,12 @@ void Padding(AdapterBackendData *backend, int bytes, void *data) {
 
   for (int num = 0; num < padded_num; num++) {
     image_data[padded_length - 1 - num * 4] = 0;
-    image_data[padded_length - 2 - num * 4] = image_data[original_length - 1 - num * 3];
-    image_data[padded_length - 3 - num * 4] = image_data[original_length - 2 - num * 3];
-    image_data[padded_length - 4 - num * 4] = image_data[original_length - 3 - num * 3];
+    image_data[padded_length - 2 - num * 4] =
+        image_data[original_length - 1 - num * 3];
+    image_data[padded_length - 3 - num * 4] =
+        image_data[original_length - 2 - num * 3];
+    image_data[padded_length - 4 - num * 4] =
+        image_data[original_length - 3 - num * 3];
   }
 }
 
@@ -190,19 +193,19 @@ bool NeuronSetInputsAndOutputsFromMemory(AdapterBackendData *backend_data) {
     for (int i = 0; i < input_nums; i++) {
       err = NeuronExecution_setInputFromMemory(
           backend_data->execution, i, nullptr,
-          backend_data->inputMemoryWrappers[t * input_nums + i].memory(),
-          0,
+          backend_data->inputMemoryWrappers[t * input_nums + i].memory(), 0,
           backend_data->inputSizes[t * input_nums + i]);
-      RETURN_FALSE_ON_ERR(err, "NeuronExecution_setInputFromMemory[" << i << "]");
+      RETURN_FALSE_ON_ERR(err,
+                          "NeuronExecution_setInputFromMemory[" << i << "]");
     }
 
     for (int i = 0; i < output_nums; i++) {
       err = NeuronExecution_setOutputFromMemory(
           backend_data->execution, i, nullptr,
-          backend_data->outputMemoryWrappers[t * output_nums + i].memory(),
-          0,
+          backend_data->outputMemoryWrappers[t * output_nums + i].memory(), 0,
           backend_data->outputSizes[t * output_nums + i]);
-      RETURN_FALSE_ON_ERR(err, "NeuronExecution_setOutputFromMemory[" << i << "]");
+      RETURN_FALSE_ON_ERR(err,
+                          "NeuronExecution_setOutputFromMemory[" << i << "]");
     }
     if (backend_data->use_throughput_mode) {
       err = NeuronExecution_setIODone(backend_data->execution, t);
@@ -706,19 +709,23 @@ bool CreateNeuronModel(neuron_backend_ptr_t backend_ptr,
   bool create_result = false;
   if (model.find("mobilenet_edgetpu_224_1.0_uint8.dla") != std::string::npos) {
     create_result = create_mobilenet_edge_model(backend_ptr, model.c_str());
-  } else if (model.find("MobileNetV4-Conv-Large-int8-ptq.dla") != std::string::npos) {
+  } else if (model.find("MobileNetV4-Conv-Large-int8-ptq.dla") !=
+             std::string::npos) {
     create_result = create_mobilenet_v4_model(backend_ptr, model.c_str());
-  } else if (model.find("mobilenet_edgetpu_224_1.0_uint8_offline.dla") != std::string::npos) {
+  } else if (model.find("mobilenet_edgetpu_224_1.0_uint8_offline.dla") !=
+             std::string::npos) {
     ReadOfflineProperties(backend_data, /*model_batch_size*/ 50,
                           /*shrads_num*/ 8, /*thread_pool_size*/ 16);
     create_result = create_mobilenet_edge_model(backend_ptr, model.c_str());
-  } else if (model.find("MobileNetV4-Conv-Large-int8-ptq_offline.dla") != std::string::npos) {
+  } else if (model.find("MobileNetV4-Conv-Large-int8-ptq_offline.dla") !=
+             std::string::npos) {
     ReadOfflineProperties(backend_data, /*model_batch_size*/ 4,
                           /*shrads_num*/ 8, /*thread_pool_size*/ 16);
     create_result = create_mobilenet_v4_model(backend_ptr, model.c_str());
   } else if (model.find("mobiledet_qat.dla") != std::string::npos) {
     create_result = create_mobiledet_qat_model(backend_ptr, model.c_str());
-  } else if (model.find("mobile_segmenter_r4_quant_argmax_uint8.dla") != std::string::npos) {
+  } else if (model.find("mobile_segmenter_r4_quant_argmax_uint8.dla") !=
+             std::string::npos) {
     create_result = create_mobile_segmenter_model(backend_ptr, model.c_str());
   } else if (model.find("mobilebert_int8_384_nnapi.dla") != std::string::npos) {
     create_result = create_mobilebert_nnapi_model(backend_ptr, model.c_str());
@@ -760,7 +767,8 @@ bool delete_neuron_backend(neuron_backend_ptr_t backend_ptr) {
 
   if (!backend_data->useNeuronBackend) return false;
 
-  // Delete executin before releasing memory in case of inferencing on invalid buffer
+  // Delete executin before releasing memory in case of inferencing on invalid
+  // buffer
   NeuronExecution_free(backend_data->execution);
   NeuronCompilation_free(backend_data->compilation);
   NeuronModel_free(backend_data->model);
@@ -825,9 +833,11 @@ bool neuron_set_input(neuron_backend_ptr_t backend_ptr, int32_t batch_index,
 
   // TRACER("memcpy");
   if (backend_data->use_throughput_mode) {
-    return NeuronExecution_submitInput(backend_data->execution, i, data_src, one_input_size) == NEURON_NO_ERROR;
+    return NeuronExecution_submitInput(backend_data->execution, i, data_src,
+                                       one_input_size) == NEURON_NO_ERROR;
   } else {
-    memcpy(backend_data->inputMemoryWrappers[i].data(), data_src, one_input_size);
+    memcpy(backend_data->inputMemoryWrappers[i].data(), data_src,
+           one_input_size);
   }
   return true;
 }
@@ -835,7 +845,8 @@ bool neuron_set_input(neuron_backend_ptr_t backend_ptr, int32_t batch_index,
 bool neuron_flush_queries(neuron_backend_ptr_t backend_ptr) {
   AdapterBackendData *const backend_data = (AdapterBackendData *)backend_ptr;
   if (backend_data->use_throughput_mode) {
-    if (NeuronExecution_resetParallelResources(backend_data->execution) != NEURON_NO_ERROR) {
+    if (NeuronExecution_resetParallelResources(backend_data->execution) !=
+        NEURON_NO_ERROR) {
       return false;
     }
   }
@@ -848,7 +859,8 @@ bool neuron_get_output(neuron_backend_ptr_t backend_ptr, int32_t batch_index,
   if (unlikely(!backend_data->useNeuronBackend)) return false;
 
   if (backend_data->use_throughput_mode) {
-    return NeuronExecution_queryOutputPointer(backend_data->execution, i, data) == NEURON_NO_ERROR;
+    return NeuronExecution_queryOutputPointer(backend_data->execution, i,
+                                              data) == NEURON_NO_ERROR;
   } else {
     *data = backend_data->outputMemoryWrappers[i].data();
   }
@@ -860,7 +872,8 @@ bool neuron_issue_query(neuron_backend_ptr_t backend_ptr) {
   if (unlikely(!backend_data->useNeuronBackend)) return false;
 
   if (backend_data->use_throughput_mode) {
-    return NeuronExecution_flushExecution(backend_data->execution) == NEURON_NO_ERROR;
+    return NeuronExecution_flushExecution(backend_data->execution) ==
+           NEURON_NO_ERROR;
   } else {
     return NeuronExecution_compute(backend_data->execution) == NEURON_NO_ERROR;
   }

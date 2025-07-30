@@ -203,7 +203,7 @@ class NeuronBuilder {
     return *this;
   }
 
-  NeuronBuilder &setUseThroughputMode(bool use){
+  NeuronBuilder &setUseThroughputMode(bool use) {
     mUseThroughputMode = use;
     return *this;
   }
@@ -244,7 +244,8 @@ class NeuronBuilder {
     if (length == 0) {
       return false;
     }
-    LOG(INFO) << "createNeuron load DLA end Successfully with buffer length: " << length;
+    LOG(INFO) << "createNeuron load DLA end Successfully with buffer length: "
+              << length;
     // ---------------------------Model------------------------------------
     LOG(INFO) << "createNeuron create Model";
     int err = NEURON_NO_ERROR;
@@ -260,7 +261,8 @@ class NeuronBuilder {
     }
 
     int32_t operandType = 0;
-    const uint16_t network_operand_restore_data = RESTORE_DLA_EXTENSION_OPERAND_TYPE;
+    const uint16_t network_operand_restore_data =
+        RESTORE_DLA_EXTENSION_OPERAND_TYPE;
     const char *extensionRestroeCompiledNetwork = RESTORE_DLA_EXTENSION_NAME;
     err = NeuronModel_getExtensionOperandType(
         model, extensionRestroeCompiledNetwork, network_operand_restore_data,
@@ -285,10 +287,11 @@ class NeuronBuilder {
       output_op_number.emplace_back(i + input_op_number.size());
     }
     err = NeuronModel_setOperandValue(model, input_op_number.back(), dlaBuffer,
-                                         length);
+                                      length);
     RETURN_FALSE_ON_ERR(err, "Set Dla Operand Value failed");
     int32_t operationType = 0;
-    const uint16_t network_operation_type_restore = RESTORE_DLA_EXTENSION_OPERATION_TYPE;
+    const uint16_t network_operation_type_restore =
+        RESTORE_DLA_EXTENSION_OPERATION_TYPE;
     err = NeuronModel_getExtensionOperationType(
         model, extensionRestroeCompiledNetwork, network_operation_type_restore,
         &operationType);
@@ -296,9 +299,9 @@ class NeuronBuilder {
 
     // Add extension operation
     err = NeuronModel_addOperation(
-        model, (NeuronOperationType)operationType,
-        input_op_number.size(), input_op_number.data(),
-        output_op_number.size(), output_op_number.data());
+        model, (NeuronOperationType)operationType, input_op_number.size(),
+        input_op_number.data(), output_op_number.size(),
+        output_op_number.data());
     RETURN_FALSE_ON_ERR(err, "get addOperation fail");
 
     // Identify input and output
@@ -325,18 +328,22 @@ class NeuronBuilder {
     if (!mUseThroughputMode) {
       LOG(INFO) << "createNeuron Compiltion Type COMPILATION_TYPE_NORMAL";
     } else {
-      LOG(INFO) << "createNeuron Compiltion Type COMPILATION_TYPE_EXECUTION_THROUGHPUT_MODE";
+      LOG(INFO) << "createNeuron Compiltion Type "
+                   "COMPILATION_TYPE_EXECUTION_THROUGHPUT_MODE";
       compilationType = COMPILATION_TYPE_EXECUTION_THROUGHPUT_MODE;
     }
-    err = NeuronCompilation_createV2(model, compilationType, nullptr, &compilation);
+    err = NeuronCompilation_createV2(model, compilationType, nullptr,
+                                     &compilation);
     RETURN_FALSE_ON_ERR(err, "NeuronCompilation_create failed");
-    mCompilation = std::unique_ptr<NeuronCompilation, NeuronDeleter>(compilation);
+    mCompilation =
+        std::unique_ptr<NeuronCompilation, NeuronDeleter>(compilation);
     err = NeuronCompilation_setPreference(compilation, mPreference);
     RETURN_FALSE_ON_ERR(err, "NeuronCompilation_setPreference failed");
     err = NeuronCompilation_setPriority(compilation, NEURON_PRIORITY_HIGH);
     RETURN_FALSE_ON_ERR(err, "NeuronCompilation_setPriority failed");
     err = NeuronCompilation_finish(compilation);
-    RETURN_FALSE_ON_ERR(err, "Failed to restore compiled network from extension");
+    RETURN_FALSE_ON_ERR(err,
+                        "Failed to restore compiled network from extension");
     LOG(INFO) << "createNeuron Compiltion Finish finish Successfully";
 
     free(dlaBuffer);
@@ -348,9 +355,11 @@ class NeuronBuilder {
     RETURN_FALSE_ON_ERR(err, "Create Neuron Execution failed");
     mExecution = std::unique_ptr<NeuronExecution, NeuronDeleter>(execution);
     if (mUseThroughputMode) {
-      LOG(INFO) << "createNeuron Execution Set Runner Pool Size: " << mShardsNum;
+      LOG(INFO) << "createNeuron Execution Set Runner Pool Size: "
+                << mShardsNum;
       err = NeuronExecution_setRunnerPoolSize(execution, mShardsNum);
-      RETURN_FALSE_ON_ERR(err, "NeuronExecution_create Set Runner Pool Size FAILED");
+      RETURN_FALSE_ON_ERR(err,
+                          "NeuronExecution_create Set Runner Pool Size FAILED");
 
       LOG(INFO) << "createNeuron Execution Set Job Pool Size: " << mThreadNum;
       err = NeuronExecution_setJobPoolSize(execution, mThreadNum);
@@ -358,7 +367,7 @@ class NeuronBuilder {
     }
     if (mNeuronExecutionFlushValue != 0) {
       err = NeuronExecution_setCacheFlushHint(execution,
-                                               mNeuronExecutionFlushValue);
+                                              mNeuronExecutionFlushValue);
       RETURN_FALSE_ON_ERR(err, "NeuronExecution_setCacheFlushHint Failed");
     }
     LOG(INFO) << "createNeuron End Successfully";
@@ -381,7 +390,8 @@ class NeuronBuilder {
 
   bool createMemory(int type) {
     std::vector<NeuronOperandType> *sourceOperand = &mInputOperand;
-    std::vector<AhwbNeuronMemoryWrapper> *memoryWrappers = &mInputMemoryWrappers;
+    std::vector<AhwbNeuronMemoryWrapper> *memoryWrappers =
+        &mInputMemoryWrappers;
     bool *isSuppress = &mInputSuppress;
     std::vector<uint32_t> *targetSizes = &mInputSizes;
 
@@ -398,16 +408,20 @@ class NeuronBuilder {
         size_t size = 0;
         if (*isSuppress) {
           if (type == TYPE_INPUT) {
-            if (NeuronCompilation_getInputPaddedSize(mCompilation.get(), i, &size) != NEURON_NO_ERROR) {
+            if (NeuronCompilation_getInputPaddedSize(
+                    mCompilation.get(), i, &size) != NEURON_NO_ERROR) {
               LOG(ERROR) << "Neuron Input Operand: " << i << " size failed";
             } else {
-              LOG(INFO) << "Neuron Input Operand: " << i << " PaddedSize: " << size;
+              LOG(INFO) << "Neuron Input Operand: " << i
+                        << " PaddedSize: " << size;
             }
           } else {
-            if (NeuronCompilation_getOutputPaddedSize(mCompilation.get(), i, &size) != NEURON_NO_ERROR) {
+            if (NeuronCompilation_getOutputPaddedSize(
+                    mCompilation.get(), i, &size) != NEURON_NO_ERROR) {
               LOG(ERROR) << "Neuron Output Operand: " << i << " size failed";
             } else {
-              LOG(INFO) << "Neuron Output Operand: " << i << " PaddedSize: " << size;
+              LOG(INFO) << "Neuron Output Operand: " << i
+                        << " PaddedSize: " << size;
             }
           }
         } else {
@@ -418,7 +432,8 @@ class NeuronBuilder {
         targetSizes->push_back(size);  // B x Input[i] == B * W * H * C
         memoryWrappers->emplace_back(size, mAhwbType);
         if (memoryWrappers->back().InitNeuronMemory() != NEURON_NO_ERROR) {
-          LOG(ERROR) << "Init Neuron Memory for " << t << "th execution operand: " << i << " failed";
+          LOG(ERROR) << "Init Neuron Memory for " << t
+                     << "th execution operand: " << i << " failed";
           return false;
         }
       }

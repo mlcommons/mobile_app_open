@@ -571,7 +571,8 @@ typedef enum {
   COMPILATION_TYPE_BATCHED = 2,
   /* One compilation with multi-executions could be created */
   COMPILATION_TYPE_MULTI_EXECUTIONS = 3,
-  /* Batched Execution: Set input/output from memory 1st time and memcpy next time */
+  /* Batched Execution: Set input/output from memory 1st time and memcpy next
+     time */
   COMPILATION_TYPE_EXECUTION_CONTROLLER = 4,
   /* Throughput Execution: Summit inputs and query output in order */
   COMPILATION_TYPE_EXECUTION_THROUGHPUT_MODE = 5,
@@ -1063,7 +1064,8 @@ int NeuronModel_restoreFromCompiledNetworkV2(NeuronModel** model,
  * 2. NeuronCompilation_finish
  * 3. NeuronExecution_create.
  * or
- * 1. NeuronModel_restoreFromCompiledNetworkV2  with COMPILATION_TYPE_EXECUTION_CONTROLLER
+ * 1. NeuronModel_restoreFromCompiledNetworkV2  with
+ * COMPILATION_TYPE_EXECUTION_CONTROLLER
  * 2. NeuronExecution_create.
  *
  * Available since 7.0.1
@@ -1807,10 +1809,13 @@ int NeuronExecution_setRunnerPoolSize(NeuronExecution* execution,
 int NeuronExecution_setBatchDone(NeuronExecution* execution);
 
 // Add Through Executor API calls
-int NeuronExecution_submitInput(NeuronExecution* execution, uint32_t index, const void* buffer, size_t length);
+int NeuronExecution_submitInput(NeuronExecution* execution, uint32_t index,
+                                const void* buffer, size_t length);
 int NeuronExecution_setJobPoolSize(NeuronExecution* execution, uint32_t size);
-int NeuronExecution_queryOutput(NeuronExecution* execution, uint32_t index, void* buffer, size_t length);
-int NeuronExecution_queryOutputPointer(NeuronExecution* execution, uint32_t index, void**ptr);
+int NeuronExecution_queryOutput(NeuronExecution* execution, uint32_t index,
+                                void* buffer, size_t length);
+int NeuronExecution_queryOutputPointer(NeuronExecution* execution,
+                                       uint32_t index, void** ptr);
 int NeuronExecution_flushExecution(NeuronExecution* execution);
 int NeuronExecution_resetParallelResources(NeuronExecution* execution);
 

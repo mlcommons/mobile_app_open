@@ -47,8 +47,6 @@
 #define RESTORE_DLA_EXTENSION_OPERATION_TYPE 0x0000
 #define RESTORE_DLA_EXTENSION_NAME "com.mediatek.compiled_network"
 
-#include "flutter/cpp/c/type.h"
-
 #include <chrono>
 #include <cstdint>
 #include <tuple>
@@ -57,14 +55,15 @@
 #include "APUWareUtilsLib.h"
 #include "NeuronAdapter.h"
 #include "NeuronAdapterShim.h"
+#include "flutter/cpp/c/type.h"
 #include "mobile_back_tflite/cpp/backend_tflite/thread_pool.h"
 
-#define RETURN_FALSE_ON_ERR(ret, msg)               \
-  do {                                              \
-    if ((ret) != NEURON_NO_ERROR) {                 \
+#define RETURN_FALSE_ON_ERR(ret, msg)                \
+  do {                                               \
+    if ((ret) != NEURON_NO_ERROR) {                  \
       LOG(ERROR) << msg << " with error: " << (ret); \
-      return false;                                 \
-    }                                               \
+      return false;                                  \
+    }                                                \
   } while (false)
 
 typedef void *neuron_backend_ptr_t;
@@ -182,14 +181,16 @@ class AhwbNeuronMemoryWrapper {
   explicit AhwbNeuronMemoryWrapper(
       uint32_t byte_size,
       uint64_t ahwb_type = AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN |
-                           AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN) : ahwb_type_(ahwb_type),
-                                                                    size_(byte_size) {}
+                           AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN)
+      : ahwb_type_(ahwb_type), size_(byte_size) {}
   ~AhwbNeuronMemoryWrapper() {
     if (data_) unlockAhwbData();
     if (memory_) NeuronMemory_free(memory_);
     if (abuffer_) AHardwareBuffer_release(abuffer_);
   }
-  AhwbNeuronMemoryWrapper(AhwbNeuronMemoryWrapper &&other) { *this = std::move(other); };
+  AhwbNeuronMemoryWrapper(AhwbNeuronMemoryWrapper &&other) {
+    *this = std::move(other);
+  };
   AhwbNeuronMemoryWrapper &operator=(AhwbNeuronMemoryWrapper &&other) {
     if (this != &other) {
       AhwbNeuronMemoryWrapper::~AhwbNeuronMemoryWrapper();
@@ -280,9 +281,9 @@ class NeuronAllocator {
 };
 
 struct ParallelExecution {
-  ParallelExecution(NeuronExecution* exec):exec(exec){}
-  NeuronExecution* exec;
-  std::unordered_map<int, std::vector<std::future<void*>>> seq_input_futures;
+  ParallelExecution(NeuronExecution *exec) : exec(exec) {}
+  NeuronExecution *exec;
+  std::unordered_map<int, std::vector<std::future<void *>>> seq_input_futures;
 };
 
 struct AdapterBackendData {
