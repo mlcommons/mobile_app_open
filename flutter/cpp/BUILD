@@ -74,6 +74,7 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
+    linkopts = ["-landroid"],
     deps = [
         "//flutter/cpp/c:headers",
         "//flutter/cpp/proto:mlperf_task_cc_proto",

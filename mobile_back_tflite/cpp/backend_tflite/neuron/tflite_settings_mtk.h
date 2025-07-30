@@ -17,7 +17,9 @@ limitations under the License.
 
 #include "mobile_back_tflite/cpp/backend_tflite/neuron/backend_settings/tflite_settings_mtk.pbtxt.h"
 #include "mobile_back_tflite/cpp/backend_tflite/neuron/backend_settings/tflite_settings_mtk_mt6989.pbtxt.h"
+#include "mobile_back_tflite/cpp/backend_tflite/neuron/backend_settings/tflite_settings_mtk_mt6991.pbtxt.h"
 
 const std::string tflite_settings_mtk = tflite_settings_mtk_pbtxt;
 const std::string tflite_settings_mtk_mt6989 = tflite_settings_mtk_mt6989_pbtxt;
+const std::string tflite_settings_mtk_mt6991 = tflite_settings_mtk_mt6991_pbtxt;
 #endif

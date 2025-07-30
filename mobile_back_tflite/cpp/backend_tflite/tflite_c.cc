@@ -100,6 +100,8 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
   *settings = tflite_settings_mtk.c_str();
   if (device == "mt6989") {
     *settings = tflite_settings_mtk_mt6989.c_str();
+  } else if (device == "mt6991") {
+    *settings = tflite_settings_mtk_mt6991.c_str();
   }
   return neuron_tflite_backend(not_allowed_message, device_info);
 #elif __APPLE__

@@ -199,17 +199,19 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
 
 #ifdef MTK_TFLITE_NEURON_BACKEND
   AdapterBackendData *neuronData = new AdapterBackendData();
+  neuronData->real_batch_size = configs->batch_size;
   neuron_backend = neuronData;
 
   backend_data->neuronBackendData = (neuron_backend_ptr_t)neuronData;
   LOG(INFO) << "ML-Perf Model path: " << std::string(model_path);
 
-  if (configs->batch_size <= 1 && need_neuron_backend(model_path)) {
+  if (need_neuron_backend(model_path)) {
     create_neuron_backend(backend_data->neuronBackendData, model_path);
     return backend_data;
   }
 #endif
 
+  // Use Tflite Interpreter backend
   // Load the model.
   backend_data->model = TfLiteModelCreateFromFile(model_path);
   if (!backend_data->model) {
@@ -462,6 +464,12 @@ mlperf_status_t SingleModelPipeline::backend_issue_query(
 // Flush the staged queries immediately.
 mlperf_status_t SingleModelPipeline::backend_flush_queries(
     mlperf_backend_ptr_t backend_ptr) {
+  TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
+#ifdef MTK_TFLITE_NEURON_BACKEND
+  if (!neuron_flush_queries(backend_data->neuronBackendData)) {
+    return MLPERF_FAILURE;
+  }
+#endif
   return MLPERF_SUCCESS;
 }
 
@@ -487,9 +495,10 @@ mlperf_data_t SingleModelPipeline::backend_get_input_type(
   neuron_data_t neuronType;
   if (neuron_get_in_out_datatype(backend_data->neuronBackendData, i,
                                  /* isIn */ true, &neuronType)) {
+    AdapterBackendData *neuron_data = (AdapterBackendData *)backend_data->neuronBackendData;
     mlperf_data_t type;
     type.type = NeuronType2Type(neuronType.type);
-    type.size = neuronType.size;
+    type.size = neuronType.size / neuron_data->real_batch_size;
     return type;
   }
 #endif
@@ -526,7 +535,7 @@ mlperf_status_t SingleModelPipeline::backend_set_input(
 #endif
 
 #ifdef MTK_TFLITE_NEURON_BACKEND
-  if (neuron_set_input(backend_data->neuronBackendData, i, data)) {
+  if (neuron_set_input(backend_data->neuronBackendData, batch_index, i, data)) {
     return MLPERF_SUCCESS;
   }
 #endif
@@ -564,9 +573,10 @@ mlperf_data_t SingleModelPipeline::backend_get_output_type(
   neuron_data_t neuronType;
   if (neuron_get_in_out_datatype(backend_data->neuronBackendData, i,
                                  /* isIn */ false, &neuronType)) {
+    AdapterBackendData *neuron_data = (AdapterBackendData *)backend_data->neuronBackendData;
     mlperf_data_t type;
     type.type = NeuronType2Type(neuronType.type);
-    type.size = neuronType.size;
+    type.size = neuronType.size / neuron_data->real_batch_size;
     return type;
   }
 #endif
@@ -585,7 +595,7 @@ mlperf_status_t SingleModelPipeline::backend_get_output(
     void **data) {
   TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
 #ifdef MTK_TFLITE_NEURON_BACKEND
-  if (neuron_get_output(backend_data->neuronBackendData, i, data)) {
+  if (neuron_get_output(backend_data->neuronBackendData, batch_index, i, data)) {
     return MLPERF_SUCCESS;
   }
 #endif

@@ -563,10 +563,18 @@ typedef enum {
  * Compilation Type.
  */
 typedef enum {
+  /* Normal Compilation */
   COMPILATION_TYPE_NORMAL = 0,
+  /* @deprecate */
   COMPILATION_TYPE_DEBUG_PLUS = 1,
+  /* Batched Execution: Set input/output from memory every time */
   COMPILATION_TYPE_BATCHED = 2,
+  /* One compilation with multi-executions could be created */
   COMPILATION_TYPE_MULTI_EXECUTIONS = 3,
+  /* Batched Execution: Set input/output from memory 1st time and memcpy next time */
+  COMPILATION_TYPE_EXECUTION_CONTROLLER = 4,
+  /* Throughput Execution: Summit inputs and query output in order */
+  COMPILATION_TYPE_EXECUTION_THROUGHPUT_MODE = 5,
 } CompilationType;
 
 /**
@@ -1044,6 +1052,30 @@ int NeuronModel_restoreFromCompiledNetworkV2(NeuronModel** model,
                                              const void* buffer,
                                              const size_t size,
                                              const CompilationType& type);
+
+/**
+ * Notify the execution that all inputs / outputs have been set.
+ * Should be called after NeuronExecution_setInputFromMemory and
+ * NeuronExecution_setOutputFromMemory.
+ *
+ * The execution must created by the following steps:
+ * 1. NeuronCompilation_createV2 with COMPILATION_TYPE_EXECUTION_CONTROLLER
+ * 2. NeuronCompilation_finish
+ * 3. NeuronExecution_create.
+ * or
+ * 1. NeuronModel_restoreFromCompiledNetworkV2  with COMPILATION_TYPE_EXECUTION_CONTROLLER
+ * 2. NeuronExecution_create.
+ *
+ * Available since 7.0.1
+ *
+ * @param execution The NeuronExecution to be utilized.
+ * @param idx The index of runner to set the previous inputs and outputs.
+ *
+ * @return NEURON_NO_ERROR if successful
+ * @return NEURON_BAD_STATE if the compilation is not created via
+ *             COMPILATION_TYPE_EXECUTION_CONTROLLER.
+ */
+int NeuronExecution_setIODone(NeuronExecution* execution, int idx);
 
 /**
  * Create a NeuronCompilation to compile the given model.
@@ -1773,6 +1805,14 @@ int NeuronExecution_setRunnerPoolSize(NeuronExecution* execution,
  * NeuronCompilation_createForBatch.
  */
 int NeuronExecution_setBatchDone(NeuronExecution* execution);
+
+// Add Through Executor API calls
+int NeuronExecution_submitInput(NeuronExecution* execution, uint32_t index, const void* buffer, size_t length);
+int NeuronExecution_setJobPoolSize(NeuronExecution* execution, uint32_t size);
+int NeuronExecution_queryOutput(NeuronExecution* execution, uint32_t index, void* buffer, size_t length);
+int NeuronExecution_queryOutputPointer(NeuronExecution* execution, uint32_t index, void**ptr);
+int NeuronExecution_flushExecution(NeuronExecution* execution);
+int NeuronExecution_resetParallelResources(NeuronExecution* execution);
 
 /**
  * Create a NeuronCompilation which can create executions with shared static
