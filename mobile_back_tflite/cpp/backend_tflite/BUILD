@@ -54,6 +54,7 @@ cc_library(
         "single_model_pipeline.cc",
         "stable_diffusion_invoker.cc",
         "stable_diffusion_pipeline.cc",
+        "llm_pipeline.cc",
         "tflite_c.cc",
     ],
     hdrs = [
@@ -63,6 +64,7 @@ cc_library(
         "single_model_pipeline.h",
         "stable_diffusion_invoker.h",
         "stable_diffusion_pipeline.h",
+        "llm_pipeline.h",
         "tflite_settings_android.h",
         "tflite_settings_apple.h",
         "tflite_settings_windows.h",
@@ -83,11 +85,17 @@ cc_library(
         ":tflite_settings",
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
+        "@com_google_sentencepiece//:sentencepiece_processor",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
         "@org_tensorflow//tensorflow/lite/c:c_api",
+        "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
         "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite:util",
+#        "@org_tensorflow//tensorflow/lite/experimental/genai:genai_ops",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
+            "@org_tensorflow//tensorflow/lite/delegates/xnnpack:xnnpack_delegate",
             "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
         ],
         "@org_tensorflow//tensorflow:ios": [

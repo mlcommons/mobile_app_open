@@ -1,0 +1,37 @@
+import tensorflow as tf
+import pandas as pd
+import argparse
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Convert a CSV of LLM prompts to TFRecord format.")
+    parser.add_argument('--input', type=str, required=True, help="Path to the input CSV file.")
+    parser.add_argument('--output', type=str, required=True, help="Path to the output TFRecord file.")
+    return parser.parse_args()
+
+def map_answer(num):
+    return {1: "A", 2: "B", 3: "C", 4: "D"}.get(num, "X")  # Use 'X' as fallback
+
+def create_example(input_text, answer_letter):
+    return tf.train.Example(features=tf.train.Features(feature={
+        "input": tf.train.Feature(bytes_list=tf.train.BytesList(value=[input_text.encode()])),
+        "answer": tf.train.Feature(bytes_list=tf.train.BytesList(value=[answer_letter.encode()])),
+    }))
+
+def main():
+    args = parse_args()
+    df = pd.read_csv(args.input_csv)
+
+    if "input_formatted" not in df.columns or "answer" not in df.columns:
+        raise ValueError("CSV must contain 'input_formatted' and 'answer' columns.")
+
+    df["answer_letter"] = df["answer"].map(map_answer)
+
+    with tf.io.TFRecordWriter(args.output_tfrecord) as writer:
+        for _, row in df.iterrows():
+            example = create_example(row["input_formatted"], row["answer_letter"])
+            writer.write(example.SerializeToString())
+
+    print(f"TFRecord written to: {args.output_tfrecord}")
+
+if __name__ == "__main__":
+    main()

@@ -26,6 +26,7 @@ limitations under the License.
 #include "flutter/cpp/datasets/coco.h"
 #include "flutter/cpp/datasets/coco_gen.h"
 #include "flutter/cpp/datasets/imagenet.h"
+#include "flutter/cpp/datasets/mmlu_gen.h"
 #include "flutter/cpp/datasets/snu_sr.h"
 #include "flutter/cpp/datasets/squad.h"
 #include "flutter/cpp/mlperf_driver.h"
@@ -67,6 +68,8 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
     return DatasetConfig::SNUSR;
   } else if (absl::EqualsIgnoreCase(name, "COCOGEN")) {
     return DatasetConfig::COCOGEN;
+  } else if (absl::EqualsIgnoreCase(name, "MMLU")) {
+    return DatasetConfig::MMLU;
   } else if (absl::EqualsIgnoreCase(name, "DUMMY")) {
     return DatasetConfig::NONE;
   } else {
@@ -88,6 +91,8 @@ DatasetConfig::DatasetType BenchmarkId2DatasetType(absl::string_view name) {
     return DatasetConfig::SNUSR;
   } else if (absl::StartsWith(name, "stable_diffusion")) {
     return DatasetConfig::COCOGEN;
+  } else if (absl::StartsWith(name, "llm")) {
+    return DatasetConfig::MMLU;
   } else {
     LOG(FATAL) << "Unrecognized benchmark_id: " << name;
     return DatasetConfig::NONE;
@@ -113,7 +118,7 @@ int Main(int argc, char *argv[]) {
           "Benchmark ID. One of image_classification, "
           "image_classification_v2, object_detection, "
           "natural_language_processing, "
-          "image_segmentation_v2, super_resolution, stable_diffusion, "
+          "image_segmentation_v2, super_resolution, stable_diffusion, LLM, "
           "image_classification_offline, image_classification_offline_v2",
           Flag::kPositional)};
   Flags::Parse(&argc, const_cast<const char **>(argv), flag_list);
@@ -384,6 +389,24 @@ int Main(int argc, char *argv[]) {
           backend) {
         dataset.reset(new CocoGen(backend.get(), input_tfrecord,
                                   input_clip_model, output_dir));
+      }
+      // Adds to flag_list for showing help.
+      flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                       dataset_flags.end());
+    } break;
+    case DatasetConfig::MMLU: {
+      LOG(INFO) << "TinyMMLU dataset for LLM benchmark";
+      std::string input_tfrecord, input_clip_model = "";
+      std::vector<Flag> dataset_flags{
+          Flag::CreateFlag(
+              "input_tfrecord", &input_tfrecord,
+              "Path to the tfrecord file containing inputs for the model.",
+              Flag::kRequired),
+      };
+
+      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+          backend) {
+        dataset.reset(new MmluGen(backend.get(), input_tfrecord));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),

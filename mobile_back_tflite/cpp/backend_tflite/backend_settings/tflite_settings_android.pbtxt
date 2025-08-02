@@ -257,3 +257,26 @@ benchmark_setting {
     value: "timestep_embeddings_data.bin.ts"
   }
 }
+
+benchmark_setting {
+  benchmark_id: "llm"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://thee.dev/mlc/model.tflite" #Placeholder
+      model_checksum: "04f62ae20a0f1c68c138f30d88411be0"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "sentencepiece_processor_path"
+    value: "llama.model.sp"
+  }
+}

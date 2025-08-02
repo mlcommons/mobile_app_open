@@ -13,7 +13,7 @@ diff --git a/tensorflow/lite/tools/evaluation/stages/BUILD b/tensorflow/lite/too
 index 9f649588145..e81b284709c 100644
 --- a/tensorflow/lite/tools/evaluation/stages/BUILD
 +++ b/tensorflow/lite/tools/evaluation/stages/BUILD
-@@ -53,9 +53,11 @@ cc_library(
+@@ -57,9 +57,11 @@ cc_library(
      ] + select({
          "//tensorflow:android": [
              "//tensorflow/core:portable_jpeg_internal",
@@ -29,14 +29,11 @@ diff --git a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.c
 index a1418c3bcb6..a9750141b3d 100644
 --- a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
 +++ b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
-@@ -29,6 +29,7 @@ limitations under the License.
+@@ -29,3 +29,4 @@ limitations under the License.
  #include "absl/strings/ascii.h"
- #include "tensorflow/core/lib/jpeg/jpeg_handle.h"
+ #include "jpeglib.h"  // from @libjpeg_turbo
  #include "tensorflow/core/lib/jpeg/jpeg_mem.h"
 +#include "tensorflow/core/lib/png/png_io.h"
- #include "tensorflow/core/platform/logging.h"
- #include "tensorflow/lite/kernels/internal/reference/reference_ops.h"
- #include "tensorflow/lite/kernels/internal/types.h"
 @@ -107,6 +108,29 @@ inline void LoadImageJpeg(std::string* filename, ImageData* image_data) {
    image_data->data.reset(float_image);
  }
