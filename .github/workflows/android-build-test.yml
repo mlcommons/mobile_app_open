@@ -46,7 +46,7 @@ jobs:
 
   build-android-apk:
     needs: build-android-image
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04-4core
     container:
       image: ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
     timeout-minutes: 120
