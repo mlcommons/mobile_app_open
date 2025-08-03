@@ -5,13 +5,14 @@ import 'package:mlperfbench/app_constants.dart';
 class AppColors {
   AppColors._();
 
-  static const _blue1 = Color(0XFF2C92CB);
-  static const _blue2 = Color(0XFF2980B7);
-  static const _blue3 = Color(0XFF166299);
-  static const _blue4 = Color(0XFF135384);
-  static const _blue5 = Color(0xFF0B3A61);
-  static const _green = Color(0xFF41C555);
-  static const _brown = Colors.brown;
+  static const _blue1  = Color(0XFF2C92CB);
+  static const _blue2  = Color(0XFF2980B7);
+  static const _blue3  = Color(0XFF166299);
+  static const _blue4  = Color(0XFF135384);
+  static const _blue5  = Color(0xFF0B3A61);
+  static const _green  = Color(0xFF41C555);
+  static const _yellow = Color(0xFFFFD000);
+  static const _brown  = Colors.brown;
 
   static const lightText = Colors.white;
   static const darkText = Colors.black;
@@ -36,6 +37,7 @@ class AppColors {
   static const infoSectionBackground = _blue5;
   static const progressCircle = _blue4;
   static const goCircle = _green;
+  static const warningIcon = _yellow;
 }
 
 class AppGradients {
