@@ -17,7 +17,8 @@ class ResourcesScreen extends StatefulWidget {
   final bool autoStart;
   final Benchmark? singleBenchmarkDownload;
 
-  const ResourcesScreen({this.autoStart = false, this.singleBenchmarkDownload, super.key});
+  const ResourcesScreen(
+      {this.autoStart = false, this.singleBenchmarkDownload, super.key});
 
   @override
   State<ResourcesScreen> createState() => _ResourcesScreen();
@@ -37,7 +38,9 @@ class _ResourcesScreen extends State<ResourcesScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await state.loadResources(
           downloadMissing: true,
-          benchmarks: widget.singleBenchmarkDownload != null ? [widget.singleBenchmarkDownload!] : state.activeBenchmarks,
+          benchmarks: widget.singleBenchmarkDownload != null
+              ? [widget.singleBenchmarkDownload!]
+              : state.activeBenchmarks,
         );
         if (state.error != null) {
           if (!mounted) return;

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
-import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
@@ -9,11 +8,11 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/auto_size_text.dart';
+import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/nil.dart';
 
 class BenchmarkConfigSection extends StatelessWidget {
-
   const BenchmarkConfigSection({super.key});
 
   @override
@@ -25,12 +24,15 @@ class BenchmarkConfigSection extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 20),
       children: <Widget>[
-    for (var benchmark in state.allBenchmarks) ...[
-      _listTile(benchmark, state, l10n),
-      if (benchmark != state.allBenchmarks.last) const Divider(height: 1,)
-    ],
-    const SizedBox(height: 24)
+        for (var benchmark in state.allBenchmarks) ...[
+          _listTile(benchmark, state, l10n),
+          if (benchmark != state.allBenchmarks.last)
+            const Divider(
+              height: 1,
+            )
         ],
+        const SizedBox(height: 24)
+      ],
     );
   }
 
@@ -43,10 +45,11 @@ class BenchmarkConfigSection extends StatelessWidget {
         builder: (context, snapshot) {
           return InkWell(
             onTap: () {
-          state.benchmarkSetActive(benchmark, !benchmark.isActive);
-                  },
+              state.benchmarkSetActive(benchmark, !benchmark.isActive);
+            },
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 20, left: 16, right: 8, top: 12),
+              padding: const EdgeInsets.only(
+                  bottom: 20, left: 16, right: 8, top: 12),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.max,
@@ -60,17 +63,15 @@ class BenchmarkConfigSection extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                            padding: const EdgeInsets.all(0.0),
-                            elevation: 3,
-                            shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
-                ),
+                        padding: const EdgeInsets.all(0.0),
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(WidgetSizes.borderRadius),
+                        ),
                       ),
                       child: SizedBox(
-                    width: 32,
-                    height: 32,
-                    child: benchmark.info.icon
-                    ),
+                          width: 32, height: 32, child: benchmark.info.icon),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -84,7 +85,12 @@ class BenchmarkConfigSection extends StatelessWidget {
                         Row(
                           children: [
                             _backendDescription(benchmark, context),
-                            const SizedBox(height: 18, child: VerticalDivider(color: Colors.black,),),
+                            const SizedBox(
+                              height: 18,
+                              child: VerticalDivider(
+                                color: Colors.black,
+                              ),
+                            ),
                             _delegateChoice(benchmark, context, state),
                           ],
                         ),
@@ -100,15 +106,24 @@ class BenchmarkConfigSection extends StatelessWidget {
         });
   }
 
-  Widget _downloadStatus(AppLocalizations l10n, Benchmark benchmark, bool status, BuildContext context) {
+  Widget _downloadStatus(AppLocalizations l10n, Benchmark benchmark,
+      bool status, BuildContext context) {
     if (!benchmark.isActive || status) return const SizedBox();
-    return InkWell(onTap:() async {await showResourceMissingDialog(context, [], benchmark: benchmark);}, child: const Icon(Icons.downloading_rounded, size: 28, color: AppColors.warningIcon));
+    return InkWell(
+        onTap: () async {
+          await showResourceMissingDialog(context, [], benchmark: benchmark);
+        },
+        child: const Icon(Icons.downloading_rounded,
+            size: 28, color: AppColors.warningIcon));
   }
 
   Widget _name(Benchmark benchmark, BuildContext context) {
     return Text(
       benchmark.info.taskName,
-      style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
+      style: Theme.of(context)
+          .textTheme
+          .titleMedium!
+          .copyWith(fontWeight: FontWeight.bold),
     );
   }
 
@@ -135,7 +150,8 @@ class BenchmarkConfigSection extends StatelessWidget {
     final info = benchmark.info.getLocalizedInfo(l10n);
 
     const double sidePadding = 18.0;
-    const double headHeight = 48.0 + (18.0 * 2); // 48pt original height + vertical padding of 18pt in each direction
+    // 48pt original height + vertical padding of 18pt in each direction
+    const double headHeight = 48.0 + (18.0 * 2);
     const double footHeight = 36.0;
 
     showModalBottomSheet(
