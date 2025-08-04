@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 
 #if defined(MTK_TFLITE_NEURON_BACKEND) && defined(__ANDROID__)
 #include <dlfcn.h>
@@ -25,16 +26,9 @@ limitations under the License.
 
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/utils.h"
-#include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/c/common.h"
 #if __ANDROID__
 #include <sys/system_properties.h>
-
-#if MTK_TFLITE_NEURON_BACKEND
-#include "neuron/neuron_backend.h"
-#include "neuron/neuron_builder.h"
-#include "neuron/neuron_delegate.h"
-#endif
 
 #include "tensorflow/lite/delegates/gpu/delegate.h"
 #include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
@@ -46,19 +40,6 @@ extern "C" {
 #endif  // __cplusplus
 
 static bool backendExists = false;
-
-#if __ANDROID__
-bool is_emulator() {
-  char ro_build_characteristics[PROP_VALUE_MAX + 1];
-  if (__system_property_get("ro.build.characteristics",
-                            ro_build_characteristics)) {
-    char *ptr;
-    ptr = strstr(ro_build_characteristics, "emulator");
-    if (ptr) return true;
-  }
-  return false;
-}
-#endif
 
 // Destroy the backend pointer and its data.
 void LLMPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
@@ -262,23 +243,20 @@ void LLMPipeline::backend_release_buffer(void *p) {
 }
 
 TfLiteInterpreter *LLMPipeline::BuildInterpreter(TfLiteModel *model, int num_threads) {
-  tflite::ops::builtin::BuiltinOpResolver resolver;
+  TfLiteInterpreterOptions* options = TfLiteInterpreterOptionsCreate();
+  TfLiteInterpreterOptionsSetNumThreads(options, num_threads);
   // NOTE: We need to manually register optimized OPs for KV-cache and
   // Scaled Dot Product Attention (SDPA).
-  tflite::ops::custom::GenAIOpsRegisterer(&resolver);
-  tflite::InterpreterBuilder builder(*model, resolver);
-  //TODO
-  MINIMAL_CHECK(builder.SetNumThreads(num_threads) == kTfLiteOk);
-  TfLiteInterpreter *interpreter;
-  builder(&interpreter);
-  //TODO
-  MINIMAL_CHECK(interpreter != nullptr);
+  TfLiteInterpreterOptionsAddCustomOp(options, "GEN_AI_GENERATE", GetGenAIGenerateOp(), 1, 1);
+  TfLiteInterpreter* interpreter = TfLiteInterpreterCreate(model, options);
+
+  MINIMAL_CHECK_PTR(interpreter != nullptr);
 
   return interpreter;
 }
 
 kv_cache_t LLMPipeline::BuildKVCache(TfLiteInterpreter *interpreter) {
-  TfLiteSignatureRunner *runner = interpreter->GetSignatureRunner("decode");
+  TfLiteSignatureRunner *runner = TfLiteInterpreterGetSignatureRunner(interpreter, "decode");
   // TODO
   if (runner == nullptr) {
     return {};
@@ -306,7 +284,7 @@ kv_cache_t LLMPipeline::BuildKVCache(TfLiteInterpreter *interpreter) {
   return kv_cache;
 }
 
-void LLMPipeline::PrepareRunner(tflite::SignatureRunner* runner, kv_cache_t& kv_cache) {
+void LLMPipeline::PrepareRunner(TfLiteSignatureRunner* runner, kv_cache_t& kv_cache) {
   for (auto& [name, cache] : kv_cache) {
     TfLiteCustomAllocation allocation = {
                                          .data = static_cast<void*>(cache.data()),
@@ -314,13 +292,10 @@ void LLMPipeline::PrepareRunner(tflite::SignatureRunner* runner, kv_cache_t& kv_
     // Both input and output tensors are set to the same buffer. Not all
     // delegates support this in-place update. For those cases, we need to do
     // a ping-pong buffer and update the pointers between inference calls.
-    //TODO
-    MINIMAL_CHECK(runner->SetCustomAllocationForInputTensor(name.c_str(), allocation) == kTfLiteOk);
-    //TODO
-    MINIMAL_CHECK(runner->SetCustomAllocationForOutputTensor(name.c_str(), allocation) == kTfLiteOk);
+    MINIMAL_CHECK_VOID(TfLiteSignatureRunnerSetInputCustomAllocation(runner, name.c_str(), &allocation));
+    MINIMAL_CHECK_VOID(TfLiteSignatureRunnerSetInputCustomAllocation(runner, name.c_str(), &allocation));
   }
-  //TODO
-  MINIMAL_CHECK(runner->AllocateTensors() == kTfLiteOk);
+  MINIMAL_CHECK_VOID(TfLiteSignatureRunnerAllocateTensors(runner));
 }
 
 TfLiteSignatureRunner *LLMPipeline::GetPrefillRunner(TfLiteInterpreter* interpreter, std::size_t num_input_tokens, kv_cache_t& kv_cache) {
@@ -335,20 +310,20 @@ TfLiteSignatureRunner *LLMPipeline::GetPrefillRunner(TfLiteInterpreter* interpre
     // The expected shape for input position is [Seq].
     size_t seq_size = input_pos->dims->data[0];
     if (num_input_tokens <= seq_size && seq_size - num_input_tokens < delta) {
-      runner = TfLiteInterpreterGetSignatureRunner(interpreter, key->c_str());
+      runner = TfLiteInterpreterGetSignatureRunner(interpreter, key.c_str());
       //best_seq_size = seq_size;
       delta = seq_size - num_input_tokens;
     }
   }
-  MINIMAL_CHECK(runner != nullptr);
-  PrepareRunner(runner->impl, kv_cache);
+  MINIMAL_CHECK_PTR(runner != nullptr);
+  PrepareRunner(runner, kv_cache);
   return runner;
 }
 
 TfLiteSignatureRunner *LLMPipeline::GetDecodeRunner(TfLiteInterpreter* interpreter, kv_cache_t& kv_cache) {
   TfLiteSignatureRunner* runner = TfLiteInterpreterGetSignatureRunner(interpreter, "decode");
-  MINIMAL_CHECK(runner != nullptr);
-  PrepareRunner(runner->impl, kv_cache);
+  MINIMAL_CHECK_PTR(runner != nullptr);
+  PrepareRunner(runner, kv_cache);
   return runner;
 }
 
@@ -357,7 +332,7 @@ sentencepiece::SentencePieceProcessor *LLMPipeline::LoadSentencePieceProcessor(s
   std::string serialized_proto = std::string(
       std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
   auto processor = new sentencepiece::SentencePieceProcessor();
-  MINIMAL_CHECK(processor->LoadFromSerializedProto(serialized_proto).ok());
+  MINIMAL_CHECK_PTR(processor->LoadFromSerializedProto(serialized_proto).ok());
   return processor;
 }
 
@@ -373,6 +348,43 @@ int LLMPipeline::GreedySampler(const TfLiteTensor* logits) {
     }
   }
   return max_index;
+}
+
+TfLiteRegistration* LLMPipeline::GetGenAIGenerateOp() {
+  static tflite::MutableOpResolver resolver;
+
+  tflite::ops::custom::GenAIOpsRegisterer(&resolver);
+
+  const TfLiteRegistration* reg = resolver.FindOp("GEN_AI_GENERATE", /*version=*/1);
+
+  if (!reg) {
+    LOG(ERROR) << "Could not find GEN_AI_GENERATE op." << std::endl;
+    return nullptr;
+  }
+
+  static TfLiteRegistration reg_copy = *reg;
+  return &reg_copy;
+}
+
+bool LLMPipeline::TfLiteSignatureRunnerSetInputCustomAllocation(TfLiteSignatureRunner* runner, const char* input_name, const TfLiteCustomAllocation* allocation) {
+  if (!runner || !input_name || !allocation) return false;
+  auto* cpp_runner = reinterpret_cast<tflite::SignatureRunner*>(runner);
+  return cpp_runner
+             ->SetCustomAllocationForInputTensor(input_name, *allocation) ==
+         kTfLiteOk;
+}
+
+bool LLMPipeline::TfLiteSignatureRunnerSetOutputCustomAllocation(TfLiteSignatureRunner* runner, const char* output_name, const TfLiteCustomAllocation* allocation) {
+  if (!runner || !output_name || !allocation) return false;
+  auto* cpp_runner = reinterpret_cast<tflite::SignatureRunner*>(runner);
+  return cpp_runner
+             ->SetCustomAllocationForOutputTensor(output_name, *allocation) ==
+         kTfLiteOk;
+}
+
+bool LLMPipeline::TfLiteSignatureRunnerAllocateTensors(TfLiteSignatureRunner* runner) {
+  if (!runner) return false;
+  return reinterpret_cast<tflite::SignatureRunner*>(runner)->AllocateTensors() == kTfLiteOk;
 }
 
 #ifdef __cplusplus

@@ -37,6 +37,16 @@ if (!(x)) {                                                                  \
       LOG(ERROR) << "Error at " << __FILE__ << ":" << __LINE__ << std::endl; \
       return MLPERF_FAILURE;                                                 \
 }
+#define MINIMAL_CHECK_PTR(x)                                                     \
+if (!(x)) {                                                                  \
+      LOG(ERROR) << "Error at " << __FILE__ << ":" << __LINE__ << std::endl; \
+      return nullptr;                                                 \
+}
+#define MINIMAL_CHECK_VOID(x)                                                     \
+if (!(x)) {                                                                  \
+      LOG(ERROR) << "Error at " << __FILE__ << ":" << __LINE__ << std::endl; \
+      return;                                                 \
+}
 
 // TF Lite requires all buffers (including external buffers used for KV cache
 // here) be `tflite::kDefaultTensorAlignment` aligned. To ensure that, we use
@@ -149,11 +159,16 @@ class LLMPipeline : public Pipeline {
  private:
   TfLiteInterpreter *BuildInterpreter(TfLiteModel *model, int num_threads);
   kv_cache_t BuildKVCache(TfLiteInterpreter *interpreter);
-  void PrepareRunner(tflite::SignatureRunner *runner, kv_cache_t &kv_cache);
+  void PrepareRunner(TfLiteSignatureRunner *runner, kv_cache_t &kv_cache);
   TfLiteSignatureRunner *GetPrefillRunner(TfLiteInterpreter *interpreter, std::size_t num_input_tokens, kv_cache_t &kv_cache);
   TfLiteSignatureRunner *GetDecodeRunner(TfLiteInterpreter *interpreter, kv_cache_t &kv_cache);
   sentencepiece::SentencePieceProcessor *LoadSentencePieceProcessor(std::string path);
   int GreedySampler(const TfLiteTensor *logits);
+  TfLiteRegistration* GetGenAIGenerateOp();
+  bool TfLiteSignatureRunnerSetInputCustomAllocation(struct TfLiteSignatureRunner* runner, const char* input_name, const struct TfLiteCustomAllocation* allocation);
+  bool TfLiteSignatureRunnerSetOutputCustomAllocation(struct TfLiteSignatureRunner* runner, const char* output_name, const struct TfLiteCustomAllocation* allocation);
+  bool TfLiteSignatureRunnerAllocateTensors(TfLiteSignatureRunner* runner);
+
 };
 
 #endif  // TFLITE_SINGLE_MODEL_PIPELINE_H_

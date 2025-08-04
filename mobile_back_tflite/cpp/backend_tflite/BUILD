@@ -92,7 +92,8 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite:util",
-#        "@org_tensorflow//tensorflow/lite/experimental/genai:genai_ops",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/experimental/genai:genai_ops",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/lite/delegates/xnnpack:xnnpack_delegate",
