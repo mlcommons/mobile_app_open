@@ -206,6 +206,19 @@ class ResourceManager {
     return result;
   }
 
+  // Similar to [validateResourcesExist], but returns one result for all resources provided
+  Future<bool> validateAllResourcesExist(List<Resource> resources) async {
+    for (Resource r in resources) {
+      final resolvedPath = get(r.path);
+      if (resolvedPath.isEmpty ||
+          (!await File(resolvedPath).exists() &&
+              !await Directory(resolvedPath).exists())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   Future<List<Resource>> validateResourcesChecksum(
       List<Resource> resources) async {
     final checksumFailedResources = <Resource>[];
