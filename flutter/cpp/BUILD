@@ -74,7 +74,12 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
-    linkopts = ["-landroid"],
+    linkopts = select({
+        "@org_tensorflow//tensorflow:android": [
+            "-landroid",
+        ],
+        "//conditions:default": [],
+    }),
     deps = [
         "//flutter/cpp/c:headers",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
