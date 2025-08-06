@@ -56,6 +56,15 @@
 #include "NeuronAdapter.h"
 #include "NeuronAdapterShim.h"
 #include "flutter/cpp/c/type.h"
+#include "mobile_back_tflite/cpp/backend_tflite/thread_pool.h"
+
+#define RETURN_FALSE_ON_ERR(ret, msg)                \
+  do {                                               \
+    if ((ret) != NEURON_NO_ERROR) {                  \
+      LOG(ERROR) << msg << " with error: " << (ret); \
+      return false;                                  \
+    }                                                \
+  } while (false)
 
 typedef void *neuron_backend_ptr_t;
 
@@ -167,6 +176,56 @@ class Allocator {
   size_t mBatchSize = 0;
 };
 
+class AhwbNeuronMemoryWrapper {
+ public:
+  explicit AhwbNeuronMemoryWrapper(
+      uint32_t byte_size,
+      uint64_t ahwb_type = AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN |
+                           AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN)
+      : ahwb_type_(ahwb_type), size_(byte_size) {}
+  ~AhwbNeuronMemoryWrapper() {
+    if (data_) unlockAhwbData();
+    if (memory_) NeuronMemory_free(memory_);
+    if (abuffer_) AHardwareBuffer_release(abuffer_);
+  }
+  AhwbNeuronMemoryWrapper(AhwbNeuronMemoryWrapper &&other) {
+    *this = std::move(other);
+  };
+  AhwbNeuronMemoryWrapper &operator=(AhwbNeuronMemoryWrapper &&other) {
+    if (this != &other) {
+      AhwbNeuronMemoryWrapper::~AhwbNeuronMemoryWrapper();
+      this->data_ = other.data_;
+      this->ahwb_type_ = other.ahwb_type_;
+      this->abuffer_ = other.abuffer_;
+      this->size_ = other.size_;
+      this->memory_ = other.memory_;
+      other.data_ = nullptr;
+      other.abuffer_ = nullptr;
+      other.memory_ = nullptr;
+      other.size_ = 0;
+    }
+    return *this;
+  }
+
+  NeuronMemory *memory() { return memory_; }
+  uint32_t size() { return size_; }
+  void *data();
+  bool Available() { return memory_ != nullptr; }
+  int32_t InitNeuronMemory();
+  int32_t lockAhwbData(void **data_ptr);
+  int32_t unlockAhwbData();
+
+ private:
+  uint64_t ahwb_type_ = 0;
+  void *data_ = 0;
+  AHardwareBuffer *abuffer_ = nullptr;
+  NeuronMemory *memory_ = nullptr;
+  uint32_t size_ = 0;
+
+  AhwbNeuronMemoryWrapper &operator=(const AhwbNeuronMemoryWrapper &) = delete;
+  AhwbNeuronMemoryWrapper(const AhwbNeuronMemoryWrapper &) = delete;
+};
+
 class NeuronAllocator {
  public:
   NeuronAllocator() { LOG(INFO) << "Neuron Allocator created"; }
@@ -221,33 +280,41 @@ class NeuronAllocator {
   int mSizeHint = 0;
 };
 
+struct ParallelExecution {
+  ParallelExecution(NeuronExecution *exec) : exec(exec) {}
+  NeuronExecution *exec;
+  std::unordered_map<int, std::vector<std::future<void *>>> seq_input_futures;
+};
+
 struct AdapterBackendData {
   const char *name = "Adapter";
   const char *vendor = "Mediatek";
   NeuronModel *model{nullptr};
   NeuronCompilation *compilation{nullptr};
   NeuronExecution *execution{nullptr};
-  std::vector<NeuronMemory *> iMemorys{};
-  std::vector<NeuronMemory *> oMemorys{};
-  std::vector<AHardwareBuffer *> inputAhwbs{};
-  std::vector<AHardwareBuffer *> outputAhwbs{};
-  std::vector<void *> inputBuffers{};
-  std::vector<void *> outputBuffers{};
+  std::vector<AhwbNeuronMemoryWrapper> inputMemoryWrappers;
+  std::vector<AhwbNeuronMemoryWrapper> outputMemoryWrappers;
   std::vector<neuron_data_t> inputTypes{};
   std::vector<neuron_data_t> outputTypes{};
   std::vector<uint32_t> inputSizes{};
   std::vector<uint32_t> outputSizes{};
   int32_t input_nums = 0;
   int32_t output_nums = 0;
+  int32_t shards_num = 1;
+  uint32_t real_batch_size = 1;
   bool useNeuronBackend = false;
   bool useSuppress = false;
+  bool use_throughput_mode = false;
   mtk::performance::PerformanceLocker locker;
   //--------------Allocator----------------
   NeuronAllocator neuronAllocator;
   bool hasPreset = false;
   //---------------------------------------
   std::function<void(AdapterBackendData *, int, void *)> paddingFunc = nullptr;
-  //---------------------------------------
+  //-------Input data thread pool----------
+  int thread_pool_size = 4;
+  //------------- Preference ------------------
+  NeuronAdapterPreferenceCode preference = NEURON_PREFER_TURBO_BOOST;
 };
 
 bool need_neuron_backend(const char *model_path);
@@ -263,10 +330,13 @@ bool neuron_get_in_out_count(neuron_backend_ptr_t backend_ptr, bool isIn,
 bool neuron_get_in_out_datatype(neuron_backend_ptr_t backend_ptr, int32_t i,
                                 bool isIn, neuron_data_t *type);
 
-bool neuron_set_input(neuron_backend_ptr_t backend_ptr, int32_t i, void *data);
+bool neuron_set_input(neuron_backend_ptr_t backend_ptr, int batch_index,
+                      int32_t i, void *data);
 
-bool neuron_get_output(neuron_backend_ptr_t backend_ptr, int32_t i,
-                       void **data);
+bool neuron_get_output(neuron_backend_ptr_t backend_ptr, int batch_index,
+                       int32_t i, void **data);
+
+bool neuron_flush_queries(neuron_backend_ptr_t backend_ptr);
 
 bool neuron_issue_query(neuron_backend_ptr_t backend_ptr);
 
