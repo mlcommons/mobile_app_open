@@ -39,6 +39,9 @@
     <!-- Mediatek -->
     <uses-native-library android:name="libapuwareutils_v2.mtk.so"
                          android:required="false"/>
+    <!-- Mediatek -->
+    <uses-native-library android:name="libapuwareapusys_v2.mtk.so"
+                         android:required="false"/>
 
     <activity android:name=".MainActivity"
               android:exported="true"
