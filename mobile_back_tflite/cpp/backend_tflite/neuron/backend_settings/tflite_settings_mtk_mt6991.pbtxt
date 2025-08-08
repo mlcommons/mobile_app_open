@@ -18,7 +18,7 @@ benchmark_setting {
     accelerator_name: "neuron-mdla"
     accelerator_desc: "MediaTek NN accelerator via the Neuron SDK"
     model_file: {
-      model_path: "local:///dla/mt6991/MobileNetV4-Conv-Large-int8-ptq.dla"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/mediatek/mt6991/MobileNetV4-Conv-Large-int8-ptq.dla"
       model_checksum: "c6d509a6dabd95d98a31fa90c203f3b2"
     }
   }
@@ -51,7 +51,7 @@ benchmark_setting {
     accelerator_name: "neuron-mdla"
     accelerator_desc: "MediaTek NN accelerator via the Neuron SDK"
     model_file: {
-      model_path: "local:///dla/mt6991/MobileNetV4-Conv-Large-int8-ptq_offline.dla"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/mediatek/mt6991/MobileNetV4-Conv-Large-int8-ptq_offline.dla"
       model_checksum: "b56019ffdb0c1bb36b85e6545634d564"
     }
     custom_setting: {
@@ -97,7 +97,7 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "MediaTek NN accelerator via the Neuron SDK"
     model_file: {
-      model_path: "local:///dla/mt6991/mobiledet_qat.dla"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/mediatek/mt6991/mobiledet_qat.dla"
       model_checksum: "b24ac5c09aad44c3d806d9f1ef2e5a8b"
     }
   }
@@ -131,7 +131,7 @@ benchmark_setting {
     accelerator_name: "neuron-no-ahwb"
     accelerator_desc: "MediaTek NN accelerator + VPU via the Neuron SDK"
     model_file: {
-      model_path: "local:///dla/mt6991/mobilebert_int8_384_nnapi.dla"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/mediatek/mt6991/mobilebert_int8_384_nnapi.dla"
       model_checksum: "efe4b9dafc5006c135c39a61838e4203"
     }
     batch_size: 1
@@ -165,7 +165,7 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "local:///dla/mt6991/mobile_segmenter_r4_quant_argmax_uint8.dla"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/mediatek/mt6991/mobile_segmenter_r4_quant_argmax_uint8.dla"
       model_checksum: "bf31702b4738087f4fbdc3400775af74"
     }
   }
@@ -198,7 +198,7 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "MediaTek NN accelerator via the Neuron SDK"
     model_file: {
-      model_path: "local:///dla/mt6991/edsr_f32b5_full_qint8.dla"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/mediatek/mt6991/edsr_f32b5_full_qint8.dla"
       model_checksum: "03d80ef004a208a1a505f18e8550feeb"
     }
   }

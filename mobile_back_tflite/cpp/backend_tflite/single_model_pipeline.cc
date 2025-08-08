@@ -207,6 +207,8 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
 
   if (need_neuron_backend(model_path)) {
     create_neuron_backend(backend_data->neuronBackendData, model_path);
+    if (strstr(configs->accelerator, "neuron") != NULL)
+      backend_data->accelerator = "NPU";
     return backend_data;
   }
 #endif
