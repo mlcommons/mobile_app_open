@@ -39,8 +39,11 @@
 
 #include <dlfcn.h>
 
+#include <string>
+
 #include "NeuronAdapter.h"
 #include "tensorflow/core/platform/logging.h"
+std::string GetPlatformName();
 
 #define LOAD_ADAPTER_FUNCTION(name) \
   static name##_fn fn = reinterpret_cast<name##_fn>(loadAdapterFunction(#name));
@@ -77,7 +80,12 @@ inline void* loadAdapterLibrary(const char* name) {
 
 inline void* getAdapterLibraryHandle() {
   if (sHandle == nullptr) {
-    sHandle = loadAdapterLibrary("libneuronusdk_adapter.mtk.so");
+    const std::string device = GetPlatformName();
+    if (device == "mt6989") {
+      sHandle = loadAdapterLibrary("libneuronusdk_adapter.mtk.mt6989.so");
+    } else if (device == "mt6991") {
+      sHandle = loadAdapterLibrary("libneuronusdk_adapter.mtk.mt6991.so");
+    }
   }
   if (sHandle == nullptr) {
     sHandle = loadAdapterLibrary("libneuron_adapter_mgvi.so");

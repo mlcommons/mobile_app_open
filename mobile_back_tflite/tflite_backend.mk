@@ -30,9 +30,26 @@ endif
 
 ifeq (${WITH_MEDIATEK},1)
   $(info WITH_MEDIATEK=1)
+
+  UU_FILES := $(wildcard mobile_back_tflite/cpp/backend_tflite/neuron/libs/*/*.uu)
+  SO_FILES := $(UU_FILES:.uu=)
+
+  decode_so: $(SO_FILES)
+
+  %: %.uu
+	cd $(dir $<) && uudecode $(notdir $<)
+
+  all: decode_so
+
   backend_mediatek_android_files= \
-    ${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/neuron/libtfliteneuronbackend.so \
-    bazel-bin/external/neuron_delegate/neuron/java/libtensorflowlite_neuron_jni.so
+  ${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/neuron/libtfliteneuronbackend.so \
+  bazel-bin/external/neuron_delegate/neuron/java/libtensorflowlite_neuron_jni.so \
+  mobile_back_tflite/cpp/backend_tflite/neuron/libs/mt6989/libneuronusdk_adapter.mtk.mt6989.so \
+  mobile_back_tflite/cpp/backend_tflite/neuron/libs/mt6991/libneuronusdk_adapter.mtk.mt6991.so
   backend_mediatek_android_target=//mobile_back_tflite/cpp/backend_tflite/neuron:libtfliteneuronbackend.so
   backend_mediatek_filename=libtfliteneuronbackend
+
+  # variables needed to run make target flutter/android/libs/checksum
+  backend_mediatek_lib_root=mobile_back_tflite/cpp/backend_tflite/neuron/libs
+  backend_mediatek_checksum_file=${backend_mediatek_lib_root}/checksums.txt
 endif
