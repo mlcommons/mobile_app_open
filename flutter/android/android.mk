@@ -40,6 +40,12 @@ ifeq (${WITH_STABLEDIFFUSION},1)
 		-f ${backend_qti_checksum_file}
 endif
 endif
+ifeq (${WITH_MEDIATEK},1)
+	@echo "Validate checksum of Mediatek lib files"
+	flutter/tool/validate-checksum.sh \
+		-d ${backend_mediatek_lib_root} \
+		-f ${backend_mediatek_checksum_file}
+endif
 
 .PHONY: flutter/android/libs/deps
 flutter/android/libs/deps:

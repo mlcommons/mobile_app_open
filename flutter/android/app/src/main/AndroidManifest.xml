@@ -42,6 +42,12 @@
     <!-- Mediatek -->
     <uses-native-library android:name="libapuwareapusys_v2.mtk.so"
                          android:required="false"/>
+    <!-- Mediatek -->
+    <uses-native-library android:name="libmvpu_engine_25_pub.mtk.so"
+                         android:required="false"/>
+    <!-- Mediatek -->
+    <uses-native-library android:name="libmvpu_pattern_25_pub.mtk.so"
+                         android:required="false"/>
 
     <activity android:name=".MainActivity"
               android:exported="true"
