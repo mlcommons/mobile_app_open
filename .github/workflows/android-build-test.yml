@@ -41,8 +41,13 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # Prefer cross-branch reusable cache. Use both GHA and GHCR cache.
+          cache-from: |
+            type=gha,scope=android-image
+            type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache
+          cache-to: |
+            type=gha,scope=android-image,mode=max
+            type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache,mode=max
 
   build-android-apk:
     needs: build-android-image
