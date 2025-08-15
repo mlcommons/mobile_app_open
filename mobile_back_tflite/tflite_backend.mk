@@ -31,13 +31,13 @@ endif
 ifeq (${WITH_MEDIATEK},1)
   $(info WITH_MEDIATEK=1)
 
-  UU_FILES := $(wildcard mobile_back_tflite/cpp/backend_tflite/neuron/libs/*/*.uu)
-  SO_FILES := $(UU_FILES:.uu=)
+  SO_PART_AA_LIST := $(wildcard mobile_back_tflite/cpp/backend_tflite/neuron/libs/*/*.so.part.aa)
+  SO_LIST := $(patsubst %.so.part.aa, %.so, $(SO_PART_AA_LIST))
 
-  decode_so: $(SO_FILES)
+  decode_so: $(SO_LIST)
 
-  %: %.uu
-	cd $(dir $<) && uudecode $(notdir $<)
+  %.so: %.so.part.aa
+	cat $(basename $@).so.part.* > $@
 
   all: decode_so
 
