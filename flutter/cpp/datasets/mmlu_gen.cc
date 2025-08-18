@@ -15,8 +15,8 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord)
     tensorflow::tstring record = sample_reader_.ReadRecord(i);
     tensorflow::Example example;
     example.ParseFromString(record);
-    std::string input = GetFeatureValues<std::string>("input", example).Get(0);
-    std::string answer = GetFeatureValues<std::string>("answer", example).Get(0);
+    std::string input = tensorflow::GetFeatureValues<std::string>("input", example).Get(0);
+    std::string answer = tensorflow::GetFeatureValues<std::string>("answer", example).Get(0);
 
     auto sample = std::make_unique<PromptSample>();
     sample->input = input;

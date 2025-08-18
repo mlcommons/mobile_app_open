@@ -277,6 +277,6 @@ benchmark_setting {
   }
   custom_setting {
     id: "sentencepiece_processor_path"
-    value: "llama.model.sp"
+    value: "llama3_1b.spm.model"
   }
 }

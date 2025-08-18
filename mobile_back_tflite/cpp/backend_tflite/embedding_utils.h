@@ -6,6 +6,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 class TsEmbeddingParser {
  public:

@@ -19,16 +19,14 @@ limitations under the License.
 
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"
-#include "tensorflow/lite/c/c_api.h"
-#include "tensorflow/lite/c/c_api_experimental.h"
+
+#include "src/sentencepiece_processor.h"
 #include "tensorflow/lite/experimental/genai/genai_ops.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/interpreter_builder.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model_builder.h"
 #include "tensorflow/lite/signature_runner.h"
-#include "tensorflow/lite/util.h"
-#include "src/sentencepiece_processor.h"
 
 #include "tensorflow/core/platform/logging.h"
 
@@ -79,12 +77,12 @@ struct LLMBackendData {
   const char *name = "TFLite";
   const char *vendor = "Google";
   const char *accelerator = "CPU";
-  TfLiteModel *model{nullptr};
+  tflite::FlatBufferModel *model{nullptr};
   sentencepiece::SentencePieceProcessor *sp_processor{nullptr};
   //TfLiteInterpreterOptions *options{}; TODO use this to allow different delegates other than CPU?
-  TfLiteInterpreter *interpreter{};
-  TfLiteSignatureRunner *prefill_runner{nullptr};
-  TfLiteSignatureRunner *decode_runner{nullptr};
+  tflite::Interpreter *interpreter{};
+  tflite::SignatureRunner *prefill_runner{nullptr};
+  tflite::SignatureRunner *decode_runner{nullptr};
   kv_cache_t kv_cache;
   //std::string input_prompt;
   std::vector<int> prompt_tokens;
@@ -93,6 +91,18 @@ struct LLMBackendData {
   std::string end_token = "<eos>";
   int stop_token_id = -1;
   std::string output;
+
+  LLMBackendData(){}
+
+  ~LLMBackendData() {
+    // Runners are owned by interpreter and therefore don't need to be deleted
+    delete sp_processor;
+    delete interpreter;
+    delete model;
+  }
+
+  LLMBackendData(const LLMBackendData&) = delete;
+  LLMBackendData& operator=(const LLMBackendData&) = delete;
 
 //  uint32_t real_batch_size = 1;
 //std::unique_ptr<Threadpool> executer;
@@ -157,17 +167,13 @@ class LLMPipeline : public Pipeline {
   void backend_release_buffer(void *p) override;
 
  private:
-  TfLiteInterpreter *BuildInterpreter(TfLiteModel *model, int num_threads);
-  kv_cache_t BuildKVCache(TfLiteInterpreter *interpreter);
-  void PrepareRunner(TfLiteSignatureRunner *runner, kv_cache_t &kv_cache);
-  TfLiteSignatureRunner *GetPrefillRunner(TfLiteInterpreter *interpreter, std::size_t num_input_tokens, kv_cache_t &kv_cache);
-  TfLiteSignatureRunner *GetDecodeRunner(TfLiteInterpreter *interpreter, kv_cache_t &kv_cache);
+  tflite::Interpreter *BuildInterpreter(tflite::FlatBufferModel *model, int num_threads);
+  kv_cache_t BuildKVCache(tflite::Interpreter *interpreter);
+  void PrepareRunner(tflite::SignatureRunner *runner, kv_cache_t &kv_cache);
+  tflite::SignatureRunner *GetPrefillRunner(tflite::Interpreter *interpreter, std::size_t num_input_tokens, kv_cache_t &kv_cache);
+  tflite::SignatureRunner *GetDecodeRunner(tflite::Interpreter *interpreter, kv_cache_t &kv_cache);
   sentencepiece::SentencePieceProcessor *LoadSentencePieceProcessor(std::string path);
   int GreedySampler(const TfLiteTensor *logits);
-  TfLiteRegistration* GetGenAIGenerateOp();
-  bool TfLiteSignatureRunnerSetInputCustomAllocation(struct TfLiteSignatureRunner* runner, const char* input_name, const struct TfLiteCustomAllocation* allocation);
-  bool TfLiteSignatureRunnerSetOutputCustomAllocation(struct TfLiteSignatureRunner* runner, const char* output_name, const struct TfLiteCustomAllocation* allocation);
-  bool TfLiteSignatureRunnerAllocateTensors(TfLiteSignatureRunner* runner);
 
 };
 

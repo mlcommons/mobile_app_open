@@ -44,14 +44,7 @@ static bool backendExists = false;
 // Destroy the backend pointer and its data.
 void LLMPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
-  if (backend_data) {
-    TfLiteModelDelete(backend_data->model);
-    TfLiteSignatureRunnerDelete(backend_data->prefill_runner);
-    TfLiteSignatureRunnerDelete(backend_data->decode_runner);
-    TfLiteInterpreterDelete(backend_data->interpreter);
-    delete backend_data->sp_processor;
-    delete backend_data;
-  }
+  if (backend_data) delete backend_data;
   backendExists = false;
 }
 
@@ -70,7 +63,7 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(const char *model_path, mlperf_
   std::string sppp = mlperf::mobile::GetConfigValue(configs, "sentencepiece_processor_path", std::string(""));
 
   // Load the model.
-  backend_data->model = TfLiteModelCreateFromFile(model_path);
+  backend_data->model = tflite::FlatBufferModel::BuildFromFile(model_path).release();
   if (!backend_data->model) {
     LOG(ERROR) << "Failed to load model: " << model_path;
     backend_delete(backend_data);
@@ -123,15 +116,15 @@ mlperf_status_t LLMPipeline::backend_issue_query(mlperf_backend_ptr_t backend_pt
 
   // Get Input Tensors for each of the runners.
   // Shape: [Batch, Seq], Dtype: int32
-  TfLiteTensor* prefill_input = TfLiteSignatureRunnerGetInputTensor(backend_data->prefill_runner, "tokens");
+  TfLiteTensor* prefill_input = backend_data->prefill_runner->input_tensor("tokens");
   // Shape: [Seq], Dtype: int32
-  TfLiteTensor* prefill_input_pos = TfLiteSignatureRunnerGetInputTensor(backend_data->prefill_runner, "input_pos");
+  TfLiteTensor* prefill_input_pos = backend_data->prefill_runner->input_tensor("input_pos");
   // Shape: [Batch, Seq], Dtype: int32
-  TfLiteTensor* decode_input = TfLiteSignatureRunnerGetInputTensor(backend_data->decode_runner, "tokens");
+  TfLiteTensor* decode_input = backend_data->decode_runner->input_tensor("tokens");
   // Shape: [Seq], Dtype: int32
-  TfLiteTensor* decode_input_pos = TfLiteSignatureRunnerGetInputTensor(backend_data->decode_runner, "input_pos");
+  TfLiteTensor* decode_input_pos = backend_data->decode_runner->input_tensor("input_pos");
   // shape: [Batch, kv_cache_max, num_query_groups, head_dim]
-  TfLiteTensor* kv_cache_k_0 = TfLiteSignatureRunnerGetInputTensor(backend_data->decode_runner, "kv_cache_k_0");
+  TfLiteTensor* kv_cache_k_0 = backend_data->decode_runner->input_tensor("kv_cache_k_0");
 
   int max_seq_size = prefill_input->dims->data[1];
   int kv_cache_max_size = kv_cache_k_0->dims->data[1];
@@ -144,7 +137,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(mlperf_backend_ptr_t backend_pt
     prefill_input_pos->data.i32[i] = i;
   }
 
-  MINIMAL_CHECK(TfLiteSignatureRunnerInvoke(backend_data->prefill_runner) == kTfLiteOk);
+  MINIMAL_CHECK(backend_data->prefill_runner->Invoke() == kTfLiteOk);
 
   int decode_steps = kv_cache_max_size - prefill_seq_size;
   MINIMAL_CHECK(decode_steps > 0);
@@ -156,8 +149,8 @@ mlperf_status_t LLMPipeline::backend_issue_query(mlperf_backend_ptr_t backend_pt
   for (int i = 0; i < decode_steps; ++i) {
     decode_input->data.i32[0] = next_token;
     decode_input_pos->data.i32[0] = next_position;
-    MINIMAL_CHECK(TfLiteSignatureRunnerInvoke(backend_data->decode_runner) == kTfLiteOk);
-    next_token = GreedySampler(TfLiteSignatureRunnerGetOutputTensor(backend_data->decode_runner, "logits"));
+    MINIMAL_CHECK(backend_data->decode_runner->Invoke() == kTfLiteOk);
+    next_token = GreedySampler(backend_data->decode_runner->output_tensor("logits"));
     output_tokens.push_back(next_token);
     next_position += 1;
     if (next_token == backend_data->stop_token_id) break;
@@ -242,28 +235,29 @@ void LLMPipeline::backend_release_buffer(void *p) {
   ::operator delete(p);
 }
 
-TfLiteInterpreter *LLMPipeline::BuildInterpreter(TfLiteModel *model, int num_threads) {
-  TfLiteInterpreterOptions* options = TfLiteInterpreterOptionsCreate();
-  TfLiteInterpreterOptionsSetNumThreads(options, num_threads);
+tflite::Interpreter *LLMPipeline::BuildInterpreter(tflite::FlatBufferModel *model, int num_threads) {
+  tflite::ops::builtin::BuiltinOpResolver resolver;
   // NOTE: We need to manually register optimized OPs for KV-cache and
   // Scaled Dot Product Attention (SDPA).
-  TfLiteInterpreterOptionsAddCustomOp(options, "GEN_AI_GENERATE", GetGenAIGenerateOp(), 1, 1);
-  TfLiteInterpreter* interpreter = TfLiteInterpreterCreate(model, options);
+  tflite::ops::custom::GenAIOpsRegisterer(&resolver);
+  tflite::InterpreterBuilder builder(*model, resolver);
+  MINIMAL_CHECK_PTR(builder.SetNumThreads(num_threads) == kTfLiteOk);
+  std::unique_ptr<tflite::Interpreter> interpreter;
+  builder(&interpreter);
 
   MINIMAL_CHECK_PTR(interpreter != nullptr);
 
-  return interpreter;
+  return interpreter.release();
 }
 
-kv_cache_t LLMPipeline::BuildKVCache(TfLiteInterpreter *interpreter) {
-  TfLiteSignatureRunner *runner = TfLiteInterpreterGetSignatureRunner(interpreter, "decode");
-  // TODO
+kv_cache_t LLMPipeline::BuildKVCache(tflite::Interpreter* interpreter) {
+  tflite::SignatureRunner* runner = interpreter->GetSignatureRunner("decode");
   if (runner == nullptr) {
     return {};
   }
   // The two arguments excluded are `tokens` and `input_pos`.
   // TODO more arguments might need to be excluded
-  size_t num_layers = (TfLiteSignatureRunnerGetInputCount(runner) - 2) / 2;
+  size_t num_layers = (runner->input_size() - 2) / 2;
   if (num_layers == 0) {
     return {};
   }
@@ -273,7 +267,7 @@ kv_cache_t LLMPipeline::BuildKVCache(TfLiteInterpreter *interpreter) {
     std::string k_cache_name = "kv_cache_k_" + std::to_string(i);
     std::string v_cache_name = "kv_cache_v_" + std::to_string(i);
     // We are assuming K and V tensors are of the same shape.
-    TfLiteTensor* tensor = TfLiteSignatureRunnerGetInputTensor(runner, k_cache_name.c_str());
+    TfLiteTensor* tensor = runner->input_tensor(k_cache_name.c_str());
     size_t count = tensor->bytes / sizeof(float);
     kv_cache.emplace(k_cache_name,
                      std::vector<float, AlignedAllocator<float>>(count, 0.0));
@@ -284,33 +278,30 @@ kv_cache_t LLMPipeline::BuildKVCache(TfLiteInterpreter *interpreter) {
   return kv_cache;
 }
 
-void LLMPipeline::PrepareRunner(TfLiteSignatureRunner* runner, kv_cache_t& kv_cache) {
+void LLMPipeline::PrepareRunner(tflite::SignatureRunner* runner, kv_cache_t& kv_cache) {
   for (auto& [name, cache] : kv_cache) {
-    TfLiteCustomAllocation allocation = {
-                                         .data = static_cast<void*>(cache.data()),
-                                         .bytes = cache.size() * sizeof(float)};
+    TfLiteCustomAllocation allocation = {.data = static_cast<void*>(cache.data()), .bytes = cache.size() * sizeof(float)};
     // Both input and output tensors are set to the same buffer. Not all
     // delegates support this in-place update. For those cases, we need to do
     // a ping-pong buffer and update the pointers between inference calls.
-    MINIMAL_CHECK_VOID(TfLiteSignatureRunnerSetInputCustomAllocation(runner, name.c_str(), &allocation));
-    MINIMAL_CHECK_VOID(TfLiteSignatureRunnerSetInputCustomAllocation(runner, name.c_str(), &allocation));
+    MINIMAL_CHECK_VOID(runner->SetCustomAllocationForInputTensor(name.c_str(), allocation) == kTfLiteOk);
+    MINIMAL_CHECK_VOID(runner->SetCustomAllocationForOutputTensor(name.c_str(), allocation) == kTfLiteOk);
   }
-  MINIMAL_CHECK_VOID(TfLiteSignatureRunnerAllocateTensors(runner));
+  MINIMAL_CHECK_VOID(runner->AllocateTensors() == kTfLiteOk);
 }
 
-TfLiteSignatureRunner *LLMPipeline::GetPrefillRunner(TfLiteInterpreter* interpreter, std::size_t num_input_tokens, kv_cache_t& kv_cache) {
+tflite::SignatureRunner *LLMPipeline::GetPrefillRunner(tflite::Interpreter* interpreter, std::size_t num_input_tokens, kv_cache_t& kv_cache) {
   // Find the prefill signature length that best matches the input token size.
-  TfLiteSignatureRunner* runner = nullptr;
+  tflite::SignatureRunner* runner = nullptr;
   //int best_seq_size = -1;
   size_t delta = std::numeric_limits<size_t>::max();
-  for (int32_t i = 0; i < TfLiteInterpreterGetSignatureCount(interpreter); i++) {
-    std::string key (TfLiteInterpreterGetSignatureKey(interpreter, i));
-    if (key.find("prefill") == std::string::npos) continue;
-    TfLiteTensor* input_pos = TfLiteSignatureRunnerGetInputTensor(TfLiteInterpreterGetSignatureRunner(interpreter, key.c_str()), "input_pos");
+  for (const std::string* key : interpreter->signature_keys()) {
+    if (key->find("prefill") == std::string::npos) continue;
+    TfLiteTensor* input_pos = interpreter->GetSignatureRunner(key->c_str())->input_tensor("input_pos");
     // The expected shape for input position is [Seq].
     size_t seq_size = input_pos->dims->data[0];
     if (num_input_tokens <= seq_size && seq_size - num_input_tokens < delta) {
-      runner = TfLiteInterpreterGetSignatureRunner(interpreter, key.c_str());
+      runner = interpreter->GetSignatureRunner(key->c_str());
       //best_seq_size = seq_size;
       delta = seq_size - num_input_tokens;
     }
@@ -320,8 +311,8 @@ TfLiteSignatureRunner *LLMPipeline::GetPrefillRunner(TfLiteInterpreter* interpre
   return runner;
 }
 
-TfLiteSignatureRunner *LLMPipeline::GetDecodeRunner(TfLiteInterpreter* interpreter, kv_cache_t& kv_cache) {
-  TfLiteSignatureRunner* runner = TfLiteInterpreterGetSignatureRunner(interpreter, "decode");
+tflite::SignatureRunner *LLMPipeline::GetDecodeRunner(tflite::Interpreter* interpreter, kv_cache_t& kv_cache) {
+  tflite::SignatureRunner* runner = interpreter->GetSignatureRunner("decode");
   MINIMAL_CHECK_PTR(runner != nullptr);
   PrepareRunner(runner, kv_cache);
   return runner;
@@ -348,43 +339,6 @@ int LLMPipeline::GreedySampler(const TfLiteTensor* logits) {
     }
   }
   return max_index;
-}
-
-TfLiteRegistration* LLMPipeline::GetGenAIGenerateOp() {
-  static tflite::MutableOpResolver resolver;
-
-  tflite::ops::custom::GenAIOpsRegisterer(&resolver);
-
-  const TfLiteRegistration* reg = resolver.FindOp("GEN_AI_GENERATE", /*version=*/1);
-
-  if (!reg) {
-    LOG(ERROR) << "Could not find GEN_AI_GENERATE op." << std::endl;
-    return nullptr;
-  }
-
-  static TfLiteRegistration reg_copy = *reg;
-  return &reg_copy;
-}
-
-bool LLMPipeline::TfLiteSignatureRunnerSetInputCustomAllocation(TfLiteSignatureRunner* runner, const char* input_name, const TfLiteCustomAllocation* allocation) {
-  if (!runner || !input_name || !allocation) return false;
-  auto* cpp_runner = reinterpret_cast<tflite::SignatureRunner*>(runner);
-  return cpp_runner
-             ->SetCustomAllocationForInputTensor(input_name, *allocation) ==
-         kTfLiteOk;
-}
-
-bool LLMPipeline::TfLiteSignatureRunnerSetOutputCustomAllocation(TfLiteSignatureRunner* runner, const char* output_name, const TfLiteCustomAllocation* allocation) {
-  if (!runner || !output_name || !allocation) return false;
-  auto* cpp_runner = reinterpret_cast<tflite::SignatureRunner*>(runner);
-  return cpp_runner
-             ->SetCustomAllocationForOutputTensor(output_name, *allocation) ==
-         kTfLiteOk;
-}
-
-bool LLMPipeline::TfLiteSignatureRunnerAllocateTensors(TfLiteSignatureRunner* runner) {
-  if (!runner) return false;
-  return reinterpret_cast<tflite::SignatureRunner*>(runner)->AllocateTensors() == kTfLiteOk;
 }
 
 #ifdef __cplusplus

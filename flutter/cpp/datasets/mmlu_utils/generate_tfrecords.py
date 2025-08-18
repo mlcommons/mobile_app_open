@@ -4,8 +4,8 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Convert a CSV of LLM prompts to TFRecord format.")
-    parser.add_argument('--input', type=str, required=True, help="Path to the input CSV file.")
-    parser.add_argument('--output', type=str, required=True, help="Path to the output TFRecord file.")
+    parser.add_argument('--input_file', type=str, required=True, help="Path to the input CSV file.")
+    parser.add_argument('--output_file', type=str, required=True, help="Path to the output TFRecord file.")
     return parser.parse_args()
 
 def map_answer(num):
@@ -19,19 +19,19 @@ def create_example(input_text, answer_letter):
 
 def main():
     args = parse_args()
-    df = pd.read_csv(args.input_csv)
+    df = pd.read_csv(args.input_file)
 
     if "input_formatted" not in df.columns or "answer" not in df.columns:
         raise ValueError("CSV must contain 'input_formatted' and 'answer' columns.")
 
     df["answer_letter"] = df["answer"].map(map_answer)
 
-    with tf.io.TFRecordWriter(args.output_tfrecord) as writer:
+    with tf.io.TFRecordWriter(args.output_file) as writer:
         for _, row in df.iterrows():
             example = create_example(row["input_formatted"], row["answer_letter"])
             writer.write(example.SerializeToString())
 
-    print(f"TFRecord written to: {args.output_tfrecord}")
+    print(f"TFRecord written to: {args.output_file}")
 
 if __name__ == "__main__":
     main()
