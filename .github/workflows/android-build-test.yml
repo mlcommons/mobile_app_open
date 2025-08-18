@@ -278,6 +278,73 @@ jobs:
             device: "Samsung Galaxy S25 Ultra-15.0"
           - backend: "samsung"
             device: "Samsung Galaxy S24-14.0"
+    env:
+      MAIN_APK_NAME: test-main-unified-${{ github.run_number }}.apk
+      HELPER_APK_NAME: test-helper-unified-${{ github.run_number }}.apk
+      BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+      - name: Download test APK
+        run: |
+          gsutil cp $GCLOUD_BUCKET_PATH/test-main-unified.apk /tmp/$MAIN_APK_NAME
+          gsutil cp $GCLOUD_BUCKET_PATH/test-helper-unified.apk /tmp/$HELPER_APK_NAME
+      - name: Upload main app
+        run: |
+          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
+          -F "file=@/tmp/$MAIN_APK_NAME" \
+          -F "custom_id=$MAIN_APK_NAME"
+      - name: Upload test suite
+        run: |
+          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
+          -F "file=@/tmp/$HELPER_APK_NAME" \
+          -F "custom_id=$HELPER_APK_NAME"
+      - uses: nick-fields/retry@v3
+        name: Trigger App Automate
+        env:
+          BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
+          BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
+          BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
+          BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
+          BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          BROWSERSTACK_DEVICES: >-
+            ["${{ matrix.device }}"]
+        with:
+          timeout_minutes: 60
+          max_attempts: 2
+          retry_wait_seconds: 300
+          retry_on_exit_code: 9
+          command: |
+            bash .github/workflows/scripts/browserstack-app-automate.sh
+      - name: Upload BrowserStack logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ github.run_number }}
+          path: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          retention-days: 28
+          if-no-files-found: error
+
+  test-android-apk-unified-extended:
+    needs: build-android-apk
+    if: github.ref_name == 'master'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
           - backend: "tflite"
             device: "Samsung Galaxy S25 Ultra-15.0"
           - backend: "tflite"
