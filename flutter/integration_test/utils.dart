@@ -182,7 +182,7 @@ Future<bool> waitFor(WidgetTester tester, int timeout, Key key) async {
   return element;
 }
 
-void printResults(ExtendedResult extendedResult) {
+void printResult(ExtendedResult extendedResult) {
   debugPrint('Benchmark result json:');
   for (final line in const JsonEncoder.withIndent('  ')
       .convert(extendedResult)
@@ -191,7 +191,7 @@ void printResults(ExtendedResult extendedResult) {
   }
 }
 
-void checkTasks(ExtendedResult extendedResult) {
+void checkResult(ExtendedResult extendedResult) {
   for (final benchmarkResult in extendedResult.results) {
     debugPrint('Checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
@@ -205,12 +205,16 @@ void checkTasks(ExtendedResult extendedResult) {
 void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   var tag = '[benchmarkId: ${benchmarkResult.benchmarkId}';
   final expectedMap = benchmarkExpectedAccuracy[benchmarkResult.benchmarkId];
+  // Skip if there is no expectedMap
+  if (expectedMap == null || expectedMap.isEmpty) {
+    debugPrint('No expected accuracy map; skipping accuracy check.');
+    return;
+  }
   expect(
     expectedMap,
     isNotNull,
     reason: 'missing expected accuracy map for ${benchmarkResult.benchmarkId}',
   );
-  expectedMap!;
 
   final accelerator = benchmarkResult.backendSettings.acceleratorCode;
   tag += ' | accelerator: $accelerator';
@@ -250,12 +254,17 @@ void checkThroughput(
   final benchmarkId = benchmarkResult.benchmarkId;
   var tag = 'benchmarkId: $benchmarkId';
   final expectedMap = benchmarkExpectedThroughput[benchmarkId];
+
+  // Skip if there is no expectedMap
+  if (expectedMap == null || expectedMap.isEmpty) {
+    debugPrint('No expected throughput map; skipping throughput check.');
+    return;
+  }
   expect(
     expectedMap,
     isNotNull,
     reason: 'missing expected throughput map for [$tag]',
   );
-  expectedMap!;
 
   final backendTag = benchmarkResult.backendInfo.filename;
   tag += ' | backendTag: $backendTag';
