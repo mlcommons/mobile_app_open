@@ -10,6 +10,9 @@ build --spawn_strategy=standalone
 # This flag is required by tensorflow
 common --experimental_repo_remote_exec
 
+common --repo_env=TF_NEED_CUDA=0
+common --repo_env=TF_NEED_ROCM=0
+
 # Default options should come above this line.
 
 # Configure logs

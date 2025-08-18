@@ -40,12 +40,18 @@ http_archive(
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         #"//:flutter/third_party/tf-eigen.patch",
     ] + PATCH_FILE,
-    sha256 = "9cc4d5773b8ee910079baaecb4086d0c28939f024dd74b33fc5e64779b6533dc",
-    strip_prefix = "tensorflow-2.17.0",
+    sha256 = "d7876f4bb0235cac60eb6316392a7c48676729860da1ab659fb440379ad5186d",
+    strip_prefix = "tensorflow-2.18.0",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.17.0.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/v2.18.0.tar.gz",
     ],
 )
+
+load("@org_tensorflow//third_party/gpus:cuda_configure.bzl", "cuda_configure")
+cuda_configure(name = "local_config_cuda")
+
+load("@org_tensorflow//third_party/gpus:rocm_configure.bzl", "rocm_configure")
+rocm_configure(name = "local_config_rocm")
 
 http_archive(
     name = "com_google_sentencepiece",
