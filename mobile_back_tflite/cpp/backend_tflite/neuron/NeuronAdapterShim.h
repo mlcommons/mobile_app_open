@@ -85,6 +85,8 @@ inline void* getAdapterLibraryHandle() {
       sHandle = loadAdapterLibrary("libneuronusdk_adapter.mtk.mt6989.so");
     } else if (device == "mt6991") {
       sHandle = loadAdapterLibrary("libneuronusdk_adapter.mtk.mt6991.so");
+    } else {
+      sHandle = loadAdapterLibrary("libneuronusdk_adapter.mtk.so");
     }
   }
   if (sHandle == nullptr) {

@@ -69,6 +69,9 @@ static bool neuron_tflite_backend(const char **not_allowed_message,
     } else if (device == "mt6991") {
       libneuron_adapter =
           dlopen("libneuronusdk_adapter.mtk.mt6991.so", RTLD_LAZY | RTLD_LOCAL);
+    } else {
+      libneuron_adapter =
+          dlopen("libneuronusdk_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
     }
     if (libneuron_adapter != nullptr) neuron_adapter = true;
   } else {
