@@ -28,6 +28,8 @@ class AppIcons {
       _pSvg('ic_task_super_resolution.svg');
   static final SvgPicture stableDiffusion =
       _pSvg('ic_task_stable_diffusion.svg');
+  static final SvgPicture llm =
+      _pSvg('ic_task_llm.svg');
 
   static final SvgPicture imageClassificationWhite =
       _pSvg('ic_task_image_classification_white.svg');
@@ -70,6 +72,7 @@ class BenchmarkIcons {
     BenchmarkId.stableDiffusion: AppIcons.stableDiffusion,
     BenchmarkId.imageClassificationOfflineV2:
         AppIcons.imageClassificationOffline,
+    BenchmarkId.llm: AppIcons.llm,
   };
 
   static final lightSet = {
@@ -81,6 +84,7 @@ class BenchmarkIcons {
     BenchmarkId.stableDiffusion: AppIcons.stableDiffusionWhite,
     BenchmarkId.imageClassificationOfflineV2:
         AppIcons.imageClassificationOfflineWhite,
+    BenchmarkId.llm: AppIcons.llm,
   };
 
   static Widget getDarkIcon(String benchmarkId) =>
