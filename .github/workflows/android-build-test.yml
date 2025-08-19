@@ -31,7 +31,7 @@ jobs:
         with:
           push: true
           files: |
-            .github/workflows/scripts/docker-bake.hcl
+            docker-bake.hcl
           targets: android
           set: |
             android.tags=ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
