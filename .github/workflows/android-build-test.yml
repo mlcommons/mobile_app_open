@@ -26,28 +26,20 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata for Docker image
-        id: meta
-        uses: docker/metadata-action@v5
+      - name: Build and push Docker image (bake)
+        uses: docker/bake-action@v5
         with:
-          images: ghcr.io/mlcommons/mobile_app_open-android
-          flavor: latest=true
-          tags: type=raw,value=${{ github.run_number }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: flutter/android/docker
-          file: flutter/android/docker/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          # Prefer cross-branch reusable cache. Use both GHA and GHCR cache.
-          cache-from: |
-            type=gha,scope=android-image
-            type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache
-          cache-to: |
-            type=gha,scope=android-image,mode=max
-            type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache,mode=max
+          files: |
+            .github/workflows/scripts/docker-bake.hcl
+          targets: android
+          set: |
+            android.tags=ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
+            android.tags=ghcr.io/mlcommons/mobile_app_open-android:latest
+            *.cache-from=type=gha,scope=android-image
+            *.cache-from=type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache
+            *.cache-to=type=gha,scope=android-image,mode=max
+            *.cache-to=type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache,mode=max
 
   build-android-apk:
     needs: build-android-image
