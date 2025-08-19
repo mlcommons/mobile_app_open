@@ -4,6 +4,6 @@ group "default" {
 
 target "android" {
   context    = "flutter/android/docker"
-  dockerfile = "flutter/android/docker/Dockerfile"
+  dockerfile = "Dockerfile"
   // platforms = ["linux/amd64"]  // optionally set platforms here
 }
