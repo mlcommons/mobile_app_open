@@ -337,7 +337,6 @@ jobs:
 
   test-android-apk-unified-extended:
     needs: build-android-apk
-    if: github.ref_name == 'master'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
