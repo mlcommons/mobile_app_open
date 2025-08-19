@@ -30,10 +30,10 @@ jobs:
         uses: docker/bake-action@v5
         with:
           push: true
+          files: |
+            .github/workflows/scripts/docker-bake.hcl
           targets: android
           set: |
-            android.context=./flutter/android/docker
-            android.dockerfile=Dockerfile
             android.tags=ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
             android.tags=ghcr.io/mlcommons/mobile_app_open-android:latest
             *.cache-from=type=gha,scope=android-image
