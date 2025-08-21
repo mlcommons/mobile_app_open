@@ -332,31 +332,6 @@ jobs:
           retention-days: 28
           if-no-files-found: error
 
-  test-android-apk-unified-mtk:
-    needs: build-android-apk
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up authentication for Google Cloud SDK
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          version: '>= 363.0.0'
-          project_id: mobile-app-build-290400
-      - name: Trigger Firebase Test Lab for [OnePlus DN2103](OP515BL1)
-        run: |
-          gcloud firebase test android run \
-            --type instrumentation \
-            --app $GCLOUD_BUCKET_PATH/test-main-unified.apk \
-            --test $GCLOUD_BUCKET_PATH/test-helper-unified.apk \
-            --timeout 30m \
-            --num-flaky-test-attempts 2 \
-            --device model=OP515BL1,version=33,locale=en,orientation=portrait \
-            --client-details=buildNumber=${{ github.run_number }}
-
   test-android-apk-single:
     needs:
       - build-android-apk
