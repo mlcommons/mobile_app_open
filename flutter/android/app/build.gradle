@@ -25,7 +25,10 @@ if (flutterVersionName == null) {
 }
 
 android {
+    namespace "org.mlcommons.android.mlperfbench"
     compileSdkVersion 34
+
+    ndkVersion "25.2.9519653"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -43,13 +46,14 @@ android {
     defaultConfig {
         applicationId "org.mlcommons.android.mlperfbench"
         minSdkVersion 30
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
           abiFilters "arm64-v8a", "armeabi-v7a"
+          debugSymbolLevel 'SYMBOL_TABLE'
         }
     }
 
@@ -75,11 +79,15 @@ android {
             // By default we do not upload mapping file to Firebase
             firebaseCrashlytics {
                 if (System.env['FIREBASE_CRASHLYTICS_ENABLED'] == 'true') {
-                    println 'mappingFileUploadEnabled set to true'
+                    println 'mappingFileUploadEnabled and nativeSymbolUploadEnabled set to true'
                     mappingFileUploadEnabled true
+                    nativeSymbolUploadEnabled true
+                    unstrippedNativeLibsDir file("${buildDir}/intermediates/merged_native_libs/release/out/lib/")
+                    symbolGeneratorType "csym"
                 } else {
-                    println 'mappingFileUploadEnabled set to false'
+                    println 'mappingFileUploadEnabled and nativeSymbolUploadEnabled set to false'
                     mappingFileUploadEnabled false
+                    nativeSymbolUploadEnabled false
                 }
             }
         }
@@ -95,9 +103,24 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    // firebase-bom v32.8.1 is required to use minSdkVersion 21
-    // https://firebase.google.com/support/release-notes/android#2024-05-02
-    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    // https://firebase.google.com/support/release-notes/android
+    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
+    // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
     implementation("com.google.firebase:firebase-appcheck-debug")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-crashlytics-ndk")
+}
+
+afterEvaluate {
+    if (System.env['FIREBASE_CRASHLYTICS_ENABLED'] == 'true') {
+        tasks.named('generateCrashlyticsSymbolFileRelease') {
+            dependsOn 'mergeReleaseNativeLibs'
+        }
+        tasks.configureEach {
+            if (name == 'assembleRelease' || name == 'bundleRelease') {
+                finalizedBy 'uploadCrashlyticsSymbolFileRelease'
+            }
+        }
+    }
 }

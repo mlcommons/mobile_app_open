@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/settings/resources_screen.dart';
@@ -121,10 +122,12 @@ Future<void> showErrorDialog(
 }
 
 Future<void> showResourceMissingDialog(
-    BuildContext context, List<String> messages) async {
+    BuildContext context, List<String> messages,
+    {Benchmark? benchmark}) async {
   final l10n = AppLocalizations.of(context)!;
 
-  Icon icon = const Icon(Icons.info_outline, color: Colors.grey, size: 32);
+  Icon icon = const Icon(Icons.warning_amber_rounded,
+      color: AppColors.warningIcon, size: 32);
   Color titleColor = Colors.grey;
 
   await showDialog(
@@ -164,37 +167,11 @@ Future<void> showResourceMissingDialog(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber, width: 1),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline, color: Colors.amber),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: Text(
-                        l10n.dialogContentMissingFilesHint,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              ...messages.map((e) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(
-                      e,
-                      style: const TextStyle(fontSize: 15),
-                    ),
-                  )),
+              Text(benchmark != null
+                  ? l10n.dialogContentMissingFiles
+                      .replaceAll('<name>', benchmark.info.taskName)
+                  : l10n.dialogContentMissingFiles
+                      .replaceAll('<name>', l10n.benchNameVarious)),
             ],
           ),
         ),
@@ -219,7 +196,10 @@ Future<void> showResourceMissingDialog(
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const ResourcesScreen(),
+                        builder: (context) => ResourcesScreen(
+                          autoStart: true,
+                          singleBenchmarkDownload: benchmark,
+                        ),
                       ),
                     );
                   },

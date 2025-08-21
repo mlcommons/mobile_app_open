@@ -34,7 +34,7 @@ class TaskConfigSection extends StatelessWidget {
     );
     String dataFolder;
     if (Platform.isIOS) {
-      dataFolder = 'Files/MLPerf/';
+      dataFolder = 'Files/MLPerf Mobile/';
     } else {
       dataFolder = state.resourceManager.getDataFolder();
     }
