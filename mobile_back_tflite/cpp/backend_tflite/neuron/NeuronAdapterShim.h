@@ -39,8 +39,11 @@
 
 #include <dlfcn.h>
 
+#include <string>
+
 #include "NeuronAdapter.h"
 #include "tensorflow/core/platform/logging.h"
+std::string GetPlatformName();
 
 #define LOAD_ADAPTER_FUNCTION(name) \
   static name##_fn fn = reinterpret_cast<name##_fn>(loadAdapterFunction(#name));
@@ -61,13 +64,30 @@ inline void* loadAdapterLibrary(const char* name) {
   sHandle = dlopen(name, RTLD_LAZY | RTLD_LOCAL);
   if (sHandle == nullptr) {
     LOG(ERROR) << "Unable to open library " << name << " " << dlerror();
+  } else {
+    NeuronRuntimeVersion version;
+    auto getVerson = reinterpret_cast<decltype(&Neuron_getVersion)>(
+        dlsym(sHandle, "Neuron_getVersion"));
+    if (getVerson == nullptr || getVerson(&version) != NEURON_NO_ERROR) {
+      LOG(ERROR) << "Loaded " << name << " with unknown version.";
+    } else {
+      LOG(INFO) << "Loaded " << name << " with version: " << (int)version.major
+                << "." << (int)version.minor << "." << (int)version.patch;
+    }
   }
   return sHandle;
 }
 
 inline void* getAdapterLibraryHandle() {
   if (sHandle == nullptr) {
-    sHandle = loadAdapterLibrary("libneuronusdk_adapter.mtk.so");
+    const std::string device = GetPlatformName();
+    if (device == "mt6989") {
+      sHandle = loadAdapterLibrary("libneuronusdk_adapter.mtk.mt6989.so");
+    } else if (device == "mt6991") {
+      sHandle = loadAdapterLibrary("libneuronusdk_adapter.mtk.mt6991.so");
+    } else {
+      sHandle = loadAdapterLibrary("libneuronusdk_adapter.mtk.so");
+    }
   }
   if (sHandle == nullptr) {
     sHandle = loadAdapterLibrary("libneuron_adapter_mgvi.so");
@@ -194,6 +214,11 @@ typedef int (*NeuronCompilation_getInputPaddedDimensions_fn)(
 typedef int (*NeuronCompilation_getOutputPaddedDimensions_fn)(
     NeuronCompilation* compilation, int32_t index, uint32_t* dimensions);
 
+typedef int (*NeuronCompilation_createV2_fn)(NeuronModel* model,
+                                             CompilationType type,
+                                             const char* options,
+                                             NeuronCompilation** compilation);
+
 typedef int (*NeuronCompilation_getInputPaddedSize_fn)(
     NeuronCompilation* compilation, int32_t index, size_t* size);
 
@@ -304,6 +329,9 @@ typedef int (*NeuronModel_setOperandExtensionData_fn)(NeuronModel* model,
                                                       const void* data,
                                                       size_t length);
 
+typedef int (*NeuronExecution_setIODone_fn)(NeuronExecution* execution,
+                                            int idx);
+
 typedef int (*NeuronCompilation_createForBatch_fn)(
     NeuronModel* model, NeuronCompilation** compilation);
 
@@ -315,6 +343,22 @@ typedef int (*NeuronExecution_setRunnerPoolSize_fn)(NeuronExecution* execution,
                                                     uint8_t numRunners);
 
 typedef int (*NeuronExecution_setBatchDone_fn)(NeuronExecution* execution);
+
+typedef int (*NeuronExecution_submitInput_fn)(NeuronExecution* execution,
+                                              uint32_t index,
+                                              const void* buffer,
+                                              size_t length);
+typedef int (*NeuronExecution_setJobPoolSize_fn)(NeuronExecution* execution,
+                                                 uint32_t size);
+typedef int (*NeuronExecution_queryOutput_fn)(NeuronExecution* execution,
+                                              uint32_t index, void* buffer,
+                                              size_t length);
+typedef int (*NeuronExecution_queryOutputPointer_fn)(NeuronExecution* execution,
+                                                     uint32_t index,
+                                                     void** ptr);
+typedef int (*NeuronExecution_flushExecution_fn)(NeuronExecution* execution);
+typedef int (*NeuronExecution_resetParallelResources_fn)(
+    NeuronExecution* execution);
 
 /*************************************************************************************************/
 
@@ -473,6 +517,13 @@ inline int NeuronCompilation_createForDevices(
     NeuronCompilation** compilation) {
   LOAD_ADAPTER_FUNCTION(NeuronCompilation_createForDevices);
   EXECUTE_ADAPTER_FUNCTION_RETURN_INT(model, devices, numDevices, compilation);
+}
+
+inline int NeuronCompilation_createV2(NeuronModel* model, CompilationType type,
+                                      const char* options,
+                                      NeuronCompilation** compilation) {
+  LOAD_ADAPTER_FUNCTION(NeuronCompilation_createV2);
+  EXECUTE_ADAPTER_FUNCTION_RETURN_INT(model, type, options, compilation);
 }
 
 inline int NeuronCompilation_createForDebug(NeuronModel* model,
@@ -685,6 +736,11 @@ inline int NeuronCompilation_createForMultiExecutions(
   EXECUTE_ADAPTER_FUNCTION_RETURN_INT(model, compilation);
 }
 
+inline int NeuronExecution_setIODone(NeuronExecution* execution, int idx) {
+  LOAD_ADAPTER_FUNCTION(NeuronExecution_setIODone);
+  EXECUTE_ADAPTER_FUNCTION_RETURN_INT(execution, idx);
+}
+
 inline int NeuronDebug_setReportPath(NeuronModel* model, const char* path) {
   LOAD_ADAPTER_FUNCTION(NeuronDebug_setReportPath);
   EXECUTE_ADAPTER_FUNCTION_RETURN_INT(model, path);
@@ -761,5 +817,38 @@ inline int NeuronExecution_setRunnerPoolSize(NeuronExecution* execution,
 
 inline int NeuronExecution_setBatchDone(NeuronExecution* execution) {
   LOAD_ADAPTER_FUNCTION(NeuronExecution_setBatchDone);
+  EXECUTE_ADAPTER_FUNCTION_RETURN_INT(execution);
+}
+
+inline int NeuronExecution_submitInput(NeuronExecution* execution,
+                                       uint32_t index, const void* buffer,
+                                       size_t length) {
+  LOAD_ADAPTER_FUNCTION(NeuronExecution_submitInput);
+  EXECUTE_ADAPTER_FUNCTION_RETURN_INT(execution, index, buffer, length);
+}
+inline int NeuronExecution_queryOutput(NeuronExecution* execution,
+                                       uint32_t index, void* buffer,
+                                       size_t length) {
+  LOAD_ADAPTER_FUNCTION(NeuronExecution_queryOutput);
+  EXECUTE_ADAPTER_FUNCTION_RETURN_INT(execution, index, buffer, length);
+}
+inline int NeuronExecution_queryOutputPointer(NeuronExecution* execution,
+                                              uint32_t index, void** ptr) {
+  LOAD_ADAPTER_FUNCTION(NeuronExecution_queryOutputPointer);
+  EXECUTE_ADAPTER_FUNCTION_RETURN_INT(execution, index, ptr);
+}
+inline int NeuronExecution_flushExecution(NeuronExecution* execution) {
+  LOAD_ADAPTER_FUNCTION(NeuronExecution_flushExecution);
+  EXECUTE_ADAPTER_FUNCTION_RETURN_INT(execution);
+}
+
+inline int NeuronExecution_setJobPoolSize(NeuronExecution* execution,
+                                          uint32_t size) {
+  LOAD_ADAPTER_FUNCTION(NeuronExecution_setJobPoolSize);
+  EXECUTE_ADAPTER_FUNCTION_RETURN_INT(execution, size);
+}
+
+inline int NeuronExecution_resetParallelResources(NeuronExecution* execution) {
+  LOAD_ADAPTER_FUNCTION(NeuronExecution_resetParallelResources);
   EXECUTE_ADAPTER_FUNCTION_RETURN_INT(execution);
 }
