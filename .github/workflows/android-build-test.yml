@@ -37,10 +37,8 @@ jobs:
           set: |
             android.tags=ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
             android.tags=ghcr.io/mlcommons/mobile_app_open-android:latest
-            *.cache-from=type=gha,scope=android-image
-            *.cache-from=type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache
-            *.cache-to=type=gha,scope=android-image,mode=max
-            *.cache-to=type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache,mode=max
+            android.cache-from=type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache
+            android.cache-to=type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache,mode=max
 
   build-android-apk:
     needs: build-android-image
