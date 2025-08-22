@@ -205,16 +205,12 @@ void checkResult(ExtendedResult extendedResult) {
 void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   var tag = '[benchmarkId: ${benchmarkResult.benchmarkId}';
   final expectedMap = benchmarkExpectedAccuracy[benchmarkResult.benchmarkId];
-  // Skip if there is no expectedMap
-  if (expectedMap == null || expectedMap.isEmpty) {
-    debugPrint('No expected accuracy map; skipping accuracy check.');
-    return;
-  }
   expect(
     expectedMap,
     isNotNull,
     reason: 'missing expected accuracy map for ${benchmarkResult.benchmarkId}',
   );
+  expectedMap!;
 
   final accelerator = benchmarkResult.backendSettings.acceleratorCode;
   tag += ' | accelerator: $accelerator';
@@ -223,12 +219,17 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   final expectedValue =
       expectedMap['$accelerator|$backendName'] ?? expectedMap[accelerator];
   tag += ' | expectedValue: $expectedValue';
+
+  // Skip if there is no expectedValue
+  if (expectedValue == null) {
+    debugPrint('No expected accuracy value; skipping accuracy check.');
+    return;
+  }
   expect(
     expectedValue,
     isNotNull,
     reason: 'missing expected accuracy for $tag',
   );
-  expectedValue!;
 
   final accuracyRun = benchmarkResult.accuracyRun;
   accuracyRun!;
@@ -254,17 +255,12 @@ void checkThroughput(
   final benchmarkId = benchmarkResult.benchmarkId;
   var tag = 'benchmarkId: $benchmarkId';
   final expectedMap = benchmarkExpectedThroughput[benchmarkId];
-
-  // Skip if there is no expectedMap
-  if (expectedMap == null || expectedMap.isEmpty) {
-    debugPrint('No expected throughput map; skipping throughput check.');
-    return;
-  }
   expect(
     expectedMap,
     isNotNull,
     reason: 'missing expected throughput map for [$tag]',
   );
+  expectedMap!;
 
   final backendTag = benchmarkResult.backendInfo.filename;
   tag += ' | backendTag: $backendTag';
@@ -280,12 +276,17 @@ void checkThroughput(
   tag += ' | deviceModel: $deviceModel';
   final expectedValue = backendExpectedMap[deviceModel];
   tag += ' | expectedValue: $expectedValue';
+
+  // Skip if there is no expectedValue
+  if (expectedValue == null) {
+    debugPrint('No expected throughput value; skipping throughput check.');
+    return;
+  }
   expect(
     expectedValue,
     isNotNull,
     reason: 'missing expected throughput for [$tag]',
   );
-  expectedValue!;
 
   final run = benchmarkResult.performanceRun;
   run!;
