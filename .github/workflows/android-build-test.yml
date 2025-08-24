@@ -1,5 +1,8 @@
 name: Android Build & Test
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ master, submission-v* ]
