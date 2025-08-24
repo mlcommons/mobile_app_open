@@ -343,12 +343,8 @@ jobs:
             device: "Samsung Galaxy S25 Ultra-15.0"
           - backend: "qti"
             device: "Samsung Galaxy S25-15.0"
-          - backend: "mtk"
-            device: "Samsung Galaxy Tab S10 Plus-15.0"
           - backend: "qti"
             device: "Samsung Galaxy S24 Ultra-14.0"
-          - backend: "samsung"
-            device: "Samsung Galaxy S24-14.0"
           - backend: "qti"
             device: "Samsung Galaxy Tab A9 Plus-14.0"
           - backend: "qti"
@@ -357,6 +353,9 @@ jobs:
             device: "Samsung Galaxy S23-13.0"
           - backend: "qti"
             device: "Samsung Galaxy Tab S9-13.0"
+
+          - backend: "samsung"
+            device: "Samsung Galaxy S24-14.0"
           - backend: "samsung"
             device: "Samsung Galaxy S22 Ultra-12.0"
           - backend: "samsung"
@@ -365,8 +364,17 @@ jobs:
             device: "Samsung Galaxy S22-12.0"
           - backend: "samsung"
             device: "Samsung Galaxy S21-12.0"
-          - backend: "qti"
-            device: "Samsung Galaxy Tab S8-12.0"
+
+          - backend: "pixel"
+            device: "Pixel 9 Pro XL-15.0"
+          - backend: "pixel"
+            device: "Pixel 9 Pro-15.0"
+          - backend: "pixel"
+            device: "Pixel 9-15.0"
+          - backend: "pixel"
+            device: "Pixel 8 Pro-14.0"
+          - backend: "pixel"
+            device: "Pixel 8-14.0"
     env:
       MAIN_APK_NAME: test-main-unified-${{ github.run_number }}.apk
       HELPER_APK_NAME: test-helper-unified-${{ github.run_number }}.apk
