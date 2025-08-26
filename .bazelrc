@@ -51,15 +51,17 @@ build:android_x86_64 --fat_apk_cpu=x86_64
 # Linux configs
 build:linux_x86_64 --config=linux
 build:linux_x86_64 --cpu=k8
+# Not required, but enables the proper SSE/MMX instructions per CPU
+build:linux_x86_64 --copt=-march=native
 
 # These are neccessary because the compiler that bazel 6.3 uses doesn't support VNNI
-build:linux_x86_64 --define=xnn_enable_avx=false
-build:linux_x86_64 --define=xnn_enable_avx2=false
-build:linux_x86_64 --define=xnn_enable_avx512=false
+#build:linux_x86_64 --define=xnn_enable_avx=false
+#build:linux_x86_64 --define=xnn_enable_avx2=false
+#build:linux_x86_64 --define=xnn_enable_avx512=false
 build:linux_x86_64 --define=xnn_enable_avx512fp16=false
-build:linux_x86_64 --define=xnn_enable_avxvnni=false
+#build:linux_x86_64 --define=xnn_enable_avxvnni=false
 build:linux_x86_64 --define=xnn_enable_avxvnniint8=false
-build:linux_x86_64 --define=xnn_enable_vnni=false
+#build:linux_x86_64 --define=xnn_enable_vnni=false
 
 # Optional, enable for debugging or compilation errors
 #build:linux_x86_64 --action_env=CC=gcc
