@@ -10,6 +10,7 @@
 #include <vector>
 #include <set>
 
+//#include "src/sentencepiece_processor.h"
 #include "flutter/cpp/dataset.h"
 #include "flutter/cpp/datasets/squad_utils/tfrecord_reader.h"
 
@@ -38,14 +39,18 @@ class MmluGen : public Dataset {
 
   std::string ComputeAccuracyString() override;
 
+
  private:
+  //void loadSentencePieceProcessor(std::string path);
+
   const std::string name_ = "MmluGen";
 
   TFRecordReader sample_reader_;
+  //sentencepiece::SentencePieceProcessor sp_processor;
 
   struct PromptSample {
     std::string input;
-    std::string correct_answer;
+    std::string answer;
   };
 
   std::vector<std::unique_ptr<PromptSample>> samples_;

@@ -98,7 +98,6 @@ const char *LLMPipeline::backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
   return backend_data->vendor;
 }
 
-// TODO: Return the name of the accelerator.
 const char *LLMPipeline::backend_accelerator_name(mlperf_backend_ptr_t backend_ptr) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
   return backend_data->accelerator;
@@ -129,6 +128,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(mlperf_backend_ptr_t backend_pt
   int max_seq_size = prefill_input->dims->data[1];
   int kv_cache_max_size = kv_cache_k_0->dims->data[1];
   int prefill_seq_size = std::min(static_cast<int>(backend_data->prompt_tokens.size()), max_seq_size);
+  int decode_input_size = std::max(static_cast<int>(backend_data->prompt_tokens.size()) - max_seq_size, 0); // Making sure the decode seq isn't negative for later subtractions
 
   std::memset(prefill_input->data.i32, 0, prefill_input->bytes);
   std::memset(prefill_input_pos->data.i32, 0, prefill_input_pos->bytes);
@@ -139,24 +139,37 @@ mlperf_status_t LLMPipeline::backend_issue_query(mlperf_backend_ptr_t backend_pt
 
   MINIMAL_CHECK(backend_data->prefill_runner->Invoke() == kTfLiteOk);
 
-  int decode_steps = kv_cache_max_size - prefill_seq_size;
+  // Use a manual number for maximum tokens to generate as long as it's not larger than the KV cache can handle
+  int decode_steps = std::min(backend_data->max_output_tokens+decode_input_size, kv_cache_max_size - prefill_seq_size);
   MINIMAL_CHECK(decode_steps > 0);
 
   std::vector<int> output_tokens;
-  output_tokens.reserve(decode_steps);
+  output_tokens.reserve(decode_steps - decode_input_size);
   int next_token = backend_data->prompt_tokens[prefill_seq_size - 1];
   int next_position = prefill_seq_size - 1;
+  int next_input_position = 0; // only used if we need to put input in the decode runner
   for (int i = 0; i < decode_steps; ++i) {
     decode_input->data.i32[0] = next_token;
     decode_input_pos->data.i32[0] = next_position;
     MINIMAL_CHECK(backend_data->decode_runner->Invoke() == kTfLiteOk);
-    next_token = GreedySampler(backend_data->decode_runner->output_tensor("logits"));
-    output_tokens.push_back(next_token);
+
+    // if the input is larger than the maximum prefill size, the decode step takes the rest, without checking logits
+    if (decode_input_size > 0 && next_input_position < decode_input_size) {
+      next_token = backend_data->prompt_tokens[max_seq_size + next_input_position++];
+      //LOG(INFO) << "position is " << std::to_string(next_input_position) << "/" << std::to_string(decode_seq_size) << std::endl;
+    }
+    else {
+      next_token = GreedySampler(backend_data->decode_runner->output_tensor("logits"));
+      LOG(INFO) << backend_data->sp_processor->IdToPiece(next_token) << std::endl;
+      if (next_token == backend_data->stop_token_id) break;
+      output_tokens.push_back(next_token);
+    }
     next_position += 1;
-    if (next_token == backend_data->stop_token_id) break;
   }
 
   MINIMAL_CHECK(backend_data->sp_processor->Decode(output_tokens, &backend_data->output).ok());
+
+  LOG(INFO) << "Output: " << backend_data->output << std::endl;
 
   return MLPERF_SUCCESS;
 }
@@ -167,8 +180,9 @@ mlperf_status_t LLMPipeline::backend_flush_queries(mlperf_backend_ptr_t backend_
 }
 
 // Return the number of inputs of the model.
+// Only 1 input needs to be provided, which is the tokens themselves, the other inputs are handled by the pipeline
 int32_t LLMPipeline::backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
-  return 2;
+  return 1;
 }
 
 // Return the type of the ith input.
@@ -181,7 +195,10 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
 
   std::string prompt = std::string(static_cast<char*>(data));
-  MINIMAL_CHECK(backend_data->sp_processor->Encode(prompt, &backend_data->prompt_tokens).ok()); //TODO
+
+
+  LOG(INFO) << "Input: " << prompt << std::endl;
+  MINIMAL_CHECK(backend_data->sp_processor->Encode(prompt, &backend_data->prompt_tokens).ok());
 
   if (!backend_data->start_token.empty()) {
     backend_data->prompt_tokens.insert(backend_data->prompt_tokens.begin(), backend_data->sp_processor->PieceToId((backend_data->start_token)));
@@ -295,17 +312,26 @@ tflite::SignatureRunner *LLMPipeline::GetPrefillRunner(tflite::Interpreter* inte
   tflite::SignatureRunner* runner = nullptr;
   //int best_seq_size = -1;
   size_t delta = std::numeric_limits<size_t>::max();
+  size_t max_prefill_size = 0;
+  std::string max_prefill_key = std::string("");
   for (const std::string* key : interpreter->signature_keys()) {
     if (key->find("prefill") == std::string::npos) continue;
     TfLiteTensor* input_pos = interpreter->GetSignatureRunner(key->c_str())->input_tensor("input_pos");
     // The expected shape for input position is [Seq].
     size_t seq_size = input_pos->dims->data[0];
+    //TODO this could be else maybe?
+    if (seq_size > max_prefill_size) {
+      max_prefill_size = seq_size;
+      max_prefill_key = std::string(key->c_str());
+    }
     if (num_input_tokens <= seq_size && seq_size - num_input_tokens < delta) {
       runner = interpreter->GetSignatureRunner(key->c_str());
       //best_seq_size = seq_size;
       delta = seq_size - num_input_tokens;
     }
   }
+  //fallback to maximum possible size if a runner is not found (most likely because the seq_size is larger than max_prefill_size)
+  if (!runner && max_prefill_key != "") runner = interpreter->GetSignatureRunner(max_prefill_key.c_str());
   MINIMAL_CHECK_PTR(runner != nullptr);
   PrepareRunner(runner, kv_cache);
   return runner;

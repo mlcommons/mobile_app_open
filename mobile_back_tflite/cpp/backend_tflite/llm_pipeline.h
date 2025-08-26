@@ -86,7 +86,8 @@ struct LLMBackendData {
   kv_cache_t kv_cache;
   //std::string input_prompt;
   std::vector<int> prompt_tokens;
-  uint8_t threads = 1;
+  uint8_t threads = 30;
+  uint32_t max_output_tokens = 2;
   std::string start_token = "<bos>";
   std::string end_token = "<eos>";
   int stop_token_id = -1;
