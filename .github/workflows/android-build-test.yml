@@ -350,8 +350,6 @@ jobs:
           - backend: "qti"
             device: "Samsung Galaxy S24 Ultra-14.0"
           - backend: "qti"
-            device: "Samsung Galaxy Tab A9 Plus-14.0"
-          - backend: "qti"
             device: "Samsung Galaxy S23 Ultra-13.0"
           - backend: "qti"
             device: "Samsung Galaxy S23-13.0"
