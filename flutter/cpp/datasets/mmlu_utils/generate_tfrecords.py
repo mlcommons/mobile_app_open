@@ -3,30 +3,46 @@ import pandas as pd
 import argparse
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Convert a CSV of LLM prompts to TFRecord format.")
-    parser.add_argument('--input_file', type=str, required=True, help="Path to the input CSV file.")
+    parser = argparse.ArgumentParser(description="Convert a Parquet of LLM prompts to TFRecord format.")
+    parser.add_argument('--input_file', type=str, required=True, help="Path to the input Parquet (.parquet) file.")
     parser.add_argument('--output_file', type=str, required=True, help="Path to the output TFRecord file.")
     return parser.parse_args()
 
 def map_answer(num):
-    return {1: "A", 2: "B", 3: "C", 4: "D"}.get(num, "X")  # Use 'X' as fallback
+    return {0: "A", 1: "B", 2: "C", 3: "D"}.get(num, "X")  # Use 'X' as fallback
 
 def create_example(input_text, answer_letter):
     return tf.train.Example(features=tf.train.Features(feature={
-        "input": tf.train.Feature(bytes_list=tf.train.BytesList(value=[input_text.encode()])),
+        "input": tf.train.Feature(bytes_list=tf.train.BytesList(value=[str(input_text).encode()])),
         "answer": tf.train.Feature(bytes_list=tf.train.BytesList(value=[answer_letter.encode()])),
     }))
 
 def main():
     args = parse_args()
-    df = pd.read_csv(args.input_file)
+
+    # Read Parquet (requires 'pyarrow' or 'fastparquet')
+    try:
+        df = pd.read_parquet(args.input_file)
+    except ImportError as e:
+        raise ImportError(
+            "Reading Parquet requires 'pyarrow' or 'fastparquet'. "
+            "Install one, e.g. `pip install pyarrow`."
+        ) from e
 
     if "input_formatted" not in df.columns or "answer" not in df.columns:
-        raise ValueError("CSV must contain 'input_formatted' and 'answer' columns.")
+        raise ValueError("Parquet must contain 'input_formatted' and 'answer' columns.")
 
-    df["answer_letter"] = df["answer"].map(map_answer)
+    # Robustly map numeric answers to letters
+    def to_letter(x):
+        try:
+            return map_answer(int(x))
+        except (ValueError, TypeError):
+            return "X"
 
-    with tf.io.TFRecordWriter(args.output_file) as writer:
+    df["answer_letter"] = df["answer"].apply(to_letter)
+
+    options = tf.io.TFRecordOptions(compression_type="ZLIB")
+    with tf.io.TFRecordWriter(args.output_file, options=options) as writer:
         for _, row in df.iterrows():
             example = create_example(row["input_formatted"], row["answer_letter"])
             writer.write(example.SerializeToString())
