@@ -15,8 +15,10 @@ import 'package:mlperfbench/ui/nil.dart';
 
 class ResourcesScreen extends StatefulWidget {
   final bool autoStart;
+  final Benchmark? singleBenchmarkDownload;
 
-  const ResourcesScreen({this.autoStart = false, super.key});
+  const ResourcesScreen(
+      {this.autoStart = false, this.singleBenchmarkDownload, super.key});
 
   @override
   State<ResourcesScreen> createState() => _ResourcesScreen();
@@ -36,7 +38,9 @@ class _ResourcesScreen extends State<ResourcesScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await state.loadResources(
           downloadMissing: true,
-          benchmarks: state.activeBenchmarks,
+          benchmarks: widget.singleBenchmarkDownload != null
+              ? [widget.singleBenchmarkDownload!]
+              : state.activeBenchmarks,
         );
         if (state.error != null) {
           if (!mounted) return;
@@ -102,9 +106,13 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _downloadStatus(
-                benchmark, store.selectedBenchmarkRunMode.performanceRunMode),
-            _downloadStatus(
                 benchmark, store.selectedBenchmarkRunMode.accuracyRunMode),
+            const SizedBox(
+              width: 4,
+              height: 4,
+            ),
+            _downloadStatus(
+                benchmark, store.selectedBenchmarkRunMode.performanceRunMode),
           ],
         ),
       ),
@@ -118,27 +126,25 @@ class _ResourcesScreen extends State<ResourcesScreen> {
       builder: (BuildContext context,
           AsyncSnapshot<Map<bool, List<String>>> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
-          const double size = 18;
-          const downloadedIcon =
-              Icon(Icons.download_done, size: size, color: Colors.green);
-          const notDownloadedIcon =
-              Icon(Icons.download_done, size: size, color: Colors.grey);
+          const double size = 20;
           final result = snapshot.data!;
           final missing = result[false] ?? [];
           final existed = result[true] ?? [];
           final downloaded = missing.isEmpty;
-          return TextButton.icon(
-            icon: downloaded ? downloadedIcon : notDownloadedIcon,
-            label: Text(
-              mode.readable,
-              style: const TextStyle(color: AppColors.darkText),
-            ),
-            //iconAlignment: IconAlignment.start,
+          final Color statusColor = downloaded ? Colors.green : Colors.grey;
+          final Icon statusIcon = Icon(
+              mode.loadgenMode == LoadgenModeEnum.performanceOnly
+                  ? Icons.speed_outlined
+                  : Icons.adjust_outlined,
+              size: size,
+              color: statusColor);
+          return TextButton(
             style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: const Size(50, 30),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: const Size(32, 32),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                alignment: Alignment.centerLeft),
+                alignment: Alignment.centerLeft,
+                backgroundColor: Colors.grey[200]),
             onPressed: () {
               showDialog(
                 context: context,
@@ -152,6 +158,20 @@ class _ResourcesScreen extends State<ResourcesScreen> {
                 },
               );
             },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                statusIcon,
+                const SizedBox(
+                  width: 4,
+                ),
+                Text(
+                  mode.readable,
+                  style: const TextStyle(color: AppColors.darkText),
+                ),
+              ],
+            ),
           );
         } else {
           return Text(l10n.resourceChecking);

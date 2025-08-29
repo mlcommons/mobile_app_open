@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/settings/resources_screen.dart';
@@ -121,11 +122,12 @@ Future<void> showErrorDialog(
 }
 
 Future<void> showResourceMissingDialog(
-    BuildContext context, List<String> messages) async {
+    BuildContext context, List<String> messages,
+    {Benchmark? benchmark}) async {
   final l10n = AppLocalizations.of(context)!;
 
-  Icon icon =
-      const Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 32);
+  Icon icon = const Icon(Icons.warning_amber_rounded,
+      color: AppColors.warningIcon, size: 32);
   Color titleColor = Colors.grey;
 
   await showDialog(
@@ -165,7 +167,11 @@ Future<void> showResourceMissingDialog(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.dialogContentMissingFiles),
+              Text(benchmark != null
+                  ? l10n.dialogContentMissingFiles
+                      .replaceAll('<name>', benchmark.info.taskName)
+                  : l10n.dialogContentMissingFiles
+                      .replaceAll('<name>', l10n.benchNameVarious)),
             ],
           ),
         ),
@@ -190,8 +196,9 @@ Future<void> showResourceMissingDialog(
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const ResourcesScreen(
+                        builder: (context) => ResourcesScreen(
                           autoStart: true,
+                          singleBenchmarkDownload: benchmark,
                         ),
                       ),
                     );

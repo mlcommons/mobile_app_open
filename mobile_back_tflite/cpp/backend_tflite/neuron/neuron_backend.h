@@ -343,4 +343,6 @@ bool neuron_issue_query(neuron_backend_ptr_t backend_ptr);
 bool neuron_convert_input(neuron_backend_ptr_t backend_ptr, int bytes,
                           void *data);
 
+std::string GetPlatformName();
+
 #endif
