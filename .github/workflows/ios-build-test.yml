@@ -14,6 +14,9 @@ jobs:
     timeout-minutes: 180
     env:
       PERF_TEST: true
+      # Because iPhone simulator on GitHub Actions is not reliable, and caused a lot of test failures,
+      # we run only 1 benchmark to validate the build.
+      BENCHMARK_IDS: "image_classification_v2"
       WITH_APPLE: 1
       WITH_TFLITE: 1
       WITH_PIXEL: 0
