@@ -347,8 +347,9 @@ jobs:
         include:
           - backend: "qti"
             device: "Samsung Galaxy S25-15.0"
-          - backend: "qti"
-            device: "Samsung Galaxy S24 Ultra-14.0"
+          # Comment out S24 Ultra-14.0 until we have a fix for it.
+          # - backend: "qti"
+          #  device: "Samsung Galaxy S24 Ultra-14.0"
           - backend: "qti"
             device: "Samsung Galaxy S23 Ultra-13.0"
           - backend: "qti"
