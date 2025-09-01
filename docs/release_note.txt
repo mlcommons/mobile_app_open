@@ -1,0 +1,17 @@
+First Play Store release. This release should be broadly compatible with newer Android devices.
+
+In testing, we found issues with the following devices:
+
+Samsung:
+Galaxy Tab S10 Plus
+Galaxy Tab A9 Plus
+Galaxy Tab S8
+Galaxy A52
+Galaxy Tab S7
+
+Google:
+Pixel 5
+
+Also, support for devices based on the Mediatek Dimensity 9400 SoC will be available soon.
+
+For user support or questions, please feel free to open issues in the MLPerf Mobile app GitHub repo.
