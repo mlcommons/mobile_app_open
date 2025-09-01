@@ -439,7 +439,7 @@ int Main(int argc, char *argv[]) {
                       batch_size);
   driver.RunMLPerfTest(mode, min_query_count, min_duration_ms / 1000.0,
                        max_duration_ms / 1000.0,
-                       single_stream_expected_latency_ns, output_dir);
+                       single_stream_expected_latency_ns, output_dir, benchmark_id=="llm");
   LOG(INFO) << "Accuracy: " << driver.ComputeAccuracyString();
   return 0;
 }

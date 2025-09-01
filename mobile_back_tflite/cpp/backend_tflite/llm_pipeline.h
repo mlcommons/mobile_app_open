@@ -58,9 +58,9 @@ class AlignedAllocator {
   T* allocate(std::size_t n) {
     void* ptr;
     std::size_t size = n * sizeof(T);
-    std::size_t padding = tflite::kDefaultTensorAlignment -
-                          (size % tflite::kDefaultTensorAlignment);
-    size += padding;
+    //std::size_t padding = tflite::kDefaultTensorAlignment -
+    //                      (size % tflite::kDefaultTensorAlignment);
+    //size += padding;
     int ret = posix_memalign(&ptr, tflite::kDefaultTensorAlignment, size);
     if (ret != 0) {
       return nullptr;
@@ -86,12 +86,13 @@ struct LLMBackendData {
   kv_cache_t kv_cache;
   //std::string input_prompt;
   std::vector<int> prompt_tokens;
+  std::vector<int> output_tokens;
+  std::string output;
   uint8_t threads = 30;
-  uint32_t max_output_tokens = 2;
+  int max_output_tokens = 2;
   std::string start_token = "<bos>";
   std::string end_token = "<eos>";
   int stop_token_id = -1;
-  std::string output;
 
   LLMBackendData(){}
 
@@ -132,6 +133,10 @@ class LLMPipeline : public Pipeline {
       mlperf_backend_ptr_t backend_ptr) override;
 
   const char *backend_name(mlperf_backend_ptr_t backend_ptr) override;
+
+
+  mlperf_status_t backend_issue_first_token_query(
+      mlperf_backend_ptr_t backend_ptr) override;
 
   mlperf_status_t backend_issue_query(
       mlperf_backend_ptr_t backend_ptr) override;

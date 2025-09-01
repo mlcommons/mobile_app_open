@@ -27,12 +27,7 @@ limitations under the License.
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/utils.h"
 #include "tensorflow/lite/c/common.h"
-#if __ANDROID__
-#include <sys/system_properties.h>
 
-#include "tensorflow/lite/delegates/gpu/delegate.h"
-#include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
-#endif
 #include "tensorflow/core/platform/logging.h"
 
 #ifdef __cplusplus
@@ -89,6 +84,10 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(const char *model_path, mlperf_
     return nullptr;
   }
 
+  if (!backend_data->end_token.empty()) {
+    backend_data->stop_token_id = backend_data->sp_processor->PieceToId((backend_data->end_token));
+  }
+
   return backend_data;
 }
 
@@ -109,12 +108,12 @@ const char *LLMPipeline::backend_name(mlperf_backend_ptr_t backend_ptr) {
   return backend_data->name;
 }
 
-// Run the inference for a sample.
-mlperf_status_t LLMPipeline::backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+//TODO this needs to include all token processing until the model produces the first output token
+mlperf_status_t LLMPipeline::backend_issue_first_token_query(mlperf_backend_ptr_t backend_ptr) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
 
-  // Get Input Tensors for each of the runners.
-  // Shape: [Batch, Seq], Dtype: int32
+          // Get Input Tensors for each of the runners.
+          // Shape: [Batch, Seq], Dtype: int32
   TfLiteTensor* prefill_input = backend_data->prefill_runner->input_tensor("tokens");
   // Shape: [Seq], Dtype: int32
   TfLiteTensor* prefill_input_pos = backend_data->prefill_runner->input_tensor("input_pos");
@@ -139,43 +138,87 @@ mlperf_status_t LLMPipeline::backend_issue_query(mlperf_backend_ptr_t backend_pt
 
   MINIMAL_CHECK(backend_data->prefill_runner->Invoke() == kTfLiteOk);
 
-  // Use a manual number for maximum tokens to generate as long as it's not larger than the KV cache can handle
-  int decode_steps = std::min(backend_data->max_output_tokens+decode_input_size, kv_cache_max_size - prefill_seq_size);
-  MINIMAL_CHECK(decode_steps > 0);
+          // Use a manual number for maximum tokens to generate as long as it's not larger than the KV cache can handle
+  int decode_steps = decode_input_size;
 
-  std::vector<int> output_tokens;
-  output_tokens.reserve(decode_steps - decode_input_size);
+          //backend_data->output_tokens.reserve(decode_steps - decode_input_size);
   int next_token = backend_data->prompt_tokens[prefill_seq_size - 1];
   int next_position = prefill_seq_size - 1;
   int next_input_position = 0; // only used if we need to put input in the decode runner
+  for (int i = 0; i < decode_steps-1; ++i) {
+    decode_input->data.i32[0] = next_token;
+    decode_input_pos->data.i32[0] = next_position;
+    MINIMAL_CHECK(backend_data->decode_runner->Invoke() == kTfLiteOk);
+    // if the input is larger than the maximum prefill size, the decode step takes the rest, without checking logits
+    next_token = backend_data->prompt_tokens[max_seq_size + next_input_position++];
+      //LOG(INFO) << "position is " << std::to_string(next_input_position) << "/" << std::to_string(decode_seq_size) << std::endl;
+    next_position += 1;
+  }
+
+  return MLPERF_SUCCESS;
+}
+
+// Run the inference for a sample.
+mlperf_status_t LLMPipeline::backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+  LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+
+  // Get Input Tensors for each of the runners.
+  // Shape: [Batch, Seq], Dtype: int32
+  TfLiteTensor* prefill_input = backend_data->prefill_runner->input_tensor("tokens");
+  // Shape: [Seq], Dtype: int32
+  TfLiteTensor* prefill_input_pos = backend_data->prefill_runner->input_tensor("input_pos");
+  // Shape: [Batch, Seq], Dtype: int32
+  TfLiteTensor* decode_input = backend_data->decode_runner->input_tensor("tokens");
+  // Shape: [Seq], Dtype: int32
+  TfLiteTensor* decode_input_pos = backend_data->decode_runner->input_tensor("input_pos");
+  // shape: [Batch, kv_cache_max, num_query_groups, head_dim]
+  TfLiteTensor* kv_cache_k_0 = backend_data->decode_runner->input_tensor("kv_cache_k_0");
+
+  int kv_cache_max_size = kv_cache_k_0->dims->data[1];
+  size_t input_size = backend_data->prompt_tokens.size();
+
+  //std::memset(prefill_input->data.i32, 0, prefill_input->bytes);
+  //std::memset(prefill_input_pos->data.i32, 0, prefill_input_pos->bytes);
+  //for (int i = 0; i < prefill_seq_size - 1; ++i) {
+  //  prefill_input->data.i32[i] = backend_data->prompt_tokens[i];
+  //  prefill_input_pos->data.i32[i] = i;
+  //}
+
+  //MINIMAL_CHECK(backend_data->prefill_runner->Invoke() == kTfLiteOk);
+
+  // Use a manual number for maximum tokens to generate as long as it's not larger than the KV cache can handle
+  int decode_steps = std::min(backend_data->max_output_tokens, kv_cache_max_size - (static_cast<int>(input_size) - 1));
+  MINIMAL_CHECK(decode_steps > 0);
+
+  //backend_data->output_tokens.reserve(decode_steps - decode_input_size);
+  int next_token = backend_data->prompt_tokens[input_size - 1];
+  int next_position = input_size - 1;
   for (int i = 0; i < decode_steps; ++i) {
     decode_input->data.i32[0] = next_token;
     decode_input_pos->data.i32[0] = next_position;
     MINIMAL_CHECK(backend_data->decode_runner->Invoke() == kTfLiteOk);
 
-    // if the input is larger than the maximum prefill size, the decode step takes the rest, without checking logits
-    if (decode_input_size > 0 && next_input_position < decode_input_size) {
-      next_token = backend_data->prompt_tokens[max_seq_size + next_input_position++];
-      //LOG(INFO) << "position is " << std::to_string(next_input_position) << "/" << std::to_string(decode_seq_size) << std::endl;
-    }
-    else {
-      next_token = GreedySampler(backend_data->decode_runner->output_tensor("logits"));
-      LOG(INFO) << backend_data->sp_processor->IdToPiece(next_token) << std::endl;
-      if (next_token == backend_data->stop_token_id) break;
-      output_tokens.push_back(next_token);
-    }
+    next_token = GreedySampler(backend_data->decode_runner->output_tensor("logits"));
+    //LOG(INFO) << backend_data->sp_processor->IdToPiece(next_token) << std::endl;
+    if (next_token == backend_data->stop_token_id) break;
+    backend_data->output_tokens.push_back(next_token);
     next_position += 1;
   }
-
-  MINIMAL_CHECK(backend_data->sp_processor->Decode(output_tokens, &backend_data->output).ok());
-
-  LOG(INFO) << "Output: " << backend_data->output << std::endl;
 
   return MLPERF_SUCCESS;
 }
 
 // Flush the staged queries immediately.
 mlperf_status_t LLMPipeline::backend_flush_queries(mlperf_backend_ptr_t backend_ptr) {
+  LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+
+  backend_data->prompt_tokens.clear();
+  backend_data->output_tokens.clear();
+
+  for (auto& [_, vec]: backend_data->kv_cache) {
+    std::fill(vec.begin(), vec.end(), 0.0f);
+  }
+
   return MLPERF_SUCCESS;
 }
 
@@ -204,12 +247,6 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
     backend_data->prompt_tokens.insert(backend_data->prompt_tokens.begin(), backend_data->sp_processor->PieceToId((backend_data->start_token)));
   }
 
-  // NOTE block below can be moved safely to backend_create
-  if (!backend_data->end_token.empty()) {
-    backend_data->stop_token_id = backend_data->sp_processor->PieceToId((backend_data->end_token));
-  }
-  // ---
-
   uint16_t effective_prefill_token_size = backend_data->prompt_tokens.size() - 1; //assuming max tokens is <16k
 
   backend_data->prefill_runner = GetPrefillRunner(backend_data->interpreter, effective_prefill_token_size, backend_data->kv_cache);
@@ -220,7 +257,7 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
 
 // Return the number of outputs for the model.
 int32_t LLMPipeline::backend_get_output_count(mlperf_backend_ptr_t backend_ptr) {
-  return 1;
+  return 2; // 0 is the output string, 1 is the output tokens
 }
 
 // Return the type of ith output.
@@ -232,12 +269,17 @@ mlperf_data_t LLMPipeline::backend_get_output_type(mlperf_backend_ptr_t backend_
 mlperf_status_t LLMPipeline::backend_get_output(mlperf_backend_ptr_t backend_ptr, uint32_t batch_index, int32_t i, void **data) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
 
-  if (i == 0) {
-    *data = backend_data->output.data();
-    return MLPERF_SUCCESS;
-  }
+  if (i == 0){
+    MINIMAL_CHECK(backend_data->sp_processor->Decode(backend_data->output_tokens, &backend_data->output).ok());
+    LOG(INFO) << "Output: " << backend_data->output << std::endl;
 
-  return MLPERF_FAILURE;
+    *data = backend_data->output.data();
+  }
+  else if (i == 1) {
+    *data = &backend_data->output_tokens;
+  }
+  else return MLPERF_FAILURE;
+  return MLPERF_SUCCESS;
 }
 
 void LLMPipeline::backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height, uint8_t *data) {}
@@ -287,9 +329,9 @@ kv_cache_t LLMPipeline::BuildKVCache(tflite::Interpreter* interpreter) {
     TfLiteTensor* tensor = runner->input_tensor(k_cache_name.c_str());
     size_t count = tensor->bytes / sizeof(float);
     kv_cache.emplace(k_cache_name,
-                     std::vector<float, AlignedAllocator<float>>(count, 0.0));
+                     std::vector<float, AlignedAllocator<float>>(count, 0.0f));
     kv_cache.emplace(v_cache_name,
-                     std::vector<float, AlignedAllocator<float>>(count, 0.0));
+                     std::vector<float, AlignedAllocator<float>>(count, 0.0f));
   }
 
   return kv_cache;

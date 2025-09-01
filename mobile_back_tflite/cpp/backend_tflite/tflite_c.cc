@@ -186,6 +186,10 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
   reset_pipeline();
 }
 
+mlperf_status_t mlperf_backend_issue_first_token_query(mlperf_backend_ptr_t backend_ptr) {
+  return pipeline->backend_issue_first_token_query(backend_ptr);
+}
+
 // Run the inference for a sample.
 mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
   return pipeline->backend_issue_query(backend_ptr);

@@ -12,6 +12,7 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord/*, const st
     : sample_reader_(input_tfrecord), Dataset(backend) {
   std::cout << "MMLUT-DATASET: " << "Initializing with TFRecord " << input_tfrecord << " with sample size " << std::to_string(sample_reader_.Size()) << std::endl;
   // Load all TFRecord samples into memory
+  //TODO move to MmluGen::LoadSamplesToRam?
   for (size_t i = 0; i < sample_reader_.Size(); i++) {
     tensorflow::tstring record = sample_reader_.ReadRecord(i);
     tensorflow::Example example;
@@ -26,12 +27,13 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord/*, const st
     std::cout << "MMLUT-DATASET: " << "Loading TFRecord Data index " << std::to_string(i) << " with answer {" << answer << "}" << std::endl;
 
     samples_.push_back(std::move(sample));
+    sample_output_token_counts_.push_back(0);
   }
   //LoadSentencePieceProcessor(input_sppp);
 }
 
 void MmluGen::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
-  std::cout << "MMLUT-DATASET: " << "Loading Samples..." << std::endl;
+  std::cout << "MMLUT-DATASET: " << "Loading " << std::to_string(samples.size()) << " samples..." << std::endl;
   for (auto id : samples) {
     loaded_sample_ids_.insert(id);
   }
@@ -55,6 +57,7 @@ std::vector<void*> MmluGen::GetData(int sample_idx) {
 std::vector<uint8_t> MmluGen::ProcessOutput(const int sample_idx, const std::vector<void*>& outputs) {
   if (sample_idx >= samples_.size() || outputs.empty()) return {0};
 
+  sample_output_token_counts_[sample_idx] = reinterpret_cast<std::vector<int>*>(outputs[1])->size();
   const char* prediction = reinterpret_cast<const char*>(outputs[0]);
   char predicted_char = prediction[1];  // Assume second token is the answer because of whitespace (e.g., 'A', 'B', ...)
   std::cout << "MMLUT-DATASET: " << "Predicted answer: " << predicted_char << std::endl;
@@ -67,6 +70,11 @@ std::vector<uint8_t> MmluGen::ProcessOutput(const int sample_idx, const std::vec
   std::cout << "MMLUT-DATASET: " << "Accuracy: " << std::to_string(correct_) << "/" << std::to_string(total_) << std::endl;
 
   return {static_cast<uint8_t>(is_correct)};
+}
+
+
+int64_t MmluGen::GetOutputTokenCount(const int sample_idx) {
+  return sample_output_token_counts_[sample_idx];
 }
 
 bool MmluGen::HasAccuracy() {

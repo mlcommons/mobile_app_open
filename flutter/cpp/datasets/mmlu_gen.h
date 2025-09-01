@@ -25,6 +25,8 @@ class MmluGen : public Dataset {
 
   size_t TotalSampleCount() override { return samples_.size(); }
 
+  size_t PerformanceSampleCount() override { return 1; }
+
   void LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) override;
 
   void UnloadSamplesFromRam(const std::vector<QuerySampleIndex>& samples) override;
@@ -32,6 +34,8 @@ class MmluGen : public Dataset {
   std::vector<void*> GetData(int sample_idx) override;
 
   std::vector<uint8_t> ProcessOutput(const int sample_idx, const std::vector<void*>& outputs) override;
+
+  int64_t GetOutputTokenCount(const int sample_idx) override;
 
   bool HasAccuracy() override;
 
@@ -54,6 +58,7 @@ class MmluGen : public Dataset {
   };
 
   std::vector<std::unique_ptr<PromptSample>> samples_;
+  std::vector<int64_t> sample_output_token_counts_;
   std::set<int> loaded_sample_ids_;
 
   size_t correct_ = 0;

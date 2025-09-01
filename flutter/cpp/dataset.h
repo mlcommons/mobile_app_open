@@ -60,6 +60,10 @@ class Dataset : public ::mlperf::QuerySampleLibrary {
   virtual std::vector<uint8_t> ProcessOutput(
       const int sample_idx, const std::vector<void*>& outputs) = 0;
 
+  // Should be called after ProcessOutput.
+  virtual int64_t GetOutputTokenCount(
+      const int sample_idx) {return 0;}
+
   virtual bool HasAccuracy() { return false; }
 
   // ComputeAccuracy calculates the accuracy of the processed outputs. This
