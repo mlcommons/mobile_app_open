@@ -37,15 +37,15 @@ jobs:
       FIREBASE_CRASHLYTICS_ENABLED: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
       - name: Cache CocoaPods
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: ${{ github.workspace }}/flutter/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
           restore-keys: ${{ runner.os }}-pods-
       - name: Cache bazel
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: /tmp/bazel_cache
           key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
@@ -62,7 +62,7 @@ jobs:
       - name: Build iOS integration tests
         run: |
           cd flutter && flutter --no-version-check build ios --simulator integration_test/first_test.dart
-      - uses: nick-fields/retry@v3
+      - uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
         name: Run iOS integration tests
         with:
           timeout_minutes: 120

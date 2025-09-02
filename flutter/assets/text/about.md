@@ -13,10 +13,7 @@ Google Pixel smartphones use the Android NNAPI run time. The Android Neural Netw
 
 The MLPerf app uses NNAPI on the following families:
 
-* Pixel 9 and Pixel 9 Pro (Tensor G4 SoC)
-* Pixel 8 and Pixel 8 Pro (Tensor G3 SoC)
-* Pixel 7 and Pixel 7 Pro (Tensor G2 ScC)
-* Pixel 6 and Pixel 6 Pro (Tensor G1 ScC)
+* Pixel 10/9/8/7/6 and Pixel 10/9/8/7/6 Pro (Tensor G5/G4/G3/G2/G1 SoC)
 
 <!-- markdown-link-check-disable-next-line -->
 For More Info: [https://developer.android.com/ndk/guides/neuralnetworks](https://developer.android.com/ndk/guides/neuralnetworks)
@@ -27,7 +24,7 @@ The MediaTek Neuron Delegate is a TensorFlow Lite delegate designed to work with
 
 The MLPerf app uses the Neuron delegate on the following families:
 
-* Dimensity 9000 series (9000/9000+/9200/9200+/9300/9300+), 9400 support will be available soon.
+* Dimensity 9000 series (9000/9000+/9200/9200+/9300/9300+/9400)
 * Dimensity 8000 series (8000/8020/8050/8100/8200/8300)
 
 Link to MediaTek Neuron Delegate: [https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate](https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate)
