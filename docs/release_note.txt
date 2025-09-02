@@ -1,0 +1,16 @@
+For release 5.0.1
+
+This release should be broadly compatible with newer Android devices.
+
+In testing, we found issues with the following devices:
+
+Samsung:
+Galaxy Tab A9 Plus
+Galaxy Tab S8
+Galaxy A52
+Galaxy Tab S7
+
+Google:
+Pixel 5
+
+For user support or questions, please feel free to open issues in the MLPerf Mobile app GitHub repo.
