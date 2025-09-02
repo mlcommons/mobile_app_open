@@ -31,7 +31,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push Docker image (bake)
-        uses: docker/bake-action@v5
+        uses: docker/bake-action@4a9a8d494466d37134e2bfca2d3a8de8fb2681ad # v5.13.0
         with:
           push: true
           files: |
@@ -324,7 +324,7 @@ jobs:
           command: |
             bash .github/workflows/scripts/browserstack-app-automate.sh
       - name: Upload BrowserStack logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ github.run_number }}
@@ -369,13 +369,13 @@ jobs:
       HELPER_APK_NAME: test-helper-unified-${{ github.run_number }}.apk
       BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Set up authentication for Google Cloud SDK
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
         with:
           credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
       - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2.2.1
         with:
           version: '>= 363.0.0'
       - name: Download test APK
@@ -394,7 +394,7 @@ jobs:
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
           -F "file=@/tmp/$HELPER_APK_NAME" \
           -F "custom_id=$HELPER_APK_NAME"
-      - uses: nick-fields/retry@v3
+      - uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
         name: Trigger App Automate
         env:
           BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
