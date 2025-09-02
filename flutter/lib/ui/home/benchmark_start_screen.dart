@@ -126,7 +126,8 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                   return;
                 }
                 String checksumError = '';
-                // Show a simple progress indicator while computing checksums
+                // Show a simple progress indicator while validating checksums,
+                // since it can take some time to finish
                 if (context.mounted) {
                   unawaited(showDialog<void>(
                     context: context,

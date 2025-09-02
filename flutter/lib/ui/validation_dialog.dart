@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mlperfbench/localizations/app_localizations.dart';
 
 /// Non-dismissible validation progress dialog used while computing checksums.
 ///
@@ -9,6 +10,7 @@ class ValidationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PopScope(
       canPop: false,
       child: AlertDialog(
@@ -22,9 +24,9 @@ class ValidationDialog extends StatelessWidget {
             const SizedBox(height: 4),
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
-            const Text(
-              'Validating files...',
-              style: TextStyle(
+            Text(
+              l10n.dialogTitleChecksumValidation,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -32,7 +34,7 @@ class ValidationDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'This may take a minute depending on your device speed. Please keep the app open.',
+              l10n.dialogContentChecksumValidation,
               style: TextStyle(
                 fontSize: 13,
                 color: Colors.black.withOpacity(0.65),
