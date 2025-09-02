@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,7 @@ import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_config_section.dart';
+import 'package:mlperfbench/ui/validation_dialog.dart';
 
 class BenchmarkStartScreen extends StatefulWidget {
   const BenchmarkStartScreen({super.key});
@@ -123,8 +125,23 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                   await showResourceMissingDialog(context, [wrongPathError]);
                   return;
                 }
-                final checksumError = await state.validator
-                    .validateChecksum(l10n.dialogContentChecksumError);
+                String checksumError = '';
+                // Show a simple progress indicator while computing checksums
+                if (context.mounted) {
+                  unawaited(showDialog<void>(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => const ValidationDialog(),
+                  ));
+                }
+                try {
+                  checksumError = await state.validator
+                      .validateChecksum(l10n.dialogContentChecksumError);
+                } finally {
+                  if (context.mounted) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                  }
+                }
                 if (checksumError.isNotEmpty) {
                   if (!context.mounted) return;
                   final messages = [
