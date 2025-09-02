@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/ui/app_styles.dart';
 
 /// Non-dismissible validation progress dialog used while computing checksums.
 ///
@@ -14,6 +15,7 @@ class ValidationDialog extends StatelessWidget {
     return PopScope(
       canPop: false,
       child: AlertDialog(
+        backgroundColor: AppColors.dialogBackground,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -22,13 +24,17 @@ class ValidationDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 4),
-            const CircularProgressIndicator(),
+            const CircularProgressIndicator(
+              color: AppColors.primary,
+              strokeWidth: 3,
+            ),
             const SizedBox(height: 16),
             Text(
               l10n.dialogTitleChecksumValidation,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
+                color: AppColors.darkText,
               ),
               textAlign: TextAlign.center,
             ),
@@ -36,8 +42,8 @@ class ValidationDialog extends StatelessWidget {
             Text(
               l10n.dialogContentChecksumValidation,
               style: TextStyle(
-                fontSize: 13,
-                color: Colors.black.withOpacity(0.65),
+                fontSize: 14,
+                color: AppColors.darkText.withOpacity(0.65),
               ),
               textAlign: TextAlign.center,
             ),
