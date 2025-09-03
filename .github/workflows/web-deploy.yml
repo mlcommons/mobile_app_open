@@ -12,7 +12,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Build website
         env:
           REACT_APP_FIREBASE_WEB_API_KEY: ${{ secrets.FIREBASE_WEB_API_KEY }}
@@ -27,7 +27,7 @@ jobs:
           cd ./react
           yarn install --immutable --immutable-cache --check-cache
           yarn build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0.10.0
         name: Deploy to Firebase Hosting on Preview channel
         if: github.ref != 'refs/heads/master'
         with:
@@ -36,7 +36,7 @@ jobs:
           projectId: mobile-app-build-290400
           entryPoint: "./react"
           expires: 30d
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0.10.0
         name: Deploy to Firebase Hosting on Live channel
         if: github.ref == 'refs/heads/master'
         with:
