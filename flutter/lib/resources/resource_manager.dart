@@ -130,15 +130,18 @@ class ResourceManager {
         throw 'A network error has occurred. Please make sure you are connected to the internet.';
       }
 
-      final checksumFailed = await validateResourcesChecksum(resources);
-      if (checksumFailed.isNotEmpty) {
-        final checksumFailedPathString =
-            checksumFailed.map((e) => '\n${e.path}').join();
-        final checksumFailedPaths = checksumFailed.map((e) => e.path).toList();
-        await cacheManager.deleteFiles(checksumFailedPaths);
-        throw 'Checksum validation failed for: $checksumFailedPathString. \nPlease download the missing files again.';
+      if (downloadMissing) {
+        // If the files are downloaded from the internet, validate its checksum and delete corrupted files.
+        final checksumFailed = await validateResourcesChecksum(resources);
+        if (checksumFailed.isNotEmpty) {
+          final checksumFailedPathString =
+              checksumFailed.map((e) => '\n${e.path}').join();
+          final checksumFailedPaths =
+              checksumFailed.map((e) => e.path).toList();
+          await cacheManager.deleteFiles(checksumFailedPaths);
+          throw 'Checksum validation failed for: $checksumFailedPathString. \nPlease download the missing files again.';
+        }
       }
-
       // delete downloaded archives to free up disk space
       await cacheManager.deleteArchives(internetPaths);
     } finally {
