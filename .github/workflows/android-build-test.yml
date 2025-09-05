@@ -94,9 +94,9 @@ jobs:
           project_id: mobile-app-build-290400
       - name: Download Samsung libraries
         env:
-          SAMSUNG_LIB: samsung_libs_v4.0_20240409
+          SAMSUNG_LIB: samsung_libs_v5.0_20250905
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v4.0/${SAMSUNG_LIB}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v5.0/${SAMSUNG_LIB}.zip /tmp/ && \
           unzip /tmp/${SAMSUNG_LIB}.zip -d /tmp/${SAMSUNG_LIB} && \
           rm /tmp/${SAMSUNG_LIB}.zip && \
           mkdir -p mobile_back_samsung/samsung/lib/internal && \
