@@ -1,8 +1,11 @@
-/* Copyright 2024 The MLPerf Authors. All Rights Reserved.
+/* Copyright 2025 The MLPerf Authors. All Rights Reserved.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +24,6 @@ limitations under the License.
 #include "pipeline.h"
 
 #include "src/sentencepiece_processor.h"
-#include "tensorflow/lite/experimental/genai/genai_ops.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/interpreter_builder.h"
 #include "tensorflow/lite/kernels/register.h"
@@ -58,6 +60,7 @@ class AlignedAllocator {
   T* allocate(std::size_t n) {
     void* ptr;
     std::size_t size = n * sizeof(T);
+    // NOTE this part of the code from seems to be redundant
     //std::size_t padding = tflite::kDefaultTensorAlignment -
     //                      (size % tflite::kDefaultTensorAlignment);
     //size += padding;
@@ -73,6 +76,49 @@ class AlignedAllocator {
 
 using kv_cache_t = std::map<std::string, std::vector<float, AlignedAllocator<float>>>;
 
+// A simple container for pointers to the tensors used during inference.
+// The pointers here should not be managed or deleted by this struct.
+struct LLMTensors {
+
+  bool get_tensors (tflite::SignatureRunner *prefill_runner, tflite::SignatureRunner *decode_runner) {
+    prefill_input_ = prefill_runner->input_tensor("tokens");
+    prefill_input_pos_ = prefill_runner->input_tensor("input_pos");
+    decode_input_ = decode_runner->input_tensor("tokens");
+    decode_input_pos_ = decode_runner->input_tensor("input_pos");
+    logits_output_ = decode_runner->output_tensor("logits");
+    kv_cache_k_0_ = decode_runner->input_tensor("kv_cache_k_0");
+
+    // Making sure none of the tensors are nullptr.
+    return prefill_input_ && prefill_input_pos_ && decode_input_ && decode_input_pos_ && logits_output_ && kv_cache_k_0_;
+  }
+
+  LLMTensors(){}
+
+  LLMTensors(const LLMTensors&) = delete;
+  LLMTensors& operator=(const LLMTensors&) = delete;
+
+  TfLiteTensor* prefill_input() const {return prefill_input_;}
+  TfLiteTensor* prefill_input_pos() const {return prefill_input_pos_;}
+  TfLiteTensor* decode_input() const {return decode_input_;}
+  TfLiteTensor* decode_input_pos() const {return decode_input_pos_;}
+  const TfLiteTensor* logits_output() const {return logits_output_;}
+  TfLiteTensor* kv_cache_k_0() const {return kv_cache_k_0_;}
+
+private:
+  // Shape: [Batch, Seq], Dtype: int32
+  TfLiteTensor* prefill_input_;
+  // Shape: [Seq], Dtype: int32
+  TfLiteTensor* prefill_input_pos_;
+  // Shape: [Batch, Seq], Dtype: int32
+  TfLiteTensor* decode_input_;
+  // Shape: [Seq], Dtype: int32
+  TfLiteTensor* decode_input_pos_;
+  // Shape: [Seq], Dtype: float32
+  const TfLiteTensor* logits_output_;
+  // shape: [Batch, kv_cache_max, num_query_groups, head_dim]
+  TfLiteTensor* kv_cache_k_0_;
+};
+
 struct LLMBackendData {
   const char *name = "TFLite";
   const char *vendor = "Google";
@@ -83,8 +129,8 @@ struct LLMBackendData {
   tflite::Interpreter *interpreter{};
   tflite::SignatureRunner *prefill_runner{nullptr};
   tflite::SignatureRunner *decode_runner{nullptr};
+  LLMTensors tensors;
   kv_cache_t kv_cache;
-  //std::string input_prompt;
   std::vector<int> prompt_tokens;
   std::vector<int> output_tokens;
   std::string output;
@@ -106,12 +152,6 @@ struct LLMBackendData {
   LLMBackendData(const LLMBackendData&) = delete;
   LLMBackendData& operator=(const LLMBackendData&) = delete;
 
-//  uint32_t real_batch_size = 1;
-//std::unique_ptr<Threadpool> executer;
-//  int32_t original_tensor_size = 0;
-//#ifdef MTK_TFLITE_NEURON_BACKEND
-//  neuron_backend_ptr_t neuronBackendData{nullptr};
-//#endif
 };
 
 // A simple pipeline which runs a single model.
@@ -180,6 +220,8 @@ class LLMPipeline : public Pipeline {
   tflite::SignatureRunner *GetDecodeRunner(tflite::Interpreter *interpreter, kv_cache_t &kv_cache);
   sentencepiece::SentencePieceProcessor *LoadSentencePieceProcessor(std::string path);
   int GreedySampler(const TfLiteTensor *logits);
+
+
 
 };
 
