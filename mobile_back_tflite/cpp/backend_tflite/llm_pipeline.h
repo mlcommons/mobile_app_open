@@ -22,31 +22,29 @@ limitations under the License.
 
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"
-
 #include "src/sentencepiece_processor.h"
+#include "tensorflow/core/platform/logging.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/interpreter_builder.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model_builder.h"
 #include "tensorflow/lite/signature_runner.h"
 
-#include "tensorflow/core/platform/logging.h"
-
-#define MINIMAL_CHECK(x)                                                     \
-if (!(x)) {                                                                  \
-      LOG(ERROR) << "Error at " << __FILE__ << ":" << __LINE__ << std::endl; \
-      return MLPERF_FAILURE;                                                 \
-}
-#define MINIMAL_CHECK_PTR(x)                                                     \
-if (!(x)) {                                                                  \
-      LOG(ERROR) << "Error at " << __FILE__ << ":" << __LINE__ << std::endl; \
-      return nullptr;                                                 \
-}
-#define MINIMAL_CHECK_VOID(x)                                                     \
-if (!(x)) {                                                                  \
-      LOG(ERROR) << "Error at " << __FILE__ << ":" << __LINE__ << std::endl; \
-      return;                                                 \
-}
+#define MINIMAL_CHECK(x)                                                   \
+  if (!(x)) {                                                              \
+    LOG(ERROR) << "Error at " << __FILE__ << ":" << __LINE__ << std::endl; \
+    return MLPERF_FAILURE;                                                 \
+  }
+#define MINIMAL_CHECK_PTR(x)                                               \
+  if (!(x)) {                                                              \
+    LOG(ERROR) << "Error at " << __FILE__ << ":" << __LINE__ << std::endl; \
+    return nullptr;                                                        \
+  }
+#define MINIMAL_CHECK_VOID(x)                                              \
+  if (!(x)) {                                                              \
+    LOG(ERROR) << "Error at " << __FILE__ << ":" << __LINE__ << std::endl; \
+    return;                                                                \
+  }
 
 // TF Lite requires all buffers (including external buffers used for KV cache
 // here) be `tflite::kDefaultTensorAlignment` aligned. To ensure that, we use
@@ -57,30 +55,31 @@ class AlignedAllocator {
  public:
   using value_type = T;
 
-  T* allocate(std::size_t n) {
-    void* ptr;
+  T *allocate(std::size_t n) {
+    void *ptr;
     std::size_t size = n * sizeof(T);
     // NOTE this part of the code from seems to be redundant
-    //std::size_t padding = tflite::kDefaultTensorAlignment -
+    // std::size_t padding = tflite::kDefaultTensorAlignment -
     //                      (size % tflite::kDefaultTensorAlignment);
-    //size += padding;
+    // size += padding;
     int ret = posix_memalign(&ptr, tflite::kDefaultTensorAlignment, size);
     if (ret != 0) {
       return nullptr;
     }
-    return static_cast<T*>(ptr);
+    return static_cast<T *>(ptr);
   };
 
-  void deallocate(T* ptr, std::size_t n) { free(ptr); }
+  void deallocate(T *ptr, std::size_t n) { free(ptr); }
 };
 
-using kv_cache_t = std::map<std::string, std::vector<float, AlignedAllocator<float>>>;
+using kv_cache_t =
+    std::map<std::string, std::vector<float, AlignedAllocator<float>>>;
 
 // A simple container for pointers to the tensors used during inference.
 // The pointers here should not be managed or deleted by this struct.
 struct LLMTensors {
-
-  bool get_tensors (tflite::SignatureRunner *prefill_runner, tflite::SignatureRunner *decode_runner) {
+  bool get_tensors(tflite::SignatureRunner *prefill_runner,
+                   tflite::SignatureRunner *decode_runner) {
     prefill_input_ = prefill_runner->input_tensor("tokens");
     prefill_input_pos_ = prefill_runner->input_tensor("input_pos");
     decode_input_ = decode_runner->input_tensor("tokens");
@@ -89,34 +88,35 @@ struct LLMTensors {
     kv_cache_k_0_ = decode_runner->input_tensor("kv_cache_k_0");
 
     // Making sure none of the tensors are nullptr.
-    return prefill_input_ && prefill_input_pos_ && decode_input_ && decode_input_pos_ && logits_output_ && kv_cache_k_0_;
+    return prefill_input_ && prefill_input_pos_ && decode_input_ &&
+           decode_input_pos_ && logits_output_ && kv_cache_k_0_;
   }
 
-  LLMTensors(){}
+  LLMTensors() {}
 
-  LLMTensors(const LLMTensors&) = delete;
-  LLMTensors& operator=(const LLMTensors&) = delete;
+  LLMTensors(const LLMTensors &) = delete;
+  LLMTensors &operator=(const LLMTensors &) = delete;
 
-  TfLiteTensor* prefill_input() const {return prefill_input_;}
-  TfLiteTensor* prefill_input_pos() const {return prefill_input_pos_;}
-  TfLiteTensor* decode_input() const {return decode_input_;}
-  TfLiteTensor* decode_input_pos() const {return decode_input_pos_;}
-  const TfLiteTensor* logits_output() const {return logits_output_;}
-  TfLiteTensor* kv_cache_k_0() const {return kv_cache_k_0_;}
+  TfLiteTensor *prefill_input() const { return prefill_input_; }
+  TfLiteTensor *prefill_input_pos() const { return prefill_input_pos_; }
+  TfLiteTensor *decode_input() const { return decode_input_; }
+  TfLiteTensor *decode_input_pos() const { return decode_input_pos_; }
+  const TfLiteTensor *logits_output() const { return logits_output_; }
+  TfLiteTensor *kv_cache_k_0() const { return kv_cache_k_0_; }
 
-private:
+ private:
   // Shape: [Batch, Seq], Dtype: int32
-  TfLiteTensor* prefill_input_;
+  TfLiteTensor *prefill_input_;
   // Shape: [Seq], Dtype: int32
-  TfLiteTensor* prefill_input_pos_;
+  TfLiteTensor *prefill_input_pos_;
   // Shape: [Batch, Seq], Dtype: int32
-  TfLiteTensor* decode_input_;
+  TfLiteTensor *decode_input_;
   // Shape: [Seq], Dtype: int32
-  TfLiteTensor* decode_input_pos_;
+  TfLiteTensor *decode_input_pos_;
   // Shape: [Seq], Dtype: float32
-  const TfLiteTensor* logits_output_;
+  const TfLiteTensor *logits_output_;
   // shape: [Batch, kv_cache_max, num_query_groups, head_dim]
-  TfLiteTensor* kv_cache_k_0_;
+  TfLiteTensor *kv_cache_k_0_;
 };
 
 struct LLMBackendData {
@@ -125,7 +125,8 @@ struct LLMBackendData {
   const char *accelerator = "CPU";
   tflite::FlatBufferModel *model{nullptr};
   sentencepiece::SentencePieceProcessor *sp_processor{nullptr};
-  //TfLiteInterpreterOptions *options{}; TODO use this to allow different delegates other than CPU?
+  // TfLiteInterpreterOptions *options{}; TODO use this to allow different
+  // delegates other than CPU?
   tflite::Interpreter *interpreter{};
   tflite::SignatureRunner *prefill_runner{nullptr};
   tflite::SignatureRunner *decode_runner{nullptr};
@@ -140,7 +141,7 @@ struct LLMBackendData {
   std::string end_token = "<eos>";
   int stop_token_id = -1;
 
-  LLMBackendData(){}
+  LLMBackendData() {}
 
   ~LLMBackendData() {
     // Runners are owned by interpreter and therefore don't need to be deleted
@@ -149,9 +150,8 @@ struct LLMBackendData {
     delete model;
   }
 
-  LLMBackendData(const LLMBackendData&) = delete;
-  LLMBackendData& operator=(const LLMBackendData&) = delete;
-
+  LLMBackendData(const LLMBackendData &) = delete;
+  LLMBackendData &operator=(const LLMBackendData &) = delete;
 };
 
 // A simple pipeline which runs a single model.
@@ -173,7 +173,6 @@ class LLMPipeline : public Pipeline {
       mlperf_backend_ptr_t backend_ptr) override;
 
   const char *backend_name(mlperf_backend_ptr_t backend_ptr) override;
-
 
   mlperf_status_t backend_issue_first_token_query(
       mlperf_backend_ptr_t backend_ptr) override;
@@ -213,16 +212,18 @@ class LLMPipeline : public Pipeline {
   void backend_release_buffer(void *p) override;
 
  private:
-  tflite::Interpreter *BuildInterpreter(tflite::FlatBufferModel *model, int num_threads);
+  tflite::Interpreter *BuildInterpreter(tflite::FlatBufferModel *model,
+                                        int num_threads);
   kv_cache_t BuildKVCache(tflite::Interpreter *interpreter);
   void PrepareRunner(tflite::SignatureRunner *runner, kv_cache_t &kv_cache);
-  tflite::SignatureRunner *GetPrefillRunner(tflite::Interpreter *interpreter, std::size_t num_input_tokens, kv_cache_t &kv_cache);
-  tflite::SignatureRunner *GetDecodeRunner(tflite::Interpreter *interpreter, kv_cache_t &kv_cache);
-  sentencepiece::SentencePieceProcessor *LoadSentencePieceProcessor(std::string path);
+  tflite::SignatureRunner *GetPrefillRunner(tflite::Interpreter *interpreter,
+                                            std::size_t num_input_tokens,
+                                            kv_cache_t &kv_cache);
+  tflite::SignatureRunner *GetDecodeRunner(tflite::Interpreter *interpreter,
+                                           kv_cache_t &kv_cache);
+  sentencepiece::SentencePieceProcessor *LoadSentencePieceProcessor(
+      std::string path);
   int GreedySampler(const TfLiteTensor *logits);
-
-
-
 };
 
 #endif  // TFLITE_SINGLE_MODEL_PIPELINE_H_
