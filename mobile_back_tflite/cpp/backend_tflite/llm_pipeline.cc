@@ -29,7 +29,6 @@ limitations under the License.
 #include "flutter/cpp/utils.h"
 #include "tensorflow/core/platform/logging.h"
 #include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/delegates/gpu/delegate.h"
 
 #ifdef __cplusplus
 extern "C" {

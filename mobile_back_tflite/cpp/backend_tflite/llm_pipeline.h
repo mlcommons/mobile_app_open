@@ -58,7 +58,7 @@ class AlignedAllocator {
   T *allocate(std::size_t n) {
     void *ptr;
     std::size_t size = n * sizeof(T);
-    // NOTE this part of the code from seems to be redundant
+    // NOTE this part of the code seems to be redundant
     // std::size_t padding = tflite::kDefaultTensorAlignment -
     //                      (size % tflite::kDefaultTensorAlignment);
     // size += padding;
