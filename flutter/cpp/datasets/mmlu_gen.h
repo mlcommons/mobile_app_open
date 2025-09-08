@@ -5,12 +5,11 @@
 #include <stdint.h>
 
 #include <memory>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <set>
 
-//#include "src/sentencepiece_processor.h"
 #include "flutter/cpp/dataset.h"
 #include "flutter/cpp/datasets/squad_utils/tfrecord_reader.h"
 
@@ -29,11 +28,13 @@ class MmluGen : public Dataset {
 
   void LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) override;
 
-  void UnloadSamplesFromRam(const std::vector<QuerySampleIndex>& samples) override;
+  void UnloadSamplesFromRam(
+      const std::vector<QuerySampleIndex>& samples) override;
 
   std::vector<void*> GetData(int sample_idx) override;
 
-  std::vector<uint8_t> ProcessOutput(const int sample_idx, const std::vector<void*>& outputs) override;
+  std::vector<uint8_t> ProcessOutput(
+      const int sample_idx, const std::vector<void*>& outputs) override;
 
   int64_t GetOutputTokenCount(const int sample_idx) override;
 
@@ -43,14 +44,10 @@ class MmluGen : public Dataset {
 
   std::string ComputeAccuracyString() override;
 
-
  private:
-  //void loadSentencePieceProcessor(std::string path);
-
   const std::string name_ = "MmluGen";
 
   TFRecordReader sample_reader_;
-  //sentencepiece::SentencePieceProcessor sp_processor;
 
   struct PromptSample {
     std::string input;
