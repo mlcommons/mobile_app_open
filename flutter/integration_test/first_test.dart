@@ -58,8 +58,8 @@ void testBenchmark(String benchmarkId) {
     await Future.delayed(Duration(seconds: cooldownDuration));
     await runBenchmarks(tester);
     final extendedResult = await getLastResult(tester);
-    printResults(extendedResult);
-    checkTasks(extendedResult);
+    printResult(extendedResult);
+    checkResult(extendedResult);
     await deleteResources(tester);
   });
 }
