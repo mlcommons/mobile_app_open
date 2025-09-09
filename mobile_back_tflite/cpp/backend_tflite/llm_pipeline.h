@@ -24,6 +24,7 @@ limitations under the License.
 #include "pipeline.h"
 #include "src/sentencepiece_processor.h"
 #include "tensorflow/core/platform/logging.h"
+#include "tensorflow/lite/experimental/genai/genai_ops.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/interpreter_builder.h"
 #include "tensorflow/lite/kernels/register.h"
