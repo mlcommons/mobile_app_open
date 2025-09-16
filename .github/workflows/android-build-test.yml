@@ -12,6 +12,7 @@ on:
 
 env:
   GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}
+  BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
 
 jobs:
   build-android-image:
@@ -295,13 +296,13 @@ jobs:
           gsutil cp $GCLOUD_BUCKET_PATH/test-helper-unified.apk /tmp/$HELPER_APK_NAME
       - name: Upload main app
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
           -F "file=@/tmp/$MAIN_APK_NAME" \
           -F "custom_id=$MAIN_APK_NAME"
       - name: Upload test suite
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
           -F "file=@/tmp/$HELPER_APK_NAME" \
           -F "custom_id=$HELPER_APK_NAME"
@@ -384,13 +385,13 @@ jobs:
           gsutil cp $GCLOUD_BUCKET_PATH/test-helper-unified.apk /tmp/$HELPER_APK_NAME
       - name: Upload main app
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
           -F "file=@/tmp/$MAIN_APK_NAME" \
           -F "custom_id=$MAIN_APK_NAME"
       - name: Upload test suite
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
           -F "file=@/tmp/$HELPER_APK_NAME" \
           -F "custom_id=$HELPER_APK_NAME"
@@ -464,13 +465,13 @@ jobs:
           gsutil cp $GCLOUD_BUCKET_PATH/test-helper-${{ matrix.backend }}.apk /tmp/$HELPER_APK_NAME
       - name: Upload main app
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
           -F "file=@/tmp/$MAIN_APK_NAME" \
           -F "custom_id=$MAIN_APK_NAME"
       - name: Upload test suite
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
           -F "file=@/tmp/$HELPER_APK_NAME" \
           -F "custom_id=$HELPER_APK_NAME"
