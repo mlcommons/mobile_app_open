@@ -1,4 +1,4 @@
-/* Copyright 2020-2023 Samsung Electronics Co. LTD  All Rights Reserved.
+/* Copyright 2020-2025 Samsung Electronics Co. LTD  All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

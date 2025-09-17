@@ -1,4 +1,4 @@
-/* Copyright 2020-2023 Samsung Electronics Co. LTD  All Rights Reserved.
+/* Copyright 2020-2025 Samsung Electronics Co. LTD  All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ limitations under the License.
 namespace mbe {
 std::string mbe_core_libs[CORE_MAX] = {
     "libmbe1200_core.so", "libmbe2100_core.so", "libmbe2200_core.so",
-    "libmbe2300_core.so", "libmbe2400_core.so",
+    "libmbe2300_core.so", "libmbe2400_core.so", "libmbe2500_core.so",
 };
 
 void* load_symbol(void* dl_handle, const char* name) {

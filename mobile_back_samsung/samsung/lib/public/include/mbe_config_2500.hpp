@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef MBE_CONFIG_1200_H
-#define MBE_CONFIG_1200_H
-#include <mbe_config_1200.pbtxt.h>
+#ifndef MBE_CONFIG_2500_H
+#define MBE_CONFIG_2500_H
+#include <mbe_config_2500.pbtxt.h>
 #endif
