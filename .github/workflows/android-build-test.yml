@@ -1,5 +1,8 @@
 name: Android Build & Test
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ master, submission-v* ]
@@ -9,6 +12,7 @@ on:
 
 env:
   GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ github.run_number }}
+  BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
 
 jobs:
   build-android-image:
@@ -16,6 +20,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Set up Docker Buildx
@@ -26,23 +31,18 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata for Docker image
-        id: meta
-        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
+      - name: Build and push Docker image (bake)
+        uses: docker/bake-action@4a9a8d494466d37134e2bfca2d3a8de8fb2681ad # v5.13.0
         with:
-          images: ghcr.io/mlcommons/mobile_app_open-android
-          flavor: latest=true
-          tags: type=raw,value=${{ github.run_number }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
-        with:
-          context: flutter/android/docker
-          file: flutter/android/docker/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          files: |
+            docker-bake.hcl
+          targets: android
+          set: |
+            android.tags=ghcr.io/mlcommons/mobile_app_open-android:${{ github.run_number }}
+            android.tags=ghcr.io/mlcommons/mobile_app_open-android:latest
+            android.cache-from=type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache
+            android.cache-to=type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache,mode=max
 
   build-android-apk:
     needs: build-android-image
@@ -256,6 +256,7 @@ jobs:
           if-no-files-found: error
 
   test-android-apk-unified:
+    name: ${{ matrix.backend }}-${{ matrix.device }} (unified)
     needs: build-android-apk
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
@@ -295,13 +296,13 @@ jobs:
           gsutil cp $GCLOUD_BUCKET_PATH/test-helper-unified.apk /tmp/$HELPER_APK_NAME
       - name: Upload main app
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
           -F "file=@/tmp/$MAIN_APK_NAME" \
           -F "custom_id=$MAIN_APK_NAME"
       - name: Upload test suite
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
           -F "file=@/tmp/$HELPER_APK_NAME" \
           -F "custom_id=$HELPER_APK_NAME"
@@ -312,7 +313,96 @@ jobs:
           BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
-          BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
+          BROWSERSTACK_BUILD_TAG: ${{ matrix.device }}
+          BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          BROWSERSTACK_DEVICES: >-
+            ["${{ matrix.device }}"]
+        with:
+          timeout_minutes: 60
+          max_attempts: 2
+          retry_wait_seconds: 300
+          retry_on_exit_code: 9
+          command: |
+            bash .github/workflows/scripts/browserstack-app-automate.sh
+      - name: Upload BrowserStack logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ github.run_number }}
+          path: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          retention-days: 28
+          if-no-files-found: error
+
+  test-android-apk-unified-extended:
+    name: ${{ matrix.backend }}-${{ matrix.device }} (unified-extended)
+    needs:
+      - build-android-apk
+      - test-android-apk-unified
+    if: github.ref == 'refs/heads/master' || vars.EXTENDED_TESTS_ON_PR == 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - backend: "qti"
+            device: "Samsung Galaxy S25-15.0"
+          # Comment out S24 Ultra-14.0 until we have a fix for it.
+          # - backend: "qti"
+          #  device: "Samsung Galaxy S24 Ultra-14.0"
+          - backend: "qti"
+            device: "Samsung Galaxy S23 Ultra-13.0"
+          - backend: "qti"
+            device: "Samsung Galaxy S23-13.0"
+          - backend: "qti"
+            device: "Samsung Galaxy Tab S9-13.0"
+          - backend: "samsung"
+            device: "Samsung Galaxy S22 Ultra-12.0"
+          - backend: "samsung"
+            device: "Samsung Galaxy S22 Plus-12.0"
+          - backend: "samsung"
+            device: "Samsung Galaxy S22-12.0"
+          - backend: "samsung"
+            device: "Samsung Galaxy S21-12.0"
+    env:
+      MAIN_APK_NAME: test-main-unified-${{ github.run_number }}.apk
+      HELPER_APK_NAME: test-helper-unified-${{ github.run_number }}.apk
+      BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2.2.1
+        with:
+          version: '>= 363.0.0'
+      - name: Download test APK
+        run: |
+          gsutil cp $GCLOUD_BUCKET_PATH/test-main-unified.apk /tmp/$MAIN_APK_NAME
+          gsutil cp $GCLOUD_BUCKET_PATH/test-helper-unified.apk /tmp/$HELPER_APK_NAME
+      - name: Upload main app
+        run: |
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
+          -F "file=@/tmp/$MAIN_APK_NAME" \
+          -F "custom_id=$MAIN_APK_NAME"
+      - name: Upload test suite
+        run: |
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
+          -F "file=@/tmp/$HELPER_APK_NAME" \
+          -F "custom_id=$HELPER_APK_NAME"
+      - uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
+        name: Trigger App Automate
+        env:
+          BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
+          BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
+          BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
+          BROWSERSTACK_BUILD_TAG: ${{ matrix.device }}
           BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
           BROWSERSTACK_DEVICES: >-
             ["${{ matrix.device }}"]
@@ -333,6 +423,7 @@ jobs:
           if-no-files-found: error
 
   test-android-apk-single:
+    name: ${{ matrix.backend }}-${{ matrix.device }} (single)
     needs:
       - build-android-apk
       - test-android-apk-unified
@@ -374,13 +465,13 @@ jobs:
           gsutil cp $GCLOUD_BUCKET_PATH/test-helper-${{ matrix.backend }}.apk /tmp/$HELPER_APK_NAME
       - name: Upload main app
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
           -F "file=@/tmp/$MAIN_APK_NAME" \
           -F "custom_id=$MAIN_APK_NAME"
       - name: Upload test suite
         run: |
-          curl -u "${{ secrets.BROWSERSTACK_CREDENTIALS }}" \
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
           -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
           -F "file=@/tmp/$HELPER_APK_NAME" \
           -F "custom_id=$HELPER_APK_NAME"
@@ -391,7 +482,7 @@ jobs:
           BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
-          BROWSERSTACK_BUILD_TAG: ${{ github.run_number }}
+          BROWSERSTACK_BUILD_TAG: ${{ matrix.device }}
           BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
           BROWSERSTACK_DEVICES: >-
             ["${{ matrix.device }}"]

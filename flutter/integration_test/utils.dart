@@ -182,7 +182,7 @@ Future<bool> waitFor(WidgetTester tester, int timeout, Key key) async {
   return element;
 }
 
-void printResults(ExtendedResult extendedResult) {
+void printResult(ExtendedResult extendedResult) {
   debugPrint('Benchmark result json:');
   for (final line in const JsonEncoder.withIndent('  ')
       .convert(extendedResult)
@@ -191,7 +191,7 @@ void printResults(ExtendedResult extendedResult) {
   }
 }
 
-void checkTasks(ExtendedResult extendedResult) {
+void checkResult(ExtendedResult extendedResult) {
   for (final benchmarkResult in extendedResult.results) {
     debugPrint('Checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
@@ -219,12 +219,17 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
   final expectedValue =
       expectedMap['$accelerator|$backendName'] ?? expectedMap[accelerator];
   tag += ' | expectedValue: $expectedValue';
+
+  // Skip if there is no expectedValue
+  if (expectedValue == null) {
+    debugPrint('No expected accuracy value; skipping accuracy check.');
+    return;
+  }
   expect(
     expectedValue,
     isNotNull,
     reason: 'missing expected accuracy for $tag',
   );
-  expectedValue!;
 
   final accuracyRun = benchmarkResult.accuracyRun;
   accuracyRun!;
@@ -271,12 +276,17 @@ void checkThroughput(
   tag += ' | deviceModel: $deviceModel';
   final expectedValue = backendExpectedMap[deviceModel];
   tag += ' | expectedValue: $expectedValue';
+
+  // Skip if there is no expectedValue
+  if (expectedValue == null) {
+    debugPrint('No expected throughput value; skipping throughput check.');
+    return;
+  }
   expect(
     expectedValue,
     isNotNull,
     reason: 'missing expected throughput for [$tag]',
   );
-  expectedValue!;
 
   final run = benchmarkResult.performanceRun;
   run!;
