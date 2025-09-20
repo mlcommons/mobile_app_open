@@ -1,10 +1,10 @@
-/* Copyright 2020-2023 Samsung Electronics Co. LTD  All Rights Reserved.
+/* Copyright 2020-2025 Samsung Electronics Co. LTD  All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -76,7 +76,8 @@ static int get_core_id_from_model(const char *model) {
     core_id = SOC_2100;
   else if (strstr((char *)model, "ERD9925") ||
            strstr((char *)model, "S5E9925") || strstr((char *)model, "S901") ||
-           strstr((char *)model, "S906") || strstr((char *)model, "S908"))
+           strstr((char *)model, "S906") || strstr((char *)model, "S908") ||
+           strstr((char *)model, "S711") || strstr((char *)model, "S23 FE"))
     core_id = SOC_2200;
   else if (strstr((char *)model, "ERD9935") ||
            strstr((char *)model, "S5E9935") || strstr((char *)model, "S919O"))
@@ -84,8 +85,14 @@ static int get_core_id_from_model(const char *model) {
   else if (strstr((char *)model, "ERD9945") ||
            strstr((char *)model, "S5E9945") || strstr((char *)model, "MU3S") ||
            strstr((char *)model, "S921") || strstr((char *)model, "S926") ||
-           strstr((char *)model, "S928"))
+           strstr((char *)model, "S928") || strstr((char *)model, "S721") ||
+           strstr((char *)model, "F761"))
     core_id = SOC_2400;
+  else if (strstr((char *)model, "ERD9955") ||
+           strstr((char *)model, "S5E9955") || strstr((char *)model, "NE1S") ||
+           strstr((char *)model, "S931") || strstr((char *)model, "S936") ||
+           strstr((char *)model, "S938") || strstr((char *)model, "F766"))
+    core_id = SOC_2500;
   else
     return CORE_INVALID;
   return retrieve_model_surfix(model, core_id) ? core_id : CORE_INVALID;
@@ -105,6 +112,8 @@ static int get_core_id_from_hardware(const char *hardware) {
     core_id = SOC_2300;
   else if (strstr((char *)hardware, "9945"))
     core_id = SOC_2400;
+  else if (strstr((char *)hardware, "9955"))
+    core_id = SOC_2500;
   else
     return CORE_INVALID;
   return core_id;
@@ -114,8 +123,17 @@ int core_ctrl::support_mbe(const char *manufacturer, const char *model) {
   std::string version = VERSION(MAJOR, MINOR, PATCH);
   MLOGV("mbe version [%s]", version.c_str());
   bool is_samsung = get_manufacturer(manufacturer);
+  if (!is_samsung) {
+    return CORE_INVALID;
+  }
+
   int core_id = get_core_id_from_model(model);
-  if (is_samsung && (core_id > CORE_INVALID)) {
+  if (core_id > CORE_INVALID) {
+    return core_id;
+  }
+
+  core_id = get_core_id();
+  if (core_id > CORE_INVALID) {
     return core_id;
   }
   return CORE_INVALID;
@@ -134,6 +152,8 @@ const char *core_ctrl::get_benchmark_config(int core_id) {
     settings = mbe_config_2300_pbtxt.c_str();
   } else if (core_id == SOC_2400) {
     settings = mbe_config_2400_pbtxt.c_str();
+  } else if (core_id == SOC_2500) {
+    settings = mbe_config_2500_pbtxt.c_str();
   }
   return settings;
 }
