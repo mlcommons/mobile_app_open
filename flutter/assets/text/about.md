@@ -61,6 +61,7 @@ Official website URL: [https://developer.samsung.com/neural/overview.html](https
 
 The MLPerf Mobile Benchmarking App uses the Exynos Neural Network SDK on the following families of Exynos processors [https://semiconductor.samsung.com/processor/](https://semiconductor.samsung.com/processor/):
 
+* Exynos 2500
 * Exynos 2400
 * Exynos 2300
 * Exynos 2200
