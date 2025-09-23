@@ -159,6 +159,8 @@ BackendFunctions::BackendFunctions(const std::string& lib_path) {
   destroy =
       reinterpret_cast<decltype(destroy)>(GetSymbol("mlperf_backend_delete"));
 
+  issue_first_token_query = reinterpret_cast<decltype(issue_first_token_query)>(
+      GetSymbol("mlperf_backend_issue_first_token_query"));
   issue_query = reinterpret_cast<decltype(issue_query)>(
       GetSymbol("mlperf_backend_issue_query"));
   flush_queries = reinterpret_cast<decltype(flush_queries)>(

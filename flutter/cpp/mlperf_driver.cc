@@ -31,6 +31,7 @@ namespace mobile {
 void MlperfDriver::IssueQuery(
     const std::vector<::mlperf::QuerySample>& samples) {
   std::vector<::mlperf::QuerySampleResponse> responses;
+  std::vector<::mlperf::QuerySampleResponse> ft_responses;
   std::vector<std::vector<uint8_t>> response_data;
 
   if (scenario_ == "Offline") {
@@ -67,15 +68,33 @@ void MlperfDriver::IssueQuery(
       ::mlperf::QuerySample sample = samples.at(idx);
       std::vector<void*> inputs = dataset_->GetData(sample.index);
       backend_->SetInputs(inputs);
+
+      if (use_tokens_) {
+        ft_responses.clear();
+        backend_->IssueFirstTokenQuery();
+        ft_responses.push_back({sample.id, reinterpret_cast<std::uintptr_t>(nullptr), 0});
+        ::mlperf::FirstTokenComplete(ft_responses.data(), ft_responses.size());
+      }
+
       backend_->IssueQuery();
+
 
       // Report to mlperf.
       std::vector<void*> outputs = backend_->GetPredictedOutputs();
       response_data.push_back(dataset_->ProcessOutput(sample.index, outputs));
-      responses.push_back(
-          {sample.id,
-           reinterpret_cast<std::uintptr_t>(response_data[idx].data()),
-           response_data[idx].size()});
+      if (use_tokens_){
+        responses.push_back(
+            {sample.id,
+             reinterpret_cast<std::uintptr_t>(response_data[idx].data()),
+             response_data[idx].size(),
+             dataset_->GetOutputTokenCount(sample.index)});
+      }
+      else {
+        responses.push_back(
+            {sample.id,
+             reinterpret_cast<std::uintptr_t>(response_data[idx].data()),
+             response_data[idx].size()});
+      }
       backend_->FlushQueries();
       query_counter_ += 1;
     }
@@ -86,7 +105,7 @@ void MlperfDriver::IssueQuery(
 void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
                                  double min_duration, double max_duration,
                                  int single_stream_expected_latency_ns,
-                                 const std::string& output_dir) {
+                                 const std::string& output_dir, bool use_tokens) {
   ::mlperf::LogSettings log_settings;
   log_settings.log_output.outdir = output_dir;
   log_settings.log_output.copy_summary_to_stdout = true;
@@ -97,7 +116,12 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
   mlperf_settings.sample_index_rng_seed = 10688027786191513374UL;
   mlperf_settings.schedule_rng_seed = 14962580496156340209UL;
 
-  mlperf_settings.min_query_count = min_query_count;
+  //mlperf_settings.min_query_count = 1;
+  //mlperf_settings.max_query_count = 2;
+  //mlperf_settings.performance_sample_count_override = 5;
+  use_tokens_ = use_tokens;
+  mlperf_settings.use_token_latencies = use_tokens;
+  //mlperf_settings.server_target_qps = 0.1;
   mlperf_settings.mode = Str2TestMode(mode);
   mlperf_settings.min_duration_ms =
       static_cast<uint64_t>(std::ceil(min_duration * 1000.0));

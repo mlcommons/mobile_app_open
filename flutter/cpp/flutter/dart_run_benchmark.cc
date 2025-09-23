@@ -14,6 +14,7 @@
 #include "flutter/cpp/datasets/imagenet.h"
 #include "flutter/cpp/datasets/snu_sr.h"
 #include "flutter/cpp/datasets/squad.h"
+#include "flutter/cpp/datasets/mmlu_gen.h"
 #include "flutter/cpp/mlperf_driver.h"
 #include "flutter/cpp/proto/backend_setting.pb.h"
 #include "flutter/cpp/proto/mlperf_task.pb.h"
@@ -104,6 +105,10 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       dataset = std::make_unique<::mlperf::mobile::CocoGen>(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
           in->output_dir);
+      break;
+    case ::mlperf::mobile::DatasetConfig::MMLU:
+      dataset = std::make_unique<::mlperf::mobile::MmluGen>(
+          backend.get(), in->dataset_data_path);
       break;
     default:
       return nullptr;

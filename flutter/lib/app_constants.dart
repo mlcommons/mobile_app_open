@@ -25,6 +25,7 @@ class BenchmarkId {
   static const imageClassificationV2 = 'image_classification_v2';
   static const imageClassificationOfflineV2 = 'image_classification_offline_v2';
   static const stableDiffusion = 'stable_diffusion';
+  static const llm = 'llm';
 
   // The sort order of this list will be used in the UI
   static const allIds = [

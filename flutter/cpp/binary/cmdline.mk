@@ -16,6 +16,7 @@
 include flutter/cpp/binary/cmdline-docker.mk
 
 cmdline/android/bins/release: cmdline/android/libs/deps cmdline/android/bins/build cmdline/android/bins/copy
+cmdline/linux/bins/release: cmdline/linux/bins/build cmdline/linux/bins/copy
 
 .PHONY: cmdline/android/libs/deps
 cmdline/android/libs/deps:
@@ -51,6 +52,29 @@ cmdline/android/bins/copy:
 		${cmdline_android_bin_release_path}
 		@# macos doesn't support --recursive flag
 		chmod -R 777 ${cmdline_android_bin_release_path}
+
+.PHONY: cmdline/linux/bins/build
+cmdline/linux/bins/build:
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} ${proxy_bazel_args} ${sonar_bazel_startup_options} \
+		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
+		--config=linux_x86_64 \
+		${backend_tflite_android_target} \
+		//flutter/cpp/flutter:libbackendbridge.so \
+		//flutter/cpp/binary:main
+
+cmdline_linux_bin_release_path=output/linux/cmdline
+.PHONY: cmdline/linux/bins/copy
+cmdline/linux/bins/copy:
+	rm -rf ${cmdline_linux_bin_release_path}
+	mkdir -p ${cmdline_linux_bin_release_path}
+	@# macos doesn't support --target-directory flag
+	cp -f \
+		${backend_tflite_android_files} \
+		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/libbackendbridge.so \
+		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/binary/main \
+		${cmdline_linux_bin_release_path}
+		@# macos doesn't support --recursive flag
+		chmod -R 777 ${cmdline_linux_bin_release_path}
 
 windows_cmdline_folder=output/windows/cmdline
 .PHONY: cmdline/windows/bins
@@ -92,4 +116,4 @@ cmdline/windows/prepare-dlls:
 .PHONY: cmdline/windows/copy-dlls
 cmdline/windows/copy-dlls:
 	currentDir=$$(pwd) && cd "${msvc_arm_dlls_path}" && \
-		cp  --target-directory $$currentDir/${windows_cmdline_folder} ${msvc_arm_dlls_list}		
+		cp  --target-directory $$currentDir/${windows_cmdline_folder} ${msvc_arm_dlls_list}

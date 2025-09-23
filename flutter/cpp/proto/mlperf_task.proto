@@ -80,6 +80,7 @@ message DatasetConfig {
     ADE20K = 4;
     SNUSR = 5;
     COCOGEN = 6;
+    MMLU = 7;
   }
   required DatasetType type = 1;
   // Config of the dataset.
