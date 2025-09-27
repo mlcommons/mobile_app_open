@@ -10,6 +10,7 @@ class CacheManager {
   late final FileCacheHelper fileCacheHelper;
   late final ArchiveCacheHelper archiveCacheHelper;
   Map<String, String> _resourcesMap = {};
+  List<String> newDownloads = [];
 
   CacheManager(this.loadedResourcesDir) {
     fileCacheHelper = FileCacheHelper(loadedResourcesDir);
@@ -30,40 +31,46 @@ class CacheManager {
 
   Future<void> deleteLoadedResources(List<String> excludes,
       [int atLeastDaysOld = 0]) async {
-    final directory = Directory(loadedResourcesDir);
+    final Map<String, String> resourcesToDelete = Map.from(_resourcesMap);
+    final deletionTime = DateTime.now();
 
-    // can't use 'await for' here because we delete files,
-    // and 'await for' on stream from directory.list() throws exceptions when file is missing
-    for (final file in await directory.list(recursive: true).toList()) {
-      // skip files in already deleted folders
-      if (!await file.exists()) continue;
-      final relativePath = file.path
-          .replaceAll('\\', '/')
-          .substring(loadedResourcesDir.length + 1);
-      var keep = false;
-      for (var resource in excludes) {
-        // relativePath.startsWith(resource): if we want to preserve a folder resource
-        // resource.startsWith(relativePath): if we want to preserve a file resource
-        //   for example:
-        //   we are checking folder 'github.com'
-        //   resource is 'github.com/mlcommons/mobile_models/raw/main/v0_7/datasets/ade20k'
-        if (relativePath.startsWith(resource) ||
-            resource.startsWith(relativePath)) {
-          keep = true;
-          break;
-        }
+    for (var key in excludes) {
+      resourcesToDelete.remove(key);
+    }
+
+    for (var resource in resourcesToDelete.keys.toList()) {
+      String resourcePath = resourcesToDelete[resource] ?? '';
+      var stat = FileStat.statSync(resourcePath);
+      if (stat.type == FileSystemEntityType.notFound ||
+          (atLeastDaysOld > 0 &&
+              deletionTime.difference(stat.modified).inDays < atLeastDaysOld)) {
+        resourcesToDelete.remove(resource);
+        continue;
       }
-      if (keep) continue;
-      if (atLeastDaysOld > 0) {
-        var stat = await file.stat();
-        if (DateTime.now().difference(stat.modified).inDays < atLeastDaysOld) {
-          continue;
+      try {
+        switch (stat.type) {
+          case FileSystemEntityType.file:
+          case FileSystemEntityType.link:
+            File(resourcePath).deleteSync(recursive: true);
+            break;
+          case FileSystemEntityType.directory:
+            Directory(resourcePath).deleteSync(recursive: true);
+            break;
+          default:
+            break;
         }
+        _resourcesMap.remove(resource);
+      } on FileSystemException catch (e) {
+        if (e.osError?.errorCode == 2) {
+          // TODO might need to be changed for Windows
+          _resourcesMap.remove(resource);
+        } else
+          rethrow;
       }
-      await file.delete(recursive: true);
     }
   }
 
+  // NOTE this does not remove the files that were extracted from the archive, just the archive itself.
   Future<void> deleteArchives(List<String> resources) async {
     for (final resource in resources) {
       final archivePath = getArchive(resource);
@@ -79,6 +86,8 @@ class CacheManager {
       if (filePath == null) continue;
       final file = File(filePath);
       if (await file.exists()) await file.delete();
+      _resourcesMap.remove(
+          resource); // Update the resource map to reflect the deleted file
       print('Deleted resource $resource stored at ${file.path}');
     }
   }
@@ -96,12 +105,14 @@ class CacheManager {
     required void Function(double, String) onProgressUpdate,
     required bool purgeOldCache,
     required bool downloadMissing,
+    bool overrideMap = false,
   }) async {
     final resourcesToDownload = <String>[];
-    _resourcesMap = {};
+    final resourcesMap = <String, String>{};
+    newDownloads.clear();
 
     for (final resource in urls) {
-      if (_resourcesMap.containsKey(resource)) continue;
+      if (resourcesMap.containsKey(resource)) continue;
       if (resourcesToDownload.contains(resource)) continue;
 
       String path;
@@ -112,7 +123,7 @@ class CacheManager {
       }
 
       if (path != '') {
-        _resourcesMap[resource] = path;
+        resourcesMap[resource] = path;
         continue;
       }
 
@@ -121,7 +132,12 @@ class CacheManager {
       continue;
     }
     if (downloadMissing) {
-      await _download(resourcesToDownload, onProgressUpdate);
+      await _download(resourcesToDownload, onProgressUpdate, resourcesMap);
+    }
+    if (overrideMap) {
+      _resourcesMap = resourcesMap;
+    } else {
+      _resourcesMap.addAll(resourcesMap);
     }
     if (purgeOldCache) {
       await purgeOutdatedCache(_oldFilesAgeInDays);
@@ -133,17 +149,19 @@ class CacheManager {
   }
 
   Future<void> _download(
-    List<String> urls,
-    void Function(double, String) onProgressUpdate,
-  ) async {
+      List<String> urls,
+      void Function(double, String) onProgressUpdate,
+      Map<String, String> resourcesMap // Passed by reference
+      ) async {
+    newDownloads = urls;
     var progress = 0.0;
     for (var url in urls) {
       progress += 0.1 / urls.length;
       onProgressUpdate(progress, url);
       if (isResourceAnArchive(url)) {
-        _resourcesMap[url] = await archiveCacheHelper.get(url, true);
+        resourcesMap[url] = await archiveCacheHelper.get(url, true);
       } else {
-        _resourcesMap[url] = await fileCacheHelper.get(url, true);
+        resourcesMap[url] = await fileCacheHelper.get(url, true);
       }
       progress += 0.9 / urls.length;
       onProgressUpdate(progress, url);

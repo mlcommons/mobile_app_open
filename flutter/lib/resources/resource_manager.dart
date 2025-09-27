@@ -11,6 +11,12 @@ import 'package:mlperfbench/resources/result_manager.dart';
 import 'package:mlperfbench/resources/utils.dart';
 import 'package:mlperfbench/store.dart';
 
+enum ResourceLoadingStatus {
+  done,
+  loading,
+  verifying,
+}
+
 class ResourceManager {
   static const _dataPrefix = 'local://';
   static const _loadedResourcesDirName = 'loaded_resources';
@@ -19,7 +25,8 @@ class ResourceManager {
   final VoidCallback _onUpdate;
   final Store store;
 
-  bool _done = false;
+  // We start out as loading to prevent benchmarks from running before handleResources() is called.
+  ResourceLoadingStatus _status = ResourceLoadingStatus.loading;
   String _loadingPath = '';
   double _loadingProgress = 0.0;
 
@@ -31,7 +38,9 @@ class ResourceManager {
 
   ResourceManager(this._onUpdate, this.store);
 
-  bool get done => _done;
+  ResourceLoadingStatus get status {
+    return _status;
+  }
 
   double get loadingProgress {
     return _loadingProgress;
@@ -101,7 +110,7 @@ class ResourceManager {
   }) async {
     _loadingPath = '';
     _loadingProgress = 0.001;
-    _done = false;
+    _status = ResourceLoadingStatus.loading;
     _onUpdate();
     try {
       var internetResources = <Resource>[];
@@ -130,24 +139,33 @@ class ResourceManager {
         throw 'A network error has occurred. Please make sure you are connected to the internet.';
       }
 
-      if (downloadMissing) {
-        // If the files are downloaded from the internet, validate its checksum and delete corrupted files.
-        final checksumFailed = await validateResourcesChecksum(resources);
-        if (checksumFailed.isNotEmpty) {
-          final checksumFailedPathString =
-              checksumFailed.map((e) => '\n${e.path}').join();
-          final checksumFailedPaths =
-              checksumFailed.map((e) => e.path).toList();
-          await cacheManager.deleteFiles(checksumFailedPaths);
-          throw 'Checksum validation failed for: $checksumFailedPathString. \nPlease download the missing files again.';
-        }
+      // Make sure to only checksum resources that were downloaded in the step above
+      final newResources = internetResources
+          .where((element) => cacheManager.newDownloads.contains(element.path))
+          .toList();
+
+      _status = ResourceLoadingStatus.verifying;
+      final checksumFailed = await validateResourcesChecksum(
+        newResources,
+        (double currentProgress, String currentPath) {
+          _loadingProgress = currentProgress;
+          _loadingPath = currentPath;
+          _onUpdate();
+        },
+      );
+      if (checksumFailed.isNotEmpty) {
+        final checksumFailedPathString =
+            checksumFailed.map((e) => '\n${e.path}').join();
+        final checksumFailedPaths = checksumFailed.map((e) => e.path).toList();
+        await cacheManager.deleteFiles(checksumFailedPaths);
+        throw 'Checksum validation failed for: $checksumFailedPathString. \nPlease download the missing files again.';
       }
       // delete downloaded archives to free up disk space
       await cacheManager.deleteArchives(internetPaths);
     } finally {
       _loadingPath = '';
       _loadingProgress = 1.0;
-      _done = true;
+      _status = ResourceLoadingStatus.done;
       _onUpdate();
     }
   }
@@ -209,6 +227,7 @@ class ResourceManager {
     return result;
   }
 
+
   // Similar to [validateResourcesExist], but returns one result for all resources provided
   Future<bool> validateAllResourcesExist(List<Resource> resources) async {
     for (Resource r in resources) {
@@ -222,10 +241,14 @@ class ResourceManager {
     return true;
   }
 
-  Future<List<Resource>> validateResourcesChecksum(
-      List<Resource> resources) async {
+  Future<List<Resource>> validateResourcesChecksum(List<Resource> resources,
+      void Function(double, String) onProgressUpdate) async {
     final checksumFailedResources = <Resource>[];
+    double progress = 0.0;
     for (final resource in resources) {
+      progress += 0.1 / resources.length;
+      onProgressUpdate(progress, resource.path);
+
       final md5Checksum = resource.md5Checksum;
       if (md5Checksum.isEmpty) continue;
       String? localPath;
@@ -238,6 +261,9 @@ class ResourceManager {
       if (!await isChecksumMatched(localPath, md5Checksum)) {
         checksumFailedResources.add(resource);
       }
+
+      progress += 0.9 / resources.length;
+      onProgressUpdate(progress, resource.path);
     }
     return checksumFailedResources;
   }
