@@ -266,8 +266,12 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "https://thee.dev/mlc/model.tflite" #Placeholder
-      model_checksum: "04f62ae20a0f1c68c138f30d88411be0"
+      model_path: "local:///mlperf_models/llama_q8_ekv3072.tflite"
+      model_checksum: "54efe0be372b55303673245067beef62"
+    }
+    model_file: {
+      model_path: "local:///mlperf_models/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
     }
   }
   delegate_selected: "CPU"

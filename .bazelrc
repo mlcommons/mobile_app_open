@@ -48,6 +48,10 @@ build:android_x86_64 --config=android
 build:android_x86_64 --cpu=x86_64
 build:android_x86_64 --fat_apk_cpu=x86_64
 
+
+build:android_x86_64 --define=xnn_enable_avx512fp16=false
+build:android_x86_64 --define=xnn_enable_avxvnniint8=false
+
 # Linux configs
 build:linux_x86_64 --config=linux
 build:linux_x86_64 --cpu=k8

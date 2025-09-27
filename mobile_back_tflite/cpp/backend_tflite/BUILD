@@ -17,6 +17,8 @@ load(
     "tflite_copts",
     "tflite_jni_binary",
 )
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
 
 package(
@@ -50,21 +52,21 @@ cc_library(
     name = "tflite_c",
     srcs = [
         "embedding_utils.cc",
+        "llm_pipeline.cc",
         "sd_utils.cc",
         "single_model_pipeline.cc",
         "stable_diffusion_invoker.cc",
         "stable_diffusion_pipeline.cc",
-        "llm_pipeline.cc",
         "tflite_c.cc",
     ],
     hdrs = [
         "embedding_utils.h",
+        "llm_pipeline.h",
         "pipeline.h",
         "sd_utils.h",
         "single_model_pipeline.h",
         "stable_diffusion_invoker.h",
         "stable_diffusion_pipeline.h",
-        "llm_pipeline.h",
         "tflite_settings_android.h",
         "tflite_settings_apple.h",
         "tflite_settings_windows.h",
@@ -87,17 +89,17 @@ cc_library(
         "//flutter/cpp/c:headers",
         "@com_google_sentencepiece//:sentencepiece_processor",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
+        "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite:util",
         "@org_tensorflow//tensorflow/lite/c:c_api",
         "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
         "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/lite:framework",
-        "@org_tensorflow//tensorflow/lite:util",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         "@org_tensorflow//tensorflow/lite/experimental/genai:genai_ops",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
-            "@org_tensorflow//tensorflow/lite/delegates/xnnpack:xnnpack_delegate",
             "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
+            "@org_tensorflow//tensorflow/lite/delegates/xnnpack:xnnpack_delegate",
         ],
         "@org_tensorflow//tensorflow:ios": [
             "@org_tensorflow//tensorflow/lite/delegates/coreml:coreml_delegate",

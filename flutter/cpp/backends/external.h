@@ -160,7 +160,8 @@ class ExternalBackend : public Backend {
   }
 
   void IssueFirstTokenQuery() override {
-    if (backend_functions_.issue_first_token_query(backend_ptr_) != MLPERF_SUCCESS) {
+    if (backend_functions_.issue_first_token_query(backend_ptr_) !=
+        MLPERF_SUCCESS) {
       LOG(FATAL) << "Error while inferencing model for first token";
     }
   }

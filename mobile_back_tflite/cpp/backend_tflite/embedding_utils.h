@@ -1,12 +1,12 @@
 #ifndef EMBEDDING_UTILS_H_
 #define EMBEDDING_UTILS_H_
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <map>
 #include <memory>
 #include <vector>
-#include <algorithm>
 
 class TsEmbeddingParser {
  public:

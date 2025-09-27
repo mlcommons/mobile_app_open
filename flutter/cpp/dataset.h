@@ -61,8 +61,7 @@ class Dataset : public ::mlperf::QuerySampleLibrary {
       const int sample_idx, const std::vector<void*>& outputs) = 0;
 
   // Should be called after ProcessOutput.
-  virtual int64_t GetOutputTokenCount(
-      const int sample_idx) {return 0;}
+  virtual int64_t GetOutputTokenCount(const int sample_idx) { return 0; }
 
   virtual bool HasAccuracy() { return false; }
 

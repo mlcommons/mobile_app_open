@@ -10,9 +10,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 #include <algorithm>
+
+#include "llm_pipeline.h"
 #include "single_model_pipeline.h"
 #include "stable_diffusion_pipeline.h"
-#include "llm_pipeline.h"
 #include "tensorflow/core/platform/logging.h"
 #include "tflite_settings_android.h"
 #include "tflite_settings_apple.h"
@@ -39,7 +40,7 @@ extern "C" {
 std::unique_ptr<Pipeline> pipeline;
 
 void init_pipeline(const char *pipeline_type) {
-  //TODO use a switch/case
+  // TODO use a switch/case
   bool sd_pipeline = (strcmp(pipeline_type, "StableDiffusionPipeline") == 0);
   bool llm_pipeline = (strcmp(pipeline_type, "LLMPipeline") == 0);
   if (sd_pipeline) {
@@ -48,8 +49,7 @@ void init_pipeline(const char *pipeline_type) {
   } else if (llm_pipeline) {
     LOG(INFO) << "Initializing LLMPipeline";
     pipeline = std::make_unique<LLMPipeline>();
-  }
-  else {
+  } else {
     LOG(INFO) << "Initializing SingleModelPipeline";
     pipeline = std::make_unique<SingleModelPipeline>();
   }
@@ -153,7 +153,8 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 mlperf_backend_ptr_t mlperf_backend_create(
     const char *model_path, mlperf_backend_configuration_t *configs,
     const char *native_lib_path) {
-  LOG(INFO) << "Using TfLite " << TfLiteVersion() << " With Schema " << TfLiteSchemaVersion() << std::endl;
+  LOG(INFO) << "Using TfLite " << TfLiteVersion() << " With Schema "
+            << TfLiteSchemaVersion() << std::endl;
   const char *pipeline_type = "";
   for (int i = 0; i < configs->count; ++i) {
     if (strcmp(configs->keys[i], "pipeline") == 0) {
@@ -186,7 +187,8 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
   reset_pipeline();
 }
 
-mlperf_status_t mlperf_backend_issue_first_token_query(mlperf_backend_ptr_t backend_ptr) {
+mlperf_status_t mlperf_backend_issue_first_token_query(
+    mlperf_backend_ptr_t backend_ptr) {
   return pipeline->backend_issue_first_token_query(backend_ptr);
 }
 

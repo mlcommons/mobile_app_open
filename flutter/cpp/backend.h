@@ -44,7 +44,8 @@ class Backend {
   // Accelerator name.
   virtual const std::string& AcceleratorName() const = 0;
 
-  // Run inference for token based input (such as LLM prompt). Only needed for LLMs currently.
+  // Run inference for token based input (such as LLM prompt). Only needed for
+  // LLMs currently.
   virtual void IssueFirstTokenQuery() = 0;
 
   // Run inference for a sample. Inputs is already set by SetInputs.

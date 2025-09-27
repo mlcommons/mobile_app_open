@@ -344,17 +344,17 @@ task {
   scenario: "SingleStream"
   runs {
     normal {
-      min_query_count: 1024
+      min_query_count: 100
       min_duration: 60
       max_duration: 300
     }
     quick {
-      min_query_count: 128
+      min_query_count: 10
       min_duration: 10
       max_duration: 40
     }
     rapid {
-      min_query_count: 64
+      min_query_count: 6
       min_duration: 6
       max_duration: 60
     }
@@ -363,22 +363,22 @@ task {
     type: MMLU
       full {
       name: "TinyMMLU prompt set for LLM"
-      input_path: "https://thee.dev/mlc/data.tfrecord"
-      input_checksum: "b564d2c228a867148fa7d6df415a0368"
+      input_path: "local:///mlperf_datasets/tinymmlu/data.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
       groundtruth_path: ""
       groundtruth_checksum: ""
     }
     lite {
       name: "TinyMMLU prompt set for LLM"
-      input_path: "https://thee.dev/mlc/data.tfrecord"
-      input_checksum: "b564d2c228a867148fa7d6df415a0368"
+      input_path: "local:///mlperf_datasets/tinymmlu/data.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
       groundtruth_path: ""
       groundtruth_checksum: ""
     }
     tiny {
       name: "TinyMMLU prompt set for LLM"
-      input_path: "https://thee.dev/mlc/data.tfrecord"
-      input_checksum: "b564d2c228a867148fa7d6df415a0368"
+      input_path: "local:///mlperf_datasets/tinymmlu/data.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
       groundtruth_path: ""
       groundtruth_checksum: ""
     }
