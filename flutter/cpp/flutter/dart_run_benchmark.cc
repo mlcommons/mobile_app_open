@@ -108,7 +108,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       break;
     case ::mlperf::mobile::DatasetConfig::MMLU:
       dataset = std::make_unique<::mlperf::mobile::MmluGen>(
-          backend.get(), in->dataset_data_path);
+          backend.get(), in->dataset_data_path, true /*zero-shot*/);
       break;
     default:
       return nullptr;

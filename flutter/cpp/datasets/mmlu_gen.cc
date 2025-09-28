@@ -9,11 +9,11 @@
 namespace mlperf {
 namespace mobile {
 
-MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord)
+MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord, bool zero_shot)
     : sample_reader_(input_tfrecord), Dataset(backend) {
   // Load all TFRecord samples into memory
   // NOTE this can be moved to LoadSamplesToRam, but will cause delays between
-  // queries due to IO reads happening between queries
+  // queries due to IO reads happening between them
   for (size_t i = 0; i < sample_reader_.Size(); i++) {
     tensorflow::tstring record = sample_reader_.ReadRecord(i);
     tensorflow::Example example;
@@ -22,6 +22,8 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord)
         tensorflow::GetFeatureValues<std::string>("input", example).Get(0);
     std::string answer =
         tensorflow::GetFeatureValues<std::string>("answer", example).Get(0);
+
+    if (zero_shot) input = input.substr(input.rfind("\n\n")+2); // input-formatted shots are separated by 2 new lines
 
     auto sample = std::make_unique<PromptSample>();
     sample->input = input;

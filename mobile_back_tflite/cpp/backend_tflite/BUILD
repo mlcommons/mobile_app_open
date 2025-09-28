@@ -17,8 +17,6 @@ load(
     "tflite_copts",
     "tflite_jni_binary",
 )
-load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
 
 package(

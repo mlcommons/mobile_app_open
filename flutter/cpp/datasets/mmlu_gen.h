@@ -18,7 +18,7 @@ namespace mobile {
 
 class MmluGen : public Dataset {
  public:
-  MmluGen(Backend* backend, const std::string& input_tfrecord);
+  MmluGen(Backend* backend, const std::string& input_tfrecord, bool zero_shot);
 
   const std::string& Name() override { return name_; }
 
