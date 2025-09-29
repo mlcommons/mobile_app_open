@@ -47,6 +47,8 @@ class MmluGen : public Dataset {
  private:
   const std::string name_ = "MmluGen";
 
+  char find_answer_char(const char* input);
+
   TFRecordReader sample_reader_;
 
   struct PromptSample {

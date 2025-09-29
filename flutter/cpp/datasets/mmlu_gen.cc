@@ -63,10 +63,12 @@ std::vector<uint8_t> MmluGen::ProcessOutput(const int sample_idx,
   sample_output_token_counts_[sample_idx] =
       reinterpret_cast<std::vector<int>*>(outputs[1])->size();
   const char* prediction = reinterpret_cast<const char*>(outputs[0]);
-  char predicted_char =
-      prediction[1];  // Assume second token is the answer because of whitespace
-                      // (e.g., 'A', 'B', ...)
+
+  char predicted_char = find_answer_char(prediction);
   const std::string& correct = samples_[sample_idx]->answer;
+
+  LOG(INFO) << "expected " << correct << " got " << predicted_char << std::endl;
+
   bool is_correct = (predicted_char == correct[0]);
 
   total_++;
@@ -88,6 +90,38 @@ float MmluGen::ComputeAccuracy() {
 std::string MmluGen::ComputeAccuracyString() {
   float acc = ComputeAccuracy();
   return "Accuracy: " + std::to_string(acc * 100.0f) + "%";
+}
+
+char MmluGen::find_answer_char(const char* input) {
+  if (!input) return 0;
+
+  const unsigned char* c = reinterpret_cast<const unsigned char*>(input);
+
+  while (*c) {
+    // skip leading whitespace
+    while (*c && std::isspace(*c)) ++c;
+    if (!*c) break;
+
+    const unsigned char* start = c; // start of word
+
+    // quick check: is the word exactly 1 char long?
+    ++c; // move to potential second char
+    if (!*c || std::isspace(*c) || *c == '<') {
+      if (*start == 'A' ||
+          *start == 'B' ||
+          *start == 'C' ||
+          *start == 'D' ||
+          *start == 'a' ||
+          *start == 'b' ||
+          *start == 'c' ||
+          *start == 'd')
+        return *start;
+    } else {
+      // skip rest of this (longer) word quickly
+      while (*c && !std::isspace(*c)) ++c;
+    }
+  }
+  return 0;
 }
 
 }  // namespace mobile
