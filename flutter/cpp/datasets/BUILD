@@ -229,6 +229,8 @@ cc_library(
         "//flutter/cpp:utils",
         "//flutter/cpp/backends:external",
         "//flutter/cpp/datasets/squad_utils",
+        "//flutter/cpp/datasets/mmlu_utils",
+        "@com_google_sentencepiece//:sentencepiece_processor",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_protobuf//:protobuf",
         "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",

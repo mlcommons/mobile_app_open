@@ -22,7 +22,6 @@ limitations under the License.
 
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"
-#include "src/sentencepiece_processor.h"
 #include "tensorflow/core/platform/logging.h"
 #include "tensorflow/lite/experimental/genai/genai_ops.h"
 #include "tensorflow/lite/interpreter.h"
@@ -125,7 +124,6 @@ struct LLMBackendData {
   const char *vendor = "Google";
   const char *accelerator = "CPU";
   tflite::FlatBufferModel *model{nullptr};
-  sentencepiece::SentencePieceProcessor *sp_processor{nullptr};
   // TfLiteInterpreterOptions *options{}; TODO use this to allow different
   // delegates other than CPU?
   tflite::Interpreter *interpreter{};
@@ -135,18 +133,14 @@ struct LLMBackendData {
   kv_cache_t kv_cache;
   std::vector<int> prompt_tokens;
   std::vector<int> output_tokens;
-  std::string output;
   uint8_t threads = 30;
   int max_output_tokens = 2;
-  std::string start_token = "<bos>";
-  std::string end_token = "<eos>";
   int stop_token_id = -1;
 
   LLMBackendData() {}
 
   ~LLMBackendData() {
     // Runners are owned by interpreter and therefore don't need to be deleted
-    delete sp_processor;
     delete interpreter;
     delete model;
   }
@@ -222,8 +216,6 @@ class LLMPipeline : public Pipeline {
                                             kv_cache_t &kv_cache);
   tflite::SignatureRunner *GetDecodeRunner(tflite::Interpreter *interpreter,
                                            kv_cache_t &kv_cache);
-  sentencepiece::SentencePieceProcessor *LoadSentencePieceProcessor(
-      std::string path);
   int GreedySampler(const TfLiteTensor *logits);
 };
 

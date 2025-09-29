@@ -3,14 +3,21 @@
 #include <fstream>
 #include <iostream>
 
+#include "flutter/cpp/datasets/mmlu_utils/sentencepiece_utils.h"
 #include "tensorflow/core/example/example.pb.h"
 #include "tensorflow/core/example/feature_util.h"
 
 namespace mlperf {
 namespace mobile {
 
-MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord, bool zero_shot)
+// TODO add eos and bos tokens as config parameters
+MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord, const std::string& sp_path, bool zero_shot)
     : sample_reader_(input_tfrecord), Dataset(backend) {
+
+  sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(LoadSentencePieceProcessor(sp_path));
+  start_token_id = sp_processor->PieceToId(start_token);
+  end_token_id = sp_processor->PieceToId(end_token);
+
   // Load all TFRecord samples into memory
   // NOTE this can be moved to LoadSamplesToRam, but will cause delays between
   // queries due to IO reads happening between them
@@ -25,8 +32,15 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord, bool zero_
 
     if (zero_shot) input = input.substr(input.rfind("\n\n")+2); // input-formatted shots are separated by 2 new lines
 
+    std::vector<int> input_tokens;
+
+    sp_processor->Encode(input.c_str(), &input_tokens).ok();
+
+    input_tokens.insert(input_tokens.begin(), start_token_id);
+
     auto sample = std::make_unique<PromptSample>();
     sample->input = input;
+    sample->input_tokens = input_tokens;
     sample->answer = answer;
 
     samples_.push_back(std::move(sample));
@@ -49,9 +63,10 @@ void MmluGen::UnloadSamplesFromRam(
 
 std::vector<void*> MmluGen::GetData(int sample_idx) {
   std::vector<void*> data;
+
   if (sample_idx < samples_.size()) {
-    data.push_back(reinterpret_cast<void*>(
-        const_cast<char*>(samples_[sample_idx]->input.c_str())));
+    data.push_back(reinterpret_cast<void*>(const_cast<std::vector<int>*>(&(samples_[sample_idx]->input_tokens))));
+    data.push_back(reinterpret_cast<void*>(const_cast<int*>(&end_token_id)));
   }
   return data;
 }
@@ -60,14 +75,16 @@ std::vector<uint8_t> MmluGen::ProcessOutput(const int sample_idx,
                                             const std::vector<void*>& outputs) {
   if (sample_idx >= samples_.size() || outputs.empty()) return {0};
 
-  sample_output_token_counts_[sample_idx] =
-      reinterpret_cast<std::vector<int>*>(outputs[1])->size();
-  const char* prediction = reinterpret_cast<const char*>(outputs[0]);
+  const auto& output_tokens = *(reinterpret_cast<std::vector<int>*>(outputs[0]));
+  LOG(INFO) << "~getout " << output_tokens.size() << std::endl;
+
+  sample_output_token_counts_[sample_idx] = output_tokens.size();
+
+  std::string prediction;
+  sp_processor->Decode(output_tokens, &prediction).ok();
 
   char predicted_char = find_answer_char(prediction);
   const std::string& correct = samples_[sample_idx]->answer;
-
-  LOG(INFO) << "expected " << correct << " got " << predicted_char << std::endl;
 
   bool is_correct = (predicted_char == correct[0]);
 
@@ -92,10 +109,9 @@ std::string MmluGen::ComputeAccuracyString() {
   return "Accuracy: " + std::to_string(acc * 100.0f) + "%";
 }
 
-char MmluGen::find_answer_char(const char* input) {
-  if (!input) return 0;
+char MmluGen::find_answer_char(const std::string& input) {
 
-  const unsigned char* c = reinterpret_cast<const unsigned char*>(input);
+  const unsigned char* c = reinterpret_cast<const unsigned char*>(input.c_str());
 
   while (*c) {
     // skip leading whitespace

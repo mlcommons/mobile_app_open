@@ -85,7 +85,6 @@ cc_library(
         ":tflite_settings",
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
-        "@com_google_sentencepiece//:sentencepiece_processor",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
         "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite:util",

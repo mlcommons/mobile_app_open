@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "src/sentencepiece_processor.h"
 #include "flutter/cpp/dataset.h"
 #include "flutter/cpp/datasets/squad_utils/tfrecord_reader.h"
 
@@ -18,7 +19,7 @@ namespace mobile {
 
 class MmluGen : public Dataset {
  public:
-  MmluGen(Backend* backend, const std::string& input_tfrecord, bool zero_shot);
+  MmluGen(Backend* backend, const std::string& input_tfrecord, const std::string& sp_path, bool zero_shot);
 
   const std::string& Name() override { return name_; }
 
@@ -47,21 +48,29 @@ class MmluGen : public Dataset {
  private:
   const std::string name_ = "MmluGen";
 
-  char find_answer_char(const char* input);
+  char find_answer_char(const std::string& input);
 
   TFRecordReader sample_reader_;
 
   struct PromptSample {
     std::string input;
+    std::vector<int> input_tokens;
     std::string answer;
   };
 
   std::vector<std::unique_ptr<PromptSample>> samples_;
   std::vector<int64_t> sample_output_token_counts_;
   std::set<int> loaded_sample_ids_;
+  std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor;
 
   size_t correct_ = 0;
   size_t total_ = 0;
+
+
+  std::string start_token = "<bos>";
+  std::string end_token = "<eos>";
+  int start_token_id;
+  int end_token_id;
 };
 
 }  // namespace mobile

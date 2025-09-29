@@ -397,11 +397,15 @@ int Main(int argc, char *argv[]) {
     case DatasetConfig::MMLU: {
       bool zero_shot = false;
       LOG(INFO) << "TinyMMLU dataset for LLM benchmark";
-      std::string input_tfrecord, input_clip_model = "";
+      std::string input_tfrecord, sp_path = "";
       std::vector<Flag> dataset_flags{
           Flag::CreateFlag(
               "input_tfrecord", &input_tfrecord,
               "Path to the tfrecord file containing inputs for the model.",
+              Flag::kRequired),
+          Flag::CreateFlag(
+              "sp_path", &sp_path,
+              "Path to the sentencepiece model file.",
               Flag::kRequired),
           Flag::CreateFlag(
               "zero-shot", &zero_shot,
@@ -410,7 +414,7 @@ int Main(int argc, char *argv[]) {
 
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
-        dataset.reset(new MmluGen(backend.get(), input_tfrecord, zero_shot));
+        dataset.reset(new MmluGen(backend.get(), input_tfrecord, sp_path, zero_shot));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),

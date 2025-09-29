@@ -44,7 +44,6 @@ void LLMPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
 }
 
 // Create a new backend and return the pointer to it.
-// TODO add eos and bos tokens as config parameters
 mlperf_backend_ptr_t LLMPipeline::backend_create(
     const char *model_path, mlperf_backend_configuration_t *configs,
     const char *native_lib_path) {
@@ -55,10 +54,6 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
   }
 
   LLMBackendData *backend_data = new LLMBackendData();
-
-  // sentencePiece Processor Path
-  std::string sppp = mlperf::mobile::GetConfigValue(
-      configs, "sentencepiece_processor_path", std::string(""));
 
   // Load the model.
   backend_data->model =
@@ -82,18 +77,6 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
 
   backend_data->decode_runner =
       GetDecodeRunner(backend_data->interpreter, backend_data->kv_cache);
-
-  backend_data->sp_processor = LoadSentencePieceProcessor(sppp);
-  if (!backend_data->sp_processor) {
-    LOG(ERROR) << "Failed to load sentencepiece processor: " << sppp;
-    backend_delete(backend_data);
-    return nullptr;
-  }
-
-  if (!backend_data->end_token.empty()) {
-    backend_data->stop_token_id =
-        backend_data->sp_processor->PieceToId((backend_data->end_token));
-  }
 
   return backend_data;
 }
@@ -209,10 +192,10 @@ mlperf_status_t LLMPipeline::backend_flush_queries(
 }
 
 // Return the number of inputs of the model.
-// Only 1 input needs to be provided, which is the tokens themselves, the other
+// Only 2 inputs need to be provided, the tokens themselves, and the EOS token. The other
 // inputs are handled by the pipeline
 int32_t LLMPipeline::backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
-  return 1;
+  return 2;
 }
 
 // Return the type of the ith input.
@@ -227,25 +210,19 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                                void *data) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
 
-  std::string prompt = std::string(static_cast<char *>(data));
+  if (i == 1) {
+    backend_data->stop_token_id = *(reinterpret_cast<int*>(data));
+    return MLPERF_SUCCESS;
+  }
 
   // Reset the tokens and kv caches from potential previous runs.
-  backend_data->prompt_tokens.clear();
   backend_data->output_tokens.clear();
 
   for (auto &[_, vec] : backend_data->kv_cache) {
     std::fill(vec.begin(), vec.end(), 0.0f);
   }
 
-  MINIMAL_CHECK(
-      backend_data->sp_processor->Encode(prompt, &backend_data->prompt_tokens)
-          .ok());
-
-  if (!backend_data->start_token.empty()) {
-    backend_data->prompt_tokens.insert(
-        backend_data->prompt_tokens.begin(),
-        backend_data->sp_processor->PieceToId((backend_data->start_token)));
-  }
+  backend_data->prompt_tokens = *(reinterpret_cast<std::vector<int>*>(data));
 
   uint16_t effective_prefill_token_size =
       backend_data->prompt_tokens.size() - 1;  // assuming max tokens is <16k
@@ -275,7 +252,7 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
 // Return the number of outputs for the model.
 int32_t LLMPipeline::backend_get_output_count(
     mlperf_backend_ptr_t backend_ptr) {
-  return 2;  // 0 is the output string, 1 is the output tokens
+  return 1;  // 0 is the output tokens
 }
 
 // Return the type of ith output.
@@ -290,18 +267,10 @@ mlperf_status_t LLMPipeline::backend_get_output(
     void **data) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
 
-  if (i == 0) {
-    MINIMAL_CHECK(
-        backend_data->sp_processor
-            ->Decode(backend_data->output_tokens, &backend_data->output)
-            .ok());
-    LOG(INFO) << "Output: " << backend_data->output << std::endl;
-
-    *data = backend_data->output.data();
-  } else if (i == 1) {
-    *data = &backend_data->output_tokens;
-  } else
+  if (i != 0)
     return MLPERF_FAILURE;
+
+  *data = reinterpret_cast<void*>(&backend_data->output_tokens);
   return MLPERF_SUCCESS;
 }
 
@@ -419,16 +388,6 @@ tflite::SignatureRunner *LLMPipeline::GetDecodeRunner(
   MINIMAL_CHECK_PTR(runner != nullptr);
   PrepareRunner(runner, kv_cache);
   return runner;
-}
-
-sentencepiece::SentencePieceProcessor *LLMPipeline::LoadSentencePieceProcessor(
-    std::string path) {
-  std::ifstream input(path, std::ios::binary);
-  std::string serialized_proto = std::string(
-      std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
-  auto processor = new sentencepiece::SentencePieceProcessor();
-  MINIMAL_CHECK_PTR(processor->LoadFromSerializedProto(serialized_proto).ok());
-  return processor;
 }
 
 // A basic greedy sampler (equivalent to argmax).
