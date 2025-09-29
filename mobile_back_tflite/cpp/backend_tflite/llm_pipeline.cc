@@ -167,8 +167,11 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
 // Run the output token producing decode inference.
 // This function exclusively takes output tokens to produce more output tokens.
 mlperf_status_t LLMPipeline::backend_issue_query(
-    mlperf_backend_ptr_t backend_ptr) {
+    mlperf_backend_ptr_t backend_ptr, ft_callback callback, void* context) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+
+  backend_issue_first_token_query(backend_ptr);
+  callback(context);
 
   int kv_cache_max_size = backend_data->tensors.kv_cache_k_0()->dims->data[1];
   size_t input_size = backend_data->prompt_tokens.size();

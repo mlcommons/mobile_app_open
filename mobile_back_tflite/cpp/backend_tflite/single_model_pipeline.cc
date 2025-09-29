@@ -425,7 +425,7 @@ const char *SingleModelPipeline::backend_name(
 
 // Run the inference for a sample.
 mlperf_status_t SingleModelPipeline::backend_issue_query(
-    mlperf_backend_ptr_t backend_ptr) {
+    mlperf_backend_ptr_t backend_ptr, ft_callback callback, void* context) {
   TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
 
 #ifdef MTK_TFLITE_NEURON_BACKEND

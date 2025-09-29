@@ -47,10 +47,8 @@ struct BackendFunctions {
   using AcceleratorNamePtr =
       std::add_pointer<const char*(mlperf_backend_ptr_t)>::type;
   using BackendDeletePtr = std::add_pointer<void(mlperf_backend_ptr_t)>::type;
-  using IssueFirstTokenQueryPtr =
-      std::add_pointer<mlperf_status_t(mlperf_backend_ptr_t)>::type;
   using IssueQueryPtr =
-      std::add_pointer<mlperf_status_t(mlperf_backend_ptr_t)>::type;
+      std::add_pointer<mlperf_status_t(mlperf_backend_ptr_t, ft_callback, void*)>::type;
   using FlushQueriesPtr =
       std::add_pointer<mlperf_status_t(mlperf_backend_ptr_t)>::type;
 
@@ -80,7 +78,6 @@ struct BackendFunctions {
   AcceleratorNamePtr accelerator_name{nullptr};
   BackendDeletePtr destroy{nullptr};
 
-  IssueFirstTokenQueryPtr issue_first_token_query{nullptr};
   IssueQueryPtr issue_query{nullptr};
   FlushQueriesPtr flush_queries{nullptr};
 
@@ -159,15 +156,9 @@ class ExternalBackend : public Backend {
     return accelerator_name_;
   }
 
-  void IssueFirstTokenQuery() override {
-    if (backend_functions_.issue_first_token_query(backend_ptr_) !=
-        MLPERF_SUCCESS) {
-      LOG(FATAL) << "Error while inferencing model for first token";
-    }
-  }
   // Run inference for a sample.
-  void IssueQuery() override {
-    if (backend_functions_.issue_query(backend_ptr_) != MLPERF_SUCCESS) {
+  void IssueQuery(ft_callback callback, void* context) override {
+    if (backend_functions_.issue_query(backend_ptr_, callback, context) != MLPERF_SUCCESS) {
       LOG(FATAL) << "Error while inferencing model";
     }
   }

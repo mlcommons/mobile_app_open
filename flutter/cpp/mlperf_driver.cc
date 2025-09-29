@@ -28,6 +28,12 @@ limitations under the License.
 namespace mlperf {
 namespace mobile {
 
+// A method to be called by the backend as soon as the first token is generated (only for token based benchmarks)
+static void FirstTokenCallback(void* context) {
+  auto ft_responses = *(reinterpret_cast<std::vector<::mlperf::QuerySampleResponse>*>(context));
+  ::mlperf::FirstTokenComplete(ft_responses.data(), ft_responses.size());
+}
+
 void MlperfDriver::IssueQuery(
     const std::vector<::mlperf::QuerySample>& samples) {
   std::vector<::mlperf::QuerySampleResponse> responses;
@@ -47,7 +53,12 @@ void MlperfDriver::IssueQuery(
         backend_->SetInputs(inputs, b);
       }
 
-      backend_->IssueQuery();
+      // TODO maybe don't do these 2 lines for non token stuff
+      // TODO figure out what this vector sample variable is
+      ft_responses.clear();
+      ft_responses.push_back({sample.back().index, reinterpret_cast<std::uintptr_t>(nullptr), 0});
+
+      backend_->IssueQuery(&FirstTokenCallback, reinterpret_cast<void*>(&ft_responses));
 
       for (int b = 0; b < batch_; b++) {
         if (idx + b == samples.size()) break;  // ignore extra data
@@ -69,15 +80,11 @@ void MlperfDriver::IssueQuery(
       std::vector<void*> inputs = dataset_->GetData(sample.index);
       backend_->SetInputs(inputs);
 
-      if (use_tokens_) {
-        ft_responses.clear();
-        backend_->IssueFirstTokenQuery();
-        ft_responses.push_back(
-            {sample.id, reinterpret_cast<std::uintptr_t>(nullptr), 0});
-        ::mlperf::FirstTokenComplete(ft_responses.data(), ft_responses.size());
-      }
+      // TODO maybe don't do these 2 lines for non token stuff
+      ft_responses.clear();
+      ft_responses.push_back({sample.id, reinterpret_cast<std::uintptr_t>(nullptr), 0});
 
-      backend_->IssueQuery();
+      backend_->IssueQuery(&FirstTokenCallback, reinterpret_cast<void*>(&ft_responses));
 
       // Report to mlperf.
       std::vector<void*> outputs = backend_->GetPredictedOutputs();

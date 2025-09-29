@@ -187,14 +187,11 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
   reset_pipeline();
 }
 
-mlperf_status_t mlperf_backend_issue_first_token_query(
-    mlperf_backend_ptr_t backend_ptr) {
-  return pipeline->backend_issue_first_token_query(backend_ptr);
-}
-
 // Run the inference for a sample.
-mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
-  return pipeline->backend_issue_query(backend_ptr);
+// callback and context are only used when running token based inferences (LLM).
+// In other cases they can be passed as nullptr
+mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr, ft_callback callback, void* context) {
+  return pipeline->backend_issue_query(backend_ptr, callback, context);
 }
 
 // Flush the staged queries immediately.

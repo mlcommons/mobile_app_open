@@ -37,13 +37,8 @@ class SingleModelPipeline : public Pipeline {
 
   const char *backend_name(mlperf_backend_ptr_t backend_ptr) override;
 
-  mlperf_status_t backend_issue_first_token_query(
-      mlperf_backend_ptr_t backend_ptr) override {
-    return MLPERF_FAILURE;
-  }
-
   mlperf_status_t backend_issue_query(
-      mlperf_backend_ptr_t backend_ptr) override;
+      mlperf_backend_ptr_t backend_ptr, ft_callback callback, void* context) override;
 
   mlperf_status_t backend_flush_queries(
       mlperf_backend_ptr_t backend_ptr) override;
