@@ -24,7 +24,7 @@ namespace mlperf {
 namespace mobile {
 
 static sentencepiece::SentencePieceProcessor *LoadSentencePieceProcessor(
-                      std::string path) {
+    std::string path) {
   std::ifstream input(path, std::ios::binary);
   std::string serialized_proto = std::string(
       std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());

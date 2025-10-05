@@ -10,16 +10,17 @@
 #include <unordered_map>
 #include <vector>
 
-#include "src/sentencepiece_processor.h"
 #include "flutter/cpp/dataset.h"
 #include "flutter/cpp/datasets/squad_utils/tfrecord_reader.h"
+#include "src/sentencepiece_processor.h"
 
 namespace mlperf {
 namespace mobile {
 
 class MmluGen : public Dataset {
  public:
-  MmluGen(Backend* backend, const std::string& input_tfrecord, const std::string& sp_path, bool zero_shot);
+  MmluGen(Backend* backend, const std::string& input_tfrecord,
+          const std::string& sp_path, bool zero_shot);
 
   const std::string& Name() override { return name_; }
 
@@ -65,7 +66,6 @@ class MmluGen : public Dataset {
 
   size_t correct_ = 0;
   size_t total_ = 0;
-
 
   std::string start_token = "<bos>";
   std::string end_token = "<eos>";

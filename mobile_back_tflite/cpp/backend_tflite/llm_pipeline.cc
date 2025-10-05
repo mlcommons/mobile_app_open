@@ -150,7 +150,7 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
 // Run the output token producing decode inference.
 // This function exclusively takes output tokens to produce more output tokens.
 mlperf_status_t LLMPipeline::backend_issue_query(
-    mlperf_backend_ptr_t backend_ptr, ft_callback callback, void* context) {
+    mlperf_backend_ptr_t backend_ptr, ft_callback callback, void *context) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
 
   backend_issue_first_token_query(backend_ptr);
@@ -192,8 +192,8 @@ mlperf_status_t LLMPipeline::backend_flush_queries(
 }
 
 // Return the number of inputs of the model.
-// Only 2 inputs need to be provided, the tokens themselves, and the EOS token. The other
-// inputs are handled by the pipeline
+// Only 2 inputs need to be provided, the tokens themselves, and the EOS token.
+// The other inputs are handled by the pipeline
 int32_t LLMPipeline::backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
   return 2;
 }
@@ -211,7 +211,9 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
 
   if (i == 1) {
-    backend_data->stop_token_id = *(reinterpret_cast<int*>(data));
+    backend_data->stop_token_id = *(reinterpret_cast<int *>(data));
+    LOG(INFO) << "stop token id: "
+              << std::to_string(backend_data->stop_token_id) << std::endl;
     return MLPERF_SUCCESS;
   }
 
@@ -222,7 +224,7 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
     std::fill(vec.begin(), vec.end(), 0.0f);
   }
 
-  backend_data->prompt_tokens = *(reinterpret_cast<std::vector<int>*>(data));
+  backend_data->prompt_tokens = *(reinterpret_cast<std::vector<int> *>(data));
 
   uint16_t effective_prefill_token_size =
       backend_data->prompt_tokens.size() - 1;  // assuming max tokens is <16k
@@ -267,10 +269,9 @@ mlperf_status_t LLMPipeline::backend_get_output(
     void **data) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
 
-  if (i != 0)
-    return MLPERF_FAILURE;
+  if (i != 0) return MLPERF_FAILURE;
 
-  *data = reinterpret_cast<void*>(&backend_data->output_tokens);
+  *data = reinterpret_cast<void *>(&backend_data->output_tokens);
   return MLPERF_SUCCESS;
 }
 

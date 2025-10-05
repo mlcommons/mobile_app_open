@@ -11,10 +11,11 @@ namespace mlperf {
 namespace mobile {
 
 // TODO add eos and bos tokens as config parameters
-MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord, const std::string& sp_path, bool zero_shot)
+MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
+                 const std::string& sp_path, bool zero_shot)
     : sample_reader_(input_tfrecord), Dataset(backend) {
-
-  sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(LoadSentencePieceProcessor(sp_path));
+  sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(
+      LoadSentencePieceProcessor(sp_path));
   start_token_id = sp_processor->PieceToId(start_token);
   end_token_id = sp_processor->PieceToId(end_token);
 
@@ -30,7 +31,10 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord, const std:
     std::string answer =
         tensorflow::GetFeatureValues<std::string>("answer", example).Get(0);
 
-    if (zero_shot) input = input.substr(input.rfind("\n\n")+2); // input-formatted shots are separated by 2 new lines
+    if (zero_shot)
+      input = input.substr(
+          input.rfind("\n\n") +
+          2);  // input-formatted shots are separated by 2 new lines
 
     std::vector<int> input_tokens;
 
@@ -65,7 +69,8 @@ std::vector<void*> MmluGen::GetData(int sample_idx) {
   std::vector<void*> data;
 
   if (sample_idx < samples_.size()) {
-    data.push_back(reinterpret_cast<void*>(const_cast<std::vector<int>*>(&(samples_[sample_idx]->input_tokens))));
+    data.push_back(reinterpret_cast<void*>(
+        const_cast<std::vector<int>*>(&(samples_[sample_idx]->input_tokens))));
     data.push_back(reinterpret_cast<void*>(const_cast<int*>(&end_token_id)));
   }
   return data;
@@ -75,8 +80,8 @@ std::vector<uint8_t> MmluGen::ProcessOutput(const int sample_idx,
                                             const std::vector<void*>& outputs) {
   if (sample_idx >= samples_.size() || outputs.empty()) return {0};
 
-  const auto& output_tokens = *(reinterpret_cast<std::vector<int>*>(outputs[0]));
-  LOG(INFO) << "~getout " << output_tokens.size() << std::endl;
+  const auto& output_tokens =
+      *(reinterpret_cast<std::vector<int>*>(outputs[0]));
 
   sample_output_token_counts_[sample_idx] = output_tokens.size();
 
@@ -110,27 +115,21 @@ std::string MmluGen::ComputeAccuracyString() {
 }
 
 char MmluGen::find_answer_char(const std::string& input) {
-
-  const unsigned char* c = reinterpret_cast<const unsigned char*>(input.c_str());
+  const unsigned char* c =
+      reinterpret_cast<const unsigned char*>(input.c_str());
 
   while (*c) {
     // skip leading whitespace
     while (*c && std::isspace(*c)) ++c;
     if (!*c) break;
 
-    const unsigned char* start = c; // start of word
+    const unsigned char* start = c;  // start of word
 
     // quick check: is the word exactly 1 char long?
-    ++c; // move to potential second char
+    ++c;  // move to potential second char
     if (!*c || std::isspace(*c) || *c == '<') {
-      if (*start == 'A' ||
-          *start == 'B' ||
-          *start == 'C' ||
-          *start == 'D' ||
-          *start == 'a' ||
-          *start == 'b' ||
-          *start == 'c' ||
-          *start == 'd')
+      if (*start == 'A' || *start == 'B' || *start == 'C' || *start == 'D' ||
+          *start == 'a' || *start == 'b' || *start == 'c' || *start == 'd')
         return *start;
     } else {
       // skip rest of this (longer) word quickly
