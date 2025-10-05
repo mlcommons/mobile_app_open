@@ -403,10 +403,9 @@ int Main(int argc, char *argv[]) {
               "input_tfrecord", &input_tfrecord,
               "Path to the tfrecord file containing inputs for the model.",
               Flag::kRequired),
-          Flag::CreateFlag(
-              "sp_path", &sp_path,
-              "Path to the sentencepiece model file.",
-              Flag::kRequired),
+          Flag::CreateFlag("sp_path", &sp_path,
+                           "Path to the sentencepiece model file.",
+                           Flag::kRequired),
           Flag::CreateFlag(
               "zero-shot", &zero_shot,
               "Use zero-shot prompts instead of the default few-shot."),
@@ -414,7 +413,8 @@ int Main(int argc, char *argv[]) {
 
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
-        dataset.reset(new MmluGen(backend.get(), input_tfrecord, sp_path, zero_shot));
+        dataset.reset(
+            new MmluGen(backend.get(), input_tfrecord, sp_path, zero_shot));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),

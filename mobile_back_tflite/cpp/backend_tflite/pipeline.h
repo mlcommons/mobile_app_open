@@ -41,8 +41,9 @@ class Pipeline {
   virtual const char *backend_name(mlperf_backend_ptr_t backend_ptr) = 0;
 
   // Run the inference for a sample.
-  virtual mlperf_status_t backend_issue_query(
-      mlperf_backend_ptr_t backend_ptr, ft_callback callback, void* context) = 0;
+  virtual mlperf_status_t backend_issue_query(mlperf_backend_ptr_t backend_ptr,
+                                              ft_callback callback,
+                                              void *context) = 0;
 
   // Flush the staged queries immediately.
   virtual mlperf_status_t backend_flush_queries(

@@ -108,8 +108,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
           in->output_dir);
       break;
     case ::mlperf::mobile::DatasetConfig::MMLU:
-      for (auto setting : settings.benchmark_setting().custom_setting())
-      {
+      for (auto setting : settings.benchmark_setting().custom_setting()) {
         if (setting.id() == "llm_tokenizer_path") sp_path = setting.value();
       }
       dataset = std::make_unique<::mlperf::mobile::MmluGen>(
