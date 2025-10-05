@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:upgrader/upgrader.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
       ),
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
-      home: home,
+      home: UpgradeAlert(child: home),
     );
   }
 }
