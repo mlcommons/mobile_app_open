@@ -264,7 +264,7 @@ typedef struct _ACPI_SRAT {
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 
 typedef struct _ACPI_SRAT_ENTRY {
   UCHAR Type;
@@ -435,7 +435,7 @@ typedef struct _ACPI_MPST {
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 
 typedef struct _POWER_STATE_CHARACTERISTICS {
   union {
@@ -934,10 +934,10 @@ typedef LOCAL_X2APIC_NMISOURCE UNALIGNED *PLOCAL_X2APIC_NMISOURCE;
     _COMPRESSED_ |= _AFF3_;                             \
   }
 
-#define UNCOMPRESS_MPIDR(_COMPRESSED_, _MPIDR_)                  \
-  {                                                              \
-    (_MPIDR_) = (ULONGLONG)(_COMPRESSED_)&0x00FFFFFFULL;         \
-    (_MPIDR_) |= ((ULONGLONG)(_COMPRESSED_)&0xFF000000ULL) << 8; \
+#define UNCOMPRESS_MPIDR(_COMPRESSED_, _MPIDR_)                    \
+  {                                                                \
+    (_MPIDR_) = (ULONGLONG)(_COMPRESSED_) & 0x00FFFFFFULL;         \
+    (_MPIDR_) |= ((ULONGLONG)(_COMPRESSED_) & 0xFF000000ULL) << 8; \
   }
 
 typedef struct _PROCLOCALGIC {
@@ -1852,7 +1852,7 @@ C_ASSERT(WAET_DEV_RTC_ENLIGHTENED == 1);
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 
 //
 // Top-level IORT table
@@ -2155,7 +2155,7 @@ typedef struct _RHSA {
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 
 typedef struct _DMARTABLE {
   USHORT Type;
@@ -2653,7 +2653,7 @@ typedef struct _PCC_TABLE {
 #define BGRT_STATUS_DISPLAY_ROTATION 0x06
 
 #define BGRT_STATUS_GET_DISPLAY_ROTATION(_Status_) \
-  ((UCHAR)((ULONG)((_Status_)&BGRT_STATUS_DISPLAY_ROTATION) >> 1))
+  ((UCHAR)((ULONG)((_Status_) & BGRT_STATUS_DISPLAY_ROTATION) >> 1))
 
 typedef enum _BGRT_IMAGE_TYPE {
   BgrtImageTypeBitmap,
@@ -3065,7 +3065,7 @@ typedef struct _ACPI_PLD_V2_BUFFER {
 
 // Color bits 8:31 (Red 8:15, Green 16:23, Blue 24:31)
 #define ACPI_PLD_MAKE_COLOR(r, g, b) \
-  ((UINT32)(((r)&0xFF) | (((g)&0xFF) << 8) | (((b)&0xFF) << 16)))
+  ((UINT32)(((r) & 0xFF) | (((g) & 0xFF) << 8) | (((b) & 0xFF) << 16)))
 #define ACPI_PLD_COLOR_RED(c) ((BYTE)(((c) >> 0) & 0xFF))
 #define ACPI_PLD_COLOR_GREEN(c) ((BYTE)(((c) >> 8) & 0xFF))
 #define ACPI_PLD_COLOR_BLUE(c) ((BYTE)(((c) >> 16) & 0xFF))
@@ -3610,7 +3610,7 @@ typedef struct _NFIT_PLATFORM_CAPABILITIES {
 #endif
 
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 
@@ -3646,7 +3646,7 @@ typedef struct _WSMT {
 #endif
 
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 
@@ -3692,7 +3692,7 @@ typedef struct _LPIT {
 #endif
 
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 
@@ -3844,7 +3844,7 @@ typedef struct _ACPI_PDTT {
 #pragma warning(disable : 4214)  // nonstandard extension used : bit field types
                                  // other than int
 #pragma warning( \
-        disable : 4201)  // nonstandard extension used : nameless struct/union
+    disable : 4201)  // nonstandard extension used : nameless struct/union
 
 #define HMAT_SIGNATURE 0x54414D48  // "HMAT"
 

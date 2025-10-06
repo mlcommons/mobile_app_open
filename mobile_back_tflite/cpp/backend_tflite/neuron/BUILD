@@ -33,6 +33,7 @@ cc_library(
     srcs = [
         "neuron_backend.cc",
         "//mobile_back_tflite/cpp/backend_tflite:sd_utils.cc",
+        "//mobile_back_tflite/cpp/backend_tflite:llm_pipeline.cc",
         "//mobile_back_tflite/cpp/backend_tflite:single_model_pipeline.cc",
         "//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_invoker.cc",
         "//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_pipeline.cc",
@@ -45,6 +46,7 @@ cc_library(
         "neuron_backend.h",
         "neuron_builder.h",
         "tflite_settings_mtk.h",
+        "//mobile_back_tflite/cpp/backend_tflite:llm_pipeline.h",
         "//mobile_back_tflite/cpp/backend_tflite:pipeline.h",
         "//mobile_back_tflite/cpp/backend_tflite:sd_utils.h",
         "//mobile_back_tflite/cpp/backend_tflite:single_model_pipeline.h",
@@ -77,6 +79,8 @@ cc_library(
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
         "@org_tensorflow//tensorflow/lite/c:c_api",
         "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/experimental/genai:genai_ops",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             ":neuron_delegate",

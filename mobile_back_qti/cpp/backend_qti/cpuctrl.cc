@@ -35,13 +35,17 @@ using namespace std::chrono;
 #define GET_AFFINITY(a, b) sched_getaffinity(gettid(), a, b)
 #else
 #define SET_AFFINITY(a, b) \
-  {}
+  {                        \
+  }
 #define GET_AFFINITY(a, b) \
-  {}
+  {                        \
+  }
 #define CPU_ZERO(a) \
-  {}
+  {                 \
+  }
 #define CPU_SET(a, b) \
-  {}
+  {                   \
+  }
 #endif
 
 static uint32_t soc_id_ = 0;

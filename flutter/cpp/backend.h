@@ -45,7 +45,8 @@ class Backend {
   virtual const std::string& AcceleratorName() const = 0;
 
   // Run inference for a sample. Inputs is already set by SetInputs.
-  // TODO might be good to provide the callback and context along with the inputs if possible
+  // TODO might be good to provide the callback and context along with the
+  // inputs if possible
   virtual void IssueQuery(ft_callback callback, void* context) = 0;
 
   // Flush the staged queries immediately.

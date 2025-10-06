@@ -213,7 +213,9 @@ mlperf_data_t mlperf_backend_get_output_type(mlperf_backend_ptr_t backend_ptr,
   return data;
 }
 
-mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
+                                           ft_callback callback,
+                                           void *context) {
   mbe_core_holder *ptr = (mbe_core_holder *)backend_ptr;
   MLOGD("+ mlperf_backend_issue_query with ptr[%p]", ptr);
   intf_mlperf_status_t intf_status = ptr->issue_query_fp();
