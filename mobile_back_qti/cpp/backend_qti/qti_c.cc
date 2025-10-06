@@ -199,7 +199,9 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
 }
 
 // Run the inference for a sample.
-mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
+                                           ft_callback callback,
+                                           void *context) {
   mlperf_status_t ret = MLPERF_FAILURE;
 
   QTIBackendHelper *backend_data = (QTIBackendHelper *)backend_ptr;
@@ -208,7 +210,8 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
   auto start = high_resolution_clock::now();
 #endif
   if (backend_data->isTflite_) {
-    return tflite_backend_issue_query(backend_data->tfliteBackend_);
+    return tflite_backend_issue_query(backend_data->tfliteBackend_, callback,
+                                      context);
   }
 
   if (backend_data->isStableDiffusion) {

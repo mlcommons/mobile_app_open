@@ -44,7 +44,7 @@ class mbe_core_holder {
   using backend_get_output_t =
       std::add_pointer<intf_mlperf_status_t(int32_t, int32_t, void **)>::type;
   using backend_issue_query_t =
-      std::add_pointer<intf_mlperf_status_t(void)>::type;
+      std::add_pointer<mlperf_status_t(void, void, void *)>::type;
   using backend_convert_inputs_t =
       std::add_pointer<void(int, int, int, uint8_t *)>::type;
   using backend_delete_t = std::add_pointer<void(void)>::type;

@@ -145,7 +145,9 @@ void tflite_backend_delete(mlperf_backend_ptr_t backend_ptr) {
 }
 
 // Run the inference for a sample.
-mlperf_status_t tflite_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+mlperf_status_t tflite_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
+                                           ft_callback callback,
+                                           void* context) {
   TFLiteBackendData* backend_data = (TFLiteBackendData*)backend_ptr;
   if (TfLiteInterpreterInvoke(backend_data->interpreter) != kTfLiteOk) {
     printf("Failed to run the inference");
