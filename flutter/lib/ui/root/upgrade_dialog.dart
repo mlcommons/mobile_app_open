@@ -23,24 +23,28 @@ class UpgradeDialog extends StatelessWidget {
     return UpgradeAlert(
       upgrader: upgrader,
       onUpdate: () {
-        _onUpgradeUpdate();
-        return true;
+        if (Platform.isAndroid) {
+          _onUpdateAndroid();
+          return false;
+        } else {
+          return true; // Return true to allow Upgrader's default behavior to proceed.
+        }
       },
       child: child,
     );
   }
 
-  // Handler for the Upgrader "Update now" button.
-  Future<bool> _onUpgradeUpdate() async {
+  // Handler for the "Update now" button on Android
+  Future<bool> _onUpdateAndroid() async {
+    // For Android and other platforms, resolve a custom URL.
     final uri = await _resolveUpdateUri();
-    if (uri == null) return false;
+    if (uri == null) return true;
     final can = await canLaunchUrl(uri);
     if (can) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
-      // Return true to indicate we handled navigation and suppress default.
-      return true;
+      return false;
     }
-    return false;
+    return true;
   }
 
   // Decide which URL to open for the update action based on installer source.
@@ -49,13 +53,11 @@ class UpgradeDialog extends StatelessWidget {
       final info = await PackageInfo.fromPlatform();
       final installer = info.installerStore;
       final packageName = info.packageName;
-
       if (Platform.isAndroid) {
         // Map known Android installer package names to their corresponding store URLs.
         final uri = _androidStoreUriFor(installer, packageName);
         if (uri != null) return uri;
       }
-
       // Fallback/update source for sideloaded APKs or unknown installers.
       // Use the public GitHub releases page for this project.
       return Uri.parse('https://github.com/mlcommons/mobile_app_open/releases');
