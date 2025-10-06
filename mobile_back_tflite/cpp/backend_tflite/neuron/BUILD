@@ -32,8 +32,8 @@ cc_library(
     name = "tflite_neuron_c",
     srcs = [
         "neuron_backend.cc",
-        "//mobile_back_tflite/cpp/backend_tflite:sd_utils.cc",
         "//mobile_back_tflite/cpp/backend_tflite:llm_pipeline.cc",
+        "//mobile_back_tflite/cpp/backend_tflite:sd_utils.cc",
         "//mobile_back_tflite/cpp/backend_tflite:single_model_pipeline.cc",
         "//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_invoker.cc",
         "//mobile_back_tflite/cpp/backend_tflite:stable_diffusion_pipeline.cc",

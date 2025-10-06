@@ -25,7 +25,9 @@ const char* mlperf_backend_name(mlperf_backend_ptr_t backend_ptr) { return ""; }
 
 void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {}
 
-mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
+                                           ft_callback callback,
+                                           void* context) {
   return MLPERF_FAILURE;
 }
 

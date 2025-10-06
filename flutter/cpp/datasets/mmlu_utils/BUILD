@@ -21,7 +21,7 @@ package(
 cc_library(
     name = "mmlu_utils",
     hdrs = [
-        "sentencepiece_utils.h"
+        "sentencepiece_utils.h",
     ],
     copts = select({
         "//flutter/android/commonlibs:use_asan": [
@@ -33,6 +33,6 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "@com_google_sentencepiece//:sentencepiece_processor"
-    ]
+        "@com_google_sentencepiece//:sentencepiece_processor",
+    ],
 )
