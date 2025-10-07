@@ -36,4 +36,5 @@ fi
 
 xcrun simctl boot "${UDID}" || true
 xcrun simctl bootstatus "${UDID}" -b
-defaults write com.apple.iopen -a Simulatorphonesimulator "CurrentDeviceUDID" "${UDID}"
+
+defaults write com.apple.iphonesimulator CurrentDeviceUDID -string "${UDID}" || echo "Warning: failed to set CurrentDeviceUDID via defaults (non-fatal)"
