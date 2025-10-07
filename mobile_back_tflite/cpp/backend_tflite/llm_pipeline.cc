@@ -334,9 +334,9 @@ kv_cache_t LLMPipeline::BuildKVCache(tflite::Interpreter *interpreter) {
 void LLMPipeline::PrepareRunner(tflite::SignatureRunner *runner,
                                 kv_cache_t &kv_cache) {
   for (auto &[name, cache] : kv_cache) {
-    TfLiteCustomAllocation allocation = {
-        .data = static_cast<void *>(cache.data()),
-        .bytes = cache.size() * sizeof(float)};
+    TfLiteCustomAllocation allocation = {};
+    allocation.data = static_cast<void *>(cache.data());
+    allocation.bytes = cache.size() * sizeof(float);
     // Both input and output tensors are set to the same buffer. Not all
     // delegates support this in-place update. For those cases, we need to do
     // a ping-pong buffer and update the pointers between inference calls.
