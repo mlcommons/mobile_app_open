@@ -134,7 +134,7 @@ struct LLMBackendData {
   std::vector<int> prompt_tokens;
   std::vector<int> output_tokens;
   uint8_t threads = 30;
-  int max_output_tokens = 2;
+  int max_output_tokens = 2048;
   int stop_token_id = -1;
 
   LLMBackendData() {}

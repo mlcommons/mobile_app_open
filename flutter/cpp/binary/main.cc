@@ -25,6 +25,7 @@ limitations under the License.
 #include "flutter/cpp/datasets/ade20k.h"
 #include "flutter/cpp/datasets/coco.h"
 #include "flutter/cpp/datasets/coco_gen.h"
+#include "flutter/cpp/datasets/ifeval.h"
 #include "flutter/cpp/datasets/imagenet.h"
 #include "flutter/cpp/datasets/mmlu_gen.h"
 #include "flutter/cpp/datasets/snu_sr.h"
@@ -70,6 +71,8 @@ DatasetConfig::DatasetType Str2DatasetType(absl::string_view name) {
     return DatasetConfig::COCOGEN;
   } else if (absl::EqualsIgnoreCase(name, "MMLU")) {
     return DatasetConfig::MMLU;
+  } else if (absl::EqualsIgnoreCase(name, "IFEVAL")) {
+    return DatasetConfig::IFEVAL;
   } else if (absl::EqualsIgnoreCase(name, "DUMMY")) {
     return DatasetConfig::NONE;
   } else {
@@ -91,6 +94,8 @@ DatasetConfig::DatasetType BenchmarkId2DatasetType(absl::string_view name) {
     return DatasetConfig::SNUSR;
   } else if (absl::StartsWith(name, "stable_diffusion")) {
     return DatasetConfig::COCOGEN;
+  } else if (absl::StartsWith(name, "llm_instruction")) {
+    return DatasetConfig::IFEVAL;
   } else if (absl::StartsWith(name, "llm")) {
     return DatasetConfig::MMLU;
   } else {
@@ -415,6 +420,32 @@ int Main(int argc, char *argv[]) {
           backend) {
         dataset.reset(
             new MmluGen(backend.get(), input_tfrecord, sp_path, zero_shot));
+      }
+      // Adds to flag_list for showing help.
+      flag_list.insert(flag_list.end(), dataset_flags.begin(),
+                       dataset_flags.end());
+    } break;
+    case DatasetConfig::IFEVAL: {
+      bool loose_follow = false;
+      LOG(INFO) << "IFEval dataset for LLM benchmark";
+      std::string input_tfrecord, sp_path = "";
+      std::vector<Flag> dataset_flags{
+          Flag::CreateFlag(
+              "input_tfrecord", &input_tfrecord,
+              "Path to the tfrecord file containing inputs for the model.",
+              Flag::kRequired),
+          Flag::CreateFlag("sp_path", &sp_path,
+                           "Path to the sentencepiece model file.",
+                           Flag::kRequired),
+          Flag::CreateFlag("loose-follow", &loose_follow,
+                           "Whether to loosely check if the instructions are "
+                           "being followed"),
+      };
+
+      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+          backend) {
+        dataset.reset(
+            new IFEval(backend.get(), input_tfrecord, sp_path, loose_follow));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),
