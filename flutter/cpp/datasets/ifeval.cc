@@ -44,7 +44,7 @@ IFEval::IFEval(Backend* backend, const std::string& input_tfrecord,
     sample->instructions = std::move(instructions);
 
     samples_.push_back(std::move(sample));
-    sample_output_token_counts_.push_back(0);
+    sample_output_tokens_.push_back(std::vector<int>());
   }
 }
 
@@ -79,44 +79,39 @@ std::vector<uint8_t> IFEval::ProcessOutput(const int sample_idx,
   const auto& output_tokens =
       *(reinterpret_cast<std::vector<int>*>(outputs[0]));
 
-  LOG(INFO) << '['
-            << std::accumulate(std::next(output_tokens.begin()),
-                               output_tokens.end(),
-                               std::to_string(output_tokens[0]),
-                               [](std::string a, int b) {
-                                 return std::move(a) + ", " + std::to_string(b);
-                               })
-            << "]\n";
+  sample_output_tokens_[sample_idx] = output_tokens;
 
-  sample_output_token_counts_[sample_idx] = output_tokens.size();
-
-  std::string prediction;
-  sp_processor->Decode(output_tokens, &prediction).ok();
-
-  LOG(INFO) << "output(" << std::to_string(sample_idx) << "): " << prediction
-            << std::endl;
-
-  bool is_correct = true;  // Automatically pass samples with no instructions.
-  std::vector<ifeval::InstructionGroup> groups;
-  for (const auto& instruction : samples_[sample_idx]->instructions) {
-    is_correct &= instruction->IsFollowed(prediction, loose_follow_);
-    groups.emplace_back(instruction->Group());
-  }
-
-  for (auto group : groups) ProcessResult(group, is_correct);
-
-  return {static_cast<uint8_t>(is_correct)};
+  return {1};
 }
 
 int64_t IFEval::GetOutputTokenCount(const int sample_idx) {
-  return sample_output_token_counts_[sample_idx];
+  return sample_output_tokens_[sample_idx].size();
 }
 
 bool IFEval::HasAccuracy() { return true; }
 
+bool IFEval::ComputeSampleAccuracy(const int sample_idx,
+                                   ifeval::GroupAccuracy& accuracy) {
+  std::string prediction;
+  sp_processor->Decode(sample_output_tokens_[sample_idx], &prediction).ok();
+
+  LOG(INFO) << "output(" << std::to_string(sample_idx) << "): " << prediction
+            << std::endl;
+
+  for (const auto& instruction : samples_[sample_idx]->instructions) {
+    bool is_correct = instruction->IsFollowed(prediction, loose_follow_);
+    ProcessResult(instruction->Group(), is_correct, accuracy);
+  }
+}
+
 float IFEval::ComputeAccuracy() {
   uint16_t correct_sum;
   uint16_t total_sum;
+  ifeval::GroupAccuracy accuracy;
+
+  for (auto sample_id : used_sample_ids_) {
+    ComputeSampleAccuracy(sample_id, accuracy);
+  }
 
   correct_sum += accuracy.change_case_correct;
   correct_sum += accuracy.combination_correct;
@@ -431,7 +426,8 @@ IFEval::BuildInstructions(const tensorflow::Example& ex) {
 }
 
 inline void IFEval::ProcessResult(ifeval::InstructionGroup group,
-                                  bool is_correct) {
+                                  bool is_correct,
+                                  ifeval::GroupAccuracy& accuracy) {
   uint8_t correct_value = is_correct ? 1 : 0;
   switch (group) {
     case ifeval::InstructionGroup::CHANGE_CASE:

@@ -56,6 +56,9 @@ class IFEval : public Dataset {
 
   bool HasAccuracy() override;
 
+  bool ComputeSampleAccuracy(const int sample_idx,
+                             ifeval::GroupAccuracy& accuracy);
+
   float ComputeAccuracy() override;
 
   std::string ComputeAccuracyString() override;
@@ -63,7 +66,8 @@ class IFEval : public Dataset {
   inline std::vector<std::unique_ptr<ifeval::Instruction>> BuildInstructions(
       const tensorflow::Example& ex);
 
-  inline void ProcessResult(ifeval::InstructionGroup group, bool is_correct);
+  inline void ProcessResult(ifeval::InstructionGroup group, bool is_correct,
+                            ifeval::GroupAccuracy& accuracy);
 
  private:
   const std::string name_ = "IFEval";
@@ -71,11 +75,11 @@ class IFEval : public Dataset {
   TFRecordReader sample_reader_;
 
   std::vector<std::unique_ptr<ifeval::Sample>> samples_;
-  std::vector<int64_t> sample_output_token_counts_;
+  std::vector<std::vector<int>> sample_output_tokens_;
+  std::unordered_set<size_t> used_sample_ids_;
   std::set<int> loaded_sample_ids_;
   std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor;
 
-  ifeval::GroupAccuracy accuracy;
   bool loose_follow_;
 
   std::string start_token = "<bos>";

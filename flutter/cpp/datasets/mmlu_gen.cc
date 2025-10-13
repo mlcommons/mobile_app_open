@@ -10,7 +10,6 @@
 namespace mlperf {
 namespace mobile {
 
-// TODO add eos and bos tokens as config parameters
 MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
                  const std::string& sp_path, bool zero_shot)
     : sample_reader_(input_tfrecord), Dataset(backend) {
@@ -48,7 +47,7 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
     sample->answer = answer;
 
     samples_.push_back(std::move(sample));
-    sample_output_token_counts_.push_back(0);
+    sample_output_tokens_.push_back(std::vector<int>());
   }
 }
 
@@ -83,30 +82,40 @@ std::vector<uint8_t> MmluGen::ProcessOutput(const int sample_idx,
   const auto& output_tokens =
       *(reinterpret_cast<std::vector<int>*>(outputs[0]));
 
-  sample_output_token_counts_[sample_idx] = output_tokens.size();
+  sample_output_tokens_[sample_idx] = output_tokens;
+  used_sample_ids_.insert(sample_idx);
 
-  std::string prediction;
-  sp_processor->Decode(output_tokens, &prediction).ok();
-
-  char predicted_char = find_answer_char(prediction);
-  const std::string& correct = samples_[sample_idx]->answer;
-
-  bool is_correct = (predicted_char == correct[0]);
-
-  total_++;
-  if (is_correct) correct_++;
-
-  return {static_cast<uint8_t>(is_correct)};
+  return {1};
 }
 
 int64_t MmluGen::GetOutputTokenCount(const int sample_idx) {
-  return sample_output_token_counts_[sample_idx];
+  return sample_output_tokens_[sample_idx].size();
 }
 
 bool MmluGen::HasAccuracy() { return true; }
 
+bool MmluGen::ComputeSampleAccuracy(const int sample_idx) {
+  std::string prediction;
+  sp_processor->Decode(sample_output_tokens_[sample_idx], &prediction).ok();
+
+  LOG(INFO) << "index: " << std::to_string(sample_idx) << std::endl;
+  LOG(INFO) << "Output: [[[" << prediction << "]]]" << std::endl;
+
+  char predicted_char = find_answer_char(prediction);
+  const std::string& correct = samples_[sample_idx]->answer;
+
+  return (predicted_char == correct[0]);
+}
+
 float MmluGen::ComputeAccuracy() {
-  return total_ > 0 ? static_cast<float>(correct_) / total_ : 0.0f;
+  int total(0), correct(0);
+
+  for (auto sample_id : used_sample_ids_) {
+    total++;
+    if (ComputeSampleAccuracy(sample_id)) correct++;
+  }
+
+  return total > 0 ? static_cast<float>(correct) / total : 0.0f;
 }
 
 std::string MmluGen::ComputeAccuracyString() {

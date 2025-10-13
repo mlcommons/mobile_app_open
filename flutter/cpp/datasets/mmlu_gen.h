@@ -7,7 +7,7 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "flutter/cpp/dataset.h"
@@ -42,6 +42,8 @@ class MmluGen : public Dataset {
 
   bool HasAccuracy() override;
 
+  bool ComputeSampleAccuracy(const int sample_idx);
+
   float ComputeAccuracy() override;
 
   std::string ComputeAccuracyString() override;
@@ -60,12 +62,10 @@ class MmluGen : public Dataset {
   };
 
   std::vector<std::unique_ptr<PromptSample>> samples_;
-  std::vector<int64_t> sample_output_token_counts_;
+  std::vector<std::vector<int>> sample_output_tokens_;
+  std::unordered_set<size_t> used_sample_ids_;
   std::set<int> loaded_sample_ids_;
   std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor;
-
-  size_t correct_ = 0;
-  size_t total_ = 0;
 
   std::string start_token = "<bos>";
   std::string end_token = "<eos>";
