@@ -81,11 +81,6 @@ class IFEval : public Dataset {
   std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor;
 
   bool loose_follow_;
-
-  std::string start_token = "<bos>";
-  std::string end_token = "<eos>";
-  int start_token_id;
-  int end_token_id;
 };
 
 }  // namespace mobile

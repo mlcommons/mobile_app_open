@@ -75,6 +75,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
 
   ::std::unique_ptr<::mlperf::mobile::Dataset> dataset;
   std::string sp_path;
+  std::string sp_path_filename;
   switch (in->dataset_type) {
     case ::mlperf::mobile::DatasetConfig::IMAGENET:
       dataset = std::make_unique<::mlperf::mobile::Imagenet>(
@@ -109,8 +110,11 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       break;
     case ::mlperf::mobile::DatasetConfig::MMLU:
       for (auto setting : settings.benchmark_setting().custom_setting()) {
-        if (setting.id() == "llm_tokenizer_path") sp_path = setting.value();
+        if (setting.id() == "tokenizer_filename") sp_path_filename = setting.value();
       }
+      sp_path = in->backend_model_path;
+      sp_path += '/' + sp_path_filename;
+      LOG(INFO) << "SP path: " << sp_path;
       dataset = std::make_unique<::mlperf::mobile::MmluGen>(
           backend.get(), in->dataset_data_path, sp_path, true /*zero-shot*/);
       break;

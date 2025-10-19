@@ -17,8 +17,6 @@ IFEval::IFEval(Backend* backend, const std::string& input_tfrecord,
       Dataset(backend) {
   sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(
       LoadSentencePieceProcessor(sp_path));
-  start_token_id = sp_processor->PieceToId(start_token);
-  end_token_id = sp_processor->PieceToId(end_token);
 
   // Load all TFRecord samples into memory
   // NOTE this can be moved to LoadSamplesToRam, but will cause delays between
@@ -32,10 +30,10 @@ IFEval::IFEval(Backend* backend, const std::string& input_tfrecord,
         tensorflow::GetFeatureValues<std::string>("prompt", example).Get(0);
     auto instructions = BuildInstructions(example);
 
-    std::vector<int> input_tokens;
-    sp_processor->Encode(prompt.c_str(), &input_tokens).ok();
 
-    input_tokens.insert(input_tokens.begin(), start_token_id);
+    std::string input_formatted = FormatLlamaUserPrompt(prompt);
+    std::vector<int> input_tokens;
+    sp_processor->Encode(input_formatted.c_str(), &input_tokens).ok();
 
     auto sample = std::make_unique<ifeval::Sample>();
     sample->key = key;
@@ -67,7 +65,6 @@ std::vector<void*> IFEval::GetData(int sample_idx) {
   if (sample_idx < samples_.size()) {
     data.push_back(reinterpret_cast<void*>(
         const_cast<std::vector<int>*>(&(samples_[sample_idx]->input_tokens))));
-    data.push_back(reinterpret_cast<void*>(const_cast<int*>(&end_token_id)));
   }
   return data;
 }

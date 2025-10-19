@@ -55,9 +55,14 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
 
   LLMBackendData *backend_data = new LLMBackendData();
 
+  std::string model_filename = mlperf::mobile::GetConfigValue(
+      configs, "model_filename", std::string(""));
+
+  std::string llm_model_path = std::string(model_path) + '/' + model_filename;
+
   // Load the model.
   backend_data->model =
-      tflite::FlatBufferModel::BuildFromFile(model_path).release();
+      tflite::FlatBufferModel::BuildFromFile(llm_model_path.c_str()).release();
   if (!backend_data->model) {
     LOG(ERROR) << "Failed to load model: " << model_path;
     backend_delete(backend_data);
@@ -125,9 +130,14 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
               backend_data->tensors.prefill_input_pos()->bytes);
   // If the prefill can fit the entire input, leave one token for decode,
   // otherwise prefill as much of the input as possible.
-  for (int i = 0; i < prefill_amount; ++i) {
+  int i = 0;
+  for (; i < prefill_amount; ++i) {
     backend_data->tensors.prefill_input()->data.i32[i] =
         backend_data->prompt_tokens[i];
+    backend_data->tensors.prefill_input_pos()->data.i32[i] = i;
+  }
+  for (; i < max_seq_size; ++i) {
+    backend_data->tensors.prefill_input()->data.i32[i] = 128009;
     backend_data->tensors.prefill_input_pos()->data.i32[i] = i;
   }
 
@@ -169,7 +179,8 @@ mlperf_status_t LLMPipeline::backend_issue_query(
 
   backend_data->output_tokens.reserve(decode_steps);
   int next_token = GreedySampler(backend_data->tensors.logits_output());
-  if (next_token == backend_data->stop_token_id) return MLPERF_SUCCESS;
+  for (int stop_token_id : backend_data->stop_token_ids)
+    if (next_token == stop_token_id) return MLPERF_SUCCESS;
   backend_data->output_tokens.push_back(next_token);
   int next_position = input_size;
   for (int i = 0; i < decode_steps; ++i) {
@@ -177,7 +188,8 @@ mlperf_status_t LLMPipeline::backend_issue_query(
     backend_data->tensors.decode_input_pos()->data.i32[0] = next_position;
     MINIMAL_CHECK(backend_data->decode_runner->Invoke() == kTfLiteOk);
     next_token = GreedySampler(backend_data->tensors.logits_output());
-    if (next_token == backend_data->stop_token_id) break;
+    for (int stop_token_id : backend_data->stop_token_ids)
+      if (next_token == stop_token_id) break;
     backend_data->output_tokens.push_back(next_token);
     next_position += 1;
   }
@@ -192,10 +204,10 @@ mlperf_status_t LLMPipeline::backend_flush_queries(
 }
 
 // Return the number of inputs of the model.
-// Only 2 inputs need to be provided, the tokens themselves, and the EOS token.
+// Only 1 input need to be provided, the tokens themselves.
 // The other inputs are handled by the pipeline
 int32_t LLMPipeline::backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
-  return 2;
+  return 1;
 }
 
 // Return the type of the ith input.
@@ -209,14 +221,6 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                                int32_t batch_index, int32_t i,
                                                void *data) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
-
-  if (i == 1) {
-    backend_data->stop_token_id = *(reinterpret_cast<int *>(data));
-    LOG(INFO) << "stop token id: "
-              << std::to_string(backend_data->stop_token_id) << std::endl;
-    return MLPERF_SUCCESS;
-  }
-
   // Reset the tokens and kv caches from potential previous runs.
   backend_data->output_tokens.clear();
 
