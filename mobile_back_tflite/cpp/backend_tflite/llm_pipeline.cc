@@ -55,10 +55,11 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
 
   LLMBackendData *backend_data = new LLMBackendData();
 
-  std::string model_filename = mlperf::mobile::GetConfigValue(
-      configs, "model_filename", std::string(""));
-
-  std::string llm_model_path = std::string(model_path) + '/' + model_filename;
+  std::string llm_model_path = std::string(model_path);
+  // Checking if the last section of the path doesn't have a file extension (indicates a directory is provided).
+  // Could be problematic when using hidden directories, in which case it would be best to provide a trailing slash.
+  if (llm_model_path.substr(llm_model_path.rfind('/')+1).find('.') == std::string::npos)
+    llm_model_path += '/' + mlperf::mobile::GetConfigValue(configs, "model_filename", std::string(""));
 
   // Load the model.
   backend_data->model =
@@ -163,6 +164,18 @@ mlperf_status_t LLMPipeline::backend_issue_query(
     mlperf_backend_ptr_t backend_ptr, ft_callback callback, void *context) {
   LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
 
+  auto check_stop_id = [backend_data] (int id) {
+    for (int stop_token_id : backend_data->stop_token_ids) {
+      LOG(INFO) << std::to_string(id) << " -:- " << std::to_string(stop_token_id);
+      if (id == stop_token_id) {
+        LOG(INFO) << "BROKEN!";
+        return true;
+      }
+    }
+    return false;
+  };
+
+
   backend_issue_first_token_query(backend_ptr);
   callback(context);
 
@@ -179,8 +192,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(
 
   backend_data->output_tokens.reserve(decode_steps);
   int next_token = GreedySampler(backend_data->tensors.logits_output());
-  for (int stop_token_id : backend_data->stop_token_ids)
-    if (next_token == stop_token_id) return MLPERF_SUCCESS;
+  if (check_stop_id(next_token)) return MLPERF_SUCCESS;
   backend_data->output_tokens.push_back(next_token);
   int next_position = input_size;
   for (int i = 0; i < decode_steps; ++i) {
@@ -188,10 +200,9 @@ mlperf_status_t LLMPipeline::backend_issue_query(
     backend_data->tensors.decode_input_pos()->data.i32[0] = next_position;
     MINIMAL_CHECK(backend_data->decode_runner->Invoke() == kTfLiteOk);
     next_token = GreedySampler(backend_data->tensors.logits_output());
-    for (int stop_token_id : backend_data->stop_token_ids)
-      if (next_token == stop_token_id) break;
     backend_data->output_tokens.push_back(next_token);
     next_position += 1;
+    if (check_stop_id(next_token)) break;
   }
 
   return MLPERF_SUCCESS;

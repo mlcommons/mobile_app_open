@@ -33,13 +33,22 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
     std::string answer =
         tensorflow::GetFeatureValues<std::string>("answer", example).Get(0);
 
-    if (zero_shot)
-      input = input.substr(
+    if (zero_shot) {
+      // input-formatted shots are separated by 2 new lines, so we find the last one which is the actual question
+      std::string question_formatted = input.substr(
           input.rfind("\n\n") +
-          2);  // input-formatted shots are separated by 2 new lines
+          2);
+      // input-formatted starts with a preface followed by 2 new lines, we want that too.
+      std::string preface = input.substr(0, input.find("\n\n") + 2);
+
+      input = preface + "Question: " + question_formatted;
+
+      LOG(INFO) << input;
+    }
 
 
-    std::string input_formatted = FormatLlamaUserPrompt(input, "Provide only the answer letter, do not provide any explanation or preface.");
+    //std::string input_formatted = FormatLlamaUserPrompt(input, "Provide only the answer letter, do not provide any explanation or preface.");
+
     std::vector<int> input_tokens;
     sp_processor->Encode(input.c_str(), &input_tokens).ok();
 
