@@ -30,7 +30,6 @@ IFEval::IFEval(Backend* backend, const std::string& input_tfrecord,
         tensorflow::GetFeatureValues<std::string>("prompt", example).Get(0);
     auto instructions = BuildInstructions(example);
 
-
     std::string input_formatted = FormatLlamaUserPrompt(prompt);
     std::vector<int> input_tokens;
     sp_processor->Encode(input_formatted.c_str(), &input_tokens).ok();

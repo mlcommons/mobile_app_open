@@ -18,8 +18,8 @@ limitations under the License.
 
 #include <map>
 #include <string>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"

@@ -110,7 +110,8 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       break;
     case ::mlperf::mobile::DatasetConfig::MMLU:
       for (auto setting : settings.benchmark_setting().custom_setting()) {
-        if (setting.id() == "tokenizer_filename") sp_path_filename = setting.value();
+        if (setting.id() == "tokenizer_filename")
+          sp_path_filename = setting.value();
       }
       sp_path = in->backend_model_path;
       sp_path += '/' + sp_path_filename;

@@ -38,28 +38,31 @@ static bool backendExists = false;
 
 // Destroy the backend pointer and its data.
 void LLMPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
-  LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+  LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
   if (backend_data) delete backend_data;
   backendExists = false;
 }
 
 // Create a new backend and return the pointer to it.
 mlperf_backend_ptr_t LLMPipeline::backend_create(
-    const char *model_path, mlperf_backend_configuration_t *configs,
-    const char *native_lib_path) {
+    const char* model_path, mlperf_backend_configuration_t* configs,
+    const char* native_lib_path) {
   // Verify only one instance of the backend exists at any time
   if (backendExists) {
     LOG(ERROR) << "Only one backend instance should exist at a time";
     return nullptr;
   }
 
-  LLMBackendData *backend_data = new LLMBackendData();
+  LLMBackendData* backend_data = new LLMBackendData();
 
   std::string llm_model_path = std::string(model_path);
-  // Checking if the last section of the path doesn't have a file extension (indicates a directory is provided).
-  // Could be problematic when using hidden directories, in which case it would be best to provide a trailing slash.
-  if (llm_model_path.substr(llm_model_path.rfind('/')+1).find('.') == std::string::npos)
-    llm_model_path += '/' + mlperf::mobile::GetConfigValue(configs, "model_filename", std::string(""));
+  // Checking if the last section of the path doesn't have a file extension
+  // (indicates a directory is provided). Could be problematic when using hidden
+  // directories, in which case it would be best to provide a trailing slash.
+  if (llm_model_path.substr(llm_model_path.rfind('/') + 1).find('.') ==
+      std::string::npos)
+    llm_model_path += '/' + mlperf::mobile::GetConfigValue(
+                                configs, "model_filename", std::string(""));
 
   // Load the model.
   backend_data->model =
@@ -88,20 +91,20 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
 }
 
 // Vendor name who create this backend.
-const char *LLMPipeline::backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
-  LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+const char* LLMPipeline::backend_vendor_name(mlperf_backend_ptr_t backend_ptr) {
+  LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
   return backend_data->vendor;
 }
 
-const char *LLMPipeline::backend_accelerator_name(
+const char* LLMPipeline::backend_accelerator_name(
     mlperf_backend_ptr_t backend_ptr) {
-  LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+  LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
   return backend_data->accelerator;
 }
 
 // Return the name of this backend.
-const char *LLMPipeline::backend_name(mlperf_backend_ptr_t backend_ptr) {
-  LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+const char* LLMPipeline::backend_name(mlperf_backend_ptr_t backend_ptr) {
+  LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
   return backend_data->name;
 }
 
@@ -109,7 +112,7 @@ const char *LLMPipeline::backend_name(mlperf_backend_ptr_t backend_ptr) {
 // inference. This function exclusively handles the input tokens.
 mlperf_status_t LLMPipeline::backend_issue_first_token_query(
     mlperf_backend_ptr_t backend_ptr) {
-  LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+  LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
 
   int max_seq_size = backend_data->tensors.prefill_input()->dims->data[1];
   int kv_cache_max_size = backend_data->tensors.kv_cache_k_0()->dims->data[1];
@@ -161,20 +164,15 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
 // Run the output token producing decode inference.
 // This function exclusively takes output tokens to produce more output tokens.
 mlperf_status_t LLMPipeline::backend_issue_query(
-    mlperf_backend_ptr_t backend_ptr, ft_callback callback, void *context) {
-  LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+    mlperf_backend_ptr_t backend_ptr, ft_callback callback, void* context) {
+  LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
 
-  auto check_stop_id = [backend_data] (int id) {
+  auto check_stop_id = [backend_data](int id) {
     for (int stop_token_id : backend_data->stop_token_ids) {
-      LOG(INFO) << std::to_string(id) << " -:- " << std::to_string(stop_token_id);
-      if (id == stop_token_id) {
-        LOG(INFO) << "BROKEN!";
-        return true;
-      }
+      if (id == stop_token_id) return true;
     }
     return false;
   };
-
 
   backend_issue_first_token_query(backend_ptr);
   callback(context);
@@ -230,16 +228,16 @@ mlperf_data_t LLMPipeline::backend_get_input_type(
 // Set the data for ith input.
 mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                                int32_t batch_index, int32_t i,
-                                               void *data) {
-  LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+                                               void* data) {
+  LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
   // Reset the tokens and kv caches from potential previous runs.
   backend_data->output_tokens.clear();
 
-  for (auto &[_, vec] : backend_data->kv_cache) {
+  for (auto& [_, vec] : backend_data->kv_cache) {
     std::fill(vec.begin(), vec.end(), 0.0f);
   }
 
-  backend_data->prompt_tokens = *(reinterpret_cast<std::vector<int> *>(data));
+  backend_data->prompt_tokens = *(reinterpret_cast<std::vector<int>*>(data));
 
   uint16_t effective_prefill_token_size =
       backend_data->prompt_tokens.size() - 1;  // assuming max tokens is <16k
@@ -281,29 +279,29 @@ mlperf_data_t LLMPipeline::backend_get_output_type(
 // Get the data from ith output.
 mlperf_status_t LLMPipeline::backend_get_output(
     mlperf_backend_ptr_t backend_ptr, uint32_t batch_index, int32_t i,
-    void **data) {
-  LLMBackendData *backend_data = (LLMBackendData *)backend_ptr;
+    void** data) {
+  LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
 
   if (i != 0) return MLPERF_FAILURE;
 
-  *data = reinterpret_cast<void *>(&backend_data->output_tokens);
+  *data = reinterpret_cast<void*>(&backend_data->output_tokens);
   return MLPERF_SUCCESS;
 }
 
 void LLMPipeline::backend_convert_inputs(mlperf_backend_ptr_t backend_ptr,
                                          int bytes, int width, int height,
-                                         uint8_t *data) {}
+                                         uint8_t* data) {}
 
 void LLMPipeline::backend_convert_outputs(mlperf_backend_ptr_t backend_ptr,
                                           int bytes, int width, int height,
-                                          uint8_t *data) {}
+                                          uint8_t* data) {}
 
-void *LLMPipeline::backend_get_buffer(size_t n) { return ::operator new(n); }
+void* LLMPipeline::backend_get_buffer(size_t n) { return ::operator new(n); }
 
-void LLMPipeline::backend_release_buffer(void *p) { ::operator delete(p); }
+void LLMPipeline::backend_release_buffer(void* p) { ::operator delete(p); }
 
-tflite::Interpreter *LLMPipeline::BuildInterpreter(
-    tflite::FlatBufferModel *model, int num_threads) {
+tflite::Interpreter* LLMPipeline::BuildInterpreter(
+    tflite::FlatBufferModel* model, int num_threads) {
   tflite::ops::builtin::BuiltinOpResolver resolver;
   // NOTE: We need to manually register optimized OPs for KV-cache and
   // Scaled Dot Product Attention (SDPA).
@@ -318,8 +316,8 @@ tflite::Interpreter *LLMPipeline::BuildInterpreter(
   return interpreter.release();
 }
 
-kv_cache_t LLMPipeline::BuildKVCache(tflite::Interpreter *interpreter) {
-  tflite::SignatureRunner *runner = interpreter->GetSignatureRunner("decode");
+kv_cache_t LLMPipeline::BuildKVCache(tflite::Interpreter* interpreter) {
+  tflite::SignatureRunner* runner = interpreter->GetSignatureRunner("decode");
   if (runner == nullptr) {
     return {};
   }
@@ -335,7 +333,7 @@ kv_cache_t LLMPipeline::BuildKVCache(tflite::Interpreter *interpreter) {
     std::string k_cache_name = "kv_cache_k_" + std::to_string(i);
     std::string v_cache_name = "kv_cache_v_" + std::to_string(i);
     // We are assuming K and V tensors are of the same shape.
-    TfLiteTensor *tensor = runner->input_tensor(k_cache_name.c_str());
+    TfLiteTensor* tensor = runner->input_tensor(k_cache_name.c_str());
     size_t count = tensor->bytes / sizeof(float);
     kv_cache.emplace(k_cache_name,
                      std::vector<float, AlignedAllocator<float>>(count, 0.0f));
@@ -346,11 +344,11 @@ kv_cache_t LLMPipeline::BuildKVCache(tflite::Interpreter *interpreter) {
   return kv_cache;
 }
 
-void LLMPipeline::PrepareRunner(tflite::SignatureRunner *runner,
-                                kv_cache_t &kv_cache) {
-  for (auto &[name, cache] : kv_cache) {
+void LLMPipeline::PrepareRunner(tflite::SignatureRunner* runner,
+                                kv_cache_t& kv_cache) {
+  for (auto& [name, cache] : kv_cache) {
     TfLiteCustomAllocation allocation = {};
-    allocation.data = static_cast<void *>(cache.data());
+    allocation.data = static_cast<void*>(cache.data());
     allocation.bytes = cache.size() * sizeof(float);
     // Both input and output tensors are set to the same buffer. Not all
     // delegates support this in-place update. For those cases, we need to do
@@ -363,18 +361,18 @@ void LLMPipeline::PrepareRunner(tflite::SignatureRunner *runner,
   MINIMAL_CHECK_VOID(runner->AllocateTensors() == kTfLiteOk);
 }
 
-tflite::SignatureRunner *LLMPipeline::GetPrefillRunner(
-    tflite::Interpreter *interpreter, std::size_t num_input_tokens,
-    kv_cache_t &kv_cache) {
+tflite::SignatureRunner* LLMPipeline::GetPrefillRunner(
+    tflite::Interpreter* interpreter, std::size_t num_input_tokens,
+    kv_cache_t& kv_cache) {
   // Find the prefill signature length that best matches the input token size.
-  tflite::SignatureRunner *runner = nullptr;
+  tflite::SignatureRunner* runner = nullptr;
   // int best_seq_size = -1;
   size_t delta = std::numeric_limits<size_t>::max();
   size_t max_prefill_size = 0;
   std::string max_prefill_key = std::string("");
-  for (const std::string *key : interpreter->signature_keys()) {
+  for (const std::string* key : interpreter->signature_keys()) {
     if (key->find("prefill") == std::string::npos) continue;
-    TfLiteTensor *input_pos = interpreter->GetSignatureRunner(key->c_str())
+    TfLiteTensor* input_pos = interpreter->GetSignatureRunner(key->c_str())
                                   ->input_tensor("input_pos");
     // The expected shape for input position is [Seq].
     size_t seq_size = input_pos->dims->data[0];
@@ -398,16 +396,16 @@ tflite::SignatureRunner *LLMPipeline::GetPrefillRunner(
   return runner;
 }
 
-tflite::SignatureRunner *LLMPipeline::GetDecodeRunner(
-    tflite::Interpreter *interpreter, kv_cache_t &kv_cache) {
-  tflite::SignatureRunner *runner = interpreter->GetSignatureRunner("decode");
+tflite::SignatureRunner* LLMPipeline::GetDecodeRunner(
+    tflite::Interpreter* interpreter, kv_cache_t& kv_cache) {
+  tflite::SignatureRunner* runner = interpreter->GetSignatureRunner("decode");
   MINIMAL_CHECK_PTR(runner != nullptr);
   PrepareRunner(runner, kv_cache);
   return runner;
 }
 
 // A basic greedy sampler (equivalent to argmax).
-int LLMPipeline::GreedySampler(const TfLiteTensor *logits) {
+int LLMPipeline::GreedySampler(const TfLiteTensor* logits) {
   float max_value = -std::numeric_limits<float>::infinity();
   int max_index = 0;
   // logits shape: [Batch, Seq, Vocab], Dtype: float
