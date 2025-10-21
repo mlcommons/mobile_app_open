@@ -55,6 +55,11 @@ cc_library(
         "@bazel_tools//src/conditions:windows": [],
         "//conditions:default": ["-lm"],
     }),
+    copts = select({
+        "@platforms//cpu:arm64": ["-DPNG_ARM_NEON_OPT=2"],
+        "@build_bazel_apple_support//configs:darwin_arm64": ["-DPNG_ARM_NEON_OPT=2"],
+        "//conditions:default": ["-DPNG_ARM_NEON_OPT=0"],
+    }),
     visibility = ["//visibility:public"],
     deps = ["@zlib//:zlib"],
 )
