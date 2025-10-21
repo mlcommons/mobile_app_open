@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:mlperfbench/app_constants.dart';
@@ -159,6 +160,34 @@ Widget buildFooter(BuildContext context) {
       ListTile(
         title: Text(l10n.settingsEula),
         onTap: () => launchUrl(Uri.parse(Url.eula)),
+      ),
+      FutureBuilder<PackageInfo>(
+        future: PackageInfo.fromPlatform(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const SizedBox.shrink();
+          }
+          if (!snapshot.hasData) {
+            return const SizedBox.shrink();
+          }
+          final info = snapshot.data!;
+          final version = info.version;
+          final build = info.buildNumber;
+          var versionText = 'v$version';
+          if (build.isNotEmpty) {
+            versionText = '$versionText ($build)';
+          }
+          return Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Text(
+              versionText,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.drawerForeground.withOpacity(0.6),
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          );
+        },
       ),
     ],
   );
