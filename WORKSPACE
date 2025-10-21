@@ -29,19 +29,19 @@ tf_patch_finder(
 # Override zlib and png version to make it compatible with Xcode 16.4
 http_archive(
     name = "zlib",
+    build_file = "//third_party:zlib.BUILD",
+    strip_prefix = "zlib-1.3.1",
     urls = [
         "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz",
         "https://github.com/madler/zlib/archive/refs/tags/v1.3.1.tar.gz",
     ],
-    strip_prefix = "zlib-1.3.1",
-    build_file = "//third_party:zlib.BUILD",
 )
 
 http_archive(
     name = "png",
-    urls = ["https://github.com/glennrp/libpng/archive/refs/tags/v1.6.50.tar.gz"],
-    strip_prefix = "libpng-1.6.50",
     build_file = "//third_party:libpng.BUILD",
+    strip_prefix = "libpng-1.6.50",
+    urls = ["https://github.com/glennrp/libpng/archive/refs/tags/v1.6.50.tar.gz"],
 )
 
 load("@tf_patch_finder//:patch_win_arm64.bzl", "PATCH_FILE")
