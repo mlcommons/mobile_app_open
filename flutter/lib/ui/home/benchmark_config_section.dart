@@ -84,7 +84,9 @@ class BenchmarkConfigSection extends StatelessWidget {
                         const SizedBox(height: 10),
                         Row(
                           children: [
-                            _backendDescription(benchmark, context),
+                            Flexible(
+                              child: _backendDescription(benchmark, context),
+                            ),
                             const SizedBox(
                               height: 18,
                               child: VerticalDivider(
@@ -131,6 +133,9 @@ class BenchmarkConfigSection extends StatelessWidget {
     return Text(
       benchmark.backendRequestDescription,
       style: Theme.of(context).textTheme.labelLarge,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      softWrap: false,
     );
   }
 

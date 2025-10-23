@@ -52,6 +52,7 @@ dependencies:
   firebase_ui_auth: ^1.14.0
   firebase_crashlytics: ^3.5.5
   firebase_app_check: ^0.2.2+6
+  upgrader: ^10.3.0
 
 dev_dependencies:
   flutter_test:
