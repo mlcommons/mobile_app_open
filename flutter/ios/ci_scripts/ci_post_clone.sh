@@ -66,9 +66,9 @@ echo "$MC_LOG_PREFIX cocoapods version:" && pod --version
 
 brew install python@3.14 || brew install python@3.14 || brew install python@3.14
 brew link --overwrite python@3.14
-echo "$MC_LOG_PREFIX python version:" && python3 --version
+echo "$MC_LOG_PREFIX python version:" && python3.14 --version
 
-python3 -m pip install --break-system-packages \
+python3.14 -m pip install --break-system-packages \
   "numpy>=1.23,<2.0" \
   "absl-py>=1.3,<2.0"
 
