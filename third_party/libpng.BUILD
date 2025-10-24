@@ -10,6 +10,17 @@ genrule(
     cmd = "cp $(location scripts/pnglibconf.h.prebuilt) $(location pnglibconf.h)",
 )
 
+config_setting(
+    name = "target_arm64",
+    constraint_values = ["@platforms//cpu:arm64"],
+)
+
+# Apple iOS CPU-based config_settings to avoid host/target mix-ups under split transitions.
+config_setting(
+    name = "cpu_ios_arm64",
+    values = {"cpu": "ios_arm64"},
+)
+
 cc_library(
     name = "png",
     srcs = [
@@ -34,12 +45,7 @@ cc_library(
         "pngwtran.c",
         "pngwutil.c",
     ] + select({
-        "@platforms//cpu:arm64": [
-            "arm/arm_init.c",
-            "arm/filter_neon_intrinsics.c",
-            "arm/palette_neon_intrinsics.c",
-        ],
-        "@build_bazel_apple_support//configs:darwin_arm64": [
+        ":cpu_ios_arm64": [
             "arm/arm_init.c",
             "arm/filter_neon_intrinsics.c",
             "arm/palette_neon_intrinsics.c",
@@ -56,8 +62,7 @@ cc_library(
         "//conditions:default": ["-lm"],
     }),
     copts = select({
-        "@platforms//cpu:arm64": ["-DPNG_ARM_NEON_OPT=2"],
-        "@build_bazel_apple_support//configs:darwin_arm64": ["-DPNG_ARM_NEON_OPT=2"],
+        ":cpu_ios_arm64": ["-DPNG_ARM_NEON_OPT=2"],
         "//conditions:default": ["-DPNG_ARM_NEON_OPT=0"],
     }),
     visibility = ["//visibility:public"],
