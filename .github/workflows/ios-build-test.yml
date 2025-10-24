@@ -9,8 +9,8 @@ on:
 jobs:
   build:
     name: Build and test iOS app
-    # https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md
-    runs-on: macos-14
+    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
+    runs-on: macos-15
     timeout-minutes: 180
     env:
       PERF_TEST: true
