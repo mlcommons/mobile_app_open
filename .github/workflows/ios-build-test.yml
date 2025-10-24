@@ -65,7 +65,7 @@ jobs:
       - name: Setup iOS simulator
         env:
           DEVICE_NAME: "iPhone 16 Pro"
-          RUNTIME_SDK: "iphonesimulator18.2"
+          RUNTIME_SDK: "iphonesimulator18.5"
         run: |
           cd flutter/ios/ci_scripts/ && bash setup_simulator.sh
           open -a Simulator
