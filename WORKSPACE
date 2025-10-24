@@ -30,6 +30,7 @@ tf_patch_finder(
 http_archive(
     name = "zlib",
     build_file = "//third_party:zlib.BUILD",
+    sha256 = "17e88863f3600672ab49182f217281b6fc4d3c762bde361935e436a95214d05c",
     strip_prefix = "zlib-1.3.1",
     urls = [
         "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz",
@@ -40,6 +41,7 @@ http_archive(
 http_archive(
     name = "png",
     build_file = "//third_party:libpng.BUILD",
+    sha256 = "71158e53cfdf2877bc99bcab33641d78df3f48e6e0daad030afe9cb8c031aa46",
     strip_prefix = "libpng-1.6.50",
     urls = ["https://github.com/glennrp/libpng/archive/refs/tags/v1.6.50.tar.gz"],
 )
