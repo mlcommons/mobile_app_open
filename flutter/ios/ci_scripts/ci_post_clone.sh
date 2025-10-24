@@ -65,6 +65,7 @@ brew install cocoapods || brew install cocoapods || brew install cocoapods
 echo "$MC_LOG_PREFIX cocoapods version:" && pod --version
 
 echo "$MC_LOG_PREFIX python version:" && python3 --version
+python3 -m pip install pip==25.1
 python3 -m pip install --break-system-packages \
   "numpy>=1.23,<2.0" \
   "absl-py>=1.3,<2.0"
