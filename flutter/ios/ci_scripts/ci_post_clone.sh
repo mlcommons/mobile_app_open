@@ -65,6 +65,7 @@ brew install cocoapods || brew install cocoapods || brew install cocoapods
 echo "$MC_LOG_PREFIX cocoapods version:" && pod --version
 
 brew install python@3.14 || brew install python@3.14 || brew install python@3.14
+brew link --overwrite python@3.14
 echo "$MC_LOG_PREFIX python version:" && python3 --version
 
 python3 -m pip install --break-system-packages \
