@@ -109,7 +109,7 @@ build:windows --host_linkopt=/OPT:ICF
 
 # MSVC does not support XNNPACK AVXVNNI instructions (causes C2440 error).
 build:windows --define=xnn_enable_avxvnni=false
-#build:windows --define=xnn_enable_avxvnniint8=false
+build:windows --define=xnn_enable_avxvnniint8=false
 
 # Address sanitizer
 build:asan --strip=never
