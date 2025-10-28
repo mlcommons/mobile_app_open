@@ -70,7 +70,7 @@ class AlignedAllocator {
     // size += padding;
 
 #if defined(_MSC_VER)
-    ptr = _aligned_malloc(size tflite::kDefaultTensorAlignment);
+    ptr = _aligned_malloc(size, tflite::kDefaultTensorAlignment);
 #else
     int ret = posix_memalign(&ptr, tflite::kDefaultTensorAlignment, size);
     if (ret != 0) {
@@ -151,7 +151,7 @@ struct LLMBackendData {
   std::vector<int> prompt_tokens;
   std::vector<int> output_tokens;
   uint8_t threads = 2;
-  int max_output_tokens = 4;
+  int max_output_tokens = 1024;
   std::unordered_set<int> stop_token_ids{128001, 128008, 128009};
 
   LLMBackendData() {}

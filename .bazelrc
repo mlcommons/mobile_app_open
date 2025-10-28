@@ -79,6 +79,8 @@ build:linux_x86_64 --define=xnn_enable_avxvnniint8=false
 build:ios --apple_platform_type=ios
 build:ios --copt=-Wno-c++11-narrowing
 build:ios --cxxopt=-fobjc-arc
+build:ios --copt=-DEIGEN_EXCEPTIONS=0
+build:ios --copt=-DEIGEN_NO_EXCEPTIONS
 
 # Windows configs
 
