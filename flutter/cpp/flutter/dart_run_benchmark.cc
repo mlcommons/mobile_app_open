@@ -76,6 +76,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   ::std::unique_ptr<::mlperf::mobile::Dataset> dataset;
   std::string sp_path;
   std::string sp_path_filename;
+  bool use_token_latencies = false;
   switch (in->dataset_type) {
     case ::mlperf::mobile::DatasetConfig::IMAGENET:
       dataset = std::make_unique<::mlperf::mobile::Imagenet>(
@@ -116,6 +117,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       sp_path = in->backend_model_path;
       sp_path += '/' + sp_path_filename;
       LOG(INFO) << "SP path: " << sp_path;
+      use_token_latencies = true;
       dataset = std::make_unique<::mlperf::mobile::MmluGen>(
           backend.get(), in->dataset_data_path, sp_path, true /*zero-shot*/);
       break;
@@ -138,7 +140,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   auto start = std::chrono::steady_clock::now();
   driver.RunMLPerfTest(in->mode, in->min_query_count, in->min_duration,
                        in->max_duration, in->single_stream_expected_latency_ns,
-                       in->output_dir);
+                       in->output_dir, use_token_latencies);
   auto end = std::chrono::steady_clock::now();
   li;
 
