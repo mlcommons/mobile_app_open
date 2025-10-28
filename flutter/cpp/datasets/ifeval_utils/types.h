@@ -44,7 +44,7 @@ class Instruction {
 
     auto transformations = transform_response(resp);
     for (std::string transformation : transformations) {
-      if (verify_(resp)) return true;
+      if (verify_(transformation)) return true;
     }
     return false;
   }
@@ -66,23 +66,42 @@ class CapitalWordFrequency : public Instruction {
   int threshold_;
   Relation rel_;
 
-  static size_t CapitalWords(const std::string& resp) {
-    size_t words = 0;
-    std::istringstream is(resp);
-    std::string w;
-    while (is >> w) {
-      size_t i = 0;
-      while (i < w.size() && !std::isalnum((unsigned char)w[i]) &&
-             !std::isupper((unsigned char)w[i]))
-        ++i;
-      if (i >= w.size()) continue;
-      ++words;
+  static bool IsAllCapsToken(std::string_view t) {
+    // trim leading/trailing punctuation (keep '-' and '\'' because they appear
+    // inside words)
+    auto is_trim = [](unsigned char c) {
+      return !(std::isalnum(c) || c == '-' || c == '\'');
+    };
+    size_t b = 0, e = t.size();
+    while (b < e && is_trim((unsigned char)t[b])) ++b;
+    while (e > b && is_trim((unsigned char)t[e - 1])) --e;
+    if (b >= e) return false;
+
+    bool seen_alpha = false;
+    for (size_t i = b; i < e; ++i) {
+      unsigned char c = (unsigned char)t[i];
+      if (std::isalpha(c)) {
+        seen_alpha = true;
+        if (std::islower(c))
+          return false;  // any lowercase letter breaks ALL-CAPS
+      }
+      // digits, '-', '\'' are allowed and ignored for casing
     }
-    return words;
+    return seen_alpha;  // at least one letter, and no lowercase letters
   }
 
-  bool verify_(const std::string& resp) const override {
-    size_t words = CapitalWords(resp);
+  static size_t CountAllCapsWords(const std::string& resp) {
+    size_t count = 0;
+    std::istringstream is(resp);
+    std::string tok;
+    while (is >> tok) {
+      if (IsAllCapsToken(tok)) ++count;
+    }
+    return count;
+  }
+
+  virtual bool verify_(const std::string& resp) const override {
+    size_t words = CountAllCapsWords(resp);
     return compare(words, threshold_, rel_);
   }
 };
@@ -93,9 +112,10 @@ class EnglishCapital : public Instruction {
   constexpr InstructionGroup Group() override { return CHANGE_CASE; }
 
  private:
-  bool verify_(const std::string& resp) const override {
-    return std::all_of(resp.begin(), resp.end(),
-                       [](unsigned char c) { return std::isupper(c); });
+  virtual bool verify_(const std::string& resp) const override {
+    return std::all_of(resp.begin(), resp.end(), [](unsigned char c) {
+      return !std::isalpha(c) || std::isupper(c);
+    });
   }
 };
 
@@ -105,9 +125,10 @@ class EnglishLowercase : public Instruction {
   constexpr InstructionGroup Group() override { return CHANGE_CASE; }
 
  private:
-  bool verify_(const std::string& resp) const override {
-    return std::all_of(resp.begin(), resp.end(),
-                       [](unsigned char c) { return std::islower(c); });
+  virtual bool verify_(const std::string& resp) const override {
+    return std::all_of(resp.begin(), resp.end(), [](unsigned char c) {
+      return !std::isalpha(c) || std::islower(c);
+    });
   }
 };
 
@@ -121,7 +142,7 @@ class RepeatPrompt : public Instruction {
 
  private:
   std::string prompt_;
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     // TODO replace with startswith?
     return contains_string(resp, prompt_);
   }
@@ -133,7 +154,7 @@ class TwoResponses : public Instruction {
   constexpr InstructionGroup Group() override { return COMBINATION; }
 
  private:
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     std::size_t count = 0;
     std::size_t pos = resp.find("******");
     while (pos != std::string::npos) {
@@ -153,7 +174,7 @@ class NumberPlaceholders : public Instruction {
 
  private:
   int n_;
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     std::size_t count = 0, pos = 0;
     while (pos < resp.length() &&
            (int)count < n_) {  // no need to keep looking if the requirement is
@@ -188,7 +209,7 @@ class Postscript : public Instruction {
 
  private:
   std::string marker_;
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     return contains_string(resp, marker_);
   }
 };
@@ -201,7 +222,7 @@ class ConstrainedResponse : public Instruction {
   constexpr InstructionGroup Group() override { return DETECTABLE_FORMAT; }
 
  private:
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     return resp == "My answer is yes." || resp == "My answer is no." ||
            resp == "My answer is maybe.";
   }
@@ -214,7 +235,7 @@ class JsonFormat : public Instruction {
 
  private:
   // TODO possibly use a C++ json validator instead
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     std::string t = resp;
     if (t.empty()) return false;
     if (!((t.front() == '{' && t.back() == '}') ||
@@ -281,7 +302,7 @@ class MultipleSections : public Instruction {
     }
     return parts;
   }
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     auto parts = SplitByDelim(resp, sep_);
     return CountNonEmpty(parts) == n_;
   }
@@ -303,7 +324,7 @@ class NumberBulletLists : public Instruction {
     return out;
   }
 
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     size_t count = 0;
     for (const auto& line : SplitLines(resp)) {
       std::string t = trim(line);
@@ -323,7 +344,7 @@ class NumberHighlightedSections : public Instruction {
 
  private:
   int n_;
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     std::size_t count = 0;
     std::size_t pos = 0;
 
@@ -363,7 +384,7 @@ class Title : public Instruction {
   constexpr InstructionGroup Group() override { return DETECTABLE_FORMAT; }
 
  private:
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     std::size_t pos_open = resp.find("<<");
     // TODO should an empty title be allowed?
     return (pos_open != std::string::npos) &&
@@ -382,7 +403,7 @@ class Existence : public Instruction {
 
  private:
   std::vector<std::string> kws_;
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     for (const auto& k : kws_)
       if (!contains_word(resp, k)) return false;
     return true;
@@ -397,7 +418,7 @@ class ForbiddenWords : public Instruction {
 
  private:
   std::vector<std::string> bad_;
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     return contains_none(resp, bad_);
   }
 };
@@ -412,12 +433,56 @@ class Frequency : public Instruction {
   int n_;
   std::string kw_;
   Relation rel_;
-  bool verify_(const std::string& resp) const override {
-    std::regex rx("\\b" + kw_ + "\\b", std::regex::icase);
-    size_t count = 0;
-    auto it = std::sregex_iterator(resp.begin(), resp.end(), rx);
-    auto end = std::sregex_iterator();
-    for (; it != end; ++it) ++count;
+
+  static inline std::string RegexEscape(const std::string& s) {
+    auto is_meta = [](unsigned char ch) {
+      switch (ch) {
+        case '^': case '$': case '.': case '|': case '?':
+        case '*': case '+': case '(': case ')':
+        case '[': case ']': case '{': case '}': case '\\':
+          return true;
+        default:
+          return false;
+      }
+    };
+
+    std::string out;
+    out.reserve(s.size() * 2);
+    for (unsigned char c : s) {
+      if (is_meta(c)) out.push_back('\\');
+      out.push_back(static_cast<char>(c));
+    }
+    return out;
+  }
+
+  // Build a regex that matches the keyword with custom token boundaries.
+  // Left boundary is (^|[^A-Za-z0-9_]) to avoid lookbehind.
+  // Right boundary uses a lookahead (?=$|[^A-Za-z0-9_]).
+  static inline std::regex MakeKeywordRegex(const std::string& keyword) {
+    const std::string kw = RegexEscape(keyword);
+    const std::string pat =
+        "(^|[^A-Za-z0-9_])"  // left boundary (consumes 1 char or start)
+        "(?:" +
+        kw +
+        ")"                     // keyword literal
+        "(?=$|[^A-Za-z0-9_])";  // right boundary (zero-width lookahead)
+    return std::regex(pat, std::regex::icase);
+  }
+
+  static inline std::size_t CountKeywordOccurrences(
+      const std::string& text, const std::string& keyword) {
+    const std::regex rx = MakeKeywordRegex(keyword);
+    std::size_t count = 0;
+    for (auto it = std::sregex_iterator(text.begin(), text.end(), rx),
+              end = std::sregex_iterator();
+         it != end; ++it) {
+      ++count;
+    }
+    return count;
+  }
+
+  virtual bool verify_(const std::string& resp) const override {
+    const std::size_t count = CountKeywordOccurrences(resp, kw_);
     return compare(count, (size_t)n_, rel_);
   }
 };
@@ -439,7 +504,7 @@ class LetterFrequency : public Instruction {
       if (std::tolower(ch) == lower) ++c;
     return c;
   }
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     size_t c = CountLetterICase(resp, letter_);
     return compare(c, (size_t)n_, rel_);
   }
@@ -514,7 +579,7 @@ class ResponseLanguage : public Instruction {
     return non_ascii_ratio() > 0.05;
   }
 
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     return LanguageHeuristic(resp, lang_);
   }
 };
@@ -560,7 +625,7 @@ class NthParagraphFirstWord : public Instruction {
     return paras;
   }
 
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     auto paras = SplitParagraphs(resp);
     if ((int)paras.size() != total_) return false;
     if (nth_ <= 0 || nth_ > (int)paras.size()) return false;
@@ -577,13 +642,13 @@ class NumberParagraphs : public Instruction {
 
  private:
   unsigned n_;
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     std::size_t count = 0, pos = 0;
-    while ((pos = resp.find("***", pos)) != std::string::npos) {
+    while ((pos = resp.find("***\n", pos)) != std::string::npos) {
       ++count;
-      pos += 3;  // advance by 3 for non-overlapping matches
+      pos += 4;  // advance by 3 for non-overlapping matches
     }
-    return count + 1 == n_;  // since *** is a saparator, the actual count is 1
+    return count == n_ - 1;  // since *** is a saparator, the actual count is 1
                              // more than the number of separators
   }
 };
@@ -597,7 +662,7 @@ class NumberSentences : public Instruction {
  private:
   int n_;
   Relation rel_;
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     size_t count = 0;
     for (unsigned char c : resp) {
       if (c == '.' || c == '!' || c == '?') ++count;
@@ -615,7 +680,7 @@ class NumberWords : public Instruction {
  private:
   int n_;
   Relation rel_;
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     size_t count = 0;
     bool in_word = false;
     for (unsigned char c : resp) {
@@ -639,7 +704,7 @@ class NoComma : public Instruction {
   constexpr InstructionGroup Group() override { return PUNCTUATION; }
 
  private:
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     return resp.find(',') == std::string::npos;
   }
 };
@@ -653,7 +718,7 @@ class EndChecker : public Instruction {
 
  private:
   std::string end_;
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     return ends_with(resp, end_);
   }
 };
@@ -664,7 +729,7 @@ class Quotation : public Instruction {
   constexpr InstructionGroup Group() override { return STARTEND; }
 
  private:
-  bool verify_(const std::string& resp) const override {
+  virtual bool verify_(const std::string& resp) const override {
     if (resp.size() < 2) return false;
     return resp.front() == '"' && resp.back() == '"';
   }

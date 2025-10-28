@@ -19,22 +19,28 @@
 namespace mlperf {
 namespace mobile {
 namespace ifeval {
-struct GroupAccuracy {
-  size_t change_case_correct = 0, combination_correct = 0,
-         detectable_content_correct = 0, detectable_format_correct = 0,
-         keywords_correct = 0, language_correct = 0,
-         length_constraints_correct = 0, punctuation_correct = 0,
-         startend_correct = 0;
-  size_t change_case_total = 0, combination_total = 0,
-         detectable_content_total = 0, detectable_format_total = 0,
-         keywords_total = 0, language_total = 0, length_constraints_total = 0,
-         punctuation_total = 0, startend_total = 0;
+// struct GroupAccuracy {
+//   size_t change_case_correct = 0, combination_correct = 0,
+//          detectable_content_correct = 0, detectable_format_correct = 0,
+//          keywords_correct = 0, language_correct = 0,
+//          length_constraints_correct = 0, punctuation_correct = 0,
+//          startend_correct = 0;
+//   size_t change_case_total = 0, combination_total = 0,
+//          detectable_content_total = 0, detectable_format_total = 0,
+//          keywords_total = 0, language_total = 0, length_constraints_total =
+//          0, punctuation_total = 0, startend_total = 0;
+// };
+
+struct Accuracy {
+  size_t prompt_correct_loose = 0, prompt_correct_strict = 0, prompt_total = 0,
+         instruction_correct_loose = 0, instruction_correct_strict = 0,
+         instruction_total = 0;
 };
 }  // namespace ifeval
 class IFEval : public Dataset {
  public:
   IFEval(Backend* backend, const std::string& input_tfrecord,
-         const std::string& sp_path, bool loose_follow);
+         const std::string& sp_path);
 
   const std::string& Name() override { return name_; }
 
@@ -57,7 +63,7 @@ class IFEval : public Dataset {
   bool HasAccuracy() override;
 
   bool ComputeSampleAccuracy(const int sample_idx,
-                             ifeval::GroupAccuracy& accuracy);
+                             ifeval::Accuracy& accuracy);
 
   float ComputeAccuracy() override;
 
@@ -65,9 +71,6 @@ class IFEval : public Dataset {
 
   inline std::vector<std::unique_ptr<ifeval::Instruction>> BuildInstructions(
       const tensorflow::Example& ex);
-
-  inline void ProcessResult(ifeval::InstructionGroup group, bool is_correct,
-                            ifeval::GroupAccuracy& accuracy);
 
  private:
   const std::string name_ = "IFEval";
@@ -79,8 +82,6 @@ class IFEval : public Dataset {
   std::unordered_set<size_t> used_sample_ids_;
   std::set<int> loaded_sample_ids_;
   std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor;
-
-  bool loose_follow_;
 };
 
 }  // namespace mobile

@@ -426,7 +426,6 @@ int Main(int argc, char *argv[]) {
                        dataset_flags.end());
     } break;
     case DatasetConfig::IFEVAL: {
-      bool loose_follow = false;
       LOG(INFO) << "IFEval dataset for LLM benchmark";
       std::string input_tfrecord, sp_path = "";
       std::vector<Flag> dataset_flags{
@@ -437,15 +436,12 @@ int Main(int argc, char *argv[]) {
           Flag::CreateFlag("sp_path", &sp_path,
                            "Path to the sentencepiece model file.",
                            Flag::kRequired),
-          Flag::CreateFlag("loose-follow", &loose_follow,
-                           "Whether to loosely check if the instructions are "
-                           "being followed"),
       };
 
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
         dataset.reset(
-            new IFEval(backend.get(), input_tfrecord, sp_path, loose_follow));
+            new IFEval(backend.get(), input_tfrecord, sp_path));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),

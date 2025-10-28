@@ -387,6 +387,10 @@ task {
     id: "LLM"
     name: "LLM"
   }
+  custom_config {
+    id: "llm_tokenizer_path"
+    value: "llama3_1b.spm.model"
+  }
 }
 
 task {

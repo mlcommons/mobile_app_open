@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <iomanip>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -48,8 +49,33 @@ inline bool contains_string(const std::string& text,
 }
 
 inline bool contains_word(const std::string& text, const std::string& word) {
-  std::regex rx("\\b" + word + "\\b", std::regex::icase);
-  return std::regex_search(text.begin(), text.end(), rx);
+  if (word.empty()) return false;
+
+  LOG(INFO) << "searching for '" << word << "'...";
+
+  auto to_lower_ascii = [](std::string s) {
+    for (char& c : s) c = std::tolower(static_cast<unsigned char>(c));
+    return s;
+  };
+  auto is_word_char = [](unsigned char c) {
+    return std::isalnum(c) || c == '_';  // match std::regex \b notion of "word"
+  };
+
+  std::string t = to_lower_ascii(text);
+  std::string w = to_lower_ascii(word);
+
+  // Scan all occurrences of w in t and check word boundaries
+  std::size_t pos = 0;
+  while ((pos = t.find(w, pos)) != std::string::npos) {
+    const bool left_ok =
+        (pos == 0) || !is_word_char(static_cast<unsigned char>(t[pos - 1]));
+    const std::size_t end = pos + w.size();
+    const bool right_ok =
+        (end == t.size()) || !is_word_char(static_cast<unsigned char>(t[end]));
+    if (left_ok && right_ok) return true;
+    ++pos;  // continue searching (overlapping-safe)
+  }
+  return false;
 }
 
 inline bool contains_none(const std::string& text,

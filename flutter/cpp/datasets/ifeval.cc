@@ -11,10 +11,8 @@ namespace mlperf {
 namespace mobile {
 
 IFEval::IFEval(Backend* backend, const std::string& input_tfrecord,
-               const std::string& sp_path, bool loose_follow)
-    : sample_reader_(input_tfrecord),
-      loose_follow_(loose_follow),
-      Dataset(backend) {
+               const std::string& sp_path)
+    : sample_reader_(input_tfrecord), Dataset(backend) {
   sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(
       LoadSentencePieceProcessor(sp_path));
 
@@ -76,6 +74,10 @@ std::vector<uint8_t> IFEval::ProcessOutput(const int sample_idx,
       *(reinterpret_cast<std::vector<int>*>(outputs[0]));
 
   sample_output_tokens_[sample_idx] = output_tokens;
+  used_sample_ids_.insert(sample_idx);
+
+  LOG(INFO) << "Processed " << std::to_string(used_sample_ids_.size())
+            << "/29";
 
   return {1};
 }
@@ -87,49 +89,77 @@ int64_t IFEval::GetOutputTokenCount(const int sample_idx) {
 bool IFEval::HasAccuracy() { return true; }
 
 bool IFEval::ComputeSampleAccuracy(const int sample_idx,
-                                   ifeval::GroupAccuracy& accuracy) {
+                                   ifeval::Accuracy& accuracy) {
+
   std::string prediction;
   sp_processor->Decode(sample_output_tokens_[sample_idx], &prediction).ok();
 
-  LOG(INFO) << "output(" << std::to_string(sample_idx) << "): " << prediction
-            << std::endl;
-
+  bool is_prompt_correct_loose = true;
+  bool is_prompt_correct_strict = true;
   for (const auto& instruction : samples_[sample_idx]->instructions) {
-    bool is_correct = instruction->IsFollowed(prediction, loose_follow_);
-    ProcessResult(instruction->Group(), is_correct, accuracy);
+
+    bool is_correct_loose = instruction->IsFollowed(prediction, true);
+    bool is_correct_strict = instruction->IsFollowed(prediction, false);
+
+    accuracy.instruction_total++;
+    accuracy.instruction_correct_loose += is_correct_loose ? 1 : 0;
+    accuracy.instruction_correct_strict += is_correct_strict ? 1 : 0;
+
+    is_prompt_correct_loose = is_prompt_correct_loose ? is_correct_loose : false;
+    is_prompt_correct_strict = is_prompt_correct_strict ? is_correct_strict : false;
   }
+
+  accuracy.prompt_total++;
+  accuracy.prompt_correct_loose += is_prompt_correct_loose ? 1 : 0;
+  accuracy.prompt_correct_strict += is_prompt_correct_strict ? 1 : 0;
+
+  return true;
 }
 
 float IFEval::ComputeAccuracy() {
-  uint16_t correct_sum;
-  uint16_t total_sum;
-  ifeval::GroupAccuracy accuracy;
+  float instruction_loose_accuracy;
+  float instruction_strict_accuracy;
+  float prompt_loose_accuracy;
+  float prompt_strict_accuracy;
+  ifeval::Accuracy accuracy;
 
   for (auto sample_id : used_sample_ids_) {
     ComputeSampleAccuracy(sample_id, accuracy);
   }
 
-  correct_sum += accuracy.change_case_correct;
-  correct_sum += accuracy.combination_correct;
-  correct_sum += accuracy.detectable_content_correct;
-  correct_sum += accuracy.detectable_format_correct;
-  correct_sum += accuracy.keywords_correct;
-  correct_sum += accuracy.language_correct;
-  correct_sum += accuracy.length_constraints_correct;
-  correct_sum += accuracy.punctuation_correct;
-  correct_sum += accuracy.startend_correct;
+  instruction_loose_accuracy =
+      accuracy.instruction_total > 0
+          ? static_cast<float>(accuracy.instruction_correct_loose) /
+                accuracy.instruction_total
+          : 0.0f;
+  instruction_strict_accuracy =
+      accuracy.instruction_total > 0
+          ? static_cast<float>(accuracy.instruction_correct_strict) /
+                accuracy.instruction_total
+          : 0.0f;
+  prompt_loose_accuracy =
+      accuracy.prompt_total > 0
+          ? static_cast<float>(accuracy.prompt_correct_loose) /
+                accuracy.prompt_total
+          : 0.0f;
+  prompt_strict_accuracy =
+      accuracy.prompt_total > 0
+          ? static_cast<float>(accuracy.prompt_correct_strict) /
+                accuracy.prompt_total
+          : 0.0f;
 
-  total_sum += accuracy.change_case_total;
-  total_sum += accuracy.combination_total;
-  total_sum += accuracy.detectable_content_total;
-  total_sum += accuracy.detectable_format_total;
-  total_sum += accuracy.keywords_total;
-  total_sum += accuracy.language_total;
-  total_sum += accuracy.length_constraints_total;
-  total_sum += accuracy.punctuation_total;
-  total_sum += accuracy.startend_total;
+  LOG(INFO) << "Instruction-level loose-accuracy: "
+            << std::to_string(instruction_loose_accuracy);
+  LOG(INFO) << "Instruction-level strict-accuracy: "
+            << std::to_string(instruction_strict_accuracy);
+  LOG(INFO) << "Prompt-level loose-accuracy: "
+            << std::to_string(prompt_loose_accuracy);
+  LOG(INFO) << "Prompt-level strict-accuracy: "
+            << std::to_string(prompt_strict_accuracy);
 
-  return total_sum > 0 ? static_cast<float>(correct_sum) / total_sum : 0.0f;
+  return (instruction_loose_accuracy + instruction_strict_accuracy +
+          prompt_loose_accuracy + prompt_strict_accuracy) /
+         4.0f;
 }
 
 std::string IFEval::ComputeAccuracyString() {
@@ -419,61 +449,6 @@ IFEval::BuildInstructions(const tensorflow::Example& ex) {
   }
 
   return out;
-}
-
-inline void IFEval::ProcessResult(ifeval::InstructionGroup group,
-                                  bool is_correct,
-                                  ifeval::GroupAccuracy& accuracy) {
-  uint8_t correct_value = is_correct ? 1 : 0;
-  switch (group) {
-    case ifeval::InstructionGroup::CHANGE_CASE:
-      accuracy.change_case_correct += correct_value;
-      accuracy.change_case_total++;
-      break;
-
-    case ifeval::InstructionGroup::COMBINATION:
-      accuracy.combination_correct += correct_value;
-      accuracy.combination_total++;
-      break;
-
-    case ifeval::InstructionGroup::DETECTABLE_CONTENT:
-      accuracy.detectable_content_correct += correct_value;
-      accuracy.detectable_content_total++;
-      break;
-
-    case ifeval::InstructionGroup::DETECTABLE_FORMAT:
-      accuracy.detectable_format_correct += correct_value;
-      accuracy.detectable_format_total++;
-      break;
-
-    case ifeval::InstructionGroup::KEYWORDS:
-      accuracy.keywords_correct += correct_value;
-      accuracy.keywords_total++;
-      break;
-
-    case ifeval::InstructionGroup::LANGUAGE:
-      accuracy.language_correct += correct_value;
-      accuracy.language_total++;
-      break;
-
-    case ifeval::InstructionGroup::LENGTH_CONSTRAINTS:
-      accuracy.length_constraints_correct += correct_value;
-      accuracy.length_constraints_total++;
-      break;
-
-    case ifeval::InstructionGroup::PUNCTUATION:
-      accuracy.punctuation_correct += correct_value;
-      accuracy.punctuation_total++;
-      break;
-
-    case ifeval::InstructionGroup::STARTEND:
-      accuracy.startend_correct += correct_value;
-      accuracy.startend_total++;
-      break;
-
-    default:
-      break;
-  }
 }
 
 }  // namespace mobile
