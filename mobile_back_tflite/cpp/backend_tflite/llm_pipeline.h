@@ -20,6 +20,11 @@ limitations under the License.
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <stdlib.h>
+
+#if defined(_MSC_VER)
+#include <malloc.h>
+#endif
 
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"
@@ -63,14 +68,25 @@ class AlignedAllocator {
     // std::size_t padding = tflite::kDefaultTensorAlignment -
     //                      (size % tflite::kDefaultTensorAlignment);
     // size += padding;
+
+#if defined(_MSC_VER)
+    ptr = _aligned_malloc(size tflite::kDefaultTensorAlignment);
+#else
     int ret = posix_memalign(&ptr, tflite::kDefaultTensorAlignment, size);
     if (ret != 0) {
       return nullptr;
     }
+#endif
     return static_cast<T *>(ptr);
   };
 
-  void deallocate(T *ptr, std::size_t n) { free(ptr); }
+  void deallocate(T *ptr, std::size_t n) {
+#if defined(_MSC_VER)
+    _aligned_free(ptr);
+#else
+    free(ptr);
+#endif
+  }
 };
 
 using kv_cache_t =
