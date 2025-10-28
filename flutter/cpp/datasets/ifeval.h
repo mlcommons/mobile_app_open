@@ -62,8 +62,7 @@ class IFEval : public Dataset {
 
   bool HasAccuracy() override;
 
-  bool ComputeSampleAccuracy(const int sample_idx,
-                             ifeval::Accuracy& accuracy);
+  bool ComputeSampleAccuracy(const int sample_idx, ifeval::Accuracy& accuracy);
 
   float ComputeAccuracy() override;
 

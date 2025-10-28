@@ -16,11 +16,12 @@ limitations under the License.
 #ifndef TFLITE_LLM_PIPELINE_H_
 #define TFLITE_LLM_PIPELINE_H_
 
+#include <stdlib.h>
+
 #include <map>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <stdlib.h>
 
 #if defined(_MSC_VER)
 #include <malloc.h>

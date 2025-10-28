@@ -437,9 +437,20 @@ class Frequency : public Instruction {
   static inline std::string RegexEscape(const std::string& s) {
     auto is_meta = [](unsigned char ch) {
       switch (ch) {
-        case '^': case '$': case '.': case '|': case '?':
-        case '*': case '+': case '(': case ')':
-        case '[': case ']': case '{': case '}': case '\\':
+        case '^':
+        case '$':
+        case '.':
+        case '|':
+        case '?':
+        case '*':
+        case '+':
+        case '(':
+        case ')':
+        case '[':
+        case ']':
+        case '{':
+        case '}':
+        case '\\':
           return true;
         default:
           return false;

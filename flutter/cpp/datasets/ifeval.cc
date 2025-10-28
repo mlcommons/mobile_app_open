@@ -76,8 +76,7 @@ std::vector<uint8_t> IFEval::ProcessOutput(const int sample_idx,
   sample_output_tokens_[sample_idx] = output_tokens;
   used_sample_ids_.insert(sample_idx);
 
-  LOG(INFO) << "Processed " << std::to_string(used_sample_ids_.size())
-            << "/29";
+  LOG(INFO) << "Processed " << std::to_string(used_sample_ids_.size()) << "/29";
 
   return {1};
 }
@@ -90,14 +89,12 @@ bool IFEval::HasAccuracy() { return true; }
 
 bool IFEval::ComputeSampleAccuracy(const int sample_idx,
                                    ifeval::Accuracy& accuracy) {
-
   std::string prediction;
   sp_processor->Decode(sample_output_tokens_[sample_idx], &prediction).ok();
 
   bool is_prompt_correct_loose = true;
   bool is_prompt_correct_strict = true;
   for (const auto& instruction : samples_[sample_idx]->instructions) {
-
     bool is_correct_loose = instruction->IsFollowed(prediction, true);
     bool is_correct_strict = instruction->IsFollowed(prediction, false);
 
@@ -105,8 +102,10 @@ bool IFEval::ComputeSampleAccuracy(const int sample_idx,
     accuracy.instruction_correct_loose += is_correct_loose ? 1 : 0;
     accuracy.instruction_correct_strict += is_correct_strict ? 1 : 0;
 
-    is_prompt_correct_loose = is_prompt_correct_loose ? is_correct_loose : false;
-    is_prompt_correct_strict = is_prompt_correct_strict ? is_correct_strict : false;
+    is_prompt_correct_loose =
+        is_prompt_correct_loose ? is_correct_loose : false;
+    is_prompt_correct_strict =
+        is_prompt_correct_strict ? is_correct_strict : false;
   }
 
   accuracy.prompt_total++;
@@ -182,7 +181,9 @@ IFEval::BuildInstructions(const tensorflow::Example& ex) {
   auto get_strs = [&](const std::string& key,
                       std::vector<std::string>* vals) -> bool {
     const auto& sfield = tensorflow::GetFeatureValues<std::string>(key, ex);
+
     std::vector<std::string> svals(sfield.begin(), sfield.end());
+
     *vals = std::move(svals);
     return true;
   };
