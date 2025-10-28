@@ -9,8 +9,8 @@ on:
 jobs:
   build:
     name: Build and test iOS app
-    # https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md
-    runs-on: macos-14
+    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
+    runs-on: macos-15
     timeout-minutes: 180
     env:
       PERF_TEST: true
@@ -65,7 +65,7 @@ jobs:
       - name: Setup iOS simulator
         env:
           DEVICE_NAME: "iPhone 16 Pro"
-          RUNTIME_SDK: "iphonesimulator18.2"
+          RUNTIME_SDK: "iphonesimulator18.5"
         run: |
           cd flutter/ios/ci_scripts/ && bash setup_simulator.sh
           open -a Simulator
