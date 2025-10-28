@@ -81,6 +81,8 @@ build:ios --copt=-Wno-c++11-narrowing
 build:ios --cxxopt=-fobjc-arc
 build:ios --copt=-fexceptions
 build:ios --cxxopt=-fexceptions
+# disable avx512-fp16 for x86 simulator
+build:ios --define=xnn_enable_avx512fp16=false
 
 # Windows configs
 
