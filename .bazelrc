@@ -81,14 +81,10 @@ build:ios --copt=-Wno-c++11-narrowing
 build:ios --cxxopt=-fobjc-arc
 build:ios --copt=-DEIGEN_EXCEPTIONS=0
 build:ios --copt=-DEIGEN_NO_EXCEPTIONS
+build:ios --copt=-fno-exceptions
 build:ios --cxxopt=-DEIGEN_EXCEPTIONS=0
 build:ios --cxxopt=-DEIGEN_NO_EXCEPTIONS
 build:ios --cxxopt=-fno-exceptions
-build:ios --objcxxopt=-DEIGEN_EXCEPTIONS=0
-build:ios --objcxxopt=-DEIGEN_NO_EXCEPTIONS
-build:ios --objcxxopt=-fno-exceptions
-build:ios --objcopt=-fno-exceptions
-build:ios --conlyopt=-fno-exceptions
 
 # Windows configs
 
