@@ -81,10 +81,16 @@ build:ios --copt=-Wno-c++11-narrowing
 build:ios --cxxopt=-fobjc-arc
 build:ios --copt=-DEIGEN_NOEXCEPTIONS_OVERRIDE
 build:ios --cxxopt=-DEIGEN_NOEXCEPTIONS_OVERRIDE
-# disable avx512-fp16 for x86 simulator
+# TODO these should only be enabled for x86 simulator
 build:ios --define=xnn_enable_f16=false
 build:ios --define=xnn_enable_f16c=false
 build:ios --define=xnn_enable_avx512fp16=false
+build:ios --copt=-DFP16_DISABLE=1
+build:ios --copt=-DPSIMD_DISABLE_F16=1
+build:ios --copt=-mno-f16c
+build:ios --cxxopt=-DFP16_DISABLE=1
+build:ios --cxxopt=-DPSIMD_DISABLE_F16=1
+build:ios --cxxopt=-mno-f16c
 
 # Windows configs
 
