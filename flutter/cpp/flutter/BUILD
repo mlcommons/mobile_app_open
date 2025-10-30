@@ -50,7 +50,7 @@ apple_xcframework(
         "simulator": [
             #"x86_64",
             # cpuinfo does not support simulator on ARM-based macs
-            "ios_sim_arm64",
+            "arm64",
         ],
         "device": ["arm64"],
     },
