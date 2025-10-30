@@ -19,13 +19,13 @@ index 00000000000..6c94319de42
 +index e76ddd3d2..6b4fc84ec 100644
 +--- a/Eigen/src/Core/util/Macros.h
 ++++ b/Eigen/src/Core/util/Macros.h
-+@@ -1236,7 +1236,7 @@ namespace Eigen {
++@@ -1236,7 +1236,6 @@ namespace Eigen {
 +   EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(METHOD,OPNAME)
-+ 
-+ 
-+-#if (defined(_CPPUNWIND) || defined(__EXCEPTIONS)) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE)
++
++-#if (defined(_CPPUNWIND) || defined(__EXCEPTIONS)) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && \
++-    !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE)
 ++#if !defined(EIGEN_NOEXCEPTIONS_OVERRIDE) && ((defined(_CPPUNWIND) || (defined(__EXCEPTIONS) && defined(__exceptions__))) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE))
-+   #define EIGEN_EXCEPTIONS
++ #define EIGEN_EXCEPTIONS
 + #endif
 + 
 diff --git a/third_party/eigen3/workspace.bzl b/third_party/eigen3/workspace.bzl
