@@ -80,12 +80,8 @@ build:ios --apple_platform_type=ios
 build:ios --copt=-Wno-c++11-narrowing
 build:ios --cxxopt=-fobjc-arc
 # Ensure C++ exceptions ON for Eigen + TF/TSL/XLA files that include Eigen.
-build:ios --per_file_copt=external/eigen_archive/.*@-fexceptions
-build:ios --per_file_copt=external/eigen_archive/.*@-fcxx-exceptions
-build:ios --per_file_copt=external/local_xla/.*@-fexceptions
-build:ios --per_file_copt=external/local_xla/.*@-fcxx-exceptions
-build:ios --per_file_copt=external/local_tsl/.*@-fexceptions
-build:ios --per_file_copt=external/local_tsl/.*@-fcxx-exceptions
+build:ios --per_file_copt=external/.*@-fexceptions
+build:ios --per_file_copt=external/.*@-fcxx-exceptions
 build:ios --copt=-fexceptions
 build:ios --cxxopt=-fexceptions
 # disable avx512-fp16 for x86 simulator
