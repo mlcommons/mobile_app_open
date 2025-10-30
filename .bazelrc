@@ -79,9 +79,13 @@ build:linux_x86_64 --define=xnn_enable_avxvnniint8=false
 build:ios --apple_platform_type=ios
 build:ios --copt=-Wno-c++11-narrowing
 build:ios --cxxopt=-fobjc-arc
-build:ios --per_file_copt=external/eigen_archive/.*@-fexceptions@-fcxx-exceptions
-build:ios --per_file_copt=external/local_xla/.*@-fexceptions@-fcxx-exceptions
-build:ios --per_file_copt=external/local_tsl/.*@-fexceptions@-fcxx-exceptions
+# Ensure C++ exceptions ON for Eigen + TF/TSL/XLA files that include Eigen.
+build:ios --per_file_copt=external/eigen_archive/.*@-fexceptions
+build:ios --per_file_copt=external/eigen_archive/.*@-fcxx-exceptions
+build:ios --per_file_copt=external/local_xla/.*@-fexceptions
+build:ios --per_file_copt=external/local_xla/.*@-fcxx-exceptions
+build:ios --per_file_copt=external/local_tsl/.*@-fexceptions
+build:ios --per_file_copt=external/local_tsl/.*@-fcxx-exceptions
 build:ios --copt=-fexceptions
 build:ios --cxxopt=-fexceptions
 # disable avx512-fp16 for x86 simulator
