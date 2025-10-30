@@ -7,7 +7,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # version format: <semantic_app_version>+<build_number>.
 # Note: build_number will be set by CI using the CLI option --build-number
-version: 5.0.0+1
+version: 5.0.2+1
 
 environment:
   sdk: ^3.3.4  # Dart SDK version
@@ -52,6 +52,7 @@ dependencies:
   firebase_ui_auth: ^1.14.0
   firebase_crashlytics: ^3.5.5
   firebase_app_check: ^0.2.2+6
+  upgrader: ^10.3.0
 
 dev_dependencies:
   flutter_test:

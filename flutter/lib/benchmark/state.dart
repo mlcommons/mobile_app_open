@@ -237,7 +237,7 @@ class BenchmarkState extends ChangeNotifier {
     restoreLastResult();
   }
 
-  Future<void> saveTaskSelection() async {
+  void saveTaskSelection() {
     _store.taskSelection = jsonEncode(_benchmarkStore.selection);
   }
 
@@ -335,6 +335,17 @@ class BenchmarkState extends ChangeNotifier {
       resetCurrentResults();
       _doneRunning = null;
     }
+  }
+
+  void benchmarkSetActive(Benchmark benchmark, bool isActive) {
+    benchmark.isActive = isActive;
+    saveTaskSelection();
+    notifyListeners();
+  }
+
+  void benchmarkSetDelegate(Benchmark benchmark, String delegate) {
+    benchmark.benchmarkSettings.delegateSelected = delegate;
+    notifyListeners();
   }
 
   @override

@@ -64,7 +64,8 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  int get cooldownDuration => _getInt(StoreConstants.cooldownDuration, 5 * 60);
+  int get cooldownDuration => _getInt(StoreConstants.cooldownDuration,
+      BenchmarkRunModeEnum.quickRun.cooldownDuration);
 
   set cooldownDuration(int value) {
     _storeFromDisk.setInt(StoreConstants.cooldownDuration, value);

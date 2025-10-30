@@ -61,15 +61,26 @@ void reset_pipeline() { pipeline.reset(); }
 static bool neuron_tflite_backend(const char **not_allowed_message,
                                   const mlperf_device_info_t *device_info) {
   bool neuron_capable = false;
-
   bool neuron_adapter = false;
   void *libneuron_adapter;
+
+  // Try to load the default neuron adapter library
   libneuron_adapter =
       dlopen("libneuron_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
+
+  // If not found, try to load platform-specific libraries
   if (libneuron_adapter == nullptr) {
-    // Try to dlopen Neuron universal SDK
-    libneuron_adapter =
-        dlopen("libneuronusdk_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
+    const std::string device = GetPlatformName();
+    if (device == "mt6989") {
+      libneuron_adapter =
+          dlopen("libneuronusdk_adapter.mtk.mt6989.so", RTLD_LAZY | RTLD_LOCAL);
+    } else if (device == "mt6991") {
+      libneuron_adapter =
+          dlopen("libneuronusdk_adapter.mtk.mt6991.so", RTLD_LAZY | RTLD_LOCAL);
+    } else {
+      libneuron_adapter =
+          dlopen("libneuronusdk_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
+    }
     if (libneuron_adapter != nullptr) neuron_adapter = true;
   } else {
     neuron_adapter = true;
@@ -105,10 +116,16 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
   *not_allowed_message = nullptr;
 #if MTK_TFLITE_NEURON_BACKEND && defined(__ANDROID__)
   std::string device = GetPlatformName();
+  LOG(INFO) << "The platform name is " << device;
+
   *settings = tflite_settings_mtk.c_str();
+
   if (device == "mt6989") {
     *settings = tflite_settings_mtk_mt6989.c_str();
+  } else if (device == "mt6991") {
+    *settings = tflite_settings_mtk_mt6991.c_str();
   }
+
   return neuron_tflite_backend(not_allowed_message, device_info);
 #elif __APPLE__
   tflite_settings_apple = tflite_settings_apple_main;

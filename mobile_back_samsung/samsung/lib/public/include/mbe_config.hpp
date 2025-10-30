@@ -1,4 +1,4 @@
-/* Copyright 2020-2023 Samsung System LSI. All Rights Reserved.
+/* Copyright 2020-2025 Samsung System LSI. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,4 +29,6 @@ limitations under the License.
 #include "mbe_config_2200.hpp"
 #include "mbe_config_2300.hpp"
 #include "mbe_config_2400.hpp"
+#include "mbe_config_2500.hpp"
+
 #endif

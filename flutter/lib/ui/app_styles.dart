@@ -11,6 +11,7 @@ class AppColors {
   static const _blue4 = Color(0XFF135384);
   static const _blue5 = Color(0xFF0B3A61);
   static const _green = Color(0xFF41C555);
+  static const _yellow = Color(0xFFFFD000);
   static const _brown = Colors.brown;
 
   static const lightText = Colors.white;
@@ -36,6 +37,7 @@ class AppColors {
   static const infoSectionBackground = _blue5;
   static const progressCircle = _blue4;
   static const goCircle = _green;
+  static const warningIcon = _yellow;
 }
 
 class AppGradients {

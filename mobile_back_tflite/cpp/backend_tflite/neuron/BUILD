@@ -10,6 +10,7 @@ pbtxt2header(
     srcs = [
         "backend_settings/tflite_settings_mtk.pbtxt",
         "backend_settings/tflite_settings_mtk_mt6989.pbtxt",
+        "backend_settings/tflite_settings_mtk_mt6991.pbtxt",
     ],
 )
 

@@ -2,9 +2,9 @@
 
 The MLPerf Mobile App supports the following runtime backends to run AI tasks on different mobile devices.
 
-## TFLite Backend
+## LiteRT Backend
 
-TensorFlow Lite is Google’s cross-platform framework for deploying machine learning (ML) models on mobile and embedded systems. The runtime uses a set of custom operators that are optimized for efficiency, offering lower latency and smaller binary size compared to the full TensorFlow runtime. It can perform inference on CPUs using optimized kernels that take advantage of ARM’s Neon vector instructions on any platform. The runtime can also execute on a variety of accelerator delegates to take advantage of specialized APIs and hardware. For example, it can target GPUs for iOS and Android, Core ML for newer iOS devices, and the Android NNAPI delegate which can target GPUs, DSPs, NPUs, and custom back-ends.
+LiteRT (formerly TensorFlow Lite) is Google’s cross-platform framework for deploying machine learning (ML) models on mobile and embedded systems. The runtime uses a set of custom operators that are optimized for efficiency, offering lower latency and smaller binary size compared to the full TensorFlow runtime. It can perform inference on CPUs using optimized kernels that take advantage of ARM’s Neon vector instructions on any platform. The runtime can also execute on a variety of accelerator delegates to take advantage of specialized APIs and hardware. For example, it can target GPUs for iOS and Android, Core ML for newer iOS devices, and the Android NNAPI delegate which can target GPUs, DSPs, NPUs, and custom back-ends.
 When invoked on the CPU it will use 4 threads.
 
 ## Google Pixel
@@ -13,9 +13,7 @@ Google Pixel smartphones use the Android NNAPI run time. The Android Neural Netw
 
 The MLPerf app uses NNAPI on the following families:
 
-* Pixel 8 and Pixel 8 Pro (Tensor G3 SoC)
-* Pixel 7 and Pixel 7 Pro (Tensor G2 ScC)
-* Pixel 6 and Pixel 6 Pro (Tensor G1 ScC)
+* Pixel 10/9/8/7/6 and Pixel 10/9/8/7/6 Pro (Tensor G5/G4/G3/G2/G1 SoC)
 
 <!-- markdown-link-check-disable-next-line -->
 For More Info: [https://developer.android.com/ndk/guides/neuralnetworks](https://developer.android.com/ndk/guides/neuralnetworks)
@@ -26,8 +24,8 @@ The MediaTek Neuron Delegate is a TensorFlow Lite delegate designed to work with
 
 The MLPerf app uses the Neuron delegate on the following families:
 
-* Dimensity 9000 series (9000/9000+/9200/9200+/9300/9300+)
-* Dimensity 8000 series (8000/8020/8050/8100/8200)
+* Dimensity 9000 series (9000/9000+/9200/9200+/9300/9300+/9400)
+* Dimensity 8000 series (8000/8020/8050/8100/8200/8300)
 
 Link to MediaTek Neuron Delegate: [https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate](https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate)
 
@@ -39,16 +37,14 @@ The Qualcomm Neural Processing SDK (SNPE) is a software accelerated runtime and 
 
 The MLPerf Application uses the SNPE Hexagon Processor runtimes on the following families:
 
+* Snapdragon 8 Elite
 * Snapdragon 8 Gen 3
 * Snapdragon 8s Gen 3
-* Snapdragon 7 Gen 3
 * Snapdragon 8 Gen 2
-* Snapdragon 7+ Gen 2
-* Snapdragon 8+ Gen 1
-* Snapdragon 8 Gen 1
-* Snapdragon 7 Gen 1
-* Snapdragon 888
-* Snapdragon 778
+* Snapdragon 7 Gen 3
+* Snapdragon 7s Gen 3
+* Snapdragon 4 Gen 2
+* Default fallback for all other Snapdragon mobile platforms
 
 The Qualcomm backend utilizes the Snapdragon platform's AI hardware to accelerate neural network execution.
 
@@ -65,8 +61,22 @@ Official website URL: [https://developer.samsung.com/neural/overview.html](https
 
 The MLPerf Mobile Benchmarking App uses the Exynos Neural Network SDK on the following families of Exynos processors [https://semiconductor.samsung.com/processor/](https://semiconductor.samsung.com/processor/):
 
+* Exynos 2500
 * Exynos 2400
 * Exynos 2300
 * Exynos 2200
 * Exynos 2100
-* Exynos 990
+
+## iOS App
+
+The MLPerf Mobile App is also available for iOS devices, optimized to leverage Apple's neural engine and Core ML framework. Core ML is Apple's machine learning framework that helps integrate machine learning models into iOS applications. On supported iOS devices, the app utilizes the Neural Engine available in Apple Silicon (A-series and M-series chips) to accelerate machine learning workloads.
+
+The iOS version of the MLPerf Mobile App supports the same benchmarks as the Android version, allowing for consistent cross-platform performance comparisons. The app takes advantage of the Metal Performance Shaders (MPS) and Apple's Neural Engine to provide optimized performance on iOS devices.
+
+For more information about Core ML, visit [https://developer.apple.com/documentation/coreml](https://developer.apple.com/documentation/coreml)
+
+## Licensing Information
+
+The MLPerf Mobile App code is licensed under the Apache 2.0 License. The models used in the benchmarks are subject to their respective licenses. For detailed licensing information, please refer to the [LICENSE.md](https://github.com/mlcommons/mobile_app_open/blob/master/LICENSE.md) file in the repository.
+
+The datasets used for benchmarking are subject to their original licenses and terms of use. Please consult the documentation of each specific dataset for details on usage rights and restrictions.
