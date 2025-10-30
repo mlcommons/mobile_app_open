@@ -31,9 +31,9 @@ apple_xcframework(
     infoplists = ["//flutter/cpp/flutter:BackendBridgeInfo.plist"],
     ios = {
         "simulator": [
-            "x86_64",
+            #"x86_64",
             # cpuinfo doesn't support simulator on ARM-based macs
-            # "ios_sim_arm64",
+            "ios_sim_arm64",
         ],
         "device": ["arm64"],
     },
