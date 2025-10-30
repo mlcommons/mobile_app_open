@@ -10,7 +10,7 @@ jobs:
   build:
     name: Build and test iOS app
     # https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md
-    runs-on: macos-13
+    runs-on: macos-14
     timeout-minutes: 180
     env:
       PERF_TEST: true
