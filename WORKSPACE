@@ -58,7 +58,7 @@ http_archive(
         "//:flutter/third_party/use_unsigned_char.patch",
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
-        #"//:flutter/third_party/tf-eigen.patch",
+        "//:flutter/third_party/tf-eigen.patch",
     ] + PATCH_FILE,
     sha256 = "d7876f4bb0235cac60eb6316392a7c48676729860da1ab659fb440379ad5186d",
     strip_prefix = "tensorflow-2.18.0",

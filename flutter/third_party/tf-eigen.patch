@@ -19,7 +19,7 @@ index 00000000000..6c94319de42
 +index e76ddd3d2..6b4fc84ec 100644
 +--- a/Eigen/src/Core/util/Macros.h
 ++++ b/Eigen/src/Core/util/Macros.h
-+@@ -1281,7 +1281,7 @@ namespace Eigen {
++@@ -1236,7 +1236,7 @@ namespace Eigen {
 +   EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(METHOD,OPNAME)
 + 
 + 
