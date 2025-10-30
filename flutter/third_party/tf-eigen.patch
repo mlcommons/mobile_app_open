@@ -14,7 +14,7 @@ new file mode 100644
 index 00000000000..6c94319de42
 --- /dev/null
 +++ b/third_party/eigen3/eigen_ios.patch
-@@ -0,0 +1,13 @@
+@@ -0,0 +1,12 @@
 +--- a/Eigen/src/Core/util/Macros.h
 ++++ b/Eigen/src/Core/util/Macros.h
 +@@ -1235,8 +1235,7 @@
