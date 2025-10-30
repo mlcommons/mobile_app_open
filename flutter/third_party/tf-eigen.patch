@@ -23,7 +23,7 @@ index 00000000000..6c94319de42
 + 
 +-#if (defined(_CPPUNWIND) || defined(__EXCEPTIONS)) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && \
 +-    !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE)
-++#if !defined(EIGEN_NOEXCEPTIONS_OVERRIDE) && ((defined(_CPPUNWIND) || (defined(__EXCEPTIONS) && defined(__exceptions__))) && !defined(EIGEN_CUDA_ARCH) && !+defined(EIGEN_EXCEPTIONS) && !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE))
+++#if !defined(EIGEN_NOEXCEPTIONS_OVERRIDE) && ((defined(_CPPUNWIND) || (defined(__EXCEPTIONS) && defined(__exceptions__))) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE))
 + #define EIGEN_EXCEPTIONS
 + #endif
 +
