@@ -83,6 +83,8 @@ build:ios --copt=-DEIGEN_NOEXCEPTIONS_OVERRIDE
 build:ios --cxxopt=-DEIGEN_NOEXCEPTIONS_OVERRIDE
 # disable avx512-fp16 for x86 simulator
 build:ios --define=xnn_enable_avx512fp16=false
+# force arm64 simulator
+build:ios --ios_multi_cpus=sim_arm64
 
 # Windows configs
 
