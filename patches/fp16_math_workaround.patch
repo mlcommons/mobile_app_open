@@ -1,19 +1,13 @@
-From 6bc45b3b372bfc67a514d0bda24993e983f79aa8 Mon Sep 17 00:00:00 2001
-From: Dillon <dsharlet@gmail.com>
-Date: Sat, 31 Aug 2024 13:18:10 -0700
+Based on 6bc45b3b372bfc67a514d0bda24993e983f79aa8 Mon Sep 17 00:00:00 2001
+From: Farook Al-Sammarraie <farook.a@scopicsoftware.com>
+Date: Fri, 31 Oct 2025
 Subject: [PATCH] Remove dependency on math.h. This of course should be fine,
  but there are some misconfigured cross compilation builds that have issues
  with math.h. These builds should be fixed, but I also just generally like to
  avoid dependencies where possible, which it is in this case.
 
----
- include/fp16/fp16.h | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
-
-diff --git a/include/fp16/fp16.h b/include/fp16/fp16.h
-index 95fa0c2..142ef6a 100644
 --- a/include/fp16/fp16.h
-+++ b/include/fp16/fp16.h
++++ a/include/fp16/fp16.h
 @@ -4,10 +4,8 @@
  
  #if defined(__cplusplus) && (__cplusplus >= 201103L)
@@ -24,23 +18,17 @@ index 95fa0c2..142ef6a 100644
 -	#include <math.h>
  #endif
  
- #include <fp16/bitcasts.h>
-@@ -286,14 +284,15 @@ static inline uint16_t fp16_ieee_from_fp32_value(float f) {
+ #ifdef _MSC_VER
+@@ -228,9 +226,10 @@
  	const float scale_to_inf = fp32_from_bits(UINT32_C(0x77800000));
  	const float scale_to_zero = fp32_from_bits(UINT32_C(0x08800000));
  #endif
-+	const uint32_t w = fp32_to_bits(f);
+-	float base = (fabsf(f) * scale_to_inf) * scale_to_zero;
+-
+ 	const uint32_t w = fp32_to_bits(f);
 +	const float abs_f = fp32_from_bits(w & UINT32_C(0x7FFFFFFF));
- #if defined(_MSC_VER) && defined(_M_IX86_FP) && (_M_IX86_FP == 0) || defined(__GNUC__) && defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ != 0)
--	const volatile float saturated_f = fabsf(f) * scale_to_inf;
-+	const volatile float saturated_f = abs_f * scale_to_inf;
- #else
--	const float saturated_f = fabsf(f) * scale_to_inf;
-+	const float saturated_f = abs_f * scale_to_inf;
- #endif
- 	float base = saturated_f * scale_to_zero;
- 
--	const uint32_t w = fp32_to_bits(f);
++	float base = (abs_f * scale_to_inf) * scale_to_zero;
++
  	const uint32_t shl1_w = w + w;
  	const uint32_t sign = w & UINT32_C(0x80000000);
  	uint32_t bias = shl1_w & UINT32_C(0xFF000000);
