@@ -213,25 +213,33 @@ mlperf_status_t LLMPipeline::backend_flush_queries(
 }
 
 // Return the number of inputs of the model.
-// Only 1 input need to be provided, the tokens themselves.
-// The other inputs are handled by the pipeline
+// 2 inputs need to be provided manually, the tokens themselves. and a token
+// count limit. The other inputs are handled by the pipeline
 int32_t LLMPipeline::backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
-  return 1;
+  return 2;
 }
 
 // Return the type of the ith input.
+// All inputs are of they type [int32]
 mlperf_data_t LLMPipeline::backend_get_input_type(
     mlperf_backend_ptr_t backend_ptr, int32_t i) {
   return mlperf_data_t{mlperf_data_t::Int32, 0};
 }
 
 // Set the data for ith input.
+// 0: list of input tokens.
+// 1: output token count limit.
 mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                                int32_t batch_index, int32_t i,
                                                void* data) {
   LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
   // Reset the tokens and kv caches from potential previous runs.
   backend_data->output_tokens.clear();
+
+  if (i == 1) {
+    backend_data->max_output_tokens = *(reinterpret_cast<int*>(data));
+    return MLPERF_SUCCESS;
+  }
 
   for (auto& [_, vec] : backend_data->kv_cache) {
     std::fill(vec.begin(), vec.end(), 0.0f);

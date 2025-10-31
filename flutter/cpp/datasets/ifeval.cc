@@ -62,6 +62,7 @@ std::vector<void*> IFEval::GetData(int sample_idx) {
   if (sample_idx < samples_.size()) {
     data.push_back(reinterpret_cast<void*>(
         const_cast<std::vector<int>*>(&(samples_[sample_idx]->input_tokens))));
+    data.push_back(reinterpret_cast<void*>(const_cast<int*>(&token_limit_)));
   }
   return data;
 }

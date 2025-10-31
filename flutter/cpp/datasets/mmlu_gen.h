@@ -66,6 +66,7 @@ class MmluGen : public Dataset {
   std::unordered_set<size_t> used_sample_ids_;
   std::set<int> loaded_sample_ids_;
   std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor;
+  static constexpr int token_limit_ = 4;
 };
 
 }  // namespace mobile
