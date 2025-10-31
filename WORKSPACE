@@ -51,7 +51,7 @@ load("@tf_patch_finder//:patch_win_arm64.bzl", "PATCH_FILE")
 http_archive(
     name = "FP16",
     build_file = "@//third_party:FP16.BUILD",
-    patches = ["//patches:fp16_math_workaround.patch.diff"],
+    patches = ["//patches:fp16_math_workaround.patch"],
     sha256 = "e66e65515fa09927b348d3d584c68be4215cfe664100d01c9dbc7655a5716d70",
     strip_prefix = "FP16-0a92994d729ff76a58f692d3028ca1b64b145d91",
     urls = [
