@@ -61,17 +61,11 @@ jobs:
         run: |
           flutter config --no-analytics && dart --disable-analytics
           dart pub global activate protoc_plugin ^21.1.2
-      - name: Install Android NDK
-        uses: nttld/setup-ndk@afb4c9964b521afb97c864b7d40b11e6911bd410 # v1.5.0
-        with:
-          ndk-version: r25c  # v25.2.9519653
-          add-to-path: true
-          link-to-sdk: true
       - name: Install Android SDK
-        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3.2.2
-        with:
-          cmdline-tools-version: 13114758
-          packages: "platform-tools build-tools;35.0.1 platforms;android-35"
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          yes | sdkmanager "platform-tools" "build-tools;35.0.1" "platforms;android-34" "platforms;android-35" 
+          yes | sdkmanager "ndk;25.2.9519653"
       - name: Prepare Flutter
         run: |
           make flutter/prepare
