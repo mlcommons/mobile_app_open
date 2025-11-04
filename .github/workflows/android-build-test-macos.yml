@@ -66,6 +66,7 @@ jobs:
         with:
           ndk-version: r25c  # v25.2.9519653
           add-to-path: true
+          link-to-sdk: true
       - name: Prepare Flutter
         run: |
           make flutter/prepare
