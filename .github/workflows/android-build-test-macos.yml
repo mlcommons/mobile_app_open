@@ -57,6 +57,10 @@ jobs:
         with:
           channel: stable
           flutter-version: 3.19.6
+      - name: Setup protoc
+        run: |
+          flutter config --no-analytics && dart --disable-analytics
+          dart pub global activate protoc_plugin ^21.1.2
       - name: Build Android app
         env:
           BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
