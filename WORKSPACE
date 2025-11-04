@@ -49,6 +49,18 @@ http_archive(
 load("@tf_patch_finder//:patch_win_arm64.bzl", "PATCH_FILE")
 
 http_archive(
+    name = "FP16",
+    build_file = "@//third_party:FP16.BUILD",
+    patch_args = ["-p1"],
+    patches = ["//patches:fp16_math_workaround.patch"],
+    sha256 = "e66e65515fa09927b348d3d584c68be4215cfe664100d01c9dbc7655a5716d70",
+    strip_prefix = "FP16-0a92994d729ff76a58f692d3028ca1b64b145d91",
+    urls = [
+        "https://github.com/Maratyszcza/FP16/archive/0a92994d729ff76a58f692d3028ca1b64b145d91.zip",
+    ],
+)
+
+http_archive(
     name = "org_tensorflow",
     patch_args = ["-p1"],
     patches = [
@@ -59,13 +71,43 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
-        # NDK 25 support
-        "//patches:ndk_25_r14.diff",
     ] + PATCH_FILE,
-    sha256 = "ce357fd0728f0d1b0831d1653f475591662ec5bca736a94ff789e6b1944df19f",
-    strip_prefix = "tensorflow-2.14.0",
+    sha256 = "d7876f4bb0235cac60eb6316392a7c48676729860da1ab659fb440379ad5186d",
+    strip_prefix = "tensorflow-2.18.0",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.14.0.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/v2.18.0.tar.gz",
+    ],
+)
+
+load("@org_tensorflow//third_party/gpus:cuda_configure.bzl", "cuda_configure")
+
+cuda_configure(name = "local_config_cuda")
+
+load("@org_tensorflow//third_party/gpus:rocm_configure.bzl", "rocm_configure")
+
+rocm_configure(name = "local_config_rocm")
+
+http_archive(
+    name = "com_google_sentencepiece",
+    build_file = "@//patches:sentencepiece.BUILD",
+    patch_args = ["-p1"],
+    patches = ["@//patches:com_google_sentencepiece.diff"],
+    sha256 = "8409b0126ebd62b256c685d5757150cf7fcb2b92a2f2b98efb3f38fc36719754",
+    strip_prefix = "sentencepiece-0.1.96",
+    urls = [
+        "https://github.com/google/sentencepiece/archive/refs/tags/v0.1.96.zip",
+    ],
+)
+
+http_archive(
+    name = "darts_clone",
+    build_file = "@//patches:darts_clone.BUILD",
+    patch_args = ["-p0"],
+    patches = ["//patches:darts_no_exceptions.diff"],
+    sha256 = "c97f55d05c98da6fcaf7f9ecc6a6dc6bc5b18b8564465f77abff8879d446491c",
+    strip_prefix = "darts-clone-e40ce4627526985a7767444b6ed6893ab6ff8983",
+    urls = [
+        "https://github.com/s-yata/darts-clone/archive/e40ce4627526985a7767444b6ed6893ab6ff8983.zip",
     ],
 )
 

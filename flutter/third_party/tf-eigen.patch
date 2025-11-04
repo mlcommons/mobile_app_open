@@ -14,20 +14,19 @@ new file mode 100644
 index 00000000000..6c94319de42
 --- /dev/null
 +++ b/third_party/eigen3/eigen_ios.patch
-@@ -0,0 +1,13 @@
-+diff --git a/Eigen/src/Core/util/Macros.h b/Eigen/src/Core/util/Macros.h
-+index e76ddd3d2..6b4fc84ec 100644
+@@ -0,0 +1,12 @@
 +--- a/Eigen/src/Core/util/Macros.h
 ++++ b/Eigen/src/Core/util/Macros.h
-+@@ -1281,7 +1281,7 @@ namespace Eigen {
-+   EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(METHOD,OPNAME)
++@@ -1235,8 +1235,7 @@
++   EIGEN_MAKE_SCALAR_BINARY_OP_ONTHELEFT(METHOD, OPNAME) \
++   EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(METHOD, OPNAME)
 + 
-+ 
-+-#if (defined(_CPPUNWIND) || defined(__EXCEPTIONS)) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE)
-++#if (defined(_CPPUNWIND) || (defined(__EXCEPTIONS) && defined(__exceptions__))) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE)
-+   #define EIGEN_EXCEPTIONS
++-#if (defined(_CPPUNWIND) || defined(__EXCEPTIONS)) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && \
++-    !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE)
+++#if !defined(EIGEN_NOEXCEPTIONS_OVERRIDE) && ((defined(_CPPUNWIND) || (defined(__EXCEPTIONS) && defined(__exceptions__))) && !defined(EIGEN_CUDA_ARCH) && !defined(EIGEN_EXCEPTIONS) && !defined(EIGEN_USE_SYCL) && !defined(EIGEN_HIP_DEVICE_COMPILE))
++ #define EIGEN_EXCEPTIONS
 + #endif
-+ 
++
 diff --git a/third_party/eigen3/workspace.bzl b/third_party/eigen3/workspace.bzl
 index 9782907cf5e..ad302dbabc5 100644
 --- a/third_party/eigen3/workspace.bzl

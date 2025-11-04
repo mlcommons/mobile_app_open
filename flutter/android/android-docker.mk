@@ -19,7 +19,7 @@ user_id=$(shell id -u)
 .PHONY: flutter/android/docker/image
 flutter/android/docker/image: output/docker/mlperf_mobile_flutter_android_${user_id}.stamp
 output/docker/mlperf_mobile_flutter_android_${user_id}.stamp: flutter/android/docker/Dockerfile
-	docker image build -t ${DOCKER_IMAGE_TAG} flutter/android/docker
+	DOCKER_BUILDKIT=1 docker buildx build --tag ${DOCKER_IMAGE_TAG} flutter/android/docker
 	mkdir -p output/docker
 	touch $@
 

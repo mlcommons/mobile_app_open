@@ -9,6 +9,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+#include <algorithm>
+
+#include "llm_pipeline.h"
 #include "single_model_pipeline.h"
 #include "stable_diffusion_pipeline.h"
 #include "tensorflow/core/platform/logging.h"
@@ -37,10 +40,15 @@ extern "C" {
 std::unique_ptr<Pipeline> pipeline;
 
 void init_pipeline(const char *pipeline_type) {
+  // TODO use a switch/case
   bool sd_pipeline = (strcmp(pipeline_type, "StableDiffusionPipeline") == 0);
+  bool llm_pipeline = (strcmp(pipeline_type, "LLMPipeline") == 0);
   if (sd_pipeline) {
     LOG(INFO) << "Initializing StableDiffusionPipeline";
     pipeline = std::make_unique<StableDiffusionPipeline>();
+  } else if (llm_pipeline) {
+    LOG(INFO) << "Initializing LLMPipeline";
+    pipeline = std::make_unique<LLMPipeline>();
   } else {
     LOG(INFO) << "Initializing SingleModelPipeline";
     pipeline = std::make_unique<SingleModelPipeline>();
@@ -162,6 +170,8 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 mlperf_backend_ptr_t mlperf_backend_create(
     const char *model_path, mlperf_backend_configuration_t *configs,
     const char *native_lib_path) {
+  LOG(INFO) << "Using TfLite " << TfLiteVersion() << " With Schema "
+            << TfLiteSchemaVersion() << std::endl;
   const char *pipeline_type = "";
   for (int i = 0; i < configs->count; ++i) {
     if (strcmp(configs->keys[i], "pipeline") == 0) {
@@ -195,8 +205,12 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
 }
 
 // Run the inference for a sample.
-mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
-  return pipeline->backend_issue_query(backend_ptr);
+// callback and context are only used when running token based inferences (LLM).
+// In other cases they can be passed as nullptr
+mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
+                                           ft_callback callback,
+                                           void *context) {
+  return pipeline->backend_issue_query(backend_ptr, callback, context);
 }
 
 // Flush the staged queries immediately.

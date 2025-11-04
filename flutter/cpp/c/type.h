@@ -61,6 +61,8 @@ typedef struct {
   const char* native_lib_path;
 } mlperf_device_info_t;
 
+typedef void (*ft_callback)(void* context);
+
 #ifdef __cplusplus
 }
 #endif  // __cplusplus

@@ -46,7 +46,7 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
   void RunMLPerfTest(const std::string& mode, int min_query_count,
                      double min_duration, double max_duration,
                      int single_stream_expected_latency_ns,
-                     const std::string& output_dir);
+                     const std::string& output_dir, bool use_tokens = false);
 
   // A human-readable string for logging purposes.
   const std::string& Name() override { return backend_->Name(); }
@@ -77,6 +77,7 @@ class MlperfDriver : public ::mlperf::SystemUnderTest {
   std::string scenario_;
   int batch_;
   std::atomic<int32_t> query_counter_{0};
+  bool use_tokens_;
 };
 
 }  // namespace mobile

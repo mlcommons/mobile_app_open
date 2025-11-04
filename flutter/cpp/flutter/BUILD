@@ -32,6 +32,7 @@ cc_library(
         "//flutter/cpp/datasets:coco",
         "//flutter/cpp/datasets:coco_gen",
         "//flutter/cpp/datasets:imagenet",
+        "//flutter/cpp/datasets:mmlu_gen",
         "//flutter/cpp/datasets:snu_sr",
         "//flutter/cpp/datasets:squad",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
@@ -49,7 +50,7 @@ apple_xcframework(
         "simulator": [
             "x86_64",
             # cpuinfo does not support simulator on ARM-based macs
-            # "ios_sim_arm64",
+            # "arm64",
         ],
         "device": ["arm64"],
     },

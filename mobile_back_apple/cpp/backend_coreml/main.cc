@@ -136,7 +136,9 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
 }
 
 // Run the inference for a sample.
-mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
+mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
+                                           ft_callback callback,
+                                           void *context) {
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
   if ([backend_data->coreMLExecutor issueQueries]) return MLPERF_SUCCESS;
   return MLPERF_FAILURE;

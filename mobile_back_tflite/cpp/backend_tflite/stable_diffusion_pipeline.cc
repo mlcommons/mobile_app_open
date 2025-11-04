@@ -175,7 +175,7 @@ void StableDiffusionPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
 }
 
 mlperf_status_t StableDiffusionPipeline::backend_issue_query(
-    mlperf_backend_ptr_t backend_ptr) {
+    mlperf_backend_ptr_t backend_ptr, ft_callback callback, void* context) {
   SDBackendData* backend_data = (SDBackendData*)backend_ptr;
   StableDiffusionInvoker* invoker = new StableDiffusionInvoker(backend_data);
   backend_data->output = invoker->invoke();

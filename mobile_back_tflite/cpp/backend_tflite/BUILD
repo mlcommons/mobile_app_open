@@ -50,6 +50,7 @@ cc_library(
     name = "tflite_c",
     srcs = [
         "embedding_utils.cc",
+        "llm_pipeline.cc",
         "sd_utils.cc",
         "single_model_pipeline.cc",
         "stable_diffusion_invoker.cc",
@@ -58,6 +59,7 @@ cc_library(
     ],
     hdrs = [
         "embedding_utils.h",
+        "llm_pipeline.h",
         "pipeline.h",
         "sd_utils.h",
         "single_model_pipeline.h",
@@ -84,11 +86,17 @@ cc_library(
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
+        "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite:util",
         "@org_tensorflow//tensorflow/lite/c:c_api",
+        "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
         "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/experimental/genai:genai_ops",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
+            "@org_tensorflow//tensorflow/lite/delegates/xnnpack:xnnpack_delegate",
         ],
         "@org_tensorflow//tensorflow:ios": [
             "@org_tensorflow//tensorflow/lite/delegates/coreml:coreml_delegate",

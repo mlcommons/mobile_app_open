@@ -60,6 +60,8 @@ typedef struct {
   const char* values[kMaxMLPerfBackendConfigs_intf];
 } intf_mlperf_backend_configuration_t;
 
+typedef void (*ft_callback)(void* context);
+
 #ifdef __cplusplus
 }
 #endif  // __cplusplus

@@ -337,6 +337,63 @@ task {
 }
 
 task {
+  id: "llm"
+  name: "LLM"
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  runs {
+    normal {
+      min_query_count: 100
+      min_duration: 60
+      max_duration: 300
+    }
+    quick {
+      min_query_count: 10
+      min_duration: 10
+      max_duration: 40
+    }
+    rapid {
+      min_query_count: 6
+      min_duration: 6
+      max_duration: 60
+    }
+  }
+  datasets {
+    type: MMLU
+      full {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "local:///mlperf_datasets/tinymmlu/data.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    lite {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "local:///mlperf_datasets/tinymmlu/data.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    tiny {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "local:///mlperf_datasets/tinymmlu/data.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+  }
+  model {
+    id: "LLM"
+    name: "LLM"
+  }
+  custom_config {
+    id: "llm_tokenizer_path"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+task {
   id: "stable_diffusion"
   name: "Stable Diffusion"
   max_throughput: 2000

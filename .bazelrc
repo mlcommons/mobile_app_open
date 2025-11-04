@@ -10,6 +10,10 @@ build --spawn_strategy=standalone
 # This flag is required by tensorflow
 common --experimental_repo_remote_exec
 
+# Without these, tensorflow complains about lack of CUDA library.
+common --repo_env=TF_NEED_CUDA=0
+common --repo_env=TF_NEED_ROCM=0
+
 # Default options should come above this line.
 
 # Configure logs
@@ -18,6 +22,7 @@ build:verbose_logs --output_filter=
 
 # Suppress C++ compiler warnings, otherwise build logs become 10s of MBs.
 build:android --copt=-w
+build:linux --copt=-w
 build:ios --copt=-w
 build:windows --copt=/W0
 
@@ -25,6 +30,8 @@ build:windows --copt=/W0
 build --cxxopt=-std=c++17
 build:android --cxxopt=-std=c++17
 build:android --host_cxxopt=-std=c++17
+build:linux --cxxopt=-std=c++17
+build:linux --host_cxxopt=-std=c++17
 build:ios --cxxopt=-std=c++17
 build:ios --host_cxxopt=-std=c++17
 build:ios --cxxopt=-xobjective-c++
@@ -41,10 +48,39 @@ build:android_x86_64 --config=android
 build:android_x86_64 --cpu=x86_64
 build:android_x86_64 --fat_apk_cpu=x86_64
 
+
+build:android_x86_64 --define=xnn_enable_avx512fp16=false
+build:android_x86_64 --define=xnn_enable_avxvnniint8=false
+
+# Linux configs
+build:linux_x86_64 --config=linux
+build:linux_x86_64 --cpu=k8
+# Not required, but enables the proper SSE/MMX instructions per CPU
+build:linux_x86_64 --copt=-march=native
+
+# These may be neccessary depending on CPU instruction support
+#build:linux_x86_64 --define=xnn_enable_avx=false
+#build:linux_x86_64 --define=xnn_enable_avx2=false
+#build:linux_x86_64 --define=xnn_enable_avx512=false
+build:linux_x86_64 --define=xnn_enable_avx512fp16=false
+#build:linux_x86_64 --define=xnn_enable_avxvnni=false
+build:linux_x86_64 --define=xnn_enable_avxvnniint8=false
+#build:linux_x86_64 --define=xnn_enable_vnni=false
+
+
+# Optional, enable for debugging or compilation errors
+#build:linux_x86_64 --action_env=CC=gcc
+#build:linux_x86_64 --action_env=CXX=g++
+#build:linux_x86_64 --strip=never
+#build:linux_x86_64 --copt=-fno-omit-frame-pointer
+#build:linux_x86_64 --linkopt=-fno-omit-frame-pointer
+
 # iOS configs
 build:ios --apple_platform_type=ios
 build:ios --copt=-Wno-c++11-narrowing
 build:ios --cxxopt=-fobjc-arc
+build:ios --copt=-DEIGEN_NOEXCEPTIONS_OVERRIDE
+build:ios --cxxopt=-DEIGEN_NOEXCEPTIONS_OVERRIDE
 
 # Windows configs
 
@@ -72,6 +108,10 @@ build:windows --linkopt=/OPT:REF
 build:windows --host_linkopt=/OPT:REF
 build:windows --linkopt=/OPT:ICF
 build:windows --host_linkopt=/OPT:ICF
+
+# MSVC does not support XNNPACK AVXVNNI instructions (causes C2440 error).
+build:windows --define=xnn_enable_avxvnni=false
+build:windows --define=xnn_enable_avxvnniint8=false
 
 # Address sanitizer
 build:asan --strip=never

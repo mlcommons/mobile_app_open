@@ -69,7 +69,7 @@ message OneRunConfig {
 
 // Datasets for a task
 //
-// Next ID: 5
+// Next ID: 9
 message DatasetConfig {
   // Type of the dataset.
   enum DatasetType {
@@ -80,6 +80,8 @@ message DatasetConfig {
     ADE20K = 4;
     SNUSR = 5;
     COCOGEN = 6;
+    MMLU = 7;
+    IFEVAL = 8;
   }
   required DatasetType type = 1;
   // Config of the dataset.
