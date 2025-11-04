@@ -43,7 +43,7 @@ jobs:
           path: /tmp/bazel_cache
           key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
           restore-keys: ${{ runner.os }}-bazel_cache-
-      - name: Install Flutter and dependencies
+      - name: Install dependencies
         run: |
           brew update --quiet || true
           brew install bazelisk
@@ -52,15 +52,20 @@ jobs:
           brew install python@3.14
           brew link --overwrite python@3.14
           python3.14 -m pip install --break-system-packages "numpy>=1.23,<2.0" "absl-py>=1.3,<2.0"
-      - name: Set up Flutter
+      - name: Install Flutter
         uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2.21.0
         with:
           channel: stable
           flutter-version: 3.19.6
-      - name: Setup protoc
+      - name: Install protoc
         run: |
           flutter config --no-analytics && dart --disable-analytics
           dart pub global activate protoc_plugin ^21.1.2
+      - name: Install Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c  # v25.2.9519653
+          add-to-path: true
       - name: Build Android app
         env:
           BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
