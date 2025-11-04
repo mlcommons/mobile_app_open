@@ -1,5 +1,8 @@
 name: iOS Build & Test (macOS)
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ master, submission-v* ]
