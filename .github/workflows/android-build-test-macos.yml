@@ -16,12 +16,16 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 180
     env:
-      WITH_APPLE: 0
+      OFFICIAL_BUILD: true
       WITH_TFLITE: 1
       WITH_PIXEL: 0
       WITH_MEDIATEK: 0
       WITH_QTI: 0
       WITH_SAMSUNG: 0
+      WITH_APPLE: 0
+      BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
+      BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
+      FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
       FIREBASE_IOS_API_KEY: ${{ secrets.FIREBASE_IOS_API_KEY }}
       FIREBASE_IOS_APP_ID: ${{ secrets.FIREBASE_IOS_APP_ID }}
       FIREBASE_IOS_CLIENT_ID: ${{ secrets.FIREBASE_IOS_CLIENT_ID }}
@@ -82,11 +86,8 @@ jobs:
           brew config
           flutter doctor -v
       - name: Build Android app
-        env:
-          BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
-          BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
         run: |
-          make flutter/android
+          make flutter/android/release
       - name: Run unit tests
         run: |
           make flutter/test/unit
