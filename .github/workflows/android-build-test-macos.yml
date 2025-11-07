@@ -90,3 +90,10 @@ jobs:
       - name: Run unit tests
         run: |
           make flutter/test/unit
+      - name: Archive APK with TFLite backend
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: android-apk-tflite-${{ github.run_number }}
+          path: output/android-apks/*-t-${{ github.run_number }}.apk
+          retention-days: 28
+          if-no-files-found: error
