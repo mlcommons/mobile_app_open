@@ -6,6 +6,32 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
+genrule(
+    name = "mlperf_conf_h",
+    srcs = ["mlperf.conf"],
+    outs = ["mlperf_conf.h"],
+    cmd = r"""
+      set -euo pipefail
+      in="$(location mlperf.conf)"
+      out="$@"
+
+      # Start the C string
+      printf 'const char* mlperf_conf =\n' > "$$out"
+
+      # Read all lines, including a final line without newline
+      while IFS= read -r line || [ -n "$$line" ]; do
+        line_esc=$${line//\\/\\\\}
+        line_esc=$${line_esc//\"/\\\"}
+        printf '"%s\\n"\n' "$$line_esc" >> "$$out"
+      done < "$$in"
+
+      # End the C string
+      printf ';\n' >> "$$out"
+
+      echo "Output config:  $$out" 1>&2
+    """,
+)
+
 cc_library(
     name = "loadgen",
     srcs = [
@@ -24,6 +50,7 @@ cc_library(
         "loadgen/version_generated.cc",
     ],
     hdrs = [
+        ":mlperf_conf_h",
         "loadgen/early_stopping.h",
         "loadgen/issue_query_controller.h",
         "loadgen/loadgen.h",
