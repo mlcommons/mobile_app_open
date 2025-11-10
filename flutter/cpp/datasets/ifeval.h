@@ -46,7 +46,7 @@ class IFEval : public Dataset {
 
   size_t TotalSampleCount() override { return samples_.size(); }
 
-  size_t PerformanceSampleCount() override { return 1; }
+  size_t PerformanceSampleCount() override { return samples_.size(); }
 
   void LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) override;
 
