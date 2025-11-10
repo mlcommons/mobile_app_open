@@ -4,6 +4,7 @@ import 'package:bot_toast/bot_toast.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
+import 'package:mlperfbench/ui/root/upgrade_dialog.dart';
 
 class MyApp extends StatelessWidget {
   final Widget home;
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
       ),
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
-      home: home,
+      home: UpgradeDialog(child: home),
     );
   }
 }
