@@ -1,4 +1,7 @@
-name: iOS Build & Test
+name: iOS Build & Test (macOS)
+
+permissions:
+  contents: read
 
 on:
   push:
