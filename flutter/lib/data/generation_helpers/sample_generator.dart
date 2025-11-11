@@ -47,6 +47,10 @@ class SampleGenerator {
           isMinQueryMet: true,
           isEarlyStoppingMet: true,
           isResultValid: true,
+          latencyFirstTokenMean: 0.123,
+          latencyFirstToken90: 0.123,
+          tokenThroughput: 12.345,
+          isTokenBased: false,
         ),
       );
 

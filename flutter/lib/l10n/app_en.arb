@@ -42,7 +42,7 @@
   "progressWaiting": "Wait for current benchmark to finish!",
 
   "resultsTitleUnverified": "Unverified",
-  "resultsTitlePerformance": "Results (qps)",
+  "resultsTitlePerformance": "Results",
   "resultsTitleAccuracy": "Results",
   "resultsTabTitlePerformance": "Performance",
   "resultsTabTitleAccuracy": "Accuracy",

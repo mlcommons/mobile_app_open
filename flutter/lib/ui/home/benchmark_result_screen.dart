@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 
 import 'package:provider/provider.dart';
 
@@ -242,14 +243,21 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     late final double? progressBarValue2;
     late final BenchmarkResult? benchmarkResult;
     late final Color resultTextColor;
+    late final isTokenBased =
+        (benchmarkResult?.loadgenInfo?.isTokenBased ?? false);
     switch (_screenMode) {
       case _ScreenMode.performance:
         benchmarkResult = benchmark.performanceModeResult;
         final throughput = benchmarkResult?.throughput;
-        resultText = throughput?.toUIString();
+        resultText = isTokenBased
+            ? benchmarkResult?.loadgenInfo?.tokenThroughput.toStringAsFixed(2)
+            : throughput?.toUIString();
         progressBarValue =
             (throughput?.value ?? 0.0) / benchmark.info.maxThroughput;
-        resultText2 = null;
+        resultText2 = isTokenBased
+            ? benchmarkResult?.loadgenInfo?.latencyFirstTokenMean
+                .toStringAsFixed(2)
+            : null;
         progressBarValue2 = null;
         final resultValidity =
             PerformanceResultValidityEnum.forBenchmark(benchmark);
@@ -289,8 +297,15 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(resultText ?? l10n.na, style: resultTextStyle),
-        if (resultText2 != null) Text(resultText2, style: resultTextStyle),
+        Tooltip(
+            message: isTokenBased ? 'TPS' : 'QPS',
+            triggerMode: TooltipTriggerMode.tap,
+            child: Text(resultText ?? l10n.na, style: resultTextStyle)),
+        if (resultText2 != null)
+          Tooltip(
+              message: isTokenBased ? 'TTFT' : '',
+              triggerMode: TooltipTriggerMode.tap,
+              child: Text(resultText2, style: resultTextStyle)),
       ],
     );
     final backendInfoRow = Text(backendInfo);
