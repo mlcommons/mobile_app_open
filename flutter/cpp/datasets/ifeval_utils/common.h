@@ -51,8 +51,6 @@ inline bool contains_string(const std::string& text,
 inline bool contains_word(const std::string& text, const std::string& word) {
   if (word.empty()) return false;
 
-  LOG(INFO) << "searching for '" << word << "'...";
-
   auto to_lower_ascii = [](std::string s) {
     for (char& c : s) c = std::tolower(static_cast<unsigned char>(c));
     return s;

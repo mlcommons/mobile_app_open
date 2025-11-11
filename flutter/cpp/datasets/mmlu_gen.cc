@@ -7,8 +7,6 @@
 #include "tensorflow/core/example/example.pb.h"
 #include "tensorflow/core/example/feature_util.h"
 
-#define li LOG(INFO) << "li:" << __FILE__ << ":" << __LINE__ << "@" << __func__
-
 namespace mlperf {
 namespace mobile {
 
@@ -17,8 +15,6 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
     : sample_reader_(input_tfrecord), Dataset(backend) {
   sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(
       LoadSentencePieceProcessor(sp_path));
-
-  li;
 
   // Load all TFRecord samples into memory
   // NOTE this can be moved to LoadSamplesToRam, but will cause delays between
@@ -41,8 +37,6 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
       std::string preface = input.substr(0, input.find("\n\n") + 2);
 
       input = preface + "Question: " + question_formatted;
-
-      LOG(INFO) << input;
     }
 
     // std::string input_formatted = FormatLlamaUserPrompt(input, "Provide only
@@ -59,7 +53,6 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
     samples_.push_back(std::move(sample));
     sample_output_tokens_.push_back(std::vector<int>());
   }
-  li;
 }
 
 void MmluGen::LoadSamplesToRam(const std::vector<QuerySampleIndex>& samples) {
@@ -78,8 +71,6 @@ void MmluGen::UnloadSamplesFromRam(
 std::vector<void*> MmluGen::GetData(int sample_idx) {
   std::vector<void*> data;
 
-  li;
-  LOG(INFO) << "Sample ID: " << std::to_string(sample_idx);
   if (sample_idx < samples_.size()) {
     data.push_back(reinterpret_cast<void*>(
         const_cast<std::vector<int>*>(&(samples_[sample_idx]->input_tokens))));
@@ -92,17 +83,11 @@ std::vector<uint8_t> MmluGen::ProcessOutput(const int sample_idx,
                                             const std::vector<void*>& outputs) {
   if (sample_idx >= samples_.size() || outputs.empty()) return {0};
 
-  li;
   const auto& output_tokens =
       *(reinterpret_cast<std::vector<int>*>(outputs[0]));
 
-  li;
   sample_output_tokens_[sample_idx] = output_tokens;
   used_sample_ids_.insert(sample_idx);
-
-  li;
-  LOG(INFO) << "Processed " << std::to_string(used_sample_ids_.size())
-            << "/100";
 
   return {1};
 }
@@ -117,14 +102,9 @@ bool MmluGen::ComputeSampleAccuracy(const int sample_idx) {
   std::string prediction;
   sp_processor->Decode(sample_output_tokens_[sample_idx], &prediction).ok();
 
-  li;
-  LOG(INFO) << "index: " << std::to_string(sample_idx) << std::endl;
-  LOG(INFO) << "Output: [[[" << prediction << "]]]" << std::endl;
-
   char predicted_char = find_answer_char(prediction);
   const std::string& correct = samples_[sample_idx]->answer;
 
-  li;
   return (predicted_char == correct[0]);
 }
 
