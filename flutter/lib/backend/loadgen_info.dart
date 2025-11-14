@@ -110,20 +110,26 @@ class LoadgenInfo {
     final isResultValid = result[validityKey] as String == 'VALID';
 
     const nanosecondsPerSecond = 1000 * Duration.microsecondsPerSecond;
+    bool usesTokens = (result[useTokenLatenciesKey] ?? false) as bool;
 
     return LoadgenInfo(
       queryCount: result[queryCountKey] as int,
-      latencyMean: (result[latencyKey] as int) / nanosecondsPerSecond,
-      latencyFirstTokenMean:
-          (result[latencyFirstTokenKey] as int) / nanosecondsPerSecond,
-      latency90: (result[latency90Key] as int) / nanosecondsPerSecond,
-      latencyFirstToken90:
-          (result[latency90FirstTokenKey] as int) / nanosecondsPerSecond,
+      latencyMean:
+          !usesTokens ? (result[latencyKey] as int) / nanosecondsPerSecond : 0,
+      latencyFirstTokenMean: usesTokens
+          ? (result[latencyFirstTokenKey] as int) / nanosecondsPerSecond
+          : 0,
+      latency90: !usesTokens
+          ? (result[latency90Key] as int) / nanosecondsPerSecond
+          : 0,
+      latencyFirstToken90: usesTokens
+          ? (result[latency90FirstTokenKey] as int) / nanosecondsPerSecond
+          : 0,
       tokenThroughput: result[tokenThroughputKey] as double,
       isMinDurationMet: result[minDurationMetKey] as bool,
       isMinQueryMet: result[minQueriesMetKey] as bool,
       isEarlyStoppingMet: result[earlyStoppingMetKey] as bool,
-      isTokenBased: result[useTokenLatenciesKey] as bool,
+      isTokenBased: usesTokens,
       isResultValid: isResultValid,
     );
   }
