@@ -7,7 +7,6 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/performance_result_validity.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
