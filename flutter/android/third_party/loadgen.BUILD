@@ -10,7 +10,7 @@ genrule(
     name = "mlperf_conf_h",
     srcs = ["mlperf.conf"],
     outs = ["mlperf_conf.h"],
-    cmd = r"""
+    cmd_bash = r"""
       set -euo pipefail
       in="$(location mlperf.conf)"
       out="$@"
@@ -29,6 +29,20 @@ genrule(
       printf ';\n' >> "$$out"
 
       echo "Output config:  $$out" 1>&2
+    """,
+    cmd_ps = r"""
+      $in  = "$(location mlperf.conf)"
+      $out = "$@"
+
+      "const char* mlperf_conf =" | Out-File -FilePath $out -Encoding utf8
+
+      Get-Content -LiteralPath $in | ForEach-Object {
+        # Escape backslashes and quotes
+        $line = $_.Replace('\', '\\').Replace('"', '\"')
+        '"{0}\n"' -f $line | Out-File -FilePath $out -Encoding utf8 -Append
+      }
+
+      ";" | Out-File -FilePath $out -Encoding utf8 -Append
     """,
 )
 
