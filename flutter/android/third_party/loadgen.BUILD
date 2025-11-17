@@ -10,7 +10,7 @@ genrule(
     name = "mlperf_conf_h",
     srcs = ["mlperf.conf"],
     outs = ["mlperf_conf.h"],
-    cmd_bash = r"""
+    cmd = r"""
       set -euo pipefail
       in="$(location mlperf.conf)"
       out="$@"
