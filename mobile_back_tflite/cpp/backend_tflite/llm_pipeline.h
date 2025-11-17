@@ -151,8 +151,9 @@ struct LLMBackendData {
   kv_cache_t kv_cache;
   std::vector<int> prompt_tokens;
   std::vector<int> output_tokens;
-  uint8_t threads = 2;
-  int max_output_tokens = 1024;
+  uint8_t threads = 8;
+  int max_output_tokens = 128;
+  int max_input_tokens = 2048;
   std::unordered_set<int> stop_token_ids{128001, 128008, 128009};
 
   LLMBackendData() {}

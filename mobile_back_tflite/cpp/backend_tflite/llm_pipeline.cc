@@ -258,6 +258,15 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
   backend_data->tensors.get_tensors(backend_data->prefill_runner,
                                     backend_data->decode_runner);
 
+  if (effective_prefill_token_size + 1 > backend_data->max_input_tokens) {
+    LOG(ERROR) << "Input size ("
+               << std::to_string(effective_prefill_token_size + 1)
+               << ") exceeds configured input limit ("
+               << std::to_string(backend_data->max_input_tokens) << ")."
+               << std::endl;
+    return MLPERF_FAILURE;
+  }
+
   if (effective_prefill_token_size + 1 >
       backend_data->tensors.kv_cache_k_0()->dims->data[1]) {
     LOG(ERROR) << "Input size ("
