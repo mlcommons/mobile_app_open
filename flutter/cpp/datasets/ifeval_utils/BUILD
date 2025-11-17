@@ -22,8 +22,8 @@ cc_library(
     name = "ifeval_utils",
     hdrs = [
         "common.h",
-        "types.h",
         "json.h",
+        "types.h",
     ],
     copts = select({
         "//flutter/android/commonlibs:use_asan": [
@@ -35,6 +35,6 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        "@cld2//:cld2",
+        "@cld2",
     ],
 )

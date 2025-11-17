@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
+#include "compact_lang_det.h"
 #include "flutter/cpp/datasets/ifeval_utils/common.h"
 #include "flutter/cpp/datasets/ifeval_utils/json.h"
-#include "compact_lang_det.h"
 
 namespace mlperf {
 namespace mobile {
@@ -508,7 +508,8 @@ class ResponseLanguage : public Instruction {
   inline bool LanguageHeuristic(const std::string& text,
                                 const std::string& lang) const {
     bool is_reliable = true;
-    std::string detected_lang(CLD2::LanguageCode(CLD2::DetectLanguage(text.c_str(), text.size(), true, &is_reliable)));
+    std::string detected_lang(CLD2::LanguageCode(
+        CLD2::DetectLanguage(text.c_str(), text.size(), true, &is_reliable)));
     return detected_lang == lang;
   }
 

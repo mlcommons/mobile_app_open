@@ -30,59 +30,48 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.*/
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
 #include <cctype>
 #include <cstdint>
 #include <cstdlib>
+#include <map>
+#include <string>
+#include <vector>
 
 namespace crow {
 namespace json {
 
-enum class type {
-  Null,
-  False,
-  True,
-  Number,
-  String,
-  List,
-  Object
-};
+enum class type { Null, False, True, Number, String, List, Object };
 
-enum class num_type {
-  Null,
-  Signed_integer,
-  Unsigned_integer,
-  Floating_point
-};
+enum class num_type { Null, Signed_integer, Unsigned_integer, Floating_point };
 
 class rvalue {
  public:
-  using list   = std::vector<rvalue>;
+  using list = std::vector<rvalue>;
   using object = std::map<std::string, rvalue>;
 
-  rvalue() : t_(type::Null), nt_(num_type::Null), error_(true) {} // default = invalid
+  rvalue()
+      : t_(type::Null),
+        nt_(num_type::Null),
+        error_(true) {}  // default = invalid
 
   explicit operator bool() const noexcept { return !error_; }
 
-  type      t()  const noexcept { return t_; }
-  num_type  nt() const noexcept { return nt_; }
+  type t() const noexcept { return t_; }
+  num_type nt() const noexcept { return nt_; }
 
-          // Accessors (no bounds checking, for brevity)
-  const list&   as_list()   const { return list_; }
+  // Accessors (no bounds checking, for brevity)
+  const list& as_list() const { return list_; }
   const object& as_object() const { return object_; }
   const std::string& as_string() const { return str_; }
 
-  int64_t   as_i() const { return i_; }
-  uint64_t  as_u() const { return u_; }
-  double    as_d() const { return d_; }
+  int64_t as_i() const { return i_; }
+  uint64_t as_u() const { return u_; }
+  double as_d() const { return d_; }
 
-          // Convenience index operators (no error checking)
+  // Convenience index operators (no error checking)
   const rvalue& operator[](std::size_t idx) const {
     static rvalue invalid;
-    if (t_ != type::List || idx >= list_.size())
-      return invalid;
+    if (t_ != type::List || idx >= list_.size()) return invalid;
     return list_[idx];
   }
 
@@ -112,58 +101,58 @@ class rvalue {
   }
 
   void set_number_signed(int64_t v) noexcept {
-    t_  = type::Number;
+    t_ = type::Number;
     nt_ = num_type::Signed_integer;
-    i_  = v;
-    u_  = static_cast<uint64_t>(v);
-    d_  = static_cast<double>(v);
+    i_ = v;
+    u_ = static_cast<uint64_t>(v);
+    d_ = static_cast<double>(v);
   }
 
   void set_number_unsigned(uint64_t v) noexcept {
-    t_  = type::Number;
+    t_ = type::Number;
     nt_ = num_type::Unsigned_integer;
-    u_  = v;
-    i_  = static_cast<int64_t>(v);
-    d_  = static_cast<double>(v);
+    u_ = v;
+    i_ = static_cast<int64_t>(v);
+    d_ = static_cast<double>(v);
   }
 
   void set_number_double(double v) noexcept {
-    t_  = type::Number;
+    t_ = type::Number;
     nt_ = num_type::Floating_point;
-    d_  = v;
-    i_  = static_cast<int64_t>(v);
-    u_  = static_cast<uint64_t>(v);
+    d_ = v;
+    i_ = static_cast<int64_t>(v);
+    u_ = static_cast<uint64_t>(v);
   }
 
   void set_string(std::string v) {
-    t_  = type::String;
+    t_ = type::String;
     nt_ = num_type::Null;
     str_ = std::move(v);
   }
 
   void set_list(list v) {
-    t_  = type::List;
+    t_ = type::List;
     nt_ = num_type::Null;
     list_ = std::move(v);
   }
 
   void set_object(object v) {
-    t_  = type::Object;
+    t_ = type::Object;
     nt_ = num_type::Null;
     object_ = std::move(v);
   }
 
-  type     t_;
+  type t_;
   num_type nt_;
-  bool     error_ = false;
+  bool error_ = false;
 
-          // basic storage
-  int64_t   i_ = 0;
-  uint64_t  u_ = 0;
-  double    d_ = 0.0;
+  // basic storage
+  int64_t i_ = 0;
+  uint64_t u_ = 0;
+  double d_ = 0.0;
   std::string str_;
-  list       list_;
-  object     object_;
+  list list_;
+  object object_;
 };
 
 class parser {
@@ -198,12 +187,24 @@ class parser {
     }
 
     switch (*cur_) {
-      case 'n': parse_null(out);  break;
-      case 't': parse_true(out);  break;
-      case 'f': parse_false(out); break;
-      case '"': parse_string(out); break;
-      case '[': parse_array(out);  break;
-      case '{': parse_object(out); break;
+      case 'n':
+        parse_null(out);
+        break;
+      case 't':
+        parse_true(out);
+        break;
+      case 'f':
+        parse_false(out);
+        break;
+      case '"':
+        parse_string(out);
+        break;
+      case '[':
+        parse_array(out);
+        break;
+      case '{':
+        parse_object(out);
+        break;
       default:
         if (*cur_ == '-' || std::isdigit(static_cast<unsigned char>(*cur_))) {
           parse_number(out);
@@ -244,7 +245,8 @@ class parser {
   bool consume_literal(const char* lit) {
     const char* p = cur_;
     while (*lit && p != end_ && *p == *lit) {
-      ++p; ++lit;
+      ++p;
+      ++lit;
     }
     if (*lit == '\0') {
       cur_ = p;
@@ -258,7 +260,7 @@ class parser {
       out.set_error();
       return;
     }
-    ++cur_; // skip opening quote
+    ++cur_;  // skip opening quote
 
     std::string result;
     while (cur_ != end_) {
@@ -269,20 +271,43 @@ class parser {
         return;
       }
       if (c == '\\') {
-        if (cur_ == end_) { out.set_error(); return; }
+        if (cur_ == end_) {
+          out.set_error();
+          return;
+        }
         char esc = *cur_++;
         switch (esc) {
-          case '"': result.push_back('"'); break;
-          case '\\': result.push_back('\\'); break;
-          case '/': result.push_back('/'); break;
-          case 'b': result.push_back('\b'); break;
-          case 'f': result.push_back('\f'); break;
-          case 'n': result.push_back('\n'); break;
-          case 'r': result.push_back('\r'); break;
-          case 't': result.push_back('\t'); break;
+          case '"':
+            result.push_back('"');
+            break;
+          case '\\':
+            result.push_back('\\');
+            break;
+          case '/':
+            result.push_back('/');
+            break;
+          case 'b':
+            result.push_back('\b');
+            break;
+          case 'f':
+            result.push_back('\f');
+            break;
+          case 'n':
+            result.push_back('\n');
+            break;
+          case 'r':
+            result.push_back('\r');
+            break;
+          case 't':
+            result.push_back('\t');
+            break;
           case 'u':
-            // minimal \uXXXX handling: skip 4 hex digits, no actual UTF-16 decode
-            if (end_ - cur_ < 4) { out.set_error(); return; }
+            // minimal \uXXXX handling: skip 4 hex digits, no actual UTF-16
+            // decode
+            if (end_ - cur_ < 4) {
+              out.set_error();
+              return;
+            }
             for (int i = 0; i < 4; ++i) {
               if (!std::isxdigit(static_cast<unsigned char>(cur_[i]))) {
                 out.set_error();
@@ -309,7 +334,10 @@ class parser {
     const char* start = cur_;
 
     if (*cur_ == '-') ++cur_;
-    if (cur_ == end_) { out.set_error(); return; }
+    if (cur_ == end_) {
+      out.set_error();
+      return;
+    }
 
     if (*cur_ == '0') {
       ++cur_;
@@ -336,8 +364,7 @@ class parser {
     if (cur_ != end_ && (*cur_ == 'e' || *cur_ == 'E')) {
       is_float = true;
       ++cur_;
-      if (cur_ != end_ && (*cur_ == '+' || *cur_ == '-'))
-        ++cur_;
+      if (cur_ != end_ && (*cur_ == '+' || *cur_ == '-')) ++cur_;
       if (cur_ == end_ || !std::isdigit(static_cast<unsigned char>(*cur_))) {
         out.set_error();
         return;
@@ -378,7 +405,10 @@ class parser {
   }
 
   void parse_array(rvalue& out) {
-    if (*cur_ != '[') { out.set_error(); return; }
+    if (*cur_ != '[') {
+      out.set_error();
+      return;
+    }
     ++cur_;
     skip_ws();
 
@@ -394,11 +424,17 @@ class parser {
       rvalue elem;
       skip_ws();
       parse_value(elem);
-      if (!elem) { out.set_error(); return; }
+      if (!elem) {
+        out.set_error();
+        return;
+      }
       elems.push_back(std::move(elem));
 
       skip_ws();
-      if (cur_ == end_) { out.set_error(); return; }
+      if (cur_ == end_) {
+        out.set_error();
+        return;
+      }
       if (*cur_ == ',') {
         ++cur_;
         skip_ws();
@@ -417,7 +453,10 @@ class parser {
   }
 
   void parse_object(rvalue& out) {
-    if (*cur_ != '{') { out.set_error(); return; }
+    if (*cur_ != '{') {
+      out.set_error();
+      return;
+    }
     ++cur_;
     skip_ws();
 
@@ -433,22 +472,34 @@ class parser {
       skip_ws();
       rvalue key_rv;
       parse_string(key_rv);
-      if (!key_rv || key_rv.t() != type::String) { out.set_error(); return; }
+      if (!key_rv || key_rv.t() != type::String) {
+        out.set_error();
+        return;
+      }
       std::string key = key_rv.as_string();
 
       skip_ws();
-      if (cur_ == end_ || *cur_ != ':') { out.set_error(); return; }
+      if (cur_ == end_ || *cur_ != ':') {
+        out.set_error();
+        return;
+      }
       ++cur_;
 
       skip_ws();
       rvalue value_rv;
       parse_value(value_rv);
-      if (!value_rv) { out.set_error(); return; }
+      if (!value_rv) {
+        out.set_error();
+        return;
+      }
 
       obj.emplace(std::move(key), std::move(value_rv));
 
       skip_ws();
-      if (cur_ == end_) { out.set_error(); return; }
+      if (cur_ == end_) {
+        out.set_error();
+        return;
+      }
       if (*cur_ == ',') {
         ++cur_;
         skip_ws();
@@ -481,9 +532,7 @@ inline rvalue load(const char* data) {
   return load(data, len);
 }
 
-inline rvalue load(const std::string& s) {
-  return load(s.data(), s.size());
-}
+inline rvalue load(const std::string& s) { return load(s.data(), s.size()); }
 
-} // namespace json
-} // namespace crow
+}  // namespace json
+}  // namespace crow
