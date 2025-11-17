@@ -9,6 +9,8 @@
 #include <vector>
 
 #include "flutter/cpp/datasets/ifeval_utils/common.h"
+#include "flutter/cpp/datasets/ifeval_utils/json.h"
+#include "compact_lang_det.h"
 
 namespace mlperf {
 namespace mobile {
@@ -234,40 +236,11 @@ class JsonFormat : public Instruction {
   constexpr InstructionGroup Group() override { return DETECTABLE_FORMAT; }
 
  private:
-  // TODO possibly use a C++ json validator instead
   virtual bool verify_(const std::string& resp) const override {
     std::string t = resp;
     if (t.empty()) return false;
-    if (!((t.front() == '{' && t.back() == '}') ||
-          (t.front() == '[' && t.back() == ']')))
-      return false;
-    int brace = 0, bracket = 0;
-    bool in_str = false, esc = false;
-    for (char c : t) {
-      if (esc) {
-        esc = false;
-        continue;
-      }
-      if (c == '\\') {
-        esc = true;
-        continue;
-      }
-      if (c == '"') {
-        in_str = !in_str;
-        continue;
-      }
-      if (in_str) continue;
-      if (c == '{')
-        ++brace;
-      else if (c == '}')
-        --brace;
-      else if (c == '[')
-        ++bracket;
-      else if (c == ']')
-        --bracket;
-      if (brace < 0 || bracket < 0) return false;
-    }
-    return brace == 0 && bracket == 0 && !in_str;
+    crow::json::rvalue jv = crow::json::load(t);
+    return jv.is_valid();
   }
 };
 
@@ -534,60 +507,9 @@ class ResponseLanguage : public Instruction {
 
   inline bool LanguageHeuristic(const std::string& text,
                                 const std::string& lang) const {
-    std::string L = tolower(lang);
-    const std::string& t = text;
-
-    auto non_ascii_ratio = [&]() {
-      size_t non_ascii = 0, total = 0;
-      for (unsigned char c : t) {
-        if (std::isalpha(c)) {
-          ++total;
-          if (c >= 128) ++non_ascii;
-        }
-      }
-      return total == 0 ? 0.0 : (double)non_ascii / (double)total;
-    };
-
-    if (L == "en") {
-      return non_ascii_ratio() < 0.05;
-    }
-    if (L == "tr") {
-      return t.find("ğ") != std::string::npos ||
-             t.find("Ğ") != std::string::npos ||
-             t.find("ş") != std::string::npos ||
-             t.find("Ş") != std::string::npos ||
-             t.find("ı") != std::string::npos ||
-             t.find("İ") != std::string::npos ||
-             t.find("ö") != std::string::npos ||
-             t.find("Ö") != std::string::npos ||
-             t.find("ç") != std::string::npos ||
-             t.find("Ç") != std::string::npos ||
-             t.find("ü") != std::string::npos ||
-             t.find("Ü") != std::string::npos;
-    }
-    if (L == "es") {
-      return t.find("ñ") != std::string::npos ||
-             t.find("Ñ") != std::string::npos ||
-             t.find("á") != std::string::npos ||
-             t.find("é") != std::string::npos ||
-             t.find("í") != std::string::npos ||
-             t.find("ó") != std::string::npos ||
-             t.find("ú") != std::string::npos;
-    }
-    if (L == "fr") {
-      return t.find("é") != std::string::npos ||
-             t.find("è") != std::string::npos ||
-             t.find("ê") != std::string::npos ||
-             t.find("ç") != std::string::npos ||
-             t.find("à") != std::string::npos;
-    }
-    if (L == "de") {
-      return t.find("ä") != std::string::npos ||
-             t.find("ö") != std::string::npos ||
-             t.find("ü") != std::string::npos ||
-             t.find("ß") != std::string::npos;
-    }
-    return non_ascii_ratio() > 0.05;
+    bool is_reliable = true;
+    std::string detected_lang(CLD2::LanguageCode(CLD2::DetectLanguage(text.c_str(), text.size(), true, &is_reliable)));
+    return detected_lang == lang;
   }
 
   virtual bool verify_(const std::string& resp) const override {
