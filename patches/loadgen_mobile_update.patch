@@ -1,0 +1,177 @@
+diff --git a/loadgen/bindings/python_api.cc b/loadgen/bindings/python_api.cc
+index 96396dab..e4a8e04d 100644
+--- a/loadgen/bindings/python_api.cc
++++ b/loadgen/bindings/python_api.cc
+@@ -316,6 +316,8 @@ PYBIND11_MODULE(mlperf_loadgen, m) {
+       .def_readwrite("max_duration_ms", &TestSettings::max_duration_ms)
+       .def_readwrite("min_query_count", &TestSettings::min_query_count)
+       .def_readwrite("max_query_count", &TestSettings::max_query_count)
++      def_readwrite("enforce_max_duration",
++                    &TestSettings::enforce_max_duration)
+       .def_readwrite("qsl_rng_seed", &TestSettings::qsl_rng_seed)
+       .def_readwrite("sample_index_rng_seed",
+                      &TestSettings::sample_index_rng_seed)
+diff --git a/loadgen/issue_query_controller.cc b/loadgen/issue_query_controller.cc
+index c1abea9d..a504ceba 100644
+--- a/loadgen/issue_query_controller.cc
++++ b/loadgen/issue_query_controller.cc
+@@ -503,7 +503,7 @@ void IssueQueryController::IssueQueriesInternal(size_t query_stride,
+            << queries_issued;
+         MLPERF_LOG_ERROR(detail, "error_runtime", ss.str());
+ #else
+-        detail.Error("IssueQueryThread ", std::to_string(thread_idx),
++        detail("IssueQueryThread ", std::to_string(thread_idx),
+                      " Ending early: Max query count reached.", "query_count",
+                      std::to_string(queries_issued));
+ #endif
+@@ -515,19 +515,21 @@ void IssueQueryController::IssueQueriesInternal(size_t query_stride,
+     // Checks if we have exceeded max_duration.
+     if (settings.max_duration.count() != 0 &&
+         duration > settings.max_duration) {
+-      LogDetail([thread_idx, duration](AsyncDetail& detail) {
++      if(settings.enforce_max_duration){
++        LogDetail([thread_idx, duration](AsyncDetail& detail) {
+ #if USE_NEW_LOGGING_FORMAT
+-        std::stringstream ss;
+-        ss << "IssueQueryThread " << thread_idx
+-           << " Ending early: Max test duration reached." << " duration_ns "
+-           << duration.count();
+-        MLPERF_LOG_ERROR(detail, "error_runtime", ss.str());
++          std::stringstream ss;
++          ss << "IssueQueryThread " << thread_idx
++            << " Ending early: Max test duration reached." << " duration_ns "
++            << duration.count();
++          MLPERF_LOG(detail, "error_runtime", ss.str());
+ #else
+-        detail.Error("IssueQueryThread ", std::to_string(thread_idx),
+-                     " Ending early: Max test duration reached.", "duration_ns",
+-                     std::to_string(duration.count()));
++          detail.Error("IssueQueryThread ", std::to_string(thread_idx),
++                      " Ending early: Max test duration reached.", "duration_ns",
++                      std::to_string(duration.count()));
+ #endif
+-      });
++        });
++      }
+       ran_out_of_generated_queries = false;
+       break;
+     }
+diff --git a/loadgen/results.cc b/loadgen/results.cc
+index f7c61af4..025cfcb5 100644
+--- a/loadgen/results.cc
++++ b/loadgen/results.cc
+@@ -506,15 +506,18 @@ void PerformanceSummary::LogSummary(AsyncSummary& summary) {
+   }
+   bool perf_constraints_met =
+       PerfConstraintsMet(&perf_constraints_recommendation);
+-  bool all_constraints_met = min_duration_met && min_queries_met &&
++  bool all_constraints_met = min_duration_met &&
+                              perf_constraints_met && early_stopping_met;
++  if (!settings.enforce_max_duration){
++    all_constraints_met = all_constraints_met && min_queries_met;
++  }
+   summary("Result is : ", all_constraints_met ? "VALID" : "INVALID");
+   if (HasPerfConstraints()) {
+     summary("  Performance constraints satisfied : ",
+             perf_constraints_met ? "Yes" : "NO");
+   }
+   summary("  Min duration satisfied : ", min_duration_met ? "Yes" : "NO");
+-  summary("  Min queries satisfied : ", min_queries_met ? "Yes" : "NO");
++  summary(" Min queries satisfied : ", min_queries_met ? "Yes" : settings.enforce_max_duration ? "Skipped" : "NO");
+   summary("  Early stopping satisfied: ", early_stopping_met ? "Yes" : "NO");
+ 
+   if (!all_constraints_met) {
+@@ -668,9 +671,11 @@ void PerformanceSummary::LogDetail(AsyncDetail& detail) {
+                       &pr.query_latencies,
+                       std::chrono::nanoseconds(settings.server_ttft_latency));
+   }
+-  bool all_constraints_met = min_duration_met && min_queries_met &&
++  bool all_constraints_met = min_duration_met &&
+                              perf_constraints_met && early_stopping_met;
+-
++  if (!settings.enforce_max_duration) {
++    all_constraints_met = all_constraints_met && min_queries_met;
++  }
+   MLPERF_LOG(detail, "result_validity",
+              all_constraints_met ? "VALID" : "INVALID");
+   if (HasPerfConstraints()) {
+diff --git a/loadgen/test_settings.h b/loadgen/test_settings.h
+index 584d073b..29082074 100644
+--- a/loadgen/test_settings.h
++++ b/loadgen/test_settings.h
+@@ -196,6 +196,7 @@ struct TestSettings {
+   /**@{*/
+   uint64_t min_duration_ms = 10000;
+   uint64_t max_duration_ms = 0;  ///< 0: Infinity.
++  bool enforce_max_duration = true;
+   uint64_t min_query_count = 100;
+   uint64_t max_query_count = 0;  ///< 0: Infinity.
+   /**@}*/
+diff --git a/loadgen/test_settings_internal.cc b/loadgen/test_settings_internal.cc
+index 3f2cd884..f7bf9c42 100644
+--- a/loadgen/test_settings_internal.cc
++++ b/loadgen/test_settings_internal.cc
+@@ -35,6 +35,7 @@ TestSettingsInternal::TestSettingsInternal(
+       target_duration(std::chrono::milliseconds(requested.min_duration_ms)),
+       min_duration(std::chrono::milliseconds(requested.min_duration_ms)),
+       max_duration(std::chrono::milliseconds(requested.max_duration_ms)),
++      enforce_max_duration(requested.enforce_max_duration),
+       min_query_count(requested.min_query_count),
+       max_query_count(requested.max_query_count),
+       min_sample_count(0),
+@@ -428,6 +429,7 @@ void TestSettingsInternal::LogEffectiveSettings() const {
+                s.target_duration.count());
+     MLPERF_LOG(detail, "effective_min_duration_ms", s.min_duration.count());
+     MLPERF_LOG(detail, "effective_max_duration_ms", s.max_duration.count());
++    MLPERF_LOG(detail, "effective_enforce_max_duration", s.enforce_max_duration);
+     MLPERF_LOG(detail, "effective_min_query_count", s.min_query_count);
+     MLPERF_LOG(detail, "effective_max_query_count", s.max_query_count);
+     MLPERF_LOG(detail, "effective_min_sample_count", s.min_sample_count);
+@@ -775,6 +777,8 @@ int TestSettings::FromConfig(const std::string &path, const std::string &model,
+ 
+   lookupkv(model, scenario, "min_duration", &min_duration_ms, nullptr);
+   lookupkv(model, scenario, "max_duration", &max_duration_ms, nullptr);
++  if (lookupkv(model, scenario, "enforce_max_duration", &val, nullptr))
++    enforce_max_duration = (val == 1) ? true : false;
+   lookupkv(model, scenario, "min_query_count", &min_query_count, nullptr);
+   lookupkv(model, scenario, "max_query_count", &max_query_count, nullptr);
+   lookupkv(model, scenario, "performance_sample_count_override",
+diff --git a/loadgen/test_settings_internal.h b/loadgen/test_settings_internal.h
+index ab2773bd..d13ad60e 100644
+--- a/loadgen/test_settings_internal.h
++++ b/loadgen/test_settings_internal.h
+@@ -65,6 +65,7 @@ struct TestSettingsInternal {
+   // duration at the end of the run.
+   std::chrono::milliseconds min_duration{0};
+   std::chrono::milliseconds max_duration{0};
++  bool enforce_max_duration;
+   uint64_t min_query_count;
+   uint64_t max_query_count;
+   uint64_t min_sample_count;  // Offline only.
+diff --git a/tools/submission/submission_checker.py b/tools/submission/submission_checker.py
+index 9e6398e2..fbcdad71 100755
+--- a/tools/submission/submission_checker.py
++++ b/tools/submission/submission_checker.py
+@@ -1598,6 +1598,8 @@ def check_performance_dir(
+     min_query_count = mlperf_log["effective_min_query_count"]
+     samples_per_query = mlperf_log["effective_samples_per_query"]
+     min_duration = mlperf_log["effective_min_duration_ms"]
++    enforce_max_duration = mlperf_log.get("effective_enforce_max_duration", True)
++    min_queries_met = mlperf_log["result_min_queries_met"]
+     equal_issue_used_check = (
+         mlperf_log["effective_sample_concatenate_permutation"] == True
+     )
+@@ -1749,6 +1751,13 @@ def check_performance_dir(
+         )
+         is_valid = False
+ 
++    if not min_queries_met and not enforce_max_duration:
++        log.error(
++            "%s Loadgen needs to enforce max duration for official submissions. Enforced %s",
++            fname,
++            enforce_max_duration,
++        )
++
+     inferred = False
+     if scenario_fixed != scenario:
+         inferred, res, inferred_valid = get_inferred_result(

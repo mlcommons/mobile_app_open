@@ -1,0 +1,97 @@
+name: Android Build & Test (macOS)
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ master, submission-v* ]
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build:
+    name: Build Android app
+    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
+    runs-on: macos-15
+    timeout-minutes: 180
+    env:
+      OFFICIAL_BUILD: true
+      WITH_TFLITE: 1
+      WITH_PIXEL: 0
+      WITH_MEDIATEK: 0
+      WITH_QTI: 0
+      WITH_SAMSUNG: 0
+      WITH_APPLE: 0
+      BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
+      BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
+      FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
+      FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
+      FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+      FIREBASE_PROJECT_ID: mobile-app-build-290400
+      FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+      FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+      FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+      FIREBASE_CI_USER_EMAIL: ${{ secrets.FIREBASE_CI_USER_EMAIL }}
+      FIREBASE_CI_USER_PASSWORD: ${{ secrets.FIREBASE_CI_USER_PASSWORD }}
+      FIREBASE_CRASHLYTICS_ENABLED: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - name: Cache bazel
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: /tmp/bazel_cache
+          key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-bazel_cache-
+      - name: Install dependencies
+        run: |
+          brew update --quiet || true
+          brew install bazelisk
+          brew install protobuf
+          brew install cocoapods
+          brew install python@3.14
+          brew link --overwrite python@3.14
+          python3.14 -m pip install --break-system-packages "numpy>=1.23,<2.0" "absl-py>=1.3,<2.0"
+      - name: Install Flutter
+        uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2.21.0
+        with:
+          channel: stable
+          flutter-version: 3.19.6
+      - name: Install protoc
+        run: |
+          flutter config --no-analytics && dart --disable-analytics
+          dart pub global activate protoc_plugin ^21.1.2
+      - name: Install Android SDK
+        run: |
+          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+          yes | sdkmanager --licenses >/dev/null
+          yes | sdkmanager "platform-tools" "build-tools;35.0.1" "platforms;android-34" "platforms;android-35"
+          yes | sdkmanager "ndk;25.2.9519653"
+      - name: Prepare Flutter
+        run: |
+          make flutter/prepare
+      - name: Set env vars
+        run: |
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/25.2.9519653" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_VERSION=25" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_API_LEVEL=33" >> "$GITHUB_ENV"
+      - name: Print versions
+        run: |
+          env
+          brew config
+          flutter doctor -v
+      - name: Build Android app
+        run: |
+          make flutter/android/release
+      - name: Run unit tests
+        run: |
+          make flutter/test/unit
+      - name: Archive APK with TFLite backend
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: android-apk-tflite-${{ github.run_number }}
+          path: output/android-apks/*-t-${{ github.run_number }}.apk
+          retention-days: 28
+          if-no-files-found: error

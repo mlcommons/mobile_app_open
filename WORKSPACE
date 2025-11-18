@@ -154,10 +154,10 @@ http_archive(
 new_git_repository(
     name = "org_mlperf_inference",
     build_file = "@//flutter/android/third_party:loadgen.BUILD",
-    commit = "238d035ab41d7ddd390b35471af169ea641380f6",
+    commit = "6776245e99dce0600cfc9a6fb61efd310f87de3d",
     patch_args = ["-p1"],
     patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
-    patches = [],
+    patches = ["//patches:loadgen_mobile_update.patch"],
     remote = "https://github.com/mlcommons/inference.git",
 )
 

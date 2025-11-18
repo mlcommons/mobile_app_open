@@ -1,4 +1,4 @@
-name: Android Build & Test
+name: Android Build & Test (Linux)
 
 permissions:
   contents: read

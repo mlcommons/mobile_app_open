@@ -77,8 +77,6 @@ std::vector<uint8_t> IFEval::ProcessOutput(const int sample_idx,
   sample_output_tokens_[sample_idx] = output_tokens;
   used_sample_ids_.insert(sample_idx);
 
-  LOG(INFO) << "Processed " << std::to_string(used_sample_ids_.size()) << "/29";
-
   return {1};
 }
 
