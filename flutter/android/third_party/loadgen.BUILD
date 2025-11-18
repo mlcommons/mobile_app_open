@@ -31,18 +31,18 @@ genrule(
       echo "Output config:  $$out" 1>&2
     """,
     cmd_ps = r"""
-      $in  = "$(location mlperf.conf)"
-      $out = "$@"
+      $$in  = "$(location mlperf.conf)"
+      $$out = "$@"
 
-      "const char* mlperf_conf =" | Out-File -FilePath $out -Encoding utf8
+      "const char* mlperf_conf =" | Out-File -FilePath $$out -Encoding utf8
 
-      Get-Content -LiteralPath $in | ForEach-Object {
+      Get-Content -LiteralPath $$in | ForEach-Object {
         # Escape backslashes and quotes
-        $line = $_.Replace('\', '\\').Replace('"', '\"')
-        '"{0}\n"' -f $line | Out-File -FilePath $out -Encoding utf8 -Append
+        $$line = $$_.Replace('\', '\\').Replace('"', '\"')
+        '"{0}\n"' -f $$line | Out-File -FilePath $$out -Encoding utf8 -Append
       }
 
-      ";" | Out-File -FilePath $out -Encoding utf8 -Append
+      ";" | Out-File -FilePath $$out -Encoding utf8 -Append
     """,
 )
 
