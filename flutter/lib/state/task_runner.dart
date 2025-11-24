@@ -375,9 +375,13 @@ class _NativeRunHelper {
       return null;
     }
     if (benchmark.info.isOffline) {
-      return result.numSamples / loadgenInfo.latency90;
+      return loadgenInfo.isTokenBased
+          ? loadgenInfo.tokenThroughput
+          : result.numSamples / loadgenInfo.latency90;
     } else {
-      return 1.0 / loadgenInfo.latency90;
+      return loadgenInfo.isTokenBased
+          ? loadgenInfo.tokenThroughput
+          : 1.0 / loadgenInfo.latency90;
     }
   }
 

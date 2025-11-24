@@ -4,6 +4,10 @@
   "unknown": "Unknown",
   "na": "N/A",
 
+  "unitSecond": "sec",
+  "unitTPS": "T/sec",
+  "unitQPS": "Q/sec",
+
   "menuHome": "MLPerf Mobile",
   "menuHistory": "History",
   "menuSettings": "Settings",
@@ -171,6 +175,7 @@
   "historyDetailsDate": "Date",
   "historyDetailsUUID": "UUID",
   "historyDetailsAvgQps": "Average throughput (QPS)",
+  "historyDetailsAvgTps": "Average throughput (TPS)",
   "historyDetailsAppVersion": "App version",
   "historyDetailsAppVersionTemplate": "<version> (build <build>) (<buildType>)",
   "historyDetailsModelName": "Device model name",

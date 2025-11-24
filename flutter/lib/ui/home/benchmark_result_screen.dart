@@ -10,6 +10,7 @@ import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
+import 'package:mlperfbench/ui/auto_size_text.dart';
 import 'package:mlperfbench/ui/confirm_dialog.dart';
 import 'package:mlperfbench/ui/formatter.dart';
 import 'package:mlperfbench/ui/home/app_drawer.dart';
@@ -233,9 +234,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
   }
 
   Widget _benchmarkResultRow(Benchmark benchmark) {
-    final leadingWidth = 0.12 * MediaQuery.of(context).size.width;
-    final subtitleWidth = 0.70 * MediaQuery.of(context).size.width;
-    final trailingWidth = 0.28 * MediaQuery.of(context).size.width;
+    const leadingWidth = 40.0;
+    const trailingWidth = 72.0;
     late final String? resultText;
     late final double? progressBarValue;
     late final String? resultText2;
@@ -279,6 +279,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     }
     final perfResult = benchmark.performanceModeResult;
     var backendInfo = l10n.na;
+    String unitText = isTokenBased ? l10n.unitTPS : l10n.unitQPS;
     if (perfResult != null) {
       final backendName = perfResult.backendName;
       final delegateName = perfResult.delegateName;
@@ -292,19 +293,58 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       fontSize: 18.0,
       fontWeight: FontWeight.bold,
     );
+    const resultUnitStyle = TextStyle(
+      color: Color(0xff2f2f2f),
+      fontSize: 10.0,
+    );
+    const resultHeightBehavior =
+        TextHeightBehavior(applyHeightToLastDescent: false);
+    const resultUnitHeightBehavior =
+        TextHeightBehavior(applyHeightToFirstAscent: false);
     final benchmarkScore = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Tooltip(
-            message: isTokenBased ? 'TPS' : 'QPS',
-            triggerMode: TooltipTriggerMode.tap,
-            child: Text(resultText ?? l10n.na, style: resultTextStyle)),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              resultText ?? l10n.na,
+              style: resultTextStyle,
+              textHeightBehavior: resultHeightBehavior,
+            ),
+            const SizedBox(
+              width: 4.0,
+            ),
+            if (resultText != null)
+              Text(
+                unitText,
+                style: resultUnitStyle,
+                textHeightBehavior: resultUnitHeightBehavior,
+              )
+          ],
+        ),
         if (resultText2 != null)
-          Tooltip(
-              message: isTokenBased ? 'TTFT' : '',
-              triggerMode: TooltipTriggerMode.tap,
-              child: Text(resultText2, style: resultTextStyle)),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                resultText2,
+                style: resultTextStyle,
+                textHeightBehavior: resultHeightBehavior,
+              ),
+              const SizedBox(
+                width: 4.0,
+              ),
+              Text(
+                l10n.unitSecond,
+                style: resultUnitStyle,
+                textHeightBehavior: resultUnitHeightBehavior,
+              )
+            ],
+          ),
       ],
     );
     final backendInfoRow = Text(backendInfo);
@@ -352,42 +392,36 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       contentPadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
       minVerticalPadding: 0,
       leading: SizedBox(
-          width: leadingWidth,
-          height: leadingWidth,
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: benchmark.info.icon,
-          )),
-      title: SizedBox(
-        width: subtitleWidth,
-        child: Text(benchmark.taskConfig.name),
-      ),
-      subtitle: SizedBox(
-        width: subtitleWidth,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: subtitleColumnChildren,
+        width: leadingWidth,
+        height: leadingWidth,
+        child: TextButton(
+          onPressed: () {
+            showBenchInfoBottomSheet(context, benchmark);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            padding: const EdgeInsets.all(0.0),
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
+            ),
+          ),
+          child: SizedBox(width: 32, height: 32, child: benchmark.info.icon),
         ),
+      ),
+      title: AutoSizeText(
+        benchmark.taskConfig.name,
+        maxLines: 1,
+      ),
+      subtitle: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: subtitleColumnChildren,
       ),
       trailing: SizedBox(
         width: trailingWidth,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Flexible(
-              flex: 7,
-              fit: FlexFit.tight,
-              child: benchmarkScore,
-            ),
-            Flexible(
-              flex: 3,
-              fit: FlexFit.tight,
-              child: BenchmarkInfoButton(benchmark: benchmark),
-            ),
-          ],
-        ),
+        child: benchmarkScore,
       ),
     );
   }

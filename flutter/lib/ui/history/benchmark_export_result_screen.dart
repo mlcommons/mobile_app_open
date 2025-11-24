@@ -74,7 +74,7 @@ class _BenchmarkExportResultScreenState
   List<Widget> _makePerformanceInfo(BenchmarkRunResult perf) {
     return [
       helper.makeInfo(l10n.historyRunDetailsPerfQps,
-          perf.throughput?.toUIString() ?? l10n.resultsNotAvailable),
+          '${perf.throughput!.toUIString()} ${perf.loadgenInfo!.isTokenBased ? l10n.unitTPS : l10n.unitQPS}'),
       helper.makeInfo(l10n.historyRunDetailsValid,
           (perf.loadgenInfo?.isResultValid).toString()),
       helper.makeInfo(l10n.historyRunDetailsDuration,
