@@ -16,18 +16,19 @@ env:
   BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
 
 jobs:
-  compute-build-number:
+  computed:
     runs-on: ubuntu-22.04
-    outputs:
-      build_number: ${{ steps.set.outputs.build_number }}
     steps:
       - name: Compute build number
         id: set
-        run: echo "build_number=$((GITHUB_RUN_NUMBER + ${OFFSET:-0}))" >> "$GITHUB_OUTPUT"
         env:
-          OFFSET: ${{ vars.OFFSET }}
+          OFFSET: ${{ vars.FLUTTER_BUILD_NUMBER_OFFSET }}
+        run: echo "build_number=$((GITHUB_RUN_NUMBER + ${OFFSET:-0}))" >> "$GITHUB_OUTPUT"
+    outputs:
+      build_number: ${{ steps.set.outputs.build_number }}
+
   build-android-image:
-    needs: compute-build-number
+    needs: computed
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -51,22 +52,22 @@ jobs:
             docker-bake.hcl
           targets: android
           set: |
-            android.tags=ghcr.io/mlcommons/mobile_app_open-android:${{ needs.compute-build-number.outputs.build_number }}
+            android.tags=ghcr.io/mlcommons/mobile_app_open-android:${{ needs.computed.outputs.build_number }}
             android.tags=ghcr.io/mlcommons/mobile_app_open-android:latest
             android.cache-from=type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache
             android.cache-to=type=registry,ref=ghcr.io/mlcommons/mobile_app_open-android:buildcache,mode=max
 
   build-android-apk:
-    needs: [build-android-image, compute-build-number]
+    needs: [ build-android-image, computed ]
     runs-on: ubuntu-22.04-4core
     container:
-      image: ghcr.io/mlcommons/mobile_app_open-android:${{ needs.compute-build-number.outputs.build_number }}
+      image: ghcr.io/mlcommons/mobile_app_open-android:${{ needs.computed.outputs.build_number }}
     timeout-minutes: 120
     env:
       BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
       BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
-      GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.compute-build-number.outputs.build_number }}
-      FLUTTER_BUILD_NUMBER: ${{ needs.compute-build-number.outputs.build_number }}
+      GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.computed.outputs.build_number }}
+      FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
       FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
       FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
       FIREBASE_PROJECT_ID: mobile-app-build-290400
@@ -221,56 +222,56 @@ jobs:
       - name: Archive APK with TFLite backend
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-apk-tflite-${{ needs.compute-build-number.outputs.build_number }}
-          path: output/android-apks/*-t-${{ needs.compute-build-number.outputs.build_number }}.apk
+          name: android-apk-tflite-${{ needs.computed.outputs.build_number }}
+          path: output/android-apks/*-t-${{ needs.computed.outputs.build_number }}.apk
           retention-days: 28
           if-no-files-found: error
       - name: Archive APK with Pixel backend
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-apk-pixel-${{ needs.compute-build-number.outputs.build_number }}
-          path: output/android-apks/*-g-${{ needs.compute-build-number.outputs.build_number }}.apk
+          name: android-apk-pixel-${{ needs.computed.outputs.build_number }}
+          path: output/android-apks/*-g-${{ needs.computed.outputs.build_number }}.apk
           retention-days: 28
           if-no-files-found: error
       - name: Archive APK with QTI backend
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-apk-qti-${{ needs.compute-build-number.outputs.build_number }}
-          path: output/android-apks/*-q-${{ needs.compute-build-number.outputs.build_number }}.apk
+          name: android-apk-qti-${{ needs.computed.outputs.build_number }}
+          path: output/android-apks/*-q-${{ needs.computed.outputs.build_number }}.apk
           retention-days: 28
           if-no-files-found: error
       - name: Archive APK with MediaTek backend
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-apk-mtk-${{ needs.compute-build-number.outputs.build_number }}
-          path: output/android-apks/*-m-${{ needs.compute-build-number.outputs.build_number }}.apk
+          name: android-apk-mtk-${{ needs.computed.outputs.build_number }}
+          path: output/android-apks/*-m-${{ needs.computed.outputs.build_number }}.apk
           retention-days: 28
           if-no-files-found: error
       - name: Archive APK with Samsung backend
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-apk-samsung-${{ needs.compute-build-number.outputs.build_number }}
-          path: output/android-apks/*-s-${{ needs.compute-build-number.outputs.build_number }}.apk
+          name: android-apk-samsung-${{ needs.computed.outputs.build_number }}
+          path: output/android-apks/*-s-${{ needs.computed.outputs.build_number }}.apk
           retention-days: 28
           if-no-files-found: error
       - name: Archive APK with unified backend
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-apk-unified-${{ needs.compute-build-number.outputs.build_number }}
-          path: output/android-apks/*-qsmgt-${{ needs.compute-build-number.outputs.build_number }}.apk
+          name: android-apk-unified-${{ needs.computed.outputs.build_number }}
+          path: output/android-apks/*-qsmgt-${{ needs.computed.outputs.build_number }}.apk
           retention-days: 28
           if-no-files-found: error
       - name: Archive AAB with unified backend
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-aab-unified-${{ needs.compute-build-number.outputs.build_number }}
-          path: output/android-apks/*-qsmgt-${{ needs.compute-build-number.outputs.build_number }}.aab
+          name: android-aab-unified-${{ needs.computed.outputs.build_number }}
+          path: output/android-apks/*-qsmgt-${{ needs.computed.outputs.build_number }}.aab
           retention-days: 28
           if-no-files-found: error
 
   test-android-apk-unified:
     name: ${{ matrix.backend }}-${{ matrix.device }} (unified)
-    needs: [build-android-apk, compute-build-number]
+    needs: [ build-android-apk, computed ]
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
@@ -290,9 +291,9 @@ jobs:
           - backend: "mtk"
             device: "Samsung Galaxy Tab S10 Plus-15.0"
     env:
-      GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.compute-build-number.outputs.build_number }}
-      MAIN_APK_NAME: test-main-unified-${{ needs.compute-build-number.outputs.build_number }}.apk
-      HELPER_APK_NAME: test-helper-unified-${{ needs.compute-build-number.outputs.build_number }}.apk
+      GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.computed.outputs.build_number }}
+      MAIN_APK_NAME: test-main-unified-${{ needs.computed.outputs.build_number }}.apk
+      HELPER_APK_NAME: test-helper-unified-${{ needs.computed.outputs.build_number }}.apk
       BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -342,7 +343,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
-          name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ needs.compute-build-number.outputs.build_number }}
+          name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ needs.computed.outputs.build_number }}
           path: ${{ env.BROWSERSTACK_LOGS_DIR }}
           retention-days: 28
           if-no-files-found: error
@@ -352,7 +353,7 @@ jobs:
     needs:
       - build-android-apk
       - test-android-apk-unified
-      - compute-build-number
+      - computed
     if: github.ref == 'refs/heads/master' || vars.EXTENDED_TESTS_ON_PR == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
@@ -381,9 +382,9 @@ jobs:
           - backend: "samsung"
             device: "Samsung Galaxy S21-12.0"
     env:
-      GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.compute-build-number.outputs.build_number }}
-      MAIN_APK_NAME: test-main-unified-${{ needs.compute-build-number.outputs.build_number }}.apk
-      HELPER_APK_NAME: test-helper-unified-${{ needs.compute-build-number.outputs.build_number }}.apk
+      GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.computed.outputs.build_number }}
+      MAIN_APK_NAME: test-main-unified-${{ needs.computed.outputs.build_number }}.apk
+      HELPER_APK_NAME: test-helper-unified-${{ needs.computed.outputs.build_number }}.apk
       BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -433,7 +434,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
-          name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ needs.compute-build-number.outputs.build_number }}
+          name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ needs.computed.outputs.build_number }}
           path: ${{ env.BROWSERSTACK_LOGS_DIR }}
           retention-days: 28
           if-no-files-found: error
@@ -443,7 +444,7 @@ jobs:
     needs:
       - build-android-apk
       - test-android-apk-unified
-      - compute-build-number
+      - computed
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
@@ -463,9 +464,9 @@ jobs:
           - backend: "samsung"
             device: "Samsung Galaxy S24-14.0"
     env:
-      GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.compute-build-number.outputs.build_number }}
-      MAIN_APK_NAME: test-main-${{ matrix.backend }}-${{ needs.compute-build-number.outputs.build_number }}.apk
-      HELPER_APK_NAME: test-helper-${{ matrix.backend }}-${{ needs.compute-build-number.outputs.build_number }}.apk
+      GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.computed.outputs.build_number }}
+      MAIN_APK_NAME: test-main-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.apk
+      HELPER_APK_NAME: test-helper-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.apk
       BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -524,11 +525,11 @@ jobs:
     needs:
       - build-android-apk
       - test-android-apk-unified
-      - compute-build-number
+      - computed
     runs-on: ubuntu-22.04
     if: vars.DEPLOY_PLAYSTORE == 'true'
     env:
-      GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.compute-build-number.outputs.build_number }}
+      GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.computed.outputs.build_number }}
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Set up authentication for Google Cloud SDK
