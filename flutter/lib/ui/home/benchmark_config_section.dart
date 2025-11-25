@@ -7,9 +7,7 @@ import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
-import 'package:mlperfbench/ui/auto_size_text.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
-import 'package:mlperfbench/ui/home/app_drawer.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
 import 'package:mlperfbench/ui/nil.dart';
 
