@@ -94,6 +94,8 @@ android {
     }
     packagingOptions {
         jniLibs {
+            // Extracts native libraries from the APK to the file system to fix a crash on Play Store version
+            // (see https://github.com/mlcommons/mobile_app_open/issues/893#issue-2360966998)
             useLegacyPackaging true
         }
     }
