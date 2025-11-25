@@ -45,9 +45,10 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
     std::vector<int> input_tokens;
     sp_processor->Encode(input.c_str(), &input_tokens).ok();
 
-    //input token sanity check
+    // input token sanity check
     if (input_tokens.size() > input_token_limit_) {
-      LOG(WARNING) << "Input token limit exceeded for entry " << std::to_string(i) << ". Ignoring.";
+      LOG(WARNING) << "Input token limit exceeded for entry "
+                   << std::to_string(i) << ". Ignoring.";
       continue;
     }
 
