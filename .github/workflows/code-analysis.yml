@@ -8,6 +8,7 @@ on:
 
 jobs:
   sonar:
+    if: ${{ github.event.repository.name == 'mobile_app_open' }}
     name: SonarScanner
     runs-on: ubuntu-22.04
     timeout-minutes: 120
@@ -85,6 +86,7 @@ jobs:
         run: make docker/scanner/scan
 
   codeql:
+    if: ${{ github.event.repository.name == 'mobile_app_open' }}
     name: CodeQL
     runs-on: ubuntu-latest
     permissions:

@@ -12,8 +12,8 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 ## Requirements for LA
 
 <!-- markdown-link-check-disable-next-line -->
-* [Qualcomm Package Manager 3](https://qpm.qualcomm.com/#/main/tools/details/QPM3)
-* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk) (Version 2.29.0.241129)
+* [Qualcomm QAIRT SDK](https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/2.40.0.251030/v2.40.0.251030.zip)
+* [SNPE SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk) (Version 2.40.0.251030)
 * Linux machine capable of running Ubuntu docker images
 
 ### Optional
@@ -48,26 +48,16 @@ git clone https://github.com/mlcommons/mobile_app_open
 cd mobile_app_open
 ```
 
-* Install Qualcomm Package manager on the linux machine
-
-```shell
-sudo dpkg -i ./QualcommPackageManager3.3.0.111.1.Linux-x86.deb
-```
-
-* Extract the QAIRT SDK (from Requirements above) to mobile_app_open/mobile_back_qti
-
-```shell
-qpm-cli --extract ./qualcomm_neural_processing_sdk.2.25.0.240728.Linux-AnyCPU.qik
-mkdir mobile_app_open/mobile_back_qti/qairt/
-cp -rv /opt/qcom/aistack/qairt/2.25.0.240728 mobile_app_open/mobile_back_qti/qairt/
-```
-
 * If you have an HTTP proxy, you may need the following
 
 ```shell
 sudo apt install ca-certificates-java
 export USE_PROXY_WORKAROUND=1
 ```
+
+Download and extract the SNPE SDK (from Requirements above) to mobile_app_open/mobile_back_qti
+
+So, the SDK should be placed in the format of mobile_app_open/mobile_back_qti/qairt
 
 Build with the following build command.
 
@@ -112,8 +102,8 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 
 ## Requirements for WoS
 
-* [SNPE windows SDK](https://qpm.qualcomm.com/#/main/tools/details/qualcomm_neural_processing_sdk)
-  * Version 2.29.0.241129
+* [SNPE windows SDK](https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/2.40.0.251030/v2.40.0.251030.zip)
+  * Version 2.40.0.251030
 * Windows x86 machine
 
 ## Setting up the environment
@@ -168,14 +158,14 @@ Run accuracy mode with following command
 .\run_mlperf_test.bat --models <path to mlperf_models> --dataset <path to mlperf_datasets> --usecase <optional, can be one of below mentioned usecases> --mode accuracy
 ```
 
-* --usecase parameter can take one of these arguments => image_classification_v2, object_detection, image_segmentation, language_understanding, super_resolution, image_classification_offline_v2
+* --usecase parameter can take one of these arguments => image_classification_v2, object_detection, image_segmentation, language_understanding, super_resolution, image_classification_offline_v2, stable_diffusion
 * see the results in accuracy_results.txt and performance_results.txt
 
 ## FAQ
 
 ### What devices does this backend support?
 
-This backend only supports SD8_Elite, SD7SG3, SDX_Elite, SD8SG3, SD8G3 devices.
+This backend only supports SD8EliteG5, SD8G5, SD8sG4, SD7G4, SD8Elite devices.
 Other already launched Snapdragon based devices can also run the MLPerf app as default fallback.
 
 ### Is SNPE used to run all the models?
@@ -184,4 +174,4 @@ Yes. All the models use Qualcomm AI Runtime(QAIRT) for execution for current ver
 
 ### What devices supports stable diffusion?
 
-Currently, SD8_Elite and SD8G3 device supports stable_diffusion.
+Currently, SD8EliteG5, SD8G5, SD8sG4, SD7G4 and SD8Elite device supports stable_diffusion.
