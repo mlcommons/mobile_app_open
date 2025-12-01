@@ -244,23 +244,28 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
     late final Color resultTextColor;
     late final isTokenBased =
         (benchmarkResult?.loadgenInfo?.isTokenBased ?? false);
+
+    late final String unitText;
+    late final String unitText2;
     switch (_screenMode) {
       case _ScreenMode.performance:
         benchmarkResult = benchmark.performanceModeResult;
         final throughput = benchmarkResult?.throughput;
         resultText = isTokenBased
-            ? benchmarkResult?.loadgenInfo?.tokenThroughput.toStringAsFixed(2)
+            ? benchmarkResult?.loadgenInfo?.latencyFirstTokenMean
+                .toStringAsFixed(2)
             : throughput?.toUIString();
         progressBarValue =
             (throughput?.value ?? 0.0) / benchmark.info.maxThroughput;
         resultText2 = isTokenBased
-            ? benchmarkResult?.loadgenInfo?.latencyFirstTokenMean
-                .toStringAsFixed(2)
+            ? benchmarkResult?.loadgenInfo?.tokenThroughput.toStringAsFixed(2)
             : null;
         progressBarValue2 = null;
         final resultValidity =
             PerformanceResultValidityEnum.forBenchmark(benchmark);
         resultTextColor = resultValidity.color;
+        unitText = isTokenBased ? l10n.unitSecond : l10n.unitQPS;
+        unitText2 = l10n.unitTPS;
         break;
       case _ScreenMode.accuracy:
         benchmarkResult = benchmark.accuracyModeResult;
@@ -275,11 +280,12 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         } else {
           resultTextColor = AppColors.resultInvalidText;
         }
+        unitText = '';
+        unitText2 = '';
         break;
     }
     final perfResult = benchmark.performanceModeResult;
     var backendInfo = l10n.na;
-    String unitText = isTokenBased ? l10n.unitTPS : l10n.unitQPS;
     if (perfResult != null) {
       final backendName = perfResult.backendName;
       final delegateName = perfResult.delegateName;
@@ -305,45 +311,69 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              resultText ?? l10n.na,
-              style: resultTextStyle,
-              textHeightBehavior: resultHeightBehavior,
-            ),
-            const SizedBox(
-              width: 4.0,
-            ),
-            if (resultText != null)
-              Text(
-                unitText,
-                style: resultUnitStyle,
-                textHeightBehavior: resultUnitHeightBehavior,
-              )
-          ],
-        ),
-        if (resultText2 != null)
-          Row(
+        Tooltip(
+          triggerMode: TooltipTriggerMode.tap,
+          message: _screenMode == _ScreenMode.performance
+              ? isTokenBased
+                  ? 'TTFT'
+                  : 'QPS'
+              : '%',
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: [
-              Text(
-                resultText2,
-                style: resultTextStyle,
-                textHeightBehavior: resultHeightBehavior,
+              Flexible(
+                child: AutoSizeText(
+                  resultText ?? l10n.na,
+                  style: resultTextStyle,
+                  maxLines: 1,
+                  maxFontSize: 18.0,
+                  textHeightBehavior: resultHeightBehavior,
+                ),
               ),
               const SizedBox(
                 width: 4.0,
               ),
-              Text(
-                l10n.unitSecond,
-                style: resultUnitStyle,
-                textHeightBehavior: resultUnitHeightBehavior,
-              )
+              if (resultText != null)
+                Text(
+                  unitText,
+                  style: resultUnitStyle,
+                  textHeightBehavior: resultUnitHeightBehavior,
+                )
             ],
+          ),
+        ),
+        if (resultText2 != null)
+          Tooltip(
+            triggerMode: TooltipTriggerMode.tap,
+            message: _screenMode == _ScreenMode.performance
+                ? isTokenBased
+                    ? 'TPS'
+                    : 'QPS'
+                : '%',
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: AutoSizeText(
+                    resultText2,
+                    style: resultTextStyle,
+                    maxLines: 1,
+                    maxFontSize: 18.0,
+                    textHeightBehavior: resultHeightBehavior,
+                  ),
+                ),
+                const SizedBox(
+                  width: 4.0,
+                ),
+                Text(
+                  unitText2,
+                  style: resultUnitStyle,
+                  textHeightBehavior: resultUnitHeightBehavior,
+                )
+              ],
+            ),
           ),
       ],
     );

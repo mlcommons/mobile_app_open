@@ -198,6 +198,7 @@
   "historyRunDetailsBatchSize": "Batch size",
   "historyRunDetailsPerfTitle": "Performance run",
   "historyRunDetailsPerfQps": "Throughput",
+  "historyRunDetailsPerfTTFT": "Time to first token",
   "historyRunDetailsValid": "Run is valid",
   "historyRunDetailsDuration": "Duration",
   "historyRunDetailsSamples": "Samples count",

@@ -75,6 +75,9 @@ class _BenchmarkExportResultScreenState
     return [
       helper.makeInfo(l10n.historyRunDetailsPerfQps,
           '${perf.throughput!.toUIString()} ${perf.loadgenInfo!.isTokenBased ? l10n.unitTPS : l10n.unitQPS}'),
+      if (perf.loadgenInfo?.isTokenBased ?? false)
+        helper.makeInfo(l10n.historyRunDetailsPerfTTFT,
+            '${perf.loadgenInfo!.latencyFirstTokenMean.toStringAsFixed(2)} ${l10n.unitSecond}'),
       helper.makeInfo(l10n.historyRunDetailsValid,
           (perf.loadgenInfo?.isResultValid).toString()),
       helper.makeInfo(l10n.historyRunDetailsDuration,
