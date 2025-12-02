@@ -52,6 +52,7 @@ class AutoSizeText extends StatefulWidget {
     this.textScaleFactor = 1.0,
     this.maxLines,
     this.semanticsLabel,
+    this.textHeightBehavior,
     this.circularPadding = 20,
   }) : textSpan = null;
 
@@ -77,6 +78,7 @@ class AutoSizeText extends StatefulWidget {
     this.textScaleFactor = 1.0,
     this.maxLines,
     this.semanticsLabel,
+    this.textHeightBehavior,
     this.circularPadding = 20,
   }) : data = null;
 
@@ -228,6 +230,8 @@ class AutoSizeText extends StatefulWidget {
   /// AutoSizeText(r'$$', semanticsLabel: 'Double dollars')
   /// ```
   final String? semanticsLabel;
+
+  final TextHeightBehavior? textHeightBehavior;
 
   final double circularPadding;
 
@@ -409,6 +413,7 @@ class AutoSizeTextState extends State<AutoSizeText> {
       maxLines: maxLines,
       locale: widget.locale,
       strutStyle: widget.strutStyle,
+      textHeightBehavior: widget.textHeightBehavior,
     );
 
     textPainter.layout(maxWidth: constraints.maxWidth);
@@ -436,6 +441,7 @@ class AutoSizeTextState extends State<AutoSizeText> {
           textScaler: const TextScaler.linear(1),
           maxLines: maxLines,
           semanticsLabel: widget.semanticsLabel,
+          textHeightBehavior: widget.textHeightBehavior,
         ),
       );
     } else {
@@ -452,6 +458,7 @@ class AutoSizeTextState extends State<AutoSizeText> {
         textScaler: TextScaler.linear(fontSize / style.fontSize!),
         maxLines: maxLines,
         semanticsLabel: widget.semanticsLabel,
+        textHeightBehavior: widget.textHeightBehavior,
       );
     }
   }

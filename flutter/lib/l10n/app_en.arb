@@ -4,6 +4,10 @@
   "unknown": "Unknown",
   "na": "N/A",
 
+  "unitSecond": "sec",
+  "unitTPS": "T/sec",
+  "unitQPS": "Q/sec",
+
   "menuHome": "MLPerf Mobile",
   "menuHistory": "History",
   "menuSettings": "Settings",
@@ -42,7 +46,7 @@
   "progressWaiting": "Wait for current benchmark to finish!",
 
   "resultsTitleUnverified": "Unverified",
-  "resultsTitlePerformance": "Results (qps)",
+  "resultsTitlePerformance": "Results",
   "resultsTitleAccuracy": "Results",
   "resultsTabTitlePerformance": "Performance",
   "resultsTabTitleAccuracy": "Accuracy",
@@ -171,6 +175,7 @@
   "historyDetailsDate": "Date",
   "historyDetailsUUID": "UUID",
   "historyDetailsAvgQps": "Average throughput (QPS)",
+  "historyDetailsAvgTps": "Average throughput (TPS)",
   "historyDetailsAppVersion": "App version",
   "historyDetailsAppVersionTemplate": "<version> (build <build>) (<buildType>)",
   "historyDetailsModelName": "Device model name",
@@ -193,6 +198,7 @@
   "historyRunDetailsBatchSize": "Batch size",
   "historyRunDetailsPerfTitle": "Performance run",
   "historyRunDetailsPerfQps": "Throughput",
+  "historyRunDetailsPerfTTFT": "Time to first token",
   "historyRunDetailsValid": "Run is valid",
   "historyRunDetailsDuration": "Duration",
   "historyRunDetailsSamples": "Samples count",
