@@ -22,6 +22,7 @@ cc_library(
     name = "ifeval_utils",
     hdrs = [
         "common.h",
+        "json.h",
         "types.h",
     ],
     copts = select({
@@ -34,5 +35,6 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
+        "@cld2",
     ],
 )
