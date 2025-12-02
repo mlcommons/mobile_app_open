@@ -11,12 +11,12 @@
 /datasets/output
 /datasets/downloads
 *.so
-* .apk
-* .tflite
-* .dlc
-* .zip
-* .jar
-* .tgz
+*.apk
+*.tflite
+*.dlc
+*.zip
+*.jar
+*.tgz
 __pycache__/
 *.log
 *.iml
