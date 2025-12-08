@@ -107,16 +107,19 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
   );
 }
 
-Future<void> showWarningDialog(
-    BuildContext context, List<String> messages) async {
-  final l10n = AppLocalizations.of(context)!;
-  await _showPopupDialog(
-      context, DialogTypeEnum.warning, l10n.dialogTitleWarning, messages);
-}
-
 Future<void> showErrorDialog(
     BuildContext context, List<String> messages) async {
   final l10n = AppLocalizations.of(context)!;
+
+  // Use the "WARN" prefix in messages to distinguish warnings from errors,
+  // so the dialog can be styled appropriately based on the detected type.
+  final isWarning = messages.any((m) => m.startsWith('WARN'));
+  if (isWarning) {
+    await _showPopupDialog(
+        context, DialogTypeEnum.warning, l10n.dialogTitleWarning, messages);
+    return;
+  }
+
   await _showPopupDialog(
       context, DialogTypeEnum.error, l10n.dialogTitleError, messages);
 }

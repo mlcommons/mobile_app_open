@@ -165,7 +165,7 @@ class ResourceManager {
           final dataFolder = getDataFolder();
           final missingList =
               missingLocalResources.map((e) => '\n - $e').join();
-          throw 'Some required accuracy datasets must be sideloaded (local resources not found).\nPlease copy the datasets to the application data folder and retry.\nData folder: $dataFolder\nMissing resources:$missingList';
+          throw 'WARN: Some required files must be sideloaded.\nPlease copy the files to the application data folder and retry.\nData folder: $dataFolder\nMissing files:$missingList';
         }
       }
     } finally {
