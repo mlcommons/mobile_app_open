@@ -165,7 +165,7 @@ class ResourceManager {
           final dataFolder = getDataFolder();
           final missingList =
               missingLocalResources.map((e) => '\n - $e').join();
-          throw 'WARN: Some required files must be sideloaded.\nPlease copy the files to the application data folder and retry.\nData folder: $dataFolder\nMissing files:$missingList';
+          throw 'WARN: Some required files must be side-loaded.\nPlease copy the files to the application data folder and retry.\nMissing files:$missingList\nData folder:\n$dataFolder';
         }
       }
     } finally {
