@@ -87,14 +87,8 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: type == DialogTypeEnum.error
-                        ? Colors.red
-                        : type == DialogTypeEnum.warning
-                            ? Colors.amber
-                            : Colors.green,
-                    foregroundColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                   child: Text(l10n.dialogOk),
                 ),
@@ -207,8 +201,8 @@ Future<void> showResourceMissingDialog(
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   ),
