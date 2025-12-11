@@ -87,14 +87,8 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: type == DialogTypeEnum.error
-                        ? Colors.red
-                        : type == DialogTypeEnum.warning
-                            ? Colors.amber
-                            : Colors.green,
-                    foregroundColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                   child: Text(l10n.dialogOk),
                 ),
@@ -107,16 +101,19 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
   );
 }
 
-Future<void> showWarningDialog(
-    BuildContext context, List<String> messages) async {
-  final l10n = AppLocalizations.of(context)!;
-  await _showPopupDialog(
-      context, DialogTypeEnum.warning, l10n.dialogTitleWarning, messages);
-}
-
 Future<void> showErrorDialog(
     BuildContext context, List<String> messages) async {
   final l10n = AppLocalizations.of(context)!;
+
+  // Use the "WARN" prefix in messages to distinguish warnings from errors,
+  // so the dialog can be styled appropriately based on the detected type.
+  final isWarning = messages.any((m) => m.startsWith('WARN'));
+  if (isWarning) {
+    await _showPopupDialog(
+        context, DialogTypeEnum.warning, l10n.dialogTitleWarning, messages);
+    return;
+  }
+
   await _showPopupDialog(
       context, DialogTypeEnum.error, l10n.dialogTitleError, messages);
 }
@@ -204,8 +201,8 @@ Future<void> showResourceMissingDialog(
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   ),
