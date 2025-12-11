@@ -352,7 +352,6 @@ jobs:
     name: ${{ matrix.backend }}-${{ matrix.device }} (unified-extended)
     needs:
       - build-android-apk
-      - test-android-apk-unified
       - computed
     runs-on: ubuntu-22.04
     timeout-minutes: 60
