@@ -9,13 +9,24 @@ part 'list.gen.dart';
 
 class BackendInfoHelper {
   BackendInfo findMatching() {
+    final matches = <BackendInfo>[];
     for (var name in getBackendsList()) {
+      print('Checking $name');
       final backendSettings = match(name);
       if (backendSettings != null) {
-        return BackendInfo._(backendSettings, name);
+        matches.add(BackendInfo._(backendSettings, name));
       }
     }
-    throw 'no matching backend found';
+
+    if (matches.isEmpty) {
+      throw 'no matching backend found';
+    }
+    if (matches.length > 1) {
+      final names = matches.map((m) => m.libName).join(', ');
+      throw 'multiple matching backends found: $names';
+    }
+
+    return matches.single;
   }
 
   pb.BackendSetting? match(String libName) {
