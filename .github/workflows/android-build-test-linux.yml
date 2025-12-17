@@ -351,9 +351,8 @@ jobs:
   test-android-apk-unified-extended:
     name: ${{ matrix.backend }}-${{ matrix.device }} (unified-extended)
     needs:
-      - build-android-apk
-      - test-android-apk-unified
       - computed
+      - build-android-apk
     if: github.ref == 'refs/heads/master' || vars.EXTENDED_TESTS_ON_PR == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
