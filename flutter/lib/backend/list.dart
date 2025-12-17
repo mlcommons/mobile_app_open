@@ -9,8 +9,11 @@ part 'list.gen.dart';
 
 class BackendInfoHelper {
   BackendInfo findMatching() {
+    const fallbackBackend = 'libtflitebackend';
     final matches = <BackendInfo>[];
+    // Try to match all backends except the fallback
     for (var name in getBackendsList()) {
+      if (name == fallbackBackend) continue;
       print('Checking $name');
       final backendSettings = match(name);
       if (backendSettings != null) {
@@ -19,6 +22,12 @@ class BackendInfoHelper {
     }
 
     if (matches.isEmpty) {
+      // No specific backend matched, use fallback
+      print('Checking $fallbackBackend');
+      final backendSettings = match(fallbackBackend);
+      if (backendSettings != null) {
+        return BackendInfo._(backendSettings, fallbackBackend);
+      }
       throw 'no matching backend found';
     }
     if (matches.length > 1) {
