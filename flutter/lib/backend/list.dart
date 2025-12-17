@@ -34,7 +34,7 @@ class BackendInfoHelper {
       final names = matches.map((m) => m.libName).join(', ');
       throw 'multiple matching backends found: $names';
     }
-
+    print('Using backend: ${matches.single.libName}');
     return matches.single;
   }
 
