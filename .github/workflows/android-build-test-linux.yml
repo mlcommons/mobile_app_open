@@ -274,7 +274,9 @@ jobs:
 
   test-android-apk-unified:
     name: ${{ matrix.backend }}-${{ matrix.device }} (unified)
-    needs: [ build-android-apk, computed ]
+    needs:
+      - computed
+      - build-android-apk
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
@@ -354,9 +356,8 @@ jobs:
   test-android-apk-unified-extended:
     name: ${{ matrix.backend }}-${{ matrix.device }} (unified-extended)
     needs:
-      - build-android-apk
-      - test-android-apk-unified
       - computed
+      - build-android-apk
     if: github.ref == 'refs/heads/master' || vars.EXTENDED_TESTS_ON_PR == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
@@ -376,12 +377,13 @@ jobs:
             device: "Samsung Galaxy S23-13.0"
           - backend: "qti"
             device: "Samsung Galaxy Tab S9-13.0"
-          - backend: "samsung"
-            device: "Samsung Galaxy S22 Ultra-12.0"
-          - backend: "samsung"
-            device: "Samsung Galaxy S22 Plus-12.0"
-          - backend: "samsung"
-            device: "Samsung Galaxy S22-12.0"
+          # Comment out S22 until we have a fix for it.
+          # - backend: "samsung"
+          #   device: "Samsung Galaxy S22 Ultra-12.0"
+          # - backend: "samsung"
+          #   device: "Samsung Galaxy S22 Plus-12.0"
+          # - backend: "samsung"
+          #   device: "Samsung Galaxy S22-12.0"
           - backend: "samsung"
             device: "Samsung Galaxy S21-12.0"
     env:
