@@ -358,6 +358,7 @@ jobs:
     needs:
       - computed
       - build-android-apk
+      - test-android-apk-unified
     if: github.ref == 'refs/heads/master' || vars.EXTENDED_TESTS_ON_PR == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
