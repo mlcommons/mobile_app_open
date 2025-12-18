@@ -108,7 +108,7 @@ jobs:
           project_id: mobile-app-build-290400
       - name: Download Samsung libraries
         env:
-          SAMSUNG_LIB: samsung_libs_v5.0.1_20251127
+          SAMSUNG_LIB: samsung_libs_v5.0.1_20251217
         run: |
           gsutil cp gs://mobile-app-build-290400_github-actions/lib/v5.0.1/${SAMSUNG_LIB}.zip /tmp/ && \
           unzip /tmp/${SAMSUNG_LIB}.zip -d /tmp/${SAMSUNG_LIB} && \
@@ -358,6 +358,7 @@ jobs:
     needs:
       - computed
       - build-android-apk
+      - test-android-apk-unified
     if: github.ref == 'refs/heads/master' || vars.EXTENDED_TESTS_ON_PR == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
@@ -377,13 +378,12 @@ jobs:
             device: "Samsung Galaxy S23-13.0"
           - backend: "qti"
             device: "Samsung Galaxy Tab S9-13.0"
-          # Comment out S22 until we have a fix for it.
-          # - backend: "samsung"
-          #   device: "Samsung Galaxy S22 Ultra-12.0"
-          # - backend: "samsung"
-          #   device: "Samsung Galaxy S22 Plus-12.0"
-          # - backend: "samsung"
-          #   device: "Samsung Galaxy S22-12.0"
+          - backend: "samsung"
+            device: "Samsung Galaxy S22 Ultra-12.0"
+          - backend: "samsung"
+            device: "Samsung Galaxy S22 Plus-12.0"
+          - backend: "samsung"
+            device: "Samsung Galaxy S22-12.0"
           - backend: "samsung"
             device: "Samsung Galaxy S21-12.0"
     env:
