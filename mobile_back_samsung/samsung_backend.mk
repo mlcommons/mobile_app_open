@@ -1,4 +1,4 @@
-# Copyright 2020-2023 Samsung Electronics Co. LTD  All Rights Reserved.
+# Copyright 2020-2025 Samsung Electronics Co. LTD  All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,11 +24,13 @@ ifeq (${WITH_SAMSUNG},1)
         ${BAZEL_LINKS_PREFIX}bin/mobile_back_samsung/samsung/lib/libsamsungbackend.so \
 		${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libenn_public_api_cpp.so \
 		${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libenn_extension.so \
+        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2600_core.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2500_core.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2400_core.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2300_core.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2200_core.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2100_core.so \
+        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe1300_core.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe1200_core.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libc++.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libeden_nn_on_system.so \

@@ -2,10 +2,10 @@ part of 'list.dart';
 
 // Always add new tags before TFLITE_TAG, otherwise your backend will never be used
 const _backendsList = [
+  'SAMSUNG_TAG',
   'MEDIATEK_TAG',
   'PIXEL_TAG',
   'QTI_TAG',
-  'SAMSUNG_TAG',
   'APPLE_TAG',
   'TFLITE_TAG',
 ];

@@ -22,7 +22,7 @@
 
 * Clone the mobile_app_open repository
 
-* Extract the QAIRT SDK from <https://softwarecenter.qualcomm.com/api/download/software/qualcomm_neural_processing_sdk/v2.29.0.241129.zip>
+* Extract the QAIRT SDK from <https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/2.40.0.251030/v2.40.0.251030.zip>
 
 * Copy the qairt folder from the extract into mobile_app_open/mobile_back_qti
 
@@ -33,6 +33,8 @@ Once done,
  ```shell
  sudo dpkg -i ./QualcommPackageManager3.3.0.111.1.Linux-x86.deb
  ```
+
+* Notebook version to be used: 0.1.1.250124
 
 * Clone the AIMET SD notebook repository inside
   `<path_to_mobile_app_open>/mobile_back_qti/DLC/util/StableDiffusion/AIMET`
@@ -59,5 +61,7 @@ Once done,
     sudo make stable_diffusion_qnn SNPE_SDK=<path_to_mobile_app_open>/mobile_back_qti/qairt/<sdk_version>
    ```
 
-* After successful execution, all the artifacts needed to run stable diffusion inference on device will be located in
-  `<path_to_mobile_app_open>/output/DLC/mlperf_models/stable_diffusion`
+* After successful execution, all the artifacts needed to run stable diffusion inference on a device will be located in
+  `<path_to_mobile_app_open>/output/DLC/mlperf_models/`
+
+* There will be multiple `stable_diffusion*` folders which corresponds to different targets architecture
