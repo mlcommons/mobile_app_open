@@ -145,8 +145,7 @@ class RepeatPrompt : public Instruction {
  private:
   std::string prompt_;
   virtual bool verify_(const std::string& resp) const override {
-    // TODO replace with startswith?
-    return contains_string(resp, prompt_);
+    return starts_with(resp, prompt_, 3);
   }
 };
 
@@ -160,6 +159,11 @@ class TwoResponses : public Instruction {
     std::size_t count = 0;
     std::size_t pos = resp.find("******");
     while (pos != std::string::npos) {
+      if (pos == 0 ||
+          pos == resp.size() - 6) {  // ignore indicators at the start and end
+        pos = resp.find("******", pos + 6);
+        continue;
+      }
       if (++count > 1) return false;       // more than one occurrence
       pos = resp.find("******", pos + 6);  // disallow overlapping matches
     }
@@ -180,24 +184,14 @@ class NumberPlaceholders : public Instruction {
     std::size_t count = 0, pos = 0;
     while (pos < resp.length() &&
            (int)count < n_) {  // no need to keep looking if the requirement is
-                               // already satisfied
+      // already satisfied
       std::size_t open = resp.find('[', pos);
       if (open == std::string::npos) break;
       std::size_t close = resp.find(']', open + 1);
       if (close == std::string::npos) break;
 
-      if (close > open + 1) {  // non-empty inner
-        const std::string inner = resp.substr(open + 1, close - open - 1);
-        bool ok = true;
-        for (unsigned char ch : inner) {
-          if (std::isspace(ch) || !(std::isalnum(ch) || ch == '_')) {
-            ok = false;
-            break;
-          }
-        }
-        if (ok) ++count;
-      }
-      pos = close + 1;  // continue after this closing bracket
+      if (close > open + 1) ++count;  // non-empty inner
+      pos = close + 1;                // continue after this closing bracket
     }
     return (int)count >= n_;
   }
@@ -224,9 +218,18 @@ class ConstrainedResponse : public Instruction {
   constexpr InstructionGroup Group() override { return DETECTABLE_FORMAT; }
 
  private:
+  // TODO constexpr?
+  const std::string aYes = "My answer is yes.";
+  const std::string aNo = "My answer is no.";
+  const std::string aMaybe = "My answer is maybe.";
+  const unsigned sizeThreshold = 3;
   virtual bool verify_(const std::string& resp) const override {
-    return resp == "My answer is yes." || resp == "My answer is no." ||
-           resp == "My answer is maybe.";
+    return (resp.find(aYes) != std::string::npos &&
+            resp.size() <= sizeThreshold + aYes.size()) ||
+           (resp.find(aNo) != std::string::npos &&
+            resp.size() <= sizeThreshold + aNo.size()) ||
+           (resp.find(aMaybe) != std::string::npos &&
+            resp.size() <= sizeThreshold + aMaybe.size());
   }
 };
 
@@ -239,6 +242,14 @@ class JsonFormat : public Instruction {
   virtual bool verify_(const std::string& resp) const override {
     std::string t = resp;
     if (t.empty()) return false;
+    if (t[0] == '`') {
+      size_t first = t.find('\n');
+      size_t last = t.rfind('\n');
+
+      if (first != std::string::npos && last != std::string::npos &&
+          last > first)
+        t = t.substr(first + 1, last - first - 1);
+    }
     crow::json::rvalue jv = crow::json::load(t);
     return jv.is_valid();
   }
@@ -259,25 +270,42 @@ class MultipleSections : public Instruction {
       if (!trim(p).empty()) ++c;
     return c;
   }
+
+  static bool isnum(const std::string text, size_t pos) {
+    unsigned char c = text[pos];
+    return (c >= '0' && c <= '9') || c == 'I' || c == 'V' || c == 'X';
+  }
+
   inline std::vector<std::string> SplitByDelim(const std::string& s,
                                                const std::string& delim) const {
     if (delim.empty()) return {s};
     std::vector<std::string> parts;
-    size_t start = 0;
+    size_t start = s.find(delim, start);
     while (true) {
-      size_t pos = s.find(delim, start);
+      if (start == std::string::npos) break;
+      size_t pos = s.find(delim, start + delim.size());
       if (pos == std::string::npos) {
         parts.push_back(s.substr(start));
         break;
       }
+      if (!isnum(s, pos + delim.size() +
+                        1)) {  // just a word, not "Section X", ignore and move
+                               // on to the next one
+        start = pos;
+        continue;
+      }
       parts.push_back(s.substr(start, pos - start));
-      start = pos + delim.size();
+      start = pos;
     }
     return parts;
   }
   virtual bool verify_(const std::string& resp) const override {
     auto parts = SplitByDelim(resp, sep_);
-    return CountNonEmpty(parts) == n_;
+    int count = CountNonEmpty(parts);
+    if (resp.find("******") != std::string::npos)
+      count /= 2;  // If 2 responses are given, divide by 2 so we get the result
+                   // for each response
+    return count == n_;
   }
 };
 
@@ -301,7 +329,7 @@ class NumberBulletLists : public Instruction {
     size_t count = 0;
     for (const auto& line : SplitLines(resp)) {
       std::string t = trim(line);
-      if (t.rfind("* ", 0) == 0) {
+      if (t.rfind("* ", 0) == 0 || t.rfind("- ", 0) == 0) {
         ++count;
         continue;
       }
@@ -537,8 +565,12 @@ class NthParagraphFirstWord : public Instruction {
   static std::string FirstWord(const std::string& s) {
     std::istringstream is(s);
     std::string w;
+    std::string fw;
     is >> w;
-    return tolower(w);
+    w = tolower(w);
+    for (char c : w)
+      if (std::isalpha(c) && !std::isspace(c)) fw.push_back(c);
+    return fw;
   }
 
   static inline std::vector<std::string> SplitParagraphs(const std::string& s) {
@@ -576,10 +608,12 @@ class NumberParagraphs : public Instruction {
 
  private:
   unsigned n_;
+  static constexpr unsigned threshold =
+      5;  // to allow 5 characters at the very start or end of the response
   virtual bool verify_(const std::string& resp) const override {
     std::size_t count = 0, pos = 0;
-    while ((pos = resp.find("***\n", pos)) != std::string::npos) {
-      ++count;
+    while ((pos = resp.find("***", pos)) != std::string::npos) {
+      if (pos >= threshold && pos <= resp.size() - (3 + threshold)) ++count;
       pos += 4;  // advance by 3 for non-overlapping matches
     }
     return count == n_ - 1;  // since *** is a saparator, the actual count is 1
@@ -596,10 +630,79 @@ class NumberSentences : public Instruction {
  private:
   int n_;
   Relation rel_;
+  inline bool is_letter(char c) const { return std::isalpha(c); }
+
+  inline bool is_digit(char c) const { return c >= '0' && c <= '9'; }
+
+  inline bool is_mark(char c) const { return c == '.' || c == '!' || c == '?'; }
+
+  bool is_enumeration_prefix(const std::string& s, size_t i) const {
+    // Matches patterns: "1." , "2." , "10." , "a." , "A."
+    // Check backwards for a run of digits or a single letter
+    if (i == 0) return false;
+
+    size_t start = i - 1;
+    if (is_digit(s[start])) {
+      while (start > 0 && is_digit(s[start - 1])) start--;
+      // Cannot be enumeration unless at the start of a new line or directly
+      // after the end of a sentence.
+      if (start > 1 && s[start - 1] != '\n' && is_mark(s[start - 2]))
+        return false;
+      // enumeration if followed by space or newline
+      if (i + 1 < s.size() && (s[i + 1] == ' ' || s[i + 1] == '\n'))
+        return true;
+    }
+
+    // letter enumeration: "a." or "A."
+    if (is_letter(s[start])) {
+      if (start > 0 && is_letter(s[start - 1])) return false;
+      // Cannot be enumeration unless at the start of a new line or directly
+      // after the end of a sentence.
+      if (start > 1 && s[start - 1] != '\n' && is_mark(s[start - 2]))
+        return false;
+      if (i + 1 < s.size() && (s[i + 1] == ' ' || s[i + 1] == '\n'))
+        return true;
+    }
+
+    return false;
+  }
+
+  bool is_decimal_point(const std::string& s, size_t i) const {
+    // digit '.' digit
+    if (i == 0 || i + 1 >= s.size()) return false;
+    return is_digit(s[i - 1]) && is_digit(s[i + 1]);
+  }
+
+  // TODO might have an issue with the first dot of e.g. or i.e.
+  bool is_abbreviation(const std::string& s, size_t i) const {
+    static const std::vector<std::string> abb = {
+        "Mr.",  "Mrs.", "Ms.",  "Dr.",   "Prof.",
+        "etc.", "e.g.", "i.e.", "U.S.A", "U.S."};
+
+    for (auto& a : abb) {
+      size_t L = a.size();
+      if (i + 1 >= L) {
+        if (s.compare(i + 1 - L, L, a) == 0) return true;
+      }
+    }
+    return false;
+  }
+
   virtual bool verify_(const std::string& resp) const override {
     size_t count = 0;
-    for (unsigned char c : resp) {
-      if (c == '.' || c == '!' || c == '?') ++count;
+
+    for (size_t i = 0; i < resp.size(); i++) {
+      char c = resp[i];
+
+      if (is_mark(c)) {
+        if (c == '.') {
+          if (is_decimal_point(resp, i)) continue;
+          if (is_enumeration_prefix(resp, i)) continue;
+          if (is_abbreviation(resp, i)) continue;
+        }
+
+        count++;
+      }
     }
     return compare(count, (size_t)n_, rel_);
   }
@@ -653,7 +756,7 @@ class EndChecker : public Instruction {
  private:
   std::string end_;
   virtual bool verify_(const std::string& resp) const override {
-    return ends_with(resp, end_);
+    return ends_with(resp, end_, 3);
   }
 };
 

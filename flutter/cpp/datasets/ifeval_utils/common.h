@@ -35,17 +35,26 @@ inline std::string tolower(std::string s) {
   return s;
 }
 
-inline bool ends_with(const std::string& s, const std::string& suf) {
-  if (s.size() < suf.size()) return false;
-  std::string a = tolower(s.substr(s.size() - suf.size()));
-  std::string b = tolower(suf);
-  return a == b;
-}
-
 inline bool contains_string(const std::string& text,
                             const std::string& substring) {
   std::string h = tolower(text), n = tolower(substring);
   return h.find(n) != std::string::npos;
+}
+
+inline bool ends_with(const std::string& s, const std::string& suf,
+                      unsigned threshold) {
+  if (s.size() < suf.size()) return false;
+  std::string a = tolower(s.substr(s.size() - (suf.size() + threshold)));
+  std::string b = tolower(suf);
+  return threshold == 0 ? a == b : contains_string(a, b);
+}
+
+inline bool starts_with(const std::string& s, const std::string& prf,
+                        unsigned threshold) {
+  if (s.size() < prf.size()) return false;
+  std::string a = tolower(s.substr(0, prf.size() + threshold));
+  std::string b = tolower(prf);
+  return threshold == 0 ? a == b : contains_string(a, b);
 }
 
 inline bool contains_word(const std::string& text, const std::string& word) {
@@ -115,14 +124,12 @@ inline std::string remove_font_modifiers(const std::string& s) {
 
 inline std::string remove_first_line(const std::string& s) {
   std::size_t pos = s.find('\n');
-  return (pos == std::string::npos) ? std::string{} : s.substr(pos + 1);
-  // If there is no newline, removing the first line yields empty.
+  return (pos == std::string::npos) ? std::string(s) : s.substr(pos + 1);
 }
 
 inline std::string remove_last_line(const std::string& s) {
   std::size_t pos = s.rfind('\n');
-  return (pos == std::string::npos) ? std::string{} : s.substr(0, pos);
-  // If there is no newline, removing the last line yields empty.
+  return (pos == std::string::npos) ? std::string(s) : s.substr(0, pos);
 }
 
 // Returns the 8 transformations as an array of strings.
