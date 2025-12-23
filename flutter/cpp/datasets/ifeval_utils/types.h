@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <unordered_set>
 
 #include "compact_lang_det.h"
 #include "flutter/cpp/datasets/ifeval_utils/common.h"
@@ -630,42 +631,107 @@ class NumberSentences : public Instruction {
  private:
   int n_;
   Relation rel_;
+
+  inline std::string word_before_dot(const std::string& s, size_t i) const {
+    size_t start = i;
+    while (start > 0 && std::isalpha((unsigned char)s[start - 1]))
+      start--;
+    return s.substr(start, i - start);
+  }
+
+  inline std::string word_after_dot(const std::string& s, size_t i) const {
+    size_t end = i + 1;
+    while (end < s.size() && std::isalpha((unsigned char)s[end]))
+      end++;
+    return s.substr(i + 1, end - (i + 1));
+  }
+
   inline bool is_letter(char c) const { return std::isalpha(c); }
 
   inline bool is_digit(char c) const { return c >= '0' && c <= '9'; }
 
   inline bool is_mark(char c) const { return c == '.' || c == '!' || c == '?'; }
 
+  bool is_initialism(const std::string& s, size_t i) const {
+    size_t j = i;
+    unsigned count = 0;
+
+    while (j > 0 && std::isupper((unsigned char)s[j - 1])) {
+      if (j + 1 < s.size() && s[j] == '.') {
+        count++;
+        j -= 2;
+      } else {
+        break;
+      }
+    }
+
+    // check if followed by another X. for first '.'
+    if (count == 1) {
+      if (i + 2 < s.size() && std::isupper((unsigned char)s[i + 1]) && s[i + 2] == '.') {
+        count = 2;
+      }
+    }
+
+    return count >= 2;
+  }
+
+  bool is_latin_abbrev(const std::string& s, size_t i) const {
+    if (i < 3) return false;
+    return std::islower((unsigned char)s[i - 3]) &&
+           s[i - 2] == '.' &&
+           std::islower((unsigned char)s[i - 1]) &&
+           s[i] == '.';
+  }
+
+  bool is_title_abbrev(const std::string& s, size_t i) const {
+    static const std::unordered_set<std::string> titles = {
+        "Mr", "Mrs", "Ms", "Dr", "Prof", "Sr", "Jr"
+    };
+
+    std::string word = word_before_dot(s, i);
+    return !word.empty() && titles.count(word) != 0;
+  }
+
   bool is_enumeration_prefix(const std::string& s, size_t i) const {
-    // Matches patterns: "1." , "2." , "10." , "a." , "A."
-    // Check backwards for a run of digits or a single letter
     if (i == 0) return false;
 
+            // Must be followed by space or newline
+    if (i + 1 >= s.size() || (s[i + 1] != ' ' && s[i + 1] != '\n'))
+      return false;
+
     size_t start = i - 1;
+
+    // ---- Numeric enumeration: 1. / 10. ----
     if (is_digit(s[start])) {
       while (start > 0 && is_digit(s[start - 1])) start--;
-      // Cannot be enumeration unless at the start of a new line or directly
-      // after the end of a sentence.
-      if (start > 1 && s[start - 1] != '\n' && is_mark(s[start - 2]))
-        return false;
-      // enumeration if followed by space or newline
-      if (i + 1 < s.size() && (s[i + 1] == ' ' || s[i + 1] == '\n'))
-        return true;
     }
 
-    // letter enumeration: "a." or "A."
-    if (is_letter(s[start])) {
-      if (start > 0 && is_letter(s[start - 1])) return false;
-      // Cannot be enumeration unless at the start of a new line or directly
-      // after the end of a sentence.
-      if (start > 1 && s[start - 1] != '\n' && is_mark(s[start - 2]))
+    // TODO roman numerals maybe?
+    // ---- Letter enumeration: a. / A. ----
+    else if (is_letter(s[start]) && start > 0 && is_letter(s[start - 1]))
         return false;
-      if (i + 1 < s.size() && (s[i + 1] == ' ' || s[i + 1] == '\n'))
-        return true;
-    }
+
+    // General check
+    if (start == 0) return true;
+
+    char prev = s[start - 1];
+    if (prev == ' ' || prev == '\n' || is_mark(prev))
+      return true;
 
     return false;
   }
+
+  bool is_domain_suffix(const std::string& s, size_t i) const {
+    static const std::unordered_set<std::string> tlds = {
+        "com", "net", "org", "io", "gov", "edu", "me"
+    };
+
+    if (i + 1 >= s.size()) return false;
+
+    std::string suffix = word_after_dot(s, i);
+    return tlds.count(suffix) != 0;
+  }
+
 
   bool is_decimal_point(const std::string& s, size_t i) const {
     // digit '.' digit
@@ -673,36 +739,48 @@ class NumberSentences : public Instruction {
     return is_digit(s[i - 1]) && is_digit(s[i + 1]);
   }
 
-  // TODO might have an issue with the first dot of e.g. or i.e.
   bool is_abbreviation(const std::string& s, size_t i) const {
-    static const std::vector<std::string> abb = {
-        "Mr.",  "Mrs.", "Ms.",  "Dr.",   "Prof.",
-        "etc.", "e.g.", "i.e.", "U.S.A", "U.S."};
+    return is_initialism(s, i) || is_latin_abbrev(s, i) || is_title_abbrev(s, i);
+  }
 
-    for (auto& a : abb) {
-      size_t L = a.size();
-      if (i + 1 >= L) {
-        if (s.compare(i + 1 - L, L, a) == 0) return true;
-      }
-    }
+  bool abbreviation_blocks_sentence(const std::string& s, size_t i) const {
+    if (!is_abbreviation(s, i)) return false;
+
+            // skip spaces
+    size_t j = i + 1;
+    while (j < s.size() && s[j] == ' ') j++;
+
+            // If next token is lowercase, it's mid-sentence
+    if (j < s.size() && std::islower((unsigned char)s[j]))
+      return true;
+
     return false;
+  }
+
+  bool ends_sentence(const std::string& s, size_t i) const {
+    char c = s[i];
+
+    if (!is_mark(c)) return false;
+
+    // collapse runs ?!...
+    if (i + 1 < s.size() && is_mark(s[i + 1]))
+      return false;
+
+    if (c == '.') {
+      if (is_decimal_point(s, i)) return false;
+      if (is_enumeration_prefix(s, i)) return false;
+      if (abbreviation_blocks_sentence(s, i)) return false;
+      if (is_domain_suffix(s, i)) return false;
+    }
+
+    return true;
   }
 
   virtual bool verify_(const std::string& resp) const override {
     size_t count = 0;
 
     for (size_t i = 0; i < resp.size(); i++) {
-      char c = resp[i];
-
-      if (is_mark(c)) {
-        if (c == '.') {
-          if (is_decimal_point(resp, i)) continue;
-          if (is_enumeration_prefix(resp, i)) continue;
-          if (is_abbreviation(resp, i)) continue;
-        }
-
-        count++;
-      }
+      if (ends_sentence(resp, i)) count++;
     }
     return compare(count, (size_t)n_, rel_);
   }
@@ -767,8 +845,7 @@ class Quotation : public Instruction {
 
  private:
   virtual bool verify_(const std::string& resp) const override {
-    if (resp.size() < 2) return false;
-    return resp.front() == '"' && resp.back() == '"';
+    return resp.size() >= 2 && resp.front() == '"' && resp.back() == '"';
   }
 };
 
