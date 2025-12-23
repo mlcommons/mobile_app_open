@@ -56,16 +56,17 @@ endif
 
 htp-dlc: mobilenet_v4 \
 	mobilenet_v4_O2 \
-    mobiledet \
-    mobiledet_O2 \
-    mosaic \
-    mosaic_O2 \
-    mobilebert \
-    mobilebert_O2 \
-    snusr \
-    snusr_O2 \
-    mobilenet_v4_batched \
-    mobilenet_v4_batched_O2
+	mobiledet \
+	mobiledet_O2 \
+	mosaic \
+	mosaic_O2 \
+	mobilebert \
+	mobilebert_O2 \
+	snusr \
+	snusr_O2 \
+	mobilenet_v4_batched \
+	mobilenet_v4_batched_O2
+
 
 ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),generate-apirec \
 mobilenet_v4_apirec mobilenet_v4_batched_apirec mosaic_apirec mobilebert_apirec mobiledet_apirec snusr_apirec))
@@ -80,9 +81,11 @@ generate-apirec: mobilenet_v4_apirec \
 	snusr_apirec
 
 mobilenet_v4_batched: \
+    ${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_sm8850.stamp \
     ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.stamp
 
 mobilenet_v4_batched_O2: \
+    ${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_O2_sm8850.stamp \
     ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.stamp
 
 mobilenet_v4_batched_apirec: \
@@ -92,7 +95,7 @@ mosaic: \
 	${DLCBUILDDIR}/mobile_mosaic_htp.stamp
 
 mosaic_O2: \
-    ${DLCBUILDDIR}/mobile_mosaic_htp_O2.stamp
+	${DLCBUILDDIR}/mobile_mosaic_htp_O2.stamp
 
 mosaic_apirec: \
 	${DLCBUILDDIR}/generate_mosaic_apirec
@@ -101,7 +104,7 @@ mobilenet_v4: \
 	${DLCBUILDDIR}/mobilenet_v4_htp.stamp
 
 mobilenet_v4_O2: \
-    ${DLCBUILDDIR}/mobilenet_v4_htp_O2.stamp
+	${DLCBUILDDIR}/mobilenet_v4_htp_O2.stamp
 
 mobilenet_v4_apirec: \
 	${DLCBUILDDIR}/generate_mobilenet_v4_apirec
@@ -134,19 +137,41 @@ snusr_apirec: \
 	${DLCBUILDDIR}/generate_snusr_apirec
 
 stable_diffusion_qnn: \
+	sd_precompute_data \
+	text_encoder \
+	vae_decoder \
+	unet
+
+sd_precompute_data: \
 	${DLCBUILDDIR}/sd_precompute_data.tar \
-	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator.stamp \
-	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator.stamp \
-	${DLCBUILDDIR}/unet_qnn_context_binary_generator.stamp
 
 text_encoder: \
-	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator.stamp
+	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator.stamp \
+	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v75.stamp \
+	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v79.stamp \
+	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v73_sd8sG4.stamp \
+	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v73_sd7G4.stamp \
+	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v81_sd8eliteG5.stamp \
+	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v81_sd8G5.stamp \
 
 vae_decoder: \
-	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator.stamp
+	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator.stamp \
+	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v75.stamp \
+	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v79.stamp \
+	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v73_sd8sG4.stamp \
+	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v73_sd7G4.stamp \
+	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v81_sd8eliteG5.stamp \
+	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v81_sd8G5.stamp \
+
 
 unet: \
-	${DLCBUILDDIR}/unet_qnn_context_binary_generator.stamp
+	${DLCBUILDDIR}/unet_qnn_context_binary_generator.stamp \
+	${DLCBUILDDIR}/unet_qnn_context_binary_generator_v75.stamp \
+	${DLCBUILDDIR}/unet_qnn_context_binary_generator_v79.stamp \
+	${DLCBUILDDIR}/unet_qnn_context_binary_generator_v73_sd8sG4.stamp \
+	${DLCBUILDDIR}/unet_qnn_context_binary_generator_v73_sd7G4.stamp \
+	${DLCBUILDDIR}/unet_qnn_context_binary_generator_v81_sd8eliteG5.stamp \
+	${DLCBUILDDIR}/unet_qnn_context_binary_generator_v81_sd8G5.stamp \
 
 mlperf_models: \
 	${DLCBUILDDIR}/mlperf_models.stamp
@@ -169,6 +194,7 @@ ${DLCBUILDDIR}/mlperf_models.stamp:
 	# Creating folder to store required models
 	(mkdir -p ${MLPERF_MODELS_PATH})
 	touch $@
+
 
 ${DLCBUILDDIR}/mobilenet_v4_float.dlc: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
@@ -211,6 +237,7 @@ ${DLCBUILDDIR}/mobilenet_v4_quant.stamp: \
 			--input_list=imagenet_image_384_list.txt \
 			--output_dlc=/output/mobilenet_v4_quant.dlc \
 	# Mobilenetedge TPU model conversion completed
+	touch $@
 
 ${DLCBUILDDIR}/mobilenet_v4_htp_sm8750.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
@@ -231,8 +258,8 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_sm8750.stamp: \
 			--input_dlc=/output/mobilenet_v4_quant.dlc \
 			--output_dlc=/output/mobilenet_v4_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8750 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8750,sm8845 \
+			--memorymapped_buffer_hint=true
 	# MobilenetV4 TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -255,8 +282,33 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_sm7550.stamp: \
 			--input_dlc=/output/mobilenet_v4_htp.dlc \
 			--output_dlc=/output/mobilenet_v4_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm7635 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
+	# MobilenetV4 TPU model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_htp_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_quant.stamp \
+	# Offline prepare of MobilenetV4 DLC for HTP
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/imagenet:/imagenet \
+		-w /imagenet \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--htp_dlbc=true \
+			--input_dlc=/output/mobilenet_v4_htp.dlc \
+			--output_dlc=/output/mobilenet_v4_htp.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8850 \
+			--memorymapped_buffer_hint=true
 	# MobilenetV4 TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -265,6 +317,7 @@ ${DLCBUILDDIR}/mobilenet_v4_htp.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_sm8750.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_sm7550.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_htp_sm8850.stamp \
 	# Offline prepare of MobilenetV4 DLC for HTP
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -281,8 +334,8 @@ ${DLCBUILDDIR}/mobilenet_v4_htp.stamp: \
 			--input_dlc=/output/mobilenet_v4_htp.dlc \
 			--output_dlc=/output/mobilenet_v4_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--memorymapped_buffer_hint=true
 	# MobilenetV4 TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -306,8 +359,8 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8750.stamp: \
 			--input_dlc=/output/mobilenet_v4_quant.dlc \
 			--output_dlc=/output/mobilenet_v4_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8750 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8750,sm8845 \
+			--memorymapped_buffer_hint=true
 	# Mobilenetedge TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -330,9 +383,33 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm7550.stamp: \
 			--input_dlc=/output/mobilenet_v4_htp_O2.dlc \
 			--output_dlc=/output/mobilenet_v4_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm7635 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
 	# Mobilenetedge TPU model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp_O2.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+	# Offline prepare of MobilenetV4 DLC for HTP
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/imagenet:/imagenet \
+		-w /imagenet \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--htp_dlbc=true \
+			--input_dlc=/output/mobilenet_v4_htp_O2.dlc \
+			--output_dlc=/output/mobilenet_v4_htp_O2.dlc \
+			--optimization_level 2 \
+			--htp_socs=sm8850 \
+			 --memorymapped_buffer_hint=true
+	# MobilenetV4 TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
@@ -340,6 +417,7 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_O2.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8750.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm7550.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8850.stamp \
 	# Offline prepare of MobilenetEdgeTPU DLC for HTP
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -356,10 +434,99 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_O2.stamp: \
 			--input_dlc=/output/mobilenet_v4_htp_O2.dlc \
 			--output_dlc=/output/mobilenet_v4_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--memorymapped_buffer_hint=true
 	# Mobilenetedge TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_O2.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_float_batched_8.dlc: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/mlperf_models.stamp
+	# MobilenetV4 TPU model conversion ....
+	# Batched Float model
+	mkdir -p ${DLCBUILDDIR}
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${MOBILENETV4_MODEL_PATH}:/models \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-tensorflow-to-dlc \
+			-i /models/ \
+			-d inputs "8,384,384,3" --out_node "probs" \
+			-o /output/mobilenet_v4_float_batched_8.dlc
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_quant_batched_8.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/imagenet/imagenet_image_384_list.txt \
+		${DLCBUILDDIR}/mobilenet_v4_float_batched_8.dlc
+	# Quantization of MobilenetV4 Batched DLC for HTP
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/imagenet:/imagenet-out \
+		-w /imagenet-out \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-quant \
+			--input_dlc=/output/mobilenet_v4_float_batched_8.dlc \
+			--input_list=imagenet_image_384_list.txt \
+			--output_dlc=/output/mobilenet_v4_quant_batched_8.dlc
+	# MobilenetV4 model conversion completed
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_quant_batched_8.stamp
+	# Offline prepare of MobilenetV4 Batched DLC for HTP
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		-w /output \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--input_dlc=/output/mobilenet_v4_quant_batched_8.dlc \
+			--output_dlc=/output/mobilenet_v4_htp_batched_8.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8850 \
+			--htp_dlbc=true \
+			--memorymapped_buffer_hint=true
+	# MobilenetV4 model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_8.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_O2_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_quant_batched_8.stamp
+	# Offline prepare of MobilenetV4 Batched DLC for HTP
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		-w /output \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--input_dlc=/output/mobilenet_v4_quant_batched_8.dlc \
+			--output_dlc=/output/mobilenet_v4_htp_batched_8_O2.dlc \
+			--optimization_level 2 \
+			--htp_socs=sm8850 \
+			--htp_dlbc=true \
+			--memorymapped_buffer_hint=true
+	# MobilenetV4 model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobilenet_v4_float_batched_4.dlc: \
@@ -380,6 +547,7 @@ ${DLCBUILDDIR}/mobilenet_v4_float_batched_4.dlc: \
 			-i /models/ \
 			-d inputs "4,384,384,3" --out_node "probs" \
 			-o /output/mobilenet_v4_float_batched_4.dlc
+	touch $@
 
 ${DLCBUILDDIR}/mobilenet_v4_quant_batched_4.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
@@ -399,6 +567,7 @@ ${DLCBUILDDIR}/mobilenet_v4_quant_batched_4.stamp: \
 			--input_dlc=/output/mobilenet_v4_float_batched_4.dlc \
 			--input_list=imagenet_image_384_list.txt \
 			--output_dlc=/output/mobilenet_v4_quant_batched_4.dlc
+	touch $@
 	# MobilenetV4 model conversion completed
 
 ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8750.stamp: \
@@ -411,14 +580,15 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8750.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=6 \
 			--input_dlc=/output/mobilenet_v4_quant_batched_4.dlc \
 			--output_dlc=/output/mobilenet_v4_htp_batched_4.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8750 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8750,sm8845 \
+			--memorymapped_buffer_hint=true
 	# MobilenetV4 model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -432,14 +602,37 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm7550.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=2 \
 			--input_dlc=/output/mobilenet_v4_htp_batched_4.dlc \
 			--output_dlc=/output/mobilenet_v4_htp_batched_4.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm7635 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
+	# MobilenetV4 model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+	# Offline prepare of MobilenetV4 Batched DLC for HTP
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		-w /output \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--input_dlc=/output/mobilenet_v4_htp_batched_4.dlc \
+			--output_dlc=/output/mobilenet_v4_htp_batched_4.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8850 \
+			--memorymapped_buffer_hint=true
 	# MobilenetV4 model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -448,6 +641,7 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8750.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm7550.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8850.stamp \
 	# Offline prepare of MobilenetV4 Batched DLC for HTP
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -455,14 +649,15 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=4 \
 			--input_dlc=/output/mobilenet_v4_htp_batched_4.dlc \
 			--output_dlc=/output/mobilenet_v4_htp_batched_4.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--memorymapped_buffer_hint=true
 	# MobilenetV4 model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -477,14 +672,15 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm8750.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=6 \
 			--input_dlc=/output/mobilenet_v4_quant_batched_4.dlc \
 			--output_dlc=/output/mobilenet_v4_htp_batched_4_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8750 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8750,sm8845 \
+			--memorymapped_buffer_hint=true
 	# MobilenetV4 model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -498,14 +694,37 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm7550.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=2 \
 			--input_dlc=/output/mobilenet_v4_htp_batched_4_O2.dlc \
 			--output_dlc=/output/mobilenet_v4_htp_batched_4_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm7635 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
+	# MobilenetV4 model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+	# Offline prepare of MobilenetV4 Batched DLC for HTP
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		-w /output \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--input_dlc=/output/mobilenet_v4_htp_batched_4_O2.dlc \
+			--output_dlc=/output/mobilenet_v4_htp_batched_4_O2.dlc \
+			--optimization_level 2 \
+			--htp_socs=sm8850 \
+			--memorymapped_buffer_hint=true
 	# MobilenetV4 model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -514,6 +733,7 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm8750.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm7550.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm8850.stamp \
 	# Offline prepare of MobilenetV4 Batched DLC for HTP
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -521,14 +741,15 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=4 \
 			--input_dlc=/output/mobilenet_v4_htp_batched_4_O2.dlc \
 			--output_dlc=/output/mobilenet_v4_htp_batched_4_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--memorymapped_buffer_hint=true
 	# MobilenetV4 model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -589,16 +810,17 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8750.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=6 \
-            --htp_dlbc=true \
+			--htp_dlbc=true \
 			--input_dlc=/output/ssd_mobiledet_qat_quant.dlc \
 			--output_dlc=/output/ssd_mobiledet_qat_htp.dlc \
 			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
 			--optimization_level 3 \
-			--htp_socs=sm8750 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8750,sm8845 \
+			--memorymapped_buffer_hint=true
 	# SSD MobileDET model offline prepare for HTP completed
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -612,16 +834,41 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm7550.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=2 \
-            --htp_dlbc=true \
+			--htp_dlbc=true \
 			--input_dlc=/output/ssd_mobiledet_qat_htp.dlc \
 			--output_dlc=/output/ssd_mobiledet_qat_htp.dlc \
 			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm7635 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
+	# SSD MobileDET model offline prepare for HTP completed
+	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+	# Offline prepare of MobileDET SSD DLC for HTP
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		-w /output \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--htp_dlbc=true \
+			--input_dlc=/output/ssd_mobiledet_qat_htp.dlc \
+			--output_dlc=/output/ssd_mobiledet_qat_htp.dlc \
+			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
+			--optimization_level 3 \
+			--htp_socs=sm8850 \
+			--memorymapped_buffer_hint=true
 	# SSD MobileDET model offline prepare for HTP completed
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -630,6 +877,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8750.stamp \
 		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm7550.stamp \
+		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8850.stamp \
 	# Offline prepare of MobileDET SSD DLC for HTP
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -637,6 +885,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=4 \
@@ -645,8 +894,8 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp.stamp: \
 			--output_dlc=/output/ssd_mobiledet_qat_htp.dlc \
 			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--memorymapped_buffer_hint=true
 	# SSD MobileDET model offline prepare for HTP completed
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -661,6 +910,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm8750.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=6 \
@@ -668,8 +918,8 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm8750.stamp: \
 			--output_dlc=/output/ssd_mobiledet_qat_htp_O2.dlc \
 			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
 			--optimization_level 2 \
-			--htp_socs=sm8750 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8750,sm8845 \
+			--memorymapped_buffer_hint=true
 	# SSD MobileDET model offline prepare for HTP completed
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -683,6 +933,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm7550.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=2 \
@@ -690,8 +941,33 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm7550.stamp: \
 			--output_dlc=/output/ssd_mobiledet_qat_htp_O2.dlc \
 			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm7635 \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
+	# SSD MobileDET model offline prepare for HTP completed
+	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/ssd_mobiledet_qat_quant.stamp
+	# Offline prepare of MobileDET SSD DLC for HTP
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		-w /output \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--htp_dlbc=true \
+			--input_dlc=/output/ssd_mobiledet_qat_htp_O2.dlc \
+			--output_dlc=/output/ssd_mobiledet_qat_htp_O2.dlc \
+			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
+			--optimization_level 2 \
+			--htp_socs=sm8850 \
+			--memorymapped_buffer_hint=true
 	# SSD MobileDET model offline prepare for HTP completed
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -700,6 +976,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm8750.stamp \
 		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm7550.stamp \
+		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm8850.stamp \
 	# Offline prepare of MobileDET SSD DLC for HTP
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -707,6 +984,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=4 \
@@ -714,8 +992,8 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.stamp: \
 			--output_dlc=/output/ssd_mobiledet_qat_htp_O2.dlc \
 			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
-                         --memorymapped_buffer_hint=true
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--memorymapped_buffer_hint=true
 	# SSD MobileDET model offline prepare for HTP completed
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -772,6 +1050,7 @@ ${DLCBUILDDIR}/mobilebert_float.dlc: \
 			--input_type segment_ids opaque \
 			--out_node transpose \
 			-o /output/mobilebert_float.dlc
+	touch $@
 	# MobileBERT Float DLC conversion completed
 
 ${DLCBUILDDIR}/mobilebert_quant.stamp: \
@@ -796,6 +1075,7 @@ ${DLCBUILDDIR}/mobilebert_quant.stamp: \
 			--act_bitwidth 8 \
 			--override_params \
 			--output_dlc=/output/mobilebert_quant.dlc
+	touch $@
 
 ${DLCBUILDDIR}/mobilebert_htp_sm8750.stamp: \
 		${DLCBUILDDIR}/mobilebert_quant.stamp \
@@ -808,21 +1088,22 @@ ${DLCBUILDDIR}/mobilebert_htp_sm8750.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=6 \
-            --htp_dlbc=true \
+			--htp_dlbc=true \
 			--input_dlc=/output/mobilebert_quant.dlc \
 			--output_dlc=/output/mobilebert_quantized_htp.dlc \
 			--set_output_tensors="transpose:0" \
 			--optimization_level 3 \
-			--htp_socs=sm8750 \
+			--htp_socs=sm8750,sm8845 \
 			--memorymapped_buffer_hint=true
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobilebert_htp_sm7550.stamp: \
-		${DLCBUILDDIR}/mobilebert_quant.stamp \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 	# MobileBERT quant model offline prepare ...
 	mkdir -p ${DLCBUILDDIR}
 	docker run \
@@ -831,15 +1112,40 @@ ${DLCBUILDDIR}/mobilebert_htp_sm7550.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=2 \
-            --htp_dlbc=true \
+			--htp_dlbc=true \
 			--input_dlc=/output/mobilebert_quantized_htp.dlc \
 			--output_dlc=/output/mobilebert_quantized_htp.dlc \
 			--set_output_tensors="transpose:0" \
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm7635 \
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
+	cp	${DLCBUILDDIR}/mobilebert_quantized_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilebert_htp_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+	# MobileBERT quant model offline prepare ...
+	mkdir -p ${DLCBUILDDIR}
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-w /output \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--htp_dlbc=true \
+			--input_dlc=/output/mobilebert_quantized_htp.dlc \
+			--output_dlc=/output/mobilebert_quantized_htp.dlc \
+			--set_output_tensors="transpose:0" \
+			--optimization_level 3 \
+			--htp_socs=sm8850 \
 			--memorymapped_buffer_hint=true
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -848,6 +1154,7 @@ ${DLCBUILDDIR}/mobilebert_htp.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/mobilebert_htp_sm8750.stamp \
 		${DLCBUILDDIR}/mobilebert_htp_sm7550.stamp \
+		${DLCBUILDDIR}/mobilebert_htp_sm8850.stamp \
 	# MobileBERT quant model offline prepare ...
 	mkdir -p ${DLCBUILDDIR}
 	docker run \
@@ -856,15 +1163,16 @@ ${DLCBUILDDIR}/mobilebert_htp.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=4 \
-            --htp_dlbc=true \
+			--htp_dlbc=true \
 			--input_dlc=/output/mobilebert_quantized_htp.dlc \
 			--output_dlc=/output/mobilebert_quantized_htp.dlc \
 			--set_output_tensors="transpose:0" \
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
 			--memorymapped_buffer_hint=true
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -880,15 +1188,16 @@ ${DLCBUILDDIR}/mobilebert_htp_O2_sm8750.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=6 \
-            --htp_dlbc=true \
+			--htp_dlbc=true \
 			--input_dlc=/output/mobilebert_quant.dlc \
 			--output_dlc=/output/mobilebert_quantized_htp_O2.dlc \
 			--set_output_tensors="transpose:0" \
 			--optimization_level 2 \
-			--htp_socs=sm8750 \
+			--htp_socs=sm8750,sm8845 \
 			--memorymapped_buffer_hint=true
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -903,6 +1212,7 @@ ${DLCBUILDDIR}/mobilebert_htp_O2_sm7550.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=2 \
@@ -911,7 +1221,31 @@ ${DLCBUILDDIR}/mobilebert_htp_O2_sm7550.stamp: \
 			--output_dlc=/output/mobilebert_quantized_htp_O2.dlc \
 			--set_output_tensors="transpose:0" \
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm7635 \
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
+	cp	${DLCBUILDDIR}/mobilebert_quantized_htp_O2.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilebert_htp_O2_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+	# MobileBERT quant model offline prepare ...
+	mkdir -p ${DLCBUILDDIR}
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-w /output \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--htp_dlbc=true \
+			--input_dlc=/output/mobilebert_quantized_htp_O2.dlc \
+			--output_dlc=/output/mobilebert_quantized_htp_O2.dlc \
+			--set_output_tensors="transpose:0" \
+			--optimization_level 2 \
+			--htp_socs=sm8850 \
 			--memorymapped_buffer_hint=true
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -920,6 +1254,7 @@ ${DLCBUILDDIR}/mobilebert_htp_O2.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/mobilebert_htp_O2_sm8750.stamp \
 		${DLCBUILDDIR}/mobilebert_htp_O2_sm7550.stamp \
+		${DLCBUILDDIR}/mobilebert_htp_O2_sm8850.stamp \
 	# MobileBERT quant model offline prepare ...
 	mkdir -p ${DLCBUILDDIR}
 	docker run \
@@ -928,15 +1263,16 @@ ${DLCBUILDDIR}/mobilebert_htp_O2.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=4 \
-            --htp_dlbc=true \
+			--htp_dlbc=true \
 			--input_dlc=/output/mobilebert_quantized_htp_O2.dlc \
 			--output_dlc=/output/mobilebert_quantized_htp_O2.dlc \
 			--set_output_tensors="transpose:0" \
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
 			--memorymapped_buffer_hint=true
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -995,6 +1331,7 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_sm8750.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=6 \
@@ -1002,7 +1339,7 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_sm8750.stamp: \
 			--input_dlc=/output/mobile_mosaic_quant.dlc \
 			--output_dlc=/output/mobile_mosaic_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8750 \
+			--htp_socs=sm8750,sm8845 \
 			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp.dlc ${MLPERF_MODELS_PATH}
@@ -1017,6 +1354,7 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_sm7550.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=2 \
@@ -1024,7 +1362,30 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_sm7550.stamp: \
 			--input_dlc=/output/mobile_mosaic_htp.dlc \
 			--output_dlc=/output/mobile_mosaic_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm7635 \
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
+	#Mobile Mosaic HTP model offline prepare completed
+	cp	${DLCBUILDDIR}/mobile_mosaic_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobile_mosaic_htp_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+	# Offline prepare of Mobile Mosaic DLC
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		-w /output \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--htp_dlbc=true \
+			--input_dlc=/output/mobile_mosaic_htp.dlc \
+			--output_dlc=/output/mobile_mosaic_htp.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8850 \
 			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp.dlc ${MLPERF_MODELS_PATH}
@@ -1034,6 +1395,7 @@ ${DLCBUILDDIR}/mobile_mosaic_htp.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/mobile_mosaic_htp_sm8750.stamp \
 		${DLCBUILDDIR}/mobile_mosaic_htp_sm7550.stamp \
+		${DLCBUILDDIR}/mobile_mosaic_htp_sm8850.stamp \
 	# Offline prepare of Mobile Mosaic DLC
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -1041,6 +1403,7 @@ ${DLCBUILDDIR}/mobile_mosaic_htp.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=4 \
@@ -1048,7 +1411,7 @@ ${DLCBUILDDIR}/mobile_mosaic_htp.stamp: \
 			--input_dlc=/output/mobile_mosaic_htp.dlc \
 			--output_dlc=/output/mobile_mosaic_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
 			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp.dlc ${MLPERF_MODELS_PATH}
@@ -1064,13 +1427,14 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm8750.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=6 \
 			--input_dlc=/output/mobile_mosaic_quant.dlc \
 			--output_dlc=/output/mobile_mosaic_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8750 \
+			--htp_socs=sm8750,sm8845 \
 			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp_O2.dlc ${MLPERF_MODELS_PATH}
@@ -1085,13 +1449,37 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm7550.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=2 \
 			--input_dlc=/output/mobile_mosaic_htp_O2.dlc \
 			--output_dlc=/output/mobile_mosaic_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm7635 \
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
+	#Mobile Mosaic HTP model offline prepare completed
+	cp	${DLCBUILDDIR}/mobile_mosaic_htp_O2.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+	# Offline prepare of Mobile Mosaic DLC
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		-w /output \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--htp_dlbc=true \
+			--input_dlc=/output/mobile_mosaic_htp_O2.dlc \
+			--output_dlc=/output/mobile_mosaic_htp_O2.dlc \
+			--optimization_level 2 \
+			--htp_socs=sm8850 \
 			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp_O2.dlc ${MLPERF_MODELS_PATH}
@@ -1101,6 +1489,7 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_O2.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm8750.stamp \
 		${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm7550.stamp \
+		${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm8850.stamp \
 	# Offline prepare of Mobile Mosaic DLC
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -1108,13 +1497,14 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_O2.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=4 \
 			--input_dlc=/output/mobile_mosaic_htp_O2.dlc \
 			--output_dlc=/output/mobile_mosaic_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
 			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp_O2.dlc ${MLPERF_MODELS_PATH}
@@ -1143,7 +1533,7 @@ ${DLCBUILDDIR}/snusr_float.dlc: \
 	touch $@
 
 ${DLCBUILDDIR}/snusr_quant.stamp: \
-        ${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/snusr_float.dlc \
 		${DLCBUILDDIR}/snusr_calibration_list.txt
 	# Offline prepare of SNUSR DLC
@@ -1165,7 +1555,7 @@ ${DLCBUILDDIR}/snusr_quant.stamp: \
 	touch $@
 
 ${DLCBUILDDIR}/snusr_htp_sm8750.stamp: \
-        ${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/snusr_quant.stamp \
 		${DLCBUILDDIR}/snusr_calibration_list.txt
 	#HTP Graph prepare of SNUSR DLC
@@ -1175,21 +1565,22 @@ ${DLCBUILDDIR}/snusr_htp_sm8750.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=6 \
-            --htp_dlbc=true \
+			--htp_dlbc=true \
 			--input_dlc=/output/snusr_quant.dlc \
 			--output_dlc=/output/snusr_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8750 \
+			--htp_socs=sm8750,sm8845 \
 			--memorymapped_buffer_hint=true
 	#HTP Graph prepare of SNUSR model completed
 	cp	${DLCBUILDDIR}/snusr_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/snusr_htp_sm7550.stamp: \
-        ${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 	#HTP Graph prepare of SNUSR DLC
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -1197,23 +1588,48 @@ ${DLCBUILDDIR}/snusr_htp_sm7550.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=2 \
-            --htp_dlbc=true \
+			--htp_dlbc=true \
 			--input_dlc=/output/snusr_htp.dlc \
 			--output_dlc=/output/snusr_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm7635 \
+			--htp_socs=sm7550,sm6650,sm7635 \
+			--memorymapped_buffer_hint=true
+	#HTP Graph prepare of SNUSR model completed
+	cp	${DLCBUILDDIR}/snusr_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/snusr_htp_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+	#HTP Graph prepare of SNUSR DLC
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		-w /output \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--htp_dlbc=true \
+			--input_dlc=/output/snusr_htp.dlc \
+			--output_dlc=/output/snusr_htp.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8850 \
 			--memorymapped_buffer_hint=true
 	#HTP Graph prepare of SNUSR model completed
 	cp	${DLCBUILDDIR}/snusr_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/snusr_htp.stamp: \
-        ${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
-        ${DLCBUILDDIR}/snusr_htp_sm8750.stamp \
-        ${DLCBUILDDIR}/snusr_htp_sm7550.stamp \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/snusr_htp_sm8750.stamp \
+		${DLCBUILDDIR}/snusr_htp_sm7550.stamp \
+		${DLCBUILDDIR}/snusr_htp_sm8850.stamp \
 	#HTP Graph prepare of SNUSR DLC
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -1221,21 +1637,22 @@ ${DLCBUILDDIR}/snusr_htp.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=4 \
-            --htp_dlbc=true \
+			--htp_dlbc=true \
 			--input_dlc=/output/snusr_htp.dlc \
 			--output_dlc=/output/snusr_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
 			--memorymapped_buffer_hint=true
 	#HTP Graph prepare of SNUSR model completed
 	cp	${DLCBUILDDIR}/snusr_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/snusr_htp_O2_sm8750.stamp: \
-        ${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/snusr_quant.stamp \
 		${DLCBUILDDIR}/snusr_calibration_list.txt
 	#HTP Graph prepare of SNUSR DLC
@@ -1245,13 +1662,14 @@ ${DLCBUILDDIR}/snusr_htp_O2_sm8750.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=6 \
 			--input_dlc=/output/snusr_quant.dlc \
 			--output_dlc=/output/snusr_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8750 \
+			--htp_socs=sm8750,sm8845 \
 			--memorymapped_buffer_hint=true
 	#HTP Graph prepare of SNUSR model completed
 	cp	${DLCBUILDDIR}/snusr_htp_O2.dlc ${MLPERF_MODELS_PATH}
@@ -1266,22 +1684,21 @@ ${DLCBUILDDIR}/snusr_htp_O2_sm7550.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=2 \
-			--input_dlc=/output/snusr_quant.dlc \
+			--input_dlc=/output/snusr_htp_O2.dlc \
 			--output_dlc=/output/snusr_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm7635 \
+			--htp_socs=sm7550,sm6650,sm7635 \
 			--memorymapped_buffer_hint=true
 	#HTP Graph prepare of SNUSR model completed
 	cp	${DLCBUILDDIR}/snusr_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
-${DLCBUILDDIR}/snusr_htp_O2.stamp: \
-        ${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
-        ${DLCBUILDDIR}/snusr_htp_O2_sm8750.stamp \
-        ${DLCBUILDDIR}/snusr_htp_O2_sm7550.stamp \
+${DLCBUILDDIR}/snusr_htp_O2_sm8850.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 	#HTP Graph prepare of SNUSR DLC
 	docker run \
 		-e PYTHONPATH=/snpe_sdk/lib/python \
@@ -1289,13 +1706,40 @@ ${DLCBUILDDIR}/snusr_htp_O2.stamp: \
 		-v ${SNPE_SDK}:/snpe_sdk \
 		-v ${DLCBUILDDIR}:/output \
 		-u ${USERID}:${GROUPID} \
+		-w /output \
+		mlperf_dlc_prepare \
+		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
+			--num_hvx_threads=8 \
+			--htp_dlbc=true \
+			--input_dlc=/output/snusr_htp_O2.dlc \
+			--output_dlc=/output/snusr_htp_O2.dlc \
+			--optimization_level 2 \
+			--htp_socs=sm8850 \
+			--memorymapped_buffer_hint=true
+	#HTP Graph prepare of SNUSR model completed
+	cp	${DLCBUILDDIR}/snusr_htp_O2.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/snusr_htp_O2.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/snusr_htp_O2_sm8750.stamp \
+		${DLCBUILDDIR}/snusr_htp_O2_sm7550.stamp \
+		${DLCBUILDDIR}/snusr_htp_O2_sm8850.stamp \
+	#HTP Graph prepare of SNUSR DLC
+	docker run \
+		-e PYTHONPATH=/snpe_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/snpe_sdk/lib/x86_64-linux-clang \
+		-v ${SNPE_SDK}:/snpe_sdk \
+		-v ${DLCBUILDDIR}:/output \
+		-u ${USERID}:${GROUPID} \
+		-w /output \
 		mlperf_dlc_prepare \
 		/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-graph-prepare \
 			--num_hvx_threads=4 \
 			--input_dlc=/output/snusr_htp_O2.dlc \
 			--output_dlc=/output/snusr_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
 			--memorymapped_buffer_hint=true
 	#HTP Graph prepare of SNUSR model completed
 	cp	${DLCBUILDDIR}/snusr_htp_O2.dlc ${MLPERF_MODELS_PATH}
@@ -1307,25 +1751,62 @@ ${DLCBUILDDIR}/sd_precompute_data.tar: \
 	# Preparing sd_precompute_data.tar
 	docker run \
 		-v ${SNPE_SDK}:/qnn_sdk \
-		-v ${TOPDIR}/mobile_back_qti/DLC/util/:/util \
+		-v ${TOPDIR}/mobile_back_qti/DLC/util/StableDiffusion:/util \
         -e PYTHONPATH=/qnn_sdk/lib/python \
 		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
 		-v ${DLCBUILDDIR}:/output \
         -v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
         -w /stable_diffusion \
 		mlperf_dlc_prepare \
-		python3 /util/StableDiffusion/flatten.py \
+		python3 /util/flatten.py \
 			--random_latent_init /stable_diffusion/random_latent_init/random_init_1.pkl \
             --time_step_embedding /stable_diffusion/time_step_embeddings/unet_time_step_embeddings_20.pkl \
             --time_step_list /stable_diffusion/scheduler/scheduler_time_steps_20.pkl \
             --unconditional_text_emb /stable_diffusion/unconditional_text_emb.pkl \
             --dumpdir /stable_diffusion/.
 	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4	
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4	
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
 	cp ${DLCBUILDDIR}/stable_diffusion/sd_precompute_data.tar ${MLPERF_MODELS_PATH}/stable_diffusion/.
 	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/lambdas.bin ${MLPERF_MODELS_PATH}/stable_diffusion/.
 	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/betas.bin ${MLPERF_MODELS_PATH}/stable_diffusion/.
+	cp ${DLCBUILDDIR}/stable_diffusion/sd_precompute_data.tar ${MLPERF_MODELS_PATH}/stable_diffusion_v75/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/lambdas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v75/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/betas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v75/.
+	cp ${DLCBUILDDIR}/stable_diffusion/sd_precompute_data.tar ${MLPERF_MODELS_PATH}/stable_diffusion_v79/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/lambdas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v79/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/betas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v79/.
+	cp ${DLCBUILDDIR}/stable_diffusion/sd_precompute_data.tar ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/lambdas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/betas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4/.
+	cp ${DLCBUILDDIR}/stable_diffusion/sd_precompute_data.tar ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/lambdas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/betas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4/.
+	cp ${DLCBUILDDIR}/stable_diffusion/sd_precompute_data.tar ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/lambdas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/betas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5/.
+	cp ${DLCBUILDDIR}/stable_diffusion/sd_precompute_data.tar ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/lambdas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/betas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5/.
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	touch $@
 
 ${DLCBUILDDIR}/text_encoder_qnn.cpp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
@@ -1350,6 +1831,7 @@ ${DLCBUILDDIR}/text_encoder_qnn.cpp: \
 			--bias_bitwidth 32 \
 			--quantization_overrides text_encoder_onnx/text_encoder.encodings \
 			--output_path /output/text_encoder.cpp
+		touch $@
 
 ${DLCBUILDDIR}/text_encoder_qnn_model_generator.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
@@ -1357,17 +1839,20 @@ ${DLCBUILDDIR}/text_encoder_qnn_model_generator.stamp: \
 		${DLCBUILDDIR}/text_encoder_qnn.cpp
 	# TEXT-ENCODER lib generation started
 	docker run \
-    	-v ${SNPE_SDK}:/qnn_sdk \
-        -e PYTHONPATH=/qnn_sdk/lib/python \
-    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
-    	-v ${DLCBUILDDIR}:/output \
-    	-u ${USERID}:${GROUPID} \
-        mlperf_dlc_prepare \
+		-v ${SNPE_SDK}:/qnn_sdk \
+		-e PYTHONPATH=/qnn_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+		-w /stable_diffusion/text_encoder \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
 		/qnn_sdk/bin/x86_64-linux-clang/qnn-model-lib-generator \
 			-c /output/text_encoder.cpp \
 			-b /output/text_encoder.bin \
 			-o /output/model_libs \
 			-t x86_64-linux-clang
+	touch $@
 	# Text-encoder lib generation completed
 
 ${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator.stamp: \
@@ -1388,30 +1873,189 @@ ${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator.stamp: \
 		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
 			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
 			--model /output/model_libs/x86_64-linux-clang/libtext_encoder.so \
-			--binary_file /output/text_encoder.serialized \
-			--config_file mcp_config.json
+			--binary_file /output/text_encoder.serialized
 	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
 	cp ${DLCBUILDDIR}/text_encoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion/.
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
-	chmod -R 777 ${DLCBUILDDIR}/stable_diffusion
+	touch $@
 	# TEXT-ENCODER context binary generation completed
+
+${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v75.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/text_encoder_qnn_model_generator.stamp
+	# TEXT-ENCODER context-binary generation started
+	docker run \
+		-v ${SNPE_SDK}:/qnn_sdk \
+		-v ${TEXTENCODER_MODEL_PATH}:/models \
+		-e PYTHONPATH=/qnn_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+		-w /stable_diffusion/text_encoder \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libtext_encoder.so \
+			--binary_file /output/text_encoder.serialized \
+			--config_file /models/mcp_config_v75.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	cp ${DLCBUILDDIR}/text_encoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v75/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	touch $@
+	# TEXT-ENCODER context binary generation for v75 completed
+
+${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v79.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/text_encoder_qnn_model_generator.stamp
+	# TEXT-ENCODER context-binary generation started
+	docker run \
+		-v ${SNPE_SDK}:/qnn_sdk \
+		-v ${TEXTENCODER_MODEL_PATH}:/models \
+		-e PYTHONPATH=/qnn_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+		-w /stable_diffusion/text_encoder \
+		-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libtext_encoder.so \
+			--binary_file /output/text_encoder.serialized \
+			--config_file /models/mcp_config_v79.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	cp ${DLCBUILDDIR}/text_encoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v79/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	touch $@
+	# TEXT-ENCODER context binary generation for v79 completed
+
+${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v73_sd8sG4.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/text_encoder_qnn_model_generator.stamp
+	# TEXT-ENCODER context-binary generation started
+	docker run \
+    	-v ${SNPE_SDK}:/qnn_sdk \
+    	-v ${TEXTENCODER_MODEL_PATH}:/models \
+        -e PYTHONPATH=/qnn_sdk/lib/python \
+    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+    	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/text_encoder \
+    	-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libtext_encoder.so \
+			--binary_file /output/text_encoder.serialized \
+			--config_file /models/mcp_config_v73_sd8sG4.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	cp ${DLCBUILDDIR}/text_encoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	# TEXT-ENCODER context binary generation for v73 sd8sG4 completed
+
+${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v73_sd7G4.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/text_encoder_qnn_model_generator.stamp
+	# TEXT-ENCODER context-binary generation started
+	docker run \
+    	-v ${SNPE_SDK}:/qnn_sdk \
+    	-v ${TEXTENCODER_MODEL_PATH}:/models \
+        -e PYTHONPATH=/qnn_sdk/lib/python \
+    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+    	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/text_encoder \
+    	-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libtext_encoder.so \
+			--binary_file /output/text_encoder.serialized \
+			--config_file /models/mcp_config_v73_sd7G4.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
+	cp ${DLCBUILDDIR}/text_encoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
+	# TEXT-ENCODER context binary generation for v73 sd7G4 completed
+
+${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v81_sd8eliteG5.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/text_encoder_qnn_model_generator.stamp
+	# TEXT-ENCODER context-binary generation started
+	docker run \
+		-v ${SNPE_SDK}:/qnn_sdk \
+		-v ${TEXTENCODER_MODEL_PATH}:/models \
+		-e PYTHONPATH=/qnn_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+		-w /stable_diffusion/text_encoder \
+		-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libtext_encoder.so \
+			--binary_file /output/text_encoder.serialized \
+			--config_file /models/mcp_config_v81_sd8eliteG5.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	cp ${DLCBUILDDIR}/text_encoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	touch $@
+	# TEXT-ENCODER context binary generation for v81 sd8eliteG5 completed
+
+${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v81_sd8G5.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/text_encoder_qnn_model_generator.stamp
+	# TEXT-ENCODER context-binary generation started
+	docker run \
+		-v ${SNPE_SDK}:/qnn_sdk \
+		-v ${TEXTENCODER_MODEL_PATH}:/models \
+		-e PYTHONPATH=/qnn_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+		-w /stable_diffusion/text_encoder \
+		-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libtext_encoder.so \
+			--binary_file /output/text_encoder.serialized \
+			--config_file /models/mcp_config_v81_sd8G5.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	cp ${DLCBUILDDIR}/text_encoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	touch $@
+	# TEXT-ENCODER context binary generation for v81 sd8G5 completed
 
 ${DLCBUILDDIR}/vae_decoder_qnn.cpp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
 		${DLCBUILDDIR}/mobile/.stamp \
 		${DLCBUILDDIR}/mlperf_models.stamp
 	# VAE-DECODER conversion and quantization
-    # cpp & bin files
+	# cpp & bin files
 	docker run \
 		-v ${SNPE_SDK}:/qnn_sdk \
 		-v ${VAEDECODER_MODEL_PATH}:/models \
-        -e PYTHONPATH=/qnn_sdk/lib/python \
+		-e PYTHONPATH=/qnn_sdk/lib/python \
 		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
 		-v ${DLCBUILDDIR}:/output \
-        -v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
-        -w /stable_diffusion/vae_decoder \
-        -v ${TOPDIR}:/dir \
+		-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+		-w /stable_diffusion/vae_decoder \
+		-v ${TOPDIR}:/dir \
 		mlperf_dlc_prepare \
 		/qnn_sdk/bin/x86_64-linux-clang/qnn-onnx-converter \
 			--input_network vae_decoder_onnx/vae_decoder.onnx \
@@ -1420,6 +2064,7 @@ ${DLCBUILDDIR}/vae_decoder_qnn.cpp: \
 			--bias_bitwidth 32 \
 			--quantization_overrides vae_decoder_onnx/vae_decoder.encodings \
 			--output_path /output/vae_decoder.cpp
+	touch $@
 
 ${DLCBUILDDIR}/vae_decoder_qnn_model_generator.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
@@ -1431,6 +2076,8 @@ ${DLCBUILDDIR}/vae_decoder_qnn_model_generator.stamp: \
         -e PYTHONPATH=/qnn_sdk/lib/python \
     	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
     	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/vae_decoder \
     	-u ${USERID}:${GROUPID} \
         mlperf_dlc_prepare \
 		/qnn_sdk/bin/x86_64-linux-clang/qnn-model-lib-generator \
@@ -1438,6 +2085,7 @@ ${DLCBUILDDIR}/vae_decoder_qnn_model_generator.stamp: \
 			-b /output/vae_decoder.bin \
 			-o /output/model_libs \
 			-t x86_64-linux-clang
+	touch $@
 	# vae-decoder lib generation completed
 
 ${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator.stamp: \
@@ -1451,19 +2099,180 @@ ${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator.stamp: \
         -e PYTHONPATH=/qnn_sdk/lib/python \
     	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
     	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/vae_decoder \
+    	-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libvae_decoder.so \
+			--binary_file /output/vae_decoder.serialized
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
+	cp ${DLCBUILDDIR}/vae_decoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
+	touch $@
+	# VAE context binary generation completed
+
+${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v75.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/vae_decoder_qnn_model_generator.stamp
+	# VAE-DECODER lib generation started
+	docker run \
+    	-v ${SNPE_SDK}:/qnn_sdk \
+    	-v ${VAEDECODER_MODEL_PATH}:/models \
+        -e PYTHONPATH=/qnn_sdk/lib/python \
+    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+    	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/vae_decoder \
     	-u ${USERID}:${GROUPID} \
         mlperf_dlc_prepare \
 		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
 			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
 			--model /output/model_libs/x86_64-linux-clang/libvae_decoder.so \
 			--binary_file /output/vae_decoder.serialized \
-			--config_file /models/mcp_config.json
-	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion
-	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
-	cp ${DLCBUILDDIR}/vae_decoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion/.
-	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
-	chmod -R 777 ${DLCBUILDDIR}/stable_diffusion
-	# VAE context binary generation completed
+			--config_file /models/mcp_config_v75.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	cp ${DLCBUILDDIR}/vae_decoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v75/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	touch $@
+	# VAE context binary generation completed for v75
+
+${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v79.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/vae_decoder_qnn_model_generator.stamp
+	# VAE-DECODER lib generation started
+	docker run \
+    	-v ${SNPE_SDK}:/qnn_sdk \
+    	-v ${VAEDECODER_MODEL_PATH}:/models \
+        -e PYTHONPATH=/qnn_sdk/lib/python \
+    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+    	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/vae_decoder \
+    	-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libvae_decoder.so \
+			--binary_file /output/vae_decoder.serialized \
+			--config_file /models/mcp_config_v79.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	cp ${DLCBUILDDIR}/vae_decoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v79/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	touch $@
+	# VAE context binary generation completed for v79
+
+${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v73_sd8sG4.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/vae_decoder_qnn_model_generator.stamp
+	# VAE-DECODER lib generation started
+	docker run \
+    	-v ${SNPE_SDK}:/qnn_sdk \
+    	-v ${VAEDECODER_MODEL_PATH}:/models \
+        -e PYTHONPATH=/qnn_sdk/lib/python \
+    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+    	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/vae_decoder \
+    	-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libvae_decoder.so \
+			--binary_file /output/vae_decoder.serialized \
+			--config_file /models/mcp_config_v73_sd8sG4.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	cp ${DLCBUILDDIR}/vae_decoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	# VAE context binary generation completed for v73 sd8sG4
+
+${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v73_sd7G4.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/vae_decoder_qnn_model_generator.stamp
+	# VAE-DECODER lib generation started
+	docker run \
+    	-v ${SNPE_SDK}:/qnn_sdk \
+    	-v ${VAEDECODER_MODEL_PATH}:/models \
+        -e PYTHONPATH=/qnn_sdk/lib/python \
+    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+    	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/vae_decoder \
+    	-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libvae_decoder.so \
+			--binary_file /output/vae_decoder.serialized \
+			--config_file /models/mcp_config_v73_sd7G4.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
+	cp ${DLCBUILDDIR}/vae_decoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
+	# VAE context binary generation completed for v73 sd7G4
+
+${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v81_sd8eliteG5.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/vae_decoder_qnn_model_generator.stamp
+	# VAE-DECODER lib generation started
+	docker run \
+		-v ${SNPE_SDK}:/qnn_sdk \
+		-v ${VAEDECODER_MODEL_PATH}:/models \
+		-e PYTHONPATH=/qnn_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+		-w /stable_diffusion/vae_decoder \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libvae_decoder.so \
+			--binary_file /output/vae_decoder.serialized \
+			--config_file /models/mcp_config_v81_sd8eliteG5.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	cp ${DLCBUILDDIR}/vae_decoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	touch $@
+	# VAE context binary generation completed for v81 sd8eliteG5
+
+${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v81_sd8G5.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/vae_decoder_qnn_model_generator.stamp
+	# VAE-DECODER lib generation started
+	docker run \
+		-v ${SNPE_SDK}:/qnn_sdk \
+		-v ${VAEDECODER_MODEL_PATH}:/models \
+		-e PYTHONPATH=/qnn_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+		-w /stable_diffusion/vae_decoder \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libvae_decoder.so \
+			--binary_file /output/vae_decoder.serialized \
+			--config_file /models/mcp_config_v81_sd8G5.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	cp ${DLCBUILDDIR}/vae_decoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	touch $@
+	# VAE context binary generation completed for v81 sd8G5
 
 ${DLCBUILDDIR}/unet_qnn.cpp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
@@ -1489,6 +2298,7 @@ ${DLCBUILDDIR}/unet_qnn.cpp: \
 			--bias_bitwidth 32 \
 			--quantization_overrides unet_onnx_batch_1/unet.encodings \
 			--output_path /output/unet.cpp
+	touch $@
 
 ${DLCBUILDDIR}/unet_qnn_model_generator.stamp: \
 		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
@@ -1500,6 +2310,8 @@ ${DLCBUILDDIR}/unet_qnn_model_generator.stamp: \
         -e PYTHONPATH=/qnn_sdk/lib/python \
     	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
     	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/unet \
     	-u ${USERID}:${GROUPID} \
         mlperf_dlc_prepare \
 		/qnn_sdk/bin/x86_64-linux-clang/qnn-model-lib-generator \
@@ -1508,6 +2320,7 @@ ${DLCBUILDDIR}/unet_qnn_model_generator.stamp: \
 			-o /output/model_libs \
 			-t x86_64-linux-clang \
 			-t aarch64-android
+	touch $@
 	# UNET lib generation completed
 
 ${DLCBUILDDIR}/unet_qnn_context_binary_generator.stamp: \
@@ -1521,19 +2334,181 @@ ${DLCBUILDDIR}/unet_qnn_context_binary_generator.stamp: \
         -e PYTHONPATH=/qnn_sdk/lib/python \
     	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
     	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/unet \
+    	-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libunet.so \
+			--binary_file /output/unet.serialized
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
+	cp ${DLCBUILDDIR}/unet.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
+	touch $@
+	# UNET context binary generation completed
+
+${DLCBUILDDIR}/unet_qnn_context_binary_generator_v75.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/unet_qnn_model_generator.stamp
+	# UNET context binary generation started
+	docker run \
+    	-v ${SNPE_SDK}:/qnn_sdk \
+    	-v ${UNET_MODEL_PATH}:/models \
+        -e PYTHONPATH=/qnn_sdk/lib/python \
+    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+    	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/unet \
     	-u ${USERID}:${GROUPID} \
         mlperf_dlc_prepare \
 		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
 			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
 			--model /output/model_libs/x86_64-linux-clang/libunet.so \
 			--binary_file /output/unet.serialized \
-			--config_file /models/mcp_config.json
-	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion
-	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
-	cp ${DLCBUILDDIR}/unet.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion/.
-	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
-	chmod -R 777 ${DLCBUILDDIR}/stable_diffusion
-	# UNET context binary generation completed
+			--config_file /models/mcp_config_v75.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	cp ${DLCBUILDDIR}/unet.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v75/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v75
+	touch $@
+	# UNET context binary generation completed for v75
+
+${DLCBUILDDIR}/unet_qnn_context_binary_generator_v79.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/unet_qnn_model_generator.stamp
+	# UNET context binary generation started
+	docker run \
+    	-v ${SNPE_SDK}:/qnn_sdk \
+    	-v ${UNET_MODEL_PATH}:/models \
+        -e PYTHONPATH=/qnn_sdk/lib/python \
+    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+    	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/unet \
+    	-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libunet.so \
+			--binary_file /output/unet.serialized \
+			--config_file /models/mcp_config_v79.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	cp ${DLCBUILDDIR}/unet.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v79/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v79
+	touch $@
+	# UNET context binary generation completed for v79
+
+${DLCBUILDDIR}/unet_qnn_context_binary_generator_v73_sd8sG4.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/unet_qnn_model_generator.stamp
+	# UNET context binary generation started
+	docker run \
+    	-v ${SNPE_SDK}:/qnn_sdk \
+    	-v ${UNET_MODEL_PATH}:/models \
+        -e PYTHONPATH=/qnn_sdk/lib/python \
+    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+    	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/unet \
+    	-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libunet.so \
+			--binary_file /output/unet.serialized \
+			--config_file /models/mcp_config_v73_sd8sG4.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	cp ${DLCBUILDDIR}/unet.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd8sG4
+	# UNET context binary generation completed for v73 sd8sG4
+
+${DLCBUILDDIR}/unet_qnn_context_binary_generator_v73_sd7G4.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/unet_qnn_model_generator.stamp
+	# UNET context binary generation started
+	docker run \
+    	-v ${SNPE_SDK}:/qnn_sdk \
+    	-v ${UNET_MODEL_PATH}:/models \
+        -e PYTHONPATH=/qnn_sdk/lib/python \
+    	-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+    	-v ${DLCBUILDDIR}:/output \
+    	-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+    	-w /stable_diffusion/unet \
+    	-u ${USERID}:${GROUPID} \
+        mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libunet.so \
+			--binary_file /output/unet.serialized \
+			--config_file /models/mcp_config_v73_sd7G4.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
+	cp ${DLCBUILDDIR}/unet.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
+	# UNET context binary generation completed for v73 sd7G4
+
+${DLCBUILDDIR}/unet_qnn_context_binary_generator_v81_sd8eliteG5.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/unet_qnn_model_generator.stamp
+	# UNET context binary generation started
+	docker run \
+		-v ${SNPE_SDK}:/qnn_sdk \
+		-v ${UNET_MODEL_PATH}:/models \
+		-e PYTHONPATH=/qnn_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+		-w /stable_diffusion/unet \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libunet.so \
+			--binary_file /output/unet.serialized \
+			--config_file /models/mcp_config_v81_sd8eliteG5.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	cp ${DLCBUILDDIR}/unet.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
+	touch $@
+	# UNET context binary generation completed for v81 sd8eliteG5
+
+${DLCBUILDDIR}/unet_qnn_context_binary_generator_v81_sd8G5.stamp: \
+		${DLCBUILDDIR}/mlperf_dlc_prepare_docker.stamp \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/unet_qnn_model_generator.stamp
+	# UNET context binary generation started
+	docker run \
+		-v ${SNPE_SDK}:/qnn_sdk \
+		-v ${UNET_MODEL_PATH}:/models \
+		-e PYTHONPATH=/qnn_sdk/lib/python \
+		-e LD_LIBRARY_PATH=/usr/local/clang-9.0.0/lib:qnn_sdk/lib/x86_64-linux-clang:${LD_LIBRARY_PATH} \
+		-v ${DLCBUILDDIR}:/output \
+		-v ${DLCBUILDDIR}/stable_diffusion/:/stable_diffusion \
+		-w /stable_diffusion/unet \
+		-u ${USERID}:${GROUPID} \
+		mlperf_dlc_prepare \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libunet.so \
+			--binary_file /output/unet.serialized \
+			--config_file /models/mcp_config_v81_sd8G5.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	cp ${DLCBUILDDIR}/unet.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	touch $@
+	# UNET context binary generation completed for v81 sd8G5
+
 
 ####################################################################################
 # CALIBRATION / QUANTIZATION
@@ -1684,6 +2659,7 @@ gen-htp-dlc-info: \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilenet_v4_htp.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/ssd_mobiledet_qat_htp.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilenet_v4_htp_batched_4.dlc && \
+			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilenet_v4_htp_batched_8_sm8850.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobile_mosaic_htp.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/snusr_htp.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilebert_quantized_htp.dlc'

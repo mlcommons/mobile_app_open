@@ -122,6 +122,50 @@ static void process_config(const mlperf_backend_configuration_t *configs,
         backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
         perfProfile = "burst";
       }
+    } else if (strcmp(configs->keys[i], "bus_voltage_start") == 0) {
+      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_MIN_START"] =
+          configs->values[i];
+      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_TARGET_START"] =
+          configs->values[i];
+      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_MAX_START"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "core_voltage_start") == 0) {
+      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_MIN_START"] =
+          configs->values[i];
+      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_TARGET_START"] =
+          configs->values[i];
+      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_MAX_START"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "bus_voltage_done") == 0) {
+      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_MIN_DONE"] =
+          configs->values[i];
+      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_TARGET_DONE"] =
+          configs->values[i];
+      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_MAX_DONE"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "bus_voltage_done") == 0) {
+      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_MIN_DONE"] =
+          configs->values[i];
+      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_TARGET_DONE"] =
+          configs->values[i];
+      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_MAX_DONE"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "hmx_voltage") == 0) {
+      backend_data->customPerfProfileMap_["DSP_HMX_VOLTAGE_CORNER_TARGET"] =
+          configs->values[i];
+      backend_data->customPerfProfileMap_["DSP_HMX_VOLTAGE_CORNER_MAX"] =
+          configs->values[i];
+      backend_data->customPerfProfileMap_["DSP_HMX_VOLTAGE_CORNER_MIN"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "hmx_clock_perf") == 0) {
+      backend_data->customPerfProfileMap_["DSP_HMX_CLOCK_PERF_MODE"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "dsp_start_sleep_latency") == 0) {
+      backend_data->customPerfProfileMap_["DSP_SLEEP_LATENCY_START_US"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "dsp_done_sleep_latency") == 0) {
+      backend_data->customPerfProfileMap_["DSP_SLEEP_LATENCY_DONE_US"] =
+          configs->values[i];
     } else if (strcmp(configs->keys[i], "profiling_level") == 0) {
       profileLevel = configs->values[i];
       if (std::strcmp(configs->values[i], "off") == 0) {
