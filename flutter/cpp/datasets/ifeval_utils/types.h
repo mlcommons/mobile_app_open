@@ -3,14 +3,18 @@
 
 #include <algorithm>
 #include <cctype>
+#include <codecvt>
+#include <locale>
 #include <regex>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 #include "compact_lang_det.h"
 #include "flutter/cpp/datasets/ifeval_utils/common.h"
+#include "flutter/cpp/datasets/ifeval_utils/english_stem.h"
+#include "flutter/cpp/datasets/ifeval_utils/irregular-plurals.h"
 #include "flutter/cpp/datasets/ifeval_utils/json.h"
 
 namespace mlperf {
@@ -281,7 +285,7 @@ class MultipleSections : public Instruction {
                                                const std::string& delim) const {
     if (delim.empty()) return {s};
     std::vector<std::string> parts;
-    size_t start = s.find(delim, start);
+    size_t start = s.find(delim);
     while (true) {
       if (start == std::string::npos) break;
       size_t pos = s.find(delim, start + delim.size());
@@ -435,62 +439,132 @@ class Frequency : public Instruction {
   int n_;
   std::string kw_;
   Relation rel_;
+  mutable stemming::english_stem<> stemmer;
 
-  static inline std::string RegexEscape(const std::string& s) {
-    auto is_meta = [](unsigned char ch) {
-      switch (ch) {
-        case '^':
-        case '$':
-        case '.':
-        case '|':
-        case '?':
-        case '*':
-        case '+':
-        case '(':
-        case ')':
-        case '[':
-        case ']':
-        case '{':
-        case '}':
-        case '\\':
-          return true;
-        default:
-          return false;
+  std::wstring to_wstring_utf8(const std::string& s) const {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+    return conv.from_bytes(s);
+  }
+
+  std::string to_string_utf8(const std::wstring& ws) const {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+    return conv.to_bytes(ws);
+  }
+
+  inline std::string getStem(const std::string& word) const {
+    std::wstring wwordStem(to_wstring_utf8(word));
+    stemmer(wwordStem);
+    std::string wordStem(to_string_utf8(wwordStem));
+    return wordStem;
+  }
+
+  static inline std::string getIrregularPlural(const std::string& word) {
+    auto it = pluralMap.find(word);
+    return it != pluralMap.end() ? it->second : word;
+  }
+
+  static inline std::string getIrregularSingular(const std::string& word) {
+    auto it = singularMap.find(word);
+    return it != singularMap.end() ? it->second : word;
+  }
+
+  // FIXME this potentially doesn't count "try" if the keyword is "trying",
+  // solution involves stemming the entire text
+  inline std::size_t CountKeywordOccurrences(const std::string& text,
+                                             const std::string& keyword) const {
+    size_t count{0};
+    bool hasStem{false}, stemSubstring{false}, hasPlural{false},
+        hasSingular{false};
+
+    std::string keyword_base = tolower(keyword);
+    std::string keyword_stem = getStem(keyword_base);
+    std::string keyword_plural = getIrregularPlural(keyword_base);
+    std::string keyword_singular;
+    hasStem = keyword_stem != keyword_base;
+    stemSubstring = keyword_base.find(keyword_stem) != std::string::npos;
+    // if the irregular plural can be stemmed to the keyword or vice versa, it
+    // should be handled by the stemming logic
+    hasPlural =
+        keyword_plural != keyword && getStem(keyword_plural) != keyword_stem;
+    if (!hasPlural) {
+      keyword_singular = getIrregularSingular(keyword_base);
+      hasSingular = keyword_singular != keyword_base &&
+                    getStem(keyword_singular) != keyword_stem;
+    }
+    std::string search_keyword = stemSubstring ? keyword_stem : keyword_base;
+
+    size_t pos = 0;
+    std::string found;
+    // count keywords by matching the smallest possible substring of the
+    // keyword, expanding it, and comparing to possible variants.
+    while ((pos = find_containing_word(text, search_keyword, found, pos)) !=
+           std::string::npos) {
+      bool match = false;
+      found = tolower(found);
+      // Exact match, Hooray!
+      if (found == keyword_base) match = true;
+      std::string foundStem = getStem(found);
+      // stem match to original keyword (looking for "word", found "words" or
+      // "wording")
+      if (!match && foundStem == keyword_base) match = true;
+      if (!match && hasStem && stemSubstring) {
+        // match to stemmed keyword (original keyword is "words", found "word")
+        if (found == keyword_stem) match = true;
+        // stem match to stemmed keyword (original keyword is "words", found
+        // "wording")
+        else if (foundStem != found && foundStem == keyword_stem)
+          match = true;
       }
-    };
 
-    std::string out;
-    out.reserve(s.size() * 2);
-    for (unsigned char c : s) {
-      if (is_meta(c)) out.push_back('\\');
-      out.push_back(static_cast<char>(c));
+      if (match) count++;
+      pos += found.size();
     }
-    return out;
-  }
-
-  // Build a regex that matches the keyword with custom token boundaries.
-  // Left boundary is (^|[^A-Za-z0-9_]) to avoid lookbehind.
-  // Right boundary uses a lookahead (?=$|[^A-Za-z0-9_]).
-  static inline std::regex MakeKeywordRegex(const std::string& keyword) {
-    const std::string kw = RegexEscape(keyword);
-    const std::string pat =
-        "(^|[^A-Za-z0-9_])"  // left boundary (consumes 1 char or start)
-        "(?:" +
-        kw +
-        ")"                     // keyword literal
-        "(?=$|[^A-Za-z0-9_])";  // right boundary (zero-width lookahead)
-    return std::regex(pat, std::regex::icase);
-  }
-
-  static inline std::size_t CountKeywordOccurrences(
-      const std::string& text, const std::string& keyword) {
-    const std::regex rx = MakeKeywordRegex(keyword);
-    std::size_t count = 0;
-    for (auto it = std::sregex_iterator(text.begin(), text.end(), rx),
-              end = std::sregex_iterator();
-         it != end; ++it) {
-      ++count;
+    // the stem's lettering differs from the original (words that end with 'y')
+    if (hasStem && !stemSubstring) {
+      pos = 0;
+      while ((pos = find_containing_word(text, keyword_stem, found, pos)) !=
+             std::string::npos) {
+        found = tolower(found);
+        // stem match to stemmed keyword (original keyword is "try" (stemmed to
+        // "tri"), found "tries") since this loop only runs if stem differs from
+        // the keyword, we can safely assume no overlap occurs with the first
+        // loop.
+        if (getStem(found) == keyword_stem) count++;
+        pos += found.size();
+      }
     }
+    // count instances of irregular plurals not caught by the first loop
+    // this assumes that the plural doesn't stem to the original word (plural
+    // "children" isn't irregular since it stems to kw "child")
+    if (hasPlural) {
+      pos = 0;
+      while ((pos = find_containing_word(text, keyword_plural, found, pos)) !=
+             std::string::npos) {
+        found = tolower(found);
+        // match to pluralized keyword (original keyword is "mouse", found
+        // "mice")
+        if (found == keyword_plural) count++;
+        pos += found.size();
+
+        // plural match to pluralized keyword is the same as an exact match.
+      }
+    }
+    // count instances of irregular singulars not caught by the first loop
+    // this assumes that the keyword doesn't stem to the singular (kw "children"
+    // isn't irregular since it stems to singular "child")
+    if (hasSingular) {
+      pos = 0;
+      while ((pos = find_containing_word(text, keyword_singular, found, pos)) !=
+             std::string::npos) {
+        found = tolower(found);
+        // match to singular keyword (original keyword is "mice", found "mouse")
+        if (found == keyword_singular) count++;
+        pos += found.size();
+
+        // singular match to singularized keyword is the same as an exact match.
+      }
+    }
+
     return count;
   }
 
@@ -634,15 +708,13 @@ class NumberSentences : public Instruction {
 
   inline std::string word_before_dot(const std::string& s, size_t i) const {
     size_t start = i;
-    while (start > 0 && std::isalpha((unsigned char)s[start - 1]))
-      start--;
+    while (start > 0 && std::isalpha((unsigned char)s[start - 1])) start--;
     return s.substr(start, i - start);
   }
 
   inline std::string word_after_dot(const std::string& s, size_t i) const {
     size_t end = i + 1;
-    while (end < s.size() && std::isalpha((unsigned char)s[end]))
-      end++;
+    while (end < s.size() && std::isalpha((unsigned char)s[end])) end++;
     return s.substr(i + 1, end - (i + 1));
   }
 
@@ -667,7 +739,8 @@ class NumberSentences : public Instruction {
 
     // check if followed by another X. for first '.'
     if (count == 1) {
-      if (i + 2 < s.size() && std::isupper((unsigned char)s[i + 1]) && s[i + 2] == '.') {
+      if (i + 2 < s.size() && std::isupper((unsigned char)s[i + 1]) &&
+          s[i + 2] == '.') {
         count = 2;
       }
     }
@@ -677,16 +750,13 @@ class NumberSentences : public Instruction {
 
   bool is_latin_abbrev(const std::string& s, size_t i) const {
     if (i < 3) return false;
-    return std::islower((unsigned char)s[i - 3]) &&
-           s[i - 2] == '.' &&
-           std::islower((unsigned char)s[i - 1]) &&
-           s[i] == '.';
+    return std::islower((unsigned char)s[i - 3]) && s[i - 2] == '.' &&
+           std::islower((unsigned char)s[i - 1]) && s[i] == '.';
   }
 
   bool is_title_abbrev(const std::string& s, size_t i) const {
     static const std::unordered_set<std::string> titles = {
-        "Mr", "Mrs", "Ms", "Dr", "Prof", "Sr", "Jr"
-    };
+        "Mr", "Mrs", "Ms", "Dr", "Prof", "Sr", "Jr"};
 
     std::string word = word_before_dot(s, i);
     return !word.empty() && titles.count(word) != 0;
@@ -695,7 +765,7 @@ class NumberSentences : public Instruction {
   bool is_enumeration_prefix(const std::string& s, size_t i) const {
     if (i == 0) return false;
 
-            // Must be followed by space or newline
+    // Must be followed by space or newline
     if (i + 1 >= s.size() || (s[i + 1] != ' ' && s[i + 1] != '\n'))
       return false;
 
@@ -709,29 +779,26 @@ class NumberSentences : public Instruction {
     // TODO roman numerals maybe?
     // ---- Letter enumeration: a. / A. ----
     else if (is_letter(s[start]) && start > 0 && is_letter(s[start - 1]))
-        return false;
+      return false;
 
     // General check
     if (start == 0) return true;
 
     char prev = s[start - 1];
-    if (prev == ' ' || prev == '\n' || is_mark(prev))
-      return true;
+    if (prev == ' ' || prev == '\n' || is_mark(prev)) return true;
 
     return false;
   }
 
   bool is_domain_suffix(const std::string& s, size_t i) const {
     static const std::unordered_set<std::string> tlds = {
-        "com", "net", "org", "io", "gov", "edu", "me"
-    };
+        "com", "net", "org", "io", "gov", "edu", "me"};
 
     if (i + 1 >= s.size()) return false;
 
     std::string suffix = word_after_dot(s, i);
     return tlds.count(suffix) != 0;
   }
-
 
   bool is_decimal_point(const std::string& s, size_t i) const {
     // digit '.' digit
@@ -740,19 +807,19 @@ class NumberSentences : public Instruction {
   }
 
   bool is_abbreviation(const std::string& s, size_t i) const {
-    return is_initialism(s, i) || is_latin_abbrev(s, i) || is_title_abbrev(s, i);
+    return is_initialism(s, i) || is_latin_abbrev(s, i) ||
+           is_title_abbrev(s, i);
   }
 
   bool abbreviation_blocks_sentence(const std::string& s, size_t i) const {
     if (!is_abbreviation(s, i)) return false;
 
-            // skip spaces
+    // skip spaces
     size_t j = i + 1;
     while (j < s.size() && s[j] == ' ') j++;
 
-            // If next token is lowercase, it's mid-sentence
-    if (j < s.size() && std::islower((unsigned char)s[j]))
-      return true;
+    // If next token is lowercase, it's mid-sentence
+    if (j < s.size() && std::islower((unsigned char)s[j])) return true;
 
     return false;
   }
@@ -763,8 +830,7 @@ class NumberSentences : public Instruction {
     if (!is_mark(c)) return false;
 
     // collapse runs ?!...
-    if (i + 1 < s.size() && is_mark(s[i + 1]))
-      return false;
+    if (i + 1 < s.size() && is_mark(s[i + 1])) return false;
 
     if (c == '.') {
       if (is_decimal_point(s, i)) return false;

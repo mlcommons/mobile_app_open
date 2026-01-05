@@ -24,6 +24,10 @@ cc_library(
         "common.h",
         "json.h",
         "types.h",
+        "english_stem.h",
+        "stemming.h",
+        "common_lang_constants.h",
+        "irregular-plurals.h",
     ],
     copts = select({
         "//flutter/android/commonlibs:use_asan": [

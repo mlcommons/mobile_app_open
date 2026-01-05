@@ -35,6 +35,16 @@ inline std::string tolower(std::string s) {
   return s;
 }
 
+inline std::string to_lower_ascii(std::string s) {
+  for (char& c : s)
+    c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+  return s;
+}
+
+inline bool is_word_char(unsigned char c) {
+  return std::isalnum(c) || c == '_';
+}
+
 inline bool contains_string(const std::string& text,
                             const std::string& substring) {
   std::string h = tolower(text), n = tolower(substring);
@@ -60,14 +70,6 @@ inline bool starts_with(const std::string& s, const std::string& prf,
 inline bool contains_word(const std::string& text, const std::string& word) {
   if (word.empty()) return false;
 
-  auto to_lower_ascii = [](std::string s) {
-    for (char& c : s) c = std::tolower(static_cast<unsigned char>(c));
-    return s;
-  };
-  auto is_word_char = [](unsigned char c) {
-    return std::isalnum(c) || c == '_';  // match std::regex \b notion of "word"
-  };
-
   std::string t = to_lower_ascii(text);
   std::string w = to_lower_ascii(word);
 
@@ -90,6 +92,39 @@ inline bool contains_none(const std::string& text,
   for (const auto& w : words)
     if (contains_word(text, w)) return false;
   return true;
+}
+
+inline size_t find_containing_word(const std::string& text,
+                                   const std::string& keyword,
+                                   std::string& containing_word, size_t pos) {
+  if (keyword.empty() || pos >= text.size()) return std::string::npos;
+
+  std::string t = to_lower_ascii(text);
+  std::string k = to_lower_ascii(keyword);
+
+  if ((pos = t.find(k, pos)) == std::string::npos) return std::string::npos;
+
+  // Expand left to word boundary
+  size_t start = pos;
+  while (start > 0 && is_word_char(static_cast<unsigned char>(t[start - 1]))) {
+    --start;
+  }
+
+  // Expand right to word boundary
+  size_t end = pos + k.size();
+  while (end < t.size() && is_word_char(static_cast<unsigned char>(t[end]))) {
+    ++end;
+  }
+
+  // Extract original (not lowercased) word
+  containing_word = text.substr(start, end - start);
+  return start;
+}
+
+inline size_t find_containing_word(const std::string& text,
+                                   const std::string& keyword,
+                                   std::string& out_word) {
+  return find_containing_word(text, keyword, out_word, 0);
 }
 
 inline std::string remove_font_modifiers(const std::string& s) {
