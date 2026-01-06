@@ -123,7 +123,7 @@ Future<void> showErrorDialog(
 
 Future<void> showResourceMissingDialog(
     BuildContext context, List<String> messages,
-    {Benchmark? benchmark}) async {
+    {Benchmark? benchmark, BenchmarkSet? benchmarkSet}) async {
   final l10n = AppLocalizations.of(context)!;
 
   Icon icon = const Icon(Icons.warning_amber_rounded,
@@ -170,8 +170,11 @@ Future<void> showResourceMissingDialog(
               Text(benchmark != null
                   ? l10n.dialogContentMissingFiles
                       .replaceAll('<name>', benchmark.info.taskName)
-                  : l10n.dialogContentMissingFiles
-                      .replaceAll('<name>', l10n.benchNameVarious)),
+                  : benchmarkSet != null
+                      ? l10n.dialogContentMissingFiles
+                          .replaceAll('<name>', benchmarkSet.config.name)
+                      : l10n.dialogContentMissingFiles
+                          .replaceAll('<name>', l10n.benchNameVarious)),
             ],
           ),
         ),
@@ -198,7 +201,11 @@ Future<void> showResourceMissingDialog(
                       MaterialPageRoute(
                         builder: (context) => ResourcesScreen(
                           autoStart: true,
-                          singleBenchmarkDownload: benchmark,
+                          benchmarksToDownload: (benchmark != null
+                              ? <Benchmark>[benchmark]
+                              : benchmarkSet?.benchmarks
+                                  .where((e) => e.isActive)
+                                  .toList()),
                         ),
                       ),
                     );

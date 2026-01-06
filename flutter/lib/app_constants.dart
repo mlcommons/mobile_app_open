@@ -22,7 +22,7 @@ class BenchmarkId {
   static const imageSegmentationV2 = 'image_segmentation_v2';
   static const naturalLanguageProcessing = 'natural_language_processing';
   static const superResolution = 'super_resolution';
-  static const imageClassificationV2 = 'image_classification_v2';
+  static const imageClassificationV2 = 'image_classification_online_v2';
   static const imageClassificationOfflineV2 = 'image_classification_offline_v2';
   static const stableDiffusion = 'stable_diffusion';
   static const llm = 'llm';

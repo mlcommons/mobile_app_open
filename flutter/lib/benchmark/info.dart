@@ -27,6 +27,11 @@ class BenchmarkInfo {
 
   BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
     switch (task.id) {
+      case (BenchmarkId.llm):
+        return BenchmarkLocalizationInfo(
+            name: "LLM",
+            detailsTitle: "Large Language Model",
+            detailsContent: "you know what ChatGPT is...");
       case (BenchmarkId.imageClassificationV2):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameImageClassification,

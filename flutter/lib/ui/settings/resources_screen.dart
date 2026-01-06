@@ -15,10 +15,10 @@ import 'package:mlperfbench/ui/nil.dart';
 
 class ResourcesScreen extends StatefulWidget {
   final bool autoStart;
-  final Benchmark? singleBenchmarkDownload;
+  final List<Benchmark>? benchmarksToDownload;
 
   const ResourcesScreen(
-      {this.autoStart = false, this.singleBenchmarkDownload, super.key});
+      {this.autoStart = false, this.benchmarksToDownload, super.key});
 
   @override
   State<ResourcesScreen> createState() => _ResourcesScreen();
@@ -38,9 +38,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await state.loadResources(
           downloadMissing: true,
-          benchmarks: widget.singleBenchmarkDownload != null
-              ? [widget.singleBenchmarkDownload!]
-              : state.activeBenchmarks,
+          benchmarks: widget.benchmarksToDownload ?? state.activeBenchmarks,
         );
         if (state.error != null) {
           if (!mounted) return;
