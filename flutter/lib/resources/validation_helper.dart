@@ -36,13 +36,14 @@ class ValidationHelper {
     return errorDescription; // + missing.mapIndexed((i, element) => '\n${i + 1}) $element').join();
   }
 
+  // TODO progress could be added here for verification dialog
   Future<String> validateChecksum(String errorDescription) async {
     final resources = benchmarkStore.listResources(
       modes: selectedRunModes,
       benchmarks: benchmarkStore.activeBenchmarks,
     );
     final checksumFailed =
-        await resourceManager.validateResourcesChecksum(resources);
+        await resourceManager.validateResourcesChecksum(resources, (_,__){});
     if (checksumFailed.isEmpty) return '';
     final mismatchedPaths = checksumFailed.map((e) => '\n${e.path}').join();
     return errorDescription + mismatchedPaths;
