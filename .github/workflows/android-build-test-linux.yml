@@ -108,21 +108,23 @@ jobs:
           project_id: mobile-app-build-290400
       - name: Download Samsung libraries
         env:
-          SAMSUNG_LIB: samsung_libs_v5.0_20250906
+          SAMSUNG_LIB: samsung_libs_v5.0.1_20251217
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v5.0/${SAMSUNG_LIB}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v5.0.1/${SAMSUNG_LIB}.zip /tmp/ && \
           unzip /tmp/${SAMSUNG_LIB}.zip -d /tmp/${SAMSUNG_LIB} && \
           rm /tmp/${SAMSUNG_LIB}.zip && \
           mkdir -p mobile_back_samsung/samsung/lib/internal && \
           mv /tmp/${SAMSUNG_LIB}/* mobile_back_samsung/samsung/lib/internal/
+          ls mobile_back_samsung/samsung/lib/internal/*
       - name: Download QTI SDK
         env:
-          QTI_SDK: qairt-2.29.0.241129-linux
+          QTI_SDK: qairt-v2.40.0.251030-linux
         run: |
           gsutil cp gs://mobile-app-build-290400_github-actions/lib/v5.0/${QTI_SDK}.zip /tmp/ && \
           unzip /tmp/${QTI_SDK}.zip -d /tmp/${QTI_SDK} && \
           rm /tmp/${QTI_SDK}.zip && \
           mv /tmp/${QTI_SDK}/* mobile_back_qti/
+          ls mobile_back_qti/*
       - name: Download QTI libraries
         env:
           QTI_LIB: StableDiffusionShared.0.1.1.250124
@@ -131,6 +133,7 @@ jobs:
           unzip /tmp/${QTI_LIB}.zip -d /tmp/${QTI_LIB} && \
           rm /tmp/${QTI_LIB}.zip && \
           mv /tmp/${QTI_LIB}/* mobile_back_qti/cpp/backend_qti/StableDiffusionShared/
+          ls mobile_back_qti/cpp/backend_qti/StableDiffusionShared/*
       - name: Cache bazel
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -271,7 +274,9 @@ jobs:
 
   test-android-apk-unified:
     name: ${{ matrix.backend }}-${{ matrix.device }} (unified)
-    needs: [ build-android-apk, computed ]
+    needs:
+      - computed
+      - build-android-apk
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
@@ -351,8 +356,10 @@ jobs:
   test-android-apk-unified-extended:
     name: ${{ matrix.backend }}-${{ matrix.device }} (unified-extended)
     needs:
-      - build-android-apk
       - computed
+      - build-android-apk
+      - test-android-apk-unified
+    if: github.ref == 'refs/heads/master' || vars.EXTENDED_TESTS_ON_PR == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:

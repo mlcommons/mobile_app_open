@@ -19,6 +19,7 @@ limitations under the License.
 #include <unordered_map>
 #include <vector>
 
+#include "DlSystem/DlEnums.hpp"
 #include "SNPE/PSNPE.h"
 #include "SNPE/SNPE.h"
 #include "allocator.h"
@@ -28,6 +29,100 @@ limitations under the License.
 #ifdef STABLEDIFFUSION_FLAG
 #include "StableDiffusionShared/include/QnnApiHelpers.hpp"
 #endif
+
+static std::unordered_map<std::string, DlSystem::DspPerfPowerMode_t>
+    powerModeMap(
+        {{"SNPE_DSP_PERF_INFRASTRUCTURE_POWERMODE_ADJUST_UP_DOWN",
+          DlSystem::DspPerfPowerMode_t::
+              DSP_PERF_INFRASTRUCTURE_POWERMODE_ADJUST_UP_DOWN},
+         {"SNPE_DSP_PERF_INFRASTRUCTURE_POWERMODE_ADJUST_ONLY_UP",
+          DlSystem::DspPerfPowerMode_t::
+              DSP_PERF_INFRASTRUCTURE_POWERMODE_ADJUST_ONLY_UP},
+         {"SNPE_DSP_PERF_INFRASTRUCTURE_POWERMODE_POWER_SAVER_MODE",
+          DlSystem::DspPerfPowerMode_t::
+              DSP_PERF_INFRASTRUCTURE_POWERMODE_POWER_SAVER_MODE},
+         {"SNPE_DSP_PERF_INFRASTRUCTURE_POWERMODE_POWER_SAVER_AGGRESSIVE_MODE",
+          DlSystem::DspPerfPowerMode_t::
+              DSP_PERF_INFRASTRUCTURE_POWERMODE_POWER_SAVER_AGGRESSIVE_MODE},
+         {"SNPE_DSP_PERF_INFRASTRUCTURE_POWERMODE_PERFORMANCE_MODE",
+          DlSystem::DspPerfPowerMode_t::
+              DSP_PERF_INFRASTRUCTURE_POWERMODE_PERFORMANCE_MODE},
+         {"SNPE_DSP_PERF_INFRASTRUCTURE_POWERMODE_DUTY_CYCLE_MODE",
+          DlSystem::DspPerfPowerMode_t::
+              DSP_PERF_INFRASTRUCTURE_POWERMODE_DUTY_CYCLE_MODE},
+         {"SNPE_DSP_PERF_INFRASTRUCTURE_POWERMODE_UNKNOWN",
+          DlSystem::DspPerfPowerMode_t::
+              DSP_PERF_INFRASTRUCTURE_POWERMODE_UNKNOWN}});
+
+static std::unordered_map<std::string, DlSystem::DspPerfVoltageCorner_t>
+    voltageCornerMap(
+        {{"SNPE_DCVS_VOLTAGE_CORNER_DISABLE",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_CORNER_DISABLE},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_MIN_VOLTAGE_CORNER",
+          DlSystem::DspPerfVoltageCorner_t::
+              DCVS_VOLTAGE_VCORNER_MIN_VOLTAGE_CORNER},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_SVS2",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_SVS2},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_SVS",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_SVS},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_SVS_PLUS",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_SVS_PLUS},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_NOM",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_NOM},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_NOM_PLUS",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_NOM_PLUS},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_TURBO",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_TURBO},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_TURBO_PLUS",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_TURBO_PLUS},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_MAX_VOLTAGE_CORNER",
+          DlSystem::DspPerfVoltageCorner_t::
+              DCVS_VOLTAGE_VCORNER_MAX_VOLTAGE_CORNER},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_TURBO_L1",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_TURBO_L1},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_TURBO_L2",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_TURBO_L2},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_TURBO_L3",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_TURBO_L3},
+         {"SNPE_DCVS_VOLTAGE_VCORNER_UNKNOWN",
+          DlSystem::DspPerfVoltageCorner_t::DCVS_VOLTAGE_VCORNER_UNKNOWN}});
+
+static std::unordered_map<std::string, DlSystem::DspHmx_ClkPerfMode_t>
+    hmxClkPerfModeMap({{"SNPE_HMX_CLK_PERF_HIGH",
+                        DlSystem::DspHmx_ClkPerfMode_t::HMX_CLK_PERF_HIGH},
+                       {"SNPE_HMX_CLK_PERF_LOW",
+                        DlSystem::DspHmx_ClkPerfMode_t::HMX_CLK_PERF_LOW}});
+
+static std::unordered_map<std::string, DlSystem::DspHmx_ExpVoltageCorner_t>
+    hmxVoltageCornerMap(
+        {{"SNPE_DCVS_EXP_VCORNER_DISABLE",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_DISABLE},
+         {"SNPE_DCVS_EXP_VCORNER_MIN",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_MIN},
+         {"SNPE_DCVS_EXP_VCORNER_LOW_SVS_D2",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D2},
+         {"SNPE_DCVS_EXP_VCORNER_LOW_SVS_D1",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D1},
+         {"SNPE_DCVS_EXP_VCORNER_LOW_SVS",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS},
+         {"SNPE_DCVS_EXP_VCORNER_SVS",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_SVS},
+         {"SNPE_DCVS_EXP_VCORNER_SVS_L1",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_SVS_L1},
+         {"SNPE_DCVS_EXP_VCORNER_NOM",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_NOM},
+         {"SNPE_DCVS_EXP_VCORNER_NOM_L1",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_NOM_L1},
+         {"SNPE_DCVS_EXP_VCORNER_TUR",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR},
+         {"SNPE_DCVS_EXP_VCORNER_TUR_L1",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L1},
+         {"SNPE_DCVS_EXP_VCORNER_TUR_L2",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L2},
+         {"SNPE_DCVS_EXP_VCORNER_TUR_L3",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L3},
+         {"SNPE_DCVS_EXP_VCORNER_MAX",
+          DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_MAX}});
 
 class snpe_handler {
  public:
@@ -62,6 +157,8 @@ class QTIBackendHelper {
   void get_accelerator_instances(int &numDSP, int &numGPU, int &numCPU,
                                  int &numGPU_FP16);
 
+  bool setupPerfHandle();
+
  public:
   enum QTIBufferType { FLOAT_32 = 0, UINT_8 = 1, INT_32 = 2 };
   const char *name_ = "snpe";
@@ -87,6 +184,8 @@ class QTIBackendHelper {
   Snpe_StringList_Handle_t networkInputTensorNamesHandle_;
   Snpe_StringList_Handle_t networkOutputTensorNamesHandle_;
   Snpe_PerformanceProfile_t perfProfile_;
+  Snpe_SNPEPerfProfile_Handle_t customPerfProfile_ = nullptr;
+  std::unordered_map<std::string, std::string> customPerfProfileMap_;
   Snpe_ProfilingLevel_t profilingLevel_;
   int32_t fd = -1;
   bool isTflite_;

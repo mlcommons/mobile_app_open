@@ -10,13 +10,15 @@
 /output_logs
 /datasets/output
 /datasets/downloads
+/mobile_back_qti/snpe-*
+/mobile_back_qti/qaisw-*
 *.so
-* .apk
-* .tflite
-* .dlc
-* .zip
-* .jar
-* .tgz
+*.apk
+*.tflite
+*.dlc
+*.zip
+*.jar
+*.tgz
 __pycache__/
 *.log
 *.iml

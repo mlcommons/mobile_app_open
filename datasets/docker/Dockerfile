@@ -47,7 +47,7 @@ RUN unzip /tmp/protoc-3.6.1-linux-x86_64.zip -d protoc3 && \
 RUN echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
 RUN curl --proto '=https' https://bazel.build/bazel-release.pub.gpg | apt-key add -
 RUN apt-get update && \
-    apt-get install -y -no-install-recommends --allow-unauthenticated bazel-3.7.2
+    apt-get install -y --no-install-recommends --allow-unauthenticated bazel-3.7.2
 RUN apt-get clean
 
 # Set timezone to UTC by default

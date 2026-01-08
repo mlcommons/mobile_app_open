@@ -12,25 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include <string>
-
-#ifndef MBE_CONFIG_H
-#define MBE_CONFIG_H
-
-/**
- * @file mbe_config.hpp
- * @brief description of benchmark_setting for samsung backend core
- * @date 2022-01-04
- * @author soobong Huh (soobong.huh@samsung.com)
- */
-
-#include "mbe_config_1200.hpp"
-#include "mbe_config_1300.hpp"
-#include "mbe_config_2100.hpp"
-#include "mbe_config_2200.hpp"
-#include "mbe_config_2300.hpp"
-#include "mbe_config_2400.hpp"
-#include "mbe_config_2500.hpp"
-#include "mbe_config_2600.hpp"
-
+#ifndef MBE_CONFIG_2600_H
+#define MBE_CONFIG_2600_H
+#include <mbe_config_2600.pbtxt.h>
 #endif
