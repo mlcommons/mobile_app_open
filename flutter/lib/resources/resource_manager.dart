@@ -144,6 +144,30 @@ class ResourceManager {
       }
       // delete downloaded archives to free up disk space
       await cacheManager.deleteArchives(internetPaths);
+
+      // After attempting downloads, check for missing local resources (e.g., accuracy datasets)
+      if (downloadMissing) {
+        final missingLocalResources = <String>[];
+        for (final resource in resources) {
+          if (!resource.path.startsWith(_dataPrefix)) continue;
+          final resolvedPath = get(resource.path);
+          if (resolvedPath.isEmpty) {
+            missingLocalResources.add(resource.path);
+            continue;
+          }
+          final exists = await File(resolvedPath).exists() ||
+              await Directory(resolvedPath).exists();
+          if (!exists) {
+            missingLocalResources.add(resource.path);
+          }
+        }
+        if (missingLocalResources.isNotEmpty) {
+          final dataFolder = getDataFolder();
+          final missingList =
+              missingLocalResources.map((e) => '\n - $e').join();
+          throw 'WARN: Some required files must be side-loaded.\nPlease copy the files to the application data folder and retry.\nMissing files:$missingList\nData folder:\n$dataFolder';
+        }
+      }
     } finally {
       _loadingPath = '';
       _loadingProgress = 1.0;

@@ -111,6 +111,8 @@ mlperf_backend_ptr_t mlperf_backend_create(
     backend_data_->useIonBuffers_ = useIonBuffer_g;
   }
 
+  CpuCtrl::init();
+
   if (backend_data->bgLoad_) {
     CpuCtrl::startLoad(backend_data->loadOffTime_, backend_data->loadOnTime_);
   }
@@ -121,8 +123,14 @@ mlperf_backend_ptr_t mlperf_backend_create(
     return backend_data;
   }
 
-  // use lowLatency cores for all snpe models
-  CpuCtrl::lowLatency();
+  // use high latency cores for SD8EliteG5 and low latency cores for other
+  // devices
+  if (Socs::get_soc_name() == "SD8EliteG5") {
+    CpuCtrl::highLatency();
+  } else {
+    CpuCtrl::lowLatency();
+  }
+
   set_system_paths(native_lib_path);
 
   std::string snpe_version = xverstr(SNPE_VERSION_STRING);
@@ -213,7 +221,6 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
     return tflite_backend_issue_query(backend_data->tfliteBackend_, callback,
                                       context);
   }
-
   if (backend_data->isStableDiffusion) {
     if (backend_data->executeSd()) {
       ret = MLPERF_SUCCESS;
@@ -227,8 +234,7 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
 #ifdef DEBUG_FLAG
   auto end = high_resolution_clock::now();
   auto duration = duration_cast<microseconds>(end - start);
-  LOG(INFO) << "Query cnt: " << backend_data->queryCount_
-            << "Inference Time(ms): " << duration.count();
+  LOG(INFO) << "Inference Time(ms): " << duration.count();
 #endif
   backend_data->queryCount_++;
   return ret;

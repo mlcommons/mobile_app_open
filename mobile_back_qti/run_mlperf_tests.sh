@@ -25,6 +25,7 @@ export models_path=""
 export usecase_name=""
 export mode=""
 export LD_LIBRARY_PATH=.
+export stable_diffusion_path=""
 
 # Below are the arguments and values to be passed to script in any order
 # use --dataset argument to pass dataset path as value
@@ -33,6 +34,7 @@ export LD_LIBRARY_PATH=.
 # valid values for --mode argument: performance, accuracy.
 # use --usecase argument to pass name of usecase to run as value (if not mentioned, by default runs all 8 usecases)
 # valid values for --usecase argument: image_classification_v2, object_detection, image_segmentation, language_understanding, super_resolution, image_classification_offline_v2
+# valid values for --sdpath argument: stable_diffusion, stable_diffusion_v73_sd7G4, stable_diffusion_v73_sd8sG4, stable_diffusion_v79, stable_diffusion_v75, stable_diffusion_v81_sd8eliteG5(default), stable_diffusion_v81_sd8G5
 
 while [[ $# -gt 0 ]]
 do
@@ -56,6 +58,11 @@ do
     export mode=$2
     shift 1
   fi
+  if [[ "$1" == "--sdpath" ]]
+  then
+    export stable_diffusion_path=$2
+    shift 1
+  fi
   shift 1
 done
 
@@ -69,6 +76,12 @@ if [[ "$models_path" == "" ]]
 then
     echo "set models path using --models"
     exit 1
+fi
+
+if [[ "$stable_diffusion_path" == "" ]]
+then
+    echo "--sdpath not set. Using stable_diffusion_v81_sd8eliteG5 path by default"
+    export stable_diffusion_path="stable_diffusion_v81_sd8eliteG5"
 fi
 
 if [[ "$mode" == "performance" || "$mode" == "" ]]
@@ -175,7 +188,7 @@ echo "####### Performance:: Stable diffusion in progress #######"
 export test_case=stable_diffusion
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL $test_case --mode=PerformanceOnly --input_tfrecord=$dataset_path/stable_diffusion/coco_gen_full.tfrecord --output_dir=$test_case$test_case_suffix --min_query_count=1024 --min_duration_ms=60000 --max_duration_ms=300000 --single_stream_expected_latency_ns=1000000  --model_file=$models_path/stable_diffusion --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL $test_case --mode=PerformanceOnly --input_tfrecord=$dataset_path/stable_diffusion/coco_gen_full.tfrecord --output_dir=$test_case$test_case_suffix --min_query_count=1024 --min_duration_ms=60000 --max_duration_ms=300000 --single_stream_expected_latency_ns=1000000  --model_file=$models_path/$stable_diffusion_path --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "90th percentile latency (ns)" $use_case_results_file >> $results_file
 grep "Result is" $use_case_results_file >> $results_file
@@ -256,7 +269,7 @@ echo "####### Accuracy:: Stable diffusion in progress #######"
 export test_case=stable_diffusion
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL $test_case --mode=AccuracyOnly --input_tfrecord=$dataset_path/stable_diffusion/coco_gen_test.tfrecord --input_clip_model=$models_path/stable_diffusion/clip_model_512x512.tflite --output_dir=$test_case$test_case_suffix --min_query_count=100 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000  --model_file=$models_path/stable_diffusion --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL $test_case --mode=AccuracyOnly --input_tfrecord=$dataset_path/stable_diffusion/coco_gen_test.tfrecord --input_clip_model=$models_path/stable_diffusion/clip_model_512x512.tflite --output_dir=$test_case$test_case_suffix --min_query_count=100 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000  --model_file=$models_path/$stable_diffusion_path --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "Accuracy" $use_case_results_file >> $results_file
 echo "####### Stable Diffusion is complete #######"
@@ -357,4 +370,3 @@ case $usecase_name in
     ;;
 esac
 fi
-

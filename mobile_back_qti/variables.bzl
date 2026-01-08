@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,12 @@ def _impl(repository_ctx):
     sdk_version = filepath[found.stdout.rfind("/") + 1:]
 
     print("Update SNPE version: " + sdk_version)  # buildifier: disable=print
-    repository_ctx.read(Label("@//:mobile_back_qti/qairt/" + sdk_version + "/ReleaseNotes.txt"))
+
+    found = repository_ctx.execute(["find", repository_ctx.attr.workspace_dir + "/mobile_back_qti/qairt/" + sdk_version, "maxdepth", "1", "-name", "QAIRT_ReleaseNotes.txt"])
+    if found.stdout != "":
+        repository_ctx.read(Label("@//:mobile_back_qti/qairt/" + sdk_version + "/QAIRT_ReleaseNotes.txt"))
+    else:
+        repository_ctx.read(Label("@//:mobile_back_qti/qairt/" + sdk_version + "/ReleaseNotes.txt"))
 
     repository_ctx.file("BUILD", "")
     repository_ctx.file(

@@ -32,6 +32,7 @@ ${AIMETBUILDDIR}/nvidia_docker_runtime.stamp: \
 
 aimet_calibration: \
 	clean \
+	${AIMETBUILDDIR}/aimet_calibration.stamp \
 	${AIMETBUILDDIR}/input_vectors_generation.stamp \
 	copy_files_to_ouptut \
 	copy_configs_to_ouptut
@@ -82,6 +83,8 @@ copy_files_to_ouptut:
 	mkdir -p ${TOPDIR}/output/DLC/stable_diffusion
 	cp -rv ${AIMETBUILDDIR}/example1/_exports_/* ${TOPDIR}/output/DLC/stable_diffusion/.
 	cp -rv ${AIMETBUILDDIR}/stable_diffusion_models ${TOPDIR}/output/DLC/stable_diffusion/.
+	rm -f ${TOPDIR}/output/DLC/stable_diffusion/time_step_embeddings/unet_time_step_embeddings_20.pkl
+	(cd ${TOPDIR}/output/DLC/stable_diffusion/time_step_embeddings/. && wget https://github.com/mlcommons/mobile_open/releases/download/v4.1-sd-tflite/unet_time_step_embeddings_20.pkl && chmod -R 777 *)
 
 copy_configs_to_ouptut:
 	#Copies configs to output
@@ -91,12 +94,47 @@ copy_configs_to_ouptut:
 	mv ${TOPDIR}/output/DLC/stable_diffusion/text_encoder_onnx ${TOPDIR}/output/DLC/stable_diffusion/text_encoder/.
 	mv ${TOPDIR}/output/DLC/stable_diffusion/vae_decoder_onnx ${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/.
 	mv ${TOPDIR}/output/DLC/stable_diffusion/unet_onnx_batch_1 ${TOPDIR}/output/DLC/stable_diffusion/unet/.
-	cp -rv ${AIMETBUILDDIR}/graph_config_text_encoder.json ${TOPDIR}/output/DLC/stable_diffusion/text_encoder/graph_config.json
-	cp -rv ${AIMETBUILDDIR}/mcp_config.json ${TOPDIR}/output/DLC/stable_diffusion/text_encoder/.
-	cp -rv ${AIMETBUILDDIR}/graph_config_vae.json ${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/graph_config.json
-	cp -rv ${AIMETBUILDDIR}/mcp_config.json ${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/.
-	cp -rv ${AIMETBUILDDIR}/graph_config_unet.json ${TOPDIR}/output/DLC/stable_diffusion/unet/graph_config.json
-	cp -rv ${AIMETBUILDDIR}/mcp_config.json ${TOPDIR}/output/DLC/stable_diffusion/unet/.
+
+	cat ${AIMETBUILDDIR}/graph_config_text_encoder.json | sed -e 's/$$dsp_arch/v75/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/text_encoder/graph_config_v75.json
+	cat ${AIMETBUILDDIR}/graph_config_text_encoder.json | sed -e 's/$$dsp_arch/v79/g' | sed -e 's/57/69/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/text_encoder/graph_config_v79.json
+	cat ${AIMETBUILDDIR}/graph_config_text_encoder.json | sed -e 's/$$dsp_arch/v73_sd8sG4/g' | sed -e 's/57/85/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/text_encoder/graph_config_v73_sd8sG4.json
+	cat ${AIMETBUILDDIR}/graph_config_text_encoder.json | sed -e 's/$$dsp_arch/v73_sd7G4/g' | sed -e 's/57/86/g' | sed -e 's/"vtcm_size"/4/g'>${TOPDIR}/output/DLC/stable_diffusion/text_encoder/graph_config_v73_sd7G4.json
+	cat ${AIMETBUILDDIR}/graph_config_text_encoder.json  | sed -e 's/$$dsp_arch/v81_sd8eliteG5/g' | sed -e 's/57/87/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/text_encoder/graph_config_v81_sd8eliteG5.json
+	cat ${AIMETBUILDDIR}/graph_config_text_encoder.json  | sed -e 's/$$dsp_arch/v81_sd8G5/g' | sed -e 's/57/97/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/text_encoder/graph_config_v81_sd8G5.json
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v75/g' >${TOPDIR}/output/DLC/stable_diffusion/text_encoder/mcp_config_v75.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v79/g' >${TOPDIR}/output/DLC/stable_diffusion/text_encoder/mcp_config_v79.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v73_sd8sG4/g' >${TOPDIR}/output/DLC/stable_diffusion/text_encoder/mcp_config_v73_sd8sG4.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v73_sd7G4/g' >${TOPDIR}/output/DLC/stable_diffusion/text_encoder/mcp_config_v73_sd7G4.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v81_sd8eliteG5/g' >${TOPDIR}/output/DLC/stable_diffusion/text_encoder/mcp_config_v81_sd8eliteG5.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v81_sd8G5/g' >${TOPDIR}/output/DLC/stable_diffusion/text_encoder/mcp_config_v81_sd8G5.json;
+
+	cat ${AIMETBUILDDIR}/graph_config_vae.json  | sed -e 's/$$dsp_arch/v75/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/graph_config_v75.json
+	cat ${AIMETBUILDDIR}/graph_config_vae.json  | sed -e 's/$$dsp_arch/v79/g' | sed -e 's/57/69/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/graph_config_v79.json
+	cat ${AIMETBUILDDIR}/graph_config_vae.json  | sed -e 's/$$dsp_arch/v73_sd8sG4/g' | sed -e 's/57/85/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/graph_config_v73_sd8sG4.json
+	cat ${AIMETBUILDDIR}/graph_config_vae.json  | sed -e 's/$$dsp_arch/v73_sd7G4/g' | sed -e 's/57/86/g' | sed -e 's/"vtcm_size"/4/g'>${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/graph_config_v73_sd7G4.json
+	cat ${AIMETBUILDDIR}/graph_config_vae.json  | sed -e 's/$$dsp_arch/v81_sd8eliteG5/g' | sed -e 's/57/87/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/graph_config_v81_sd8eliteG5.json
+	cat ${AIMETBUILDDIR}/graph_config_vae.json  | sed -e 's/$$dsp_arch/v81_sd8G5/g' | sed -e 's/57/97/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/graph_config_v81_sd8G5.json
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v75/g' >${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/mcp_config_v75.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v79/g' >${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/mcp_config_v79.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v73_sd8sG4/g' >${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/mcp_config_v73_sd8sG4.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v73_sd7G4/g' >${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/mcp_config_v73_sd7G4.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v81_sd8eliteG5/g' >${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/mcp_config_v81_sd8eliteG5.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v81_sd8G5/g' >${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/mcp_config_v81_sd8G5.json;
+
+
+	cat ${AIMETBUILDDIR}/graph_config_unet.json  | sed -e 's/$$dsp_arch/v75/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/unet/graph_config_v75.json
+	cat ${AIMETBUILDDIR}/graph_config_unet.json  | sed -e 's/$$dsp_arch/v79/g' | sed -e 's/57/69/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/unet/graph_config_v79.json
+	cat ${AIMETBUILDDIR}/graph_config_unet.json  | sed -e 's/$$dsp_arch/v73_sd8sG4/g' | sed -e 's/57/85/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/unet/graph_config_v73_sd8sG4.json
+	cat ${AIMETBUILDDIR}/graph_config_unet.json  | sed -e 's/$$dsp_arch/v73_sd7G4/g' | sed -e 's/57/86/g' | sed -e 's/"vtcm_size"/4/g'>${TOPDIR}/output/DLC/stable_diffusion/unet/graph_config_v73_sd7G4.json
+	cat ${AIMETBUILDDIR}/graph_config_unet.json  | sed -e 's/$$dsp_arch/v81_sd8eliteG5/g' | sed -e 's/57/87/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/unet/graph_config_v81_sd8eliteG5.json
+	cat ${AIMETBUILDDIR}/graph_config_unet.json  | sed -e 's/$$dsp_arch/v81_sd8G5/g' | sed -e 's/57/97/g' | sed -e 's/"vtcm_size"/8/g'>${TOPDIR}/output/DLC/stable_diffusion/unet/graph_config_v81_sd8G5.json
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v75/g' >${TOPDIR}/output/DLC/stable_diffusion/unet/mcp_config_v75.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v79/g' >${TOPDIR}/output/DLC/stable_diffusion/unet/mcp_config_v79.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v73_sd8sG4/g' >${TOPDIR}/output/DLC/stable_diffusion/unet/mcp_config_v73_sd8sG4.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v73_sd7G4/g' >${TOPDIR}/output/DLC/stable_diffusion/unet/mcp_config_v73_sd7G4.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v81_sd8eliteG5/g' >${TOPDIR}/output/DLC/stable_diffusion/unet/mcp_config_v81_sd8eliteG5.json;
+	cat ${AIMETBUILDDIR}/mcp_config.json | sed -e 's/_$$dsp_arch/_v81_sd8G5/g' >${TOPDIR}/output/DLC/stable_diffusion/unet/mcp_config_v81_sd8G5.json;
+
 	mkdir -p ${TOPDIR}/output/DLC/stable_diffusion/text_encoder/stable_diffusion_models
 	cp -rv ${AIMETBUILDDIR}/stable_diffusion_models/text_encoder_onnx ${TOPDIR}/output/DLC/stable_diffusion/text_encoder/stable_diffusion_models/.
 	mkdir -p ${TOPDIR}/output/DLC/stable_diffusion/vae_decoder/stable_diffusion_models
