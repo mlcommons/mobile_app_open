@@ -52,20 +52,12 @@ http_archive(
     name = "org_tensorflow",
     patch_args = ["-p1"],
     patches = [
-        # Add patches for adding png in tflite evaluation code
-        "//:flutter/third_party/enable-png-in-tensorflow-lite-tools-evaluation.patch",
-        "//:flutter/third_party/png-with-number-of-channels-detected.patch",
-        "//:flutter/third_party/use_unsigned_char.patch",
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
-        "//:flutter/third_party/tf-eigen.patch",
-        # NDK 25 support
-        "//patches:ndk_25_r14.diff",
     ] + PATCH_FILE,
-    sha256 = "ce357fd0728f0d1b0831d1653f475591662ec5bca736a94ff789e6b1944df19f",
-    strip_prefix = "tensorflow-2.14.0",
+    strip_prefix = "tensorflow-2.20.0",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.14.0.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/v2.20.0.tar.gz",
     ],
 )
 

@@ -9,6 +9,8 @@ build --spawn_strategy=standalone
 
 # This flag is required by tensorflow
 common --experimental_repo_remote_exec
+common --noenable_bzlmod
+common --enable_workspace
 
 # Default options should come above this line.
 

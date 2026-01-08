@@ -1,0 +1,7 @@
+module(name = "mlperf_app", version="")
+
+# -- bazel_dep definitions -- #
+
+# -- use_repo_rule statements -- #
+
+# -- repo definitions -- #
