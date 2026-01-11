@@ -188,8 +188,9 @@ class BenchmarkOptionSet {
   bool setOption(String id) {
     BenchmarkOption? opt = options[id];
     if (opt == null ||
-        (config.maxSelected > 0 && selected == config.maxSelected))
+        (config.maxSelected > 0 && selected == config.maxSelected)) {
       return false;
+    }
     opt.enabled = true;
     return true;
   }
@@ -197,8 +198,9 @@ class BenchmarkOptionSet {
   bool unsetOption(String id) {
     BenchmarkOption? opt = options[id];
     if (opt == null ||
-        (config.minSelected > 0 && selected == config.minSelected))
+        (config.minSelected > 0 && selected == config.minSelected)) {
       return false;
+    }
     opt.enabled = false;
     return true;
   }
