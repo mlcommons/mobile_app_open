@@ -1,3 +1,4 @@
+// clang-format off
 /** @addtogroup Stemming
     @brief Library for stemming words down to their root words.
     @date 2004-2025
@@ -199,3 +200,4 @@ namespace common_lang_constants
 /** @}*/
 
 #endif // OLEAN_COMMON_LANG_CONSTANTS_H
+// clang-format on

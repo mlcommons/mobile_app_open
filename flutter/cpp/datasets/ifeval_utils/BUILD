@@ -22,12 +22,12 @@ cc_library(
     name = "ifeval_utils",
     hdrs = [
         "common.h",
-        "json.h",
-        "types.h",
-        "english_stem.h",
-        "stemming.h",
         "common_lang_constants.h",
+        "english_stem.h",
         "irregular-plurals.h",
+        "json.h",
+        "stemming.h",
+        "types.h",
     ],
     copts = select({
         "//flutter/android/commonlibs:use_asan": [

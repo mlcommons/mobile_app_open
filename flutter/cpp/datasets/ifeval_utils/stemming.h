@@ -1,3 +1,4 @@
+// clang-format off
 /** @addtogroup Stemming
     @brief Library for stemming words down to their root words.
     @date 2004-2025
@@ -18,6 +19,8 @@
 #include <cassert>
 #include "flutter/cpp/datasets/ifeval_utils/common_lang_constants.h"
 
+
+// TODO remove parts not related to english stemmer
 /// @brief Namespace for stemming classes.
 namespace stemming
     {
@@ -3252,3 +3255,4 @@ namespace stemming
 /** @}*/
 
 #endif // __STEM_H__
+// clang-format on
