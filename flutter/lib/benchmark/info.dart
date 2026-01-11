@@ -28,7 +28,7 @@ class BenchmarkInfo {
   BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
     switch (task.id) {
       case (BenchmarkId.llm):
-      // TODO translate this and add proper info
+        // TODO translate this and add proper info
         return BenchmarkLocalizationInfo(
             name: 'LLM',
             detailsTitle: 'Large Language Model',
