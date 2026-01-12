@@ -73,8 +73,18 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
     return nullptr;
   }
 
+  // Get the thread count in config
+  for (size_t i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], "num_threads") == 0) {
+      if (int value = atoi(configs->values[i]); value != 0) {
+        backend_data->num_threads = static_cast<uint16_t>(value);
+        break;
+      }
+    }
+  }
+
   backend_data->interpreter =
-      BuildInterpreter(backend_data->model, backend_data->threads);
+      BuildInterpreter(backend_data->model, backend_data->num_threads);
   if (!backend_data->interpreter) {
     LOG(ERROR) << "Failed to load interpreter";
     backend_delete(backend_data);

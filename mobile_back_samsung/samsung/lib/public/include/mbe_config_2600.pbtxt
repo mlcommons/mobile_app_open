@@ -1,0 +1,308 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
+common_setting {
+  id: "num_threads"
+  name: "Number of threads"
+  value {
+    value: "4"
+    name: "4 threads"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "image_segmentation_v2"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1007"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_file: {
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/sm_uint8.nnc"
+    model_checksum: "43814a29b2e63719af67a30e8b5efc0c"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 500000
+}
+
+benchmark_setting {
+  benchmark_id: "object_detection"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1007"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Int8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_file: {
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/od.nnc"
+    model_checksum: "43a7e0faa0ab1e8a86e774947792e36d"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 200000
+}
+
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1010"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Int8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Int8"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_file: {
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/sr.nnc"
+    model_checksum: "5ff526a6a30f781fdc4be310df43ac5e"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 990000
+}
+
+benchmark_setting {
+  benchmark_id: "natural_language_processing"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "npu"
+    accelerator_desc: "npu"
+    custom_setting {
+      id: "preset"
+      value: "1011"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Int32"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_file: {
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/mobile_bert.nnc"
+    model_checksum: "5b7c8b635697c909693264034fcc5898"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 990000
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1007"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_file: {
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/mnv4_large.nnc"
+    model_checksum: "6d86899c52a88ae24c025a327bd7e3a0"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 1000000
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "npu"
+    batch_size: 6144
+    custom_setting {
+      id: "scenario"
+      value: "offline"
+    }
+    custom_setting {
+      id: "preset"
+      value: "1004"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "false"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "false"
+    }
+    model_file: {
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/mnv4_large_offline.nnc"
+    model_checksum: "dbef7a1c6d56e2437d89085a3a38d7bf"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 1000000
+}
+
+benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "npu"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/sd_dec.nnc"
+      model_checksum: "0d961ff0471472b2903594f497e3064c"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/sd_unet.nnc"
+      model_checksum: "f600698aab63398291f64f3c49d99b2e"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/sd_enc.nnc"
+      model_checksum: "9470f2195a2b2eee0c0e90d5fd3853fe"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/te.bin"
+      model_checksum: "798b772155a69de5df44b304327bb3cc"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/gt.bin"
+      model_checksum: "f41c1130809647fbccd76707b2f14305"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/np.bin"
+      model_checksum: "c50807d72ce221cf08a2248a6ac3c48e"
+    }
+  }
+  custom_setting {
+      id: "preset"
+      value: "1004"
+  }
+  custom_setting {
+    id: "o_type"
+    value: "Uint8"
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 500000
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "text_encoder_filename"
+    value: "sd_enc.nnc"
+  }
+  custom_setting {
+    id: "diffusion_model_filename"
+    value: "sd_unet.nnc"
+  }
+  custom_setting {
+    id: "decoder_filename"
+    value: "sd_dec.nnc"
+  }
+  custom_setting {
+    id: "timestep_embeddings_filename"
+    value: "te.bin"
+  }
+  custom_setting {
+    id: "gather_filename"
+    value: "gt.bin"
+  }
+  custom_setting {
+    id: "negative_prompt_filename"
+    value: "np.bin"
+  }
+}

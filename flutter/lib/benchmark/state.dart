@@ -144,7 +144,7 @@ class BenchmarkState extends ChangeNotifier {
     final selectedBenchmarks = benchmarks.isEmpty ? allBenchmarks : benchmarks;
     await Wakelock.enable();
     final selectedResources = _benchmarkStore.listResources(
-      modes: [taskRunner.perfMode, taskRunner.accuracyMode],
+      modes: taskRunner.selectedRunModes,
       benchmarks: selectedBenchmarks,
     );
     final allResources = _benchmarkStore.listResources(
