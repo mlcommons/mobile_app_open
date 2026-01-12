@@ -65,7 +65,7 @@ extern "C" struct dart_ffi_backend_match_result *dart_ffi_backend_match(
   result->pbdata = new char[result->pbdata_size];
   memcpy(result->pbdata, res.data(), result->pbdata_size);
 
-  LOG(INFO) << "backend matches";
+  LOG(INFO) << "backend matches '" << lib_path << "'";
 
   return result;
 }

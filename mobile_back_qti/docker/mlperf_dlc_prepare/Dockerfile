@@ -31,25 +31,26 @@ RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y && \
        zip bzip2 gnupg wget python3-six python3-pip libncurses5 openjdk-11-jdk-headless clang-format golang-1.13-go build-essential
 
 RUN pip3 install pip==24.1.1 setuptools==45.0.0
-RUN pip3 install numpy==1.26.4 opencv-python tensorflow-cpu==2.10.1
+
 RUN pip3 install protobuf==3.6.0
-RUN pip3 install Pillow tensorflow_hub tf-slim \
-                 absl-py pyyaml
+RUN pip3 install Pillow tf-slim absl-py pyyaml
+RUN pip3 install opencv-python tensorflow-cpu==2.10.1
 RUN pip3 install pandas matplotlib
 RUN pip3 install onnx==1.12.0 onnxruntime packaging
-#RUN pip3 install protobuf==3.19.4
+RUN pip3 install protobuf==3.19.4
+RUN pip3 install numpy==1.23.5 --force-reinstall --no-cache-dir
 
 RUN curl -SL http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz | tar -xJC /usr/local/. && \
     mv /usr/local/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04 /usr/local/clang-9.0.0
 
-RUN apt-get update && apt-get install -y --no-install-recommends bash coreutils
+RUN apt-get update && apt-get install -y bash coreutils
 RUN which readlink
 
 ARG ndk_version=android-ndk-r25c
 ARG android_ndk_home=/opt/android/${ndk_version}
 # Install the NDK
 # Use wget instead of curl to avoid "Error in the HTTP2 framing layer"
-RUN cd /tmp &&  wget --max-redirect=0 -nv https://dl.google.com/android/repository/${ndk_version}-linux.zip && \
+RUN cd /tmp &&  wget -nv https://dl.google.com/android/repository/${ndk_version}-linux.zip && \
     unzip -q /tmp/${ndk_version}-linux.zip -d /opt/android && \
     rm /tmp/${ndk_version}-linux.zip
 

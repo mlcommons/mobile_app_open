@@ -1,17 +1,18 @@
 {
     "graphs": [{
         "graph_names":["vae_decoder"],
-        "vtcm_mb":8,
+        "vtcm_mb":"vtcm_size",
         "O" : 3,
         "fp16_relaxed_precision": 0
     }],
     "devices": [
         {   "pd_session": "unsigned",
-            "dsp_arch": "v79",
+            "dsp_arch": "$dsp_arch",
+            "soc_model": 57,
             "cores":[{
                 "rpc_control_latency": 100,
                 "perf_profile": "burst"
             }]
         }
     ]
-  }
+}

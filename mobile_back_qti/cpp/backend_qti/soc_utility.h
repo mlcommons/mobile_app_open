@@ -68,10 +68,16 @@ class SocInfo {
     }
     if (m_needs_stablediffusion) {
 #ifdef STABLEDIFFUSION_FLAG
-      if (m_soc_name == "SD8G3")
-        m_settings += qti_settings_stablediffusion_v75;
-      else if (m_soc_name == "SD8Elite")
+      if (m_soc_name == "SD8elite")
         m_settings += qti_settings_stablediffusion_v79;
+      else if (m_soc_name == "SD8sG4")
+        m_settings += qti_settings_stablediffusion_v73_sd8sG4;
+      else if (m_soc_name == "SD7G4")
+        m_settings += qti_settings_stablediffusion_v73_sd7G4;
+      else if (m_soc_name == "SD8EliteG5")
+        m_settings += qti_settings_stablediffusion_v81_sd8eliteG5;
+      else if (m_soc_name == "SD8G5")
+        m_settings += qti_settings_stablediffusion_v81_sd8G5;
       else
         // set m_needs_stablediffusion flag to "true" in SocInfo table to enable
         // default stable diffusion settings
