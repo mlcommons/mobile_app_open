@@ -22,11 +22,8 @@ cc_library(
     name = "ifeval_utils",
     hdrs = [
         "common.h",
-        "common_lang_constants.h",
-        "english_stem.h",
         "irregular-plurals.h",
         "json.h",
-        "stemming.h",
         "types.h",
     ],
     copts = select({
@@ -40,5 +37,6 @@ cc_library(
     }),
     deps = [
         "@cld2",
+        "@oleander_stemming_library"
     ],
 )

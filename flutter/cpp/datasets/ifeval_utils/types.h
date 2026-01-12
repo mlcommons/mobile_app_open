@@ -12,8 +12,8 @@
 #include <vector>
 
 #include "compact_lang_det.h"
+#include "english_stem.h"
 #include "flutter/cpp/datasets/ifeval_utils/common.h"
-#include "flutter/cpp/datasets/ifeval_utils/english_stem.h"
 #include "flutter/cpp/datasets/ifeval_utils/irregular-plurals.h"
 #include "flutter/cpp/datasets/ifeval_utils/json.h"
 
