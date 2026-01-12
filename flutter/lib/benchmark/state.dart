@@ -77,6 +77,10 @@ class BenchmarkState extends ChangeNotifier {
 
   List<Benchmark> get allBenchmarks => _benchmarkStore.allBenchmarks;
 
+  List<Benchmark> get looseBenchmarks => _benchmarkStore.looseBenchmarks;
+
+  List<BenchmarkSet> get benchmarkSets => _benchmarkStore.benchmarkSets;
+
   List<Benchmark> get activeBenchmarks => _benchmarkStore.activeBenchmarks;
 
   late BenchmarkStore _benchmarkStore;
@@ -345,6 +349,39 @@ class BenchmarkState extends ChangeNotifier {
 
   void benchmarkSetDelegate(Benchmark benchmark, String delegate) {
     benchmark.benchmarkSettings.delegateSelected = delegate;
+    notifyListeners();
+  }
+
+  void benchmarkSetOption(
+      BenchmarkSet benchmarkSet, String option, bool value) {
+    benchmarkSet.optionSets[benchmarkSet.optionMap[option]!]
+        .setOptionTo(option, value);
+    benchmarkSet.applyOptions();
+    notifyListeners();
+  }
+
+// Config section controls
+  final Set<BenchmarkSet> _openAdvancedSets = {};
+  bool isAdvancedConfigOpen(BenchmarkSet set) =>
+      _openAdvancedSets.contains(set);
+  void toggleAdvancedConfig(BenchmarkSet set) {
+    _openAdvancedSets.contains(set)
+        ? _openAdvancedSets.remove(set)
+        : _openAdvancedSets.add(set);
+    notifyListeners();
+  }
+
+  final Set<String> _expandedOptionSets = {};
+
+  bool isOptionsExpanded(BenchmarkSet bset) =>
+      _expandedOptionSets.contains(bset.config.id);
+
+  void toggleOptionsExpanded(BenchmarkSet bset) {
+    if (_expandedOptionSets.contains(bset.config.id)) {
+      _expandedOptionSets.remove(bset.config.id);
+    } else {
+      _expandedOptionSets.add(bset.config.id);
+    }
     notifyListeners();
   }
 

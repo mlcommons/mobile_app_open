@@ -1,9 +1,29 @@
 # proto-file: flutter/cpp/proto/mlperf_task.proto
 # proto-message: MLPerfConfig
 
-task {
+task_set {
   id: "image_classification_v2"
   name: "Image Classification v2"
+  option_set {
+    id: "options"
+    name: "Options"
+    opt {
+      id: "offline"
+      name: "Offline"
+    }
+    opt {
+      id: "online"
+      name: "Online"
+      enabled: true
+    }
+  }
+}
+
+task {
+  id: "image_classification_online_v2"
+  name: "Image Classification v2 (Online)"
+  task_set: "image_classification_v2"
+  required_option: "online"
   max_throughput: 1000
   max_accuracy: 1.0
   scenario: "SingleStream"
@@ -282,6 +302,8 @@ task {
 task {
   id: "image_classification_offline_v2"
   name: "Image Classification v2 (Offline)"
+  task_set: "image_classification_v2"
+  required_option: "offline"
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "Offline"
