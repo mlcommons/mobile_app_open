@@ -37,6 +37,6 @@ cc_library(
     }),
     deps = [
         "@cld2",
-        "@oleander_stemming_library"
+        "@oleander_stemming_library",
     ],
 )

@@ -165,8 +165,8 @@ http_archive(
     name = "oleander_stemming_library",
     build_file = "@//third_party:oleander_stemming_library.BUILD",
     sha256 = "d4390e82590d67c73ac32629ddd4fc3ba0b6b293a2757612a2e76726c3752e0b",
-    urls = ["https://github.com/Blake-Madden/OleanderStemmingLibrary/archive/45eb3485f67b94d67bb883601ed65459975b3960.zip"],
     strip_prefix = "OleanderStemmingLibrary-45eb3485f67b94d67bb883601ed65459975b3960",
+    urls = ["https://github.com/Blake-Madden/OleanderStemmingLibrary/archive/45eb3485f67b94d67bb883601ed65459975b3960.zip"],
 )
 
 new_git_repository(
