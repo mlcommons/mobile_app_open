@@ -22,16 +22,17 @@ option java_package = "org.mlperf.proto";
 
 // App config
 //
-// Next ID: 2
+// Next ID: 3
 message MLPerfConfig {
   // All tasks will be run.
   repeated TaskConfig task = 1;
+  repeated TaskSet task_set = 2;
 }
 
 // Config of the mlperf tasks.
 // A task is basically a combination of models and a dataset.
 //
-// Next ID: 13
+// Next ID: 15
 message TaskConfig {
   // Must be unique in one task file. Ex: image_classification
   // used to match backend settings
@@ -48,6 +49,37 @@ message TaskConfig {
   required DatasetConfig datasets = 8;
   required ModelConfig model = 9;
   repeated CustomConfig custom_config = 11;
+  optional string task_set = 13;
+  repeated string required_option = 14;
+}
+
+// A group to control multiple tasks through the use of options.
+//
+// Next ID: 4
+message TaskSet {
+  required string id = 1;
+  required string name = 2;
+  repeated OptionSet option_set = 3;
+}
+
+// A container for similar options for a task-set
+//
+// Next ID: 6
+message OptionSet {
+  required string id = 1;
+  required string name = 2;
+  optional int32 min_selected = 3 [default = 0];
+  optional int32 max_selected = 4 [default = 0];
+  repeated Option opt = 5;
+}
+
+// A fancy boolean with a name and an id.
+//
+// Next ID: 4
+message Option {
+  required string id = 1;
+  required string name = 2;
+  optional bool enabled = 3 [default = false];
 }
 
 // Run configurations

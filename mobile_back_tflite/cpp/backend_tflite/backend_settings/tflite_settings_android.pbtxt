@@ -36,7 +36,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "image_classification_v2"
+  benchmark_id: "image_classification_online_v2"
   framework: "TFLite"
   delegate_choice: {
     delegate_name: "NNAPI"

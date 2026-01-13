@@ -23,7 +23,15 @@ class BenchmarkConfigSection extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 20),
       children: <Widget>[
-        for (var benchmark in state.allBenchmarks) ...[
+        for (var benchmarkSet in state.benchmarkSets) ...[
+          _setListTile(benchmarkSet, state, l10n, context),
+          if (benchmarkSet != state.benchmarkSets.last ||
+              state.looseBenchmarks.isNotEmpty)
+            const Divider(
+              height: 1,
+            )
+        ],
+        for (var benchmark in state.looseBenchmarks) ...[
           _listTile(benchmark, state, l10n),
           if (benchmark != state.allBenchmarks.last)
             const Divider(
@@ -34,6 +42,319 @@ class BenchmarkConfigSection extends StatelessWidget {
       ],
     );
   }
+
+  Widget _setDownloadStatus(AppLocalizations l10n, BenchmarkSet benchmarkSet,
+      bool allResourcesExist, BuildContext context) {
+    // Check if any benchmark in the set is currently active
+    final hasActiveBenchmarks = benchmarkSet.benchmarks.any((b) => b.isActive);
+
+    // If no benchmarks are active, or all resources already exist, show nothing
+    if (!hasActiveBenchmarks || allResourcesExist) return const SizedBox();
+
+    return InkWell(
+        onTap: () async {
+          // You can pass the benchmarkSet here to trigger downloads for all active items in the set
+          await showResourceMissingDialog(context, [],
+              benchmarkSet: benchmarkSet);
+        },
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          child: Icon(
+            Icons.downloading_rounded,
+            size: 28,
+            color: AppColors.warningIcon,
+          ),
+        ));
+  }
+
+  Widget _setListTile(BenchmarkSet benchmarkSet, BenchmarkState state,
+      AppLocalizations l10n, BuildContext context) {
+    final totalOptions = benchmarkSet.optionMap.length;
+    final activeOptions = benchmarkSet.optionSets
+        .expand((e) => e.options.values)
+        .where((e) => e.enabled)
+        .length;
+
+    final bool isOptionsOpen = state.isOptionsExpanded(benchmarkSet);
+    final bool isAdvancedOpen = state.isAdvancedConfigOpen(benchmarkSet);
+
+    final Future<bool> resourcesExistFuture = Future.wait(
+      benchmarkSet.benchmarks.where((b) => b.isActive).map(
+            (b) => state.validator.validateAllResourcesExist(b,
+                modes: state.taskRunner.selectedRunModes),
+          ),
+    ).then((results) => results.every((exists) => exists));
+
+    return Column(
+      children: [
+        InkWell(
+          onTap: () => state.toggleOptionsExpanded(benchmarkSet),
+          child: Padding(
+            padding: EdgeInsets.zero,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // LEADING BUTTON
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20, left: 16, top: 12),
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: TextButton(
+                      //TODO use benchmarkset's id
+                      onPressed: () => showBenchInfoBottomSheet(
+                          context, benchmarkSet.benchmarks[0]),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding: EdgeInsets.zero,
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                WidgetSizes.borderRadius)),
+                      ),
+                      //TODO use benchmarkset's icon
+                      child: SizedBox(
+                          width: 32,
+                          height: 32,
+                          child: benchmarkSet.benchmarks[0].info.icon),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+
+                // TITLE & SUBTITLE
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 20, top: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          benchmarkSet.config.name,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '$activeOptions/$totalOptions options selected',
+                          style:
+                              const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // TRAILING
+                FutureBuilder<bool>(
+                  future: resourcesExistFuture,
+                  initialData: true,
+                  builder: (context, snapshot) => _setDownloadStatus(
+                      l10n, benchmarkSet, snapshot.data!, context),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // Advanced Config Button
+                      AnimatedRotation(
+                        turns: isAdvancedOpen ? 0.5 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.fastOutSlowIn,
+                        child: IconButton(
+                          icon: Icon(Icons.settings,
+                              color: isAdvancedOpen
+                                  ? AppColors.secondary
+                                  : Colors.grey),
+                          onPressed: () =>
+                              state.toggleAdvancedConfig(benchmarkSet),
+                        ),
+                      ),
+
+                      AnimatedRotation(
+                        turns: isOptionsOpen ? 0.5 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.fastOutSlowIn,
+                        child: Icon(Icons.expand_more,
+                            color: isOptionsOpen
+                                ? AppColors.secondary
+                                : Colors.grey),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+
+        // --- THE BODY (Options List) ---
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          switchInCurve: Curves.fastOutSlowIn,
+          switchOutCurve: Curves.fastOutSlowIn,
+          transitionBuilder: (child, animation) => SizeTransition(
+              sizeFactor: animation, axisAlignment: 0.0, child: child),
+          child: !isOptionsOpen
+              ? const SizedBox.shrink()
+              : Container(
+                  key: const ValueKey('options_container'),
+                  child: Column(
+                    children: [
+                      for (int i = 0;
+                          i < benchmarkSet.optionSets.length;
+                          i++) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 16, top: 8, bottom: 4),
+                          child: Row(
+                            children: [
+                              Text(
+                                benchmarkSet.optionSets[i].config.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                    fontSize: 12),
+                              ),
+                              const Expanded(
+                                  child: Divider(indent: 10, endIndent: 16)),
+                            ],
+                          ),
+                        ),
+                        for (final option
+                            in benchmarkSet.optionSets[i].options.keys)
+                          ListTile(
+                            dense: true,
+                            contentPadding:
+                                const EdgeInsets.only(left: 24, right: 16),
+                            title: Text(option),
+                            onTap: () {
+                              state.benchmarkSetOption(
+                                  benchmarkSet,
+                                  option,
+                                  !benchmarkSet.optionSets[
+                                          benchmarkSet.optionMap[option]!]
+                                      .getOption(option)!);
+                            },
+                            trailing: Checkbox(
+                              key: Key(option),
+                              value:
+                                  benchmarkSet.optionSets[i].getOption(option),
+                              onChanged: (bool? value) {
+                                state.benchmarkSetOption(
+                                    benchmarkSet, option, value!);
+                              },
+                            ),
+                          ),
+                      ]
+                    ],
+                  ),
+                ),
+        ),
+
+        // --- ADVANCED CONFIG (Benchmarks List) ---
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          switchInCurve: Curves.fastOutSlowIn,
+          switchOutCurve: Curves.fastOutSlowIn,
+          transitionBuilder: (child, animation) => SizeTransition(
+              sizeFactor: animation, axisAlignment: 0.0, child: child),
+          child: !isAdvancedOpen
+              ? const SizedBox.shrink()
+              : Container(
+                  key: const ValueKey('advanced_config_container'),
+                  width: double.infinity,
+                  color: Colors.grey[100],
+                  child: Column(
+                    children: [
+                      ...benchmarkSet.benchmarks.map((benchmark) {
+                        return FutureBuilder(
+                          future: state.validator.validateAllResourcesExist(
+                              benchmark,
+                              modes: state.taskRunner.selectedRunModes),
+                          initialData: false,
+                          builder: (context, snapshot) {
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                  bottom: 12, left: 16, right: 8, top: 8),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(
+                                          WidgetSizes.borderRadius),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 2)
+                                      ],
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(6),
+                                      child: benchmark.info.icon,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  // Benchmark Metadata
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _nameDynamic(benchmark, context),
+                                        Row(
+                                          children: [
+                                            Flexible(
+                                                child: _backendDescription(
+                                                    benchmark, context)),
+                                            const SizedBox(
+                                                height: 14,
+                                                child: VerticalDivider(
+                                                    color: Colors.black)),
+                                            _delegateChoice(
+                                                benchmark, context, state),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // Individual Download Status
+                                  _downloadStatus(
+                                      l10n, benchmark, snapshot.data!, context),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                      const SizedBox(height: 12),
+                    ],
+                  ),
+                ),
+        ),
+      ],
+    );
+  }
+  // Widget _setListTile(BenchmarkSet benchmarkSet, BenchmarkState state, AppLocalizations l10n) {
+  //   return Column(children: [
+  //     Text(benchmarkSet.config.name),
+  //     const Divider(height: 0.5,),
+  //     for (final option in benchmarkSet.optionMap.keys) ...[
+  //       Row(
+  //         children: [
+  //           Text(option),
+  //           Checkbox(key: Key(option), value: benchmarkSet.optionSets[benchmarkSet.optionMap[option]!].getOption(option), onChanged: (bool? value) {state.benchmarkSetOption(benchmarkSet, option, value!); })
+  //         ],
+  //       ),
+  //     ]
+  //   ],);
+  // }
 
   Widget _listTile(
       Benchmark benchmark, BenchmarkState state, AppLocalizations l10n) {
@@ -125,6 +446,15 @@ class BenchmarkConfigSection extends StatelessWidget {
           .textTheme
           .titleMedium!
           .copyWith(fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _nameDynamic(Benchmark benchmark, BuildContext context) {
+    return Text(
+      benchmark.info.taskName,
+      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+          color: benchmark.isActive ? AppColors.primary : Colors.black,
+          fontWeight: FontWeight.bold),
     );
   }
 

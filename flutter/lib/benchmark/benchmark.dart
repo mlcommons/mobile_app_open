@@ -116,11 +116,127 @@ class Benchmark {
   }
 }
 
+class BenchmarkSet {
+  final pb.TaskSet config;
+  late final List<Benchmark> benchmarks;
+  late final List<BenchmarkOptionSet> optionSets;
+  //TODO use pass by reference
+  late final Map<String, int> optionMap;
+
+  BenchmarkSet(
+      {required this.config, List<Benchmark> allBenchmarks = const []}) {
+    optionSets =
+        config.optionSet.map((e) => BenchmarkOptionSet(config: e)).toList();
+    benchmarks =
+        allBenchmarks.where((e) => e.taskConfig.taskSet == config.id).toList();
+    optionMap = {
+      for (final (index, item) in optionSets.indexed)
+        for (final key in item.options.keys) key: index,
+    };
+    applyOptions();
+  }
+
+  void applyOptions() {
+    for (Benchmark benchmark in benchmarks) {
+      benchmark.isActive = true;
+      for (String optionId in benchmark.taskConfig.requiredOption) {
+        final index = optionMap[optionId];
+        final optionSet =
+            (index != null && index >= 0 && index < optionSets.length)
+                ? optionSets[index]
+                : null;
+        if (!(optionSet?.getOption(optionId) ?? false)) {
+          benchmark.isActive = false;
+          break;
+        }
+      }
+    }
+  }
+}
+
+class BenchmarkOptionSet {
+  final pb.OptionSet config;
+  late final Map<String, BenchmarkOption> options;
+  late int selected;
+
+  BenchmarkOptionSet({required this.config}) {
+    options = _createOptions(config);
+    selected = options.values.where((e) => e.enabled).length;
+    if ((config.maxSelected > 0 && selected > config.maxSelected) ||
+        (config.minSelected > 0 && selected < config.minSelected)) {
+      throw Exception('pbtxt config error! Option constraint mismatch!');
+    }
+  }
+
+  Map<String, BenchmarkOption> _createOptions(pb.OptionSet config) {
+    return {
+      for (final item in config.opt) item.id: BenchmarkOption(config: item)
+    };
+  }
+
+  bool? getOption(String id) {
+    return options[id]?.enabled;
+  }
+
+  bool setOptionTo(String id, bool value) {
+    BenchmarkOption? opt = options[id];
+    if (opt == null) return false;
+    if (!value) return unsetOption(id);
+    return setOption(id);
+  }
+
+  bool setOption(String id) {
+    BenchmarkOption? opt = options[id];
+    if (opt == null ||
+        (config.maxSelected > 0 && selected == config.maxSelected)) {
+      return false;
+    }
+    opt.enabled = true;
+    return true;
+  }
+
+  bool unsetOption(String id) {
+    BenchmarkOption? opt = options[id];
+    if (opt == null ||
+        (config.minSelected > 0 && selected == config.minSelected)) {
+      return false;
+    }
+    opt.enabled = false;
+    return true;
+  }
+
+  bool toggleOption(String id) {
+    BenchmarkOption? opt = options[id];
+    if (opt == null) return false;
+    if (opt.enabled) return unsetOption(id);
+    return setOption(id);
+  }
+}
+
+class BenchmarkOption {
+  final pb.Option config;
+  late bool enabled;
+
+  BenchmarkOption({required this.config}) {
+    enabled = config.enabled;
+  }
+
+  String get id => config.id;
+
+  String get name => config.name;
+}
+
 class BenchmarkStore {
+  // NOTE this includes benchmarks inside sets
   final List<Benchmark> allBenchmarks = <Benchmark>[];
+  final List<BenchmarkSet> benchmarkSets = <BenchmarkSet>[];
 
   List<Benchmark> get activeBenchmarks {
     return allBenchmarks.where((e) => e.isActive).toList();
+  }
+
+  List<Benchmark> get looseBenchmarks {
+    return allBenchmarks.where((e) => e.taskConfig.taskSet.isEmpty).toList();
   }
 
   BenchmarkStore({
@@ -146,6 +262,10 @@ class BenchmarkStore {
         benchmarkSettings: backendSettings,
         isActive: enabled,
       ));
+    }
+    for (final setConfig in appConfig.taskSet) {
+      benchmarkSets
+          .add(BenchmarkSet(config: setConfig, allBenchmarks: allBenchmarks));
     }
   }
 
