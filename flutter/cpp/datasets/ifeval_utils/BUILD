@@ -22,6 +22,7 @@ cc_library(
     name = "ifeval_utils",
     hdrs = [
         "common.h",
+        "irregular-plurals.h",
         "json.h",
         "types.h",
     ],
@@ -36,5 +37,6 @@ cc_library(
     }),
     deps = [
         "@cld2",
+        "@oleander_stemming_library",
     ],
 )

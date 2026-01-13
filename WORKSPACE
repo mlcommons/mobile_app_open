@@ -99,7 +99,7 @@ rocm_configure(name = "local_config_rocm")
 
 http_archive(
     name = "com_google_sentencepiece",
-    build_file = "@//patches:sentencepiece.BUILD",
+    build_file = "@//third_party:sentencepiece.BUILD",
     patch_args = ["-p1"],
     patches = ["@//patches:com_google_sentencepiece.diff"],
     sha256 = "8409b0126ebd62b256c685d5757150cf7fcb2b92a2f2b98efb3f38fc36719754",
@@ -111,7 +111,7 @@ http_archive(
 
 http_archive(
     name = "darts_clone",
-    build_file = "@//patches:darts_clone.BUILD",
+    build_file = "@//third_party:darts_clone.BUILD",
     patch_args = ["-p0"],
     patches = ["//patches:darts_no_exceptions.diff"],
     sha256 = "c97f55d05c98da6fcaf7f9ecc6a6dc6bc5b18b8564465f77abff8879d446491c",
@@ -159,6 +159,14 @@ http_archive(
     sha256 = "7918cc54a2bab63c30eb87a90de8ce3f3730b5572e0269a2b57a0c9bcd28cd69",
     strip_prefix = "tflite-neuron-delegate-update_for_leroy",
     urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/heads/update_for_leroy.zip"],
+)
+
+http_archive(
+    name = "oleander_stemming_library",
+    build_file = "@//third_party:oleander_stemming_library.BUILD",
+    sha256 = "d4390e82590d67c73ac32629ddd4fc3ba0b6b293a2757612a2e76726c3752e0b",
+    strip_prefix = "OleanderStemmingLibrary-45eb3485f67b94d67bb883601ed65459975b3960",
+    urls = ["https://github.com/Blake-Madden/OleanderStemmingLibrary/archive/45eb3485f67b94d67bb883601ed65459975b3960.zip"],
 )
 
 new_git_repository(
