@@ -1,0 +1,231 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
+common_setting {
+  id: "num_threads"
+  name: "Number of threads"
+  value {
+    value: "4"
+    name: "4 threads"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1002"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "false"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "false"
+    }
+    model_file: {
+    model_path: "local:///MLPerf_sideload/ic.nnc"
+    model_checksum: "11a2debf7c43e89dfd8a6b97fe8ad4e1"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 900000
+}
+
+benchmark_setting {
+  benchmark_id: "image_segmentation_v2"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1002"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Int32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_file: {
+    model_path: "local:///MLPerf_sideload/sm_uint8.nnc"
+    model_checksum: "ba5c65b897094559478ae82dcc2a3163"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 1000000
+}
+
+benchmark_setting {
+  benchmark_id: "object_detection"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1002"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "false"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "false"
+    }
+    model_file: {
+    model_path: "local:///MLPerf_sideload/od.nnc"
+    model_checksum: "57b84061e81f91da19580c7171e59662"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 1000000
+}
+
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "NPU"
+    custom_setting {
+      id: "preset"
+      value: "1002"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "true"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "true"
+    }
+    model_file: {
+    model_path: "local:///MLPerf_sideload/sr.nnc"
+    model_checksum: ""
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 1000000
+}
+benchmark_setting {
+  benchmark_id: "natural_language_processing"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "npu"
+    accelerator_desc: "npu"
+    custom_setting {
+      id: "preset"
+      value: "1000"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Int32"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "false"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "false"
+    }
+    model_file: {
+    model_path: "local:///MLPerf_sideload/mobile_bert_gpu.nnc"
+    model_checksum: "8bcc0eedf45e05d16f20a1842b514a3e"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 1000000
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline"
+  framework: "ENN"
+  delegate_choice: {
+    delegate_name: "ENN_NPU"
+    accelerator_name: "samsung_npu"
+    accelerator_desc: "npu"
+    batch_size: 48
+    custom_setting {
+      id: "scenario"
+      value: "offline"
+    }
+    custom_setting {
+      id: "preset"
+      value: "1002"
+    }
+    custom_setting {
+      id: "i_type"
+      value: "Uint8"
+    }
+    custom_setting {
+      id: "o_type"
+      value: "Float32"
+    }
+    custom_setting {
+      id: "extension"
+      value: "false"
+    }
+    custom_setting {
+      id: "lazy_mode"
+      value: "false"
+    }
+    model_file: {
+    model_path: "local:///MLPerf_sideload/ic_offline.nnc"
+    model_checksum: "11a2debf7c43e89dfd8a6b97fe8ad4e1"
+    }
+  }
+  delegate_selected: "ENN_NPU"
+  single_stream_expected_latency_ns: 1000000
+}

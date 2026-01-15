@@ -37,12 +37,17 @@ The Qualcomm Neural Processing SDK (SNPE) is a software accelerated runtime and 
 
 The MLPerf Application uses the SNPE Hexagon Processor runtimes on the following families:
 
+* Snapdragon 8 Elite Gen 5
 * Snapdragon 8 Elite
+* Snapdragon 8 Gen 5
 * Snapdragon 8 Gen 3
+* Snapdragon 8s Gen 4
 * Snapdragon 8s Gen 3
 * Snapdragon 8 Gen 2
+* Snapdragon 7 Gen 4
 * Snapdragon 7 Gen 3
 * Snapdragon 7s Gen 3
+* Snapdragon 6 Gen 4
 * Snapdragon 4 Gen 2
 * Default fallback for all other Snapdragon mobile platforms
 
@@ -61,6 +66,7 @@ Official website URL: [https://developer.samsung.com/neural/overview.html](https
 
 The MLPerf Mobile Benchmarking App uses the Exynos Neural Network SDK on the following families of Exynos processors [https://semiconductor.samsung.com/processor/](https://semiconductor.samsung.com/processor/):
 
+* Exynos 2600
 * Exynos 2500
 * Exynos 2400
 * Exynos 2300
