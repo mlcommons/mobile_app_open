@@ -49,7 +49,7 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
     if (input_tokens.size() > input_token_limit_) {
       LOG(WARNING) << "Input token limit exceeded for entry "
                    << std::to_string(i) << ". Truncating.";
-      std::erase(input_tokens.begin(), input_tokens.end() - input_token_limit_);
+      input_tokens.erase(input_tokens.begin(), input_tokens.end() - input_token_limit_);
     }
 
     auto sample = std::make_unique<PromptSample>();
