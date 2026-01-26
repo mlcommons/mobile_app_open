@@ -43,7 +43,7 @@ inline bool compare(size_t value, size_t threshold, Relation rel) {
 class Instruction {
  public:
   virtual ~Instruction() = default;
-  virtual constexpr InstructionGroup Group() = 0;
+  virtual InstructionGroup Group() = 0;
 
   bool IsFollowed(const std::string& resp, bool loose = false) const {
     // For strict checks, just verify the response itself
@@ -67,7 +67,7 @@ class CapitalWordFrequency : public Instruction {
   CapitalWordFrequency(int capital_frequency, Relation capital_relation)
       : threshold_(capital_frequency), rel_(capital_relation) {}
 
-  constexpr InstructionGroup Group() override { return CHANGE_CASE; }
+  InstructionGroup Group() override { return CHANGE_CASE; }
 
  private:
   int threshold_;
@@ -116,7 +116,7 @@ class CapitalWordFrequency : public Instruction {
 class EnglishCapital : public Instruction {
  public:
   EnglishCapital() = default;
-  constexpr InstructionGroup Group() override { return CHANGE_CASE; }
+  InstructionGroup Group() override { return CHANGE_CASE; }
 
  private:
   virtual bool verify_(const std::string& resp) const override {
@@ -129,7 +129,7 @@ class EnglishCapital : public Instruction {
 class EnglishLowercase : public Instruction {
  public:
   EnglishLowercase() = default;
-  constexpr InstructionGroup Group() override { return CHANGE_CASE; }
+  InstructionGroup Group() override { return CHANGE_CASE; }
 
  private:
   virtual bool verify_(const std::string& resp) const override {
@@ -145,7 +145,7 @@ class RepeatPrompt : public Instruction {
  public:
   explicit RepeatPrompt(std::string prompt_to_repeat)
       : prompt_(std::move(prompt_to_repeat)) {}
-  constexpr InstructionGroup Group() override { return COMBINATION; }
+  InstructionGroup Group() override { return COMBINATION; }
 
  private:
   std::string prompt_;
@@ -157,7 +157,7 @@ class RepeatPrompt : public Instruction {
 class TwoResponses : public Instruction {
  public:
   TwoResponses() = default;
-  constexpr InstructionGroup Group() override { return COMBINATION; }
+  InstructionGroup Group() override { return COMBINATION; }
 
  private:
   virtual bool verify_(const std::string& resp) const override {
@@ -181,7 +181,7 @@ class TwoResponses : public Instruction {
 class NumberPlaceholders : public Instruction {
  public:
   explicit NumberPlaceholders(int num_placeholders) : n_(num_placeholders) {}
-  constexpr InstructionGroup Group() override { return DETECTABLE_CONTENT; }
+  InstructionGroup Group() override { return DETECTABLE_CONTENT; }
 
  private:
   int n_;
@@ -206,7 +206,7 @@ class Postscript : public Instruction {
  public:
   explicit Postscript(std::string postscript_marker)
       : marker_(std::move(postscript_marker)) {}
-  constexpr InstructionGroup Group() override { return DETECTABLE_CONTENT; }
+  InstructionGroup Group() override { return DETECTABLE_CONTENT; }
 
  private:
   std::string marker_;
@@ -220,7 +220,7 @@ class Postscript : public Instruction {
 class ConstrainedResponse : public Instruction {
  public:
   ConstrainedResponse() = default;
-  constexpr InstructionGroup Group() override { return DETECTABLE_FORMAT; }
+  InstructionGroup Group() override { return DETECTABLE_FORMAT; }
 
  private:
   // TODO constexpr?
@@ -241,7 +241,7 @@ class ConstrainedResponse : public Instruction {
 class JsonFormat : public Instruction {
  public:
   JsonFormat() = default;
-  constexpr InstructionGroup Group() override { return DETECTABLE_FORMAT; }
+  InstructionGroup Group() override { return DETECTABLE_FORMAT; }
 
  private:
   virtual bool verify_(const std::string& resp) const override {
@@ -264,7 +264,7 @@ class MultipleSections : public Instruction {
  public:
   MultipleSections(int num_sections, std::string section_spliter)
       : n_(num_sections), sep_(std::move(section_spliter)) {}
-  constexpr InstructionGroup Group() override { return DETECTABLE_FORMAT; }
+  InstructionGroup Group() override { return DETECTABLE_FORMAT; }
 
  private:
   int n_;
@@ -317,7 +317,7 @@ class MultipleSections : public Instruction {
 class NumberBulletLists : public Instruction {
  public:
   explicit NumberBulletLists(int num_bullets) : n_(num_bullets) {}
-  constexpr InstructionGroup Group() override { return DETECTABLE_FORMAT; }
+  InstructionGroup Group() override { return DETECTABLE_FORMAT; }
 
  private:
   int n_;
@@ -346,7 +346,7 @@ class NumberBulletLists : public Instruction {
 class NumberHighlightedSections : public Instruction {
  public:
   explicit NumberHighlightedSections(int num_highlights) : n_(num_highlights) {}
-  constexpr InstructionGroup Group() override { return DETECTABLE_FORMAT; }
+  InstructionGroup Group() override { return DETECTABLE_FORMAT; }
 
  private:
   int n_;
@@ -387,7 +387,7 @@ class NumberHighlightedSections : public Instruction {
 class Title : public Instruction {
  public:
   Title() = default;
-  constexpr InstructionGroup Group() override { return DETECTABLE_FORMAT; }
+  InstructionGroup Group() override { return DETECTABLE_FORMAT; }
 
  private:
   virtual bool verify_(const std::string& resp) const override {
@@ -405,7 +405,7 @@ class Existence : public Instruction {
  public:
   explicit Existence(std::vector<std::string> keywords)
       : kws_(std::move(keywords)) {}
-  constexpr InstructionGroup Group() override { return KEYWORDS; }
+  InstructionGroup Group() override { return KEYWORDS; }
 
  private:
   std::vector<std::string> kws_;
@@ -420,7 +420,7 @@ class ForbiddenWords : public Instruction {
  public:
   explicit ForbiddenWords(std::vector<std::string> forbidden_words)
       : bad_(std::move(forbidden_words)) {}
-  constexpr InstructionGroup Group() override { return KEYWORDS; }
+  InstructionGroup Group() override { return KEYWORDS; }
 
  private:
   std::vector<std::string> bad_;
@@ -433,7 +433,7 @@ class Frequency : public Instruction {
  public:
   Frequency(int frequency, std::string keyword, Relation relation)
       : n_(frequency), kw_(std::move(keyword)), rel_(relation) {}
-  constexpr InstructionGroup Group() override { return KEYWORDS; }
+  InstructionGroup Group() override { return KEYWORDS; }
 
  private:
   int n_;
@@ -578,7 +578,7 @@ class LetterFrequency : public Instruction {
  public:
   LetterFrequency(int let_frequency, char letter, Relation let_relation)
       : n_(let_frequency), letter_(letter), rel_(let_relation) {}
-  constexpr InstructionGroup Group() override { return KEYWORDS; }
+  InstructionGroup Group() override { return KEYWORDS; }
 
  private:
   int n_;
@@ -603,7 +603,7 @@ class ResponseLanguage : public Instruction {
  public:
   explicit ResponseLanguage(std::string language)
       : lang_(std::move(language)) {}
-  constexpr InstructionGroup Group() override { return LANGUAGE; }
+  InstructionGroup Group() override { return LANGUAGE; }
 
  private:
   std::string lang_;
@@ -630,7 +630,7 @@ class NthParagraphFirstWord : public Instruction {
       : nth_(nth_paragraph),
         first_(std::move(first_word)),
         total_(num_paragraphs) {}
-  constexpr InstructionGroup Group() override { return LENGTH_CONSTRAINTS; }
+  InstructionGroup Group() override { return LENGTH_CONSTRAINTS; }
 
  private:
   int nth_;
@@ -679,7 +679,7 @@ class NthParagraphFirstWord : public Instruction {
 class NumberParagraphs : public Instruction {
  public:
   explicit NumberParagraphs(int num_paragraphs) : n_(num_paragraphs) {}
-  constexpr InstructionGroup Group() override { return LENGTH_CONSTRAINTS; }
+  InstructionGroup Group() override { return LENGTH_CONSTRAINTS; }
 
  private:
   unsigned n_;
@@ -700,7 +700,7 @@ class NumberSentences : public Instruction {
  public:
   NumberSentences(int num_sentences, Relation relation)
       : n_(num_sentences), rel_(relation) {}
-  constexpr InstructionGroup Group() override { return LENGTH_CONSTRAINTS; }
+  InstructionGroup Group() override { return LENGTH_CONSTRAINTS; }
 
  private:
   int n_;
@@ -856,7 +856,7 @@ class NumberWords : public Instruction {
  public:
   NumberWords(int num_words, Relation relation)
       : n_(num_words), rel_(relation) {}
-  constexpr InstructionGroup Group() override { return LENGTH_CONSTRAINTS; }
+  InstructionGroup Group() override { return LENGTH_CONSTRAINTS; }
 
  private:
   int n_;
@@ -882,7 +882,7 @@ class NumberWords : public Instruction {
 class NoComma : public Instruction {
  public:
   NoComma() = default;
-  constexpr InstructionGroup Group() override { return PUNCTUATION; }
+  InstructionGroup Group() override { return PUNCTUATION; }
 
  private:
   virtual bool verify_(const std::string& resp) const override {
@@ -895,7 +895,7 @@ class NoComma : public Instruction {
 class EndChecker : public Instruction {
  public:
   explicit EndChecker(std::string end_phrase) : end_(std::move(end_phrase)) {}
-  constexpr InstructionGroup Group() override { return STARTEND; }
+  InstructionGroup Group() override { return STARTEND; }
 
  private:
   std::string end_;
@@ -907,7 +907,7 @@ class EndChecker : public Instruction {
 class Quotation : public Instruction {
  public:
   Quotation() = default;
-  constexpr InstructionGroup Group() override { return STARTEND; }
+  InstructionGroup Group() override { return STARTEND; }
 
  private:
   virtual bool verify_(const std::string& resp) const override {
