@@ -266,7 +266,7 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "http://192.168.1.128:8084/llama_q8_ekv3072.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
       model_checksum: "54efe0be372b55303673245067beef62"
     }
     model_file: {
@@ -297,7 +297,7 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "http://192.168.1.128:8084/llama_q8_ekv3072.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
       model_checksum: "54efe0be372b55303673245067beef62"
     }
     model_file: {
