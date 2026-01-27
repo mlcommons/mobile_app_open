@@ -31,6 +31,7 @@ cc_library(
         "//flutter/cpp/datasets:ade20k",
         "//flutter/cpp/datasets:coco",
         "//flutter/cpp/datasets:coco_gen",
+        "//flutter/cpp/datasets:ifeval",
         "//flutter/cpp/datasets:imagenet",
         "//flutter/cpp/datasets:mmlu_gen",
         "//flutter/cpp/datasets:snu_sr",

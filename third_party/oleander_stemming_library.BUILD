@@ -6,9 +6,9 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "oleander_stemming_library",
-    hdrs = [
+    hdrs = glob([
         "src/*.h",
-    ],
+    ]),
     includes = [
         "src"
     ]

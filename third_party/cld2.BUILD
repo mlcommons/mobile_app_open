@@ -35,6 +35,7 @@ cc_library(
     ],
     copts = [
         "-std=c++11",
+        "-Wno-c++11-narrowing",
     ],
     visibility = ["//visibility:public"],
 )
