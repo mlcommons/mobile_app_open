@@ -49,6 +49,7 @@ RUN yes | sdkmanager \
 # Install NDK in a separate layer to decrease max layer size.
 RUN yes | sdkmanager "ndk;25.2.9519653"
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/25.2.9519653
+ENV ANDROID_NDK=${ANDROID_NDK_ROOT}
 ENV ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
 ENV ANDROID_NDK_VERSION=25
 ENV ANDROID_NDK_API_LEVEL=33
@@ -77,7 +78,6 @@ RUN git config --global --add safe.directory /image-workdir/project
 # Add 32-bit support since the adb in our sdk's are 32-bit binaries
 RUN dpkg --add-architecture i386
 ARG DEBIAN_FRONTEND=noninteractive
-ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
 # build-essential: for rest-kit(rest-kit needed for crad-repo)
 # file : used by ndk to determine if host is 32 or 64 bit
@@ -127,13 +127,13 @@ RUN chmod +x /opt/cmake-3.19.3-Linux-x86_64.sh && mkdir -p /opt/cmake && \
     bash /opt/cmake-3.19.3-Linux-x86_64.sh --skip-license --prefix=/opt/cmake && \
     rm -rf /opt/cmake-3.19.3-Linux-x86_64.sh
 # Add CMAKE into PATH
-ENV PATH "/opt/cmake/bin:${PATH}"
+ENV PATH="/opt/cmake/bin:${PATH}"
 
 # OpenCV
-ENV CMAKE_TOOLCHAIN_FILE "${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake"
-ENV ANDROID_ABI "arm64-v8a"
-ENV API_LEVEL "31"
-ENV ANDROID_TOOLCHAIN_NAME "aarch64-linux-android-4.9"
+ENV CMAKE_TOOLCHAIN_FILE="${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake"
+ENV ANDROID_ABI="arm64-v8a"
+ENV API_LEVEL="31"
+ENV ANDROID_TOOLCHAIN_NAME="aarch64-linux-android-4.9"
 ARG COMMON_CMAKE_OPTIONS="-DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=release \
                           -DBUILD_ZLIB=ON -DWITH_FFMPEG=ON -DBUILD_TESTS=OFF \
                           -DWITH_TBB=ON -DBUILD_PERF_TESTS=OFF -DWITH_IPP=OFF \
@@ -158,8 +158,8 @@ RUN tar -C /tmp -xvf /tmp/3.4.7.tar.gz  && \
     sudo make -j16 install  && cp -rf ./3rdparty/ /opt/opencv-3.4.7_android/
 
 # Set the variables to be used for actual app development/build
-ENV ANDROID_SYSROOT "${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
-ENV ANDROID_PLATFORM "${API_LEVEL}"
-ENV ANDROID_PLATFORM_TOOLS "${ANDROID_HOME}/platform-tools"
-ENV PATH "${ANDROID_PLATFORM_TOOLS}:${PATH}"
-ENV LD_LIBRARY_PATH "/usr/local/lib/:${LD_LIBRARY_PATH}"
+ENV ANDROID_SYSROOT="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+ENV ANDROID_PLATFORM="${API_LEVEL}"
+ENV ANDROID_PLATFORM_TOOLS="${ANDROID_HOME}/platform-tools"
+ENV PATH="${ANDROID_PLATFORM_TOOLS}:${PATH}"
+ENV LD_LIBRARY_PATH="/usr/local/lib/:${LD_LIBRARY_PATH}"
