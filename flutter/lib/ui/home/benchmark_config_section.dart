@@ -341,20 +341,6 @@ class BenchmarkConfigSection extends StatelessWidget {
       ],
     );
   }
-  // Widget _setListTile(BenchmarkSet benchmarkSet, BenchmarkState state, AppLocalizations l10n) {
-  //   return Column(children: [
-  //     Text(benchmarkSet.config.name),
-  //     const Divider(height: 0.5,),
-  //     for (final option in benchmarkSet.optionMap.keys) ...[
-  //       Row(
-  //         children: [
-  //           Text(option),
-  //           Checkbox(key: Key(option), value: benchmarkSet.optionSets[benchmarkSet.optionMap[option]!].getOption(option), onChanged: (bool? value) {state.benchmarkSetOption(benchmarkSet, option, value!); })
-  //         ],
-  //       ),
-  //     ]
-  //   ],);
-  // }
 
   Widget _listTile(
       Benchmark benchmark, BenchmarkState state, AppLocalizations l10n) {

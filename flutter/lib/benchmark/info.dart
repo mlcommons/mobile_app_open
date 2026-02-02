@@ -32,7 +32,7 @@ class BenchmarkInfo {
         return BenchmarkLocalizationInfo(
             name: 'LLM',
             detailsTitle: 'Large Language Model',
-            detailsContent: 'you know what ChatGPT is...');
+            detailsContent: 'LLM description goes here');
       case (BenchmarkId.imageClassificationV2):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameImageClassification,
