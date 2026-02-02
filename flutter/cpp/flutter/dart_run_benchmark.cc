@@ -11,6 +11,7 @@
 #include "flutter/cpp/datasets/ade20k.h"
 #include "flutter/cpp/datasets/coco.h"
 #include "flutter/cpp/datasets/coco_gen.h"
+#include "flutter/cpp/datasets/ifeval.h"
 #include "flutter/cpp/datasets/imagenet.h"
 #include "flutter/cpp/datasets/mmlu_gen.h"
 #include "flutter/cpp/datasets/snu_sr.h"
@@ -116,10 +117,20 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       }
       sp_path = in->backend_model_path;
       sp_path += '/' + sp_path_filename;
-      LOG(INFO) << "SP path: " << sp_path;
       use_token_latencies = true;
       dataset = std::make_unique<::mlperf::mobile::MmluGen>(
-          backend.get(), in->dataset_data_path, sp_path, true /*zero-shot*/);
+          backend.get(), in->dataset_data_path, sp_path, false /*zero-shot*/);
+      break;
+    case ::mlperf::mobile::DatasetConfig::IFEVAL:
+      for (auto setting : settings.benchmark_setting().custom_setting()) {
+        if (setting.id() == "tokenizer_filename")
+          sp_path_filename = setting.value();
+      }
+      sp_path = in->backend_model_path;
+      sp_path += '/' + sp_path_filename;
+      use_token_latencies = true;
+      dataset = std::make_unique<::mlperf::mobile::IFEval>(
+          backend.get(), in->dataset_data_path, sp_path);
       break;
     default:
       return nullptr;

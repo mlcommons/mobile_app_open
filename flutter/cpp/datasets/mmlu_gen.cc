@@ -46,10 +46,20 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
     sp_processor->Encode(input.c_str(), &input_tokens).ok();
 
     // input token sanity check
-    if (input_tokens.size() > input_token_limit_) {
+    while (input_tokens.size() > input_token_limit_) {
       LOG(WARNING) << "Input token limit exceeded for entry "
-                   << std::to_string(i) << ". Ignoring.";
-      continue;
+                   << std::to_string(i) << ". Truncating.";
+
+      size_t cur = input.find("\n\n") + 2;
+      std::string preface = input.substr(0, cur);
+      std::string truncated_shots = input.substr(input.find("\n\n", cur) + 2);
+
+      input = preface + truncated_shots;
+
+      // LOG(WARNING) << "new string: " << input;
+
+      sp_processor->Encode(input.c_str(), &input_tokens).ok();
+      LOG(WARNING) << "new size: " << input_tokens.size();
     }
 
     auto sample = std::make_unique<PromptSample>();

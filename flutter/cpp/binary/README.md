@@ -135,3 +135,28 @@ adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL S
   --groundtruth_file=/sdcard/Android/data/org.mlperf.inference/files/cache/cache/squad_groundtruth.tfrecord \
   --lib_path=/data/local/tmp/libtflitebackend.so
 ```
+
+Evaluating accuracy of LLama3 with TinyMMLU evaluation set.
+
+```shell
+adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL llm \
+--mode=AccuracyOnly \
+--output_dir=/data/local/tmp/llm_output \
+--zero-shot=false \
+--model_file=/sdcard/Android/data/org.mlperf.inference/files/cache/cache/llama_1b_q8_ekv1280.tflite \
+--input_tfrecord=/sdcard/Android/data/org.mlperf.inference/files/cache/cache/tinymmlu.tfrecord \
+--lib_path=/data/local/tmp/libtflitebackend.so \
+--sp_path=/sdcard/Android/data/org.mlperf.inference/files/cache/cache/llama3_1b.spm.model 
+```
+
+Evaluating accuracy of LLama3 with IFEval evaluation set.
+
+```shell
+adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL llm_instruction \
+--mode=AccuracyOnly \
+--output_dir=/data/local/tmp/llm_output \
+--model_file=/sdcard/Android/data/org.mlperf.inference/files/cache/cache/llama_1b_q8_ekv1280.tflite \
+--input_tfrecord=/sdcard/Android/data/org.mlperf.inference/files/cache/cache/tinyifeval.tfrecord \
+--lib_path=/data/local/tmp/libtflitebackend.so \
+--sp_path=/sdcard/Android/data/org.mlperf.inference/files/cache/cache/llama3_1b.spm.model 
+```

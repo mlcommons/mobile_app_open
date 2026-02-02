@@ -266,11 +266,42 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "local:///mlperf_models/llama_q8_ekv3072.tflite"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
       model_checksum: "54efe0be372b55303673245067beef62"
     }
     model_file: {
-      model_path: "local:///mlperf_models/llama3_1b.spm.model"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-instruct"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
+      model_checksum: "54efe0be372b55303673245067beef62"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
       model_checksum: "2ad260fc18b965ce16006d76c9327082"
     }
   }
