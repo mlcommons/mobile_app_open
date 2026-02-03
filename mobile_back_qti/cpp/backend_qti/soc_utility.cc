@@ -338,7 +338,6 @@ int Socs::soc_num_inits() {
 }
 
 bool Socs::isSnapDragon(const char *manufacturer) {
-  soc_info_init();
 #ifdef __ANDROID__
   bool is_qcom = false;
   if (strncmp("QUALCOMM", manufacturer, 7) == 0) {
@@ -357,14 +356,38 @@ bool Socs::isSnapDragon(const char *manufacturer) {
 
     /* get an EGL display connection */
     display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (display == EGL_NO_DISPLAY) {
+      LOG(ERROR) << "Failed to get EGL display";
+      return false;
+    }
     /* initialize the EGL display connection */
-    eglInitialize(display, NULL, NULL);
+    if (eglInitialize(display, NULL, NULL) == EGL_FALSE) {
+      LOG(ERROR) << "Failed to initialize EGL";
+      eglTerminate(display);
+      return false;
+    }
     /* get an appropriate EGL frame buffer configuration */
-    eglChooseConfig(display, attribute_list, &config, 1, &num_config);
+    if (eglChooseConfig(display, attribute_list, &config, 1, &num_config) == EGL_FALSE || num_config == 0) {
+      LOG(ERROR) << "Failed to choose EGL config";
+      eglTerminate(display);
+      return false;
+    }
     /* create an EGL rendering context */
     context = eglCreateContext(display, config, EGL_NO_CONTEXT, NULL);
+    if (context == EGL_NO_CONTEXT) {
+      LOG(ERROR) << "Failed to create EGL context";
+      eglDestroySurface(display, surface);
+      eglTerminate(display);
+      return false;
+    }
     /* connect the context to the surface */
-    eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, context);
+    if (eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, context) == EGL_FALSE) {
+      LOG(ERROR) << "Failed to make EGL context current";
+      eglDestroyContext(display, context);
+      eglDestroySurface(display, surface);
+      eglTerminate(display);
+      return false;
+    }
 
     const unsigned char *vendor = glGetString(GL_VENDOR);
 
