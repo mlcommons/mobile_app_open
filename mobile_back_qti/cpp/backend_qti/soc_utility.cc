@@ -367,7 +367,9 @@ bool Socs::isSnapDragon(const char *manufacturer) {
       return false;
     }
     /* get an appropriate EGL frame buffer configuration */
-    if (eglChooseConfig(display, attribute_list, &config, 1, &num_config) == EGL_FALSE || num_config == 0) {
+    if (eglChooseConfig(display, attribute_list, &config, 1, &num_config) ==
+            EGL_FALSE ||
+        num_config == 0) {
       LOG(ERROR) << "Failed to choose EGL config";
       eglTerminate(display);
       return false;
@@ -381,7 +383,8 @@ bool Socs::isSnapDragon(const char *manufacturer) {
       return false;
     }
     /* connect the context to the surface */
-    if (eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, context) == EGL_FALSE) {
+    if (eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, context) ==
+        EGL_FALSE) {
       LOG(ERROR) << "Failed to make EGL context current";
       eglDestroyContext(display, context);
       eglDestroySurface(display, surface);
