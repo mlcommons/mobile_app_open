@@ -62,7 +62,6 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
     ${local_snpe_sdk_root}/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v79/unsigned/libSnpeHtpV79Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v81/unsigned/libSnpeHtpV81Skel.so \
-    mobile_back_qti/run_mlperf_tests.sh \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtp.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV73Stub.so \
     ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libQnnHtpV73Skel.so \

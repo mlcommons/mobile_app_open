@@ -12,7 +12,19 @@ on:
     types: [ checks_requested ]
 
 jobs:
+  computed:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Compute build number
+        id: set
+        env:
+          OFFSET: ${{ vars.FLUTTER_BUILD_NUMBER_OFFSET }}
+        run: echo "build_number=$((GITHUB_RUN_NUMBER + ${OFFSET:-0}))" >> "$GITHUB_OUTPUT"
+    outputs:
+      build_number: ${{ steps.set.outputs.build_number }}
+
   build:
+    needs: computed
     name: Build Android app
     # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
     runs-on: macos-15
@@ -27,7 +39,7 @@ jobs:
       WITH_APPLE: 0
       BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
       BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
-      FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
+      FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
       FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
       FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
       FIREBASE_PROJECT_ID: mobile-app-build-290400
@@ -93,7 +105,17 @@ jobs:
       - name: Archive APK with TFLite backend
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-apk-tflite-${{ github.run_number }}
-          path: output/android-apks/*-t-${{ github.run_number }}.apk
+          name: android-apk-tflite-${{ needs.computed.outputs.build_number }}
+          path: output/android-apks/*-t-${{ needs.computed.outputs.build_number }}.apk
+          retention-days: 28
+          if-no-files-found: error
+      - name: Build macOS CLI binaries
+        run: |
+          make cmdline/macos/bins/release
+      - name: Archive macOS CLI binaries
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: macos-cmdline-${{ needs.computed.outputs.build_number }}
+          path: output/macos-cli/*
           retention-days: 28
           if-no-files-found: error
