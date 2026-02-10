@@ -16,6 +16,7 @@
 include flutter/cpp/binary/cmdline-docker.mk
 
 cmdline/android/bins/release: cmdline/android/libs/deps cmdline/android/bins/build cmdline/android/bins/copy
+cmdline/macos/bins/release: cmdline/macos/bins/build cmdline/macos/bins/copy
 
 .PHONY: cmdline/android/libs/deps
 cmdline/android/libs/deps:
@@ -34,7 +35,7 @@ cmdline/android/bins/build:
 		//flutter/cpp/flutter:libbackendbridge.so \
 		//flutter/cpp/binary:main
 
-cmdline_android_bin_release_path=output/cmdline_bins/release
+cmdline_android_bin_release_path=output/android-cli
 .PHONY: cmdline/android/bins/copy
 cmdline/android/bins/copy:
 	rm -rf ${cmdline_android_bin_release_path}
@@ -93,3 +94,24 @@ cmdline/windows/prepare-dlls:
 cmdline/windows/copy-dlls:
 	currentDir=$$(pwd) && cd "${msvc_arm_dlls_path}" && \
 		cp  --target-directory $$currentDir/${windows_cmdline_folder} ${msvc_arm_dlls_list}
+
+.PHONY: cmdline/macos/bins/build
+cmdline/macos/bins/build:
+	bazel ${BAZEL_OUTPUT_ROOT_ARG} ${proxy_bazel_args} ${sonar_bazel_startup_options} \
+		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
+		-c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 --macos_minimum_os=13.1 \
+		${backend_tflite_android_target} \
+		//flutter/cpp/binary:main
+
+cmdline_macos_bin_release_path=output/macos-cli
+.PHONY: cmdline/macos/bins/copy
+cmdline/macos/bins/copy:
+	rm -rf ${cmdline_macos_bin_release_path}
+	mkdir -p ${cmdline_macos_bin_release_path}
+	@# macos doesn't support --target-directory flag
+	cp -f \
+		${backend_tflite_android_files} \
+		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/binary/main \
+		${cmdline_macos_bin_release_path}
+		@# macos doesn't support --recursive flag
+		chmod -R 777 ${cmdline_macos_bin_release_path}
