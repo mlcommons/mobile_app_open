@@ -93,7 +93,7 @@ void main() {
         _Examples.latency90,
         _Examples.validity,
       ];
-      
+
       final info = await LoadgenInfo.extractLoadgenInfo(
         logLines: Stream.fromIterable(lines),
       );
