@@ -271,6 +271,23 @@ jobs:
           path: output/android-apks/*-qsmgt-${{ needs.computed.outputs.build_number }}.aab
           retention-days: 28
           if-no-files-found: error
+      - name: Build Android CLI binaries
+        env:
+          WITH_TFLITE: 1
+          WITH_PIXEL: 1
+          WITH_MEDIATEK: 1
+          WITH_QTI: 1
+          WITH_SAMSUNG: 1
+          WITH_APPLE: 0
+        run: |
+          make cmdline/android/bins/release
+      - name: Archive Android CLI binaries
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: android-cmdline-${{ needs.computed.outputs.build_number }}
+          path: output/android-cli/*
+          retention-days: 28
+          if-no-files-found: error
 
   test-android-apk-unified:
     name: ${{ matrix.backend }}-${{ matrix.device }} (unified)
