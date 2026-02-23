@@ -93,12 +93,20 @@ void main() {
         _Examples.latency90,
         _Examples.validity,
       ];
+      
+      final info = await LoadgenInfo.extractLoadgenInfo(
+        logLines: Stream.fromIterable(lines),
+      );
 
-      expect(() async {
-        await LoadgenInfo.extractLoadgenInfo(
-          logLines: Stream.fromIterable(lines),
-        );
-      }, throwsA(isA<TypeError>()));
+      expect(info, isNotNull);
+      info!;
+      expect(info.latency90, 0.0410139);
+      expect(info.latencyMean, 0.031329862);
+      expect(info.queryCount, 0);
+      expect(info.isResultValid, false);
+      expect(info.isMinDurationMet, false);
+      expect(info.isMinQueryMet, false);
+      expect(info.isEarlyStoppingMet, false);
     });
   });
 }
