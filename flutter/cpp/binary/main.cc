@@ -418,8 +418,8 @@ int Main(int argc, char *argv[]) {
 
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
-        dataset.reset(
-            new MmluGen(backend.get(), input_tfrecord, sp_path, zero_shot));
+        dataset.reset(new MmluGen(backend.get(), input_tfrecord, sp_path,
+                                  zero_shot, Str2TestMode(mode)));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),
@@ -471,9 +471,10 @@ int Main(int argc, char *argv[]) {
   // Running mlperf.
   MlperfDriver driver(std::move(dataset), std::move(backend), scenario,
                       batch_size);
-  driver.RunMLPerfTest(
-      mode, min_query_count, min_duration_ms / 1000.0, max_duration_ms / 1000.0,
-      single_stream_expected_latency_ns, output_dir, benchmark_id == "llm");
+  driver.RunMLPerfTest(mode, min_query_count, min_duration_ms / 1000.0,
+                       max_duration_ms / 1000.0,
+                       single_stream_expected_latency_ns, output_dir,
+                       (benchmark_id.rfind("llm", 0) == 0));
   LOG(INFO) << "Accuracy: " << driver.ComputeAccuracyString();
   return 0;
 }

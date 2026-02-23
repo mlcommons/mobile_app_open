@@ -135,7 +135,13 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
   use_tokens_ = use_tokens;
   mlperf_settings.use_token_latencies = use_tokens;
   // mlperf_settings.server_target_qps = 0.1;
-  mlperf_settings.mode = Str2TestMode(mode);
+
+  // Prevent datasets with performance sample count 0 from running.
+  ::mlperf::TestMode runMode = Str2TestMode(mode);
+  if (dataset_->PerformanceSampleCount() == 0)
+    runMode = ::mlperf::TestMode::AccuracyOnly;
+
+  mlperf_settings.mode = runMode;
   mlperf_settings.min_duration_ms =
       static_cast<uint64_t>(std::ceil(min_duration * 1000.0));
   // Note: max_duration_ms works only in SingleStream scenario.
