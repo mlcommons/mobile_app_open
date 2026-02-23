@@ -112,8 +112,9 @@ class LoadgenInfo {
 
     return LoadgenInfo(
       queryCount: result[queryCountKey] as int? ?? 0,
-      latencyMean:
-          !usesTokens ? (result[latencyKey] as int? ?? 0) / nanosecondsPerSecond : 0,
+      latencyMean: !usesTokens
+          ? (result[latencyKey] as int? ?? 0) / nanosecondsPerSecond
+          : 0,
       latencyFirstTokenMean: usesTokens
           ? (result[latencyFirstTokenKey] as int? ?? 0) / nanosecondsPerSecond
           : 0,
@@ -123,7 +124,8 @@ class LoadgenInfo {
       latencyFirstToken90: usesTokens
           ? (result[latency90FirstTokenKey] as int? ?? 0) / nanosecondsPerSecond
           : 0,
-      tokenThroughput: usesTokens ? result[tokenThroughputKey] as double? ?? 0.0 : 0,
+      tokenThroughput:
+          usesTokens ? result[tokenThroughputKey] as double? ?? 0.0 : 0,
       isMinDurationMet: result[minDurationMetKey] as bool? ?? false,
       isMinQueryMet: result[minQueriesMetKey] as bool? ?? false,
       isEarlyStoppingMet: result[earlyStoppingMetKey] as bool? ?? false,
