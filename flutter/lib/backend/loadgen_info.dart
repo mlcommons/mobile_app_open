@@ -107,30 +107,30 @@ class LoadgenInfo {
       return null;
     }
 
-    final isResultValid = result[validityKey] as String == 'VALID';
-
     const nanosecondsPerSecond = 1000 * Duration.microsecondsPerSecond;
     bool usesTokens = (result[useTokenLatenciesKey] ?? false) as bool;
 
     return LoadgenInfo(
-      queryCount: result[queryCountKey] as int,
-      latencyMean:
-          !usesTokens ? (result[latencyKey] as int) / nanosecondsPerSecond : 0,
+      queryCount: result[queryCountKey] as int? ?? 0,
+      latencyMean: !usesTokens
+          ? (result[latencyKey] as int? ?? 0) / nanosecondsPerSecond
+          : 0,
       latencyFirstTokenMean: usesTokens
-          ? (result[latencyFirstTokenKey] as int) / nanosecondsPerSecond
+          ? (result[latencyFirstTokenKey] as int? ?? 0) / nanosecondsPerSecond
           : 0,
       latency90: !usesTokens
-          ? (result[latency90Key] as int) / nanosecondsPerSecond
+          ? (result[latency90Key] as int? ?? 0) / nanosecondsPerSecond
           : 0,
       latencyFirstToken90: usesTokens
-          ? (result[latency90FirstTokenKey] as int) / nanosecondsPerSecond
+          ? (result[latency90FirstTokenKey] as int? ?? 0) / nanosecondsPerSecond
           : 0,
-      tokenThroughput: usesTokens ? result[tokenThroughputKey] as double : 0,
-      isMinDurationMet: result[minDurationMetKey] as bool,
-      isMinQueryMet: result[minQueriesMetKey] as bool,
-      isEarlyStoppingMet: result[earlyStoppingMetKey] as bool,
+      tokenThroughput:
+          usesTokens ? result[tokenThroughputKey] as double? ?? 0.0 : 0,
+      isMinDurationMet: result[minDurationMetKey] as bool? ?? false,
+      isMinQueryMet: result[minQueriesMetKey] as bool? ?? false,
+      isEarlyStoppingMet: result[earlyStoppingMetKey] as bool? ?? false,
       isTokenBased: usesTokens,
-      isResultValid: isResultValid,
+      isResultValid: (result[validityKey] as String?) == 'VALID',
     );
   }
 
