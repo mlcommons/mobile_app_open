@@ -11,7 +11,8 @@ namespace mlperf {
 namespace mobile {
 
 MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
-                 const std::string& sp_path, bool zero_shot)
+                 const std::string& sp_path, bool zero_shot,
+                 ::mlperf::TestMode mode)
     : sample_reader_(input_tfrecord), Dataset(backend) {
   sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(
       LoadSentencePieceProcessor(sp_path));
@@ -27,6 +28,9 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
         tensorflow::GetFeatureValues<std::string>("input", example).Get(0);
     std::string answer =
         tensorflow::GetFeatureValues<std::string>("answer", example).Get(0);
+
+    // Set output token limit to 128 if performance mode is being used
+    if (mode == ::mlperf::TestMode::PerformanceOnly) token_limit_ = 128;
 
     if (zero_shot) {
       // input-formatted shots are separated by 2 new lines, so we find the last
@@ -47,19 +51,16 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
 
     // input token sanity check
     while (input_tokens.size() > input_token_limit_) {
-      LOG(WARNING) << "Input token limit exceeded for entry "
-                   << std::to_string(i) << ". Truncating.";
-
       size_t cur = input.find("\n\n") + 2;
       std::string preface = input.substr(0, cur);
       std::string truncated_shots = input.substr(input.find("\n\n", cur) + 2);
 
       input = preface + truncated_shots;
 
-      // LOG(WARNING) << "new string: " << input;
-
       sp_processor->Encode(input.c_str(), &input_tokens).ok();
-      LOG(WARNING) << "new size: " << input_tokens.size();
+      LOG(WARNING) << "Input token limit exceeded for entry "
+                   << std::to_string(i) << ". Truncated to "
+                   << input_tokens.size();
     }
 
     auto sample = std::make_unique<PromptSample>();
@@ -138,7 +139,10 @@ float MmluGen::ComputeAccuracy() {
 
 std::string MmluGen::ComputeAccuracyString() {
   float acc = ComputeAccuracy();
-  return "Accuracy: " + std::to_string(acc * 100.0f) + "%";
+
+  std::stringstream stream;
+  stream << std::fixed << std::setprecision(4) << acc * 100.0f << "%";
+  return stream.str();
 }
 
 char MmluGen::find_answer_char(const std::string& input) {

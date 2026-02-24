@@ -169,7 +169,9 @@ float IFEval::ComputeAccuracy() {
 
 std::string IFEval::ComputeAccuracyString() {
   float acc = ComputeAccuracy();
-  return "Accuracy: " + std::to_string(acc * 100.0f) + "%";
+  std::stringstream stream;
+  stream << std::fixed << std::setprecision(4) << acc * 100.0f << "%";
+  return stream.str();
 }
 
 inline std::vector<std::unique_ptr<ifeval::Instruction>>

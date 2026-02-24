@@ -12,6 +12,7 @@
 
 #include "flutter/cpp/dataset.h"
 #include "flutter/cpp/datasets/squad_utils/tfrecord_reader.h"
+#include "loadgen/test_settings.h"
 #include "src/sentencepiece_processor.h"
 
 namespace mlperf {
@@ -20,7 +21,7 @@ namespace mobile {
 class MmluGen : public Dataset {
  public:
   MmluGen(Backend* backend, const std::string& input_tfrecord,
-          const std::string& sp_path, bool zero_shot);
+          const std::string& sp_path, bool zero_shot, ::mlperf::TestMode mode);
 
   const std::string& Name() override { return name_; }
 
@@ -66,8 +67,8 @@ class MmluGen : public Dataset {
   std::unordered_set<size_t> used_sample_ids_;
   std::set<int> loaded_sample_ids_;
   std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor;
-  static constexpr int input_token_limit_ = 1024;
-  static constexpr int token_limit_ = 4;
+  static constexpr int input_token_limit_ = 2048;
+  int token_limit_ = 4;
 };
 
 }  // namespace mobile
