@@ -267,7 +267,7 @@ benchmark_setting {
     accelerator_desc: "CPU"
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
-      model_checksum: "54efe0be372b55303673245067beef62"
+      model_checksum: ""
     }
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
@@ -298,7 +298,7 @@ benchmark_setting {
     accelerator_desc: "CPU"
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
-      model_checksum: "54efe0be372b55303673245067beef62"
+      model_checksum: ""
     }
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
