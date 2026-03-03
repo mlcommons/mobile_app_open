@@ -3,26 +3,39 @@ name: iOS Build & Test (macOS)
 permissions:
   contents: read
 
-# DISABLED for testing
-# on:
-#   push:
-#     branches: [ master, submission-v* ]
-#   pull_request:
-#     types: [ opened, synchronize, reopened ]
-#   merge_group:
-#     types: [ checks_requested ]
-# 
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master, submission-v* ]
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+  merge_group:
+    types: [ checks_requested ]
 
-on: [workflow_dispatch]
+env:
+  BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
 
 jobs:
-  build:
+  computed:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Compute build number
+        id: set
+        env:
+          OFFSET: ${{ vars.FLUTTER_BUILD_NUMBER_OFFSET }}
+        run: echo "build_number=$((GITHUB_RUN_NUMBER + ${OFFSET:-0}))" >> "$GITHUB_OUTPUT"
+    outputs:
+      build_number: ${{ steps.set.outputs.build_number }}
+
+  build-and-test:
     name: Build and test iOS app
+    needs: computed
     # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
     runs-on: macos-15
     timeout-minutes: 180
     env:
       PERF_TEST: true
+      FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
       # Because iPhone simulator on GitHub Actions is not reliable, and caused a lot of test failures,
       # we run only 1 benchmark to validate the build.
       BENCHMARK_IDS: "image_classification_v2"
@@ -59,6 +72,30 @@ jobs:
           path: /tmp/bazel_cache
           key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
           restore-keys: ${{ runner.os }}-bazel_cache-
+      - name: Install the Apple certificate and provisioning profile
+        env:
+          IOS_BUILD_CERTIFICATE_BASE64: ${{ secrets.IOS_BUILD_CERTIFICATE_BASE64 }}
+          IOS_BUILD_CERTIFICATE_PASSWORD: ${{ secrets.IOS_BUILD_CERTIFICATE_PASSWORD }}
+          IOS_BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_BUILD_PROVISION_PROFILE_BASE64 }}
+          IOS_KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
+        run: |
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          echo -n "$IOS_BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+          echo -n "$IOS_BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+
+          security create-keychain -p "$IOS_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$IOS_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          security import $CERTIFICATE_PATH -P "$IOS_BUILD_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -k "$IOS_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
       - name: Build iOS app
         env:
           BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
@@ -85,3 +122,79 @@ jobs:
           max_attempts: 2
           command: |
             make flutter/test/integration
+      - name: Build iOS test package
+        env:
+          DEVELOPMENT_TEAM: ${{ secrets.APPLE_DEVELOPMENT_TEAM }}
+        run: |
+          make flutter/ios/test-package
+      - name: Upload test package artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ios-test-package-${{ needs.computed.outputs.build_number }}
+          path: output/ios-test-package/*.zip
+          retention-days: 28
+          if-no-files-found: error
+      - name: Clean up keychain and provisioning profile
+        if: ${{ always() }}
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
+          rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+
+  test-ios-browserstack:
+    name: ${{ matrix.backend }}-${{ matrix.device }}
+    needs:
+      - computed
+      - build-and-test
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - backend: "tflite"
+            device: "iPhone 16 Pro-18"
+          - backend: "apple"
+            device: "iPhone 16 Pro-18"
+    env:
+      TEST_PACKAGE_NAME: ios_tests-${{ needs.computed.outputs.build_number }}.zip
+      BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Download test package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ios-test-package-${{ needs.computed.outputs.build_number }}
+          path: /tmp
+      - name: Upload test package to BrowserStack
+        run: |
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/ios/test-package" \
+          -F "file=@/tmp/$TEST_PACKAGE_NAME" \
+          -F "custom_id=$TEST_PACKAGE_NAME"
+      - uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
+        name: Trigger App Automate
+        env:
+          BROWSERSTACK_PLATFORM: ios
+          BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
+          BROWSERSTACK_TEST_PACKAGE: ${{ env.TEST_PACKAGE_NAME }}
+          BROWSERSTACK_BUILD_TAG: ${{ matrix.device }}
+          BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          BROWSERSTACK_DEVICES: >-
+            ["${{ matrix.device }}"]
+        with:
+          timeout_minutes: 60
+          max_attempts: 2
+          retry_wait_seconds: 300
+          retry_on_exit_code: 9
+          command: |
+            bash .github/workflows/scripts/browserstack-app-automate.sh
+      - name: Upload BrowserStack logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ needs.computed.outputs.build_number }}
+          path: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          retention-days: 28
+          if-no-files-found: error
