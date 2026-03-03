@@ -46,6 +46,8 @@ class BenchmarkState extends ChangeNotifier {
   // null - downloading/waiting; false - running; true - done
   bool? _doneRunning;
 
+  ResourceLoadingStatus get loadingStatus => resourceManager.status;
+
   // Only if [state] == [BenchmarkStateEnum.downloading]
   String get loadingPath => resourceManager.loadingPath;
 
@@ -147,10 +149,6 @@ class BenchmarkState extends ChangeNotifier {
       modes: taskRunner.selectedRunModes,
       benchmarks: selectedBenchmarks,
     );
-    final allResources = _benchmarkStore.listResources(
-      modes: [taskRunner.perfMode, taskRunner.accuracyMode],
-      benchmarks: allBenchmarks,
-    );
     try {
       final selectedBenchmarkIds = selectedBenchmarks
           .map((e) => e.benchmarkSettings.benchmarkId)
@@ -163,12 +161,6 @@ class BenchmarkState extends ChangeNotifier {
         downloadMissing: downloadMissing,
       );
       print('Finished loading resources with downloadMissing=$downloadMissing');
-      // We still need to load all resources after download selected resources.
-      await resourceManager.handleResources(
-        resources: allResources,
-        purgeOldCache: false,
-        downloadMissing: false,
-      );
       error = null;
       stackTrace = null;
       taskConfigFailedToLoad = false;
@@ -261,7 +253,8 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   Future<void> runBenchmarks() async {
-    assert(resourceManager.done, 'Resource manager is not done.');
+    assert(resourceManager.status == ResourceLoadingStatus.done,
+        'Resource manager is not done.');
     assert(_doneRunning != false, '_doneRunning is false');
     _store.previousExtendedResult = '';
     _doneRunning = false;
