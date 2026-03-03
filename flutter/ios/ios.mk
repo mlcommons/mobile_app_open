@@ -68,7 +68,7 @@ flutter/ios/test-package/build:
 		-derivedDataPath ../build/ios_integration \
 		-sdk iphoneos \
 		CODE_SIGN_IDENTITY="$${CODE_SIGN_IDENTITY:-Apple Development}" \
-		DEVELOPMENT_TEAM="$${DEVELOPMENT_TEAM}" \
+		$$(if [ -n "$${DEVELOPMENT_TEAM}" ]; then echo "DEVELOPMENT_TEAM=$${DEVELOPMENT_TEAM}"; fi) \
 		build-for-testing
 
 .PHONY: flutter/ios/test-package/zip
