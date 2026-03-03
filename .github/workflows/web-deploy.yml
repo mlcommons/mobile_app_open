@@ -1,12 +1,16 @@
 name: Web Deploy
 
-on:
-  push:
-    branches: [ master, submission-v* ]
-    paths: [ 'react/**' ]
-  pull_request:
-    types: [ opened, synchronize, reopened ]
-    paths: [ 'react/**' ]
+# DISABLED for testing
+# on:
+#   push:
+#     branches: [ master, submission-v* ]
+#     paths: [ 'react/**' ]
+#   pull_request:
+#     types: [ opened, synchronize, reopened ]
+#     paths: [ 'react/**' ]
+# 
+
+on: [workflow_dispatch]
 
 jobs:
   build-and-deploy:
