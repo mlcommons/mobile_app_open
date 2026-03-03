@@ -33,13 +33,13 @@ These are needed to sign the iOS test package for real device testing.
 See the [GitHub docs on signing Xcode applications](https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms/sign-xcode-applications)
 for a detailed walkthrough.
 
-| Secret | Where to get it |
-|---|---|
-| `BUILD_CERTIFICATE_BASE64` | Export a Development certificate (.p12) from Keychain Access, then base64-encode it: `base64 -i build_certificate.p12 \| pbcopy` |
-| `P12_PASSWORD` | The password you set when exporting the .p12 certificate. |
-| `BUILD_PROVISION_PROFILE_BASE64` | Download the provisioning profile (.mobileprovision) from [Apple Developer > Profiles](https://developer.apple.com/account/resources/profiles/list). It must include the app's bundle ID (`com.mlcommons.inference`). Base64-encode it: `base64 -i profile.mobileprovision \| pbcopy` |
-| `KEYCHAIN_PASSWORD` | Any random password for the temporary CI keychain. Generate one with: `openssl rand -base64 32` |
-| `APPLE_DEVELOPMENT_TEAM` | Your 10-character Apple Team ID. Find it at [Apple Developer > Membership details](https://developer.apple.com/account#MembershipDetailsCard) or in Xcode under **Signing & Capabilities**. |
+| Secret | Where to get it                                                                                                                                                                                                                                                                       |
+|---|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `IOS_BUILD_CERTIFICATE_BASE64` | Export a Development certificate (.p12) from Keychain Access or Xcode app, then base64-encode it: `base64 -i build_certificate.p12 \| pbcopy`                                                                                                                                         |
+| `IOS_BUILD_CERTIFICATE_PASSWORD` | The password you set when exporting the .p12 certificate.                                                                                                                                                                                                                             |
+| `IOS_BUILD_PROVISION_PROFILE_BASE64` | Download the provisioning profile (.mobileprovision) from [Apple Developer > Profiles](https://developer.apple.com/account/resources/profiles/list). It must include the app's bundle ID (`com.mlcommons.inference`). Base64-encode it: `base64 -i profile.mobileprovision \| pbcopy` |
+| `IOS_KEYCHAIN_PASSWORD` | Any random password for the temporary CI keychain. Generate one with: `openssl rand -base64 32`                                                                                                                                                                                       |
+| `APPLE_DEVELOPMENT_TEAM` | Your 10-character Apple Team ID. Find it at [Apple Developer > Membership details](https://developer.apple.com/account#MembershipDetailsCard) or in Xcode under **Signing & Capabilities**.                                                                                           |
 
 ### Firebase
 
@@ -86,7 +86,7 @@ under **Project Settings > General > Your apps > iOS app**.
   ```bash
   base64 -i certificate.p12 | pbcopy
   ```
-- Save the base64 string as `BUILD_CERTIFICATE_BASE64` and the password as `P12_PASSWORD`
+- Save the base64 string as `IOS_BUILD_CERTIFICATE_BASE64` and the password as `IOS_BUILD_CERTIFICATE_PASSWORD`
 
 ### 4. Create a provisioning profile
 
@@ -100,11 +100,11 @@ under **Project Settings > General > Your apps > iOS app**.
   ```bash
   base64 -i profile.mobileprovision | pbcopy
   ```
-- Save as `BUILD_PROVISION_PROFILE_BASE64`
+- Save as `IOS_BUILD_PROVISION_PROFILE_BASE64`
 
 ### 5. Set the keychain password
 
-Generate a random password and save it as `KEYCHAIN_PASSWORD`:
+Generate a random password and save it as `IOS_KEYCHAIN_PASSWORD`:
 
 ```bash
 openssl rand -base64 32
