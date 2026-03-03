@@ -1,0 +1,194 @@
+name: iOS BrowserStack Test
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master, submission-v* ]
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+  merge_group:
+    types: [ checks_requested ]
+
+env:
+  BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+
+jobs:
+  build-ios-test-package:
+    name: Build iOS test package
+    runs-on: macos-15
+    timeout-minutes: 180
+    env:
+      PERF_TEST: true
+      WITH_APPLE: 1
+      WITH_TFLITE: 1
+      WITH_PIXEL: 0
+      WITH_MEDIATEK: 0
+      WITH_QTI: 0
+      WITH_SAMSUNG: 0
+      FIREBASE_IOS_API_KEY: ${{ secrets.FIREBASE_IOS_API_KEY }}
+      FIREBASE_IOS_APP_ID: ${{ secrets.FIREBASE_IOS_APP_ID }}
+      FIREBASE_IOS_CLIENT_ID: ${{ secrets.FIREBASE_IOS_CLIENT_ID }}
+      FIREBASE_IOS_REVERSED_CLIENT_ID: ${{ secrets.FIREBASE_IOS_REVERSED_CLIENT_ID }}
+      FIREBASE_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_IOS_BUNDLE_ID }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+      FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+      FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+      FIREBASE_CRASHLYTICS_ENABLED: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - name: Cache CocoaPods
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: ${{ github.workspace }}/flutter/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+      - name: Cache bazel
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: /tmp/bazel_cache
+          key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-bazel_cache-
+      - name: Import code signing certificate
+        uses: apple-actions/import-codesign-certs@63fff01cd422d4b7b855d40ca1e9d34d2de9c4d8 # v3
+        with:
+          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+      - name: Build iOS libs
+        env:
+          BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
+          BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
+        run: |
+          cd flutter/ios/ci_scripts/ && bash ci_post_clone.sh
+      - name: Build iOS test package
+        env:
+          DEVELOPMENT_TEAM: ${{ secrets.APPLE_DEVELOPMENT_TEAM }}
+        run: |
+          make flutter/ios/test-package
+      - name: Upload test package artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ios-test-package
+          path: output/ios-test-package/ios_tests.zip
+          retention-days: 28
+          if-no-files-found: error
+
+  test-ios-browserstack:
+    name: ${{ matrix.backend }}-${{ matrix.device }}
+    needs: build-ios-test-package
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - backend: "tflite"
+            device: "iPhone 16 Pro-18"
+          - backend: "apple"
+            device: "iPhone 16 Pro-18"
+    env:
+      TEST_PACKAGE_NAME: ios_tests.zip
+      BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Download test package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ios-test-package
+          path: /tmp
+      - name: Upload test package to BrowserStack
+        run: |
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/ios/test-package" \
+          -F "file=@/tmp/$TEST_PACKAGE_NAME" \
+          -F "custom_id=$TEST_PACKAGE_NAME"
+      - uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
+        name: Trigger App Automate
+        env:
+          BROWSERSTACK_PLATFORM: ios
+          BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
+          BROWSERSTACK_TEST_PACKAGE: ${{ env.TEST_PACKAGE_NAME }}
+          BROWSERSTACK_BUILD_TAG: ${{ matrix.device }}
+          BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          BROWSERSTACK_DEVICES: >-
+            ["${{ matrix.device }}"]
+        with:
+          timeout_minutes: 60
+          max_attempts: 2
+          retry_wait_seconds: 300
+          retry_on_exit_code: 9
+          command: |
+            bash .github/workflows/scripts/browserstack-app-automate.sh
+      - name: Upload BrowserStack logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: logs-${{ matrix.backend }}-${{ matrix.device }}
+          path: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          retention-days: 28
+          if-no-files-found: error
+
+  test-ios-browserstack-manual:
+    name: ${{ matrix.backend }}-${{ matrix.device }} (manual)
+    needs: build-ios-test-package
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - backend: "tflite"
+            device: "iPhone 16 Pro-18"
+          - backend: "apple"
+            device: "iPhone 16 Pro-18"
+    env:
+      TEST_PACKAGE_NAME: ios_tests.zip
+      BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Download test package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ios-test-package
+          path: /tmp
+      - name: Upload test package to BrowserStack
+        run: |
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/ios/test-package" \
+          -F "file=@/tmp/$TEST_PACKAGE_NAME" \
+          -F "custom_id=$TEST_PACKAGE_NAME"
+      - uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
+        name: Trigger App Automate
+        env:
+          BROWSERSTACK_PLATFORM: ios
+          BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
+          BROWSERSTACK_TEST_PACKAGE: ${{ env.TEST_PACKAGE_NAME }}
+          BROWSERSTACK_BUILD_TAG: ${{ matrix.device }}
+          BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          BROWSERSTACK_DEVICES: >-
+            ["${{ matrix.device }}"]
+        with:
+          timeout_minutes: 60
+          max_attempts: 2
+          retry_wait_seconds: 300
+          retry_on_exit_code: 9
+          command: |
+            bash .github/workflows/scripts/browserstack-app-automate.sh
+      - name: Upload BrowserStack logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: logs-${{ matrix.backend }}-${{ matrix.device }}-manual
+          path: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          retention-days: 28
+          if-no-files-found: error

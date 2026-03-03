@@ -51,3 +51,31 @@ flutter/ios/ipa:
 		${flutter_build_number_arg}
 	mkdir -p output/flutter/ios/
 	cp -rf flutter/build/ios/archive/Runner.xcarchive output/flutter/ios/release.xcarchive
+
+# BrowserStack test package targets
+flutter/ios/test-package: flutter/ios/test-package/build flutter/ios/test-package/zip
+
+.PHONY: flutter/ios/test-package/build
+flutter/ios/test-package/build:
+	cd flutter && flutter --no-version-check build ios \
+		--config-only \
+		${flutter_perf_test_arg} \
+		integration_test/first_test.dart
+	cd flutter/ios && xcodebuild \
+		-workspace Runner.xcworkspace \
+		-scheme Runner \
+		-config Flutter/Release.xcconfig \
+		-derivedDataPath ../build/ios_integration \
+		-sdk iphoneos \
+		CODE_SIGN_IDENTITY="$${CODE_SIGN_IDENTITY:-Apple Development}" \
+		DEVELOPMENT_TEAM="$${DEVELOPMENT_TEAM}" \
+		build-for-testing
+
+.PHONY: flutter/ios/test-package/zip
+flutter/ios/test-package/zip:
+	mkdir -p output/ios-test-package
+	cd flutter/build/ios_integration/Build/Products && \
+		zip -r ../../../../ios_tests.zip \
+		Release-iphoneos/ \
+		*.xctestrun
+	mv flutter/build/ios_tests.zip output/ios-test-package/ios_tests.zip
