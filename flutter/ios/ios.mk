@@ -71,10 +71,11 @@ flutter/ios/test-package/build:
 		$$(if [ -n "$${DEVELOPMENT_TEAM}" ]; then echo "DEVELOPMENT_TEAM=$${DEVELOPMENT_TEAM}"; fi) \
 		build-for-testing
 
+FLUTTER_IOS_TEST_PACKAGE?=ios_tests-${FLUTTER_BUILD_NUMBER}.zip
 .PHONY: flutter/ios/test-package/zip
 flutter/ios/test-package/zip:
 	mkdir -p output/ios-test-package
 	cd flutter/build/ios_integration/Build/Products && \
-		zip -r $(CURDIR)/output/ios-test-package/ios_tests.zip \
+		zip -r $(CURDIR)/output/ios-test-package/${FLUTTER_IOS_TEST_PACKAGE} \
 		Release-iphoneos/ \
 		*.xctestrun

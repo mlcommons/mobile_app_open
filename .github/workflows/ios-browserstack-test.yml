@@ -16,12 +16,25 @@ env:
   BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
 
 jobs:
+  computed:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Compute build number
+        id: set
+        env:
+          OFFSET: ${{ vars.FLUTTER_BUILD_NUMBER_OFFSET }}
+        run: echo "build_number=$((GITHUB_RUN_NUMBER + ${OFFSET:-0}))" >> "$GITHUB_OUTPUT"
+    outputs:
+      build_number: ${{ steps.set.outputs.build_number }}
+
   build-ios-test-package:
     name: Build iOS test package
+    needs: computed
     runs-on: macos-15
     timeout-minutes: 180
     env:
       PERF_TEST: true
+      FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
       WITH_APPLE: 1
       WITH_TFLITE: 1
       WITH_PIXEL: 0
@@ -72,14 +85,16 @@ jobs:
       - name: Upload test package artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ios-test-package
-          path: output/ios-test-package/ios_tests.zip
+          name: ios-test-package-${{ needs.computed.outputs.build_number }}
+          path: output/ios-test-package/*.zip
           retention-days: 28
           if-no-files-found: error
 
   test-ios-browserstack:
     name: ${{ matrix.backend }}-${{ matrix.device }}
-    needs: build-ios-test-package
+    needs:
+      - computed
+      - build-ios-test-package
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
@@ -93,14 +108,14 @@ jobs:
           - backend: "apple"
             device: "iPhone 16 Pro-18"
     env:
-      TEST_PACKAGE_NAME: ios_tests.zip
+      TEST_PACKAGE_NAME: ios_tests-${{ needs.computed.outputs.build_number }}.zip
       BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Download test package
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: ios-test-package
+          name: ios-test-package-${{ needs.computed.outputs.build_number }}
           path: /tmp
       - name: Upload test package to BrowserStack
         run: |
@@ -130,14 +145,16 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
-          name: logs-${{ matrix.backend }}-${{ matrix.device }}
+          name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ needs.computed.outputs.build_number }}
           path: ${{ env.BROWSERSTACK_LOGS_DIR }}
           retention-days: 28
           if-no-files-found: error
 
   test-ios-browserstack-manual:
     name: ${{ matrix.backend }}-${{ matrix.device }} (manual)
-    needs: build-ios-test-package
+    needs:
+      - computed
+      - build-ios-test-package
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
@@ -151,14 +168,14 @@ jobs:
           - backend: "apple"
             device: "iPhone 16 Pro-18"
     env:
-      TEST_PACKAGE_NAME: ios_tests.zip
+      TEST_PACKAGE_NAME: ios_tests-${{ needs.computed.outputs.build_number }}.zip
       BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Download test package
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: ios-test-package
+          name: ios-test-package-${{ needs.computed.outputs.build_number }}
           path: /tmp
       - name: Upload test package to BrowserStack
         run: |
@@ -188,7 +205,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
-          name: logs-${{ matrix.backend }}-${{ matrix.device }}-manual
+          name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ needs.computed.outputs.build_number }}-manual
           path: ${{ env.BROWSERSTACK_LOGS_DIR }}
           retention-days: 28
           if-no-files-found: error
