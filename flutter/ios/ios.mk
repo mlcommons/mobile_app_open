@@ -67,8 +67,10 @@ flutter/ios/test-package/build:
 		-config Flutter/Release.xcconfig \
 		-derivedDataPath ../build/ios_integration \
 		-sdk iphoneos \
+		-allowProvisioningUpdates \
 		CODE_SIGN_IDENTITY="$${CODE_SIGN_IDENTITY:-Apple Development}" \
 		$$(if [ -n "$${DEVELOPMENT_TEAM}" ]; then echo "DEVELOPMENT_TEAM=$${DEVELOPMENT_TEAM}"; fi) \
+		$$(if [ -n "$${APP_STORE_CONNECT_API_KEY_PATH}" ]; then echo "-authenticationKeyPath $${APP_STORE_CONNECT_API_KEY_PATH} -authenticationKeyID $${APP_STORE_CONNECT_API_KEY_ID} -authenticationKeyIssuerID $${APP_STORE_CONNECT_API_KEY_ISSUER_ID}"; fi) \
 		build-for-testing
 
 FLUTTER_IOS_TEST_PACKAGE?=ios_tests-${FLUTTER_BUILD_NUMBER}.zip

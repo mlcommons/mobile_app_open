@@ -35,11 +35,13 @@ for a detailed walkthrough.
 
 | Secret | Where to get it                                                                                                                                                                                                                                                                       |
 |---|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `IOS_BUILD_CERTIFICATE_BASE64` | Export a Development certificate (.p12) from Keychain Access or Xcode app, then base64-encode it: `base64 -i build_certificate.p12 \| pbcopy`                                                                                                                                         |
-| `IOS_BUILD_CERTIFICATE_PASSWORD` | The password you set when exporting the .p12 certificate.                                                                                                                                                                                                                             |
-| `IOS_BUILD_PROVISION_PROFILE_BASE64` | Download the provisioning profile (.mobileprovision) from [Apple Developer > Profiles](https://developer.apple.com/account/resources/profiles/list). It must include the app's bundle ID (`com.mlcommons.inference`). Base64-encode it: `base64 -i profile.mobileprovision \| pbcopy` |
-| `IOS_KEYCHAIN_PASSWORD` | Any random password for the temporary CI keychain. Generate one with: `openssl rand -base64 32`                                                                                                                                                                                       |
-| `APPLE_DEVELOPMENT_TEAM` | Your 10-character Apple Team ID. Find it at [Apple Developer > Membership details](https://developer.apple.com/account#MembershipDetailsCard) or in Xcode under **Signing & Capabilities**.                                                                                           |
+| `IOS_BUILD_CERTIFICATE_BASE64` | Export a Development certificate (.p12) from Keychain Access or Xcode app, then base64-encode it: `base64 -i build_certificate.p12 \| pbcopy` |
+| `IOS_BUILD_CERTIFICATE_PASSWORD` | The password you set when exporting the .p12 certificate. |
+| `IOS_KEYCHAIN_PASSWORD` | Any random password for the temporary CI keychain. Generate one with: `openssl rand -base64 32` |
+| `APPLE_DEVELOPMENT_TEAM` | Your 10-character Apple Team ID. Find it at [Apple Developer > Membership details](https://developer.apple.com/account#MembershipDetailsCard) or in Xcode under **Signing & Capabilities**. |
+| `APP_STORE_CONNECT_API_KEY_BASE64` | Base64-encoded App Store Connect API key (.p8 file). See steps below. |
+| `APP_STORE_CONNECT_API_KEY_ID` | The Key ID shown in App Store Connect when creating the API key. |
+| `APP_STORE_CONNECT_API_KEY_ISSUER_ID` | The Issuer ID from [App Store Connect > Users and Access > Integrations > App Store Connect API](https://appstoreconnect.apple.com/access/integrations/api). |
 
 ### Firebase
 
@@ -64,7 +66,7 @@ under **Project Settings > General > Your apps > iOS app**.
 |---|---|
 | `FLUTTER_BUILD_NUMBER_OFFSET` | Optional offset added to `GITHUB_RUN_NUMBER` to compute the build number. Set this if you need to align build numbers across workflows. Default: `0`. |
 
-## Step-by-step: Creating the Apple certificate and provisioning profile
+## Step-by-step: Creating the Apple certificate and API key
 
 ### 1. Create a certificate signing request (CSR)
 
@@ -88,19 +90,20 @@ under **Project Settings > General > Your apps > iOS app**.
   ```
 - Save the base64 string as `IOS_BUILD_CERTIFICATE_BASE64` and the password as `IOS_BUILD_CERTIFICATE_PASSWORD`
 
-### 4. Create a provisioning profile
+### 4. Create an App Store Connect API key
 
-- Go to [Apple Developer > Profiles](https://developer.apple.com/account/resources/profiles/list)
-- Click **+**, select **iOS App Development**
-- Select the App ID matching `com.mlcommons.inference`
-- Select the certificate created in step 2
-- Select the devices to test on (or select all)
-- Download the `.mobileprovision` file
-- Base64-encode it:
+- Go to [App Store Connect > Users and Access > Integrations > App Store Connect API](https://appstoreconnect.apple.com/access/integrations/api)
+- Click **+** to generate a new key
+- Give it a name (e.g. `CI Signing`) and select the **Developer** role
+- Download the `.p8` file (you can only download it once)
+- Note the **Key ID** and **Issuer ID** shown on the page
+- Base64-encode the key:
   ```bash
-  base64 -i profile.mobileprovision | pbcopy
+  base64 -i AuthKey_XXXXXXXXXX.p8 | pbcopy
   ```
-- Save as `IOS_BUILD_PROVISION_PROFILE_BASE64`
+- Save the base64 string as `APP_STORE_CONNECT_API_KEY_BASE64`
+- Save the Key ID as `APP_STORE_CONNECT_API_KEY_ID`
+- Save the Issuer ID as `APP_STORE_CONNECT_API_KEY_ISSUER_ID`
 
 ### 5. Set the keychain password
 

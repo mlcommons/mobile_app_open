@@ -67,9 +67,11 @@ make flutter/ios/test-package
 This produces `output/ios-test-package/ios_tests.zip` containing the
 `Release-iphoneos/` directory and `*.xctestrun` file.
 
-**Note:** `build-for-testing` requires code signing. By default it uses
-`CODE_SIGN_IDENTITY="Apple Development"` and the team configured in the
-Xcode project. Override via environment variables if needed:
+**Note:** `build-for-testing` requires code signing. The build uses automatic
+signing with `-allowProvisioningUpdates`. Locally, Xcode resolves profiles
+using your Apple account. In CI, an App Store Connect API key is passed via
+`-authenticationKeyPath` so Xcode can download profiles automatically.
+Override the team via environment variables if needed:
 
 ```bash
 DEVELOPMENT_TEAM=XXXXXXXXXX make flutter/ios/test-package
