@@ -75,7 +75,6 @@ flutter/ios/test-package/build:
 flutter/ios/test-package/zip:
 	mkdir -p output/ios-test-package
 	cd flutter/build/ios_integration/Build/Products && \
-		zip -r ../../../../ios_tests.zip \
+		zip -r $(CURDIR)/output/ios-test-package/ios_tests.zip \
 		Release-iphoneos/ \
 		*.xctestrun
-	mv flutter/build/ios_tests.zip output/ios-test-package/ios_tests.zip
