@@ -51,3 +51,33 @@ flutter/ios/ipa:
 		${flutter_build_number_arg}
 	mkdir -p output/flutter/ios/
 	cp -rf flutter/build/ios/archive/Runner.xcarchive output/flutter/ios/release.xcarchive
+
+# BrowserStack test package targets
+flutter/ios/test-package: flutter/ios/test-package/build flutter/ios/test-package/zip
+
+.PHONY: flutter/ios/test-package/build
+flutter/ios/test-package/build:
+	cd flutter && flutter --no-version-check build ios \
+		--config-only \
+		${flutter_perf_test_arg} \
+		integration_test/first_test.dart
+	cd flutter/ios && xcodebuild \
+		-workspace Runner.xcworkspace \
+		-scheme Runner \
+		-config Flutter/Release.xcconfig \
+		-derivedDataPath ../build/ios_integration \
+		-sdk iphoneos \
+		-allowProvisioningUpdates \
+		CODE_SIGN_IDENTITY="$${CODE_SIGN_IDENTITY:-Apple Development}" \
+		$$(if [ -n "$${DEVELOPMENT_TEAM}" ]; then echo "DEVELOPMENT_TEAM=$${DEVELOPMENT_TEAM}"; fi) \
+		$$(if [ -n "$${APP_STORE_CONNECT_API_KEY_PATH}" ] && [ -s "$${APP_STORE_CONNECT_API_KEY_PATH}" ] && [ -n "$${APP_STORE_CONNECT_API_KEY_ID}" ] && [ -n "$${APP_STORE_CONNECT_API_KEY_ISSUER_ID}" ]; then echo "-authenticationKeyPath $${APP_STORE_CONNECT_API_KEY_PATH} -authenticationKeyID $${APP_STORE_CONNECT_API_KEY_ID} -authenticationKeyIssuerID $${APP_STORE_CONNECT_API_KEY_ISSUER_ID}"; fi) \
+		build-for-testing
+
+FLUTTER_IOS_TEST_PACKAGE?=ios_tests-${FLUTTER_BUILD_NUMBER}.zip
+.PHONY: flutter/ios/test-package/zip
+flutter/ios/test-package/zip:
+	mkdir -p output/ios-test-package
+	cd flutter/build/ios_integration/Build/Products && \
+		zip -r $(CURDIR)/output/ios-test-package/${FLUTTER_IOS_TEST_PACKAGE} \
+		Release-iphoneos/ \
+		*.xctestrun
