@@ -77,16 +77,18 @@ jobs:
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-          echo -n "$IOS_BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-          echo -n "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode -o $RUNNER_TEMP/AuthKey.p8
+          echo -n "$IOS_BUILD_CERTIFICATE_BASE64" | base64 --decode -o "$CERTIFICATE_PATH"
+          if [ -n "$APP_STORE_CONNECT_API_KEY_BASE64" ]; then
+            echo -n "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode -o "$RUNNER_TEMP/AuthKey.p8"
+          fi
 
-          security create-keychain -p "$IOS_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-          security unlock-keychain -p "$IOS_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security create-keychain -p "$IOS_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$IOS_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
-          security import $CERTIFICATE_PATH -P "$IOS_BUILD_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-          security set-key-partition-list -S apple-tool:,apple: -k "$IOS_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security list-keychain -d user -s $KEYCHAIN_PATH
+          security import "$CERTIFICATE_PATH" -P "$IOS_BUILD_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -k "$IOS_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
       - name: Build iOS app
         env:
           BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
@@ -99,10 +101,15 @@ jobs:
       - name: Build iOS test package
         env:
           DEVELOPMENT_TEAM: ${{ secrets.APPLE_DEVELOPMENT_TEAM }}
-          APP_STORE_CONNECT_API_KEY_PATH: ${{ runner.temp }}/AuthKey.p8
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
         run: |
+          if [ -s "$RUNNER_TEMP/AuthKey.p8" ] && [ -n "$APP_STORE_CONNECT_API_KEY_ID" ] && [ -n "$APP_STORE_CONNECT_API_KEY_ISSUER_ID" ]; then
+            export APP_STORE_CONNECT_API_KEY_PATH="$RUNNER_TEMP/AuthKey.p8"
+          else
+            unset APP_STORE_CONNECT_API_KEY_PATH
+            echo "App Store Connect API key is not fully configured; running xcodebuild without -authenticationKey* flags."
+          fi
           make flutter/ios/test-package
       - name: Upload test package artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
