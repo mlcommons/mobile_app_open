@@ -74,12 +74,32 @@ jobs:
           IOS_KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
           APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
         run: |
+          set -euo pipefail
+
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          AUTH_KEY_PATH=$RUNNER_TEMP/AuthKey.p8
 
           echo -n "$IOS_BUILD_CERTIFICATE_BASE64" | base64 --decode -o "$CERTIFICATE_PATH"
           if [ -n "$APP_STORE_CONNECT_API_KEY_BASE64" ]; then
-            echo -n "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode -o "$RUNNER_TEMP/AuthKey.p8"
+            # Accept either raw .p8 content or base64-encoded .p8 content.
+            if printf '%s' "$APP_STORE_CONNECT_API_KEY_BASE64" | grep -q "BEGIN PRIVATE KEY"; then
+              printf '%s\n' "$APP_STORE_CONNECT_API_KEY_BASE64" > "$AUTH_KEY_PATH"
+            else
+              printf '%s' "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode -o "$AUTH_KEY_PATH"
+            fi
+            # Normalize line endings; CRLF keys can fail parsing in some tooling.
+            tr -d '\r' < "$AUTH_KEY_PATH" > "$AUTH_KEY_PATH.tmp"
+            mv "$AUTH_KEY_PATH.tmp" "$AUTH_KEY_PATH"
+
+            if ! grep -q "BEGIN PRIVATE KEY" "$AUTH_KEY_PATH" || ! grep -q "END PRIVATE KEY" "$AUTH_KEY_PATH"; then
+              echo "APP_STORE_CONNECT_API_KEY_BASE64 does not decode to a valid .p8 PEM private key."
+              exit 1
+            fi
+            if ! openssl pkey -in "$AUTH_KEY_PATH" -noout >/dev/null 2>&1; then
+              echo "Decoded App Store Connect API key is not a valid private key."
+              exit 1
+            fi
           fi
 
           security create-keychain -p "$IOS_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
