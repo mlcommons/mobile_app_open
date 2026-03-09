@@ -35,6 +35,7 @@ jobs:
     timeout-minutes: 180
     env:
       PERF_TEST: true
+      BENCHMARK_IDS: image_classification_v2,object_detection
       FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
       WITH_APPLE: 1
       WITH_TFLITE: 1
