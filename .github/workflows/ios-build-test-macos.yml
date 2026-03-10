@@ -28,16 +28,27 @@ jobs:
       build_number: ${{ steps.set.outputs.build_number }}
 
   build:
-    name: Build iOS app
+    name: Build iOS app (${{ matrix.backend }})
     needs: computed
     # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
     runs-on: macos-15
     timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - backend: "tflite"
+            with_apple: 0
+            with_tflite: 1
+          - backend: "apple"
+            with_apple: 1
+            with_tflite: 0
     env:
       PERF_TEST: true
       FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
-      WITH_APPLE: 1
-      WITH_TFLITE: 1
+      FLUTTER_IOS_TEST_PACKAGE: ios_tests-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.zip
+      WITH_APPLE: ${{ matrix.with_apple }}
+      WITH_TFLITE: ${{ matrix.with_tflite }}
       WITH_PIXEL: 0
       WITH_MEDIATEK: 0
       WITH_QTI: 0
@@ -134,7 +145,7 @@ jobs:
       - name: Upload test package artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ios-test-package-${{ needs.computed.outputs.build_number }}
+          name: ios-test-package-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}
           path: output/ios-test-package/*.zip
           retention-days: 28
           if-no-files-found: error
@@ -161,14 +172,14 @@ jobs:
           - backend: "apple"
             device: "iPhone 16 Pro-18"
     env:
-      TEST_PACKAGE_NAME: ios_tests-${{ needs.computed.outputs.build_number }}.zip
+      TEST_PACKAGE_NAME: ios_tests-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.zip
       BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Download test package
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: ios-test-package-${{ needs.computed.outputs.build_number }}
+          name: ios-test-package-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}
           path: /tmp
       - name: Upload test package to BrowserStack
         run: |
@@ -183,7 +194,7 @@ jobs:
           BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
           BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
           BROWSERSTACK_TEST_PACKAGE: ${{ env.TEST_PACKAGE_NAME }}
-          BROWSERSTACK_BUILD_TAG: ${{ matrix.device }}
+          BROWSERSTACK_BUILD_TAG: ${{ matrix.backend }}-${{ matrix.device }}
           BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
           BROWSERSTACK_DEVICES: >-
             ["${{ matrix.device }}"]
