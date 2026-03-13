@@ -7,13 +7,11 @@ import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
 import 'package:mlperfbench/store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_driver/flutter_driver.dart';
 
 import 'utils.dart';
 
 const _runMode = BenchmarkRunModeEnum.integrationTestRun;
-const _driverKeepAliveInterval = Duration(seconds: 30);
-const _driverConnectTimeout = Duration(seconds: 10);
+const _bindingKeepAliveInterval = Duration(seconds: 20);
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -38,64 +36,49 @@ void main() {
 
   // Run each benchmark separately to avoid idle timout error on BrowserStack
   for (var benchmarkId in benchmarkIds) {
-    testBenchmark(benchmarkId);
+    testBenchmark(binding, benchmarkId);
   }
 }
 
-Future<T> runWithDriverKeepAlive<T>(
+Future<T> runWithBindingKeepAlive<T>(
+  IntegrationTestWidgetsFlutterBinding binding,
   String description,
   Future<T> Function() action,
 ) async {
-  FlutterDriver? driver;
-  try {
-    driver = await FlutterDriver.connect().timeout(_driverConnectTimeout);
-    await driver.checkHealth();
-    debugPrint('FlutterDriver keepalive connected for $description');
-  } catch (error) {
-    debugPrint(
-      'FlutterDriver keepalive unavailable for $description: $error',
-    );
-    return action();
-  }
-
   var keepAliveInFlight = false;
 
-  Future<void> pingDriver() async {
+  Future<void> pingBinding() async {
     if (keepAliveInFlight) {
       return;
     }
     keepAliveInFlight = true;
     try {
-      await driver!.checkHealth();
-      debugPrint('FlutterDriver keepalive ping during $description');
+      await binding.callback(<String, String>{'command': 'get_health'});
+      debugPrint('IntegrationTest keepalive ping during $description');
     } catch (error) {
       debugPrint(
-        'FlutterDriver keepalive failed during $description: $error',
+        'IntegrationTest keepalive failed during $description: $error',
       );
     } finally {
       keepAliveInFlight = false;
     }
   }
 
-  final keepAliveTimer = Timer.periodic(_driverKeepAliveInterval, (_) {
-    unawaited(pingDriver());
+  final keepAliveTimer = Timer.periodic(_bindingKeepAliveInterval, (_) {
+    unawaited(pingBinding());
   });
 
   try {
     return await action();
   } finally {
     keepAliveTimer.cancel();
-    try {
-      await driver.close();
-    } catch (error) {
-      debugPrint(
-        'FlutterDriver keepalive close failed for $description: $error',
-      );
-    }
   }
 }
 
-void testBenchmark(String benchmarkId) {
+void testBenchmark(
+  IntegrationTestWidgetsFlutterBinding binding,
+  String benchmarkId,
+) {
   testWidgets('Test benchmark: $benchmarkId', (WidgetTester tester) async {
     await startApp(tester);
     await validateSettings(tester);
@@ -110,14 +93,12 @@ void testBenchmark(String benchmarkId) {
     await setBenchmarks(tester, [benchmarkId]);
     debugPrint('Wait 5 seconds to let the app finishing loading resources');
     await Future.delayed(const Duration(seconds: 5));
-    await runWithDriverKeepAlive(
-      'resource download for $benchmarkId',
-      () => downloadResources(tester),
-    );
+    await downloadResources(tester);
     final cooldownDuration = _runMode.cooldownDuration;
     debugPrint('Wait $cooldownDuration seconds before running benchmark');
     await Future.delayed(Duration(seconds: cooldownDuration));
-    await runWithDriverKeepAlive(
+    await runWithBindingKeepAlive(
+      binding,
       'benchmark run for $benchmarkId',
       () => runBenchmarks(tester),
     );
