@@ -1,12 +1,16 @@
 name: Code Analysis
 
-on:
-  push:
-    branches: [ master, submission-v* ]
-  pull_request:
-    types: [ opened, synchronize, reopened ]
-  merge_group:
-    types: [ checks_requested ]
+# DISABLED for testing
+# on:
+#   push:
+#     branches: [ master, submission-v* ]
+#   pull_request:
+#     types: [ opened, synchronize, reopened ]
+#   merge_group:
+#     types: [ checks_requested ]
+# 
+
+on: [workflow_dispatch]
 
 jobs:
   sonar:

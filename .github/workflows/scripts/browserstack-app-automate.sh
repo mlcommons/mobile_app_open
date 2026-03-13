@@ -1,22 +1,28 @@
 #!/bin/bash
 
 # This script is used to trigger a build on BrowserStack App Automate and monitor its status.
+# https://www.browserstack.com/docs/app-automate/api-reference/flutter/builds
+# https://www.browserstack.com/docs/app-automate/api-reference/flutter-ios/builds
 
 # Build parameters
 DEVICE_LOGS=true
 RETRY_INTERVAL=10
 
+# Platform: "android" or "ios"
+PLATFORM="${BROWSERSTACK_PLATFORM:-android}"
+
 # API URLs
-TRIGGER_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/build"
-STATUS_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/builds"
+TRIGGER_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/${PLATFORM}/build"
+STATUS_URL="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/${PLATFORM}/builds"
 DEVICES_URL="https://api-cloud.browserstack.com/app-automate/devices"
-BUILDS_URL="https://api.browserstack.com/app-automate/flutter-integration-tests/builds"
+IDLE_TIMEOUT=900
 
 # Retrieve vars from environment variables
 CREDENTIALS="${BROWSERSTACK_CREDENTIALS:-}"
 PROJECT="${BROWSERSTACK_PROJECT:-}"
 APP="${BROWSERSTACK_APP:-}"
 TEST_SUITE="${BROWSERSTACK_TEST_SUITE:-}"
+TEST_PACKAGE="${BROWSERSTACK_TEST_PACKAGE:-}"
 BUILD_TAG="${BROWSERSTACK_BUILD_TAG:-}"
 DEVICES="${BROWSERSTACK_DEVICES:-}"
 LOGS_DIR="${BROWSERSTACK_LOGS_DIR:-}"
@@ -27,11 +33,20 @@ if [[ -z "$CREDENTIALS" ]]; then
   exit 1
 fi
 
-if [[ -z "$PROJECT" ||  -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" || -z "$DEVICES" ]]; then
-  echo "Error: Environment variables"\
-  "BROWSERSTACK_PROJECT, BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE, BROWSERSTACK_BUILD_TAG and BROWSERSTACK_DEVICES"\
-  "must be set."
-  exit 1
+if [[ "$PLATFORM" == "ios" ]]; then
+  if [[ -z "$PROJECT" || -z "$TEST_PACKAGE" || -z "$BUILD_TAG" || -z "$DEVICES" ]]; then
+    echo "Error: Environment variables"\
+    "BROWSERSTACK_PROJECT, BROWSERSTACK_TEST_PACKAGE, BROWSERSTACK_BUILD_TAG and BROWSERSTACK_DEVICES"\
+    "must be set for iOS."
+    exit 1
+  fi
+else
+  if [[ -z "$PROJECT" ||  -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" || -z "$DEVICES" ]]; then
+    echo "Error: Environment variables"\
+    "BROWSERSTACK_PROJECT, BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE, BROWSERSTACK_BUILD_TAG and BROWSERSTACK_DEVICES"\
+    "must be set."
+    exit 1
+  fi
 fi
 
 # Function to get a list of available devices
@@ -48,16 +63,32 @@ get_available_devices() {
 
 # Function to trigger the build
 trigger_build() {
-  local response=$(curl -s -u "$CREDENTIALS" \
-    -X POST "$TRIGGER_URL" \
-    -d "{
+  local payload
+
+  if [[ "$PLATFORM" == "ios" ]]; then
+    payload="{
           \"devices\": $DEVICES,
           \"deviceLogs\": $DEVICE_LOGS,
+          \"idleTimeout\": \"$IDLE_TIMEOUT\",
+          \"project\": \"$PROJECT\",
+          \"testPackage\": \"$TEST_PACKAGE\",
+          \"buildTag\": \"$BUILD_TAG\"
+        }"
+  else
+    payload="{
+          \"devices\": $DEVICES,
+          \"deviceLogs\": $DEVICE_LOGS,
+          \"idleTimeout\": \"$IDLE_TIMEOUT\",
           \"project\": \"$PROJECT\",
           \"app\": \"$APP\",
           \"testSuite\": \"$TEST_SUITE\",
           \"buildTag\": \"$BUILD_TAG\"
-        }" \
+        }"
+  fi
+
+  local response=$(curl -s -u "$CREDENTIALS" \
+    -X POST "$TRIGGER_URL" \
+    -d "$payload" \
     -H "Content-Type: application/json")
 
   local build_id=$(echo "$response" | jq -r '.build_id')
