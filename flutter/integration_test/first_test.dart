@@ -69,6 +69,7 @@ Future<T> runWithBindingKeepAlive<T>(
   });
 
   try {
+    await pingBinding();
     return await action();
   } finally {
     keepAliveTimer.cancel();
@@ -93,14 +94,16 @@ void testBenchmark(
     await setBenchmarks(tester, [benchmarkId]);
     debugPrint('Wait 5 seconds to let the app finishing loading resources');
     await Future.delayed(const Duration(seconds: 5));
-    await downloadResources(tester);
-    final cooldownDuration = _runMode.cooldownDuration;
-    debugPrint('Wait $cooldownDuration seconds before running benchmark');
-    await Future.delayed(Duration(seconds: cooldownDuration));
     await runWithBindingKeepAlive(
       binding,
-      'benchmark run for $benchmarkId',
-      () => runBenchmarks(tester),
+      'benchmark flow for $benchmarkId',
+      () async {
+        await downloadResources(tester);
+        final cooldownDuration = _runMode.cooldownDuration;
+        debugPrint('Wait $cooldownDuration seconds before running benchmark');
+        await Future.delayed(Duration(seconds: cooldownDuration));
+        await runBenchmarks(tester);
+      },
     );
     final extendedResult = await getLastResult(tester);
     printResult(extendedResult);
