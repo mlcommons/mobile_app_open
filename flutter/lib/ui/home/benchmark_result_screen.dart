@@ -220,16 +220,110 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
   }
 
   Widget _detailSection() {
-    final children = <Widget>[];
-    for (final benchmark in state.allBenchmarks) {
-      final row = _benchmarkResultRow(benchmark);
-      children.add(row);
-      children.add(const Divider());
-    }
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: children,
+      children: <Widget>[
+        // 1. Render Benchmark Sets (Expandable)
+        for (var benchmarkSet in state.benchmarkSets) ...[
+          _benchmarkSetResultRow(benchmarkSet),
+          const Divider(height: 1),
+        ],
+        // 2. Render Loose Benchmarks (Stand-alone)
+        for (var benchmark in state.looseBenchmarks) ...[
+          _benchmarkResultRow(benchmark),
+          const Divider(height: 1),
+        ],
+      ],
+    );
+  }
+
+  Widget _benchmarkSetResultRow(BenchmarkSet benchmarkSet) {
+    final bool isExpanded = state.isOptionsExpanded(benchmarkSet);
+
+    return Column(
+      children: [
+        // --- SET HEADER ---
+        InkWell(
+          onTap: () => state.toggleOptionsExpanded(benchmarkSet),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+            child: Row(
+              children: [
+                // Set Icon (using first benchmark's icon as representative)
+                SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.circular(WidgetSizes.borderRadius),
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black12, blurRadius: 2)
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: benchmarkSet.benchmarks.isNotEmpty
+                          ? benchmarkSet.benchmarks[0].info.icon
+                          : null,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                // Set Name & Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        benchmarkSet.config.name,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Text(
+                        '${benchmarkSet.benchmarks.length} benchmarks in this set',
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                // Expansion Indicator
+                AnimatedRotation(
+                  turns: isExpanded ? 0.5 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: const Icon(Icons.expand_more, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // --- EXPANDABLE BODY (List of Results) ---
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          transitionBuilder: (child, animation) => SizeTransition(
+            sizeFactor: animation,
+            axisAlignment: 0.0,
+            child: child,
+          ),
+          child: !isExpanded
+              ? const SizedBox.shrink()
+              : Container(
+                  key: ValueKey('results_${benchmarkSet.config.name}'),
+                  color:
+                      Colors.grey[50], // Slight background tint for the group
+                  child: Column(
+                    children: [
+                      for (var benchmark in benchmarkSet.benchmarks)
+                        _benchmarkResultRow(benchmark),
+                    ],
+                  ),
+                ),
+        ),
+      ],
     );
   }
 

@@ -64,13 +64,14 @@ message TaskSet {
 
 // A container for similar options for a task-set
 //
-// Next ID: 6
+// Next ID: 7
 message OptionSet {
   required string id = 1;
   required string name = 2;
   optional int32 min_selected = 3 [default = 0];
   optional int32 max_selected = 4 [default = 0];
-  repeated Option opt = 5;
+  optional bool hidden = 5 [default = false];
+  repeated Option opt = 6;
 }
 
 // A fancy boolean with a name and an id.
