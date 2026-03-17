@@ -1,7 +1,7 @@
 #include "flutter/cpp/datasets/mmlu_gen.h"
 
+#include <filesystem>
 #include <fstream>
-#include <iostream>
 
 #include "flutter/cpp/datasets/mmlu_utils/sentencepiece_utils.h"
 #include "tensorflow/core/example/example.pb.h"
@@ -11,11 +11,20 @@ namespace mlperf {
 namespace mobile {
 
 MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
-                 const std::string& sp_path, bool zero_shot,
-                 ::mlperf::TestMode mode)
+                 const std::string& sp_path, const std::string& output_dir,
+                 bool zero_shot, ::mlperf::TestMode mode)
     : sample_reader_(input_tfrecord), Dataset(backend) {
   sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(
       LoadSentencePieceProcessor(sp_path));
+
+  raw_output_dir_ = output_dir + "/mmlugen_outputs";
+  std::error_code ec;
+  std::filesystem::create_directories(raw_output_dir_, ec);
+  if (ec) {
+    LOG(ERROR) << "Error: Could not create directory " << raw_output_dir_
+               << ": " << ec.message();
+    return;
+  }
 
   // Load all TFRecord samples into memory
   // NOTE this can be moved to LoadSamplesToRam, but will cause delays between
@@ -122,6 +131,18 @@ bool MmluGen::ComputeSampleAccuracy(const int sample_idx) {
 
   char predicted_char = find_answer_char(prediction);
   const std::string& correct = samples_[sample_idx]->answer;
+
+  std::string filename =
+      raw_output_dir_ + "/sample_" + std::to_string(sample_idx) + ".txt";
+  std::ofstream file(filename);
+  if (file.is_open()) {
+    file << samples_[sample_idx]->input << std::endl;
+    file << "-----" << std::endl;
+    file << prediction << std::endl;
+    file << "-----" << std::endl;
+    file << predicted_char << " - " << correct[0] << std::endl;
+    file.close();
+  }
 
   return (predicted_char == correct[0]);
 }

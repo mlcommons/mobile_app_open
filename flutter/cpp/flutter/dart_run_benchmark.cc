@@ -120,8 +120,8 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       sp_path += '/' + sp_path_filename;
       use_token_latencies = true;
       dataset = std::make_unique<::mlperf::mobile::MmluGen>(
-          backend.get(), in->dataset_data_path, sp_path, false /*zero-shot*/,
-          mlperf::mobile::Str2TestMode(in->mode));
+          backend.get(), in->dataset_data_path, sp_path, in->output_dir,
+          false /*zero-shot*/, mlperf::mobile::Str2TestMode(in->mode));
       break;
     case ::mlperf::mobile::DatasetConfig::IFEVAL:
       for (auto setting : settings.benchmark_setting().custom_setting()) {
@@ -132,7 +132,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       sp_path += '/' + sp_path_filename;
       use_token_latencies = true;
       dataset = std::make_unique<::mlperf::mobile::IFEval>(
-          backend.get(), in->dataset_data_path, sp_path);
+          backend.get(), in->dataset_data_path, sp_path, in->output_dir);
       break;
     default:
       return nullptr;

@@ -1,7 +1,7 @@
 #include "flutter/cpp/datasets/ifeval.h"
 
+#include <filesystem>
 #include <fstream>
-#include <iostream>
 
 #include "flutter/cpp/datasets/mmlu_utils/sentencepiece_utils.h"
 #include "tensorflow/core/example/example.pb.h"
@@ -11,10 +11,19 @@ namespace mlperf {
 namespace mobile {
 
 IFEval::IFEval(Backend* backend, const std::string& input_tfrecord,
-               const std::string& sp_path)
+               const std::string& sp_path, const std::string& output_dir)
     : sample_reader_(input_tfrecord), Dataset(backend) {
   sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(
       LoadSentencePieceProcessor(sp_path));
+
+  raw_output_dir_ = output_dir + "/ifeval_outputs";
+  std::error_code ec;
+  std::filesystem::create_directories(raw_output_dir_, ec);
+  if (ec) {
+    LOG(ERROR) << "Error: Could not create directory " << raw_output_dir_
+               << ": " << ec.message();
+    return;
+  }
 
   // Load all TFRecord samples into memory
   // NOTE this can be moved to LoadSamplesToRam, but will cause delays between
@@ -117,6 +126,23 @@ bool IFEval::ComputeSampleAccuracy(const int sample_idx,
   accuracy.prompt_total++;
   accuracy.prompt_correct_loose += is_prompt_correct_loose ? 1 : 0;
   accuracy.prompt_correct_strict += is_prompt_correct_strict ? 1 : 0;
+
+  std::string filename =
+      raw_output_dir_ + "/sample_" + std::to_string(sample_idx) + ".txt";
+  std::ofstream file(filename);
+  if (file.is_open()) {
+    file << std::to_string(samples_[sample_idx]->key) << std::endl;
+    file << "-----" << std::endl;
+    file << samples_[sample_idx]->prompt << std::endl;
+    file << "-----" << std::endl;
+    file << prediction << std::endl;
+    file << "-----" << std::endl;
+    file << "Loose result: " << (is_prompt_correct_loose ? "Success" : "Fail")
+         << std::endl;
+    file << "Strict result: " << (is_prompt_correct_strict ? "Success" : "Fail")
+         << std::endl;
+    file.close();
+  }
 
   return true;
 }
