@@ -34,10 +34,14 @@ class LoadgenInfo {
   });
 
   static Future<LoadgenInfo?> fromFile({required String filepath}) {
-    final lines = File(filepath)
-        .openRead()
-        .map(utf8.decode)
-        .transform(const LineSplitter());
+    final loadgenFile = File(filepath);
+
+    if (!loadgenFile.existsSync()) {
+      return extractLoadgenInfo(logLines: const Stream<String>.empty());
+    }
+
+    final lines =
+        loadgenFile.openRead().map(utf8.decode).transform(const LineSplitter());
     return extractLoadgenInfo(logLines: lines);
   }
 
