@@ -139,7 +139,7 @@ adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL S
 Evaluating accuracy of LLama3 with TinyMMLU evaluation set.
 
 ```shell
-adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL llm \
+adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL llm-1b \
 --mode=AccuracyOnly \
 --output_dir=/data/local/tmp/llm_output \
 --zero-shot=false \
@@ -152,7 +152,7 @@ adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL l
 Evaluating accuracy of LLama3 with IFEval evaluation set.
 
 ```shell
-adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL llm_instruction \
+adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL llm-1b-instruct \
 --mode=AccuracyOnly \
 --output_dir=/data/local/tmp/llm_output \
 --model_file=/sdcard/Android/data/org.mlperf.inference/files/cache/cache/llama_1b_q8_ekv1280.tflite \
