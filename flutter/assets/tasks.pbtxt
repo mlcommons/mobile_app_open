@@ -57,7 +57,7 @@ task_set {
 }
 
 task {
-  id: "image_classification"
+  id: "image_classification_v2"
   name: "Image Classification v2 (Online)"
   task_set: "image_classification"
   required_option: "online"
