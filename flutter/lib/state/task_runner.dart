@@ -201,7 +201,7 @@ class TaskRunner {
       );
       final performanceRunInfo = await runHelper.run();
       perfTimer.stop();
-      performanceRunInfo.loadgenInfo!;
+      //performanceRunInfo.loadgenInfo!;
 
       final performanceResult = performanceRunInfo.result;
       benchmark.performanceModeResult = BenchmarkResult(
@@ -212,7 +212,7 @@ class TaskRunner {
         acceleratorName: performanceResult.acceleratorName,
         delegateName: benchmark.benchmarkSettings.delegateSelected,
         batchSize: benchmark.selectedDelegate.batchSize,
-        loadgenInfo: performanceRunInfo.loadgenInfo!,
+        loadgenInfo: performanceRunInfo.loadgenInfo,
       );
       resultHelper.performanceRunInfo = performanceRunInfo;
     } else if (mode.loadgenMode == LoadgenModeEnum.accuracyOnly) {

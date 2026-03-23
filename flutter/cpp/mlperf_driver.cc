@@ -137,9 +137,12 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
   // mlperf_settings.server_target_qps = 0.1;
 
   // Prevent datasets with performance sample count 0 from running.
+  // This function isn't expected to see a Submission run mode, only Accuracy
+  // and Performance separately.
   ::mlperf::TestMode runMode = Str2TestMode(mode);
-  if (dataset_->PerformanceSampleCount() == 0)
-    runMode = ::mlperf::TestMode::AccuracyOnly;
+  if (dataset_->PerformanceSampleCount() == 0 &&
+      runMode == ::mlperf::TestMode::PerformanceOnly)
+    return;
 
   mlperf_settings.mode = runMode;
   mlperf_settings.min_duration_ms =
