@@ -419,7 +419,7 @@ int Main(int argc, char *argv[]) {
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new MmluGen(backend.get(), input_tfrecord, sp_path,
-                                  zero_shot, Str2TestMode(mode)));
+                                  output_dir, zero_shot, Str2TestMode(mode)));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),
@@ -440,7 +440,8 @@ int Main(int argc, char *argv[]) {
 
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
-        dataset.reset(new IFEval(backend.get(), input_tfrecord, sp_path));
+        dataset.reset(
+            new IFEval(backend.get(), input_tfrecord, sp_path, output_dir));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),
