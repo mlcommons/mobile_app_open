@@ -69,7 +69,8 @@ class BenchmarkConfigSection extends StatelessWidget {
 
   Widget _setListTile(BenchmarkSet benchmarkSet, BenchmarkState state,
       AppLocalizations l10n, BuildContext context) {
-    final totalOptions = benchmarkSet.optionMap.length;
+    final totalOptions =
+        benchmarkSet.optionMap.length; //FIXME this includes hidden options
     final activeOptions = benchmarkSet.optionSets
         .expand((e) => e.options.values)
         .where((e) => e.enabled)
@@ -116,7 +117,9 @@ class BenchmarkConfigSection extends StatelessWidget {
                       child: SizedBox(
                           width: 32,
                           height: 32,
-                          child: benchmarkSet.benchmarks[0].info.icon),
+                          child: benchmarkSet.benchmarks.isEmpty
+                              ? null
+                              : benchmarkSet.benchmarks[0].info.icon),
                     ),
                   ),
                 ),
@@ -207,48 +210,50 @@ class BenchmarkConfigSection extends StatelessWidget {
                       for (int i = 0;
                           i < benchmarkSet.optionSets.length;
                           i++) ...[
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16, top: 8, bottom: 4),
-                          child: Row(
-                            children: [
-                              Text(
-                                benchmarkSet.optionSets[i].config.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey,
-                                    fontSize: 12),
-                              ),
-                              const Expanded(
-                                  child: Divider(indent: 10, endIndent: 16)),
-                            ],
-                          ),
-                        ),
-                        for (final option
-                            in benchmarkSet.optionSets[i].options.keys)
-                          ListTile(
-                            dense: true,
-                            contentPadding:
-                                const EdgeInsets.only(left: 24, right: 16),
-                            title: Text(option),
-                            onTap: () {
-                              state.benchmarkSetOption(
-                                  benchmarkSet,
-                                  option,
-                                  !benchmarkSet.optionSets[
-                                          benchmarkSet.optionMap[option]!]
-                                      .getOption(option)!);
-                            },
-                            trailing: Checkbox(
-                              key: Key(option),
-                              value:
-                                  benchmarkSet.optionSets[i].getOption(option),
-                              onChanged: (bool? value) {
-                                state.benchmarkSetOption(
-                                    benchmarkSet, option, value!);
-                              },
+                        if (!benchmarkSet.optionSets[i].config.hidden) ...{
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 16, top: 8, bottom: 4),
+                            child: Row(
+                              children: [
+                                Text(
+                                  benchmarkSet.optionSets[i].config.name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey,
+                                      fontSize: 12),
+                                ),
+                                const Expanded(
+                                    child: Divider(indent: 10, endIndent: 16)),
+                              ],
                             ),
                           ),
+                          for (final option
+                              in benchmarkSet.optionSets[i].options.keys)
+                            ListTile(
+                              dense: true,
+                              contentPadding:
+                                  const EdgeInsets.only(left: 24, right: 16),
+                              title: Text(option),
+                              onTap: () {
+                                state.benchmarkSetOption(
+                                    benchmarkSet,
+                                    option,
+                                    !benchmarkSet.optionSets[
+                                            benchmarkSet.optionMap[option]!]
+                                        .getOption(option)!);
+                              },
+                              trailing: Checkbox(
+                                key: Key(option),
+                                value: benchmarkSet.optionSets[i]
+                                    .getOption(option),
+                                onChanged: (bool? value) {
+                                  state.benchmarkSetOption(
+                                      benchmarkSet, option, value!);
+                                },
+                              ),
+                            )
+                        }
                       ]
                     ],
                   ),

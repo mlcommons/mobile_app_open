@@ -259,7 +259,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "llm"
+  benchmark_id: "llm-1b"
   framework: "TFLite"
   delegate_choice: {
     delegate_name: "CPU"
@@ -290,7 +290,7 @@ benchmark_setting {
 }
 
 benchmark_setting {
-  benchmark_id: "llm-instruct"
+  benchmark_id: "llm-1b-instruct"
   framework: "TFLite"
   delegate_choice: {
     delegate_name: "CPU"

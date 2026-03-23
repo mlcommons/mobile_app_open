@@ -94,9 +94,9 @@ DatasetConfig::DatasetType BenchmarkId2DatasetType(absl::string_view name) {
     return DatasetConfig::SNUSR;
   } else if (absl::StartsWith(name, "stable_diffusion")) {
     return DatasetConfig::COCOGEN;
-  } else if (absl::StartsWith(name, "llm_instruction")) {
+  } else if (absl::StartsWith(name, "llm-1b-instruct")) {
     return DatasetConfig::IFEVAL;
-  } else if (absl::StartsWith(name, "llm")) {
+  } else if (absl::StartsWith(name, "llm-1b")) {
     return DatasetConfig::MMLU;
   } else {
     LOG(FATAL) << "Unrecognized benchmark_id: " << name;

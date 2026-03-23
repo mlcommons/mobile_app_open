@@ -2,7 +2,7 @@
 # proto-message: MLPerfConfig
 
 task_set {
-  id: "image_classification_v2"
+  id: "image_classification"
   name: "Image Classification v2"
   option_set {
     id: "options"
@@ -19,10 +19,47 @@ task_set {
   }
 }
 
+task_set {
+  id: "llm"
+  name: "LLM"
+  option_set {
+    id: "parameters"
+    name: "Parameters"
+    opt {
+      id: "1b"
+      name: "1B"
+      enabled: true
+    }
+    opt {
+      id: "3b"
+      name: "3B"
+    }
+    opt {
+      id: "8b"
+      name: "8B"
+    }
+  }
+  option_set {
+    id: "dataset"
+    name: "Dataset"
+    hidden: true
+    opt {
+      id: "mmlu"
+      name: "MMLU"
+      enabled: true
+    }
+    opt {
+      id: "ifeval"
+      name: "IFEval"
+      enabled: true
+    }
+  }
+}
+
 task {
-  id: "image_classification_online_v2"
+  id: "image_classification_v2"
   name: "Image Classification v2 (Online)"
-  task_set: "image_classification_v2"
+  task_set: "image_classification"
   required_option: "online"
   max_throughput: 1000
   max_accuracy: 1.0
@@ -302,7 +339,7 @@ task {
 task {
   id: "image_classification_offline_v2"
   name: "Image Classification v2 (Offline)"
-  task_set: "image_classification_v2"
+  task_set: "image_classification"
   required_option: "offline"
   max_throughput: 2000
   max_accuracy: 1.0
@@ -359,11 +396,14 @@ task {
 }
 
 task {
-  id: "llm"
+  id: "llm-1b"
   name: "LLM"
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
+  task_set: "llm"
+  required_option: "1b"
+  required_option: "mmlu"
   runs {
     normal {
       min_query_count: 100
@@ -416,11 +456,14 @@ task {
 }
 
 task {
-  id: "llm-instruct"
+  id: "llm-1b-instruct"
   name: "LLM (instruct)"
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
+  task_set: "llm"
+  required_option: "1b"
+  required_option: "ifeval"
   runs {
     normal {
       min_query_count: 100
