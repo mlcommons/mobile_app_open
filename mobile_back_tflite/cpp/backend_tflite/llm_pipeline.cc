@@ -230,7 +230,7 @@ int32_t LLMPipeline::backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
 }
 
 // Return the type of the ith input.
-// All inputs are of they type [int32]
+// All inputs are of the type [int32]
 mlperf_data_t LLMPipeline::backend_get_input_type(
     mlperf_backend_ptr_t backend_ptr, int32_t i) {
   return mlperf_data_t{mlperf_data_t::Int32, 0};
