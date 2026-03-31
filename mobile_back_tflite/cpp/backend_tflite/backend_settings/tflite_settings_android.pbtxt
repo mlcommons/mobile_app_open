@@ -318,4 +318,124 @@ benchmark_setting {
     id: "tokenizer_filename"
     value: "llama3_1b.spm.model"
   }
+}benchmark_setting {
+  benchmark_id: "llm-3b"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_3b_q8_ekv3072.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-3b-instruct"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_3b_q8_ekv3072.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}benchmark_setting {
+  benchmark_id: "llm-8b"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_8b_q8_ekv3072.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-8b-instruct"
+  framework: "TFLite"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_8b_q8_ekv3072.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
 }

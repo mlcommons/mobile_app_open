@@ -397,7 +397,7 @@ task {
 
 task {
   id: "llm-1b"
-  name: "LLM"
+  name: "LLM 1B"
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
@@ -457,12 +457,252 @@ task {
 
 task {
   id: "llm-1b-instruct"
-  name: "LLM (instruct)"
+  name: "LLM 1B (instruct)"
   max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
   task_set: "llm"
   required_option: "1b"
+  required_option: "ifeval"
+  runs {
+    normal {
+      min_query_count: 100
+      min_duration: 60
+      max_duration: 300
+    }
+    quick {
+      min_query_count: 10
+      min_duration: 10
+      max_duration: 40
+    }
+    rapid {
+      min_query_count: 6
+      min_duration: 6
+      max_duration: 60
+    }
+  }
+  datasets {
+    type: IFEVAL
+      full {
+      name: "IFEVAL prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tiny33_ifeval.tfrecord"
+      input_checksum: "147806b0d2cb0c4329d0901939f62c1c"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    lite {
+      name: "IFEVAL prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tiny33_ifeval.tfrecord"
+      input_checksum: "147806b0d2cb0c4329d0901939f62c1c"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    tiny {
+      name: "IFEVAL prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tiny33_ifeval.tfrecord"
+      input_checksum: "147806b0d2cb0c4329d0901939f62c1c"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+  }
+  model {
+    id: "LLM"
+    name: "LLM"
+  }
+  custom_config {
+    id: "llm_tokenizer_path"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+task {
+  id: "llm-3b"
+  name: "LLM 3B"
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  task_set: "llm"
+  required_option: "3b"
+  required_option: "mmlu"
+  runs {
+    normal {
+      min_query_count: 100
+      min_duration: 60
+      max_duration: 300
+    }
+    quick {
+      min_query_count: 10
+      min_duration: 10
+      max_duration: 40
+    }
+    rapid {
+      min_query_count: 6
+      min_duration: 6
+      max_duration: 60
+    }
+  }
+  datasets {
+    type: MMLU
+      full {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tinymmlu.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    lite {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tinymmlu.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    tiny {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tinymmlu.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+  }
+  model {
+    id: "LLM"
+    name: "LLM"
+  }
+  custom_config {
+    id: "llm_tokenizer_path"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+task {
+  id: "llm-3b-instruct"
+  name: "LLM 3B (instruct)"
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  task_set: "llm"
+  required_option: "3b"
+  required_option: "ifeval"
+  runs {
+    normal {
+      min_query_count: 100
+      min_duration: 60
+      max_duration: 300
+    }
+    quick {
+      min_query_count: 10
+      min_duration: 10
+      max_duration: 40
+    }
+    rapid {
+      min_query_count: 6
+      min_duration: 6
+      max_duration: 60
+    }
+  }
+  datasets {
+    type: IFEVAL
+      full {
+      name: "IFEVAL prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tiny33_ifeval.tfrecord"
+      input_checksum: "147806b0d2cb0c4329d0901939f62c1c"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    lite {
+      name: "IFEVAL prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tiny33_ifeval.tfrecord"
+      input_checksum: "147806b0d2cb0c4329d0901939f62c1c"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    tiny {
+      name: "IFEVAL prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tiny33_ifeval.tfrecord"
+      input_checksum: "147806b0d2cb0c4329d0901939f62c1c"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+  }
+  model {
+    id: "LLM"
+    name: "LLM"
+  }
+  custom_config {
+    id: "llm_tokenizer_path"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+task {
+  id: "llm-8b"
+  name: "LLM 8B"
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  task_set: "llm"
+  required_option: "8b"
+  required_option: "mmlu"
+  runs {
+    normal {
+      min_query_count: 100
+      min_duration: 60
+      max_duration: 300
+    }
+    quick {
+      min_query_count: 10
+      min_duration: 10
+      max_duration: 40
+    }
+    rapid {
+      min_query_count: 6
+      min_duration: 6
+      max_duration: 60
+    }
+  }
+  datasets {
+    type: MMLU
+      full {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tinymmlu.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    lite {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tinymmlu.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    tiny {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tinymmlu.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+  }
+  model {
+    id: "LLM"
+    name: "LLM"
+  }
+  custom_config {
+    id: "llm_tokenizer_path"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+task {
+  id: "llm-8b-instruct"
+  name: "LLM 8B (instruct)"
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  task_set: "llm"
+  required_option: "8b"
   required_option: "ifeval"
   runs {
     normal {
