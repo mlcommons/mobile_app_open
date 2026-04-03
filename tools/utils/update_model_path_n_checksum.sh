@@ -12,13 +12,13 @@ set -euo pipefail
 #   update_model_path_n_checksum.sh [-d DIR] [-c CHECKSUM_FILE] [-t TARGET_URL] [-s SOURCE_URL]
 #     -d DIR            Directory to scan (default: script directory)
 #     -c CHECKSUM_FILE  Path to checksums.txt (default: DIR/checksums.txt)
-#     -t|--target-url   Base target URL (default: https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/)
+#     -t|--target-url   Base target URL (default: https://mobile.mlcommons-storage.org/app-resources/models/v6_0/)
 #     -s|--source-url   Source URL prefix to replace (default: local:///mlperf_models/)
 #
 #
 
 SCAN_DIR="$(cd "$(dirname "$0")" && pwd)"
-TARGET_URL="https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/"
+TARGET_URL="https://mobile.mlcommons-storage.org/app-resources/models/v6_0/"
 SOURCE_URL="local:///mlperf_models/"
 CHECKSUM_FILE=""
 
