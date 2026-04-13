@@ -87,8 +87,7 @@ class LoadgenInfo {
     const minQueriesMetKey = 'result_min_queries_met';
     const earlyStoppingMetKey = 'early_stopping_met';
     const useTokenLatenciesKey = 'requested_use_token_latencies';
-    const tokenThroughputKey =
-        'result_token_throughput_with_loadgen_overhead'; // For some reason result_token_throughput is unreasonably low
+    const tokenThroughputKey = 'result_time_to_output_token_mean';
 
     final result = await extractKeys(
       logLines: logLines,
@@ -128,8 +127,9 @@ class LoadgenInfo {
       latencyFirstToken90: usesTokens
           ? (result[latency90FirstTokenKey] as int? ?? 0) / nanosecondsPerSecond
           : 0,
-      tokenThroughput:
-          usesTokens ? result[tokenThroughputKey] as double? ?? 0.0 : 0,
+      tokenThroughput: usesTokens
+          ? 1.0 / (((result[tokenThroughputKey] as num?)?.toDouble() ?? 0.0) / nanosecondsPerSecond)
+          : 0,
       isMinDurationMet: result[minDurationMetKey] as bool? ?? false,
       isMinQueryMet: result[minQueriesMetKey] as bool? ?? false,
       isEarlyStoppingMet: result[earlyStoppingMetKey] as bool? ?? false,
