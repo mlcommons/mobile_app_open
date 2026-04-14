@@ -7,7 +7,16 @@
 #   3. Invokes xcrun clang (or clang++) with processed args
 set -euo pipefail
 
-SDKROOT=$(/usr/bin/xcrun --show-sdk-path 2>/dev/null)
+# Use APPLE_SDK_PLATFORM (set by Bazel) to resolve the correct SDK.
+# e.g. "MacOSX" for macOS, "iPhoneOS" for iOS, "iPhoneSimulator" etc.
+# xcrun requires lowercase SDK names (e.g. "iphoneos" not "iPhoneOS").
+SDK_ARGS=()
+if [ -n "${APPLE_SDK_PLATFORM:-}" ]; then
+  sdk_name=$(printf '%s' "$APPLE_SDK_PLATFORM" | tr '[:upper:]' '[:lower:]')
+  SDK_ARGS=(--sdk "$sdk_name")
+fi
+
+RESOLVED_SDKROOT=$(/usr/bin/xcrun "${SDK_ARGS[@]}" --show-sdk-path 2>/dev/null)
 DEVELOPER_DIR=$(/usr/bin/xcode-select -p 2>/dev/null)
 
 # Determine if we're wrapping clang or clang++
@@ -21,7 +30,7 @@ fi
 args=()
 for arg in "$@"; do
   # Replace SDK/Developer dir placeholders
-  arg="${arg/__BAZEL_XCODE_SDKROOT__/$SDKROOT}"
+  arg="${arg/__BAZEL_XCODE_SDKROOT__/$RESOLVED_SDKROOT}"
   arg="${arg/__BAZEL_XCODE_DEVELOPER_DIR__/$DEVELOPER_DIR}"
 
   # Handle DEBUG_PREFIX_MAP_PWD=<value> → -fdebug-prefix-map=<value>=.
@@ -34,4 +43,4 @@ for arg in "$@"; do
   args+=("$arg")
 done
 
-exec /usr/bin/xcrun "$COMPILER" "${args[@]}"
+exec /usr/bin/xcrun "${SDK_ARGS[@]}" "$COMPILER" "${args[@]}"
