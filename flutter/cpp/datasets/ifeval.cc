@@ -179,6 +179,28 @@ float IFEval::ComputeAccuracy() {
                 accuracy.prompt_total
           : 0.0f;
 
+  std::string filename = raw_output_dir_ + "/accuracy.txt";
+  std::ofstream file(filename);
+  if (file.is_open()) {
+    file << "Instruction-level loose-accuracy: "
+         << std::to_string(accuracy.instruction_correct_loose) << '/'
+         << std::to_string(accuracy.instruction_total) << " = "
+         << std::to_string(instruction_loose_accuracy) << std::endl;
+    file << "Instruction-level strict-accuracy: "
+         << std::to_string(accuracy.instruction_correct_strict) << '/'
+         << std::to_string(accuracy.instruction_total) << " = "
+         << std::to_string(instruction_strict_accuracy) << std::endl;
+    file << "Prompt-level loose-accuracy: "
+         << std::to_string(accuracy.prompt_correct_loose) << '/'
+         << std::to_string(accuracy.prompt_total) << " = "
+         << std::to_string(prompt_loose_accuracy) << std::endl;
+    file << "Prompt-level strict-accuracy: "
+         << std::to_string(accuracy.prompt_correct_strict) << '/'
+         << std::to_string(accuracy.prompt_total) << " = "
+         << std::to_string(prompt_strict_accuracy) << std::endl;
+    file.close();
+  }
+
   LOG(INFO) << "Instruction-level loose-accuracy: "
             << std::to_string(instruction_loose_accuracy);
   LOG(INFO) << "Instruction-level strict-accuracy: "
