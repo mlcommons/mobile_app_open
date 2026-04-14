@@ -53,7 +53,7 @@ flutter/android/libs/deps:
 	${backend_qti_libs_deps}
 
 .PHONY: flutter/android/libs/build
-flutter/android/libs/build:
+flutter/android/libs/build: flutter/android/libs/patch-wrapped-clang
 	bazel ${BAZEL_OUTPUT_ROOT_ARG} ${proxy_bazel_args} ${sonar_bazel_startup_options} \
 		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
 		--config=android_arm64 \
@@ -63,6 +63,14 @@ flutter/android/libs/build:
 		${backend_qti_android_target} \
 		${backend_samsung_android_target} \
 		//flutter/cpp/flutter:libbackendbridge.so
+
+# macOS 26+ rejects Bazel 6.x's wrapped_clang binary (missing LC_UUID).
+# Replace it with a shell script that replicates its behavior.
+.PHONY: flutter/android/libs/patch-wrapped-clang
+flutter/android/libs/patch-wrapped-clang:
+ifeq ($(shell uname -s),Darwin)
+	@bash tools/patch_wrapped_clang.sh
+endif
 
 flutter_android_libs_folder=flutter/android/app/src/main/jniLibs/arm64-v8a
 .PHONY: flutter/android/libs/copy
