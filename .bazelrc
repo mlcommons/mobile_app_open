@@ -45,6 +45,8 @@ build:android_x86_64 --fat_apk_cpu=x86_64
 build:ios --apple_platform_type=ios
 build:ios --copt=-Wno-c++11-narrowing
 build:ios --cxxopt=-fobjc-arc
+# Suppress clang 21 (Xcode 26.4) errors for TF's std::is_signed specializations
+build:ios --copt=-Wno-invalid-specialization
 
 # Windows configs
 

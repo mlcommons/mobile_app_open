@@ -20,27 +20,43 @@ RESOLVED_SDKROOT=$(/usr/bin/xcrun "${SDK_ARGS[@]}" --show-sdk-path 2>/dev/null)
 DEVELOPER_DIR=$(/usr/bin/xcode-select -p 2>/dev/null)
 
 # Determine if we're wrapping clang or clang++
+# Note: match "_pp" not "pp" — "wrapped" itself contains "pp".
 SELF=$(basename "$0")
-if [[ "$SELF" == *"pp"* ]] || [[ "$SELF" == *"++"* ]]; then
+if [[ "$SELF" == *"_pp"* ]] || [[ "$SELF" == *"++"* ]]; then
   COMPILER="clang++"
 else
   COMPILER="clang"
 fi
 
-args=()
-for arg in "$@"; do
-  # Replace SDK/Developer dir placeholders
+process_arg() {
+  local arg="$1"
   arg="${arg/__BAZEL_XCODE_SDKROOT__/$RESOLVED_SDKROOT}"
   arg="${arg/__BAZEL_XCODE_DEVELOPER_DIR__/$DEVELOPER_DIR}"
-
-  # Handle DEBUG_PREFIX_MAP_PWD=<value> → -fdebug-prefix-map=<value>=.
   if [[ "$arg" == DEBUG_PREFIX_MAP_PWD=* ]]; then
-    val="${arg#DEBUG_PREFIX_MAP_PWD=}"
-    args+=("-fdebug-prefix-map=${val}=.")
-    continue
+    local val="${arg#DEBUG_PREFIX_MAP_PWD=}"
+    printf '%s\n' "-fdebug-prefix-map=${val}=."
+  else
+    printf '%s\n' "$arg"
+  fi
+}
+
+args=()
+for arg in "$@"; do
+  # Handle @params files: read, process, and rewrite in-place
+  if [[ "$arg" == @* ]]; then
+    params_file="${arg#@}"
+    if [ -f "$params_file" ]; then
+      tmp_params=$(mktemp)
+      while IFS= read -r line || [ -n "$line" ]; do
+        process_arg "$line" >> "$tmp_params"
+      done < "$params_file"
+      mv "$tmp_params" "$params_file"
+      args+=("$arg")
+      continue
+    fi
   fi
 
-  args+=("$arg")
+  args+=("$(process_arg "$arg")")
 done
 
 exec /usr/bin/xcrun "${SDK_ARGS[@]}" "$COMPILER" "${args[@]}"

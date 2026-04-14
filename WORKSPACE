@@ -59,6 +59,8 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
+        # Fix std::abs overload resolution with clang 21 (Xcode 26.4)
+        "//:flutter/third_party/tf-elementwise-clang21.patch",
         # NDK 25 support
         "//patches:ndk_25_r14.diff",
     ] + PATCH_FILE,

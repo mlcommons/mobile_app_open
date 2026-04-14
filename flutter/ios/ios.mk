@@ -26,7 +26,7 @@ flutter/ios/clean:
 
 # BAZEL_OUTPUT_ROOT_ARG is set on our Jenkins CI
 .PHONY: flutter/ios/libs
-flutter/ios/libs:
+flutter/ios/libs: flutter/ios/libs/patch-wrapped-clang
 	# --use_top_level_targets_for_symlinks
 	bazel ${BAZEL_OUTPUT_ROOT_ARG} build ${BAZEL_CACHE_ARG} \
 		--config=ios \
@@ -38,6 +38,11 @@ flutter/ios/libs:
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_bridge_ios_zip}
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_tflite_ios_zip}
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_coreml_ios_zip}
+
+# macOS 26+ rejects Bazel 6.x's wrapped_clang binary (missing LC_UUID).
+.PHONY: flutter/ios/libs/patch-wrapped-clang
+flutter/ios/libs/patch-wrapped-clang:
+	@bash tools/patch_wrapped_clang.sh
 
 flutter/ios/release: flutter/check-release-env flutter/ios flutter/prepare flutter/ios/ipa
 
