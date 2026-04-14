@@ -138,20 +138,37 @@ class BenchmarkSet {
 
   void applyOptions() {
     for (Benchmark benchmark in benchmarks) {
-      benchmark.isActive = true;
-      for (String optionId in benchmark.taskConfig.requiredOption) {
-        final index = optionMap[optionId];
-        final optionSet =
-            (index != null && index >= 0 && index < optionSets.length)
-                ? optionSets[index]
-                : null;
-        if (!(optionSet?.getOption(optionId) ?? false)) {
-          benchmark.isActive = false;
-          break;
-        }
+      if (!areOptionsMet(benchmark)) {
+        benchmark.isActive = false;
       }
     }
   }
+
+  /// Activate all benchmarks whose required options are met,
+  /// deactivate the rest.
+  void setAllActive(bool active) {
+    for (Benchmark benchmark in benchmarks) {
+      benchmark.isActive = active && areOptionsMet(benchmark);
+    }
+  }
+
+  /// Whether all required options are met for a benchmark.
+  bool areOptionsMet(Benchmark benchmark) {
+    for (String optionId in benchmark.taskConfig.requiredOption) {
+      final index = optionMap[optionId];
+      final optionSet =
+          (index != null && index >= 0 && index < optionSets.length)
+              ? optionSets[index]
+              : null;
+      if (!(optionSet?.getOption(optionId) ?? false)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Whether any benchmark in the set is active.
+  bool get hasActiveBenchmarks => benchmarks.any((b) => b.isActive);
 }
 
 class BenchmarkOptionSet {
@@ -256,7 +273,7 @@ class BenchmarkStore {
         continue;
       }
 
-      final enabled = taskSelection[task.id] ?? true;
+      final enabled = taskSelection[task.id] ?? false;
       allBenchmarks.add(Benchmark(
         taskConfig: task,
         benchmarkSettings: backendSettings,

@@ -156,6 +156,14 @@ class BenchmarkConfigSection extends StatelessWidget {
                   builder: (context, snapshot) => _setDownloadStatus(
                       l10n, benchmarkSet, snapshot.data!, context),
                 ),
+                // Master toggle for the entire set
+                Switch(
+                  activeColor: AppColors.primary,
+                  value: benchmarkSet.hasActiveBenchmarks,
+                  onChanged: (flag) {
+                    state.toggleBenchmarkSetAll(benchmarkSet, flag);
+                  },
+                ),
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: Column(
