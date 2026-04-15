@@ -7,6 +7,7 @@ variables.
 ## Overview
 
 The workflow has two jobs:
+
 1. **build-ios-test-package** — builds the Flutter iOS app with
    `xcodebuild build-for-testing` on a `macos-15` runner and uploads the
    resulting zip as an artifact.
@@ -16,8 +17,9 @@ The workflow has two jobs:
 ## Where to save secrets and variables
 
 Go to your GitHub repository **Settings > Secrets and variables > Actions**.
-- **Secrets** (encrypted) — for credentials, keys, and certificates.
-- **Variables** (plaintext) — for non-sensitive configuration.
+
+* **Secrets** (encrypted) — for credentials, keys, and certificates.
+* **Variables** (plaintext) — for non-sensitive configuration.
 
 ## Required secrets
 
@@ -70,40 +72,44 @@ under **Project Settings > General > Your apps > iOS app**.
 
 ### 1. Create a certificate signing request (CSR)
 
-- Open **Keychain Access** on your Mac
-- Go to **Keychain Access > Certificate Assistant > Request a Certificate From a Certificate Authority**
-- Enter your email, select **Saved to disk**, and save the CSR file
+* Open **Keychain Access** on your Mac
+* Go to **Keychain Access > Certificate Assistant > Request a Certificate From a Certificate Authority**
+* Enter your email, select **Saved to disk**, and save the CSR file
 
 ### 2. Create a Development certificate
 
-- Go to [Apple Developer > Certificates](https://developer.apple.com/account/resources/certificates/list)
-- Click **+**, select **Apple Development**, upload the CSR, and download the certificate
-- Double-click the downloaded `.cer` file to install it in Keychain Access
+* Go to [Apple Developer > Certificates](https://developer.apple.com/account/resources/certificates/list)
+* Click **+**, select **Apple Development**, upload the CSR, and download the certificate
+* Double-click the downloaded `.cer` file to install it in Keychain Access
 
 ### 3. Export as .p12
 
-- In **Keychain Access**, find the installed certificate under **My Certificates**
-- Right-click > **Export** and save as `.p12` with a password
-- Base64-encode it:
+* In **Keychain Access**, find the installed certificate under **My Certificates**
+* Right-click > **Export** and save as `.p12` with a password
+* Base64-encode it:
+
   ```bash
   base64 -i certificate.p12 | pbcopy
   ```
-- Save the base64 string as `IOS_BUILD_CERTIFICATE_BASE64` and the password as `IOS_BUILD_CERTIFICATE_PASSWORD`
+
+* Save the base64 string as `IOS_BUILD_CERTIFICATE_BASE64` and the password as `IOS_BUILD_CERTIFICATE_PASSWORD`
 
 ### 4. Create an App Store Connect API key
 
-- Go to [App Store Connect > Users and Access > Integrations > App Store Connect API](https://appstoreconnect.apple.com/access/integrations/api)
-- Click **+** to generate a new key
-- Give it a name (e.g. `CI Signing`) and select the **Developer** role
-- Download the `.p8` file (you can only download it once)
-- Note the **Key ID** and **Issuer ID** shown on the page
-- Base64-encode the key:
+* Go to [App Store Connect > Users and Access > Integrations > App Store Connect API](https://appstoreconnect.apple.com/access/integrations/api)
+* Click **+** to generate a new key
+* Give it a name (e.g. `CI Signing`) and select the **Developer** role
+* Download the `.p8` file (you can only download it once)
+* Note the **Key ID** and **Issuer ID** shown on the page
+* Base64-encode the key:
+
   ```bash
   base64 -i AuthKey_XXXXXXXXXX.p8 | pbcopy
   ```
-- Save the base64 string as `APP_STORE_CONNECT_API_KEY_BASE64`
-- Save the Key ID as `APP_STORE_CONNECT_API_KEY_ID`
-- Save the Issuer ID as `APP_STORE_CONNECT_API_KEY_ISSUER_ID`
+
+* Save the base64 string as `APP_STORE_CONNECT_API_KEY_BASE64`
+* Save the Key ID as `APP_STORE_CONNECT_API_KEY_ID`
+* Save the Issuer ID as `APP_STORE_CONNECT_API_KEY_ISSUER_ID`
 
 ### 5. Set the keychain password
 
@@ -115,6 +121,6 @@ openssl rand -base64 32
 
 ### 6. Find your Team ID
 
-- Go to [Apple Developer > Membership details](https://developer.apple.com/account#MembershipDetailsCard)
-- Copy the 10-character **Team ID**
-- Save as `APPLE_DEVELOPMENT_TEAM`
+* Go to [Apple Developer > Membership details](https://developer.apple.com/account#MembershipDetailsCard)
+* Copy the 10-character **Team ID**
+* Save as `APPLE_DEVELOPMENT_TEAM`

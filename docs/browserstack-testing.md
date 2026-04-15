@@ -21,8 +21,9 @@ make flutter/android/release flutter/android/apk flutter/android/test-apk
 ```
 
 This produces two files in `output/android-apks/`:
-- `test-main.apk` — the app under test
-- `test-helper.apk` — the instrumentation test suite
+
+* `test-main.apk` — the app under test
+* `test-helper.apk` — the instrumentation test suite
 
 ### 2. Upload to BrowserStack
 
