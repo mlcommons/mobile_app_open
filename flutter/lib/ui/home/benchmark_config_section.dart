@@ -69,12 +69,8 @@ class BenchmarkConfigSection extends StatelessWidget {
 
   Widget _setListTile(BenchmarkSet benchmarkSet, BenchmarkState state,
       AppLocalizations l10n, BuildContext context) {
-    final totalOptions =
-        benchmarkSet.optionMap.length; //FIXME this includes hidden options
-    final activeOptions = benchmarkSet.optionSets
-        .expand((e) => e.options.values)
-        .where((e) => e.enabled)
-        .length;
+    final totalOptions = benchmarkSet.visibleOptions();
+    final activeOptions = benchmarkSet.selectedOptions();
 
     final bool isOptionsOpen = state.isOptionsExpanded(benchmarkSet);
     final bool isAdvancedOpen = state.isAdvancedConfigOpen(benchmarkSet);
