@@ -36,7 +36,8 @@ const _kM32 = 'SM-M326B'; // Samsung Galaxy M32
 
 // iOS
 const _kIphoneOnGitHubAction = 'iPhone16,2';
-const _kIphoneOnMacbook = 'iPhone17,1'; // Also used on BrowserStack (iPhone 16 Pro)
+const _kIphoneOnMacbook =
+    'iPhone17,1'; // Also used on BrowserStack (iPhone 16 Pro)
 
 const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   _kTFLiteBackend: {
