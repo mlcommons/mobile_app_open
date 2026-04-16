@@ -61,6 +61,8 @@ http_archive(
         "//:flutter/third_party/tf-eigen.patch",
         # NDK 25 support
         "//patches:ndk_25_r14.diff",
+        # Xcode 26 / LLVM 20 compatibility
+        "//patches:xcode26_compat.patch",
     ] + PATCH_FILE,
     sha256 = "ce357fd0728f0d1b0831d1653f475591662ec5bca736a94ff789e6b1944df19f",
     strip_prefix = "tensorflow-2.14.0",
