@@ -11,6 +11,10 @@ version: 5.0.4+1
 
 environment:
   sdk: ^3.3.4  # Dart SDK version
+  # TODO: upgrade Flutter for iOS 26 debug mode support.
+  # Flutter 3.19.6's Dart VM crashes on iOS 26 devices in debug mode
+  # (mprotect denied by stricter W^X enforcement). Use --release or
+  # --profile for on-device testing until upgraded.
   flutter: ^3.19.6  # Flutter SDK version
 
 dependencies:
