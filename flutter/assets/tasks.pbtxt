@@ -14,7 +14,6 @@ task_set {
     opt {
       id: "online"
       name: "Online"
-      enabled: true
     }
   }
 }
@@ -28,7 +27,6 @@ task_set {
     opt {
       id: "1b"
       name: "1B"
-      enabled: true
     }
     opt {
       id: "3b"

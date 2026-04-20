@@ -318,7 +318,9 @@ benchmark_setting {
     id: "tokenizer_filename"
     value: "llama3_1b.spm.model"
   }
-}benchmark_setting {
+}
+
+benchmark_setting {
   benchmark_id: "llm-3b"
   framework: "TFLite"
   delegate_choice: {
@@ -341,7 +343,7 @@ benchmark_setting {
   }
   custom_setting {
     id: "model_filename"
-    value: "llama_q8_ekv3072.tflite"
+    value: "llama_3b_q8_ekv3072.tflite"
   }
   custom_setting {
     id: "tokenizer_filename"
@@ -372,13 +374,15 @@ benchmark_setting {
   }
   custom_setting {
     id: "model_filename"
-    value: "llama_q8_ekv3072.tflite"
+    value: "llama_3b_q8_ekv3072.tflite"
   }
   custom_setting {
     id: "tokenizer_filename"
     value: "llama3_1b.spm.model"
   }
-}benchmark_setting {
+}
+
+benchmark_setting {
   benchmark_id: "llm-8b"
   framework: "TFLite"
   delegate_choice: {
@@ -401,7 +405,7 @@ benchmark_setting {
   }
   custom_setting {
     id: "model_filename"
-    value: "llama_q8_ekv3072.tflite"
+    value: "llama_8b_q8_ekv3072.tflite"
   }
   custom_setting {
     id: "tokenizer_filename"
@@ -432,7 +436,7 @@ benchmark_setting {
   }
   custom_setting {
     id: "model_filename"
-    value: "llama_q8_ekv3072.tflite"
+    value: "llama_8b_q8_ekv3072.tflite"
   }
   custom_setting {
     id: "tokenizer_filename"
