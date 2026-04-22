@@ -189,6 +189,8 @@ class BenchmarkState extends ChangeNotifier {
     await state.resourceManager.initSystemPaths();
     state.configManager = ConfigManager(
         state.resourceManager.applicationDirectory, state.resourceManager);
+    // Clear persisted task selection so all tasks start unchecked
+    store.taskSelection = '';
     try {
       await state.setTaskConfig(name: store.chosenConfigurationName);
       state.deferredLoadResources();
@@ -347,6 +349,20 @@ class BenchmarkState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleBenchmarkSetAll(BenchmarkSet benchmarkSet, bool isActive) {
+    benchmarkSet.setAllActive(isActive);
+    saveTaskSelection();
+    notifyListeners();
+  }
+
+  void resetAllBenchmarks() {
+    for (var b in _benchmarkStore.allBenchmarks) {
+      b.isActive = false;
+    }
+    saveTaskSelection();
+    notifyListeners();
+  }
+
   void benchmarkSetDelegate(Benchmark benchmark, String delegate) {
     benchmark.benchmarkSettings.delegateSelected = delegate;
     notifyListeners();
@@ -357,6 +373,7 @@ class BenchmarkState extends ChangeNotifier {
     benchmarkSet.optionSets[benchmarkSet.optionMap[option]!]
         .setOptionTo(option, value);
     benchmarkSet.applyOptions();
+    saveTaskSelection();
     notifyListeners();
   }
 
