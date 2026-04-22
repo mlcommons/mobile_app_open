@@ -130,9 +130,7 @@ void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
   mlperf_settings.sample_index_rng_seed = 14276810075590677512UL;
   mlperf_settings.schedule_rng_seed = 3936089224930324775UL;
 
-  // mlperf_settings.min_query_count = 1;
-  // mlperf_settings.max_query_count = 2;
-  // mlperf_settings.performance_sample_count_override = 5;
+  mlperf_settings.min_query_count = min_query_count;
   use_tokens_ = use_tokens;
   mlperf_settings.use_token_latencies = use_tokens;
   // mlperf_settings.server_target_qps = 0.1;
