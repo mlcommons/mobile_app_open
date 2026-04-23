@@ -4,6 +4,7 @@ permissions:
   contents: read
 
 on:
+  workflow_dispatch:
   push:
     branches: [ master, submission-v* ]
   pull_request:
@@ -11,19 +12,43 @@ on:
   merge_group:
     types: [ checks_requested ]
 
+env:
+  BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+
 jobs:
+  computed:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Compute build number
+        id: set
+        env:
+          OFFSET: ${{ vars.FLUTTER_BUILD_NUMBER_OFFSET }}
+        run: echo "build_number=$((GITHUB_RUN_NUMBER + ${OFFSET:-0}))" >> "$GITHUB_OUTPUT"
+    outputs:
+      build_number: ${{ steps.set.outputs.build_number }}
+
   build:
-    name: Build and test iOS app
+    name: Build iOS app (${{ matrix.backend }})
+    needs: computed
     # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
     runs-on: macos-15
     timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - backend: "tflite"
+            with_apple: 0
+            with_tflite: 1
+          - backend: "apple"
+            with_apple: 1
+            with_tflite: 0
     env:
       PERF_TEST: true
-      # Because iPhone simulator on GitHub Actions is not reliable, and caused a lot of test failures,
-      # we run only 1 benchmark to validate the build.
-      BENCHMARK_IDS: "image_classification_v2"
-      WITH_APPLE: 1
-      WITH_TFLITE: 1
+      FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
+      FLUTTER_IOS_TEST_PACKAGE: ios_tests-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.zip
+      WITH_APPLE: ${{ matrix.with_apple }}
+      WITH_TFLITE: ${{ matrix.with_tflite }}
       WITH_PIXEL: 0
       WITH_MEDIATEK: 0
       WITH_QTI: 0
@@ -37,8 +62,6 @@ jobs:
       FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
       FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
-      FIREBASE_CI_USER_EMAIL: ${{ secrets.FIREBASE_CI_USER_EMAIL }}
-      FIREBASE_CI_USER_PASSWORD: ${{ secrets.FIREBASE_CI_USER_PASSWORD }}
       FIREBASE_CRASHLYTICS_ENABLED: false
     steps:
       - name: Checkout
@@ -55,6 +78,48 @@ jobs:
           path: /tmp/bazel_cache
           key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
           restore-keys: ${{ runner.os }}-bazel_cache-
+      - name: Install the Apple certificate and API key
+        env:
+          IOS_BUILD_CERTIFICATE_BASE64: ${{ secrets.IOS_BUILD_CERTIFICATE_BASE64 }}
+          IOS_BUILD_CERTIFICATE_PASSWORD: ${{ secrets.IOS_BUILD_CERTIFICATE_PASSWORD }}
+          IOS_KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+        run: |
+          set -euo pipefail
+
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          AUTH_KEY_PATH=$RUNNER_TEMP/AuthKey.p8
+
+          echo -n "$IOS_BUILD_CERTIFICATE_BASE64" | base64 --decode -o "$CERTIFICATE_PATH"
+          if [ -n "$APP_STORE_CONNECT_API_KEY_BASE64" ]; then
+            # Accept either raw .p8 content or base64-encoded .p8 content.
+            if printf '%s' "$APP_STORE_CONNECT_API_KEY_BASE64" | grep -q "BEGIN PRIVATE KEY"; then
+              printf '%s\n' "$APP_STORE_CONNECT_API_KEY_BASE64" > "$AUTH_KEY_PATH"
+            else
+              printf '%s' "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode -o "$AUTH_KEY_PATH"
+            fi
+            # Normalize line endings; CRLF keys can fail parsing in some tooling.
+            tr -d '\r' < "$AUTH_KEY_PATH" > "$AUTH_KEY_PATH.tmp"
+            mv "$AUTH_KEY_PATH.tmp" "$AUTH_KEY_PATH"
+
+            if ! grep -q "BEGIN PRIVATE KEY" "$AUTH_KEY_PATH" || ! grep -q "END PRIVATE KEY" "$AUTH_KEY_PATH"; then
+              echo "APP_STORE_CONNECT_API_KEY_BASE64 does not decode to a valid .p8 PEM private key."
+              exit 1
+            fi
+            if ! openssl pkey -in "$AUTH_KEY_PATH" -noout >/dev/null 2>&1; then
+              echo "Decoded App Store Connect API key is not a valid private key."
+              exit 1
+            fi
+          fi
+
+          security create-keychain -p "$IOS_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$IOS_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          security import "$CERTIFICATE_PATH" -P "$IOS_BUILD_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -k "$IOS_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
       - name: Build iOS app
         env:
           BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
@@ -64,20 +129,87 @@ jobs:
       - name: Run iOS unit tests
         run: |
           make flutter/test/unit
-      - name: Build iOS integration tests
-        run: |
-          cd flutter && flutter --no-version-check build ios --simulator integration_test/first_test.dart
-      - name: Setup iOS simulator
+      - name: Build iOS test package
         env:
-          DEVICE_NAME: "iPhone 16 Pro"
-          RUNTIME_SDK: "iphonesimulator18.5"
+          DEVELOPMENT_TEAM: ${{ secrets.APPLE_DEVELOPMENT_TEAM }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
         run: |
-          cd flutter/ios/ci_scripts/ && bash setup_simulator.sh
-          open -a Simulator
-      - uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
-        name: Run iOS integration tests
+          if [ -s "$RUNNER_TEMP/AuthKey.p8" ] && [ -n "$APP_STORE_CONNECT_API_KEY_ID" ] && [ -n "$APP_STORE_CONNECT_API_KEY_ISSUER_ID" ]; then
+            export APP_STORE_CONNECT_API_KEY_PATH="$RUNNER_TEMP/AuthKey.p8"
+          else
+            unset APP_STORE_CONNECT_API_KEY_PATH
+            echo "App Store Connect API key is not fully configured; running xcodebuild without -authenticationKey* flags."
+          fi
+          make flutter/ios/test-package
+      - name: Upload test package artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          timeout_minutes: 120
+          name: ios-test-package-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}
+          path: output/ios-test-package/*.zip
+          retention-days: 28
+          if-no-files-found: error
+      - name: Clean up keychain and API key
+        if: ${{ always() }}
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
+          rm -f $RUNNER_TEMP/AuthKey.p8
+
+  test-ios-browserstack:
+    name: ${{ matrix.backend }}-${{ matrix.device }}
+    needs:
+      - computed
+      - build
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - backend: "tflite"
+            device: "iPhone 16 Pro-18"
+          - backend: "apple"
+            device: "iPhone 16 Pro-18"
+    env:
+      TEST_PACKAGE_NAME: ios_tests-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.zip
+      BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Download test package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ios-test-package-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}
+          path: /tmp
+      - name: Upload test package to BrowserStack
+        run: |
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/ios/test-package" \
+          -F "file=@/tmp/$TEST_PACKAGE_NAME" \
+          -F "custom_id=$TEST_PACKAGE_NAME"
+      - uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
+        name: Trigger App Automate
+        env:
+          BROWSERSTACK_PLATFORM: ios
+          BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
+          BROWSERSTACK_TEST_PACKAGE: ${{ env.TEST_PACKAGE_NAME }}
+          BROWSERSTACK_BUILD_TAG: ${{ matrix.backend }}-${{ matrix.device }}
+          BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          BROWSERSTACK_DEVICES: >-
+            ["${{ matrix.device }}"]
+        with:
+          timeout_minutes: 60
           max_attempts: 2
+          retry_wait_seconds: 300
+          retry_on_exit_code: 9
           command: |
-            make flutter/test/integration
+            bash .github/workflows/scripts/browserstack-app-automate.sh
+      - name: Upload BrowserStack logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: logs-${{ matrix.backend }}-${{ matrix.device }}-${{ needs.computed.outputs.build_number }}
+          path: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          retention-days: 28
+          if-no-files-found: error

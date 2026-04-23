@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -9,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'utils.dart';
 
 const _runMode = BenchmarkRunModeEnum.integrationTestRun;
+const _bindingKeepAliveInterval = Duration(seconds: 20);
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -33,11 +36,50 @@ void main() {
 
   // Run each benchmark separately to avoid idle timout error on BrowserStack
   for (var benchmarkId in benchmarkIds) {
-    testBenchmark(benchmarkId);
+    testBenchmark(binding, benchmarkId);
   }
 }
 
-void testBenchmark(String benchmarkId) {
+Future<T> runWithBindingKeepAlive<T>(
+  IntegrationTestWidgetsFlutterBinding binding,
+  String description,
+  Future<T> Function() action,
+) async {
+  var keepAliveInFlight = false;
+
+  Future<void> pingBinding() async {
+    if (keepAliveInFlight) {
+      return;
+    }
+    keepAliveInFlight = true;
+    try {
+      await binding.callback(<String, String>{'command': 'get_health'});
+      debugPrint('IntegrationTest keepalive ping during $description');
+    } catch (error) {
+      debugPrint(
+        'IntegrationTest keepalive failed during $description: $error',
+      );
+    } finally {
+      keepAliveInFlight = false;
+    }
+  }
+
+  final keepAliveTimer = Timer.periodic(_bindingKeepAliveInterval, (_) {
+    unawaited(pingBinding());
+  });
+
+  try {
+    await pingBinding();
+    return await action();
+  } finally {
+    keepAliveTimer.cancel();
+  }
+}
+
+void testBenchmark(
+  IntegrationTestWidgetsFlutterBinding binding,
+  String benchmarkId,
+) {
   testWidgets('Test benchmark: $benchmarkId', (WidgetTester tester) async {
     await startApp(tester);
     await validateSettings(tester);
@@ -52,11 +94,17 @@ void testBenchmark(String benchmarkId) {
     await setBenchmarks(tester, [benchmarkId]);
     debugPrint('Wait 5 seconds to let the app finishing loading resources');
     await Future.delayed(const Duration(seconds: 5));
-    await downloadResources(tester);
-    final cooldownDuration = _runMode.cooldownDuration;
-    debugPrint('Wait $cooldownDuration seconds before running benchmark');
-    await Future.delayed(Duration(seconds: cooldownDuration));
-    await runBenchmarks(tester);
+    await runWithBindingKeepAlive(
+      binding,
+      'benchmark flow for $benchmarkId',
+      () async {
+        await downloadResources(tester);
+        final cooldownDuration = _runMode.cooldownDuration;
+        debugPrint('Wait $cooldownDuration seconds before running benchmark');
+        await Future.delayed(Duration(seconds: cooldownDuration));
+        await runBenchmarks(tester);
+      },
+    );
     final extendedResult = await getLastResult(tester);
     printResult(extendedResult);
     checkResult(extendedResult);
