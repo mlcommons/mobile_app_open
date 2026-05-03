@@ -29,7 +29,7 @@ LOGS_DIR="${BROWSERSTACK_LOGS_DIR:-}"
 
 # Validate required environment variables
 if [[ -z "$CREDENTIALS" ]]; then
-  echo "Error: Environment variable BROWSERSTACK_CREDENTIALS must be set in the format 'user_name:access_key'."
+  echo "Error: Environment variable BROWSERSTACK_CREDENTIALS must be set in the format 'user_name:access_key'." >&2
   exit 1
 fi
 
@@ -37,14 +37,14 @@ if [[ "$PLATFORM" == "ios" ]]; then
   if [[ -z "$PROJECT" || -z "$TEST_PACKAGE" || -z "$BUILD_TAG" || -z "$DEVICES" ]]; then
     echo "Error: Environment variables"\
     "BROWSERSTACK_PROJECT, BROWSERSTACK_TEST_PACKAGE, BROWSERSTACK_BUILD_TAG and BROWSERSTACK_DEVICES"\
-    "must be set for iOS."
+    "must be set for iOS." >&2
     exit 1
   fi
 else
   if [[ -z "$PROJECT" ||  -z "$APP" || -z "$TEST_SUITE" || -z "$BUILD_TAG" || -z "$DEVICES" ]]; then
     echo "Error: Environment variables"\
     "BROWSERSTACK_PROJECT, BROWSERSTACK_APP, BROWSERSTACK_TEST_SUITE, BROWSERSTACK_BUILD_TAG and BROWSERSTACK_DEVICES"\
-    "must be set."
+    "must be set." >&2
     exit 1
   fi
 fi

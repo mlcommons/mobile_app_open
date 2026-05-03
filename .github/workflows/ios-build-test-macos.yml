@@ -1,8 +1,5 @@
 name: iOS Build & Test (macOS)
 
-permissions:
-  contents: read
-
 on:
   workflow_dispatch:
   push:
@@ -18,6 +15,8 @@ env:
 jobs:
   computed:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: Compute build number
         id: set
@@ -32,6 +31,8 @@ jobs:
     needs: computed
     # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
     runs-on: macos-15
+    permissions:
+      contents: read
     timeout-minutes: 180
     strategy:
       fail-fast: false
@@ -161,6 +162,8 @@ jobs:
       - computed
       - build
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     timeout-minutes: 60
     strategy:
       fail-fast: false
