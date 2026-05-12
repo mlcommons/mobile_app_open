@@ -42,7 +42,8 @@ class _ResourcesScreen extends State<ResourcesScreen> {
         );
         if (state.resourceError != null) {
           if (!mounted) return;
-          await showErrorDialog(context, <String>[state.resourceError.toString()]);
+          await showErrorDialog(
+              context, <String>[state.resourceError.toString()]);
           // Reset both the error and stacktrace for further operation
           state.resourceError = null;
           state.stackTrace = null;
