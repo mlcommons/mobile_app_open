@@ -136,17 +136,21 @@ class BenchmarkSet {
     applyOptions();
   }
 
-  int selectedOptions() => optionSets
-      .where((e) => !e.config.hidden)
-      .expand((e) => e.options.values)
-      .where((e) => e.enabled)
-      .length;
+  Iterable<BenchmarkOption> availableOptions() {
+    var unhiddenOptions = optionSets
+        .where((e) => !e.config.hidden)
+        .expand((e) => e.options.values);
+
+    var benchmarkOptions =
+        benchmarks.expand((e) => e.taskConfig.requiredOption).toSet();
+
+    return unhiddenOptions.where((e) => benchmarkOptions.contains(e.id));
+  }
+
+  int selectedOptions() => availableOptions().where((e) => e.enabled).length;
 
   int visibleOptions() {
-    return optionSets
-        .where((e) => !e.config.hidden)
-        .expand((e) => e.options.values)
-        .length;
+    return availableOptions().length;
   }
 
   void applyOptions() {

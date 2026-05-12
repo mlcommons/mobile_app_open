@@ -224,8 +224,12 @@ class BenchmarkConfigSection extends StatelessWidget {
                               ],
                             ),
                           ),
-                          for (final option
-                              in benchmarkSet.optionSets[i].options.keys)
+                          for (final option in benchmarkSet
+                              .optionSets[i].options.keys
+                              .where((element) => benchmarkSet
+                                  .availableOptions()
+                                  .map((e) => e.id)
+                                  .contains(element)))
                             ListTile(
                               dense: true,
                               contentPadding:
