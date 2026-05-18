@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
@@ -189,7 +190,9 @@ class _ResourcesScreen extends State<ResourcesScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          l10n.resourceDownloading,
+          state.loadingStatus == ResourceLoadingStatus.loading
+              ? l10n.resourceDownloading
+              : l10n.resourceVerifying,
           maxLines: 1,
           style: const TextStyle(fontSize: 12),
         ),

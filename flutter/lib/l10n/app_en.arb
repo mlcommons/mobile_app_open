@@ -137,6 +137,7 @@
   "resourceErrorCurrentConfig": "Current task config file: ",
   "resourceErrorRereadConfig": "I have fixed current config, try again",
   "resourceErrorFail": "Config failed to load",
+  "resourceVerifying": "Verifying",
   "resourceStatusNotDownloaded": "Resources Not Downloaded",
 
   "listScreenTitleMain": "Results",
