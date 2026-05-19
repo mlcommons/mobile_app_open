@@ -24,7 +24,8 @@ class BenchmarkConfigSection extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 20),
       children: <Widget>[
         for (var benchmarkSet in state.benchmarkSets) ...[
-          _setListTile(benchmarkSet, state, l10n, context),
+          if (benchmarkSet.benchmarks.isNotEmpty)
+            _setListTile(benchmarkSet, state, l10n, context),
           if (benchmarkSet != state.benchmarkSets.last ||
               state.looseBenchmarks.isNotEmpty)
             const Divider(
