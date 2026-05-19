@@ -40,11 +40,12 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           downloadMissing: true,
           benchmarks: widget.benchmarksToDownload ?? state.activeBenchmarks,
         );
-        if (state.error != null) {
+        if (state.resourceError != null) {
           if (!mounted) return;
-          await showErrorDialog(context, <String>[state.error.toString()]);
+          await showErrorDialog(
+              context, <String>[state.resourceError.toString()]);
           // Reset both the error and stacktrace for further operation
-          state.error = null;
+          state.resourceError = null;
           state.stackTrace = null;
         }
       });
@@ -215,12 +216,12 @@ class _ResourcesScreen extends State<ResourcesScreen> {
                 downloadMissing: true,
                 benchmarks: benchmarks,
               );
-              if (state.error != null) {
+              if (state.resourceError != null) {
                 if (!mounted) return;
                 await showErrorDialog(
-                    context, <String>[state.error.toString()]);
+                    context, <String>[state.resourceError.toString()]);
                 // Reset both the error and stacktrace for further operation
-                state.error = null;
+                state.resourceError = null;
                 state.stackTrace = null;
               }
             },
