@@ -45,7 +45,8 @@ ifeq (${WITH_MEDIATEK},1)
   ${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/neuron/libtfliteneuronbackend.so \
   bazel-bin/external/neuron_delegate/neuron/java/libtensorflowlite_neuron_jni.so \
   mobile_back_tflite/cpp/backend_tflite/neuron/libs/mt6989/libneuronusdk_adapter.mtk.mt6989.so \
-  mobile_back_tflite/cpp/backend_tflite/neuron/libs/mt6991/libneuronusdk_adapter.mtk.mt6991.so
+  mobile_back_tflite/cpp/backend_tflite/neuron/libs/mt6991/libneuronusdk_adapter.mtk.mt6991.so \
+  mobile_back_tflite/cpp/backend_tflite/neuron/libs/mt6993/libneuronusdk_adapter.mtk.mt6993.so
   backend_mediatek_android_target=//mobile_back_tflite/cpp/backend_tflite/neuron:libtfliteneuronbackend.so
   backend_mediatek_filename=libtfliteneuronbackend
 

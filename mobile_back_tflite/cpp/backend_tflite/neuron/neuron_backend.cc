@@ -54,106 +54,11 @@
 #include "NeuronAdapter.h"
 #include "NeuronAdapterShim.h"
 #include "neuron_builder.h"
+#include "neuron_utils.h"
 #include "tensorflow/core/platform/logging.h"
 
 #define likely(x) __builtin_expect((x), 1)
 #define unlikely(x) __builtin_expect((x), 0)
-
-namespace {
-int32_t CreateNeuronMemoryWithAHWB(uint32_t byte_size, uint64_t ahwb_type,
-                                   NeuronMemory **memory,
-                                   AHardwareBuffer **abuffer) {
-  if (byte_size == 0) {
-    LOG(ERROR) << "Allocate AHWB with size 0 is not allowed.";
-    return NEURON_BAD_DATA;
-  }
-  if (*memory != nullptr || *abuffer != nullptr) return NEURON_BAD_DATA;
-  AHardwareBuffer_Desc iDesc{
-      .width = byte_size,
-      .height = 1,
-      .layers = 1,
-      .format = AHARDWAREBUFFER_FORMAT_BLOB,
-      .usage = ahwb_type,
-      .stride = byte_size,
-  };
-  LOG(INFO) << "CREATE AHWB: " << byte_size;
-
-  AHardwareBuffer_allocate(&iDesc, abuffer);
-  if (*abuffer == nullptr) {
-    LOG(ERROR) << "Allocate AHWB failed";
-    return NEURON_UNEXPECTED_NULL;
-  }
-
-  if (int ret = NeuronMemory_createFromAHardwareBuffer(*abuffer, memory);
-      ret != NEURON_NO_ERROR) {
-    LOG(ERROR) << "Create Neuron Memory Failed";
-    return ret;
-  }
-  return NEURON_NO_ERROR;
-}
-}  // namespace
-
-int32_t AhwbNeuronMemoryWrapper::InitNeuronMemory() {
-  if (CreateNeuronMemoryWithAHWB(size_, ahwb_type_, &memory_, &abuffer_) !=
-      NEURON_NO_ERROR) {
-    LOG(ERROR) << "Construct NeuronMemoryWrapper for AHWB Failed";
-    return NEURON_BAD_STATE;
-  }
-  return NEURON_NO_ERROR;
-}
-
-int32_t AhwbNeuronMemoryWrapper::unlockAhwbData() {
-  if (!data_) return NEURON_NO_ERROR;
-  if (AHardwareBuffer_unlock(abuffer_, nullptr) != 0) {
-    LOG(ERROR) << "AHWB unlock fail";
-    return NEURON_BAD_STATE;
-  }
-  data_ = nullptr;
-  return NEURON_NO_ERROR;
-}
-
-int32_t AhwbNeuronMemoryWrapper::lockAhwbData(void **out_data_ptr) {
-  if (!out_data_ptr) {
-    LOG(ERROR) << "out_data_ptr is nullptr";
-    return NEURON_UNEXPECTED_NULL;
-  }
-  if (data_) {
-    *out_data_ptr = data_;
-    return NEURON_NO_ERROR;
-  }
-  if (!abuffer_) {
-    LOG(ERROR) << "No AHWB allocated";
-    return NEURON_BAD_STATE;
-  }
-  if (AHardwareBuffer_lock(abuffer_, ahwb_type_, -1, nullptr, out_data_ptr) !=
-      0) {
-    LOG(ERROR) << "AHWB lock fail";
-    return NEURON_BAD_STATE;
-  }
-  data_ = *out_data_ptr;
-  return NEURON_NO_ERROR;
-}
-
-void *AhwbNeuronMemoryWrapper::data() {
-  if (!data_) {
-    void *temp_ptr = nullptr;
-    if (lockAhwbData(&temp_ptr) != NEURON_NO_ERROR) {
-      LOG(ERROR) << "Lock and aquire data failed";
-      data_ = nullptr;
-    } else {
-      data_ = temp_ptr;
-    }
-  }
-  return data_;
-}
-
-std::string GetPropertyValue(const std::string &property) {
-  char value[PROP_VALUE_MAX];
-  if (0 == __system_property_get(property.c_str(), value)) {
-    return std::string();
-  }
-  return std::string(value);
-}
 
 std::string GetPlatformName() {
   static std::string kPlatform = GetPropertyValue("ro.hardware");
@@ -184,16 +89,16 @@ void Padding(AdapterBackendData *backend, int bytes, void *data) {
 bool NeuronSetInputsAndOutputsFromMemory(AdapterBackendData *backend_data) {
   if (!backend_data) return false;
   LOG(INFO) << "NeuronSetInputsAndOutputsFromMemory Start";
-  const uint32_t shards_num = backend_data->shards_num;
+  const uint32_t exec_num = backend_data->exec_num;
   const int input_nums = backend_data->input_nums;
   const int output_nums = backend_data->output_nums;
 
   int err = NEURON_NO_ERROR;
-  for (int t = 0; t < shards_num; t++) {
+  for (int t = 0; t < exec_num; t++) {
     for (int i = 0; i < input_nums; i++) {
       err = NeuronExecution_setInputFromMemory(
           backend_data->execution, i, nullptr,
-          backend_data->inputMemoryWrappers[t * input_nums + i].memory(), 0,
+          backend_data->inputMemoryWrappers[t * input_nums + i]->memory(), 0,
           backend_data->inputSizes[t * input_nums + i]);
       RETURN_FALSE_ON_ERR(err,
                           "NeuronExecution_setInputFromMemory[" << i << "]");
@@ -202,7 +107,7 @@ bool NeuronSetInputsAndOutputsFromMemory(AdapterBackendData *backend_data) {
     for (int i = 0; i < output_nums; i++) {
       err = NeuronExecution_setOutputFromMemory(
           backend_data->execution, i, nullptr,
-          backend_data->outputMemoryWrappers[t * output_nums + i].memory(), 0,
+          backend_data->outputMemoryWrappers[t * output_nums + i]->memory(), 0,
           backend_data->outputSizes[t * output_nums + i]);
       RETURN_FALSE_ON_ERR(err,
                           "NeuronExecution_setOutputFromMemory[" << i << "]");
@@ -219,9 +124,9 @@ bool NeuronSetInputsAndOutputsFromMemory(AdapterBackendData *backend_data) {
 
 void ResizeInputsAndOutputsBuffers(AdapterBackendData *backend_data,
                                    uint32_t input_num, uint32_t output_num) {
-  uint32_t shards_num = backend_data->shards_num;
-  uint32_t input_buffer_num = input_num * shards_num;
-  uint32_t output_buffer_num = output_num * shards_num;
+  uint32_t exec_num = backend_data->exec_num;
+  uint32_t input_buffer_num = input_num * exec_num;
+  uint32_t output_buffer_num = output_num * exec_num;
   backend_data->input_nums = input_num;
   backend_data->inputTypes.resize(input_num);
 
@@ -231,6 +136,7 @@ void ResizeInputsAndOutputsBuffers(AdapterBackendData *backend_data,
 
 bool create_mobilenet_edge_model(neuron_backend_ptr_t backend_ptr,
                                  const char *model) {
+  Tracer trace("create_mobilenet_edge_model");
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
 
   uint32_t real_batch_size = backend_data->real_batch_size;
@@ -281,13 +187,14 @@ bool create_mobilenet_edge_model(neuron_backend_ptr_t backend_ptr,
           .setOutputOperand(output_op)
           .setSuppressConversion(TYPE_INPUT, true)
           .setSuppressConversion(TYPE_OUTPUT, false)
-          .setAhwbType(AHWB_OFTEN)
-          .setExecutionFlushValue(0)
+          .setBufferType(CACHEABLE)
+          .setDisableCoherentBuffer(backend_data->disableCoherentBuffer)
           .setModelPath(model)
           .setPreference(backend_data->preference)
           .setThreadNumber(backend_data->thread_pool_size)
-          .setShardsNumber(backend_data->shards_num)
+          .setExecutorNumber(backend_data->exec_num)
           .setUseThroughputMode(backend_data->use_throughput_mode)
+          .setDmaBufferAllocator(backend_data->bufferAllocator.get())
           .create(backend_ptr) == false) {
     LOG(ERROR) << "create Neuron error";
     return false;
@@ -299,6 +206,7 @@ bool create_mobilenet_edge_model(neuron_backend_ptr_t backend_ptr,
 
 bool create_mobilenet_v4_model(neuron_backend_ptr_t backend_ptr,
                                const char *model) {
+  Tracer trace("create_mobilenet_v4_model");
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
   uint32_t real_batch_size = backend_data->real_batch_size;
   ResizeInputsAndOutputsBuffers(backend_data, 1, 1);
@@ -348,13 +256,14 @@ bool create_mobilenet_v4_model(neuron_backend_ptr_t backend_ptr,
           .setOutputOperand(output_op)
           .setSuppressConversion(TYPE_INPUT, true)
           .setSuppressConversion(TYPE_OUTPUT, false)
-          .setAhwbType(AHWB_OFTEN)
-          .setExecutionFlushValue(0)
+          .setBufferType(CACHEABLE)
+          .setDisableCoherentBuffer(backend_data->disableCoherentBuffer)
           .setModelPath(model)
           .setPreference(backend_data->preference)
           .setThreadNumber(backend_data->thread_pool_size)
-          .setShardsNumber(backend_data->shards_num)
+          .setExecutorNumber(backend_data->exec_num)
           .setUseThroughputMode(backend_data->use_throughput_mode)
+          .setDmaBufferAllocator(backend_data->bufferAllocator.get())
           .create(backend_ptr) == false) {
     LOG(ERROR) << "create Neuron error";
     return false;
@@ -366,6 +275,7 @@ bool create_mobilenet_v4_model(neuron_backend_ptr_t backend_ptr,
 
 bool create_mobiledet_qat_model(neuron_backend_ptr_t backend_ptr,
                                 const char *model) {
+  Tracer trace("create_mobiledet_qat_model");
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
   ResizeInputsAndOutputsBuffers(backend_data, 1, 4);
 
@@ -433,13 +343,14 @@ bool create_mobiledet_qat_model(neuron_backend_ptr_t backend_ptr,
           .setOutputOperand(output_op)
           .setSuppressConversion(TYPE_INPUT, true)
           .setSuppressConversion(TYPE_OUTPUT, false)
-          .setAhwbType(AHWB_RARELY)
-          .setExecutionFlushValue(3)
+          .setBufferType(UNCACHED)
+          .setDisableCoherentBuffer(backend_data->disableCoherentBuffer)
           .setModelPath(model)
           .setPreference(backend_data->preference)
           .setThreadNumber(backend_data->thread_pool_size)
-          .setShardsNumber(backend_data->shards_num)
+          .setExecutorNumber(backend_data->exec_num)
           .setUseThroughputMode(backend_data->use_throughput_mode)
+          .setDmaBufferAllocator(backend_data->bufferAllocator.get())
           .create(backend_ptr) == false) {
     LOG(ERROR) << "create Neuron error";
     return false;
@@ -451,6 +362,7 @@ bool create_mobiledet_qat_model(neuron_backend_ptr_t backend_ptr,
 
 bool create_mobilebert_nnapi_model(neuron_backend_ptr_t backend_ptr,
                                    const char *model) {
+  Tracer trace("create_mobilebert_nnapi_model");
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
   ResizeInputsAndOutputsBuffers(backend_data, 3, 2);
 
@@ -501,13 +413,14 @@ bool create_mobilebert_nnapi_model(neuron_backend_ptr_t backend_ptr,
           .setOutputOperand(output_op)
           .setSuppressConversion(TYPE_INPUT, false)
           .setSuppressConversion(TYPE_OUTPUT, false)
-          .setAhwbType(AHWB_OFTEN)
-          .setExecutionFlushValue(0)
+          .setBufferType(CACHEABLE)
+          .setDisableCoherentBuffer(backend_data->disableCoherentBuffer)
           .setModelPath(model)
           .setPreference(backend_data->preference)
           .setThreadNumber(backend_data->thread_pool_size)
-          .setShardsNumber(backend_data->shards_num)
+          .setExecutorNumber(backend_data->exec_num)
           .setUseThroughputMode(backend_data->use_throughput_mode)
+          .setDmaBufferAllocator(backend_data->bufferAllocator.get())
           .create(backend_ptr) == false) {
     LOG(ERROR) << "create Neuron error";
     return false;
@@ -518,6 +431,7 @@ bool create_mobilebert_nnapi_model(neuron_backend_ptr_t backend_ptr,
 
 bool create_mobile_segmenter_model(neuron_backend_ptr_t backend_ptr,
                                    const char *model) {
+  Tracer trace("create_mobile_segmenter_model");
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
   ResizeInputsAndOutputsBuffers(backend_data, 1, 1);
 
@@ -560,13 +474,14 @@ bool create_mobile_segmenter_model(neuron_backend_ptr_t backend_ptr,
           .setOutputOperand(output_op)
           .setSuppressConversion(TYPE_INPUT, true)
           .setSuppressConversion(TYPE_OUTPUT, false)
-          .setAhwbType(AHWB_RARELY)
-          .setExecutionFlushValue(3)
+          .setBufferType(UNCACHED)
+          .setDisableCoherentBuffer(backend_data->disableCoherentBuffer)
           .setModelPath(model)
           .setPreference(backend_data->preference)
           .setThreadNumber(backend_data->thread_pool_size)
-          .setShardsNumber(backend_data->shards_num)
+          .setExecutorNumber(backend_data->exec_num)
           .setUseThroughputMode(backend_data->use_throughput_mode)
+          .setDmaBufferAllocator(backend_data->bufferAllocator.get())
           .create(backend_ptr) == false) {
     LOG(ERROR) << "create Neuron error";
     return false;
@@ -577,6 +492,7 @@ bool create_mobile_segmenter_model(neuron_backend_ptr_t backend_ptr,
 }
 
 bool create_edsr_model(neuron_backend_ptr_t backend_ptr, const char *model) {
+  Tracer trace("create_edsr_model");
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
   ResizeInputsAndOutputsBuffers(backend_data, 1, 1);
 
@@ -624,13 +540,15 @@ bool create_edsr_model(neuron_backend_ptr_t backend_ptr, const char *model) {
           .setOutputOperand(output_op)
           .setSuppressConversion(TYPE_INPUT, true)
           .setSuppressConversion(TYPE_OUTPUT, false)
-          .setAhwbType(AHWB_OFTEN)
-          .setExecutionFlushValue(0)
+          .setBufferType(CACHEABLE)
+          .setDisableCoherentBuffer(backend_data->disableCoherentBuffer)
           .setModelPath(model)
           .setPreference(backend_data->preference)
           .setThreadNumber(backend_data->thread_pool_size)
-          .setShardsNumber(backend_data->shards_num)
+          .setExecutorNumber(backend_data->exec_num)
           .setUseThroughputMode(backend_data->use_throughput_mode)
+          .setDmaBufferAllocator(backend_data->bufferAllocator.get())
+          .setPerfParam(mtk::performance::kEdsrParams)
           .create(backend_ptr) == false) {
     LOG(ERROR) << "create Neuron error";
     return false;
@@ -650,39 +568,23 @@ bool need_neuron_backend(const char *model_path) {
   return false;
 }
 
-std::string InsertFolderAfterTargetFolder(const std::string &input,
-                                          const std::string &target_folder,
-                                          const std::string &folder) {
-  size_t pos = input.find(target_folder);
-  if (pos == std::string::npos) {
-    // Directory not found, return the original input
-    return input;
-  }
-  // Add the length of the directory to the position
-  pos += target_folder.length();
-  // Insert '/test' after the directory
-  std::string output = input.substr(0, pos) + "/" + folder + input.substr(pos);
-  return output;
-};
-
-void ReadOfflineProperties(AdapterBackendData *backend_data,
-                           uint32_t model_batch_size, uint32_t shrads_num,
-                           uint32_t thread_pool_size) {
+void ReadOfflineProperties(AdapterBackendData *backend_data) {
 #if defined(__ANDROID__)
-  char debug_mlperf_offline_shrads_num[PROP_VALUE_MAX + 1];
-  if (__system_property_get("debug.mlperf.offline_shrads_num",
-                            debug_mlperf_offline_shrads_num)) {
-    shrads_num = atoi(debug_mlperf_offline_shrads_num);
+  char debug_mlperf_offline_exec_num[PROP_VALUE_MAX + 1];
+  if (__system_property_get("debug.mlperf.offline_exec_num",
+                            debug_mlperf_offline_exec_num)) {
+    backend_data->exec_num = atoi(debug_mlperf_offline_exec_num);
   }
   char debug_mlperf_offline_thread_pool_size[PROP_VALUE_MAX + 1];
   if (__system_property_get("debug.mlperf.offline_thread_pool_size",
                             debug_mlperf_offline_thread_pool_size)) {
-    thread_pool_size = atoi(debug_mlperf_offline_thread_pool_size);
+    backend_data->thread_pool_size =
+        atoi(debug_mlperf_offline_thread_pool_size);
   }
   char debug_mlperf_offline_model_batch_size[PROP_VALUE_MAX + 1];
   if (__system_property_get("debug.mlperf.offline_model_batch_size",
                             debug_mlperf_offline_model_batch_size)) {
-    model_batch_size = atoi(debug_mlperf_offline_model_batch_size);
+    backend_data->real_batch_size = atoi(debug_mlperf_offline_model_batch_size);
   }
   auto preference = NEURON_PREFER_FAST_SINGLE_ANSWER;
   char debug_mlperf_offline_preference[PROP_VALUE_MAX + 1];
@@ -692,11 +594,6 @@ void ReadOfflineProperties(AdapterBackendData *backend_data,
         max(0, min(atoi(debug_mlperf_offline_preference), 3)));
   }
   backend_data->preference = preference;
-  backend_data->thread_pool_size = thread_pool_size;
-  backend_data->shards_num = shrads_num;
-  // Originally, real_batch_size is the whole batch size passed in from mlperf
-  // Now, it's model_batch_size
-  backend_data->real_batch_size = model_batch_size;
   backend_data->use_throughput_mode = true;
 #endif
 }
@@ -714,13 +611,11 @@ bool CreateNeuronModel(neuron_backend_ptr_t backend_ptr,
     create_result = create_mobilenet_v4_model(backend_ptr, model.c_str());
   } else if (model.find("mobilenet_edgetpu_224_1.0_uint8_offline.dla") !=
              std::string::npos) {
-    ReadOfflineProperties(backend_data, /*model_batch_size*/ 50,
-                          /*shrads_num*/ 8, /*thread_pool_size*/ 16);
+    ReadOfflineProperties(backend_data);
     create_result = create_mobilenet_edge_model(backend_ptr, model.c_str());
   } else if (model.find("MobileNetV4-Conv-Large-int8-ptq_offline.dla") !=
              std::string::npos) {
-    ReadOfflineProperties(backend_data, /*model_batch_size*/ 4,
-                          /*shrads_num*/ 8, /*thread_pool_size*/ 16);
+    ReadOfflineProperties(backend_data);
     create_result = create_mobilenet_v4_model(backend_ptr, model.c_str());
   } else if (model.find("mobiledet_qat.dla") != std::string::npos) {
     create_result = create_mobiledet_qat_model(backend_ptr, model.c_str());
@@ -735,33 +630,95 @@ bool CreateNeuronModel(neuron_backend_ptr_t backend_ptr,
     LOG(ERROR) << "Not a supported dla";
     return false;
   }
-  LOG(INFO) << "create_neuron_backend Create model: " << model << " End, "
-            << "shrads_num: " << backend_data->shards_num
-            << ", real_batch_size(model batch size): "
-            << backend_data->real_batch_size;
+  if (!create_result) {
+    LOG(ERROR) << "Failed to create neuron model";
+  } else {
+    LOG(INFO) << "create_neuron_backend Create model: " << model << " End";
+  }
+  LOG(INFO) << "Neuron Backend Configs: "
+            << "\n| exec_num: " << backend_data->exec_num
+            << "\n| real_batch_size(model batch size): "
+            << backend_data->real_batch_size
+            << "\n| thread_pool_size: " << backend_data->thread_pool_size
+            << "\n| preference: " << backend_data->preference
+            << "\n| input_nums: " << backend_data->input_nums
+            << "\n| output_nums: " << backend_data->output_nums
+            << "\n| use_throughput_mode: " << backend_data->use_throughput_mode
+            << "\n| disableCoherentBuffer: "
+            << backend_data->disableCoherentBuffer;
   return create_result;
 }
 
+bool ReadU32ValueFromStr(const char *str, uint32_t &output) {
+  char *end;
+  uint32_t value = std::strtoul(str, &end, 10);
+  if (*end != '\0') return false;
+  output = value;
+  return true;
+}
+
+bool ReadNeuronBackendConfigs(AdapterBackendData *backend_data,
+                              mlperf_backend_configuration_t *configs) {
+  for (size_t i = 0; i < configs->count; ++i) {
+    const char *k = configs->keys[i];
+    const char *v = configs->values[i];
+
+    if (strcmp(k, "thread_pool_size") == 0) {
+      if (!ReadU32ValueFromStr(v, backend_data->thread_pool_size)) {
+        LOG(ERROR) << "Failed to read neuron thread_pool_size value";
+        return false;
+      }
+    } else if (strcmp(k, "model_batch_size") == 0) {
+      // Originally, real_batch_size is the whole batch size passed in from
+      // mlperf Now, it's model_batch_size
+      if (!ReadU32ValueFromStr(v, backend_data->real_batch_size)) {
+        LOG(ERROR) << "Failed to read neuron model_batch_size value";
+        return false;
+      }
+    } else if (strcmp(k, "exec_num") == 0) {
+      if (!ReadU32ValueFromStr(v, backend_data->exec_num)) {
+        LOG(ERROR) << "Failed to read neuron exec_num value";
+        return false;
+      }
+    } else if (strcmp(k, "disable_coherent") == 0) {
+      if (strcmp(v, "true") == 0) {
+        backend_data->disableCoherentBuffer = true;
+      } else {
+        backend_data->disableCoherentBuffer = false;
+      }
+    }
+  }
+  return true;
+}
+
 bool create_neuron_backend(neuron_backend_ptr_t backend_ptr,
+                           mlperf_backend_configuration_t *configs,
                            const char *model_path) {
   LOG(INFO) << "create_neuron_backend Start.";
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
   backend_data->useNeuronBackend = true;
+  if (!ReadNeuronBackendConfigs(backend_data, configs)) {
+    LOG(ERROR) << "Failed to read neuron backend configs";
+    return false;
+  }
+  backend_data->bufferAllocator = std::make_unique<DmaBufferAllocatorWrapper>();
 
-  std::string modified_model_path = InsertFolderAfterTargetFolder(
-      std::string(model_path), GetPlatformName(), "test");
-  if (!CreateNeuronModel(backend_ptr, modified_model_path)) {
+  if (!CreateNeuronModel(backend_ptr, model_path)) {
     LOG(ERROR) << "create_neuron_backend create model FAILED";
     return false;
   }
   // PERFORMANCE_ON;
-  backend_data->locker.Start(0);  // Powerhal infinite times
+  if (!Config::GetDisablePerformanceLocker()) {
+    LOG(INFO) << "PerformanceLocker started";
+    backend_data->locker.Start(0);  // Powerhal infinite times
+  }
 
   LOG(INFO) << "create_neuron_backend End Successfully";
   return true;
 }
 
 bool delete_neuron_backend(neuron_backend_ptr_t backend_ptr) {
+  Tracer trace("delete_neuron_backend");
   LOG(INFO) << "delete_neuron_backend Start";
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
 
@@ -778,6 +735,7 @@ bool delete_neuron_backend(neuron_backend_ptr_t backend_ptr) {
   backend_data->outputMemoryWrappers.clear();
   backend_data->inputTypes.clear();
   backend_data->outputTypes.clear();
+  backend_data->bufferAllocator.reset();
 
   LOG(INFO) << "delete_neuron_backend End";
   return true;
@@ -803,40 +761,18 @@ bool neuron_get_in_out_datatype(neuron_backend_ptr_t backend_ptr, int32_t i,
 
 bool neuron_set_input(neuron_backend_ptr_t backend_ptr, int32_t batch_index,
                       int32_t i, void *data_src) {
+  Tracer trace("neuron_set_input");
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
   if (unlikely(!backend_data->useNeuronBackend)) return false;
-#ifdef SET_INPUT_FROM_MEMORY
-  // If the input data is cached, use the cached NeuronMemory first.
-  if (backend_data->neuronAllocator.IsEnable()) {
-    auto [base, offset, memory] =
-        backend_data->neuronAllocator.GetCachedMemory(data_src);
-    if (memory != nullptr) {
-      LOG(INFO) << "cached hit";
-      int res = 0;
-      {
-        TRACER("NeuronExecution_setInputFromMemory");
-        res = NeuronExecution_setInputFromMemory(backend_data->execution, i,
-                                                 nullptr, memory, offset,
-                                                 backend_data->inputSizes[i]);
-      }
-      if (res == NEURON_NO_ERROR) {
-        return true;
-      } else {
-        LOG(ERROR) << "Set cached Neuron Memory Failed. fallback";
-        abort();
-      }
-    }
-  }
-#endif
   const int model_batch_size = backend_data->real_batch_size;  // 50
   const int one_input_size = backend_data->inputSizes[i] / model_batch_size;
 
-  // TRACER("memcpy");
   if (backend_data->use_throughput_mode) {
     return NeuronExecution_submitInput(backend_data->execution, i, data_src,
                                        one_input_size) == NEURON_NO_ERROR;
   } else {
-    memcpy(backend_data->inputMemoryWrappers[i].data(), data_src,
+    Tracer trace("SetInput:memcpy");
+    memcpy(backend_data->inputMemoryWrappers[i]->data(), data_src,
            one_input_size);
   }
   return true;
@@ -855,6 +791,7 @@ bool neuron_flush_queries(neuron_backend_ptr_t backend_ptr) {
 
 bool neuron_get_output(neuron_backend_ptr_t backend_ptr, int32_t batch_index,
                        int32_t i, void **data) {
+  Tracer trace("neuron_get_output");
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
   if (unlikely(!backend_data->useNeuronBackend)) return false;
 
@@ -862,12 +799,13 @@ bool neuron_get_output(neuron_backend_ptr_t backend_ptr, int32_t batch_index,
     return NeuronExecution_queryOutputPointer(backend_data->execution, i,
                                               data) == NEURON_NO_ERROR;
   } else {
-    *data = backend_data->outputMemoryWrappers[i].data();
+    *data = backend_data->outputMemoryWrappers[i]->data();
   }
   return true;
 }
 
 bool neuron_issue_query(neuron_backend_ptr_t backend_ptr) {
+  Tracer trace("neuron_issue_query");
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
   if (unlikely(!backend_data->useNeuronBackend)) return false;
 
@@ -881,6 +819,7 @@ bool neuron_issue_query(neuron_backend_ptr_t backend_ptr) {
 
 bool neuron_convert_input(neuron_backend_ptr_t backend_ptr, int bytes,
                           void *data) {
+  Tracer trace("neuron_convert_input");
   AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
   if (!backend_data->useNeuronBackend) return false;
 
@@ -888,33 +827,6 @@ bool neuron_convert_input(neuron_backend_ptr_t backend_ptr, int bytes,
     backend_data->paddingFunc(backend_data, bytes, data);
   }
 
-#ifdef SET_INPUT_FROM_MEMORY
-  static int cnt = 0;
-  cnt++;
-  LOG(INFO) << "neuron_convert_input :" << cnt;
-  if (cnt % 300 != 0) {
-    return true;
-  }
-  LOG(INFO) << "neuron_convert_input should set";
-  // We hint the "importForvered" APUSysEngine by preset the NeuronMemory.
-  // Due to the first-time setInputFromMemory would take longer time,
-  // we preset the input here.
-  if (!backend_data->hasPreset) {
-    TRACER("Preset_NeuronExecution");
-    backend_data->hasPreset = true;
-    auto neuronMemorys =
-        backend_data->neuronAllocator.GetAllocatedNeuronMemory();
-    for (auto [size, memorys] : neuronMemorys) {
-      for (auto memory : memorys) {
-        int res = NeuronExecution_setInputFromMemory(backend_data->execution, 0,
-                                                     nullptr, memory, 0, size);
-        if (res != NEURON_NO_ERROR) {
-          LOG(ERROR) << "Preset NeuronExecution fail";
-        }
-      }
-    }
-  }
-#endif  // PRE_HINT_ALL_NEURONMEMORY
   return true;
 }
 #endif
