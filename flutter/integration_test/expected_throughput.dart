@@ -123,7 +123,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 400, max: 750),
     _kS24Ultra: Interval(min: 1200, max: 1600),
-    _kS25Ultra: Interval(min: 1500, max: 2200),
+    _kS25Ultra: Interval(min: 1500, max: 2400),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 45, max: 70),
