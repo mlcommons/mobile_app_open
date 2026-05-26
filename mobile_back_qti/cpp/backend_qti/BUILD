@@ -59,6 +59,15 @@ string_flag(
     ],
 )
 
+string_flag(
+    name = "with_genie",
+    build_setting_default = "2",
+    values = [
+        "1",
+        "2",
+    ],
+)
+
 config_setting(
     name = "stablediffusion_option",
     flag_values = {":with_stablediffusion": "1"},
@@ -67,6 +76,16 @@ config_setting(
 config_setting(
     name = "nostablediffusion_option",
     flag_values = {":with_stablediffusion": "2"},
+)
+
+config_setting(
+    name = "genie_option",
+    flag_values = {":with_genie": "1"},
+)
+
+config_setting(
+    name = "nogenie_option",
+    flag_values = {":with_genie": "2"},
 )
 
 selects.config_setting_group(
@@ -82,6 +101,14 @@ selects.config_setting_group(
     match_all = [
         "android_arm64",
         "nostablediffusion_option",
+    ],
+)
+
+selects.config_setting_group(
+    name = "android_with_genie",
+    match_all = [
+        "android_arm64",
+        "genie_option",
     ],
 )
 
@@ -108,6 +135,7 @@ snpe_copts = [
     "-Imobile_back_qti/" + "qairt/" + SNPE_VERSION + "/include/SNPE",
     "-Imobile_back_qti/" + "qairt/" + SNPE_VERSION + "/include/QNN",
     "-Imobile_back_qti/" + "qairt/" + SNPE_VERSION + "/include/QNN/HTP",
+    "-Imobile_back_qti/" + "qairt/" + SNPE_VERSION + "/include",
     "-fcxx-exceptions",
     "-lc++_shared",
 ]
@@ -118,10 +146,10 @@ pbtxt2header(
         "settings/qti_settings_default_cpu.pbtxt",
         "settings/qti_settings_default_dsp.pbtxt",
         "settings/qti_settings_default_gpu.pbtxt",
+        "settings/qti_settings_genie_llm.pbtxt",
         "settings/qti_settings_gpufp16.pbtxt",
         "settings/qti_settings_sd7G4.pbtxt",
         "settings/qti_settings_sd8G5.pbtxt",
-        "settings/qti_settings_sd8cxg3.pbtxt",
         "settings/qti_settings_sd8elite.pbtxt",
         "settings/qti_settings_sd8eliteG5.pbtxt",
         "settings/qti_settings_sd8sG4.pbtxt",
@@ -178,19 +206,29 @@ cc_library(
 cc_library(
     name = "qti_c",
     srcs = [
+        "GenieExecutor.cc",
+        "PsnpeExecutor.cc",
+        "SdExecutor.cc",
+        "SnpeExecutor.cc",
+        "backend_utils.cc",
         "cpuctrl.cc",
-        "qti_backend_helper.cc",
+        "qtiBackendHelper.cc",
         "qti_c.cc",
         "soc_utility.cc",
-        "tflite_c.cc",
     ],
     hdrs = [
         "cpuctrl.h",
         "mlperf_helper.h",
-        "qti_backend_helper.h",
+        "Executor.h",
+        "backend_utils.h",
+        "SnpeExecutor.h",
+        "PsnpeExecutor.h",
+        "SdExecutor.h",
+        "GenieExecutor.h",
+        "qtiBackendHelper.h",
+        "BackendFactory.h",
         "qti_settings.h",
         "soc_utility.h",
-        "tflite_c.h",
     ] + select({
         "android_arm64": [],
         "windows_arm64": [
@@ -207,6 +245,10 @@ cc_library(
                     }) +
                     select({
                         "stablediffusion_option": ["STABLEDIFFUSION_FLAG"],
+                        "//conditions:default": [],
+                    }) +
+                    select({
+                        "genie_option": ["GENIE_FLAG"],
                         "//conditions:default": [],
                     }),
     deps = [
@@ -230,6 +272,11 @@ cc_library(
         ],
         "windows_arm64": [
             "//mobile_back_qti:snpewindowslib",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        ":android_with_genie": [
+            "//mobile_back_qti:genie",
         ],
         "//conditions:default": [],
     }),

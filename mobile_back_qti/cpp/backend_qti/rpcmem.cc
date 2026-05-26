@@ -25,19 +25,15 @@ limitations under the License.
 #include "tensorflow/core/platform/logging.h"
 
 RpcMem::RpcMem() {
-  if (useIonBuffer_g) {
-// TODO: Replace dlopen with tflite's shared libs handling
 #ifdef __ANDROID__
-    libHandle_ = dlopen("libcdsprpc.so", RTLD_NOW);
+  // Always load the library
+  libHandle_ = dlopen("libcdsprpc.so", RTLD_NOW);
 #else
-    std::string windowsRpcPath = Socs::getServiceBinaryPath(L"qcnspmcdm");
-    std::string windowsLibName = "libcdsprpc.dll";
-    windowsRpcPath = windowsRpcPath + '\\' + windowsLibName;
-    libHandle_ = LoadLibrary(windowsRpcPath.c_str());
+  std::string windowsRpcPath = Socs::getServiceBinaryPath(L"qcnspmcdm");
+  std::string windowsLibName = "libcdsprpc.dll";
+  windowsRpcPath = windowsRpcPath + '\\' + windowsLibName;
+  libHandle_ = LoadLibrary(windowsRpcPath.c_str());
 #endif
-  } else {
-    libHandle_ = nullptr;
-  }
 
   if (libHandle_ == nullptr) {
     LOG(ERROR) << "Can't open rpc lib";
