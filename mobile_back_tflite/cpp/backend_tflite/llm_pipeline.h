@@ -30,12 +30,11 @@ limitations under the License.
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"
 #include "tensorflow/core/platform/logging.h"
-#include "tensorflow/lite/experimental/genai/genai_ops.h"
-#include "tensorflow/lite/interpreter.h"
-#include "tensorflow/lite/interpreter_builder.h"
-#include "tensorflow/lite/kernels/register.h"
-#include "tensorflow/lite/model_builder.h"
-#include "tensorflow/lite/signature_runner.h"
+#include "tflite/interpreter.h"
+#include "tflite/interpreter_builder.h"
+#include "tflite/kernels/register.h"
+#include "tflite/model_builder.h"
+#include "tflite/signature_runner.h"
 
 #define MINIMAL_CHECK(x)                                                   \
   if (!(x)) {                                                              \

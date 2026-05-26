@@ -28,7 +28,7 @@ limitations under the License.
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/utils.h"
 #include "tensorflow/core/platform/logging.h"
-#include "tensorflow/lite/c/common.h"
+#include "tflite/c/common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -321,9 +321,6 @@ void LLMPipeline::backend_release_buffer(void* p) { ::operator delete(p); }
 tflite::Interpreter* LLMPipeline::BuildInterpreter(
     tflite::FlatBufferModel* model, int num_threads) {
   tflite::ops::builtin::BuiltinOpResolver resolver;
-  // NOTE: We need to manually register optimized OPs for KV-cache and
-  // Scaled Dot Product Attention (SDPA).
-  tflite::ops::custom::GenAIOpsRegisterer(&resolver);
   tflite::InterpreterBuilder builder(*model, resolver);
   MINIMAL_CHECK_PTR(builder.SetNumThreads(num_threads) == kTfLiteOk);
   std::unique_ptr<tflite::Interpreter> interpreter;

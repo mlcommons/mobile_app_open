@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 load(
-    "@org_tensorflow//tensorflow/lite:build_def.bzl",
+    "@litert//tflite:build_def.bzl",
     "tflite_copts",
     "tflite_jni_binary",
 )
@@ -86,21 +86,20 @@ cc_library(
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-        "@org_tensorflow//tensorflow/lite:framework",
-        "@org_tensorflow//tensorflow/lite:util",
-        "@org_tensorflow//tensorflow/lite/c:c_api",
-        "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
-        "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/lite/experimental/genai:genai_ops",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@litert//tflite:framework",
+        "@litert//tflite:util",
+        "@litert//tflite/c:c_api",
+        "@litert//tflite/c:c_api_experimental",
+        "@litert//tflite/c:common",
+        "@litert//tflite/kernels:builtin_ops",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
-            "@org_tensorflow//tensorflow/lite/delegates/xnnpack:xnnpack_delegate",
+            "@litert//tflite/delegates/gpu:delegate",
+            "@litert//tflite/delegates/xnnpack:xnnpack_delegate",
         ],
         "@org_tensorflow//tensorflow:ios": [
-            "@org_tensorflow//tensorflow/lite/delegates/coreml:coreml_delegate",
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:metal_delegate",
+            "@litert//tflite/delegates/coreml:coreml_delegate",
+            "@litert//tflite/delegates/gpu:metal_delegate",
         ],
         "//conditions:default": [],
     }),
