@@ -16,11 +16,11 @@ limitations under the License.
 #include <stdlib.h>
 #include <string.h>
 #ifdef __ANDROID__
-#include "tensorflow/core/platform/logging.h"
-#include "tensorflow/lite/c/c_api.h"
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/delegates/gpu/delegate.h"
-#include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
+#include "absl/log/log.h"
+#include "tflite/c/c_api.h"
+#include "tflite/c/common.h"
+#include "tflite/delegates/gpu/delegate.h"
+#include "tflite/delegates/nnapi/nnapi_delegate.h"
 #endif
 #include "tflite_c.h"
 

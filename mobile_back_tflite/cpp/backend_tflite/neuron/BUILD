@@ -1,5 +1,5 @@
 load(
-    "@org_tensorflow//tensorflow/lite:build_def.bzl",
+    "@litert//tflite:build_def.bzl",
     "tflite_copts",
     "tflite_jni_binary",
 )
@@ -78,14 +78,14 @@ cc_library(
         "//mobile_back_tflite/cpp/backend_tflite:embedding_utils",
         "//mobile_back_tflite/cpp/backend_tflite:tflite_settings",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-        "@org_tensorflow//tensorflow/lite/c:c_api",
-        "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/lite/experimental/genai:genai_ops",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@litert//tflite/c:c_api",
+        "@litert//tflite/c:common",
+        "@litert//tflite/experimental/genai:genai_ops",
+        "@litert//tflite/kernels:builtin_ops",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             ":neuron_delegate",
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
+            "@litert//tflite/delegates/gpu:delegate",
         ],
         "//conditions:default": [],
     }),

@@ -9,8 +9,8 @@
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/utils.h"
 #include "stable_diffusion_invoker.h"
-#include "tensorflow/lite/c/c_api.h"
-#include "tensorflow/lite/c/common.h"
+#include "tflite/c/c_api.h"
+#include "tflite/c/common.h"
 #include "thread_pool.h"
 #include "utils.h"
 

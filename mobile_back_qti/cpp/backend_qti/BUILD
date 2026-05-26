@@ -22,7 +22,7 @@
 
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@bazel_skylib//lib:selects.bzl", "selects")
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
+load("@litert//tflite:build_def.bzl", "tflite_copts", "tflite_jni_binary")
 load("@snpe_version_loader//:snpe_var_def.bzl", "SNPE_VERSION")
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
 
@@ -216,15 +216,15 @@ cc_library(
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
     ] + select({
         ":android_without_stablediffusion": [
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
-            "@org_tensorflow//tensorflow/lite/c:c_api",
-            "@org_tensorflow//tensorflow/lite/c:common",
+            "@litert//tflite/delegates/gpu:delegate",
+            "@litert//tflite/c:c_api",
+            "@litert//tflite/c:common",
             "//mobile_back_qti:snpe",
         ],
         ":android_with_stablediffusion": [
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
-            "@org_tensorflow//tensorflow/lite/c:c_api",
-            "@org_tensorflow//tensorflow/lite/c:common",
+            "@litert//tflite/delegates/gpu:delegate",
+            "@litert//tflite/c:c_api",
+            "@litert//tflite/c:common",
             "//mobile_back_qti:snpe",
             "//mobile_back_qti/cpp/backend_qti/StableDiffusionShared:StableDiffusionShared",
         ],
@@ -266,7 +266,7 @@ cc_binary(
         "android_arm64": [
             ":libqtibackend.so",
             "//flutter/cpp/c:headers",
-            "@org_tensorflow//tensorflow/lite:shared_library",
+            "@litert//tflite:shared_library",
         ],
     }),
 )

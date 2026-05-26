@@ -14,7 +14,7 @@ limitations under the License.
 #define TFLITE_PIPELINE_H_
 
 #include "flutter/cpp/c/type.h"
-#include "tensorflow/lite/c/c_api.h"
+#include "tflite/c/c_api.h"
 
 // A pipeline interface to run TFLite models.
 class Pipeline {

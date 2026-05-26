@@ -22,7 +22,7 @@ limitations under the License.
 #include "windows.h"
 #endif
 
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 
 RpcMem::RpcMem() {
   if (useIonBuffer_g) {

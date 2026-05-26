@@ -18,7 +18,7 @@ limitations under the License.
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
 #include "qti_backend_helper.h"
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 
 static void process_config(const mlperf_backend_configuration_t *configs,
                            QTIBackendHelper *backend_data) {

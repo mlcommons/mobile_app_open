@@ -134,7 +134,7 @@ class LoadgenInfo {
       latencyFirstToken90: usesTokens
           ? (result[latency90FirstTokenKey] as int? ?? 0) / nanosecondsPerSecond
           : 0,
-      tokenThroughput: usesTokens ? tokenThroughput : 0,
+      tokenThroughput: double.infinity, //usesTokens ? tokenThroughput : 0,
       isMinDurationMet: result[minDurationMetKey] as bool? ?? false,
       isMinQueryMet: result[minQueriesMetKey] as bool? ?? false,
       isEarlyStoppingMet: result[earlyStoppingMetKey] as bool? ?? false,

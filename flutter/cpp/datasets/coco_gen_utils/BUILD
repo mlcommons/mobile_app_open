@@ -39,7 +39,7 @@ cc_library(
     deps = [
         "//flutter/cpp:utils",
         "@com_google_absl//absl/strings",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@litert//tflite/kernels:builtin_ops",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/core:portable_tensorflow_lib_lite",

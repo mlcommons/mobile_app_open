@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"
-#include "tensorflow/lite/c/c_api.h"
+#include "tflite/c/c_api.h"
 
 // A simple pipeline which runs a single model.
 class SingleModelPipeline : public Pipeline {

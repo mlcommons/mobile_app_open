@@ -21,7 +21,7 @@ limitations under the License.
 #include <thread>
 
 #include "qti_backend_helper.h"
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 #ifndef __ANDROID__
 #include <Windows.h>
 

@@ -11,7 +11,7 @@ limitations under the License.
 ==============================================================================*/
 #include "single_model_pipeline.h"
 #include "stable_diffusion_pipeline.h"
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 #include "tflite_settings_pixel.h"
 
 #if __ANDROID__

@@ -7,12 +7,20 @@ build --config=short_logs
 build --verbose_failures
 build --spawn_strategy=standalone
 
+
+# needed to solve a bug in LiteRT 2.1.2
+build --per_file_copt=external/litert/.*@-fpermissive
+build --per_file_copt=mobile_back_tflite/cpp/backend_tflite/llm_pipeline.cc@-fpermissive
+
 # This flag is required by tensorflow
 common --experimental_repo_remote_exec
 
 # Without these, tensorflow complains about lack of CUDA library.
 common --repo_env=TF_NEED_CUDA=0
 common --repo_env=TF_NEED_ROCM=0
+
+common --noenable_bzlmod
+common --repo_env=HERMETIC_PYTHON_VERSION=3.10
 
 # Default options should come above this line.
 

@@ -34,7 +34,7 @@ limitations under the License.
 #include "flutter/cpp/proto/mlperf_task.pb.h"
 #include "flutter/cpp/utils.h"
 #include "google/protobuf/text_format.h"
-#include "tensorflow/lite/tools/command_line_flags.h"
+#include "tflite/tools/command_line_flags.h"
 
 namespace mlperf {
 namespace mobile {

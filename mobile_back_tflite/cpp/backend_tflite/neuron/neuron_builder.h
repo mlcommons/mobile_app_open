@@ -49,7 +49,7 @@
 #include "NeuronAdapter.h"
 #include "NeuronAdapterShim.h"
 #include "neuron_backend.h"
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 
 typedef enum {
   TYPE_INPUT = 0,

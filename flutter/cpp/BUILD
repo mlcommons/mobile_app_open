@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_linkopts")
+load("@litert//tflite:build_def.bzl", "tflite_copts", "tflite_linkopts")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -85,7 +85,7 @@ cc_library(
         "//flutter/cpp/proto:mlperf_task_cc_proto",
         "@org_mlperf_inference//:loadgen",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
+        "@litert//tflite/tools/evaluation:utils",
     ],
 )
 

@@ -38,7 +38,7 @@ limitations under the License.
 #include "absl/strings/ascii.h"
 #include "cpuctrl.h"
 #include "soc_utility.h"
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 #include "tflite_c.h"
 
 static size_t calcSizeFromDims(const size_t rank, const size_t *dims) {

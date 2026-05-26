@@ -9,7 +9,7 @@ Subject: [PATCH] hacks
  2 files changed, 14 insertions(+)
  create mode 100644 third_party/eigen3/eigen_ios.patch
 
-diff --git a/third_party/eigen3/eigen_ios.patch b/third_party/eigen3/eigen_ios.patch
+diff --git a/third_party/xla/third_party/eigen3/eigen_ios.patch b/third_party/xla/third_party/eigen3/eigen_ios.patch
 new file mode 100644
 index 00000000000..6c94319de42
 --- /dev/null
@@ -17,7 +17,7 @@ index 00000000000..6c94319de42
 @@ -0,0 +1,12 @@
 +--- a/Eigen/src/Core/util/Macros.h
 ++++ b/Eigen/src/Core/util/Macros.h
-+@@ -1235,8 +1235,7 @@
++@@ -1300,8 +1300,7 @@
 +   EIGEN_MAKE_SCALAR_BINARY_OP_ONTHELEFT(METHOD, OPNAME) \
 +   EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(METHOD, OPNAME)
 + 
@@ -29,8 +29,8 @@ index 00000000000..6c94319de42
 +
 diff --git a/third_party/eigen3/workspace.bzl b/third_party/eigen3/workspace.bzl
 index 9782907cf5e..ad302dbabc5 100644
---- a/third_party/eigen3/workspace.bzl
-+++ b/third_party/eigen3/workspace.bzl
+--- a/third_party/xla/third_party/eigen3/workspace.bzl
++++ b/third_party/xla/third_party/eigen3/workspace.bzl
 @@ -13,6 +13,7 @@ def repo():
  
      tf_http_archive(

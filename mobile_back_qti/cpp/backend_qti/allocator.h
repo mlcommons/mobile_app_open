@@ -21,7 +21,7 @@ limitations under the License.
 #include <memory>
 
 #include "rpcmem.h"
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 
 // This allocator assumes all allocations and frees are done in order
 class ChunkAllocator {

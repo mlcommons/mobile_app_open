@@ -7,8 +7,8 @@
 #include "embedding_utils.h"
 #include "sd_utils.h"
 #include "stable_diffusion_pipeline.h"
-#include "tensorflow/lite/c/c_api.h"
-#include "tensorflow/lite/c/common.h"
+#include "tflite/c/c_api.h"
+#include "tflite/c/common.h"
 
 std::vector<float> get_normal(unsigned numbers, unsigned seed = 5,
                               float mean = 0.0, float stddev = 1.0) {

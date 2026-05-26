@@ -22,7 +22,7 @@ limitations under the License.
 #include "qti_backend_helper.h"
 #include "qti_settings.h"
 #include "soc_utility.h"
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 #include "tflite_c.h"
 
 #ifdef DEBUG_FLAG

@@ -54,7 +54,7 @@
 #include "NeuronAdapter.h"
 #include "NeuronAdapterShim.h"
 #include "neuron_builder.h"
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 
 #define likely(x) __builtin_expect((x), 1)
 #define unlikely(x) __builtin_expect((x), 0)

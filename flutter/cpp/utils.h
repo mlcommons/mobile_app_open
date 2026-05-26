@@ -23,7 +23,7 @@ limitations under the License.
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/proto/backend_setting.pb.h"
 #include "loadgen/test_settings.h"
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 
 namespace mlperf {
 namespace mobile {
