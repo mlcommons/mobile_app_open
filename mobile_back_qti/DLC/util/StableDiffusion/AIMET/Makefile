@@ -79,6 +79,7 @@ ${AIMETBUILDDIR}/input_vectors_generation.stamp: \
 
 copy_files_to_ouptut:
 	#Copies generated artifacts to output/DLC/stable_diffusion
+	mkdir -p ${TOPDIR}/output/DLC/
 	chmod -R 777 ${TOPDIR}/output/DLC/
 	mkdir -p ${TOPDIR}/output/DLC/stable_diffusion
 	cp -rv ${AIMETBUILDDIR}/example1/_exports_/* ${TOPDIR}/output/DLC/stable_diffusion/.

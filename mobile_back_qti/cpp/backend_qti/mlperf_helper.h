@@ -17,203 +17,38 @@ limitations under the License.
 
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
-#include "qti_backend_helper.h"
+#include "qtiBackendHelper.h"
 #include "tensorflow/core/platform/logging.h"
 
-static void process_config(const mlperf_backend_configuration_t *configs,
-                           QTIBackendHelper *backend_data) {
-  backend_data->isTflite_ = false;
-  backend_data->batchSize_ = 1;
-  backend_data->useSnpe_ = false;
-  backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
-  backend_data->loadOffTime_ = 2;
-  backend_data->loadOnTime_ = 100;
-  backend_data->useIonBuffers_ = true;
-  backend_data->bgLoad_ = false;
-  backend_data->acceleratorName_ = configs->accelerator_desc;
+static void process_config_framework(
+    const mlperf_backend_configuration_t *configs,
+    qtiBackendHelper *backend_data) {
+  /* this function is meant to determine only the framework type.
+   * As soon as it determines it, it returns from this function */
 
-  std::string &delegate = backend_data->delegate_;
-  delegate = configs->accelerator;
-  if ((delegate == "gpu_f16") || (delegate == "nnapi_qti-dsp") ||
-      (delegate == "nnapi_qti-gpu")) {
-    backend_data->isTflite_ = true;
-  } else if (strncmp(configs->accelerator, "snpe", 4) == 0) {
-    backend_data->useSnpe_ = true;
-  } else if (strncmp(configs->accelerator, "psnpe", 5) == 0) {
-    backend_data->useSnpe_ = false;
-  } else {
-    LOG(FATAL) << "Error: Unsupported delegate " << delegate;
-  }
-
-  // Batch size is zero if not specified
-  backend_data->batchSize_ =
-      (configs->batch_size == 0) ? 1 : configs->batch_size;
-
-  // Handle custom settings
-  std::string perfProfile = "burst";
-  std::string profileLevel = "off";
   for (int i = 0; i < configs->count; ++i) {
-    if (strcmp(configs->keys[i], "scenario") == 0) {
-      backend_data->scenario_ = configs->values[i];
-    } else if (strcmp(configs->keys[i], "snpe_output_layers") == 0) {
-      backend_data->snpeOutputLayers_ = configs->values[i];
-    } else if (strcmp(configs->keys[i], "snpe_output_tensors") == 0) {
-      backend_data->snpeOutputTensors_ = configs->values[i];
-    } else if (strcmp(configs->keys[i], "bg_load") == 0) {
-      if (strcmp(configs->values[i], "true") == 0) {
-        backend_data->bgLoad_ = true;
-      } else {
-        backend_data->bgLoad_ = false;
-      }
-    } else if (strcmp(configs->keys[i], "load_off_time") == 0) {
-      backend_data->loadOffTime_ = atoi(configs->values[i]);
-    } else if (strcmp(configs->keys[i], "load_on_time") == 0) {
-      backend_data->loadOnTime_ = atoi(configs->values[i]);
-    } else if (strcmp(configs->keys[i], "input_buffer_type") == 0) {
-      if (std::strcmp(configs->values[i], "float_32") == 0) {
-        backend_data->inputBufferType_ =
-            QTIBackendHelper::QTIBufferType::FLOAT_32;
-      } else {
-        backend_data->inputBufferType_ =
-            QTIBackendHelper::QTIBufferType::UINT_8;
-      }
-    } else if (strcmp(configs->keys[i], "output_buffer_type") == 0) {
-      if (std::strcmp(configs->values[i], "float_32") == 0) {
-        backend_data->outputBufferType_ =
-            QTIBackendHelper::QTIBufferType::FLOAT_32;
-      } else if (std::strcmp(configs->values[i], "int_32") == 0) {
-        backend_data->outputBufferType_ =
-            QTIBackendHelper::QTIBufferType::INT_32;
-      } else {
-        backend_data->outputBufferType_ =
-            QTIBackendHelper::QTIBufferType::UINT_8;
-      }
-    } else if (strcmp(configs->keys[i], "use_ion_buffer") == 0) {
-      if (std::strcmp(configs->values[i], "true") == 0) {
-        backend_data->useIonBuffers_ = true;
-      } else {
-        backend_data->useIonBuffers_ = false;
-      }
-    } else if (strcmp(configs->keys[i], "perf_profile") == 0) {
-      perfProfile = configs->values[i];
-      if ((std::strcmp(configs->values[i], "default") == 0) ||
-          (std::strcmp(configs->values[i], "balanced") == 0)) {
-        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BALANCED;
-      } else if (std::strcmp(configs->values[i], "high_performance") == 0) {
-        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_HIGH_PERFORMANCE;
-      } else if (std::strcmp(configs->values[i], "power_saver") == 0) {
-        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_POWER_SAVER;
-      } else if (std::strcmp(configs->values[i], "system_settings") == 0) {
-        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_SYSTEM_SETTINGS;
-      } else if (std::strcmp(configs->values[i],
-                             "sustained_high_performance") == 0) {
-        backend_data->perfProfile_ =
-            SNPE_PERFORMANCE_PROFILE_SUSTAINED_HIGH_PERFORMANCE;
-      } else if (std::strcmp(configs->values[i], "burst") == 0) {
-        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
-      } else if (std::strcmp(configs->values[i], "low_power_saver") == 0) {
-        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_LOW_POWER_SAVER;
-      } else if (std::strcmp(configs->values[i], "high_power_saver") == 0) {
-        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_HIGH_POWER_SAVER;
-      } else if (std::strcmp(configs->values[i], "low_balanced") == 0) {
-        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_LOW_BALANCED;
-      } else {
-        LOG(INFO) << "Unrecognized performance profile: " << perfProfile;
-        backend_data->perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
-        perfProfile = "burst";
-      }
-    } else if (strcmp(configs->keys[i], "bus_voltage_start") == 0) {
-      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_MIN_START"] =
-          configs->values[i];
-      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_TARGET_START"] =
-          configs->values[i];
-      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_MAX_START"] =
-          configs->values[i];
-    } else if (strcmp(configs->keys[i], "core_voltage_start") == 0) {
-      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_MIN_START"] =
-          configs->values[i];
-      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_TARGET_START"] =
-          configs->values[i];
-      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_MAX_START"] =
-          configs->values[i];
-    } else if (strcmp(configs->keys[i], "bus_voltage_done") == 0) {
-      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_MIN_DONE"] =
-          configs->values[i];
-      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_TARGET_DONE"] =
-          configs->values[i];
-      backend_data->customPerfProfileMap_["BUS_VOLTAGE_CORNER_MAX_DONE"] =
-          configs->values[i];
-    } else if (strcmp(configs->keys[i], "bus_voltage_done") == 0) {
-      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_MIN_DONE"] =
-          configs->values[i];
-      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_TARGET_DONE"] =
-          configs->values[i];
-      backend_data->customPerfProfileMap_["CORE_VOLTAGE_CORNER_MAX_DONE"] =
-          configs->values[i];
-    } else if (strcmp(configs->keys[i], "hmx_voltage") == 0) {
-      backend_data->customPerfProfileMap_["DSP_HMX_VOLTAGE_CORNER_TARGET"] =
-          configs->values[i];
-      backend_data->customPerfProfileMap_["DSP_HMX_VOLTAGE_CORNER_MAX"] =
-          configs->values[i];
-      backend_data->customPerfProfileMap_["DSP_HMX_VOLTAGE_CORNER_MIN"] =
-          configs->values[i];
-    } else if (strcmp(configs->keys[i], "hmx_clock_perf") == 0) {
-      backend_data->customPerfProfileMap_["DSP_HMX_CLOCK_PERF_MODE"] =
-          configs->values[i];
-    } else if (strcmp(configs->keys[i], "dsp_start_sleep_latency") == 0) {
-      backend_data->customPerfProfileMap_["DSP_SLEEP_LATENCY_START_US"] =
-          configs->values[i];
-    } else if (strcmp(configs->keys[i], "dsp_done_sleep_latency") == 0) {
-      backend_data->customPerfProfileMap_["DSP_SLEEP_LATENCY_DONE_US"] =
-          configs->values[i];
-    } else if (strcmp(configs->keys[i], "profiling_level") == 0) {
-      profileLevel = configs->values[i];
-      if (std::strcmp(configs->values[i], "off") == 0) {
-        backend_data->profilingLevel_ = SNPE_PROFILING_LEVEL_OFF;
-      } else if (std::strcmp(configs->values[i], "basic") == 0) {
-        backend_data->profilingLevel_ = SNPE_PROFILING_LEVEL_BASIC;
-      } else if (std::strcmp(configs->values[i], "moderate") == 0) {
-        backend_data->profilingLevel_ = SNPE_PROFILING_LEVEL_MODERATE;
-      } else if (std::strcmp(configs->values[i], "detailed") == 0) {
-        backend_data->profilingLevel_ = SNPE_PROFILING_LEVEL_DETAILED;
-      } else {
-        LOG(INFO) << "Unrecognized profiling level: " << profileLevel;
-        backend_data->profilingLevel_ = SNPE_PROFILING_LEVEL_OFF;
-        profileLevel = "off";
-      }
-    } else if (strcmp(configs->keys[i], "cpu_int8") == 0) {
-      if (std::strcmp(configs->values[i], "true") == 0) {
-        backend_data->useCpuInt8_ = true;
-      } else {
-        backend_data->useCpuInt8_ = false;
-      }
-    } else if (strcmp(configs->keys[i], "pipeline") == 0) {
+    if (strcmp(configs->keys[i], "pipeline") == 0) {
       if (std::strcmp(configs->values[i], "StableDiffusionPipeline") == 0) {
-        backend_data->isStableDiffusion = true;
-      } else {
-        backend_data->isStableDiffusion = false;
+        backend_data->backend_type_ = QTI_BACKEND_TYPE_STABLE_DIFFUSION;
+        return;
+      }
+      if (std::strcmp(configs->values[i], "GeniePipeline") == 0) {
+        backend_data->backend_type_ = QTI_BACKEND_TYPE_GENIE;
+        return;
       }
     }
   }
-
-  LOG(INFO) << "Config: delegate: " << delegate
-            << " | scenario: " << backend_data->scenario_
-            << " | output layer: " << backend_data->snpeOutputLayers_
-            << " | output tensor: " << backend_data->snpeOutputTensors_
-            << " | isTfLite: " << backend_data->isTflite_
-            << " | batchSize: " << backend_data->batchSize_
-            << " | useSNPE: " << backend_data->useSnpe_
-            << " | bgLoad: " << backend_data->bgLoad_
-            << " | loadOffTime: " << backend_data->loadOffTime_
-            << " | loadOnTime_: " << backend_data->loadOnTime_
-            << " | inputBufferType: " << backend_data->inputBufferType_
-            << " | outputBufferType: " << backend_data->outputBufferType_
-            << " | perfProfile: " << perfProfile
-            << " | profileLevel: " << profileLevel
-            << " | useIonBuffer: " << backend_data->useIonBuffers_
-            << " | acceleratorName: " << backend_data->acceleratorName_
-            << " | useCpuInt8: " << backend_data->useCpuInt8_
-            << " | isStableDiffusion: " << backend_data->isStableDiffusion;
+  std::string delegate = configs->accelerator;
+  if ((delegate == "gpu_f16") || (delegate == "nnapi_qti-dsp") ||
+      (delegate == "nnapi_qti-gpu")) {
+    backend_data->backend_type_ = QTI_BACKEND_TYPE_TFLITE;
+  } else if (strncmp(configs->accelerator, "snpe", 4) == 0) {
+    backend_data->backend_type_ = QTI_BACKEND_TYPE_SNPE;
+  } else if (strncmp(configs->accelerator, "psnpe", 5) == 0) {
+    backend_data->backend_type_ = QTI_BACKEND_TYPE_PSNPE;
+  } else {
+    LOG(FATAL) << "Error: Unsupported delegate " << delegate;
+  }
 }
 
 #endif

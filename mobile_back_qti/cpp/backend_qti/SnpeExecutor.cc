@@ -13,294 +13,112 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "qti_backend_helper.h"
+#include "SnpeExecutor.h"
 
-#include <random>
-#include <sstream>
-#include <string>
-#include <vector>
+#define xverstr(a) verstr(a)
+#define verstr(a) #a
 
-#include "DiagLog/IDiagLog.h"
-#include "DlContainer/DlContainer.h"
-#include "DlSystem/DlEnums.h"
-#include "DlSystem/DlError.h"
-#include "DlSystem/IBufferAttributes.h"
-#include "DlSystem/IUserBuffer.h"
-#include "DlSystem/PlatformConfig.hpp"
-#include "DlSystem/StringList.h"
-#include "DlSystem/TensorMap.h"
-#include "DlSystem/TensorShape.h"
-#include "DlSystem/TensorShapeMap.h"
-#include "DlSystem/UserBufferMap.h"
-#include "SNPE/SNPEBuilder.h"
-#include "SNPE/SNPEUtil.h"
-#include "SNPE/UserBufferList.h"
-#include "absl/strings/ascii.h"
-#include "cpuctrl.h"
-#include "soc_utility.h"
-#include "tensorflow/core/platform/logging.h"
-#include "tflite_c.h"
+#ifndef SNPE_VERSION_STRING
+#define SNPE_VERSION_STRING "default"
+#endif
 
-static size_t calcSizeFromDims(const size_t rank, const size_t *dims) {
-  if (rank == 0) return 0;
-  size_t size = 1;
-  for (size_t i = rank; i > 0; i--) {
-    if (*dims != 0)
-      size *= *dims;
-    else
-      size *= 10;
-    dims++;
-  }
-  return size;
+int SnpeExecutor::count = 0, SnpeExecutor::flag = 0;
+
+std::string SnpeExecutor::get_sdk_version() {
+  Snpe_DlVersion_Handle_t version = Snpe_Util_GetLibraryVersion();
+  return Snpe_DlVersion_GetBuild(version);
 }
 
-// Helper for splitting tokenized strings
-static void split(std::vector<std::string> &split_string,
-                  const std::string &tokenized_string, const char separator) {
-  split_string.clear();
-  std::istringstream tokenized_string_stream(tokenized_string);
-
-  while (!tokenized_string_stream.eof()) {
-    std::string value;
-    getline(tokenized_string_stream, value, separator);
-    if (!value.empty()) {
-      split_string.push_back(value);
-    }
+void SnpeExecutor::create(const char *model_path,
+                          const char *native_model_path) {
+  // reset the flags
+  SnpeExecutor::count = 0;
+  SnpeExecutor::flag = 0;
+  std::string snpe_version = xverstr(SNPE_VERSION_STRING);
+  if (snpe_version.compare("default") != 0) {
+    int dotPosition = snpe_version.find_last_of(".");
+    snpe_version = snpe_version.substr(dotPosition + 1);
   }
+
+  if (get_sdk_version().find_first_of(snpe_version) != 0) {
+    LOG(FATAL) << "Snpe libs modified. expected: " << snpe_version
+               << " found: " << get_sdk_version();
+  }
+  LOG(INFO) << "snpe_version: " << snpe_version;
+
+  set_runtime_config();
+  Init(model_path);
+  get_data_formats();
+  map_inputs();
+  map_outputs();
+
+  LOG(INFO) << "SNPE build completed successfully";
 }
 
-static Snpe_StringList_Handle_t ResolveCommaSeparatedList(std::string &line) {
-  Snpe_StringList_Handle_t stringListHandle = Snpe_StringList_Create();
-  if (!line.empty()) {
-    std::vector<std::string> names;
-    split(names, line.substr(0), ',');
-    for (auto &name : names)
-      Snpe_StringList_Append(stringListHandle, name.c_str());
-  }
-  return stringListHandle;
-}
-
-static Snpe_TensorShape_Handle_t calcStrides(
-    Snpe_TensorShape_Handle_t dimsHandle, size_t elementSize) {
-  std::vector<size_t> strides(Snpe_TensorShape_Rank(dimsHandle));
-  strides[strides.size() - 1] = elementSize;
-  size_t stride = strides[strides.size() - 1];
-  for (size_t i = Snpe_TensorShape_Rank(dimsHandle) - 1; i > 0; i--) {
-    if (Snpe_TensorShape_At(dimsHandle, i) != 0)
-      stride *= Snpe_TensorShape_At(dimsHandle, i);
-    else
-      stride *= 10;
-    strides[i - 1] = stride;
-  }
-  Snpe_TensorShape_Handle_t tensorShapeHandle = Snpe_TensorShape_CreateDimsSize(
-      strides.data(), Snpe_TensorShape_Rank(dimsHandle));
-  return tensorShapeHandle;
-}
-
-static Snpe_Runtime_t Str2Delegate(const snpe_runtimes_t delegate,
-                                   bool isFatal = false) {
+void SnpeExecutor::set_runtime_config() {
+  int numDSP = 0, numGPU = 0, numCPU = 0, numGPU_FP16 = 0;
+  get_accelerator_instances_utils(numDSP, numGPU, numCPU, numGPU_FP16);
   Snpe_Runtime_t runtime;
-
-  switch (delegate) {
-    case SNPE_DSP:
-      runtime = SNPE_RUNTIME_DSP;
-      break;
-    case SNPE_GPU:
-      runtime = SNPE_RUNTIME_GPU;
-      break;
-    case SNPE_CPU:
-      runtime = SNPE_RUNTIME_CPU;
-      break;
-    case SNPE_GPU_FP16:
-      runtime = SNPE_RUNTIME_GPU_FLOAT16;
-      break;
-    default:
-      runtime = SNPE_RUNTIME_UNSET;
-      LOG(ERROR) << "runtime not supported";
-      break;
-  }
-
-  if (Snpe_Util_IsRuntimeAvailableCheckOption(
-          runtime, SNPE_RUNTIME_CHECK_OPTION_UNSIGNEDPD_CHECK)) {
-    LOG(INFO) << "runtime " << delegate << " is available on this platform";
-  } else {
-    std::stringstream log_err_string;
-    log_err_string << "runtime " << delegate
-                   << " is not available on this platform";
-    if (isFatal)
-      LOG(FATAL) << log_err_string.str();
-    else
-      LOG(ERROR) << log_err_string.str();
-  }
-
-  return runtime;
-}
-
-bool QTIBackendHelper::IsRuntimeAvailable(const snpe_runtimes_t delegate) {
-  return (Str2Delegate(delegate) != SNPE_RUNTIME_UNSET);
-}
-
-void QTIBackendHelper::use_psnpe(const char *model_path) {
-  uint32_t numInits = get_num_inits();
-  LOG(INFO) << "Using PSNPE. numInits: " << numInits;
-
-// Enable debug logs
-#ifdef DEBUG_FLAG
-  if (Snpe_Util_InitializeLogging(SNPE_LOG_LEVEL_VERBOSE)) {
-    LOG(INFO) << "Debug logs successful";
-  } else {
-    LOG(INFO) << "Debug logs can not be intialized";
-  }
-#endif
-
-  bool psnpe_buildStatus = false;
-  // Init cache generated on device giving better performance.
-  // So build the DLC twice to use the init cache generated in the first run
-  for (int i = 0; i < numInits; i++) {
-    // Open the DL container that contains the network to execute.
-    Snpe_DlContainer_Handle_t containerHandle =
-        Snpe_DlContainer_Open(model_path);
-    // destroys previous snpe instance and creates a new one.
-    psnpe_.reset(new psnpe_handler());
-    // Loads the container after destroying the previous instance
-    if (!containerHandle) {
-      LOG(FATAL) << "Container is not available " << model_path;
+  for (int i = 0; i < numDSP; i++) {
+    if (i == 0) {
+      runtime = Str2Delegate_utils(snpe_runtimes_::SNPE_DSP);
     }
+    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
 
-    Snpe_BuildConfig_Handle_t buildConfigHandle = Snpe_BuildConfig_Create();
-    Snpe_BuildConfig_SetContainer(buildConfigHandle, containerHandle);
-    Snpe_BuildConfig_SetRuntimeConfigList(buildConfigHandle,
-                                          runtimeConfigsListHandle);
-    Snpe_BuildConfig_SetInputOutputTransmissionMode(
-        buildConfigHandle,
-        static_cast<Snpe_PSNPE_InputOutputTransmissionMode_t>(
-            SNPE_PSNPE_INPUTOUTPUTTRANSMISSIONMODE_SYNC));
-
-    Snpe_StringList_Handle_t outputLayers =
-        ResolveCommaSeparatedList(snpeOutputLayers_);
-
-    Snpe_StringList_Handle_t outputTensors =
-        ResolveCommaSeparatedList(snpeOutputTensors_);
-
-    Snpe_SNPEBuilder_Handle_t snpeBuilderHandle =
-        Snpe_SNPEBuilder_Create(containerHandle);
-    dummyInputRuntimeListHandle = Snpe_RuntimeList_Create();
-    Snpe_RuntimeList_Add(dummyInputRuntimeListHandle, SNPE_RUNTIME_CPU);
+    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
+    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
+                                    runtimeConfigHandle);
+    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
     setupPerfHandle();
-    Snpe_SNPEBuilder_SetCustomPerfProfile(snpeBuilderHandle,
-                                          customPerfProfile_);
-    Snpe_SNPEBuilder_SetExecutionPriorityHint(snpeBuilderHandle,
-                                              SNPE_EXECUTION_PRIORITY_HIGH);
-    Snpe_SNPEBuilder_SetRuntimeProcessorOrder(snpeBuilderHandle,
-                                              dummyInputRuntimeListHandle);
-    Snpe_SNPEBuilder_SetOutputLayers(snpeBuilderHandle, outputLayers);
-    Snpe_SNPEBuilder_SetOutputTensors(snpeBuilderHandle, outputTensors);
+    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
+  }
 
-    if (Snpe_StringList_Size(outputLayers) > 0)
-      Snpe_BuildConfig_SetOutputBufferNames(buildConfigHandle, outputLayers);
-
-    std::string platformOptionStr = "";
-    if (useCpuInt8_) {
-      platformOptionStr = "enableCpuFxpMode:ON";
+  for (int i = 0; i < numGPU; i++) {
+    if (i == 0) {
+      runtime = Str2Delegate_utils(snpe_runtimes_::SNPE_GPU);
     }
-    if (Socs::get_use_dsp_features()) {
-      // use unsignedPD feature for untrusted app.
-      platformOptionStr += "unsignedPD:ON";
+    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
+    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
+    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
+                                    runtimeConfigHandle);
+    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
+    setupPerfHandle();
+    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
+  }
+
+  for (int i = 0; i < numCPU; i++) {
+    if (i == 0) {
+      runtime = Str2Delegate_utils(snpe_runtimes_::SNPE_CPU);
     }
-    Snpe_BuildConfig_SetPlatformOptions(buildConfigHandle,
-                                        platformOptionStr.c_str());
+    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
+    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
+    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
+                                    runtimeConfigHandle);
+    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
+    setupPerfHandle();
+    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
+  }
 
-    Snpe_PlatformConfig_Handle_t platformConfigHandle =
-        Snpe_PlatformConfig_Create();
-    bool setSuccess = Snpe_PlatformConfig_SetPlatformOptions(
-        platformConfigHandle, platformOptionStr.c_str());
-    bool isValid = Snpe_PlatformConfig_IsOptionsValid(platformConfigHandle);
-    if (!isValid) {
-      LOG(INFO) << "platformconfig option is invalid";
+  for (int i = 0; i < numGPU_FP16; i++) {
+    if (i == 0) {
+      runtime = Str2Delegate_utils(snpe_runtimes_::SNPE_GPU_FP16);
     }
-    Snpe_SNPEBuilder_SetPlatformConfig(snpeBuilderHandle, platformConfigHandle);
-    snpe_->snpeHandle = Snpe_SNPEBuilder_Build(snpeBuilderHandle);
+    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
+    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
+    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
+                                    runtimeConfigHandle);
+    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
+    setupPerfHandle();
 
-    // psnpe_buildStatus = Snpe_PSNPE_Build(psnpe_->psnpeHandle,
-    // buildConfigHandle);
-    psnpe_buildStatus = (Snpe_PSNPE_Build(psnpe_->psnpeHandle,
-                                          buildConfigHandle) == SNPE_SUCCESS);
-    // Saves the container if there is a modification in any of the record.
-    if (numInits > 1) Snpe_DlContainer_Save(containerHandle, model_path);
-
-    Snpe_DlContainer_Delete(containerHandle);
-    Snpe_BuildConfig_Delete(buildConfigHandle);
-    Snpe_StringList_Delete(outputLayers);
-    Snpe_SNPEBuilder_Delete(snpeBuilderHandle);
-    Snpe_PlatformConfig_Delete(platformConfigHandle);
+    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
   }
-
-  if (!psnpe_buildStatus) {
-    LOG(FATAL) << "Error in init of psnpe_ " << psnpe_buildStatus;
-  }
-  if (!snpe_->snpeHandle) {
-    LOG(FATAL) << "Error in init of snpe_ " << snpe_->snpeHandle;
-  }
-
-  if (profilingLevel_ != SNPE_PROFILING_LEVEL_OFF) {
-    auto diagLogHandle = Snpe_SNPE_GetDiagLogInterface_Ref(snpe_->snpeHandle);
-    if (!diagLogHandle) LOG(INFO) << "Get diagLogHandle failed";
-    auto optionsHandle = Snpe_IDiagLog_GetOptions(diagLogHandle);
-    std::string OutputDir = ".\diaglogs";
-#ifdef __ANDROID__
-    OutputDir =
-        "/sdcard/Android/data/org.mlcommons.android.mlperfbench/files/diaglogs";
-#endif
-    Snpe_Options_SetLogFileDirectory(optionsHandle, OutputDir.c_str());
-
-    if (Snpe_IDiagLog_SetOptions(diagLogHandle, optionsHandle) != SNPE_SUCCESS)
-      LOG(INFO) << "Failed to set DiagLog options";
-
-    if (Snpe_IDiagLog_Start(diagLogHandle) != SNPE_SUCCESS)
-      LOG(INFO) << "Failed to start logger ";
-  }
-  // Snpe_DlContainer_Delete(containerHandle);
 }
 
-mlperf_status_t QTIBackendHelper::execute() {
-  if (useIonBuffers_ && !isIonRegistered) {
-    if (!useSnpe_) {
-      if (Snpe_PSNPE_RegisterUserMemoryMappedBuffers(
-              psnpe_->psnpeHandle, userMemoryMappedBufferMapHandle_) ==
-          SNPE_SUCCESS) {
-        LOG(INFO) << "Ion Buffer Registration Successful";
-        isIonRegistered = true;
-      } else {
-        LOG(FATAL) << "Not able to do registration";
-      }
-    } else {
-      if (Snpe_SNPE_RegisterUserMemoryMappedBuffers(
-              snpe_->snpeHandle, userMemoryMappedBufferMapHandle_) ==
-          SNPE_SUCCESS) {
-        LOG(INFO) << "Ion Buffer Registration Successful";
-        isIonRegistered = true;
-      } else {
-        LOG(FATAL) << "Not able to do registration";
-      }
-    }
-  }
-  if (!useSnpe_) {
-    if (Snpe_PSNPE_Execute(psnpe_->psnpeHandle, inputMapListHandle_,
-                           outputMapListHandle_) != SNPE_SUCCESS) {
-      return MLPERF_FAILURE;
-    }
-  } else {
-    auto in_ = Snpe_UserBufferList_At_Ref(inputMapListHandle_, 0);
-    auto out_ = Snpe_UserBufferList_At_Ref(outputMapListHandle_, 0);
-    if (Snpe_SNPE_ExecuteUserBuffers(snpe_->snpeHandle, in_, out_) !=
-        SNPE_SUCCESS) {
-      return MLPERF_FAILURE;
-    }
-  }
-  return MLPERF_SUCCESS;
-}
-
-void QTIBackendHelper::use_snpe(const char *model_path) {
+void SnpeExecutor::Init(const char *model_path) {
   uint32_t numInits = get_num_inits();
   LOG(INFO) << "using SNPE. numInits: " << numInits;
 
@@ -327,12 +145,11 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
         Snpe_SNPEBuilder_Create(containerHandle);
     Snpe_SNPEBuilder_SetCpuFixedPointMode(snpeBuilderHandle, useCpuInt8_);
     Snpe_StringList_Handle_t outputLayers =
-        ResolveCommaSeparatedList(snpeOutputLayers_);
+        ResolveCommaSeparatedList_utils(snpeOutputLayers_);
     Snpe_StringList_Handle_t outputTensors =
-        ResolveCommaSeparatedList(snpeOutputTensors_);
+        ResolveCommaSeparatedList_utils(snpeOutputTensors_);
     setupPerfHandle();
-    Snpe_SNPEBuilder_SetCustomPerfProfile(snpeBuilderHandle,
-                                          customPerfProfile_);
+    Snpe_SNPEBuilder_SetPerformanceProfile(snpeBuilderHandle, perfProfile_);
     Snpe_SNPEBuilder_SetProfilingLevel(snpeBuilderHandle, profilingLevel_);
     Snpe_SNPEBuilder_SetExecutionPriorityHint(snpeBuilderHandle,
                                               SNPE_EXECUTION_PRIORITY_HIGH);
@@ -343,6 +160,9 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
     Snpe_SNPEBuilder_SetOutputTensors(snpeBuilderHandle, outputTensors);
 
     std::string platformOptionStr = "";
+    if (Socs::soc_check_feature(useIonBuffers_, platformOptionStr)) {
+      Snpe_SNPEBuilder_SetInitCacheMode(snpeBuilderHandle, true);
+    }
     Snpe_PlatformConfig_Handle_t platformConfigHandle =
         Snpe_PlatformConfig_Create();
     bool setSuccess = Snpe_PlatformConfig_SetPlatformOptions(
@@ -384,42 +204,7 @@ void QTIBackendHelper::use_snpe(const char *model_path) {
   }
 }
 
-inline int QTIBackendHelper::get_num_inits() { return Socs::soc_num_inits(); }
-
-void QTIBackendHelper::get_accelerator_instances(int &num_dsp, int &num_gpu,
-                                                 int &num_cpu,
-                                                 int &num_gpu_fp16) {
-  std::string &delegate = delegate_;
-  num_dsp = 0;
-  num_gpu = 0;
-  num_cpu = 0;
-  num_gpu_fp16 = 0;
-  if (scenario_ == "Offline") {
-    Socs::soc_offline_core_instance(num_dsp, num_gpu, num_cpu, num_gpu_fp16,
-                                    delegate);
-  } else {
-    if (delegate == "snpe_dsp" || delegate == "psnpe_dsp") {
-      num_dsp = 1;
-      Socs::set_use_dsp_features(true);
-    } else if (delegate == "snpe_gpu" || delegate == "psnpe_gpu") {
-      num_gpu = 1;
-      Socs::set_use_dsp_features(false);
-    } else if (delegate == "snpe_cpu" || delegate == "psnpe_cpu") {
-      num_cpu = 1;
-      Socs::set_use_dsp_features(false);
-    } else if (delegate == "snpe_gpu_fp16" || delegate == "psnpe_gpu_fp16") {
-      num_gpu_fp16 = 1;
-      Socs::set_use_dsp_features(false);
-    } else {
-      LOG(FATAL) << "Error: Unsupported delegate " << delegate << " SoC ID "
-                 << Socs::get_soc_name();
-    }
-  }
-  LOG(INFO) << "Using " << num_dsp << " dsp " << num_gpu << " gpu" << num_cpu
-            << " cpu" << num_gpu_fp16 << " gpu_fp16";
-}
-
-void QTIBackendHelper::map_inputs() {
+void SnpeExecutor::map_inputs() {
   Snpe_UserBufferMap_Handle_t inputMapHandle = Snpe_UserBufferMap_Create();
 
   uint64_t offset = 0;
@@ -434,35 +219,26 @@ void QTIBackendHelper::map_inputs() {
       Snpe_TensorShape_Handle_t dimsHandle =
           Snpe_IBufferAttributes_GetDims(ubaOptHandle);
       long bufSize =
-          calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
-                           Snpe_TensorShape_GetDimensions(dimsHandle));
+          calcSizeFromDims_utils(Snpe_TensorShape_Rank(dimsHandle),
+                                 Snpe_TensorShape_GetDimensions(dimsHandle));
       std::vector<Snpe_IUserBuffer_Handle_t> ubPtr;
       std::vector<uint8_t> inputBuffer;
 
       if (inputBufferType_ == QTIBufferType::FLOAT_32) {
         // Prepare float buffer
         bufSize *= sizeof(float);
-
-        if (useIonBuffers_ && inputBatch_ > 1) {
-          if (bi == 0) {
-            inputBufferShared.resize(bufSize * (batchSize_ / inputBatch_));
-          }
-        } else {
-          inputBuffer.resize(bufSize);
-        }
-        auto stridesHandle = calcStrides(
+        inputBuffer.resize(bufSize);
+        auto stridesHandle = calcStrides_utils(
             Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(float));
         Snpe_UserBufferEncoding_Handle_t ubeFloatHandle =
             Snpe_UserBufferEncodingFloat_Create();
 
-        if (useIonBuffers_ && inputBatch_ > 1) {
-          ubPtr.push_back(Snpe_Util_CreateUserBufferShared(
-              std::move(inputBufferShared.data()), bufSize, offset,
-              stridesHandle, ubeFloatHandle));
-        } else {
-          ubPtr.push_back(Snpe_Util_CreateUserBuffer(
-              std::move(inputBuffer.data()), inputBuffer.size(), stridesHandle,
-              ubeFloatHandle));
+        ubPtr.push_back(
+            Snpe_Util_CreateUserBuffer(inputBuffer.data(), inputBuffer.size(),
+                                       stridesHandle, ubeFloatHandle));
+        if (ubPtr.back() == nullptr) {
+          Snpe_IBufferAttributes_Delete(ubaOptHandle);
+          LOG(FATAL) << "Null pointer returned from CreateUserBuffer.";
         }
         Snpe_UserBufferMap_Add(inputMapHandle, name, ubPtr.back());
 
@@ -480,7 +256,7 @@ void QTIBackendHelper::map_inputs() {
           inputBuffer.resize(bufSize);
         }
 
-        auto stridesHandle = calcStrides(
+        auto stridesHandle = calcStrides_utils(
             Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(uint8_t));
         auto ubeTfN = Snpe_IUserBuffer_GetEncoding_Ref(ubaOptHandle);
 
@@ -517,7 +293,7 @@ void QTIBackendHelper::map_inputs() {
   Snpe_UserBufferMap_Delete(inputMapHandle);
 }
 
-void QTIBackendHelper::map_outputs() {
+void SnpeExecutor::map_outputs() {
   Snpe_UserBufferMap_Handle_t outputMapHandle = Snpe_UserBufferMap_Create();
 
   uint64_t offset = 0;
@@ -531,8 +307,8 @@ void QTIBackendHelper::map_outputs() {
       Snpe_TensorShape_Handle_t dimsHandle =
           Snpe_IBufferAttributes_GetDims(ubaOptHandle);
       long bufSize =
-          calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
-                           Snpe_TensorShape_GetDimensions(dimsHandle));
+          calcSizeFromDims_utils(Snpe_TensorShape_Rank(dimsHandle),
+                                 Snpe_TensorShape_GetDimensions(dimsHandle));
 
       outputBatchBufsize_ = bufSize;
 
@@ -546,7 +322,7 @@ void QTIBackendHelper::map_outputs() {
 
         std::vector<Snpe_IUserBuffer_Handle_t> x;
 
-        auto stridesHandle = calcStrides(
+        auto stridesHandle = calcStrides_utils(
             Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(uint8_t));
 
         if (useIonBuffers_ && inputBatch_ > 1) {
@@ -586,7 +362,7 @@ void QTIBackendHelper::map_outputs() {
         bufs_[bi].emplace(std::string(name),
                           std::vector<uint8_t, Allocator<uint8_t>>(
                               bufSize * sizeof(int32_t)));
-        auto stridesHandle = calcStrides(
+        auto stridesHandle = calcStrides_utils(
             Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(int32_t));
         x.push_back(Snpe_Util_CreateUserBuffer(bufs_[bi].at(name).data(),
                                                bufSize * sizeof(int32_t),
@@ -607,7 +383,7 @@ void QTIBackendHelper::map_outputs() {
         bufs_[bi].emplace(
             std::string(name),
             std::vector<uint8_t, Allocator<uint8_t>>(bufSize * sizeof(float)));
-        auto stridesHandle = calcStrides(
+        auto stridesHandle = calcStrides_utils(
             Snpe_IBufferAttributes_GetDims(ubaOptHandle), sizeof(float));
         x.push_back(Snpe_Util_CreateUserBuffer(
             bufs_[bi].at(name).data(), bufSize * sizeof(float), stridesHandle,
@@ -631,7 +407,7 @@ void QTIBackendHelper::map_outputs() {
   Snpe_UserBufferMap_Delete(outputMapHandle);
 }
 
-void QTIBackendHelper::get_data_formats() {
+void SnpeExecutor::get_data_formats() {
   networkInputTensorNamesHandle_ =
       Snpe_SNPE_GetInputTensorNames(snpe_->snpeHandle);
   if (!networkInputTensorNamesHandle_) {
@@ -654,8 +430,9 @@ void QTIBackendHelper::get_data_formats() {
     Snpe_TensorShape_Handle_t dimsHandle =
         Snpe_IBufferAttributes_GetDims(ubaOptHandle);
 
-    long bufSize = calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
-                                    Snpe_TensorShape_GetDimensions(dimsHandle));
+    long bufSize =
+        calcSizeFromDims_utils(Snpe_TensorShape_Rank(dimsHandle),
+                               Snpe_TensorShape_GetDimensions(dimsHandle));
 
     if (inputBufferType_ == FLOAT_32) {
       // Input buffer type FLOAT
@@ -684,8 +461,9 @@ void QTIBackendHelper::get_data_formats() {
         Snpe_SNPE_GetInputOutputBufferAttributes(snpe_->snpeHandle, name);
     Snpe_TensorShape_Handle_t dimsHandle =
         Snpe_IBufferAttributes_GetDims(ubaOptHandle);
-    long bufSize = calcSizeFromDims(Snpe_TensorShape_Rank(dimsHandle),
-                                    Snpe_TensorShape_GetDimensions(dimsHandle));
+    long bufSize =
+        calcSizeFromDims_utils(Snpe_TensorShape_Rank(dimsHandle),
+                               Snpe_TensorShape_GetDimensions(dimsHandle));
     if (outputBufferType_ == FLOAT_32) {
       if (snpeOutputLayers_ == "transpose" ||
           snpeOutputTensors_ == "transpose:0") {
@@ -718,186 +496,155 @@ void QTIBackendHelper::get_data_formats() {
   }
 }
 
-void QTIBackendHelper::set_runtime_config() {
-  int numDSP = 0, numGPU = 0, numCPU = 0, numGPU_FP16 = 0;
-  get_accelerator_instances(numDSP, numGPU, numCPU, numGPU_FP16);
-
-  Snpe_Runtime_t runtime;
-  for (int i = 0; i < numDSP; i++) {
-    if (i == 0) {
-      runtime = Str2Delegate(SNPE_DSP, true);
+mlperf_status_t SnpeExecutor::set_input(int32_t batchIndex, int32_t i,
+                                        void *data) {
+  void *batchedDataPtr = ((useIonBuffers_ == false) && (inputBatch_ <= 1))
+                             ? data
+                             : ChunkAllocator::GetBatchPtr(data);
+  if (useIonBuffers_ && inputBatch_ > 1) {
+    if (!SnpeExecutor::flag) {
+      SnpeExecutor::count = 0;
+      SnpeExecutor::flag++;
     }
-    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
 
-    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
-    setupPerfHandle();
-    Snpe_RuntimeConfig_SetCustomPerfProfile(runtimeConfigHandle,
-                                            customPerfProfile_);
-    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
-                                    runtimeConfigHandle);
-    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
-
-    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
-  }
-
-  for (int i = 0; i < numGPU; i++) {
-    if (i == 0) {
-      runtime = Str2Delegate(SNPE_GPU, true);
-    }
-    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
-    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
-    setupPerfHandle();
-    Snpe_RuntimeConfig_SetCustomPerfProfile(runtimeConfigHandle,
-                                            customPerfProfile_);
-    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
-                                    runtimeConfigHandle);
-    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
-    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
-  }
-
-  for (int i = 0; i < numCPU; i++) {
-    if (i == 0) {
-      runtime = Str2Delegate(SNPE_CPU, true);
-    }
-    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
-    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
-    setupPerfHandle();
-    Snpe_RuntimeConfig_SetCustomPerfProfile(runtimeConfigHandle,
-                                            customPerfProfile_);
-    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
-                                    runtimeConfigHandle);
-    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
-    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
-  }
-
-  for (int i = 0; i < numGPU_FP16; i++) {
-    if (i == 0) {
-      runtime = Str2Delegate(SNPE_GPU_FP16);
-    }
-    auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
-    Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
-    setupPerfHandle();
-    Snpe_RuntimeConfig_SetCustomPerfProfile(runtimeConfigHandle,
-                                            customPerfProfile_);
-    Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
-                                    runtimeConfigHandle);
-    Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
-
-    Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
-  }
-}
-
-std::string QTIBackendHelper::get_snpe_version() {
-  Snpe_DlVersion_Handle_t version = Snpe_Util_GetLibraryVersion();
-  return Snpe_DlVersion_GetBuild(version);
-}
-
-std::vector<float> get_normal(unsigned numbers, unsigned seed = 5,
-                              float mean = 0.0, float stddev = 1.0) {
-  std::default_random_engine generator(seed);
-  std::normal_distribution<float> distribution(mean, stddev);
-
-  std::vector<float> d;
-  for (unsigned i = 0; i < numbers; i++) d.push_back(distribution(generator));
-
-  return d;
-}
-
-void QTIBackendHelper::initSd(const char *model_path, const char *lib_path) {
-#ifdef STABLEDIFFUSION_FLAG
-  bool use_mmap = false;  // we don't want to use cached
-  uint64_t context_bin_mmap_read_budget = 100000;
-  std::string temp(lib_path);
-  native_lib_path = temp;
-  std::string newtemp(model_path);
-  data_folder_path = newtemp;
-
-  // TODO: Below vars are using in preprocessInputSd
-  // May need to be set from the configuration from MLC. Hardcoded for now.
-  num_steps = 20;
-  seed = 633994880;
-  guidance_scale = 7.5;
-
-  mlperf_data_t input;
-  input.type = mlperf_data_t::Int32;
-  input.size = 77 * 1;  // tokenized inputs 77 numbers
-  inputFormat_.push_back(input);
-
-  mlperf_data_t output;
-  output.type = mlperf_data_t::Uint8;
-  output.size = 512 * 512 * 3;
-  outputFormat_.push_back(output);
-
-  sd_pipeline = new QnnApiHelpers();
-
-  if (0 != sd_pipeline->Init(data_folder_path, native_lib_path, 768, 77, 1.0,
-                             512, 512, 3.0, use_mmap,
-                             context_bin_mmap_read_budget)) {
-    LOG(FATAL) << "Initialization Failure";
-  }
-#endif
-}
-
-bool QTIBackendHelper::preprocessInputSd(void *data) {
-#ifdef STABLEDIFFUSION_FLAG
-  int32_t *input_prompt_ids = (int32_t *)data;
-  std::vector<float32_t> noise = get_normal(64 * 64 * 4, seed);
-  return sd_pipeline->PreProcessInput(input_prompt_ids, noise, num_steps,
-                                      guidance_scale);
-#else
-  return false;
-#endif
-}
-
-bool QTIBackendHelper::executeSd() {
-#ifdef STABLEDIFFUSION_FLAG
-  for (int stepIdx = 0; stepIdx < num_steps; stepIdx++) {
-    bool runVAE = ((stepIdx + 1) == num_steps);
-    if (true != sd_pipeline->RunInference(runVAE)) {
-      LOG(FATAL) << "RunInference failure";
-      return false;
+    if (SnpeExecutor::count++ % inputBatch_ != 0) {
+      return MLPERF_SUCCESS;
     }
   }
-  return true;
-#else
-  return false;
-#endif
-}
 
-bool QTIBackendHelper::getOutputSd(void **data) {
-#ifdef STABLEDIFFUSION_FLAG
-  JniHelpers::InferenceReturn inferenceReturn;
-  if (true != sd_pipeline->PostProcessOutput(false, false, inferenceReturn)) {
-    LOG(FATAL) << "PostProcessOutput failure";
-    return false;
+  // Set the input data pointer to the user buffer
+  // "Snpe_UserBufferMap_GetUserBuffer_Ref" is a macro that expands to
+  // "Snpe_UserBufferMap_GetUserBuffer
+  Snpe_IUserBuffer_SetBufferAddress(
+      Snpe_UserBufferMap_GetUserBuffer_Ref(
+          Snpe_UserBufferList_At_Ref(inputMapListHandle_,
+                                     batchIndex / inputBatch_),
+          Snpe_StringList_At(networkInputTensorNamesHandle_, i)),
+      batchedDataPtr);
+
+  if (useIonBuffers_) {
+    uint64_t offset = ChunkAllocator::GetOffset(data);
+
+    Snpe_IUserBuffer_SetBufferAddressOffset(
+        Snpe_UserBufferMap_GetUserBuffer_Ref(
+            Snpe_UserBufferList_At_Ref(inputMapListHandle_,
+                                       batchIndex / inputBatch_),
+            Snpe_StringList_At(networkInputTensorNamesHandle_, i)),
+        offset);
   }
-  *data = inferenceReturn.m_ImageData;
 
-  // delete sd_pipeline;
-  // sd_pipeline = new QnnApiHelpers();
-  return true;
-#else
-  return false;
-#endif
+  return MLPERF_SUCCESS;
 }
 
-void QTIBackendHelper::deinitSd() {
-#ifdef STABLEDIFFUSION_FLAG
-  bool use_mmap = false;  // we don't want to use cached
-  uint64_t context_bin_mmap_read_budget = 100000;
-  /*if (0 != sd_pipeline->Init(data_folder_path, native_lib_path,
-                     768, 77, 1.0,
-                     512, 512, 3.0,
-                     use_mmap, context_bin_mmap_read_budget)) {
-                     LOG(FATAL) << "Initialization Failure";
-                     }
-*/
-  delete sd_pipeline;
-  sd_pipeline = nullptr;
-#endif
+mlperf_status_t SnpeExecutor::get_output(uint32_t batchIndex,
+                                         int32_t outputIndex, void **data) {
+  if (snpeOutputTensors_.find(
+          "Postprocessor/BatchMultiClassNonMaxSuppression_classes") !=
+          std::string::npos ||
+      snpeOutputLayers_ == "Postprocessor/BatchMultiClassNonMaxSuppression") {
+    // Reorder snpeOutputLayers_ for coco process_output
+    const char *outputLayerName = odLayerMap[outputIndex].c_str();
+    *data = bufs_[batchIndex].at(odLayerMap[outputIndex]).data();
+    return MLPERF_SUCCESS;
+  } else if (snpeOutputTensors_.find("transpose:0") != std::string::npos ||
+             snpeOutputLayers_ == "transpose") {
+    *data = bufs_[int(batchIndex / inputBatch_)]
+                .at(Snpe_StringList_At(networkOutputTensorNamesHandle_, 0))
+                .data() +
+            (1 - outputIndex) * 384 * sizeof(float);
+    return MLPERF_SUCCESS;
+  }
+  size_t size = sizeof(float);
+  if (outputBufferType_ == Executor::QTIBufferType::UINT_8) {
+    size = sizeof(uint8_t);
+  }
+
+  int index =
+      (inputBatch_ > 1 && useIonBuffers_) ? 0 : int(batchIndex / inputBatch_);
+  auto offsetAddress =
+      (inputBatch_ > 1 && useIonBuffers_)
+          ? (outputBatchBufsize_ * (batchIndex / inputBatch_) * size)
+          : 0;
+
+  *data =
+      bufs_[index]
+          .at(Snpe_StringList_At(networkOutputTensorNamesHandle_, outputIndex))
+          .data() +
+      (batchIndex % inputBatch_) * int(outputBatchBufsize_ / inputBatch_) *
+          size +
+      offsetAddress;
+
+  return MLPERF_SUCCESS;
 }
 
-bool QTIBackendHelper::setupPerfHandle() {
+mlperf_status_t SnpeExecutor::execute(ft_callback /*callback*/,
+                                      void * /*context*/) {
+  if (useIonBuffers_ && !isIonRegistered_) {
+    if (Snpe_SNPE_RegisterUserMemoryMappedBuffers(
+            snpe_->snpeHandle, userMemoryMappedBufferMapHandle_) ==
+        SNPE_SUCCESS) {
+      LOG(INFO) << "Ion Buffer Registration Successful";
+      isIonRegistered_ = true;
+    } else {
+      LOG(FATAL) << "Not able to do registration";
+    }
+  }
+
+  auto in_ = Snpe_UserBufferList_At_Ref(inputMapListHandle_, 0);
+  auto out_ = Snpe_UserBufferList_At_Ref(outputMapListHandle_, 0);
+
+  if (Snpe_SNPE_ExecuteUserBuffers(snpe_->snpeHandle, in_, out_) !=
+      SNPE_SUCCESS) {
+    LOG(ERROR) << "Failed to execute SNPE model. Check input/output buffer "
+                  "configuration.";
+    return MLPERF_FAILURE;
+  }
+  return MLPERF_SUCCESS;
+}
+
+void *SnpeExecutor::getBuffer(size_t n) {
+  void *batchedDataPtr = nullptr;
+
+  if (useIonBuffers_) {
+    const char *name = Snpe_StringList_At(networkInputTensorNamesHandle_, 0);
+
+    size_t totalBlocks = ChunkAllocator::GetSize(n) + (inputBatch_ - 1);
+
+    batchedDataPtr = get_buffer(n, totalBlocks);
+    uint64_t Offset = ChunkAllocator::GetOffset(batchedDataPtr);
+
+    if (SnpeExecutor::count % inputBatch_ == 0) {
+      Snpe_UserMemoryMap_AddFdOffset(
+          userMemoryMappedBufferMapHandle_, name,
+          ChunkAllocator::GetBatchPtr(batchedDataPtr), n * totalBlocks, fd,
+          Offset);
+    }
+
+  } else {
+    batchedDataPtr = get_buffer(n, inputBatch_);
+  }
+
+  return batchedDataPtr;
+}
+
+void SnpeExecutor::deregister(void *p) {
+  if (useIonBuffers_ && isIonRegistered_) {
+    Snpe_StringList_Handle_t userBufferNames =
+        Snpe_UserMemoryMap_GetUserBufferNames(userMemoryMappedBufferMapHandle_);
+    if (Snpe_SNPE_DeregisterUserMemoryMappedBuffers(
+            snpe_->snpeHandle, userBufferNames) != SNPE_SUCCESS)
+      LOG(INFO) << "Deregistration Failed !";
+
+    auto input_buffer_name = Snpe_StringList_At(userBufferNames, 0);
+    Snpe_UserMemoryMap_Remove(userMemoryMappedBufferMapHandle_,
+                              input_buffer_name);
+    Snpe_StringList_Delete(userBufferNames);
+    isIonRegistered_ = false;
+  }
+  release_buffer(p);
+}
+
+bool SnpeExecutor::setupPerfHandle() {
   customPerfProfile_ = Snpe_SNPEPerfProfile_CreatePreset(perfProfile_);
   for (std::unordered_map<std::string, std::string>::iterator mapIter =
            customPerfProfileMap_.begin();
@@ -1040,4 +787,160 @@ bool QTIBackendHelper::setupPerfHandle() {
     LOG(INFO) << "Setting " << setting << " to " << value << std::endl;
   }
   return true;
+}
+
+const char *SnpeExecutor::get_name_() const { return name_; }
+
+bool SnpeExecutor::getUseIonBuffers_() const { return useIonBuffers_; }
+
+std::vector<mlperf_data_t> SnpeExecutor::getInputFormat_() const {
+  return inputFormat_;
+}
+
+std::vector<mlperf_data_t> SnpeExecutor::getOutputFormat_() const {
+  return outputFormat_;
+}
+
+void SnpeExecutor::setConfigs(const mlperf_backend_configuration_t *configs) {
+  // Setting defaults
+  setDelegate_utils(configs->accelerator);
+
+  // Batch size is zero if not specified
+  batchSize_ = (configs->batch_size == 0) ? 1 : configs->batch_size;
+
+  // set ion buffers to true, unless specified from config
+  useIonBuffers_ = true;
+
+  // Handle custom settings
+  std::string perfProfile = "burst";
+  std::string profileLevel = "off";
+  std::string scenario = "";
+
+  // Applying config settings to backend
+  for (int i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], "scenario") == 0) {
+      setScenario_utils(configs->values[i]);
+      scenario = configs->values[i];
+    } else if (strcmp(configs->keys[i], "snpe_output_layers") == 0) {
+      snpeOutputLayers_ = (configs->values[i]);
+    } else if (strcmp(configs->keys[i], "snpe_output_tensors") == 0) {
+      snpeOutputTensors_ = (configs->values[i]);
+    } else if (strcmp(configs->keys[i], "input_buffer_type") == 0) {
+      if (std::strcmp(configs->values[i], "float_32") == 0) {
+        inputBufferType_ = Executor::QTIBufferType::FLOAT_32;
+      } else {
+        inputBufferType_ = Executor::QTIBufferType::UINT_8;
+      }
+    } else if (strcmp(configs->keys[i], "output_buffer_type") == 0) {
+      if (std::strcmp(configs->values[i], "float_32") == 0) {
+        outputBufferType_ = Executor::QTIBufferType::FLOAT_32;
+      } else if (std::strcmp(configs->values[i], "int_32") == 0) {
+        outputBufferType_ = Executor::QTIBufferType::INT_32;
+      } else {
+        outputBufferType_ = Executor::QTIBufferType::UINT_8;
+      }
+    } else if (strcmp(configs->keys[i], "use_ion_buffer") == 0) {
+      if (std::strcmp(configs->values[i], "true") == 0) {
+        useIonBuffers_ = true;
+      } else {
+        useIonBuffers_ = false;
+      }
+      useIonBuffers_ =
+          useIonBuffers_ && Socs::needs_rpcmem() && get_rpc_status();
+    } else if (strcmp(configs->keys[i], "perf_profile") == 0) {
+      perfProfile = configs->values[i];
+      if ((std::strcmp(configs->values[i], "default") == 0) ||
+          (std::strcmp(configs->values[i], "balanced") == 0)) {
+        perfProfile_ = SNPE_PERFORMANCE_PROFILE_BALANCED;
+      } else if (std::strcmp(configs->values[i], "high_performance") == 0) {
+        perfProfile_ = SNPE_PERFORMANCE_PROFILE_HIGH_PERFORMANCE;
+      } else if (std::strcmp(configs->values[i], "power_saver") == 0) {
+        perfProfile_ = SNPE_PERFORMANCE_PROFILE_POWER_SAVER;
+      } else if (std::strcmp(configs->values[i], "system_settings") == 0) {
+        perfProfile_ = SNPE_PERFORMANCE_PROFILE_SYSTEM_SETTINGS;
+      } else if (std::strcmp(configs->values[i],
+                             "sustained_high_performance") == 0) {
+        perfProfile_ = SNPE_PERFORMANCE_PROFILE_SUSTAINED_HIGH_PERFORMANCE;
+      } else if (std::strcmp(configs->values[i], "burst") == 0) {
+        perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
+      } else if (std::strcmp(configs->values[i], "low_power_saver") == 0) {
+        perfProfile_ = SNPE_PERFORMANCE_PROFILE_LOW_POWER_SAVER;
+      } else if (std::strcmp(configs->values[i], "high_power_saver") == 0) {
+        perfProfile_ = SNPE_PERFORMANCE_PROFILE_HIGH_POWER_SAVER;
+      } else if (std::strcmp(configs->values[i], "low_balanced") == 0) {
+        perfProfile_ = SNPE_PERFORMANCE_PROFILE_LOW_BALANCED;
+      } else {
+        LOG(INFO) << "Unrecognized performance profile: " << perfProfile;
+        perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
+      }
+    } else if (strcmp(configs->keys[i], "bus_voltage_start") == 0) {
+      customPerfProfileMap_["BUS_VOLTAGE_CORNER_MIN_START"] =
+          configs->values[i];
+      customPerfProfileMap_["BUS_VOLTAGE_CORNER_TARGET_START"] =
+          configs->values[i];
+      customPerfProfileMap_["BUS_VOLTAGE_CORNER_MAX_START"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "core_voltage_start") == 0) {
+      customPerfProfileMap_["CORE_VOLTAGE_CORNER_MIN_START"] =
+          configs->values[i];
+      customPerfProfileMap_["CORE_VOLTAGE_CORNER_TARGET_START"] =
+          configs->values[i];
+      customPerfProfileMap_["CORE_VOLTAGE_CORNER_MAX_START"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "bus_voltage_done") == 0) {
+      customPerfProfileMap_["BUS_VOLTAGE_CORNER_MIN_DONE"] = configs->values[i];
+      customPerfProfileMap_["BUS_VOLTAGE_CORNER_TARGET_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["BUS_VOLTAGE_CORNER_MAX_DONE"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "bus_voltage_done") == 0) {
+      customPerfProfileMap_["CORE_VOLTAGE_CORNER_MIN_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["CORE_VOLTAGE_CORNER_TARGET_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["CORE_VOLTAGE_CORNER_MAX_DONE"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "hmx_voltage") == 0) {
+      customPerfProfileMap_["DSP_HMX_VOLTAGE_CORNER_TARGET"] =
+          configs->values[i];
+      customPerfProfileMap_["DSP_HMX_VOLTAGE_CORNER_MAX"] = configs->values[i];
+      customPerfProfileMap_["DSP_HMX_VOLTAGE_CORNER_MIN"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "hmx_clock_perf") == 0) {
+      customPerfProfileMap_["DSP_HMX_CLOCK_PERF_MODE"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "dsp_start_sleep_latency") == 0) {
+      customPerfProfileMap_["DSP_SLEEP_LATENCY_START_US"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "dsp_done_sleep_latency") == 0) {
+      customPerfProfileMap_["DSP_SLEEP_LATENCY_DONE_US"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "profiling_level") == 0) {
+      profileLevel = configs->values[i];
+      if (std::strcmp(configs->values[i], "off") == 0) {
+        profilingLevel_ = SNPE_PROFILING_LEVEL_OFF;
+      } else if (std::strcmp(configs->values[i], "basic") == 0) {
+        profilingLevel_ = SNPE_PROFILING_LEVEL_BASIC;
+      } else if (std::strcmp(configs->values[i], "moderate") == 0) {
+        profilingLevel_ = SNPE_PROFILING_LEVEL_MODERATE;
+      } else if (std::strcmp(configs->values[i], "detailed") == 0) {
+        profilingLevel_ = SNPE_PROFILING_LEVEL_DETAILED;
+      } else {
+        LOG(INFO) << "Unrecognized  profiling level: " << profileLevel;
+        profilingLevel_ = SNPE_PROFILING_LEVEL_OFF;
+      }
+    } else if (strcmp(configs->keys[i], "cpu_int8") == 0) {
+      if (std::strcmp(configs->values[i], "true") == 0) {
+        useCpuInt8_ = true;
+      } else {
+        useCpuInt8_ = false;
+      }
+    }
+  }
+
+  LOG(INFO) << " | scenario: " << scenario
+            << " | output layer: " << snpeOutputLayers_
+            << " | output tensor: " << snpeOutputTensors_
+            << " | batchSize: " << batchSize_
+            << " | inputBufferType: " << inputBufferType_
+            << " | outputBufferType: " << outputBufferType_
+            << " | perfProfile: " << perfProfile
+            << " | profileLevel: " << profileLevel
+            << " | useIonBuffer: " << useIonBuffers_
+            << " | useCpuInt8: " << useCpuInt8_;
 }

@@ -65,6 +65,34 @@ cc_library(
 )
 
 cc_library(
+    name = "genie",
+    srcs = [
+        # Genie core + CPU backend
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libGenie.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnGenAiTransformer.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnGenAiTransformerModel.so",
+        # HTP/V81 backend (required for QnnHtp device type)
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtp.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV81Stub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV81CalculatorStub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpNetRunExtensions.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnSystem.so",
+    ],
+    hdrs = glob([
+        "qairt/" + SNPE_VERSION + "/include/Genie/**/*.h",
+    ]),
+    copts = [
+        "-I" + "qairt/" + SNPE_VERSION + "/include/Genie",
+    ],
+    data = [
+        # Hexagon DSP binaries — not aarch64, cannot be linked, deployed to device via ADSP path
+        "qairt/" + SNPE_VERSION + "/lib/hexagon-v81/unsigned/libQnnHtpV81Skel.so",
+        "qairt/" + SNPE_VERSION + "/lib/hexagon-v81/unsigned/libqnnhtpv81.cat",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "snpe_deps",
     srcs = [
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libhta.so",

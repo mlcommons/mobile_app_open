@@ -1,8 +1,11 @@
 /* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +23,7 @@ limitations under the License.
 #include <string>
 #include <thread>
 
-#include "qti_backend_helper.h"
+#include "backend_utils.h"
 #include "tensorflow/core/platform/logging.h"
 #ifndef __ANDROID__
 #include <Windows.h>
@@ -67,33 +70,41 @@ std::map<uint32_t, SocInfo> socDetails =
             // llc,
             // max_cores, needs_rpcmem,
             // m_needs_stablediffusion
-            {538, SocInfo(2, 0, 0, 0, false, qti_settings_sd8cxg3, "SDX_Elite",
-                          1, std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true)},
             {655, SocInfo(2, 0, 0, 0, true, qti_settings_sd8sG4, "SD8sG4", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true,
-                          /* stable_diffusion */ true)},
+                          /* stable_diffusion */ true,
+                          /* genie */ false)},
             {659, SocInfo(2, 0, 0, 0, true, qti_settings_sd7G4, "SD7G4", 1,
                           std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true,
-                          /* stable_diffusion */ true)},
+                          /* stable_diffusion */ true,
+                          /* genie */ false)},
             {618, SocInfo(2, 0, 0, 0, true, qti_settings_sd8elite, "SD8Elite",
                           1, std::vector<int>({0, 1, 2, 3, 4, 5}),
                           std::vector<int>({6, 7}), 8, true,
-                          /* stable_diffusion */ true)},
+                          /* stable_diffusion */ true,
+                          /* genie */ false)},
             {660, SocInfo(2, 0, 0, 0, true, qti_settings_sd8eliteG5,
-                          "SD8EliteG5", 1, std::vector<int>({0, 1, 2, 3, 4, 5}),
-                          std::vector<int>({6, 7}), 8, true,
-                          /* stable_diffusion */ true)},
+                          "SD8EliteG5", 1, std::vector<int>({0, 1, 2, 3, 4}),
+                          std::vector<int>({5, 6, 7}), 8, true,
+                          /* stable_diffusion */ true,
+                          /* genie */ true)},
             {685, SocInfo(2, 0, 0, 0, true, qti_settings_sd8G5, "SD8G5", 1,
                           std::vector<int>({0, 1, 2, 3, 4, 5}),
                           std::vector<int>({6, 7}), 8, true,
-                          /* stable_diffusion */ true)},
+                          /* stable_diffusion */ true,
+                          /* genie */ false)},
             {640, SocInfo(2, 0, 0, 0, true, qti_settings_default_dsp, "SD6G4",
                           1, std::vector<int>({0, 1, 2, 3}),
                           std::vector<int>({4, 5, 6, 7}), 8, true,
-                          /* stable_diffusion */ false)},
+                          /* stable_diffusion */ false,
+                          /* genie */ false)},
+            {636, SocInfo(2, 0, 0, 0, true, qti_settings_default_dsp, "SD6G4",
+                          1, std::vector<int>({0, 1, 2, 3}),
+                          std::vector<int>({4, 5, 6, 7}), 8, true,
+                          /* stable_diffusion */ false,
+                          /* genie */ false)},
             {UNSUPPORTED_SOC_ID,
              SocInfo(2, 0, 0, 0, true, qti_settings_default_dsp, "Snapdragon",
                      1, std::vector<int>({0, 1, 2, 3}),
@@ -129,8 +140,6 @@ uint32_t Socs::get_android_soc_id(void) {
 
 static std::unordered_map<uint64_t, int> pptt_mappings = {
     {LEVEL_ID(113ULL, 449ULL), 435},  // SD8cxG3
-    {LEVEL_ID(136ULL, 555ULL), 538},  // SDX_Elite
-    {LEVEL_ID(136ULL, 615ULL), 538},  // SDX_Elite (C10)
     {LEVEL_ID(118ULL, 487ULL), 475},  // SD7cxG3 (SC7280)
     {LEVEL_ID(118ULL, 488ULL), 475},  // SD7cxG3 (SC7295)
     {LEVEL_ID(118ULL, 546ULL), 475},  // SD7cxG3 (SC7280P)
@@ -302,9 +311,9 @@ void Socs::soc_info_init() {
     m_soc_info.m_settings = get_external_config_string();
   }
   if (soc_id == UNSUPPORTED_SOC_ID) {
-    if (QTIBackendHelper::IsRuntimeAvailable(SNPE_DSP)) {
+    if (IsRuntimeAvailable_utils(snpe_runtimes_::SNPE_DSP)) {
       m_soc_info.m_settings = qti_settings_default_dsp;
-    } else if (QTIBackendHelper::IsRuntimeAvailable(SNPE_GPU)) {
+    } else if (IsRuntimeAvailable_utils(snpe_runtimes_::SNPE_GPU)) {
       m_soc_info.m_settings = qti_settings_default_gpu;
     } else {
       m_soc_info.m_settings = qti_settings_default_cpu;
