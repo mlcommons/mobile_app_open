@@ -38,7 +38,8 @@ class BenchmarkState extends ChangeNotifier {
   late final TaskRunner taskRunner;
   late final BoardDecoder boardDecoder;
 
-  Object? error;
+  Object? resourceError;
+  Object? benchmarkError;
   StackTrace? stackTrace;
 
   bool taskConfigFailedToLoad = false;
@@ -114,7 +115,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("Can't load resources: $e");
       print(trace);
-      error = e;
+      resourceError = e;
       stackTrace = trace;
       taskConfigFailedToLoad = true;
       notifyListeners();
@@ -130,7 +131,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("Can't load resources: $e");
       print(trace);
-      error = e;
+      resourceError = e;
       stackTrace = trace;
       taskConfigFailedToLoad = true;
       notifyListeners();
@@ -173,12 +174,12 @@ class BenchmarkState extends ChangeNotifier {
         purgeOldCache: false,
         downloadMissing: false,
       );
-      error = null;
+      resourceError = null;
       stackTrace = null;
       taskConfigFailedToLoad = false;
     } catch (e, s) {
       print('Could not load resources due to error: $e');
-      error = e;
+      resourceError = e;
       stackTrace = s;
     }
     await Wakelock.disable();
@@ -195,7 +196,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("Can't load resources: $e");
       print(trace);
-      state.error = e;
+      state.resourceError = e;
       state.stackTrace = trace;
       state.taskConfigFailedToLoad = true;
     }
@@ -216,7 +217,7 @@ class BenchmarkState extends ChangeNotifier {
     }
     await configManager.loadConfig(name);
     _store.chosenConfigurationName = name;
-    error = null;
+    resourceError = null;
     stackTrace = null;
     taskConfigFailedToLoad = false;
 
@@ -297,6 +298,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e) {
       _doneRunning = null;
       print('Error: $e');
+      benchmarkError = e;
       rethrow;
     } finally {
       if (currentLogDir.isNotEmpty && !_store.keepLogs) {
@@ -333,7 +335,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print('unable to restore previous extended result: $e');
       print(trace);
-      error = e;
+      resourceError = e;
       stackTrace = trace;
       _store.previousExtendedResult = '';
       resetCurrentResults();
