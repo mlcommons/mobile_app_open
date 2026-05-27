@@ -79,7 +79,7 @@ benchmark_setting {
     batch_size: 12360
     model_file: {
         model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/mobilenet_v4_htp_batched_4.dlc"
-        model_checksum: "b9ef14eb266e3f8f6e30948758f094a2"
+        model_checksum: "c0f665a63bac7dcb2f592403894ddfed"
     }
   }
   delegate_selected: "SNPE_DSP"
