@@ -28,6 +28,7 @@ pbtxt2header(
     name = "tflite_settings",
     srcs = [
         "backend_settings/tflite_settings_android.pbtxt",
+        "backend_settings/tflite_settings_android_m32.pbtxt",
         "backend_settings/tflite_settings_apple_iphone11.pbtxt",
         "backend_settings/tflite_settings_apple_iphone12.pbtxt",
         "backend_settings/tflite_settings_apple_iphoneX.pbtxt",
