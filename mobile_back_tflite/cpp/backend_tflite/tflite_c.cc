@@ -163,7 +163,14 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 #elif defined(_WIN64) || defined(_WIN32)
   *settings = tflite_settings_windows.c_str();
 #else
-  *settings = tflite_settings_android.c_str();
+  // Samsung Galaxy M32 (SM-M326B) does not have enough memory to run LLM
+  // benchmarks, so use a settings file that omits them.
+  if (device_info->model != nullptr &&
+      strcmp(device_info->model, "SM-M326B") == 0) {
+    *settings = tflite_settings_android_m32.c_str();
+  } else {
+    *settings = tflite_settings_android.c_str();
+  }
 #endif
   LOG(INFO) << "TFLite backend matches hardware";
   return true;
