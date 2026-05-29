@@ -24,7 +24,7 @@ The MediaTek Neuron Delegate is a TensorFlow Lite delegate designed to work with
 
 The MLPerf app uses the Neuron delegate on the following families:
 
-* Dimensity 9000 series (9000/9000+/9200/9200+/9300/9300+/9400)
+* Dimensity 9000 series (9000/9000+/9200/9200+/9300/9300+/9400/9500)
 * Dimensity 8000 series (8000/8020/8050/8100/8200/8300)
 
 Link to MediaTek Neuron Delegate: [https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate](https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate)
