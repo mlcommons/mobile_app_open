@@ -81,6 +81,8 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:flutter/third_party/tf-eigen.patch",
+        # Xcode 26 / Clang 21: std::abs<T> no longer usable as std::function<T(T)>
+        "//patches:xcode26_compat.patch",
     ] + PATCH_FILE,
     sha256 = "d7876f4bb0235cac60eb6316392a7c48676729860da1ab659fb440379ad5186d",
     strip_prefix = "tensorflow-2.18.0",
