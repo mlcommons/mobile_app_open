@@ -41,6 +41,7 @@
 
 #pragma once
 
+#include <android/trace.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -49,7 +50,10 @@
 #include "NeuronAdapter.h"
 #include "NeuronAdapterShim.h"
 #include "neuron_backend.h"
+#include "neuron_utils.h"
 #include "tensorflow/core/platform/logging.h"
+
+constexpr uint8_t kNotToFlushCacheHint = 3;
 
 typedef enum {
   TYPE_INPUT = 0,
@@ -122,6 +126,13 @@ inline int load_file(const char *dla_path, uint8_t **buffer) {
   return length;
 }
 
+inline uint64_t GetAhwbType(BufferType type) {
+  return type == CACHEABLE ? AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN |
+                                 AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN
+                           : AHARDWAREBUFFER_USAGE_CPU_READ_RARELY |
+                                 AHARDWAREBUFFER_USAGE_CPU_WRITE_RARELY;
+}
+
 struct NeuronDeleter {
   void operator()(NeuronModel *model) {
     if (model != nullptr) {
@@ -177,19 +188,8 @@ class NeuronBuilder {
     return *this;
   }
 
-  NeuronBuilder &setAhwbType(int res) {
-    if (res == AHWB_RARELY) {
-      mAhwbType = AHARDWAREBUFFER_USAGE_CPU_READ_RARELY |
-                  AHARDWAREBUFFER_USAGE_CPU_WRITE_RARELY;
-    } else {
-      mAhwbType = AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN |
-                  AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN;
-    }
-    return *this;
-  }
-
-  NeuronBuilder &setExecutionFlushValue(uint8_t value) {
-    mNeuronExecutionFlushValue = value;
+  NeuronBuilder &setBufferType(BufferType type) {
+    mBufferType = type;
     return *this;
   }
 
@@ -198,8 +198,14 @@ class NeuronBuilder {
     return *this;
   }
 
-  NeuronBuilder &setShardsNumber(uint32_t num) {
-    mShardsNum = num;
+  NeuronBuilder &setExecutorNumber(uint32_t num) {
+    mExecNum = num;
+    return *this;
+  }
+
+  NeuronBuilder &setDmaBufferAllocator(
+      DmaBufferAllocatorWrapper *bufferAllocator) {
+    mBufferAllocator = bufferAllocator;
     return *this;
   }
 
@@ -218,6 +224,16 @@ class NeuronBuilder {
     return *this;
   }
 
+  NeuronBuilder &setDisableCoherentBuffer(bool disable) {
+    mDisableCoherentBuffer = disable;
+    return *this;
+  }
+
+  NeuronBuilder &setPerfParam(std::vector<int32_t> param) {
+    mPerfParam = param;
+    return *this;
+  }
+
   bool create(neuron_backend_ptr_t backend_ptr) {
     if (!createNeuron()) {
       return false;
@@ -229,6 +245,14 @@ class NeuronBuilder {
       return false;
     }
 
+    AdapterBackendData *backend_data = (AdapterBackendData *)backend_ptr;
+    if (mPerfParam.size() != 0) {
+      backend_data->locker.ResetParam(mPerfParam);
+    }
+
+    if (auto param = mtk::performance::GetCustomParams(); param.size()) {
+      backend_data->locker.ResetParam(param);
+    }
     return moveToBackend(backend_ptr);
   }
 
@@ -239,6 +263,7 @@ class NeuronBuilder {
     NeuronExecution *execution = nullptr;
 
     LOG(INFO) << "createNeuron load DLA from file: " << mModelPath;
+    Tracer trace(std::string() + "load " + mModelPath);
     uint8_t *dlaBuffer = nullptr;
     int length = load_file(mModelPath.c_str(), &dlaBuffer);
     if (length == 0) {
@@ -339,6 +364,11 @@ class NeuronBuilder {
         std::unique_ptr<NeuronCompilation, NeuronDeleter>(compilation);
     err = NeuronCompilation_setPreference(compilation, mPreference);
     RETURN_FALSE_ON_ERR(err, "NeuronCompilation_setPreference failed");
+    if (Config::GetUserDefinedPreference() != -1) {
+      err = NeuronCompilation_setPreference(compilation,
+                                            Config::GetUserDefinedPreference());
+      RETURN_FALSE_ON_ERR(err, "reset NeuronCompilation_setPreference failed");
+    }
     err = NeuronCompilation_setPriority(compilation, NEURON_PRIORITY_HIGH);
     RETURN_FALSE_ON_ERR(err, "NeuronCompilation_setPriority failed");
     err = NeuronCompilation_finish(compilation);
@@ -355,9 +385,8 @@ class NeuronBuilder {
     RETURN_FALSE_ON_ERR(err, "Create Neuron Execution failed");
     mExecution = std::unique_ptr<NeuronExecution, NeuronDeleter>(execution);
     if (mUseThroughputMode) {
-      LOG(INFO) << "createNeuron Execution Set Runner Pool Size: "
-                << mShardsNum;
-      err = NeuronExecution_setRunnerPoolSize(execution, mShardsNum);
+      LOG(INFO) << "createNeuron Execution Set Runner Pool Size: " << mExecNum;
+      err = NeuronExecution_setRunnerPoolSize(execution, mExecNum);
       RETURN_FALSE_ON_ERR(err,
                           "NeuronExecution_create Set Runner Pool Size FAILED");
 
@@ -365,11 +394,17 @@ class NeuronBuilder {
       err = NeuronExecution_setJobPoolSize(execution, mThreadNum);
       RETURN_FALSE_ON_ERR(err, "NeuronExecution_setJobPoolSize FAILED");
     }
-    if (mNeuronExecutionFlushValue != 0) {
-      err = NeuronExecution_setCacheFlushHint(execution,
-                                              mNeuronExecutionFlushValue);
+    if (mBufferType != CACHEABLE) {
+      err = NeuronExecution_setCacheFlushHint(execution, kNotToFlushCacheHint);
       RETURN_FALSE_ON_ERR(err, "NeuronExecution_setCacheFlushHint Failed");
     }
+
+    if (Config::GetUserDefinedBoostHint() != -1) {
+      err = NeuronExecution_setBoostHint(execution,
+                                         Config::GetUserDefinedBoostHint());
+      RETURN_FALSE_ON_ERR(err, "NeuronExecution_setBoostHint Failed");
+    }
+
     LOG(INFO) << "createNeuron End Successfully";
     return true;
   }
@@ -390,7 +425,7 @@ class NeuronBuilder {
 
   bool createMemory(int type) {
     std::vector<NeuronOperandType> *sourceOperand = &mInputOperand;
-    std::vector<AhwbNeuronMemoryWrapper> *memoryWrappers =
+    std::vector<std::unique_ptr<NeuronMemoryWrapper>> *memoryWrappers =
         &mInputMemoryWrappers;
     bool *isSuppress = &mInputSuppress;
     std::vector<uint32_t> *targetSizes = &mInputSizes;
@@ -402,7 +437,7 @@ class NeuronBuilder {
       targetSizes = &mOutputSizes;
     }
 
-    for (int t = 0; t < mShardsNum; t++) {
+    for (int t = 0; t < mExecNum; t++) {
       for (int i = 0; i < sourceOperand->size(); i++) {
         auto operand = sourceOperand->at(i);
         size_t size = 0;
@@ -430,8 +465,67 @@ class NeuronBuilder {
         }
 
         targetSizes->push_back(size);  // B x Input[i] == B * W * H * C
-        memoryWrappers->emplace_back(size, mAhwbType);
-        if (memoryWrappers->back().InitNeuronMemory() != NEURON_NO_ERROR) {
+
+        bool disableCoherentBuffer = mDisableCoherentBuffer;
+        if (Config::GetEnableCustomBuffer()) {
+          int value = type == TYPE_INPUT ? Config::GetCustomInputBufferType()
+                                         : Config::GetCustomOutputBufferType();
+          switch (value) {
+            case UNCACHED:
+              disableCoherentBuffer = true;
+              NeuronExecution_setCacheFlushHint(mExecution.get(),
+                                                kNotToFlushCacheHint);
+              mBufferType = UNCACHED;
+              break;
+            case CACHEABLE:
+              disableCoherentBuffer = true;
+              NeuronExecution_setCacheFlushHint(mExecution.get(),
+                                                NEURON_CACHE_FLUSH_ENABLE_ALL);
+              mBufferType = CACHEABLE;
+              break;
+            case COHERENT:
+              disableCoherentBuffer = false;
+              NeuronExecution_setCacheFlushHint(mExecution.get(),
+                                                kNotToFlushCacheHint);
+              mBufferType = COHERENT;
+              break;
+            default:
+              LOG(ERROR) << "Failed to getCustomBufferType";
+          }
+        }
+
+        bool useAhwb = !mBufferAllocator || mBufferType == UNKNOWN;
+        if (!useAhwb) {
+          if (!disableCoherentBuffer && mBufferAllocator->Available(COHERENT)) {
+            setBufferType(COHERENT);
+            RETURN_FALSE_ON_ERR(NeuronExecution_setCacheFlushHint(
+                                    mExecution.get(), kNotToFlushCacheHint),
+                                "NeuronExecution_setCacheFlushHint Failed");
+          }
+
+          LOG(INFO) << "Allocating dma buffer of type: " << mBufferType;
+          if (mBufferAllocator->Available(mBufferType)) {
+            std::unique_ptr<DmaBuffer> buffer;
+            if (mBufferAllocator->Allocate(mBufferType, size, buffer)) {
+              memoryWrappers->emplace_back(
+                  new DmaNeuronMemoryWrapper(std::move(*buffer.release())));
+            } else {
+              LOG(ERROR) << "Failed to allocate Dma buffer. Fallback to AHWB.";
+              useAhwb = true;
+            }
+          } else {
+            LOG(ERROR) << "The dma BufferType is not available" << mBufferType
+                       << ". Fallback to AHWB.";
+            useAhwb = true;
+          }
+        }
+
+        if (useAhwb) {
+          memoryWrappers->emplace_back(
+              new AhwbNeuronMemoryWrapper(size, GetAhwbType(mBufferType)));
+        }
+
+        if (memoryWrappers->back()->InitNeuronMemory() != NEURON_NO_ERROR) {
           LOG(ERROR) << "Init Neuron Memory for " << t
                      << "th execution operand: " << i << " failed";
           return false;
@@ -453,13 +547,15 @@ class NeuronBuilder {
 
   std::unique_ptr<NeuronExecution, NeuronDeleter> mExecution;
 
-  std::vector<AhwbNeuronMemoryWrapper> mInputMemoryWrappers;
+  std::vector<std::unique_ptr<NeuronMemoryWrapper>> mInputMemoryWrappers;
 
-  std::vector<AhwbNeuronMemoryWrapper> mOutputMemoryWrappers;
+  std::vector<std::unique_ptr<NeuronMemoryWrapper>> mOutputMemoryWrappers;
 
   std::vector<uint32_t> mInputSizes;
 
   std::vector<uint32_t> mOutputSizes;
+
+  std::vector<int32_t> mPerfParam;
 
   bool mUseThroughputMode = false;
 
@@ -469,14 +565,15 @@ class NeuronBuilder {
 
   uint32_t mThreadNum = 1;
 
-  uint32_t mShardsNum = 1;
+  uint32_t mExecNum = 1;
 
   std::vector<NeuronExecution *> mExecs;
 
   NeuronAdapterPreferenceCode mPreference = NEURON_PREFER_TURBO_BOOST;
 
-  uint8_t mNeuronExecutionFlushValue = 0;
+  BufferType mBufferType = UNKNOWN;
 
-  uint64_t mAhwbType = AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN |
-                       AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN;
+  DmaBufferAllocatorWrapper *mBufferAllocator = nullptr;
+
+  bool mDisableCoherentBuffer = false;
 };

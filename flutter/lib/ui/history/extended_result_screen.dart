@@ -159,15 +159,20 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
     return ListView(children: _makeBody());
   }
 
-  double calculateAverageThroughput(List<BenchmarkExportResult> results) {
+  double calculateAverageThroughput(List<BenchmarkExportResult> results,
+      {bool tokenBased = false}) {
     var throughput = 0.0;
     var count = 0;
     for (var item in results) {
-      if (item.performanceRun == null) {
+      if (item.performanceRun == null ||
+          item.performanceRun!.loadgenInfo!.isTokenBased != tokenBased) {
         continue;
       }
       throughput += item.performanceRun!.throughput!.value;
       count++;
+    }
+    if (count == 0) {
+      return 0.0;
     }
     return throughput / count;
   }
@@ -181,6 +186,9 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
 
     final averageThroughput =
         calculateAverageThroughput(res.results).toStringAsFixed(2);
+    final averageTokenThroughput =
+        calculateAverageThroughput(res.results, tokenBased: true)
+            .toStringAsFixed(2);
 
     final appVersionType =
         (res.buildInfo.gitDirtyFlag || res.buildInfo.devTestFlag)
@@ -202,6 +210,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
       helper.makeInfo(l10n.historyDetailsDate, date),
       helper.makeInfo(l10n.historyDetailsUUID, res.meta.uuid),
       helper.makeInfo(l10n.historyDetailsAvgQps, averageThroughput),
+      helper.makeInfo(l10n.historyDetailsAvgTps, averageTokenThroughput),
       helper.makeInfo(l10n.historyDetailsAppVersion, appVersion),
       helper.makeInfo(l10n.historyDetailsBackendName, backendName),
       helper.makeInfo(l10n.historyDetailsModelName, modelDescription),
@@ -238,8 +247,9 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
     return RowData(
       isHeader: false,
       name: runInfo.benchmarkName,
-      throughput: runInfo.performanceRun?.throughput?.toUIString() ??
-          l10n.resultsNotAvailable,
+      throughput: runInfo.performanceRun != null
+          ? '${runInfo.performanceRun!.throughput!.toUIString()} ${runInfo.performanceRun!.loadgenInfo!.isTokenBased ? l10n.unitTPS : l10n.unitQPS}'
+          : l10n.resultsNotAvailable,
       throughputValid:
           runInfo.performanceRun?.loadgenInfo?.isResultValid ?? false,
       accuracy:

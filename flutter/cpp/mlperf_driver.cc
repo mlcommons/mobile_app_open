@@ -28,9 +28,18 @@ limitations under the License.
 namespace mlperf {
 namespace mobile {
 
+// A method to be called by the backend as soon as the first token is generated
+// (only for token based benchmarks)
+static void FirstTokenCallback(void* context) {
+  auto ft_responses =
+      *(reinterpret_cast<std::vector<::mlperf::QuerySampleResponse>*>(context));
+  ::mlperf::FirstTokenComplete(ft_responses.data(), ft_responses.size());
+}
+
 void MlperfDriver::IssueQuery(
     const std::vector<::mlperf::QuerySample>& samples) {
   std::vector<::mlperf::QuerySampleResponse> responses;
+  std::vector<::mlperf::QuerySampleResponse> ft_responses;
   std::vector<std::vector<uint8_t>> response_data;
 
   if (scenario_ == "Offline") {
@@ -46,7 +55,14 @@ void MlperfDriver::IssueQuery(
         backend_->SetInputs(inputs, b);
       }
 
-      backend_->IssueQuery();
+      // TODO maybe don't do these 2 lines for non token stuff
+      // TODO figure out what this vector sample variable is
+      ft_responses.clear();
+      ft_responses.push_back(
+          {sample.back().index, reinterpret_cast<std::uintptr_t>(nullptr), 0});
+
+      backend_->IssueQuery(&FirstTokenCallback,
+                           reinterpret_cast<void*>(&ft_responses));
 
       for (int b = 0; b < batch_; b++) {
         if (idx + b == samples.size()) break;  // ignore extra data
@@ -67,15 +83,30 @@ void MlperfDriver::IssueQuery(
       ::mlperf::QuerySample sample = samples.at(idx);
       std::vector<void*> inputs = dataset_->GetData(sample.index);
       backend_->SetInputs(inputs);
-      backend_->IssueQuery();
+
+      // TODO maybe don't do these 2 lines for non token stuff
+      ft_responses.clear();
+      ft_responses.push_back(
+          {sample.id, reinterpret_cast<std::uintptr_t>(nullptr), 0});
+
+      backend_->IssueQuery(&FirstTokenCallback,
+                           reinterpret_cast<void*>(&ft_responses));
 
       // Report to mlperf.
       std::vector<void*> outputs = backend_->GetPredictedOutputs();
       response_data.push_back(dataset_->ProcessOutput(sample.index, outputs));
-      responses.push_back(
-          {sample.id,
-           reinterpret_cast<std::uintptr_t>(response_data[idx].data()),
-           response_data[idx].size()});
+      if (use_tokens_) {
+        responses.push_back(
+            {sample.id,
+             reinterpret_cast<std::uintptr_t>(response_data[idx].data()),
+             response_data[idx].size(),
+             dataset_->GetOutputTokenCount(sample.index)});
+      } else {
+        responses.push_back(
+            {sample.id,
+             reinterpret_cast<std::uintptr_t>(response_data[idx].data()),
+             response_data[idx].size()});
+      }
       backend_->FlushQueries();
       query_counter_ += 1;
     }
@@ -86,19 +117,33 @@ void MlperfDriver::IssueQuery(
 void MlperfDriver::RunMLPerfTest(const std::string& mode, int min_query_count,
                                  double min_duration, double max_duration,
                                  int single_stream_expected_latency_ns,
-                                 const std::string& output_dir) {
+                                 const std::string& output_dir,
+                                 bool use_tokens) {
   ::mlperf::LogSettings log_settings;
   log_settings.log_output.outdir = output_dir;
   log_settings.log_output.copy_summary_to_stdout = true;
 
   ::mlperf::TestSettings mlperf_settings;
-  // https://github.com/mlcommons/inference/blob/master/mlperf.conf
-  mlperf_settings.qsl_rng_seed = 3066443479025735752UL;
-  mlperf_settings.sample_index_rng_seed = 10688027786191513374UL;
-  mlperf_settings.schedule_rng_seed = 14962580496156340209UL;
+  // https://github.com/mlcommons/inference/blob/master/loadgen/mlperf.conf
+  // https://github.com/mlcommons/inference/blob/2ee7190205bab7941fe6cea5c29479228dc1d8f5/loadgen/mlperf.conf#L41-L43
+  mlperf_settings.qsl_rng_seed = 2465351861681999779UL;
+  mlperf_settings.sample_index_rng_seed = 14276810075590677512UL;
+  mlperf_settings.schedule_rng_seed = 3936089224930324775UL;
 
   mlperf_settings.min_query_count = min_query_count;
-  mlperf_settings.mode = Str2TestMode(mode);
+  use_tokens_ = use_tokens;
+  mlperf_settings.use_token_latencies = use_tokens;
+  // mlperf_settings.server_target_qps = 0.1;
+
+  // Prevent datasets with performance sample count 0 from running.
+  // This function isn't expected to see a Submission run mode, only Accuracy
+  // and Performance separately.
+  ::mlperf::TestMode runMode = Str2TestMode(mode);
+  if (dataset_->PerformanceSampleCount() == 0 &&
+      runMode == ::mlperf::TestMode::PerformanceOnly)
+    return;
+
+  mlperf_settings.mode = runMode;
   mlperf_settings.min_duration_ms =
       static_cast<uint64_t>(std::ceil(min_duration * 1000.0));
   // Note: max_duration_ms works only in SingleStream scenario.

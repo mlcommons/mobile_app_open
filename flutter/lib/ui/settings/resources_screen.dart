@@ -15,10 +15,10 @@ import 'package:mlperfbench/ui/nil.dart';
 
 class ResourcesScreen extends StatefulWidget {
   final bool autoStart;
-  final Benchmark? singleBenchmarkDownload;
+  final List<Benchmark>? benchmarksToDownload;
 
   const ResourcesScreen(
-      {this.autoStart = false, this.singleBenchmarkDownload, super.key});
+      {this.autoStart = false, this.benchmarksToDownload, super.key});
 
   @override
   State<ResourcesScreen> createState() => _ResourcesScreen();
@@ -38,15 +38,14 @@ class _ResourcesScreen extends State<ResourcesScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await state.loadResources(
           downloadMissing: true,
-          benchmarks: widget.singleBenchmarkDownload != null
-              ? [widget.singleBenchmarkDownload!]
-              : state.activeBenchmarks,
+          benchmarks: widget.benchmarksToDownload ?? state.activeBenchmarks,
         );
-        if (state.error != null) {
+        if (state.resourceError != null) {
           if (!mounted) return;
-          await showErrorDialog(context, <String>[state.error.toString()]);
+          await showErrorDialog(
+              context, <String>[state.resourceError.toString()]);
           // Reset both the error and stacktrace for further operation
-          state.error = null;
+          state.resourceError = null;
           state.stackTrace = null;
         }
       });
@@ -217,12 +216,12 @@ class _ResourcesScreen extends State<ResourcesScreen> {
                 downloadMissing: true,
                 benchmarks: benchmarks,
               );
-              if (state.error != null) {
+              if (state.resourceError != null) {
                 if (!mounted) return;
                 await showErrorDialog(
-                    context, <String>[state.error.toString()]);
+                    context, <String>[state.resourceError.toString()]);
                 // Reset both the error and stacktrace for further operation
-                state.error = null;
+                state.resourceError = null;
                 state.stackTrace = null;
               }
             },

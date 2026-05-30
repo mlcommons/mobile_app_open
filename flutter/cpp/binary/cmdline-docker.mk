@@ -18,3 +18,9 @@ docker/cmdline/android/release: flutter/android/docker/image
 	MSYS2_ARG_CONV_EXCL="*" docker run \
 		${flutter_common_docker_flags} \
 		make cmdline/android/bins/release
+
+.PHONY: docker/cmdline/linux/release
+docker/cmdline/linux/release: flutter/android/docker/image
+	MSYS2_ARG_CONV_EXCL="*" docker run \
+		${flutter_common_docker_flags} \
+		make cmdline/linux/bins/release

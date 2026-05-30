@@ -36,8 +36,8 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "HTP"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/mobilenet_v4_htp.dlc"
-      model_checksum: "769cc5495681c010eedaade2f4fee5bf"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/mobilenet_v4_htp.dlc"
+      model_checksum: "9bf2200ae028dcf17041f530371c7b26"
     }
   }
   delegate_selected: "SNPE_DSP"
@@ -65,8 +65,8 @@ benchmark_setting {
     accelerator_desc: "HTP"
     batch_size: 12288
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/mobilenet_v4_htp_batched_4.dlc"
-      model_checksum: "e34f79344c71ea2e625b17ca166cf144"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/mobilenet_v4_htp_batched_4.dlc"
+      model_checksum: "c0f665a63bac7dcb2f592403894ddfed"
     }
   }
   delegate_selected: "SNPE_DSP"
@@ -93,8 +93,8 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "HTP"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/ssd_mobiledet_qat_htp.dlc"
-      model_checksum: "ecd8e895a6ffd9d0f558af143aa6a483"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/ssd_mobiledet_qat_htp.dlc"
+      model_checksum: "ef219d5e618f933486ee107393b0bccd"
     }
   }
   delegate_selected: "SNPE_DSP"
@@ -129,8 +129,8 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/mobilebert_quantized_htp.dlc"
-      model_checksum: "b346d91294c6faee2d1b88e4846fae6e"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/mobilebert_quantized_htp.dlc"
+      model_checksum: "2a1e282552998aec941bb560dd2b7e6c"
     }
   }
   delegate_selected: "SNPE_DSP"
@@ -161,8 +161,8 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/mobile_mosaic_htp.dlc"
-      model_checksum: "0a4cf9d1349a66ef86dc1f1f2b1070cb"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/mobile_mosaic_htp.dlc"
+      model_checksum: "8604d60708eb21e6b1d4024b10b52d19"
     }
   }
   delegate_selected: "SNPE_DSP"
@@ -197,8 +197,8 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/snusr_htp.dlc"
-      model_checksum: "81b860b70814bbfab3079805b6826eab"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/snusr_htp.dlc"
+      model_checksum: "bf3e54f70b770668494ab02ead11b1df"
     }
   }
   delegate_selected: "SNPE_DSP"

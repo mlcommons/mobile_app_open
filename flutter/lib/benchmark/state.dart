@@ -38,7 +38,8 @@ class BenchmarkState extends ChangeNotifier {
   late final TaskRunner taskRunner;
   late final BoardDecoder boardDecoder;
 
-  Object? error;
+  Object? resourceError;
+  Object? benchmarkError;
   StackTrace? stackTrace;
 
   bool taskConfigFailedToLoad = false;
@@ -77,6 +78,10 @@ class BenchmarkState extends ChangeNotifier {
 
   List<Benchmark> get allBenchmarks => _benchmarkStore.allBenchmarks;
 
+  List<Benchmark> get looseBenchmarks => _benchmarkStore.looseBenchmarks;
+
+  List<BenchmarkSet> get benchmarkSets => _benchmarkStore.benchmarkSets;
+
   List<Benchmark> get activeBenchmarks => _benchmarkStore.activeBenchmarks;
 
   late BenchmarkStore _benchmarkStore;
@@ -110,7 +115,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("Can't load resources: $e");
       print(trace);
-      error = e;
+      resourceError = e;
       stackTrace = trace;
       taskConfigFailedToLoad = true;
       notifyListeners();
@@ -126,7 +131,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("Can't load resources: $e");
       print(trace);
-      error = e;
+      resourceError = e;
       stackTrace = trace;
       taskConfigFailedToLoad = true;
       notifyListeners();
@@ -169,12 +174,12 @@ class BenchmarkState extends ChangeNotifier {
         purgeOldCache: false,
         downloadMissing: false,
       );
-      error = null;
+      resourceError = null;
       stackTrace = null;
       taskConfigFailedToLoad = false;
     } catch (e, s) {
       print('Could not load resources due to error: $e');
-      error = e;
+      resourceError = e;
       stackTrace = s;
     }
     await Wakelock.disable();
@@ -191,7 +196,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print("Can't load resources: $e");
       print(trace);
-      state.error = e;
+      state.resourceError = e;
       state.stackTrace = trace;
       state.taskConfigFailedToLoad = true;
     }
@@ -212,7 +217,7 @@ class BenchmarkState extends ChangeNotifier {
     }
     await configManager.loadConfig(name);
     _store.chosenConfigurationName = name;
-    error = null;
+    resourceError = null;
     stackTrace = null;
     taskConfigFailedToLoad = false;
 
@@ -293,6 +298,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e) {
       _doneRunning = null;
       print('Error: $e');
+      benchmarkError = e;
       rethrow;
     } finally {
       if (currentLogDir.isNotEmpty && !_store.keepLogs) {
@@ -329,7 +335,7 @@ class BenchmarkState extends ChangeNotifier {
     } catch (e, trace) {
       print('unable to restore previous extended result: $e');
       print(trace);
-      error = e;
+      resourceError = e;
       stackTrace = trace;
       _store.previousExtendedResult = '';
       resetCurrentResults();
@@ -345,6 +351,39 @@ class BenchmarkState extends ChangeNotifier {
 
   void benchmarkSetDelegate(Benchmark benchmark, String delegate) {
     benchmark.benchmarkSettings.delegateSelected = delegate;
+    notifyListeners();
+  }
+
+  void benchmarkSetOption(
+      BenchmarkSet benchmarkSet, String option, bool value) {
+    benchmarkSet.optionSets[benchmarkSet.optionMap[option]!]
+        .setOptionTo(option, value);
+    benchmarkSet.applyOptions();
+    notifyListeners();
+  }
+
+// Config section controls
+  final Set<BenchmarkSet> _openAdvancedSets = {};
+  bool isAdvancedConfigOpen(BenchmarkSet set) =>
+      _openAdvancedSets.contains(set);
+  void toggleAdvancedConfig(BenchmarkSet set) {
+    _openAdvancedSets.contains(set)
+        ? _openAdvancedSets.remove(set)
+        : _openAdvancedSets.add(set);
+    notifyListeners();
+  }
+
+  final Set<String> _expandedOptionSets = {};
+
+  bool isOptionsExpanded(BenchmarkSet bset) =>
+      _expandedOptionSets.contains(bset.config.id);
+
+  void toggleOptionsExpanded(BenchmarkSet bset) {
+    if (_expandedOptionSets.contains(bset.config.id)) {
+      _expandedOptionSets.remove(bset.config.id);
+    } else {
+      _expandedOptionSets.add(bset.config.id);
+    }
     notifyListeners();
   }
 
