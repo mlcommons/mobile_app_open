@@ -226,8 +226,11 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       children: <Widget>[
         // 1. Render Benchmark Sets (Expandable)
         for (var benchmarkSet in state.benchmarkSets) ...[
-          _benchmarkSetResultRow(benchmarkSet),
-          const Divider(height: 1),
+          if (benchmarkSet.benchmarks.isNotEmpty)
+            _benchmarkSetResultRow(benchmarkSet),
+          if (benchmarkSet != state.benchmarkSets.last ||
+              state.looseBenchmarks.isNotEmpty)
+            const Divider(height: 1),
         ],
         // 2. Render Loose Benchmarks (Stand-alone)
         for (var benchmark in state.looseBenchmarks) ...[
