@@ -85,4 +85,20 @@ For more information about Core ML, visit [https://developer.apple.com/documenta
 
 The MLPerf Mobile App code is licensed under the Apache 2.0 License. The models used in the benchmarks are subject to their respective licenses. For detailed licensing information, please refer to the [LICENSE.md](https://github.com/mlcommons/mobile_app_open/blob/master/LICENSE.md) file in the repository.
 
+### Large Language Models
+
+The LLM benchmarks in this app are built with Llama. The following Meta Llama models are used, and your use of them is governed by the Llama Community License Agreement and the Llama Acceptable Use Policy:
+
+* Llama 3.1 8B-Instruct — Llama 3.1 Community License Agreement ([https://www.llama.com/llama3_1/license/](https://www.llama.com/llama3_1/license/)) and Acceptable Use Policy ([https://www.llama.com/llama3_1/use-policy/](https://www.llama.com/llama3_1/use-policy/))
+* Llama 3.2 3B-Instruct — Llama 3.2 Community License Agreement ([https://www.llama.com/llama3_2/license/](https://www.llama.com/llama3_2/license/)) and Acceptable Use Policy ([https://www.llama.com/llama3_2/use-policy/](https://www.llama.com/llama3_2/use-policy/))
+
+Llama is a trademark of Meta Platforms, Inc. "Built with Llama." Use of these models is governed by Meta's license terms linked above.
+
+### Open Source Software Licenses
+
+This app includes open source software components. A complete report of the third-party open source dependencies and their licenses is available here:
+
+<!-- markdown-link-check-disable-next-line -->
+[Open Source License Report](https://app.fossa.com/reports/eb25eabe-7e15-45fb-ac34-b1f1cd848b03)
+
 The datasets used for benchmarking are subject to their original licenses and terms of use. Please consult the documentation of each specific dataset for details on usage rights and restrictions.
