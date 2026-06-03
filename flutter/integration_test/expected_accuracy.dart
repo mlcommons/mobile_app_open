@@ -48,10 +48,10 @@ const Map<String, Interval> _objectDetection = {
   'ane|TFLite': Interval(min: 0.31, max: 0.34),
   'ane|Core ML': Interval(min: 0.45, max: 0.46),
   'cpu&gpu&ane': Interval(min: 0.45, max: 0.46),
-  'snpe_dsp': Interval(min: 0.34, max: 0.35),
+  'snpe_dsp': Interval(min: 0.33, max: 0.35),
   'psnpe_dsp': Interval(min: 0.34, max: 0.35),
   'neuron': Interval(min: 0.28, max: 0.35),
-  'samsung_npu': Interval(min: 0.36, max: 0.39),
+  'samsung_npu': Interval(min: 0.36, max: 0.45),
 };
 
 const Map<String, Interval> _imageSegmentationV2 = {

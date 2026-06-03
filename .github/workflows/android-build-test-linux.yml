@@ -314,6 +314,10 @@ jobs:
             device: "Samsung Galaxy S25 Ultra-15.0"
           - backend: "samsung"
             device: "Samsung Galaxy S24-14.0"
+          - backend: "qti"
+            device: "Samsung Galaxy S26 Ultra-16.0" # SM-S948B, Snapdragon
+          - backend: "samsung"
+            device: "Samsung Galaxy S26-16.0" # SM-S942B, Exynos 2600
           - backend: "mtk"
             device: "Samsung Galaxy Tab S10 Plus-15.0"
     env:
