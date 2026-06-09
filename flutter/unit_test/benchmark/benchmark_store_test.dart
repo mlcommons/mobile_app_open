@@ -47,8 +47,8 @@ void main() {
       expect(store.allBenchmarks.first.benchmarkSettings, backendSettings1);
       expect(
         store.allBenchmarks.first.isActive,
-        true,
-        reason: 'benchmarks must be enabled by default',
+        false,
+        reason: 'benchmarks must be disabled by default',
       );
     });
 
@@ -99,7 +99,7 @@ void main() {
       final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
-        taskSelection: {},
+        taskSelection: {task1.id: true},
       );
 
       final modes = [BenchmarkRunModeEnum.accuracyOnly.accuracyRunMode];
@@ -136,7 +136,7 @@ void main() {
       final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
-        taskSelection: {},
+        taskSelection: {task1.id: true},
       );
 
       final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
@@ -167,7 +167,7 @@ void main() {
       final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
-        taskSelection: {},
+        taskSelection: {task1.id: true},
       );
 
       final modes = [
