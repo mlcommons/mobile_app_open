@@ -105,7 +105,7 @@ std::map<uint32_t, SocInfo> socDetails =
                           std::vector<int>({4, 5, 6, 7}), 8, true,
                           /* stable_diffusion */ false,
                           /* genie */ false)},
-            {UNSUPPORTED_SOC_ID,
+            {UNSUPPORTED_SOC_ID, 
              SocInfo(2, 0, 0, 0, false, qti_settings_default_dsp, "Snapdragon",
                      1, std::vector<int>({0, 1, 2, 3}),
                      std::vector<int>({4, 5, 6, 7}), 8, false)},
