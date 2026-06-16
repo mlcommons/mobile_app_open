@@ -18,6 +18,7 @@ load(
     "tflite_jni_binary",
 )
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
+load("@litert//litert/build_common:special_rule.bzl", "litert_gpu_accelerator_prebuilts")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -79,7 +80,8 @@ cc_library(
             "-fno-omit-frame-pointer",
         ],
         "//conditions:default": [],
-    }),
+        # fpermissive required due to bug in LiteRT (as of version 2.1.2)
+    }) + ["-UTFLITE_USE_OPAQUE_DELEGATE", "-fpermissive"],
     deps = [
         ":embedding_utils",
         ":tflite_settings",
@@ -91,8 +93,11 @@ cc_library(
         "@litert//tflite/c:c_api",
         "@litert//tflite/c:c_api_experimental",
         "@litert//tflite/c:common",
-        "@litert//tflite/kernels:builtin_ops",
-    ] + select({
+        "@litert//litert/cc:litert_compiled_model",
+        "@litert//litert/cc:litert_environment",
+        "@litert//litert/cc:litert_tensor_buffer",
+    ]
+    + select({
         "@org_tensorflow//tensorflow:android": [
             "@litert//tflite/delegates/gpu:delegate",
             "@litert//tflite/delegates/xnnpack:xnnpack_delegate",
@@ -113,6 +118,9 @@ tflite_jni_binary(
     linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [
         ":tflite_c",
+    ],
+    linkopts = [
+        "-Wl,--export-dynamic",
     ],
 )
 

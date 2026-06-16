@@ -25,16 +25,40 @@ limitations under the License.
 #include "neuron/APUWareUtilsApi.h"
 #endif
 
+#include "absl/log/log.h"
+#include "absl/types/span.h"
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/utils.h"
-#include "tensorflow/core/platform/logging.h"
-#include "tflite/c/common.h"
+#include "litert/cc/litert_compiled_model.h"
+#include "litert/cc/litert_environment.h"
+#include "litert/cc/litert_tensor_buffer.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
 static bool backendExists = false;
+
+static bool CopyKVBuffer(litert::TensorBuffer& src, litert::TensorBuffer& dst,
+                         int float_count) {
+  std::vector<float> tmp(float_count);
+  if (!src.Read<float>(absl::MakeSpan(tmp))) return false;
+  return !!dst.Write<float>(absl::MakeConstSpan(tmp));
+}
+
+static size_t lookup (const std::unordered_map<std::string, size_t>& map,
+                 const std::string& name) {
+  auto it = map.find(name);
+  if (it == map.end()) return std::numeric_limits<size_t>::max();
+  return it->second;
+};
+
+static std::unordered_map<std::string, size_t> make_index_map (const std::vector<std::string_view>& names) {
+  std::unordered_map<std::string, size_t> map;
+  for (size_t i = 0; i < names.size(); ++i)
+    map[std::string(names[i])] = i;
+  return map;
+};
 
 // Destroy the backend pointer and its data.
 void LLMPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
@@ -55,47 +79,20 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
 
   LLMBackendData* backend_data = new LLMBackendData();
 
-  std::string llm_model_path = std::string(model_path);
-  // Checking if the last section of the path doesn't have a file extension
-  // (indicates a directory is provided). Could be problematic when using hidden
-  // directories, in which case it would be best to provide a trailing slash.
-  if (llm_model_path.substr(llm_model_path.rfind('/') + 1).find('.') ==
-      std::string::npos)
-    llm_model_path += '/' + mlperf::mobile::GetConfigValue(
-                                configs, "model_filename", std::string(""));
-
-  // Load the model.
-  backend_data->model =
-      tflite::FlatBufferModel::BuildFromFile(llm_model_path.c_str()).release();
-  if (!backend_data->model) {
-    LOG(ERROR) << "Failed to load model: " << model_path;
+  if (!BuildCompiledModel(backend_data, model_path)) {
+    LOG(ERROR) << "Failed to build CompiledModel from: " << model_path;
+    backend_delete(backend_data);
+    return nullptr;
+  }
+  if (!BuildDecodeBuffers(backend_data)) {
+    LOG(ERROR) << "Failed to allocate decode buffers";
     backend_delete(backend_data);
     return nullptr;
   }
 
-  // Get the thread count in config
-  for (size_t i = 0; i < configs->count; ++i) {
-    if (strcmp(configs->keys[i], "num_threads") == 0) {
-      if (int value = atoi(configs->values[i]); value != 0) {
-        backend_data->num_threads = static_cast<uint16_t>(value);
-        break;
-      }
-    }
-  }
-
-  backend_data->interpreter =
-      BuildInterpreter(backend_data->model, backend_data->num_threads);
-  if (!backend_data->interpreter) {
-    LOG(ERROR) << "Failed to load interpreter";
-    backend_delete(backend_data);
-    return nullptr;
-  }
-
-  backend_data->kv_cache = BuildKVCache(backend_data->interpreter);
-  // TODO kv_cache check
-
-  backend_data->decode_runner =
-      GetDecodeRunner(backend_data->interpreter, backend_data->kv_cache);
+  LOG(ERROR) << "backend_create: model=" << (backend_data->model ? "ok" : "null")
+             << " decode_input_bufs=" << backend_data->decode_input_bufs.size()
+             << " num_kv_layers=" << backend_data->num_kv_layers;
 
   return backend_data;
 }
@@ -124,8 +121,11 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
     mlperf_backend_ptr_t backend_ptr) {
   LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
 
-  int max_seq_size = backend_data->tensors.prefill_input()->dims->data[1];
-  int kv_cache_max_size = backend_data->tensors.kv_cache_k_0()->dims->data[1];
+  //ResetPrefillKV(backend_data);
+
+  int max_seq_size = backend_data->prefill_seq_size;
+
+  int kv_cache_max_size = backend_data->kv_cache_max_size;
   int prefill_seq_size = std::min(
       static_cast<int>(backend_data->prompt_tokens.size()), max_seq_size);
   bool prefill_overflow =
@@ -138,34 +138,41 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
       prefill_overflow ? prefill_seq_size : (prefill_seq_size - 1);
   int decode_tokens = prefill_overflow ? overflow_size - 1 : 1;
 
-  std::memset(backend_data->tensors.prefill_input()->data.i32, 0,
-              backend_data->tensors.prefill_input()->bytes);
-  std::memset(backend_data->tensors.prefill_input_pos()->data.i32, 0,
-              backend_data->tensors.prefill_input_pos()->bytes);
-  // If the prefill can fit the entire input, leave one token for decode,
-  // otherwise prefill as much of the input as possible.
-  int i = 0;
-  for (; i < prefill_amount; ++i) {
-    backend_data->tensors.prefill_input()->data.i32[i] =
-        backend_data->prompt_tokens[i];
-    backend_data->tensors.prefill_input_pos()->data.i32[i] = i;
-  }
-  for (; i < max_seq_size; ++i) {
-    backend_data->tensors.prefill_input()->data.i32[i] = 128009;
-    backend_data->tensors.prefill_input_pos()->data.i32[i] = i;
+  std::vector<int32_t> tokens_data(max_seq_size, 128009);
+  std::vector<int32_t> pos_data(max_seq_size);
+  for (int i = 0; i < prefill_amount; ++i)
+    tokens_data[i] = backend_data->prompt_tokens[i];
+  for (int i = 0; i < max_seq_size; ++i) pos_data[i] = i;
+  backend_data->prefill_input_bufs[backend_data->prefill_tokens_idx].Write<int32_t>(
+      absl::MakeConstSpan(tokens_data));
+  backend_data->prefill_input_bufs[backend_data->prefill_pos_idx].Write<int32_t>(
+      absl::MakeConstSpan(pos_data));
+  if (backend_data->kv_buf_float_count > 0) {
+    ResetPrefillKV(backend_data);
   }
 
-  MINIMAL_CHECK(backend_data->prefill_runner->Invoke() == kTfLiteOk);
+  MINIMAL_CHECK(backend_data->model->Run(
+      backend_data->current_prefill_sig_idx,
+      absl::MakeSpan(backend_data->prefill_input_bufs),
+      absl::MakeSpan(backend_data->prefill_output_bufs)));
+
+  // Swap the prefill KV buffers with the decode ones
+  TransferKV(backend_data);
 
   // Run decode once if input fits inside prefill, otherwise decode the rest of
   // the input one by one
   int next_token = backend_data->prompt_tokens[prefill_amount];
   int next_position = prefill_amount;
   for (int i = 0; i < decode_tokens; ++i) {
-    backend_data->tensors.decode_input()->data.i32[0] = next_token;
-    backend_data->tensors.decode_input_pos()->data.i32[0] = next_position;
-    MINIMAL_CHECK(backend_data->decode_runner->Invoke() == kTfLiteOk);
+    std::vector<int32_t> tok{next_token}, pos{next_position};
+    backend_data->decode_input_bufs[backend_data->decode_tokens_idx].Write<int32_t>(absl::MakeConstSpan(tok));
+    backend_data->decode_input_bufs[backend_data->decode_pos_idx].Write<int32_t>(absl::MakeConstSpan(pos));
+    MINIMAL_CHECK(backend_data->model->Run(
+        backend_data->decode_sig_idx,
+        absl::MakeSpan(backend_data->decode_input_bufs),
+        absl::MakeSpan(backend_data->decode_output_bufs)));
     next_token = backend_data->prompt_tokens[++next_position];
+    UpdateDecodeKV(backend_data);
   }
 
   return MLPERF_SUCCESS;
@@ -187,7 +194,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(
   backend_issue_first_token_query(backend_ptr);
   callback(context);
 
-  int kv_cache_max_size = backend_data->tensors.kv_cache_k_0()->dims->data[1];
+  int kv_cache_max_size = backend_data->kv_cache_max_size;
   size_t input_size = backend_data->prompt_tokens.size();
 
   // Use a manual number for maximum tokens to generate as long as it's not
@@ -199,15 +206,20 @@ mlperf_status_t LLMPipeline::backend_issue_query(
   MINIMAL_CHECK(decode_steps > 0);
 
   backend_data->output_tokens.reserve(decode_steps);
-  int next_token = GreedySampler(backend_data->tensors.logits_output());
+  int next_token = GreedySampler(backend_data);
   if (check_stop_id(next_token)) return MLPERF_SUCCESS;
   backend_data->output_tokens.push_back(next_token);
   int next_position = input_size;
   for (int i = 0; i < decode_steps; ++i) {
-    backend_data->tensors.decode_input()->data.i32[0] = next_token;
-    backend_data->tensors.decode_input_pos()->data.i32[0] = next_position;
-    MINIMAL_CHECK(backend_data->decode_runner->Invoke() == kTfLiteOk);
-    next_token = GreedySampler(backend_data->tensors.logits_output());
+    std::vector<int32_t> tok{next_token}, pos{next_position};
+    backend_data->decode_input_bufs[backend_data->decode_tokens_idx].Write<int32_t>(absl::MakeConstSpan(tok));
+    backend_data->decode_input_bufs[backend_data->decode_pos_idx].Write<int32_t>(absl::MakeConstSpan(pos));
+    MINIMAL_CHECK(backend_data->model->Run(
+        backend_data->decode_sig_idx,
+        absl::MakeSpan(backend_data->decode_input_bufs),
+        absl::MakeSpan(backend_data->decode_output_bufs)));
+    UpdateDecodeKV(backend_data);
+    next_token = GreedySampler(backend_data);
     backend_data->output_tokens.push_back(next_token);
     next_position += 1;
     if (check_stop_id(next_token)) break;
@@ -251,31 +263,20 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
     return MLPERF_SUCCESS;
   }
 
-  for (auto& [_, vec] : backend_data->kv_cache) {
-    std::fill(vec.begin(), vec.end(), 0.0f);
-  }
-
   backend_data->prompt_tokens = *(reinterpret_cast<std::vector<int>*>(data));
 
-  uint16_t effective_prefill_token_size =
-      backend_data->prompt_tokens.size() - 1;  // assuming max tokens is <16k
-
-  backend_data->prefill_runner =
-      GetPrefillRunner(backend_data->interpreter, effective_prefill_token_size,
-                       backend_data->kv_cache);
-
-  // Get the necessary tensor pointers for inference.
-  backend_data->tensors.get_tensors(backend_data->prefill_runner,
-                                    backend_data->decode_runner);
-
-  if (effective_prefill_token_size + 1 >
-      backend_data->tensors.kv_cache_k_0()->dims->data[1]) {
+  ResetKV(backend_data);
+  size_t effective_prefill_token_size = backend_data->prompt_tokens.size() - 1;
+  size_t sig_idx =
+      GetSuitablePrefillSignature(backend_data, effective_prefill_token_size);
+  if (!BuildPrefillBuffers(backend_data, sig_idx)) return MLPERF_FAILURE;
+  if ((int)(effective_prefill_token_size + 1) >
+      backend_data->kv_cache_max_size) {
     LOG(ERROR) << "Input size ("
                << std::to_string(effective_prefill_token_size + 1)
                << ") exceeds KV cache limit ("
-               << std::to_string(
-                      backend_data->tensors.kv_cache_k_0()->dims->data[1])
-               << ")." << std::endl;
+               << std::to_string(backend_data->kv_cache_max_size) << ")."
+               << std::endl;
     return MLPERF_FAILURE;
   }
 
@@ -318,115 +319,283 @@ void* LLMPipeline::backend_get_buffer(size_t n) { return ::operator new(n); }
 
 void LLMPipeline::backend_release_buffer(void* p) { ::operator delete(p); }
 
-tflite::Interpreter* LLMPipeline::BuildInterpreter(
-    tflite::FlatBufferModel* model, int num_threads) {
-  tflite::ops::builtin::BuiltinOpResolver resolver;
-  tflite::InterpreterBuilder builder(*model, resolver);
-  MINIMAL_CHECK_PTR(builder.SetNumThreads(num_threads) == kTfLiteOk);
-  std::unique_ptr<tflite::Interpreter> interpreter;
-  builder(&interpreter);
+// TODO for private methods, provide only necessary data
 
-  MINIMAL_CHECK_PTR(interpreter != nullptr);
+bool LLMPipeline::BuildCompiledModel(LLMBackendData* backend_ptr,
+                                     const char* model_path) {
+  auto env = litert::Environment::Create({});
+  if (!env) {
+    LOG(ERROR) << "Environment::Create failed";
+    return false;
+  }
+  backend_ptr->env = std::make_unique<litert::Environment>(std::move(*env));
 
-  return interpreter.release();
+  auto options = litert::Options::Create();
+  options->SetHardwareAccelerators(litert::HwAccelerators::kGpu | litert::HwAccelerators::kCpu);
+
+  auto model =
+      litert::CompiledModel::Create(*backend_ptr->env, model_path, *options);
+  if (!model) {
+    LOG(ERROR) << "CompiledModel::Create failed";
+    return false;
+  }
+  backend_ptr->model =
+      std::make_unique<litert::CompiledModel>(std::move(*model));
+
+  auto decode = backend_ptr->model->GetSignatureIndex("decode");
+  if (!decode) {
+    LOG(ERROR) << "No 'decode' signature";
+    return false;
+  }
+  backend_ptr->decode_sig_idx = *decode;
+
+  static const int kSizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096};
+  for (int seq : kSizes) {
+    auto sig_idx =
+        backend_ptr->model->GetSignatureIndex("prefill_" + std::to_string(seq));
+    if (!sig_idx) continue;
+    // auto reqs = backend_ptr->model->GetInputBufferRequirements(*sig_idx, 1);
+    // if (!reqs) continue;
+    // auto buffer_size = reqs->BufferSize();
+    // int actual = static_cast<int>(*buffer_size / sizeof(int32_t));
+    backend_ptr->prefill_sigs.push_back(
+        {*sig_idx, seq});
+  }
+  if (backend_ptr->prefill_sigs.empty()) {
+    LOG(ERROR) << "No prefill signatures found";
+    return false;
+  }
+  std::sort(backend_ptr->prefill_sigs.begin(), backend_ptr->prefill_sigs.end(),
+            [](const auto& a, const auto& b) { return a.second < b.second; });
+  return true;
 }
 
-kv_cache_t LLMPipeline::BuildKVCache(tflite::Interpreter* interpreter) {
-  tflite::SignatureRunner* runner = interpreter->GetSignatureRunner("decode");
-  if (runner == nullptr) {
-    return {};
+bool LLMPipeline::BuildDecodeBuffers(LLMBackendData* backend_ptr) {
+  auto input_bufs =
+      backend_ptr->model->CreateInputBuffers(backend_ptr->decode_sig_idx);
+  if (!input_bufs) {
+    LOG(ERROR) << "CreateInputBuffers (decode) failed";
+    return false;
   }
-  // The two arguments excluded are `tokens` and `input_pos`.
-  // TODO more arguments might need to be excluded
-  size_t num_layers = (runner->input_size() - 2) / 2;
-  if (num_layers == 0) {
-    return {};
+  backend_ptr->decode_input_bufs = std::move(*input_bufs);
+
+  const auto input_names_exp = backend_ptr->model->GetSignatureInputNames(backend_ptr->decode_sig_idx);
+  if (!input_names_exp) {
+    LOG(ERROR) << "Couldn't get input names";
+    return false;
+  }
+  const auto& input_names = *input_names_exp;
+  auto it = absl::c_find(input_names, "tokens");
+  if (it != input_names.end())
+    backend_ptr->decode_tokens_idx = std::distance(input_names.begin(), it);
+  it = absl::c_find(input_names, "input_pos");
+  if (it != input_names.end())
+    backend_ptr->decode_pos_idx = std::distance(input_names.begin(), it);
+
+  auto output_bufs =
+      backend_ptr->model->CreateOutputBuffers(backend_ptr->decode_sig_idx);
+  if (!output_bufs) {
+    LOG(ERROR) << "CreateOutputBuffers (decode) failed";
+    return false;
+  }
+  backend_ptr->decode_output_bufs = std::move(*output_bufs);
+
+  const auto output_names_exp = backend_ptr->model->GetSignatureOutputNames(backend_ptr->decode_sig_idx);
+  if (!output_names_exp) {
+    LOG(ERROR) << "Couldn't get output names";
+    return false;
+  }
+  const auto& output_names = *output_names_exp;
+  // it = absl::c_find(output_names, "logits");
+  // if (it != output_names.end())
+  //   backend_ptr->logits_idx = std::distance(output_names.begin(), it);
+
+  backend_ptr->decode_input_map  = make_index_map(input_names);
+  backend_ptr->decode_output_map = make_index_map(output_names);
+
+  // tokens, pos
+  backend_ptr->decode_tokens_idx = backend_ptr->decode_input_map.at("tokens");
+  backend_ptr->decode_pos_idx    = backend_ptr->decode_input_map.at("input_pos");
+  backend_ptr->logits_idx        = backend_ptr->decode_output_map.at("logits");
+
+  // There are 2 KV tensors per layer + tokens and pos tensors.
+  // TODO search for "kv_k" instead of using hard coded numbers.
+  backend_ptr->num_kv_layers = (backend_ptr->decode_output_map.size() - 1) / 2;
+      //(static_cast<int>(backend_ptr->decode_input_bufs.size()) - 2) / 2;
+
+  if (backend_ptr->num_kv_layers > 0) {
+    // info on the very first KV_K tensor
+    // TODO get index by name instead of hard coding 2
+    auto kv_metadata = backend_ptr->model->GetInputBufferRequirements(
+        backend_ptr->decode_sig_idx, "kv_cache_k_0");
+    if (!kv_metadata) {
+      LOG(ERROR) << "GetInputBufferRequirements (KV) failed";
+      return false;
+    }
+
+    auto kv_type = backend_ptr->model->GetInputTensorType(backend_ptr->decode_sig_idx, "kv_cache_k_0");
+    if (!kv_type) {
+      LOG(ERROR) << "RankedTensorType failed";
+      return false;
+    }
+    backend_ptr->kv_cache_max_size = (*kv_type).Layout().Dimensions()[1];
+
+    auto buffer_size = kv_metadata->BufferSize();
+    backend_ptr->kv_buf_float_count =
+        static_cast<int>(*buffer_size / sizeof(float));
   }
 
-  kv_cache_t kv_cache;
-  for (int i = 0; i < num_layers; ++i) {
-    std::string k_cache_name = "kv_cache_k_" + std::to_string(i);
-    std::string v_cache_name = "kv_cache_v_" + std::to_string(i);
-    // We are assuming K and V tensors are of the same shape.
-    TfLiteTensor* tensor = runner->input_tensor(k_cache_name.c_str());
-    size_t count = tensor->bytes / sizeof(float);
-    kv_cache.emplace(k_cache_name,
-                     std::vector<float, AlignedAllocator<float>>(count, 0.0f));
-    kv_cache.emplace(v_cache_name,
-                     std::vector<float, AlignedAllocator<float>>(count, 0.0f));
+  auto logits_metadata = backend_ptr->model->GetOutputBufferRequirements(
+      backend_ptr->decode_sig_idx, "logits");
+  if (!logits_metadata) {
+    LOG(ERROR) << "GetOutputBufferRequirements (logits) failed";
+    return false;
   }
 
-  return kv_cache;
+  auto buffer_size = logits_metadata->BufferSize();
+  backend_ptr->vocab_size =
+      static_cast<int>(*buffer_size / sizeof(float));
+  backend_ptr->logits_scratch.resize(backend_ptr->vocab_size);
+  return true;
 }
 
-void LLMPipeline::PrepareRunner(tflite::SignatureRunner* runner,
-                                kv_cache_t& kv_cache) {
-  for (auto& [name, cache] : kv_cache) {
-    TfLiteCustomAllocation allocation = {};
-    allocation.data = static_cast<void*>(cache.data());
-    allocation.bytes = cache.size() * sizeof(float);
-    // Both input and output tensors are set to the same buffer. Not all
-    // delegates support this in-place update. For those cases, we need to do
-    // a ping-pong buffer and update the pointers between inference calls.
-    MINIMAL_CHECK_VOID(runner->SetCustomAllocationForInputTensor(
-                           name.c_str(), allocation) == kTfLiteOk);
-    MINIMAL_CHECK_VOID(runner->SetCustomAllocationForOutputTensor(
-                           name.c_str(), allocation) == kTfLiteOk);
+bool LLMPipeline::BuildPrefillBuffers(LLMBackendData* backend_ptr,
+                                      size_t prefill_sig_idx) {
+  if (backend_ptr->current_prefill_sig_idx == prefill_sig_idx) return true;
+
+  auto input_bufs = backend_ptr->model->CreateInputBuffers(prefill_sig_idx);
+  if (!input_bufs) {
+    LOG(ERROR) << "CreateInputBuffers (prefill) failed";
+    return false;
   }
-  MINIMAL_CHECK_VOID(runner->AllocateTensors() == kTfLiteOk);
+  backend_ptr->prefill_input_bufs = std::move(*input_bufs);
+
+  // get input indices
+  const auto input_names_exp = backend_ptr->model->GetSignatureInputNames(prefill_sig_idx);
+  if (!input_names_exp) {
+    LOG(ERROR) << "Couldn't get input names";
+    return false;
+  }
+  const auto& input_names = *input_names_exp;
+
+  const auto output_names_exp = backend_ptr->model->GetSignatureOutputNames(prefill_sig_idx);
+  if (!output_names_exp) {
+    LOG(ERROR) << "Couldn't get input names";
+    return false;
+  }
+  const auto& output_names = *output_names_exp;
+
+  auto it = absl::c_find(input_names, "tokens");
+  if (it != input_names.end())
+    backend_ptr->prefill_tokens_idx = std::distance(input_names.begin(), it);
+  it = absl::c_find(input_names, "input_pos");
+  if (it != input_names.end())
+    backend_ptr->prefill_pos_idx = std::distance(input_names.begin(), it);
+
+  auto output_bufs = backend_ptr->model->CreateOutputBuffers(prefill_sig_idx);
+  if (!output_bufs) {
+    LOG(ERROR) << "CreateOutputBuffers (prefill) failed";
+    return false;
+  }
+  backend_ptr->prefill_output_bufs = std::move(*output_bufs);
+
+  backend_ptr->prefill_input_map  = make_index_map(input_names);
+  backend_ptr->prefill_output_map = make_index_map(output_names);
+
+  backend_ptr->prefill_tokens_idx = backend_ptr->prefill_input_map.at("tokens");
+  backend_ptr->prefill_pos_idx    = backend_ptr->prefill_input_map.at("input_pos");
+
+  auto reqs =
+      backend_ptr->model->GetInputBufferRequirements(prefill_sig_idx, "tokens");
+  if (reqs){
+    auto buffer_size = reqs->BufferSize();
+    backend_ptr->prefill_seq_size =
+        static_cast<int>(*buffer_size / sizeof(int32_t));
+  }
+
+  backend_ptr->current_prefill_sig_idx = prefill_sig_idx;
+  return true;
 }
 
-tflite::SignatureRunner* LLMPipeline::GetPrefillRunner(
-    tflite::Interpreter* interpreter, std::size_t num_input_tokens,
-    kv_cache_t& kv_cache) {
-  // Find the prefill signature length that best matches the input token size.
-  tflite::SignatureRunner* runner = nullptr;
-  // int best_seq_size = -1;
+size_t LLMPipeline::GetSuitablePrefillSignature(LLMBackendData* backend_ptr,
+                                                size_t num_input_tokens) const {
+  size_t best = backend_ptr->prefill_sigs.back().first;
   size_t delta = std::numeric_limits<size_t>::max();
-  size_t max_prefill_size = 0;
-  std::string max_prefill_key = std::string("");
-  for (const std::string* key : interpreter->signature_keys()) {
-    if (key->find("prefill") == std::string::npos) continue;
-    TfLiteTensor* input_pos = interpreter->GetSignatureRunner(key->c_str())
-                                  ->input_tensor("input_pos");
-    // The expected shape for input position is [Seq].
-    size_t seq_size = input_pos->dims->data[0];
-    // TODO this could be else maybe?
-    if (seq_size > max_prefill_size) {
-      max_prefill_size = seq_size;
-      max_prefill_key = std::string(key->c_str());
-    }
-    if (num_input_tokens <= seq_size && seq_size - num_input_tokens < delta) {
-      runner = interpreter->GetSignatureRunner(key->c_str());
-      // best_seq_size = seq_size;
+  for (const auto& [sig_idx, seq_size] : backend_ptr->prefill_sigs) {
+    if (seq_size >= num_input_tokens && seq_size - num_input_tokens < delta) {
       delta = seq_size - num_input_tokens;
+      best = sig_idx;
     }
   }
-  // fallback to maximum possible size if a runner is not found (most likely
-  // because the seq_size is larger than max_prefill_size)
-  if (!runner && max_prefill_key != "")
-    runner = interpreter->GetSignatureRunner(max_prefill_key.c_str());
-  MINIMAL_CHECK_PTR(runner != nullptr);
-  PrepareRunner(runner, kv_cache);
-  return runner;
+  return best;
 }
 
-tflite::SignatureRunner* LLMPipeline::GetDecodeRunner(
-    tflite::Interpreter* interpreter, kv_cache_t& kv_cache) {
-  tflite::SignatureRunner* runner = interpreter->GetSignatureRunner("decode");
-  MINIMAL_CHECK_PTR(runner != nullptr);
-  PrepareRunner(runner, kv_cache);
-  return runner;
+void LLMPipeline::TransferKV(LLMBackendData* backend_ptr) {
+  for (int i = 0; i < backend_ptr->num_kv_layers; ++i) {
+    for (const char* prefix : {"kv_cache_k_", "kv_cache_v_"}) {
+      std::string name = std::string(prefix) + std::to_string(i);
+      size_t prefill_out_idx = backend_ptr->prefill_output_map.at(name);
+      size_t decode_in_idx   = backend_ptr->decode_input_map.at(name);
+      std::swap(backend_ptr->prefill_output_bufs[prefill_out_idx],
+                backend_ptr->decode_input_bufs[decode_in_idx]);
+    }
+  }
+}
+
+void LLMPipeline::ResetKV(LLMBackendData* backend_ptr) {
+  if (backend_ptr->kv_buf_float_count == 0) return;
+  std::vector<float> zeros(backend_ptr->kv_buf_float_count, 0.0f);
+  for (int i = 0; i < backend_ptr->num_kv_layers; ++i) {
+    for (const char* prefix : {"kv_cache_k_", "kv_cache_v_"}) {
+      std::string name = std::string(prefix) + std::to_string(i);
+      backend_ptr->decode_input_bufs[backend_ptr->decode_input_map.at(name)]
+          .Write<float>(absl::MakeConstSpan(zeros));
+    }
+  }
+}
+
+void LLMPipeline::ResetPrefillKV(LLMBackendData* backend_ptr) {
+  if (backend_ptr->kv_buf_float_count == 0) return;
+  std::vector<float> zeros(backend_ptr->kv_buf_float_count, 0.0f);
+  for (int i = 0; i < backend_ptr->num_kv_layers; ++i) {
+    for (const char* prefix : {"kv_cache_k_", "kv_cache_v_"}) {
+      std::string name = std::string(prefix) + std::to_string(i);
+      backend_ptr->prefill_input_bufs[backend_ptr->prefill_input_map.at(name)]
+          .Write<float>(absl::MakeConstSpan(zeros));
+    }
+  }
+}
+
+void LLMPipeline::UpdateDecodeKV(LLMBackendData* backend_ptr) {
+  for (int i = 0; i < backend_ptr->num_kv_layers; ++i) {
+    for (const char* prefix : {"kv_cache_k_", "kv_cache_v_"}) {
+      std::string name = std::string(prefix) + std::to_string(i);
+      std::swap(
+          backend_ptr->decode_input_bufs[backend_ptr->decode_input_map.at(name)],
+          backend_ptr->decode_output_bufs[backend_ptr->decode_output_map.at(name)]);
+    }
+  }
 }
 
 // A basic greedy sampler (equivalent to argmax).
-int LLMPipeline::GreedySampler(const TfLiteTensor* logits) {
+int LLMPipeline::GreedySampler(LLMBackendData* backend_ptr) {
+  std::vector<float> tmp(backend_ptr->vocab_size);
+  auto span = absl::MakeSpan(tmp);
+  auto ok = backend_ptr->decode_output_bufs[backend_ptr->logits_idx].Read<float>(span);
+  auto meta = backend_ptr->model->GetOutputBufferRequirements(
+      backend_ptr->decode_sig_idx, backend_ptr->logits_idx);
+  if (meta)
+    LOG(ERROR) << "logits buffer size=" << meta->BufferSize()
+               << " expected=" << backend_ptr->vocab_size * sizeof(float);
+  if (!ok) {
+    LOG(ERROR) << "Failed to read logits" << " " << ok.Error().Message();
+    return 0;
+  }
   float max_value = -std::numeric_limits<float>::infinity();
-  int max_index = 0;
-  // logits shape: [Batch, Seq, Vocab], Dtype: float
-  for (int i = 0; i < logits->dims->data[2]; ++i) {
-    if (logits->data.f[i] > max_value) {
-      max_value = logits->data.f[i];
+  int max_index = 5;
+  for (int i = 0; i < backend_ptr->vocab_size; ++i) {
+    if (tmp[i] > max_value) {
+      max_value = tmp[i];
       max_index = i;
     }
   }

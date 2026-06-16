@@ -27,14 +27,12 @@ limitations under the License.
 #include <malloc.h>
 #endif
 
+#include "absl/log/log.h"
 #include "flutter/cpp/c/type.h"
+#include "litert/cc/litert_compiled_model.h"
+#include "litert/cc/litert_environment.h"
+#include "litert/cc/litert_tensor_buffer.h"
 #include "pipeline.h"
-#include "tensorflow/core/platform/logging.h"
-#include "tflite/interpreter.h"
-#include "tflite/interpreter_builder.h"
-#include "tflite/kernels/register.h"
-#include "tflite/model_builder.h"
-#include "tflite/signature_runner.h"
 
 #define MINIMAL_CHECK(x)                                                   \
   if (!(x)) {                                                              \
@@ -52,102 +50,36 @@ limitations under the License.
     return;                                                                \
   }
 
-// TF Lite requires all buffers (including external buffers used for KV cache
-// here) be `tflite::kDefaultTensorAlignment` aligned. To ensure that, we use
-// this custom allocator. Please use with caution as different platforms may
-// have different alignment requirements.
-template <typename T>
-class AlignedAllocator {
- public:
-  using value_type = T;
-
-  T *allocate(std::size_t n) {
-    void *ptr;
-    std::size_t size = n * sizeof(T);
-    // NOTE this part of the code seems to be redundant
-    // std::size_t padding = tflite::kDefaultTensorAlignment -
-    //                      (size % tflite::kDefaultTensorAlignment);
-    // size += padding;
-
-#if defined(_MSC_VER)
-    ptr = _aligned_malloc(size, tflite::kDefaultTensorAlignment);
-#else
-    int ret = posix_memalign(&ptr, tflite::kDefaultTensorAlignment, size);
-    if (ret != 0) {
-      return nullptr;
-    }
-#endif
-    return static_cast<T *>(ptr);
-  };
-
-  void deallocate(T *ptr, std::size_t n) {
-#if defined(_MSC_VER)
-    _aligned_free(ptr);
-#else
-    free(ptr);
-#endif
-  }
-};
-
-using kv_cache_t =
-    std::map<std::string, std::vector<float, AlignedAllocator<float>>>;
-
-// A simple container for pointers to the tensors used during inference.
-// The pointers here should not be managed or deleted by this struct.
-struct LLMTensors {
-  bool get_tensors(tflite::SignatureRunner *prefill_runner,
-                   tflite::SignatureRunner *decode_runner) {
-    prefill_input_ = prefill_runner->input_tensor("tokens");
-    prefill_input_pos_ = prefill_runner->input_tensor("input_pos");
-    decode_input_ = decode_runner->input_tensor("tokens");
-    decode_input_pos_ = decode_runner->input_tensor("input_pos");
-    logits_output_ = decode_runner->output_tensor("logits");
-    kv_cache_k_0_ = decode_runner->input_tensor("kv_cache_k_0");
-
-    // Making sure none of the tensors are nullptr.
-    return prefill_input_ && prefill_input_pos_ && decode_input_ &&
-           decode_input_pos_ && logits_output_ && kv_cache_k_0_;
-  }
-
-  LLMTensors() {}
-
-  LLMTensors(const LLMTensors &) = delete;
-  LLMTensors &operator=(const LLMTensors &) = delete;
-
-  TfLiteTensor *prefill_input() const { return prefill_input_; }
-  TfLiteTensor *prefill_input_pos() const { return prefill_input_pos_; }
-  TfLiteTensor *decode_input() const { return decode_input_; }
-  TfLiteTensor *decode_input_pos() const { return decode_input_pos_; }
-  const TfLiteTensor *logits_output() const { return logits_output_; }
-  TfLiteTensor *kv_cache_k_0() const { return kv_cache_k_0_; }
-
- private:
-  // Shape: [Batch, Seq], Dtype: int32
-  TfLiteTensor *prefill_input_;
-  // Shape: [Seq], Dtype: int32
-  TfLiteTensor *prefill_input_pos_;
-  // Shape: [Batch, Seq], Dtype: int32
-  TfLiteTensor *decode_input_;
-  // Shape: [Seq], Dtype: int32
-  TfLiteTensor *decode_input_pos_;
-  // Shape: [Seq], Dtype: float32
-  const TfLiteTensor *logits_output_;
-  // shape: [Batch, kv_cache_max, num_query_groups, head_dim]
-  TfLiteTensor *kv_cache_k_0_;
-};
-
 struct LLMBackendData {
-  const char *name = "TFLite";
-  const char *vendor = "Google";
-  const char *accelerator = "CPU";
-  tflite::FlatBufferModel *model{nullptr};
-  // TfLiteInterpreterOptions *options{}; TODO use this to allow different
-  // delegates other than CPU?
-  tflite::Interpreter *interpreter{};
-  tflite::SignatureRunner *prefill_runner{nullptr};
-  tflite::SignatureRunner *decode_runner{nullptr};
-  LLMTensors tensors;
-  kv_cache_t kv_cache;
+  const char* name = "TFLite";
+  const char* vendor = "Google";
+  const char* accelerator = "CPU";
+
+  std::unique_ptr<litert::CompiledModel> model;
+  std::unique_ptr<litert::Environment> env;
+  std::vector<std::pair<size_t, size_t>> prefill_sigs;  // (sig_idx, seq_size)
+  std::vector<litert::TensorBuffer> decode_input_bufs;
+  std::vector<litert::TensorBuffer> decode_output_bufs;
+  std::vector<litert::TensorBuffer> prefill_input_bufs;
+  std::vector<litert::TensorBuffer> prefill_output_bufs;
+  std::unordered_map<std::string, size_t> decode_input_map;
+  std::unordered_map<std::string, size_t> decode_output_map;
+  std::unordered_map<std::string, size_t> prefill_input_map;
+  std::unordered_map<std::string, size_t> prefill_output_map;
+  size_t decode_sig_idx = 0;
+  size_t current_prefill_sig_idx = SIZE_MAX;
+  size_t prefill_tokens_idx = 0;
+  size_t prefill_pos_idx = 0;
+  size_t decode_tokens_idx = 0;
+  size_t decode_pos_idx = 0;
+  size_t logits_idx = 0;
+  int num_kv_layers = 0;
+  int kv_cache_max_size = 0;
+  int kv_buf_float_count = 0;
+  int prefill_seq_size = 0;
+  std::vector<float> logits_scratch;
+  int vocab_size = 0;
+
   std::vector<int> prompt_tokens;
   std::vector<int> output_tokens;
   uint16_t num_threads = 4;
@@ -156,14 +88,10 @@ struct LLMBackendData {
 
   LLMBackendData() {}
 
-  ~LLMBackendData() {
-    // Runners are owned by interpreter and therefore don't need to be deleted
-    delete interpreter;
-    delete model;
-  }
+  ~LLMBackendData() {}
 
-  LLMBackendData(const LLMBackendData &) = delete;
-  LLMBackendData &operator=(const LLMBackendData &) = delete;
+  LLMBackendData(const LLMBackendData&) = delete;
+  LLMBackendData& operator=(const LLMBackendData&) = delete;
 };
 
 // A simple pipeline which runs a single model.
@@ -175,23 +103,23 @@ class LLMPipeline : public Pipeline {
 
   void backend_delete(mlperf_backend_ptr_t backend_ptr) override;
 
-  mlperf_backend_ptr_t backend_create(const char *model_path,
-                                      mlperf_backend_configuration_t *configs,
-                                      const char *native_lib_path) override;
+  mlperf_backend_ptr_t backend_create(const char* model_path,
+                                      mlperf_backend_configuration_t* configs,
+                                      const char* native_lib_path) override;
 
-  const char *backend_vendor_name(mlperf_backend_ptr_t backend_ptr) override;
+  const char* backend_vendor_name(mlperf_backend_ptr_t backend_ptr) override;
 
-  const char *backend_accelerator_name(
+  const char* backend_accelerator_name(
       mlperf_backend_ptr_t backend_ptr) override;
 
-  const char *backend_name(mlperf_backend_ptr_t backend_ptr) override;
+  const char* backend_name(mlperf_backend_ptr_t backend_ptr) override;
 
   mlperf_status_t backend_issue_first_token_query(
       mlperf_backend_ptr_t backend_ptr);
 
   mlperf_status_t backend_issue_query(mlperf_backend_ptr_t backend_ptr,
                                       ft_callback callback,
-                                      void *context) override;
+                                      void* context) override;
 
   mlperf_status_t backend_flush_queries(
       mlperf_backend_ptr_t backend_ptr) override;
@@ -203,7 +131,7 @@ class LLMPipeline : public Pipeline {
 
   mlperf_status_t backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                     int32_t batch_index, int32_t i,
-                                    void *data) override;
+                                    void* data) override;
 
   int32_t backend_get_output_count(mlperf_backend_ptr_t backend_ptr) override;
 
@@ -212,29 +140,29 @@ class LLMPipeline : public Pipeline {
 
   mlperf_status_t backend_get_output(mlperf_backend_ptr_t backend_ptr,
                                      uint32_t batchIndex, int32_t i,
-                                     void **data) override;
+                                     void** data) override;
 
   void backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
-                              int width, int height, uint8_t *data) override;
+                              int width, int height, uint8_t* data) override;
 
   void backend_convert_outputs(mlperf_backend_ptr_t backend_ptr, int bytes,
-                               int width, int height, uint8_t *data) override;
+                               int width, int height, uint8_t* data) override;
 
-  void *backend_get_buffer(size_t n) override;
+  void* backend_get_buffer(size_t n) override;
 
-  void backend_release_buffer(void *p) override;
+  void backend_release_buffer(void* p) override;
 
  private:
-  tflite::Interpreter *BuildInterpreter(tflite::FlatBufferModel *model,
-                                        int num_threads);
-  kv_cache_t BuildKVCache(tflite::Interpreter *interpreter);
-  void PrepareRunner(tflite::SignatureRunner *runner, kv_cache_t &kv_cache);
-  tflite::SignatureRunner *GetPrefillRunner(tflite::Interpreter *interpreter,
-                                            std::size_t num_input_tokens,
-                                            kv_cache_t &kv_cache);
-  tflite::SignatureRunner *GetDecodeRunner(tflite::Interpreter *interpreter,
-                                           kv_cache_t &kv_cache);
-  int GreedySampler(const TfLiteTensor *logits);
+  bool BuildCompiledModel(LLMBackendData* backend_ptr, const char* model_path);
+  bool BuildDecodeBuffers(LLMBackendData* backend_ptr);
+  bool BuildPrefillBuffers(LLMBackendData* backend_ptr, size_t prefill_sig_idx);
+  size_t GetSuitablePrefillSignature(LLMBackendData* backend_ptr,
+                                     size_t num_input_tokens) const;
+  void TransferKV(LLMBackendData* backend_ptr);
+  void UpdateDecodeKV(LLMBackendData* backend_ptr);
+  void ResetKV(LLMBackendData* backend_ptr);
+  void ResetPrefillKV(LLMBackendData* backend_ptr);
+  int GreedySampler(LLMBackendData* backend_ptr);
 };
 
 #endif  // TFLITE_SINGLE_MODEL_PIPELINE_H_
