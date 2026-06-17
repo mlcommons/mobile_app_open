@@ -314,9 +314,9 @@ jobs:
             device: "Samsung Galaxy S25 Ultra-15.0"
           # the app fails on these devices with old Android build
           # removing these for now
-          #- backend: "qti"
+          # - backend: "qti"
           #  device: "Samsung Galaxy Tab S9-13.0"
-          #- backend: "qti"
+          # - backend: "qti"
           #  device: "Samsung Galaxy S23 Ultra-13.0"
           - backend: "samsung"
             device: "Samsung Galaxy S24-14.0"
@@ -406,9 +406,9 @@ jobs:
             device: "Samsung Galaxy S25 Ultra-15.0"
           # the app fails on these devices with old Android build
           # removing these for now
-          #- backend: "qti"
+          # - backend: "qti"
           #  device: "Samsung Galaxy S23-13.0"
-          #- backend: "qti"
+          # - backend: "qti"
           #  device: "Samsung Galaxy Tab S9-13.0"
           - backend: "samsung"
             device: "Samsung Galaxy S22 Ultra-12.0"
