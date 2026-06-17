@@ -310,6 +310,8 @@ jobs:
             device: "Samsung Galaxy M32-11.0"
           - backend: "pixel"
             device: "Google Pixel 9 Pro-15.0"
+          - backend: "qti"
+            device: "Samsung Galaxy S25 Ultra-15.0"
           # the app fails on these devices with old Android build
           # removing these for now
           #- backend: "qti"
