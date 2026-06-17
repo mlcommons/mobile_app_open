@@ -311,6 +311,8 @@ jobs:
           - backend: "pixel"
             device: "Google Pixel 9 Pro-15.0"
           - backend: "qti"
+            device: "Samsung Galaxy Tab S9-13.0"
+          - backend: "qti"
             device: "Samsung Galaxy S23 Ultra-13.0"
           - backend: "samsung"
             device: "Samsung Galaxy S24-14.0"
