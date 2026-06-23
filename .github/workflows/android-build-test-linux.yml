@@ -401,11 +401,11 @@ jobs:
           - backend: "qti"
             device: "Samsung Galaxy S25-15.0"
           - backend: "qti"
-            device: "Samsung Galaxy S24 Ultra-16.0"
-          - backend: "qti"
             device: "Samsung Galaxy S25 Ultra-15.0"
           # the app fails on these devices with old Android build
           # removing these for now
+          # - backend: "qti"
+          #   device: "Samsung Galaxy S24 Ultra-16.0"
           # - backend: "qti"
           #  device: "Samsung Galaxy S23-13.0"
           # - backend: "qti"
