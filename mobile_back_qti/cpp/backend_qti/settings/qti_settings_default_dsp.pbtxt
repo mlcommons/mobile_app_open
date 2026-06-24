@@ -177,7 +177,7 @@ benchmark_setting {
   }
   custom_setting {
     id: "use_ion_buffer"
-    value: "true"
+    value: "false"
   }
   custom_setting {
     id: "input_buffer_type"

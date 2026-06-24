@@ -312,6 +312,12 @@ jobs:
             device: "Google Pixel 9 Pro-15.0"
           - backend: "qti"
             device: "Samsung Galaxy S25 Ultra-15.0"
+          # the app fails on these devices with old Android build
+          # removing these for now
+          # - backend: "qti"
+          #  device: "Samsung Galaxy Tab S9-13.0"
+          # - backend: "qti"
+          #  device: "Samsung Galaxy S23 Ultra-13.0"
           - backend: "samsung"
             device: "Samsung Galaxy S24-14.0"
           - backend: "qti"
@@ -394,16 +400,16 @@ jobs:
         include:
           - backend: "qti"
             device: "Samsung Galaxy S25-15.0"
-          # Comment out S24 Ultra-14.0 until we have a fix for it.
+          - backend: "qti"
+            device: "Samsung Galaxy S25 Ultra-15.0"
+          # the app fails on these devices with old Android build
+          # removing these for now
           # - backend: "qti"
-          #  device: "Samsung Galaxy S24 Ultra-14.0"
-          # Comment out qti Android 13.0 devices until we have a fix: failing in CI (master and PRs).
+          #   device: "Samsung Galaxy S24 Ultra-16.0"
           # - backend: "qti"
-          #   device: "Samsung Galaxy S23 Ultra-13.0"
+          #  device: "Samsung Galaxy S23-13.0"
           # - backend: "qti"
-          #   device: "Samsung Galaxy S23-13.0"
-          # - backend: "qti"
-          #   device: "Samsung Galaxy Tab S9-13.0"
+          #  device: "Samsung Galaxy Tab S9-13.0"
           - backend: "samsung"
             device: "Samsung Galaxy S22 Ultra-12.0"
           - backend: "samsung"
