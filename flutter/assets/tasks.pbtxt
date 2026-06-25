@@ -10,6 +10,7 @@ task_set {
     opt {
       id: "offline"
       name: "Offline"
+      enabled: true
     }
     opt {
       id: "online"
@@ -28,7 +29,6 @@ task_set {
     opt {
       id: "1b"
       name: "1B"
-      enabled: true
     }
     opt {
       id: "3b"

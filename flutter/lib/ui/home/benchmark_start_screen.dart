@@ -34,6 +34,15 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
     store = context.watch<Store>();
     l10n = AppLocalizations.of(context)!;
 
+    if (state.benchmarkError != null) {
+      final error = state.benchmarkError;
+      state.benchmarkError = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        await showErrorDialog(context, <String>[error.toString()]);
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.menuHome),

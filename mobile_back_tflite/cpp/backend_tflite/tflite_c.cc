@@ -30,6 +30,7 @@ limitations under the License.
 #endif
 
 #if MTK_TFLITE_NEURON_BACKEND
+#include <map>
 std::string GetPlatformName();
 #endif
 
@@ -58,35 +59,32 @@ void init_pipeline(const char *pipeline_type) {
 void reset_pipeline() { pipeline.reset(); }
 
 #if defined(__ANDROID__) && defined(MTK_TFLITE_NEURON_BACKEND)
+
+void *LoadNeuronAdapter() {
+  return dlopen("libneuron_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
+}
+
+void *LoadNeuronUsdkAdapter(const std::string &platform) {
+  std::string usdk_name;
+  if (platform == "mt6989" || platform == "mt6991" || platform == "mt6993") {
+    usdk_name = "libneuronusdk_adapter.mtk." + platform + ".so";
+  } else {
+    usdk_name = "libneuronusdk_adapter.mtk.so";
+  }
+  return dlopen(usdk_name.c_str(), RTLD_LAZY | RTLD_LOCAL);
+}
+
 static bool neuron_tflite_backend(const char **not_allowed_message,
                                   const mlperf_device_info_t *device_info) {
   bool neuron_capable = false;
-  bool neuron_adapter = false;
-  void *libneuron_adapter;
+  void *adapter_handle = LoadNeuronAdapter();
 
-  // Try to load the default neuron adapter library
-  libneuron_adapter =
-      dlopen("libneuron_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
-
-  // If not found, try to load platform-specific libraries
-  if (libneuron_adapter == nullptr) {
-    const std::string device = GetPlatformName();
-    if (device == "mt6989") {
-      libneuron_adapter =
-          dlopen("libneuronusdk_adapter.mtk.mt6989.so", RTLD_LAZY | RTLD_LOCAL);
-    } else if (device == "mt6991") {
-      libneuron_adapter =
-          dlopen("libneuronusdk_adapter.mtk.mt6991.so", RTLD_LAZY | RTLD_LOCAL);
-    } else {
-      libneuron_adapter =
-          dlopen("libneuronusdk_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
-    }
-    if (libneuron_adapter != nullptr) neuron_adapter = true;
-  } else {
-    neuron_adapter = true;
+  if (adapter_handle == nullptr) {
+    const std::string platform = GetPlatformName();
+    adapter_handle = LoadNeuronUsdkAdapter(platform);
   }
 
-  if (neuron_adapter) {
+  if (adapter_handle != nullptr) {
     char ro_system_build_version_sdk[PROP_VALUE_MAX + 1];
     if (__system_property_get("ro.system.build.version.sdk",
                               ro_system_build_version_sdk)) {
@@ -115,15 +113,20 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const mlperf_device_info_t *device_info) {
   *not_allowed_message = nullptr;
 #if MTK_TFLITE_NEURON_BACKEND && defined(__ANDROID__)
-  std::string device = GetPlatformName();
-  LOG(INFO) << "The platform name is " << device;
+  const std::string platform = GetPlatformName();
+  LOG(INFO) << "The platform is " << platform;
 
-  *settings = tflite_settings_mtk.c_str();
+  static const std::map<std::string, std::string> platform_settings_file = {
+      {"mt6989", tflite_settings_mtk_mt6989},
+      {"mt6991", tflite_settings_mtk_mt6991},
+      {"mt6993", tflite_settings_mtk_mt6993},
+  };
 
-  if (device == "mt6989") {
-    *settings = tflite_settings_mtk_mt6989.c_str();
-  } else if (device == "mt6991") {
-    *settings = tflite_settings_mtk_mt6991.c_str();
+  auto iteration = platform_settings_file.find(platform);
+  if (iteration != platform_settings_file.end()) {
+    *settings = iteration->second.c_str();
+  } else {
+    *settings = tflite_settings_mtk.c_str();
   }
 
   return neuron_tflite_backend(not_allowed_message, device_info);
@@ -160,7 +163,14 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 #elif defined(_WIN64) || defined(_WIN32)
   *settings = tflite_settings_windows.c_str();
 #else
-  *settings = tflite_settings_android.c_str();
+  // Samsung Galaxy M32 (SM-M326B) does not have enough memory to run LLM
+  // benchmarks, so use a settings file that omits them.
+  if (device_info->model != nullptr &&
+      strcmp(device_info->model, "SM-M326B") == 0) {
+    *settings = tflite_settings_android_m32.c_str();
+  } else {
+    *settings = tflite_settings_android.c_str();
+  }
 #endif
   LOG(INFO) << "TFLite backend matches hardware";
   return true;

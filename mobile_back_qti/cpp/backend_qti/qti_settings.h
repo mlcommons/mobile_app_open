@@ -30,7 +30,6 @@ const std::string empty_settings = "";
 #define SETTINGS_RHS(device) qti_settings_##device##_pbtxt
 #define STRING_SETTINGS(device) SETTINGS_LHS(device) = SETTINGS_RHS(device);
 
-#include INCLUDE_SETTINGS(sd8cxg3)
 #include INCLUDE_SETTINGS(sd8sG4)
 #include INCLUDE_SETTINGS(sd7G4)
 #include INCLUDE_SETTINGS(sd8elite)
@@ -47,8 +46,8 @@ const std::string empty_settings = "";
 #include INCLUDE_SETTINGS(stablediffusion_v73_sd7G4)
 #include INCLUDE_SETTINGS(stablediffusion_v81_sd8eliteG5)
 #include INCLUDE_SETTINGS(stablediffusion_v81_sd8G5)
+#include INCLUDE_SETTINGS(genie_llm)
 
-STRING_SETTINGS(sd8cxg3)
 STRING_SETTINGS(sd8sG4)
 STRING_SETTINGS(sd7G4)
 STRING_SETTINGS(sd8elite)
@@ -65,5 +64,6 @@ STRING_SETTINGS(stablediffusion_v73_sd8sG4)
 STRING_SETTINGS(stablediffusion_v73_sd7G4)
 STRING_SETTINGS(stablediffusion_v81_sd8eliteG5)
 STRING_SETTINGS(stablediffusion_v81_sd8G5)
+STRING_SETTINGS(genie_llm)
 
 #endif

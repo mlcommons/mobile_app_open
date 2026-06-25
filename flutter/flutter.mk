@@ -149,11 +149,14 @@ flutter/test/integration:
 		${flutter_firebase_crashlytics_arg} \
 		${flutter_perf_test_arg}
 
+# Default to release mode: Flutter 3.19.6's Dart VM crashes on iOS 26+
+# devices in debug mode (mprotect denied). Override with FLUTTER_RUN_MODE=debug.
+FLUTTER_RUN_MODE?=release
 .PHONY: flutter/run
 flutter/run:
 	cd flutter && ${_start_args} \
 		flutter --no-version-check \
-		run \
+		run --${FLUTTER_RUN_MODE} \
 		${flutter_test_device_arg} \
 		${flutter_official_build_arg} \
 		${flutter_firebase_crashlytics_arg}

@@ -1,2 +1,3 @@
 9124e150ab2da667ed87f8619dc3c9282ad6a87772aa8e201b80f8fa4e7e6ec9  mt6989/libneuronusdk_adapter.mtk.mt6989.so
 7196b7aec72f77408aaeb84e2da4e202ca613489640a48f198f1affb38335475  mt6991/libneuronusdk_adapter.mtk.mt6991.so
+b7f7fd84b636bd54df9581d10d2674ec355fece6ce0675edc4e31b06a3f36cd4  mt6993/libneuronusdk_adapter.mtk.mt6993.so

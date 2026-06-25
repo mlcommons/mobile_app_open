@@ -21,6 +21,7 @@ limitations under the License.
 #include <memory>
 
 #include "rpcmem.h"
+#include "soc_utility.h"
 #include "tensorflow/core/platform/logging.h"
 
 // This allocator assumes all allocations and frees are done in order
@@ -47,12 +48,17 @@ class ChunkAllocator {
       : chunk_size_(chunk_size), chunks_per_block_(chunks_per_block) {}
 
   class Block {
+    bool isIon_;
+
    public:
+    // load rpcmem buffer only when configured for the test case.
     Block(size_t chunk_size, int32_t num_chunks)
         : num_chunks_(num_chunks),
           free_chunks_(num_chunks),
-          chunk_size_(chunk_size) {
-      ptr_ = getRpcMem().Alloc(chunk_size * num_chunks);
+          chunk_size_(chunk_size),
+          isIon_(useIonBuffer_g) {
+      ptr_ = isIon_ ? getRpcMem().Alloc(chunk_size * num_chunks)
+                    : std::malloc(chunk_size * num_chunks);
       block_map_[ptr_] = this;
     }
 
@@ -68,7 +74,7 @@ class ChunkAllocator {
     void ReleaseChunk(void *p) {
       free_chunks_++;
       if (free_chunks_ == num_chunks_) {
-        getRpcMem().Free(ptr_);
+        isIon_ ? getRpcMem().Free(ptr_) : std::free(ptr_);
         ptr_ = nullptr;
       }
       Block::block_map_.erase(p);
@@ -87,7 +93,7 @@ class ChunkAllocator {
     }
 
     ~Block() {
-      if (ptr_ != nullptr) getRpcMem().Free(ptr_);
+      if (ptr_ != nullptr) isIon_ ? getRpcMem().Free(ptr_) : std::free(ptr_);
     }
 
     // Map allocated pointers to their block

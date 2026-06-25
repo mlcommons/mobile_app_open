@@ -108,9 +108,9 @@ jobs:
           project_id: mobile-app-build-290400
       - name: Download Samsung libraries
         env:
-          SAMSUNG_LIB: samsung_libs_v5.0.1_20251217
+          SAMSUNG_LIB: samsung_libs_v6.0_20260505
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v5.0.1/${SAMSUNG_LIB}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v6.0/${SAMSUNG_LIB}.zip /tmp/ && \
           unzip /tmp/${SAMSUNG_LIB}.zip -d /tmp/${SAMSUNG_LIB} && \
           rm /tmp/${SAMSUNG_LIB}.zip && \
           mkdir -p mobile_back_samsung/samsung/lib/internal && \
@@ -118,9 +118,9 @@ jobs:
           ls mobile_back_samsung/samsung/lib/internal/*
       - name: Download QTI SDK
         env:
-          QTI_SDK: qairt-v2.40.0.251030-linux
+          QTI_SDK: qairt-v2.45.0.260326-linux
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v5.0/${QTI_SDK}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v6.0/${QTI_SDK}.zip /tmp/ && \
           unzip /tmp/${QTI_SDK}.zip -d /tmp/${QTI_SDK} && \
           rm /tmp/${QTI_SDK}.zip && \
           mv /tmp/${QTI_SDK}/* mobile_back_qti/
@@ -169,6 +169,7 @@ jobs:
           WITH_TFLITE: 0
           WITH_QTI: 1
           WITH_STABLEDIFFUSION: 1
+          WITH_GENIE: 1
         run: |
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-qti.apk
@@ -218,6 +219,7 @@ jobs:
           WITH_SAMSUNG: 1
           WITH_APPLE: 0
           WITH_STABLEDIFFUSION: 1
+          WITH_GENIE: 1
         run: |
           make flutter/android/release
           gsutil cp flutter/build/app/outputs/bundle/release/app-release.aab $GCLOUD_BUCKET_PATH/app-release.aab
@@ -279,6 +281,8 @@ jobs:
           WITH_QTI: 1
           WITH_SAMSUNG: 1
           WITH_APPLE: 0
+          WITH_STABLEDIFFUSION: 1
+          WITH_GENIE: 1
         run: |
           make cmdline/android/bins/release
       - name: Archive Android CLI binaries
@@ -310,6 +314,10 @@ jobs:
             device: "Samsung Galaxy S25 Ultra-15.0"
           - backend: "samsung"
             device: "Samsung Galaxy S24-14.0"
+          - backend: "qti"
+            device: "Samsung Galaxy S26 Ultra-16.0" # SM-S948B, Snapdragon
+          - backend: "samsung"
+            device: "Samsung Galaxy S26-16.0" # SM-S942B, Exynos 2600
           - backend: "mtk"
             device: "Samsung Galaxy Tab S10 Plus-15.0"
     env:

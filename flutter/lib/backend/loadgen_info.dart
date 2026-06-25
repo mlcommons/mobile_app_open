@@ -113,6 +113,13 @@ class LoadgenInfo {
     const nanosecondsPerSecond = 1000 * Duration.microsecondsPerSecond;
     bool usesTokens = (result[useTokenLatenciesKey] ?? false) as bool;
 
+    double tokenThroughput = 1.0 /
+        (((result[tokenThroughputKey] as num?)?.toDouble() ?? 0.0) /
+            nanosecondsPerSecond);
+    if (tokenThroughput.isInfinite) {
+      tokenThroughput = 0;
+    }
+
     return LoadgenInfo(
       queryCount: result[queryCountKey] as int? ?? 0,
       latencyMean: !usesTokens
@@ -127,11 +134,7 @@ class LoadgenInfo {
       latencyFirstToken90: usesTokens
           ? (result[latency90FirstTokenKey] as int? ?? 0) / nanosecondsPerSecond
           : 0,
-      tokenThroughput: usesTokens
-          ? 1.0 /
-              (((result[tokenThroughputKey] as num?)?.toDouble() ?? 0.0) /
-                  nanosecondsPerSecond)
-          : 0,
+      tokenThroughput: usesTokens ? tokenThroughput : 0,
       isMinDurationMet: result[minDurationMetKey] as bool? ?? false,
       isMinQueryMet: result[minQueriesMetKey] as bool? ?? false,
       isEarlyStoppingMet: result[earlyStoppingMetKey] as bool? ?? false,

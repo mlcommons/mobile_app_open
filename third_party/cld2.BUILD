@@ -33,9 +33,13 @@ cc_library(
     includes = [
         "public",
     ],
-    copts = [
-        "-std=c++11",
-        "-Wno-c++11-narrowing",
-    ],
+    copts = select({
+        # MSVC (cl.exe) rejects these GCC/Clang flags (D8021).
+        "@bazel_tools//src/conditions:windows": [],
+        "//conditions:default": [
+            "-std=c++11",
+            "-Wno-c++11-narrowing",
+        ],
+    }),
     visibility = ["//visibility:public"],
 )
