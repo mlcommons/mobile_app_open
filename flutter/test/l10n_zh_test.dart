@@ -1,7 +1,10 @@
 // Verifies Simplified Chinese (zh) localization renders in a real MaterialApp,
 // wired with the same delegates/supportedLocales the app uses.
+
 import 'package:flutter/material.dart';
+
 import 'package:flutter_test/flutter_test.dart';
+
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
 Widget _wrap(Locale locale) {
