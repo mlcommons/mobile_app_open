@@ -173,6 +173,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               .toList(),
           onChanged: (value) => setState(() {
                 store.selectedBenchmarkRunMode = value!;
+                state.resetAllBenchmarks();
               })),
     );
   }
