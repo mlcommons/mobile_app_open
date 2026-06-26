@@ -33,6 +33,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context)!;
 
+    Widget languageDropdown = _languageDropdown();
     Widget artificialLoadSwitch = _artificialLoadSwitch();
     Widget crashlyticsSwitch = _crashlyticsSwitch();
     Widget runModeDropdown = _runModeDropdown();
@@ -49,6 +50,7 @@ class _SettingsScreen extends State<SettingsScreen> {
             child: ListView(
           padding: const EdgeInsets.only(top: 20),
           children: [
+            languageDropdown,
             runModeDropdown,
             offlineModeSwitch,
             keepLogSwitch,
@@ -150,6 +152,42 @@ class _SettingsScreen extends State<SettingsScreen> {
         onChanged: (flag) {
           store.offlineMode = flag;
         },
+      ),
+    );
+  }
+
+  Widget _languageDropdown() {
+    // Native names (endonyms) for each supported language code.
+    const languageNames = <String, String>{
+      'en': 'English',
+      'zh': '简体中文',
+    };
+    return ListTile(
+      title: Padding(
+        padding: const EdgeInsets.only(bottom: 5),
+        child: Text(l10n.settingsLanguage),
+      ),
+      subtitle: Text(l10n.settingsLanguageSubtitle),
+      trailing: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
+        value: store.appLocale,
+        items: [
+          // Empty value means follow the system/device language.
+          DropdownMenuItem<String>(
+            value: '',
+            child: Text(l10n.settingsLanguageSystem),
+          ),
+          ...AppLocalizations.supportedLocales.map(
+            (locale) => DropdownMenuItem<String>(
+              value: locale.languageCode,
+              child: Text(
+                  languageNames[locale.languageCode] ?? locale.languageCode),
+            ),
+          ),
+        ],
+        onChanged: (value) => setState(() {
+          store.appLocale = value!;
+        }),
       ),
     );
   }

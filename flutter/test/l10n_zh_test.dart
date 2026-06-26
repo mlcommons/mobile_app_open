@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
-Widget _wrap(Locale locale) {
+Widget _wrap(Locale? locale) {
   return MaterialApp(
     locale: locale,
     localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -51,6 +51,16 @@ void main() {
     await tester.pumpWidget(_wrap(const Locale('zh', 'CN')));
     await tester.pumpAndSettle();
     expect(find.text('设置'), findsOneWidget);
+  });
+
+  testWidgets('null locale (system default) falls back to device English',
+      (tester) async {
+    // A null locale is what the app passes when "System default" is selected;
+    // Flutter then resolves against the device locale (en in the test env).
+    await tester.pumpWidget(_wrap(null));
+    await tester.pumpAndSettle();
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('设置'), findsNothing);
   });
 
   testWidgets('placeholder template preserved in zh', (tester) async {

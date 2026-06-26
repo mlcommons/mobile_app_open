@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
+import 'package:mlperfbench/store.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/root/upgrade_dialog.dart';
 
@@ -14,10 +16,13 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final store = context.watch<Store>();
     return MaterialApp(
       title: 'MLPerf Mobile',
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      // An empty appLocale means follow the system/device language.
+      locale: store.appLocale.isEmpty ? null : Locale(store.appLocale),
       theme: Theme.of(context).copyWith(
         // TODO: https://docs.flutter.dev/release/breaking-changes/material-3-migration
         // ignore: deprecated_member_use

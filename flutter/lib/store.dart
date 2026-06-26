@@ -114,6 +114,15 @@ class Store extends ChangeNotifier {
     _storeFromDisk.setBool(StoreConstants.crashlyticsEnabled, value);
     notifyListeners();
   }
+
+  // Language code of the app locale, e.g. 'en' or 'zh'.
+  // An empty string means follow the system/device language.
+  String get appLocale => _getString(StoreConstants.appLocale);
+
+  set appLocale(String value) {
+    _storeFromDisk.setString(StoreConstants.appLocale, value);
+    notifyListeners();
+  }
 }
 
 class StoreConstants {
@@ -129,4 +138,5 @@ class StoreConstants {
   static const keepLogs = 'keep_logs';
   static const taskSelection = 'disabled_tasks';
   static const crashlyticsEnabled = 'crashlyticsEnabled';
+  static const appLocale = 'app_locale';
 }
