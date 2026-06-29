@@ -84,6 +84,7 @@
   "settingsPrivacyPolicy": "隐私政策",
   "settingsEula": "最终用户许可协议",
   "settingsTaskConfigTitle": "任务配置",
+  "settingsTaskConfigDefault": "默认",
   "settingsTaskConfigInternetResource": "可下载",
   "settingsTaskConfigLocalResource": "本地",
   "settingsTaskConfigError": "配置路径无效：",

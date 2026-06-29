@@ -84,6 +84,7 @@
   "settingsPrivacyPolicy": "Privacy Policy",
   "settingsEula": "End User License Agreement",
   "settingsTaskConfigTitle": "Task configuration",
+  "settingsTaskConfigDefault": "Default",
   "settingsTaskConfigInternetResource": "downloadable",
   "settingsTaskConfigLocalResource": "local",
   "settingsTaskConfigError": "Path to config is invalid:",

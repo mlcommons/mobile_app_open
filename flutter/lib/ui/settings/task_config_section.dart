@@ -66,7 +66,10 @@ class TaskConfigSection extends StatelessWidget {
         selected: isSelected,
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
-          child: Text(configuration.name),
+          child: Text(
+              configuration.name == state.configManager.defaultConfig.name
+                  ? l10n.settingsTaskConfigDefault
+                  : configuration.name),
         ),
         subtitle: Text(configuration.path),
         trailing: Text(configuration.getType(l10n)),
