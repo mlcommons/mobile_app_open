@@ -137,7 +137,9 @@ class BenchmarkConfigSection extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '$activeOptions/$totalOptions options selected',
+                          l10n.mainScreenOptionsSelected
+                              .replaceAll('<active>', activeOptions.toString())
+                              .replaceAll('<total>', totalOptions.toString()),
                           style:
                               const TextStyle(fontSize: 12, color: Colors.grey),
                         ),

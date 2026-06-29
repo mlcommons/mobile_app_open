@@ -286,7 +286,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
                             fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       Text(
-                        '${benchmarkSet.benchmarks.length} benchmarks in this set',
+                        l10n.resultsBenchmarksInSet.replaceAll('<count>',
+                            benchmarkSet.benchmarks.length.toString()),
                         style:
                             const TextStyle(fontSize: 12, color: Colors.grey),
                       ),

@@ -77,7 +77,7 @@ class _SettingsScreen extends State<SettingsScreen> {
         if (snapshot.hasData && snapshot.data != null) {
           return TaskConfigSection(snapshot.data!);
         } else {
-          return const Text('Loading data');
+          return Text(l10n.settingsLoadingData);
         }
       },
     );
@@ -86,7 +86,9 @@ class _SettingsScreen extends State<SettingsScreen> {
   Widget _versionText() {
     final buildInfo = BuildInfoHelper.info;
     return Text(
-      'Version: ${buildInfo.version} | Build: ${buildInfo.buildNumber}',
+      l10n.settingsVersion
+          .replaceAll('<version>', buildInfo.version)
+          .replaceAll('<build>', buildInfo.buildNumber),
       textAlign: TextAlign.center,
     );
   }

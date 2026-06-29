@@ -35,6 +35,7 @@
   "mainScreenGo": "GO",
   "mainScreenMeasureTitle": "Measure your device performance for:",
   "mainScreenBenchmarkSelected": "Benchmarks (<selected>/<total> selected)",
+  "mainScreenOptionsSelected": "<active>/<total> options selected",
 
   "progressPerformance": "Performance",
   "progressAccuracy": "Accuracy",
@@ -54,6 +55,7 @@
   "resultsNotAvailable": "N/A",
   "resultsBenchmarkAborted": "Benchmark aborted!",
   "resultsBatchSize": "Batches: <batchSize>",
+  "resultsBenchmarksInSet": "<count> benchmarks in this set",
 
   "shareButtonMLCommons": "Share with MLCommons",
   "shareButtonOther": "Share with others",
@@ -90,6 +92,8 @@
   "settingsClearCacheConfirm": "All downloaded resources will be deleted. Continue?",
   "settingsClearCacheFinished": "Cache cleared.",
   "settingsUnableSpecifyConfiguration": "Could not specify until benchmarks is running or content is loading",
+  "settingsLoadingData": "Loading data",
+  "settingsVersion": "Version: <version> | Build: <build>",
 
   "dialogTitleWarning": "Warning",
   "dialogTitleError": "Error",

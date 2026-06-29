@@ -35,6 +35,7 @@
   "mainScreenGo": "开始",
   "mainScreenMeasureTitle": "测量您的设备性能：",
   "mainScreenBenchmarkSelected": "基准测试（已选择 <selected>/<total>）",
+  "mainScreenOptionsSelected": "已选择 <active>/<total> 个选项",
 
   "progressPerformance": "性能",
   "progressAccuracy": "准确度",
@@ -54,6 +55,7 @@
   "resultsNotAvailable": "N/A",
   "resultsBenchmarkAborted": "基准测试已中止！",
   "resultsBatchSize": "批次：<batchSize>",
+  "resultsBenchmarksInSet": "此组包含 <count> 个基准测试",
 
   "shareButtonMLCommons": "分享给 MLCommons",
   "shareButtonOther": "分享给他人",
@@ -90,6 +92,8 @@
   "settingsClearCacheConfirm": "所有已下载的资源都将被删除。是否继续？",
   "settingsClearCacheFinished": "缓存已清除。",
   "settingsUnableSpecifyConfiguration": "在基准测试运行或内容加载期间无法指定",
+  "settingsLoadingData": "正在加载数据",
+  "settingsVersion": "版本：<version> | 构建：<build>",
 
   "dialogTitleWarning": "警告",
   "dialogTitleError": "错误",
