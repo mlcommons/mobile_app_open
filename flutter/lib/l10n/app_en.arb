@@ -35,6 +35,7 @@
   "mainScreenGo": "GO",
   "mainScreenMeasureTitle": "Measure your device performance for:",
   "mainScreenBenchmarkSelected": "Benchmarks (<selected>/<total> selected)",
+  "mainScreenOptionsSelected": "<active>/<total> options selected",
 
   "progressPerformance": "Performance",
   "progressAccuracy": "Accuracy",
@@ -54,6 +55,7 @@
   "resultsNotAvailable": "N/A",
   "resultsBenchmarkAborted": "Benchmark aborted!",
   "resultsBatchSize": "Batches: <batchSize>",
+  "resultsBenchmarksInSet": "<count> benchmarks in this set",
 
   "shareButtonMLCommons": "Share with MLCommons",
   "shareButtonOther": "Share with others",
@@ -68,6 +70,9 @@
   "settingsOfflineSubtitle": "In offline mode, a warning will be raised if the app tries to use internet resources.",
   "settingsRunMode": "Run mode",
   "settingsRunModeSubtitle": "Choose a benchmark run mode",
+  "settingsLanguage": "Language",
+  "settingsLanguageSubtitle": "Choose the app language",
+  "settingsLanguageSystem": "System default",
   "settingsArtificialCPULoadTitle": "Artificial CPU Load",
   "settingsArtificialCPULoadSubtitle": "Some devices perform better with an additional artificial CPU load during test",
   "settingsCrashlyticsTitle": "Crash reporting",
@@ -79,6 +84,7 @@
   "settingsPrivacyPolicy": "Privacy Policy",
   "settingsEula": "End User License Agreement",
   "settingsTaskConfigTitle": "Task configuration",
+  "settingsTaskConfigDefault": "Default",
   "settingsTaskConfigInternetResource": "downloadable",
   "settingsTaskConfigLocalResource": "local",
   "settingsTaskConfigError": "Path to config is invalid:",
@@ -87,6 +93,8 @@
   "settingsClearCacheConfirm": "All downloaded resources will be deleted. Continue?",
   "settingsClearCacheFinished": "Cache cleared.",
   "settingsUnableSpecifyConfiguration": "Could not specify until benchmarks is running or content is loading",
+  "settingsLoadingData": "Loading data",
+  "settingsVersion": "Version: <version> | Build: <build>",
 
   "dialogTitleWarning": "Warning",
   "dialogTitleError": "Error",
