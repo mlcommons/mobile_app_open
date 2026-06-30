@@ -8,28 +8,40 @@ part 'loadgen_info.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake)
 class LoadgenInfo {
   final int queryCount;
-  final double latencyMean; // Mean latency in seconds
-  final double latency90; // 90th percentile in seconds
+  final double latencyMean; // Mean latency for a query in seconds
+  final double latency90; // 90th percentile for a query in seconds
+  final double latencyFirstTokenMean; // Mean TTFT latency in seconds
+  final double latencyFirstToken90; // 90th percentile TTFT in seconds
+  final double tokenThroughput; // A.K.A. TPS
   final bool isMinDurationMet;
   final bool isMinQueryMet;
   final bool isEarlyStoppingMet;
+  final bool isTokenBased;
   final bool isResultValid;
 
   LoadgenInfo({
     required this.queryCount,
     required this.latencyMean,
     required this.latency90,
+    required this.latencyFirstTokenMean,
+    required this.latencyFirstToken90,
+    required this.tokenThroughput,
     required this.isMinDurationMet,
     required this.isMinQueryMet,
     required this.isEarlyStoppingMet,
+    required this.isTokenBased,
     required this.isResultValid,
   });
 
   static Future<LoadgenInfo?> fromFile({required String filepath}) {
-    final lines = File(filepath)
-        .openRead()
-        .map(utf8.decode)
-        .transform(const LineSplitter());
+    final loadgenFile = File(filepath);
+
+    if (!loadgenFile.existsSync()) {
+      return extractLoadgenInfo(logLines: const Stream<String>.empty());
+    }
+
+    final lines =
+        loadgenFile.openRead().map(utf8.decode).transform(const LineSplitter());
     return extractLoadgenInfo(logLines: lines);
   }
 
@@ -58,29 +70,39 @@ class LoadgenInfo {
   static Future<LoadgenInfo?> extractLoadgenInfo({
     required Stream<String> logLines,
   }) async {
+    // TODO possibly update these links
     // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1119
     const latencyKey = 'result_mean_latency_ns';
+    const latencyFirstTokenKey = 'result_first_token_mean_latency_ns';
     // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1055
     const queryCountKey = 'result_query_count';
     // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1121-L1124
     const latency90Key = 'result_90.00_percentile_latency_ns';
+    const latency90FirstTokenKey =
+        'result_first_token_90.00_percentile_latency_ns';
     // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1028-L1029
     const validityKey = 'result_validity';
     // https://github.com/mlcommons/inference/blob/318cb131c0adf3bffcbc3379a502f40891331c54/loadgen/loadgen.cc#L1033C23-L1035
     const minDurationMetKey = 'result_min_duration_met';
     const minQueriesMetKey = 'result_min_queries_met';
     const earlyStoppingMetKey = 'early_stopping_met';
+    const useTokenLatenciesKey = 'requested_use_token_latencies';
+    const tokenThroughputKey = 'result_time_to_output_token_mean';
 
     final result = await extractKeys(
       logLines: logLines,
       requiredKeys: {
         latencyKey,
+        latencyFirstTokenKey,
         queryCountKey,
         latency90Key,
+        latency90FirstTokenKey,
         validityKey,
         minDurationMetKey,
         minQueriesMetKey,
         earlyStoppingMetKey,
+        useTokenLatenciesKey,
+        tokenThroughputKey,
       },
     );
 
@@ -88,18 +110,36 @@ class LoadgenInfo {
       return null;
     }
 
-    final isResultValid = result[validityKey] as String == 'VALID';
-
     const nanosecondsPerSecond = 1000 * Duration.microsecondsPerSecond;
+    bool usesTokens = (result[useTokenLatenciesKey] ?? false) as bool;
+
+    double tokenThroughput = 1.0 /
+        (((result[tokenThroughputKey] as num?)?.toDouble() ?? 0.0) /
+            nanosecondsPerSecond);
+    if (tokenThroughput.isInfinite) {
+      tokenThroughput = 0;
+    }
 
     return LoadgenInfo(
-      queryCount: result[queryCountKey] as int,
-      latencyMean: (result[latencyKey] as int) / nanosecondsPerSecond,
-      latency90: (result[latency90Key] as int) / nanosecondsPerSecond,
-      isMinDurationMet: result[minDurationMetKey] as bool,
-      isMinQueryMet: result[minQueriesMetKey] as bool,
-      isEarlyStoppingMet: result[earlyStoppingMetKey] as bool,
-      isResultValid: isResultValid,
+      queryCount: result[queryCountKey] as int? ?? 0,
+      latencyMean: !usesTokens
+          ? (result[latencyKey] as int? ?? 0) / nanosecondsPerSecond
+          : 0,
+      latencyFirstTokenMean: usesTokens
+          ? (result[latencyFirstTokenKey] as int? ?? 0) / nanosecondsPerSecond
+          : 0,
+      latency90: !usesTokens
+          ? (result[latency90Key] as int? ?? 0) / nanosecondsPerSecond
+          : 0,
+      latencyFirstToken90: usesTokens
+          ? (result[latency90FirstTokenKey] as int? ?? 0) / nanosecondsPerSecond
+          : 0,
+      tokenThroughput: usesTokens ? tokenThroughput : 0,
+      isMinDurationMet: result[minDurationMetKey] as bool? ?? false,
+      isMinQueryMet: result[minQueriesMetKey] as bool? ?? false,
+      isEarlyStoppingMet: result[earlyStoppingMetKey] as bool? ?? false,
+      isTokenBased: usesTokens,
+      isResultValid: (result[validityKey] as String?) == 'VALID',
     );
   }
 

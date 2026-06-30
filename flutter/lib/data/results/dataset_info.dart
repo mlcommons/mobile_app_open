@@ -15,6 +15,10 @@ enum DatasetTypeEnum {
   snusr,
   @JsonValue('COCOGEN')
   cocogen,
+  @JsonValue('MMLU')
+  mmlu,
+  @JsonValue('IFEVAL')
+  ifeval,
 }
 
 extension DatasetTypeExtension on DatasetTypeEnum {

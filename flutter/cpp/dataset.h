@@ -41,6 +41,7 @@ class Dataset : public ::mlperf::QuerySampleLibrary {
   ~Dataset() override {}
 
   // The number of samples that are guaranteed to fit in RAM.
+  // Returning 0 means performance mode should not run.
   size_t PerformanceSampleCount() override {
     int sample_size = 0;
     for (const DataType& data_type : input_format_) {
@@ -59,6 +60,9 @@ class Dataset : public ::mlperf::QuerySampleLibrary {
   // result by any means.
   virtual std::vector<uint8_t> ProcessOutput(
       const int sample_idx, const std::vector<void*>& outputs) = 0;
+
+  // Should be called after ProcessOutput.
+  virtual int64_t GetOutputTokenCount(const int sample_idx) { return 0; }
 
   virtual bool HasAccuracy() { return false; }
 

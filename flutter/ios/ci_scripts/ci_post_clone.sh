@@ -91,8 +91,8 @@ dart pub global activate protoc_plugin ^21.1.2
 cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 
 echo "$MC_LOG_PREFIX ========== Build app =========="
-export WITH_TFLITE=0
-export WITH_APPLE=1
+export WITH_TFLITE="${WITH_TFLITE:-0}"
+export WITH_APPLE="${WITH_APPLE:-1}"
 
 echo "$MC_LOG_PREFIX Build backend and Flutter packages"
 # Remember to update the next line if make commands are changed.

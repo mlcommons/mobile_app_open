@@ -11,12 +11,15 @@
 #include "flutter/cpp/datasets/ade20k.h"
 #include "flutter/cpp/datasets/coco.h"
 #include "flutter/cpp/datasets/coco_gen.h"
+#include "flutter/cpp/datasets/ifeval.h"
 #include "flutter/cpp/datasets/imagenet.h"
+#include "flutter/cpp/datasets/mmlu_gen.h"
 #include "flutter/cpp/datasets/snu_sr.h"
 #include "flutter/cpp/datasets/squad.h"
 #include "flutter/cpp/mlperf_driver.h"
 #include "flutter/cpp/proto/backend_setting.pb.h"
 #include "flutter/cpp/proto/mlperf_task.pb.h"
+#include "flutter/cpp/utils.h"
 
 static ::mlperf::mobile::MlperfDriver* global_driver = nullptr;
 static ::std::mutex global_driver_mutex;
@@ -73,6 +76,9 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   out->accelerator_name = strdup(backend->AcceleratorName().c_str());
 
   ::std::unique_ptr<::mlperf::mobile::Dataset> dataset;
+  std::string sp_path;
+  std::string sp_path_filename;
+  bool use_token_latencies = false;
   switch (in->dataset_type) {
     case ::mlperf::mobile::DatasetConfig::IMAGENET:
       dataset = std::make_unique<::mlperf::mobile::Imagenet>(
@@ -105,6 +111,29 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
           backend.get(), in->dataset_data_path, in->dataset_groundtruth_path,
           in->output_dir);
       break;
+    case ::mlperf::mobile::DatasetConfig::MMLU:
+      for (auto setting : settings.benchmark_setting().custom_setting()) {
+        if (setting.id() == "tokenizer_filename")
+          sp_path_filename = setting.value();
+      }
+      sp_path = in->backend_model_path;
+      sp_path += '/' + sp_path_filename;
+      use_token_latencies = true;
+      dataset = std::make_unique<::mlperf::mobile::MmluGen>(
+          backend.get(), in->dataset_data_path, sp_path, in->output_dir,
+          false /*zero-shot*/, mlperf::mobile::Str2TestMode(in->mode));
+      break;
+    case ::mlperf::mobile::DatasetConfig::IFEVAL:
+      for (auto setting : settings.benchmark_setting().custom_setting()) {
+        if (setting.id() == "tokenizer_filename")
+          sp_path_filename = setting.value();
+      }
+      sp_path = in->backend_model_path;
+      sp_path += '/' + sp_path_filename;
+      use_token_latencies = true;
+      dataset = std::make_unique<::mlperf::mobile::IFEval>(
+          backend.get(), in->dataset_data_path, sp_path, in->output_dir);
+      break;
     default:
       return nullptr;
   }
@@ -124,7 +153,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   auto start = std::chrono::steady_clock::now();
   driver.RunMLPerfTest(in->mode, in->min_query_count, in->min_duration,
                        in->max_duration, in->single_stream_expected_latency_ns,
-                       in->output_dir);
+                       in->output_dir, use_token_latencies);
   auto end = std::chrono::steady_clock::now();
   li;
 

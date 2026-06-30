@@ -1,4 +1,6 @@
-For release 5.0.1
+For release 6.0
+
+TODO: Update release notes for v6.0
 
 This release should be broadly compatible with newer Android devices.
 

@@ -9,6 +9,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+#include <algorithm>
+
+#include "llm_pipeline.h"
 #include "single_model_pipeline.h"
 #include "stable_diffusion_pipeline.h"
 #include "tensorflow/core/platform/logging.h"
@@ -27,6 +30,7 @@ limitations under the License.
 #endif
 
 #if MTK_TFLITE_NEURON_BACKEND
+#include <map>
 std::string GetPlatformName();
 #endif
 
@@ -37,10 +41,15 @@ extern "C" {
 std::unique_ptr<Pipeline> pipeline;
 
 void init_pipeline(const char *pipeline_type) {
+  // TODO use a switch/case
   bool sd_pipeline = (strcmp(pipeline_type, "StableDiffusionPipeline") == 0);
+  bool llm_pipeline = (strcmp(pipeline_type, "LLMPipeline") == 0);
   if (sd_pipeline) {
     LOG(INFO) << "Initializing StableDiffusionPipeline";
     pipeline = std::make_unique<StableDiffusionPipeline>();
+  } else if (llm_pipeline) {
+    LOG(INFO) << "Initializing LLMPipeline";
+    pipeline = std::make_unique<LLMPipeline>();
   } else {
     LOG(INFO) << "Initializing SingleModelPipeline";
     pipeline = std::make_unique<SingleModelPipeline>();
@@ -50,35 +59,32 @@ void init_pipeline(const char *pipeline_type) {
 void reset_pipeline() { pipeline.reset(); }
 
 #if defined(__ANDROID__) && defined(MTK_TFLITE_NEURON_BACKEND)
+
+void *LoadNeuronAdapter() {
+  return dlopen("libneuron_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
+}
+
+void *LoadNeuronUsdkAdapter(const std::string &platform) {
+  std::string usdk_name;
+  if (platform == "mt6989" || platform == "mt6991" || platform == "mt6993") {
+    usdk_name = "libneuronusdk_adapter.mtk." + platform + ".so";
+  } else {
+    usdk_name = "libneuronusdk_adapter.mtk.so";
+  }
+  return dlopen(usdk_name.c_str(), RTLD_LAZY | RTLD_LOCAL);
+}
+
 static bool neuron_tflite_backend(const char **not_allowed_message,
                                   const mlperf_device_info_t *device_info) {
   bool neuron_capable = false;
-  bool neuron_adapter = false;
-  void *libneuron_adapter;
+  void *adapter_handle = LoadNeuronAdapter();
 
-  // Try to load the default neuron adapter library
-  libneuron_adapter =
-      dlopen("libneuron_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
-
-  // If not found, try to load platform-specific libraries
-  if (libneuron_adapter == nullptr) {
-    const std::string device = GetPlatformName();
-    if (device == "mt6989") {
-      libneuron_adapter =
-          dlopen("libneuronusdk_adapter.mtk.mt6989.so", RTLD_LAZY | RTLD_LOCAL);
-    } else if (device == "mt6991") {
-      libneuron_adapter =
-          dlopen("libneuronusdk_adapter.mtk.mt6991.so", RTLD_LAZY | RTLD_LOCAL);
-    } else {
-      libneuron_adapter =
-          dlopen("libneuronusdk_adapter.mtk.so", RTLD_LAZY | RTLD_LOCAL);
-    }
-    if (libneuron_adapter != nullptr) neuron_adapter = true;
-  } else {
-    neuron_adapter = true;
+  if (adapter_handle == nullptr) {
+    const std::string platform = GetPlatformName();
+    adapter_handle = LoadNeuronUsdkAdapter(platform);
   }
 
-  if (neuron_adapter) {
+  if (adapter_handle != nullptr) {
     char ro_system_build_version_sdk[PROP_VALUE_MAX + 1];
     if (__system_property_get("ro.system.build.version.sdk",
                               ro_system_build_version_sdk)) {
@@ -107,15 +113,20 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const mlperf_device_info_t *device_info) {
   *not_allowed_message = nullptr;
 #if MTK_TFLITE_NEURON_BACKEND && defined(__ANDROID__)
-  std::string device = GetPlatformName();
-  LOG(INFO) << "The platform name is " << device;
+  const std::string platform = GetPlatformName();
+  LOG(INFO) << "The platform is " << platform;
 
-  *settings = tflite_settings_mtk.c_str();
+  static const std::map<std::string, std::string> platform_settings_file = {
+      {"mt6989", tflite_settings_mtk_mt6989},
+      {"mt6991", tflite_settings_mtk_mt6991},
+      {"mt6993", tflite_settings_mtk_mt6993},
+  };
 
-  if (device == "mt6989") {
-    *settings = tflite_settings_mtk_mt6989.c_str();
-  } else if (device == "mt6991") {
-    *settings = tflite_settings_mtk_mt6991.c_str();
+  auto iteration = platform_settings_file.find(platform);
+  if (iteration != platform_settings_file.end()) {
+    *settings = iteration->second.c_str();
+  } else {
+    *settings = tflite_settings_mtk.c_str();
   }
 
   return neuron_tflite_backend(not_allowed_message, device_info);
@@ -152,7 +163,14 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 #elif defined(_WIN64) || defined(_WIN32)
   *settings = tflite_settings_windows.c_str();
 #else
-  *settings = tflite_settings_android.c_str();
+  // Samsung Galaxy M32 (SM-M326B) does not have enough memory to run LLM
+  // benchmarks, so use a settings file that omits them.
+  if (device_info->model != nullptr &&
+      strcmp(device_info->model, "SM-M326B") == 0) {
+    *settings = tflite_settings_android_m32.c_str();
+  } else {
+    *settings = tflite_settings_android.c_str();
+  }
 #endif
   LOG(INFO) << "TFLite backend matches hardware";
   return true;
@@ -162,6 +180,8 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 mlperf_backend_ptr_t mlperf_backend_create(
     const char *model_path, mlperf_backend_configuration_t *configs,
     const char *native_lib_path) {
+  LOG(INFO) << "Using TfLite " << TfLiteVersion() << " With Schema "
+            << TfLiteSchemaVersion() << std::endl;
   const char *pipeline_type = "";
   for (int i = 0; i < configs->count; ++i) {
     if (strcmp(configs->keys[i], "pipeline") == 0) {
@@ -195,8 +215,12 @@ void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
 }
 
 // Run the inference for a sample.
-mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr) {
-  return pipeline->backend_issue_query(backend_ptr);
+// callback and context are only used when running token based inferences (LLM).
+// In other cases they can be passed as nullptr
+mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
+                                           ft_callback callback,
+                                           void *context) {
+  return pipeline->backend_issue_query(backend_ptr, callback, context);
 }
 
 // Flush the staged queries immediately.

@@ -46,7 +46,7 @@ class ResourceErrorScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'Error: ${state.error}\n',
+                        'Error: ${state.resourceError}\n',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 15,

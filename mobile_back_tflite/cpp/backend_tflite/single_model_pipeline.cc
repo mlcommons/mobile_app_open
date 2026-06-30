@@ -206,14 +206,19 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
   LOG(INFO) << "ML-Perf Model path: " << std::string(model_path);
 
   if (need_neuron_backend(model_path)) {
-    create_neuron_backend(backend_data->neuronBackendData, model_path);
-    if (strstr(configs->accelerator, "neuron") != NULL)
-      backend_data->accelerator = "NPU";
-    return backend_data;
+    if (create_neuron_backend(backend_data->neuronBackendData, configs,
+                              model_path)) {
+      if (strstr(configs->accelerator, "neuron") != NULL)
+        backend_data->accelerator = "NPU";
+      return backend_data;
+    } else {
+      backend_delete(backend_data);
+      return nullptr;
+    }
   }
+
 #endif
 
-  // Use Tflite Interpreter backend
   // Load the model.
   backend_data->model = TfLiteModelCreateFromFile(model_path);
   if (!backend_data->model) {
@@ -429,7 +434,7 @@ const char *SingleModelPipeline::backend_name(
 
 // Run the inference for a sample.
 mlperf_status_t SingleModelPipeline::backend_issue_query(
-    mlperf_backend_ptr_t backend_ptr) {
+    mlperf_backend_ptr_t backend_ptr, ft_callback callback, void *context) {
   TFLiteBackendData *backend_data = (TFLiteBackendData *)backend_ptr;
 
 #ifdef MTK_TFLITE_NEURON_BACKEND

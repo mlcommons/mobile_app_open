@@ -204,3 +204,70 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:object_detection_average_precision_stage",
     ],
 )
+
+cc_library(
+    name = "mmlu_gen",
+    srcs = [
+        "mmlu_gen.cc",
+    ],
+    hdrs = [
+        "mmlu_gen.h",
+        "utils.h",
+    ],
+    copts = tflite_copts() + select({
+        "//flutter/android/commonlibs:use_asan": [
+            "-fsanitize=address",
+            "-g",
+            "-O1",
+            "-fno-omit-frame-pointer",
+        ],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":allocator",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp:utils",
+        "//flutter/cpp/backends:external",
+        "//flutter/cpp/datasets/mmlu_utils",
+        "//flutter/cpp/datasets/squad_utils",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_protobuf//:protobuf",
+        "@com_google_sentencepiece//:sentencepiece_processor",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "ifeval",
+    srcs = [
+        "ifeval.cc",
+    ],
+    hdrs = [
+        "ifeval.h",
+        "utils.h",
+    ],
+    copts = tflite_copts() + select({
+        "//flutter/android/commonlibs:use_asan": [
+            "-fsanitize=address",
+            "-g",
+            "-O1",
+            "-fno-omit-frame-pointer",
+        ],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":allocator",
+        "//flutter/cpp:mlperf_driver",
+        "//flutter/cpp:utils",
+        "//flutter/cpp/backends:external",
+        "//flutter/cpp/datasets/ifeval_utils",
+        "//flutter/cpp/datasets/mmlu_utils",
+        "//flutter/cpp/datasets/squad_utils",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_protobuf//:protobuf",
+        "@com_google_sentencepiece//:sentencepiece_processor",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
+        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
+    ],
+)

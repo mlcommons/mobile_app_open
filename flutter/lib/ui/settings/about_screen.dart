@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:mlperfbench/localizations/app_localizations.dart';
 
@@ -36,7 +39,14 @@ class _AboutText extends State<AboutText> {
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         Widget child;
         if (snapshot.hasData) {
-          child = Markdown(data: snapshot.data!);
+          child = Markdown(
+            data: snapshot.data!,
+            onTapLink: (text, href, title) {
+              if (href == null) return;
+              final uri = Uri.parse(href);
+              unawaited(launchUrl(uri, mode: LaunchMode.externalApplication));
+            },
+          );
         } else if (snapshot.hasError) {
           child = Text('${snapshot.error}');
         } else {

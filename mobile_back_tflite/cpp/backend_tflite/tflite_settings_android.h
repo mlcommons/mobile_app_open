@@ -16,7 +16,10 @@ limitations under the License.
 #define TFLITE_SETTINGS_ANDROID_H
 
 #include "mobile_back_tflite/cpp/backend_tflite/backend_settings/tflite_settings_android.pbtxt.h"
+#include "mobile_back_tflite/cpp/backend_tflite/backend_settings/tflite_settings_android_m32.pbtxt.h"
 
 const std::string tflite_settings_android = tflite_settings_android_pbtxt;
+const std::string tflite_settings_android_m32 =
+    tflite_settings_android_m32_pbtxt;
 
 #endif
