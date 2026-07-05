@@ -26,10 +26,7 @@ class _Examples {
 void main() {
   group('LoadgenInfo', () {
     test('extract keys', () async {
-      const lines = [
-        _Examples.mean,
-        _Examples.max,
-      ];
+      const lines = [_Examples.mean, _Examples.max];
 
       final values = await LoadgenInfo.extractKeys(
         logLines: Stream.fromIterable(lines),
@@ -40,9 +37,7 @@ void main() {
       expect(values[_Examples.meanKey], 31329862);
     });
     test('extract keys: empty', () async {
-      const lines = [
-        _Examples.max,
-      ];
+      const lines = [_Examples.max];
 
       final values = await LoadgenInfo.extractKeys(
         logLines: Stream.fromIterable(lines),
@@ -77,9 +72,7 @@ void main() {
       expect(info.isEarlyStoppingMet, true);
     });
     test('extract info: missing keys: all', () async {
-      const lines = [
-        _Examples.max,
-      ];
+      const lines = [_Examples.max];
 
       final info = await LoadgenInfo.extractLoadgenInfo(
         logLines: Stream.fromIterable(lines),
@@ -88,11 +81,7 @@ void main() {
       expect(info, isNull);
     });
     test('extract info: missing keys: partially', () async {
-      const lines = [
-        _Examples.mean,
-        _Examples.latency90,
-        _Examples.validity,
-      ];
+      const lines = [_Examples.mean, _Examples.latency90, _Examples.validity];
 
       final info = await LoadgenInfo.extractLoadgenInfo(
         logLines: Stream.fromIterable(lines),

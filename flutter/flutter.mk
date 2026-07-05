@@ -78,7 +78,7 @@ flutter/result/json:
 	@echo "Generate .g.dart files for the @JsonSerializable annotation"
 	cd flutter && ${_start_args} dart pub get
 	cd flutter && ${_start_args} dart run \
-		build_runner build --delete-conflicting-outputs
+		build_runner build
 
 .PHONY: flutter/build-info
 flutter/build-info:
@@ -108,8 +108,7 @@ flutter/l10n:
 		--arb-dir=lib/l10n \
 		--output-dir=lib/localizations \
 		--template-arb-file=app_en.arb \
-		--output-localization-file=app_localizations.dart \
-		--no-synthetic-package
+		--output-localization-file=app_localizations.dart
 	dart format flutter/lib/localizations
 
 .PHONY: flutter/set-windows-build-number
@@ -149,9 +148,10 @@ flutter/test/integration:
 		${flutter_firebase_crashlytics_arg} \
 		${flutter_perf_test_arg}
 
-# Default to release mode: Flutter 3.19.6's Dart VM crashes on iOS 26+
-# devices in debug mode (mprotect denied). Override with FLUTTER_RUN_MODE=debug.
-FLUTTER_RUN_MODE?=release
+# Flutter 3.44.4 (Dart 3.12.2) supports debug mode on iOS 26+ devices; the
+# Dart VM mprotect crash that affected 3.19.6 is resolved. Override with e.g.
+# FLUTTER_RUN_MODE=release or FLUTTER_RUN_MODE=profile.
+FLUTTER_RUN_MODE?=debug
 .PHONY: flutter/run
 flutter/run:
 	cd flutter && ${_start_args} \

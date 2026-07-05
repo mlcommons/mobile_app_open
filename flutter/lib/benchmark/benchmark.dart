@@ -52,14 +52,15 @@ class Benchmark {
     required this.benchmarkSettings,
     required this.taskConfig,
     required this.isActive,
-  })  : info = BenchmarkInfo(taskConfig),
-        backendRequestDescription = benchmarkSettings.framework;
+  }) : info = BenchmarkInfo(taskConfig),
+       backendRequestDescription = benchmarkSettings.framework;
 
   String get id => taskConfig.id;
 
   pb.DelegateSetting get selectedDelegate {
     final delegate = benchmarkSettings.delegateChoice.firstWhere(
-        (e) => e.delegateName == benchmarkSettings.delegateSelected);
+      (e) => e.delegateName == benchmarkSettings.delegateSelected,
+    );
     return delegate;
   }
 
@@ -88,8 +89,10 @@ class Benchmark {
     benchmarkSettings.customSetting.addAll(customConfigs);
     final uris = selectedDelegate.modelFile.map((e) => e.modelPath).toList();
     final modelDirName = selectedDelegate.delegateName.replaceAll(' ', '_');
-    final backendModelPath =
-        await resourceManager.getModelPath(uris, modelDirName);
+    final backendModelPath = await resourceManager.getModelPath(
+      uris,
+      modelDirName,
+    );
     return RunSettings(
       backend_model_path: backendModelPath,
       backend_lib_name: backendLibName,
@@ -123,12 +126,16 @@ class BenchmarkSet {
   //TODO use pass by reference
   late final Map<String, int> optionMap;
 
-  BenchmarkSet(
-      {required this.config, List<Benchmark> allBenchmarks = const []}) {
-    optionSets =
-        config.optionSet.map((e) => BenchmarkOptionSet(config: e)).toList();
-    benchmarks =
-        allBenchmarks.where((e) => e.taskConfig.taskSet == config.id).toList();
+  BenchmarkSet({
+    required this.config,
+    List<Benchmark> allBenchmarks = const [],
+  }) {
+    optionSets = config.optionSet
+        .map((e) => BenchmarkOptionSet(config: e))
+        .toList();
+    benchmarks = allBenchmarks
+        .where((e) => e.taskConfig.taskSet == config.id)
+        .toList();
     optionMap = {
       for (final (index, item) in optionSets.indexed)
         for (final key in item.options.keys) key: index,
@@ -141,8 +148,9 @@ class BenchmarkSet {
         .where((e) => !e.config.hidden)
         .expand((e) => e.options.values);
 
-    var benchmarkOptions =
-        benchmarks.expand((e) => e.taskConfig.requiredOption).toSet();
+    var benchmarkOptions = benchmarks
+        .expand((e) => e.taskConfig.requiredOption)
+        .toSet();
 
     return unhiddenOptions.where((e) => benchmarkOptions.contains(e.id));
   }
@@ -160,8 +168,8 @@ class BenchmarkSet {
         final index = optionMap[optionId];
         final optionSet =
             (index != null && index >= 0 && index < optionSets.length)
-                ? optionSets[index]
-                : null;
+            ? optionSets[index]
+            : null;
         if (!(optionSet?.getOption(optionId) ?? false)) {
           benchmark.isActive = false;
           break;
@@ -187,7 +195,7 @@ class BenchmarkOptionSet {
 
   Map<String, BenchmarkOption> _createOptions(pb.OptionSet config) {
     return {
-      for (final item in config.opt) item.id: BenchmarkOption(config: item)
+      for (final item in config.opt) item.id: BenchmarkOption(config: item),
     };
   }
 
@@ -263,26 +271,32 @@ class BenchmarkStore {
   }) {
     // sort the order of task based on BenchmarkId.allIds
     final List<pb.TaskConfig> sortedTasks = List.from(appConfig.task)
-      ..sort((a, b) =>
-          BenchmarkId.allIds.indexOf(a.id) - BenchmarkId.allIds.indexOf(b.id));
+      ..sort(
+        (a, b) =>
+            BenchmarkId.allIds.indexOf(a.id) - BenchmarkId.allIds.indexOf(b.id),
+      );
     for (final task in sortedTasks) {
-      final backendSettings = backendConfig
-          .singleWhereOrNull((setting) => setting.benchmarkId == task.id);
+      final backendSettings = backendConfig.singleWhereOrNull(
+        (setting) => setting.benchmarkId == task.id,
+      );
       if (backendSettings == null) {
         print('No matching benchmark settings for task ${task.id}');
         continue;
       }
 
       final enabled = taskSelection[task.id] ?? true;
-      allBenchmarks.add(Benchmark(
-        taskConfig: task,
-        benchmarkSettings: backendSettings,
-        isActive: enabled,
-      ));
+      allBenchmarks.add(
+        Benchmark(
+          taskConfig: task,
+          benchmarkSettings: backendSettings,
+          isActive: enabled,
+        ),
+      );
     }
     for (final setConfig in appConfig.taskSet) {
-      benchmarkSets
-          .add(BenchmarkSet(config: setConfig, allBenchmarks: allBenchmarks));
+      benchmarkSets.add(
+        BenchmarkSet(config: setConfig, allBenchmarks: allBenchmarks),
+      );
     }
   }
 

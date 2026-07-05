@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:flutter/material.dart';
 
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/list.dart';
@@ -21,12 +21,7 @@ import 'package:mlperfbench/resources/validation_helper.dart';
 import 'package:mlperfbench/state/task_runner.dart';
 import 'package:mlperfbench/store.dart';
 
-enum BenchmarkStateEnum {
-  waiting,
-  running,
-  aborting,
-  done,
-}
+enum BenchmarkStateEnum { waiting, running, aborting, done }
 
 class BenchmarkState extends ChangeNotifier {
   final Store _store;
@@ -62,16 +57,18 @@ class BenchmarkState extends ChangeNotifier {
     if (benchmarksCount == 0) return 0;
 
     final summaryThroughput = pow(
-        allBenchmarks.fold<double>(1, (prev, i) {
-          return prev * (i.performanceModeResult?.throughput?.value ?? 1.0);
-        }),
-        1.0 / benchmarksCount);
+      allBenchmarks.fold<double>(1, (prev, i) {
+        return prev * (i.performanceModeResult?.throughput?.value ?? 1.0);
+      }),
+      1.0 / benchmarksCount,
+    );
 
     final maxSummaryThroughput = pow(
-        allBenchmarks.fold<double>(1, (prev, i) {
-          return prev * (i.info.maxThroughput);
-        }),
-        1.0 / benchmarksCount);
+      allBenchmarks.fold<double>(1, (prev, i) {
+        return prev * (i.info.maxThroughput);
+      }),
+      1.0 / benchmarksCount,
+    );
 
     return summaryThroughput / maxSummaryThroughput;
   }
@@ -138,16 +135,17 @@ class BenchmarkState extends ChangeNotifier {
     }
   }
 
-  Future<void> loadResources(
-      {required bool downloadMissing,
-      List<Benchmark> benchmarks = const []}) async {
+  Future<void> loadResources({
+    required bool downloadMissing,
+    List<Benchmark> benchmarks = const [],
+  }) async {
     final newAppVersion =
         '${BuildInfoHelper.info.version}+${BuildInfoHelper.info.buildNumber}';
     var needToPurgeCache = _store.previousAppVersion != newAppVersion;
     _store.previousAppVersion = newAppVersion;
 
     final selectedBenchmarks = benchmarks.isEmpty ? allBenchmarks : benchmarks;
-    await Wakelock.enable();
+    await WakelockPlus.enable();
     final selectedResources = _benchmarkStore.listResources(
       modes: taskRunner.selectedRunModes,
       benchmarks: selectedBenchmarks,
@@ -160,8 +158,10 @@ class BenchmarkState extends ChangeNotifier {
       final selectedBenchmarkIds = selectedBenchmarks
           .map((e) => e.benchmarkSettings.benchmarkId)
           .join(', ');
-      print('Start loading resources with downloadMissing=$downloadMissing '
-          'for $selectedBenchmarkIds');
+      print(
+        'Start loading resources with downloadMissing=$downloadMissing '
+        'for $selectedBenchmarkIds',
+      );
       await resourceManager.handleResources(
         resources: selectedResources,
         purgeOldCache: needToPurgeCache,
@@ -182,14 +182,16 @@ class BenchmarkState extends ChangeNotifier {
       resourceError = e;
       stackTrace = s;
     }
-    await Wakelock.disable();
+    await WakelockPlus.disable();
   }
 
   static Future<BenchmarkState> create(Store store) async {
     final state = BenchmarkState._(store, await BridgeIsolate.create());
     await state.resourceManager.initSystemPaths();
     state.configManager = ConfigManager(
-        state.resourceManager.applicationDirectory, state.resourceManager);
+      state.resourceManager.applicationDirectory,
+      state.resourceManager,
+    );
     try {
       await state.setTaskConfig(name: store.chosenConfigurationName);
       state.deferredLoadResources();
@@ -272,7 +274,7 @@ class BenchmarkState extends ChangeNotifier {
     _doneRunning = false;
 
     // disable screen sleep when benchmarks is running
-    await Wakelock.enable();
+    await WakelockPlus.enable();
 
     final startTime = DateTime.now();
     final logDirName = startTime.toIso8601String().replaceAll(':', '-');
@@ -281,16 +283,19 @@ class BenchmarkState extends ChangeNotifier {
 
     try {
       resetCurrentResults();
-      lastResult =
-          await taskRunner.runBenchmarks(_benchmarkStore, currentLogDir);
+      lastResult = await taskRunner.runBenchmarks(
+        _benchmarkStore,
+        currentLogDir,
+      );
 
       if (lastResult == null) {
         print('Benchmark aborted');
       } else {
         print('Benchmarks finished');
 
-        _store.previousExtendedResult =
-            const JsonEncoder().convert(lastResult!.toJson());
+        _store.previousExtendedResult = const JsonEncoder().convert(
+          lastResult!.toJson(),
+        );
         await resourceManager.resultManager.saveResult(lastResult!);
       }
 
@@ -309,7 +314,7 @@ class BenchmarkState extends ChangeNotifier {
 
       notifyListeners();
 
-      await Wakelock.disable();
+      await WakelockPlus.disable();
     }
   }
 
@@ -327,9 +332,12 @@ class BenchmarkState extends ChangeNotifier {
 
     try {
       lastResult = ExtendedResult.fromJson(
-          jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>);
-      resourceManager.resultManager
-          .restoreResults(lastResult!.results, allBenchmarks);
+        jsonDecode(_store.previousExtendedResult) as Map<String, dynamic>,
+      );
+      resourceManager.resultManager.restoreResults(
+        lastResult!.results,
+        allBenchmarks,
+      );
       _doneRunning = true;
       return;
     } catch (e, trace) {
@@ -355,14 +363,19 @@ class BenchmarkState extends ChangeNotifier {
   }
 
   void benchmarkSetOption(
-      BenchmarkSet benchmarkSet, String option, bool value) {
-    benchmarkSet.optionSets[benchmarkSet.optionMap[option]!]
-        .setOptionTo(option, value);
+    BenchmarkSet benchmarkSet,
+    String option,
+    bool value,
+  ) {
+    benchmarkSet.optionSets[benchmarkSet.optionMap[option]!].setOptionTo(
+      option,
+      value,
+    );
     benchmarkSet.applyOptions();
     notifyListeners();
   }
 
-// Config section controls
+  // Config section controls
   final Set<BenchmarkSet> _openAdvancedSets = {};
   bool isAdvancedConfigOpen(BenchmarkSet set) =>
       _openAdvancedSets.contains(set);

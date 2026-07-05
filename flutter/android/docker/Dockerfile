@@ -42,10 +42,12 @@ RUN yes | sdkmanager \
     "platform-tools" \
     "build-tools;30.0.3" \
     "build-tools;34.0.0" \
+    "build-tools;35.0.0" \
     "platforms;android-29" \
     "platforms;android-31" \
     "platforms;android-33" \
-    "platforms;android-34"
+    "platforms;android-34" \
+    "platforms;android-35"
 # Install NDK in a separate layer to decrease max layer size.
 RUN yes | sdkmanager "ndk;25.2.9519653"
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/25.2.9519653
@@ -58,7 +60,7 @@ WORKDIR $HOME
 
 ENV PUB_CACHE=$HOME/.cache/.pub-cache
 ENV PATH=$PATH:$HOME/flutter/bin:$HOME/flutter/bin/cache/dart-sdk/bin:$PUB_CACHE/bin
-RUN git clone --branch "3.19.6" --single-branch --depth 1 https://github.com/flutter/flutter.git $HOME/flutter
+RUN git clone --branch "3.44.4" --single-branch --depth 1 https://github.com/flutter/flutter.git $HOME/flutter
 RUN git config --global --add safe.directory $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN flutter doctor -v

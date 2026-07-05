@@ -25,12 +25,12 @@ Otherwise, you can get errors about missing pods
   * Download flutter repo:
 
     ```bash
-    mkdir -p ~/tools && git clone --branch 3.19.6 --depth 1 https://github.com/flutter/flutter.git ~/tools/flutter
+    mkdir -p ~/tools && git clone --branch 3.44.4 --depth 1 https://github.com/flutter/flutter.git ~/tools/flutter
     ```
 
   * Add flutter binary folders to path: `export PATH="$PATH:$HOME/tools/flutter/bin:$HOME/.pub-cache/bin"`  
     If you use zsh: `echo export PATH="\$PATH:\$HOME/tools/flutter/bin:\$HOME/.pub-cache/bin" >>~/.zshrc`
-  * Enable protobuf plugin: `dart pub global activate protoc_plugin ^21.1.2`
+  * Enable protobuf plugin: `dart pub global activate protoc_plugin ^25.0.0`
 * Go to `ios` directory and install pods: `pod install`
 
 ## Tested environment
@@ -42,10 +42,10 @@ macOS 14.4.1
 Xcode 15.4
 
 $ flutter --version
-Flutter 3.19.6 • channel stable • https://github.com/flutter/flutter.git
+Flutter 3.44.4 • channel stable • https://github.com/flutter/flutter.git
 Framework • revision 54e66469a9 (4 weeks ago) • 2024-04-17 13:08:03 -0700
 Engine • revision c4cd48e186
-Tools • Dart 3.3.4 • DevTools 2.31.1
+Tools • Dart 3.12.2 • DevTools 2.57.0
 
 $ bazel --version
 bazel 6.3.2

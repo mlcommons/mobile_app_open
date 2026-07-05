@@ -53,8 +53,9 @@ void main() {
     expect(find.text('设置'), findsOneWidget);
   });
 
-  testWidgets('null locale (system default) falls back to device English',
-      (tester) async {
+  testWidgets('null locale (system default) falls back to device English', (
+    tester,
+  ) async {
     // A null locale is what the app passes when "System default" is selected;
     // Flutter then resolves against the device locale (en in the test env).
     await tester.pumpWidget(_wrap(null));

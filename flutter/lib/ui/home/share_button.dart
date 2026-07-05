@@ -23,9 +23,7 @@ class ShareButton extends StatelessWidget {
       onPressed: () {
         showModalBottomSheet(
           context: context,
-          builder: (_) => const Wrap(
-            children: [ShareBottomSheet()],
-          ),
+          builder: (_) => const Wrap(children: [ShareBottomSheet()]),
         );
       },
     );
@@ -47,9 +45,7 @@ class _ShareButton extends State<ShareBottomSheet> {
   Widget build(BuildContext context) {
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context)!;
-    return Center(
-      child: _buildShareModal(context),
-    );
+    return Center(child: _buildShareModal(context));
   }
 
   Future<void> _handleSharing(_ShareDestination destination) async {
@@ -57,9 +53,11 @@ class _ShareButton extends State<ShareBottomSheet> {
     switch (destination) {
       case _ShareDestination.local:
         final filePath = resultManager.getSubmissionFile().path;
-        await Share.shareXFiles(
-          [XFile(filePath)],
-          subject: l10n.shareButtonOtherSubject,
+        await SharePlus.instance.share(
+          ShareParams(
+            files: [XFile(filePath)],
+            subject: l10n.shareButtonOtherSubject,
+          ),
         );
         break;
       case _ShareDestination.cloud:
@@ -71,8 +69,6 @@ class _ShareButton extends State<ShareBottomSheet> {
         cancel();
         BotToast.showText(text: l10n.uploadSuccess);
         break;
-      default:
-        throw Exception('Unknown destination: $destination');
     }
   }
 
@@ -134,25 +130,28 @@ class _ShareButton extends State<ShareBottomSheet> {
   Future<void> _buildProfileModal(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  l10n.shareButtonMLCommons,
-                  style: const TextStyle(
-                      color: AppColors.shareTextButton, fontSize: 18),
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                l10n.shareButtonMLCommons,
+                style: const TextStyle(
+                  color: AppColors.shareTextButton,
+                  fontSize: 18,
                 ),
-                const SizedBox(height: 20),
-                Text(l10n.uploadRequiredSignedIn),
-                const SizedBox(height: 20),
-                const UserProfileSection(),
-              ],
-            ),
-          );
-        });
+              ),
+              const SizedBox(height: 20),
+              Text(l10n.uploadRequiredSignedIn),
+              const SizedBox(height: 20),
+              const UserProfileSection(),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

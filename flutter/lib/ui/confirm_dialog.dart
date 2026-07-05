@@ -13,18 +13,16 @@ Future<ConfirmDialogAction?> showConfirmDialog(
   final l10n = AppLocalizations.of(context)!;
 
   Widget cancelButton = TextButton(
-      style: TextButton.styleFrom(
-        textStyle: const TextStyle(fontSize: 18),
-      ),
-      onPressed: () => Navigator.pop(context, ConfirmDialogAction.cancel),
-      child: Text(l10n.dialogCancel));
+    style: TextButton.styleFrom(textStyle: const TextStyle(fontSize: 18)),
+    onPressed: () => Navigator.pop(context, ConfirmDialogAction.cancel),
+    child: Text(l10n.dialogCancel),
+  );
 
   Widget okButton = TextButton(
-      style: TextButton.styleFrom(
-        textStyle: const TextStyle(fontSize: 18),
-      ),
-      onPressed: () => Navigator.pop(context, ConfirmDialogAction.ok),
-      child: Text(l10n.dialogOk));
+    style: TextButton.styleFrom(textStyle: const TextStyle(fontSize: 18)),
+    onPressed: () => Navigator.pop(context, ConfirmDialogAction.ok),
+    child: Text(l10n.dialogOk),
+  );
 
   return await showDialog<ConfirmDialogAction>(
     context: context,

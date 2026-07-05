@@ -28,7 +28,7 @@ RUN start /w vs_BuildTools --quiet --norestart --nocache --wait`
 RUN choco install -y --no-progress msys2 --version 20220319.0.0 --params "/NoUpdate"
 RUN setx path "%path%;C:/tools/msys64/usr/bin"
 
-RUN choco install -y --no-progress flutter --version 3.19.6
+RUN choco install -y --no-progress flutter --version 3.44.4
 RUN choco install -y --no-progress git --version 2.33.0.2
 RUN choco install -y --no-progress make --version 4.3
 RUN choco install -y --no-progress bazelisk --version 1.16.0

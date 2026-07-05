@@ -71,11 +71,11 @@ jobs:
         uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
-          flutter-version: 3.19.6
+          flutter-version: 3.44.4
       - name: Install protoc
         run: |
           flutter config --no-analytics && dart --disable-analytics
-          dart pub global activate protoc_plugin ^21.1.2
+          dart pub global activate protoc_plugin ^25.0.0
       - name: Install Android SDK
         run: |
           export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin

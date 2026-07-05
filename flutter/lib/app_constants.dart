@@ -1,12 +1,18 @@
 class DartDefine {
   DartDefine._();
 
-  static const isOfficialBuild =
-      bool.fromEnvironment('OFFICIAL_BUILD', defaultValue: false);
-  static const firebaseCrashlyticsEnabled =
-      bool.fromEnvironment('FIREBASE_CRASHLYTICS_ENABLED', defaultValue: false);
-  static const perfTestEnabled =
-      bool.fromEnvironment('PERF_TEST', defaultValue: false);
+  static const isOfficialBuild = bool.fromEnvironment(
+    'OFFICIAL_BUILD',
+    defaultValue: false,
+  );
+  static const firebaseCrashlyticsEnabled = bool.fromEnvironment(
+    'FIREBASE_CRASHLYTICS_ENABLED',
+    defaultValue: false,
+  );
+  static const perfTestEnabled = bool.fromEnvironment(
+    'PERF_TEST',
+    defaultValue: false,
+  );
 }
 
 class WidgetKeys {
@@ -50,14 +56,7 @@ class BackendId {
   static const qti = 'libqtibackend';
   static const apple = 'libcoremlbackend';
 
-  static const allIds = [
-    tflite,
-    pixel,
-    mediatek,
-    samsung,
-    qti,
-    apple,
-  ];
+  static const allIds = [tflite, pixel, mediatek, samsung, qti, apple];
 }
 
 class Url {

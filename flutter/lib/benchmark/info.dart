@@ -30,9 +30,10 @@ class BenchmarkInfo {
       case (BenchmarkId.llm):
         // TODO translate this and add proper info
         return BenchmarkLocalizationInfo(
-            name: 'LLM',
-            detailsTitle: 'Large Language Model',
-            detailsContent: 'LLM description goes here');
+          name: 'LLM',
+          detailsTitle: 'Large Language Model',
+          detailsContent: 'LLM description goes here',
+        );
       case (BenchmarkId.imageClassificationV2):
         return BenchmarkLocalizationInfo(
           name: stringResources.benchNameImageClassification,
