@@ -81,7 +81,7 @@ jobs:
           export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
           yes | sdkmanager --licenses >/dev/null
           yes | sdkmanager "platform-tools" "build-tools;35.0.1" "build-tools;36.0.0" "platforms;android-34" "platforms;android-35" "platforms;android-36"
-          yes | sdkmanager "ndk;25.2.9519653"
+          yes | sdkmanager "ndk;25.2.9519653" "ndk;28.2.13676358"
       - name: Prepare Flutter
         run: |
           make flutter/prepare
