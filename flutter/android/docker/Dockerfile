@@ -183,3 +183,13 @@ ENV ANDROID_PLATFORM="${API_LEVEL}"
 ENV ANDROID_PLATFORM_TOOLS="${ANDROID_HOME}/platform-tools"
 ENV PATH="${ANDROID_PLATFORM_TOOLS}:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/local/lib/:${LD_LIBRARY_PATH}"
+
+# Expose the cmdline-tools under the canonical `latest` directory as well.
+# Flutter 3.44's release app-bundle build runs `apkanalyzer` to verify that
+# native debug symbols were stripped, and it only looks for apkanalyzer under
+# `cmdline-tools/latest/bin`, `cmdline-tools/<version>/bin`, or `<sdk>/tools/bin`
+# — not the `cmdline-tools/tools` layout used above. Without this the AAB build
+# fails with the misleading "Release app bundle failed to strip debug symbols".
+# Kept as a trailing layer (a symlink, not a rename) so the earlier cmdline-tools
+# / NDK / OpenCV layers stay cache-valid and the image rebuild stays fast.
+RUN ln -s "$ANDROID_SDK_ROOT/cmdline-tools/tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
