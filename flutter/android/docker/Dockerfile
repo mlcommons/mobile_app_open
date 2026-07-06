@@ -51,7 +51,23 @@ RUN yes | sdkmanager \
     "platforms;android-35" \
     "platforms;android-36"
 # Install NDK in a separate layer to decrease max layer size.
+#
+# Two NDKs are installed on purpose, because they serve different jobs:
+#   * NDK 25 (ANDROID_NDK_ROOT below) COMPILES the native code — bazel builds
+#     the backend bridge + TFLite backend against ANDROID_NDK_HOME, and the
+#     OpenCV 3.4.7 layer builds against NDK 25's android.toolchain.cmake. Both
+#     are known-good on NDK 25.
+#   * NDK 28 is used by the Flutter Gradle build (app ndkVersion) only to STRIP
+#     the prebuilt .so's for the release bundle. It is required because the
+#     plugins (integration_test, jni, firebase_*) declare NDK >= 28.2.x, and
+#     because NDK 25 ships x86_64-only macOS host tools that fail to strip on
+#     the arm64 macOS CI runner (NDK >= 26 adds arm64 macOS host binaries).
+#
+# Consolidating everything onto NDK 28 is possible but is a separate change:
+# it means recompiling TFLite + OpenCV 3.4.7 (2019) with a much newer NDK,
+# which needs its own validation and is out of scope for the Flutter upgrade.
 RUN yes | sdkmanager "ndk;25.2.9519653"
+RUN yes | sdkmanager "ndk;28.2.13676358"
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/25.2.9519653
 ENV ANDROID_NDK=${ANDROID_NDK_ROOT}
 ENV ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
