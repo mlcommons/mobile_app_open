@@ -43,11 +43,13 @@ RUN yes | sdkmanager \
     "build-tools;30.0.3" \
     "build-tools;34.0.0" \
     "build-tools;35.0.0" \
+    "build-tools;36.0.0" \
     "platforms;android-29" \
     "platforms;android-31" \
     "platforms;android-33" \
     "platforms;android-34" \
-    "platforms;android-35"
+    "platforms;android-35" \
+    "platforms;android-36"
 # Install NDK in a separate layer to decrease max layer size.
 RUN yes | sdkmanager "ndk;25.2.9519653"
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/25.2.9519653
@@ -64,7 +66,7 @@ RUN git clone --branch "3.44.4" --single-branch --depth 1 https://github.com/flu
 RUN git config --global --add safe.directory $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN flutter doctor -v
-RUN dart pub global activate protoc_plugin ^21.1.2 && chmod --recursive a=u $PUB_CACHE
+RUN dart pub global activate protoc_plugin ^25.0.0 && chmod --recursive a=u $PUB_CACHE
 
 RUN mkdir -p $HOME/.cache/.gradle
 ENV GRADLE_USER_HOME=$HOME/.cache/.gradle

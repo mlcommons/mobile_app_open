@@ -38,7 +38,7 @@ RUN choco install -y --no-progress protoc --version 23.2
 RUN python3 -m pip install --user numpy absl-py
 
 RUN dart --disable-analytics && `
-    dart pub global activate protoc_plugin ^21.1.2 && `
+    dart pub global activate protoc_plugin ^25.0.0 && `
     setx path "%path%;%LOCALAPPDATA%/Pub/Cache/bin"
 
 ENTRYPOINT ["cmd", "/S", "/C"]
