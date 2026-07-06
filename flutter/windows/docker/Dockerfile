@@ -28,8 +28,15 @@ RUN start /w vs_BuildTools --quiet --norestart --nocache --wait`
 RUN choco install -y --no-progress msys2 --version 20220319.0.0 --params "/NoUpdate"
 RUN setx path "%path%;C:/tools/msys64/usr/bin"
 
-RUN choco install -y --no-progress flutter --version 3.44.4
+# Chocolatey's flutter package does not publish every release (e.g. 3.44.4),
+# so install the official Windows SDK archive directly to pin the exact version.
+# $ProgressPreference='SilentlyContinue' makes Invoke-WebRequest download the
+# ~1GB archive at full speed instead of crawling on progress rendering.
+RUN powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol=[Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-WebRequest -Uri 'https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.44.4-stable.zip' -OutFile C:\flutter.zip; Expand-Archive -Path C:\flutter.zip -DestinationPath C:\tools -Force; Remove-Item C:\flutter.zip"
+RUN setx path "%path%;C:\tools\flutter\bin"
 RUN choco install -y --no-progress git --version 2.33.0.2
+# The SDK archive ships a .git dir; allow flutter's git checks to run against it.
+RUN git config --global --add safe.directory "*"
 RUN choco install -y --no-progress make --version 4.3
 RUN choco install -y --no-progress bazelisk --version 1.16.0
 RUN choco install -y --no-progress python3 --version 3.11 && copy "C:\Python311\python.exe" "C:\Python311\python3.exe"
