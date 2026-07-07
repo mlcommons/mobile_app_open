@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io' show Platform, exit;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,22 +16,6 @@ const _bindingKeepAliveInterval = Duration(seconds: 20);
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
-
-  // Flutter 3.44's integration_test no longer terminates the app once the suite
-  // finishes: the live binding (fullyLive) keeps rendering frames, so the app
-  // process lingers even though every test passed. On BrowserStack this means
-  // the Android session never ends and is failed on the ~900s idle timeout,
-  // despite "All tests passed!". integration_test pushes results to the native
-  // runner in its own tearDownAll (registered during ensureInitialized above),
-  // which runs AFTER this one (tearDownAll is LIFO). So we don't exit inline —
-  // we schedule the exit, which fires once results have been flushed to native,
-  // letting the session close cleanly. Android only: the iOS/XCTest sessions
-  // already end correctly and a force-exit there would be reported as a crash.
-  tearDownAll(() {
-    if (Platform.isAndroid) {
-      Timer(const Duration(seconds: 5), () => exit(0));
-    }
-  });
 
   final prefs = <String, Object>{
     StoreConstants.selectedBenchmarkRunMode: _runMode.name,
