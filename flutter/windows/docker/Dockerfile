@@ -9,7 +9,12 @@ RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
     iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-ADD https://aka.ms/vs/16/release/vs_buildtools.exe vs_BuildTools.exe
+# Visual Studio 2022 (vs/17) Build Tools. VS 2019 (vs/16) bundles CMake 3.20,
+# but the Firebase C++ SDK (pulled in by firebase_core's Windows support)
+# requires CMake >= 3.22. Flutter's Windows build uses the CMake bundled with
+# the Visual Studio installation (not one on PATH), so the only way to raise it
+# is to install a newer Visual Studio; VS 2022 17.x bundles CMake >= 3.29.
+ADD https://aka.ms/vs/17/release/vs_buildtools.exe vs_BuildTools.exe
 RUN start /w vs_BuildTools --quiet --norestart --nocache --wait`
     --add Microsoft.VisualStudio.Workload.VCTools `
     --add Microsoft.VisualStudio.Component.Windows10SDK.19041 `
