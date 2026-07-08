@@ -86,7 +86,15 @@ if [ $runner = $GITHUB_ACTIONS ]; then
 fi
 
 echo "$MC_LOG_PREFIX flutter version:" && flutter --version
-flutter config --no-analytics && dart --disable-analytics
+# This project integrates iOS plugins via CocoaPods (see `pod install` below).
+# Swift Package Manager is on by default in Flutter 3.44+, and on this fresh
+# Xcode Cloud machine `flutter build ios --config-only` fails while adding SPM
+# integration: it cannot resolve packages (e.g. recaptcha-enterprise-mobile-sdk,
+# pulled in by firebase_app_check) without a committed Package.resolved. Disable
+# SPM so the CocoaPods integration is used instead. `flutter config` writes a
+# per-machine setting, so this must run on the CI machine (it is not covered by
+# the same flag in flutter/ios/ios.mk, which only affects other runners).
+flutter config --no-analytics --no-enable-swift-package-manager && dart --disable-analytics
 dart pub global activate protoc_plugin ^25.0.0
 cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 
