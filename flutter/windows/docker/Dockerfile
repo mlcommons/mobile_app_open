@@ -27,11 +27,17 @@ RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
 # skip the "latest" component without installing a 14.2x toolset directory, so
 # the fixed-version component is the reliable source of the concrete 14.29
 # payload.
+#
+# The VC.ATL component provides atlstr.h, which the desktop_webview_auth plugin
+# includes. VS 2019's VCTools workload bundled ATL, but VS 2022's does not, so
+# it must be added explicitly or the plugin fails with C1083 (cannot open
+# 'atlstr.h').
 ADD https://aka.ms/vs/17/release/vs_buildtools.exe vs_BuildTools.exe
 RUN start /w vs_BuildTools --quiet --norestart --nocache --wait`
     --add Microsoft.VisualStudio.Workload.VCTools `
     --add Microsoft.VisualStudio.Component.Windows10SDK.19041 `
     --add Microsoft.VisualStudio.Component.VC.CMake.Project `
+    --add Microsoft.VisualStudio.Component.VC.ATL `
     --add Microsoft.VisualStudio.Component.VC.v142.x86.x64 `
     --add Microsoft.VisualStudio.Component.VC.14.29.16.11.x86.x64 `
     && powershell -Command "if ($err = dir $Env:TEMP -Filter dd_setup_*_errors.log | where Length -gt 0 | Get-Content) { throw $err }" `
