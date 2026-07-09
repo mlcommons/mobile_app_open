@@ -133,9 +133,34 @@ Future<void> setBenchmarks(
 Future<void> downloadResources(WidgetTester tester) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
-  await benchmarkState.loadResources(
-    downloadMissing: true,
-    benchmarks: benchmarkState.activeBenchmarks,
+
+  // Resource downloads occasionally fail on CI devices with a transient
+  // network error (e.g. "HttpException: Connection closed while receiving
+  // data"). loadResources() catches such errors into resourceError instead of
+  // throwing, so without a retry the test proceeds and later fails with a
+  // misleading "Progress screen is not presented". Retry a few times, matching
+  // how a real user recovers by tapping "retry" on the resource error screen.
+  const maxAttempts = 3;
+  for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+    await benchmarkState.loadResources(
+      downloadMissing: true,
+      benchmarks: benchmarkState.activeBenchmarks,
+    );
+    if (benchmarkState.resourceError == null) {
+      return;
+    }
+    debugPrint(
+      'downloadResources attempt $attempt/$maxAttempts failed: '
+      '${benchmarkState.resourceError}',
+    );
+    if (attempt < maxAttempts) {
+      await Future.delayed(const Duration(seconds: 5));
+    }
+  }
+  expect(
+    benchmarkState.resourceError,
+    isNull,
+    reason: 'Failed to download resources after $maxAttempts attempts',
   );
 }
 
