@@ -50,12 +50,6 @@ flutter/windows/ci:
 		flutter/prepare \
 		flutter/windows/libs
 	flutter config --enable-windows-desktop
-	# Diagnostics: if the integration-test compile fails to read source files,
-	# these lines show whether the files are missing (extraction/disk) or present
-	# but unreadable (path/permission), plus free space on C:.
-	-df -h /c
-	-ls -l /c/tools/flutter/packages/flutter/lib/src/cupertino/magnifier.dart
-	-ls -l /c/Users/ContainerAdministrator/AppData/Local/Pub/Cache/hosted/pub.dev/collection-*/lib/src/algorithms.dart
 	cd ${fwc_local_project} && make \
 		flutter/test/integration
 	cd ${fwc_local_project} && make \
