@@ -60,7 +60,13 @@ RUN setx path "%path%;C:/tools/msys64/usr/bin"
 # so install the official Windows SDK archive directly to pin the exact version.
 # $ProgressPreference='SilentlyContinue' makes Invoke-WebRequest download the
 # ~1GB archive at full speed instead of crawling on progress rendering.
-RUN powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol=[Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-WebRequest -Uri 'https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.44.4-stable.zip' -OutFile C:\flutter.zip; Expand-Archive -Path C:\flutter.zip -DestinationPath C:\tools -Force; Remove-Item C:\flutter.zip"
+#
+# Extract with tar (bsdtar, shipped in Windows since 1809) rather than
+# Expand-Archive: Expand-Archive silently drops files from very large archives,
+# which left the Flutter SDK incomplete and made the first full compile fail
+# with hundreds of "Error when reading '<sdk file>': The system cannot find the
+# file specified". tar extracts the archive reliably.
+RUN powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol=[Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-WebRequest -Uri 'https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.44.4-stable.zip' -OutFile C:\flutter.zip; New-Item -ItemType Directory -Force C:\tools | Out-Null; tar -xf C:\flutter.zip -C C:\tools; Remove-Item C:\flutter.zip"
 RUN setx path "%path%;C:\tools\flutter\bin"
 RUN choco install -y --no-progress git --version 2.33.0.2
 # The SDK archive ships a .git dir; allow flutter's git checks to run against it.
