@@ -61,11 +61,13 @@ class ResultFilter {
         ? true
         : resultCreationDate.isBefore(toCreationDate!.add(oneDay));
     bool platformMatched = platform == null ? true : platform == resultPlatform;
-    bool deviceModelMatched =
-        resultDeviceModel.containsIgnoreCase(deviceModel ?? '');
+    bool deviceModelMatched = resultDeviceModel.containsIgnoreCase(
+      deviceModel ?? '',
+    );
     bool backendMatched = backend == null ? true : backend == resultBackend;
-    bool manufacturerMatched =
-        resultManufacturer.containsIgnoreCase(manufacturer ?? '');
+    bool manufacturerMatched = resultManufacturer.containsIgnoreCase(
+      manufacturer ?? '',
+    );
     bool socMatched = resultSoc.containsIgnoreCase(soc ?? '');
     bool benchmarkIdMatched = benchmarkId == null
         ? true

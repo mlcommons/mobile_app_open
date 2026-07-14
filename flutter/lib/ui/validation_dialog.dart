@@ -17,9 +17,7 @@ class ValidationDialog extends StatelessWidget {
       canPop: false,
       child: AlertDialog(
         backgroundColor: AppColors.dialogBackground,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -44,7 +42,7 @@ class ValidationDialog extends StatelessWidget {
               l10n.dialogContentChecksumValidation,
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.darkText.withOpacity(0.65),
+                color: AppColors.darkText.withValues(alpha: 0.65),
               ),
               textAlign: TextAlign.center,
             ),

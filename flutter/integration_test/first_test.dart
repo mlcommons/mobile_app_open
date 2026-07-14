@@ -25,8 +25,10 @@ void main() {
   SharedPreferences.setMockInitialValues(prefs);
 
   // Get benchmark IDs from environment variables
-  const benchmarkIdsStr =
-      String.fromEnvironment('BENCHMARK_IDS', defaultValue: '');
+  const benchmarkIdsStr = String.fromEnvironment(
+    'BENCHMARK_IDS',
+    defaultValue: '',
+  );
 
   var benchmarkIds = BenchmarkId.allIds;
   if (benchmarkIdsStr.isNotEmpty) {

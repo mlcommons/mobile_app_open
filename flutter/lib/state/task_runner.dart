@@ -75,7 +75,9 @@ class TaskRunner {
   }
 
   Future<ExtendedResult?> runBenchmarks(
-      BenchmarkStore benchmarkStore, String currentLogDir) async {
+    BenchmarkStore benchmarkStore,
+    String currentLogDir,
+  ) async {
     progressInfo = ProgressInfo();
     final cooldown = store.cooldown;
     final cooldownDuration = Duration(seconds: store.cooldownDuration);
@@ -86,10 +88,11 @@ class TaskRunner {
     for (final benchmark in activeBenchmarks) {
       progressInfo.activeBenchmarks.add(benchmark.info);
       final resultHelper = ResultHelper(
-          benchmark: benchmark,
-          backendInfo: backendInfo,
-          performanceMode: perfMode,
-          accuracyMode: accuracyMode);
+        benchmark: benchmark,
+        backendInfo: backendInfo,
+        performanceMode: perfMode,
+        accuracyMode: accuracyMode,
+      );
       resultHelpers.add(resultHelper);
     }
 
@@ -124,8 +127,9 @@ class TaskRunner {
       }
       first = false;
       if (aborting) break;
-      final resultHelper =
-          resultHelpers.firstWhere((e) => e.benchmark == benchmark);
+      final resultHelper = resultHelpers.firstWhere(
+        (e) => e.benchmark == benchmark,
+      );
       await runBenchmark(resultHelper, perfMode, currentLogDir);
     }
 
@@ -134,8 +138,9 @@ class TaskRunner {
     for (final benchmark in activeBenchmarks) {
       if (aborting) break;
       if (!store.selectedBenchmarkRunMode.doAccuracyRun) break;
-      final resultHelper =
-          resultHelpers.firstWhere((e) => e.benchmark == benchmark);
+      final resultHelper = resultHelpers.firstWhere(
+        (e) => e.benchmark == benchmark,
+      );
       await runBenchmark(resultHelper, accuracyMode, currentLogDir);
     }
 
@@ -163,26 +168,32 @@ class TaskRunner {
     );
   }
 
-  Future<void> runBenchmark(ResultHelper resultHelper, BenchmarkRunMode mode,
-      String currentLogDir) async {
+  Future<void> runBenchmark(
+    ResultHelper resultHelper,
+    BenchmarkRunMode mode,
+    String currentLogDir,
+  ) async {
     final benchmark = resultHelper.benchmark;
     progressInfo.currentBenchmark = benchmark.info;
     progressInfo.currentStage++;
     if (mode.loadgenMode == LoadgenModeEnum.performanceOnly) {
       final perfTimer = Stopwatch()..start();
       progressInfo.accuracy = false;
-      double taskMinDuration =
-          mode.chooseRunConfig(benchmark.taskConfig).minDuration;
-      int taskMinQueryCount =
-          mode.chooseRunConfig(benchmark.taskConfig).minQueryCount;
+      double taskMinDuration = mode
+          .chooseRunConfig(benchmark.taskConfig)
+          .minDuration;
+      int taskMinQueryCount = mode
+          .chooseRunConfig(benchmark.taskConfig)
+          .minQueryCount;
       progressInfo.calculateStageProgress = () {
         // UI updates once per second so using 1 second as lower bound should not affect it.
         final minDuration = max(taskMinDuration, 1);
         final timeProgress = perfTimer.elapsed.inSeconds / minDuration;
         final minQueries = max(taskMinQueryCount, 1);
         final queryCounter = backendBridge.getQueryCounter();
-        final queryProgress =
-            queryCounter < 0 ? 0.0 : queryCounter / minQueries;
+        final queryProgress = queryCounter < 0
+            ? 0.0
+            : queryCounter / minQueries;
         return min(timeProgress, queryProgress);
       };
       notifyListeners();
@@ -297,16 +308,13 @@ class _NativeRunHelper {
 
     if (enableArtificialLoad) {
       print('Apply the artificial CPU load for ${benchmark.taskConfig.id}');
-      final _ = workerManager.execute(
-        () async {
-          const value = 999999999999999.0;
-          var newValue = value;
-          while (true) {
-            newValue = newValue * 0.999999999999999;
-          }
-        },
-        priority: WorkPriority.immediately,
-      );
+      final _ = workerManager.execute(() async {
+        const value = 999999999999999.0;
+        var newValue = value;
+        while (true) {
+          newValue = newValue * 0.999999999999999;
+        }
+      }, priority: WorkPriority.immediately);
     }
 
     try {
@@ -387,8 +395,6 @@ class _NativeRunHelper {
 
   Future<LoadgenInfo?> extractLoadgenInfo() async {
     const logFileName = 'mlperf_log_detail.txt';
-    return await LoadgenInfo.fromFile(
-      filepath: '$logDir/$logFileName',
-    );
+    return await LoadgenInfo.fromFile(filepath: '$logDir/$logFileName');
   }
 }

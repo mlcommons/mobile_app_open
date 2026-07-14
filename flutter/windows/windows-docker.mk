@@ -33,7 +33,9 @@ flutter/windows/docker/--: flutter/windows/docker/image
 		cmd
 
 fwc_local_project=C:/project-local
-fwc_msvc_dlls=C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Redist/MSVC/14.29.30133/x64/Microsoft.VC142.CRT
+# The builder image now installs VS 2022 Build Tools (see windows/docker/Dockerfile),
+# so the v142 (14.29.30133) redist ships under the 2022 install path, not 2019.
+fwc_msvc_dlls=C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Redist/MSVC/14.29.30133/x64/Microsoft.VC142.CRT
 .PHONY: flutter/windows/ci
 flutter/windows/ci:
 	@[ -n "${FLUTTER_RELEASE_NAME}" ] || (echo FLUTTER_RELEASE_NAME env must be set; exit 1)

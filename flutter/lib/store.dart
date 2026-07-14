@@ -37,7 +37,9 @@ class Store extends ChangeNotifier {
 
   set selectedBenchmarkRunMode(BenchmarkRunModeEnum value) {
     _storeFromDisk.setString(
-        StoreConstants.selectedBenchmarkRunMode, value.name);
+      StoreConstants.selectedBenchmarkRunMode,
+      value.name,
+    );
     cooldownDuration = value.cooldownDuration;
     notifyListeners();
   }
@@ -64,8 +66,10 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  int get cooldownDuration => _getInt(StoreConstants.cooldownDuration,
-      BenchmarkRunModeEnum.quickRun.cooldownDuration);
+  int get cooldownDuration => _getInt(
+    StoreConstants.cooldownDuration,
+    BenchmarkRunModeEnum.quickRun.cooldownDuration,
+  );
 
   set cooldownDuration(int value) {
     _storeFromDisk.setInt(StoreConstants.cooldownDuration, value);

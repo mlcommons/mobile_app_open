@@ -44,6 +44,10 @@ flutter/ios/release: flutter/check-release-env flutter/ios flutter/prepare flutt
 .PHONY: flutter/ios/ipa
 flutter/ios/ipa:
 	@[ -n "${FLUTTER_BUILD_NUMBER}" ] || (echo FLUTTER_BUILD_NUMBER env must be set; exit 1)
+	# This project integrates iOS plugins via CocoaPods. Swift Package Manager is
+	# on by default in Flutter 3.44+, and its build-for-testing path fails with
+	# "no such module 'Flutter'"; disable it to keep the CocoaPods integration.
+	flutter --no-version-check config --no-enable-swift-package-manager
 	cd flutter && flutter --no-version-check clean
 	cd flutter && flutter --no-version-check build \
 		ipa \
@@ -57,6 +61,9 @@ flutter/ios/test-package: flutter/ios/test-package/build flutter/ios/test-packag
 
 .PHONY: flutter/ios/test-package/build
 flutter/ios/test-package/build:
+	# See flutter/ios/ipa: SPM (default-on in Flutter 3.44+) breaks the
+	# build-for-testing path; keep the CocoaPods integration.
+	flutter --no-version-check config --no-enable-swift-package-manager
 	cd flutter && flutter --no-version-check build ios \
 		--config-only \
 		${flutter_perf_test_arg} \

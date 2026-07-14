@@ -10,12 +10,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 6.0.0+1
 
 environment:
-  sdk: ^3.3.4  # Dart SDK version
-  # TODO: upgrade Flutter for iOS 26 debug mode support.
-  # Flutter 3.19.6's Dart VM crashes on iOS 26 devices in debug mode
-  # (mprotect denied by stricter W^X enforcement). Use --release or
-  # --profile for on-device testing until upgraded.
-  flutter: ^3.19.6  # Flutter SDK version
+  sdk: ^3.12.0  # Dart SDK version
+  flutter: ^3.44.0  # Flutter SDK version
 
 dependencies:
   flutter:
@@ -25,55 +21,50 @@ dependencies:
   intl: any
   collection: ^1.18.0
   cupertino_icons: ^1.0.8
-  device_info_plus: ^10.1.0
+  device_info_plus: ^13.2.0
   flutter_svg: ^2.0.10+1
   path_provider: ^2.1.3
   provider: ^6.1.2
-  share: ^2.0.4
   shared_preferences: ^2.2.3
   quiver: ^3.2.1
   url_launcher: ^6.3.1
   url_launcher_ios: ^6.3.2
-  wakelock: ^0.6.2
+  wakelock_plus: ^1.2.8
   uuid: ^4.4.0
-  package_info_plus: ^8.0.0
-  device_marketing_names: ^0.8.3
-  share_plus: ^9.0.0
+  package_info_plus: ^10.2.0
+  device_marketing_names: ^2.0.2
+  share_plus: ^13.2.0
   crypto: ^3.0.3
   tuple: ^2.0.2
   bot_toast: ^4.1.3
-  process_run: ^0.14.2
+  process_run: ^1.3.4
   worker_manager: ^7.0.2
   ffi: ^2.1.2
   async: ^2.11.0
-  archive: ^3.5.1
+  archive: ^4.0.9
   http: ^1.2.1
-  json_annotation: ^4.9.0
+  json_annotation: ^4.12.0
   flutter_markdown: ^0.7.1
-  firebase_core: ^2.31.0
-  firebase_storage: ^11.7.5
-  firebase_auth: ^4.19.5
-  firebase_ui_auth: ^1.14.0
-  firebase_crashlytics: ^3.5.5
-  firebase_app_check: ^0.2.2+6
-  upgrader: ^10.3.0
+  firebase_core: ^4.11.0
+  firebase_storage: ^13.4.3
+  firebase_auth: ^6.5.4
+  firebase_ui_auth: ^3.0.1
+  firebase_crashlytics: ^5.2.4
+  firebase_app_check: ^0.4.5
+  upgrader: ^13.5.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.4
   import_sorter: ^4.6.0
-  flutter_lints: ^4.0.0
-  pedantic: ^1.11.1
-  protoc_plugin: ^21.1.2
+  flutter_lints: ^6.0.0
+  protoc_plugin: ^25.0.0
   json_serializable: ^6.8.0
   build_runner: ^2.4.9
   flutter_gen_runner: ^5.4.0
-
-dependency_overrides:
-  win32: 5.5.0
 
 flutter_launcher_icons:
   image_path: "assets/ic_launcher_ios.png"

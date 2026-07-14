@@ -10,8 +10,9 @@ enum PerformanceResultValidityEnum {
   invalid,
   semivalid;
 
-  static PerformanceResultValidityEnum forBenchmarkExportResult(
-      {required BenchmarkExportResult? benchmarkExportResult}) {
+  static PerformanceResultValidityEnum forBenchmarkExportResult({
+    required BenchmarkExportResult? benchmarkExportResult,
+  }) {
     if (benchmarkExportResult == null) {
       return PerformanceResultValidityEnum.invalid;
     }

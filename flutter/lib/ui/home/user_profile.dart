@@ -97,15 +97,17 @@ class _UserProfileSectionState extends State<UserProfileSection> {
         Navigator.pop(context);
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) {
-            return Scaffold(
-              appBar: AppBar(title: Text(l10n.menuSignIn)),
-              body: SignInScreen(
-                providers: FirebaseManager.instance.authProviders,
-                actions: signInScreenActions,
-              ),
-            );
-          }),
+          MaterialPageRoute(
+            builder: (context) {
+              return Scaffold(
+                appBar: AppBar(title: Text(l10n.menuSignIn)),
+                body: SignInScreen(
+                  providers: FirebaseManager.instance.authProviders,
+                  actions: signInScreenActions,
+                ),
+              );
+            },
+          ),
         );
       },
       child: Text(l10n.userSignInEmailPassword),
@@ -154,7 +156,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       SignedOutAction((context) {
         resultManager.clearRemoteResult();
         Navigator.pop(context);
-      })
+      }),
     ];
     return Scaffold(
       appBar: AppBar(title: Text(l10n.menuProfile)),
@@ -180,10 +182,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
     List<Widget> children = [];
     final titleTextStyle = Theme.of(context).textTheme.titleMedium;
-    final subtitleTextStyle = Theme.of(context)
-        .textTheme
-        .titleMedium
-        ?.copyWith(color: Colors.black.withOpacity(0.6));
+    final subtitleTextStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+      color: Colors.black.withValues(alpha: 0.6),
+    );
     final email = currentUser.email;
     if (email != null) {
       children.add(Text(email, style: titleTextStyle));
@@ -216,11 +217,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       children.add(creationTimeRow);
     }
 
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: children,
-    );
+    return Wrap(spacing: 12, runSpacing: 12, children: children);
   }
 
   Widget _buildManageUploadedFileButton() {
