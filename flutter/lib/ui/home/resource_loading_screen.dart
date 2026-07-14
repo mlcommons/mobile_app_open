@@ -34,7 +34,7 @@ class _ResourceLoadingScreenState extends State<ResourceLoadingScreen> {
               color: Colors.black12,
               offset: Offset(15, 15),
               blurRadius: 10,
-            )
+            ),
           ],
         ),
         child: Center(
@@ -58,10 +58,7 @@ class _ResourceLoadingScreenState extends State<ResourceLoadingScreen> {
         children: [
           Text(
             l10n.mainScreenLoading,
-            style: const TextStyle(
-              color: AppColors.lightText,
-              fontSize: 16,
-            ),
+            style: const TextStyle(color: AppColors.lightText, fontSize: 16),
           ),
           const SizedBox(height: 20),
           Text(
@@ -90,10 +87,7 @@ class _ResourceLoadingScreenState extends State<ResourceLoadingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            progressCircle,
-            statusText,
-          ],
+          children: [progressCircle, statusText],
         ),
       ),
     );

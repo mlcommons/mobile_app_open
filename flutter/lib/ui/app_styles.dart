@@ -24,10 +24,12 @@ class AppColors {
   static const primary = _blue2;
   static const secondary = _blue1;
 
-  static const primaryAppBarBackground =
-      DartDefine.isOfficialBuild ? _blue3 : _brown;
-  static const secondaryAppBarBackground =
-      DartDefine.isOfficialBuild ? _blue1 : _brown;
+  static const primaryAppBarBackground = DartDefine.isOfficialBuild
+      ? _blue3
+      : _brown;
+  static const secondaryAppBarBackground = DartDefine.isOfficialBuild
+      ? _blue1
+      : _brown;
   static const appBarIcon = Colors.white;
   static const drawerBackground = _blue4;
   static const drawerForeground = Colors.white;
@@ -57,10 +59,10 @@ class AppGradients {
   ];
 
   static List<Color> get scoreBar => [
-        AppColors._blue3,
-        AppColors._blue2,
-        AppColors._blue1,
-      ];
+    AppColors._blue3,
+    AppColors._blue2,
+    AppColors._blue1,
+  ];
 }
 
 class WidgetSizes {

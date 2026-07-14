@@ -77,7 +77,7 @@ export MC_FLUTTER_HOME=$MC_BUILD_HOME/flutter
 export PUB_CACHE=$MC_BUILD_HOME/.pub-cache
 
 mkdir -p "$MC_BUILD_HOME"
-test ! -d "$MC_FLUTTER_HOME" && git clone --branch 3.19.6 --depth 1 https://github.com/flutter/flutter.git "$MC_FLUTTER_HOME"
+test ! -d "$MC_FLUTTER_HOME" && git clone --branch 3.44.4 --depth 1 https://github.com/flutter/flutter.git "$MC_FLUTTER_HOME"
 export PATH="$PATH:$MC_FLUTTER_HOME/bin:$PUB_CACHE/bin"
 if [ $runner = $GITHUB_ACTIONS ]; then
   # make Flutter available in the subsequent GitHub Actions steps
@@ -86,8 +86,16 @@ if [ $runner = $GITHUB_ACTIONS ]; then
 fi
 
 echo "$MC_LOG_PREFIX flutter version:" && flutter --version
-flutter config --no-analytics && dart --disable-analytics
-dart pub global activate protoc_plugin ^21.1.2
+# This project integrates iOS plugins via CocoaPods (see `pod install` below).
+# Swift Package Manager is on by default in Flutter 3.44+, and on this fresh
+# Xcode Cloud machine `flutter build ios --config-only` fails while adding SPM
+# integration: it cannot resolve packages (e.g. recaptcha-enterprise-mobile-sdk,
+# pulled in by firebase_app_check) without a committed Package.resolved. Disable
+# SPM so the CocoaPods integration is used instead. `flutter config` writes a
+# per-machine setting, so this must run on the CI machine (it is not covered by
+# the same flag in flutter/ios/ios.mk, which only affects other runners).
+flutter config --no-analytics --no-enable-swift-package-manager && dart --disable-analytics
+dart pub global activate protoc_plugin ^25.0.0
 cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 
 echo "$MC_LOG_PREFIX ========== Build app =========="

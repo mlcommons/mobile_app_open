@@ -15,7 +15,7 @@ class ProgressCircle extends StatelessWidget {
     return _BorderedCircle(
       strokeWidth: strokeWidth,
       radius: size / 2,
-      color: Colors.white.withOpacity(0.88),
+      color: Colors.white.withValues(alpha: 0.88),
     );
   }
 }
@@ -33,9 +33,7 @@ class _BorderedCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: DrawCircle(strokeWidth, radius, color),
-    );
+    return CustomPaint(painter: DrawCircle(strokeWidth, radius, color));
   }
 }
 

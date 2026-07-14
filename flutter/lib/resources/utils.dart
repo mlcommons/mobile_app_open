@@ -27,7 +27,12 @@ String jsonToStringIndented(dynamic json) {
 
 /// Lineraly interpolates between [start] and [end] using a [factor] between [valueStart] and [ValueEnd] instead of between 0 and 1.
 double? lerpRange(
-    num? start, num? end, double valueStart, double valueEnd, double factor) {
+  num? start,
+  num? end,
+  double valueStart,
+  double valueEnd,
+  double factor,
+) {
   final double valueEndNormalized = valueEnd - valueStart;
   final double factorNormalized = (factor - valueStart) / valueEndNormalized;
 

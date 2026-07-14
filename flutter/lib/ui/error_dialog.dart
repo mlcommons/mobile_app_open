@@ -7,8 +7,12 @@ import 'package:mlperfbench/ui/settings/resources_screen.dart';
 
 enum DialogTypeEnum { error, warning, success }
 
-Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
-    String title, List<String> messages) async {
+Future<void> _showPopupDialog(
+  BuildContext context,
+  DialogTypeEnum type,
+  String title,
+  List<String> messages,
+) async {
   final l10n = AppLocalizations.of(context)!;
 
   late Icon icon;
@@ -19,13 +23,19 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
       titleColor = Colors.red;
       break;
     case DialogTypeEnum.warning:
-      icon = const Icon(Icons.warning_amber_outlined,
-          color: Colors.amber, size: 32);
+      icon = const Icon(
+        Icons.warning_amber_outlined,
+        color: Colors.amber,
+        size: 32,
+      );
       titleColor = Colors.amber;
       break;
     case DialogTypeEnum.success:
-      icon =
-          const Icon(Icons.check_circle_outline, color: Colors.green, size: 32);
+      icon = const Icon(
+        Icons.check_circle_outline,
+        color: Colors.green,
+        size: 32,
+      );
       titleColor = Colors.green;
       break;
   }
@@ -38,9 +48,7 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
         backgroundColor: AppColors.dialogBackground,
         titlePadding: const EdgeInsets.all(12),
         contentPadding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Column(
           children: [
             Row(
@@ -67,13 +75,12 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ...messages.map((e) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(
-                      e,
-                      style: const TextStyle(fontSize: 15),
-                    ),
-                  )),
+              ...messages.map(
+                (e) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(e, style: const TextStyle(fontSize: 15)),
+                ),
+              ),
             ],
           ),
         ),
@@ -102,7 +109,9 @@ Future<void> _showPopupDialog(BuildContext context, DialogTypeEnum type,
 }
 
 Future<void> showErrorDialog(
-    BuildContext context, List<String> messages) async {
+  BuildContext context,
+  List<String> messages,
+) async {
   final l10n = AppLocalizations.of(context)!;
 
   // Use the "WARN" prefix in messages to distinguish warnings from errors,
@@ -110,21 +119,35 @@ Future<void> showErrorDialog(
   final isWarning = messages.any((m) => m.startsWith('WARN'));
   if (isWarning) {
     await _showPopupDialog(
-        context, DialogTypeEnum.warning, l10n.dialogTitleWarning, messages);
+      context,
+      DialogTypeEnum.warning,
+      l10n.dialogTitleWarning,
+      messages,
+    );
     return;
   }
 
   await _showPopupDialog(
-      context, DialogTypeEnum.error, l10n.dialogTitleError, messages);
+    context,
+    DialogTypeEnum.error,
+    l10n.dialogTitleError,
+    messages,
+  );
 }
 
 Future<void> showResourceMissingDialog(
-    BuildContext context, List<String> messages,
-    {Benchmark? benchmark, BenchmarkSet? benchmarkSet}) async {
+  BuildContext context,
+  List<String> messages, {
+  Benchmark? benchmark,
+  BenchmarkSet? benchmarkSet,
+}) async {
   final l10n = AppLocalizations.of(context)!;
 
-  Icon icon = const Icon(Icons.warning_amber_rounded,
-      color: AppColors.warningIcon, size: 32);
+  Icon icon = const Icon(
+    Icons.warning_amber_rounded,
+    color: AppColors.warningIcon,
+    size: 32,
+  );
   Color titleColor = Colors.grey;
 
   await showDialog(
@@ -135,9 +158,7 @@ Future<void> showResourceMissingDialog(
         backgroundColor: AppColors.dialogBackground,
         titlePadding: const EdgeInsets.all(12),
         contentPadding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Column(
           children: [
             Row(
@@ -164,14 +185,22 @@ Future<void> showResourceMissingDialog(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(benchmark != null
-                  ? l10n.dialogContentMissingFiles
-                      .replaceAll('<name>', benchmark.info.taskName)
-                  : benchmarkSet != null
-                      ? l10n.dialogContentMissingFiles
-                          .replaceAll('<name>', benchmarkSet.config.name)
-                      : l10n.dialogContentMissingFiles
-                          .replaceAll('<name>', l10n.benchNameVarious)),
+              Text(
+                benchmark != null
+                    ? l10n.dialogContentMissingFiles.replaceAll(
+                        '<name>',
+                        benchmark.info.taskName,
+                      )
+                    : benchmarkSet != null
+                    ? l10n.dialogContentMissingFiles.replaceAll(
+                        '<name>',
+                        benchmarkSet.config.name,
+                      )
+                    : l10n.dialogContentMissingFiles.replaceAll(
+                        '<name>',
+                        l10n.benchNameVarious,
+                      ),
+              ),
             ],
           ),
         ),
@@ -201,8 +230,8 @@ Future<void> showResourceMissingDialog(
                           benchmarksToDownload: (benchmark != null
                               ? <Benchmark>[benchmark]
                               : benchmarkSet?.benchmarks
-                                  .where((e) => e.isActive)
-                                  .toList()),
+                                    .where((e) => e.isActive)
+                                    .toList()),
                         ),
                       ),
                     );
@@ -210,8 +239,10 @@ Future<void> showResourceMissingDialog(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                   ),
                 ),
               ],
@@ -224,8 +255,14 @@ Future<void> showResourceMissingDialog(
 }
 
 Future<void> showSuccessDialog(
-    BuildContext context, List<String> messages) async {
+  BuildContext context,
+  List<String> messages,
+) async {
   final l10n = AppLocalizations.of(context)!;
   await _showPopupDialog(
-      context, DialogTypeEnum.success, l10n.dialogTitleSuccess, messages);
+    context,
+    DialogTypeEnum.success,
+    l10n.dialogTitleSuccess,
+    messages,
+  );
 }

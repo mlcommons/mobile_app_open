@@ -38,8 +38,9 @@ class ArchiveCacheHelper {
     await result.create(recursive: true);
 
     try {
-      final archive =
-          ZipDecoder().decodeBytes(await File(archivePath).readAsBytes());
+      final archive = ZipDecoder().decodeBytes(
+        await File(archivePath).readAsBytes(),
+      );
 
       var archiveParentPath = result.path;
       if (!archive.first.isFile) {

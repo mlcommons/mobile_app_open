@@ -21,9 +21,7 @@ class _UploadedFilesScreenState extends State<UploadedFilesScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.userUploadedFiles),
-      ),
+      appBar: AppBar(title: Text(l10n.userUploadedFiles)),
       body: FutureBuilder(
         future: fetchFileList(),
         builder: (context, AsyncSnapshot<List<String>> snapshot) {
@@ -34,7 +32,7 @@ class _UploadedFilesScreenState extends State<UploadedFilesScreen> {
             child = ListView.separated(
               itemCount: fileList.length,
               shrinkWrap: false,
-              separatorBuilder: (_, __) => const Divider(),
+              separatorBuilder: (_, _) => const Divider(),
               itemBuilder: (context, index) {
                 final fileName = fileList[index];
                 final resultFileName = ResultFileName.fromFileName(fileName);
@@ -75,12 +73,17 @@ class _UploadedFilesScreenState extends State<UploadedFilesScreen> {
   }
 
   void _viewFile(String fileName) {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) {
-        return RemoteExtendedResultScreen(fileName: fileName);
-      },
-    )).then((value) => setState(() {
-          fetchFileList();
-        }));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return RemoteExtendedResultScreen(fileName: fileName);
+        },
+      ),
+    ).then(
+      (value) => setState(() {
+        fetchFileList();
+      }),
+    );
   }
 }

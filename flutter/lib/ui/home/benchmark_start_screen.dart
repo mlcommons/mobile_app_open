@@ -60,7 +60,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
               absorbing: state.state != BenchmarkStateEnum.waiting,
               child: const BenchmarkConfigSection(),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -116,9 +116,10 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
             child: ElevatedButton(
               key: const Key(WidgetKeys.goButton),
               style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.goCircle,
-                  shape: const CircleBorder(),
-                  minimumSize: Size.fromWidth(circleWidth)),
+                backgroundColor: AppColors.goCircle,
+                shape: const CircleBorder(),
+                minimumSize: Size.fromWidth(circleWidth),
+              ),
               child: Text(
                 l10n.mainScreenGo,
                 style: const TextStyle(
@@ -129,7 +130,8 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
               onPressed: () async {
                 final wrongPathError = await state.validator
                     .validateExternalResourcesDirectory(
-                        l10n.dialogContentMissingFiles);
+                      l10n.dialogContentMissingFiles,
+                    );
                 if (wrongPathError.isNotEmpty) {
                   if (!context.mounted) return;
                   await showResourceMissingDialog(context, [wrongPathError]);
@@ -139,15 +141,18 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                 // Show a simple progress indicator while validating checksums,
                 // since it can take some time to finish
                 if (context.mounted) {
-                  unawaited(showDialog<void>(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (context) => const ValidationDialog(),
-                  ));
+                  unawaited(
+                    showDialog<void>(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => const ValidationDialog(),
+                    ),
+                  );
                 }
                 try {
-                  checksumError = await state.validator
-                      .validateChecksum(l10n.dialogContentChecksumError);
+                  checksumError = await state.validator.validateChecksum(
+                    l10n.dialogContentChecksumError,
+                  );
                 } finally {
                   if (context.mounted) {
                     Navigator.of(context, rootNavigator: true).pop();
@@ -157,7 +162,7 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                   if (!context.mounted) return;
                   final messages = [
                     checksumError,
-                    l10n.dialogContentChecksumErrorHint
+                    l10n.dialogContentChecksumErrorHint,
                   ];
                   await showErrorDialog(context, messages);
                   return;
@@ -182,8 +187,9 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                   // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
                   // ignore: use_build_context_synchronously
                   if (!context.mounted) return;
-                  await showErrorDialog(
-                      context, [l10n.dialogContentNoSelectedBenchmarkError]);
+                  await showErrorDialog(context, [
+                    l10n.dialogContentNoSelectedBenchmarkError,
+                  ]);
                   return;
                 }
                 try {
@@ -193,8 +199,10 @@ class _BenchmarkStartScreenState extends State<BenchmarkStartScreen> {
                   // Workaround for Dart linter bug. See https://github.com/dart-lang/linter/issues/4007
                   // ignore: use_build_context_synchronously
                   if (!context.mounted) return;
-                  await showErrorDialog(
-                      context, ['${l10n.runFail}:', e.toString()]);
+                  await showErrorDialog(context, [
+                    '${l10n.runFail}:',
+                    e.toString(),
+                  ]);
                   return;
                 }
               },

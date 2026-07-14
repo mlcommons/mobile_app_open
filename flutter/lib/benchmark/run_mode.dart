@@ -15,10 +15,7 @@ class BenchmarkRunMode {
 
   // final int coolDownDuration;
 
-  BenchmarkRunMode._({
-    required this.loadgenMode,
-    required this.readable,
-  });
+  BenchmarkRunMode._({required this.loadgenMode, required this.readable});
 
   @override
   String toString() {
@@ -26,10 +23,7 @@ class BenchmarkRunMode {
   }
 }
 
-enum LoadgenModeEnum {
-  performanceOnly,
-  accuracyOnly,
-}
+enum LoadgenModeEnum { performanceOnly, accuracyOnly }
 
 extension LoadgenModeEnumExtension on LoadgenModeEnum {
   String get name {
@@ -47,7 +41,7 @@ enum BenchmarkRunModeEnum {
   accuracyOnly,
   submissionRun,
   quickRun,
-  integrationTestRun
+  integrationTestRun,
 }
 
 extension BenchmarkRunModeEnumExtension on BenchmarkRunModeEnum {

@@ -45,9 +45,9 @@ class _SettingsScreen extends State<SettingsScreen> {
     Widget taskConfig = _taskConfig(context);
 
     return Scaffold(
-        appBar: AppBar(title: Text(l10n.menuSettings)),
-        body: SafeArea(
-            child: ListView(
+      appBar: AppBar(title: Text(l10n.menuSettings)),
+      body: SafeArea(
+        child: ListView(
           padding: const EdgeInsets.only(top: 20),
           children: [
             languageDropdown,
@@ -63,23 +63,28 @@ class _SettingsScreen extends State<SettingsScreen> {
             const Divider(),
             const Divider(),
             versionText,
-            const SizedBox(height: 20)
+            const SizedBox(height: 20),
           ],
-        )));
+        ),
+      ),
+    );
   }
 
   Widget _taskConfig(BuildContext context) {
     final taskConfigs = state.configManager.getConfigs();
     return FutureBuilder<List<TaskConfigDescription>>(
       future: taskConfigs,
-      builder: (BuildContext context,
-          AsyncSnapshot<List<TaskConfigDescription>> snapshot) {
-        if (snapshot.hasData && snapshot.data != null) {
-          return TaskConfigSection(snapshot.data!);
-        } else {
-          return Text(l10n.settingsLoadingData);
-        }
-      },
+      builder:
+          (
+            BuildContext context,
+            AsyncSnapshot<List<TaskConfigDescription>> snapshot,
+          ) {
+            if (snapshot.hasData && snapshot.data != null) {
+              return TaskConfigSection(snapshot.data!);
+            } else {
+              return Text(l10n.settingsLoadingData);
+            }
+          },
     );
   }
 
@@ -116,13 +121,18 @@ class _SettingsScreen extends State<SettingsScreen> {
         padding: const EdgeInsets.only(bottom: 5),
         child: Text(l10n.settingsCooldown),
       ),
-      subtitle: Text(l10n.settingsCooldownSubtitle
-          .replaceAll('<cooldownPause>', store.cooldownDuration.toString())),
+      subtitle: Text(
+        l10n.settingsCooldownSubtitle.replaceAll(
+          '<cooldownPause>',
+          store.cooldownDuration.toString(),
+        ),
+      ),
       trailing: Switch(
-          value: store.cooldown,
-          onChanged: (flag) {
-            store.cooldown = flag;
-          }),
+        value: store.cooldown,
+        onChanged: (flag) {
+          store.cooldown = flag;
+        },
+      ),
     );
   }
 
@@ -160,10 +170,7 @@ class _SettingsScreen extends State<SettingsScreen> {
 
   Widget _languageDropdown() {
     // Native names (endonyms) for each supported language code.
-    const languageNames = <String, String>{
-      'en': 'English',
-      'zh': '简体中文',
-    };
+    const languageNames = <String, String>{'en': 'English', 'zh': '简体中文'};
     return ListTile(
       title: Padding(
         padding: const EdgeInsets.only(bottom: 5),
@@ -183,7 +190,8 @@ class _SettingsScreen extends State<SettingsScreen> {
             (locale) => DropdownMenuItem<String>(
               value: locale.languageCode,
               child: Text(
-                  languageNames[locale.languageCode] ?? locale.languageCode),
+                languageNames[locale.languageCode] ?? locale.languageCode,
+              ),
             ),
           ),
         ],
@@ -202,18 +210,21 @@ class _SettingsScreen extends State<SettingsScreen> {
       ),
       subtitle: Text(l10n.settingsRunModeSubtitle),
       trailing: DropdownButton<BenchmarkRunModeEnum>(
-          borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
-          value: store.selectedBenchmarkRunMode,
-          items: BenchmarkRunModeEnum.values
-              .where((e) => !e.isHiddenFromUI)
-              .map((runMode) => DropdownMenuItem<BenchmarkRunModeEnum>(
-                    value: runMode,
-                    child: Text(runMode.localizedName(l10n)),
-                  ))
-              .toList(),
-          onChanged: (value) => setState(() {
-                store.selectedBenchmarkRunMode = value!;
-              })),
+        borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
+        value: store.selectedBenchmarkRunMode,
+        items: BenchmarkRunModeEnum.values
+            .where((e) => !e.isHiddenFromUI)
+            .map(
+              (runMode) => DropdownMenuItem<BenchmarkRunModeEnum>(
+                value: runMode,
+                child: Text(runMode.localizedName(l10n)),
+              ),
+            )
+            .toList(),
+        onChanged: (value) => setState(() {
+          store.selectedBenchmarkRunMode = value!;
+        }),
+      ),
     );
   }
 

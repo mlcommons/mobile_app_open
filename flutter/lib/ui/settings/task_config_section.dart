@@ -21,12 +21,14 @@ class TaskConfigSection extends StatelessWidget {
     final store = context.watch<Store>();
     final state = context.watch<BenchmarkState>();
     List<Widget> items = [];
-    items.add(ListTile(
-      leading: Text(
-        l10n.settingsTaskConfigTitle,
-        style: Theme.of(context).textTheme.headlineSmall,
+    items.add(
+      ListTile(
+        leading: Text(
+          l10n.settingsTaskConfigTitle,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
       ),
-    ));
+    );
     items.addAll(
       _configs.map(
         (c) => _getConfigChoice(context, c, store.chosenConfigurationName),
@@ -42,8 +44,9 @@ class TaskConfigSection extends StatelessWidget {
     items.addAll([
       const Divider(),
       ListTile(
-          title: Text(l10n.settingsTaskDataFolderTitle),
-          subtitle: Text(subtitle)),
+        title: Text(l10n.settingsTaskDataFolderTitle),
+        subtitle: Text(subtitle),
+      ),
     ]);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,9 +70,10 @@ class TaskConfigSection extends StatelessWidget {
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Text(
-              configuration.name == state.configManager.defaultConfig.name
-                  ? l10n.settingsTaskConfigDefault
-                  : configuration.name),
+            configuration.name == state.configManager.defaultConfig.name
+                ? l10n.settingsTaskConfigDefault
+                : configuration.name,
+          ),
         ),
         subtitle: Text(configuration.path),
         trailing: Text(configuration.getType(l10n)),
@@ -81,10 +85,10 @@ class TaskConfigSection extends StatelessWidget {
             await state.loadResources(downloadMissing: false);
           } catch (e) {
             if (!context.mounted) return;
-            await showErrorDialog(
-              context,
-              <String>[l10n.settingsTaskConfigError, e.toString()],
-            );
+            await showErrorDialog(context, <String>[
+              l10n.settingsTaskConfigError,
+              e.toString(),
+            ]);
           }
         },
       ),
@@ -101,9 +105,7 @@ class TaskConfigErrorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.resourceErrorSelectTaskFile),
-      ),
+      appBar: AppBar(title: Text(l10n.resourceErrorSelectTaskFile)),
       body: TaskConfigSection(configs),
     );
   }

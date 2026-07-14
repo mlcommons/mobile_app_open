@@ -29,8 +29,9 @@ class AboutText extends StatefulWidget {
 }
 
 class _AboutText extends State<AboutText> {
-  final Future<String> _markdownData =
-      rootBundle.loadString('assets/text/about.md');
+  final Future<String> _markdownData = rootBundle.loadString(
+    'assets/text/about.md',
+  );
 
   @override
   Widget build(BuildContext context) {

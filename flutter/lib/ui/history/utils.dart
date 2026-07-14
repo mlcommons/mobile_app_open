@@ -18,10 +18,7 @@ class HistoryHelperUtils {
     return Center(
       child: Text(
         value,
-        style: const TextStyle(
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-        ),
+        style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -32,10 +29,7 @@ class HistoryHelperUtils {
         padding: const EdgeInsets.symmetric(vertical: 15.0),
         child: Text(
           value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -71,14 +65,8 @@ class HistoryHelperUtils {
   }
 
   Widget makeTable(List<RowData> rows) {
-    const borderStyle = BorderSide(
-      width: 1,
-      color: Colors.grey,
-    );
-    final headerBorder = TableBorder.all(
-      width: 1,
-      color: Colors.grey,
-    );
+    const borderStyle = BorderSide(width: 1, color: Colors.grey);
+    final headerBorder = TableBorder.all(width: 1, color: Colors.grey);
     const rowBorder = TableBorder(
       left: borderStyle,
       right: borderStyle,
@@ -114,13 +102,10 @@ class HistoryHelperUtils {
               firstColumn,
               Text(rowData.throughput, style: perfStyle),
               Text(rowData.accuracy, style: style),
-            ])
+            ]),
           ],
         );
-        return InkWell(
-          onTap: rowData.onTap,
-          child: table,
-        );
+        return InkWell(onTap: rowData.onTap, child: table);
       }).toList(),
     );
     return Padding(
@@ -143,8 +128,9 @@ class HistoryHelperUtils {
             return boardName;
           }
         }
-        final socProp =
-            android.props.where((e) => e.type == AndroidPropType.socName);
+        final socProp = android.props.where(
+          (e) => e.type == AndroidPropType.socName,
+        );
         if (socProp.isNotEmpty) {
           return socProp.first.value;
         }
@@ -162,8 +148,6 @@ class HistoryHelperUtils {
           return l10n.unknown;
         }
         return windows.cpuFullName;
-      default:
-        return l10n.unknown;
     }
   }
 }
@@ -188,13 +172,8 @@ class RowData {
 
 TableRow _makeTableRow(List<Widget> cells) {
   return TableRow(
-    children: cells.map(
-      (cell) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: cell,
-        );
-      },
-    ).toList(),
+    children: cells.map((cell) {
+      return Padding(padding: const EdgeInsets.all(8.0), child: cell);
+    }).toList(),
   );
 }
