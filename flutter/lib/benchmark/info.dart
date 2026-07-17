@@ -28,11 +28,10 @@ class BenchmarkInfo {
   BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
     switch (task.id) {
       case (BenchmarkId.llm):
-        // TODO translate this and add proper info
         return BenchmarkLocalizationInfo(
           name: 'LLM',
-          detailsTitle: 'Large Language Model',
-          detailsContent: 'LLM description goes here',
+          detailsTitle: stringResources.benchInfoLlm,
+          detailsContent: stringResources.benchInfoLlmDesc,
         );
       case (BenchmarkId.imageClassificationV2):
         return BenchmarkLocalizationInfo(
