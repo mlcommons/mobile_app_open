@@ -15,11 +15,12 @@ limitations under the License.
 
 #include "llm_pipeline.h"
 
+#include <unistd.h>
+
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <limits>
-#include <unistd.h>
 
 #if defined(MTK_TFLITE_NEURON_BACKEND) && defined(__ANDROID__)
 #include <dlfcn.h>
@@ -32,12 +33,11 @@ limitations under the License.
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/utils.h"
 #include "litert/cc/litert_compiled_model.h"
-#include "litert/cc/litert_environment.h"
-#include "litert/cc/litert_tensor_buffer.h"
-#include "litert/cc/litert_options.h"
 #include "litert/cc/litert_element_type.h"
+#include "litert/cc/litert_environment.h"
+#include "litert/cc/litert_options.h"
+#include "litert/cc/litert_tensor_buffer.h"
 #include "litert/cc/options/litert_gpu_options.h"
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,24 +45,15 @@ extern "C" {
 
 static bool backendExists = false;
 
-static bool CopyKVBuffer(litert::TensorBuffer& src, litert::TensorBuffer& dst,
-                         int float_count) {
-  std::vector<float> tmp(float_count);
-  if (!src.Read<float>(absl::MakeSpan(tmp))) return false;
-  return !!dst.Write<float>(absl::MakeConstSpan(tmp));
-}
+// Fill value for masked attention positions. Must be finite, not -inf: the
+// WebGPU softmax overflows on -inf. Matches LiteRT-LM's -0.7 * FLT_MAX for
+// float32. Allowed positions are filled with 0.
+static constexpr float kMaskedValue = -0.7f * std::numeric_limits<float>::max();
 
-static size_t lookup (const std::unordered_map<std::string, size_t>& map,
-                 const std::string& name) {
-  auto it = map.find(name);
-  if (it == map.end()) return std::numeric_limits<size_t>::max();
-  return it->second;
-};
-
-static std::unordered_map<std::string, size_t> make_index_map (const std::vector<std::string_view>& names) {
+static std::unordered_map<std::string, size_t> make_index_map(
+    const std::vector<std::string_view>& names) {
   std::unordered_map<std::string, size_t> map;
-  for (size_t i = 0; i < names.size(); ++i)
-    map[std::string(names[i])] = i;
+  for (size_t i = 0; i < names.size(); ++i) map[std::string(names[i])] = i;
   return map;
 };
 
@@ -151,10 +142,10 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
                  backend_data->prefill_input_map,
                  backend_data->prefill_input_bufs);
   if (backend_data->has_mask_input) {
-    WritePrefillMask(*backend_data->model,
-                     backend_data->current_prefill_sig_idx,
-                     backend_data->prefill_mask_idx, backend_data->mask_is_bool,
-                     backend_data->prefill_input_bufs[backend_data->prefill_mask_idx]);
+    WritePrefillMask(
+        *backend_data->model, backend_data->current_prefill_sig_idx,
+        backend_data->prefill_mask_idx, backend_data->mask_is_bool,
+        backend_data->prefill_input_bufs[backend_data->prefill_mask_idx]);
   }
 
   MINIMAL_CHECK(backend_data->model->Run(
@@ -178,10 +169,11 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
     backend_data->decode_input_bufs[backend_data->decode_pos_idx]
         .Write<int32_t>(absl::MakeConstSpan(pos));
     if (backend_data->has_mask_input) {
-      WriteDecodeMask(*backend_data->model, backend_data->decode_sig_idx,
-                      backend_data->decode_mask_idx, backend_data->mask_is_bool,
-                      backend_data->decode_input_bufs[backend_data->decode_mask_idx],
-                      next_position);
+      WriteDecodeMask(
+          *backend_data->model, backend_data->decode_sig_idx,
+          backend_data->decode_mask_idx, backend_data->mask_is_bool,
+          backend_data->decode_input_bufs[backend_data->decode_mask_idx],
+          next_position);
     }
     MINIMAL_CHECK(backend_data->model->Run(
         backend_data->decode_sig_idx,
@@ -223,9 +215,9 @@ mlperf_status_t LLMPipeline::backend_issue_query(
   MINIMAL_CHECK(decode_steps > 0);
 
   backend_data->output_tokens.reserve(decode_steps);
-  int next_token = GreedySampler(
-      backend_data->decode_output_bufs[backend_data->logits_idx],
-      backend_data->vocab_size);
+  int next_token =
+      GreedySampler(backend_data->decode_output_bufs[backend_data->logits_idx],
+                    backend_data->vocab_size);
   if (check_stop_id(next_token)) return MLPERF_SUCCESS;
   backend_data->output_tokens.push_back(next_token);
   int next_position = input_size;
@@ -236,10 +228,11 @@ mlperf_status_t LLMPipeline::backend_issue_query(
     backend_data->decode_input_bufs[backend_data->decode_pos_idx]
         .Write<int32_t>(absl::MakeConstSpan(pos));
     if (backend_data->has_mask_input) {
-      WriteDecodeMask(*backend_data->model, backend_data->decode_sig_idx,
-                      backend_data->decode_mask_idx, backend_data->mask_is_bool,
-                      backend_data->decode_input_bufs[backend_data->decode_mask_idx],
-                      next_position);
+      WriteDecodeMask(
+          *backend_data->model, backend_data->decode_sig_idx,
+          backend_data->decode_mask_idx, backend_data->mask_is_bool,
+          backend_data->decode_input_bufs[backend_data->decode_mask_idx],
+          next_position);
     }
     MINIMAL_CHECK(backend_data->model->Run(
         backend_data->decode_sig_idx,
@@ -479,8 +472,7 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
     data.decode_mask_idx = it->second;
     auto mtype = data.model->GetInputTensorType(data.decode_sig_idx, mname);
     if (mtype)
-      data.mask_is_bool =
-          (*mtype).ElementType() == litert::ElementType::Bool;
+      data.mask_is_bool = (*mtype).ElementType() == litert::ElementType::Bool;
     break;
   }
 
