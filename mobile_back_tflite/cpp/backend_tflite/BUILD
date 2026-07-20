@@ -96,6 +96,18 @@ cc_library(
         "@litert//litert/cc:litert_compiled_model",
         "@litert//litert/cc:litert_environment",
         "@litert//litert/cc:litert_tensor_buffer",
+        # For GPU acc symbol
+        "@litert//litert/c:litert_environment",
+        "@litert//litert/c:litert_environment_options",
+        "@litert//litert/c:litert_event",
+        "@litert//litert/c:litert_tensor_buffer",
+        "@litert//litert/c:litert_opaque_options",
+        "@litert//litert/c/options:litert_gpu_options",
+        "@litert//litert/c/internal:litert_accelerator_registration",
+        "@litert//litert/c/internal:litert_tensor_buffer_registry",
+        "@litert//litert/c/internal:litert_external_litert_buffer_context",
+        #"@litert//litert/c/internal:litert_delegate_wrapper",
+
     ]
     + select({
         "@org_tensorflow//tensorflow:android": [

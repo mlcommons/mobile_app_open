@@ -36,14 +36,9 @@ cc_library(
     }),
     deps = [
         "@com_google_absl//absl/strings",
-    ] + select({
-        "@org_tensorflow//tensorflow:android": [
-            "@org_tensorflow//tensorflow/core:portable_tensorflow_lib_lite",
-        ],
-        "//conditions:default": [
-            "@org_tensorflow//tensorflow/core:framework",
-            "@org_tensorflow//tensorflow/core:lib",
-            "@org_tensorflow//tensorflow/core:protos_all_cc",
-        ],
-    }),
+    ] + [
+        "@org_tensorflow//tensorflow/core:framework",
+        "@org_tensorflow//tensorflow/core:lib",
+        "@org_tensorflow//tensorflow/core:protos_all_cc",
+    ],
 )

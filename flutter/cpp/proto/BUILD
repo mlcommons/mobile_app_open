@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+load("@rules_python//python:py_binary.bzl", "py_binary")
 load("@litert//tflite:build_def.bzl", "tflite_linkopts")
 
 package(

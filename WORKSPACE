@@ -87,11 +87,12 @@ http_archive(
         "//:flutter/third_party/use_unsigned_char.patch",
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
+        "//:patches/litert-internal-visibility.diff",
     ],
-    sha256 = "16079585fcd0c7fbb95585db10516d059f35b8860d4a92566e257d67e259473a",
-    strip_prefix = "LiteRT-2.1.2",
+    sha256 = "7d0313c4851deb18af6f5f2dbc002bf01293583b87b819b0949ee33dcfe2d91b",
+    strip_prefix = "LiteRT-2.1.5",
     urls = [
-        "https://github.com/google-ai-edge/LiteRT/archive/v2.1.2.tar.gz",
+        "https://github.com/google-ai-edge/LiteRT/archive/v2.1.5.tar.gz",
     ],
 )
 
@@ -107,10 +108,10 @@ tensorflow_source_repo(
     patch_scripts = [
         "//third_party:fix_tensorflow.py",
     ],
-    sha256 = "7350a523293b90234f830cb5831c4da561c15f73436760501532278273eb3ed8",
-    strip_prefix = "tensorflow-96ec9851967f0e2b9c0537d6686eda5c52178822",
+    sha256 = "879cf25692d50c60315a4dd3929dccd923d4c44a2c4b95ebb483666d2c16a22a",
+    strip_prefix = "tensorflow-6d40c20cdfe385746c31da6227b95722f5ece342",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/96ec9851967f0e2b9c0537d6686eda5c52178822.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/6d40c20cdfe385746c31da6227b95722f5ece342.tar.gz",
     ],
 )
 
@@ -141,10 +142,10 @@ http_archive(
 # Required by LiteRT's rules_ml_toolchain for GPU/CC toolchain configuration.
 http_archive(
     name = "rules_ml_toolchain",
-    sha256 = "9dbee8f24cc1b430bf9c2a6661ab70cbca89979322ddc7742305a05ff637ab6b",
-    strip_prefix = "rules_ml_toolchain-545c80f1026d526ea9c7aaa410bf0b52c9a82e74",
+    sha256 = "0b42f693a60c6050d87db1e0a0eaeb84ab3f54191fce094d86334faedc807da0",
+    strip_prefix = "rules_ml_toolchain-398d613aea7a4c294da49b79a6d6f3f8732bd84c",
     urls = [
-        "https://github.com/google-ml-infra/rules_ml_toolchain/archive/545c80f1026d526ea9c7aaa410bf0b52c9a82e74.tar.gz",
+        "https://github.com/google-ml-infra/rules_ml_toolchain/archive/398d613aea7a4c294da49b79a6d6f3f8732bd84c.tar.gz",
     ],
 )
 

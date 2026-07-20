@@ -73,6 +73,11 @@ struct LLMBackendData {
   size_t decode_tokens_idx = 0;
   size_t decode_pos_idx = 0;
   size_t logits_idx = 0;
+  size_t prefill_mask_idx = 0;
+  size_t decode_mask_idx = 0;
+  bool has_mask_input = false;  // model exported with a mask input
+  bool mask_is_bool = false;    // mask element type: bool vs float32
+
   int num_kv_layers = 0;
   int kv_cache_max_size = 0;
   int kv_buf_float_count = 0;
@@ -94,7 +99,7 @@ struct LLMBackendData {
   LLMBackendData& operator=(const LLMBackendData&) = delete;
 };
 
-// A simple pipeline which runs a single model.
+// Pipeline for autoregressive LLM inference (prefill + decode).
 class LLMPipeline : public Pipeline {
  public:
   LLMPipeline() = default;
@@ -153,16 +158,41 @@ class LLMPipeline : public Pipeline {
   void backend_release_buffer(void* p) override;
 
  private:
-  bool BuildCompiledModel(LLMBackendData* backend_ptr, const char* model_path);
-  bool BuildDecodeBuffers(LLMBackendData* backend_ptr);
-  bool BuildPrefillBuffers(LLMBackendData* backend_ptr, size_t prefill_sig_idx);
-  size_t GetSuitablePrefillSignature(LLMBackendData* backend_ptr,
-                                     size_t num_input_tokens) const;
-  void TransferKV(LLMBackendData* backend_ptr);
-  void UpdateDecodeKV(LLMBackendData* backend_ptr);
-  void ResetKV(LLMBackendData* backend_ptr);
-  void ResetPrefillKV(LLMBackendData* backend_ptr);
-  int GreedySampler(LLMBackendData* backend_ptr);
+  bool BuildCompiledModel(LLMBackendData& data, const char* model_path);
+  bool BuildDecodeBuffers(LLMBackendData& data);
+  bool BuildPrefillBuffers(LLMBackendData& data, size_t prefill_sig_idx);
+
+  size_t GetSuitablePrefillSignature(
+      const std::vector<std::pair<size_t, size_t>>& prefill_sigs,
+      size_t num_input_tokens) const;
+  // Move each layer's KV from the prefill outputs into the decode inputs.
+  void TransferKV(
+      int num_layers,
+      const std::unordered_map<std::string, size_t>& prefill_output_map,
+      const std::unordered_map<std::string, size_t>& decode_input_map,
+      std::vector<litert::TensorBuffer>& prefill_output_bufs,
+      std::vector<litert::TensorBuffer>& decode_input_bufs);
+  // Swap each layer's KV between the decode inputs and outputs (one step).
+  void UpdateDecodeKV(
+      int num_layers,
+      const std::unordered_map<std::string, size_t>& decode_input_map,
+      const std::unordered_map<std::string, size_t>& decode_output_map,
+      std::vector<litert::TensorBuffer>& decode_input_bufs,
+      std::vector<litert::TensorBuffer>& decode_output_bufs);
+  void ResetKV(int num_layers, int float_count,
+               const std::unordered_map<std::string, size_t>& decode_input_map,
+               std::vector<litert::TensorBuffer>& decode_input_bufs);
+  void ResetPrefillKV(
+      int num_layers, int float_count,
+      const std::unordered_map<std::string, size_t>& prefill_input_map,
+      std::vector<litert::TensorBuffer>& prefill_input_bufs);
+  void WritePrefillMask(litert::CompiledModel& model, size_t sig_idx,
+                        size_t mask_idx, bool mask_is_bool,
+                        litert::TensorBuffer& buf);
+  void WriteDecodeMask(litert::CompiledModel& model, size_t sig_idx,
+                       size_t mask_idx, bool mask_is_bool,
+                       litert::TensorBuffer& buf, int position);
+  int GreedySampler(litert::TensorBuffer& logits_buf, int vocab_size);
 };
 
-#endif  // TFLITE_SINGLE_MODEL_PIPELINE_H_
+#endif  // TFLITE_LLM_PIPELINE_H_
