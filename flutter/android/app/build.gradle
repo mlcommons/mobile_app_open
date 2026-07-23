@@ -26,17 +26,20 @@ if (flutterVersionName == null) {
 
 android {
     namespace "org.mlcommons.android.mlperfbench"
-    compileSdkVersion 34
+    compileSdk 36
 
-    ndkVersion "25.2.9519653"
+    // Plugins (incl. integration_test, jni, firebase_*) require NDK >= 28.2.x,
+    // and NDK 25 ships x86_64-only macOS host tools which fail to strip release
+    // symbols on the arm64 macOS CI runner. NDK 28 has arm64 macOS host binaries.
+    ndkVersion "28.2.13676358"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
 
     sourceSets {

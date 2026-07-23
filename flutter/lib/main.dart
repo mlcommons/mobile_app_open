@@ -21,8 +21,10 @@ import 'package:mlperfbench/ui/root/unsupported_device_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   try {
     await launchUi();
@@ -56,7 +58,7 @@ Future<void> launchUi() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: benchmarkState),
-        ChangeNotifierProvider.value(value: store)
+        ChangeNotifierProvider.value(value: store),
       ],
       child: const MyApp(home: MainScreen()),
     ),
@@ -64,11 +66,7 @@ Future<void> launchUi() async {
 }
 
 Future<void> showUnsupportedDeviceScreen(UnsupportedDeviceException e) async {
-  runApp(MyApp(
-    home: UnsupportedDeviceScreen(
-      backendError: e.backendError,
-    ),
-  ));
+  runApp(MyApp(home: UnsupportedDeviceScreen(backendError: e.backendError)));
 }
 
 Future<void> showExceptionScreen(Object e, StackTrace s) async {
@@ -81,10 +79,12 @@ Future<void> autostartHandler(BenchmarkState state, Store store) async {
   if (state.state == BenchmarkStateEnum.waiting) {
     store.selectedBenchmarkRunMode =
         const bool.fromEnvironment('submission', defaultValue: false)
-            ? BenchmarkRunModeEnum.submissionRun
-            : BenchmarkRunModeEnum.quickRun;
-    store.offlineMode =
-        const bool.fromEnvironment('offline', defaultValue: false);
+        ? BenchmarkRunModeEnum.submissionRun
+        : BenchmarkRunModeEnum.quickRun;
+    store.offlineMode = const bool.fromEnvironment(
+      'offline',
+      defaultValue: false,
+    );
     await state.runBenchmarks();
     return;
   }

@@ -18,8 +18,8 @@ benchmark_setting {
     accelerator_name: "neuron-mdla"
     accelerator_desc: "MediaTek NN accelerator via the Neuron SDK"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/mediatek/mt6993/MobileNetV4-Conv-Large-int8-ptq.dla"
-      model_checksum: "217a51d5faa674f6dcf4d080676576fd"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_1/mediatek/mt6993/MobileNetV4-Conv-Large-int8-ptq.dla"
+      model_checksum: "9a45093025e2986eaa5c6e494cbce4bd"
     }
     custom_setting: {
       id: "disable_coherent"
@@ -55,8 +55,8 @@ benchmark_setting {
     accelerator_name: "neuron-mdla"
     accelerator_desc: "MediaTek NN accelerator via the Neuron SDK"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/mediatek/mt6993/MobileNetV4-Conv-Large-int8-ptq_offline.dla"
-      model_checksum: "24b025aa3d60b0eb87b1f5445260d7af"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_1/mediatek/mt6993/MobileNetV4-Conv-Large-int8-ptq_offline.dla"
+      model_checksum: "5019f50e3654ee44b93fdf1b02a92d76"
     }
     custom_setting: {
       id: "thread_pool_size"
@@ -64,11 +64,11 @@ benchmark_setting {
     }
     custom_setting: {
       id: "exec_num"
-      value: "6"
+      value: "4"
     }
     custom_setting: {
       id: "model_batch_size"
-      value: "8"
+      value: "16"
     }
     custom_setting: {
       id: "disable_coherent"
@@ -105,8 +105,8 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "MediaTek NN accelerator via the Neuron SDK"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/mediatek/mt6993/mobiledet_qat.dla"
-      model_checksum: "1f4f1d1d5caf5696f159e4f18f86b473"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_1/mediatek/mt6993/mobiledet_qat.dla"
+      model_checksum: "bad523b0264ac739a9e0547377d14960"
     }
     custom_setting: {
       id: "disable_coherent"
@@ -143,8 +143,8 @@ benchmark_setting {
     accelerator_name: "neuron-no-ahwb"
     accelerator_desc: "MediaTek NN accelerator + VPU via the Neuron SDK"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/mediatek/mt6993/mobilebert_int8_384_nnapi.dla"
-      model_checksum: "33d976594465c4e8f7b38fb138a4aa03"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_1/mediatek/mt6993/mobilebert_int8_384_nnapi.dla"
+      model_checksum: "84ded5c021584ecbbd34c6382a96d716"
     }
     custom_setting: {
       id: "disable_coherent"
@@ -181,8 +181,8 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "NPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/mediatek/mt6993/mobile_segmenter_r4_quant_argmax_uint8.dla"
-      model_checksum: "9258e5d4b8de1f0231b9f113ea518b3d"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_1/mediatek/mt6993/mobile_segmenter_r4_quant_argmax_uint8.dla"
+      model_checksum: "8b5df25b167f3248dbfa7cd72547cebc"
     }
     custom_setting: {
       id: "disable_coherent"
@@ -208,6 +208,7 @@ benchmark_setting {
     }
   }
   delegate_selected: "Neuron"
+  single_stream_expected_latency_ns: 300000
 }
 
 benchmark_setting {
@@ -218,8 +219,8 @@ benchmark_setting {
     accelerator_name: "neuron"
     accelerator_desc: "MediaTek NN accelerator via the Neuron SDK"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/mediatek/mt6993/edsr_f32b5_full_qint8.dla"
-      model_checksum: "c6a8434d28f646df68a4c4120edd029c"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_1/mediatek/mt6993/edsr_f32b5_full_qint8.dla"
+      model_checksum: "104318678959015eef1748795385372a"
     }
     custom_setting: {
       id: "disable_coherent"

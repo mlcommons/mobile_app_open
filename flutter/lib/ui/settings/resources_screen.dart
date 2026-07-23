@@ -17,8 +17,11 @@ class ResourcesScreen extends StatefulWidget {
   final bool autoStart;
   final List<Benchmark>? benchmarksToDownload;
 
-  const ResourcesScreen(
-      {this.autoStart = false, this.benchmarksToDownload, super.key});
+  const ResourcesScreen({
+    this.autoStart = false,
+    this.benchmarksToDownload,
+    super.key,
+  });
 
   @override
   State<ResourcesScreen> createState() => _ResourcesScreen();
@@ -42,8 +45,9 @@ class _ResourcesScreen extends State<ResourcesScreen> {
         );
         if (state.resourceError != null) {
           if (!mounted) return;
-          await showErrorDialog(
-              context, <String>[state.resourceError.toString()]);
+          await showErrorDialog(context, <String>[
+            state.resourceError.toString(),
+          ]);
           // Reset both the error and stacktrace for further operation
           state.resourceError = null;
           state.stackTrace = null;
@@ -91,12 +95,13 @@ class _ResourcesScreen extends State<ResourcesScreen> {
     final subtitleWidth = 0.90 * MediaQuery.of(context).size.width;
     return ListTile(
       leading: SizedBox(
-          width: leadingWidth,
-          height: leadingWidth,
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: benchmark.info.icon,
-          )),
+        width: leadingWidth,
+        height: leadingWidth,
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: benchmark.info.icon,
+        ),
+      ),
       title: Text(benchmark.info.taskName),
       subtitle: SizedBox(
         width: subtitleWidth,
@@ -105,13 +110,14 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _downloadStatus(
-                benchmark, store.selectedBenchmarkRunMode.accuracyRunMode),
-            const SizedBox(
-              width: 4,
-              height: 4,
+              benchmark,
+              store.selectedBenchmarkRunMode.accuracyRunMode,
             ),
+            const SizedBox(width: 4, height: 4),
             _downloadStatus(
-                benchmark, store.selectedBenchmarkRunMode.performanceRunMode),
+              benchmark,
+              store.selectedBenchmarkRunMode.performanceRunMode,
+            ),
           ],
         ),
       ),
@@ -122,60 +128,63 @@ class _ResourcesScreen extends State<ResourcesScreen> {
   Widget _downloadStatus(Benchmark benchmark, BenchmarkRunMode mode) {
     return FutureBuilder<Map<bool, List<String>>>(
       future: state.validator.validateResourcesExist(benchmark, mode),
-      builder: (BuildContext context,
-          AsyncSnapshot<Map<bool, List<String>>> snapshot) {
-        if (snapshot.hasData && snapshot.data != null) {
-          const double size = 20;
-          final result = snapshot.data!;
-          final missing = result[false] ?? [];
-          final existed = result[true] ?? [];
-          final downloaded = missing.isEmpty;
-          final Color statusColor = downloaded ? Colors.green : Colors.grey;
-          final Icon statusIcon = Icon(
-              mode.loadgenMode == LoadgenModeEnum.performanceOnly
-                  ? Icons.speed_outlined
-                  : Icons.adjust_outlined,
-              size: size,
-              color: statusColor);
-          return TextButton(
-            style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                minimumSize: const Size(32, 32),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                alignment: Alignment.centerLeft,
-                backgroundColor: Colors.grey[200]),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return _ResourcesTable(
-                    taskName: benchmark.info.taskName,
-                    modeName: mode.readable,
-                    missing: missing,
-                    existed: existed,
+      builder:
+          (
+            BuildContext context,
+            AsyncSnapshot<Map<bool, List<String>>> snapshot,
+          ) {
+            if (snapshot.hasData && snapshot.data != null) {
+              const double size = 20;
+              final result = snapshot.data!;
+              final missing = result[false] ?? [];
+              final existed = result[true] ?? [];
+              final downloaded = missing.isEmpty;
+              final Color statusColor = downloaded ? Colors.green : Colors.grey;
+              final Icon statusIcon = Icon(
+                mode.loadgenMode == LoadgenModeEnum.performanceOnly
+                    ? Icons.speed_outlined
+                    : Icons.adjust_outlined,
+                size: size,
+                color: statusColor,
+              );
+              return TextButton(
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(32, 32),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  alignment: Alignment.centerLeft,
+                  backgroundColor: Colors.grey[200],
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return _ResourcesTable(
+                        taskName: benchmark.info.taskName,
+                        modeName: mode.readable,
+                        missing: missing,
+                        existed: existed,
+                      );
+                    },
                   );
                 },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    statusIcon,
+                    const SizedBox(width: 4),
+                    Text(
+                      mode.readable,
+                      style: const TextStyle(color: AppColors.darkText),
+                    ),
+                  ],
+                ),
               );
-            },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                statusIcon,
-                const SizedBox(
-                  width: 4,
-                ),
-                Text(
-                  mode.readable,
-                  style: const TextStyle(color: AppColors.darkText),
-                ),
-              ],
-            ),
-          );
-        } else {
-          return Text(l10n.resourceChecking);
-        }
-      },
+            } else {
+              return Text(l10n.resourceChecking);
+            }
+          },
     );
   }
 
@@ -199,10 +208,7 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           style: const TextStyle(fontSize: 12),
         ),
         const SizedBox(height: 8),
-        LinearProgressIndicator(
-          value: state.loadingProgress,
-          minHeight: 8,
-        ),
+        LinearProgressIndicator(value: state.loadingProgress, minHeight: 8),
       ],
     );
   }
@@ -218,8 +224,9 @@ class _ResourcesScreen extends State<ResourcesScreen> {
               );
               if (state.resourceError != null) {
                 if (!mounted) return;
-                await showErrorDialog(
-                    context, <String>[state.resourceError.toString()]);
+                await showErrorDialog(context, <String>[
+                  state.resourceError.toString(),
+                ]);
                 // Reset both the error and stacktrace for further operation
                 state.resourceError = null;
                 state.stackTrace = null;
@@ -236,7 +243,9 @@ class _ResourcesScreen extends State<ResourcesScreen> {
           ? null
           : () async {
               final dialogAction = await showConfirmDialog(
-                  context, l10n.settingsClearCacheConfirm);
+                context,
+                l10n.settingsClearCacheConfirm,
+              );
               switch (dialogAction) {
                 case ConfirmDialogAction.ok:
                   await state.clearCache();
@@ -259,23 +268,23 @@ class _ResourcesScreen extends State<ResourcesScreen> {
 
 ButtonStyle _downloadButtonStyle = ButtonStyle(
   backgroundColor: ResourceButtonColor(),
-  foregroundColor: const MaterialStatePropertyAll(Colors.white),
+  foregroundColor: const WidgetStatePropertyAll(Colors.white),
 );
 
 ButtonStyle _clearButtonStyle = ButtonStyle(
   backgroundColor: ResourceButtonColor(defaultColor: Colors.red),
-  foregroundColor: const MaterialStatePropertyAll(Colors.white),
+  foregroundColor: const WidgetStatePropertyAll(Colors.white),
 );
 
-class ResourceButtonColor extends MaterialStateColor {
+class ResourceButtonColor extends WidgetStateColor {
   ResourceButtonColor({this.defaultColor = Colors.blue})
-      : super(defaultColor.value);
+    : super(defaultColor.toARGB32());
 
   final Color defaultColor;
 
   @override
-  Color resolve(Set<MaterialState> states) {
-    if (states.contains(MaterialState.disabled)) return Colors.grey;
+  Color resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.disabled)) return Colors.grey;
     return defaultColor;
   }
 }
@@ -296,14 +305,7 @@ class _ResourcesTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          children: [
-            Text(taskName),
-            Text(modeName),
-          ],
-        ),
-      ),
+      appBar: AppBar(title: Column(children: [Text(taskName), Text(modeName)])),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
@@ -336,10 +338,7 @@ class _ResourcesTable extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: existed ? downloadedIcon : notDownloadedIcon,
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(path),
-        ),
+        Padding(padding: const EdgeInsets.all(8.0), child: Text(path)),
       ],
     );
   }

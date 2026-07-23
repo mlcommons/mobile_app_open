@@ -21,7 +21,8 @@ void showBenchInfoBottomSheet(BuildContext context, Benchmark benchmark) {
     enableDrag: false,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
     builder: (context) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: sidePadding),
       child: Column(
@@ -57,31 +58,32 @@ void showBenchInfoBottomSheet(BuildContext context, Benchmark benchmark) {
               ),
             ),
           ),
-          LayoutBuilder(builder: (context, constraints) {
-            print(constraints.maxHeight);
-            return ConstrainedBox(
-              constraints: constraints.copyWith(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              print(constraints.maxHeight);
+              return ConstrainedBox(
+                constraints: constraints.copyWith(
                   maxHeight: constraints.maxHeight != double.infinity
                       ? constraints.maxHeight
-                      : MediaQuery.of(context).size.height - headHeight),
-              child: ScrollConfiguration(
-                behavior: NoGlowScrollBehavior(),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Text(
-                        info.detailsContent,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(
-                        height: footHeight,
-                      )
-                    ],
+                      : MediaQuery.of(context).size.height - headHeight,
+                ),
+                child: ScrollConfiguration(
+                  behavior: NoGlowScrollBehavior(),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Text(
+                          info.detailsContent,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: footHeight),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            },
+          ),
         ],
       ),
     ),

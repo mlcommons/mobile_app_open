@@ -29,34 +29,35 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     final filter = state.resourceManager.resultManager.resultFilter;
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.historyFilterTitle),
-          actions: [
-            _applyFilterButton(),
-            _clearFilterButton(state.resourceManager.resultManager),
+      appBar: AppBar(
+        title: Text(l10n.historyFilterTitle),
+        actions: [
+          _applyFilterButton(),
+          _clearFilterButton(state.resourceManager.resultManager),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          children: [
+            const SizedBox(height: 18),
+            _creationDateFilter(filter),
+            const SizedBox(height: 12),
+            _platformFilter(filter),
+            const SizedBox(height: 12),
+            _benchmarkIdFilter(filter),
+            const SizedBox(height: 12),
+            _backendNameFilter(filter),
+            const SizedBox(height: 12),
+            _deviceModelFilter(filter),
+            const SizedBox(height: 12),
+            _manufacturerFilter(filter),
+            const SizedBox(height: 12),
+            _socFilter(filter),
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListView(
-            children: [
-              const SizedBox(height: 18),
-              _creationDateFilter(filter),
-              const SizedBox(height: 12),
-              _platformFilter(filter),
-              const SizedBox(height: 12),
-              _benchmarkIdFilter(filter),
-              const SizedBox(height: 12),
-              _backendNameFilter(filter),
-              const SizedBox(height: 12),
-              _deviceModelFilter(filter),
-              const SizedBox(height: 12),
-              _manufacturerFilter(filter),
-              const SizedBox(height: 12),
-              _socFilter(filter),
-            ],
-          ),
-        ));
+      ),
+    );
   }
 
   Widget _creationDateFilter(ResultFilter filter) {
@@ -95,45 +96,50 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
 
   Widget _platformFilter(ResultFilter filter) {
     return _makeDropDownFilter(
-        labelText: l10n.historyFilterPlatform,
-        choices: EnvPlatform.values
-            .map((e) => DropdownOption(e.name, e.name))
-            .toList(),
-        value: filter.platform != null
-            ? DropdownOption(filter.platform, filter.platform ?? '')
-            : null,
-        onChanged: (option) => setState(() {
-              filter.platform = option?.value as String;
-            }));
+      labelText: l10n.historyFilterPlatform,
+      choices: EnvPlatform.values
+          .map((e) => DropdownOption(e.name, e.name))
+          .toList(),
+      value: filter.platform != null
+          ? DropdownOption(filter.platform, filter.platform ?? '')
+          : null,
+      onChanged: (option) => setState(() {
+        filter.platform = option?.value as String;
+      }),
+    );
   }
 
   Widget _benchmarkIdFilter(ResultFilter filter) {
     return _makeDropDownFilter(
-        labelText: l10n.historyFilterBenchmarkID,
-        choices: BenchmarkId.allIds
-            .map((benchmarkId) => DropdownOption(benchmarkId, benchmarkId))
-            .toList(),
-        value: filter.benchmarkId != null
-            ? DropdownOption(filter.benchmarkId, filter.benchmarkId ?? '')
-            : null,
-        onChanged: (option) => setState(() {
-              filter.benchmarkId = option?.value as String;
-            }));
+      labelText: l10n.historyFilterBenchmarkID,
+      choices: BenchmarkId.allIds
+          .map((benchmarkId) => DropdownOption(benchmarkId, benchmarkId))
+          .toList(),
+      value: filter.benchmarkId != null
+          ? DropdownOption(filter.benchmarkId, filter.benchmarkId ?? '')
+          : null,
+      onChanged: (option) => setState(() {
+        filter.benchmarkId = option?.value as String;
+      }),
+    );
   }
 
   Widget _backendNameFilter(ResultFilter filter) {
     return _makeDropDownFilter(
-        labelText: l10n.historyFilterBackendID,
-        choices: BackendId.allIds
-            .map((backendId) => DropdownOption(backendId, backendId))
-            .toList(),
-        value: filter.backend != null
-            ? DropdownOption(
-                filter.backend, filter.backend ?? BackendId.allIds[0])
-            : null,
-        onChanged: (option) => setState(() {
-              filter.backend = option?.value as String;
-            }));
+      labelText: l10n.historyFilterBackendID,
+      choices: BackendId.allIds
+          .map((backendId) => DropdownOption(backendId, backendId))
+          .toList(),
+      value: filter.backend != null
+          ? DropdownOption(
+              filter.backend,
+              filter.backend ?? BackendId.allIds[0],
+            )
+          : null,
+      onChanged: (option) => setState(() {
+        filter.backend = option?.value as String;
+      }),
+    );
   }
 
   Widget _deviceModelFilter(ResultFilter filter) {
@@ -212,36 +218,41 @@ class _ResultFilterScreenState extends State<ResultFilterScreen> {
     );
   }
 
-  Widget _makeDropDownFilter(
-      {required String labelText,
-      required DropdownOption? value,
-      required List<DropdownOption> choices,
-      required void Function(DropdownOption?)? onChanged}) {
+  Widget _makeDropDownFilter({
+    required String labelText,
+    required DropdownOption? value,
+    required List<DropdownOption> choices,
+    required void Function(DropdownOption?)? onChanged,
+  }) {
     final items = choices
-        .map((e) => DropdownMenuItem<DropdownOption>(
-              value: e,
-              child: Text(e.label),
-            ))
+        .map(
+          (e) =>
+              DropdownMenuItem<DropdownOption>(value: e, child: Text(e.label)),
+        )
         .toList();
     return Container(
       decoration: const ShapeDecoration(
         shape: RoundedRectangleBorder(
           side: BorderSide(
-              color: Colors.grey, width: 1.0, style: BorderStyle.solid),
+            color: Colors.grey,
+            width: 1.0,
+            style: BorderStyle.solid,
+          ),
           borderRadius: BorderRadius.all(Radius.circular(3.0)),
         ),
       ),
       child: DropdownButtonFormField<DropdownOption>(
-          isExpanded: true,
-          decoration: InputDecoration(
-            enabledBorder: InputBorder.none,
-            filled: true,
-            fillColor: Colors.white,
-            labelText: labelText,
-          ),
-          value: value,
-          items: items,
-          onChanged: onChanged),
+        isExpanded: true,
+        decoration: InputDecoration(
+          enabledBorder: InputBorder.none,
+          filled: true,
+          fillColor: Colors.white,
+          labelText: labelText,
+        ),
+        initialValue: value,
+        items: items,
+        onChanged: onChanged,
+      ),
     );
   }
 }
@@ -254,7 +265,7 @@ class DropdownOption<T> {
 
   @override
   bool operator ==(Object other) =>
-      other is DropdownOption && this.value == other.value;
+      other is DropdownOption && value == other.value;
 
   @override
   int get hashCode => value.hashCode ^ label.hashCode;

@@ -155,8 +155,10 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       icon: const Icon(Icons.delete),
       color: Colors.white,
       onPressed: () async {
-        final dialogAction =
-            await showConfirmDialog(context, l10n.resultsDeleteConfirm);
+        final dialogAction = await showConfirmDialog(
+          context,
+          l10n.resultsDeleteConfirm,
+        );
         switch (dialogAction) {
           case ConfirmDialogAction.ok:
             await state.resourceManager.resultManager.deleteLastResult();
@@ -260,10 +262,11 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(WidgetSizes.borderRadius),
+                      borderRadius: BorderRadius.circular(
+                        WidgetSizes.borderRadius,
+                      ),
                       boxShadow: const [
-                        BoxShadow(color: Colors.black12, blurRadius: 2)
+                        BoxShadow(color: Colors.black12, blurRadius: 2),
                       ],
                     ),
                     child: Padding(
@@ -283,12 +286,19 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
                       Text(
                         benchmarkSet.config.name,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                       Text(
-                        '${benchmarkSet.benchmarks.length} benchmarks in this set',
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
+                        l10n.resultsBenchmarksInSet.replaceAll(
+                          '<count>',
+                          benchmarkSet.benchmarks.length.toString(),
+                        ),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -309,7 +319,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
           duration: const Duration(milliseconds: 200),
           transitionBuilder: (child, animation) => SizeTransition(
             sizeFactor: animation,
-            axisAlignment: 0.0,
+            alignment: Alignment.center,
             child: child,
           ),
           child: !isExpanded
@@ -350,7 +360,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         final throughput = benchmarkResult?.throughput;
         resultText = isTokenBased
             ? benchmarkResult?.loadgenInfo?.latencyFirstTokenMean
-                .toStringAsFixed(2)
+                  .toStringAsFixed(2)
             : throughput?.toUIString();
         progressBarValue =
             (throughput?.value ?? 0.0) / benchmark.info.maxThroughput;
@@ -358,8 +368,9 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
             ? benchmarkResult?.loadgenInfo?.tokenThroughput.toStringAsFixed(2)
             : null;
         progressBarValue2 = null;
-        final resultValidity =
-            PerformanceResultValidityEnum.forBenchmark(benchmark);
+        final resultValidity = PerformanceResultValidityEnum.forBenchmark(
+          benchmark,
+        );
         resultTextColor = resultValidity.color;
         unitText = isTokenBased ? l10n.unitSecond : l10n.unitQPS;
         unitText2 = l10n.unitTPS;
@@ -396,14 +407,13 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
       fontSize: 18.0,
       fontWeight: FontWeight.bold,
     );
-    const resultUnitStyle = TextStyle(
-      color: Color(0xff2f2f2f),
-      fontSize: 10.0,
+    const resultUnitStyle = TextStyle(color: Color(0xff2f2f2f), fontSize: 10.0);
+    const resultHeightBehavior = TextHeightBehavior(
+      applyHeightToLastDescent: false,
     );
-    const resultHeightBehavior =
-        TextHeightBehavior(applyHeightToLastDescent: false);
-    const resultUnitHeightBehavior =
-        TextHeightBehavior(applyHeightToFirstAscent: false);
+    const resultUnitHeightBehavior = TextHeightBehavior(
+      applyHeightToFirstAscent: false,
+    );
     final benchmarkScore = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -412,8 +422,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
           triggerMode: TooltipTriggerMode.tap,
           message: _screenMode == _ScreenMode.performance
               ? isTokenBased
-                  ? 'TTFT'
-                  : 'QPS'
+                    ? 'TTFT'
+                    : 'QPS'
               : '%',
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -428,15 +438,13 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
                   textHeightBehavior: resultHeightBehavior,
                 ),
               ),
-              const SizedBox(
-                width: 4.0,
-              ),
+              const SizedBox(width: 4.0),
               if (resultText != null)
                 Text(
                   unitText,
                   style: resultUnitStyle,
                   textHeightBehavior: resultUnitHeightBehavior,
-                )
+                ),
             ],
           ),
         ),
@@ -445,8 +453,8 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
             triggerMode: TooltipTriggerMode.tap,
             message: _screenMode == _ScreenMode.performance
                 ? isTokenBased
-                    ? 'TPS'
-                    : 'QPS'
+                      ? 'TPS'
+                      : 'QPS'
                 : '%',
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -461,14 +469,12 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
                     textHeightBehavior: resultHeightBehavior,
                   ),
                 ),
-                const SizedBox(
-                  width: 4.0,
-                ),
+                const SizedBox(width: 4.0),
                 Text(
                   unitText2,
                   style: resultUnitStyle,
                   textHeightBehavior: resultUnitHeightBehavior,
-                )
+                ),
               ],
             ),
           ),
@@ -490,10 +496,7 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
         children: [
           Text(
             l10n.resultsBatchSize.replaceAll('<batchSize>', batchSize),
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 14.0,
-            ),
+            style: const TextStyle(color: Colors.grey, fontSize: 14.0),
           ),
         ],
       );
@@ -536,20 +539,14 @@ class _BenchmarkResultScreenState extends State<BenchmarkResultScreen>
           child: SizedBox(width: 32, height: 32, child: benchmark.info.icon),
         ),
       ),
-      title: AutoSizeText(
-        benchmark.taskConfig.name,
-        maxLines: 1,
-      ),
+      title: AutoSizeText(benchmark.taskConfig.name, maxLines: 1),
       subtitle: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: subtitleColumnChildren,
       ),
-      trailing: SizedBox(
-        width: trailingWidth,
-        child: benchmarkScore,
-      ),
+      trailing: SizedBox(width: trailingWidth, child: benchmarkScore),
     );
   }
 }

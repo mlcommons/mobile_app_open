@@ -14,34 +14,19 @@ class EnvironmentInfo {
   final EnvPlatform platform;
   final EnvInfoValue value;
 
-  EnvironmentInfo({
-    required this.platform,
-    required this.value,
-  });
+  EnvironmentInfo({required this.platform, required this.value});
 
   EnvironmentInfo.makeAndroid({required EnvAndroid info})
-      : platform = EnvPlatform.android,
-        value = EnvInfoValue(
-          android: info,
-          ios: null,
-          windows: null,
-        );
+    : platform = EnvPlatform.android,
+      value = EnvInfoValue(android: info, ios: null, windows: null);
 
   EnvironmentInfo.makeIos({required EnvIos info})
-      : platform = EnvPlatform.ios,
-        value = EnvInfoValue(
-          android: null,
-          ios: info,
-          windows: null,
-        );
+    : platform = EnvPlatform.ios,
+      value = EnvInfoValue(android: null, ios: info, windows: null);
 
   EnvironmentInfo.makeWindows({required EnvWindows info})
-      : platform = EnvPlatform.windows,
-        value = EnvInfoValue(
-          android: null,
-          ios: null,
-          windows: info,
-        );
+    : platform = EnvPlatform.windows,
+      value = EnvInfoValue(android: null, ios: null, windows: info);
 
   factory EnvironmentInfo.fromJson(Map<String, dynamic> json) =>
       _$EnvironmentInfoFromJson(json);
@@ -64,8 +49,6 @@ class EnvironmentInfo {
         return 'Apple ${ios.modelName}';
       case EnvPlatform.windows:
         return 'PC';
-      default:
-        return '';
     }
   }
 }

@@ -72,15 +72,18 @@ class UpgradeDialog extends StatelessWidget {
       // Google Play Store
       case 'com.android.vending':
         return Uri.parse(
-            'https://play.google.com/store/apps/details?id=$packageName');
+          'https://play.google.com/store/apps/details?id=$packageName',
+        );
       // Amazon Appstore
       case 'com.amazon.venezia':
         return Uri.parse(
-            'https://www.amazon.com/gp/mas/dl/android?p=$packageName');
+          'https://www.amazon.com/gp/mas/dl/android?p=$packageName',
+        );
       // Samsung Galaxy Store
       case 'com.sec.android.app.samsungapps':
         return Uri.parse(
-            'https://apps.samsung.com/appquery/appDetail.as?appId=$packageName');
+          'https://apps.samsung.com/appquery/appDetail.as?appId=$packageName',
+        );
       // Huawei AppGallery (best-effort web link; may require app-specific ID)
       case 'com.huawei.appmarket':
         return Uri.parse('https://appgallery.huawei.com/#/app/$packageName');
@@ -90,7 +93,8 @@ class UpgradeDialog extends StatelessWidget {
       // Oppo App Market
       case 'com.oppo.market':
         return Uri.parse(
-            'https://store.heytap.com/app/details?id=$packageName');
+          'https://store.heytap.com/app/details?id=$packageName',
+        );
       // Vivo App Store
       case 'com.bbk.appstore':
         return Uri.parse('https://appstore.vivo.com.cn/appdetail/$packageName');

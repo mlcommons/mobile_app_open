@@ -38,10 +38,7 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.menuHistory),
-        actions: [
-          _sortButton(sort),
-          _filterButton(filter),
-        ],
+        actions: [_sortButton(sort), _filterButton(filter)],
       ),
       body: ListView.separated(
         controller: ScrollController(),
@@ -58,9 +55,7 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
 
   PopupMenuButton<SortByEnum> _sortButton(ResultSort sort) {
     return PopupMenuButton<SortByEnum>(
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width,
-      ),
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
       initialValue: sort.sortBy,
       onSelected: (SortByEnum item) {
         setState(() {
@@ -98,14 +93,13 @@ class _HistoryListScreenState extends State<HistoryListScreen> {
   Widget _filterButton(ResultFilter filter) {
     return IconButton(
       icon: Icon(
-          filter.anyFilterActive ? Icons.filter_list : Icons.filter_list_off),
+        filter.anyFilterActive ? Icons.filter_list : Icons.filter_list_off,
+      ),
       tooltip: l10n.historyFilterTitle,
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const ResultFilterScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const ResultFilterScreen()),
         ).then((value) => setState(() {}));
       },
     );

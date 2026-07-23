@@ -19,9 +19,7 @@ void main() {
         tiny: pb.OneDatasetConfig(inputPath: 'tiny-inputPath'),
       ),
     );
-    final model1 = pb.ModelFile(
-      modelPath: 'model1-path',
-    );
+    final model1 = pb.ModelFile(modelPath: 'model1-path');
     final choice1 = pb.DelegateSetting(
       delegateName: 'delegate1',
       modelFile: [model1],
@@ -110,27 +108,36 @@ void main() {
 
       expect(resources.length, 3);
       expect(
-          resources,
-          contains(Resource(
+        resources,
+        contains(
+          Resource(
             type: ResourceTypeEnum.datasetData,
             path: task1.datasets.full.inputPath,
             md5Checksum: task1.datasets.full.inputChecksum,
-          )));
+          ),
+        ),
+      );
       expect(
-          resources,
-          contains(Resource(
+        resources,
+        contains(
+          Resource(
             type: ResourceTypeEnum.datasetGroundtruth,
             path: task1.datasets.full.groundtruthPath,
             md5Checksum: task1.datasets.full.groundtruthChecksum,
-          )));
+          ),
+        ),
+      );
       expect(
-          resources,
-          contains(Resource(
+        resources,
+        contains(
+          Resource(
             path:
                 backendSettings1.delegateChoice.first.modelFile.first.modelPath,
             type: ResourceTypeEnum.model,
             md5Checksum: '',
-          )));
+          ),
+        ),
+      );
     });
     test('resource list: performance', () async {
       final store = BenchmarkStore(
@@ -148,20 +155,26 @@ void main() {
 
       expect(resources.length, 2);
       expect(
-          resources,
-          contains(Resource(
+        resources,
+        contains(
+          Resource(
             type: ResourceTypeEnum.datasetData,
             path: task1.datasets.lite.inputPath,
             md5Checksum: task1.datasets.lite.inputChecksum,
-          )));
+          ),
+        ),
+      );
       expect(
-          resources,
-          contains(Resource(
+        resources,
+        contains(
+          Resource(
             path:
                 backendSettings1.delegateChoice.first.modelFile.first.modelPath,
             type: ResourceTypeEnum.model,
             md5Checksum: '',
-          )));
+          ),
+        ),
+      );
     });
     test('resource list: test', () async {
       final store = BenchmarkStore(
@@ -182,20 +195,26 @@ void main() {
 
       expect(resources.length, 3);
       expect(
-          resources,
-          contains(Resource(
+        resources,
+        contains(
+          Resource(
             type: ResourceTypeEnum.datasetData,
             path: task1.datasets.lite.inputPath,
             md5Checksum: task1.datasets.lite.inputChecksum,
-          )));
+          ),
+        ),
+      );
       expect(
-          resources,
-          contains(Resource(
+        resources,
+        contains(
+          Resource(
             path:
                 backendSettings1.delegateChoice.first.modelFile.first.modelPath,
             type: ResourceTypeEnum.model,
             md5Checksum: '',
-          )));
+          ),
+        ),
+      );
     });
   });
 }

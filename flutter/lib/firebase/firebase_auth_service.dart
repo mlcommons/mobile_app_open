@@ -4,9 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart'
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
 class FirebaseAuthService {
-  static final List<AuthProvider> providers = [
-    EmailAuthProvider(),
-  ];
+  static final List<AuthProvider> providers = [EmailAuthProvider()];
 
   late final FirebaseAuth firebaseAuth;
 

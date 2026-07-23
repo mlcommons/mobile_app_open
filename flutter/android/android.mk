@@ -103,10 +103,23 @@ flutter/android/appbundle:
 		${flutter_build_number_arg}
 	cp -f flutter/build/app/outputs/bundle/release/app-release.aab ${flutter_android_apk_release_path}.aab
 
+# Flutter 3.44 strips dev_dependency plugins (integration_test) from the
+# generated plugin registrant on release builds. CI runs a release
+# `flutter build` immediately before building these test APKs, so the registrant
+# no longer registers integration_test. The on-device test then cannot report
+# its results (MissingPluginException on 'allTestsFinished'), and the
+# BrowserStack session is marked failed even though every test passes.
+# Regenerate the debug build files (registrant with integration_test) before
+# assembling the test APKs. --config-only only rewrites the build files, it does
+# not build an artifact. Ref: https://docs.flutter.dev/testing/integration-tests
+.PHONY: flutter/android/test-apk/debug-plugins
+flutter/android/test-apk/debug-plugins:
+	cd flutter && ${_start_args} flutter --no-version-check build apk --debug --config-only
+
 FLUTTER_ANDROID_APK_TEST_MAIN?=test-main.apk
 flutter_android_apk_test_main_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_MAIN}
 .PHONY: flutter/android/test-apk/main
-flutter/android/test-apk/main:
+flutter/android/test-apk/main: flutter/android/test-apk/debug-plugins
 	mkdir -p $$(dirname ${flutter_android_apk_test_main_path})
 	flutter_android_apk_perf_test_arg=$$(printf PERF_TEST=${PERF_TEST} | base64) && \
 	flutter_android_apk_benchmark_ids_arg=$$(printf BENCHMARK_IDS=${BENCHMARK_IDS} | base64) && \
@@ -120,7 +133,7 @@ flutter/android/test-apk/main:
 FLUTTER_ANDROID_APK_TEST_HELPER?=test-helper.apk
 flutter_android_apk_test_helper_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_HELPER}
 .PHONY: flutter/android/test-apk/helper
-flutter/android/test-apk/helper:
+flutter/android/test-apk/helper: flutter/android/test-apk/debug-plugins
 	mkdir -p $$(dirname ${flutter_android_apk_test_helper_path})
 	cd flutter/android && ./gradlew app:assembleAndroidTest
 	cp -f flutter/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk ${flutter_android_apk_test_helper_path}

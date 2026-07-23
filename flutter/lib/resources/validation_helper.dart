@@ -19,7 +19,8 @@ class ValidationHelper {
   });
 
   Future<String> validateExternalResourcesDirectory(
-      String errorDescription) async {
+    String errorDescription,
+  ) async {
     final dataFolderPath = resourceManager.getDataFolder();
     if (dataFolderPath.isEmpty) {
       return 'Data folder must not be empty'; // TODO l10n
@@ -41,8 +42,9 @@ class ValidationHelper {
       modes: selectedRunModes,
       benchmarks: benchmarkStore.activeBenchmarks,
     );
-    final checksumFailed =
-        await resourceManager.validateResourcesChecksum(resources);
+    final checksumFailed = await resourceManager.validateResourcesChecksum(
+      resources,
+    );
     if (checksumFailed.isEmpty) return '';
     final mismatchedPaths = checksumFailed.map((e) => '\n${e.path}').join();
     return errorDescription + mismatchedPaths;
@@ -63,7 +65,9 @@ class ValidationHelper {
   }
 
   Future<Map<bool, List<String>>> validateResourcesExist(
-      Benchmark benchmark, BenchmarkRunMode mode) {
+    Benchmark benchmark,
+    BenchmarkRunMode mode,
+  ) {
     final resources = benchmarkStore.listResources(
       modes: [mode],
       benchmarks: [benchmark],
@@ -71,8 +75,11 @@ class ValidationHelper {
     return resourceManager.validateResourcesExist(resources);
   }
 
-  Future<bool> validateAllResourcesExist(Benchmark benchmark,
-      {BenchmarkRunMode? mode, List<BenchmarkRunMode> modes = const []}) {
+  Future<bool> validateAllResourcesExist(
+    Benchmark benchmark, {
+    BenchmarkRunMode? mode,
+    List<BenchmarkRunMode> modes = const [],
+  }) {
     final resources = benchmarkStore.listResources(
       modes: mode != null ? [mode] : modes,
       benchmarks: [benchmark],
