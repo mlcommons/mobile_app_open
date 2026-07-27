@@ -21,6 +21,7 @@ cmdline/macos/bins/release: cmdline/macos/bins/build cmdline/macos/bins/copy
 
 .PHONY: cmdline/android/libs/deps
 cmdline/android/libs/deps:
+	${backend_tflite_lib_deps}
 	${backend_qti_libs_deps}
 
 .PHONY: cmdline/android/bins/build

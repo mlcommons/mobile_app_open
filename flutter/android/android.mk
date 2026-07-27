@@ -50,6 +50,7 @@ endif
 
 .PHONY: flutter/android/libs/deps
 flutter/android/libs/deps:
+	${backend_tflite_lib_deps}
 	${backend_qti_libs_deps}
 
 .PHONY: flutter/android/libs/build
