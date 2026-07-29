@@ -131,9 +131,14 @@ tflite_jni_binary(
     deps = [
         ":tflite_c",
     ],
-    linkopts = [
-        "-Wl,--export-dynamic",
-    ],
+    linkopts = select({
+        "@org_tensorflow//tensorflow:macos": [
+            "-Wl,-export_dynamic",
+        ],
+        "//conditions:default": [
+            "-Wl,--export-dynamic",
+        ],
+    }),
 )
 
 cc_binary(
