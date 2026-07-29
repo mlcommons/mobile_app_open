@@ -140,6 +140,26 @@ tensorflow_source_repo(
 )
 
 http_archive(
+    name = "rules_python",
+    patch_args = ["-p1"],
+    patch_cmds = [
+        "sed -i.bak 's|%interpreter_args%||g' python/private/python_bootstrap_template.txt",
+        "sed -i.bak 's|STAGE2_BOOTSTRAP=\"%stage2_bootstrap%\"|STAGE2_BOOTSTRAP=\"%stage2_bootstrap%\" if \"%stage2_bootstrap%\".find(\"%\") == -1 else \"%main%\"|g' python/private/python_bootstrap_template.txt",
+    ],
+    patches = [
+        "@org_tensorflow//third_party/py:rules_python_pip_version.patch",
+        "@org_tensorflow//third_party/py:rules_python_scope.patch",
+        "@org_tensorflow//third_party/py:rules_python_freethreaded.patch",
+        "@org_tensorflow//third_party/py:rules_python_versions.patch",
+    ],
+    sha256 = "8964aa1e7525fea5244ba737458694a057ada1be96a92998a41caa1983562d00",
+    strip_prefix = "rules_python-1.8.5",
+    urls = [
+        "https://github.com/bazelbuild/rules_python/releases/download/1.8.5/rules_python-1.8.5.tar.gz",
+    ],
+)
+
+http_archive(
     name = "com_google_sentencepiece",
     build_file = "@//third_party:sentencepiece.BUILD",
     patch_args = ["-p1"],
