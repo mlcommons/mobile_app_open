@@ -88,12 +88,36 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:patches/litert-internal-visibility.diff",
+        "//:patches/litert-coreml-replace-resize.patch",
     ],
     sha256 = "7d0313c4851deb18af6f5f2dbc002bf01293583b87b819b0949ee33dcfe2d91b",
     strip_prefix = "LiteRT-2.1.5",
     urls = [
         "https://github.com/google-ai-edge/LiteRT/archive/v2.1.5.tar.gz",
     ],
+)
+
+http_archive(
+    name = "coremltools",
+    build_file = "@litert//third_party/coremltools:coremltools.BUILD",
+    patch_cmds = [
+        "sed -i.bak 's|import public \"|import public \"mlmodel/format/|g' mlmodel/format/*.proto",
+    ],
+    sha256 = "37d4d141718c70102f763363a8b018191882a179f4ce5291168d066a84d01c9d",
+    strip_prefix = "coremltools-8.0",
+    url = "https://github.com/apple/coremltools/archive/8.0.tar.gz",
+)
+
+http_archive(
+    name = "build_bazel_apple_support",
+    patch_cmds = [
+        "sed -i.bak 's|std::string developer_dir = GetMandatoryEnvVar(\"DEVELOPER_DIR\");|std::string developer_dir = getenv(\"DEVELOPER_DIR\") ? getenv(\"DEVELOPER_DIR\") : \"/Applications/Xcode-beta.app/Contents/Developer\";|g' crosstool/wrapped_clang.cc",
+        "sed -i.bak 's|std::string sdk_root = GetMandatoryEnvVar(\"SDKROOT\");|std::string sdk_root = getenv(\"SDKROOT\") ? getenv(\"SDKROOT\") : \"/Applications/Xcode-beta.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk\";|g' crosstool/wrapped_clang.cc",
+        "sed -i.bak 's|std::string developer_dir = getMandatoryEnvVar(\"DEVELOPER_DIR\");|std::string developer_dir = getenv(\"DEVELOPER_DIR\") ? getenv(\"DEVELOPER_DIR\") : \"/Applications/Xcode-beta.app/Contents/Developer\";|g' crosstool/libtool.cc",
+        "sed -i.bak 's|std::string sdk_root = getMandatoryEnvVar(\"SDKROOT\");|std::string sdk_root = getenv(\"SDKROOT\") ? getenv(\"SDKROOT\") : \"/Applications/Xcode-beta.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk\";|g' crosstool/libtool.cc",
+    ],
+    sha256 = "ee20cc5c0bab47065473c8033d462374dd38d172406ecc8de5c8f08487943f2f",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/1.23.1/apple_support.1.23.1.tar.gz",
 )
 
 load("//third_party:tensorflow_source_rules.bzl", "tensorflow_source_repo")

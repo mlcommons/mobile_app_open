@@ -1,0 +1,11 @@
+--- a/tflite/delegates/coreml/builders/convolution_op_builder.cc
++++ b/tflite/delegates/coreml/builders/convolution_op_builder.cc
+@@ -181,7 +181,7 @@ void ConvolutionOpBuilder::BuildWeightTensor() {
+   if (weights_->type == kTfLiteFloat32) {
+     auto* coreml_weights =
+         layer_->mutable_convolution()->mutable_weights()->mutable_floatvalue();
+-    coreml_weights->resize(NumElements(weights_), 0);
++    coreml_weights->Resize(NumElements(weights_), 0);
+ 
+     optimized_ops::Transpose<float>(params, tfl_shape, weights_->data.f,
+                                     coreml_shape,
