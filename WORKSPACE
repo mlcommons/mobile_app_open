@@ -1,5 +1,8 @@
 workspace(name = "mlperf_app")
 
+load("//patches:fix_macos_host_toolchain.bzl", "auto_macos_host_toolchain")
+auto_macos_host_toolchain(name = "local_config_cc")
+
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
