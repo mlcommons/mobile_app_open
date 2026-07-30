@@ -314,10 +314,6 @@ void main() {
         (e) => e.id == 'task2',
       );
       expect(task2Benchmark.selectedBackend.info.libName, 'libtflitebackend');
-      expect(store.backendSelectionMap, {
-        'task1': 'libtflitebackend',
-        'task2': 'libtflitebackend',
-      });
     });
 
     test('listResources follows the selected backend', () {

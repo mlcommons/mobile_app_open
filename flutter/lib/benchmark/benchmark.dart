@@ -351,10 +351,6 @@ class BenchmarkStore {
     }
   }
 
-  Map<String, String> get backendSelectionMap => {
-    for (final b in allBenchmarks) b.id: b.selectedBackend.info.libName,
-  };
-
   List<Resource> listResources({
     required List<BenchmarkRunMode> modes,
     required List<Benchmark> benchmarks,

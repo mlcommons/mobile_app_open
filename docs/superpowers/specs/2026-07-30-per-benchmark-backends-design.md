@@ -99,14 +99,18 @@ libName → default + log, never fatal). Add
 `Store.backendSelection`: JSON map `{benchmarkId: libName}` mirroring
 `taskSelection`. Persisted because a forgotten selection silently changes which
 backend runs and which large models get downloaded. Stale entries are ignored.
+Only benchmarks the user explicitly switched are written (merged into the
+stored map one entry at a time) — untouched benchmarks keep following future
+defaults, and selections made under other task configs are preserved.
 
 ### Wiring
 
 - `state.dart`: `late final List<BackendInfo> matchedBackends` replaces
   `backendInfo`; `setTaskConfig` parses `_store.backendSelection` and passes it
   to `BenchmarkStore`; new mutator `benchmarkSetBackend(benchmark, libName)`
-  mirroring `benchmarkSetDelegate` (no-op while running/aborting; persists map;
-  `notifyListeners`).
+  mirroring `benchmarkSetDelegate` (no-op while running/aborting; merges the
+  explicit choice into the stored map; triggers `deferredLoadResources()` so
+  resource validation sees the new backend's files; `notifyListeners`).
 - `task_runner.dart`: `backendInfo` field removed; run settings come from the
   benchmark itself; `ResultHelper` built without `backendInfo`.
 - `export_result_helper.dart`: `filename: runInfo.settings.backend_lib_name` —

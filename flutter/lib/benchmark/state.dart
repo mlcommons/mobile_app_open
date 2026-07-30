@@ -381,7 +381,22 @@ class BenchmarkState extends ChangeNotifier {
       return;
     }
     if (!benchmark.selectBackend(libName)) return;
-    _store.backendSelection = jsonEncode(_benchmarkStore.backendSelectionMap);
+    // Persist only this explicit choice, merged into the stored map, so
+    // untouched benchmarks keep following future defaults and selections
+    // made under other task configs are preserved.
+    Map<String, dynamic> stored = {};
+    if (_store.backendSelection.isNotEmpty) {
+      try {
+        stored = jsonDecode(_store.backendSelection) as Map<String, dynamic>;
+      } catch (e) {
+        print('Backend selection parse fail: $e');
+      }
+    }
+    stored[benchmark.id] = libName;
+    _store.backendSelection = jsonEncode(stored);
+    // The resource map is built for the previously selected backends;
+    // rebuild it so resource validation sees the new backend's files.
+    deferredLoadResources();
     notifyListeners();
   }
 
