@@ -40,14 +40,17 @@ void main() {
     expect(notifications, 1);
   });
 
-  test('backendSelection defaults to empty and persists a JSON string', () async {
-    final store = await Store.create();
-    expect(store.backendSelection, '');
+  test(
+    'backendSelection defaults to empty and persists a JSON string',
+    () async {
+      final store = await Store.create();
+      expect(store.backendSelection, '');
 
-    store.backendSelection = '{"image_classification":"libcoremlbackend"}';
-    expect(
-      store.backendSelection,
-      '{"image_classification":"libcoremlbackend"}',
-    );
-  });
+      store.backendSelection = '{"image_classification":"libcoremlbackend"}';
+      expect(
+        store.backendSelection,
+        '{"image_classification":"libcoremlbackend"}',
+      );
+    },
+  );
 }
