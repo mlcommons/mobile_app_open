@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mlperfbench/app_constants.dart';
@@ -103,12 +104,10 @@ bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
   if (benchmarkId == 'stable_diffusion') {
     final state = tester.state(find.byType(MaterialApp));
     final benchmarkState = state.context.read<BenchmarkState>();
-    final libName = benchmarkState.backendInfo.libName;
-    if (libName == BackendId.qti) {
-      return true;
-    } else {
-      return false;
-    }
+    final benchmark = benchmarkState.allBenchmarks.firstWhereOrNull(
+      (e) => e.id == benchmarkId,
+    );
+    return benchmark?.selectedBackend.info.libName == BackendId.qti;
   }
   return true;
 }

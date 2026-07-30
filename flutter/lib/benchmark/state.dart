@@ -29,7 +29,7 @@ class BenchmarkState extends ChangeNotifier {
 
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
-  late final BackendInfo backendInfo;
+  late final List<BackendInfo> matchedBackends;
   late final TaskRunner taskRunner;
   late final BoardDecoder boardDecoder;
 
@@ -93,13 +93,12 @@ class BenchmarkState extends ChangeNotifier {
 
   BenchmarkState._(this._store, this.backendBridge) {
     resourceManager = ResourceManager(notifyListeners, _store);
-    backendInfo = BackendInfoHelper().findMatching();
+    matchedBackends = BackendInfoHelper().findMatchingBackends();
     taskRunner = TaskRunner(
       store: _store,
       notifyListeners: notifyListeners,
       resourceManager: resourceManager,
       backendBridge: backendBridge,
-      backendInfo: backendInfo,
     );
   }
 
@@ -236,10 +235,24 @@ class BenchmarkState extends ChangeNotifier {
       }
     }
 
+    Map<String, String> backendSelection = {};
+    if (_store.backendSelection.isNotEmpty) {
+      try {
+        final map = jsonDecode(_store.backendSelection) as Map<String, dynamic>;
+        for (var kv in map.entries) {
+          backendSelection[kv.key] = kv.value as String;
+        }
+      } catch (e, t) {
+        print('Backend selection parse fail: $e');
+        print(t);
+      }
+    }
+
     _benchmarkStore = BenchmarkStore(
       appConfig: configManager.decodedConfig,
-      backendConfig: backendInfo.settings.benchmarkSetting,
+      backends: matchedBackends,
       taskSelection: taskSelection,
+      backendSelection: backendSelection,
     );
     restoreLastResult();
   }
@@ -359,6 +372,16 @@ class BenchmarkState extends ChangeNotifier {
 
   void benchmarkSetDelegate(Benchmark benchmark, String delegate) {
     benchmark.benchmarkSettings.delegateSelected = delegate;
+    notifyListeners();
+  }
+
+  void benchmarkSetBackend(Benchmark benchmark, String libName) {
+    if (state == BenchmarkStateEnum.running ||
+        state == BenchmarkStateEnum.aborting) {
+      return;
+    }
+    if (!benchmark.selectBackend(libName)) return;
+    _store.backendSelection = jsonEncode(_benchmarkStore.backendSelectionMap);
     notifyListeners();
   }
 

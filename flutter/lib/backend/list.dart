@@ -49,10 +49,6 @@ class BackendInfoHelper {
     return matches;
   }
 
-  // TEMPORARY shim so existing call sites keep compiling; removed in the
-  // core-rewiring task of the per-benchmark-backends plan.
-  BackendInfo findMatching() => findMatchingBackends().first;
-
   pb.BackendSetting? match(String libName) {
     switch (DeviceInfo.instance.envInfo.platform) {
       case EnvPlatform.android:
