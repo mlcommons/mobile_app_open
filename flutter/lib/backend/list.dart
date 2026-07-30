@@ -1,5 +1,7 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+
 import 'package:mlperfbench/backend/bridge/ffi_match.dart';
 import 'package:mlperfbench/data/environment/environment_info.dart';
 import 'package:mlperfbench/device_info.dart';
@@ -8,8 +10,20 @@ import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 part 'list.gen.dart';
 
 class BackendInfoHelper {
-  BackendInfo findMatching() {
-    const fallbackBackend = 'libtflitebackend';
+  static const fallbackBackend = 'libtflitebackend';
+
+  // When true, the TFLite fallback backend is offered alongside any matching
+  // vendor backend, so each benchmark can choose among all matching backends
+  // and tasks the vendor backend lacks fall back to TFLite.
+  // When false, the fallback is probed only when no vendor backend matches,
+  // which reproduces the historical single-backend-per-session behavior.
+  static const alwaysOfferFallback = true;
+
+  // Returns all matching backends in priority order
+  // (the order of _backendsList, vendor backends before the fallback).
+  List<BackendInfo> findMatchingBackends({
+    bool alwaysOfferFallback = BackendInfoHelper.alwaysOfferFallback,
+  }) {
     final matches = <BackendInfo>[];
     // Try to match all backends except the fallback
     for (var name in getBackendsList()) {
@@ -21,22 +35,23 @@ class BackendInfoHelper {
       }
     }
 
-    if (matches.isEmpty) {
-      // No specific backend matched, use fallback
+    if (matches.isEmpty || alwaysOfferFallback) {
       print('Checking $fallbackBackend');
       final backendSettings = match(fallbackBackend);
       if (backendSettings != null) {
-        return BackendInfo._(backendSettings, fallbackBackend);
+        matches.add(BackendInfo._(backendSettings, fallbackBackend));
       }
+    }
+    if (matches.isEmpty) {
       throw 'no matching backend found';
     }
-    if (matches.length > 1) {
-      final names = matches.map((m) => m.libName).join(', ');
-      throw 'multiple matching backends found: $names';
-    }
-    print('Using backend: ${matches.single.libName}');
-    return matches.single;
+    print('Matching backends: ${matches.map((e) => e.libName).join(', ')}');
+    return matches;
   }
+
+  // TEMPORARY shim so existing call sites keep compiling; removed in the
+  // core-rewiring task of the per-benchmark-backends plan.
+  BackendInfo findMatching() => findMatchingBackends().first;
 
   pb.BackendSetting? match(String libName) {
     switch (DeviceInfo.instance.envInfo.platform) {
@@ -85,4 +100,7 @@ class BackendInfo {
   final String libName;
 
   BackendInfo._(this.settings, this.libName);
+
+  @visibleForTesting
+  BackendInfo.forTest(this.settings, this.libName);
 }
