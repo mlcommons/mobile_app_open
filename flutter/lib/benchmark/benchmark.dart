@@ -1,5 +1,6 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
+
+import 'package:collection/collection.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
