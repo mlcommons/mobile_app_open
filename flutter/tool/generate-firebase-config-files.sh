@@ -12,7 +12,9 @@ set -e
 # app can start. The Dart side recognizes the dummy project ID and keeps
 # Firebase disabled (see DefaultFirebaseOptions.available()).
 FIREBASE_IOS_APP_ID="${FIREBASE_IOS_APP_ID:-1:000000000000:ios:0000000000000000}"
-FIREBASE_IOS_API_KEY="${FIREBASE_IOS_API_KEY:-AIzaSyDummyApiKeyForBuildsWithoutFirebase}"
+# FirebaseInstallations requires the API key to be 39 chars, start with "A",
+# and contain only base64 url-safe characters.
+FIREBASE_IOS_API_KEY="${FIREBASE_IOS_API_KEY:-AIzaSyDummyKeyForBuildsWithoutFirebase0}"
 FIREBASE_PROJECT_ID="${FIREBASE_PROJECT_ID:-dummy-project}"
 
 files=(
