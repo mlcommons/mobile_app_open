@@ -4,12 +4,16 @@
 set -e
 
 # FlutterFire auto-configures Firebase on iOS whenever GoogleService-Info.plist
-# is bundled, and firebase-ios-sdk raises an NSException at launch if
-# GOOGLE_APP_ID is empty or malformed. Builds without Firebase secrets need a
-# well-formed dummy app ID so the app can start; Firebase stays disabled on the
-# Dart side because FIREBASE_IOS_API_KEY is empty
-# (see DefaultFirebaseOptions.available()).
+# is bundled, and firebase-ios-sdk kills the app at launch when required options
+# are empty or malformed: FIRApp validates the GOOGLE_APP_ID format, and
+# FirebaseInstallations separately validates API_KEY and PROJECT_ID on app
+# activation.
+# Builds without Firebase secrets need well-formed dummies for all three so the
+# app can start. The Dart side recognizes the dummy project ID and keeps
+# Firebase disabled (see DefaultFirebaseOptions.available()).
 FIREBASE_IOS_APP_ID="${FIREBASE_IOS_APP_ID:-1:000000000000:ios:0000000000000000}"
+FIREBASE_IOS_API_KEY="${FIREBASE_IOS_API_KEY:-AIzaSyDummyApiKeyForBuildsWithoutFirebase}"
+FIREBASE_PROJECT_ID="${FIREBASE_PROJECT_ID:-dummy-project}"
 
 files=(
   "flutter/lib/firebase/firebase_options.template.dart:flutter/lib/firebase/firebase_options.gen.dart"
