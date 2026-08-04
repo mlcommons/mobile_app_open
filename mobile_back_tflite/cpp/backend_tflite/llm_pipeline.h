@@ -93,7 +93,14 @@ struct LLMBackendData {
 
   LLMBackendData() {}
 
-  ~LLMBackendData() {}
+  ~LLMBackendData() {
+    decode_input_bufs.clear();
+    decode_output_bufs.clear();
+    prefill_input_bufs.clear();
+    prefill_output_bufs.clear();
+    model.reset();
+    env.reset();
+  }
 
   LLMBackendData(const LLMBackendData&) = delete;
   LLMBackendData& operator=(const LLMBackendData&) = delete;

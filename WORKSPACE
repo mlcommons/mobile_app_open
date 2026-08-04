@@ -88,6 +88,8 @@ http_archive(
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:patches/litert-internal-visibility.diff",
+        # Fix for LiteRT crashing on close when using OpenCL accelerator
+        "//:patches/custom_buffer_teardown.patch"
     ],
     sha256 = "7d0313c4851deb18af6f5f2dbc002bf01293583b87b819b0949ee33dcfe2d91b",
     strip_prefix = "LiteRT-2.1.5",

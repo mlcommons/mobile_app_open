@@ -45,17 +45,16 @@ extern "C" {
 
 static bool backendExists = false;
 
-// Fill value for masked attention positions. Must be finite, not -inf: the
-// WebGPU softmax overflows on -inf. Matches LiteRT-LM's -0.7 * FLT_MAX for
-// float32. Allowed positions are filled with 0.
-static constexpr float kMaskedValue = -0.7f * std::numeric_limits<float>::max();
+// Fill value for masked attention positions. Must be finite, not -inf
+static constexpr float kMaskedValue = -0.7f * 65504.0f;
 
 static std::unordered_map<std::string, size_t> make_index_map(
     const std::vector<std::string_view>& names) {
   std::unordered_map<std::string, size_t> map;
-  for (size_t i = 0; i < names.size(); ++i) map[std::string(names[i])] = i;
+  for (size_t i = 0; i < names.size(); ++i)
+    map[std::string(names[i])] = i;
   return map;
-};
+}
 
 // Destroy the backend pointer and its data.
 void LLMPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
