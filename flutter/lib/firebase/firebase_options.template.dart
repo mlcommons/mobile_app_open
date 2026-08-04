@@ -9,12 +9,19 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 class DefaultFirebaseOptions {
+  // Sentinel injected by flutter/tool/generate-firebase-config-files.sh when
+  // no real Firebase project is configured. Native Firebase needs non-empty,
+  // well-formed options to survive app launch; this value marks them as fake
+  // so the Dart side keeps Firebase disabled.
+  static const dummyProjectId = 'dummy-project';
+
   static bool available() {
     try {
       final currentPlatform = DefaultFirebaseOptions.currentPlatform;
       return currentPlatform.apiKey.isNotEmpty &&
           currentPlatform.appId.isNotEmpty &&
-          currentPlatform.projectId.isNotEmpty;
+          currentPlatform.projectId.isNotEmpty &&
+          currentPlatform.projectId != dummyProjectId;
     } catch (e) {
       return false;
     }
