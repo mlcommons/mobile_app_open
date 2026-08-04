@@ -328,6 +328,24 @@ class BenchmarkStore {
           candidates.add(BenchmarkBackend(info: backend, settings: setting));
         }
       }
+      // A vendor backend can restrict the fallback backend to benchmarks it
+      // does not support itself (FALLBACK_FILL_GAPS); FALLBACK_DISABLED is
+      // enforced device-wide in findMatchingBackends().
+      final vendors = candidates.where(
+        (c) => c.info.libName != BackendInfoHelper.fallbackBackend,
+      );
+      final offerFallback =
+          vendors.isEmpty ||
+          vendors.every(
+            (c) =>
+                c.info.settings.fallbackPolicy ==
+                pb.FallbackPolicy.FALLBACK_COEXIST,
+          );
+      if (!offerFallback) {
+        candidates.removeWhere(
+          (c) => c.info.libName == BackendInfoHelper.fallbackBackend,
+        );
+      }
       if (candidates.isEmpty) {
         print('No matching benchmark settings for task ${task.id}');
         continue;

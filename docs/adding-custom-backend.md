@@ -44,9 +44,17 @@ You will need to do few things:
 
 * Include your `<vendor>_backend.mk` into the root makefile.
 * Add new line with your `<VENDOR>_TAG` into [list.in](../flutter/lib/backend/list.in).  
-Note that order is important in this file. Backends are probed in the order they are defined, and every backend that matches the device is offered in the app; the TFLite fallback is always probed last as the baseline choice.
+Note that order is important in this file. Backends are probed in the order they are defined, and every backend that matches the device is offered in the app; the TFLite fallback is probed last and offered only if a matching backend opts in via `fallback_policy` (or if nothing else matches).
 Each benchmark defaults to the first backend in this order that provides a `benchmark_setting` for it and can be switched to any other matching backend per benchmark in the app's config screen.
 Place your tag before TFLite tag so your backend takes priority over the fallback.
+
+A backend controls whether the TFLite fallback is offered next to it on
+devices it matches by setting `fallback_policy` in its `BackendSetting`
+(see `flutter/cpp/proto/backend_setting.proto`). The default is
+`FALLBACK_DISABLED`: only your backend is offered, and benchmarks it does not
+declare are hidden. Opt in with `FALLBACK_FILL_GAPS` to let TFLite serve only
+the benchmarks your backend does not declare, or `FALLBACK_COEXIST` to offer
+TFLite as a selectable alternative for every benchmark.
 * Add line to substitute this tag with the actual name of your backend lib into [flutter.mk](../flutter/flutter.mk) in the `flutter/backend-list` make target
 * Add commands to build your backend when `WITH_<VENDOR>=1` make variable is supplied.
   Modify `flutter/android/libs` ([android.mk](../flutter/android/android.mk))

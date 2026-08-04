@@ -20,14 +20,34 @@ option cc_enable_arenas = true;
 option java_multiple_files = true;
 option java_package = "org.mlperf.proto";
 
-// Config of a backend.
+// Policy governing whether the generic fallback backend (libtflitebackend)
+// is offered for user selection alongside this backend on devices this
+// backend matches. Each vendor backend declares this in its own settings;
+// offering the fallback is opt-in.
 //
 // Next ID: 3
+enum FallbackPolicy {
+  // The fallback backend is never offered while this backend matches the
+  // device, not even for benchmarks this backend does not support (default).
+  FALLBACK_DISABLED = 0;
+  // The fallback backend is offered only for benchmarks this backend
+  // declares no benchmark_setting for.
+  FALLBACK_FILL_GAPS = 1;
+  // The fallback backend is offered alongside this backend for every
+  // benchmark.
+  FALLBACK_COEXIST = 2;
+}
+
+// Config of a backend.
+//
+// Next ID: 4
 message BackendSetting {
   // Common setting for all benchmarks.
   repeated CommonSetting common_setting = 1;
   // Setting that is specialized for each benchmark.
   repeated BenchmarkSetting benchmark_setting = 2;
+  // How the generic fallback backend is offered alongside this backend.
+  optional FallbackPolicy fallback_policy = 3 [default = FALLBACK_DISABLED];
 }
 
 // Config of a benchmark.

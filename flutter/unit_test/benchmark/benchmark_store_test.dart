@@ -61,6 +61,20 @@ void main() {
       'libtflitebackend',
     );
     BackendInfo coremlBackend() => BackendInfo.forTest(
+      pb.BackendSetting(
+        benchmarkSetting: [coremlSettings1],
+        fallbackPolicy: pb.FallbackPolicy.FALLBACK_COEXIST,
+      ),
+      'libcoremlbackend',
+    );
+    BackendInfo coremlFillGapsBackend() => BackendInfo.forTest(
+      pb.BackendSetting(
+        benchmarkSetting: [coremlSettings1],
+        fallbackPolicy: pb.FallbackPolicy.FALLBACK_FILL_GAPS,
+      ),
+      'libcoremlbackend',
+    );
+    BackendInfo coremlDefaultPolicyBackend() => BackendInfo.forTest(
       pb.BackendSetting(benchmarkSetting: [coremlSettings1]),
       'libcoremlbackend',
     );
@@ -279,6 +293,51 @@ void main() {
       );
       expect(task2Benchmark.backends.length, 1);
       expect(task2Benchmark.selectedBackend.info.libName, 'libtflitebackend');
+    });
+
+    test('default policy: fallback is not offered for vendor tasks', () {
+      final store = BenchmarkStore(
+        appConfig: pb.MLPerfConfig(task: [task1]),
+        backends: [coremlDefaultPolicyBackend(), tfliteBackend()],
+        taskSelection: {},
+      );
+      final benchmark = store.allBenchmarks.single;
+      expect(benchmark.backends.map((e) => e.info.libName), [
+        'libcoremlbackend',
+      ]);
+    });
+
+    test('FALLBACK_FILL_GAPS: fallback offered only for tasks vendor lacks', () {
+      final store = BenchmarkStore(
+        appConfig: pb.MLPerfConfig(task: [task1, task2]),
+        backends: [coremlFillGapsBackend(), tfliteBackendBoth()],
+        taskSelection: {},
+      );
+      // task1 is supported by the vendor: fallback is filtered out
+      final task1Benchmark = store.allBenchmarks.firstWhere(
+        (e) => e.id == 'task1',
+      );
+      expect(task1Benchmark.backends.map((e) => e.info.libName), [
+        'libcoremlbackend',
+      ]);
+      // task2 is a gap: fallback still fills it
+      final task2Benchmark = store.allBenchmarks.firstWhere(
+        (e) => e.id == 'task2',
+      );
+      expect(task2Benchmark.backends.map((e) => e.info.libName), [
+        'libtflitebackend',
+      ]);
+    });
+
+    test('FALLBACK_FILL_GAPS overrides a persisted fallback selection', () {
+      final store = BenchmarkStore(
+        appConfig: pb.MLPerfConfig(task: [task1]),
+        backends: [coremlFillGapsBackend(), tfliteBackend()],
+        taskSelection: {},
+        backendSelection: {'task1': 'libtflitebackend'},
+      );
+      final benchmark = store.allBenchmarks.single;
+      expect(benchmark.selectedBackend.info.libName, 'libcoremlbackend');
     });
 
     test('selectBackend swaps settings and delegate choices', () {

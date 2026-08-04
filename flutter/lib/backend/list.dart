@@ -12,11 +12,13 @@ part 'list.gen.dart';
 class BackendInfoHelper {
   static const fallbackBackend = 'libtflitebackend';
 
-  // When true, the TFLite fallback backend is offered alongside any matching
-  // vendor backend, so each benchmark can choose among all matching backends
-  // and tasks the vendor backend lacks fall back to TFLite.
+  // When true, the TFLite fallback backend can be offered alongside a matching
+  // vendor backend, subject to that backend's BackendSetting.fallback_policy.
+  // Offering the fallback is opt-in: it stays suppressed unless the matched
+  // vendor backend declares FALLBACK_FILL_GAPS or FALLBACK_COEXIST.
   // When false, the fallback is probed only when no vendor backend matches,
-  // which reproduces the historical single-backend-per-session behavior.
+  // which reproduces the historical single-backend-per-session behavior
+  // regardless of vendor policies.
   static const alwaysOfferFallback = true;
 
   // Returns all matching backends in priority order
@@ -35,7 +37,10 @@ class BackendInfoHelper {
       }
     }
 
-    if (matches.isEmpty || alwaysOfferFallback) {
+    final fallbackDisabled = matches.any(
+      (m) => m.settings.fallbackPolicy == pb.FallbackPolicy.FALLBACK_DISABLED,
+    );
+    if (matches.isEmpty || (alwaysOfferFallback && !fallbackDisabled)) {
       print('Checking $fallbackBackend');
       final backendSettings = match(fallbackBackend);
       if (backendSettings != null) {

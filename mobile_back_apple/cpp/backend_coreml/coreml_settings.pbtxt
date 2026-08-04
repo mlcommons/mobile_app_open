@@ -1,6 +1,11 @@
 # proto-file: flutter/cpp/proto/backend_setting.proto
 # proto-message: BackendSetting
 
+# Offer the TFLite fallback next to Core ML for every benchmark, so tasks
+# Core ML does not support (llm, stable_diffusion) stay available and users
+# can compare backends per benchmark.
+fallback_policy: FALLBACK_COEXIST
+
 benchmark_setting {
   benchmark_id: "image_classification"
   framework: "Core ML"
