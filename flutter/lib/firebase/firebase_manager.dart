@@ -50,14 +50,14 @@ class FirebaseManager {
   Future<void> _initAppCheck() async {
     if (kReleaseMode) {
       await FirebaseAppCheck.instance.activate(
-        androidProvider: AndroidProvider.playIntegrity,
-        appleProvider: AppleProvider.deviceCheck,
+        providerAndroid: const AndroidPlayIntegrityProvider(),
+        providerApple: const AppleDeviceCheckProvider(),
       );
       print('Init Firebase App Check in release mode');
     } else {
       await FirebaseAppCheck.instance.activate(
-        androidProvider: AndroidProvider.debug,
-        appleProvider: AppleProvider.debug,
+        providerAndroid: const AndroidDebugProvider(),
+        providerApple: const AppleDebugProvider(),
       );
       print('Init Firebase App Check in debug mode');
     }
@@ -101,11 +101,16 @@ extension Authentication on FirebaseManager {
 
 extension Storage on FirebaseManager {
   Future<void> uploadResult(ExtendedResult result) async {
-    final resultFile =
-        ResultFileName(result.meta.uuid, result.meta.creationDate);
+    final resultFile = ResultFileName(
+      result.meta.uuid,
+      result.meta.creationDate,
+    );
     final jsonString = jsonToStringIndented(result);
     await _storageService.upload(
-        jsonString, _authService.currentUser.uid, resultFile.fileName);
+      jsonString,
+      _authService.currentUser.uid,
+      resultFile.fileName,
+    );
   }
 
   Future<void> deleteResult(String fileName) async {

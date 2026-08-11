@@ -28,24 +28,23 @@ class BenchmarkConfigSection extends StatelessWidget {
             _setListTile(benchmarkSet, state, l10n, context),
           if (benchmarkSet != state.benchmarkSets.last ||
               state.looseBenchmarks.isNotEmpty)
-            const Divider(
-              height: 1,
-            )
+            const Divider(height: 1),
         ],
         for (var benchmark in state.looseBenchmarks) ...[
           _listTile(benchmark, state, l10n),
-          if (benchmark != state.allBenchmarks.last)
-            const Divider(
-              height: 1,
-            )
+          if (benchmark != state.allBenchmarks.last) const Divider(height: 1),
         ],
-        const SizedBox(height: 24)
+        const SizedBox(height: 24),
       ],
     );
   }
 
-  Widget _setDownloadStatus(AppLocalizations l10n, BenchmarkSet benchmarkSet,
-      bool allResourcesExist, BuildContext context) {
+  Widget _setDownloadStatus(
+    AppLocalizations l10n,
+    BenchmarkSet benchmarkSet,
+    bool allResourcesExist,
+    BuildContext context,
+  ) {
     // Check if any benchmark in the set is currently active
     final hasActiveBenchmarks = benchmarkSet.benchmarks.any((b) => b.isActive);
 
@@ -53,23 +52,31 @@ class BenchmarkConfigSection extends StatelessWidget {
     if (!hasActiveBenchmarks || allResourcesExist) return const SizedBox();
 
     return InkWell(
-        onTap: () async {
-          // You can pass the benchmarkSet here to trigger downloads for all active items in the set
-          await showResourceMissingDialog(context, [],
-              benchmarkSet: benchmarkSet);
-        },
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: Icon(
-            Icons.downloading_rounded,
-            size: 28,
-            color: AppColors.warningIcon,
-          ),
-        ));
+      onTap: () async {
+        // You can pass the benchmarkSet here to trigger downloads for all active items in the set
+        await showResourceMissingDialog(
+          context,
+          [],
+          benchmarkSet: benchmarkSet,
+        );
+      },
+      child: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.0),
+        child: Icon(
+          Icons.downloading_rounded,
+          size: 28,
+          color: AppColors.warningIcon,
+        ),
+      ),
+    );
   }
 
-  Widget _setListTile(BenchmarkSet benchmarkSet, BenchmarkState state,
-      AppLocalizations l10n, BuildContext context) {
+  Widget _setListTile(
+    BenchmarkSet benchmarkSet,
+    BenchmarkState state,
+    AppLocalizations l10n,
+    BuildContext context,
+  ) {
     final totalOptions = benchmarkSet.visibleOptions();
     final activeOptions = benchmarkSet.selectedOptions();
 
@@ -77,9 +84,13 @@ class BenchmarkConfigSection extends StatelessWidget {
     final bool isAdvancedOpen = state.isAdvancedConfigOpen(benchmarkSet);
 
     final Future<bool> resourcesExistFuture = Future.wait(
-      benchmarkSet.benchmarks.where((b) => b.isActive).map(
-            (b) => state.validator.validateAllResourcesExist(b,
-                modes: state.taskRunner.selectedRunModes),
+      benchmarkSet.benchmarks
+          .where((b) => b.isActive)
+          .map(
+            (b) => state.validator.validateAllResourcesExist(
+              b,
+              modes: state.taskRunner.selectedRunModes,
+            ),
           ),
     ).then((results) => results.every((exists) => exists));
 
@@ -101,22 +112,27 @@ class BenchmarkConfigSection extends StatelessWidget {
                     child: TextButton(
                       //TODO use benchmarkset's id
                       onPressed: () => showBenchInfoBottomSheet(
-                          context, benchmarkSet.benchmarks[0]),
+                        context,
+                        benchmarkSet.benchmarks[0],
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         padding: EdgeInsets.zero,
                         elevation: 3,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                WidgetSizes.borderRadius)),
+                          borderRadius: BorderRadius.circular(
+                            WidgetSizes.borderRadius,
+                          ),
+                        ),
                       ),
                       //TODO use benchmarkset's icon
                       child: SizedBox(
-                          width: 32,
-                          height: 32,
-                          child: benchmarkSet.benchmarks.isEmpty
-                              ? null
-                              : benchmarkSet.benchmarks[0].info.icon),
+                        width: 32,
+                        height: 32,
+                        child: benchmarkSet.benchmarks.isEmpty
+                            ? null
+                            : benchmarkSet.benchmarks[0].info.icon,
+                      ),
                     ),
                   ),
                 ),
@@ -132,14 +148,20 @@ class BenchmarkConfigSection extends StatelessWidget {
                         Text(
                           benchmarkSet.config.name,
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '$activeOptions/$totalOptions options selected',
-                          style:
-                              const TextStyle(fontSize: 12, color: Colors.grey),
+                          l10n.mainScreenOptionsSelected
+                              .replaceAll('<active>', activeOptions.toString())
+                              .replaceAll('<total>', totalOptions.toString()),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -151,7 +173,11 @@ class BenchmarkConfigSection extends StatelessWidget {
                   future: resourcesExistFuture,
                   initialData: true,
                   builder: (context, snapshot) => _setDownloadStatus(
-                      l10n, benchmarkSet, snapshot.data!, context),
+                    l10n,
+                    benchmarkSet,
+                    snapshot.data!,
+                    context,
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
@@ -165,10 +191,12 @@ class BenchmarkConfigSection extends StatelessWidget {
                         duration: const Duration(milliseconds: 200),
                         curve: Curves.fastOutSlowIn,
                         child: IconButton(
-                          icon: Icon(Icons.settings,
-                              color: isAdvancedOpen
-                                  ? AppColors.secondary
-                                  : Colors.grey),
+                          icon: Icon(
+                            Icons.settings,
+                            color: isAdvancedOpen
+                                ? AppColors.secondary
+                                : Colors.grey,
+                          ),
                           onPressed: () =>
                               state.toggleAdvancedConfig(benchmarkSet),
                         ),
@@ -178,14 +206,16 @@ class BenchmarkConfigSection extends StatelessWidget {
                         turns: isOptionsOpen ? 0.5 : 0.0,
                         duration: const Duration(milliseconds: 200),
                         curve: Curves.fastOutSlowIn,
-                        child: Icon(Icons.expand_more,
-                            color: isOptionsOpen
-                                ? AppColors.secondary
-                                : Colors.grey),
+                        child: Icon(
+                          Icons.expand_more,
+                          color: isOptionsOpen
+                              ? AppColors.secondary
+                              : Colors.grey,
+                        ),
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -197,65 +227,84 @@ class BenchmarkConfigSection extends StatelessWidget {
           switchInCurve: Curves.fastOutSlowIn,
           switchOutCurve: Curves.fastOutSlowIn,
           transitionBuilder: (child, animation) => SizeTransition(
-              sizeFactor: animation, axisAlignment: 0.0, child: child),
+            sizeFactor: animation,
+            alignment: Alignment.center,
+            child: child,
+          ),
           child: !isOptionsOpen
               ? const SizedBox.shrink()
               : Container(
                   key: const ValueKey('options_container'),
                   child: Column(
                     children: [
-                      for (int i = 0;
-                          i < benchmarkSet.optionSets.length;
-                          i++) ...[
+                      for (
+                        int i = 0;
+                        i < benchmarkSet.optionSets.length;
+                        i++
+                      ) ...[
                         if (!benchmarkSet.optionSets[i].config.hidden) ...{
                           Padding(
                             padding: const EdgeInsets.only(
-                                left: 16, top: 8, bottom: 4),
+                              left: 16,
+                              top: 8,
+                              bottom: 4,
+                            ),
                             child: Row(
                               children: [
                                 Text(
                                   benchmarkSet.optionSets[i].config.name,
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey,
-                                      fontSize: 12),
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
                                 ),
                                 const Expanded(
-                                    child: Divider(indent: 10, endIndent: 16)),
+                                  child: Divider(indent: 10, endIndent: 16),
+                                ),
                               ],
                             ),
                           ),
-                          for (final option in benchmarkSet
-                              .optionSets[i].options.keys
-                              .where((element) => benchmarkSet
-                                  .availableOptions()
-                                  .map((e) => e.id)
-                                  .contains(element)))
+                          for (final option
+                              in benchmarkSet.optionSets[i].options.keys.where(
+                                (element) => benchmarkSet
+                                    .availableOptions()
+                                    .map((e) => e.id)
+                                    .contains(element),
+                              ))
                             ListTile(
                               dense: true,
-                              contentPadding:
-                                  const EdgeInsets.only(left: 24, right: 16),
+                              contentPadding: const EdgeInsets.only(
+                                left: 24,
+                                right: 16,
+                              ),
                               title: Text(option),
                               onTap: () {
                                 state.benchmarkSetOption(
-                                    benchmarkSet,
-                                    option,
-                                    !benchmarkSet.optionSets[
-                                            benchmarkSet.optionMap[option]!]
-                                        .getOption(option)!);
+                                  benchmarkSet,
+                                  option,
+                                  !benchmarkSet
+                                      .optionSets[benchmarkSet
+                                          .optionMap[option]!]
+                                      .getOption(option)!,
+                                );
                               },
                               trailing: Checkbox(
                                 key: Key(option),
-                                value: benchmarkSet.optionSets[i]
-                                    .getOption(option),
+                                value: benchmarkSet.optionSets[i].getOption(
+                                  option,
+                                ),
                                 onChanged: (bool? value) {
                                   state.benchmarkSetOption(
-                                      benchmarkSet, option, value!);
+                                    benchmarkSet,
+                                    option,
+                                    value!,
+                                  );
                                 },
                               ),
-                            )
-                        }
-                      ]
+                            ),
+                        },
+                      ],
                     ],
                   ),
                 ),
@@ -267,7 +316,10 @@ class BenchmarkConfigSection extends StatelessWidget {
           switchInCurve: Curves.fastOutSlowIn,
           switchOutCurve: Curves.fastOutSlowIn,
           transitionBuilder: (child, animation) => SizeTransition(
-              sizeFactor: animation, axisAlignment: 0.0, child: child),
+            sizeFactor: animation,
+            alignment: Alignment.center,
+            child: child,
+          ),
           child: !isAdvancedOpen
               ? const SizedBox.shrink()
               : Container(
@@ -279,13 +331,18 @@ class BenchmarkConfigSection extends StatelessWidget {
                       ...benchmarkSet.benchmarks.map((benchmark) {
                         return FutureBuilder(
                           future: state.validator.validateAllResourcesExist(
-                              benchmark,
-                              modes: state.taskRunner.selectedRunModes),
+                            benchmark,
+                            modes: state.taskRunner.selectedRunModes,
+                          ),
                           initialData: false,
                           builder: (context, snapshot) {
                             return Padding(
                               padding: const EdgeInsets.only(
-                                  bottom: 12, left: 16, right: 8, top: 8),
+                                bottom: 12,
+                                left: 16,
+                                right: 8,
+                                top: 8,
+                              ),
                               child: Row(
                                 children: [
                                   Container(
@@ -294,11 +351,13 @@ class BenchmarkConfigSection extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(
-                                          WidgetSizes.borderRadius),
+                                        WidgetSizes.borderRadius,
+                                      ),
                                       boxShadow: const [
                                         BoxShadow(
-                                            color: Colors.black12,
-                                            blurRadius: 2)
+                                          color: Colors.black12,
+                                          blurRadius: 2,
+                                        ),
                                       ],
                                     ),
                                     child: Padding(
@@ -317,14 +376,22 @@ class BenchmarkConfigSection extends StatelessWidget {
                                         Row(
                                           children: [
                                             Flexible(
-                                                child: _backendDescription(
-                                                    benchmark, context)),
+                                              child: _backendDescription(
+                                                benchmark,
+                                                context,
+                                              ),
+                                            ),
                                             const SizedBox(
-                                                height: 14,
-                                                child: VerticalDivider(
-                                                    color: Colors.black)),
+                                              height: 14,
+                                              child: VerticalDivider(
+                                                color: Colors.black,
+                                              ),
+                                            ),
                                             _delegateChoice(
-                                                benchmark, context, state),
+                                              benchmark,
+                                              context,
+                                              state,
+                                            ),
                                           ],
                                         ),
                                       ],
@@ -332,7 +399,11 @@ class BenchmarkConfigSection extends StatelessWidget {
                                   ),
                                   // Individual Download Status
                                   _downloadStatus(
-                                      l10n, benchmark, snapshot.data!, context),
+                                    l10n,
+                                    benchmark,
+                                    snapshot.data!,
+                                    context,
+                                  ),
                                 ],
                               ),
                             );
@@ -349,95 +420,114 @@ class BenchmarkConfigSection extends StatelessWidget {
   }
 
   Widget _listTile(
-      Benchmark benchmark, BenchmarkState state, AppLocalizations l10n) {
+    Benchmark benchmark,
+    BenchmarkState state,
+    AppLocalizations l10n,
+  ) {
     return FutureBuilder(
-        future: state.validator.validateAllResourcesExist(benchmark,
-            modes: state.taskRunner.selectedRunModes),
-        initialData: false,
-        builder: (context, snapshot) {
-          return InkWell(
-            onTap: () {
-              state.benchmarkSetActive(benchmark, !benchmark.isActive);
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  bottom: 20, left: 16, right: 8, top: 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: TextButton(
-                      onPressed: () {
-                        showBenchInfoBottomSheet(context, benchmark);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: const EdgeInsets.all(0.0),
-                        elevation: 3,
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(WidgetSizes.borderRadius),
+      future: state.validator.validateAllResourcesExist(
+        benchmark,
+        modes: state.taskRunner.selectedRunModes,
+      ),
+      initialData: false,
+      builder: (context, snapshot) {
+        return InkWell(
+          onTap: () {
+            state.benchmarkSetActive(benchmark, !benchmark.isActive);
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(
+              bottom: 20,
+              left: 16,
+              right: 8,
+              top: 12,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: TextButton(
+                    onPressed: () {
+                      showBenchInfoBottomSheet(context, benchmark);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.all(0.0),
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          WidgetSizes.borderRadius,
                         ),
                       ),
-                      child: SizedBox(
-                          width: 32, height: 32, child: benchmark.info.icon),
+                    ),
+                    child: SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: benchmark.info.icon,
                     ),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      //mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _name(benchmark, context),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Flexible(
-                              child: _backendDescription(benchmark, context),
-                            ),
-                            const SizedBox(
-                              height: 18,
-                              child: VerticalDivider(
-                                color: Colors.black,
-                              ),
-                            ),
-                            _delegateChoice(benchmark, context, state),
-                          ],
-                        ),
-                      ],
-                    ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    //mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _name(benchmark, context),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: _backendDescription(benchmark, context),
+                          ),
+                          const SizedBox(
+                            height: 18,
+                            child: VerticalDivider(color: Colors.black),
+                          ),
+                          _delegateChoice(benchmark, context, state),
+                        ],
+                      ),
+                    ],
                   ),
-                  _downloadStatus(l10n, benchmark, snapshot.data!, context),
-                  _activeToggle(benchmark, state),
-                ],
-              ),
+                ),
+                _downloadStatus(l10n, benchmark, snapshot.data!, context),
+                _activeToggle(benchmark, state),
+              ],
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
-  Widget _downloadStatus(AppLocalizations l10n, Benchmark benchmark,
-      bool status, BuildContext context) {
+  Widget _downloadStatus(
+    AppLocalizations l10n,
+    Benchmark benchmark,
+    bool status,
+    BuildContext context,
+  ) {
     if (!benchmark.isActive || status) return const SizedBox();
     return InkWell(
-        onTap: () async {
-          await showResourceMissingDialog(context, [], benchmark: benchmark);
-        },
-        child: const Icon(Icons.downloading_rounded,
-            size: 28, color: AppColors.warningIcon));
+      onTap: () async {
+        await showResourceMissingDialog(context, [], benchmark: benchmark);
+      },
+      child: const Icon(
+        Icons.downloading_rounded,
+        size: 28,
+        color: AppColors.warningIcon,
+      ),
+    );
   }
 
   Widget _name(Benchmark benchmark, BuildContext context) {
     return Text(
       benchmark.info.taskName,
-      style: Theme.of(context)
-          .textTheme
-          .titleMedium!
-          .copyWith(fontWeight: FontWeight.bold),
+      style: Theme.of(
+        context,
+      ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
     );
   }
 
@@ -445,8 +535,9 @@ class BenchmarkConfigSection extends StatelessWidget {
     return Text(
       benchmark.info.taskName,
       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-          color: benchmark.isActive ? AppColors.primary : Colors.black,
-          fontWeight: FontWeight.bold),
+        color: benchmark.isActive ? AppColors.primary : Colors.black,
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 
@@ -462,7 +553,7 @@ class BenchmarkConfigSection extends StatelessWidget {
 
   Widget _activeToggle(Benchmark benchmark, BenchmarkState state) {
     return Switch(
-      activeColor: AppColors.primary,
+      activeThumbColor: AppColors.primary,
       value: benchmark.isActive,
       onChanged: (flag) {
         state.benchmarkSetActive(benchmark, flag);
@@ -471,7 +562,10 @@ class BenchmarkConfigSection extends StatelessWidget {
   }
 
   Widget _delegateChoice(
-      Benchmark benchmark, BuildContext context, BenchmarkState state) {
+    Benchmark benchmark,
+    BuildContext context,
+    BenchmarkState state,
+  ) {
     final selected = benchmark.benchmarkSettings.delegateSelected;
     final choices = benchmark.benchmarkSettings.delegateChoice
         .sorted((b, a) => a.priority.compareTo(b.priority))
@@ -497,13 +591,15 @@ class BenchmarkConfigSection extends StatelessWidget {
         underline: const SizedBox(),
         value: selected,
         items: choices
-            .map((item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
-                ))
+            .map(
+              (item) => DropdownMenuItem<String>(
+                value: item,
+                child: Text(
+                  item,
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ),
+            )
             .toList(),
         onChanged: (value) {
           state.benchmarkSetDelegate(benchmark, value ?? '');

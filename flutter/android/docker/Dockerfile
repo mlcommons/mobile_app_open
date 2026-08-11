@@ -42,12 +42,32 @@ RUN yes | sdkmanager \
     "platform-tools" \
     "build-tools;30.0.3" \
     "build-tools;34.0.0" \
+    "build-tools;35.0.0" \
+    "build-tools;36.0.0" \
     "platforms;android-29" \
     "platforms;android-31" \
     "platforms;android-33" \
-    "platforms;android-34"
+    "platforms;android-34" \
+    "platforms;android-35" \
+    "platforms;android-36"
 # Install NDK in a separate layer to decrease max layer size.
+#
+# Two NDKs are installed on purpose, because they serve different jobs:
+#   * NDK 25 (ANDROID_NDK_ROOT below) COMPILES the native code — bazel builds
+#     the backend bridge + TFLite backend against ANDROID_NDK_HOME, and the
+#     OpenCV 3.4.7 layer builds against NDK 25's android.toolchain.cmake. Both
+#     are known-good on NDK 25.
+#   * NDK 28 is used by the Flutter Gradle build (app ndkVersion) only to STRIP
+#     the prebuilt .so's for the release bundle. It is required because the
+#     plugins (integration_test, jni, firebase_*) declare NDK >= 28.2.x, and
+#     because NDK 25 ships x86_64-only macOS host tools that fail to strip on
+#     the arm64 macOS CI runner (NDK >= 26 adds arm64 macOS host binaries).
+#
+# Consolidating everything onto NDK 28 is possible but is a separate change:
+# it means recompiling TFLite + OpenCV 3.4.7 (2019) with a much newer NDK,
+# which needs its own validation and is out of scope for the Flutter upgrade.
 RUN yes | sdkmanager "ndk;25.2.9519653"
+RUN yes | sdkmanager "ndk;28.2.13676358"
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/25.2.9519653
 ENV ANDROID_NDK=${ANDROID_NDK_ROOT}
 ENV ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
@@ -58,11 +78,11 @@ WORKDIR $HOME
 
 ENV PUB_CACHE=$HOME/.cache/.pub-cache
 ENV PATH=$PATH:$HOME/flutter/bin:$HOME/flutter/bin/cache/dart-sdk/bin:$PUB_CACHE/bin
-RUN git clone --branch "3.19.6" --single-branch --depth 1 https://github.com/flutter/flutter.git $HOME/flutter
+RUN git clone --branch "3.44.4" --single-branch --depth 1 https://github.com/flutter/flutter.git $HOME/flutter
 RUN git config --global --add safe.directory $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN flutter doctor -v
-RUN dart pub global activate protoc_plugin ^21.1.2 && chmod --recursive a=u $PUB_CACHE
+RUN dart pub global activate protoc_plugin ^25.0.0 && chmod --recursive a=u $PUB_CACHE
 
 RUN mkdir -p $HOME/.cache/.gradle
 ENV GRADLE_USER_HOME=$HOME/.cache/.gradle
@@ -163,3 +183,13 @@ ENV ANDROID_PLATFORM="${API_LEVEL}"
 ENV ANDROID_PLATFORM_TOOLS="${ANDROID_HOME}/platform-tools"
 ENV PATH="${ANDROID_PLATFORM_TOOLS}:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/local/lib/:${LD_LIBRARY_PATH}"
+
+# Expose the cmdline-tools under the canonical `latest` directory as well.
+# Flutter 3.44's release app-bundle build runs `apkanalyzer` to verify that
+# native debug symbols were stripped, and it only looks for apkanalyzer under
+# `cmdline-tools/latest/bin`, `cmdline-tools/<version>/bin`, or `<sdk>/tools/bin`
+# — not the `cmdline-tools/tools` layout used above. Without this the AAB build
+# fails with the misleading "Release app bundle failed to strip debug symbols".
+# Kept as a trailing layer (a symlink, not a rename) so the earlier cmdline-tools
+# / NDK / OpenCV layers stay cache-valid and the image rebuild stays fast.
+RUN ln -s "$ANDROID_SDK_ROOT/cmdline-tools/tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"

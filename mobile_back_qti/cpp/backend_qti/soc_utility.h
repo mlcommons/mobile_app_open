@@ -1,8 +1,11 @@
 /* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,12 +47,14 @@ class SocInfo {
         m_num_inits(0),
         m_max_cores(0),
         m_needs_rpcmem(false),
-        m_needs_stablediffusion(false) {}
+        m_needs_stablediffusion(false),
+        m_needs_genie(false) {}
 
   SocInfo(int num_dsp, int num_gpu, int num_cpu, int num_gpu_fp16,
           bool useDspFeatures, const std::string settings, std::string soc_name,
           int num_inits, std::vector<int> hlc, std::vector<int> llc,
-          int max_cores, bool needs_rpcmem, bool needs_stablediffusion = false)
+          int max_cores, bool needs_rpcmem, bool needs_stablediffusion = false,
+          bool needs_genie = false)
       : m_num_dsp(num_dsp),
         m_num_gpu(num_gpu),
         m_num_cpu(num_cpu),
@@ -62,7 +67,8 @@ class SocInfo {
         m_low_latency_cores(llc),
         m_max_cores(max_cores),
         m_needs_rpcmem(needs_rpcmem),
-        m_needs_stablediffusion(needs_stablediffusion) {
+        m_needs_stablediffusion(needs_stablediffusion),
+        m_needs_genie(needs_genie) {
     if (m_useDspFeatures == false) {
       m_num_inits = 1;
     }
@@ -84,6 +90,11 @@ class SocInfo {
         m_settings += qti_settings_stablediffusion;
 #endif
     }
+    if (m_needs_genie) {
+#ifdef GENIE_FLAG
+      m_settings += qti_settings_genie_llm;
+#endif
+    }
   }
 
   int m_num_dsp;
@@ -99,6 +110,7 @@ class SocInfo {
   int m_max_cores;
   bool m_needs_rpcmem;
   bool m_needs_stablediffusion;
+  bool m_needs_genie;
 };
 
 class SocProperties {

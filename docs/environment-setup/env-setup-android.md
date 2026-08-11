@@ -75,7 +75,7 @@ Flutter requires native libs so you must complete [Setting up Bazel on Ubuntu](#
   * Install Flutter:
 
     ```bash
-    mkdir -p ~/tools && cd ~/tools && curl https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.6-stable.tar.xz | tar Jxf -
+    mkdir -p ~/tools && cd ~/tools && curl https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.44.4-stable.tar.xz | tar Jxf -
     ```
 
   * Add flutter binary folders to path: `export PATH=$PATH:~/tools/flutter/bin:~/.pub-cache/bin`  
@@ -91,7 +91,7 @@ Flutter requires native libs so you must complete [Setting up Bazel on Ubuntu](#
 
     You will need to restart your WSL instance to apply changes.  
     Run `wsl --shutdown` in Windows, and then reopen WSL.
-* Enable protobuf plugin: `dart pub global activate protoc_plugin ^21.1.2`
+* Enable protobuf plugin: `dart pub global activate protoc_plugin ^25.0.0`
 
 * Install dependencies via sdkmanager, accept licenses for dependencies:
 

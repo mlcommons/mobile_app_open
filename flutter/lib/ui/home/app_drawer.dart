@@ -29,16 +29,14 @@ class AppDrawer extends StatelessWidget {
           // ignore: deprecated_member_use
           useMaterial3: false,
           textTheme: Theme.of(context).textTheme.apply(
-                bodyColor: AppColors.drawerForeground,
-                displayColor: AppColors.drawerForeground,
-                decorationColor: AppColors.drawerForeground,
-              ),
+            bodyColor: AppColors.drawerForeground,
+            displayColor: AppColors.drawerForeground,
+            decorationColor: AppColors.drawerForeground,
+          ),
           listTileTheme: const ListTileThemeData(
             iconColor: AppColors.drawerForeground,
           ),
-          iconTheme: const IconThemeData(
-            color: AppColors.drawerForeground,
-          ),
+          iconTheme: const IconThemeData(color: AppColors.drawerForeground),
         ),
         child: Container(
           color: AppColors.drawerBackground,
@@ -48,11 +46,7 @@ class AppDrawer extends StatelessWidget {
               child: Column(
                 children: [
                   header,
-                  Expanded(
-                    child: ListView(
-                      children: menuList,
-                    ),
-                  ),
+                  Expanded(child: ListView(children: menuList)),
                   footer,
                 ],
               ),
@@ -74,18 +68,10 @@ class AppDrawer extends StatelessWidget {
     );
     if (FirebaseManager.enabled) {
       return DrawerHeader(
-        child: ListView(
-          children: [
-            appTitle,
-            const UserProfileSection(),
-          ],
-        ),
+        child: ListView(children: [appTitle, const UserProfileSection()]),
       );
     } else {
-      return SizedBox(
-        height: 80,
-        child: DrawerHeader(child: appTitle),
-      );
+      return SizedBox(height: 80, child: DrawerHeader(child: appTitle));
     }
   }
 
@@ -99,9 +85,7 @@ class AppDrawer extends StatelessWidget {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const HistoryListScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const HistoryListScreen()),
           );
         },
       ),
@@ -112,9 +96,7 @@ class AppDrawer extends StatelessWidget {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const SettingsScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const SettingsScreen()),
           );
         },
       ),
@@ -125,9 +107,7 @@ class AppDrawer extends StatelessWidget {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ResourcesScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const ResourcesScreen()),
           );
         },
       ),
@@ -137,10 +117,9 @@ class AppDrawer extends StatelessWidget {
         onTap: () {
           Navigator.pop(context);
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AboutScreen(),
-              ));
+            context,
+            MaterialPageRoute(builder: (context) => const AboutScreen()),
+          );
         },
       ),
     ];
@@ -182,8 +161,8 @@ Widget buildFooter(BuildContext context) {
             child: Text(
               versionText,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.drawerForeground.withOpacity(0.6),
-                  ),
+                color: AppColors.drawerForeground.withValues(alpha: 0.6),
+              ),
               textAlign: TextAlign.center,
             ),
           );
@@ -197,7 +176,10 @@ Widget buildFooter(BuildContext context) {
 class NoGlowScrollBehavior extends ScrollBehavior {
   @override
   Widget buildOverscrollIndicator(
-      BuildContext context, Widget child, ScrollableDetails details) {
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
     return child; // Disable glow effect
   }
 }

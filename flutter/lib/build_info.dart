@@ -23,14 +23,15 @@ class BuildInfoHelper {
     print('packageInfo.version = ${packageInfo.version}');
 
     info = BuildInfo(
-        version: packageInfo.version,
-        buildNumber: packageInfo.buildNumber,
-        buildDate: DateTime.now(),
-        officialReleaseFlag: DartDefine.isOfficialBuild,
-        devTestFlag: DartDefine.perfTestEnabled,
-        backendList: BackendInfoHelper().getBackendsList(),
-        gitBranch: GeneratedBuildInfo.gitBranch,
-        gitCommit: GeneratedBuildInfo.gitCommit,
-        gitDirtyFlag: GeneratedBuildInfo.gitDirty != 0);
+      version: packageInfo.version,
+      buildNumber: packageInfo.buildNumber,
+      buildDate: DateTime.now(),
+      officialReleaseFlag: DartDefine.isOfficialBuild,
+      devTestFlag: DartDefine.perfTestEnabled,
+      backendList: BackendInfoHelper().getBackendsList(),
+      gitBranch: GeneratedBuildInfo.gitBranch,
+      gitCommit: GeneratedBuildInfo.gitCommit,
+      gitDirtyFlag: GeneratedBuildInfo.gitDirty != 0,
+    );
   }
 }

@@ -34,6 +34,8 @@
 #include <thread>
 #include <utility>
 #include <vector>
+
+#include "neuron_utils.h"
 using namespace std;
 
 namespace mtk::performance {
@@ -66,8 +68,39 @@ static const std::vector<int32_t> kFastSingleAnswerParams = {
     0x01438700, 40000,    // PERF_RES_SCHED_UTIL_DOWN_RATE_LIMIT_US_CLUSTER_1
     0x01438800, 40000,    // PERF_RES_SCHED_UTIL_DOWN_RATE_LIMIT_US_CLUSTER_2
     0x01c3c100, 0,        // PERF_RES_PM_QOS_CPUIDLE_MCDI_ENABLE
+    0x03000000, 8,       // PERF_RES_THERMAL_POLICY
 };
+
+static const std::vector<int32_t> kEdsrParams = {
+    0x00410000, 1,       // PERF_RES_CPUFREQ_CCI_FREQ
+    0x00400000, 1800000, // PERF_RES_CPUFREQ_MIN_CLUSTER_0
+    0x00404000, 1800000, // PERF_RES_CPUFREQ_MAX_CLUSTER_0
+    0x00400100, 1800000, // PERF_RES_CPUFREQ_MIN_CLUSTER_1
+    0x00404100, 1800000, // PERF_RES_CPUFREQ_MAX_CLUSTER_1
+    0x00400200, 1800000, // PERF_RES_CPUFREQ_MIN_CLUSTER_2
+    0x00404200, 1800000, // PERF_RES_CPUFREQ_MAX_CLUSTER_2
+
+    0x01000000, 0,       // PERF_RES_DRAM_OPP_MIN
+    0x01438400, 0,       // PERF_RES_SCHED_UTIL_UP_RATE_LIMIT_US_CLUSTER_1
+    0x01438500, 0,       // PERF_RES_SCHED_UTIL_UP_RATE_LIMIT_US_CLUSTER_2
+    0x01438700, 40000,   // PERF_RES_SCHED_UTIL_DOWN_RATE_LIMIT_US_CLUSTER_1
+    0x01438800, 40000,   // PERF_RES_SCHED_UTIL_DOWN_RATE_LIMIT_US_CLUSTER_2
+    0x01c3c100, 1,       // PERF_RES_PM_QOS_CPUIDLE_MCDI_ENABLE
+    0x03000000, 8,       // PERF_RES_THERMAL_POLICY
+};
+
+inline std::vector<int32_t> kUserDefinedParams;
 // clang-format on
+
+static const std::vector<int32_t> GetCustomParams() {
+  if (Config::GetEnableUserDefinedPerformance()) {
+    kUserDefinedParams = Config::GetUserDefinedPerformanceParam();
+    __android_log_print(ANDROID_LOG_DEBUG, "APUWARELIB",
+                        "Get user defined setting");
+    return kUserDefinedParams;
+  }
+  { return {}; }
+}
 
 //------------------------------------- -------------------------------------
 #define APUWARE_LOG_D(format, ...)                                  \
@@ -133,14 +166,16 @@ class PerformanceLocker {
   void Start(uint32_t ms) {
     if (mLib.mEnable) {
       APUWARE_LOG_D("Powerhal Up %u ms", ms);
-      mHandle = mLib.acquirePerfParamsLock(mHandle, ms,
-                                           (int*)kFastSingleAnswerParams.data(),
-                                           kFastSingleAnswerParams.size());
+      mHandle = mLib.acquirePerfParamsLock(mHandle, ms, (int*)mParam.data(),
+                                           mParam.size());
       APUWARE_LOG_D("PerformanceLocker get handle %d", mHandle);
     } else {
       APUWARE_LOG_D("Powerhal is invalid");
     }
   }
+
+  void ResetParam(std::vector<int32_t>& param) { mParam = param; }
+
   ~PerformanceLocker() {
     if (mLib.mEnable && mHandle) {
       APUWARE_LOG_D("PerformanceLocker release handle %d", mHandle);
@@ -156,7 +191,8 @@ class PerformanceLocker {
   struct ApuWareUtilsLib mLib;
 
   int32_t mHandle = 0;
+
+  std::vector<int32_t> mParam = kFastSingleAnswerParams;
 };
-;
 
 }  // namespace mtk::performance

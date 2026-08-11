@@ -46,8 +46,6 @@ class BackendInfoHelper {
         return matchIos(libName);
       case EnvPlatform.windows:
         return matchWindows(libName);
-      default:
-        throw 'unsupported platform';
     }
   }
 
@@ -70,11 +68,7 @@ class BackendInfoHelper {
   }
 
   pb.BackendSetting? matchWindows(String libName) {
-    return backendMatch(
-      libName: libName,
-      manufacturer: '',
-      model: '',
-    );
+    return backendMatch(libName: libName, manufacturer: '', model: '');
   }
 
   List<String> getBackendsList() {

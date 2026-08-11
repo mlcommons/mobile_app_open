@@ -67,8 +67,10 @@ class ResultManager {
 
   Future<void> saveResult(ExtendedResult result) async {
     localResults.add(result);
-    final resultFileName =
-        ResultFileName(result.meta.uuid, result.meta.creationDate);
+    final resultFileName = ResultFileName(
+      result.meta.uuid,
+      result.meta.creationDate,
+    );
     final resultFile = File('${_resultsDir.path}/${resultFileName.fileName}');
     await resultFile.writeAsString(jsonToStringIndented(result));
     final submissionFile = File('${_resultsDir.path}/$_submissionFileName');
@@ -95,20 +97,29 @@ class ResultManager {
   }
 
   void restoreResults(
-      List<BenchmarkExportResult> results, List<Benchmark> benchmarks) {
+    List<BenchmarkExportResult> results,
+    List<Benchmark> benchmarks,
+  ) {
     for (final exportResult in results) {
-      final benchmark = benchmarks
-          .singleWhere((benchmark) => benchmark.id == exportResult.benchmarkId);
+      final benchmark = benchmarks.singleWhere(
+        (benchmark) => benchmark.id == exportResult.benchmarkId,
+      );
 
-      benchmark.performanceModeResult =
-          _parseExportResult(exportResult, exportResult.performanceRun);
-      benchmark.accuracyModeResult =
-          _parseExportResult(exportResult, exportResult.accuracyRun);
+      benchmark.performanceModeResult = _parseExportResult(
+        exportResult,
+        exportResult.performanceRun,
+      );
+      benchmark.accuracyModeResult = _parseExportResult(
+        exportResult,
+        exportResult.accuracyRun,
+      );
     }
   }
 
   BenchmarkResult? _parseExportResult(
-      BenchmarkExportResult export, BenchmarkRunResult? runResult) {
+    BenchmarkExportResult export,
+    BenchmarkRunResult? runResult,
+  ) {
     if (runResult == null) {
       return null;
     }

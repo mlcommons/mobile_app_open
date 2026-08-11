@@ -28,8 +28,10 @@ class CacheManager {
     return archiveFilePath;
   }
 
-  Future<void> deleteLoadedResources(List<String> excludes,
-      [int atLeastDaysOld = 0]) async {
+  Future<void> deleteLoadedResources(
+    List<String> excludes, [
+    int atLeastDaysOld = 0,
+  ]) async {
     final directory = Directory(loadedResourcesDir);
 
     // can't use 'await for' here because we delete files,

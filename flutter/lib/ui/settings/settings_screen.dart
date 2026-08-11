@@ -33,6 +33,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     state = context.watch<BenchmarkState>();
     l10n = AppLocalizations.of(context)!;
 
+    Widget languageDropdown = _languageDropdown();
     Widget artificialLoadSwitch = _artificialLoadSwitch();
     Widget crashlyticsSwitch = _crashlyticsSwitch();
     Widget runModeDropdown = _runModeDropdown();
@@ -44,11 +45,12 @@ class _SettingsScreen extends State<SettingsScreen> {
     Widget taskConfig = _taskConfig(context);
 
     return Scaffold(
-        appBar: AppBar(title: Text(l10n.menuSettings)),
-        body: SafeArea(
-            child: ListView(
+      appBar: AppBar(title: Text(l10n.menuSettings)),
+      body: SafeArea(
+        child: ListView(
           padding: const EdgeInsets.only(top: 20),
           children: [
+            languageDropdown,
             runModeDropdown,
             offlineModeSwitch,
             keepLogSwitch,
@@ -61,30 +63,37 @@ class _SettingsScreen extends State<SettingsScreen> {
             const Divider(),
             const Divider(),
             versionText,
-            const SizedBox(height: 20)
+            const SizedBox(height: 20),
           ],
-        )));
+        ),
+      ),
+    );
   }
 
   Widget _taskConfig(BuildContext context) {
     final taskConfigs = state.configManager.getConfigs();
     return FutureBuilder<List<TaskConfigDescription>>(
       future: taskConfigs,
-      builder: (BuildContext context,
-          AsyncSnapshot<List<TaskConfigDescription>> snapshot) {
-        if (snapshot.hasData && snapshot.data != null) {
-          return TaskConfigSection(snapshot.data!);
-        } else {
-          return const Text('Loading data');
-        }
-      },
+      builder:
+          (
+            BuildContext context,
+            AsyncSnapshot<List<TaskConfigDescription>> snapshot,
+          ) {
+            if (snapshot.hasData && snapshot.data != null) {
+              return TaskConfigSection(snapshot.data!);
+            } else {
+              return Text(l10n.settingsLoadingData);
+            }
+          },
     );
   }
 
   Widget _versionText() {
     final buildInfo = BuildInfoHelper.info;
     return Text(
-      'Version: ${buildInfo.version} | Build: ${buildInfo.buildNumber}',
+      l10n.settingsVersion
+          .replaceAll('<version>', buildInfo.version)
+          .replaceAll('<build>', buildInfo.buildNumber),
       textAlign: TextAlign.center,
     );
   }
@@ -112,13 +121,18 @@ class _SettingsScreen extends State<SettingsScreen> {
         padding: const EdgeInsets.only(bottom: 5),
         child: Text(l10n.settingsCooldown),
       ),
-      subtitle: Text(l10n.settingsCooldownSubtitle
-          .replaceAll('<cooldownPause>', store.cooldownDuration.toString())),
+      subtitle: Text(
+        l10n.settingsCooldownSubtitle.replaceAll(
+          '<cooldownPause>',
+          store.cooldownDuration.toString(),
+        ),
+      ),
       trailing: Switch(
-          value: store.cooldown,
-          onChanged: (flag) {
-            store.cooldown = flag;
-          }),
+        value: store.cooldown,
+        onChanged: (flag) {
+          store.cooldown = flag;
+        },
+      ),
     );
   }
 
@@ -154,6 +168,40 @@ class _SettingsScreen extends State<SettingsScreen> {
     );
   }
 
+  Widget _languageDropdown() {
+    // Native names (endonyms) for each supported language code.
+    const languageNames = <String, String>{'en': 'English', 'zh': '简体中文'};
+    return ListTile(
+      title: Padding(
+        padding: const EdgeInsets.only(bottom: 5),
+        child: Text(l10n.settingsLanguage),
+      ),
+      subtitle: Text(l10n.settingsLanguageSubtitle),
+      trailing: DropdownButton<String>(
+        borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
+        value: store.appLocale,
+        items: [
+          // Empty value means follow the system/device language.
+          DropdownMenuItem<String>(
+            value: '',
+            child: Text(l10n.settingsLanguageSystem),
+          ),
+          ...AppLocalizations.supportedLocales.map(
+            (locale) => DropdownMenuItem<String>(
+              value: locale.languageCode,
+              child: Text(
+                languageNames[locale.languageCode] ?? locale.languageCode,
+              ),
+            ),
+          ),
+        ],
+        onChanged: (value) => setState(() {
+          store.appLocale = value!;
+        }),
+      ),
+    );
+  }
+
   Widget _runModeDropdown() {
     return ListTile(
       title: Padding(
@@ -162,18 +210,21 @@ class _SettingsScreen extends State<SettingsScreen> {
       ),
       subtitle: Text(l10n.settingsRunModeSubtitle),
       trailing: DropdownButton<BenchmarkRunModeEnum>(
-          borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
-          value: store.selectedBenchmarkRunMode,
-          items: BenchmarkRunModeEnum.values
-              .where((e) => !e.isHiddenFromUI)
-              .map((runMode) => DropdownMenuItem<BenchmarkRunModeEnum>(
-                    value: runMode,
-                    child: Text(runMode.localizedName(l10n)),
-                  ))
-              .toList(),
-          onChanged: (value) => setState(() {
-                store.selectedBenchmarkRunMode = value!;
-              })),
+        borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
+        value: store.selectedBenchmarkRunMode,
+        items: BenchmarkRunModeEnum.values
+            .where((e) => !e.isHiddenFromUI)
+            .map(
+              (runMode) => DropdownMenuItem<BenchmarkRunModeEnum>(
+                value: runMode,
+                child: Text(runMode.localizedName(l10n)),
+              ),
+            )
+            .toList(),
+        onChanged: (value) => setState(() {
+          store.selectedBenchmarkRunMode = value!;
+        }),
+      ),
     );
   }
 

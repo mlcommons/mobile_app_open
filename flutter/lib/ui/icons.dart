@@ -14,40 +14,55 @@ class AppIcons {
     return SvgPicture.asset('assets/icons/$name');
   }
 
-  static final SvgPicture imageClassification =
-      _pSvg('ic_task_image_classification.svg');
-  static final SvgPicture imageSegmentation =
-      _pSvg('ic_task_image_segmentation.svg');
-  static final SvgPicture objectDetection =
-      _pSvg('ic_task_object_detection.svg');
-  static final SvgPicture languageProcessing =
-      _pSvg('ic_task_language_processing.svg');
-  static final SvgPicture imageClassificationOffline =
-      _pSvg('ic_task_image_classification_offline.svg');
-  static final SvgPicture superResolution =
-      _pSvg('ic_task_super_resolution.svg');
-  static final SvgPicture stableDiffusion =
-      _pSvg('ic_task_stable_diffusion.svg');
+  static final SvgPicture imageClassification = _pSvg(
+    'ic_task_image_classification.svg',
+  );
+  static final SvgPicture imageSegmentation = _pSvg(
+    'ic_task_image_segmentation.svg',
+  );
+  static final SvgPicture objectDetection = _pSvg(
+    'ic_task_object_detection.svg',
+  );
+  static final SvgPicture languageProcessing = _pSvg(
+    'ic_task_language_processing.svg',
+  );
+  static final SvgPicture imageClassificationOffline = _pSvg(
+    'ic_task_image_classification_offline.svg',
+  );
+  static final SvgPicture superResolution = _pSvg(
+    'ic_task_super_resolution.svg',
+  );
+  static final SvgPicture stableDiffusion = _pSvg(
+    'ic_task_stable_diffusion.svg',
+  );
   static final SvgPicture llm = _pSvg('ic_task_llm.svg');
   static final SvgPicture llmInstruct = _pSvg('ic_task_llm_instruct.svg');
 
-  static final SvgPicture imageClassificationWhite =
-      _pSvg('ic_task_image_classification_white.svg');
-  static final SvgPicture imageSegmentationWhite =
-      _pSvg('ic_task_image_segmentation_white.svg');
-  static final SvgPicture objectDetectionWhite =
-      _pSvg('ic_task_object_detection_white.svg');
-  static final SvgPicture languageProcessingWhite =
-      _pSvg('ic_task_language_processing_white.svg');
-  static final SvgPicture imageClassificationOfflineWhite =
-      _pSvg('ic_task_image_classification_offline_white.svg');
-  static final SvgPicture superResolutionWhite =
-      _pSvg('ic_task_super_resolution_white.svg');
-  static final SvgPicture stableDiffusionWhite =
-      _pSvg('ic_task_stable_diffusion_white.svg');
+  static final SvgPicture imageClassificationWhite = _pSvg(
+    'ic_task_image_classification_white.svg',
+  );
+  static final SvgPicture imageSegmentationWhite = _pSvg(
+    'ic_task_image_segmentation_white.svg',
+  );
+  static final SvgPicture objectDetectionWhite = _pSvg(
+    'ic_task_object_detection_white.svg',
+  );
+  static final SvgPicture languageProcessingWhite = _pSvg(
+    'ic_task_language_processing_white.svg',
+  );
+  static final SvgPicture imageClassificationOfflineWhite = _pSvg(
+    'ic_task_image_classification_offline_white.svg',
+  );
+  static final SvgPicture superResolutionWhite = _pSvg(
+    'ic_task_super_resolution_white.svg',
+  );
+  static final SvgPicture stableDiffusionWhite = _pSvg(
+    'ic_task_stable_diffusion_white.svg',
+  );
   static final SvgPicture llmWhite = _pSvg('ic_task_llm_white.svg');
-  static final SvgPicture llmInstructWhite =
-      _pSvg('ic_task_llm_instruct_white.svg');
+  static final SvgPicture llmInstructWhite = _pSvg(
+    'ic_task_llm_instruct_white.svg',
+  );
 
   static final SvgPicture arrow = _pSvg('ic_arrow.svg');
 
@@ -61,7 +76,9 @@ class AppIcons {
 
   static DecorationImage splashBackground() {
     return const DecorationImage(
-        image: AssetImage('assets/splash.png'), fit: BoxFit.fill);
+      image: AssetImage('assets/splash.png'),
+      fit: BoxFit.fill,
+    );
   }
 }
 

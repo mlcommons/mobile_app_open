@@ -218,7 +218,7 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
                                            void *context) {
   mbe_core_holder *ptr = (mbe_core_holder *)backend_ptr;
   MLOGD("+ mlperf_backend_issue_query with ptr[%p]", ptr);
-  intf_mlperf_status_t intf_status = ptr->issue_query_fp();
+  intf_mlperf_status_t intf_status = ptr->issue_query_fp(callback, context);
 
   mlperf_status_t status;
   if (convert_backend_status(intf_status, &status)) {

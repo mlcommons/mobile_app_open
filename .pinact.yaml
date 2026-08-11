@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/suzuki-shunsuke/pinact/refs/heads/main/json-schema/pinact.json
+# pinact - https://github.com/suzuki-shunsuke/pinact
+# Pin/update GitHub Actions to commit SHAs:  pinact run -u --min-age 15 .github/workflows/*.yml
+version: 3
+
+ignore_actions:
+  # FirebaseExtended/action-hosting-deploy: the latest release (v0.10.0) still runs on
+  # Node 20, but `main` is exactly one commit ahead — the "bump action runtime to Node 24"
+  # change (#450) — so we pin to that main commit to clear the Node 20 deprecation warning.
+  # This ignore stops `pinact run -u` from reverting it back to the v0.10.0 release tag.
+  # Drop this entry once upstream cuts a post-v0.10.0 release and pin to that tag instead.
+  - name: FirebaseExtended/action-hosting-deploy
+    ref: main

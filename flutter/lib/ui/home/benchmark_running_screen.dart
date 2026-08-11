@@ -78,34 +78,37 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     if (progress.runMode.selectedRunModes.length > 1) {
       loadgenRunModeStage = progress.accuracy ? '2/2' : '1/2';
     }
-    final loadgenRunModeName =
-        progress.accuracy ? l10n.progressAccuracy : l10n.progressPerformance;
-    final benchmarkRunModeName =
-        store.selectedBenchmarkRunMode.localizedName(l10n);
+    final loadgenRunModeName = progress.accuracy
+        ? l10n.progressAccuracy
+        : l10n.progressPerformance;
+    final benchmarkRunModeName = store.selectedBenchmarkRunMode.localizedName(
+      l10n,
+    );
     return Padding(
-        padding: const EdgeInsets.fromLTRB(40, 48, 40, 4),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              '($loadgenRunModeStage) $loadgenRunModeName',
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: AppColors.lightText,
-                fontSize: 20,
-              ),
+      padding: const EdgeInsets.fromLTRB(40, 48, 40, 4),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            '($loadgenRunModeStage) $loadgenRunModeName',
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              color: AppColors.lightText,
+              fontSize: 20,
             ),
-            Text(
-              benchmarkRunModeName,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: AppColors.lightText,
-                fontSize: 14,
-              ),
+          ),
+          Text(
+            benchmarkRunModeName,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              color: AppColors.lightText,
+              fontSize: 14,
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _circle() {
@@ -127,7 +130,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
                   color: Colors.black12,
                   offset: Offset(15, 15),
                   blurRadius: 10,
-                )
+                ),
               ],
             ),
             child: ClipOval(
@@ -137,10 +140,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
               ),
             ),
           ),
-          ProgressCircle(
-            strokeWidth: 6,
-            size: diameter + 20,
-          ),
+          ProgressCircle(strokeWidth: 6, size: diameter + 20),
         ],
       ),
     );
@@ -152,10 +152,12 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
 
     final double containerRadius = diameter / 2;
     final double creepFactor = lerpRange(2, 6, 160, 240, diameter)!;
-    final double horizontalPadding = containerRadius -
-        sqrt(pow(containerRadius, 2) -
-            pow((containerRadius - (8 * creepFactor)),
-                2)); // 8 is the padding from the bottom of the circle to the bottom of the text
+    final double horizontalPadding =
+        containerRadius -
+        sqrt(
+          pow(containerRadius, 2) -
+              pow((containerRadius - (8 * creepFactor)), 2),
+        ); // 8 is the padding from the bottom of the circle to the bottom of the text
 
     const textStyle = TextStyle(
       fontSize: 14,
@@ -226,10 +228,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     });
     return Material(
       type: MaterialType.transparency,
-      child: ListView(
-        shrinkWrap: true,
-        children: childrenList,
-      ),
+      child: ListView(shrinkWrap: true, children: childrenList),
     );
   }
 
@@ -239,10 +238,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     const trailingWidth = 24.0;
     Widget? doneIcon;
     if (progress.currentBenchmark?.taskName == benchmarkInfo.taskName) {
-      doneIcon = const ProgressCircle(
-        strokeWidth: 2,
-        size: trailingWidth - 4,
-      );
+      doneIcon = const ProgressCircle(strokeWidth: 2, size: trailingWidth - 4);
     } else if (progress.completedBenchmarks.contains(benchmarkInfo)) {
       doneIcon = const Icon(
         Icons.check_circle,
@@ -257,20 +253,18 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
       dense: true,
       minVerticalPadding: 0,
       leading: SizedBox(
-          width: leadingWidth,
-          height: leadingWidth,
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: benchmarkInfo.iconWhite,
-          )),
+        width: leadingWidth,
+        height: leadingWidth,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: benchmarkInfo.iconWhite,
+        ),
+      ),
       title: SizedBox(
         width: titleWidth,
         child: Text(
           benchmarkInfo.taskName,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ),
       trailing: SizedBox(
@@ -289,10 +283,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _footerText(),
-          _cancelButton(),
-        ],
+        children: [_footerText(), _cancelButton()],
       );
     }
   }
@@ -301,18 +292,12 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        const Icon(
-          Icons.warning,
-          color: AppColors.lightText,
-        ),
+        const Icon(Icons.warning, color: AppColors.lightText),
         const SizedBox(width: 8),
         Text(
           l10n.progressDontClose,
-          style: const TextStyle(
-            color: AppColors.lightText,
-            fontSize: 17,
-          ),
-        )
+          style: const TextStyle(color: AppColors.lightText, fontSize: 17),
+        ),
       ],
     );
   }
@@ -322,7 +307,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
       child: TextButton(
         style: ButtonStyle(
-          shape: MaterialStateProperty.all(
+          shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
               side: const BorderSide(color: Colors.white),
@@ -334,10 +319,7 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: Text(
             l10n.progressCancel,
-            style: const TextStyle(
-              fontSize: 15.0,
-              color: AppColors.lightText,
-            ),
+            style: const TextStyle(fontSize: 15.0, color: AppColors.lightText),
           ),
         ),
       ),
@@ -361,19 +343,13 @@ class _BenchmarkRunningScreenState extends State<BenchmarkRunningScreen> {
             const SizedBox(width: 8),
             Text(
               l10n.progressAborting,
-              style: const TextStyle(
-                fontSize: 18,
-                color: AppColors.lightText,
-              ),
-            )
+              style: const TextStyle(fontSize: 18, color: AppColors.lightText),
+            ),
           ],
         ),
         Text(
           l10n.progressWaiting,
-          style: const TextStyle(
-            fontSize: 14,
-            color: AppColors.lightText,
-          ),
+          style: const TextStyle(fontSize: 14, color: AppColors.lightText),
         ),
       ],
     );

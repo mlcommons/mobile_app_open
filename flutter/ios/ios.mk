@@ -44,6 +44,10 @@ flutter/ios/release: flutter/check-release-env flutter/ios flutter/prepare flutt
 .PHONY: flutter/ios/ipa
 flutter/ios/ipa:
 	@[ -n "${FLUTTER_BUILD_NUMBER}" ] || (echo FLUTTER_BUILD_NUMBER env must be set; exit 1)
+	# This project integrates iOS plugins via CocoaPods. Swift Package Manager is
+	# on by default in Flutter 3.44+, and its build-for-testing path fails with
+	# "no such module 'Flutter'"; disable it to keep the CocoaPods integration.
+	flutter --no-version-check config --no-enable-swift-package-manager
 	cd flutter && flutter --no-version-check clean
 	cd flutter && flutter --no-version-check build \
 		ipa \
@@ -51,3 +55,36 @@ flutter/ios/ipa:
 		${flutter_build_number_arg}
 	mkdir -p output/flutter/ios/
 	cp -rf flutter/build/ios/archive/Runner.xcarchive output/flutter/ios/release.xcarchive
+
+# BrowserStack test package targets
+flutter/ios/test-package: flutter/ios/test-package/build flutter/ios/test-package/zip
+
+.PHONY: flutter/ios/test-package/build
+flutter/ios/test-package/build:
+	# See flutter/ios/ipa: SPM (default-on in Flutter 3.44+) breaks the
+	# build-for-testing path; keep the CocoaPods integration.
+	flutter --no-version-check config --no-enable-swift-package-manager
+	cd flutter && flutter --no-version-check build ios \
+		--config-only \
+		${flutter_perf_test_arg} \
+		integration_test/first_test.dart
+	cd flutter/ios && xcodebuild \
+		-workspace Runner.xcworkspace \
+		-scheme Runner \
+		-config Flutter/Release.xcconfig \
+		-derivedDataPath ../build/ios_integration \
+		-sdk iphoneos \
+		-allowProvisioningUpdates \
+		CODE_SIGN_IDENTITY="$${CODE_SIGN_IDENTITY:-Apple Development}" \
+		$$(if [ -n "$${DEVELOPMENT_TEAM}" ]; then echo "DEVELOPMENT_TEAM=$${DEVELOPMENT_TEAM}"; fi) \
+		$$(if [ -n "$${APP_STORE_CONNECT_API_KEY_PATH}" ] && [ -s "$${APP_STORE_CONNECT_API_KEY_PATH}" ] && [ -n "$${APP_STORE_CONNECT_API_KEY_ID}" ] && [ -n "$${APP_STORE_CONNECT_API_KEY_ISSUER_ID}" ]; then echo "-authenticationKeyPath $${APP_STORE_CONNECT_API_KEY_PATH} -authenticationKeyID $${APP_STORE_CONNECT_API_KEY_ID} -authenticationKeyIssuerID $${APP_STORE_CONNECT_API_KEY_ISSUER_ID}"; fi) \
+		build-for-testing
+
+FLUTTER_IOS_TEST_PACKAGE?=ios_tests-${FLUTTER_BUILD_NUMBER}.zip
+.PHONY: flutter/ios/test-package/zip
+flutter/ios/test-package/zip:
+	mkdir -p output/ios-test-package
+	cd flutter/build/ios_integration/Build/Products && \
+		zip -r $(CURDIR)/output/ios-test-package/${FLUTTER_IOS_TEST_PACKAGE} \
+		Release-iphoneos/ \
+		*.xctestrun

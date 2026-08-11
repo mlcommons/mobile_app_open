@@ -36,7 +36,8 @@ const _kM32 = 'SM-M326B'; // Samsung Galaxy M32
 
 // iOS
 const _kIphoneOnGitHubAction = 'iPhone16,2';
-const _kIphoneOnMacbook = 'iPhone17,1';
+const _kIphoneOnMacbook =
+    'iPhone17,1'; // Also used on BrowserStack (iPhone 16 Pro)
 
 const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   _kTFLiteBackend: {
@@ -51,6 +52,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0, max: 29),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 600),
@@ -63,11 +65,9 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 4.5, max: 90),
-    _kS10Plus: Interval(min: 400, max: 800)
+    _kS10Plus: Interval(min: 400, max: 800),
   },
-  _kSamsungBackend: {
-    _kS24: Interval(min: 600, max: 1000),
-  },
+  _kSamsungBackend: {_kS24: Interval(min: 600, max: 1000)},
 };
 
 const Map<String, Map<String, Interval>> _objectDetection = {
@@ -83,6 +83,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0, max: 9),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 200, max: 500),
@@ -95,11 +96,9 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 120, max: 210),
-    _kS10Plus: Interval(min: 1200, max: 2000)
+    _kS10Plus: Interval(min: 1200, max: 2000),
   },
-  _kSamsungBackend: {
-    _kS24: Interval(min: 1400, max: 2400),
-  },
+  _kSamsungBackend: {_kS24: Interval(min: 1400, max: 2400)},
 };
 
 const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
@@ -115,6 +114,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0, max: 9),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 190),
@@ -123,15 +123,13 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 400, max: 750),
     _kS24Ultra: Interval(min: 1200, max: 1600),
-    _kS25Ultra: Interval(min: 1500, max: 2200),
+    _kS25Ultra: Interval(min: 1500, max: 2700),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 45, max: 70),
-    _kS10Plus: Interval(min: 800, max: 1500)
+    _kS10Plus: Interval(min: 800, max: 1500),
   },
-  _kSamsungBackend: {
-    _kS24: Interval(min: 800, max: 1500),
-  },
+  _kSamsungBackend: {_kS24: Interval(min: 800, max: 1500)},
 };
 
 const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
@@ -147,6 +145,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0, max: 9),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 2, max: 85),
@@ -159,11 +158,9 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 1, max: 6),
-    _kS10Plus: Interval(min: 100, max: 300)
+    _kS10Plus: Interval(min: 100, max: 300),
   },
-  _kSamsungBackend: {
-    _kS24: Interval(min: 220, max: 350),
-  },
+  _kSamsungBackend: {_kS24: Interval(min: 220, max: 350)},
 };
 
 const Map<String, Map<String, Interval>> _superResolution = {
@@ -179,6 +176,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0, max: 9),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 7, max: 17),
@@ -191,11 +189,9 @@ const Map<String, Map<String, Interval>> _superResolution = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 5, max: 15),
-    _kS10Plus: Interval(min: 150, max: 300)
+    _kS10Plus: Interval(min: 150, max: 300),
   },
-  _kSamsungBackend: {
-    _kS24: Interval(min: 90, max: 180),
-  },
+  _kSamsungBackend: {_kS24: Interval(min: 90, max: 180)},
 };
 
 // TODO (anhappdev): update expected throughput for stable diffusion
@@ -212,6 +208,7 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0, max: 100),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 0, max: 100),
@@ -224,11 +221,9 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 0, max: 100),
-    _kS10Plus: Interval(min: 0, max: 100)
+    _kS10Plus: Interval(min: 0, max: 100),
   },
-  _kSamsungBackend: {
-    _kS24: Interval(min: 0, max: 100),
-  },
+  _kSamsungBackend: {_kS24: Interval(min: 0, max: 100)},
 };
 
 const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
@@ -244,6 +239,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0, max: 25),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 700),
@@ -256,11 +252,9 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 4.5, max: 90),
-    _kS10Plus: Interval(min: 700, max: 1200)
+    _kS10Plus: Interval(min: 700, max: 1200),
   },
-  _kSamsungBackend: {
-    _kS24: Interval(min: 800, max: 1200),
-  },
+  _kSamsungBackend: {_kS24: Interval(min: 800, max: 1200)},
 };
 
 const benchmarkExpectedThroughput = {

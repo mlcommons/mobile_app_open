@@ -25,8 +25,10 @@ class _ResultCircleState extends State<ResultCircle>
 
   @override
   void initState() {
-    _controller =
-        AnimationController(duration: _durationOfAnimation, vsync: this);
+    _controller = AnimationController(
+      duration: _durationOfAnimation,
+      vsync: this,
+    );
     _controller.addListener(() => setState(() {}));
     _controller.forward();
 
@@ -69,20 +71,24 @@ class _ResultCircleState extends State<ResultCircle>
               color: Colors.black12,
               offset: Offset(15, 15),
               blurRadius: 10,
-            )
+            ),
           ],
         ),
         child: Stack(
           alignment: AlignmentDirectional.center,
           children: <Widget>[
             SizedBox(
-                width: edgeSize,
-                height: edgeSize,
-                child: RotationTransition(
-                    turns: AlwaysStoppedAnimation(value),
-                    child: app_icons.AppIcons.performanceHand)),
+              width: edgeSize,
+              height: edgeSize,
+              child: RotationTransition(
+                turns: AlwaysStoppedAnimation(value),
+                child: app_icons.AppIcons.performanceHand,
+              ),
+            ),
             CustomPaint(
-                size: Size(edgeSize, edgeSize), painter: ArcPaint(value))
+              size: Size(edgeSize, edgeSize),
+              painter: ArcPaint(value),
+            ),
           ],
         ),
       ),
@@ -103,13 +109,18 @@ class ArcPaint extends CustomPainter {
     final sweepAngle = 2 * pi * _value;
     const useCenter = false;
 
-    final rect = Rect.fromLTRB(-size.width / 8, -size.width / 8,
-        9 / 8 * size.width, 9 / 8 * size.width);
+    final rect = Rect.fromLTRB(
+      -size.width / 8,
+      -size.width / 8,
+      9 / 8 * size.width,
+      9 / 8 * size.width,
+    );
     final paint = Paint()
       ..shader = SweepGradient(
-          transform: const GradientRotation(pi / 2 - angleEpsilon),
-          endAngle: sweepAngle + angleEpsilon,
-          colors: const [Colors.white54, Colors.white]).createShader(rect)
+        transform: const GradientRotation(pi / 2 - angleEpsilon),
+        endAngle: sweepAngle + angleEpsilon,
+        colors: const [Colors.white54, Colors.white],
+      ).createShader(rect)
       ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 10)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth

@@ -1,0 +1,148 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
+benchmark_setting {
+  benchmark_id: "llm-8b"
+  framework: "GENIE"
+  custom_setting {
+    id: "pipeline"
+    value: "GeniePipeline"
+  }
+  custom_setting {
+    id: "device_type"
+    value: "HTP"
+  }
+  custom_setting {
+    id: "context_size"
+    value: "4096"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "false"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "GENIE_HTP"
+    accelerator_name: "genie_htp"
+    accelerator_desc: "HTP"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/genie_config_npu.json"
+      model_checksum: "5343504b549385d39a88a933bb369738"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/htpBackendExtConfig.json"
+      model_checksum: "3515252d67694b1513020f1008c99638"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_1_of_6.bin"
+      model_checksum: "5aab8f1f29fda8f71593ea67a4c728dd"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_2_of_6.bin"
+      model_checksum: "04d6f2c9beb9615a574301f9fd6a00cb"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_3_of_6.bin"
+      model_checksum: "ca5f42e58b26d0a0f4d972e169bb8564"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_4_of_6.bin"
+      model_checksum: "5edc27e43dac474a7cd29314bc4889e3"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_5_of_6.bin"
+      model_checksum: "701d2bf6ba94536e18258002a8acd292"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_6_of_6.bin"
+      model_checksum: "704c36b297f90ca0c36050e3cee309b6"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/tokenizer.json"
+      model_checksum: "3ff6b653d22a2676f3a03bd7b5d7ff88"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  single_stream_expected_latency_ns: 1000000
+  delegate_selected: "GENIE_HTP"
+}
+
+benchmark_setting {
+  benchmark_id: "llm-8b-instruct"
+  framework: "GENIE"
+  custom_setting {
+    id: "pipeline"
+    value: "GeniePipeline"
+  }
+  custom_setting {
+    id: "device_type"
+    value: "HTP"
+  }
+  custom_setting {
+    id: "context_size"
+    value: "4096"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "false"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "GENIE_HTP"
+    accelerator_name: "genie_htp"
+    accelerator_desc: "HTP"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/genie_config_npu.json"
+      model_checksum: "5343504b549385d39a88a933bb369738"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/htpBackendExtConfig.json"
+      model_checksum: "3515252d67694b1513020f1008c99638"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_1_of_6.bin"
+      model_checksum: "5aab8f1f29fda8f71593ea67a4c728dd"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_2_of_6.bin"
+      model_checksum: "04d6f2c9beb9615a574301f9fd6a00cb"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_3_of_6.bin"
+      model_checksum: "ca5f42e58b26d0a0f4d972e169bb8564"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_4_of_6.bin"
+      model_checksum: "5edc27e43dac474a7cd29314bc4889e3"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_5_of_6.bin"
+      model_checksum: "701d2bf6ba94536e18258002a8acd292"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/llama3_npu_6_of_6.bin"
+      model_checksum: "704c36b297f90ca0c36050e3cee309b6"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/llama3_npu/tokenizer.json"
+      model_checksum: "3ff6b653d22a2676f3a03bd7b5d7ff88"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  single_stream_expected_latency_ns: 1000000
+  delegate_selected: "GENIE_HTP"
+}

@@ -11,12 +11,14 @@ class ResultSort {
     List<ExtendedResult> items = List<ExtendedResult>.from(results);
     switch (sortBy) {
       case SortByEnum.dateAsc:
-        items
-            .sort((a, b) => a.meta.creationDate.compareTo(b.meta.creationDate));
+        items.sort(
+          (a, b) => a.meta.creationDate.compareTo(b.meta.creationDate),
+        );
         break;
       case SortByEnum.dateDesc:
-        items
-            .sort((a, b) => b.meta.creationDate.compareTo(a.meta.creationDate));
+        items.sort(
+          (a, b) => b.meta.creationDate.compareTo(a.meta.creationDate),
+        );
         break;
     }
     return items;

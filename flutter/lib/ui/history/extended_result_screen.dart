@@ -49,7 +49,10 @@ class _RemoteExtendedResultScreenState
           } else {
             child = const CircularProgressIndicator();
           }
-          return Container(color: Colors.white, child: Center(child: child));
+          return Container(
+            color: Colors.white,
+            child: Center(child: child),
+          );
         },
       ),
     );
@@ -159,8 +162,10 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
     return ListView(children: _makeBody());
   }
 
-  double calculateAverageThroughput(List<BenchmarkExportResult> results,
-      {bool tokenBased = false}) {
+  double calculateAverageThroughput(
+    List<BenchmarkExportResult> results, {
+    bool tokenBased = false,
+  }) {
     var throughput = 0.0;
     var count = 0;
     for (var item in results) {
@@ -184,18 +189,20 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
     final date = res.meta.creationDate.toUIString();
     final backendName = firstResult.backendInfo.backendName;
 
-    final averageThroughput =
-        calculateAverageThroughput(res.results).toStringAsFixed(2);
-    final averageTokenThroughput =
-        calculateAverageThroughput(res.results, tokenBased: true)
-            .toStringAsFixed(2);
+    final averageThroughput = calculateAverageThroughput(
+      res.results,
+    ).toStringAsFixed(2);
+    final averageTokenThroughput = calculateAverageThroughput(
+      res.results,
+      tokenBased: true,
+    ).toStringAsFixed(2);
 
     final appVersionType =
         (res.buildInfo.gitDirtyFlag || res.buildInfo.devTestFlag)
-            ? l10n.historyDetailsBuildTypeDebug
-            : res.buildInfo.officialReleaseFlag
-                ? l10n.historyDetailsBuildTypeOfficial
-                : l10n.historyDetailsBuildTypeUnofficial;
+        ? l10n.historyDetailsBuildTypeDebug
+        : res.buildInfo.officialReleaseFlag
+        ? l10n.historyDetailsBuildTypeOfficial
+        : l10n.historyDetailsBuildTypeUnofficial;
     final appVersion = l10n.historyDetailsAppVersionTemplate
         .replaceFirst('<version>', res.buildInfo.version)
         .replaceFirst('<build>', res.buildInfo.buildNumber)
@@ -228,18 +235,17 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
-      child: helper.makeTable(
-        [
-          RowData(
-              isHeader: true,
-              name: l10n.historyDetailsTableColName,
-              throughput: l10n.historyDetailsTableColPerf,
-              throughputValid: true,
-              accuracy: l10n.historyDetailsTableColAccuracy,
-              onTap: null),
-          ...list.map(_makeRowData),
-        ],
-      ),
+      child: helper.makeTable([
+        RowData(
+          isHeader: true,
+          name: l10n.historyDetailsTableColName,
+          throughput: l10n.historyDetailsTableColPerf,
+          throughputValid: true,
+          accuracy: l10n.historyDetailsTableColAccuracy,
+          onTap: null,
+        ),
+        ...list.map(_makeRowData),
+      ]),
     );
   }
 

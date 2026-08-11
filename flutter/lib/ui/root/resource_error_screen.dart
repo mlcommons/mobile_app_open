@@ -77,8 +77,8 @@ class ResourceErrorScreen extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () async {
-                          final taskConfigs =
-                              await state.configManager.getConfigs();
+                          final taskConfigs = await state.configManager
+                              .getConfigs();
                           if (!context.mounted) return;
                           await Navigator.of(context).push(
                             MaterialPageRoute(
@@ -93,14 +93,16 @@ class ResourceErrorScreen extends StatelessWidget {
                         onPressed: () async {
                           try {
                             await state.setTaskConfig(
-                                name: store.chosenConfigurationName);
+                              name: store.chosenConfigurationName,
+                            );
                             state.deferredLoadResources();
                           } catch (e, trace) {
                             print("can't change task config: $e");
                             print(trace);
                             if (!context.mounted) return;
-                            await showErrorDialog(context,
-                                ['${l10n.resourceErrorFail}: ${e.toString()}']);
+                            await showErrorDialog(context, [
+                              '${l10n.resourceErrorFail}: ${e.toString()}',
+                            ]);
                           }
                         },
                         child: Text(l10n.resourceErrorRereadConfig),

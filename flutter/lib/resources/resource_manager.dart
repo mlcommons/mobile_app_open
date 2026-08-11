@@ -134,10 +134,12 @@ class ResourceManager {
         // If the files are downloaded from the internet, validate its checksum and delete corrupted files.
         final checksumFailed = await validateResourcesChecksum(resources);
         if (checksumFailed.isNotEmpty) {
-          final checksumFailedPathString =
-              checksumFailed.map((e) => '\n${e.path}').join();
-          final checksumFailedPaths =
-              checksumFailed.map((e) => e.path).toList();
+          final checksumFailedPathString = checksumFailed
+              .map((e) => '\n${e.path}')
+              .join();
+          final checksumFailedPaths = checksumFailed
+              .map((e) => e.path)
+              .toList();
           await cacheManager.deleteFiles(checksumFailedPaths);
           throw 'Checksum validation failed for: $checksumFailedPathString. \nPlease download the missing files again.';
         }
@@ -155,7 +157,8 @@ class ResourceManager {
             missingLocalResources.add(resource.path);
             continue;
           }
-          final exists = await File(resolvedPath).exists() ||
+          final exists =
+              await File(resolvedPath).exists() ||
               await Directory(resolvedPath).exists();
           if (!exists) {
             missingLocalResources.add(resource.path);
@@ -163,8 +166,9 @@ class ResourceManager {
         }
         if (missingLocalResources.isNotEmpty) {
           final dataFolder = getDataFolder();
-          final missingList =
-              missingLocalResources.map((e) => '\n - $e').join();
+          final missingList = missingLocalResources
+              .map((e) => '\n - $e')
+              .join();
           throw 'WARN: Some required files must be side-loaded.\nPlease copy the files to the application data folder and retry.\nMissing files:$missingList\nData folder:\n$dataFolder';
         }
       }
@@ -209,7 +213,8 @@ class ResourceManager {
 
   // Returns a map of { true: [existedResources], false: [missingResources] }
   Future<Map<bool, List<String>>> validateResourcesExist(
-      List<Resource> resources) async {
+    List<Resource> resources,
+  ) async {
     final missingResources = <String>[];
     final existedResources = <String>[];
     for (var r in resources) {
@@ -217,7 +222,8 @@ class ResourceManager {
       if (resolvedPath.isEmpty) {
         missingResources.add(r.path);
       } else {
-        final isResourceExist = await File(resolvedPath).exists() ||
+        final isResourceExist =
+            await File(resolvedPath).exists() ||
             await Directory(resolvedPath).exists();
         if (isResourceExist) {
           existedResources.add(r.path);
@@ -226,10 +232,7 @@ class ResourceManager {
         }
       }
     }
-    final result = {
-      false: missingResources,
-      true: existedResources,
-    };
+    final result = {false: missingResources, true: existedResources};
     return result;
   }
 
@@ -247,7 +250,8 @@ class ResourceManager {
   }
 
   Future<List<Resource>> validateResourcesChecksum(
-      List<Resource> resources) async {
+    List<Resource> resources,
+  ) async {
     final checksumFailedResources = <Resource>[];
     for (final resource in resources) {
       final md5Checksum = resource.md5Checksum;
@@ -267,7 +271,9 @@ class ResourceManager {
   }
 
   Future<List<String>> _createSymlinks(
-      List<File> files, Directory cacheDir) async {
+    List<File> files,
+    Directory cacheDir,
+  ) async {
     if (!await cacheDir.exists()) {
       await cacheDir.create(recursive: true);
     }

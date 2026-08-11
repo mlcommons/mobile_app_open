@@ -74,20 +74,32 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnSystem.so \
     ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so
 
-  backend_qti_android_target_sd=//mobile_back_qti/cpp/backend_qti/StableDiffusion:stableDiffusion
   backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so \
                                  //flutter/android/commonlibs:commonlibs
 
   ifeq ($(EXTERNAL_CONFIG),1)
-	backend_qti_flutter_docker_args = --env EXTERNAL_CONFIG=${EXTERNAL_CONFIG}
+	backend_qti_flutter_docker_args += --env EXTERNAL_CONFIG=${EXTERNAL_CONFIG}
 	backend_qti_android_target+=--//mobile_back_qti/cpp/backend_qti:external_config=${EXTERNAL_CONFIG}
   endif
 
+  ifeq ($(WITH_GENIE),1)
+	backend_qti_flutter_docker_args += --env WITH_GENIE=${WITH_GENIE}
+	backend_qti_android_target+=--//mobile_back_qti/cpp/backend_qti:with_genie=${WITH_GENIE}
+	genie_libs := \
+	  ${local_snpe_sdk_root}/lib/aarch64-android/libGenie.so \
+	  ${local_snpe_sdk_root}/lib/aarch64-android/libQnnGenAiTransformer.so \
+	  ${local_snpe_sdk_root}/lib/aarch64-android/libQnnGenAiTransformerModel.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV81CalculatorStub.so \
+	  ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpNetRunExtensions.so
+	backend_qti_android_files+=${genie_libs}
+	backend_qti_cmdline_files+=${genie_libs}
+  endif
+
   ifeq ($(WITH_STABLEDIFFUSION),1)
-	backend_qti_libs_deps = rm -f ./mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv && \
-    						ln -s /opt/opencv-3.4.7_android/sdk/native mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv
-	backend_qti_flutter_docker_args = --env WITH_STABLEDIFFUSION=${WITH_STABLEDIFFUSION}
+	backend_qti_flutter_docker_args += --env WITH_STABLEDIFFUSION=${WITH_STABLEDIFFUSION}
 	backend_qti_android_target+=--//mobile_back_qti/cpp/backend_qti:with_stablediffusion=${WITH_STABLEDIFFUSION}
+	backend_qti_libs_deps = rm -f ./mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv && \
+                            ln -s /opt/opencv-3.4.7_android/sdk/native ./mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv
 	backend_qti_cmdline_files+=mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv/libs/arm64-v8a/libopencv_core.so \
                                mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv/libs/arm64-v8a/libopencv_imgcodecs.so \
                                mobile_back_qti/cpp/backend_qti/StableDiffusionShared/include/opencv/libs/arm64-v8a/libopencv_imgproc.so \

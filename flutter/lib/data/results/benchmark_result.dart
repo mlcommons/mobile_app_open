@@ -11,9 +11,7 @@ part 'benchmark_result.g.dart';
 class Throughput implements Comparable<Throughput> {
   final double value;
 
-  const Throughput({
-    required this.value,
-  });
+  const Throughput({required this.value});
 
   factory Throughput.fromJson(Map<String, dynamic> json) =>
       _$ThroughputFromJson(json);
@@ -59,10 +57,7 @@ class Accuracy implements Comparable<Accuracy> {
   final double normalized;
   final String formatted;
 
-  const Accuracy({
-    required this.normalized,
-    required this.formatted,
-  });
+  const Accuracy({required this.normalized, required this.formatted});
 
   factory Accuracy.fromJson(Map<String, dynamic> json) =>
       _$AccuracyFromJson(json);

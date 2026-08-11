@@ -18,10 +18,7 @@ class DeviceInfo {
 
   static late final DeviceInfo instance;
 
-  DeviceInfo({
-    required this.envInfo,
-    required this.nativeLibraryPath,
-  });
+  DeviceInfo({required this.envInfo, required this.nativeLibraryPath});
 
   static bool _isInitialized = false;
 
@@ -85,8 +82,10 @@ class DeviceInfo {
 
     final modelCode = deviceInfo.model;
     String? modelName;
-    modelName =
-        deviceNames.getSingleNameFromModel(DeviceType.android, modelCode);
+    modelName = deviceNames.getSingleNameFromModel(
+      DeviceType.android,
+      modelCode,
+    );
     return EnvAndroid(
       osVersion: Platform.operatingSystemVersion,
       // deviceInfo.manufacturer is usually a human-readable string with proper capitalisation

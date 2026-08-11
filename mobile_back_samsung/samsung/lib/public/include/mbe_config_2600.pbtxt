@@ -23,7 +23,7 @@ benchmark_setting {
     }
     custom_setting {
       id: "i_type"
-      value: "Uint8"
+      value: "Int8"
     }
     custom_setting {
       id: "o_type"
@@ -38,8 +38,8 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/sm_uint8.nnc"
-    model_checksum: "43814a29b2e63719af67a30e8b5efc0c"
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/sm_uint8.nnc"
+    model_checksum: "abd4b06acd970e90321ead06a540a01f"
     }
   }
   delegate_selected: "ENN_NPU"
@@ -74,8 +74,8 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/od.nnc"
-    model_checksum: "43a7e0faa0ab1e8a86e774947792e36d"
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/od.nnc"
+    model_checksum: "f38333055d0a8d71f45f8c233f8f1cb3"
     }
   }
   delegate_selected: "ENN_NPU"
@@ -91,7 +91,7 @@ benchmark_setting {
     accelerator_desc: "NPU"
     custom_setting {
       id: "preset"
-      value: "1010"
+      value: "1009"
     }
     custom_setting {
       id: "i_type"
@@ -110,8 +110,8 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/sr.nnc"
-    model_checksum: "5ff526a6a30f781fdc4be310df43ac5e"
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/sr.nnc"
+    model_checksum: "371a8e9c97830e25f789e76a7296a47a"
     }
   }
   delegate_selected: "ENN_NPU"
@@ -146,8 +146,8 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/mobile_bert.nnc"
-    model_checksum: "5b7c8b635697c909693264034fcc5898"
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/mobile_bert.nnc"
+    model_checksum: "076e12b6cac8fced4f943c2f7ffbd654"
     }
   }
   delegate_selected: "ENN_NPU"
@@ -182,8 +182,8 @@ benchmark_setting {
       value: "true"
     }
     model_file: {
-    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/mnv4_large.nnc"
-    model_checksum: "6d86899c52a88ae24c025a327bd7e3a0"
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/mnv4_large.nnc"
+    model_checksum: "3a4507c1d95bff53c28da2c5847e6707"
     }
   }
   delegate_selected: "ENN_NPU"
@@ -223,12 +223,11 @@ benchmark_setting {
       value: "false"
     }
     model_file: {
-    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/mnv4_large_offline.nnc"
-    model_checksum: "dbef7a1c6d56e2437d89085a3a38d7bf"
+    model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/mnv4_large_offline.nnc"
+    model_checksum: "8f3e0fb8663e9385778658a0c3262581"
     }
   }
   delegate_selected: "ENN_NPU"
-  single_stream_expected_latency_ns: 1000000
 }
 
 benchmark_setting {
@@ -239,27 +238,27 @@ benchmark_setting {
     accelerator_name: "samsung_npu"
     accelerator_desc: "npu"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/sd_dec.nnc"
-      model_checksum: "0d961ff0471472b2903594f497e3064c"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/sd_dec.nnc"
+      model_checksum: "e820be61269dedb1b7f91efcf9b5c4d0"
     }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/sd_unet.nnc"
-      model_checksum: "f600698aab63398291f64f3c49d99b2e"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/sd_unet.nnc"
+      model_checksum: "19d5fa4d7c9312b6e83725e8753af3c6"
     }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/sd_enc.nnc"
-      model_checksum: "9470f2195a2b2eee0c0e90d5fd3853fe"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/sd_enc.nnc"
+      model_checksum: "73d80fb53c4db267fd5fc90d21312be7"
     }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/te.bin"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/te.bin"
       model_checksum: "798b772155a69de5df44b304327bb3cc"
     }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/gt.bin"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/gt.bin"
       model_checksum: "f41c1130809647fbccd76707b2f14305"
     }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/samsung/exynos2600/np.bin"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/samsung/exynos2600/np.bin"
       model_checksum: "c50807d72ce221cf08a2248a6ac3c48e"
     }
   }
@@ -306,3 +305,4 @@ benchmark_setting {
     value: "np.bin"
   }
 }
+

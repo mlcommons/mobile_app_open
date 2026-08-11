@@ -49,23 +49,20 @@ class HistoryListItem implements ListItem {
         ),
       ),
       trailing: SizedBox(
-          width: trailingWidth,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Flexible(
-                flex: 9,
-                fit: FlexFit.tight,
-                child: _resultList(),
-              ),
-              const Flexible(
-                flex: 1,
-                fit: FlexFit.tight,
-                child: Icon(Icons.chevron_right, color: AppColors.primary),
-              ),
-            ],
-          )),
+        width: trailingWidth,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(flex: 9, fit: FlexFit.tight, child: _resultList()),
+            const Flexible(
+              flex: 1,
+              fit: FlexFit.tight,
+              child: Icon(Icons.chevron_right, color: AppColors.primary),
+            ),
+          ],
+        ),
+      ),
       onTap: tapHandler,
     );
   }
@@ -73,8 +70,9 @@ class HistoryListItem implements ListItem {
   Widget _resultList() {
     List<Widget> children = [];
     for (String id in BenchmarkId.allIds) {
-      final benchmark =
-          item.results.firstWhereOrNull((e) => e.benchmarkId == id);
+      final benchmark = item.results.firstWhereOrNull(
+        (e) => e.benchmarkId == id,
+      );
       Color throughputTextColor = AppColors.resultValidText;
       Color accuracyTextColor = AppColors.resultValidText;
       final icon = SizedBox(
@@ -88,10 +86,7 @@ class HistoryListItem implements ListItem {
       } else {
         iconWidget = ColorFiltered(
           colorFilter: _greyscaleColorFilter,
-          child: Opacity(
-            opacity: 0.4,
-            child: icon,
-          ),
+          child: Opacity(opacity: 0.4, child: icon),
         );
         throughputTextColor = Colors.transparent;
         accuracyTextColor = Colors.transparent;
@@ -104,8 +99,8 @@ class HistoryListItem implements ListItem {
         throughputString = throughput.value.toStringAsFixed(0);
         final resultValidity =
             PerformanceResultValidityEnum.forBenchmarkExportResult(
-          benchmarkExportResult: benchmark,
-        );
+              benchmarkExportResult: benchmark,
+            );
         throughputTextColor = resultValidity.color;
       }
       if (accuracy != null) {
@@ -122,10 +117,7 @@ class HistoryListItem implements ListItem {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(
-                flex: 4,
-                child: iconWidget,
-              ),
+              Expanded(flex: 4, child: iconWidget),
               const SizedBox(height: 8),
               Expanded(
                 flex: 3,
@@ -152,10 +144,7 @@ class HistoryListItem implements ListItem {
         ),
       );
     }
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      children: children,
-    );
+    return ListView(scrollDirection: Axis.horizontal, children: children);
   }
 }
 

@@ -32,8 +32,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobilenet_v4_htp.dlc"
-      model_checksum: "4dc06ff76d00a442be24b796651a27df"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/mobilenet_v4_htp.dlc"
+      model_checksum: "9bf2200ae028dcf17041f530371c7b26"
     }
   }
   single_stream_expected_latency_ns: 500000
@@ -58,8 +58,8 @@ benchmark_setting {
     accelerator_desc: "GPU_FP16"
     batch_size: 12360
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobilenet_v4_htp_batched_4.dlc"
-      model_checksum: "07d1d4f86d09e950434bc0c790d8b00a"
+       model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/mobilenet_v4_htp_batched_4.dlc"
+      model_checksum: "c0f665a63bac7dcb2f592403894ddfed"
     }
   }
   delegate_selected: "SNPE_GPU_FP16"
@@ -94,8 +94,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobilebert_quantized_htp.dlc"
-      model_checksum: "4cfaced53aed0ea563628d626bf2570b"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/mobilebert_quantized_htp_O2.dlc"
+      model_checksum: "b9dc820ebecfc89c9793137d311082bb"
     }
   }
   delegate_selected: "SNPE_GPU_FP16"
@@ -122,8 +122,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/mobile_mosaic_htp.dlc"
-      model_checksum: "b2b2a51ae3a52d97b1eb44c00432b713"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/mobile_mosaic_htp.dlc"
+      model_checksum: "8604d60708eb21e6b1d4024b10b52d19"
     }
   }
   delegate_selected: "SNPE_GPU_FP16"
@@ -157,8 +157,8 @@ benchmark_setting {
     accelerator_name: "snpe_gpu_fp16"
     accelerator_desc: "GPU_FP16"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/qualcomm/snusr_htp.dlc"
-      model_checksum: "8ff44a39cf911b3fd04809f4967d1501"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/qualcomm/snusr_htp_O2.dlc"
+      model_checksum: "b1a0eee411beced34bdd1f3e1b7dfe28"
     }
   }
   delegate_selected: "SNPE_GPU_FP16"

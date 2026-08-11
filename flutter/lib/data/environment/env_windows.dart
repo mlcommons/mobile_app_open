@@ -7,10 +7,7 @@ class EnvWindows {
   final String osVersion;
   final String cpuFullName;
 
-  EnvWindows({
-    required this.osVersion,
-    required this.cpuFullName,
-  });
+  EnvWindows({required this.osVersion, required this.cpuFullName});
 
   factory EnvWindows.fromJson(Map<String, dynamic> json) =>
       _$EnvWindowsFromJson(json);

@@ -11,17 +11,20 @@ class ExceptionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'MLPerf Mobile',
-        home: Material(
-          type: MaterialType.transparency,
-          child: SafeArea(
-              child: Text(
+      title: 'MLPerf Mobile',
+      home: Material(
+        type: MaterialType.transparency,
+        child: SafeArea(
+          child: Text(
             'Error: $error\n\nStackTrace: $stackTrace',
             style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
-                color: AppColors.lightText),
-          )),
-        ));
+              fontSize: 16,
+              fontWeight: FontWeight.normal,
+              color: AppColors.lightText,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

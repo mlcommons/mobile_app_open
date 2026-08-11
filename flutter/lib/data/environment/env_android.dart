@@ -36,11 +36,7 @@ class EnvAndroidProp {
   final String name;
   final String value;
 
-  EnvAndroidProp({
-    required this.type,
-    required this.name,
-    required this.value,
-  });
+  EnvAndroidProp({required this.type, required this.name, required this.value});
 
   factory EnvAndroidProp.fromJson(Map<String, dynamic> json) =>
       _$EnvAndroidPropFromJson(json);

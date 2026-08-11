@@ -37,33 +37,59 @@ Future<void> validateSettings(WidgetTester tester) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
   for (var benchmark in benchmarkState.allBenchmarks) {
-    expect(benchmark.selectedDelegate.batchSize, greaterThanOrEqualTo(0),
-        reason: 'batchSize must >= 0');
+    expect(
+      benchmark.selectedDelegate.batchSize,
+      greaterThanOrEqualTo(0),
+      reason: 'batchSize must >= 0',
+    );
     for (var modelFile in benchmark.selectedDelegate.modelFile) {
-      expect(modelFile.modelPath.isNotEmpty, isTrue,
-          reason: 'modelPath cannot be empty');
-      expect(modelFile.modelChecksum.isNotEmpty, isTrue,
-          reason: 'modelChecksum cannot be empty');
+      expect(
+        modelFile.modelPath.isNotEmpty,
+        isTrue,
+        reason: 'modelPath cannot be empty',
+      );
+      expect(
+        modelFile.modelChecksum.isNotEmpty,
+        isTrue,
+        reason: 'modelChecksum cannot be empty',
+      );
     }
-    expect(benchmark.selectedDelegate.acceleratorName.isNotEmpty, isTrue,
-        reason: 'acceleratorName cannot be empty');
-    expect(benchmark.selectedDelegate.acceleratorDesc.isNotEmpty, isTrue,
-        reason: 'acceleratorDesc cannot be empty');
-    expect(benchmark.benchmarkSettings.framework.isNotEmpty, isTrue,
-        reason: 'framework cannot be empty');
-    expect(benchmark.selectedDelegate.delegateName,
-        equals(benchmark.benchmarkSettings.delegateSelected),
-        reason: 'delegateSelected must be the same as delegateName');
+    expect(
+      benchmark.selectedDelegate.acceleratorName.isNotEmpty,
+      isTrue,
+      reason: 'acceleratorName cannot be empty',
+    );
+    expect(
+      benchmark.selectedDelegate.acceleratorDesc.isNotEmpty,
+      isTrue,
+      reason: 'acceleratorDesc cannot be empty',
+    );
+    expect(
+      benchmark.benchmarkSettings.framework.isNotEmpty,
+      isTrue,
+      reason: 'framework cannot be empty',
+    );
+    expect(
+      benchmark.selectedDelegate.delegateName,
+      equals(benchmark.benchmarkSettings.delegateSelected),
+      reason: 'delegateSelected must be the same as delegateName',
+    );
 
     final selected = benchmark.benchmarkSettings.delegateSelected;
     final choices = benchmark.benchmarkSettings.delegateChoice
         .map((e) => e.delegateName)
         .toList();
-    expect(choices.isNotEmpty, isTrue,
-        reason: 'There must be at least one delegate choice');
-    expect(choices.contains(selected), isTrue,
-        reason:
-            'delegate_selected=$selected must be one of delegate_choice=$choices');
+    expect(
+      choices.isNotEmpty,
+      isTrue,
+      reason: 'There must be at least one delegate choice',
+    );
+    expect(
+      choices.contains(selected),
+      isTrue,
+      reason:
+          'delegate_selected=$selected must be one of delegate_choice=$choices',
+    );
   }
 }
 
@@ -107,9 +133,34 @@ Future<void> setBenchmarks(
 Future<void> downloadResources(WidgetTester tester) async {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
-  await benchmarkState.loadResources(
-    downloadMissing: true,
-    benchmarks: benchmarkState.activeBenchmarks,
+
+  // Resource downloads occasionally fail on CI devices with a transient
+  // network error (e.g. "HttpException: Connection closed while receiving
+  // data"). loadResources() catches such errors into resourceError instead of
+  // throwing, so without a retry the test proceeds and later fails with a
+  // misleading "Progress screen is not presented". Retry a few times, matching
+  // how a real user recovers by tapping "retry" on the resource error screen.
+  const maxAttempts = 3;
+  for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+    await benchmarkState.loadResources(
+      downloadMissing: true,
+      benchmarks: benchmarkState.activeBenchmarks,
+    );
+    if (benchmarkState.resourceError == null) {
+      return;
+    }
+    debugPrint(
+      'downloadResources attempt $attempt/$maxAttempts failed: '
+      '${benchmarkState.resourceError}',
+    );
+    if (attempt < maxAttempts) {
+      await Future.delayed(const Duration(seconds: 5));
+    }
+  }
+  expect(
+    benchmarkState.resourceError,
+    isNull,
+    reason: 'Failed to download resources after $maxAttempts attempts',
   );
 }
 
@@ -134,13 +185,22 @@ Future<void> runBenchmarks(WidgetTester tester) async {
     await tester.tap(goButton);
   }
 
-  var progressCircleIsPresented =
-      await waitFor(tester, 30, const Key(WidgetKeys.progressCircle));
-  expect(progressCircleIsPresented, true,
-      reason: 'Progress screen is not presented');
+  var progressCircleIsPresented = await waitFor(
+    tester,
+    30,
+    const Key(WidgetKeys.progressCircle),
+  );
+  expect(
+    progressCircleIsPresented,
+    true,
+    reason: 'Progress screen is not presented',
+  );
 
   var totalScoreIsPresented = await waitFor(
-      tester, runBenchmarkTimeout, const Key(WidgetKeys.totalScoreCircle));
+    tester,
+    runBenchmarkTimeout,
+    const Key(WidgetKeys.totalScoreCircle),
+  );
   expect(totalScoreIsPresented, true, reason: 'Result screen is not presented');
 }
 
@@ -161,8 +221,6 @@ String getDeviceModel(EnvironmentInfo info) {
     case EnvPlatform.windows:
       final value = info.value.windows!;
       return value.cpuFullName;
-    default:
-      throw 'unsupported platform ${info.platform}';
   }
 }
 
@@ -184,9 +242,9 @@ Future<bool> waitFor(WidgetTester tester, int timeout, Key key) async {
 
 void printResult(ExtendedResult extendedResult) {
   debugPrint('Benchmark result json:');
-  for (final line in const JsonEncoder.withIndent('  ')
-      .convert(extendedResult)
-      .split('\n')) {
+  for (final line in const JsonEncoder.withIndent(
+    '  ',
+  ).convert(extendedResult).split('\n')) {
     debugPrint(line);
   }
 }

@@ -35,10 +35,12 @@ class ResultHelper {
       throw 'One of performanceRunInfo or accuracyRunInfo must not be null';
     }
     final commonSettings = runInfo.settings.backend_settings.setting;
-    final performanceModeRunConfig =
-        performanceMode.chooseRunConfig(benchmark.taskConfig);
-    final accuracyModeRunConfig =
-        accuracyMode.chooseRunConfig(benchmark.taskConfig);
+    final performanceModeRunConfig = performanceMode.chooseRunConfig(
+      benchmark.taskConfig,
+    );
+    final accuracyModeRunConfig = accuracyMode.chooseRunConfig(
+      benchmark.taskConfig,
+    );
     assert(performanceModeRunConfig == accuracyModeRunConfig);
     return BenchmarkExportResult(
       benchmarkId: benchmark.id,
@@ -50,7 +52,8 @@ class ResultHelper {
       backendInfo: _makeBackendInfo(runInfo.result),
       backendSettings: _makeBackendSettingsInfo(benchmark, commonSettings),
       loadgenScenario: BenchmarkExportResult.parseLoadgenScenario(
-          benchmark.taskConfig.scenario),
+        benchmark.taskConfig.scenario,
+      ),
     );
   }
 
@@ -68,7 +71,8 @@ class ResultHelper {
       dataset: DatasetInfo(
         name: dataset.name,
         type: DatasetInfo.parseDatasetType(
-            benchmark.taskConfig.datasets.type.toString()),
+          benchmark.taskConfig.datasets.type.toString(),
+        ),
         dataPath: dataset.inputPath,
         groundtruthPath: dataset.groundtruthPath,
       ),
@@ -89,12 +93,16 @@ class ResultHelper {
   }
 
   BackendSettingsInfo _makeBackendSettingsInfo(
-      Benchmark benchmark, List<pb.CommonSetting> commonSettings) {
+    Benchmark benchmark,
+    List<pb.CommonSetting> commonSettings,
+  ) {
     final delegate = benchmark.selectedDelegate;
-    final extraSettings = _extraSettingsFromCommon(commonSettings) +
+    final extraSettings =
+        _extraSettingsFromCommon(commonSettings) +
         _extraSettingsFromCustom(benchmark.selectedDelegate.customSetting);
-    final modelPathsJoined =
-        delegate.modelFile.map((e) => e.modelPath).join(', ');
+    final modelPathsJoined = delegate.modelFile
+        .map((e) => e.modelPath)
+        .join(', ');
     final modelPathString = '[$modelPathsJoined]';
     return BackendSettingsInfo(
       acceleratorCode: delegate.acceleratorName,
@@ -108,28 +116,35 @@ class ResultHelper {
   }
 
   List<BackendExtraSetting> _extraSettingsFromCommon(
-      List<pb.CommonSetting> commonSettings) {
+    List<pb.CommonSetting> commonSettings,
+  ) {
     final list = <BackendExtraSetting>[];
     for (var item in commonSettings) {
-      list.add(BackendExtraSetting(
+      list.add(
+        BackendExtraSetting(
           id: item.id,
           name: item.name,
           value: item.value.value,
-          valueName: item.value.name));
+          valueName: item.value.name,
+        ),
+      );
     }
     return list;
   }
 
   List<BackendExtraSetting> _extraSettingsFromCustom(
-      List<pb.CustomSetting> settings) {
+    List<pb.CustomSetting> settings,
+  ) {
     final list = <BackendExtraSetting>[];
     for (var item in settings) {
-      list.add(BackendExtraSetting(
-        id: item.id,
-        name: '',
-        value: item.value,
-        valueName: '',
-      ));
+      list.add(
+        BackendExtraSetting(
+          id: item.id,
+          name: '',
+          value: item.value,
+          valueName: '',
+        ),
+      );
     }
     return list;
   }

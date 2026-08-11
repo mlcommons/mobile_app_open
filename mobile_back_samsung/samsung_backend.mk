@@ -24,6 +24,8 @@ ifeq (${WITH_SAMSUNG},1)
         ${BAZEL_LINKS_PREFIX}bin/mobile_back_samsung/samsung/lib/libsamsungbackend.so \
 		${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libenn_public_api_cpp.so \
 		${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libenn_extension.so \
+        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libenn_nncgraph.so \
+        ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2600_llm.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2600_core.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2500_core.so \
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libmbe2400_core.so \

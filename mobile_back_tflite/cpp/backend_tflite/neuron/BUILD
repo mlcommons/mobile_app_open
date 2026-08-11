@@ -11,6 +11,7 @@ pbtxt2header(
         "backend_settings/tflite_settings_mtk.pbtxt",
         "backend_settings/tflite_settings_mtk_mt6989.pbtxt",
         "backend_settings/tflite_settings_mtk_mt6991.pbtxt",
+        "backend_settings/tflite_settings_mtk_mt6993.pbtxt",
     ],
 )
 
@@ -33,6 +34,7 @@ cc_library(
     name = "tflite_neuron_c",
     srcs = [
         "neuron_backend.cc",
+        "neuron_memory.cc",
         "//mobile_back_tflite/cpp/backend_tflite:llm_pipeline.cc",
         "//mobile_back_tflite/cpp/backend_tflite:sd_utils.cc",
         "//mobile_back_tflite/cpp/backend_tflite:single_model_pipeline.cc",
@@ -46,6 +48,8 @@ cc_library(
         "NeuronAdapterShim.h",
         "neuron_backend.h",
         "neuron_builder.h",
+        "neuron_memory.h",
+        "neuron_utils.h",
         "tflite_settings_mtk.h",
         "//mobile_back_tflite/cpp/backend_tflite:llm_pipeline.h",
         "//mobile_back_tflite/cpp/backend_tflite:pipeline.h",

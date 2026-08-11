@@ -29,8 +29,10 @@ class TaskConfigDescription {
 class ConfigManager {
   final String applicationDirectory;
   final ResourceManager resourceManager;
-  final TaskConfigDescription defaultConfig =
-      TaskConfigDescription(_defaultConfigName, _defaultConfigUrl);
+  final TaskConfigDescription defaultConfig = TaskConfigDescription(
+    _defaultConfigName,
+    _defaultConfigUrl,
+  );
 
   String configLocation = '';
   late pb.MLPerfConfig decodedConfig;
@@ -52,8 +54,10 @@ class ConfigManager {
     }
     String configContent;
     if (isInternetResource(config.path)) {
-      configLocation = await resourceManager.cacheManager.fileCacheHelper
-          .get(config.path, true);
+      configLocation = await resourceManager.cacheManager.fileCacheHelper.get(
+        config.path,
+        true,
+      );
       configContent = await File(configLocation).readAsString();
     } else if (isAsset(config.path)) {
       configLocation = config.path;
@@ -69,8 +73,11 @@ class ConfigManager {
 
     final nonRemovableResources = <String>[];
     if (isInternetResource(config.path)) {
-      nonRemovableResources.add(resourceManager.cacheManager.fileCacheHelper
-          .getResourceRelativePath(config.path));
+      nonRemovableResources.add(
+        resourceManager.cacheManager.fileCacheHelper.getResourceRelativePath(
+          config.path,
+        ),
+      );
     }
 
     decodedConfig = getMLPerfConfig(configContent);
