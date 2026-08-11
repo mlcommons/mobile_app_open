@@ -161,6 +161,16 @@ class BenchmarkSet {
     return availableOptions().length;
   }
 
+  Map<String, bool> optionStateMap() => {
+    for (BenchmarkOption item in availableOptions()) item.id: item.enabled,
+  };
+
+  void applyOptionStateMap(Map<String, bool> inputMap) {
+    for (final entry in inputMap.entries) {
+      optionSets[optionMap[entry.key]!].setOptionTo(entry.key, entry.value);
+    }
+  }
+
   void applyOptions() {
     for (Benchmark benchmark in benchmarks) {
       benchmark.isActive = true;
@@ -268,6 +278,7 @@ class BenchmarkStore {
     required pb.MLPerfConfig appConfig,
     required List<pb.BenchmarkSetting> backendConfig,
     required Map<String, bool> taskSelection,
+    required Map<String, Map<String, bool>> taskSetSelection,
   }) {
     // sort the order of task based on BenchmarkId.allIds
     final List<pb.TaskConfig> sortedTasks = List.from(appConfig.task)
@@ -297,6 +308,13 @@ class BenchmarkStore {
       benchmarkSets.add(
         BenchmarkSet(config: setConfig, allBenchmarks: allBenchmarks),
       );
+    }
+
+    for (final item in benchmarkSets) {
+      final setMap = taskSetSelection[item.config.id];
+      if (setMap != null) {
+        item.applyOptionStateMap(setMap);
+      }
     }
   }
 
@@ -343,6 +361,14 @@ class BenchmarkStore {
     Map<String, bool> result = {};
     for (var item in allBenchmarks) {
       result[item.id] = item.isActive;
+    }
+    return result;
+  }
+
+  Map<String, Map<String, bool>> get setSelection {
+    Map<String, Map<String, bool>> result = {};
+    for (var item in benchmarkSets) {
+      result[item.config.id] = item.optionStateMap();
     }
     return result;
   }

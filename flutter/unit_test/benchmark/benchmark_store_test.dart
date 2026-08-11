@@ -37,6 +37,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backendConfig: [backendSettings1],
         taskSelection: {},
+        taskSetSelection: {},
       );
 
       expect(store.allBenchmarks.length, 1);
@@ -55,6 +56,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task2, task1]),
         backendConfig: [backendSettings1, backendSettings2],
         taskSelection: {},
+        taskSetSelection: {},
       );
 
       expect(store.allBenchmarks.length, 2);
@@ -71,6 +73,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backendConfig: [backendSettings1, backendSettings2],
         taskSelection: {task1.id: true, task2.id: false},
+        taskSetSelection: {},
       );
 
       expect(store.allBenchmarks.length, 2);
@@ -83,6 +86,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
         taskSelection: {task1.id: false},
+        taskSetSelection: {},
       );
 
       final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
@@ -98,6 +102,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
         taskSelection: {},
+        taskSetSelection: {},
       );
 
       final modes = [BenchmarkRunModeEnum.accuracyOnly.accuracyRunMode];
@@ -144,6 +149,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
         taskSelection: {},
+        taskSetSelection: {},
       );
 
       final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
@@ -181,6 +187,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backendConfig: [backendSettings1],
         taskSelection: {},
+        taskSetSelection: {},
       );
 
       final modes = [
