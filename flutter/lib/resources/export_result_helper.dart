@@ -1,5 +1,3 @@
-import 'package:mlperfbench/backend/bridge/run_result.dart';
-import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/run_info.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
@@ -12,7 +10,6 @@ import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 
 class ResultHelper {
   final Benchmark benchmark;
-  final BackendInfo backendInfo;
   RunInfo? performanceRunInfo;
   RunInfo? accuracyRunInfo;
   BenchmarkRunMode performanceMode;
@@ -20,7 +17,6 @@ class ResultHelper {
 
   ResultHelper({
     required this.benchmark,
-    required this.backendInfo,
     required this.performanceMode,
     required this.accuracyMode,
   });
@@ -49,7 +45,7 @@ class ResultHelper {
       accuracyRun: _makeRunResult(accuracyRunInfo, accuracyMode),
       minDuration: performanceModeRunConfig.minDuration,
       minSamples: performanceModeRunConfig.minQueryCount,
-      backendInfo: _makeBackendInfo(runInfo.result),
+      backendInfo: _makeBackendInfo(runInfo),
       backendSettings: _makeBackendSettingsInfo(benchmark, commonSettings),
       loadgenScenario: BenchmarkExportResult.parseLoadgenScenario(
         benchmark.taskConfig.scenario,
@@ -83,9 +79,12 @@ class ResultHelper {
     );
   }
 
-  BackendReportedInfo _makeBackendInfo(NativeRunResult result) {
+  BackendReportedInfo _makeBackendInfo(RunInfo runInfo) {
+    // The filename comes from the run's own settings snapshot, so the export
+    // records the backend that actually ran even if the selection changed.
+    final result = runInfo.result;
     return BackendReportedInfo(
-      filename: backendInfo.libName,
+      filename: runInfo.settings.backend_lib_name,
       backendName: result.backendName,
       vendorName: result.backendVendor,
       acceleratorName: result.acceleratorName,

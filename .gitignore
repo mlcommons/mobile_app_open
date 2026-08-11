@@ -27,3 +27,6 @@ __pycache__/
 *.g.dart
 *.gen.dart
 *.gen.h
+
+# Local AI-workflow docs
+docs/superpowers/

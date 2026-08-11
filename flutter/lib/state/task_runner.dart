@@ -8,7 +8,6 @@ import 'package:worker_manager/worker_manager.dart';
 import 'package:mlperfbench/backend/bridge/isolate.dart';
 import 'package:mlperfbench/backend/bridge/run_result.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
-import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/info.dart';
@@ -19,7 +18,6 @@ import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/meta_info.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/device_info.dart';
-import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/resources/export_result_helper.dart';
 import 'package:mlperfbench/resources/resource_manager.dart';
 import 'package:mlperfbench/store.dart';
@@ -45,7 +43,6 @@ class TaskRunner {
   final void Function() notifyListeners;
   final ResourceManager resourceManager;
   final BridgeIsolate backendBridge;
-  final BackendInfo backendInfo;
 
   late ProgressInfo progressInfo;
   bool aborting = false;
@@ -56,7 +53,6 @@ class TaskRunner {
     required this.notifyListeners,
     required this.resourceManager,
     required this.backendBridge,
-    required this.backendInfo,
   });
 
   BenchmarkRunMode get perfMode =>
@@ -89,7 +85,6 @@ class TaskRunner {
       progressInfo.activeBenchmarks.add(benchmark.info);
       final resultHelper = ResultHelper(
         benchmark: benchmark,
-        backendInfo: backendInfo,
         performanceMode: perfMode,
         accuracyMode: accuracyMode,
       );
@@ -205,11 +200,7 @@ class TaskRunner {
         runMode: perfMode,
         logParentDir: currentLogDir,
       );
-      await runHelper.initRunSettings(
-        resourceManager: resourceManager,
-        commonSettings: backendInfo.settings.commonSetting,
-        backendLibName: backendInfo.libName,
-      );
+      await runHelper.initRunSettings(resourceManager: resourceManager);
       final performanceRunInfo = await runHelper.run();
       perfTimer.stop();
       //performanceRunInfo.loadgenInfo!;
@@ -243,11 +234,7 @@ class TaskRunner {
         runMode: accuracyMode,
         logParentDir: currentLogDir,
       );
-      await runHelper.initRunSettings(
-        resourceManager: resourceManager,
-        commonSettings: backendInfo.settings.commonSetting,
-        backendLibName: backendInfo.libName,
-      );
+      await runHelper.initRunSettings(resourceManager: resourceManager);
       final accuracyRunInfo = await runHelper.run();
       resultHelper.accuracyRunInfo = accuracyRunInfo;
       final accuracyResult = accuracyRunInfo.result;
@@ -291,14 +278,10 @@ class _NativeRunHelper {
 
   Future<void> initRunSettings({
     required ResourceManager resourceManager,
-    required List<pb.CommonSetting> commonSettings,
-    required String backendLibName,
   }) async {
     runSettings = await benchmark.createRunSettings(
       runMode: runMode,
       resourceManager: resourceManager,
-      commonSettings: commonSettings,
-      backendLibName: backendLibName,
       logDir: logDir,
     );
   }
