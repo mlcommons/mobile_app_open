@@ -1,11 +1,13 @@
 #include "flutter/cpp/utils.h"
 
+#include <sstream>
+
 #if defined(_WIN64) || defined(_WIN32)
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else
-#include "tensorflow/lite/tools/evaluation/utils.h"
+#include "tflite/tools/evaluation/utils.h"
 #endif
 
 namespace mlperf {

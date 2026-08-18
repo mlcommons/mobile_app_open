@@ -17,7 +17,7 @@ limitations under the License.
 
 #include "cpp/c/backend_c.h"
 #include "cpp/c/type.h"
-#include "tensorflow/lite/shared_library.h"
+#include "tflite/shared_library.h"
 
 void *GetSymbol(void *handle, const char *name) {
   void *result;

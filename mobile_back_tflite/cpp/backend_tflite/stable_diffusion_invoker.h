@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "stable_diffusion_pipeline.h"
-#include "tensorflow/lite/interpreter.h"
-#include "tensorflow/lite/model_builder.h"
+#include "tflite/interpreter.h"
+#include "tflite/model_builder.h"
 
 class StableDiffusionInvoker {
  public:

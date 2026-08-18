@@ -38,12 +38,12 @@ limitations under the License.
 #include "SNPE/SNPEBuilder.h"
 #include "SNPE/SNPEUtil.h"
 #include "SNPE/UserBufferList.h"
+#include "absl/log/log.h"
 #include "absl/strings/ascii.h"
 #include "allocator.h"
 #include "cpuctrl.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
-#include "tensorflow/core/platform/logging.h"
 
 enum class snpe_runtimes_ {
   SNPE_DSP = 0,

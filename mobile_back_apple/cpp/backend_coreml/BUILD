@@ -16,7 +16,7 @@
 # we borrow tflite_jni_binary even for non-tflite one
 load("@build_bazel_rules_apple//apple:apple.bzl", "apple_xcframework")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
+load("@litert//tflite:build_def.bzl", "tflite_jni_binary")
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
 
 package(

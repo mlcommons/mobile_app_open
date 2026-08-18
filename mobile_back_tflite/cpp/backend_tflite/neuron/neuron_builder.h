@@ -49,9 +49,9 @@
 
 #include "NeuronAdapter.h"
 #include "NeuronAdapterShim.h"
+#include "absl/log/log.h"
 #include "neuron_backend.h"
 #include "neuron_utils.h"
-#include "tensorflow/core/platform/logging.h"
 
 constexpr uint8_t kNotToFlushCacheHint = 3;
 

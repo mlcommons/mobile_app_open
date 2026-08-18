@@ -7,11 +7,11 @@ Date:   Thu Jun 29 16:19:21 2023 +0800
     use unsigned char instead of char to avoid causing problems
     on iOS and others
 
-diff --git a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
+diff --git a/tflite/tools/evaluation/stages/image_preprocessing_stage.cc b/tflite/evaluation/stages/image_preprocessing_stage.cc
 index 47b5ed09a20..224cc5da6c2 100644
---- a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
-+++ b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
-@@ -118,8 +118,8 @@ inline void LoadImagePng(std::string* filename, ImageData* image_data) {
+--- a/tflite/tools/evaluation/stages/image_preprocessing_stage.cc
++++ b/tflite/tools/evaluation/stages/image_preprocessing_stage.cc
+@@ -122,8 +122,8 @@ inline void LoadImagePng(std::string* filename, ImageData* image_data) {
    tensorflow::png::DecodeContext context;
    // 0: channels is detected from the input
    CHECK(CommonInitDecode(image_str, 0, 8 /*uint8*/, &context));

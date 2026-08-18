@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "qtiBackendHelper.h"
 
-#include "tensorflow/core/platform/logging.h"
+#include "absl/log/log.h"
 
 void qtiBackendHelper::setBackend() {
   switch (backend_type_) {

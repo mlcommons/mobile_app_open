@@ -20,9 +20,9 @@ limitations under the License.
 #include <map>
 #include <memory>
 
+#include "absl/log/log.h"
 #include "rpcmem.h"
 #include "soc_utility.h"
-#include "tensorflow/core/platform/logging.h"
 
 // This allocator assumes all allocations and frees are done in order
 class ChunkAllocator {

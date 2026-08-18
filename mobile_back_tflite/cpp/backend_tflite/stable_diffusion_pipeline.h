@@ -17,8 +17,8 @@ limitations under the License.
 
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"
-#include "tensorflow/core/platform/logging.h"
-#include "tensorflow/lite/c/c_api.h"
+#include "absl/log/log.h"
+#include "tflite/c/c_api.h"
 #include "thread_pool.h"
 
 struct SDBackendData {

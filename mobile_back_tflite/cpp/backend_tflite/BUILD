@@ -13,11 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 load(
-    "@org_tensorflow//tensorflow/lite:build_def.bzl",
+    "@litert//tflite:build_def.bzl",
     "tflite_copts",
     "tflite_jni_binary",
 )
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
+load("@litert//litert/build_common:special_rule.bzl", "litert_gpu_accelerator_prebuilts")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -80,28 +81,43 @@ cc_library(
             "-fno-omit-frame-pointer",
         ],
         "//conditions:default": [],
-    }),
+        # fpermissive required due to bug in LiteRT (as of version 2.1.2)
+    }) + ["-UTFLITE_USE_OPAQUE_DELEGATE", "-fpermissive"],
     deps = [
         ":embedding_utils",
         ":tflite_settings",
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-        "@org_tensorflow//tensorflow/lite:framework",
-        "@org_tensorflow//tensorflow/lite:util",
-        "@org_tensorflow//tensorflow/lite/c:c_api",
-        "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
-        "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/lite/experimental/genai:genai_ops",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
-    ] + select({
+        "@litert//tflite:framework",
+        "@litert//tflite:util",
+        "@litert//tflite/c:c_api",
+        "@litert//tflite/c:c_api_experimental",
+        "@litert//tflite/c:common",
+        "@litert//litert/cc:litert_compiled_model",
+        "@litert//litert/cc:litert_environment",
+        "@litert//litert/cc:litert_tensor_buffer",
+        # For GPU acc symbol
+        "@litert//litert/c:litert_environment",
+        "@litert//litert/c:litert_environment_options",
+        "@litert//litert/c:litert_event",
+        "@litert//litert/c:litert_tensor_buffer",
+        "@litert//litert/c:litert_opaque_options",
+        "@litert//litert/c/options:litert_gpu_options",
+        "@litert//litert/c/internal:litert_accelerator_registration",
+        "@litert//litert/c/internal:litert_tensor_buffer_registry",
+        "@litert//litert/c/internal:litert_external_litert_buffer_context",
+        #"@litert//litert/c/internal:litert_delegate_wrapper",
+
+    ]
+    + select({
         "@org_tensorflow//tensorflow:android": [
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
-            "@org_tensorflow//tensorflow/lite/delegates/xnnpack:xnnpack_delegate",
+            "@litert//tflite/delegates/gpu:delegate",
+            "@litert//tflite/delegates/xnnpack:xnnpack_delegate",
         ],
         "@org_tensorflow//tensorflow:ios": [
-            "@org_tensorflow//tensorflow/lite/delegates/coreml:coreml_delegate",
-            "@org_tensorflow//tensorflow/lite/delegates/gpu:metal_delegate",
+            "@litert//tflite/delegates/coreml:coreml_delegate",
+            "@litert//tflite/delegates/gpu:metal_delegate",
         ],
         "//conditions:default": [],
     }),
@@ -115,6 +131,9 @@ tflite_jni_binary(
     linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [
         ":tflite_c",
+    ],
+    linkopts = [
+        "-Wl,--export-dynamic",
     ],
 )
 

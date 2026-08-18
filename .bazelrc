@@ -7,12 +7,20 @@ build --config=short_logs
 build --verbose_failures
 build --spawn_strategy=standalone
 
+
+# needed to solve a bug in LiteRT 2.1.2
+build --per_file_copt=external/litert/.*@-fpermissive
+build --per_file_copt=mobile_back_tflite/cpp/backend_tflite/llm_pipeline.cc@-fpermissive
+
 # This flag is required by tensorflow
 common --experimental_repo_remote_exec
 
 # Without these, tensorflow complains about lack of CUDA library.
 common --repo_env=TF_NEED_CUDA=0
 common --repo_env=TF_NEED_ROCM=0
+
+common --noenable_bzlmod
+common --repo_env=HERMETIC_PYTHON_VERSION=3.10
 
 # Default options should come above this line.
 
@@ -41,12 +49,15 @@ build:windows --host_cxxopt=/std:c++17
 # Android configs
 build:android --crosstool_top=//external:android/crosstool
 build:android --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+build:android --incompatible_enable_cc_toolchain_resolution=false
 build:android_arm64 --config=android
 build:android_arm64 --cpu=arm64-v8a
 build:android_arm64 --fat_apk_cpu=arm64-v8a
+build:android_arm64 --platforms=@org_tensorflow//tensorflow/tools/toolchains/android:arm64-v8a
 build:android_x86_64 --config=android
 build:android_x86_64 --cpu=x86_64
 build:android_x86_64 --fat_apk_cpu=x86_64
+build:android_x86_64 --platforms=@org_tensorflow//tensorflow/tools/toolchains/android:x86_64
 
 
 build:android_x86_64 --define=xnn_enable_avx512fp16=false

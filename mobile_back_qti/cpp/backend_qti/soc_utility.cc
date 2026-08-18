@@ -23,8 +23,8 @@ limitations under the License.
 #include <string>
 #include <thread>
 
+#include "absl/log/log.h"
 #include "backend_utils.h"
-#include "tensorflow/core/platform/logging.h"
 #ifndef __ANDROID__
 #include <Windows.h>
 

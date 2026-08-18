@@ -21,10 +21,10 @@ limitations under the License.
 #endif
 
 #include "resize_argmax_op.h"
-#include "tensorflow/lite/core/api/profiler.h"
-#include "tensorflow/lite/kernels/cpu_backend_context.h"
-#include "tensorflow/lite/kernels/cpu_backend_threadpool.h"
-#include "tensorflow/lite/kernels/kernel_util.h"
+#include "tflite/core/api/profiler.h"
+#include "tflite/kernels/cpu_backend_context.h"
+#include "tflite/kernels/cpu_backend_threadpool.h"
+#include "tflite/kernels/kernel_util.h"
 
 constexpr int kInputTensor = 0;
 constexpr int kSizeTensor = 1;

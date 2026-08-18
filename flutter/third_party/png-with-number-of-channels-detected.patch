@@ -7,11 +7,11 @@ Subject: [PATCH] detect number of channels instead of forcing 3 (RGB)
  .../evaluation/stages/image_preprocessing_stage.cc  | 13 ++++++++-----
  1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
+diff --git a/tflite/tools/evaluation/stages/image_preprocessing_stage.cc b/tflite/tools/evaluation/stages/image_preprocessing_stage.cc
 index a9750141b3d..47b5ed09a20 100644
---- a/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
-+++ b/tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.cc
-@@ -116,16 +116,19 @@ inline void LoadImagePng(std::string* filename, ImageData* image_data) {
+--- a/tflite/tools/evaluation/stages/image_preprocessing_stage.cc
++++ b/tflite/tools/evaluation/stages/image_preprocessing_stage.cc
+@@ -120,16 +120,19 @@ inline void LoadImagePng(std::string* filename, ImageData* image_data) {
                          std::istreambuf_iterator<char>());
 
    tensorflow::png::DecodeContext context;
