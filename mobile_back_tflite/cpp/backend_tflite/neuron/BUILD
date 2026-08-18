@@ -28,6 +28,14 @@ cc_library(
             "@neuron_delegate//neuron:neuron_delegate.h",
         ],
     }),
+    deps = select({
+        # neuron_delegate.h includes tensorflow/lite/c/common.h. The MediaTek
+        # delegate is built against TensorFlow's TF Lite C API, not LiteRT's,
+        # so that header still has to come from @org_tensorflow.
+        "@org_tensorflow//tensorflow:android": [
+            "@org_tensorflow//tensorflow/lite/c:common",
+        ],
+    }),
 )
 
 cc_library(
