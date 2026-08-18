@@ -13,7 +13,7 @@ diff --git a/third_party/xla/third_party/eigen3/eigen_ios.patch b/third_party/xl
 new file mode 100644
 index 00000000000..6c94319de42
 --- /dev/null
-+++ b/third_party/eigen3/eigen_ios.patch
++++ b/third_party/xla/third_party/eigen3/eigen_ios.patch
 @@ -0,0 +1,12 @@
 +--- a/Eigen/src/Core/util/Macros.h
 ++++ b/Eigen/src/Core/util/Macros.h
