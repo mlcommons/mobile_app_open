@@ -25,6 +25,39 @@ http_archive(
 # Declaring rules_python 0.25.0 here would win over XLA's version and break
 # hermetic Python initialization (missing python_version_kind attribute).
 
+# Apple rules, declared before the TensorFlow workspace macros so these win.
+# TensorFlow pins rules_apple 3.5.1, whose py_binary tooling predates the
+# rules_python that XLA now brings in: rules_apple's plisttool is generated
+# from a bootstrap template containing %interpreter_args%, which the older
+# rules leave unsubstituted, so it fails to parse as Python. These are the
+# same versions LiteRT 2.1.5 pins for this dependency set.
+http_archive(
+    name = "build_bazel_rules_apple",
+    sha256 = "a78f26c22ac8d6e3f3fcaad50eace4d9c767688bd7254b75bdf4a6735b299f6a",
+    url = "https://github.com/bazelbuild/rules_apple/releases/download/3.22.0/rules_apple.3.22.0.tar.gz",
+)
+
+http_archive(
+    name = "build_bazel_rules_swift",
+    sha256 = "f7a67197cd8a79debfe70b8cef4dc19d03039af02cc561e31e0718e98cad83ac",
+    url = "https://github.com/bazelbuild/rules_swift/releases/download/2.9.0/rules_swift.2.9.0.tar.gz",
+)
+
+# 1.23.1 rather than the 1.24.5 TensorFlow uses: the highest version without
+# missing LC_UUID / DEVELOPER_DIR / SDKROOT issues on macOS Tahoe.
+http_archive(
+    name = "build_bazel_apple_support",
+    sha256 = "ee20cc5c0bab47065473c8033d462374dd38d172406ecc8de5c8f08487943f2f",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/1.23.1/apple_support.1.23.1.tar.gz",
+)
+
+http_archive(
+    name = "bazel_features",
+    sha256 = "c26b4e69cf02fea24511a108d158188b9d8174426311aac59ce803a78d107648",
+    strip_prefix = "bazel_features-1.43.0",
+    url = "https://github.com/bazel-contrib/bazel_features/releases/download/v1.43.0/bazel_features-v1.43.0.tar.gz",
+)
+
 load("//:platform.bzl", "tf_patch_finder")
 
 tf_patch_finder(
