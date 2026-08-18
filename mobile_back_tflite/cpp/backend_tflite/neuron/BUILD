@@ -73,7 +73,14 @@ cc_library(
             "-fno-omit-frame-pointer",
         ],
         "//conditions:default": [],
-    }),
+        # fpermissive required due to bug in LiteRT (as of version 2.1.2)
+    }) + [
+        # Same as //mobile_back_tflite/cpp/backend_tflite:tflite_c: this target
+        # shares its sources, which call TfLiteInterpreterOptionsAddDelegate
+        # with a TfLiteDelegate rather than the opaque type.
+        "-UTFLITE_USE_OPAQUE_DELEGATE",
+        "-fpermissive",
+    ],
     local_defines = ["MTK_TFLITE_NEURON_BACKEND"],
     deps = [
         ":tflite_settings",

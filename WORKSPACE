@@ -139,6 +139,8 @@ http_archive(
         "//:patches/litert-internal-visibility.diff",
         # Fix for LiteRT crashing on close when using OpenCL accelerator
         "//:patches/custom_buffer_teardown.patch",
+        # CoreML delegate calls RepeatedField::resize, which does not exist
+        "//:patches/litert_coreml_repeatedfield_resize.patch",
     ],
     sha256 = "7d0313c4851deb18af6f5f2dbc002bf01293583b87b819b0949ee33dcfe2d91b",
     strip_prefix = "LiteRT-2.1.5",
