@@ -23,6 +23,12 @@ limitations under the License.
 #include "soc_utility.h"
 
 #ifdef STABLEDIFFUSION_FLAG
+// QnnApiHelpers.hpp uses float32_t without including the NEON header that
+// defines it. TensorFlow's headers used to pull arm_neon.h in transitively;
+// LiteRT's do not, so include it explicitly.
+#if defined(__ARM_NEON) || defined(__ARM_NEON__)
+#include <arm_neon.h>
+#endif
 #include "StableDiffusionShared/include/QnnApiHelpers.hpp"
 #endif
 
