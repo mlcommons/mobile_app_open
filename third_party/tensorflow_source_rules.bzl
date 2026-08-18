@@ -20,7 +20,9 @@ def _apply_patches(ctx):
         result = ctx.execute(cmd)
         if result.return_code != 0:
             fail("Failed to apply patch {}: {}\n{}".format(
-                patch_label, result.stdout, result.stderr,
+                patch_label,
+                result.stdout,
+                result.stderr,
             ))
 
 def _apply_patch_cmds(ctx):
@@ -30,7 +32,9 @@ def _apply_patch_cmds(ctx):
         result = ctx.execute(["bash", "-c", cmd])
         if result.return_code != 0:
             fail("patch_cmd failed: {}\nstdout: {}\nstderr: {}".format(
-                cmd, result.stdout, result.stderr,
+                cmd,
+                result.stdout,
+                result.stderr,
             ))
 
 def _apply_patch_scripts(ctx):
@@ -42,9 +46,12 @@ def _apply_patch_scripts(ctx):
         result = ctx.execute(["python3", str(script_path)])
         if result.return_code != 0:
             fail("patch_script failed: {}\nstdout: {}\nstderr: {}".format(
-                script_label, result.stdout, result.stderr,
+                script_label,
+                result.stdout,
+                result.stderr,
             ))
         if result.stdout:
+            # buildifier: disable=print
             print(result.stdout)
 
 def _tensorflow_source_repo_impl(ctx):

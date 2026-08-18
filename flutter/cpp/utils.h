@@ -20,10 +20,10 @@ limitations under the License.
 #include <string>
 #include <vector>
 
+#include "absl/log/log.h"
 #include "flutter/cpp/c/type.h"
 #include "flutter/cpp/proto/backend_setting.pb.h"
 #include "loadgen/test_settings.h"
-#include "absl/log/log.h"
 
 namespace mlperf {
 namespace mobile {

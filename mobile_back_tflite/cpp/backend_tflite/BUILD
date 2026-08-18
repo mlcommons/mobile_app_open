@@ -18,7 +18,6 @@ load(
     "tflite_jni_binary",
 )
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
-load("@litert//litert/build_common:special_rule.bzl", "litert_gpu_accelerator_prebuilts")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -82,7 +81,10 @@ cc_library(
         ],
         "//conditions:default": [],
         # fpermissive required due to bug in LiteRT (as of version 2.1.2)
-    }) + ["-UTFLITE_USE_OPAQUE_DELEGATE", "-fpermissive"],
+    }) + [
+        "-UTFLITE_USE_OPAQUE_DELEGATE",
+        "-fpermissive",
+    ],
     deps = [
         ":embedding_utils",
         ":tflite_settings",
@@ -108,9 +110,7 @@ cc_library(
         "@litert//litert/c/internal:litert_tensor_buffer_registry",
         "@litert//litert/c/internal:litert_external_litert_buffer_context",
         #"@litert//litert/c/internal:litert_delegate_wrapper",
-
-    ]
-    + select({
+    ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@litert//tflite/delegates/gpu:delegate",
             "@litert//tflite/delegates/xnnpack:xnnpack_delegate",
@@ -128,12 +128,12 @@ tflite_jni_binary(
     name = "libtflitebackend.so",
     # macOS uses exported_symbols, while Windows uses linkscript
     exported_symbols = "//flutter/cpp/c:exported_symbols.lds",
+    linkopts = [
+        "-Wl,--export-dynamic",
+    ],
     linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [
         ":tflite_c",
-    ],
-    linkopts = [
-        "-Wl,--export-dynamic",
     ],
 )
 

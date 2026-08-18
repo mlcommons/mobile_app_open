@@ -12,7 +12,6 @@ http_archive(
     ],
 )
 
-
 http_archive(
     name = "rules_platform",
     sha256 = "0aadd1bd350091aa1f9b6f2fbcac8cd98201476289454e475b28801ecf85d3fd",
@@ -89,7 +88,7 @@ http_archive(
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:patches/litert-internal-visibility.diff",
         # Fix for LiteRT crashing on close when using OpenCL accelerator
-        "//:patches/custom_buffer_teardown.patch"
+        "//:patches/custom_buffer_teardown.patch",
     ],
     sha256 = "7d0313c4851deb18af6f5f2dbc002bf01293583b87b819b0949ee33dcfe2d91b",
     strip_prefix = "LiteRT-2.1.5",
@@ -103,13 +102,13 @@ load("//third_party:tensorflow_source_rules.bzl", "tensorflow_source_repo")
 tensorflow_source_repo(
     name = "org_tensorflow",
     patch_args = ["-p1"],
-    patches = [
-        "//:flutter/third_party/tf-eigen.patch",
-    ] + PATCH_FILE,
     patch_cmds = [],
     patch_scripts = [
         "//third_party:fix_tensorflow.py",
     ],
+    patches = [
+        "//:flutter/third_party/tf-eigen.patch",
+    ] + PATCH_FILE,
     sha256 = "879cf25692d50c60315a4dd3929dccd923d4c44a2c4b95ebb483666d2c16a22a",
     strip_prefix = "tensorflow-6d40c20cdfe385746c31da6227b95722f5ece342",
     urls = [
@@ -154,6 +153,7 @@ http_archive(
 load("//third_party:local_config_python_stub.bzl", "local_config_python_stub")
 
 local_config_python_stub(name = "local_config_python")
+
 local_config_python_stub(name = "local_execution_config_python")
 
 # Initialize tensorflow workspace.
@@ -168,10 +168,6 @@ load("@xla//third_party/py:python_init_rules.bzl", "python_init_rules")
 
 python_init_rules()
 
-load("@xla//third_party/py:python_init_rules.bzl", "python_init_rules")
-
-python_init_rules()
-
 # Force hermetic Python 3.10 download via rules_python.
 # python_init_toolchains() alone isn't registering python_3_10_host
 # in INTERPRETER_LABELS (Kind: "" fallback). This explicit call downloads
@@ -180,8 +176,8 @@ load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 
 python_register_toolchains(
     name = "python_3_10",
-    python_version = "3.10",
     ignore_root_user_error = True,
+    python_version = "3.10",
 )
 
 load("@xla//third_party/py:python_init_repositories.bzl", "python_init_repositories")

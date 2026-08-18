@@ -25,8 +25,8 @@ limitations under the License.
 #include <thread>
 #include <vector>
 
-#include "soc_utility.h"
 #include "absl/log/log.h"
+#include "soc_utility.h"
 
 using namespace std::chrono;
 

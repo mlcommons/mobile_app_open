@@ -51,8 +51,7 @@ static constexpr float kMaskedValue = -0.7f * 65504.0f;
 static std::unordered_map<std::string, size_t> make_index_map(
     const std::vector<std::string_view>& names) {
   std::unordered_map<std::string, size_t> map;
-  for (size_t i = 0; i < names.size(); ++i)
-    map[std::string(names[i])] = i;
+  for (size_t i = 0; i < names.size(); ++i) map[std::string(names[i])] = i;
   return map;
 }
 

@@ -83,9 +83,9 @@ cc_library(
     deps = [
         "//flutter/cpp/c:headers",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
+        "@litert//tflite/tools/evaluation:utils",
         "@org_mlperf_inference//:loadgen",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-        "@litert//tflite/tools/evaluation:utils",
     ],
 )
 

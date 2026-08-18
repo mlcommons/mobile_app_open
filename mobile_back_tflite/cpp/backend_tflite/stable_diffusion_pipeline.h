@@ -15,9 +15,9 @@ limitations under the License.
 
 #include <vector>
 
+#include "absl/log/log.h"
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"
-#include "absl/log/log.h"
 #include "tflite/c/c_api.h"
 #include "thread_pool.h"
 
