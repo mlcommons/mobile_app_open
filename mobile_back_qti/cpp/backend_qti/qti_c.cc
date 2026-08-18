@@ -14,6 +14,7 @@ limitations under the License.
 ==============================================================================*/
 
 #include <fstream>
+#include <sstream>
 #include <unordered_map>
 
 #include "Executor.h"

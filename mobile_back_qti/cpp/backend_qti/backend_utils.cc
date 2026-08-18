@@ -15,6 +15,8 @@ limitations under the License.
 
 #include "backend_utils.h"
 
+#include <sstream>
+
 #include "soc_utility.h"
 
 // TODO: Remove these global variables
