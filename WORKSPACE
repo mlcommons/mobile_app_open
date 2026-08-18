@@ -58,6 +58,23 @@ http_archive(
     url = "https://github.com/bazel-contrib/bazel_features/releases/download/v1.43.0/bazel_features-v1.43.0.tar.gz",
 )
 
+# Same coremltools TensorFlow uses, but with LiteRT's patch_cmds. The .proto
+# files import each other by bare filename while protoc is invoked with
+# -Iexternal/coremltools, so the imports do not resolve and mlmodel_proto
+# fails to generate. Rewriting the imports to be repo-relative fixes it.
+# third_party/coremltools.BUILD is byte-identical to TensorFlow's.
+http_archive(
+    name = "coremltools",
+    build_file = "@//third_party:coremltools.BUILD",
+    patch_cmds = [
+        # Append "mlmodel/format/" to the import path of all proto files.
+        "sed -i -e 's|import public \"|import public \"mlmodel/format/|g' mlmodel/format/*.proto",
+    ],
+    sha256 = "37d4d141718c70102f763363a8b018191882a179f4ce5291168d066a84d01c9d",
+    strip_prefix = "coremltools-8.0",
+    url = "https://github.com/apple/coremltools/archive/8.0.tar.gz",
+)
+
 load("//:platform.bzl", "tf_patch_finder")
 
 tf_patch_finder(

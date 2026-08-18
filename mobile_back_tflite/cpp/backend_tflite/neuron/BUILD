@@ -86,6 +86,21 @@ cc_library(
         "@litert//tflite/c:common",
         "@litert//tflite/experimental/genai:genai_ops",
         "@litert//tflite/kernels:builtin_ops",
+        # This target compiles tflite_c.cc and llm_pipeline.cc, which use the
+        # LiteRT compiled-model API, so it needs the same deps as
+        # //mobile_back_tflite/cpp/backend_tflite:tflite_c.
+        "@litert//litert/cc:litert_compiled_model",
+        "@litert//litert/cc:litert_environment",
+        "@litert//litert/cc:litert_tensor_buffer",
+        "@litert//litert/c:litert_environment",
+        "@litert//litert/c:litert_environment_options",
+        "@litert//litert/c:litert_event",
+        "@litert//litert/c:litert_tensor_buffer",
+        "@litert//litert/c:litert_opaque_options",
+        "@litert//litert/c/options:litert_gpu_options",
+        "@litert//litert/c/internal:litert_accelerator_registration",
+        "@litert//litert/c/internal:litert_tensor_buffer_registry",
+        "@litert//litert/c/internal:litert_external_litert_buffer_context",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             ":neuron_delegate",
