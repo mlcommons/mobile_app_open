@@ -32,7 +32,7 @@ limitations under the License.
 #if MTK_TFLITE_NEURON_BACKEND
 #include "neuron/neuron_backend.h"
 #include "neuron/neuron_builder.h"
-#include "neuron/neuron_delegate.h"
+#include "neuron/neuron_delegate_mtk.h"
 #endif
 
 #include "tflite/delegates/gpu/delegate.h"

@@ -25,14 +25,11 @@ cc_library(
     hdrs = select({
         "@org_tensorflow//tensorflow:android": [
             "@neuron_delegate//neuron:APUWareUtilsApi.h",
-            "@neuron_delegate//neuron:neuron_delegate.h",
-            "tf_compat/tensorflow/lite/c/common.h",
+            # neuron_delegate_mtk.h replaces the archive's neuron_delegate.h,
+            # which includes tensorflow/lite/c/common.h. See that file.
+            "neuron_delegate_mtk.h",
         ],
     }),
-    # Puts tf_compat/ on the include path so neuron_delegate.h's include of
-    # tensorflow/lite/c/common.h resolves to the forwarding header there,
-    # which points at LiteRT. See that file for why.
-    includes = ["tf_compat"],
     deps = select({
         "@org_tensorflow//tensorflow:android": [
             "@litert//tflite/c:common",
