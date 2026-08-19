@@ -13,9 +13,12 @@ which has bit-rotted at this TensorFlow revision:
    them for lite-proto builds), but the target does not put the protobuf
    headers on its include path; add the dependency.
 
+3. Its quantization sources reach xla/tsl/concurrency/executor.h, which is
+   not in its declared dependency closure; add the header-only target.
+
 --- a/tensorflow/core/BUILD
 +++ b/tensorflow/core/BUILD
-@@ -1036,7 +1036,7 @@
+@@ -1036,7 +1036,8 @@
          "//tensorflow/core:mobile_additional_lib_deps",
          "//tensorflow/core/platform:resource",
          "//tensorflow/core/public:release_version",
@@ -23,4 +26,5 @@ which has bit-rotted at this TensorFlow revision:
          "//tensorflow/core/util:stats_calculator_portable",
          "@xla//xla/tsl/util:safe_reinterpret_cast",
 +        "@com_google_protobuf//:protobuf",
++        "@xla//xla/tsl/concurrency:executor",
      ] + tf_portable_proto_lib() + tf_portable_deps_no_runtime(),
