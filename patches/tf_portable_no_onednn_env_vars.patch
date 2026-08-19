@@ -1,0 +1,18 @@
+At this TensorFlow revision, portable_tensorflow_lib_lite (the mobile build
+of TF core) depends on //tensorflow/core/util:onednn_env_vars, a oneDNN/MKL
+helper whose deps unconditionally include the full //tensorflow/core:framework.
+Linking the portable lib on Android therefore also links
+framework_internal_impl, and every symbol both provide is duplicated.
+oneDNN is x86-only and tf_mkl_kernel_library compiles no sources in mobile
+builds, so the dependency is dead weight there; drop it.
+
+--- a/tensorflow/core/BUILD
++++ b/tensorflow/core/BUILD
+@@ -1036,7 +1036,6 @@
+         "//tensorflow/core:mobile_additional_lib_deps",
+         "//tensorflow/core/platform:resource",
+         "//tensorflow/core/public:release_version",
+-        "//tensorflow/core/util:onednn_env_vars",
+         "//tensorflow/core/util:stats_calculator_portable",
+         "@xla//xla/tsl/util:safe_reinterpret_cast",
+     ] + tf_portable_proto_lib() + tf_portable_deps_no_runtime(),
