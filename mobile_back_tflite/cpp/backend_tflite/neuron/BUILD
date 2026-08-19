@@ -29,11 +29,13 @@ cc_library(
         ],
     }),
     deps = select({
-        # neuron_delegate.h includes tensorflow/lite/c/common.h. The MediaTek
-        # delegate is built against TensorFlow's TF Lite C API, not LiteRT's,
-        # so that header still has to come from @org_tensorflow.
+        # neuron_delegate.h's include of tensorflow/lite/c/common.h is
+        # rewritten to tflite/c/common.h by the neuron_delegate patch_cmds in
+        # WORKSPACE, so this resolves against LiteRT. Depending on
+        # @org_tensorflow//tensorflow/lite/c:common instead links a second copy
+        # of the TF Lite C API and the .so fails with duplicate symbols.
         "@org_tensorflow//tensorflow:android": [
-            "@org_tensorflow//tensorflow/lite/c:common",
+            "@litert//tflite/c:common",
         ],
     }),
 )
