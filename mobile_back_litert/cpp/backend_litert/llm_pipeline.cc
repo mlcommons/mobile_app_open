@@ -25,7 +25,6 @@ limitations under the License.
 #include "absl/log/log.h"
 #include "absl/types/span.h"
 #include "flutter/cpp/c/type.h"
-#include "flutter/cpp/utils.h"
 #include "litert/cc/litert_compiled_model.h"
 #include "litert/cc/litert_element_type.h"
 #include "litert/cc/litert_environment.h"
