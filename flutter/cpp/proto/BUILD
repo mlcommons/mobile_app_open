@@ -14,6 +14,11 @@
 # ==============================================================================
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_linkopts")
 
+# The builtin py_binary's bootstrap template is not filled in correctly under
+# this workspace's rules_python, leaving %interpreter_args% placeholders in
+# the launcher; rules_python's own py_binary works.
+load("@rules_python//python:py_binary.bzl", "py_binary")
+
 package(
     default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
