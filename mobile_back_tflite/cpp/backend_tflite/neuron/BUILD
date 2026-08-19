@@ -15,22 +15,6 @@ pbtxt2header(
     ],
 )
 
-# MediaTek's neuron_delegate.h includes tensorflow/lite/c/common.h, but this
-# app links LiteRT. Depending on @org_tensorflow//tensorflow/lite/c:common to
-# satisfy that include puts a second copy of the TF Lite C API in the .so and
-# the link fails on duplicate symbols; patching the archive in place instead
-# breaks its own targets, which are built against TensorFlow throughout.
-#
-# So take a copy of just that header with the include repointed at LiteRT's
-# identical one. Quoted includes search the includer's directory first, so this
-# shadows the vendor header for this package only and the archive is untouched.
-genrule(
-    name = "neuron_delegate_h",
-    srcs = ["@neuron_delegate//neuron:neuron_delegate.h"],
-    outs = ["neuron_delegate.h"],
-    cmd = "sed -e 's|tensorflow/lite/c/common.h|tflite/c/common.h|' $< > $@",
-)
-
 cc_library(
     name = "neuron_delegate",
     srcs = select({
@@ -41,9 +25,14 @@ cc_library(
     hdrs = select({
         "@org_tensorflow//tensorflow:android": [
             "@neuron_delegate//neuron:APUWareUtilsApi.h",
-            ":neuron_delegate.h",
+            "@neuron_delegate//neuron:neuron_delegate.h",
+            "tf_compat/tensorflow/lite/c/common.h",
         ],
     }),
+    # Puts tf_compat/ on the include path so neuron_delegate.h's include of
+    # tensorflow/lite/c/common.h resolves to the forwarding header there,
+    # which points at LiteRT. See that file for why.
+    includes = ["tf_compat"],
     deps = select({
         "@org_tensorflow//tensorflow:android": [
             "@litert//tflite/c:common",
