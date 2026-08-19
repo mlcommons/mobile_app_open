@@ -1,5 +1,5 @@
 load("@build_bazel_rules_apple//apple:apple.bzl", "apple_xcframework")
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
+load("@litert//tflite:build_def.bzl", "tflite_jni_binary")
 
 package(
     default_visibility = ["//visibility:public"],

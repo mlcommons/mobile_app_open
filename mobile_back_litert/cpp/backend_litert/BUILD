@@ -80,7 +80,9 @@ cc_library(
 
 tflite_jni_binary(
     name = "liblitertbackend.so",
-    linkscript = "//flutter/cpp/c:version_script.lds",
+    # Not //flutter/cpp/c:version_script.lds — this backend also exports the
+    # LiteRt* symbols for the dlopened GPU accelerator library.
+    linkscript = "version_script.lds",
     deps = [
         ":litert_c",
     ],

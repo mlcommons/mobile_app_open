@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_linkopts")
+load("@litert//tflite:build_def.bzl", "tflite_copts", "tflite_linkopts")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -81,11 +81,13 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
+        # No TF Lite evaluation dep here: utils is linked into every backend,
+        # and each backend brings its own TF Lite runtime, so linking one from
+        # here duplicates symbols. GetSortedFileNames is implemented locally.
         "//flutter/cpp/c:headers",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
         "@org_mlperf_inference//:loadgen",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
     ],
 )
 
