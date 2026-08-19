@@ -121,6 +121,9 @@ cc_library(
         "//flutter/cpp:mlperf_driver",
         "//flutter/cpp:utils",
         "//flutter/cpp/datasets/squad_utils",
+        # tsl/platform/protobuf.h includes full-protobuf util headers at this
+        # TF revision, so TF-header consumers need them on the include path.
+        "@com_google_protobuf//:protobuf",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/core:portable_tensorflow_lib_lite",

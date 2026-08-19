@@ -39,6 +39,9 @@ cc_library(
     deps = [
         "//flutter/cpp:utils",
         "@com_google_absl//absl/strings",
+        # tsl/platform/protobuf.h includes full-protobuf util headers at this
+        # TF revision, so TF-header consumers need them on the include path.
+        "@com_google_protobuf//:protobuf",
         "@litert//tflite:framework",
         "@litert//tflite/c:c_api",
         "@litert//tflite/kernels:builtin_ops",
