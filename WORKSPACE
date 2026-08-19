@@ -299,12 +299,6 @@ python_wheel_version_suffix_repository(name = "tf_wheel_version_suffix")
 #TODO remove this since LiteRT has its own MTK delegate
 http_archive(
     name = "neuron_delegate",
-    patch_cmds = [
-        # neuron_delegate.h includes tensorflow/lite/c/common.h. Point it at
-        # LiteRT's copy of the same header so the backend links against one
-        # TF Lite C API rather than two.
-        "sed -i -e 's|tensorflow/lite/c/common.h|tflite/c/common.h|g' neuron/neuron_delegate.h",
-    ],
     sha256 = "7918cc54a2bab63c30eb87a90de8ce3f3730b5572e0269a2b57a0c9bcd28cd69",
     strip_prefix = "tflite-neuron-delegate-update_for_leroy",
     urls = ["https://github.com/MediaTek-NeuroPilot/tflite-neuron-delegate/archive/refs/heads/update_for_leroy.zip"],
