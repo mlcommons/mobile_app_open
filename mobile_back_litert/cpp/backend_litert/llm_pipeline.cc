@@ -67,8 +67,23 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
 
   LLMBackendData* backend_data = new LLMBackendData();
 
-  if (!BuildCompiledModel(*backend_data, model_path)) {
-    LOG(ERROR) << "Failed to build CompiledModel from: " << model_path;
+  // The app passes a directory when the benchmark lists several files (the
+  // model and the tokenizer); the model's filename then comes from the
+  // settings. A path whose last segment has no extension is a directory.
+  std::string llm_model_path = std::string(model_path);
+  if (llm_model_path.substr(llm_model_path.rfind('/') + 1).find('.') ==
+      std::string::npos) {
+    for (int i = 0; i < configs->count; ++i) {
+      if (strcmp(configs->keys[i], "model_filename") == 0) {
+        llm_model_path += '/';
+        llm_model_path += configs->values[i];
+        break;
+      }
+    }
+  }
+
+  if (!BuildCompiledModel(*backend_data, llm_model_path.c_str())) {
+    LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
     backend_delete(backend_data);
     return nullptr;
   }

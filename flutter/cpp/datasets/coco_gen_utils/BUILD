@@ -42,11 +42,14 @@ cc_library(
         "@litert//tflite:framework",
         "@litert//tflite/c:c_api",
         "@litert//tflite/kernels:builtin_ops",
-        # On this TF revision the evaluation-utils path links the full
-        # framework even on Android, so the portable_tensorflow_lib_lite
-        # variant duplicates its symbols. Use the full framework everywhere.
-        "@org_tensorflow//tensorflow/core:framework",
-        "@org_tensorflow//tensorflow/core:lib",
-        "@org_tensorflow//tensorflow/core:protos_all_cc",
-    ],
+    ] + select({
+        "@org_tensorflow//tensorflow:android": [
+            "@org_tensorflow//tensorflow/core:portable_tensorflow_lib_lite",
+        ],
+        "//conditions:default": [
+            "@org_tensorflow//tensorflow/core:framework",
+            "@org_tensorflow//tensorflow/core:lib",
+            "@org_tensorflow//tensorflow/core:protos_all_cc",
+        ],
+    }),
 )
