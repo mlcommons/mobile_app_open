@@ -34,7 +34,7 @@ limitations under the License.
 #include "flutter/cpp/proto/mlperf_task.pb.h"
 #include "flutter/cpp/utils.h"
 #include "google/protobuf/text_format.h"
-#include "tflite/tools/command_line_flags.h"
+#include "tensorflow/lite/tools/command_line_flags.h"
 
 namespace mlperf {
 namespace mobile {
@@ -123,8 +123,7 @@ int Main(int argc, char *argv[]) {
           "Benchmark ID. One of image_classification, "
           "image_classification_v2, object_detection, "
           "natural_language_processing, "
-          "image_segmentation_v2, super_resolution, stable_diffusion, llm-1b, "
-          "llm-1b-instruct"
+          "image_segmentation_v2, super_resolution, stable_diffusion, llm, "
           "image_classification_offline, image_classification_offline_v2",
           Flag::kPositional)};
   Flags::Parse(&argc, const_cast<const char **>(argv), flag_list);

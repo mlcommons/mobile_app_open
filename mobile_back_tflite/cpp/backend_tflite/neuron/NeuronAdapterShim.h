@@ -42,7 +42,7 @@
 #include <string>
 
 #include "NeuronAdapter.h"
-#include "absl/log/log.h"
+#include "tensorflow/core/platform/logging.h"
 std::string GetPlatformName();
 
 #define LOAD_ADAPTER_FUNCTION(name) \

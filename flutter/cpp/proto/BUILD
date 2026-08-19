@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-load("@rules_python//python:py_binary.bzl", "py_binary")
-load("@litert//tflite:build_def.bzl", "tflite_linkopts")
+load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_linkopts")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -54,7 +53,7 @@ cc_binary(
         "//flutter/cpp:utils",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
         "@com_google_protobuf//:protobuf",
-        "@litert//tflite/tools:command_line_flags",
+        "@org_tensorflow//tensorflow/lite/tools:command_line_flags",
     ],
 )
 

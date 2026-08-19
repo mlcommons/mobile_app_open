@@ -24,29 +24,29 @@ limitations under the License.
 #endif
 
 #include "flutter/cpp/c/type.h"
-#include "tflite/c/c_api.h"
-#include "tflite/c/common.h"
+#include "tensorflow/lite/c/c_api.h"
+#include "tensorflow/lite/c/common.h"
 #if __ANDROID__
 #include <sys/system_properties.h>
 
 #if MTK_TFLITE_NEURON_BACKEND
 #include "neuron/neuron_backend.h"
 #include "neuron/neuron_builder.h"
-#include "neuron/neuron_delegate_mtk.h"
+#include "neuron/neuron_delegate.h"
 #endif
 
-#include "tflite/delegates/gpu/delegate.h"
-#include "tflite/delegates/nnapi/nnapi_delegate.h"
+#include "tensorflow/lite/delegates/gpu/delegate.h"
+#include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
 #endif
-#include "absl/log/log.h"
+#include "tensorflow/core/platform/logging.h"
 #include "thread_pool.h"
 #include "utils.h"
 
 #if __APPLE__
 #include <TargetConditionals.h>
 #if TARGET_OS_IPHONE
-#include "tflite/delegates/coreml/coreml_delegate.h"
-#include "tflite/delegates/gpu/metal_delegate.h"
+#include "tensorflow/lite/delegates/coreml/coreml_delegate.h"
+#include "tensorflow/lite/delegates/gpu/metal_delegate.h"
 #endif
 #endif
 

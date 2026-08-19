@@ -15,7 +15,7 @@ limitations under the License.
 #ifndef RESIZE_ARGMAX_OP_H_
 #define RESIZE_ARGMAX_OP_H_
 
-#include "tflite/c/common.h"
+#include "tensorflow/lite/c/common.h"
 
 TfLiteRegistration* Register_ResizeArgmax();
 

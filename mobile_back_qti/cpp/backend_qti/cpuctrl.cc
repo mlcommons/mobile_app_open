@@ -25,8 +25,8 @@ limitations under the License.
 #include <thread>
 #include <vector>
 
-#include "absl/log/log.h"
 #include "soc_utility.h"
+#include "tensorflow/core/platform/logging.h"
 
 using namespace std::chrono;
 

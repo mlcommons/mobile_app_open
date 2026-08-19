@@ -14,17 +14,16 @@ limitations under the License.
 ==============================================================================*/
 
 #include <fstream>
-#include <sstream>
 #include <unordered_map>
 
 #include "Executor.h"
-#include "absl/log/log.h"
 #include "allocator.h"
 #include "cpuctrl.h"
 #include "mlperf_helper.h"
 #include "qtiBackendHelper.h"
 #include "qti_settings.h"
 #include "soc_utility.h"
+#include "tensorflow/core/platform/logging.h"
 
 #ifdef DEBUG_FLAG
 #include <chrono>

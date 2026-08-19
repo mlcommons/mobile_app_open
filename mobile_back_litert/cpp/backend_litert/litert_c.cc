@@ -1,4 +1,4 @@
-/* Copyright 2024 The MLPerf Authors. All Rights Reserved.
+/* Copyright 2026 The MLPerf Authors. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -9,14 +9,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include "single_model_pipeline.h"
-#include "stable_diffusion_pipeline.h"
-#include "tensorflow/core/platform/logging.h"
-#include "tflite_settings_pixel.h"
+#include <cstring>
+#include <memory>
 
-#if __ANDROID__
-#include <sys/system_properties.h>
-#endif
+#include "absl/log/log.h"
+#include "litert_settings_android.h"
+#include "llm_pipeline.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,52 +22,35 @@ extern "C" {
 
 std::unique_ptr<Pipeline> pipeline;
 
-void init_pipeline(const char *pipeline_type) {
-  bool sd_pipeline = (strcmp(pipeline_type, "StableDiffusionPipeline") == 0);
-  if (sd_pipeline) {
-    LOG(INFO) << "Initializing StableDiffusionPipeline";
-    pipeline = std::make_unique<StableDiffusionPipeline>();
-  } else {
-    LOG(INFO) << "Initializing SingleModelPipeline";
-    pipeline = std::make_unique<SingleModelPipeline>();
-  }
-}
-
-void reset_pipeline() { pipeline.reset(); }
-
-// TFLite is the standard backend for all hardware.
+// This backend serves only the llm-* benchmarks, and only on Android.
+// All other benchmarks fall through to the next backend in the list
+// (see fallback_policy in litert_settings_android.pbtxt).
 bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const char **settings,
                                      const mlperf_device_info_t *device_info) {
   *not_allowed_message = nullptr;
-  *settings = tflite_settings.c_str();
-
-  if (device_info && device_info->model && device_info->manufacturer) {
-    LOG(INFO) << "Pixel HW supported check: model: " << device_info->model
-              << ", manufacturer: " << device_info->manufacturer;
-
-    if (strcmp(device_info->manufacturer, "Google") == 0 &&
-        access("/dev/edgetpu", F_OK) == 0) {
-      LOG(INFO) << "Pixel backend matches hardware";
-      return true;
-    }
+#ifdef __ANDROID__
+  // Samsung Galaxy M32 (SM-M326B) does not have enough memory to run LLM
+  // benchmarks, so don't offer this backend there.
+  if (device_info->model != nullptr &&
+      strcmp(device_info->model, "SM-M326B") == 0) {
+    LOG(INFO) << "LiteRT backend disabled on SM-M326B";
+    return false;
   }
-
+  *settings = litert_settings_android.c_str();
+  LOG(INFO) << "LiteRT backend matches hardware";
+  return true;
+#else
   return false;
+#endif
 }
 
 // Create a new backend and return the pointer to it.
 mlperf_backend_ptr_t mlperf_backend_create(
     const char *model_path, mlperf_backend_configuration_t *configs,
     const char *native_lib_path) {
-  const char *pipeline_type = "";
-  for (int i = 0; i < configs->count; ++i) {
-    if (strcmp(configs->keys[i], "pipeline") == 0) {
-      pipeline_type = configs->values[i];
-      break;
-    }
-  }
-  init_pipeline(pipeline_type);
+  LOG(INFO) << "Initializing LLMPipeline";
+  pipeline = std::make_unique<LLMPipeline>();
   return pipeline->backend_create(model_path, configs, native_lib_path);
 }
 
@@ -91,10 +72,12 @@ const char *mlperf_backend_name(mlperf_backend_ptr_t backend_ptr) {
 // Destroy the backend pointer and its data.
 void mlperf_backend_delete(mlperf_backend_ptr_t backend_ptr) {
   pipeline->backend_delete(backend_ptr);
-  reset_pipeline();
+  pipeline.reset();
 }
 
 // Run the inference for a sample.
+// callback and context are only used when running token based inferences
+// (LLM). In other cases they can be passed as nullptr
 mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
                                            ft_callback callback,
                                            void *context) {
@@ -146,6 +129,12 @@ void mlperf_backend_convert_inputs(mlperf_backend_ptr_t backend_ptr, int bytes,
                                    int width, int height, uint8_t *data) {
   return pipeline->backend_convert_inputs(backend_ptr, bytes, width, height,
                                           data);
+}
+
+void mlperf_backend_convert_outputs(mlperf_backend_ptr_t backend_ptr, int bytes,
+                                    int width, int height, uint8_t *data) {
+  return pipeline->backend_convert_outputs(backend_ptr, bytes, width, height,
+                                           data);
 }
 
 void *mlperf_backend_get_buffer(size_t n) {

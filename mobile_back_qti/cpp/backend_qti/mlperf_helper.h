@@ -15,10 +15,10 @@ limitations under the License.
 #ifndef MLPERFHELPER_H
 #define MLPERFHELPER_H
 
-#include "absl/log/log.h"
 #include "flutter/cpp/c/backend_c.h"
 #include "flutter/cpp/c/type.h"
 #include "qtiBackendHelper.h"
+#include "tensorflow/core/platform/logging.h"
 
 static void process_config_framework(
     const mlperf_backend_configuration_t *configs,

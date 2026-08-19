@@ -1,5 +1,5 @@
 load(
-    "@litert//tflite:build_def.bzl",
+    "@org_tensorflow//tensorflow/lite:build_def.bzl",
     "tflite_copts",
     "tflite_jni_binary",
 )
@@ -25,14 +25,7 @@ cc_library(
     hdrs = select({
         "@org_tensorflow//tensorflow:android": [
             "@neuron_delegate//neuron:APUWareUtilsApi.h",
-            # neuron_delegate_mtk.h replaces the archive's neuron_delegate.h,
-            # which includes tensorflow/lite/c/common.h. See that file.
-            "neuron_delegate_mtk.h",
-        ],
-    }),
-    deps = select({
-        "@org_tensorflow//tensorflow:android": [
-            "@litert//tflite/c:common",
+            "@neuron_delegate//neuron:neuron_delegate.h",
         ],
     }),
 )
@@ -80,14 +73,7 @@ cc_library(
             "-fno-omit-frame-pointer",
         ],
         "//conditions:default": [],
-        # fpermissive required due to bug in LiteRT (as of version 2.1.2)
-    }) + [
-        # Same as //mobile_back_tflite/cpp/backend_tflite:tflite_c: this target
-        # shares its sources, which call TfLiteInterpreterOptionsAddDelegate
-        # with a TfLiteDelegate rather than the opaque type.
-        "-UTFLITE_USE_OPAQUE_DELEGATE",
-        "-fpermissive",
-    ],
+    }),
     local_defines = ["MTK_TFLITE_NEURON_BACKEND"],
     deps = [
         ":tflite_settings",
@@ -96,29 +82,14 @@ cc_library(
         "//mobile_back_tflite/cpp/backend_tflite:embedding_utils",
         "//mobile_back_tflite/cpp/backend_tflite:tflite_settings",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-        "@litert//tflite/c:c_api",
-        "@litert//tflite/c:common",
-        "@litert//tflite/experimental/genai:genai_ops",
-        "@litert//tflite/kernels:builtin_ops",
-        # This target compiles tflite_c.cc and llm_pipeline.cc, which use the
-        # LiteRT compiled-model API, so it needs the same deps as
-        # //mobile_back_tflite/cpp/backend_tflite:tflite_c.
-        "@litert//litert/cc:litert_compiled_model",
-        "@litert//litert/cc:litert_environment",
-        "@litert//litert/cc:litert_tensor_buffer",
-        "@litert//litert/c:litert_environment",
-        "@litert//litert/c:litert_environment_options",
-        "@litert//litert/c:litert_event",
-        "@litert//litert/c:litert_tensor_buffer",
-        "@litert//litert/c:litert_opaque_options",
-        "@litert//litert/c/options:litert_gpu_options",
-        "@litert//litert/c/internal:litert_accelerator_registration",
-        "@litert//litert/c/internal:litert_tensor_buffer_registry",
-        "@litert//litert/c/internal:litert_external_litert_buffer_context",
+        "@org_tensorflow//tensorflow/lite/c:c_api",
+        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/experimental/genai:genai_ops",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             ":neuron_delegate",
-            "@litert//tflite/delegates/gpu:delegate",
+            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
         ],
         "//conditions:default": [],
     }),

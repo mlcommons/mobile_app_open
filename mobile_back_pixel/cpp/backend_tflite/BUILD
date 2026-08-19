@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 load(
-    "@litert//tflite:build_def.bzl",
+    "@org_tensorflow//tensorflow/lite:build_def.bzl",
     "tflite_copts",
     "tflite_jni_binary",
 )
@@ -40,11 +40,11 @@ cc_library(
         "resize_argmax_op.h",
     ],
     deps = [
-        "@litert//tflite/c:common",
-        "@litert//tflite/core/api",
-        "@litert//tflite/kernels:cpu_backend_context",
-        "@litert//tflite/kernels:cpu_backend_threadpool",
-        "@litert//tflite/kernels:kernel_util",
+        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/core/api",
+        "@org_tensorflow//tensorflow/lite/kernels:cpu_backend_context",
+        "@org_tensorflow//tensorflow/lite/kernels:cpu_backend_threadpool",
+        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
     ],
 )
 
@@ -87,12 +87,12 @@ cc_library(
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-        "@litert//tflite/c:c_api",
-        "@litert//tflite/c:c_api_experimental",
-        "@litert//tflite/c:common",
+        "@org_tensorflow//tensorflow/lite/c:c_api",
+        "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
+        "@org_tensorflow//tensorflow/lite/c:common",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
-            "@litert//tflite/delegates/gpu:delegate",
+            "@org_tensorflow//tensorflow/lite/delegates/gpu:delegate",
         ],
         "//conditions:default": [],
     }),

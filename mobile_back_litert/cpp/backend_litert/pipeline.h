@@ -10,11 +10,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef TFLITE_PIPELINE_H_
-#define TFLITE_PIPELINE_H_
+#ifndef LITERT_PIPELINE_H_
+#define LITERT_PIPELINE_H_
 
 #include "flutter/cpp/c/type.h"
-#include "tensorflow/lite/c/c_api.h"
+#include "tflite/c/c_api.h"
 
 // A pipeline interface to run TFLite models.
 class Pipeline {
@@ -88,4 +88,4 @@ class Pipeline {
   virtual void backend_release_buffer(void *p) = 0;
 };
 
-#endif  // TFLITE_PIPELINE_H_
+#endif  // LITERT_PIPELINE_H_

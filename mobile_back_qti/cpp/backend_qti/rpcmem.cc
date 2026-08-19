@@ -22,7 +22,7 @@ limitations under the License.
 #include "windows.h"
 #endif
 
-#include "absl/log/log.h"
+#include "tensorflow/core/platform/logging.h"
 
 RpcMem::RpcMem() {
 #ifdef __ANDROID__

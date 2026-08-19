@@ -20,7 +20,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "absl/log/log.h"
+#include "tensorflow/core/platform/logging.h"
 
 // Static output buffer
 std::vector<uint32_t> GenieExecutor::outputTokens_;

@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 load(
-    "@litert//tflite:build_def.bzl",
+    "@org_tensorflow//tensorflow/lite:build_def.bzl",
     "tflite_copts",
 )
 
@@ -42,6 +42,6 @@ cc_library(
         "//flutter/cpp:utils",
         "//flutter/cpp/datasets:allocator",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
-        "@litert//tflite:shared_library",
+        "@org_tensorflow//tensorflow/lite:shared_library",
     ],
 )
