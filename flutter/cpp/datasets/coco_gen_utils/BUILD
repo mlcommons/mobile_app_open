@@ -39,6 +39,8 @@ cc_library(
     deps = [
         "//flutter/cpp:utils",
         "@com_google_absl//absl/strings",
+        "@litert//tflite:framework",
+        "@litert//tflite/c:c_api",
         "@litert//tflite/kernels:builtin_ops",
         # On this TF revision the evaluation-utils path links the full
         # framework even on Android, so the portable_tensorflow_lib_lite
