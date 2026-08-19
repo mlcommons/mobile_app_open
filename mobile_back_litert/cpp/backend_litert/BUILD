@@ -38,6 +38,7 @@ cc_library(
         "llm_pipeline.cc",
     ],
     hdrs = [
+        "litert_settings_android.h",
         "llm_pipeline.h",
         "pipeline.h",
     ],

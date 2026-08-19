@@ -160,6 +160,7 @@ tensorflow_source_repo(
     ],
     patches = [
         "//:flutter/third_party/tf-eigen.patch",
+        "//patches:tf_coreml_repeatedfield_resize.patch",
     ] + PATCH_FILE,
     sha256 = "879cf25692d50c60315a4dd3929dccd923d4c44a2c4b95ebb483666d2c16a22a",
     strip_prefix = "tensorflow-6d40c20cdfe385746c31da6227b95722f5ece342",
