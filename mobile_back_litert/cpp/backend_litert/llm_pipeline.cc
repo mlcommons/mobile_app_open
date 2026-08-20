@@ -19,7 +19,6 @@ limitations under the License.
 
 #include <cstdlib>
 #include <cstring>
-#include <fstream>
 #include <limits>
 
 #include "absl/log/log.h"
