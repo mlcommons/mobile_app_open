@@ -165,7 +165,9 @@ class LLMPipeline : public Pipeline {
   void backend_release_buffer(void* p) override;
 
  private:
-  bool BuildCompiledModel(LLMBackendData& data, const char* model_path);
+  bool BuildCompiledModel(LLMBackendData& data, const char* model_path,
+                          bool use_gpu);
+  bool FindSignatures(LLMBackendData& data);
   bool BuildDecodeBuffers(LLMBackendData& data);
   bool BuildPrefillBuffers(LLMBackendData& data, size_t prefill_sig_idx);
 

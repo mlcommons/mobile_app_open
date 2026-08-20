@@ -82,10 +82,31 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
     }
   }
 
-  if (!BuildCompiledModel(*backend_data, llm_model_path.c_str())) {
-    LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
-    backend_delete(backend_data);
-    return nullptr;
+  // Request the GPU only when the selected delegate asks for it; the CL
+  // accelerator cannot fully delegate this graph on every device, and partial
+  // delegation is disabled because the KV-cache swap needs each signature in
+  // a single partition.
+  bool use_gpu = configs->accelerator != nullptr &&
+                 strcmp(configs->accelerator, "cpu") != 0;
+
+  if (!BuildCompiledModel(*backend_data, llm_model_path.c_str(), use_gpu)) {
+    if (use_gpu) {
+      LOG(ERROR) << "GPU compilation failed for " << llm_model_path
+                 << ", retrying on CPU";
+      backend_delete(backend_data);
+      backend_data = new LLMBackendData();
+      if (BuildCompiledModel(*backend_data, llm_model_path.c_str(), false)) {
+        backend_data->accelerator = "CPU";
+      } else {
+        LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
+        backend_delete(backend_data);
+        return nullptr;
+      }
+    } else {
+      LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
+      backend_delete(backend_data);
+      return nullptr;
+    }
   }
   if (!BuildDecodeBuffers(*backend_data)) {
     LOG(ERROR) << "Failed to allocate decode buffers";
@@ -352,7 +373,7 @@ void* LLMPipeline::backend_get_buffer(size_t n) { return ::operator new(n); }
 void LLMPipeline::backend_release_buffer(void* p) { ::operator delete(p); }
 
 bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
-                                     const char* model_path) {
+                                     const char* model_path, bool use_gpu) {
   auto env = litert::Environment::Create({});
   if (!env) {
     LOG(ERROR) << "Environment::Create failed";
@@ -364,6 +385,18 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
   if (!options) {
     LOG(ERROR) << "Options::Create failed";
     return false;
+  }
+  if (!use_gpu) {
+    options->SetHardwareAccelerators(litert::HwAccelerators::kCpu);
+    std::string transformer_path = model_path;
+    auto model =
+        litert::CompiledModel::Create(*data.env, transformer_path, *options);
+    if (!model) {
+      LOG(ERROR) << "CompiledModel::Create failed: " << transformer_path;
+      return false;
+    }
+    data.model = std::make_unique<litert::CompiledModel>(std::move(*model));
+    return FindSignatures(data);
   }
   options->SetHardwareAccelerators(litert::HwAccelerators::kGpu |
                                    litert::HwAccelerators::kCpu);
@@ -407,7 +440,10 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     return false;
   }
   data.model = std::make_unique<litert::CompiledModel>(std::move(*model));
+  return FindSignatures(data);
+}
 
+bool LLMPipeline::FindSignatures(LLMBackendData& data) {
   auto decode = data.model->GetSignatureIndex("decode");
   if (!decode) {
     LOG(ERROR) << "No 'decode' signature";
