@@ -55,8 +55,9 @@ class BackendId {
   static const samsung = 'libsamsungbackend';
   static const qti = 'libqtibackend';
   static const apple = 'libcoremlbackend';
+  static const litert = 'liblitertbackend';
 
-  static const allIds = [tflite, pixel, mediatek, samsung, qti, apple];
+  static const allIds = [tflite, pixel, mediatek, samsung, qti, apple, litert];
 }
 
 class Url {

@@ -107,6 +107,10 @@ const Map<String, Interval> _stableDiffusion = {
   'samsung_npu': Interval(min: 0, max: 1.0),
 };
 
+// No reference accuracy values for the LLM benchmarks yet: run them as a
+// smoke test (an empty map makes checkAccuracy skip the value comparison).
+const Map<String, Interval> _llm = {};
+
 const benchmarkExpectedAccuracy = {
   BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
@@ -114,5 +118,7 @@ const benchmarkExpectedAccuracy = {
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.stableDiffusion: _stableDiffusion,
+  BenchmarkId.llm: _llm,
+  BenchmarkId.llmInstruct: _llm,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };

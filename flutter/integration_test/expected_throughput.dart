@@ -13,6 +13,7 @@ const _kCoreMLBackend = BackendId.apple;
 const _kQtiBackend = BackendId.qti;
 const _kMediatekBackend = BackendId.mediatek;
 const _kSamsungBackend = BackendId.samsung;
+const _kLitertBackend = BackendId.litert;
 
 // Windows
 // Google Cloud Build n2-standard-4 machine
@@ -257,6 +258,11 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   _kSamsungBackend: {_kS24: Interval(min: 800, max: 1200)},
 };
 
+// No reference token-throughput values for the LLM benchmarks yet: run them
+// as a smoke test (an empty device map makes checkThroughput skip the value
+// comparison while still requiring the benchmark to finish with a result).
+const Map<String, Map<String, Interval>> _llm = {_kLitertBackend: {}};
+
 const benchmarkExpectedThroughput = {
   BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
@@ -264,5 +270,7 @@ const benchmarkExpectedThroughput = {
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.stableDiffusion: _stableDiffusion,
+  BenchmarkId.llm: _llm,
+  BenchmarkId.llmInstruct: _llm,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };
