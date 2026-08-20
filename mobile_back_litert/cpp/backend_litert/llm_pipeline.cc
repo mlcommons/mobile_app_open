@@ -17,6 +17,7 @@ limitations under the License.
 
 #include <unistd.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
@@ -535,8 +536,11 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
       LOG(ERROR) << "RankedTensorType failed";
       return false;
     }
-    // [1, n_kv_heads, kv_len, head_dim]
-    data.kv_cache_max_size = (*kv_type).Layout().Dimensions()[2];
+    // The KV layout is [1, n_kv_heads, kv_len, head_dim] or
+    // [1, kv_len, n_kv_heads, head_dim] depending on the exporter;
+    // kv_len is the larger of the two middle dimensions.
+    const auto kv_dims = (*kv_type).Layout().Dimensions();
+    data.kv_cache_max_size = static_cast<int>(std::max(kv_dims[1], kv_dims[2]));
 
     auto buffer_size = kv_metadata->BufferSize();
     data.kv_buf_float_count = static_cast<int>(*buffer_size / sizeof(float));
