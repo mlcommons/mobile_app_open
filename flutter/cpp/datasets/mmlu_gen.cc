@@ -114,6 +114,13 @@ std::vector<uint8_t> MmluGen::ProcessOutput(const int sample_idx,
       *(reinterpret_cast<std::vector<int>*>(outputs[0]));
 
   sample_output_tokens_[sample_idx] = output_tokens;
+
+
+  std::string prediction;
+  sp_processor->Decode(sample_output_tokens_[sample_idx], &prediction).ok();
+
+  LOG(INFO) << "OUT -> \"" << prediction << '\"' << std::endl;
+
   used_sample_ids_.insert(sample_idx);
 
   return {1};

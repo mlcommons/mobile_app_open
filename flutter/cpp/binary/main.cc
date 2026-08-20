@@ -106,7 +106,7 @@ DatasetConfig::DatasetType BenchmarkId2DatasetType(absl::string_view name) {
 
 }  // namespace
 
-int Main(int argc, char *argv[]) {
+int Main(int argc, char* argv[]) {
   using tflite::Flag;
   using tflite::Flags;
   std::string command_line = argv[0];
@@ -127,7 +127,7 @@ int Main(int argc, char *argv[]) {
           "llm-1b-instruct"
           "image_classification_offline, image_classification_offline_v2",
           Flag::kPositional)};
-  Flags::Parse(&argc, const_cast<const char **>(argv), flag_list);
+  Flags::Parse(&argc, const_cast<const char**>(argv), flag_list);
   backend_type = Str2BackendType(backend_name);
   if (backend_type == BackendType::NONE) {
     LOG(FATAL) << Flags::Usage(command_line, flag_list);
@@ -195,8 +195,8 @@ int Main(int argc, char *argv[]) {
                             "Scenario to run the benchmark."),
            Flag::CreateFlag("batch_size", &batch_size, "Batch size.")});
 
-      if (Flags::Parse(&argc, const_cast<const char **>(argv), flag_list)) {
-        const char *pbdata;
+      if (Flags::Parse(&argc, const_cast<const char**>(argv), flag_list)) {
+        const char* pbdata;
         std::string msg = mlperf::mobile::BackendFunctions::isSupported(
             lib_path, native_lib_path, "Unknown manufacturer", "Unknown model",
             &pbdata);
@@ -205,11 +205,11 @@ int Main(int argc, char *argv[]) {
         google::protobuf::TextFormat::ParseFromString(pbdata, &backend_setting);
 
         // If batch_size flag is set, override the backend_setting
-        for (auto &bs : *backend_setting.mutable_benchmark_setting()) {
+        for (auto& bs : *backend_setting.mutable_benchmark_setting()) {
           if (bs.benchmark_id() != benchmark_id) {
             continue;
           }
-          for (auto &ds : *bs.mutable_delegate_choice()) {
+          for (auto& ds : *bs.mutable_delegate_choice()) {
             if (batch_size > 1) {
               ds.set_batch_size(batch_size);
               LOG(INFO) << "Override benchmark " << benchmark_id
@@ -222,7 +222,7 @@ int Main(int argc, char *argv[]) {
         SettingList setting_list =
             CreateSettingList(backend_setting, custom_config, benchmark_id);
 
-        ExternalBackend *external_backend = new ExternalBackend(
+        ExternalBackend* external_backend = new ExternalBackend(
             model_file_path, lib_path, setting_list, native_lib_path);
         backend.reset(external_backend);
       }
@@ -258,7 +258,7 @@ int Main(int argc, char *argv[]) {
           Flag::CreateFlag("image_height", &image_height,
                            "The height of the processed image."),
       };
-      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new Imagenet(backend.get(), images_directory,
                                    groundtruth_file, offset, image_width,
@@ -289,7 +289,7 @@ int Main(int argc, char *argv[]) {
                            "The width of the processed image."),
           Flag::CreateFlag("image_height", &image_height,
                            "The height of the processed image.")};
-      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new Coco(backend.get(), images_directory,
                                groundtruth_file, offset, num_classes,
@@ -313,7 +313,7 @@ int Main(int argc, char *argv[]) {
               Flag::kRequired),
       };
 
-      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new Squad(backend.get(), input_tfrecord, gt_tfrecord));
       }
@@ -337,7 +337,7 @@ int Main(int argc, char *argv[]) {
                            "The width of the processed image."),
           Flag::CreateFlag("image_height", &image_height,
                            "The height of the processed image.")};
-      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new ADE20K(backend.get(), images_directory,
                                  ground_truth_directory, num_classes,
@@ -368,7 +368,7 @@ int Main(int argc, char *argv[]) {
           Flag::CreateFlag("n_channels", &num_channels,
                            "The number of color channels."),
           Flag::CreateFlag("scale", &scale, "Super-resolution scale factor")};
-      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new SNUSR(backend.get(), images_directory,
                                 ground_truth_directory, num_channels, scale,
@@ -391,7 +391,7 @@ int Main(int argc, char *argv[]) {
               "Path to the CLIP model (TFLite) file for score prediction."),
       };
 
-      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new CocoGen(backend.get(), input_tfrecord,
                                   input_clip_model, output_dir));
@@ -417,7 +417,7 @@ int Main(int argc, char *argv[]) {
               "Use zero-shot prompts instead of the default few-shot."),
       };
 
-      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
           backend) {
         dataset.reset(new MmluGen(backend.get(), input_tfrecord, sp_path,
                                   output_dir, zero_shot, Str2TestMode(mode)));
@@ -439,7 +439,7 @@ int Main(int argc, char *argv[]) {
                            Flag::kRequired),
       };
 
-      if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
+      if (Flags::Parse(&argc, const_cast<const char**>(argv), dataset_flags) &&
           backend) {
         dataset.reset(
             new IFEval(backend.get(), input_tfrecord, sp_path, output_dir));
@@ -484,4 +484,4 @@ int Main(int argc, char *argv[]) {
 }  // namespace mobile
 }  // namespace mlperf
 
-int main(int argc, char *argv[]) { return mlperf::mobile::Main(argc, argv); }
+int main(int argc, char* argv[]) { return mlperf::mobile::Main(argc, argv); }

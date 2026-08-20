@@ -25,11 +25,13 @@ flutter/windows/libs:
 	bazel ${BAZEL_OUTPUT_ROOT_ARG} build ${BAZEL_CACHE_ARG} ${bazel_links_arg} \
 		--config=windows \
 		${backend_tflite_windows_target} \
+		${backend_litert_windows_target} \
 		//flutter/cpp/flutter:backend_bridge.dll
 	rm -rf ${flutter_windows_libs_folder}
 	mkdir -p ${flutter_windows_libs_folder}
 	cp -f --target-directory ${flutter_windows_libs_folder} \
 		${backend_tflite_windows_files} \
+		${backend_litert_windows_files} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/backend_bridge.dll
 	chmod 777 --recursive ${flutter_windows_libs_folder}
 

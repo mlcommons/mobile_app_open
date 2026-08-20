@@ -50,13 +50,14 @@ class BenchmarkId {
 
 class BackendId {
   static const tflite = 'libtflitebackend';
+  static const litert = 'liblitertbackend';
   static const pixel = 'libtflitepixelbackend';
   static const mediatek = 'libtfliteneuronbackend';
   static const samsung = 'libsamsungbackend';
   static const qti = 'libqtibackend';
   static const apple = 'libcoremlbackend';
 
-  static const allIds = [tflite, pixel, mediatek, samsung, qti, apple];
+  static const allIds = [tflite, litert, pixel, mediatek, samsung, qti, apple];
 }
 
 class Url {

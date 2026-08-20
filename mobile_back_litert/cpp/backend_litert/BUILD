@@ -18,6 +18,7 @@ load(
     "tflite_jni_binary",
 )
 load("//flutter/cpp/proto:pbtxt2header.bzl", "pbtxt2header")
+load("@litert//litert/build_common:special_rule.bzl", "litert_gpu_accelerator_prebuilts")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -25,15 +26,14 @@ package(
 )
 
 pbtxt2header(
-    name = "tflite_settings",
+    name = "litert_settings",
     srcs = [
-        "backend_settings/tflite_settings_android.pbtxt",
-        "backend_settings/tflite_settings_android_m32.pbtxt",
-        "backend_settings/tflite_settings_apple_iphone11.pbtxt",
-        "backend_settings/tflite_settings_apple_iphone12.pbtxt",
-        "backend_settings/tflite_settings_apple_iphoneX.pbtxt",
-        "backend_settings/tflite_settings_apple_main.pbtxt",
-        "backend_settings/tflite_settings_windows.pbtxt",
+        "backend_settings/litert_settings_android.pbtxt",
+        "backend_settings/litert_settings_apple_iphone11.pbtxt",
+        "backend_settings/litert_settings_apple_iphone12.pbtxt",
+        "backend_settings/litert_settings_apple_iphoneX.pbtxt",
+        "backend_settings/litert_settings_apple_main.pbtxt",
+        "backend_settings/litert_settings_windows.pbtxt",
     ],
 )
 
@@ -48,7 +48,7 @@ cc_library(
 )
 
 cc_library(
-    name = "tflite_c",
+    name = "litert_c",
     srcs = [
         "embedding_utils.cc",
         "llm_pipeline.cc",
@@ -56,7 +56,7 @@ cc_library(
         "single_model_pipeline.cc",
         "stable_diffusion_invoker.cc",
         "stable_diffusion_pipeline.cc",
-        "tflite_c.cc",
+        "litert_c.cc",
     ],
     hdrs = [
         "embedding_utils.h",
@@ -66,9 +66,9 @@ cc_library(
         "single_model_pipeline.h",
         "stable_diffusion_invoker.h",
         "stable_diffusion_pipeline.h",
-        "tflite_settings_android.h",
-        "tflite_settings_apple.h",
-        "tflite_settings_windows.h",
+        "litert_settings_android.h",
+        "litert_settings_apple.h",
+        "litert_settings_windows.h",
         "thread_pool.h",
         "utils.h",
     ],
@@ -80,10 +80,11 @@ cc_library(
             "-fno-omit-frame-pointer",
         ],
         "//conditions:default": [],
-    }),
+        # fpermissive required due to bug in LiteRT (as of version 2.1.2)
+    }) + ["-UTFLITE_USE_OPAQUE_DELEGATE", "-fpermissive"],
     deps = [
         ":embedding_utils",
-        ":tflite_settings",
+        ":litert_settings",
         "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
@@ -92,8 +93,23 @@ cc_library(
         "@litert//tflite/c:c_api",
         "@litert//tflite/c:c_api_experimental",
         "@litert//tflite/c:common",
-        "@litert//tflite/kernels:builtin_ops",
-    ] + select({
+        "@litert//litert/cc:litert_compiled_model",
+        "@litert//litert/cc:litert_environment",
+        "@litert//litert/cc:litert_tensor_buffer",
+        # For GPU acc symbol
+        "@litert//litert/c:litert_environment",
+        "@litert//litert/c:litert_environment_options",
+        "@litert//litert/c:litert_event",
+        "@litert//litert/c:litert_tensor_buffer",
+        "@litert//litert/c:litert_opaque_options",
+        "@litert//litert/c/options:litert_gpu_options",
+        "@litert//litert/c/internal:litert_accelerator_registration",
+        "@litert//litert/c/internal:litert_tensor_buffer_registry",
+        "@litert//litert/c/internal:litert_external_litert_buffer_context",
+        #"@litert//litert/c/internal:litert_delegate_wrapper",
+
+    ]
+    + select({
         "@org_tensorflow//tensorflow:android": [
             "@litert//tflite/delegates/gpu:delegate",
             "@litert//tflite/delegates/xnnpack:xnnpack_delegate",
@@ -108,20 +124,23 @@ cc_library(
 )
 
 tflite_jni_binary(
-    name = "libtflitebackend.so",
+    name = "liblitertbackend.so",
     # macOS uses exported_symbols, while Windows uses linkscript
     exported_symbols = "//flutter/cpp/c:exported_symbols.lds",
     linkscript = "//flutter/cpp/c:version_script.lds",
     deps = [
-        ":tflite_c",
+        ":litert_c",
     ],
+    linkopts = [
+        "-Wl,--export-dynamic",
+    ]
 )
 
 cc_binary(
-    name = "libtflitebackend.dll",
+    name = "liblitertbackend.dll",
     linkshared = 1,
     win_def_file = "//flutter/cpp/c:dll_export.def",
     deps = [
-        ":tflite_c",
+        ":litert_c",
     ],
 )

@@ -15,16 +15,9 @@
 
 ifeq (${WITH_TFLITE},1)
   $(info WITH_TFLITE=1)
-  backend_tflite_bins_dir=output/tflite-bins
-  backend_tflite_bin_filename=libLiteRtClGlAccelerator.so
-  backend_tflite_bins_url=http://storage.googleapis.com/litert/binaries/2.1.5/android_arm64/${backend_tflite_bin_filename}
-  backend_tflite_lib_deps= mkdir -p ${backend_tflite_bins_dir} && \
-                           curl -fSL -o ${backend_tflite_bins_dir}/${backend_tflite_bin_filename} ${backend_tflite_bins_url}
-
   backend_tflite_windows_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.dll
   backend_tflite_windows_target=//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.dll
-  backend_tflite_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so \
-			       ${backend_tflite_bins_dir}/libLiteRtClGlAccelerator.so
+  backend_tflite_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/libtflitebackend.so
   backend_tflite_android_target=//mobile_back_tflite/cpp/backend_tflite:libtflitebackend.so
   backend_tflite_ios_target=//mobile_back_tflite/cpp/backend_tflite/ios:libtflitebackend
   backend_tflite_ios_zip=${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/ios/libtflitebackend.xcframework.zip

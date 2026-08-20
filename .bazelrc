@@ -11,6 +11,7 @@ build --spawn_strategy=standalone
 # needed to solve a bug in LiteRT 2.1.2
 build --per_file_copt=external/litert/.*@-fpermissive
 build --per_file_copt=mobile_back_tflite/cpp/backend_tflite/llm_pipeline.cc@-fpermissive
+build --per_file_copt=mobile_back_litert/cpp/backend_litert/llm_pipeline.cc@-fpermissive
 
 # This flag is required by tensorflow
 common --experimental_repo_remote_exec

@@ -22,6 +22,7 @@ cmdline/macos/bins/release: cmdline/macos/bins/build cmdline/macos/bins/copy
 .PHONY: cmdline/android/libs/deps
 cmdline/android/libs/deps:
 	${backend_tflite_lib_deps}
+	${backend_litert_lib_deps}
 	${backend_qti_libs_deps}
 
 .PHONY: cmdline/android/bins/build
@@ -30,6 +31,7 @@ cmdline/android/bins/build:
 		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
 		--config=android_arm64 \
 		${backend_tflite_android_target} \
+		${backend_litert_android_target} \
 		${backend_mediatek_android_target} \
 		${backend_pixel_android_target} \
 		${backend_qti_android_target} \
@@ -45,6 +47,7 @@ cmdline/android/bins/copy:
 	@# macos doesn't support --target-directory flag
 	cp -f \
 		${backend_tflite_android_files} \
+		${backend_litert_android_files} \
 		${backend_mediatek_android_files} \
 		${backend_pixel_android_files} \
 		${backend_qti_cmdline_files} \
@@ -61,6 +64,7 @@ cmdline/linux/bins/build:
 		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
 		--config=linux_x86_64 \
 		${backend_tflite_android_target} \
+		${backend_litert_android_target} \
 		//flutter/cpp/flutter:libbackendbridge.so \
 		//flutter/cpp/binary:main
 
@@ -72,6 +76,7 @@ cmdline/linux/bins/copy:
 	@# macos doesn't support --target-directory flag
 	cp -f \
 		${backend_tflite_android_files} \
+		${backend_litert_android_files} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/libbackendbridge.so \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/binary/main \
 		${cmdline_linux_bin_release_path}
@@ -86,12 +91,14 @@ cmdline/windows/bins:
 		--config=windows_arm64 \
 		--cpu=x64_arm64_windows --worker_verbose\
 		${backend_tflite_windows_target} \
+		${backend_litert_windows_target} \
 		${backend_qti_windows_target} \
 		//flutter/cpp/binary:main
 	rm -rf ${windows_cmdline_folder}
 	mkdir -p ${windows_cmdline_folder}
 	cp -f --target-directory ${windows_cmdline_folder} \
 		${backend_tflite_windows_files} \
+		${backend_litert_windows_files} \
 		${backend_qti_windows_files} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/binary/main.exe
 	chmod 777 --recursive ${windows_cmdline_folder}
@@ -126,6 +133,7 @@ cmdline/macos/bins/build:
 		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
 		-c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 --macos_minimum_os=13.1 \
 		${backend_tflite_android_target} \
+		${backend_litert_android_target} \
 		//flutter/cpp/binary:main
 
 cmdline_macos_bin_release_path=output/macos-cli
@@ -136,6 +144,7 @@ cmdline/macos/bins/copy:
 	@# macos doesn't support --target-directory flag
 	cp -f \
 		${backend_tflite_android_files} \
+		${backend_litert_android_files} \
 		${BAZEL_LINKS_PREFIX}bin/flutter/cpp/binary/main \
 		${cmdline_macos_bin_release_path}
 		@# macos doesn't support --recursive flag

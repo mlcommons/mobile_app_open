@@ -51,6 +51,7 @@ endif
 .PHONY: flutter/android/libs/deps
 flutter/android/libs/deps:
 	${backend_tflite_lib_deps}
+	${backend_litert_lib_deps}
 	${backend_qti_libs_deps}
 
 .PHONY: flutter/android/libs/build
@@ -60,6 +61,7 @@ flutter/android/libs/build:
 		--config=android_arm64 \
 		--platforms=//platforms:android_arm64 \
 		${backend_tflite_android_target} \
+		${backend_litert_android_target} \
 		${backend_mediatek_android_target} \
 		${backend_pixel_android_target} \
 		${backend_qti_android_target} \
@@ -74,6 +76,7 @@ flutter/android/libs/copy:
 	@# macos doesn't support --target-directory flag
 	cp -f \
 		${backend_tflite_android_files} \
+		${backend_litert_android_files} \
 		${backend_mediatek_android_files} \
 		${backend_pixel_android_files} \
 		${backend_qti_android_files} \
