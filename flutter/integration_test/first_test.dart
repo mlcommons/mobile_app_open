@@ -11,7 +11,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'utils.dart';
 
 const _runMode = BenchmarkRunModeEnum.integrationTestRun;
+// The LLM accuracy phase evaluates the whole TinyMMLU set, which is far too
+// slow for a CI device session on the CPU path. quickRun keeps the same lite
+// dataset and quick run config but skips the accuracy phase.
+const _llmRunMode = BenchmarkRunModeEnum.quickRun;
 const _bindingKeepAliveInterval = Duration(seconds: 20);
+
+BenchmarkRunModeEnum _runModeFor(String benchmarkId) =>
+    benchmarkId.startsWith('llm') ? _llmRunMode : _runMode;
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -83,6 +90,12 @@ void testBenchmark(
   String benchmarkId,
 ) {
   testWidgets('Test benchmark: $benchmarkId', (WidgetTester tester) async {
+    final runMode = _runModeFor(benchmarkId);
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      StoreConstants.selectedBenchmarkRunMode: runMode.name,
+      StoreConstants.cooldown: true,
+      StoreConstants.cooldownDuration: runMode.cooldownDuration,
+    });
     await startApp(tester);
     await validateSettings(tester);
     if (!hasBenchmark(tester, benchmarkId)) {
@@ -101,7 +114,7 @@ void testBenchmark(
       'benchmark flow for $benchmarkId',
       () async {
         await downloadResources(tester);
-        final cooldownDuration = _runMode.cooldownDuration;
+        final cooldownDuration = runMode.cooldownDuration;
         debugPrint('Wait $cooldownDuration seconds before running benchmark');
         await Future.delayed(Duration(seconds: cooldownDuration));
         await runBenchmarks(tester);
