@@ -304,14 +304,19 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
 
   final accuracy = accuracyRun.accuracy;
   accuracy!;
+  // The native code computes accuracy in float32, so a score exactly at a
+  // bound can convert to a double just outside it
+  // (e.g. float32(0.82) == 0.8199999928...). Tolerate that representation
+  // error when comparing against the bounds.
+  const accuracyTolerance = 1e-6;
   expect(
     accuracy.normalized,
-    greaterThanOrEqualTo(expectedValue.min),
+    greaterThanOrEqualTo(expectedValue.min - accuracyTolerance),
     reason: 'accuracy for $tag is too low',
   );
   expect(
     accuracy.normalized,
-    lessThanOrEqualTo(expectedValue.max),
+    lessThanOrEqualTo(expectedValue.max + accuracyTolerance),
     reason: 'accuracy for $tag is too high',
   );
 }
