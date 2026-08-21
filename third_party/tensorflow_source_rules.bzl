@@ -81,9 +81,27 @@ def _tensorflow_source_repo_impl(ctx):
     # Required by tf_vendored for @xla path resolution.
     ctx.file("unused", "")
 
+    _patch_xla_windows_copts(ctx)
     _apply_patches(ctx)
     _apply_patch_cmds(ctx)
     _apply_patch_scripts(ctx)
+
+def _patch_xla_windows_copts(ctx):
+    """Switch XLA Windows copts to MSVC-style flags (same fix as upstream LiteRT).
+
+    xla/tsl assumes clang-cl on Windows and hardcodes is_msvc = False, which
+    passes GNU-style flags such as -Wno-sign-compare that cl.exe rejects
+    (error D8021). Only the //xla/tsl:windows select branch is affected, so
+    this is a no-op for every non-Windows build.
+    """
+    tsl_bzl = "third_party/xla/xla/tsl/tsl.bzl"
+    content = ctx.read(tsl_bzl)
+    old = 'clean_dep("//xla/tsl:windows"): get_win_copts(is_external, is_msvc = False),'
+    new = 'clean_dep("//xla/tsl:windows"): get_win_copts(is_external, is_msvc = True),'
+    if old not in content:
+        fail("{} does not contain the expected is_msvc line; ".format(tsl_bzl) +
+             "re-check _patch_xla_windows_copts against the new TF pin.")
+    ctx.file(tsl_bzl, content.replace(old, new))
 
 tensorflow_source_repo = repository_rule(
     implementation = _tensorflow_source_repo_impl,
