@@ -57,15 +57,16 @@ jobs:
           choco install -y --no-progress protoc --version 23.2
           python -m pip install --quiet numpy absl-py
       - name: Use bazelisk as bazel
-        # The runner image ships both a plain `bazel` binary (a current major
-        # version that no longer supports WORKSPACE) and `bazelisk`. The make
-        # targets invoke `bazel`, so put a bazelisk copy named bazel.exe first
-        # on PATH to honor .bazelversion.
+        # The runner image ships a plain `bazel` binary (a current major
+        # version that no longer supports WORKSPACE) and an npm-based
+        # bazelisk wrapper that only works from its install directory. The
+        # make targets invoke `bazel`, so put the standalone bazelisk binary
+        # named bazel.exe first on PATH to honor .bazelversion.
         run: |
           set -euo pipefail
-          command -v bazelisk >/dev/null || choco install -y --no-progress bazelisk
           mkdir -p /c/bazel-shim
-          cp "$(command -v bazelisk)" /c/bazel-shim/bazel.exe
+          curl -sSL -o /c/bazel-shim/bazel.exe \
+            https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-windows-amd64.exe
           echo "C:\bazel-shim" >> "$GITHUB_PATH"
           /c/bazel-shim/bazel.exe --version
       - name: Cache Flutter SDK
