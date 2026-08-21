@@ -13,17 +13,20 @@
 def _apply_patches(ctx):
     if not ctx.attr.patches:
         return
-    patch_args = ctx.attr.patch_args if ctx.attr.patch_args else ["-p0"]
-    for patch_label in ctx.attr.patches:
-        patch_file = ctx.path(patch_label)
-        cmd = ["patch"] + patch_args + ["-i", str(patch_file)]
-        result = ctx.execute(cmd)
-        if result.return_code != 0:
-            fail("Failed to apply patch {}: {}\n{}".format(
-                patch_label,
-                result.stdout,
-                result.stderr,
+
+    # Use Bazel's built-in patch implementation (the same one http_archive
+    # uses): it is pure Java, so it works on hosts without a `patch` binary,
+    # such as the Windows builder. Only `-pN` strip levels are supported.
+    strip = 0
+    for arg in ctx.attr.patch_args:
+        if arg.startswith("-p"):
+            strip = int(arg[2:])
+        else:
+            fail("Unsupported patch_args {}: only -pN is supported.".format(
+                ctx.attr.patch_args,
             ))
+    for patch_label in ctx.attr.patches:
+        ctx.patch(ctx.path(patch_label), strip = strip)
 
 def _apply_patch_cmds(ctx):
     if not ctx.attr.patch_cmds:
@@ -41,9 +44,13 @@ def _apply_patch_scripts(ctx):
     """Execute Python scripts (resolved from labels) post-extraction."""
     if not ctx.attr.patch_scripts:
         return
+    python = "python3"
+    if ctx.which("python3") == None and ctx.which("python") != None:
+        # Windows installs typically ship `python`, not `python3`.
+        python = "python"
     for script_label in ctx.attr.patch_scripts:
         script_path = ctx.path(script_label)
-        result = ctx.execute(["python3", str(script_path)])
+        result = ctx.execute([python, str(script_path)])
         if result.return_code != 0:
             fail("patch_script failed: {}\nstdout: {}\nstderr: {}".format(
                 script_label,
