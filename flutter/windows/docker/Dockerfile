@@ -28,7 +28,13 @@ RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
 # includes. VS 2019's VCTools workload bundled ATL, but VS 2022's does not, so
 # it must be added explicitly or the plugin fails with C1083 (cannot open
 # 'atlstr.h').
-ADD https://aka.ms/vs/17/release/vs_buildtools.exe vs_BuildTools.exe
+#
+# Use the VS 17.12 LTSC channel bootstrapper, not the current-release one:
+# from 17.13 the VCTools workload depends on Microsoft.WebView2, whose runtime
+# installer cannot run inside a Server Core container ("The system cannot find
+# the path specified"), so the whole Build Tools install fails. 17.12 ships
+# MSVC toolset 14.42, which satisfies the 14.38+ requirement checked below.
+ADD https://aka.ms/vs/17/release.ltsc.17.12/vs_buildtools.exe vs_BuildTools.exe
 RUN start /w vs_BuildTools --quiet --norestart --nocache --wait`
     --add Microsoft.VisualStudio.Workload.VCTools `
     --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
