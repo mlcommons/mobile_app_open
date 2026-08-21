@@ -62,6 +62,11 @@ build:windows --per_file_copt=external/pthreadpool/.*@/std:c11,/experimental:c11
 build:windows --repo_env=ANDROID_NDK_HOME=
 build:windows --repo_env=ANDROID_SDK_HOME=
 
+# Protobuf 30+ fails with "#error Protobuf will be dropping support for
+# MSVC + Bazel in 34.0" unless explicitly allowed
+# (protocolbuffers/protobuf#20085). LiteRT's Windows CI passes the same flag.
+build:windows --define=protobuf_allow_msvc=true
+
 # Android configs
 build:android --crosstool_top=//external:android/crosstool
 build:android --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
