@@ -1,0 +1,121 @@
+name: Windows Build & Test
+
+# GitHub Actions replacement for the Cloud Build Windows pipeline
+# (.github/cloudbuild/flutter-windows.yaml). The windows-2022 runner already
+# provides Visual Studio 2022 (MSVC 14.4x, with C11 <stdatomic.h> and
+# <threads.h> needed by pthreadpool), Bazelisk, msys2, and Python, so no
+# Docker image is involved. The Cloud Build trigger can be disabled once this
+# workflow is trusted.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master, submission-v* ]
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+  merge_group:
+    types: [ checks_requested ]
+
+jobs:
+  computed:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - name: Compute build number
+        id: set
+        env:
+          OFFSET: ${{ vars.FLUTTER_BUILD_NUMBER_OFFSET }}
+        run: echo "build_number=$((GITHUB_RUN_NUMBER + ${OFFSET:-0}))" >> "$GITHUB_OUTPUT"
+    outputs:
+      build_number: ${{ steps.set.outputs.build_number }}
+
+  build:
+    name: Build Windows app
+    needs: computed
+    runs-on: windows-2022
+    permissions:
+      contents: read
+    timeout-minutes: 300
+    env:
+      FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
+      FLUTTER_FORCE_PUB_GET: 1
+      # Bazel on Windows needs a bash; the runner ships msys2 at C:\msys64.
+      BAZEL_SH: C:\msys64\usr\bin\bash.exe
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Support long paths in git
+        run: git config --system core.longpaths true
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - name: Install build tools
+        run: |
+          set -euo pipefail
+          choco install -y --no-progress make --version 4.3
+          choco install -y --no-progress protoc --version 23.2
+          python -m pip install --quiet numpy absl-py
+      - name: Cache Flutter SDK
+        id: flutter-cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: C:\tools\flutter
+          key: ${{ runner.os }}-flutter-3.44.4
+      - name: Install Flutter
+        run: |
+          set -euo pipefail
+          if [ ! -d "/c/tools/flutter/bin" ]; then
+            curl -sSL -o /c/flutter.zip \
+              https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.44.4-stable.zip
+            mkdir -p /c/tools
+            (cd /c/tools && unzip -q /c/flutter.zip)
+            rm /c/flutter.zip
+          fi
+          git config --global --add safe.directory "*"
+          echo "C:\tools\flutter\bin" >> "$GITHUB_PATH"
+      - name: Install Dart protoc plugin
+        run: |
+          set -euo pipefail
+          export PATH="/c/tools/flutter/bin:$PATH"
+          dart --disable-analytics
+          dart pub global activate protoc_plugin '^25.0.0'
+          echo "$LOCALAPPDATA\Pub\Cache\bin" >> "$GITHUB_PATH"
+      - name: Cache bazel
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: D:\bazel-disk-cache
+          key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-bazel_cache-
+      - name: Build native libs
+        run: |
+          set -euo pipefail
+          flutter config --no-enable-windows-desktop
+          make \
+            BAZEL_OUTPUT_ROOT_ARG=--output_user_root=D:/bazel-root \
+            BAZEL_LINKS_PREFIX=D:/bazel-links/ \
+            BAZEL_CACHE_ARG=--disk_cache=D:/bazel-disk-cache \
+            flutter/prepare \
+            flutter/windows/libs
+      - name: Run integration test
+        run: |
+          set -euo pipefail
+          flutter config --enable-windows-desktop
+          make flutter/test/integration
+      - name: Build release
+        run: |
+          set -euo pipefail
+          # The runner installs VS under an edition directory (Enterprise on
+          # hosted images); resolve the current v143 CRT redist dynamically.
+          MSVC_DLLS=$(ls -d "/c/Program Files/Microsoft Visual Studio/2022/"*"/VC/Redist/MSVC/"*"/x64/Microsoft.VC143.CRT" | tail -n 1)
+          [ -n "$MSVC_DLLS" ] || { echo "VC143 CRT redist not found"; exit 1; }
+          make \
+            "FLUTTER_MSVC_DLLS=$MSVC_DLLS" \
+            FLUTTER_RELEASE_NAME=${{ github.sha }} \
+            flutter/windows/release
+      - name: Upload release artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: windows-build-${{ needs.computed.outputs.build_number }}
+          path: output/flutter-windows-releases/
+          if-no-files-found: error
