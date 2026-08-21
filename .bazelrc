@@ -52,6 +52,16 @@ build:windows --host_cxxopt=/std:c++17
 # still flag-gated in MSVC) and toolset 14.38+ (see windows/docker/Dockerfile).
 build:windows --per_file_copt=external/pthreadpool/.*@/std:c11,/experimental:c11atomics
 
+# flutter.mk exports all make variables, so ANDROID_NDK_API_LEVEL and
+# ANDROID_NDK_VERSION (android.mk) reach bazel; on a machine that also sets
+# ANDROID_NDK_HOME (e.g. the GitHub windows runner, or a dev machine with
+# Android Studio), TensorFlow's android_configure then writes that raw
+# Windows path into its generated android.bzl, where the backslashes are
+# invalid Starlark escapes. The Windows build never targets Android, so hide
+# the variables from repository rules.
+build:windows --repo_env=ANDROID_NDK_HOME=
+build:windows --repo_env=ANDROID_SDK_HOME=
+
 # Android configs
 build:android --crosstool_top=//external:android/crosstool
 build:android --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
