@@ -55,7 +55,7 @@ jobs:
           set -euo pipefail
           choco install -y --no-progress make --version 4.3
           choco install -y --no-progress protoc --version 23.2
-          python -m pip install --quiet numpy absl-py
+          python -m pip install --quiet numpy==1.26.4 absl-py==2.1.0
       - name: Use bazelisk as bazel
         # The runner image ships a plain `bazel` binary (a current major
         # version that no longer supports WORKSPACE) and an npm-based
@@ -67,6 +67,7 @@ jobs:
           mkdir -p /c/bazel-shim
           curl -sSL -o /c/bazel-shim/bazel.exe \
             https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-windows-amd64.exe
+          echo "023734f33ed6b9c6d65468fe20bb2c5fb32473ccb8aca2fc5bf1521e61ce1622  /c/bazel-shim/bazel.exe" | sha256sum -c -
           echo "C:\bazel-shim" >> "$GITHUB_PATH"
           /c/bazel-shim/bazel.exe --version
       - name: Cache Flutter SDK
@@ -81,6 +82,8 @@ jobs:
           if [ ! -d "/c/tools/flutter/bin" ]; then
             curl -sSL -o /c/flutter.zip \
               https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.44.4-stable.zip
+            # sha256 from releases_windows.json in the same bucket
+            echo "8f2d6224fc6872d2f7f180de86cde989fcea3776efe0edf48a9aac2cd9be2b1b  /c/flutter.zip" | sha256sum -c -
             mkdir -p /c/tools
             (cd /c/tools && unzip -q /c/flutter.zip)
             rm /c/flutter.zip
@@ -116,6 +119,8 @@ jobs:
           flutter config --enable-windows-desktop
           make flutter/test/integration
       - name: Build release
+        env:
+          RELEASE_NAME: ${{ github.sha }}
         run: |
           set -euo pipefail
           # The runner installs VS under an edition directory (Enterprise on
@@ -124,7 +129,7 @@ jobs:
           [ -n "$MSVC_DLLS" ] || { echo "VC143 CRT redist not found"; exit 1; }
           make \
             "FLUTTER_MSVC_DLLS=$MSVC_DLLS" \
-            FLUTTER_RELEASE_NAME=${{ github.sha }} \
+            "FLUTTER_RELEASE_NAME=$RELEASE_NAME" \
             flutter/windows/release
       - name: Upload release artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
