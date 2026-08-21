@@ -46,6 +46,12 @@ build:ios --cxxopt=-xobjective-c++
 build:windows --cxxopt=/std:c++17
 build:windows --host_cxxopt=/std:c++17
 
+# pthreadpool (via the LiteRT-pinned TensorFlow) uses C11 <stdatomic.h> and
+# <threads.h> on Windows. Its own -std=c11 copt is GCC syntax that cl.exe
+# ignores; MSVC needs /std:c11 plus /experimental:c11atomics (C11 atomics are
+# still flag-gated in MSVC) and toolset 14.38+ (see windows/docker/Dockerfile).
+build:windows --per_file_copt=external/pthreadpool/.*@/std:c11,/experimental:c11atomics
+
 # Android configs
 build:android --crosstool_top=//external:android/crosstool
 build:android --host_crosstool_top=@bazel_tools//tools/cpp:toolchain

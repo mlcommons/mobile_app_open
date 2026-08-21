@@ -15,18 +15,14 @@ RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
 # the Visual Studio installation (not one on PATH), so the only way to raise it
 # is to install a newer Visual Studio; VS 2022 17.x bundles CMake >= 3.29.
 #
-# VS 2022's default MSVC toolset (v143, 14.4x) fails to compile nsync (a
-# TensorFlow/bazel dependency): its C++11 <chrono> platform header does not
-# build with the newer STL. nsync builds fine with the VS 2019-era MSVC v142
-# (14.2x) toolset (which is what the Windows build used before this upgrade), so
-# we also install v142 and pin bazel to it via BAZEL_VC_FULL_VERSION below. CMake
-# still uses VS 2022's default toolset for the Firebase C++ SDK.
-#
-# We request v142 two ways: the "latest v142" component and the fixed
-# 14.29-16.11 component. The online bootstrapper has been observed to silently
-# skip the "latest" component without installing a 14.2x toolset directory, so
-# the fixed-version component is the reliable source of the concrete 14.29
-# payload.
+# The TensorFlow revision pinned by the LiteRT workspace no longer depends on
+# nsync, which used to require the VS 2019-era v142 toolset (its C++11 <chrono>
+# platform header did not build with the newer STL). Its pthreadpool now
+# requires C11 <stdatomic.h> and <threads.h>, which MSVC provides from toolset
+# 14.35 / 14.38 (VS 2022 17.5 / 17.8), so install VS 2022's current v143
+# toolset (requested explicitly: the bootstrapper has been observed to
+# silently skip the workload's bundled compiler) and verify below that it is
+# new enough.
 #
 # The VC.ATL component provides atlstr.h, which the desktop_webview_auth plugin
 # includes. VS 2019's VCTools workload bundled ATL, but VS 2022's does not, so
@@ -35,21 +31,18 @@ RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; `
 ADD https://aka.ms/vs/17/release/vs_buildtools.exe vs_BuildTools.exe
 RUN start /w vs_BuildTools --quiet --norestart --nocache --wait`
     --add Microsoft.VisualStudio.Workload.VCTools `
+    --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
     --add Microsoft.VisualStudio.Component.Windows10SDK.19041 `
     --add Microsoft.VisualStudio.Component.VC.CMake.Project `
     --add Microsoft.VisualStudio.Component.VC.ATL `
-    --add Microsoft.VisualStudio.Component.VC.v142.x86.x64 `
-    --add Microsoft.VisualStudio.Component.VC.14.29.16.11.x86.x64 `
     && powershell -Command "if ($err = dir $Env:TEMP -Filter dd_setup_*_errors.log | where Length -gt 0 | Get-Content) { throw $err }" `
     && del vs_BuildTools.exe
 
-# Pin bazel to the MSVC v142 (14.2x) toolset so the native (nsync/TensorFlow)
-# build uses it instead of VS 2022's default v143. Detect the installed version
-# rather than hard-coding it (v142 == 14.2x; v143 is 14.3x/14.4x). Log every
-# installed toolset so a mismatch is diagnosable from the build log, and include
-# that list in the error if no v142 toolset is present. Set it machine-wide so
-# the build process inherits it.
-RUN powershell -NoProfile -Command "$root = 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC'; $all = Get-ChildItem $root -Directory | Sort-Object Name; Write-Host ('Installed MSVC toolsets: ' + ($all.Name -join ', ')); $v = ($all | Where-Object { $_.Name -like '14.2*' } | Select-Object -Last 1).Name; if (-not $v) { throw ('MSVC v142 (14.2x) toolset not found. Installed: ' + ($all.Name -join ', ')) }; Write-Host ('Pinning BAZEL_VC_FULL_VERSION=' + $v); [Environment]::SetEnvironmentVariable('BAZEL_VC_FULL_VERSION', $v, 'Machine')"
+# Pin bazel to the newest installed MSVC toolset and verify it provides C11
+# <threads.h> (14.38+), which pthreadpool needs on Windows. Log every installed
+# toolset so a mismatch is diagnosable from the build log. Set it machine-wide
+# so the build process inherits it.
+RUN powershell -NoProfile -Command "$root = 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC'; $all = Get-ChildItem $root -Directory | Sort-Object { [version]$_.Name }; Write-Host ('Installed MSVC toolsets: ' + ($all.Name -join ', ')); $v = ($all | Select-Object -Last 1).Name; if ([version]$v -lt [version]'14.38') { throw ('MSVC toolset 14.38+ required for C11 threads.h, found only: ' + ($all.Name -join ', ')) }; Write-Host ('Pinning BAZEL_VC_FULL_VERSION=' + $v); [Environment]::SetEnvironmentVariable('BAZEL_VC_FULL_VERSION', $v, 'Machine')"
 
 # --no-progress is required on all `choco install` commands
 # because on CI where the output is not a terminal but a file
