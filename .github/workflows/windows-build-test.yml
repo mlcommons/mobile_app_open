@@ -56,6 +56,18 @@ jobs:
           choco install -y --no-progress make --version 4.3
           choco install -y --no-progress protoc --version 23.2
           python -m pip install --quiet numpy absl-py
+      - name: Use bazelisk as bazel
+        # The runner image ships both a plain `bazel` binary (a current major
+        # version that no longer supports WORKSPACE) and `bazelisk`. The make
+        # targets invoke `bazel`, so put a bazelisk copy named bazel.exe first
+        # on PATH to honor .bazelversion.
+        run: |
+          set -euo pipefail
+          command -v bazelisk >/dev/null || choco install -y --no-progress bazelisk
+          mkdir -p /c/bazel-shim
+          cp "$(command -v bazelisk)" /c/bazel-shim/bazel.exe
+          echo "C:\bazel-shim" >> "$GITHUB_PATH"
+          /c/bazel-shim/bazel.exe --version
       - name: Cache Flutter SDK
         id: flutter-cache
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
