@@ -258,10 +258,13 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   _kSamsungBackend: {_kS24: Interval(min: 800, max: 1200)},
 };
 
-// No reference token-throughput values for the LLM benchmarks yet: run them
-// as a smoke test (an empty device map makes checkThroughput skip the value
-// comparison while still requiring the benchmark to finish with a result).
-const Map<String, Map<String, Interval>> _llm = {_kLitertBackend: {}};
+// Token throughput (tok/s) of the LiteRT CPU path. CI runs llm-1b and
+// llm-1b-instruct only on the Pixel 9 Pro job, which measured 4.9-8.0 tok/s
+// across runs; the wide interval absorbs shared-device variance while still
+// catching real regressions and nonsense values.
+const Map<String, Map<String, Interval>> _llm = {
+  _kLitertBackend: {_kPixel9Pro: Interval(min: 2, max: 20)},
+};
 
 const benchmarkExpectedThroughput = {
   BenchmarkId.imageClassificationV2: _imageClassificationV2,
