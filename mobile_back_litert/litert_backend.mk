@@ -19,9 +19,9 @@ ifeq (${WITH_LITERT},1)
   $(info WITH_LITERT=1)
   backend_litert_bins_dir=output/litert-bins
   backend_litert_bin_filename=libLiteRtClGlAccelerator.so
-  backend_litert_bins_url=http://storage.googleapis.com/litert/binaries/2.1.5/android_arm64/${backend_litert_bin_filename}
+  backend_litert_bins_url=https://storage.googleapis.com/litert/binaries/2.1.5/android_arm64/${backend_litert_bin_filename}
   backend_litert_lib_deps= mkdir -p ${backend_litert_bins_dir} && \
-                           curl -fSL -o ${backend_litert_bins_dir}/${backend_litert_bin_filename} ${backend_litert_bins_url}
+                           curl -fSL --proto '=https' -o ${backend_litert_bins_dir}/${backend_litert_bin_filename} ${backend_litert_bins_url}
 
   backend_litert_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_litert/cpp/backend_litert/liblitertbackend.so \
 			       ${backend_litert_bins_dir}/${backend_litert_bin_filename}

@@ -31,5 +31,6 @@ Example: `mlperfbench-v1.1-qsmgt.apk`
 * I - Intel
 * H - Huawei
 * T - TFLite
+* L - LiteRT
 
 Single version of the app should be used for both submission and release.
