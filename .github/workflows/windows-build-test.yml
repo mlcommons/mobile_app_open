@@ -65,7 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /c/bazel-shim
-          curl -sSL -o /c/bazel-shim/bazel.exe \
+          curl -sSL --proto '=https' -o /c/bazel-shim/bazel.exe \
             https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-windows-amd64.exe
           echo "023734f33ed6b9c6d65468fe20bb2c5fb32473ccb8aca2fc5bf1521e61ce1622  /c/bazel-shim/bazel.exe" | sha256sum -c -
           echo "C:\bazel-shim" >> "$GITHUB_PATH"
@@ -80,7 +80,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ ! -d "/c/tools/flutter/bin" ]; then
-            curl -sSL -o /c/flutter.zip \
+            curl -sSL --proto '=https' -o /c/flutter.zip \
               https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.44.4-stable.zip
             # sha256 from releases_windows.json in the same bucket
             echo "8f2d6224fc6872d2f7f180de86cde989fcea3776efe0edf48a9aac2cd9be2b1b  /c/flutter.zip" | sha256sum -c -
