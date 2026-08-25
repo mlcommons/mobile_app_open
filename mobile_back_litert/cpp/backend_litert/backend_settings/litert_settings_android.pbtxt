@@ -21,6 +21,26 @@ benchmark_setting {
       model_checksum: "2ad260fc18b965ce16006d76c9327082"
     }
   }
+  # The GPU delegate uses a dedicated GPU export of the model; the
+  # delegate-level model_filename overrides the benchmark-level one.
+  # TODO(anhappdev): fill model_checksum once the upload is final.
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072_gpu.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+    custom_setting {
+      id: "model_filename"
+      value: "llama_q8_ekv3072_gpu.tflite"
+    }
+  }
   delegate_selected: "CPU"
   custom_setting {
     id: "pipeline"
@@ -50,6 +70,26 @@ benchmark_setting {
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
       model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  # The GPU delegate uses a dedicated GPU export of the model; the
+  # delegate-level model_filename overrides the benchmark-level one.
+  # TODO(anhappdev): fill model_checksum once the upload is final.
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072_gpu.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+    custom_setting {
+      id: "model_filename"
+      value: "llama_q8_ekv3072_gpu.tflite"
     }
   }
   delegate_selected: "CPU"
