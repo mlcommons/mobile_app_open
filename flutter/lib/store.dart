@@ -117,6 +117,13 @@ class Store extends ChangeNotifier {
     _storeFromDisk.setString(StoreConstants.taskSelection, value);
   }
 
+  // JSON map {benchmarkId: backend libName}; empty string means defaults.
+  String get backendSelection => _getString(StoreConstants.backendSelection);
+
+  set backendSelection(String value) {
+    _storeFromDisk.setString(StoreConstants.backendSelection, value);
+  }
+
   bool get crashlyticsEnabled =>
       _getBool(StoreConstants.crashlyticsEnabled, false);
 
@@ -148,6 +155,7 @@ class StoreConstants {
   static const keepLogs = 'keep_logs';
   static const taskSelection = 'disabled_tasks';
   static const taskSetSelection = 'disabled_task_sets';
+  static const backendSelection = 'backend_selection';
   static const crashlyticsEnabled = 'crashlyticsEnabled';
   static const appLocale = 'app_locale';
 }

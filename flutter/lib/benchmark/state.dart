@@ -29,7 +29,7 @@ class BenchmarkState extends ChangeNotifier {
 
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
-  late final BackendInfo backendInfo;
+  late final List<BackendInfo> matchedBackends;
   late final TaskRunner taskRunner;
   late final BoardDecoder boardDecoder;
 
@@ -93,13 +93,12 @@ class BenchmarkState extends ChangeNotifier {
 
   BenchmarkState._(this._store, this.backendBridge) {
     resourceManager = ResourceManager(notifyListeners, _store);
-    backendInfo = BackendInfoHelper().findMatching();
+    matchedBackends = BackendInfoHelper().findMatchingBackends();
     taskRunner = TaskRunner(
       store: _store,
       notifyListeners: notifyListeners,
       resourceManager: resourceManager,
       backendBridge: backendBridge,
-      backendInfo: backendInfo,
     );
   }
 
@@ -252,11 +251,25 @@ class BenchmarkState extends ChangeNotifier {
       }
     }
 
+    Map<String, String> backendSelection = {};
+    if (_store.backendSelection.isNotEmpty) {
+      try {
+        final map = jsonDecode(_store.backendSelection) as Map<String, dynamic>;
+        for (var kv in map.entries) {
+          backendSelection[kv.key] = kv.value as String;
+        }
+      } catch (e, t) {
+        print('Backend selection parse fail: $e');
+        print(t);
+      }
+    }
+
     _benchmarkStore = BenchmarkStore(
       appConfig: configManager.decodedConfig,
-      backendConfig: backendInfo.settings.benchmarkSetting,
+      backends: matchedBackends,
       taskSelection: taskSelection,
       taskSetSelection: taskSetSelection,
+      backendSelection: backendSelection,
     );
     restoreLastResult();
   }
@@ -380,6 +393,31 @@ class BenchmarkState extends ChangeNotifier {
 
   void benchmarkSetDelegate(Benchmark benchmark, String delegate) {
     benchmark.benchmarkSettings.delegateSelected = delegate;
+    notifyListeners();
+  }
+
+  void benchmarkSetBackend(Benchmark benchmark, String libName) {
+    if (state == BenchmarkStateEnum.running ||
+        state == BenchmarkStateEnum.aborting) {
+      return;
+    }
+    if (!benchmark.selectBackend(libName)) return;
+    // Persist only this explicit choice, merged into the stored map, so
+    // untouched benchmarks keep following future defaults and selections
+    // made under other task configs are preserved.
+    Map<String, dynamic> stored = {};
+    if (_store.backendSelection.isNotEmpty) {
+      try {
+        stored = jsonDecode(_store.backendSelection) as Map<String, dynamic>;
+      } catch (e) {
+        print('Backend selection parse fail: $e');
+      }
+    }
+    stored[benchmark.id] = libName;
+    _store.backendSelection = jsonEncode(stored);
+    // The resource map is built for the previously selected backends;
+    // rebuild it so resource validation sees the new backend's files.
+    deferredLoadResources();
     notifyListeners();
   }
 

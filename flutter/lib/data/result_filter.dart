@@ -49,7 +49,6 @@ class ResultFilter {
     resultSoc = resultSoc ?? StringValue.unknown;
 
     DateTime resultCreationDate = result.meta.creationDate;
-    String resultBackend = result.results.first.backendInfo.filename;
     String resultPlatform = envInfo.platform.name;
 
     bool fromCreationDateMatched = fromCreationDate == null
@@ -64,7 +63,11 @@ class ResultFilter {
     bool deviceModelMatched = resultDeviceModel.containsIgnoreCase(
       deviceModel ?? '',
     );
-    bool backendMatched = backend == null ? true : backend == resultBackend;
+    // Results within one file may come from different backends,
+    // so the filter matches if any result ran on the requested backend.
+    bool backendMatched = backend == null
+        ? true
+        : result.results.any((e) => e.backendInfo.filename == backend);
     bool manufacturerMatched = resultManufacturer.containsIgnoreCase(
       manufacturer ?? '',
     );
