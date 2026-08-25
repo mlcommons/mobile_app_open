@@ -1,0 +1,117 @@
+name: LiteRT Device Test
+
+# Manually-dispatched BrowserStack run for validating the LiteRT backend on
+# a specific real device. The tflite test APK bundles TFLite + LiteRT and no
+# vendor backends, so LiteRT is the default for every benchmark it claims on
+# any device; the unified APK adds the vendor backends for coexistence tests.
+# Reuses the test APKs already built and uploaded by the Android board, so
+# this job only spends BrowserStack time, not a rebuild.
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      device:
+        description: 'BrowserStack device (Name-OSVersion)'
+        required: true
+        default: 'Google Pixel 10 Pro-16.0'
+      apk_variant:
+        description: >-
+          Test APK to run: tflite = TFLite + LiteRT only (LiteRT is default
+          for all benchmarks it claims), unified = all backends (coexistence)
+        required: true
+        default: 'tflite'
+        type: choice
+        options:
+          - tflite
+          - unified
+      build_number:
+        description: >-
+          Build number of an Android board run whose test APKs to reuse
+          (leave empty to use the newest build on the bucket)
+        required: false
+        default: ''
+
+env:
+  BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+
+jobs:
+  test-litert-device:
+    name: litert-${{ inputs.apk_variant }}-${{ inputs.device }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    env:
+      BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - name: Set up authentication for Google Cloud SDK
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        with:
+          version: '>= 363.0.0'
+      - name: Resolve build number and APK names
+        env:
+          INPUT_BUILD_NUMBER: ${{ inputs.build_number }}
+          APK_VARIANT: ${{ inputs.apk_variant }}
+        run: |
+          if [ -n "$INPUT_BUILD_NUMBER" ]; then
+            n="$INPUT_BUILD_NUMBER"
+          else
+            n=$(gsutil ls "gs://mobile-app-build-290400_github-actions/build/*/test-main-${APK_VARIANT}.apk" \
+              | sed -E 's|.*/build/([0-9]+)/.*|\1|' | sort -n | tail -1)
+          fi
+          test -n "$n"
+          echo "Using APKs from build $n"
+          {
+            echo "GCLOUD_BUCKET_PATH=gs://mobile-app-build-290400_github-actions/build/$n"
+            echo "MAIN_APK_NAME=test-main-$APK_VARIANT-$n.apk"
+            echo "HELPER_APK_NAME=test-helper-$APK_VARIANT-$n.apk"
+            echo "BUILD_NUMBER=$n"
+          } >> "$GITHUB_ENV"
+      - name: Download test APK
+        run: |
+          gsutil cp "$GCLOUD_BUCKET_PATH/test-main-${{ inputs.apk_variant }}.apk" "/tmp/$MAIN_APK_NAME"
+          gsutil cp "$GCLOUD_BUCKET_PATH/test-helper-${{ inputs.apk_variant }}.apk" "/tmp/$HELPER_APK_NAME"
+      - name: Upload main app
+        run: |
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app" \
+          -F "file=@/tmp/$MAIN_APK_NAME" \
+          -F "custom_id=$MAIN_APK_NAME"
+      - name: Upload test suite
+        run: |
+          curl -u "$BROWSERSTACK_CREDENTIALS" \
+          -X POST "https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite" \
+          -F "file=@/tmp/$HELPER_APK_NAME" \
+          -F "custom_id=$HELPER_APK_NAME"
+      - uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+        name: Trigger App Automate
+        env:
+          BROWSERSTACK_CREDENTIALS: ${{ secrets.BROWSERSTACK_CREDENTIALS }}
+          BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
+          BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
+          BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
+          BROWSERSTACK_BUILD_TAG: ${{ inputs.device }}
+          BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          BROWSERSTACK_DEVICES: >-
+            ["${{ inputs.device }}"]
+        with:
+          timeout_minutes: 60
+          max_attempts: 2
+          retry_wait_seconds: 300
+          retry_on_exit_code: 9
+          command: |
+            bash .github/workflows/scripts/browserstack-app-automate.sh
+      - name: Upload BrowserStack logs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: logs-litert-${{ inputs.device }}-${{ github.run_number }}
+          path: ${{ env.BROWSERSTACK_LOGS_DIR }}
+          retention-days: 28
+          if-no-files-found: error
