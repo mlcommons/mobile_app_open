@@ -103,11 +103,13 @@ export WITH_TFLITE="${WITH_TFLITE:-0}"
 export WITH_APPLE="${WITH_APPLE:-1}"
 
 echo "$MC_LOG_PREFIX Build backend and Flutter packages"
-# The GCS remote cache occasionally fails with transient network errors
-# (e.g. "handshake timed out after 10000ms" fetching a blob). Retry once:
-# bazel reuses everything already built and re-fetches only what is missing.
+# The GCS remote cache occasionally fails with "handshake timed out"
+# fetching a blob, and when connectivity to GCS is degraded a plain retry
+# fails the same way. Retry once with the remote cache disabled: actions
+# already completed stay in bazel's local action cache, so the fallback
+# only builds the few unfinished actions locally.
 # Remember to update the next line if make commands are changed.
-cd "$MC_REPO_HOME" && time make flutter/prepare && { time make flutter/ios || time make flutter/ios; }
+cd "$MC_REPO_HOME" && time make flutter/prepare && { time make flutter/ios || time make BAZEL_CACHE_ARG= flutter/ios; }
 
 if [ $runner = $XCODE_CLOUD ]; then
   if [ "$CI_XCODEBUILD_ACTION" = "build-for-testing" ]; then
@@ -117,7 +119,9 @@ if [ $runner = $XCODE_CLOUD ]; then
   fi
 fi
 
-cd "$MC_REPO_HOME"/flutter/ios && pod install
+# The CocoaPods CDN falls back to raw.githubusercontent.com, which
+# rate-limits the shared CI runner IPs (HTTP 429). Back off and retry.
+cd "$MC_REPO_HOME"/flutter/ios && { pod install || { sleep 60 && pod install; } || { sleep 180 && pod install; }; }
 
 echo "$MC_LOG_PREFIX END ci_post_clone"
 exit 0
