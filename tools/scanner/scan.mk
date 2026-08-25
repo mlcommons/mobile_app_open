@@ -59,6 +59,7 @@ scanner/scan: scanner/build-app
 		-Dsonar.projectVersion=${FLUTTER_APP_VERSION} \
 		-Dsonar.sources=. \
 		-Dsonar.exclusions=**/*.java \
+		-Dsonar.cpd.exclusions=mobile_back_litert/cpp/backend_litert/*_pipeline.h,mobile_back_litert/cpp/backend_litert/*_pipeline.cc \
 		-Dsonar.python.version="3.8, 3.9, 3.10" \
 		-Dsonar.cfamily.compile-commands="${SONAR_OUT_DIR}/compile_commands.json" \
 		-Dsonar.cfamily.analysisCache.mode=server \
