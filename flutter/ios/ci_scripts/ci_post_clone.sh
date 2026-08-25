@@ -103,8 +103,11 @@ export WITH_TFLITE="${WITH_TFLITE:-0}"
 export WITH_APPLE="${WITH_APPLE:-1}"
 
 echo "$MC_LOG_PREFIX Build backend and Flutter packages"
+# The GCS remote cache occasionally fails with transient network errors
+# (e.g. "handshake timed out after 10000ms" fetching a blob). Retry once:
+# bazel reuses everything already built and re-fetches only what is missing.
 # Remember to update the next line if make commands are changed.
-cd "$MC_REPO_HOME" && time make flutter/prepare && time make flutter/ios
+cd "$MC_REPO_HOME" && time make flutter/prepare && { time make flutter/ios || time make flutter/ios; }
 
 if [ $runner = $XCODE_CLOUD ]; then
   if [ "$CI_XCODEBUILD_ACTION" = "build-for-testing" ]; then
