@@ -5,7 +5,9 @@ This backend runs the `llm-*` benchmarks on [LiteRT](https://github.com/google-a
 ## Overview
 
 * Android arm64 only. The backend claims only the six `llm-*` benchmarks.
-* `fallback_policy: FALLBACK_FILL_GAPS`: all other benchmarks stay on the TFLite backend.
+* `claim_policy: CLAIM_SHARED`: the TFLite implementation stays selectable
+  next to LiteRT for the `llm-*` benchmarks; all other benchmarks fall
+  through to the TFLite backend.
 * `llm_pipeline.cc` drives a `litert::CompiledModel` with explicit `TensorBuffer`s
   for the prefill and decode signatures.
 * Inference runs on the CPU delegate by default.
