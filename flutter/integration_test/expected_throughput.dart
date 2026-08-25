@@ -258,12 +258,13 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   _kSamsungBackend: {_kS24: Interval(min: 800, max: 1200)},
 };
 
-// Token throughput (tok/s) of the LiteRT CPU path. CI runs llm-1b and
-// llm-1b-instruct only on the Pixel 9 Pro job, which measured 4.9-8.0 tok/s
-// across runs; the wide interval absorbs shared-device variance while still
-// catching real regressions and nonsense values.
+// Token throughput (tok/s) of the LiteRT backend. CI runs llm-1b and
+// llm-1b-instruct only on the Pixel 9 Pro job. The GPU delegate is the
+// default; the CPU path measured 4.9-8.0 tok/s across runs and remains the
+// automatic fallback when GPU compilation fails, so the interval must cover
+// both. Tighten the bounds once GPU runs have produced real numbers.
 const Map<String, Map<String, Interval>> _llm = {
-  _kLitertBackend: {_kPixel9Pro: Interval(min: 2, max: 20)},
+  _kLitertBackend: {_kPixel9Pro: Interval(min: 2, max: 50)},
 };
 
 const benchmarkExpectedThroughput = {
