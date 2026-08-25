@@ -120,16 +120,6 @@ bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
   if (primaryLib != BackendId.tflite && selectedLib == BackendId.tflite) {
     return false;
   }
-  // The LiteRT backend fills the LLM gap on every Android device, but a
-  // vendor device job should run LLM only with the vendor's own support:
-  // a LiteRT CPU result says nothing about the vendor stack. LiteRT's
-  // on-device LLM coverage comes from the pixel and tflite jobs.
-  const llmVendorLibs = [BackendId.qti, BackendId.samsung, BackendId.mediatek];
-  if (benchmarkId.startsWith('llm') &&
-      llmVendorLibs.contains(primaryLib) &&
-      selectedLib != primaryLib) {
-    return false;
-  }
   return true;
 }
 
