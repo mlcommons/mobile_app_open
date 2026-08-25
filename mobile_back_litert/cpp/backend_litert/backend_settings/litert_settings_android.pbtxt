@@ -40,7 +40,7 @@ benchmark_setting {
       value: "llama_q8_ekv3072_litert.tflite"
     }
   }
-  delegate_selected: "GPU"
+  delegate_selected: "CPU"
   custom_setting {
     id: "pipeline"
     value: "LLMPipeline"
@@ -90,7 +90,7 @@ benchmark_setting {
       value: "llama_q8_ekv3072_litert.tflite"
     }
   }
-  delegate_selected: "GPU"
+  delegate_selected: "CPU"
   custom_setting {
     id: "pipeline"
     value: "LLMPipeline"
