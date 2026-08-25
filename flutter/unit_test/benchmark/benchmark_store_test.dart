@@ -275,7 +275,8 @@ void main() {
       final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backends: [coremlBackend(), tfliteBackend()],
-        taskSelection: {}, taskSetSelection: {},
+        taskSelection: {},
+        taskSetSelection: {},
       );
       final task1Benchmark = store.allBenchmarks.firstWhere(
         (e) => e.id == 'task1',
@@ -292,7 +293,8 @@ void main() {
       final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backends: [coremlBackend(), tfliteBackend2()],
-        taskSelection: {}, taskSetSelection: {},
+        taskSelection: {},
+        taskSetSelection: {},
       );
       // task2 exists only in the tflite backend: present, defaults to tflite
       final task2Benchmark = store.allBenchmarks.firstWhere(
@@ -306,7 +308,8 @@ void main() {
       final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [coremlDefaultPolicyBackend(), tfliteBackend()],
-        taskSelection: {}, taskSetSelection: {},
+        taskSelection: {},
+        taskSetSelection: {},
       );
       final benchmark = store.allBenchmarks.single;
       expect(benchmark.backends.map((e) => e.info.libName), [
@@ -320,7 +323,8 @@ void main() {
         final store = BenchmarkStore(
           appConfig: pb.MLPerfConfig(task: [task1, task2]),
           backends: [coremlFillGapsBackend(), tfliteBackendBoth()],
-          taskSelection: {}, taskSetSelection: {},
+          taskSelection: {},
+          taskSetSelection: {},
         );
         // task1 is supported by the vendor: fallback is filtered out
         final task1Benchmark = store.allBenchmarks.firstWhere(
@@ -344,7 +348,8 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [coremlFillGapsBackend(), tfliteBackend()],
         taskSelection: {},
-        backendSelection: {'task1': 'libtflitebackend'}, taskSetSelection: {},
+        backendSelection: {'task1': 'libtflitebackend'},
+        taskSetSelection: {},
       );
       final benchmark = store.allBenchmarks.single;
       expect(benchmark.selectedBackend.info.libName, 'libcoremlbackend');
@@ -354,7 +359,8 @@ void main() {
       final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [coremlBackend(), tfliteBackend()],
-        taskSelection: {}, taskSetSelection: {},
+        taskSelection: {},
+        taskSetSelection: {},
       );
       final benchmark = store.allBenchmarks.single;
       expect(benchmark.selectedDelegate.delegateName, 'coreml-delegate');
@@ -373,7 +379,8 @@ void main() {
         backendSelection: {
           'task1': 'libtflitebackend',
           'task2': 'libgonebackend',
-        }, taskSetSelection: {},
+        },
+        taskSetSelection: {},
       );
       final task1Benchmark = store.allBenchmarks.firstWhere(
         (e) => e.id == 'task1',
@@ -389,7 +396,8 @@ void main() {
       final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [coremlBackend(), tfliteBackend()],
-        taskSelection: {}, taskSetSelection: {},
+        taskSelection: {},
+        taskSetSelection: {},
       );
       final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
       final before = store.listResources(
