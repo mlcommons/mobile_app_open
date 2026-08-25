@@ -319,32 +319,23 @@ class BenchmarkStore {
             BenchmarkId.allIds.indexOf(a.id) - BenchmarkId.allIds.indexOf(b.id),
       );
     for (final task in sortedTasks) {
+      // Walk the priority-ordered backends and collect every one claiming
+      // this task. A backend's claim_policy gates everything below it:
+      // the walk stops after the first claiming backend that does not
+      // declare CLAIM_SHARED (the default is CLAIM_EXCLUSIVE), so each
+      // backend decides whether lower-priority backends (including the
+      // TFLite fallback) stay selectable for benchmarks it claims. Backends
+      // that do not claim the task never affect the walk.
       final candidates = <BenchmarkBackend>[];
       for (final backend in backends) {
         final setting = backend.settings.benchmarkSetting.singleWhereOrNull(
           (s) => s.benchmarkId == task.id,
         );
-        if (setting != null) {
-          candidates.add(BenchmarkBackend(info: backend, settings: setting));
+        if (setting == null) continue;
+        candidates.add(BenchmarkBackend(info: backend, settings: setting));
+        if (backend.settings.claimPolicy != pb.ClaimPolicy.CLAIM_SHARED) {
+          break;
         }
-      }
-      // A vendor backend can restrict the fallback backend to benchmarks it
-      // does not support itself (FALLBACK_FILL_GAPS); FALLBACK_DISABLED is
-      // enforced device-wide in findMatchingBackends().
-      final vendors = candidates.where(
-        (c) => c.info.libName != BackendInfoHelper.fallbackBackend,
-      );
-      final offerFallback =
-          vendors.isEmpty ||
-          vendors.every(
-            (c) =>
-                c.info.settings.fallbackPolicy ==
-                pb.FallbackPolicy.FALLBACK_COEXIST,
-          );
-      if (!offerFallback) {
-        candidates.removeWhere(
-          (c) => c.info.libName == BackendInfoHelper.fallbackBackend,
-        );
       }
       if (candidates.isEmpty) {
         print('No matching benchmark settings for task ${task.id}');

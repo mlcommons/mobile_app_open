@@ -2,8 +2,9 @@
 # proto-message: BackendSetting
 
 # This backend serves only the llm-* benchmarks (LiteRT compiled-model API).
-# Let the TFLite fallback cover every benchmark this backend does not claim.
-fallback_policy: FALLBACK_FILL_GAPS
+# Lower-priority backends (the TFLite fallback) stay selectable next to it,
+# so users can compare LLM implementations per benchmark.
+claim_policy: CLAIM_SHARED
 
 benchmark_setting {
   benchmark_id: "llm-1b"
