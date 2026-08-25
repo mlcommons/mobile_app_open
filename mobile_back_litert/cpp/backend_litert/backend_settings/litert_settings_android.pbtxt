@@ -23,14 +23,13 @@ benchmark_setting {
   }
   # The GPU delegate uses a dedicated GPU export of the model; the
   # delegate-level model_filename overrides the benchmark-level one.
-  # TODO(anhappdev): fill model_checksum once the upload is final.
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072_gpu.tflite"
-      model_checksum: ""
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072_litert.tflite"
+      model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
     }
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
@@ -38,7 +37,7 @@ benchmark_setting {
     }
     custom_setting {
       id: "model_filename"
-      value: "llama_q8_ekv3072_gpu.tflite"
+      value: "llama_q8_ekv3072_litert.tflite"
     }
   }
   delegate_selected: "GPU"
@@ -74,14 +73,13 @@ benchmark_setting {
   }
   # The GPU delegate uses a dedicated GPU export of the model; the
   # delegate-level model_filename overrides the benchmark-level one.
-  # TODO(anhappdev): fill model_checksum once the upload is final.
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072_gpu.tflite"
-      model_checksum: ""
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072_litert.tflite"
+      model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
     }
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
@@ -89,7 +87,7 @@ benchmark_setting {
     }
     custom_setting {
       id: "model_filename"
-      value: "llama_q8_ekv3072_gpu.tflite"
+      value: "llama_q8_ekv3072_litert.tflite"
     }
   }
   delegate_selected: "GPU"
