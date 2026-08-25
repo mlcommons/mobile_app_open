@@ -6,11 +6,18 @@ name: LiteRT Device Test
 # any device; the unified APK adds the vendor backends for coexistence tests.
 # Reuses the test APKs already built and uploaded by the Android board, so
 # this job only spends BrowserStack time, not a rebuild.
+#
+# workflow_dispatch only works once this file is on the default branch, so
+# until the PR merges, launch it by pushing a litert-test-* tag on a commit
+# containing this file (the run uses the input defaults):
+#   git tag litert-test-1 && git push <remote> litert-test-1
 
 permissions:
   contents: read
 
 on:
+  push:
+    tags: ['litert-test-*']
   workflow_dispatch:
     inputs:
       device:
@@ -39,11 +46,15 @@ env:
 
 jobs:
   test-litert-device:
-    name: litert-${{ inputs.apk_variant }}-${{ inputs.device }}
+    name: litert-${{ inputs.apk_variant || 'tflite' }}-${{ inputs.device || 'Google Pixel 10 Pro-16.0' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     env:
       BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
+      # Fall back to the defaults when triggered by a litert-test-* tag,
+      # where the workflow_dispatch inputs are empty.
+      DEVICE: ${{ inputs.device || 'Google Pixel 10 Pro-16.0' }}
+      APK_VARIANT: ${{ inputs.apk_variant || 'tflite' }}
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Set up authentication for Google Cloud SDK
@@ -57,7 +68,6 @@ jobs:
       - name: Resolve build number and APK names
         env:
           INPUT_BUILD_NUMBER: ${{ inputs.build_number }}
-          APK_VARIANT: ${{ inputs.apk_variant }}
         run: |
           if [ -n "$INPUT_BUILD_NUMBER" ]; then
             n="$INPUT_BUILD_NUMBER"
@@ -75,8 +85,8 @@ jobs:
           } >> "$GITHUB_ENV"
       - name: Download test APK
         run: |
-          gsutil cp "$GCLOUD_BUCKET_PATH/test-main-${{ inputs.apk_variant }}.apk" "/tmp/$MAIN_APK_NAME"
-          gsutil cp "$GCLOUD_BUCKET_PATH/test-helper-${{ inputs.apk_variant }}.apk" "/tmp/$HELPER_APK_NAME"
+          gsutil cp "$GCLOUD_BUCKET_PATH/test-main-$APK_VARIANT.apk" "/tmp/$MAIN_APK_NAME"
+          gsutil cp "$GCLOUD_BUCKET_PATH/test-helper-$APK_VARIANT.apk" "/tmp/$HELPER_APK_NAME"
       - name: Upload main app
         run: |
           curl -u "$BROWSERSTACK_CREDENTIALS" \
@@ -96,10 +106,10 @@ jobs:
           BROWSERSTACK_PROJECT: ${{ github.event.repository.name }}
           BROWSERSTACK_APP: ${{ env.MAIN_APK_NAME }}
           BROWSERSTACK_TEST_SUITE: ${{ env.HELPER_APK_NAME }}
-          BROWSERSTACK_BUILD_TAG: ${{ inputs.device }}
+          BROWSERSTACK_BUILD_TAG: ${{ env.DEVICE }}
           BROWSERSTACK_LOGS_DIR: ${{ env.BROWSERSTACK_LOGS_DIR }}
           BROWSERSTACK_DEVICES: >-
-            ["${{ inputs.device }}"]
+            ["${{ env.DEVICE }}"]
         with:
           timeout_minutes: 60
           max_attempts: 2
@@ -111,7 +121,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
-          name: logs-litert-${{ inputs.device }}-${{ github.run_number }}
+          name: logs-litert-${{ env.DEVICE }}-${{ github.run_number }}
           path: ${{ env.BROWSERSTACK_LOGS_DIR }}
           retention-days: 28
           if-no-files-found: error
