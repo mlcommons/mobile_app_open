@@ -258,12 +258,10 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
   _kSamsungBackend: {_kS24: Interval(min: 800, max: 1200)},
 };
 
-// Token throughput (tok/s) of the LiteRT CPU path. Every Android device job
-// runs llm-1b and llm-1b-instruct via the LiteRT fallback; devices without an
-// entry here skip the value check until real numbers are collected. The
-// Pixel 9 Pro measured 4.9-8.0 tok/s across runs; the wide interval absorbs
-// shared-device variance while still catching real regressions and nonsense
-// values.
+// Token throughput (tok/s) of the LiteRT CPU path. CI runs llm-1b and
+// llm-1b-instruct only on the Pixel 9 Pro job, which measured 4.9-8.0 tok/s
+// across runs; the wide interval absorbs shared-device variance while still
+// catching real regressions and nonsense values.
 const Map<String, Map<String, Interval>> _llm = {
   _kLitertBackend: {_kPixel9Pro: Interval(min: 2, max: 20)},
 };
