@@ -29,6 +29,7 @@ const _kDN2103 = 'DN2103'; // OnePlus DN2103
 
 // Android devices on BrowserStack App Automate
 const _kPixel9Pro = 'Pixel 9 Pro'; // Google Pixel 9 Pro
+const _kPixel10Pro = 'Pixel 10 Pro'; // Google Pixel 10 Pro
 const _kS24 = 'SM-S921B'; // Samsung Galaxy S24
 const _kS24Ultra = 'SM-S928B'; // Samsung Galaxy S24 Ultra
 const _kS25Ultra = 'SM-S938B'; // Samsung Galaxy S25 Ultra
@@ -264,7 +265,11 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
 // shared-device variance while still catching real regressions and nonsense
 // values. Re-measure and widen when the GPU delegate becomes the default.
 const Map<String, Map<String, Interval>> _llm = {
-  _kLitertBackend: {_kPixel9Pro: Interval(min: 2, max: 20)},
+  _kLitertBackend: {
+    _kPixel9Pro: Interval(min: 2, max: 20),
+    // Measured 7.97-8.14 tok/s in the manual LiteRT device test.
+    _kPixel10Pro: Interval(min: 2, max: 20),
+  },
 };
 
 const benchmarkExpectedThroughput = {
