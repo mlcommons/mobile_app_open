@@ -16,7 +16,7 @@ limitations under the License.
 #include "flutter/cpp/c/type.h"
 #include "tflite/c/c_api.h"
 
-// A pipeline interface to run TFLite models.
+// A pipeline interface to run LiteRT models.
 class Pipeline {
  public:
   Pipeline() = default;
