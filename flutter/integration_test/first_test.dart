@@ -97,6 +97,7 @@ void testBenchmark(
       StoreConstants.cooldownDuration: runMode.cooldownDuration,
     });
     await startApp(tester);
+    applyDeviceBackendOverride(tester);
     await validateSettings(tester);
     if (!hasBenchmark(tester, benchmarkId)) {
       markTestSkipped('Backend does not support benchmark $benchmarkId');

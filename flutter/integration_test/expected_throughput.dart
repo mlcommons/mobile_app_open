@@ -70,6 +70,12 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
     _kS10Plus: Interval(min: 400, max: 800),
   },
   _kSamsungBackend: {_kS24: Interval(min: 600, max: 1000)},
+  // LiteRT vision runs exist only on the Pixel 10 Pro job, where the
+  // integration test pins every benchmark to the LiteRT backend (see
+  // deviceBackendOverride in utils.dart). The intervals stay wide until
+  // the first runs produce real numbers: they must cover both the
+  // NNAPI-accelerated path and a CPU fallback.
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 20, max: 1000)},
 };
 
 const Map<String, Map<String, Interval>> _objectDetection = {
@@ -101,6 +107,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kS10Plus: Interval(min: 1200, max: 2000),
   },
   _kSamsungBackend: {_kS24: Interval(min: 1400, max: 2400)},
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 30, max: 1000)},
 };
 
 const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
@@ -132,6 +139,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
     _kS10Plus: Interval(min: 800, max: 1500),
   },
   _kSamsungBackend: {_kS24: Interval(min: 800, max: 1500)},
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 10, max: 800)},
 };
 
 const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
@@ -163,6 +171,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kS10Plus: Interval(min: 100, max: 300),
   },
   _kSamsungBackend: {_kS24: Interval(min: 220, max: 350)},
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 1, max: 300)},
 };
 
 const Map<String, Map<String, Interval>> _superResolution = {
@@ -194,6 +203,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kS10Plus: Interval(min: 150, max: 300),
   },
   _kSamsungBackend: {_kS24: Interval(min: 90, max: 180)},
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 1, max: 300)},
 };
 
 // TODO (anhappdev): update expected throughput for stable diffusion
@@ -257,6 +267,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
     _kS10Plus: Interval(min: 700, max: 1200),
   },
   _kSamsungBackend: {_kS24: Interval(min: 800, max: 1200)},
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 20, max: 1200)},
 };
 
 // Token throughput (tok/s) of the LiteRT backend. The GPU delegate is the

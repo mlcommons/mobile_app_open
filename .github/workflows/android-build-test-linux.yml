@@ -330,6 +330,10 @@ jobs:
             device: "Samsung Galaxy M32-11.0"
           - backend: "pixel"
             device: "Google Pixel 9 Pro-15.0"
+          # The integration test overrides the backend selection on this
+          # device so every benchmark LiteRT supports runs on it (stable
+          # diffusion has no LiteRT setting and is skipped there); see
+          # deviceBackendOverride in flutter/integration_test.
           - backend: "litert"
             device: "Google Pixel 10 Pro-16.0"
           - backend: "qti"

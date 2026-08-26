@@ -13,8 +13,9 @@
 # limitations under the License.
 ##########################################################################
 
-# LiteRT backend: serves the llm-* benchmarks on Android via the LiteRT
-# compiled-model API. All other benchmarks stay on the TFLite backend.
+# LiteRT backend (Android only): the llm-* benchmarks run on the LiteRT
+# compiled-model API, the vision/NLP benchmarks on the TFLite interpreter
+# vendored inside LiteRT.
 ifeq (${WITH_LITERT},1)
   $(info WITH_LITERT=1)
   backend_litert_bins_dir=output/litert-bins

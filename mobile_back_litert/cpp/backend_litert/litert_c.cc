@@ -15,6 +15,7 @@ limitations under the License.
 #include "absl/log/log.h"
 #include "litert_settings_android.h"
 #include "llm_pipeline.h"
+#include "single_model_pipeline.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,9 +23,9 @@ extern "C" {
 
 std::unique_ptr<Pipeline> pipeline;
 
-// This backend serves only the llm-* benchmarks, and only on Android.
-// All other benchmarks fall through to the next backend in the list
-// (see fallback_policy in litert_settings_android.pbtxt).
+// This backend is Android-only. The llm-* benchmarks run on the LiteRT
+// CompiledModel LLM pipeline; every other benchmark runs on the TFLite
+// interpreter single-model pipeline backed by @litert's vendored runtime.
 bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const char **settings,
                                      const mlperf_device_info_t *device_info) {
@@ -49,8 +50,20 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
 mlperf_backend_ptr_t mlperf_backend_create(
     const char *model_path, mlperf_backend_configuration_t *configs,
     const char *native_lib_path) {
-  LOG(INFO) << "Initializing LLMPipeline";
-  pipeline = std::make_unique<LLMPipeline>();
+  const char *pipeline_type = "";
+  for (int i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], "pipeline") == 0) {
+      pipeline_type = configs->values[i];
+      break;
+    }
+  }
+  if (strcmp(pipeline_type, "LLMPipeline") == 0) {
+    LOG(INFO) << "Initializing LLMPipeline";
+    pipeline = std::make_unique<LLMPipeline>();
+  } else {
+    LOG(INFO) << "Initializing SingleModelPipeline";
+    pipeline = std::make_unique<SingleModelPipeline>();
+  }
   return pipeline->backend_create(model_path, configs, native_lib_path);
 }
 

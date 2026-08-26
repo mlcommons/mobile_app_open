@@ -20,6 +20,9 @@ key: <accelerator> OR <accelerator>|<backendName>
 const Map<String, Interval> _imageClassificationV2 = {
   'cpu': Interval(min: 0.82, max: 0.84),
   'npu': Interval(min: 0.80, max: 0.82),
+  // LiteRT vision runs on the Pixel 10 Pro CI job. Wide intervals spanning
+  // the other accelerators' values until the first runs produce numbers.
+  'npu|LiteRT': Interval(min: 0.75, max: 0.90),
   'tpu': Interval(min: 0.82, max: 0.84),
   'ane': Interval(min: 0.69, max: 0.91),
   'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
@@ -32,6 +35,7 @@ const Map<String, Interval> _imageClassificationV2 = {
 const Map<String, Interval> _imageClassificationOfflineV2 = {
   'cpu': Interval(min: 0.88, max: 0.91),
   'npu': Interval(min: 0.69, max: 0.71),
+  'npu|LiteRT': Interval(min: 0.65, max: 0.95),
   'tpu': Interval(min: 0.89, max: 0.91),
   'ane': Interval(min: 0.69, max: 0.91),
   'cpu&gpu&ane': Interval(min: 0.69, max: 0.91),
@@ -44,6 +48,7 @@ const Map<String, Interval> _imageClassificationOfflineV2 = {
 const Map<String, Interval> _objectDetection = {
   'cpu': Interval(min: 0.31, max: 0.32),
   'npu': Interval(min: 0.28, max: 0.31),
+  'npu|LiteRT': Interval(min: 0.25, max: 0.45),
   'tpu': Interval(min: 0.36, max: 0.38),
   'ane|TFLite': Interval(min: 0.31, max: 0.34),
   'ane|Core ML': Interval(min: 0.45, max: 0.46),
@@ -57,6 +62,7 @@ const Map<String, Interval> _objectDetection = {
 const Map<String, Interval> _imageSegmentationV2 = {
   'cpu': Interval(min: 0.38, max: 0.40),
   'npu': Interval(min: 0.33, max: 0.34),
+  'npu|LiteRT': Interval(min: 0.30, max: 0.45),
   'tpu': Interval(min: 0.33, max: 0.34),
   'ane|TFLite': Interval(min: 0.38, max: 0.40),
   'ane|Core ML': Interval(min: 0.38, max: 0.40),
@@ -71,6 +77,7 @@ const Map<String, Interval> _naturalLanguageProcessing = {
   'cpu': Interval(min: 1.00, max: 1.00),
   'tpu': Interval(min: 1.00, max: 1.00),
   'gpu|TFLite': Interval(min: 1.00, max: 1.00),
+  'gpu|LiteRT': Interval(min: 0.80, max: 1.00),
   // 1.00 in simulator, 0.80 on iphone 12 mini
   'gpu|Core ML': Interval(min: 0.80, max: 1.00),
   'cpu&gpu&ane': Interval(min: 0.80, max: 1.00),
@@ -83,6 +90,7 @@ const Map<String, Interval> _naturalLanguageProcessing = {
 const Map<String, Interval> _superResolution = {
   'cpu': Interval(min: 0.32, max: 0.35),
   'npu': Interval(min: 0.32, max: 0.35),
+  'npu|LiteRT': Interval(min: 0.30, max: 0.40),
   'tpu': Interval(min: 0.32, max: 0.35),
   'ane|TFLite': Interval(min: 0.32, max: 0.35),
   'ane|Core ML': Interval(min: 0.32, max: 0.35),

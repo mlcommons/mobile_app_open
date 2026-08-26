@@ -36,11 +36,15 @@ cc_library(
     srcs = [
         "litert_c.cc",
         "llm_pipeline.cc",
+        "single_model_pipeline.cc",
     ],
     hdrs = [
         "litert_settings_android.h",
         "llm_pipeline.h",
         "pipeline.h",
+        "single_model_pipeline.h",
+        "thread_pool.h",
+        "utils.h",
     ],
     copts = tflite_copts() + select({
         "//flutter/android/commonlibs:use_asan": [
@@ -74,7 +78,20 @@ cc_library(
         "@litert//tflite/c:c_api",
         "@litert//tflite/c:common",
         "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-    ],
+    ] + select({
+        # The single-model pipeline's delegates come from @litert's vendored
+        # TFLite, the same copy the rest of this .so links — pulling them
+        # from @org_tensorflow would duplicate the TF Lite runtime.
+        "@org_tensorflow//tensorflow:android": [
+            "@litert//tflite/delegates/gpu:delegate",
+            "@litert//tflite/delegates/nnapi:nnapi_delegate",
+        ],
+        "@org_tensorflow//tensorflow:ios": [
+            "@litert//tflite/delegates/coreml:coreml_delegate",
+            "@litert//tflite/delegates/gpu:metal_delegate",
+        ],
+        "//conditions:default": [],
+    }),
     alwayslink = 1,
 )
 

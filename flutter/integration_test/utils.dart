@@ -11,6 +11,7 @@ import 'package:mlperfbench/data/environment/environment_info.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/main.dart' as app;
 
 import 'expected_accuracy.dart';
@@ -94,6 +95,36 @@ Future<void> validateSettings(WidgetTester tester) async {
   }
 }
 
+// Devices where the test pins every benchmark to one backend (when that
+// backend is a candidate for the benchmark). The app's default selection
+// follows the backend priority order, so without this the LiteRT vision
+// runs would never execute in CI: the pixel backend outranks litert on
+// Pixel devices.
+const deviceBackendOverride = <String, String>{
+  'Pixel 10 Pro': BackendId.litert,
+};
+
+void applyDeviceBackendOverride(WidgetTester tester) {
+  final deviceModel = getDeviceModel(DeviceInfo.instance.envInfo);
+  final backendLib = deviceBackendOverride[deviceModel];
+  if (backendLib == null) return;
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  for (final benchmark in benchmarkState.allBenchmarks) {
+    if (benchmark.selectBackend(backendLib)) {
+      debugPrint(
+        'Backend override on $deviceModel: '
+        '${benchmark.id} runs on $backendLib',
+      );
+    } else {
+      debugPrint(
+        'Backend override on $deviceModel: '
+        '$backendLib is not a candidate for ${benchmark.id}',
+      );
+    }
+  }
+}
+
 bool hasBenchmark(WidgetTester tester, String benchmarkId) {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
@@ -128,6 +159,20 @@ bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
   if (benchmarkId.startsWith('llm') &&
       llmVendorLibs.contains(primaryLib) &&
       selectedLib != primaryLib) {
+    return false;
+  }
+  // Same reasoning for the vision/NLP benchmarks LiteRT claims: on a
+  // device job dedicated to another backend, a benchmark that defaults to
+  // LiteRT is one the primary backend does not claim. Skip it to keep
+  // that job's coverage and runtime unchanged. Jobs pinned to LiteRT via
+  // deviceBackendOverride (and the litert-only APK, where LiteRT is
+  // primary) still run everything on LiteRT.
+  final overrideLib =
+      deviceBackendOverride[getDeviceModel(DeviceInfo.instance.envInfo)];
+  if (!benchmarkId.startsWith('llm') &&
+      selectedLib == BackendId.litert &&
+      primaryLib != BackendId.litert &&
+      overrideLib != BackendId.litert) {
     return false;
   }
   return true;
