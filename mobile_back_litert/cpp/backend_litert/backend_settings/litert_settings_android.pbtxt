@@ -24,28 +24,24 @@ benchmark_setting {
   }
   # The GPU delegate uses a dedicated GPU export of the model; the
   # delegate-level model_filename overrides the benchmark-level one.
-  # TODO(anhappdev): uncomment once llama_q8_ekv3072_litert.tflite is
-  # uploaded. The app downloads every delegate_choice's model files up
-  # front, so an entry pointing at a missing file breaks resource
-  # loading on every device even when another delegate is selected.
-  # delegate_choice: {
-  #   delegate_name: "GPU"
-  #   accelerator_name: "gpu"
-  #   accelerator_desc: "GPU"
-  #   model_file: {
-  #     model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072_litert.tflite"
-  #     model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
-  #   }
-  #   model_file: {
-  #     model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
-  #     model_checksum: "2ad260fc18b965ce16006d76c9327082"
-  #   }
-  #   custom_setting {
-  #     id: "model_filename"
-  #     value: "llama_q8_ekv3072_litert.tflite"
-  #   }
-  # }
-  delegate_selected: "CPU"
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/llama_q8_ekv3072_litert.tflite"
+      model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+    custom_setting {
+      id: "model_filename"
+      value: "llama_q8_ekv3072_litert.tflite"
+    }
+  }
+  delegate_selected: "GPU"
   custom_setting {
     id: "pipeline"
     value: "LLMPipeline"
@@ -78,28 +74,24 @@ benchmark_setting {
   }
   # The GPU delegate uses a dedicated GPU export of the model; the
   # delegate-level model_filename overrides the benchmark-level one.
-  # TODO(anhappdev): uncomment once llama_q8_ekv3072_litert.tflite is
-  # uploaded. The app downloads every delegate_choice's model files up
-  # front, so an entry pointing at a missing file breaks resource
-  # loading on every device even when another delegate is selected.
-  # delegate_choice: {
-  #   delegate_name: "GPU"
-  #   accelerator_name: "gpu"
-  #   accelerator_desc: "GPU"
-  #   model_file: {
-  #     model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072_litert.tflite"
-  #     model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
-  #   }
-  #   model_file: {
-  #     model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
-  #     model_checksum: "2ad260fc18b965ce16006d76c9327082"
-  #   }
-  #   custom_setting {
-  #     id: "model_filename"
-  #     value: "llama_q8_ekv3072_litert.tflite"
-  #   }
-  # }
-  delegate_selected: "CPU"
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/llama_q8_ekv3072_litert.tflite"
+      model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+    custom_setting {
+      id: "model_filename"
+      value: "llama_q8_ekv3072_litert.tflite"
+    }
+  }
+  delegate_selected: "GPU"
   custom_setting {
     id: "pipeline"
     value: "LLMPipeline"
