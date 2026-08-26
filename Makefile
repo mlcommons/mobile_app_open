@@ -18,7 +18,7 @@ all: flutter
 
 # available backends
 WITH_TFLITE?=1
-WITH_LITERT?=1
+WITH_LITERT?=0
 WITH_QTI?=0
 WITH_SAMSUNG?=0
 WITH_PIXEL?=0

@@ -18,8 +18,9 @@ This backend runs the `llm-*` benchmarks on [LiteRT](https://github.com/google-a
 
 ## Build
 
-The backend is enabled by default (`WITH_LITERT=1` in the root Makefile).
-Set `WITH_LITERT=0` to exclude it.
+The backend is disabled by default (`WITH_LITERT=0` in the root Makefile),
+like the vendor backends. Add `WITH_LITERT=1` to include it; the unified CI
+and release builds do.
 
 Build it together with the app libs:
 

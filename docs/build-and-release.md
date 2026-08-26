@@ -22,7 +22,7 @@ For private files, private repo should be used.
 
 Release files should be named to include version numbers and backends:
 
-Example: `mlperfbench-v1.1-qsmgt.apk`
+Example: `mlperfbench-v1.1-qsmglt.apk`
 
 * Q - QTI
 * S - Samsung SLSI
@@ -30,7 +30,7 @@ Example: `mlperfbench-v1.1-qsmgt.apk`
 * G - Google Pixel
 * I - Intel
 * H - Huawei
-* T - TFLite
 * L - LiteRT
+* T - TFLite
 
 Single version of the app should be used for both submission and release.

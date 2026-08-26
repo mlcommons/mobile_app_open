@@ -194,11 +194,22 @@ jobs:
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-samsung.apk
           gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-samsung.apk
+      - name: Build and upload test APK for LiteRT
+        env:
+          OFFICIAL_BUILD: false
+          PERF_TEST: true
+          WITH_TFLITE: 0
+          WITH_LITERT: 1
+        run: |
+          make flutter/android/release flutter/android/apk flutter/android/test-apk
+          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-litert.apk
+          gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-litert.apk
       - name: Build and upload test APK for all backends
         env:
           OFFICIAL_BUILD: false
           PERF_TEST: true
           WITH_TFLITE: 1
+          WITH_LITERT: 1
           WITH_PIXEL: 1
           WITH_MEDIATEK: 1
           WITH_QTI: 1
@@ -213,6 +224,7 @@ jobs:
           OFFICIAL_BUILD: true
           FIREBASE_CRASHLYTICS_ENABLED: true
           WITH_TFLITE: 1
+          WITH_LITERT: 1
           WITH_PIXEL: 1
           WITH_MEDIATEK: 1
           WITH_QTI: 1
@@ -259,23 +271,31 @@ jobs:
           path: output/android-apks/*-s-${{ needs.computed.outputs.build_number }}.apk
           retention-days: 28
           if-no-files-found: error
+      - name: Archive APK with LiteRT backend
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-apk-litert-${{ needs.computed.outputs.build_number }}
+          path: output/android-apks/*-l-${{ needs.computed.outputs.build_number }}.apk
+          retention-days: 28
+          if-no-files-found: error
       - name: Archive APK with unified backend
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: android-apk-unified-${{ needs.computed.outputs.build_number }}
-          path: output/android-apks/*-qsmgt-${{ needs.computed.outputs.build_number }}.apk
+          path: output/android-apks/*-qsmglt-${{ needs.computed.outputs.build_number }}.apk
           retention-days: 28
           if-no-files-found: error
       - name: Archive AAB with unified backend
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: android-aab-unified-${{ needs.computed.outputs.build_number }}
-          path: output/android-apks/*-qsmgt-${{ needs.computed.outputs.build_number }}.aab
+          path: output/android-apks/*-qsmglt-${{ needs.computed.outputs.build_number }}.aab
           retention-days: 28
           if-no-files-found: error
       - name: Build Android CLI binaries
         env:
           WITH_TFLITE: 1
+          WITH_LITERT: 1
           WITH_PIXEL: 1
           WITH_MEDIATEK: 1
           WITH_QTI: 1
@@ -496,6 +516,8 @@ jobs:
             device: "Samsung Galaxy M32-11.0"
           - backend: "pixel"
             device: "Google Pixel 9 Pro-15.0"
+          - backend: "litert"
+            device: "Google Pixel 10 Pro-16.0"
           - backend: "mtk"
             device: "Samsung Galaxy Tab S10 Plus-15.0"
           - backend: "qti"

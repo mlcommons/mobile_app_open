@@ -48,8 +48,10 @@ scanner/build-image: flutter/android/docker/image output/docker_mlperf_scanner.s
 .PHONY: scanner/build-app
 scanner/build-app:
 	bazel clean
+	@# WITH_LITERT=1: unlike the proprietary vendor SDKs, the LiteRT backend
+	@# is first-party code and must stay under Sonar analysis.
 	build-wrapper-linux-x86-64 --out-dir "${SONAR_OUT_DIR}" \
-		make flutter/android
+		make WITH_LITERT=1 flutter/android
 
 .PHONY: scanner/scan
 scanner/scan: scanner/build-app

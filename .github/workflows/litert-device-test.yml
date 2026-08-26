@@ -1,9 +1,9 @@
 name: LiteRT Device Test
 
 # Manually-dispatched BrowserStack run for validating the LiteRT backend on
-# a specific real device. The tflite test APK bundles TFLite + LiteRT and no
-# vendor backends, so LiteRT is the default for every benchmark it claims on
-# any device; the unified APK adds the vendor backends for coexistence tests.
+# a specific real device. The litert test APK contains only the LiteRT
+# backend, so it runs exactly the benchmarks LiteRT claims; the unified APK
+# adds every other backend for coexistence tests.
 # Reuses the test APKs already built and uploaded by the Android board, so
 # this job only spends BrowserStack time, not a rebuild.
 #
@@ -26,14 +26,15 @@ on:
         default: 'Google Pixel 10 Pro-16.0'
       apk_variant:
         description: >-
-          Test APK to run: tflite = TFLite + LiteRT only (LiteRT is default
-          for all benchmarks it claims), unified = all backends (coexistence)
+          Test APK to run: litert = LiteRT only, unified = all backends
+          (coexistence), tflite = TFLite only
         required: true
-        default: 'tflite'
+        default: 'litert'
         type: choice
         options:
-          - tflite
+          - litert
           - unified
+          - tflite
       build_number:
         description: >-
           Build number of an Android board run whose test APKs to reuse
@@ -46,7 +47,7 @@ env:
 
 jobs:
   test-litert-device:
-    name: litert-${{ inputs.apk_variant || 'tflite' }}-${{ inputs.device || 'Google Pixel 10 Pro-16.0' }}
+    name: litert-${{ inputs.apk_variant || 'litert' }}-${{ inputs.device || 'Google Pixel 10 Pro-16.0' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     env:
@@ -54,7 +55,7 @@ jobs:
       # Fall back to the defaults when triggered by a litert-test-* tag,
       # where the workflow_dispatch inputs are empty.
       DEVICE: ${{ inputs.device || 'Google Pixel 10 Pro-16.0' }}
-      APK_VARIANT: ${{ inputs.apk_variant || 'tflite' }}
+      APK_VARIANT: ${{ inputs.apk_variant || 'litert' }}
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Set up authentication for Google Cloud SDK
