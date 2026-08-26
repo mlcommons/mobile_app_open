@@ -49,6 +49,10 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
     _kPixel5: Interval(min: 20, max: 75),
     _kPixel6: Interval(min: 100, max: 600),
     _kM32: Interval(min: 5, max: 15),
+    // The TFLite-pinned Pixel 10 Pro comparison job (deviceBackendOverride);
+    // wide until the first runs produce numbers — NNAPI may land on the
+    // EdgeTPU-class accelerator or fall back to CPU.
+    _kPixel10Pro: Interval(min: 5, max: 2000),
     _kIphoneOnGitHubAction: Interval(min: 0, max: 29),
     _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
@@ -87,6 +91,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kPixel5: Interval(min: 40, max: 60),
     _kPixel6: Interval(min: 100, max: 450),
     _kM32: Interval(min: 20, max: 40),
+    _kPixel10Pro: Interval(min: 5, max: 2000),
     _kIphoneOnGitHubAction: Interval(min: 0, max: 9),
     _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
@@ -120,6 +125,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
     _kPixel5: Interval(min: 25, max: 40),
     _kPixel6: Interval(min: 80, max: 180),
     _kM32: Interval(min: 2, max: 10),
+    _kPixel10Pro: Interval(min: 5, max: 2000),
     _kIphoneOnGitHubAction: Interval(min: 0, max: 9),
     _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
@@ -152,6 +158,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kPixel5: Interval(min: 2.3, max: 3.0),
     _kPixel6: Interval(min: 2, max: 75),
     _kM32: Interval(min: 2, max: 5),
+    _kPixel10Pro: Interval(min: 1, max: 500),
     _kIphoneOnGitHubAction: Interval(min: 0, max: 9),
     _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
@@ -184,6 +191,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kPixel5: Interval(min: 4, max: 8),
     _kPixel6: Interval(min: 7, max: 14),
     _kM32: Interval(min: 0.1, max: 3),
+    _kPixel10Pro: Interval(min: 1, max: 500),
     _kIphoneOnGitHubAction: Interval(min: 0, max: 9),
     _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
@@ -248,6 +256,7 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
     _kPixel5: Interval(min: 20, max: 180),
     _kPixel6: Interval(min: 100, max: 700),
     _kM32: Interval(min: 8, max: 18),
+    _kPixel10Pro: Interval(min: 5, max: 2000),
     _kIphoneOnGitHubAction: Interval(min: 0, max: 25),
     _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
   },
@@ -284,6 +293,9 @@ const Map<String, Map<String, Interval>> _llm = {
     _kPixel9Pro: Interval(min: 2, max: 50),
     _kPixel10Pro: Interval(min: 2, max: 50),
   },
+  // The TFLite-pinned Pixel 10 Pro comparison job runs the LLMs on the
+  // TFLite backend's CPU pipeline.
+  _kTFLiteBackend: {_kPixel10Pro: Interval(min: 2, max: 50)},
 };
 
 const benchmarkExpectedThroughput = {

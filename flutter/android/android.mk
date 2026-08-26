@@ -120,17 +120,22 @@ flutter/android/test-apk/debug-plugins:
 	cd flutter && ${_start_args} flutter --no-version-check build apk --debug --config-only
 
 FLUTTER_ANDROID_APK_TEST_MAIN?=test-main.apk
+# Which backend the Pixel 10 Pro CI jobs pin every benchmark to; see
+# deviceBackendOverride in flutter/integration_test/utils.dart.
+P10P_BACKEND?=litert
 flutter_android_apk_test_main_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_TEST_MAIN}
 .PHONY: flutter/android/test-apk/main
 flutter/android/test-apk/main: flutter/android/test-apk/debug-plugins
 	mkdir -p $$(dirname ${flutter_android_apk_test_main_path})
 	flutter_android_apk_perf_test_arg=$$(printf PERF_TEST=${PERF_TEST} | base64) && \
 	flutter_android_apk_benchmark_ids_arg=$$(printf BENCHMARK_IDS=${BENCHMARK_IDS} | base64) && \
+	flutter_android_apk_p10p_backend_arg=$$(printf P10P_BACKEND=${P10P_BACKEND} | base64) && \
 		cd flutter/android && \
 		./gradlew app:assembleDebug \
 		-Ptarget=integration_test/first_test.dart \
 		-Pdart-defines=$${flutter_android_apk_perf_test_arg} \
-		-Pdart-defines=$${flutter_android_apk_benchmark_ids_arg}
+		-Pdart-defines=$${flutter_android_apk_benchmark_ids_arg} \
+		-Pdart-defines=$${flutter_android_apk_p10p_backend_arg}
 	cp -f flutter/build/app/outputs/apk/debug/app-debug.apk ${flutter_android_apk_test_main_path}
 
 FLUTTER_ANDROID_APK_TEST_HELPER?=test-helper.apk
