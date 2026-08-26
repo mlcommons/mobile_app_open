@@ -391,6 +391,13 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
                << "; using the CPU accelerator";
   }
 
+  if (use_gpu && backend_data->shards_num > 1) {
+    // Two shards Run() concurrently in issue_query; on the shared LiteRT GPU
+    // context that deadlocks (observed on Pixel 10 Pro). Batched GPU
+    // benchmarks should set shards_num to 1 and rely on the batch resize.
+    LOG(WARNING) << "shards_num=" << backend_data->shards_num
+                 << " with the GPU accelerator may deadlock";
+  }
   if (use_gpu && !BuildShards(backend_data, model_path, input_resizes,
                               /*use_gpu=*/true, num_threads)) {
     LOG(WARNING) << "GPU compilation failed; falling back to CPU";

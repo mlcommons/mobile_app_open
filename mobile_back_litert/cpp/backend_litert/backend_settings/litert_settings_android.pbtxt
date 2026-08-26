@@ -164,6 +164,13 @@ benchmark_setting {
     batch_size: 2
   }
   delegate_selected: "GPU"
+  # One CompiledModel with the batch dimension resized to 2: concurrent Run
+  # calls from multiple shards deadlock on the shared LiteRT GPU context
+  # (observed on Pixel 10 Pro).
+  custom_setting {
+    id: "shards_num"
+    value: "1"
+  }
 }
 
 benchmark_setting {

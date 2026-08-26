@@ -75,7 +75,8 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   // deviceBackendOverride in utils.dart). The intervals stay wide until
   // the first runs produce real numbers: they must cover both the
   // GPU-accelerated path and a CPU fallback.
-  _kLitertBackend: {_kPixel10Pro: Interval(min: 20, max: 1000)},
+  // Measured 14.8 QPS on the GPU delegate (fp32 MobileNetV4-Conv-Large).
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 10, max: 1000)},
 };
 
 const Map<String, Map<String, Interval>> _objectDetection = {
@@ -107,7 +108,8 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kS10Plus: Interval(min: 1200, max: 2000),
   },
   _kSamsungBackend: {_kS24: Interval(min: 1400, max: 2400)},
-  _kLitertBackend: {_kPixel10Pro: Interval(min: 30, max: 1000)},
+  // Measured 22.9 QPS on the GPU delegate (fp32 MobileDet).
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 15, max: 1000)},
 };
 
 const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
@@ -267,7 +269,9 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
     _kS10Plus: Interval(min: 700, max: 1200),
   },
   _kSamsungBackend: {_kS24: Interval(min: 800, max: 1200)},
-  _kLitertBackend: {_kPixel10Pro: Interval(min: 20, max: 1200)},
+  // Single-stream GPU measured 14.8 QPS; the batched offline rate is not
+  // measured yet, so keep the floor below the single-stream rate.
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 10, max: 1200)},
 };
 
 // Token throughput (tok/s) of the LiteRT backend. The GPU delegate is the
