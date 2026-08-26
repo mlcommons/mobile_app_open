@@ -74,6 +74,23 @@ mlperf_data_t::Type ToMlperfType(litert::ElementType type) {
   }
 }
 
+size_t ByteWidthOf(mlperf_data_t::Type type) {
+  switch (type) {
+    case mlperf_data_t::Uint8:
+    case mlperf_data_t::Int8:
+      return 1;
+    case mlperf_data_t::Float16:
+      return 2;
+    case mlperf_data_t::Float32:
+    case mlperf_data_t::Int32:
+      return 4;
+    case mlperf_data_t::Int64:
+      return 8;
+    default:
+      return 4;
+  }
+}
+
 #if __ANDROID__
 bool IsEmulator() {
   char ro_build_characteristics[PROP_VALUE_MAX + 1];
@@ -115,8 +132,15 @@ struct LiteRTBackendData {
 
 bool backendExists = false;
 
-// Reads the per-tensor metadata for the default signature from the model.
-bool ReadTensorInfos(LiteRTBackendData *backend_data) {
+// Reads the element types for the default signature from the model and plans
+// the input resizes: the benchmark models export the batch dimension as
+// dynamic (-1), so every input whose leading dimension is not
+// real_batch_size gets resized on the compiled model before buffers are
+// created (the legacy interpreter pipeline did the same). Tensor byte sizes
+// are not computed here — dynamic shapes have none until after the resize —
+// but from the created TensorBuffers in BuildShards.
+bool PlanTensors(LiteRTBackendData *backend_data,
+                 std::vector<std::vector<int>> *input_resizes) {
   auto input_names = backend_data->model->GetSignatureInputNames();
   auto output_names = backend_data->model->GetSignatureOutputNames();
   if (!input_names || !output_names) {
@@ -124,53 +148,73 @@ bool ReadTensorInfos(LiteRTBackendData *backend_data) {
     return false;
   }
 
-  auto read_one = [&](bool is_input, size_t index, TensorInfo *info) -> bool {
-    auto type = is_input ? backend_data->model->GetInputTensorType(0, index)
-                         : backend_data->model->GetOutputTensorType(0, index);
+  backend_data->inputs.resize(input_names->size());
+  input_resizes->assign(input_names->size(), {});
+  for (size_t i = 0; i < input_names->size(); ++i) {
+    auto type = backend_data->model->GetInputTensorType(kSignatureIndex, i);
     if (!type) {
-      LOG(ERROR) << "Failed to read tensor type " << index << ": "
+      LOG(ERROR) << "Failed to read input tensor type " << i << ": "
                  << type.Error().Message();
       return false;
     }
-    auto elements = type->Layout().NumElements();
-    auto bytes = type->Bytes();
-    if (!elements || !bytes || *elements == 0) {
-      LOG(ERROR) << "Tensor " << index << " has no static shape";
-      return false;
-    }
+    backend_data->inputs[i].type = ToMlperfType(type->ElementType());
     auto dims = type->Layout().Dimensions();
-    const size_t batch_dim = (!dims.empty() && dims[0] > 0) ? dims[0] : 1;
-    if (is_input && batch_dim != backend_data->real_batch_size) {
-      // The models used by the benchmarks all carry the batch in the shard
-      // count (real_batch_size == 1), so a resize path is not implemented.
-      LOG(ERROR) << "Model batch dimension " << batch_dim
-                 << " != batch_size/shards_num "
-                 << backend_data->real_batch_size
-                 << "; set shards_num equal to batch_size";
-      return false;
+    std::vector<int> target(dims.begin(), dims.end());
+    for (size_t d = 1; d < target.size(); ++d) {
+      if (target[d] <= 0) {
+        LOG(ERROR) << "Input " << i << " has a dynamic non-batch dimension";
+        return false;
+      }
     }
-    info->type = ToMlperfType(type->ElementType());
-    info->per_sample_elements = *elements / batch_dim;
-    info->per_sample_bytes = *bytes / batch_dim;
-    info->batch_bytes = info->per_sample_bytes * backend_data->real_batch_size;
-    return true;
-  };
-
-  backend_data->inputs.resize(input_names->size());
-  for (size_t i = 0; i < input_names->size(); ++i) {
-    if (!read_one(true, i, &backend_data->inputs[i])) return false;
+    if (!target.empty() &&
+        target[0] != static_cast<int>(backend_data->real_batch_size)) {
+      target[0] = static_cast<int>(backend_data->real_batch_size);
+      (*input_resizes)[i] = std::move(target);
+    }
   }
+
   backend_data->outputs.resize(output_names->size());
   for (size_t i = 0; i < output_names->size(); ++i) {
-    if (!read_one(false, i, &backend_data->outputs[i])) return false;
+    auto type = backend_data->model->GetOutputTensorType(kSignatureIndex, i);
+    if (!type) {
+      LOG(ERROR) << "Failed to read output tensor type " << i << ": "
+                 << type.Error().Message();
+      return false;
+    }
+    backend_data->outputs[i].type = ToMlperfType(type->ElementType());
   }
   return true;
 }
 
-// Compiles one model per shard for the given accelerator and creates the
-// tensor buffers and host staging. Returns false (with everything it built
-// cleared) so the caller can retry on another accelerator.
+// Fills the tensor sizes from the actual buffer sizes of the first shard
+// (exact after any resize, unlike the model's static shapes).
+bool ReadTensorSizes(LiteRTBackendData *backend_data) {
+  auto fill = [&](std::vector<TensorInfo> &infos,
+                  std::vector<litert::TensorBuffer> &bufs) -> bool {
+    for (size_t i = 0; i < infos.size(); ++i) {
+      auto packed = bufs[i].PackedSize();
+      if (!packed || *packed == 0 ||
+          *packed % backend_data->real_batch_size != 0) {
+        LOG(ERROR) << "Unusable tensor buffer size for tensor " << i;
+        return false;
+      }
+      infos[i].batch_bytes = *packed;
+      infos[i].per_sample_bytes = *packed / backend_data->real_batch_size;
+      infos[i].per_sample_elements =
+          infos[i].per_sample_bytes / ByteWidthOf(infos[i].type);
+    }
+    return true;
+  };
+  return fill(backend_data->inputs, backend_data->input_bufs[0]) &&
+         fill(backend_data->outputs, backend_data->output_bufs[0]);
+}
+
+// Compiles one model per shard for the given accelerator, applies the
+// planned input resizes, and creates the tensor buffers and host staging.
+// Returns false (with everything it built cleared) so the caller can retry
+// on another accelerator.
 bool BuildShards(LiteRTBackendData *backend_data, const char *model_path,
+                 const std::vector<std::vector<int>> &input_resizes,
                  bool use_gpu, int num_threads) {
   backend_data->shards.clear();
   for (int k = 0; k < backend_data->shards_num; ++k) {
@@ -206,31 +250,50 @@ bool BuildShards(LiteRTBackendData *backend_data, const char *model_path,
     backend_data->shards.push_back(std::move(*compiled));
   }
 
+  auto fail = [backend_data]() -> bool {
+    backend_data->input_bufs.clear();
+    backend_data->output_bufs.clear();
+    backend_data->input_staging.clear();
+    backend_data->output_staging.clear();
+    backend_data->shards.clear();
+    return false;
+  };
+
   backend_data->input_bufs.clear();
   backend_data->output_bufs.clear();
   backend_data->input_staging.clear();
   backend_data->output_staging.clear();
   for (int k = 0; k < backend_data->shards_num; ++k) {
+    for (size_t i = 0; i < input_resizes.size(); ++i) {
+      const auto &dims = input_resizes[i];
+      if (dims.empty()) continue;
+      auto resized = backend_data->shards[k].ResizeInputTensorNonStrict(
+          kSignatureIndex, i,
+          litert::Span<const int>(dims.data(), dims.size()));
+      if (!resized) {
+        LOG(ERROR) << "Failed to resize input " << i << ": "
+                   << resized.Error().Message();
+        return fail();
+      }
+    }
     auto input_bufs = backend_data->shards[k].CreateInputBuffers();
     auto output_bufs = backend_data->shards[k].CreateOutputBuffers();
     if (!input_bufs || !output_bufs) {
       LOG(ERROR) << "Failed to create tensor buffers for shard " << k;
-      backend_data->input_bufs.clear();
-      backend_data->output_bufs.clear();
-      backend_data->shards.clear();
-      return false;
+      return fail();
     }
     if (input_bufs->size() != backend_data->inputs.size() ||
         output_bufs->size() != backend_data->outputs.size()) {
       LOG(ERROR) << "Tensor buffer count does not match the model signature";
-      backend_data->input_bufs.clear();
-      backend_data->output_bufs.clear();
-      backend_data->shards.clear();
-      return false;
+      return fail();
     }
     backend_data->input_bufs.push_back(std::move(*input_bufs));
     backend_data->output_bufs.push_back(std::move(*output_bufs));
+  }
 
+  if (!ReadTensorSizes(backend_data)) return fail();
+
+  for (int k = 0; k < backend_data->shards_num; ++k) {
     std::vector<std::vector<uint8_t>> in_staging;
     for (const auto &info : backend_data->inputs) {
       in_staging.emplace_back(info.batch_bytes);
@@ -310,7 +373,8 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
   }
   backend_data->model = std::make_unique<litert::Model>(std::move(*model));
 
-  if (!ReadTensorInfos(backend_data)) {
+  std::vector<std::vector<int>> input_resizes;
+  if (!PlanTensors(backend_data, &input_resizes)) {
     backend_delete(backend_data);
     return nullptr;
   }
@@ -327,13 +391,13 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
                << "; using the CPU accelerator";
   }
 
-  if (use_gpu &&
-      !BuildShards(backend_data, model_path, /*use_gpu=*/true, num_threads)) {
+  if (use_gpu && !BuildShards(backend_data, model_path, input_resizes,
+                              /*use_gpu=*/true, num_threads)) {
     LOG(WARNING) << "GPU compilation failed; falling back to CPU";
     use_gpu = false;
   }
-  if (!use_gpu &&
-      !BuildShards(backend_data, model_path, /*use_gpu=*/false, num_threads)) {
+  if (!use_gpu && !BuildShards(backend_data, model_path, input_resizes,
+                               /*use_gpu=*/false, num_threads)) {
     backend_delete(backend_data);
     return nullptr;
   }
