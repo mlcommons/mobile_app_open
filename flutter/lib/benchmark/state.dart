@@ -235,6 +235,22 @@ class BenchmarkState extends ChangeNotifier {
       }
     }
 
+    Map<String, Map<String, bool>> taskSetSelection = {};
+    if (_store.taskSetSelection.isNotEmpty) {
+      try {
+        final map = jsonDecode(_store.taskSetSelection) as Map<String, dynamic>;
+        for (final kv in map.entries) {
+          final inner = kv.value as Map<String, dynamic>;
+          taskSetSelection[kv.key] = inner.map(
+            (k, v) => MapEntry(k, v as bool),
+          );
+        }
+      } catch (e, t) {
+        print('Task set selection parse fail: $e');
+        print(t);
+      }
+    }
+
     Map<String, String> backendSelection = {};
     if (_store.backendSelection.isNotEmpty) {
       try {
@@ -252,6 +268,7 @@ class BenchmarkState extends ChangeNotifier {
       appConfig: configManager.decodedConfig,
       backends: matchedBackends,
       taskSelection: taskSelection,
+      taskSetSelection: taskSetSelection,
       backendSelection: backendSelection,
     );
     restoreLastResult();
@@ -259,6 +276,10 @@ class BenchmarkState extends ChangeNotifier {
 
   void saveTaskSelection() {
     _store.taskSelection = jsonEncode(_benchmarkStore.selection);
+  }
+
+  void saveTaskSetSelection() {
+    _store.taskSetSelection = jsonEncode(_benchmarkStore.setSelection);
   }
 
   BenchmarkStateEnum get state {
@@ -410,6 +431,7 @@ class BenchmarkState extends ChangeNotifier {
       value,
     );
     benchmarkSet.applyOptions();
+    saveTaskSetSelection();
     notifyListeners();
   }
 

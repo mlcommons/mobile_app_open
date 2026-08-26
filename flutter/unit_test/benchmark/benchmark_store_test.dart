@@ -84,6 +84,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backends: [tfliteBackend()],
         taskSelection: {},
+        taskSetSelection: {},
       );
 
       expect(store.allBenchmarks.length, 1);
@@ -102,6 +103,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task2, task1]),
         backends: [tfliteBackendBoth()],
         taskSelection: {},
+        taskSetSelection: {},
       );
 
       expect(store.allBenchmarks.length, 2);
@@ -118,6 +120,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backends: [tfliteBackendBoth()],
         taskSelection: {task1.id: true, task2.id: false},
+        taskSetSelection: {},
       );
 
       expect(store.allBenchmarks.length, 2);
@@ -130,6 +133,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [tfliteBackend()],
         taskSelection: {task1.id: false},
+        taskSetSelection: {},
       );
 
       final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
@@ -145,6 +149,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [tfliteBackend()],
         taskSelection: {},
+        taskSetSelection: {},
       );
 
       final modes = [BenchmarkRunModeEnum.accuracyOnly.accuracyRunMode];
@@ -191,6 +196,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [tfliteBackend()],
         taskSelection: {},
+        taskSetSelection: {},
       );
 
       final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
@@ -228,6 +234,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [tfliteBackend()],
         taskSelection: {},
+        taskSetSelection: {},
       );
 
       final modes = [
@@ -269,6 +276,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backends: [coremlBackend(), tfliteBackend()],
         taskSelection: {},
+        taskSetSelection: {},
       );
       final task1Benchmark = store.allBenchmarks.firstWhere(
         (e) => e.id == 'task1',
@@ -286,6 +294,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1, task2]),
         backends: [coremlBackend(), tfliteBackend2()],
         taskSelection: {},
+        taskSetSelection: {},
       );
       // task2 exists only in the tflite backend: present, defaults to tflite
       final task2Benchmark = store.allBenchmarks.firstWhere(
@@ -300,6 +309,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [coremlDefaultPolicyBackend(), tfliteBackend()],
         taskSelection: {},
+        taskSetSelection: {},
       );
       final benchmark = store.allBenchmarks.single;
       expect(benchmark.backends.map((e) => e.info.libName), [
@@ -314,6 +324,7 @@ void main() {
           appConfig: pb.MLPerfConfig(task: [task1, task2]),
           backends: [coremlFillGapsBackend(), tfliteBackendBoth()],
           taskSelection: {},
+          taskSetSelection: {},
         );
         // task1 is supported by the vendor: fallback is filtered out
         final task1Benchmark = store.allBenchmarks.firstWhere(
@@ -338,6 +349,7 @@ void main() {
         backends: [coremlFillGapsBackend(), tfliteBackend()],
         taskSelection: {},
         backendSelection: {'task1': 'libtflitebackend'},
+        taskSetSelection: {},
       );
       final benchmark = store.allBenchmarks.single;
       expect(benchmark.selectedBackend.info.libName, 'libcoremlbackend');
@@ -348,6 +360,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [coremlBackend(), tfliteBackend()],
         taskSelection: {},
+        taskSetSelection: {},
       );
       final benchmark = store.allBenchmarks.single;
       expect(benchmark.selectedDelegate.delegateName, 'coreml-delegate');
@@ -367,6 +380,7 @@ void main() {
           'task1': 'libtflitebackend',
           'task2': 'libgonebackend',
         },
+        taskSetSelection: {},
       );
       final task1Benchmark = store.allBenchmarks.firstWhere(
         (e) => e.id == 'task1',
@@ -383,6 +397,7 @@ void main() {
         appConfig: pb.MLPerfConfig(task: [task1]),
         backends: [coremlBackend(), tfliteBackend()],
         taskSelection: {},
+        taskSetSelection: {},
       );
       final modes = [BenchmarkRunModeEnum.performanceOnly.performanceRunMode];
       final before = store.listResources(
