@@ -15,9 +15,8 @@ limitations under the License.
 
 #include "flutter/cpp/c/type.h"
 #include "pipeline.h"
-#include "tflite/c/c_api.h"
 
-// A simple pipeline which runs a single model.
+// A simple pipeline which runs a single model on the LiteRT CompiledModel API.
 class SingleModelPipeline : public Pipeline {
  public:
   SingleModelPipeline() = default;

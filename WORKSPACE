@@ -141,11 +141,6 @@ http_archive(
         "//:patches/custom_buffer_teardown.patch",
         # CoreML delegate calls RepeatedField::resize, which does not exist
         "//:patches/litert_coreml_repeatedfield_resize.patch",
-        # Same NNAPI fix as tf_nnapi_no_mmap_sharing.patch below, for the
-        # TFLite runtime vendored in LiteRT: don't pass the model file's fd
-        # to NNAPI drivers, SELinux rejects it for models on external
-        # storage and the graph silently falls back to CPU.
-        "//:patches/litert_nnapi_no_mmap_sharing.patch",
     ],
     sha256 = "7d0313c4851deb18af6f5f2dbc002bf01293583b87b819b0949ee33dcfe2d91b",
     strip_prefix = "LiteRT-2.1.5",

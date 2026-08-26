@@ -74,7 +74,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   // integration test pins every benchmark to the LiteRT backend (see
   // deviceBackendOverride in utils.dart). The intervals stay wide until
   // the first runs produce real numbers: they must cover both the
-  // NNAPI-accelerated path and a CPU fallback.
+  // GPU-accelerated path and a CPU fallback.
   _kLitertBackend: {_kPixel10Pro: Interval(min: 20, max: 1000)},
 };
 

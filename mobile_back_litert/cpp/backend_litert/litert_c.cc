@@ -24,8 +24,8 @@ extern "C" {
 std::unique_ptr<Pipeline> pipeline;
 
 // This backend is Android-only. The llm-* benchmarks run on the LiteRT
-// CompiledModel LLM pipeline; every other benchmark runs on the TFLite
-// interpreter single-model pipeline backed by @litert's vendored runtime.
+// CompiledModel LLM pipeline; every other benchmark runs on the CompiledModel
+// single-model pipeline (GPU accelerator with CPU fallback).
 bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const char **settings,
                                      const mlperf_device_info_t *device_info) {
@@ -60,9 +60,15 @@ mlperf_backend_ptr_t mlperf_backend_create(
   if (strcmp(pipeline_type, "LLMPipeline") == 0) {
     LOG(INFO) << "Initializing LLMPipeline";
     pipeline = std::make_unique<LLMPipeline>();
-  } else {
+  } else if (strcmp(pipeline_type, "") == 0 ||
+             strcmp(pipeline_type, "SingleModelPipeline") == 0) {
     LOG(INFO) << "Initializing SingleModelPipeline";
     pipeline = std::make_unique<SingleModelPipeline>();
+  } else {
+    // Fail loudly on settings imported from another backend (e.g.
+    // StableDiffusionPipeline) instead of feeding them to the wrong pipeline.
+    LOG(ERROR) << "Unsupported pipeline: " << pipeline_type;
+    return nullptr;
   }
   return pipeline->backend_create(model_path, configs, native_lib_path);
 }

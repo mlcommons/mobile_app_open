@@ -44,7 +44,6 @@ cc_library(
         "pipeline.h",
         "single_model_pipeline.h",
         "thread_pool.h",
-        "utils.h",
     ],
     copts = tflite_copts() + select({
         "//flutter/android/commonlibs:use_asan": [
@@ -71,27 +70,15 @@ cc_library(
         "@litert//litert/c/internal:litert_accelerator_registration",
         "@litert//litert/c/internal:litert_external_litert_buffer_context",
         "@litert//litert/c/internal:litert_tensor_buffer_registry",
+        "@litert//litert/c/options:litert_cpu_options",
         "@litert//litert/c/options:litert_gpu_options",
         "@litert//litert/cc:litert_compiled_model",
+        "@litert//litert/cc:litert_element_type",
         "@litert//litert/cc:litert_environment",
+        "@litert//litert/cc:litert_model",
+        "@litert//litert/cc:litert_options",
         "@litert//litert/cc:litert_tensor_buffer",
-        "@litert//tflite/c:c_api",
-        "@litert//tflite/c:common",
-        "@org_tensorflow//tensorflow/core:tflite_portable_logging",
-    ] + select({
-        # The single-model pipeline's delegates come from @litert's vendored
-        # TFLite, the same copy the rest of this .so links — pulling them
-        # from @org_tensorflow would duplicate the TF Lite runtime.
-        "@org_tensorflow//tensorflow:android": [
-            "@litert//tflite/delegates/gpu:delegate",
-            "@litert//tflite/delegates/nnapi:nnapi_delegate",
-        ],
-        "@org_tensorflow//tensorflow:ios": [
-            "@litert//tflite/delegates/coreml:coreml_delegate",
-            "@litert//tflite/delegates/gpu:metal_delegate",
-        ],
-        "//conditions:default": [],
-    }),
+    ],
     alwayslink = 1,
 )
 

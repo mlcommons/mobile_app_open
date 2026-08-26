@@ -1,8 +1,9 @@
 # Mobile backend LiteRT
 
-This backend runs all benchmarks on [LiteRT](https://github.com/google-ai-edge/LiteRT) 2.1.5:
-the `llm-*` benchmarks on the LiteRT compiled-model API, and the vision/NLP
-benchmarks on the TFLite interpreter backed by LiteRT's vendored runtime.
+This backend runs all benchmarks on the
+[LiteRT](https://github.com/google-ai-edge/LiteRT) 2.1.5 CompiledModel API:
+the `llm-*` benchmarks on a dedicated LLM pipeline, and the vision/NLP
+benchmarks on a single-model pipeline.
 
 ## Overview
 
@@ -12,10 +13,11 @@ benchmarks on the TFLite interpreter backed by LiteRT's vendored runtime.
   fallback) stay selectable next to LiteRT for every claimed benchmark.
 * `llm_pipeline.cc` drives a `litert::CompiledModel` with explicit `TensorBuffer`s
   for the prefill and decode signatures.
-* `single_model_pipeline.cc` runs the vision/NLP benchmarks on the TFLite
-  interpreter with the NNAPI or GPU delegate. It compiles against the TFLite
-  runtime vendored inside `@litert` — the same copy the compiled-model API
-  links — so the `.so` contains a single TF Lite runtime.
+* `single_model_pipeline.cc` runs the vision/NLP benchmarks on
+  `litert::CompiledModel` with the GPU accelerator by default (fp32 model
+  exports, automatic CPU fallback); the CPU delegate choice runs the int8
+  exports on XNNPACK. NNAPI is not used: it is deprecated since Android 15,
+  and the CompiledModel NPU path needs vendor SDKs and AOT-compiled models.
 * `llm-1b` and `llm-1b-instruct` default to the GPU delegate
   (`libLiteRtClGlAccelerator.so`, downloaded and bundled) with a dedicated
   GPU model export; GPU compilation failure falls back to CPU. The larger
@@ -45,7 +47,9 @@ bazel build -c opt --config=android_arm64 //mobile_back_litert/cpp/backend_liter
 * `cpp/backend_litert/litert_c.cc` — MLPerf backend C API implementation and
   pipeline dispatch (the `pipeline` custom setting selects the LLM pipeline).
 * `cpp/backend_litert/llm_pipeline.h` / `llm_pipeline.cc` — LLM pipeline: tokenizer, prefill, decode, KV cache.
-* `cpp/backend_litert/single_model_pipeline.h` / `single_model_pipeline.cc` — TFLite interpreter pipeline for the vision/NLP benchmarks.
+* `cpp/backend_litert/single_model_pipeline.h` / `single_model_pipeline.cc` — CompiledModel pipeline for the vision/NLP benchmarks.
+* The stable-diffusion sources (`sd_utils.cc`, `stable_diffusion_*.cc`,
+  `embedding_utils.cc`) are imported but not compiled or wired up yet.
 * `cpp/backend_litert/backend_settings/litert_settings_android.pbtxt` — benchmark settings (models, delegates).
 * `litert_backend.mk` — make variables and the GPU accelerator download.
 
