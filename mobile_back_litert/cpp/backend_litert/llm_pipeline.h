@@ -18,8 +18,10 @@ limitations under the License.
 
 #include <stdlib.h>
 
-#include <map>
+#include <cstdint>
+#include <memory>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -201,7 +203,8 @@ class LLMPipeline : public Pipeline {
   void WriteDecodeMask(litert::CompiledModel& model, size_t sig_idx,
                        size_t mask_idx, bool mask_is_bool,
                        litert::TensorBuffer& buf, int position);
-  int GreedySampler(litert::TensorBuffer& logits_buf, int vocab_size);
+  int GreedySampler(litert::TensorBuffer& logits_buf, int vocab_size,
+                    std::vector<float>& logits);
 };
 
 #endif  // LITERT_LLM_PIPELINE_H_

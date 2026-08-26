@@ -96,7 +96,7 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
       backend_delete(backend_data);
       backend_data = new LLMBackendData();
       if (BuildCompiledModel(*backend_data, llm_model_path.c_str(), false)) {
-        backend_data->accelerator = "CPU";
+        use_gpu = false;
       } else {
         LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
         backend_delete(backend_data);
@@ -108,6 +108,7 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
       return nullptr;
     }
   }
+  backend_data->accelerator = use_gpu ? "GPU" : "CPU";
   if (!BuildDecodeBuffers(*backend_data)) {
     LOG(ERROR) << "Failed to allocate decode buffers";
     backend_delete(backend_data);
@@ -228,7 +229,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(
     return false;
   };
 
-  backend_issue_first_token_query(backend_ptr);
+  MINIMAL_CHECK(backend_issue_first_token_query(backend_ptr) == MLPERF_SUCCESS);
   callback(context);
 
   int kv_cache_max_size = backend_data->kv_cache_max_size;
@@ -244,7 +245,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(
   backend_data->output_tokens.reserve(decode_steps);
   int next_token =
       GreedySampler(backend_data->decode_output_bufs[backend_data->logits_idx],
-                    backend_data->vocab_size);
+                    backend_data->vocab_size, backend_data->logits_scratch);
   if (check_stop_id(next_token)) return MLPERF_SUCCESS;
   backend_data->output_tokens.push_back(next_token);
   int next_position = input_size;
@@ -271,7 +272,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(
                    backend_data->decode_output_bufs);
     next_token = GreedySampler(
         backend_data->decode_output_bufs[backend_data->logits_idx],
-        backend_data->vocab_size);
+        backend_data->vocab_size, backend_data->logits_scratch);
     backend_data->output_tokens.push_back(next_token);
     next_position += 1;
     if (check_stop_id(next_token)) break;
@@ -748,10 +749,11 @@ void LLMPipeline::WriteDecodeMask(litert::CompiledModel& model, size_t sig_idx,
   }
 }
 
-// Greedy sampler (argmax over the logits buffer).
-int LLMPipeline::GreedySampler(litert::TensorBuffer& logits_buf,
-                               int vocab_size) {
-  std::vector<float> logits(vocab_size);
+// Greedy sampler (argmax over the logits buffer). The scratch vector avoids
+// a per-token heap allocation for the ~vocab_size logits copy.
+int LLMPipeline::GreedySampler(litert::TensorBuffer& logits_buf, int vocab_size,
+                               std::vector<float>& logits) {
+  logits.resize(vocab_size);
   auto ok = logits_buf.Read<float>(absl::MakeSpan(logits));
   if (!ok) {
     LOG(ERROR) << "Failed to read logits: " << ok.Error().Message();
