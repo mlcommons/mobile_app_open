@@ -320,7 +320,7 @@ jobs:
       - build-android-apk
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -395,7 +395,7 @@ jobs:
           BROWSERSTACK_DEVICES: >-
             ["${{ matrix.device }}"]
         with:
-          timeout_minutes: 60
+          timeout_minutes: 85
           max_attempts: 2
           retry_wait_seconds: 300
           retry_on_exit_code: 9
