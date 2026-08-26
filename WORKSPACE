@@ -320,7 +320,13 @@ new_git_repository(
     build_file = "@//flutter/android/third_party:loadgen.BUILD",
     commit = "6776245e99dce0600cfc9a6fb61efd310f87de3d",
     patch_args = ["-p1"],
-    patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
+    patch_cmds = [
+        "python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen",
+        # The generator stamps fetch-time timestamps into BuildDate{Local,Utc}.
+        # Pin them so the file (and everything linking loadgen) is
+        # byte-identical across CI jobs and can hit the shared bazel cache.
+        "sed -i.bak -E 's/\"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.]+\"/\"1970-01-01T00:00:00\"/g' loadgen/version_generated.cc && rm -f loadgen/version_generated.cc.bak",
+    ],
     patches = ["//patches:loadgen_mobile_update.patch"],
     remote = "https://github.com/mlcommons/inference.git",
 )
