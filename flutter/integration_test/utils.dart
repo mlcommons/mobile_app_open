@@ -100,21 +100,8 @@ Future<void> validateSettings(WidgetTester tester) async {
 // follows the backend priority order, so without this the LiteRT vision
 // runs would never execute in CI: the pixel backend outranks litert on
 // Pixel devices.
-/// The backend the Pixel 10 Pro CI jobs pin every benchmark to. Two jobs run
-/// on that device — LiteRT (the default) and TFLite — so the two backends can
-/// be compared on the same hardware. The backend is chosen at test-APK build
-/// time via --dart-define=P10P_BACKEND (see android.mk): the BrowserStack
-/// Flutter API offers no runtime channel into the test, so each job downloads
-/// the unified APK variant built with its define.
-const _pixel10ProBackend = String.fromEnvironment(
-  'P10P_BACKEND',
-  defaultValue: 'litert',
-);
-
-final deviceBackendOverride = <String, String>{
-  'Pixel 10 Pro': _pixel10ProBackend == 'tflite'
-      ? BackendId.tflite
-      : BackendId.litert,
+const deviceBackendOverride = <String, String>{
+  'Pixel 10 Pro': BackendId.litert,
 };
 
 void applyDeviceBackendOverride(WidgetTester tester) {
@@ -155,19 +142,13 @@ bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
   if (benchmarkId == 'stable_diffusion') {
     return selectedLib == BackendId.qti;
   }
-  final overrideLib =
-      deviceBackendOverride[getDeviceModel(DeviceInfo.instance.envInfo)];
   // The TFLite fallback is now offered alongside vendor backends, so
   // benchmarks the vendor backend lacks appear defaulting to TFLite.
   // Skip them here to keep device-job coverage and runtime the same as
   // before per-benchmark backends: running the fallback-only benchmarks
-  // (e.g. LLM on CPU) blows the CI job timeout on vendor devices. The
-  // TFLite-pinned Pixel 10 Pro comparison job is the exception: there
-  // TFLite is selected on purpose.
+  // (e.g. LLM on CPU) blows the CI job timeout on vendor devices.
   final primaryLib = benchmarkState.matchedBackends.first.libName;
-  if (primaryLib != BackendId.tflite &&
-      selectedLib == BackendId.tflite &&
-      overrideLib != BackendId.tflite) {
+  if (primaryLib != BackendId.tflite && selectedLib == BackendId.tflite) {
     return false;
   }
   // The LiteRT backend fills the LLM gap on every Android device, but a
@@ -186,6 +167,8 @@ bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
   // that job's coverage and runtime unchanged. Jobs pinned to LiteRT via
   // deviceBackendOverride (and the litert-only APK, where LiteRT is
   // primary) still run everything on LiteRT.
+  final overrideLib =
+      deviceBackendOverride[getDeviceModel(DeviceInfo.instance.envInfo)];
   if (!benchmarkId.startsWith('llm') &&
       selectedLib == BackendId.litert &&
       primaryLib != BackendId.litert &&

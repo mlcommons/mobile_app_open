@@ -219,27 +219,6 @@ jobs:
           make flutter/android/release flutter/android/apk flutter/android/test-apk
           gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-unified.apk
           gsutil mv output/android-apks/test-helper.apk $GCLOUD_BUCKET_PATH/test-helper-unified.apk
-      # A second build of the same unified test app whose only difference is
-      # the P10P_BACKEND dart-define: the TFLite-pinned Pixel 10 Pro
-      # comparison job downloads this main APK (the helper APK carries no
-      # dart-defines, so the unified one is reused). Runs right after the
-      # unified build with the same WITH_* set, so the native libs are
-      # already staged and only the Flutter app is rebuilt.
-      - name: Build and upload test APK for TFLite on Pixel 10 Pro
-        env:
-          OFFICIAL_BUILD: false
-          PERF_TEST: true
-          P10P_BACKEND: tflite
-          WITH_TFLITE: 1
-          WITH_LITERT: 1
-          WITH_PIXEL: 1
-          WITH_MEDIATEK: 1
-          WITH_QTI: 1
-          WITH_SAMSUNG: 1
-          WITH_APPLE: 0
-        run: |
-          make flutter/android/test-apk/main
-          gsutil mv output/android-apks/test-main.apk $GCLOUD_BUCKET_PATH/test-main-unified-tflite-p10p.apk
       - name: Build Android release APK with all backends
         env:
           OFFICIAL_BUILD: true
@@ -357,13 +336,6 @@ jobs:
           # deviceBackendOverride in flutter/integration_test.
           - backend: "litert"
             device: "Google Pixel 10 Pro-16.0"
-          # Same device as the LiteRT job above but pinned to the TFLite
-          # backend via a unified-APK variant built with
-          # --dart-define=P10P_BACKEND=tflite, so the two backends can be
-          # compared on the same hardware.
-          - backend: "tflite"
-            device: "Google Pixel 10 Pro-16.0"
-            main_apk: "unified-tflite-p10p"
           - backend: "qti"
             device: "Samsung Galaxy S25 Ultra-15.0"
           # the app fails on these devices with old Android build
@@ -382,8 +354,7 @@ jobs:
             device: "Samsung Galaxy Tab S10 Plus-15.0"
     env:
       GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.computed.outputs.build_number }}
-      MAIN_APK_VARIANT: ${{ matrix.main_apk || 'unified' }}
-      MAIN_APK_NAME: test-main-${{ matrix.main_apk || 'unified' }}-${{ needs.computed.outputs.build_number }}.apk
+      MAIN_APK_NAME: test-main-unified-${{ needs.computed.outputs.build_number }}.apk
       HELPER_APK_NAME: test-helper-unified-${{ needs.computed.outputs.build_number }}.apk
       BROWSERSTACK_LOGS_DIR: /tmp/browserstack-device-logs
     steps:
@@ -398,7 +369,7 @@ jobs:
           version: '>= 363.0.0'
       - name: Download test APK
         run: |
-          gsutil cp $GCLOUD_BUCKET_PATH/test-main-$MAIN_APK_VARIANT.apk /tmp/$MAIN_APK_NAME
+          gsutil cp $GCLOUD_BUCKET_PATH/test-main-unified.apk /tmp/$MAIN_APK_NAME
           gsutil cp $GCLOUD_BUCKET_PATH/test-helper-unified.apk /tmp/$HELPER_APK_NAME
       - name: Upload main app
         run: |
