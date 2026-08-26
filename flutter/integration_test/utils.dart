@@ -250,9 +250,15 @@ Future<void> runBenchmarks(WidgetTester tester) async {
     await tester.tap(goButton);
   }
 
+  // The go button md5-validates every resource of the active benchmarks
+  // before the run starts, covering all delegate choices of the selected
+  // backend. For the LLM benchmarks that is two ~1.2 GB models (CPU and
+  // GPU delegates), which takes 30-60s on slower devices, so the progress
+  // screen can take a while to appear.
+  const progressScreenTimeout = 5 * 60;
   var progressCircleIsPresented = await waitFor(
     tester,
-    30,
+    progressScreenTimeout,
     const Key(WidgetKeys.progressCircle),
   );
   expect(
