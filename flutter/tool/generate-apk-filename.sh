@@ -8,7 +8,7 @@ suffix=""
 if [ "${WITH_QTI}" = 1 ]; then suffix+="q"; fi
 if [ "${WITH_SAMSUNG}" = 1 ]; then suffix+="s"; fi
 if [ "${WITH_MEDIATEK}" = 1 ]; then suffix+="m"; fi
-if [ "${WITH_PIXEL}" = 1 ]; then suffix+="g"; fi
+if [ "${WITH_PIXEL}" = 1 ]; then suffix+="p"; fi
 if [ "${WITH_LITERT}" = 1 ]; then suffix+="l"; fi
 if [ "${WITH_TFLITE}" = 1 ]; then suffix+="t"; fi
 

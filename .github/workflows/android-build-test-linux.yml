@@ -247,7 +247,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: android-apk-pixel-${{ needs.computed.outputs.build_number }}
-          path: output/android-apks/*-g-${{ needs.computed.outputs.build_number }}.apk
+          path: output/android-apks/*-p-${{ needs.computed.outputs.build_number }}.apk
           retention-days: 28
           if-no-files-found: error
       - name: Archive APK with QTI backend
@@ -282,14 +282,14 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: android-apk-unified-${{ needs.computed.outputs.build_number }}
-          path: output/android-apks/*-qsmglt-${{ needs.computed.outputs.build_number }}.apk
+          path: output/android-apks/*-qsmplt-${{ needs.computed.outputs.build_number }}.apk
           retention-days: 28
           if-no-files-found: error
       - name: Archive AAB with unified backend
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: android-aab-unified-${{ needs.computed.outputs.build_number }}
-          path: output/android-apks/*-qsmglt-${{ needs.computed.outputs.build_number }}.aab
+          path: output/android-apks/*-qsmplt-${{ needs.computed.outputs.build_number }}.aab
           retention-days: 28
           if-no-files-found: error
       - name: Build Android CLI binaries

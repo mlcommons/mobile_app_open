@@ -22,12 +22,12 @@ For private files, private repo should be used.
 
 Release files should be named to include version numbers and backends:
 
-Example: `mlperfbench-v1.1-qsmglt.apk`
+Example: `mlperfbench-v1.1-qsmplt.apk`
 
 * Q - QTI
 * S - Samsung SLSI
 * M - MediaTek
-* G - Google Pixel
+* P - Pixel
 * I - Intel
 * H - Huawei
 * L - LiteRT
