@@ -331,9 +331,9 @@ jobs:
           - backend: "pixel"
             device: "Google Pixel 9 Pro-15.0"
           # The integration test overrides the backend selection on this
-          # device so every benchmark LiteRT supports runs on it (stable
-          # diffusion has no LiteRT setting and is skipped there); see
-          # deviceBackendOverride in flutter/integration_test.
+          # device so every benchmark LiteRT supports runs on it, stable
+          # diffusion included; see deviceBackendOverride in
+          # flutter/integration_test.
           - backend: "litert"
             device: "Google Pixel 10 Pro-16.0"
           - backend: "qti"
@@ -396,7 +396,12 @@ jobs:
             ["${{ matrix.device }}"]
         with:
           timeout_minutes: 85
-          max_attempts: 2
+          # BrowserStack refuses the trigger with BROWSERSTACK_ALL_PARALLELS_IN_USE
+          # when the account's session budget is busy, which happens whenever two
+          # boards run at once. Exit 9 is that trigger failure specifically, so
+          # retrying it just waits for a slot; every other failure still fails
+          # fast. 8 attempts x 5 min tolerates a ~40 min queue.
+          max_attempts: 8
           retry_wait_seconds: 300
           retry_on_exit_code: 9
           command: |
@@ -488,7 +493,11 @@ jobs:
             ["${{ matrix.device }}"]
         with:
           timeout_minutes: 60
-          max_attempts: 2
+          # Exit 9 is a BrowserStack trigger failure, which is what
+          # BROWSERSTACK_ALL_PARALLELS_IN_USE produces when the account's
+          # session budget is busy - retrying it just waits for a free slot.
+          # Every other failure still fails fast.
+          max_attempts: 8
           retry_wait_seconds: 300
           retry_on_exit_code: 9
           command: |
@@ -572,7 +581,11 @@ jobs:
             ["${{ matrix.device }}"]
         with:
           timeout_minutes: 60
-          max_attempts: 2
+          # Exit 9 is a BrowserStack trigger failure, which is what
+          # BROWSERSTACK_ALL_PARALLELS_IN_USE produces when the account's
+          # session budget is busy - retrying it just waits for a free slot.
+          # Every other failure still fails fast.
+          max_attempts: 8
           retry_wait_seconds: 300
           retry_on_exit_code: 9
           command: |
