@@ -7,7 +7,7 @@ benchmarks on a single-model pipeline.
 
 ## Overview
 
-* Android arm64 only. The backend claims the `llm-*` benchmarks and the
+* Android arm64 and iOS arm64. The backend claims the `llm-*` benchmarks and the
   vision/NLP benchmarks (stable diffusion is not supported yet).
 * `claim_policy: CLAIM_SHARED`: lower-priority backends (e.g. the TFLite
   fallback) stay selectable next to LiteRT for every claimed benchmark.
@@ -42,6 +42,26 @@ Or build only the backend library:
 bazel build -c opt --config=android_arm64 //mobile_back_litert/cpp/backend_litert:liblitertbackend.so
 ```
 
+## iOS
+
+```bash
+WITH_LITERT=1 make flutter/ios
+```
+
+* The GPU accelerator is the prebuilt `libLiteRtMetalAccelerator.dylib`, pinned
+  at 2.1.5 and downloaded by `litert_backend.mk`. It is embedded in
+  `Runner.app/Frameworks` next to the backend frameworks: LiteRT dlopens it from
+  the directory given by `kLiteRtEnvOptionTagRuntimeLibraryDir`, and iOS has no
+  dlopen search path to fall back on.
+* Minimum iOS is 14.0, which is LiteRT's own floor (`LITERT_MIN_IOS_VERSION`);
+  the other backends in this repo still target 13.1.
+* Both CPU and Metal are offered, but CPU is the default delegate until a device
+  run confirms Metal. `LiteRtGpuBackend` has no Metal enumerator: on Apple,
+  Metal is selected by `kLiteRtGpuBackendAutomatic` plus compile-time Metal
+  support.
+* There is no CoreML/ANE path: the LiteRT v2 API does not expose one yet
+  (upstream marks ANE "coming soon"). Use the Apple backend for CoreML.
+
 ## Files
 
 * `cpp/backend_litert/litert_c.cc` — MLPerf backend C API implementation and
@@ -50,8 +70,11 @@ bazel build -c opt --config=android_arm64 //mobile_back_litert/cpp/backend_liter
 * `cpp/backend_litert/single_model_pipeline.h` / `single_model_pipeline.cc` — CompiledModel pipeline for the vision/NLP benchmarks.
 * The stable-diffusion sources (`sd_utils.cc`, `stable_diffusion_*.cc`,
   `embedding_utils.cc`) are imported but not compiled or wired up yet.
-* `cpp/backend_litert/backend_settings/litert_settings_android.pbtxt` — benchmark settings (models, delegates).
-* `litert_backend.mk` — make variables and the GPU accelerator download.
+* `cpp/backend_litert/apple_support.h` — locates the accelerator inside the app bundle on iOS.
+* `cpp/backend_litert/backend_settings/litert_settings_android.pbtxt` and
+  `litert_settings_apple.pbtxt` — benchmark settings (models, delegates).
+* `cpp/backend_litert/ios/BUILD` — the `liblitertbackend.xcframework` bundle.
+* `litert_backend.mk` — make variables and the GPU accelerator downloads.
 
 Models and tokenizers are downloaded from `mobile.mlcommons-storage.org`
 as defined in the settings file.

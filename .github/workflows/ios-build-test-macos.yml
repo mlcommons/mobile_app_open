@@ -41,15 +41,22 @@ jobs:
           - backend: "tflite"
             with_apple: 0
             with_tflite: 1
+            with_litert: 0
           - backend: "apple"
             with_apple: 1
             with_tflite: 0
+            with_litert: 0
+          - backend: "litert"
+            with_apple: 0
+            with_tflite: 0
+            with_litert: 1
     env:
       PERF_TEST: true
       FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
       FLUTTER_IOS_TEST_PACKAGE: ios_tests-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.zip
       WITH_APPLE: ${{ matrix.with_apple }}
       WITH_TFLITE: ${{ matrix.with_tflite }}
+      WITH_LITERT: ${{ matrix.with_litert }}
       WITH_PIXEL: 0
       WITH_MEDIATEK: 0
       WITH_QTI: 0
@@ -182,7 +189,10 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
-    timeout-minutes: 60
+    # The litert row runs the llm-* benchmarks, whose go-button check validates
+    # every delegate choice's model file (two ~1.2 GB LLM exports), so it needs
+    # the same headroom as the Android unified job.
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -191,6 +201,8 @@ jobs:
           - backend: "tflite"
             device: "iPhone 16 Pro-18"
           - backend: "apple"
+            device: "iPhone 16 Pro-18"
+          - backend: "litert"
             device: "iPhone 16 Pro-18"
     env:
       TEST_PACKAGE_NAME: ios_tests-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.zip
