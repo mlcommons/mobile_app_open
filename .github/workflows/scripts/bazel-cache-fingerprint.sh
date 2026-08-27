@@ -13,6 +13,11 @@
 # differed, and of every environment value exactly one did -- PATH, carrying a
 # per-run uuid that setup-gcloud puts there.
 #
+# The macOS jobs turned out NOT to have that problem -- the iOS build hits
+# 4486 of 4486 cacheable actions across runs on different machines -- so the
+# expensive external-repo manifest is off by default here. Set
+# FINGERPRINT_MANIFEST=1 to turn it back on when a key really does drift.
+#
 # Usage:
 #   bazel-cache-fingerprint.sh pre  <label>
 #   bazel-cache-fingerprint.sh post <label>
@@ -159,6 +164,15 @@ write_fingerprint() {
 # rather than followed, so a symlinked NDK is identified without hashing it.
 write_manifest() {
   local ob
+  case "${FINGERPRINT_MANIFEST:-0}" in
+    1|true|yes) ;;
+    *)
+      echo "manifest disabled (set FINGERPRINT_MANIFEST=1 to hash every fetched"
+      echo "external repo file; it is worth minutes only when chasing a"
+      echo "reproducibility bug)"
+      return 0
+      ;;
+  esac
   # shellcheck disable=SC2086
   ob="$(bazel $BAZEL_ROOT_ARG info output_base 2>/dev/null)"
   if [ -z "$ob" ] || [ ! -d "$ob/external" ]; then

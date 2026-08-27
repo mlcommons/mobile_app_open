@@ -56,10 +56,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-      # actions/cache is gone on purpose. It restored a populated 166 MB disk
-      # cache and still produced zero hits, because the 10 GB Actions quota is
-      # churned by other entries and because actions/cache never re-saves an
-      # existing key, so warm state was discarded after the first save.
+      # actions/cache is gone on purpose, and not for the reason the Linux job
+      # dropped it. This job and both iOS matrix jobs all declared the key
+      # `${{ runner.os }}-bazel_cache-${{ hashFiles(...) }}` over /tmp/bazel_cache,
+      # and they all run on macos-15, so all three resolved to one key. Only the
+      # first job to finish gets to write it: this one logged "Failed to save:
+      # Unable to reserve cache ... another job may be creating this cache" and
+      # then, on the next run, restored 166 MB of the iOS job's --config=ios
+      # entries and asked bazel for --config=android_arm64 keys. Zero hits was
+      # the correct answer, and this job had never once saved a cache of its own.
+      # A GCS prefix per configuration has no reservation race and no
+      # write-once rule, so every job can both read and write.
       - name: Set up authentication for Google Cloud SDK
         if: env.HAS_GCLOUD_CREDS == 'true'
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
