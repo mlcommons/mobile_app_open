@@ -42,7 +42,6 @@ jobs:
       # GCS remote cache needs a credential that pull_request runs from forks
       # do not get, so it falls back to a local disk cache there.
       HAS_GCLOUD_CREDS: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD != '' }}
-      DIAG_GCS_PREFIX: gs://mobile-app-build-290400_github-actions/bazel-cache-diagnostics
       FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
       FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
       FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
@@ -140,14 +139,9 @@ jobs:
           env
           brew config
           flutter doctor -v
-      - name: Fingerprint bazel inputs
-        run: bash .github/workflows/scripts/bazel-cache-fingerprint.sh pre macos-android
       - name: Build Android app
         run: |
           make flutter/android/release
-      - name: Compare bazel inputs with the previous run
-        if: always()
-        run: bash .github/workflows/scripts/bazel-cache-fingerprint.sh post macos-android
       - name: Run unit tests
         run: |
           make flutter/test/unit
