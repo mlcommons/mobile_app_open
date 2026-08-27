@@ -27,17 +27,23 @@ flutter/ios/clean:
 # BAZEL_OUTPUT_ROOT_ARG is set on our Jenkins CI
 .PHONY: flutter/ios/libs
 flutter/ios/libs:
+	${backend_litert_ios_lib_deps}
 	# --use_top_level_targets_for_symlinks
 	bazel ${BAZEL_OUTPUT_ROOT_ARG} build ${BAZEL_CACHE_ARG} \
 		--config=ios \
 		${backend_bridge_ios_target} \
 		${backend_tflite_ios_target} \
-		${backend_coreml_ios_target}
+		${backend_coreml_ios_target} \
+		${backend_litert_ios_target}
 
 	rm -rf ${flutter_ios_fw_dir}
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_bridge_ios_zip}
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_tflite_ios_zip}
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_coreml_ios_zip}
+	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_litert_ios_zip}
+	@# LiteRT dlopens the Metal accelerator from the app bundle's Frameworks
+	@# directory, so it has to be embedded next to the backend frameworks
+	cp -f ${backend_litert_ios_file} ${flutter_ios_fw_dir}
 
 flutter/ios/release: flutter/check-release-env flutter/ios flutter/prepare flutter/ios/ipa
 
