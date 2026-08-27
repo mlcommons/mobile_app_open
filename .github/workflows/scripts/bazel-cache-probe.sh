@@ -59,8 +59,10 @@ upload_bundle() {
   echo
   echo "== uploading this run's bundle to $DIAG_PREFIX/$RUN_ID/ (script rc=$rc)"
   gsutil -m cp "$OUT"/fingerprint.txt "$OUT"/summary-*.txt "$OUT"/objects-*.txt \
-               "$OUT"/external-*.txt.gz "$DIAG_PREFIX/$RUN_ID/" 2>/dev/null \
+               "$OUT"/external-*.txt.gz "$OUT"/spawns-*.txt.gz \
+               "$DIAG_PREFIX/$RUN_ID/" 2>/dev/null \
     && echo "   uploaded" || echo "   upload incomplete (some files may not exist)"
+  gsutil -m cp -r "$OUT"/gen-c "$DIAG_PREFIX/$RUN_ID/" 2>/dev/null || true
   return "$rc"
 }
 trap upload_bundle EXIT
@@ -176,6 +178,72 @@ run_probe() {
   return 0
 }
 
+# Copy the small generated repo-config files verbatim, so the next run's diff
+# shows the actual text that changed rather than just a hash. The cross-run
+# manifest diff pointed at these: local_config_android/android.bzl plus the
+# @androidndk / @local_config_android / @local_config_sh markers.
+capture_generated() {
+  local tag="$1" ob dst f name
+  # shellcheck disable=SC2086
+  ob="$(bazel $BAZEL_ROOT_ARG info output_base 2>/dev/null || true)"
+  [ -n "$ob" ] || return 0
+  dst="$OUT/gen-$tag"
+  mkdir -p "$dst"
+  for f in "local_config_android/android.bzl" \
+           "local_config_android/BUILD" \
+           "androidndk/BUILD.bazel" \
+           "androidndk/BUILD" \
+           "@androidndk.marker" \
+           "@local_config_android.marker" \
+           "@local_config_sh.marker" \
+           "@local_config_cc.marker"; do
+    if [ -f "$ob/external/$f" ]; then
+      name="$(printf '%s' "$f" | tr '/@' '__')"
+      cp "$ob/external/$f" "$dst/$name" 2>/dev/null || true
+    fi
+  done
+  echo "captured $(ls -1 "$dst" 2>/dev/null | wc -l) generated config files for $tag"
+}
+
+# Reduce an execution log to one compact line per spawn:
+#   <primary output> <sha of cmdline+env+platform> <sha of input digests>
+# so a cross-run diff says immediately whether a key moved because of the
+# command line/environment or because an input's content changed.
+spawn_fingerprint() {
+  local tag="$1" src="$OUT/execlog-$tag.json"
+  [ -f "$src" ] || return 0
+  python3 - "$src" "$OUT/spawns-$tag.txt" <<'PY' || echo "spawn fingerprint failed for $tag"
+import hashlib, json, sys
+
+src, dst = sys.argv[1], sys.argv[2]
+dec = json.JSONDecoder()
+data = open(src, encoding="utf-8").read()
+i, n, rows = 0, len(data), []
+def sha(x):
+    return hashlib.sha256(json.dumps(x, sort_keys=True).encode()).hexdigest()[:16]
+while i < n:
+    while i < n and data[i].isspace():
+        i += 1
+    if i >= n:
+        break
+    obj, i = dec.raw_decode(data, i)
+    outs = obj.get("listedOutputs") or obj.get("actualOutputs") or []
+    key = outs[0] if outs else obj.get("targetLabel", "?")
+    if isinstance(key, dict):
+        key = key.get("path", "?")
+    cmd = sha([obj.get("commandArgs"), obj.get("environmentVariables"),
+               obj.get("platform")])
+    ins = sha([(x.get("path"), (x.get("digest") or {}).get("hash"))
+               for x in obj.get("inputs", [])])
+    rows.append(f"{key}\t{cmd}\t{ins}")
+rows.sort()
+open(dst, "w", encoding="utf-8").write("\n".join(rows) + "\n")
+print(f"spawn fingerprint: {len(rows)} spawns -> {dst}")
+PY
+  gzip -9 -f "$OUT/spawns-$tag.txt" 2>/dev/null || true
+  gzip -9 -f "$src" 2>/dev/null || true
+}
+
 # sha256 of every regular file in every fetched external repo. Symlinks are
 # recorded by target rather than followed, so the NDK (symlinked in by
 # android_ndk_repository) is identified without hashing gigabytes.
@@ -254,8 +322,23 @@ run_probe b /tmp/probe-path-b probe-nostrict --noincompatible_strict_action_env
 run_manifest b
 
 # --- leg 2: PATH varies, action env pinned by .bazelrc. Tests the fix. ---
+# Probe c is the cross-run leg (it reads keys a previous run uploaded), so it
+# also records an execution log. Comparing its per-spawn fingerprint against the
+# previous run's says whether a key moved because of the command line and
+# environment or because an input's content changed.
+EXECLOG_FLAGS=()
+# shellcheck disable=SC2086
+if bazel $BAZEL_ROOT_ARG help build 2>/dev/null | grep -q -- '--execution_log_json_file'; then
+  EXECLOG_FLAGS=("--execution_log_json_file=$OUT/execlog-c.json")
+  echo "execution log: enabled"
+else
+  echo "execution log: --execution_log_json_file unsupported, skipping"
+fi
+
 reset_bazel_state
-run_probe c /tmp/probe-path-c probe-strict
+run_probe c /tmp/probe-path-c probe-strict "${EXECLOG_FLAGS[@]}"
+capture_generated c
+spawn_fingerprint c
 
 reset_bazel_state
 run_probe d /tmp/probe-path-d probe-strict
@@ -292,6 +375,19 @@ else
   gsutil -m cp -r "$DIAG_PREFIX/$prev/*" "$OUT/prev/" >/dev/null 2>&1 || true
   report_diff "fingerprint (env/toolchain)" "$OUT/prev/fingerprint.txt" "$OUT/fingerprint.txt"
   report_diff "external repo contents" "$OUT/prev/external-a.txt.gz" "$OUT/external-a.txt.gz"
+
+  # Which half of the action key moved: command line + environment, or inputs?
+  report_diff "spawn fingerprints (output / cmdline+env / inputs)" \
+              "$OUT/prev/spawns-c.txt.gz" "$OUT/spawns-c.txt.gz"
+
+  # The actual text of the generated repo-config files that the manifest diff
+  # flagged, so we see what changed rather than that something did.
+  if [ -d "$OUT/gen-c" ]; then
+    for gf in "$OUT"/gen-c/*; do
+      [ -f "$gf" ] || continue
+      report_diff "generated $(basename "$gf")" "$OUT/prev/gen-c/$(basename "$gf")" "$gf"
+    done
+  fi
   echo
   echo "-- previous run probe c: $(hit_rate "$OUT/prev/summary-c.txt")"
   echo "-- this run     probe c: $(hit_rate "$OUT/summary-c.txt")"
