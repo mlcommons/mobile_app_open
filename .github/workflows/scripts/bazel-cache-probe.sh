@@ -210,7 +210,11 @@ capture_generated() {
 # so a cross-run diff says immediately whether a key moved because of the
 # command line/environment or because an input's content changed.
 spawn_fingerprint() {
-  local tag="$1" src="$OUT/execlog-$tag.json"
+  # Separate statements on purpose: bash declares every name in a single
+  # `local` before evaluating any of the assignments, so referring to `tag`
+  # from the same statement trips `set -u`.
+  local tag="$1"
+  local src="$OUT/execlog-$tag.json"
   [ -f "$src" ] || return 0
   python3 - "$src" "$OUT/spawns-$tag.txt" <<'PY' || echo "spawn fingerprint failed for $tag"
 import hashlib, json, sys
