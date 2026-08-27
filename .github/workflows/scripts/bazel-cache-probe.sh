@@ -1,61 +1,66 @@
 #!/usr/bin/env bash
 #
-# Diagnose why the GCS bazel remote cache gets ~0% cross-run hits.
+# Controlled experiment for the bazel remote cache hit rate.
 #
-# Background: the Linux Android build points bazel at a GCS remote cache, and
-# the cache demonstrably works *within* a run (later backend builds hit
-# hundreds of entries uploaded by earlier ones) but delivers almost nothing
-# *across* runs -- three separate runs each reported exactly
-# "4497 processes: 7 remote cache hit, 771 internal, 3719 local".
+# Background. The Linux Android build points bazel at a GCS remote cache. It
+# worked within a run (later backend builds hit hundreds of entries uploaded by
+# earlier ones) and delivered nothing across runs -- three separate runs each
+# reported the identical "4497 processes: 7 remote cache hit, 771 internal,
+# 3719 local" for the first and most expensive build step.
 #
-# Content-addressed inputs have already been ruled out from the CI logs: the
-# linux/amd64 image manifest digest, the bazel-reported hashes of the
-# unpinned archives, and the output_base path are all identical across runs.
-# That leaves the parts of a bazel action key that are NOT file content --
-# the command line, the action environment (PATH/LD_LIBRARY_PATH are
-# inherited from the client unless --incompatible_strict_action_env is set)
-# and the output paths.
+# Earlier revisions of this probe established, by measurement:
+#   * uploads land -- 1189 locally executed actions produced exactly ac=1189
+#     objects in a prefix that started empty
+#   * objects persist -- the real cache holds ~19k action entries
+#   * bazel keeps the path prefix of the --remote_cache URL (bucket root stayed
+#     at ac=0)
+#   * a full re-fetch of every external repo inside one run still hit 1188 of
+#     1189 actions, so fetching is reproducible
+#   * across two runs, the only differing external repo file was loadgen's
+#     version_generated.cc, and the only differing environment value was PATH:
+#       PATH=/__w/_temp/447e3f0f-.../google-cloud-sdk/bin:...
+#       PATH=/__w/_temp/ada2e556-.../google-cloud-sdk/bin:...
+#     setup-gcloud installs the SDK into a fresh $RUNNER_TEMP/<uuid> every run.
 #
-# `bazel aquery --output=text` prints exactly those: every action's
-# ActionKey, Environment and Command Line, and it is analysis-only, so a
-# cross-run diff of it costs ~2 minutes instead of a 70-minute build.
+# Bazel bakes the client PATH into every action's environment unless
+# --incompatible_strict_action_env is set, and the action environment is part of
+# every action key -- so a new uuid on PATH invalidated the entire cache on
+# every run.
 #
-# The probe collects, per run:
-#   fingerprint.txt        host/env/toolchain identity (allowlisted vars only)
-#   aquery-{a,b}.txt.gz    action keys + env + command lines
-#   external-{a,b}.txt.gz  sha256 of every fetched external repo file
-#   summary-{a,b}.txt      bazel's "N processes: ..." cache-hit line
+# This probe now tests that claim and its fix directly. Four builds of one small
+# canary target, resetting all bazel state between them, varying only PATH:
 #
-# and reports two things:
-#   same-run  : A vs B, with `bazel clean --expunge` in between, so every
-#               external repo is re-fetched. Any diff here is fetch-time
-#               non-determinism, caught in a single run.
-#   cross-run : current bundle vs the previous run's bundle in GCS. Probe A's
-#               hit rate IS the cross-run reuse number we care about.
+#   a  PATH prefix A, --noincompatible_strict_action_env   populates
+#   b  PATH prefix B, --noincompatible_strict_action_env   expect ~0% hits
+#   c  PATH prefix C, strict action env (from .bazelrc)    populates
+#   d  PATH prefix D, strict action env (from .bazelrc)    expect ~100% hits
+#
+# b near zero reproduces the bug; d near 100% proves the fix.
 #
 set -euo pipefail
 
 OUT="${PROBE_OUT_DIR:-/tmp/bazel-cache-probe}"
 CANARY="${CANARY_TARGET:-//flutter/cpp:mlperf_driver}"
 DIAG_PREFIX="${DIAG_GCS_PREFIX:?DIAG_GCS_PREFIX must be set}"
+BUCKET="${DIAG_BUCKET:-gs://mobile-app-build-290400_github-actions}"
+CACHE_BASE="${DIAG_CACHE_BASE:-https://storage.googleapis.com/mobile-app-build-290400_github-actions/bazel-cache}"
 RUN_ID="${GITHUB_RUN_NUMBER:-local}"
 
 BAZEL_ROOT_ARG="${BAZEL_OUTPUT_ROOT_ARG:-}"
 BAZEL_CFG=(--config=android_arm64 --platforms=//platforms:android_arm64)
+ORIG_PATH="$PATH"
 
 mkdir -p "$OUT"
 
-# The bundle is what the *next* run compares against, so it has to be uploaded
-# even when a later probe step dies -- the first probe run lost its baseline
-# exactly that way.
+# The bundle is what the next run compares against, so upload it even when a
+# later step dies -- an earlier probe run lost its baseline exactly that way.
 upload_bundle() {
   local rc=$?
   echo
   echo "== uploading this run's bundle to $DIAG_PREFIX/$RUN_ID/ (script rc=$rc)"
-  gsutil -m cp "$OUT"/fingerprint.txt "$OUT"/summary-*.txt "$OUT"/symlinks-*.txt \
-               "$OUT"/objects-*.txt "$OUT"/aquery-*.txt.gz "$OUT"/external-*.txt.gz \
-               "$DIAG_PREFIX/$RUN_ID/" 2>/dev/null \
-    && echo "   uploaded" || echo "   upload incomplete (some files may not exist yet)"
+  gsutil -m cp "$OUT"/fingerprint.txt "$OUT"/summary-*.txt "$OUT"/objects-*.txt \
+               "$OUT"/external-*.txt.gz "$DIAG_PREFIX/$RUN_ID/" 2>/dev/null \
+    && echo "   uploaded" || echo "   upload incomplete (some files may not exist)"
   return "$rc"
 }
 trap upload_bundle EXIT
@@ -68,16 +73,15 @@ section() {
 }
 
 # ---------------------------------------------------------------- fingerprint
-# Only an explicit allowlist of variable names is printed. The job deliberately
-# does not define the signing/Firebase/BrowserStack secrets, but an allowlist
-# is still the right default for something that gets uploaded to a bucket.
+# Only an explicit allowlist of variable names is printed; this file is uploaded
+# to a bucket, so an allowlist is the right default even though this job does
+# not define the signing/Firebase/BrowserStack secrets.
 fingerprint() {
   local f="$OUT/fingerprint.txt"
   {
     echo "## host"
     uname -a
     echo "nproc=$(nproc)"
-    echo "id=$(id -u):$(id -g)"
 
     echo
     echo "## env (allowlist)"
@@ -93,7 +97,7 @@ fingerprint() {
     echo
     echo "## host toolchain identity"
     local t p
-    for t in gcc g++ cc c++ ld ar python3 java bazel bazelisk; do
+    for t in gcc g++ cc c++ ld ar python3 java bazel; do
       p="$(command -v "$t" 2>/dev/null || true)"
       if [ -n "$p" ] && [ -f "$p" ]; then
         printf '%-9s %-40s %s\n' "$t" "$p" "$(sha256sum "$p" | cut -d' ' -f1)"
@@ -102,11 +106,6 @@ fingerprint() {
       fi
     done
     echo "gcc -dumpversion: $(gcc -dumpversion 2>/dev/null || echo n/a)"
-    echo "gcc -dumpmachine: $(gcc -dumpmachine 2>/dev/null || echo n/a)"
-
-    echo
-    echo "## gcc builtin include dirs (these land in @local_config_cc)"
-    echo | gcc -E -xc++ - -v 2>&1 | sed -n '/#include <...> search starts here/,/End of search list/p' || true
 
     echo
     echo "## android ndk identity"
@@ -120,137 +119,27 @@ fingerprint() {
       echo "ANDROID_NDK_HOME unset or missing"
     fi
   } > "$f"
-  echo "wrote $f"
+  cat "$f"
 }
 
-# ------------------------------------------------------------------- probes
-run_aquery() {
-  local tag="$1"
-  echo "aquery ($tag) over deps($CANARY) ..."
-  # shellcheck disable=SC2086
-  bazel $BAZEL_ROOT_ARG aquery "${BAZEL_CFG[@]}" \
-      "deps($CANARY)" --output=text \
-      2> "$OUT/aquery-$tag.stderr" \
-    | gzip -9 > "$OUT/aquery-$tag.txt.gz"
-  echo "  $(zcat "$OUT/aquery-$tag.txt.gz" | grep -c '^  ActionKey:' || true) actions"
-}
-
-run_build() {
-  local tag="$1" rc=0
-  echo "build ($tag) $CANARY ..."
-  # shellcheck disable=SC2086
-  bazel $BAZEL_ROOT_ARG build ${BAZEL_CACHE_ARG:-} "${BAZEL_CFG[@]}" \
-      "$CANARY" 2>&1 | tee "$OUT/build-$tag.log" || rc=$?
-  rc="${PIPESTATUS[0]:-$rc}"
-  grep -E '^INFO: [0-9]+ processes:' "$OUT/build-$tag.log" | tail -1 \
-    > "$OUT/summary-$tag.txt" || true
-  echo "  $(cat "$OUT/summary-$tag.txt" 2>/dev/null || echo '<no summary line>')"
-  return "$rc"
-}
-
-# sha256 of every regular file in every fetched external repo. Symlinks are
-# recorded by target rather than followed, so the NDK (symlinked in by
-# android_ndk_repository) is identified without hashing gigabytes.
-run_manifest() {
-  local tag="$1" ob
-  # shellcheck disable=SC2086
-  ob="$(bazel $BAZEL_ROOT_ARG info output_base)"
-  echo "manifest ($tag) of $ob/external ..."
-  ( cd "$ob/external" && find . -type l -printf '%p -> %l\n' | LC_ALL=C sort ) \
-    > "$OUT/symlinks-$tag.txt" 2>/dev/null || true
-  ( cd "$ob/external" \
-      && find . -type f -print0 \
-      | xargs -0 -P "$(nproc)" -n 512 sha256sum 2>/dev/null ) \
-    | LC_ALL=C sort -k2 | gzip -9 > "$OUT/external-$tag.txt.gz" || true
-  echo "  $(zcat "$OUT/external-$tag.txt.gz" | wc -l) files, $(wc -l < "$OUT/symlinks-$tag.txt") symlinks"
-}
-
-# Counts objects bazel actually wrote. Two things are worth knowing here:
-# whether uploads land at all (if they do not, no amount of key stability will
-# help), and whether bazel keeps the path prefix of the --remote_cache URL --
-# if it does not, the "probe" prefix silently shares a namespace with the real
-# build cache at the bucket root.
+# Counting objects proves uploads land and shows whether bazel keeps the path
+# prefix of the --remote_cache URL (if it did not, everything would pile up at
+# the bucket root).
 count_cache_objects() {
-  local when="$1" bucket="gs://mobile-app-build-290400_github-actions"
-  local p
-  for p in "$bucket/bazel-cache/probe" "$bucket/bazel-cache/linux-android" "$bucket"; do
-    local ac cas
+  local when="$1" p ac cas
+  for p in "$BUCKET/bazel-cache/probe-nostrict" "$BUCKET/bazel-cache/probe-strict" \
+           "$BUCKET/bazel-cache/linux-android" "$BUCKET"; do
     ac="$(gsutil ls "$p/ac/" 2>/dev/null | wc -l || echo 0)"
     cas="$(gsutil ls "$p/cas/" 2>/dev/null | wc -l || echo 0)"
-    printf '%-12s %-60s ac=%-8s cas=%s\n' "$when" "$p" "$ac" "$cas"
+    printf '%-10s %-62s ac=%-8s cas=%s\n' "$when" "$p" "$ac" "$cas"
   done
 }
 
-# --------------------------------------------------------------- comparisons
-# $1 label, $2 old file, $3 new file. Handles .gz transparently.
-report_diff() {
-  local label="$1" old="$2" new="$3" o n
-  if [ ! -f "$old" ] || [ ! -f "$new" ]; then
-    echo "-- $label: SKIPPED (missing $( [ -f "$old" ] || echo old )$( [ -f "$new" ] || echo ' new' ))"
-    return 0
-  fi
-  o="$(mktemp)"; n="$(mktemp)"
-  case "$old" in *.gz) zcat "$old" > "$o" ;; *) cp "$old" "$o" ;; esac
-  case "$new" in *.gz) zcat "$new" > "$n" ;; *) cp "$new" "$n" ;; esac
-  local count
-  count="$(diff -U0 "$o" "$n" | grep -cE '^[+-][^+-]' || true)"
-  if [ "$count" = "0" ]; then
-    echo "-- $label: IDENTICAL"
-  else
-    echo "-- $label: $count differing lines (first 60):"
-    diff -U0 "$o" "$n" | grep -E '^[+-][^+-]' | head -60
-  fi
-  rm -f "$o" "$n"
-}
-
-# aquery text output is one action per stanza; compare just the ActionKey set
-# so a single changed key is obvious even when the surrounding text is huge.
-report_action_keys() {
-  local old="$1" new="$2" o n total_old total_new common
-  if [ ! -f "$old" ] || [ ! -f "$new" ]; then
-    echo "-- action keys: SKIPPED (no baseline)"
-    return 0
-  fi
-  o="$(mktemp)"; n="$(mktemp)"
-  zcat "$old" | grep -E '^  ActionKey: ' | sed 's/^  ActionKey: //' | LC_ALL=C sort -u > "$o"
-  zcat "$new" | grep -E '^  ActionKey: ' | sed 's/^  ActionKey: //' | LC_ALL=C sort -u > "$n"
-  total_old="$(wc -l < "$o")"; total_new="$(wc -l < "$n")"
-  common="$(comm -12 "$o" "$n" | wc -l)"
-  echo "-- action keys: $common of $total_new shared (baseline had $total_old)"
-  if [ "$common" != "$total_new" ]; then
-    echo "   NOT reproducible -- action keys changed. Sample changed actions:"
-    # Show the stanzas whose keys are new, which carries Mnemonic/Env/CmdLine.
-    comm -13 "$o" "$n" | head -3 | while read -r key; do
-      echo "   ---- new key $key ----"
-      zcat "$new" | grep -B6 -A14 "ActionKey: $key" | head -24
-    done
-  fi
-  rm -f "$o" "$n"
-}
-
-# ------------------------------------------------------------------ main
-section "fingerprint"
-fingerprint
-cat "$OUT/fingerprint.txt"
-
-section "cache object counts BEFORE probe A"
-count_cache_objects before | tee "$OUT/objects-before.txt"
-
-section "probe A -- cold local state, reads whatever previous runs uploaded"
-run_aquery a
-run_build a || echo "WARNING: probe A build failed (rc=$?), continuing to gather evidence"
-run_manifest a
-
-section "cache object counts AFTER probe A -- did the uploads land?"
-count_cache_objects after-a | tee "$OUT/objects-after-a.txt"
-
-# `bazel clean --expunge` is not usable here: it tries to stop the server and
-# gives up with a FATAL if the process outlives its SIGKILL grace period,
-# which is exactly what happened on the first probe run (exit 36) while the
-# server was still flushing remote-cache uploads. Tear the output base down by
-# hand instead, keeping --output_user_root identical so every absolute path
-# probe B sees matches probe A's.
-section "reset bazel state (same paths, all external repos re-fetched)"
+# `bazel clean --expunge` is unusable here: it gives up with a FATAL when the
+# server outlives its SIGKILL grace period, which is what happened on the first
+# probe run (exit 36) while the server was still flushing cache uploads. Tear
+# the output base down by hand, keeping --output_user_root identical so every
+# probe sees exactly the same absolute paths.
 reset_bazel_state() {
   local ob=""
   # shellcheck disable=SC2086
@@ -262,59 +151,139 @@ reset_bazel_state() {
   pkill -9 -f 'bazel_real' >/dev/null 2>&1 || true
   sleep 3
   if [ -n "$ob" ] && [ -d "$ob" ]; then
-    echo "removing output base $ob"
     rm -rf "$ob"
+    echo "removed output base $ob"
   fi
 }
-reset_bazel_state
-echo "reset done"
 
-section "probe B -- same run, same machine, re-fetched repos"
-run_aquery b
-run_build b || echo "WARNING: probe B build failed (rc=$?), continuing to gather evidence"
+# run_probe <tag> <path-prefix-dir> <cache-prefix> [extra bazel flags...]
+run_probe() {
+  local tag="$1" pathdir="$2" cacheprefix="$3"; shift 3
+  local rc=0
+  mkdir -p "$pathdir"
+  export PATH="$pathdir:$ORIG_PATH"
+
+  section "probe $tag -- PATH prefix $pathdir, cache prefix $cacheprefix, flags: $*"
+  echo "PATH=$PATH"
+  # shellcheck disable=SC2086
+  bazel $BAZEL_ROOT_ARG build \
+      "--remote_cache=$CACHE_BASE/$cacheprefix" --google_default_credentials \
+      "$@" "${BAZEL_CFG[@]}" "$CANARY" 2>&1 | tee "$OUT/build-$tag.log" || rc=$?
+  grep -E '^INFO: [0-9]+ processes:' "$OUT/build-$tag.log" | tail -1 \
+    > "$OUT/summary-$tag.txt" 2>/dev/null || true
+  echo "probe $tag: $(cat "$OUT/summary-$tag.txt" 2>/dev/null || echo '<no summary line>')"
+  export PATH="$ORIG_PATH"
+  return 0
+}
+
+# sha256 of every regular file in every fetched external repo. Symlinks are
+# recorded by target rather than followed, so the NDK (symlinked in by
+# android_ndk_repository) is identified without hashing gigabytes.
+run_manifest() {
+  local tag="$1" ob
+  # shellcheck disable=SC2086
+  ob="$(bazel $BAZEL_ROOT_ARG info output_base 2>/dev/null || true)"
+  [ -n "$ob" ] && [ -d "$ob/external" ] || { echo "no external dir for $tag"; return 0; }
+  ( cd "$ob/external" \
+      && find . -type f -print0 \
+      | xargs -0 -P "$(nproc)" -n 512 sha256sum 2>/dev/null ) \
+    | LC_ALL=C sort -k2 | gzip -9 > "$OUT/external-$tag.txt.gz" || true
+  echo "manifest $tag: $(zcat "$OUT/external-$tag.txt.gz" | wc -l) files"
+}
+
+# $1 label, $2 old file, $3 new file. Handles .gz transparently.
+report_diff() {
+  local label="$1" old="$2" new="$3" o n count
+  if [ ! -f "$old" ] || [ ! -f "$new" ]; then
+    echo "-- $label: SKIPPED (missing baseline)"
+    return 0
+  fi
+  o="$(mktemp)"; n="$(mktemp)"
+  case "$old" in *.gz) zcat "$old" > "$o" ;; *) cp "$old" "$o" ;; esac
+  case "$new" in *.gz) zcat "$new" > "$n" ;; *) cp "$new" "$n" ;; esac
+  count="$(diff -U0 "$o" "$n" | grep -cE '^[+-][^+-]' || true)"
+  if [ "$count" = "0" ]; then
+    echo "-- $label: IDENTICAL"
+  else
+    echo "-- $label: $count differing lines (first 40):"
+    diff -U0 "$o" "$n" | grep -E '^[+-][^+-]' | head -40 || true
+  fi
+  rm -f "$o" "$n"
+}
+
+# Pull "N remote cache hit" and the process total out of a bazel summary line.
+hit_rate() {
+  local f="$1" line hits total
+  [ -f "$f" ] || { echo "n/a"; return 0; }
+  line="$(cat "$f")"
+  total="$(sed -E 's/^INFO: ([0-9]+) processes:.*/\1/' <<<"$line")"
+  hits="$(grep -oE '[0-9]+ remote cache hit' <<<"$line" | grep -oE '^[0-9]+' || echo 0)"
+  [ -z "$hits" ] && hits=0
+  if [ -n "$total" ] && [ "$total" -gt 0 ] 2>/dev/null; then
+    echo "$hits/$total ($(( hits * 100 / total ))%)"
+  else
+    echo "$hits/?"
+  fi
+}
+
+# ------------------------------------------------------------------ main
+section "fingerprint"
+fingerprint
+
+section "cache object counts BEFORE"
+count_cache_objects before | tee "$OUT/objects-before.txt"
+
+# --- leg 1: PATH varies, action env NOT pinned. Reproduces the bug. ---
+reset_bazel_state
+run_probe a /tmp/probe-path-a probe-nostrict --noincompatible_strict_action_env
+run_manifest a
+
+reset_bazel_state
+run_probe b /tmp/probe-path-b probe-nostrict --noincompatible_strict_action_env
 run_manifest b
 
-section "SAME-RUN REPORT (A vs B) -- any diff here is fetch-time non-determinism"
-report_action_keys "$OUT/aquery-a.txt.gz" "$OUT/aquery-b.txt.gz"
-report_diff "external repo contents" "$OUT/external-a.txt.gz" "$OUT/external-b.txt.gz"
-report_diff "external repo symlinks" "$OUT/symlinks-a.txt" "$OUT/symlinks-b.txt"
-# Without --incompatible_strict_action_env, bazel inherits PATH (and
-# LD_LIBRARY_PATH) from the client into every action's environment, and the
-# action environment is part of the action key. If these blocks carry a value
-# that differs between runners, no action can ever hit across runs.
-echo "-- distinct action environments seen by aquery:"
-zcat "$OUT/aquery-b.txt.gz" | grep -E '^  Environment: ' | LC_ALL=C sort -u | head -20
+# --- leg 2: PATH varies, action env pinned by .bazelrc. Tests the fix. ---
+reset_bazel_state
+run_probe c /tmp/probe-path-c probe-strict
 
-echo "-- probe A cache line: $(cat "$OUT/summary-a.txt" 2>/dev/null || echo n/a)"
-echo "-- probe B cache line: $(cat "$OUT/summary-b.txt" 2>/dev/null || echo n/a)"
+reset_bazel_state
+run_probe d /tmp/probe-path-d probe-strict
+
+section "cache object counts AFTER"
+count_cache_objects after | tee "$OUT/objects-after.txt"
+
+section "RESULT"
+echo "  a (unpinned env, PATH A, populates) : $(hit_rate "$OUT/summary-a.txt")"
+echo "  b (unpinned env, PATH B)            : $(hit_rate "$OUT/summary-b.txt")   <- expect ~0%"
+echo "  c (pinned env,   PATH C, populates) : $(hit_rate "$OUT/summary-c.txt")"
+echo "  d (pinned env,   PATH D)            : $(hit_rate "$OUT/summary-d.txt")   <- expect ~100%"
 echo
-echo "   Probe B reads what probe A just uploaded, so a high hit rate in B"
-echo "   with a low one in A is the signature of the reported bug."
+echo "  Only PATH differs between a and b, and between c and d. A low b with a"
+echo "  high d means PATH alone was invalidating every action key, and that"
+echo "  --incompatible_strict_action_env fixes it."
+echo
+report_diff "external repo contents across a re-fetch (a vs b)" \
+            "$OUT/external-a.txt.gz" "$OUT/external-b.txt.gz"
+echo "  (loadgen's version_generated.cc used to be the one file that differed"
+echo "   here; WORKSPACE now pins its build-date stamps.)"
 
-section "CROSS-RUN REPORT (previous run vs this run)"
+section "CROSS-RUN COMPARISON (previous run vs this run)"
 prev="$(gsutil ls "$DIAG_PREFIX/" 2>/dev/null \
         | sed -n 's|.*/\([0-9][0-9]*\)/$|\1|p' \
         | LC_ALL=C sort -n \
         | awk -v cur="$RUN_ID" '($1+0) < (cur+0)' \
         | tail -1 || true)"
 if [ -z "${prev:-}" ]; then
-  echo "No previous probe bundle under $DIAG_PREFIX/ -- this is the baseline run."
-  echo "Re-run this workflow to get the cross-run comparison."
+  echo "No previous bundle under $DIAG_PREFIX/ -- this is the baseline run."
 else
   echo "Comparing against run $prev"
   mkdir -p "$OUT/prev"
   gsutil -m cp -r "$DIAG_PREFIX/$prev/*" "$OUT/prev/" >/dev/null 2>&1 || true
-  # Compare probe A, not probe B: probe A always runs, and its hit rate IS the
-  # cross-run reuse number under test.
   report_diff "fingerprint (env/toolchain)" "$OUT/prev/fingerprint.txt" "$OUT/fingerprint.txt"
-  report_action_keys "$OUT/prev/aquery-a.txt.gz" "$OUT/aquery-a.txt.gz"
   report_diff "external repo contents" "$OUT/prev/external-a.txt.gz" "$OUT/external-a.txt.gz"
-  report_diff "external repo symlinks" "$OUT/prev/symlinks-a.txt" "$OUT/symlinks-a.txt"
   echo
-  echo "-- previous run probe A cache line: $(cat "$OUT/prev/summary-a.txt" 2>/dev/null || echo n/a)"
-  echo "-- this run     probe A cache line: $(cat "$OUT/summary-a.txt" 2>/dev/null || echo n/a)"
-  echo
-  echo "   This run's probe A read a cache the previous run filled. A high hit"
-  echo "   rate means action keys reproduce across runs; a near-zero one"
-  echo "   reproduces the bug in minutes instead of a 70-minute build."
+  echo "-- previous run probe c: $(hit_rate "$OUT/prev/summary-c.txt")"
+  echo "-- this run     probe c: $(hit_rate "$OUT/summary-c.txt")"
+  echo "   Probe c reads a prefix the previous run filled with pinned-env keys,"
+  echo "   so a high number here is cross-run reuse actually working."
 fi

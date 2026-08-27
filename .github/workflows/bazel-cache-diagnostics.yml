@@ -41,9 +41,11 @@ jobs:
     timeout-minutes: 90
     env:
       BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
-      # A prefix of its own, so the probe neither pollutes nor is polluted by
-      # the cache the real build job uses.
-      BAZEL_CACHE_ARG: "--remote_cache=https://storage.googleapis.com/mobile-app-build-290400_github-actions/bazel-cache/probe --google_default_credentials"
+      # The probe builds its own --remote_cache flag per leg, under prefixes of
+      # their own, so it neither pollutes nor is polluted by the cache the real
+      # build job uses.
+      DIAG_BUCKET: gs://mobile-app-build-290400_github-actions
+      DIAG_CACHE_BASE: https://storage.googleapis.com/mobile-app-build-290400_github-actions/bazel-cache
       DIAG_GCS_PREFIX: gs://mobile-app-build-290400_github-actions/bazel-cache-diagnostics
       CANARY_TARGET: "//flutter/cpp:mlperf_driver"
       PROBE_OUT_DIR: /tmp/bazel-cache-probe
