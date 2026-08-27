@@ -211,16 +211,27 @@ report_diff() {
   rm -f "$o" "$n"
 }
 
-# Pull "N remote cache hit" and the process total out of a bazel summary line.
+# Pull the hit count out of a bazel summary line, as a fraction of the actions
+# that can actually be cached. Bazel's "N internal" actions (symlink trees,
+# workspace status, ...) never go to the remote cache, so counting them in the
+# denominator understates a perfect result -- 1189 hits with 229 internal and 0
+# local is 100% reuse, not 83%.
 hit_rate() {
-  local f="$1" line hits total
+  local f="$1" line hits total internal cacheable
   [ -f "$f" ] || { echo "n/a"; return 0; }
   line="$(cat "$f")"
   total="$(sed -E 's/^INFO: ([0-9]+) processes:.*/\1/' <<<"$line")"
-  hits="$(grep -oE '[0-9]+ remote cache hit' <<<"$line" | grep -oE '^[0-9]+' || echo 0)"
+  hits="$(grep -oE '[0-9]+ remote cache hit' <<<"$line" | grep -oE '^[0-9]+' || true)"
+  internal="$(grep -oE '[0-9]+ internal' <<<"$line" | grep -oE '^[0-9]+' || true)"
   [ -z "$hits" ] && hits=0
+  [ -z "$internal" ] && internal=0
   if [ -n "$total" ] && [ "$total" -gt 0 ] 2>/dev/null; then
-    echo "$hits/$total ($(( hits * 100 / total ))%)"
+    cacheable=$(( total - internal ))
+    if [ "$cacheable" -gt 0 ]; then
+      echo "$hits/$cacheable cacheable ($(( hits * 100 / cacheable ))%)"
+    else
+      echo "$hits/0 cacheable"
+    fi
   else
     echo "$hits/?"
   fi
