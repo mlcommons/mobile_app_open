@@ -221,7 +221,11 @@ jobs:
             ["${{ matrix.device }}"]
         with:
           timeout_minutes: 60
-          max_attempts: 2
+          # Exit 9 is a BrowserStack trigger failure, which is what
+          # BROWSERSTACK_ALL_PARALLELS_IN_USE produces when the account's
+          # session budget is busy - retrying it just waits for a free slot.
+          # Every other failure still fails fast.
+          max_attempts: 8
           retry_wait_seconds: 300
           retry_on_exit_code: 9
           command: |
