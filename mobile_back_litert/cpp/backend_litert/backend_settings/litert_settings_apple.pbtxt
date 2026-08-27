@@ -12,10 +12,16 @@
 # (the TFLite fallback) stay selectable next to it, so users can compare
 # implementations per benchmark. Stable diffusion has no LiteRT setting yet.
 #
-# delegate_selected is "CPU" for every benchmark in this first landing: Metal is
-# offered so it can be picked in the UI, but it has not been verified on a real
-# device yet. Once a device run confirms it, promoting a default is a one-line
-# change per benchmark -- the same sequencing the Android settings went through.
+# The vision/NLP benchmarks default to Metal, measured on an iPad mini: Metal
+# ran image_classification_v2 at 77.3 QPS against 44.9 on CPU, and completed
+# object_detection, image_segmentation_v2, natural_language_processing and
+# image_classification_offline_v2 with valid results. super_resolution follows
+# the same pattern but has not been measured; if its GPU compile ever fails the
+# pipeline falls back to CPU on its own.
+#
+# The llm-* benchmarks stay on CPU. They are unmeasured on Apple, and on Android
+# the LiteRT GPU LLM path was about half the speed of LiteRT CPU, so Metal is
+# offered there but not assumed to be the better default.
 claim_policy: CLAIM_SHARED
 
 common_setting {
@@ -48,7 +54,7 @@ benchmark_setting {
       model_checksum: "b57cc2a027607c3b36873a15ace84acb"
     }
   }
-  delegate_selected: "CPU"
+  delegate_selected: "Metal"
 }
 
 benchmark_setting {
@@ -72,7 +78,7 @@ benchmark_setting {
       model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
     }
   }
-  delegate_selected: "CPU"
+  delegate_selected: "Metal"
 }
 
 benchmark_setting {
@@ -96,7 +102,7 @@ benchmark_setting {
       model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
     }
   }
-  delegate_selected: "CPU"
+  delegate_selected: "Metal"
 }
 
 benchmark_setting {
@@ -120,7 +126,7 @@ benchmark_setting {
       model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
     }
   }
-  delegate_selected: "CPU"
+  delegate_selected: "Metal"
 }
 
 benchmark_setting {
@@ -144,7 +150,7 @@ benchmark_setting {
       model_checksum: "672240427c1f3dc33baf2facacd9631f"
     }
   }
-  delegate_selected: "CPU"
+  delegate_selected: "Metal"
 }
 
 benchmark_setting {
@@ -170,7 +176,7 @@ benchmark_setting {
     }
     batch_size: 2
   }
-  delegate_selected: "CPU"
+  delegate_selected: "Metal"
   # One CompiledModel with the batch dimension resized to 2, matching the
   # Android setting: concurrent Run calls from multiple shards deadlock on the
   # shared LiteRT GPU context (observed on Pixel 10 Pro), and the Metal
