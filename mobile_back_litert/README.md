@@ -60,12 +60,13 @@ WITH_LITERT=1 make flutter/ios
   `llm-*` benchmarks default to CPU. `LiteRtGpuBackend` has no Metal
   enumerator: on Apple, Metal is selected by `kLiteRtGpuBackendAutomatic` plus
   compile-time Metal support.
-* The `llm-*` benchmarks need a high-memory device. The prefill buffers are
+* The `llm-*` benchmarks do not currently run on iOS. The prefill buffers are
   sized by the selected prefill signature, so a prompt just over 2048 tokens
-  picks the 4096 bucket and its logits buffer alone is several GB; together
-  with the ~1.2 GB model this exceeds the per-process memory limit on 4 GB-class
-  devices, and iOS kills the app (`EXC_RESOURCE`, observed on an iPad mini).
-  This is not Apple-specific -- Android just has more headroom.
+  picks the 4096 bucket, and that logits buffer alone is several GB; together
+  with the ~1.2 GB model it exceeds the per-process memory limit and iOS kills
+  the app (`EXC_RESOURCE`). The observed limit is 3376 MB on an 8 GB device, so
+  this is not confined to small devices, and both the CPU and the Metal delegate
+  hit it. Android is unaffected -- it has far more headroom.
 * There is no CoreML/ANE path: the LiteRT v2 API does not expose one yet
   (upstream marks ANE "coming soon"). Use the Apple backend for CoreML.
 
