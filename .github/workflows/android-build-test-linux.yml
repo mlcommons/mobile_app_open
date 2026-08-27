@@ -306,6 +306,23 @@ jobs:
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    # BrowserStack allows only 2 parallel sessions on this account, so a
+    # superseded run's device tests starve the current one and it fails with
+    # BROWSERSTACK_ALL_PARALLELS_IN_USE. Cancel the previous run's job for the
+    # same device as soon as a new commit arrives.
+    #
+    # Deliberately per job rather than workflow-wide: the build jobs must always
+    # run to completion. GitHub runners are plentiful, and a build that finishes
+    # is what populates the bazel cache for every later run.
+    #
+    # The group has to include the matrix values, or the legs of a single run
+    # would cancel each other. It deliberately leaves the job name out so that
+    # an older run's -extended leg is also cancelled by a newer run's -unified
+    # leg for the same device; within one run those never overlap, because
+    # -extended and -single both need -unified.
+    concurrency:
+      group: browserstack-${{ github.ref }}-${{ matrix.backend }}-${{ matrix.device }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -398,6 +415,11 @@ jobs:
     if: github.ref == 'refs/heads/master' || vars.EXTENDED_TESTS_ON_PR == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    # Same BrowserStack session budget as test-android-apk-unified above; see
+    # the comment there for why this is per job and per matrix leg.
+    concurrency:
+      group: browserstack-${{ github.ref }}-${{ matrix.backend }}-${{ matrix.device }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -490,6 +512,11 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    # Same BrowserStack session budget as test-android-apk-unified above; see
+    # the comment there for why this is per job and per matrix leg.
+    concurrency:
+      group: browserstack-${{ github.ref }}-${{ matrix.backend }}-${{ matrix.device }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       max-parallel: 2

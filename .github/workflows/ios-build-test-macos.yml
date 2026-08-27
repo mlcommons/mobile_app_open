@@ -236,6 +236,21 @@ jobs:
     permissions:
       contents: read
     timeout-minutes: 60
+    # BrowserStack allows only 2 parallel sessions on this account, and a
+    # superseded run's device tests starve the current one -- this job has
+    # already failed with BROWSERSTACK_ALL_PARALLELS_IN_USE. Cancel the previous
+    # run's job for the same device when a new commit arrives.
+    #
+    # Deliberately per job, not workflow-wide: the two "Build iOS app" jobs must
+    # always run to completion, both to publish their test package and to leave a
+    # warm bazel cache behind. GitHub runners are plentiful; BrowserStack seats
+    # are not.
+    #
+    # The matrix values are part of the group, or the two legs of one run would
+    # cancel each other.
+    concurrency:
+      group: browserstack-${{ github.ref }}-${{ matrix.backend }}-${{ matrix.device }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       max-parallel: 2
