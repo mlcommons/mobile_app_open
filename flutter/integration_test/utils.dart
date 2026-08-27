@@ -139,7 +139,13 @@ bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
   );
   if (benchmark == null) return false;
   final selectedLib = benchmark.selectedBackend.info.libName;
-  if (benchmarkId == 'stable_diffusion') {
+  // Stable diffusion has a backend setting only on QTI and LiteRT (CPU,
+  // see litert_settings_android). Every other backend would fall back to
+  // TFLite, which is far too slow for a CI device session. LiteRT is not
+  // short-circuited here: it falls through to the checks below so that,
+  // like the other benchmarks it claims, it runs only where LiteRT is the
+  // primary backend or is pinned via deviceBackendOverride.
+  if (benchmarkId == 'stable_diffusion' && selectedLib != BackendId.litert) {
     return selectedLib == BackendId.qti;
   }
   // The TFLite fallback is now offered alongside vendor backends, so

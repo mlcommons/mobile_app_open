@@ -14,11 +14,20 @@ const _runMode = BenchmarkRunModeEnum.integrationTestRun;
 // The LLM accuracy phase evaluates the whole TinyMMLU set, which is far too
 // slow for a CI device session on the CPU path. quickRun keeps the same lite
 // dataset and quick run config but skips the accuracy phase.
-const _llmRunMode = BenchmarkRunModeEnum.quickRun;
+//
+// Stable diffusion needs the same treatment for the same reason, only more so:
+// loadgen ignores min_query_count in accuracy mode and runs the whole set, so
+// the accuracy phase is 150 sequential 20-step generations plus 150 CLIP
+// scoring passes. On the CPU that is hours, and it also pulls the 1.71 GB CLIP
+// ground truth. quickRun keeps the performance phase, which is time-bounded.
+const _quickRunIds = {BenchmarkId.stableDiffusion};
+const _quickRunMode = BenchmarkRunModeEnum.quickRun;
 const _bindingKeepAliveInterval = Duration(seconds: 20);
 
 BenchmarkRunModeEnum _runModeFor(String benchmarkId) =>
-    benchmarkId.startsWith('llm') ? _llmRunMode : _runMode;
+    benchmarkId.startsWith('llm') || _quickRunIds.contains(benchmarkId)
+        ? _quickRunMode
+        : _runMode;
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();

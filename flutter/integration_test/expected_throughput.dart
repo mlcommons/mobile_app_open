@@ -238,6 +238,7 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
     _kS10Plus: Interval(min: 0, max: 100),
   },
   _kSamsungBackend: {_kS24: Interval(min: 0, max: 100)},
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 0, max: 100)},
 };
 
 const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {

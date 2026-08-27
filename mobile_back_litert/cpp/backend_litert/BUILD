@@ -34,15 +34,23 @@ pbtxt2header(
 cc_library(
     name = "litert_c",
     srcs = [
+        "embedding_utils.cc",
         "litert_c.cc",
         "llm_pipeline.cc",
+        "sd_utils.cc",
         "single_model_pipeline.cc",
+        "stable_diffusion_invoker.cc",
+        "stable_diffusion_pipeline.cc",
     ],
     hdrs = [
+        "embedding_utils.h",
         "litert_settings_android.h",
         "llm_pipeline.h",
         "pipeline.h",
+        "sd_utils.h",
         "single_model_pipeline.h",
+        "stable_diffusion_invoker.h",
+        "stable_diffusion_pipeline.h",
         "thread_pool.h",
     ],
     copts = tflite_copts() + select({

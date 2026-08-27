@@ -1,5 +1,7 @@
 #include "sd_utils.h"
 
+#include "absl/log/log.h"
+
 std::vector<int> get_timesteps(int start, int stop, int delta) {
   std::vector<int> timesteps;
   for (int i = start; i < stop; i += delta) {
@@ -216,50 +218,16 @@ std::tuple<std::vector<float>, std::vector<float>> get_initial_alphas(
 
   alphas_prev.push_back(1.0);
   for (auto i = timesteps.begin(); i < timesteps.end(); i++) {
+    // A timestep outside the cumulative alpha table means the schedule does
+    // not belong to this model; return empty vectors so the caller fails
+    // instead of reading past the table.
+    if (*i < 0 || static_cast<size_t>(*i) >= alpha_cum.size()) {
+      LOG(ERROR) << "Timestep " << *i << " is outside the alpha table of "
+                 << alpha_cum.size() << " entries";
+      return make_tuple(std::vector<float>(), std::vector<float>());
+    }
     alphas.push_back(alpha_cum[*i]);
     if (i < timesteps.end() - 1) alphas_prev.push_back(alpha_cum[*i]);
   }
   return make_tuple(alphas, alphas_prev);
 }
-
-std::vector<float> get_timestep_embedding(int timestep, int batch_size, int dim,
-                                          int max_period) {
-  std::vector<float> embedding_cos;
-  std::vector<float> embedding_sin;
-
-  auto half = dim / 2;
-  for (int i = 0; i < half; i++) {
-    auto freq = expf(-logf(max_period) * i / half);
-    embedding_cos.push_back(cosf(timestep * freq));
-    embedding_sin.push_back(sinf(timestep * freq));
-  }
-  std::vector<float> embedding;
-  for (int i = 0; i < batch_size; i++) {
-    embedding.insert(embedding.end(),
-                     std::make_move_iterator(embedding_cos.begin()),
-                     std::make_move_iterator(embedding_cos.end()));
-    embedding.insert(embedding.end(),
-                     std::make_move_iterator(embedding_sin.begin()),
-                     std::make_move_iterator(embedding_sin.end()));
-  }
-
-  // std::cout << "embedding.size(): " << embedding.size() << "\n";
-  return embedding;
-}
-
-#ifdef __TEST_BPE__
-int main(int argc, char *argv[]) {
-  int num_steps = 30;
-  auto timesteps = get_timesteps(1, 1000, 1000 / num_steps);
-  auto as = get_initial_alphas(timesteps);
-  auto len = std::get<0>(as).size();
-  for (int i = 0; i < len; i++) {
-    std::cout << std::get<0>(as)[i] << ", " << std::get<1>(as)[i] << "\n";
-  }
-  auto e = get_timestep_embedding(801);
-  for (int i = 0; i < 16; i++) {
-    std::cout << e[i] << "\t";
-  }
-  std::cout << "\n";
-}
-#endif
