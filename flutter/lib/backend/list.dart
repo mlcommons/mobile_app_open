@@ -1,5 +1,7 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+
 import 'package:mlperfbench/backend/bridge/ffi_match.dart';
 import 'package:mlperfbench/data/environment/environment_info.dart';
 import 'package:mlperfbench/device_info.dart';
@@ -8,8 +10,22 @@ import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 part 'list.gen.dart';
 
 class BackendInfoHelper {
-  BackendInfo findMatching() {
-    const fallbackBackend = 'libtflitebackend';
+  static const fallbackBackend = 'libtflitebackend';
+
+  // When true, the TFLite fallback backend can be offered alongside a matching
+  // vendor backend, subject to that backend's BackendSetting.fallback_policy.
+  // Offering the fallback is opt-in: it stays suppressed unless the matched
+  // vendor backend declares FALLBACK_FILL_GAPS or FALLBACK_COEXIST.
+  // When false, the fallback is probed only when no vendor backend matches,
+  // which reproduces the historical single-backend-per-session behavior
+  // regardless of vendor policies.
+  static const alwaysOfferFallback = true;
+
+  // Returns all matching backends in priority order
+  // (the order of _backendsList, vendor backends before the fallback).
+  List<BackendInfo> findMatchingBackends({
+    bool alwaysOfferFallback = BackendInfoHelper.alwaysOfferFallback,
+  }) {
     final matches = <BackendInfo>[];
     // Try to match all backends except the fallback
     for (var name in getBackendsList()) {
@@ -21,21 +37,21 @@ class BackendInfoHelper {
       }
     }
 
-    if (matches.isEmpty) {
-      // No specific backend matched, use fallback
+    final fallbackDisabled = matches.any(
+      (m) => m.settings.fallbackPolicy == pb.FallbackPolicy.FALLBACK_DISABLED,
+    );
+    if (matches.isEmpty || (alwaysOfferFallback && !fallbackDisabled)) {
       print('Checking $fallbackBackend');
       final backendSettings = match(fallbackBackend);
       if (backendSettings != null) {
-        return BackendInfo._(backendSettings, fallbackBackend);
+        matches.add(BackendInfo._(backendSettings, fallbackBackend));
       }
+    }
+    if (matches.isEmpty) {
       throw 'no matching backend found';
     }
-    if (matches.length > 1) {
-      final names = matches.map((m) => m.libName).join(', ');
-      throw 'multiple matching backends found: $names';
-    }
-    print('Using backend: ${matches.single.libName}');
-    return matches.single;
+    print('Matching backends: ${matches.map((e) => e.libName).join(', ')}');
+    return matches;
   }
 
   pb.BackendSetting? match(String libName) {
@@ -85,4 +101,7 @@ class BackendInfo {
   final String libName;
 
   BackendInfo._(this.settings, this.libName);
+
+  @visibleForTesting
+  BackendInfo.forTest(this.settings, this.libName);
 }
