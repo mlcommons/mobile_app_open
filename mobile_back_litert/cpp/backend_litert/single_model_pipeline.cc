@@ -27,20 +27,32 @@ limitations under the License.
 #include <sys/system_properties.h>
 #endif
 
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
+
 #include "absl/log/log.h"
 #include "flutter/cpp/c/type.h"
 #include "litert/cc/litert_compiled_model.h"
 #include "litert/cc/litert_element_type.h"
 #include "litert/cc/litert_environment.h"
+#include "litert/cc/litert_environment_options.h"
+#include "litert/cc/litert_expected.h"
 #include "litert/cc/litert_model.h"
 #include "litert/cc/litert_options.h"
 #include "litert/cc/litert_tensor_buffer.h"
+#include "litert_env.h"
 #include "thread_pool.h"
 
 namespace {
 
 constexpr char kDelegateCpu[] = "CPU";
 constexpr char kDelegateGpu[] = "GPU";
+#if defined(__APPLE__)
+// The Apple settings name the GPU choice after the accelerator that serves it,
+// the same way the TFLite backend's iOS settings do.
+constexpr char kDelegateMetal[] = "Metal";
+#endif
 
 // The vision/NLP models expose a single (default) signature.
 constexpr size_t kSignatureIndex = 0;
@@ -357,7 +369,7 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
   backend_data->executer =
       std::make_unique<Threadpool>(backend_data->shards_num);
 
-  auto env = litert::Environment::Create({});
+  auto env = CreateLiteRtEnvironment();
   if (!env) {
     LOG(ERROR) << "Environment::Create failed";
     backend_delete(backend_data);
@@ -380,16 +392,28 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
   }
 
   bool use_gpu = strcmp(configs->delegate_selected, kDelegateGpu) == 0;
+#if defined(__APPLE__)
+  use_gpu = use_gpu || strcmp(configs->delegate_selected, kDelegateMetal) == 0;
+#endif
+  // Report an unrecognized selection before any platform downgrade below, so a
+  // valid choice that we deliberately fall back from is not logged as unknown.
+  if (!use_gpu && strcmp(configs->delegate_selected, kDelegateCpu) != 0) {
+    LOG(ERROR) << "Unknown delegate_selected: " << configs->delegate_selected
+               << "; using the CPU accelerator";
+  }
 #if __ANDROID__
   if (use_gpu && IsEmulator()) {
     LOG(INFO) << "Emulator detected, using the CPU accelerator";
     use_gpu = false;
   }
-#endif
-  if (!use_gpu && strcmp(configs->delegate_selected, kDelegateCpu) != 0) {
-    LOG(ERROR) << "Unknown delegate_selected: " << configs->delegate_selected
-               << "; using the CPU accelerator";
+#elif defined(__APPLE__) && TARGET_OS_SIMULATOR
+  // Only the ios_arm64 (device) slice of the Metal accelerator is downloaded by
+  // litert_backend.mk, so there is nothing for the simulator to dlopen.
+  if (use_gpu) {
+    LOG(INFO) << "Simulator detected, using the CPU accelerator";
+    use_gpu = false;
   }
+#endif
 
   if (use_gpu && backend_data->shards_num > 1) {
     // Two shards Run() concurrently in issue_query; on the shared LiteRT GPU

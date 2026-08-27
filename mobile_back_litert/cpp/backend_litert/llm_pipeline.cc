@@ -28,9 +28,12 @@ limitations under the License.
 #include "litert/cc/litert_compiled_model.h"
 #include "litert/cc/litert_element_type.h"
 #include "litert/cc/litert_environment.h"
+#include "litert/cc/litert_environment_options.h"
+#include "litert/cc/litert_expected.h"
 #include "litert/cc/litert_options.h"
 #include "litert/cc/litert_tensor_buffer.h"
 #include "litert/cc/options/litert_gpu_options.h"
+#include "litert_env.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -375,7 +378,7 @@ void LLMPipeline::backend_release_buffer(void* p) { ::operator delete(p); }
 
 bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
                                      const char* model_path, bool use_gpu) {
-  auto env = litert::Environment::Create({});
+  auto env = CreateLiteRtEnvironment();
   if (!env) {
     LOG(ERROR) << "Environment::Create failed";
     return false;

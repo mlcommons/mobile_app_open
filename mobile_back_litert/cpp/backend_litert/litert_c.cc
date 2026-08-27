@@ -13,9 +13,14 @@ limitations under the License.
 #include <memory>
 
 #include "absl/log/log.h"
-#include "litert_settings_android.h"
 #include "llm_pipeline.h"
 #include "single_model_pipeline.h"
+
+#if defined(__APPLE__)
+#include "litert_settings_apple.h"
+#elif defined(__ANDROID__)
+#include "litert_settings_android.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,14 +28,21 @@ extern "C" {
 
 std::unique_ptr<Pipeline> pipeline;
 
-// This backend is Android-only. The llm-* benchmarks run on the LiteRT
-// CompiledModel LLM pipeline; every other benchmark runs on the CompiledModel
-// single-model pipeline (GPU accelerator with CPU fallback).
+// This backend supports Android and Apple (iOS). The llm-* benchmarks run on
+// the LiteRT CompiledModel LLM pipeline; every other benchmark runs on the
+// CompiledModel single-model pipeline (GPU accelerator with CPU fallback). The
+// GPU accelerator is the Metal one on Apple and the OpenCL/GL one on Android;
+// LiteRT picks it from the compile-time platform support, so each platform only
+// differs in its settings file.
 bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const char **settings,
                                      const mlperf_device_info_t *device_info) {
   *not_allowed_message = nullptr;
-#ifdef __ANDROID__
+#if defined(__APPLE__)
+  *settings = litert_settings_apple.c_str();
+  LOG(INFO) << "LiteRT backend matches hardware";
+  return true;
+#elif defined(__ANDROID__)
   // Samsung Galaxy M32 (SM-M326B) does not have enough memory to run LLM
   // benchmarks, so don't offer this backend there.
   if (device_info->model != nullptr &&

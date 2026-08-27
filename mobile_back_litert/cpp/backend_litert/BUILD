@@ -24,10 +24,17 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+exports_files(
+    [
+        "exported_symbols_litert.lds",
+    ],
+)
+
 pbtxt2header(
     name = "litert_settings",
     srcs = [
         "backend_settings/litert_settings_android.pbtxt",
+        "backend_settings/litert_settings_apple.pbtxt",
     ],
 )
 
@@ -39,7 +46,10 @@ cc_library(
         "single_model_pipeline.cc",
     ],
     hdrs = [
+        "apple_support.h",
+        "litert_env.h",
         "litert_settings_android.h",
+        "litert_settings_apple.h",
         "llm_pipeline.h",
         "pipeline.h",
         "single_model_pipeline.h",
@@ -54,6 +64,10 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
+    # No Apple-only deps: unlike the legacy interpreter backends this one talks
+    # to the v2 CompiledModel API, and Metal support is compiled into the litert
+    # runtime on __APPLE__ and provided at runtime by the dlopened
+    # libLiteRtMetalAccelerator.dylib.
     deps = [
         ":litert_settings",
         # Not //flutter/cpp:utils — it links TensorFlow's runtime via
@@ -75,6 +89,8 @@ cc_library(
         "@litert//litert/cc:litert_compiled_model",
         "@litert//litert/cc:litert_element_type",
         "@litert//litert/cc:litert_environment",
+        "@litert//litert/cc:litert_environment_options",
+        "@litert//litert/cc:litert_expected",
         "@litert//litert/cc:litert_model",
         "@litert//litert/cc:litert_options",
         "@litert//litert/cc:litert_tensor_buffer",
