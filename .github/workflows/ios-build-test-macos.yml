@@ -232,7 +232,13 @@ jobs:
           BROWSERSTACK_DEVICES: >-
             ["${{ matrix.device }}"]
         with:
-          timeout_minutes: 60
+          # This is the timeout that actually fires: the job-level one never
+          # gets a chance, because the step waits out retry_wait_seconds even
+          # when it will not retry (retry_on_exit_code only covers a trigger
+          # rejection). Keep it below the job cap minus retry_wait_seconds.
+          # BrowserStack reports a build as "running" while it is still queued
+          # for a device, so this budget covers queue time as well as the run.
+          timeout_minutes: 80
           max_attempts: 2
           retry_wait_seconds: 300
           retry_on_exit_code: 9
