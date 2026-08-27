@@ -46,6 +46,11 @@ jobs:
             with_tflite: 0
     env:
       PERF_TEST: true
+      BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
+      # BAZEL_CACHE_ARG is set by the "Configure bazel cache" step below: the
+      # GCS remote cache needs a credential that pull_request runs from forks
+      # do not get, so it falls back to a local disk cache there.
+      HAS_GCLOUD_CREDS: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD != '' }}
       FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
       FLUTTER_IOS_TEST_PACKAGE: ios_tests-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.zip
       WITH_APPLE: ${{ matrix.with_apple }}
@@ -89,14 +94,59 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ github.workspace }}/flutter/ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-          restore-keys: ${{ runner.os }}-pods-
-      - name: Cache bazel
+          # Keyed on the Podfile, not Podfile.lock: the lock file is not tracked,
+          # so hashFiles('**/Podfile.lock') returned empty and the key collapsed
+          # to the constant "macOS-pods-" -- shared by both matrix jobs, which
+          # then raced for the single write, and never invalidated when the
+          # Podfile changed. The backend keeps the two legs from colliding.
+          key: ${{ runner.os }}-pods-${{ matrix.backend }}-${{ hashFiles('flutter/ios/Podfile') }}
+          restore-keys: ${{ runner.os }}-pods-${{ matrix.backend }}-
+      # Two cache layers: a local disk cache in front of the GCS remote cache.
+      #
+      # The old key was `${{ runner.os }}-bazel_cache-${{ hashFiles(...) }}` over
+      # /tmp/bazel_cache, declared identically by these two matrix jobs and the
+      # Android-macOS job, all on macos-15 -- so all three resolved to one key
+      # and raced for the single write actions/cache allows. Caching worked here
+      # only because an iOS job usually won that race (this job hits 4486 of
+      # 4486 cacheable actions), while the Android job restored these iOS
+      # entries and never once saved its own. The key below is per matrix leg.
+      #
+      # GCS then backs it up: it has no reservation race and no write-once rule,
+      # so it stays warm across the key rotations that leave the disk layer cold.
+      - name: Cache bazel disk layer
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: /tmp/bazel_cache
-          key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
-          restore-keys: ${{ runner.os }}-bazel_cache-
+          key: ${{ runner.os }}-bazel-ios-${{ matrix.backend }}-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-bazel-ios-${{ matrix.backend }}-
+      - name: Set up authentication for Google Cloud SDK
+        if: env.HAS_GCLOUD_CREDS == 'true'
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        if: env.HAS_GCLOUD_CREDS == 'true'
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Configure bazel cache
+        run: |
+          set -euo pipefail
+          if [ "${HAS_GCLOUD_CREDS}" = "true" ]; then
+            # Disk first, GCS second. Bazel reads the disk cache before going to
+            # the network and writes both, so a warm disk layer keeps this job as
+            # fast as it was on disk alone while GCS covers the cold cases.
+            # Both matrix backends share one GCS prefix on purpose: they compile
+            # almost the same C++, so each one warms the cache for the other.
+            # Note that setup-gcloud above puts a per-run random path on PATH.
+            # That is exactly what broke the Linux cache, and it is harmless
+            # only because .bazelrc sets --incompatible_strict_action_env.
+            echo "BAZEL_CACHE_ARG=--disk_cache=/tmp/bazel_cache --remote_cache=https://storage.googleapis.com/mobile-app-build-290400_github-actions/bazel-cache/macos-ios --google_default_credentials" >> "$GITHUB_ENV"
+          else
+            echo "No GCS credentials (fork pull request?); using the disk cache only."
+            echo "BAZEL_CACHE_ARG=--disk_cache=/tmp/bazel_cache" >> "$GITHUB_ENV"
+          fi
       - name: Install the Apple certificate and API key
         env:
           IOS_BUILD_CERTIFICATE_BASE64: ${{ secrets.IOS_BUILD_CERTIFICATE_BASE64 }}
@@ -140,9 +190,6 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -k "$IOS_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security list-keychain -d user -s "$KEYCHAIN_PATH"
       - name: Build iOS app
-        env:
-          BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
-          BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
         run: |
           cd flutter/ios/ci_scripts/ && bash ci_post_clone.sh
       - name: Run iOS unit tests
@@ -182,10 +229,25 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
-    timeout-minutes: 60
+    timeout-minutes: 135
+    # BrowserStack allows only 2 parallel sessions on this account, and a
+    # superseded run's device tests starve the current one -- this job has
+    # already failed with BROWSERSTACK_ALL_PARALLELS_IN_USE. Cancel the previous
+    # run's job for the same device when a new commit arrives.
+    #
+    # Deliberately per job, not workflow-wide: the two "Build iOS app" jobs must
+    # always run to completion, both to publish their test package and to leave a
+    # warm bazel cache behind. GitHub runners are plentiful; BrowserStack seats
+    # are not.
+    #
+    # The matrix values are part of the group, or the two legs of one run would
+    # cancel each other.
+    concurrency:
+      group: browserstack-${{ github.ref }}-${{ matrix.backend }}-${{ matrix.device }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         include:
           - backend: "tflite"
