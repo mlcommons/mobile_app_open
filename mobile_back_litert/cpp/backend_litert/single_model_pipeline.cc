@@ -288,6 +288,23 @@ bool BuildShards(LiteRTBackendData *backend_data, const char *model_path,
         return fail();
       }
     }
+    // Propagate the new shapes before creating the buffers. A resize only
+    // marks the signature as needing allocation; LiteRT defers AllocateTensors
+    // to Run, so the output tensors still report their pre-resize sizes here.
+    // CreateOutputBuffers sizes a CPU buffer from exactly that value, and Run
+    // then registers it as a TFLite custom allocation and reallocates, which
+    // fails with "Custom allocation is too small for tensor idx" once the real
+    // shapes land. Asking for the output layouts with update_allocation forces
+    // the allocation first. The GPU path is unaffected (its requirements come
+    // from the accelerator, not from tensor->bytes), and Run allocates again
+    // anyway, so this is safe for both.
+    auto layouts = backend_data->shards[k].GetOutputTensorLayouts(
+        kSignatureIndex, /*update_allocation=*/true);
+    if (!layouts) {
+      LOG(ERROR) << "Failed to update the tensor allocation for shard " << k
+                 << ": " << layouts.Error().Message();
+      return fail();
+    }
     auto input_bufs = backend_data->shards[k].CreateInputBuffers();
     auto output_bufs = backend_data->shards[k].CreateOutputBuffers();
     if (!input_bufs || !output_bufs) {
