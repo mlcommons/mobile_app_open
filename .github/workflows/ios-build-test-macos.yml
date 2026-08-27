@@ -102,15 +102,24 @@ jobs:
           # Podfile changed. The backend keeps the two legs from colliding.
           key: ${{ runner.os }}-pods-${{ matrix.backend }}-${{ hashFiles('flutter/ios/Podfile') }}
           restore-keys: ${{ runner.os }}-pods-${{ matrix.backend }}-
-      # actions/cache is gone on purpose. These two matrix jobs and the
-      # Android-macOS job all declared the key
-      # `${{ runner.os }}-bazel_cache-${{ hashFiles(...) }}` over /tmp/bazel_cache
-      # and all run on macos-15, so all three resolved to one key and raced for
-      # the single write. Caching worked here only because an iOS job usually
-      # won that race -- this job hits 4486 of 4486 cacheable actions -- while
-      # the Android job restored these iOS entries and never saved its own.
-      # A GCS prefix per configuration has no reservation race and no
-      # write-once rule, so every job can both read and write.
+      # Two cache layers: a local disk cache in front of the GCS remote cache.
+      #
+      # The old key was `${{ runner.os }}-bazel_cache-${{ hashFiles(...) }}` over
+      # /tmp/bazel_cache, declared identically by these two matrix jobs and the
+      # Android-macOS job, all on macos-15 -- so all three resolved to one key
+      # and raced for the single write actions/cache allows. Caching worked here
+      # only because an iOS job usually won that race (this job hits 4486 of
+      # 4486 cacheable actions), while the Android job restored these iOS
+      # entries and never once saved its own. The key below is per matrix leg.
+      #
+      # GCS then backs it up: it has no reservation race and no write-once rule,
+      # so it stays warm across the key rotations that leave the disk layer cold.
+      - name: Cache bazel disk layer
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: /tmp/bazel_cache
+          key: ${{ runner.os }}-bazel-ios-${{ matrix.backend }}-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-bazel-ios-${{ matrix.backend }}-
       - name: Set up authentication for Google Cloud SDK
         if: env.HAS_GCLOUD_CREDS == 'true'
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
@@ -126,14 +135,17 @@ jobs:
         run: |
           set -euo pipefail
           if [ "${HAS_GCLOUD_CREDS}" = "true" ]; then
-            # Both matrix backends share one prefix on purpose: they compile
+            # Disk first, GCS second. Bazel reads the disk cache before going to
+            # the network and writes both, so a warm disk layer keeps this job as
+            # fast as it was on disk alone while GCS covers the cold cases.
+            # Both matrix backends share one GCS prefix on purpose: they compile
             # almost the same C++, so each one warms the cache for the other.
             # Note that setup-gcloud above puts a per-run random path on PATH.
             # That is exactly what broke the Linux cache, and it is harmless
             # only because .bazelrc sets --incompatible_strict_action_env.
-            echo "BAZEL_CACHE_ARG=--remote_cache=https://storage.googleapis.com/mobile-app-build-290400_github-actions/bazel-cache/macos-ios --google_default_credentials" >> "$GITHUB_ENV"
+            echo "BAZEL_CACHE_ARG=--disk_cache=/tmp/bazel_cache --remote_cache=https://storage.googleapis.com/mobile-app-build-290400_github-actions/bazel-cache/macos-ios --google_default_credentials" >> "$GITHUB_ENV"
           else
-            echo "No GCS credentials (fork pull request?); using a local disk cache."
+            echo "No GCS credentials (fork pull request?); using the disk cache only."
             echo "BAZEL_CACHE_ARG=--disk_cache=/tmp/bazel_cache" >> "$GITHUB_ENV"
           fi
       - name: Install the Apple certificate and API key
