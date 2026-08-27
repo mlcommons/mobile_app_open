@@ -305,7 +305,7 @@ jobs:
       - build-android-apk
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 135
     # BrowserStack allows only 2 parallel sessions on this account, so a
     # superseded run's device tests starve the current one and it fails with
     # BROWSERSTACK_ALL_PARALLELS_IN_USE. Cancel the previous run's job for the
@@ -414,7 +414,7 @@ jobs:
       - test-android-apk-unified
     if: github.ref == 'refs/heads/master' || vars.EXTENDED_TESTS_ON_PR == 'true'
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 135
     # Same BrowserStack session budget as test-android-apk-unified above; see
     # the comment there for why this is per job and per matrix leg.
     concurrency:
@@ -511,7 +511,7 @@ jobs:
       - computed
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 135
     # Same BrowserStack session budget as test-android-apk-unified above; see
     # the comment there for why this is per job and per matrix leg.
     concurrency:

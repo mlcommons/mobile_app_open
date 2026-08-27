@@ -229,7 +229,7 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
-    timeout-minutes: 60
+    timeout-minutes: 135
     # BrowserStack allows only 2 parallel sessions on this account, and a
     # superseded run's device tests starve the current one -- this job has
     # already failed with BROWSERSTACK_ALL_PARALLELS_IN_USE. Cancel the previous
