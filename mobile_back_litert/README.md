@@ -55,10 +55,17 @@ WITH_LITERT=1 make flutter/ios
   dlopen search path to fall back on.
 * Minimum iOS is 14.0, which is LiteRT's own floor (`LITERT_MIN_IOS_VERSION`);
   the other backends in this repo still target 13.1.
-* Both CPU and Metal are offered, but CPU is the default delegate until a device
-  run confirms Metal. `LiteRtGpuBackend` has no Metal enumerator: on Apple,
-  Metal is selected by `kLiteRtGpuBackendAutomatic` plus compile-time Metal
-  support.
+* Both CPU and Metal are offered. The vision/NLP benchmarks default to Metal,
+  which measured 1.7-3.0x faster than CPU across all six on an iPad mini; the
+  `llm-*` benchmarks default to CPU. `LiteRtGpuBackend` has no Metal
+  enumerator: on Apple, Metal is selected by `kLiteRtGpuBackendAutomatic` plus
+  compile-time Metal support.
+* The `llm-*` benchmarks need a high-memory device. The prefill buffers are
+  sized by the selected prefill signature, so a prompt just over 2048 tokens
+  picks the 4096 bucket and its logits buffer alone is several GB; together
+  with the ~1.2 GB model this exceeds the per-process memory limit on 4 GB-class
+  devices, and iOS kills the app (`EXC_RESOURCE`, observed on an iPad mini).
+  This is not Apple-specific -- Android just has more headroom.
 * There is no CoreML/ANE path: the LiteRT v2 API does not expose one yet
   (upstream marks ANE "coming soon"). Use the Apple backend for CoreML.
 
