@@ -132,7 +132,7 @@ void testBenchmark(
     );
     final extendedResult = await getLastResult(tester);
     printResult(extendedResult);
-    checkResult(extendedResult);
+    checkResult(extendedResult, expectAccuracy: runMode.doAccuracyRun);
     await deleteResources(tester);
   });
 }

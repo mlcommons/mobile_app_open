@@ -326,18 +326,26 @@ void printResult(ExtendedResult extendedResult) {
   }
 }
 
-void checkResult(ExtendedResult extendedResult) {
+// [expectAccuracy] is the run mode's doAccuracyRun: quickRun skips the
+// accuracy phase entirely, so there is no accuracy to check.
+void checkResult(
+  ExtendedResult extendedResult, {
+  required bool expectAccuracy,
+}) {
   for (final benchmarkResult in extendedResult.results) {
     debugPrint('Checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
-    checkAccuracy(benchmarkResult);
+    checkAccuracy(benchmarkResult, expectAccuracy: expectAccuracy);
     checkThroughput(benchmarkResult, extendedResult.environmentInfo);
   }
 }
 
-void checkAccuracy(BenchmarkExportResult benchmarkResult) {
+void checkAccuracy(
+  BenchmarkExportResult benchmarkResult, {
+  required bool expectAccuracy,
+}) {
   var tag = '[benchmarkId: ${benchmarkResult.benchmarkId}';
   final expectedMap = benchmarkExpectedAccuracy[benchmarkResult.benchmarkId];
   expect(
@@ -365,6 +373,11 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
     isNotNull,
     reason: 'missing expected accuracy for $tag',
   );
+
+  if (!expectAccuracy) {
+    debugPrint('Run mode has no accuracy phase; skipping accuracy check.');
+    return;
+  }
 
   final accuracyRun = benchmarkResult.accuracyRun;
   accuracyRun!;
