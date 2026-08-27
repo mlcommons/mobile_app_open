@@ -26,8 +26,8 @@ const _bindingKeepAliveInterval = Duration(seconds: 20);
 
 BenchmarkRunModeEnum _runModeFor(String benchmarkId) =>
     benchmarkId.startsWith('llm') || _quickRunIds.contains(benchmarkId)
-        ? _quickRunMode
-        : _runMode;
+    ? _quickRunMode
+    : _runMode;
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
