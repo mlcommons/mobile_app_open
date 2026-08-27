@@ -7,12 +7,20 @@ build --config=short_logs
 build --verbose_failures
 build --spawn_strategy=standalone
 
+
+# needed to solve a bug in LiteRT 2.1.2
+build --per_file_copt=external/litert/.*@-fpermissive
+build --per_file_copt=mobile_back_tflite/cpp/backend_tflite/llm_pipeline.cc@-fpermissive
+
 # This flag is required by tensorflow
 common --experimental_repo_remote_exec
 
 # Without these, tensorflow complains about lack of CUDA library.
 common --repo_env=TF_NEED_CUDA=0
 common --repo_env=TF_NEED_ROCM=0
+
+common --noenable_bzlmod
+common --repo_env=HERMETIC_PYTHON_VERSION=3.10
 
 # Default options should come above this line.
 
@@ -38,15 +46,39 @@ build:ios --cxxopt=-xobjective-c++
 build:windows --cxxopt=/std:c++17
 build:windows --host_cxxopt=/std:c++17
 
+# pthreadpool (via the LiteRT-pinned TensorFlow) uses C11 <stdatomic.h> and
+# <threads.h> on Windows. Its own -std=c11 copt is GCC syntax that cl.exe
+# ignores; MSVC needs /std:c11 plus /experimental:c11atomics (C11 atomics are
+# still flag-gated in MSVC) and toolset 14.38+ (see windows/docker/Dockerfile).
+build:windows --per_file_copt=external/pthreadpool/.*@/std:c11,/experimental:c11atomics
+
+# flutter.mk exports all make variables, so ANDROID_NDK_API_LEVEL and
+# ANDROID_NDK_VERSION (android.mk) reach bazel; on a machine that also sets
+# ANDROID_NDK_HOME (e.g. the GitHub windows runner, or a dev machine with
+# Android Studio), TensorFlow's android_configure then writes that raw
+# Windows path into its generated android.bzl, where the backslashes are
+# invalid Starlark escapes. The Windows build never targets Android, so hide
+# the variables from repository rules.
+build:windows --repo_env=ANDROID_NDK_HOME=
+build:windows --repo_env=ANDROID_SDK_HOME=
+
+# Protobuf 30+ fails with "#error Protobuf will be dropping support for
+# MSVC + Bazel in 34.0" unless explicitly allowed
+# (protocolbuffers/protobuf#20085). LiteRT's Windows CI passes the same flag.
+build:windows --define=protobuf_allow_msvc=true
+
 # Android configs
 build:android --crosstool_top=//external:android/crosstool
 build:android --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+build:android --incompatible_enable_cc_toolchain_resolution=false
 build:android_arm64 --config=android
 build:android_arm64 --cpu=arm64-v8a
 build:android_arm64 --fat_apk_cpu=arm64-v8a
+build:android_arm64 --platforms=@org_tensorflow//tensorflow/tools/toolchains/android:arm64-v8a
 build:android_x86_64 --config=android
 build:android_x86_64 --cpu=x86_64
 build:android_x86_64 --fat_apk_cpu=x86_64
+build:android_x86_64 --platforms=@org_tensorflow//tensorflow/tools/toolchains/android:x86_64
 
 
 build:android_x86_64 --define=xnn_enable_avx512fp16=false

@@ -13,6 +13,7 @@ const _kCoreMLBackend = BackendId.apple;
 const _kQtiBackend = BackendId.qti;
 const _kMediatekBackend = BackendId.mediatek;
 const _kSamsungBackend = BackendId.samsung;
+const _kLitertBackend = BackendId.litert;
 
 // Windows
 // Google Cloud Build n2-standard-4 machine
@@ -28,6 +29,7 @@ const _kDN2103 = 'DN2103'; // OnePlus DN2103
 
 // Android devices on BrowserStack App Automate
 const _kPixel9Pro = 'Pixel 9 Pro'; // Google Pixel 9 Pro
+const _kPixel10Pro = 'Pixel 10 Pro'; // Google Pixel 10 Pro
 const _kS24 = 'SM-S921B'; // Samsung Galaxy S24
 const _kS24Ultra = 'SM-S928B'; // Samsung Galaxy S24 Ultra
 const _kS25Ultra = 'SM-S938B'; // Samsung Galaxy S25 Ultra
@@ -68,6 +70,13 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
     _kS10Plus: Interval(min: 400, max: 800),
   },
   _kSamsungBackend: {_kS24: Interval(min: 600, max: 1000)},
+  // LiteRT vision runs exist only on the Pixel 10 Pro job, where the
+  // integration test pins every benchmark to the LiteRT backend (see
+  // deviceBackendOverride in utils.dart). The intervals stay wide until
+  // the first runs produce real numbers: they must cover both the
+  // GPU-accelerated path and a CPU fallback.
+  // Measured 14.8 QPS on the GPU delegate (fp32 MobileNetV4-Conv-Large).
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 10, max: 1000)},
 };
 
 const Map<String, Map<String, Interval>> _objectDetection = {
@@ -99,6 +108,8 @@ const Map<String, Map<String, Interval>> _objectDetection = {
     _kS10Plus: Interval(min: 1200, max: 2000),
   },
   _kSamsungBackend: {_kS24: Interval(min: 1400, max: 2400)},
+  // Measured 22.9 QPS on the GPU delegate (fp32 MobileDet).
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 15, max: 1000)},
 };
 
 const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
@@ -130,6 +141,7 @@ const Map<String, Map<String, Interval>> _imageSegmentationV2 = {
     _kS10Plus: Interval(min: 800, max: 1500),
   },
   _kSamsungBackend: {_kS24: Interval(min: 800, max: 1500)},
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 10, max: 800)},
 };
 
 const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
@@ -161,6 +173,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
     _kS10Plus: Interval(min: 100, max: 300),
   },
   _kSamsungBackend: {_kS24: Interval(min: 220, max: 350)},
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 1, max: 300)},
 };
 
 const Map<String, Map<String, Interval>> _superResolution = {
@@ -192,6 +205,7 @@ const Map<String, Map<String, Interval>> _superResolution = {
     _kS10Plus: Interval(min: 150, max: 300),
   },
   _kSamsungBackend: {_kS24: Interval(min: 90, max: 180)},
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 1, max: 300)},
 };
 
 // TODO (anhappdev): update expected throughput for stable diffusion
@@ -224,6 +238,7 @@ const Map<String, Map<String, Interval>> _stableDiffusion = {
     _kS10Plus: Interval(min: 0, max: 100),
   },
   _kSamsungBackend: {_kS24: Interval(min: 0, max: 100)},
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 0, max: 100)},
 };
 
 const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
@@ -255,6 +270,21 @@ const Map<String, Map<String, Interval>> _imageClassificationOfflineV2 = {
     _kS10Plus: Interval(min: 700, max: 1200),
   },
   _kSamsungBackend: {_kS24: Interval(min: 800, max: 1200)},
+  // Single-stream GPU measured 14.8 QPS; the batched offline rate is not
+  // measured yet, so keep the floor below the single-stream rate.
+  _kLitertBackend: {_kPixel10Pro: Interval(min: 10, max: 1200)},
+};
+
+// Token throughput (tok/s) of the LiteRT backend. The GPU delegate is the
+// default for llm-1b and llm-1b-instruct; the CPU path (4.9-8.1 tok/s
+// measured across Pixel 9/10 Pro runs) remains the automatic fallback when
+// GPU compilation fails, so the interval must cover both. Tighten the upper
+// bound once GPU runs have produced real numbers.
+const Map<String, Map<String, Interval>> _llm = {
+  _kLitertBackend: {
+    _kPixel9Pro: Interval(min: 2, max: 50),
+    _kPixel10Pro: Interval(min: 2, max: 50),
+  },
 };
 
 const benchmarkExpectedThroughput = {
@@ -264,5 +294,7 @@ const benchmarkExpectedThroughput = {
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.stableDiffusion: _stableDiffusion,
+  BenchmarkId.llm: _llm,
+  BenchmarkId.llmInstruct: _llm,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };

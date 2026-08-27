@@ -5,18 +5,74 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "bazel_skylib",
-    sha256 = "66ffd9315665bfaafc96b52278f57c7e2dd09f5ede279ea6d39b2be471e7e3aa",
+    #sha256 = "66ffd9315665bfaafc96b52278f57c7e2dd09f5ede279ea6d39b2be471e7e3aa",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.4.2/bazel-skylib-1.4.2.tar.gz",
-        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.4.2/bazel-skylib-1.4.2.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.7.1/bazel-skylib-1.7.1.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.7.1/bazel-skylib-1.7.1.tar.gz",
     ],
 )
 
 http_archive(
-    name = "rules_python",
-    sha256 = "5868e73107a8e85d8f323806e60cad7283f34b32163ea6ff1020cf27abef6036",
-    strip_prefix = "rules_python-0.25.0",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.25.0/rules_python-0.25.0.tar.gz",
+    name = "rules_platform",
+    sha256 = "0aadd1bd350091aa1f9b6f2fbcac8cd98201476289454e475b28801ecf85d3fd",
+    urls = [
+        "https://github.com/bazelbuild/rules_platform/releases/download/0.1.0/rules_platform-0.1.0.tar.gz",
+    ],
+)
+
+# rules_python is intentionally NOT declared here.
+# XLA's python_init_rules() brings in a compatible version automatically.
+# Declaring rules_python 0.25.0 here would win over XLA's version and break
+# hermetic Python initialization (missing python_version_kind attribute).
+
+# Apple rules, declared before the TensorFlow workspace macros so these win.
+# TensorFlow pins rules_apple 3.5.1, whose py_binary tooling predates the
+# rules_python that XLA now brings in: rules_apple's plisttool is generated
+# from a bootstrap template containing %interpreter_args%, which the older
+# rules leave unsubstituted, so it fails to parse as Python. These are the
+# same versions LiteRT 2.1.5 pins for this dependency set.
+http_archive(
+    name = "build_bazel_rules_apple",
+    sha256 = "a78f26c22ac8d6e3f3fcaad50eace4d9c767688bd7254b75bdf4a6735b299f6a",
+    url = "https://github.com/bazelbuild/rules_apple/releases/download/3.22.0/rules_apple.3.22.0.tar.gz",
+)
+
+http_archive(
+    name = "build_bazel_rules_swift",
+    sha256 = "f7a67197cd8a79debfe70b8cef4dc19d03039af02cc561e31e0718e98cad83ac",
+    url = "https://github.com/bazelbuild/rules_swift/releases/download/2.9.0/rules_swift.2.9.0.tar.gz",
+)
+
+# 1.23.1 rather than the 1.24.5 TensorFlow uses: the highest version without
+# missing LC_UUID / DEVELOPER_DIR / SDKROOT issues on macOS Tahoe.
+http_archive(
+    name = "build_bazel_apple_support",
+    sha256 = "ee20cc5c0bab47065473c8033d462374dd38d172406ecc8de5c8f08487943f2f",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/1.23.1/apple_support.1.23.1.tar.gz",
+)
+
+http_archive(
+    name = "bazel_features",
+    sha256 = "c26b4e69cf02fea24511a108d158188b9d8174426311aac59ce803a78d107648",
+    strip_prefix = "bazel_features-1.43.0",
+    url = "https://github.com/bazel-contrib/bazel_features/releases/download/v1.43.0/bazel_features-v1.43.0.tar.gz",
+)
+
+# Same coremltools TensorFlow uses, but with LiteRT's patch_cmds. The .proto
+# files import each other by bare filename while protoc is invoked with
+# -Iexternal/coremltools, so the imports do not resolve and mlmodel_proto
+# fails to generate. Rewriting the imports to be repo-relative fixes it.
+# third_party/coremltools.BUILD is byte-identical to TensorFlow's.
+http_archive(
+    name = "coremltools",
+    build_file = "@//third_party:coremltools.BUILD",
+    patch_cmds = [
+        # Append "mlmodel/format/" to the import path of all proto files.
+        "sed -i -e 's|import public \"|import public \"mlmodel/format/|g' mlmodel/format/*.proto",
+    ],
+    sha256 = "37d4d141718c70102f763363a8b018191882a179f4ce5291168d066a84d01c9d",
+    strip_prefix = "coremltools-8.0",
+    url = "https://github.com/apple/coremltools/archive/8.0.tar.gz",
 )
 
 load("//:platform.bzl", "tf_patch_finder")
@@ -30,7 +86,7 @@ tf_patch_finder(
 http_archive(
     name = "zlib",
     build_file = "//third_party:zlib.BUILD",
-    sha256 = "17e88863f3600672ab49182f217281b6fc4d3c762bde361935e436a95214d05c",
+    #sha256 = "17e88863f3600672ab49182f217281b6fc4d3c762bde361935e436a95214d05c",
     strip_prefix = "zlib-1.3.1",
     urls = [
         "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz",
@@ -71,7 +127,7 @@ http_archive(
 )
 
 http_archive(
-    name = "org_tensorflow",
+    name = "litert",
     patch_args = ["-p1"],
     patches = [
         # Add patches for adding png in tflite evaluation code
@@ -80,24 +136,40 @@ http_archive(
         "//:flutter/third_party/use_unsigned_char.patch",
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
-        "//:flutter/third_party/tf-eigen.patch",
-        # Xcode 26 / Clang 21: std::abs<T> no longer usable as std::function<T(T)>
-        "//patches:xcode26_compat.patch",
-    ] + PATCH_FILE,
-    sha256 = "d7876f4bb0235cac60eb6316392a7c48676729860da1ab659fb440379ad5186d",
-    strip_prefix = "tensorflow-2.18.0",
+        "//:patches/litert-internal-visibility.diff",
+        # Fix for LiteRT crashing on close when using OpenCL accelerator
+        "//:patches/custom_buffer_teardown.patch",
+        # CoreML delegate calls RepeatedField::resize, which does not exist
+        "//:patches/litert_coreml_repeatedfield_resize.patch",
+    ],
+    sha256 = "7d0313c4851deb18af6f5f2dbc002bf01293583b87b819b0949ee33dcfe2d91b",
+    strip_prefix = "LiteRT-2.1.5",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.18.0.tar.gz",
+        "https://github.com/google-ai-edge/LiteRT/archive/v2.1.5.tar.gz",
     ],
 )
 
-load("@org_tensorflow//third_party/gpus:cuda_configure.bzl", "cuda_configure")
+load("//third_party:tensorflow_source_rules.bzl", "tensorflow_source_repo")
 
-cuda_configure(name = "local_config_cuda")
-
-load("@org_tensorflow//third_party/gpus:rocm_configure.bzl", "rocm_configure")
-
-rocm_configure(name = "local_config_rocm")
+tensorflow_source_repo(
+    name = "org_tensorflow",
+    patch_args = ["-p1"],
+    patch_cmds = [],
+    patch_scripts = [
+        "//third_party:fix_tensorflow.py",
+    ],
+    patches = [
+        "//:flutter/third_party/tf-eigen.patch",
+        "//patches:tf_coreml_repeatedfield_resize.patch",
+        "//patches:tf_nnapi_no_mmap_sharing.patch",
+        "//patches:tf_portable_no_onednn_env_vars.patch",
+    ] + PATCH_FILE,
+    sha256 = "879cf25692d50c60315a4dd3929dccd923d4c44a2c4b95ebb483666d2c16a22a",
+    strip_prefix = "tensorflow-6d40c20cdfe385746c31da6227b95722f5ece342",
+    urls = [
+        "https://github.com/tensorflow/tensorflow/archive/6d40c20cdfe385746c31da6227b95722f5ece342.tar.gz",
+    ],
+)
 
 http_archive(
     name = "com_google_sentencepiece",
@@ -123,26 +195,77 @@ http_archive(
     ],
 )
 
-load(
-    "@org_tensorflow//tensorflow/tools/toolchains/python:python_repo.bzl",
-    "python_repository",
+# Required by LiteRT's rules_ml_toolchain for GPU/CC toolchain configuration.
+http_archive(
+    name = "rules_ml_toolchain",
+    sha256 = "0b42f693a60c6050d87db1e0a0eaeb84ab3f54191fce094d86334faedc807da0",
+    strip_prefix = "rules_ml_toolchain-398d613aea7a4c294da49b79a6d6f3f8732bd84c",
+    urls = [
+        "https://github.com/google-ml-infra/rules_ml_toolchain/archive/398d613aea7a4c294da49b79a6d6f3f8732bd84c.tar.gz",
+    ],
 )
-load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 
-python_repository(name = "python_version_repo")
+load("//third_party:local_config_python_stub.bzl", "local_config_python_stub")
 
-load("@python_version_repo//:py_version.bzl", "HERMETIC_PYTHON_VERSION")
+local_config_python_stub(name = "local_config_python")
 
-python_register_toolchains(
-    name = "python",
-    ignore_root_user_error = True,
-    python_version = HERMETIC_PYTHON_VERSION,
-)
+local_config_python_stub(name = "local_execution_config_python")
 
 # Initialize tensorflow workspace.
+# The chain mirrors LiteRT's own WORKSPACE structure exactly.
 load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
 
 tf_workspace3()
+
+# Hermetic Python init — required between tf_workspace3 and tf_workspace2.
+# Taken verbatim from LiteRT's WORKSPACE.
+load("@xla//third_party/py:python_init_rules.bzl", "python_init_rules")
+
+python_init_rules()
+
+# Force hermetic Python 3.10 download via rules_python.
+# python_init_toolchains() alone isn't registering python_3_10_host
+# in INTERPRETER_LABELS (Kind: "" fallback). This explicit call downloads
+# Python 3.10 from python-build-standalone and properly registers it.
+load("@rules_python//python:repositories.bzl", "python_register_toolchains")
+
+python_register_toolchains(
+    name = "python_3_10",
+    ignore_root_user_error = True,
+    python_version = "3.10",
+)
+
+load("@xla//third_party/py:python_init_repositories.bzl", "python_init_repositories")
+
+python_init_repositories(
+    default_python_version = "3.10",
+    local_wheel_dist_folder = "dist",
+    local_wheel_inclusion_list = [
+        "tensorflow*",
+        "tf_nightly*",
+    ],
+    local_wheel_workspaces = ["@org_tensorflow//:WORKSPACE"],
+    requirements = {
+        "3.10": "@org_tensorflow//:requirements_lock_3_10.txt",
+        "3.11": "@org_tensorflow//:requirements_lock_3_11.txt",
+        "3.12": "@org_tensorflow//:requirements_lock_3_12.txt",
+        "3.13": "@org_tensorflow//:requirements_lock_3_13.txt",
+    },
+)
+
+load("@xla//third_party/py:python_init_toolchains.bzl", "python_init_toolchains")
+
+python_init_toolchains()
+
+load("@xla//third_party/py:python_init_pip.bzl", "python_init_pip")
+
+python_init_pip()
+
+load("@pypi//:requirements.bzl", "install_deps")
+
+install_deps()
+
+# End hermetic Python init.
 
 load("@org_tensorflow//tensorflow:workspace2.bzl", "tf_workspace2")
 
@@ -156,6 +279,27 @@ load("@org_tensorflow//tensorflow:workspace0.bzl", "tf_workspace0")
 
 tf_workspace0()
 
+# Stub @local_config_cuda — satisfies all load() calls from tensorflow.bzl
+# and xla/tsl/platform/default/cuda_build_defs.bzl with no-op definitions.
+# TF_NEED_CUDA=0 is set in .bazelrc so no actual CUDA is required.
+load("//third_party:local_config_cuda_stub.bzl", "local_config_cuda_stub")
+
+local_config_cuda_stub(name = "local_config_cuda")
+
+# ROCm configure — creates @local_config_rocm stub (TF_NEED_ROCM=0).
+load("@xla//third_party/gpus:rocm_configure.bzl", "rocm_configure")
+
+rocm_configure(name = "local_config_rocm")
+
+# Required by tensorflow/tf_version.bzl → tf_version.default.bzl.
+load(
+    "@xla//third_party/py:python_wheel.bzl",
+    "python_wheel_version_suffix_repository",
+)
+
+python_wheel_version_suffix_repository(name = "tf_wheel_version_suffix")
+
+#TODO remove this since LiteRT has its own MTK delegate
 http_archive(
     name = "neuron_delegate",
     sha256 = "7918cc54a2bab63c30eb87a90de8ce3f3730b5572e0269a2b57a0c9bcd28cd69",
@@ -176,7 +320,13 @@ new_git_repository(
     build_file = "@//flutter/android/third_party:loadgen.BUILD",
     commit = "6776245e99dce0600cfc9a6fb61efd310f87de3d",
     patch_args = ["-p1"],
-    patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
+    patch_cmds = [
+        "python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen",
+        # The generator stamps fetch-time timestamps into BuildDate{Local,Utc}.
+        # Pin them so the file (and everything linking loadgen) is
+        # byte-identical across CI jobs and can hit the shared bazel cache.
+        "sed -i.bak -E 's/\"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.]+\"/\"1970-01-01T00:00:00\"/g' loadgen/version_generated.cc && rm -f loadgen/version_generated.cc.bak",
+    ],
     patches = ["//patches:loadgen_mobile_update.patch"],
     remote = "https://github.com/mlcommons/inference.git",
 )

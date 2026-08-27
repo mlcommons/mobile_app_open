@@ -1,0 +1,448 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
+# Every benchmark runs on the LiteRT CompiledModel API: llm-* on the LLM
+# pipeline, stable_diffusion on the stable diffusion pipeline, the rest on
+# the single-model pipeline. The GPU accelerator is the default (fp32 model
+# exports, automatic CPU fallback); the CPU choice keeps the int8 exports
+# benchmarkable on XNNPACK. NNAPI is not offered: it is deprecated since
+# Android 15 and the CompiledModel NPU path needs vendor SDKs and
+# AOT-compiled models. Lower-priority backends (the TFLite fallback) stay
+# selectable next to it, so users can compare implementations per benchmark.
+claim_policy: CLAIM_SHARED
+
+common_setting {
+  id: "num_threads"
+  name: "Number of threads"
+  value {
+    value: "4"
+    name: "4 threads"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
+  }
+  delegate_selected: "GPU"
+}
+
+benchmark_setting {
+  benchmark_id: "object_detection"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet_qat.tflite"
+      model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet.tflite"
+      model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+    }
+  }
+  delegate_selected: "GPU"
+}
+
+benchmark_setting {
+  benchmark_id: "image_segmentation_v2"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+      model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_argmax_f32.tflite"
+      model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+    }
+  }
+  delegate_selected: "GPU"
+}
+
+benchmark_setting {
+  benchmark_id: "natural_language_processing"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_int8_384_nnapi.tflite"
+      model_checksum: "3944a2dee04a5f8a5fd016ac34c4d390"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_float_384_gpu.tflite"
+      model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+    }
+  }
+  delegate_selected: "GPU"
+}
+
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_full_qint8.tflite"
+      model_checksum: "18ce6df0e4603f4b4ee5d04193708d9c"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_fp32.tflite"
+      model_checksum: "672240427c1f3dc33baf2facacd9631f"
+    }
+  }
+  delegate_selected: "GPU"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+    }
+    batch_size: 2
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
+    batch_size: 2
+  }
+  delegate_selected: "GPU"
+  # One CompiledModel with the batch dimension resized to 2: concurrent Run
+  # calls from multiple shards deadlock on the shared LiteRT GPU context
+  # (observed on Pixel 10 Pro).
+  custom_setting {
+    id: "shards_num"
+    value: "1"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "LiteRT"
+  # CPU only: the shipped exports are dynamic_int8 (text encoder, diffusion)
+  # and dynamic_fp16 (decoder), aimed at CPU/XNNPACK. A GPU choice would
+  # need dedicated fp32 exports.
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_decoder_dynamic_fp16.tflite"
+      model_checksum: "165b70a01643e70a23e5e54a949be306"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_diffusion_model_dynamic_int8.tflite"
+      model_checksum: "ccfd761a2f8186c3669948515d40a880"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_text_encoder_dynamic_int8.tflite"
+      model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/timestep_embeddings_data.bin.ts"
+      model_checksum: "798b772155a69de5df44b304327bb3cc"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "text_encoder_filename"
+    value: "sd_text_encoder_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "diffusion_model_filename"
+    value: "sd_diffusion_model_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "decoder_filename"
+    value: "sd_decoder_dynamic_fp16.tflite"
+  }
+  custom_setting {
+    id: "timestep_embeddings_filename"
+    value: "timestep_embeddings_data.bin.ts"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-1b"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
+      model_checksum: "c618e9bbb89ce52eedcab4f61b2dc3a4"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  # The GPU delegate uses a dedicated GPU export of the model; the
+  # delegate-level model_filename overrides the benchmark-level one.
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/llama_q8_ekv3072_litert.tflite"
+      model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+    custom_setting {
+      id: "model_filename"
+      value: "llama_q8_ekv3072_litert.tflite"
+    }
+  }
+  delegate_selected: "GPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-1b-instruct"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
+      model_checksum: "c618e9bbb89ce52eedcab4f61b2dc3a4"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  # The GPU delegate uses a dedicated GPU export of the model; the
+  # delegate-level model_filename overrides the benchmark-level one.
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/llama_q8_ekv3072_litert.tflite"
+      model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+    custom_setting {
+      id: "model_filename"
+      value: "llama_q8_ekv3072_litert.tflite"
+    }
+  }
+  delegate_selected: "GPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-3b"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_3b_q8_ekv3072.tflite"
+      model_checksum: "6bde54c22e2be27bdad5303a0bd9cf72"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_3b_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-3b-instruct"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_3b_q8_ekv3072.tflite"
+      model_checksum: "6bde54c22e2be27bdad5303a0bd9cf72"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_3b_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-8b"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_8b_q8_ekv3072.tflite"
+      model_checksum: "ec19cf40f881684f15db0b862883ff00"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_8b_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-8b-instruct"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_8b_q8_ekv3072.tflite"
+      model_checksum: "ec19cf40f881684f15db0b862883ff00"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_8b_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}

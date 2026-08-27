@@ -230,3 +230,7 @@ benchmark_setting {
   delegate_selected: "ENN_NPU"
   single_stream_expected_latency_ns: 1000000
 }
+
+# Lower-priority backends stay selectable next to this backend for the
+# benchmarks it claims (see ClaimPolicy in backend_setting.proto).
+claim_policy: CLAIM_SHARED
