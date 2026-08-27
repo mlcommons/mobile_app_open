@@ -45,6 +45,21 @@ BAZEL_CFG=(--config=android_arm64 --platforms=//platforms:android_arm64)
 
 mkdir -p "$OUT"
 
+# The bundle is what the *next* run compares against, so it has to be uploaded
+# even when a later probe step dies -- the first probe run lost its baseline
+# exactly that way.
+upload_bundle() {
+  local rc=$?
+  echo
+  echo "== uploading this run's bundle to $DIAG_PREFIX/$RUN_ID/ (script rc=$rc)"
+  gsutil -m cp "$OUT"/fingerprint.txt "$OUT"/summary-*.txt "$OUT"/symlinks-*.txt \
+               "$OUT"/objects-*.txt "$OUT"/aquery-*.txt.gz "$OUT"/external-*.txt.gz \
+               "$DIAG_PREFIX/$RUN_ID/" 2>/dev/null \
+    && echo "   uploaded" || echo "   upload incomplete (some files may not exist yet)"
+  return "$rc"
+}
+trap upload_bundle EXIT
+
 section() {
   echo
   echo "=================================================================="
@@ -229,9 +244,30 @@ run_manifest a
 section "cache object counts AFTER probe A -- did the uploads land?"
 count_cache_objects after-a | tee "$OUT/objects-after-a.txt"
 
-section "bazel clean --expunge (forces every external repo to be re-fetched)"
-# shellcheck disable=SC2086
-bazel $BAZEL_ROOT_ARG clean --expunge
+# `bazel clean --expunge` is not usable here: it tries to stop the server and
+# gives up with a FATAL if the process outlives its SIGKILL grace period,
+# which is exactly what happened on the first probe run (exit 36) while the
+# server was still flushing remote-cache uploads. Tear the output base down by
+# hand instead, keeping --output_user_root identical so every absolute path
+# probe B sees matches probe A's.
+section "reset bazel state (same paths, all external repos re-fetched)"
+reset_bazel_state() {
+  local ob=""
+  # shellcheck disable=SC2086
+  ob="$(bazel $BAZEL_ROOT_ARG info output_base 2>/dev/null || true)"
+  # shellcheck disable=SC2086
+  bazel $BAZEL_ROOT_ARG shutdown >/dev/null 2>&1 || true
+  sleep 5
+  pkill -9 -f 'bazel.*server' >/dev/null 2>&1 || true
+  pkill -9 -f 'bazel_real' >/dev/null 2>&1 || true
+  sleep 3
+  if [ -n "$ob" ] && [ -d "$ob" ]; then
+    echo "removing output base $ob"
+    rm -rf "$ob"
+  fi
+}
+reset_bazel_state
+echo "reset done"
 
 section "probe B -- same run, same machine, re-fetched repos"
 run_aquery b
@@ -268,16 +304,17 @@ else
   echo "Comparing against run $prev"
   mkdir -p "$OUT/prev"
   gsutil -m cp -r "$DIAG_PREFIX/$prev/*" "$OUT/prev/" >/dev/null 2>&1 || true
+  # Compare probe A, not probe B: probe A always runs, and its hit rate IS the
+  # cross-run reuse number under test.
   report_diff "fingerprint (env/toolchain)" "$OUT/prev/fingerprint.txt" "$OUT/fingerprint.txt"
-  report_action_keys "$OUT/prev/aquery-b.txt.gz" "$OUT/aquery-b.txt.gz"
-  report_diff "external repo contents" "$OUT/prev/external-b.txt.gz" "$OUT/external-b.txt.gz"
-  report_diff "external repo symlinks" "$OUT/prev/symlinks-b.txt" "$OUT/symlinks-b.txt"
+  report_action_keys "$OUT/prev/aquery-a.txt.gz" "$OUT/aquery-a.txt.gz"
+  report_diff "external repo contents" "$OUT/prev/external-a.txt.gz" "$OUT/external-a.txt.gz"
+  report_diff "external repo symlinks" "$OUT/prev/symlinks-a.txt" "$OUT/symlinks-a.txt"
+  echo
   echo "-- previous run probe A cache line: $(cat "$OUT/prev/summary-a.txt" 2>/dev/null || echo n/a)"
   echo "-- this run     probe A cache line: $(cat "$OUT/summary-a.txt" 2>/dev/null || echo n/a)"
+  echo
+  echo "   This run's probe A read a cache the previous run filled. A high hit"
+  echo "   rate means action keys reproduce across runs; a near-zero one"
+  echo "   reproduces the bug in minutes instead of a 70-minute build."
 fi
-
-section "upload this run's bundle"
-gsutil -m cp "$OUT"/fingerprint.txt "$OUT"/summary-*.txt "$OUT"/symlinks-*.txt \
-             "$OUT"/objects-*.txt "$OUT"/aquery-*.txt.gz "$OUT"/external-*.txt.gz \
-             "$DIAG_PREFIX/$RUN_ID/" >/dev/null
-echo "uploaded to $DIAG_PREFIX/$RUN_ID/"
