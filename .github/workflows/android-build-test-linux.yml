@@ -208,10 +208,6 @@ jobs:
         env:
           OFFICIAL_BUILD: false
           PERF_TEST: true
-          # TEMPORARY (revert before merge): run only stable diffusion, to
-          # validate the new LiteRT SD pipeline on one device session while
-          # the BrowserStack parallel budget is contended.
-          BENCHMARK_IDS: "stable_diffusion"
           WITH_TFLITE: 1
           WITH_LITERT: 1
           WITH_PIXEL: 1
@@ -330,23 +326,32 @@ jobs:
       max-parallel: 2
       matrix:
         include:
-          # TEMPORARY (revert before merge): only the LiteRT Pixel 10 Pro
-          # entry, so this board needs one BrowserStack session instead of
-          # eight while validating stable diffusion.
+          - backend: "tflite"
+            device: "Samsung Galaxy M32-11.0"
+          - backend: "pixel"
+            device: "Google Pixel 9 Pro-15.0"
           # The integration test overrides the backend selection on this
           # device so every benchmark LiteRT supports runs on it, stable
           # diffusion included; see deviceBackendOverride in
           # flutter/integration_test.
           - backend: "litert"
             device: "Google Pixel 10 Pro-16.0"
+          - backend: "qti"
+            device: "Samsung Galaxy S25 Ultra-15.0"
           # the app fails on these devices with old Android build
           # removing these for now
           # - backend: "qti"
           #  device: "Samsung Galaxy Tab S9-13.0"
           # - backend: "qti"
           #  device: "Samsung Galaxy S23 Ultra-13.0"
-          # TEMPORARY (revert before merge): vendor entries trimmed with the
-          # rest of the matrix for the stable-diffusion validation run.
+          - backend: "samsung"
+            device: "Samsung Galaxy S24-14.0"
+          - backend: "qti"
+            device: "Samsung Galaxy S26 Ultra-16.0" # SM-S948B, Snapdragon
+          - backend: "samsung"
+            device: "Samsung Galaxy S26-16.0" # SM-S942B, Exynos 2600
+          - backend: "mtk"
+            device: "Samsung Galaxy Tab S10 Plus-15.0"
     env:
       GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.computed.outputs.build_number }}
       MAIN_APK_NAME: test-main-unified-${{ needs.computed.outputs.build_number }}.apk
