@@ -2,15 +2,16 @@
 # proto-message: BackendSetting
 
 # Apple/iOS settings for the LiteRT backend. Every benchmark runs on the LiteRT
-# CompiledModel API: llm-* on the LLM pipeline, the rest on the single-model
-# pipeline. The Metal choice is served by the prebuilt
+# CompiledModel API: llm-* on the LLM pipeline, stable_diffusion on the stable
+# diffusion pipeline, the rest on the single-model pipeline. The Metal choice
+# is served by the prebuilt
 # libLiteRtMetalAccelerator.dylib that ios.mk drops next to the backend
 # frameworks in the app bundle's Frameworks directory and LiteRT dlopens at
 # environment setup; the CPU choice runs on XNNPACK and keeps
 # the int8 exports benchmarkable. No ANE choice is offered: the CompiledModel
 # NPU path needs vendor SDKs and AOT-compiled models. Lower-priority backends
 # (the TFLite fallback) stay selectable next to it, so users can compare
-# implementations per benchmark. Stable diffusion has no LiteRT setting yet.
+# implementations per benchmark.
 #
 # The vision/NLP benchmarks default to Metal, measured on an iPad mini: Metal
 # ran image_classification_v2 at 77.3 QPS against 44.9 on CPU, and completed
@@ -22,6 +23,11 @@
 # The llm-* benchmarks stay on CPU. They are unmeasured on Apple, and on Android
 # the LiteRT GPU LLM path was about half the speed of LiteRT CPU, so Metal is
 # offered there but not assumed to be the better default.
+#
+# Only the 1B sizes are claimed here; see the note at the bottom of the file for
+# why llm-3b and llm-8b are not. The 1B pipeline also caps its prefill bucket at
+# the KV cache length on Apple (llm_pipeline.cc), which keeps the prefill logits
+# buffer at 0.98 GiB instead of 1.96 GiB and brings the peak to about 2.55 GiB.
 claim_policy: CLAIM_SHARED
 
 common_setting {
@@ -188,6 +194,58 @@ benchmark_setting {
 }
 
 benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "LiteRT"
+  # CPU only, exactly as on Android: the shipped exports are dynamic_int8 (text
+  # encoder, diffusion) and dynamic_fp16 (decoder), aimed at CPU/XNNPACK. A
+  # Metal choice would need dedicated fp32 exports. The three models total
+  # about 1.04 GiB, which leaves plenty of headroom under the iOS per-process
+  # memory limit -- unlike the llm-* benchmarks.
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_decoder_dynamic_fp16.tflite"
+      model_checksum: "165b70a01643e70a23e5e54a949be306"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_diffusion_model_dynamic_int8.tflite"
+      model_checksum: "ccfd761a2f8186c3669948515d40a880"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_text_encoder_dynamic_int8.tflite"
+      model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/timestep_embeddings_data.bin.ts"
+      model_checksum: "798b772155a69de5df44b304327bb3cc"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "text_encoder_filename"
+    value: "sd_text_encoder_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "diffusion_model_filename"
+    value: "sd_diffusion_model_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "decoder_filename"
+    value: "sd_decoder_dynamic_fp16.tflite"
+  }
+  custom_setting {
+    id: "timestep_embeddings_filename"
+    value: "timestep_embeddings_data.bin.ts"
+  }
+}
+
+benchmark_setting {
   benchmark_id: "llm-1b"
   framework: "LiteRT"
   delegate_choice: {
@@ -289,130 +347,15 @@ benchmark_setting {
   }
 }
 
-# llm-3b and llm-8b are CPU-only, like the Android settings: there is no GPU
-# export of those models, and the q8 CPU export does not run on the LiteRT GPU
-# accelerator. Offering a Metal choice here would need a new model, so these
-# stay a single delegate until one exists.
-benchmark_setting {
-  benchmark_id: "llm-3b"
-  framework: "LiteRT"
-  delegate_choice: {
-    delegate_name: "CPU"
-    accelerator_name: "cpu"
-    accelerator_desc: "CPU"
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_3b_q8_ekv3072.tflite"
-      model_checksum: "6bde54c22e2be27bdad5303a0bd9cf72"
-    }
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
-      model_checksum: "2ad260fc18b965ce16006d76c9327082"
-    }
-  }
-  delegate_selected: "CPU"
-  custom_setting {
-    id: "pipeline"
-    value: "LLMPipeline"
-  }
-  custom_setting {
-    id: "model_filename"
-    value: "llama_3b_q8_ekv3072.tflite"
-  }
-  custom_setting {
-    id: "tokenizer_filename"
-    value: "llama3_1b.spm.model"
-  }
-}
-
-benchmark_setting {
-  benchmark_id: "llm-3b-instruct"
-  framework: "LiteRT"
-  delegate_choice: {
-    delegate_name: "CPU"
-    accelerator_name: "cpu"
-    accelerator_desc: "CPU"
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_3b_q8_ekv3072.tflite"
-      model_checksum: "6bde54c22e2be27bdad5303a0bd9cf72"
-    }
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
-      model_checksum: "2ad260fc18b965ce16006d76c9327082"
-    }
-  }
-  delegate_selected: "CPU"
-  custom_setting {
-    id: "pipeline"
-    value: "LLMPipeline"
-  }
-  custom_setting {
-    id: "model_filename"
-    value: "llama_3b_q8_ekv3072.tflite"
-  }
-  custom_setting {
-    id: "tokenizer_filename"
-    value: "llama3_1b.spm.model"
-  }
-}
-
-benchmark_setting {
-  benchmark_id: "llm-8b"
-  framework: "LiteRT"
-  delegate_choice: {
-    delegate_name: "CPU"
-    accelerator_name: "cpu"
-    accelerator_desc: "CPU"
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_8b_q8_ekv3072.tflite"
-      model_checksum: "ec19cf40f881684f15db0b862883ff00"
-    }
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
-      model_checksum: "2ad260fc18b965ce16006d76c9327082"
-    }
-  }
-  delegate_selected: "CPU"
-  custom_setting {
-    id: "pipeline"
-    value: "LLMPipeline"
-  }
-  custom_setting {
-    id: "model_filename"
-    value: "llama_8b_q8_ekv3072.tflite"
-  }
-  custom_setting {
-    id: "tokenizer_filename"
-    value: "llama3_1b.spm.model"
-  }
-}
-
-benchmark_setting {
-  benchmark_id: "llm-8b-instruct"
-  framework: "LiteRT"
-  delegate_choice: {
-    delegate_name: "CPU"
-    accelerator_name: "cpu"
-    accelerator_desc: "CPU"
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_8b_q8_ekv3072.tflite"
-      model_checksum: "ec19cf40f881684f15db0b862883ff00"
-    }
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
-      model_checksum: "2ad260fc18b965ce16006d76c9327082"
-    }
-  }
-  delegate_selected: "CPU"
-  custom_setting {
-    id: "pipeline"
-    value: "LLMPipeline"
-  }
-  custom_setting {
-    id: "model_filename"
-    value: "llama_8b_q8_ekv3072.tflite"
-  }
-  custom_setting {
-    id: "tokenizer_filename"
-    value: "llama3_1b.spm.model"
-  }
-}
+# llm-3b and llm-8b are deliberately NOT claimed on iOS. The pipeline holds the
+# weights, the prefill logits and two KV sets resident at once, and iOS kills
+# the app (EXC_RESOURCE) past a per-process limit measured at 3376 MB on an
+# 8 GB device:
+#
+#   llm-3b: 3.05 GiB weights + 1.31 GiB KV = 4.36 GiB before a single logit.
+#   llm-8b: 7.55 GiB weights + 1.50 GiB KV = 9.05 GiB, more than the device has.
+#
+# Shrinking the prefill bucket cannot recover either one, so claiming them would
+# only offer the user a benchmark that kills the app. claim_policy is
+# CLAIM_SHARED, so the TFLite fallback still offers these benchmarks. Android
+# keeps all six sizes; it has far more headroom.

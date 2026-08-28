@@ -27,6 +27,7 @@ limitations under the License.
 #include "absl/log/log.h"
 #include "embedding_utils.h"
 #include "litert/cc/litert_options.h"
+#include "litert_env.h"
 #include "stable_diffusion_invoker.h"
 
 namespace {
@@ -301,8 +302,11 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   }
 
   // One environment shared by all three compiled models, as the LiteRT
-  // header recommends.
-  auto env = litert::Environment::Create({});
+  // header recommends. Built through the shared factory so the Apple runtime
+  // library directory is set the same way as in the other pipelines; this
+  // pipeline is CPU-only today, but an environment that cannot find the
+  // accelerators is a trap for whoever adds a GPU choice here.
+  auto env = CreateLiteRtEnvironment();
   if (!env) {
     LOG(ERROR) << "Environment::Create failed";
     backend_delete(backend_data);

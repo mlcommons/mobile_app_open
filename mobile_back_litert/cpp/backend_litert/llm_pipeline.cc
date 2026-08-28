@@ -324,8 +324,24 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
   ResetKV(backend_data->num_kv_layers, backend_data->kv_buf_float_count,
           backend_data->decode_input_map, backend_data->decode_input_bufs);
   size_t effective_prefill_token_size = backend_data->prompt_tokens.size() - 1;
-  size_t sig_idx = GetSuitablePrefillSignature(backend_data->prefill_sigs,
-                                               effective_prefill_token_size);
+  // The prefill logits buffer is [1, bucket, vocab] fp32, so every step up in
+  // bucket size doubles it -- for the 1B export that is 1.05 GiB at 2048 and
+  // 2.10 GiB at 4096. On Apple that overshoots the per-process memory limit
+  // (measured at 3376 MB on an 8 GB device) once the ~1.2 GiB model is in, and
+  // the app is killed with EXC_RESOURCE. A bucket bigger than the KV cache can
+  // never be used anyway: the check below rejects any prompt longer than
+  // kv_cache_max_size, so tokens past it would have nowhere to go. Capping
+  // there keeps the largest usable bucket and drops the wasted half. Android
+  // keeps the uncapped choice so its validated throughput does not move.
+#if defined(__APPLE__)
+  const size_t max_useful_seq_size =
+      static_cast<size_t>(backend_data->kv_cache_max_size);
+#else
+  const size_t max_useful_seq_size = std::numeric_limits<size_t>::max();
+#endif
+  size_t sig_idx = GetSuitablePrefillSignature(
+      backend_data->prefill_sigs, effective_prefill_token_size,
+      max_useful_seq_size);
   if (!BuildPrefillBuffers(*backend_data, sig_idx)) return MLPERF_FAILURE;
   if ((int)(effective_prefill_token_size + 1) >
       backend_data->kv_cache_max_size) {
@@ -624,16 +640,32 @@ bool LLMPipeline::BuildPrefillBuffers(LLMBackendData& data,
 
 size_t LLMPipeline::GetSuitablePrefillSignature(
     const std::vector<std::pair<size_t, size_t>>& prefill_sigs,
-    size_t num_input_tokens) const {
-  size_t best = prefill_sigs.back().first;
+    size_t num_input_tokens, size_t max_useful_seq_size) const {
+  // The smallest bucket that fits the prompt without exceeding the cap.
   size_t delta = std::numeric_limits<size_t>::max();
+  size_t best = 0;
   for (const auto& [sig_idx, seq_size] : prefill_sigs) {
+    if (seq_size > max_useful_seq_size) continue;
     if (seq_size >= num_input_tokens && seq_size - num_input_tokens < delta) {
       delta = seq_size - num_input_tokens;
       best = sig_idx;
     }
   }
-  return best;
+  if (delta != std::numeric_limits<size_t>::max()) return best;
+
+  // Nothing within the cap is large enough for the prompt, so take the largest
+  // bucket that is still within it: the caller prefills that many tokens and
+  // decodes the remainder one at a time, which is slower but correct.
+  // prefill_sigs is sorted by sequence size, so the last match is the largest.
+  bool found = false;
+  for (const auto& [sig_idx, seq_size] : prefill_sigs) {
+    if (seq_size <= max_useful_seq_size) {
+      best = sig_idx;
+      found = true;
+    }
+  }
+  // The cap is below every bucket; the smallest one is the best we can do.
+  return found ? best : prefill_sigs.front().first;
 }
 
 void LLMPipeline::TransferKV(

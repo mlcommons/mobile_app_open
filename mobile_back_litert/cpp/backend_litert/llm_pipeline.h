@@ -173,9 +173,12 @@ class LLMPipeline : public Pipeline {
   bool BuildDecodeBuffers(LLMBackendData& data);
   bool BuildPrefillBuffers(LLMBackendData& data, size_t prefill_sig_idx);
 
+  // Pick the prefill signature to run the prompt through. Buckets larger than
+  // max_useful_seq_size are skipped when a smaller one exists; pass SIZE_MAX
+  // to consider every bucket.
   size_t GetSuitablePrefillSignature(
       const std::vector<std::pair<size_t, size_t>>& prefill_sigs,
-      size_t num_input_tokens) const;
+      size_t num_input_tokens, size_t max_useful_seq_size) const;
   // Move each layer's KV from the prefill outputs into the decode inputs.
   void TransferKV(
       int num_layers,

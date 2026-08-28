@@ -8,9 +8,11 @@ single-model pipeline.
 
 ## Overview
 
-* Android arm64 and iOS arm64. The backend claims the `llm-*` benchmarks,
-  `stable_diffusion` and the vision/NLP benchmarks on Android; the iOS
-  settings claim the same set except `stable_diffusion`.
+* Android arm64 and iOS arm64. Android claims all 13 benchmarks: the six
+  `llm-*` sizes, `stable_diffusion` and the vision/NLP benchmarks. iOS claims
+  nine of them -- the same set without `llm-3b`, `llm-3b-instruct`, `llm-8b`
+  and `llm-8b-instruct`, which cannot fit in the iOS per-process memory limit
+  (see [iOS](#ios)).
 * `claim_policy: CLAIM_SHARED`: lower-priority backends (e.g. the TFLite
   fallback) stay selectable next to LiteRT for every claimed benchmark.
 * `llm_pipeline.cc` drives a `litert::CompiledModel` with explicit `TensorBuffer`s
@@ -62,13 +64,42 @@ WITH_LITERT=1 make flutter/ios
   `llm-*` benchmarks default to CPU. `LiteRtGpuBackend` has no Metal
   enumerator: on Apple, Metal is selected by `kLiteRtGpuBackendAutomatic` plus
   compile-time Metal support.
-* The `llm-*` benchmarks do not currently run on iOS. The prefill buffers are
-  sized by the selected prefill signature, so a prompt just over 2048 tokens
-  picks the 4096 bucket, and that logits buffer alone is several GB; together
-  with the ~1.2 GB model it exceeds the per-process memory limit and iOS kills
-  the app (`EXC_RESOURCE`). The observed limit is 3376 MB on an 8 GB device, so
-  this is not confined to small devices, and both the CPU and the Metal delegate
-  hit it. Android is unaffected -- it has far more headroom.
+* `stable_diffusion` runs on the CPU delegate, exactly as on Android: the
+  shipped exports are `dynamic_int8` (text encoder, diffusion) and
+  `dynamic_fp16` (decoder), and the three models total about 1.04 GiB, which
+  sits comfortably inside the memory limit below.
+* **Memory is the binding constraint for the LLM benchmarks on iOS.** iOS kills
+  a process that exceeds a per-process limit measured at 3376 MB on an 8 GB
+  device (`EXC_RESOURCE`); it is not confined to small devices, and it applies
+  to the CPU and the Metal delegate alike. The LLM pipeline holds the weights,
+  the prefill logits and two KV sets resident at once:
+
+  | benchmark | weights | 2x KV | prefill logits | peak | |
+  |---|---|---|---|---|---|
+  | `llm-1b` | 1.20 GiB | 0.38 GiB | 0.98 GiB @2048 | 2.55 GiB | fits |
+  | `llm-3b` | 3.05 GiB | 1.31 GiB | 0.06 GiB @128 | 4.42 GiB | over |
+  | `llm-8b` | 7.55 GiB | 1.50 GiB | 0.06 GiB @128 | 9.11 GiB | over |
+
+  So `llm-1b` and `llm-1b-instruct` are claimed and `llm-3b*`/`llm-8b*` are
+  not: shrinking the prefill bucket cannot rescue them, because the weights and
+  the KV cache alone already exceed the limit. `CLAIM_SHARED` means the TFLite
+  fallback still offers those four.
+* The 1B benchmarks needed one fix to fit. The prefill logits buffer is
+  `[1, bucket, vocab]` fp32, so each step up in bucket size doubles it, and the
+  original selection picked the smallest bucket at or above the prompt length --
+  a 2589-token prompt took the 4096 bucket and a 1.96 GiB buffer, which pushed
+  the peak past the limit. On Apple the bucket is now capped at the KV cache
+  length (`GetSuitablePrefillSignature` in `llm_pipeline.cc`): a bucket larger
+  than the KV cache can never be used anyway, since a prompt longer than the KV
+  cache is rejected outright. Tokens past the chosen bucket are decoded one at
+  a time, which is slower for long prompts but correct. Android keeps the
+  uncapped choice so its validated throughput does not move.
+* Raising the ceiling instead would need the
+  `com.apple.developer.kernel.increased-memory-limit` entitlement. That is not
+  enabled here: it must also be turned on for the App ID in the developer
+  portal, and an entitlement the provisioning profile does not carry breaks
+  signing for every iOS backend. It would not help `llm-8b` in any case -- 9.11
+  GiB exceeds the RAM of the devices in question.
 * There is no CoreML/ANE path: the LiteRT v2 API does not expose one yet
   (upstream marks ANE "coming soon"). Use the Apple backend for CoreML.
 
