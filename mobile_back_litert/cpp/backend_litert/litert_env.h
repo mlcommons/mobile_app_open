@@ -27,6 +27,15 @@ limitations under the License.
 #include "apple_support.h"
 #endif
 
+// Log the remaining process memory budget at a phase boundary. Only Apple
+// enforces a per-process limit tight enough to matter here, so this is a no-op
+// everywhere else and costs nothing.
+#if defined(__APPLE__)
+#define LITERT_LOG_MEM(stage) ::litert_apple::LogAvailableMemory(stage)
+#else
+#define LITERT_LOG_MEM(stage) ((void)0)
+#endif
+
 // Creates the LiteRT environment the compiled models are built in. Both
 // pipelines share it so the platform-conditional setup stays in one place.
 //

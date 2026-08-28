@@ -389,6 +389,8 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   backend_data->unconditional_tokens[0] = kStartOfTextToken;
   backend_data->input_prompt_tokens.assign(kTokenCount, 0);
 
+  LITERT_LOG_MEM("sd: all three models compiled");
+
 #if defined(__APPLE__)
   // See the comment on these members in the header: the decode step is the
   // memory peak and iOS kills the process past its high-watermark limit, so

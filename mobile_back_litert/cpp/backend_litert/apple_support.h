@@ -18,6 +18,7 @@ limitations under the License.
 #if defined(__APPLE__)
 
 #include <dlfcn.h>
+#include <os/proc.h>
 #include <sys/stat.h>
 
 #include <string>
@@ -31,6 +32,20 @@ limitations under the License.
 // mlperf_backend_create (device_info.dart returns '' on iOS), so the directory
 // has to be recovered from this binary's own location instead.
 namespace litert_apple {
+
+// How many bytes this process can still allocate before iOS kills it. This is
+// the budget EXC_RESOURCE enforces (3376 MB on an 8 GB device), and it is the
+// only thing that decides which benchmarks this backend can claim, so log it
+// around the phases that allocate rather than reasoning about it from model
+// sizes. Cheap: a counter read, not a scan.
+inline void LogAvailableMemory(const char* stage) {
+  const size_t available = os_proc_available_memory();
+  // 0 means the call is unavailable (it needs an app context), not that the
+  // process is out of memory -- do not report that as an imminent kill.
+  if (available == 0) return;
+  LOG(INFO) << "[mem] " << stage << ": " << (available / (1024 * 1024))
+            << " MiB left before the iOS limit";
+}
 
 inline bool FileExists(const std::string& path) {
   struct stat info;

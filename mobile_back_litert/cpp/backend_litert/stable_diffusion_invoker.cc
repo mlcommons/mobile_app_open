@@ -23,6 +23,7 @@ limitations under the License.
 #include "absl/log/log.h"
 #include "embedding_utils.h"
 #include "litert/cc/litert_tensor_buffer.h"
+#include "litert_env.h"
 #include "sd_utils.h"
 
 namespace {
@@ -124,6 +125,8 @@ bool StableDiffusionInvoker::invoke(std::vector<float> *image) {
     return false;
   }
 
+  LITERT_LOG_MEM("sd: query start");
+
   LOG(INFO) << "Prompt encoding started";
   std::vector<float> encoded_text;
   if (!encode_prompt(backend_data_->input_prompt_tokens, &encoded_text)) {
@@ -143,14 +146,19 @@ bool StableDiffusionInvoker::invoke(std::vector<float> *image) {
     return false;
   }
 
+  LITERT_LOG_MEM("sd: diffusion done");
+
   // Decoding is the memory peak and needs neither of these, so let the
   // platform reclaim them first if it asked to.
   if (backend_data_->release_transient_models) {
     backend_data_->release_transient_models();
+    LITERT_LOG_MEM("sd: transient models released");
   }
 
   LOG(INFO) << "Image decoding started";
-  return decode_image(latent, image);
+  const bool decoded = decode_image(latent, image);
+  LITERT_LOG_MEM("sd: decode done");
+  return decoded;
 }
 
 bool StableDiffusionInvoker::encode_prompt(const std::vector<int32_t> &tokens,
