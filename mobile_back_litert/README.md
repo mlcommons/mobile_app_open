@@ -68,24 +68,37 @@ WITH_LITERT=1 make flutter/ios
   shipped exports are `dynamic_int8` (text encoder, diffusion) and
   `dynamic_fp16` (decoder). Measured on an iPad mini at about 4.4-5.6 s per
   diffusion step, so roughly 100 s for the default 20 steps.
-* The three Stable Diffusion models are compiled up front and all stay
-  resident, which is fine on Android but not here: the VAE decode is the
-  memory peak of the pipeline, and holding the text encoder and the 822 MiB
-  diffusion model across it crosses the iOS limit below -- the first device run
-  finished all 20 diffusion steps and was killed at `Image decoding started`.
-  Neither model is needed to decode, so on Apple both are released before the
-  decode and rebuilt at the start of the next query
-  (`ensure_transient_models` / `release_transient_models` in
-  `stable_diffusion_pipeline.h`). Compiling all three takes about 1.3 s against
-  a ~100 s query. Android keeps them resident and is unaffected.
-* Destroying them is not sufficient on its own. `free()` does not necessarily
-  shrink the process footprint -- libmalloc keeps the pages on its free list --
-  and that footprint is exactly what `EXC_RESOURCE` measures, so the release
-  can be invisible to the limit. `ReturnFreeMemoryToOS()` in `apple_support.h`
-  calls `malloc_zone_pressure_relief` to hand the pages back. This matters
-  because LiteRT defers `AllocateTensors` to the first `Run`, so the decoder's
-  arena -- the largest single allocation in the pipeline -- is created *during*
-  the decode, on top of whatever the allocator is still holding.
+* **A query has two phases and they do not fit in memory together.** The three
+  models are compiled up front and stay resident, which is fine on Android but
+  not here. Measured on an iPhone 16 Pro, in MiB still available before the
+  limit:
+
+  | phase | MiB left | |
+  |---|---|---|
+  | before compiling models | 2849 | ~527 already used by the app |
+  | all three models compiled | 1770 | the three models cost 1079 |
+  | diffusion done | 373 | the denoising loop needs ~1405 |
+  | transient models released | 2688 | freeing them recovered 2315 |
+  | decode done | 1279 | the decoder arena needs ~1409 |
+
+  Each phase needs most of the budget on its own, so on Apple only the models
+  the current phase uses are kept compiled and the rest are released and
+  rebuilt on demand (`set_phase` in `stable_diffusion_pipeline.h`). Compiling
+  all three takes about 1.3 s against a ~100 s query. Android has the headroom,
+  keeps everything resident, and its throughput does not move.
+* Releasing has to be symmetric, and this is easy to get wrong. Freeing only
+  the encoder and the diffusion model got the decode to pass, and then the
+  *second* query died: it rebuilt those two on top of the decoder's ~1.4 GiB
+  arena and had 541 MiB left for a phase that needs ~1405.
+* Destroying a model is not sufficient on its own. `free()` does not
+  necessarily shrink the process footprint -- libmalloc keeps the pages on its
+  free list -- and that footprint is exactly what `EXC_RESOURCE` measures, so
+  the release can be invisible to the limit. `ReturnFreeMemoryToOS()` in
+  `apple_support.h` calls `malloc_zone_pressure_relief` to hand the pages back;
+  it is worth 2.3 GiB in the table above. This matters because LiteRT defers
+  `AllocateTensors` to the first `Run`, so a model's arena -- the largest
+  single allocation in the pipeline -- is created while it runs, on top of
+  whatever the allocator is still holding.
 * When a memory question comes up here, measure it rather than reasoning from
   model sizes: `LITERT_LOG_MEM("stage")` logs `os_proc_available_memory()`, the
   budget `EXC_RESOURCE` actually enforces, and is a no-op off Apple. Note that

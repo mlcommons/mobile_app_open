@@ -100,7 +100,9 @@ bool ReadFloats(litert::TensorBuffer &buffer, std::vector<float> *out,
   return true;
 }
 
-// Run is synchronous; the buffers were created once at backend_create time.
+// Run is synchronous. The buffers belong to the compiled model and are created
+// with it -- at backend_create, or again on the platforms that release and
+// rebuild a model between phases (see SDBackendData::set_phase).
 bool RunModel(SDModel &model, const char *what) {
   auto run =
       model.compiled->Run(kSignatureIndex, model.input_bufs, model.output_bufs);
@@ -117,11 +119,11 @@ StableDiffusionInvoker::StableDiffusionInvoker(SDBackendData *backend_data)
     : backend_data_(backend_data) {}
 
 bool StableDiffusionInvoker::invoke(std::vector<float> *image) {
-  // No-ops unless the platform releases the transient models between queries
-  // (see SDBackendData). Rebuilding is cheap next to a query.
-  if (backend_data_->ensure_transient_models &&
-      !backend_data_->ensure_transient_models()) {
-    LOG(ERROR) << "Failed to rebuild the text encoder and diffusion model";
+  // A no-op unless the platform keeps the two phases apart in memory (see
+  // SDBackendData). Rebuilding a model is cheap next to a query.
+  if (backend_data_->set_phase &&
+      !backend_data_->set_phase(SDPhase::kEncodeAndDiffuse)) {
+    LOG(ERROR) << "Failed to prepare the text encoder and diffusion model";
     return false;
   }
 
@@ -148,12 +150,13 @@ bool StableDiffusionInvoker::invoke(std::vector<float> *image) {
 
   LITERT_LOG_MEM("sd: diffusion done");
 
-  // Decoding is the memory peak and needs neither of these, so let the
-  // platform reclaim them first if it asked to.
-  if (backend_data_->release_transient_models) {
-    backend_data_->release_transient_models();
-    LITERT_LOG_MEM("sd: transient models released");
+  // The decode needs neither the encoder nor the diffusion model, and on a
+  // constrained platform it cannot run alongside them.
+  if (backend_data_->set_phase && !backend_data_->set_phase(SDPhase::kDecode)) {
+    LOG(ERROR) << "Failed to prepare the decoder";
+    return false;
   }
+  LITERT_LOG_MEM("sd: switched to the decode phase");
 
   LOG(INFO) << "Image decoding started";
   const bool decoded = decode_image(latent, image);

@@ -404,36 +404,51 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   // See the comment on these members in the header: the decode step is the
   // memory peak and iOS kills the process past its high-watermark limit, so
   // the encoder and the diffusion model do not stay resident across it.
-  backend_data->release_transient_models = [backend_data]() {
-    ReleaseModel(&backend_data->text_encoder);
-    ReleaseModel(&backend_data->diffusion);
-    // Destroying them is not enough on its own: the pages stay on libmalloc's
-    // free list and keep counting against the limit until they are handed
-    // back. Without this the release is invisible to EXC_RESOURCE.
-    litert_apple::ReturnFreeMemoryToOS();
-  };
-  backend_data->ensure_transient_models =
-      [backend_data, text_encoder_path, diffusion_model_path, num_threads,
-       encoder_inputs, encoder_output, diffusion_inputs, diffusion_output]() {
+  backend_data->set_phase =
+      [backend_data, text_encoder_path, diffusion_model_path, decoder_path,
+       num_threads, encoder_inputs, encoder_output, diffusion_inputs,
+       diffusion_output, decoder_inputs, decoder_output](SDPhase phase) {
+        // Release first, then build: the point is to never hold both phases'
+        // working sets at once. Destroying a model is not enough on its own --
+        // the pages stay on libmalloc's free list and keep counting against the
+        // limit until they are handed back, which is what makes the release
+        // visible to EXC_RESOURCE.
         std::vector<size_t> idx;
-        if (backend_data->text_encoder.compiled == nullptr) {
-          if (!BuildModel(*backend_data->env, text_encoder_path, num_threads,
-                          encoder_inputs, encoder_output,
-                          &backend_data->text_encoder, &idx)) {
-            return false;
+        if (phase == SDPhase::kEncodeAndDiffuse) {
+          ReleaseModel(&backend_data->decoder);
+          litert_apple::ReturnFreeMemoryToOS();
+          if (backend_data->text_encoder.compiled == nullptr) {
+            if (!BuildModel(*backend_data->env, text_encoder_path, num_threads,
+                            encoder_inputs, encoder_output,
+                            &backend_data->text_encoder, &idx)) {
+              return false;
+            }
+            backend_data->encoder_tokens_idx = idx[0];
+            backend_data->encoder_positions_idx = idx[1];
           }
-          backend_data->encoder_tokens_idx = idx[0];
-          backend_data->encoder_positions_idx = idx[1];
+          if (backend_data->diffusion.compiled == nullptr) {
+            if (!BuildModel(*backend_data->env, diffusion_model_path,
+                            num_threads, diffusion_inputs, diffusion_output,
+                            &backend_data->diffusion, &idx)) {
+              return false;
+            }
+            backend_data->diffusion_latent_idx = idx[0];
+            backend_data->diffusion_context_idx = idx[1];
+            backend_data->diffusion_timestep_idx = idx[2];
+          }
+          return true;
         }
-        if (backend_data->diffusion.compiled == nullptr) {
-          if (!BuildModel(*backend_data->env, diffusion_model_path, num_threads,
-                          diffusion_inputs, diffusion_output,
-                          &backend_data->diffusion, &idx)) {
+
+        ReleaseModel(&backend_data->text_encoder);
+        ReleaseModel(&backend_data->diffusion);
+        litert_apple::ReturnFreeMemoryToOS();
+        if (backend_data->decoder.compiled == nullptr) {
+          if (!BuildModel(*backend_data->env, decoder_path, num_threads,
+                          decoder_inputs, decoder_output,
+                          &backend_data->decoder, &idx)) {
             return false;
           }
-          backend_data->diffusion_latent_idx = idx[0];
-          backend_data->diffusion_context_idx = idx[1];
-          backend_data->diffusion_timestep_idx = idx[2];
+          backend_data->decoder_latent_idx = idx[0];
         }
         return true;
       };
