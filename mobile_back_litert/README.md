@@ -66,8 +66,18 @@ WITH_LITERT=1 make flutter/ios
   compile-time Metal support.
 * `stable_diffusion` runs on the CPU delegate, exactly as on Android: the
   shipped exports are `dynamic_int8` (text encoder, diffusion) and
-  `dynamic_fp16` (decoder), and the three models total about 1.04 GiB, which
-  sits comfortably inside the memory limit below.
+  `dynamic_fp16` (decoder). Measured on an iPad mini at about 4.4-5.6 s per
+  diffusion step, so roughly 100 s for the default 20 steps.
+* The three Stable Diffusion models are compiled up front and all stay
+  resident, which is fine on Android but not here: the VAE decode is the
+  memory peak of the pipeline, and holding the text encoder and the 822 MiB
+  diffusion model across it crosses the iOS limit below -- the first device run
+  finished all 20 diffusion steps and was killed at `Image decoding started`.
+  Neither model is needed to decode, so on Apple both are released before the
+  decode and rebuilt at the start of the next query
+  (`ensure_transient_models` / `release_transient_models` in
+  `stable_diffusion_pipeline.h`). Compiling all three takes about 1.3 s against
+  a ~100 s query. Android keeps them resident and is unaffected.
 * **Memory is the binding constraint for the LLM benchmarks on iOS.** iOS kills
   a process that exceeds a per-process limit measured at 3376 MB on an 8 GB
   device (`EXC_RESOURCE`); it is not confined to small devices, and it applies

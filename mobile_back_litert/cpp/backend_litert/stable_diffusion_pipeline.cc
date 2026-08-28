@@ -56,6 +56,15 @@ struct TensorSpec {
   std::vector<int> dims;
 };
 
+// Free a compiled model and everything allocated from it. The buffers were
+// created from the compiled model, so they have to go first -- the same
+// ordering constraint the SDModel declaration order encodes.
+void ReleaseModel(SDModel *model) {
+  model->output_bufs.clear();
+  model->input_bufs.clear();
+  model->compiled.reset();
+}
+
 bool backendExists = false;
 
 // The //flutter/cpp:utils config readers are deliberately not linked into
@@ -374,6 +383,41 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   backend_data->unconditional_tokens.assign(kTokenCount, kEndOfTextToken);
   backend_data->unconditional_tokens[0] = kStartOfTextToken;
   backend_data->input_prompt_tokens.assign(kTokenCount, 0);
+
+#if defined(__APPLE__)
+  // See the comment on these members in the header: the decode step is the
+  // memory peak and iOS kills the process past its high-watermark limit, so
+  // the encoder and the diffusion model do not stay resident across it.
+  backend_data->release_transient_models = [backend_data]() {
+    ReleaseModel(&backend_data->text_encoder);
+    ReleaseModel(&backend_data->diffusion);
+  };
+  backend_data->ensure_transient_models =
+      [backend_data, text_encoder_path, diffusion_model_path, num_threads,
+       encoder_inputs, encoder_output, diffusion_inputs, diffusion_output]() {
+        std::vector<size_t> idx;
+        if (backend_data->text_encoder.compiled == nullptr) {
+          if (!BuildModel(*backend_data->env, text_encoder_path, num_threads,
+                          encoder_inputs, encoder_output,
+                          &backend_data->text_encoder, &idx)) {
+            return false;
+          }
+          backend_data->encoder_tokens_idx = idx[0];
+          backend_data->encoder_positions_idx = idx[1];
+        }
+        if (backend_data->diffusion.compiled == nullptr) {
+          if (!BuildModel(*backend_data->env, diffusion_model_path, num_threads,
+                          diffusion_inputs, diffusion_output,
+                          &backend_data->diffusion, &idx)) {
+            return false;
+          }
+          backend_data->diffusion_latent_idx = idx[0];
+          backend_data->diffusion_context_idx = idx[1];
+          backend_data->diffusion_timestep_idx = idx[2];
+        }
+        return true;
+      };
+#endif
 
   return backend_data;
 }

@@ -116,6 +116,14 @@ StableDiffusionInvoker::StableDiffusionInvoker(SDBackendData *backend_data)
     : backend_data_(backend_data) {}
 
 bool StableDiffusionInvoker::invoke(std::vector<float> *image) {
+  // No-ops unless the platform releases the transient models between queries
+  // (see SDBackendData). Rebuilding is cheap next to a query.
+  if (backend_data_->ensure_transient_models &&
+      !backend_data_->ensure_transient_models()) {
+    LOG(ERROR) << "Failed to rebuild the text encoder and diffusion model";
+    return false;
+  }
+
   LOG(INFO) << "Prompt encoding started";
   std::vector<float> encoded_text;
   if (!encode_prompt(backend_data_->input_prompt_tokens, &encoded_text)) {
@@ -133,6 +141,12 @@ bool StableDiffusionInvoker::invoke(std::vector<float> *image) {
                          backend_data_->num_steps, backend_data_->seed,
                          &latent)) {
     return false;
+  }
+
+  // Decoding is the memory peak and needs neither of these, so let the
+  // platform reclaim them first if it asked to.
+  if (backend_data_->release_transient_models) {
+    backend_data_->release_transient_models();
   }
 
   LOG(INFO) << "Image decoding started";

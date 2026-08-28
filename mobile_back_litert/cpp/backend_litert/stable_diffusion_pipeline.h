@@ -15,6 +15,7 @@ limitations under the License.
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -70,6 +71,20 @@ struct SDBackendData {
   // Host staging for the decoded image: backend_get_output hands out a
   // pointer into it, so it has to stay valid after the call returns.
   std::vector<float> output;
+
+  // Apple only; left null elsewhere, where every model stays resident.
+  //
+  // iOS kills a process that crosses a per-process high-watermark limit
+  // (measured at 3376 MB on an 8 GB device). The VAE decode is the memory peak
+  // of this pipeline and needs neither the text encoder nor the 822 MiB
+  // diffusion model, but both stay compiled for the whole run, and the sum
+  // crosses the limit. So the two transient models are released before
+  // decoding and rebuilt at the start of the next query. Compiling all three
+  // takes about 1.3 s against a query that takes ~100 s on the CPU, so the
+  // cost is negligible; Android has the headroom and keeps them resident, and
+  // its validated throughput does not move.
+  std::function<bool()> ensure_transient_models;
+  std::function<void()> release_transient_models;
 };
 
 // A pipeline for Stable Diffusion.
