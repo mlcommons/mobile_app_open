@@ -74,39 +74,6 @@ inline void LogNote(const std::string& text) {
   os_log(OS_LOG_DEFAULT, "%{public}s", text.c_str());
 }
 
-// Whether this device can run the llm-* benchmarks without being killed.
-//
-// Derived from an iPad mini run (limit 3376 MB), which failed. It had 2968 MiB
-// available when the backend was created, spent 2072 of it compiling the model
-// -- the q8 weights repack to far more than the 1229 MiB of the .tflite file --
-// and 435 more on buffers, then ran out inside the prefill Run with 461 MiB
-// left. So the requirement is above 2968, and above 2507 plus a prefill arena
-// that is larger than 461. 3.25 GiB clears that with a margin while staying
-// under what an iPhone 16 Pro evidently has, since llm-1b passes there.
-//
-// This threshold is the weakest part of the gate: it is bounded below by one
-// measured failure and above by one measured success, so both LogNote calls
-// report the real number to narrow it on any device that runs this.
-inline bool HasHeadroomForLlm() {
-  constexpr size_t kRequiredBytes = size_t{3328} * 1024 * 1024;  // 3.25 GiB
-  const size_t available = os_proc_available_memory();
-  if (available == 0) {
-    // No app context, so the budget is unknowable rather than zero. Withhold
-    // the benchmarks: a wrong "yes" kills the app, a wrong "no" only hides
-    // them, and this path is loud enough to notice.
-    LogNote(
-        "[mem] llm gate: os_proc_available_memory() unavailable, not offering "
-        "the llm-* benchmarks");
-    return false;
-  }
-  const bool ok = available >= kRequiredBytes;
-  LogNote("[mem] llm gate: " + std::to_string(available / (1024 * 1024)) +
-          " MiB available, need " +
-          std::to_string(kRequiredBytes / (1024 * 1024)) + " MiB -> " +
-          (ok ? "offering llm-*" : "not offering llm-*"));
-  return ok;
-}
-
 inline bool FileExists(const std::string& path) {
   struct stat info;
   return stat(path.c_str(), &info) == 0;

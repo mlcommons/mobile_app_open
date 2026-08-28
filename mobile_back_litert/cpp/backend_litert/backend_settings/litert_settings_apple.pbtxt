@@ -20,11 +20,9 @@
 # the same pattern but has not been measured; if its GPU compile ever fails the
 # pipeline falls back to CPU on its own.
 #
-# This file holds the benchmarks every supported device can run. The llm-*
-# settings live in litert_settings_apple_llm.pbtxt and are appended by
-# litert_c.cc only on devices with the memory to run them; see the gate there
-# and the measurements in that file. llm-3b and llm-8b are not offered at all
-# -- see the note at the bottom.
+# The llm-* benchmarks are offered on every device, which is known not to hold
+# on all of them -- see the note above the llm-1b entry. llm-3b and llm-8b are
+# never offered; see the note at the bottom.
 claim_policy: CLAIM_SHARED
 
 common_setting {
@@ -239,6 +237,90 @@ benchmark_setting {
   custom_setting {
     id: "timestep_embeddings_filename"
     value: "timestep_embeddings_data.bin.ts"
+  }
+}
+
+# The llm-* benchmarks are claimed on every iOS device, and that is known to be
+# wrong for some of them: llm-1b is killed by EXC_RESOURCE on an iPad mini.
+# Measured there (limit 3376 MB), MiB still available:
+#
+#   backend_create start   2968   (app baseline 408)
+#   model compiled          896   (the q8 weights cost 2072 resident, not the
+#                                  1229 of the .tflite file -- XNNPACK repacks)
+#   decode buffers built    894
+#   prefill buffers built   653
+#   prefill inputs written  461
+#   prefill Run                   -> killed, the arena needs more than 461
+#
+# The weights alone take 2072 of 3376 MB and there is no smaller configuration
+# to fall back on: this export publishes exactly one prefill bucket (1024), used
+# above on a 381-token prompt. It does run on an iPhone 16 Pro (9.31 tok/s).
+#
+# Gating this on os_proc_available_memory() was tried and removed. The value is
+# not a device property: mlperf_backend_matches_hardware is called repeatedly
+# and it read anywhere from 3319 MiB down to 2600 MiB on one iPhone run
+# depending on what had already run, so the benchmark list depended on when the
+# question was asked. A tested-device allowlist is the intended replacement.
+
+benchmark_setting {
+  benchmark_id: "llm-1b"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
+      model_checksum: "c618e9bbb89ce52eedcab4f61b2dc3a4"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-1b-instruct"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
+      model_checksum: "c618e9bbb89ce52eedcab4f61b2dc3a4"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
   }
 }
 

@@ -10,9 +10,9 @@ single-model pipeline.
 
 * Android arm64 and iOS arm64. Android claims all 13 benchmarks: the six
   `llm-*` sizes, `stable_diffusion` and the vision/NLP benchmarks. iOS claims
-  seven or nine depending on the device: never `llm-3b*` or `llm-8b*`, and the
-  two `llm-1b*` benchmarks only where there is memory to run them, decided at
-  runtime (see [iOS](#ios)).
+  nine of them -- everything except `llm-3b*` and `llm-8b*`, which cannot fit in
+  the iOS per-process memory limit. `llm-1b*` is claimed but does not fit on
+  every device either; see [iOS](#ios).
 * `claim_policy: CLAIM_SHARED`: lower-priority backends (e.g. the TFLite
   fallback) stay selectable next to LiteRT for every claimed benchmark.
 * `llm_pipeline.cc` drives a `litert::CompiledModel` with explicit `TensorBuffer`s
@@ -140,13 +140,14 @@ WITH_LITERT=1 make flutter/ios
   is no smaller configuration to fall back to, so `llm-1b` simply does not fit
   on that device. It does run on an iPhone 16 Pro (9.31 tok/s), which has more
   headroom.
-* So the `llm-*` settings are **gated at runtime** rather than claimed or
-  dropped outright. They live in `litert_settings_apple_llm.pbtxt`, and
-  `mlperf_backend_matches_hardware` appends them to the base settings only when
-  `litert_apple::HasHeadroomForLlm()` passes. Both branches log the measured
-  budget and the decision, so the threshold can be narrowed on any device that
-  runs it -- it is currently bounded below by one measured failure (2968 MiB)
-  and above by one measured success, which is the weakest part of the design.
+* **`llm-1b` is currently claimed on every iOS device anyway**, which is known
+  to be wrong for the iPad mini. A tested-device allowlist is the intended fix.
+  Gating on `os_proc_available_memory()` was tried and removed: that value is
+  not a device property. `mlperf_backend_matches_hardware` is called repeatedly,
+  and on one iPhone run it read anywhere from 3319 MiB down to 2600 MiB
+  depending on what had already run, so the benchmark list depended on when the
+  question was asked. A threshold picked to separate the two devices also came
+  within 9 MiB of excluding an iPhone 16 Pro, where the benchmark works.
 * `llm-3b` and `llm-8b` are never offered, on any device: at the ratio above
   their weights alone exceed the limit before a single buffer. `CLAIM_SHARED`
   means the TFLite fallback still offers those four.

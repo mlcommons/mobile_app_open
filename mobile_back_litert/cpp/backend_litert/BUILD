@@ -35,7 +35,6 @@ pbtxt2header(
     srcs = [
         "backend_settings/litert_settings_android.pbtxt",
         "backend_settings/litert_settings_apple.pbtxt",
-        "backend_settings/litert_settings_apple_llm.pbtxt",
     ],
 )
 

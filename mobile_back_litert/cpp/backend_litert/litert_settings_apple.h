@@ -16,13 +16,7 @@ limitations under the License.
 #define LITERT_SETTINGS_APPLE_H
 
 #include "mobile_back_litert/cpp/backend_litert/backend_settings/litert_settings_apple.pbtxt.h"
-#include "mobile_back_litert/cpp/backend_litert/backend_settings/litert_settings_apple_llm.pbtxt.h"
 
-// The benchmarks every supported iOS device can run.
 const std::string litert_settings_apple = litert_settings_apple_pbtxt;
-
-// Appended to the above only where there is memory to run them; see
-// mlperf_backend_matches_hardware.
-const std::string litert_settings_apple_llm = litert_settings_apple_llm_pbtxt;
 
 #endif
