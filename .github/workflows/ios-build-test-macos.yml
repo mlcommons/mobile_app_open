@@ -239,7 +239,13 @@ jobs:
           # BrowserStack reports a build as "running" while it is still queued
           # for a device, so this budget covers queue time as well as the run.
           timeout_minutes: 80
-          max_attempts: 2
+          # Exit 9 is a BrowserStack trigger failure, which is what
+          # BROWSERSTACK_ALL_PARALLELS_IN_USE produces when the account's
+          # session budget is busy - retrying it just waits for a free slot.
+          # Every other failure still fails fast. A rejection returns
+          # immediately, but each retry still costs retry_wait_seconds, so a
+          # long queue can burn into the job cap above.
+          max_attempts: 8
           retry_wait_seconds: 300
           retry_on_exit_code: 9
           command: |

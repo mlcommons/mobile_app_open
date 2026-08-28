@@ -2,6 +2,7 @@
 #define EMBEDDING_UTILS_H_
 
 #include <algorithm>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <map>
@@ -17,6 +18,9 @@ class TsEmbeddingParser {
 
  private:
   static constexpr size_t EMBEDDING_DIM = 1280;
+  // Upper bound on the timestep count read from the file, used as a sanity
+  // check before anything is resized by it.
+  static constexpr uint32_t MAX_TIMESTEPS = 1000;
   std::map<int32_t, std::vector<int32_t>> timesteps_;
   std::map<int32_t, std::vector<std::vector<float>>> embeddings_;
 };

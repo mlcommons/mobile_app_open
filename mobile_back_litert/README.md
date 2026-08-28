@@ -2,13 +2,15 @@
 
 This backend runs all benchmarks on the
 [LiteRT](https://github.com/google-ai-edge/LiteRT) 2.1.5 CompiledModel API:
-the `llm-*` benchmarks on a dedicated LLM pipeline, and the vision/NLP
-benchmarks on a single-model pipeline.
+the `llm-*` benchmarks on a dedicated LLM pipeline, `stable_diffusion` on a
+dedicated stable diffusion pipeline, and the vision/NLP benchmarks on a
+single-model pipeline.
 
 ## Overview
 
-* Android arm64 and iOS arm64. The backend claims the `llm-*` benchmarks and the
-  vision/NLP benchmarks (stable diffusion is not supported yet).
+* Android arm64 and iOS arm64. The backend claims the `llm-*` benchmarks,
+  `stable_diffusion` and the vision/NLP benchmarks on Android; the iOS
+  settings claim the same set except `stable_diffusion`.
 * `claim_policy: CLAIM_SHARED`: lower-priority backends (e.g. the TFLite
   fallback) stay selectable next to LiteRT for every claimed benchmark.
 * `llm_pipeline.cc` drives a `litert::CompiledModel` with explicit `TensorBuffer`s
@@ -73,11 +75,17 @@ WITH_LITERT=1 make flutter/ios
 ## Files
 
 * `cpp/backend_litert/litert_c.cc` — MLPerf backend C API implementation and
-  pipeline dispatch (the `pipeline` custom setting selects the LLM pipeline).
+  pipeline dispatch (the `pipeline` custom setting selects the LLM or the
+  stable diffusion pipeline).
 * `cpp/backend_litert/llm_pipeline.h` / `llm_pipeline.cc` — LLM pipeline: tokenizer, prefill, decode, KV cache.
 * `cpp/backend_litert/single_model_pipeline.h` / `single_model_pipeline.cc` — CompiledModel pipeline for the vision/NLP benchmarks.
-* The stable-diffusion sources (`sd_utils.cc`, `stable_diffusion_*.cc`,
-  `embedding_utils.cc`) are imported but not compiled or wired up yet.
+* `cpp/backend_litert/stable_diffusion_pipeline.h` / `stable_diffusion_pipeline.cc`,
+  `stable_diffusion_invoker.*`, `sd_utils.*`, `embedding_utils.*` — stable
+  diffusion pipeline: text encoder, diffusion loop and decoder. It runs on
+  the CPU accelerator; the shipped models are `dynamic_int8` (text encoder,
+  diffusion) and `dynamic_fp16` (decoder) exports aimed at CPU/XNNPACK.
+* `cpp/backend_litert/litert_env.h` — builds the `litert::Environment` shared by
+  the pipelines.
 * `cpp/backend_litert/apple_support.h` — locates the accelerator inside the app bundle on iOS.
 * `cpp/backend_litert/backend_settings/litert_settings_android.pbtxt` and
   `litert_settings_apple.pbtxt` — benchmark settings (models, delegates).

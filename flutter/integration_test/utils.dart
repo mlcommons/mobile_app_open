@@ -139,7 +139,13 @@ bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
   );
   if (benchmark == null) return false;
   final selectedLib = benchmark.selectedBackend.info.libName;
-  if (benchmarkId == 'stable_diffusion') {
+  // Stable diffusion has a backend setting only on QTI and LiteRT (CPU,
+  // see litert_settings_android). Every other backend would fall back to
+  // TFLite, which is far too slow for a CI device session. LiteRT is not
+  // short-circuited here: it falls through to the checks below so that,
+  // like the other benchmarks it claims, it runs only where LiteRT is the
+  // primary backend or is pinned via deviceBackendOverride.
+  if (benchmarkId == 'stable_diffusion' && selectedLib != BackendId.litert) {
     return selectedLib == BackendId.qti;
   }
   // The TFLite fallback is now offered alongside vendor backends, so
@@ -320,18 +326,26 @@ void printResult(ExtendedResult extendedResult) {
   }
 }
 
-void checkResult(ExtendedResult extendedResult) {
+// [expectAccuracy] is the run mode's doAccuracyRun: quickRun skips the
+// accuracy phase entirely, so there is no accuracy to check.
+void checkResult(
+  ExtendedResult extendedResult, {
+  required bool expectAccuracy,
+}) {
   for (final benchmarkResult in extendedResult.results) {
     debugPrint('Checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
-    checkAccuracy(benchmarkResult);
+    checkAccuracy(benchmarkResult, expectAccuracy: expectAccuracy);
     checkThroughput(benchmarkResult, extendedResult.environmentInfo);
   }
 }
 
-void checkAccuracy(BenchmarkExportResult benchmarkResult) {
+void checkAccuracy(
+  BenchmarkExportResult benchmarkResult, {
+  required bool expectAccuracy,
+}) {
   var tag = '[benchmarkId: ${benchmarkResult.benchmarkId}';
   final expectedMap = benchmarkExpectedAccuracy[benchmarkResult.benchmarkId];
   expect(
@@ -359,6 +373,11 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
     isNotNull,
     reason: 'missing expected accuracy for $tag',
   );
+
+  if (!expectAccuracy) {
+    debugPrint('Run mode has no accuracy phase; skipping accuracy check.');
+    return;
+  }
 
   final accuracyRun = benchmarkResult.accuracyRun;
   accuracyRun!;

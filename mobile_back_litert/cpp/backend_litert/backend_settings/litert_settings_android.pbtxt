@@ -2,13 +2,13 @@
 # proto-message: BackendSetting
 
 # Every benchmark runs on the LiteRT CompiledModel API: llm-* on the LLM
-# pipeline, the rest on the single-model pipeline. The GPU accelerator is
-# the default (fp32 model exports, automatic CPU fallback); the CPU choice
-# keeps the int8 exports benchmarkable on XNNPACK. NNAPI is not offered:
-# it is deprecated since Android 15 and the CompiledModel NPU path needs
-# vendor SDKs and AOT-compiled models. Lower-priority backends (the TFLite
-# fallback) stay selectable next to it, so users can compare implementations
-# per benchmark. Stable diffusion has no LiteRT setting yet.
+# pipeline, stable_diffusion on the stable diffusion pipeline, the rest on
+# the single-model pipeline. The GPU accelerator is the default (fp32 model
+# exports, automatic CPU fallback); the CPU choice keeps the int8 exports
+# benchmarkable on XNNPACK. NNAPI is not offered: it is deprecated since
+# Android 15 and the CompiledModel NPU path needs vendor SDKs and
+# AOT-compiled models. Lower-priority backends (the TFLite fallback) stay
+# selectable next to it, so users can compare implementations per benchmark.
 claim_policy: CLAIM_SHARED
 
 common_setting {
@@ -170,6 +170,56 @@ benchmark_setting {
   custom_setting {
     id: "shards_num"
     value: "1"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "LiteRT"
+  # CPU only: the shipped exports are dynamic_int8 (text encoder, diffusion)
+  # and dynamic_fp16 (decoder), aimed at CPU/XNNPACK. A GPU choice would
+  # need dedicated fp32 exports.
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_decoder_dynamic_fp16.tflite"
+      model_checksum: "165b70a01643e70a23e5e54a949be306"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_diffusion_model_dynamic_int8.tflite"
+      model_checksum: "ccfd761a2f8186c3669948515d40a880"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_text_encoder_dynamic_int8.tflite"
+      model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/timestep_embeddings_data.bin.ts"
+      model_checksum: "798b772155a69de5df44b304327bb3cc"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "text_encoder_filename"
+    value: "sd_text_encoder_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "diffusion_model_filename"
+    value: "sd_diffusion_model_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "decoder_filename"
+    value: "sd_decoder_dynamic_fp16.tflite"
+  }
+  custom_setting {
+    id: "timestep_embeddings_filename"
+    value: "timestep_embeddings_data.bin.ts"
   }
 }
 

@@ -114,6 +114,7 @@ const Map<String, Interval> _superResolution = {
 // TODO (anhappdev): update expected accuracy for stable diffusion
 const Map<String, Interval> _stableDiffusion = {
   'cpu': Interval(min: 0, max: 1.0),
+  'cpu|LiteRT': Interval(min: 0, max: 1.0),
   'npu': Interval(min: 0, max: 1.0),
   'tpu': Interval(min: 0, max: 1.0),
   'ane|TFLite': Interval(min: 0, max: 1.0),
