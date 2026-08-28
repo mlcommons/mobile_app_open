@@ -19,6 +19,7 @@ limitations under the License.
 
 #include <dlfcn.h>
 #include <malloc/malloc.h>
+#include <os/log.h>
 #include <os/proc.h>
 #include <sys/stat.h>
 
@@ -44,8 +45,15 @@ inline void LogAvailableMemory(const char* stage) {
   // 0 means the call is unavailable (it needs an app context), not that the
   // process is out of memory -- do not report that as an imminent kill.
   if (available == 0) return;
-  LOG(INFO) << "[mem] " << stage << ": " << (available / (1024 * 1024))
+  const size_t mib = available / (1024 * 1024);
+  LOG(INFO) << "[mem] " << stage << ": " << mib
             << " MiB left before the iOS limit";
+  // Also to os_log, which is the only one of the two that reaches a
+  // BrowserStack device-log artifact: that capture carries os_log entries
+  // (Dart's print arrives that way) but no native stderr, so without this a CI
+  // memory failure gives pass/fail and nothing to diagnose it with.
+  os_log(OS_LOG_DEFAULT, "[mem] %{public}s: %zu MiB left before the iOS limit",
+         stage, mib);
 }
 
 // Hand pages the allocator is holding back to the OS.
