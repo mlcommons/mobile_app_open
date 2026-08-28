@@ -485,6 +485,15 @@ void StableDiffusionPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
   // environment. Safe on a partially built backend: every member is RAII.
   delete static_cast<SDBackendData *>(backend_ptr);
   backendExists = false;
+  LITERT_LOG_MEM("sd: backend deleted (before reclaim)");
+#if defined(__APPLE__)
+  // The next benchmark allocates into whatever this leaves behind, and this
+  // pipeline is the largest consumer in the backend. Destroying the models
+  // only returns the pages to the allocator's free list, where they still
+  // count against the limit, so hand them back to the OS here too.
+  litert_apple::ReturnFreeMemoryToOS();
+  LITERT_LOG_MEM("sd: backend deleted (after reclaim)");
+#endif
 }
 
 // Run the inference for a sample.

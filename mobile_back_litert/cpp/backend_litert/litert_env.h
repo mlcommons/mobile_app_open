@@ -15,6 +15,7 @@ limitations under the License.
 #ifndef LITERT_ENV_H_
 #define LITERT_ENV_H_
 
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -34,6 +35,21 @@ limitations under the License.
 #define LITERT_LOG_MEM(stage) ::litert_apple::LogAvailableMemory(stage)
 #else
 #define LITERT_LOG_MEM(stage) ((void)0)
+#endif
+
+// Log a stream-style diagnostic. Same line on every platform; on Apple it also
+// goes to os_log, which is the only sink a device-log artifact captures.
+//
+//   LITERT_LOG_NOTE("chose bucket " << seq << " for " << n << " tokens");
+#if defined(__APPLE__)
+#define LITERT_LOG_NOTE(stream_expr)                   \
+  do {                                                 \
+    std::ostringstream litert_note_stream;             \
+    litert_note_stream << stream_expr;                 \
+    ::litert_apple::LogNote(litert_note_stream.str()); \
+  } while (0)
+#else
+#define LITERT_LOG_NOTE(stream_expr) LOG(INFO) << stream_expr
 #endif
 
 // Creates the LiteRT environment the compiled models are built in. Both

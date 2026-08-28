@@ -66,6 +66,14 @@ inline void LogAvailableMemory(const char* stage) {
 // every zone, and a goal of 0 means reclaim as much as possible.
 inline void ReturnFreeMemoryToOS() { malloc_zone_pressure_relief(nullptr, 0); }
 
+// Log a diagnostic line to both sinks, for the same reason LogAvailableMemory
+// does: absl goes to native stderr, which a local `flutter run` shows but a
+// BrowserStack device-log artifact drops entirely.
+inline void LogNote(const std::string& text) {
+  LOG(INFO) << text;
+  os_log(OS_LOG_DEFAULT, "%{public}s", text.c_str());
+}
+
 inline bool FileExists(const std::string& path) {
   struct stat info;
   return stat(path.c_str(), &info) == 0;
