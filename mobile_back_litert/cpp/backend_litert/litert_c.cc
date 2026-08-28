@@ -11,6 +11,7 @@ limitations under the License.
 ==============================================================================*/
 #include <cstring>
 #include <memory>
+#include <string>
 
 #include "absl/log/log.h"
 #include "llm_pipeline.h"
@@ -18,6 +19,7 @@ limitations under the License.
 #include "stable_diffusion_pipeline.h"
 
 #if defined(__APPLE__)
+#include "apple_support.h"
 #include "litert_settings_apple.h"
 #elif defined(__ANDROID__)
 #include "litert_settings_android.h"
@@ -41,7 +43,16 @@ bool mlperf_backend_matches_hardware(const char **not_allowed_message,
                                      const mlperf_device_info_t *device_info) {
   *not_allowed_message = nullptr;
 #if defined(__APPLE__)
-  *settings = litert_settings_apple.c_str();
+  // The llm-* benchmarks need most of the iOS per-process memory budget and
+  // are killed outright on a device that cannot spare it, so they are offered
+  // per device rather than unconditionally. Everything else runs anywhere.
+  // Static because the caller keeps the pointer after this returns.
+  static std::string apple_settings;
+  apple_settings = litert_settings_apple;
+  if (litert_apple::HasHeadroomForLlm()) {
+    apple_settings += litert_settings_apple_llm;
+  }
+  *settings = apple_settings.c_str();
   LOG(INFO) << "LiteRT backend matches hardware";
   return true;
 #elif defined(__ANDROID__)

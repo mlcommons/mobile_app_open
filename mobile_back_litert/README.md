@@ -10,9 +10,9 @@ single-model pipeline.
 
 * Android arm64 and iOS arm64. Android claims all 13 benchmarks: the six
   `llm-*` sizes, `stable_diffusion` and the vision/NLP benchmarks. iOS claims
-  nine of them -- the same set without `llm-3b`, `llm-3b-instruct`, `llm-8b`
-  and `llm-8b-instruct`, which cannot fit in the iOS per-process memory limit
-  (see [iOS](#ios)).
+  seven or nine depending on the device: never `llm-3b*` or `llm-8b*`, and the
+  two `llm-1b*` benchmarks only where there is memory to run them, decided at
+  runtime (see [iOS](#ios)).
 * `claim_policy: CLAIM_SHARED`: lower-priority backends (e.g. the TFLite
   fallback) stay selectable next to LiteRT for every claimed benchmark.
 * `llm_pipeline.cc` drives a `litert::CompiledModel` with explicit `TensorBuffer`s
@@ -110,37 +110,50 @@ WITH_LITERT=1 make flutter/ios
   single allocation in the pipeline -- is created while it runs, on top of
   whatever the allocator is still holding.
 * When a memory question comes up here, measure it rather than reasoning from
-  model sizes: `LITERT_LOG_MEM("stage")` logs `os_proc_available_memory()`, the
-  budget `EXC_RESOURCE` actually enforces, and is a no-op off Apple. Note that
-  a BrowserStack device-log artifact contains only Dart `flutter:` output and
-  no native C++ lines, so these numbers have to come from a local
-  `flutter run`.
-* **Memory is the binding constraint for the LLM benchmarks on iOS.** iOS kills
-  a process that exceeds a per-process limit measured at 3376 MB on an 8 GB
-  device (`EXC_RESOURCE`); it is not confined to small devices, and it applies
-  to the CPU and the Metal delegate alike. The LLM pipeline holds the weights,
-  the prefill logits and two KV sets resident at once:
+  model sizes -- that reasoning has been wrong more than once, most recently by
+  taking a model file's size for its resident cost. `LITERT_LOG_MEM("stage")`
+  logs `os_proc_available_memory()`, the budget `EXC_RESOURCE` actually
+  enforces, and `LITERT_LOG_NOTE(...)` logs a note beside it; both are no-ops
+  off Apple. They also go to `os_log`, because a BrowserStack device-log
+  artifact carries only `os_log` entries and drops native stderr entirely --
+  without that a CI memory failure gives pass/fail and nothing to explain it.
+* **Memory is the binding constraint for the LLM benchmarks, and it is decided
+  per device.** iOS kills a process that exceeds a per-process limit measured
+  at 3376 MB on an 8 GB device (`EXC_RESOURCE`). Measured for `llm-1b` on an
+  iPad mini, in MiB still available:
 
-  | benchmark | weights | 2x KV | prefill logits | peak | |
-  |---|---|---|---|---|---|
-  | `llm-1b` | 1.20 GiB | 0.38 GiB | 0.98 GiB @2048 | 2.55 GiB | fits |
-  | `llm-3b` | 3.05 GiB | 1.31 GiB | 0.06 GiB @128 | 4.42 GiB | over |
-  | `llm-8b` | 7.55 GiB | 1.50 GiB | 0.06 GiB @128 | 9.11 GiB | over |
+  | stage | MiB left | consumed |
+  |---|---|---|
+  | `backend_create` start | 2968 | app baseline 408 |
+  | model compiled | 896 | **2072** |
+  | decode buffers built | 894 | 2 |
+  | prefill buffers built | 653 | 241 |
+  | prefill inputs written | 461 | 192 |
+  | prefill `Run` | — | more than 461, killed |
 
-  So `llm-1b` and `llm-1b-instruct` are claimed and `llm-3b*`/`llm-8b*` are
-  not: shrinking the prefill bucket cannot rescue them, because the weights and
-  the KV cache alone already exceed the limit. `CLAIM_SHARED` means the TFLite
-  fallback still offers those four.
-* The 1B benchmarks needed one fix to fit. The prefill logits buffer is
-  `[1, bucket, vocab]` fp32, so each step up in bucket size doubles it, and the
-  original selection picked the smallest bucket at or above the prompt length --
-  a 2589-token prompt took the 4096 bucket and a 1.96 GiB buffer, which pushed
-  the peak past the limit. On Apple the bucket is now capped at the KV cache
-  length (`GetSuitablePrefillSignature` in `llm_pipeline.cc`): a bucket larger
-  than the KV cache can never be used anyway, since a prompt longer than the KV
-  cache is rejected outright. Tokens past the chosen bucket are decoded one at
-  a time, which is slower for long prompts but correct. Android keeps the
-  uncapped choice so its validated throughput does not move.
+  Two things there are worth keeping in mind. The weights cost **2072 MiB
+  resident against a 1229 MiB model file** -- XNNPACK repacks the q8 weights,
+  so file size is not a useful proxy. And this export publishes exactly **one**
+  prefill bucket, 1024, which the run above used on a 381-token prompt: there
+  is no smaller configuration to fall back to, so `llm-1b` simply does not fit
+  on that device. It does run on an iPhone 16 Pro (9.31 tok/s), which has more
+  headroom.
+* So the `llm-*` settings are **gated at runtime** rather than claimed or
+  dropped outright. They live in `litert_settings_apple_llm.pbtxt`, and
+  `mlperf_backend_matches_hardware` appends them to the base settings only when
+  `litert_apple::HasHeadroomForLlm()` passes. Both branches log the measured
+  budget and the decision, so the threshold can be narrowed on any device that
+  runs it -- it is currently bounded below by one measured failure (2968 MiB)
+  and above by one measured success, which is the weakest part of the design.
+* `llm-3b` and `llm-8b` are never offered, on any device: at the ratio above
+  their weights alone exceed the limit before a single buffer. `CLAIM_SHARED`
+  means the TFLite fallback still offers those four.
+* The Apple prefill-bucket cap in `GetSuitablePrefillSignature` is a **no-op for
+  this export**, which publishes only the 1024 bucket. It is kept because it is
+  correct for any export that publishes several -- a bucket larger than the KV
+  cache can never be used, since a longer prompt is rejected outright -- but it
+  is not what makes anything fit here. Android passes `SIZE_MAX` and is
+  unaffected either way.
 * Raising the ceiling instead would need the
   `com.apple.developer.kernel.increased-memory-limit` entitlement. That is not
   enabled here: it must also be turned on for the App ID in the developer

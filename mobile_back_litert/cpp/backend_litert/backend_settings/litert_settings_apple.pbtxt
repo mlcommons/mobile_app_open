@@ -20,23 +20,11 @@
 # the same pattern but has not been measured; if its GPU compile ever fails the
 # pipeline falls back to CPU on its own.
 #
-# The llm-* benchmarks are CPU only here, and deliberately offer no Metal
-# choice at all. Measured on an iPad mini: the Metal delegate is killed by
-# EXC_RESOURCE while it is still initialising, in delegate_kernel.cc
-# "Initializing Metal-based API from graph" -- before the model finishes
-# compiling and long before any prefill buffer exists. It consumed the whole
-# ~3.0 GiB budget materialising the graph, which carries every prefill
-# signature. Unlike XNNPACK, which allocates lazily per signature, that cost is
-# paid up front and no prefill tuning reaches it. Offering the choice would
-# only give the user a delegate that kills the app. Android keeps its GPU
-# choice, where it ran at about half the speed of LiteRT CPU anyway.
-#
-# Only the 1B sizes are claimed here; see the note at the bottom of the file for
-# why llm-3b and llm-8b are not. The 1B pipeline also caps its prefill bucket at
-# the KV cache length on Apple (llm_pipeline.cc), which halves the prefill
-# logits buffer to 0.98 GiB. That cap is necessary but, on an iPad mini, still
-# not sufficient -- llm-1b is being measured with the instrumentation in
-# llm_pipeline.cc before deciding whether it can be claimed at all.
+# This file holds the benchmarks every supported device can run. The llm-*
+# settings live in litert_settings_apple_llm.pbtxt and are appended by
+# litert_c.cc only on devices with the memory to run them; see the gate there
+# and the measurements in that file. llm-3b and llm-8b are not offered at all
+# -- see the note at the bottom.
 claim_policy: CLAIM_SHARED
 
 common_setting {
@@ -254,77 +242,16 @@ benchmark_setting {
   }
 }
 
-benchmark_setting {
-  benchmark_id: "llm-1b"
-  framework: "LiteRT"
-  delegate_choice: {
-    delegate_name: "CPU"
-    accelerator_name: "cpu"
-    accelerator_desc: "CPU"
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
-      model_checksum: "c618e9bbb89ce52eedcab4f61b2dc3a4"
-    }
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
-      model_checksum: "2ad260fc18b965ce16006d76c9327082"
-    }
-  }
-  delegate_selected: "CPU"
-  custom_setting {
-    id: "pipeline"
-    value: "LLMPipeline"
-  }
-  custom_setting {
-    id: "model_filename"
-    value: "llama_q8_ekv3072.tflite"
-  }
-  custom_setting {
-    id: "tokenizer_filename"
-    value: "llama3_1b.spm.model"
-  }
-}
-
-benchmark_setting {
-  benchmark_id: "llm-1b-instruct"
-  framework: "LiteRT"
-  delegate_choice: {
-    delegate_name: "CPU"
-    accelerator_name: "cpu"
-    accelerator_desc: "CPU"
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
-      model_checksum: "c618e9bbb89ce52eedcab4f61b2dc3a4"
-    }
-    model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
-      model_checksum: "2ad260fc18b965ce16006d76c9327082"
-    }
-  }
-  delegate_selected: "CPU"
-  custom_setting {
-    id: "pipeline"
-    value: "LLMPipeline"
-  }
-  custom_setting {
-    id: "model_filename"
-    value: "llama_q8_ekv3072.tflite"
-  }
-  custom_setting {
-    id: "tokenizer_filename"
-    value: "llama3_1b.spm.model"
-  }
-}
-
-# llm-3b and llm-8b are deliberately NOT claimed on iOS. The pipeline holds the
-# weights, the prefill logits and two KV sets resident at once, and iOS kills
-# the app (EXC_RESOURCE) past a per-process limit measured at 3376 MB on an
-# 8 GB device:
+# llm-3b and llm-8b are NEVER offered on iOS, on any device, which is why they
+# are absent from the gated file as well. iOS kills a process past a per-process
+# limit measured at 3376 MB on an 8 GB device (EXC_RESOURCE), and their weights
+# alone exceed it. llm-1b was measured at 2072 MiB resident against a 1229 MiB
+# model file -- XNNPACK repacks the q8 weights -- so scaling that ratio:
 #
-#   llm-3b: 3.05 GiB weights + 1.31 GiB KV = 4.36 GiB before a single logit.
-#   llm-8b: 7.55 GiB weights + 1.50 GiB KV = 9.05 GiB, more than the device has.
+#   llm-3b: 3.05 GiB of model file, over 5 GiB resident before any buffer.
+#   llm-8b: 7.55 GiB of model file, more than the device has in total.
 #
-# Shrinking the prefill bucket cannot recover either one, so claiming them would
-# only offer the user a benchmark that kills the app. claim_policy is
-# CLAIM_SHARED, so the TFLite fallback still offers these benchmarks. Android
-# keeps all six sizes; it has far more headroom.
+# No prefill tuning reaches that, so claiming them would only offer the user a
+# benchmark that kills the app. claim_policy is CLAIM_SHARED, so the TFLite
+# fallback still offers these benchmarks. Android keeps all six sizes; it has
+# far more headroom.
