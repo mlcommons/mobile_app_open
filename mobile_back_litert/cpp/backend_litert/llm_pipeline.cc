@@ -339,9 +339,9 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
 #else
   const size_t max_useful_seq_size = std::numeric_limits<size_t>::max();
 #endif
-  size_t sig_idx = GetSuitablePrefillSignature(
-      backend_data->prefill_sigs, effective_prefill_token_size,
-      max_useful_seq_size);
+  size_t sig_idx = GetSuitablePrefillSignature(backend_data->prefill_sigs,
+                                               effective_prefill_token_size,
+                                               max_useful_seq_size);
   if (!BuildPrefillBuffers(*backend_data, sig_idx)) return MLPERF_FAILURE;
   if ((int)(effective_prefill_token_size + 1) >
       backend_data->kv_cache_max_size) {
