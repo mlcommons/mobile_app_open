@@ -59,15 +59,25 @@ WITH_LITERT=1 make flutter/ios
   dlopen search path to fall back on.
 * Minimum iOS is 14.0, which is LiteRT's own floor (`LITERT_MIN_IOS_VERSION`);
   the other backends in this repo still target 13.1.
-* Both CPU and Metal are offered. The vision/NLP benchmarks default to Metal,
-  which measured 1.7-3.0x faster than CPU across all six on an iPad mini; the
-  `llm-*` benchmarks default to CPU. `LiteRtGpuBackend` has no Metal
-  enumerator: on Apple, Metal is selected by `kLiteRtGpuBackendAutomatic` plus
-  compile-time Metal support.
-* `stable_diffusion` runs on the CPU delegate, exactly as on Android: the
-  shipped exports are `dynamic_int8` (text encoder, diffusion) and
-  `dynamic_fp16` (decoder). Measured on an iPad mini at about 4.4-5.6 s per
-  diffusion step, so roughly 100 s for the default 20 steps.
+* The vision/NLP benchmarks offer both CPU and Metal and default to Metal,
+  which measured 1.7-3.0x faster than CPU across all six on an iPad mini.
+  `LiteRtGpuBackend` has no Metal enumerator: on Apple, Metal is selected by
+  `kLiteRtGpuBackendAutomatic` plus compile-time Metal support.
+* `stable_diffusion` and the `llm-*` benchmarks are CPU only and offer no Metal
+  choice. For the LLMs that is a memory result, not a preference: on an iPad
+  mini the Metal delegate is killed by `EXC_RESOURCE` while still initialising
+  (`delegate_kernel.cc`, "Initializing Metal-based API from graph"), before the
+  model finishes compiling and long before a prefill buffer exists. It spends
+  the whole ~3.0 GiB budget materialising a graph that carries every prefill
+  signature; XNNPACK allocates lazily per signature instead, which is why the
+  CPU path gets much further. No prefill tuning reaches a failure that happens
+  that early, so offering the choice would only hand the user a delegate that
+  kills the app. Android keeps its GPU choice.
+* For `stable_diffusion` the CPU-only choice matches Android: the shipped
+  exports are `dynamic_int8` (text encoder, diffusion) and `dynamic_fp16`
+  (decoder), aimed at CPU/XNNPACK, and a Metal choice would need dedicated fp32
+  exports. Measured on an iPad mini at about 4.4-5.6 s per diffusion step, so
+  roughly 100 s for the default 20 steps.
 * **A query has two phases and they do not fit in memory together.** The three
   models are compiled up front and stay resident, which is fine on Android but
   not here. Measured on an iPhone 16 Pro, in MiB still available before the
