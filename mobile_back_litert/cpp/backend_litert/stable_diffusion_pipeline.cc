@@ -56,14 +56,19 @@ struct TensorSpec {
   std::vector<int> dims;
 };
 
+#if defined(__APPLE__)
 // Free a compiled model and everything allocated from it. The buffers were
 // created from the compiled model, so they have to go first -- the same
 // ordering constraint the SDModel declaration order encodes.
+//
+// Guarded because its only caller is: an unguarded definition would be an
+// unused function in an anonymous namespace on every other platform.
 void ReleaseModel(SDModel *model) {
   model->output_bufs.clear();
   model->input_bufs.clear();
   model->compiled.reset();
 }
+#endif
 
 bool backendExists = false;
 
