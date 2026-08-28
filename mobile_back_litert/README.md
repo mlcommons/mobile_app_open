@@ -78,6 +78,20 @@ WITH_LITERT=1 make flutter/ios
   (`ensure_transient_models` / `release_transient_models` in
   `stable_diffusion_pipeline.h`). Compiling all three takes about 1.3 s against
   a ~100 s query. Android keeps them resident and is unaffected.
+* Destroying them is not sufficient on its own. `free()` does not necessarily
+  shrink the process footprint -- libmalloc keeps the pages on its free list --
+  and that footprint is exactly what `EXC_RESOURCE` measures, so the release
+  can be invisible to the limit. `ReturnFreeMemoryToOS()` in `apple_support.h`
+  calls `malloc_zone_pressure_relief` to hand the pages back. This matters
+  because LiteRT defers `AllocateTensors` to the first `Run`, so the decoder's
+  arena -- the largest single allocation in the pipeline -- is created *during*
+  the decode, on top of whatever the allocator is still holding.
+* When a memory question comes up here, measure it rather than reasoning from
+  model sizes: `LITERT_LOG_MEM("stage")` logs `os_proc_available_memory()`, the
+  budget `EXC_RESOURCE` actually enforces, and is a no-op off Apple. Note that
+  a BrowserStack device-log artifact contains only Dart `flutter:` output and
+  no native C++ lines, so these numbers have to come from a local
+  `flutter run`.
 * **Memory is the binding constraint for the LLM benchmarks on iOS.** iOS kills
   a process that exceeds a per-process limit measured at 3376 MB on an 8 GB
   device (`EXC_RESOURCE`); it is not confined to small devices, and it applies

@@ -18,6 +18,7 @@ limitations under the License.
 #if defined(__APPLE__)
 
 #include <dlfcn.h>
+#include <malloc/malloc.h>
 #include <os/proc.h>
 #include <sys/stat.h>
 
@@ -46,6 +47,16 @@ inline void LogAvailableMemory(const char* stage) {
   LOG(INFO) << "[mem] " << stage << ": " << (available / (1024 * 1024))
             << " MiB left before the iOS limit";
 }
+
+// Hand pages the allocator is holding back to the OS.
+//
+// Destroying a compiled model frees its weights and arenas, but free() does
+// not necessarily shrink the process footprint: libmalloc keeps the pages in
+// its free list and stays ready to reuse them. phys_footprint still counts
+// them, and phys_footprint is exactly what EXC_RESOURCE measures -- so a
+// release that looks correct can leave the budget unchanged. A null zone means
+// every zone, and a goal of 0 means reclaim as much as possible.
+inline void ReturnFreeMemoryToOS() { malloc_zone_pressure_relief(nullptr, 0); }
 
 inline bool FileExists(const std::string& path) {
   struct stat info;

@@ -315,6 +315,15 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
                  << "; the Stable Diffusion pipeline runs on the CPU";
   }
 
+#if defined(__APPLE__)
+  // This is the most memory-hungry pipeline in the backend and, in a CI sweep,
+  // it starts after five other benchmarks have each built and torn down a
+  // backend. Hand back whatever the allocator is still holding from those
+  // before compiling about 1 GiB of models on top of it.
+  litert_apple::ReturnFreeMemoryToOS();
+  LITERT_LOG_MEM("sd: before compiling models");
+#endif
+
   // One environment shared by all three compiled models, as the LiteRT
   // header recommends. Built through the shared factory so the Apple runtime
   // library directory is set the same way as in the other pipelines; this
@@ -398,6 +407,10 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   backend_data->release_transient_models = [backend_data]() {
     ReleaseModel(&backend_data->text_encoder);
     ReleaseModel(&backend_data->diffusion);
+    // Destroying them is not enough on its own: the pages stay on libmalloc's
+    // free list and keep counting against the limit until they are handed
+    // back. Without this the release is invisible to EXC_RESOURCE.
+    litert_apple::ReturnFreeMemoryToOS();
   };
   backend_data->ensure_transient_models =
       [backend_data, text_encoder_path, diffusion_model_path, num_threads,
