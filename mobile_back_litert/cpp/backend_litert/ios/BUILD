@@ -32,9 +32,10 @@ apple_xcframework(
         ],
         "device": ["arm64"],
     },
-    # 13.1 like the sibling backends is not enough: litert/cc/BUILD sets
-    # LITERT_MIN_IOS_VERSION = "14.0", so anything linking the LiteRT runtime
-    # has to declare at least that.
+    # litert/cc/BUILD sets LITERT_MIN_IOS_VERSION = "14.0", so anything linking
+    # the LiteRT runtime has to declare at least that. The sibling backends were
+    # raised to match rather than left at 13.1, so every framework in the app
+    # now declares one minimum; the app itself targets 15.0 regardless.
     minimum_os_versions = {
         "ios": "14.0",
         "macos": "14.0",

@@ -57,8 +57,10 @@ WITH_LITERT=1 make flutter/ios
   `Runner.app/Frameworks` next to the backend frameworks: LiteRT dlopens it from
   the directory given by `kLiteRtEnvOptionTagRuntimeLibraryDir`, and iOS has no
   dlopen search path to fall back on.
-* Minimum iOS is 14.0, which is LiteRT's own floor (`LITERT_MIN_IOS_VERSION`);
-  the other backends in this repo still target 13.1.
+* Minimum iOS is 14.0, which is LiteRT's own floor
+  (`LITERT_MIN_IOS_VERSION`). The sibling backend frameworks were raised from
+  13.1 to match, so every framework the app embeds declares the same minimum.
+  The app itself targets 15.0, so nothing here is the binding constraint.
 * The vision/NLP benchmarks offer both CPU and Metal and default to Metal,
   which measured 1.7-3.0x faster than CPU across all six on an iPad mini.
   `LiteRtGpuBackend` has no Metal enumerator: on Apple, Metal is selected by

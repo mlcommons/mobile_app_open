@@ -28,8 +28,8 @@ apple_xcframework(
         "device": ["arm64"],
     },
     minimum_os_versions = {
-        "ios": "13.1",
-        "macos": "13.1",
+        "ios": "14.0",
+        "macos": "14.0",
     },
     deps = [
         "//mobile_back_tflite/cpp/backend_dummy:dummy_backend",
@@ -48,10 +48,9 @@ apple_xcframework(
         "simulator": ["x86_64"],
         "device": ["arm64"],
     },
-    # The dummy links no LiteRT, so it does not need the real backend's 14.0.
     minimum_os_versions = {
-        "ios": "13.1",
-        "macos": "13.1",
+        "ios": "14.0",
+        "macos": "14.0",
     },
     deps = [
         "//mobile_back_tflite/cpp/backend_dummy:dummy_backend",
@@ -71,8 +70,8 @@ apple_xcframework(
         "device": ["arm64"],
     },
     minimum_os_versions = {
-        "ios": "13.1",
-        "macos": "13.1",
+        "ios": "14.0",
+        "macos": "14.0",
     },
     deps = [
         "//mobile_back_tflite/cpp/backend_dummy:dummy_backend",
