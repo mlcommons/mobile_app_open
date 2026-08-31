@@ -15,6 +15,7 @@ limitations under the License.
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -36,6 +37,13 @@ struct SDModel {
 
   // Signature index of the model's single output, resolved by name.
   size_t output_idx = 0;
+};
+
+// The two halves of a query, which on Apple are kept apart in memory: the
+// prompt encoder and the denoising loop, then the VAE decode.
+enum class SDPhase {
+  kEncodeAndDiffuse,
+  kDecode,
 };
 
 struct SDBackendData {
@@ -70,6 +78,26 @@ struct SDBackendData {
   // Host staging for the decoded image: backend_get_output hands out a
   // pointer into it, so it has to stay valid after the call returns.
   std::vector<float> output;
+
+  // Apple only; left null elsewhere, where every model stays resident.
+  //
+  // iOS kills a process that crosses a per-process limit (measured at 3376 MB
+  // on an 8 GB device), and this pipeline has two phases that each need most
+  // of that budget on their own. Measured on an iPhone 16 Pro, in MiB still
+  // available:
+  //
+  //   before compiling models   2849   (~527 already used by the app)
+  //   all three models compiled 1770   (the three models cost 1079)
+  //   diffusion done             373   (the denoising loop needs ~1405)
+  //   transient models released 2688   (freeing them recovered 2315)
+  //   decode done               1279   (the decoder arena needs ~1409)
+  //
+  // So the two phases fit one at a time and never together. Only the models
+  // the current phase needs are kept compiled; the rest are released and
+  // rebuilt on demand. Compiling all three takes about 1.3 s against a query
+  // that takes ~100 s on the CPU, so the cost is negligible. Android has the
+  // headroom, keeps everything resident, and its throughput does not move.
+  std::function<bool(SDPhase)> set_phase;
 };
 
 // A pipeline for Stable Diffusion.

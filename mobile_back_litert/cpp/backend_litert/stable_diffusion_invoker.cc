@@ -23,6 +23,7 @@ limitations under the License.
 #include "absl/log/log.h"
 #include "embedding_utils.h"
 #include "litert/cc/litert_tensor_buffer.h"
+#include "litert_env.h"
 #include "sd_utils.h"
 
 namespace {
@@ -99,7 +100,9 @@ bool ReadFloats(litert::TensorBuffer &buffer, std::vector<float> *out,
   return true;
 }
 
-// Run is synchronous; the buffers were created once at backend_create time.
+// Run is synchronous. The buffers belong to the compiled model and are created
+// with it -- at backend_create, or again on the platforms that release and
+// rebuild a model between phases (see SDBackendData::set_phase).
 bool RunModel(SDModel &model, const char *what) {
   auto run =
       model.compiled->Run(kSignatureIndex, model.input_bufs, model.output_bufs);
@@ -116,6 +119,16 @@ StableDiffusionInvoker::StableDiffusionInvoker(SDBackendData *backend_data)
     : backend_data_(backend_data) {}
 
 bool StableDiffusionInvoker::invoke(std::vector<float> *image) {
+  // A no-op unless the platform keeps the two phases apart in memory (see
+  // SDBackendData). Rebuilding a model is cheap next to a query.
+  if (backend_data_->set_phase &&
+      !backend_data_->set_phase(SDPhase::kEncodeAndDiffuse)) {
+    LOG(ERROR) << "Failed to prepare the text encoder and diffusion model";
+    return false;
+  }
+
+  LITERT_LOG_MEM("sd: query start");
+
   LOG(INFO) << "Prompt encoding started";
   std::vector<float> encoded_text;
   if (!encode_prompt(backend_data_->input_prompt_tokens, &encoded_text)) {
@@ -135,8 +148,20 @@ bool StableDiffusionInvoker::invoke(std::vector<float> *image) {
     return false;
   }
 
+  LITERT_LOG_MEM("sd: diffusion done");
+
+  // The decode needs neither the encoder nor the diffusion model, and on a
+  // constrained platform it cannot run alongside them.
+  if (backend_data_->set_phase && !backend_data_->set_phase(SDPhase::kDecode)) {
+    LOG(ERROR) << "Failed to prepare the decoder";
+    return false;
+  }
+  LITERT_LOG_MEM("sd: switched to the decode phase");
+
   LOG(INFO) << "Image decoding started";
-  return decode_image(latent, image);
+  const bool decoded = decode_image(latent, image);
+  LITERT_LOG_MEM("sd: decode done");
+  return decoded;
 }
 
 bool StableDiffusionInvoker::encode_prompt(const std::vector<int32_t> &tokens,

@@ -27,6 +27,7 @@ limitations under the License.
 #include "absl/log/log.h"
 #include "embedding_utils.h"
 #include "litert/cc/litert_options.h"
+#include "litert_env.h"
 #include "stable_diffusion_invoker.h"
 
 namespace {
@@ -54,6 +55,20 @@ struct TensorSpec {
   const char *name;
   std::vector<int> dims;
 };
+
+#if defined(__APPLE__)
+// Free a compiled model and everything allocated from it. The buffers were
+// created from the compiled model, so they have to go first -- the same
+// ordering constraint the SDModel declaration order encodes.
+//
+// Guarded because its only caller is: an unguarded definition would be an
+// unused function in an anonymous namespace on every other platform.
+void ReleaseModel(SDModel *model) {
+  model->output_bufs.clear();
+  model->input_bufs.clear();
+  model->compiled.reset();
+}
+#endif
 
 bool backendExists = false;
 
@@ -300,9 +315,21 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
                  << "; the Stable Diffusion pipeline runs on the CPU";
   }
 
+#if defined(__APPLE__)
+  // This is the most memory-hungry pipeline in the backend and, in a CI sweep,
+  // it starts after five other benchmarks have each built and torn down a
+  // backend. Hand back whatever the allocator is still holding from those
+  // before compiling about 1 GiB of models on top of it.
+  litert_apple::ReturnFreeMemoryToOS();
+  LITERT_LOG_MEM("sd: before compiling models");
+#endif
+
   // One environment shared by all three compiled models, as the LiteRT
-  // header recommends.
-  auto env = litert::Environment::Create({});
+  // header recommends. Built through the shared factory so the Apple runtime
+  // library directory is set the same way as in the other pipelines; this
+  // pipeline is CPU-only today, but an environment that cannot find the
+  // accelerators is a trap for whoever adds a GPU choice here.
+  auto env = CreateLiteRtEnvironment();
   if (!env) {
     LOG(ERROR) << "Environment::Create failed";
     backend_delete(backend_data);
@@ -371,6 +398,62 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   backend_data->unconditional_tokens[0] = kStartOfTextToken;
   backend_data->input_prompt_tokens.assign(kTokenCount, 0);
 
+  LITERT_LOG_MEM("sd: all three models compiled");
+
+#if defined(__APPLE__)
+  // See the comment on these members in the header: the decode step is the
+  // memory peak and iOS kills the process past its high-watermark limit, so
+  // the encoder and the diffusion model do not stay resident across it.
+  backend_data->set_phase =
+      [backend_data, text_encoder_path, diffusion_model_path, decoder_path,
+       num_threads, encoder_inputs, encoder_output, diffusion_inputs,
+       diffusion_output, decoder_inputs, decoder_output](SDPhase phase) {
+        // Release first, then build: the point is to never hold both phases'
+        // working sets at once. Destroying a model is not enough on its own --
+        // the pages stay on libmalloc's free list and keep counting against the
+        // limit until they are handed back, which is what makes the release
+        // visible to EXC_RESOURCE.
+        std::vector<size_t> idx;
+        if (phase == SDPhase::kEncodeAndDiffuse) {
+          ReleaseModel(&backend_data->decoder);
+          litert_apple::ReturnFreeMemoryToOS();
+          if (backend_data->text_encoder.compiled == nullptr) {
+            if (!BuildModel(*backend_data->env, text_encoder_path, num_threads,
+                            encoder_inputs, encoder_output,
+                            &backend_data->text_encoder, &idx)) {
+              return false;
+            }
+            backend_data->encoder_tokens_idx = idx[0];
+            backend_data->encoder_positions_idx = idx[1];
+          }
+          if (backend_data->diffusion.compiled == nullptr) {
+            if (!BuildModel(*backend_data->env, diffusion_model_path,
+                            num_threads, diffusion_inputs, diffusion_output,
+                            &backend_data->diffusion, &idx)) {
+              return false;
+            }
+            backend_data->diffusion_latent_idx = idx[0];
+            backend_data->diffusion_context_idx = idx[1];
+            backend_data->diffusion_timestep_idx = idx[2];
+          }
+          return true;
+        }
+
+        ReleaseModel(&backend_data->text_encoder);
+        ReleaseModel(&backend_data->diffusion);
+        litert_apple::ReturnFreeMemoryToOS();
+        if (backend_data->decoder.compiled == nullptr) {
+          if (!BuildModel(*backend_data->env, decoder_path, num_threads,
+                          decoder_inputs, decoder_output,
+                          &backend_data->decoder, &idx)) {
+            return false;
+          }
+          backend_data->decoder_latent_idx = idx[0];
+        }
+        return true;
+      };
+#endif
+
   return backend_data;
 }
 
@@ -402,6 +485,15 @@ void StableDiffusionPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
   // environment. Safe on a partially built backend: every member is RAII.
   delete static_cast<SDBackendData *>(backend_ptr);
   backendExists = false;
+  LITERT_LOG_MEM("sd: backend deleted (before reclaim)");
+#if defined(__APPLE__)
+  // The next benchmark allocates into whatever this leaves behind, and this
+  // pipeline is the largest consumer in the backend. Destroying the models
+  // only returns the pages to the allocator's free list, where they still
+  // count against the limit, so hand them back to the OS here too.
+  litert_apple::ReturnFreeMemoryToOS();
+  LITERT_LOG_MEM("sd: backend deleted (after reclaim)");
+#endif
 }
 
 // Run the inference for a sample.

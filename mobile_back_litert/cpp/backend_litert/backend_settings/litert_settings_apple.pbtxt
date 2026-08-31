@@ -1,0 +1,339 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
+# Apple/iOS settings for the LiteRT backend. Every benchmark runs on the LiteRT
+# CompiledModel API: llm-* on the LLM pipeline, stable_diffusion on the stable
+# diffusion pipeline, the rest on the single-model pipeline. The Metal choice
+# is served by the prebuilt
+# libLiteRtMetalAccelerator.dylib that ios.mk drops next to the backend
+# frameworks in the app bundle's Frameworks directory and LiteRT dlopens at
+# environment setup; the CPU choice runs on XNNPACK and keeps
+# the int8 exports benchmarkable. No ANE choice is offered: the CompiledModel
+# NPU path needs vendor SDKs and AOT-compiled models. Lower-priority backends
+# (the TFLite fallback) stay selectable next to it, so users can compare
+# implementations per benchmark.
+#
+# The vision/NLP benchmarks default to Metal, measured on an iPad mini: Metal
+# ran image_classification_v2 at 77.3 QPS against 44.9 on CPU, and completed
+# object_detection, image_segmentation_v2, natural_language_processing and
+# image_classification_offline_v2 with valid results. super_resolution follows
+# the same pattern but has not been measured; if its GPU compile ever fails the
+# pipeline falls back to CPU on its own.
+#
+# The llm-* benchmarks are offered on every device, which is known not to hold
+# on all of them -- see the note above the llm-1b entry. llm-3b and llm-8b are
+# never offered; see the note at the bottom.
+claim_policy: CLAIM_SHARED
+
+common_setting {
+  id: "num_threads"
+  name: "Number of threads"
+  value {
+    value: "4"
+    name: "4 threads"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
+  }
+  delegate_selected: "Metal"
+}
+
+benchmark_setting {
+  benchmark_id: "object_detection"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet_qat.tflite"
+      model_checksum: "6c7af49d97a2b2488222d94936d2dc18"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet.tflite"
+      model_checksum: "566ceb72a4c7c8926fe4ac8eededb5bf"
+    }
+  }
+  delegate_selected: "Metal"
+}
+
+benchmark_setting {
+  benchmark_id: "image_segmentation_v2"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_quant_argmax_uint8.tflite"
+      model_checksum: "b7a7620b8b818d64305b51ab796bfb1d"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_argmax_f32.tflite"
+      model_checksum: "b3a5d3c2e5756431a471ed5211c344a9"
+    }
+  }
+  delegate_selected: "Metal"
+}
+
+benchmark_setting {
+  benchmark_id: "natural_language_processing"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_int8_384_nnapi.tflite"
+      model_checksum: "3944a2dee04a5f8a5fd016ac34c4d390"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_float_384_gpu.tflite"
+      model_checksum: "36a953d07a8c6f2d3e05b22e87cec95b"
+    }
+  }
+  delegate_selected: "Metal"
+}
+
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_full_qint8.tflite"
+      model_checksum: "18ce6df0e4603f4b4ee5d04193708d9c"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_fp32.tflite"
+      model_checksum: "672240427c1f3dc33baf2facacd9631f"
+    }
+  }
+  delegate_selected: "Metal"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite"
+      model_checksum: "590a7a88640a18d28b16b6f571cdfc93"
+    }
+    batch_size: 2
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite"
+      model_checksum: "b57cc2a027607c3b36873a15ace84acb"
+    }
+    batch_size: 2
+  }
+  delegate_selected: "Metal"
+  # One CompiledModel with the batch dimension resized to 2, matching the
+  # Android setting: concurrent Run calls from multiple shards deadlock on the
+  # shared LiteRT GPU context (observed on Pixel 10 Pro), and the Metal
+  # accelerator has not been exercised with multiple shards either.
+  custom_setting {
+    id: "shards_num"
+    value: "1"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "LiteRT"
+  # CPU only, exactly as on Android: the shipped exports are dynamic_int8 (text
+  # encoder, diffusion) and dynamic_fp16 (decoder), aimed at CPU/XNNPACK. A
+  # Metal choice would need dedicated fp32 exports. The three models total
+  # about 1.04 GiB, which leaves plenty of headroom under the iOS per-process
+  # memory limit -- unlike the llm-* benchmarks.
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_decoder_dynamic_fp16.tflite"
+      model_checksum: "165b70a01643e70a23e5e54a949be306"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_diffusion_model_dynamic_int8.tflite"
+      model_checksum: "ccfd761a2f8186c3669948515d40a880"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_text_encoder_dynamic_int8.tflite"
+      model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/timestep_embeddings_data.bin.ts"
+      model_checksum: "798b772155a69de5df44b304327bb3cc"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "text_encoder_filename"
+    value: "sd_text_encoder_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "diffusion_model_filename"
+    value: "sd_diffusion_model_dynamic_int8.tflite"
+  }
+  custom_setting {
+    id: "decoder_filename"
+    value: "sd_decoder_dynamic_fp16.tflite"
+  }
+  custom_setting {
+    id: "timestep_embeddings_filename"
+    value: "timestep_embeddings_data.bin.ts"
+  }
+}
+
+# The llm-* benchmarks are claimed on every iOS device, and that is known to be
+# wrong for some of them: llm-1b is killed by EXC_RESOURCE on an iPad mini.
+# Measured there (limit 3376 MB), MiB still available:
+#
+#   backend_create start   2968   (app baseline 408)
+#   model compiled          896   (the q8 weights cost 2072 resident, not the
+#                                  1229 of the .tflite file -- XNNPACK repacks)
+#   decode buffers built    894
+#   prefill buffers built   653
+#   prefill inputs written  461
+#   prefill Run                   -> killed, the arena needs more than 461
+#
+# The weights alone take 2072 of 3376 MB and there is no smaller configuration
+# to fall back on: this export publishes exactly one prefill bucket (1024), used
+# above on a 381-token prompt. It does run on an iPhone 16 Pro (9.31 tok/s).
+#
+# Gating this on os_proc_available_memory() was tried and removed. The value is
+# not a device property: mlperf_backend_matches_hardware is called repeatedly
+# and it read anywhere from 3319 MiB down to 2600 MiB on one iPhone run
+# depending on what had already run, so the benchmark list depended on when the
+# question was asked. A tested-device allowlist is the intended replacement.
+
+benchmark_setting {
+  benchmark_id: "llm-1b"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
+      model_checksum: "c618e9bbb89ce52eedcab4f61b2dc3a4"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-1b-instruct"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
+      model_checksum: "c618e9bbb89ce52eedcab4f61b2dc3a4"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+# llm-3b and llm-8b are NEVER offered on iOS, on any device, which is why they
+# are absent from the gated file as well. iOS kills a process past a per-process
+# limit measured at 3376 MB on an 8 GB device (EXC_RESOURCE), and their weights
+# alone exceed it. llm-1b was measured at 2072 MiB resident against a 1229 MiB
+# model file -- XNNPACK repacks the q8 weights -- so scaling that ratio:
+#
+#   llm-3b: 3.05 GiB of model file, over 5 GiB resident before any buffer.
+#   llm-8b: 7.55 GiB of model file, more than the device has in total.
+#
+# No prefill tuning reaches that, so claiming them would only offer the user a
+# benchmark that kills the app. claim_policy is CLAIM_SHARED, so the TFLite
+# fallback still offers these benchmarks. Android keeps all six sizes; it has
+# far more headroom.

@@ -28,8 +28,29 @@ apple_xcframework(
         "device": ["arm64"],
     },
     minimum_os_versions = {
-        "ios": "13.1",
-        "macos": "13.1",
+        "ios": "14.0",
+        "macos": "14.0",
+    },
+    deps = [
+        "//mobile_back_tflite/cpp/backend_dummy:dummy_backend",
+    ],
+)
+
+# This target is required to have the same name
+# as the true litert backend.
+# Otherwise xcode will fail to build the app.
+apple_xcframework(
+    name = "liblitertbackend",
+    bundle_id = "com.mlcommons.inference.backend-litert-dummy",
+    exported_symbols_lists = ["//flutter/cpp/c:exported_symbols.lds"],
+    infoplists = ["//flutter/cpp/flutter:BackendBridgeInfo.plist"],
+    ios = {
+        "simulator": ["x86_64"],
+        "device": ["arm64"],
+    },
+    minimum_os_versions = {
+        "ios": "14.0",
+        "macos": "14.0",
     },
     deps = [
         "//mobile_back_tflite/cpp/backend_dummy:dummy_backend",
@@ -49,8 +70,8 @@ apple_xcframework(
         "device": ["arm64"],
     },
     minimum_os_versions = {
-        "ios": "13.1",
-        "macos": "13.1",
+        "ios": "14.0",
+        "macos": "14.0",
     },
     deps = [
         "//mobile_back_tflite/cpp/backend_dummy:dummy_backend",

@@ -41,15 +41,22 @@ jobs:
           - backend: "tflite"
             with_apple: 0
             with_tflite: 1
+            with_litert: 0
           - backend: "apple"
             with_apple: 1
             with_tflite: 0
+            with_litert: 0
+          - backend: "litert"
+            with_apple: 0
+            with_tflite: 0
+            with_litert: 1
     env:
       PERF_TEST: true
       FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
       FLUTTER_IOS_TEST_PACKAGE: ios_tests-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.zip
       WITH_APPLE: ${{ matrix.with_apple }}
       WITH_TFLITE: ${{ matrix.with_tflite }}
+      WITH_LITERT: ${{ matrix.with_litert }}
       WITH_PIXEL: 0
       WITH_MEDIATEK: 0
       WITH_QTI: 0
@@ -182,7 +189,10 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
-    timeout-minutes: 60
+    # The litert row runs the llm-* benchmarks, whose go-button check validates
+    # every delegate choice's model file (two ~1.2 GB LLM exports), so it needs
+    # the same headroom as the Android unified job.
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -191,6 +201,8 @@ jobs:
           - backend: "tflite"
             device: "iPhone 16 Pro-18"
           - backend: "apple"
+            device: "iPhone 16 Pro-18"
+          - backend: "litert"
             device: "iPhone 16 Pro-18"
     env:
       TEST_PACKAGE_NAME: ios_tests-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.zip
@@ -220,11 +232,19 @@ jobs:
           BROWSERSTACK_DEVICES: >-
             ["${{ matrix.device }}"]
         with:
-          timeout_minutes: 60
+          # This is the timeout that actually fires: the job-level one never
+          # gets a chance, because the step waits out retry_wait_seconds even
+          # when it will not retry (retry_on_exit_code only covers a trigger
+          # rejection). Keep it below the job cap minus retry_wait_seconds.
+          # BrowserStack reports a build as "running" while it is still queued
+          # for a device, so this budget covers queue time as well as the run.
+          timeout_minutes: 80
           # Exit 9 is a BrowserStack trigger failure, which is what
           # BROWSERSTACK_ALL_PARALLELS_IN_USE produces when the account's
           # session budget is busy - retrying it just waits for a free slot.
-          # Every other failure still fails fast.
+          # Every other failure still fails fast. A rejection returns
+          # immediately, but each retry still costs retry_wait_seconds, so a
+          # long queue can burn into the job cap above.
           max_attempts: 8
           retry_wait_seconds: 300
           retry_on_exit_code: 9
