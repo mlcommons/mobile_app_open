@@ -57,6 +57,13 @@ WITH_LITERT=1 make flutter/ios
   `Runner.app/Frameworks` next to the backend frameworks: LiteRT dlopens it from
   the directory given by `kLiteRtEnvOptionTagRuntimeLibraryDir`, and iOS has no
   dlopen search path to fall back on.
+* It ships wrapped in `LiteRtMetalAccelerator.framework`, assembled by
+  `flutter/ios/ios.mk`. An iOS app bundle may only embed bundles, and a bare
+  Mach-O under `Frameworks/` is rejected by App Store Connect — that was
+  `ITMS-90426`, reported against Xcode Cloud build 265. The framework's
+  `CFBundleExecutable` is the dylib's original filename, so the path LiteRT
+  builds still resolves; `GetAppleRuntimeLibraryDir()` looks inside the
+  framework as well as beside the backend binary.
 * Minimum iOS is 14.0, which is LiteRT's own floor
   (`LITERT_MIN_IOS_VERSION`). The sibling backend frameworks were raised from
   13.1 to match, so every framework the app embeds declares the same minimum.

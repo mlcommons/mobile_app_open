@@ -92,11 +92,19 @@ inline std::string DirName(const std::string& path) {
 // Returns the directory holding libLiteRtMetalAccelerator.dylib inside the app
 // bundle, or an empty string when it cannot be found (the caller then runs on
 // CPU). dladdr gives this binary's path, e.g.
-// .../MyApp.app/Frameworks/liblitertbackend.framework/liblitertbackend, and the
-// accelerator sits either next to it or one level up in
-// .../MyApp.app/Frameworks.
+// .../MyApp.app/Frameworks/liblitertbackend.framework/liblitertbackend, so the
+// search starts there and walks up to .../MyApp.app/Frameworks.
+//
+// The accelerator ships wrapped in LiteRtMetalAccelerator.framework, because an
+// iOS app bundle may only embed bundles and App Store Connect rejects a bare
+// Mach-O under Frameworks/. The framework's CFBundleExecutable is the dylib's
+// original filename, so the path this returns still joins with that name the
+// way LiteRT expects. The loose layout is still accepted at each level: it is
+// what a non-bundle host (a macOS command-line harness) produces.
 inline std::string GetAppleRuntimeLibraryDir() {
   static constexpr char kAcceleratorName[] = "libLiteRtMetalAccelerator.dylib";
+  static constexpr char kAcceleratorFramework[] =
+      "LiteRtMetalAccelerator.framework";
 
   Dl_info info;
   if (dladdr(reinterpret_cast<const void*>(&GetAppleRuntimeLibraryDir),
@@ -109,9 +117,12 @@ inline std::string GetAppleRuntimeLibraryDir() {
 
   std::string dir = litert_apple::DirName(std::string(info.dli_fname));
   for (int level = 0; level < 2 && !dir.empty(); ++level) {
-    if (litert_apple::FileExists(dir + "/" + kAcceleratorName)) {
-      LOG(INFO) << "LiteRT runtime library dir: " << dir;
-      return dir;
+    const std::string candidates[] = {dir, dir + "/" + kAcceleratorFramework};
+    for (const std::string& candidate : candidates) {
+      if (litert_apple::FileExists(candidate + "/" + kAcceleratorName)) {
+        LOG(INFO) << "LiteRT runtime library dir: " << candidate;
+        return candidate;
+      }
     }
     dir = litert_apple::DirName(dir);
   }

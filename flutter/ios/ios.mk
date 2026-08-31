@@ -20,6 +20,14 @@ backend_bridge_ios_zip=${BAZEL_LINKS_PREFIX}bin/flutter/cpp/flutter/backend_brid
 
 flutter_ios_fw_dir=flutter/ios/frameworks
 
+# The Metal accelerator ships as a plain dylib, but an iOS app bundle may only
+# embed bundles: a bare Mach-O under Frameworks/ is rejected by App Store
+# Connect. Wrap it in a framework whose CFBundleExecutable keeps the original
+# filename -- LiteRT dlopens the accelerator by joining its runtime library dir
+# with that exact name, so the name has to survive the move.
+flutter_ios_metal_fw_name=LiteRtMetalAccelerator
+flutter_ios_metal_fw_dir=${flutter_ios_fw_dir}/${flutter_ios_metal_fw_name}.framework
+
 .PHONY: flutter/ios/clean
 flutter/ios/clean:
 	rm -rf flutter/build/ios
@@ -42,8 +50,32 @@ flutter/ios/libs:
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_coreml_ios_zip}
 	unzip -q -o -d ${flutter_ios_fw_dir} ${backend_litert_ios_zip}
 	@# LiteRT dlopens the Metal accelerator from the app bundle's Frameworks
-	@# directory, so it has to be embedded next to the backend frameworks
-	cp -f ${backend_litert_ios_file} ${flutter_ios_fw_dir}
+	@# directory, so it has to be embedded next to the backend frameworks --
+	@# as a framework rather than a loose dylib, see flutter_ios_metal_fw_dir.
+	rm -rf ${flutter_ios_metal_fw_dir}
+	mkdir -p ${flutter_ios_metal_fw_dir}
+	cp -f ${backend_litert_ios_file} ${flutter_ios_metal_fw_dir}/
+	@# CFBundleExecutable is the dylib's own filename, which is what keeps
+	@# kLiteRtEnvOptionTagRuntimeLibraryDir + "libLiteRtMetalAccelerator.dylib"
+	@# resolving. MinimumOSVersion has to match the frameworks the app embeds
+	@# (LITERT_MIN_IOS_VERSION), or the bundle is rejected as inconsistent.
+	printf '%s\n' \
+		'<?xml version="1.0" encoding="UTF-8"?>' \
+		'<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' \
+		'<plist version="1.0">' \
+		'<dict>' \
+		'<key>CFBundleDevelopmentRegion</key><string>en</string>' \
+		'<key>CFBundleExecutable</key><string>${backend_litert_ios_bin_filename}</string>' \
+		'<key>CFBundleIdentifier</key><string>org.mlcommons.litert.metalaccelerator</string>' \
+		'<key>CFBundleInfoDictionaryVersion</key><string>6.0</string>' \
+		'<key>CFBundleName</key><string>${flutter_ios_metal_fw_name}</string>' \
+		'<key>CFBundlePackageType</key><string>FMWK</string>' \
+		'<key>CFBundleShortVersionString</key><string>2.1.5</string>' \
+		'<key>CFBundleVersion</key><string>2.1.5</string>' \
+		'<key>CFBundleSupportedPlatforms</key><array><string>iPhoneOS</string></array>' \
+		'<key>MinimumOSVersion</key><string>14.0</string>' \
+		'</dict>' \
+		'</plist>' > ${flutter_ios_metal_fw_dir}/Info.plist
 
 flutter/ios/release: flutter/check-release-env flutter/ios flutter/prepare flutter/ios/ipa
 
