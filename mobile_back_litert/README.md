@@ -72,21 +72,43 @@ WITH_LITERT=1 make flutter/ios
   which measured 1.7-3.0x faster than CPU across all six on an iPad mini.
   `LiteRtGpuBackend` has no Metal enumerator: on Apple, Metal is selected by
   `kLiteRtGpuBackendAutomatic` plus compile-time Metal support.
-* `stable_diffusion` and the `llm-*` benchmarks are CPU only and offer no Metal
-  choice. For the LLMs that is a memory result, not a preference: on an iPad
-  mini the Metal delegate is killed by `EXC_RESOURCE` while still initialising
-  (`delegate_kernel.cc`, "Initializing Metal-based API from graph"), before the
-  model finishes compiling and long before a prefill buffer exists. It spends
-  the whole ~3.0 GiB budget materialising a graph that carries every prefill
-  signature; XNNPACK allocates lazily per signature instead, which is why the
-  CPU path gets much further. No prefill tuning reaches a failure that happens
-  that early, so offering the choice would only hand the user a delegate that
-  kills the app. Android keeps its GPU choice.
-* For `stable_diffusion` the CPU-only choice matches Android: the shipped
-  exports are `dynamic_int8` (text encoder, diffusion) and `dynamic_fp16`
-  (decoder), aimed at CPU/XNNPACK, and a Metal choice would need dedicated fp32
-  exports. Measured on an iPad mini at about 4.4-5.6 s per diffusion step, so
-  roughly 100 s for the default 20 steps.
+* `stable_diffusion` and the `llm-*` benchmarks each offer a Metal choice, and
+  **CPU stays selected for both**. They are offered to be measured, not as
+  defaults; nothing below has been confirmed on a device yet.
+* The LLM Metal choice was withdrawn once and has now been reinstated with a
+  fix. What was measured on an iPad mini: the delegate is killed by
+  `EXC_RESOURCE` while still initialising (`delegate_kernel.cc`, "Initializing
+  Metal-based API from graph"), spending the whole ~3.0 GiB budget in about
+  0.3 s, before the model finishes compiling and long before a prefill buffer
+  exists. The reading at the time was that the graph carries every prefill
+  signature and the delegate pays for all of them, against XNNPACK allocating
+  lazily per signature.
+  That is the symptom; the mechanism is `EnableConstantTensorSharing`. With it
+  off -- which is what the pipeline inherited from LiteRT-LM's Android options
+  -- constant tensors are *not* shared between subgraphs, so each signature
+  carries its own copy of weights that are 2072 MiB resident. Turning it on
+  routes them through LiteRT's mmap-backed `SharedMemoryManager`, and
+  `SetMadviseOriginalSharedTensors` lets the kernel drop the pages the layout
+  converter has already read. Clean file-backed pages do not count against
+  `phys_footprint`, which is what `EXC_RESOURCE` measures. Both are now on for
+  Apple only; Android's options are unchanged.
+  Note the same iPad mini also fails `llm-1b` on **CPU**, so it is not the
+  device to validate this on. An `EXC_RESOURCE` kill cannot be caught, so there
+  is no fallback to catch it: if the budget runs out the app goes down. Watch
+  the `[mem] llm: before GPU compile` and `[mem] llm: after GPU compile` lines
+  to see what the delegate actually costs.
+* For `stable_diffusion` the Metal choice runs the same files as CPU. The
+  shipped exports are `dynamic_int8` (text encoder, diffusion) and
+  `dynamic_fp16` (decoder), aimed at CPU/XNNPACK, and no fp32 export of them
+  exists to switch to -- the model bucket has none. So the pipeline asks for
+  GPU with CPU alongside it and lets ops the delegate cannot take stay on CPU:
+  partial delegation is the expected outcome, and
+  `EnableAllowSrcQuantizedFcConvOps` is what lets the delegate take the
+  quantized FC/conv ops at all. All three models compile on the same
+  accelerator or none do, because the benchmark reports a single accelerator
+  name; if the GPU attempt fails the pipeline releases what it built and
+  retries the three on CPU. Measured on an iPad mini on CPU at about 4.4-5.6 s
+  per diffusion step, so roughly 100 s for the default 20 steps.
 * **A query has two phases and they do not fit in memory together.** The three
   models are compiled up front and stay resident, which is fine on Android but
   not here. Measured on an iPhone 16 Pro, in MiB still available before the
@@ -164,12 +186,18 @@ WITH_LITERT=1 make flutter/ios
   cache can never be used, since a longer prompt is rejected outright -- but it
   is not what makes anything fit here. Android passes `SIZE_MAX` and is
   unaffected either way.
-* Raising the ceiling instead would need the
-  `com.apple.developer.kernel.increased-memory-limit` entitlement. That is not
-  enabled here: it must also be turned on for the App ID in the developer
-  portal, and an entitlement the provisioning profile does not carry breaks
-  signing for every iOS backend. It would not help `llm-8b` in any case -- 9.11
-  GiB exceeds the RAM of the devices in question.
+* Raising the ceiling is the other half of the approach, and
+  `flutter/ios/Runner/Runner.entitlements` now requests both
+  `com.apple.developer.kernel.increased-memory-limit` (raises the per-process
+  cap jetsam enforces) and
+  `com.apple.developer.kernel.extended-virtual-addressing` (lifts the
+  address-space limit the same allocations meet once the cap is up).
+  **They are inert until the matching capability is enabled for the App ID in
+  the developer portal**, and a provisioning profile that does not carry them
+  fails to sign every iOS backend -- so they are a separate commit, revertible
+  on its own if the signing setup is not ready. Neither helps `llm-8b`: 9.11
+  GiB exceeds the RAM of the devices in question, which is why it is still not
+  claimed.
 * There is no CoreML/ANE path: the LiteRT v2 API does not expose one yet
   (upstream marks ANE "coming soon"). Use the Apple backend for CoreML.
 

@@ -24,9 +24,14 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
+
 #include "absl/log/log.h"
 #include "embedding_utils.h"
 #include "litert/cc/litert_options.h"
+#include "litert/cc/options/litert_gpu_options.h"
 #include "litert_env.h"
 #include "stable_diffusion_invoker.h"
 
@@ -56,19 +61,26 @@ struct TensorSpec {
   std::vector<int> dims;
 };
 
+// The delegate names the settings may select. The Apple settings name the GPU
+// choice after the accelerator that serves it, the same way the vision
+// benchmarks and the TFLite backend's iOS settings do.
+constexpr char kDelegateCpu[] = "CPU";
+constexpr char kDelegateGpu[] = "GPU";
 #if defined(__APPLE__)
+constexpr char kDelegateMetal[] = "Metal";
+#endif
+
 // Free a compiled model and everything allocated from it. The buffers were
 // created from the compiled model, so they have to go first -- the same
 // ordering constraint the SDModel declaration order encodes.
 //
-// Guarded because its only caller is: an unguarded definition would be an
-// unused function in an anonymous namespace on every other platform.
+// Called on every platform: by the GPU->CPU fallback when a compile fails
+// partway through, and on Apple by the phase swap as well.
 void ReleaseModel(SDModel *model) {
   model->output_bufs.clear();
   model->input_bufs.clear();
   model->compiled.reset();
 }
-#endif
 
 bool backendExists = false;
 
@@ -163,12 +175,19 @@ bool CheckPackedSize(const litert::TensorBuffer &buffer, const TensorSpec &spec,
   return true;
 }
 
-// Compiles one model on the CPU accelerator, binds every tensor by name,
-// pins the batch dimension and creates the buffers that all invocations
+// Compiles one model on the requested accelerator, binds every tensor by
+// name, pins the batch dimension and creates the buffers that all invocations
 // reuse. On success `*input_indices` holds the signature index of each spec
 // in `input_specs`, in the same order.
+//
+// `use_gpu` asks for the GPU with CPU kept alongside it, so ops the delegate
+// cannot take still run: the shipped exports are dynamic_int8 (text encoder,
+// diffusion) and dynamic_fp16 (decoder), aimed at XNNPACK, and there is no
+// fp32 export of them to switch to. Partial delegation is therefore the
+// normal outcome here, not a failure.
 bool BuildModel(litert::Environment &env, const std::string &model_path,
-                int num_threads, const std::vector<TensorSpec> &input_specs,
+                int num_threads, bool use_gpu,
+                const std::vector<TensorSpec> &input_specs,
                 const TensorSpec &output_spec, SDModel *model,
                 std::vector<size_t> *input_indices) {
   auto options = litert::Options::Create();
@@ -176,7 +195,39 @@ bool BuildModel(litert::Environment &env, const std::string &model_path,
     LOG(ERROR) << "Options::Create failed for " << model_path;
     return false;
   }
-  options->SetHardwareAccelerators(litert::HwAccelerators::kCpu);
+  if (use_gpu) {
+    options->SetHardwareAccelerators(litert::HwAccelerators::kGpu |
+                                     litert::HwAccelerators::kCpu);
+    auto gpu_options = options->GetGpuOptions();
+    if (gpu_options) {
+      // Constant-tensor sharing is not optional here: litert_gpu_options.h
+      // states that AllowSrcQuantizedFcConvOps below "must" have it true, and
+      // it is also what keeps the weights in a single mmap-backed mapping
+      // rather than one copy per subgraph. On Apple that second property is
+      // what matters -- phys_footprint is what EXC_RESOURCE measures, and this
+      // is already the most memory-hungry pipeline in the backend -- so
+      // madvise the originals as well and let the kernel drop the pages the
+      // layout converter has already read.
+      gpu_options->EnableConstantTensorSharing(true);
+#if defined(__APPLE__)
+      gpu_options->SetMadviseOriginalSharedTensors(true);
+#endif  // defined(__APPLE__)
+      // Let the delegate take the quantized fully-connected and convolution
+      // ops of the int8 exports instead of leaving them all on CPU; without
+      // this the diffusion model, which is where the time goes, is barely
+      // delegated at all. It costs accuracy (inputs are quantized to 8-bit)
+      // and initialisation time, both of which the accuracy run will show.
+      gpu_options->EnableAllowSrcQuantizedFcConvOps(true);
+      gpu_options->SetPrecision(litert::GpuOptions::Precision::kFp16);
+      gpu_options->SetBufferStorageType(
+          litert::GpuOptions::BufferStorageType::kBuffer);
+    } else {
+      LOG(WARNING) << "GetGpuOptions failed for " << model_path
+                   << "; compiling with default GPU options";
+    }
+  } else {
+    options->SetHardwareAccelerators(litert::HwAccelerators::kCpu);
+  }
   if (num_threads > 0) {
     auto cpu_options = options->GetCpuOptions();
     if (cpu_options) {
@@ -306,14 +357,27 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   const std::string decoder_path = dir + decoder_name;
   const std::string timestep_embeddings_path = dir + timestep_embeddings_name;
 
-  // The shipped exports are dynamic_int8 (text encoder, diffusion) and
-  // dynamic_fp16 (decoder), aimed at CPU/XNNPACK; the settings only offer a
-  // CPU delegate for this benchmark.
-  if (configs->delegate_selected != nullptr &&
-      strcmp(configs->delegate_selected, "CPU") != 0) {
-    LOG(WARNING) << "Ignoring delegate_selected=" << configs->delegate_selected
-                 << "; the Stable Diffusion pipeline runs on the CPU";
+  bool use_gpu = false;
+  if (configs->delegate_selected != nullptr) {
+    use_gpu = strcmp(configs->delegate_selected, kDelegateGpu) == 0;
+#if defined(__APPLE__)
+    use_gpu = use_gpu || strcmp(configs->delegate_selected, kDelegateMetal) == 0;
+#endif
+    // Report an unrecognized selection before the platform downgrade below, so
+    // a valid choice we deliberately fall back from is not logged as unknown.
+    if (!use_gpu && strcmp(configs->delegate_selected, kDelegateCpu) != 0) {
+      LOG(ERROR) << "Unknown delegate_selected: " << configs->delegate_selected
+                 << "; using the CPU accelerator";
+    }
   }
+#if defined(__APPLE__) && TARGET_OS_SIMULATOR
+  // Only the ios_arm64 (device) slice of the Metal accelerator is downloaded
+  // by litert_backend.mk, so there is nothing for the simulator to dlopen.
+  if (use_gpu) {
+    LOG(INFO) << "Simulator detected, using the CPU accelerator";
+    use_gpu = false;
+  }
+#endif
 
 #if defined(__APPLE__)
   // This is the most memory-hungry pipeline in the backend and, in a CI sweep,
@@ -326,9 +390,9 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
 
   // One environment shared by all three compiled models, as the LiteRT
   // header recommends. Built through the shared factory so the Apple runtime
-  // library directory is set the same way as in the other pipelines; this
-  // pipeline is CPU-only today, but an environment that cannot find the
-  // accelerators is a trap for whoever adds a GPU choice here.
+  // library directory is set the same way as in the other pipelines -- on iOS
+  // that directory is the only way the Metal accelerator is found at all, so
+  // the GPU choice below depends on it.
   auto env = CreateLiteRtEnvironment();
   if (!env) {
     LOG(ERROR) << "Environment::Create failed";
@@ -358,32 +422,55 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   };
   const TensorSpec decoder_output = {"padded_conv2d_37", {1, 512, 512, 3}};
 
-  std::vector<size_t> indices;
-  if (!BuildModel(*backend_data->env, text_encoder_path, num_threads,
-                  encoder_inputs, encoder_output, &backend_data->text_encoder,
-                  &indices)) {
-    backend_delete(backend_data);
-    return nullptr;
-  }
-  backend_data->encoder_tokens_idx = indices[0];
-  backend_data->encoder_positions_idx = indices[1];
+  // All three models compile on the same accelerator or none of them do. A
+  // mixed pipeline would still produce images, but the benchmark reports a
+  // single accelerator name, and reporting one when two ran is worse than
+  // giving up the GPU.
+  auto build_all = [&](bool gpu) {
+    std::vector<size_t> indices;
+    if (!BuildModel(*backend_data->env, text_encoder_path, num_threads, gpu,
+                    encoder_inputs, encoder_output, &backend_data->text_encoder,
+                    &indices)) {
+      return false;
+    }
+    backend_data->encoder_tokens_idx = indices[0];
+    backend_data->encoder_positions_idx = indices[1];
 
-  if (!BuildModel(*backend_data->env, diffusion_model_path, num_threads,
-                  diffusion_inputs, diffusion_output, &backend_data->diffusion,
-                  &indices)) {
-    backend_delete(backend_data);
-    return nullptr;
-  }
-  backend_data->diffusion_latent_idx = indices[0];
-  backend_data->diffusion_context_idx = indices[1];
-  backend_data->diffusion_timestep_idx = indices[2];
+    if (!BuildModel(*backend_data->env, diffusion_model_path, num_threads, gpu,
+                    diffusion_inputs, diffusion_output,
+                    &backend_data->diffusion, &indices)) {
+      return false;
+    }
+    backend_data->diffusion_latent_idx = indices[0];
+    backend_data->diffusion_context_idx = indices[1];
+    backend_data->diffusion_timestep_idx = indices[2];
 
-  if (!BuildModel(*backend_data->env, decoder_path, num_threads, decoder_inputs,
-                  decoder_output, &backend_data->decoder, &indices)) {
+    if (!BuildModel(*backend_data->env, decoder_path, num_threads, gpu,
+                    decoder_inputs, decoder_output, &backend_data->decoder,
+                    &indices)) {
+      return false;
+    }
+    backend_data->decoder_latent_idx = indices[0];
+    return true;
+  };
+
+  if (use_gpu && !build_all(true)) {
+    LOG(WARNING) << "GPU compilation failed; falling back to CPU";
+    // A failed attempt can leave models compiled behind it, and on iOS those
+    // pages still count against the limit the CPU retry has to fit inside.
+    ReleaseModel(&backend_data->text_encoder);
+    ReleaseModel(&backend_data->diffusion);
+    ReleaseModel(&backend_data->decoder);
+#if defined(__APPLE__)
+    litert_apple::ReturnFreeMemoryToOS();
+#endif
+    use_gpu = false;
+  }
+  if (!use_gpu && !build_all(false)) {
     backend_delete(backend_data);
     return nullptr;
   }
-  backend_data->decoder_latent_idx = indices[0];
+  backend_data->accelerator = use_gpu ? "GPU" : "CPU";
 
   if (!EmbeddingManager::getInstance().load_timestep_embeddings(
           timestep_embeddings_path)) {
@@ -406,7 +493,7 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   // the encoder and the diffusion model do not stay resident across it.
   backend_data->set_phase =
       [backend_data, text_encoder_path, diffusion_model_path, decoder_path,
-       num_threads, encoder_inputs, encoder_output, diffusion_inputs,
+       num_threads, use_gpu, encoder_inputs, encoder_output, diffusion_inputs,
        diffusion_output, decoder_inputs, decoder_output](SDPhase phase) {
         // Release first, then build: the point is to never hold both phases'
         // working sets at once. Destroying a model is not enough on its own --
@@ -419,7 +506,7 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
           litert_apple::ReturnFreeMemoryToOS();
           if (backend_data->text_encoder.compiled == nullptr) {
             if (!BuildModel(*backend_data->env, text_encoder_path, num_threads,
-                            encoder_inputs, encoder_output,
+                            use_gpu, encoder_inputs, encoder_output,
                             &backend_data->text_encoder, &idx)) {
               return false;
             }
@@ -428,8 +515,8 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
           }
           if (backend_data->diffusion.compiled == nullptr) {
             if (!BuildModel(*backend_data->env, diffusion_model_path,
-                            num_threads, diffusion_inputs, diffusion_output,
-                            &backend_data->diffusion, &idx)) {
+                            num_threads, use_gpu, diffusion_inputs,
+                            diffusion_output, &backend_data->diffusion, &idx)) {
               return false;
             }
             backend_data->diffusion_latent_idx = idx[0];
@@ -444,7 +531,7 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
         litert_apple::ReturnFreeMemoryToOS();
         if (backend_data->decoder.compiled == nullptr) {
           if (!BuildModel(*backend_data->env, decoder_path, num_threads,
-                          decoder_inputs, decoder_output,
+                          use_gpu, decoder_inputs, decoder_output,
                           &backend_data->decoder, &idx)) {
             return false;
           }

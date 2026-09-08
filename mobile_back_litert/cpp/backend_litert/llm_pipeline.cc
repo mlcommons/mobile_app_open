@@ -491,9 +491,38 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     gpu_options->AddExternalTensorPattern("kv_cache_");
     // Prefill and decode must each land in a single delegate partition.
     gpu_options->SetHintFullyDelegatedToSingleDelegate(true);
-    gpu_options->SetMadviseOriginalSharedTensors(false);
     gpu_options->SetConvertWeightsOnGpu(false);
+#if defined(__APPLE__)
+    // Apple diverges from LiteRT-LM here, and it is the difference between
+    // running and being killed. Metal materialises every signature in the
+    // graph before the first Run, and with constant-tensor sharing off each
+    // subgraph carries its own copy of the transformer weights -- 2072 MiB
+    // resident, per subgraph. On an iPad mini that ate the whole ~3.0 GiB
+    // budget in about 0.3 s during "Initializing Metal-based API from graph"
+    // and the process died in __bzero under EXC_RESOURCE, before the model
+    // finished compiling and long before any prefill buffer existed.
+    //
+    // Sharing routes those constants through LiteRT's SharedMemoryManager,
+    // which is mmap-backed, so the copies collapse to one mapping; madvising
+    // the originals then lets the kernel drop the pages the layout converter
+    // has already read. phys_footprint is what EXC_RESOURCE measures, and
+    // clean file-backed pages do not count against it, so both flags have to
+    // be on to move the number that kills us. The documented cost is slower
+    // tensor binding through the external-tensor APIs, which is the right
+    // trade against not running at all.
+    //
+    // It is also a documented prerequisite of the option set just below:
+    // litert_gpu_options.h says enable_constant_tensors_sharing "must be true
+    // to use" AllowSrcQuantizedFcConvOps. The non-Apple branch inherits that
+    // contradiction from LiteRT-LM and is left alone here -- Android's GPU LLM
+    // path is measured and working, and this change is scoped to iOS -- but it
+    // is worth knowing that the quantized-op option is probably inert there.
+    gpu_options->EnableConstantTensorSharing(true);
+    gpu_options->SetMadviseOriginalSharedTensors(true);
+#else
+    gpu_options->SetMadviseOriginalSharedTensors(false);
     gpu_options->EnableConstantTensorSharing(false);
+#endif  // defined(__APPLE__)
     gpu_options->EnableAllowSrcQuantizedFcConvOps(true);
     // KV cache is swapped, so GPU bindings repeat every 2 steps.
     gpu_options->SetNumStepsOfCommandBufferPreparations(2);
@@ -506,6 +535,10 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     LOG(ERROR) << "GetGpuOptions failed; GPU compile may crash";
   }
 
+  // The GPU compile is where this pipeline has historically been killed
+  // rather than returning an error, so record the budget on the way in: a
+  // process that dies inside Create leaves this as the last line written.
+  LITERT_LOG_MEM("llm: before GPU compile");
   std::string transformer_path = model_path;
   auto model =
       litert::CompiledModel::Create(*data.env, transformer_path, *options);
@@ -513,6 +546,7 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     LOG(ERROR) << "CompiledModel::Create failed: " << transformer_path;
     return false;
   }
+  LITERT_LOG_MEM("llm: after GPU compile");
   data.model = std::make_unique<litert::CompiledModel>(std::move(*model));
   return FindSignatures(data);
 }

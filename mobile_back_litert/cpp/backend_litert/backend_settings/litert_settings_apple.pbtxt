@@ -21,7 +21,9 @@
 # pipeline falls back to CPU on its own.
 #
 # The llm-* benchmarks are offered on every device, which is known not to hold
-# on all of them -- see the note above the llm-1b entry. llm-3b and llm-8b are
+# on all of them -- see the note above the llm-1b entry. They and
+# stable_diffusion now offer a Metal choice as well, neither of them selected:
+# both are there to be measured, not to be defaults. llm-3b and llm-8b are
 # never offered; see the note at the bottom.
 claim_policy: CLAIM_SHARED
 
@@ -191,15 +193,40 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "stable_diffusion"
   framework: "LiteRT"
-  # CPU only, exactly as on Android: the shipped exports are dynamic_int8 (text
-  # encoder, diffusion) and dynamic_fp16 (decoder), aimed at CPU/XNNPACK. A
-  # Metal choice would need dedicated fp32 exports. The three models total
-  # about 1.04 GiB, which leaves plenty of headroom under the iOS per-process
-  # memory limit -- unlike the llm-* benchmarks.
+  # The shipped exports are dynamic_int8 (text encoder, diffusion) and
+  # dynamic_fp16 (decoder), aimed at CPU/XNNPACK, and no fp32 export of them
+  # exists to switch to -- the storage bucket has none. The Metal choice below
+  # therefore runs those same files with the GPU accelerator asked for
+  # alongside CPU, so ops the delegate cannot take still run: expect partial
+  # delegation rather than a clean GPU pipeline. It is offered so it can be
+  # measured; CPU stays selected until it is. The three models total about
+  # 1.04 GiB, which leaves real headroom under the iOS per-process memory
+  # limit -- unlike the llm-* benchmarks.
   delegate_choice: {
     delegate_name: "CPU"
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_decoder_dynamic_fp16.tflite"
+      model_checksum: "165b70a01643e70a23e5e54a949be306"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_diffusion_model_dynamic_int8.tflite"
+      model_checksum: "ccfd761a2f8186c3669948515d40a880"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_text_encoder_dynamic_int8.tflite"
+      model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/timestep_embeddings_data.bin.ts"
+      model_checksum: "798b772155a69de5df44b304327bb3cc"
+    }
+  }
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_decoder_dynamic_fp16.tflite"
       model_checksum: "165b70a01643e70a23e5e54a949be306"
@@ -261,6 +288,17 @@ benchmark_setting {
 # and it read anywhere from 3319 MiB down to 2600 MiB on one iPhone run
 # depending on what had already run, so the benchmark list depended on when the
 # question was asked. A tested-device allowlist is the intended replacement.
+#
+# The Metal choice below was withdrawn once (see the git history) because the
+# delegate was killed by EXC_RESOURCE while still initialising: with GPU
+# constant-tensor sharing off, every signature in the graph carried its own
+# copy of the weights. The pipeline now turns that sharing on for Apple, which
+# is what the withdrawal was missing, so the choice is offered again -- but
+# CPU stays selected. Two reasons: the fix has not been measured on a device
+# yet, and an EXC_RESOURCE kill cannot be caught, so a delegate that runs out
+# of budget takes the app down instead of falling back. Select Metal
+# deliberately, watch the "[mem] llm: before GPU compile" line, and only make
+# it the default once it has been shown to survive on the target devices.
 
 benchmark_setting {
   benchmark_id: "llm-1b"
@@ -276,6 +314,26 @@ benchmark_setting {
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
       model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  # The Metal choice uses the dedicated GPU export, exactly as on Android; the
+  # delegate-level model_filename overrides the benchmark-level one. It is
+  # offered but not selected: see the note above this benchmark.
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/llama_q8_ekv3072_litert.tflite"
+      model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+    custom_setting {
+      id: "model_filename"
+      value: "llama_q8_ekv3072_litert.tflite"
     }
   }
   delegate_selected: "CPU"
@@ -307,6 +365,26 @@ benchmark_setting {
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
       model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+  }
+  # The Metal choice uses the dedicated GPU export, exactly as on Android; the
+  # delegate-level model_filename overrides the benchmark-level one. It is
+  # offered but not selected: see the note above this benchmark.
+  delegate_choice: {
+    delegate_name: "Metal"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/llama_q8_ekv3072_litert.tflite"
+      model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
+      model_checksum: "2ad260fc18b965ce16006d76c9327082"
+    }
+    custom_setting {
+      id: "model_filename"
+      value: "llama_q8_ekv3072_litert.tflite"
     }
   }
   delegate_selected: "CPU"
