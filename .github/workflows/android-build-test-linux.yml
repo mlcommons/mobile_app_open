@@ -71,6 +71,11 @@ jobs:
       # after every run. The auth step below exports
       # GOOGLE_APPLICATION_CREDENTIALS, which --google_default_credentials
       # picks up. Same pattern as the Xcode Cloud build (ci_post_clone.sh).
+      #
+      # This only pays off together with --incompatible_strict_action_env in
+      # .bazelrc: setup-gcloud puts a per-run random path on PATH, and bazel
+      # bakes PATH into every action key, so before that flag the cache held
+      # ~19k entries and still hit 7 of 4497 actions.
       BAZEL_CACHE_ARG: "--remote_cache=https://storage.googleapis.com/mobile-app-build-290400_github-actions/bazel-cache/linux-android --google_default_credentials"
       GCLOUD_BUCKET_PATH: gs://mobile-app-build-290400_github-actions/build/${{ needs.computed.outputs.build_number }}
       FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
@@ -320,10 +325,27 @@ jobs:
       - build-android-apk
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-22.04
-    timeout-minutes: 90
+    timeout-minutes: 135
+    # BrowserStack allows only 2 parallel sessions on this account, so a
+    # superseded run's device tests starve the current one and it fails with
+    # BROWSERSTACK_ALL_PARALLELS_IN_USE. Cancel the previous run's job for the
+    # same device as soon as a new commit arrives.
+    #
+    # Deliberately per job rather than workflow-wide: the build jobs must always
+    # run to completion. GitHub runners are plentiful, and a build that finishes
+    # is what populates the bazel cache for every later run.
+    #
+    # The group has to include the matrix values, or the legs of a single run
+    # would cancel each other. It deliberately leaves the job name out so that
+    # an older run's -extended leg is also cancelled by a newer run's -unified
+    # leg for the same device; within one run those never overlap, because
+    # -extended and -single both need -unified.
+    concurrency:
+      group: browserstack-${{ github.ref }}-${{ matrix.backend }}-${{ matrix.device }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         include:
           - backend: "tflite"
@@ -423,10 +445,15 @@ jobs:
       - test-android-apk-unified
     if: github.ref == 'refs/heads/master' || vars.EXTENDED_TESTS_ON_PR == 'true'
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 135
+    # Same BrowserStack session budget as test-android-apk-unified above; see
+    # the comment there for why this is per job and per matrix leg.
+    concurrency:
+      group: browserstack-${{ github.ref }}-${{ matrix.backend }}-${{ matrix.device }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         include:
           - backend: "qti"
@@ -519,10 +546,15 @@ jobs:
       - computed
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 135
+    # Same BrowserStack session budget as test-android-apk-unified above; see
+    # the comment there for why this is per job and per matrix leg.
+    concurrency:
+      group: browserstack-${{ github.ref }}-${{ matrix.backend }}-${{ matrix.device }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         include:
           - backend: "tflite"
