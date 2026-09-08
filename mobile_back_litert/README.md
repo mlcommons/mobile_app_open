@@ -180,24 +180,30 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   partial delegation degrading to CPU, it is `CompiledModel::Create` returning
   an error.
 
-  The dynamic dimension is **the batch dimension, and only that**. Reading the
-  shape signatures back:
+  The declared batch dimension looks like the culprit and is not. Each model
+  does declare `-1` for batch (`tokens [-1,77]`, `latent [-1,64,64,4]`,
+  `input_1 [-1,64,64,4]`), but rewriting `shape_signature` in all three so they
+  report **0 dynamic tensors** changes nothing -- the compile fails identically.
+  That was worth testing before recommending it.
 
-  | model | signature | dynamic tensors |
+  The real cause is that the graphs compute their shapes at run time:
+  `SHAPE` -> `REDUCE_PROD`/`PACK`/`CONCATENATION` -> `RESHAPE`/`BROADCAST_TO`.
+  A `RESHAPE` whose shape operand is a computed tensor has a dynamic output no
+  matter how concrete the inputs are.
+
+  | model | total ops | shape-computing ops |
   |---|---|---|
-  | text encoder | `tokens/positions [-1, 77]` -> `[-1, 77, 768]` | 783 of 1332 |
-  | diffusion | `latent [-1,64,64,4]`, `context [-1,77,768]`, `timestep_embedding [-1,1280]` | 3305 of 5349 |
-  | decoder | `input_1 [-1,64,64,4]` -> `[-1,512,512,3]` | 738 of 1348 |
+  | text encoder | 1118 | 48 `SHAPE`, 96 `REDUCE_PROD`, 48 `PACK`, 240 `RESHAPE` |
+  | diffusion | 4558 | 402 `SHAPE`, 194 `REDUCE_PROD`, 657 `RESHAPE`, 366 `BROADCAST_TO` |
+  | decoder | 1180 | 150 `SHAPE`, 30 `PACK`, 64 `RESHAPE`, 180 `BROADCAST_TO` |
 
-  Every other dimension is already concrete, and the pipeline only ever runs
-  batch 1. So the earlier note that "a Metal choice would need dedicated fp32
-  exports" was right that new exports are needed and wrong about why: **what
-  they need is the batch dimension pinned to 1.** Re-quantizing or converting
-  to fp32 would not fix it on its own, and since all three fail, no mixed
-  CPU/GPU split rescues part of it either. There is no way to pin the shapes
-  from this side: LiteRT 2.1.5 only exposes `CompiledModel::Create` over a
-  filename or a buffer, so a resize can only happen after the compile that is
-  already failing.
+  So new exports have to be **converted with concrete input shapes**, so that
+  the converter constant-folds the shape arithmetic away instead of emitting
+  it. Patching the file afterwards cannot do it -- the ops are still there.
+  fp32 or re-quantization would not fix it either, and since all three fail,
+  no mixed CPU/GPU split rescues part of it. Nor can the backend work around
+  it: LiteRT 2.1.5 exposes `CompiledModel::Create` over a filename or a buffer
+  only, so a resize can happen only after the compile that is already failing.
 
   The pipeline handles it correctly rather than pretending: the GPU attempt
   fails, everything built so far is released, the pages are handed back and
