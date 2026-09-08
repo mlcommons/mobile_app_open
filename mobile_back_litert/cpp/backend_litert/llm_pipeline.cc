@@ -84,7 +84,20 @@ void LLMPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
   backendExists = false;
   // Reported after the delete so a benchmark that follows this one can be told
   // apart from one that inherits memory this pipeline never gave back.
-  LITERT_LOG_MEM("llm: backend deleted");
+  LITERT_LOG_MEM("llm: backend deleted (before reclaim)");
+#if defined(__APPLE__)
+  // Destroying the model is not enough to make a release visible to the limit:
+  // free() leaves the pages on libmalloc's free list and phys_footprint --
+  // which is what EXC_RESOURCE measures -- still counts them. The stable
+  // diffusion pipeline reclaims for this reason and measured 2.3 GiB from it.
+  //
+  // This only reaches host allocations. It cannot release GPU resources the
+  // runtime never freed, so it is an adjunct here, not the fix for the Metal
+  // teardown leak -- see patches/custom_buffer_teardown.patch for that. The
+  // two log lines around it are what tell the difference apart on device.
+  litert_apple::ReturnFreeMemoryToOS();
+  LITERT_LOG_MEM("llm: backend deleted (after reclaim)");
+#endif  // defined(__APPLE__)
 }
 
 // Create a new backend and return the pointer to it.

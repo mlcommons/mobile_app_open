@@ -57,8 +57,16 @@ struct LLMBackendData {
   const char* vendor = "Google";
   const char* accelerator = "CPU";
 
-  std::unique_ptr<litert::CompiledModel> model;
+  // LiteRT requires the environment to outlive the compiled model built in it
+  // ("the provided environment must outlive the compiled model and any
+  // executions running on it" -- litert_compiled_model.h). The destructor
+  // below is what enforces that here: it clears the buffers, then the model,
+  // then the environment, and a destructor body runs before its members are
+  // destroyed. Declaration order is kept consistent with it anyway -- and with
+  // the ordering SDBackendData documents -- so the two cannot drift if that
+  // destructor is ever simplified away.
   std::unique_ptr<litert::Environment> env;
+  std::unique_ptr<litert::CompiledModel> model;
   std::vector<std::pair<size_t, size_t>> prefill_sigs;  // (sig_idx, seq_size)
   std::vector<litert::TensorBuffer> decode_input_bufs;
   std::vector<litert::TensorBuffer> decode_output_bufs;
