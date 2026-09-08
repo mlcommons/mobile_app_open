@@ -56,6 +56,27 @@ jobs:
           choco install -y --no-progress make --version 4.3
           choco install -y --no-progress protoc --version 23.2
           python -m pip install --quiet numpy==1.26.4 absl-py==2.1.0
+      - name: Install perl into msys2
+        # Bazel runs genrules through BAZEL_SH with a fixed PATH of
+        # C:\msys64\usr\bin;C:\msys64\bin plus the Windows directories, so the
+        # Strawberry Perl the runner image ships under C:\Strawberry is
+        # invisible to them. The TFLite acceleration/configuration schema
+        # genrules shell out to perl, and the image installs msys2 with the
+        # base package set only, which has sed but not perl. Without this the
+        # build fails with "perl: command not found" on a cold cache; runs that
+        # restored a warm bazel disk cache never executed the genrule and so
+        # kept the gap hidden.
+        shell: pwsh
+        run: |
+          $pacman = 'C:\msys64\usr\bin\pacman.exe'
+          # The image's package database is a few days old, so a mirror may
+          # already have rotated the package away; re-sync it and retry.
+          & $pacman -S --noconfirm --needed --noprogressbar --disable-download-timeout perl
+          if ($LASTEXITCODE -ne 0) {
+            & $pacman -Sy --noconfirm --needed --noprogressbar --disable-download-timeout perl
+          }
+          if ($LASTEXITCODE -ne 0) { throw 'failed to install msys2 perl' }
+          & C:\msys64\usr\bin\perl.exe --version
       - name: Use bazelisk as bazel
         # The runner image ships a plain `bazel` binary (a current major
         # version that no longer supports WORKSPACE) and an npm-based
