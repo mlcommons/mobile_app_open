@@ -120,6 +120,11 @@ Apple GPU via the same Metal accelerator iOS uses, one MMLU query, MiB of
 | peak (prefill Run) | 3392 | 3464 | 5839 |
 | time per output token | 49.10 ms | **16.28 ms** | -- |
 | first token latency | 2.433 s | **1.229 s** | -- |
+| TinyMMLU accuracy (100 samples) | 42.00% | 41.00% | -- |
+
+The accuracy line matters as much as the speed one: one sample in a hundred
+separates them, which is what an fp16 GPU path against an int8/fp32 CPU path
+should look like. Metal is not trading correctness for the 3x.
 
 Two things follow. **Metal costs what CPU costs** once constant-tensor sharing
 is on -- 2055 against 2094 after compile, and 72 MiB more at peak -- so a

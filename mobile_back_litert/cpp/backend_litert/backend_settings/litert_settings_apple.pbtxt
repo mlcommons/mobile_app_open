@@ -322,7 +322,11 @@ benchmark_setting {
 #   after compile          2094      2055        4497
 #   peak (prefill Run)     3392      3464        5839
 #   time per output token 49.10ms   16.28ms       --
-#   TinyMMLU accuracy        --      41.00%       --
+#   TinyMMLU accuracy      42.00%    41.00%       --
+#
+# One sample in a hundred separates the accuracies, which is what an fp16 GPU
+# path against an int8/fp32 CPU path should look like -- the 3x is not being
+# bought with correctness.
 #
 # So Metal costs what CPU costs (+72 MiB at peak) and decodes 3.0x faster,
 # while the unfixed path needed 4497 MiB to compile against a 3376 MB device
