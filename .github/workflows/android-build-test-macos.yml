@@ -38,7 +38,10 @@ jobs:
       WITH_SAMSUNG: 0
       WITH_APPLE: 0
       BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
-      BAZEL_CACHE_ARG: "--disk_cache=/tmp/bazel_cache"
+      # BAZEL_CACHE_ARG is set by the "Configure bazel cache" step below: the
+      # GCS remote cache needs a credential that pull_request runs from forks
+      # do not get, so it falls back to a local disk cache there.
+      HAS_GCLOUD_CREDS: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD != '' }}
       FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
       FIREBASE_ANDROID_API_KEY: ${{ secrets.FIREBASE_ANDROID_API_KEY }}
       FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
@@ -52,12 +55,52 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-      - name: Cache bazel
+      # Two cache layers: a local disk cache in front of the GCS remote cache.
+      #
+      # The old key was `${{ runner.os }}-bazel_cache-${{ hashFiles(...) }}` over
+      # /tmp/bazel_cache, declared identically by this job and both iOS matrix
+      # jobs, all on macos-15 -- so all three resolved to one key, and
+      # actions/cache lets only one of them write it. This job always lost:
+      # "Failed to save: Unable to reserve cache ... another job may be creating
+      # this cache", and on the next run it restored 166 MB of the iOS job's
+      # --config=ios entries and asked bazel for --config=android_arm64 keys.
+      # Zero hits was the correct answer, and this job had never once saved a
+      # cache of its own. The key below is specific to this configuration.
+      #
+      # GCS then backs it up: it has no reservation race and no write-once rule,
+      # so it stays warm across the key rotations that leave the disk layer cold.
+      - name: Cache bazel disk layer
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: /tmp/bazel_cache
-          key: ${{ runner.os }}-bazel_cache-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
-          restore-keys: ${{ runner.os }}-bazel_cache-
+          key: ${{ runner.os }}-bazel-android-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-bazel-android-
+      - name: Set up authentication for Google Cloud SDK
+        if: env.HAS_GCLOUD_CREDS == 'true'
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD }}
+      - name: Set up Google Cloud SDK
+        if: env.HAS_GCLOUD_CREDS == 'true'
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        with:
+          version: '>= 363.0.0'
+          project_id: mobile-app-build-290400
+      - name: Configure bazel cache
+        run: |
+          set -euo pipefail
+          if [ "${HAS_GCLOUD_CREDS}" = "true" ]; then
+            # Disk first, GCS second. Bazel reads the disk cache before going to
+            # the network and writes both, so a warm disk layer keeps this job as
+            # fast as it was on disk alone while GCS covers the cold cases.
+            # Note that setup-gcloud above puts a per-run random path on PATH.
+            # That is exactly what broke the Linux cache, and it is harmless
+            # only because .bazelrc sets --incompatible_strict_action_env.
+            echo "BAZEL_CACHE_ARG=--disk_cache=/tmp/bazel_cache --remote_cache=https://storage.googleapis.com/mobile-app-build-290400_github-actions/bazel-cache/macos-android --google_default_credentials" >> "$GITHUB_ENV"
+          else
+            echo "No GCS credentials (fork pull request?); using the disk cache only."
+            echo "BAZEL_CACHE_ARG=--disk_cache=/tmp/bazel_cache" >> "$GITHUB_ENV"
+          fi
       - name: Install dependencies
         run: |
           brew update --quiet || true
