@@ -193,15 +193,23 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "stable_diffusion"
   framework: "LiteRT"
-  # The shipped exports are dynamic_int8 (text encoder, diffusion) and
-  # dynamic_fp16 (decoder), aimed at CPU/XNNPACK, and no fp32 export of them
-  # exists to switch to -- the storage bucket has none. The Metal choice below
-  # therefore runs those same files with the GPU accelerator asked for
-  # alongside CPU, so ops the delegate cannot take still run: expect partial
-  # delegation rather than a clean GPU pipeline. It is offered so it can be
-  # measured; CPU stays selected until it is. The three models total about
-  # 1.04 GiB, which leaves real headroom under the iOS per-process memory
-  # limit -- unlike the llm-* benchmarks.
+  # MEASURED: Metal does not work for this benchmark with the models that ship
+  # today, and the reason is shapes, not quantization. Compiled against the
+  # Metal accelerator on a macOS host, all three exports fail
+  # CompiledModel::Create with "a delegate that only supports static-sized
+  # tensors with a graph that has dynamic-sized tensors" -- text encoder,
+  # diffusion and decoder alike. Setting no GPU options at all fails
+  # identically, so it is not the option set. New exports would have to be
+  # STATIC-SHAPED; fp32 alone would not fix it, and since all three fail there
+  # is no CPU/GPU split that rescues part of it.
+  #
+  # The choice is kept so this stays a measurement rather than an assumption,
+  # and because the pipeline handles it correctly: the GPU attempt fails, what
+  # was built is released, and the three recompile on CPU, which runs a full
+  # 20-step query and reports CPU. Selecting Metal here costs nothing extra to
+  # download -- it names the same four files as the CPU choice. The three
+  # models total about 1.04 GiB, which leaves real headroom under the iOS
+  # per-process memory limit -- unlike the llm-* benchmarks.
   delegate_choice: {
     delegate_name: "CPU"
     accelerator_name: "cpu"
@@ -290,15 +298,28 @@ benchmark_setting {
 # question was asked. A tested-device allowlist is the intended replacement.
 #
 # The Metal choice below was withdrawn once (see the git history) because the
-# delegate was killed by EXC_RESOURCE while still initialising: with GPU
-# constant-tensor sharing off, every signature in the graph carried its own
-# copy of the weights. The pipeline now turns that sharing on for Apple, which
-# is what the withdrawal was missing, so the choice is offered again -- but
-# CPU stays selected. Two reasons: the fix has not been measured on a device
-# yet, and an EXC_RESOURCE kill cannot be caught, so a delegate that runs out
-# of budget takes the app down instead of falling back. Select Metal
-# deliberately, watch the "[mem] llm: before GPU compile" line, and only make
-# it the default once it has been shown to survive on the target devices.
+# delegate was killed by EXC_RESOURCE while still initialising. The cause was
+# GPU constant-tensor sharing being off, which gives each subgraph its own copy
+# of the weights; the pipeline now turns it on for Apple.
+#
+# MEASURED on a macOS host through mobile_back_apple/dev-utils, MiB of
+# phys_footprint (the counter EXC_RESOURCE compares against), one MMLU query:
+#
+#                          CPU     Metal on    Metal off
+#   after compile          2094      2055        4497
+#   peak (prefill Run)     3392      3464        5839
+#   time per output token 49.10ms   16.28ms       --
+#   TinyMMLU accuracy        --      41.00%       --
+#
+# So Metal costs what CPU costs (+72 MiB at peak) and decodes 3.0x faster,
+# while the unfixed path needed 4497 MiB to compile against a 3376 MB device
+# cap -- which is the crash, exactly.
+#
+# CPU is still what is selected. The measurement is on a host, not a device;
+# an EXC_RESOURCE kill cannot be caught, so a delegate that runs out of budget
+# takes the app down rather than falling back; and the one iOS device this was
+# tried on crashed. Given a device run where CPU llm-1b already passes, Metal
+# should pass too and this should become the default -- it is this one line.
 #
 # Offering it is not free: listResources() in benchmark.dart walks every
 # delegate_choice, so the GPU export is downloaded whether or not Metal is

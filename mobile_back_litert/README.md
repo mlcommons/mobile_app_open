@@ -73,8 +73,67 @@ WITH_LITERT=1 make flutter/ios
   `LiteRtGpuBackend` has no Metal enumerator: on Apple, Metal is selected by
   `kLiteRtGpuBackendAutomatic` plus compile-time Metal support.
 * `stable_diffusion` and the `llm-*` benchmarks each offer a Metal choice, and
-  **CPU stays selected for both**. They are offered to be measured, not as
-  defaults; nothing below has been confirmed on a device yet.
+  **CPU stays selected for both**. `llm-1b` on Metal is measured and good (see
+  the table below); it is still not the default because the measurement is on
+  a macOS host, an `EXC_RESOURCE` kill on device cannot be caught, and the one
+  iOS device this was ever tried on crashed. Flipping the default is a one-line
+  change in the settings file once a device run confirms it.
+  `stable_diffusion` on Metal does **not** work at all -- see below -- and the
+  choice exists only so that stops being a guess.
+
+### Measuring this without a device
+
+The dev-utils CLI (`mobile_back_apple/dev-utils/Makefile`) runs a backend `.so`
+on the host, which is far faster than an app build and is how the numbers below
+were produced. macOS has no per-process jetsam cap, so a crash does not
+reproduce there -- but `phys_footprint`, the counter `EXC_RESOURCE` compares
+against, is reported at every phase, so "this delegate costs N MiB" transfers
+straight to the device budget.
+
+```bash
+bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
+  --macos_minimum_os=14.0 \
+  //flutter/cpp/binary:main \
+  //mobile_back_litert/cpp/backend_litert:liblitertbackend.so
+# put the macos_arm64 accelerator next to the .so; the loose layout is what
+# GetAppleRuntimeLibraryDir expects from a command-line harness
+curl -fSL -o <dir>/libLiteRtMetalAccelerator.dylib \
+  https://storage.googleapis.com/litert/binaries/2.1.5/macos_arm64/libLiteRtMetalAccelerator.dylib
+bazel-bin/flutter/cpp/binary/main EXTERNAL llm-1b --mode=PerformanceOnly \
+  --model_file=<dir with the model> --lib_path=<dir>/liblitertbackend.so \
+  --input_tfrecord=tinymmlu.tfrecord --sp_path=llama3_1b.spm.model
+```
+
+The CLI copies `delegate_selected` out of the settings verbatim and has no flag
+to override it, so testing the Metal choice means flipping `delegate_selected`
+in `litert_settings_apple.pbtxt` and rebuilding the `.so` (the settings are
+compiled into it).
+
+### llm-1b on Metal, measured
+
+Apple GPU via the same Metal accelerator iOS uses, one MMLU query, MiB of
+`phys_footprint`:
+
+| stage | CPU | Metal, sharing **on** | Metal, sharing **off** |
+|---|---|---|---|
+| after compile | 2094 | 2055 | 4497 |
+| peak (prefill Run) | 3392 | 3464 | 5839 |
+| time per output token | 49.10 ms | **16.28 ms** | -- |
+| first token latency | 2.433 s | **1.229 s** | -- |
+
+Two things follow. **Metal costs what CPU costs** once constant-tensor sharing
+is on -- 2055 against 2094 after compile, and 72 MiB more at peak -- so a
+device that runs `llm-1b` on CPU has the headroom to run it on Metal. And
+**Metal is 3.0x faster per output token** and 2.0x faster to first token, which
+is the opposite of the Android GPU result (about half of CPU) that the earlier
+"nothing is lost" reasoning leaned on.
+
+The third column is the bug. With sharing off the compile alone costs 4497 MiB
+against a 3376 MB device cap, which is precisely the iPad mini crash: killed
+inside `delegate_kernel.cc` "Initializing Metal-based API from graph", before
+the model finished compiling. The log shows exactly two of those lines -- the
+prefill and decode subgraphs -- and 4497 - 2055 = 2442 MiB is one extra copy of
+the weights. That is what `EnableConstantTensorSharing` collapses.
 * Offering the LLM choice costs a download. `listResources()` in
   `benchmark.dart` walks every `delegate_choice`, so the GPU export is fetched
   whether or not Metal is ever selected: +1.25 GB on iOS, once, since `llm-1b`
@@ -104,18 +163,34 @@ WITH_LITERT=1 make flutter/ios
   is no fallback to catch it: if the budget runs out the app goes down. Watch
   the `[mem] llm: before GPU compile` and `[mem] llm: after GPU compile` lines
   to see what the delegate actually costs.
-* For `stable_diffusion` the Metal choice runs the same files as CPU. The
-  shipped exports are `dynamic_int8` (text encoder, diffusion) and
-  `dynamic_fp16` (decoder), aimed at CPU/XNNPACK, and no fp32 export of them
-  exists to switch to -- the model bucket has none. So the pipeline asks for
-  GPU with CPU alongside it and lets ops the delegate cannot take stay on CPU:
-  partial delegation is the expected outcome, and
-  `EnableAllowSrcQuantizedFcConvOps` is what lets the delegate take the
-  quantized FC/conv ops at all. All three models compile on the same
-  accelerator or none do, because the benchmark reports a single accelerator
-  name; if the GPU attempt fails the pipeline releases what it built and
-  retries the three on CPU. Measured on an iPad mini on CPU at about 4.4-5.6 s
-  per diffusion step, so roughly 100 s for the default 20 steps.
+* **`stable_diffusion` cannot use Metal with the models that ship today, and
+  the reason is not the quantization.** Each of the three was compiled against
+  the Metal accelerator on the host and each one failed:
+
+  ```
+  WARNING: Attempting to use a delegate that only supports static-sized tensors
+           with a graph that has dynamic-sized tensors
+  [probe] text_encoder on GPU: FAILED
+  [probe] diffusion   on GPU: FAILED
+  [probe] decoder     on GPU: FAILED
+  ```
+
+  The Metal delegate takes static shapes only, and all three exports carry a
+  dynamic dimension. This is not caused by the GPU options -- compiling with
+  none of them set fails identically -- and it is not partial delegation
+  degrading to CPU, it is `CompiledModel::Create` returning an error. So the
+  earlier note that "a Metal choice would need dedicated fp32 exports" was
+  right about needing new exports and wrong about why: what they need is
+  **static shapes**. fp32 alone would not fix it, and since all three fail,
+  no mixed CPU/GPU split rescues part of it either.
+
+  The pipeline handles it correctly rather than pretending: the GPU attempt
+  fails, everything built so far is released, the pages are handed back and
+  the three recompile on CPU. A full 20-step query then runs to completion and
+  reports `CPU`. All three compile on one accelerator or none do, because the
+  benchmark reports a single accelerator name. Measured on an iPad mini on CPU
+  at about 4.4-5.6 s per diffusion step, so roughly 100 s for 20 steps; on the
+  host the same query takes about 44 s.
 * **A query has two phases and they do not fit in memory together.** The three
   models are compiled up front and stay resident, which is fine on Android but
   not here. Measured on an iPhone 16 Pro, in MiB still available before the
