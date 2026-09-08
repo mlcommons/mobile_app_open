@@ -175,14 +175,29 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   [probe] decoder     on GPU: FAILED
   ```
 
-  The Metal delegate takes static shapes only, and all three exports carry a
-  dynamic dimension. This is not caused by the GPU options -- compiling with
-  none of them set fails identically -- and it is not partial delegation
-  degrading to CPU, it is `CompiledModel::Create` returning an error. So the
-  earlier note that "a Metal choice would need dedicated fp32 exports" was
-  right about needing new exports and wrong about why: what they need is
-  **static shapes**. fp32 alone would not fix it, and since all three fail,
-  no mixed CPU/GPU split rescues part of it either.
+  The Metal delegate takes static shapes only. This is not caused by the GPU
+  options -- compiling with none of them set fails identically -- and it is not
+  partial delegation degrading to CPU, it is `CompiledModel::Create` returning
+  an error.
+
+  The dynamic dimension is **the batch dimension, and only that**. Reading the
+  shape signatures back:
+
+  | model | signature | dynamic tensors |
+  |---|---|---|
+  | text encoder | `tokens/positions [-1, 77]` -> `[-1, 77, 768]` | 783 of 1332 |
+  | diffusion | `latent [-1,64,64,4]`, `context [-1,77,768]`, `timestep_embedding [-1,1280]` | 3305 of 5349 |
+  | decoder | `input_1 [-1,64,64,4]` -> `[-1,512,512,3]` | 738 of 1348 |
+
+  Every other dimension is already concrete, and the pipeline only ever runs
+  batch 1. So the earlier note that "a Metal choice would need dedicated fp32
+  exports" was right that new exports are needed and wrong about why: **what
+  they need is the batch dimension pinned to 1.** Re-quantizing or converting
+  to fp32 would not fix it on its own, and since all three fail, no mixed
+  CPU/GPU split rescues part of it either. There is no way to pin the shapes
+  from this side: LiteRT 2.1.5 only exposes `CompiledModel::Create` over a
+  filename or a buffer, so a resize can only happen after the compile that is
+  already failing.
 
   The pipeline handles it correctly rather than pretending: the GPU attempt
   fails, everything built so far is released, the pages are handed back and

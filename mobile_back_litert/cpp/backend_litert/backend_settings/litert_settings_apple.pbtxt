@@ -199,9 +199,13 @@ benchmark_setting {
   # CompiledModel::Create with "a delegate that only supports static-sized
   # tensors with a graph that has dynamic-sized tensors" -- text encoder,
   # diffusion and decoder alike. Setting no GPU options at all fails
-  # identically, so it is not the option set. New exports would have to be
-  # STATIC-SHAPED; fp32 alone would not fix it, and since all three fail there
-  # is no CPU/GPU split that rescues part of it.
+  # identically, so it is not the option set. The dynamic dimension is the
+  # BATCH dimension and only that -- tokens [-1,77], latent [-1,64,64,4],
+  # input_1 [-1,64,64,4] and so on, everything else already concrete -- and it
+  # spreads to 783/1332, 3305/5349 and 738/1348 tensors. The pipeline only ever
+  # runs batch 1, so what new exports need is the batch dimension pinned to 1;
+  # fp32 or re-quantization would not fix it, and since all three fail there is
+  # no CPU/GPU split that rescues part of it.
   #
   # The choice is kept so this stays a measurement rather than an assumption,
   # and because the pipeline handles it correctly: the GPU attempt fails, what
