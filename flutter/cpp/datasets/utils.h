@@ -15,7 +15,7 @@ limitations under the License.
 #ifndef MLPERF_DATASETS_UTILS_H_
 #define MLPERF_DATASETS_UTILS_H_
 
-#include "tensorflow/lite/tools/evaluation/utils.h"
+#include "tflite/tools/evaluation/utils.h"
 
 namespace mlperf {
 namespace mobile {

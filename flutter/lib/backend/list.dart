@@ -12,20 +12,14 @@ part 'list.gen.dart';
 class BackendInfoHelper {
   static const fallbackBackend = 'libtflitebackend';
 
-  // When true, the TFLite fallback backend can be offered alongside a matching
-  // vendor backend, subject to that backend's BackendSetting.fallback_policy.
-  // Offering the fallback is opt-in: it stays suppressed unless the matched
-  // vendor backend declares FALLBACK_FILL_GAPS or FALLBACK_COEXIST.
-  // When false, the fallback is probed only when no vendor backend matches,
-  // which reproduces the historical single-backend-per-session behavior
-  // regardless of vendor policies.
-  static const alwaysOfferFallback = true;
-
-  // Returns all matching backends in priority order
-  // (the order of _backendsList, vendor backends before the fallback).
-  List<BackendInfo> findMatchingBackends({
-    bool alwaysOfferFallback = BackendInfoHelper.alwaysOfferFallback,
-  }) {
+  // Returns all matching backends in priority order (the order of
+  // _backendsList, vendor backends before the fallback). Whether a matched
+  // backend is actually offered for a given benchmark is decided per
+  // benchmark in BenchmarkStore: the priority walk over these matches stops
+  // after the first claiming backend whose claim_policy is
+  // CLAIM_EXCLUSIVE (the default), so each backend controls whether
+  // lower-priority backends stay selectable for benchmarks it claims.
+  List<BackendInfo> findMatchingBackends() {
     final matches = <BackendInfo>[];
     // Try to match all backends except the fallback
     for (var name in getBackendsList()) {
@@ -37,15 +31,12 @@ class BackendInfoHelper {
       }
     }
 
-    final fallbackDisabled = matches.any(
-      (m) => m.settings.fallbackPolicy == pb.FallbackPolicy.FALLBACK_DISABLED,
-    );
-    if (matches.isEmpty || (alwaysOfferFallback && !fallbackDisabled)) {
-      print('Checking $fallbackBackend');
-      final backendSettings = match(fallbackBackend);
-      if (backendSettings != null) {
-        matches.add(BackendInfo._(backendSettings, fallbackBackend));
-      }
+    // The fallback is always probed last; per-benchmark visibility is
+    // governed by the claim policies of the backends above it.
+    print('Checking $fallbackBackend');
+    final backendSettings = match(fallbackBackend);
+    if (backendSettings != null) {
+      matches.add(BackendInfo._(backendSettings, fallbackBackend));
     }
     if (matches.isEmpty) {
       throw 'no matching backend found';

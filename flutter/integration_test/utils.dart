@@ -11,6 +11,7 @@ import 'package:mlperfbench/data/environment/environment_info.dart';
 import 'package:mlperfbench/data/extended_result.dart';
 import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/benchmark/state.dart';
+import 'package:mlperfbench/device_info.dart';
 import 'package:mlperfbench/main.dart' as app;
 
 import 'expected_accuracy.dart';
@@ -94,6 +95,36 @@ Future<void> validateSettings(WidgetTester tester) async {
   }
 }
 
+// Devices where the test pins every benchmark to one backend (when that
+// backend is a candidate for the benchmark). The app's default selection
+// follows the backend priority order, so without this the LiteRT vision
+// runs would never execute in CI: the pixel backend outranks litert on
+// Pixel devices.
+const deviceBackendOverride = <String, String>{
+  'Pixel 10 Pro': BackendId.litert,
+};
+
+void applyDeviceBackendOverride(WidgetTester tester) {
+  final deviceModel = getDeviceModel(DeviceInfo.instance.envInfo);
+  final backendLib = deviceBackendOverride[deviceModel];
+  if (backendLib == null) return;
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  for (final benchmark in benchmarkState.allBenchmarks) {
+    if (benchmark.selectBackend(backendLib)) {
+      debugPrint(
+        'Backend override on $deviceModel: '
+        '${benchmark.id} runs on $backendLib',
+      );
+    } else {
+      debugPrint(
+        'Backend override on $deviceModel: '
+        '$backendLib is not a candidate for ${benchmark.id}',
+      );
+    }
+  }
+}
+
 bool hasBenchmark(WidgetTester tester, String benchmarkId) {
   final state = tester.state(find.byType(MaterialApp));
   final benchmarkState = state.context.read<BenchmarkState>();
@@ -108,7 +139,13 @@ bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
   );
   if (benchmark == null) return false;
   final selectedLib = benchmark.selectedBackend.info.libName;
-  if (benchmarkId == 'stable_diffusion') {
+  // Stable diffusion has a backend setting only on QTI and LiteRT (CPU,
+  // see litert_settings_android). Every other backend would fall back to
+  // TFLite, which is far too slow for a CI device session. LiteRT is not
+  // short-circuited here: it falls through to the checks below so that,
+  // like the other benchmarks it claims, it runs only where LiteRT is the
+  // primary backend or is pinned via deviceBackendOverride.
+  if (benchmarkId == 'stable_diffusion' && selectedLib != BackendId.litert) {
     return selectedLib == BackendId.qti;
   }
   // The TFLite fallback is now offered alongside vendor backends, so
@@ -118,6 +155,30 @@ bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
   // (e.g. LLM on CPU) blows the CI job timeout on vendor devices.
   final primaryLib = benchmarkState.matchedBackends.first.libName;
   if (primaryLib != BackendId.tflite && selectedLib == BackendId.tflite) {
+    return false;
+  }
+  // The LiteRT backend fills the LLM gap on every Android device, but a
+  // vendor device job should run LLM only with the vendor's own support:
+  // a LiteRT CPU result says nothing about the vendor stack. LiteRT's
+  // on-device LLM coverage comes from the pixel and tflite jobs.
+  const llmVendorLibs = [BackendId.qti, BackendId.samsung, BackendId.mediatek];
+  if (benchmarkId.startsWith('llm') &&
+      llmVendorLibs.contains(primaryLib) &&
+      selectedLib != primaryLib) {
+    return false;
+  }
+  // Same reasoning for the vision/NLP benchmarks LiteRT claims: on a
+  // device job dedicated to another backend, a benchmark that defaults to
+  // LiteRT is one the primary backend does not claim. Skip it to keep
+  // that job's coverage and runtime unchanged. Jobs pinned to LiteRT via
+  // deviceBackendOverride (and the litert-only APK, where LiteRT is
+  // primary) still run everything on LiteRT.
+  final overrideLib =
+      deviceBackendOverride[getDeviceModel(DeviceInfo.instance.envInfo)];
+  if (!benchmarkId.startsWith('llm') &&
+      selectedLib == BackendId.litert &&
+      primaryLib != BackendId.litert &&
+      overrideLib != BackendId.litert) {
     return false;
   }
   return true;
@@ -195,9 +256,15 @@ Future<void> runBenchmarks(WidgetTester tester) async {
     await tester.tap(goButton);
   }
 
+  // The go button md5-validates every resource of the active benchmarks
+  // before the run starts, covering all delegate choices of the selected
+  // backend. For the LLM benchmarks that is two ~1.2 GB models (CPU and
+  // GPU delegates), which takes 30-60s on slower devices, so the progress
+  // screen can take a while to appear.
+  const progressScreenTimeout = 5 * 60;
   var progressCircleIsPresented = await waitFor(
     tester,
-    30,
+    progressScreenTimeout,
     const Key(WidgetKeys.progressCircle),
   );
   expect(
@@ -259,18 +326,26 @@ void printResult(ExtendedResult extendedResult) {
   }
 }
 
-void checkResult(ExtendedResult extendedResult) {
+// [expectAccuracy] is the run mode's doAccuracyRun: quickRun skips the
+// accuracy phase entirely, so there is no accuracy to check.
+void checkResult(
+  ExtendedResult extendedResult, {
+  required bool expectAccuracy,
+}) {
   for (final benchmarkResult in extendedResult.results) {
     debugPrint('Checking ${benchmarkResult.benchmarkId}');
     expect(benchmarkResult.performanceRun, isNotNull);
     expect(benchmarkResult.performanceRun!.throughput, isNotNull);
 
-    checkAccuracy(benchmarkResult);
+    checkAccuracy(benchmarkResult, expectAccuracy: expectAccuracy);
     checkThroughput(benchmarkResult, extendedResult.environmentInfo);
   }
 }
 
-void checkAccuracy(BenchmarkExportResult benchmarkResult) {
+void checkAccuracy(
+  BenchmarkExportResult benchmarkResult, {
+  required bool expectAccuracy,
+}) {
   var tag = '[benchmarkId: ${benchmarkResult.benchmarkId}';
   final expectedMap = benchmarkExpectedAccuracy[benchmarkResult.benchmarkId];
   expect(
@@ -299,19 +374,29 @@ void checkAccuracy(BenchmarkExportResult benchmarkResult) {
     reason: 'missing expected accuracy for $tag',
   );
 
+  if (!expectAccuracy) {
+    debugPrint('Run mode has no accuracy phase; skipping accuracy check.');
+    return;
+  }
+
   final accuracyRun = benchmarkResult.accuracyRun;
   accuracyRun!;
 
   final accuracy = accuracyRun.accuracy;
   accuracy!;
+  // The native code computes accuracy in float32, so a score exactly at a
+  // bound can convert to a double just outside it
+  // (e.g. float32(0.82) == 0.8199999928...). Tolerate that representation
+  // error when comparing against the bounds.
+  const accuracyTolerance = 1e-6;
   expect(
     accuracy.normalized,
-    greaterThanOrEqualTo(expectedValue.min),
+    greaterThanOrEqualTo(expectedValue.min - accuracyTolerance),
     reason: 'accuracy for $tag is too low',
   );
   expect(
     accuracy.normalized,
-    lessThanOrEqualTo(expectedValue.max),
+    lessThanOrEqualTo(expectedValue.max + accuracyTolerance),
     reason: 'accuracy for $tag is too high',
   );
 }

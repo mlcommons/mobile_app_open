@@ -18,6 +18,7 @@ all: flutter
 
 # available backends
 WITH_TFLITE?=1
+WITH_LITERT?=0
 WITH_QTI?=0
 WITH_SAMSUNG?=0
 WITH_PIXEL?=0
@@ -29,6 +30,7 @@ include tools/formatter/format.mk
 include tools/scanner/scan.mk
 
 include mobile_back_tflite/tflite_backend.mk
+include mobile_back_litert/litert_backend.mk
 include mobile_back_samsung/samsung_backend.mk
 include mobile_back_qti/make/qti_backend.mk
 include mobile_back_pixel/pixel_backend.mk

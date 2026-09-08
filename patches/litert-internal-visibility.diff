@@ -1,0 +1,16 @@
+  --- a/litert/c/internal/BUILD
+  +++ b/litert/c/internal/BUILD
+  @@ cc_library(
+       name = "litert_delegate_wrapper",
+       srcs = ["litert_delegate_wrapper.cc"],
+       hdrs = ["litert_delegate_wrapper.h"],
+  -    visibility = [
+  -        "//litert/runtime:__pkg__",
+  -        "//litert/runtime/accelerators:__subpackages__",
+  -    ],
+  +    visibility = ["//visibility:public"],
+       deps = [
+           "//litert/c:litert_common",
+           "//tflite/c:common",
+       ],
+  )

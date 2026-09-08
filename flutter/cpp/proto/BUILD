@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_linkopts")
+load("@litert//tflite:build_def.bzl", "tflite_linkopts")
+
+# The builtin py_binary's bootstrap template is not filled in correctly under
+# this workspace's rules_python, leaving %interpreter_args% placeholders in
+# the launcher; rules_python's own py_binary works.
+load("@rules_python//python:py_binary.bzl", "py_binary")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -53,7 +58,7 @@ cc_binary(
         "//flutter/cpp:utils",
         "//flutter/cpp/proto:mlperf_task_cc_proto",
         "@com_google_protobuf//:protobuf",
-        "@org_tensorflow//tensorflow/lite/tools:command_line_flags",
+        "@litert//tflite/tools:command_line_flags",
     ],
 )
 
