@@ -322,9 +322,12 @@ new_git_repository(
     patch_args = ["-p1"],
     patch_cmds = [
         "python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen",
-        # The generator stamps fetch-time timestamps into BuildDate{Local,Utc}.
-        # Pin them so the file (and everything linking loadgen) is
-        # byte-identical across CI jobs and can hit the shared bazel cache.
+        # The generator stamps datetime.now()/utcnow() into BuildDateLocal and
+        # BuildDateUtc, so this file -- and every action that compiles or links
+        # loadgen -- got a new content digest on every fetch. It was the only
+        # external repo file that differed between two fetches of the same
+        # commit. Pin the two timestamps so the repo is byte-identical across
+        # runs and can be served from the shared cache.
         "sed -i.bak -E 's/\"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.]+\"/\"1970-01-01T00:00:00\"/g' loadgen/version_generated.cc && rm -f loadgen/version_generated.cc.bak",
     ],
     patches = ["//patches:loadgen_mobile_update.patch"],
