@@ -108,8 +108,14 @@ cc_library(
 
 tflite_jni_binary(
     name = "liblitertbackend.so",
-    # Not //flutter/cpp/c:version_script.lds — this backend also exports the
-    # LiteRt* symbols for the dlopened GPU accelerator library.
+    # macOS uses exported_symbols, other platforms use linkscript -- passing
+    # only one of them silently produces a library that exports nothing on the
+    # other. Without exported_symbols this target links on macOS but yields a
+    # 179K stub with no mlperf_backend_* symbols, so the dev-utils CLI in
+    # mobile_back_apple cannot load it. Neither file is the //flutter/cpp/c one
+    # the sibling backends use: this backend also exports the LiteRt* symbols
+    # for the dlopened GPU accelerator library.
+    exported_symbols = "exported_symbols_litert.lds",
     linkscript = "version_script.lds",
     deps = [
         ":litert_c",

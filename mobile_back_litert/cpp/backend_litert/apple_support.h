@@ -17,13 +17,26 @@ limitations under the License.
 
 #if defined(__APPLE__)
 
+#include <TargetConditionals.h>
 #include <dlfcn.h>
 #include <malloc/malloc.h>
 #include <os/log.h>
-#include <os/proc.h>
 #include <sys/stat.h>
 
 #include <string>
+
+#if TARGET_OS_IPHONE
+#include <os/proc.h>
+#else
+// os_proc_available_memory() is explicitly unavailable on macOS: there is no
+// per-process high-watermark limit there to be available against. The dev-utils
+// CLI (mobile_back_apple/dev-utils) runs this backend on the host, so the file
+// still has to compile; report phys_footprint instead, which is the same
+// quantity EXC_RESOURCE measures on device and is what makes host runs
+// comparable to device ones.
+#include <mach/mach.h>
+#include <mach/task.h>
+#endif  // TARGET_OS_IPHONE
 
 #include "absl/log/log.h"
 
@@ -41,19 +54,33 @@ namespace litert_apple {
 // around the phases that allocate rather than reasoning about it from model
 // sizes. Cheap: a counter read, not a scan.
 inline void LogAvailableMemory(const char* stage) {
+#if TARGET_OS_IPHONE
   const size_t available = os_proc_available_memory();
   // 0 means the call is unavailable (it needs an app context), not that the
   // process is out of memory -- do not report that as an imminent kill.
   if (available == 0) return;
   const size_t mib = available / (1024 * 1024);
-  LOG(INFO) << "[mem] " << stage << ": " << mib
-            << " MiB left before the iOS limit";
+  const char* const unit = "MiB left before the iOS limit";
+#else
+  // macOS: report what the process is holding rather than what is left, since
+  // nothing is enforcing a ceiling here. phys_footprint is the same counter
+  // EXC_RESOURCE compares against on device, so a host measurement of "this
+  // delegate costs N MiB" transfers directly to the device budget.
+  task_vm_info_data_t info = {};
+  mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
+  if (task_info(mach_task_self(), TASK_VM_INFO,
+                reinterpret_cast<task_info_t>(&info), &count) != KERN_SUCCESS) {
+    return;
+  }
+  const size_t mib = static_cast<size_t>(info.phys_footprint) / (1024 * 1024);
+  const char* const unit = "MiB phys_footprint";
+#endif  // TARGET_OS_IPHONE
+  LOG(INFO) << "[mem] " << stage << ": " << mib << " " << unit;
   // Also to os_log, which is the only one of the two that reaches a
   // BrowserStack device-log artifact: that capture carries os_log entries
   // (Dart's print arrives that way) but no native stderr, so without this a CI
   // memory failure gives pass/fail and nothing to diagnose it with.
-  os_log(OS_LOG_DEFAULT, "[mem] %{public}s: %zu MiB left before the iOS limit",
-         stage, mib);
+  os_log(OS_LOG_DEFAULT, "[mem] %{public}s: %zu %{public}s", stage, mib, unit);
 }
 
 // Hand pages the allocator is holding back to the OS.
