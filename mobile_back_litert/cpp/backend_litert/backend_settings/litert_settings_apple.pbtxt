@@ -299,6 +299,14 @@ benchmark_setting {
 # of budget takes the app down instead of falling back. Select Metal
 # deliberately, watch the "[mem] llm: before GPU compile" line, and only make
 # it the default once it has been shown to survive on the target devices.
+#
+# Offering it is not free: listResources() in benchmark.dart walks every
+# delegate_choice, so the GPU export is downloaded whether or not Metal is
+# ever selected. That is +1.25 GB on iOS, once -- llm-1b and llm-1b-instruct
+# name the same URL and the resource set dedupes. Android already pays it.
+# The stable_diffusion Metal choice below costs nothing extra by contrast: it
+# names the same four files as its CPU choice, and the per-delegate model
+# directory is symlinks into one shared download.
 
 benchmark_setting {
   benchmark_id: "llm-1b"

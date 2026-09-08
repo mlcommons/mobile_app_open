@@ -75,6 +75,13 @@ WITH_LITERT=1 make flutter/ios
 * `stable_diffusion` and the `llm-*` benchmarks each offer a Metal choice, and
   **CPU stays selected for both**. They are offered to be measured, not as
   defaults; nothing below has been confirmed on a device yet.
+* Offering the LLM choice costs a download. `listResources()` in
+  `benchmark.dart` walks every `delegate_choice`, so the GPU export is fetched
+  whether or not Metal is ever selected: +1.25 GB on iOS, once, since `llm-1b`
+  and `llm-1b-instruct` name the same URL and the resource set dedupes.
+  Android already pays this. The `stable_diffusion` Metal choice costs nothing
+  extra -- it names the same four files as its CPU choice, and the
+  per-delegate model directory is symlinks into one shared download.
 * The LLM Metal choice was withdrawn once and has now been reinstated with a
   fix. What was measured on an iPad mini: the delegate is killed by
   `EXC_RESOURCE` while still initialising (`delegate_kernel.cc`, "Initializing
