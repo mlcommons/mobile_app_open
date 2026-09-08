@@ -72,14 +72,21 @@ WITH_LITERT=1 make flutter/ios
   which measured 1.7-3.0x faster than CPU across all six on an iPad mini.
   `LiteRtGpuBackend` has no Metal enumerator: on Apple, Metal is selected by
   `kLiteRtGpuBackendAutomatic` plus compile-time Metal support.
-* `stable_diffusion` and the `llm-*` benchmarks each offer a Metal choice, and
-  **CPU stays selected for both**. `llm-1b` on Metal is measured and good (see
-  the table below); it is still not the default because the measurement is on
-  a macOS host, an `EXC_RESOURCE` kill on device cannot be caught, and the one
-  iOS device this was ever tried on crashed. Flipping the default is a one-line
-  change in the settings file once a device run confirms it.
-  `stable_diffusion` on Metal does **not** work at all -- see below -- and the
-  choice exists only so that stops being a guess.
+* `stable_diffusion` and the `llm-*` benchmarks each offer a Metal choice.
+  **The `llm-*` benchmarks select Metal; `stable_diffusion` stays on CPU.**
+  The LLM default follows the measurements below -- Metal costs 72 MiB more at
+  peak than CPU and decodes 3.0x faster -- and it puts the choice in front of
+  the CI iPhone 16 Pro, which is the device those numbers predict should hold:
+  `llm-1b` already passes there on CPU.
+  The risk is worth stating plainly. An `EXC_RESOURCE` kill cannot be caught,
+  so if the budget does not stretch the app goes down rather than falling back,
+  and the measurements are from a macOS host where nothing enforces a ceiling.
+  The one iOS device Metal was ever tried on (an iPad mini) crashed -- though
+  that device also fails `llm-1b` on **CPU**, so it says nothing about this
+  choice. If the device run fails on memory, put `delegate_selected` back to
+  `CPU`; nothing else has to change.
+  `stable_diffusion` on Metal does **not** work at all -- see below -- so it
+  stays on CPU, and its choice exists only so that stops being a guess.
 
 ### Measuring this without a device
 

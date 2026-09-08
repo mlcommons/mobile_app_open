@@ -332,11 +332,17 @@ benchmark_setting {
 # while the unfixed path needed 4497 MiB to compile against a 3376 MB device
 # cap -- which is the crash, exactly.
 #
-# CPU is still what is selected. The measurement is on a host, not a device;
-# an EXC_RESOURCE kill cannot be caught, so a delegate that runs out of budget
-# takes the app down rather than falling back; and the one iOS device this was
-# tried on crashed. Given a device run where CPU llm-1b already passes, Metal
-# should pass too and this should become the default -- it is this one line.
+# Metal is now what is selected, so the CI iPhone 16 Pro exercises it. That is
+# the device the host numbers predict should hold: llm-1b already passes there
+# on CPU, and Metal costs 72 MiB more at peak while decoding 3x faster.
+#
+# It is still the riskier of the two choices, and the risk is worth stating
+# plainly: an EXC_RESOURCE kill cannot be caught, so if the budget does not
+# stretch the app goes down rather than falling back to CPU, and the one iOS
+# device this was ever tried on (an iPad mini) crashed -- though that device
+# also fails llm-1b on CPU, so it proves nothing about this one. If the CI
+# device run fails on memory, put this line back to "CPU"; everything else in
+# this file stays as it is.
 #
 # Offering it is not free: listResources() in benchmark.dart walks every
 # delegate_choice, so the GPU export is downloaded whether or not Metal is
@@ -382,7 +388,7 @@ benchmark_setting {
       value: "llama_q8_ekv3072_litert.tflite"
     }
   }
-  delegate_selected: "CPU"
+  delegate_selected: "Metal"
   custom_setting {
     id: "pipeline"
     value: "LLMPipeline"
@@ -433,7 +439,7 @@ benchmark_setting {
       value: "llama_q8_ekv3072_litert.tflite"
     }
   }
-  delegate_selected: "CPU"
+  delegate_selected: "Metal"
   custom_setting {
     id: "pipeline"
     value: "LLMPipeline"
