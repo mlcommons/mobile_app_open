@@ -146,6 +146,7 @@ inside `delegate_kernel.cc` "Initializing Metal-based API from graph", before
 the model finished compiling. The log shows exactly two of those lines -- the
 prefill and decode subgraphs -- and 4497 - 2055 = 2442 MiB is one extra copy of
 the weights. That is what `EnableConstantTensorSharing` collapses.
+
 * Offering the LLM choice costs a download. `listResources()` in
   `benchmark.dart` walks every `delegate_choice`, so the GPU export is fetched
   whether or not Metal is ever selected: +1.25 GB on iOS, once, since `llm-1b`
@@ -179,7 +180,7 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   the reason is not the quantization.** Each of the three was compiled against
   the Metal accelerator on the host and each one failed:
 
-  ```
+  ```text
   WARNING: Attempting to use a delegate that only supports static-sized tensors
            with a graph that has dynamic-sized tensors
   [probe] text_encoder on GPU: FAILED

@@ -361,7 +361,8 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   if (configs->delegate_selected != nullptr) {
     use_gpu = strcmp(configs->delegate_selected, kDelegateGpu) == 0;
 #if defined(__APPLE__)
-    use_gpu = use_gpu || strcmp(configs->delegate_selected, kDelegateMetal) == 0;
+    use_gpu =
+        use_gpu || strcmp(configs->delegate_selected, kDelegateMetal) == 0;
 #endif
     // Report an unrecognized selection before the platform downgrade below, so
     // a valid choice we deliberately fall back from is not logged as unknown.
