@@ -154,6 +154,7 @@ http_archive(
         "//:flutter/third_party/enable-png-in-tensorflow-lite-tools-evaluation.patch",
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
+        "//:patches/litert_logistic_fp16_msvc.patch",
         "//:patches/litert-internal-visibility.diff",
         # Fix for LiteRT crashing on close when using OpenCL accelerator
         "//:patches/custom_buffer_teardown.patch",

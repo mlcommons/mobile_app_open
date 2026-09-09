@@ -1,5 +1,5 @@
-Two fixes to portable_tensorflow_lib_lite (the mobile build of TF core),
-which has bit-rotted at this TensorFlow revision:
+Fixes to portable_tensorflow_lib_lite (the mobile build of TF core), which
+has bit-rotted at this TensorFlow revision:
 
 1. It depends on //tensorflow/core/util:onednn_env_vars, a oneDNN/MKL helper
    whose deps unconditionally include the full //tensorflow/core:framework.
@@ -16,15 +16,48 @@ which has bit-rotted at this TensorFlow revision:
 3. Its quantization sources reach xla/tsl/concurrency/executor.h, which is
    not in its declared dependency closure; add the header-only target.
 
+4. xla/tsl/platform/file_system.h -- which is in the mobile header set, and
+   which the mobile sources include -- includes xla/tsl/platform/status_macros.h,
+   which is not. That header in turn includes absl/status/status_macros.h.
+   Neither is declared, so compiling xla/tsl/platform/default/unbounded_work_queue.cc
+   for Android fails:
+
+     undeclared inclusion(s) in rule
+     '@@org_tensorflow//tensorflow/core:portable_tensorflow_lib_lite':
+       'external/xla/xla/tsl/platform/status_macros.h'
+       'external/com_google_absl/absl/status/status_macros.h'
+       'external/com_google_absl/absl/status/status_builder.h'
+       'external/com_google_absl/absl/strings/internal/stringify_stream.h'
+
+   Add status_macros.h to the mobile header filegroup next to status.h and
+   statusor.h, and depend on @com_google_absl//absl/status:status_macros,
+   whose own deps cover the remaining two headers. This surfaced only with
+   the Abseil that LiteRT 2.2.0's TensorFlow pins, which is where
+   absl/status:status_macros first appears.
+
+diff --git a/tensorflow/core/BUILD b/tensorflow/core/BUILD
 --- a/tensorflow/core/BUILD
 +++ b/tensorflow/core/BUILD
-@@ -1036,7 +1036,8 @@
+@@ -1086,7 +1086,9 @@
          "//tensorflow/core:mobile_additional_lib_deps",
          "//tensorflow/core/platform:resource",
          "//tensorflow/core/public:release_version",
 -        "//tensorflow/core/util:onednn_env_vars",
          "//tensorflow/core/util:stats_calculator_portable",
          "@xla//xla/tsl/util:safe_reinterpret_cast",
++        "@com_google_absl//absl/status:status_macros",
 +        "@com_google_protobuf//:protobuf",
 +        "@xla//xla/tsl/concurrency:executor",
      ] + tf_portable_proto_lib() + tf_portable_deps_no_runtime(),
+diff --git a/third_party/xla/xla/tsl/platform/BUILD b/third_party/xla/xla/tsl/platform/BUILD
+--- a/third_party/xla/xla/tsl/platform/BUILD
++++ b/third_party/xla/xla/tsl/platform/BUILD
+@@ -201,7 +201,8 @@
+         "prefetch.h",
+         "ram_file_system.h",
+         "resource.h",
+         "status.h",
++        "status_macros.h",
+         "statusor.h",
+         "threadpool.h",
+         "threadpool_interface.h",
