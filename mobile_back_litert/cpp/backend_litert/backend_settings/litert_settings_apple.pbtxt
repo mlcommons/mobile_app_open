@@ -210,11 +210,29 @@ benchmark_setting {
   #   text encoder: 48 SHAPE, 96 REDUCE_PROD, 48 PACK, 240 RESHAPE
   #   diffusion:   402 SHAPE, 194 REDUCE_PROD, 657 RESHAPE, 366 BROADCAST_TO
   #   decoder:     150 SHAPE, 30 PACK, 64 RESHAPE, 180 BROADCAST_TO
-  # So new exports have to be CONVERTED with concrete input shapes, so the
-  # converter constant-folds that shape arithmetic away. Patching the file
-  # afterwards cannot: the ops are still there. fp32 or re-quantization would
-  # not fix it either, and since all three fail there is no CPU/GPU split that
-  # rescues part of it.
+  #
+  # The models CAN be rewritten to run on Metal; tools/sd_gpu/convert.py does
+  # it, and its README carries the details. Folding those shapes away is only
+  # the first of four blockers -- BROADCAST_TO is unimplemented on the GPU, the
+  # group-norm blocks are rank 5 against a rank-4 limit, and SUB is declared at
+  # version 3 against a delegate that supports 2. With all four fixed the
+  # diffusion model and the decoder are FULLY GPU-accelerated and every output
+  # stays bit-identical; on a macOS host the diffusion model goes 1494 ms ->
+  # 332 ms per step and the decoder 7702 ms -> 463 ms.
+  #
+  # Two things still block switching this over, so CPU stays selected:
+  #   1. The rewritten models are not hosted yet. listResources walks every
+  #      delegate choice, so naming a URL that 404s would break every
+  #      benchmark, not just this one.
+  #   2. LiteRT 2.1.5, which this backend pins, cannot run the rewritten
+  #      diffusion model anyway: its Metal backend emits invalid shader source
+  #      for the int8 weights ("use of undeclared identifier 'q0'" in
+  #      newLibraryWithSource, from half4 weight_scale = half4(q0)). That is a
+  #      code-generation bug, not an option -- it reproduces with
+  #      AllowSrcQuantizedFcConvOps both on and off. 2.2.0 compiles all three,
+  #      so this needs the pin moved. The accelerator cannot be upgraded on its
+  #      own: a 2.2.0 dylib will not load into a 2.1.5 runtime, nor the
+  #      reverse.
   #
   # The choice is kept so this stays a measurement rather than an assumption,
   # and because the pipeline handles it correctly: the GPU attempt fails, what

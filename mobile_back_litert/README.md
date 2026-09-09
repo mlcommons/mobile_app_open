@@ -176,9 +176,9 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   is no fallback to catch it: if the budget runs out the app goes down. Watch
   the `[mem] llm: before GPU compile` and `[mem] llm: after GPU compile` lines
   to see what the delegate actually costs.
-* **`stable_diffusion` cannot use Metal with the models that ship today, and
-  the reason is not the quantization.** Each of the three was compiled against
-  the Metal accelerator on the host and each one failed:
+* **`stable_diffusion` cannot use Metal with the models that ship today, but
+  the models can be rewritten so that it can.** Each of the three published
+  exports fails to compile against the Metal accelerator:
 
   ```text
   WARNING: Attempting to use a delegate that only supports static-sized tensors
@@ -188,43 +188,64 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   [probe] decoder     on GPU: FAILED
   ```
 
-  The Metal delegate takes static shapes only. This is not caused by the GPU
-  options -- compiling with none of them set fails identically -- and it is not
-  partial delegation degrading to CPU, it is `CompiledModel::Create` returning
-  an error.
+  This is not caused by the GPU options -- compiling with none of them set
+  fails identically -- and it is not partial delegation degrading to CPU, it is
+  `CompiledModel::Create` returning an error.
 
   The declared batch dimension looks like the culprit and is not. Each model
   does declare `-1` for batch (`tokens [-1,77]`, `latent [-1,64,64,4]`,
   `input_1 [-1,64,64,4]`), but rewriting `shape_signature` in all three so they
-  report **0 dynamic tensors** changes nothing -- the compile fails identically.
-  That was worth testing before recommending it.
+  report **0 dynamic tensors** changes nothing.
 
-  The real cause is that the graphs compute their shapes at run time:
-  `SHAPE` -> `REDUCE_PROD`/`PACK`/`CONCATENATION` -> `RESHAPE`/`BROADCAST_TO`.
-  A `RESHAPE` whose shape operand is a computed tensor has a dynamic output no
-  matter how concrete the inputs are.
+  There are four blockers, not one, and `tools/sd_gpu/convert.py` fixes all
+  four; see that directory's README for the details and the measurements.
 
-  | model | total ops | shape-computing ops |
-  |---|---|---|
-  | text encoder | 1118 | 48 `SHAPE`, 96 `REDUCE_PROD`, 48 `PACK`, 240 `RESHAPE` |
-  | diffusion | 4558 | 402 `SHAPE`, 194 `REDUCE_PROD`, 657 `RESHAPE`, 366 `BROADCAST_TO` |
-  | decoder | 1180 | 150 `SHAPE`, 30 `PACK`, 64 `RESHAPE`, 180 `BROADCAST_TO` |
+  1. The graphs compute their shapes at run time (`SHAPE` ->
+     `REDUCE_PROD`/`GATHER`/`PACK`/`BROADCAST_ARGS` -> `RESHAPE`/`BROADCAST_TO`),
+     so a `RESHAPE` output stays dynamic however concrete the inputs are.
+     Since the pipeline only ever runs batch 1, those shapes are constants and
+     can be folded away.
+  2. `BROADCAST_TO` is not implemented by the GPU delegate at all.
+  3. The group-norm blocks work in rank 5, and the delegate refuses anything
+     above rank 4.
+  4. `SUB` is declared at version 3 -- which only the rank-5 operands needed --
+     against a delegate that supports version 2, which alone splits the graph
+     into partitions too small to delegate.
 
-  So new exports have to be **converted with concrete input shapes**, so that
-  the converter constant-folds the shape arithmetic away instead of emitting
-  it. Patching the file afterwards cannot do it -- the ops are still there.
-  fp32 or re-quantization would not fix it either, and since all three fail,
-  no mixed CPU/GPU split rescues part of it. Nor can the backend work around
-  it: LiteRT 2.1.5 exposes `CompiledModel::Create` over a filename or a buffer
-  only, so a resize can happen only after the compile that is already failing.
+  With all four fixed the diffusion model and the decoder come out **fully**
+  GPU-accelerated and every output stays bit-identical. On an M-series Mac, ms
+  per invocation:
 
-  The pipeline handles it correctly rather than pretending: the GPU attempt
-  fails, everything built so far is released, the pages are handed back and
-  the three recompile on CPU. A full 20-step query then runs to completion and
-  reports `CPU`. All three compile on one accelerator or none do, because the
+  | model | original CPU | rewritten CPU | rewritten Metal |
+  |---|---|---|---|
+  | text encoder | 12.4 | 13.1 | 14.1 |
+  | diffusion model | 1494.0 | 977.0 | 331.8 |
+  | decoder | 7702.3 | 2000.5 | 463.1 |
+
+  **Two things still block shipping this.** The rewritten models have to be
+  hosted before the settings can point at them, and LiteRT 2.1.5 -- the version
+  this backend pins -- cannot run the rewritten diffusion model anyway: its
+  Metal backend emits invalid shader source for the int8 weights,
+
+  ```text
+  newLibraryWithSource: program_source:30:30: error: use of undeclared identifier 'q0'
+    half4 weight_scale = half4(q0);
+  ```
+
+  which is a code-generation bug, not something the options control -- it
+  happens with `AllowSrcQuantizedFcConvOps` both on and off. The text encoder
+  compiles on 2.1.5; the diffusion model does not. LiteRT 2.2.0 compiles all
+  three, so this needs the pin moved to 2.2.x. The accelerator cannot be
+  upgraded on its own: a 2.2.0 `libLiteRtMetalAccelerator.dylib` will not load
+  into a 2.1.5 runtime, nor the reverse.
+
+  Until both are resolved `stable_diffusion` stays on CPU, and the pipeline
+  handles the failure rather than pretending: the GPU attempt fails, everything
+  built so far is released, the pages are handed back and the three recompile
+  on CPU. All three compile on one accelerator or none do, because the
   benchmark reports a single accelerator name. Measured on an iPad mini on CPU
   at about 4.4-5.6 s per diffusion step, so roughly 100 s for 20 steps; on the
-  host the same query takes about 44 s.
+  host the same query takes about 42 s.
 * **A query has two phases and they do not fit in memory together.** The three
   models are compiled up front and stay resident, which is fine on Android but
   not here. Measured on an iPhone 16 Pro, in MiB still available before the
