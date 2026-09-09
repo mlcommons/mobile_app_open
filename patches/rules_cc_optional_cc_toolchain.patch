@@ -1,0 +1,48 @@
+Make the two legacy select()-support rules tolerate an unresolvable C++
+toolchain, restoring the behaviour of the rules_cc we used before LiteRT 2.2.0.
+
+rules_cc reaches us through rules_python's py_repositories(), by way of XLA's
+and rules_ml_toolchain's python_init_repositories(). Moving TensorFlow to the
+commit LiteRT 2.2.0 pins dragged that chain forward to rules_cc 0.1.5, whose
+use_cc_toolchain() defaults to mandatory = True (0.0.16 defaulted to False).
+compiler_flag and cc_flags_supplier therefore now demand a *registered*
+toolchain for @bazel_tools//tools/cpp:toolchain_type. The Android build
+resolves C++ toolchains the legacy way (--crosstool_top, with
+--incompatible_enable_cc_toolchain_resolution=false in .bazelrc) and registers
+none for @platforms//os:android, so analysis dies before anything is compiled:
+
+  ERROR: external/rules_cc/cc/private/toolchain/BUILD:107:14: While resolving
+  toolchains for target @@rules_cc//cc/private/toolchain:compiler: No matching
+  toolchains found for types @@bazel_tools//tools/cpp:toolchain_type.
+
+which then cascades into "errors encountered resolving select() keys for
+@@com_google_absl//absl/base:base", because Abseil's config_settings read
+@bazel_tools//tools/cpp:compiler -- an alias for that target.
+
+Nothing is lost by making it optional. Both rules obtain their toolchain
+through find_cpp_toolchain(), which checks the incompatible flag first and,
+when resolution is disabled, reads the legacy _cc_toolchain attribute without
+ever consulting ctx.toolchains. Where resolution *is* enabled -- iOS, macOS,
+Windows, Linux -- a toolchain is found as before and mandatory changes nothing.
+
+diff --git a/cc/toolchains/compiler_flag.bzl b/cc/toolchains/compiler_flag.bzl
+--- a/cc/toolchains/compiler_flag.bzl
++++ b/cc/toolchains/compiler_flag.bzl
+@@ -23,5 +23,5 @@
+ compiler_flag = rule(
+     implementation = _compiler_flag_impl,
+     attrs = CC_TOOLCHAIN_ATTRS,
+-    toolchains = use_cc_toolchain(),
++    toolchains = use_cc_toolchain(mandatory = False),
+ )
+diff --git a/cc/toolchains/cc_flags_supplier.bzl b/cc/toolchains/cc_flags_supplier.bzl
+--- a/cc/toolchains/cc_flags_supplier.bzl
++++ b/cc/toolchains/cc_flags_supplier.bzl
+@@ -28,6 +28,6 @@
+ cc_flags_supplier = rule(
+     implementation = _cc_flags_supplier_impl,
+     attrs = CC_TOOLCHAIN_ATTRS,
+-    toolchains = use_cc_toolchain(),
++    toolchains = use_cc_toolchain(mandatory = False),
+     fragments = ["cpp"],
+ )

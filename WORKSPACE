@@ -51,6 +51,23 @@ http_archive(
     url = "https://github.com/bazelbuild/apple_support/releases/download/1.23.1/apple_support.1.23.1.tar.gz",
 )
 
+# The rules_cc rules_python's py_repositories() would bring in anyway, patched.
+# Declared here so it is fetched with the patch rather than without it; the
+# declaration below it is a maybe(), so ours wins.
+#
+# Moving TensorFlow to LiteRT 2.2.0's commit pulled this chain -- XLA, then
+# rules_ml_toolchain, then rules_python -- forward to a rules_cc whose
+# use_cc_toolchain() is mandatory. That breaks the Android build during
+# analysis. See patches/rules_cc_optional_cc_toolchain.patch for the detail.
+http_archive(
+    name = "rules_cc",
+    patch_args = ["-p1"],
+    patches = ["//patches:rules_cc_optional_cc_toolchain.patch"],
+    sha256 = "b8b918a85f9144c01f6cfe0f45e4f2838c7413961a8ff23bc0c6cdf8bb07a3b6",
+    strip_prefix = "rules_cc-0.1.5",
+    url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.5/rules_cc-0.1.5.tar.gz",
+)
+
 http_archive(
     name = "bazel_features",
     sha256 = "c26b4e69cf02fea24511a108d158188b9d8174426311aac59ce803a78d107648",
@@ -160,6 +177,7 @@ tensorflow_source_repo(
     patches = [
         "//:flutter/third_party/tf-eigen.patch",
         "//patches:tf_coreml_repeatedfield_resize.patch",
+        "//patches:tf_logistic_fp16_msvc.patch",
         "//patches:tf_nnapi_no_mmap_sharing.patch",
         "//patches:tf_portable_no_onednn_env_vars.patch",
     ] + PATCH_FILE,
