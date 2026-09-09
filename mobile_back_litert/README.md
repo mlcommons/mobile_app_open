@@ -239,6 +239,17 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   upgraded on its own: a 2.2.0 `libLiteRtMetalAccelerator.dylib` will not load
   into a 2.1.5 runtime, nor the reverse.
 
+  Moving the pin was tried far enough to cost it. The 2.2.0 source and both
+  prebuilts (`binaries/2.2.0/ios_arm64`, `.../android_arm64`) exist, and
+  `patches/custom_buffer_teardown.patch` still applies -- `~CustomBuffer` is
+  unchanged between the two releases. `enable-png-in-tensorflow-lite-tools-evaluation.patch`
+  does not: 2.2.0 refactored `image_preprocessing_stage.cc` to `ABSL_LOG` and
+  changed `ImageData::data` from a `unique_ptr` to a `std::vector<float>`, so
+  `LoadImagePng` has to be rewritten against the new data model rather than
+  re-offset. That makes the bump its own change, and one that moves the runtime
+  for Android as much as for iOS, so it needs re-validating on every device
+  rather than riding along here.
+
   Until both are resolved `stable_diffusion` stays on CPU, and the pipeline
   handles the failure rather than pretending: the GPU attempt fails, everything
   built so far is released, the pages are handed back and the three recompile
