@@ -95,9 +95,18 @@ by `llama_q8_ekv3072_litert.tflite`.
 Each conversion runs the original and the rewrite on the same random inputs and
 prints `max_abs_diff`; anything other than `0.000e+00` aborts the write.
 
-The conversion is deterministic: running it in two different environments
-produced byte-identical files, so the checksums the backend settings carry stay
-valid for anyone who regenerates the models rather than downloading them.
+Running the converter twice, in two separately built environments, produced
+byte-identical files, which is why the backend settings can carry these md5s.
+Note the limits of that: `ai-edge-litert` is pinned above but `numpy` and
+`flatbuffers` are not, so this is evidence of determinism rather than a
+guarantee of it. If a regenerated file does not match, download it instead of
+assuming the checksum is stale.
+
+Note also what the equivalence check does **not** cover. It runs both models
+through the CPU `Interpreter` on one seeded input set per model. That
+establishes the rewrite computes the same function on that sample; it does not
+exercise the fp16 Metal path these models are actually selected for, and it is
+not a proof for all inputs.
 
 | file | md5 |
 | --- | --- |
@@ -107,9 +116,11 @@ valid for anyone who regenerates the models rather than downloading them.
 
 ## Hosting
 
-The backend settings download models over HTTPS, so the converted files have to
-be published before `litert_settings_apple.pbtxt` can point at them. The
-existing precedent is `llama_q8_ekv3072_litert.tflite` under
-`https://storage.googleapis.com/mlperf-mobile-public/litert/`. Until the SD
-files are uploaded there, the settings keep pointing at the published v5_0
-exports and `stable_diffusion` stays on CPU.
+The three files are published under
+`https://storage.googleapis.com/mlperf-mobile-public/litert/`, alongside
+`llama_q8_ekv3072_litert.tflite`, and `litert_settings_apple.pbtxt` points its
+`stable_diffusion` Metal choice at them.
+
+Anything republished here has to keep the checksums above in step, and
+`listResources` walks *every* delegate choice: a URL that 404s blocks resource
+preparation for stable diffusion rather than only degrading the Metal path.

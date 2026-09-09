@@ -3,8 +3,8 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "ai-edge-litert==2.2.0",
-#     "numpy",
-#     "flatbuffers",
+#     "numpy==2.5.3",
+#     "flatbuffers==25.12.19",
 # ]
 # ///
 # Copyright 2025 The MLPerf Authors. All Rights Reserved.

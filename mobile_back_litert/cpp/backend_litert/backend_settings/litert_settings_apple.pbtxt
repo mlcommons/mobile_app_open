@@ -234,12 +234,16 @@ benchmark_setting {
   # Metal run at all. The iOS memory cost has not been measured.
   #
   # Measured end to end through this backend on a macOS host, one 20-step
-  # image: 43.84 s on CPU with the published models, 19.40 s on Metal with
-  # these, no CPU fallback. Per denoising step that is about 2.1 s against
-  # 0.82 s.
+  # image: 43.84 s on CPU with the published models against 18.8-19.4 s on
+  # Metal with these, over two runs. Per denoising step that is about 2.1 s
+  # against 0.82 s. "On Metal" means all three models compiled on the delegate
+  # and the pipeline never took its CPU retry path -- not that no operator ran
+  # on CPU; two GATHERs in the text encoder still do.
   #
-  # The three models total about 1.04 GiB, which leaves real headroom under the
-  # iOS per-process memory limit -- unlike the llm-* benchmarks.
+  # The three model files total about 1.04 GiB. That is a download size, not a
+  # peak footprint: all three are compiled before the phase separation takes
+  # effect, and compilation and first invocation allocate on top. The iOS
+  # figure has not been measured for this configuration.
   delegate_choice: {
     delegate_name: "CPU"
     accelerator_name: "cpu"

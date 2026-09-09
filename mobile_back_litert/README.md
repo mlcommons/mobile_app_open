@@ -261,11 +261,16 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   | models | delegate | per image | per step |
   |---|---|---|---|
   | published v5_0 | CPU | 43.84 s | ~2.1 s |
-  | rewritten | Metal | 19.40 s | ~0.82 s |
+  | rewritten | Metal | 18.8-19.4 s | ~0.82 s |
 
-  with no CPU fallback. For reference the rewrite is worth nothing on CPU on
-  its own -- 43.22 s against 43.84 s, one query each, which is noise -- so it
-  only pays off together with the delegate.
+  Two runs, so the Metal figure is a range rather than a number. "Metal" here
+  means the pipeline compiled all three models on the delegate and never took
+  its CPU retry path; it is not a claim that no operator ran on CPU, and two
+  `GATHER`s in the text encoder do -- see `tools/sd_gpu/README.md`.
+
+  For reference the rewrite is worth nothing on CPU on its own -- 43.22 s
+  against 43.84 s, one query each, which is noise -- so it only pays off
+  together with the delegate.
 
   When a GPU compile does fail the pipeline handles it rather than pretending:
   everything built so far is released, the pages are handed back and the three
