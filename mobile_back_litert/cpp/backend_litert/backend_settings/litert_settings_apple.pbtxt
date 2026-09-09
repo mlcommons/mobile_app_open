@@ -240,12 +240,6 @@ benchmark_setting {
   # models are fully delegated without it and the header notes it quantizes the
   # input tensors to 8 bit, which costs accuracy.
   #
-  # NOTE: this depends on the Metal model files below being the per-axis
-  # exports. Until they are republished, the diffusion model still carries
-  # per-tensor FULLY_CONNECTED weights, its Metal compile fails on the shader
-  # above, and the pipeline falls back to CPU for all three models -- a working
-  # run, but on the CPU accelerator, not Metal.
-  #
   # Measured end to end through this backend on a macOS host, one 20-step
   # image: 43.84 s on CPU with the published models against 18.8-19.4 s on
   # Metal with these, over two runs. Per denoising step that is about 2.1 s
@@ -294,12 +288,12 @@ benchmark_setting {
       model_checksum: "8aa94e17f9394958e0c71c653ab1140f"
     }
     model_file: {
-      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/sd_diffusion_model_litert.tflite"
-      model_checksum: "6547cfadc83bd809969dcb90bf754efd"
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/sd_diffusion_model_litert_v2.tflite"
+      model_checksum: "7bd563de431b8253ea482fdbdd513a47"
     }
     model_file: {
-      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/sd_text_encoder_litert.tflite"
-      model_checksum: "dd4041a27340e829dda3eb90928b0804"
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/sd_text_encoder_litert_v2.tflite"
+      model_checksum: "be6310001157f50bed34750db2c88486"
     }
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/timestep_embeddings_data.bin.ts"
