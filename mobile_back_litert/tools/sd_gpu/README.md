@@ -71,9 +71,14 @@ The text encoder keeps two `GATHER`s on CPU: its token and position indices are
 ## Usage
 
 ```bash
-pip install ai-edge-litert numpy flatbuffers
-python convert.py --in-dir <dir with the v5_0 exports> --out-dir <dir>
+uv run convert.py --in-dir <dir with the v5_0 exports> --out-dir <dir>
 ```
+
+The dependency pins are in the PEP 723 header of `convert.py`, so `uv` builds
+the environment itself and nothing is installed into whatever Python the repo
+otherwise uses. The `ai-edge-litert` pin is the point: it is the runtime whose
+Metal accelerator these models are being made compatible with, and the
+conversion should be reproduced against the same one.
 
 The input directory needs the three published exports:
 
@@ -86,6 +91,16 @@ by `llama_q8_ekv3072_litert.tflite`.
 
 Each conversion runs the original and the rewrite on the same random inputs and
 prints `max_abs_diff`; anything other than `0.000e+00` aborts the write.
+
+The conversion is deterministic: running it in two different environments
+produced byte-identical files, so the checksums the backend settings carry stay
+valid for anyone who regenerates the models rather than downloading them.
+
+| file | md5 |
+| --- | --- |
+| `sd_text_encoder_litert.tflite` | `dd4041a27340e829dda3eb90928b0804` |
+| `sd_diffusion_model_litert.tflite` | `6547cfadc83bd809969dcb90bf754efd` |
+| `sd_decoder_litert.tflite` | `8aa94e17f9394958e0c71c653ab1140f` |
 
 ## Hosting
 
