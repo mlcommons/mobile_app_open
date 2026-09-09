@@ -70,8 +70,8 @@ flutter/ios/libs:
 		'<key>CFBundleInfoDictionaryVersion</key><string>6.0</string>' \
 		'<key>CFBundleName</key><string>${flutter_ios_metal_fw_name}</string>' \
 		'<key>CFBundlePackageType</key><string>FMWK</string>' \
-		'<key>CFBundleShortVersionString</key><string>2.1.5</string>' \
-		'<key>CFBundleVersion</key><string>2.1.5</string>' \
+		'<key>CFBundleShortVersionString</key><string>2.2.0</string>' \
+		'<key>CFBundleVersion</key><string>2.2.0</string>' \
 		'<key>CFBundleSupportedPlatforms</key><array><string>iPhoneOS</string></array>' \
 		'<key>MinimumOSVersion</key><string>14.0</string>' \
 		'</dict>' \

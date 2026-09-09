@@ -1,7 +1,7 @@
 # Mobile backend LiteRT
 
 This backend runs all benchmarks on the
-[LiteRT](https://github.com/google-ai-edge/LiteRT) 2.1.5 CompiledModel API:
+[LiteRT](https://github.com/google-ai-edge/LiteRT) 2.2.0 CompiledModel API:
 the `llm-*` benchmarks on a dedicated LLM pipeline, `stable_diffusion` on a
 dedicated stable diffusion pipeline, and the vision/NLP benchmarks on a
 single-model pipeline.
@@ -53,7 +53,7 @@ WITH_LITERT=1 make flutter/ios
 ```
 
 * The GPU accelerator is the prebuilt `libLiteRtMetalAccelerator.dylib`, pinned
-  at 2.1.5 and downloaded by `litert_backend.mk`. It is embedded in
+  at 2.2.0 and downloaded by `litert_backend.mk`. It is embedded in
   `Runner.app/Frameworks` next to the backend frameworks: LiteRT dlopens it from
   the directory given by `kLiteRtEnvOptionTagRuntimeLibraryDir`, and iOS has no
   dlopen search path to fall back on.
@@ -105,7 +105,7 @@ bazel build -c opt --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 \
 # put the macos_arm64 accelerator next to the .so; the loose layout is what
 # GetAppleRuntimeLibraryDir expects from a command-line harness
 curl -fSL -o <dir>/libLiteRtMetalAccelerator.dylib \
-  https://storage.googleapis.com/litert/binaries/2.1.5/macos_arm64/libLiteRtMetalAccelerator.dylib
+  https://storage.googleapis.com/litert/binaries/2.2.0/macos_arm64/libLiteRtMetalAccelerator.dylib
 bazel-bin/flutter/cpp/binary/main EXTERNAL llm-1b --mode=PerformanceOnly \
   --model_file=<dir with the model> --lib_path=<dir>/liblitertbackend.so \
   --input_tfrecord=tinymmlu.tfrecord --sp_path=llama3_1b.spm.model
@@ -222,14 +222,7 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   | diffusion model | 1494.0 | 977.0 | 331.8 |
   | decoder | 7702.3 | 2000.5 | 463.1 |
 
-  Those CPU figures are 2.2.0's CPU path and do not carry back to 2.1.5:
-  measured end to end there, one 20-step image on CPU takes 43.84 s with the
-  published models against 43.22 s with the rewritten ones, which is noise.
-  The rewrite is worth adopting only together with the version bump.
-
-  **Two things still block shipping this.** The rewritten models have to be
-  hosted before the settings can point at them, and LiteRT 2.1.5 -- the version
-  this backend pins -- cannot run the rewritten diffusion model anyway: its
+  This needs **LiteRT 2.2.0**, which is why this backend pins it. On 2.1.5 the
   Metal backend emits invalid shader source for the int8 weights,
 
   ```text
@@ -237,31 +230,41 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
     half4 weight_scale = half4(q0);
   ```
 
-  which is a code-generation bug, not something the options control -- it
-  happens with `AllowSrcQuantizedFcConvOps` both on and off. The text encoder
-  compiles on 2.1.5; the diffusion model does not. LiteRT 2.2.0 compiles all
-  three, so this needs the pin moved to 2.2.x. The accelerator cannot be
-  upgraded on its own: a 2.2.0 `libLiteRtMetalAccelerator.dylib` will not load
-  into a 2.1.5 runtime, nor the reverse.
+  with `AllowSrcQuantizedFcConvOps` both on and off, so it is a code-generation
+  bug rather than something the options control. The text encoder compiles on
+  2.1.5; the diffusion model does not. The accelerator cannot be upgraded on
+  its own either: a 2.2.0 `libLiteRtMetalAccelerator.dylib` will not load into
+  a 2.1.5 runtime, nor the reverse.
 
-  Moving the pin was tried far enough to cost it. The 2.2.0 source and both
-  prebuilts (`binaries/2.2.0/ios_arm64`, `.../android_arm64`) exist, and
-  `patches/custom_buffer_teardown.patch` still applies -- `~CustomBuffer` is
-  unchanged between the two releases. `enable-png-in-tensorflow-lite-tools-evaluation.patch`
-  does not: 2.2.0 refactored `image_preprocessing_stage.cc` to `ABSL_LOG` and
-  changed `ImageData::data` from a `unique_ptr` to a `std::vector<float>`, so
-  `LoadImagePng` has to be rewritten against the new data model rather than
-  re-offset. That makes the bump its own change, and one that moves the runtime
-  for Android as much as for iOS, so it needs re-validating on every device
-  rather than riding along here.
+  A near-identical bug survives into 2.2.0 and is worth knowing about before
+  touching this pipeline's GPU options: with **constant-tensor sharing on**,
+  the diffusion model still fails, now with `use of undeclared identifier
+  'scale'`. Bisecting the options one at a time shows sharing alone is the
+  trigger, so the SD pipeline turns it off, and turns off
+  `AllowSrcQuantizedFcConvOps` with it because `litert_gpu_options.h` says
+  sharing "must be true to use this". Neither is missed: the rewritten models
+  are fully delegated without the quantized fc/conv path, and sharing
+  de-duplicates weights across the subgraphs of one model while each SD export
+  has a single signature. Dropping the quantized path also stops quantizing
+  inputs to 8 bit, which the header notes costs accuracy. The `llm-*` pipeline
+  keeps sharing, where it does the memory work it was added for.
 
-  Until both are resolved `stable_diffusion` stays on CPU, and the pipeline
-  handles the failure rather than pretending: the GPU attempt fails, everything
-  built so far is released, the pages are handed back and the three recompile
-  on CPU. All three compile on one accelerator or none do, because the
-  benchmark reports a single accelerator name. Measured on an iPad mini on CPU
-  at about 4.4-5.6 s per diffusion step, so roughly 100 s for 20 steps; on the
-  host the same query takes about 42 s.
+  End to end through this backend on a macOS host, one 20-step image:
+
+  | models | delegate | per image | per step |
+  |---|---|---|---|
+  | published v5_0 | CPU | 43.84 s | ~2.1 s |
+  | rewritten | Metal | 19.40 s | ~0.82 s |
+
+  with no CPU fallback. For reference the rewrite is worth nothing on CPU on
+  its own -- 43.22 s against 43.84 s, one query each, which is noise -- so it
+  only pays off together with the delegate.
+
+  When a GPU compile does fail the pipeline handles it rather than pretending:
+  everything built so far is released, the pages are handed back and the three
+  recompile on CPU. All three compile on one accelerator or none do, because
+  the benchmark reports a single accelerator name. On CPU an iPad mini measures
+  about 4.4-5.6 s per diffusion step, so roughly 100 s for 20 steps.
 * **A query has two phases and they do not fit in memory together.** The three
   models are compiled up front and stay resident, which is fine on Android but
   not here. Measured on an iPhone 16 Pro, in MiB still available before the

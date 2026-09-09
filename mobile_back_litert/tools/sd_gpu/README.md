@@ -57,12 +57,15 @@ once per image, so for one image this is roughly 37.6 s against 7.1 s.
 Dropping `BROADCAST_TO` speeds up the CPU path too — it was materialising full
 size tensors that the binary kernels now broadcast for free.
 
-That CPU gain does **not** carry back to LiteRT 2.1.5, which is what this
-backend pins. Measured end to end through the C++ backend on a macOS host, one
+That CPU gain does **not** show up end to end, and it does not carry back to
+LiteRT 2.1.5 at all. Measured through the C++ backend on a macOS host, one
 20-step image on CPU takes 43.84 s with the published models and 43.22 s with
-the rewritten ones — a single query each, 1.4% apart, which is noise. So there
-is no reason to adopt the rewritten models while pinned at 2.1.5: everything
-they buy needs 2.2.x.
+the rewritten ones — a single query each, 1.4% apart, which is noise. The
+rewrite is worth adopting for the delegate, not for the CPU path.
+
+These models also need **LiteRT 2.2.0 or newer**. On 2.1.5 the Metal backend
+emits invalid shader source for the int8 diffusion weights (`use of undeclared
+identifier 'q0'`) and the compile fails whatever the options say.
 
 The text encoder keeps two `GATHER`s on CPU: its token and position indices are
 2-D and the delegate only accepts 1-D indices there. It costs ~13 ms against the

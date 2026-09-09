@@ -193,54 +193,48 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "stable_diffusion"
   framework: "LiteRT"
-  # MEASURED: Metal does not work for this benchmark with the models that ship
-  # today, and the reason is shapes, not quantization. Compiled against the
-  # Metal accelerator on a macOS host, all three exports fail
-  # CompiledModel::Create with "a delegate that only supports static-sized
-  # tensors with a graph that has dynamic-sized tensors" -- text encoder,
-  # diffusion and decoder alike. Setting no GPU options at all fails
-  # identically, so it is not the option set.
+  # MEASURED: Metal works for this benchmark, but only with the exports
+  # produced by tools/sd_gpu/convert.py and only on LiteRT 2.2.0 or newer.
   #
-  # The declared batch dimension is a red herring. Rewriting shape_signature
-  # so all three models report fully static shapes (0 dynamic tensors) does
-  # NOT help -- tried, the compile fails exactly the same way. The models
-  # compute their shapes at RUN TIME: SHAPE -> REDUCE_PROD/PACK/CONCATENATION
-  # -> RESHAPE/BROADCAST_TO, which makes the outputs dynamic whatever the
-  # inputs say.
-  #   text encoder: 48 SHAPE, 96 REDUCE_PROD, 48 PACK, 240 RESHAPE
-  #   diffusion:   402 SHAPE, 194 REDUCE_PROD, 657 RESHAPE, 366 BROADCAST_TO
-  #   decoder:     150 SHAPE, 30 PACK, 64 RESHAPE, 180 BROADCAST_TO
+  # The published v5_0 models do not compile on the Metal accelerator at all:
+  # CompiledModel::Create fails with "a delegate that only supports
+  # static-sized tensors with a graph that has dynamic-sized tensors", for the
+  # text encoder, diffusion model and decoder alike. Setting no GPU options at
+  # all fails identically, so it is not the option set, and rewriting
+  # shape_signature so the models report 0 dynamic tensors does not help
+  # either: the graphs compute their shapes at RUN TIME (SHAPE ->
+  # REDUCE_PROD/GATHER/PACK/BROADCAST_ARGS -> RESHAPE/BROADCAST_TO), which
+  # makes the outputs dynamic whatever the inputs say.
   #
-  # The models CAN be rewritten to run on Metal; tools/sd_gpu/convert.py does
-  # it, and its README carries the details. Folding those shapes away is only
-  # the first of four blockers -- BROADCAST_TO is unimplemented on the GPU, the
-  # group-norm blocks are rank 5 against a rank-4 limit, and SUB is declared at
-  # version 3 against a delegate that supports 2. With all four fixed the
-  # diffusion model and the decoder are FULLY GPU-accelerated and every output
-  # stays bit-identical; on a macOS host the diffusion model goes 1494 ms ->
-  # 332 ms per step and the decoder 7702 ms -> 463 ms.
+  # Folding those shapes away is only the first of four blockers. BROADCAST_TO
+  # is not implemented by the delegate; the group-norm blocks work in rank 5
+  # against a rank-4 limit; and SUB is declared at version 3, which only the
+  # rank-5 operands needed, against a delegate that supports version 2 -- that
+  # last one alone splits the graph into partitions too small to delegate.
+  # tools/sd_gpu/README.md carries the details and the measurements.
   #
-  # Two things still block switching this over, so CPU stays selected:
-  #   1. The rewritten models are not hosted yet. listResources walks every
-  #      delegate choice, so naming a URL that 404s would break every
-  #      benchmark, not just this one.
-  #   2. LiteRT 2.1.5, which this backend pins, cannot run the rewritten
-  #      diffusion model anyway: its Metal backend emits invalid shader source
-  #      for the int8 weights ("use of undeclared identifier 'q0'" in
-  #      newLibraryWithSource, from half4 weight_scale = half4(q0)). That is a
-  #      code-generation bug, not an option -- it reproduces with
-  #      AllowSrcQuantizedFcConvOps both on and off. 2.2.0 compiles all three,
-  #      so this needs the pin moved. The accelerator cannot be upgraded on its
-  #      own: a 2.2.0 dylib will not load into a 2.1.5 runtime, nor the
-  #      reverse.
+  # The Metal choice below therefore names its own model files. They are the
+  # same networks: the converter runs the original and the rewrite on the same
+  # inputs and refuses to write anything that is not bit-identical.
   #
-  # The choice is kept so this stays a measurement rather than an assumption,
-  # and because the pipeline handles it correctly: the GPU attempt fails, what
-  # was built is released, and the three recompile on CPU, which runs a full
-  # 20-step query and reports CPU. Selecting Metal here costs nothing extra to
-  # download -- it names the same four files as the CPU choice. The three
-  # models total about 1.04 GiB, which leaves real headroom under the iOS
-  # per-process memory limit -- unlike the llm-* benchmarks.
+  # Two things about this pipeline's GPU options are worth knowing before
+  # changing them. Constant-tensor sharing must stay OFF here -- with it on the
+  # Metal backend generates invalid shader source for the int8 diffusion model
+  # ("use of undeclared identifier 'scale'") and the compile fails; bisecting
+  # the options one at a time shows sharing alone is the trigger.
+  # AllowSrcQuantizedFcConvOps is off with it, because litert_gpu_options.h
+  # says sharing "must be true to use this". Neither is missed: the rewritten
+  # models are fully delegated without the quantized fc/conv path, and sharing
+  # de-duplicates weights across the subgraphs of one model, while each of
+  # these three exports a single signature.
+  #
+  # Measured end to end through this backend on a macOS host, one 20-step
+  # image: 43.84 s on CPU with the published models, 19.40 s on Metal with
+  # these, no CPU fallback. Per denoising step that is about 2.1 s against
+  # 0.82 s.
+  #
+  # The three models total about 1.04 GiB, which leaves real headroom under the
+  # iOS per-process memory limit -- unlike the llm-* benchmarks.
   delegate_choice: {
     delegate_name: "CPU"
     accelerator_name: "cpu"
@@ -266,24 +260,40 @@ benchmark_setting {
     delegate_name: "Metal"
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
+    # The GPU-ready exports, produced by tools/sd_gpu/convert.py from the v5_0
+    # models above. They are the same networks -- the converter refuses to
+    # write a model whose output is not bit-identical -- rewritten so the
+    # delegate will take them. The CPU choice keeps the published files.
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_decoder_dynamic_fp16.tflite"
-      model_checksum: "165b70a01643e70a23e5e54a949be306"
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/sd_decoder_litert.tflite"
+      model_checksum: "8aa94e17f9394958e0c71c653ab1140f"
     }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_diffusion_model_dynamic_int8.tflite"
-      model_checksum: "ccfd761a2f8186c3669948515d40a880"
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/sd_diffusion_model_litert.tflite"
+      model_checksum: "6547cfadc83bd809969dcb90bf754efd"
     }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/sd_text_encoder_dynamic_int8.tflite"
-      model_checksum: "b64effb0360f9ea49a117cdaf8a2fbdc"
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/sd_text_encoder_litert.tflite"
+      model_checksum: "dd4041a27340e829dda3eb90928b0804"
     }
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0/tflite/timestep_embeddings_data.bin.ts"
       model_checksum: "798b772155a69de5df44b304327bb3cc"
     }
+    custom_setting {
+      id: "text_encoder_filename"
+      value: "sd_text_encoder_litert.tflite"
+    }
+    custom_setting {
+      id: "diffusion_model_filename"
+      value: "sd_diffusion_model_litert.tflite"
+    }
+    custom_setting {
+      id: "decoder_filename"
+      value: "sd_decoder_litert.tflite"
+    }
   }
-  delegate_selected: "CPU"
+  delegate_selected: "Metal"
   custom_setting {
     id: "pipeline"
     value: "StableDiffusionPipeline"
