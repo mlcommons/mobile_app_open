@@ -217,21 +217,34 @@ benchmark_setting {
   # same networks: the converter runs the original and the rewrite on the same
   # inputs and refuses to write anything that is not bit-identical.
   #
-  # Two things about this pipeline's GPU options are worth knowing before
-  # changing them. Constant-tensor sharing must stay OFF here -- with it on the
-  # Metal backend generates invalid shader source for the int8 diffusion model
-  # ("use of undeclared identifier 'scale'") and the compile fails; bisecting
-  # the options one at a time shows sharing alone is the trigger.
-  # AllowSrcQuantizedFcConvOps is off with it, because litert_gpu_options.h
-  # says sharing "must be true to use this"; the rewritten models are fully
-  # delegated without the quantized fc/conv path anyway.
+  # Constant-tensor sharing is ON, and this benchmark does not fit without it.
+  # The option decides whether the delegate materialises the weights or keeps
+  # them stored and dequantises them in the shader: compiling the diffusion
+  # model on Metal costs 4409 MiB with it off against 1913 MiB with it on,
+  # measured on a macOS host with phys_footprint, the counter EXC_RESOURCE
+  # compares against. Roughly 2885 MiB is available to this benchmark on an
+  # iPhone 16 Pro, so with sharing off no arrangement of the pipeline fits.
   #
-  # Turning sharing off is NOT free. The same header says it reduces
-  # allocation for constant tensors "even though tensors are not shared with
-  # other subgraphs", so this gives up their mmap/madvise handling, not just
-  # cross-subgraph de-duplication -- on the pipeline already closest to the
-  # per-process limit. It is accepted because with sharing on there is no
-  # Metal run at all. The iOS memory cost has not been measured.
+  # Sharing was off until the converter learned its fifth rewrite. With it on
+  # the Metal backend used to emit invalid shader source ("use of undeclared
+  # identifier 'scale'"): it picks a scalar weight-dequant template for
+  # per-tensor int8 weights but never declares the arguments that template
+  # references. Single-op models place the fault exactly -- per-tensor int8
+  # FULLY_CONNECTED fails, per-axis FULLY_CONNECTED and every CONV_2D form
+  # compile -- so tools/sd_gpu/convert.py re-expresses those weights as
+  # per-axis, repeating the one scale they already carry. The weight bytes are
+  # untouched and the CPU output is bit-identical.
+  #
+  # AllowSrcQuantizedFcConvOps stays off. litert_gpu_options.h says sharing
+  # "must be true to use this", so it is available now, but the rewritten
+  # models are fully delegated without it and the header notes it quantizes the
+  # input tensors to 8 bit, which costs accuracy.
+  #
+  # NOTE: this depends on the Metal model files below being the per-axis
+  # exports. Until they are republished, the diffusion model still carries
+  # per-tensor FULLY_CONNECTED weights, its Metal compile fails on the shader
+  # above, and the pipeline falls back to CPU for all three models -- a working
+  # run, but on the CPU accelerator, not Metal.
   #
   # Measured end to end through this backend on a macOS host, one 20-step
   # image: 43.84 s on CPU with the published models against 18.8-19.4 s on
@@ -240,10 +253,13 @@ benchmark_setting {
   # and the pipeline never took its CPU retry path -- not that no operator ran
   # on CPU; two GATHERs in the text encoder still do.
   #
-  # The three model files total about 1.04 GiB. That is a download size, not a
-  # peak footprint: all three are compiled before the phase separation takes
-  # effect, and compilation and first invocation allocate on top. The iOS
-  # figure has not been measured for this configuration.
+  # The three model files total about 1.04 GiB, which is a download size, not a
+  # peak footprint. Measured on the macOS host: 118 MiB for the text encoder,
+  # 1913 MiB for the diffusion model and 217 MiB for the decoder, 2015 MiB with
+  # all three compiled at once, and about 2.3-2.6 GiB at the peak of the
+  # denoising loop. The pipeline still keeps the three stages apart in memory on
+  # Apple, so only one model is resident during a query. Not yet confirmed on
+  # device.
   delegate_choice: {
     delegate_name: "CPU"
     accelerator_name: "cpu"

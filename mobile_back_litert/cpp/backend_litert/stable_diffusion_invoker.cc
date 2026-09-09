@@ -119,11 +119,12 @@ StableDiffusionInvoker::StableDiffusionInvoker(SDBackendData *backend_data)
     : backend_data_(backend_data) {}
 
 bool StableDiffusionInvoker::invoke(std::vector<float> *image) {
-  // A no-op unless the platform keeps the two phases apart in memory (see
-  // SDBackendData). Rebuilding a model is cheap next to a query.
+  // A no-op unless the platform keeps the three stages apart in memory (see
+  // SDBackendData). Rebuilding a model is cheap next to a query, and no extra
+  // compiles are paid for: the same three models are built either way.
   if (backend_data_->set_phase &&
-      !backend_data_->set_phase(SDPhase::kEncodeAndDiffuse)) {
-    LOG(ERROR) << "Failed to prepare the text encoder and diffusion model";
+      !backend_data_->set_phase(SDPhase::kEncode)) {
+    LOG(ERROR) << "Failed to prepare the text encoder";
     return false;
   }
 
@@ -139,6 +140,15 @@ bool StableDiffusionInvoker::invoke(std::vector<float> *image) {
                      &unconditional_encoded_text)) {
     return false;
   }
+
+  // Both prompts are encoded, and the contexts above are host vectors, so the
+  // encoder is finished with. The denoising loop is the memory peak, so it is
+  // not carried into it.
+  if (backend_data_->set_phase && !backend_data_->set_phase(SDPhase::kDiffuse)) {
+    LOG(ERROR) << "Failed to prepare the diffusion model";
+    return false;
+  }
+  LITERT_LOG_MEM("sd: switched to the diffusion phase");
 
   LOG(INFO) << "Diffusion process started";
   std::vector<float> latent;

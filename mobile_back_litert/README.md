@@ -277,24 +277,56 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   recompile on CPU. All three compile on one accelerator or none do, because
   the benchmark reports a single accelerator name. On CPU an iPad mini measures
   about 4.4-5.6 s per diffusion step, so roughly 100 s for 20 steps.
-* **A query has two phases and they do not fit in memory together.** The three
-  models are compiled up front and stay resident, which is fine on Android but
-  not here. Measured on an iPhone 16 Pro, in MiB still available before the
-  limit:
+* **Constant tensor sharing is what makes the Metal path fit, and one shader
+  bug stood in the way of it.** The option decides whether the delegate
+  materialises the weights or keeps them stored and dequantises them in the
+  shader. Measured on a macOS host with `phys_footprint`, the counter
+  `EXC_RESOURCE` compares against:
 
-  | phase | MiB left | |
-  |---|---|---|
-  | before compiling models | 2849 | ~527 already used by the app |
-  | all three models compiled | 1770 | the three models cost 1079 |
-  | diffusion done | 373 | the denoising loop needs ~1405 |
-  | transient models released | 2688 | freeing them recovered 2315 |
-  | decode done | 1279 | the decoder arena needs ~1409 |
+  | model | file | sharing off | sharing on |
+  |---|---|---|---|
+  | text encoder (int8) | 118 MiB | 446 MiB | 118 MiB |
+  | diffusion model (int8) | 822 MiB | 4409 MiB | 1913 MiB |
+  | decoder (fp16) | 95 MiB | 1022 MiB | 217 MiB |
 
-  Each phase needs most of the budget on its own, so on Apple only the models
-  the current phase uses are kept compiled and the rest are released and
-  rebuilt on demand (`set_phase` in `stable_diffusion_pipeline.h`). Compiling
-  all three takes about 1.3 s against a ~100 s query. Android has the headroom,
-  keeps everything resident, and its throughput does not move.
+  About 2885 MiB is available to this benchmark on an iPhone 16 Pro, so with
+  sharing off the diffusion model does not fit on its own and no arrangement of
+  the pipeline rescues it.
+
+  Sharing could not be turned on because the Metal backend generated a shader
+  that does not compile -- `use of undeclared identifier 'scale'`. It carries
+  two templates for dequantising int8 weights, one reading a per-axis scale
+  tensor and one taking a scalar, and it picks the scalar form for per-tensor
+  weights without declaring the arguments that form references. Single-op
+  models place the fault exactly: per-tensor int8 `FULLY_CONNECTED` fails,
+  while per-axis `FULLY_CONNECTED`, per-tensor `CONV_2D`, per-axis `CONV_2D`
+  and fp16 `CONV_2D` all compile. The accelerator is a prebuilt dylib, so the
+  model is the only side we control -- `tools/sd_gpu/convert.py` re-expresses
+  those weights as per-axis, repeating the one scale they already carry. The
+  weight bytes are untouched and the CPU output is bit-identical.
+* **A query has three stages and they are still kept apart in memory.** With
+  sharing on the three models do fit together (2015 MiB), but not with much
+  room, so on Apple only the model the current stage needs is kept compiled and
+  the others are released and rebuilt on demand (`set_phase` in
+  `stable_diffusion_pipeline.h`). This costs no extra compiles -- the same
+  three models are built either way. Measured on the macOS host:
+
+  | stage | MiB held |
+  |---|---|
+  | all three models compiled | 2015 |
+  | query start (encoder only) | 192 |
+  | diffusion phase | 1849 |
+  | diffusion done | 2523 |
+  | decode | 220 |
+  | decode done | 620 |
+
+  Sharing costs throughput, because the weights are dequantised in the shader
+  on every access rather than once up front: one 20-step query went from 38.2 s
+  to 45.5 s on that host. Android has the headroom, keeps everything resident,
+  and its throughput does not move.
+
+  These are host numbers on a paravirtual GPU and have not yet been confirmed
+  on device.
 * Releasing has to be symmetric, and this is easy to get wrong. Freeing only
   the encoder and the diffusion model got the decode to pass, and then the
   *second* query died: it rebuilt those two on top of the decoder's ~1.4 GiB

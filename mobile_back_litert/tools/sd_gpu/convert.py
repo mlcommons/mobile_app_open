@@ -23,9 +23,11 @@
 # ==============================================================================
 """Rewrite the Stable Diffusion exports so the LiteRT GPU delegate accepts them.
 
-The v5_0 SD exports run only on CPU under LiteRT. Four separate things stop the
-GPU delegate from taking them; this script fixes all four and checks that the
-result still computes exactly the same function.
+The v5_0 SD exports run only on CPU under LiteRT. Five separate things stop the
+GPU delegate from taking them -- four that block delegation outright, and one
+that blocks the memory option the delegate needs to fit on a phone. This script
+fixes all five and checks that the result still computes exactly the same
+function.
 
 1. Dynamic shapes. Every input declares -1 on the batch dimension and the
    graphs recompute their own shapes at run time (SHAPE -> REDUCE_PROD / GATHER
@@ -52,6 +54,17 @@ result still computes exactly the same function.
    nothing needs version 3, but the declared version stays and splits the graph
    into partitions too small to delegate. This is the step that takes the
    diffusion and decoder graphs from ~7% delegated to fully accelerated.
+
+5. Per-tensor int8 FULLY_CONNECTED weights. These delegate fine, but they make
+   the Metal backend generate a shader that references undeclared identifiers,
+   so compiling with constant tensor sharing enabled fails outright:
+
+       newLibraryWithSource: error: use of undeclared identifier 'scale'
+
+   Sharing is not optional here: without it the diffusion model costs 4409 MiB
+   to compile on Metal, against an iOS budget of about 2885 MiB. Re-expressing
+   those weights as per-axis, repeating the one scale they already carry,
+   selects a shader template that does compile and brings that down to 1913 MiB.
 
 Measured on an M-series Mac (LiteRT CompiledModel, ms per invocation):
 
@@ -329,6 +342,64 @@ def lower_op_versions(model, sub, shapes):
     return lowered
 
 
+def widen_fc_quantization(model, sub):
+    """Step 5: re-express per-tensor FULLY_CONNECTED weights as per-axis.
+
+    The Metal backend carries two shader templates for dequantising int8
+    weights: one that reads a per-axis scale tensor, and one that takes a
+    scalar. For per-tensor weights it emits the scalar form but never declares
+    the arguments that form references, so with constant tensor sharing on the
+    generated shader does not compile:
+
+        newLibraryWithSource: error: use of undeclared identifier 'scale'
+          half4 w_scale_s0 = half4(float4(scale));
+        error: use of undeclared identifier 'zero_point'
+
+    Repeating the single scale across the output-channel axis selects the
+    per-axis template instead. Every entry is the value the tensor already
+    carried, so the dequantised weights are identical -- only quantization
+    metadata changes here, never a weight byte.
+
+    This is what lets the pipeline turn sharing on, and sharing is what keeps
+    the diffusion model inside the iOS per-process limit: compiling it on Metal
+    costs 4409 MiB without sharing against 1913 MiB with it, and the budget at
+    that point in a run is about 2885 MiB. Measured with single-op models, the
+    trigger is per-tensor int8 FULLY_CONNECTED specifically: per-axis
+    FULLY_CONNECTED, per-tensor CONV_2D, per-axis CONV_2D and fp16 CONV_2D all
+    compile.
+    """
+    names = {}
+    for ci, oc in enumerate(model.operatorCodes):
+        code = max(oc.builtinCode, oc.deprecatedBuiltinCode)
+        names[ci] = shape_eval.OPNAME.get(code)
+
+    widened = 0
+    for op in sub.operators:
+        if names.get(int(op.opcodeIndex)) != "FULLY_CONNECTED":
+            continue
+        ins = ins_of(op)
+        if len(ins) < 2 or ins[1] < 0:
+            continue
+        weights = sub.tensors[ins[1]]
+        if weights.type != schema.TensorType.INT8:
+            continue
+        q = weights.quantization
+        # Already per-axis, or not quantized at all. A tensor shared by several
+        # FULLY_CONNECTED ops is widened by the first one and skipped here.
+        if q is None or q.scale is None or len(q.scale) != 1:
+            continue
+        if weights.shape is None or len(weights.shape) != 2:
+            continue
+        channels = int(weights.shape[0])
+        zero = 0 if q.zeroPoint is None or len(q.zeroPoint) == 0 else int(
+            q.zeroPoint[0])
+        q.scale = np.full(channels, float(q.scale[0]), dtype=np.float32)
+        q.zeroPoint = np.full(channels, zero, dtype=np.int64)
+        q.quantizedDimension = 0
+        widened += 1
+    return widened
+
+
 def optimize(data):
     """Steps 2-4: the op-level rewrites, after the shapes are static."""
     shapes, _, _ = probe(data)
@@ -340,8 +411,10 @@ def optimize(data):
     squeezed = {i: (v[1:] if len(v) >= 5 and v[0] == 1 else v)
                 for i, v in shapes.items()}
     lowered = lower_op_versions(model, sub, squeezed)
+    n_widened = widen_fc_quantization(model, sub)
     print("    dropped %d BROADCAST_TO, squeezed %d rank-5 tensors %s, "
-          "lowered %s" % (n_bcast, n_sq, notes, lowered or "nothing"))
+          "lowered %s, widened %d per-tensor FC weights"
+          % (n_bcast, n_sq, notes, lowered or "nothing", n_widened))
     return serialize(model)
 
 

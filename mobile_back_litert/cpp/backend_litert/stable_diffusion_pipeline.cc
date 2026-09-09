@@ -82,6 +82,17 @@ void ReleaseModel(SDModel *model) {
   model->compiled.reset();
 }
 
+#if defined(__APPLE__)
+// The filename of a model path. When a compile is killed by EXC_RESOURCE the
+// process dies without unwinding, so the last line that reached the log is the
+// only evidence of which of the three models was being built; a shared label
+// would leave that unanswered.
+std::string ModelLabel(const std::string &path) {
+  const size_t slash = path.rfind('/');
+  return slash == std::string::npos ? path : path.substr(slash + 1);
+}
+#endif
+
 bool backendExists = false;
 
 // The //flutter/cpp:utils config readers are deliberately not linked into
@@ -200,35 +211,43 @@ bool BuildModel(litert::Environment &env, const std::string &model_path,
                                      litert::HwAccelerators::kCpu);
     auto gpu_options = options->GetGpuOptions();
     if (gpu_options) {
-      // Constant-tensor sharing is off, and that is deliberate. With it on,
-      // the Metal backend generates invalid shader source for the int8
-      // diffusion model and the whole compile fails:
+      // Constant-tensor sharing is ON, and the models are built so it can be.
+      //
+      // The option decides whether the delegate materialises the weights or
+      // keeps them in their stored form and dequantises them in the shader.
+      // That is the difference between fitting on a phone and not: compiling
+      // the diffusion model on Metal costs 4409 MiB with sharing off and
+      // 1913 MiB with it on, against roughly 2885 MiB still available to this
+      // benchmark on an iPhone 16 Pro. iOS kills a process that crosses its
+      // per-process limit and the kill cannot be caught, so this is not a
+      // tuning knob here.
+      //
+      // Sharing used to be off because turning it on made the Metal backend
+      // emit a shader that does not compile:
       //
       //   newLibraryWithSource: program_source:29:35:
       //     error: use of undeclared identifier 'scale'
+      //     half4 w_scale_s0 = half4(float4(scale));
       //
-      // Bisecting the GPU options one at a time shows sharing alone causes it;
-      // every other option compiles.
+      // The backend carries two templates for dequantising int8 weights: one
+      // that reads a per-axis scale tensor, and one that takes a scalar. It
+      // picks the scalar form for per-tensor weights but never declares the
+      // arguments that form references. Single-op models place the fault
+      // precisely: per-tensor int8 FULLY_CONNECTED fails, while per-axis
+      // FULLY_CONNECTED, per-tensor CONV_2D, per-axis CONV_2D and fp16 CONV_2D
+      // all compile. tools/sd_gpu/convert.py therefore re-expresses those
+      // weights as per-axis, repeating the single scale they already carry, so
+      // the working template is chosen. The weights are untouched.
       //
-      // This is not a free trade. litert_gpu_options.h is explicit that the
-      // option reduces allocation for constant tensors "even though tensors
-      // are not shared with other subgraphs", so turning it off costs memory
-      // here even though each of these three models exports a single
-      // signature -- it gives up the mmap/madvise handling of the weights,
-      // not just cross-subgraph de-duplication. That matters on iOS, where
-      // this pipeline is already the closest to the per-process limit. It is
-      // accepted only because the alternative is not a heavier Metal run but
-      // no Metal run at all: with sharing on the compile fails outright.
-      // The iOS memory cost of running without it has NOT been measured; the
-      // numbers quoted here are from a macOS host.
+      // The Metal accelerator is a prebuilt dylib, so the codegen itself
+      // cannot be patched from here; the model is the only side we control.
       //
-      // AllowSrcQuantizedFcConvOps stays off with it. litert_gpu_options.h
-      // says constant tensor sharing "must be true to use this", so the two
-      // move together -- and it is no longer needed: with statically shaped
-      // models the diffusion graph is fully delegated without it. Dropping it
-      // also stops quantizing the input tensors to 8 bit, which the header
-      // notes costs accuracy.
-      gpu_options->EnableConstantTensorSharing(false);
+      // AllowSrcQuantizedFcConvOps stays off. litert_gpu_options.h says
+      // sharing "must be true to use this", so it is now available -- but it
+      // is not needed (with statically shaped models the diffusion graph is
+      // fully delegated without it) and the header notes it quantizes the
+      // input tensors to 8 bit, which costs accuracy.
+      gpu_options->EnableConstantTensorSharing(true);
       gpu_options->EnableAllowSrcQuantizedFcConvOps(false);
       gpu_options->SetPrecision(litert::GpuOptions::Precision::kFp16);
       gpu_options->SetBufferStorageType(
@@ -249,7 +268,13 @@ bool BuildModel(litert::Environment &env, const std::string &model_path,
     }
   }
 
+#if defined(__APPLE__)
+  LITERT_LOG_MEM(("sd: compiling " + ModelLabel(model_path)).c_str());
+#endif
   auto compiled = litert::CompiledModel::Create(env, model_path, *options);
+#if defined(__APPLE__)
+  LITERT_LOG_MEM(("sd: compiled " + ModelLabel(model_path)).c_str());
+#endif
   if (!compiled) {
     LOG(ERROR) << "CompiledModel::Create failed for " << model_path << ": "
                << compiled.Error().Message();
@@ -304,6 +329,9 @@ bool BuildModel(litert::Environment &env, const std::string &model_path,
   }
   model->input_bufs = std::move(*input_bufs);
   model->output_bufs = std::move(*output_bufs);
+#if defined(__APPLE__)
+  LITERT_LOG_MEM(("sd: buffers ready " + ModelLabel(model_path)).c_str());
+#endif
 
   for (size_t i = 0; i < input_specs.size(); ++i) {
     if (!CheckPackedSize(model->input_bufs[(*input_indices)[i]], input_specs[i],
@@ -414,6 +442,7 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   }
   backend_data->env = std::make_unique<litert::Environment>(std::move(*env));
 
+
   // Signature input keys are alphabetical, so these lists are in role order,
   // not tensor order: the text encoder's signature reads (positions,
   // tokens), and the diffusion model's reads (context, latent,
@@ -501,20 +530,20 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   LITERT_LOG_MEM("sd: all three models compiled");
 
 #if defined(__APPLE__)
-  // See the comment on these members in the header: the decode step is the
-  // memory peak and iOS kills the process past its high-watermark limit, so
-  // the encoder and the diffusion model do not stay resident across it.
+  // See the comment on these members in the header. Each stage of a query
+  // needs exactly one of the three models, so only that one is kept compiled.
   backend_data->set_phase =
       [backend_data, text_encoder_path, diffusion_model_path, decoder_path,
        num_threads, use_gpu, encoder_inputs, encoder_output, diffusion_inputs,
        diffusion_output, decoder_inputs, decoder_output](SDPhase phase) {
-        // Release first, then build: the point is to never hold both phases'
-        // working sets at once. Destroying a model is not enough on its own --
-        // the pages stay on libmalloc's free list and keep counting against the
-        // limit until they are handed back, which is what makes the release
-        // visible to EXC_RESOURCE.
+        // Release first, then build, so two models are never resident at once.
+        // Destroying a model is not enough on its own: the pages stay on
+        // libmalloc's free list and keep counting against the limit until they
+        // are handed back, which is what makes the release visible to
+        // EXC_RESOURCE.
         std::vector<size_t> idx;
-        if (phase == SDPhase::kEncodeAndDiffuse) {
+        if (phase == SDPhase::kEncode) {
+          ReleaseModel(&backend_data->diffusion);
           ReleaseModel(&backend_data->decoder);
           litert_apple::ReturnFreeMemoryToOS();
           if (backend_data->text_encoder.compiled == nullptr) {
@@ -526,6 +555,13 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
             backend_data->encoder_tokens_idx = idx[0];
             backend_data->encoder_positions_idx = idx[1];
           }
+          return true;
+        }
+
+        if (phase == SDPhase::kDiffuse) {
+          ReleaseModel(&backend_data->text_encoder);
+          ReleaseModel(&backend_data->decoder);
+          litert_apple::ReturnFreeMemoryToOS();
           if (backend_data->diffusion.compiled == nullptr) {
             if (!BuildModel(*backend_data->env, diffusion_model_path,
                             num_threads, use_gpu, diffusion_inputs,

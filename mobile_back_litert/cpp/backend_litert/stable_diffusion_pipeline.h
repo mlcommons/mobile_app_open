@@ -39,10 +39,13 @@ struct SDModel {
   size_t output_idx = 0;
 };
 
-// The two halves of a query, which on Apple are kept apart in memory: the
-// prompt encoder and the denoising loop, then the VAE decode.
+// The three stages of a query, which on Apple are kept apart in memory. Each
+// needs exactly one of the three models, and the values that pass between them
+// -- the encoded prompts, then the latent -- are small host vectors, so no two
+// models ever have to be resident at once.
 enum class SDPhase {
-  kEncodeAndDiffuse,
+  kEncode,
+  kDiffuse,
   kDecode,
 };
 
@@ -82,21 +85,29 @@ struct SDBackendData {
   // Apple only; left null elsewhere, where every model stays resident.
   //
   // iOS kills a process that crosses a per-process limit (measured at 3376 MB
-  // on an 8 GB device), and this pipeline has two phases that each need most
-  // of that budget on their own. Measured on an iPhone 16 Pro, in MiB still
-  // available:
+  // on an 8 GB device) and the kill cannot be caught, so this pipeline keeps
+  // only the model the current stage needs compiled and rebuilds the others on
+  // demand. Measured on the macOS host with phys_footprint, the counter
+  // EXC_RESOURCE compares against, for the Metal path:
   //
-  //   before compiling models   2849   (~527 already used by the app)
-  //   all three models compiled 1770   (the three models cost 1079)
-  //   diffusion done             373   (the denoising loop needs ~1405)
-  //   transient models released 2688   (freeing them recovered 2315)
-  //   decode done               1279   (the decoder arena needs ~1409)
+  //   text encoder compiled        118 MiB
+  //   diffusion model compiled    1913 MiB   (the peak; ~2.3-2.6 GiB during
+  //                                           the denoising loop with its
+  //                                           working set on top)
+  //   decoder compiled             217 MiB
+  //   all three at once           2015 MiB
   //
-  // So the two phases fit one at a time and never together. Only the models
-  // the current phase needs are kept compiled; the rest are released and
-  // rebuilt on demand. Compiling all three takes about 1.3 s against a query
-  // that takes ~100 s on the CPU, so the cost is negligible. Android has the
-  // headroom, keeps everything resident, and its throughput does not move.
+  // against roughly 2885 MiB still available to this benchmark on an iPhone 16
+  // Pro. The three fit together, but not with much room, so the stages are
+  // still kept apart: the encoder is released before the denoising loop, and
+  // both before the decode. Rebuilding costs no extra compiles -- the same
+  // three models are built either way, just not at the same time.
+  //
+  // These numbers depend on constant tensor sharing being on, which in turn
+  // depends on the models tools/sd_gpu/convert.py produces; see the comment on
+  // the GPU options in BuildModel. Without it the diffusion model alone needs
+  // 4409 MiB and no arrangement of phases fits. Android has the headroom, keeps
+  // everything resident, and its throughput does not move.
   std::function<bool(SDPhase)> set_phase;
 };
 

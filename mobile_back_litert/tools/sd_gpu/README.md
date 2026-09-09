@@ -11,7 +11,9 @@ bit-identical to the original.
 
 ## What blocks the GPU delegate
 
-Four separate things, all of which `convert.py` fixes:
+Five separate things, all of which `convert.py` fixes -- four that stop the
+delegate taking the graph at all, and one that stops the memory option the
+delegate needs to fit on a phone:
 
 1. **Dynamic shapes.** Every input declares `-1` on the batch dimension and the
    graphs recompute their own shapes at run time (`SHAPE` ->
@@ -39,6 +41,33 @@ Four separate things, all of which `convert.py` fixes:
    needs version 3, but the declared version stays and splits the graph into
    partitions too small to delegate. This step is what takes the diffusion and
    decoder graphs from ~7% delegated to fully accelerated.
+
+5. **Per-tensor int8 `FULLY_CONNECTED` weights.** These delegate fine, but they
+   make the Metal backend generate a shader that does not compile once constant
+   tensor sharing is enabled:
+
+   ```text
+   newLibraryWithSource: program_source:29:35:
+     error: use of undeclared identifier 'scale'
+     half4 w_scale_s0 = half4(float4(scale));
+   ```
+
+   The backend carries two templates for dequantising int8 weights -- one that
+   reads a per-axis scale tensor, one that takes a scalar -- and it picks the
+   scalar form for per-tensor weights without declaring the arguments that form
+   references. Single-op models place the fault exactly: per-tensor int8
+   `FULLY_CONNECTED` fails, while per-axis `FULLY_CONNECTED`, per-tensor
+   `CONV_2D`, per-axis `CONV_2D` and fp16 `CONV_2D` all compile.
+
+   Sharing is not optional here. It decides whether the delegate materialises
+   the weights or keeps them stored and dequantises them in the shader, and on
+   Metal the diffusion model costs 4409 MiB to compile without it against
+   1913 MiB with it -- against roughly 2885 MiB available on an iPhone 16 Pro.
+   The accelerator is a prebuilt dylib, so the model is the only side we
+   control: re-expressing those weights as per-axis, repeating the one scale
+   they already carry, selects the template that compiles. 183 tensors in the
+   diffusion model and 72 in the text encoder are rewritten this way; the
+   decoder is fp16 and has none.
 
 ## Results
 
