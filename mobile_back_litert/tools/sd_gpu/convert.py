@@ -364,15 +364,31 @@ def verify(original_path, new_bytes, seed=0):
     del it
 
     a, b = run(original_path, feeds), run(new_bytes, feeds)
-    worst = 0.0
+    if len(a) != len(b):
+        print("    output count changed: %d -> %d" % (len(a), len(b)))
+        return False
+
+    ok, worst = True, 0.0
     for x, y in zip(a, b):
         if x.shape != y.shape:
             print("    output shape changed: %s -> %s" % (x.shape, y.shape))
-            return False
-        worst = max(worst, float(np.abs(x.astype(np.float64) -
-                                       y.astype(np.float64)).max()))
-    print("    verified against the original: max_abs_diff=%.3e" % worst)
-    return worst == 0.0
+            ok = False
+            continue
+        # Compare the values themselves rather than reducing to a max
+        # difference. max(0.0, nan) is 0.0 in Python, so a NaN difference
+        # would otherwise report a clean 0.000e+00 and pass.
+        if not np.array_equal(x, y, equal_nan=True):
+            ok = False
+        d = np.abs(x.astype(np.float64) - y.astype(np.float64))
+        finite = d[np.isfinite(d)]
+        if finite.size:
+            worst = max(worst, float(finite.max()))
+        if finite.size != d.size:
+            print("    non-finite values present in %d of %d elements"
+                  % (d.size - finite.size, d.size))
+    print("    verified against the original: max_abs_diff=%.3e%s"
+          % (worst, "" if ok else "  MISMATCH"))
+    return ok
 
 
 def convert_one(src, dst):
