@@ -242,12 +242,19 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   'scale'`. Bisecting the options one at a time shows sharing alone is the
   trigger, so the SD pipeline turns it off, and turns off
   `AllowSrcQuantizedFcConvOps` with it because `litert_gpu_options.h` says
-  sharing "must be true to use this". Neither is missed: the rewritten models
-  are fully delegated without the quantized fc/conv path, and sharing
-  de-duplicates weights across the subgraphs of one model while each SD export
-  has a single signature. Dropping the quantized path also stops quantizing
-  inputs to 8 bit, which the header notes costs accuracy. The `llm-*` pipeline
-  keeps sharing, where it does the memory work it was added for.
+  sharing "must be true to use this" -- and the rewritten models are fully
+  delegated without the quantized fc/conv path anyway. Dropping that path also
+  stops quantizing inputs to 8 bit, which the header notes costs accuracy.
+
+  Turning sharing off is **not** free, and it would be wrong to claim a single
+  signature makes it cheap. `litert_gpu_options.h` says the option reduces
+  allocation for constant tensors "even though tensors are not shared with
+  other subgraphs", so this gives up their mmap/madvise handling rather than
+  only cross-subgraph de-duplication -- on the pipeline already closest to the
+  iOS per-process limit. It is accepted because the alternative is not a
+  heavier Metal run but no Metal run at all. **The iOS memory cost has not
+  been measured**; every number here is from a macOS host. The `llm-*`
+  pipeline keeps sharing, where it does the memory work it was added for.
 
   End to end through this backend on a macOS host, one 20-step image:
 

@@ -16,14 +16,21 @@
 # LiteRT backend (Android and iOS): every benchmark runs on the LiteRT
 # CompiledModel API -- the llm-* benchmarks on the LLM pipeline, the vision/NLP
 # benchmarks on the single-model pipeline.
-backend_litert_bins_dir=output/litert-bins
+# The prebuilt accelerators are cached under a version-stamped directory. The
+# iOS rule below reuses whatever is already there rather than re-downloading,
+# so an unversioned path would silently keep an accelerator from an older
+# LiteRT next to a newer runtime -- and the two do not load together: a 2.2.0
+# dylib will not load into a 2.1.5 runtime, nor the reverse. Bumping the
+# version therefore has to change the cache path as well as the URL.
+backend_litert_version=2.2.0
+backend_litert_bins_dir=output/litert-bins/${backend_litert_version}
 
 # The Metal accelerator is a prebuilt dylib that the Xcode project embeds
 # unconditionally (it is dlopened at runtime, never linked), so it has to be
 # downloaded for every iOS build, even with WITH_LITERT=0 where only the dummy
 # backend is bundled.
 backend_litert_ios_bin_filename=libLiteRtMetalAccelerator.dylib
-backend_litert_ios_bins_url=https://storage.googleapis.com/litert/binaries/2.2.0/ios_arm64/${backend_litert_ios_bin_filename}
+backend_litert_ios_bins_url=https://storage.googleapis.com/litert/binaries/${backend_litert_version}/ios_arm64/${backend_litert_ios_bin_filename}
 backend_litert_ios_file=${backend_litert_bins_dir}/${backend_litert_ios_bin_filename}
 backend_litert_ios_lib_deps= mkdir -p ${backend_litert_bins_dir} && \
                              { [ -s ${backend_litert_ios_file} ] || \
@@ -33,7 +40,7 @@ backend_litert_ios_lib_deps= mkdir -p ${backend_litert_bins_dir} && \
 ifeq (${WITH_LITERT},1)
   $(info WITH_LITERT=1)
   backend_litert_bin_filename=libLiteRtClGlAccelerator.so
-  backend_litert_bins_url=https://storage.googleapis.com/litert/binaries/2.2.0/android_arm64/${backend_litert_bin_filename}
+  backend_litert_bins_url=https://storage.googleapis.com/litert/binaries/${backend_litert_version}/android_arm64/${backend_litert_bin_filename}
   backend_litert_lib_deps= mkdir -p ${backend_litert_bins_dir} && \
                            curl -fSL --proto '=https' -o ${backend_litert_bins_dir}/${backend_litert_bin_filename} ${backend_litert_bins_url}
 

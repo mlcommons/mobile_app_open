@@ -208,9 +208,19 @@ bool BuildModel(litert::Environment &env, const std::string &model_path,
       //     error: use of undeclared identifier 'scale'
       //
       // Bisecting the GPU options one at a time shows sharing alone causes it;
-      // every other option compiles. Sharing also buys much less here than it
-      // does for the LLM: it de-duplicates weights across the subgraphs of one
-      // model, and each of the three SD models exports a single signature.
+      // every other option compiles.
+      //
+      // This is not a free trade. litert_gpu_options.h is explicit that the
+      // option reduces allocation for constant tensors "even though tensors
+      // are not shared with other subgraphs", so turning it off costs memory
+      // here even though each of these three models exports a single
+      // signature -- it gives up the mmap/madvise handling of the weights,
+      // not just cross-subgraph de-duplication. That matters on iOS, where
+      // this pipeline is already the closest to the per-process limit. It is
+      // accepted only because the alternative is not a heavier Metal run but
+      // no Metal run at all: with sharing on the compile fails outright.
+      // The iOS memory cost of running without it has NOT been measured; the
+      // numbers quoted here are from a macOS host.
       //
       // AllowSrcQuantizedFcConvOps stays off with it. litert_gpu_options.h
       // says constant tensor sharing "must be true to use this", so the two
