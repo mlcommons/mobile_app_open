@@ -1,4 +1,12 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "ai-edge-litert==2.2.0",
+#     "numpy",
+#     "flatbuffers",
+# ]
+# ///
 # Copyright 2025 The MLPerf Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,8 +66,12 @@ the delegate only takes 1-D indices there. All three outputs are bit-identical
 to the originals.
 
 Usage:
-    pip install ai-edge-litert numpy flatbuffers
-    python convert.py --in-dir <dir with the v5_0 exports> --out-dir <dir>
+    uv run convert.py --in-dir <dir with the v5_0 exports> --out-dir <dir>
+
+The dependency pins live in the PEP 723 header above, so uv builds the
+environment itself and nothing has to be installed into the repo's Python. The
+ai-edge-litert pin matters: it is the runtime whose Metal accelerator these
+models are being made compatible with.
 
 The rewritten files are named *_litert.tflite, matching the convention already
 used by llama_q8_ekv3072_litert.tflite.
