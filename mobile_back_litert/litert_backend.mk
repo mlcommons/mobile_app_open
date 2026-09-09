@@ -23,7 +23,7 @@ backend_litert_bins_dir=output/litert-bins
 # downloaded for every iOS build, even with WITH_LITERT=0 where only the dummy
 # backend is bundled.
 backend_litert_ios_bin_filename=libLiteRtMetalAccelerator.dylib
-backend_litert_ios_bins_url=https://storage.googleapis.com/litert/binaries/2.1.5/ios_arm64/${backend_litert_ios_bin_filename}
+backend_litert_ios_bins_url=https://storage.googleapis.com/litert/binaries/2.2.0/ios_arm64/${backend_litert_ios_bin_filename}
 backend_litert_ios_file=${backend_litert_bins_dir}/${backend_litert_ios_bin_filename}
 backend_litert_ios_lib_deps= mkdir -p ${backend_litert_bins_dir} && \
                              { [ -s ${backend_litert_ios_file} ] || \
@@ -33,7 +33,7 @@ backend_litert_ios_lib_deps= mkdir -p ${backend_litert_bins_dir} && \
 ifeq (${WITH_LITERT},1)
   $(info WITH_LITERT=1)
   backend_litert_bin_filename=libLiteRtClGlAccelerator.so
-  backend_litert_bins_url=https://storage.googleapis.com/litert/binaries/2.1.5/android_arm64/${backend_litert_bin_filename}
+  backend_litert_bins_url=https://storage.googleapis.com/litert/binaries/2.2.0/android_arm64/${backend_litert_bin_filename}
   backend_litert_lib_deps= mkdir -p ${backend_litert_bins_dir} && \
                            curl -fSL --proto '=https' -o ${backend_litert_bins_dir}/${backend_litert_bin_filename} ${backend_litert_bins_url}
 

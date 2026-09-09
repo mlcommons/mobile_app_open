@@ -200,24 +200,26 @@ bool BuildModel(litert::Environment &env, const std::string &model_path,
                                      litert::HwAccelerators::kCpu);
     auto gpu_options = options->GetGpuOptions();
     if (gpu_options) {
-      // Constant-tensor sharing is not optional here: litert_gpu_options.h
-      // states that AllowSrcQuantizedFcConvOps below "must" have it true, and
-      // it is also what keeps the weights in a single mmap-backed mapping
-      // rather than one copy per subgraph. On Apple that second property is
-      // what matters -- phys_footprint is what EXC_RESOURCE measures, and this
-      // is already the most memory-hungry pipeline in the backend -- so
-      // madvise the originals as well and let the kernel drop the pages the
-      // layout converter has already read.
-      gpu_options->EnableConstantTensorSharing(true);
-#if defined(__APPLE__)
-      gpu_options->SetMadviseOriginalSharedTensors(true);
-#endif  // defined(__APPLE__)
-      // Let the delegate take the quantized fully-connected and convolution
-      // ops of the int8 exports instead of leaving them all on CPU; without
-      // this the diffusion model, which is where the time goes, is barely
-      // delegated at all. It costs accuracy (inputs are quantized to 8-bit)
-      // and initialisation time, both of which the accuracy run will show.
-      gpu_options->EnableAllowSrcQuantizedFcConvOps(true);
+      // Constant-tensor sharing is off, and that is deliberate. With it on,
+      // the Metal backend generates invalid shader source for the int8
+      // diffusion model and the whole compile fails:
+      //
+      //   newLibraryWithSource: program_source:29:35:
+      //     error: use of undeclared identifier 'scale'
+      //
+      // Bisecting the GPU options one at a time shows sharing alone causes it;
+      // every other option compiles. Sharing also buys much less here than it
+      // does for the LLM: it de-duplicates weights across the subgraphs of one
+      // model, and each of the three SD models exports a single signature.
+      //
+      // AllowSrcQuantizedFcConvOps stays off with it. litert_gpu_options.h
+      // says constant tensor sharing "must be true to use this", so the two
+      // move together -- and it is no longer needed: with statically shaped
+      // models the diffusion graph is fully delegated without it. Dropping it
+      // also stops quantizing the input tensors to 8 bit, which the header
+      // notes costs accuracy.
+      gpu_options->EnableConstantTensorSharing(false);
+      gpu_options->EnableAllowSrcQuantizedFcConvOps(false);
       gpu_options->SetPrecision(litert::GpuOptions::Precision::kFp16);
       gpu_options->SetBufferStorageType(
           litert::GpuOptions::BufferStorageType::kBuffer);

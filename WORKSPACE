@@ -30,7 +30,7 @@ http_archive(
 # rules_python that XLA now brings in: rules_apple's plisttool is generated
 # from a bootstrap template containing %interpreter_args%, which the older
 # rules leave unsubstituted, so it fails to parse as Python. These are the
-# same versions LiteRT 2.1.5 pins for this dependency set.
+# same versions LiteRT 2.2.0 pins for this dependency set.
 http_archive(
     name = "build_bazel_rules_apple",
     sha256 = "a78f26c22ac8d6e3f3fcaad50eace4d9c767688bd7254b75bdf4a6735b299f6a",
@@ -131,21 +131,20 @@ http_archive(
     patch_args = ["-p1"],
     patches = [
         # Add patches for adding png in tflite evaluation code
+        # Channel detection and the unsigned-char decode buffer, formerly
+        # png-with-number-of-channels-detected.patch and use_unsigned_char.patch,
+        # are folded into this one.
         "//:flutter/third_party/enable-png-in-tensorflow-lite-tools-evaluation.patch",
-        "//:flutter/third_party/png-with-number-of-channels-detected.patch",
-        "//:flutter/third_party/use_unsigned_char.patch",
         # Fix tensorflow not being able to read image files on Windows
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:patches/litert-internal-visibility.diff",
         # Fix for LiteRT crashing on close when using OpenCL accelerator
         "//:patches/custom_buffer_teardown.patch",
-        # CoreML delegate calls RepeatedField::resize, which does not exist
-        "//:patches/litert_coreml_repeatedfield_resize.patch",
     ],
-    sha256 = "7d0313c4851deb18af6f5f2dbc002bf01293583b87b819b0949ee33dcfe2d91b",
-    strip_prefix = "LiteRT-2.1.5",
+    sha256 = "6d2ce16738199adc5a3cdde76c3c6a6dac636d3b52a1d7790ea524fb0d59f7fc",
+    strip_prefix = "LiteRT-2.2.0",
     urls = [
-        "https://github.com/google-ai-edge/LiteRT/archive/v2.1.5.tar.gz",
+        "https://github.com/google-ai-edge/LiteRT/archive/v2.2.0.tar.gz",
     ],
 )
 
@@ -164,10 +163,13 @@ tensorflow_source_repo(
         "//patches:tf_nnapi_no_mmap_sharing.patch",
         "//patches:tf_portable_no_onednn_env_vars.patch",
     ] + PATCH_FILE,
-    sha256 = "879cf25692d50c60315a4dd3929dccd923d4c44a2c4b95ebb483666d2c16a22a",
-    strip_prefix = "tensorflow-6d40c20cdfe385746c31da6227b95722f5ece342",
+    # The commit LiteRT 2.2.0 pins. LiteRT's GPU delegate needs
+    # @com_google_absl//absl/status:status_macros, which only exists in the
+    # Abseil this TensorFlow's XLA brings in, so the two move together.
+    sha256 = "c3c552414ab2e59e72511a21c1df566346a7c8f160909325edec6d1ff403d69d",
+    strip_prefix = "tensorflow-bcdab1a62e138c8f8784a7477c0be8af6dd0bd0a",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/6d40c20cdfe385746c31da6227b95722f5ece342.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/bcdab1a62e138c8f8784a7477c0be8af6dd0bd0a.tar.gz",
     ],
 )
 
