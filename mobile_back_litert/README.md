@@ -222,6 +222,11 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   | diffusion model | 1494.0 | 977.0 | 331.8 |
   | decoder | 7702.3 | 2000.5 | 463.1 |
 
+  Those CPU figures are 2.2.0's CPU path and do not carry back to 2.1.5:
+  measured end to end there, one 20-step image on CPU takes 43.84 s with the
+  published models against 43.22 s with the rewritten ones, which is noise.
+  The rewrite is worth adopting only together with the version bump.
+
   **Two things still block shipping this.** The rewritten models have to be
   hosted before the settings can point at them, and LiteRT 2.1.5 -- the version
   this backend pins -- cannot run the rewritten diffusion model anyway: its
