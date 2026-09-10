@@ -300,12 +300,7 @@ jobs:
           # rejection). Keep it below the job cap minus retry_wait_seconds.
           # BrowserStack reports a build as "running" while it is still queued
           # for a device, so this budget covers queue time as well as the run.
-          #
-          # Raised from 80 while the litert suite's run time is investigated:
-          # stable_diffusion on Metal takes the job from 27 minutes to over 80,
-          # and at 80 the step is killed before the script downloads the device
-          # logs, which is the only evidence of where the time goes.
-          timeout_minutes: 120
+          timeout_minutes: 80
           # Exit 9 is a BrowserStack trigger failure, which is what
           # BROWSERSTACK_ALL_PARALLELS_IN_USE produces when the account's
           # session budget is busy - retrying it just waits for a free slot.

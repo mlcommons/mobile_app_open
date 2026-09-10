@@ -301,11 +301,11 @@ benchmark_setting {
     }
     custom_setting {
       id: "text_encoder_filename"
-      value: "sd_text_encoder_litert.tflite"
+      value: "sd_text_encoder_litert_v2.tflite"
     }
     custom_setting {
       id: "diffusion_model_filename"
-      value: "sd_diffusion_model_litert.tflite"
+      value: "sd_diffusion_model_litert_v2.tflite"
     }
     custom_setting {
       id: "decoder_filename"
