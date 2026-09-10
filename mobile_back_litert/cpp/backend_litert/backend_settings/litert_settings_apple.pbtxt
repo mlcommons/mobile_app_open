@@ -250,10 +250,11 @@ benchmark_setting {
   # The three model files total about 1.04 GiB, which is a download size, not a
   # peak footprint. Measured on the macOS host: 118 MiB for the text encoder,
   # 1913 MiB for the diffusion model and 217 MiB for the decoder, 2015 MiB with
-  # all three compiled at once, and about 2.3-2.6 GiB at the peak of the
-  # denoising loop. The pipeline still keeps the three stages apart in memory on
-  # Apple, so only one model is resident during a query. Not yet confirmed on
-  # device.
+  # all three compiled at once, and about 2.3-2.7 GiB at the peak. On an
+  # iPhone 16 Pro the three cost 1368 MiB of the 2885 available. They are
+  # compiled once and left resident on the GPU: releasing one does not return
+  # its Metal buffers, so rebuilding per phase only stacks a second copy and
+  # crosses the limit. See SDBackendData::set_phase.
   delegate_choice: {
     delegate_name: "CPU"
     accelerator_name: "cpu"

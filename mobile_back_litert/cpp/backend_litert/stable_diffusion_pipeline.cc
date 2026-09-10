@@ -529,64 +529,86 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   LITERT_LOG_MEM("sd: all three models compiled");
 
 #if defined(__APPLE__)
-  // See the comment on these members in the header. Each stage of a query
-  // needs exactly one of the three models, so only that one is kept compiled.
-  backend_data->set_phase =
-      [backend_data, text_encoder_path, diffusion_model_path, decoder_path,
-       num_threads, use_gpu, encoder_inputs, encoder_output, diffusion_inputs,
-       diffusion_output, decoder_inputs, decoder_output](SDPhase phase) {
-        // Release first, then build, so two models are never resident at once.
-        // Destroying a model is not enough on its own: the pages stay on
-        // libmalloc's free list and keep counting against the limit until they
-        // are handed back, which is what makes the release visible to
-        // EXC_RESOURCE.
-        std::vector<size_t> idx;
-        if (phase == SDPhase::kEncode) {
-          ReleaseModel(&backend_data->diffusion);
-          ReleaseModel(&backend_data->decoder);
-          litert_apple::ReturnFreeMemoryToOS();
-          if (backend_data->text_encoder.compiled == nullptr) {
-            if (!BuildModel(*backend_data->env, text_encoder_path, num_threads,
-                            use_gpu, encoder_inputs, encoder_output,
-                            &backend_data->text_encoder, &idx)) {
-              return false;
+  // Keeping the stages apart only helps when releasing a model actually hands
+  // its memory back, and on the GPU it does not. ReleaseModel drops the LiteRT
+  // objects and ReturnFreeMemoryToOS empties libmalloc's free list, but the
+  // delegate's weights live in Metal buffers that libmalloc never owned, so
+  // nothing is returned. Measured on an iPhone 16 Pro, in MiB still available:
+  //
+  //   all three models compiled                    1517
+  //   query start, after releasing two of them     1586   (only 69 recovered)
+  //   diffusion model rebuilt                        72   -> killed
+  //
+  // Rebuilding therefore stacks a second copy on top of the first and the
+  // process crosses the limit. Compiled once and left alone the three cost
+  // 1368 MiB together and leave 1517 free, which is the whole working set with
+  // room to spare -- so on the GPU the phases are simply not used.
+  //
+  // The CPU path keeps them: there the weights are ordinary allocations, the
+  // release does return them, and the three models plus a phase's working set
+  // do not fit together.
+  if (!use_gpu) {
+    // See the comment on these members in the header. Each stage of a query
+    // needs exactly one of the three models, so only that one is kept compiled.
+    backend_data->set_phase =
+        [backend_data, text_encoder_path, diffusion_model_path, decoder_path,
+         num_threads, use_gpu, encoder_inputs, encoder_output, diffusion_inputs,
+         diffusion_output, decoder_inputs, decoder_output](SDPhase phase) {
+          // Release first, then build, so two models are never resident
+          // at once. Destroying a model is not enough on its own: the pages
+          // stay on libmalloc's free list and keep counting against the limit
+          // until they are handed back, which is what makes the release
+          // visible to EXC_RESOURCE.
+          std::vector<size_t> idx;
+          if (phase == SDPhase::kEncode) {
+            ReleaseModel(&backend_data->diffusion);
+            ReleaseModel(&backend_data->decoder);
+            litert_apple::ReturnFreeMemoryToOS();
+            if (backend_data->text_encoder.compiled == nullptr) {
+              if (!BuildModel(*backend_data->env, text_encoder_path,
+                              num_threads, use_gpu, encoder_inputs,
+                              encoder_output, &backend_data->text_encoder,
+                              &idx)) {
+                return false;
+              }
+              backend_data->encoder_tokens_idx = idx[0];
+              backend_data->encoder_positions_idx = idx[1];
             }
-            backend_data->encoder_tokens_idx = idx[0];
-            backend_data->encoder_positions_idx = idx[1];
+            return true;
           }
-          return true;
-        }
 
-        if (phase == SDPhase::kDiffuse) {
+          if (phase == SDPhase::kDiffuse) {
+            ReleaseModel(&backend_data->text_encoder);
+            ReleaseModel(&backend_data->decoder);
+            litert_apple::ReturnFreeMemoryToOS();
+            if (backend_data->diffusion.compiled == nullptr) {
+              if (!BuildModel(*backend_data->env, diffusion_model_path,
+                              num_threads, use_gpu, diffusion_inputs,
+                              diffusion_output, &backend_data->diffusion,
+                              &idx)) {
+                return false;
+              }
+              backend_data->diffusion_latent_idx = idx[0];
+              backend_data->diffusion_context_idx = idx[1];
+              backend_data->diffusion_timestep_idx = idx[2];
+            }
+            return true;
+          }
+
           ReleaseModel(&backend_data->text_encoder);
-          ReleaseModel(&backend_data->decoder);
+          ReleaseModel(&backend_data->diffusion);
           litert_apple::ReturnFreeMemoryToOS();
-          if (backend_data->diffusion.compiled == nullptr) {
-            if (!BuildModel(*backend_data->env, diffusion_model_path,
-                            num_threads, use_gpu, diffusion_inputs,
-                            diffusion_output, &backend_data->diffusion, &idx)) {
+          if (backend_data->decoder.compiled == nullptr) {
+            if (!BuildModel(*backend_data->env, decoder_path, num_threads,
+                            use_gpu, decoder_inputs, decoder_output,
+                            &backend_data->decoder, &idx)) {
               return false;
             }
-            backend_data->diffusion_latent_idx = idx[0];
-            backend_data->diffusion_context_idx = idx[1];
-            backend_data->diffusion_timestep_idx = idx[2];
+            backend_data->decoder_latent_idx = idx[0];
           }
           return true;
-        }
-
-        ReleaseModel(&backend_data->text_encoder);
-        ReleaseModel(&backend_data->diffusion);
-        litert_apple::ReturnFreeMemoryToOS();
-        if (backend_data->decoder.compiled == nullptr) {
-          if (!BuildModel(*backend_data->env, decoder_path, num_threads,
-                          use_gpu, decoder_inputs, decoder_output,
-                          &backend_data->decoder, &idx)) {
-            return false;
-          }
-          backend_data->decoder_latent_idx = idx[0];
-        }
-        return true;
-      };
+        };
+  }
 #endif
 
   return backend_data;

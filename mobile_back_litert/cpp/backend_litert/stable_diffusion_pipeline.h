@@ -82,32 +82,31 @@ struct SDBackendData {
   // pointer into it, so it has to stay valid after the call returns.
   std::vector<float> output;
 
-  // Apple only; left null elsewhere, where every model stays resident.
+  // Apple CPU only. Left null on the GPU, and everywhere off Apple, where
+  // every model stays resident.
   //
   // iOS kills a process that crosses a per-process limit (measured at 3376 MB
-  // on an 8 GB device) and the kill cannot be caught, so this pipeline keeps
-  // only the model the current stage needs compiled and rebuilds the others on
-  // demand. Measured on the macOS host with phys_footprint, the counter
-  // EXC_RESOURCE compares against, for the Metal path:
+  // on an 8 GB device) and the kill cannot be caught. Releasing a model and
+  // rebuilding it later is only worth doing when the release actually returns
+  // the memory, which is true of the CPU path and NOT of the GPU one:
+  // ReleaseModel drops the LiteRT objects and ReturnFreeMemoryToOS empties
+  // libmalloc's free list, but the delegate's weights sit in Metal buffers
+  // that libmalloc never owned. Measured on an iPhone 16 Pro, in MiB still
+  // available before the limit:
   //
-  //   text encoder compiled        118 MiB
-  //   diffusion model compiled    1913 MiB   (the peak; ~2.3-2.6 GiB during
-  //                                           the denoising loop with its
-  //                                           working set on top)
-  //   decoder compiled             217 MiB
-  //   all three at once           2015 MiB
+  //   before compiling models                      2885
+  //   all three models compiled                    1517   (the three cost 1368)
+  //   query start, after releasing two of them     1586   (only 69 recovered)
+  //   diffusion model rebuilt                        72   -> killed
   //
-  // against roughly 2885 MiB still available to this benchmark on an iPhone 16
-  // Pro. The three fit together, but not with much room, so the stages are
-  // still kept apart: the encoder is released before the denoising loop, and
-  // both before the decode. Rebuilding costs no extra compiles -- the same
-  // three models are built either way, just not at the same time.
+  // So on the GPU the phases are not used at all: the three models are
+  // compiled once and left alone. They fit together with room for the working
+  // set, and not rebuilding them each query also takes a 20-step image from
+  // 45.5 s to 18.8 s on the macOS host.
   //
-  // These numbers depend on constant tensor sharing being on, which in turn
-  // depends on the models tools/sd_gpu/convert.py produces; see the comment on
-  // the GPU options in BuildModel. Without it the diffusion model alone needs
-  // 4409 MiB and no arrangement of phases fits. Android has the headroom, keeps
-  // everything resident, and its throughput does not move.
+  // The CPU path keeps the phases. There the weights are ordinary allocations
+  // that the release does return, and the three models plus a phase's working
+  // set do not fit together.
   std::function<bool(SDPhase)> set_phase;
 };
 

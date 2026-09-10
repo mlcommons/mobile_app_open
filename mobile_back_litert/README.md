@@ -304,29 +304,28 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   model is the only side we control -- `tools/sd_gpu/convert.py` re-expresses
   those weights as per-axis, repeating the one scale they already carry. The
   weight bytes are untouched and the CPU output is bit-identical.
-* **A query has three stages and they are still kept apart in memory.** With
-  sharing on the three models do fit together (2015 MiB), but not with much
-  room, so on Apple only the model the current stage needs is kept compiled and
-  the others are released and rebuilt on demand (`set_phase` in
-  `stable_diffusion_pipeline.h`). This costs no extra compiles -- the same
-  three models are built either way. Measured on the macOS host:
+* **On the GPU the three models stay resident, because releasing one does not
+  give the memory back.** `ReleaseModel` drops the LiteRT objects and
+  `ReturnFreeMemoryToOS` empties libmalloc's free list, but the delegate's
+  weights live in Metal buffers libmalloc never owned. Measured on an iPhone 16
+  Pro, in MiB still available before the limit:
 
-  | stage | MiB held |
-  |---|---|
-  | all three models compiled | 2015 |
-  | query start (encoder only) | 192 |
-  | diffusion phase | 1849 |
-  | diffusion done | 2523 |
-  | decode | 220 |
-  | decode done | 620 |
+  | stage | MiB left | |
+  |---|---|---|
+  | before compiling models | 2885 | |
+  | all three models compiled | 1517 | the three cost 1368 |
+  | query start, after releasing two of them | 1586 | only 69 recovered |
+  | diffusion model rebuilt | 72 | then `ActiveHard 3376 MB (fatal)` |
 
-  Sharing costs throughput, because the weights are dequantised in the shader
-  on every access rather than once up front: one 20-step query went from 38.2 s
-  to 45.5 s on that host. Android has the headroom, keeps everything resident,
-  and its throughput does not move.
+  Rebuilding stacks a second copy on top of the first. Compiled once and left
+  alone the three fit with the working set on top, so `set_phase` is simply not
+  installed on the GPU path — which also takes a 20-step image from 45.5 s to
+  18.8 s on the macOS host, since nothing is recompiled per query.
 
-  These are host numbers on a paravirtual GPU and have not yet been confirmed
-  on device.
+  The CPU path keeps the phases: there the weights are ordinary allocations
+  that the release does return, and the three models plus a phase's working set
+  do not fit together. Android has the headroom, keeps everything resident, and
+  its throughput does not move.
 * Releasing has to be symmetric, and this is easy to get wrong. Freeing only
   the encoder and the diffusion model got the decode to pass, and then the
   *second* query died: it rebuilt those two on top of the decoder's ~1.4 GiB
