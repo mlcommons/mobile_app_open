@@ -442,7 +442,6 @@ mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
   }
   backend_data->env = std::make_unique<litert::Environment>(std::move(*env));
 
-
   // Signature input keys are alphabetical, so these lists are in role order,
   // not tensor order: the text encoder's signature reads (positions,
   // tokens), and the diffusion model's reads (context, latent,
