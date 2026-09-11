@@ -75,21 +75,19 @@ WITH_LITERT=1 make flutter/ios
   which measured 1.7-3.0x faster than CPU across all six on an iPad mini.
   `LiteRtGpuBackend` has no Metal enumerator: on Apple, Metal is selected by
   `kLiteRtGpuBackendAutomatic` plus compile-time Metal support.
-* `stable_diffusion` and the `llm-*` benchmarks each offer a Metal choice.
-  **The `llm-*` benchmarks select Metal; `stable_diffusion` stays on CPU.**
-  The LLM default follows the measurements below -- Metal costs 72 MiB more at
-  peak than CPU and decodes 3.0x faster -- and it puts the choice in front of
-  the CI iPhone 16 Pro, which is the device those numbers predict should hold:
-  `llm-1b` already passes there on CPU.
+* `stable_diffusion` and the `llm-*` benchmarks each offer a Metal choice, and
+  **all three select it.** The LLM default follows the measurements below --
+  Metal costs 72 MiB more at peak than CPU and decodes 3.0x faster -- and the
+  CI iPhone 16 Pro bears that out: 25.0 tok/s there against 9.27 on CPU.
+  `stable_diffusion` needed the model rewrite and the residency fix below
+  before it could take the choice at all; on the same device it now runs at
+  about 75 s per image against about 98 s on CPU.
   The risk is worth stating plainly. An `EXC_RESOURCE` kill cannot be caught,
-  so if the budget does not stretch the app goes down rather than falling back,
-  and the measurements are from a macOS host where nothing enforces a ceiling.
-  The one iOS device Metal was ever tried on (an iPad mini) crashed -- though
-  that device also fails `llm-1b` on **CPU**, so it says nothing about this
-  choice. If the device run fails on memory, put `delegate_selected` back to
-  `CPU`; nothing else has to change.
-  `stable_diffusion` on Metal does **not** work at all -- see below -- so it
-  stays on CPU, and its choice exists only so that stops being a guess.
+  so if the budget does not stretch the app goes down rather than falling back.
+  The iPad mini crashes on Metal -- though it also fails `llm-1b` on **CPU**,
+  so it says nothing about this choice, and `llm-*` on Metal there is still
+  unmeasured while being claimed anyway. If a device run fails on memory, put
+  `delegate_selected` back to `CPU`; nothing else has to change.
 
 ### Measuring this without a device
 
@@ -179,9 +177,10 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   is no fallback to catch it: if the budget runs out the app goes down. Watch
   the `[mem] llm: before GPU compile` and `[mem] llm: after GPU compile` lines
   to see what the delegate actually costs.
-* **`stable_diffusion` cannot use Metal with the models that ship today, but
-  the models can be rewritten so that it can.** Each of the three published
-  exports fails to compile against the Metal accelerator:
+* **`stable_diffusion` cannot use Metal with the published v5_0 exports, but
+  they can be rewritten so that it can** -- which is what the `*_litert_v2`
+  models the Metal choice downloads are. Each of the three v5_0 exports fails
+  to compile against the Metal accelerator:
 
   ```text
   WARNING: Attempting to use a delegate that only supports static-sized tensors
@@ -200,8 +199,11 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   `input_1 [-1,64,64,4]`), but rewriting `shape_signature` in all three so they
   report **0 dynamic tensors** changes nothing.
 
-  There are four blockers, not one, and `tools/sd_gpu/convert.py` fixes all
-  four; see that directory's README for the details and the measurements.
+  There are five blockers, not one, and `tools/sd_gpu/convert.py` fixes all
+  five; see that directory's README for the details and the measurements. Four
+  of them stop the delegate taking the graph at all and are listed here; the
+  fifth stops the memory option the delegate needs to fit on a phone, and is
+  the shader bug further down.
 
   1. The graphs compute their shapes at run time (`SHAPE` ->
      `REDUCE_PROD`/`GATHER`/`PACK`/`BROADCAST_ARGS` -> `RESHAPE`/`BROADCAST_TO`),
@@ -215,7 +217,7 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
      against a delegate that supports version 2, which alone splits the graph
      into partitions too small to delegate.
 
-  With all four fixed the diffusion model and the decoder come out **fully**
+  With those four fixed the diffusion model and the decoder come out **fully**
   GPU-accelerated and every output stays bit-identical. On an M-series Mac, ms
   per invocation:
 
@@ -239,25 +241,16 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
   its own either: a 2.2.0 `libLiteRtMetalAccelerator.dylib` will not load into
   a 2.1.5 runtime, nor the reverse.
 
-  A near-identical bug survives into 2.2.0 and is worth knowing about before
-  touching this pipeline's GPU options: with **constant-tensor sharing on**,
-  the diffusion model still fails, now with `use of undeclared identifier
-  'scale'`. Bisecting the options one at a time shows sharing alone is the
-  trigger, so the SD pipeline turns it off, and turns off
-  `AllowSrcQuantizedFcConvOps` with it because `litert_gpu_options.h` says
-  sharing "must be true to use this" -- and the rewritten models are fully
-  delegated without the quantized fc/conv path anyway. Dropping that path also
-  stops quantizing inputs to 8 bit, which the header notes costs accuracy.
-
-  Turning sharing off is **not** free, and it would be wrong to claim a single
-  signature makes it cheap. `litert_gpu_options.h` says the option reduces
-  allocation for constant tensors "even though tensors are not shared with
-  other subgraphs", so this gives up their mmap/madvise handling rather than
-  only cross-subgraph de-duplication -- on the pipeline already closest to the
-  iOS per-process limit. It is accepted because the alternative is not a
-  heavier Metal run but no Metal run at all. **The iOS memory cost has not
-  been measured**; every number here is from a macOS host. The `llm-*`
-  pipeline keeps sharing, where it does the memory work it was added for.
+  A near-identical bug survives into 2.2.0, and it is the reason for the fifth
+  rewrite: with **constant-tensor sharing on**, the diffusion model fails with
+  `use of undeclared identifier 'scale'`. Bisecting the options one at a time
+  shows sharing alone is the trigger. Sharing cannot simply be dropped -- it is
+  what makes the diffusion model fit on an iPhone at all -- so the models are
+  rewritten instead; the constant-tensor-sharing bullet below has the mechanism
+  and the numbers. `AllowSrcQuantizedFcConvOps` stays off either way: the
+  rewritten models are fully delegated without the quantized fc/conv path, and
+  dropping it also stops quantizing inputs to 8 bit, which
+  `litert_gpu_options.h` notes costs accuracy.
 
   End to end through this backend on a macOS host, one 20-step image:
 
