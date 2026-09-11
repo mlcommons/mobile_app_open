@@ -24,10 +24,17 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+exports_files(
+    [
+        "exported_symbols_litert.lds",
+    ],
+)
+
 pbtxt2header(
     name = "litert_settings",
     srcs = [
         "backend_settings/litert_settings_android.pbtxt",
+        "backend_settings/litert_settings_apple.pbtxt",
     ],
 )
 
@@ -43,8 +50,11 @@ cc_library(
         "stable_diffusion_pipeline.cc",
     ],
     hdrs = [
+        "apple_support.h",
         "embedding_utils.h",
+        "litert_env.h",
         "litert_settings_android.h",
+        "litert_settings_apple.h",
         "llm_pipeline.h",
         "pipeline.h",
         "sd_utils.h",
@@ -62,6 +72,10 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
+    # No Apple-only deps: unlike the legacy interpreter backends this one talks
+    # to the v2 CompiledModel API, and Metal support is compiled into the litert
+    # runtime on __APPLE__ and provided at runtime by the dlopened
+    # libLiteRtMetalAccelerator.dylib.
     deps = [
         ":litert_settings",
         # Not //flutter/cpp:utils — it links TensorFlow's runtime via
@@ -83,6 +97,8 @@ cc_library(
         "@litert//litert/cc:litert_compiled_model",
         "@litert//litert/cc:litert_element_type",
         "@litert//litert/cc:litert_environment",
+        "@litert//litert/cc:litert_environment_options",
+        "@litert//litert/cc:litert_expected",
         "@litert//litert/cc:litert_model",
         "@litert//litert/cc:litert_options",
         "@litert//litert/cc:litert_tensor_buffer",
@@ -92,8 +108,14 @@ cc_library(
 
 tflite_jni_binary(
     name = "liblitertbackend.so",
-    # Not //flutter/cpp/c:version_script.lds — this backend also exports the
-    # LiteRt* symbols for the dlopened GPU accelerator library.
+    # macOS uses exported_symbols, other platforms use linkscript -- passing
+    # only one of them silently produces a library that exports nothing on the
+    # other. Without exported_symbols this target links on macOS but yields a
+    # 179K stub with no mlperf_backend_* symbols, so the dev-utils CLI in
+    # mobile_back_apple cannot load it. Neither file is the //flutter/cpp/c one
+    # the sibling backends use: this backend also exports the LiteRt* symbols
+    # for the dlopened GPU accelerator library.
+    exported_symbols = "exported_symbols_litert.lds",
     linkscript = "version_script.lds",
     deps = [
         ":litert_c",

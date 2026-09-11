@@ -57,8 +57,16 @@ struct LLMBackendData {
   const char* vendor = "Google";
   const char* accelerator = "CPU";
 
-  std::unique_ptr<litert::CompiledModel> model;
+  // LiteRT requires the environment to outlive the compiled model built in it
+  // ("the provided environment must outlive the compiled model and any
+  // executions running on it" -- litert_compiled_model.h). The destructor
+  // below is what enforces that here: it clears the buffers, then the model,
+  // then the environment, and a destructor body runs before its members are
+  // destroyed. Declaration order is kept consistent with it anyway -- and with
+  // the ordering SDBackendData documents -- so the two cannot drift if that
+  // destructor is ever simplified away.
   std::unique_ptr<litert::Environment> env;
+  std::unique_ptr<litert::CompiledModel> model;
   std::vector<std::pair<size_t, size_t>> prefill_sigs;  // (sig_idx, seq_size)
   std::vector<litert::TensorBuffer> decode_input_bufs;
   std::vector<litert::TensorBuffer> decode_output_bufs;
@@ -173,9 +181,12 @@ class LLMPipeline : public Pipeline {
   bool BuildDecodeBuffers(LLMBackendData& data);
   bool BuildPrefillBuffers(LLMBackendData& data, size_t prefill_sig_idx);
 
+  // Pick the prefill signature to run the prompt through. Buckets larger than
+  // max_useful_seq_size are skipped when a smaller one exists; pass SIZE_MAX
+  // to consider every bucket.
   size_t GetSuitablePrefillSignature(
       const std::vector<std::pair<size_t, size_t>>& prefill_sigs,
-      size_t num_input_tokens) const;
+      size_t num_input_tokens, size_t max_useful_seq_size) const;
   // Move each layer's KV from the prefill outputs into the decode inputs.
   void TransferKV(
       int num_layers,

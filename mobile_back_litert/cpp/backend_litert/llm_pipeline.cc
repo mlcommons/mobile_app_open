@@ -28,9 +28,12 @@ limitations under the License.
 #include "litert/cc/litert_compiled_model.h"
 #include "litert/cc/litert_element_type.h"
 #include "litert/cc/litert_environment.h"
+#include "litert/cc/litert_environment_options.h"
+#include "litert/cc/litert_expected.h"
 #include "litert/cc/litert_options.h"
 #include "litert/cc/litert_tensor_buffer.h"
 #include "litert/cc/options/litert_gpu_options.h"
+#include "litert_env.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,11 +51,53 @@ static std::unordered_map<std::string, size_t> make_index_map(
   return map;
 }
 
+// Report what a buffer set actually costs, and which single tensor dominates
+// it. The Apple memory decisions for this pipeline were made from arithmetic
+// over model files and tensor shapes, and that arithmetic was wrong once
+// already (the KV cache is four resident sets, not two). These are the
+// measured numbers.
+static void LogBufferSet(const char* label,
+                         const std::vector<litert::TensorBuffer>& bufs,
+                         const std::vector<std::string_view>& names) {
+  size_t total = 0;
+  size_t largest = 0;
+  std::string largest_name = "?";
+  for (size_t i = 0; i < bufs.size(); ++i) {
+    auto packed = bufs[i].PackedSize();
+    if (!packed) continue;
+    total += *packed;
+    if (*packed > largest) {
+      largest = *packed;
+      largest_name = i < names.size() ? std::string(names[i]) : "?";
+    }
+  }
+  LITERT_LOG_NOTE("[mem] llm " << label << ": " << (total >> 20) << " MiB over "
+                               << bufs.size() << " tensors, largest '"
+                               << largest_name << "' " << (largest >> 20)
+                               << " MiB");
+}
+
 // Destroy the backend pointer and its data.
 void LLMPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
   LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
   if (backend_data) delete backend_data;
   backendExists = false;
+  // Reported after the delete so a benchmark that follows this one can be told
+  // apart from one that inherits memory this pipeline never gave back.
+  LITERT_LOG_MEM("llm: backend deleted (before reclaim)");
+#if defined(__APPLE__)
+  // Destroying the model is not enough to make a release visible to the limit:
+  // free() leaves the pages on libmalloc's free list and phys_footprint --
+  // which is what EXC_RESOURCE measures -- still counts them. The stable
+  // diffusion pipeline reclaims for this reason and measured 2.3 GiB from it.
+  //
+  // This only reaches host allocations. It cannot release GPU resources the
+  // runtime never freed, so it is an adjunct here, not the fix for the Metal
+  // teardown leak -- see patches/custom_buffer_teardown.patch for that. The
+  // two log lines around it are what tell the difference apart on device.
+  litert_apple::ReturnFreeMemoryToOS();
+  LITERT_LOG_MEM("llm: backend deleted (after reclaim)");
+#endif  // defined(__APPLE__)
 }
 
 // Create a new backend and return the pointer to it.
@@ -64,6 +109,8 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
     LOG(ERROR) << "Only one backend instance should exist at a time";
     return nullptr;
   }
+
+  LITERT_LOG_MEM("llm: backend_create start");
 
   LLMBackendData* backend_data = new LLMBackendData();
 
@@ -109,11 +156,14 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
     }
   }
   backend_data->accelerator = use_gpu ? "GPU" : "CPU";
+  LITERT_LOG_MEM("llm: model compiled");
+
   if (!BuildDecodeBuffers(*backend_data)) {
     LOG(ERROR) << "Failed to allocate decode buffers";
     backend_delete(backend_data);
     return nullptr;
   }
+  LITERT_LOG_MEM("llm: decode buffers built");
 
   backendExists = true;
   return backend_data;
@@ -176,10 +226,15 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
         backend_data->prefill_input_bufs[backend_data->prefill_mask_idx]);
   }
 
+  // The observed EXC_RESOURCE lands in a memmove around here. LiteRT defers
+  // AllocateTensors to the first Run, so this call is where the prefill
+  // signature's arena appears -- not at buffer-creation time.
+  LITERT_LOG_MEM("llm: prefill inputs written, about to Run");
   MINIMAL_CHECK(backend_data->model->Run(
       backend_data->current_prefill_sig_idx,
       absl::MakeSpan(backend_data->prefill_input_bufs),
       absl::MakeSpan(backend_data->prefill_output_bufs)));
+  LITERT_LOG_MEM("llm: prefill Run done");
 
   // Move the prefill KV state into the decode buffers.
   TransferKV(backend_data->num_kv_layers, backend_data->prefill_output_map,
@@ -321,8 +376,39 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
   ResetKV(backend_data->num_kv_layers, backend_data->kv_buf_float_count,
           backend_data->decode_input_map, backend_data->decode_input_bufs);
   size_t effective_prefill_token_size = backend_data->prompt_tokens.size() - 1;
+  // The prefill logits buffer is [1, bucket, vocab] fp32, so every step up in
+  // bucket size doubles it -- for the 1B export that is 1.05 GiB at 2048 and
+  // 2.10 GiB at 4096. On Apple that overshoots the per-process memory limit
+  // (measured at 3376 MB on an 8 GB device) once the ~1.2 GiB model is in, and
+  // the app is killed with EXC_RESOURCE. A bucket bigger than the KV cache can
+  // never be used anyway: the check below rejects any prompt longer than
+  // kv_cache_max_size, so tokens past it would have nowhere to go. Capping
+  // there keeps the largest usable bucket and drops the wasted half. Android
+  // keeps the uncapped choice so its validated throughput does not move.
+#if defined(__APPLE__)
+  const size_t max_useful_seq_size =
+      static_cast<size_t>(backend_data->kv_cache_max_size);
+#else
+  const size_t max_useful_seq_size = std::numeric_limits<size_t>::max();
+#endif
   size_t sig_idx = GetSuitablePrefillSignature(backend_data->prefill_sigs,
-                                               effective_prefill_token_size);
+                                               effective_prefill_token_size,
+                                               max_useful_seq_size);
+  {
+    // The one fact that decides the prefill logits buffer, and the one this
+    // pipeline never reported: which bucket the cap actually selected.
+    size_t chosen_seq = 0;
+    for (const auto& [idx, seq] : backend_data->prefill_sigs) {
+      if (idx == sig_idx) chosen_seq = seq;
+    }
+    const bool capped =
+        max_useful_seq_size != std::numeric_limits<size_t>::max();
+    LITERT_LOG_NOTE(
+        "[mem] llm bucket choice: prompt "
+        << (effective_prefill_token_size + 1) << " tokens, cap "
+        << (capped ? std::to_string(max_useful_seq_size) : std::string("none"))
+        << " -> bucket " << chosen_seq);
+  }
   if (!BuildPrefillBuffers(*backend_data, sig_idx)) return MLPERF_FAILURE;
   if ((int)(effective_prefill_token_size + 1) >
       backend_data->kv_cache_max_size) {
@@ -375,7 +461,7 @@ void LLMPipeline::backend_release_buffer(void* p) { ::operator delete(p); }
 
 bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
                                      const char* model_path, bool use_gpu) {
-  auto env = litert::Environment::Create({});
+  auto env = CreateLiteRtEnvironment();
   if (!env) {
     LOG(ERROR) << "Environment::Create failed";
     return false;
@@ -418,9 +504,38 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     gpu_options->AddExternalTensorPattern("kv_cache_");
     // Prefill and decode must each land in a single delegate partition.
     gpu_options->SetHintFullyDelegatedToSingleDelegate(true);
-    gpu_options->SetMadviseOriginalSharedTensors(false);
     gpu_options->SetConvertWeightsOnGpu(false);
+#if defined(__APPLE__)
+    // Apple diverges from LiteRT-LM here, and it is the difference between
+    // running and being killed. Metal materialises every signature in the
+    // graph before the first Run, and with constant-tensor sharing off each
+    // subgraph carries its own copy of the transformer weights -- 2072 MiB
+    // resident, per subgraph. On an iPad mini that ate the whole ~3.0 GiB
+    // budget in about 0.3 s during "Initializing Metal-based API from graph"
+    // and the process died in __bzero under EXC_RESOURCE, before the model
+    // finished compiling and long before any prefill buffer existed.
+    //
+    // Sharing routes those constants through LiteRT's SharedMemoryManager,
+    // which is mmap-backed, so the copies collapse to one mapping; madvising
+    // the originals then lets the kernel drop the pages the layout converter
+    // has already read. phys_footprint is what EXC_RESOURCE measures, and
+    // clean file-backed pages do not count against it, so both flags have to
+    // be on to move the number that kills us. The documented cost is slower
+    // tensor binding through the external-tensor APIs, which is the right
+    // trade against not running at all.
+    //
+    // It is also a documented prerequisite of the option set just below:
+    // litert_gpu_options.h says enable_constant_tensors_sharing "must be true
+    // to use" AllowSrcQuantizedFcConvOps. The non-Apple branch inherits that
+    // contradiction from LiteRT-LM and is left alone here -- Android's GPU LLM
+    // path is measured and working, and this change is scoped to iOS -- but it
+    // is worth knowing that the quantized-op option is probably inert there.
+    gpu_options->EnableConstantTensorSharing(true);
+    gpu_options->SetMadviseOriginalSharedTensors(true);
+#else
+    gpu_options->SetMadviseOriginalSharedTensors(false);
     gpu_options->EnableConstantTensorSharing(false);
+#endif  // defined(__APPLE__)
     gpu_options->EnableAllowSrcQuantizedFcConvOps(true);
     // KV cache is swapped, so GPU bindings repeat every 2 steps.
     gpu_options->SetNumStepsOfCommandBufferPreparations(2);
@@ -433,6 +548,10 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     LOG(ERROR) << "GetGpuOptions failed; GPU compile may crash";
   }
 
+  // The GPU compile is where this pipeline has historically been killed
+  // rather than returning an error, so record the budget on the way in: a
+  // process that dies inside Create leaves this as the last line written.
+  LITERT_LOG_MEM("llm: before GPU compile");
   std::string transformer_path = model_path;
   auto model =
       litert::CompiledModel::Create(*data.env, transformer_path, *options);
@@ -440,6 +559,7 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     LOG(ERROR) << "CompiledModel::Create failed: " << transformer_path;
     return false;
   }
+  LITERT_LOG_MEM("llm: after GPU compile");
   data.model = std::make_unique<litert::CompiledModel>(std::move(*model));
   return FindSignatures(data);
 }
@@ -465,6 +585,16 @@ bool LLMPipeline::FindSignatures(LLMBackendData& data) {
   }
   std::sort(data.prefill_sigs.begin(), data.prefill_sigs.end(),
             [](const auto& a, const auto& b) { return a.second < b.second; });
+
+  {
+    std::ostringstream buckets;
+    for (const auto& [sig_idx, seq] : data.prefill_sigs) {
+      if (buckets.tellp() > 0) buckets << ", ";
+      buckets << seq;
+    }
+    LITERT_LOG_NOTE(
+        "[mem] llm prefill buckets exported by the model: " << buckets.str());
+  }
 
   return true;
 }
@@ -557,6 +687,13 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
   auto buffer_size = logits_metadata->BufferSize();
   data.vocab_size = static_cast<int>(*buffer_size / sizeof(float));
   data.logits_scratch.resize(data.vocab_size);
+
+  LITERT_LOG_NOTE("[mem] llm geometry: kv_cache_max_size="
+                  << data.kv_cache_max_size << " num_kv_layers="
+                  << data.num_kv_layers << " vocab_size=" << data.vocab_size
+                  << " (decode logits " << (*buffer_size >> 20) << " MiB)");
+  LogBufferSet("decode inputs", data.decode_input_bufs, input_names);
+  LogBufferSet("decode outputs", data.decode_output_bufs, output_names);
   return true;
 }
 
@@ -615,22 +752,44 @@ bool LLMPipeline::BuildPrefillBuffers(LLMBackendData& data,
     data.prefill_seq_size = static_cast<int>(*buffer_size / sizeof(int32_t));
   }
 
+  LITERT_LOG_NOTE("[mem] llm prefill buffers built for bucket "
+                  << data.prefill_seq_size);
+  LogBufferSet("prefill inputs", data.prefill_input_bufs, input_names);
+  LogBufferSet("prefill outputs", data.prefill_output_bufs, output_names);
+  LITERT_LOG_MEM("llm: prefill buffers built");
+
   data.current_prefill_sig_idx = prefill_sig_idx;
   return true;
 }
 
 size_t LLMPipeline::GetSuitablePrefillSignature(
     const std::vector<std::pair<size_t, size_t>>& prefill_sigs,
-    size_t num_input_tokens) const {
-  size_t best = prefill_sigs.back().first;
+    size_t num_input_tokens, size_t max_useful_seq_size) const {
+  // The smallest bucket that fits the prompt without exceeding the cap.
   size_t delta = std::numeric_limits<size_t>::max();
+  size_t best = 0;
   for (const auto& [sig_idx, seq_size] : prefill_sigs) {
+    if (seq_size > max_useful_seq_size) continue;
     if (seq_size >= num_input_tokens && seq_size - num_input_tokens < delta) {
       delta = seq_size - num_input_tokens;
       best = sig_idx;
     }
   }
-  return best;
+  if (delta != std::numeric_limits<size_t>::max()) return best;
+
+  // Nothing within the cap is large enough for the prompt, so take the largest
+  // bucket that is still within it: the caller prefills that many tokens and
+  // decodes the remainder one at a time, which is slower but correct.
+  // prefill_sigs is sorted by sequence size, so the last match is the largest.
+  bool found = false;
+  for (const auto& [sig_idx, seq_size] : prefill_sigs) {
+    if (seq_size <= max_useful_seq_size) {
+      best = sig_idx;
+      found = true;
+    }
+  }
+  // The cap is below every bucket; the smallest one is the best we can do.
+  return found ? best : prefill_sigs.front().first;
 }
 
 void LLMPipeline::TransferKV(
