@@ -64,10 +64,13 @@ WITH_LITERT=1 make flutter/ios
   `CFBundleExecutable` is the dylib's original filename, so the path LiteRT
   builds still resolves; `GetAppleRuntimeLibraryDir()` looks inside the
   framework as well as beside the backend binary.
-* Minimum iOS is 14.0, which is LiteRT's own floor
-  (`LITERT_MIN_IOS_VERSION`). The sibling backend frameworks were raised from
-  13.1 to match, so every framework the app embeds declares the same minimum.
-  The app itself targets 15.0, so nothing here is the binding constraint.
+* Minimum iOS is 15.0: LiteRT's own floor (`LITERT_MIN_IOS_VERSION`), what the
+  prebuilt accelerator's Mach-O declares, and what the app already targets. The
+  sibling backend frameworks were raised from 13.1 to match, so every framework
+  the app embeds declares the same minimum. The accelerator framework's
+  `MinimumOSVersion` is read back out of the dylib by `ios.mk` rather than
+  written by hand: 2.2.0 raised the dylib from 14.0 to 15.0, and the 14.0 left
+  behind is what `ITMS-90208` rejected in build 269.
 * The vision/NLP benchmarks offer both CPU and Metal and default to Metal,
   which measured 1.7-3.0x faster than CPU across all six on an iPad mini.
   `LiteRtGpuBackend` has no Metal enumerator: on Apple, Metal is selected by

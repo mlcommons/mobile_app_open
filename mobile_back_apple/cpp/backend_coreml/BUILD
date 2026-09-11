@@ -38,8 +38,8 @@ apple_xcframework(
         "device": ["arm64"],
     },
     minimum_os_versions = {
-        "ios": "14.0",
-        "macos": "14.0",
+        "ios": "15.0",
+        "macos": "15.0",
     },
     deps = [
         "//mobile_back_apple/cpp/backend_coreml:coreml_c",

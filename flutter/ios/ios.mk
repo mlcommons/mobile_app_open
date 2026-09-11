@@ -57,8 +57,13 @@ flutter/ios/libs:
 	cp -f ${backend_litert_ios_file} ${flutter_ios_metal_fw_dir}/
 	@# CFBundleExecutable is the dylib's own filename, which is what keeps
 	@# kLiteRtEnvOptionTagRuntimeLibraryDir + "libLiteRtMetalAccelerator.dylib"
-	@# resolving. MinimumOSVersion has to match the frameworks the app embeds
-	@# (LITERT_MIN_IOS_VERSION), or the bundle is rejected as inconsistent.
+	@# resolving. MinimumOSVersion is read out of the dylib instead of written
+	@# here: it has to be the minimum its Mach-O actually declares, or App Store
+	@# Connect rejects the bundle as unable to run where the plist says it can.
+	@# 2.2.0 raised the accelerator from 14.0 to 15.0, and the 14.0 left behind
+	@# is what ITMS-90208 rejected in build 269.
+	minos=$$(vtool -show-build ${backend_litert_ios_file} | awk '/minos/ {print $$2; exit}'); \
+	[ -n "$$minos" ] || { echo "no LC_BUILD_VERSION minos in ${backend_litert_ios_file}"; exit 1; }; \
 	printf '%s\n' \
 		'<?xml version="1.0" encoding="UTF-8"?>' \
 		'<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' \
@@ -70,10 +75,10 @@ flutter/ios/libs:
 		'<key>CFBundleInfoDictionaryVersion</key><string>6.0</string>' \
 		'<key>CFBundleName</key><string>${flutter_ios_metal_fw_name}</string>' \
 		'<key>CFBundlePackageType</key><string>FMWK</string>' \
-		'<key>CFBundleShortVersionString</key><string>2.2.0</string>' \
-		'<key>CFBundleVersion</key><string>2.2.0</string>' \
+		'<key>CFBundleShortVersionString</key><string>${backend_litert_version}</string>' \
+		'<key>CFBundleVersion</key><string>${backend_litert_version}</string>' \
 		'<key>CFBundleSupportedPlatforms</key><array><string>iPhoneOS</string></array>' \
-		'<key>MinimumOSVersion</key><string>14.0</string>' \
+		"<key>MinimumOSVersion</key><string>$$minos</string>" \
 		'</dict>' \
 		'</plist>' > ${flutter_ios_metal_fw_dir}/Info.plist
 
