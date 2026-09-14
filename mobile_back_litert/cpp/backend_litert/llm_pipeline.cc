@@ -67,9 +67,6 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
 
   LLMBackendData* backend_data = new LLMBackendData();
 
-  // The app passes a directory when the benchmark lists several files (the
-  // model and the tokenizer); the model's filename then comes from the
-  // settings. A path whose last segment has no extension is a directory.
   std::string llm_model_path = std::string(model_path);
   if (llm_model_path.substr(llm_model_path.rfind('/') + 1).find('.') ==
       std::string::npos) {
@@ -82,31 +79,13 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
     }
   }
 
-  // Request the GPU only when the selected delegate asks for it; the CL
-  // accelerator cannot fully delegate this graph on every device, and partial
-  // delegation is disabled because the KV-cache swap needs each signature in
-  // a single partition.
   bool use_gpu = configs->accelerator != nullptr &&
                  strcmp(configs->accelerator, "cpu") != 0;
 
   if (!BuildCompiledModel(*backend_data, llm_model_path.c_str(), use_gpu)) {
-    if (use_gpu) {
-      LOG(ERROR) << "GPU compilation failed for " << llm_model_path
-                 << ", retrying on CPU";
-      backend_delete(backend_data);
-      backend_data = new LLMBackendData();
-      if (BuildCompiledModel(*backend_data, llm_model_path.c_str(), false)) {
-        use_gpu = false;
-      } else {
-        LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
-        backend_delete(backend_data);
-        return nullptr;
-      }
-    } else {
-      LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
-      backend_delete(backend_data);
-      return nullptr;
-    }
+    LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
+    backend_delete(backend_data);
+    return nullptr;
   }
   backend_data->accelerator = use_gpu ? "GPU" : "CPU";
   if (!BuildDecodeBuffers(*backend_data)) {
@@ -245,7 +224,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(
   backend_data->output_tokens.reserve(decode_steps);
   int next_token =
       GreedySampler(backend_data->decode_output_bufs[backend_data->logits_idx],
-                    backend_data->vocab_size, backend_data->logits_scratch);
+                    backend_data->vocab_size);
   if (check_stop_id(next_token)) return MLPERF_SUCCESS;
   backend_data->output_tokens.push_back(next_token);
   int next_position = input_size;
@@ -272,7 +251,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(
                    backend_data->decode_output_bufs);
     next_token = GreedySampler(
         backend_data->decode_output_bufs[backend_data->logits_idx],
-        backend_data->vocab_size, backend_data->logits_scratch);
+        backend_data->vocab_size);
     backend_data->output_tokens.push_back(next_token);
     next_position += 1;
     if (check_stop_id(next_token)) break;
@@ -387,20 +366,9 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     LOG(ERROR) << "Options::Create failed";
     return false;
   }
-  if (!use_gpu) {
-    options->SetHardwareAccelerators(litert::HwAccelerators::kCpu);
-    std::string transformer_path = model_path;
-    auto model =
-        litert::CompiledModel::Create(*data.env, transformer_path, *options);
-    if (!model) {
-      LOG(ERROR) << "CompiledModel::Create failed: " << transformer_path;
-      return false;
-    }
-    data.model = std::make_unique<litert::CompiledModel>(std::move(*model));
-    return FindSignatures(data);
-  }
-  options->SetHardwareAccelerators(litert::HwAccelerators::kGpu |
-                                   litert::HwAccelerators::kCpu);
+  options->SetHardwareAccelerators(
+      use_gpu ? (litert::HwAccelerators::kGpu | litert::HwAccelerators::kCpu)
+              : litert::HwAccelerators::kCpu);
 
   // GPU compile options mirroring LiteRT-LM's CreateCompilationOptions
   // (llm_executor_settings_utils.cc). With empty options the prebuilt WebGPU
@@ -441,10 +409,7 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     return false;
   }
   data.model = std::make_unique<litert::CompiledModel>(std::move(*model));
-  return FindSignatures(data);
-}
 
-bool LLMPipeline::FindSignatures(LLMBackendData& data) {
   auto decode = data.model->GetSignatureIndex("decode");
   if (!decode) {
     LOG(ERROR) << "No 'decode' signature";
@@ -537,11 +502,8 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
       LOG(ERROR) << "RankedTensorType failed";
       return false;
     }
-    // The KV layout is [1, n_kv_heads, kv_len, head_dim] or
-    // [1, kv_len, n_kv_heads, head_dim] depending on the exporter;
-    // kv_len is the larger of the two middle dimensions.
-    const auto kv_dims = (*kv_type).Layout().Dimensions();
-    data.kv_cache_max_size = static_cast<int>(std::max(kv_dims[1], kv_dims[2]));
+    // [1, n_kv_heads, kv_len, head_dim]
+    data.kv_cache_max_size = (*kv_type).Layout().Dimensions()[2];
 
     auto buffer_size = kv_metadata->BufferSize();
     data.kv_buf_float_count = static_cast<int>(*buffer_size / sizeof(float));
@@ -556,7 +518,6 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
 
   auto buffer_size = logits_metadata->BufferSize();
   data.vocab_size = static_cast<int>(*buffer_size / sizeof(float));
-  data.logits_scratch.resize(data.vocab_size);
   return true;
 }
 
@@ -749,16 +710,16 @@ void LLMPipeline::WriteDecodeMask(litert::CompiledModel& model, size_t sig_idx,
   }
 }
 
-// Greedy sampler (argmax over the logits buffer). The scratch vector avoids
-// a per-token heap allocation for the ~vocab_size logits copy.
-int LLMPipeline::GreedySampler(litert::TensorBuffer& logits_buf, int vocab_size,
-                               std::vector<float>& logits) {
-  logits.resize(vocab_size);
-  auto ok = logits_buf.Read<float>(absl::MakeSpan(logits));
-  if (!ok) {
-    LOG(ERROR) << "Failed to read logits: " << ok.Error().Message();
+// Greedy sampler (argmax over the logits buffer).
+int LLMPipeline::GreedySampler(litert::TensorBuffer& logits_buf,
+                               int vocab_size) {
+  auto lock = litert::TensorBufferScopedLock::Create<const float>(
+      logits_buf, litert::TensorBuffer::LockMode::kRead);
+  if (!lock) {
+    LOG(ERROR) << "Failed to lock logits: " << lock.Error().Message();
     return 0;
   }
+  const float* logits = lock->second;
   float max_value = -std::numeric_limits<float>::infinity();
   int max_index = 0;
   for (int i = 0; i < vocab_size; ++i) {

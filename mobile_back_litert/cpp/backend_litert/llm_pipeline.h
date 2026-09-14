@@ -84,7 +84,6 @@ struct LLMBackendData {
   int kv_cache_max_size = 0;
   int kv_buf_float_count = 0;
   int prefill_seq_size = 0;
-  std::vector<float> logits_scratch;
   int vocab_size = 0;
 
   std::vector<int> prompt_tokens;
@@ -169,7 +168,6 @@ class LLMPipeline : public Pipeline {
  private:
   bool BuildCompiledModel(LLMBackendData& data, const char* model_path,
                           bool use_gpu);
-  bool FindSignatures(LLMBackendData& data);
   bool BuildDecodeBuffers(LLMBackendData& data);
   bool BuildPrefillBuffers(LLMBackendData& data, size_t prefill_sig_idx);
 
@@ -203,8 +201,7 @@ class LLMPipeline : public Pipeline {
   void WriteDecodeMask(litert::CompiledModel& model, size_t sig_idx,
                        size_t mask_idx, bool mask_is_bool,
                        litert::TensorBuffer& buf, int position);
-  int GreedySampler(litert::TensorBuffer& logits_buf, int vocab_size,
-                    std::vector<float>& logits);
+  int GreedySampler(litert::TensorBuffer& logits_buf, int vocab_size);
 };
 
 #endif  // LITERT_LLM_PIPELINE_H_
