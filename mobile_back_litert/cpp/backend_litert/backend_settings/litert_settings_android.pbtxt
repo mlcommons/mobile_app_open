@@ -231,16 +231,14 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
-      model_checksum: "c618e9bbb89ce52eedcab4f61b2dc3a4"
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/llama_q8_ekv3072_litert.tflite"
+      model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
     }
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
       model_checksum: "2ad260fc18b965ce16006d76c9327082"
     }
   }
-  # The GPU delegate uses a dedicated GPU export of the model; the
-  # delegate-level model_filename overrides the benchmark-level one.
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
@@ -253,9 +251,65 @@ benchmark_setting {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
       model_checksum: "2ad260fc18b965ce16006d76c9327082"
     }
-    custom_setting {
-      id: "model_filename"
-      value: "llama_q8_ekv3072_litert.tflite"
+  }
+  delegate_selected: "GPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "llama_q8_ekv3072_litert.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "llama3_1b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-gemma-e2b"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/model_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/embedder_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/per_layer_embedder_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/gemma4_e2b.spm.model"
+      model_checksum: ""
+    }
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/model_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/embedder_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/per_layer_embedder_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/gemma4_e2b.spm.model"
+      model_checksum: ""
     }
   }
   delegate_selected: "GPU"
@@ -265,11 +319,87 @@ benchmark_setting {
   }
   custom_setting {
     id: "model_filename"
-    value: "llama_q8_ekv3072.tflite"
+    value: "model_quantized.tflite"
+  }
+  custom_setting {
+    id: "embedder_filename"
+    value: "embedder_quantized.tflite"
+  }
+  custom_setting {
+    id: "per_layer_embedder_filename"
+    value: "per_layer_embedder_quantized.tflite"
   }
   custom_setting {
     id: "tokenizer_filename"
-    value: "llama3_1b.spm.model"
+    value: "gemma4_e2b.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-gemma-e2b-instruct"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/model_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/embedder_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/per_layer_embedder_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/gemma4_e2b.spm.model"
+      model_checksum: ""
+    }
+  }
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/model_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/embedder_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/per_layer_embedder_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "http://192.168.1.128:8084/gemma4/gemma4_e2b.spm.model"
+      model_checksum: ""
+    }
+  }
+  delegate_selected: "GPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "model_quantized.tflite"
+  }
+  custom_setting {
+    id: "embedder_filename"
+    value: "embedder_quantized.tflite"
+  }
+  custom_setting {
+    id: "per_layer_embedder_filename"
+    value: "per_layer_embedder_quantized.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "gemma4_e2b.spm.model"
   }
 }
 
@@ -281,16 +411,14 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0/tflite/llama_q8_ekv3072.tflite"
-      model_checksum: "c618e9bbb89ce52eedcab4f61b2dc3a4"
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/llama_q8_ekv3072_litert.tflite"
+      model_checksum: "fcabc03f8361f7081e13e89df84a0ce5"
     }
     model_file: {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
       model_checksum: "2ad260fc18b965ce16006d76c9327082"
     }
   }
-  # The GPU delegate uses a dedicated GPU export of the model; the
-  # delegate-level model_filename overrides the benchmark-level one.
   delegate_choice: {
     delegate_name: "GPU"
     accelerator_name: "gpu"
@@ -303,10 +431,6 @@ benchmark_setting {
       model_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/llama3_1b.spm.model"
       model_checksum: "2ad260fc18b965ce16006d76c9327082"
     }
-    custom_setting {
-      id: "model_filename"
-      value: "llama_q8_ekv3072_litert.tflite"
-    }
   }
   delegate_selected: "GPU"
   custom_setting {
@@ -315,7 +439,7 @@ benchmark_setting {
   }
   custom_setting {
     id: "model_filename"
-    value: "llama_q8_ekv3072.tflite"
+    value: "llama_q8_ekv3072_litert.tflite"
   }
   custom_setting {
     id: "tokenizer_filename"

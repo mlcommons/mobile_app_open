@@ -60,6 +60,26 @@ struct LLMBackendData {
   std::unique_ptr<litert::CompiledModel> model;
   std::unique_ptr<litert::Environment> env;
   std::vector<std::pair<size_t, size_t>> prefill_sigs;  // (sig_idx, seq_size)
+
+  std::unique_ptr<litert::CompiledModel> embedder;
+  std::unique_ptr<litert::CompiledModel> per_layer_embedder;
+  std::vector<litert::TensorBuffer> emb_decode_in, emb_decode_out;
+  std::vector<litert::TensorBuffer> emb_prefill_in, emb_prefill_out;
+  std::vector<litert::TensorBuffer> ple_decode_in, ple_decode_out;
+  std::vector<litert::TensorBuffer> ple_prefill_in, ple_prefill_out;
+  size_t emb_decode_sig_idx = 0;
+  size_t emb_prefill_sig_idx = 0;
+  size_t ple_decode_sig_idx = 0;
+  size_t ple_prefill_sig_idx = 0;
+  bool external_embedder = false;
+  bool has_per_layer_embedder = false;
+  size_t decode_embeddings_idx = 0;
+  size_t decode_ple_idx = 0;
+  size_t prefill_embeddings_idx = 0;
+  size_t prefill_ple_idx = 0;
+  size_t emb_decode_floats = 0, emb_prefill_floats = 0;
+  size_t ple_decode_floats = 0, ple_prefill_floats = 0;
+
   std::vector<litert::TensorBuffer> decode_input_bufs;
   std::vector<litert::TensorBuffer> decode_output_bufs;
   std::vector<litert::TensorBuffer> prefill_input_bufs;
@@ -82,7 +102,8 @@ struct LLMBackendData {
 
   int num_kv_layers = 0;
   int kv_cache_max_size = 0;
-  int kv_buf_float_count = 0;
+  std::vector<int> kv_k_float_counts;
+  std::vector<int> kv_v_float_counts;
   int prefill_seq_size = 0;
   int vocab_size = 0;
 
@@ -90,6 +111,7 @@ struct LLMBackendData {
   std::vector<int> output_tokens;
   uint16_t num_threads = 4;
   int max_output_tokens = 128;
+  int pad_token_id = 128009;
   std::unordered_set<int> stop_token_ids{128001, 128008, 128009};
 
   LLMBackendData() {}
@@ -99,6 +121,16 @@ struct LLMBackendData {
     decode_output_bufs.clear();
     prefill_input_bufs.clear();
     prefill_output_bufs.clear();
+    emb_decode_in.clear();
+    emb_decode_out.clear();
+    emb_prefill_in.clear();
+    emb_prefill_out.clear();
+    ple_decode_in.clear();
+    ple_decode_out.clear();
+    ple_prefill_in.clear();
+    ple_prefill_out.clear();
+    embedder.reset();
+    per_layer_embedder.reset();
     model.reset();
     env.reset();
   }
@@ -170,6 +202,11 @@ class LLMPipeline : public Pipeline {
                           bool use_gpu);
   bool BuildDecodeBuffers(LLMBackendData& data);
   bool BuildPrefillBuffers(LLMBackendData& data, size_t prefill_sig_idx);
+  bool BuildEmbedders(LLMBackendData& data, const std::string& embedder_path,
+                      const std::string& per_layer_embedder_path);
+  bool BuildEmbedderPrefillBuffers(LLMBackendData& data, int seq_size);
+  bool RunEmbedders(LLMBackendData& data, const std::vector<int32_t>& tokens,
+                    bool prefill);
 
   size_t GetSuitablePrefillSignature(
       const std::vector<std::pair<size_t, size_t>>& prefill_sigs,
@@ -188,13 +225,10 @@ class LLMPipeline : public Pipeline {
       const std::unordered_map<std::string, size_t>& decode_output_map,
       std::vector<litert::TensorBuffer>& decode_input_bufs,
       std::vector<litert::TensorBuffer>& decode_output_bufs);
-  void ResetKV(int num_layers, int float_count,
-               const std::unordered_map<std::string, size_t>& decode_input_map,
-               std::vector<litert::TensorBuffer>& decode_input_bufs);
-  void ResetPrefillKV(
-      int num_layers, int float_count,
-      const std::unordered_map<std::string, size_t>& prefill_input_map,
-      std::vector<litert::TensorBuffer>& prefill_input_bufs);
+  void ResetKV(int num_layers, const std::vector<int>& k_float_counts,
+               const std::vector<int>& v_float_counts,
+               const std::unordered_map<std::string, size_t>& input_map,
+               std::vector<litert::TensorBuffer>& input_bufs);
   void WritePrefillMask(litert::CompiledModel& model, size_t sig_idx,
                         size_t mask_idx, bool mask_is_bool,
                         litert::TensorBuffer& buf);
