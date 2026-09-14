@@ -412,9 +412,12 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     LOG(ERROR) << "Options::Create failed";
     return false;
   }
-  options->SetHardwareAccelerators(
-      use_gpu ? (litert::HwAccelerators::kGpu | litert::HwAccelerators::kCpu)
-              : litert::HwAccelerators::kCpu);
+  if (use_gpu) {
+    options->SetHardwareAccelerators(litert::HwAccelerators::kGpu |
+                                     litert::HwAccelerators::kCpu);
+  } else {
+    options->SetHardwareAccelerators(litert::HwAccelerators::kCpu);
+  }
 
   // GPU compile options mirroring LiteRT-LM's CreateCompilationOptions
   // (llm_executor_settings_utils.cc). With empty options the prebuilt WebGPU
