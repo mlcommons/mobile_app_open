@@ -275,19 +275,19 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/model_quantized.tflite"
+      model_path: "local:///gemma4/model_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/embedder_quantized.tflite"
+      model_path: "local:///gemma4/embedder_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/per_layer_embedder_quantized.tflite"
+      model_path: "local:///gemma4/per_layer_embedder_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/gemma4_e2b.spm.model"
+      model_path: "local:///gemma4/gemma4_e2b.spm.model"
       model_checksum: ""
     }
   }
@@ -296,19 +296,19 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/model_quantized.tflite"
+      model_path: "local:///gemma4/model_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/embedder_quantized.tflite"
+      model_path: "local:///gemma4/embedder_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/per_layer_embedder_quantized.tflite"
+      model_path: "local:///gemma4/per_layer_embedder_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/gemma4_e2b.spm.model"
+      model_path: "local:///gemma4/gemma4_e2b.spm.model"
       model_checksum: ""
     }
   }
@@ -343,19 +343,19 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/model_quantized.tflite"
+      model_path: "local:///gemma4/model_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/embedder_quantized.tflite"
+      model_path: "local:///gemma4/embedder_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/per_layer_embedder_quantized.tflite"
+      model_path: "local:///gemma4/per_layer_embedder_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/gemma4_e2b.spm.model"
+      model_path: "local:///gemma4/gemma4_e2b.spm.model"
       model_checksum: ""
     }
   }
@@ -364,19 +364,19 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/model_quantized.tflite"
+      model_path: "local:///gemma4/model_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/embedder_quantized.tflite"
+      model_path: "local:///gemma4/embedder_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/per_layer_embedder_quantized.tflite"
+      model_path: "local:///gemma4/per_layer_embedder_quantized.tflite"
       model_checksum: ""
     }
     model_file: {
-      model_path: "http://192.168.1.128:8084/gemma4/gemma4_e2b.spm.model"
+      model_path: "local:///gemma4/gemma4_e2b.spm.model"
       model_checksum: ""
     }
   }
