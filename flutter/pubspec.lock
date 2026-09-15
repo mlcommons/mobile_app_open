@@ -968,18 +968,18 @@ packages:
     dependency: transitive
     description:
       name: protobuf
-      sha256: "75ec242d22e950bdcc79ee38dd520ce4ee0bc491d7fadc4ea47694604d22bf06"
+      sha256: "13b6717366aa7ec3792dd62c19c7d33a785708224365f2db23c5ca01f1c1a0f2"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.0"
+    version: "6.1.0"
   protoc_plugin:
     dependency: "direct dev"
     description:
       name: protoc_plugin
-      sha256: d1ea363e9118f954d9d482c2f7281c5ff5149b059e68672d1faa564d49091f05
+      sha256: e6df1acfca57523537da0ce629bf02d5f8378364f18f8a45bd914abd53e48403
       url: "https://pub.dev"
     source: hosted
-    version: "25.0.0"
+    version: "25.1.0"
   provider:
     dependency: "direct main"
     description:
