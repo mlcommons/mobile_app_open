@@ -72,7 +72,7 @@ ENV ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/25.2.9519653
 ENV ANDROID_NDK=${ANDROID_NDK_ROOT}
 ENV ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
 ENV ANDROID_NDK_VERSION=25
-ENV ANDROID_NDK_API_LEVEL=33
+ENV ANDROID_NDK_API_LEVEL=30
 ENV HOME=/image-workdir
 WORKDIR $HOME
 
@@ -82,7 +82,7 @@ RUN git clone --branch "3.44.4" --single-branch --depth 1 https://github.com/flu
 RUN git config --global --add safe.directory $HOME/flutter
 RUN flutter config --no-analytics && dart --disable-analytics
 RUN flutter doctor -v
-RUN dart pub global activate protoc_plugin ^25.0.0 && chmod --recursive a=u $PUB_CACHE
+RUN dart pub global activate protoc_plugin 25.0.0 && chmod --recursive a=u $PUB_CACHE
 
 RUN mkdir -p $HOME/.cache/.gradle
 ENV GRADLE_USER_HOME=$HOME/.cache/.gradle

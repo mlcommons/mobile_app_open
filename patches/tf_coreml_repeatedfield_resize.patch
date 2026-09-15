@@ -1,0 +1,18 @@
+The protobuf bundled with this TensorFlow revision renames
+RepeatedField::resize() to Resize(), but the CoreML delegate still calls the
+lowercase spelling for float32 weights. Same fix as
+litert_coreml_repeatedfield_resize.patch, applied to TensorFlow's copy of
+the delegate. The float16 branch just below is a std::string (float16value
+has type bytes), so its lowercase resize() is correct and left alone.
+
+--- a/tensorflow/lite/delegates/coreml/builders/convolution_op_builder.cc
++++ b/tensorflow/lite/delegates/coreml/builders/convolution_op_builder.cc
+@@ -181,7 +181,7 @@
+   if (weights_->type == kTfLiteFloat32) {
+     auto* coreml_weights =
+         layer_->mutable_convolution()->mutable_weights()->mutable_floatvalue();
+-    coreml_weights->resize(NumElements(weights_), 0);
++    coreml_weights->Resize(NumElements(weights_), 0);
+
+     optimized_ops::Transpose<float>(params, tfl_shape, weights_->data.f,
+                                     coreml_shape,

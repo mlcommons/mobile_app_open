@@ -11,7 +11,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'utils.dart';
 
 const _runMode = BenchmarkRunModeEnum.integrationTestRun;
+// The LLM accuracy phase evaluates the whole TinyMMLU set, which is far too
+// slow for a CI device session on the CPU path. quickRun keeps the same lite
+// dataset and quick run config but skips the accuracy phase.
+//
+// Stable diffusion needs the same treatment for the same reason, only more so:
+// loadgen ignores min_query_count in accuracy mode and runs the whole set, so
+// the accuracy phase is 150 sequential 20-step generations plus 150 CLIP
+// scoring passes. On the CPU that is hours, and it also pulls the 1.71 GB CLIP
+// ground truth. quickRun keeps the performance phase, which is time-bounded.
+const _quickRunIds = {BenchmarkId.stableDiffusion};
+const _quickRunMode = BenchmarkRunModeEnum.quickRun;
 const _bindingKeepAliveInterval = Duration(seconds: 20);
+
+BenchmarkRunModeEnum _runModeFor(String benchmarkId) =>
+    benchmarkId.startsWith('llm') || _quickRunIds.contains(benchmarkId)
+    ? _quickRunMode
+    : _runMode;
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -83,7 +99,14 @@ void testBenchmark(
   String benchmarkId,
 ) {
   testWidgets('Test benchmark: $benchmarkId', (WidgetTester tester) async {
+    final runMode = _runModeFor(benchmarkId);
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      StoreConstants.selectedBenchmarkRunMode: runMode.name,
+      StoreConstants.cooldown: true,
+      StoreConstants.cooldownDuration: runMode.cooldownDuration,
+    });
     await startApp(tester);
+    applyDeviceBackendOverride(tester);
     await validateSettings(tester);
     if (!hasBenchmark(tester, benchmarkId)) {
       markTestSkipped('Backend does not support benchmark $benchmarkId');
@@ -101,7 +124,7 @@ void testBenchmark(
       'benchmark flow for $benchmarkId',
       () async {
         await downloadResources(tester);
-        final cooldownDuration = _runMode.cooldownDuration;
+        final cooldownDuration = runMode.cooldownDuration;
         debugPrint('Wait $cooldownDuration seconds before running benchmark');
         await Future.delayed(Duration(seconds: cooldownDuration));
         await runBenchmarks(tester);
@@ -109,7 +132,7 @@ void testBenchmark(
     );
     final extendedResult = await getLastResult(tester);
     printResult(extendedResult);
-    checkResult(extendedResult);
+    checkResult(extendedResult, expectAccuracy: runMode.doAccuracyRun);
     await deleteResources(tester);
   });
 }
