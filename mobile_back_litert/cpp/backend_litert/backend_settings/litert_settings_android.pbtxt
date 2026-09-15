@@ -275,20 +275,20 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "local:///gemma4/model_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/model_quantized.tflite"
+      model_checksum: "82c91df6aca776bbc14a0f1c038bcb02"
     }
     model_file: {
-      model_path: "local:///gemma4/embedder_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/embedder_quantized.tflite"
+      model_checksum: "82f937a22bb88a0449e3f7d9ee116f90"
     }
     model_file: {
-      model_path: "local:///gemma4/per_layer_embedder_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/per_layer_embedder_quantized.tflite"
+      model_checksum: "8b73ef4f0a81e3b9214d5c43fe1d66c6"
     }
     model_file: {
-      model_path: "local:///gemma4/gemma4_e2b.spm.model"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/gemma4_e2b.spm.model"
+      model_checksum: "165f0fbf729600b9ed85f22e40ed7042"
     }
   }
   delegate_choice: {
@@ -296,20 +296,20 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "local:///gemma4/model_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/model_quantized.tflite"
+      model_checksum: "82c91df6aca776bbc14a0f1c038bcb02"
     }
     model_file: {
-      model_path: "local:///gemma4/embedder_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/embedder_quantized.tflite"
+      model_checksum: "82f937a22bb88a0449e3f7d9ee116f90"
     }
     model_file: {
-      model_path: "local:///gemma4/per_layer_embedder_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/per_layer_embedder_quantized.tflite"
+      model_checksum: "8b73ef4f0a81e3b9214d5c43fe1d66c6"
     }
     model_file: {
-      model_path: "local:///gemma4/gemma4_e2b.spm.model"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/gemma4_e2b.spm.model"
+      model_checksum: "165f0fbf729600b9ed85f22e40ed7042"
     }
   }
   delegate_selected: "GPU"
@@ -343,20 +343,20 @@ benchmark_setting {
     accelerator_name: "cpu"
     accelerator_desc: "CPU"
     model_file: {
-      model_path: "local:///gemma4/model_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/model_quantized.tflite"
+      model_checksum: "82c91df6aca776bbc14a0f1c038bcb02"
     }
     model_file: {
-      model_path: "local:///gemma4/embedder_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/embedder_quantized.tflite"
+      model_checksum: "82f937a22bb88a0449e3f7d9ee116f90"
     }
     model_file: {
-      model_path: "local:///gemma4/per_layer_embedder_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/per_layer_embedder_quantized.tflite"
+      model_checksum: "8b73ef4f0a81e3b9214d5c43fe1d66c6"
     }
     model_file: {
-      model_path: "local:///gemma4/gemma4_e2b.spm.model"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/gemma4_e2b.spm.model"
+      model_checksum: "165f0fbf729600b9ed85f22e40ed7042"
     }
   }
   delegate_choice: {
@@ -364,20 +364,20 @@ benchmark_setting {
     accelerator_name: "gpu"
     accelerator_desc: "GPU"
     model_file: {
-      model_path: "local:///gemma4/model_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/model_quantized.tflite"
+      model_checksum: "82c91df6aca776bbc14a0f1c038bcb02"
     }
     model_file: {
-      model_path: "local:///gemma4/embedder_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/embedder_quantized.tflite"
+      model_checksum: "82f937a22bb88a0449e3f7d9ee116f90"
     }
     model_file: {
-      model_path: "local:///gemma4/per_layer_embedder_quantized.tflite"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/per_layer_embedder_quantized.tflite"
+      model_checksum: "8b73ef4f0a81e3b9214d5c43fe1d66c6"
     }
     model_file: {
-      model_path: "local:///gemma4/gemma4_e2b.spm.model"
-      model_checksum: ""
+      model_path: "https://storage.googleapis.com/mlperf-mobile-public/litert/gemma4/gemma4_e2b.spm.model"
+      model_checksum: "165f0fbf729600b9ed85f22e40ed7042"
     }
   }
   delegate_selected: "GPU"
