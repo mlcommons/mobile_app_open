@@ -27,9 +27,16 @@ class BenchmarkInfo {
 
   BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
     switch (task.id) {
-      case (BenchmarkId.llm):
+      // Every LLM variant shares one description; the size and the eval it
+      // runs are already in the task's own name.
+      case (BenchmarkId.llm1b):
+      case (BenchmarkId.llm1bInstruct):
+      case (BenchmarkId.llm3b):
+      case (BenchmarkId.llm3bInstruct):
+      case (BenchmarkId.llm8b):
+      case (BenchmarkId.llm8bInstruct):
         return BenchmarkLocalizationInfo(
-          name: 'LLM',
+          name: task.name,
           detailsTitle: stringResources.benchInfoLlm,
           detailsContent: stringResources.benchInfoLlmDesc,
         );
