@@ -1,10 +1,17 @@
-diff --git a/litert/runtime/custom_buffer.cc b/litert/runtime/custom_buffer.cc
-index ca581e1..7764ab9 100644
 --- a/litert/runtime/custom_buffer.cc
 +++ b/litert/runtime/custom_buffer.cc
-@@ -20,0 +21 @@
+@@ -17,6 +17,7 @@
+ #include <stdlib.h>
+ 
+ #include <utility>
 +#include "litert/c/internal/litert_logging.h"
-@@ -75,5 +76,2 @@ LITERT_NO_CFI_CHECK CustomBuffer::~CustomBuffer() {
+ 
+ #include "litert/c/internal/litert_tensor_buffer_registry.h"
+ #include "litert/c/litert_any.h"
+@@ -72,12 +73,26 @@
+ }  // namespace
+ 
+ LITERT_NO_CFI_CHECK CustomBuffer::~CustomBuffer() {
 -  LITERT_ASSIGN_OR_ABORT(auto registry, GetTensorBufferRegistry(env_));
 -  LITERT_ASSIGN_OR_ABORT(auto custom_buffer_handlers,
 -                         registry->GetCustomHandlers(buffer_type_));
@@ -12,7 +19,7 @@ index ca581e1..7764ab9 100644
 -    custom_buffer_handlers.destroy_func(hw_memory_info_);
 +  if (!hw_memory_info_) {
 +    return;
-@@ -80,0 +79,17 @@ LITERT_NO_CFI_CHECK CustomBuffer::~CustomBuffer() {
+   }
 +  // The registry is owned by the LiteRtEnvironment; if the environment was
 +  // destroyed first, `env_` dangles. Guard the lookups instead of aborting.
 +  auto registry = GetTensorBufferRegistry(env_);
@@ -30,3 +37,6 @@ index ca581e1..7764ab9 100644
 +    return;
 +  }
 +  custom_buffer_handlers->destroy_func(hw_memory_info_);
+ }
+ 
+ LITERT_NO_CFI_CHECK Expected<void*> CustomBuffer::Lock(

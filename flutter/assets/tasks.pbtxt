@@ -417,7 +417,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6
@@ -477,7 +483,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6
@@ -657,7 +669,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6
@@ -717,7 +735,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6
@@ -777,7 +801,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6
@@ -837,7 +867,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6

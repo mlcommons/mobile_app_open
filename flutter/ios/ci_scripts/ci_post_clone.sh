@@ -101,6 +101,7 @@ cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 echo "$MC_LOG_PREFIX ========== Build app =========="
 export WITH_TFLITE="${WITH_TFLITE:-0}"
 export WITH_APPLE="${WITH_APPLE:-1}"
+export WITH_LITERT="${WITH_LITERT:-0}"
 
 echo "$MC_LOG_PREFIX Build backend and Flutter packages"
 # The GCS remote cache occasionally fails with "handshake timed out"

@@ -125,16 +125,27 @@ download_device_logs() {
   if [[ -n "$test_id" && "$test_id" != "null" && -n "$device_log_url" && "$device_log_url" != "null" ]]; then
     echo "Found last test case $test_id with device log URL"
 
-    # Download device logs using the extracted URL
+    # Download device logs using the extracted URL. -f so an HTTP error is a
+    # failure instead of an error page written to the log, and retries because
+    # the log is not always served the instant the session ends.
     local log_file="$LOGS_DIR/${test_id}.log"
     echo "Downloading device log to $log_file"
-    curl -s -u "$CREDENTIALS" -X GET "$device_log_url" -o "$log_file"
-
-    if [ -f "$log_file" ]; then
-      echo "Device logs downloaded successfully to $log_file"
+    if curl -sf --retry 3 --retry-delay 5 -u "$CREDENTIALS" -X GET \
+        "$device_log_url" -o "$log_file" && [ -s "$log_file" ]; then
+      echo "Device logs downloaded successfully to $log_file ($(wc -c <"$log_file") bytes)"
     else
-      echo "Failed to download device logs for test case $test_id"
+      # Test -s, not -f: a zero-byte log is what this used to leave behind, and
+      # it reads as "the run produced no output" rather than "the download
+      # failed". Leave a note in its place so the artifact explains itself --
+      # if-no-files-found on the upload step only catches a missing file.
+      echo "Failed to download device logs for test case $test_id" \
+        | tee "$log_file"
+      echo "  session: $session_id" >> "$log_file"
+      echo "  url: $device_log_url" >> "$log_file"
     fi
+  else
+    echo "No device log URL in the session response for build $build_id" \
+      | tee "$LOGS_DIR/no-device-log-${session_id}.txt"
   fi
 }
 

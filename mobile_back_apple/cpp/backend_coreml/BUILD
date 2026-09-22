@@ -38,8 +38,8 @@ apple_xcframework(
         "device": ["arm64"],
     },
     minimum_os_versions = {
-        "ios": "13.1",
-        "macos": "13.1",
+        "ios": "15.0",
+        "macos": "15.0",
     },
     deps = [
         "//mobile_back_apple/cpp/backend_coreml:coreml_c",
@@ -55,6 +55,12 @@ swift_library(
     name = "coreml_util",
     srcs = [
         "coreml_util.swift",
+    ],
+    # Xcode 27 no longer defaults the language mode, so swiftc refuses to build
+    # without one. The source is mode-agnostic; 6 is what Xcode 27 would pick.
+    copts = [
+        "-swift-version",
+        "6",
     ],
     generates_header = True,
     deps = [

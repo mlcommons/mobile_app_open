@@ -15,6 +15,7 @@ limitations under the License.
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -36,6 +37,16 @@ struct SDModel {
 
   // Signature index of the model's single output, resolved by name.
   size_t output_idx = 0;
+};
+
+// The three stages of a query, which on Apple are kept apart in memory. Each
+// needs exactly one of the three models, and the values that pass between them
+// -- the encoded prompts, then the latent -- are small host vectors, so no two
+// models ever have to be resident at once.
+enum class SDPhase {
+  kEncode,
+  kDiffuse,
+  kDecode,
 };
 
 struct SDBackendData {
@@ -70,6 +81,33 @@ struct SDBackendData {
   // Host staging for the decoded image: backend_get_output hands out a
   // pointer into it, so it has to stay valid after the call returns.
   std::vector<float> output;
+
+  // Apple CPU only. Left null on the GPU, and everywhere off Apple, where
+  // every model stays resident.
+  //
+  // iOS kills a process that crosses a per-process limit (measured at 3376 MB
+  // on an 8 GB device) and the kill cannot be caught. Releasing a model and
+  // rebuilding it later is only worth doing when the release actually returns
+  // the memory, which is true of the CPU path and NOT of the GPU one:
+  // ReleaseModel drops the LiteRT objects and ReturnFreeMemoryToOS empties
+  // libmalloc's free list, but the delegate's weights sit in Metal buffers
+  // that libmalloc never owned. Measured on an iPhone 16 Pro, in MiB still
+  // available before the limit:
+  //
+  //   before compiling models                      2885
+  //   all three models compiled                    1517   (the three cost 1368)
+  //   query start, after releasing two of them     1586   (only 69 recovered)
+  //   diffusion model rebuilt                        72   -> killed
+  //
+  // So on the GPU the phases are not used at all: the three models are
+  // compiled once and left alone. They fit together with room for the working
+  // set, and not rebuilding them each query also takes a 20-step image from
+  // 45.5 s to 18.8 s on the macOS host.
+  //
+  // The CPU path keeps the phases. There the weights are ordinary allocations
+  // that the release does return, and the three models plus a phase's working
+  // set do not fit together.
+  std::function<bool(SDPhase)> set_phase;
 };
 
 // A pipeline for Stable Diffusion.

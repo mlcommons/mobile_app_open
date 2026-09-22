@@ -26,6 +26,23 @@ build --per_file_copt=mobile_back_tflite/cpp/backend_tflite/llm_pipeline.cc@-fpe
 # tools resolved at fetch time still work.
 build --incompatible_strict_action_env
 
+# Abseil does not survive clang's layering check when it is built for the exec
+# configuration, i.e. as part of a host tool such as protoc:
+#
+#   absl/status/statusor.h:58:10: error: module com_google_absl//absl/status:
+#   statusor does not depend on a module exporting 'absl/types/span.h'
+#
+# The dependency is declared -- //absl/types:span is in statusor's deps and its
+# .cppmap is on the command line -- so this is the runner's clang disagreeing
+# with Abseil's own module layering, not a missing edge we could add. It is a
+# hygiene diagnostic over third-party code that produces no artifact, so it is
+# turned off rather than worked around.
+#
+# It went unnoticed until the LiteRT 2.2.0 pin move: the action was a remote
+# cache hit on every previous green run, and only the cold cache the new pins
+# forced actually compiled it. Target configurations keep the check.
+build --host_features=-layering_check
+
 # This flag is required by tensorflow
 common --experimental_repo_remote_exec
 
