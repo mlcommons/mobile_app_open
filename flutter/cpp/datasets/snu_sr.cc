@@ -22,10 +22,10 @@ limitations under the License.
 #include <unordered_set>
 
 #include "flutter/cpp/utils.h"
-#include "tensorflow/lite/kernels/kernel_util.h"
-#include "tensorflow/lite/tools/evaluation/proto/evaluation_stages.pb.h"
-#include "tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.h"
-#include "tensorflow/lite/tools/evaluation/utils.h"
+#include "tflite/kernels/kernel_util.h"
+#include "tflite/tools/evaluation/proto/evaluation_stages.pb.h"
+#include "tflite/tools/evaluation/stages/image_preprocessing_stage.h"
+#include "tflite/tools/evaluation/utils.h"
 
 namespace mlperf {
 namespace mobile {

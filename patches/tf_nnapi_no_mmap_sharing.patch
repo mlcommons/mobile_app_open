@@ -1,0 +1,29 @@
+Do not share the model file's mmap fd with NNAPI drivers.
+
+With mmap sharing, the NNAPI delegate passes the mmapped model file's
+descriptor to the driver inside the compilation request. Our models
+live on external storage (fuse), which vendor HAL processes are not
+allowed to read: on the Pixel 9 Pro the kernel's binder SELinux hook
+rejects transferring the fd (avc denied { read } for dev="fuse"
+scontext=u:r:hal_neuralnetworks_darwinn), getSupportedOperations fails
+with FAILED_TRANSACTION, and the whole graph silently falls back to
+CPU. Compile out only the weights-from-mmap branch so those operand
+values are copied instead; TFLITE_NNAPI_ALLOW_MMAP_SHARING itself must
+stay defined because it also guards NNMemory, the delegate's ashmem
+input/output pools, without which the delegate cannot apply at all.
+
+--- a/tensorflow/lite/delegates/nnapi/nnapi_delegate.cc
++++ b/tensorflow/lite/delegates/nnapi/nnapi_delegate.cc
+@@ -1999,7 +1999,11 @@
+                 nn_model_, ann_tensor_index, new_tensor->data.data,
+                 new_tensor->bytes),
+             "setting new operand value", tensor, nnapi_errno_);
+-#ifdef TFLITE_NNAPI_ALLOW_MMAP_SHARING
++// Do not pass the mmapped model file's fd to the driver: our models
++// live on external storage (fuse), which vendor HAL processes may not
++// read, so the kernel's binder SELinux hook rejects the fd transfer
++// and delegation falls back to CPU.
++#if 0
+       } else if (tensor->allocation &&
+                  static_cast<const Allocation*>(tensor->allocation)->type() ==
+                      Allocation::Type::kMMap) {

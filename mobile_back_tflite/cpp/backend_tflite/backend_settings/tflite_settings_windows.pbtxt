@@ -132,3 +132,7 @@ benchmark_setting {
   }
   delegate_selected: "CPU"
 }
+
+# Lower-priority backends stay selectable next to this backend for the
+# benchmarks it claims (see ClaimPolicy in backend_setting.proto).
+claim_policy: CLAIM_SHARED
