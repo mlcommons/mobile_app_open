@@ -287,6 +287,20 @@ const Map<String, Map<String, Interval>> _llm = {
   },
 };
 
+// No reference throughput values for the Gemma E2B benchmarks yet, so only the
+// backend is registered and the per-device map is left empty, which makes
+// checkThroughput skip the value comparison.
+//
+// Reusing _llm's interval would be wrong. The quickRun numbers observed so far
+// are 5.6 tok/s (Pixel 9 Pro) and 1.7 tok/s (Pixel 10 Pro) for llm-gemma-e2b,
+// so the slower device already falls under _llm's lower bound. The instruct
+// variant reports 63.6 and 405.6 tok/s for that same model, which is not
+// plausible and gets *higher* as the device gets slower, so those runs are
+// measuring something other than generation rate. Every one of these runs also
+// reports is_result_valid: false. Pinning bounds to them would encode the
+// defect rather than guard against it.
+const Map<String, Map<String, Interval>> _llmGemma = {_kLitertBackend: {}};
+
 const benchmarkExpectedThroughput = {
   BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
@@ -296,5 +310,7 @@ const benchmarkExpectedThroughput = {
   BenchmarkId.stableDiffusion: _stableDiffusion,
   BenchmarkId.llm: _llm,
   BenchmarkId.llmInstruct: _llm,
+  BenchmarkId.llmGemmaE2b: _llmGemma,
+  BenchmarkId.llmGemmaE2bInstruct: _llmGemma,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };

@@ -116,7 +116,7 @@ jobs:
           set -euo pipefail
           export PATH="/c/tools/flutter/bin:$PATH"
           dart --disable-analytics
-          dart pub global activate protoc_plugin '^25.0.0'
+          dart pub global activate protoc_plugin '25.0.0'
           echo "$LOCALAPPDATA\Pub\Cache\bin" >> "$GITHUB_PATH"
       - name: Cache bazel
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5

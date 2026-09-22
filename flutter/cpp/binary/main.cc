@@ -94,9 +94,10 @@ DatasetConfig::DatasetType BenchmarkId2DatasetType(absl::string_view name) {
     return DatasetConfig::SNUSR;
   } else if (absl::StartsWith(name, "stable_diffusion")) {
     return DatasetConfig::COCOGEN;
-  } else if (absl::StartsWith(name, "llm-1b-instruct")) {
+  } else if (absl::StartsWith(name, "llm-") &&
+             absl::EndsWith(name, "-instruct")) {
     return DatasetConfig::IFEVAL;
-  } else if (absl::StartsWith(name, "llm-1b")) {
+  } else if (absl::StartsWith(name, "llm-")) {
     return DatasetConfig::MMLU;
   } else {
     LOG(FATAL) << "Unrecognized benchmark_id: " << name;
@@ -179,12 +180,21 @@ int Main(int argc, char *argv[]) {
     case BackendType::EXTERNAL: {
       LOG(INFO) << "Using External backend";
       std::string model_file_path;
+      std::string embedder_file_path;
+      std::string per_layer_embedder_file_path;
       std::string lib_path;
       std::string native_lib_path;
       flag_list.insert(
           flag_list.end(),
           {Flag::CreateFlag("model_file", &model_file_path,
                             "Path to model file.", Flag::kRequired),
+           Flag::CreateFlag("embedder_file", &embedder_file_path,
+                            "Path to the embedder model file, for models that "
+                            "take external embeddings instead of token ids."),
+           Flag::CreateFlag("per_layer_embedder_file",
+                            &per_layer_embedder_file_path,
+                            "Path to the per-layer embedder model file, for "
+                            "models with per-layer embeddings."),
            Flag::CreateFlag("lib_path", &lib_path,
                             "Path to the backend library .so file."),
            Flag::CreateFlag(
@@ -220,6 +230,20 @@ int Main(int argc, char *argv[]) {
         }
         SettingList setting_list =
             CreateSettingList(backend_setting, custom_config, benchmark_id);
+
+        auto add_custom_setting = [&setting_list](const char *id,
+                                                  const std::string &value) {
+          if (value.empty()) return;
+          CustomSetting setting;
+          setting.set_id(id);
+          setting.set_value(value);
+          setting_list.mutable_benchmark_setting()
+              ->mutable_custom_setting()
+              ->Add(std::move(setting));
+        };
+        add_custom_setting("embedder_filename", embedder_file_path);
+        add_custom_setting("per_layer_embedder_filename",
+                           per_layer_embedder_file_path);
 
         ExternalBackend *external_backend = new ExternalBackend(
             model_file_path, lib_path, setting_list, native_lib_path);

@@ -118,7 +118,7 @@ jobs:
       - name: Install protoc
         run: |
           flutter config --no-analytics && dart --disable-analytics
-          dart pub global activate protoc_plugin ^25.0.0
+          dart pub global activate protoc_plugin 25.0.0
       - name: Install Android SDK
         run: |
           export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin

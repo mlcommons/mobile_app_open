@@ -78,9 +78,7 @@ cc_library(
     # libLiteRtMetalAccelerator.dylib.
     deps = [
         ":litert_settings",
-        # Not //flutter/cpp:utils — it links TensorFlow's runtime via
-        # tensorflow/lite/tools/evaluation:utils, which duplicates the TF Lite
-        # C API that @litert already provides in this .so.
+        "//flutter/cpp:utils",
         "//flutter/cpp/c:headers",
         "@com_google_absl//absl/log",
         "@com_google_absl//absl/types:span",

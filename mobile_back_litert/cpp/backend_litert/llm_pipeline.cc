@@ -25,6 +25,7 @@ limitations under the License.
 #include "absl/log/log.h"
 #include "absl/types/span.h"
 #include "flutter/cpp/c/type.h"
+#include "flutter/cpp/utils.h"
 #include "litert/cc/litert_compiled_model.h"
 #include "litert/cc/litert_element_type.h"
 #include "litert/cc/litert_environment.h"
@@ -114,48 +115,58 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
 
   LLMBackendData* backend_data = new LLMBackendData();
 
-  // The app passes a directory when the benchmark lists several files (the
-  // model and the tokenizer); the model's filename then comes from the
-  // settings. A path whose last segment has no extension is a directory.
-  std::string llm_model_path = std::string(model_path);
+  std::string model_dir = std::string(model_path);
+  std::string llm_model_path = model_dir;
   if (llm_model_path.substr(llm_model_path.rfind('/') + 1).find('.') ==
       std::string::npos) {
-    for (int i = 0; i < configs->count; ++i) {
-      if (strcmp(configs->keys[i], "model_filename") == 0) {
-        llm_model_path += '/';
-        llm_model_path += configs->values[i];
-        break;
-      }
-    }
+    llm_model_path += '/' + mlperf::mobile::GetConfigValue(
+                                configs, "model_filename", std::string(""));
+  } else {
+    model_dir = model_dir.substr(0, model_dir.rfind('/'));
   }
 
-  // Request the GPU only when the selected delegate asks for it; the CL
-  // accelerator cannot fully delegate this graph on every device, and partial
-  // delegation is disabled because the KV-cache swap needs each signature in
-  // a single partition.
+  // Gemma uses different pad and stop token ids than the Llama default.
+  std::string model_identity =
+      llm_model_path + '/' +
+      mlperf::mobile::GetConfigValue(configs, "tokenizer_filename",
+                                     std::string(""));
+  if (model_identity.find("gemma") != std::string::npos) {
+    backend_data->pad_token_id = 0;
+    backend_data->stop_token_ids = {1, 106};
+  }
+
   bool use_gpu = configs->accelerator != nullptr &&
                  strcmp(configs->accelerator, "cpu") != 0;
 
   if (!BuildCompiledModel(*backend_data, llm_model_path.c_str(), use_gpu)) {
-    if (use_gpu) {
-      LOG(ERROR) << "GPU compilation failed for " << llm_model_path
-                 << ", retrying on CPU";
+    LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
+    backend_delete(backend_data);
+    return nullptr;
+  }
+  backend_data->accelerator = use_gpu ? "GPU" : "CPU";
+
+  if (backend_data->external_embedder) {
+    std::string embedder_name = mlperf::mobile::GetConfigValue(
+        configs, "embedder_filename", std::string(""));
+    std::string ple_name = mlperf::mobile::GetConfigValue(
+        configs, "per_layer_embedder_filename", std::string(""));
+    if (embedder_name.empty()) {
+      LOG(ERROR) << "Model takes external embeddings but no "
+                    "'embedder_filename' setting was provided";
       backend_delete(backend_data);
-      backend_data = new LLMBackendData();
-      if (BuildCompiledModel(*backend_data, llm_model_path.c_str(), false)) {
-        use_gpu = false;
-      } else {
-        LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
-        backend_delete(backend_data);
-        return nullptr;
-      }
-    } else {
-      LOG(ERROR) << "Failed to build CompiledModel from: " << llm_model_path;
+      return nullptr;
+    }
+    auto resolve = [&model_dir](const std::string& name) {
+      if (name.empty() || name.find('/') != std::string::npos) return name;
+      return model_dir + '/' + name;
+    };
+    if (!BuildEmbedders(*backend_data, resolve(embedder_name),
+                        resolve(ple_name))) {
+      LOG(ERROR) << "Failed to build the embedder models";
       backend_delete(backend_data);
       return nullptr;
     }
   }
-  backend_data->accelerator = use_gpu ? "GPU" : "CPU";
   LITERT_LOG_MEM("llm: model compiled");
 
   if (!BuildDecodeBuffers(*backend_data)) {
@@ -206,19 +217,23 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
       prefill_overflow ? prefill_seq_size : (prefill_seq_size - 1);
   int decode_tokens = prefill_overflow ? overflow_size - 1 : 1;
 
-  std::vector<int32_t> tokens_data(max_seq_size, 128009);
+  std::vector<int32_t> tokens_data(max_seq_size, backend_data->pad_token_id);
   std::vector<int32_t> pos_data(max_seq_size);
   for (int i = 0; i < prefill_amount; ++i)
     tokens_data[i] = backend_data->prompt_tokens[i];
   for (int i = 0; i < max_seq_size; ++i) pos_data[i] = i;
 
-  backend_data->prefill_input_bufs[backend_data->prefill_tokens_idx]
-      .Write<int32_t>(absl::MakeConstSpan(tokens_data));
+  if (backend_data->external_embedder) {
+    MINIMAL_CHECK(RunEmbedders(*backend_data, tokens_data, /*prefill=*/true));
+  } else {
+    backend_data->prefill_input_bufs[backend_data->prefill_tokens_idx]
+        .Write<int32_t>(absl::MakeConstSpan(tokens_data));
+  }
   backend_data->prefill_input_bufs[backend_data->prefill_pos_idx]
       .Write<int32_t>(absl::MakeConstSpan(pos_data));
-  ResetPrefillKV(backend_data->num_kv_layers, backend_data->kv_buf_float_count,
-                 backend_data->prefill_input_map,
-                 backend_data->prefill_input_bufs);
+  ResetKV(backend_data->num_kv_layers, backend_data->kv_k_float_counts,
+          backend_data->kv_v_float_counts, backend_data->prefill_input_map,
+          backend_data->prefill_input_bufs);
   if (backend_data->has_mask_input) {
     WritePrefillMask(
         *backend_data->model, backend_data->current_prefill_sig_idx,
@@ -247,8 +262,12 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
   int next_position = prefill_amount;
   for (int i = 0; i < decode_tokens; ++i) {
     std::vector<int32_t> tok{next_token}, pos{next_position};
-    backend_data->decode_input_bufs[backend_data->decode_tokens_idx]
-        .Write<int32_t>(absl::MakeConstSpan(tok));
+    if (backend_data->external_embedder) {
+      MINIMAL_CHECK(RunEmbedders(*backend_data, tok, /*prefill=*/false));
+    } else {
+      backend_data->decode_input_bufs[backend_data->decode_tokens_idx]
+          .Write<int32_t>(absl::MakeConstSpan(tok));
+    }
     backend_data->decode_input_bufs[backend_data->decode_pos_idx]
         .Write<int32_t>(absl::MakeConstSpan(pos));
     if (backend_data->has_mask_input) {
@@ -300,14 +319,18 @@ mlperf_status_t LLMPipeline::backend_issue_query(
   backend_data->output_tokens.reserve(decode_steps);
   int next_token =
       GreedySampler(backend_data->decode_output_bufs[backend_data->logits_idx],
-                    backend_data->vocab_size, backend_data->logits_scratch);
+                    backend_data->vocab_size);
   if (check_stop_id(next_token)) return MLPERF_SUCCESS;
   backend_data->output_tokens.push_back(next_token);
   int next_position = input_size;
   for (int i = 0; i < decode_steps; ++i) {
     std::vector<int32_t> tok{next_token}, pos{next_position};
-    backend_data->decode_input_bufs[backend_data->decode_tokens_idx]
-        .Write<int32_t>(absl::MakeConstSpan(tok));
+    if (backend_data->external_embedder) {
+      MINIMAL_CHECK(RunEmbedders(*backend_data, tok, /*prefill=*/false));
+    } else {
+      backend_data->decode_input_bufs[backend_data->decode_tokens_idx]
+          .Write<int32_t>(absl::MakeConstSpan(tok));
+    }
     backend_data->decode_input_bufs[backend_data->decode_pos_idx]
         .Write<int32_t>(absl::MakeConstSpan(pos));
     if (backend_data->has_mask_input) {
@@ -327,7 +350,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(
                    backend_data->decode_output_bufs);
     next_token = GreedySampler(
         backend_data->decode_output_bufs[backend_data->logits_idx],
-        backend_data->vocab_size, backend_data->logits_scratch);
+        backend_data->vocab_size);
     backend_data->output_tokens.push_back(next_token);
     next_position += 1;
     if (check_stop_id(next_token)) break;
@@ -373,8 +396,9 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
 
   backend_data->prompt_tokens = *(reinterpret_cast<std::vector<int>*>(data));
 
-  ResetKV(backend_data->num_kv_layers, backend_data->kv_buf_float_count,
-          backend_data->decode_input_map, backend_data->decode_input_bufs);
+  ResetKV(backend_data->num_kv_layers, backend_data->kv_k_float_counts,
+          backend_data->kv_v_float_counts, backend_data->decode_input_map,
+          backend_data->decode_input_bufs);
   size_t effective_prefill_token_size = backend_data->prompt_tokens.size() - 1;
   // The prefill logits buffer is [1, bucket, vocab] fp32, so every step up in
   // bucket size doubles it -- for the 1B export that is 1.05 GiB at 2048 and
@@ -473,20 +497,12 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
     LOG(ERROR) << "Options::Create failed";
     return false;
   }
-  if (!use_gpu) {
+  if (use_gpu) {
+    options->SetHardwareAccelerators(litert::HwAccelerators::kGpu |
+                                     litert::HwAccelerators::kCpu);
+  } else {
     options->SetHardwareAccelerators(litert::HwAccelerators::kCpu);
-    std::string transformer_path = model_path;
-    auto model =
-        litert::CompiledModel::Create(*data.env, transformer_path, *options);
-    if (!model) {
-      LOG(ERROR) << "CompiledModel::Create failed: " << transformer_path;
-      return false;
-    }
-    data.model = std::make_unique<litert::CompiledModel>(std::move(*model));
-    return FindSignatures(data);
   }
-  options->SetHardwareAccelerators(litert::HwAccelerators::kGpu |
-                                   litert::HwAccelerators::kCpu);
 
   // GPU compile options mirroring LiteRT-LM's CreateCompilationOptions
   // (llm_executor_settings_utils.cc). With empty options the prebuilt WebGPU
@@ -561,16 +577,24 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
   }
   LITERT_LOG_MEM("llm: after GPU compile");
   data.model = std::make_unique<litert::CompiledModel>(std::move(*model));
-  return FindSignatures(data);
-}
 
-bool LLMPipeline::FindSignatures(LLMBackendData& data) {
   auto decode = data.model->GetSignatureIndex("decode");
   if (!decode) {
     LOG(ERROR) << "No 'decode' signature";
     return false;
   }
   data.decode_sig_idx = *decode;
+
+  const auto decode_inputs =
+      data.model->GetSignatureInputNames(data.decode_sig_idx);
+  if (!decode_inputs) {
+    LOG(ERROR) << "Couldn't get decode input names";
+    return false;
+  }
+  for (const auto& name : *decode_inputs) {
+    if (name == "embeddings") data.external_embedder = true;
+    if (name == "per_layer_embeddings") data.has_per_layer_embedder = true;
+  }
 
   static const int kSizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096};
   for (int seq : kSizes) {
@@ -594,6 +618,245 @@ bool LLMPipeline::FindSignatures(LLMBackendData& data) {
     }
     LITERT_LOG_NOTE(
         "[mem] llm prefill buckets exported by the model: " << buckets.str());
+  }
+
+  return true;
+}
+
+static bool compile_cpu_model(litert::Environment& env,
+                              const std::string& model_path,
+                              std::unique_ptr<litert::CompiledModel>& model) {
+  auto options = litert::Options::Create();
+  if (!options) {
+    LOG(ERROR) << "Options::Create failed for " << model_path;
+    return false;
+  }
+  options->SetHardwareAccelerators(litert::HwAccelerators::kCpu);
+
+  auto compiled = litert::CompiledModel::Create(env, model_path, *options);
+  if (!compiled) {
+    LOG(ERROR) << "CompiledModel::Create failed: " << model_path;
+    return false;
+  }
+  model = std::make_unique<litert::CompiledModel>(std::move(*compiled));
+  return true;
+}
+
+static bool build_embedder_buffers(litert::CompiledModel& model, size_t sig_idx,
+                                   std::vector<litert::TensorBuffer>& inputs,
+                                   std::vector<litert::TensorBuffer>& outputs,
+                                   size_t& float_count) {
+  auto input_bufs = model.CreateInputBuffers(sig_idx);
+  if (!input_bufs) {
+    LOG(ERROR) << "CreateInputBuffers (embedder) failed";
+    return false;
+  }
+  inputs = std::move(*input_bufs);
+
+  auto output_bufs = model.CreateOutputBuffers(sig_idx);
+  if (!output_bufs) {
+    LOG(ERROR) << "CreateOutputBuffers (embedder) failed";
+    return false;
+  }
+  outputs = std::move(*output_bufs);
+
+  if (inputs.size() != 1 || outputs.size() != 1) {
+    LOG(ERROR)
+        << "Expected 1 input and 1 output on the embedder signature, got "
+        << inputs.size() << " and " << outputs.size();
+    return false;
+  }
+
+  auto buffer_size = outputs[0].PackedSize();
+  if (!buffer_size) {
+    LOG(ERROR) << "PackedSize (embedder output) failed";
+    return false;
+  }
+  float_count = *buffer_size / sizeof(float);
+  return true;
+}
+
+static bool check_embedding_dest(litert::TensorBuffer& dst, size_t float_count,
+                                 const char* name) {
+  auto dst_size = dst.PackedSize();
+  if (!dst_size) {
+    LOG(ERROR) << "PackedSize (decoder '" << name << "' input) failed";
+    return false;
+  }
+  if (*dst_size != float_count * sizeof(float)) {
+    LOG(ERROR) << "Size mismatch between the embedder output and the decoder '"
+               << name << "' input: " << float_count * sizeof(float) << " vs "
+               << *dst_size << " bytes";
+    return false;
+  }
+  return true;
+}
+
+static bool copy_embedding(litert::TensorBuffer& src, litert::TensorBuffer& dst,
+                           size_t float_count, const char* name) {
+  auto dst_lock = litert::TensorBufferScopedLock::Create<float>(
+      dst, litert::TensorBuffer::LockMode::kWrite);
+  if (!dst_lock) {
+    LOG(ERROR) << "Failed to lock the decoder '" << name << "' input";
+    return false;
+  }
+  if (!src.Read<float>(absl::MakeSpan(dst_lock->second, float_count))) {
+    LOG(ERROR) << "Failed to read the embedder output into the decoder '"
+               << name << "' input";
+    return false;
+  }
+  return true;
+}
+
+bool LLMPipeline::BuildEmbedders(LLMBackendData& data,
+                                 const std::string& embedder_path,
+                                 const std::string& per_layer_embedder_path) {
+  if (!compile_cpu_model(*data.env, embedder_path, data.embedder)) return false;
+
+  auto emb_decode = data.embedder->GetSignatureIndex("decode_embedder");
+  if (!emb_decode) {
+    LOG(ERROR) << "No 'decode_embedder' signature in " << embedder_path;
+    return false;
+  }
+  data.emb_decode_sig_idx = *emb_decode;
+  if (!build_embedder_buffers(*data.embedder, data.emb_decode_sig_idx,
+                              data.emb_decode_in, data.emb_decode_out,
+                              data.emb_decode_floats))
+    return false;
+
+  if (data.has_per_layer_embedder) {
+    if (per_layer_embedder_path.empty()) {
+      LOG(ERROR) << "Model takes per_layer_embeddings but no "
+                    "'per_layer_embedder_filename' setting was provided";
+      return false;
+    }
+    if (!compile_cpu_model(*data.env, per_layer_embedder_path,
+                           data.per_layer_embedder))
+      return false;
+
+    auto ple_decode =
+        data.per_layer_embedder->GetSignatureIndex("decode_per_layer_embedder");
+    if (!ple_decode) {
+      LOG(ERROR) << "No 'decode_per_layer_embedder' signature in "
+                 << per_layer_embedder_path;
+      return false;
+    }
+    data.ple_decode_sig_idx = *ple_decode;
+    if (!build_embedder_buffers(*data.per_layer_embedder,
+                                data.ple_decode_sig_idx, data.ple_decode_in,
+                                data.ple_decode_out, data.ple_decode_floats))
+      return false;
+  }
+
+  std::vector<std::pair<size_t, size_t>> supported;
+  for (const auto& [sig_idx, seq_size] : data.prefill_sigs) {
+    const std::string suffix = std::to_string(seq_size);
+    if (!data.embedder->GetSignatureIndex("prefill_embedder_" + suffix))
+      continue;
+    if (data.has_per_layer_embedder &&
+        !data.per_layer_embedder->GetSignatureIndex(
+            "prefill_per_layer_embedder_" + suffix))
+      continue;
+    supported.push_back({sig_idx, seq_size});
+  }
+  if (supported.empty()) {
+    LOG(ERROR) << "No prefill length is supported by both the decoder and the "
+                  "embedder models";
+    return false;
+  }
+  if (supported.size() != data.prefill_sigs.size()) {
+    LOG(WARNING)
+        << "Dropped " << data.prefill_sigs.size() - supported.size()
+        << " decoder prefill signature(s) unsupported by the embedders";
+  }
+  data.prefill_sigs = std::move(supported);
+
+  return true;
+}
+
+bool LLMPipeline::BuildEmbedderPrefillBuffers(LLMBackendData& data,
+                                              int seq_size) {
+  const std::string suffix = std::to_string(seq_size);
+
+  auto emb_sig = data.embedder->GetSignatureIndex("prefill_embedder_" + suffix);
+  if (!emb_sig) {
+    LOG(ERROR) << "No 'prefill_embedder_" << suffix << "' signature";
+    return false;
+  }
+  data.emb_prefill_sig_idx = *emb_sig;
+  if (!build_embedder_buffers(*data.embedder, data.emb_prefill_sig_idx,
+                              data.emb_prefill_in, data.emb_prefill_out,
+                              data.emb_prefill_floats))
+    return false;
+  if (!check_embedding_dest(
+          data.prefill_input_bufs[data.prefill_embeddings_idx],
+          data.emb_prefill_floats, "embeddings"))
+    return false;
+
+  if (data.has_per_layer_embedder) {
+    auto ple_sig = data.per_layer_embedder->GetSignatureIndex(
+        "prefill_per_layer_embedder_" + suffix);
+    if (!ple_sig) {
+      LOG(ERROR) << "No 'prefill_per_layer_embedder_" << suffix
+                 << "' signature";
+      return false;
+    }
+    data.ple_prefill_sig_idx = *ple_sig;
+    if (!build_embedder_buffers(*data.per_layer_embedder,
+                                data.ple_prefill_sig_idx, data.ple_prefill_in,
+                                data.ple_prefill_out, data.ple_prefill_floats))
+      return false;
+    if (!check_embedding_dest(data.prefill_input_bufs[data.prefill_ple_idx],
+                              data.ple_prefill_floats, "per_layer_embeddings"))
+      return false;
+  }
+
+  return true;
+}
+
+bool LLMPipeline::RunEmbedders(LLMBackendData& data,
+                               const std::vector<int32_t>& tokens,
+                               bool prefill) {
+  auto& emb_in = prefill ? data.emb_prefill_in : data.emb_decode_in;
+  auto& emb_out = prefill ? data.emb_prefill_out : data.emb_decode_out;
+  const size_t emb_sig =
+      prefill ? data.emb_prefill_sig_idx : data.emb_decode_sig_idx;
+  auto& dec_bufs = prefill ? data.prefill_input_bufs : data.decode_input_bufs;
+  const size_t emb_dst =
+      prefill ? data.prefill_embeddings_idx : data.decode_embeddings_idx;
+  const size_t emb_floats =
+      prefill ? data.emb_prefill_floats : data.emb_decode_floats;
+
+  emb_in[0].Write<int32_t>(absl::MakeConstSpan(tokens));
+  if (!data.embedder->Run(emb_sig, absl::MakeSpan(emb_in),
+                          absl::MakeSpan(emb_out))) {
+    LOG(ERROR) << "Embedder Run failed";
+    return false;
+  }
+  if (!copy_embedding(emb_out[0], dec_bufs[emb_dst], emb_floats,
+                      "embeddings")) {
+    return false;
+  }
+
+  if (!data.has_per_layer_embedder) return true;
+
+  auto& ple_in = prefill ? data.ple_prefill_in : data.ple_decode_in;
+  auto& ple_out = prefill ? data.ple_prefill_out : data.ple_decode_out;
+  const size_t ple_sig =
+      prefill ? data.ple_prefill_sig_idx : data.ple_decode_sig_idx;
+  const size_t ple_dst = prefill ? data.prefill_ple_idx : data.decode_ple_idx;
+  const size_t ple_floats =
+      prefill ? data.ple_prefill_floats : data.ple_decode_floats;
+
+  ple_in[0].Write<int32_t>(absl::MakeConstSpan(tokens));
+  if (!data.per_layer_embedder->Run(ple_sig, absl::MakeSpan(ple_in),
+                                    absl::MakeSpan(ple_out))) {
+    LOG(ERROR) << "Per-layer embedder Run failed";
+    return false;
+  }
+  if (!copy_embedding(ple_out[0], dec_bufs[ple_dst], ple_floats,
+                      "per_layer_embeddings")) {
+    return false;
   }
 
   return true;
@@ -633,7 +896,21 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
   data.decode_input_map = make_index_map(input_names);
   data.decode_output_map = make_index_map(output_names);
 
-  data.decode_tokens_idx = data.decode_input_map.at("tokens");
+  if (data.external_embedder) {
+    data.decode_embeddings_idx = data.decode_input_map.at("embeddings");
+    if (!check_embedding_dest(
+            data.decode_input_bufs[data.decode_embeddings_idx],
+            data.emb_decode_floats, "embeddings"))
+      return false;
+    if (data.has_per_layer_embedder) {
+      data.decode_ple_idx = data.decode_input_map.at("per_layer_embeddings");
+      if (!check_embedding_dest(data.decode_input_bufs[data.decode_ple_idx],
+                                data.ple_decode_floats, "per_layer_embeddings"))
+        return false;
+    }
+  } else {
+    data.decode_tokens_idx = data.decode_input_map.at("tokens");
+  }
   data.decode_pos_idx = data.decode_input_map.at("input_pos");
   data.logits_idx = data.decode_output_map.at("logits");
 
@@ -649,32 +926,39 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
     break;
   }
 
-  // 2 KV tensors per layer + the logits output.
-  // TODO: count "kv_cache_k_*" outputs instead of assuming the layout.
-  data.num_kv_layers = (data.decode_output_map.size() - 1) / 2;
+  data.num_kv_layers = 0;
+  for (const auto& entry : data.decode_output_map) {
+    if (entry.first.rfind("kv_cache_k_", 0) == 0) ++data.num_kv_layers;
+  }
 
   if (data.num_kv_layers > 0) {
-    auto kv_metadata = data.model->GetInputBufferRequirements(
-        data.decode_sig_idx, "kv_cache_k_0");
-    if (!kv_metadata) {
-      LOG(ERROR) << "GetInputBufferRequirements (KV) failed";
-      return false;
-    }
-
     auto kv_type =
         data.model->GetInputTensorType(data.decode_sig_idx, "kv_cache_k_0");
     if (!kv_type) {
       LOG(ERROR) << "RankedTensorType failed";
       return false;
     }
-    // The KV layout is [1, n_kv_heads, kv_len, head_dim] or
-    // [1, kv_len, n_kv_heads, head_dim] depending on the exporter;
-    // kv_len is the larger of the two middle dimensions.
-    const auto kv_dims = (*kv_type).Layout().Dimensions();
-    data.kv_cache_max_size = static_cast<int>(std::max(kv_dims[1], kv_dims[2]));
+    // [1, n_kv_heads, kv_len, head_dim]
+    data.kv_cache_max_size = (*kv_type).Layout().Dimensions()[2];
 
-    auto buffer_size = kv_metadata->BufferSize();
-    data.kv_buf_float_count = static_cast<int>(*buffer_size / sizeof(float));
+    data.kv_k_float_counts.resize(data.num_kv_layers);
+    data.kv_v_float_counts.resize(data.num_kv_layers);
+    for (int i = 0; i < data.num_kv_layers; ++i) {
+      const std::string suffix = std::to_string(i);
+      auto k_reqs = data.model->GetInputBufferRequirements(
+          data.decode_sig_idx, "kv_cache_k_" + suffix);
+      auto v_reqs = data.model->GetInputBufferRequirements(
+          data.decode_sig_idx, "kv_cache_v_" + suffix);
+      if (!k_reqs || !v_reqs) {
+        LOG(ERROR) << "GetInputBufferRequirements (KV layer " << i
+                   << ") failed";
+        return false;
+      }
+      auto k_size = k_reqs->BufferSize();
+      auto v_size = v_reqs->BufferSize();
+      data.kv_k_float_counts[i] = static_cast<int>(*k_size / sizeof(float));
+      data.kv_v_float_counts[i] = static_cast<int>(*v_size / sizeof(float));
+    }
   }
 
   auto logits_metadata =
@@ -686,7 +970,6 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
 
   auto buffer_size = logits_metadata->BufferSize();
   data.vocab_size = static_cast<int>(*buffer_size / sizeof(float));
-  data.logits_scratch.resize(data.vocab_size);
 
   LITERT_LOG_NOTE("[mem] llm geometry: kv_cache_max_size="
                   << data.kv_cache_max_size << " num_kv_layers="
@@ -734,7 +1017,13 @@ bool LLMPipeline::BuildPrefillBuffers(LLMBackendData& data,
   data.prefill_input_map = make_index_map(input_names);
   data.prefill_output_map = make_index_map(output_names);
 
-  data.prefill_tokens_idx = data.prefill_input_map.at("tokens");
+  if (data.external_embedder) {
+    data.prefill_embeddings_idx = data.prefill_input_map.at("embeddings");
+    if (data.has_per_layer_embedder)
+      data.prefill_ple_idx = data.prefill_input_map.at("per_layer_embeddings");
+  } else {
+    data.prefill_tokens_idx = data.prefill_input_map.at("tokens");
+  }
   data.prefill_pos_idx = data.prefill_input_map.at("input_pos");
 
   // Optional attention-mask input (model exported with a mask input).
@@ -746,10 +1035,22 @@ bool LLMPipeline::BuildPrefillBuffers(LLMBackendData& data,
     break;
   }
 
-  auto reqs = data.model->GetInputBufferRequirements(prefill_sig_idx, "tokens");
+  auto reqs = data.model->GetInputBufferRequirements(
+      prefill_sig_idx, data.external_embedder ? "input_pos" : "tokens");
   if (reqs) {
     auto buffer_size = reqs->BufferSize();
     data.prefill_seq_size = static_cast<int>(*buffer_size / sizeof(int32_t));
+  }
+
+  if (data.external_embedder) {
+    if (data.prefill_seq_size <= 0) {
+      LOG(ERROR) << "Could not determine the prefill sequence length";
+      return false;
+    }
+    if (!BuildEmbedderPrefillBuffers(data, data.prefill_seq_size)) {
+      LOG(ERROR) << "Failed to allocate the embedder prefill buffers";
+      return false;
+    }
   }
 
   LITERT_LOG_NOTE("[mem] llm prefill buffers built for bucket "
@@ -823,32 +1124,23 @@ void LLMPipeline::UpdateDecodeKV(
 }
 
 void LLMPipeline::ResetKV(
-    int num_layers, int float_count,
-    const std::unordered_map<std::string, size_t>& decode_input_map,
-    std::vector<litert::TensorBuffer>& decode_input_bufs) {
-  if (float_count == 0) return;
-  std::vector<float> zeros(float_count, 0.0f);
-  for (int i = 0; i < num_layers; ++i) {
-    for (const char* prefix : {"kv_cache_k_", "kv_cache_v_"}) {
-      std::string name = std::string(prefix) + std::to_string(i);
-      decode_input_bufs[decode_input_map.at(name)].Write<float>(
-          absl::MakeConstSpan(zeros));
-    }
-  }
-}
+    int num_layers, const std::vector<int>& k_float_counts,
+    const std::vector<int>& v_float_counts,
+    const std::unordered_map<std::string, size_t>& input_map,
+    std::vector<litert::TensorBuffer>& input_bufs) {
+  if (num_layers == 0) return;
 
-void LLMPipeline::ResetPrefillKV(
-    int num_layers, int float_count,
-    const std::unordered_map<std::string, size_t>& prefill_input_map,
-    std::vector<litert::TensorBuffer>& prefill_input_bufs) {
-  if (float_count == 0) return;
-  std::vector<float> zeros(float_count, 0.0f);
+  int max_count = 0;
+  for (int i = 0; i < num_layers; ++i)
+    max_count = std::max({max_count, k_float_counts[i], v_float_counts[i]});
+  const std::vector<float> zeros(max_count, 0.0f);
+
   for (int i = 0; i < num_layers; ++i) {
-    for (const char* prefix : {"kv_cache_k_", "kv_cache_v_"}) {
-      std::string name = std::string(prefix) + std::to_string(i);
-      prefill_input_bufs[prefill_input_map.at(name)].Write<float>(
-          absl::MakeConstSpan(zeros));
-    }
+    const std::string suffix = std::to_string(i);
+    input_bufs[input_map.at("kv_cache_k_" + suffix)].Write<float>(
+        absl::MakeConstSpan(zeros.data(), k_float_counts[i]));
+    input_bufs[input_map.at("kv_cache_v_" + suffix)].Write<float>(
+        absl::MakeConstSpan(zeros.data(), v_float_counts[i]));
   }
 }
 
@@ -908,16 +1200,16 @@ void LLMPipeline::WriteDecodeMask(litert::CompiledModel& model, size_t sig_idx,
   }
 }
 
-// Greedy sampler (argmax over the logits buffer). The scratch vector avoids
-// a per-token heap allocation for the ~vocab_size logits copy.
-int LLMPipeline::GreedySampler(litert::TensorBuffer& logits_buf, int vocab_size,
-                               std::vector<float>& logits) {
-  logits.resize(vocab_size);
-  auto ok = logits_buf.Read<float>(absl::MakeSpan(logits));
-  if (!ok) {
-    LOG(ERROR) << "Failed to read logits: " << ok.Error().Message();
+// Greedy sampler (argmax over the logits buffer).
+int LLMPipeline::GreedySampler(litert::TensorBuffer& logits_buf,
+                               int vocab_size) {
+  auto lock = litert::TensorBufferScopedLock::Create<const float>(
+      logits_buf, litert::TensorBuffer::LockMode::kRead);
+  if (!lock) {
+    LOG(ERROR) << "Failed to lock logits: " << lock.Error().Message();
     return 0;
   }
+  const float* logits = lock->second;
   float max_value = -std::numeric_limits<float>::infinity();
   int max_index = 0;
   for (int i = 0; i < vocab_size; ++i) {

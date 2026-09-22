@@ -95,7 +95,7 @@ echo "$MC_LOG_PREFIX flutter version:" && flutter --version
 # per-machine setting, so this must run on the CI machine (it is not covered by
 # the same flag in flutter/ios/ios.mk, which only affects other runners).
 flutter config --no-analytics --no-enable-swift-package-manager && dart --disable-analytics
-dart pub global activate protoc_plugin ^25.0.0
+dart pub global activate protoc_plugin 25.0.0
 cd "$MC_REPO_HOME"/flutter && flutter precache --ios
 
 echo "$MC_LOG_PREFIX ========== Build app =========="
