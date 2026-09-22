@@ -73,6 +73,11 @@ pb.TaskConfig task(String id, String name, List<String> requiredOption) =>
       requiredOption: requiredOption,
     );
 
+/// A benchmark belonging to no set, the way stable_diffusion ships.
+final looseTasks = [
+  pb.TaskConfig(id: 'stable_diffusion', name: 'Stable Diffusion'),
+];
+
 final llmTasks = [
   task('llm-1b', 'LLM 1B', ['1b', 'mmlu']),
   task('llm-1b-instruct', 'LLM 1B (instruct)', ['1b', 'ifeval']),
@@ -113,12 +118,13 @@ BenchmarkStore buildStore(Map<String, Map<String, bool>> selection) {
   final allTaskIds = [
     ...llmTasks.map((e) => e.id),
     ...icTasks.map((e) => e.id),
+    ...looseTasks.map((e) => e.id),
   ];
   // 8B has no CoreML build, so its rows show a single backend and no picker.
   final coremlTaskIds = allTaskIds.where((id) => !id.contains('8b')).toList();
   return BenchmarkStore(
     appConfig: pb.MLPerfConfig(
-      task: [...llmTasks, ...icTasks],
+      task: [...llmTasks, ...icTasks, ...looseTasks],
       taskSet: [llmSet(), imageClassificationSet()],
     ),
     backends: [

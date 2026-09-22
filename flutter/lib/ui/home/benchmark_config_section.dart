@@ -4,30 +4,43 @@ import 'package:provider/provider.dart';
 
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/benchmark/state.dart';
-import 'package:mlperfbench/localizations/app_localizations.dart';
-import 'package:mlperfbench/ui/app_styles.dart';
 import 'package:mlperfbench/ui/error_dialog.dart';
-import 'package:mlperfbench/ui/home/backend_choice.dart';
 import 'package:mlperfbench/ui/home/benchmark_info_button.dart';
+import 'package:mlperfbench/ui/home/benchmark_loose_card.dart';
 import 'package:mlperfbench/ui/home/benchmark_set_card.dart';
+
+/// The list of benchmark sets and loose benchmarks on the start screen.
+///
+/// Kept free of [BenchmarkState] so the same list can be rendered in a widget
+/// test; [BenchmarkConfigSection] is the adapter that wires it to state.
+class BenchmarkConfigList extends StatelessWidget {
+  final List<Widget> cards;
+
+  const BenchmarkConfigList({super.key, required this.cards});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 20),
+      children: [...cards, const SizedBox(height: 24)],
+    );
+  }
+}
 
 class BenchmarkConfigSection extends StatelessWidget {
   const BenchmarkConfigSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    BenchmarkState state = context.watch<BenchmarkState>();
-    AppLocalizations l10n = AppLocalizations.of(context)!;
+    final state = context.watch<BenchmarkState>();
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 20),
-      children: <Widget>[
-        for (var benchmarkSet in state.benchmarkSets)
+    return BenchmarkConfigList(
+      cards: [
+        for (final benchmarkSet in state.benchmarkSets)
           if (benchmarkSet.benchmarks.isNotEmpty)
             _setCard(benchmarkSet, state, context),
-        for (var benchmark in state.looseBenchmarks)
-          _looseCard(benchmark, state, l10n),
-        const SizedBox(height: 24),
+        for (final benchmark in state.looseBenchmarks)
+          _looseCard(benchmark, state, context),
       ],
     );
   }
@@ -64,123 +77,23 @@ class BenchmarkConfigSection extends StatelessWidget {
   Widget _looseCard(
     Benchmark benchmark,
     BenchmarkState state,
-    AppLocalizations l10n,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.cardBorder),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: FutureBuilder(
-        future: state.validator.validateAllResourcesExist(
-          benchmark,
-          modes: state.taskRunner.selectedRunModes,
-        ),
-        initialData: false,
-        builder: (context, snapshot) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: TextButton(
-                    onPressed: () =>
-                        showBenchInfoBottomSheet(context, benchmark),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.setIconBackground,
-                      padding: EdgeInsets.zero,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          WidgetSizes.borderRadius,
-                        ),
-                      ),
-                    ),
-                    child: SizedBox(
-                      width: 28,
-                      height: 28,
-                      child: benchmark.info.icon,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        benchmark.info.taskName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Flexible(
-                            child: BackendChoice(
-                              benchmark: benchmark,
-                              onChanged: (libName) =>
-                                  state.benchmarkSetBackend(benchmark, libName),
-                            ),
-                          ),
-                          if (hasDelegateChoice(benchmark)) ...[
-                            const SizedBox(
-                              height: 16,
-                              child: VerticalDivider(color: Colors.black26),
-                            ),
-                            DelegateChoice(
-                              benchmark: benchmark,
-                              onChanged: (delegate) => state
-                                  .benchmarkSetDelegate(benchmark, delegate),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                _downloadStatus(l10n, benchmark, snapshot.data!, context),
-                _activeToggle(benchmark, state),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _downloadStatus(
-    AppLocalizations l10n,
-    Benchmark benchmark,
-    bool status,
     BuildContext context,
   ) {
-    if (!benchmark.isActive || status) return const SizedBox.shrink();
-    return InkWell(
-      onTap: () async {
-        await showResourceMissingDialog(context, [], benchmark: benchmark);
-      },
-      child: const Icon(
-        Icons.downloading_rounded,
-        size: 26,
-        color: AppColors.warningIcon,
+    return BenchmarkLooseCard(
+      benchmark: benchmark,
+      onInfoTap: () => showBenchInfoBottomSheet(context, benchmark),
+      onDownloadTap: () async =>
+          showResourceMissingDialog(context, [], benchmark: benchmark),
+      resourcesExist: state.validator.validateAllResourcesExist(
+        benchmark,
+        modes: state.taskRunner.selectedRunModes,
       ),
-    );
-  }
-
-  Widget _activeToggle(Benchmark benchmark, BenchmarkState state) {
-    return Switch(
-      activeThumbColor: AppColors.primary,
-      value: benchmark.isActive,
-      onChanged: (flag) => state.benchmarkSetActive(benchmark, flag),
+      onActiveChanged: (isActive) =>
+          state.benchmarkSetActive(benchmark, isActive),
+      onBackendChanged: (libName) =>
+          state.benchmarkSetBackend(benchmark, libName),
+      onDelegateChanged: (delegate) =>
+          state.benchmarkSetDelegate(benchmark, delegate),
     );
   }
 }
