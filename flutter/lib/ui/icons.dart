@@ -117,9 +117,19 @@ class BenchmarkIcons {
     BenchmarkId.llm8bInstruct: AppIcons.llmInstructWhite,
   };
 
+  /// Icons for a whole task set, so a set does not have to borrow one from
+  /// whichever of its benchmarks happens to sort first.
+  static final setDarkSet = {
+    BenchmarkSetId.imageClassification: AppIcons.imageClassification,
+    BenchmarkSetId.llm: AppIcons.llm,
+  };
+
   static Widget getDarkIcon(String benchmarkId) =>
       darkSet[benchmarkId] ?? AppIcons.logo;
 
   static Widget getLightIcon(String benchmarkId) =>
       lightSet[benchmarkId] ?? AppIcons.logo;
+
+  static Widget getSetDarkIcon(String setId) =>
+      setDarkSet[setId] ?? AppIcons.logo;
 }

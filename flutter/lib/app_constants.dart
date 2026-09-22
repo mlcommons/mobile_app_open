@@ -67,6 +67,12 @@ class BenchmarkId {
   ];
 }
 
+/// Ids of the `task_set` blocks in tasks.pbtxt.
+class BenchmarkSetId {
+  static const imageClassification = 'image_classification';
+  static const llm = 'llm';
+}
+
 class BackendId {
   static const tflite = 'libtflitebackend';
   static const pixel = 'libtflitepixelbackend';

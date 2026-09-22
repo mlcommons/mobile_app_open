@@ -98,3 +98,30 @@ class BenchmarkInfo {
   @override
   String toString() => 'Benchmark:${task.id}';
 }
+
+/// Name, icon and description of a whole task set.
+///
+/// A set is a frontend-only grouping, so it needs its own identity rather than
+/// borrowing one from whichever benchmark happens to sort first.
+class BenchmarkSetInfo {
+  final pb.TaskSet config;
+
+  BenchmarkSetInfo(this.config);
+
+  String get name => config.name;
+
+  Widget get icon => BenchmarkIcons.getSetDarkIcon(config.id);
+
+  /// Null when the set has no description of its own. Sets come from config,
+  /// so an unknown one is a gap to fall back from, not a crash.
+  String? localizedDetails(AppLocalizations stringResources) {
+    switch (config.id) {
+      case (BenchmarkSetId.llm):
+        return stringResources.benchInfoLlmDesc;
+      case (BenchmarkSetId.imageClassification):
+        return stringResources.benchInfoImageClassificationV2Desc;
+      default:
+        return null;
+    }
+  }
+}
