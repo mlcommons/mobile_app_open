@@ -171,6 +171,7 @@ class BenchmarkSet {
   BenchmarkSet({
     required this.config,
     List<Benchmark> allBenchmarks = const [],
+    Map<String, bool> optionState = const {},
   }) {
     optionSets = config.optionSet
         .map((e) => BenchmarkOptionSet(config: e))
@@ -182,7 +183,9 @@ class BenchmarkSet {
       for (final (index, item) in optionSets.indexed)
         for (final key in item.options.keys) key: index,
     };
-    applyOptions();
+    // Restore before the first applyOptions(): isActive is derived from the
+    // option states, so the states have to be final by the time it runs.
+    applyOptionStateMap(optionState);
   }
 
   Iterable<BenchmarkOption> availableOptions() {
@@ -207,10 +210,33 @@ class BenchmarkSet {
     for (BenchmarkOption item in availableOptions()) item.id: item.enabled,
   };
 
+  /// Restores a state produced by [optionStateMap], then recomputes which
+  /// benchmarks are active. Callers never have to remember [applyOptions].
   void applyOptionStateMap(Map<String, bool> inputMap) {
+    // Group by option set so each set is applied in one go: applying entries
+    // one at a time makes the result depend on map order whenever the set
+    // carries a min_selected/max_selected constraint.
+    final perOptionSet = <int, Map<String, bool>>{};
     for (final entry in inputMap.entries) {
-      optionSets[optionMap[entry.key]!].setOptionTo(entry.key, entry.value);
+      final index = optionMap[entry.key];
+      if (index == null) {
+        // The stored state outlives the config it came from: an option can
+        // disappear in an app update or differ between backends.
+        print('Ignoring unknown option "${entry.key}" of set ${config.id}');
+        continue;
+      }
+      (perOptionSet[index] ??= {})[entry.key] = entry.value;
     }
+    for (final entry in perOptionSet.entries) {
+      if (!optionSets[entry.key].applyState(entry.value)) {
+        print(
+          'Ignoring stored state of option set '
+          '${optionSets[entry.key].config.id} of set ${config.id}: '
+          'it violates the option constraints',
+        );
+      }
+    }
+    applyOptions();
   }
 
   void applyOptions() {
@@ -255,6 +281,31 @@ class BenchmarkOptionSet {
     return options[id]?.enabled;
   }
 
+  /// Applies [desired] to the whole set at once. Unknown ids are ignored, and
+  /// the change is rejected outright — leaving the set untouched — when the
+  /// result would violate min_selected/max_selected, so a restored state can
+  /// never be left half-applied.
+  bool applyState(Map<String, bool> desired) {
+    final next = {
+      for (final entry in options.entries) entry.key: entry.value.enabled,
+    };
+    for (final entry in desired.entries) {
+      if (!next.containsKey(entry.key)) continue;
+      next[entry.key] = entry.value;
+    }
+    final count = next.values.where((e) => e).length;
+    if (!_isValidCount(count)) return false;
+    for (final entry in next.entries) {
+      options[entry.key]!.enabled = entry.value;
+    }
+    selected = count;
+    return true;
+  }
+
+  bool _isValidCount(int count) =>
+      (config.maxSelected <= 0 || count <= config.maxSelected) &&
+      (config.minSelected <= 0 || count >= config.minSelected);
+
   bool setOptionTo(String id, bool value) {
     BenchmarkOption? opt = options[id];
     if (opt == null) return false;
@@ -264,21 +315,21 @@ class BenchmarkOptionSet {
 
   bool setOption(String id) {
     BenchmarkOption? opt = options[id];
-    if (opt == null ||
-        (config.maxSelected > 0 && selected == config.maxSelected)) {
-      return false;
-    }
+    if (opt == null) return false;
+    if (opt.enabled) return true;
+    if (!_isValidCount(selected + 1)) return false;
     opt.enabled = true;
+    selected++;
     return true;
   }
 
   bool unsetOption(String id) {
     BenchmarkOption? opt = options[id];
-    if (opt == null ||
-        (config.minSelected > 0 && selected == config.minSelected)) {
-      return false;
-    }
+    if (opt == null) return false;
+    if (!opt.enabled) return true;
+    if (!_isValidCount(selected - 1)) return false;
     opt.enabled = false;
+    selected--;
     return true;
   }
 
@@ -376,15 +427,12 @@ class BenchmarkStore {
     }
     for (final setConfig in appConfig.taskSet) {
       benchmarkSets.add(
-        BenchmarkSet(config: setConfig, allBenchmarks: allBenchmarks),
+        BenchmarkSet(
+          config: setConfig,
+          allBenchmarks: allBenchmarks,
+          optionState: taskSetSelection[setConfig.id] ?? const {},
+        ),
       );
-    }
-
-    for (final item in benchmarkSets) {
-      final setMap = taskSetSelection[item.config.id];
-      if (setMap != null) {
-        item.applyOptionStateMap(setMap);
-      }
     }
   }
 
