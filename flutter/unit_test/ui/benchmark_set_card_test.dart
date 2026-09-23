@@ -225,7 +225,9 @@ void main() {
   testWidgets('a set states how many benchmarks its options produce', (
     tester,
   ) async {
-    await tester.binding.setSurfaceSize(const Size(390, 520));
+    tester.view.devicePixelRatio = 3.0;
+    tester.view.physicalSize = const Size(390 * 3, 520 * 3);
+    addTearDown(tester.view.reset);
     final store = buildStore({
       'llm': {'1b': true, '3b': false, '8b': false},
     });
@@ -244,7 +246,9 @@ void main() {
   });
 
   testWidgets('a set with nothing selected says so', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(390, 400));
+    tester.view.devicePixelRatio = 3.0;
+    tester.view.physicalSize = const Size(390 * 3, 400 * 3);
+    addTearDown(tester.view.reset);
     final store = buildStore({
       'image_classification': {'offline': false, 'online': false},
     });
@@ -265,7 +269,9 @@ void main() {
   testWidgets('the backends panel keeps a picker per benchmark', (
     tester,
   ) async {
-    await tester.binding.setSurfaceSize(const Size(390, 1000));
+    tester.view.devicePixelRatio = 3.0;
+    tester.view.physicalSize = const Size(390 * 3, 1000 * 3);
+    addTearDown(tester.view.reset);
     final store = buildStore({
       'llm': {'1b': true, '3b': false, '8b': false},
     });
@@ -284,7 +290,9 @@ void main() {
   });
 
   testWidgets('results name what ran and what was skipped', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(390, 420));
+    tester.view.devicePixelRatio = 3.0;
+    tester.view.physicalSize = const Size(390 * 3, 420 * 3);
+    addTearDown(tester.view.reset);
     final store = buildStore({
       'llm': {'1b': true, '3b': false, '8b': false},
     });

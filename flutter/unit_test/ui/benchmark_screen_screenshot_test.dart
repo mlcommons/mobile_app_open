@@ -190,12 +190,22 @@ Widget phone(Widget child) {
   );
 }
 
+/// A 6.1" phone. Sets the view rather than the surface size: the latter leaves
+/// MediaQuery reporting the test default, so anything measured from
+/// MediaQuery — the GO circle here — lays out for the wrong screen.
+void usePhoneScreen(WidgetTester tester) {
+  const size = Size(390, 844);
+  const ratio = 3.0;
+  tester.view.devicePixelRatio = ratio;
+  tester.view.physicalSize = size * ratio;
+  addTearDown(tester.view.reset);
+}
+
 void main() {
   setUpAll(loadFonts);
 
   testWidgets('the whole screen at phone size', (tester) async {
-    // A 6.1" phone in logical pixels.
-    await tester.binding.setSurfaceSize(const Size(390, 844));
+    usePhoneScreen(tester);
 
     final store = buildStore({
       'llm': {'1b': true, '3b': false, '8b': false},
@@ -213,7 +223,7 @@ void main() {
   testWidgets('the whole screen scrolled to the loose benchmarks', (
     tester,
   ) async {
-    await tester.binding.setSurfaceSize(const Size(390, 844));
+    usePhoneScreen(tester);
 
     final store = buildStore({
       'llm': {'1b': true, '3b': false, '8b': false},
@@ -228,7 +238,7 @@ void main() {
   });
 
   testWidgets('the whole screen with the backends panel open', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(390, 844));
+    usePhoneScreen(tester);
 
     final store = buildStore({
       'llm': {'1b': true, '3b': false, '8b': false},
