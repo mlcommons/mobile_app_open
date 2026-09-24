@@ -1,0 +1,1034 @@
+[
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPhone 15 Pro Max",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPhone 15",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPhone 15 Pro Max",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPhone 15 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 1",
+    "device_limit": 80
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPhone 15 Plus",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPhone 15",
+    "realMobile": true,
+    "device_tier": "Tier 1",
+    "device_limit": 80
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPhone 14 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPhone 14",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPhone 14",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPhone 13 Pro Max",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPhone 13",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPhone 12 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPhone 13",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPhone 12 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPhone 12",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPhone 14 Pro Max",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPhone 14 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 2",
+    "device_limit": 40
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPhone 14 Plus",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPhone 14",
+    "realMobile": true,
+    "device_tier": "Tier 2",
+    "device_limit": 40
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPhone 13",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPhone 12 Pro Max",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "15",
+    "device": "iPhone 13 Pro Max",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "15",
+    "device": "iPhone 13 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "15",
+    "device": "iPhone 13 Mini",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "15",
+    "device": "iPhone 13",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "14",
+    "device": "iPhone 12 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "14",
+    "device": "iPhone 12",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "13",
+    "device": "iPhone 11",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "10",
+    "device": "iPhone 7",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPhone Air",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPhone 17 Pro Max",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPhone 17 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPhone 17",
+    "realMobile": true,
+    "device_tier": "Tier 2",
+    "device_limit": 40
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPhone 16e",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPhone 16 Pro Max",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPhone 16 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPhone 16 Plus",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPhone 16",
+    "realMobile": true,
+    "device_tier": "Tier 1",
+    "device_limit": 80
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPhone SE 2020",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "15",
+    "device": "iPhone SE 2022",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "14",
+    "device": "iPad Air 4",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPad 9th",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "15",
+    "device": "iPad 9th",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPad Pro 13 2025",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPad Pro 11 2025",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPad Air 5",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPad Pro 11 2021",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPad Pro 13 2024",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPad Pro 12.9 2021",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPad Pro 11 2024",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "17",
+    "device": "iPad Air 6",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPad Pro 12.9 2022",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPad Pro 12.9 2020",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPad Pro 11 2022",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPad 10th",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "14",
+    "device": "iPad Pro 12.9 2021",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "14",
+    "device": "iPad Pro 12.9 2020",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "26",
+    "device": "iPad Air 13 2025",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "18",
+    "device": "iPad Air 13 2025",
+    "realMobile": true,
+    "device_tier": "Tier 2",
+    "device_limit": 40
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPad Pro 11 2020",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "16",
+    "device": "iPad 8th",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "ios",
+    "os_version": "15",
+    "device": "iPad Mini 2021",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "14",
+    "device": "iPad 8th",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "13",
+    "device": "iPad Pro 11 2020",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "ios",
+    "os_version": "11",
+    "device": "iPad 6th",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "13.0",
+    "device": "Samsung Galaxy S23 Ultra",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "13.0",
+    "device": "Samsung Galaxy S23",
+    "realMobile": true,
+    "device_tier": "Tier 2",
+    "device_limit": 40
+  },
+  {
+    "os": "android",
+    "os_version": "12.0",
+    "device": "Samsung Galaxy S22 Ultra",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "12.0",
+    "device": "Samsung Galaxy S22 Plus",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "12.0",
+    "device": "Samsung Galaxy S22",
+    "realMobile": true,
+    "device_tier": "Tier 2",
+    "device_limit": 40
+  },
+  {
+    "os": "android",
+    "os_version": "12.0",
+    "device": "Samsung Galaxy S21",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Samsung Galaxy S21 Ultra",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Samsung Galaxy S21",
+    "realMobile": true,
+    "device_tier": "Tier 2",
+    "device_limit": 40
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Samsung Galaxy S21 Plus",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "Samsung Galaxy S20",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "Samsung Galaxy S20 Ultra",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "15.0",
+    "device": "Samsung Galaxy S25 Ultra",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "15.0",
+    "device": "Samsung Galaxy S25",
+    "realMobile": true,
+    "device_tier": "Tier 1",
+    "device_limit": 80
+  },
+  {
+    "os": "android",
+    "os_version": "14.0",
+    "device": "Samsung Galaxy S24 Ultra",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "14.0",
+    "device": "Samsung Galaxy S24",
+    "realMobile": true,
+    "device_tier": "Tier 1",
+    "device_limit": 80
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Samsung Galaxy M52",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Samsung Galaxy M32",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Samsung Galaxy A52",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "Samsung Galaxy Note 20",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "Samsung Galaxy A51",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "Samsung Galaxy A11",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "9.0",
+    "device": "Samsung Galaxy S10",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "9.0",
+    "device": "Samsung Galaxy A10",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "8.1",
+    "device": "Samsung Galaxy Note 9",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "16.0",
+    "device": "Google Pixel 9",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "16.0",
+    "device": "Google Pixel 10 Pro XL",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "16.0",
+    "device": "Google Pixel 10 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "16.0",
+    "device": "Google Pixel 10",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "15.0",
+    "device": "Google Pixel 9 Pro XL",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "15.0",
+    "device": "Google Pixel 9 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "15.0",
+    "device": "Google Pixel 9",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "15.0",
+    "device": "Google Pixel 6 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "14.0",
+    "device": "Google Pixel 8 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "14.0",
+    "device": "Google Pixel 8",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "13.0",
+    "device": "Google Pixel 7 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "13.0",
+    "device": "Google Pixel 7",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "13.0",
+    "device": "Google Pixel 6 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "12.0",
+    "device": "Google Pixel 6 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "12.0",
+    "device": "Google Pixel 6",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Google Pixel 5",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "15.0",
+    "device": "OnePlus 13R",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "14.0",
+    "device": "OnePlus 12R",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "13.0",
+    "device": "OnePlus 11R",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "OnePlus 9",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "OnePlus 8",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Vivo Y21",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Vivo V21",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "Vivo Y50",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Oppo Reno 6",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Oppo A96",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "Oppo Reno 3 Pro",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Xiaomi Redmi Note 11",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "Xiaomi Redmi Note 9",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Motorola Moto G71 5G",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "Motorola Moto G9 Play",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "12.0",
+    "device": "Huawei Nova 11 SE",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 0
+  },
+  {
+    "os": "android",
+    "os_version": "9.0",
+    "device": "Huawei P30",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "16.0",
+    "device": "Samsung Galaxy Tab S11",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "15.0",
+    "device": "Samsung Galaxy Tab S10 Plus",
+    "realMobile": true,
+    "device_tier": "Tier 2",
+    "device_limit": 40
+  },
+  {
+    "os": "android",
+    "os_version": "14.0",
+    "device": "Samsung Galaxy Tab A9 Plus",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "13.0",
+    "device": "Samsung Galaxy Tab S9",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "12.0",
+    "device": "Samsung Galaxy Tab S8",
+    "realMobile": true,
+    "device_tier": "Tier 3",
+    "device_limit": 16
+  },
+  {
+    "os": "android",
+    "os_version": "11.0",
+    "device": "Samsung Galaxy Tab S7",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  },
+  {
+    "os": "android",
+    "os_version": "10.0",
+    "device": "Samsung Galaxy Tab S7",
+    "realMobile": true,
+    "device_tier": "Tier 4",
+    "device_limit": 5
+  }
+]
