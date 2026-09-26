@@ -197,7 +197,17 @@ Future<void> shoot(WidgetTester tester, String name) async {
   final boundary =
       tester.renderObject(find.byType(RepaintBoundary).first)
           as RenderRepaintBoundary;
-  final image = await tester.runAsync(() => boundary.toImage(pixelRatio: 3.0));
+  // flutter_test paints elevation as a solid black outline. Repaint with real
+  // shadows for the capture, and restore the flag its invariant check expects.
+  debugDisableShadows = false;
+  final ui.Image? image;
+  try {
+    boundary.reassemble();
+    await tester.pump();
+    image = await tester.runAsync(() => boundary.toImage(pixelRatio: 3.0));
+  } finally {
+    debugDisableShadows = true;
+  }
   final bytes = await tester.runAsync(
     () => image!.toByteData(format: ui.ImageByteFormat.png),
   );
