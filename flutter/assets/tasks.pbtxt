@@ -38,6 +38,10 @@ task_set {
       id: "8b"
       name: "8B"
     }
+    opt {
+      id: "gemma-e2b"
+      name: "Gemma E2B"
+    }
   }
   option_set {
     id: "dataset"
@@ -413,7 +417,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6
@@ -473,7 +483,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6
@@ -516,6 +532,126 @@ task {
 }
 
 task {
+  id: "llm-gemma-e2b"
+  name: "LLM Gemma E2B"
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  task_set: "llm"
+  required_option: "gemma-e2b"
+  required_option: "mmlu"
+  runs {
+    normal {
+      min_query_count: 100
+      min_duration: 60
+      max_duration: 300
+    }
+    quick {
+      min_query_count: 10
+      min_duration: 10
+      max_duration: 40
+    }
+    rapid {
+      min_query_count: 6
+      min_duration: 6
+      max_duration: 60
+    }
+  }
+  datasets {
+    type: MMLU
+      full {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tinymmlu.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    lite {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tinymmlu.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    tiny {
+      name: "TinyMMLU prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tinymmlu.tfrecord"
+      input_checksum: "c20f9115582217af15e4d9955b41ace1"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+  }
+  model {
+    id: "LLM"
+    name: "LLM"
+  }
+  custom_config {
+    id: "llm_tokenizer_path"
+    value: "gemma4_e2b.spm.model"
+  }
+}
+
+task {
+  id: "llm-gemma-e2b-instruct"
+  name: "LLM Gemma E2B (instruct)"
+  max_throughput: 2000
+  max_accuracy: 1.0
+  scenario: "SingleStream"
+  task_set: "llm"
+  required_option: "gemma-e2b"
+  required_option: "ifeval"
+  runs {
+    normal {
+      min_query_count: 100
+      min_duration: 60
+      max_duration: 300
+    }
+    quick {
+      min_query_count: 10
+      min_duration: 10
+      max_duration: 40
+    }
+    rapid {
+      min_query_count: 6
+      min_duration: 6
+      max_duration: 60
+    }
+  }
+  datasets {
+    type: IFEVAL
+      full {
+      name: "IFEVAL prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tiny33_ifeval.tfrecord"
+      input_checksum: "147806b0d2cb0c4329d0901939f62c1c"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    lite {
+      name: "IFEVAL prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tiny33_ifeval.tfrecord"
+      input_checksum: "147806b0d2cb0c4329d0901939f62c1c"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+    tiny {
+      name: "IFEVAL prompt set for LLM"
+      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v6_0/tiny33_ifeval.tfrecord"
+      input_checksum: "147806b0d2cb0c4329d0901939f62c1c"
+      groundtruth_path: ""
+      groundtruth_checksum: ""
+    }
+  }
+  model {
+    id: "LLM"
+    name: "LLM"
+  }
+  custom_config {
+    id: "llm_tokenizer_path"
+    value: "gemma4_e2b.spm.model"
+  }
+}
+
+task {
   id: "llm-3b"
   name: "LLM 3B"
   max_throughput: 2000
@@ -533,7 +669,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6
@@ -593,7 +735,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6
@@ -653,7 +801,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6
@@ -713,7 +867,13 @@ task {
     quick {
       min_query_count: 10
       min_duration: 10
-      max_duration: 40
+      # 40s could never satisfy min_query_count on a 1B model: measured on an
+      # iPhone 16 Pro, llm-1b runs about 10.1s per query on the Metal delegate
+      # (24.3 tok/s), so ten queries need ~101s and the run ended invalid --
+      # isMinQueryMet false -- on both the CPU and the GPU delegate. A run
+      # stops as soon as min_duration AND min_query_count are both met, so
+      # this ceiling only costs time on devices that were failing anyway.
+      max_duration: 150
     }
     rapid {
       min_query_count: 6

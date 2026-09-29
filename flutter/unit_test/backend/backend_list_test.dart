@@ -6,13 +6,8 @@ import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 class _FakeBackendInfoHelper extends BackendInfoHelper {
   final List<String> backends;
   final Set<String> matching;
-  final Map<String, pb.FallbackPolicy> policies;
 
-  _FakeBackendInfoHelper({
-    required this.backends,
-    required this.matching,
-    this.policies = const {},
-  });
+  _FakeBackendInfoHelper({required this.backends, required this.matching});
 
   @override
   List<String> getBackendsList() => backends;
@@ -22,7 +17,6 @@ class _FakeBackendInfoHelper extends BackendInfoHelper {
     if (matching.contains(libName)) {
       return pb.BackendSetting(
         benchmarkSetting: [pb.BenchmarkSetting(benchmarkId: 'bm-$libName')],
-        fallbackPolicy: policies[libName],
       );
     }
     return null;
@@ -36,20 +30,12 @@ void main() {
     const tflite = 'libtflitebackend';
     const allBackends = [vendor1, vendor2, tflite];
 
-    test('vendor match without opt-in suppresses the fallback (default)', () {
+    test('the fallback is always matched, after the vendors', () {
+      // Per-benchmark visibility is decided later in BenchmarkStore by each
+      // backend's claim_policy; the match list always carries the fallback.
       final helper = _FakeBackendInfoHelper(
         backends: allBackends,
         matching: {vendor1, tflite},
-      );
-      final matches = helper.findMatchingBackends();
-      expect(matches.map((e) => e.libName), [vendor1]);
-    });
-
-    test('FALLBACK_COEXIST vendor offers the fallback, in priority order', () {
-      final helper = _FakeBackendInfoHelper(
-        backends: allBackends,
-        matching: {vendor1, tflite},
-        policies: {vendor1: pb.FallbackPolicy.FALLBACK_COEXIST},
       );
       final matches = helper.findMatchingBackends();
       expect(matches.map((e) => e.libName), [vendor1, tflite]);
@@ -59,10 +45,6 @@ void main() {
       final helper = _FakeBackendInfoHelper(
         backends: allBackends,
         matching: {vendor1, vendor2, tflite},
-        policies: {
-          vendor1: pb.FallbackPolicy.FALLBACK_COEXIST,
-          vendor2: pb.FallbackPolicy.FALLBACK_COEXIST,
-        },
       );
       final matches = helper.findMatchingBackends();
       expect(matches.map((e) => e.libName), [vendor1, vendor2, tflite]);
@@ -77,36 +59,13 @@ void main() {
       expect(matches.map((e) => e.libName), [tflite]);
     });
 
-    test('alwaysOfferFallback=false suppresses even an opted-in vendor', () {
+    test('vendors match even when the fallback is not built in', () {
       final helper = _FakeBackendInfoHelper(
         backends: allBackends,
-        matching: {vendor1, tflite},
-        policies: {vendor1: pb.FallbackPolicy.FALLBACK_COEXIST},
-      );
-      final matches = helper.findMatchingBackends(alwaysOfferFallback: false);
-      expect(matches.map((e) => e.libName), [vendor1]);
-    });
-
-    test('FALLBACK_DISABLED vendor suppresses the fallback device-wide', () {
-      final helper = _FakeBackendInfoHelper(
-        backends: allBackends,
-        matching: {vendor1, tflite},
-        policies: {vendor1: pb.FallbackPolicy.FALLBACK_DISABLED},
+        matching: {vendor1},
       );
       final matches = helper.findMatchingBackends();
       expect(matches.map((e) => e.libName), [vendor1]);
-    });
-
-    test('FALLBACK_FILL_GAPS keeps the fallback in the match list', () {
-      // Per-benchmark filtering for FILL_GAPS happens in BenchmarkStore;
-      // the fallback must stay matched so it can fill unsupported tasks.
-      final helper = _FakeBackendInfoHelper(
-        backends: allBackends,
-        matching: {vendor1, tflite},
-        policies: {vendor1: pb.FallbackPolicy.FALLBACK_FILL_GAPS},
-      );
-      final matches = helper.findMatchingBackends();
-      expect(matches.map((e) => e.libName), [vendor1, tflite]);
     });
 
     test('no matching backend throws', () {

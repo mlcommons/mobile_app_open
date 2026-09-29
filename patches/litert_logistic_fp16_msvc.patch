@@ -1,0 +1,23 @@
+Compute the reference Logistic kernel in float so it builds under MSVC.
+
+The same change as patches/tf_logistic_fp16_msvc.patch, against LiteRT's own
+vendored copy of the TFLite kernels. The two files are identical apart from
+their include paths, and the Windows build compiles both
+@org_tensorflow//tensorflow/lite/kernels:builtin_op_kernels and
+@litert//tflite/kernels:builtin_op_kernels, so both need it.
+
+diff --git a/tflite/kernels/internal/reference/logistic.h b/tflite/kernels/internal/reference/logistic.h
+--- a/tflite/kernels/internal/reference/logistic.h
++++ b/tflite/kernels/internal/reference/logistic.h
+@@ -44,7 +44,10 @@
+   // optimized kernels. (check the definition of scalar_logistic_op<float>)
+ 
+   for (int i = 0; i < flat_size; i++) {
+-    T val = input_data[i];
++    // Compute in float. For T = Eigen::half, comparing against the float
++    // cutoffs below is ambiguous under MSVC (error C2666): it sees both
++    // Eigen's half comparison operators and the builtin float one.
++    const float val = static_cast<float>(input_data[i]);
+     float result;
+     if (val > cutoff_upper) {
+       result = 1.0f;
