@@ -1,5 +1,5 @@
-Two fixes to portable_tensorflow_lib_lite (the mobile build of TF core),
-which has bit-rotted at this TensorFlow revision:
+Fixes to portable_tensorflow_lib_lite (the mobile build of TF core), which
+has bit-rotted at this TensorFlow revision:
 
 1. It depends on //tensorflow/core/util:onednn_env_vars, a oneDNN/MKL helper
    whose deps unconditionally include the full //tensorflow/core:framework.
@@ -16,15 +16,103 @@ which has bit-rotted at this TensorFlow revision:
 3. Its quantization sources reach xla/tsl/concurrency/executor.h, which is
    not in its declared dependency closure; add the header-only target.
 
+4. Two families of header are included but not declared, so the Android build
+   fails with "undeclared inclusion(s) in rule":
+
+     xla/tsl/platform/file_system.h is in the mobile header set and includes
+     xla/tsl/platform/status_macros.h, which is not; that in turn reaches
+     absl/status/status_macros.h, status_builder.h and
+     absl/strings/internal/stringify_stream.h. Add the header to the filegroup
+     beside status.h and statusor.h, and depend on
+     @com_google_absl//absl/status:status_macros, whose deps cover the rest.
+     This appears only with the Abseil that LiteRT 2.2.0's TensorFlow pins,
+     which is where absl/status:status_macros first exists.
+
+     tensorflow/core/kernels/pooling_ops_common.cc reaches
+     xla/tsl/framework/fixedpoint/*.h; depend on the header-only
+     @xla//xla/tsl/framework/fixedpoint that already exports them.
+
+5. Three mobile *hdrs* filegroups list proto rules -- ":example_protos_cc" in
+   tensorflow/core/example, and ":tensor_proto_cc", ":tensor_shape_proto_cc",
+   ":allocation_description_proto_cc", ":attr_value_proto_cc",
+   ":node_def_proto_cc", ":op_def_proto_cc" and ":types_proto_cc" in
+   tensorflow/core/framework. A rule in a filegroup expands to every one of its
+   outputs, so each generated .pb.cc rides in alongside its .pb.h, reaches
+   mobile_srcs, and is compiled into portable_tensorflow_lib_lite. The same
+   objects are also linked from the proto archives the target pulls in through
+   tf_portable_proto_lib(), so linking libbackendbridge.so fails on every
+   symbol in them:
+
+     ld.lld: error: duplicate symbol: tensorflow::Example::clear_features()
+     >>> ... in archive .../tensorflow/core/example/libexample_protos.a
+     >>> ... _objs/portable_tensorflow_lib_lite/example.pb.o
+
+   Drop them from the filegroups; the generated headers still arrive through
+   the proto libraries the target already depends on. The previous revision
+   listed only feature_util.{cc,h} in the example filegroup and had no such
+   entries, which is why this is new with the 2.2.0 pin.
+
+diff --git a/tensorflow/core/BUILD b/tensorflow/core/BUILD
 --- a/tensorflow/core/BUILD
 +++ b/tensorflow/core/BUILD
-@@ -1036,7 +1036,8 @@
+@@ -1087,9 +1087,12 @@
          "//tensorflow/core:mobile_additional_lib_deps",
          "//tensorflow/core/platform:resource",
          "//tensorflow/core/public:release_version",
 -        "//tensorflow/core/util:onednn_env_vars",
          "//tensorflow/core/util:stats_calculator_portable",
          "@xla//xla/tsl/util:safe_reinterpret_cast",
++        "@com_google_absl//absl/status:status_macros",
 +        "@com_google_protobuf//:protobuf",
 +        "@xla//xla/tsl/concurrency:executor",
++        "@xla//xla/tsl/framework/fixedpoint",
      ] + tf_portable_proto_lib() + tf_portable_deps_no_runtime(),
+     alwayslink = 1,
+ )
+diff --git a/tensorflow/core/example/BUILD b/tensorflow/core/example/BUILD
+--- a/tensorflow/core/example/BUILD
++++ b/tensorflow/core/example/BUILD
+@@ -160,7 +160,6 @@
+     name = "mobile_hdrs_no_runtime",
+     srcs = [
+         "feature_util.h",
+-        ":example_protos_cc",
+     ],
+ )
+ 
+diff --git a/tensorflow/core/framework/BUILD b/tensorflow/core/framework/BUILD
+--- a/tensorflow/core/framework/BUILD
++++ b/tensorflow/core/framework/BUILD
+@@ -366,8 +366,6 @@
+         "variant_encode_decode.h",
+         "variant_op_registry.h",
+         "variant_tensor_data.h",
+-        ":tensor_proto_cc",
+-        ":tensor_shape_proto_cc",
+         "@xla//xla/tsl/framework:device_type.h",
+     ],
+ )
+@@ -478,12 +476,7 @@
+         "tensor_util.h",
+         "thread_factory.h",
+         "versions.h",
+-        ":allocation_description_proto_cc",
+-        ":attr_value_proto_cc",
+         ":attr_value_proto_text_hdrs",
+-        ":node_def_proto_cc",
+-        ":op_def_proto_cc",
+-        ":types_proto_cc",
+         "//tensorflow/core/framework/registration:options.h",
+         "//tensorflow/core/framework/registration:registration.h",
+     ],
+diff --git a/third_party/xla/xla/tsl/platform/BUILD b/third_party/xla/xla/tsl/platform/BUILD
+--- a/third_party/xla/xla/tsl/platform/BUILD
++++ b/third_party/xla/xla/tsl/platform/BUILD
+@@ -202,6 +202,7 @@
+         "ram_file_system.h",
+         "resource.h",
+         "status.h",
++        "status_macros.h",
+         "statusor.h",
+         "threadpool.h",
+         "threadpool_interface.h",

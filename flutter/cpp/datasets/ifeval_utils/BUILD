@@ -40,3 +40,13 @@ cc_library(
         "@oleander_stemming_library",
     ],
 )
+
+cc_test(
+    name = "common_test",
+    srcs = ["common_test.cc"],
+    linkstatic = 1,
+    deps = [
+        ":ifeval_utils",
+        "@com_google_googletest//:gtest",
+    ],
+)
