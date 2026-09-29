@@ -1,6 +1,9 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    // Do not apply "kotlin-android" here. The Flutter Gradle Plugin applies KGP
+    // itself, using the version pinned in settings.gradle. Applying it here makes
+    // Flutter warn about migrating to Built-in Kotlin and will break future builds.
+    // https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers
     id "dev.flutter.flutter-gradle-plugin"
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
