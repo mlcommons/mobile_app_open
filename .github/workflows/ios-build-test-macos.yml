@@ -27,23 +27,42 @@ jobs:
       build_number: ${{ steps.set.outputs.build_number }}
 
   build:
-    name: Build iOS app (${{ matrix.backend }})
+    name: Build iOS app (${{ matrix.label }})
     needs: computed
-    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
-    runs-on: macos-15
+    # macos-26: https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
+    # xcode-27: https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
     timeout-minutes: 180
+    # The xcode-27 image is a GitHub preview: capacity is still being balanced and
+    # it can queue for a long time. Let that leg fail without failing the workflow,
+    # so a preview-image hiccup cannot block the BrowserStack jobs that need this
+    # one. Drop this once xcode-27 reaches GA.
+    continue-on-error: ${{ matrix.experimental || false }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - backend: "tflite"
+          - label: "tflite"
+            runner: macos-26
             with_apple: 0
             with_tflite: 1
-          - backend: "apple"
+          - label: "apple"
+            runner: macos-26
             with_apple: 1
             with_tflite: 0
+          # Xcode Cloud archives with Xcode 27 and runs only on master, so an
+          # Xcode 27 break stayed invisible until after merge -- that is how
+          # swiftc refusing coreml_util without -swift-version reached master.
+          # This leg builds the same backend on the same Xcode 27 build Xcode
+          # Cloud uses (27A266a), on pull requests. It builds only: the test
+          # package and BrowserStack legs stay on the GA image.
+          - label: "apple-xcode27"
+            runner: xcode-27
+            with_apple: 1
+            with_tflite: 0
+            experimental: true
     env:
       PERF_TEST: true
       BAZEL_OUTPUT_ROOT_ARG: "--output_user_root=/tmp/bazel_output"
@@ -52,7 +71,7 @@ jobs:
       # do not get, so it falls back to a local disk cache there.
       HAS_GCLOUD_CREDS: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_MOBILE_APP_BUILD != '' }}
       FLUTTER_BUILD_NUMBER: ${{ needs.computed.outputs.build_number }}
-      FLUTTER_IOS_TEST_PACKAGE: ios_tests-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}.zip
+      FLUTTER_IOS_TEST_PACKAGE: ios_tests-${{ matrix.label }}-${{ needs.computed.outputs.build_number }}.zip
       WITH_APPLE: ${{ matrix.with_apple }}
       WITH_TFLITE: ${{ matrix.with_tflite }}
       WITH_PIXEL: 0
@@ -72,19 +91,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-      - name: Select Xcode with iOS 26.1 SDK
+      - name: Select Xcode
         # device_info_plus 13.x (since 12.4.0) calls NSProcessInfo.isiOSAppOnVision,
         # an iOS 26.1 API. The @available guard is a runtime check; the selector
         # must still be *declared* by the SDK at compile time, so the pods only
-        # build against the iOS 26.1 (or newer) SDK. The macos-15 runner defaults
-        # to Xcode 16.4 (iOS 18.5 SDK), which fails with "no visible @interface for
-        # 'NSProcessInfo' declares the selector 'isiOSAppOnVision'". Select the
-        # newest installed Xcode 26.x, which ships the iOS 26.1+ SDK.
+        # build against the iOS 26.1 (or newer) SDK. Select the newest Xcode 26.x
+        # or 27.x on the runner: 26.6 on macos-26, 27.0 on xcode-27. Pinning to a
+        # major would fail on one of the two images, since macos-26 ships no
+        # Xcode 27 and xcode-27 ships no Xcode 26.
         run: |
           set -euo pipefail
-          XCODE_APP=$(ls -d /Applications/Xcode_26.*.app 2>/dev/null | sort -V | tail -1)
+          XCODE_APP=$(ls -d /Applications/Xcode_2[67].*.app 2>/dev/null | sort -V | tail -1)
           if [ -z "$XCODE_APP" ]; then
-            echo "No Xcode 26.x found on the runner" >&2
+            echo "No Xcode 26.x or 27.x found on the runner" >&2
             exit 1
           fi
           echo "Selecting $XCODE_APP"
@@ -98,14 +117,16 @@ jobs:
           # so hashFiles('**/Podfile.lock') returned empty and the key collapsed
           # to the constant "macOS-pods-" -- shared by both matrix jobs, which
           # then raced for the single write, and never invalidated when the
-          # Podfile changed. The backend keeps the two legs from colliding.
-          key: ${{ runner.os }}-pods-${{ matrix.backend }}-${{ hashFiles('flutter/ios/Podfile') }}
-          restore-keys: ${{ runner.os }}-pods-${{ matrix.backend }}-
+          # Podfile changed. The label keeps the legs from colliding, and it is
+          # the label rather than the backend because two legs build "apple" on
+          # different Xcode versions.
+          key: ${{ runner.os }}-pods-${{ matrix.label }}-${{ hashFiles('flutter/ios/Podfile') }}
+          restore-keys: ${{ runner.os }}-pods-${{ matrix.label }}-
       # Two cache layers: a local disk cache in front of the GCS remote cache.
       #
       # The old key was `${{ runner.os }}-bazel_cache-${{ hashFiles(...) }}` over
-      # /tmp/bazel_cache, declared identically by these two matrix jobs and the
-      # Android-macOS job, all on macos-15 -- so all three resolved to one key
+      # /tmp/bazel_cache, declared identically by the iOS matrix jobs and the
+      # Android-macOS job, all on one image -- so all three resolved to one key
       # and raced for the single write actions/cache allows. Caching worked here
       # only because an iOS job usually won that race (this job hits 4486 of
       # 4486 cacheable actions), while the Android job restored these iOS
@@ -117,8 +138,8 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: /tmp/bazel_cache
-          key: ${{ runner.os }}-bazel-ios-${{ matrix.backend }}-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
-          restore-keys: ${{ runner.os }}-bazel-ios-${{ matrix.backend }}-
+          key: ${{ runner.os }}-bazel-ios-${{ matrix.label }}-${{ hashFiles('**/BUILD', '**/WORKSPACE') }}
+          restore-keys: ${{ runner.os }}-bazel-ios-${{ matrix.label }}-
       - name: Set up authentication for Google Cloud SDK
         if: env.HAS_GCLOUD_CREDS == 'true'
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
@@ -137,8 +158,10 @@ jobs:
             # Disk first, GCS second. Bazel reads the disk cache before going to
             # the network and writes both, so a warm disk layer keeps this job as
             # fast as it was on disk alone while GCS covers the cold cases.
-            # Both matrix backends share one GCS prefix on purpose: they compile
-            # almost the same C++, so each one warms the cache for the other.
+            # All legs share one GCS prefix on purpose: the two macos-26 legs
+            # compile almost the same C++, so each warms the cache for the other.
+            # The Xcode 27 leg cannot collide with them -- its toolchain is part
+            # of every action key, so it simply keeps its own entries alongside.
             # Note that setup-gcloud above puts a per-run random path on PATH.
             # That is exactly what broke the Linux cache, and it is harmless
             # only because .bazelrc sets --incompatible_strict_action_env.
@@ -196,6 +219,9 @@ jobs:
         run: |
           make flutter/test/unit
       - name: Build iOS test package
+        # The Xcode 27 leg is a compile check only. The device tests keep running
+        # against the GA image, so a preview-image build never reaches BrowserStack.
+        if: ${{ !matrix.experimental }}
         env:
           DEVELOPMENT_TEAM: ${{ secrets.APPLE_DEVELOPMENT_TEAM }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
@@ -209,9 +235,10 @@ jobs:
           fi
           make flutter/ios/test-package
       - name: Upload test package artifact
+        if: ${{ !matrix.experimental }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: ios-test-package-${{ matrix.backend }}-${{ needs.computed.outputs.build_number }}
+          name: ios-test-package-${{ matrix.label }}-${{ needs.computed.outputs.build_number }}
           path: output/ios-test-package/*.zip
           retention-days: 28
           if-no-files-found: error
