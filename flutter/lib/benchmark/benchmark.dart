@@ -209,8 +209,10 @@ class BenchmarkSet {
 
   void applyOptionStateMap(Map<String, bool> inputMap) {
     for (final entry in inputMap.entries) {
+      // FIXME throws on a stored option id missing from the current config.
       optionSets[optionMap[entry.key]!].setOptionTo(entry.key, entry.value);
     }
+    applyOptions();
   }
 
   void applyOptions() {
@@ -234,6 +236,7 @@ class BenchmarkSet {
 class BenchmarkOptionSet {
   final pb.OptionSet config;
   late final Map<String, BenchmarkOption> options;
+  // FIXME stale after construction; min/max_selected check a wrong count.
   late int selected;
 
   BenchmarkOptionSet({required this.config}) {
