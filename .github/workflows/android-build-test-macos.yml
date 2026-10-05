@@ -104,11 +104,16 @@ jobs:
       - name: Install dependencies
         run: |
           brew update --quiet || true
-          # The macos-15 image links openssl@1.1 at /opt/homebrew/bin/openssl.
-          # When `brew install python@3.14` upgrades an outdated python, it also
-          # upgrades openssl@3, whose link step then collides with that symlink
-          # and makes `brew install` exit 1. Unlink the old one first.
-          brew unlink openssl@1.1 2>/dev/null || true
+          # The macos-15 image points /opt/homebrew/bin/openssl at openssl@1.1
+          # with a plain symlink that brew does not track, so `brew unlink
+          # openssl@1.1` removes nothing. When `brew install python@3.14`
+          # upgrades an outdated python, it also upgrades openssl@3, whose link
+          # step then collides with that symlink and makes `brew install` exit 1.
+          # Remove the stray link so openssl@3 can link in its place.
+          OPENSSL_LINK="$(brew --prefix)/bin/openssl"
+          if [[ "$(readlink "$OPENSSL_LINK")" == *openssl@1.1* ]]; then
+            rm "$OPENSSL_LINK"
+          fi
           brew install bazelisk
           brew install protobuf
           brew install cocoapods
