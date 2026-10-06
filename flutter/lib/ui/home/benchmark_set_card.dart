@@ -261,7 +261,7 @@ class BenchmarkSetCard extends StatelessWidget {
                       Text(
                         optionSet.isSingleChoice
                             ? l10n.mainScreenOptionRulePickOne
-                            : l10n.mainScreenOptionRuleAny,
+                            : l10n.mainScreenOptionRuleOneOrMore,
                         style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.subtleText,
@@ -269,14 +269,13 @@ class BenchmarkSetCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 2),
                   Wrap(
                     spacing: 8,
-                    runSpacing: 8,
                     children: [
                       for (final option in optionSet.options.values)
                         if (availableIds.contains(option.id))
-                          _optionChip(optionSet, option),
+                          _optionToggle(optionSet, option),
                     ],
                   ),
                 ],
@@ -287,49 +286,48 @@ class BenchmarkSetCard extends StatelessWidget {
     );
   }
 
-  Widget _optionChip(BenchmarkOptionSet optionSet, BenchmarkOption option) {
-    // A set bounded to one choice reads as a radio group, not as checkboxes.
-    final marker = optionSet.isSingleChoice
+  /// A checkbox, or a radio button when the set is bounded to one choice. Both
+  /// states show the box, so an unticked option still reads as selectable;
+  /// pill-shaped chips side by side read as a pick-one segmented control.
+  Widget _optionToggle(BenchmarkOptionSet optionSet, BenchmarkOption option) {
+    final single = optionSet.isSingleChoice;
+    final marker = single
         ? (option.enabled ? Icons.radio_button_checked : Icons.radio_button_off)
-        : (option.enabled ? Icons.check : null);
+        : (option.enabled ? Icons.check_box : Icons.check_box_outline_blank);
 
-    return InkWell(
-      key: Key(option.id),
-      borderRadius: BorderRadius.circular(22),
-      onTap: () => onOptionChanged(option.id, !option.enabled),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 44),
-        // Generous side padding so a short label like "3B" does not collapse
-        // into a circle at this corner radius.
-        padding: EdgeInsets.only(left: marker == null ? 22 : 14, right: 22),
-        decoration: BoxDecoration(
-          color: option.enabled ? AppColors.primary : Colors.white,
-          border: Border.all(
-            color: option.enabled ? AppColors.primary : AppColors.chipBorder,
-            width: 1.5,
-          ),
-          borderRadius: BorderRadius.circular(22),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (marker != null) ...[
-              Icon(
-                marker,
-                size: 16,
-                color: option.enabled ? Colors.white : AppColors.subtleText,
-              ),
-              const SizedBox(width: 6),
-            ],
-            Text(
-              option.name,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: option.enabled ? Colors.white : AppColors.bodyText,
-              ),
+    return Semantics(
+      checked: option.enabled,
+      inMutuallyExclusiveGroup: single,
+      child: InkWell(
+        key: Key(option.id),
+        borderRadius: BorderRadius.circular(WidgetSizes.borderRadius),
+        onTap: () => onOptionChanged(option.id, !option.enabled),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(2, 0, 10, 0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  marker,
+                  size: 24,
+                  color: option.enabled
+                      ? AppColors.primary
+                      : AppColors.mutedText,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  option.name,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.bodyText,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

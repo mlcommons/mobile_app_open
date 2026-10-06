@@ -44,7 +44,7 @@
   "mainScreenSetBackendMixed": "Mixed",
   "mainScreenBackendLabel": "Backend",
   "mainScreenDelegateLabel": "Delegate",
-  "mainScreenOptionRuleAny": "any",
+  "mainScreenOptionRuleOneOrMore": "select one or more",
   "mainScreenOptionRulePickOne": "pick one",
   "mainScreenBenchmarkNotSelected": "not selected",
 

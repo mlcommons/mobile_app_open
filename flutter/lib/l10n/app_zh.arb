@@ -44,7 +44,7 @@
   "mainScreenSetBackendMixed": "混合",
   "mainScreenBackendLabel": "后端",
   "mainScreenDelegateLabel": "委托",
-  "mainScreenOptionRuleAny": "任意",
+  "mainScreenOptionRuleOneOrMore": "选择一项或多项",
   "mainScreenOptionRulePickOne": "选择一项",
   "mainScreenBenchmarkNotSelected": "未选择",
 
