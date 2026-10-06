@@ -149,7 +149,9 @@ class BenchmarkSetCard extends StatelessWidget {
   /// to more benchmarks than it shows, so the card has to name them.
   Widget _runList(List<Benchmark> active) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(66, 0, 14, 10),
+      // The icons hang left of the set name, so the benchmark names line up
+      // under it rather than losing width to the icon.
+      padding: const EdgeInsets.fromLTRB(66 - _rowIconSize - 8, 0, 14, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -158,14 +160,7 @@ class BenchmarkSetCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 2),
               child: Row(
                 children: [
-                  Container(
-                    width: 5,
-                    height: 5,
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
+                  _rowIcon(benchmark),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -507,16 +502,7 @@ class BenchmarkSetCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: benchmark.isActive
-                      ? AppColors.primary
-                      : AppColors.chipBorder,
-                  shape: BoxShape.circle,
-                ),
-              ),
+              _rowIcon(benchmark, dimmed: !benchmark.isActive),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -553,7 +539,7 @@ class BenchmarkSetCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Padding(
-            padding: const EdgeInsets.only(left: 14),
+            padding: const EdgeInsets.only(left: _rowIconSize + 8),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -582,6 +568,19 @@ class BenchmarkSetCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  static const double _rowIconSize = 20;
+
+  /// The benchmark's own icon, as the results screen shows it on each row.
+  /// Dimmed the same way the results tile dims a benchmark that did not run.
+  Widget _rowIcon(Benchmark benchmark, {bool dimmed = false}) {
+    final icon = SizedBox(
+      width: _rowIconSize,
+      height: _rowIconSize,
+      child: benchmark.info.icon,
+    );
+    return dimmed ? Opacity(opacity: 0.35, child: icon) : icon;
   }
 
   Widget _labelledControl(String label, Widget control) {
