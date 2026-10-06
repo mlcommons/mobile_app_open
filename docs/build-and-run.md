@@ -49,6 +49,10 @@ For example:
 make WITH_QTI=1 WITH_SAMSUNG=1 WITH_PIXEL=1 WITH_MEDIATEK=1 flutter
 ```
 
+The LiteRT backend (an alternative Android backend that runs the `llm-*`
+and vision/NLP benchmarks) is disabled by default like the vendor backends.
+Add `WITH_LITERT=1` to include it.
+
 Some of the backends have additional requirements. See command output for details.
 
 The app is built with an unofficial UI (different color and text) by default.

@@ -20,22 +20,22 @@ option cc_enable_arenas = true;
 option java_multiple_files = true;
 option java_package = "org.mlperf.proto";
 
-// Policy governing whether the generic fallback backend (libtflitebackend)
-// is offered for user selection alongside this backend on devices this
-// backend matches. Each vendor backend declares this in its own settings;
-// offering the fallback is opt-in.
+// Whether backends later in the app's backend priority list may also be
+// offered for user selection on benchmarks this backend claims. For each
+// benchmark the app walks the priority-ordered matched backends and collects
+// every one that claims it; the walk stops after the first backend whose
+// policy is CLAIM_EXCLUSIVE, so a backend's policy gates ALL lower-priority
+// backends (including the TFLite fallback), but only for benchmarks it
+// claims itself. Each backend declares this in its own settings.
 //
-// Next ID: 3
-enum FallbackPolicy {
-  // The fallback backend is never offered while this backend matches the
-  // device, not even for benchmarks this backend does not support (default).
-  FALLBACK_DISABLED = 0;
-  // The fallback backend is offered only for benchmarks this backend
-  // declares no benchmark_setting for.
-  FALLBACK_FILL_GAPS = 1;
-  // The fallback backend is offered alongside this backend for every
-  // benchmark.
-  FALLBACK_COEXIST = 2;
+// Next ID: 2
+enum ClaimPolicy {
+  // Lower-priority backends are not offered for benchmarks this backend
+  // claims (default).
+  CLAIM_EXCLUSIVE = 0;
+  // Lower-priority backends stay available alongside this backend, so users
+  // can pick another implementation of the same benchmark.
+  CLAIM_SHARED = 1;
 }
 
 // Config of a backend.
@@ -46,8 +46,9 @@ message BackendSetting {
   repeated CommonSetting common_setting = 1;
   // Setting that is specialized for each benchmark.
   repeated BenchmarkSetting benchmark_setting = 2;
-  // How the generic fallback backend is offered alongside this backend.
-  optional FallbackPolicy fallback_policy = 3 [default = FALLBACK_DISABLED];
+  // Whether lower-priority backends stay selectable for benchmarks this
+  // backend claims.
+  optional ClaimPolicy claim_policy = 3 [default = CLAIM_EXCLUSIVE];
 }
 
 // Config of a benchmark.

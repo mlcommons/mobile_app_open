@@ -74,8 +74,16 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnSystem.so \
     ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so
 
+  # :libcpp_shared_arm64 is requested explicitly even though :commonlibs already
+  # depends on it. backend_qti_android_files copies lib_arm64/libc++_shared.so
+  # straight out of bazel-bin, and bazel 7 defaults to
+  # --remote_download_outputs=toplevel: a file that is only a src of the
+  # :commonlibs cc_library is not a top-level output, so a remote cache hit on
+  # the genrule leaves it undownloaded and the copy fails. Cold-cache runs
+  # execute the genrule locally and hide this.
   backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so \
-                                 //flutter/android/commonlibs:commonlibs
+                                 //flutter/android/commonlibs:commonlibs \
+                                 //flutter/android/commonlibs:libcpp_shared_arm64
 
   ifeq ($(EXTERNAL_CONFIG),1)
 	backend_qti_flutter_docker_args += --env EXTERNAL_CONFIG=${EXTERNAL_CONFIG}
