@@ -92,8 +92,12 @@ class BenchmarkIcons {
     BenchmarkId.stableDiffusion: AppIcons.stableDiffusion,
     BenchmarkId.imageClassificationOfflineV2:
         AppIcons.imageClassificationOffline,
-    BenchmarkId.llm: AppIcons.llm,
-    BenchmarkId.llmInstruct: AppIcons.llmInstruct,
+    BenchmarkId.llm1b: AppIcons.llm,
+    BenchmarkId.llm3b: AppIcons.llm,
+    BenchmarkId.llm8b: AppIcons.llm,
+    BenchmarkId.llm1bInstruct: AppIcons.llmInstruct,
+    BenchmarkId.llm3bInstruct: AppIcons.llmInstruct,
+    BenchmarkId.llm8bInstruct: AppIcons.llmInstruct,
   };
 
   static final lightSet = {
@@ -105,8 +109,19 @@ class BenchmarkIcons {
     BenchmarkId.stableDiffusion: AppIcons.stableDiffusionWhite,
     BenchmarkId.imageClassificationOfflineV2:
         AppIcons.imageClassificationOfflineWhite,
-    BenchmarkId.llm: AppIcons.llmWhite,
-    BenchmarkId.llmInstruct: AppIcons.llmInstructWhite,
+    BenchmarkId.llm1b: AppIcons.llmWhite,
+    BenchmarkId.llm3b: AppIcons.llmWhite,
+    BenchmarkId.llm8b: AppIcons.llmWhite,
+    BenchmarkId.llm1bInstruct: AppIcons.llmInstructWhite,
+    BenchmarkId.llm3bInstruct: AppIcons.llmInstructWhite,
+    BenchmarkId.llm8bInstruct: AppIcons.llmInstructWhite,
+  };
+
+  /// Icons for a whole task set, so a set does not have to borrow one from
+  /// whichever of its benchmarks happens to sort first.
+  static final setDarkSet = {
+    BenchmarkSetId.imageClassification: AppIcons.imageClassification,
+    BenchmarkSetId.llm: AppIcons.llm,
   };
 
   static Widget getDarkIcon(String benchmarkId) =>
@@ -114,4 +129,7 @@ class BenchmarkIcons {
 
   static Widget getLightIcon(String benchmarkId) =>
       lightSet[benchmarkId] ?? AppIcons.logo;
+
+  static Widget getSetDarkIcon(String setId) =>
+      setDarkSet[setId] ?? AppIcons.logo;
 }

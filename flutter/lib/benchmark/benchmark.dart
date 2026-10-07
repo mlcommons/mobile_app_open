@@ -188,6 +188,12 @@ class BenchmarkSet {
     applyOptionStateMap(optionState);
   }
 
+  BenchmarkSetInfo get info => BenchmarkSetInfo(config);
+
+  /// The benchmarks this set will actually run under the current options.
+  List<Benchmark> get activeBenchmarks =>
+      benchmarks.where((e) => e.isActive).toList();
+
   Iterable<BenchmarkOption> availableOptions() {
     var unhiddenOptions = optionSets
         .where((e) => !e.config.hidden)
@@ -276,6 +282,10 @@ class BenchmarkOptionSet {
       for (final item in config.opt) item.id: BenchmarkOption(config: item),
     };
   }
+
+  /// True when the config allows exactly one option here, so the UI should
+  /// offer a single choice rather than independent checkboxes.
+  bool get isSingleChoice => config.maxSelected == 1;
 
   bool? getOption(String id) {
     return options[id]?.enabled;

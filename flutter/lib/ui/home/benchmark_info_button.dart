@@ -7,9 +7,41 @@ import 'package:mlperfbench/ui/home/app_drawer.dart';
 
 void showBenchInfoBottomSheet(BuildContext context, Benchmark benchmark) {
   final l10n = AppLocalizations.of(context)!;
+  showInfoBottomSheet(
+    context,
+    title: benchmark.taskConfig.name,
+    content: benchmark.info.getLocalizedInfo(l10n).detailsContent,
+  );
+}
 
-  final info = benchmark.info.getLocalizedInfo(l10n);
+/// The sheet for a whole set. Falls back to the description of the first
+/// benchmark that has one, so a set added to the config without its own text
+/// still opens with something useful.
+void showBenchmarkSetInfoBottomSheet(
+  BuildContext context,
+  BenchmarkSet benchmarkSet,
+) {
+  final l10n = AppLocalizations.of(context)!;
+  var content = benchmarkSet.info.localizedDetails(l10n);
+  if (content == null) {
+    for (final benchmark in benchmarkSet.benchmarks) {
+      try {
+        content = benchmark.info.getLocalizedInfo(l10n).detailsContent;
+        break;
+      } catch (_) {
+        continue;
+      }
+    }
+  }
+  if (content == null) return;
+  showInfoBottomSheet(context, title: benchmarkSet.info.name, content: content);
+}
 
+void showInfoBottomSheet(
+  BuildContext context, {
+  required String title,
+  required String content,
+}) {
   const double sidePadding = 18.0;
   // 48pt original height + vertical padding of 18pt in each direction
   const double headHeight = 48.0 + (18.0 * 2);
@@ -39,7 +71,7 @@ void showBenchInfoBottomSheet(BuildContext context, Benchmark benchmark) {
                 children: [
                   Expanded(
                     child: AutoSizeText(
-                      benchmark.taskConfig.name,
+                      title,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1, //can be changed to 2 without issue
                       textAlign: TextAlign.left,
@@ -60,7 +92,6 @@ void showBenchInfoBottomSheet(BuildContext context, Benchmark benchmark) {
           ),
           LayoutBuilder(
             builder: (context, constraints) {
-              print(constraints.maxHeight);
               return ConstrainedBox(
                 constraints: constraints.copyWith(
                   maxHeight: constraints.maxHeight != double.infinity
@@ -72,10 +103,7 @@ void showBenchInfoBottomSheet(BuildContext context, Benchmark benchmark) {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        Text(
-                          info.detailsContent,
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                        Text(content, style: const TextStyle(fontSize: 16)),
                         const SizedBox(height: footHeight),
                       ],
                     ),

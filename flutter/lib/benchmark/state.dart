@@ -402,9 +402,30 @@ class BenchmarkState extends ChangeNotifier {
       return;
     }
     if (!benchmark.selectBackend(libName)) return;
-    // Persist only this explicit choice, merged into the stored map, so
-    // untouched benchmarks keep following future defaults and selections
-    // made under other task configs are preserved.
+    _persistBackendSelection({benchmark.id: libName});
+    notifyListeners();
+  }
+
+  /// Applies one backend to every benchmark in the set that offers it.
+  /// Benchmarks without that backend keep the one they have.
+  void benchmarkSetBackendForSet(BenchmarkSet benchmarkSet, String libName) {
+    if (state == BenchmarkStateEnum.running ||
+        state == BenchmarkStateEnum.aborting) {
+      return;
+    }
+    final applied = <String, String>{};
+    for (final benchmark in benchmarkSet.benchmarks) {
+      if (benchmark.selectBackend(libName)) applied[benchmark.id] = libName;
+    }
+    if (applied.isEmpty) return;
+    _persistBackendSelection(applied);
+    notifyListeners();
+  }
+
+  /// Persist only explicit choices, merged into the stored map, so untouched
+  /// benchmarks keep following future defaults and selections made under other
+  /// task configs are preserved.
+  void _persistBackendSelection(Map<String, String> choices) {
     Map<String, dynamic> stored = {};
     if (_store.backendSelection.isNotEmpty) {
       try {
@@ -413,12 +434,11 @@ class BenchmarkState extends ChangeNotifier {
         print('Backend selection parse fail: $e');
       }
     }
-    stored[benchmark.id] = libName;
+    stored.addAll(choices);
     _store.backendSelection = jsonEncode(stored);
     // The resource map is built for the previously selected backends;
-    // rebuild it so resource validation sees the new backend's files.
+    // rebuild it so resource validation sees the new backends' files.
     deferredLoadResources();
-    notifyListeners();
   }
 
   void benchmarkSetOption(
