@@ -51,8 +51,15 @@ scanner/build-app:
 	build-wrapper-linux-x86-64 --out-dir "${SONAR_OUT_DIR}" \
 		make flutter/android
 
+# The Dart analyzer needs resolved dependencies and generated sources (protos,
+# l10n, *.g.dart, ...), otherwise every import is reported as unresolved.
+# https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/languages/dart
+.PHONY: scanner/prepare-dart
+scanner/prepare-dart:
+	make flutter/prepare
+
 .PHONY: scanner/scan
-scanner/scan: scanner/build-app
+scanner/scan: scanner/build-app scanner/prepare-dart
 	sonar-scanner \
 		-Dsonar.organization=mlcommons \
 		-Dsonar.projectKey=mlcommons_${REPO_NAME} \
