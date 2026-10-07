@@ -426,11 +426,7 @@ class BenchmarkState extends ChangeNotifier {
     String option,
     bool value,
   ) {
-    benchmarkSet.optionSets[benchmarkSet.optionMap[option]!].setOptionTo(
-      option,
-      value,
-    );
-    benchmarkSet.applyOptions();
+    benchmarkSet.applyOptionStateMap({option: value});
     saveTaskSetSelection();
     notifyListeners();
   }
