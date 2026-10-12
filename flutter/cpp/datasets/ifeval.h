@@ -40,7 +40,8 @@ struct Accuracy {
 class IFEval : public Dataset {
  public:
   IFEval(Backend* backend, const std::string& input_tfrecord,
-         const std::string& sp_path, const std::string& output_dir);
+         const std::string& sp_path, const std::string& output_dir,
+         const std::string& prompt_format = "llama");
 
   const std::string& Name() override { return name_; }
 
@@ -82,6 +83,7 @@ class IFEval : public Dataset {
   std::set<int> loaded_sample_ids_;
   std::string raw_output_dir_;
   std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor;
+  const std::string prompt_format_;
   static constexpr int input_token_limit_ = 2048;
   int token_limit_ = 1024;
 };

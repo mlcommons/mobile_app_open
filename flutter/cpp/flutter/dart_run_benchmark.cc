@@ -78,6 +78,7 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
   ::std::unique_ptr<::mlperf::mobile::Dataset> dataset;
   std::string sp_path;
   std::string sp_path_filename;
+  std::string prompt_format = "llama";
   bool use_token_latencies = false;
   switch (in->dataset_type) {
     case ::mlperf::mobile::DatasetConfig::IMAGENET:
@@ -127,12 +128,14 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       for (auto setting : settings.benchmark_setting().custom_setting()) {
         if (setting.id() == "tokenizer_filename")
           sp_path_filename = setting.value();
+        if (setting.id() == "prompt_format") prompt_format = setting.value();
       }
       sp_path = in->backend_model_path;
       sp_path += '/' + sp_path_filename;
       use_token_latencies = true;
       dataset = std::make_unique<::mlperf::mobile::IFEval>(
-          backend.get(), in->dataset_data_path, sp_path, in->output_dir);
+          backend.get(), in->dataset_data_path, sp_path, in->output_dir,
+          prompt_format);
       break;
     default:
       return nullptr;

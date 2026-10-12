@@ -144,6 +144,7 @@ int Main(int argc, char *argv[]) {
 
   // Command Line Flags for mlperf.
   std::string mode, scenario = "SingleStream", output_dir, custom_config;
+  std::string prompt_format = "llama";
   int min_query_count = 100, min_duration_ms = 100,
       max_duration_ms = 10 * 60 * 1000,
       single_stream_expected_latency_ns = 1000000;
@@ -244,6 +245,11 @@ int Main(int argc, char *argv[]) {
         add_custom_setting("embedder_filename", embedder_file_path);
         add_custom_setting("per_layer_embedder_filename",
                            per_layer_embedder_file_path);
+
+        for (const auto &s :
+             setting_list.benchmark_setting().custom_setting()) {
+          if (s.id() == "prompt_format") prompt_format = s.value();
+        }
 
         ExternalBackend *external_backend = new ExternalBackend(
             model_file_path, lib_path, setting_list, native_lib_path);
@@ -464,8 +470,8 @@ int Main(int argc, char *argv[]) {
 
       if (Flags::Parse(&argc, const_cast<const char **>(argv), dataset_flags) &&
           backend) {
-        dataset.reset(
-            new IFEval(backend.get(), input_tfrecord, sp_path, output_dir));
+        dataset.reset(new IFEval(backend.get(), input_tfrecord, sp_path,
+                                 output_dir, prompt_format));
       }
       // Adds to flag_list for showing help.
       flag_list.insert(flag_list.end(), dataset_flags.begin(),

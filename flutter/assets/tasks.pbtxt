@@ -649,6 +649,10 @@ task {
     id: "llm_tokenizer_path"
     value: "gemma4_e2b.spm.model"
   }
+  custom_config {
+    id: "prompt_format"
+    value: "gemma"
+  }
 }
 
 task {
