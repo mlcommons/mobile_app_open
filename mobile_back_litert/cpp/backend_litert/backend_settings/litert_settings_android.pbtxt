@@ -404,6 +404,68 @@ benchmark_setting {
 }
 
 benchmark_setting {
+  benchmark_id: "llm-qwen-0_8b"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "local:///qwen3_5/model_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "local:///qwen3_5/qwen3_5.spm.model"
+      model_checksum: ""
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "model_quantized.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "qwen3_5.spm.model"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "llm-qwen-0_8b-instruct"
+  framework: "LiteRT"
+  delegate_choice: {
+    delegate_name: "CPU"
+    accelerator_name: "cpu"
+    accelerator_desc: "CPU"
+    model_file: {
+      model_path: "local:///qwen3_5/model_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "local:///qwen3_5/qwen3_5.spm.model"
+      model_checksum: ""
+    }
+  }
+  delegate_selected: "CPU"
+  custom_setting {
+    id: "pipeline"
+    value: "LLMPipeline"
+  }
+  custom_setting {
+    id: "model_filename"
+    value: "model_quantized.tflite"
+  }
+  custom_setting {
+    id: "tokenizer_filename"
+    value: "qwen3_5.spm.model"
+  }
+}
+
+benchmark_setting {
   benchmark_id: "llm-1b-instruct"
   framework: "LiteRT"
   delegate_choice: {

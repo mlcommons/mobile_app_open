@@ -141,5 +141,7 @@ const benchmarkExpectedAccuracy = {
   BenchmarkId.llmInstruct: _llm,
   BenchmarkId.llmGemmaE2b: _llm,
   BenchmarkId.llmGemmaE2bInstruct: _llm,
+  BenchmarkId.llmQwen08b: _llm,
+  BenchmarkId.llmQwen08bInstruct: _llm,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };
