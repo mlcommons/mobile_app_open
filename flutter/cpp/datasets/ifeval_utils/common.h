@@ -54,7 +54,10 @@ inline bool contains_string(const std::string& text,
 inline bool ends_with(const std::string& s, const std::string& suf,
                       unsigned threshold) {
   if (s.size() < suf.size()) return false;
-  std::string a = tolower(s.substr(s.size() - (suf.size() + threshold)));
+  // The window may be longer than the response itself, in which case it is the
+  // whole response; subtracting unclamped would wrap and make substr throw.
+  const std::size_t window = std::min(s.size(), suf.size() + threshold);
+  std::string a = tolower(s.substr(s.size() - window));
   std::string b = tolower(suf);
   return threshold == 0 ? a == b : contains_string(a, b);
 }
@@ -142,8 +145,10 @@ inline std::string remove_font_modifiers(const std::string& s) {
     }
 
     // skip emphasis/strong/strike/escape chars as long as they're not preceeded
-    // by an escape character
-    if ((c == '*' || c == '_' || c == '~' || c == '\\') && s[i - 1] != '\\')
+    // by an escape character. The first character has nothing before it, so it
+    // is never escaped -- without the i == 0 guard this reads s[SIZE_MAX].
+    if ((c == '*' || c == '_' || c == '~' || c == '\\') &&
+        (i == 0 || s[i - 1] != '\\'))
       continue;
 
     // remove heading markers (#) at line starts

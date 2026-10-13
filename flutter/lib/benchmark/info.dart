@@ -28,6 +28,8 @@ class BenchmarkInfo {
   BenchmarkLocalizationInfo getLocalizedInfo(AppLocalizations stringResources) {
     switch (task.id) {
       case (BenchmarkId.llm):
+      case (BenchmarkId.llmQwen08b):
+      case (BenchmarkId.llmQwen08bInstruct):
         return BenchmarkLocalizationInfo(
           name: 'LLM',
           detailsTitle: stringResources.benchInfoLlm,

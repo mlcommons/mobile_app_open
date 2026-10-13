@@ -7,5 +7,6 @@ const _backendsList = [
   'PIXEL_TAG',
   'QTI_TAG',
   'APPLE_TAG',
+  'LITERT_TAG',
   'TFLITE_TAG',
 ];

@@ -22,7 +22,7 @@ limitations under the License.
 
 #include "flutter/cpp/backend.h"
 #include "flutter/cpp/utils.h"
-#include "tensorflow/lite/shared_library.h"
+#include "tflite/shared_library.h"
 
 namespace mlperf {
 namespace mobile {

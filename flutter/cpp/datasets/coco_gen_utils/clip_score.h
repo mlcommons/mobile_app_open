@@ -20,8 +20,8 @@ limitations under the License.
 #include <memory>
 #include <vector>
 
-#include "tensorflow/lite/interpreter.h"
-#include "tensorflow/lite/model.h"
+#include "tflite/interpreter.h"
+#include "tflite/model.h"
 
 namespace mlperf {
 namespace mobile {
