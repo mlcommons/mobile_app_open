@@ -426,4 +426,183 @@ void main() {
       expect(settings.customSetting.single.value, 'v1');
     });
   });
+
+  group('BenchmarkSet option persistence', () {
+    // Mirrors flutter/assets/tasks.pbtxt: the image_classification set ships
+    // with both options on, the llm set ships with every size off.
+    pb.TaskSet icSet() => pb.TaskSet(
+      id: 'ic',
+      name: 'Image Classification v2',
+      optionSet: [
+        pb.OptionSet(
+          id: 'options',
+          opt: [
+            pb.Option(id: 'offline', name: 'Offline', enabled: true),
+            pb.Option(id: 'online', name: 'Online', enabled: true),
+          ],
+        ),
+      ],
+    );
+    pb.TaskSet llmSet() => pb.TaskSet(
+      id: 'llm',
+      name: 'LLM',
+      optionSet: [
+        pb.OptionSet(
+          id: 'parameters',
+          opt: [
+            pb.Option(id: '1b', name: '1B'),
+            pb.Option(id: '3b', name: '3B'),
+          ],
+        ),
+        pb.OptionSet(
+          id: 'dataset',
+          hidden: true,
+          opt: [pb.Option(id: 'mmlu', name: 'MMLU', enabled: true)],
+        ),
+      ],
+    );
+
+    final icOnline = pb.TaskConfig(
+      id: 'ic_online',
+      taskSet: 'ic',
+      requiredOption: ['online'],
+    );
+    final icOffline = pb.TaskConfig(
+      id: 'ic_offline',
+      taskSet: 'ic',
+      requiredOption: ['offline'],
+    );
+    final llm1b = pb.TaskConfig(
+      id: 'llm_1b',
+      taskSet: 'llm',
+      requiredOption: ['1b', 'mmlu'],
+    );
+    final llm3b = pb.TaskConfig(
+      id: 'llm_3b',
+      taskSet: 'llm',
+      requiredOption: ['3b', 'mmlu'],
+    );
+
+    BackendInfo backend() => BackendInfo.forTest(
+      pb.BackendSetting(
+        benchmarkSetting: [
+          for (final id in ['ic_online', 'ic_offline', 'llm_1b', 'llm_3b'])
+            pb.BenchmarkSetting(benchmarkId: id),
+        ],
+      ),
+      'libtflitebackend',
+    );
+
+    BenchmarkStore storeWith(Map<String, Map<String, bool>> setSelection) =>
+        BenchmarkStore(
+          appConfig: pb.MLPerfConfig(
+            task: [icOnline, icOffline, llm1b, llm3b],
+            taskSet: [icSet(), llmSet()],
+          ),
+          backends: [backend()],
+          taskSelection: {},
+          taskSetSelection: setSelection,
+        );
+
+    test('defaults come from the config when nothing is stored', () {
+      final store = storeWith({});
+      expect(store.activeBenchmarks.map((e) => e.id), [
+        'ic_online',
+        'ic_offline',
+      ]);
+    });
+
+    test('restored option state decides which benchmarks are active', () {
+      // The user picked "LLM only": both image classification options off,
+      // the 1B parameter option on.
+      final store = storeWith({
+        'ic': {'offline': false, 'online': false},
+        'llm': {'1b': true, '3b': false},
+      });
+
+      expect(store.activeBenchmarks.map((e) => e.id), ['llm_1b']);
+    });
+
+    test('restored option state round-trips through setSelection', () {
+      final selection = {
+        'ic': {'offline': false, 'online': false},
+        'llm': {'1b': true, '3b': false},
+      };
+      expect(storeWith(selection).setSelection, selection);
+    });
+
+    test('unknown stored option ids are ignored, not fatal', () {
+      // A stored id can disappear when tasks.pbtxt changes under an upgrade.
+      final store = storeWith({
+        'llm': {'1b': true, 'option_that_no_longer_exists': true},
+      });
+      // The unknown id is dropped; the rest of the stored state still lands.
+      expect(store.activeBenchmarks.map((e) => e.id), contains('llm_1b'));
+    });
+
+    test('a stored set id that no longer exists is ignored', () {
+      final store = storeWith({
+        'set_that_no_longer_exists': {'whatever': true},
+      });
+      expect(store.activeBenchmarks.map((e) => e.id), [
+        'ic_online',
+        'ic_offline',
+      ]);
+    });
+  });
+
+  group('BenchmarkOptionSet selection constraints', () {
+    BenchmarkOptionSet optionSet({int minSelected = 0, int maxSelected = 0}) =>
+        BenchmarkOptionSet(
+          config: pb.OptionSet(
+            id: 'parameters',
+            minSelected: minSelected,
+            maxSelected: maxSelected,
+            opt: [
+              pb.Option(id: 'a', name: 'A', enabled: true),
+              pb.Option(id: 'b', name: 'B'),
+            ],
+          ),
+        );
+
+    test('the selected count tracks set and unset', () {
+      final set = optionSet();
+      expect(set.selected, 1);
+      set.setOptionTo('b', true);
+      expect(set.selected, 2);
+      set.setOptionTo('a', false);
+      set.setOptionTo('b', false);
+      expect(set.selected, 0);
+    });
+
+    test('swapping the choice works when maxSelected is 1', () {
+      final set = optionSet(maxSelected: 1);
+      expect(set.setOptionTo('a', false), isTrue);
+      expect(set.setOptionTo('b', true), isTrue);
+      expect(set.getOption('a'), isFalse);
+      expect(set.getOption('b'), isTrue);
+    });
+
+    test('maxSelected still blocks an over-selection', () {
+      final set = optionSet(maxSelected: 1);
+      expect(set.setOptionTo('b', true), isFalse);
+      expect(set.getOption('b'), isFalse);
+      expect(set.selected, 1);
+    });
+
+    test('minSelected still blocks an under-selection', () {
+      final set = optionSet(minSelected: 1);
+      expect(set.setOptionTo('a', false), isFalse);
+      expect(set.getOption('a'), isTrue);
+      expect(set.selected, 1);
+    });
+
+    test('setting an already-set option does not double count', () {
+      final set = optionSet();
+      expect(set.setOptionTo('a', true), isTrue);
+      expect(set.selected, 1);
+      expect(set.setOptionTo('b', false), isTrue);
+      expect(set.selected, 1);
+    });
+  });
 }
