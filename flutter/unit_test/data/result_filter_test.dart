@@ -111,5 +111,24 @@ void main() {
       emptyResult.results.clear();
       expect(filter.match(emptyResult), isFalse);
     });
+
+    test('backend filter matches any result in a mixed-backend file', () {
+      final mixedData = jsonDecode(jsonString) as Map<String, dynamic>;
+      final results = mixedData['results'] as List<dynamic>;
+      final lastBackendInfo =
+          (results.last as Map<String, dynamic>)['backend_info']
+              as Map<String, dynamic>;
+      lastBackendInfo['filename'] = 'libcoremlbackend';
+      final mixedResult = ExtendedResult.fromJson(mixedData);
+
+      final coremlFilter = ResultFilter()..backend = 'libcoremlbackend';
+      expect(coremlFilter.match(mixedResult), isTrue);
+
+      final tfliteFilter = ResultFilter()..backend = 'libtflitebackend';
+      expect(tfliteFilter.match(mixedResult), isTrue);
+
+      final otherFilter = ResultFilter()..backend = 'libqtibackend';
+      expect(otherFilter.match(mixedResult), isFalse);
+    });
   });
 }

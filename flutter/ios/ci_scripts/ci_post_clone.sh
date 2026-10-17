@@ -51,6 +51,20 @@ echo "$MC_LOG_PREFIX runner is ${runner}"
 
 echo "$MC_LOG_PREFIX ========== Install dependencies =========="
 
+# Xcode Cloud does not always hand out the same machine. The macOS 27 image
+# resolves `brew` to the native arm64 install at /opt/homebrew, but a macOS
+# 26.5 image resolves it to the x86_64 install at /usr/local and runs it under
+# Rosetta 2. Homebrew stopped building Intel bottles in September 2026, so on
+# that machine `brew install protobuf` falls back to a source build and dies
+# with "clang: error: unsupported argument 'westmere' to option '-march='"
+# (Rosetta reports a westmere CPU that the native clang will not accept).
+# Prefer the native Homebrew whenever it is there; this is a no-op when it is
+# not, and the `brew config` below records which one we actually got.
+if [ -x /opt/homebrew/bin/brew ]; then
+  export PATH="/opt/homebrew/bin:$PATH"
+fi
+echo "$MC_LOG_PREFIX brew is $(command -v brew)"
+
 brew update --quiet || true
 echo "$MC_LOG_PREFIX brew version:" && brew config
 

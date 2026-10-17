@@ -4,6 +4,10 @@ analyzer:
   exclude:
     - lib/localizations/**
     - lib/protos/**
+    - build/**
+    - android/**
+    - ios/**
+    - windows/**
   language:
     strict-casts: true
 

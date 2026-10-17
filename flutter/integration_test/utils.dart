@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mlperfbench/app_constants.dart';
@@ -100,15 +101,24 @@ bool hasBenchmark(WidgetTester tester, String benchmarkId) {
 }
 
 bool canRunBenchmark(WidgetTester tester, String benchmarkId) {
+  final state = tester.state(find.byType(MaterialApp));
+  final benchmarkState = state.context.read<BenchmarkState>();
+  final benchmark = benchmarkState.allBenchmarks.firstWhereOrNull(
+    (e) => e.id == benchmarkId,
+  );
+  if (benchmark == null) return false;
+  final selectedLib = benchmark.selectedBackend.info.libName;
   if (benchmarkId == 'stable_diffusion') {
-    final state = tester.state(find.byType(MaterialApp));
-    final benchmarkState = state.context.read<BenchmarkState>();
-    final libName = benchmarkState.backendInfo.libName;
-    if (libName == BackendId.qti) {
-      return true;
-    } else {
-      return false;
-    }
+    return selectedLib == BackendId.qti;
+  }
+  // The TFLite fallback is now offered alongside vendor backends, so
+  // benchmarks the vendor backend lacks appear defaulting to TFLite.
+  // Skip them here to keep device-job coverage and runtime the same as
+  // before per-benchmark backends: running the fallback-only benchmarks
+  // (e.g. LLM on CPU) blows the CI job timeout on vendor devices.
+  final primaryLib = benchmarkState.matchedBackends.first.libName;
+  if (primaryLib != BackendId.tflite && selectedLib == BackendId.tflite) {
+    return false;
   }
   return true;
 }

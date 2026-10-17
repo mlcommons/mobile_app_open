@@ -29,7 +29,7 @@ class BenchmarkState extends ChangeNotifier {
 
   late final ResourceManager resourceManager;
   late final ConfigManager configManager;
-  late final BackendInfo backendInfo;
+  late final List<BackendInfo> matchedBackends;
   late final TaskRunner taskRunner;
   late final BoardDecoder boardDecoder;
 
@@ -93,13 +93,12 @@ class BenchmarkState extends ChangeNotifier {
 
   BenchmarkState._(this._store, this.backendBridge) {
     resourceManager = ResourceManager(notifyListeners, _store);
-    backendInfo = BackendInfoHelper().findMatching();
+    matchedBackends = BackendInfoHelper().findMatchingBackends();
     taskRunner = TaskRunner(
       store: _store,
       notifyListeners: notifyListeners,
       resourceManager: resourceManager,
       backendBridge: backendBridge,
-      backendInfo: backendInfo,
     );
   }
 
@@ -236,16 +235,51 @@ class BenchmarkState extends ChangeNotifier {
       }
     }
 
+    Map<String, Map<String, bool>> taskSetSelection = {};
+    if (_store.taskSetSelection.isNotEmpty) {
+      try {
+        final map = jsonDecode(_store.taskSetSelection) as Map<String, dynamic>;
+        for (final kv in map.entries) {
+          final inner = kv.value as Map<String, dynamic>;
+          taskSetSelection[kv.key] = inner.map(
+            (k, v) => MapEntry(k, v as bool),
+          );
+        }
+      } catch (e, t) {
+        print('Task set selection parse fail: $e');
+        print(t);
+      }
+    }
+
+    Map<String, String> backendSelection = {};
+    if (_store.backendSelection.isNotEmpty) {
+      try {
+        final map = jsonDecode(_store.backendSelection) as Map<String, dynamic>;
+        for (var kv in map.entries) {
+          backendSelection[kv.key] = kv.value as String;
+        }
+      } catch (e, t) {
+        print('Backend selection parse fail: $e');
+        print(t);
+      }
+    }
+
     _benchmarkStore = BenchmarkStore(
       appConfig: configManager.decodedConfig,
-      backendConfig: backendInfo.settings.benchmarkSetting,
+      backends: matchedBackends,
       taskSelection: taskSelection,
+      taskSetSelection: taskSetSelection,
+      backendSelection: backendSelection,
     );
     restoreLastResult();
   }
 
   void saveTaskSelection() {
     _store.taskSelection = jsonEncode(_benchmarkStore.selection);
+  }
+
+  void saveTaskSetSelection() {
+    _store.taskSetSelection = jsonEncode(_benchmarkStore.setSelection);
   }
 
   BenchmarkStateEnum get state {
@@ -362,16 +396,58 @@ class BenchmarkState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void benchmarkSetBackend(Benchmark benchmark, String libName) {
+    if (state == BenchmarkStateEnum.running ||
+        state == BenchmarkStateEnum.aborting) {
+      return;
+    }
+    if (!benchmark.selectBackend(libName)) return;
+    _persistBackendSelection({benchmark.id: libName});
+    notifyListeners();
+  }
+
+  /// Applies one backend to every benchmark in the set that offers it.
+  /// Benchmarks without that backend keep the one they have.
+  void benchmarkSetBackendForSet(BenchmarkSet benchmarkSet, String libName) {
+    if (state == BenchmarkStateEnum.running ||
+        state == BenchmarkStateEnum.aborting) {
+      return;
+    }
+    final applied = <String, String>{};
+    for (final benchmark in benchmarkSet.benchmarks) {
+      if (benchmark.selectBackend(libName)) applied[benchmark.id] = libName;
+    }
+    if (applied.isEmpty) return;
+    _persistBackendSelection(applied);
+    notifyListeners();
+  }
+
+  /// Persist only explicit choices, merged into the stored map, so untouched
+  /// benchmarks keep following future defaults and selections made under other
+  /// task configs are preserved.
+  void _persistBackendSelection(Map<String, String> choices) {
+    Map<String, dynamic> stored = {};
+    if (_store.backendSelection.isNotEmpty) {
+      try {
+        stored = jsonDecode(_store.backendSelection) as Map<String, dynamic>;
+      } catch (e) {
+        print('Backend selection parse fail: $e');
+      }
+    }
+    stored.addAll(choices);
+    _store.backendSelection = jsonEncode(stored);
+    // The resource map is built for the previously selected backends;
+    // rebuild it so resource validation sees the new backends' files.
+    deferredLoadResources();
+  }
+
   void benchmarkSetOption(
     BenchmarkSet benchmarkSet,
     String option,
     bool value,
   ) {
-    benchmarkSet.optionSets[benchmarkSet.optionMap[option]!].setOptionTo(
-      option,
-      value,
-    );
-    benchmarkSet.applyOptions();
+    benchmarkSet.applyOptionStateMap({option: value});
+    saveTaskSetSelection();
     notifyListeners();
   }
 

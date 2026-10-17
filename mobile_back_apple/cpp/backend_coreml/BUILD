@@ -56,6 +56,12 @@ swift_library(
     srcs = [
         "coreml_util.swift",
     ],
+    # Xcode 27 no longer defaults the language mode, so swiftc refuses to build
+    # without one. The source is mode-agnostic; 6 is what Xcode 27 would pick.
+    copts = [
+        "-swift-version",
+        "6",
+    ],
     generates_header = True,
     deps = [
         ":apple_frameworks",

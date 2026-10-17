@@ -185,9 +185,12 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
   List<Widget> _makeBody() {
     final res = widget.result;
 
-    final firstResult = res.results.first;
     final date = res.meta.creationDate.toUIString();
-    final backendName = firstResult.backendInfo.backendName;
+    // Results within one file may come from different backends.
+    final backendName = res.results
+        .map((e) => e.backendInfo.backendName)
+        .toSet()
+        .join(', ');
 
     final averageThroughput = calculateAverageThroughput(
       res.results,

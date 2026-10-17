@@ -176,7 +176,16 @@ new_git_repository(
     build_file = "@//flutter/android/third_party:loadgen.BUILD",
     commit = "6776245e99dce0600cfc9a6fb61efd310f87de3d",
     patch_args = ["-p1"],
-    patch_cmds = ["python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen"],
+    patch_cmds = [
+        "python3 loadgen/version_generator.py loadgen/version_generated.cc loadgen",
+        # The generator stamps datetime.now()/utcnow() into BuildDateLocal and
+        # BuildDateUtc, so this file -- and every action that compiles or links
+        # loadgen -- got a new content digest on every fetch. It was the only
+        # external repo file that differed between two fetches of the same
+        # commit. Pin the two timestamps so the repo is byte-identical across
+        # runs and can be served from the shared cache.
+        "sed -i.bak -E 's/\"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.]+\"/\"1970-01-01T00:00:00\"/g' loadgen/version_generated.cc && rm -f loadgen/version_generated.cc.bak",
+    ],
     patches = ["//patches:loadgen_mobile_update.patch"],
     remote = "https://github.com/mlcommons/inference.git",
 )

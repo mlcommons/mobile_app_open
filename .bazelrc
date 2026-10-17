@@ -7,6 +7,21 @@ build --config=short_logs
 build --verbose_failures
 build --spawn_strategy=standalone
 
+# Keep action keys independent of the client environment.
+#
+# Without this, bazel inherits the client's PATH (and LD_LIBRARY_PATH) into
+# every action's environment, and the action environment is part of every
+# action key. On GitHub Actions, setup-gcloud installs the Cloud SDK into
+# $RUNNER_TEMP/<random-uuid>/google-cloud-sdk/bin and prepends it to PATH, so
+# PATH -- and therefore every single action key -- changed on every run. That
+# is why the shared remote cache reported the same 7 hits out of 4497 actions
+# run after run while holding ~19k uploaded entries. With this flag actions get
+# a fixed PATH of /usr/local/bin:/usr/bin:/bin instead.
+#
+# Repository rules are unaffected: they see the real client environment, so
+# tools resolved at fetch time still work.
+build --incompatible_strict_action_env
+
 # This flag is required by tensorflow
 common --experimental_repo_remote_exec
 

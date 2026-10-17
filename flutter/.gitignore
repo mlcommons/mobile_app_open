@@ -33,3 +33,6 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+# Flutter tool generated iOS debug files
+**/ios/Flutter/ephemeral/

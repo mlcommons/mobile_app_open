@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart' show visibleForTesting;
+
 import 'package:collection/collection.dart';
 
 import 'package:mlperfbench/app_constants.dart';
 import 'package:mlperfbench/backend/bridge/run_settings.dart';
+import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/backend/loadgen_info.dart';
 import 'package:mlperfbench/benchmark/info.dart';
 import 'package:mlperfbench/benchmark/run_mode.dart';
@@ -34,28 +37,53 @@ class BenchmarkResult {
   });
 }
 
+class BenchmarkBackend {
+  final BackendInfo info;
+  final pb.BenchmarkSetting settings;
+
+  BenchmarkBackend({required this.info, required this.settings});
+}
+
 class Benchmark {
-  final pb.BenchmarkSetting benchmarkSettings;
+  // All backends that match this device and support this task,
+  // in priority order (vendor backends before the TFLite fallback).
+  final List<BenchmarkBackend> backends;
   final pb.TaskConfig taskConfig;
   bool isActive;
 
   final BenchmarkInfo info;
 
-  // this variable holds description of our config file,
-  // which may not represent what backend actually used for computations
-  final String backendRequestDescription;
+  BenchmarkBackend _selectedBackend;
 
   BenchmarkResult? performanceModeResult;
   BenchmarkResult? accuracyModeResult;
 
   Benchmark({
-    required this.benchmarkSettings,
+    required this.backends,
     required this.taskConfig,
     required this.isActive,
-  }) : info = BenchmarkInfo(taskConfig),
-       backendRequestDescription = benchmarkSettings.framework;
+  }) : assert(backends.isNotEmpty),
+       info = BenchmarkInfo(taskConfig),
+       _selectedBackend = backends.first;
 
   String get id => taskConfig.id;
+
+  BenchmarkBackend get selectedBackend => _selectedBackend;
+
+  pb.BenchmarkSetting get benchmarkSettings => _selectedBackend.settings;
+
+  // this getter holds description of our config file,
+  // which may not represent what backend actually used for computations
+  String get backendRequestDescription => benchmarkSettings.framework;
+
+  // Selects the backend with the given lib name.
+  // Returns false if it is not one of this benchmark's candidates.
+  bool selectBackend(String libName) {
+    final backend = backends.firstWhereOrNull((e) => e.info.libName == libName);
+    if (backend == null) return false;
+    _selectedBackend = backend;
+    return true;
+  }
 
   pb.DelegateSetting get selectedDelegate {
     final delegate = benchmarkSettings.delegateChoice.firstWhere(
@@ -67,8 +95,6 @@ class Benchmark {
   Future<RunSettings> createRunSettings({
     required BenchmarkRunMode runMode,
     required ResourceManager resourceManager,
-    required List<pb.CommonSetting> commonSettings,
-    required String backendLibName,
     required String logDir,
   }) async {
     final dataset = runMode.chooseDataset(taskConfig);
@@ -79,23 +105,23 @@ class Benchmark {
     double maxDuration = runConfig.maxDuration;
 
     final settings = pb.SettingList(
-      setting: commonSettings,
+      setting: _selectedBackend.info.settings.commonSetting,
       benchmarkSetting: benchmarkSettings,
     );
-    // Convert TaskConfig.CustomConfig to BenchmarkSetting.CustomSetting
-    final customConfigs = taskConfig.customConfig
-        .map((e) => pb.CustomSetting(id: e.id, value: e.value))
-        .toList();
-    benchmarkSettings.customSetting.addAll(customConfigs);
+    mergeCustomSettings(benchmarkSettings, taskConfig.customConfig);
     final uris = selectedDelegate.modelFile.map((e) => e.modelPath).toList();
-    final modelDirName = selectedDelegate.delegateName.replaceAll(' ', '_');
+    // Namespace the symlink dir by backend and benchmark so backends that
+    // share a delegate name cannot cross-contaminate each other's models.
+    final modelDirName =
+        '${_selectedBackend.info.libName}_${id}_${selectedDelegate.delegateName}'
+            .replaceAll(' ', '_');
     final backendModelPath = await resourceManager.getModelPath(
       uris,
       modelDirName,
     );
     return RunSettings(
       backend_model_path: backendModelPath,
-      backend_lib_name: backendLibName,
+      backend_lib_name: _selectedBackend.info.libName,
       backend_settings: settings,
       backend_native_lib_path: DeviceInfo.instance.nativeLibraryPath,
       dataset_type: taskConfig.datasets.type.value,
@@ -119,6 +145,22 @@ class Benchmark {
   }
 }
 
+// Convert TaskConfig.CustomConfig to BenchmarkSetting.CustomSetting.
+// Idempotent: setting ids that are already present are left untouched, so
+// repeated runs do not append duplicates.
+@visibleForTesting
+void mergeCustomSettings(
+  pb.BenchmarkSetting settings,
+  List<pb.CustomConfig> configs,
+) {
+  for (final config in configs) {
+    if (settings.customSetting.any((e) => e.id == config.id)) continue;
+    settings.customSetting.add(
+      pb.CustomSetting(id: config.id, value: config.value),
+    );
+  }
+}
+
 class BenchmarkSet {
   final pb.TaskSet config;
   late final List<Benchmark> benchmarks;
@@ -129,6 +171,7 @@ class BenchmarkSet {
   BenchmarkSet({
     required this.config,
     List<Benchmark> allBenchmarks = const [],
+    Map<String, bool> optionState = const {},
   }) {
     optionSets = config.optionSet
         .map((e) => BenchmarkOptionSet(config: e))
@@ -140,8 +183,16 @@ class BenchmarkSet {
       for (final (index, item) in optionSets.indexed)
         for (final key in item.options.keys) key: index,
     };
-    applyOptions();
+    // Restore before the first applyOptions(): isActive is derived from the
+    // option states, so the states have to be final by the time it runs.
+    applyOptionStateMap(optionState);
   }
+
+  BenchmarkSetInfo get info => BenchmarkSetInfo(config);
+
+  /// The benchmarks this set will actually run under the current options.
+  List<Benchmark> get activeBenchmarks =>
+      benchmarks.where((e) => e.isActive).toList();
 
   Iterable<BenchmarkOption> availableOptions() {
     var unhiddenOptions = optionSets
@@ -159,6 +210,39 @@ class BenchmarkSet {
 
   int visibleOptions() {
     return availableOptions().length;
+  }
+
+  Map<String, bool> optionStateMap() => {
+    for (BenchmarkOption item in availableOptions()) item.id: item.enabled,
+  };
+
+  /// Restores a state produced by [optionStateMap], then recomputes which
+  /// benchmarks are active. Callers never have to remember [applyOptions].
+  void applyOptionStateMap(Map<String, bool> inputMap) {
+    // Group by option set so each set is applied in one go: applying entries
+    // one at a time makes the result depend on map order whenever the set
+    // carries a min_selected/max_selected constraint.
+    final perOptionSet = <int, Map<String, bool>>{};
+    for (final entry in inputMap.entries) {
+      final index = optionMap[entry.key];
+      if (index == null) {
+        // The stored state outlives the config it came from: an option can
+        // disappear in an app update or differ between backends.
+        print('Ignoring unknown option "${entry.key}" of set ${config.id}');
+        continue;
+      }
+      (perOptionSet[index] ??= {})[entry.key] = entry.value;
+    }
+    for (final entry in perOptionSet.entries) {
+      if (!optionSets[entry.key].applyState(entry.value)) {
+        print(
+          'Ignoring stored state of option set '
+          '${optionSets[entry.key].config.id} of set ${config.id}: '
+          'it violates the option constraints',
+        );
+      }
+    }
+    applyOptions();
   }
 
   void applyOptions() {
@@ -199,9 +283,38 @@ class BenchmarkOptionSet {
     };
   }
 
+  /// True when the config allows exactly one option here, so the UI should
+  /// offer a single choice rather than independent checkboxes.
+  bool get isSingleChoice => config.maxSelected == 1;
+
   bool? getOption(String id) {
     return options[id]?.enabled;
   }
+
+  /// Applies [desired] to the whole set at once. Unknown ids are ignored, and
+  /// the change is rejected outright — leaving the set untouched — when the
+  /// result would violate min_selected/max_selected, so a restored state can
+  /// never be left half-applied.
+  bool applyState(Map<String, bool> desired) {
+    final next = {
+      for (final entry in options.entries) entry.key: entry.value.enabled,
+    };
+    for (final entry in desired.entries) {
+      if (!next.containsKey(entry.key)) continue;
+      next[entry.key] = entry.value;
+    }
+    final count = next.values.where((e) => e).length;
+    if (!_isValidCount(count)) return false;
+    for (final entry in next.entries) {
+      options[entry.key]!.enabled = entry.value;
+    }
+    selected = count;
+    return true;
+  }
+
+  bool _isValidCount(int count) =>
+      (config.maxSelected <= 0 || count <= config.maxSelected) &&
+      (config.minSelected <= 0 || count >= config.minSelected);
 
   bool setOptionTo(String id, bool value) {
     BenchmarkOption? opt = options[id];
@@ -212,21 +325,21 @@ class BenchmarkOptionSet {
 
   bool setOption(String id) {
     BenchmarkOption? opt = options[id];
-    if (opt == null ||
-        (config.maxSelected > 0 && selected == config.maxSelected)) {
-      return false;
-    }
+    if (opt == null) return false;
+    if (opt.enabled) return true;
+    if (!_isValidCount(selected + 1)) return false;
     opt.enabled = true;
+    selected++;
     return true;
   }
 
   bool unsetOption(String id) {
     BenchmarkOption? opt = options[id];
-    if (opt == null ||
-        (config.minSelected > 0 && selected == config.minSelected)) {
-      return false;
-    }
+    if (opt == null) return false;
+    if (!opt.enabled) return true;
+    if (!_isValidCount(selected - 1)) return false;
     opt.enabled = false;
+    selected--;
     return true;
   }
 
@@ -266,8 +379,10 @@ class BenchmarkStore {
 
   BenchmarkStore({
     required pb.MLPerfConfig appConfig,
-    required List<pb.BenchmarkSetting> backendConfig,
+    required List<BackendInfo> backends,
     required Map<String, bool> taskSelection,
+    required Map<String, Map<String, bool>> taskSetSelection,
+    Map<String, String> backendSelection = const {},
   }) {
     // sort the order of task based on BenchmarkId.allIds
     final List<pb.TaskConfig> sortedTasks = List.from(appConfig.task)
@@ -276,26 +391,57 @@ class BenchmarkStore {
             BenchmarkId.allIds.indexOf(a.id) - BenchmarkId.allIds.indexOf(b.id),
       );
     for (final task in sortedTasks) {
-      final backendSettings = backendConfig.singleWhereOrNull(
-        (setting) => setting.benchmarkId == task.id,
+      final candidates = <BenchmarkBackend>[];
+      for (final backend in backends) {
+        final setting = backend.settings.benchmarkSetting.singleWhereOrNull(
+          (s) => s.benchmarkId == task.id,
+        );
+        if (setting != null) {
+          candidates.add(BenchmarkBackend(info: backend, settings: setting));
+        }
+      }
+      // A vendor backend can restrict the fallback backend to benchmarks it
+      // does not support itself (FALLBACK_FILL_GAPS); FALLBACK_DISABLED is
+      // enforced device-wide in findMatchingBackends().
+      final vendors = candidates.where(
+        (c) => c.info.libName != BackendInfoHelper.fallbackBackend,
       );
-      if (backendSettings == null) {
+      final offerFallback =
+          vendors.isEmpty ||
+          vendors.every(
+            (c) =>
+                c.info.settings.fallbackPolicy ==
+                pb.FallbackPolicy.FALLBACK_COEXIST,
+          );
+      if (!offerFallback) {
+        candidates.removeWhere(
+          (c) => c.info.libName == BackendInfoHelper.fallbackBackend,
+        );
+      }
+      if (candidates.isEmpty) {
         print('No matching benchmark settings for task ${task.id}');
         continue;
       }
 
       final enabled = taskSelection[task.id] ?? true;
-      allBenchmarks.add(
-        Benchmark(
-          taskConfig: task,
-          benchmarkSettings: backendSettings,
-          isActive: enabled,
-        ),
+      final benchmark = Benchmark(
+        backends: candidates,
+        taskConfig: task,
+        isActive: enabled,
       );
+      final selectedLib = backendSelection[task.id];
+      if (selectedLib != null && !benchmark.selectBackend(selectedLib)) {
+        print('Ignoring unknown backend $selectedLib for task ${task.id}');
+      }
+      allBenchmarks.add(benchmark);
     }
     for (final setConfig in appConfig.taskSet) {
       benchmarkSets.add(
-        BenchmarkSet(config: setConfig, allBenchmarks: allBenchmarks),
+        BenchmarkSet(
+          config: setConfig,
+          allBenchmarks: allBenchmarks,
+          optionState: taskSetSelection[setConfig.id] ?? const {},
+        ),
       );
     }
   }
@@ -343,6 +489,14 @@ class BenchmarkStore {
     Map<String, bool> result = {};
     for (var item in allBenchmarks) {
       result[item.id] = item.isActive;
+    }
+    return result;
+  }
+
+  Map<String, Map<String, bool>> get setSelection {
+    Map<String, Map<String, bool>> result = {};
+    for (var item in benchmarkSets) {
+      result[item.config.id] = item.optionStateMap();
     }
     return result;
   }
