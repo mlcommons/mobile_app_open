@@ -1,4 +1,5 @@
 import CoreML
+import CryptoKit
 import Foundation
 
 struct MLFeature {
@@ -6,8 +7,12 @@ struct MLFeature {
   public var description: MLFeatureDescription?
 }
 
-struct MLError: Error {
+struct MLError: LocalizedError {
   let message: String
+
+  var errorDescription: String? {
+    return message
+  }
 }
 
 private class EmptyFeatureProvider: MLFeatureProvider {
@@ -161,6 +166,89 @@ private class MLCommonsComputationUnit {
   }
 }
 
+// Compiling a model takes seconds, so the compiled .mlmodelc is kept in the
+// Caches directory and reused while the source model is unchanged. Each source
+// path gets one entry; a fingerprint of the source files decides whether the
+// entry is still valid. The OS may purge Caches, which only costs a recompile.
+private enum CompiledModelCache {
+  private static let compiledName = "model.mlmodelc"
+  private static let fingerprintName = "source.fingerprint"
+
+  static func loadModel(at sourceURL: URL, configuration: MLModelConfiguration) throws
+    -> MLModel
+  {
+    if sourceURL.pathExtension == "mlmodelc" {
+      return try MLModel(contentsOf: sourceURL, configuration: configuration)
+    }
+
+    let fingerprint = try fingerprintOf(sourceURL)
+    let entryURL = try entryURLFor(sourceURL)
+    let compiledURL = entryURL.appendingPathComponent(compiledName)
+    let fingerprintURL = entryURL.appendingPathComponent(fingerprintName)
+
+    if (try? String(contentsOf: fingerprintURL, encoding: .utf8)) == fingerprint {
+      if let mlmodel = try? MLModel(contentsOf: compiledURL, configuration: configuration) {
+        return mlmodel
+      }
+      NSLog("Cached compiled model is unreadable, recompiling: \(sourceURL.path)")
+    }
+
+    let temporaryURL = try MLModel.compileModel(at: sourceURL)
+    do {
+      let fileManager = FileManager.default
+      if fileManager.fileExists(atPath: entryURL.path) {
+        try fileManager.removeItem(at: entryURL)
+      }
+      try fileManager.createDirectory(at: entryURL, withIntermediateDirectories: true)
+      try fileManager.moveItem(at: temporaryURL, to: compiledURL)
+      // Written last, so an interrupted update leaves an entry that is never used.
+      try fingerprint.write(to: fingerprintURL, atomically: true, encoding: .utf8)
+    } catch {
+      NSLog("Failed to cache compiled model: \(error.localizedDescription)")
+      let loadURL =
+        FileManager.default.fileExists(atPath: temporaryURL.path)
+        ? temporaryURL : compiledURL
+      return try MLModel(contentsOf: loadURL, configuration: configuration)
+    }
+    return try MLModel(contentsOf: compiledURL, configuration: configuration)
+  }
+
+  private static func entryURLFor(_ sourceURL: URL) throws -> URL {
+    let cachesURL = try FileManager.default.url(
+      for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+    let digest = SHA256.hash(data: Data(sourceURL.standardizedFileURL.path.utf8))
+    let key = digest.map { String(format: "%02x", $0) }.joined()
+    return cachesURL.appendingPathComponent("mlperf_coreml_models", isDirectory: true)
+      .appendingPathComponent(key, isDirectory: true)
+  }
+
+  // The source path plus the path, size and modification time of every file in
+  // the model (an .mlpackage is a directory).
+  private static func fingerprintOf(_ sourceURL: URL) throws -> String {
+    let keys: [URLResourceKey] = [.isRegularFileKey, .fileSizeKey, .contentModificationDateKey]
+    var fileURLs = [sourceURL]
+    if (try sourceURL.resourceValues(forKeys: [.isDirectoryKey])).isDirectory == true {
+      guard
+        let enumerator = FileManager.default.enumerator(
+          at: sourceURL, includingPropertiesForKeys: keys)
+      else {
+        throw MLError(message: "Cannot list model files in \(sourceURL.path)")
+      }
+      fileURLs = enumerator.compactMap { $0 as? URL }
+    }
+
+    var lines = [sourceURL.standardizedFileURL.path]
+    for fileURL in fileURLs {
+      let values = try fileURL.resourceValues(forKeys: Set(keys))
+      guard values.isRegularFile == true else { continue }
+      let size = values.fileSize ?? -1
+      let modified = values.contentModificationDate?.timeIntervalSince1970 ?? -1
+      lines.append("\(fileURL.path) \(size) \(modified)")
+    }
+    return lines.sorted().joined(separator: "\n")
+  }
+}
+
 @objc
 public class CoreMLExecutor: NSObject {
   private var modelURL: URL?
@@ -189,13 +277,11 @@ public class CoreMLExecutor: NSObject {
       config.computeUnits = accelerator.computeUnits
     }
 
-    guard let modelPathString = String(validatingUTF8: modelPath),
-      let url = URL(string: modelPathString),
-      let compiledModelURL = try? MLModel.compileModel(at: url),
-      let mlmodel = try? MLModel(contentsOf: compiledModelURL, configuration: config)
-    else {
-      throw MLError(message: "Failed to load Core ML model")
+    guard let modelPathString = String(validatingUTF8: modelPath) else {
+      throw MLError(message: "Model path is not valid UTF-8")
     }
+    let url = URL(fileURLWithPath: modelPathString)
+    let mlmodel = try CompiledModelCache.loadModel(at: url, configuration: config)
 
     let modelInputNames = mlmodel.modelDescription.inputDescriptionsByName.keys.sorted()
     let modelOutputNames = mlmodel.modelDescription.outputDescriptionsByName.keys.sorted()
