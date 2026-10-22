@@ -101,7 +101,6 @@ mlperf_backend_ptr_t mlperf_backend_create(
   }
 
   CoreMLBackendData *backend_data = new CoreMLBackendData();
-  backendExists = true;
   std::string dataFormat =
       mlperf::mobile::GetConfigValue(configs, "data-format", std::string(""));
   if (dataFormat == "NCHW") {
@@ -122,12 +121,14 @@ mlperf_backend_ptr_t mlperf_backend_create(
   if (!coreMLExecutor || error) {
     LOG(ERROR) << "Cannot create CoreMLExecutor: "
                << (error ? error.localizedDescription.UTF8String : "");
+    delete backend_data;
     return nullptr;
   }
   backend_data->coreMLExecutor = coreMLExecutor;
   backend_data->accelerator = [coreMLExecutor getAccelerator];
   LOG(INFO) << "Accelerator: " << backend_data->accelerator;
 
+  backendExists = true;
   return backend_data;
 }
 
