@@ -40,7 +40,10 @@ original_model = tf.saved_model.load(saved_model_dir)
 pruned_model = original_model.prune(input_node+':0', [bbox_output_node+':0', class_output_node+':0'])
 
 inputs=[ct.TensorType(name=input_node, shape=(1, input_height, input_width, 3))]
-ssd_model = ct.convert([pruned_model], source='tensorflow', inputs=inputs)
+ssd_model = ct.convert([pruned_model],
+                       source='tensorflow',
+                       convert_to='neuralnetwork',
+                       inputs=inputs)
 
 spec = ssd_model.get_spec()
 

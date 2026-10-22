@@ -38,7 +38,7 @@ apple_xcframework(
         "device": ["arm64"],
     },
     minimum_os_versions = {
-        "ios": "13.1",
+        "ios": "15.0",
         "macos": "13.1",
     },
     deps = [
