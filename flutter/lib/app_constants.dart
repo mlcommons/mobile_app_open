@@ -31,14 +31,33 @@ class BenchmarkId {
   static const imageClassificationV2 = 'image_classification_v2';
   static const imageClassificationOfflineV2 = 'image_classification_offline_v2';
   static const stableDiffusion = 'stable_diffusion';
-  static const llm = 'llm-1b';
-  static const llmInstruct = 'llm-1b-instruct';
+  static const llm1b = 'llm-1b';
+  static const llm1bInstruct = 'llm-1b-instruct';
+  static const llm3b = 'llm-3b';
+  static const llm3bInstruct = 'llm-3b-instruct';
+  static const llm8b = 'llm-8b';
+  static const llm8bInstruct = 'llm-8b-instruct';
   static const llmGemmaE2b = 'llm-gemma-e2b';
   static const llmGemmaE2bInstruct = 'llm-gemma-e2b-instruct';
   static const llmQwen08b = 'llm-qwen-0_8b';
   static const llmQwen08bInstruct = 'llm-qwen-0_8b-instruct';
 
-  // The sort order of this list will be used in the UI
+  static const llmIds = [
+    llm1b,
+    llm1bInstruct,
+    llm3b,
+    llm3bInstruct,
+    llm8b,
+    llm8bInstruct,
+    llmGemmaE2b,
+    llmGemmaE2bInstruct,
+    llmQwen08b,
+    llmQwen08bInstruct,
+  ];
+
+  // The sort order of this list will be used in the UI.
+  // Every task in tasks.pbtxt must appear here: BenchmarkStore sorts with
+  // indexOf, which returns -1 for anything missing and floats it to the top.
   static const allIds = [
     imageClassificationV2,
     objectDetection,
@@ -46,14 +65,24 @@ class BenchmarkId {
     naturalLanguageProcessing,
     superResolution,
     stableDiffusion,
-    llm,
-    llmInstruct,
+    llm1b,
+    llm1bInstruct,
+    llm3b,
+    llm3bInstruct,
+    llm8b,
+    llm8bInstruct,
     llmGemmaE2b,
     llmGemmaE2bInstruct,
     llmQwen08b,
     llmQwen08bInstruct,
     imageClassificationOfflineV2,
   ];
+}
+
+/// Ids of the `task_set` blocks in tasks.pbtxt.
+class BenchmarkSetId {
+  static const imageClassification = 'image_classification';
+  static const llm = 'llm';
 }
 
 class BackendId {

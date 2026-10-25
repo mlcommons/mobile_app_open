@@ -8,7 +8,7 @@ import 'package:mlperfbench/backend/list.dart';
 import 'package:mlperfbench/benchmark/benchmark.dart';
 import 'package:mlperfbench/protos/backend_setting.pb.dart' as pb;
 import 'package:mlperfbench/protos/mlperf_task.pb.dart' as task_pb;
-import 'package:mlperfbench/ui/home/benchmark_config_section.dart';
+import 'package:mlperfbench/ui/home/backend_choice.dart';
 
 Benchmark _makeBenchmark(List<(String, String)> backendsSpec) {
   // backendsSpec: list of (libName, framework)

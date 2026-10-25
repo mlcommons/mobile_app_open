@@ -40,6 +40,21 @@ class AppColors {
   static const progressCircle = _blue4;
   static const goCircle = _green;
   static const warningIcon = _yellow;
+
+  // Benchmark config / result cards.
+  static const cardBorder = Color(0xFFE2E8F0);
+  static const cardDivider = Color(0xFFF1F5F9);
+  static const cardFooter = Color(0xFFFAFBFC);
+  static const panelBackground = Color(0xFFF4F7FA);
+  static const panelDivider = Color(0xFFE6ECF1);
+  static const setIconBackground = Color(0xFFEAF4FB);
+  static const chipBorder = Color(0xFFC3CED9);
+  static const bodyText = Color(0xFF0F172A);
+  static const mutedText = Color(0xFF475569);
+  static const subtleText = Color(0xFF64748B);
+  static const warningText = Color(0xFF7A5800);
+  static const warningBackground = Color(0xFFFDF6E0);
+  static const warningBorder = Color(0xFFE8C95C);
 }
 
 class AppGradients {
