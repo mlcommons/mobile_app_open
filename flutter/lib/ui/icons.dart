@@ -96,12 +96,10 @@ class BenchmarkIcons {
     BenchmarkId.llm3b: AppIcons.llm,
     BenchmarkId.llm8b: AppIcons.llm,
     BenchmarkId.llmGemmaE2b: AppIcons.llm,
-    BenchmarkId.llmQwen08b: AppIcons.llm,
     BenchmarkId.llm1bInstruct: AppIcons.llmInstruct,
     BenchmarkId.llm3bInstruct: AppIcons.llmInstruct,
     BenchmarkId.llm8bInstruct: AppIcons.llmInstruct,
     BenchmarkId.llmGemmaE2bInstruct: AppIcons.llmInstruct,
-    BenchmarkId.llmQwen08bInstruct: AppIcons.llmInstruct,
   };
 
   static final lightSet = {
@@ -117,12 +115,10 @@ class BenchmarkIcons {
     BenchmarkId.llm3b: AppIcons.llmWhite,
     BenchmarkId.llm8b: AppIcons.llmWhite,
     BenchmarkId.llmGemmaE2b: AppIcons.llmWhite,
-    BenchmarkId.llmQwen08b: AppIcons.llmWhite,
     BenchmarkId.llm1bInstruct: AppIcons.llmInstructWhite,
     BenchmarkId.llm3bInstruct: AppIcons.llmInstructWhite,
     BenchmarkId.llm8bInstruct: AppIcons.llmInstructWhite,
     BenchmarkId.llmGemmaE2bInstruct: AppIcons.llmInstructWhite,
-    BenchmarkId.llmQwen08bInstruct: AppIcons.llmInstructWhite,
   };
 
   /// Icons for a whole task set, so a set does not have to borrow one from

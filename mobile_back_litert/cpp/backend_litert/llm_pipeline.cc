@@ -134,10 +134,6 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
     backend_data->pad_token_id = 0;
     backend_data->stop_token_ids = {1, 106};
   }
-  if (model_identity.find("qwen") != std::string::npos) {
-    backend_data->pad_token_id = 248044;
-    backend_data->stop_token_ids = {248044, 248046};
-  }
 
   bool use_gpu = configs->accelerator != nullptr &&
                  strcmp(configs->accelerator, "cpu") != 0;
@@ -235,8 +231,9 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
   }
   backend_data->prefill_input_bufs[backend_data->prefill_pos_idx]
       .Write<int32_t>(absl::MakeConstSpan(pos_data));
-  ResetKV(backend_data->kv_names, backend_data->kv_float_counts,
-          backend_data->prefill_input_map, backend_data->prefill_input_bufs);
+  ResetKV(backend_data->num_kv_layers, backend_data->kv_k_float_counts,
+          backend_data->kv_v_float_counts, backend_data->prefill_input_map,
+          backend_data->prefill_input_bufs);
   if (backend_data->has_mask_input) {
     WritePrefillMask(
         *backend_data->model, backend_data->current_prefill_sig_idx,
@@ -255,7 +252,7 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
   LITERT_LOG_MEM("llm: prefill Run done");
 
   // Move the prefill KV state into the decode buffers.
-  TransferKV(backend_data->kv_names, backend_data->prefill_output_map,
+  TransferKV(backend_data->num_kv_layers, backend_data->prefill_output_map,
              backend_data->decode_input_map, backend_data->prefill_output_bufs,
              backend_data->decode_input_bufs);
 
@@ -285,7 +282,7 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
         absl::MakeSpan(backend_data->decode_input_bufs),
         absl::MakeSpan(backend_data->decode_output_bufs)));
     next_token = backend_data->prompt_tokens[++next_position];
-    UpdateDecodeKV(backend_data->kv_names, backend_data->decode_input_map,
+    UpdateDecodeKV(backend_data->num_kv_layers, backend_data->decode_input_map,
                    backend_data->decode_output_map,
                    backend_data->decode_input_bufs,
                    backend_data->decode_output_bufs);
@@ -347,7 +344,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(
         backend_data->decode_sig_idx,
         absl::MakeSpan(backend_data->decode_input_bufs),
         absl::MakeSpan(backend_data->decode_output_bufs)));
-    UpdateDecodeKV(backend_data->kv_names, backend_data->decode_input_map,
+    UpdateDecodeKV(backend_data->num_kv_layers, backend_data->decode_input_map,
                    backend_data->decode_output_map,
                    backend_data->decode_input_bufs,
                    backend_data->decode_output_bufs);
@@ -399,8 +396,9 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
 
   backend_data->prompt_tokens = *(reinterpret_cast<std::vector<int>*>(data));
 
-  ResetKV(backend_data->kv_names, backend_data->kv_float_counts,
-          backend_data->decode_input_map, backend_data->decode_input_bufs);
+  ResetKV(backend_data->num_kv_layers, backend_data->kv_k_float_counts,
+          backend_data->kv_v_float_counts, backend_data->decode_input_map,
+          backend_data->decode_input_bufs);
   size_t effective_prefill_token_size = backend_data->prompt_tokens.size() - 1;
   // The prefill logits buffer is [1, bucket, vocab] fp32, so every step up in
   // bucket size doubles it -- for the 1B export that is 1.05 GiB at 2048 and
@@ -929,20 +927,13 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
   }
 
   data.num_kv_layers = 0;
-  data.kv_names.clear();
-  std::string kv_k_name;
   for (const auto& entry : data.decode_output_map) {
-    if (entry.first.rfind("kv_cache_", 0) != 0) continue;
-    data.kv_names.push_back(entry.first);
-    if (entry.first.rfind("kv_cache_k_", 0) == 0) {
-      ++data.num_kv_layers;
-      kv_k_name = entry.first;
-    }
+    if (entry.first.rfind("kv_cache_k_", 0) == 0) ++data.num_kv_layers;
   }
 
   if (data.num_kv_layers > 0) {
     auto kv_type =
-        data.model->GetInputTensorType(data.decode_sig_idx, kv_k_name);
+        data.model->GetInputTensorType(data.decode_sig_idx, "kv_cache_k_0");
     if (!kv_type) {
       LOG(ERROR) << "RankedTensorType failed";
       return false;
@@ -950,17 +941,23 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
     // [1, n_kv_heads, kv_len, head_dim]
     data.kv_cache_max_size = (*kv_type).Layout().Dimensions()[2];
 
-    data.kv_float_counts.resize(data.kv_names.size());
-    for (size_t i = 0; i < data.kv_names.size(); ++i) {
-      auto reqs = data.model->GetInputBufferRequirements(data.decode_sig_idx,
-                                                         data.kv_names[i]);
-      if (!reqs) {
-        LOG(ERROR) << "GetInputBufferRequirements (" << data.kv_names[i]
+    data.kv_k_float_counts.resize(data.num_kv_layers);
+    data.kv_v_float_counts.resize(data.num_kv_layers);
+    for (int i = 0; i < data.num_kv_layers; ++i) {
+      const std::string suffix = std::to_string(i);
+      auto k_reqs = data.model->GetInputBufferRequirements(
+          data.decode_sig_idx, "kv_cache_k_" + suffix);
+      auto v_reqs = data.model->GetInputBufferRequirements(
+          data.decode_sig_idx, "kv_cache_v_" + suffix);
+      if (!k_reqs || !v_reqs) {
+        LOG(ERROR) << "GetInputBufferRequirements (KV layer " << i
                    << ") failed";
         return false;
       }
-      auto size = reqs->BufferSize();
-      data.kv_float_counts[i] = static_cast<int>(*size / sizeof(float));
+      auto k_size = k_reqs->BufferSize();
+      auto v_size = v_reqs->BufferSize();
+      data.kv_k_float_counts[i] = static_cast<int>(*k_size / sizeof(float));
+      data.kv_v_float_counts[i] = static_cast<int>(*v_size / sizeof(float));
     }
   }
 
@@ -1097,43 +1094,53 @@ size_t LLMPipeline::GetSuitablePrefillSignature(
 }
 
 void LLMPipeline::TransferKV(
-    const std::vector<std::string>& kv_names,
+    int num_layers,
     const std::unordered_map<std::string, size_t>& prefill_output_map,
     const std::unordered_map<std::string, size_t>& decode_input_map,
     std::vector<litert::TensorBuffer>& prefill_output_bufs,
     std::vector<litert::TensorBuffer>& decode_input_bufs) {
-  for (const auto& name : kv_names) {
-    std::swap(prefill_output_bufs[prefill_output_map.at(name)],
-              decode_input_bufs[decode_input_map.at(name)]);
+  for (int i = 0; i < num_layers; ++i) {
+    for (const char* prefix : {"kv_cache_k_", "kv_cache_v_"}) {
+      std::string name = std::string(prefix) + std::to_string(i);
+      std::swap(prefill_output_bufs[prefill_output_map.at(name)],
+                decode_input_bufs[decode_input_map.at(name)]);
+    }
   }
 }
 
 void LLMPipeline::UpdateDecodeKV(
-    const std::vector<std::string>& kv_names,
+    int num_layers,
     const std::unordered_map<std::string, size_t>& decode_input_map,
     const std::unordered_map<std::string, size_t>& decode_output_map,
     std::vector<litert::TensorBuffer>& decode_input_bufs,
     std::vector<litert::TensorBuffer>& decode_output_bufs) {
-  for (const auto& name : kv_names) {
-    std::swap(decode_input_bufs[decode_input_map.at(name)],
-              decode_output_bufs[decode_output_map.at(name)]);
+  for (int i = 0; i < num_layers; ++i) {
+    for (const char* prefix : {"kv_cache_k_", "kv_cache_v_"}) {
+      std::string name = std::string(prefix) + std::to_string(i);
+      std::swap(decode_input_bufs[decode_input_map.at(name)],
+                decode_output_bufs[decode_output_map.at(name)]);
+    }
   }
 }
 
 void LLMPipeline::ResetKV(
-    const std::vector<std::string>& kv_names,
-    const std::vector<int>& float_counts,
+    int num_layers, const std::vector<int>& k_float_counts,
+    const std::vector<int>& v_float_counts,
     const std::unordered_map<std::string, size_t>& input_map,
     std::vector<litert::TensorBuffer>& input_bufs) {
-  if (kv_names.empty()) return;
+  if (num_layers == 0) return;
 
   int max_count = 0;
-  for (int count : float_counts) max_count = std::max(max_count, count);
+  for (int i = 0; i < num_layers; ++i)
+    max_count = std::max({max_count, k_float_counts[i], v_float_counts[i]});
   const std::vector<float> zeros(max_count, 0.0f);
 
-  for (size_t i = 0; i < kv_names.size(); ++i) {
-    input_bufs[input_map.at(kv_names[i])].Write<float>(
-        absl::MakeConstSpan(zeros.data(), float_counts[i]));
+  for (int i = 0; i < num_layers; ++i) {
+    const std::string suffix = std::to_string(i);
+    input_bufs[input_map.at("kv_cache_k_" + suffix)].Write<float>(
+        absl::MakeConstSpan(zeros.data(), k_float_counts[i]));
+    input_bufs[input_map.at("kv_cache_v_" + suffix)].Write<float>(
+        absl::MakeConstSpan(zeros.data(), v_float_counts[i]));
   }
 }
 
