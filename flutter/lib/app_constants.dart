@@ -39,6 +39,8 @@ class BenchmarkId {
   static const llm8bInstruct = 'llm-8b-instruct';
   static const llmGemmaE2b = 'llm-gemma-e2b';
   static const llmGemmaE2bInstruct = 'llm-gemma-e2b-instruct';
+  static const llmQwen08b = 'llm-qwen-0_8b';
+  static const llmQwen08bInstruct = 'llm-qwen-0_8b-instruct';
 
   static const llmIds = [
     llm1b,
@@ -49,6 +51,8 @@ class BenchmarkId {
     llm8bInstruct,
     llmGemmaE2b,
     llmGemmaE2bInstruct,
+    llmQwen08b,
+    llmQwen08bInstruct,
   ];
 
   // The sort order of this list will be used in the UI.
@@ -69,6 +73,8 @@ class BenchmarkId {
     llm8bInstruct,
     llmGemmaE2b,
     llmGemmaE2bInstruct,
+    llmQwen08b,
+    llmQwen08bInstruct,
     imageClassificationOfflineV2,
   ];
 }
