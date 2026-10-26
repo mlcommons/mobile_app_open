@@ -100,7 +100,12 @@ cc_library(
         "@litert//litert/cc:litert_model",
         "@litert//litert/cc:litert_options",
         "@litert//litert/cc:litert_tensor_buffer",
-    ],
+    ] + select({
+        "@org_tensorflow//tensorflow:android": [
+            "@litert//litert/runtime/accelerators/gpu:ml_drift_cl_accelerator",
+        ],
+        "//conditions:default": [],
+    }),
     alwayslink = 1,
 )
 
