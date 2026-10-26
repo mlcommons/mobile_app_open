@@ -135,8 +135,9 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
     backend_data->stop_token_ids = {1, 106};
   }
   if (model_identity.find("qwen") != std::string::npos) {
-    backend_data->pad_token_id = 248044;
+    backend_data->pad_token_id = 0;
     backend_data->stop_token_ids = {248044, 248046};
+    backend_data->gpu_fp32 = true;
   }
 
   bool use_gpu = configs->accelerator != nullptr &&
@@ -512,7 +513,9 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
   auto gpu_options = options->GetGpuOptions();
   if (gpu_options) {
     gpu_options->EnableInfiniteFloatCapping(true);
-    gpu_options->SetPrecision(litert::GpuOptions::Precision::kFp16);
+    gpu_options->SetPrecision(data.gpu_fp32
+                                  ? litert::GpuOptions::Precision::kFp32
+                                  : litert::GpuOptions::Precision::kFp16);
     gpu_options->SetBufferStorageType(
         litert::GpuOptions::BufferStorageType::kBuffer);
     gpu_options->SetPreferTextureWeights(false);

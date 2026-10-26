@@ -419,7 +419,20 @@ benchmark_setting {
       model_checksum: ""
     }
   }
-  delegate_selected: "CPU"
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "local:///qwen3_5/model_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "local:///qwen3_5/qwen3_5.spm.model"
+      model_checksum: ""
+    }
+  }
+  delegate_selected: "GPU"
   custom_setting {
     id: "pipeline"
     value: "LLMPipeline"
@@ -450,7 +463,20 @@ benchmark_setting {
       model_checksum: ""
     }
   }
-  delegate_selected: "CPU"
+  delegate_choice: {
+    delegate_name: "GPU"
+    accelerator_name: "gpu"
+    accelerator_desc: "GPU"
+    model_file: {
+      model_path: "local:///qwen3_5/model_quantized.tflite"
+      model_checksum: ""
+    }
+    model_file: {
+      model_path: "local:///qwen3_5/qwen3_5.spm.model"
+      model_checksum: ""
+    }
+  }
+  delegate_selected: "GPU"
   custom_setting {
     id: "pipeline"
     value: "LLMPipeline"

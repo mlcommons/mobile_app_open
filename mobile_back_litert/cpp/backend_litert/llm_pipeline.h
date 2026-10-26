@@ -121,6 +121,7 @@ struct LLMBackendData {
   int max_output_tokens = 128;
   int pad_token_id = 128009;
   std::unordered_set<int> stop_token_ids{128001, 128008, 128009};
+  bool gpu_fp32 = false;
 
   LLMBackendData() {}
 
