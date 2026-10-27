@@ -11,8 +11,11 @@ namespace mlperf {
 namespace mobile {
 
 IFEval::IFEval(Backend* backend, const std::string& input_tfrecord,
-               const std::string& sp_path, const std::string& output_dir)
-    : sample_reader_(input_tfrecord), Dataset(backend) {
+               const std::string& sp_path, const std::string& output_dir,
+               const std::string& prompt_format)
+    : sample_reader_(input_tfrecord),
+      prompt_format_(prompt_format),
+      Dataset(backend) {
   sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(
       LoadSentencePieceProcessor(sp_path));
 
@@ -37,7 +40,7 @@ IFEval::IFEval(Backend* backend, const std::string& input_tfrecord,
         tensorflow::GetFeatureValues<std::string>("prompt", example).Get(0);
     auto instructions = BuildInstructions(example);
 
-    std::string input_formatted = FormatLlamaUserPrompt(prompt);
+    std::string input_formatted = FormatUserPrompt(prompt_format_, prompt);
     std::vector<int> input_tokens;
     sp_processor->Encode(input_formatted.c_str(), &input_tokens).ok();
 

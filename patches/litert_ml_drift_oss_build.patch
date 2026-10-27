@@ -1,0 +1,41 @@
+diff --git a/ml_drift_delegate/tflite/convert/BUILD b/ml_drift_delegate/tflite/convert/BUILD
+--- a/ml_drift_delegate/tflite/convert/BUILD
++++ b/ml_drift_delegate/tflite/convert/BUILD
+@@ -543,7 +543,7 @@
+         "//tflite/core/c:private_common",
+         "//tflite/kernels:kernel_util",
+         "@com_google_absl//absl/container:flat_hash_map",
+-        "@flatbuffers//include/flatbuffers:flexbuffers",
++        "@flatbuffers",
+         "@ml_drift//ml_drift/common:ir_model",
+         "@ml_drift//ml_drift/common:operations",
+     ],
+diff --git a/ml_drift_delegate/tflite/support/support.cc b/ml_drift_delegate/tflite/support/support.cc
+--- a/ml_drift_delegate/tflite/support/support.cc
++++ b/ml_drift_delegate/tflite/support/support.cc
+@@ -449,12 +449,12 @@
+   for (int i = 0; i < node->inputs->size; ++i) {
+     const int tensor_id = node->inputs->data[i];
+     if (tensor_id == kTfLiteOptionalTensor) continue;
+-    if (quant_types.contains(context->tensors[tensor_id].type)) return true;
++    if (quant_types.count(context->tensors[tensor_id].type)) return true;
+   }
+   for (int i = 0; i < node->outputs->size; ++i) {
+     const int tensor_id = node->outputs->data[i];
+     if (tensor_id == kTfLiteOptionalTensor) continue;
+-    if (quant_types.contains(context->tensors[tensor_id].type)) return true;
++    if (quant_types.count(context->tensors[tensor_id].type)) return true;
+   }
+   if (registration->builtin_code == kTfLiteBuiltinQuantize) return true;
+   if (registration->builtin_code == kTfLiteBuiltinDequantize) return true;
+diff --git a/tflite/core/BUILD b/tflite/core/BUILD
+--- a/tflite/core/BUILD
++++ b/tflite/core/BUILD
+@@ -195,6 +195,7 @@
+     ],
+     compatible_with = get_compatible_with_portable(),
+     visibility = [
++        "//ml_drift_delegate:__subpackages__",
+         "//tflite:__subpackages__",
+         "@org_tensorflow//third_party/deepmind/lyria_live/internal/odml:__subpackages__",
+         "@org_tensorflow//third_party/odml/litert:__subpackages__",

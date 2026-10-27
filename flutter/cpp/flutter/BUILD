@@ -1,5 +1,5 @@
 load("@build_bazel_rules_apple//apple:apple.bzl", "apple_xcframework")
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
+load("@litert//tflite:build_def.bzl", "tflite_jni_binary")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -56,8 +56,8 @@ apple_xcframework(
         "device": ["arm64"],
     },
     minimum_os_versions = {
-        "ios": "13.1",
-        "macos": "13.1",
+        "ios": "15.0",
+        "macos": "15.0",
     },
     deps = [
         "//flutter/cpp/flutter:bridge",

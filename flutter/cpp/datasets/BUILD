@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_copts")
+load("@litert//tflite:build_def.bzl", "tflite_copts")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -65,10 +65,10 @@ cc_library(
         "//flutter/cpp:mlperf_driver",
         "//flutter/cpp:utils",
         "//flutter/cpp/backends:external",
-        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:image_preprocessing_stage",
+        "@litert//tflite/kernels:kernel_util",
+        "@litert//tflite/tools/evaluation:utils",
+        "@litert//tflite/tools/evaluation/proto:evaluation_stages_cc_proto",
+        "@litert//tflite/tools/evaluation/stages:image_preprocessing_stage",
     ],
 )
 
@@ -97,10 +97,10 @@ cc_library(
         "//flutter/cpp/backends:external",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_protobuf//:protobuf",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:image_preprocessing_stage",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:object_detection_average_precision_stage",
+        "@litert//tflite/tools/evaluation:utils",
+        "@litert//tflite/tools/evaluation/proto:evaluation_stages_cc_proto",
+        "@litert//tflite/tools/evaluation/stages:image_preprocessing_stage",
+        "@litert//tflite/tools/evaluation/stages:object_detection_average_precision_stage",
     ],
 )
 
@@ -121,6 +121,9 @@ cc_library(
         "//flutter/cpp:mlperf_driver",
         "//flutter/cpp:utils",
         "//flutter/cpp/datasets/squad_utils",
+        # tsl/platform/protobuf.h includes full-protobuf util headers at this
+        # TF revision, so TF-header consumers need them on the include path.
+        "@com_google_protobuf//:protobuf",
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@org_tensorflow//tensorflow/core:portable_tensorflow_lib_lite",
@@ -145,10 +148,10 @@ cc_library(
         "//flutter/cpp:mlperf_driver",
         "//flutter/cpp:utils",
         "//flutter/cpp/backends:external",
-        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:image_preprocessing_stage",
+        "@litert//tflite/kernels:kernel_util",
+        "@litert//tflite/tools/evaluation:utils",
+        "@litert//tflite/tools/evaluation/proto:evaluation_stages_cc_proto",
+        "@litert//tflite/tools/evaluation/stages:image_preprocessing_stage",
     ],
 )
 
@@ -164,10 +167,10 @@ cc_library(
         "//flutter/cpp:mlperf_driver",
         "//flutter/cpp:utils",
         "//flutter/cpp/backends:external",
-        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:image_preprocessing_stage",
+        "@litert//tflite/kernels:kernel_util",
+        "@litert//tflite/tools/evaluation:utils",
+        "@litert//tflite/tools/evaluation/proto:evaluation_stages_cc_proto",
+        "@litert//tflite/tools/evaluation/stages:image_preprocessing_stage",
     ],
 )
 
@@ -198,10 +201,10 @@ cc_library(
         "//flutter/cpp/datasets/squad_utils",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_protobuf//:protobuf",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:image_preprocessing_stage",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/stages:object_detection_average_precision_stage",
+        "@litert//tflite/tools/evaluation:utils",
+        "@litert//tflite/tools/evaluation/proto:evaluation_stages_cc_proto",
+        "@litert//tflite/tools/evaluation/stages:image_preprocessing_stage",
+        "@litert//tflite/tools/evaluation/stages:object_detection_average_precision_stage",
     ],
 )
 
@@ -233,8 +236,8 @@ cc_library(
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_protobuf//:protobuf",
         "@com_google_sentencepiece//:sentencepiece_processor",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
+        "@litert//tflite/tools/evaluation:utils",
+        "@litert//tflite/tools/evaluation/proto:evaluation_stages_cc_proto",
     ],
 )
 
@@ -267,7 +270,7 @@ cc_library(
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_protobuf//:protobuf",
         "@com_google_sentencepiece//:sentencepiece_processor",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation:utils",
-        "@org_tensorflow//tensorflow/lite/tools/evaluation/proto:evaluation_stages_cc_proto",
+        "@litert//tflite/tools/evaluation:utils",
+        "@litert//tflite/tools/evaluation/proto:evaluation_stages_cc_proto",
     ],
 )

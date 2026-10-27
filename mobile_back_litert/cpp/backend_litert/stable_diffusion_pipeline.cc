@@ -1,0 +1,769 @@
+/* Copyright 2024 The MLPerf Authors. All Rights Reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
+#include "stable_diffusion_pipeline.h"
+
+#include <algorithm>
+#include <cerrno>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
+
+#include "absl/log/log.h"
+#include "embedding_utils.h"
+#include "litert/cc/litert_options.h"
+#include "litert/cc/options/litert_gpu_options.h"
+#include "litert_env.h"
+#include "stable_diffusion_invoker.h"
+
+namespace {
+
+// All three Stable Diffusion models export exactly one signature.
+constexpr size_t kSignatureIndex = 0;
+
+// CLIP prompt length, and the size of the decoded RGB image.
+constexpr int kTokenCount = 77;
+constexpr int kImageElements = 512 * 512 * 3;
+
+// Start-of-text / end-of-text ids of the CLIP BPE vocabulary. The
+// unconditional prompt is a start token followed by padding.
+constexpr int32_t kStartOfTextToken = 49406;
+constexpr int32_t kEndOfTextToken = 49407;
+
+// Every tensor this pipeline binds is int32 or float32, and none is
+// quantized at the graph boundary (all quantization parameters are (0, 0)),
+// so element size is uniform.
+constexpr size_t kElementBytes = 4;
+
+// A tensor bound by name, with the concrete shape it is resized to. Only the
+// batch dimension is dynamic in the exported models.
+struct TensorSpec {
+  const char *name;
+  std::vector<int> dims;
+};
+
+// The delegate names the settings may select. The Apple settings name the GPU
+// choice after the accelerator that serves it, the same way the vision
+// benchmarks and the TFLite backend's iOS settings do.
+constexpr char kDelegateCpu[] = "CPU";
+constexpr char kDelegateGpu[] = "GPU";
+#if defined(__APPLE__)
+constexpr char kDelegateMetal[] = "Metal";
+#endif
+
+// Free a compiled model and everything allocated from it. The buffers were
+// created from the compiled model, so they have to go first -- the same
+// ordering constraint the SDModel declaration order encodes.
+//
+// Called on every platform: by the GPU->CPU fallback when a compile fails
+// partway through, and on Apple by the phase swap as well.
+void ReleaseModel(SDModel *model) {
+  model->output_bufs.clear();
+  model->input_bufs.clear();
+  model->compiled.reset();
+}
+
+#if defined(__APPLE__)
+// The filename of a model path. When a compile is killed by EXC_RESOURCE the
+// process dies without unwinding, so the last line that reached the log is the
+// only evidence of which of the three models was being built; a shared label
+// would leave that unanswered.
+std::string ModelLabel(const std::string &path) {
+  const size_t slash = path.rfind('/');
+  return slash == std::string::npos ? path : path.substr(slash + 1);
+}
+#endif
+
+bool backendExists = false;
+
+// The //flutter/cpp:utils config readers are deliberately not linked into
+// this backend (they drag in a second copy of the TF Lite C API), so the two
+// cases this pipeline needs are inlined here.
+int GetConfigInt(mlperf_backend_configuration_t *configs, const char *key,
+                 int default_value) {
+  for (int i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], key) != 0) continue;
+    const char *value_str = configs->values[i];
+    char *endptr = nullptr;
+    errno = 0;
+    long value = strtol(value_str, &endptr, 10);
+    if (errno == ERANGE || value < INT_MIN || value > INT_MAX ||
+        endptr == value_str || *endptr != '\0') {
+      LOG(ERROR) << "Invalid int value for " << key << ": " << value_str;
+      return default_value;
+    }
+    return static_cast<int>(value);
+  }
+  return default_value;
+}
+
+std::string GetConfigString(mlperf_backend_configuration_t *configs,
+                            const char *key, const std::string &default_value) {
+  for (int i = 0; i < configs->count; ++i) {
+    if (strcmp(configs->keys[i], key) == 0) {
+      return std::string(configs->values[i]);
+    }
+  }
+  return default_value;
+}
+
+size_t ElementCount(const std::vector<int> &dims) {
+  size_t count = 1;
+  for (int dim : dims) count *= static_cast<size_t>(dim);
+  return count;
+}
+
+std::unordered_map<std::string, size_t> MakeIndexMap(
+    const std::vector<litert::StringView> &names) {
+  std::unordered_map<std::string, size_t> map;
+  for (size_t i = 0; i < names.size(); ++i) map[std::string(names[i])] = i;
+  return map;
+}
+
+std::string JoinNames(const std::vector<litert::StringView> &names) {
+  std::string joined;
+  for (const auto &name : names) {
+    if (!joined.empty()) joined += ", ";
+    joined += std::string(name);
+  }
+  return joined;
+}
+
+// Binds one role to its signature index by exact tensor name. There is
+// deliberately no positional fallback: the signature keys are ordered
+// alphabetically and do not match the positional tensor order, so a wrong
+// binding would produce a silently wrong image instead of a crash.
+bool LookupTensor(const std::unordered_map<std::string, size_t> &index_map,
+                  const std::vector<litert::StringView> &names,
+                  const std::string &model_path, const char *tensor_name,
+                  size_t *index) {
+  auto it = index_map.find(tensor_name);
+  if (it == index_map.end()) {
+    LOG(ERROR) << "Model " << model_path << " has no tensor named '"
+               << tensor_name
+               << "'; its signature exposes: " << JoinNames(names);
+    return false;
+  }
+  *index = it->second;
+  return true;
+}
+
+// A buffer whose size does not match the shape this pipeline resized it to
+// means the model file is not the export this code was written for.
+bool CheckPackedSize(const litert::TensorBuffer &buffer, const TensorSpec &spec,
+                     const std::string &model_path) {
+  auto packed = buffer.PackedSize();
+  if (!packed) {
+    LOG(ERROR) << "PackedSize failed for '" << spec.name << "' of "
+               << model_path << ": " << packed.Error().Message();
+    return false;
+  }
+  const size_t expected = ElementCount(spec.dims) * kElementBytes;
+  if (*packed != expected) {
+    LOG(ERROR) << "Tensor '" << spec.name << "' of " << model_path << " holds "
+               << *packed << " bytes, expected " << expected;
+    return false;
+  }
+  return true;
+}
+
+// Compiles one model on the requested accelerator, binds every tensor by
+// name, pins the batch dimension and creates the buffers that all invocations
+// reuse. On success `*input_indices` holds the signature index of each spec
+// in `input_specs`, in the same order.
+//
+// `use_gpu` asks for the GPU with CPU kept alongside it, so ops the delegate
+// cannot take still run: the shipped exports are dynamic_int8 (text encoder,
+// diffusion) and dynamic_fp16 (decoder), aimed at XNNPACK, and there is no
+// fp32 export of them to switch to. Partial delegation is therefore the
+// normal outcome here, not a failure.
+bool BuildModel(litert::Environment &env, const std::string &model_path,
+                int num_threads, bool use_gpu,
+                const std::vector<TensorSpec> &input_specs,
+                const TensorSpec &output_spec, SDModel *model,
+                std::vector<size_t> *input_indices) {
+  auto options = litert::Options::Create();
+  if (!options) {
+    LOG(ERROR) << "Options::Create failed for " << model_path;
+    return false;
+  }
+  if (use_gpu) {
+    options->SetHardwareAccelerators(litert::HwAccelerators::kGpu |
+                                     litert::HwAccelerators::kCpu);
+    auto gpu_options = options->GetGpuOptions();
+    if (gpu_options) {
+      // Constant-tensor sharing is ON, and the models are built so it can be.
+      //
+      // The option decides whether the delegate materialises the weights or
+      // keeps them in their stored form and dequantises them in the shader.
+      // That is the difference between fitting on a phone and not: compiling
+      // the diffusion model on Metal costs 4409 MiB with sharing off and
+      // 1913 MiB with it on, against roughly 2885 MiB still available to this
+      // benchmark on an iPhone 16 Pro. iOS kills a process that crosses its
+      // per-process limit and the kill cannot be caught, so this is not a
+      // tuning knob here.
+      //
+      // Sharing used to be off because turning it on made the Metal backend
+      // emit a shader that does not compile:
+      //
+      //   newLibraryWithSource: program_source:29:35:
+      //     error: use of undeclared identifier 'scale'
+      //     half4 w_scale_s0 = half4(float4(scale));
+      //
+      // The backend carries two templates for dequantising int8 weights: one
+      // that reads a per-axis scale tensor, and one that takes a scalar. It
+      // picks the scalar form for per-tensor weights but never declares the
+      // arguments that form references. Single-op models place the fault
+      // precisely: per-tensor int8 FULLY_CONNECTED fails, while per-axis
+      // FULLY_CONNECTED, per-tensor CONV_2D, per-axis CONV_2D and fp16 CONV_2D
+      // all compile. tools/sd_gpu/convert.py therefore re-expresses those
+      // weights as per-axis, repeating the single scale they already carry, so
+      // the working template is chosen. The weights are untouched.
+      //
+      // The Metal accelerator is a prebuilt dylib, so the codegen itself
+      // cannot be patched from here; the model is the only side we control.
+      //
+      // AllowSrcQuantizedFcConvOps stays off. litert_gpu_options.h says
+      // sharing "must be true to use this", so it is now available -- but it
+      // is not needed (with statically shaped models the diffusion graph is
+      // fully delegated without it) and the header notes it quantizes the
+      // input tensors to 8 bit, which costs accuracy.
+      gpu_options->EnableConstantTensorSharing(true);
+      gpu_options->EnableAllowSrcQuantizedFcConvOps(false);
+      gpu_options->SetPrecision(litert::GpuOptions::Precision::kFp16);
+      gpu_options->SetBufferStorageType(
+          litert::GpuOptions::BufferStorageType::kBuffer);
+    } else {
+      LOG(WARNING) << "GetGpuOptions failed for " << model_path
+                   << "; compiling with default GPU options";
+    }
+  } else {
+    options->SetHardwareAccelerators(litert::HwAccelerators::kCpu);
+  }
+  if (num_threads > 0) {
+    auto cpu_options = options->GetCpuOptions();
+    if (cpu_options) {
+      cpu_options->SetNumThreads(num_threads);
+    } else {
+      LOG(WARNING) << "GetCpuOptions failed; using the default thread count";
+    }
+  }
+
+#if defined(__APPLE__)
+  LITERT_LOG_MEM(("sd: compiling " + ModelLabel(model_path)).c_str());
+#endif
+  auto compiled = litert::CompiledModel::Create(env, model_path, *options);
+#if defined(__APPLE__)
+  LITERT_LOG_MEM(("sd: compiled " + ModelLabel(model_path)).c_str());
+#endif
+  if (!compiled) {
+    LOG(ERROR) << "CompiledModel::Create failed for " << model_path << ": "
+               << compiled.Error().Message();
+    return false;
+  }
+  model->compiled =
+      std::make_unique<litert::CompiledModel>(std::move(*compiled));
+
+  auto input_names = model->compiled->GetSignatureInputNames(kSignatureIndex);
+  auto output_names = model->compiled->GetSignatureOutputNames(kSignatureIndex);
+  if (!input_names || !output_names) {
+    LOG(ERROR) << "Failed to read the signature tensor names of " << model_path;
+    return false;
+  }
+  const auto input_map = MakeIndexMap(*input_names);
+  const auto output_map = MakeIndexMap(*output_names);
+
+  input_indices->clear();
+  for (const auto &spec : input_specs) {
+    size_t index = 0;
+    if (!LookupTensor(input_map, *input_names, model_path, spec.name, &index)) {
+      return false;
+    }
+    input_indices->push_back(index);
+  }
+  if (!LookupTensor(output_map, *output_names, model_path, output_spec.name,
+                    &model->output_idx)) {
+    return false;
+  }
+
+  // Pin the shapes before the buffers are created: every input exports the
+  // batch dimension as dynamic (-1) and has no size until it is resized.
+  for (size_t i = 0; i < input_specs.size(); ++i) {
+    const std::vector<int> &dims = input_specs[i].dims;
+    auto resized = model->compiled->ResizeInputTensorNonStrict(
+        kSignatureIndex, (*input_indices)[i],
+        litert::Span<const int>(dims.data(), dims.size()));
+    if (!resized) {
+      LOG(ERROR) << "Failed to resize input '" << input_specs[i].name << "' of "
+                 << model_path << ": " << resized.Error().Message();
+      return false;
+    }
+  }
+
+  // Created once and reused by every invocation; the denoising loop must not
+  // reallocate them per step.
+  auto input_bufs = model->compiled->CreateInputBuffers(kSignatureIndex);
+  auto output_bufs = model->compiled->CreateOutputBuffers(kSignatureIndex);
+  if (!input_bufs || !output_bufs) {
+    LOG(ERROR) << "Failed to create the tensor buffers of " << model_path;
+    return false;
+  }
+  model->input_bufs = std::move(*input_bufs);
+  model->output_bufs = std::move(*output_bufs);
+#if defined(__APPLE__)
+  LITERT_LOG_MEM(("sd: buffers ready " + ModelLabel(model_path)).c_str());
+#endif
+
+  for (size_t i = 0; i < input_specs.size(); ++i) {
+    if (!CheckPackedSize(model->input_bufs[(*input_indices)[i]], input_specs[i],
+                         model_path)) {
+      return false;
+    }
+  }
+  return CheckPackedSize(model->output_bufs[model->output_idx], output_spec,
+                         model_path);
+}
+
+}  // namespace
+
+// Create a new backend and return the pointer to it.
+mlperf_backend_ptr_t StableDiffusionPipeline::backend_create(
+    const char *model_path, mlperf_backend_configuration_t *configs,
+    const char *native_lib_path) {
+  // model_path is a directory for this benchmark: it ships three models plus
+  // the timestep embedding table, and the filenames come from the settings.
+
+  // Verify only one instance of the backend exists at any time
+  if (backendExists) {
+    LOG(ERROR) << "Only one backend instance should exist at a time";
+    return nullptr;
+  }
+
+  auto *backend_data = new SDBackendData();
+  backendExists = true;
+
+  backend_data->seed = GetConfigInt(configs, "stable_diffusion_seed", 0);
+  if (backend_data->seed == 0) {
+    LOG(ERROR) << "Cannot get stable_diffusion_seed";
+    backend_delete(backend_data);
+    return nullptr;
+  }
+  backend_data->num_steps =
+      GetConfigInt(configs, "stable_diffusion_num_steps", 0);
+  if (backend_data->num_steps <= 0) {
+    LOG(ERROR) << "Cannot get stable_diffusion_num_steps";
+    backend_delete(backend_data);
+    return nullptr;
+  }
+  const int num_threads = GetConfigInt(configs, "num_threads", 4);
+
+  const std::string text_encoder_name =
+      GetConfigString(configs, "text_encoder_filename", "");
+  const std::string diffusion_model_name =
+      GetConfigString(configs, "diffusion_model_filename", "");
+  const std::string decoder_name =
+      GetConfigString(configs, "decoder_filename", "");
+  const std::string timestep_embeddings_name =
+      GetConfigString(configs, "timestep_embeddings_filename", "");
+  if (text_encoder_name.empty() || diffusion_model_name.empty() ||
+      decoder_name.empty() || timestep_embeddings_name.empty()) {
+    LOG(ERROR) << "Missing a Stable Diffusion filename in the settings";
+    backend_delete(backend_data);
+    return nullptr;
+  }
+
+  const std::string dir = std::string(model_path) + "/";
+  const std::string text_encoder_path = dir + text_encoder_name;
+  const std::string diffusion_model_path = dir + diffusion_model_name;
+  const std::string decoder_path = dir + decoder_name;
+  const std::string timestep_embeddings_path = dir + timestep_embeddings_name;
+
+  bool use_gpu = false;
+  if (configs->delegate_selected != nullptr) {
+    use_gpu = strcmp(configs->delegate_selected, kDelegateGpu) == 0;
+#if defined(__APPLE__)
+    use_gpu =
+        use_gpu || strcmp(configs->delegate_selected, kDelegateMetal) == 0;
+#endif
+    // Report an unrecognized selection before the platform downgrade below, so
+    // a valid choice we deliberately fall back from is not logged as unknown.
+    if (!use_gpu && strcmp(configs->delegate_selected, kDelegateCpu) != 0) {
+      LOG(ERROR) << "Unknown delegate_selected: " << configs->delegate_selected
+                 << "; using the CPU accelerator";
+    }
+  }
+#if defined(__APPLE__) && TARGET_OS_SIMULATOR
+  // Only the ios_arm64 (device) slice of the Metal accelerator is downloaded
+  // by litert_backend.mk, so there is nothing for the simulator to dlopen.
+  if (use_gpu) {
+    LOG(INFO) << "Simulator detected, using the CPU accelerator";
+    use_gpu = false;
+  }
+#endif
+
+#if defined(__APPLE__)
+  // This is the most memory-hungry pipeline in the backend and, in a CI sweep,
+  // it starts after five other benchmarks have each built and torn down a
+  // backend. Hand back whatever the allocator is still holding from those
+  // before compiling about 1 GiB of models on top of it.
+  litert_apple::ReturnFreeMemoryToOS();
+  LITERT_LOG_MEM("sd: before compiling models");
+#endif
+
+  // One environment shared by all three compiled models, as the LiteRT
+  // header recommends. Built through the shared factory so the Apple runtime
+  // library directory is set the same way as in the other pipelines -- on iOS
+  // that directory is the only way the Metal accelerator is found at all, so
+  // the GPU choice below depends on it.
+  auto env = CreateLiteRtEnvironment();
+  if (!env) {
+    LOG(ERROR) << "Environment::Create failed";
+    backend_delete(backend_data);
+    return nullptr;
+  }
+  backend_data->env = std::make_unique<litert::Environment>(std::move(*env));
+
+  // Signature input keys are alphabetical, so these lists are in role order,
+  // not tensor order: the text encoder's signature reads (positions,
+  // tokens), and the diffusion model's reads (context, latent,
+  // timestep_embedding).
+  const std::vector<TensorSpec> encoder_inputs = {
+      {"tokens", {1, kTokenCount}},
+      {"positions", {1, kTokenCount}},
+  };
+  const TensorSpec encoder_output = {"layer_normalization_72",
+                                     {1, kTokenCount, 768}};
+  const std::vector<TensorSpec> diffusion_inputs = {
+      {"latent", {1, 64, 64, 4}},
+      {"context", {1, kTokenCount, 768}},
+      {"timestep_embedding", {1, 1280}},
+  };
+  const TensorSpec diffusion_output = {"padded_conv2d_83", {1, 64, 64, 4}};
+  const std::vector<TensorSpec> decoder_inputs = {
+      {"input_1", {1, 64, 64, 4}},
+  };
+  const TensorSpec decoder_output = {"padded_conv2d_37", {1, 512, 512, 3}};
+
+  // All three models compile on the same accelerator or none of them do. A
+  // mixed pipeline would still produce images, but the benchmark reports a
+  // single accelerator name, and reporting one when two ran is worse than
+  // giving up the GPU.
+  auto build_all = [&](bool gpu) {
+    std::vector<size_t> indices;
+    if (!BuildModel(*backend_data->env, text_encoder_path, num_threads, gpu,
+                    encoder_inputs, encoder_output, &backend_data->text_encoder,
+                    &indices)) {
+      return false;
+    }
+    backend_data->encoder_tokens_idx = indices[0];
+    backend_data->encoder_positions_idx = indices[1];
+
+    if (!BuildModel(*backend_data->env, diffusion_model_path, num_threads, gpu,
+                    diffusion_inputs, diffusion_output,
+                    &backend_data->diffusion, &indices)) {
+      return false;
+    }
+    backend_data->diffusion_latent_idx = indices[0];
+    backend_data->diffusion_context_idx = indices[1];
+    backend_data->diffusion_timestep_idx = indices[2];
+
+    if (!BuildModel(*backend_data->env, decoder_path, num_threads, gpu,
+                    decoder_inputs, decoder_output, &backend_data->decoder,
+                    &indices)) {
+      return false;
+    }
+    backend_data->decoder_latent_idx = indices[0];
+    return true;
+  };
+
+  if (use_gpu && !build_all(true)) {
+    LOG(WARNING) << "GPU compilation failed; falling back to CPU";
+    // A failed attempt can leave models compiled behind it, and on iOS those
+    // pages still count against the limit the CPU retry has to fit inside.
+    ReleaseModel(&backend_data->text_encoder);
+    ReleaseModel(&backend_data->diffusion);
+    ReleaseModel(&backend_data->decoder);
+#if defined(__APPLE__)
+    litert_apple::ReturnFreeMemoryToOS();
+#endif
+    use_gpu = false;
+  }
+  if (!use_gpu && !build_all(false)) {
+    backend_delete(backend_data);
+    return nullptr;
+  }
+  backend_data->accelerator = use_gpu ? "GPU" : "CPU";
+
+  if (!EmbeddingManager::getInstance().load_timestep_embeddings(
+          timestep_embeddings_path)) {
+    LOG(ERROR) << "Failed to load timestep embeddings from "
+               << timestep_embeddings_path;
+    backend_delete(backend_data);
+    return nullptr;
+  }
+
+  // The unconditional prompt is constant: a start token, then padding.
+  backend_data->unconditional_tokens.assign(kTokenCount, kEndOfTextToken);
+  backend_data->unconditional_tokens[0] = kStartOfTextToken;
+  backend_data->input_prompt_tokens.assign(kTokenCount, 0);
+
+  LITERT_LOG_MEM("sd: all three models compiled");
+
+#if defined(__APPLE__)
+  // Keeping the stages apart only helps when releasing a model actually hands
+  // its memory back, and on the GPU it does not. ReleaseModel drops the LiteRT
+  // objects and ReturnFreeMemoryToOS empties libmalloc's free list, but the
+  // delegate's weights live in Metal buffers that libmalloc never owned, so
+  // nothing is returned. Measured on an iPhone 16 Pro, in MiB still available:
+  //
+  //   all three models compiled                    1517
+  //   query start, after releasing two of them     1586   (only 69 recovered)
+  //   diffusion model rebuilt                        72   -> killed
+  //
+  // Rebuilding therefore stacks a second copy on top of the first and the
+  // process crosses the limit. Compiled once and left alone the three cost
+  // 1368 MiB together and leave 1517 free, which is the whole working set with
+  // room to spare -- so on the GPU the phases are simply not used.
+  //
+  // The CPU path keeps them: there the weights are ordinary allocations, the
+  // release does return them, and the three models plus a phase's working set
+  // do not fit together.
+  if (!use_gpu) {
+    // See the comment on these members in the header. Each stage of a query
+    // needs exactly one of the three models, so only that one is kept compiled.
+    backend_data->set_phase = [backend_data, text_encoder_path,
+                               diffusion_model_path, decoder_path, num_threads,
+                               use_gpu, encoder_inputs, encoder_output,
+                               diffusion_inputs, diffusion_output,
+                               decoder_inputs, decoder_output](SDPhase phase) {
+      // Release first, then build, so two models are never resident
+      // at once. Destroying a model is not enough on its own: the pages
+      // stay on libmalloc's free list and keep counting against the limit
+      // until they are handed back, which is what makes the release
+      // visible to EXC_RESOURCE.
+      std::vector<size_t> idx;
+      if (phase == SDPhase::kEncode) {
+        ReleaseModel(&backend_data->diffusion);
+        ReleaseModel(&backend_data->decoder);
+        litert_apple::ReturnFreeMemoryToOS();
+        if (backend_data->text_encoder.compiled == nullptr) {
+          if (!BuildModel(*backend_data->env, text_encoder_path, num_threads,
+                          use_gpu, encoder_inputs, encoder_output,
+                          &backend_data->text_encoder, &idx)) {
+            return false;
+          }
+          backend_data->encoder_tokens_idx = idx[0];
+          backend_data->encoder_positions_idx = idx[1];
+        }
+        return true;
+      }
+
+      if (phase == SDPhase::kDiffuse) {
+        ReleaseModel(&backend_data->text_encoder);
+        ReleaseModel(&backend_data->decoder);
+        litert_apple::ReturnFreeMemoryToOS();
+        if (backend_data->diffusion.compiled == nullptr) {
+          if (!BuildModel(*backend_data->env, diffusion_model_path, num_threads,
+                          use_gpu, diffusion_inputs, diffusion_output,
+                          &backend_data->diffusion, &idx)) {
+            return false;
+          }
+          backend_data->diffusion_latent_idx = idx[0];
+          backend_data->diffusion_context_idx = idx[1];
+          backend_data->diffusion_timestep_idx = idx[2];
+        }
+        return true;
+      }
+
+      ReleaseModel(&backend_data->text_encoder);
+      ReleaseModel(&backend_data->diffusion);
+      litert_apple::ReturnFreeMemoryToOS();
+      if (backend_data->decoder.compiled == nullptr) {
+        if (!BuildModel(*backend_data->env, decoder_path, num_threads, use_gpu,
+                        decoder_inputs, decoder_output, &backend_data->decoder,
+                        &idx)) {
+          return false;
+        }
+        backend_data->decoder_latent_idx = idx[0];
+      }
+      return true;
+    };
+  }
+#endif
+
+  return backend_data;
+}
+
+// Vendor name who create this backend.
+const char *StableDiffusionPipeline::backend_vendor_name(
+    mlperf_backend_ptr_t backend_ptr) {
+  auto *backend_data = static_cast<SDBackendData *>(backend_ptr);
+  return backend_data->vendor;
+}
+
+// Return the name of the accelerator.
+const char *StableDiffusionPipeline::backend_accelerator_name(
+    mlperf_backend_ptr_t backend_ptr) {
+  auto *backend_data = static_cast<SDBackendData *>(backend_ptr);
+  return backend_data->accelerator;
+}
+
+// Return the name of this backend.
+const char *StableDiffusionPipeline::backend_name(
+    mlperf_backend_ptr_t backend_ptr) {
+  auto *backend_data = static_cast<SDBackendData *>(backend_ptr);
+  return backend_data->name;
+}
+
+// Destroy the backend pointer and its data.
+void StableDiffusionPipeline::backend_delete(mlperf_backend_ptr_t backend_ptr) {
+  // ~SDBackendData tears the LiteRT objects down in reverse declaration
+  // order, which gives buffers, then compiled models, then the shared
+  // environment. Safe on a partially built backend: every member is RAII.
+  delete static_cast<SDBackendData *>(backend_ptr);
+  backendExists = false;
+  LITERT_LOG_MEM("sd: backend deleted (before reclaim)");
+#if defined(__APPLE__)
+  // The next benchmark allocates into whatever this leaves behind, and this
+  // pipeline is the largest consumer in the backend. Destroying the models
+  // only returns the pages to the allocator's free list, where they still
+  // count against the limit, so hand them back to the OS here too.
+  litert_apple::ReturnFreeMemoryToOS();
+  LITERT_LOG_MEM("sd: backend deleted (after reclaim)");
+#endif
+}
+
+// Run the inference for a sample.
+mlperf_status_t StableDiffusionPipeline::backend_issue_query(
+    mlperf_backend_ptr_t backend_ptr, ft_callback callback, void *context) {
+  auto *backend_data = static_cast<SDBackendData *>(backend_ptr);
+  StableDiffusionInvoker invoker(backend_data);
+  if (!invoker.invoke(&backend_data->output)) {
+    LOG(ERROR) << "Stable Diffusion inference failed";
+    return MLPERF_FAILURE;
+  }
+  return MLPERF_SUCCESS;
+}
+
+// Flush the staged queries immediately.
+mlperf_status_t StableDiffusionPipeline::backend_flush_queries(
+    mlperf_backend_ptr_t backend_ptr) {
+  return MLPERF_SUCCESS;
+}
+
+// Return the number of inputs of the model.
+int32_t StableDiffusionPipeline::backend_get_input_count(
+    mlperf_backend_ptr_t backend_ptr) {
+  return 1;
+}
+
+// Return the type of the ith input: the text encoder's "tokens" tensor.
+mlperf_data_t StableDiffusionPipeline::backend_get_input_type(
+    mlperf_backend_ptr_t backend_ptr, int32_t i) {
+  mlperf_data_t result;
+  result.type = mlperf_data_t::Int32;
+  result.size = kTokenCount;
+  if (i != 0) {
+    LOG(ERROR) << "Unsupported input index: " << i;
+    result.size = 0;
+  }
+  return result;
+}
+
+// Set the data for ith input.
+mlperf_status_t StableDiffusionPipeline::backend_set_input(
+    mlperf_backend_ptr_t backend_ptr, int32_t batchIndex, int32_t i,
+    void *data) {
+  auto *backend_data = static_cast<SDBackendData *>(backend_ptr);
+  if (i != 0 || data == nullptr) {
+    LOG(ERROR) << "Unsupported input index: " << i;
+    return MLPERF_FAILURE;
+  }
+
+  // The dataset hands over a zero-terminated token array sized for the
+  // encoder input; stop at the terminator but never scan past the tensor.
+  const int *tokens = static_cast<const int *>(data);
+  int token_count = 0;
+  while (token_count < kTokenCount && tokens[token_count] != 0) ++token_count;
+
+  // Rewrite the whole tensor length so no tail from the previous sample
+  // survives into this run.
+  backend_data->input_prompt_tokens.assign(kTokenCount, 0);
+  std::copy(tokens, tokens + token_count,
+            backend_data->input_prompt_tokens.begin());
+  return MLPERF_SUCCESS;
+}
+
+// Return the number of outputs for the model.
+int32_t StableDiffusionPipeline::backend_get_output_count(
+    mlperf_backend_ptr_t backend_ptr) {
+  return 1;
+}
+
+// Return the type of ith output: the decoder's RGB image.
+mlperf_data_t StableDiffusionPipeline::backend_get_output_type(
+    mlperf_backend_ptr_t backend_ptr, int32_t i) {
+  mlperf_data_t result;
+  result.type = mlperf_data_t::Float32;
+  result.size = kImageElements;
+  if (i != 0) {
+    LOG(ERROR) << "Unsupported output index: " << i;
+    result.size = 0;
+  }
+  return result;
+}
+
+// Get the data from ith output.
+mlperf_status_t StableDiffusionPipeline::backend_get_output(
+    mlperf_backend_ptr_t backend_ptr, uint32_t batchIndex, int32_t i,
+    void **data) {
+  auto *backend_data = static_cast<SDBackendData *>(backend_ptr);
+  if (i != 0) {
+    LOG(ERROR) << "Unsupported output index: " << i;
+    return MLPERF_FAILURE;
+  }
+  if (backend_data->output.size() != static_cast<size_t>(kImageElements)) {
+    LOG(ERROR) << "Decoded image holds " << backend_data->output.size()
+               << " floats, expected " << kImageElements;
+    return MLPERF_FAILURE;
+  }
+  // Points into the member staging vector, so it stays valid after this
+  // call returns.
+  *data = backend_data->output.data();
+  return MLPERF_SUCCESS;
+}
+
+void StableDiffusionPipeline::backend_convert_inputs(
+    mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
+    uint8_t *data) {}
+
+void StableDiffusionPipeline::backend_convert_outputs(
+    mlperf_backend_ptr_t backend_ptr, int bytes, int width, int height,
+    uint8_t *data) {}
+
+void *StableDiffusionPipeline::backend_get_buffer(size_t n) {
+  return ::operator new(n);
+}
+
+void StableDiffusionPipeline::backend_release_buffer(void *p) {
+  ::operator delete(p);
+}

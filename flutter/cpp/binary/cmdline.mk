@@ -21,6 +21,7 @@ cmdline/macos/bins/release: cmdline/macos/bins/build cmdline/macos/bins/copy
 
 .PHONY: cmdline/android/libs/deps
 cmdline/android/libs/deps:
+	${backend_litert_lib_deps}
 	${backend_qti_libs_deps}
 
 .PHONY: cmdline/android/bins/build
@@ -29,6 +30,7 @@ cmdline/android/bins/build:
 		build ${BAZEL_CACHE_ARG} ${bazel_links_arg} ${sonar_bazel_build_args} \
 		--config=android_arm64 \
 		${backend_tflite_android_target} \
+		${backend_litert_android_target} \
 		${backend_mediatek_android_target} \
 		${backend_pixel_android_target} \
 		${backend_qti_android_target} \
@@ -44,6 +46,7 @@ cmdline/android/bins/copy:
 	@# macos doesn't support --target-directory flag
 	cp -f \
 		${backend_tflite_android_files} \
+		${backend_litert_android_files} \
 		${backend_mediatek_android_files} \
 		${backend_pixel_android_files} \
 		${backend_qti_cmdline_files} \

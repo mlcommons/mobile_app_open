@@ -1,11 +1,15 @@
 #include "flutter/cpp/utils.h"
 
+#include <algorithm>
+#include <cctype>
+#include <sstream>
+
 #if defined(_WIN64) || defined(_WIN32)
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else
-#include "tensorflow/lite/tools/evaluation/utils.h"
+#include <dirent.h>
 #endif
 
 namespace mlperf {
@@ -31,13 +35,31 @@ std::vector<std::string> GetSortedFileNames(
   return result;
 }
 #else
+// Same behavior as tflite::evaluation::GetSortedFileNames, implemented
+// locally so this library does not link a TF Lite runtime: backends that
+// depend on it bring their own, and two runtimes in one binary collide.
 std::vector<std::string> GetSortedFileNames(
     const std::string &directory,
     const std::unordered_set<std::string> &extensions) {
+  std::string dir = directory;
+  while (!dir.empty() && dir.back() == '/') dir.pop_back();
+  DIR *dir_handle = opendir(dir.c_str());
+  if (dir_handle == nullptr) return {};
   std::vector<std::string> result;
-  TfLiteStatus ret = tflite::evaluation::GetSortedFileNames(
-      tflite::evaluation::StripTrailingSlashes(directory), &result, extensions);
-  if (ret == kTfLiteError) return {};
+  while (struct dirent *entry = readdir(dir_handle)) {
+    std::string filename(entry->d_name);
+    if (filename == "." || filename == "..") continue;
+    if (!extensions.empty()) {
+      size_t dot = filename.find_last_of('.');
+      if (dot == std::string::npos) continue;
+      std::string ext = filename.substr(dot);
+      std::transform(ext.begin(), ext.end(), ext.begin(), tolower);
+      if (extensions.count(ext) == 0) continue;
+    }
+    result.emplace_back(dir + "/" + filename);
+  }
+  closedir(dir_handle);
+  std::sort(result.begin(), result.end());
   return result;
 }
 #endif

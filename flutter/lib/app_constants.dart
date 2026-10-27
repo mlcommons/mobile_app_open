@@ -37,6 +37,8 @@ class BenchmarkId {
   static const llm3bInstruct = 'llm-3b-instruct';
   static const llm8b = 'llm-8b';
   static const llm8bInstruct = 'llm-8b-instruct';
+  static const llmGemmaE2b = 'llm-gemma-e2b';
+  static const llmGemmaE2bInstruct = 'llm-gemma-e2b-instruct';
 
   static const llmIds = [
     llm1b,
@@ -45,6 +47,8 @@ class BenchmarkId {
     llm3bInstruct,
     llm8b,
     llm8bInstruct,
+    llmGemmaE2b,
+    llmGemmaE2bInstruct,
   ];
 
   // The sort order of this list will be used in the UI.
@@ -63,6 +67,8 @@ class BenchmarkId {
     llm3bInstruct,
     llm8b,
     llm8bInstruct,
+    llmGemmaE2b,
+    llmGemmaE2bInstruct,
     imageClassificationOfflineV2,
   ];
 }
@@ -80,8 +86,9 @@ class BackendId {
   static const samsung = 'libsamsungbackend';
   static const qti = 'libqtibackend';
   static const apple = 'libcoremlbackend';
+  static const litert = 'liblitertbackend';
 
-  static const allIds = [tflite, pixel, mediatek, samsung, qti, apple];
+  static const allIds = [tflite, pixel, mediatek, samsung, qti, apple, litert];
 }
 
 class Url {

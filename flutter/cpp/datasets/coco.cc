@@ -29,10 +29,10 @@ limitations under the License.
 #include "flutter/cpp/dataset.h"
 #include "flutter/cpp/utils.h"
 #include "src/google/protobuf/text_format.h"
-#include "tensorflow/lite/tools/evaluation/proto/evaluation_stages.pb.h"
-#include "tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.h"
-#include "tensorflow/lite/tools/evaluation/stages/object_detection_average_precision_stage.h"
-#include "tensorflow/lite/tools/evaluation/utils.h"
+#include "tflite/tools/evaluation/proto/evaluation_stages.pb.h"
+#include "tflite/tools/evaluation/stages/image_preprocessing_stage.h"
+#include "tflite/tools/evaluation/stages/object_detection_average_precision_stage.h"
+#include "tflite/tools/evaluation/utils.h"
 
 namespace mlperf {
 namespace mobile {
