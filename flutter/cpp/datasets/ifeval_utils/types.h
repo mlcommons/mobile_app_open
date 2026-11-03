@@ -229,12 +229,13 @@ class ConstrainedResponse : public Instruction {
   const std::string aMaybe = "My answer is maybe.";
   const unsigned sizeThreshold = 3;
   virtual bool verify_(const std::string& resp) const override {
+    const size_t n = utf8_len(resp);
     return (resp.find(aYes) != std::string::npos &&
-            resp.size() <= sizeThreshold + aYes.size()) ||
+            n <= sizeThreshold + aYes.size()) ||
            (resp.find(aNo) != std::string::npos &&
-            resp.size() <= sizeThreshold + aNo.size()) ||
+            n <= sizeThreshold + aNo.size()) ||
            (resp.find(aMaybe) != std::string::npos &&
-            resp.size() <= sizeThreshold + aMaybe.size());
+            n <= sizeThreshold + aMaybe.size());
   }
 };
 
