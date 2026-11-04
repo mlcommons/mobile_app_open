@@ -203,9 +203,10 @@ inline std::array<std::string, 8> transform_response(const std::string& resp) {
   std::array<std::string, 8> out{};
   for (int mask = 0; mask < 8; ++mask) {
     std::string t = resp;
-    if (mask & 0b001) t = remove_font_modifiers(t);
     if (mask & 0b010) t = remove_first_line(t);
     if (mask & 0b100) t = remove_last_line(t);
+    if (mask & 0b110) t = trim(t);  // python strips after removing a line
+    if (mask & 0b001) t = remove_font_modifiers(t);
     out[mask] = std::move(t);
   }
   return out;
