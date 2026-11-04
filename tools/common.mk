@@ -33,3 +33,22 @@ endif
 # Particularly, we have to overwrite it when building inside Windows container
 BAZEL_LINKS_PREFIX=bazel-
 bazel_links_arg=--symlink_prefix ${BAZEL_LINKS_PREFIX}
+
+# Xcode 15+'s clang reads <SDKROOT>/SDKSettings.json on every compile (even
+# for non-Apple targets, e.g. host tools like protoc built for Android
+# builds), regardless of flags. Bazel's host/exec cc toolchain only allowlists
+# that absolute path for the Command Line Tools SDK
+# (/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk), not for the
+# full-Xcode one, so any host-tool compile fails with "absolute path
+# inclusion(s) found" once Xcode.app is the active developer dir. Steering
+# the host toolchain at the Command Line Tools SDK sidesteps the mismatch;
+# it's only used for host-tool compilation, so it doesn't affect the actual
+# Apple target builds (ios.mk/apple_backend), which keep using Xcode.app.
+ifeq ($(shell uname -s),Darwin)
+ifneq ($(wildcard /Library/Developer/CommandLineTools/usr/bin/clang),)
+bazel_macos_host_sdk_args=\
+	--repo_env=DEVELOPER_DIR=/Library/Developer/CommandLineTools \
+	--action_env=DEVELOPER_DIR=/Library/Developer/CommandLineTools \
+	--host_action_env=DEVELOPER_DIR=/Library/Developer/CommandLineTools
+endif
+endif
