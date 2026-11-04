@@ -103,6 +103,7 @@ cc_library(
     ] + select({
         "@org_tensorflow//tensorflow:android": [
             "@litert//litert/runtime/accelerators/gpu:ml_drift_cl_accelerator",
+            "@litert//litert/vendors/google_tensor/dispatch:dispatch_api_static",
         ],
         "//conditions:default": [],
     }),

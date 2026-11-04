@@ -48,6 +48,7 @@ namespace {
 
 constexpr char kDelegateCpu[] = "CPU";
 constexpr char kDelegateGpu[] = "GPU";
+constexpr char kDelegateNpu[] = "NPU";
 #if defined(__APPLE__)
 // The Apple settings name the GPU choice after the accelerator that serves it,
 // the same way the TFLite backend's iOS settings do.
@@ -227,7 +228,7 @@ bool ReadTensorSizes(LiteRTBackendData *backend_data) {
 // on another accelerator.
 bool BuildShards(LiteRTBackendData *backend_data, const char *model_path,
                  const std::vector<std::vector<int>> &input_resizes,
-                 bool use_gpu, int num_threads) {
+                 const char *accelerator_name, int num_threads) {
   backend_data->shards.clear();
   for (int k = 0; k < backend_data->shards_num; ++k) {
     auto options = litert::Options::Create();
@@ -235,7 +236,10 @@ bool BuildShards(LiteRTBackendData *backend_data, const char *model_path,
       LOG(ERROR) << "Options::Create failed";
       return false;
     }
-    if (use_gpu) {
+    if (strcmp(accelerator_name, kDelegateNpu) == 0) {
+      options->SetHardwareAccelerators(litert::HwAccelerators::kNpu |
+                                       litert::HwAccelerators::kCpu);
+    } else if (strcmp(accelerator_name, kDelegateGpu) == 0) {
       // CPU stays in the set so ops the GPU cannot take fall back per-op
       // instead of failing compilation outright.
       options->SetHardwareAccelerators(litert::HwAccelerators::kGpu |
@@ -254,7 +258,7 @@ bool BuildShards(LiteRTBackendData *backend_data, const char *model_path,
     auto compiled = litert::CompiledModel::Create(
         *backend_data->env, std::string(model_path), *options);
     if (!compiled) {
-      LOG(ERROR) << "CompiledModel::Create (" << (use_gpu ? "GPU" : "CPU")
+      LOG(ERROR) << "CompiledModel::Create (" << accelerator_name
                  << ") failed: " << compiled.Error().Message();
       backend_data->shards.clear();
       return false;
@@ -408,20 +412,32 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
     return nullptr;
   }
 
-  bool use_gpu = strcmp(configs->delegate_selected, kDelegateGpu) == 0;
+  const char *delegate_selected = configs->delegate_selected;
+  if (const char *env_del = getenv("LITERT_DELEGATE")) {
+    delegate_selected = env_del;
+  }
+  for (int i = 0; i < configs->count; ++i) {
+    if (configs->keys[i] && strcmp(configs->keys[i], "delegate") == 0) {
+      delegate_selected = configs->values[i];
+    }
+  }
+
+  bool use_npu = strcmp(delegate_selected, kDelegateNpu) == 0;
+  bool use_gpu = strcmp(delegate_selected, kDelegateGpu) == 0;
 #if defined(__APPLE__)
-  use_gpu = use_gpu || strcmp(configs->delegate_selected, kDelegateMetal) == 0;
+  use_gpu = use_gpu || strcmp(delegate_selected, kDelegateMetal) == 0;
 #endif
   // Report an unrecognized selection before any platform downgrade below, so a
   // valid choice that we deliberately fall back from is not logged as unknown.
-  if (!use_gpu && strcmp(configs->delegate_selected, kDelegateCpu) != 0) {
-    LOG(ERROR) << "Unknown delegate_selected: " << configs->delegate_selected
+  if (!use_npu && !use_gpu && strcmp(delegate_selected, kDelegateCpu) != 0) {
+    LOG(ERROR) << "Unknown delegate_selected: " << delegate_selected
                << "; using the CPU accelerator";
   }
 #if __ANDROID__
-  if (use_gpu && IsEmulator()) {
+  if ((use_gpu || use_npu) && IsEmulator()) {
     LOG(INFO) << "Emulator detected, using the CPU accelerator";
     use_gpu = false;
+    use_npu = false;
   }
 #elif defined(__APPLE__) && TARGET_OS_SIMULATOR
   // Only the ios_arm64 (device) slice of the Metal accelerator is downloaded by
@@ -439,17 +455,30 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
     LOG(WARNING) << "shards_num=" << backend_data->shards_num
                  << " with the GPU accelerator may deadlock";
   }
-  if (use_gpu && !BuildShards(backend_data, model_path, input_resizes,
-                              /*use_gpu=*/true, num_threads)) {
-    LOG(WARNING) << "GPU compilation failed; falling back to CPU";
-    use_gpu = false;
+
+  const char *accelerator_name = kDelegateCpu;
+  if (use_npu) {
+    if (BuildShards(backend_data, model_path, input_resizes, kDelegateNpu,
+                    num_threads)) {
+      accelerator_name = kDelegateNpu;
+    } else {
+      LOG(WARNING) << "NPU compilation failed; falling back to CPU";
+    }
+  } else if (use_gpu) {
+    if (BuildShards(backend_data, model_path, input_resizes, kDelegateGpu,
+                    num_threads)) {
+      accelerator_name = kDelegateGpu;
+    } else {
+      LOG(WARNING) << "GPU compilation failed; falling back to CPU";
+    }
   }
-  if (!use_gpu && !BuildShards(backend_data, model_path, input_resizes,
-                               /*use_gpu=*/false, num_threads)) {
+  if (strcmp(accelerator_name, kDelegateCpu) == 0 &&
+      !BuildShards(backend_data, model_path, input_resizes, kDelegateCpu,
+                   num_threads)) {
     backend_delete(backend_data);
     return nullptr;
   }
-  backend_data->accelerator = use_gpu ? "GPU" : "CPU";
+  backend_data->accelerator = accelerator_name;
 
   return backend_data;
 }

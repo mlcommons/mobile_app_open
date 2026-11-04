@@ -74,6 +74,30 @@ inline litert::Expected<litert::Environment> CreateLiteRtEnvironment() {
     LOG(WARNING) << "Environment::Create with a runtime library dir failed; "
                  << "retrying without it";
   }
+#elif defined(__ANDROID__)
+  const char* compiler_plugin_dir = getenv("LITERT_COMPILER_PLUGIN_DIR");
+  if (!compiler_plugin_dir) {
+    compiler_plugin_dir = "/data/local/tmp";
+  }
+  const char* dispatch_lib_dir = getenv("LITERT_DISPATCH_LIB_DIR");
+  if (!dispatch_lib_dir) {
+    dispatch_lib_dir = "/vendor/lib64";
+  }
+  const char* cache_dir = getenv("LITERT_CACHE_DIR");
+  if (!cache_dir) {
+    cache_dir = "/data/local/tmp";
+  }
+  const std::vector<litert::EnvironmentOptions::Option> env_options = {
+      {litert::EnvironmentOptions::Tag::kCompilerPluginLibraryDir,
+       compiler_plugin_dir},
+      {litert::EnvironmentOptions::Tag::kDispatchLibraryDir,
+       dispatch_lib_dir},
+      {litert::EnvironmentOptions::Tag::kCompilerCacheDir,
+       cache_dir}};
+  auto env = litert::Environment::Create(litert::EnvironmentOptions(
+      litert::Span<const litert::EnvironmentOptions::Option>(
+          env_options.data(), env_options.size())));
+  if (env) return env;
 #endif
   return litert::Environment::Create({});
 }

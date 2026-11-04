@@ -13,4 +13,12 @@
            "//litert/c:litert_common",
            "//tflite/c:common",
        ],
+  --- a/litert/vendors/google_tensor/dispatch/BUILD
+  +++ b/litert/vendors/google_tensor/dispatch/BUILD
+  @@ -131,4 +131,3 @@
+       visibility = [
+  +        "//visibility:public",
+  -        "//litert:litert_public",
+  -        "//platforms/darwinn/tests/sdk_3p/litert_tools:__subpackages__",
+       ],
   )
