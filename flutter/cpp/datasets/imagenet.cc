@@ -158,11 +158,17 @@ float Imagenet::ComputeAccuracy() {
   while (gt_file >> label_idx) {
     groundtruth.push_back(label_idx);
   }
+  if (groundtruth.empty() || predictions_.empty()) {
+    return -1.0f;
+  }
 
   // Read the result in mlpef log file and calculate the accuracy.
   int good = 0;
   for (auto const &element : predictions_) {
-    if (groundtruth[element.first] == element.second) good++;
+    if (element.first < groundtruth.size() &&
+        groundtruth[element.first] == element.second) {
+      good++;
+    }
   }
   return static_cast<float>(good) / predictions_.size();
 }

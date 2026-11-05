@@ -48,6 +48,11 @@
     <!-- Mediatek -->
     <uses-native-library android:name="libmvpu_pattern_25_pub.mtk.so"
                          android:required="false"/>
+    <!-- Google Tensor / LiteRT -->
+    <uses-native-library android:name="libedgetpu_litert.so"
+                         android:required="false"/>
+    <uses-native-library android:name="libedgetpu_client.google.so"
+                         android:required="false"/>
 
     <activity android:name=".MainActivity"
               android:exported="true"

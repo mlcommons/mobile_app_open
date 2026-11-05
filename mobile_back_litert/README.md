@@ -18,10 +18,15 @@ single-model pipeline.
 * `llm_pipeline.cc` drives a `litert::CompiledModel` with explicit `TensorBuffer`s
   for the prefill and decode signatures.
 * `single_model_pipeline.cc` runs the vision/NLP benchmarks on
-  `litert::CompiledModel` with the GPU accelerator by default (fp32 model
-  exports, automatic CPU fallback); the CPU delegate choice runs the int8
-  exports on XNNPACK. NNAPI is not used: it is deprecated since Android 15,
-  and the CompiledModel NPU path needs vendor SDKs and AOT-compiled models.
+  `litert::CompiledModel`. On devices with Google Tensor (Pixel), the NPU
+  accelerator is supported via JIT compilation using the EdgeTPU compiler
+  plugin (`libLiteRtCompilerPlugin_google_tensor.so`) and static dispatch API
+  communicating with `/vendor/lib64/libedgetpu_litert.so`. Dynamic delegate
+  selection can be configured via `LITERT_DELEGATE=NPU|GPU|CPU` or custom
+  config `delegate:<name>`. Models compiled on-device are cached in the
+  designated compiler cache directory for instant subsequent warmups. In
+  addition, the OpenCL GPU accelerator is supported for fp32 model exports with
+  automatic CPU fallback, and the CPU delegate runs int8 exports on XNNPACK.
 * `llm-1b` and `llm-1b-instruct` default to the GPU delegate
   (`libLiteRtClGlAccelerator.so`, downloaded and bundled) with a dedicated
   GPU model export; GPU compilation failure falls back to CPU. The larger
@@ -418,3 +423,18 @@ the weights. That is what `EnableConstantTensorSharing` collapses.
 
 Models and tokenizers are downloaded from `mobile.mlcommons-storage.org`
 as defined in the settings file.
+
+## Google Tensor NPU on Android (Pixel)
+
+Full documentation on running vision and NLP benchmarks on the Google Tensor NPU (EdgeTPU) via LiteRT, including linker configuration, vendor allowlist security handling, cache seeding, and Ahead-of-Time (AOT) compilation, is available in:
+
+👉 **[`GOOGLE_TENSOR_NPU.md`](GOOGLE_TENSOR_NPU.md)**
+
+### Quick Reference
+- **CLI (`flutter/cpp/binary:main`)**: Runs under ADB `shell` (`UID 2000`), performing JIT compilation directly on the Tensor NPU.
+- **Flutter App (`org.mlcommons.android.mlperfbench`)**: Bypasses the vendor JIT allowlist by using pre-compiled AOT models or pre-seeded cache artifacts in `/data/user/0/.../cache`.
+- **Measured App Throughput**:
+  - Object Detection: **~87–92 QPS**
+  - Image Segmentation v2: **~87–93 QPS**
+  - Language Understanding (MobileBERT): **~118 QPS** (~8.5 ms)
+  - Super Resolution (EDSR): **~24–27 QPS** (~37 ms)

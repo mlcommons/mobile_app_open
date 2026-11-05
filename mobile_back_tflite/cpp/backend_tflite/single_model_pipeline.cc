@@ -273,11 +273,21 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
       }
     }
 
+    const char *delegate_selected = configs->delegate_selected;
+    if (const char *env_del = getenv("TFLITE_DELEGATE")) {
+      delegate_selected = env_del;
+    }
+    for (int i = 0; i < configs->count; ++i) {
+      if (configs->keys[i] && strcmp(configs->keys[i], "delegate") == 0) {
+        delegate_selected = configs->values[i];
+      }
+    }
+
 #if __ANDROID__
-    if (strcmp(configs->delegate_selected, kDelegateCpu) == 0) {
+    if (strcmp(delegate_selected, kDelegateCpu) == 0) {
       backend_data->accelerator = "CPU";
     } else if (!is_emulator() &&
-               (strcmp(configs->delegate_selected, kDelegateGpu) == 0)) {
+               (strcmp(delegate_selected, kDelegateGpu) == 0)) {
       backend_data->accelerator = "GPU";
       auto options = TfLiteGpuDelegateOptionsV2Default();
       options.inference_priority1 = TFLITE_GPU_INFERENCE_PRIORITY_MIN_LATENCY;
@@ -285,7 +295,7 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
 #if MTK_TFLITE_NEURON_BACKEND
       mtk_use_gpu = true;
 #endif
-    } else if (strcmp(configs->delegate_selected, kDelegateNnapi) == 0) {
+    } else if (strcmp(delegate_selected, kDelegateNnapi) == 0) {
       backend_data->accelerator = "NPU";
       auto options = tflite::StatefulNnApiDelegate::Options();
       options.allow_fp16 = true;

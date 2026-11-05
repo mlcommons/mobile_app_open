@@ -390,7 +390,7 @@ mlperf_backend_ptr_t SingleModelPipeline::backend_create(
   backend_data->executer =
       std::make_unique<Threadpool>(backend_data->shards_num);
 
-  auto env = CreateLiteRtEnvironment();
+  auto env = CreateLiteRtEnvironment(native_lib_path);
   if (!env) {
     LOG(ERROR) << "Environment::Create failed";
     backend_delete(backend_data);

@@ -156,6 +156,7 @@ http_archive(
         "//:flutter/third_party/tensorflow-fix-file-opening-mode-for-Windows.patch",
         "//:patches/litert_logistic_fp16_msvc.patch",
         "//:patches/litert-internal-visibility.diff",
+        "//:patches/litert-android-edgetpu-soname.diff",
         # Fix for LiteRT crashing on close when using OpenCL accelerator
         "//:patches/custom_buffer_teardown.patch",
         "//:patches/litert_ml_drift_oss_build.patch",

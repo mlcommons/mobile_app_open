@@ -160,3 +160,194 @@ adb shell LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/mlperf_main EXTERNAL l
 --lib_path=/data/local/tmp/libtflitebackend.so \
 --sp_path=/sdcard/Android/data/org.mlperf.inference/files/cache/cache/llama3_1b.spm.model 
 ```
+
+## Running LiteRT NPU and TFLite NPU on Google Tensor (Pixel)
+
+### Building the CLI and Backend Libraries
+
+Build the command-line binary `main` along with both `liblitertbackend.so` (bundled with the Google Tensor compiler plugin and dispatch `.so`) and `libtflitebackend.so`:
+
+```shell
+make WITH_LITERT=1 cmdline/android/bins/release
+```
+
+Push all generated binaries to the device:
+
+```shell
+adb push output/android-cli/* /data/local/tmp/
+adb shell "chmod 755 /data/local/tmp/main /data/local/tmp/*.so"
+```
+
+Define the resources path (where models and datasets reside from the app or download):
+
+```shell
+RESOURCES_DIR=/sdcard/Android/data/org.mlcommons.android.mlperfbench/files/loaded_resources
+```
+
+---
+
+### 1. Object Detection (`mobiledet_qat.tflite`)
+
+* **LiteRT NPU (JIT)**:
+```shell
+adb shell "mkdir -p /data/local/tmp/coco_litert_npu && \
+  LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/main EXTERNAL object_detection \
+  --mode=PerformanceOnly \
+  --output_dir=/data/local/tmp/coco_litert_npu \
+  --model_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet_qat.tflite \
+  --images_directory=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v0_7/coco \
+  --groundtruth_file=/data/local/tmp/dummy.pbtxt \
+  --image_width=320 --image_height=320 --offset=1 --num_classes=91 \
+  --lib_path=/data/local/tmp/liblitertbackend.so \
+  --native_lib_path=/data/local/tmp \
+  --min_query_count=64 --min_duration_ms=2500"
+```
+
+* **TFLite NPU (NNAPI)**:
+```shell
+adb shell "mkdir -p /data/local/tmp/coco_tflite_npu && \
+  LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/main EXTERNAL object_detection \
+  --mode=PerformanceOnly \
+  --output_dir=/data/local/tmp/coco_tflite_npu \
+  --model_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/models/v1_0/mobiledet_qat.tflite \
+  --images_directory=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v0_7/coco \
+  --groundtruth_file=/data/local/tmp/dummy.pbtxt \
+  --image_width=320 --image_height=320 --offset=1 --num_classes=91 \
+  --lib_path=/data/local/tmp/libtflitebackend.so \
+  --native_lib_path=/data/local/tmp \
+  --min_query_count=64 --min_duration_ms=2500"
+```
+
+---
+
+### 2. Natural Language Processing (`mobilebert_int8_384_nnapi.tflite`)
+
+* **LiteRT NPU (JIT)**:
+```shell
+adb shell "mkdir -p /data/local/tmp/nlp_litert_npu && \
+  LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/main EXTERNAL natural_language_processing \
+  --mode=PerformanceOnly \
+  --output_dir=/data/local/tmp/nlp_litert_npu \
+  --model_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_int8_384_nnapi.tflite \
+  --input_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_mini.tfrecord \
+  --groundtruth_file=/data/local/tmp/squad_groundtruth.tfrecord \
+  --lib_path=/data/local/tmp/liblitertbackend.so \
+  --native_lib_path=/data/local/tmp \
+  --min_query_count=64 --min_duration_ms=2500"
+```
+
+* **TFLite NPU (NNAPI)**:
+```shell
+adb shell "mkdir -p /data/local/tmp/nlp_tflite_npu && \
+  TFLITE_DELEGATE=NNAPI LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/main EXTERNAL natural_language_processing \
+  --mode=PerformanceOnly \
+  --output_dir=/data/local/tmp/nlp_tflite_npu \
+  --model_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/models/v0_7/mobilebert_int8_384_nnapi.tflite \
+  --input_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_mini.tfrecord \
+  --groundtruth_file=/data/local/tmp/squad_groundtruth.tfrecord \
+  --lib_path=/data/local/tmp/libtflitebackend.so \
+  --native_lib_path=/data/local/tmp \
+  --min_query_count=64 --min_duration_ms=2500"
+```
+
+---
+
+### 3. Image Segmentation v2 (`mobile_segmenter_r4_quant_argmax_uint8.tflite`)
+
+* **LiteRT NPU (JIT)**:
+```shell
+adb shell "mkdir -p /data/local/tmp/mosaic_litert_npu && \
+  LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/main EXTERNAL image_segmentation_v2 \
+  --mode=PerformanceOnly \
+  --output_dir=/data/local/tmp/mosaic_litert_npu \
+  --model_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_quant_argmax_uint8.tflite \
+  --images_directory=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v0_7/ade20k \
+  --ground_truth_directory=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v0_7/ade20k \
+  --num_class=31 --image_width=512 --image_height=512 \
+  --lib_path=/data/local/tmp/liblitertbackend.so \
+  --native_lib_path=/data/local/tmp \
+  --min_query_count=64 --min_duration_ms=2500"
+```
+
+* **TFLite NPU (NNAPI)**:
+```shell
+adb shell "mkdir -p /data/local/tmp/mosaic_tflite_npu && \
+  TFLITE_DELEGATE=NNAPI LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/main EXTERNAL image_segmentation_v2 \
+  --mode=PerformanceOnly \
+  --output_dir=/data/local/tmp/mosaic_tflite_npu \
+  --model_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/models/v2_0/mobile_segmenter_r4_quant_argmax_uint8.tflite \
+  --images_directory=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v0_7/ade20k \
+  --ground_truth_directory=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v0_7/ade20k \
+  --num_class=31 --image_width=512 --image_height=512 \
+  --lib_path=/data/local/tmp/libtflitebackend.so \
+  --native_lib_path=/data/local/tmp \
+  --min_query_count=64 --min_duration_ms=2500"
+```
+
+---
+
+### 4. Super Resolution (`edsr_f32b5_full_qint8.tflite`)
+
+*Note: Pass an empty ground truth directory (e.g., `/data/local/tmp/empty_gt`) in PerformanceOnly mode to bypass PSNR ground truth dimension checks.*
+
+* **LiteRT NPU (JIT)**:
+```shell
+adb shell "mkdir -p /data/local/tmp/empty_gt /data/local/tmp/edsr_litert_npu && \
+  LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/main EXTERNAL super_resolution \
+  --mode=PerformanceOnly \
+  --output_dir=/data/local/tmp/edsr_litert_npu \
+  --model_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_full_qint8.tflite \
+  --images_directory=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v3_1/snusr_lr_png \
+  --ground_truth_directory=/data/local/tmp/empty_gt \
+  --lib_path=/data/local/tmp/liblitertbackend.so \
+  --native_lib_path=/data/local/tmp \
+  --min_query_count=32 --min_duration_ms=2500"
+```
+
+* **TFLite NPU (NNAPI)**:
+```shell
+adb shell "mkdir -p /data/local/tmp/empty_gt /data/local/tmp/edsr_tflite_npu && \
+  TFLITE_DELEGATE=NNAPI LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/main EXTERNAL super_resolution \
+  --mode=PerformanceOnly \
+  --output_dir=/data/local/tmp/edsr_tflite_npu \
+  --model_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/models/v3_0/edsr_f32b5_full_qint8.tflite \
+  --images_directory=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v3_1/snusr_lr_png \
+  --ground_truth_directory=/data/local/tmp/empty_gt \
+  --lib_path=/data/local/tmp/libtflitebackend.so \
+  --native_lib_path=/data/local/tmp \
+  --min_query_count=32 --min_duration_ms=2500"
+```
+
+---
+
+### 5. Image Classification v2 (`MobileNetV4-Conv-Large-int8-ptq.tflite` / `fp32`)
+
+* **LiteRT GPU / CPU**:
+```shell
+adb shell "mkdir -p /data/local/tmp/imgcls_litert_gpu && \
+  LITERT_DELEGATE=GPU LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/main EXTERNAL image_classification_v2 \
+  --mode=PerformanceOnly \
+  --output_dir=/data/local/tmp/imgcls_litert_gpu \
+  --model_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-fp32.tflite \
+  --images_directory=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet \
+  --groundtruth_file=/data/local/tmp/dummy.pbtxt \
+  --image_width=384 --image_height=384 --offset=0 \
+  --lib_path=/data/local/tmp/liblitertbackend.so \
+  --native_lib_path=/data/local/tmp \
+  --min_query_count=64 --min_duration_ms=2500"
+```
+
+* **TFLite NPU (NNAPI)**:
+```shell
+adb shell "mkdir -p /data/local/tmp/imgcls_tflite_npu && \
+  TFLITE_DELEGATE=NNAPI LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/main EXTERNAL image_classification_v2 \
+  --mode=PerformanceOnly \
+  --output_dir=/data/local/tmp/imgcls_tflite_npu \
+  --model_file=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/models/v4_0/tflite/MobileNetV4-Conv-Large-int8-ptq.tflite \
+  --images_directory=${RESOURCES_DIR}/mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet \
+  --groundtruth_file=/data/local/tmp/dummy.pbtxt \
+  --image_width=384 --image_height=384 --offset=0 \
+  --lib_path=/data/local/tmp/libtflitebackend.so \
+  --native_lib_path=/data/local/tmp \
+  --min_query_count=64 --min_duration_ms=2500"
+```

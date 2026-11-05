@@ -39,8 +39,12 @@ backend_litert_ios_lib_deps= mkdir -p ${backend_litert_bins_dir} && \
 
 ifeq (${WITH_LITERT},1)
   $(info WITH_LITERT=1)
-  backend_litert_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_litert/cpp/backend_litert/liblitertbackend.so
-  backend_litert_android_target=//mobile_back_litert/cpp/backend_litert:liblitertbackend.so
+  backend_litert_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_litert/cpp/backend_litert/liblitertbackend.so \
+                               ${BAZEL_LINKS_PREFIX}bin/external/litert/litert/vendors/google_tensor/compiler/libLiteRtCompilerPlugin_google_tensor.so \
+                               ${BAZEL_LINKS_PREFIX}bin/external/litert/litert/vendors/google_tensor/dispatch/libLiteRtDispatch_GoogleTensor.so
+  backend_litert_android_target=//mobile_back_litert/cpp/backend_litert:liblitertbackend.so \
+                                @litert//litert/vendors/google_tensor/compiler:google_tensor_compiler_plugin_so \
+                                @litert//litert/vendors/google_tensor/dispatch:dispatch_api_so
   backend_litert_ios_target=//mobile_back_litert/cpp/backend_litert/ios:liblitertbackend
   backend_litert_ios_zip=${BAZEL_LINKS_PREFIX}bin/mobile_back_litert/cpp/backend_litert/ios/liblitertbackend.xcframework.zip
   backend_litert_filename=liblitertbackend

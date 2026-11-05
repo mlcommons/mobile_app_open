@@ -1,0 +1,41 @@
+diff --git a/litert/vendors/google_tensor/adapter_odc.cc b/litert/vendors/google_tensor/adapter_odc.cc
+index b84b1b0..496a548 100644
+--- a/litert/vendors/google_tensor/adapter_odc.cc
++++ b/litert/vendors/google_tensor/adapter_odc.cc
+@@ -42,7 +42,16 @@
+ namespace litert::google_tensor {
+ 
+ // EdgeTPU LiteRT shared library path.
++#if defined(__ANDROID__)
++// Use bare soname instead of absolute vendor path so that Android's linker
++// namespace resolves the library via public.libraries.txt. The absolute
++// path is blocked for untrusted_app contexts on Android 12+.
++constexpr const char* kLiteRtLibPath = "libedgetpu_litert.so";
++constexpr const char* kLiteRtFallbackLibPath = "/vendor/lib64/libedgetpu_litert.so";
++#else
+ constexpr const char* kLiteRtLibPath = "/vendor/lib64/libedgetpu_litert.so";
++constexpr const char* kLiteRtFallbackLibPath = "libedgetpu_litert.so";
++#endif
+ 
+ litert::Expected<Adapter::Ptr> Adapter::Create(
+     std::optional<std::string> shared_library_dir) {
+@@ -64,9 +73,16 @@ AdapterOdc::~AdapterOdc() {
+ litert::Expected<void> AdapterOdc::LoadSymbols() {
+   // Load the shared library.
+   // TODO(b/502581932): Removing NoDelete leads to seg faults in benchmarks.
+-  LITERT_ASSIGN_OR_RETURN(
+-      dlib_,
+-      SharedLibrary::Load(kLiteRtLibPath, RtldFlags::Default().NoDelete()));
++  auto dlib =
++      SharedLibrary::Load(kLiteRtLibPath, RtldFlags::Default().NoDelete());
++  if (!dlib && kLiteRtFallbackLibPath != nullptr) {
++    dlib = SharedLibrary::Load(kLiteRtFallbackLibPath,
++                               RtldFlags::Default().NoDelete());
++  }
++  if (!dlib) {
++    return dlib.Error();
++  }
++  dlib_ = std::move(*dlib);
+   // Binds all supported symbols from the shared library to the function
+   // pointers.
+   LOAD_SYMBOL(api_->create, EdgeTpuCompilerCreate);

@@ -1,24 +1,30 @@
-  --- a/litert/c/internal/BUILD
-  +++ b/litert/c/internal/BUILD
-  @@ cc_library(
-       name = "litert_delegate_wrapper",
-       srcs = ["litert_delegate_wrapper.cc"],
-       hdrs = ["litert_delegate_wrapper.h"],
-  -    visibility = [
-  -        "//litert/runtime:__pkg__",
-  -        "//litert/runtime/accelerators:__subpackages__",
-  -    ],
-  +    visibility = ["//visibility:public"],
-       deps = [
-           "//litert/c:litert_common",
-           "//tflite/c:common",
-       ],
-  --- a/litert/vendors/google_tensor/dispatch/BUILD
-  +++ b/litert/vendors/google_tensor/dispatch/BUILD
-  @@ -131,4 +131,3 @@
-       visibility = [
-  +        "//visibility:public",
-  -        "//litert:litert_public",
-  -        "//platforms/darwinn/tests/sdk_3p/litert_tools:__subpackages__",
-       ],
-  )
+diff --git a/litert/c/internal/BUILD b/litert/c/internal/BUILD
+index 2705a2b..601782f 100644
+--- a/litert/c/internal/BUILD
++++ b/litert/c/internal/BUILD
+@@ -451,10 +451,7 @@ cc_library(
+     name = "litert_delegate_wrapper",
+     srcs = ["litert_delegate_wrapper.cc"],
+     hdrs = ["litert_delegate_wrapper.h"],
+-    visibility = [
+-        "//litert/runtime:__pkg__",
+-        "//litert/runtime/accelerators:__subpackages__",
+-    ],
++    visibility = ["//visibility:public"],
+     deps = [
+         "//litert/c:litert_common",
+         "//tflite/c:common",
+diff --git a/litert/vendors/google_tensor/dispatch/BUILD b/litert/vendors/google_tensor/dispatch/BUILD
+index 9e55f64..11f86c7 100644
+--- a/litert/vendors/google_tensor/dispatch/BUILD
++++ b/litert/vendors/google_tensor/dispatch/BUILD
+@@ -129,8 +129,7 @@ litert_dispatch_api(
+         "nobuilder",
+     ],
+     visibility = [
+-        "//litert:litert_public",
+-        "//platforms/darwinn/tests/sdk_3p/litert_tools:__subpackages__",
++        "//visibility:public",
+     ],
+     deps = [
+         # copybara:uncomment "//litert/vendors/google_tensor/dispatch/google:litert_darwinn_runtime_options",

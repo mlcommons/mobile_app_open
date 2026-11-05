@@ -26,6 +26,9 @@ limitations under the License.
 
 #if defined(__APPLE__)
 #include "apple_support.h"
+#elif defined(__ANDROID__)
+#include <dlfcn.h>
+#include <unistd.h>
 #endif
 
 // Log the remaining process memory budget at a phase boundary. Only Apple
@@ -58,7 +61,8 @@ limitations under the License.
 // On Apple the GPU (Metal) accelerator is dlopened from the runtime library
 // directory, which has to be passed explicitly; see apple_support.h. Everywhere
 // else LiteRT uses its default library search, so no options are needed.
-inline litert::Expected<litert::Environment> CreateLiteRtEnvironment() {
+inline litert::Expected<litert::Environment> CreateLiteRtEnvironment(
+    const char* native_lib_path = nullptr) {
 #if defined(__APPLE__)
   const std::string runtime_library_dir = GetAppleRuntimeLibraryDir();
   if (!runtime_library_dir.empty()) {
@@ -75,25 +79,75 @@ inline litert::Expected<litert::Environment> CreateLiteRtEnvironment() {
                  << "retrying without it";
   }
 #elif defined(__ANDROID__)
-  const char* compiler_plugin_dir = getenv("LITERT_COMPILER_PLUGIN_DIR");
-  if (!compiler_plugin_dir) {
-    compiler_plugin_dir = "/data/local/tmp";
+  std::string plugin_dir;
+  if (const char* env_dir = getenv("LITERT_COMPILER_PLUGIN_DIR")) {
+    plugin_dir = env_dir;
+  } else if (native_lib_path && native_lib_path[0] != '\0' &&
+             access((std::string(native_lib_path) +
+                     "/libLiteRtCompilerPlugin_google_tensor.so")
+                        .c_str(),
+                    R_OK) == 0) {
+    plugin_dir = native_lib_path;
+  } else {
+    // Check if compiler plugin sits next to liblitertbackend.so via dladdr
+    Dl_info info;
+    if (dladdr((void*)&CreateLiteRtEnvironment, &info) && info.dli_fname) {
+      std::string dli_path(info.dli_fname);
+      auto slash = dli_path.rfind('/');
+      if (slash != std::string::npos) {
+        std::string dir = dli_path.substr(0, slash);
+        if (access((dir + "/libLiteRtCompilerPlugin_google_tensor.so").c_str(),
+                   R_OK) == 0) {
+          plugin_dir = dir;
+        }
+      }
+    }
+    if (plugin_dir.empty()) {
+      plugin_dir = "/data/local/tmp";
+    }
   }
-  const char* dispatch_lib_dir = getenv("LITERT_DISPATCH_LIB_DIR");
-  if (!dispatch_lib_dir) {
-    dispatch_lib_dir = "/vendor/lib64";
+
+  std::string dispatch_dir;
+  if (const char* env_dir = getenv("LITERT_DISPATCH_LIB_DIR")) {
+    dispatch_dir = env_dir;
+  } else if (native_lib_path && native_lib_path[0] != '\0' &&
+             access((std::string(native_lib_path) +
+                     "/libLiteRtDispatch_GoogleTensor.so")
+                        .c_str(),
+                    R_OK) == 0) {
+    dispatch_dir = native_lib_path;
+  } else if (!plugin_dir.empty() &&
+             access((plugin_dir + "/libLiteRtDispatch_GoogleTensor.so").c_str(),
+                    R_OK) == 0) {
+    dispatch_dir = plugin_dir;
+  } else {
+    dispatch_dir = "/vendor/lib64";
   }
-  const char* cache_dir = getenv("LITERT_CACHE_DIR");
-  if (!cache_dir) {
+
+  std::string cache_dir;
+  if (const char* env_cache = getenv("LITERT_CACHE_DIR")) {
+    cache_dir = env_cache;
+  } else if (access("/data/data/org.mlcommons.android.mlperfbench/cache",
+                    W_OK) == 0) {
+    cache_dir = "/data/data/org.mlcommons.android.mlperfbench/cache";
+  } else if (access("/data/user/0/org.mlcommons.android.mlperfbench/cache",
+                    W_OK) == 0) {
+    cache_dir = "/data/user/0/org.mlcommons.android.mlperfbench/cache";
+  } else {
     cache_dir = "/data/local/tmp";
   }
+
+  LOG(INFO) << "LiteRT env config: plugin_dir=" << plugin_dir
+            << ", dispatch_dir=" << dispatch_dir
+            << ", cache_dir=" << cache_dir;
+
   const std::vector<litert::EnvironmentOptions::Option> env_options = {
       {litert::EnvironmentOptions::Tag::kCompilerPluginLibraryDir,
-       compiler_plugin_dir},
+       plugin_dir.c_str()},
       {litert::EnvironmentOptions::Tag::kDispatchLibraryDir,
-       dispatch_lib_dir},
+       dispatch_dir.c_str()},
       {litert::EnvironmentOptions::Tag::kCompilerCacheDir,
-       cache_dir}};
+       cache_dir.c_str()}};
   auto env = litert::Environment::Create(litert::EnvironmentOptions(
       litert::Span<const litert::EnvironmentOptions::Option>(
           env_options.data(), env_options.size())));
