@@ -12,7 +12,7 @@ LiteRT delegates machine learning operations to the Google Tensor EdgeTPU via tw
 ┌─────────────────────────────────────────────────────────────────┐
 │                    LiteRT CompiledModel                         │
 └───────────────┬─────────────────────────────────┬───────────────┘
-                │ Graph Partitioning & JIT         │ Hardware Dispatch
+                │ Graph Partitioning & JIT        │ Hardware Dispatch
                 ▼                                 ▼
 ┌──────────────────────────────┐  ┌──────────────────────────────┐
 │    Tensor Compiler Plugin    │  │    Tensor Dispatch Library   │
