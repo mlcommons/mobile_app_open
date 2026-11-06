@@ -89,13 +89,38 @@ FLUTTER_ANDROID_APK_FOLDER?=output/android-apks
 
 FLUTTER_ANDROID_APK_RELEASE?=$(shell flutter/tool/generate-apk-filename.sh)
 flutter_android_apk_release_path=${FLUTTER_ANDROID_APK_FOLDER}/${FLUTTER_ANDROID_APK_RELEASE}
+# Dart symbols for Crashlytics. With FIREBASE_CRASHLYTICS_ENABLED=true the Dart
+# AOT code (libapp.so) is built with --split-debug-info and its symbols are
+# uploaded with the Firebase CLI, so native crashes in libapp.so and Dart stack
+# traces are symbolicated in the Crashlytics console. The Crashlytics Gradle
+# plugin uploads the symbols of the other native libraries; it does not handle
+# Dart symbols.
+# Each artifact gets its own folder (relative to flutter/), so the uploaded
+# symbols are always the ones of the build just made. Keep these folders to
+# symbolicate a stack trace offline with `flutter symbolize`.
+# The upload (flutter/tool/upload-dart-symbols.sh) needs the Firebase CLI
+# (FIREBASE_CLI, preinstalled in the Android Docker image) and
+# FIREBASE_ANDROID_APP_ID. It does not need a Firebase login.
+# Both variables are recursive so the gate is read when a recipe expands:
+# FIREBASE_CRASHLYTICS_ENABLED may come from FIREBASE_ENV_FILE, which
+# flutter.mk includes after this file.
+# Ref: https://firebase.google.com/docs/crashlytics/flutter/get-deobfuscated-reports
+FIREBASE_CLI?=firebase
+FLUTTER_ANDROID_SYMBOLS_FOLDER?=build/app/outputs/symbols
+flutter_android_split_debug_info_arg=$(if $(filter true,${FIREBASE_CRASHLYTICS_ENABLED}),\
+--split-debug-info=${FLUTTER_ANDROID_SYMBOLS_FOLDER}/$(1))
+flutter_android_upload_dart_symbols=$(if $(filter true,${FIREBASE_CRASHLYTICS_ENABLED}),\
+bash flutter/tool/upload-dart-symbols.sh flutter/${FLUTTER_ANDROID_SYMBOLS_FOLDER}/$(1))
+
 .PHONY: flutter/android/apk
 flutter/android/apk:
 	mkdir -p $$(dirname ${flutter_android_apk_release_path})
 	cd flutter && ${_start_args} flutter --no-version-check build apk \
 		${flutter_official_build_arg} \
 		${flutter_firebase_crashlytics_arg} \
+		$(call flutter_android_split_debug_info_arg,apk) \
 		${flutter_build_number_arg}
+	$(call flutter_android_upload_dart_symbols,apk)
 	cp -f flutter/build/app/outputs/flutter-apk/app-release.apk ${flutter_android_apk_release_path}.apk
 .PHONY: flutter/android/appbundle
 flutter/android/appbundle:
@@ -103,7 +128,9 @@ flutter/android/appbundle:
 	cd flutter && ${_start_args} flutter --no-version-check build appbundle \
 		${flutter_official_build_arg} \
 		${flutter_firebase_crashlytics_arg} \
+		$(call flutter_android_split_debug_info_arg,aab) \
 		${flutter_build_number_arg}
+	$(call flutter_android_upload_dart_symbols,aab)
 	cp -f flutter/build/app/outputs/bundle/release/app-release.aab ${flutter_android_apk_release_path}.aab
 
 # Flutter 3.44 strips dev_dependency plugins (integration_test) from the
