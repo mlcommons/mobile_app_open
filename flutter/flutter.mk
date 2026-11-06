@@ -64,6 +64,7 @@ flutter/firebase-config:
 .PHONY: flutter/backend-list
 flutter/backend-list:
 	cat flutter/lib/backend/list.in | sed \
+		-e "s/LITERT_TAG/${backend_litert_filename}/" \
 		-e "s/TFLITE_TAG/${backend_tflite_filename}/" \
 		-e "s/MEDIATEK_TAG/${backend_mediatek_filename}/" \
 		-e "s/PIXEL_TAG/${backend_pixel_filename}/" \

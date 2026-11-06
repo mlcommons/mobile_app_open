@@ -63,20 +63,37 @@ void main() {
     BackendInfo coremlBackend() => BackendInfo.forTest(
       pb.BackendSetting(
         benchmarkSetting: [coremlSettings1],
-        fallbackPolicy: pb.FallbackPolicy.FALLBACK_COEXIST,
+        claimPolicy: pb.ClaimPolicy.CLAIM_SHARED,
       ),
       'libcoremlbackend',
     );
-    BackendInfo coremlFillGapsBackend() => BackendInfo.forTest(
+    BackendInfo coremlExclusiveBackend() => BackendInfo.forTest(
       pb.BackendSetting(
         benchmarkSetting: [coremlSettings1],
-        fallbackPolicy: pb.FallbackPolicy.FALLBACK_FILL_GAPS,
+        claimPolicy: pb.ClaimPolicy.CLAIM_EXCLUSIVE,
       ),
       'libcoremlbackend',
     );
     BackendInfo coremlDefaultPolicyBackend() => BackendInfo.forTest(
       pb.BackendSetting(benchmarkSetting: [coremlSettings1]),
       'libcoremlbackend',
+    );
+    BackendInfo vendor2DefaultPolicyBackend() => BackendInfo.forTest(
+      pb.BackendSetting(
+        benchmarkSetting: [
+          pb.BenchmarkSetting(
+            benchmarkId: 'task1',
+            delegateChoice: [
+              pb.DelegateSetting(
+                delegateName: 'vendor2-delegate',
+                modelFile: [pb.ModelFile(modelPath: 'vendor2-model1-path')],
+              ),
+            ],
+            delegateSelected: 'vendor2-delegate',
+          ),
+        ],
+      ),
+      'libvendor2backend',
     );
 
     test('match', () async {
@@ -318,22 +335,22 @@ void main() {
     });
 
     test(
-      'FALLBACK_FILL_GAPS: fallback offered only for tasks vendor lacks',
+      'CLAIM_EXCLUSIVE: lower backends offered only for tasks vendor lacks',
       () {
         final store = BenchmarkStore(
           appConfig: pb.MLPerfConfig(task: [task1, task2]),
-          backends: [coremlFillGapsBackend(), tfliteBackendBoth()],
+          backends: [coremlExclusiveBackend(), tfliteBackendBoth()],
           taskSelection: {},
           taskSetSelection: {},
         );
-        // task1 is supported by the vendor: fallback is filtered out
+        // task1 is claimed by the vendor: the walk stops there
         final task1Benchmark = store.allBenchmarks.firstWhere(
           (e) => e.id == 'task1',
         );
         expect(task1Benchmark.backends.map((e) => e.info.libName), [
           'libcoremlbackend',
         ]);
-        // task2 is a gap: fallback still fills it
+        // task2 is a gap: the vendor is not in its walk, tflite fills it
         final task2Benchmark = store.allBenchmarks.firstWhere(
           (e) => e.id == 'task2',
         );
@@ -343,10 +360,30 @@ void main() {
       },
     );
 
-    test('FALLBACK_FILL_GAPS overrides a persisted fallback selection', () {
+    test('the walk stops after the first CLAIM_EXCLUSIVE claimant', () {
       final store = BenchmarkStore(
         appConfig: pb.MLPerfConfig(task: [task1]),
-        backends: [coremlFillGapsBackend(), tfliteBackend()],
+        backends: [
+          coremlBackend(), // CLAIM_SHARED: keep walking
+          // default CLAIM_EXCLUSIVE: stop after this one
+          vendor2DefaultPolicyBackend(),
+          tfliteBackend(), // claims task1 too, but is never reached
+        ],
+        taskSelection: {},
+        taskSetSelection: {},
+      );
+      final benchmark = store.allBenchmarks.single;
+      expect(benchmark.backends.map((e) => e.info.libName), [
+        'libcoremlbackend',
+        'libvendor2backend',
+      ]);
+      expect(benchmark.selectedBackend.info.libName, 'libcoremlbackend');
+    });
+
+    test('CLAIM_EXCLUSIVE overrides a persisted fallback selection', () {
+      final store = BenchmarkStore(
+        appConfig: pb.MLPerfConfig(task: [task1]),
+        backends: [coremlExclusiveBackend(), tfliteBackend()],
         taskSelection: {},
         backendSelection: {'task1': 'libtflitebackend'},
         taskSetSelection: {},

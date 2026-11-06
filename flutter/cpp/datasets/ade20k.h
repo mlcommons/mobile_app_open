@@ -20,7 +20,7 @@ limitations under the License.
 #include "allocator.h"
 #include "flutter/cpp/dataset.h"
 #include "flutter/cpp/datasets/utils.h"
-#include "tensorflow/lite/tools/evaluation/stages/image_preprocessing_stage.h"
+#include "tflite/tools/evaluation/stages/image_preprocessing_stage.h"
 
 namespace mlperf {
 namespace mobile {

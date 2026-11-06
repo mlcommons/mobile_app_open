@@ -43,11 +43,17 @@ ifeq (${WITH_MEDIATEK},1)
 
   backend_mediatek_android_files= \
   ${BAZEL_LINKS_PREFIX}bin/mobile_back_tflite/cpp/backend_tflite/neuron/libtfliteneuronbackend.so \
-  bazel-bin/external/neuron_delegate/neuron/java/libtensorflowlite_neuron_jni.so \
+  ${BAZEL_LINKS_PREFIX}bin/external/neuron_delegate/neuron/java/libtensorflowlite_neuron_jni.so \
   mobile_back_tflite/cpp/backend_tflite/neuron/libs/mt6989/libneuronusdk_adapter.mtk.mt6989.so \
   mobile_back_tflite/cpp/backend_tflite/neuron/libs/mt6991/libneuronusdk_adapter.mtk.mt6991.so \
   mobile_back_tflite/cpp/backend_tflite/neuron/libs/mt6993/libneuronusdk_adapter.mtk.mt6993.so
-  backend_mediatek_android_target=//mobile_back_tflite/cpp/backend_tflite/neuron:libtfliteneuronbackend.so
+  # The jni .so is only a src of the :neuron_delegate cc_library, so it is not a
+  # top-level output. Request it explicitly, otherwise bazel 7's default
+  # --remote_download_outputs=toplevel leaves it undownloaded when the action is
+  # a remote cache hit and the copy above fails. Same reason as the
+  # commonlibs entry in mobile_back_qti/make/qti_backend.mk.
+  backend_mediatek_android_target=//mobile_back_tflite/cpp/backend_tflite/neuron:libtfliteneuronbackend.so \
+  @neuron_delegate//neuron/java:libtensorflowlite_neuron_jni.so
   backend_mediatek_filename=libtfliteneuronbackend
 
   # variables needed to run make target flutter/android/libs/checksum

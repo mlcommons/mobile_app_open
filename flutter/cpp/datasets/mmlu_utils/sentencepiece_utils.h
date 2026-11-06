@@ -74,6 +74,46 @@ inline static std::string FormatLlamaUserPrompt(
   return out;
 }
 
+inline static std::string FormatGemmaUserPrompt(
+    std::string_view user_content, std::string_view system_content = "",
+    bool add_generation_prompt = true, bool add_bos = true) {
+  static constexpr const char* kBOS = "<bos>";
+  static constexpr const char* kStartTurn = "<start_of_turn>";
+  static constexpr const char* kEndTurn = "<end_of_turn>";
+
+  std::string out;
+  out.reserve(user_content.size() + 64);
+
+  if (add_bos) out += kBOS;
+
+  out += kStartTurn;
+  out += "user";
+  out += "\n";
+  if (!system_content.empty()) {
+    out.append(system_content);
+    out += "\n\n";
+  }
+  out.append(user_content);
+  out += kEndTurn;
+  out += "\n";
+
+  if (add_generation_prompt) {
+    out += kStartTurn;
+    out += "model";
+    out += "\n";
+  }
+  return out;
+}
+
+inline static std::string FormatUserPrompt(
+    std::string_view prompt_format, std::string_view user_content,
+    std::string_view system_content = "") {
+  if (prompt_format == "gemma") {
+    return FormatGemmaUserPrompt(user_content, system_content);
+  }
+  return FormatLlamaUserPrompt(user_content, system_content);
+}
+
 }  // namespace mobile
 }  // namespace mlperf
 #endif  // MLPERF_DATASETS_MMLU_UTILS_SENTENCEPIECE_UTILS_H_
