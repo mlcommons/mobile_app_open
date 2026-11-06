@@ -301,6 +301,8 @@ const Map<String, Map<String, Interval>> _llm = {
 // defect rather than guard against it.
 const Map<String, Map<String, Interval>> _llmGemma = {_kLitertBackend: {}};
 
+const Map<String, Map<String, Interval>> _llmQwen = {_kLitertBackend: {}};
+
 const benchmarkExpectedThroughput = {
   BenchmarkId.imageClassificationV2: _imageClassificationV2,
   BenchmarkId.objectDetection: _objectDetection,
@@ -308,9 +310,11 @@ const benchmarkExpectedThroughput = {
   BenchmarkId.naturalLanguageProcessing: _naturalLanguageProcessing,
   BenchmarkId.superResolution: _superResolution,
   BenchmarkId.stableDiffusion: _stableDiffusion,
-  BenchmarkId.llm: _llm,
-  BenchmarkId.llmInstruct: _llm,
+  BenchmarkId.llm1b: _llm,
+  BenchmarkId.llm1bInstruct: _llm,
   BenchmarkId.llmGemmaE2b: _llmGemma,
   BenchmarkId.llmGemmaE2bInstruct: _llmGemma,
+  BenchmarkId.llmQwen08b: _llmQwen,
+  BenchmarkId.llmQwen08bInstruct: _llmQwen,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };

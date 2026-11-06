@@ -110,8 +110,8 @@ struct LLMBackendData {
 
   int num_kv_layers = 0;
   int kv_cache_max_size = 0;
-  std::vector<int> kv_k_float_counts;
-  std::vector<int> kv_v_float_counts;
+  std::vector<std::string> kv_names;
+  std::vector<int> kv_float_counts;
   int prefill_seq_size = 0;
   int vocab_size = 0;
 
@@ -121,6 +121,7 @@ struct LLMBackendData {
   int max_output_tokens = 128;
   int pad_token_id = 128009;
   std::unordered_set<int> stop_token_ids{128001, 128008, 128009};
+  bool gpu_fp32 = false;
 
   LLMBackendData() {}
 
@@ -224,20 +225,20 @@ class LLMPipeline : public Pipeline {
       size_t num_input_tokens, size_t max_useful_seq_size) const;
   // Move each layer's KV from the prefill outputs into the decode inputs.
   void TransferKV(
-      int num_layers,
+      const std::vector<std::string>& kv_names,
       const std::unordered_map<std::string, size_t>& prefill_output_map,
       const std::unordered_map<std::string, size_t>& decode_input_map,
       std::vector<litert::TensorBuffer>& prefill_output_bufs,
       std::vector<litert::TensorBuffer>& decode_input_bufs);
   // Swap each layer's KV between the decode inputs and outputs (one step).
   void UpdateDecodeKV(
-      int num_layers,
+      const std::vector<std::string>& kv_names,
       const std::unordered_map<std::string, size_t>& decode_input_map,
       const std::unordered_map<std::string, size_t>& decode_output_map,
       std::vector<litert::TensorBuffer>& decode_input_bufs,
       std::vector<litert::TensorBuffer>& decode_output_bufs);
-  void ResetKV(int num_layers, const std::vector<int>& k_float_counts,
-               const std::vector<int>& v_float_counts,
+  void ResetKV(const std::vector<std::string>& kv_names,
+               const std::vector<int>& float_counts,
                const std::unordered_map<std::string, size_t>& input_map,
                std::vector<litert::TensorBuffer>& input_bufs);
   void WritePrefillMask(litert::CompiledModel& model, size_t sig_idx,
