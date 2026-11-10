@@ -42,6 +42,7 @@ def main():
   model = ct.convert(
     saved_model_export_dir,
     source='tensorflow',
+    convert_to='neuralnetwork',
     inputs=[ct.TensorType(shape=input_shape)],
   )
 

@@ -29,6 +29,7 @@ struct CoreMLBackendData {
   const char *accelerator{nullptr};
   CoreMLExecutor *coreMLExecutor{nullptr};
   bool expectNCHW = false;
+  bool reportFirstToken = false;
 };
 
 inline mlperf_data_t::Type MLMultiArrayDataType2MLPerfDataType(
@@ -100,13 +101,15 @@ mlperf_backend_ptr_t mlperf_backend_create(
   }
 
   CoreMLBackendData *backend_data = new CoreMLBackendData();
-  backendExists = true;
   std::string dataFormat =
       mlperf::mobile::GetConfigValue(configs, "data-format", std::string(""));
   if (dataFormat == "NCHW") {
     backend_data->expectNCHW = true;
     LOG(INFO) << "Will convert inputs from NHWC to NCHW!";
   }
+  backend_data->reportFirstToken =
+      mlperf::mobile::GetConfigValue(configs, "report-first-token",
+                                     std::string("")) == "true";
 
   // Load the model.
   NSError *error;
@@ -116,13 +119,16 @@ mlperf_backend_ptr_t mlperf_backend_create(
                                 acceleratorName:configs->accelerator
                                           error:&error];
   if (!coreMLExecutor || error) {
-    LOG(ERROR) << "Cannot create CoreMLExecutor";
+    LOG(ERROR) << "Cannot create CoreMLExecutor: "
+               << (error ? error.localizedDescription.UTF8String : "");
+    delete backend_data;
     return nullptr;
   }
   backend_data->coreMLExecutor = coreMLExecutor;
   backend_data->accelerator = [coreMLExecutor getAccelerator];
   LOG(INFO) << "Accelerator: " << backend_data->accelerator;
 
+  backendExists = true;
   return backend_data;
 }
 
@@ -140,8 +146,13 @@ mlperf_status_t mlperf_backend_issue_query(mlperf_backend_ptr_t backend_ptr,
                                            ft_callback callback,
                                            void *context) {
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
-  if ([backend_data->coreMLExecutor issueQueries]) return MLPERF_SUCCESS;
-  return MLPERF_FAILURE;
+  if (![backend_data->coreMLExecutor issueQueries]) return MLPERF_FAILURE;
+  // One prediction produces the whole output, so the first token is ready when
+  // it returns. Only token-based benchmarks opt in with "report-first-token":
+  // for the others loadgen expects no token latencies, and in Offline mode the
+  // driver puts a sample index where loadgen reads a sample pointer.
+  if (backend_data->reportFirstToken && callback) callback(context);
+  return MLPERF_SUCCESS;
 }
 
 // Flush the staged queries immediately.

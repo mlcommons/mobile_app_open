@@ -1,2 +1,14 @@
-tensorflow-macos==2.9.2
-coremltools==6.0b1
+# Python 3.11 (the newest version tensorflow-macos 2.12 ships wheels for).
+# coremltools 9.0 is tested with torch <= 2.7.0 and TensorFlow 2 <= 2.12.0;
+# newer versions only print a warning but are not covered by its test suite.
+coremltools==9.0
+numpy<1.24  # tensorflow-macos 2.12 requires numpy < 1.24
+
+# mobilenetv4_pytorch.py
+torch==2.7.0
+torchvision==0.22.0
+timm==1.0.15
+pillow
+
+# mobilebert.py, mobiledet.py, mobilenet_edgetpu.py, mobilenetv4_tflite.py, mosaic.py
+tensorflow-macos==2.12.0

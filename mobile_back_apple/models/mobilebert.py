@@ -35,6 +35,7 @@ def main():
   model = ct.convert(
     [pruned],
     source='tensorflow',
+    convert_to='neuralnetwork',
   )
   model_quantized = quantization_utils.quantize_weights(model, nbits=16)
 
