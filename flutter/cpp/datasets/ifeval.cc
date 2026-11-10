@@ -107,8 +107,24 @@ bool IFEval::HasAccuracy() { return true; }
 
 bool IFEval::ComputeSampleAccuracy(const int sample_idx,
                                    ifeval::Accuracy& accuracy) {
+  auto is_special = [this](int id) {
+    if (sp_processor->IsControl(id)) return true;
+    const std::string& piece = sp_processor->IdToPiece(id);
+    if (piece == "<pad>" || piece == "<eos>" || piece == "<bos>" ||
+        piece == "<mask>")
+      return true;
+    return piece.size() > 3 && piece.front() == '<' && piece.back() == '>' &&
+           (piece.compare(0, 2, "<|") == 0 ||
+            piece.compare(piece.size() - 2, 2, "|>") == 0);
+  };
+  std::vector<int> scored_tokens;
+  for (int id : sample_output_tokens_[sample_idx]) {
+    if (!is_special(id)) scored_tokens.push_back(id);
+  }
+  std::string raw_prediction;
+  sp_processor->Decode(sample_output_tokens_[sample_idx], &raw_prediction).ok();
   std::string prediction;
-  sp_processor->Decode(sample_output_tokens_[sample_idx], &prediction).ok();
+  sp_processor->Decode(scored_tokens, &prediction).ok();
 
   bool is_prompt_correct_loose = true;
   bool is_prompt_correct_strict = true;
@@ -134,12 +150,15 @@ bool IFEval::ComputeSampleAccuracy(const int sample_idx,
       raw_output_dir_ + "/sample_" + std::to_string(sample_idx) + ".txt";
   std::ofstream file(filename);
   if (file.is_open()) {
+    file << "----- Key -----" << std::endl;
     file << std::to_string(samples_[sample_idx]->key) << std::endl;
-    file << "-----" << std::endl;
+    file << "----- Prompt -----" << std::endl;
     file << samples_[sample_idx]->prompt << std::endl;
-    file << "-----" << std::endl;
+    file << "----- Raw output -----" << std::endl;
+    file << raw_prediction << std::endl;
+    file << "----- Scored output (special tokens stripped) -----" << std::endl;
     file << prediction << std::endl;
-    file << "-----" << std::endl;
+    file << "----- Result -----" << std::endl;
     file << "Loose result: " << (is_prompt_correct_loose ? "Success" : "Fail")
          << std::endl;
     file << "Strict result: " << (is_prompt_correct_strict ? "Success" : "Fail")

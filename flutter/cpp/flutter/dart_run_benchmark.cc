@@ -116,13 +116,15 @@ struct dart_ffi_run_benchmark_out* dart_ffi_run_benchmark(
       for (auto setting : settings.benchmark_setting().custom_setting()) {
         if (setting.id() == "tokenizer_filename")
           sp_path_filename = setting.value();
+        if (setting.id() == "prompt_format") prompt_format = setting.value();
       }
       sp_path = in->backend_model_path;
       sp_path += '/' + sp_path_filename;
       use_token_latencies = true;
       dataset = std::make_unique<::mlperf::mobile::MmluGen>(
           backend.get(), in->dataset_data_path, sp_path, in->output_dir,
-          false /*zero-shot*/, mlperf::mobile::Str2TestMode(in->mode));
+          false /*zero-shot*/, mlperf::mobile::Str2TestMode(in->mode),
+          prompt_format);
       break;
     case ::mlperf::mobile::DatasetConfig::IFEVAL:
       for (auto setting : settings.benchmark_setting().custom_setting()) {

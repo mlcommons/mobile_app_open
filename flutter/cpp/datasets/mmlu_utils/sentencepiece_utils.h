@@ -78,8 +78,8 @@ inline static std::string FormatGemmaUserPrompt(
     std::string_view user_content, std::string_view system_content = "",
     bool add_generation_prompt = true, bool add_bos = true) {
   static constexpr const char* kBOS = "<bos>";
-  static constexpr const char* kStartTurn = "<start_of_turn>";
-  static constexpr const char* kEndTurn = "<end_of_turn>";
+  static constexpr const char* kStartTurn = "<|turn>";
+  static constexpr const char* kEndTurn = "<turn|>";
 
   std::string out;
   out.reserve(user_content.size() + 64);

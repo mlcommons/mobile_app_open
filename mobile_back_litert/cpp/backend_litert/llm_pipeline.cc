@@ -220,7 +220,7 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
           : 0;
   int prefill_amount =
       prefill_overflow ? prefill_seq_size : (prefill_seq_size - 1);
-  int decode_tokens = prefill_overflow ? overflow_size - 1 : 1;
+  int decode_tokens = prefill_overflow ? overflow_size : 1;
 
   std::vector<int32_t> tokens_data(max_seq_size, backend_data->pad_token_id);
   std::vector<int32_t> pos_data(max_seq_size);
@@ -285,7 +285,8 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
         backend_data->decode_sig_idx,
         absl::MakeSpan(backend_data->decode_input_bufs),
         absl::MakeSpan(backend_data->decode_output_bufs)));
-    next_token = backend_data->prompt_tokens[++next_position];
+    if (++next_position < static_cast<int>(backend_data->prompt_tokens.size()))
+      next_token = backend_data->prompt_tokens[next_position];
     UpdateDecodeKV(backend_data->kv_names, backend_data->decode_input_map,
                    backend_data->decode_output_map,
                    backend_data->decode_input_bufs,

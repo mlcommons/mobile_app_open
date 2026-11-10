@@ -22,7 +22,8 @@ class MmluGen : public Dataset {
  public:
   MmluGen(Backend* backend, const std::string& input_tfrecord,
           const std::string& sp_path, const std::string& output_dir,
-          bool zero_shot, ::mlperf::TestMode mode);
+          bool zero_shot, ::mlperf::TestMode mode,
+          const std::string& prompt_format = "llama");
 
   const std::string& Name() override { return name_; }
 
@@ -69,8 +70,9 @@ class MmluGen : public Dataset {
   std::set<int> loaded_sample_ids_;
   std::string raw_output_dir_;
   std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor;
+  const std::string prompt_format_;
   static constexpr int input_token_limit_ = 2048;
-  int token_limit_ = 4;
+  int token_limit_ = 8;
 };
 
 }  // namespace mobile

@@ -12,8 +12,11 @@ namespace mobile {
 
 MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
                  const std::string& sp_path, const std::string& output_dir,
-                 bool zero_shot, ::mlperf::TestMode mode)
-    : sample_reader_(input_tfrecord), Dataset(backend) {
+                 bool zero_shot, ::mlperf::TestMode mode,
+                 const std::string& prompt_format)
+    : sample_reader_(input_tfrecord),
+      prompt_format_(prompt_format),
+      Dataset(backend) {
   sp_processor = std::unique_ptr<sentencepiece::SentencePieceProcessor>(
       LoadSentencePieceProcessor(sp_path));
 
@@ -56,7 +59,16 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
     // the answer letter, do not provide any explanation or preface.");
 
     std::vector<int> input_tokens;
-    sp_processor->Encode(input.c_str(), &input_tokens).ok();
+    auto encode = [&](const std::string& text) {
+      std::string formatted =
+          prompt_format_ == "gemma"
+              ? FormatUserPrompt(
+                    prompt_format_, text,
+                    "Answer with only the letter of the correct option.")
+              : text;
+      sp_processor->Encode(formatted.c_str(), &input_tokens).ok();
+    };
+    encode(input);
 
     // input token sanity check
     while (input_tokens.size() > input_token_limit_) {
@@ -66,7 +78,7 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
 
       input = preface + truncated_shots;
 
-      sp_processor->Encode(input.c_str(), &input_tokens).ok();
+      encode(input);
       LOG(WARNING) << "Input token limit exceeded for entry "
                    << std::to_string(i) << ". Truncated to "
                    << input_tokens.size();
@@ -136,10 +148,11 @@ bool MmluGen::ComputeSampleAccuracy(const int sample_idx) {
       raw_output_dir_ + "/sample_" + std::to_string(sample_idx) + ".txt";
   std::ofstream file(filename);
   if (file.is_open()) {
+    file << "----- Prompt -----" << std::endl;
     file << samples_[sample_idx]->input << std::endl;
-    file << "-----" << std::endl;
+    file << "----- Output -----" << std::endl;
     file << prediction << std::endl;
-    file << "-----" << std::endl;
+    file << "----- Predicted - Correct -----" << std::endl;
     file << predicted_char << " - " << correct[0] << std::endl;
     file.close();
   }
@@ -155,7 +168,18 @@ float MmluGen::ComputeAccuracy() {
     if (ComputeSampleAccuracy(sample_id)) correct++;
   }
 
-  return total > 0 ? static_cast<float>(correct) / total : 0.0f;
+  float accuracy = total > 0 ? static_cast<float>(correct) / total : 0.0f;
+
+  std::string filename = raw_output_dir_ + "/accuracy.txt";
+  std::ofstream file(filename);
+  if (file.is_open()) {
+    file << "Accuracy: " << std::to_string(correct) << '/'
+         << std::to_string(total) << " = " << std::to_string(accuracy)
+         << std::endl;
+    file.close();
+  }
+
+  return accuracy;
 }
 
 std::string MmluGen::ComputeAccuracyString() {
@@ -175,10 +199,14 @@ char MmluGen::find_answer_char(const std::string& input) {
     while (*c && std::isspace(*c)) ++c;
     if (!*c) break;
 
+    while (*c == '*' || *c == '(') ++c;
+    if (!*c || std::isspace(*c)) continue;
+
     const unsigned char* start = c;  // start of word
 
     // quick check: is the word exactly 1 char long?
     ++c;  // move to potential second char
+    while (*c == '.' || *c == ')' || *c == ':' || *c == '*') ++c;
     if (!*c || std::isspace(*c) || *c == '<') {
       if (*start == 'A' || *start == 'B' || *start == 'C' || *start == 'D' ||
           *start == 'a' || *start == 'b' || *start == 'c' || *start == 'd')
