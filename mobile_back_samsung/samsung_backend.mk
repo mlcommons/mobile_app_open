@@ -38,9 +38,15 @@ ifeq (${WITH_SAMSUNG},1)
         ${MOBILE_BACK_SAMSUNG_LIB_ROOT}/internal/libeden_nn_on_system.so \
 
   # main binaries for Samsung backend are prebuilt
+  # :libcpp_shared_arm64 is requested explicitly for the same reason as in
+  # mobile_back_qti/make/qti_backend.mk: backend_samsung_android_files copies
+  # lib_arm64/libc++_shared.so out of bazel-bin, and bazel 7's default
+  # --remote_download_outputs=toplevel does not materialize it when the genrule
+  # is served from the remote cache.
   backend_samsung_android_target= \
     //mobile_back_samsung/samsung/lib:samsungbackend \
-    //flutter/android/commonlibs:commonlibs
+    //flutter/android/commonlibs:commonlibs \
+    //flutter/android/commonlibs:libcpp_shared_arm64
   backend_samsung_filename=libsamsungbackend
 
   # variables needed to run make target flutter/android/libs/checksum

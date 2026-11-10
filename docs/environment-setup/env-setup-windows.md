@@ -13,18 +13,25 @@ This file describes how to build the app for Windows.
 [comment]: # (Don't remove spaces at the end of lines, they force line breaks)
 
 * Install Visual Studio: <https://visualstudio.microsoft.com/vs/>  
-Visual Studio Community will suffice. At least Visual Studio 2019 is required.
+Visual Studio Community will suffice. Visual Studio 2022 with MSVC toolset 14.38 or newer is required:
+the pinned TensorFlow uses C11 `<stdatomic.h>` and `<threads.h>`.  
+Install the `C++ ATL` component too; the `desktop_webview_auth` plugin needs `atlstr.h`.
 * Install Chocolatey: <https://chocolatey.org>  
 This is an optional step. You can download and install all of the dependencies from other sources.  
 However, using Chocolatey greatly simplifies installation.
 * Install dependencies:
   * `choco install -y git`
   * `choco install -y make`
-  * `choco install -y bazelisk`
+  * `choco install -y bazelisk`  
+  Bazelisk reads the `.bazelversion` file in the repo root and downloads the right Bazel automatically.
   * `choco install -y python3`
   * `choco install -y msys2`
-  * `choco install -y flutter`
-  * `choco install -y protoc`
+  * `choco install -y protoc --version 23.2`
+  * Install Flutter with the exact version pinned in `flutter/pubspec.yaml` (currently 3.44.4).  
+  Chocolatey does not publish every Flutter release.
+  Download the official Windows SDK zip from
+  [the Flutter SDK archive](https://docs.flutter.dev/release/archive) instead
+  and add its `bin` folder to `PATH`.
   * `dart pub global activate protoc_plugin ^25.0.0`
 * Configure python
   * You must have command `python3` in your PATH.  
@@ -75,34 +82,20 @@ $env:TMP=$env:USERPROFILE+'\AppData\Local\Temp'
 
 ## Tested environment
 
-The app was built and tested successfully in this environment:
+The GitHub Actions workflow [windows-build-test.yml](../../.github/workflows/windows-build-test.yml)
+is a working reference for a complete Windows build, including the integration test and release packaging.
+It runs on the `windows-2022` runner image with:
 
 ```shell
-Windows 20H2 (build 19042.928)
-Microsoft Visual Studio 2019, version 16.11.2
+Windows Server 2022
+Microsoft Visual Studio 2022 (MSVC toolset 14.44)
 
-λ flutter --version
-Flutter 2.10.5 • channel unknown • unknown source
-Framework • revision 5464c5bac7 (4 weeks ago) • 2022-04-18 09:55:37 -0700
-Engine • revision 57d3bac3dd
-Tools • Dart 2.16.2 • DevTools 2.9.2
-
-λ bazel --version
-bazel 4.2.2
-
-λ protoc --version
-libprotoc 3.17.3
-
-λ python3 --version
-Python 3.9.7
-
-λ git --version
-git version 2.34.1.windows.1
-
-λ make --version
+bazel 7.7.0 (via bazelisk, pinned by .bazelversion)
+Flutter 3.44.4
+libprotoc 23.2
+Python 3.9
 GNU Make 4.3
-
-msys2 version: 20220319.0.0
+msys2 (runner-provided, C:\msys64)
 ```
 
 ## Formatting

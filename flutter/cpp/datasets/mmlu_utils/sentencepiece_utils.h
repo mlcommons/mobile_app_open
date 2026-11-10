@@ -74,6 +74,12 @@ inline static std::string FormatLlamaUserPrompt(
   return out;
 }
 
+inline static std::string FormatUserPrompt(
+    std::string_view prompt_format, std::string_view user_content,
+    std::string_view system_content = "") {
+  return FormatLlamaUserPrompt(user_content, system_content);
+}
+
 }  // namespace mobile
 }  // namespace mlperf
 #endif  // MLPERF_DATASETS_MMLU_UTILS_SENTENCEPIECE_UTILS_H_

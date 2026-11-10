@@ -109,7 +109,7 @@ BackendInfo backend(String libName, String framework, List<String> taskIds) =>
               delegateSelected: 'gpu',
             ),
         ],
-        fallbackPolicy: pb.FallbackPolicy.FALLBACK_COEXIST,
+        claimPolicy: pb.ClaimPolicy.CLAIM_SHARED,
       ),
       libName,
     );
