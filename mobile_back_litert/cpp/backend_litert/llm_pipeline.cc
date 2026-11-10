@@ -125,16 +125,6 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
     model_dir = model_dir.substr(0, model_dir.rfind('/'));
   }
 
-  // Gemma uses different pad and stop token ids than the Llama default.
-  std::string model_identity =
-      llm_model_path + '/' +
-      mlperf::mobile::GetConfigValue(configs, "tokenizer_filename",
-                                     std::string(""));
-  if (model_identity.find("gemma") != std::string::npos) {
-    backend_data->pad_token_id = 0;
-    backend_data->stop_token_ids = {1, 106};
-  }
-
   bool use_gpu = configs->accelerator != nullptr &&
                  strcmp(configs->accelerator, "cpu") != 0;
 
