@@ -10,6 +10,38 @@
 namespace mlperf {
 namespace mobile {
 
+namespace {
+
+std::string remove_special_tokens(const std::string& s) {
+  std::string out;
+  out.reserve(s.size());
+  std::size_t i = 0;
+  while (i < s.size()) {
+    if (s[i] == '<') {
+      std::size_t j = i + 1;
+      while (j < s.size() && s[j] != '<' && s[j] != '>' &&
+             !std::isspace(static_cast<unsigned char>(s[j])))
+        ++j;
+      if (j < s.size() && s[j] == '>') {
+        std::string piece = s.substr(i, j - i + 1);
+        if (piece == "<pad>" || piece == "<eos>" || piece == "<bos>" ||
+            piece == "<mask>" ||
+            (piece.size() > 3 &&
+             (piece.compare(0, 2, "<|") == 0 ||
+              piece.compare(piece.size() - 2, 2, "|>") == 0))) {
+          i = j + 1;
+          continue;
+        }
+      }
+    }
+    out.push_back(s[i]);
+    ++i;
+  }
+  return out;
+}
+
+}  // namespace
+
 IFEval::IFEval(Backend* backend, const std::string& input_tfrecord,
                const std::string& sp_path, const std::string& output_dir,
                const std::string& prompt_format)
@@ -107,24 +139,9 @@ bool IFEval::HasAccuracy() { return true; }
 
 bool IFEval::ComputeSampleAccuracy(const int sample_idx,
                                    ifeval::Accuracy& accuracy) {
-  auto is_special = [this](int id) {
-    if (sp_processor->IsControl(id)) return true;
-    const std::string& piece = sp_processor->IdToPiece(id);
-    if (piece == "<pad>" || piece == "<eos>" || piece == "<bos>" ||
-        piece == "<mask>")
-      return true;
-    return piece.size() > 3 && piece.front() == '<' && piece.back() == '>' &&
-           (piece.compare(0, 2, "<|") == 0 ||
-            piece.compare(piece.size() - 2, 2, "|>") == 0);
-  };
-  std::vector<int> scored_tokens;
-  for (int id : sample_output_tokens_[sample_idx]) {
-    if (!is_special(id)) scored_tokens.push_back(id);
-  }
   std::string raw_prediction;
   sp_processor->Decode(sample_output_tokens_[sample_idx], &raw_prediction).ok();
-  std::string prediction;
-  sp_processor->Decode(scored_tokens, &prediction).ok();
+  std::string prediction = remove_special_tokens(raw_prediction);
 
   bool is_prompt_correct_loose = true;
   bool is_prompt_correct_strict = true;
@@ -156,7 +173,7 @@ bool IFEval::ComputeSampleAccuracy(const int sample_idx,
     file << samples_[sample_idx]->prompt << std::endl;
     file << "----- Raw output -----" << std::endl;
     file << raw_prediction << std::endl;
-    file << "----- Scored output (special tokens stripped) -----" << std::endl;
+    file << "----- Scored output (special tokens removed) -----" << std::endl;
     file << prediction << std::endl;
     file << "----- Result -----" << std::endl;
     file << "Loose result: " << (is_prompt_correct_loose ? "Success" : "Fail")
