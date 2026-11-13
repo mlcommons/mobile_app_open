@@ -16,33 +16,32 @@
 # limitations under the License.
 
 import coremltools as ct
+from utils import register_keras_optimizer_fallback
 
 
 def main():
   """
   Download the MobileNetV4-Conv-Large-fp32 from https://github.com/mlcommons/mobile_open/releases
-  Tested with tensorflow==2.15.0 and coremltools==7.1
+  Tested with tensorflow==2.15.0+ and coremltools==9.0
   """
+  register_keras_optimizer_fallback()
   saved_model_dir = '../dev-resources/mobilenet_v4/MobileNetV4-Conv-Large-saved-model'
-  export_fpath = '../dev-resources/mobilenet_v4/MobilenetV4_Large.mlmodel'
+  export_fpath = '../dev-resources/mobilenet_v4/MobilenetV4_Large.mlpackage'
   print("Converting model...")
   model = ct.convert(
     saved_model_dir,
     source="tensorflow",
-    convert_to="neuralnetwork",
+    convert_to="mlprogram",
     inputs=[ct.TensorType(shape=(1, 384, 384, 3))],
   )
   model.short_description = "MobileNetV4-Conv-Large-fp32 from https://github.com/mlcommons/mobile_open"
 
   spec = model.get_spec()
-  for n in (1, 1001):
-    spec.description.output[0].type.multiArrayType.shape.append(n)
-
   ct.utils.rename_feature(spec, "inputs", "images")
   ct.utils.rename_feature(spec, "Identity", "Softmax")
   print(spec.description)
 
-  ct.models.MLModel(spec).save(export_fpath)
+  ct.models.MLModel(spec, weights_dir=model.weights_dir).save(export_fpath)
   print("Done! Core ML model exported to:", export_fpath)
 
 

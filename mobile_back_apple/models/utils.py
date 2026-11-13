@@ -25,6 +25,32 @@ def print_versions():
   print('coremltools version:', ct.__version__)
 
 
+def register_keras_optimizer_fallback():
+  """Registers a fallback revived type for legacy Keras 2 'optimizer' nodes
+  when loading SavedModels on TensorFlow 2.16+ (Keras 3) without tf_keras."""
+  from tensorflow.python.saved_model import revived_types
+  from tensorflow.python.trackable import autotrackable
+
+  if 'optimizer' not in revived_types.registered_identifiers():
+    class _DummyOptimizer(autotrackable.AutoTrackable):
+      def add_slot(self, var, slot_name):
+        return tf.Variable(tf.zeros_like(var), trainable=False)
+
+    revived_types.register_revived_type(
+      'optimizer',
+      lambda proto: proto.identifier == 'optimizer',
+      [
+        revived_types.VersionedTypeRegistration(
+          object_factory=lambda proto: _DummyOptimizer(),
+          version=1,
+          min_producer_version=1,
+          min_consumer_version=1,
+          bad_consumers=[],
+        )
+      ],
+    )
+
+
 def load_frozen_graph(path: str) -> tf.compat.v1.GraphDef():
   print(f"Loading frozen graph from {path}")
   with tf.io.gfile.GFile(path, "rb") as f:
@@ -69,3 +95,41 @@ def optimize_graph(graph_def: tf.compat.v1.GraphDef(),
                                          signature_def_map=sigs)
     builder.save()
     print('Optimized graph saved at:', export_dir)
+
+
+def quantize_weights(mlmodel, dtype: str = 'int8', mode: str = 'linear_symmetric'):
+  """Quantizes ML Program weights to 8-bit integers (W8)."""
+  import coremltools.optimize.coreml as cto
+
+  op_config = cto.OpLinearQuantizerConfig(mode=mode, dtype=dtype)
+  config = cto.OptimizationConfig(global_config=op_config)
+  quantized_model = cto.linear_quantize_weights(mlmodel, config)
+  print('Weights quantization (W8) finished.')
+  return quantized_model
+
+
+def quantize_activations(mlmodel,
+                         sample_data: list,
+                         dtype: str = 'int8',
+                         mode: str = 'linear_symmetric'):
+  """Quantizes ML Program activations to 8-bit integers (A8, requires iOS 17+)."""
+  import coremltools.optimize.coreml as cto
+  try:
+    from coremltools.optimize.coreml import (
+      OpActivationLinearQuantizerConfig,
+      linear_quantize_activations,
+    )
+  except ImportError:
+    from coremltools.optimize.coreml.experimental import (
+      OpActivationLinearQuantizerConfig,
+      linear_quantize_activations,
+    )
+
+  op_config = OpActivationLinearQuantizerConfig(mode=mode, dtype=dtype)
+  config = cto.OptimizationConfig(global_config=op_config)
+  quantized_model = linear_quantize_activations(
+    mlmodel, config, sample_data=sample_data
+  )
+  print('Activations quantization (A8) finished.')
+  return quantized_model
+

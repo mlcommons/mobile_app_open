@@ -15,19 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
 import tensorflow as tf
 import coremltools as ct
-from coremltools.models.neural_network import quantization_utils
 
 
 def main():
   # Download saved_model from
-  # https://storage.googleapis.com/cloud-tpu-checkpoints/mobilebert/mobilebert_squad_savedmodels.tar.gz
+  # https://github.com/mlcommons/mobile_open/tree/main/language/bert/models_and_code/checkpoints/float
   saved_model_source_dir = '../dev-resources/mobilebert/float_saved_model'
   input_names = ['input_ids', 'input_mask', 'segment_ids']
   output_names = ['start_logits', 'end_logits']
-  output_shapes = [(1, 384), (1, 384)]
-  coreml_export_filepath = '../dev-resources/mobilebert/MobileBERT.mlmodel'
+  coreml_export_filepath = '../dev-resources/mobilebert/MobileBERT.mlpackage'
 
   tfmodel = tf.saved_model.load(saved_model_source_dir, tags={'serve'})
   pruned = tfmodel.prune([e + ':0' for e in input_names],
@@ -35,22 +34,14 @@ def main():
   model = ct.convert(
     [pruned],
     source='tensorflow',
+    convert_to='mlprogram',
+    inputs=[ct.TensorType(name=name, shape=(1, 384), dtype=np.int32) for name in input_names],
+    outputs=[ct.TensorType(name=name, dtype=np.float32) for name in output_names],
   )
-  model_quantized = quantization_utils.quantize_weights(model, nbits=16)
 
-  spec = model_quantized.get_spec()
-  for i, shape in enumerate(output_shapes):
-    for n in shape:
-      spec.description.output[i].type.multiArrayType.shape.append(n)
-
-  dtype_int32 = ct.proto.FeatureTypes_pb2.ArrayFeatureType.INT32
-  for i, _ in enumerate(input_names):
-    spec.description.input[i].type.multiArrayType.dataType = dtype_int32
-
-  print(spec.description)
-
-  model_quantized = ct.models.MLModel(spec)
-  model_quantized.save(coreml_export_filepath)
+  print(model.get_spec().description)
+  model.save(coreml_export_filepath)
+  print('Done! Core ML model exported to:', coreml_export_filepath)
 
 
 if __name__ == "__main__":

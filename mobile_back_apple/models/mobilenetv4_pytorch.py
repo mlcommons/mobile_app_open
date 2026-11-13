@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Tested with torch==2.3.1, coremltools==8.0b1, timm==1.0.7, macOS 14.5, XCode 16.0 beta
+# Tested with torch>=2.3.1, coremltools==9.0, timm>=1.0.7
 
 import os
 import timm
@@ -25,10 +25,12 @@ import coremltools as ct
 import coremltools.optimize.coreml as cto
 from torchvision.transforms import v2
 
-# The following API is for coremltools==8.0b1
-# It will be moved out of "experimental" in later versions of coremltools
-from coremltools.optimize.coreml.experimental import OpActivationLinearQuantizerConfig, \
-  linear_quantize_activations
+try:
+  from coremltools.optimize.coreml import OpActivationLinearQuantizerConfig, \
+    linear_quantize_activations
+except ImportError:
+  from coremltools.optimize.coreml.experimental import OpActivationLinearQuantizerConfig, \
+    linear_quantize_activations
 from PIL import Image
 
 C = 3
@@ -39,9 +41,9 @@ INPUT_NAME = 'images'
 OUTPUT_NAME = 'softmax'
 MODEL_NAME = 'hf-hub:timm/mobilenetv4_conv_large.e600_r384_in1k'
 
-MLMODEL_FILE_FP32 = 'mobilenetv4_fp32.mlpackage'
-MLMODEL_FILE_W8 = "mobilenetv4_w8.mlpackage"
-MLMODEL_FILE_W8A8 = "mobilenetv4_w8a8.mlpackage"
+MLMODEL_FILE_FP32 = '../dev-resources/mobilenet_v4/mobilenetv4_fp32.mlpackage'
+MLMODEL_FILE_W8 = '../dev-resources/mobilenet_v4/mobilenetv4_w8.mlpackage'
+MLMODEL_FILE_W8A8 = '../dev-resources/mobilenet_v4/mobilenetv4_w8a8.mlpackage'
 
 IMAGE_DIR = './imagenet'
 LABELS_FILE = 'imagenet_val_full.txt'
@@ -152,8 +154,10 @@ def convert_model():
   mlmodel_quantized = quantize_weights(ml_model)
   mlmodel_quantized.save(MLMODEL_FILE_W8)
 
-  # pil_images = load_dummy_images(count=9)
-  pil_images = load_images_from_folder(IMAGE_DIR, max_images=999)
+  if os.path.isdir(IMAGE_DIR):
+    pil_images = load_images_from_folder(IMAGE_DIR, max_images=999)
+  else:
+    pil_images = load_dummy_images(count=9)
   sample_data = preprocess_images(pil_images)
   mlmodel_quantized = quantize_activations(mlmodel_quantized, sample_data)
   mlmodel_quantized.save(MLMODEL_FILE_W8A8)
@@ -187,7 +191,8 @@ def test_accuracy(mlmodel_file: str):
 
 def main():
   convert_model()
-  test_accuracy(mlmodel_file=MLMODEL_FILE_W8A8)
+  if os.path.isdir(IMAGE_DIR) and os.path.isfile(LABELS_FILE):
+    test_accuracy(mlmodel_file=MLMODEL_FILE_W8A8)
 
 
 if __name__ == "__main__":

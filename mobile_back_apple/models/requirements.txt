@@ -1,2 +1,11 @@
-tensorflow-macos==2.9.2
-coremltools==6.0b1
+coremltools==9.0
+numpy>=1.24
+
+# PyTorch model conversion (mobilenetv4_pytorch.py)
+pillow>=10.0
+timm>=1.0.7
+torch>=2.3.1
+torchvision>=0.18.1
+
+# TensorFlow model conversion (edsr.py, mobilebert.py, mobiledet.py, mobilenet_edgetpu.py, mobilenetv4_tflite.py, mosaic.py)
+tensorflow>=2.15.0

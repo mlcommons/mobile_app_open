@@ -21,15 +21,14 @@ from utils import load_frozen_graph, optimize_graph
 
 
 def main():
-  # Download frozen_graph.pb from
-  # https://storage.cloud.google.com/mobilenet_edgetpu/checkpoints/mobilenet_edgetpu_224_1.0.tgz
+  # Download edge_frozen_graph.pb as frozen_graph.pb from
+  # https://github.com/mlcommons/mobile_open/blob/main/vision/mobilenet/models_and_code/checkpoints/float/edge_frozen_graph.pb
   frozen_graph_filepath = '../dev-resources/mobilenet_edgetpu/frozen_graph.pb'
   input_name = 'images'
   input_shape = (1, 224, 224, 3)
   output_name = 'Softmax'
-  output_shape = (1, 1001)
   saved_model_export_dir = '../dev-resources/mobilenet_edgetpu/optimized_saved_model'
-  coreml_export_filepath = '../dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlmodel'
+  coreml_export_filepath = '../dev-resources/mobilenet_edgetpu/MobilenetEdgeTPU.mlpackage'
 
   graph_def = load_frozen_graph(frozen_graph_filepath)
   shutil.rmtree(saved_model_export_dir, ignore_errors=True)
@@ -42,15 +41,13 @@ def main():
   model = ct.convert(
     saved_model_export_dir,
     source='tensorflow',
+    convert_to='mlprogram',
     inputs=[ct.TensorType(shape=input_shape)],
   )
 
-  spec = model.get_spec()
-  for n in output_shape:
-    spec.description.output[0].type.multiArrayType.shape.append(n)
-
-  print(spec.description)
-  ct.models.MLModel(spec).save(coreml_export_filepath)
+  print(model.get_spec().description)
+  model.save(coreml_export_filepath)
+  print('Done! Core ML model exported to:', coreml_export_filepath)
 
 
 if __name__ == "__main__":
