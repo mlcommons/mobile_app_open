@@ -106,6 +106,8 @@ def convert_tflite_to_mlpackage(
   tflite_path: str,
   export_path: str,
   quantize_activations: bool = True,
+  symmetric: bool = False,
+  compute_precision=ct.precision.FLOAT16,
   float_io: bool = True,
   short_description: str = '',
 ):
@@ -158,10 +160,21 @@ def convert_tflite_to_mlpackage(
       return var
     if len(q['scales']) != 1:
       return var
-    scale = np.float32(q['scales'][0])
-    zp = np.int8(np.clip(q['zps'][0], -128, 127))
-    qv = mb.quantize(input=var, scale=scale, zero_point=zp, output_dtype='int8')
-    return mb.dequantize(input=qv, scale=scale, zero_point=zp)
+    scale = float(q['scales'][0])
+    zp = int(np.clip(q['zps'][0], -128, 127))
+    if symmetric and zp != 0:
+      min_val = (-128 - zp) * scale
+      max_val = (127 - zp) * scale
+      abs_max = max(abs(min_val), abs(max_val))
+      scale = max(abs_max / 127.0, 1e-12)
+      zp = 0
+    scale_val = np.float32(scale)
+    if symmetric:
+      qv = mb.quantize(input=var, scale=scale_val, output_dtype='int8')
+      return mb.dequantize(input=qv, scale=scale_val)
+    zp_val = np.int8(zp)
+    qv = mb.quantize(input=var, scale=scale_val, zero_point=zp_val, output_dtype='int8')
+    return mb.dequantize(input=qv, scale=scale_val, zero_point=zp_val)
 
   def get_const_fp32(tensor_idx):
     arr = buffers[tensor_idx]
@@ -199,7 +212,32 @@ def convert_tflite_to_mlpackage(
         arr = arr.astype(np.int8)
       scales = q['scales'].astype(np.float32)
       zps = np.clip(q['zps'], -128, 127).astype(np.int8)
+      if symmetric and not np.all(zps == 0):
+        # Re-quantize asymmetric weights symmetrically around zero_point=0
+        if len(scales) == 1:
+          w_fp32 = (arr.astype(np.float32) - float(zps[0])) * float(scales[0])
+          abs_max = max(float(np.max(np.abs(w_fp32))), 1e-12)
+          scales = np.array([abs_max / 127.0], dtype=np.float32)
+          arr = np.clip(np.round(w_fp32 / scales[0]), -127, 127).astype(np.int8)
+          zps = np.array([0], dtype=np.int8)
+        else:
+          axis = new_qdim if new_qdim is not None else q['qdim']
+          b_shape = [1] * arr.ndim
+          b_shape[axis] = len(scales)
+          w_fp32 = (arr.astype(np.float32) - zps.reshape(b_shape).astype(np.float32)) * scales.reshape(b_shape)
+          reduce_axes = tuple(i for i in range(arr.ndim) if i != axis)
+          abs_max = np.maximum(np.max(np.abs(w_fp32), axis=reduce_axes), 1e-12)
+          scales = (abs_max / 127.0).astype(np.float32)
+          arr = np.clip(np.round(w_fp32 / scales.reshape(b_shape)), -127, 127).astype(np.int8)
+          zps = np.zeros_like(zps, dtype=np.int8)
       if len(scales) == 1:
+        if symmetric:
+          return mb.constexpr_affine_dequantize(
+            quantized_data=arr,
+            zero_point=np.int8(0),
+            scale=np.float32(scales[0]),
+            axis=0,
+          )
         return mb.constexpr_affine_dequantize(
           quantized_data=arr,
           zero_point=np.int8(zps[0]),
@@ -240,7 +278,7 @@ def convert_tflite_to_mlpackage(
   with Function(input_placeholders, opset_version=ct.target.iOS17) as func:
     for i, idx in enumerate(sg_inputs):
       v = func.inputs[input_names[i]]
-      if tensors[idx].Type() in (schema.TensorType.INT8, schema.TensorType.UINT8):
+      if not symmetric and tensors[idx].Type() in (schema.TensorType.INT8, schema.TensorType.UINT8):
         v = qdq(v, idx)
       env[idx] = v
       layout[idx] = 'NHWC' if len(shapes[idx]) == 4 else 'OTHER'
@@ -255,6 +293,8 @@ def convert_tflite_to_mlpackage(
         opt = schema.Conv2DOptions()
         opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
         x = get_var(ins[0], 'NCHW')
+        if symmetric and ins[0] in sg_inputs:
+          x = qdq(x, ins[0])
         w = get_quant_weight(ins[1], perm=[0, 3, 1, 2], new_qdim=0)
         b = get_const_fp32(ins[2]) if len(ins) > 2 and ins[2] >= 0 else None
         pad = 'same' if opt.Padding() == schema.Padding.SAME else 'valid'
@@ -328,19 +368,19 @@ def convert_tflite_to_mlpackage(
         }
         y = fn_map[op_name](x=a, y=b)
         y = _apply_activation(y, act)
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if (symmetric and op_name in ('MINIMUM', 'MAXIMUM')) else qdq(y, outs[0])
         layout[outs[0]] = target if target else l0
 
       elif op_name == 'RELU':
         x = get_var(ins[0])
         y = mb.relu(x=x)
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = layout.get(ins[0], 'OTHER')
 
       elif op_name == 'LOGISTIC':
         x = get_var(ins[0])
         y = mb.sigmoid(x=x)
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = layout.get(ins[0], 'OTHER')
 
       elif op_name == 'DEPTH_TO_SPACE':
@@ -348,7 +388,7 @@ def convert_tflite_to_mlpackage(
         opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
         x = get_var(ins[0], 'NCHW')
         y = mb.depth_to_space(x=x, block_size=opt.BlockSize())
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = 'NCHW'
 
       elif op_name == 'AVERAGE_POOL_2D':
@@ -379,7 +419,7 @@ def convert_tflite_to_mlpackage(
           target_size_width=int(out_w),
           sampling_mode=mode,
         )
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = 'NCHW'
 
       elif op_name == 'CONCATENATION':
@@ -406,7 +446,7 @@ def convert_tflite_to_mlpackage(
         if not isinstance(splits, (list, tuple)):
           splits = [splits]
         for out_idx, s in zip(outs, splits):
-          env[out_idx] = qdq(s, out_idx)
+          env[out_idx] = s if symmetric else qdq(s, out_idx)
           layout[out_idx] = cur_layout
 
       elif op_name == 'MEAN':
@@ -461,7 +501,7 @@ def convert_tflite_to_mlpackage(
         if opt.Beta() != 1.0:
           x = mb.mul(x=x, y=np.float32(opt.Beta()))
         y = mb.softmax(x=x, axis=-1)
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = 'NHWC' if len(shapes[outs[0]]) == 4 else 'OTHER'
 
       elif op_name == 'RESHAPE':
@@ -478,7 +518,7 @@ def convert_tflite_to_mlpackage(
             dtype=np.int32,
           )
         y = mb.reshape(x=x, shape=target_shape)
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = 'NHWC' if len(y.shape) == 4 else 'OTHER'
 
       elif op_name == 'SQUEEZE':
@@ -487,7 +527,7 @@ def convert_tflite_to_mlpackage(
         opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
         axes = [opt.SqueezeDims(j) for j in range(opt.SqueezeDimsLength())]
         y = mb.squeeze(x=x, axes=axes if axes else None)
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = 'NHWC' if len(y.shape) == 4 else 'OTHER'
 
       elif op_name == 'QUANTIZE':
@@ -504,7 +544,7 @@ def convert_tflite_to_mlpackage(
         x = get_var(ins[0], 'NHWC' if len(get_var(ins[0]).shape) == 4 else None)
         perm = [int(p) for p in get_var(ins[1]).flatten()]
         y = mb.transpose(x=x, perm=perm)
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = 'OTHER'
 
       elif op_name == 'CAST':
@@ -512,7 +552,7 @@ def convert_tflite_to_mlpackage(
         out_t = tensors[outs[0]].Type()
         mil_dt = 'int32' if out_t in (schema.TensorType.INT32, schema.TensorType.INT64) else 'fp32'
         y = mb.cast(x=x, dtype=mil_dt)
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = layout.get(ins[0], 'OTHER')
 
       elif op_name == 'GATHER':
@@ -521,14 +561,14 @@ def convert_tflite_to_mlpackage(
         params = get_var(ins[0])
         indices = get_var(ins[1])
         y = mb.gather(x=params, indices=indices, axis=opt.Axis())
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = 'OTHER'
 
       elif op_name == 'PAD':
         x = get_var(ins[0], 'NHWC' if len(get_var(ins[0]).shape) == 4 else None)
         paddings = buffers[ins[1]].astype(np.int32).flatten()
         y = mb.pad(x=x, pad=paddings, mode='constant', constant_val=np.float32(0.0))
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = 'OTHER'
 
       elif op_name == 'SLICE':
@@ -537,7 +577,7 @@ def convert_tflite_to_mlpackage(
         size = buffers[ins[2]].astype(np.int32).flatten()
         end = np.where(size < 0, np.array(x.shape, dtype=np.int32), begin + size)
         y = mb.slice_by_index(x=x, begin=begin, end=end)
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = 'OTHER'
 
       elif op_name == 'STRIDED_SLICE':
@@ -559,7 +599,7 @@ def convert_tflite_to_mlpackage(
           end_mask=end_mask,
           squeeze_mask=squeeze_mask,
         )
-        env[outs[0]] = qdq(y, outs[0])
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
         layout[outs[0]] = 'OTHER'
 
       elif op_name == 'UNPACK':
@@ -571,7 +611,7 @@ def convert_tflite_to_mlpackage(
           splits = [splits]
         for out_idx, s in zip(outs, splits):
           sq = mb.squeeze(x=s, axes=[opt.Axis()])
-          env[out_idx] = qdq(sq, out_idx)
+          env[out_idx] = sq if symmetric else qdq(sq, out_idx)
           layout[out_idx] = 'OTHER'
 
       elif op_name == 'TFLite_Detection_PostProcess':
@@ -653,6 +693,7 @@ def convert_tflite_to_mlpackage(
     prog,
     convert_to='mlprogram',
     minimum_deployment_target=ct.target.iOS17,
+    compute_precision=compute_precision,
   )
   spec = mlmodel.get_spec()
   for i, name in enumerate(input_names):
@@ -686,9 +727,15 @@ if __name__ == '__main__':
     action='store_true',
     help='Only quantize weights (W8) without inserting activation quantize/dequantize ops.',
   )
+  parser.add_argument(
+    '--symmetric',
+    action='store_true',
+    help='Convert asymmetric quantized tensors (zero_point != 0) to symmetric (zero_point = 0).',
+  )
   args = parser.parse_args()
   convert_tflite_to_mlpackage(
     args.tflite_path,
     args.export_path,
     quantize_activations=not args.weights_only,
+    symmetric=args.symmetric,
   )
