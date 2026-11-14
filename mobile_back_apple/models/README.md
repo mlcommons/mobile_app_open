@@ -31,6 +31,7 @@ pip install -r requirements.txt
 | `mobilebert_int8.py` | MobileBERT (INT8 W8 / W8A8) | Natural Language Processing | `.mlpackage` |
 | `edsr.py` | EDSR (`edsr_f32b5` FP16) | Super Resolution | `.mlpackage` |
 | `edsr_int8.py` | EDSR (`edsr_f32b5` INT8 W8 / W8A8) | Super Resolution | `.mlpackage` |
+| `tflite_to_coreml.py` | Any quantized INT8/UINT8 `.tflite` | Direct TFLite W8A8 -> Core ML | `.mlpackage` |
 
 ## Helpful resources
 
