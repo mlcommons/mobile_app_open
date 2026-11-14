@@ -133,3 +133,38 @@ def quantize_activations(mlmodel,
   print('Activations quantization (A8) finished.')
   return quantized_model
 
+
+def convert_mosaic_ios18(pruned_fn, input_shape: tuple):
+  """Converts pruned MOSAIC TF graph to iOS 18 ML Program with uint16 argmax for ANE."""
+  import coremltools as ct
+  from coremltools.converters.mil import Builder as mb
+
+  prog = ct.convert(
+    [pruned_fn],
+    source='tensorflow',
+    convert_to='milinternal',
+    inputs=[ct.TensorType(shape=input_shape)],
+    minimum_deployment_target=ct.target.iOS18,
+  )
+  fn = prog.functions['main']
+  out_var = fn.outputs[0]
+  last_op = out_var.op
+  if last_op is not None and last_op.op_type == 'reduce_argmax':
+    with fn:
+      new_out = mb.reduce_argmax(
+        x=last_op.x,
+        axis=last_op.axis,
+        keep_dims=last_op.keep_dims,
+        output_dtype='uint16',
+        name=out_var.name,
+      )
+      fn.set_outputs([new_out])
+    fn.remove_ops([last_op])
+
+  return ct.convert(
+    prog,
+    convert_to='mlprogram',
+    minimum_deployment_target=ct.target.iOS18,
+  )
+
+

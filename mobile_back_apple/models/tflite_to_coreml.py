@@ -108,6 +108,7 @@ def convert_tflite_to_mlpackage(
   quantize_activations: bool = True,
   symmetric: bool = False,
   compute_precision=ct.precision.FLOAT16,
+  minimum_deployment_target=ct.target.iOS18,
   float_io: bool = True,
   short_description: str = '',
 ):
@@ -275,7 +276,7 @@ def convert_tflite_to_mlpackage(
       v = mb.transpose(x=v, perm=[0, 2, 3, 1])
     return v
 
-  with Function(input_placeholders, opset_version=ct.target.iOS17) as func:
+  with Function(input_placeholders, opset_version=minimum_deployment_target) as func:
     for i, idx in enumerate(sg_inputs):
       v = func.inputs[input_names[i]]
       if not symmetric and tensors[idx].Type() in (schema.TensorType.INT8, schema.TensorType.UINT8):
@@ -469,8 +470,13 @@ def convert_tflite_to_mlpackage(
         x = get_var(ins[0])
         if cur_layout == 'NCHW':
           axis = _nhwc_axis_to_nchw(axis, 4)
-        y = mb.reduce_argmax(x=x, axis=axis, keep_dims=False)
-        env[outs[0]] = mb.cast(x=y, dtype='int32')
+        if minimum_deployment_target >= ct.target.iOS18:
+          env[outs[0]] = mb.reduce_argmax(
+            x=x, axis=axis, keep_dims=False, output_dtype='uint16'
+          )
+        else:
+          y = mb.reduce_argmax(x=x, axis=axis, keep_dims=False)
+          env[outs[0]] = mb.cast(x=y, dtype='int32')
         layout[outs[0]] = 'OTHER'
 
       elif op_name == 'FULLY_CONNECTED':
@@ -692,7 +698,7 @@ def convert_tflite_to_mlpackage(
   mlmodel = ct.convert(
     prog,
     convert_to='mlprogram',
-    minimum_deployment_target=ct.target.iOS17,
+    minimum_deployment_target=minimum_deployment_target,
     compute_precision=compute_precision,
   )
   spec = mlmodel.get_spec()

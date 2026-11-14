@@ -16,10 +16,10 @@
 # limitations under the License.
 
 import shutil
-import coremltools as ct
 import numpy as np
 import tensorflow as tf
 from utils import (
+  convert_mosaic_ios18,
   load_frozen_graph,
   optimize_graph,
   quantize_activations,
@@ -49,12 +49,7 @@ def main():
   tfmodel = tf.saved_model.load(saved_model_export_dir)
   pruned = tfmodel.prune('sub_2:0', 'ArgMax:0')
 
-  model = ct.convert(
-    [pruned],
-    source='tensorflow',
-    convert_to='mlprogram',
-    inputs=[ct.TensorType(shape=input_shape)],
-  )
+  model = convert_mosaic_ios18(pruned, input_shape)
 
   w8_model = quantize_weights(model)
   w8_model.save(w8_export_filepath)

@@ -17,8 +17,7 @@
 
 import shutil
 import tensorflow as tf
-import coremltools as ct
-from utils import load_frozen_graph, optimize_graph
+from utils import convert_mosaic_ios18, load_frozen_graph, optimize_graph
 
 
 def main():
@@ -43,12 +42,7 @@ def main():
   tfmodel = tf.saved_model.load(saved_model_export_dir)
   pruned = tfmodel.prune("sub_2:0", "ArgMax:0")
 
-  model = ct.convert(
-    [pruned],
-    source='tensorflow',
-    convert_to='mlprogram',
-    inputs=[ct.TensorType(shape=input_shape)],
-  )
+  model = convert_mosaic_ios18(pruned, input_shape)
 
   print(model.get_spec().description)
   model.save(coreml_export_filepath)
