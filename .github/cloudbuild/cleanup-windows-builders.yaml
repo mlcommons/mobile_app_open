@@ -1,0 +1,43 @@
+# Deletes Compute Engine VMs leaked by flutter-windows.yaml.
+#
+# windows-builder creates a VM named windows-builder-<uuid> for every build and
+# deletes it when the build step finishes. When the build is cancelled or times
+# out, the step is killed before that cleanup runs and the VM (plus its pd-ssd
+# disk) keeps running and billing.
+#
+# Run daily by the manual trigger "cleanup-windows-builders", fired by the Cloud
+# Scheduler job of the same name (us-central1). Any windows-builder VM older
+# than _MAX_AGE_HOURS is deleted with its disks; the Windows build's own timeout
+# is 2 hours, so a VM older than that cannot belong to a running build.
+
+substitutions:
+  _MAX_AGE_HOURS: '3'
+
+steps:
+  - id: delete-stale-windows-builders
+    name: gcr.io/cloud-builders/gcloud
+    timeout: 1200s
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        cutoff="$$(date -u -d "-${_MAX_AGE_HOURS} hours" +%Y-%m-%dT%H:%M:%SZ)"
+        echo "Deleting windows-builder-* VMs created before $$cutoff"
+        gcloud compute instances list \
+          --project="$PROJECT_ID" \
+          --filter="name~^windows-builder- AND creationTimestamp<'$$cutoff'" \
+          --format='value(name,zone.basename(),creationTimestamp,status)' \
+          >stale.txt
+        if [ ! -s stale.txt ]; then
+          echo "No stale VMs."
+          exit 0
+        fi
+        cat stale.txt
+        while read -r name zone _; do
+          gcloud compute instances delete "$$name" \
+            --project="$PROJECT_ID" --zone="$$zone" \
+            --delete-disks=all --quiet
+        done <stale.txt
+
+timeout: 1500s
