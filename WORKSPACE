@@ -158,11 +158,23 @@ http_archive(
         "//:patches/litert-internal-visibility.diff",
         # Fix for LiteRT crashing on close when using OpenCL accelerator
         "//:patches/custom_buffer_teardown.patch",
+        "//:patches/litert_ml_drift_oss_build.patch",
     ],
     sha256 = "6d2ce16738199adc5a3cdde76c3c6a6dac636d3b52a1d7790ea524fb0d59f7fc",
     strip_prefix = "LiteRT-2.2.0",
     urls = [
         "https://github.com/google-ai-edge/LiteRT/archive/v2.2.0.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "ml_drift",
+    patch_args = ["-p1"],
+    patches = ["//:patches/ml_drift_oss_build.patch"],
+    sha256 = "c0a6a635c1089868af47da05ba84eecd48a669bbba27dbbf8d27611bddbcd639",
+    strip_prefix = "ml-drift-697f6de5b82c8976136505eca30f79337d9d5dd9",
+    urls = [
+        "https://github.com/google-ai-edge/ml-drift/archive/697f6de5b82c8976136505eca30f79337d9d5dd9.tar.gz",
     ],
 )
 

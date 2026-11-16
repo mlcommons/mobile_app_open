@@ -1,0 +1,55 @@
+diff --git a/ml_drift/common/BUILD b/ml_drift/common/BUILD
+--- a/ml_drift/common/BUILD
++++ b/ml_drift/common/BUILD
+@@ -658,7 +658,7 @@
+ cc_library(
+     name = "types",
+     hdrs = ["types.h"],
+-    deps = ["@fp16"],
++    deps = ["@FP16//:FP16"],
+ )
+
+ cc_library(
+diff --git a/ml_drift/common/default/BUILD b/ml_drift/common/default/BUILD
+--- a/ml_drift/common/default/BUILD
++++ b/ml_drift/common/default/BUILD
+@@ -22,12 +22,12 @@
+ cc_library(
+     name = "custom_parsers",
+     srcs = ["custom_parsers.cc"],
+-    hdrs = ["@//ml_drift_delegate/tflite:custom_parsers.h"],
++    hdrs = ["@litert//ml_drift_delegate/tflite:custom_parsers.h"],
+     deps = [
+         "//ml_drift/common:shape",
+         "//ml_drift/common:status",
+-        "@//ml_drift_delegate/tflite:operation_parser",
+-        "@//ml_drift_delegate/tflite:unimplemented_operation_parser",
++        "@litert//ml_drift_delegate/tflite:operation_parser",
++        "@litert//ml_drift_delegate/tflite:unimplemented_operation_parser",
+         "@com_google_absl//absl/strings",
+     ],
+ )
+diff --git a/ml_drift/common/kernels/BUILD b/ml_drift/common/kernels/BUILD
+--- a/ml_drift/common/kernels/BUILD
++++ b/ml_drift/common/kernels/BUILD
+@@ -673,7 +673,7 @@
+         "fully_connected.h",
+     ],
+     visibility = [
+-        "@//ml_drift_delegate/delegate/serialization_weight_cache:__pkg__",
++        "@litert//ml_drift_delegate/delegate/serialization_weight_cache:__pkg__",
+     ],
+ )
+
+diff --git a/ml_drift/common/task/BUILD b/ml_drift/common/task/BUILD
+--- a/ml_drift/common/task/BUILD
++++ b/ml_drift/common/task/BUILD
+@@ -379,7 +379,7 @@
+         "weights_layout.h",
+     ],
+     visibility = [
+-        "@//ml_drift_delegate/delegate/serialization_weight_cache:__pkg__",
++        "@litert//ml_drift_delegate/delegate/serialization_weight_cache:__pkg__",
+     ],
+ )
+

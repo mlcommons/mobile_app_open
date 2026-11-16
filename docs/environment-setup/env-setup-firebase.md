@@ -42,6 +42,14 @@ To enable it, you need to set the environment variable:
 export FIREBASE_CRASHLYTICS_ENABLED=true
 ```
 
+For Android release builds (`make flutter/android/release`), this also builds the Dart code with
+`--split-debug-info` and uploads its symbols with `firebase crashlytics:symbols:upload`, so crashes in
+`libapp.so` and Dart stack traces are readable in Crashlytics. This needs the
+[Firebase CLI](https://firebase.google.com/docs/cli) (preinstalled in the Android Docker image) and
+`FIREBASE_ANDROID_APP_ID` set in the environment. The upload does not need a Firebase login.
+The symbols stay in `flutter/build/app/outputs/symbols/{apk,aab}`; keep them to symbolicate a stack trace
+offline with `flutter symbolize`.
+
 That's it! You can now run the app with your own Firebase project.
 
 ## Firebase Extension

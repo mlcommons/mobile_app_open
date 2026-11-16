@@ -193,3 +193,16 @@ ENV LD_LIBRARY_PATH="/usr/local/lib/:${LD_LIBRARY_PATH}"
 # Kept as a trailing layer (a symlink, not a rename) so the earlier cmdline-tools
 # / NDK / OpenCV layers stay cache-valid and the image rebuild stays fast.
 RUN ln -s "$ANDROID_SDK_ROOT/cmdline-tools/tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+
+# Firebase CLI, to upload the Dart symbols of release builds to Crashlytics
+# (`firebase crashlytics:symbols:upload`, see flutter/android/android.mk).
+# The standalone binary bundles its own Node.js, which Ubuntu 22.04 only ships
+# in a version too old for the CLI. The upload runs the Crashlytics buildtools
+# jar with the JDK above and needs no Firebase login.
+# Kept as a trailing layer so the earlier layers stay cache-valid. To update,
+# change the version in the URL and the checksum together (the release lists
+# the sha256 digest of each asset).
+ADD --chmod=755 \
+    --checksum=sha256:c995923beab904488e55802a5cf74bc9c8a1f57780d2aa22131fae8065fb3327 \
+    https://github.com/firebase/firebase-tools/releases/download/v15.33.0/firebase-tools-linux \
+    /usr/local/bin/firebase
