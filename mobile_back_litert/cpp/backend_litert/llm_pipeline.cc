@@ -302,6 +302,8 @@ mlperf_status_t LLMPipeline::backend_issue_query(
   LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
 
   auto check_stop_id = [backend_data](int id) {
+    if (backend_data->output_tokens.size() < backend_data->min_output_tokens)
+      return false;
     for (int stop_token_id : backend_data->stop_token_ids) {
       if (id == stop_token_id) return true;
     }
@@ -371,10 +373,11 @@ mlperf_status_t LLMPipeline::backend_flush_queries(
 }
 
 // Return the number of inputs of the model.
-// 2 inputs need to be provided manually, the tokens themselves. and a token
-// count limit. The other inputs are handled by the pipeline
+// 3 inputs need to be provided manually, the tokens themselves, a maximum
+// token count and a minimum token count. The other inputs are handled by the
+// pipeline
 int32_t LLMPipeline::backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
-  return 2;
+  return 3;
 }
 
 // Return the type of the ith input.
@@ -386,7 +389,8 @@ mlperf_data_t LLMPipeline::backend_get_input_type(
 
 // Set the data for ith input.
 // 0: list of input tokens.
-// 1: output token count limit.
+// 1: maximum output token count.
+// 2: minimum output token count.
 mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                                int32_t batch_index, int32_t i,
                                                void* data) {
@@ -396,6 +400,11 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
 
   if (i == 1) {
     backend_data->max_output_tokens = *(reinterpret_cast<int*>(data));
+    return MLPERF_SUCCESS;
+  }
+
+  if (i == 2) {
+    backend_data->min_output_tokens = *(reinterpret_cast<int*>(data));
     return MLPERF_SUCCESS;
   }
 

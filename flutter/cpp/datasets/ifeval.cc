@@ -114,6 +114,8 @@ std::vector<void*> IFEval::GetData(int sample_idx) {
     data.push_back(reinterpret_cast<void*>(
         const_cast<std::vector<int>*>(&(samples_[sample_idx]->input_tokens))));
     data.push_back(reinterpret_cast<void*>(const_cast<int*>(&token_limit_)));
+    data.push_back(
+        reinterpret_cast<void*>(const_cast<int*>(&min_output_tokens_)));
   }
   return data;
 }

@@ -86,6 +86,7 @@ class IFEval : public Dataset {
   const std::string prompt_format_;
   static constexpr int input_token_limit_ = 2048;
   int token_limit_ = 1024;
+  int min_output_tokens_ = 0;
 };
 
 }  // namespace mobile

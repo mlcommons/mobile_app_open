@@ -42,7 +42,10 @@ MmluGen::MmluGen(Backend* backend, const std::string& input_tfrecord,
         tensorflow::GetFeatureValues<std::string>("answer", example).Get(0);
 
     // Set output token limit to 128 if performance mode is being used
-    if (mode == ::mlperf::TestMode::PerformanceOnly) token_limit_ = 128;
+    if (mode == ::mlperf::TestMode::PerformanceOnly) {
+      token_limit_ = 128;
+      min_output_tokens_ = 128;
+    }
 
     if (zero_shot) {
       // input-formatted shots are separated by 2 new lines, so we find the last
@@ -114,6 +117,8 @@ std::vector<void*> MmluGen::GetData(int sample_idx) {
     data.push_back(reinterpret_cast<void*>(
         const_cast<std::vector<int>*>(&(samples_[sample_idx]->input_tokens))));
     data.push_back(reinterpret_cast<void*>(const_cast<int*>(&token_limit_)));
+    data.push_back(
+        reinterpret_cast<void*>(const_cast<int*>(&min_output_tokens_)));
   }
   return data;
 }
