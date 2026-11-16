@@ -10,6 +10,38 @@
 namespace mlperf {
 namespace mobile {
 
+namespace {
+
+std::string remove_special_tokens(const std::string& s) {
+  std::string out;
+  out.reserve(s.size());
+  std::size_t i = 0;
+  while (i < s.size()) {
+    if (s[i] == '<') {
+      std::size_t j = i + 1;
+      while (j < s.size() && s[j] != '<' && s[j] != '>' &&
+             !std::isspace(static_cast<unsigned char>(s[j])))
+        ++j;
+      if (j < s.size() && s[j] == '>') {
+        std::string piece = s.substr(i, j - i + 1);
+        if (piece == "<pad>" || piece == "<eos>" || piece == "<bos>" ||
+            piece == "<mask>" ||
+            (piece.size() > 3 &&
+             (piece.compare(0, 2, "<|") == 0 ||
+              piece.compare(piece.size() - 2, 2, "|>") == 0))) {
+          i = j + 1;
+          continue;
+        }
+      }
+    }
+    out.push_back(s[i]);
+    ++i;
+  }
+  return out;
+}
+
+}  // namespace
+
 IFEval::IFEval(Backend* backend, const std::string& input_tfrecord,
                const std::string& sp_path, const std::string& output_dir,
                const std::string& prompt_format)
@@ -82,6 +114,8 @@ std::vector<void*> IFEval::GetData(int sample_idx) {
     data.push_back(reinterpret_cast<void*>(
         const_cast<std::vector<int>*>(&(samples_[sample_idx]->input_tokens))));
     data.push_back(reinterpret_cast<void*>(const_cast<int*>(&token_limit_)));
+    data.push_back(
+        reinterpret_cast<void*>(const_cast<int*>(&min_output_tokens_)));
   }
   return data;
 }
@@ -107,8 +141,9 @@ bool IFEval::HasAccuracy() { return true; }
 
 bool IFEval::ComputeSampleAccuracy(const int sample_idx,
                                    ifeval::Accuracy& accuracy) {
-  std::string prediction;
-  sp_processor->Decode(sample_output_tokens_[sample_idx], &prediction).ok();
+  std::string raw_prediction;
+  sp_processor->Decode(sample_output_tokens_[sample_idx], &raw_prediction).ok();
+  std::string prediction = remove_special_tokens(raw_prediction);
 
   bool is_prompt_correct_loose = true;
   bool is_prompt_correct_strict = true;
@@ -134,12 +169,15 @@ bool IFEval::ComputeSampleAccuracy(const int sample_idx,
       raw_output_dir_ + "/sample_" + std::to_string(sample_idx) + ".txt";
   std::ofstream file(filename);
   if (file.is_open()) {
+    file << "----- Key -----" << std::endl;
     file << std::to_string(samples_[sample_idx]->key) << std::endl;
-    file << "-----" << std::endl;
+    file << "----- Prompt -----" << std::endl;
     file << samples_[sample_idx]->prompt << std::endl;
-    file << "-----" << std::endl;
+    file << "----- Raw output -----" << std::endl;
+    file << raw_prediction << std::endl;
+    file << "----- Scored output (special tokens removed) -----" << std::endl;
     file << prediction << std::endl;
-    file << "-----" << std::endl;
+    file << "----- Result -----" << std::endl;
     file << "Loose result: " << (is_prompt_correct_loose ? "Success" : "Fail")
          << std::endl;
     file << "Strict result: " << (is_prompt_correct_strict ? "Success" : "Fail")

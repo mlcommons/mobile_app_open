@@ -35,6 +35,10 @@ class BenchmarkInfo {
       case (BenchmarkId.llm3bInstruct):
       case (BenchmarkId.llm8b):
       case (BenchmarkId.llm8bInstruct):
+      case (BenchmarkId.llmGemmaE2b):
+      case (BenchmarkId.llmGemmaE2bInstruct):
+      case (BenchmarkId.llmQwen08b):
+      case (BenchmarkId.llmQwen08bInstruct):
         return BenchmarkLocalizationInfo(
           name: task.name,
           detailsTitle: stringResources.benchInfoLlm,

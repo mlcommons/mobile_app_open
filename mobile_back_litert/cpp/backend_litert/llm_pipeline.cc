@@ -125,6 +125,21 @@ mlperf_backend_ptr_t LLMPipeline::backend_create(
     model_dir = model_dir.substr(0, model_dir.rfind('/'));
   }
 
+  // Gemma uses different pad and stop token ids than the Llama default.
+  std::string model_identity =
+      llm_model_path + '/' +
+      mlperf::mobile::GetConfigValue(configs, "tokenizer_filename",
+                                     std::string(""));
+  if (model_identity.find("gemma") != std::string::npos) {
+    backend_data->pad_token_id = 0;
+    backend_data->stop_token_ids = {1, 106};
+  }
+  if (model_identity.find("qwen") != std::string::npos) {
+    backend_data->pad_token_id = 0;
+    backend_data->stop_token_ids = {248044, 248046};
+    backend_data->gpu_fp32 = true;
+  }
+
   bool use_gpu = configs->accelerator != nullptr &&
                  strcmp(configs->accelerator, "cpu") != 0;
 
@@ -205,7 +220,7 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
           : 0;
   int prefill_amount =
       prefill_overflow ? prefill_seq_size : (prefill_seq_size - 1);
-  int decode_tokens = prefill_overflow ? overflow_size - 1 : 1;
+  int decode_tokens = prefill_overflow ? overflow_size : 1;
 
   std::vector<int32_t> tokens_data(max_seq_size, backend_data->pad_token_id);
   std::vector<int32_t> pos_data(max_seq_size);
@@ -221,9 +236,8 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
   }
   backend_data->prefill_input_bufs[backend_data->prefill_pos_idx]
       .Write<int32_t>(absl::MakeConstSpan(pos_data));
-  ResetKV(backend_data->num_kv_layers, backend_data->kv_k_float_counts,
-          backend_data->kv_v_float_counts, backend_data->prefill_input_map,
-          backend_data->prefill_input_bufs);
+  ResetKV(backend_data->kv_names, backend_data->kv_float_counts,
+          backend_data->prefill_input_map, backend_data->prefill_input_bufs);
   if (backend_data->has_mask_input) {
     WritePrefillMask(
         *backend_data->model, backend_data->current_prefill_sig_idx,
@@ -242,7 +256,7 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
   LITERT_LOG_MEM("llm: prefill Run done");
 
   // Move the prefill KV state into the decode buffers.
-  TransferKV(backend_data->num_kv_layers, backend_data->prefill_output_map,
+  TransferKV(backend_data->kv_names, backend_data->prefill_output_map,
              backend_data->decode_input_map, backend_data->prefill_output_bufs,
              backend_data->decode_input_bufs);
 
@@ -271,8 +285,9 @@ mlperf_status_t LLMPipeline::backend_issue_first_token_query(
         backend_data->decode_sig_idx,
         absl::MakeSpan(backend_data->decode_input_bufs),
         absl::MakeSpan(backend_data->decode_output_bufs)));
-    next_token = backend_data->prompt_tokens[++next_position];
-    UpdateDecodeKV(backend_data->num_kv_layers, backend_data->decode_input_map,
+    if (++next_position < static_cast<int>(backend_data->prompt_tokens.size()))
+      next_token = backend_data->prompt_tokens[next_position];
+    UpdateDecodeKV(backend_data->kv_names, backend_data->decode_input_map,
                    backend_data->decode_output_map,
                    backend_data->decode_input_bufs,
                    backend_data->decode_output_bufs);
@@ -287,6 +302,8 @@ mlperf_status_t LLMPipeline::backend_issue_query(
   LLMBackendData* backend_data = (LLMBackendData*)backend_ptr;
 
   auto check_stop_id = [backend_data](int id) {
+    if (backend_data->output_tokens.size() < backend_data->min_output_tokens)
+      return false;
     for (int stop_token_id : backend_data->stop_token_ids) {
       if (id == stop_token_id) return true;
     }
@@ -334,7 +351,7 @@ mlperf_status_t LLMPipeline::backend_issue_query(
         backend_data->decode_sig_idx,
         absl::MakeSpan(backend_data->decode_input_bufs),
         absl::MakeSpan(backend_data->decode_output_bufs)));
-    UpdateDecodeKV(backend_data->num_kv_layers, backend_data->decode_input_map,
+    UpdateDecodeKV(backend_data->kv_names, backend_data->decode_input_map,
                    backend_data->decode_output_map,
                    backend_data->decode_input_bufs,
                    backend_data->decode_output_bufs);
@@ -356,10 +373,11 @@ mlperf_status_t LLMPipeline::backend_flush_queries(
 }
 
 // Return the number of inputs of the model.
-// 2 inputs need to be provided manually, the tokens themselves. and a token
-// count limit. The other inputs are handled by the pipeline
+// 3 inputs need to be provided manually, the tokens themselves, a maximum
+// token count and a minimum token count. The other inputs are handled by the
+// pipeline
 int32_t LLMPipeline::backend_get_input_count(mlperf_backend_ptr_t backend_ptr) {
-  return 2;
+  return 3;
 }
 
 // Return the type of the ith input.
@@ -371,7 +389,8 @@ mlperf_data_t LLMPipeline::backend_get_input_type(
 
 // Set the data for ith input.
 // 0: list of input tokens.
-// 1: output token count limit.
+// 1: maximum output token count.
+// 2: minimum output token count.
 mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
                                                int32_t batch_index, int32_t i,
                                                void* data) {
@@ -384,11 +403,15 @@ mlperf_status_t LLMPipeline::backend_set_input(mlperf_backend_ptr_t backend_ptr,
     return MLPERF_SUCCESS;
   }
 
+  if (i == 2) {
+    backend_data->min_output_tokens = *(reinterpret_cast<int*>(data));
+    return MLPERF_SUCCESS;
+  }
+
   backend_data->prompt_tokens = *(reinterpret_cast<std::vector<int>*>(data));
 
-  ResetKV(backend_data->num_kv_layers, backend_data->kv_k_float_counts,
-          backend_data->kv_v_float_counts, backend_data->decode_input_map,
-          backend_data->decode_input_bufs);
+  ResetKV(backend_data->kv_names, backend_data->kv_float_counts,
+          backend_data->decode_input_map, backend_data->decode_input_bufs);
   size_t effective_prefill_token_size = backend_data->prompt_tokens.size() - 1;
   // The prefill logits buffer is [1, bucket, vocab] fp32, so every step up in
   // bucket size doubles it -- for the 1B export that is 1.05 GiB at 2048 and
@@ -500,7 +523,9 @@ bool LLMPipeline::BuildCompiledModel(LLMBackendData& data,
   auto gpu_options = options->GetGpuOptions();
   if (gpu_options) {
     gpu_options->EnableInfiniteFloatCapping(true);
-    gpu_options->SetPrecision(litert::GpuOptions::Precision::kFp16);
+    gpu_options->SetPrecision(data.gpu_fp32
+                                  ? litert::GpuOptions::Precision::kFp32
+                                  : litert::GpuOptions::Precision::kFp16);
     gpu_options->SetBufferStorageType(
         litert::GpuOptions::BufferStorageType::kBuffer);
     gpu_options->SetPreferTextureWeights(false);
@@ -917,13 +942,20 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
   }
 
   data.num_kv_layers = 0;
+  data.kv_names.clear();
+  std::string kv_k_name;
   for (const auto& entry : data.decode_output_map) {
-    if (entry.first.rfind("kv_cache_k_", 0) == 0) ++data.num_kv_layers;
+    if (entry.first.rfind("kv_cache_", 0) != 0) continue;
+    data.kv_names.push_back(entry.first);
+    if (entry.first.rfind("kv_cache_k_", 0) == 0) {
+      ++data.num_kv_layers;
+      kv_k_name = entry.first;
+    }
   }
 
   if (data.num_kv_layers > 0) {
     auto kv_type =
-        data.model->GetInputTensorType(data.decode_sig_idx, "kv_cache_k_0");
+        data.model->GetInputTensorType(data.decode_sig_idx, kv_k_name);
     if (!kv_type) {
       LOG(ERROR) << "RankedTensorType failed";
       return false;
@@ -931,23 +963,17 @@ bool LLMPipeline::BuildDecodeBuffers(LLMBackendData& data) {
     // [1, n_kv_heads, kv_len, head_dim]
     data.kv_cache_max_size = (*kv_type).Layout().Dimensions()[2];
 
-    data.kv_k_float_counts.resize(data.num_kv_layers);
-    data.kv_v_float_counts.resize(data.num_kv_layers);
-    for (int i = 0; i < data.num_kv_layers; ++i) {
-      const std::string suffix = std::to_string(i);
-      auto k_reqs = data.model->GetInputBufferRequirements(
-          data.decode_sig_idx, "kv_cache_k_" + suffix);
-      auto v_reqs = data.model->GetInputBufferRequirements(
-          data.decode_sig_idx, "kv_cache_v_" + suffix);
-      if (!k_reqs || !v_reqs) {
-        LOG(ERROR) << "GetInputBufferRequirements (KV layer " << i
+    data.kv_float_counts.resize(data.kv_names.size());
+    for (size_t i = 0; i < data.kv_names.size(); ++i) {
+      auto reqs = data.model->GetInputBufferRequirements(data.decode_sig_idx,
+                                                         data.kv_names[i]);
+      if (!reqs) {
+        LOG(ERROR) << "GetInputBufferRequirements (" << data.kv_names[i]
                    << ") failed";
         return false;
       }
-      auto k_size = k_reqs->BufferSize();
-      auto v_size = v_reqs->BufferSize();
-      data.kv_k_float_counts[i] = static_cast<int>(*k_size / sizeof(float));
-      data.kv_v_float_counts[i] = static_cast<int>(*v_size / sizeof(float));
+      auto size = reqs->BufferSize();
+      data.kv_float_counts[i] = static_cast<int>(*size / sizeof(float));
     }
   }
 
@@ -1084,53 +1110,43 @@ size_t LLMPipeline::GetSuitablePrefillSignature(
 }
 
 void LLMPipeline::TransferKV(
-    int num_layers,
+    const std::vector<std::string>& kv_names,
     const std::unordered_map<std::string, size_t>& prefill_output_map,
     const std::unordered_map<std::string, size_t>& decode_input_map,
     std::vector<litert::TensorBuffer>& prefill_output_bufs,
     std::vector<litert::TensorBuffer>& decode_input_bufs) {
-  for (int i = 0; i < num_layers; ++i) {
-    for (const char* prefix : {"kv_cache_k_", "kv_cache_v_"}) {
-      std::string name = std::string(prefix) + std::to_string(i);
-      std::swap(prefill_output_bufs[prefill_output_map.at(name)],
-                decode_input_bufs[decode_input_map.at(name)]);
-    }
+  for (const auto& name : kv_names) {
+    std::swap(prefill_output_bufs[prefill_output_map.at(name)],
+              decode_input_bufs[decode_input_map.at(name)]);
   }
 }
 
 void LLMPipeline::UpdateDecodeKV(
-    int num_layers,
+    const std::vector<std::string>& kv_names,
     const std::unordered_map<std::string, size_t>& decode_input_map,
     const std::unordered_map<std::string, size_t>& decode_output_map,
     std::vector<litert::TensorBuffer>& decode_input_bufs,
     std::vector<litert::TensorBuffer>& decode_output_bufs) {
-  for (int i = 0; i < num_layers; ++i) {
-    for (const char* prefix : {"kv_cache_k_", "kv_cache_v_"}) {
-      std::string name = std::string(prefix) + std::to_string(i);
-      std::swap(decode_input_bufs[decode_input_map.at(name)],
-                decode_output_bufs[decode_output_map.at(name)]);
-    }
+  for (const auto& name : kv_names) {
+    std::swap(decode_input_bufs[decode_input_map.at(name)],
+              decode_output_bufs[decode_output_map.at(name)]);
   }
 }
 
 void LLMPipeline::ResetKV(
-    int num_layers, const std::vector<int>& k_float_counts,
-    const std::vector<int>& v_float_counts,
+    const std::vector<std::string>& kv_names,
+    const std::vector<int>& float_counts,
     const std::unordered_map<std::string, size_t>& input_map,
     std::vector<litert::TensorBuffer>& input_bufs) {
-  if (num_layers == 0) return;
+  if (kv_names.empty()) return;
 
   int max_count = 0;
-  for (int i = 0; i < num_layers; ++i)
-    max_count = std::max({max_count, k_float_counts[i], v_float_counts[i]});
+  for (int count : float_counts) max_count = std::max(max_count, count);
   const std::vector<float> zeros(max_count, 0.0f);
 
-  for (int i = 0; i < num_layers; ++i) {
-    const std::string suffix = std::to_string(i);
-    input_bufs[input_map.at("kv_cache_k_" + suffix)].Write<float>(
-        absl::MakeConstSpan(zeros.data(), k_float_counts[i]));
-    input_bufs[input_map.at("kv_cache_v_" + suffix)].Write<float>(
-        absl::MakeConstSpan(zeros.data(), v_float_counts[i]));
+  for (size_t i = 0; i < kv_names.size(); ++i) {
+    input_bufs[input_map.at(kv_names[i])].Write<float>(
+        absl::MakeConstSpan(zeros.data(), float_counts[i]));
   }
 }
 

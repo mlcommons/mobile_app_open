@@ -139,5 +139,9 @@ const benchmarkExpectedAccuracy = {
   BenchmarkId.stableDiffusion: _stableDiffusion,
   BenchmarkId.llm1b: _llm,
   BenchmarkId.llm1bInstruct: _llm,
+  BenchmarkId.llmGemmaE2b: _llm,
+  BenchmarkId.llmGemmaE2bInstruct: _llm,
+  BenchmarkId.llmQwen08b: _llm,
+  BenchmarkId.llmQwen08bInstruct: _llm,
   BenchmarkId.imageClassificationOfflineV2: _imageClassificationOfflineV2,
 };

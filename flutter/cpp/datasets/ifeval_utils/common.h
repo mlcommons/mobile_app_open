@@ -52,8 +52,6 @@ inline bool contains_string(const std::string& text,
 }
 
 // Python's len() counts characters; count UTF-8 lead bytes to match it.
-// Special tokens left in the response text, e.g. "<turn>", count as their 6
-// characters, not as a single token.
 inline size_t utf8_len(const std::string& s) {
   size_t n = 0;
   for (unsigned char c : s) n += (c & 0xC0) != 0x80;
