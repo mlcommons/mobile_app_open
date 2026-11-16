@@ -83,7 +83,10 @@ flutter_launcher_icons:
 flutter:
   assets:
     - assets/
+    - assets/datasets/
     - assets/icons/
+    - assets/models/
+    - assets/models_fp16/
     - assets/text/
     - assets/android-boards/database.json
   generate: true

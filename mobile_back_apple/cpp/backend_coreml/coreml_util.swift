@@ -1,8 +1,11 @@
+import Accelerate
 import CoreML
+import CoreVideo
 import Foundation
 
 struct MLFeature {
   public var data: UnsafeMutableRawPointer?
+  public var pixelBuffer: CVPixelBuffer?
   public var description: MLFeatureDescription?
 }
 
@@ -36,6 +39,11 @@ private class MLMultiArrayFeatureProvider: NSObject, MLFeatureProvider {
       }
 
       featureNames.insert(featureName)
+
+      if let pixelBuffer = input.pixelBuffer {
+        featureValues[featureName] = MLFeatureValue(pixelBuffer: pixelBuffer)
+        continue
+      }
 
       guard let constraint = input.description?.multiArrayConstraint else {
         throw MLError(message: "Constraint is missing")
@@ -218,12 +226,12 @@ public class CoreMLExecutor: NSObject {
   func prepareFeatureVector() {
     let modelInputFeatures = [[MLFeature]](
       repeating: [MLFeature](
-        repeating: MLFeature(data: nil, description: nil), count: Int(inputCount)),
+        repeating: MLFeature(data: nil, pixelBuffer: nil, description: nil), count: Int(inputCount)),
       count: Int(batchSize))
     self.inputFeatures = modelInputFeatures
     let modelOutputFeatures = [[MLFeature]](
       repeating: [MLFeature](
-        repeating: MLFeature(data: nil, description: nil), count: Int(outputCount)),
+        repeating: MLFeature(data: nil, pixelBuffer: nil, description: nil), count: Int(outputCount)),
       count: Int(batchSize))
     self.outputFeatures = modelOutputFeatures
   }
@@ -248,8 +256,17 @@ public class CoreMLExecutor: NSObject {
   }
 
   @objc
+  public func isInputImageAt(_ i: Int) -> Bool {
+    return getInputAt(i)?.imageConstraint != nil
+  }
+
+  @objc
   public func getInputSizeAt(_ i: Int) -> Int {
     let input = getInputAt(i)
+    if let imageConstraint = input?.imageConstraint {
+      let channels = imageConstraint.pixelFormatType == kCVPixelFormatType_OneComponent8 ? 1 : 3
+      return imageConstraint.pixelsHigh * imageConstraint.pixelsWide * channels
+    }
     let shape = input?.multiArrayConstraint?.shape
     let inputSize = shape?.reduce(1, { $0 * $1.intValue }) ?? 0
     assert(inputSize > 0)
@@ -294,10 +311,65 @@ public class CoreMLExecutor: NSObject {
     return nil
   }
 
+  private func createPixelBuffer(
+    from data: UnsafeMutableRawPointer, constraint: MLImageConstraint
+  ) -> CVPixelBuffer? {
+    let width = constraint.pixelsWide
+    let height = constraint.pixelsHigh
+    let isGray = constraint.pixelFormatType == kCVPixelFormatType_OneComponent8
+    let pixelFormat = isGray ? kCVPixelFormatType_OneComponent8 : kCVPixelFormatType_32BGRA
+
+    var pixelBuffer: CVPixelBuffer?
+    let attrs: [CFString: Any] = [
+      kCVPixelBufferCGImageCompatibilityKey: true,
+      kCVPixelBufferCGBitmapContextCompatibilityKey: true,
+      kCVPixelBufferIOSurfacePropertiesKey: [:],
+    ]
+    let status = CVPixelBufferCreate(
+      kCFAllocatorDefault, width, height, pixelFormat, attrs as CFDictionary, &pixelBuffer)
+    guard status == kCVReturnSuccess, let pb = pixelBuffer else {
+      return nil
+    }
+
+    CVPixelBufferLockBaseAddress(pb, [])
+    defer { CVPixelBufferUnlockBaseAddress(pb, []) }
+    guard let dstBase = CVPixelBufferGetBaseAddress(pb) else {
+      return nil
+    }
+    let dstRowBytes = CVPixelBufferGetBytesPerRow(pb)
+    if isGray {
+      var srcBuf = vImage_Buffer(
+        data: data, height: vImagePixelCount(height), width: vImagePixelCount(width),
+        rowBytes: width)
+      var dstBuf = vImage_Buffer(
+        data: dstBase, height: vImagePixelCount(height), width: vImagePixelCount(width),
+        rowBytes: dstRowBytes)
+      vImageCopyBuffer(&srcBuf, &dstBuf, 1, vImage_Flags(kvImageNoFlags))
+    } else {
+      var srcBuf = vImage_Buffer(
+        data: data, height: vImagePixelCount(height), width: vImagePixelCount(width),
+        rowBytes: width * 3)
+      var dstBuf = vImage_Buffer(
+        data: dstBase, height: vImagePixelCount(height), width: vImagePixelCount(width),
+        rowBytes: dstRowBytes)
+      vImageConvert_RGB888toBGRA8888(
+        &srcBuf, nil, 255, &dstBuf, false, vImage_Flags(kvImageNoFlags))
+    }
+    return pb
+  }
+
   @objc
   public func setInputData(_ data: UnsafeMutableRawPointer, at i: Int, batchIndex: Int) -> Bool {
     let input = getInputAt(i)
-    inputFeatures[batchIndex][i] = MLFeature(data: data, description: input)
+    if let imageConstraint = input?.imageConstraint {
+      guard let pixelBuffer = createPixelBuffer(from: data, constraint: imageConstraint) else {
+        return false
+      }
+      inputFeatures[batchIndex][i] = MLFeature(
+        data: data, pixelBuffer: pixelBuffer, description: input)
+      return true
+    }
+    inputFeatures[batchIndex][i] = MLFeature(data: data, pixelBuffer: nil, description: input)
     return true
   }
 

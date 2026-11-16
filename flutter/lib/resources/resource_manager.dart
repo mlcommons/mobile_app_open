@@ -1,7 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
+import 'package:archive/archive_io.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -14,6 +15,7 @@ import 'package:mlperfbench/store.dart';
 class ResourceManager {
   static const _dataPrefix = 'local://';
   static const _loadedResourcesDirName = 'loaded_resources';
+  static const _bundledAssetsDirName = 'bundled_assets';
   static const _symlinksDirName = 'symlinks';
 
   final VoidCallback _onUpdate;
@@ -25,6 +27,7 @@ class ResourceManager {
 
   late final String applicationDirectory;
   late final String _loadedResourcesDir;
+  late final String _bundledAssetsDir;
 
   late final CacheManager cacheManager;
   late final ResultManager resultManager;
@@ -47,6 +50,13 @@ class ResourceManager {
     if (uri.startsWith(_dataPrefix)) {
       final resourceSystemPath = uri.replaceFirst(_dataPrefix, getDataFolder());
       return resourceSystemPath;
+    }
+    if (isAsset(uri)) {
+      final assetPath = stripAssetPrefix(uri);
+      if (assetPath.endsWith('.zip')) {
+        return '$_bundledAssetsDir/${assetPath.substring(0, assetPath.length - 4)}';
+      }
+      return '$_bundledAssetsDir/$assetPath';
     }
     if (isInternetResource(uri)) {
       final resourceSystemPath = cacheManager.get(uri);
@@ -105,14 +115,21 @@ class ResourceManager {
     _onUpdate();
     try {
       var internetResources = <Resource>[];
+      var assetResources = <Resource>[];
       for (final resource in resources) {
         if (resource.path.startsWith(_dataPrefix)) continue;
+        if (isAsset(resource.path)) {
+          assetResources.add(resource);
+          continue;
+        }
         if (isInternetResource(resource.path)) {
           internetResources.add(resource);
           continue;
         }
-        throw 'forbidden path: ${resource.path} (only http://, https:// and local:// resources are allowed)';
+        throw 'forbidden path: ${resource.path} (only http://, https://, local:// and asset:// resources are allowed)';
       }
+
+      await _unpackAssetResources(assetResources);
 
       final internetPaths = internetResources.map((e) => e.path).toList();
       try {
@@ -201,11 +218,70 @@ class ResourceManager {
     }
   }
 
+  Future<void> _unpackAssetResources(List<Resource> resources) async {
+    for (final resource in resources) {
+      final targetPath = get(resource.path);
+      final markerFile = File('$targetPath.md5');
+      final isZip = resource.path.endsWith('.zip');
+      final exists = isZip
+          ? await Directory(targetPath).exists()
+          : await File(targetPath).exists();
+      if (exists &&
+          (resource.md5Checksum.isEmpty ||
+              (await markerFile.exists() &&
+                  await markerFile.readAsString() == resource.md5Checksum))) {
+        continue;
+      }
+
+      _loadingPath = resource.path;
+      _onUpdate();
+
+      final assetData = await rootBundle.load(stripAssetPrefix(resource.path));
+      final bytes = assetData.buffer.asUint8List(
+        assetData.offsetInBytes,
+        assetData.lengthInBytes,
+      );
+
+      if (isZip) {
+        final targetDir = Directory(targetPath);
+        if (await targetDir.exists()) {
+          await targetDir.delete(recursive: true);
+        }
+        await targetDir.create(recursive: true);
+        final archive = ZipDecoder().decodeBytes(bytes);
+        var extractRoot = targetDir.path;
+        if (archive.isNotEmpty && !archive.first.isFile) {
+          extractRoot = targetDir.parent.path;
+        }
+        for (int i = 0; i < archive.files.length; i++) {
+          final archiveFile = archive.files[i];
+          final itemPath = '$extractRoot/${archiveFile.name}';
+          if (archiveFile.isFile) {
+            final outFile = await File(itemPath).create(recursive: true);
+            await outFile.writeAsBytes(archiveFile.content as List<int>);
+          } else if (i != 0) {
+            await Directory(itemPath).create(recursive: true);
+          }
+        }
+      } else {
+        final outFile = await File(targetPath).create(recursive: true);
+        await outFile.writeAsBytes(bytes);
+      }
+
+      if (resource.md5Checksum.isNotEmpty) {
+        await markerFile.create(recursive: true);
+        await markerFile.writeAsString(resource.md5Checksum);
+      }
+    }
+  }
+
   Future<void> initSystemPaths() async {
     applicationDirectory = await getApplicationDirectory();
     await Directory(applicationDirectory).create(recursive: true);
     _loadedResourcesDir = '$applicationDirectory/$_loadedResourcesDirName';
     await Directory(_loadedResourcesDir).create();
+    _bundledAssetsDir = '$applicationDirectory/$_bundledAssetsDirName';
+    await Directory(_bundledAssetsDir).create();
 
     cacheManager = CacheManager(_loadedResourcesDir);
     resultManager = await ResultManager.create(applicationDirectory);

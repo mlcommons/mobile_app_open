@@ -48,7 +48,11 @@ apple_xcframework(
 
 objc_library(
     name = "apple_frameworks",
-    sdk_frameworks = ["CoreML"],
+    sdk_frameworks = [
+        "Accelerate",
+        "CoreML",
+        "CoreVideo",
+    ],
 )
 
 swift_library(

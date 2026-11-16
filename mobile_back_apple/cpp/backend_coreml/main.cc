@@ -161,6 +161,11 @@ mlperf_data_t mlperf_backend_get_input_type(mlperf_backend_ptr_t backend_ptr,
                                             int32_t i) {
   mlperf_data_t data;
   CoreMLBackendData *backend_data = (CoreMLBackendData *)backend_ptr;
+  if ([backend_data->coreMLExecutor isInputImageAt:i]) {
+    data.type = mlperf_data_t::Uint8;
+    data.size = [backend_data->coreMLExecutor getInputSizeAt:i];
+    return data;
+  }
   NSNumber *inputTypeNumber = [backend_data->coreMLExecutor getInputTypeAt:i];
   MLMultiArrayDataType coreml_type =
       (MLMultiArrayDataType)inputTypeNumber.integerValue;

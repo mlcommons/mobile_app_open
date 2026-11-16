@@ -134,19 +134,13 @@ def quantize_activations(mlmodel,
   return quantized_model
 
 
-def convert_mosaic_ios18(pruned_fn, input_shape: tuple):
-  """Converts pruned MOSAIC TF graph to iOS 18 ML Program with uint16 argmax for ANE."""
+def _patch_reduce_argmax_uint16(prog):
+  """Replaces trailing reduce_argmax with uint16 output_dtype for iOS 18+ ANE."""
   import coremltools as ct
   from coremltools.converters.mil import Builder as mb
 
-  prog = ct.convert(
-    [pruned_fn],
-    source='tensorflow',
-    convert_to='milinternal',
-    inputs=[ct.TensorType(shape=input_shape)],
-    minimum_deployment_target=ct.target.iOS18,
-  )
   fn = prog.functions['main']
+  fn.opset_version = ct.target.iOS18
   out_var = fn.outputs[0]
   last_op = out_var.op
   if last_op is not None and last_op.op_type == 'reduce_argmax':
@@ -160,6 +154,39 @@ def convert_mosaic_ios18(pruned_fn, input_shape: tuple):
       )
       fn.set_outputs([new_out])
     fn.remove_ops([last_op])
+
+
+def convert_mosaic_ios18(pruned_fn, input_shape: tuple):
+  """Converts pruned MOSAIC TF graph to iOS 18 ML Program with uint16 argmax for ANE."""
+  import coremltools as ct
+  import numpy as np
+
+  prog = ct.convert(
+    [pruned_fn],
+    source='tensorflow',
+    convert_to='milinternal',
+    inputs=[ct.TensorType(shape=input_shape, dtype=np.float32)],
+    minimum_deployment_target=ct.target.iOS18,
+  )
+  _patch_reduce_argmax_uint16(prog)
+
+  return ct.convert(
+    prog,
+    convert_to='mlprogram',
+    minimum_deployment_target=ct.target.iOS18,
+  )
+
+
+def upgrade_mosaic_ios18(mlmodel):
+  """Upgrades a quantized MOSAIC MLModel to iOS 18 with uint16 argmax for ANE."""
+  import coremltools as ct
+  from coremltools.converters.mil.frontend.milproto.load import load as milproto_load
+
+  spec = mlmodel.get_spec()
+  prog = milproto_load(
+    spec, spec.specificationVersion, file_weights_dir=mlmodel.weights_dir
+  )
+  _patch_reduce_argmax_uint16(prog)
 
   return ct.convert(
     prog,

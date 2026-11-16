@@ -92,16 +92,16 @@ task {
     }
     lite {
       name: "Open images subset for classification"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet.zip"
+      input_path: "asset://assets/datasets/imagenet.zip"
       input_checksum: "fdcce28e06475321dc9b1c63a5539a4e"
       groundtruth_path: ""
       groundtruth_checksum: ""
     }
     tiny {
       name: "Imagenet dataset for integration test"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v5_0/imagenet_tiny.zip"
+      input_path: "asset://assets/datasets/imagenet_tiny.zip"
       input_checksum: "2cde6f1d741b9c1834db261ac6e43a6e"
-      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v5_0/imagenet_tiny_val.txt"
+      groundtruth_path: "asset://assets/datasets/imagenet_tiny_val.txt"
       groundtruth_checksum: "086f99eff3d1b93fd41e7f35498570a7"
     }
   }
@@ -149,16 +149,16 @@ task {
     }
     lite {
       name: "Open images subset for detection"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/coco.zip"
+      input_path: "asset://assets/datasets/coco.zip"
       input_checksum: "c630e2ddf96a1e9482c4a9e1d4aced70"
       groundtruth_path: ""
       groundtruth_checksum: ""
     }
     tiny {
       name: "Coco dataset for integration test"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/coco-test.zip"
+      input_path: "asset://assets/datasets/coco-test.zip"
       input_checksum: "7440da62aee7043b825d3ac1c6732e0a"
-      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/coco_val_tiny.pbtxt"
+      groundtruth_path: "asset://assets/datasets/coco_val_tiny.pbtxt"
       groundtruth_checksum: "0bae0c934cae7fa41f178c085bf31c7b"
     }
   }
@@ -206,16 +206,16 @@ task {
     }
     lite {
       name: "Open images subset for segmentation"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/ade20k.zip"
+      input_path: "asset://assets/datasets/ade20k.zip"
       input_checksum: "97f48388e5ca3b4f19047e0b7a062c88"
       groundtruth_path: ""
       groundtruth_checksum: ""
     }
     tiny {
       name: "ADE20K validation subset for integration test"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/ade20k_tiny.zip"
+      input_path: "asset://assets/datasets/ade20k_tiny.zip"
       input_checksum: "544a538eed16283586bd583dd39c44db"
-      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/ade20k_tiny_annotations.zip"
+      groundtruth_path: "asset://assets/datasets/ade20k_tiny_annotations.zip"
       groundtruth_checksum: "a0e4b79dceac96a784b7abaa59aa76df"
     }
   }
@@ -255,23 +255,23 @@ task {
     type: SQUAD
     full {
       name: "Squad V1.1 validation set"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_mini.tfrecord"
+      input_path: "asset://assets/datasets/squad_eval_mini.tfrecord"
       input_checksum: "3c9a1c4c373037889938d4b13d41f4c2"
-      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_groundtruth.tfrecord"
+      groundtruth_path: "asset://assets/datasets/squad_groundtruth.tfrecord"
       groundtruth_checksum: "f9d6d209ec9a05a522749a6bd597a75c"
     }
     lite {
       name: "Squad V1.1 mini set"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_mini.tfrecord"
+      input_path: "asset://assets/datasets/squad_eval_mini.tfrecord"
       input_checksum: "3c9a1c4c373037889938d4b13d41f4c2"
       groundtruth_path: ""
       groundtruth_checksum: ""
     }
     tiny {
       name: "Squad V1.1 mini set"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_eval_tiny.tfrecord"
+      input_path: "asset://assets/datasets/squad_eval_tiny.tfrecord"
       input_checksum: "fa018f599d0016ed385b31aee7b00bed"
-      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v1_0/squad_groundtruth.tfrecord"
+      groundtruth_path: "asset://assets/datasets/squad_groundtruth.tfrecord"
       groundtruth_checksum: "f9d6d209ec9a05a522749a6bd597a75c"
     }
   }
@@ -315,16 +315,16 @@ task {
     }
     lite {
       name: "SNUSR dataset for performance test"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/snusr_lr_png.zip"
+      input_path: "asset://assets/datasets/snusr_lr_png.zip"
       input_checksum: "38bf296e38cba0a8229d946fc1a5095a"
       groundtruth_path: ""
       groundtruth_checksum: ""
     }
     tiny {
       name: "SNUSR dataset for integration test"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/snusr_lr_png_tiny.zip"
+      input_path: "asset://assets/datasets/snusr_lr_png_tiny.zip"
       input_checksum: "134e9f96e4bbd5e925093e30a4433548"
-      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_1/snusr_hr_png_tiny.zip"
+      groundtruth_path: "asset://assets/datasets/snusr_hr_png_tiny.zip"
       groundtruth_checksum: "c8eac83e32d163552ca8e317c2dd57c3"
     }
   }
@@ -372,16 +372,16 @@ task {
     }
     lite {
       name: "Open images subset for classification"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet.zip"
+      input_path: "asset://assets/datasets/imagenet.zip"
       input_checksum: "fdcce28e06475321dc9b1c63a5539a4e"
       groundtruth_path: ""
       groundtruth_checksum: ""
     }
     tiny {
       name: "Imagenet dataset for integration test"
-      input_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v0_7/imagenet_tiny.zip"
+      input_path: "asset://assets/datasets/imagenet_tiny.zip"
       input_checksum: "42cb83d80d0341d6719d68b32322adf2"
-      groundtruth_path: "https://mobile.mlcommons-storage.org/app-resources/datasets/v3_0/imagenet_tiny-groundtruth.txt"
+      groundtruth_path: "asset://assets/datasets/imagenet_tiny-groundtruth.txt"
       groundtruth_checksum: "cc6d83ca25daeb2475f36c079e53bc26"
     }
   }
