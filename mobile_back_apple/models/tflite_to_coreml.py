@@ -620,6 +620,28 @@ def convert_tflite_to_mlpackage(
           env[out_idx] = sq if symmetric else qdq(sq, out_idx)
           layout[out_idx] = 'OTHER'
 
+      elif op_name == 'PACK':
+        opt = schema.PackOptions()
+        opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
+        xs = [get_var(i, 'NHWC' if len(get_var(i).shape) == 4 else None) for i in ins]
+        y = mb.stack(values=xs, axis=opt.Axis())
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
+        layout[outs[0]] = 'OTHER'
+
+      elif op_name == 'MINIMUM':
+        x = get_var(ins[0], 'NHWC' if len(get_var(ins[0]).shape) == 4 else None)
+        y_in = get_var(ins[1], 'NHWC' if len(get_var(ins[1]).shape) == 4 else None)
+        y = mb.minimum(x=x, y=y_in)
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
+        layout[outs[0]] = layout.get(ins[0], 'OTHER')
+
+      elif op_name == 'MAXIMUM':
+        x = get_var(ins[0], 'NHWC' if len(get_var(ins[0]).shape) == 4 else None)
+        y_in = get_var(ins[1], 'NHWC' if len(get_var(ins[1]).shape) == 4 else None)
+        y = mb.maximum(x=x, y=y_in)
+        env[outs[0]] = y if symmetric else qdq(y, outs[0])
+        layout[outs[0]] = layout.get(ins[0], 'OTHER')
+
       elif op_name == 'TFLite_Detection_PostProcess':
         opts = flexbuffers.Loads(op.CustomOptionsAsNumpy().tobytes())
         boxes_raw = get_var(ins[0])
