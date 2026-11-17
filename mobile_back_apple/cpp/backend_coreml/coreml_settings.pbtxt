@@ -78,13 +78,17 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "image_classification_v2"
   framework: "Core ML"
+  custom_setting {
+    id: "data-format"
+    value: "NCHW"
+  }
   delegate_choice: {
     delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     model_file: {
-      model_path: "asset://assets/models/MobilenetV4_Large_w8a8.mlpackage.zip"
-      model_checksum: "37dcf05e275089f67087cd0827cc5a02"
+      model_path: "asset://assets/models/MobilenetV4_Large_NCHW_w8a8.mlpackage.zip"
+      model_checksum: "e4dffce7f26b865aa1edf51b7d269600"
     }
   }
   delegate_choice: {
@@ -92,8 +96,8 @@ benchmark_setting {
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
     model_file: {
-      model_path: "asset://assets/models/MobilenetV4_Large_w8a8.mlpackage.zip"
-      model_checksum: "37dcf05e275089f67087cd0827cc5a02"
+      model_path: "asset://assets/models/MobilenetV4_Large_NCHW_w8a8.mlpackage.zip"
+      model_checksum: "e4dffce7f26b865aa1edf51b7d269600"
     }
   }
   delegate_choice: {
@@ -101,8 +105,8 @@ benchmark_setting {
     accelerator_name: "cpu&ane"
     accelerator_desc: "CPU and Neural Engine"
     model_file: {
-      model_path: "asset://assets/models/MobilenetV4_Large_w8a8.mlpackage.zip"
-      model_checksum: "37dcf05e275089f67087cd0827cc5a02"
+      model_path: "asset://assets/models/MobilenetV4_Large_NCHW_w8a8.mlpackage.zip"
+      model_checksum: "e4dffce7f26b865aa1edf51b7d269600"
     }
   }
   delegate_selected: "CPU & GPU & ANE"
@@ -111,14 +115,18 @@ benchmark_setting {
 benchmark_setting {
   benchmark_id: "image_classification_offline_v2"
   framework: "Core ML"
+  custom_setting {
+    id: "data-format"
+    value: "NCHW"
+  }
   delegate_choice: {
     delegate_name: "CPU & GPU & ANE"
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     batch_size: 32
     model_file: {
-      model_path: "asset://assets/models/MobilenetV4_Large_w8a8.mlpackage.zip"
-      model_checksum: "37dcf05e275089f67087cd0827cc5a02"
+      model_path: "asset://assets/models/MobilenetV4_Large_NCHW_w8a8.mlpackage.zip"
+      model_checksum: "e4dffce7f26b865aa1edf51b7d269600"
     }
   }
   delegate_choice: {
@@ -127,8 +135,8 @@ benchmark_setting {
     accelerator_desc: "CPU and GPU"
     batch_size: 32
     model_file: {
-      model_path: "asset://assets/models/MobilenetV4_Large_w8a8.mlpackage.zip"
-      model_checksum: "37dcf05e275089f67087cd0827cc5a02"
+      model_path: "asset://assets/models/MobilenetV4_Large_NCHW_w8a8.mlpackage.zip"
+      model_checksum: "e4dffce7f26b865aa1edf51b7d269600"
     }
   }
   delegate_choice: {
@@ -137,8 +145,8 @@ benchmark_setting {
     accelerator_desc: "CPU and Neural Engine"
     batch_size: 32
     model_file: {
-      model_path: "asset://assets/models/MobilenetV4_Large_w8a8.mlpackage.zip"
-      model_checksum: "37dcf05e275089f67087cd0827cc5a02"
+      model_path: "asset://assets/models/MobilenetV4_Large_NCHW_w8a8.mlpackage.zip"
+      model_checksum: "e4dffce7f26b865aa1edf51b7d269600"
     }
   }
   delegate_selected: "CPU & GPU & ANE"

@@ -15,13 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import coremltools as ct
 import numpy as np
-from utils import (
-  quantize_activations,
-  quantize_weights,
-  register_keras_optimizer_fallback,
-)
+from mobilenetv4_tflite import convert_mobilenetv4_nchw
+from utils import quantize_activations, quantize_weights
 
 
 def main():
@@ -29,29 +25,18 @@ def main():
   Download the MobileNetV4-Conv-Large-fp32 from https://github.com/mlcommons/mobile_open/releases
   Tested with tensorflow==2.15.0+ and coremltools==9.0
   """
-  register_keras_optimizer_fallback()
   saved_model_dir = '../dev-resources/mobilenet_v4/MobileNetV4-Conv-Large-saved-model'
-  input_shape = (1, 384, 384, 3)
-  w8_export_fpath = '../dev-resources/mobilenet_v4/MobilenetV4_Large_w8.mlpackage'
-  w8a8_export_fpath = '../dev-resources/mobilenet_v4/MobilenetV4_Large_w8a8.mlpackage'
+  input_shape = (1, 3, 384, 384)
+  w8_export_fpath = '../dev-resources/mobilenet_v4/MobilenetV4_Large_NCHW_w8.mlpackage'
+  w8a8_export_fpath = '../dev-resources/mobilenet_v4/MobilenetV4_Large_NCHW_w8a8.mlpackage'
 
   print('Converting model...')
-  model = ct.convert(
-    saved_model_dir,
-    source='tensorflow',
-    convert_to='mlprogram',
-    inputs=[ct.TensorType(shape=input_shape)],
-  )
-  model.short_description = (
-    'MobileNetV4-Conv-Large-int8 from https://github.com/mlcommons/mobile_open'
+  fp16_model = convert_mobilenetv4_nchw(saved_model_dir)
+  fp16_model.short_description = (
+    'MobileNetV4-Conv-Large-int8 (NCHW) from https://github.com/mlcommons/mobile_open'
   )
 
-  spec = model.get_spec()
-  ct.utils.rename_feature(spec, 'inputs', 'images')
-  ct.utils.rename_feature(spec, 'Identity', 'Softmax')
-  renamed_model = ct.models.MLModel(spec, weights_dir=model.weights_dir)
-
-  w8_model = quantize_weights(renamed_model)
+  w8_model = quantize_weights(fp16_model)
   w8_model.save(w8_export_fpath)
   print('Done! W8 Core ML model exported to:', w8_export_fpath)
 
