@@ -46,12 +46,13 @@ class Instruction {
   virtual InstructionGroup Group() = 0;
 
   bool IsFollowed(const std::string& resp, bool loose = false) const {
+    // Blank text never counts as following (matches the python reference)
     // For strict checks, just verify the response itself
-    if (!loose) return verify_(resp);
+    if (!loose) return !trim(resp).empty() && verify_(resp);
 
     auto transformations = transform_response(resp);
     for (std::string transformation : transformations) {
-      if (verify_(transformation)) return true;
+      if (!trim(transformation).empty() && verify_(transformation)) return true;
     }
     return false;
   }
@@ -912,7 +913,8 @@ class Quotation : public Instruction {
 
  private:
   virtual bool verify_(const std::string& resp) const override {
-    return resp.size() >= 2 && resp.front() == '"' && resp.back() == '"';
+    const std::string t = trim(resp);
+    return t.size() >= 2 && t.front() == '"' && t.back() == '"';
   }
 };
 
