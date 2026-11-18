@@ -52,7 +52,7 @@ const Map<String, Map<String, Interval>> _imageClassificationV2 = {
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0, max: 29),
-    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 2000),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 100, max: 600),
@@ -83,7 +83,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   },
   _kCoreMLBackend: {
     _kIphoneOnGitHubAction: Interval(min: 0, max: 9),
-    _kIphoneOnMacbook: Interval(min: 0.01, max: 999),
+    _kIphoneOnMacbook: Interval(min: 0.01, max: 2000),
   },
   _kPixelBackend: {
     _kPixel6: Interval(min: 200, max: 500),

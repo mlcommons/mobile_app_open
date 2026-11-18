@@ -126,7 +126,10 @@ with fn:
       per_class_suppression=True,
   )
   coords = mb.transpose(x=coords_t, perm=[0, 2, 1])
-  conf = mb.transpose(x=conf_t, perm=[0, 2, 1])
+  # conf_t is [n, K, B] (NMS's native class-major layout).
+  # reduce_argmax/reduce_max over axis=1 (K) give the same [n, B]
+  # result as transposing to [n, B, K] and reducing over axis=2 would,
+  # without the extra transpose op.
 
   # Convert (x_center, y_center, width, height) to (y1, x1, y2, x2).
   t = np.array(
@@ -139,20 +142,18 @@ with fn:
       dtype=np.float32,
   )
   det_boxes = mb.matmul(x=coords, y=t, name='detection_boxes')
-  cls_idx = mb.reduce_argmax(x=conf, axis=2, keep_dims=False)
+  cls_idx = mb.reduce_argmax(x=conf_t, axis=1, keep_dims=False)
   det_classes = mb.sub(
       x=mb.cast(x=cls_idx, dtype='fp32'),
       y=np.float32(1.0),
       name='detection_classes',
   )
   det_scores = mb.reduce_max(
-      x=conf, axes=[2], keep_dims=False, name='detection_scores'
-  )
-  valid_boxes = mb.cast(
-      x=mb.greater_equal(x=det_scores, y=np.float32(0.3)), dtype='fp32'
+      x=conf_t, axes=[1], keep_dims=False, name='detection_scores'
   )
   det_num = mb.reduce_sum(
-      x=valid_boxes, axes=[1], keep_dims=False, name='number_of_boxes'
+      x=mb.sign(x=det_scores), axes=[1], keep_dims=False,
+      name='number_of_boxes',
   )
   fn.set_outputs([det_boxes, det_classes, det_scores, det_num])
 

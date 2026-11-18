@@ -93,6 +93,7 @@ def main():
       y=anchors_hw,
     )
 
+    # NonMaximumSuppression (iOS 17+) expects boxes [n, 4, B] and scores [n, K, B].
     y_c, x_c = mb.split(x=yx, num_splits=2, axis=2)
     h_c, w_c = mb.split(x=hw, num_splits=2, axis=2)
     raw_coordinates = mb.concat(values=[x_c, y_c, w_c, h_c], axis=2)
@@ -112,7 +113,11 @@ def main():
       per_class_suppression=True,
     )
     coords = mb.transpose(x=coords_t, perm=[0, 2, 1])
-    conf = mb.transpose(x=conf_t, perm=[0, 2, 1])
+    # conf_t is [n, K, B] (NMS's native class-major layout, see the comment
+    # above). reduce_argmax/reduce_max over axis=1 (K) give the same [n, B]
+    # result as transposing to [n, B, K] and reducing over axis=2 would, but
+    # without the extra transpose op -- which otherwise lands on CPU like the
+    # rest of this post-NMS tail and adds a CPU<->ANE handoff.
 
     t = np.array(
       [
@@ -124,20 +129,23 @@ def main():
       dtype=np.float32,
     )
     det_boxes = mb.matmul(x=coords, y=t, name='detection_boxes')
-    cls_idx = mb.reduce_argmax(x=conf, axis=2, keep_dims=False)
+    cls_idx = mb.reduce_argmax(x=conf_t, axis=1, keep_dims=False)
     det_classes = mb.sub(
       x=mb.cast(x=cls_idx, dtype='fp32'),
       y=np.float32(1.0),
       name='detection_classes',
     )
     det_scores = mb.reduce_max(
-      x=conf, axes=[2], keep_dims=False, name='detection_scores'
+      x=conf_t, axes=[1], keep_dims=False, name='detection_scores'
     )
-    valid_boxes = mb.cast(
-      x=mb.greater_equal(x=det_scores, y=np.float32(0.3)), dtype='fp32'
-    )
+    # det_scores is exactly 0.0 for NMS's padding slots and >=0.3 for real
+    # detections (scores below 0.3 were already zeroed by score_mask/select
+    # above, so there's no value in between). sign() reproduces the same 0/1
+    # indicator as greater_equal+cast in one op instead of two, and -- since
+    # it stays in det_scores' own dtype -- avoids an extra bool<->fp16 cast.
     det_num = mb.reduce_sum(
-      x=valid_boxes, axes=[1], keep_dims=False, name='number_of_boxes'
+      x=mb.sign(x=det_scores), axes=[1], keep_dims=False,
+      name='number_of_boxes',
     )
     fn.set_outputs([det_boxes, det_classes, det_scores, det_num])
 

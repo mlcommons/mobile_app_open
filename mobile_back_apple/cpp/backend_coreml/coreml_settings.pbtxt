@@ -161,7 +161,7 @@ benchmark_setting {
     accelerator_desc: "All compute units"
     model_file: {
       model_path: "asset://assets/models/MobileDet_w8a8.mlpackage.zip"
-      model_checksum: "6bbc05e1ce303ae06adc26e22af6746a"
+      model_checksum: "8fdc0aff768a751e2ff144cfd7b8bd31"
     }
   }
   delegate_choice: {
@@ -170,7 +170,7 @@ benchmark_setting {
     accelerator_desc: "CPU and GPU"
     model_file: {
       model_path: "asset://assets/models/MobileDet_w8a8.mlpackage.zip"
-      model_checksum: "6bbc05e1ce303ae06adc26e22af6746a"
+      model_checksum: "8fdc0aff768a751e2ff144cfd7b8bd31"
     }
   }
   delegate_choice: {
@@ -179,7 +179,7 @@ benchmark_setting {
     accelerator_desc: "CPU and Neural Engine"
     model_file: {
       model_path: "asset://assets/models/MobileDet_w8a8.mlpackage.zip"
-      model_checksum: "6bbc05e1ce303ae06adc26e22af6746a"
+      model_checksum: "8fdc0aff768a751e2ff144cfd7b8bd31"
     }
   }
   delegate_selected: "CPU & GPU & ANE"

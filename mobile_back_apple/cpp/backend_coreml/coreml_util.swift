@@ -172,6 +172,7 @@ private class MLCommonsComputationUnit {
 @objc
 public class CoreMLExecutor: NSObject {
   private var modelURL: URL?
+  private var compiledModelURL: URL?
   private var mlmodel: MLModel?
   private var batchSize: UInt = 0
   private var inputCount: UInt = 0
@@ -181,13 +182,16 @@ public class CoreMLExecutor: NSObject {
   private var inputNames: [String] = []
   private var outputNames: [String] = []
   private var outputProvider: MLBatchProvider?
+  private var singleOutputFeature: MLFeatureProvider?
+  private var preallocInputArrays: [[String: MLMultiArray]] = []
+  private var preallocSingleProvider: MLDictionaryFeatureProvider?
+  private var preallocBatchProvider: MLArrayBatchProvider?
   private var accelerator: MLCommonsComputationUnit = MLCommonsComputationUnit(unitName: .all)
 
   @objc
   public init(
     modelPath: UnsafePointer<CChar>, batchSize: Int, acceleratorName: UnsafePointer<CChar>
   ) throws {
-    pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0)
     let config = MLModelConfiguration()
 
     let unitName = String(validatingUTF8: acceleratorName)
@@ -209,6 +213,7 @@ public class CoreMLExecutor: NSObject {
     let modelOutputNames = mlmodel.modelDescription.outputDescriptionsByName.keys.sorted()
 
     self.modelURL = url
+    self.compiledModelURL = compiledModelURL
     self.mlmodel = mlmodel
     self.batchSize = UInt(batchSize > 1 ? batchSize : 1)
     self.inputCount = UInt(modelInputNames.count)
@@ -220,6 +225,59 @@ public class CoreMLExecutor: NSObject {
     super.init()
 
     self.prepareFeatureVector()
+    self.preparePreallocInputs()
+  }
+
+  private static func isContiguous(_ array: MLMultiArray) -> Bool {
+    let shape = array.shape
+    let strides = array.strides
+    guard shape.count == strides.count else { return false }
+    var expected = 1
+    for i in stride(from: shape.count - 1, through: 0, by: -1) {
+      let dim = shape[i].intValue
+      if dim > 1 && strides[i].intValue != expected {
+        return false
+      }
+      expected *= dim
+    }
+    return true
+  }
+
+  private func preparePreallocInputs() {
+    guard let mlmodel = self.mlmodel else { return }
+    var batchArrays: [[String: MLMultiArray]] = []
+    var batchProviders: [MLDictionaryFeatureProvider] = []
+    batchArrays.reserveCapacity(Int(batchSize))
+    batchProviders.reserveCapacity(Int(batchSize))
+
+    for _ in 0..<batchSize {
+      var arrays: [String: MLMultiArray] = [:]
+      var dict: [String: MLFeatureValue] = [:]
+      for name in inputNames {
+        guard let desc = mlmodel.modelDescription.inputDescriptionsByName[name],
+          let constraint = desc.multiArrayConstraint,
+          constraint.dataType != .int32,
+          let arr = try? MLMultiArray(shape: constraint.shape, dataType: constraint.dataType),
+          CoreMLExecutor.isContiguous(arr)
+        else {
+          return
+        }
+        arrays[name] = arr
+        dict[name] = MLFeatureValue(multiArray: arr)
+      }
+      guard let provider = try? MLDictionaryFeatureProvider(dictionary: dict) else {
+        return
+      }
+      batchArrays.append(arrays)
+      batchProviders.append(provider)
+    }
+
+    self.preallocInputArrays = batchArrays
+    if batchSize == 1, let single = batchProviders.first {
+      self.preallocSingleProvider = single
+    } else {
+      self.preallocBatchProvider = MLArrayBatchProvider(array: batchProviders)
+    }
   }
 
   @objc
@@ -243,6 +301,9 @@ public class CoreMLExecutor: NSObject {
 
   deinit {
     clearFeatureVector()
+    if let compiledURL = compiledModelURL {
+      try? FileManager.default.removeItem(at: compiledURL)
+    }
   }
 
   @objc
@@ -369,31 +430,56 @@ public class CoreMLExecutor: NSObject {
         data: data, pixelBuffer: pixelBuffer, description: input)
       return true
     }
+    if batchIndex < preallocInputArrays.count,
+      let name = input?.name,
+      let arr = preallocInputArrays[batchIndex][name]
+    {
+      let elemBytes: Int
+      switch arr.dataType {
+      case .double: elemBytes = 8
+      case .float32, .int32: elemBytes = 4
+      default: elemBytes = 2
+      }
+      memcpy(arr.dataPointer, data, arr.count * elemBytes)
+      return true
+    }
     inputFeatures[batchIndex][i] = MLFeature(data: data, pixelBuffer: nil, description: input)
+    return true
+  }
+
+  private func extractOutputs(from featureProvider: MLFeatureProvider?, batchIndex: Int) -> Bool {
+    for (outputIndex, name) in outputNames.enumerated() {
+      guard let outputValue = featureProvider?.featureValue(for: name) else {
+        NSLog("Feature \(name) not found")
+        return false
+      }
+      guard let outputArray = outputValue.multiArrayValue else {
+        return false
+      }
+      outputFeatures[batchIndex][outputIndex] = MLFeature(
+        data: outputArray.dataPointer, description: nil)
+    }
     return true
   }
 
   @objc
   public func issueQueries() -> Bool {
-    autoreleasepool {
+    return autoreleasepool {
       do {
-        let batchProvider = MLMultiArrayBatchProvider(inputs: inputFeatures)
+        if batchSize == 1, let singleProvider = preallocSingleProvider {
+          let outFeature = try mlmodel?.prediction(from: singleProvider)
+          singleOutputFeature = outFeature
+          return extractOutputs(from: outFeature, batchIndex: 0)
+        }
+
+        let batchProvider: MLBatchProvider =
+          preallocBatchProvider ?? MLMultiArrayBatchProvider(inputs: inputFeatures)
         outputProvider = try mlmodel?.predictions(fromBatch: batchProvider)
 
-        for batchIndex in 0..<batchSize {
-          let outputFeature = outputProvider?.features(at: Int(batchIndex))
-
-          for (outputIndex, name) in outputNames.enumerated() {
-            guard let outputValue = outputFeature?.featureValue(for: name) else {
-              NSLog("Feature \(name) not found")
-              return false
-            }
-            guard let outputArray = outputValue.multiArrayValue else {
-              return false
-            }
-
-            let data = outputArray.dataPointer
-            outputFeatures[Int(batchIndex)][outputIndex] = MLFeature(data: data, description: nil)
+        for batchIndex in 0..<Int(batchSize) {
+          let outputFeature = outputProvider?.features(at: batchIndex)
+          if !extractOutputs(from: outputFeature, batchIndex: batchIndex) {
+            return false
           }
         }
         return true
