@@ -245,6 +245,9 @@ public class CoreMLExecutor: NSObject {
 
   private func preparePreallocInputs() {
     guard let mlmodel = self.mlmodel else { return }
+    // Batched (offline) runs are faster with the per-query MLMultiArrayBatchProvider than with a
+    // pre-allocated MLArrayBatchProvider (about 1000 vs 830 QPS on A18 for MobileNetV4 batch 32).
+    if batchSize > 1 { return }
     var batchArrays: [[String: MLMultiArray]] = []
     var batchProviders: [MLDictionaryFeatureProvider] = []
     batchArrays.reserveCapacity(Int(batchSize))
