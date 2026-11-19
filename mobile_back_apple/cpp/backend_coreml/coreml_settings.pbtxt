@@ -193,8 +193,8 @@ benchmark_setting {
     accelerator_name: "cpu&gpu&ane"
     accelerator_desc: "All compute units"
     model_file: {
-      model_path: "asset://assets/models/mobilebert_nnapi_sym_lin.mlpackage.zip"
-      model_checksum: "666d12c4406cf7a3d435a31cb1b2b362"
+      model_path: "asset://assets/models/mobilebert_qat_w8.mlpackage.zip"
+      model_checksum: "3f8deb3655601674e4f5b975b003cc84"
     }
   }
   delegate_choice: {
@@ -202,8 +202,8 @@ benchmark_setting {
     accelerator_name: "cpu&gpu"
     accelerator_desc: "CPU and GPU"
     model_file: {
-      model_path: "asset://assets/models/mobilebert_nnapi_sym_lin.mlpackage.zip"
-      model_checksum: "666d12c4406cf7a3d435a31cb1b2b362"
+      model_path: "asset://assets/models/mobilebert_qat_w8.mlpackage.zip"
+      model_checksum: "3f8deb3655601674e4f5b975b003cc84"
     }
   }
   delegate_selected: "CPU & GPU & ANE"

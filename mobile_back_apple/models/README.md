@@ -29,6 +29,7 @@ pip install -r requirements.txt
 | `mosaic_int8.py` | MOSAIC (INT8 W8 / W8A8) | Image Segmentation | `.mlpackage` |
 | `mobilebert.py` | MobileBERT (FP16) | Natural Language Processing | `.mlpackage` |
 | `mobilebert_int8.py` | MobileBERT (INT8 W8 / W8A8) | Natural Language Processing | `.mlpackage` |
+| `mobilebert_qat.py` | MobileBERT (TF QAT -> INT8 W8) | Natural Language Processing | `.mlpackage` |
 | `edsr.py` | EDSR (`edsr_f32b5` FP16) | Super Resolution | `.mlpackage` |
 | `edsr_int8.py` | EDSR (`edsr_f32b5` INT8 W8 / W8A8) | Super Resolution | `.mlpackage` |
 | `tflite_to_coreml.py` | Any quantized INT8/UINT8 `.tflite` | Direct TFLite W8A8 -> Core ML | `.mlpackage` |
@@ -81,10 +82,12 @@ Run all commands from `mobile_back_apple/models/` with the virtual environment a
   python3 mobilebert.py
   ```
   Source: `../dev-resources/mobilebert/float_saved_model` -> `../dev-resources/mobilebert/MobileBERT.mlpackage`.
-- **Quantized W8A8** (`mobilebert_nnapi_sym_lin.mlpackage`):
+- **Quantized W8 (TF QAT)** (`mobilebert_qat_w8.mlpackage`):
   ```shell
-  python3 tflite_to_coreml.py --symmetric <mobilebert_int8_384_nnapi.tflite> <mobilebert_nnapi_sym_lin.mlpackage>
+  python3 mobilebert_qat.py <checkpoints/quant dir> <mobilebert_qat_w8.mlpackage>
   ```
+  Source: `checkpoints/quant` from `mlcommons/mobile_open`. Drops activation `FakeQuantWithMinMaxVars` nodes while preserving QAT-trained folded `int8` weights via `quantize_weights()`.
+  *(Alternative TFLite W8A8 path: `python3 tflite_to_coreml.py --symmetric <mobilebert_int8_384_nnapi.tflite> <mobilebert_nnapi_sym_lin.mlpackage>`.)*
 
 ### 5. Super Resolution (`super_resolution`)
 - **FP16** (`edsr_f32b5_fp32.mlpackage`):
