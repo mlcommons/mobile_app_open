@@ -29,7 +29,7 @@ pip install -r requirements.txt
 | `mosaic_int8.py` | MOSAIC (INT8 W8 / W8A8) | Image Segmentation | `.mlpackage` |
 | `mobilebert.py` | MobileBERT (FP16) | Natural Language Processing | `.mlpackage` |
 | `mobilebert_int8.py` | MobileBERT (INT8 W8 / W8A8) | Natural Language Processing | `.mlpackage` |
-| `mobilebert_qat.py` | MobileBERT (TF QAT -> INT8 W8) | Natural Language Processing | `.mlpackage` |
+| `mobilebert_qat.py` | MobileBERT (TF QAT -> INT8 W8A8 / W8) | Natural Language Processing | `.mlpackage` |
 | `edsr.py` | EDSR (`edsr_f32b5` FP16) | Super Resolution | `.mlpackage` |
 | `edsr_int8.py` | EDSR (`edsr_f32b5` INT8 W8 / W8A8) | Super Resolution | `.mlpackage` |
 | `tflite_to_coreml.py` | Any quantized INT8/UINT8 `.tflite` | Direct TFLite W8A8 -> Core ML | `.mlpackage` |
@@ -82,12 +82,17 @@ Run all commands from `mobile_back_apple/models/` with the virtual environment a
   python3 mobilebert.py
   ```
   Source: `../dev-resources/mobilebert/float_saved_model` -> `../dev-resources/mobilebert/MobileBERT.mlpackage`.
-- **Quantized W8 (TF QAT)** (`mobilebert_qat_w8.mlpackage`):
+- **Quantized W8A8 (`sym_all`, shipped)** (`mobilebert_qat_w8a8_sym_all.mlpackage`):
   ```shell
-  python3 mobilebert_qat.py <checkpoints/quant dir> <mobilebert_qat_w8.mlpackage>
+  python3 mobilebert_qat.py --mode sym_all <checkpoints/quant dir> <mobilebert_qat_w8a8_sym_all.mlpackage>
   ```
-  Source: `checkpoints/quant` from `mlcommons/mobile_open`. Drops activation `FakeQuantWithMinMaxVars` nodes while preserving QAT-trained folded `int8` weights via `quantize_weights()`.
-  *(Alternative TFLite W8A8 path: `python3 tflite_to_coreml.py --symmetric <mobilebert_int8_384_nnapi.tflite> <mobilebert_nnapi_sym_lin.mlpackage>`.)*
+  Source: `checkpoints/quant` from `mlcommons/mobile_open`. Converts all 840 activation `FakeQuantWithMinMaxVars` nodes into symmetric `int8` Core ML `iOS17` `quantize`/`dequantize` ops (`768` Q/DQ pairs surviving MIL passes) and compresses QAT-folded weights via `quantize_weights()`.
+- **Quantized W8A8 (`sym_no_attn_ln`, higher-accuracy alternative)** (`mobilebert_qat_w8a8_sym_no_attn_ln.mlpackage`):
+  ```shell
+  python3 mobilebert_qat.py --mode sym_no_attn_ln <checkpoints/quant dir> <mobilebert_qat_w8a8_sym_no_attn_ln.mlpackage>
+  ```
+  Leaves the 96 `attention/self/MobileBertActFakeQuantWithMinMaxVars` nodes and 192 `FakeLayerNorm` nodes in FP16 while quantizing the remaining 552 activation nodes (`480` Q/DQ pairs surviving MIL passes), retaining W8/FP16-level SQuAD F1 (`94.40` vs `92.61` on 100 mini QAs).
+- *(Alternative `--mode w8` keeps all activations in FP16 as `mobilebert_qat_w8.mlpackage`, and `tflite_to_coreml.py --symmetric <mobilebert_int8_384_nnapi.tflite> <mobilebert_nnapi_sym_lin.mlpackage>` converts directly from TFLite.)*
 
 ### 5. Super Resolution (`super_resolution`)
 - **FP16** (`edsr_f32b5_fp32.mlpackage`):
