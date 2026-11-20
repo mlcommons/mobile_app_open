@@ -1,6 +1,7 @@
 import Accelerate
 import CoreML
 import CoreVideo
+import CryptoKit
 import Foundation
 
 struct MLFeature {
@@ -173,6 +174,7 @@ private class MLCommonsComputationUnit {
 public class CoreMLExecutor: NSObject {
   private var modelURL: URL?
   private var compiledModelURL: URL?
+  private var compiledModelIsPersistent = false
   private var mlmodel: MLModel?
   private var batchSize: UInt = 0
   private var inputCount: UInt = 0
@@ -202,10 +204,44 @@ public class CoreMLExecutor: NSObject {
     }
 
     guard let modelPathString = String(validatingUTF8: modelPath),
-      let url = URL(string: modelPathString),
-      let compiledModelURL = try? MLModel.compileModel(at: url),
-      let mlmodel = try? MLModel(contentsOf: compiledModelURL, configuration: config)
+      let url = URL(string: modelPathString)
     else {
+      throw MLError(message: "Failed to load Core ML model")
+    }
+
+    // Loading a freshly compiled .mlmodelc forces a full ANE compile through ANECompilerService on
+    // every run. That helper is killed by the system once it has accumulated about 6 MB, which makes
+    // a later benchmark's ANE compile fail and fall back to CPU. Reusing a persisted compiled model
+    // lets the ANE compile cache hit, so the helper is only involved the first time.
+    let persistentURL = CoreMLExecutor.persistentCompiledURL(for: url)
+    var loadedModel: MLModel?
+    var usedCompiledURL: URL?
+    var persistent = false
+    if let cached = persistentURL, FileManager.default.fileExists(atPath: cached.path) {
+      if let model = try? MLModel(contentsOf: cached, configuration: config) {
+        loadedModel = model
+        usedCompiledURL = cached
+        persistent = true
+      } else {
+        try? FileManager.default.removeItem(at: cached)
+      }
+    }
+    if loadedModel == nil {
+      guard let freshURL = try? MLModel.compileModel(at: url) else {
+        throw MLError(message: "Failed to load Core ML model")
+      }
+      var compiledURL = freshURL
+      if let target = persistentURL, CoreMLExecutor.moveCompiledModel(freshURL, to: target) {
+        compiledURL = target
+        persistent = true
+      }
+      guard let model = try? MLModel(contentsOf: compiledURL, configuration: config) else {
+        throw MLError(message: "Failed to load Core ML model")
+      }
+      loadedModel = model
+      usedCompiledURL = compiledURL
+    }
+    guard let mlmodel = loadedModel, let compiledModelURL = usedCompiledURL else {
       throw MLError(message: "Failed to load Core ML model")
     }
 
@@ -214,6 +250,7 @@ public class CoreMLExecutor: NSObject {
 
     self.modelURL = url
     self.compiledModelURL = compiledModelURL
+    self.compiledModelIsPersistent = persistent
     self.mlmodel = mlmodel
     self.batchSize = UInt(batchSize > 1 ? batchSize : 1)
     self.inputCount = UInt(modelInputNames.count)
@@ -226,6 +263,53 @@ public class CoreMLExecutor: NSObject {
 
     self.prepareFeatureVector()
     self.preparePreallocInputs()
+  }
+
+  // Key = OS version + model name + hash of the package's graph/manifest files and weight sizes, so
+  // a changed model or an OS update compiles a new copy instead of reusing a stale one.
+  private static func persistentCompiledURL(for source: URL) -> URL? {
+    let fileManager = FileManager.default
+    guard let caches = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+      return nil
+    }
+    let resolved = source.resolvingSymlinksInPath()
+    guard let enumerator = fileManager.enumerator(
+      at: resolved, includingPropertiesForKeys: [.fileSizeKey, .isRegularFileKey])
+    else {
+      return nil
+    }
+    var hasher = SHA256()
+    hasher.update(data: Data(ProcessInfo.processInfo.operatingSystemVersionString.utf8))
+    var entries: [(String, URL, Int)] = []
+    for case let file as URL in enumerator {
+      let values = try? file.resourceValues(forKeys: [.fileSizeKey, .isRegularFileKey])
+      guard values?.isRegularFile == true else { continue }
+      entries.append((file.path.replacingOccurrences(of: resolved.path, with: ""), file, values?.fileSize ?? 0))
+    }
+    entries.sort { $0.0 < $1.0 }
+    for (relativePath, file, size) in entries {
+      hasher.update(data: Data("\(relativePath):\(size)".utf8))
+      if file.pathExtension == "mlmodel" || file.lastPathComponent == "Manifest.json" {
+        guard let data = try? Data(contentsOf: file, options: .mappedIfSafe) else { return nil }
+        hasher.update(data: data)
+      }
+    }
+    let key = hasher.finalize().prefix(16).map { String(format: "%02x", $0) }.joined()
+    let name = resolved.deletingPathExtension().lastPathComponent
+    return caches.appendingPathComponent("coreml_compiled/\(key)/\(name).mlmodelc")
+  }
+
+  private static func moveCompiledModel(_ source: URL, to target: URL) -> Bool {
+    let fileManager = FileManager.default
+    do {
+      try fileManager.createDirectory(
+        at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+      try? fileManager.removeItem(at: target)
+      try fileManager.moveItem(at: source, to: target)
+      return true
+    } catch {
+      return false
+    }
   }
 
   private static func isContiguous(_ array: MLMultiArray) -> Bool {
@@ -304,7 +388,7 @@ public class CoreMLExecutor: NSObject {
 
   deinit {
     clearFeatureVector()
-    if let compiledURL = compiledModelURL {
+    if let compiledURL = compiledModelURL, !compiledModelIsPersistent {
       try? FileManager.default.removeItem(at: compiledURL)
     }
   }
