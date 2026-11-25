@@ -61,7 +61,7 @@ task {
   name: "Image Classification v2 (Online)"
   task_set: "image_classification"
   required_option: "online"
-  max_throughput: 1000
+  max_throughput: 2000
   max_accuracy: 1.0
   scenario: "SingleStream"
   runs {
@@ -118,7 +118,7 @@ task {
 task {
   id: "object_detection"
   name: "Object Detection"
-  max_throughput: 2000
+  max_throughput: 5000
   max_accuracy: 1.0
   scenario: "SingleStream"
   runs {
@@ -175,7 +175,7 @@ task {
 task {
   id: "image_segmentation_v2"
   name: "Image Segmentation v2"
-  max_throughput: 2000
+  max_throughput: 3000
   max_accuracy: 1.0
   scenario: "SingleStream"
   runs {
@@ -231,7 +231,7 @@ task {
 task {
   id: "natural_language_processing"
   name: "Language Understanding"
-  max_throughput: 2000
+  max_throughput: 1300
   max_accuracy: 1.0
   scenario: "SingleStream"
   runs {
@@ -284,7 +284,7 @@ task {
 task {
   id: "super_resolution"
   name: "Super Resolution "
-  max_throughput: 2000
+  max_throughput: 400
   max_accuracy: 1.0
   scenario: "SingleStream"
   runs {
@@ -341,7 +341,7 @@ task {
   name: "Image Classification v2 (Offline)"
   task_set: "image_classification"
   required_option: "offline"
-  max_throughput: 2000
+  max_throughput: 3000
   max_accuracy: 1.0
   scenario: "Offline"
   runs {

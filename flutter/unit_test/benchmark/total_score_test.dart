@@ -39,7 +39,7 @@ Benchmark _benchmark(String id, double maxThroughput, {double? throughput}) {
   return benchmark;
 }
 
-// Mirrors the shipped tasks.pbtxt: one task at 1000, twelve at 2000.
+// 13 tasks with mixed maxima, as in issue #1182's example.
 List<Benchmark> _store({required Set<int> ran, double fraction = 0.5}) {
   return List.generate(13, (i) {
     final max = i == 0 ? 1000.0 : 2000.0;
