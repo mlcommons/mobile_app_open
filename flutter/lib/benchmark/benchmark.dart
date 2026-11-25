@@ -39,18 +39,15 @@ class BenchmarkResult {
   });
 }
 
-// Geometric mean of throughput/max over benchmarks that ran; a run without a
-// usable throughput scores 0, so a failed run is not hidden.
+// Unusable ratios are dropped, not scored 0: the gauge shows 0 as nothing ran.
 num totalScore(Iterable<Benchmark> benchmarks) {
-  final ran = benchmarks.where((b) => b.performanceModeResult != null).toList();
-  if (ran.isEmpty) return 0;
-
-  final product = ran.fold<double>(1, (prev, b) {
-    final value = b.performanceModeResult!.throughput?.value;
-    if (value == null || !(value > 0) || !value.isFinite) return 0;
-    return prev * value / b.info.maxThroughput;
-  });
-  return pow(product, 1.0 / ran.length);
+  final ratios = [
+    for (final b in benchmarks)
+      if (b.performanceModeResult?.throughput?.value case final value?)
+        value / b.info.maxThroughput,
+  ].where((r) => r.isFinite && r > 0).toList();
+  if (ratios.isEmpty) return 0;
+  return exp(ratios.map(log).reduce((a, b) => a + b) / ratios.length);
 }
 
 class BenchmarkBackend {

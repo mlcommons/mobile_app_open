@@ -71,7 +71,7 @@ void main() {
     );
   });
 
-  test('a run that produced no throughput scores 0', () {
+  test('a run that produced no throughput is left out', () {
     final benchmarks = _store(ran: {1, 2});
     benchmarks[3].performanceModeResult = BenchmarkResult(
       throughput: null,
@@ -83,15 +83,24 @@ void main() {
       batchSize: 1,
       loadgenInfo: null,
     );
-    expect(totalScore(benchmarks), 0);
+    expect(totalScore(benchmarks), closeTo(0.5, 1e-9));
   });
 
-  test('a negative throughput scores 0, not NaN', () {
+  test('a negative throughput is left out, not NaN', () {
     final benchmarks = [
       _benchmark('a', 2000, throughput: 1000), // 0.5
       _benchmark('b', 2000, throughput: -1000),
     ];
-    expect(totalScore(benchmarks), 0);
+    expect(totalScore(benchmarks), closeTo(0.5, 1e-9));
+  });
+
+  test('a zero max_throughput is left out, not Infinity', () {
+    final benchmarks = [
+      _benchmark('a', 2000, throughput: 1000), // 0.5
+      _benchmark('b', 0, throughput: 1000),
+      _benchmark('c', 0, throughput: 0),
+    ];
+    expect(totalScore(benchmarks), closeTo(0.5, 1e-9));
   });
 
   test('geometric mean of per-benchmark ratios', () {
