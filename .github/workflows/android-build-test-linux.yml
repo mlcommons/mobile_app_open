@@ -129,9 +129,9 @@ jobs:
           ls mobile_back_samsung/samsung/lib/internal/*
       - name: Download QTI SDK
         env:
-          QTI_SDK: qairt-v2.45.0.260326-linux
+          QTI_SDK: qairt-v2.51.200.261021-linux
         run: |
-          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v6.0/${QTI_SDK}.zip /tmp/ && \
+          gsutil cp gs://mobile-app-build-290400_github-actions/lib/v6.0.2/${QTI_SDK}.zip /tmp/ && \
           unzip /tmp/${QTI_SDK}.zip -d /tmp/${QTI_SDK} && \
           rm /tmp/${QTI_SDK}.zip && \
           mv /tmp/${QTI_SDK}/* mobile_back_qti/

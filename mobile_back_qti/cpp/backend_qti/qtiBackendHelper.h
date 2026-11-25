@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ class qtiBackendHelper {
 
   const char* acceleratorName_;
   bool bgLoad_ = false;
+  std::string soc_latency;
   int queryCount_;
   uint32_t loadOffTime_ = 2;
   uint32_t loadOnTime_ = 100;

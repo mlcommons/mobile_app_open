@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -109,7 +109,21 @@ mlperf_backend_ptr_t mlperf_backend_create(
 
   // use high latency cores for SD8EliteG5 and low latency cores for other
   // devices
-  if (Socs::get_soc_name() == "SD8EliteG5") {
+  if (Socs::get_soc_name() == "SD8EliteExtremeG6" ||
+      Socs::get_soc_name() == "SD8EliteG6") {
+    if (backend_data->soc_latency == "high") {
+      CpuCtrl::highLatency();
+    } else if (backend_data->soc_latency == "normal") {
+      CpuCtrl::normalLatency();
+    } else if (backend_data->soc_latency == "low") {
+      CpuCtrl::lowLatency();
+    } else {
+      LOG(WARNING) << "Unrecognized latency value '"
+                   << backend_data->soc_latency
+                   << "' for SD8G6, defaulting to low latency";
+      CpuCtrl::lowLatency();
+    }
+  } else if (Socs::get_soc_name() == "SD8EliteG5") {
     CpuCtrl::highLatency();
   } else {
     CpuCtrl::lowLatency();

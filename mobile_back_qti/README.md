@@ -12,7 +12,7 @@ uploaded with the other submission files to here: `<path where needs to be uploa
 ## Requirements for LA
 
 <!-- markdown-link-check-disable-next-line -->
-* [Qualcomm QAIRT SDK](https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/2.45.0.260326/v2.45.0.260326.zip)(Version 2.45.0.260326)
+* [Qualcomm QAIRT SDK](https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/2.51.200.261021/v2.51.200.261021.zip)(Version 2.51.200.261021)
 * Linux machine capable of running Ubuntu docker images
 
 ### Optional
@@ -53,6 +53,9 @@ cd DLC/ && make docker/htp-dlc SNPE_SDK=</path/to/QAIRT/SDK>
 ```
 
 It will take about 2 hours on an 8-core Xeon workstation to generate the DLC files.
+
+For regenerating all models (DLCs, Stable Diffusion and Llama-3.1-8B) for a submission, including
+machine sizing and the fixes the upstream instructions need, see [MODEL_GENERATION.md](MODEL_GENERATION.md).
 
 ## Building the MLPerf app with the QTI backend
 

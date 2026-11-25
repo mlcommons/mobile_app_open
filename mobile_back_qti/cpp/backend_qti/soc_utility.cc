@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -66,49 +66,112 @@ std::map<uint32_t, SocInfo> socDetails =
             // num_dsp, num_gpu, num_cpu,
             // useDspFeatures, settings,
             // soc_name, num_inits,
-            // hlc,
-            // llc,
+            // hlc,nlc,llc,
             // max_cores, needs_rpcmem,
             // m_needs_stablediffusion
+            {555, SocInfo(2, 0, 0, 0, true, qti_settings_sd8cxg3, "SDX_Elite",
+                          1, {0, 1, 2, 3},  // HLC
+                          {},               // NLC
+                          {4, 5, 6, 7},     // LLC
+                          8, false)},
+            {538, SocInfo(2, 0, 0, 0, false, qti_settings_sd8cxg3, "SDX_Elite",
+                          1, {0, 1, 2, 3},  // HLC
+                          {},               // NLC
+                          {4, 5, 6, 7},     // LLC
+                          8, true)},
             {655, SocInfo(2, 0, 0, 0, true, qti_settings_sd8sG4, "SD8sG4", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true,
-                          /* stable_diffusion */ true,
-                          /* genie */ false)},
+                          {0, 1, 2, 3},  // HLC
+                          {},            // NLC
+                          {4, 5, 6, 7},  // LLC
+                          8, true,
+                          true,  // stable_diffusion
+                          false  // genie
+                          )},
             {659, SocInfo(2, 0, 0, 0, true, qti_settings_sd7G4, "SD7G4", 1,
-                          std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true,
-                          /* stable_diffusion */ true,
-                          /* genie */ false)},
+                          {0, 1, 2, 3},  // HLC
+                          {},            // NLC
+                          {4, 5, 6, 7},  // LLC
+                          8, true,
+                          true,  // stable_diffusion
+                          false  // genie
+                          )},
             {618, SocInfo(2, 0, 0, 0, true, qti_settings_sd8elite, "SD8Elite",
-                          1, std::vector<int>({0, 1, 2, 3, 4, 5}),
-                          std::vector<int>({6, 7}), 8, true,
-                          /* stable_diffusion */ true,
-                          /* genie */ false)},
+                          1, {0, 1, 2, 3, 4, 5},  // HLC
+                          {},                     // NLC
+                          {6, 7},                 // LLC
+                          8, true,
+                          true,  // stable_diffusion
+                          false  // genie
+                          )},
             {660, SocInfo(2, 0, 0, 0, true, qti_settings_sd8eliteG5,
-                          "SD8EliteG5", 1, std::vector<int>({0, 1, 2, 3, 4}),
-                          std::vector<int>({5, 6, 7}), 8, true,
-                          /* stable_diffusion */ true,
-                          /* genie */ true)},
+                          "SD8EliteG5", 1, {0, 1, 2, 3, 4},  // HLC
+                          {},                                // NLC
+                          {5, 6, 7},                         // LLC
+                          8, true,
+                          true,  // stable_diffusion
+                          true   // genie
+                          )},
+            {722, SocInfo(2, 0, 0, 0, true, qti_settings_sd8eliteG5,
+                          "SD8EliteG5_Alana", 1, {0, 1, 2, 3, 4, 5},  // HLC
+                          {},                                         // NLC
+                          {6, 7},                                     // LLC
+                          8, true,
+                          true  // stable_diffusion
+                          )},
             {685, SocInfo(2, 0, 0, 0, true, qti_settings_sd8G5, "SD8G5", 1,
-                          std::vector<int>({0, 1, 2, 3, 4, 5}),
-                          std::vector<int>({6, 7}), 8, true,
-                          /* stable_diffusion */ true,
-                          /* genie */ false)},
+                          {0, 1, 2, 3, 4, 5},  // HLC
+                          {},                  // NLC
+                          {6, 7},              // LLC
+                          8, true,
+                          true,  // stable_diffusion
+                          false  // genie
+                          )},
+            {707, SocInfo(2, 0, 0, 0, true, qti_settings_sd8eliteEG6,
+                          "SD8EliteExtremeG6", 1, {0, 1, 2},  // HLC
+                          {3, 4, 5},                          // NLC
+                          {6, 7},                             // LLC
+                          8, true,
+                          true,  // stable_diffusion
+                          true   // genie
+                          )},
+            {735, SocInfo(2, 0, 0, 0, true, qti_settings_sd8eliteG6,
+                          "SD8EliteG6", 1, {0, 1, 2},  // HLC
+                          {3, 4, 5},                   // NLC
+                          {6, 7},                      // LLC
+                          8, true,
+                          true,  // stable_diffusion
+                          true   // genie
+                          )},
+            {741, SocInfo(2, 0, 0, 0, true, qti_settings_sd8eliteG6,
+                          "SD8EliteG6", 1, {0, 1, 2},  // HLC
+                          {3, 4, 5},                   // NLC
+                          {6, 7},                      // LLC
+                          8, true,
+                          true,  // stable_diffusion
+                          true   // genie
+                          )},
             {640, SocInfo(2, 0, 0, 0, true, qti_settings_default_dsp, "SD6G4",
-                          1, std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true,
-                          /* stable_diffusion */ false,
-                          /* genie */ false)},
+                          1, {0, 1, 2, 3},  // HLC
+                          {},               // NLC
+                          {4, 5, 6, 7},     // LLC
+                          8, true,
+                          false,  // stable_diffusion
+                          false   // genie
+                          )},
             {636, SocInfo(2, 0, 0, 0, true, qti_settings_default_dsp, "SD6G4",
-                          1, std::vector<int>({0, 1, 2, 3}),
-                          std::vector<int>({4, 5, 6, 7}), 8, true,
-                          /* stable_diffusion */ false,
-                          /* genie */ false)},
+                          1, {0, 1, 2, 3},  // HLC
+                          {},               // NLC
+                          {4, 5, 6, 7},     // LLC
+                          8, true,
+                          false,  // stable_diffusion
+                          false   // genie
+                          )},
             {UNSUPPORTED_SOC_ID,
              SocInfo(2, 0, 0, 0, false, qti_settings_default_dsp, "Snapdragon",
-                     1, std::vector<int>({0, 1, 2, 3}),
-                     std::vector<int>({4, 5, 6, 7}), 8, false)},
+                     1, {0, 1, 2, 3},  // HLC
+                     {},               // NLC
+                     {4, 5, 6, 7},     // LLC
+                     8, false)},
         })
         .m_soc_details;
 
@@ -461,11 +524,14 @@ void Socs::set_use_dsp_features(bool flag) {
 
 void Socs::define_soc(std::vector<uint32_t> &allcores,
                       std::vector<uint32_t> &low_latency_cores,
+                      std::vector<uint32_t> &normal_latency_cores,
                       std::vector<uint32_t> &high_latency_cores,
                       int &maxcores) {
   soc_info_init();
   high_latency_cores.assign(m_soc_info.m_high_latency_cores.begin(),
                             m_soc_info.m_high_latency_cores.end());
+  normal_latency_cores.assign(m_soc_info.m_normal_latency_cores.begin(),
+                              m_soc_info.m_normal_latency_cores.end());
   low_latency_cores.assign(m_soc_info.m_low_latency_cores.begin(),
                            m_soc_info.m_low_latency_cores.end());
   maxcores = m_soc_info.m_max_cores;

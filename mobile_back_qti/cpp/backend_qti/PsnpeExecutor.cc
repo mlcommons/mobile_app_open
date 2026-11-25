@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -134,9 +134,9 @@ void PsnpeExecutor::Init(const char* model_path) {
   }
 
   if (profilingLevel_ != SNPE_PROFILING_LEVEL_OFF) {
-    auto diagLogHandle = Snpe_SNPE_GetDiagLogInterface_Ref(snpe_->snpeHandle);
-    if (!diagLogHandle) LOG(INFO) << "Get diagLogHandle failed";
-    auto optionsHandle = Snpe_IDiagLog_GetOptions(diagLogHandle);
+    diagLogHandle_ = Snpe_SNPE_GetDiagLogInterface_Ref(snpe_->snpeHandle);
+    if (!diagLogHandle_) LOG(INFO) << "Get diagLogHandle failed";
+    auto optionsHandle = Snpe_IDiagLog_GetOptions(diagLogHandle_);
     std::string OutputDir = ".\diaglogs";
 #ifdef __ANDROID__
     OutputDir =
@@ -144,10 +144,19 @@ void PsnpeExecutor::Init(const char* model_path) {
 #endif
     Snpe_Options_SetLogFileDirectory(optionsHandle, OutputDir.c_str());
 
-    if (Snpe_IDiagLog_SetOptions(diagLogHandle, optionsHandle) != SNPE_SUCCESS)
+    // Derive a unique log filename from the model path so consecutive models
+    // don't overwrite each other's diaglog file.
+    std::string modelFile = model_path;
+    auto slash = modelFile.find_last_of("/\\");
+    if (slash != std::string::npos) modelFile = modelFile.substr(slash + 1);
+    auto dot = modelFile.rfind('.');
+    if (dot != std::string::npos) modelFile = modelFile.substr(0, dot);
+    Snpe_Options_SetLogFileName(optionsHandle, (modelFile + ".log").c_str());
+
+    if (Snpe_IDiagLog_SetOptions(diagLogHandle_, optionsHandle) != SNPE_SUCCESS)
       LOG(INFO) << "Failed to set DiagLog options";
 
-    if (Snpe_IDiagLog_Start(diagLogHandle) != SNPE_SUCCESS)
+    if (Snpe_IDiagLog_Start(diagLogHandle_) != SNPE_SUCCESS)
       LOG(INFO) << "Failed to start logger ";
   }
 }

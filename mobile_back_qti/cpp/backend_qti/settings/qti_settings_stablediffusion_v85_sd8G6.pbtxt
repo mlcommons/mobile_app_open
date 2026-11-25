@@ -1,0 +1,46 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
+benchmark_setting {
+  benchmark_id: "stable_diffusion"
+  framework: "QNN"
+  custom_setting {
+    id: "pipeline"
+    value: "StableDiffusionPipeline"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "false"
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "QNN_DSP"
+    accelerator_name: "snpe_dsp"
+    accelerator_desc: "DSP"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v85_sd8G6/betas.bin"
+      model_checksum: "09d2e4306d319caf1b34e6afb5c63c22"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v85_sd8G6/lambdas.bin"
+      model_checksum: "c7179725ec31a6e2c7daf008a5e1ff23"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v85_sd8G6/sd_precompute_data.tar"
+      model_checksum: "cac2a6133d45a3dde3d34120aeb5694f"
+    }
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v85_sd8G6/text_encoder.serialized.bin"
+      model_checksum: "2e01243279994db2928eb66a43606602"
+    }
+    model_file: {
+        model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v85_sd8G6/unet.serialized.bin"
+        model_checksum: "4a9f0c8bbcd2404ee47594c696eb9e17"
+    }
+    model_file: {
+        model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v85_sd8G6/vae_decoder.serialized.bin"
+        model_checksum: "53fd9e92f2855f4591cfca5418138a80"
+    }
+  }
+  delegate_selected: "QNN_DSP"
+}

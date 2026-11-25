@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -66,11 +66,12 @@ void SnpeExecutor::set_runtime_config() {
     auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
 
     Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
-    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    setupPerfHandle();
+    Snpe_RuntimeConfig_SetCustomPerfProfile(runtimeConfigHandle,
+                                            customPerfProfile_);
     Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
                                     runtimeConfigHandle);
     Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
-    setupPerfHandle();
     Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
   }
 
@@ -80,11 +81,12 @@ void SnpeExecutor::set_runtime_config() {
     }
     auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
     Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
-    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    setupPerfHandle();
+    Snpe_RuntimeConfig_SetCustomPerfProfile(runtimeConfigHandle,
+                                            customPerfProfile_);
     Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
                                     runtimeConfigHandle);
     Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
-    setupPerfHandle();
     Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
   }
 
@@ -94,11 +96,12 @@ void SnpeExecutor::set_runtime_config() {
     }
     auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
     Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
-    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    setupPerfHandle();
+    Snpe_RuntimeConfig_SetCustomPerfProfile(runtimeConfigHandle,
+                                            customPerfProfile_);
     Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
                                     runtimeConfigHandle);
     Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
-    setupPerfHandle();
     Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
   }
 
@@ -108,12 +111,12 @@ void SnpeExecutor::set_runtime_config() {
     }
     auto runtimeConfigHandle = Snpe_RuntimeConfig_Create();
     Snpe_RuntimeConfig_SetRuntime(runtimeConfigHandle, runtime);
-    Snpe_RuntimeConfig_SetPerformanceProfile(runtimeConfigHandle, perfProfile_);
+    setupPerfHandle();
+    Snpe_RuntimeConfig_SetCustomPerfProfile(runtimeConfigHandle,
+                                            customPerfProfile_);
     Snpe_RuntimeConfigList_PushBack(runtimeConfigsListHandle,
                                     runtimeConfigHandle);
     Snpe_RuntimeList_Add(inputRuntimeListHandle, runtime);
-    setupPerfHandle();
-
     Snpe_RuntimeConfig_Delete(runtimeConfigHandle);
   }
 }
@@ -149,7 +152,8 @@ void SnpeExecutor::Init(const char *model_path) {
     Snpe_StringList_Handle_t outputTensors =
         ResolveCommaSeparatedList_utils(snpeOutputTensors_);
     setupPerfHandle();
-    Snpe_SNPEBuilder_SetPerformanceProfile(snpeBuilderHandle, perfProfile_);
+    Snpe_SNPEBuilder_SetCustomPerfProfile(snpeBuilderHandle,
+                                          customPerfProfile_);
     Snpe_SNPEBuilder_SetProfilingLevel(snpeBuilderHandle, profilingLevel_);
     Snpe_SNPEBuilder_SetExecutionPriorityHint(snpeBuilderHandle,
                                               SNPE_EXECUTION_PRIORITY_HIGH);
@@ -185,10 +189,22 @@ void SnpeExecutor::Init(const char *model_path) {
     LOG(FATAL) << "Error in init of the model " << snpe_;
   }
 
+  // VTCM retention: keep VTCM allocated across inferences of the same graph,
+  // eliminating per-inference re-allocation overhead. Must be called after
+  // Build and before the first execute.
+  if (useVtcmRetention_) {
+    if (Snpe_SNPE_SetDspVtcmRetention(snpe_->snpeHandle, "", true) ==
+        SNPE_SUCCESS) {
+      LOG(INFO) << "VTCM retention enabled";
+    } else {
+      LOG(WARNING) << "VTCM retention requested but no HTP subnet was updated";
+    }
+  }
+
   if (profilingLevel_ != SNPE_PROFILING_LEVEL_OFF) {
-    auto diagLogHandle = Snpe_SNPE_GetDiagLogInterface_Ref(snpe_->snpeHandle);
-    if (!diagLogHandle) LOG(INFO) << "Get diagLogHandle failed";
-    auto optionsHandle = Snpe_IDiagLog_GetOptions(diagLogHandle);
+    diagLogHandle_ = Snpe_SNPE_GetDiagLogInterface_Ref(snpe_->snpeHandle);
+    if (!diagLogHandle_) LOG(INFO) << "Get diagLogHandle failed";
+    auto optionsHandle = Snpe_IDiagLog_GetOptions(diagLogHandle_);
     std::string OutputDir = ".\diaglogs";
 #ifdef __ANDROID__
     OutputDir =
@@ -196,10 +212,19 @@ void SnpeExecutor::Init(const char *model_path) {
 #endif
     Snpe_Options_SetLogFileDirectory(optionsHandle, OutputDir.c_str());
 
-    if (Snpe_IDiagLog_SetOptions(diagLogHandle, optionsHandle) != SNPE_SUCCESS)
+    // Derive a unique log filename from the model path so consecutive models
+    // don't overwrite each other's diaglog file.
+    std::string modelFile = model_path;
+    auto slash = modelFile.find_last_of("/\\");
+    if (slash != std::string::npos) modelFile = modelFile.substr(slash + 1);
+    auto dot = modelFile.rfind('.');
+    if (dot != std::string::npos) modelFile = modelFile.substr(0, dot);
+    Snpe_Options_SetLogFileName(optionsHandle, (modelFile + ".log").c_str());
+
+    if (Snpe_IDiagLog_SetOptions(diagLogHandle_, optionsHandle) != SNPE_SUCCESS)
       LOG(INFO) << "Failed to set DiagLog options";
 
-    if (Snpe_IDiagLog_Start(diagLogHandle) != SNPE_SUCCESS)
+    if (Snpe_IDiagLog_Start(diagLogHandle_) != SNPE_SUCCESS)
       LOG(INFO) << "Failed to start logger ";
   }
 }
@@ -779,6 +804,166 @@ bool SnpeExecutor::setupPerfHandle() {
       err = Snpe_SNPEPerfProfile_SetHmxVoltageCornerTarget(
           customPerfProfile_, static_cast<Snpe_DspHmx_ExpVoltageCorner_t>(
                                   hmxVoltageCornerMap[value]));
+    } else if (setting == "ADAPTIVE_POLLING_TIME_US") {
+      err = Snpe_SNPEPerfProfile_SetAdaptivePollingTime(customPerfProfile_,
+                                                        std::stoi(value));
+    } else if (setting == "DDR_PERF_MODE") {
+      err = Snpe_SNPEPerfProfile_SetDdrPerfMode(customPerfProfile_,
+                                                value == "true");
+    } else if (setting == "DSP_CENG_VOLTAGE_CORNER_MIN_START") {
+      err = Snpe_SNPEPerfProfile_SetCengVoltageCornerMinStart(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_VoltageCorner_t>(voltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_VOLTAGE_CORNER_TARGET_START") {
+      err = Snpe_SNPEPerfProfile_SetCengVoltageCornerTargetStart(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_VoltageCorner_t>(voltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_VOLTAGE_CORNER_MAX_START") {
+      err = Snpe_SNPEPerfProfile_SetCengVoltageCornerMaxStart(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_VoltageCorner_t>(voltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_CLOCK_PERF_MODE_START") {
+      err = Snpe_SNPEPerfProfile_SetCengClkPerfModeStart(
+          customPerfProfile_,
+          static_cast<Snpe_DspHmx_ClkPerfMode_t>(hmxClkPerfModeMap[value]));
+    } else if (setting == "DSP_CENG_VOLTAGE_CORNER_MIN_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCengVoltageCornerMinDone(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_VoltageCorner_t>(voltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_VOLTAGE_CORNER_TARGET_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCengVoltageCornerTargetDone(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_VoltageCorner_t>(voltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_VOLTAGE_CORNER_MAX_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCengVoltageCornerMaxDone(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_VoltageCorner_t>(voltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_CLOCK_PERF_MODE_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCengClkPerfModeDone(
+          customPerfProfile_,
+          static_cast<Snpe_DspHmx_ClkPerfMode_t>(hmxClkPerfModeMap[value]));
+    } else if (setting == "DSP_CENG_EXP_VOLTAGE_CORNER_MIN_START") {
+      err = Snpe_SNPEPerfProfile_SetCengExpVoltageCornerMinStart(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_EXP_VOLTAGE_CORNER_TARGET_START") {
+      err = Snpe_SNPEPerfProfile_SetCengExpVoltageCornerTargetStart(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_EXP_VOLTAGE_CORNER_MAX_START") {
+      err = Snpe_SNPEPerfProfile_SetCengExpVoltageCornerMaxStart(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_EXP_VOLTAGE_CORNER_MIN_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCengExpVoltageCornerMinDone(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_EXP_VOLTAGE_CORNER_TARGET_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCengExpVoltageCornerTargetDone(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "DSP_CENG_EXP_VOLTAGE_CORNER_MAX_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCengExpVoltageCornerMaxDone(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    }
+
+    else if (setting == "DSP_CENG_EXP_CLOCK_PERF_MODE_START") {
+      err = Snpe_SNPEPerfProfile_SetCengExpClkPerfModeStart(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_ClkPerfMode_t>(clkPerfModeMap[value]));
+    } else if (setting == "DSP_CENG_EXP_CLOCK_PERF_MODE_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCengExpClkPerfModeDone(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_ClkPerfMode_t>(clkPerfModeMap[value]));
+    }
+
+    else if (setting == "BUS_EXP_VOLTAGE_CORNER_MIN_START") {
+      err = Snpe_SNPEPerfProfile_SetBusVoltageCornerExpMinMvStart(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "BUS_EXP_VOLTAGE_CORNER_TARGET_START") {
+      err = Snpe_SNPEPerfProfile_SetBusVoltageCornerExpTargetMvStart(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "BUS_EXP_VOLTAGE_CORNER_MAX_START") {
+      err = Snpe_SNPEPerfProfile_SetBusVoltageCornerExpMaxMvStart(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "BUS_EXP_VOLTAGE_CORNER_MIN_DONE") {
+      err = Snpe_SNPEPerfProfile_SetBusVoltageCornerExpMinMvDone(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "BUS_EXP_VOLTAGE_CORNER_TARGET_DONE") {
+      err = Snpe_SNPEPerfProfile_SetBusVoltageCornerExpTargetMvDone(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "BUS_EXP_VOLTAGE_CORNER_MAX_DONE") {
+      err = Snpe_SNPEPerfProfile_SetBusVoltageCornerExpMaxMvDone(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    }
+
+    else if (setting == "CORE_EXP_VOLTAGE_CORNER_MIN_START") {
+      err = Snpe_SNPEPerfProfile_SetCoreVoltageCornerExpMinMvStart(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "CORE_EXP_VOLTAGE_CORNER_TARGET_START") {
+      err = Snpe_SNPEPerfProfile_SetCoreVoltageCornerExpTargetMvStart(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "CORE_EXP_VOLTAGE_CORNER_MAX_START") {
+      err = Snpe_SNPEPerfProfile_SetCoreVoltageCornerExpMaxMvStart(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "CORE_EXP_VOLTAGE_CORNER_MIN_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCoreVoltageCornerExpMinMvDone(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "CORE_EXP_VOLTAGE_CORNER_TARGET_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCoreVoltageCornerExpTargetMvDone(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "CORE_EXP_VOLTAGE_CORNER_MAX_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCoreVoltageCornerExpMaxMvDone(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    }
+
+    else if (setting == "CORE_CLOCK_PERF_MODE_START") {
+      err = Snpe_SNPEPerfProfile_SetCoreClkPerfModeStart(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_ClkPerfMode_t>(clkPerfModeMap[value]));
+    } else if (setting == "CORE_CLOCK_PERF_MODE_DONE") {
+      err = Snpe_SNPEPerfProfile_SetCoreClkPerfModeDone(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_ClkPerfMode_t>(clkPerfModeMap[value]));
+    } else if (setting == "BUS_CLOCK_PERF_MODE_START") {
+      err = Snpe_SNPEPerfProfile_SetBusClkPerfModeStart(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_ClkPerfMode_t>(clkPerfModeMap[value]));
+    } else if (setting == "BUS_CLOCK_PERF_MODE_DONE") {
+      err = Snpe_SNPEPerfProfile_SetBusClkPerfModeDone(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_ClkPerfMode_t>(clkPerfModeMap[value]));
+    }
+
+    else if (setting == "HMX_EXP_VOLTAGE_CORNER_MIN") {
+      err = Snpe_SNPEPerfProfile_SetHmxExpVoltageCornerMin(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "HMX_EXP_VOLTAGE_CORNER_MAX") {
+      err = Snpe_SNPEPerfProfile_SetHmxExpVoltageCornerMax(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "HMX_EXP_VOLTAGE_CORNER_TARGET") {
+      err = Snpe_SNPEPerfProfile_SetHmxExpVoltageCornerTarget(
+          customPerfProfile_, static_cast<Snpe_DspPerf_ExpVoltageCorner_t>(
+                                  expVoltageCornerMap[value]));
+    } else if (setting == "HMX_CLOCK_PERF_MODE") {
+      err = Snpe_SNPEPerfProfile_SetHmxExpClkPerfMode(
+          customPerfProfile_,
+          static_cast<Snpe_DspPerf_ClkPerfMode_t>(clkPerfModeMap[value]));
     }
     if (err != SNPE_SUCCESS) {
       LOG(ERROR) << "could not parse setting " << setting << std::endl;
@@ -892,7 +1077,7 @@ void SnpeExecutor::setConfigs(const mlperf_backend_configuration_t *configs) {
       customPerfProfileMap_["BUS_VOLTAGE_CORNER_TARGET_DONE"] =
           configs->values[i];
       customPerfProfileMap_["BUS_VOLTAGE_CORNER_MAX_DONE"] = configs->values[i];
-    } else if (strcmp(configs->keys[i], "bus_voltage_done") == 0) {
+    } else if (strcmp(configs->keys[i], "core_voltage_done") == 0) {
       customPerfProfileMap_["CORE_VOLTAGE_CORNER_MIN_DONE"] =
           configs->values[i];
       customPerfProfileMap_["CORE_VOLTAGE_CORNER_TARGET_DONE"] =
@@ -906,10 +1091,99 @@ void SnpeExecutor::setConfigs(const mlperf_backend_configuration_t *configs) {
       customPerfProfileMap_["DSP_HMX_VOLTAGE_CORNER_MIN"] = configs->values[i];
     } else if (strcmp(configs->keys[i], "hmx_clock_perf") == 0) {
       customPerfProfileMap_["DSP_HMX_CLOCK_PERF_MODE"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "ceng_voltage_start") == 0) {
+      customPerfProfileMap_["DSP_CENG_VOLTAGE_CORNER_MIN_START"] =
+          configs->values[i];
+      customPerfProfileMap_["DSP_CENG_VOLTAGE_CORNER_TARGET_START"] =
+          configs->values[i];
+      customPerfProfileMap_["DSP_CENG_VOLTAGE_CORNER_MAX_START"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "ceng_voltage_done") == 0) {
+      customPerfProfileMap_["DSP_CENG_VOLTAGE_CORNER_MIN_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["DSP_CENG_VOLTAGE_CORNER_TARGET_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["DSP_CENG_VOLTAGE_CORNER_MAX_DONE"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "ceng_clock_perf_start") == 0) {
+      customPerfProfileMap_["DSP_CENG_CLOCK_PERF_MODE_START"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "ceng_clock_perf_done") == 0) {
+      customPerfProfileMap_["DSP_CENG_CLOCK_PERF_MODE_DONE"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "ceng_exp_voltage_start") == 0) {
+      customPerfProfileMap_["DSP_CENG_EXP_VOLTAGE_CORNER_MIN_START"] =
+          configs->values[i];
+      customPerfProfileMap_["DSP_CENG_EXP_VOLTAGE_CORNER_TARGET_START"] =
+          configs->values[i];
+      customPerfProfileMap_["DSP_CENG_EXP_VOLTAGE_CORNER_MAX_START"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "ceng_exp_voltage_done") == 0) {
+      customPerfProfileMap_["DSP_CENG_EXP_VOLTAGE_CORNER_MIN_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["DSP_CENG_EXP_VOLTAGE_CORNER_TARGET_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["DSP_CENG_EXP_VOLTAGE_CORNER_MAX_DONE"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "ceng_exp_clock_perf_start") == 0) {
+      customPerfProfileMap_["DSP_CENG_EXP_CLOCK_PERF_MODE_START"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "ceng_exp_clock_perf_done") == 0) {
+      customPerfProfileMap_["DSP_CENG_EXP_CLOCK_PERF_MODE_DONE"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "bus_exp_voltage_start") == 0) {
+      customPerfProfileMap_["BUS_EXP_VOLTAGE_CORNER_MIN_START"] =
+          configs->values[i];
+      customPerfProfileMap_["BUS_EXP_VOLTAGE_CORNER_TARGET_START"] =
+          configs->values[i];
+      customPerfProfileMap_["BUS_EXP_VOLTAGE_CORNER_MAX_START"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "bus_exp_voltage_done") == 0) {
+      customPerfProfileMap_["BUS_EXP_VOLTAGE_CORNER_MIN_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["BUS_EXP_VOLTAGE_CORNER_TARGET_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["BUS_EXP_VOLTAGE_CORNER_MAX_DONE"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "core_exp_voltage_start") == 0) {
+      customPerfProfileMap_["CORE_EXP_VOLTAGE_CORNER_MIN_START"] =
+          configs->values[i];
+      customPerfProfileMap_["CORE_EXP_VOLTAGE_CORNER_TARGET_START"] =
+          configs->values[i];
+      customPerfProfileMap_["CORE_EXP_VOLTAGE_CORNER_MAX_START"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "core_exp_voltage_done") == 0) {
+      customPerfProfileMap_["CORE_EXP_VOLTAGE_CORNER_MIN_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["CORE_EXP_VOLTAGE_CORNER_TARGET_DONE"] =
+          configs->values[i];
+      customPerfProfileMap_["CORE_EXP_VOLTAGE_CORNER_MAX_DONE"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "bus_clock_perf_start") == 0) {
+      customPerfProfileMap_["BUS_CLOCK_PERF_MODE_START"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "bus_clock_perf_done") == 0) {
+      customPerfProfileMap_["BUS_CLOCK_PERF_MODE_DONE"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "core_clock_perf_start") == 0) {
+      customPerfProfileMap_["CORE_CLOCK_PERF_MODE_START"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "core_clock_perf_done") == 0) {
+      customPerfProfileMap_["CORE_CLOCK_PERF_MODE_DONE"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "hmx_exp_voltage") == 0) {
+      customPerfProfileMap_["HMX_EXP_VOLTAGE_CORNER_MIN"] = configs->values[i];
+      customPerfProfileMap_["HMX_EXP_VOLTAGE_CORNER_MAX"] = configs->values[i];
+      customPerfProfileMap_["HMX_EXP_VOLTAGE_CORNER_TARGET"] =
+          configs->values[i];
+    } else if (strcmp(configs->keys[i], "hmx_exp_clock_perf") == 0) {
+      customPerfProfileMap_["HMX_CLOCK_PERF_MODE"] = configs->values[i];
     } else if (strcmp(configs->keys[i], "dsp_start_sleep_latency") == 0) {
       customPerfProfileMap_["DSP_SLEEP_LATENCY_START_US"] = configs->values[i];
     } else if (strcmp(configs->keys[i], "dsp_done_sleep_latency") == 0) {
       customPerfProfileMap_["DSP_SLEEP_LATENCY_DONE_US"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "adaptive_polling") == 0) {
+      customPerfProfileMap_["ADAPTIVE_POLLING_TIME_US"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "ddr_perf_mode") == 0) {
+      customPerfProfileMap_["DDR_PERF_MODE"] = configs->values[i];
+    } else if (strcmp(configs->keys[i], "vtcm_retention") == 0) {
+      useVtcmRetention_ = (std::strcmp(configs->values[i], "true") == 0);
     } else if (strcmp(configs->keys[i], "profiling_level") == 0) {
       profileLevel = configs->values[i];
       if (std::strcmp(configs->values[i], "off") == 0) {
@@ -942,5 +1216,7 @@ void SnpeExecutor::setConfigs(const mlperf_backend_configuration_t *configs) {
             << " | perfProfile: " << perfProfile
             << " | profileLevel: " << profileLevel
             << " | useIonBuffer: " << useIonBuffers_
-            << " | useCpuInt8: " << useCpuInt8_;
+            << " | useCpuInt8: " << useCpuInt8_
+            << " | ddrPerfMode: " << customPerfProfileMap_["DDR_PERF_MODE"]
+            << " | vtcmRetention: " << useVtcmRetention_;
 }

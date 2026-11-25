@@ -61,7 +61,7 @@ Once done,
     sudo make stable_diffusion_qnn SNPE_SDK=<path_to_mobile_app_open>/mobile_back_qti/qairt/<sdk_version>
    ```
 
-* After successful execution, all the artifacts needed to run stable diffusion inference on a device will be located in
+* After successful execution, all the artifacts needed to run stable diffusion inference on device will be located in stable_diffusion* corresponding to device
   `<path_to_mobile_app_open>/output/DLC/mlperf_models/`
 
-* There will be multiple `stable_diffusion*` folders which corresponds to different targets architecture
+* There will be multiple `stable_diffusion*` folders which corresponds to different target architecture

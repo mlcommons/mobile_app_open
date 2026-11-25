@@ -18,28 +18,28 @@ benchmark_setting {
     accelerator_name: "snpe_dsp"
     accelerator_desc: "DSP"
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/stable_diffusion_v73_sd8sG4/betas.bin"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v73_sd8sG4/betas.bin"
       model_checksum: "09d2e4306d319caf1b34e6afb5c63c22"
     }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/stable_diffusion_v73_sd8sG4/lambdas.bin"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v73_sd8sG4/lambdas.bin"
       model_checksum: "c7179725ec31a6e2c7daf008a5e1ff23"
     }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/stable_diffusion_v73_sd8sG4/sd_precompute_data.tar"
-      model_checksum: "4c4bc6652b3f6c0b61de5a2212e1a538"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v73_sd8sG4/sd_precompute_data.tar"
+      model_checksum: "cac2a6133d45a3dde3d34120aeb5694f"
     }
     model_file: {
-      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/stable_diffusion_v73_sd8sG4/text_encoder.serialized.bin"
-      model_checksum: "bf77554a27e38adeaabd4e74a869da76"
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v73_sd8sG4/text_encoder.serialized.bin"
+      model_checksum: "b036cf41583126d0f9d1e01eec23b3c2"
     }
     model_file: {
-        model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/stable_diffusion_v73_sd8sG4/unet.serialized.bin"
-        model_checksum: "d5c7d4b4fff26f92a622ca29b91f4299"
+        model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v73_sd8sG4/unet.serialized.bin"
+        model_checksum: "3af7ee0a99c74f5396721ecb4d1957a9"
     }
     model_file: {
-        model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v5_0_1/qualcomm/stable_diffusion_v73_sd8sG4/vae_decoder.serialized.bin"
-        model_checksum: "1c0ed244d3f4cd5e96ab8ebcd1e7b0d7"
+        model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/stable_diffusion_v73_sd8sG4/vae_decoder.serialized.bin"
+        model_checksum: "626a1a9fb7b2a8aeaa3ffce4ad317d6f"
     }
   }
   delegate_selected: "QNN_DSP"

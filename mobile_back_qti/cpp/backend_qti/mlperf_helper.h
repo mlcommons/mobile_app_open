@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ static void process_config_framework(
         backend_data->backend_type_ = QTI_BACKEND_TYPE_GENIE;
         return;
       }
+    } else if (strcmp(configs->keys[i], "delegate_options_latency") == 0) {
+      backend_data->soc_latency = configs->values[i];
     }
   }
   std::string delegate = configs->accelerator;

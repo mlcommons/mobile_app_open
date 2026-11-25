@@ -75,6 +75,8 @@ cc_library(
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtp.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV81Stub.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV81CalculatorStub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV85Stub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV85CalculatorStub.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpNetRunExtensions.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnSystem.so",
     ],
@@ -88,6 +90,7 @@ cc_library(
         # Hexagon DSP binaries — not aarch64, cannot be linked, deployed to device via ADSP path
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v81/unsigned/libQnnHtpV81Skel.so",
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v81/unsigned/libqnnhtpv81.cat",
+        "qairt/" + SNPE_VERSION + "/lib/hexagon-v85/unsigned/libQnnHtpV85Skel.so",
     ],
     visibility = ["//visibility:public"],
 )
@@ -100,6 +103,7 @@ cc_library(
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV79Stub.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV75Stub.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV73Stub.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpV85Stub.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSNPE.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libSnpeHtpPrepare.so",
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so",
@@ -107,12 +111,15 @@ cc_library(
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v79/unsigned/libSnpeHtpV75Skel.so",
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v81/unsigned/libSnpeHtpV81Skel.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV81Stub.so",
+        "qairt/" + SNPE_VERSION + "/lib/hexagon-v85/unsigned/libSnpeHtpV85Skel.so",
+        "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpV85Stub.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtp.so",
         "qairt/" + SNPE_VERSION + "/lib/aarch64-android/libQnnHtpPrepare.so",
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v73/unsigned/libQnnHtpV73Skel.so",
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v75/unsigned/libQnnHtpV75Skel.so",
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v79/unsigned/libQnnHtpV79Skel.so",
         "qairt/" + SNPE_VERSION + "/lib/hexagon-v81/unsigned/libQnnHtpV81Skel.so",
+        "qairt/" + SNPE_VERSION + "/lib/hexagon-v85/unsigned/libQnnHtpV85Skel.so",
     ],
 )
 
