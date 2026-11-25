@@ -94,7 +94,7 @@ class _BenchmarkExportResultScreenState
         ),
       helper.makeInfo(
         l10n.historyRunDetailsValid,
-        (perf.loadgenInfo?.isResultValid).toString(),
+        perf.loadgenInfo?.isResultValid.toString() ?? l10n.resultsNotAvailable,
       ),
       helper.makeInfo(
         l10n.historyRunDetailsDuration,

@@ -29,6 +29,7 @@ BenchmarkExportResult _exportResult({
   required String benchmarkId,
   required LoadgenInfo? loadgenInfo,
   bool hasPerformanceRun = true,
+  Throughput? throughput = const Throughput(value: 1234.45),
 }) {
   final sample = SampleGenerator();
   final run = sample.runResult;
@@ -41,7 +42,7 @@ BenchmarkExportResult _exportResult({
     backendInfo: base.backendInfo,
     performanceRun: hasPerformanceRun
         ? BenchmarkRunResult(
-            throughput: run.throughput,
+            throughput: throughput,
             accuracy: run.accuracy,
             accuracy2: run.accuracy2,
             dataset: run.dataset,
@@ -114,6 +115,29 @@ void main() {
         invalid,
       );
     });
+
+    for (final (name, throughput) in <(String, Throughput?)>[
+      ('zero', const Throughput(value: 0)),
+      ('null', null),
+    ]) {
+      test('$name throughput is invalid despite valid loadgen flags', () {
+        final result = _exportResult(
+          benchmarkId: BenchmarkId.imageClassificationV2,
+          loadgenInfo: _loadgenInfo(
+            minDurationMet: true,
+            minQueryMet: true,
+            earlyStoppingMet: true,
+          ),
+          throughput: throughput,
+        );
+        expect(
+          PerformanceResultValidityEnum.forBenchmarkExportResult(
+            benchmarkExportResult: result,
+          ),
+          invalid,
+        );
+      });
+    }
 
     // (minDurationMet, minQueryMet, earlyStoppingMet) -> expected validity
     final regularCases = <(bool, bool, bool, PerformanceResultValidityEnum)>[
