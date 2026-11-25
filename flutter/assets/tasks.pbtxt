@@ -758,7 +758,7 @@ task {
 task {
   id: "stable_diffusion"
   name: "Stable Diffusion"
-  max_throughput: 2000
+  max_throughput: 1
   max_accuracy: 1.0
   scenario: "SingleStream"
   runs {
