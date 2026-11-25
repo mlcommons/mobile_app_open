@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import 'package:collection/collection.dart';
@@ -35,6 +37,30 @@ class BenchmarkResult {
     required this.batchSize,
     required this.loadgenInfo,
   });
+}
+
+// Geometric mean of throughput / maxThroughput over the benchmarks that
+// produced a throughput. Benchmarks that did not run are left out of both
+// the numerator and the denominator, so a partial run is scored on the
+// benchmarks it ran rather than being pulled towards 0 by the rest.
+num totalScore(Iterable<Benchmark> benchmarks) {
+  final ran = benchmarks
+      .where((b) => b.performanceModeResult?.throughput != null)
+      .toList();
+  if (ran.isEmpty) return 0;
+
+  final summaryThroughput = pow(
+    ran.fold<double>(
+      1,
+      (prev, b) => prev * b.performanceModeResult!.throughput!.value,
+    ),
+    1.0 / ran.length,
+  );
+  final maxSummaryThroughput = pow(
+    ran.fold<double>(1, (prev, b) => prev * b.info.maxThroughput),
+    1.0 / ran.length,
+  );
+  return summaryThroughput / maxSummaryThroughput;
 }
 
 class BenchmarkBackend {
