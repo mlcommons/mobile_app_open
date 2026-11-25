@@ -86,6 +86,14 @@ void main() {
     expect(totalScore(benchmarks), 0);
   });
 
+  test('a negative throughput scores 0, not NaN', () {
+    final benchmarks = [
+      _benchmark('a', 2000, throughput: 1000), // 0.5
+      _benchmark('b', 2000, throughput: -1000),
+    ];
+    expect(totalScore(benchmarks), 0);
+  });
+
   test('geometric mean of per-benchmark ratios', () {
     final benchmarks = [
       _benchmark('a', 1000, throughput: 800), // 0.8

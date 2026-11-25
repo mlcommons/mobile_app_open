@@ -43,16 +43,17 @@ class BenchmarkResult {
 // i.e. those with a performanceModeResult. Benchmarks that did not run are
 // left out entirely, so a partial run is scored on the benchmarks it ran
 // rather than being pulled towards 0 by the rest. A run that finished
-// without a throughput (e.g. a missing mlperf_log_detail.txt) counts as a
-// ratio of 0, which makes the score 0 so the failure is not hidden.
+// without a usable throughput (missing, e.g. no mlperf_log_detail.txt, or
+// non-positive or non-finite from a malformed log) counts as a ratio of 0,
+// which makes the score 0 so the failure is not hidden and never NaN.
 num totalScore(Iterable<Benchmark> benchmarks) {
   final ran = benchmarks.where((b) => b.performanceModeResult != null).toList();
   if (ran.isEmpty) return 0;
 
   final product = ran.fold<double>(1, (prev, b) {
-    final throughput = b.performanceModeResult!.throughput;
-    if (throughput == null) return 0;
-    return prev * throughput.value / b.info.maxThroughput;
+    final value = b.performanceModeResult!.throughput?.value;
+    if (value == null || !(value > 0) || !value.isFinite) return 0;
+    return prev * value / b.info.maxThroughput;
   });
   return pow(product, 1.0 / ran.length);
 }
