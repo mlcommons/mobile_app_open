@@ -39,13 +39,8 @@ class BenchmarkResult {
   });
 }
 
-// Geometric mean of throughput / maxThroughput over the benchmarks that ran,
-// i.e. those with a performanceModeResult. Benchmarks that did not run are
-// left out entirely, so a partial run is scored on the benchmarks it ran
-// rather than being pulled towards 0 by the rest. A run that finished
-// without a usable throughput (missing, e.g. no mlperf_log_detail.txt, or
-// non-positive or non-finite from a malformed log) counts as a ratio of 0,
-// which makes the score 0 so the failure is not hidden and never NaN.
+// Geometric mean of throughput/max over benchmarks that ran; a run without a
+// usable throughput scores 0, so a failed run is not hidden.
 num totalScore(Iterable<Benchmark> benchmarks) {
   final ran = benchmarks.where((b) => b.performanceModeResult != null).toList();
   if (ran.isEmpty) return 0;
