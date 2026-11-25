@@ -71,7 +71,7 @@ void main() {
     );
   });
 
-  test('a run without a throughput is left out of both halves', () {
+  test('a run that produced no throughput scores 0', () {
     final benchmarks = _store(ran: {1, 2});
     benchmarks[3].performanceModeResult = BenchmarkResult(
       throughput: null,
@@ -83,7 +83,7 @@ void main() {
       batchSize: 1,
       loadgenInfo: null,
     );
-    expect(totalScore(benchmarks), closeTo(0.5, 1e-9));
+    expect(totalScore(benchmarks), 0);
   });
 
   test('geometric mean of per-benchmark ratios', () {

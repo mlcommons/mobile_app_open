@@ -39,28 +39,22 @@ class BenchmarkResult {
   });
 }
 
-// Geometric mean of throughput / maxThroughput over the benchmarks that
-// produced a throughput. Benchmarks that did not run are left out of both
-// the numerator and the denominator, so a partial run is scored on the
-// benchmarks it ran rather than being pulled towards 0 by the rest.
+// Geometric mean of throughput / maxThroughput over the benchmarks that ran,
+// i.e. those with a performanceModeResult. Benchmarks that did not run are
+// left out entirely, so a partial run is scored on the benchmarks it ran
+// rather than being pulled towards 0 by the rest. A run that finished
+// without a throughput (e.g. a missing mlperf_log_detail.txt) counts as a
+// ratio of 0, which makes the score 0 so the failure is not hidden.
 num totalScore(Iterable<Benchmark> benchmarks) {
-  final ran = benchmarks
-      .where((b) => b.performanceModeResult?.throughput != null)
-      .toList();
+  final ran = benchmarks.where((b) => b.performanceModeResult != null).toList();
   if (ran.isEmpty) return 0;
 
-  final summaryThroughput = pow(
-    ran.fold<double>(
-      1,
-      (prev, b) => prev * b.performanceModeResult!.throughput!.value,
-    ),
-    1.0 / ran.length,
-  );
-  final maxSummaryThroughput = pow(
-    ran.fold<double>(1, (prev, b) => prev * b.info.maxThroughput),
-    1.0 / ran.length,
-  );
-  return summaryThroughput / maxSummaryThroughput;
+  final product = ran.fold<double>(1, (prev, b) {
+    final throughput = b.performanceModeResult!.throughput;
+    if (throughput == null) return 0;
+    return prev * throughput.value / b.info.maxThroughput;
+  });
+  return pow(product, 1.0 / ran.length);
 }
 
 class BenchmarkBackend {
