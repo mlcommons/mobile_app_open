@@ -1,0 +1,475 @@
+# proto-file: flutter/cpp/proto/backend_setting.proto
+# proto-message: BackendSetting
+
+# NOTE: To enable ddr_perf_mode, bus voltage corner must be
+# SNPE_DCVS_VOLTAGE_VCORNER_MAX_VOLTAGE_CORNER, or perf_profile must be burst.
+
+common_setting {
+  id: "num_threads"
+  name: "Number of threads"
+  value {
+    value: "4"
+    name: "4 threads"
+  }
+}
+
+common_setting {
+  id: "profiling_level"
+  name: "profile level"
+  value {
+    value: "off"
+    name: "profile level"
+  }
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_v2"
+  framework: "SNPE"
+  custom_setting {
+    id: "bg_load"
+    value: "false"
+  }
+  custom_setting {
+    id: "adaptive_polling"
+    value: "5"
+  }
+  custom_setting {
+    id: "perf_profile"
+    value: "burst"
+  }
+  custom_setting {
+    id: "ddr_perf_mode"
+    value: "true"
+  }
+  custom_setting {
+    id: "vtcm_retention"
+    value: "true"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "uint_8"
+  }
+  custom_setting {
+    id: "hmx_exp_voltage"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM_L0"
+  }
+  custom_setting {
+    id: "hmx_exp_clock_perf"
+    value: "SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "core_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3_0"
+  }
+  custom_setting {
+    id: "core_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3_0"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "SNPE_DSP"
+    accelerator_name: "snpe_dsp"
+    accelerator_desc: "HTP"
+    model_file: {
+        model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/mobilenet_v4_htp.dlc"
+        model_checksum: "bd772c29476327174d1a079ede823791"
+    }
+  }
+  single_stream_expected_latency_ns: 500000
+  delegate_selected: "SNPE_DSP"
+}
+
+benchmark_setting {
+  benchmark_id: "image_classification_offline_v2"
+  framework: "SNPE"
+  custom_setting {
+    id: "scenario"
+    value: "Offline"
+  }
+  custom_setting {
+    id: "adaptive_polling"
+    value: "5"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "false"
+  }
+  custom_setting {
+    id: "perf_profile"
+    value: "burst"
+  }
+  custom_setting {
+    id: "ddr_perf_mode"
+    value: "true"
+  }
+  custom_setting {
+    id: "use_ion_buffer"
+    value: "false"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "uint_8"
+  }
+  custom_setting {
+    id: "core_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L4"
+  }
+  custom_setting {
+    id: "core_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L4"
+  }
+  custom_setting {
+    id: "hmx_exp_voltage"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR"
+  }
+  custom_setting {
+    id: "hmx_exp_clock_perf"
+    value: "SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "SNPE_DSP"
+    accelerator_name: "psnpe_dsp"
+    accelerator_desc: "HTP"
+    batch_size: 12360
+    model_file: {
+        model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/mobilenet_v4_htp_batched.dlc"
+        model_checksum: "80aee1f0ac2e79e46a61b26b676aa657"
+    }
+  }
+  delegate_selected: "SNPE_DSP"
+}
+
+benchmark_setting {
+  benchmark_id: "object_detection"
+  framework: "SNPE"
+  custom_setting {
+    id: "snpe_output_tensors"
+    value: "Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "false"
+  }
+  custom_setting {
+    id: "perf_profile"
+    value: "burst"
+  }
+  custom_setting {
+    id: "ddr_perf_mode"
+    value: "true"
+  }
+  custom_setting {
+    id: "vtcm_retention"
+    value: "true"
+  }
+  custom_setting {
+    id: "use_ion_buffer"
+    value: "false"
+  }
+  custom_setting {
+    id: "core_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L4"
+  }
+  custom_setting {
+    id: "core_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L4"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "hmx_exp_voltage"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR"
+  }
+  custom_setting {
+    id: "hmx_exp_clock_perf"
+    value: "SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "SNPE_DSP"
+    accelerator_name: "snpe_dsp"
+    accelerator_desc: "HTP"
+    model_file: {
+        model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/ssd_mobiledet_qat_htp.dlc"
+        model_checksum: "3483e501de212ad1fde71d58e891fe3a"
+    }
+  }
+  delegate_selected: "SNPE_DSP"
+  single_stream_expected_latency_ns: 200000
+}
+
+benchmark_setting {
+  benchmark_id: "natural_language_processing"
+  framework: "SNPE"
+  custom_setting {
+    id: "snpe_output_tensors"
+    value: "transpose:0"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "false"
+  }
+  custom_setting {
+    id: "input_buffer_type"
+    value: "float_32"
+  }
+  custom_setting {
+    id: "use_ion_buffer"
+    value: "false"
+  }
+  custom_setting {
+    id: "perf_profile"
+    value: "burst"
+  }
+  custom_setting {
+    id: "ddr_perf_mode"
+    value: "true"
+  }
+  custom_setting {
+    id: "vtcm_retention"
+    value: "true"
+  }
+  custom_setting {
+    id: "hmx_exp_voltage"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM_L1"
+  }
+  custom_setting {
+    id: "hmx_exp_clock_perf"
+    value: "SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH"
+  }
+  custom_setting {
+    id: "core_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L4"
+  }
+  custom_setting {
+    id: "core_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L4"
+  }
+  custom_setting {
+    id: "adaptive_polling"
+    value: "5"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "SNPE_DSP"
+    accelerator_name: "snpe_dsp"
+    accelerator_desc: "DSP"
+    model_file: {
+        model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/mobilebert_quantized_htp.dlc"
+        model_checksum: "801b6e825ec0b5a87cd28bd1b88d847a"
+    }
+  }
+  delegate_selected: "SNPE_DSP"
+}
+
+benchmark_setting {
+  benchmark_id: "image_segmentation_v2"
+  framework: "SNPE"
+  custom_setting {
+    id: "input_buffer_type"
+    value: "uint_8"
+  }
+  custom_setting {
+    id: "bg_load"
+    value: "false"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "int_32"
+  }
+  custom_setting {
+    id: "perf_profile"
+    value: "burst"
+  }
+  custom_setting {
+    id: "ddr_perf_mode"
+    value: "true"
+  }
+  custom_setting {
+    id: "vtcm_retention"
+    value: "true"
+  }
+  custom_setting {
+    id: "core_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L4"
+  }
+  custom_setting {
+    id: "core_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L4"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "hmx_exp_voltage"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR"
+  }
+  custom_setting {
+    id: "hmx_exp_clock_perf"
+    value: "SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "SNPE_DSP"
+    accelerator_name: "snpe_dsp"
+    accelerator_desc: "HTP"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/mobile_mosaic_htp.dlc"
+      model_checksum: "0019f9313e70050df88f9e18d0f77be9"
+    }
+  }
+  delegate_selected: "SNPE_DSP"
+  single_stream_expected_latency_ns: 500000
+}
+
+benchmark_setting {
+  benchmark_id: "super_resolution"
+  framework: "SNPE"
+  custom_setting {
+    id: "bg_load"
+    value: "false"
+  }
+  custom_setting {
+    id: "input_buffer_type"
+    value: "uint_8"
+  }
+  custom_setting {
+    id: "output_buffer_type"
+    value: "uint_8"
+  }
+  custom_setting {
+    id: "perf_profile"
+    value: "burst"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "bus_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3"
+  }
+  custom_setting {
+    id: "core_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L1"
+  }
+  custom_setting {
+    id: "core_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L1"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_start"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  custom_setting {
+    id: "ceng_exp_voltage_done"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM"
+  }
+  custom_setting {
+    id: "hmx_exp_voltage"
+    value: "SNPE_DCVS_EXP_VOLTAGE_VCORNER_SVS_L1"
+  }
+  custom_setting {
+    id: "hmx_exp_clock_perf"
+    value: "SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH"
+  }
+  custom_setting {
+    id: "adaptive_polling"
+    value: "10"
+  }
+  custom_setting {
+    id: "ddr_perf_mode"
+    value: "true"
+  }
+  custom_setting {
+    id: "vtcm_retention"
+    value: "true"
+  }
+  delegate_choice: {
+    priority: 1
+    delegate_name: "SNPE_DSP"
+    accelerator_name: "snpe_dsp"
+    accelerator_desc: "DSP"
+    model_file: {
+      model_path: "https://mobile.mlcommons-storage.org/app-resources/models/v6_0_2/qualcomm/snusr_htp.dlc"
+      model_checksum: "96320092ef165321c652f7679f8dc931"
+    }
+  }
+  delegate_selected: "SNPE_DSP"
+}

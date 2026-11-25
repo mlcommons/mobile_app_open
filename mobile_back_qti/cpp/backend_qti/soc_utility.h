@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -52,9 +52,9 @@ class SocInfo {
 
   SocInfo(int num_dsp, int num_gpu, int num_cpu, int num_gpu_fp16,
           bool useDspFeatures, const std::string settings, std::string soc_name,
-          int num_inits, std::vector<int> hlc, std::vector<int> llc,
-          int max_cores, bool needs_rpcmem, bool needs_stablediffusion = false,
-          bool needs_genie = false)
+          int num_inits, std::vector<int> hlc, std::vector<int> nlc,
+          std::vector<int> llc, int max_cores, bool needs_rpcmem,
+          bool needs_stablediffusion = false, bool needs_genie = false)
       : m_num_dsp(num_dsp),
         m_num_gpu(num_gpu),
         m_num_cpu(num_cpu),
@@ -64,6 +64,7 @@ class SocInfo {
         m_soc_name(soc_name),
         m_num_inits(num_inits),
         m_high_latency_cores(hlc),
+        m_normal_latency_cores(nlc),
         m_low_latency_cores(llc),
         m_max_cores(max_cores),
         m_needs_rpcmem(needs_rpcmem),
@@ -84,6 +85,8 @@ class SocInfo {
         m_settings += qti_settings_stablediffusion_v81_sd8eliteG5;
       else if (m_soc_name == "SD8G5")
         m_settings += qti_settings_stablediffusion_v81_sd8G5;
+      else if (m_soc_name == "SD8EliteExtremeG6" || m_soc_name == "SD8EliteG6")
+        m_settings += qti_settings_stablediffusion_v85_sd8G6;
       else
         // set m_needs_stablediffusion flag to "true" in SocInfo table to enable
         // default stable diffusion settings
@@ -92,7 +95,14 @@ class SocInfo {
     }
     if (m_needs_genie) {
 #ifdef GENIE_FLAG
-      m_settings += qti_settings_genie_llm;
+      if (m_soc_name == "SD8EliteG5")
+        m_settings += qti_settings_genie_llm_sd8eliteG5;
+      else if (m_soc_name == "SD8EliteExtremeG6")
+        m_settings += qti_settings_genie_llm_sd8eliteEG6;
+      else if (m_soc_name == "SD8EliteG6")
+        m_settings += qti_settings_genie_llm_sd8eliteG6;
+      else
+        m_settings += qti_settings_genie_llm;
 #endif
     }
   }
@@ -106,6 +116,7 @@ class SocInfo {
   std::string m_settings;
   std::string m_soc_name;
   std::vector<int> m_high_latency_cores;
+  std::vector<int> m_normal_latency_cores;
   std::vector<int> m_low_latency_cores;
   int m_max_cores;
   bool m_needs_rpcmem;
@@ -152,6 +163,7 @@ class Socs {
 
   static void define_soc(std::vector<uint32_t> &allcores,
                          std::vector<uint32_t> &low_latency_cores,
+                         std::vector<uint32_t> &normal_latency_cores,
                          std::vector<uint32_t> &high_latency_cores,
                          int &maxcore);
 

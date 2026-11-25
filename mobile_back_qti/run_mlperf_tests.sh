@@ -176,7 +176,7 @@ echo "####### Performance:: Image classification offline V2 in progress #######"
 export test_case=image_classification_offline_v2
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL $test_case --mode=PerformanceOnly --scenario=Offline --batch_size=12288 --images_directory=$dataset_path/imagenet/img --offset=0 --output_dir=$test_case$test_case_suffix --min_query_count=24576 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000 --groundtruth_file= --model_file=$models_path/mobilenet_v4_htp_batched_4.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL $test_case --mode=PerformanceOnly --scenario=Offline --batch_size=12360 --images_directory=$dataset_path/imagenet/img --offset=0 --output_dir=$test_case$test_case_suffix --min_query_count=24576 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000 --groundtruth_file= --model_file=$models_path/mobilenet_v4_htp_batched_4.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "Result is" $use_case_results_file >> $results_file
 grep "Samples per second" $use_case_results_file >> $results_file
@@ -258,7 +258,7 @@ echo "####### Accuracy:: Image classification offline V2 in progress #######"
 export test_case=image_classification_offline_v2
 mkdir -p $test_case$test_case_suffix
 export use_case_results_file=$results_prefix$test_case$results_suffix
-./main EXTERNAL $test_case --mode=AccuracyOnly --scenario=Offline --batch_size=12288 --images_directory=$dataset_path/imagenet/img --offset=0 --output_dir=$test_case$test_case_suffix --min_query_count=24576 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000 --groundtruth_file=$dataset_path/imagenet/imagenet_val_full.txt --model_file=$models_path/mobilenet_v4_htp_batched_4.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
+./main EXTERNAL $test_case --mode=AccuracyOnly --scenario=Offline --batch_size=12360 --images_directory=$dataset_path/imagenet/img --offset=0 --output_dir=$test_case$test_case_suffix --min_query_count=24576 --min_duration_ms=0 --single_stream_expected_latency_ns=1000000 --groundtruth_file=$dataset_path/imagenet/imagenet_val_full.txt --model_file=$models_path/mobilenet_v4_htp_batched_4.dlc --lib_path=libqtibackend.so --native_lib_path=. > $use_case_results_file 2>&1
 echo "#######$test_case######" >> $results_file
 grep "Accuracy" $use_case_results_file >> $results_file
 echo "####### Image classification offline V2 is complete #######"

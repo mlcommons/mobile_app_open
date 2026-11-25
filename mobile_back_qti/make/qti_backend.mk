@@ -23,57 +23,68 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
   $(info detected SNPE SDK: ${local_snpe_sdk_root})
   backend_qti_android_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSNPE.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV75Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV73Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV69Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV68Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV69Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV73Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV75Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV79Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV81Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV85Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpPrepare.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libSnpeHtpV75Skel.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libSnpeHtpV75Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v79/unsigned/libSnpeHtpV79Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v81/unsigned/libSnpeHtpV81Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v85/unsigned/libSnpeHtpV85Skel.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtp.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV73Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV75Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV79Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV81Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV85Stub.so \
     ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libQnnHtpV73Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libQnnHtpV75Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v79/unsigned/libQnnHtpV79Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v81/unsigned/libQnnHtpV81Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v85/unsigned/libQnnHtpV85Skel.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnSystem.so \
     ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so
   backend_qti_cmdline_files=${BAZEL_LINKS_PREFIX}bin/mobile_back_qti/cpp/backend_qti/libqtibackend.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSNPE.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV75Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV73Stub.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV69Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV68Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV69Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV73Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV75Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV79Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV81Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpV85Stub.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libSnpeHtpPrepare.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libSnpeHtpV75Skel.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v68/unsigned/libSnpeHtpV68Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v69/unsigned/libSnpeHtpV69Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libSnpeHtpV73Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libSnpeHtpV75Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v79/unsigned/libSnpeHtpV79Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v81/unsigned/libSnpeHtpV81Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v85/unsigned/libSnpeHtpV85Skel.so \
+    mobile_back_qti/run_mlperf_tests.sh \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtp.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV73Stub.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libQnnHtpV73Skel.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV75Stub.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libQnnHtpV75Skel.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV79Stub.so \
-    ${local_snpe_sdk_root}/lib/hexagon-v79/unsigned/libQnnHtpV79Skel.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV81Stub.so \
+    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV85Stub.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v73/unsigned/libQnnHtpV73Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v75/unsigned/libQnnHtpV75Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v79/unsigned/libQnnHtpV79Skel.so \
     ${local_snpe_sdk_root}/lib/hexagon-v81/unsigned/libQnnHtpV81Skel.so \
+    ${local_snpe_sdk_root}/lib/hexagon-v85/unsigned/libQnnHtpV85Skel.so \
     ${local_snpe_sdk_root}/lib/aarch64-android/libQnnSystem.so \
     ${BAZEL_LINKS_PREFIX}bin/flutter/android/commonlibs/lib_arm64/libc++_shared.so
 
+  backend_qti_android_target_sd=//mobile_back_qti/cpp/backend_qti/StableDiffusion:stableDiffusion
+  backend_qti_android_flags=
   backend_qti_android_target=//mobile_back_qti/cpp/backend_qti:libqtibackend.so \
                                  //flutter/android/commonlibs:commonlibs
 
@@ -89,7 +100,8 @@ else ifeq ($(WITH_QTI),$(filter $(WITH_QTI),1 2))
 	  ${local_snpe_sdk_root}/lib/aarch64-android/libGenie.so \
 	  ${local_snpe_sdk_root}/lib/aarch64-android/libQnnGenAiTransformer.so \
 	  ${local_snpe_sdk_root}/lib/aarch64-android/libQnnGenAiTransformerModel.so \
-    ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV81CalculatorStub.so \
+	  ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV81CalculatorStub.so \
+	  ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpV85CalculatorStub.so \
 	  ${local_snpe_sdk_root}/lib/aarch64-android/libQnnHtpNetRunExtensions.so
 	backend_qti_android_files+=${genie_libs}
 	backend_qti_cmdline_files+=${genie_libs}

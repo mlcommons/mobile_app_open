@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -127,6 +127,143 @@ class SnpeExecutor : public Executor {
           {"SNPE_DCVS_EXP_VCORNER_MAX",
            DlSystem::DspHmx_ExpVoltageCorner_t::DCVS_EXP_VCORNER_MAX}};
 
+  std::unordered_map<std::string, DlSystem::DspPerfExpVoltageCorner_t>
+      expVoltageCornerMap = {
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_DISABLE",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_DISABLE},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_MIN",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_MIN},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_RET",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_RET},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_MIN_SVS",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_MIN_SVS},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D3_0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D3_0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D3",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D3},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D2_1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D2_1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D2",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D2},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D1_2",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D1_2},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D1_1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D1_1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D1_0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D1_0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D0_1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D0_1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D0_0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D0_0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_D0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_D0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_P1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_P1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_L0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_L0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_L1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_L1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_LOW_SVS_L2",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_LOW_SVS_L2},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_SVS",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_SVS},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_SVS_L0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_SVS_L0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_SVS_L0_1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_SVS_L0_1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_SVS_L0_2",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_SVS_L0_2},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_SVS_L1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_SVS_L1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_SVS_L2",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_SVS_L2},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_SVS_L2_0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_SVS_L2_0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_NOM},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM_L0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_NOM_L0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM_L0_0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_NOM_L0_0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM_L1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_NOM_L1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM_L2",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_NOM_L2},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_NOM_L3",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_NOM_L3},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L1_0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L1_0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L1_1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L1_1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L1_2",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L1_2},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L2",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L2},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L3},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3_0",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L3_0},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3_1",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L3_1},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L3_2",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L3_2},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L4",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L4},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_TUR_L5",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_TUR_L5},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_SUPER_TURBO",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_SUPER_TURBO},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_SUPER_TURBO_NO_CPR",
+           DlSystem::DspPerfExpVoltageCorner_t::
+               DCVS_EXP_VCORNER_SUPER_TURBO_NO_CPR},
+          {"SNPE_DCVS_EXP_VOLTAGE_VCORNER_MAX",
+           DlSystem::DspPerfExpVoltageCorner_t::DCVS_EXP_VCORNER_MAX}};
+
+  std::unordered_map<std::string, DlSystem::DspClkPerfMode_t> clkPerfModeMap = {
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_LOW",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_LOW},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D1",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D1},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D2",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D2},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D3",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D3},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D4",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D4},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D5",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D5},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D6",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D6},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D7",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D7},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D8",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D8},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D9",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D9},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D10",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D10},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D11",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D11},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D12",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D12},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D13",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D13},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D14",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D14},
+      {"SNPE_DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D15",
+       DlSystem::DspClkPerfMode_t::DSP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH_D15}};
   const char* name_ = "snpe";
   static int count, flag;
   Snpe_RuntimeList_Handle_t inputRuntimeListHandle;
@@ -142,12 +279,14 @@ class SnpeExecutor : public Executor {
   std::unordered_map<int, std::string> odLayerMap;
   Snpe_PerformanceProfile_t perfProfile_ = SNPE_PERFORMANCE_PROFILE_BURST;
   Snpe_ProfilingLevel_t profilingLevel_;
+  Snpe_IDiagLog_Handle_t diagLogHandle_ = nullptr;
   int32_t fd = -1;
   bool useIonBuffers_ = true;
   bool useCpuInt8_ = false;
   bool isIonRegistered_;
   int batchSize_;
   int inputBatch_;
+  bool useVtcmRetention_ = false;
   int outputBatchBufsize_;
   int inputBatchBufsize_;
   std::vector<mlperf_data_t> inputFormat_;
@@ -209,6 +348,9 @@ class SnpeExecutor : public Executor {
   };
 
   ~SnpeExecutor() {
+    if (diagLogHandle_) {
+      Snpe_IDiagLog_Stop(diagLogHandle_);
+    }
     Snpe_RuntimeList_Delete(inputRuntimeListHandle);
     Snpe_RuntimeList_Delete(dummyInputRuntimeListHandle);
     Snpe_RuntimeConfigList_Delete(runtimeConfigsListHandle);

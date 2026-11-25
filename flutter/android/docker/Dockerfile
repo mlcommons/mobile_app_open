@@ -17,6 +17,7 @@ RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install 
     pwgen \
     gnupg \
     make \
+    acl \
     protobuf-compiler \
     python3 \
     python3-dev \
@@ -26,7 +27,12 @@ RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python3 -m pip install numpy absl-py
 
-ADD --chmod=755 https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 /usr/local/bin/bazel
+# GitHub release-asset downloads redirect through release-assets.githubusercontent.com,
+# whose CDN occasionally has TLS handshake timeouts. `ADD <url>` has no retry logic,
+# so use curl with retries instead of failing the whole build on a transient blip.
+RUN curl --proto '=https' --retry 5 --retry-all-errors --retry-delay 5 -fSL \
+    -o /usr/local/bin/bazel https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64 && \
+    chmod 755 /usr/local/bin/bazel
 
 ENV ANDROID_SDK_ROOT=/opt/android
 ENV ANDROID_HOME=/opt/android
@@ -142,7 +148,11 @@ RUN apt-get update && apt-get install --no-install-recommends -y mc \
 # Get cmake-3.19.3
 # apt has 3.10.2 as latest version, so remove it
 RUN apt-get remove --no-install-recommends -y cmake
-ADD https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh /opt/cmake-3.19.3-Linux-x86_64.sh
+# See note above on release-assets.githubusercontent.com TLS flakiness: use curl with retries
+# instead of ADD, which fails the whole build on a transient handshake timeout.
+RUN curl --proto '=https' --retry 5 --retry-all-errors --retry-delay 5 -fSL \
+    -o /opt/cmake-3.19.3-Linux-x86_64.sh \
+    https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh
 RUN chmod +x /opt/cmake-3.19.3-Linux-x86_64.sh && mkdir -p /opt/cmake && \
     bash /opt/cmake-3.19.3-Linux-x86_64.sh --skip-license --prefix=/opt/cmake && \
     rm -rf /opt/cmake-3.19.3-Linux-x86_64.sh
@@ -182,7 +192,7 @@ ENV ANDROID_SYSROOT="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroo
 ENV ANDROID_PLATFORM="${API_LEVEL}"
 ENV ANDROID_PLATFORM_TOOLS="${ANDROID_HOME}/platform-tools"
 ENV PATH="${ANDROID_PLATFORM_TOOLS}:${PATH}"
-ENV LD_LIBRARY_PATH="/usr/local/lib/:${LD_LIBRARY_PATH}"
+ENV LD_LIBRARY_PATH="/usr/local/lib/"
 
 # Expose the cmdline-tools under the canonical `latest` directory as well.
 # Flutter 3.44's release app-bundle build runs `apkanalyzer` to verify that

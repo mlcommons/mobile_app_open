@@ -9,7 +9,7 @@ This notebook is intended to run on a machine with:
 * Ubuntu 22.04
 * NVIDIA driver version equivalent to 525.60.13
 * NVIDIA A100 GPU
-* QAIRT version = 2.43.1.260218
+* QAIRT version = 2.51.200.261021
 
 ## Install Notebook for Llama-3.1 8B instruct
 
@@ -29,16 +29,16 @@ docker run --rm --gpus all --name=aimet-dev-torch-gpu -v $PWD:$PWD -w $PWD -v /e
 
 ### Install QAIRT
 
-1. Extract the QAIRT 2.43.1.260218 version sdk using
+1. Extract the QAIRT 2.51.200.261021 version sdk using
 
    ```bash
-   wget https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/2.43.1.260218/v2.43.1.260218.zip
+   wget https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/2.51.200.261021/v2.51.200.261021.zip
    ```
 
 1. Unzip the sdk
 
    ```bash
-   unzip v2.43.1.260218.zip
+   unzip v2.51.200.261021.zip
    ```
 
 1. Copy QAIRT inside notebook folder

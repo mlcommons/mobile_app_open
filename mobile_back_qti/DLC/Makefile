@@ -34,13 +34,13 @@ ${DATASETS_OUT}/state/calibration.stamp:
 	docker/mosaic docker/mosaic_O2 \
 	docker/mobilebert docker/mobilebert_O2 \
 	docker/snusr docker/snusr_O2 \
-	docker/mobilenet_v4_batched docker/mobilenet_v4_batched_O2 \
+	docker/mobilenet_v4_batched  \
 	mobilenet_v4 mobilenet_v4_O2 \
 	mobiledet mobiledet_O2 \
 	mosaic mosaic_O2 \
 	mobilebert mobilebert_O2 \
 	snusr snusr_O2 \
-	mobilenet_v4_batched nodock/mobilenet_v4_batched_O2 \
+	mobilenet_v4_batched \
 	dependencies gen-hta-dlc-info gen-htp-dlc-info clean
 
 DLCBUILDDIR=${BUILDDIR}/DLC
@@ -70,6 +70,7 @@ MOBILEDETSSDQAT_MODEL_PATH = ${DLCBUILDDIR}/mobile/vision/mobiledet/uint8/export
 # command in "docker run mlperf_dlc_prepare ...".
 ##########################################################################
 USE_DOCKER ?= 0
+OPTIMIZATION_PRESET ?= 0
 
 ifeq ($(USE_DOCKER),1)
 INTERNAL_DOCKER?=0
@@ -110,6 +111,7 @@ docker run \
 	-v ${MOBILEMOSAIC_MODEL_PATH}:/mobile_mosaic \
 	-v ${MOBILEBERT_MODEL_PATH}:/mobilebert_models \
 	-v ${SNUSR_MODEL_PATH}:/snusr_models \
+	-v ${DLCBUILDDIR}:/dlc \
 	-w /output \
 	-u ${USERID}:${GROUPID} \
 	mlperf_dlc_prepare
@@ -460,8 +462,6 @@ docker/snusr_O2:
 docker/mobilenet_v4_batched:
 	$(MAKE) mobilenet_v4_batched USE_DOCKER=1
 
-docker/mobilenet_v4_batched_O2:
-	$(MAKE) mobilenet_v4_batched_O2 USE_DOCKER=1
 
 htp-dlc: mobilenet_v4 \
 	mobilenet_v4_O2 \
@@ -473,9 +473,7 @@ htp-dlc: mobilenet_v4 \
 	mobilebert_O2 \
 	snusr \
 	snusr_O2 \
-	mobilenet_v4_batched \
-	mobilenet_v4_batched_O2
-
+	mobilenet_v4_batched
 
 ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),generate-apirec \
 mobilenet_v4_apirec mobilenet_v4_batched_apirec mosaic_apirec mobilebert_apirec mobiledet_apirec snusr_apirec \
@@ -493,19 +491,21 @@ generate-apirec: mobilenet_v4_apirec \
 	mobilebert_apirec \
 	snusr_apirec
 
+
 mobilenet_v4_batched: \
-    ${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_sm8850.stamp \
+	${DLCBUILDDIR}/mobilenet_v4_htp_batched_10_sm8975.stamp \
+	${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_sm8950.stamp \
+	${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_sm8850.stamp \
     ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.stamp
 
-mobilenet_v4_batched_O2: \
-    ${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_O2_sm8850.stamp \
-    ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.stamp
 
 mobilenet_v4_batched_apirec: \
 	${DLCBUILDDIR}/generate_mobilenet_v4_batched_4_apirec
 
 mosaic: \
-	${DLCBUILDDIR}/mobile_mosaic_htp.stamp
+	${DLCBUILDDIR}/mobile_mosaic_htp.stamp \
+	${DLCBUILDDIR}/mobile_mosaic_htp_sm8975.stamp \
+	${DLCBUILDDIR}/mobile_mosaic_htp_sm8950.stamp
 
 mosaic_O2: \
 	${DLCBUILDDIR}/mobile_mosaic_htp_O2.stamp
@@ -514,7 +514,9 @@ mosaic_apirec: \
 	${DLCBUILDDIR}/generate_mosaic_apirec
 
 mobilenet_v4: \
-	${DLCBUILDDIR}/mobilenet_v4_htp.stamp
+	${DLCBUILDDIR}/mobilenet_v4_htp.stamp \
+	${DLCBUILDDIR}/mobilenet_v4_htp_sm8975.stamp \
+	${DLCBUILDDIR}/mobilenet_v4_htp_sm8950.stamp
 
 mobilenet_v4_O2: \
 	${DLCBUILDDIR}/mobilenet_v4_htp_O2.stamp
@@ -523,7 +525,9 @@ mobilenet_v4_apirec: \
 	${DLCBUILDDIR}/generate_mobilenet_v4_apirec
 
 mobiledet: \
-	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.stamp
+	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.stamp \
+	${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8975.stamp \
+	${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8950.stamp
 
 mobiledet_O2: \
 	${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.stamp
@@ -532,7 +536,9 @@ mobiledet_apirec: \
 	${DLCBUILDDIR}/generate_mobiledet_apirec
 
 mobilebert: \
-	${DLCBUILDDIR}/mobilebert_htp.stamp
+	${DLCBUILDDIR}/mobilebert_htp.stamp \
+	${DLCBUILDDIR}/mobilebert_htp_sm8975.stamp \
+	${DLCBUILDDIR}/mobilebert_htp_sm8950.stamp
 
 mobilebert_O2: \
 	${DLCBUILDDIR}/mobilebert_htp_O2.stamp
@@ -541,7 +547,9 @@ mobilebert_apirec: \
 	${DLCBUILDDIR}/generate_mobilebert_apirec
 
 snusr : \
-	${DLCBUILDDIR}/snusr_htp.stamp
+	${DLCBUILDDIR}/snusr_htp.stamp \
+	${DLCBUILDDIR}/snusr_htp_sm8975.stamp \
+	${DLCBUILDDIR}/snusr_htp_sm8950.stamp
 
 snusr_O2 : \
 	${DLCBUILDDIR}/snusr_htp_O2.stamp
@@ -570,6 +578,7 @@ text_encoder: \
 	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v73_sd7G4.stamp \
 	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v81_sd8eliteG5.stamp \
 	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v81_sd8G5.stamp \
+	${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v85_sd8G6.stamp \
 
 vae_decoder: \
 	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator.stamp \
@@ -579,6 +588,7 @@ vae_decoder: \
 	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v73_sd7G4.stamp \
 	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v81_sd8eliteG5.stamp \
 	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v81_sd8G5.stamp \
+	${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v85_sd8G6.stamp \
 
 
 unet: \
@@ -589,6 +599,7 @@ unet: \
 	${DLCBUILDDIR}/unet_qnn_context_binary_generator_v73_sd7G4.stamp \
 	${DLCBUILDDIR}/unet_qnn_context_binary_generator_v81_sd8eliteG5.stamp \
 	${DLCBUILDDIR}/unet_qnn_context_binary_generator_v81_sd8G5.stamp \
+	${DLCBUILDDIR}/unet_qnn_context_binary_generator_v85_sd8G6.stamp \
 
 mlperf_models: \
 	${DLCBUILDDIR}/mlperf_models.stamp
@@ -642,6 +653,7 @@ ${DLCBUILDDIR}/mobilenet_v4_quant.stamp: \
 	# Mobilenetedge TPU model conversion completed
 	touch $@
 
+
 ${DLCBUILDDIR}/mobilenet_v4_htp_sm8750.stamp: \
 		$(DOCKER_STAMP) \
 		${DLCBUILDDIR}/mobilenet_v4_quant.stamp \
@@ -660,6 +672,7 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_sm8750.stamp: \
 
 ${DLCBUILDDIR}/mobilenet_v4_htp_sm7550.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_htp_sm8750.stamp \
 	# Offline prepare of MobilenetV4 DLC for HTP
 	$(DOCKER_RUN_SNPE_IMAGENET) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -668,14 +681,14 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_sm7550.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp.dlc \
 			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm6650,sm7635
+			--htp_socs=sm7550,sm6650,sm7635,sm7325
 	# MobilenetV4 TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobilenet_v4_htp_sm8850.stamp: \
 		$(DOCKER_STAMP) \
-		${DLCBUILDDIR}/mobilenet_v4_quant.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_htp_sm7550.stamp \
 	# Offline prepare of MobilenetV4 DLC for HTP
 	$(DOCKER_RUN_SNPE_IMAGENET) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -688,12 +701,53 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_sm8850.stamp: \
 	# MobilenetV4 TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
+${DLCBUILDDIR}/mobilenet_v4_htp_sm8975.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_htp_sm8850.stamp \
+	# Offline prepare of MobilenetV4 DLC for HTP
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp.dlc \
+			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8975 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--memorymapped_buffer_hint=true \
+			--num_hvx_threads=6 \
+			--htp_cached_weights=true
+	# MobilenetV4 TPU model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_htp_sm8950.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_htp_sm8975.stamp \
+	# Offline prepare of MobilenetV4 DLC for HTP
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--num_hvx_threads=2 \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp.dlc \
+			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8950 \
+			--optimization_preset 26 \
+			--memorymapped_buffer_hint=true \
+			--htp_cached_weights=true
+	# MobilenetV4 TPU model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
 
 ${DLCBUILDDIR}/mobilenet_v4_htp.stamp: \
 		$(DOCKER_STAMP) \
 		${DLCBUILDDIR}/mobilenet_v4_htp_sm8750.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_sm7550.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_sm8850.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_htp_sm8975.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_htp_sm8950.stamp \
 	# Offline prepare of MobilenetV4 DLC for HTP
 	$(DOCKER_RUN_SNPE_IMAGENET) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -702,7 +756,7 @@ ${DLCBUILDDIR}/mobilenet_v4_htp.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp.dlc \
 			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
 	# MobilenetV4 TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -723,8 +777,27 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8750.stamp: \
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
+${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8975.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8750.stamp \
+	# Offline prepare of MobilenetEdgeTPU DLC for HTP
+	$(DOCKER_RUN_SNPE_IMAGENET) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_O2.dlc \
+			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_O2.dlc \
+			--optimization_level 2 \
+			--htp_socs=sm8975 \
+			--num_hvx_threads=6 \
+			--htp_cached_weights=true
+	# Mobilenetedge TPU model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp_O2.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
 ${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm7550.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8975.stamp \
 	# Offline prepare of MobilenetEdgeTPU DLC for HTP
 	$(DOCKER_RUN_SNPE_IMAGENET) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -733,13 +806,14 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm7550.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_O2.dlc \
 			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm6650,sm7635
+			--htp_socs=sm7550,sm6650,sm7635,sm7325
 	# Mobilenetedge TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8850.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm7550.stamp \
 	# Offline prepare of MobilenetV4 DLC for HTP
 	$(DOCKER_RUN_SNPE_IMAGENET) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -749,7 +823,7 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8850.stamp: \
 			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_O2.dlc \
 			--optimization_level 2 \
 			--htp_socs=sm8850 \
-			 --memorymapped_buffer_hint=true
+			--memorymapped_buffer_hint=true
 	# MobilenetV4 TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -759,6 +833,7 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_O2.stamp: \
 		${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8750.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm7550.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8850.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_htp_O2_sm8975.stamp \
 	# Offline prepare of MobilenetEdgeTPU DLC for HTP
 	$(DOCKER_RUN_SNPE_IMAGENET) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -767,7 +842,7 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_O2.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_O2.dlc \
 			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
 	# Mobilenetedge TPU model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -816,21 +891,69 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_sm8850.stamp: \
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_8.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
-${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_O2_sm8850.stamp: \
+${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_sm8950.stamp: \
 		$(DOCKER_STAMP) \
-		${DLCBUILDDIR}/mobilenet_v4_quant_batched_8.stamp
+		${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_sm8850.stamp
 	# Offline prepare of MobilenetV4 Batched DLC for HTP
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
-			--num_hvx_threads=8 \
-			--input_dlc=$(SNPE_OUT)/mobilenet_v4_quant_batched_8.dlc \
-			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_8_O2.dlc \
-			--optimization_level 2 \
-			--htp_socs=sm8850 \
+			--num_hvx_threads=2 \
+			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_8.dlc \
+			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_8.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8950 \
+			--optimization_preset 26 \
 			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
 			--memorymapped_buffer_hint=true
 	# MobilenetV4 model conversion completed
-	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_8_O2.dlc ${MLPERF_MODELS_PATH}
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_8.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_float_batched_10.dlc: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/mlperf_models.stamp
+	# MobilenetV4 TPU model conversion ....
+	# Batched Float model (batch=10)
+	mkdir -p ${DLCBUILDDIR}
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-tensorflow-to-dlc \
+			-i $(SNPE_MOBILENETV4_DIR)/ \
+			-d inputs "10,384,384,3" --out_node "probs" \
+			-o $(SNPE_OUT)/mobilenet_v4_float_batched_10.dlc
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_quant_batched_10.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/imagenet/imagenet_image_384_list.txt \
+		${DLCBUILDDIR}/mobilenet_v4_float_batched_10.dlc
+	# Quantization of MobilenetV4 Batched DLC for HTP (batch=10)
+	$(SNPE_IMAGENET_CD) $(DOCKER_RUN_SNPE_IMAGENET) \
+		$(SNPE_BIN)/snpe-dlc-quant \
+			--input_dlc=$(SNPE_OUT)/mobilenet_v4_float_batched_10.dlc \
+			--input_list=$(IMAGENET_BUILD_DIR)/imagenet_image_384_list.txt \
+			--output_dlc=$(SNPE_OUT)/mobilenet_v4_quant_batched_10.dlc
+	# MobilenetV4 model conversion completed
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_htp_batched_10_sm8975.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_quant_batched_10.stamp
+	# Offline prepare of MobilenetV4 Batched DLC for HTP
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--input_dlc=$(SNPE_OUT)/mobilenet_v4_quant_batched_10.dlc \
+			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8975 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--memorymapped_buffer_hint=true \
+			--num_hvx_threads=6
+	# MobilenetV4 model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobilenet_v4_float_batched_4.dlc: \
@@ -877,6 +1000,7 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8750.stamp: \
 
 ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm7550.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8750.stamp \
 	# Offline prepare of MobilenetV4 Batched DLC for HTP
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -884,13 +1008,14 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm7550.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4.dlc \
 			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm6650,sm7635
+			--htp_socs=sm7550,sm6650,sm7635,sm7325
 	# MobilenetV4 model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8850.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm7550.stamp \
 	# Offline prepare of MobilenetV4 Batched DLC for HTP
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -903,11 +1028,47 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8850.stamp: \
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
+${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8975.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8850.stamp
+	# Offline prepare of MobilenetV4 Batched DLC for HTP
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4.dlc \
+			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8975 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--memorymapped_buffer_hint=true \
+			--num_hvx_threads=6
+	# MobilenetV4 model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8950.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8975.stamp
+	# Offline prepare of MobilenetV4 Batched DLC for HTP
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--num_hvx_threads=2 \
+			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4.dlc \
+			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8950 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--memorymapped_buffer_hint=true
+	# MobilenetV4 model conversion completed
+	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+	
 ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.stamp: \
 		$(DOCKER_STAMP) \
 		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8750.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm7550.stamp \
 		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8850.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8975.stamp \
+		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_sm8950.stamp \
 	# Offline prepare of MobilenetV4 Batched DLC for HTP
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -915,70 +1076,11 @@ ${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4.dlc \
 			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
 	# MobilenetV4 model conversion completed
 	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
-${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm8750.stamp: \
-		$(DOCKER_STAMP) \
-		${DLCBUILDDIR}/mobilenet_v4_quant_batched_4.stamp
-	# Offline prepare of MobilenetV4 Batched DLC for HTP
-	$(DOCKER_RUN_SNPE) \
-		$(SNPE_BIN)/snpe-dlc-graph-prepare \
-			--num_hvx_threads=6 \
-			--input_dlc=$(SNPE_OUT)/mobilenet_v4_quant_batched_4.dlc \
-			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4_O2.dlc \
-			--optimization_level 2 \
-			--htp_socs=sm8750,sm8845
-	# MobilenetV4 model conversion completed
-	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.dlc ${MLPERF_MODELS_PATH}
-	touch $@
-
-${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm7550.stamp: \
-		$(DOCKER_STAMP) \
-	# Offline prepare of MobilenetV4 Batched DLC for HTP
-	$(DOCKER_RUN_SNPE) \
-		$(SNPE_BIN)/snpe-dlc-graph-prepare \
-			--num_hvx_threads=2 \
-			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4_O2.dlc \
-			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4_O2.dlc \
-			--optimization_level 2 \
-			--htp_socs=sm7550,sm6650,sm7635
-	# MobilenetV4 model conversion completed
-	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.dlc ${MLPERF_MODELS_PATH}
-	touch $@
-
-${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm8850.stamp: \
-		$(DOCKER_STAMP) \
-	# Offline prepare of MobilenetV4 Batched DLC for HTP
-	$(DOCKER_RUN_SNPE) \
-		$(SNPE_BIN)/snpe-dlc-graph-prepare \
-			--num_hvx_threads=8 \
-			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4_O2.dlc \
-			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4_O2.dlc \
-			--optimization_level 2 \
-			--htp_socs=sm8850
-	# MobilenetV4 model conversion completed
-	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.dlc ${MLPERF_MODELS_PATH}
-	touch $@
-
-${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.stamp: \
-		$(DOCKER_STAMP) \
-		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm8750.stamp \
-		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm7550.stamp \
-		${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2_sm8850.stamp \
-	# Offline prepare of MobilenetV4 Batched DLC for HTP
-	$(DOCKER_RUN_SNPE) \
-		$(SNPE_BIN)/snpe-dlc-graph-prepare \
-			--num_hvx_threads=4 \
-			--input_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4_O2.dlc \
-			--output_dlc=$(SNPE_OUT)/mobilenet_v4_htp_batched_4_O2.dlc \
-			--optimization_level 2 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x
-	# MobilenetV4 model conversion completed
-	cp	${DLCBUILDDIR}/mobilenet_v4_htp_batched_4_O2.dlc ${MLPERF_MODELS_PATH}
-	touch $@
 
 ${DLCBUILDDIR}/ssd_mobiledet_qat.dlc: \
 		$(DOCKER_STAMP) \
@@ -1029,6 +1131,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8750.stamp: \
 
 ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm7550.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8750.stamp \
 	# Offline prepare of MobileDET SSD DLC for HTP
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1038,7 +1141,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm7550.stamp: \
 			--output_dlc=$(SNPE_OUT)/ssd_mobiledet_qat_htp.dlc \
 			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm6650,sm7635 \
+			--htp_socs=sm7550,sm6650,sm7635,sm7325 \
 			--memorymapped_buffer_hint=true
 	# SSD MobileDET model offline prepare for HTP completed
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.dlc ${MLPERF_MODELS_PATH}
@@ -1046,6 +1149,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm7550.stamp: \
 
 ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8850.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm7550.stamp \
 	# Offline prepare of MobileDET SSD DLC for HTP
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1060,11 +1164,55 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8850.stamp: \
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
+${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8975.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8850.stamp
+	# Offline prepare of MobileDET SSD DLC for HTP
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/ssd_mobiledet_qat_htp.dlc \
+			--output_dlc=$(SNPE_OUT)/ssd_mobiledet_qat_htp.dlc \
+			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
+			--optimization_level 3 \
+			--htp_socs=sm8975 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--memorymapped_buffer_hint=true \
+			--num_hvx_threads=6 \
+			--htp_cached_weights=true
+	# SSD MobileDET model offline prepare for HTP completed
+	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8950.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8975.stamp
+	# Offline prepare of MobileDET SSD DLC for HTP
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--num_hvx_threads=2 \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/ssd_mobiledet_qat_htp.dlc \
+			--output_dlc=$(SNPE_OUT)/ssd_mobiledet_qat_htp.dlc \
+			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
+			--optimization_level 3 \
+			--htp_socs=sm8950 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--memorymapped_buffer_hint=true \
+			--htp_cached_weights=true
+	# SSD MobileDET model offline prepare for HTP completed
+	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
 ${DLCBUILDDIR}/ssd_mobiledet_qat_htp.stamp: \
 		$(DOCKER_STAMP) \
 		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8750.stamp \
 		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm7550.stamp \
 		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8850.stamp \
+		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8975.stamp \
+		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_sm8950.stamp \
 	# Offline prepare of MobileDET SSD DLC for HTP
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1074,7 +1222,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp.stamp: \
 			--output_dlc=$(SNPE_OUT)/ssd_mobiledet_qat_htp.dlc \
 			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
 	# SSD MobileDET model offline prepare for HTP completed
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -1097,6 +1245,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm8750.stamp: \
 
 ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm7550.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm8750.stamp
 	# Offline prepare of MobileDET SSD DLC for HTP
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1105,14 +1254,14 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm7550.stamp: \
 			--output_dlc=$(SNPE_OUT)/ssd_mobiledet_qat_htp_O2.dlc \
 			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm6650,sm7635
+			--htp_socs=sm7550,sm6650,sm7635,sm7325
 	# SSD MobileDET model offline prepare for HTP completed
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm8850.stamp: \
 		$(DOCKER_STAMP) \
-		${DLCBUILDDIR}/ssd_mobiledet_qat_quant.stamp
+		${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2_sm7550.stamp \
 	# Offline prepare of MobileDET SSD DLC for HTP
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1140,7 +1289,7 @@ ${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.stamp: \
 			--output_dlc=$(SNPE_OUT)/ssd_mobiledet_qat_htp_O2.dlc \
 			--set_output_tensors="Postprocessor/BatchMultiClassNonMaxSuppression_classes,Postprocessor/BatchMultiClassNonMaxSuppression_num_detections,detection_scores:0,detection_boxes:0"\
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm7325,sm8450,sm8550,sm7475,sc8380xp,sc8280x
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
 	# SSD MobileDET model offline prepare for HTP completed
 	cp	${DLCBUILDDIR}/ssd_mobiledet_qat_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -1220,6 +1369,7 @@ ${DLCBUILDDIR}/mobilebert_htp_sm8750.stamp: \
 
 ${DLCBUILDDIR}/mobilebert_htp_sm7550.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilebert_htp_sm8750.stamp \
 	# MobileBERT quant model offline prepare ...
 	mkdir -p ${DLCBUILDDIR}
 	$(DOCKER_RUN_SNPE) \
@@ -1230,12 +1380,13 @@ ${DLCBUILDDIR}/mobilebert_htp_sm7550.stamp: \
 			--output_dlc=$(SNPE_OUT)/mobilebert_quantized_htp.dlc \
 			--set_output_tensors="transpose:0" \
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm6650,sm7635
+			--htp_socs=sm7550,sm6650,sm7635,sm7325
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobilebert_htp_sm8850.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilebert_htp_sm7550.stamp \
 	# MobileBERT quant model offline prepare ...
 	mkdir -p ${DLCBUILDDIR}
 	$(DOCKER_RUN_SNPE) \
@@ -1250,11 +1401,55 @@ ${DLCBUILDDIR}/mobilebert_htp_sm8850.stamp: \
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
+${DLCBUILDDIR}/mobilebert_htp_sm8975.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilebert_htp_sm8850.stamp
+	# MobileBERT quant model offline prepare ...
+	mkdir -p ${DLCBUILDDIR}
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/mobilebert_quantized_htp.dlc \
+			--output_dlc=$(SNPE_OUT)/mobilebert_quantized_htp.dlc \
+			--set_output_tensors="transpose:0" \
+			--optimization_level 3 \
+			--htp_socs=sm8975 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--memorymapped_buffer_hint=true \
+			--num_hvx_threads=6 \
+			--htp_cached_weights=true
+	cp	${DLCBUILDDIR}/mobilebert_quantized_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobilebert_htp_sm8950.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilebert_htp_sm8975.stamp
+	# MobileBERT quant model offline prepare ...
+	mkdir -p ${DLCBUILDDIR}
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--num_hvx_threads=2 \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/mobilebert_quantized_htp.dlc \
+			--output_dlc=$(SNPE_OUT)/mobilebert_quantized_htp.dlc \
+			--set_output_tensors="transpose:0" \
+			--optimization_level 3 \
+			--htp_socs=sm8950 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--memorymapped_buffer_hint=true \
+			--htp_cached_weights=true		
+	cp	${DLCBUILDDIR}/mobilebert_quantized_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
 ${DLCBUILDDIR}/mobilebert_htp.stamp: \
 		$(DOCKER_STAMP) \
 		${DLCBUILDDIR}/mobilebert_htp_sm8750.stamp \
 		${DLCBUILDDIR}/mobilebert_htp_sm7550.stamp \
 		${DLCBUILDDIR}/mobilebert_htp_sm8850.stamp \
+		${DLCBUILDDIR}/mobilebert_htp_sm8975.stamp \
+		${DLCBUILDDIR}/mobilebert_htp_sm8950.stamp \
 	# MobileBERT quant model offline prepare ...
 	mkdir -p ${DLCBUILDDIR}
 	$(DOCKER_RUN_SNPE) \
@@ -1265,7 +1460,7 @@ ${DLCBUILDDIR}/mobilebert_htp.stamp: \
 			--output_dlc=$(SNPE_OUT)/mobilebert_quantized_htp.dlc \
 			--set_output_tensors="transpose:0" \
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
@@ -1288,6 +1483,7 @@ ${DLCBUILDDIR}/mobilebert_htp_O2_sm8750.stamp: \
 
 ${DLCBUILDDIR}/mobilebert_htp_O2_sm7550.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilebert_htp_O2_sm8750.stamp \
 	# MobileBERT quant model offline prepare ...
 	mkdir -p ${DLCBUILDDIR}
 	$(DOCKER_RUN_SNPE) \
@@ -1298,12 +1494,13 @@ ${DLCBUILDDIR}/mobilebert_htp_O2_sm7550.stamp: \
 			--output_dlc=$(SNPE_OUT)/mobilebert_quantized_htp_O2.dlc \
 			--set_output_tensors="transpose:0" \
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm6650,sm7635
+			--htp_socs=sm7550,sm6650,sm7635,sm7325
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobilebert_htp_O2_sm8850.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobilebert_htp_O2_sm7550.stamp \
 	# MobileBERT quant model offline prepare ...
 	mkdir -p ${DLCBUILDDIR}
 	$(DOCKER_RUN_SNPE) \
@@ -1333,7 +1530,7 @@ ${DLCBUILDDIR}/mobilebert_htp_O2.stamp: \
 			--output_dlc=$(SNPE_OUT)/mobilebert_quantized_htp_O2.dlc \
 			--set_output_tensors="transpose:0" \
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
 	cp	${DLCBUILDDIR}/mobilebert_quantized_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
@@ -1377,13 +1574,15 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_sm8750.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobile_mosaic_quant.dlc \
 			--output_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8750,sm8845
+			--htp_socs=sm8750,sm8845 \
+			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobile_mosaic_htp_sm7550.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobile_mosaic_htp_sm8750.stamp \
 	# Offline prepare of Mobile Mosaic DLC
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1392,13 +1591,15 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_sm7550.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
 			--output_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm6650,sm7635
+			--htp_socs=sm7550,sm6650,sm7635,sm7325 \
+			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobile_mosaic_htp_sm8850.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobile_mosaic_htp_sm7550.stamp \
 	# Offline prepare of Mobile Mosaic DLC
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1407,7 +1608,48 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_sm8850.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
 			--output_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8850
+			--htp_socs=sm8850 \
+			--memorymapped_buffer_hint=true
+	#Mobile Mosaic HTP model offline prepare completed
+	cp	${DLCBUILDDIR}/mobile_mosaic_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobile_mosaic_htp_sm8975.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobile_mosaic_htp_sm8850.stamp \
+	# Offline prepare of Mobile Mosaic DLC
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
+			--output_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8975 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--memorymapped_buffer_hint=true \
+			--num_hvx_threads=6 \
+			--htp_cached_weights=true
+	#Mobile Mosaic HTP model offline prepare completed
+	cp	${DLCBUILDDIR}/mobile_mosaic_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/mobile_mosaic_htp_sm8950.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobile_mosaic_htp_sm8975.stamp \
+	# Offline prepare of Mobile Mosaic DLC
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--num_hvx_threads=2 \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
+			--output_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8950 \
+			--optimization_preset 26 \
+			--memorymapped_buffer_hint=true \
+			--htp_cached_weights=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -1417,6 +1659,8 @@ ${DLCBUILDDIR}/mobile_mosaic_htp.stamp: \
 		${DLCBUILDDIR}/mobile_mosaic_htp_sm8750.stamp \
 		${DLCBUILDDIR}/mobile_mosaic_htp_sm7550.stamp \
 		${DLCBUILDDIR}/mobile_mosaic_htp_sm8850.stamp \
+		${DLCBUILDDIR}/mobile_mosaic_htp_sm8975.stamp \
+		${DLCBUILDDIR}/mobile_mosaic_htp_sm8950.stamp \
 	# Offline prepare of Mobile Mosaic DLC
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1425,7 +1669,8 @@ ${DLCBUILDDIR}/mobile_mosaic_htp.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
 			--output_dlc=$(SNPE_OUT)/mobile_mosaic_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -1440,13 +1685,15 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm8750.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobile_mosaic_quant.dlc \
 			--output_dlc=$(SNPE_OUT)/mobile_mosaic_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8750,sm8845
+			--htp_socs=sm8750,sm8845 \
+			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm7550.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm8750.stamp \
 	# Offline prepare of Mobile Mosaic DLC
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1454,13 +1701,15 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm7550.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobile_mosaic_htp_O2.dlc \
 			--output_dlc=$(SNPE_OUT)/mobile_mosaic_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm6650,sm7635
+			--htp_socs=sm7550,sm6650,sm7635,sm7325 \
+			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm8850.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm7550.stamp \
 	# Offline prepare of Mobile Mosaic DLC
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1469,7 +1718,8 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_O2_sm8850.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobile_mosaic_htp_O2.dlc \
 			--output_dlc=$(SNPE_OUT)/mobile_mosaic_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8850
+			--htp_socs=sm8850 \
+			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -1486,7 +1736,8 @@ ${DLCBUILDDIR}/mobile_mosaic_htp_O2.stamp: \
 			--input_dlc=$(SNPE_OUT)/mobile_mosaic_htp_O2.dlc \
 			--output_dlc=$(SNPE_OUT)/mobile_mosaic_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--memorymapped_buffer_hint=true
 	#Mobile Mosaic HTP model offline prepare completed
 	cp	${DLCBUILDDIR}/mobile_mosaic_htp_O2.dlc ${MLPERF_MODELS_PATH}
 	touch $@
@@ -1539,6 +1790,7 @@ ${DLCBUILDDIR}/snusr_htp_sm8750.stamp: \
 
 ${DLCBUILDDIR}/snusr_htp_sm7550.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/snusr_htp_sm8750.stamp \
 	#HTP Graph prepare of SNUSR DLC
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1547,14 +1799,15 @@ ${DLCBUILDDIR}/snusr_htp_sm7550.stamp: \
 			--input_dlc=$(SNPE_OUT)/snusr_htp.dlc \
 			--output_dlc=$(SNPE_OUT)/snusr_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm7550,sm6650,sm7635 \
-			--memorymapped_buffer_hint=true
+			--htp_socs=sm7550,sm6650,sm7635,sm7325 \
+			--memorymapped_buffer_hint=true 
 	#HTP Graph prepare of SNUSR model completed
 	cp	${DLCBUILDDIR}/snusr_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
 ${DLCBUILDDIR}/snusr_htp_sm8850.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/snusr_htp_sm7550.stamp \
 	#HTP Graph prepare of SNUSR DLC
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1569,11 +1822,53 @@ ${DLCBUILDDIR}/snusr_htp_sm8850.stamp: \
 	cp	${DLCBUILDDIR}/snusr_htp.dlc ${MLPERF_MODELS_PATH}
 	touch $@
 
+${DLCBUILDDIR}/snusr_htp_sm8975.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/snusr_htp_sm8850.stamp \
+	#HTP Graph prepare of SNUSR DLC
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/snusr_htp.dlc \
+			--output_dlc=$(SNPE_OUT)/snusr_htp.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8975 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--memorymapped_buffer_hint=true \
+			--num_hvx_threads=6 \
+			--htp_cached_weights=true
+	#HTP Graph prepare of SNUSR model completed
+	cp	${DLCBUILDDIR}/snusr_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
+${DLCBUILDDIR}/snusr_htp_sm8950.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/snusr_htp_sm8975.stamp \
+	#HTP Graph prepare of SNUSR DLC
+	$(DOCKER_RUN_SNPE) \
+		$(SNPE_BIN)/snpe-dlc-graph-prepare \
+			--num_hvx_threads=2 \
+			--htp_dlbc=true \
+			--htp_dlbc_weights=true \
+			--input_dlc=$(SNPE_OUT)/snusr_htp.dlc \
+			--output_dlc=$(SNPE_OUT)/snusr_htp.dlc \
+			--optimization_level 3 \
+			--htp_socs=sm8950 \
+			--optimization_preset $(OPTIMIZATION_PRESET) \
+			--memorymapped_buffer_hint=true \
+			--htp_cached_weights=true
+	#HTP Graph prepare of SNUSR model completed
+	cp	${DLCBUILDDIR}/snusr_htp.dlc ${MLPERF_MODELS_PATH}
+	touch $@
+
 ${DLCBUILDDIR}/snusr_htp.stamp: \
 		$(DOCKER_STAMP) \
 		${DLCBUILDDIR}/snusr_htp_sm8750.stamp \
 		${DLCBUILDDIR}/snusr_htp_sm7550.stamp \
 		${DLCBUILDDIR}/snusr_htp_sm8850.stamp \
+		${DLCBUILDDIR}/snusr_htp_sm8975.stamp \
+		${DLCBUILDDIR}/snusr_htp_sm8950.stamp \
 	#HTP Graph prepare of SNUSR DLC
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1582,7 +1877,7 @@ ${DLCBUILDDIR}/snusr_htp.stamp: \
 			--input_dlc=$(SNPE_OUT)/snusr_htp.dlc \
 			--output_dlc=$(SNPE_OUT)/snusr_htp.dlc \
 			--optimization_level 3 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
 			--memorymapped_buffer_hint=true
 	#HTP Graph prepare of SNUSR model completed
 	cp	${DLCBUILDDIR}/snusr_htp.dlc ${MLPERF_MODELS_PATH}
@@ -1607,6 +1902,7 @@ ${DLCBUILDDIR}/snusr_htp_O2_sm8750.stamp: \
 
 ${DLCBUILDDIR}/snusr_htp_O2_sm7550.stamp: \
         $(DOCKER_STAMP) \
+		${DLCBUILDDIR}/snusr_htp_O2_sm8750.stamp \
 	#HTP Graph prepare of SNUSR DLC
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1614,7 +1910,7 @@ ${DLCBUILDDIR}/snusr_htp_O2_sm7550.stamp: \
 			--input_dlc=$(SNPE_OUT)/snusr_htp_O2.dlc \
 			--output_dlc=$(SNPE_OUT)/snusr_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm7550,sm6650,sm7635 \
+			--htp_socs=sm7550,sm6650,sm7635,sm7325 \
 			--memorymapped_buffer_hint=true
 	#HTP Graph prepare of SNUSR model completed
 	cp	${DLCBUILDDIR}/snusr_htp_O2.dlc ${MLPERF_MODELS_PATH}
@@ -1622,6 +1918,7 @@ ${DLCBUILDDIR}/snusr_htp_O2_sm7550.stamp: \
 
 ${DLCBUILDDIR}/snusr_htp_O2_sm8850.stamp: \
 		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/snusr_htp_O2_sm7550.stamp \
 	#HTP Graph prepare of SNUSR DLC
 	$(DOCKER_RUN_SNPE) \
 		$(SNPE_BIN)/snpe-dlc-graph-prepare \
@@ -1648,7 +1945,7 @@ ${DLCBUILDDIR}/snusr_htp_O2.stamp: \
 			--input_dlc=$(SNPE_OUT)/snusr_htp_O2.dlc \
 			--output_dlc=$(SNPE_OUT)/snusr_htp_O2.dlc \
 			--optimization_level 2 \
-			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm7325,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
+			--htp_socs=sm8650,sm7750,sm8735,sm8635,sm8350,sm8450,sm8550,sm7475,sc8380xp,sc8280x \
 			--memorymapped_buffer_hint=true
 	#HTP Graph prepare of SNUSR model completed
 	cp	${DLCBUILDDIR}/snusr_htp_O2.dlc ${MLPERF_MODELS_PATH}
@@ -1672,6 +1969,7 @@ ${DLCBUILDDIR}/sd_precompute_data.tar: \
 	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
 	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
 	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v75
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v79
@@ -1679,6 +1977,7 @@ ${DLCBUILDDIR}/sd_precompute_data.tar: \
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
 	cp ${DLCBUILDDIR}/stable_diffusion/sd_precompute_data.tar ${MLPERF_MODELS_PATH}/stable_diffusion/.
 	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/lambdas.bin ${MLPERF_MODELS_PATH}/stable_diffusion/.
 	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/betas.bin ${MLPERF_MODELS_PATH}/stable_diffusion/.
@@ -1700,6 +1999,9 @@ ${DLCBUILDDIR}/sd_precompute_data.tar: \
 	cp ${DLCBUILDDIR}/stable_diffusion/sd_precompute_data.tar ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5/.
 	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/lambdas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5/.
 	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/betas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5/.
+	cp ${DLCBUILDDIR}/stable_diffusion/sd_precompute_data.tar ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/lambdas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6/.
+	cp ${DLCBUILDDIR}/stable_diffusion/scheduler/betas.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6/.
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v75
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v79
@@ -1707,6 +2009,7 @@ ${DLCBUILDDIR}/sd_precompute_data.tar: \
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v73_sd7G4
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8eliteG5
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
 	touch $@
 
 ${DLCBUILDDIR}/text_encoder_qnn.cpp: \
@@ -1862,6 +2165,24 @@ ${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v81_sd8G5.stamp: \
 	touch $@
 	# TEXT-ENCODER context binary generation for v81 sd8G5 completed
 
+${DLCBUILDDIR}/text_encoder_qnn_context_binary_generator_v85_sd8G6.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/text_encoder_qnn_model_generator.stamp
+	# TEXT-ENCODER context-binary generation started
+	$(DOCKER_RUN_QNN_TEXT_ENCODER) \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libtext_encoder.so \
+			--binary_file /output/text_encoder.serialized \
+			--config_file /models/mcp_config_v85_sd8G6.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
+	cp ${DLCBUILDDIR}/text_encoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
+	touch $@
+	# TEXT-ENCODER context binary generation for v85 sd8G6 completed
+
 ${DLCBUILDDIR}/vae_decoder_qnn.cpp: \
 		$(DOCKER_STAMP) \
 		${DLCBUILDDIR}/mobile/.stamp \
@@ -2014,6 +2335,24 @@ ${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v81_sd8G5.stamp: \
 	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v81_sd8G5
 	touch $@
 	# VAE context binary generation completed for v81 sd8G5
+
+${DLCBUILDDIR}/vae_decoder_qnn_context_binary_generator_v85_sd8G6.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/vae_decoder_qnn_model_generator.stamp
+	# VAE-DECODER lib generation started
+	$(DOCKER_RUN_QNN_VAE_DECODER) \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libvae_decoder.so \
+			--binary_file /output/vae_decoder.serialized \
+			--config_file /models/mcp_config_v85_sd8G6.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
+	cp ${DLCBUILDDIR}/vae_decoder.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
+	touch $@
+	# VAE context binary generation completed for v85 sd8G6
 
 ${DLCBUILDDIR}/unet_qnn.cpp: \
 		$(DOCKER_STAMP) \
@@ -2170,6 +2509,24 @@ ${DLCBUILDDIR}/unet_qnn_context_binary_generator_v81_sd8G5.stamp: \
 	touch $@
 	# UNET context binary generation completed for v81 sd8G5
 
+${DLCBUILDDIR}/unet_qnn_context_binary_generator_v85_sd8G6.stamp: \
+		$(DOCKER_STAMP) \
+		${DLCBUILDDIR}/mobile/.stamp \
+		${DLCBUILDDIR}/unet_qnn_model_generator.stamp
+	# UNET context binary generation started
+	$(DOCKER_RUN_QNN_UNET) \
+		/qnn_sdk/bin/x86_64-linux-clang/qnn-context-binary-generator \
+			--backend /qnn_sdk/lib/x86_64-linux-clang/libQnnHtp.so \
+			--model /output/model_libs/x86_64-linux-clang/libunet.so \
+			--binary_file /output/unet.serialized \
+			--config_file /models/mcp_config_v85_sd8G6.json
+	mkdir -p ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
+	cp ${DLCBUILDDIR}/unet.serialized.bin ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6/.
+	chmod -R 777 ${MLPERF_MODELS_PATH}/stable_diffusion_v85_sd8G6
+	touch $@
+	# UNET context binary generation completed for v85 sd8G6
+
 
 ####################################################################################
 # CALIBRATION / QUANTIZATION
@@ -2276,12 +2633,11 @@ gen-htp-dlc-info: \
 		$(DOCKER_MOBILE_STAMP) \
 		htp-dlc
 	$(DOCKER_RUN_SNPE) \
-		-v ${DLCBUILDDIR}:/dlc \
 		/bin/bash -c '\
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilenet_v4_htp.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/ssd_mobiledet_qat_htp.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilenet_v4_htp_batched_4.dlc && \
-			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilenet_v4_htp_batched_8_sm8850.dlc && \
+			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilenet_v4_htp_batched_8.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobile_mosaic_htp.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/snusr_htp.dlc && \
 			/snpe_sdk/bin/x86_64-linux-clang/snpe-dlc-info -i /dlc/mobilebert_quantized_htp.dlc'

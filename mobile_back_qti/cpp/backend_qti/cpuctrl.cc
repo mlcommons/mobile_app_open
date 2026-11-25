@@ -1,4 +1,4 @@
-/* Copyright (c) 2020-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+/* Copyright (c) 2020-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ using namespace std::chrono;
   {}
 #define CPU_SET(a, b) \
   {}
+#define CPU_COUNT(a) 0
 #endif
 
 static uint32_t soc_id_ = 0;
@@ -52,6 +53,7 @@ static uint32_t loadOnTime_ = 100;
 static std::thread *thread_ = nullptr;
 #ifdef __ANDROID__
 static cpu_set_t cpusetLow_;
+static cpu_set_t cpusetNormal_;
 static cpu_set_t cpusetHigh_;
 static cpu_set_t cpusetall_;
 #else
@@ -101,18 +103,53 @@ void CpuCtrl::stopLoad() {
   thread_ = nullptr;
 }
 
-void CpuCtrl::lowLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetLow_); }
+void CpuCtrl::lowLatency() {
+  if (CPU_COUNT(&cpusetLow_) == 0) {
+    LOG(INFO) << "No low latency cores configured";
+    return;
+  }
 
-void CpuCtrl::normalLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetall_); }
+  LOG(INFO) << "set to low latency core ";
+  if (SET_AFFINITY(sizeof(cpu_set_t), &cpusetLow_) == -1) {
+    LOG(ERROR) << "sched_setaffinity failed to set to low latency core "
+               << errno;
+  }
+}
 
-void CpuCtrl::highLatency() { SET_AFFINITY(sizeof(cpu_set_t), &cpusetHigh_); }
+void CpuCtrl::normalLatency() {
+  if (CPU_COUNT(&cpusetNormal_) == 0) {
+    LOG(INFO) << "No normal latency cores configured";
+    return;
+  }
+
+  LOG(INFO) << "set to normal latency core ";
+  if (SET_AFFINITY(sizeof(cpu_set_t), &cpusetNormal_) == -1) {
+    LOG(ERROR) << "sched_setaffinity failed to set to normal latency core "
+               << errno;
+  }
+}
+
+void CpuCtrl::highLatency() {
+  if (CPU_COUNT(&cpusetHigh_) == 0) {
+    LOG(INFO) << "No high latency cores configured";
+    return;
+  }
+
+  LOG(INFO) << "set to high latency core ";
+  if (SET_AFFINITY(sizeof(cpu_set_t), &cpusetHigh_) == -1) {
+    LOG(ERROR) << "sched_setaffinity failed to set to high latency core "
+               << errno;
+  }
+}
 
 void CpuCtrl::init() {
   std::vector<uint32_t> allcores;
   std::vector<uint32_t> low_latency_cores;
+  std::vector<uint32_t> normal_latency_cores;
   std::vector<uint32_t> high_latency_cores;
   int maxcores = 0;
-  Socs::define_soc(allcores, low_latency_cores, high_latency_cores, maxcores);
+  Socs::define_soc(allcores, low_latency_cores, normal_latency_cores,
+                   high_latency_cores, maxcores);
 
   for (auto i = 0; i < maxcores; i++) {
     allcores.emplace_back(i);
@@ -121,6 +158,10 @@ void CpuCtrl::init() {
   CPU_ZERO(&cpusetLow_);
   for (auto core : low_latency_cores) {
     CPU_SET(core, &cpusetLow_);
+  }
+  CPU_ZERO(&cpusetNormal_);
+  for (auto core : normal_latency_cores) {
+    CPU_SET(core, &cpusetNormal_);
   }
   CPU_ZERO(&cpusetHigh_);
   for (auto core : high_latency_cores) {

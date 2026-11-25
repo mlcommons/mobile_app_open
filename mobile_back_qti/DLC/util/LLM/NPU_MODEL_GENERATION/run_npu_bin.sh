@@ -63,106 +63,145 @@ else
     echo "Step 1 Notebook already executed"
 fi
 
-step2_success="step2_success.stamp"
-if [ ! -f "$step2_success" ]; then
+asset_dir_name="ar128_ar32_cl512_cl1024_cl2048_cl3072_cl4096"
+generated_asset_dir="Step-2/host_linux/assets/${asset_dir_name}"
 
-    cp "run_example_2.py" "Step-2/host_linux/"
+generate_target() {
+    local target_name="$1"
+    local platform_gen="$2"
+    local soc_id="$3"
+    local dsp_arch="$4"
+    local target_platform="$5"
+    local step2_stamp="step2_${target_name}_success.stamp"
+    local copy_stamp="copy_of_bins_${target_name}.stamp"
+    local package_stamp="package_${target_name}_success.stamp"
+    local target_asset_copy="${asset_dir_name}_${target_name}"
+    local output_dir="mlperf_models/llm_${target_name}"
+    local file
+    local required_file
+    local index
+    local bin_count
 
-    cd "Step-2/host_linux/"
-    python run_example_2.py "$model_name"
+    echo "=============================================="
+    echo "Generating Llama NPU binaries for ${target_name}"
+    echo "TARGET_PLATFORM=${target_platform} PLATFORM_GEN=${platform_gen} soc_id=${soc_id} dsp_arch=${dsp_arch}"
+    echo "=============================================="
 
-    if [ $? -eq 0 ]; then
-        echo "Step2 notebook python script executed successfully"
-        cd "../../"
-        touch "$step2_success"
+    if [ -f "$package_stamp" ] && [ -d "$output_dir" ] \
+        && [ "$(find "$output_dir" -maxdepth 1 -type f -name 'llama3_npu_*_of_6.bin' | wc -l)" -eq 6 ] \
+        && [ -f "$output_dir/htpBackendExtConfig.json" ] \
+        && [ -f "$output_dir/genie_config_npu.json" ]; then
+        echo "${target_name} package already completed"
+        return 0
+    fi
+
+    export TARGET_PLATFORM="$target_platform"
+    export PLATFORM_GEN="$platform_gen"
+
+    if [ ! -f "$step2_stamp" ] || [ ! -d "$generated_asset_dir" ]; then
+        if [ -d "$generated_asset_dir" ]; then
+            rm -rf -- "$generated_asset_dir" || return 1
+        fi
+
+        cp "run_example_2.py" "Step-2/host_linux/" || return 1
+
+        if ! (
+            find Step-2 -type f -exec grep -Il "$(printf '\r')" {} + 2>/dev/null \
+                | xargs -r sed -i 's/\r$//'
+            cd "Step-2/host_linux/" || exit 1
+            python run_example_2.py "$model_name"
+        ); then
+            echo "Error running Step-2 for ${target_name}."
+            return 1
+        fi
+
+        touch "$step2_stamp" || return 1
+        echo "Step-2 completed for ${target_name}"
     else
-        echo "Error running step2 notebook python script."
-        cd "../../"
-        exit 1
+        echo "Step-2 already completed for ${target_name}"
     fi
-else
-    echo "Step 2 Notebook already executed"
-fi
 
-copy_of_bins_success="copy_of_bins_success.stamp"
-if [ ! -f "$copy_of_bins_success" ]; then
-    cp -r "Step-2/host_linux/assets/ar128_ar32_cl512_cl1024_cl2048_cl3072_cl4096" "./"
-    if [ $? -eq 0 ]; then
-        echo "Bins file copied successfully to current folder"
-        touch "$copy_of_bins_success"
+    if [ ! -d "$generated_asset_dir" ]; then
+        echo "Error: generated asset directory not found: $generated_asset_dir"
+        return 1
+    fi
+
+    if [ ! -f "$copy_stamp" ] || [ ! -d "$target_asset_copy" ]; then
+        if [ -e "$target_asset_copy" ]; then
+            rm -rf -- "$target_asset_copy" || return 1
+        fi
+
+        cp -r "$generated_asset_dir" "$target_asset_copy" || return 1
+
+        index=1
+        for file in "$target_asset_copy"/*; do
+            [ -f "$file" ] || continue
+            case "$file" in
+                *.json) continue ;;
+            esac
+
+            mv -- "$file" "$target_asset_copy/llama3_npu_${index}_of_6.bin" || return 1
+            echo "Renamed $file to llama3_npu_${index}_of_6.bin"
+            index=$((index + 1))
+        done
+
+        bin_count=$((index - 1))
+        if [ "$bin_count" -ne 6 ]; then
+            echo "Error: expected 6 generated binaries for ${target_name}, found ${bin_count}."
+            return 1
+        fi
+
+        touch "$copy_stamp" || return 1
+        echo "Bins copied and renamed for ${target_name}"
     else
-        echo "Error copying Bins."
-        exit 1
+        echo "Bins are already copied and renamed for ${target_name}"
     fi
-else
-    echo "Bins are already copied to current folder successfully"
-fi
 
-renaming_file_success="renaming_success.stamp"
-if [ ! -f "$renaming_file_success" ]; then
-    parent_dir="ar128_ar32_cl512_cl1024_cl2048_cl3072_cl4096"
-    cd "$parent_dir" || exit
-    pwd
+    mkdir -p "$output_dir" || return 1
+    rm -f \
+        "$output_dir"/llama3_npu_*_of_6.bin \
+        "$output_dir"/htpBackendExtConfig.json \
+        "$output_dir"/genie_config_npu.json || return 1
 
-    for file in `ls .`; do
-        echo "$file"
-        num=$(echo "$file" | cut -c 67)
-        new_name="llama3_npu_${num}_of_6.bin"
-        mv "$file" "$new_name"
-        echo "Renamed $file to $new_name"
-    done
-    if [ $? -eq 0 ]; then
-        echo "Bins file renamed successfully"
-    else
-        echo "Error in renaming the bins"
-        cd ../
-        exit 1
-    fi
-    cd ../
-    touch "$renaming_file_success"
-else
-    echo "Bins are already renamed"
-fi
+    cp -r "$target_asset_copy/." "$output_dir/" || return 1
 
-copy_htp_backend_extension_success="copy_htp_BE_success.stamp"
-if [ ! -f "$copy_htp_backend_extension_success" ]; then
-    echo '{ "devices": [ { "soc_id": 660, "dsp_arch": "v81", "cores": [ { "core_id": 0, "perf_profile": "burst", "rpc_control_latency": 100 } ], "pd_session": "unsigned" } ], "context": { "weight_sharing_enabled": true, "extended_udma": true }, "memory": { "mem_type": "shared_buffer" }, "groupContext": { "share_resources": false } }' > htpBackendExtConfig.json
-    cp "htpBackendExtConfig.json" "ar128_ar32_cl512_cl1024_cl2048_cl3072_cl4096/"
-    if [ $? -eq 0 ]; then
-        echo "Backend Extension is copied"
-        touch "$copy_htp_backend_extension_success"
-    else
-        echo "Error in copying backend extension"
-        exit 1
-    fi
-    rm htpBackendExtConfig.json
-fi
+    cat > "$output_dir/htpBackendExtConfig.json" <<EOF
+{
+    "devices": [
+        {
+            "soc_id": ${soc_id},
+            "dsp_arch": "${dsp_arch}",
+            "cores": [
+                {
+                    "core_id": 0,
+                    "perf_profile": "burst",
+                    "rpc_control_latency": 100
+                }
+            ],
+            "pd_session": "unsigned"
+        }
+    ],
+    "context": {
+        "weight_sharing_enabled": true,
+        "extended_udma": true
+    },
+    "memory": {
+        "mem_type": "shared_buffer"
+    },
+    "groupContext": {
+        "share_resources": false
+    }
+}
+EOF
 
-rename_to_mlperf_models_success="rename_to_mlperf_models_success.stamp"
-if [ ! -f "$rename_to_mlperf_models_success" ]; then
-    mkdir -p "mlperf_models/llm"
-    cp -r "ar128_ar32_cl512_cl1024_cl2048_cl3072_cl4096/." "mlperf_models/llm/"
-    if [ $? -eq 0 ]; then
-        echo "Contents copied to mlperf_models/llm/"
-        touch "$rename_to_mlperf_models_success"
-    else
-        echo "Error copying contents to mlperf_models/llm/"
-        exit 1
-    fi
-fi
+    cp -f "genie_config_npu.json" "$output_dir/" || return 1
 
-copy_genie_config_success="copy_genie_config_success.stamp"
-if [ ! -f "$copy_genie_config_success" ]; then
-    if [ ! -f "genie_config_npu.json" ]; then
-        echo "Error: genie_config_npu.json not found in current directory."
-        exit 1
-    fi
-    cp "genie_config_npu.json" "mlperf_models/llm/"
-    if [ $? -eq 0 ]; then
-        echo "genie_config_npu.json copied to mlperf_models/llm/"
-        touch "$copy_genie_config_success"
-    else
-        echo "Error copying genie_config_npu.json"
-        exit 1
-    fi
-fi
+    touch "$package_stamp" || return 1
+    echo "Completed ${target_name}: ${output_dir}"
+}
+generate_target "sd8eliteG5" 3 88 v81 "Windows" || exit 1
+generate_target "sd8eliteEG6" 5 103 v85 "Android" || exit 1
+generate_target "sd8eliteG6" 5 103 v85 "Android" || exit 1
+
+
+echo "All target packages generated successfully."

@@ -92,7 +92,7 @@ const Map<String, Map<String, Interval>> _objectDetection = {
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 700, max: 1400),
     _kS24Ultra: Interval(min: 1800, max: 2700),
-    _kS25Ultra: Interval(min: 2000, max: 3500),
+    _kS25Ultra: Interval(min: 2000, max: 4200),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 120, max: 210),
@@ -154,7 +154,7 @@ const Map<String, Map<String, Interval>> _naturalLanguageProcessing = {
   _kQtiBackend: {
     _kS22Ultra: Interval(min: 100, max: 200),
     _kS24Ultra: Interval(min: 250, max: 460),
-    _kS25Ultra: Interval(min: 350, max: 800),
+    _kS25Ultra: Interval(min: 350, max: 1000),
   },
   _kMediatekBackend: {
     _kDN2103: Interval(min: 1, max: 6),
