@@ -398,7 +398,7 @@ task {
 task {
   id: "llm-1b"
   name: "LLM 1B"
-  max_throughput: 2000
+  max_throughput: 100
   max_accuracy: 1.0
   scenario: "SingleStream"
   task_set: "llm"
@@ -458,7 +458,7 @@ task {
 task {
   id: "llm-1b-instruct"
   name: "LLM 1B (instruct)"
-  max_throughput: 2000
+  max_throughput: 100
   max_accuracy: 1.0
   scenario: "SingleStream"
   task_set: "llm"
@@ -518,7 +518,7 @@ task {
 task {
   id: "llm-3b"
   name: "LLM 3B"
-  max_throughput: 2000
+  max_throughput: 50
   max_accuracy: 1.0
   scenario: "SingleStream"
   task_set: "llm"
@@ -578,7 +578,7 @@ task {
 task {
   id: "llm-3b-instruct"
   name: "LLM 3B (instruct)"
-  max_throughput: 2000
+  max_throughput: 50
   max_accuracy: 1.0
   scenario: "SingleStream"
   task_set: "llm"
@@ -638,7 +638,7 @@ task {
 task {
   id: "llm-8b"
   name: "LLM 8B"
-  max_throughput: 2000
+  max_throughput: 20
   max_accuracy: 1.0
   scenario: "SingleStream"
   task_set: "llm"
@@ -698,7 +698,7 @@ task {
 task {
   id: "llm-8b-instruct"
   name: "LLM 8B (instruct)"
-  max_throughput: 2000
+  max_throughput: 20
   max_accuracy: 1.0
   scenario: "SingleStream"
   task_set: "llm"
