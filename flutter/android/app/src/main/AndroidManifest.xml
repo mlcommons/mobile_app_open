@@ -8,7 +8,10 @@
                    android:maxSdkVersion="32"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
                    android:maxSdkVersion="29"/>
-  <uses-feature android:name="android.hardware.npu" /> 
+  <!-- Optional: required="false" keeps Google Play from hiding the app on
+       devices that don't report an NPU. -->
+  <uses-feature android:name="android.hardware.npu"
+                android:required="false"/>
 
   <application android:label="MLPerf Mobile"
                android:icon="@mipmap/ic_launcher"
