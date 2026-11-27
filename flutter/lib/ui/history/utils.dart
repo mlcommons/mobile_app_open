@@ -6,6 +6,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:mlperfbench/benchmark/state.dart';
 import 'package:mlperfbench/data/environment/env_android.dart';
 import 'package:mlperfbench/data/environment/environment_info.dart';
+import 'package:mlperfbench/data/results/benchmark_result.dart';
 import 'package:mlperfbench/localizations/app_localizations.dart';
 import 'package:mlperfbench/ui/app_styles.dart';
 
@@ -114,6 +115,16 @@ class HistoryHelperUtils {
     );
   }
 
+  // A run whose loadgen log was missing is saved with no throughput.
+  String formatThroughput(BenchmarkRunResult? run) {
+    final throughput = run?.throughput;
+    if (throughput == null) return l10n.resultsNotAvailable;
+    final unit = (run?.loadgenInfo?.isTokenBased ?? false)
+        ? l10n.unitTPS
+        : l10n.unitQPS;
+    return '${throughput.toUIString()} $unit';
+  }
+
   String makeSocName(BenchmarkState state, EnvironmentInfo info) {
     switch (info.platform) {
       case EnvPlatform.android:
@@ -150,6 +161,27 @@ class HistoryHelperUtils {
         return windows.cpuFullName;
     }
   }
+}
+
+// Runs saved without a throughput (missing loadgen log) are skipped, not
+// counted as 0, so they do not drag the average down.
+double calculateAverageThroughput(
+  Iterable<BenchmarkExportResult> results, {
+  bool tokenBased = false,
+}) {
+  var throughput = 0.0;
+  var count = 0;
+  for (final item in results) {
+    final run = item.performanceRun;
+    final value = run?.throughput?.value;
+    if (value == null ||
+        (run?.loadgenInfo?.isTokenBased ?? false) != tokenBased) {
+      continue;
+    }
+    throughput += value;
+    count++;
+  }
+  return count == 0 ? 0.0 : throughput / count;
 }
 
 class RowData {

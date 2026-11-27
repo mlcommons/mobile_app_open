@@ -16,8 +16,9 @@ enum PerformanceResultValidityEnum {
     if (benchmarkExportResult == null) {
       return PerformanceResultValidityEnum.invalid;
     }
-    final loadgenInfo = benchmarkExportResult.performanceRun?.loadgenInfo;
-    if (loadgenInfo == null) {
+    final run = benchmarkExportResult.performanceRun;
+    final loadgenInfo = run?.loadgenInfo;
+    if (loadgenInfo == null || !_isUsable(run?.throughput)) {
       return PerformanceResultValidityEnum.invalid;
     }
     final benchmarkId = benchmarkExportResult.benchmarkId;
@@ -33,8 +34,9 @@ enum PerformanceResultValidityEnum {
   }
 
   static PerformanceResultValidityEnum forBenchmark(Benchmark benchmark) {
-    final loadgenInfo = benchmark.performanceModeResult?.loadgenInfo;
-    if (loadgenInfo == null) {
+    final result = benchmark.performanceModeResult;
+    final loadgenInfo = result?.loadgenInfo;
+    if (loadgenInfo == null || !_isUsable(result?.throughput)) {
       return PerformanceResultValidityEnum.invalid;
     }
     final benchmarkId = benchmark.id;
@@ -47,6 +49,12 @@ enum PerformanceResultValidityEnum {
       isMinQueryMet: isMinQueryMet,
       isEarlyStoppingMet: isEarlyStoppingMet,
     );
+  }
+
+  // totalScore drops these runs, so the row has to show the failure.
+  static bool _isUsable(Throughput? throughput) {
+    final value = throughput?.value;
+    return value != null && value.isFinite && value > 0;
   }
 
   static PerformanceResultValidityEnum _performanceResultValidity({

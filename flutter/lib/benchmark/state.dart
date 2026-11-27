@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
@@ -49,29 +48,7 @@ class BenchmarkState extends ChangeNotifier {
 
   ExtendedResult? lastResult;
 
-  num get result {
-    final benchmarksCount = allBenchmarks
-        .where((benchmark) => benchmark.performanceModeResult != null)
-        .length;
-
-    if (benchmarksCount == 0) return 0;
-
-    final summaryThroughput = pow(
-      allBenchmarks.fold<double>(1, (prev, i) {
-        return prev * (i.performanceModeResult?.throughput?.value ?? 1.0);
-      }),
-      1.0 / benchmarksCount,
-    );
-
-    final maxSummaryThroughput = pow(
-      allBenchmarks.fold<double>(1, (prev, i) {
-        return prev * (i.info.maxThroughput);
-      }),
-      1.0 / benchmarksCount,
-    );
-
-    return summaryThroughput / maxSummaryThroughput;
-  }
+  num get result => totalScore(allBenchmarks);
 
   List<Benchmark> get allBenchmarks => _benchmarkStore.allBenchmarks;
 

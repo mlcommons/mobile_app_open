@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import 'package:collection/collection.dart';
@@ -35,6 +37,17 @@ class BenchmarkResult {
     required this.batchSize,
     required this.loadgenInfo,
   });
+}
+
+// Unusable ratios are dropped, not scored 0: the gauge shows 0 as nothing ran.
+num totalScore(Iterable<Benchmark> benchmarks) {
+  final ratios = [
+    for (final b in benchmarks)
+      if (b.performanceModeResult?.throughput?.value case final value?)
+        value / b.info.maxThroughput,
+  ].where((r) => r.isFinite && r > 0).toList();
+  if (ratios.isEmpty) return 0;
+  return exp(ratios.map(log).reduce((a, b) => a + b) / ratios.length);
 }
 
 class BenchmarkBackend {

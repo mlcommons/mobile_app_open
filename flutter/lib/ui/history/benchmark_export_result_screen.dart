@@ -85,7 +85,7 @@ class _BenchmarkExportResultScreenState
     return [
       helper.makeInfo(
         l10n.historyRunDetailsPerfQps,
-        '${perf.throughput!.toUIString()} ${perf.loadgenInfo!.isTokenBased ? l10n.unitTPS : l10n.unitQPS}',
+        helper.formatThroughput(perf),
       ),
       if (perf.loadgenInfo?.isTokenBased ?? false)
         helper.makeInfo(
@@ -94,7 +94,7 @@ class _BenchmarkExportResultScreenState
         ),
       helper.makeInfo(
         l10n.historyRunDetailsValid,
-        (perf.loadgenInfo?.isResultValid).toString(),
+        perf.loadgenInfo?.isResultValid.toString() ?? l10n.resultsNotAvailable,
       ),
       helper.makeInfo(
         l10n.historyRunDetailsDuration,

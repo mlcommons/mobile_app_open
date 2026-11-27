@@ -162,26 +162,6 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
     return ListView(children: _makeBody());
   }
 
-  double calculateAverageThroughput(
-    List<BenchmarkExportResult> results, {
-    bool tokenBased = false,
-  }) {
-    var throughput = 0.0;
-    var count = 0;
-    for (var item in results) {
-      if (item.performanceRun == null ||
-          item.performanceRun!.loadgenInfo!.isTokenBased != tokenBased) {
-        continue;
-      }
-      throughput += item.performanceRun!.throughput!.value;
-      count++;
-    }
-    if (count == 0) {
-      return 0.0;
-    }
-    return throughput / count;
-  }
-
   List<Widget> _makeBody() {
     final res = widget.result;
 
@@ -256,9 +236,7 @@ class _ExtendedResultViewState extends State<ExtendedResultView> {
     return RowData(
       isHeader: false,
       name: runInfo.benchmarkName,
-      throughput: runInfo.performanceRun != null
-          ? '${runInfo.performanceRun!.throughput!.toUIString()} ${runInfo.performanceRun!.loadgenInfo!.isTokenBased ? l10n.unitTPS : l10n.unitQPS}'
-          : l10n.resultsNotAvailable,
+      throughput: helper.formatThroughput(runInfo.performanceRun),
       throughputValid:
           runInfo.performanceRun?.loadgenInfo?.isResultValid ?? false,
       accuracy:
